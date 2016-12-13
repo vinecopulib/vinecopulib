@@ -1,5 +1,5 @@
 file(GLOB_RECURSE common_sources *.cpp *.cc)
-file(GLOB_RECURSE common_headers *.h *.hpp)
+file(GLOB_RECURSE common_headers include/*.h include/*.hpp)
 
 include_directories(${external_includes})
 
