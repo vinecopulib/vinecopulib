@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/tvatter/Dropbox/vinecopula/src/apps/main.cpp
+common/dummy.h
+-
+
+/Users/tvatter/Dropbox/vinecopula/src/common/dummy.h
+

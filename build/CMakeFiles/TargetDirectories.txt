@@ -1,0 +1,8 @@
+/Users/tvatter/Dropbox/vinecopula/build/CMakeFiles/edit_cache.dir
+/Users/tvatter/Dropbox/vinecopula/build/CMakeFiles/rebuild_cache.dir
+/Users/tvatter/Dropbox/vinecopula/build/common/CMakeFiles/edit_cache.dir
+/Users/tvatter/Dropbox/vinecopula/build/common/CMakeFiles/rebuild_cache.dir
+/Users/tvatter/Dropbox/vinecopula/build/common/CMakeFiles/common.dir
+/Users/tvatter/Dropbox/vinecopula/build/apps/CMakeFiles/edit_cache.dir
+/Users/tvatter/Dropbox/vinecopula/build/apps/CMakeFiles/rebuild_cache.dir
+/Users/tvatter/Dropbox/vinecopula/build/apps/CMakeFiles/main.dir
