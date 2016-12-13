@@ -33,7 +33,7 @@
 *.user
 
 #build dirs
-build-*
+build/*
 
 # Ctags
 src/tags
