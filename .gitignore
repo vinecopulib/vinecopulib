@@ -32,8 +32,9 @@
 
 *.user
 
-#build dirs
-build/*
+#build and bin dirs
+bin/
+build/
 
 # Ctags
 src/tags
