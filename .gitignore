@@ -35,6 +35,8 @@
 #build and bin dirs
 bin/
 build/
+cmake-build-debug/
+cmake-build/
 
 # Ctags
 src/tags
