@@ -2,7 +2,7 @@
 // Created by Vatter Thibault on 13/12/16.
 //
 
-#include <common/include/parbicop.h>
+#include <common/include/parbicop.hpp>
 #include <iostream>
 
 int main(int argc, char *argv[]) {

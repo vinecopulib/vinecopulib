@@ -2,9 +2,14 @@
 // Created by Vatter Thibault on 13/12/16.
 //
 
-#include "include/parbicop.h"
+#include "include/parbicop.hpp"
 #include <set>
 #include <boost/assign/list_of.hpp>
+#include <eigen3/Eigen/Dense>
+
+namespace {
+    typedef Eigen::VectorXd dvec;
+}
 
 
 // constructors --------------------------------
@@ -83,4 +88,69 @@ int ParBiCop::calculateNpars()
 
     // if not, it must be a two-parameter family
     return(2);
+}
+
+// hfunctions: the conditioning variable is put second
+dvec ParBiCop::hFunc1(dvec &u1, dvec &u2)
+{
+    int n = u1.size();
+    dvec out(n);
+
+    Hfunc1(&_family, &n, &u2[0], &u1[0], &_par, &_par2, &out[0]);
+
+    return out;
+}
+
+dvec ParBiCop::hFunc2(dvec &u1, dvec &u2)
+{
+    int n = u1.size();
+    dvec out(n);
+
+    Hfunc2(&_family, &n, &u1[0], &u2[0], &_par, &_par2, &out[0]);
+
+    return out;
+}
+
+// PDF
+dvec ParBiCop::PDF(dvec &u1, dvec &u2)
+{
+    int n = u1.size();
+    dvec out(n);
+
+    PDF_seperate(&_family, &n, &u1[0], &u2[0], &_par, &_par2, &out[0]);
+
+    return out;
+};
+
+// fit statistics
+double ParBiCop::logLik(dvec &u1, dvec &u2)
+{
+    int n = u1.size();
+    double out;
+
+    LL_mod2(&_family, &n, &u1[0], &u2[0], &_par, &_par2, &out);
+
+    return out;
+}
+
+double ParBiCop::AIC(dvec &u1, dvec &u2)
+{
+    int n = u1.size();
+    double out;
+
+    LL_mod2(&_family, &n, &u1[0], &u2[0], &_par, &_par2, &out);
+    out = -2 * out + 2 * this->_npars;
+
+    return out;
+}
+
+double ParBiCop::BIC(dvec &u1, dvec &u2)
+{
+    int n = u1.size();
+    double out;
+
+    LL_mod2(&_family, &n, &u1[0], &u2[0], &_par, &_par2, &out);
+    out = -2 * out + log(n) * this->_npars;
+
+    return out;
 }

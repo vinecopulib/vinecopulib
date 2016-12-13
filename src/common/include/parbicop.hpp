@@ -5,11 +5,22 @@
 #ifndef __PARBICOP_H_INCLUDED__
 #define __PARBICOP_H_INCLUDED__
 
-#include "bicop.h"
+#include "bicop.hpp"
+#include <eigen3/Eigen/Dense>
+
+extern "C" {
+#include "hfunc.h"
+}
+
+extern "C" {
+#include "likelihood.h"
+}
 
 class ParBiCop : public BiCop {
 
 public:
+    typedef Eigen::VectorXd dvec;
+
     // constructors --------------------------------
 
     // default constructor (independence copula)
@@ -30,6 +41,18 @@ public:
 
     // calculate number of parameters
     int calculateNpars() ;
+
+    // hfunctions: the conditioning variable is put second
+    dvec hFunc1(dvec &u1, dvec &u2);
+    dvec hFunc2(dvec &u1, dvec &u2);
+
+    // PDF
+    dvec PDF(dvec &u1, dvec &u2);
+
+    // fit statistics
+    double logLik(dvec &u1, dvec &u2);
+    double AIC(dvec &u1, dvec &u2);
+    double BIC(dvec &u1, dvec &u2);
 
 private:
     // copula specification
