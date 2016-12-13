@@ -32,11 +32,12 @@
 
 *.user
 
-#build and bin dirs
+#build, bin and Lion related dirs
 bin/
 build/
 cmake-build-debug/
 cmake-build/
+.idea/
 
 # Ctags
 src/tags
