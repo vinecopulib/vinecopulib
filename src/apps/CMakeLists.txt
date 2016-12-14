@@ -7,7 +7,7 @@ include_directories(${external_includes})
 
 # Create test executables
 set(app_programs
-	main)
+        test_parbicop)
 
 foreach(app ${app_programs})
     add_executable(${app} ${app}.cpp)

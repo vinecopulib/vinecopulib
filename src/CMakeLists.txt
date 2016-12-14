@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(main)
+project(vinecoplib)
 
 include(cmake/options.cmake               REQUIRED)
 
-include(cmake/findGSL.cmake      REQUIRED)
+include(cmake/findGSL.cmake               REQUIRED)
+
+include(cmake/findEigen3.cmake            REQUIRED)
 
 include(cmake/findDependencies.cmake      REQUIRED)
 
