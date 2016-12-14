@@ -3,21 +3,13 @@
 //
 
 
-#include <common/include/par_bicop.hpp>
+#include <common/include/par_bicop.h>
 #include <iostream>
 #include <vector>
 
 using namespace std;
 
 int main(int __unused argc, char __unused *argv[]) {
-
-    // Create a dummy object
-    // ParBiCop a;
-
-//    cout << "An independance copula...\n";
-//    cout << "Family : " << a.get_family() << "\n";
-//    cout << "Parameter : " << a.get_par() << "\n";
-//    cout << "Number of parameters : " << a.get_npars() << "\n \n";
 
 
     vector<int> allfams = {0,1,2,3,4,5,6,7,8,9,10,13,14,16,17,18,19,20,23,24,26,27,28,29,30,23,33,34,36,37,38,39,
@@ -28,9 +20,8 @@ int main(int __unused argc, char __unused *argv[]) {
     vector<int> negfams = {1,2,5,23,24,26,27,28,29,30,33,34,36,37,38,39,40,124,134,224,234};
     vector<int> posfams = {1,2,3,4,5,6,7,8,9,10,13,14,16,17,18,19,20,104,114,204,214};
 
-
     // Iterate and print values of vector
-    cout << "All avalaible families: \n";
+    cout << "All available families: \n";
     for(int n : allfams) {
         cout << n << " ";
     }

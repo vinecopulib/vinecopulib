@@ -4,10 +4,6 @@ project(vinecoplib)
 
 include(cmake/options.cmake               REQUIRED)
 
-include(cmake/findGSL.cmake               REQUIRED)
-
-include(cmake/findEigen3.cmake            REQUIRED)
-
 include(cmake/findDependencies.cmake      REQUIRED)
 
 include(cmake/compilerDefOpt.cmake        REQUIRED)
