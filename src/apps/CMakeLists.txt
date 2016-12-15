@@ -10,7 +10,8 @@ set(app_programs
         test_indep_bicop
         test_normal_bicop
         test_gumbel_bicop
-        test_clayton_bicop)
+        test_clayton_bicop
+        test_frank_bicop)
 
 foreach(app ${app_programs})
     add_executable(${app} ${app}.cpp)
