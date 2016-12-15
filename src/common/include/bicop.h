@@ -6,6 +6,8 @@
 #define VINECOPLIB_BICOP_H_INCLUDED__
 
 #include <Eigen/Dense>
+#include <random>
+#include <nlopt.hpp>
 typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
 
@@ -20,6 +22,14 @@ public:
 
     // PDF
     virtual VecXd pdf(const MatXd &u) = 0;
+
+    // Inverse of the h-functions
+    VecXd hinv1(const MatXd &u);
+    VecXd hinv2(const MatXd &u);
+
+    // Simulation
+    MatXd simulate(int n);
+
 
     // fit statistics
     //virtual double loglik(MatXd u) = 0;

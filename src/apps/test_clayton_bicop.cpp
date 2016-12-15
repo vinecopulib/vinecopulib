@@ -40,7 +40,9 @@ int main(int __unused argc, char __unused *argv[]) {
     std::cout << "generator_derivative2 for u1 = \n" << b.generator_derivative2(U.col(0)) << "\n";
     std::cout << "pdf = \n" << b.pdf(U) << "\n";
     std::cout << "hfunc1 = \n" << b.hfunc1(U) << "\n";
-    std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n \n";
+    std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n";
+    std::cout << "hinv1 = \n" << b.hinv1(U) << "\n";
+    std::cout << "hinv2 = \n" << b.hinv2(U) << "\n \n";
 
     b.set_rotation(180);
     std::cout << "The same clayton copula rotated 180 degrees...\n";
@@ -52,7 +54,9 @@ int main(int __unused argc, char __unused *argv[]) {
     std::cout << "U = \n" << U << "\n";
     std::cout << "pdf = \n" << b.pdf(U) << "\n";
     std::cout << "hfunc1 = \n" << b.hfunc1(U) << "\n";
-    std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n \n";
+    std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n";
+    std::cout << "hinv1 = \n" << b.hinv1(U) << "\n";
+    std::cout << "hinv2 = \n" << b.hinv2(U) << "\n \n";
 
     b.set_rotation(90);
     b.set_parameters(-b.get_parameters());
@@ -65,7 +69,9 @@ int main(int __unused argc, char __unused *argv[]) {
     std::cout << "U = \n" << U << "\n";
     std::cout << "pdf = \n" << b.pdf(U) << "\n";
     std::cout << "hfunc1 = \n" << b.hfunc1(U) << "\n";
-    std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n \n";
+    std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n";
+    std::cout << "hinv1 = \n" << b.hinv1(U) << "\n";
+    std::cout << "hinv2 = \n" << b.hinv2(U) << "\n \n";
 
     b.set_rotation(270);
     std::cout << "The same clayton copula rotated 270 degrees...\n";
@@ -77,6 +83,9 @@ int main(int __unused argc, char __unused *argv[]) {
     std::cout << "U = \n" << U << "\n";
     std::cout << "pdf = \n" << b.pdf(U) << "\n";
     std::cout << "hfunc1 = \n" << b.hfunc1(U) << "\n";
-    std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n \n";
+    std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n";
+    std::cout << "hinv1 = \n" << b.hinv1(U) << "\n";
+    std::cout << "hinv2 = \n" << b.hinv2(U) << "\n \n";
+
     return 0;
 }

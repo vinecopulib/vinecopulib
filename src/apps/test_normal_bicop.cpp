@@ -14,7 +14,7 @@ int main(int __unused argc, char __unused *argv[]) {
     std::cout << "Parameter : " << a.get_parameters() << "\n";
     std::cout << "Number of parameters : " << a.calculate_npars() << "\n \n";
 
-    MatXd U = MatXd::Zero(6,2);
+    /*MatXd U = MatXd::Zero(6,2);
     U(0,0) = 0.3;
     U(0,1) = 1.0;
     U(1,0) = 0.7;
@@ -26,7 +26,12 @@ int main(int __unused argc, char __unused *argv[]) {
     U(4,0) = 0.3;
     U(4,1) = 0.7;
     U(5,0) = 0.7;
-    U(5,1) = 0.3;
+    U(5,1) = 0.3;*/
+    MatXd U = MatXd::Zero(2,2);
+    U(0,0) = 0.3;
+    U(0,1) = 0.4;
+    U(1,0) = 0.8;
+    U(1,1) = 0.6;
     std::cout << "U = \n" << U << "\n";
     std::cout << "pdf = \n" << a.pdf(U) << "\n";
     std::cout << "hfunc1 = \n" << a.hfunc1(U) << "\n";
@@ -43,5 +48,9 @@ int main(int __unused argc, char __unused *argv[]) {
     std::cout << "pdf = \n" << b.pdf(U) << "\n";
     std::cout << "hfunc1 = \n" << b.hfunc1(U) << "\n";
     std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n";
+    std::cout << "hinv1 = \n" << b.hinv1(U) << "\n";
+    std::cout << "hinv2 = \n" << b.hinv2(U) << "\n";
+
+    std::cout << "A random sample : " << b.simulate(10) << "\n";
     return 0;
 }

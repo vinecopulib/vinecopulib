@@ -40,6 +40,9 @@ int main(int __unused argc, char __unused *argv[]) {
     std::cout << "generator_derivative2 for u1 = \n" << b.generator_derivative2(U.col(0)) << "\n";
     std::cout << "pdf = \n" << b.pdf(U) << "\n";
     std::cout << "hfunc1 = \n" << b.hfunc1(U) << "\n";
-    std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n \n";
+    std::cout << "hfunc2 = \n" << b.hfunc2(U) << "\n";
+    std::cout << "hinv1 = \n" << b.hinv1(U) << "\n";
+    std::cout << "hinv2 = \n" << b.hinv2(U) << "\n \n";
+
     return 0;
 }

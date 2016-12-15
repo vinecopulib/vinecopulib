@@ -4,6 +4,8 @@ project(vinecoplib)
 
 include(cmake/options.cmake               REQUIRED)
 
+include(cmake/findNlopt.cmake             REQUIRED)
+
 include(cmake/findDependencies.cmake      REQUIRED)
 
 include(cmake/compilerDefOpt.cmake        REQUIRED)
