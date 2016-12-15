@@ -10,6 +10,9 @@
 class ArchimedeanBicop : public ParBicop {
 
 public:
+    void set_rotation(int rotation);
+    int get_rotation();
+
     // hfunctions: the conditioning variable is put second
     VecXd hfunc1(const MatXd &u);
     VecXd hfunc2(const MatXd &u);
