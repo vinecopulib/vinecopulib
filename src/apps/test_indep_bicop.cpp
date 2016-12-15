@@ -20,8 +20,8 @@ int main(int __unused argc, char __unused *argv[]) {
     U(1,0) = 0.7;
     U(1,1) = 0.3;
     std::cout << "U = \n" << U << "\n";
-    std::cout << "pdf = \n" << a.pdf(&U) << "\n";
-    std::cout << "hfunc1 = \n" << a.hfunc1(&U) << "\n";
-    std::cout << "hfunc2 = \n" << a.hfunc2(&U) << "\n";
+    std::cout << "pdf = \n" << a.pdf(U) << "\n";
+    std::cout << "hfunc1 = \n" << a.hfunc1(U) << "\n";
+    std::cout << "hfunc2 = \n" << a.hfunc2(U) << "\n";
     return 0;
 }

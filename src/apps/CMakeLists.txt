@@ -9,7 +9,8 @@ include_directories(${external_includes})
 set(app_programs
         test_indep_bicop
         test_normal_bicop
-        test_par_bicop)
+        test_par_bicop
+        test_gumbel_bicop)
 
 foreach(app ${app_programs})
     add_executable(${app} ${app}.cpp)

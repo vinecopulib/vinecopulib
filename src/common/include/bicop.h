@@ -15,11 +15,11 @@ class Bicop
 public:
 
     // hfunctions: the conditioning variable is put second
-    virtual VecXd hfunc1(const MatXd *u) = 0;
-    virtual VecXd hfunc2(const MatXd *u) = 0;
+    virtual VecXd hfunc1(const MatXd &u) = 0;
+    virtual VecXd hfunc2(const MatXd &u) = 0;
 
     // PDF
-    virtual VecXd pdf(const MatXd *u) = 0;
+    virtual VecXd pdf(const MatXd &u) = 0;
 
     // fit statistics
     //virtual double loglik(MatXd u) = 0;

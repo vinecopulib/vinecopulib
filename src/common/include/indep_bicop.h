@@ -14,11 +14,11 @@ public:
     IndepBicop();
 
     // hfunctions: the conditioning variable is put second
-    VecXd hfunc1(const MatXd *u);
-    VecXd hfunc2(const MatXd *u);
+    VecXd hfunc1(const MatXd &u);
+    VecXd hfunc2(const MatXd &u);
 
     // PDF
-    VecXd pdf(const MatXd *u);
+    VecXd pdf(const MatXd &u);
 };
 
 

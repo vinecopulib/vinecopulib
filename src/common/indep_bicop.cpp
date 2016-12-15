@@ -12,18 +12,20 @@ IndepBicop::IndepBicop()
 }
 
 // hfunctions: the conditioning variable is put second
-VecXd IndepBicop::hfunc1(const MatXd *u)
+VecXd IndepBicop::hfunc1(const MatXd &u)
 {
-    return(u->col(1));
+    VecXd v = u.col(1);
+    return(v);
 }
 
-VecXd IndepBicop::hfunc2(const MatXd *u)
+VecXd IndepBicop::hfunc2(const MatXd &u)
 {
-    return(u->col(0));
+    VecXd v = u.col(0);
+    return(v);
 }
 
 // PDF
-VecXd IndepBicop::pdf(const MatXd *u)
+VecXd IndepBicop::pdf(const MatXd &u)
 {
-    return(VecXd::Ones(u->rows()));
+    return(VecXd::Ones(u.rows()));
 }

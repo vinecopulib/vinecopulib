@@ -10,11 +10,6 @@
 class ParBicop : public Bicop {
 
 public:
-/*    // constructors --------------------------------
-    // default constructor (independence copula)
-    ParBiCop();
-    // construct with family and parameters
-    ParBiCop(int family, VectorXd parameters);*/
 
     // getters and setters --------------------------------
     int get_family();
