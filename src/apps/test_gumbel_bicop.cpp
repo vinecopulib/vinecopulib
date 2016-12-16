@@ -6,7 +6,7 @@
 #include <common/include/gumbel_bicop.h>
 #include <iostream>
 
-int main(int __unused argc, char __unused *argv[]) {
+int main(int __attribute__((unused)) argc, char __attribute__((unused)) *argv[]) {
 
     GumbelBicop a;
     std::cout << "A gumbel copula...\n";

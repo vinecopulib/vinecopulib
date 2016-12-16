@@ -6,7 +6,7 @@
 #include <common/include/joe_bicop.h>
 #include <iostream>
 
-int main(int __unused argc, char __unused *argv[]) {
+int main(int __attribute__((unused)) argc, __attribute__((unused)) char *argv[]) {
 
     JoeBicop a;
     std::cout << "A joe copula...\n";

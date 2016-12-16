@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int main(int __unused argc, char __unused *argv[]) {
+int main(int __attribute__((unused)), __attribute__((unused)) char *argv[]) {
 
 
     vector<int> allfams = {0,1,2,3,4,5,6,7,8,9,10,13,14,16,17,18,19,20,23,24,26,27,28,29,30,23,33,34,36,37,38,39,

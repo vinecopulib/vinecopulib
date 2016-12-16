@@ -6,7 +6,7 @@
 #include <common/include/frank_bicop.h>
 #include <iostream>
 
-int main(int __unused argc, char __unused *argv[]) {
+int main(int __attribute__((unused)) argc, __attribute__((unused)) char *argv[]) {
 
     FrankBicop a;
     std::cout << "A frank copula...\n";

@@ -6,7 +6,7 @@
 #include <common/include/clayton_bicop.h>
 #include <iostream>
 
-int main(int __unused argc, char __unused *argv[]) {
+int main(int __attribute__((unused)) argc, __attribute__((unused)) char *argv[]) {
 
     ClaytonBicop a;
     std::cout << "A clayton copula...\n";
