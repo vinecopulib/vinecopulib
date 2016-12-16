@@ -1,5 +1,5 @@
 find_package(Eigen3 REQUIRED)
-find_package(GSL REQUIRED)
+#find_package(GSL REQUIRED)
 #find_package(NLOPT REQUIRED)
 #find_package(Boost REQUIRED)
 
