@@ -40,7 +40,7 @@ VecXd NormalBicop::hfunc1(const MatXd &u)
             //t1 = boost::math::quantile(dist, u1);
             //t2 = boost::math::quantile(dist, u2);
             h(j) = (t2 - rho*t1)/sqrt(1.0-pow(rho,2.0));
-            if (isfinite(h(j)))
+            if (std::isfinite(h(j)))
                 h(j) = gsl_cdf_ugaussian_P(h(j));
                 //h(j) = boost::math::cdf(dist, h(j));
             else if ((t2 - rho*t1) < 0)
