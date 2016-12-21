@@ -1,11 +1,11 @@
 language: cpp
 matrix:
   include:
-    - os: osx
-      sudo: required
     - os: linux
       dist: trusty
       sudo: required
+ #   - os: osx
+ #        sudo: required
 
 before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo sh -c 'echo "deb https://cloud.r-project.org/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list'; fi
