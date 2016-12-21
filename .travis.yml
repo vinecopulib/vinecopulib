@@ -30,7 +30,7 @@ script:
   - cd build
   - cmake .. && make
   - cd ../bin
-  - ./test_par_bicop
+  - ./test_bicop_parametric
 
 notifications:
   email:

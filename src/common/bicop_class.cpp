@@ -80,7 +80,7 @@ VecXd Bicop::hinv2_num(const MatXd &u)
     MatXd v = u;
     VecXd u1 = u.col(0);
 
-    int j=0, br = 0, in = 1, it = 0;
+    int j=0, br = 0, it = 0;
     double tol = 1e-12, xl = 1e-10, xh = 1-1e-10;
 
     v.col(0) = xl*VecXd::Ones(u1.size());
