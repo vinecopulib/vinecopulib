@@ -122,7 +122,6 @@ VecXd Bicop::hinv2_num(const MatXd &u)
             if (it > 50) br = 1;
         }
         br = 0;
-        in = 1;
         it = 0;
         xl = 1e-10;
         xh = 1-1e-10;
