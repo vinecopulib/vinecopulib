@@ -16,10 +16,12 @@ install:
   ### LINUX
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install libeigen3-dev libnlopt-dev libgsl0-dev gsl-bin; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install r-base r-base-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install doxygen doxygen-doc doxygen-gui graphviz; fi
 
   ### OSX
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install cask && brew cask install xquartz && brew install r; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen; fi
 
   ### Common
   - sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), repos="https://cloud.r-project.org/", type="source")'
@@ -28,7 +30,7 @@ script:
   - mkdir build
   - mkdir bin
   - cd build
-  - cmake .. && make
+  - cmake .. && make && make doc
   - cd ../bin
   - ./test_bicop_parametric
 

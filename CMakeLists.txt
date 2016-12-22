@@ -23,3 +23,5 @@ include(cmake/paths.cmake                 REQUIRED)
 include(cmake/buildTargets.cmake          REQUIRED)
 
 include(cmake/printInfo.cmake             REQUIRED)
+
+include(cmake/findDoxygen.cmake           REQUIRED)
