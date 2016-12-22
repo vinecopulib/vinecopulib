@@ -25,29 +25,15 @@
 class ParBicop : public Bicop {
 
 public:
+    // fit copula parameters
+    void fit(const MatXd &data, char method[]);
 
-    // getters and setters --------------------------------
-    int get_family();
-    VecXd get_parameters();
-    void set_family(int family);
-    void set_parameters(VecXd parameters);
-    virtual MatXd get_bounds() = 0;
+    // link between Kendall's tau and the par_bicop parameter
+    virtual VecXd tau_to_par(const double& tau) = 0;
+    virtual double par_to_tau(const VecXd& parameters) = 0;
 
-    // other methods --------------------------------
     // number of parameters
     int calculate_npars();
-
-    // fit related methods --------------------------------
-    // set the object parameters according to the provided data
-    void fit(const MatXd &data, char method[]);
-    // link between Kendall's tau and the par_bicop parameter
-    virtual double tau_to_par(double &tau) = 0;
-    virtual double par_to_tau(double &par) = 0;
-
-protected:
-    // copula specification
-    int family_;                // copula family
-    VecXd parameters_;       // first copula parameter
 };
 
 

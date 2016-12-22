@@ -94,18 +94,18 @@ public:
     virtual int calculate_npars() = 0;
 
     //! Calculate the theoretical Kendall's tau
-    double calculate_tau();
+    double calculate_tau();  // this will be a generic fall back method
     virtual double par_to_tau(const VecXd& parameters);
 
     //! Getters and setters.
     //! @{
     int get_family() const {return family_;}
     int get_rotation() const {return rotation_;}
-    VecXd get_par() const {return parameters_;}
+    VecXd get_parameters() const {return parameters_;}
     VecXd get_par_bounds() const {return parameter_bounds_;}
 
     void set_rotation(const int& rotation) {rotation_ = rotation;}
-    void set_par(const VecXd& parameters) {parameters_ = parameters;}
+    void set_parameters(const VecXd& parameters) {parameters_ = parameters;}
     //! @}
 
 protected:
