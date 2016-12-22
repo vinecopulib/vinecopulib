@@ -27,6 +27,12 @@ IndepBicop::IndepBicop()
     parameter_bounds_ = MatXd::Zero(1, 2);
 }
 
+// PDF
+VecXd IndepBicop::pdf(const MatXd& u)
+{
+    return VecXd::Ones(u.rows());
+}
+
 // hfunctions: the conditioning variable is put second
 VecXd IndepBicop::hfunc1(const MatXd& u)
 {
@@ -40,18 +46,12 @@ VecXd IndepBicop::hfunc2(const MatXd& u)
     return v;
 }
 
-// PDF
-VecXd IndepBicop::pdf(const MatXd& u)
-{
-    return VecXd::Ones(u.rows());
-}
-
 VecXd IndepBicop::tau_to_par(const double __attribute__((unused))& tau)
 {
     return VecXd::Zero(1);
 }
 
-double IndepBicop::par_to_tau(const double __attribute__((unused))& parameters)
+double IndepBicop::par_to_tau(const VecXd __attribute__((unused))& parameters)
 {
     return 0.0;
 }

@@ -44,7 +44,7 @@ public:
     //! @param family the copula family.
     //! @param par the copula parameters (must be compatible with family).
     //! @return A pointer to an object that inherits from \c Bicop.
-    static Bicop* create(const int& family, const VecXd& parameters);
+    // static Bicop* create(const int& family, const VecXd& parameters);
 
     //! Copula density
     //!
@@ -95,7 +95,7 @@ public:
 
     //! Calculate the theoretical Kendall's tau
     double calculate_tau();  // this will be a generic fall back method
-    virtual double par_to_tau(const VecXd& parameters);
+    virtual double par_to_tau(const VecXd& parameters) = 0;
 
     //! Getters and setters.
     //! @{
