@@ -28,87 +28,89 @@ ClaytonBicop::ClaytonBicop()
     rotation_ = 0;
 }
 
-ClaytonBicop::ClaytonBicop(double theta)
+ClaytonBicop::ClaytonBicop(const VecXd& parameters)
 {
     family_ = 3;
-    VecXd par = VecXd::Zero(1);
-    par(0) = theta;
-    parameters_ = par;
+    parameters_ = parameters;
     rotation_ = 0;
 }
 
-ClaytonBicop::ClaytonBicop(double theta, int rotation)
+ClaytonBicop::ClaytonBicop(const VecXd& parameters, const int& rotation)
 {
     family_ = 3;
-    VecXd par = VecXd::Zero(1);
-    par(0) = theta;
-    parameters_ = par;
+    parameters_ = parameters;
     rotation_ = rotation;
 }
 
-VecXd ClaytonBicop::generator(const VecXd &u)
+VecXd ClaytonBicop::generator(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
     VecXd psi = u.array().pow(-theta);
-    psi = (psi-VecXd::Ones(psi.size()))/theta;
-    return(psi);
+    psi = (psi - VecXd::Ones(psi.size())) / theta;
+    return psi;
 }
-VecXd ClaytonBicop::generator_inv(const VecXd &u)
+VecXd ClaytonBicop::generator_inv(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (theta*u+VecXd::Ones(u.size()));
+    VecXd psi = (theta * u + VecXd::Ones(u.size()));
     psi = psi.array().pow(-1/theta);
-    return(psi);
+    return psi;
 }
 
-VecXd ClaytonBicop::generator_derivative(const VecXd &u)
+VecXd ClaytonBicop::generator_derivative(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (-1)*u.array().pow(-1-theta);
-    return(psi);
+    VecXd psi = (-1) * u.array().pow(-1-theta);
+    return psi;
 }
 
-VecXd ClaytonBicop::generator_derivative2(const VecXd &u)
+VecXd ClaytonBicop::generator_derivative2(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (1+theta)*u.array().pow(-2-theta);
-    return(psi);
+    VecXd psi = (1 + theta) * u.array().pow(-2-theta);
+    return psi;
 }
 
-VecXd ClaytonBicop::hinv(const MatXd &u)
+VecXd ClaytonBicop::hinv(const MatXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd hinv = u.col(0).array().pow(theta+1);
+    VecXd hinv = u.col(0).array().pow(theta + 1.0);
     if (theta < 75) {
         hinv = u.col(1).cwiseProduct(hinv);
-        hinv = hinv.array().pow(-theta/(theta+1.0));
+        hinv = hinv.array().pow(-theta/(theta + 1.0));
         VecXd x = u.col(0);
         x = x.array().pow(-theta);
-        hinv = hinv-x+VecXd::Ones(x.size());
+        hinv = hinv - x + VecXd::Ones(x.size());
         hinv = hinv.array().pow(-1/theta);
     } else {
         hinv = hinv1_num(u);
     }
-    return(hinv);
+    return hinv;
 
 }
 
 // link between Kendall's tau and the par_bicop parameter
-double ClaytonBicop::tau_to_par(double &tau)
+VecXd ClaytonBicop::tau_to_par(const VecXd& tau)
 {
-    double par = 2 * tau/(1 - std::fabs(tau));
-    return(par);
+    double parameters = 2 * tau / (1 - std::fabs(tau));
+    return parameters;
 }
 
-double ClaytonBicop::par_to_tau(double &par)
+double ClaytonBicop::par_to_tau(const VecXd& parameters)
 {
-    double tau =  par/(2 + std::fabs(par));
-    return(tau);
+    double tau =  parameters(0) / (2 + std::fabs(parameters(0)));
+    return tau;
+}
+
+double ClaytonBicop::calculate_tau()
+{
+    double tau = parameters_(0) / (2 + std::fabs(parameters_(0)));
+    return tau;
 }
 
 MatXd ClaytonBicop::get_bounds_standard()
 {
-    MatXd bounds = MatXd::Zero(1,2);
-    bounds(0,1) = 2e2;
-    return(bounds);
+    MatXd bounds = MatXd::Zero(1, 2);
+    bounds(0, 1) = 2e2;
+    return bounds;
 }

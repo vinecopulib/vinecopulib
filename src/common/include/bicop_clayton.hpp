@@ -27,25 +27,26 @@ class ClaytonBicop : public ArchimedeanBicop {
 public:
     // constructor
     ClaytonBicop();
-    ClaytonBicop(double theta);
-    ClaytonBicop(double theta, int rotation);
+    ClaytonBicop(const VecXd& parameters);
+    ClaytonBicop(const VecXd& parameters, const int& rotation);
 
     // generator, its inverse and derivatives for the archimedean copula
-    VecXd generator(const VecXd &u);
-    VecXd generator_inv(const VecXd &u);
-    VecXd generator_derivative(const VecXd &u);
-    VecXd generator_derivative2(const VecXd &u);
+    VecXd generator(const VecXd& u);
+    VecXd generator_inv(const VecXd& u);
+    VecXd generator_derivative(const VecXd& u);
+    VecXd generator_derivative2(const VecXd& u);
 
     // bounds on the copula parameter
     MatXd get_bounds_standard();
 
     // inverse hfunction
-    VecXd hinv(const MatXd &u);
+    VecXd hinv(const MatXd& u);
 
     // link between Kendall's tau and the par_bicop parameter
-    double tau_to_par(double &tau);
-    double par_to_tau(double &par);
+    VecXd tau_to_par(const double& tau);
+    double par_to_tau(const VecXd& parameters);
+    double calculate_tau();
 };
 
 
-#endif 
+#endif
