@@ -17,8 +17,8 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_JOE_BICOP_H
-#define VINECOPLIB_JOE_BICOP_H
+#ifndef VINECOPLIB_JOE_BICOP_HPP
+#define VINECOPLIB_JOE_BICOP_HPP
 
 
 #include "bicop_archimedean.hpp"
@@ -53,4 +53,4 @@ public:
 double qcondjoe(double* q, double* u, double* de);
 
 
-#endif //VINECOPLIB_JOE_BICOP_H
+#endif 

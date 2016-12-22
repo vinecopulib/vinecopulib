@@ -33,5 +33,4 @@ public:
     double par_to_tau(double &par);
 };
 
-
-#endif //VINECOPLIB_BICOP_ELLIPTICAL_HPP
+#endif

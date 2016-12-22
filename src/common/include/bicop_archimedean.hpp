@@ -17,8 +17,8 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_ARCHIMEDEAN_BICOP_H
-#define VINECOPLIB_ARCHIMEDEAN_BICOP_H
+#ifndef VINECOPLIB_ARCHIMEDEAN_BICOP_HPP_INCLUDED__
+#define VINECOPLIB_ARCHIMEDEAN_BICOP_HPP_INCLUDED__
 
 #include "bicop_parametric.hpp"
 
@@ -47,4 +47,4 @@ public:
 };
 
 
-#endif //VINECOPLIB_ARCHIMEDEAN_BICOP_H
+#endif 

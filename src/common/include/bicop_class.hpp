@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VINECOPLIB_BICOP_H_INCLUDED__
-#define VINECOPLIB_BICOP_H_INCLUDED__
+#ifndef VINECOPLIB_BICOP_HPP
+#define VINECOPLIB_BICOP_HPP
 
 #include <Eigen/Dense>
 #include <random>
@@ -111,4 +111,4 @@ protected:
     MatXd par_bounds_;
 };
 
-#endif // __BICOP_H_INCLUDED__
+#endif

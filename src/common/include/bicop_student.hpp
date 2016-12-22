@@ -45,4 +45,4 @@ public:
 };
 
 
-#endif //VINECOPLIB_BICOP_STUDENT_HPP
+#endif

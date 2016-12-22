@@ -17,8 +17,8 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_INDEP_BICOP_H
-#define VINECOPLIB_INDEP_BICOP_H
+#ifndef VINECOPLIB_INDEP_BICOP_HPP
+#define VINECOPLIB_INDEP_BICOP_HPP
 
 #include "bicop_parametric.hpp"
 
@@ -43,5 +43,4 @@ public:
     VecXd hinv2(const MatXd &u);
 };
 
-
-#endif //VINECOPLIB_INDEP_BICOP_H
+#endif

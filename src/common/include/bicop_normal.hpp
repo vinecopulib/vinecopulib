@@ -17,8 +17,8 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_NORMAL_BICOP_H
-#define VINECOPLIB_NORMAL_BICOP_H
+#ifndef VINECOPLIB_NORMAL_BICOP_HPP
+#define VINECOPLIB_NORMAL_BICOP_HPP
 
 #include "bicop_elliptical.hpp"
 #include <gsl/gsl_cdf.h>
@@ -46,4 +46,4 @@ public:
 };
 
 
-#endif //VINECOPLIB_NORMAL_BICOP_H
+#endif

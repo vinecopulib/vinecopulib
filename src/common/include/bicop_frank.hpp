@@ -17,8 +17,8 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_FRANK_BICOP_H
-#define VINECOPLIB_FRANK_BICOP_H
+#ifndef VINECOPLIB_FRANK_BICOP_HPP
+#define VINECOPLIB_FRANK_BICOP_HPP
 
 #include "bicop_archimedean.hpp"
 #include <gsl/gsl_sf_debye.h>
@@ -49,5 +49,4 @@ public:
 
 };
 
-
-#endif //VINECOPLIB_FRANK_BICOP_H
+#endif

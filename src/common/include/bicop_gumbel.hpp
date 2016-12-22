@@ -17,8 +17,8 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_GUMBEL_BICOP_H
-#define VINECOPLIB_GUMBEL_BICOP_H
+#ifndef VINECOPLIB_GUMBEL_BICOP_HPP
+#define VINECOPLIB_GUMBEL_BICOP_HPP
 
 #include "bicop_archimedean.hpp"
 
@@ -50,5 +50,4 @@ public:
 
 double qcondgum(double* q, double* u, double* de);
 
-
-#endif //VINECOPLIB_GUMBEL_BICOP_H
+#endif
