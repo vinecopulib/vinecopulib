@@ -97,18 +97,18 @@ public:
     //! @{
     int get_family() const {return family_;}
     int get_rotation() const {return rotation_;}
-    VecXd get_par() const {return par_;}
-    VecXd get_par_bounds() const {return par_bounds_;}
+    VecXd get_par() const {return parameters_;}
+    VecXd get_par_bounds() const {return parameter_bounds_;}
 
     void set_rotation(const int &rotation) {rotation_ = rotation;}
-    void set_par(const VecXd &par) {par_ = par;}
+    void set_par(const VecXd &parameters) {parameters_ = parameters;}
     //! @}
 
 protected:
     int family_;
     int rotation_;
-    VecXd par_;
-    MatXd par_bounds_;
+    VecXd parameters_;
+    MatXd parameter_bounds_;
 };
 
 #endif
