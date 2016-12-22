@@ -44,12 +44,12 @@ public:
     //! @param family the copula family.
     //! @param par the copula parameters (must be compatible with family).
     //! @return A pointer to an object that inherits from \c Bicop.
-    static Bicop* create(const int &family, const VecXd &par);
+    static Bicop* create(const int& family, const VecXd& parameters);
 
     //! Copula density
     //!
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
-    virtual VecXd pdf(const MatXd &u) = 0;
+    virtual VecXd pdf(const MatXd& u) = 0;
 
     //! \defgroup hfunctions h-functions
     //!
@@ -61,10 +61,10 @@ public:
     //! \c hinv2 is the inverse w.r.t. first argument (conditioned on second),
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     //! @{
-    virtual VecXd hfunc1(const MatXd &u) = 0;
-    virtual VecXd hfunc2(const MatXd &u) = 0;
-    virtual VecXd hinv1(const MatXd &u) = 0;
-    virtual VecXd hinv2(const MatXd &u) = 0;
+    virtual VecXd hfunc1(const MatXd& u) = 0;
+    virtual VecXd hfunc2(const MatXd& u) = 0;
+    virtual VecXd hinv1(const MatXd& u) = 0;
+    virtual VecXd hinv2(const MatXd& u) = 0;
     //! @}
 
     //! Numerical inversion of h-functions
@@ -73,21 +73,21 @@ public:
     //! They can be used in derived classes to define \c hinv1 and \c hinv2.
     //!
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
-    VecXd hinv1_num(const MatXd &u);
-    VecXd hinv2_num(const MatXd &u);
+    VecXd hinv1_num(const MatXd& u);
+    VecXd hinv2_num(const MatXd& u);
 
     //! Simulate from a bivariate copula
     //!
     //! @param n number of observations.
-    MatXd simulate(int n);
+    MatXd simulate(const int& n);
 
     //! \devgroup fitstats Fit statistics
     //!
     //! @param u \f$m \times 2\f$ matrix of observations.
     //! @{
-    double loglik(MatXd &u);
-    double aic(MatXd &u);
-    double bic(MatXd &u);
+    double loglik(MatXd& u);
+    double aic(MatXd& u);
+    double bic(MatXd& u);
     //! @}
 
     //! Get number of parameters.
@@ -95,7 +95,7 @@ public:
 
     //! Calculate the theoretical Kendall's tau
     double calculate_tau();
-    virtual double par_to_tau_tau(const VecXd& parameters);
+    virtual double par_to_tau(const VecXd& parameters);
 
     //! Getters and setters.
     //! @{
@@ -104,8 +104,8 @@ public:
     VecXd get_par() const {return parameters_;}
     VecXd get_par_bounds() const {return parameter_bounds_;}
 
-    void set_rotation(const int &rotation) {rotation_ = rotation;}
-    void set_par(const VecXd &parameters) {parameters_ = parameters;}
+    void set_rotation(const int& rotation) {rotation_ = rotation;}
+    void set_par(const VecXd& parameters) {parameters_ = parameters;}
     //! @}
 
 protected:
