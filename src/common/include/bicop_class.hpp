@@ -90,8 +90,12 @@ public:
     double bic(MatXd &u);
     //! @}
 
-    //! Number of parameters.
+    //! Get number of parameters.
     virtual int calculate_npars() = 0;
+
+    //! Calculate the theoretical Kendall's tau
+    double calculate_tau();
+    virtual double par_to_tau_tau(const VecXd& parameters);
 
     //! Getters and setters.
     //! @{

@@ -108,9 +108,3 @@ double ClaytonBicop::par_to_tau(const VecXd& parameters)
     double tau =  parameters(0) / (2 + std::fabs(parameters(0)));
     return tau;
 }
-
-double ClaytonBicop::calculate_tau()
-{
-    double tau = parameters_(0) / (2 + std::fabs(parameters_(0)));
-    return tau;
-}

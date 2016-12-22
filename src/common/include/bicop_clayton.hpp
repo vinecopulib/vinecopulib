@@ -45,7 +45,6 @@ public:
     // link between Kendall's tau and the par_bicop parameter
     VecXd tau_to_par(const double& tau);
     double par_to_tau(const VecXd& parameters);
-    double calculate_tau();
 };
 
 
