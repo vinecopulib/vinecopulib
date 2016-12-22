@@ -20,31 +20,31 @@
 #include "include/bicop_elliptical.hpp"
 
 
-VecXd EllipticalBicop::hfunc2(const MatXd &u)
+VecXd EllipticalBicop::hfunc2(const MatXd& u)
 {
     MatXd v = u;
     v.col(0).swap(v.col(1));
     VecXd h = hfunc1(v);
-    return(h);
+    return h;
 }
 
-VecXd EllipticalBicop::hinv2(const MatXd &u)
+VecXd EllipticalBicop::hinv2(const MatXd& u)
 {
     MatXd v = u;
     v.col(0).swap(v.col(1));
     VecXd h = hinv1(v);
-    return(h);
+    return h;
 }
 
 // link between Kendall's tau and the par_bicop parameter
-double EllipticalBicop::tau_to_par(double &tau)
+VecXd EllipticalBicop::tau_to_par(const double& tau)
 {
-    double eta = sin(tau*M_PI/2);
-    return(eta);
+    double eta = sin(tau * M_PI / 2);
+    return eta;
 }
 
-double EllipticalBicop::par_to_tau(double &par)
+double EllipticalBicop::par_to_tau(const VecXd& parameters)
 {
-    double tau = (2/M_PI)*asin(par);
-    return(tau);
+    double tau = (2 / M_PI) * asin(parameters(0));
+    return tau;
 }

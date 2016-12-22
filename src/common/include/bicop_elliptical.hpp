@@ -25,12 +25,13 @@
 class EllipticalBicop : public ParBicop  {
 public:
     // hfunction and its inverse
-    VecXd hfunc2(const MatXd &u);
-    VecXd hinv2(const MatXd &u);
+    VecXd hfunc2(const MatXd& u);
+    VecXd hinv2(const MatXd& u);
 
     // link between Kendall's tau and the par_bicop parameter
-    double tau_to_par(double &tau);
-    double par_to_tau(double &par);
+    double tau_to_par(const double& tau);
+    double par_to_tau(const VecXd& parameters);
+    double calculate_tau();
 };
 
 #endif
