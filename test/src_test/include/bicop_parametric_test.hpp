@@ -17,8 +17,8 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_TEST_PAR_BICOP_H
-#define VINECOPLIB_TEST_PAR_BICOP_H
+#ifndef VINECOPLIB_BICOP_PARAMETRIC_TEST_HPP
+#define VINECOPLIB_BICOP_PARAMETRIC_TEST_HPP
 
 #include "gtest/gtest.h"
 #include "src/common/include/bicop_families.hpp"
@@ -65,4 +65,4 @@ TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);
 //typedef ::testing::Types<ClaytonBicop, GumbelBicop> RotatedBicopTypes;
 //TYPED_TEST_CASE(ParBicopTest, RotatedBicopTypes);
 
-#endif //VINECOPLIB_TEST_PAR_BICOP_H
+#endif

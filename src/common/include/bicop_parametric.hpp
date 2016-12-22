@@ -17,8 +17,8 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_PAR_BICOP_HPP
-#define VINECOPLIB_PAR_BICOP_HPP
+#ifndef VINECOPLIB_BICOP_PARAMETRIC_HPP
+#define VINECOPLIB_BICOP_PARAMETRIC_HPP
 
 #include "bicop_class.hpp"
 

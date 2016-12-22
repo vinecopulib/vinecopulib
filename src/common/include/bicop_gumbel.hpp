@@ -17,8 +17,8 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_GUMBEL_BICOP_HPP
-#define VINECOPLIB_GUMBEL_BICOP_HPP
+#ifndef VINECOPLIB_BICOP_GUMBEL_HPP
+#define VINECOPLIB_BICOP_GUMBEL_HPP
 
 #include "bicop_archimedean.hpp"
 
