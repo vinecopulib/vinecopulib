@@ -24,79 +24,83 @@
 FrankBicop::FrankBicop()
 {
     family_ = 5;
+    rotation_ = 0;
     parameters_ = VecXd::Zero(1);
-    rotation_ = 0;
+    MatXd parameter_bounds_ = MatXd::Zero(1, 2);
+    parameter_bounds_(0, 0) = -2e2;
+    parameter_bounds_(0, 0) = 2e2;
 }
 
-FrankBicop::FrankBicop(double theta)
+FrankBicop::FrankBicop(const VecXd& parameters)
 {
     family_ = 5;
-    VecXd par = VecXd::Zero(1);
-    par(0) = theta;
-    parameters_ = par;
     rotation_ = 0;
+    VecXd parameters_ = parameters;
+    MatXd parameter_bounds_ = MatXd::Zero(1, 2);
+    parameter_bounds_(0, 0) = -2e2;
+    parameter_bounds_(0, 0) = 2e2;
 }
 
-FrankBicop::FrankBicop(double theta, int rotation)
+FrankBicop::FrankBicop(const VecXd& parameters, const int& rotation)
 {
     family_ = 5;
-    VecXd par = VecXd::Zero(1);
-    par(0) = theta;
-    parameters_ = par;
     rotation_ = rotation;
+    VecXd parameters_ = parameters;
+    MatXd parameter_bounds_ = MatXd::Zero(1, 2);
+    parameter_bounds_(0, 0) = -2e2;
+    parameter_bounds_(0, 0) = 2e2;
 }
 
-VecXd FrankBicop::generator(const VecXd &u)
+VecXd FrankBicop::generator(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (-theta)*u;
+    VecXd psi = (-theta) * u;
     psi = psi.array().exp();
-    psi = (psi - VecXd::Ones(psi.size()))/(exp(-theta)-1);
-    psi = (-1)*psi.array().log();
-    return(psi);
+    psi = (psi - VecXd::Ones(psi.size())) / (exp(-theta) - 1);
+    psi = (-1) * psi.array().log();
+    return psi;
 }
-VecXd FrankBicop::generator_inv(const VecXd &u)
+VecXd FrankBicop::generator_inv(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (-1)*u;
-    psi = (exp(-theta)-1)*psi.array().exp();
-    psi = psi+VecXd::Ones(psi.size());
-    psi = (-1/theta)*psi.array().log();
-    return(psi);
+    VecXd psi = (-1) * u;
+    psi = (exp(-theta) - 1) * psi.array().exp();
+    psi = psi + VecXd::Ones(psi.size());
+    psi = (-1 / theta) * psi.array().log();
+    return psi;
 }
 
-VecXd FrankBicop::generator_derivative(const VecXd &u)
+VecXd FrankBicop::generator_derivative(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = theta*u;
+    VecXd psi = theta * u;
     psi = psi.array().exp();
-    psi = VecXd::Ones(psi.size())-psi;
-    psi = theta*psi.cwiseInverse();
-    return(psi);
+    psi = VecXd::Ones(psi.size()) - psi;
+    psi = theta * psi.cwiseInverse();
+    return psi;
 }
 
-VecXd FrankBicop::generator_derivative2(const VecXd &u)
+VecXd FrankBicop::generator_derivative2(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (-(theta/2)*u).array().exp()-((theta/2)*u).array().exp();
-    psi = (theta*theta)*psi.cwiseInverse().array().square();
-    return(psi);
+    VecXd psi = (-(theta/2) * u).array().exp() - ((theta/2) * u).array().exp();
+    psi = (theta*theta) * psi.cwiseInverse().array().square();
+    return psi;
 }
 
-VecXd FrankBicop::hinv(const MatXd &u)
+VecXd FrankBicop::hinv(const MatXd& u)
 {
     VecXd hinv = hinv1_num(u);
-    return(hinv);
-
+    return hinv;
 }
 
-double FrankBicop::tau_to_par(double &tau)
+VecXd FrankBicop::tau_to_par(const double& tau)
 {
     int br = 0, it = 0;
     double tol = 1e-12, xl = -100+1e-6, xh = 100, fl, fh, fm, par;
 
-    fl = fabs(par_to_tau(xl) - tau);
-    fh = fabs(par_to_tau(xh) - tau);
+    fl = std::fabs(par_to_tau(VecXd::Constant(1, xl)) - tau);
+    fh = std::fabs(par_to_tau(VecXd::Constant(1, xh)) - tau);
     if (fl <= tol) {
         par = xl;
         br = 1;
@@ -108,11 +112,11 @@ double FrankBicop::tau_to_par(double &tau)
 
     while (!br) {
         par = (xh + xl) / 2.0;
-        fm = par_to_tau(par) - tau;
+        fm = par_to_tau(VecXd::Constant(1, par)) - tau;
 
         //stop if values become too close (avoid infinite loop)
-        if (fabs(fm) <= tol) br = 1;
-        if (fabs(xl - xh) <= tol) br = 1;
+        if (std::fabs(fm) <= tol) br = 1;
+        if (std::fabs(xl - xh) <= tol) br = 1;
 
         if (fm < 0.0) {
             xl = par;
@@ -124,27 +128,21 @@ double FrankBicop::tau_to_par(double &tau)
 
         //stop if too many iterations are required (avoid infinite loop)
         ++it;
-        if (it > 50) br = 1;
+        if (it > 50)
+            br = 1;
     }
 
-    return(par);
+    VecXd parameters = VecXd::Constant(1, par);
+    return parameters;
 }
 
-double FrankBicop::par_to_tau(double &par)
+double FrankBicop::par_to_tau(const VecXd& parameters)
 {
-    double tau = 1-4/par;
+    double par = parameters(0);
+    double tau = 1 - 4/par;
     double d = gsl_sf_debye_1(std::fabs(par));
-    if (par < 0) {
+    if (par < 0)
         d = d - par/2;
-    }
-    tau = tau + (4/par)*d;
-    return(tau);
-}
-
-MatXd FrankBicop::get_bounds_standard()
-{
-    MatXd bounds = MatXd::Zero(1,2);
-    bounds(0,0) = -2e2;
-    bounds(0,0) = 2e2;
-    return(bounds);
+    tau = tau + (4/par) * d;
+    return tau;
 }
