@@ -29,28 +29,24 @@ class JoeBicop : public ArchimedeanBicop {
 public:
     // constructor
     JoeBicop();
-    JoeBicop(double theta);
-    JoeBicop(double theta, int rotation);
+    JoeBicop(const VecXd& parameters);
+    JoeBicop(const VecXd& parameters, const int& rotation);
 
     // generator, its inverse and derivatives for the archimedean copula
-    VecXd generator(const VecXd &u);
-    VecXd generator_inv(const VecXd &u);
-    VecXd generator_derivative(const VecXd &u);
-    VecXd generator_derivative2(const VecXd &u);
+    VecXd generator(const VecXd& u);
+    VecXd generator_inv(const VecXd& u);
+    VecXd generator_derivative(const VecXd& u);
+    VecXd generator_derivative2(const VecXd& u);
 
     // inverse hfunction
-    VecXd hinv(const MatXd &u);
+    VecXd hinv(const MatXd& u);
 
     // link between Kendall's tau and the par_bicop parameter
-    double tau_to_par(double &tau);
-    double par_to_tau(double &par);
-
-    // get bounds on the unrotated copula parameter
-    MatXd get_bounds_standard();
-
+    VecXd tau_to_par(const double& tau);
+    double par_to_tau(const VecXd& par);
 };
 
 double qcondjoe(double* q, double* u, double* de);
 
 
-#endif 
+#endif
