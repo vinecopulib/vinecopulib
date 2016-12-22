@@ -17,8 +17,8 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_BICOP_STUDENT_HPP
-#define VINECOPLIB_BICOP_STUDENT_HPP
+#ifndef VINECOPLIB_STUDENT_BICOP_HPP
+#define VINECOPLIB_STUDENT_BICOP_HPP
 
 #include "bicop_elliptical.hpp"
 #include <gsl/gsl_cdf.h>
@@ -29,19 +29,17 @@ class StudentBicop : public EllipticalBicop {
 public:
     // constructor
     StudentBicop();
-    StudentBicop(double rho, double nu);
-
-    // bounds on the copula parameter
-    MatXd get_bounds();
-
-    // hfunction
-    VecXd hfunc1(const MatXd &u);
-
-    // inverse hfunction
-    VecXd hinv1(const MatXd &u);
+    StudentBicop(const VecXd& parameters);
+    StudentBicop(const VecXd& parameters, const int& rotation);
 
     // PDF
-    VecXd pdf(const MatXd &u);
+    VecXd pdf(const MatXd& u);
+
+    // hfunction
+    VecXd hfunc1(const MatXd& u);
+
+    // inverse hfunction
+    VecXd hinv1(const MatXd& u);
 };
 
 
