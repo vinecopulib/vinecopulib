@@ -1,4 +1,4 @@
-# vinecopula
+# vinecopulib
 [![Build Status](https://travis-ci.org/tvatter/vinecoplib.svg?branch=master)](https://travis-ci.org/tvatter/vinecoplib)
 
 A C++ library for Vine Copulas.
