@@ -17,33 +17,30 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_NORMAL_BICOP_HPP
-#define VINECOPLIB_NORMAL_BICOP_HPP
+#ifndef VINECOPLIB_Gauss_BICOP_HPP
+#define VINECOPLIB_Gauss_BICOP_HPP
 
 #include "bicop_elliptical.hpp"
 #include <gsl/gsl_cdf.h>
 #include <gsl/gsl_randist.h>
 //#include <boost/math/distributions/normal.hpp>
 
-class NormalBicop : public EllipticalBicop {
+class GaussBicop : public EllipticalBicop {
 
 public:
     // constructor
-    NormalBicop();
-    NormalBicop(double rho);
-
-    // bounds on the copula parameter
-    MatXd get_bounds();
-
-    // hfunction
-    VecXd hfunc1(const MatXd &u);
-
-    // inverse hfunction
-    VecXd hinv1(const MatXd &u);
+    GaussBicop();
+    GaussBicop(const VecXd& parameters);
+    GaussBicop(const VecXd& parameters, const int& rotation);
 
     // PDF
-    VecXd pdf(const MatXd &u);
-};
+    VecXd pdf(const MatXd& u);
 
+    // hfunction
+    VecXd hfunc1(const MatXd& u);
+
+    // inverse hfunction
+    VecXd hinv1(const MatXd& u);
+};
 
 #endif

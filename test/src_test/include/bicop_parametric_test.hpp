@@ -21,13 +21,7 @@
 #define VINECOPLIB_TEST_PAR_BICOP_H
 
 #include "gtest/gtest.h"
-#include "src/common/include/bicop_indep.hpp"
-#include "src/common/include/bicop_normal.hpp"
-#include "src/common/include/bicop_student.hpp"
-#include "src/common/include/bicop_clayton.hpp"
-#include "src/common/include/bicop_gumbel.hpp"
-#include "src/common/include/bicop_frank.hpp"
-#include "src/common/include/bicop_joe.hpp"
+#include "src/common/include/bicop_families.hpp"
 #include "r_instance.hpp"
 
 // Fake test class allowing access to the R instance
@@ -66,7 +60,7 @@ protected:
 };
 
 // Create a list of types, each of which will be used as the test fixture's 'T'
-typedef ::testing::Types<IndepBicop, NormalBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop> ParBicopTypes;
+typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);
 //typedef ::testing::Types<ClaytonBicop, GumbelBicop> RotatedBicopTypes;
 //TYPED_TEST_CASE(ParBicopTest, RotatedBicopTypes);

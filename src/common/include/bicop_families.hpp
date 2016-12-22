@@ -61,9 +61,9 @@ along with vinecoplib.  If not, see "http://www.gnu.org/licenses/".
     #include "bicop_joe.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_NORMAL_HPP
-    #define VINECOPLIB_BICOP_NORMAL_HPP
-    #include "bicop_normal.hpp"
+    #ifndef VINECOPLIB_BICOP_GAUSS_HPP
+    #define VINECOPLIB_BICOP_GAUSS_HPP
+    #include "bicop_gauss.hpp"
     #endif
 
     #ifndef VINECOPLIB_BICOP_PARAMETRIC_HPP
