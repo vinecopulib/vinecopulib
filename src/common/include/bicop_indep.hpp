@@ -28,19 +28,18 @@ public:
     // constructor
     IndepBicop();
 
-    // hfunctions: the conditioning variable is put second
-    VecXd hfunc1(const MatXd &u);
-    VecXd hfunc2(const MatXd &u);
-
     // PDF
-    VecXd pdf(const MatXd &u);
+    VecXd pdf(const MatXd& u);
 
-    double tau_to_par(double __attribute__((unused)) &tau);
-    double par_to_tau(double __attribute__((unused)) &par);
-    MatXd get_bounds();
+    // hfunctions: the conditioning variable is put second
+    VecXd hfunc1(const MatXd& u);
+    VecXd hfunc2(const MatXd& u);
 
-    VecXd hinv1(const MatXd &u);
-    VecXd hinv2(const MatXd &u);
+    VecXd tau_to_par(const double __attribute__((unused))& tau);
+    double par_to_tau(const double __attribute__((unused))& parameters);
+
+    VecXd hinv1(const MatXd& u);
+    VecXd hinv2(const MatXd& u);
 };
 
 #endif

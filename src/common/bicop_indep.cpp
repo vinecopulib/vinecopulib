@@ -24,49 +24,44 @@ IndepBicop::IndepBicop()
 {
     family_ = 0;
     parameters_ = VecXd::Zero(1);
+    parameter_bounds_ = MatXd::Zero(1, 2);
 }
 
 // hfunctions: the conditioning variable is put second
-VecXd IndepBicop::hfunc1(const MatXd &u)
+VecXd IndepBicop::hfunc1(const MatXd& u)
 {
     VecXd v = u.col(1);
-    return(v);
+    return v;
 }
 
-VecXd IndepBicop::hfunc2(const MatXd &u)
+VecXd IndepBicop::hfunc2(const MatXd& u)
 {
     VecXd v = u.col(0);
-    return(v);
+    return v;
 }
 
 // PDF
-VecXd IndepBicop::pdf(const MatXd &u)
+VecXd IndepBicop::pdf(const MatXd& u)
 {
-    return(VecXd::Ones(u.rows()));
+    return VecXd::Ones(u.rows());
 }
 
-double IndepBicop::tau_to_par(double __attribute__((unused)) &tau)
+VecXd IndepBicop::tau_to_par(const double __attribute__((unused))& tau)
 {
-    return(0);
+    return VecXd::Zero(1);
 }
 
-double IndepBicop::par_to_tau(double __attribute__((unused)) &par)
+double IndepBicop::par_to_tau(const double __attribute__((unused))& parameters)
 {
-    return(0);
+    return 0.0;
 }
 
-MatXd IndepBicop::get_bounds()
+VecXd IndepBicop::hinv1(const MatXd& u)
 {
-    MatXd bounds = MatXd::Zero(1,2);
-    return(bounds);
+    return u.col(1);
 }
 
-VecXd IndepBicop::hinv1(const MatXd &u)
+VecXd IndepBicop::hinv2(const MatXd& u)
 {
-    return(u.col(1));
-}
-
-VecXd IndepBicop::hinv2(const MatXd &u)
-{
-    return(u.col(0));
+    return u.col(0);
 }
