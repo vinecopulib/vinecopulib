@@ -1,0 +1,4 @@
+\form#0:$ c $
+\form#1:\[ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) ds, \]
+\form#2:\[ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds. \]
+\form#3:$m \times 2$
