@@ -19,15 +19,6 @@
 
 #include "include/bicop_archimedean.hpp"
 
-void ArchimedeanBicop::set_rotation(int rotation)
-{
-    rotation_ = rotation;
-}
-
-int ArchimedeanBicop::get_rotation()
-{
-    return this->rotation_;
-}
 
 VecXd ArchimedeanBicop::hfunc1(const MatXd &u)
 {
