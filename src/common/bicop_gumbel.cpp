@@ -23,94 +23,96 @@
 GumbelBicop::GumbelBicop()
 {
     family_ = 4;
-    parameters_ = VecXd::Zero(1);
     rotation_ = 0;
+    parameters_ = VecXd::Ones(1);
+    parameter_bounds_ = MatXd::Ones(1, 2);
+    parameter_bounds_(0, 1) = 200.0;
 }
 
-GumbelBicop::GumbelBicop(double theta)
+GumbelBicop::GumbelBicop(const VecXd& parameters)
 {
     family_ = 4;
-    VecXd par = VecXd::Zero(1);
-    par(0) = theta;
-    parameters_ = par;
     rotation_ = 0;
+    parameters_ = parameters;
+    parameter_bounds_ = MatXd::Ones(1, 2);
+    parameter_bounds_(0, 1) = 200.0;
 }
 
-GumbelBicop::GumbelBicop(double theta, int rotation)
+GumbelBicop::GumbelBicop(const VecXd& parameters, const int& rotation)
 {
     family_ = 4;
-    VecXd par = VecXd::Zero(1);
-    par(0) = theta;
-    parameters_ = par;
     rotation_ = rotation;
+    parameters_ = parameters;
+    parameter_bounds_ = MatXd::Ones(1, 2);
+    parameter_bounds_(0, 1) = 200.0;
 }
 
-VecXd GumbelBicop::generator(const VecXd &u)
+VecXd GumbelBicop::generator(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
     VecXd psi = u;
     psi = psi.cwiseInverse().array().log().pow(theta);
-    return(psi);
+    return psi;
 }
-VecXd GumbelBicop::generator_inv(const VecXd &u)
+VecXd GumbelBicop::generator_inv(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
     VecXd psi = u;
-    psi = (-1.0)*psi.array().pow(1/theta);
+    psi = (-1.0) * psi.array().pow(1/theta);
     psi = psi.array().exp();
-    return(psi);
+    return psi;
 }
 
-VecXd GumbelBicop::generator_derivative(const VecXd &u)
+VecXd GumbelBicop::generator_derivative(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
     VecXd psi = u;
-    psi = psi.cwiseInverse().array().log().pow(theta-1.0);
-    psi = (-theta)*psi.cwiseQuotient(u);
-    return(psi);
+    psi = psi.cwiseInverse().array().log().pow(theta - 1.0);
+    psi = (-theta) * psi.cwiseQuotient(u);
+    return psi;
 }
 
-VecXd GumbelBicop::generator_derivative2(const VecXd &u)
+VecXd GumbelBicop::generator_derivative2(const VecXd& u)
 {
     double theta = double(this->parameters_(0));;
     VecXd psi_ilog = u.cwiseInverse().array().log();
-    VecXd psi = (theta-1)*VecXd::Ones(u.size())+psi_ilog;
-    psi_ilog = psi_ilog.array().pow(theta-2.0);
+    VecXd psi = (theta - 1.0) * VecXd::Ones(u.size()) + psi_ilog;
+    psi_ilog = psi_ilog.array().pow(theta - 2.0);
     psi = theta*psi.cwiseProduct(psi_ilog);
     psi_ilog = u.array().square();
     psi = psi.cwiseQuotient(psi_ilog);
-    return(psi);
+    return psi;
 }
 
-VecXd GumbelBicop::hinv(const MatXd &u)
+VecXd GumbelBicop::hinv(const MatXd& u)
 {
     double theta = double(this->parameters_(0));
     double u1, u2;
     VecXd hinv = VecXd::Zero(u.rows());
-
-    for(int j=0;j<u.rows();j++)
-    {
-        u1=u(j,1);
-        u2=u(j,0);
+    for (int j = 0; j < u.rows(); ++j) {
+        u1 = u(j, 1);
+        u2 = u(j, 0);
         hinv(j) = qcondgum(&u1, &u2, &theta);
     }
-    return(hinv);
 
+    return hinv;
 }
 
 // link between Kendall's tau and the par_bicop parameter
-double GumbelBicop::tau_to_par(double &tau)
+VecXd GumbelBicop::tau_to_par(const double& tau)
 {
-    double eta = (tau/std::fabs(tau))*1/(1 - std::fabs(tau));
-    return(eta);
+    VecXd parameters = VecXd::Zero(1);
+    parameters(0) = (tau / std::fabs(tau)) / (1 - std::fabs(tau));
+    return parameters;
 }
 
-double GumbelBicop::par_to_tau(double &par)
+double GumbelBicop::par_to_tau(const VecXd& parameters)
 {
-    double tau =   (std::fabs(par)-1)/par;
-    return(tau);
+    double par = parameters(0);
+    return (std::fabs(par) - 1) / par;
 }
 
+// This is copy&paste from the VineCopula package
 double qcondgum(double* q, double* u, double* de)
 {
     double a,p,g,gp,z1,z2,con,de1,dif;
@@ -144,11 +146,4 @@ double qcondgum(double* q, double* u, double* de)
     }
     z2=pow(pow(a,*de)-pow(z1,*de),1./(*de));
     return(exp(-z2));
-}
-
-MatXd GumbelBicop::get_bounds_standard()
-{
-    MatXd bounds = MatXd::Ones(1,2);
-    bounds(0,1) = 2e2;
-    return(bounds);
 }

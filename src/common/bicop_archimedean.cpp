@@ -20,62 +20,6 @@ along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
 #include "include/bicop_archimedean.hpp"
 
 
-VecXd ArchimedeanBicop::hfunc1(const MatXd& u)
-{
-    VecXd h = VecXd::Ones(u.rows());
-    int rotation = get_rotation();
-
-    if (rotation == 0) {
-        VecXd v = VecXd::Ones(u.rows());
-        v = generator(u.col(0)) + generator(u.col(1));
-        h = generator_derivative(u.col(0)).cwiseQuotient(generator_derivative(generator_inv(v)));
-    } else {
-        MatXd v = u;
-        set_rotation(0);
-        VecXd parameters = get_parameters();
-        if (rotation == 180) {
-            v = MatXd::Ones(u.rows(), u.cols()) - v;
-        } else {
-            set_parameters((-1)*parameters);
-            if (rotation == 90) {
-                v.col(0) = VecXd::Ones(u.rows()) - v.col(0);
-            } else {
-                v.col(1) = VecXd::Ones(u.rows()) - v.col(1);
-            }
-        }
-
-        h = hfunc1(v);
-        set_rotation(rotation);
-        set_parameters(parameters);
-        if (rotation == 180 || rotation == 270) {
-            h = VecXd::Ones(u.rows()) - h;
-        }
-    }
-    
-    return h;
-}
-
-VecXd ArchimedeanBicop::hfunc2(const MatXd& u)
-{
-    VecXd h = VecXd::Ones(u.rows());
-    MatXd v = u;
-    v.col(0).swap(v.col(1));
-    int rotation = get_rotation();
-    if (rotation == 90) {
-        set_rotation(270);
-        h = hfunc1(v);
-        set_rotation(90);
-    } else if (rotation == 270) {
-        set_rotation(90);
-        h = hfunc1(v);
-        set_rotation(270);
-    } else {
-        h = hfunc1(v);
-    }
-
-    return h;
-}
-
 // PDF
 VecXd ArchimedeanBicop::pdf(const MatXd& u)
 {
@@ -112,6 +56,62 @@ VecXd ArchimedeanBicop::pdf(const MatXd& u)
     }
 
     return f;
+}
+
+VecXd ArchimedeanBicop::hfunc1(const MatXd& u)
+{
+    VecXd h = VecXd::Ones(u.rows());
+    int rotation = get_rotation();
+
+    if (rotation == 0) {
+        VecXd v = VecXd::Ones(u.rows());
+        v = generator(u.col(0)) + generator(u.col(1));
+        h = generator_derivative(u.col(0)).cwiseQuotient(generator_derivative(generator_inv(v)));
+    } else {
+        MatXd v = u;
+        set_rotation(0);
+        VecXd parameters = get_parameters();
+        if (rotation == 180) {
+            v = MatXd::Ones(u.rows(), u.cols()) - v;
+        } else {
+            set_parameters((-1)*parameters);
+            if (rotation == 90) {
+                v.col(0) = VecXd::Ones(u.rows()) - v.col(0);
+            } else {
+                v.col(1) = VecXd::Ones(u.rows()) - v.col(1);
+            }
+        }
+
+        h = hfunc1(v);
+        set_rotation(rotation);
+        set_parameters(parameters);
+        if (rotation == 180 || rotation == 270) {
+            h = VecXd::Ones(u.rows()) - h;
+        }
+    }
+
+    return h;
+}
+
+VecXd ArchimedeanBicop::hfunc2(const MatXd& u)
+{
+    VecXd h = VecXd::Ones(u.rows());
+    MatXd v = u;
+    v.col(0).swap(v.col(1));
+    int rotation = get_rotation();
+    if (rotation == 90) {
+        set_rotation(270);
+        h = hfunc1(v);
+        set_rotation(90);
+    } else if (rotation == 270) {
+        set_rotation(90);
+        h = hfunc1(v);
+        set_rotation(270);
+    } else {
+        h = hfunc1(v);
+    }
+
+    return h;
 }
 
 VecXd ArchimedeanBicop::hinv1(const MatXd& u)

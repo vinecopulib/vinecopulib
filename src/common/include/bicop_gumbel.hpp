@@ -27,25 +27,21 @@ class GumbelBicop : public ArchimedeanBicop {
 public:
     // constructor
     GumbelBicop();
-    GumbelBicop(double theta);
-    GumbelBicop(double theta, int rotation);
+    GumbelBicop(const VecXd& parameters);
+    GumbelBicop(const VecXd& parameters, const int& rotation);
 
     // generator, its inverse and derivatives for the archimedean copula
-    VecXd generator(const VecXd &u);
-    VecXd generator_inv(const VecXd &u);
-    VecXd generator_derivative(const VecXd &u);
-    VecXd generator_derivative2(const VecXd &u);
+    VecXd generator(const VecXd& u);
+    VecXd generator_inv(const VecXd& u);
+    VecXd generator_derivative(const VecXd& u);
+    VecXd generator_derivative2(const VecXd& u);
 
     // inverse hfunction
-    VecXd hinv(const MatXd &u);
+    VecXd hinv(const MatXd& u);
 
     // link between Kendall's tau and the par_bicop parameter
-    double tau_to_par(double &tau);
-    double par_to_tau(double &par);
-
-    // get bounds on the unrotated copula parameter
-    MatXd get_bounds_standard();
-
+    VecXd tau_to_par(const double& tau);
+    double par_to_tau(const VecXd& parameters);
 };
 
 double qcondgum(double* q, double* u, double* de);
