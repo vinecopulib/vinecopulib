@@ -29,7 +29,7 @@ public:
     VecXd hinv2(const MatXd& u);
 
     // link between Kendall's tau and the par_bicop parameter
-    double tau_to_par(const double& tau);
+    VecXd tau_to_par(const double& tau);
     double par_to_tau(const VecXd& parameters);
     double calculate_tau();
 };

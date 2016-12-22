@@ -24,22 +24,28 @@
 ClaytonBicop::ClaytonBicop()
 {
     family_ = 3;
-    parameters_ = VecXd::Zero(1);
     rotation_ = 0;
+    parameters_ = VecXd::Zero(1);
+    MatXd parameter_bounds_ = MatXd::Zero(1, 2);
+    parameter_bounds_(0, 1) = 2e2;
 }
 
 ClaytonBicop::ClaytonBicop(const VecXd& parameters)
 {
     family_ = 3;
-    parameters_ = parameters;
     rotation_ = 0;
+    parameters_ = parameters;
+    MatXd parameter_bounds_ = MatXd::Zero(1, 2);
+    parameter_bounds_(0, 1) = 2e2;
 }
 
 ClaytonBicop::ClaytonBicop(const VecXd& parameters, const int& rotation)
 {
     family_ = 3;
-    parameters_ = parameters;
     rotation_ = rotation;
+    parameters_ = parameters;
+    MatXd parameter_bounds_ = MatXd::Zero(1, 2);
+    parameter_bounds_(0, 1) = 2e2;
 }
 
 VecXd ClaytonBicop::generator(const VecXd& u)
@@ -90,9 +96,10 @@ VecXd ClaytonBicop::hinv(const MatXd& u)
 }
 
 // link between Kendall's tau and the par_bicop parameter
-VecXd ClaytonBicop::tau_to_par(const VecXd& tau)
+VecXd ClaytonBicop::tau_to_par(const double& tau)
 {
-    double parameters = 2 * tau / (1 - std::fabs(tau));
+    VecXd parameters(1);
+    parameters(0) = 2 * tau / (1 - std::fabs(tau));
     return parameters;
 }
 
@@ -106,11 +113,4 @@ double ClaytonBicop::calculate_tau()
 {
     double tau = parameters_(0) / (2 + std::fabs(parameters_(0)));
     return tau;
-}
-
-MatXd ClaytonBicop::get_bounds_standard()
-{
-    MatXd bounds = MatXd::Zero(1, 2);
-    bounds(0, 1) = 2e2;
-    return bounds;
 }
