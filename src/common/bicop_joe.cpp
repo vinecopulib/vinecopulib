@@ -109,7 +109,7 @@ VecXd JoeBicop::hinv(const MatXd& u)
 VecXd JoeBicop::tau_to_parameters(const double& tau)
 {
     int br = 0, it = 0;
-    double tol = 1e-12, xl = -100 + 1e-6, xh = 100, fl, fh, fm, par;
+    double tol = 1e-12, xl = 1 + 1e-6, xh = 100, fl, fh, fm, par;
 
     fl = fabs(parameters_to_tau(VecXd::Constant(1, xl)) - tau);
     fh = fabs(parameters_to_tau(VecXd::Constant(1, xh)) - tau);
@@ -153,6 +153,10 @@ double JoeBicop::parameters_to_tau(const VecXd& parameters)
     double tau = 2 / par + 1;
     tau = gsl_sf_psi(2) - gsl_sf_psi(tau);
     tau = 1 + 2 * tau / (2 - par);
+    if (rotation_ == 90 | rotation_ == 270)
+    {
+        tau *= -1;
+    }
     return tau;
 }
 

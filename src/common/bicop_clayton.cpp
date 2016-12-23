@@ -99,12 +99,16 @@ VecXd ClaytonBicop::hinv(const MatXd& u)
 VecXd ClaytonBicop::tau_to_parameters(const double& tau)
 {
     VecXd parameters(1);
-    parameters(0) = 2 * tau / (1 - std::fabs(tau));
+    parameters(0) = 2 * std::fabs(tau) / (1 - std::fabs(tau));
     return parameters;
 }
 
 double ClaytonBicop::parameters_to_tau(const VecXd& parameters)
 {
     double tau =  parameters(0) / (2 + std::fabs(parameters(0)));
+    if (rotation_ == 90 | rotation_ == 270)
+    {
+        tau *= -1;
+    }
     return tau;
 }
