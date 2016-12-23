@@ -36,9 +36,6 @@ public:
     VecXd generator_derivative(const VecXd& u);
     VecXd generator_derivative2(const VecXd& u);
 
-    // bounds on the copula parameter
-    MatXd get_bounds_standard();
-
     // inverse hfunction
     VecXd hinv(const MatXd& u);
 
