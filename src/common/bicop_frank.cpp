@@ -94,7 +94,7 @@ VecXd FrankBicop::hinv(const MatXd& u)
     return hinv;
 }
 
-VecXd FrankBicop::tau_to_par(const double& tau)
+VecXd FrankBicop::tau_to_parameters(const double& tau)
 {
     int br = 0, it = 0;
     double tol = 1e-12, xl = -100+1e-6, xh = 100, fl, fh, fm, par;
@@ -136,7 +136,7 @@ VecXd FrankBicop::tau_to_par(const double& tau)
     return parameters;
 }
 
-double FrankBicop::par_to_tau(const VecXd& parameters)
+double FrankBicop::parameters_to_tau(const VecXd& parameters)
 {
     double par = parameters(0);
     double tau = 1 - 4/par;

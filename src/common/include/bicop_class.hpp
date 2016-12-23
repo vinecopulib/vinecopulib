@@ -88,7 +88,7 @@ public:
 
     //! Calculate the theoretical Kendall's tau
     double calculate_tau();  // this will be a generic fall back method
-    virtual double par_to_tau(const VecXd& parameters) = 0;
+    virtual double parameters_to_tau(const VecXd& parameters) = 0;
 
     //! Getters and setters.
     //! @{

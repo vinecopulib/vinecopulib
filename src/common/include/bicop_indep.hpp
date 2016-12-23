@@ -37,8 +37,8 @@ public:
     VecXd hfunc1(const MatXd& u);
     VecXd hfunc2(const MatXd& u);
 
-    VecXd tau_to_par(const double __attribute__((unused))& tau);
-    double par_to_tau(const VecXd __attribute__((unused))& parameters);
+    VecXd tau_to_parameters(const double __attribute__((unused))& tau);
+    double parameters_to_tau(const VecXd __attribute__((unused))& parameters);
 
     VecXd hinv1(const MatXd& u);
     VecXd hinv2(const MatXd& u);

@@ -96,14 +96,14 @@ VecXd ClaytonBicop::hinv(const MatXd& u)
 }
 
 // link between Kendall's tau and the par_bicop parameter
-VecXd ClaytonBicop::tau_to_par(const double& tau)
+VecXd ClaytonBicop::tau_to_parameters(const double& tau)
 {
     VecXd parameters(1);
     parameters(0) = 2 * tau / (1 - std::fabs(tau));
     return parameters;
 }
 
-double ClaytonBicop::par_to_tau(const VecXd& parameters)
+double ClaytonBicop::parameters_to_tau(const VecXd& parameters)
 {
     double tau =  parameters(0) / (2 + std::fabs(parameters(0)));
     return tau;

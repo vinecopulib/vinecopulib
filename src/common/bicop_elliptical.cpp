@@ -36,14 +36,14 @@ VecXd EllipticalBicop::hinv2(const MatXd& u)
     return h;
 }
 
-double EllipticalBicop::par_to_tau(const VecXd& parameters)
+double EllipticalBicop::parameters_to_tau(const VecXd& parameters)
 {
     double tau = (2 / M_PI) * asin(parameters(0));
     return tau;
 }
 
 // link between Kendall's tau and the par_bicop parameter
-VecXd EllipticalBicop::tau_to_par(const double& tau)
+VecXd EllipticalBicop::tau_to_parameters(const double& tau)
 {
     VecXd parameters = this->parameters_;
     parameters(0) = sin(tau * M_PI / 2);

@@ -106,7 +106,7 @@ VecXd JoeBicop::hinv(const MatXd& u)
 }
 
 // link between Kendall's tau and the par_bicop parameter
-VecXd JoeBicop::tau_to_par(const double& tau)
+VecXd JoeBicop::tau_to_parameters(const double& tau)
 {
     int br = 0, it = 0;
     double tol = 1e-12, xl = -100 + 1e-6, xh = 100, fl, fh, fm, par;
@@ -147,7 +147,7 @@ VecXd JoeBicop::tau_to_par(const double& tau)
     return VecXd::Constant(1, par);
 }
 
-double JoeBicop::par_to_tau(const VecXd& parameters)
+double JoeBicop::parameters_to_tau(const VecXd& parameters)
 {
     double par = parameters(0);
     double tau = 2 / par + 1;
