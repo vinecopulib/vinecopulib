@@ -64,13 +64,13 @@ VecXd StudentBicop::pdf(const MatXd& u)
         u2 = u(j, 1);
         t1 = gsl_cdf_tdist_Pinv(u1, nu);
         t2 = gsl_cdf_tdist_Pinv(u2, nu);
-        f(j) = StableGammaDivision((nu + 2.0) / 2.0, nu / 2.0);
-        f(j) /= nu * M_PI * sqrt(1.0 - pow(rho, 2.0));
-        f(j) *= gsl_ran_tdist_pdf(t1,nu);
-        f(j) *= gsl_ran_tdist_pdf(t2,nu);
-        f(j) *= pow(1.0 + (pow(t1, 2.0) + pow(t2, 2.0) - 2.0 * rho * t1 * t2) /
-                        (nu * (1.0 - pow(rho, 2.0))), // base
-                    - (nu + 2.0) / 2.0  // exponent
+        f(j) = StableGammaDivision((nu + 2.0) / 2.0, nu / 2.0) /
+         (nu * M_PI * sqrt(1.0 - pow(rho, 2.0)) *
+         gsl_ran_tdist_pdf(t1, nu) *
+         gsl_ran_tdist_pdf(t2, nu)) *
+         pow(1.0 + (pow(t1, 2.0) + pow(t2, 2.0) - 2.0 * rho * t1 * t2) /
+                (nu * (1.0 - pow(rho, 2.0))),
+            -(nu+2.0)/2.0
         );
     }
 
