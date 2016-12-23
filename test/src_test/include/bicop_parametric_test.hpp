@@ -21,8 +21,7 @@
 #define VINECOPLIB_BICOP_PARAMETRIC_TEST_HPP
 
 #include "gtest/gtest.h"
-#include "src/common/include/bicop_class.hpp"
-#include "src/common/include/bicop_families.hpp"
+#include "src/common/include/bicop.hpp"
 #include "r_instance.hpp"
 
 // Fake test class allowing access to the R instance
