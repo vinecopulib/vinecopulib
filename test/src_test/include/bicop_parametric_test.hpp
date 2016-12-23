@@ -17,17 +17,11 @@
     along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_TEST_PAR_BICOP_H
-#define VINECOPLIB_TEST_PAR_BICOP_H
+#ifndef VINECOPLIB_BICOP_PARAMETRIC_TEST_HPP
+#define VINECOPLIB_BICOP_PARAMETRIC_TEST_HPP
 
 #include "gtest/gtest.h"
-#include "src/common/include/bicop_indep.hpp"
-#include "src/common/include/bicop_normal.hpp"
-#include "src/common/include/bicop_student.hpp"
-#include "src/common/include/bicop_clayton.hpp"
-#include "src/common/include/bicop_gumbel.hpp"
-#include "src/common/include/bicop_frank.hpp"
-#include "src/common/include/bicop_joe.hpp"
+#include "src/common/include/bicop.hpp"
 #include "r_instance.hpp"
 
 // Fake test class allowing access to the R instance
@@ -53,9 +47,10 @@ class ParBicopTest : public FakeParBicopTest {
 public:
     void setup_parameters(RInstance *rinstance_ptr) {
         double tau = this->get_tau(rinstance_ptr);
-        double par = this->par_bicop_.tau_to_par(tau);
-        VecXd parameters = par * VecXd::Ones(2);
-        parameters(1) = 4;
+        VecXd parameters(2);
+        parameters = this->par_bicop_.tau_to_parameters(tau);
+        if (parameters.size() == 2)
+            parameters(1) = 4.0;
         this->par_bicop_.set_parameters(parameters);
         this->set_family(rinstance_ptr, this->par_bicop_.get_family());
         this->set_parameters(rinstance_ptr, this->par_bicop_.get_parameters());
@@ -66,9 +61,9 @@ protected:
 };
 
 // Create a list of types, each of which will be used as the test fixture's 'T'
-typedef ::testing::Types<IndepBicop, NormalBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop> ParBicopTypes;
+typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);
 //typedef ::testing::Types<ClaytonBicop, GumbelBicop> RotatedBicopTypes;
 //TYPED_TEST_CASE(ParBicopTest, RotatedBicopTypes);
 
-#endif //VINECOPLIB_TEST_PAR_BICOP_H
+#endif

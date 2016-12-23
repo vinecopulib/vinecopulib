@@ -24,8 +24,8 @@ RInstance::RInstance() {
     int n = 1e3;
     n_ = n;
     family_ = 0;
-    parameters_ = 4*VecXd::Ones(2);
-    U_ = MatXd::Zero(n,2);
+    parameters_ = 4 * VecXd::Ones(2);
+    U_ = MatXd::Zero(n, 2);
     tau_ = 0.5;
 
     // Set-up some R commands
@@ -44,8 +44,8 @@ RInstance::RInstance() {
     //R.parseEval(eval_fct);
 
     // Evaluate the tests random vectors u1 and u2 and load them in C++
-    const Eigen::Map<Eigen::VectorXd>  U1 = Rcpp::as<Eigen::Map<Eigen::VectorXd>>(R.parseEval(u1));
-    const Eigen::Map<Eigen::VectorXd>  U2 = Rcpp::as<Eigen::Map<Eigen::VectorXd>>(R.parseEval(u2));
+    const Eigen::Map<Eigen::VectorXd> U1 = Rcpp::as<Eigen::Map<Eigen::VectorXd>>(R.parseEval(u1));
+    const Eigen::Map<Eigen::VectorXd> U2 = Rcpp::as<Eigen::Map<Eigen::VectorXd>>(R.parseEval(u2));
     U_.col(0) = U1;
     U_.col(1) = U2;
 
@@ -138,11 +138,11 @@ void RInstance::set_tau(double tau)
 
 RInside RInstance::get_R()
 {
-    return(this->R);
+    return this->R;
 }
 MatXd RInstance::get_U()
 {
-    return(this->U_);
+    return this->U_;
 }
 void RInstance::change_n(int n)
 {
