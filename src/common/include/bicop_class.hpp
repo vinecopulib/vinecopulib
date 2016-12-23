@@ -1,20 +1,20 @@
 /*
-Copyright 2016 Thibault Vatter
+Copyright 2016 Thibault Vatter, Thomas Nagler
 
 This file is part of vinecopulib.
 
-vinecoplib is free software: you can redistribute it and/or modify
+vinecopulib is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-vinecoplib is distributed in the hope that it will be useful,
+vinecopulib is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
+along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef VINECOPLIB_BICOP_CLASS_HPP
@@ -39,13 +39,6 @@ class Bicop
 {
 
 public:
-    //! Create a bivariate copula
-    //!
-    //! @param family the copula family.
-    //! @param par the copula parameters (must be compatible with family).
-    //! @return A pointer to an object that inherits from \c Bicop.
-    // static Bicop* create(const int& family, const VecXd& parameters);
-
     //! Copula density
     //!
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
