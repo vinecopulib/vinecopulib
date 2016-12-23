@@ -25,16 +25,16 @@ namespace {
     // Test if the C++ implementation of the par_to_tau and tau_to_par is correct
     TYPED_TEST(ParBicopTest, par_to_tau_is_correct) {
         // set-up parameters
-        // this->setup_parameters(rinstance_ptr);
+        this->setup_parameters(rinstance_ptr);
 
         // evaluate in R
-        // MatXd U = this->get_U(rinstance_ptr);
-        // std::string eval_fct = "BiCopPar2Tau(,,)";
-        // VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 13);
+        MatXd U = this->get_U(rinstance_ptr);
+        std::string eval_fct = "BiCopPar2Tau(,,)";
+        VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 13);
 
         // assert approximate equality
-        // VecXd par = this->get_parameters(rinstance_ptr);
-        // ASSERT_TRUE(fabs(this->par_bicop_.par_to_tau(par) - f(0)) < 1e-4);
+        VecXd par = this->get_parameters(rinstance_ptr);
+        ASSERT_TRUE(fabs(this->par_bicop_.parameters_to_tau(par) - f(0)) < 1e-4);
     }
 
     // Test if the C++ implementation of the PDF is correct

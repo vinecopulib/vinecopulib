@@ -28,7 +28,7 @@ void ParBicop::fit(const MatXd& data, char method[])
         double tau = 0.0;
         MatXd newdata = data;
         ktau_matrix(newdata.data(), &d, &n, &tau);
-        VecXd newpar = tau_to_par(tau);
+        VecXd newpar = tau_to_parameters(tau);
         if (calculate_npars() == 1)
             set_parameters(newpar);
     } else if (strcmp(method, "mle") == 0) {

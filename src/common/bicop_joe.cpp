@@ -111,8 +111,8 @@ VecXd JoeBicop::tau_to_parameters(const double& tau)
     int br = 0, it = 0;
     double tol = 1e-12, xl = -100 + 1e-6, xh = 100, fl, fh, fm, par;
 
-    fl = fabs(par_to_tau(VecXd::Constant(1, xl)) - tau);
-    fh = fabs(par_to_tau(VecXd::Constant(1, xh)) - tau);
+    fl = fabs(parameters_to_tau(VecXd::Constant(1, xl)) - tau);
+    fh = fabs(parameters_to_tau(VecXd::Constant(1, xh)) - tau);
     if (fl <= tol) {
         par = xl;
         br = 1;
@@ -124,7 +124,7 @@ VecXd JoeBicop::tau_to_parameters(const double& tau)
 
     while (!br) {
         par = (xh + xl) / 2.0;
-        fm = par_to_tau(VecXd::Constant(1, par)) - tau;
+        fm = parameters_to_tau(VecXd::Constant(1, par)) - tau;
 
         //stop if values become too close (avoid infinite loop)
         if (fabs(fm) <= tol) br = 1;

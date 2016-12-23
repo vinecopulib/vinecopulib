@@ -48,7 +48,7 @@ public:
     void setup_parameters(RInstance *rinstance_ptr) {
         double tau = this->get_tau(rinstance_ptr);
         VecXd parameters(2);
-        parameters = this->par_bicop_.tau_to_par(tau);
+        parameters = this->par_bicop_.tau_to_parameters(tau);
         if (parameters.size() == 2)
             parameters(1) = 4.0;
         this->par_bicop_.set_parameters(parameters);
