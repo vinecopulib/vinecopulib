@@ -23,7 +23,24 @@
 IndepBicop::IndepBicop()
 {
     family_ = 0;
+    rotation_ = 0;
     parameters_ = VecXd::Zero(1);
+    parameter_bounds_ = MatXd::Zero(1, 2);
+}
+
+IndepBicop::IndepBicop(const VecXd & parameters)
+{
+    family_ = 0;
+    rotation_ = 0;
+    parameters_ = parameters;
+    parameter_bounds_ = MatXd::Zero(1, 2);
+}
+
+IndepBicop::IndepBicop(const VecXd& parameters, const int& rotation)
+{
+    family_ = 0;
+    rotation_ = rotation;
+    parameters_ = parameters;
     parameter_bounds_ = MatXd::Zero(1, 2);
 }
 

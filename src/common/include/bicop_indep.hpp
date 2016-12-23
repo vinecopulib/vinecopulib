@@ -27,6 +27,8 @@ class IndepBicop : public ParBicop {
 public:
     // constructor
     IndepBicop();
+    IndepBicop(const VecXd& parameters);
+    IndepBicop(const VecXd& parameters, const int& rotation);
 
     // PDF
     VecXd pdf(const MatXd& u);
