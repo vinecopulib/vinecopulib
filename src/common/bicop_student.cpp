@@ -24,6 +24,7 @@ StudentBicop::StudentBicop()
 {
     family_ = 2;
     rotation_ = 0;
+    association_direction_ = "both";
     parameters_ = VecXd::Zero(2);
     parameters_(1) = 100.0;
     parameter_bounds_ = MatXd::Ones(2, 2);
@@ -36,6 +37,7 @@ StudentBicop::StudentBicop(const VecXd& parameters)
 {
     family_ = 2;
     rotation_ = 0;
+    association_direction_ = "both";
     parameters_ = parameters;
     parameter_bounds_ = MatXd::Ones(2, 2);
     parameter_bounds_(0, 0) = -1.0;
@@ -47,6 +49,7 @@ StudentBicop::StudentBicop(const VecXd& parameters, const int& rotation)
 {
     family_ = 2;
     rotation_ = rotation;
+    association_direction_ = "both";
     parameters_ = parameters;
     parameter_bounds_ = MatXd::Ones(2, 2);
     parameter_bounds_(0, 0) = -1.0;

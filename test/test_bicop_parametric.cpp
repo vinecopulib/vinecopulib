@@ -22,6 +22,24 @@
 RInstance *rinstance_ptr = new RInstance;
 
 namespace {
+
+    /*TYPED_TEST(ParBicopTest, mle_is_correct) {
+        // set-up parameters
+        this->setup_parameters(rinstance_ptr);
+
+        // evaluate in R
+        MatXd U = this->get_U(rinstance_ptr);
+
+        // evaluate in C++
+        char method[] = "itau";
+        this->par_bicop_.fit(U, method);
+
+        double tau = this->par_bicop_.calculate_tau();
+
+        // assert approximate equality
+        ASSERT_TRUE(fabs(tau - this->get_tau(rinstance_ptr)) < 1e-1);
+    } */
+
     // Test if the C++ implementation of the par_to_tau and tau_to_par is correct
     TYPED_TEST(ParBicopTest, par_to_tau_is_correct) {
         // set-up parameters

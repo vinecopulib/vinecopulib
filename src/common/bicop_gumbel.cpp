@@ -24,6 +24,7 @@ GumbelBicop::GumbelBicop()
 {
     family_ = 4;
     rotation_ = 0;
+    association_direction_ = "positive";
     parameters_ = VecXd::Ones(1);
     parameter_bounds_ = MatXd::Ones(1, 2);
     parameter_bounds_(0, 1) = 200.0;
@@ -33,6 +34,7 @@ GumbelBicop::GumbelBicop(const VecXd& parameters)
 {
     family_ = 4;
     rotation_ = 0;
+    association_direction_ = "positive";
     parameters_ = parameters;
     parameter_bounds_ = MatXd::Ones(1, 2);
     parameter_bounds_(0, 1) = 200.0;
@@ -42,6 +44,12 @@ GumbelBicop::GumbelBicop(const VecXd& parameters, const int& rotation)
 {
     family_ = 4;
     rotation_ = rotation;
+    if (rotation == 90 | rotation == 270)
+    {
+        association_direction_ = "negative";
+    } else {
+        association_direction_ = "positive";
+    }
     parameters_ = parameters;
     parameter_bounds_ = MatXd::Ones(1, 2);
     parameter_bounds_(0, 1) = 200.0;

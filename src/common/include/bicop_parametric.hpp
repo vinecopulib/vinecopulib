@@ -21,6 +21,7 @@
 #define VINECOPULIB_BICOP_PARAMETRIC_HPP
 
 #include "bicop_class.hpp"
+#include <nlopt.hpp>
 
 class ParBicop : public Bicop {
 
@@ -37,5 +38,7 @@ public:
     int calculate_npars();
 };
 
+double mle_objective(const std::vector<double> &x, std::vector<double> &grad, void *data);
+double pmle_objective(const std::vector<double> &x, std::vector<double> &grad, void *data);
 
 #endif

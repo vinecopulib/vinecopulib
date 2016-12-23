@@ -10,6 +10,8 @@ include(cmake/findGSL.cmake               REQUIRED)
 
 include(cmake/findEigen3.cmake            REQUIRED)
 
+include(cmake/findNlopt.cmake             REQUIRED)
+
 include(cmake/findR.cmake                 REQUIRED)
 
 include(cmake/findDependencies.cmake      REQUIRED)

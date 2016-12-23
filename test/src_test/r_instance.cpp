@@ -29,32 +29,32 @@ RInstance::RInstance() {
     tau_ = 0.5;
 
     // Set-up some R commands
-    std::string u1 = "u1 <- runif()";
+    /*std::string u1 = "u1 <- runif()";
     u1.insert(12, std::to_string(n));
     std::string u2 = "u2 <- runif()";
-    u2.insert(12, std::to_string(n));
-    /* std::string eval_fct = "par <- BiCopTau2Par(1,)";
+    u2.insert(12, std::to_string(n));*/
+    std::string eval_fct = "par <- BiCopTau2Par(1,)";
     eval_fct.insert(22, std::to_string(tau_));
     std::string eval_fct2 = "U <- BiCopSim(,1,par)";
-    eval_fct2.insert(14, std::to_string(n));*/
+    eval_fct2.insert(14, std::to_string(n));
     std::string load_VineCopula = "library(VineCopula)";
 
     // Declare the RInside instance and load the VineCopula package
     R.parseEval(load_VineCopula);
-    //R.parseEval(eval_fct);
+    R.parseEval(eval_fct);
 
-    // Evaluate the tests random vectors u1 and u2 and load them in C++
+    /*// Evaluate the tests random vectors u1 and u2 and load them in C++
     const Eigen::Map<Eigen::VectorXd> U1 = Rcpp::as<Eigen::Map<Eigen::VectorXd>>(R.parseEval(u1));
     const Eigen::Map<Eigen::VectorXd> U2 = Rcpp::as<Eigen::Map<Eigen::VectorXd>>(R.parseEval(u2));
     U_.col(0) = U1;
-    U_.col(1) = U2;
+    U_.col(1) = U2;*/
 
-    /*// Evaluate the tests random matrix U and load it in C++
+    // Evaluate the tests random matrix U and load it in C++
     const Eigen::Map<Eigen::MatrixXd>  U = Rcpp::as<Eigen::Map<Eigen::MatrixXd>>(R.parseEval(eval_fct2));
     R.parseEval("u1 <- U[,1]");
     R.parseEval("u2 <- U[,2]");
     U_.col(0) = U.col(0);
-    U_.col(1) = U.col(1);*/
+    U_.col(1) = U.col(1);
 }
 
 VecXd RInstance::eval_in_R(std::string eval_fct, int start)

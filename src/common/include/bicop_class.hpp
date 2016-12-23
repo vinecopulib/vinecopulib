@@ -94,8 +94,9 @@ public:
     //! @{
     int get_family() const {return family_;}
     int get_rotation() const {return rotation_;}
+    std::string get_association_direction() const {return association_direction_;}
     VecXd get_parameters() const {return parameters_;}
-    VecXd get_par_bounds() const {return parameter_bounds_;}
+    MatXd get_parameters_bounds() const {return parameter_bounds_;}
 
     void set_rotation(const int& rotation) {rotation_ = rotation;}
     void set_parameters(const VecXd& parameters) {parameters_ = parameters;}
@@ -104,6 +105,7 @@ public:
 protected:
     int family_;
     int rotation_;
+    std::string association_direction_;
     VecXd parameters_;
     MatXd parameter_bounds_;   // first row lower, second row upper
 };
