@@ -17,8 +17,8 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_BICOP_CLAYTON_HPP
-#define VINECOPLIB_BICOP_CLAYTON_HPP
+#ifndef VINECOPULIB_BICOP_CLAYTON_HPP
+#define VINECOPULIB_BICOP_CLAYTON_HPP
 
 #include "bicop_archimedean.hpp"
 

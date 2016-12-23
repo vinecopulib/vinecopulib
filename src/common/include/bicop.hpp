@@ -17,14 +17,14 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_BICOP_HPP
-#define VINECOPLIB_BICOP_HPP
+#ifndef VINECOPULIB_BICOP_HPP
+#define VINECOPULIB_BICOP_HPP
     // include the class and all families
-    #ifndef VINECOPLIB_BICOP_CLASS_HPP
+    #ifndef VINECOPULIB_BICOP_CLASS_HPP
     #include "bicop_class.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_FAMILIES_HPP
+    #ifndef VINECOPULIB_BICOP_FAMILIES_HPP
     #include "bicop_families.hpp"
     #endif
 

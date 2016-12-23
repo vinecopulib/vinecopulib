@@ -17,51 +17,51 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see "http://www.gnu.org/licenses/".
 */
 
-#ifndef VINECOPLIB_BICOP_FAMILIES_HPP
-#define VINECOPLIB_BICOP_FAMILIES_HPP
+#ifndef VINECOPULIB_BICOP_FAMILIES_HPP
+#define VINECOPULIB_BICOP_FAMILIES_HPP
 
     // include all familie headers not included yet (alphabetic order)
-    #ifndef VINECOPLIB_BICOP_ARCHIMEDEAN_HPP
+    #ifndef VINECOPULIB_BICOP_ARCHIMEDEAN_HPP
     #include "bicop_archimedean.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_CLASS_HPP
+    #ifndef VINECOPULIB_BICOP_CLASS_HPP
     #include "bicop_class.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_CLAYTON_HPP
+    #ifndef VINECOPULIB_BICOP_CLAYTON_HPP
     #include "bicop_clayton.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_ELLIPTICAL_HPP
+    #ifndef VINECOPULIB_BICOP_ELLIPTICAL_HPP
     #include "bicop_elliptical.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_FRANK_HPP
+    #ifndef VINECOPULIB_BICOP_FRANK_HPP
     #include "bicop_frank.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_GAUSS_HPP
+    #ifndef VINECOPULIB_BICOP_GAUSS_HPP
     #include "bicop_gauss.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_GUMBEL_HPP
+    #ifndef VINECOPULIB_BICOP_GUMBEL_HPP
     #include "bicop_gumbel.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_INDEP_HPP
+    #ifndef VINECOPULIB_BICOP_INDEP_HPP
     #include "bicop_indep.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_JOE_HPP
+    #ifndef VINECOPULIB_BICOP_JOE_HPP
     #include "bicop_joe.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_PARAMETRIC_HPP
+    #ifndef VINECOPULIB_BICOP_PARAMETRIC_HPP
     #include "bicop_parametric.hpp"
     #endif
 
-    #ifndef VINECOPLIB_BICOP_STUDENT_HPP
+    #ifndef VINECOPULIB_BICOP_STUDENT_HPP
     #include "bicop_student.hpp"
     #endif
 

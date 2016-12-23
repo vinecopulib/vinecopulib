@@ -17,8 +17,8 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPLIB_BICOP_GAUSS_HPP
-#define VINECOPLIB_BICOP_GAUSS_HPP
+#ifndef VINECOPULIB_BICOP_GAUSS_HPP
+#define VINECOPULIB_BICOP_GAUSS_HPP
 
 #include "bicop_elliptical.hpp"
 #include <gsl/gsl_cdf.h>
