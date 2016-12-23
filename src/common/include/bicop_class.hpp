@@ -105,7 +105,7 @@ protected:
     int family_;
     int rotation_;
     VecXd parameters_;
-    MatXd parameter_bounds_;
+    MatXd parameter_bounds_;   // first row lower, second row upper
 };
 
 #endif

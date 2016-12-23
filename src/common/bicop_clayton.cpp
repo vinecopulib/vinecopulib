@@ -26,8 +26,8 @@ ClaytonBicop::ClaytonBicop()
     family_ = 3;
     rotation_ = 0;
     parameters_ = VecXd::Zero(1);
-    MatXd parameter_bounds_ = MatXd::Zero(1, 2);
-    parameter_bounds_(0, 1) = 2e2;
+    parameter_bounds_ = MatXd::Zero(1, 2);
+    parameter_bounds_(0, 1) = 200.0;
 }
 
 ClaytonBicop::ClaytonBicop(const VecXd& parameters)
@@ -35,8 +35,8 @@ ClaytonBicop::ClaytonBicop(const VecXd& parameters)
     family_ = 3;
     rotation_ = 0;
     parameters_ = parameters;
-    MatXd parameter_bounds_ = MatXd::Zero(1, 2);
-    parameter_bounds_(0, 1) = 2e2;
+    parameter_bounds_ = MatXd::Zero(1, 2);
+    parameter_bounds_(0, 1) = 200.0;
 }
 
 ClaytonBicop::ClaytonBicop(const VecXd& parameters, const int& rotation)
@@ -44,8 +44,8 @@ ClaytonBicop::ClaytonBicop(const VecXd& parameters, const int& rotation)
     family_ = 3;
     rotation_ = rotation;
     parameters_ = parameters;
-    MatXd parameter_bounds_ = MatXd::Zero(1, 2);
-    parameter_bounds_(0, 1) = 2e2;
+    parameter_bounds_ = MatXd::Zero(1, 2);
+    parameter_bounds_(0, 1) = 200.0;
 }
 
 VecXd ClaytonBicop::generator(const VecXd& u)
