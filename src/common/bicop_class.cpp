@@ -1,25 +1,24 @@
 /*
-    Copyright 2016 Thibault Vatter
+Copyright 2016 Thibault Vatter
 
-    This file is part of vinecopulib.
+This file is part of vinecopulib.
 
-    vinecoplib is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+vinecoplib is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    vinecoplib is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+vinecoplib is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
- */
+You should have received a copy of the GNU General Public License
+along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <exception>
 #include "include/bicop_class.hpp"
-#include "include/bicop_families.hpp"
 
 VecXd Bicop::hinv1_num(const MatXd &u)
 {
@@ -162,8 +161,10 @@ double Bicop::bic(MatXd& u)
     return out;
 }
 
+// TODO: generic fall-back that calculates Kendall's tau based on the pdf:
+// tau = int_0^1 int_0^1 C(u, v) c(u, v) du dv
+//     = int_0^1 int_0^1 (int_0^u int_0^v c(s, t) ds dt) c(u, v) du dv
 double Bicop::calculate_tau()
 {
-    double tau = this->par_to_tau(parameters_);
-    return tau;
+    return 999.0;
 }
