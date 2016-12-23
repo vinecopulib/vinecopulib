@@ -150,7 +150,7 @@ VecXd JoeBicop::tau_to_par(const double& tau)
 double JoeBicop::par_to_tau(const VecXd& parameters)
 {
     double par = parameters(0);
-    double tau = 2/par + 1;
+    double tau = 2 / par + 1;
     tau = gsl_sf_psi(2) - gsl_sf_psi(tau);
     tau = 1 + 2 * tau / (2 - par);
     return tau;

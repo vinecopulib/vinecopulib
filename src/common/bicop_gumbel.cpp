@@ -101,15 +101,12 @@ VecXd GumbelBicop::hinv(const MatXd& u)
 // link between Kendall's tau and the par_bicop parameter
 VecXd GumbelBicop::tau_to_par(const double& tau)
 {
-    VecXd parameters = VecXd::Zero(1);
-    parameters(0) = (tau / std::fabs(tau)) / (1 - std::fabs(tau));
-    return parameters;
+    return VecXd::Constant(1, 1.0 / (1 - tau));
 }
 
 double GumbelBicop::par_to_tau(const VecXd& parameters)
 {
-    double par = parameters(0);
-    return (std::fabs(par) - 1) / par;
+    return (parameters(0) - 1) / parameters(0);
 }
 
 // This is copy&paste from the VineCopula package

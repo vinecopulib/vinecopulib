@@ -33,6 +33,10 @@ along with vinecoplib.  If not, see "http://www.gnu.org/licenses/".
     #include "bicop_clayton.hpp"
     #endif
 
+    #ifndef VINECOPLIB_BICOP_ELLIPTICAL_HPP
+    #include "bicop_elliptical.hpp"
+    #endif
+
     #ifndef VINECOPLIB_BICOP_FRANK_HPP
     #include "bicop_frank.hpp"
     #endif

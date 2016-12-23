@@ -21,6 +21,7 @@
 #define VINECOPLIB_BICOP_PARAMETRIC_TEST_HPP
 
 #include "gtest/gtest.h"
+#include "src/common/include/bicop_class.hpp"
 #include "src/common/include/bicop_families.hpp"
 #include "r_instance.hpp"
 
@@ -47,9 +48,10 @@ class ParBicopTest : public FakeParBicopTest {
 public:
     void setup_parameters(RInstance *rinstance_ptr) {
         double tau = this->get_tau(rinstance_ptr);
-        double par = this->par_bicop_.tau_to_par(tau);
-        VecXd parameters = par * VecXd::Ones(2);
-        parameters(1) = 4;
+        VecXd parameters(2);
+        parameters = this->par_bicop_.tau_to_par(tau);
+        if (parameters.size() == 2)
+            parameters(1) = 4.0;
         this->par_bicop_.set_parameters(parameters);
         this->set_family(rinstance_ptr, this->par_bicop_.get_family());
         this->set_parameters(rinstance_ptr, this->par_bicop_.get_parameters());

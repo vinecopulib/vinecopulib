@@ -31,6 +31,7 @@ public:
     // link between Kendall's tau and the par_bicop parameter
     virtual VecXd tau_to_par(const double& tau) = 0;
     virtual double par_to_tau(const VecXd& parameters) = 0;
+    double calculate_tau();
 
     // number of parameters
     int calculate_npars();

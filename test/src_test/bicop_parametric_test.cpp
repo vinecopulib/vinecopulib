@@ -47,23 +47,23 @@ void FakeParBicopTest::change_n(RInstance *rinstance_ptr, int n)
 }
 MatXd FakeParBicopTest::get_U(RInstance *rinstance_ptr)
 {
-    return(rinstance_ptr->get_U());
+    return rinstance_ptr->get_U();
 }
 
 VecXd FakeParBicopTest::get_parameters(RInstance *rinstance_ptr)
 {
-    return(rinstance_ptr->get_parameters());
+    return rinstance_ptr->get_parameters();
 }
 
 int FakeParBicopTest::get_family(RInstance *rinstance_ptr)
 {
-    return(rinstance_ptr->get_family());
+    return rinstance_ptr->get_family();
 }
 double FakeParBicopTest::get_tau(RInstance *rinstance_ptr)
 {
-    return(rinstance_ptr->get_tau());
+    return rinstance_ptr->get_tau();
 }
 int FakeParBicopTest::get_rotation(RInstance *rinstance_ptr)
 {
-    return(rinstance_ptr->get_rotation());
+    return rinstance_ptr->get_rotation();
 }
