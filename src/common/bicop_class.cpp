@@ -20,6 +20,8 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <exception>
 #include "include/bicop_class.hpp"
 
+
+
 VecXd Bicop::hinv1_num(const MatXd &u)
 {
     MatXd v = u;
@@ -142,23 +144,21 @@ MatXd Bicop::simulate(const int& n)
     return U;
 }
 
-double Bicop::loglik(MatXd& u)
+double Bicop::loglik(const MatXd& u)
 {
     VecXd ll = this->pdf(u);
     ll = ll.array().log();
     return ll.sum();
 }
 
-double Bicop::aic(MatXd& u)
+double Bicop::aic(const MatXd& u)
 {
-    double out = -2 * this->loglik(u) + 2 * calculate_npars();
-    return out;
+    return -2 * this->loglik(u) + 2 * calculate_npars();
 }
 
-double Bicop::bic(MatXd& u)
+double Bicop::bic(const MatXd& u)
 {
-    double out = -2 * this->loglik(u) + 2 * log(this->calculate_npars());
-    return out;
+    return -2 * this->loglik(u) + 2 * log(this->calculate_npars());
 }
 
 // TODO: generic fall-back that calculates Kendall's tau based on the pdf:

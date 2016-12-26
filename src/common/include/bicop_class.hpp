@@ -78,9 +78,9 @@ public:
     //!
     //! @param u \f$m \times 2\f$ matrix of observations.
     //! @{
-    double loglik(MatXd& u);
-    double aic(MatXd& u);
-    double bic(MatXd& u);
+    double loglik(const MatXd& u);
+    double aic(const MatXd& u);
+    double bic(const MatXd& u);
     //! @}
 
     //! Get number of parameters.
