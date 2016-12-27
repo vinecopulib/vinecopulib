@@ -19,7 +19,8 @@ add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_
 add_subdirectory(src_test)
 
 set(unit_tests
-        test_bicop_parametric)
+        test_bicop_parametric
+        test_bicop_class)
 
 foreach(app ${unit_tests})
     add_executable(${app} ${app}.cpp)
