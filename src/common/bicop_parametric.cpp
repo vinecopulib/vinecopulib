@@ -48,7 +48,9 @@ typedef struct
 } pmle_data;
 
 // the objective function for maximum likelihood estimation
-double mle_objective(const std::vector<double>& x, std::vector<double>& grad, void *data)
+double mle_objective(const std::vector<double>& x,
+                     std::vector<double> __attribute__((unused))& grad,
+                     void* data)
 {
     mle_data* newdata = (mle_data*) data;
     ++newdata->mle_objective_calls;
@@ -60,7 +62,9 @@ double mle_objective(const std::vector<double>& x, std::vector<double>& grad, vo
 }
 
 // the objective function for profile maximum likelihood estimation
-double pmle_objective(const std::vector<double>& x, std::vector<double>& grad, void *data)
+double pmle_objective(const std::vector<double>& x,
+                      std::vector<double> __attribute__((unused))& grad,
+                      void* data)
 {
     pmle_data* newdata = (pmle_data*) data;
     ++newdata->pmle_objective_calls;
@@ -90,8 +94,8 @@ void ParBicop::fit(const MatXd &data, char method[])
     VecXd newpar = tau_to_parameters(tau);
 
     std::string association_direction = get_association_direction();
-    if ((tau < 0 & association_direction.compare("positive") == 0) |
-            (tau > 0 & association_direction.compare("negative") == 0))
+    if (((tau < 0) & (association_direction.compare("positive") == 0)) |
+            ((tau > 0) & (association_direction.compare("negative") == 0)))
     {
         std::cout << "The data and copula are not compatible." << std::endl;
     } else

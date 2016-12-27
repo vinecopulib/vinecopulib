@@ -38,7 +38,11 @@ public:
     int calculate_npars();
 };
 
-double mle_objective(const std::vector<double> &x, std::vector<double> &grad, void *data);
-double pmle_objective(const std::vector<double> &x, std::vector<double> &grad, void *data);
+double mle_objective(const std::vector<double>& x,
+                    std::vector<double> __attribute__((unused))& grad,
+                    void* data);
+double pmle_objective(const std::vector<double>& x,
+                      std::vector<double> __attribute__((unused))& grad,
+                      void* data);
 
 #endif

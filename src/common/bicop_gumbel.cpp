@@ -44,12 +44,10 @@ GumbelBicop::GumbelBicop(const VecXd& parameters, const int& rotation)
 {
     family_ = 4;
     rotation_ = rotation;
-    if (rotation == 90 | rotation == 270)
-    {
+    if ((rotation == 90) | (rotation == 270))
         association_direction_ = "negative";
-    } else {
+    else
         association_direction_ = "positive";
-    }
     parameters_ = parameters;
     parameter_bounds_ = MatXd::Ones(1, 2);
     parameter_bounds_(0, 1) = 200.0;
@@ -115,10 +113,9 @@ VecXd GumbelBicop::tau_to_parameters(const double& tau)
 double GumbelBicop::parameters_to_tau(const VecXd& parameters)
 {
     double tau = (parameters(0) - 1) / parameters(0);
-    if (rotation_ == 90 | rotation_ == 270)
-    {
+    if ((rotation_ == 90) | (rotation_ == 270))
         tau *= -1;
-    }
+
     return tau;
 }
 
