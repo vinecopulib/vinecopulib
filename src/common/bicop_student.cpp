@@ -58,19 +58,17 @@ StudentBicop::StudentBicop(const VecXd& parameters, const int& rotation)
 }
 
 // PDF
-VecXd StudentBicop::pdf(const MatXd& u)
+VecXd StudentBicop::pdf_default(const MatXd& u)
 {
     int j;
-    double u1, u2, t1, t2;
+    double t1, t2;
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));
     VecXd f = VecXd::Zero(u.rows());
 
     for (j = 0; j < u.rows(); ++j) {
-        u1 = u(j, 0);
-        u2 = u(j, 1);
-        t1 = gsl_cdf_tdist_Pinv(u1, nu);
-        t2 = gsl_cdf_tdist_Pinv(u2, nu);
+        t1 = gsl_cdf_tdist_Pinv(u(j, 0), nu);
+        t2 = gsl_cdf_tdist_Pinv(u(j, 1), nu);
         f(j) = StableGammaDivision((nu + 2.0) / 2.0, nu / 2.0) /
         (nu * M_PI * sqrt(1.0 - pow(rho, 2.0)) *
         gsl_ran_tdist_pdf(t1, nu) *
@@ -85,7 +83,7 @@ return f;
 }
 
 // Student h-function
-VecXd StudentBicop::hfunc1(const MatXd& u)
+VecXd StudentBicop::hfunc1_default(const MatXd& u)
 {
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));
@@ -112,7 +110,7 @@ VecXd StudentBicop::hfunc1(const MatXd& u)
 }
 
 
-VecXd StudentBicop::hinv1(const MatXd& u)
+VecXd StudentBicop::hinv1_default(const MatXd& u)
 {
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));

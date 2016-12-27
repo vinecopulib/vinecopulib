@@ -48,22 +48,30 @@ IndepBicop::IndepBicop(const VecXd& parameters, const int& rotation)
 }
 
 // PDF
-VecXd IndepBicop::pdf(const MatXd& u)
+VecXd IndepBicop::pdf_default(const MatXd& u)
 {
     return VecXd::Ones(u.rows());
 }
 
 // hfunctions: the conditioning variable is put second
-VecXd IndepBicop::hfunc1(const MatXd& u)
+VecXd IndepBicop::hfunc1_default(const MatXd& u)
 {
-    VecXd v = u.col(1);
-    return v;
+    return u.col(1);
 }
 
-VecXd IndepBicop::hfunc2(const MatXd& u)
+VecXd IndepBicop::hfunc2_default(const MatXd& u)
 {
-    VecXd v = u.col(0);
-    return v;
+    return u.col(0);
+}
+
+VecXd IndepBicop::hinv1_default(const MatXd& u)
+{
+    return u.col(1);
+}
+
+VecXd IndepBicop::hinv2_default(const MatXd& u)
+{
+    return u.col(0);
 }
 
 VecXd IndepBicop::tau_to_parameters(const double __attribute__((unused))& tau)
@@ -74,14 +82,4 @@ VecXd IndepBicop::tau_to_parameters(const double __attribute__((unused))& tau)
 double IndepBicop::parameters_to_tau(const VecXd __attribute__((unused))& parameters)
 {
     return 0.0;
-}
-
-VecXd IndepBicop::hinv1(const MatXd& u)
-{
-    return u.col(1);
-}
-
-VecXd IndepBicop::hinv2(const MatXd& u)
-{
-    return u.col(0);
 }

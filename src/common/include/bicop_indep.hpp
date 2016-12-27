@@ -31,17 +31,16 @@ public:
     IndepBicop(const VecXd& parameters, const int& rotation);
 
     // PDF
-    VecXd pdf(const MatXd& u);
+    VecXd pdf_default(const MatXd& u);
 
     // hfunctions: the conditioning variable is put second
-    VecXd hfunc1(const MatXd& u);
-    VecXd hfunc2(const MatXd& u);
+    VecXd hfunc1_default(const MatXd& u);
+    VecXd hfunc2_default(const MatXd& u);
+    VecXd hinv1_default(const MatXd& u);
+    VecXd hinv2_default(const MatXd& u);
 
     VecXd tau_to_parameters(const double __attribute__((unused))& tau);
     double parameters_to_tau(const VecXd __attribute__((unused))& parameters);
-
-    VecXd hinv1(const MatXd& u);
-    VecXd hinv2(const MatXd& u);
 };
 
 #endif

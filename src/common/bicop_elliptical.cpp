@@ -20,20 +20,14 @@
 #include "include/bicop_elliptical.hpp"
 
 
-VecXd EllipticalBicop::hfunc2(const MatXd& u)
+VecXd EllipticalBicop::hfunc2_default(const MatXd& u)
 {
-    MatXd v = u;
-    v.col(0).swap(v.col(1));
-    VecXd h = hfunc1(v);
-    return h;
+    return hfunc1_default(swap_cols(u));
 }
 
-VecXd EllipticalBicop::hinv2(const MatXd& u)
+VecXd EllipticalBicop::hinv2_default(const MatXd& u)
 {
-    MatXd v = u;
-    v.col(0).swap(v.col(1));
-    VecXd h = hinv1(v);
-    return h;
+    return hinv1_default(swap_cols(u));
 }
 
 double EllipticalBicop::parameters_to_tau(const VecXd& parameters)
