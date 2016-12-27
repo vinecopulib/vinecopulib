@@ -24,6 +24,8 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <random>
 #include <nlopt.hpp>
 #include <iostream>
+#include <memory>
+
 typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
 
@@ -39,7 +41,16 @@ class Bicop
 {
 
 public:
-    //! pdf Copula density
+    //! Create a bivariate copula
+    //!
+    //! @param family the copula family.
+    //! @param par the copula parameters (must be compatible with family).
+    //! @return A pointer to an object that inherits from \c Bicop.
+    static std::shared_ptr<Bicop> create(const int& family,
+                                         const VecXd& parameters,
+                                         const int& rotation);
+
+    //! \defgroup df Copula density
     //!
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     //! @{
@@ -129,5 +140,7 @@ protected:
     VecXd parameters_;
     MatXd parameter_bounds_;   // first row lower, second row upper
 };
+
+typedef std::shared_ptr<Bicop> Bicop_ptr;
 
 #endif
