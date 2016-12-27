@@ -22,7 +22,6 @@
 RInstance *rinstance_ptr = new RInstance;
 
 namespace {
-
     /*TYPED_TEST(ParBicopTest, mle_is_correct) {
         // set-up parameters
         this->setup_parameters(rinstance_ptr);
@@ -42,123 +41,127 @@ namespace {
 
     // Test if the C++ implementation of the par_to_tau and tau_to_par is correct
     TYPED_TEST(ParBicopTest, par_to_tau_is_correct) {
-        // set-up parameters
         this->setup_parameters(rinstance_ptr);
+        if (this->needs_check_) {
+            // evaluate in R
+            MatXd U = this->get_U(rinstance_ptr);
+            std::string eval_fct = "BiCopPar2Tau(,,)";
+            VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 13);
 
-        // evaluate in R
-        MatXd U = this->get_U(rinstance_ptr);
-        std::string eval_fct = "BiCopPar2Tau(,,)";
-        VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 13);
-
-        // assert approximate equality
-        VecXd par = this->get_parameters(rinstance_ptr);
-        ASSERT_TRUE(fabs(this->par_bicop_.parameters_to_tau(par) - f(0)) < 1e-4);
+            // assert approximate equality
+            VecXd par = this->get_parameters(rinstance_ptr);
+            ASSERT_TRUE(fabs(this->par_bicop_.parameters_to_tau(par) - f(0)) < 1e-4);
+        }
     }
 
     // Test if the C++ implementation of the PDF is correct
     TYPED_TEST(ParBicopTest, pdf_is_correct) {
-        // set-up parameters
         this->setup_parameters(rinstance_ptr);
+        if (this->needs_check_) {
+            // evaluate in R
+            MatXd U = this->get_U(rinstance_ptr);
+            std::string eval_fct = "BiCopPDF(u1,u2,,,)";
+            VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 15);
 
-        // evaluate in R
-        MatXd U = this->get_U(rinstance_ptr);
-        std::string eval_fct = "BiCopPDF(u1,u2,,,)";
-        VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 15);
+            // evaluate in C++
+            VecXd f2 = this->par_bicop_.pdf(U);
 
-        // evaluate in C++
-        VecXd f2 = this->par_bicop_.pdf(U);
-
-        // assert approximate equality
-        ASSERT_TRUE(f.isApprox(f2, 1e-4));
+            // assert approximate equality
+            MatXd output(f2.size(), 2);
+            output.col(0) = f;
+            output.col(1) = f2;
+            ASSERT_TRUE(f.isApprox(f2, 1e-4));
+        }
     }
 
     // Test if the C++ implementation of the hfunc1 is correct
     TYPED_TEST(ParBicopTest, hfunc1_is_correct) {
-        // set-up parameters
         this->setup_parameters(rinstance_ptr);
+        if (this->needs_check_) {
+            // evaluate in R
+            MatXd U = this->get_U(rinstance_ptr);
+            std::string eval_fct = "BiCopHfunc1(u1,u2,,,)";
+            VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 18);
 
-        // evaluate in R
-        MatXd U = this->get_U(rinstance_ptr);
-        std::string eval_fct = "BiCopHfunc1(u1,u2,,,)";
-        VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 18);
+            // evaluate in C++
+            VecXd f2 = this->par_bicop_.hfunc1(U);
 
-        // evaluate in C++
-        VecXd f2 = this->par_bicop_.hfunc1(U);
-
-        // assert approximate equality
-        ASSERT_TRUE(f.isApprox(f2, 1e-4));
+            // assert approximate equality
+            ASSERT_TRUE(f.isApprox(f2, 1e-4)) << f(0) << " != " << f2(0);
+        }
     }
 
     // Test if the C++ implementation of the hfunc2 is correct
     TYPED_TEST(ParBicopTest, hfunc2_is_correct) {
-        // set-up parameters
         this->setup_parameters(rinstance_ptr);
+        if (this->needs_check_) {
+            // evaluate in R
+            MatXd U = this->get_U(rinstance_ptr);
+            std::string eval_fct = "BiCopHfunc2(u1,u2,,,)";
+            VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 18);
 
-        // evaluate in R
-        MatXd U = this->get_U(rinstance_ptr);
-        std::string eval_fct = "BiCopHfunc2(u1,u2,,,)";
-        VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 18);
+            // evaluate in C++
+            VecXd f2 = this->par_bicop_.hfunc2(U);
 
-        // evaluate in C++
-        VecXd f2 = this->par_bicop_.hfunc2(U);
-
-        // assert approximate equality
-        ASSERT_TRUE(f.isApprox(f2, 1e-4));
+            // assert approximate equality
+            ASSERT_TRUE(f.isApprox(f2, 1e-4)) << f(0) << " != " << f2(0);
+        }
     }
 
     // Test if the C++ implementation of the hinv1 is correct
     TYPED_TEST(ParBicopTest, hinv1_is_correct) {
-        // set-up parameters
         this->setup_parameters(rinstance_ptr);
+        if (this->needs_check_) {
+            // evaluate in R
+            MatXd U = this->get_U(rinstance_ptr);
+            std::string eval_fct = "BiCopHinv1(u1,u2,,,)";
+            VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 17);
 
-        // evaluate in R
-        MatXd U = this->get_U(rinstance_ptr);
-        std::string eval_fct = "BiCopHinv1(u1,u2,,,)";
-        VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 17);
+            // evaluate in C++
+            VecXd f2 = this->par_bicop_.hinv1(U);
 
-        // evaluate in C++
-        VecXd f2 = this->par_bicop_.hinv1(U);
-
-        // assert approximate equality
-        ASSERT_TRUE(f.isApprox(f2, 1e-4));
+            // assert approximate equality
+            ASSERT_TRUE(f.isApprox(f2, 1e-4));
+        }
     }
 
     // Test if the C++ implementation of the hinv2 is correct
     TYPED_TEST(ParBicopTest, hinv2_is_correct) {
-        // set-up parameters
         this->setup_parameters(rinstance_ptr);
+        if (this->needs_check_) {
+            // evaluate in R
+            MatXd U = this->get_U(rinstance_ptr);
+            std::string eval_fct = "BiCopHinv2(u1,u2,,,)";
+            VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 17);
 
-        // evaluate in R
-        MatXd U = this->get_U(rinstance_ptr);
-        std::string eval_fct = "BiCopHinv2(u1,u2,,,)";
-        VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 17);
+            // evaluate in C++
+            VecXd f2 = this->par_bicop_.hinv2(U);
 
-        // evaluate in C++
-        VecXd f2 = this->par_bicop_.hinv2(U);
-
-        // assert approximate equality
-        ASSERT_TRUE(f.isApprox(f2, 1e-4));
+            // assert approximate equality
+            ASSERT_TRUE(f.isApprox(f2, 1e-4));
+        }
     }
 
     // Test if the C++ implementation of the loglik is correct
     TYPED_TEST(ParBicopTest, loglik_is_correct) {
-        // set-up parameters
         this->setup_parameters(rinstance_ptr);
+        if (this->needs_check_) {
+            // evaluate in R
+            MatXd U = this->get_U(rinstance_ptr);
+            std::string eval_fct = "sum(log(BiCopPDF(u1,u2,,,)))";
+            VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 23);
 
-        // evaluate in R
-        MatXd U = this->get_U(rinstance_ptr);
-        std::string eval_fct = "sum(log(BiCopPDF(u1,u2,,,)))";
-        VecXd f = this->eval_in_R(rinstance_ptr, eval_fct, 23);
+            // evaluate in C++
+            double f2 = this->par_bicop_.loglik(U);
 
-        // evaluate in C++
-        double f2 = this->par_bicop_.loglik(U);
-
-        // assert approximate equality
-        ASSERT_TRUE(fabs(f2 - f(0)) < 1e-2);
+            // assert approximate equality
+            ASSERT_TRUE(fabs(f2 - f(0)) < 1e-2);
+        }
     }
 }
 
 int main(int argc, char **argv) {
+    rinstance_ptr->set_rotation(270);
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

@@ -1,21 +1,21 @@
 /*
-    Copyright 2016 Thibault Vatter
+Copyright 2016 Thibault Vatter
 
-    This file is part of vinecoplib.
+This file is part of vinecoplib.
 
-    vinecoplib is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+vinecoplib is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    vinecoplib is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+vinecoplib is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
- */
+You should have received a copy of the GNU General Public License
+along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "include/r_instance.hpp"
 
@@ -58,25 +58,27 @@ VecXd RInstance::eval_in_R(std::string eval_fct, int start)
 {
 
     std::string new_eval_fct = eval_fct;
-    std::string par = std::to_string(parameters_(0));
     int family = get_family();
+    double parameter = parameters_(0);
 
     // take care of the rotations
-    int rotated_families_array[] = {3,4,6,7,8,9,10};
-    std::vector<int> rotated_families;
-    rotated_families.assign(rotated_families_array,rotated_families_array+7);
-    if(std::find(rotated_families.begin(), rotated_families.end(), family) != rotated_families.end()) {
+    std::vector<int> rotated_families = {3,4,6,7,8,9,10};
+    if (std::find(rotated_families.begin(), rotated_families.end(), family) != rotated_families.end()) {
         int rotation = get_rotation();
-        if (rotation == 180)
-            family += 10;
-        if (rotation == 90)
+        if (rotation == 90) {
             family += 20;
-        if (rotation == 270)
+            parameter *= -1;
+        } else if (rotation == 180) {
+            family += 10;
+        } else if (rotation == 270) {
             family += 30;
+            parameter *= -1;
+        }
     }
 
     // evaluate the function in R
     std::string fam = std::to_string(family);
+    std::string par = std::to_string(parameter);
     new_eval_fct.insert(start,fam);
     new_eval_fct.insert(start+fam.length()+1,par);
     if (parameters_.size() == 1) {
