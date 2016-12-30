@@ -18,8 +18,6 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "include/bicop_archimedean.hpp"
-#include <iostream>
-
 
 // PDF
 VecXd ArchimedeanBicop::pdf_default(const MatXd& u)
