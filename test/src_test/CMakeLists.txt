@@ -8,4 +8,4 @@ add_library(src_test STATIC
         ${src_test_headers}
         )
 
-target_link_libraries(src_test gtest gmock common ${external_libs} ${test_libs})
+target_link_libraries(src_test gtest gmock vinecopulib ${external_libs} ${test_libs})

@@ -83,7 +83,7 @@ double pmle_objective(const std::vector<double>& x,
 }
 
 // fit
-void ParBicop::fit(const MatXd &data, char method[])
+void ParBicop::fit(const MatXd &data, std::string method)
 {
     int npars = calculate_npars();
     int n = data.rows();
@@ -100,7 +100,7 @@ void ParBicop::fit(const MatXd &data, char method[])
         std::cout << "The data and copula are not compatible." << std::endl;
     } else
     {
-        if (strcmp(method,"itau") == 0)
+        if (method.compare("itau") == 0)
         {
             if (npars == 1)
             {
@@ -169,7 +169,7 @@ void ParBicop::fit(const MatXd &data, char method[])
 
                 set_parameters(parameters);
             }
-        } else if (strcmp(method,"mle") == 0) {
+        } else if (method.compare("mle") == 0) {
             if (npars != 0)
             {
                 // Derivatives free optimization
@@ -229,7 +229,7 @@ void ParBicop::fit(const MatXd &data, char method[])
 
 
         } else {
-            std::cout << "method not implemented! \n";
+            throw std::runtime_error(std::string("Method not implemented"));
         }
     }
 }

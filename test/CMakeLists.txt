@@ -19,11 +19,12 @@ add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_
 add_subdirectory(src_test)
 
 set(unit_tests
-        test_bicop_parametric)
+        test_bicop_parametric
+        test_bicop_class)
 
 foreach(app ${unit_tests})
     add_executable(${app} ${app}.cpp)
-    target_link_libraries(${app} gtest gmock common ${external_libs} ${test_libs} src_test)
+    target_link_libraries(${app} gtest gmock vinecopulib ${external_libs} ${test_libs} src_test)
 endforeach()
 
 #add_executable(runUnitTests gtest.cpp) #${test_SRCS}

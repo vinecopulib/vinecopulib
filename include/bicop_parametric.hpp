@@ -27,7 +27,7 @@ class ParBicop : public Bicop {
 
 public:
     // fit copula parameters
-    void fit(const MatXd &data, char method[]);
+    void fit(const MatXd &data, std::string method);
 
     // link between Kendall's tau and the par_bicop parameter
     virtual VecXd tau_to_parameters(const double& tau) = 0;

@@ -33,6 +33,7 @@ script:
   - cmake .. && make && make doc
   - cd ../bin
   - ./test_bicop_parametric
+  - ./test_bicop_class
 
 notifications:
   email:

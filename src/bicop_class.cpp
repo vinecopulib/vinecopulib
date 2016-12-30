@@ -18,7 +18,36 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <exception>
-#include "include/bicop_class.hpp"
+#include "include/bicop.hpp"
+
+Bicop_ptr Bicop::create(const int& family, const VecXd& parameters, const int& rotation)
+{
+    switch (family) {
+        case 0:
+            return Bicop_ptr(new IndepBicop(parameters, rotation));
+
+        case 1:
+            return Bicop_ptr(new GaussBicop(parameters, rotation));
+
+        case 2:
+            return Bicop_ptr(new StudentBicop(parameters, rotation));
+
+        case 3:
+            return Bicop_ptr(new ClaytonBicop(parameters, rotation));
+
+        case 4:
+            return Bicop_ptr(new GumbelBicop(parameters, rotation));
+
+        case 5:
+            return Bicop_ptr(new FrankBicop(parameters, rotation));
+
+        case 6:
+            return Bicop_ptr(new JoeBicop(parameters, rotation));
+
+        default:
+            throw std::runtime_error(std::string("Family not implemented"));
+    }
+}
 
 VecXd Bicop::pdf(const MatXd& u)
 {

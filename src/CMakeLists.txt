@@ -1,5 +1,10 @@
-include_directories(${PROJECT_SOURCE_DIR})
-include_directories(${PROJECT_BINARY_DIR})
+file(GLOB_RECURSE vinecopulib_sources *.cpp *.cc *c)
+file(GLOB_RECURSE vinecopulib_headers include/*.h include/*.hpp)
 
-add_subdirectory(common)
-add_subdirectory(apps)
+include_directories(${external_includes})
+
+add_library(vinecopulib STATIC
+        ${vinecopulib_sources}
+        ${vinecopulib_headers})
+
+target_link_libraries(vinecopulib ${external_libs})
