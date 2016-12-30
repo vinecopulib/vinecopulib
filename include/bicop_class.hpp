@@ -25,6 +25,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <nlopt.hpp>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
@@ -89,10 +90,11 @@ public:
     //! @param n number of observations.
     MatXd simulate(const int& n);
 
-    //! \devgroup fitstats Fit statistics
+    //! \devgroup fitstats Fit methods and statistics
     //!
     //! @param u \f$m \times 2\f$ matrix of observations.
     //! @{
+    virtual void fit(const MatXd &data, std::string method) = 0;
     double loglik(const MatXd& u);
     double aic(const MatXd& u);
     double bic(const MatXd& u);

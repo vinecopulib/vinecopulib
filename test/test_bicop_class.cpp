@@ -19,7 +19,6 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "gtest/gtest.h"
 #include "include/bicop.hpp"
-#include <vector>
 
 namespace {
     // Test if the C++ implementation of the par_to_tau and tau_to_par is correct

@@ -21,21 +21,10 @@ along with vinecopulib.  If not, see "http://www.gnu.org/licenses/".
 #define VINECOPULIB_BICOP_FAMILIES_HPP
 
     // include all familie headers not included yet (alphabetic order);
-    // this automatically includes the bicop_class header
-    #ifndef VINECOPULIB_BICOP_ARCHIMEDEAN_HPP
-    #include "bicop_archimedean.hpp"
-    #endif
-
-    #ifndef VINECOPULIB_BICOP_CLASS_HPP
-    #include "bicop_class.hpp"
-    #endif
+    // this automatically includes the bicop_class, bicop_archimedean bicop_elliptical and bicop_parametric headers
 
     #ifndef VINECOPULIB_BICOP_CLAYTON_HPP
     #include "bicop_clayton.hpp"
-    #endif
-
-    #ifndef VINECOPULIB_BICOP_ELLIPTICAL_HPP
-    #include "bicop_elliptical.hpp"
     #endif
 
     #ifndef VINECOPULIB_BICOP_FRANK_HPP
@@ -56,10 +45,6 @@ along with vinecopulib.  If not, see "http://www.gnu.org/licenses/".
 
     #ifndef VINECOPULIB_BICOP_JOE_HPP
     #include "bicop_joe.hpp"
-    #endif
-
-    #ifndef VINECOPULIB_BICOP_PARAMETRIC_HPP
-    #include "bicop_parametric.hpp"
     #endif
 
     #ifndef VINECOPULIB_BICOP_STUDENT_HPP
