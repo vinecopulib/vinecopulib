@@ -67,10 +67,6 @@ public:
     VecXd hfunc2(const MatXd& u);
     VecXd hinv1(const MatXd& u);
     VecXd hinv2(const MatXd& u);
-    virtual VecXd hfunc1_default(const MatXd& u) = 0;
-    virtual VecXd hfunc2_default(const MatXd& u) = 0;
-    virtual VecXd hinv1_default(const MatXd& u) = 0;
-    virtual VecXd hinv2_default(const MatXd& u) = 0;
     //! @}
 
     //! Simulate from a bivariate copula
@@ -108,6 +104,11 @@ public:
 
 
 protected:
+    virtual VecXd hfunc1_default(const MatXd& u) = 0;
+    virtual VecXd hfunc2_default(const MatXd& u) = 0;
+    virtual VecXd hinv1_default(const MatXd& u) = 0;
+    virtual VecXd hinv2_default(const MatXd& u) = 0;
+
     //! Numerical inversion of h-functions
     //!
     //! These are generic functions to invert the hfunctions numerically.
