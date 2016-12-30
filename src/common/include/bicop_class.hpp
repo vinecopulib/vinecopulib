@@ -44,7 +44,6 @@ public:
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     //! @{
     VecXd pdf(const MatXd& u);
-    virtual VecXd pdf_default(const MatXd& u) = 0;
     //! @}
 
     //! \defgroup hfunctions h-functions
@@ -104,6 +103,7 @@ public:
 
 
 protected:
+    virtual VecXd pdf_default(const MatXd& u) = 0;
     virtual VecXd hfunc1_default(const MatXd& u) = 0;
     virtual VecXd hfunc2_default(const MatXd& u) = 0;
     virtual VecXd hinv1_default(const MatXd& u) = 0;
