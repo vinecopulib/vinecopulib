@@ -34,13 +34,13 @@ public:
     GaussBicop(const VecXd& parameters, const int& rotation);
 
     // PDF
-    VecXd pdf(const MatXd& u);
+    VecXd pdf_default(const MatXd& u);
 
     // hfunction
-    VecXd hfunc1(const MatXd& u);
+    VecXd hfunc1_default(const MatXd& u);
 
     // inverse hfunction
-    VecXd hinv1(const MatXd& u);
+    VecXd hinv1_default(const MatXd& u);
 };
 
 #endif

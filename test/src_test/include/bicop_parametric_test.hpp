@@ -54,10 +54,23 @@ public:
         this->par_bicop_.set_parameters(parameters);
         this->set_family(rinstance_ptr, this->par_bicop_.get_family());
         this->set_parameters(rinstance_ptr, this->par_bicop_.get_parameters());
-    };
+        this->par_bicop_.set_rotation(rinstance_ptr->get_rotation());
+        needs_check_ = true;
+        std::vector<int> rotation_less_fams = {0, 1, 2, 5};
+        bool is_rotless = (
+            std::find(
+                rotation_less_fams.begin(),
+                rotation_less_fams.end(),
+                this->par_bicop_.get_family()
+            )  != rotation_less_fams.end()
+        );
+        if (is_rotless)
+            needs_check_ = (rinstance_ptr->get_rotation() == 0);
+    }
 protected:
     ParBicopTest() : par_bicop_() {}
     T par_bicop_;
+    bool needs_check_;
 };
 
 // Create a list of types, each of which will be used as the test fixture's 'T'

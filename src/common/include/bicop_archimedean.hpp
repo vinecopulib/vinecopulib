@@ -26,11 +26,13 @@ class ArchimedeanBicop : public ParBicop {
 
 public:
     // PDF
-    VecXd pdf(const MatXd& u);
+    VecXd pdf_default(const MatXd& u);
 
     // hfunctions: the conditioning variable is put second
-    VecXd hfunc1(const MatXd& u);
-    VecXd hfunc2(const MatXd& u);
+    VecXd hfunc1_default(const MatXd& u);
+    VecXd hfunc2_default(const MatXd& u);
+    VecXd hinv1_default(const MatXd& u);
+    VecXd hinv2_default(const MatXd& u);
 
     // generator, its inverse and derivatives for the archimedean copula
     virtual VecXd generator(const VecXd& u) = 0;
@@ -39,8 +41,6 @@ public:
     virtual VecXd generator_derivative2(const VecXd& u) = 0;
 
     virtual VecXd hinv(const MatXd& u) = 0;
-    VecXd hinv1(const MatXd& u);
-    VecXd hinv2(const MatXd& u);
 };
 
 

@@ -161,7 +161,7 @@ double JoeBicop::parameters_to_tau(const VecXd& parameters)
     tau = 1 + 2 * tau / (2 - par);
     if ((rotation_ == 90) | (rotation_ == 270))
         tau *= -1;
-    
+
     return tau;
 }
 
@@ -212,7 +212,8 @@ double qcondjoe(double* q, double* u, double* de)
         if(isnan(pdf) || isnan(c21) ) { diff/=-2.; }  // added for de>=30
         else diff=(c21-*q)/pdf;
         v-=diff;
-        while(v<=0 || v>=1 || fabs(diff)>0.25 ) { diff/=2.; v+=diff; }
+        int iter2 = 0;
+        while((v<=0 || v>=1 || fabs(diff)>0.25) & (iter2 <20)) {++iter2; diff/=2.; v+=diff; }
     }
     return(v);
 }

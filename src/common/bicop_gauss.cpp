@@ -51,19 +51,16 @@ GaussBicop::GaussBicop(const VecXd& parameters, const int& rotation)
 }
 
 // PDF
-VecXd GaussBicop::pdf(const MatXd& u)
+VecXd GaussBicop::pdf_default(const MatXd& u)
 {
-    int j;
-    double u1, u2, t1, t2, tmp;
+    double t1, t2, tmp;
     double rho = double(this->parameters_(0));
     VecXd f = VecXd::Zero(u.rows());
     //boost::math::normal dist(0,1);
 
-    for (j = 0; j < u.rows(); ++j) {
-        u1 = u(j, 0);
-        u2 = u(j, 1);
-        t1 = gsl_cdf_ugaussian_Pinv(u1);
-        t2 = gsl_cdf_ugaussian_Pinv(u2);
+    for (int j = 0; j < u.rows(); ++j) {
+        t1 = gsl_cdf_ugaussian_Pinv(u(j, 0));
+        t2 = gsl_cdf_ugaussian_Pinv(u(j, 1));
         tmp = gsl_ran_bivariate_gaussian_pdf(t1, t2, 1.0, 1.0, rho);
         tmp /= gsl_ran_ugaussian_pdf(t1) * gsl_ran_ugaussian_pdf(t2);
         f(j) = tmp;
@@ -77,7 +74,7 @@ VecXd GaussBicop::pdf(const MatXd& u)
 
 
 // Normal h-function
-VecXd GaussBicop::hfunc1(const MatXd& u)
+VecXd GaussBicop::hfunc1_default(const MatXd& u)
 {
     double rho = double(this->parameters_(0));
     int j;
@@ -111,7 +108,7 @@ VecXd GaussBicop::hfunc1(const MatXd& u)
 }
 
 
-VecXd GaussBicop::hinv1(const MatXd& u)
+VecXd GaussBicop::hinv1_default(const MatXd& u)
 {
     double rho = double(this->parameters_(0));
     VecXd hinv = VecXd::Zero(u.rows());

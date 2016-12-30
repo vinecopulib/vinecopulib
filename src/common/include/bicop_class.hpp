@@ -39,10 +39,12 @@ class Bicop
 {
 
 public:
-    //! Copula density
+    //! pdf Copula density
     //!
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
-    virtual VecXd pdf(const MatXd& u) = 0;
+    //! @{
+    VecXd pdf(const MatXd& u);
+    //! @}
 
     //! \defgroup hfunctions h-functions
     //!
@@ -52,22 +54,19 @@ public:
     //! \f[ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds. \f]
     //! \c hinv1 is the inverse w.r.t. second argument (conditioned on first),
     //! \c hinv2 is the inverse w.r.t. first argument (conditioned on second),
+    //!
+    //! \c hfunc1, \c hfunc2, \c hinv1, and \c hinv2 mainly take care that
+    //! rotations are properly handled.  They call \c hfunc1_default,
+    //! \c hfunc2_default, \c hinv1_default, and hinv2_default which are
+    //! family-specific implementations for `rotation = 0`.
+    //!
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     //! @{
-    virtual VecXd hfunc1(const MatXd& u) = 0;
-    virtual VecXd hfunc2(const MatXd& u) = 0;
-    virtual VecXd hinv1(const MatXd& u) = 0;
-    virtual VecXd hinv2(const MatXd& u) = 0;
+    VecXd hfunc1(const MatXd& u);
+    VecXd hfunc2(const MatXd& u);
+    VecXd hinv1(const MatXd& u);
+    VecXd hinv2(const MatXd& u);
     //! @}
-
-    //! Numerical inversion of h-functions
-    //!
-    //! These are generic functions to invert the hfunctions numerically.
-    //! They can be used in derived classes to define \c hinv1 and \c hinv2.
-    //!
-    //! @param u \f$m \times 2\f$ matrix of evaluation points.
-    VecXd hinv1_num(const MatXd& u);
-    VecXd hinv2_num(const MatXd& u);
 
     //! Simulate from a bivariate copula
     //!
@@ -78,9 +77,9 @@ public:
     //!
     //! @param u \f$m \times 2\f$ matrix of observations.
     //! @{
-    double loglik(MatXd& u);
-    double aic(MatXd& u);
-    double bic(MatXd& u);
+    double loglik(const MatXd& u);
+    double aic(const MatXd& u);
+    double bic(const MatXd& u);
     //! @}
 
     //! Get number of parameters.
@@ -102,7 +101,29 @@ public:
     void set_parameters(const VecXd& parameters) {parameters_ = parameters;}
     //! @}
 
+
 protected:
+    virtual VecXd pdf_default(const MatXd& u) = 0;
+    virtual VecXd hfunc1_default(const MatXd& u) = 0;
+    virtual VecXd hfunc2_default(const MatXd& u) = 0;
+    virtual VecXd hinv1_default(const MatXd& u) = 0;
+    virtual VecXd hinv2_default(const MatXd& u) = 0;
+
+    //! Numerical inversion of h-functions
+    //!
+    //! These are generic functions to invert the hfunctions numerically.
+    //! They can be used in derived classes to define \c hinv1 and \c hinv2.
+    //!
+    //! @param u \f$m \times 2\f$ matrix of evaluation points.
+    VecXd hinv1_num(const MatXd& u);
+    VecXd hinv2_num(const MatXd& u);
+
+    //! Data manipulations for rotated families
+    //!
+    //! @param u \f$m \times 2\f$ matrix of evaluation points.
+    MatXd rotate_u(const MatXd& u);
+    MatXd swap_cols(const MatXd& u);
+
     int family_;
     int rotation_;
     std::string association_direction_;
