@@ -20,7 +20,7 @@
 #ifndef VINECOPLIB_R_INSTANCE_H
 #define VINECOPLIB_R_INSTANCE_H
 
-#include "src/common/include/bicop_parametric.hpp"
+#include "include/bicop_parametric.hpp"
 #include <RInside.h>
 #include <RcppEigen.h>
 #include <string>

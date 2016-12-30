@@ -18,7 +18,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "gtest/gtest.h"
-#include "src/common/include/bicop.hpp"
+#include "include/bicop.hpp"
 #include <vector>
 
 namespace {
