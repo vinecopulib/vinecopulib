@@ -17,7 +17,7 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/bicop_elliptical.hpp"
+#include "bicop_elliptical.hpp"
 
 
 VecXd EllipticalBicop::hfunc2_default(const MatXd& u)

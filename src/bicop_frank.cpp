@@ -17,7 +17,7 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/bicop_frank.hpp"
+#include "bicop_frank.hpp"
 
 
 // constructor

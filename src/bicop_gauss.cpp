@@ -17,7 +17,7 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/bicop_gauss.hpp"
+#include "bicop_gauss.hpp"
 
 // constructor
 GaussBicop::GaussBicop()

@@ -17,7 +17,7 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/bicop_parametric.hpp"
+#include "bicop_parametric.hpp"
 
 // calculate number of parameters
 int ParBicop::calculate_npars()

@@ -18,7 +18,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <exception>
-#include "include/bicop.hpp"
+#include "bicop.hpp"
 
 Bicop_ptr Bicop::create(const int& family, const VecXd& parameters, const int& rotation)
 {

@@ -17,7 +17,7 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/bicop_gumbel.hpp"
+#include "bicop_gumbel.hpp"
 
 // constructor
 GumbelBicop::GumbelBicop()

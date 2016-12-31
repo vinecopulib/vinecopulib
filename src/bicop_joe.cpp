@@ -17,7 +17,7 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/bicop_joe.hpp"
+#include "bicop_joe.hpp"
 
 // constructor
 JoeBicop::JoeBicop()

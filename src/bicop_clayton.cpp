@@ -18,7 +18,7 @@
  */
 
 
-#include "include/bicop_clayton.hpp"
+#include "bicop_clayton.hpp"
 
 // constructor
 ClaytonBicop::ClaytonBicop()
@@ -47,7 +47,7 @@ ClaytonBicop::ClaytonBicop(const VecXd& parameters, const int& rotation)
     rotation_ = rotation;
     if ((rotation == 90) | (rotation == 270))
         association_direction_ = "negative";
-    else 
+    else
         association_direction_ = "positive";
     parameters_ = parameters;
     parameter_bounds_ = MatXd::Zero(1, 2);

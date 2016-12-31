@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "include/bicop_archimedean.hpp"
+#include "bicop_archimedean.hpp"
 
 // PDF
 VecXd ArchimedeanBicop::pdf_default(const MatXd& u)
