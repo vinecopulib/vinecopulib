@@ -18,20 +18,41 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "gtest/gtest.h"
-#include "include/bicop.hpp"
+#include "src_test/include/bicop_parametric_test.hpp"
+
+RInstance *rinstance_ptr = new RInstance;
 
 namespace {
     // Test if the C++ implementation of the par_to_tau and tau_to_par is correct
-    TEST(ParBicopTest, bicop_creates_right_copula) {
-        std::vector<int> fams = {0, 1, 2, 3, 4, 5, 6};
+    TYPED_TEST(ParBicopTest, bicop_select_mle_is_correct) {
         std::vector<int> rots = {0, 90, 180, 270};
+        std::string selection_criterion = "aic";
+        std::string method = "mle";
+        std::vector<int> family_set = {};
+        this->setup_parameters(rinstance_ptr);
 
-        for (unsigned int i = 0; i < fams.size(); ++i) {
-            for (unsigned int j = 0; j < rots.size(); ++j) {
-                BicopPtr bicop = Bicop::create(fams[i], VecXd::Zero(1), rots[j]);
-                EXPECT_EQ(bicop->get_family(), fams[i]);
+        for (unsigned int j = 0; j < rots.size(); ++j) {
+            if (rots[j] == 0 || rots[j] == 180)
+            {
+                this->set_tau(rinstance_ptr, fabs(this->get_tau(rinstance_ptr)));
+            } else
+            {
+                this->set_tau(rinstance_ptr, (-1)*fabs(this->get_tau(rinstance_ptr)));
+            }
+            this->set_rotation(rinstance_ptr, rots[j]);
+            this->setup_parameters(rinstance_ptr);
+
+            if (this->needs_check_) {
+                MatXd data = this->par_bicop_.simulate(this->get_n(rinstance_ptr));
+                BicopPtr bicop = Bicop::select(data,
+                                               selection_criterion,
+                                               family_set,
+                                               true,
+                                               false,
+                                               method);
+                EXPECT_EQ(bicop->get_family(), this->par_bicop_.get_family());
                 EXPECT_EQ(bicop->get_rotation(), rots[j]);
-                EXPECT_EQ(bicop->get_parameters(), VecXd::Zero(1));
+                //EXPECT_EQ(bicop->get_parameters(), VecXd::Zero(1));
             }
         }
     }

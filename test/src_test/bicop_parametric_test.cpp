@@ -67,3 +67,7 @@ int FakeParBicopTest::get_rotation(RInstance *rinstance_ptr)
 {
     return rinstance_ptr->get_rotation();
 }
+int FakeParBicopTest::get_n(RInstance *rinstance_ptr)
+{
+    return rinstance_ptr->get_n();
+}

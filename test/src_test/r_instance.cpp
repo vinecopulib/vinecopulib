@@ -21,9 +21,10 @@ along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
 
 RInstance::RInstance() {
     // Default sample size
-    int n = 1e3;
+    int n = 1e4;
     n_ = n;
     family_ = 0;
+    rotation_ = 0;
     parameters_ = 4 * VecXd::Ones(2);
     U_ = MatXd::Zero(n, 2);
     tau_ = 0.5;
@@ -106,6 +107,11 @@ VecXd RInstance::get_parameters()
 int RInstance::get_rotation()
 {
     return this->rotation_;
+}
+
+int RInstance::get_n()
+{
+    return this->n_;
 }
 
 double RInstance::get_tau()

@@ -20,33 +20,177 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <exception>
 #include "include/bicop.hpp"
 
-Bicop_ptr Bicop::create(const int& family, const VecXd& parameters, const int& rotation)
+BicopPtr Bicop::create(const int& family, const int& rotation)
 {
+    BicopPtr my_bicop;
     switch (family) {
         case 0:
-            return Bicop_ptr(new IndepBicop(parameters, rotation));
-
+            my_bicop = BicopPtr(new IndepBicop());
+            break;
         case 1:
-            return Bicop_ptr(new GaussBicop(parameters, rotation));
-
+            my_bicop = BicopPtr(new GaussBicop());
+            break;
         case 2:
-            return Bicop_ptr(new StudentBicop(parameters, rotation));
-
+            my_bicop = BicopPtr(new StudentBicop());
+            break;
         case 3:
-            return Bicop_ptr(new ClaytonBicop(parameters, rotation));
-
+            my_bicop = BicopPtr(new ClaytonBicop());
+            break;
         case 4:
-            return Bicop_ptr(new GumbelBicop(parameters, rotation));
-
+            my_bicop = BicopPtr(new GumbelBicop());
+            break;
         case 5:
-            return Bicop_ptr(new FrankBicop(parameters, rotation));
-
+            my_bicop = BicopPtr(new FrankBicop());
+            break;
         case 6:
-            return Bicop_ptr(new JoeBicop(parameters, rotation));
-
+            my_bicop = BicopPtr(new JoeBicop());
+            break;
         default:
             throw std::runtime_error(std::string("Family not implemented"));
     }
+    my_bicop->set_rotation(rotation);
+    return my_bicop;
+}
+
+
+BicopPtr Bicop::create(const int& family, const VecXd& parameters, const int& rotation)
+{
+    BicopPtr my_bicop = create(family, rotation);
+    my_bicop->set_parameters(parameters);
+    return my_bicop;
+}
+
+BicopPtr Bicop::select(const MatXd& data,
+                     std::string selection_criterion,
+                     std::vector<int> family_set,
+                     bool use_rotations,
+                     bool preselect_families,
+                     std::string method)
+{
+    std::vector<int> all_families = {0, 1, 2, 3, 4, 5, 6};
+    std::vector<int> rotationless_families = {0, 1, 2, 5};
+
+    // If the familyset is empty, use all families.
+    // If the familyset is not empty, check that all included families are implemented.
+    if (family_set.empty())
+    {
+        family_set = all_families;
+    } else
+    {
+        bool family_exists = true;
+        for (unsigned int j = 0; j < family_set.size(); j++)
+        {
+            family_exists = (
+                    std::find(
+                            all_families.begin(),
+                            all_families.end(),
+                            family_set[j]
+                    )  != all_families.end()
+            );
+            if (!family_exists)
+                throw std::runtime_error(std::string("One of the families is not implemented"));
+        }
+    }
+
+    // When using rotations, add only the ones that yield the appropriate association direction.
+    std::vector<int> which_rotations = {0};
+    if (use_rotations)
+    {
+        int n = data.rows();
+        int d = 2;
+        double tau = 0.0;
+        MatXd newdata = data;
+        ktau_matrix(newdata.data(), &d, &n, &tau);
+
+        if (tau < 0)
+        {
+            which_rotations.pop_back();
+            which_rotations.push_back(90);
+            which_rotations.push_back(270);
+        } else {
+            which_rotations.push_back(180);
+        }
+        //std::cout << which_rotations[0] << "/" << which_rotations[1] << "/" << tau << std::endl;
+    }
+
+    // Create the combinations of families and rotations to estimate
+    std::vector<int> families;
+    std::vector<int> rotations;
+    for (unsigned int j = 0; j < family_set.size(); j++)
+    {
+        bool is_rotationless = (
+                std::find(
+                        rotationless_families.begin(),
+                        rotationless_families.end(),
+                        family_set[j]
+                )  != rotationless_families.end()
+        );
+
+        if (preselect_families)
+        {
+            // TODO
+            /*MatXd x = MatXd::Zero(n,2);
+            MatXd z = x;
+            double c1, c2;
+            for (int j = 0; j < n; ++j) {
+                x(j,0) = gsl_cdf_ugaussian_Pinv(data(j, 0));
+                x(j,1) = gsl_cdf_ugaussian_Pinv(data(j, 1));
+            }
+            if (tau > 0)
+            {
+                //std::cout << (x.array() > 0.0).rowwise().prod() << std::endl;
+
+            }*/
+
+        } else {
+            if (is_rotationless)
+            {
+                families.push_back(family_set[j]);
+                rotations.push_back(0);
+            } else {
+                for (unsigned int k = 0; k < which_rotations.size(); k++)
+                {
+                    families.push_back(family_set[j]);
+                    rotations.push_back(which_rotations[k]);
+                }
+            }
+        }
+    }
+
+    // Estimate all models and select the best one using the selection_criterion
+    BicopPtr fitted_bicop;
+    double fitted_criterion = 1e6;
+    for (unsigned int j = 0; j < families.size(); j++)
+    {
+        //std::cout << families[j] << "/" << rotations[j] <<  std::endl;
+        // Estimate the model
+        BicopPtr new_bicop = create(families[j], rotations[j]);
+        new_bicop->fit(data, method);
+
+        // Compute the selection criterion
+        double new_criterion;
+        if (selection_criterion.compare("aic") == 0)
+        {
+            new_criterion = new_bicop->aic(data);
+        } else if (selection_criterion.compare("bic") == 0)
+        {
+            new_criterion = new_bicop->bic(data);
+        } else
+        {
+            throw std::runtime_error(std::string("Selection criterion not implemented"));
+        }
+
+        // If the new model is better than the current one, then replace the current model by the new one
+        if (new_criterion < fitted_criterion)
+        {
+            fitted_criterion = new_criterion;
+            fitted_bicop = new_bicop;
+        }
+        //std::cout << families[j] << " " << rotations[j] << " " << new_criterion << " " << new_bicop->loglik(data) << std::endl;
+    }
+
+    return fitted_bicop;
+
 }
 
 VecXd Bicop::pdf(const MatXd& u)
@@ -322,4 +466,19 @@ VecXd Bicop::hinv2_num(const MatXd& u)
     }
 
     return v.col(0);
+}
+
+void Bicop::set_rotation(const int& rotation) {
+    rotation_ = rotation;
+    if ((this->association_direction_).compare("positive") == 0 ||
+            (this->association_direction_).compare("negative") == 0)
+    {
+        if (rotation == 0 || rotation == 180)
+        {
+            this->association_direction_ = "positive";
+        } else
+        {
+            this->association_direction_ = "negative";
+        }
+    }
 }

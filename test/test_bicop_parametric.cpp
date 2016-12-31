@@ -161,7 +161,7 @@ namespace {
 }
 
 int main(int argc, char **argv) {
-    rinstance_ptr->set_rotation(270);
+    rinstance_ptr->set_rotation(0);
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
