@@ -12,7 +12,7 @@ A findR.cmake looks for them in the default locations for linux and osx, but pro
 with versions installed from R/RStudio. Therefore, prior to building the library,
 it is recommended to use:
 
-`sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), repos="http://cran.rstudio.com/")'`
+`sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'`
 
 ## Compilation
 
