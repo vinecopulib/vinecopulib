@@ -105,15 +105,14 @@ VecXd InterpolationGrid::interpolate(const MatXd& x)
     return out;
 }
 
-//! Evaluate an h-function corresponding to a copula density estimate
+//! Integrate the grid along one axis
 //!
 //! @param uev mx2 matrix of evaluation points
-//! @param cond_var either 1 or 2; the variable to condition on.
+//! @param cond_var either 1 or 2; the axis considered fixed.
 //! @param vals matrix of density estimate evaluated on a kxk grid.
 //! @param grid the grid points (1-dim) on which vals has been computed.
 //!
-//! @return h-function evaluated at uev.
-VecXd InterpolationGrid::hfunc(const MatXd& uev, const int& cond_var)
+VecXd InterpolationGrid::intergrate_1d(const MatXd& uev, const int& cond_var)
 {
     int n = uev.rows();
     int m = gridpoints_.size();
@@ -144,15 +143,14 @@ VecXd InterpolationGrid::hfunc(const MatXd& uev, const int& cond_var)
     return out;
 }
 
-//! Evaluate the inverse of an h-function
+//! Inverse of integral along one axis of the grid
 //!
 //! @param uev mx2 matrix of evaluation points
-//! @param cond_var either 1 or 2; the variable to condition on.
+//! @param cond_var either 1 or 2; the axis considered fixed.
 //! @param vals matrix of density estimate evaluated on a kxk grid.
 //! @param grid the grid points (1-dim) on which vals has been computed.
 //!
-//! @return Inverse h-function estimate evaluated at uev.
-VecXd InterpolationGrid::hinv(const MatXd& uev, const int& cond_var)
+VecXd InterpolationGrid::inv_intergrate_1d(const MatXd& uev, const int& cond_var)
 {
     VecXd out(uev.rows());
 
@@ -180,8 +178,8 @@ VecXd InterpolationGrid::hinv(const MatXd& uev, const int& cond_var)
         }
 
         // evaluate h-function at boundary points
-        double ql = hfunc(tmpu0, cond_var)(0);
-        double qh = hfunc(tmpu1, cond_var)(0);
+        double ql = intergrate_1d(tmpu0, cond_var)(0);
+        double qh = intergrate_1d(tmpu1, cond_var)(0);
         ql = ql - q;
         qh = qh - q;
 
@@ -213,7 +211,7 @@ VecXd InterpolationGrid::hinv(const MatXd& uev, const int& cond_var)
                 tmpu0(0, 1) = uev(i, 1);
             }
 
-            double gap = hfunc(tmpu0, cond_var)(0) - q;
+            double gap = intergrate_1d(tmpu0, cond_var)(0) - q;
 
             // find section for next iteration
             if (::fabs(gap) < 1e-9) {
@@ -238,10 +236,10 @@ VecXd InterpolationGrid::hinv(const MatXd& uev, const int& cond_var)
 
             // stop if values are close enough
             if (::fabs(x0 - x1) <= tol)
-                br = 1;
+            br = 1;
 
             if (br == 1)
-                break;
+            break;
         }
 
         out(i) = ans;

@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VINECOPULIB_BICOP_KERNEL_HPP
-#define VINECOPULIB_BICOP_KERNEL_HPP
+#ifndef VINECOPULIB_BICOP_INTERPOLATION_HPP
+#define VINECOPULIB_BICOP_INTERPOLATION_HPP
 
 #include <Eigen/Dense>
 
@@ -34,8 +34,8 @@ public:
     InterpolationGrid(const VecXd& gridpoints, const MatXd& values);
 
     VecXd interpolate(const MatXd& x);
-    VecXd hfunc(const MatXd& uev, const int& cond_var);
-    VecXd hinv(const MatXd& uev, const int& cond_var);
+    VecXd intergrate_1d(const MatXd& uev, const int& cond_var);
+    VecXd inv_intergrate_1d(const MatXd& uev, const int& cond_var);
 
 private:
     // Utility functions for spline Interpolation
