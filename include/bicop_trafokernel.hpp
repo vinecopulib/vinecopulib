@@ -17,32 +17,14 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VINECOPULIB_BICOP_KERNEL_HPP
-#define VINECOPULIB_BICOP_KERNEL_HPP
+#ifndef VINECOPULIB_BICOP_TRAFOKERNEL_HPP
+#define VINECOPULIB_BICOP_TRAFOKERNEL_HPP
 
-#include "bicop_interpolation.hpp"
-#include "bicop_class.hpp"
+#include "bicop_kernel.hpp"
 
-class KernelBicop : public Bicop {
+class TrafokernelBicop : public KernelBicop {
 public:
-    KernelBicop();
-
-    VecXd pdf_default(const MatXd& u);
-    VecXd hfunc1_default(const MatXd& u);
-    VecXd hfunc2_default(const MatXd& u);
-    VecXd hinv1_default(const MatXd& u);
-    VecXd hinv2_default(const MatXd& u);
-
-    double parameters_to_tau(const VecXd __attribute__((unused))& parameters);
-    int calculate_npars();
-
-protected:
-    InterpolationGrid interp_grid_;
-
-private:
-    // methods for fitting a particular kernel estimators
-    void fit_t(const MatXd& data);
+    void fit(const MatXd& data, std::string __attribute__((unused)) method);
 };
-
 
 #endif

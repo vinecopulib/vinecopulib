@@ -44,6 +44,9 @@ Bicop_ptr Bicop::create(const int& family, const VecXd& parameters, const int& r
         case 6:
             return Bicop_ptr(new JoeBicop(parameters, rotation));
 
+        case 1001:
+            return Bicop_ptr(new TrafokernelBicop());
+
         default:
             throw std::runtime_error(std::string("Family not implemented"));
     }
@@ -245,7 +248,7 @@ VecXd Bicop::hinv1_num(const MatXd &u)
 
         while (!br) {
             v(j, 1) = (xh + xl) / 2.0;
-            fm(j) = hfunc1(v.row(j))(0) - u1(j);
+            fm(j) = hfunc1_default(v.row(j))(0) - u1(j);
 
             //stop if values become too close (avoid infinite loop)
             if (fabs(fm(j)) <= tol) br = 1;
@@ -297,7 +300,7 @@ VecXd Bicop::hinv2_num(const MatXd& u)
 
         while (!br) {
             v(j, 0) = (xh + xl) / 2.0;
-            fm(j) = hfunc2(v.row(j))(0) - u1(j);
+            fm(j) = hfunc2_default(v.row(j))(0) - u1(j);
 
             //stop if values become too close (avoid infinite loop)
             if (fabs(fm(j)) <= tol) br = 1;

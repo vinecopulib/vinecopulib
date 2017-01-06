@@ -20,35 +20,21 @@ along with vinecopulib.  If not, see "http://www.gnu.org/licenses/".
 #ifndef VINECOPULIB_BICOP_FAMILIES_HPP
 #define VINECOPULIB_BICOP_FAMILIES_HPP
 
-    // include all familie headers not included yet (alphabetic order);
-    // this automatically includes the bicop_class, bicop_archimedean bicop_elliptical and bicop_parametric headers
-
-    #ifndef VINECOPULIB_BICOP_CLAYTON_HPP
+    // include all family headers not included yet (alphabetic order);
+    // this automatically includes the headers:
+    //   bicop_class
+    //   bicop_archimedean
+    //   bicop_elliptical
+    //   bicop_parametric
+    //   bicop_kernel
+    //   bicop_interpolation
     #include "bicop_clayton.hpp"
-    #endif
-
-    #ifndef VINECOPULIB_BICOP_FRANK_HPP
     #include "bicop_frank.hpp"
-    #endif
-
-    #ifndef VINECOPULIB_BICOP_GAUSS_HPP
     #include "bicop_gauss.hpp"
-    #endif
-
-    #ifndef VINECOPULIB_BICOP_GUMBEL_HPP
     #include "bicop_gumbel.hpp"
-    #endif
-
-    #ifndef VINECOPULIB_BICOP_INDEP_HPP
     #include "bicop_indep.hpp"
-    #endif
-
-    #ifndef VINECOPULIB_BICOP_JOE_HPP
     #include "bicop_joe.hpp"
-    #endif
-
-    #ifndef VINECOPULIB_BICOP_STUDENT_HPP
     #include "bicop_student.hpp"
-    #endif
+    #include "bicop_trafokernel.hpp"
 
 #endif

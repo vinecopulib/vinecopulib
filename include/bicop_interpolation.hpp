@@ -31,7 +31,8 @@ typedef Eigen::MatrixXd MatXd;
 //! observations obsolete and allows for fast numerical integration.
 class InterpolationGrid {
 public:
-    InterpolationGrid(const VecXd& gridpoints, const MatXd& values);
+    InterpolationGrid() {}
+    InterpolationGrid(const VecXd& grid_points, const MatXd& values);
 
     VecXd interpolate(const MatXd& x);
     VecXd intergrate_1d(const MatXd& uev, const int& cond_var);
@@ -50,7 +51,7 @@ private:
     double int_on_grid(const double& upr, const VecXd& vals, const VecXd& grid);
     double inv_int_on_grid(const double& qq, const VecXd& vals, const VecXd& grid);
 
-    VecXd gridpoints_;
+    VecXd grid_points_;
     MatXd values_;
 };
 

@@ -20,27 +20,27 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include "bicop_interpolation.hpp"
 #include <algorithm>
 // ---------------- Public methods ----------------
-//
+
 //! Constructor
 //!
-//! @param gridpoints an ascending sequence of gridpoints; used in both
+//! @param grid_points an ascending sequence of grid_points; used in both
 //! dimensions.
 //! @param values a dxd matrix of copula density values evaluated at
-//! (gridpoints_i, gridpoints_j).
-InterpolationGrid::InterpolationGrid(const VecXd& gridpoints, const MatXd& values)
+//! (grid_points_i, grid_points_j).
+InterpolationGrid::InterpolationGrid(const VecXd& grid_points, const MatXd& values)
 {
     if (values.cols() != values.rows()) {
         throw std::runtime_error(
             "values must be a quadratic matrix"
         );
     }
-    if (gridpoints.size() != values.rows()) {
+    if (grid_points.size() != values.rows()) {
         throw std::runtime_error(
-            "number of gridpoints must equal dimension of values"
+            "number of grid_points must equal dimension of values"
         );
     }
 
-    gridpoints_ = gridpoints;
+    grid_points_ = grid_points;
     values_ = values;
 }
 
@@ -51,7 +51,7 @@ InterpolationGrid::InterpolationGrid(const VecXd& gridpoints, const MatXd& value
 VecXd InterpolationGrid::interpolate(const MatXd& x)
 {
     int N = x.rows();
-    int m = gridpoints_.size();
+    int m = grid_points_.size();
     VecXd y(4), out(N), a(4), tmpgrid(4), tmpvals(4);
     int i = 0;
     int j = 0;
@@ -60,19 +60,19 @@ VecXd InterpolationGrid::interpolate(const MatXd& x)
     for (int n = 0; n < N; ++n) {
         // find cell
         for (int k = 1; k < (m-1); ++k) {
-            if ((x(n, 0) >= gridpoints_(k)))
+            if ((x(n, 0) >= grid_points_(k)))
             i = k;
-            if ((x(n, 1) >= gridpoints_(k)))
+            if ((x(n, 1) >= grid_points_(k)))
             j = k;
         }
 
         // construct grid for first direction
         i0 = std::max(i-1, 0);
         i3 = std::min(i+2, m-1);
-        tmpgrid(0) = gridpoints_(i0);
-        tmpgrid(1) = gridpoints_(i);
-        tmpgrid(2) = gridpoints_(i+1);
-        tmpgrid(3) = gridpoints_(i3);
+        tmpgrid(0) = grid_points_(i0);
+        tmpgrid(1) = grid_points_(i);
+        tmpgrid(2) = grid_points_(i+1);
+        tmpgrid(3) = grid_points_(i3);
 
         // interpolate in one direction (four times)
         for (int s = 0; s < 4; ++s) {
@@ -93,10 +93,10 @@ VecXd InterpolationGrid::interpolate(const MatXd& x)
         // use these four points to interpolate in the remaining direction#
         i0 = std::max(j-1, 0);
         i3 = std::min(j+2, m-1);
-        tmpgrid(0) = gridpoints_(i0);
-        tmpgrid(1) = gridpoints_(j);
-        tmpgrid(2) = gridpoints_(j+1);
-        tmpgrid(3) = gridpoints_(i3);
+        tmpgrid(0) = grid_points_(i0);
+        tmpgrid(1) = grid_points_(j);
+        tmpgrid(2) = grid_points_(j+1);
+        tmpgrid(3) = grid_points_(i3);
 
         out(n) = interp_on_grid(x(n, 1), y, tmpgrid);
         out(n) = fmax(out(n), 1e-15);
@@ -115,7 +115,7 @@ VecXd InterpolationGrid::interpolate(const MatXd& x)
 VecXd InterpolationGrid::intergrate_1d(const MatXd& uev, const int& cond_var)
 {
     int n = uev.rows();
-    int m = gridpoints_.size();
+    int m = grid_points_.size();
     VecXd tmpvals(m), out(n), tmpa(4), tmpb(4);
     MatXd tmpgrid(m, 2);
     double upr = 0.0;
@@ -126,15 +126,15 @@ VecXd InterpolationGrid::intergrate_1d(const MatXd& uev, const int& cond_var)
         if (cond_var == 1) {
             upr = uev(i, 1);
             tmpgrid.col(0) = VecXd::Constant(m, uev(i, 0));
-            tmpgrid.col(1) = gridpoints_;
+            tmpgrid.col(1) = grid_points_;
         } else if (cond_var == 2) {
             upr = uev(i, 0);
-            tmpgrid.col(0) = gridpoints_;
+            tmpgrid.col(0) = grid_points_;
             tmpgrid.col(1) = VecXd::Constant(m, uev(i, 1));
         }
         tmpvals = interpolate(tmpgrid);
-        tmpint = int_on_grid(upr, tmpvals, gridpoints_);
-        int1 =  int_on_grid(1.0, tmpvals, gridpoints_);
+        tmpint = int_on_grid(upr, tmpvals, grid_points_);
+        int1 =  int_on_grid(1.0, tmpvals, grid_points_);
         out(i) = tmpint/int1;
         out(i) = fmax(out(i), 1e-10);
         out(i) = fmin(out(i), 1-1e-10);
