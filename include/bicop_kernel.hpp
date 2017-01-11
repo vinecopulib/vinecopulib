@@ -20,7 +20,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef VINECOPULIB_BICOP_KERNEL_HPP
 #define VINECOPULIB_BICOP_KERNEL_HPP
 
-#include "bicop_interpolation.hpp"
+#include "interpolation_grid.hpp"
 #include "bicop_class.hpp"
 
 class KernelBicop : public Bicop {
