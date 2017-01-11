@@ -60,9 +60,11 @@ VecXd InterpolationGrid::interpolate(const MatXd& x)
         // find cell
         for (int k = 1; k < (m-1); ++k) {
             if ((x(n, 0) >= grid_points_(k)))
-            i = k;
+                i = k;
             if ((x(n, 1) >= grid_points_(k)))
-            j = k;
+                j = k;
+            if ((i > 0) & (j > 0))
+                break;
         }
 
         // construct grid for first direction
