@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Thibault Vatter
+Copyright 2016 Thibault Vatter, Thomas Nagler
 
 This file is part of vinecoplib.
 
@@ -40,7 +40,7 @@ RInstance::RInstance() {
     eval_sim.insert(14, std::to_string(n_));
     std::string load_VineCopula = "library(VineCopula)";
 
-    // Declare the RInside instance and load the VineCopula package
+    // Set the seed and load the VineCopula package
     R.parseEval(load_VineCopula);
 
     // Evaluate the tests random matrix U and load it in C++

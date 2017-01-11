@@ -83,9 +83,6 @@ protected:
 
 // Create a list of types, each of which will be used as the test fixture's 'T'
 typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop> ParBicopTypes;
-//typedef ::testing::Types<IndepBicop> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);
-//typedef ::testing::Types<ClaytonBicop, GumbelBicop> RotatedBicopTypes;
-//TYPED_TEST_CASE(ParBicopTest, RotatedBicopTypes);
 
 #endif

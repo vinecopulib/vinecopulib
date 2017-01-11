@@ -173,5 +173,9 @@ protected:
 };
 
 typedef std::shared_ptr<Bicop> BicopPtr;
+double correlation(const MatXd& z);
+template<typename T> bool is_member(T element, std::vector<T> set);
+std::vector<double> get_c1c2(const MatXd& data, double tau);
+bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless);
 
 #endif

@@ -1,5 +1,5 @@
 /*
-    Copyright 2016 Thibault Vatter
+    Copyright 2016 Thibault Vatter, Thomas Nagler
 
     This file is part of vinecoplib.
 

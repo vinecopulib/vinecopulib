@@ -174,10 +174,10 @@ void ParBicop::fit(const MatXd &data, std::string method)
             {
                 // Derivatives free optimization
                 nlopt::opt opt(nlopt::LN_BOBYQA, npars);
-                opt.set_xtol_rel(1e-4);
-                opt.set_xtol_abs(1e-4);
-                opt.set_ftol_rel(1e-4);
-                opt.set_ftol_abs(1e-4);
+                opt.set_xtol_rel(1e-3);
+                opt.set_xtol_abs(1e-3);
+                opt.set_ftol_rel(1e-2);
+                opt.set_ftol_abs(1e-2);
                 opt.set_maxeval(1e3);
 
                 // Set bounds

@@ -80,28 +80,22 @@ BicopPtr Bicop::select(const MatXd& data,
         bool family_exists = true;
         for (unsigned int j = 0; j < family_set.size(); j++)
         {
-            family_exists = (
-                    std::find(
-                            all_families.begin(),
-                            all_families.end(),
-                            family_set[j]
-                    )  != all_families.end()
-            );
+            family_exists = is_member(family_set[j], all_families);
             if (!family_exists)
                 throw std::runtime_error(std::string("One of the families is not implemented"));
         }
     }
 
+    int n = data.rows();
+    int d = 2;
+    double tau = 0.0;
+    MatXd newdata = data;
+    ktau_matrix(newdata.data(), &d, &n, &tau);
+
     // When using rotations, add only the ones that yield the appropriate association direction.
     std::vector<int> which_rotations = {0};
     if (use_rotations)
     {
-        int n = data.rows();
-        int d = 2;
-        double tau = 0.0;
-        MatXd newdata = data;
-        ktau_matrix(newdata.data(), &d, &n, &tau);
-
         if (tau < 0)
         {
             which_rotations.pop_back();
@@ -110,7 +104,15 @@ BicopPtr Bicop::select(const MatXd& data,
         } else {
             which_rotations.push_back(180);
         }
-        //std::cout << which_rotations[0] << "/" << which_rotations[1] << "/" << tau << std::endl;
+    }
+
+    double c1 = 0;
+    double c2 = 0;
+    if (preselect_families)
+    {
+        std::vector<double> c = get_c1c2(data, tau);
+        c1 = c[0];
+        c2 = c[1];
     }
 
     // Create the combinations of families and rotations to estimate
@@ -118,37 +120,29 @@ BicopPtr Bicop::select(const MatXd& data,
     std::vector<int> rotations;
     for (unsigned int j = 0; j < family_set.size(); j++)
     {
-        bool is_rotationless = (
-                std::find(
-                        rotationless_families.begin(),
-                        rotationless_families.end(),
-                        family_set[j]
-                )  != rotationless_families.end()
-        );
-
-        if (preselect_families)
+        bool is_rotationless = is_member(family_set[j], rotationless_families);
+        bool preselect = true;
+        if (is_rotationless)
         {
-            // TODO
-            /*MatXd x = MatXd::Zero(n,2);
-            MatXd z = x;
-            double c1, c2;
-            for (int j = 0; j < n; ++j) {
-                x(j,0) = gsl_cdf_ugaussian_Pinv(data(j, 0));
-                x(j,1) = gsl_cdf_ugaussian_Pinv(data(j, 1));
-            }
-            if (tau > 0)
+            if (preselect_families)
             {
-                //std::cout << (x.array() > 0.0).rowwise().prod() << std::endl;
+                preselect = preselect_family(c1, c2, tau, family_set[j], 0, is_rotationless);
+            }
 
-            }*/
-
-        } else {
-            if (is_rotationless)
+            if (preselect)
             {
                 families.push_back(family_set[j]);
                 rotations.push_back(0);
-            } else {
-                for (unsigned int k = 0; k < which_rotations.size(); k++)
+            }
+        } else {
+            for (unsigned int k = 0; k < which_rotations.size(); k++)
+            {
+                if (preselect_families)
+                {
+                    preselect = preselect_family(c1, c2, tau, family_set[j], which_rotations[k], is_rotationless);
+                }
+
+                if (preselect)
                 {
                     families.push_back(family_set[j]);
                     rotations.push_back(which_rotations[k]);
@@ -186,16 +180,59 @@ BicopPtr Bicop::select(const MatXd& data,
             fitted_criterion = new_criterion;
             fitted_bicop = new_bicop;
         }
-        //std::cout << families[j] << " " << rotations[j] << " " << new_criterion << " " << new_bicop->loglik(data) << std::endl;
+        //std::cout << families[j] << " " << rotations[j] << " " << new_criterion << " " << -2*new_bicop->loglik(data) << " " << new_bicop->get_parameters() << std::endl;
     }
 
     return fitted_bicop;
 
 }
 
+std::vector<double> get_c1c2(const MatXd& data, double tau)
+{
+    int n = data.rows();
+    MatXd x = MatXd::Zero(n,2);
+    MatXd z1 = x;
+    MatXd z2 = x;
+    int count1 = 0, count2 = 0;
+    for (int j = 0; j < n; ++j) {
+        x(j,0) = gsl_cdf_ugaussian_Pinv(data(j, 0));
+        x(j,1) = gsl_cdf_ugaussian_Pinv(data(j, 1));
+        if (tau > 0)
+        {
+            if (x(j,0) > 0 && x(j,1) > 0)
+            {
+                z1.row(count1) = x.row(j);
+                ++count1;
+            }
+            if (x(j,0) < 0 && x(j,1) < 0)
+            {
+                z2.row(count2) = x.row(j);
+                ++count2;
+            }
+        } else {
+            if (x(j,0) < 0 && x(j,1) > 0)
+            {
+                z1.row(count1) = x.row(j);
+                ++count1;
+            }
+            if (x(j,0) > 0 && x(j,1) < 0)
+            {
+                z2.row(count2) = x.row(j);
+                ++count2;
+            }
+        }
+    }
+
+    std::vector<double> c = {correlation(z1.block(0,0,count1-1,2)),correlation(z2.block(0,0,count2-1,2))};
+    return c;
+}
+
 VecXd Bicop::pdf(const MatXd& u)
 {
-    return pdf_default(rotate_u(u));
+    if (rotation_ == 0)
+        return pdf_default(u);
+    else
+        return pdf_default(rotate_u(u));
 }
 
 
@@ -289,7 +326,8 @@ VecXd Bicop::hinv2(const MatXd& u)
 
 MatXd Bicop::simulate(const int& n)
 {
-    std::default_random_engine generator(time(0));
+    std::random_device rd;
+    std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
     MatXd U = MatXd::Zero(n, 2);
@@ -316,7 +354,7 @@ double Bicop::aic(const MatXd& u)
 
 double Bicop::bic(const MatXd& u)
 {
-    return -2 * this->loglik(u) + 2 * log(this->calculate_npars());
+    return -2 * this->loglik(u) + this->calculate_npars() * log(u.rows());
 }
 
 // TODO: generic fall-back that calculates Kendall's tau based on the pdf:
@@ -481,4 +519,84 @@ void Bicop::set_rotation(const int& rotation) {
             this->association_direction_ = "negative";
         }
     }
+}
+
+template<typename T> bool is_member(T element, std::vector<T> set)
+{
+    return std::find(set.begin(), set.end(), element) != set.end();
+}
+
+double correlation(const MatXd& z)
+{
+    double rho;
+    MatXd x = z.rowwise() - z.colwise().mean();
+    MatXd sigma = x.adjoint() * x;
+    rho = sigma(1,0) / sqrt(sigma(0,0) * sigma(1,1));
+
+    return rho;
+}
+
+
+bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless)
+{
+    bool preselect = false;
+    if (is_rotationless)
+    {
+        if (std::fabs(c1-c2) > 0.3)
+        {
+            if (family == 2 || family == 0)
+            {
+                preselect = true;
+            }
+        } else
+        {
+            preselect = true;
+        }
+    } else
+    {
+        bool is_90or180 = (rotation == 90 || rotation == 180);
+        if (c1 - c2 > 0.05)
+        {
+            if (family == 3)
+            {
+                if (is_90or180)
+                {
+                    preselect = true;
+                }
+            }
+            if (family == 4 || family == 6)
+            {
+                if (!is_90or180)
+                {
+                    preselect = true;
+                }
+            }
+        } else if (c1 - c2 < -0.05)
+        {
+            if (family == 3)
+            {
+                if (!is_90or180)
+                {
+                    preselect = true;
+                }
+            }
+            if (family == 4 || family == 6)
+            {
+                if (is_90or180)
+                {
+                    preselect = true;
+                }
+            }
+        } else {
+            if (tau > 0 && (rotation == 0 || rotation == 180))
+            {
+                preselect = true;
+            }
+            if (tau < 0 && (rotation == 90 || rotation == 270))
+            {
+                preselect = true;
+            }
+        }
+    }
+    return preselect;
 }
