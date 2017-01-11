@@ -26,6 +26,9 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <exception>
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_cdf.h>
 
 typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;

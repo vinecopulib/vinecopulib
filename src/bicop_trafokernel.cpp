@@ -19,10 +19,6 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "bicop_trafokernel.hpp"
 #include "bicop.hpp"
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_cdf.h>
-#include <cmath>
-
 
 VecXd gaussian_kernel_1d(const VecXd& x)
 {

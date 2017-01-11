@@ -18,9 +18,6 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "bicop_kernel.hpp"
-#include <exception>
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_cdf.h>
 
 KernelBicop::KernelBicop()
 {

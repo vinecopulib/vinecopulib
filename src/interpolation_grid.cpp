@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "bicop_interpolation.hpp"
-#include <algorithm>
+#include "interpolation_grid.hpp"
 // ---------------- Public methods ----------------
 
 //! Constructor
