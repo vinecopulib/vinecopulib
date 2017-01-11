@@ -80,11 +80,13 @@ void TrafokernelBicop::fit(const MatXd& data, __attribute__((unused)) std::strin
 
     // apply normal density to z (used later for normalization)
     MatXd phi = z.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf));
+    MatXd phi_data = z_data.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf));
 
     // find bandwidth matrix
     int n = data.rows();
     MatXd centered = z_data.rowwise() - z_data.colwise().mean();
     MatXd cov = (centered.adjoint() * centered) / double(n - 1);
+
     Eigen::SelfAdjointEigenSolver<MatXd> takes_root(cov);
     MatXd cov_root = takes_root.operatorSqrt();
     MatXd B =  1.25 * std::pow(n, - 1.0 / 6.0) * cov_root.transpose();
@@ -114,4 +116,14 @@ void TrafokernelBicop::fit(const MatXd& data, __attribute__((unused)) std::strin
     grid_points(m - 1) = 1.0;
 
     interp_grid_ = InterpolationGrid(grid_points, values);
+    
+    // compute effective number of parameters
+    double K0 = gaussian_kernel_2d(MatXd::Constant(1, 2, 0.0))(0);
+    VecXd scale = phi_data.rowwise().prod();
+    npars_ =  K0 / det_B / (scale.array() * this->pdf(data).array()).mean();
+}
+
+double TrafokernelBicop::calculate_npars()
+{
+    return npars_;
 }

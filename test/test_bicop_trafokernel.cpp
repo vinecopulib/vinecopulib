@@ -19,13 +19,30 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "gtest/gtest.h"
 #include "include/bicop.hpp"
+#include <iostream>
 
 namespace {
     // Test if the C++ implementation of the par_to_tau and tau_to_par is correct
     TEST(KernelBicopTest, trafo_kernel_fit_works) {
         Bicop_ptr cop = Bicop::create(1001, VecXd::Zero(1), 0);
-        MatXd dat = MatXd::Random(100, 2).array() * 0.5 + 1.0;
+        MatXd dat = MatXd::Random(100, 2).array() * 0.5 + 0.5;
+        MatXd eval = MatXd::Random(10, 2).array() * 0.5 + 0.5;
         cop->fit(dat, std::string(""));
+        
+        EXPECT_GE(cop->pdf(eval).minCoeff(), 0.0);
+        
+        EXPECT_GE(cop->hfunc1(eval).minCoeff(), 0.0);
+        EXPECT_GE(cop->hfunc2(eval).minCoeff(), 0.0);
+        EXPECT_GE(cop->hinv1(eval).minCoeff(), 0.0);
+        EXPECT_GE(cop->hinv2(eval).minCoeff(), 0.0);
+        
+        EXPECT_LE(cop->hfunc1(eval).maxCoeff(), 1.0);
+        EXPECT_LE(cop->hfunc2(eval).maxCoeff(), 1.0);
+        EXPECT_LE(cop->hinv1(eval).maxCoeff(), 1.0);
+        EXPECT_LE(cop->hinv2(eval).maxCoeff(), 1.0);
+
+        EXPECT_GE(cop->calculate_npars(), 0.0);
+        EXPECT_LE(cop->calculate_npars(), 100.0);
     }
 }
 

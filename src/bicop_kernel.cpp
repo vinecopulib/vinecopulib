@@ -61,13 +61,6 @@ VecXd KernelBicop::hinv2_default(const MatXd& u)
 }
 
 // TODO
-int KernelBicop::calculate_npars()
-{
-    throw std::runtime_error(
-        "calculate_npars not yet implemented for kernel estimator"
-    );
-}
-// TODO
 double KernelBicop::parameters_to_tau(const VecXd __attribute__((unused))& parameters)
 {
     throw std::runtime_error(

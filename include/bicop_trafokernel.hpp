@@ -25,6 +25,10 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 class TrafokernelBicop : public KernelBicop {
 public:
     void fit(const MatXd& data, std::string __attribute__((unused)) method);
+    double calculate_npars();
+        
+private:
+    double npars_;
 };
 
 #endif

@@ -96,7 +96,7 @@ public:
     //! @}
 
     //! Get number of parameters.
-    virtual int calculate_npars() = 0;
+    virtual double calculate_npars() = 0;
 
     //! Calculate the theoretical Kendall's tau
     double calculate_tau();  // this will be a generic fall back method
