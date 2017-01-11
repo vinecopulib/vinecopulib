@@ -171,6 +171,10 @@ VecXd InterpolationGrid::inv_intergrate_1d(const MatXd& u, const int& cond_var)
             tmpu0(0, 1) = u(i, 1);
             tmpu1(0, 0) = x1;
             tmpu1(0, 1) = u(i, 1);
+        } else {
+            throw std::runtime_error(
+                    "cond_var must be 1 or 2"
+            );
         }
 
         // evaluate h-function at boundary points

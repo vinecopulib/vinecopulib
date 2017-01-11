@@ -21,14 +21,14 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #define VINECOPULIB_BICOP_CLASS_HPP
 
 #include <Eigen/Dense>
-#include <random>
 #include <nlopt.hpp>
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_cdf.h>
+#include <random>
 #include <iostream>
 #include <memory>
 #include <vector>
 #include <exception>
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_cdf.h>
 #include <cmath>
 
 typedef Eigen::VectorXd VecXd;

@@ -14,8 +14,8 @@ before_install:
 
 install:
   ### LINUX
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install libeigen3-dev libnlopt-dev libgsl0-dev gsl-bin; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install r-base r-base-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install libeigen3-dev libnlopt-dev libgsl0-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install r-base; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install doxygen doxygen-doc doxygen-gui graphviz; fi
 
   ### OSX
@@ -24,7 +24,7 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen; fi
 
   ### Common
-  - sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), repos="https://cloud.r-project.org/", type="source")'
+  - sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'
 
 script:
   - mkdir build
@@ -35,6 +35,7 @@ script:
   - ./test_bicop_parametric
   - ./test_bicop_class
   - ./test_bicop_select
+  - ./test_bicop_trafokernel
 
 notifications:
   email:

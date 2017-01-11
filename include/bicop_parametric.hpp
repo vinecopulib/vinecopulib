@@ -21,7 +21,6 @@
 #define VINECOPULIB_BICOP_PARAMETRIC_HPP
 
 #include "bicop_class.hpp"
-#include <nlopt.hpp>
 
 class ParBicop : public Bicop {
 
@@ -37,6 +36,26 @@ public:
     // number of parameters
     double calculate_npars();
 };
+
+
+//! A helper struct for nlopt maximum likelihood estimation
+//!
+typedef struct
+{
+    MatXd& U; //! The data
+    ParBicop* bicop; //! A pointer to the bivariate copula to optimize
+    unsigned int mle_objective_calls; //! The number of evaluations of the objective
+} ParBicopMLEData;
+
+//! A helper struct for nlopt profile maximum likelihood estimation
+//!
+typedef struct
+{
+    MatXd& U; //! The data
+    ParBicop* bicop; //! A pointer to the bivariate copula to optimize
+    double par0;  //! The main dependence parameter
+    unsigned int pmle_objective_calls; //! The number of evaluations of the objective
+} ParBicopPMLEData;
 
 double mle_objective(const std::vector<double>& x,
                     std::vector<double> __attribute__((unused))& grad,

@@ -30,29 +30,12 @@ double ParBicop::calculate_npars()
 }
 
 
-// a helper type for nlopt maximum likelihood estimation
-typedef struct
-{
-    MatXd& U;
-    ParBicop* bicop;
-    unsigned int mle_objective_calls;
-} mle_data;
-
-// a helper type for nlopt profile maximum likelihood estimation
-typedef struct
-{
-    MatXd& U;
-    ParBicop* bicop;
-    double par0;
-    unsigned int pmle_objective_calls;
-} pmle_data;
-
 // the objective function for maximum likelihood estimation
 double mle_objective(const std::vector<double>& x,
                      std::vector<double> __attribute__((unused))& grad,
                      void* data)
 {
-    mle_data* newdata = (mle_data*) data;
+    ParBicopMLEData* newdata = (ParBicopMLEData*) data;
     ++newdata->mle_objective_calls;
     Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
     newdata->bicop->set_parameters(par);
@@ -66,7 +49,7 @@ double pmle_objective(const std::vector<double>& x,
                       std::vector<double> __attribute__((unused))& grad,
                       void* data)
 {
-    pmle_data* newdata = (pmle_data*) data;
+    ParBicopPMLEData* newdata = (ParBicopPMLEData*) data;
     ++newdata->pmle_objective_calls;
     VecXd par = VecXd::Ones(x.size()+1);
     par(0) = newdata->par0;
@@ -95,7 +78,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
 
     std::string association_direction = get_association_direction();
     if (((tau < 0) & (association_direction.compare("positive") == 0)) |
-            ((tau > 0) & (association_direction.compare("negative") == 0)))
+        ((tau > 0) & (association_direction.compare("negative") == 0)))
     {
         std::cout << "The data and copula are not compatible." << std::endl;
     } else
@@ -129,7 +112,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
 
                 // organize data for nlopt
                 MatXd U = data;
-                pmle_data my_pmle_data = {U, this, newpar(0), 0};
+                ParBicopPMLEData my_pmle_data = {U, this, newpar(0), 0};
 
                 // call to the optimizer
                 opt.set_min_objective(pmle_objective, &my_pmle_data);
@@ -196,7 +179,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 set_rotation(0);
 
                 // organize data for nlopt
-                mle_data my_mle_data = {U, this, 0};
+                ParBicopMLEData my_mle_data = {U, this, 0};
                 // call to the optimizer
                 opt.set_min_objective(mle_objective, &my_mle_data);
 

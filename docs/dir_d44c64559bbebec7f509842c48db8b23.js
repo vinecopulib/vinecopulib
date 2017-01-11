@@ -10,7 +10,10 @@ var dir_d44c64559bbebec7f509842c48db8b23 =
     [ "bicop_gumbel.hpp", "bicop__gumbel_8hpp_source.html", null ],
     [ "bicop_indep.hpp", "bicop__indep_8hpp_source.html", null ],
     [ "bicop_joe.hpp", "bicop__joe_8hpp_source.html", null ],
+    [ "bicop_kernel.hpp", "bicop__kernel_8hpp_source.html", null ],
     [ "bicop_parametric.hpp", "bicop__parametric_8hpp_source.html", null ],
     [ "bicop_student.hpp", "bicop__student_8hpp_source.html", null ],
+    [ "bicop_trafokernel.hpp", "bicop__trafokernel_8hpp_source.html", null ],
+    [ "interpolation_grid.hpp", "interpolation__grid_8hpp_source.html", null ],
     [ "ktau.h", "ktau_8h_source.html", null ]
 ];

@@ -2,7 +2,7 @@ var class_bicop =
 [
     [ "aic", "class_bicop.html#adb4aecd877fc32cc857e2477d5bddf9b", null ],
     [ "bic", "class_bicop.html#a68ee43f29c026aaf8157673c1ddf29b2", null ],
-    [ "calculate_npars", "class_bicop.html#a6c2b1e5e368f4339bd6acac2f32da74e", null ],
+    [ "calculate_npars", "class_bicop.html#a21f37d9e51460c13be57e48c3d1e7ba4", null ],
     [ "calculate_tau", "class_bicop.html#abe228ece449fb66996f91b0fcfed60d3", null ],
     [ "fit", "class_bicop.html#a0ff40d8054e11ed8aaa4956c7fd84e89", null ],
     [ "get_association_direction", "class_bicop.html#adde8fc6d920041c2ab93a5ba0cc874cb", null ],

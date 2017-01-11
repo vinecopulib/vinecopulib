@@ -1,6 +1,9 @@
 var hierarchy =
 [
     [ "Bicop", "class_bicop.html", [
+      [ "KernelBicop", "class_kernel_bicop.html", [
+        [ "TrafokernelBicop", "class_trafokernel_bicop.html", null ]
+      ] ],
       [ "ParBicop", "class_par_bicop.html", [
         [ "ArchimedeanBicop", "class_archimedean_bicop.html", [
           [ "ClaytonBicop", "class_clayton_bicop.html", null ],
@@ -15,6 +18,7 @@ var hierarchy =
         [ "IndepBicop", "class_indep_bicop.html", null ]
       ] ]
     ] ],
-    [ "mle_data", "structmle__data.html", null ],
-    [ "pmle_data", "structpmle__data.html", null ]
+    [ "InterpolationGrid", "class_interpolation_grid.html", null ],
+    [ "ParBicopMLEData", "struct_par_bicop_m_l_e_data.html", null ],
+    [ "ParBicopPMLEData", "struct_par_bicop_p_m_l_e_data.html", null ]
 ];

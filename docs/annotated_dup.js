@@ -8,9 +8,12 @@ var annotated_dup =
     [ "GaussBicop", "class_gauss_bicop.html", "class_gauss_bicop" ],
     [ "GumbelBicop", "class_gumbel_bicop.html", "class_gumbel_bicop" ],
     [ "IndepBicop", "class_indep_bicop.html", "class_indep_bicop" ],
+    [ "InterpolationGrid", "class_interpolation_grid.html", "class_interpolation_grid" ],
     [ "JoeBicop", "class_joe_bicop.html", "class_joe_bicop" ],
-    [ "mle_data", "structmle__data.html", "structmle__data" ],
+    [ "KernelBicop", "class_kernel_bicop.html", "class_kernel_bicop" ],
     [ "ParBicop", "class_par_bicop.html", "class_par_bicop" ],
-    [ "pmle_data", "structpmle__data.html", "structpmle__data" ],
-    [ "StudentBicop", "class_student_bicop.html", "class_student_bicop" ]
+    [ "ParBicopMLEData", "struct_par_bicop_m_l_e_data.html", "struct_par_bicop_m_l_e_data" ],
+    [ "ParBicopPMLEData", "struct_par_bicop_p_m_l_e_data.html", "struct_par_bicop_p_m_l_e_data" ],
+    [ "StudentBicop", "class_student_bicop.html", "class_student_bicop" ],
+    [ "TrafokernelBicop", "class_trafokernel_bicop.html", "class_trafokernel_bicop" ]
 ];
