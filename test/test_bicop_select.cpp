@@ -50,7 +50,7 @@ namespace {
                                                true,
                                                true,
                                                method);
-                EXPECT_EQ(bicop->get_family(), this->par_bicop_.get_family());
+                EXPECT_EQ(bicop->get_family(), this->par_bicop_.get_family()) << bicop->aic(data) << " " << this->par_bicop_.aic(data);
                 EXPECT_EQ(bicop->get_rotation(), rots[j]);
             }
         }
@@ -83,7 +83,7 @@ namespace {
                                                true,
                                                true,
                                                method);
-                EXPECT_EQ(bicop->get_family(), this->par_bicop_.get_family());
+                EXPECT_EQ(bicop->get_family(), this->par_bicop_.get_family()) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
                 EXPECT_EQ(bicop->get_rotation(), rots[j]);
             }
         }

@@ -26,6 +26,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <cmath>
 
 typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
