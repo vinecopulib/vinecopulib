@@ -20,13 +20,13 @@
 #include "bicop_parametric.hpp"
 
 // calculate number of parameters
-int ParBicop::calculate_npars()
+double ParBicop::calculate_npars()
 {
     // indepence copula has no parameters
     if (family_ == 0)
-        return 0;
+        return 0.0;
     // otherwise, return length of parameter vector
-    return parameters_.size();
+    return (double) parameters_.size();
 }
 
 

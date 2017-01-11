@@ -26,6 +26,9 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <exception>
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_cdf.h>
 #include <cmath>
 
 typedef Eigen::VectorXd VecXd;
@@ -125,7 +128,7 @@ public:
     //! @}
 
     //! Get number of parameters.
-    virtual int calculate_npars() = 0;
+    virtual double calculate_npars() = 0;
 
     //! Calculate the theoretical Kendall's tau
     double calculate_tau();  // this will be a generic fall back method

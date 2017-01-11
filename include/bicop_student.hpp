@@ -21,8 +21,6 @@
 #define VINECOPULIB_BICOP_STUDENT_HPP
 
 #include "bicop_elliptical.hpp"
-#include <gsl/gsl_cdf.h>
-#include <gsl/gsl_randist.h>
 
 class StudentBicop : public EllipticalBicop {
 

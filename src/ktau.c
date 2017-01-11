@@ -10,7 +10,7 @@
 **
 */
 
-#include "include/ktau.h"
+#include "ktau.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Function that allocates space and creates a double matrix.
@@ -71,10 +71,10 @@ void ktau(double *X, double *Y, int *N, double *tau, double *S, double *D, int *
 			{
 				Iflag = (I < Iend);
 				Jflag = (J < Jend);
-				if (Iflag & Jflag) 
+				if (Iflag & Jflag)
 				{
 				 	Xflag = ((X[I] > X[J]) | ((X[I] == X[J]) & (Y[I] > Y[J])));
-				} 
+				}
 				else
 				{
 					Xflag = false;
@@ -93,24 +93,24 @@ void ktau(double *X, double *Y, int *N, double *tau, double *S, double *D, int *
 					J++;
 					L++;
 				};
-			} 
+			}
 			while(Iflag | Jflag);
-		} 
+		}
 		while(L < *N);
-		
+
 		// Swap lists
 		xptr=X; X=X2; X2=xptr;
 		yptr=Y; Y=Y2; Y2=yptr;
 		#ifdef OLD
 		for(i = 0; i < *N; i++)
-		{ 
+		{
 			Xtem = X[i]; Ytem = Y[i];
 			X[i] = X2[i]; Y[i] = Y2[i];
 			X2[i] = Xtem; Y2[i] = Ytem;
 		};
 		#endif
 		K *= 2;
-	} 
+	}
 	while (K < *N);
 
 	/* 1.2 Count pairs of tied X, T */
@@ -151,10 +151,10 @@ void ktau(double *X, double *Y, int *N, double *tau, double *S, double *D, int *
 			{
 				Iflag = (I < Iend);
 				Jflag = (J < Jend);
-				if (Iflag & Jflag) 
+				if (Iflag & Jflag)
 				{
 				 	Xflag = (Y[I] > Y[J]);
-				} 
+				}
 				else
 				{
 					Xflag = false;
@@ -174,24 +174,24 @@ void ktau(double *X, double *Y, int *N, double *tau, double *S, double *D, int *
 					J++;
 					L++;
 				};
-			} 
+			}
 			while((Iflag | Jflag));
-		} 
+		}
 		while(L < *N);
-    
+
 		// Swap lists
 		xptr=X; X=X2; X2=xptr;
 		yptr=Y; Y=Y2; Y2=yptr;
 		#ifdef OLD
 		for(i = 0; i < *N; i++)
-		{ 
+		{
 			Xtem = X[i]; Ytem = Y[i];
 			X[i] = X2[i]; Y[i] = Y2[i];
 			X2[i] = Xtem; Y2[i] = Ytem;
 		};
 		#endif
 		K *= 2;
-	} 
+	}
 	while (K < *N);
 
 	/* 2.2 Count pairs of tied Y, U */
@@ -240,14 +240,14 @@ void ktau_matrix(double *data, int *d, int *N, double *out)
 	Y = (double*) calloc(*N,sizeof(double));
 
 	for(i=0;i<*d;i++)
-    { 
-		for (t=0;t<*N;t++ ) 
+    {
+		for (t=0;t<*N;t++ )
 		{
 			x[i][t] = data[k];
 			k++;
 		}
     }
-	
+
 	k=0;
 	for(i=0;i<((*d)-1);i++)
 	{

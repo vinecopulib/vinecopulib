@@ -21,8 +21,9 @@ add_subdirectory(src_test)
 set(unit_tests
         test_bicop_parametric
         test_bicop_class
-        test_bicop_select)
-
+        test_bicop_select
+        test_bicop_trafokernel)
+        
 foreach(app ${unit_tests})
     add_executable(${app} ${app}.cpp)
     target_link_libraries(${app} gtest gmock vinecopulib ${external_libs} ${test_libs} src_test)

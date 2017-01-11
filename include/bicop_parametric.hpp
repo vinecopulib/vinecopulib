@@ -35,7 +35,7 @@ public:
     double calculate_tau() {return this->parameters_to_tau(parameters_);}
 
     // number of parameters
-    int calculate_npars();
+    double calculate_npars();
 };
 
 double mle_objective(const std::vector<double>& x,

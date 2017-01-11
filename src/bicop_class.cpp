@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <exception>
 #include "bicop.hpp"
 
 BicopPtr Bicop::create(const int& family, const int& rotation)
@@ -45,6 +44,10 @@ BicopPtr Bicop::create(const int& family, const int& rotation)
         case 6:
             my_bicop = BicopPtr(new JoeBicop());
             break;
+        case 1001:
+            my_bicop =  BicopPtr(new TrafokernelBicop());
+            break;
+        
         default:
             throw std::runtime_error(std::string("Family not implemented"));
     }
@@ -425,7 +428,7 @@ VecXd Bicop::hinv1_num(const MatXd &u)
 
         while (!br) {
             v(j, 1) = (xh + xl) / 2.0;
-            fm(j) = hfunc1(v.row(j))(0) - u1(j);
+            fm(j) = hfunc1_default(v.row(j))(0) - u1(j);
 
             //stop if values become too close (avoid infinite loop)
             if (fabs(fm(j)) <= tol) br = 1;
@@ -477,7 +480,7 @@ VecXd Bicop::hinv2_num(const MatXd& u)
 
         while (!br) {
             v(j, 0) = (xh + xl) / 2.0;
-            fm(j) = hfunc2(v.row(j))(0) - u1(j);
+            fm(j) = hfunc2_default(v.row(j))(0) - u1(j);
 
             //stop if values become too close (avoid infinite loop)
             if (fabs(fm(j)) <= tol) br = 1;
