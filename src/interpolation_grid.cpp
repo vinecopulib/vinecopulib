@@ -108,14 +108,14 @@ VecXd InterpolationGrid::interpolate(const MatXd& x)
 
 //! Integrate the grid along one axis
 //!
-//! @param uev mx2 matrix of evaluation points
+//! @param u mx2 matrix of evaluation points
 //! @param cond_var either 1 or 2; the axis considered fixed.
 //! @param vals matrix of density estimate evaluated on a kxk grid.
 //! @param grid the grid points (1-dim) on which vals has been computed.
 //!
-VecXd InterpolationGrid::intergrate_1d(const MatXd& uev, const int& cond_var)
+VecXd InterpolationGrid::intergrate_1d(const MatXd& u, const int& cond_var)
 {
-    int n = uev.rows();
+    int n = u.rows();
     int m = grid_points_.size();
     VecXd tmpvals(m), out(n), tmpa(4), tmpb(4);
     MatXd tmpgrid(m, 2);
@@ -125,13 +125,13 @@ VecXd InterpolationGrid::intergrate_1d(const MatXd& uev, const int& cond_var)
 
     for (int i = 0; i < n; ++i) {
         if (cond_var == 1) {
-            upr = uev(i, 1);
-            tmpgrid.col(0) = VecXd::Constant(m, uev(i, 0));
+            upr = u(i, 1);
+            tmpgrid.col(0) = VecXd::Constant(m, u(i, 0));
             tmpgrid.col(1) = grid_points_;
         } else if (cond_var == 2) {
-            upr = uev(i, 0);
+            upr = u(i, 0);
             tmpgrid.col(0) = grid_points_;
-            tmpgrid.col(1) = VecXd::Constant(m, uev(i, 1));
+            tmpgrid.col(1) = VecXd::Constant(m, u(i, 1));
         }
         tmpvals = interpolate(tmpgrid);
         tmpint = int_on_grid(upr, tmpvals, grid_points_);
@@ -146,16 +146,16 @@ VecXd InterpolationGrid::intergrate_1d(const MatXd& uev, const int& cond_var)
 
 //! Inverse of integral along one axis of the grid
 //!
-//! @param uev mx2 matrix of evaluation points
+//! @param u mx2 matrix of evaluation points
 //! @param cond_var either 1 or 2; the axis considered fixed.
 //! @param vals matrix of density estimate evaluated on a kxk grid.
 //! @param grid the grid points (1-dim) on which vals has been computed.
 //!
-VecXd InterpolationGrid::inv_intergrate_1d(const MatXd& uev, const int& cond_var)
+VecXd InterpolationGrid::inv_intergrate_1d(const MatXd& u, const int& cond_var)
 {
-    VecXd out(uev.rows());
+    VecXd out(u.rows());
 
-    for (int i = 0; i < uev.rows(); ++i) {
+    for (int i = 0; i < u.rows(); ++i) {
         int br = 0;
         double x0 = 0.0;
         double x1 = 1.0;
@@ -164,18 +164,18 @@ VecXd InterpolationGrid::inv_intergrate_1d(const MatXd& uev, const int& cond_var
         MatXd tmpu0(1, 2), tmpu1(1, 2);
         double q;
         if (cond_var == 1) {
-            q = uev(i, 1);
-            tmpu0(0, 0) = uev(i, 0);
+            q = u(i, 1);
+            tmpu0(0, 0) = u(i, 0);
             tmpu0(0, 1) = x0;
-            tmpu1(0, 0) = uev(i, 0);
+            tmpu1(0, 0) = u(i, 0);
             tmpu1(0, 1) = x1;
 
         } else if (cond_var == 2) {
-            q = uev(i, 0);
+            q = u(i, 0);
             tmpu0(0, 0) = x0;
-            tmpu0(0, 1) = uev(i, 1);
+            tmpu0(0, 1) = u(i, 1);
             tmpu1(0, 0) = x1;
-            tmpu1(0, 1) = uev(i, 1);
+            tmpu1(0, 1) = u(i, 1);
         }
 
         // evaluate h-function at boundary points
@@ -202,14 +202,14 @@ VecXd InterpolationGrid::inv_intergrate_1d(const MatXd& uev, const int& cond_var
             // set new evaluation point
             ans = (x0 + x1) / 2.0;
             if (cond_var == 1) {
-                q = uev(i, 1);
-                tmpu0(0, 0) = uev(i, 0);
+                q = u(i, 1);
+                tmpu0(0, 0) = u(i, 0);
                 tmpu0(0, 1) = ans;
 
             } else if (cond_var == 2) {
-                q = uev(i, 0);
+                q = u(i, 0);
                 tmpu0(0, 0) = ans;
-                tmpu0(0, 1) = uev(i, 1);
+                tmpu0(0, 1) = u(i, 1);
             }
 
             double gap = intergrate_1d(tmpu0, cond_var)(0) - q;

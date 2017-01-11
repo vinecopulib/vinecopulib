@@ -35,8 +35,8 @@ public:
     InterpolationGrid(const VecXd& grid_points, const MatXd& values);
 
     VecXd interpolate(const MatXd& x);
-    VecXd intergrate_1d(const MatXd& uev, const int& cond_var);
-    VecXd inv_intergrate_1d(const MatXd& uev, const int& cond_var);
+    VecXd intergrate_1d(const MatXd& u, const int& cond_var);
+    VecXd inv_intergrate_1d(const MatXd& u, const int& cond_var);
 
 private:
     // Utility functions for spline Interpolation
