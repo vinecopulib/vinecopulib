@@ -64,3 +64,8 @@ double KernelBicop::parameters_to_tau(const VecXd __attribute__((unused))& param
         "parameters_to_tau not yet implemented for kernel estimator"
     );
 }
+
+double KernelBicop::calculate_npars()
+{
+    return npars_;
+}

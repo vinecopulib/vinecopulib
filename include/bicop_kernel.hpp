@@ -34,6 +34,7 @@ public:
     VecXd hinv2_default(const MatXd& u);
 
     double parameters_to_tau(const VecXd __attribute__((unused))& parameters);
+    double calculate_npars();
 
 protected:
     InterpolationGrid interp_grid_;

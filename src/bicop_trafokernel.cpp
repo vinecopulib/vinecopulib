@@ -117,8 +117,3 @@ void TrafokernelBicop::fit(const MatXd& data, __attribute__((unused)) std::strin
     VecXd scale = phi_data.rowwise().prod();
     npars_ =  K0 / det_B / (scale.array() * this->pdf(data).array()).mean();
 }
-
-double TrafokernelBicop::calculate_npars()
-{
-    return npars_;
-}
