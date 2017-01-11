@@ -121,12 +121,24 @@ VecXd FrankBicop::tau_to_parameters(const double& tau)
         if (std::fabs(fm) <= tol) br = 1;
         if (std::fabs(xl - xh) <= tol) br = 1;
 
-        if (fm < 0.0) {
-            xl = par;
-            fh = fm;
-        } else {
-            xh = par;
-            fl = fm;
+        if (tau < 0.0)
+        {
+            if (fm > 0.0) {
+                xl = par;
+                fh = fm;
+            } else {
+                xh = par;
+                fl = fm;
+            }
+        } else
+        {
+            if (fm < 0.0) {
+                xl = par;
+                fh = fm;
+            } else {
+                xh = par;
+                fl = fm;
+            }
         }
 
         //stop if too many iterations are required (avoid infinite loop)

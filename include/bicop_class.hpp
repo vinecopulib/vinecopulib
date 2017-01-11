@@ -29,6 +29,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <exception>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_cdf.h>
+#include <cmath>
 
 typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
@@ -45,14 +46,42 @@ class Bicop
 {
 
 public:
-    //! Create a bivariate copula
+    //! Create a bivariate copula using the default contructor
+    //!
+    //! @param family the copula family.
+    //! @rotation rotation the rotation type.
+    //! @return A pointer to an object that inherits from \c Bicop.
+    static std::shared_ptr<Bicop> create(const int& family,
+                                         const int& rotation);
+
+    //! Create a bivariate copula with a specified parameters vector
     //!
     //! @param family the copula family.
     //! @param par the copula parameters (must be compatible with family).
+    //! @rotation rotation the rotation type.
     //! @return A pointer to an object that inherits from \c Bicop.
     static std::shared_ptr<Bicop> create(const int& family,
                                          const VecXd& parameters,
                                          const int& rotation);
+
+    //! Select a bivariate copula
+    //!
+    //! @param data the data to fit the bivariate copula.
+    //! @param selection_criterion the selection criterion ("aic" or "bic").
+    //! @param family_set the set of copula families to consider (if empty, then all families are included).
+    //! @param use_rotations whether rotations in the familyset are included.
+    //! @param preselect_families whether to exclude families before fitting based on symmetry properties of the data.
+    //! @param method indicates the estimation method: either maximum likelihood estimation (method = "mle") or
+    //! inversion of Kendall's tau (method = "itau"). When method = "itau" is used with families having more than
+    //! one parameter, the main dependence parameter is found by inverting the Kendall's tau and the remainders by a
+    //! profile likelihood optimization.
+    //! @return A pointer to an object that inherits from \c Bicop.
+    static std::shared_ptr<Bicop> select(const MatXd& data,
+                                         std::string selection_criterion,
+                                         std::vector<int> family_set,
+                                         bool use_rotations,
+                                         bool preselect_families,
+                                         std::string method);
 
     //! \defgroup df Copula density
     //!
@@ -113,7 +142,7 @@ public:
     VecXd get_parameters() const {return parameters_;}
     MatXd get_parameters_bounds() const {return parameter_bounds_;}
 
-    void set_rotation(const int& rotation) {rotation_ = rotation;}
+    void set_rotation(const int& rotation);
     void set_parameters(const VecXd& parameters) {parameters_ = parameters;}
     //! @}
 
@@ -147,6 +176,10 @@ protected:
     MatXd parameter_bounds_;   // first row lower, second row upper
 };
 
-typedef std::shared_ptr<Bicop> Bicop_ptr;
+typedef std::shared_ptr<Bicop> BicopPtr;
+double correlation(const MatXd& z);
+template<typename T> bool is_member(T element, std::vector<T> set);
+std::vector<double> get_c1c2(const MatXd& data, double tau);
+bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless);
 
 #endif

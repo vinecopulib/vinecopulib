@@ -40,6 +40,7 @@ public:
     VecXd get_parameters();
     int get_rotation();
     int get_family();
+    int get_n();
 
     // other methods
     RInstance();

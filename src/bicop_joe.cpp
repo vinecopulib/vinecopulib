@@ -137,12 +137,24 @@ VecXd JoeBicop::tau_to_parameters(const double& tau)
         if (fabs(fm) <= tol) br = 1;
         if (fabs(xl - xh) <= tol) br = 1;
 
-        if (fm < 0.0) {
-            xl = par;
-            fh = fm;
-        } else {
-            xh = par;
-            fl = fm;
+        if (tau < 0.0)
+        {
+            if (fm > 0.0) {
+                xl = par;
+                fh = fm;
+            } else {
+                xh = par;
+                fl = fm;
+            }
+        } else
+        {
+            if (fm < 0.0) {
+                xl = par;
+                fh = fm;
+            } else {
+                xh = par;
+                fl = fm;
+            }
         }
 
         //stop if too many iterations are required (avoid infinite loop)
@@ -162,7 +174,6 @@ double JoeBicop::parameters_to_tau(const VecXd& parameters)
     tau = 1 + 2 * tau / (2 - par);
     if ((rotation_ == 90) | (rotation_ == 270))
         tau *= -1;
-
     return tau;
 }
 

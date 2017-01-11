@@ -1,5 +1,5 @@
 /*
-    Copyright 2016 Thibault Vatter
+    Copyright 2016 Thibault Vatter, Thomas Nagler
 
     This file is part of vinecoplib.
 
@@ -22,23 +22,6 @@
 RInstance *rinstance_ptr = new RInstance;
 
 namespace {
-    /*TYPED_TEST(ParBicopTest, mle_is_correct) {
-        // set-up parameters
-        this->setup_parameters(rinstance_ptr);
-
-        // evaluate in R
-        MatXd U = this->get_U(rinstance_ptr);
-
-        // evaluate in C++
-        char method[] = "itau";
-        this->par_bicop_.fit(U, method);
-
-        double tau = this->par_bicop_.calculate_tau();
-
-        // assert approximate equality
-        ASSERT_TRUE(fabs(tau - this->get_tau(rinstance_ptr)) < 1e-1);
-    } */
-
     // Test if the C++ implementation of the par_to_tau and tau_to_par is correct
     TYPED_TEST(ParBicopTest, par_to_tau_is_correct) {
         this->setup_parameters(rinstance_ptr);
@@ -161,41 +144,7 @@ namespace {
 }
 
 int main(int argc, char **argv) {
-    rinstance_ptr->set_rotation(270);
+    rinstance_ptr->set_rotation(0);
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-
-/*// survival version
-rinstance_ptr->set_rotation(180);
-::testing::InitGoogleTest(&argc, argv);
-res = RUN_ALL_TESTS();
-
-// rotated 90
-rinstance_ptr->set_rotation(90);
-parameters(0) = -3;
-rinstance_ptr->set_parameters(parameters);
-::testing::InitGoogleTest(&argc, argv);
-res = RUN_ALL_TESTS();
-
-// survival version
-rinstance_ptr->set_rotation(270);
-::testing::InitGoogleTest(&argc, argv);
-res = RUN_ALL_TESTS();
-
-return(res);
-
- //    const clock_t t1 = clock();
-//    const clock_t t2 = clock();
-//    std::cout << "simulation time " << float( t2 - t1 ) /  CLOCKS_PER_SEC << "\n";
-//    char method[] = "itau";
-//    b.fit(data,method);
-//    const clock_t t3 = clock();
-//    std::cout << "fit time " << float( t3 - t2 ) /  CLOCKS_PER_SEC << "\n";
-    char method[] = "itau";
-    MatXd data = b.simulate(1000);
-    b.fit(data,method);
-    std::cout << "Fitted parameter using Kendall's tau inversion based on a sample of 1000 random variables:";
-    std::cout <<  b.get_parameters() << "\n";
-
- */

@@ -1,0 +1,13 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_bicop.html" title="Bicop" alt="" coords="5,203,60,228"/>
+<area shape="rect" id="node2" href="$class_par_bicop.html" title="ParBicop" alt="" coords="108,203,183,228"/>
+<area shape="rect" id="node3" href="$class_archimedean_bicop.html" title="ArchimedeanBicop" alt="" coords="231,104,365,129"/>
+<area shape="rect" id="node8" href="$class_elliptical_bicop.html" title="EllipticalBicop" alt="" coords="246,203,350,228"/>
+<area shape="rect" id="node11" href="$class_indep_bicop.html" title="IndepBicop" alt="" coords="254,252,342,277"/>
+<area shape="rect" id="node4" href="$class_clayton_bicop.html" title="ClaytonBicop" alt="" coords="413,5,513,31"/>
+<area shape="rect" id="node5" href="$class_frank_bicop.html" title="FrankBicop" alt="" coords="419,55,508,80"/>
+<area shape="rect" id="node6" href="$class_gumbel_bicop.html" title="GumbelBicop" alt="" coords="413,104,514,129"/>
+<area shape="rect" id="node7" href="$class_joe_bicop.html" title="JoeBicop" alt="" coords="425,153,501,179"/>
+<area shape="rect" id="node9" href="$class_gauss_bicop.html" title="GaussBicop" alt="" coords="417,203,510,228"/>
+<area shape="rect" id="node10" href="$class_student_bicop.html" title="StudentBicop" alt="" coords="413,252,514,277"/>
+</map>
