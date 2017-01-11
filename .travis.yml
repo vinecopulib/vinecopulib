@@ -34,6 +34,7 @@ script:
   - cd ../bin
   - ./test_bicop_parametric
   - ./test_bicop_class
+  - ./test_bicop_select
 
 notifications:
   email:
