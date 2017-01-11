@@ -110,8 +110,6 @@ VecXd InterpolationGrid::interpolate(const MatXd& x)
 //!
 //! @param u mx2 matrix of evaluation points
 //! @param cond_var either 1 or 2; the axis considered fixed.
-//! @param vals matrix of density estimate evaluated on a kxk grid.
-//! @param grid the grid points (1-dim) on which vals has been computed.
 //!
 VecXd InterpolationGrid::intergrate_1d(const MatXd& u, const int& cond_var)
 {
@@ -148,8 +146,6 @@ VecXd InterpolationGrid::intergrate_1d(const MatXd& u, const int& cond_var)
 //!
 //! @param u mx2 matrix of evaluation points
 //! @param cond_var either 1 or 2; the axis considered fixed.
-//! @param vals matrix of density estimate evaluated on a kxk grid.
-//! @param grid the grid points (1-dim) on which vals has been computed.
 //!
 VecXd InterpolationGrid::inv_intergrate_1d(const MatXd& u, const int& cond_var)
 {
@@ -343,7 +339,6 @@ double InterpolationGrid::inv_cubic_integral(const double& q, const VecXd& a)
 //!
 //! @param vals length 4 vector of function values.
 //! @param grid length 4 vector of grid points.
-//! @param a vector of polynomial coefficients.
 VecXd InterpolationGrid::find_coefs(const VecXd& vals, const VecXd& grid)
 {
     VecXd a(4);
@@ -383,7 +378,6 @@ VecXd InterpolationGrid::find_coefs(const VecXd& vals, const VecXd& grid)
 //! @param x evaluation point.
 //! @param vals length 4 vector of function values.
 //! @param grid length 4 vector of grid points.
-//! @param a vector of polynomial coefficients.
 double InterpolationGrid::interp_on_grid(const double& x, const VecXd& vals, const VecXd& grid)
 {
     VecXd a = find_coefs(vals, grid);
