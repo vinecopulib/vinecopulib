@@ -24,7 +24,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 namespace {
     // Test if the C++ implementation of the par_to_tau and tau_to_par is correct
     TEST(KernelBicopTest, trafo_kernel_fit_works) {
-        Bicop_ptr cop = Bicop::create(1001, VecXd::Zero(1), 0);
+        BicopPtr cop = Bicop::create(1001, VecXd::Zero(1), 0);
         MatXd dat = MatXd::Random(100, 2).array() * 0.5 + 0.5;
         MatXd eval = MatXd::Random(10, 2).array() * 0.5 + 0.5;
         cop->fit(dat, std::string(""));

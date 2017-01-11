@@ -43,9 +43,10 @@ BicopPtr Bicop::create(const int& family, const int& rotation)
             break;
         case 6:
             my_bicop = BicopPtr(new JoeBicop());
-
+            break;
         case 1001:
             my_bicop =  BicopPtr(new TrafokernelBicop());
+            break;
         
         default:
             throw std::runtime_error(std::string("Family not implemented"));
