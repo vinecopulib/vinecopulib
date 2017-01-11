@@ -26,9 +26,6 @@ class TrafokernelBicop : public KernelBicop {
 public:
     void fit(const MatXd& data, std::string __attribute__((unused)) method);
     double calculate_npars();
-        
-private:
-    double npars_;
 };
 
 #endif

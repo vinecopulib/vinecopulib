@@ -37,10 +37,7 @@ public:
 
 protected:
     InterpolationGrid interp_grid_;
-
-private:
-    // methods for fitting a particular kernel estimators
-    void fit_t(const MatXd& data);
+    double npars_;
 };
 
 

@@ -114,7 +114,6 @@ void TrafokernelBicop::fit(const MatXd& data, __attribute__((unused)) std::strin
     // for interpolation, we shift the limiting gridpoints to 0 and 1
     grid_points(0) = 0.0;
     grid_points(m - 1) = 1.0;
-
     interp_grid_ = InterpolationGrid(grid_points, values);
     
     // compute effective number of parameters
