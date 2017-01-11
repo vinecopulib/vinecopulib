@@ -28,7 +28,7 @@ namespace {
 
         for (unsigned int i = 0; i < fams.size(); ++i) {
             for (unsigned int j = 0; j < rots.size(); ++j) {
-                Bicop_ptr bicop = Bicop::create(fams[i], VecXd::Zero(1), rots[j]);
+                BicopPtr bicop = Bicop::create(fams[i], VecXd::Zero(1), rots[j]);
                 EXPECT_EQ(bicop->get_family(), fams[i]);
                 EXPECT_EQ(bicop->get_rotation(), rots[j]);
                 EXPECT_EQ(bicop->get_parameters(), VecXd::Zero(1));

@@ -35,6 +35,7 @@ public:
     int get_family(RInstance *rinstance_ptr);
     VecXd get_parameters(RInstance *rinstance_ptr);
     int get_rotation(RInstance *rinstance_ptr);
+    int get_n(RInstance *rinstance_ptr);
     void change_n(RInstance *rinstance_ptr, int n);
     double get_tau(RInstance *rinstance_ptr);
     void set_tau(RInstance *rinstance_ptr, double tau);
@@ -46,15 +47,22 @@ template <typename T>
 class ParBicopTest : public FakeParBicopTest {
 public:
     void setup_parameters(RInstance *rinstance_ptr) {
+        // set family and extracts kendall's tau from the R instance
+        this->set_family(rinstance_ptr, this->par_bicop_.get_family());
         double tau = this->get_tau(rinstance_ptr);
+
+        // set the rotion and compute the parameters vector
+        this->par_bicop_.set_rotation(rinstance_ptr->get_rotation());
         VecXd parameters(2);
         parameters = this->par_bicop_.tau_to_parameters(tau);
         if (parameters.size() == 2)
             parameters(1) = 4.0;
+
+        // set the parameters vector for the ParBicop and R instance
         this->par_bicop_.set_parameters(parameters);
-        this->set_family(rinstance_ptr, this->par_bicop_.get_family());
         this->set_parameters(rinstance_ptr, this->par_bicop_.get_parameters());
-        this->par_bicop_.set_rotation(rinstance_ptr->get_rotation());
+
+        // whether checks need to be done
         needs_check_ = true;
         std::vector<int> rotation_less_fams = {0, 1, 2, 5};
         bool is_rotless = (
@@ -76,7 +84,5 @@ protected:
 // Create a list of types, each of which will be used as the test fixture's 'T'
 typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);
-//typedef ::testing::Types<ClaytonBicop, GumbelBicop> RotatedBicopTypes;
-//TYPED_TEST_CASE(ParBicopTest, RotatedBicopTypes);
 
 #endif

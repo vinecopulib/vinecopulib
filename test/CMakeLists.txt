@@ -20,7 +20,8 @@ add_subdirectory(src_test)
 
 set(unit_tests
         test_bicop_parametric
-        test_bicop_class)
+        test_bicop_class
+        test_bicop_select)
 
 foreach(app ${unit_tests})
     add_executable(${app} ${app}.cpp)

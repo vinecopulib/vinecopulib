@@ -1,5 +1,5 @@
 /*
-    Copyright 2016 Thibault Vatter
+    Copyright 2016 Thibault Vatter, Thomas Nagler
 
     This file is part of vinecoplib.
 
@@ -66,4 +66,8 @@ double FakeParBicopTest::get_tau(RInstance *rinstance_ptr)
 int FakeParBicopTest::get_rotation(RInstance *rinstance_ptr)
 {
     return rinstance_ptr->get_rotation();
+}
+int FakeParBicopTest::get_n(RInstance *rinstance_ptr)
+{
+    return rinstance_ptr->get_n();
 }
