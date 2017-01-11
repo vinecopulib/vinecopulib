@@ -20,24 +20,9 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include "bicop_trafokernel.hpp"
 #include "bicop.hpp"
 
-VecXd gaussian_kernel_1d(const VecXd& x)
-{
-    VecXd out(x);
-    int n = x.rows();
-
-    for (int i = 0; i < n; ++i) {
-        if (std::fabs(x(i)) >= 5) {
-            out(i) = 0.0;
-        } else {
-            out(i) = exp(- 0.5 * pow(x(i), 2)) / (sqrt(2.0 * 3.1415)) / 0.9999994267;
-        }
-    }
-    return out;
-}
-
 VecXd gaussian_kernel_2d(const MatXd& x)
 {
-    return gaussian_kernel_1d(x.col(0)).cwiseProduct(gaussian_kernel_1d(x.col(1)));
+    return x.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf)).rowwise().prod();
 }
 
 void TrafokernelBicop::fit(const MatXd& data, __attribute__((unused)) std::string method)
