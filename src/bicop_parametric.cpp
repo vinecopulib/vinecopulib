@@ -111,10 +111,10 @@ void ParBicop::fit(const MatXd &data, std::string method)
             {
                 // Derivatives free optimization
                 nlopt::opt opt(nlopt::LN_BOBYQA, npars - 1);
-                opt.set_xtol_rel(1e-4);
-                opt.set_xtol_abs(1e-4);
-                opt.set_ftol_rel(1e-4);
-                opt.set_ftol_abs(1e-4);
+                opt.set_xtol_rel(1e-2);
+                opt.set_xtol_abs(1e-3);
+                opt.set_ftol_rel(1e-2);
+                opt.set_ftol_abs(1e-2);
                 opt.set_maxeval(1e3);
 
                 // Set bounds
@@ -190,8 +190,12 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 opt.set_lower_bounds(lb);
                 opt.set_upper_bounds(ub);
 
+                // rotate copula and data
+                int rotation = get_rotation();
+                MatXd U = rotate_u(data);
+                set_rotation(0);
+
                 // organize data for nlopt
-                MatXd U = data;
                 mle_data my_mle_data = {U, this, 0};
                 // call to the optimizer
                 opt.set_min_objective(mle_objective, &my_mle_data);
@@ -225,9 +229,8 @@ void ParBicop::fit(const MatXd &data, std::string method)
 
                 Eigen::Map<const Eigen::VectorXd> parameters(&x[0], x.size());
                 set_parameters(parameters);
+                set_rotation(rotation);
             }
-
-
         } else {
             throw std::runtime_error(std::string("Method not implemented"));
         }
