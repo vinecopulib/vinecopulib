@@ -27,21 +27,11 @@ VecXd gaussian_kernel_2d(const MatXd& x)
 
 void TrafokernelBicop::fit(const MatXd& data, __attribute__((unused)) std::string method)
 {
-    // default grid for evaluating the kernel estimate
+    // construct default grid (equally spaced on Gaussian scale)
     int m = 30;
     VecXd grid_points(m);
-    grid_points <<
-        0.000577025042390767, 0.00123962686200121, 0.00254151589573534,
-        0.0049746530390053, 0.00930009771273897, 0.0166142962429879,
-        0.0283788314258559, 0.0463781084506, 0.0725724690258812,
-        0.108832916878933, 0.156578290481851, 0.21637844739498,
-        0.287622128209223, 0.368357426310209, 0.455384362153775,
-        0.544615637846225, 0.631642573689791, 0.712377871790777,
-        0.78362155260502, 0.843421709518149, 0.891167083121067,
-        0.927427530974119, 0.9536218915494, 0.971621168574144,
-        0.983385703757012, 0.990699902287261, 0.995025346960995,
-        0.997458484104265, 0.998760373137999, 0.999422974957609;
-
+    for (int i = 0; i < m; ++i)
+        grid_points(i) = gsl_cdf_ugaussian_P(- 3.25 + i * (6.25 / (double) m));
 
     // expand the interpolation grid; a matrix with two columns where each row
     // contains one combination of the grid points
