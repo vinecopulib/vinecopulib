@@ -50,8 +50,31 @@ namespace {
                                                true,
                                                true,
                                                method);
-                EXPECT_EQ(bicop->get_family(), this->par_bicop_.get_family()) << bicop->aic(data) << " " << this->par_bicop_.aic(data);
-                EXPECT_EQ(bicop->get_rotation(), rots[j]);
+                int selected_family = bicop->get_family();
+                int true_family = this->par_bicop_.get_family();
+                if (true_family == 3 || true_family == 6)
+                {
+                    EXPECT_TRUE(selected_family == 3 || selected_family == 6) << bicop->aic(data) << " " << this->par_bicop_.aic(data);
+                    if (selected_family == true_family)
+                    {
+                        EXPECT_EQ(bicop->get_rotation(), rots[j]);
+                    }
+                    else
+                    {
+                        if (rots[j] < 180)
+                        {
+                            EXPECT_EQ(bicop->get_rotation()-180, rots[j]);
+                        }
+                        else
+                        {
+                            EXPECT_EQ(bicop->get_rotation()+180, rots[j]);
+                        }
+                    }
+                } else
+                {
+                    EXPECT_EQ(selected_family, true_family) << bicop->aic(data) << " " << this->par_bicop_.aic(data);
+                    EXPECT_EQ(bicop->get_rotation(), rots[j]);
+                }
             }
         }
     }
@@ -83,8 +106,31 @@ namespace {
                                                true,
                                                true,
                                                method);
-                EXPECT_EQ(bicop->get_family(), this->par_bicop_.get_family()) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
-                EXPECT_EQ(bicop->get_rotation(), rots[j]);
+                int selected_family = bicop->get_family();
+                int true_family = this->par_bicop_.get_family();
+                if (true_family == 3 || true_family == 6)
+                {
+                    EXPECT_TRUE(selected_family == 3 || selected_family == 6) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
+                    if (selected_family == true_family)
+                    {
+                        EXPECT_EQ(bicop->get_rotation(), rots[j]);
+                    }
+                    else
+                    {
+                        if (rots[j] < 180)
+                        {
+                            EXPECT_EQ(bicop->get_rotation()-180, rots[j]);
+                        }
+                        else
+                        {
+                            EXPECT_EQ(bicop->get_rotation()+180, rots[j]);
+                        }
+                    }
+                } else
+                {
+                    EXPECT_EQ(selected_family, true_family) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
+                    EXPECT_EQ(bicop->get_rotation(), rots[j]);
+                }
             }
         }
     }

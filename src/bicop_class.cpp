@@ -110,7 +110,7 @@ BicopPtr Bicop::select(const MatXd& data,
     double c2 = 0;
     if (preselect_families)
     {
-        std::vector<double> c = get_c1c2(data, tau);
+        std::vector<double> c = get_c1c2(newdata, tau);
         c1 = c[0];
         c2 = c[1];
     }
@@ -156,19 +156,18 @@ BicopPtr Bicop::select(const MatXd& data,
     double fitted_criterion = 1e6;
     for (unsigned int j = 0; j < families.size(); j++)
     {
-        //std::cout << families[j] << "/" << rotations[j] <<  std::endl;
         // Estimate the model
         BicopPtr new_bicop = create(families[j], rotations[j]);
-        new_bicop->fit(data, method);
+        new_bicop->fit(newdata, method);
 
         // Compute the selection criterion
         double new_criterion;
         if (selection_criterion.compare("aic") == 0)
         {
-            new_criterion = new_bicop->aic(data);
+            new_criterion = new_bicop->aic(newdata);
         } else if (selection_criterion.compare("bic") == 0)
         {
-            new_criterion = new_bicop->bic(data);
+            new_criterion = new_bicop->bic(newdata);
         } else
         {
             throw std::runtime_error(std::string("Selection criterion not implemented"));
@@ -180,8 +179,7 @@ BicopPtr Bicop::select(const MatXd& data,
             fitted_criterion = new_criterion;
             fitted_bicop = new_bicop;
         }
-        //std::cout << families[j] << " " << rotations[j] << " " << new_criterion << " " << -2*new_bicop->loglik(data) << " " << new_bicop->get_parameters() << std::endl;
-    }
+     }
 
     return fitted_bicop;
 
