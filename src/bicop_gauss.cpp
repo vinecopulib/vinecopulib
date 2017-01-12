@@ -47,23 +47,32 @@ GaussBicop::GaussBicop(const VecXd& parameters, const int& rotation)
 // PDF
 VecXd GaussBicop::pdf_default(const MatXd& u)
 {
-    double t1, t2, tmp;
+    // Inverse Cholesky of the correlation matrix
+    double rho = double(this->parameters_(0));
+    MatXd L = MatXd::Zero(2,2);
+    L(0,0) = 1;
+    L(1,1) = 1/sqrt(1.0-pow(rho,2.0));
+    L(0,1) = -rho*L(1,1);
+
+    // Compute copula density
+    VecXd f = VecXd::Ones(u.rows());
+    MatXd tmp = u.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_Pinv));
+    f = f.cwiseQuotient(tmp.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf)).rowwise().prod());
+    tmp = tmp*L;
+    f = f.cwiseProduct(tmp.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf)).rowwise().prod());
+    return f/sqrt(1.0-pow(rho,2.0));
+
+
+    /*double t1, t2;
     double rho = double(this->parameters_(0));
     VecXd f = VecXd::Zero(u.rows());
-    //boost::math::normal dist(0,1);
-
+    boost::math::normal dist(0,1);
     for (int j = 0; j < u.rows(); ++j) {
-        t1 = gsl_cdf_ugaussian_Pinv(u(j, 0));
-        t2 = gsl_cdf_ugaussian_Pinv(u(j, 1));
-        tmp = gsl_ran_bivariate_gaussian_pdf(t1, t2, 1.0, 1.0, rho);
-        tmp /= gsl_ran_ugaussian_pdf(t1) * gsl_ran_ugaussian_pdf(t2);
-        f(j) = tmp;
-        //t1 = boost::math::quantile(dist, u1);
-        //t2 = boost::math::quantile(dist, u2);
-        //f(j) = 1.0/sqrt(1.0-pow(rho,2.0))*exp((pow(t1,2.0)+pow(t2,2.0))/2.0+(2.0*rho*t1*t2-pow(t1,2.0)-pow(t2,2.0))/(2.0*(1.0-pow(rho,2.0))));
+        t1 = boost::math::quantile(dist, u(j,0));
+        t2 = boost::math::quantile(dist, u(j,1));
+        f(j) = 1.0/sqrt(1.0-pow(rho,2.0))*exp((pow(t1,2.0)+pow(t2,2.0))/2.0+(2.0*rho*t1*t2-pow(t1,2.0)-pow(t2,2.0))/(2.0*(1.0-pow(rho,2.0))));
     }
-
-    return f;
+    return f;*/
 }
 
 
