@@ -26,8 +26,8 @@ GaussBicop::GaussBicop()
     rotation_ = 0;
     association_direction_ = "both";
     parameters_ = VecXd::Zero(1);
-    parameter_bounds_ = MatXd::Ones(1, 2);
-    parameter_bounds_(0, 0) = -1;
+    parameters_bounds_ = MatXd::Ones(1, 2);
+    parameters_bounds_(0, 0) = -1;
 }
 
 GaussBicop::GaussBicop(const VecXd& parameters)
@@ -36,8 +36,8 @@ GaussBicop::GaussBicop(const VecXd& parameters)
     rotation_ = 0;
     association_direction_ = "both";
     parameters_ = parameters;
-    parameter_bounds_ = MatXd::Ones(1, 2);
-    parameter_bounds_(0, 0) = -1;
+    parameters_bounds_ = MatXd::Ones(1, 2);
+    parameters_bounds_(0, 0) = -1;
 }
 
 GaussBicop::GaussBicop(const VecXd& parameters, const int& rotation)
@@ -46,8 +46,8 @@ GaussBicop::GaussBicop(const VecXd& parameters, const int& rotation)
     rotation_ = rotation;
     association_direction_ = "both";
     parameters_ = parameters;
-    parameter_bounds_ = MatXd::Ones(1, 2);
-    parameter_bounds_(0, 0) = -1;
+    parameters_bounds_ = MatXd::Ones(1, 2);
+    parameters_bounds_(0, 0) = -1;
 }
 
 // PDF

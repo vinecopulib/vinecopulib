@@ -26,7 +26,7 @@ IndepBicop::IndepBicop()
     rotation_ = 0;
     association_direction_ = "none";
     parameters_ = VecXd::Zero(1);
-    parameter_bounds_ = MatXd::Zero(1, 2);
+    parameters_bounds_ = MatXd::Zero(1, 2);
 }
 
 IndepBicop::IndepBicop(const VecXd & parameters)
@@ -35,7 +35,7 @@ IndepBicop::IndepBicop(const VecXd & parameters)
     rotation_ = 0;
     association_direction_ = "none";
     parameters_ = parameters;
-    parameter_bounds_ = MatXd::Zero(1, 2);
+    parameters_bounds_ = MatXd::Zero(1, 2);
 }
 
 IndepBicop::IndepBicop(const VecXd& parameters, const int& rotation)
@@ -44,7 +44,7 @@ IndepBicop::IndepBicop(const VecXd& parameters, const int& rotation)
     rotation_ = rotation;
     association_direction_ = "none";
     parameters_ = parameters;
-    parameter_bounds_ = MatXd::Zero(1, 2);
+    parameters_bounds_ = MatXd::Zero(1, 2);
 }
 
 // PDF

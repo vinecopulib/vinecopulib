@@ -140,7 +140,7 @@ public:
     int get_rotation() const {return rotation_;}
     std::string get_association_direction() const {return association_direction_;}
     VecXd get_parameters() const {return parameters_;}
-    MatXd get_parameters_bounds() const {return parameter_bounds_;}
+    MatXd get_parameters_bounds() const {return parameters_bounds_;}
 
     void set_rotation(const int& rotation);
     void set_parameters(const VecXd& parameters) {parameters_ = parameters;}
@@ -173,7 +173,7 @@ protected:
     int rotation_;
     std::string association_direction_;
     VecXd parameters_;
-    MatXd parameter_bounds_;   // first row lower, second row upper
+    MatXd parameters_bounds_;   // first column lower, second column upper
 };
 
 typedef std::shared_ptr<Bicop> BicopPtr;
