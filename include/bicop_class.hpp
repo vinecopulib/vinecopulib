@@ -20,10 +20,9 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef VINECOPULIB_BICOP_CLASS_HPP
 #define VINECOPULIB_BICOP_CLASS_HPP
 
+#include "boost_tools.hpp"
 #include <Eigen/Dense>
 #include <nlopt.hpp>
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_cdf.h>
 #include <random>
 #include <iostream>
 #include <memory>
@@ -35,7 +34,7 @@ typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
 
 extern "C" {
-    #include "ktau.h"
+#include "c_tools.h"
 }
 
 //! A class for bivariate copulas
@@ -140,13 +139,12 @@ public:
     int get_rotation() const {return rotation_;}
     std::string get_association_direction() const {return association_direction_;}
     VecXd get_parameters() const {return parameters_;}
-    MatXd get_parameters_bounds() const {return parameter_bounds_;}
+    MatXd get_parameters_bounds() const {return parameters_bounds_;}
 
     void set_rotation(const int& rotation);
-    void set_parameters(const VecXd& parameters) {parameters_ = parameters;}
+    void set_parameters(const VecXd& parameters);
     //! @}
-
-
+    
 protected:
     virtual VecXd pdf_default(const MatXd& u) = 0;
     virtual VecXd hfunc1_default(const MatXd& u) = 0;
@@ -170,10 +168,18 @@ protected:
     MatXd swap_cols(const MatXd& u);
 
     int family_;
+    std::string family_name_;
     int rotation_;
     std::string association_direction_;
     VecXd parameters_;
-    MatXd parameter_bounds_;   // first row lower, second row upper
+    MatXd parameters_bounds_;   // first column lower, second column upper
+    
+private:
+    //! Sanity checks
+    //! @{
+    void check_parameters(const VecXd& parameters);
+    void check_rotation(const int& rotation);
+    //! @}
 };
 
 typedef std::shared_ptr<Bicop> BicopPtr;

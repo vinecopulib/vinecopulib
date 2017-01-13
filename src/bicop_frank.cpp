@@ -24,34 +24,26 @@
 FrankBicop::FrankBicop()
 {
     family_ = 5;
+    family_name_ = "Frank";
     rotation_ = 0;
     association_direction_ = "both";
     parameters_ = VecXd::Zero(1);
-    parameter_bounds_ = MatXd::Zero(1, 2);
-    parameter_bounds_(0, 0) = -200.0;
-    parameter_bounds_(0, 1) = 200.0;
+    parameters_bounds_ = MatXd::Zero(1, 2);
+    parameters_bounds_(0, 0) = -200.0;
+    parameters_bounds_(0, 1) = 200.0;
 }
 
 FrankBicop::FrankBicop(const VecXd& parameters)
 {
-    family_ = 5;
-    rotation_ = 0;
-    association_direction_ = "both";
-    parameters_ = parameters;
-    parameter_bounds_ = MatXd::Zero(1, 2);
-    parameter_bounds_(0, 0) = -200.0;
-    parameter_bounds_(0, 1) = 200.0;
+    FrankBicop();
+    set_parameters(parameters);
 }
 
 FrankBicop::FrankBicop(const VecXd& parameters, const int& rotation)
 {
-    family_ = 5;
-    rotation_ = rotation;
-    association_direction_ = "both";
-    parameters_ = parameters;
-    parameter_bounds_ = MatXd::Zero(1, 2);
-    parameter_bounds_(0, 0) = -200.0;
-    parameter_bounds_(0, 1) = 200.0;
+    FrankBicop();
+    set_parameters(parameters);
+    set_rotation(rotation);
 }
 
 VecXd FrankBicop::generator(const VecXd& u)
@@ -155,7 +147,7 @@ double FrankBicop::parameters_to_tau(const VecXd& parameters)
 {
     double par = parameters(0);
     double tau = 1 - 4/par;
-    double d = gsl_sf_debye_1(std::fabs(par));
+    double d = debyen(std::fabs(par), 1) / std::fabs(par);
     if (par < 0)
         d = d - par/2;
     tau = tau + (4/par) * d;
