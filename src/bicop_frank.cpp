@@ -24,6 +24,7 @@
 FrankBicop::FrankBicop()
 {
     family_ = 5;
+    family_name_ = "Frank";
     rotation_ = 0;
     association_direction_ = "both";
     parameters_ = VecXd::Zero(1);
@@ -34,24 +35,15 @@ FrankBicop::FrankBicop()
 
 FrankBicop::FrankBicop(const VecXd& parameters)
 {
-    family_ = 5;
-    rotation_ = 0;
-    association_direction_ = "both";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Zero(1, 2);
-    parameters_bounds_(0, 0) = -200.0;
-    parameters_bounds_(0, 1) = 200.0;
+    FrankBicop();
+    set_parameters(parameters);
 }
 
 FrankBicop::FrankBicop(const VecXd& parameters, const int& rotation)
 {
-    family_ = 5;
-    rotation_ = rotation;
-    association_direction_ = "both";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Zero(1, 2);
-    parameters_bounds_(0, 0) = -200.0;
-    parameters_bounds_(0, 1) = 200.0;
+    FrankBicop();
+    set_parameters(parameters);
+    set_rotation(rotation);
 }
 
 VecXd FrankBicop::generator(const VecXd& u)

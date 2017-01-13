@@ -23,28 +23,22 @@
 IndepBicop::IndepBicop()
 {
     family_ = 0;
+    family_name_ = "Independence";
     rotation_ = 0;
     association_direction_ = "none";
-    parameters_ = VecXd::Zero(1);
-    parameters_bounds_ = MatXd::Zero(1, 2);
 }
 
 IndepBicop::IndepBicop(const VecXd & parameters)
 {
-    family_ = 0;
-    rotation_ = 0;
-    association_direction_ = "none";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Zero(1, 2);
+    IndepBicop();
+    set_parameters(parameters);
 }
 
 IndepBicop::IndepBicop(const VecXd& parameters, const int& rotation)
 {
-    family_ = 0;
-    rotation_ = rotation;
-    association_direction_ = "none";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Zero(1, 2);
+    IndepBicop();
+    set_parameters(parameters);
+    set_rotation(rotation);
 }
 
 // PDF

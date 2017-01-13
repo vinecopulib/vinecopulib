@@ -24,6 +24,7 @@
 ClaytonBicop::ClaytonBicop()
 {
     family_ = 3;
+    family_name_ = "Clayton";
     rotation_ = 0;
     association_direction_ = "positive";
     parameters_ = VecXd::Zero(1);
@@ -33,25 +34,15 @@ ClaytonBicop::ClaytonBicop()
 
 ClaytonBicop::ClaytonBicop(const VecXd& parameters)
 {
-    family_ = 3;
-    rotation_ = 0;
-    association_direction_ = "positive";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Zero(1, 2);
-    parameters_bounds_(0, 1) = 200.0;
+    ClaytonBicop();
+    set_parameters(parameters);
 }
 
 ClaytonBicop::ClaytonBicop(const VecXd& parameters, const int& rotation)
 {
-    family_ = 3;
-    rotation_ = rotation;
-    if ((rotation == 90) | (rotation == 270))
-        association_direction_ = "negative";
-    else
-        association_direction_ = "positive";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Zero(1, 2);
-    parameters_bounds_(0, 1) = 200.0;
+    ClaytonBicop();
+    set_parameters(parameters);
+    set_rotation(rotation);
 }
 
 VecXd ClaytonBicop::generator(const VecXd& u)

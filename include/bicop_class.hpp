@@ -145,7 +145,9 @@ public:
     void set_rotation(const int& rotation);
     void set_parameters(const VecXd& parameters) {parameters_ = parameters;}
     //! @}
-
+    
+    // Check if parameters are in allowed range
+    void check_parameters(const VecXd& parameters);
 
 protected:
     virtual VecXd pdf_default(const MatXd& u) = 0;
@@ -170,6 +172,7 @@ protected:
     MatXd swap_cols(const MatXd& u);
 
     int family_;
+    std::string family_name_;
     int rotation_;
     std::string association_direction_;
     VecXd parameters_;

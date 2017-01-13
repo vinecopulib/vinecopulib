@@ -24,6 +24,7 @@
 JoeBicop::JoeBicop()
 {
     family_ = 6;
+    family_name_ = "Joe";
     rotation_ = 0;
     association_direction_ = "positive";
     parameters_ = VecXd::Ones(1);
@@ -33,25 +34,15 @@ JoeBicop::JoeBicop()
 
 JoeBicop::JoeBicop(const VecXd& parameters)
 {
-    family_ = 6;
-    rotation_ = 0;
-    association_direction_ = "positive";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Ones(1, 2);
-    parameters_bounds_(0, 1) = 200.0;
+    JoeBicop();
+    set_parameters(parameters);
 }
 
 JoeBicop::JoeBicop(const VecXd& parameters, const int& rotation)
 {
-    family_ = 6;
-    rotation_ = rotation;
-    if ((rotation == 90) | (rotation == 270))
-        association_direction_ = "negative";
-    else
-        association_direction_ = "positive";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Ones(1, 2);
-    parameters_bounds_(0, 1) = 200.0;
+    JoeBicop();
+    set_parameters(parameters);
+    set_rotation(rotation);
 }
 
 VecXd JoeBicop::generator(const VecXd& u)

@@ -23,6 +23,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 TrafokernelBicop::TrafokernelBicop()
 {
     family_ = 1001;
+    family_name_ = "Transformation kernel";
     rotation_ = 0;
     association_direction_ = "both";
 }
