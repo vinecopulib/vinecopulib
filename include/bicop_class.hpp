@@ -143,10 +143,9 @@ public:
     MatXd get_parameters_bounds() const {return parameters_bounds_;}
 
     void set_rotation(const int& rotation);
-    void set_parameters(const VecXd& parameters) {parameters_ = parameters;}
+    void set_parameters(const VecXd& parameters);
     //! @}
-
-
+    
 protected:
     virtual VecXd pdf_default(const MatXd& u) = 0;
     virtual VecXd hfunc1_default(const MatXd& u) = 0;
@@ -170,10 +169,18 @@ protected:
     MatXd swap_cols(const MatXd& u);
 
     int family_;
+    std::string family_name_;
     int rotation_;
     std::string association_direction_;
     VecXd parameters_;
     MatXd parameters_bounds_;   // first column lower, second column upper
+    
+private:
+    //! Sanity checks
+    //! @{
+    void check_parameters(const VecXd& parameters);
+    void check_rotation(const int& rotation);
+    //! @}
 };
 
 typedef std::shared_ptr<Bicop> BicopPtr;

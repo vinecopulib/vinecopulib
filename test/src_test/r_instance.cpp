@@ -28,7 +28,7 @@ RInstance::RInstance() {
     parameters_ = 4 * VecXd::Ones(2);
     U_ = MatXd::Zero(n, 2);
     tau_ = 0.5;
-
+    
     // Set-up some R commands
     std::string u1 = "u1 <- runif()";
     u1.insert(12, std::to_string(n_));
@@ -39,10 +39,10 @@ RInstance::RInstance() {
     std::string eval_sim = "U <- BiCopSim(,1,par)";
     eval_sim.insert(14, std::to_string(n_));
     std::string load_VineCopula = "library(VineCopula)";
-
+    
     // Set the seed and load the VineCopula package
     R.parseEval(load_VineCopula);
-
+    
     // Evaluate the tests random matrix U and load it in C++
     // const Eigen::Map<Eigen::VectorXd> U2 = Rcpp::as<Eigen::Map<Eigen::VectorXd>>(R.parseEval(u2));
     R.parseEval(eval_fct);
@@ -57,32 +57,34 @@ RInstance::RInstance() {
 
 VecXd RInstance::eval_in_R(std::string eval_fct, int start)
 {
-
+    
     std::string new_eval_fct = eval_fct;
     int family = get_family();
-    double parameter = parameters_(0);
-
-    // take care of the rotations
-    std::vector<int> rotated_families = {3,4,6,7,8,9,10};
-    if (std::find(rotated_families.begin(), rotated_families.end(), family) != rotated_families.end()) {
-        int rotation = get_rotation();
-        if (rotation == 90) {
-            family += 20;
-            parameter *= -1;
-        } else if (rotation == 180) {
-            family += 10;
-        } else if (rotation == 270) {
-            family += 30;
-            parameter *= -1;
+    double parameter = 0;
+    if (family != 0) {
+        parameter = parameters_(0);
+        // take care of the rotations
+        std::vector<int> rotated_families = {3,4,6,7,8,9,10};
+        if (std::find(rotated_families.begin(), rotated_families.end(), family) != rotated_families.end()) {
+            int rotation = get_rotation();
+            if (rotation == 90) {
+                family += 20;
+                parameter *= -1;
+            } else if (rotation == 180) {
+                family += 10;
+            } else if (rotation == 270) {
+                family += 30;
+                parameter *= -1;
+            }
         }
     }
-
+        
     // evaluate the function in R
     std::string fam = std::to_string(family);
     std::string par = std::to_string(parameter);
     new_eval_fct.insert(start,fam);
     new_eval_fct.insert(start+fam.length()+1,par);
-    if (parameters_.size() == 1) {
+    if (parameters_.size() < 2) {
         new_eval_fct.insert(start+par.length()+fam.length()+2,std::to_string(0));
     } else {
         new_eval_fct.insert(start+par.length()+fam.length()+2,std::to_string(parameters_(1)));
@@ -152,13 +154,13 @@ MatXd RInstance::get_U()
 void RInstance::change_n(int n)
 {
     this->n_ = n;
-
+    
     // Set-up some R commands
     std::string u1 = "u1 <- runif()";
     u1.insert(12, std::to_string(n));
     std::string u2 = "u2 <- runif()";
     u2.insert(12, std::to_string(n));
-
+    
     // Evaluate the tests random vectors u1 and u2 and load them in C++
     const Eigen::Map<Eigen::VectorXd>  U1 = Rcpp::as<Eigen::Map<Eigen::VectorXd>>(R.parseEval(u1));
     const Eigen::Map<Eigen::VectorXd>  U2 = Rcpp::as<Eigen::Map<Eigen::VectorXd>>(R.parseEval(u2));

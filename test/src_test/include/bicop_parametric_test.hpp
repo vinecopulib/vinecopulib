@@ -53,7 +53,7 @@ public:
 
         // set the rotion and compute the parameters vector
         this->par_bicop_.set_rotation(rinstance_ptr->get_rotation());
-        VecXd parameters(2);
+        VecXd parameters;
         parameters = this->par_bicop_.tau_to_parameters(tau);
         if (parameters.size() == 2)
             parameters(1) = 4.0;

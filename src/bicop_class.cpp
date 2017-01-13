@@ -51,6 +51,7 @@ BicopPtr Bicop::create(const int& family, const int& rotation)
         default:
             throw std::runtime_error(std::string("Family not implemented"));
     }
+    
     my_bicop->set_rotation(rotation);
     return my_bicop;
 }
@@ -508,6 +509,7 @@ VecXd Bicop::hinv2_num(const MatXd& u)
 }
 
 void Bicop::set_rotation(const int& rotation) {
+    check_rotation(rotation);    
     rotation_ = rotation;
     if ((this->association_direction_).compare("positive") == 0 ||
             (this->association_direction_).compare("negative") == 0)
@@ -520,6 +522,55 @@ void Bicop::set_rotation(const int& rotation) {
             this->association_direction_ = "negative";
         }
     }
+}
+
+void Bicop::set_parameters(const VecXd& parameters)
+{
+    check_parameters(parameters);
+    parameters_ = parameters;
+}
+
+void Bicop::check_parameters(const VecXd& parameters)
+{
+    int num_pars = parameters_bounds_.rows();
+
+    if (parameters.size() != num_pars) {
+        std::stringstream message;
+        message << 
+            "Wrong size of parameters for " << family_name_ << " copula; " <<
+            "expected: " << num_pars << ", " <<
+            "actual: " << parameters.size() << std::endl;
+        throw std::runtime_error(message.str().c_str());
+    }
+    if (num_pars > 0) {
+        std::stringstream message;
+        for (int i = 0; i < num_pars; ++i) {
+            if (parameters(i) < parameters_bounds_(i, 0)) {
+                message << 
+                    "parameters[" << i << "]" <<
+                    " must be larger than " << parameters_bounds_(i, 0) <<
+                    " for the " << family_name_ << " copula" << std::endl;
+                throw std::runtime_error(message.str().c_str());
+            }
+            if (parameters(i) > parameters_bounds_(i, 1)) {
+                message << 
+                "parameters[" << i << "]" <<
+                    " must be smaller than " << parameters_bounds_(i, 1) <<
+                    " for the " << family_name_ << " copula";
+                throw std::runtime_error(message.str().c_str());
+            }
+        }
+    }
+}
+
+void Bicop::check_rotation(const int& rotation)
+{
+    std::vector<int> allowed_rotations = {0, 90, 180, 270};
+    if (!is_member(rotation, allowed_rotations)) {
+        std::string message = "rotation must be one of {0, 90, 180, 270}";
+        throw std::runtime_error(message);
+    }
+        
 }
 
 template<typename T> bool is_member(T element, std::vector<T> set)

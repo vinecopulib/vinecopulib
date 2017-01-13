@@ -23,10 +23,11 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 StudentBicop::StudentBicop()
 {
     family_ = 2;
+    family_name_ = "t";
     rotation_ = 0;
     association_direction_ = "both";
     parameters_ = VecXd::Zero(2);
-    parameters_(1) = 100.0;
+    parameters_(1) = 50.0;
     parameters_bounds_ = MatXd::Ones(2, 2);
     parameters_bounds_(0, 0) = -1.0;
     parameters_bounds_(1, 0) = 2.0;
@@ -35,26 +36,15 @@ StudentBicop::StudentBicop()
 
 StudentBicop::StudentBicop(const VecXd& parameters)
 {
-    family_ = 2;
-    rotation_ = 0;
-    association_direction_ = "both";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Ones(2, 2);
-    parameters_bounds_(0, 0) = -1.0;
-    parameters_bounds_(1, 0) = 2.0;
-    parameters_bounds_(1, 1) = 50.0;
+    StudentBicop();
+    set_parameters(parameters);
 }
 
 StudentBicop::StudentBicop(const VecXd& parameters, const int& rotation)
 {
-    family_ = 2;
-    rotation_ = rotation;
-    association_direction_ = "both";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Ones(2, 2);
-    parameters_bounds_(0, 0) = -1.0;
-    parameters_bounds_(1, 0) = 2.0;
-    parameters_bounds_(1, 1) = 50.0;
+    StudentBicop();
+    set_parameters(parameters);
+    set_rotation(rotation);
 }
 
 // PDF

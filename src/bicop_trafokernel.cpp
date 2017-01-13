@@ -20,6 +20,14 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include "bicop_trafokernel.hpp"
 #include "bicop.hpp"
 
+TrafokernelBicop::TrafokernelBicop()
+{
+    family_ = 1001;
+    family_name_ = "Transformation kernel";
+    rotation_ = 0;
+    association_direction_ = "both";
+}
+
 VecXd gaussian_kernel_2d(const MatXd& x)
 {
     return x.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf)).rowwise().prod();

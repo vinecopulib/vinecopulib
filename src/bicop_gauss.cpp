@@ -23,6 +23,7 @@
 GaussBicop::GaussBicop()
 {
     family_ = 1;
+    family_name_ = "Gaussian";
     rotation_ = 0;
     association_direction_ = "both";
     parameters_ = VecXd::Zero(1);
@@ -32,22 +33,15 @@ GaussBicop::GaussBicop()
 
 GaussBicop::GaussBicop(const VecXd& parameters)
 {
-    family_ = 1;
-    rotation_ = 0;
-    association_direction_ = "both";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Ones(1, 2);
-    parameters_bounds_(0, 0) = -1;
+    GaussBicop();
+    set_parameters(parameters);
 }
 
 GaussBicop::GaussBicop(const VecXd& parameters, const int& rotation)
 {
-    family_ = 1;
-    rotation_ = rotation;
-    association_direction_ = "both";
-    parameters_ = parameters;
-    parameters_bounds_ = MatXd::Ones(1, 2);
-    parameters_bounds_(0, 0) = -1;
+    GaussBicop();
+    set_parameters(parameters);
+    set_rotation(rotation);
 }
 
 // PDF
