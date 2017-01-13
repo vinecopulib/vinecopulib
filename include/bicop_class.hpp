@@ -143,7 +143,7 @@ public:
     MatXd get_parameters_bounds() const {return parameters_bounds_;}
 
     void set_rotation(const int& rotation);
-    void set_parameters(const VecXd& parameters) {parameters_ = parameters;}
+    void set_parameters(const VecXd& parameters);
     //! @}
     
     // Check if parameters are in allowed range

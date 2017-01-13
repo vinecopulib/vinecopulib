@@ -30,9 +30,16 @@ namespace {
         EXPECT_EQ(bicop->get_parameters(), VecXd::Zero(1));
     }
     
-    TEST(bicop_class, check_for_parameters_bounds) {
+    TEST(bicop_class, catches_wrong_parameter_size) {
         BicopPtr bicop;
-        bicop = Bicop::create(3, VecXd::Zero(1), 0);
+        EXPECT_ANY_THROW(Bicop::create(0, VecXd::Zero(1), 0));
+        EXPECT_ANY_THROW(Bicop::create(1, VecXd::Zero(0), 0));
+        EXPECT_ANY_THROW(Bicop::create(2, VecXd::Zero(1), 0));
+        EXPECT_ANY_THROW(Bicop::create(3, VecXd::Zero(2), 0));
+        EXPECT_ANY_THROW(Bicop::create(4, VecXd::Zero(0), 0));
+        EXPECT_ANY_THROW(Bicop::create(5, VecXd::Zero(2), 0));
+        EXPECT_ANY_THROW(Bicop::create(6, VecXd::Zero(0), 0));
+        EXPECT_ANY_THROW(Bicop::create(1001, VecXd::Zero(1), 0));
     }
 }
 

@@ -51,6 +51,7 @@ BicopPtr Bicop::create(const int& family, const int& rotation)
         default:
             throw std::runtime_error(std::string("Family not implemented"));
     }
+    
     my_bicop->set_rotation(rotation);
     return my_bicop;
 }
@@ -520,6 +521,27 @@ void Bicop::set_rotation(const int& rotation) {
             this->association_direction_ = "negative";
         }
     }
+}
+
+void Bicop::set_parameters(const VecXd& parameters)
+{
+    check_parameters(parameters);
+    parameters_ = parameters;
+}
+
+void Bicop::check_parameters(const VecXd& parameters)
+{
+    int num_pars = parameters_bounds_.rows();
+    std::stringstream message;
+
+    if (parameters.size() != num_pars) {
+        message << 
+            "Wrong size of parameters for " << family_name_ << " copula; " <<
+            "expected: " << num_pars << ", " <<
+            "actual: " << parameters.size() << std::endl;
+        throw std::runtime_error(message.str().c_str());
+    }
+
 }
 
 template<typename T> bool is_member(T element, std::vector<T> set)
