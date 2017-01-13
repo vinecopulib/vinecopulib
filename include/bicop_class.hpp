@@ -146,10 +146,6 @@ public:
     void set_parameters(const VecXd& parameters);
     //! @}
     
-    // Check if parameters are in allowed range
-    void check_parameters(const VecXd& parameters);
-    void check_rotation(const int& rotation);
-
 protected:
     virtual VecXd pdf_default(const MatXd& u) = 0;
     virtual VecXd hfunc1_default(const MatXd& u) = 0;
@@ -178,6 +174,13 @@ protected:
     std::string association_direction_;
     VecXd parameters_;
     MatXd parameters_bounds_;   // first column lower, second column upper
+    
+private:
+    //! Sanity checks
+    //! @{
+    void check_parameters(const VecXd& parameters);
+    void check_rotation(const int& rotation);
+    //! @}
 };
 
 typedef std::shared_ptr<Bicop> BicopPtr;
