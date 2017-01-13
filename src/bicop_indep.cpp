@@ -28,7 +28,7 @@ IndepBicop::IndepBicop()
     association_direction_ = "none";
 }
 
-IndepBicop::IndepBicop(const VecXd & parameters)
+IndepBicop::IndepBicop(const VecXd& parameters)
 {
     IndepBicop();
     set_parameters(parameters);
@@ -70,7 +70,8 @@ VecXd IndepBicop::hinv2_default(const MatXd& u)
 
 VecXd IndepBicop::tau_to_parameters(const double __attribute__((unused))& tau)
 {
-    return VecXd::Zero(1);
+    VecXd pars;
+    return pars;
 }
 
 double IndepBicop::parameters_to_tau(const VecXd __attribute__((unused))& parameters)
