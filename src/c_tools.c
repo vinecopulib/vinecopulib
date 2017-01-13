@@ -329,8 +329,8 @@ double debyen(const double x, const int n)
             const double xk = x*k ;
             double ksum= 1./xk ;
             double tmp = n*ksum/xk ;	/* n/(xk)^2 */
-
-            for (int s=1 ; s <= n ; s++)
+            int s;
+            for (s=1 ; s <= n ; s++)
             {
                 ksum += tmp ;
                 tmp *= (n-s)/xk ;
