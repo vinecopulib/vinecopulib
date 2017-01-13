@@ -21,7 +21,6 @@
 #define VINECOPULIB_BICOP_GAUSS_HPP
 
 #include "bicop_elliptical.hpp"
-//#include <boost/math/distributions/normal.hpp>
 
 class GaussBicop : public EllipticalBicop {
 

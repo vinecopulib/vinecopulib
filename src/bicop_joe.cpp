@@ -170,7 +170,7 @@ double JoeBicop::parameters_to_tau(const VecXd& parameters)
 {
     double par = parameters(0);
     double tau = 2 / par + 1;
-    tau = gsl_sf_psi(2) - gsl_sf_psi(tau);
+    tau = boost::math::digamma(2.0) - boost::math::digamma(tau);
     tau = 1 + 2 * tau / (2 - par);
     if ((rotation_ == 90) | (rotation_ == 270))
         tau *= -1;

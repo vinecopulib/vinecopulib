@@ -22,7 +22,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 VecXd gaussian_kernel_2d(const MatXd& x)
 {
-    return x.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf)).rowwise().prod();
+    return dnorm(x).rowwise().prod();
 }
 
 void TrafokernelBicop::fit(const MatXd& data, __attribute__((unused)) std::string method)
@@ -31,7 +31,8 @@ void TrafokernelBicop::fit(const MatXd& data, __attribute__((unused)) std::strin
     int m = 30;
     VecXd grid_points(m);
     for (int i = 0; i < m; ++i)
-        grid_points(i) = gsl_cdf_ugaussian_P(- 3.25 + i * (6.25 / (double) m));
+        grid_points(i) = - 3.25 + i * (6.25 / (double) m);
+    grid_points = pnorm(grid_points);
 
     // expand the interpolation grid; a matrix with two columns where each row
     // contains one combination of the grid points
@@ -46,12 +47,12 @@ void TrafokernelBicop::fit(const MatXd& data, __attribute__((unused)) std::strin
     }
 
     // transform evaluation grid and data by inverse Gaussian cdf
-    MatXd z = grid_2d.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_Pinv));
-    MatXd z_data = data.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_Pinv));
+    MatXd z = qnorm(grid_2d);
+    MatXd z_data = qnorm(data);
 
     // apply normal density to z (used later for normalization)
-    MatXd phi = z.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf));
-    MatXd phi_data = z_data.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf));
+    MatXd phi = dnorm(z);
+    MatXd phi_data = dnorm(z_data);
 
     // find bandwidth matrix
     int n = data.rows();

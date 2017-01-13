@@ -194,10 +194,9 @@ std::vector<double> get_c1c2(const MatXd& data, double tau)
     MatXd x = MatXd::Zero(n,2);
     MatXd z1 = x;
     MatXd z2 = x;
+    x = qnorm(data);
     int count1 = 0, count2 = 0;
     for (int j = 0; j < n; ++j) {
-        x(j,0) = gsl_cdf_ugaussian_Pinv(data(j, 0));
-        x(j,1) = gsl_cdf_ugaussian_Pinv(data(j, 1));
         if (tau > 0)
         {
             if (x(j,0) > 0 && x(j,1) > 0)
