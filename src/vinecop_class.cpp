@@ -34,7 +34,7 @@ Vinecop::Vinecop(const int& d)
     // all pair-copulas are independence
     pair_copulas_.reserve(d * (d - 1) / 2);
     for (unsigned int i = 0; i < pair_copulas_.size(); ++i) {
-        pair_copulas_.push_back(Bicop_ptr(new IndepBicop));;
+        pair_copulas_.push_back(BicopPtr(new IndepBicop));;
     }
 }
 
@@ -45,18 +45,18 @@ Vinecop::Vinecop(const int& d)
 //! 
 //! @return A \code std::shared_ptr (alias \code BicopPtr) to a \code Bicop 
 //! object.
-Bicop_ptr Vinecop::get_pair_copula(int tree, int edge) 
+BicopPtr Vinecop::get_pair_copula(int tree, int edge) 
 {
-    int pc_index = -1;
-    int tree_shift = 0;
-    for (int j = 1; j < d_ + 1; ++j) {
-        if (tree == j) {
-            pc_index = tree_shift + edge - 1;
-            break;
-        }
-        tree_shift += d_ - j;
+    if ((edge < 1) | (edge > d_ - tree)) {
+        std::stringstream message;
+        message << 
+            "edge index out of bounds" << std::endl <<
+            "allowed: 1, ..., " << d_ - tree << std::endl <<
+            "actual: " << edge << std::endl << 
+            "tree level: " <<  tree  << std::endl;
+            throw std::runtime_error(message.str().c_str());
     }
-    return pair_copulas_[pc_index];
+    return pair_copulas_[(tree - 1) * d_ - tree * (tree - 1) / 2 + edge - 1];
 }
 
 int Vinecop::get_family(int tree, int edge) 

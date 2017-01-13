@@ -40,7 +40,7 @@ class Vinecop {
 public:
     Vinecop(const int& d);
     
-    Bicop_ptr get_pair_copula(int tree, int edge);
+    BicopPtr get_pair_copula(int tree, int edge);
     int get_family(int tree, int edge);
     int get_rotation(int tree, int edge);
     VecXd get_parameters(int tree, int edge);
@@ -50,7 +50,7 @@ public:
 private:
     int d_;
     MatXd vine_matrix_;
-    std::vector<Bicop_ptr> pair_copulas_;
+    std::vector<BicopPtr> pair_copulas_;
 };
 
 
