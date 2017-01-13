@@ -322,7 +322,8 @@ double debyen(const double x, const int n)
 
         const int kmax = ((int) x < sizeof(kLim)/sizeof(int)) ? kLim[(int)x] : 3 ;
         /* Abramowitz Stegun 27.1.2 */
-        for(int k=1; k<=kmax ;k++)
+        int k;
+        for(k=1; k<=kmax ;k++)
         {
             /* do not use x(k+1)=xk+x to avoid loss of precision */
             const double xk = x*k ;
@@ -389,7 +390,8 @@ double debyen(const double x, const int n)
 
         /* Abramowitz-Stegun 27.1.1 */
         const double x2pi=x*M_1_2PI ;
-        for(int k=1;k< sizeof(koeff)/sizeof(double)-1 ;k++)
+        int k;
+        for(k=1;k< sizeof(koeff)/sizeof(double)-1 ;k++)
         {
             const double sumold=sum ;
             /* do not precompute x2pi^2 to avoid loss of precision */
