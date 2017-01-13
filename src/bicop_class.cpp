@@ -541,7 +541,24 @@ void Bicop::check_parameters(const VecXd& parameters)
             "actual: " << parameters.size() << std::endl;
         throw std::runtime_error(message.str().c_str());
     }
-
+    if (num_pars > 0) {
+        for (int i = 0; i < num_pars; ++i) {
+            if (parameters(i) < parameters_bounds_(i, 0)) {
+                message << 
+                    "parameters[" << i << "]" <<
+                    " must be larger than " << parameters_bounds_(i, 0) <<
+                    " for the " << family_name_ << " copula" << std::endl;
+                throw std::runtime_error(message.str().c_str());
+            }
+            if (parameters(i) > parameters_bounds_(i, 1)) {
+                message << 
+                "parameters[" << i << "]" <<
+                    " must be smaller than " << parameters_bounds_(i, 1) <<
+                    " for the " << family_name_ << " copula";
+                throw std::runtime_error(message.str().c_str());
+            }
+        }
+    }
 }
 
 template<typename T> bool is_member(T element, std::vector<T> set)

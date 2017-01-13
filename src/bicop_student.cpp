@@ -27,7 +27,7 @@ StudentBicop::StudentBicop()
     rotation_ = 0;
     association_direction_ = "both";
     parameters_ = VecXd::Zero(2);
-    parameters_(1) = 100.0;
+    parameters_(1) = 50.0;
     parameters_bounds_ = MatXd::Ones(2, 2);
     parameters_bounds_(0, 0) = -1.0;
     parameters_bounds_(1, 0) = 2.0;
