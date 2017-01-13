@@ -509,6 +509,7 @@ VecXd Bicop::hinv2_num(const MatXd& u)
 }
 
 void Bicop::set_rotation(const int& rotation) {
+    check_rotation(rotation);    
     rotation_ = rotation;
     if ((this->association_direction_).compare("positive") == 0 ||
             (this->association_direction_).compare("negative") == 0)
@@ -532,9 +533,9 @@ void Bicop::set_parameters(const VecXd& parameters)
 void Bicop::check_parameters(const VecXd& parameters)
 {
     int num_pars = parameters_bounds_.rows();
-    std::stringstream message;
 
     if (parameters.size() != num_pars) {
+        std::stringstream message;
         message << 
             "Wrong size of parameters for " << family_name_ << " copula; " <<
             "expected: " << num_pars << ", " <<
@@ -542,6 +543,7 @@ void Bicop::check_parameters(const VecXd& parameters)
         throw std::runtime_error(message.str().c_str());
     }
     if (num_pars > 0) {
+        std::stringstream message;
         for (int i = 0; i < num_pars; ++i) {
             if (parameters(i) < parameters_bounds_(i, 0)) {
                 message << 
@@ -559,6 +561,16 @@ void Bicop::check_parameters(const VecXd& parameters)
             }
         }
     }
+}
+
+void Bicop::check_rotation(const int& rotation)
+{
+    std::vector<int> allowed_rotations = {0, 90, 180, 270};
+    if (!is_member(rotation, allowed_rotations)) {
+        std::string message = "rotation must be one of {0, 90, 180, 270}";
+        throw std::runtime_error(message);
+    }
+        
 }
 
 template<typename T> bool is_member(T element, std::vector<T> set)

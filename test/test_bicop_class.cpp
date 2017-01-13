@@ -49,6 +49,11 @@ namespace {
         EXPECT_ANY_THROW(Bicop::create(5, VecXd::Constant(1, 10000.0), 0));
         EXPECT_ANY_THROW(Bicop::create(6, VecXd::Constant(1, -0.1), 0));
     }
+    
+    TEST(bicop_class, catches_wrong_rotation) {
+        EXPECT_ANY_THROW(Bicop::create(1, VecXd::Zero(1), -10));
+        EXPECT_ANY_THROW(Bicop::create(1, VecXd::Zero(1), 10));
+    }
 }
 
 int main(int argc, char **argv) {

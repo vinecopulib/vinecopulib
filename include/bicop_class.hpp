@@ -148,6 +148,7 @@ public:
     
     // Check if parameters are in allowed range
     void check_parameters(const VecXd& parameters);
+    void check_rotation(const int& rotation);
 
 protected:
     virtual VecXd pdf_default(const MatXd& u) = 0;
