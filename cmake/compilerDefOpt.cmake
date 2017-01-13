@@ -3,7 +3,7 @@
 
 ###### Compiler options
 
-set (CMAKE_CXX_FLAGS                "-std=c++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type")
+set (CMAKE_CXX_FLAGS                "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type")
 set (CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG")
 set (CMAKE_CXX_FLAGS_RELEASE        "-O3")
 
