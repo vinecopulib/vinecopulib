@@ -18,19 +18,48 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "gtest/gtest.h"
-#include <include/boost_tools.hpp>
+#include "include/boost_tools.hpp"
+#include <gsl/gsl_cdf.h>
+#include <gsl/gsl_randist.h>
+#include <Eigen/Dense>
+#include <ctime>
+
+template<typename T> T dnorm_gsl(const T& x)
+{
+    return x.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf));
+};
+template<typename T> T pnorm_gsl(const T& x)
+{
+    return x.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_P));
+};
+template<typename T> T qnorm_gsl(const T& x)
+{
+    return x.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_Pinv));
+};
 
 int main(int argc, char **argv) {
 
-    VecXd x = VecXd::Zero(3);
-    x(0) = -0.5;
-    x(2) = 0.5;
-    std::cout << dnorm(x) << std::endl;
-    std::cout << pnorm(x) << std::endl;
-    x(0) = 0.05;
-    x(1) = 0.5;
-    x(2) = 0.95;
-    std::cout << qnorm(x) << std::endl;
+    Eigen::VectorXd x = Eigen::VectorXd::Ones(1e5);
+    x = 0.5*x;
+    Eigen::VectorXd y = x;
+    clock_t begin_time = clock();
+    y = dnorm(x);
+    std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
+    begin_time = clock();
+    y = dnorm_gsl(x);
+    std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
+    begin_time = clock();
+    y = pnorm(x);
+    std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
+    begin_time = clock();
+    y = pnorm_gsl(x);
+    std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
+    begin_time = clock();
+    y = qnorm(x);
+    std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
+    begin_time = clock();
+    y = qnorm_gsl(x);
+    std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
 
     return 0;
 }

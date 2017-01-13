@@ -20,10 +20,9 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef VINECOPULIB_BICOP_CLASS_HPP
 #define VINECOPULIB_BICOP_CLASS_HPP
 
+#include "boost_tools.hpp"
 #include <Eigen/Dense>
 #include <nlopt.hpp>
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_cdf.h>
 #include <random>
 #include <iostream>
 #include <memory>
@@ -35,7 +34,7 @@ typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
 
 extern "C" {
-    #include "ktau.h"
+#include "c_tools.h"
 }
 
 //! A class for bivariate copulas

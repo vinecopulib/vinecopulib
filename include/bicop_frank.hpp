@@ -21,7 +21,6 @@
 #define VINECOPULIB_BICOP_FRANK_HPP
 
 #include "bicop_archimedean.hpp"
-#include <gsl/gsl_sf_debye.h>
 
 class FrankBicop : public ArchimedeanBicop {
 

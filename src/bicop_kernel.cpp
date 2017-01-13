@@ -25,7 +25,8 @@ KernelBicop::KernelBicop()
     int m = 30;
     VecXd grid_points(m);
     for (int i = 0; i < m; ++i)
-        grid_points(i) = gsl_cdf_ugaussian_P(- 3.25 + i * (6.25 / (double) m));
+        grid_points(i) = - 3.25 + i * (6.25 / (double) m);
+    grid_points = pnorm(grid_points);
 
     interp_grid_ = InterpolationGrid(grid_points, MatXd::Constant(30, 30, 1.0));
 }

@@ -20,43 +20,82 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef VINECOPULIB_BOOST_TOOLS_HPP
 #define VINECOPULIB_BOOST_TOOLS_HPP
 
-#include <Eigen/Dense>
-typedef Eigen::VectorXd VecXd;
-typedef Eigen::MatrixXd MatXd;
-
-#include <boost/bind.hpp>
+#include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/distributions.hpp>
+#include <boost/bind.hpp>
 #include <boost/function.hpp>
 
-namespace bm = boost::math;
+template<typename T> T dnorm(const T& x)
+{
+    boost::math::normal std_normal;
+    return x.unaryExpr(boost::bind<double>(boost::math::pdf<boost::math::normal,double>, std_normal, _1));
+};
 
-namespace distributions{
-    bm::normal std_normal;
-}
+template<typename T> T pnorm(const T& x)
+{
+    boost::math::normal std_normal;
+    return x.unaryExpr(boost::bind<double>(boost::math::cdf<boost::math::normal,double>, std_normal, _1));
+};
 
-boost::function<double(double)> dnorm_scalar = boost::bind<double>(bm::pdf<bm::normal,double>,
-                                                                   distributions::std_normal, _1);
+template<typename T> T qnorm(const T& x)
+{
+    boost::math::normal std_normal;
+    return x.unaryExpr(boost::bind<double>(boost::math::quantile<boost::math::normal,double>, std_normal, _1));
+};
 
-boost::function<double(double)> pnorm_scalar = boost::bind<double>(bm::cdf<bm::normal,double>,
-                                                                   distributions::std_normal, _1);
+template<typename T> T dt(const T& x, double nu)
+{
+    boost::math::students_t dist(nu);
+    return x.unaryExpr(boost::bind<double>(boost::math::pdf<boost::math::students_t,double>, dist, _1));
+};
 
-boost::function<double(double)> qnorm_scalar = boost::bind<double>(bm::quantile<bm::normal,double>,
-                                                                   distributions::std_normal, _1);
+template<typename T> T pt(const T& x, double nu)
+{
+    boost::math::students_t dist(nu);
+    return x.unaryExpr(boost::bind<double>(boost::math::cdf<boost::math::students_t,double>, dist, _1));
+};
 
+template<typename T> T qt(const T& x, double nu)
+{
+    boost::math::students_t dist(nu);
+    return x.unaryExpr(boost::bind<double>(boost::math::quantile<boost::math::students_t,double>, dist, _1));
+};
 
-VecXd dnorm(const VecXd& x) { return x.unaryExpr(dnorm_scalar); }
+/* A GSL ALTERNATIVE
+ *
+#include <gsl/gsl_cdf.h>
+#include <gsl/gsl_randist.h>
+#include <functional>
 
-VecXd pnorm(const VecXd& x) { return x.unaryExpr(pnorm_scalar); }
+template<typename T> T dnorm(const T& x)
+{
+    return x.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf));
+};
+template<typename T> T pnorm(const T& x)
+{
+    return x.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_P));
+};
+template<typename T> T qnorm(const T& x)
+{
+    return x.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_Pinv));
+};
 
-VecXd qnorm(const VecXd& p) { return p.unaryExpr(qnorm_scalar); }
-
-//namespace distributions{
-//    bm::normal std_normal(0,1);
-//}
-
-//bm::normal std_normal(0,1);
-//boost::function<double(double)> qnorm = boost::bind(quantile, distributions::std_normal, _1);
-//boost::function<double(double)> qnorm = boost::bind(bm::cdf<double>, boost::ref(std_normal), _1);
-//VecXd qsnorm(VecXd u);
+template<typename T> T dt(const T& x, double nu)
+{
+    auto tpdf = std::bind(gsl_ran_tdist_pdf, std::placeholders::_1, nu);
+    return x.unaryExpr(std::function<double(double)>(tpdf));
+};
+template<typename T> T pt(const T& x, double nu)
+{
+    auto tcdf = std::bind(gsl_cdf_tdist_P, std::placeholders::_1, nu);
+    return x.unaryExpr(std::function<double(double)>(tcdf));
+};
+template<typename T> T qt(const T& x, double nu)
+{
+    auto tquantile = std::bind(gsl_cdf_tdist_Pinv, std::placeholders::_1, nu);
+    return x.unaryExpr(std::function<double(double)>(tquantile));
+};*/
 
 #endif //VINECOPULIB_BOOST_TOOLS_HPP
+

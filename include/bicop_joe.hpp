@@ -22,7 +22,6 @@
 
 
 #include "bicop_archimedean.hpp"
-#include "gsl/gsl_sf_psi.h"
 
 class JoeBicop : public ArchimedeanBicop {
 
