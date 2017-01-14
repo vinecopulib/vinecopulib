@@ -31,10 +31,10 @@ public:
     RVineMatrix(const MatXi& matrix);
     MatXi get_matrix();
     MatXi get_no_matrix();
-
-    static MatXi to_natural_order(const MatXi& matrix);
      
 private:
+    MatXi to_natural_order(const MatXi& matrix);
+
     int d_;
     MatXi matrix_;
     MatXi no_matrix_;

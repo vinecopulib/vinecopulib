@@ -41,17 +41,16 @@ MatXi RVineMatrix::get_no_matrix()
 MatXi RVineMatrix::to_natural_order(const MatXi& matrix) 
 {
     VecXi old_order = matrix.diagonal(); // old variable labels
-    int d = old_order.size();            // dimension of the vine
      
     // create vector of new variable labels: d, ..., 1
-    std::vector<int> ivec(d);    
+    std::vector<int> ivec(d_);    
     std::iota(std::begin(ivec), std::end(ivec), 1); // fill with 1, ..., d
     std::reverse(std::begin(ivec), std::end(ivec));
-    Eigen::Map<VecXi> new_labels(&ivec[0], d);     // convert to VecXi
+    Eigen::Map<VecXi> new_labels(&ivec[0], d_);     // convert to VecXi
 
     // relabel all elements in the matrix
-    MatXi new_matrix = MatXi::Zero(d, d);
-    for (int i = 0; i < d; ++i) {
+    MatXi new_matrix = MatXi::Zero(d_, d_);
+    for (int i = 0; i < d_; ++i) {
         for (int j = 0; j < i + 1; ++j) {
             new_matrix(i, j) = relabel(matrix(i, j), old_order, new_labels);
         }

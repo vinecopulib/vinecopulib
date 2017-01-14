@@ -34,8 +34,8 @@ namespace {
                   3, 3, 3, 0, 0,
                   1, 2, 2, 2, 0,
                   2, 1, 1, 1, 1;
-        MatXi my_no = RVineMatrix::to_natural_order(mat);
-        EXPECT_EQ(my_no, no_mat);
+        RVineMatrix rvine_matrix(mat);
+        EXPECT_EQ(rvine_matrix.get_no_matrix(), no_mat);
     }
 }
 
