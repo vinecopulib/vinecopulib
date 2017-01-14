@@ -31,17 +31,19 @@ public:
     RVineMatrix(const MatXi& matrix);
     MatXi get_matrix();
     MatXi get_no_matrix();
-     
+    MatXi get_max_matrix();
+
 private:
     MatXi to_natural_order(const MatXi& matrix);
+    MatXi to_max_matrix(const MatXi& matrix);
 
     int d_;
     MatXi matrix_;
     MatXi no_matrix_;
+    MatXi max_matrix_;
 };
 
-int relabel(const int& matrix_entry,
-    const VecXi& old_labels, 
-    const VecXi& new_labels);
+int relabel_one(const int& x, const VecXi& old_labels, const VecXi& new_labels);
+MatXi relabel_elements(const MatXi& matrix, const VecXi& new_labels);
 
 #endif

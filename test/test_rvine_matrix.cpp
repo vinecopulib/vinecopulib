@@ -22,20 +22,45 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace {
     TEST(rvine_matrix, can_convert_to_natural_order) {
-        MatXi mat(5, 5);
-        mat << 5, 0, 0, 0, 0,
-               2, 2, 0, 0, 0,
-               3, 3, 3, 0, 0,
-               1, 4, 4, 4, 0,
-               4, 1, 1, 1, 1;
-        MatXi no_mat(5, 5);
-        no_mat << 5, 0, 0, 0, 0,
-                  4, 4, 0, 0, 0,
-                  3, 3, 3, 0, 0,
-                  1, 2, 2, 2, 0,
-                  2, 1, 1, 1, 1;
+        MatXi mat(7, 7);
+        mat << 4, 0, 0, 0, 0, 0, 0,
+               7, 3, 0, 0, 0, 0, 0,
+               3, 7, 7, 0, 0, 0, 0,
+               1, 1, 5, 1, 0, 0, 0,
+               2, 5, 2, 5, 2, 0, 0,
+               6, 6, 1, 2, 5, 5, 0,
+               5, 2, 6, 6, 6, 6, 6;
+        MatXi true_no_matrix(7, 7);
+        true_no_matrix << 7, 0, 0, 0, 0, 0, 0,
+                          5, 6, 0, 0, 0, 0, 0,
+                          6, 5, 5, 0, 0, 0, 0,
+                          4, 4, 2, 4, 0, 0, 0,
+                          3, 2, 3, 2, 3, 0, 0,
+                          1, 1, 4, 3, 2, 2, 0,
+                          2, 3, 1, 1, 1, 1, 1;
         RVineMatrix rvine_matrix(mat);
-        EXPECT_EQ(rvine_matrix.get_no_matrix(), no_mat);
+        EXPECT_EQ(rvine_matrix.get_no_matrix(), true_no_matrix);
+    }
+    
+    TEST(rvine_matrix, max_mat_is_correct) {
+        MatXi mat(7, 7);
+        mat << 4, 0, 0, 0, 0, 0, 0,
+               7, 3, 0, 0, 0, 0, 0,
+               3, 7, 7, 0, 0, 0, 0,
+               1, 1, 5, 1, 0, 0, 0,
+               2, 5, 2, 5, 2, 0, 0,
+               6, 6, 1, 2, 5, 5, 0,
+               5, 2, 6, 6, 6, 6, 6;
+        MatXi true_max_matrix(7, 7);
+        true_max_matrix << 4, 0, 0, 0, 0, 0, 0,
+                           3, 3, 0, 0, 0, 0, 0,
+                           3, 7, 7, 0, 0, 0, 0,
+                           1, 1, 1, 1, 0, 0, 0,
+                           2, 2, 1, 2, 2, 0, 0,
+                           5, 2, 1, 2, 5, 5, 0,
+                           5, 2, 6, 6, 6, 6, 6;
+        RVineMatrix rvine_matrix(mat);
+        EXPECT_EQ(rvine_matrix.get_max_matrix(), true_max_matrix);
     }
 }
 
