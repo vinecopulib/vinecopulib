@@ -25,7 +25,6 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 typedef Eigen::MatrixXi MatXi;
 typedef Eigen::VectorXi VecXi;
 
-
 class RVineMatrix {    
 public:
     RVineMatrix(const MatXi& matrix);
@@ -35,8 +34,8 @@ public:
 
 private:
     MatXi to_natural_order(const MatXi& matrix);
-    MatXi to_max_matrix(const MatXi& matrix);
-
+    MatXi to_max_matrix(const MatXi& no_matrix);
+    
     int d_;
     MatXi matrix_;
     MatXi no_matrix_;
