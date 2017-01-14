@@ -84,7 +84,7 @@ namespace {
                        1, 1, 1, 1, 1, 1, 0;
                        
         RVineMatrix rvine_matrix(mat);
-        EXPECT_EQ(rvine_matrix.get_needs_hfunc1(), true_hfunc1);
+        EXPECT_EQ(rvine_matrix.get_needed_hfunc1(), true_hfunc1);
     }
     
     TEST(rvine_matrix, needed_hfunc2_is_correct) {
@@ -106,7 +106,7 @@ namespace {
                        0, 0, 0, 0, 0, 0, 0;
                        
         RVineMatrix rvine_matrix(mat);
-        EXPECT_EQ(rvine_matrix.get_needs_hfunc2(), true_hfunc2);
+        EXPECT_EQ(rvine_matrix.get_needed_hfunc2(), true_hfunc2);
     }
 }
 

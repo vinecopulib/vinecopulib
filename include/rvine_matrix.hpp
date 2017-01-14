@@ -33,21 +33,21 @@ public:
     MatXi get_matrix();
     MatXi get_no_matrix();
     MatXi get_max_matrix();
-    MatXb get_needs_hfunc1();
-    MatXb get_needs_hfunc2();
+    MatXb get_needed_hfunc1();
+    MatXb get_needed_hfunc2();
 
 private:
     MatXi to_natural_order(const MatXi& matrix);
     MatXi to_max_matrix(const MatXi& no_matrix);
-    MatXb get_needed_hfunc1(const MatXi& no_matrix) ;
-    MatXb get_needed_hfunc2(const MatXi& no_matrix) ;
+    MatXb compute_needed_hfunc1(const MatXi& no_matrix) ;
+    MatXb compute_needed_hfunc2(const MatXi& no_matrix) ;
 
     int d_;
     MatXi matrix_;
     MatXi no_matrix_;
     MatXi max_matrix_;
-    MatXb needs_hfunc1_;
-    MatXb needs_hfunc2_;;
+    MatXb needed_hfunc1_;
+    MatXb needed_hfunc2_;;
 };
 
 int relabel_one(const int& x, const VecXi& old_labels, const VecXi& new_labels);

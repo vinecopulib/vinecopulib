@@ -26,8 +26,8 @@ RVineMatrix::RVineMatrix(const MatXi& matrix)
     matrix_ = matrix;
     no_matrix_ = to_natural_order(matrix);
     max_matrix_ = to_max_matrix(no_matrix_);
-    needs_hfunc1_ = get_needed_hfunc1(no_matrix_);
-    needs_hfunc2_ = get_needed_hfunc2(no_matrix_);
+    needed_hfunc1_ = compute_needed_hfunc1(no_matrix_);
+    needed_hfunc2_ = compute_needed_hfunc2(no_matrix_);
 }
 
 MatXi RVineMatrix::get_matrix()
@@ -45,14 +45,14 @@ MatXi RVineMatrix::get_max_matrix()
     return max_matrix_;
 }
 
-MatXb RVineMatrix::get_needs_hfunc1()
+MatXb RVineMatrix::get_needed_hfunc1()
 {
-    return needs_hfunc1_;
+    return needed_hfunc1_;
 }
 
-MatXb RVineMatrix::get_needs_hfunc2()
+MatXb RVineMatrix::get_needed_hfunc2()
 {
-    return needs_hfunc2_;
+    return needed_hfunc2_;
 }
 
 //! Reorder R-vine matrix to natural order 
@@ -109,7 +109,7 @@ MatXi RVineMatrix::to_max_matrix(const MatXi& no_matrix)
 //! whether hfunc1/2 is needed for a given pair copula.
 //! 
 //! @{
-MatXb RVineMatrix::get_needed_hfunc1(const MatXi& no_matrix) 
+MatXb RVineMatrix::compute_needed_hfunc1(const MatXi& no_matrix) 
 {
     int d = no_matrix.rows();
     MatXb needed_hfunc1 = MatXb::Constant(d, d, false);
@@ -130,7 +130,7 @@ MatXb RVineMatrix::get_needed_hfunc1(const MatXi& no_matrix)
     return needed_hfunc1;
 }
 
-MatXb RVineMatrix::get_needed_hfunc2(const MatXi& no_matrix) 
+MatXb RVineMatrix::compute_needed_hfunc2(const MatXi& no_matrix) 
 {
     int d = no_matrix.rows();
     MatXb needed_hfunc2 = MatXb::Constant(d, d, false);
@@ -144,12 +144,6 @@ MatXb RVineMatrix::get_needed_hfunc2(const MatXi& no_matrix)
         MatXb is_different = (!is_mat_j.array() && is_max_j.array());
         needed_hfunc2.block(i, i, d - i, 1) = is_different.rowwise().any();
     }    
-//         v <- d - i + 1
-//         bw <- as.matrix(MaxMat[i:d, 1:(i - 1)]) == v
-//         direct <- Vine[i:d, 1:(i - 1)] == v
-//         M$indirect[i:d, i] <- apply(as.matrix(bw & (!direct)), 1, any)
-//         M$direct[i:d, i] <- TRUE
-//         M$direct[i, i] <- any(as.matrix(bw)[1, ] & as.matrix(direct)[1, ])    
     return needed_hfunc2;
 }
 //! @}
