@@ -21,19 +21,6 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #define VINECOPULIB_VINECOP_CLASS_HPP
 
 #include "bicop.hpp"
-#include <Eigen/Dense>
-#include <random>
-#include <nlopt.hpp>
-#include <iostream>
-#include <memory>
-#include <vector>
-
-typedef Eigen::VectorXd VecXd;
-typedef Eigen::MatrixXd MatXd;
-
-extern "C" {
-    #include "ktau.h"
-}
 
 //! A class for vine copulas
 class Vinecop {
