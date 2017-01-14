@@ -139,9 +139,9 @@ MatXb RVineMatrix::compute_needed_hfunc2(const MatXi& no_matrix)
     for (int i = 1; i < d - 1; ++i) {
         int j = d - i;
         // for diagonal, check whether matrix and maximum matrix coincide
-        MatXb is_mat_j = (no_matrix.block(i, 0, d - i, i).array() == j);
+        MatXb isnt_mat_j = (no_matrix.block(i, 0, d - i, i).array() != j);
         MatXb is_max_j = (max_matrix.block(i, 0, d - i, i).array() == j);
-        MatXb is_different = (!is_mat_j.array() && is_max_j.array());
+        MatXb is_different = (isnt_mat_j.array() && is_max_j.array());
         needed_hfunc2.block(i, i, d - i, 1) = is_different.rowwise().any();
     }    
     return needed_hfunc2;
