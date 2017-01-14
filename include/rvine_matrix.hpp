@@ -24,6 +24,8 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef Eigen::MatrixXi MatXi;
 typedef Eigen::VectorXi VecXi;
+typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatXb;
+// typedef Eigen::Vector<bool, Eigen::Dynamic> VecXb;
 
 class RVineMatrix {    
 public:
@@ -31,15 +33,21 @@ public:
     MatXi get_matrix();
     MatXi get_no_matrix();
     MatXi get_max_matrix();
+    MatXb get_needs_hfunc1();
+    MatXb get_needs_hfunc2();
 
 private:
     MatXi to_natural_order(const MatXi& matrix);
     MatXi to_max_matrix(const MatXi& no_matrix);
-    
+    MatXb get_needed_hfunc1(const MatXi& no_matrix) ;
+    MatXb get_needed_hfunc2(const MatXi& no_matrix) ;
+
     int d_;
     MatXi matrix_;
     MatXi no_matrix_;
     MatXi max_matrix_;
+    MatXb needs_hfunc1_;
+    MatXb needs_hfunc2_;;
 };
 
 int relabel_one(const int& x, const VecXi& old_labels, const VecXi& new_labels);

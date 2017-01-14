@@ -38,6 +38,7 @@ namespace {
                           3, 2, 3, 2, 3, 0, 0,
                           1, 1, 4, 3, 2, 2, 0,
                           2, 3, 1, 1, 1, 1, 1;
+                          
         RVineMatrix rvine_matrix(mat);
         EXPECT_EQ(rvine_matrix.get_no_matrix(), true_no_matrix);
     }
@@ -59,8 +60,53 @@ namespace {
                            3, 3, 4, 3, 3, 0, 0,
                            2, 3, 4, 3, 2, 2, 0,
                            2, 3, 1, 1, 1, 1, 1;
+                           
         RVineMatrix rvine_matrix(mat);
         EXPECT_EQ(rvine_matrix.get_max_matrix(), true_max_matrix);
+    }
+    
+    TEST(rvine_matrix, needed_hfunc1_is_correct) {
+        MatXi mat(7, 7);
+        mat << 4, 0, 0, 0, 0, 0, 0,
+               7, 3, 0, 0, 0, 0, 0,
+               3, 7, 7, 0, 0, 0, 0,
+               1, 1, 5, 1, 0, 0, 0,
+               2, 5, 2, 5, 2, 0, 0,
+               6, 6, 1, 2, 5, 5, 0,
+               5, 2, 6, 6, 6, 6, 6;
+        MatXb true_hfunc1(7, 7);
+        true_hfunc1 << 0, 0, 0, 0, 0, 0, 0,
+                       1, 0, 0, 0, 0, 0, 0,
+                       1, 1, 1, 0, 0, 0, 0,
+                       1, 1, 1, 1, 0, 0, 0,
+                       1, 1, 1, 1, 1, 0, 0,
+                       1, 1, 1, 1, 1, 1, 0,
+                       1, 1, 1, 1, 1, 1, 0;
+                       
+        RVineMatrix rvine_matrix(mat);
+        EXPECT_EQ(rvine_matrix.get_needs_hfunc1(), true_hfunc1);
+    }
+    
+    TEST(rvine_matrix, needed_hfunc2_is_correct) {
+        MatXi mat(7, 7);
+        mat << 4, 0, 0, 0, 0, 0, 0,
+               7, 3, 0, 0, 0, 0, 0,
+               3, 7, 7, 0, 0, 0, 0,
+               1, 1, 5, 1, 0, 0, 0,
+               2, 5, 2, 5, 2, 0, 0,
+               6, 6, 1, 2, 5, 5, 0,
+               5, 2, 6, 6, 6, 6, 6;
+        MatXb true_hfunc2(7, 7);
+        true_hfunc2 << 0, 0, 0, 0, 0, 0, 0,
+                       0, 1, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 1, 0, 0, 0,
+                       0, 0, 0, 1, 1, 0, 0,
+                       0, 0, 0, 0, 1, 1, 0,
+                       0, 0, 0, 0, 0, 0, 0;
+                       
+        RVineMatrix rvine_matrix(mat);
+        EXPECT_EQ(rvine_matrix.get_needs_hfunc2(), true_hfunc2);
     }
 }
 

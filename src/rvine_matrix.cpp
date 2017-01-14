@@ -26,6 +26,8 @@ RVineMatrix::RVineMatrix(const MatXi& matrix)
     matrix_ = matrix;
     no_matrix_ = to_natural_order(matrix);
     max_matrix_ = to_max_matrix(no_matrix_);
+    needs_hfunc1_ = get_needed_hfunc1(no_matrix_);
+    needs_hfunc2_ = get_needed_hfunc2(no_matrix_);
 }
 
 MatXi RVineMatrix::get_matrix()
@@ -41,6 +43,16 @@ MatXi RVineMatrix::get_no_matrix()
 MatXi RVineMatrix::get_max_matrix()
 {
     return max_matrix_;
+}
+
+MatXb RVineMatrix::get_needs_hfunc1()
+{
+    return needs_hfunc1_;
+}
+
+MatXb RVineMatrix::get_needs_hfunc2()
+{
+    return needs_hfunc2_;
 }
 
 //! Reorder R-vine matrix to natural order 
@@ -87,6 +99,60 @@ MatXi RVineMatrix::to_max_matrix(const MatXi& no_matrix)
     return max_matrix;
 }
 
+//! Obtain matrix indicating which h-functions are needed
+//! 
+//! It is usually not necessary to apply both h-functions for each pair-copula.
+//! 
+//! @parameter no_matrix initial R-vine matrix (assumed to be in natural order).
+//! 
+//! @return An Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> indicating
+//! whether hfunc1/2 is needed for a given pair copula.
+//! 
+//! @{
+MatXb RVineMatrix::get_needed_hfunc1(const MatXi& no_matrix) 
+{
+    int d = no_matrix.rows();
+    MatXb needed_hfunc1 = MatXb::Constant(d, d, false);
+    needed_hfunc1.block(1, 0, d - 1, 1) = MatXb::Constant(d - 1, 1, true);
+        
+    MatXi max_matrix = to_max_matrix(no_matrix);
+    for (int i = 1; i < d - 1; ++i) {
+        int j = d - i;
+        // fill row j with true below the diagonal
+        needed_hfunc1.block(i, i, d - i, 1) = MatXb::Constant(d - i, 1, true);
+        
+        // for diagonal, check whether matrix and maximum matrix coincide
+        MatXb is_mat_j = (no_matrix.block(i, 0, 1, i).array() == j);
+        MatXb is_max_j = (max_matrix.block(i, 0, 1, i).array() == j);
+        needed_hfunc1(i, i) = (is_mat_j.array() && is_max_j.array()).any();
+    }
+    
+    return needed_hfunc1;
+}
+
+MatXb RVineMatrix::get_needed_hfunc2(const MatXi& no_matrix) 
+{
+    int d = no_matrix.rows();
+    MatXb needed_hfunc2 = MatXb::Constant(d, d, false);
+    
+    MatXi max_matrix = to_max_matrix(no_matrix);
+    for (int i = 1; i < d - 1; ++i) {
+        int j = d - i;
+        // for diagonal, check whether matrix and maximum matrix coincide
+        MatXb is_mat_j = (no_matrix.block(i, 0, d - i, i).array() == j);
+        MatXb is_max_j = (max_matrix.block(i, 0, d - i, i).array() == j);
+        MatXb is_different = (!is_mat_j.array() && is_max_j.array());
+        needed_hfunc2.block(i, i, d - i, 1) = is_different.rowwise().any();
+    }    
+//         v <- d - i + 1
+//         bw <- as.matrix(MaxMat[i:d, 1:(i - 1)]) == v
+//         direct <- Vine[i:d, 1:(i - 1)] == v
+//         M$indirect[i:d, i] <- apply(as.matrix(bw & (!direct)), 1, any)
+//         M$direct[i:d, i] <- TRUE
+//         M$direct[i, i] <- any(as.matrix(bw)[1, ] & as.matrix(direct)[1, ])    
+    return needed_hfunc2;
+}
+//! @}
 
 // translates matrix_entry from old to new labels
 int relabel_one(const int& x, const VecXi& old_labels, const VecXi& new_labels)
