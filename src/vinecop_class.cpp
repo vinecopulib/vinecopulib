@@ -20,7 +20,12 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include "include/vinecop_class.hpp"
 
 
-
+//! Construct a vine copula object
+//! 
+//! @param d tree index (starting with 1).
+//! 
+//! @return a d-dimensional D-vine with variable order 1, ..., d and all 
+//! pair-copulas set to independence
 Vinecop::Vinecop(const int& d)
 {
     d_ = d;
