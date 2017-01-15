@@ -108,6 +108,20 @@ namespace {
         RVineMatrix rvine_matrix(mat);
         EXPECT_EQ(rvine_matrix.get_needed_hfunc2(), true_hfunc2);
     }
+    
+    TEST(rvine_matrix, construct_d_vine_matrix_is_correct) {
+        VecXi order(7);
+        order << 7, 2, 3, 5, 1, 4, 6;
+        MatXi true_d_vine_matrix(7, 7);
+        true_d_vine_matrix << 6, 0, 0, 0, 0, 0, 0,
+                              7, 4, 0, 0, 0, 0, 0,
+                              2, 7, 1, 0, 0, 0, 0,
+                              3, 2, 7, 5, 0, 0, 0,
+                              5, 3, 2, 7, 3, 0, 0,
+                              1, 5, 3, 2, 7, 2, 0,
+                              4, 1, 5, 3, 2, 7, 7;
+        EXPECT_EQ(RVineMatrix::construct_d_vine_matrix(order), true_d_vine_matrix);
+     }
 }
 
 int main(int argc, char **argv) {

@@ -38,23 +38,24 @@ MatXi RVineMatrix::get_matrix()
 //! @param order order of the variables
 //! 
 //! @return An Eigen::MatrixXi describing the D-vine structure.
-MatXi RVineMatrix::construct_d_vine_matrix(const VecXd& order)
+MatXi RVineMatrix::construct_d_vine_matrix(const VecXi& order)
 {
     int d = order.size();
-    MatXi vine_matrix(d, d);
+    MatXi vine_matrix = MatXi::Constant(d, d, 0);
     
     for (int i = 0; i < d; ++i) {
-        vine_matrix(d - i, d - i) = order(i);
+        vine_matrix(i, i) = order(d - 1 - i);  // diagonal
     }
     
-    for (int i = 0; i < d; ++i) {
-        for (int j = 1; j < d - 1; ++j) {
-            vine_matrix(d - i, d - j - i) = order(j);
+    for (int i = 1; i < d; ++i) {
+        for (int j = 0; j < i; ++j) {
+            vine_matrix(i, j) = order(i - j - 1);  // below diagonal
         }
     }
-    
+
     return vine_matrix;
 }
+
 
 //! Reorder R-vine matrix to natural order 
 //! 

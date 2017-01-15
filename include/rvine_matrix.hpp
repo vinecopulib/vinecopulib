@@ -44,7 +44,7 @@ public:
     MatXb get_needed_hfunc1();
     MatXb get_needed_hfunc2();
 
-    static MatXi construct_d_vine_matrix(const VecXd& order);
+    static MatXi construct_d_vine_matrix(const VecXi& order);
 
 private:
     int d_;
