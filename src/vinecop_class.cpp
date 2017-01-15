@@ -42,6 +42,29 @@ Vinecop::Vinecop(const int& d)
     }
 }
 
+//! Construct a vine copula object from a vector<BicopPtr> and structure matrix
+//! 
+//! @param pair_copulas pointers to Bicop objects.
+//! @param matrix R-vine matrix.
+//! 
+//! @return a d-dimensional D-vine with variable order 1, ..., d and all 
+//! pair-copulas set to independence
+Vinecop::Vinecop(const std::vector<BicopPtr>& pair_copulas, const MatXi& matrix)
+{
+    d_ = matrix.rows();
+    if ((int) pair_copulas.size() != d_ * (d_ + 1) / 2) {
+        std::stringstream message;
+        message << 
+            "wrong size of pair_copulas; "
+            "expected:" << d_ * (d_ + 1) / 2 << ", "<<
+            "actual:" << pair_copulas.size() << std::endl;
+            throw std::runtime_error(message.str().c_str());
+    }
+    // D-vine with variable order (1, ..., d)
+    vine_matrix_ = RVineMatrix(matrix);
+    pair_copulas_ = pair_copulas;
+}
+
 //! Access to a pair copula
 //! 
 //! @param tree tree index (starting with 0).
