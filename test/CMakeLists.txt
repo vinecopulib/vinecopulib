@@ -23,7 +23,8 @@ set(unit_tests
         test_bicop_class
         test_bicop_select
         test_bicop_trafokernel
-        test_boost_tools)
+        test_boost_tools
+        test_rvine_matrix)
         
 foreach(app ${unit_tests})
     add_executable(${app} ${app}.cpp)

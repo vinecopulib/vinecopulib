@@ -20,7 +20,12 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include "include/vinecop_class.hpp"
 
 
-
+//! Construct a vine copula object
+//! 
+//! @param d tree index (starting with 1).
+//! 
+//! @return a d-dimensional D-vine with variable order 1, ..., d and all 
+//! pair-copulas set to independence
 Vinecop::Vinecop(const int& d)
 {
     d_ = d;
@@ -29,7 +34,8 @@ Vinecop::Vinecop(const int& d)
     VecXd order(d);
     for (int i = 0; i < d; ++i)
         order(i) = i + 1;
-    vine_matrix_ = construct_d_vine_matrix(order);
+    RVineMatrix vine_matrix_(RVineMatrix::construct_d_vine_matrix(order));
+    
     
     // all pair-copulas are independence
     pair_copulas_.reserve(d * (d - 1) / 2);
@@ -72,24 +78,4 @@ int Vinecop::get_rotation(int tree, int edge)
 VecXd Vinecop::get_parameters(int tree, int edge) 
 {
     return get_pair_copula(tree, edge)->get_parameters();
-}
-
-//! Construct a D-vine matrix 
-//! @param order order of the variables
-MatXd Vinecop::construct_d_vine_matrix(const VecXd& order)
-{
-    int d = order.size();
-    MatXd vine_matrix(d, d);
-    
-    for (int i = 0; i < d; ++i) {
-        vine_matrix(d - i, d - i) = order(i);
-    }
-    
-    for (int i = 0; i < d; ++i) {
-        for (int j = 1; j < d - 1; ++j) {
-            vine_matrix(d - i, d - j - i) = order(j);
-        }
-    }
-    
-    return vine_matrix;
 }
