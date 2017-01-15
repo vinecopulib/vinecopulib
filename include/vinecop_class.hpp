@@ -26,13 +26,17 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 //! A class for vine copulas
 class Vinecop {
 public:
+    Vinecop() {}
     Vinecop(const int& d);
-    
+    Vinecop(const std::vector<BicopPtr>& pair_copulas, const MatXi& matrix);
+
     BicopPtr get_pair_copula(int tree, int edge);
     int get_family(int tree, int edge);
     int get_rotation(int tree, int edge);
     VecXd get_parameters(int tree, int edge);
-        
+    
+    VecXd pdf(const MatXd& u);
+    
 private:
     int d_;
     RVineMatrix vine_matrix_;
