@@ -149,9 +149,7 @@ VecXd Vinecop::pdf(const MatXd& u)
     MatXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1().colwise().reverse();
     MatXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2().colwise().reverse();
     
-    // all pair-copula densities will be multiplied at the end. initialize with
-    // 1 so that unused elements have no effect
-    MatXd pc_density = MatXd::Constant(d, d, 1.0);
+    // initial value must be 1.0 for multiplication
     VecXd vine_density = VecXd::Constant(u.rows(), 1.0);  
     // temporary storage objects for h-functions (re-used for each eval point)
     MatXd direct(d, d);
@@ -180,7 +178,7 @@ VecXd Vinecop::pdf(const MatXd& u)
                 } else {
                     u_e(0, 0) = indirect(tree, d - m);
                 }
-
+                
                 vine_density(i) *= edge_copula->pdf(u_e)(0);
                 // h-functions are only evaluated if needed in next step
                 if (needed_hfunc1(tree + 1, edge))

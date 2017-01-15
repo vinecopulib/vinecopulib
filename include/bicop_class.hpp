@@ -165,7 +165,7 @@ protected:
     //! Data manipulations for rotated families
     //!
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
-    MatXd rotate_u(const MatXd& u);
+    MatXd cut_and_rotate(const MatXd& u);
     MatXd swap_cols(const MatXd& u);
 
     int family_;
