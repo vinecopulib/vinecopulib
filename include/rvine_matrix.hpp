@@ -34,29 +34,21 @@ public:
     RVineMatrix(const MatXi& matrix);
     //! @}
     
-    //! \devgroup getters Getters
+    //! Getters
     //! @{
     MatXi get_matrix();
-    MatXi get_no_matrix();
+    //! @}
+    
+    MatXi in_natural_order();
     MatXi get_max_matrix();
     MatXb get_needed_hfunc1();
     MatXb get_needed_hfunc2();
-    //! @}
 
     static MatXi construct_d_vine_matrix(const VecXd& order);
 
 private:
-    MatXi to_natural_order(const MatXi& matrix);
-    MatXi to_max_matrix(const MatXi& no_matrix);
-    MatXb compute_needed_hfunc1(const MatXi& no_matrix) ;
-    MatXb compute_needed_hfunc2(const MatXi& no_matrix) ;
-
     int d_;
     MatXi matrix_;
-    MatXi no_matrix_;
-    MatXi max_matrix_;
-    MatXb needed_hfunc1_;
-    MatXb needed_hfunc2_;
 };
 
 int relabel_one(const int& x, const VecXi& old_labels, const VecXi& new_labels);

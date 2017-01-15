@@ -24,35 +24,11 @@ RVineMatrix::RVineMatrix(const MatXi& matrix)
 {
     d_ = matrix.rows();
     matrix_ = matrix;
-    no_matrix_ = to_natural_order(matrix);
-    max_matrix_ = to_max_matrix(no_matrix_);
-    needed_hfunc1_ = compute_needed_hfunc1(no_matrix_);
-    needed_hfunc2_ = compute_needed_hfunc2(no_matrix_);
 }
 
 MatXi RVineMatrix::get_matrix()
 {
     return matrix_;
-}
-
-MatXi RVineMatrix::get_no_matrix()
-{
-    return no_matrix_;
-}
-
-MatXi RVineMatrix::get_max_matrix()
-{
-    return max_matrix_;
-}
-
-MatXb RVineMatrix::get_needed_hfunc1()
-{
-    return needed_hfunc1_;
-}
-
-MatXb RVineMatrix::get_needed_hfunc2()
-{
-    return needed_hfunc2_;
 }
 
 //! Construct a D-vine matrix 
@@ -89,20 +65,18 @@ MatXi RVineMatrix::construct_d_vine_matrix(const VecXd& order)
 //! @parameter matrix initial R-vine matrix.
 //! 
 //! @return An Eigen::MatrixXi containing the matrix in natural order.
-MatXi RVineMatrix::to_natural_order(const MatXi& matrix) 
+MatXi RVineMatrix::in_natural_order() 
 {
-    
     // create vector of new variable labels: d, ..., 1
-    int d = matrix.rows();
-    std::vector<int> ivec(d);    
+    std::vector<int> ivec(d_);    
     std::iota(std::begin(ivec), std::end(ivec), 1); // fill with 1, ..., d
     std::reverse(std::begin(ivec), std::end(ivec));
-    Eigen::Map<VecXi> new_labels(&ivec[0], d);     // convert to VecXi
+    Eigen::Map<VecXi> new_labels(&ivec[0], d_);     // convert to VecXi
     
-    return relabel_elements(matrix, new_labels);
+    return relabel_elements(matrix_, new_labels);
 }
 
-//! Convert to maximum matrix
+//! Get maximum matrix
 //! 
 //! The maximum matrix is derived from an R-vine matrix by iteratively computing
 //! the (elementwise) maximum of a row and the row below (starting from the 
@@ -112,11 +86,10 @@ MatXi RVineMatrix::to_natural_order(const MatXi& matrix)
 //! @parameter no_matrix initial R-vine matrix, assumed to be in natural order.
 //! 
 //! @return An Eigen::MatrixXi containing the maximum matrix
-MatXi RVineMatrix::to_max_matrix(const MatXi& no_matrix) 
+MatXi RVineMatrix::get_max_matrix() 
 {
-    int d = no_matrix.rows();
-    MatXi max_matrix = no_matrix;
-    for (int i = d - 2; i > -1; --i) {
+    MatXi max_matrix = this->in_natural_order();
+    for (int i = d_ - 2; i > -1; --i) {
         for (int j = 0 ; j < i + 1; ++j) {
             max_matrix(i, j) = max_matrix.block(i, j, 2, 1).maxCoeff();
         }
@@ -134,17 +107,17 @@ MatXi RVineMatrix::to_max_matrix(const MatXi& no_matrix)
 //! whether hfunc1/2 is needed for a given pair copula.
 //! 
 //! @{
-MatXb RVineMatrix::compute_needed_hfunc1(const MatXi& no_matrix) 
+MatXb RVineMatrix::get_needed_hfunc1() 
 {
-    int d = no_matrix.rows();
-    MatXb needed_hfunc1 = MatXb::Constant(d, d, false);
-    needed_hfunc1.block(1, 0, d - 1, 1) = MatXb::Constant(d - 1, 1, true);
+    MatXb needed_hfunc1 = MatXb::Constant(d_, d_, false);
+    needed_hfunc1.block(1, 0, d_ - 1, 1) = MatXb::Constant(d_ - 1, 1, true);
         
-    MatXi max_matrix = to_max_matrix(no_matrix);
-    for (int i = 1; i < d - 1; ++i) {
-        int j = d - i;
+    MatXi no_matrix = this->in_natural_order();
+    MatXi max_matrix = this->get_max_matrix();
+    for (int i = 1; i < d_ - 1; ++i) {
+        int j = d_ - i;
         // fill row j with true below the diagonal
-        needed_hfunc1.block(i, i, d - i, 1) = MatXb::Constant(d - i, 1, true);
+        needed_hfunc1.block(i, i, d_ - i, 1) = MatXb::Constant(d_ - i, 1, true);
         
         // for diagonal, check whether matrix and maximum matrix coincide
         MatXb is_mat_j = (no_matrix.block(i, 0, 1, i).array() == j);
@@ -155,19 +128,19 @@ MatXb RVineMatrix::compute_needed_hfunc1(const MatXi& no_matrix)
     return needed_hfunc1;
 }
 
-MatXb RVineMatrix::compute_needed_hfunc2(const MatXi& no_matrix) 
+MatXb RVineMatrix::get_needed_hfunc2() 
 {
-    int d = no_matrix.rows();
-    MatXb needed_hfunc2 = MatXb::Constant(d, d, false);
+    MatXb needed_hfunc2 = MatXb::Constant(d_, d_, false);
     
-    MatXi max_matrix = to_max_matrix(no_matrix);
-    for (int i = 1; i < d - 1; ++i) {
-        int j = d - i;
+    MatXi no_matrix = this->in_natural_order();
+    MatXi max_matrix = this->get_max_matrix();
+    for (int i = 1; i < d_ - 1; ++i) {
+        int j = d_ - i;
         // for diagonal, check whether matrix and maximum matrix coincide
-        MatXb isnt_mat_j = (no_matrix.block(i, 0, d - i, i).array() != j);
-        MatXb is_max_j = (max_matrix.block(i, 0, d - i, i).array() == j);
+        MatXb isnt_mat_j = (no_matrix.block(i, 0, d_ - i, i).array() != j);
+        MatXb is_max_j = (max_matrix.block(i, 0, d_ - i, i).array() == j);
         MatXb is_different = (isnt_mat_j.array() && is_max_j.array());
-        needed_hfunc2.block(i, i, d - i, 1) = is_different.rowwise().any();
+        needed_hfunc2.block(i, i, d_ - i, 1) = is_different.rowwise().any();
     }    
     return needed_hfunc2;
 }

@@ -40,7 +40,7 @@ namespace {
                           2, 3, 1, 1, 1, 1, 1;
                           
         RVineMatrix rvine_matrix(mat);
-        EXPECT_EQ(rvine_matrix.get_no_matrix(), true_no_matrix);
+        EXPECT_EQ(rvine_matrix.in_natural_order(), true_no_matrix);
     }
     
     TEST(rvine_matrix, max_mat_is_correct) {
