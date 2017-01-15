@@ -30,7 +30,7 @@ class RVineMatrix {
 public:
     //! \devgroup constructors Constructors
     //! @{
-    RVineMatrix();
+    RVineMatrix() {}
     RVineMatrix(const MatXi& matrix);
     //! @}
     
