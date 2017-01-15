@@ -55,6 +55,31 @@ MatXb RVineMatrix::get_needed_hfunc2()
     return needed_hfunc2_;
 }
 
+//! Construct a D-vine matrix 
+//! 
+//! A D-vine is a vine where each tree is a path.
+//! 
+//! @param order order of the variables
+//! 
+//! @return An Eigen::MatrixXi describing the D-vine structure.
+MatXi RVineMatrix::construct_d_vine_matrix(const VecXd& order)
+{
+    int d = order.size();
+    MatXi vine_matrix(d, d);
+    
+    for (int i = 0; i < d; ++i) {
+        vine_matrix(d - i, d - i) = order(i);
+    }
+    
+    for (int i = 0; i < d; ++i) {
+        for (int j = 1; j < d - 1; ++j) {
+            vine_matrix(d - i, d - j - i) = order(j);
+        }
+    }
+    
+    return vine_matrix;
+}
+
 //! Reorder R-vine matrix to natural order 
 //! 
 //! Natural order means that the diagonal has entries (d, ..., 1). We convert

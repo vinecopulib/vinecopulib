@@ -17,24 +17,33 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VINECOPULIB_VINECOP_CLASS_HPP
-#define VINECOPULIB_VINECOP_CLASS_HPP
+#ifndef VINECOPULIB_RVINE_MATRIX_HPP
+#define VINECOPULIB_RVINE_MATRIX_HPP
 
 #include "bicop.hpp"
 
 typedef Eigen::MatrixXi MatXi;
 typedef Eigen::VectorXi VecXi;
 typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatXb;
-// typedef Eigen::Vector<bool, Eigen::Dynamic> VecXb;
 
 class RVineMatrix {    
 public:
+    //! \devgroup constructors Constructors
+    //! @{
+    RVineMatrix();
     RVineMatrix(const MatXi& matrix);
+    //! @}
+    
+    //! \devgroup getters Getters
+    //! @{
     MatXi get_matrix();
     MatXi get_no_matrix();
     MatXi get_max_matrix();
     MatXb get_needed_hfunc1();
     MatXb get_needed_hfunc2();
+    //! @}
+
+    static MatXi construct_d_vine_matrix(const VecXd& order);
 
 private:
     MatXi to_natural_order(const MatXi& matrix);
@@ -47,7 +56,7 @@ private:
     MatXi no_matrix_;
     MatXi max_matrix_;
     MatXb needed_hfunc1_;
-    MatXb needed_hfunc2_;;
+    MatXb needed_hfunc2_;
 };
 
 int relabel_one(const int& x, const VecXi& old_labels, const VecXi& new_labels);

@@ -21,6 +21,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #define VINECOPULIB_VINECOP_CLASS_HPP
 
 #include "bicop.hpp"
+#include "rvine_matrix.hpp"
 
 //! A class for vine copulas
 class Vinecop {
@@ -31,12 +32,10 @@ public:
     int get_family(int tree, int edge);
     int get_rotation(int tree, int edge);
     VecXd get_parameters(int tree, int edge);
-    
-    MatXd construct_d_vine_matrix(const VecXd& order);
-    
+        
 private:
     int d_;
-    MatXd vine_matrix_;
+    RVineMatrix vine_matrix_;
     std::vector<BicopPtr> pair_copulas_;
 };
 
