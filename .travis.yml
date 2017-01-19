@@ -30,12 +30,16 @@ script:
   - mkdir build
   - mkdir bin
   - cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug && make && make doc
+  - ./bin/test_bicop_parametric
+  - ./bin/test_bicop_class
+  - ./bin/test_bicop_select
+  - ./bin/test_bicop_trafokernel
   - cmake .. -DCMAKE_BUILD_TYPE=Release && make && make doc
-  - cd ../bin
-  - ./test_bicop_parametric
-  - ./test_bicop_class
-  - ./test_bicop_select
-  - ./test_bicop_trafokernel
+  - ./bin/test_bicop_parametric
+  - ./bin/test_bicop_class
+  - ./bin/test_bicop_select
+  - ./bin/test_bicop_trafokernel
 
 notifications:
   email:

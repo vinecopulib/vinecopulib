@@ -5,7 +5,7 @@
 
 set (CMAKE_CXX_FLAGS                "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type")
 set (CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG")
-set (CMAKE_CXX_FLAGS_RELEASE        "-O3")
+set (CMAKE_CXX_FLAGS_RELEASE        "-O3") #-Ofast ?
 
 if(WARNINGS_AS_ERRORS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werr")
