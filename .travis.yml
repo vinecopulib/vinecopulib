@@ -27,19 +27,23 @@ install:
   - sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'
 
 script:
-  - mkdir build
   - mkdir bin
-  - cd build
+  - mkdir release
+  - mkdir debug
+  - cd debug
   - cmake .. -DCMAKE_BUILD_TYPE=Debug && make && make doc
-  - ./bin/test_bicop_parametric
-  - ./bin/test_bicop_class
-  - ./bin/test_bicop_select
-  - ./bin/test_bicop_trafokernel
+  - cd ../bin
+  - ./test_bicop_parametric
+  - ./test_bicop_class
+  - ./test_bicop_select
+  - ./test_bicop_trafokernel
+  - cd ../release
   - cmake .. -DCMAKE_BUILD_TYPE=Release && make && make doc
-  - ./bin/test_bicop_parametric
-  - ./bin/test_bicop_class
-  - ./bin/test_bicop_select
-  - ./bin/test_bicop_trafokernel
+  - cd ../bin
+  - ./test_bicop_parametric
+  - ./test_bicop_class
+  - ./test_bicop_select
+  - ./test_bicop_trafokernel
 
 notifications:
   email:
