@@ -30,7 +30,7 @@ script:
   - mkdir build
   - mkdir bin
   - cd build
-  - cmake .. && make && make doc
+  - cmake .. -DCMAKE_BUILD_TYPE=Release && make && make doc
   - cd ../bin
   - ./test_bicop_parametric
   - ./test_bicop_class
