@@ -31,7 +31,7 @@ Vinecop::Vinecop(const int& d)
     d_ = d;
     
     // D-vine with variable order (1, ..., d)
-    VecXd order(d);
+    VecXi order(d);
     for (int i = 0; i < d; ++i)
         order(i) = i + 1;
     RVineMatrix vine_matrix_(RVineMatrix::construct_d_vine_matrix(order));
