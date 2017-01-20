@@ -26,7 +26,8 @@ it is recommended to use:
 
 * Create the `MakeFile` via cmake:
 
-`cmake ..`
+    * `cmake .. -DCMAKE_BUILD_TYPE=Debug` for the debug version
+    * `cmake .. -DCMAKE_BUILD_TYPE=Release` for the release version (faster)
 
 * Compile the code to generate the executable:
 
