@@ -49,28 +49,33 @@ if(R_COMMAND)
             PATH_SUFFIXES include R/include
             DOC "Path to file R.h")
     if(NOT R_INCLUDE_DIR)
-        message(
-                FATAL_ERROR
-                "R.h file not found. Locations tried:\n"
-                "/usr/local/lib /usr/local/lib64 /usr/share ${R_ROOT_DIR}"
-        )
+        message(FATAL_ERROR "R.h file not found.")
     endif()
 
     file(GLOB_RECURSE Rcpp_INCLUDE_DIR "${R_HOME}/*/Rcpp.h")
     if(NOT Rcpp_INCLUDE_DIR)
         file(GLOB_RECURSE Rcpp_INCLUDE_DIR "/usr/local/lib/R/*/Rcpp.h")
+        if(NOT Rcpp_INCLUDE_DIR)
+            message(FATAL_ERROR "Rcpp.h file not found.")
+        endif()
     endif()
     string(REGEX REPLACE "/Rcpp.h$" "" Rcpp_INCLUDE_DIR "${Rcpp_INCLUDE_DIR}")
 
     file(GLOB_RECURSE RInside_INCLUDE_DIR "${R_HOME}/*/RInside.h")
     if(NOT RInside_INCLUDE_DIR)
         file(GLOB_RECURSE RInside_INCLUDE_DIR "/usr/local/lib/R/*/RInside.h")
+        if(NOT RInside_INCLUDE_DIR)
+            message(FATAL_ERROR "RInside.h file not found.")
+        endif()
     endif()
     string(REGEX REPLACE "/RInside.h$" "" RInside_INCLUDE_DIR "${RInside_INCLUDE_DIR}")
 
     file(GLOB_RECURSE RcppEigen_INCLUDE_DIR "${R_HOME}/*/RcppEigen.h")
     if(NOT RcppEigen_INCLUDE_DIR)
         file(GLOB_RECURSE RcppEigen_INCLUDE_DIR "/usr/local/lib/R/*/RcppEigen.h")
+        if(NOT RInside_INCLUDE_DIR)
+            message(FATAL_ERROR "RcppEigen.h file not found.")
+        endif()
     endif()
     string(REGEX REPLACE "/RcppEigen.h$" "" RcppEigen_INCLUDE_DIR "${RcppEigen_INCLUDE_DIR}")
     file(GLOB_RECURSE RInside_LIBRAIRIES "${RInside_INCLUDE_DIR}/../*.a")
