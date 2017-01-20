@@ -130,7 +130,7 @@ VecXd Vinecop::get_parameters(int tree, int edge)
 
 //! Probability density function of a vine copula
 //! 
-//! @param u mxd matrix of evaluation points
+//! @param u mxd matrix of evaluation points.
 VecXd Vinecop::pdf(const MatXd& u)
 {
     int d = u.cols();
@@ -190,3 +190,117 @@ VecXd Vinecop::pdf(const MatXd& u)
 
     return vine_density;
 }
+
+// get indexes for reverting back to old order in simulation routine
+VecXi invert_order(const VecXi& order) {
+    // start with (0, 1, .., k)
+    std::vector<int> indexes(order.size());
+    iota(indexes.begin(), indexes.end(), 0);
+    
+    // get sort indexes by comparing values in order
+    sort(indexes.begin(), indexes.end(),
+        [&order](int i1, int i2) {return order(i1) < order(i2);});
+    
+    // convert to VecXi;
+    return Eigen::Map<VecXi>(&indexes[0], order.size());  
+}
+
+// reverse columns and rows of an Eigen::Matrix type object
+template<typename Mat>
+Mat to_upper_tri(Mat A) {return A.rowwise().reverse().colwise().reverse();}
+
+
+//! Simulate from a vine copula model
+//! 
+//! @param n number of observations.
+//! @param U mxd matrix of indpendent uniform random variables.
+//! 
+//! @{
+MatXd Vinecop::simulate(int n)
+{
+    if (n < 1)
+        throw std::runtime_error("n must be at least one");
+    MatXd U(n, d_);
+    // fill matrix with independent uniforms
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    auto runif = [&](double) { return distribution(generator); };
+    U = U.unaryExpr(runif);
+    
+    // call simulation algorithm
+    return simulate(n, U);
+}
+
+MatXd Vinecop::simulate(int n, const MatXd& U)
+{
+    if (n < 1)
+        throw std::runtime_error("n must be at least one");
+    int d = U.cols();
+    if (d != d_) {
+        std::stringstream message;
+        message << "U has wrong number of columns; " <<
+        "expected: " << d_ <<
+        ", actual: " << d << std::endl;
+        throw std::runtime_error(message.str().c_str());
+    }
+    if (U.rows() != n) {
+        std::stringstream message;
+        message << "U must have n rows; " <<
+        "expected: " << n <<
+        ", actual: " << U.rows() << std::endl;
+        throw std::runtime_error(message.str().c_str());
+    }
+    
+    // info about the vine structure (in upper triangular matrix notation)
+    VecXi order = vine_matrix_.get_matrix().diagonal().reverse();
+    VecXi inverse_order = invert_order(order);
+    MatXi no_matrix     = to_upper_tri(vine_matrix_.in_natural_order());
+    MatXi max_matrix    = to_upper_tri(vine_matrix_.get_max_matrix());
+    MatXb needed_hfunc1 = to_upper_tri(vine_matrix_.get_needed_hfunc1());
+    MatXb needed_hfunc2 = to_upper_tri(vine_matrix_.get_needed_hfunc2());
+
+    MatXd U_vine = U;  // output matrix
+    // temporary storage objects for (inverse) h-functions (re-used for each 
+    // evaluation point)
+    MatXd direct(d, d);
+    MatXd indirect(d, d);
+    
+    // loop through the samples to keep the memory usage to a minimum; this 
+    // is important for very high-dimensional settings (d >> 100)
+    for (unsigned int i = 0; i < U.rows(); ++i) {
+        // initialize with independent uniforms (corresponding to natural order)
+        for (int j = 0; j < d; ++j) 
+            direct(j, j) = U(i, order(j) - 1);
+        indirect(0, 0) = direct(0, 0);
+        
+        // loop through variables (0 is just the inital uniform)
+        for (int var = 1; var < d; ++var) {  
+            for (int tree = var - 1; tree > -1; --tree) {
+                BicopPtr edge_copula = get_pair_copula(tree, d - var - 1);
+                // extract data for conditional pair
+                MatXd U_e(1, 2);
+                int m = max_matrix(tree, var);
+                U_e(0, 1) = direct(tree + 1, var);
+                if (m == no_matrix(tree, var)) {
+                    U_e(0, 0) = direct(tree, m - 1);
+                } else {
+                    U_e(0, 0) = indirect(tree, m - 1);
+                }
+                //
+                direct(tree, var) = edge_copula->hinv1(U_e)(0);
+                if (var < d_ - 1) {
+                    if (needed_hfunc2(tree + 1, var)) {
+                        U_e(0, 1) = direct(tree, var);
+                        indirect(tree + 1, var) = edge_copula->hfunc2(U_e)(0);
+                    }
+                }
+            }
+        }
+        // go back to original order
+        for (int j = 0; j < d; ++j) 
+            U_vine(i, j) = direct(0, inverse_order(j));
+    }
+    return U_vine;
+}
+//! @}

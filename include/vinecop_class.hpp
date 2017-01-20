@@ -36,6 +36,8 @@ public:
     VecXd get_parameters(int tree, int edge);
     
     VecXd pdf(const MatXd& u);
+    MatXd simulate(int n);
+    MatXd simulate(int n, const MatXd& U);
     
 private:
     int d_;
