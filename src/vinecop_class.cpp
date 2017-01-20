@@ -134,58 +134,57 @@ VecXd Vinecop::get_parameters(int tree, int edge)
 VecXd Vinecop::pdf(const MatXd& u)
 {
     int d = u.cols();
+    int n = u.rows();
     if (d != d_) {
         std::stringstream message;
         message << "u has wrong number of columns. " <<
-                   "expected: " << d_ <<
-                   ", actual: " << d << std::endl;
+                "expected: " << d_ <<
+                ", actual: " << d << std::endl;
         throw std::runtime_error(message.str().c_str());
     }
-    
+
     // info about the vine structure (reverse rows (!) for more natural indexing)
     VecXi order         = vine_matrix_.get_matrix().diagonal();
     MatXi no_matrix     = vine_matrix_.in_natural_order().colwise().reverse();
     MatXi max_matrix    = vine_matrix_.get_max_matrix().colwise().reverse();
     MatXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1().colwise().reverse();
     MatXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2().colwise().reverse();
-    
-    // initial value must be 1.0 for multiplication
-    VecXd vine_density = VecXd::Constant(u.rows(), 1.0);  
-    // temporary storage objects for h-functions (re-used for each eval point)
-    MatXd direct(d, d);
-    MatXd indirect(d, d);
-    
-    // loop through the data to keep the memory usage to a minimum; this 
-    // is important for very high-dimensional settings (d >> 100)
-    for (unsigned int i = 0; i < u.rows(); ++i) {
-        // fill first row of direct matrix with evaluation points;
-        // points have tos be reordered to correspond to natural order
-        for (int j = 0; j < d; ++j)
-            direct(0, j) = u(i, order(j) - 1);
-    
-        for (int tree = 0; tree < d - 1; ++tree) {
-            for (int edge = 0; edge < d - tree - 1; ++edge) {  
-                // get pair copula for this edge
-                BicopPtr edge_copula = get_pair_copula(tree, edge);
-                // extract evaluation point from hfunction matrices (have been
-                // computed in previous tree level)
-                MatXd u_e(1, 2);
-                int m = max_matrix(tree, edge);
-                u_e(0, 1) = direct(tree, edge);
 
-                if (m == no_matrix(tree, edge)) {
-                    u_e(0, 0) = direct(tree, d - m);
-                } else {
-                    u_e(0, 0) = indirect(tree, d - m);
-                }
-                
-                vine_density(i) *= edge_copula->pdf(u_e)(0);
-                // h-functions are only evaluated if needed in next step
-                if (needed_hfunc1(tree + 1, edge))
-                    direct(tree + 1, edge) = edge_copula->hfunc1(u_e)(0);
-                if (needed_hfunc2(tree + 1, edge))
-                    indirect(tree + 1, edge) = edge_copula->hfunc2(u_e)(0);
+    // initial value must be 1.0 for multiplication
+    VecXd vine_density = VecXd::Constant(u.rows(), 1.0);
+
+    // temporary storage objects for h-functions
+    MatXd direct(n, d);
+    MatXd indirect(n, d);
+    MatXd u_e(n, 2);
+
+    // fill first row of direct matrix with evaluation points;
+    // points have tos be reordered to correspond to natural order
+    for (int j = 0; j < d; ++j)
+        direct.col(j) = u.col(order(j) - 1);
+
+    for (int tree = 0; tree < d - 1; ++tree) {
+        for (int edge = 0; edge < d - tree - 1; ++edge) {
+
+            // get pair copula for this edge
+            BicopPtr edge_copula = get_pair_copula(tree, edge);
+
+            // extract evaluation point from hfunction matrices (have been
+            // computed in previous tree level)
+            int m = max_matrix(tree, edge);
+            u_e.col(1) = direct.col(edge);
+            if (m == no_matrix(tree, edge)) {
+                u_e.col(0) = direct.col(d - m);
+            } else {
+                u_e.col(0) = indirect.col(d - m);
             }
+
+            vine_density = vine_density.cwiseProduct(edge_copula->pdf(u_e));
+            // h-functions are only evaluated if needed in next step
+            if (needed_hfunc1(tree + 1, edge))
+                direct.col(edge) = edge_copula->hfunc1(u_e);
+            if (needed_hfunc2(tree + 1, edge))
+                indirect.col(edge) = edge_copula->hfunc2(u_e);
         }
     }
 
