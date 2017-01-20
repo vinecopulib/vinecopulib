@@ -23,6 +23,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 RVineMatrix::RVineMatrix(const MatXi& matrix)
 {
     d_ = matrix.rows();
+    // TODO: sanity checks for input matrix
     matrix_ = matrix;
 }
 
