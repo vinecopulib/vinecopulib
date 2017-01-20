@@ -33,7 +33,7 @@ namespace {
                5, 2, 6, 6, 6, 6, 6;
         std::vector<BicopPtr> pair_copulas(28);
         for (int i = 0; i < 28; ++i) {
-            pair_copulas[i] = Bicop::create(1, 0.5);
+            pair_copulas[i] = Bicop::create(1, VecXd::Constant(1, 0.5), 0);
         }
         Vinecop vinecop_parametrized(pair_copulas, mat);
     }
