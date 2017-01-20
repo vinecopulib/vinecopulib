@@ -324,17 +324,16 @@ VecXd Bicop::hinv2(const MatXd& u)
 
 MatXd Bicop::simulate(const int& n)
 {
+    MatXd U(n, 2);
+    // fill matrix with independent uniforms
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
-    MatXd U = MatXd::Zero(n, 2);
-    for (int i = 0; i < n; ++i) {
-        U(i, 0) = distribution(generator);
-        U(i, 1) = distribution(generator);
-    }
+    auto runif = [&](double) { return distribution(generator); };
+    U = U.unaryExpr(runif);
+    
+    // use inverse Rosenblatt transform to generate a sample from the copula
     U.col(1) = hinv1(U);
-
     return U;
 }
 
