@@ -411,9 +411,9 @@ VecXd Bicop::hinv1_num(const MatXd &u)
     VecXd xl = VecXd::Constant(u1.size(), 1e-20);
     VecXd xh = 1.0 - xl.array();
 
-    v.col(1) = xl * VecXd::Ones(u1.size());
+    v.col(1) = xl;
     VecXd fl = (hfunc1(v) - u1).cwiseAbs();
-    v.col(1) = xh * VecXd::Ones(u1.size());
+    v.col(1) = xh;
     VecXd fh = (hfunc1(v) - u1).cwiseAbs();
     VecXd fm = VecXd::Ones(u1.size());
     
@@ -437,9 +437,9 @@ VecXd Bicop::hinv2_num(const MatXd& u)
     VecXd xl = VecXd::Constant(u1.size(), 1e-20);
     VecXd xh = 1.0 - xl.array();
     
-    v.col(0) = xl * VecXd::Ones(u1.size());
+    v.col(0) = xl;
     VecXd fl = (hfunc2(v) - u1).cwiseAbs();
-    v.col(0) = xh * VecXd::Ones(u1.size());
+    v.col(0) = xh;
     VecXd fh = (hfunc2(v) - u1).cwiseAbs();
     VecXd fm = VecXd::Ones(u1.size());
 
