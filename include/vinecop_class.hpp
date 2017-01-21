@@ -45,5 +45,9 @@ private:
     std::vector<BicopPtr> pair_copulas_;
 };
 
+VecXi invert_order(const VecXi& order);
+// reverse columns and rows of an Eigen::Matrix type object
+template<typename Mat>
+Mat to_upper_tri(Mat A) {return A.rowwise().reverse().colwise().reverse();}
 
 #endif

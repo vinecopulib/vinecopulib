@@ -191,25 +191,6 @@ VecXd Vinecop::pdf(const MatXd& u)
     return vine_density;
 }
 
-// get indexes for reverting back to old order in simulation routine
-VecXi invert_order(const VecXi& order) {
-    // start with (0, 1, .., k)
-    std::vector<int> indexes(order.size());
-    iota(indexes.begin(), indexes.end(), 0);
-    
-    // get sort indexes by comparing values in order
-    sort(indexes.begin(), indexes.end(),
-        [&order](int i1, int i2) {return order(i1) < order(i2);});
-    
-    // convert to VecXi;
-    return Eigen::Map<VecXi>(&indexes[0], order.size());  
-}
-
-// reverse columns and rows of an Eigen::Matrix type object
-template<typename Mat>
-Mat to_upper_tri(Mat A) {return A.rowwise().reverse().colwise().reverse();}
-
-
 //! Simulate from a vine copula model
 //! 
 //! @param n number of observations.
@@ -218,16 +199,7 @@ Mat to_upper_tri(Mat A) {return A.rowwise().reverse().colwise().reverse();}
 //! @{
 MatXd Vinecop::simulate(int n)
 {
-    if (n < 1)
-        throw std::runtime_error("n must be at least one");
-    MatXd U(n, d_);
-    // fill matrix with independent uniforms
-    std::random_device rd;
-    std::default_random_engine generator(rd());
-    std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    auto runif = [&](double) { return distribution(generator); };
-    U = U.unaryExpr(runif);
-    
+    MatXd U = simulate_uniform(n, d_);
     // call simulation algorithm
     return simulate(n, U);
 }
@@ -304,3 +276,17 @@ MatXd Vinecop::simulate(int n, const MatXd& U)
     return U_vine;
 }
 //! @}
+
+// get indexes for reverting back to old order in simulation routine
+VecXi invert_order(const VecXi& order) {
+    // start with (0, 1, .., k)
+    std::vector<int> indexes(order.size());
+    iota(indexes.begin(), indexes.end(), 0);
+    
+    // get sort indexes by comparing values in order
+    sort(indexes.begin(), indexes.end(),
+        [&order](int i1, int i2) {return order(i1) < order(i2);});
+    
+    // convert to VecXi;
+    return Eigen::Map<VecXi>(&indexes[0], order.size());  
+}

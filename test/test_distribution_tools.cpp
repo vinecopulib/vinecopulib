@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "include/boost_tools.hpp"
+#include "include/distribution_tools.hpp"
 #include <gsl/gsl_cdf.h>
 #include <gsl/gsl_randist.h>
 #include <Eigen/Dense>
