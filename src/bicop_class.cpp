@@ -567,17 +567,15 @@ bool preselect_family(double c1, double c2, double tau, int family, int rotation
     return preselect;
 }
 
-//! Numerical inversion of a univariate function
+//! Numerical inversion of a function on [0, 1].
 //! 
 //! Computes the inverse \f$f^{-1}\f$ of a function \f$f\f$ by the bisection 
 //! method.
 //! 
 //! @param x evaluation points.
 //! @param f the function to invert.
-//! @param n_iter the number of iterations for the bisection. 
-//! 
-//! The default are 35 iterations which guarantee an accuracy of 
-//! 0.5^35 ~= 6e-11 if the domain is the unit interval.
+//! @param n_iter the number of iterations for the bisection (defaults to 35,
+//! guaranteeing an accuracy of 0.5^35 ~= 6e-11). 
 //! 
 //! @return f^{-1}(x).
 VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, int n_iter) 
