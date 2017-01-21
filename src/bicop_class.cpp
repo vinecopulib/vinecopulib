@@ -416,7 +416,7 @@ VecXd Bicop::hinv2_num(const MatXd &u)
     MatXd u_new = u;
     auto h1 = [&](const VecXd &x) {
         u_new.col(0) = x; 
-        return hfunc1_default(u_new);
+        return hfunc2_default(u_new);
     };
     
     return invert_f(u.col(0), h1);
