@@ -193,6 +193,11 @@ VecXd Vinecop::pdf(const MatXd& u)
 
 //! Simulate from a vine copula model
 //! 
+//! If the problem is too large, it is split recursively into halves (w.r.t 
+//! to n, the number of observations). 
+//! "Too large" means that the required memory will exceed 1 GB. An examplary
+//! configuration requiring less than 1GB is n = 1000, d = 200.
+//!  
 //! @param n number of observations.
 //! @param U mxd matrix of indpendent uniform random variables.
 //! 
@@ -223,6 +228,21 @@ MatXd Vinecop::simulate(int n, const MatXd& U)
         ", actual: " << U.rows() << std::endl;
         throw std::runtime_error(message.str().c_str());
     }
+    MatXd U_vine = U;  // output matrix
+    
+    //                   (direct + indirect)    (U_vine)       (info matrices)
+    int bytes_required = (8 * 2 * n * d * d) +  (8 * n * d)  + (4 * 4 * d * d);
+    // if the problem is too large (requires more than 1 GB memory), split 
+    // the data into two halves and call simulate on the reduced data.
+    if ((n > 1) & (bytes_required > 1e9)) {
+        int n_half = n / 2;
+        int n_left = n - n_half;
+        U_vine.block(0, 0, n_half, d) = 
+            simulate(n_half, U.block(0, 0, n_half, d));
+        U_vine.block(n_half, 0, n_left, d) = 
+            simulate(n_left, U.block(n_half, 0, n_left, d));
+        return U_vine;
+    }
     
     // info about the vine structure (in upper triangular matrix notation)
     VecXi order = vine_matrix_.get_matrix().diagonal().reverse();
@@ -232,47 +252,44 @@ MatXd Vinecop::simulate(int n, const MatXd& U)
     MatXb needed_hfunc1 = to_upper_tri(vine_matrix_.get_needed_hfunc1());
     MatXb needed_hfunc2 = to_upper_tri(vine_matrix_.get_needed_hfunc2());
 
-    MatXd U_vine = U;  // output matrix
-    // temporary storage objects for (inverse) h-functions (re-used for each 
-    // evaluation point)
-    MatXd direct(d, d);
-    MatXd indirect(d, d);
+    // temporary storage objects for (inverse) h-functions
+    typedef Eigen::Matrix<VecXd, Eigen::Dynamic, Eigen::Dynamic> Array3d;
+    Array3d direct(d, d);
+    Array3d indirect(d, d);
     
-    // loop through the samples to keep the memory usage to a minimum; this 
-    // is important for very high-dimensional settings (d >> 100)
-    for (unsigned int i = 0; i < U.rows(); ++i) {
-        // initialize with independent uniforms (corresponding to natural order)
-        for (int j = 0; j < d; ++j) 
-            direct(j, j) = U(i, order(j) - 1);
-        indirect(0, 0) = direct(0, 0);
-        
-        // loop through variables (0 is just the inital uniform)
-        for (int var = 1; var < d; ++var) {  
-            for (int tree = var - 1; tree > -1; --tree) {
-                BicopPtr edge_copula = get_pair_copula(tree, d - var - 1);
-                // extract data for conditional pair
-                MatXd U_e(1, 2);
-                int m = max_matrix(tree, var);
-                U_e(0, 1) = direct(tree + 1, var);
-                if (m == no_matrix(tree, var)) {
-                    U_e(0, 0) = direct(tree, m - 1);
-                } else {
-                    U_e(0, 0) = indirect(tree, m - 1);
-                }
-                //
-                direct(tree, var) = edge_copula->hinv1(U_e)(0);
-                if (var < d_ - 1) {
-                    if (needed_hfunc2(tree + 1, var)) {
-                        U_e(0, 1) = direct(tree, var);
-                        indirect(tree + 1, var) = edge_copula->hfunc2(U_e)(0);
-                    }
+    // initialize with independent uniforms (corresponding to natural order)
+    for (int j = 0; j < d; ++j) 
+        direct(j, j) = U.col(order(j) - 1);
+    indirect(0, 0) = direct(0, 0);
+    
+    // loop through variables (0 is just the inital uniform)
+    for (int var = 1; var < d; ++var) {  
+        for (int tree = var - 1; tree > -1; --tree) {
+            BicopPtr edge_copula = get_pair_copula(tree, d - var - 1);
+            // extract data for conditional pair
+            MatXd U_e(n, 2);
+            int m = max_matrix(tree, var);
+            U_e.col(1) = direct(tree + 1, var);
+            if (m == no_matrix(tree, var)) {
+                U_e.col(0) = direct(tree, m - 1);
+            } else {
+                U_e.col(0) = indirect(tree, m - 1);
+            }
+            // inverse Rosenblatt transform simulates data for conditional pair
+            direct(tree, var) = edge_copula->hinv1(U_e);
+            // if required at later stage, also calculate hfunc2
+            if (var < d_ - 1) {
+                if (needed_hfunc2(tree + 1, var)) {
+                    U_e.col(1) = direct(tree, var);
+                    indirect(tree + 1, var) = edge_copula->hfunc2(U_e);
                 }
             }
         }
-        // go back to original order
-        for (int j = 0; j < d; ++j) 
-            U_vine(i, j) = direct(0, inverse_order(j));
     }
+    // go back to original order
+    for (int j = 0; j < d; ++j) 
+        U_vine.col(j) = direct(0, inverse_order(j));
+    
     return U_vine;
 }
 //! @}
