@@ -401,107 +401,56 @@ MatXd Bicop::swap_cols(const MatXd& u)
     return u_swapped;
 }
 
-
+//! The inverse is found by the bisection method with 35 iterations. This 
+//! guarantees an accuracy of 0.5^35 ~= 6e-11.
 VecXd Bicop::hinv1_num(const MatXd &u)
 {
     MatXd v = u;
     VecXd u1 = u.col(1);
-    int j = 0, br = 0, it = 0;
-    double tol = 1e-12, xl = 1e-10, xh = 1-1e-10;
+    
+    VecXd xl = VecXd::Constant(u1.size(), 1e-20);
+    VecXd xh = 1.0 - xl.array();
 
     v.col(1) = xl * VecXd::Ones(u1.size());
     VecXd fl = (hfunc1(v) - u1).cwiseAbs();
     v.col(1) = xh * VecXd::Ones(u1.size());
     VecXd fh = (hfunc1(v) - u1).cwiseAbs();
     VecXd fm = VecXd::Ones(u1.size());
-
-    for (j = 0; j < u.rows(); ++j)
-    {
-        if (fl(j) <= tol) {
-            v(j, 1) = xl;
-            br = 1;
-        }
-        if (fh(j) <= tol) {
-            v(j, 1) = xh;
-            br = 1;
-        }
-
-        while (!br) {
-            v(j, 1) = (xh + xl) / 2.0;
-            fm(j) = hfunc1_default(v.row(j))(0) - u1(j);
-
-            //stop if values become too close (avoid infinite loop)
-            if (fabs(fm(j)) <= tol) br = 1;
-            if (fabs(xl-xh) <= tol) br = 1;
-
-            if (fm(j) < 0.0) {
-                xl = v(j, 1);
-                fh(j) = fm(j);
-            } else {
-                xh = v(j, 1);
-                fl(j) = fm(j);
-            }
-
-            //stop if too many iterations are required (avoid infinite loop)
-            ++it;
-            if (it > 50) br = 1;
-        }
-        br = 0;
-        it = 0;
-        xl = 1e-10;
-        xh = 1-1e-10;
+    
+    for (int iter = 0; iter < 35; ++iter) {
+        v.col(1) = (xh + xl) / 2.0;
+        fm = hfunc1_default(v) - u1;
+        xl = (fm.array() < 0).select(v.col(1), xl);
+        xh = (fm.array() < 0).select(xh, v.col(1));
+        fh = (fm.array() < 0).select(fm, fh);
+        fl = (fm.array() < 0).select(fl, fm);
     }
 
     return v.col(1);
 }
+
 VecXd Bicop::hinv2_num(const MatXd& u)
 {
     MatXd v = u;
     VecXd u1 = u.col(0);
-    int j = 0, br = 0, it = 0;
-    double tol = 1e-12, xl = 1e-10, xh = 1-1e-10;
-
+    
+    VecXd xl = VecXd::Constant(u1.size(), 1e-20);
+    VecXd xh = 1.0 - xl.array();
+    
     v.col(0) = xl * VecXd::Ones(u1.size());
     VecXd fl = (hfunc2(v) - u1).cwiseAbs();
     v.col(0) = xh * VecXd::Ones(u1.size());
     VecXd fh = (hfunc2(v) - u1).cwiseAbs();
     VecXd fm = VecXd::Ones(u1.size());
 
-    for (j = 0; j < u.rows(); ++j)
-    {
-        if (fl(j) <= tol) {
-            v(j, 0) = xl;
-            br = 1;
-        }
-        if (fh(j) <= tol) {
-            v(j, 0) = xh;
-            br = 1;
-        }
-
-        while (!br) {
-            v(j, 0) = (xh + xl) / 2.0;
-            fm(j) = hfunc2_default(v.row(j))(0) - u1(j);
-
-            //stop if values become too close (avoid infinite loop)
-            if (fabs(fm(j)) <= tol) br = 1;
-            if (fabs(xl-xh) <= tol) br = 1;
-
-            if (fm(j) < 0.0) {
-                xl = v(j,0);
-                fh(j) = fm(j);
-            } else {
-                xh = v(j,0);
-                fl(j) = fm(j);
-            }
-
-            //stop if too many iterations are required (avoid infinite loop)
-            ++it;
-            if (it > 50) br = 1;
-        }
-        br = 0;
-        it = 0;
-        xl = 1e-10;
-        xh = 1-1e-10;
+    // 35 iterations guarantee an accuracy of 0.5^35 ~= 6e-11
+    for (int iter = 0; iter < 35; ++iter) {
+        v.col(0) = (xh + xl) / 2.0;
+        fm = hfunc2_default(v) - u1;
+        xl = (fm.array() < 0).select(v.col(0), xl);
+        xh = (fm.array() < 0).select(xh, v.col(0));
+        fh = (fm.array() < 0).select(fm, fh);
+        fl = (fm.array() < 0).select(fl, fm);
     }
 
     return v.col(0);
