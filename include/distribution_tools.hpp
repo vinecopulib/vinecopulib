@@ -111,7 +111,6 @@ inline Eigen::MatrixXd simulate_uniform(int n, int d)
     if ((n < 1) | (d < 1))
         throw std::runtime_error("both n and d must be at least 1.");
     Eigen::MatrixXd U(n, d);
-    return U;
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
