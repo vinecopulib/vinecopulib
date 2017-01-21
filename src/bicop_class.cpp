@@ -401,59 +401,25 @@ MatXd Bicop::swap_cols(const MatXd& u)
     return u_swapped;
 }
 
-//! The inverse is found by the bisection method with 35 iterations. This 
-//! guarantees an accuracy of 0.5^35 ~= 6e-11.
 VecXd Bicop::hinv1_num(const MatXd &u)
 {
-    MatXd v = u;
-    VecXd u1 = u.col(1);
-    
-    VecXd xl = VecXd::Constant(u1.size(), 1e-20);
-    VecXd xh = 1.0 - xl.array();
-
-    v.col(1) = xl;
-    VecXd fl = (hfunc1(v) - u1).cwiseAbs();
-    v.col(1) = xh;
-    VecXd fh = (hfunc1(v) - u1).cwiseAbs();
-    VecXd fm = VecXd::Ones(u1.size());
-    
-    for (int iter = 0; iter < 35; ++iter) {
-        v.col(1) = (xh + xl) / 2.0;
-        fm = hfunc1_default(v) - u1;
-        xl = (fm.array() < 0).select(v.col(1), xl);
-        xh = (fm.array() < 0).select(xh, v.col(1));
-        fh = (fm.array() < 0).select(fm, fh);
-        fl = (fm.array() < 0).select(fl, fm);
-    }
-
-    return v.col(1);
+    MatXd u_new = u;
+    auto h1 = [&](const VecXd &v) {
+        u_new.col(1) = v; 
+        return hfunc1_default(u_new);
+    };
+    return invert_f(u.col(1), h1);
 }
 
-VecXd Bicop::hinv2_num(const MatXd& u)
+VecXd Bicop::hinv2_num(const MatXd &u)
 {
-    MatXd v = u;
-    VecXd u1 = u.col(0);
+    MatXd u_new = u;
+    auto h1 = [&](const VecXd &x) {
+        u_new.col(0) = x; 
+        return hfunc1_default(u_new);
+    };
     
-    VecXd xl = VecXd::Constant(u1.size(), 1e-20);
-    VecXd xh = 1.0 - xl.array();
-    
-    v.col(0) = xl;
-    VecXd fl = (hfunc2(v) - u1).cwiseAbs();
-    v.col(0) = xh;
-    VecXd fh = (hfunc2(v) - u1).cwiseAbs();
-    VecXd fm = VecXd::Ones(u1.size());
-
-    // 35 iterations guarantee an accuracy of 0.5^35 ~= 6e-11
-    for (int iter = 0; iter < 35; ++iter) {
-        v.col(0) = (xh + xl) / 2.0;
-        fm = hfunc2_default(v) - u1;
-        xl = (fm.array() < 0).select(v.col(0), xl);
-        xh = (fm.array() < 0).select(xh, v.col(0));
-        fh = (fm.array() < 0).select(fm, fh);
-        fl = (fm.array() < 0).select(fl, fm);
-    }
-
-    return v.col(0);
+    return invert_f(u.col(0), h1);
 }
 
 void Bicop::set_rotation(const int& rotation) {
@@ -599,4 +565,32 @@ bool preselect_family(double c1, double c2, double tau, int family, int rotation
         }
     }
     return preselect;
+}
+
+//! Numerical inversion of a univariate function
+//! 
+//! Computes the inverse \f$f^{-1}\f$ of a function \f$f\f$ by the bisection 
+//! method.
+//! 
+//! @param x evaluation points.
+//! @param f the function to invert.
+//! @param n_iter the number of iterations for the bisection. 
+//! 
+//! The default are 35 iterations which guarantee an accuracy of 
+//! 0.5^35 ~= 6e-11 if the domain is the unit interval.
+//! 
+//! @return f^{-1}(x).
+VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, int n_iter) 
+{
+    VecXd xl = VecXd::Constant(x.size(), 1e-20);
+    VecXd xh = 1.0 - xl.array();
+    VecXd x_tmp = x;
+    for (int iter = 0; iter < n_iter; ++iter) {
+        x_tmp = (xh + xl) / 2.0;
+        VecXd fm = f(x_tmp) - x;
+        xl = (fm.array() < 0).select(x_tmp, xl);
+        xh = (fm.array() < 0).select(xh, x_tmp);
+    }
+
+    return x_tmp;
 }
