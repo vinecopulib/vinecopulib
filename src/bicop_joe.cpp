@@ -106,55 +106,11 @@ VecXd JoeBicop::hinv(const MatXd& u)
 // link between Kendall's tau and the par_bicop parameter
 VecXd JoeBicop::tau_to_parameters(const double& tau)
 {
-    int br = 0, it = 0;
-    double tol = 1e-12, xl = 1 + 1e-6, xh = 100, fl, fh, fm, par;
-
-    fl = fabs(parameters_to_tau(VecXd::Constant(1, xl)) - tau);
-    fh = fabs(parameters_to_tau(VecXd::Constant(1, xh)) - tau);
-    if (fl <= tol) {
-        par = xl;
-        br = 1;
-    }
-    if (fh <= tol) {
-        par = xh;
-        br = 1;
-    }
-
-    while (!br) {
-        par = (xh + xl) / 2.0;
-        fm = parameters_to_tau(VecXd::Constant(1, par)) - tau;
-
-        //stop if values become too close (avoid infinite loop)
-        if (fabs(fm) <= tol) br = 1;
-        if (fabs(xl - xh) <= tol) br = 1;
-
-        if (tau < 0.0)
-        {
-            if (fm > 0.0) {
-                xl = par;
-                fh = fm;
-            } else {
-                xh = par;
-                fl = fm;
-            }
-        } else
-        {
-            if (fm < 0.0) {
-                xl = par;
-                fh = fm;
-            } else {
-                xh = par;
-                fl = fm;
-            }
-        }
-
-        //stop if too many iterations are required (avoid infinite loop)
-        ++it;
-        if (it > 50)
-            br = 1;
-    }
-
-    return VecXd::Constant(1, par);
+    VecXd tau2 = VecXd::Constant(1, std::fabs(tau));
+    auto f = [&](const VecXd &v) {
+        return VecXd::Constant(1, std::fabs(parameters_to_tau(v)));
+    };
+    return invert_f(tau2, f, 1+1e-6, 100);
 }
 
 double JoeBicop::parameters_to_tau(const VecXd& parameters)
