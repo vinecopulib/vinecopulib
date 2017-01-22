@@ -65,7 +65,7 @@ VecXd RInstance::eval_in_R(std::string eval_fct, int start)
         parameter = parameters_(0);
         // take care of the rotations
         std::vector<int> rotated_families = {3,4,6,7,8,9,10};
-        if (std::find(rotated_families.begin(), rotated_families.end(), family) != rotated_families.end()) {
+        if (is_member(family, rotated_families)) {
             int rotation = get_rotation();
             if (rotation == 90) {
                 family += 20;
