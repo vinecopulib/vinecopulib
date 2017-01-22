@@ -53,15 +53,12 @@ double pmle_objective(const std::vector<double>& x,
     ++newdata->pmle_objective_calls;
     VecXd par = VecXd::Ones(x.size()+1);
     par(0) = newdata->par0;
-    int n = x.size();
-    for (int i=1; i < n; i++)
-    {
-        std::cout << i << std::endl;
-        par(i) = x[i-1];
-    }
+    for (unsigned int i = 0; i < x.size(); ++i)
+        par(i + 1) = x[i];
     newdata->bicop->set_parameters(par);
     double nll = newdata->bicop->loglik(newdata->U);
     nll *= -1;
+    
     return nll;
 }
 
@@ -106,22 +103,23 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 std::vector<double> ub(npars-1);
                 VecXd::Map(&lb[0], npars-1) = bounds.block(1,0,npars-1,1);
                 VecXd::Map(&ub[0], npars-1) = bounds.block(1,1,npars-1,1);
-
+                
                 opt.set_lower_bounds(lb);
                 opt.set_upper_bounds(ub);
-
+                
                 // organize data for nlopt
                 MatXd U = data;
                 ParBicopPMLEData my_pmle_data = {U, this, newpar(0), 0};
-
+                
                 // call to the optimizer
                 opt.set_min_objective(pmle_objective, &my_pmle_data);
-
+                
                 // to store the log-likelihood
                 double nll;
                 // starting value
                 std::vector<double> x = lb;
                 transform(x.begin(), x.end(), x.begin(), bind2nd(std::plus<double>(), 0.1));
+                x[0] = (lb[0] + ub[0]) / 4.0;
                 // optimize function
                 try
                 {
@@ -143,13 +141,11 @@ void ParBicop::fit(const MatXd &data, std::string method)
                     throw std::string("Generic failure. ") + err.what();
                 }
 
-                VecXd parameters = VecXd::Ones(x.size()+1);
+                VecXd parameters = VecXd::Ones(x.size() + 1);
                 parameters(0) = newpar(0);
-                for (int i=1; i < npars-1; i++)
-                {
-                    parameters(i) = x[i-1];
-                }
-
+                for (int i = 0; i < npars-1; ++i)
+                    parameters(i + 1) = x[i];
+                
                 set_parameters(parameters);
             }
         } else if (method.compare("mle") == 0) {
