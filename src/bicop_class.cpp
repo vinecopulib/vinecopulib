@@ -487,11 +487,6 @@ void Bicop::check_rotation(const int& rotation)
         
 }
 
-template<typename T> bool is_member(T element, std::vector<T> set)
-{
-    return std::find(set.begin(), set.end(), element) != set.end();
-}
-
 double correlation(const MatXd& z)
 {
     double rho;
