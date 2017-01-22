@@ -27,7 +27,6 @@ namespace {
     TYPED_TEST(ParBicopTest, bicop_select_mle_bic_is_correct) {
         std::vector<int> rots = {0, 90, 180, 270};
         std::string selection_criterion = "bic";
-        std::string method = "mle";
         std::vector<int> family_set = {};
         this->setup_parameters(rinstance_ptr);
 
@@ -49,7 +48,61 @@ namespace {
                                                family_set,
                                                true,
                                                true,
-                                               method);
+                                               "mle");
+                int selected_family = bicop->get_family();
+                int true_family = this->par_bicop_.get_family();
+                if (true_family == 3 || true_family == 6)
+                {
+                    EXPECT_TRUE(selected_family == 3 || selected_family == 6) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
+                    if (selected_family == true_family)
+                    {
+                        EXPECT_EQ(bicop->get_rotation(), rots[j]);
+                    }
+                    else
+                    {
+                        if (rots[j] < 180)
+                        {
+                            EXPECT_EQ(bicop->get_rotation()-180, rots[j]);
+                        }
+                        else
+                        {
+                            EXPECT_EQ(bicop->get_rotation()+180, rots[j]);
+                        }
+                    }
+                } else
+                {
+                    EXPECT_EQ(selected_family, true_family) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
+                    EXPECT_EQ(bicop->get_rotation(), rots[j]);
+                }
+            }
+        }
+    }
+    
+    TYPED_TEST(ParBicopTest, bicop_select_itau_bic_is_correct) {
+        std::vector<int> rots = {0, 90, 180, 270};
+        std::string selection_criterion = "bic";
+        std::vector<int> family_set = {};
+        this->setup_parameters(rinstance_ptr);
+
+        for (unsigned int j = 0; j < rots.size(); ++j) {
+            if (rots[j] == 0 || rots[j] == 180)
+            {
+                this->set_tau(rinstance_ptr, fabs(this->get_tau(rinstance_ptr)));
+            } else
+            {
+                this->set_tau(rinstance_ptr, (-1)*fabs(this->get_tau(rinstance_ptr)));
+            }
+            this->set_rotation(rinstance_ptr, rots[j]);
+            this->setup_parameters(rinstance_ptr);
+
+            if (this->needs_check_) {
+                MatXd data = this->par_bicop_.simulate(this->get_n(rinstance_ptr));
+                BicopPtr bicop = Bicop::select(data,
+                                               selection_criterion,
+                                               family_set,
+                                               true,
+                                               true,
+                                               "itau");
                 int selected_family = bicop->get_family();
                 int true_family = this->par_bicop_.get_family();
                 if (true_family == 3 || true_family == 6)
