@@ -185,10 +185,10 @@ private:
 
 typedef std::shared_ptr<Bicop> BicopPtr;
 double correlation(const MatXd& z);
-template<typename T> bool is_member(T element, std::vector<T> set);
 std::vector<double> get_c1c2(const MatXd& data, double tau);
 bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless);
-VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, int n_iter = 35);
+VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, const double lb = 1e-20, const double ub = 1-1e-20,
+               int n_iter = 35);
 
 template<typename T> bool is_member(T element, std::vector<T> set) {
     return std::find(set.begin(), set.end(), element) != set.end(); }
