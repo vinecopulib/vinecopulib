@@ -71,8 +71,8 @@ BicopPtr Bicop::select(const MatXd& data,
                      bool preselect_families,
                      std::string method)
 {
-    std::vector<int> all_families = {0, 1, 2, 3, 4, 5, 6};
-    std::vector<int> rotationless_families = {0, 1, 2, 5};
+    std::vector<int> all_families = {0, 1, 2, 3, 4, 5, 6, 1001};
+    std::vector<int> rotationless_families = {0, 1, 2, 5, 1001};
 
     // If the familyset is empty, use all families.
     // If the familyset is not empty, check that all included families are implemented.
