@@ -27,3 +27,12 @@ include(cmake/buildTargets.cmake          REQUIRED)
 include(cmake/printInfo.cmake             REQUIRED)
 
 include(cmake/findDoxygen.cmake           REQUIRED)
+
+
+# generate a header file with git revision id
+if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
+  add_custom_target(git_revision.h
+   git log -1 "--format=format:#define GIT_REVISION \"%H\"%n" HEAD > include/git_revision.h
+   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} VERBATIM
+  )
+endif()
