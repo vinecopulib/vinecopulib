@@ -2,7 +2,7 @@
 
 #include <git_revision.h>
 
-BOOST_PYTHON_MODULE(pyvinecopulib)
+BOOST_PYTHON_MODULE(libpyvinecopulib)
 {
     namespace bp = boost::python;
 

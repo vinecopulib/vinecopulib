@@ -16,13 +16,20 @@ target_include_directories(pyvinecopulib PUBLIC ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(pyvinecopulib ${PYTHON_LIBRARIES})
 
 # informing the Python bindings where to find Boost.Python 
-find_package(Boost 1.63 COMPONENTS python QUIET)
+if (PYTHONLIBS_VERSION_STRING MATCHES "^3\.")
+    set(TMP_BOOST_PYTHON_REQ "python-py35")
+else()
+    set(TMP_BOOST_PYTHON_REQ "python-py27")
+endif()
+find_package(Boost 1.63 COMPONENTS ${TMP_BOOST_PYTHON_REQ} QUIET)
+unset(TMP_BOOST_PYTHON_REQ)
 if (NOT Boost_FOUND)
   message(FATAL_ERROR "
     Boost.Python not found. 
     Please install it (e.g. sudo apt-get install libboost-python-dev).
   ")
 endif()
+message(WARNING "FIXME! You may safely ignore warning the 'No header definder for python-py...' if present! (see https://gitlab.kitware.com/cmake/cmake/issues/16335)")
 target_link_libraries(pyvinecopulib ${Boost_LIBRARIES})
 
 # ... where to find vinecopulib
