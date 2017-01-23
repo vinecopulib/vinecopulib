@@ -20,6 +20,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef VINECOPULIB_BICOP_INTERPOLATION_HPP
 #define VINECOPULIB_BICOP_INTERPOLATION_HPP
 
+#include <exception>
 #include <Eigen/Dense>
 
 typedef Eigen::VectorXd VecXd;

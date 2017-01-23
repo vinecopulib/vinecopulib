@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 
     time("Boost dnorm:", [m]{ auto a = dnorm(m); });
     time("GSL dnorm:  ", [m]{ auto b = dnorm_gsl(m); });
-    time("Boost pnom:", [m]{ auto a = pnorm(m); });
+    time("Boost pnorm:", [m]{ auto a = pnorm(m); });
     time("GSL pnorm:  ", [m]{ auto b = pnorm_gsl(m); });
     time("Boost qnom:", [m]{ auto a = qnorm(m); });
     time("GSL qnorm:  ", [m]{ auto b = qnorm_gsl(m); });
