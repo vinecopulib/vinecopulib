@@ -1,0 +1,2 @@
+import libpyvinecopulib
+print(libpyvinecopulib.git_revision)

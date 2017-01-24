@@ -401,110 +401,25 @@ MatXd Bicop::swap_cols(const MatXd& u)
     return u_swapped;
 }
 
-
 VecXd Bicop::hinv1_num(const MatXd &u)
 {
-    MatXd v = u;
-    VecXd u1 = u.col(1);
-    int j = 0, br = 0, it = 0;
-    double tol = 1e-12, xl = 1e-10, xh = 1-1e-10;
-
-    v.col(1) = xl * VecXd::Ones(u1.size());
-    VecXd fl = (hfunc1(v) - u1).cwiseAbs();
-    v.col(1) = xh * VecXd::Ones(u1.size());
-    VecXd fh = (hfunc1(v) - u1).cwiseAbs();
-    VecXd fm = VecXd::Ones(u1.size());
-
-    for (j = 0; j < u.rows(); ++j)
-    {
-        if (fl(j) <= tol) {
-            v(j, 1) = xl;
-            br = 1;
-        }
-        if (fh(j) <= tol) {
-            v(j, 1) = xh;
-            br = 1;
-        }
-
-        while (!br) {
-            v(j, 1) = (xh + xl) / 2.0;
-            fm(j) = hfunc1_default(v.row(j))(0) - u1(j);
-
-            //stop if values become too close (avoid infinite loop)
-            if (fabs(fm(j)) <= tol) br = 1;
-            if (fabs(xl-xh) <= tol) br = 1;
-
-            if (fm(j) < 0.0) {
-                xl = v(j, 1);
-                fh(j) = fm(j);
-            } else {
-                xh = v(j, 1);
-                fl(j) = fm(j);
-            }
-
-            //stop if too many iterations are required (avoid infinite loop)
-            ++it;
-            if (it > 50) br = 1;
-        }
-        br = 0;
-        it = 0;
-        xl = 1e-10;
-        xh = 1-1e-10;
-    }
-
-    return v.col(1);
+    MatXd u_new = u;
+    auto h1 = [&](const VecXd &v) {
+        u_new.col(1) = v; 
+        return hfunc1_default(u_new);
+    };
+    return invert_f(u.col(1), h1);
 }
-VecXd Bicop::hinv2_num(const MatXd& u)
+
+VecXd Bicop::hinv2_num(const MatXd &u)
 {
-    MatXd v = u;
-    VecXd u1 = u.col(0);
-    int j = 0, br = 0, it = 0;
-    double tol = 1e-12, xl = 1e-10, xh = 1-1e-10;
-
-    v.col(0) = xl * VecXd::Ones(u1.size());
-    VecXd fl = (hfunc2(v) - u1).cwiseAbs();
-    v.col(0) = xh * VecXd::Ones(u1.size());
-    VecXd fh = (hfunc2(v) - u1).cwiseAbs();
-    VecXd fm = VecXd::Ones(u1.size());
-
-    for (j = 0; j < u.rows(); ++j)
-    {
-        if (fl(j) <= tol) {
-            v(j, 0) = xl;
-            br = 1;
-        }
-        if (fh(j) <= tol) {
-            v(j, 0) = xh;
-            br = 1;
-        }
-
-        while (!br) {
-            v(j, 0) = (xh + xl) / 2.0;
-            fm(j) = hfunc2_default(v.row(j))(0) - u1(j);
-
-            //stop if values become too close (avoid infinite loop)
-            if (fabs(fm(j)) <= tol) br = 1;
-            if (fabs(xl-xh) <= tol) br = 1;
-
-            if (fm(j) < 0.0) {
-                xl = v(j,0);
-                fh(j) = fm(j);
-            } else {
-                xh = v(j,0);
-                fl(j) = fm(j);
-            }
-
-            //stop if too many iterations are required (avoid infinite loop)
-            ++it;
-            if (it > 50) br = 1;
-        }
-        br = 0;
-        it = 0;
-        xl = 1e-10;
-        xh = 1-1e-10;
-    }
-
-    return v.col(0);
+    MatXd u_new = u;
+    auto h1 = [&](const VecXd &x) {
+        u_new.col(0) = x; 
+        return hfunc2_default(u_new);
+    };
+    
+    return invert_f(u.col(0), h1);
 }
 
 void Bicop::set_rotation(const int& rotation) {
@@ -650,4 +565,30 @@ bool preselect_family(double c1, double c2, double tau, int family, int rotation
         }
     }
     return preselect;
+}
+
+//! Numerical inversion of a function on [0, 1].
+//! 
+//! Computes the inverse \f$f^{-1}\f$ of a function \f$f\f$ by the bisection 
+//! method.
+//! 
+//! @param x evaluation points.
+//! @param f the function to invert.
+//! @param n_iter the number of iterations for the bisection (defaults to 35,
+//! guaranteeing an accuracy of 0.5^35 ~= 6e-11). 
+//! 
+//! @return f^{-1}(x).
+VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, int n_iter) 
+{
+    VecXd xl = VecXd::Constant(x.size(), 1e-20);
+    VecXd xh = 1.0 - xl.array();
+    VecXd x_tmp = x;
+    for (int iter = 0; iter < n_iter; ++iter) {
+        x_tmp = (xh + xl) / 2.0;
+        VecXd fm = f(x_tmp) - x;
+        xl = (fm.array() < 0).select(x_tmp, xl);
+        xh = (fm.array() < 0).select(xh, x_tmp);
+    }
+
+    return x_tmp;
 }

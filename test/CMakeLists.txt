@@ -1,15 +1,8 @@
-project(Test)
-
-project(Example)
-
-include(CTest)
-enable_testing()
-
 #set(gtest_disable_pthreads on) #needed in MinGW
 include(../cmake/DownloadProject.cmake)
 download_project(
         PROJ                googletest
-        GIT_REPOSITORY      git@github.com:google/googletest.git
+        GIT_REPOSITORY      https://github.com/google/googletest.git
         GIT_TAG             master
         UPDATE_DISCONNECTED 1
 )
@@ -32,3 +25,5 @@ endforeach()
 
 #add_executable(runUnitTests gtest.cpp) #${test_SRCS}
 #target_link_libraries(runUnitTests gtest gmock common ${external_libs} ${test_libs} src_test)#
+
+add_subdirectory(bindings)

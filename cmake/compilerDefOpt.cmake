@@ -10,8 +10,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 set (CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG")
-set (CMAKE_CXX_FLAGS_RELEASE        "-O3") #-Ofast ?
-
+set (CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
 if(WARNINGS_AS_ERRORS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werr")
 endif()
