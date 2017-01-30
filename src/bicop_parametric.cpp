@@ -77,7 +77,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
     if (((tau < 0) & (association_direction.compare("positive") == 0)) |
         ((tau > 0) & (association_direction.compare("negative") == 0)))
     {
-        std::cout << "The data and copula are not compatible." << std::endl;
+        throw std::runtime_error("The data and copula are not compatible.");
     } else
     {
         if (method.compare("itau") == 0)
