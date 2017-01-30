@@ -1,4 +1,4 @@
-add_library(pyvinecopulib SHARED lib.cpp)
+add_library(pyvinecopulib SHARED git_revision.cpp bicop.cpp)
 add_dependencies(pyvinecopulib git_revision.h)
 set_target_properties(pyvinecopulib PROPERTIES SUFFIX ".so") # e.g. Mac defaults to .dylib which is not looked for by Python
 target_link_libraries(pyvinecopulib vinecopulib)
