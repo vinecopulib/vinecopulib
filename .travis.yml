@@ -8,6 +8,7 @@ matrix:
  #        sudo: required
 
 before_install:
+  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo sh -c 'echo "deb https://cloud.r-project.org/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list'; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
