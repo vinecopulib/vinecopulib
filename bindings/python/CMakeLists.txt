@@ -4,6 +4,7 @@ set_target_properties(pyvinecopulib PROPERTIES SUFFIX ".so") # e.g. Mac defaults
 target_link_libraries(pyvinecopulib vinecopulib)
 target_include_directories(pyvinecopulib PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
+
 # informing the Python bindings where to find Python
 find_package(PythonInterp REQUIRED)
 find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
@@ -16,6 +17,12 @@ target_link_libraries(pyvinecopulib ${PYTHON_LIBRARIES})
 find_package(Boost 1.54 COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} QUIET REQUIRED)
 message(WARNING "FIXME! You may safely ignore warning the 'No header definder for python-py...' if present! (see https://gitlab.kitware.com/cmake/cmake/issues/16335)")
 target_link_libraries(pyvinecopulib ${Boost_LIBRARIES})
+target_include_directories(pyvinecopulib PUBLIC ${Boost_INCLUDE_DIRS})
+
+
+# Eigen
+#TODO: find_package() ...
+target_include_directories(pyvinecopulib PUBLIC ${EIGEN3_INCLUDE_DIR})
 
 
 # installation (see http://www.cmake.org/pipermail/cmake/2013-March/054138.html)
