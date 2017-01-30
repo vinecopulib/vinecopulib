@@ -33,7 +33,7 @@ script:
   - mkdir debug
   - cd debug
   - cmake .. -DCMAKE_BUILD_TYPE=Debug && make && make doc
-  - make test
+  - make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
   - cd ../bin
   - ./test_bicop_parametric
   - ./test_bicop_class
@@ -41,7 +41,7 @@ script:
   - ./test_bicop_trafokernel
   - cd ../release
   - cmake .. -DCMAKE_BUILD_TYPE=Release && make && make doc
-  - make test
+  - make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
   - cd ../bin
   - ./test_bicop_parametric
   - ./test_bicop_class
