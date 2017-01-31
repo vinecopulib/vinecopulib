@@ -13,9 +13,8 @@ target_link_libraries(pyvinecopulib ${PYTHON_LIBRARIES})
 
 
 # informing the Python bindings where to find Boost.Python 
-# TODO! NumPy support was introduced in 1.63
-find_package(Boost 1.54 COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} QUIET REQUIRED)
-message(WARNING "FIXME! You may safely ignore warning the 'No header definder for python-py...' if present! (see https://gitlab.kitware.com/cmake/cmake/issues/16335)")
+# NumPy support was introduced in 1.63
+find_package(Boost 1.63 COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} QUIET REQUIRED)
 target_link_libraries(pyvinecopulib ${Boost_LIBRARIES})
 target_include_directories(pyvinecopulib PUBLIC ${Boost_INCLUDE_DIRS})
 
