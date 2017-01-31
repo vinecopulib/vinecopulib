@@ -34,14 +34,17 @@ namespace
         { return this->get_override("hinv2_default")(u); }
     };
 
-    boost::python::numpy::ndarray hello(const boost::python::numpy::ndarray &arr)
-    {
-        return arr;
-    }
+//    boost::python::numpy::ndarray hello(const boost::python::numpy::ndarray &arr)
+//    {
+//        return arr;
+//    }
 }
 
 BOOST_PYTHON_MODULE(libpyvinecopulib)
 {
+//    Py_Initialize();
+//    boost::python::numpy::initialize();
+
     export_git_revision();
 
     boost::python::class_<bicop_wrap, boost::noncopyable>("bicop", boost::python::no_init)
@@ -51,6 +54,6 @@ BOOST_PYTHON_MODULE(libpyvinecopulib)
     ;
 
     // Numpy hellow world
-    boost::python::def("hello", hello);
+//    boost::python::def("hello", hello);
 }
 
