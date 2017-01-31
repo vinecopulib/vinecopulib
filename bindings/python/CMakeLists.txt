@@ -25,6 +25,12 @@ target_include_directories(pyvinecopulib PUBLIC ${Boost_INCLUDE_DIRS})
 target_include_directories(pyvinecopulib PUBLIC ${EIGEN3_INCLUDE_DIR})
 
 
+# ASAN
+if(OPT_ASAN)
+    target_link_libraries(pyvinecopulib debug asan)
+endif()
+
+
 # installation (see http://www.cmake.org/pipermail/cmake/2013-March/054138.html)
 if (NOT PYTHONLIBS_VERSION_STRING EQUAL PYTHON_VERSION_STRING)
     message(FATAL_ERROR "Python libs version (${PYTHONLIBS_VERSION_STRING}) does not match version of the Python interpreter (${PYTHON_VERSION_STRING})")
