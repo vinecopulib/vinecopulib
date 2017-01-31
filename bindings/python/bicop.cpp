@@ -1,5 +1,5 @@
 #include <boost/python.hpp>
-#include <boost/python/numpy.hpp>
+//#include <boost/python/numpy.hpp>
 
 #include <bicop.hpp>
 
