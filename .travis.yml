@@ -17,8 +17,10 @@ before_install:
 install:
   ### LINUX
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y libeigen3-dev libnlopt-dev libgsl0-dev libboost1.63-dev; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y doxygen doxygen-doc doxygen-gui graphviz; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get autoremove; fi # in particular remove old compilers so that new ones are the default
+
 
   ### OSX
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt boost; fi
@@ -26,7 +28,7 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen; fi
 
   ### Common
-  - sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'
+  - sudo Rscript -e 'withCallingHandlers(install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
 
 script:
   - mkdir bin
