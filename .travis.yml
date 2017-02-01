@@ -5,6 +5,7 @@ os:
 #  - os: osx
 
 sudo: required
+dist: trusty
 
 compiler:
   - gcc
