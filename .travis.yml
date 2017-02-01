@@ -1,14 +1,15 @@
-language: cpp
+language: python
 matrix:
   include:
     - os: linux
       dist: trusty
       sudo: required
-      python:
-        - "2.7"
-        - "3.5"
  #   - os: osx
  #        sudo: required
+
+python:
+  - "2.7"
+  - "3.5"
 
 before_install:
   - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
@@ -44,7 +45,7 @@ script:
   - ./test_bicop_class
   - ./test_bicop_select
   - ./test_bicop_trafokernel
-  - cmake .. -DOPT_ASAN=OFF && make
+  - cmake .. -DOPT_ASAN=OFF -DEIGEN3_INCLUDE_DIR=/usr/lib/R/site-library/RcppEigen/include/ -DCMAKE_BUILD_TYPE=Debug && make
   - make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
   - cd ../release
   - cmake .. -DEIGEN3_INCLUDE_DIR=/usr/lib/R/site-library/RcppEigen/include/ -DCMAKE_BUILD_TYPE=Release && make && make doc
