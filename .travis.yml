@@ -16,7 +16,7 @@ before_install:
 
 install:
   ### LINUX
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y libeigen3-dev libnlopt-dev libgsl0-dev libboost1.63-dev libboost-python1.63-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y libnlopt-dev libgsl0-dev libboost1.63-dev libboost-python1.63-dev; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev r-cran-rcppeigen r-cran-rinside g++; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y doxygen doxygen-doc doxygen-gui graphviz; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get autoremove; fi # in particular remove old compilers so that new ones are the default
@@ -35,7 +35,7 @@ script:
   - mkdir release
   - mkdir debug
   - cd debug
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug && make && make doc
+  - cmake .. -DEIGEN3_INCLUDE_DIR=/usr/lib/R/site-library/RcppEigen/include/ -DCMAKE_BUILD_TYPE=Debug && make && make doc
   - make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
   - cd ../bin
   - ./test_bicop_parametric
@@ -43,7 +43,7 @@ script:
   - ./test_bicop_select
   - ./test_bicop_trafokernel
   - cd ../release
-  - cmake .. -DCMAKE_BUILD_TYPE=Release && make && make doc
+  - cmake .. -DEIGEN3_INCLUDE_DIR=/usr/lib/R/site-library/RcppEigen/include/ -DCMAKE_BUILD_TYPE=Release && make && make doc
   - make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
   - cd ../bin
   - ./test_bicop_parametric
