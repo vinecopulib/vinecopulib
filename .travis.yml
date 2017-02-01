@@ -9,15 +9,15 @@ matrix:
 
 before_install:
   - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo sh -c 'echo "deb https://cloud.r-project.org/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list'; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9; fi
+  #- if [ $TRAVIS_OS_NAME == linux ]; then sudo sh -c 'echo "deb https://cloud.r-project.org/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list'; fi
+  #- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ zesty main universe"; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
 
 install:
   ### LINUX
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y libnlopt-dev libgsl0-dev libboost1.63-dev libboost-python1.63-dev; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev g++; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y libeigen3-dev libnlopt-dev libgsl0-dev libboost1.63-dev libboost-python1.63-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev r-cran-rcppeigen g++; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y doxygen doxygen-doc doxygen-gui graphviz; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get autoremove; fi # in particular remove old compilers so that new ones are the default
 
@@ -28,7 +28,7 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen; fi
 
   ### Common
-  - sudo Rscript -e 'withCallingHandlers(install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
+  - sudo Rscript -e 'withCallingHandlers(install.packages(c("VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
 
 script:
   - mkdir bin
