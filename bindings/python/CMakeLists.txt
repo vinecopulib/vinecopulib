@@ -2,10 +2,6 @@ add_library(pyvinecopulib SHARED git_revision.cpp bicop.cpp)
 add_dependencies(pyvinecopulib git_revision.h)
 set_target_properties(pyvinecopulib PROPERTIES SUFFIX ".so") # e.g. Mac defaults to .dylib which is not looked for by Python
 
-# ASAN (must come first! otherwise: "ASan runtime does not come first in initial library list; you should either link runtime to your application or manually preload it with LD_PRELOAD"
-if(OPT_ASAN)
-    target_link_libraries(pyvinecopulib debug asan)
-endif()
 
 target_link_libraries(pyvinecopulib vinecopulib)
 target_include_directories(pyvinecopulib PUBLIC ${CMAKE_SOURCE_DIR}/include)
