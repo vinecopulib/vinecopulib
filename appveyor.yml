@@ -8,7 +8,7 @@ install:
   - ps: Bootstrap #R
   - ps: $env:R_LIBS_USER = 'c:\Program Files\R\R-3.3.2patched\library'
   - travis-tool.sh r_install RcppEigen RInside VineCopula
-  - tree
+  - tree c:\ /A
 
 #TODO: after we get rid of the dependency on R
 #  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
