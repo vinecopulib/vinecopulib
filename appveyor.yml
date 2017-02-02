@@ -8,6 +8,7 @@ install:
   - ps: Bootstrap #R
   - ps: $env:R_LIBS_USER = 'c:\Program Files\R\R-3.3.2patched\library'
   - travis-tool.sh r_install RcppEigen RInside VineCopula
+  - tree
 
 #TODO: after we get rid of the dependency on R
 #  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
@@ -17,7 +18,6 @@ install:
   - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
 
 before_build:
-  - dir "C:/Program Files/R/R-3.3.2patched/library/RcppEigen/include/Eigen/src/Core/util"
   - md build
   - cd build
   - cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\Program Files\R\R-3.3.2patched\library\RcppEigen\include" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt;C:\Program Files\R\R-3.3.2patched\library\Rcpp\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt;C:\Program Files\R\R-3.3.2patched\library\Rcpp\libs" -DCMAKE_PREFIX_PATH="C:\Program Files\R\R-3.3.2patched\"
