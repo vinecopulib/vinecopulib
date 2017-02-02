@@ -4,6 +4,10 @@ init:
         Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
 
+environment:
+  global:
+    USE_RTOOLS: true
+
 install:
   - ps: Bootstrap #R
   - Rscript -e 'withCallingHandlers(install.packages(c("RcppEigen","RInside","VineCopula"), repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
