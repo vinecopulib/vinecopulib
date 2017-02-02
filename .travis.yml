@@ -1,9 +1,9 @@
 language: cpp
 matrix:
   include:
-    - os: linux
-      dist: trusty
-      sudo: required
+#    - os: linux
+#      dist: trusty
+#      sudo: required
     - os: osx
       sudo: required
 
