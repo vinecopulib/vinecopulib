@@ -19,7 +19,7 @@ install:
 before_build:
   - md build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt;C:\R\library\Rcpp\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt;C:\R\library\Rcpp\libs" -DCMAKE_PREFIX_PATH="C:\R" -DR_LIB_ARCH=PATH:x64
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt;C:\R\library\Rcpp\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt;C:\R\library\Rcpp\libs" -DCMAKE_PREFIX_PATH="C:\R" -DR_LIB_ARCH="\x64"
 
 build_script:
   - cmake --build .
