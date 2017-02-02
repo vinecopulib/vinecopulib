@@ -24,8 +24,8 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt; fi
 #  - if [ $TRAVIS_OS_NAME == osx ]; then brew install boost --with-python; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install boost-python; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install cask && brew cask install xquartz && brew install r; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt r; fi
+#  - if [ $TRAVIS_OS_NAME == osx ]; then brew install cask && brew install r; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen; fi
 
   ### Common
