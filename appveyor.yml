@@ -6,8 +6,12 @@ init:
 
 install:
   - ps: Bootstrap #R
+  - Rscript -e 'withCallingHandlers(install.packages(c("RcppEigen","RInside","VineCopula"), repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
+
+
   - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
   - 7z x eigen.zip -o"C:\projects" -y > nul
+
   - ps: wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip -OutFile nlopt.zip
   - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
 
