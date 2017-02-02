@@ -1,4 +1,4 @@
 before_build:
   - cmd: md build
   - cmd: cd build
-  - cmd: cmake .. -DCMAKE_BUILD_TYPE=Release
+  - cmd: cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\Libraries\boost_1_63_0
