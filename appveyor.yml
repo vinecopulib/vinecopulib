@@ -6,10 +6,11 @@ init:
 
 install:
   - ps: Bootstrap #R
-  - travis-tool.sh r_install RcppEigeni RInside VineCopula
+  - travis-tool.sh r_install RcppEigen RInside VineCopula
 
-  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
-  - 7z x eigen.zip -o"C:\projects" -y > nul
+#TODO: after we get rid of the dependency on R
+#  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
+#  - 7z x eigen.zip -o"C:\projects" -y > nul
 
   - ps: wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip -OutFile nlopt.zip
   - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
@@ -17,7 +18,7 @@ install:
 before_build:
   - md build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR=C:\projects\eigen-eigen-da9b4e14c255 -DCMAKE_INCLUDE_PATH=C:\projects\nlopt -DCMAKE_LIBRARY_PATH=C:\projects\nlopt
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR=C:\Program Files\R\R-3.3.2patched\library\RcppEigen\include -DCMAKE_INCLUDE_PATH=C:\projects\nlopt;C:\Program Files\R\R-3.3.2patched\library\Rcpp\include -DCMAKE_LIBRARY_PATH=C:\projects\nlopt;c:\\Program Files\R\R-3.3.2patched\library\Rcpp\libs
 
 build_script:
   - cmake --build .
