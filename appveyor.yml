@@ -16,10 +16,11 @@ install:
 
   - ps: wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip -OutFile nlopt.zip
   - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
-  - move C:\projects\nlopt\libnlopt-0.dll C:\projects\nlopt\libnlopt.dll
-  - move C:\projects\nlopt\libnlopt-0.def C:\projects\nlopt\libnlopt.def
-  - lib /def:C:\projects\nlopt\libnlopt.def
-  - dir C:\projects\nlopt
+  - cd C:\projects\nlopt
+  - move libnlopt-0.dll libnlopt.dll
+  - move libnlopt-0.def libnlopt.def
+  - lib /def:libnlopt.def
+  - cd ..\..
 
 before_build:
   - md build
