@@ -15,12 +15,15 @@ install:
 
   - ps: wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip -OutFile nlopt.zip
   - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
-  - move C:\projects\nlopt\libnlopt-0.dll C:\projects\nlopt\nlopt.dll
+  - lib /def:C:\projects\nlopt\libnlopt-0.def
 
 before_build:
   - md build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt;C:\R\library\Rcpp\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt;C:\R\library\Rcpp\libs" -DCMAKE_PREFIX_PATH="C:\R" -DR_LIB_ARCH="x64"
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="x64"
+#;C:\R\library\Rcpp\include" 
+#;C:\R\library\Rcpp\libs;C:\R\bin\x86" 
+#-DCMAKE_PREFIX_PATH="C:\R" 
 
 build_script:
   - cmake --build .
