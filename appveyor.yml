@@ -1,14 +1,14 @@
 init:
   - cmd: C:/"Program Files (x86)"/"Microsoft Visual Studio 12.0"/VC/vcvarsall.bat
-  - ps: |
-        $ErrorActionPreference = "Stop"
-        Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
-        Import-Module '..\appveyor-tool.ps1'
+##  - ps: |
+##        $ErrorActionPreference = "Stop"
+##        Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
+##        Import-Module '..\appveyor-tool.ps1'
 
 install:
-  - ps: Bootstrap #R
-  - ps: $env:R_LIBS_USER = 'c:\R\library'
-  - travis-tool.sh r_install RcppEigen RInside VineCopula
+##  - ps: Bootstrap #R
+##  - ps: $env:R_LIBS_USER = 'c:\R\library'
+##  - travis-tool.sh r_install RcppEigen RInside VineCopula
 
 #TODO: after we get rid of the dependency on R
 #  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
@@ -19,6 +19,7 @@ install:
   - move C:\projects\nlopt\libnlopt-0.dll C:\projects\nlopt\libnlopt.dll
   - move C:\projects\nlopt\libnlopt-0.def C:\projects\nlopt\libnlopt.def
   - lib /def:C:\projects\nlopt\libnlopt.def
+  - dir C:\projects\nlopt
 
 before_build:
   - md build
