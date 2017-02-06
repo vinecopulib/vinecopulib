@@ -28,7 +28,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <exception>
 #include <cmath>
-#include <algorithm>
+#include <functional>
 
 typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
@@ -186,6 +186,7 @@ typedef std::shared_ptr<Bicop> BicopPtr;
 double correlation(const MatXd& z);
 std::vector<double> get_c1c2(const MatXd& data, double tau);
 bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless);
+VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, int n_iter = 35);
 
 template<typename T> bool is_member(T element, std::vector<T> set)
 {

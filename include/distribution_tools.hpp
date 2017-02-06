@@ -23,45 +23,44 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/distributions.hpp>
-#include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <Eigen/Dense>
 #include <random>
 
 template<typename T> T dnorm(const T& x)
 {
-    boost::math::normal std_normal;
-    return x.unaryExpr(boost::bind<double>(boost::math::pdf<boost::math::normal,double>, std_normal, _1));
+    boost::math::normal dist;
+    return x.unaryExpr([&dist](double y) {return boost::math::pdf(dist, y);});
 };
 
 template<typename T> T pnorm(const T& x)
 {
-    boost::math::normal std_normal;
-    return x.unaryExpr(boost::bind<double>(boost::math::cdf<boost::math::normal,double>, std_normal, _1));
+    boost::math::normal dist;
+    return x.unaryExpr([&dist](double y) {return boost::math::cdf(dist, y);});
 };
 
 template<typename T> T qnorm(const T& x)
 {
-    boost::math::normal std_normal;
-    return x.unaryExpr(boost::bind<double>(boost::math::quantile<boost::math::normal,double>, std_normal, _1));
+    boost::math::normal dist;
+    return x.unaryExpr([&dist](double y) {return boost::math::quantile(dist, y);});
 };
 
 template<typename T> T dt(const T& x, double nu)
 {
     boost::math::students_t dist(nu);
-    return x.unaryExpr(boost::bind<double>(boost::math::pdf<boost::math::students_t,double>, dist, _1));
+    return x.unaryExpr([&dist](double y) {return boost::math::pdf(dist, y);});
 };
 
 template<typename T> T pt(const T& x, double nu)
 {
     boost::math::students_t dist(nu);
-    return x.unaryExpr(boost::bind<double>(boost::math::cdf<boost::math::students_t,double>, dist, _1));
+    return x.unaryExpr([&dist](double y) {return boost::math::cdf(dist, y);});
 };
 
 template<typename T> T qt(const T& x, double nu)
 {
     boost::math::students_t dist(nu);
-    return x.unaryExpr(boost::bind<double>(boost::math::quantile<boost::math::students_t,double>, dist, _1));
+    return x.unaryExpr([&dist](double y) {return boost::math::quantile(dist, y);});
 };
 
 /* A GSL ALTERNATIVE
@@ -98,7 +97,6 @@ template<typename T> T qt(const T& x, double nu)
     auto tquantile = std::bind(gsl_cdf_tdist_Pinv, std::placeholders::_1, nu);
     return x.unaryExpr(std::function<double(double)>(tquantile));
 };*/
-
 
 //! Simulate from the multivariate uniform distribution
 //! 
