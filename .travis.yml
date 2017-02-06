@@ -1,19 +1,24 @@
 language: cpp
 
-os: 
-  - linux
-#  - os: osx
-
-sudo: required
-dist: trusty
-
 compiler:
   - gcc
-#  - clang
+#  - clang TODO!
 
 env:
   - PYTHONVER=2.7 
   - PYTHONVER=3.5
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+    - os: osx
+      sudo: required
+      osx_image: xcode8.2
+  exclude:
+    - os: osx
+    - env: PYTHONVER=3.5 #TODO!
 
 before_install:
   - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
@@ -33,12 +38,17 @@ install:
 
 
   ### OSX
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt boost; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install cask && brew cask install xquartz && brew install r; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt boost-python; fi
+
+  - if [ $TRAVIS_OS_NAME == osx ]; then rm /usr/local/include/c++; fi # https://github.com/Homebrew/brew/issues/1742#issuecomment-277308817
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install r; fi
+
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen graphviz; fi
 
   ### Common
-  - sudo Rscript -e 'withCallingHandlers(install.packages(c("VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
+  - if [ $TRAVIS_OS_NAME == linux ]; then export R_PACKAGES='c("VineCopula")'; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then export R_PACKAGES='c("Rcpp","RInside","RcppEigen","VineCopula")'; fi
+  - sudo Rscript -e 'withCallingHandlers(install.packages('$R_PACKAGES', repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
 
 script:
   - echo $CMAKE_ARGS
