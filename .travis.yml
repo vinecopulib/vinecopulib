@@ -21,10 +21,9 @@ install:
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install doxygen doxygen-doc doxygen-gui graphviz; fi
 
   ### OSX
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt boost-python; fi
 #  - if [ $TRAVIS_OS_NAME == osx ]; then brew install boost --with-python; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install boost-python; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt r; fi
+#  - if [ $TRAVIS_OS_NAME == osx ]; then brew install boost-python; fi
 
   - if [ $TRAVIS_OS_NAME == osx ]; then rm /usr/local/include/c++; fi # https://github.com/Homebrew/brew/issues/1742#issuecomment-277308817
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install r; fi
