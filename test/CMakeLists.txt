@@ -14,6 +14,10 @@ download_project(
         UPDATE_DISCONNECTED 1
 )
 
+#<TEMP>
+if (NOT WIN32)
+#</TEMP>
+
 include_directories(${test_includes} ${external_includes}) #
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 add_subdirectory(src_test)
@@ -32,3 +36,7 @@ endforeach()
 
 #add_executable(runUnitTests gtest.cpp) #${test_SRCS}
 #target_link_libraries(runUnitTests gtest gmock common ${external_libs} ${test_libs} src_test)#
+
+#<TEMP>
+endif()
+#</TEMP>
