@@ -1,7 +1,3 @@
-configuration:
-  - Debug
-  - Release
-
 init:
   - cmd: C:/"Program Files (x86)"/"Microsoft Visual Studio 12.0"/VC/vcvarsall.bat
   - ps: |
@@ -29,10 +25,14 @@ install:
 before_build:
   - md build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="x64"
 
 build_script:
-  - cmake --build . --config %CONFIGURATION%
+  - $env:CMAKE_ARGS: '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="x64"'
 
-test_script:
+  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Debug 
+  - cmake --build .
+  - ctest --output-on-failure 
+
+  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release 
+  - cmake --build .
   - ctest --output-on-failure 
