@@ -1,7 +1,7 @@
 language: cpp
 
-compiler:
-  - gcc
+#compiler:
+#  - gcc
 #  - clang TODO!
 
 sudo: required
@@ -17,6 +17,10 @@ matrix:
     - os: osx
       osx_image: xcode8.2
       env: PYTHONVER=2.7
+  exclude:
+    - os: osx
+      osx_image: xcode8.2
+      env: PYTHONVER=3.5
 
 before_install:
   - false
