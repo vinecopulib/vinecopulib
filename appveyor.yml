@@ -29,14 +29,14 @@ build_script:
 
   - md build-debug
   - cd build-debug
-  - cmake --config Debug .. %CMAKE_ARGS% 
+  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Debug
   - cmake --build .
   - ctest --output-on-failure 
   - cd ..
 
   - md build-release
   - cd build-release
-  - cmake --config Release .. %CMAKE_ARGS% 
+  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release
   - cmake --build .
   - ctest --output-on-failure 
   - cd ..
