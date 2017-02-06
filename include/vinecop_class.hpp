@@ -36,6 +36,8 @@ public:
     VecXd get_parameters(int tree, int edge);
     
     VecXd pdf(const MatXd& u);
+    MatXd simulate(int n);
+    MatXd simulate(int n, const MatXd& U);
     
 private:
     int d_;
@@ -43,5 +45,9 @@ private:
     std::vector<BicopPtr> pair_copulas_;
 };
 
+VecXi invert_order(const VecXi& order);
+// reverse columns and rows of an Eigen::Matrix type object
+template<typename Mat>
+Mat to_upper_tri(Mat A) {return A.rowwise().reverse().colwise().reverse();}
 
 #endif

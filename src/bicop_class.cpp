@@ -324,17 +324,9 @@ VecXd Bicop::hinv2(const MatXd& u)
 
 MatXd Bicop::simulate(const int& n)
 {
-    std::random_device rd;
-    std::default_random_engine generator(rd());
-    std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
-    MatXd U = MatXd::Zero(n, 2);
-    for (int i = 0; i < n; ++i) {
-        U(i, 0) = distribution(generator);
-        U(i, 1) = distribution(generator);
-    }
+    MatXd U = simulate_uniform(n, 2);
+    // use inverse Rosenblatt transform to generate a sample from the copula
     U.col(1) = hinv1(U);
-
     return U;
 }
 
@@ -574,11 +566,6 @@ void Bicop::check_rotation(const int& rotation)
         throw std::runtime_error(message);
     }
         
-}
-
-template<typename T> bool is_member(T element, std::vector<T> set)
-{
-    return std::find(set.begin(), set.end(), element) != set.end();
 }
 
 double correlation(const MatXd& z)
