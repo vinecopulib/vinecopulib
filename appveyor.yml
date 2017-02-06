@@ -20,6 +20,7 @@ install:
   - move C:\projects\nlopt\libnlopt-0.def C:\projects\nlopt\libnlopt.def
   - lib /def:C:\projects\nlopt\libnlopt.def
   - move libnlopt.lib C:\projects\nlopt\
+  - move libnlopt.exp C:\projects\nlopt\
 
 before_build:
   - md build
