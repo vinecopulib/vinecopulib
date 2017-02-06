@@ -26,7 +26,7 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then rm /usr/local/include/c++; fi # https://github.com/Homebrew/brew/issues/1742#issuecomment-277308817
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install r; fi
 
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen graphviz; fi
 
   ### Common
   - sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), repos="http://cran.rstudio.com/")'
