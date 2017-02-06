@@ -16,10 +16,7 @@ matrix:
       env: PYTHONVER=2.7
     - os: osx
       osx_image: xcode8.2
-  exclude:
-    - os: linux
-      dist: trusty
-      env:
+      env: PYTHONVER=2.7
 
 before_install:
   - false
