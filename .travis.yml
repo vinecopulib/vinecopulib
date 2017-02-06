@@ -32,7 +32,8 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen; fi
 
   ### Common
-  - sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'
+#  - sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'
+  - sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), repos="http://cran.rstudio.com/")'
 
 script:
   - mkdir bin
