@@ -22,8 +22,6 @@ install:
   - move nlopt.lib C:\projects\nlopt\
   - move nlopt.exp C:\projects\nlopt\
 
-before_build:
-
 build_script:
   - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="x64"'
 
