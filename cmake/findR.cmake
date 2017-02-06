@@ -104,6 +104,7 @@ if(R_COMMAND)
             DOC "Rlapack library (example libRlapack.a, libRlapack.dylib, etc.).")
 #<TEMP>
 if (WIN32)
+  message(WARNING "Compilation of R-linked tests temporarily disabled for Windows !")
   set(R_LIBRARY_BLAS "")
   set(R_LIBRARY_LAPACK "")
 endif()

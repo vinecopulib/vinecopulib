@@ -38,5 +38,7 @@ endforeach()
 #target_link_libraries(runUnitTests gtest gmock common ${external_libs} ${test_libs} src_test)#
 
 #<TEMP>
+else()
+    message(WARNING "Compilation of tests temporarily disabled for Windows !")
 endif()
 #</TEMP>

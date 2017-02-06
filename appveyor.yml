@@ -1,3 +1,7 @@
+configuration:
+  - Debug
+  - Release
+
 init:
   - cmd: C:/"Program Files (x86)"/"Microsoft Visual Studio 12.0"/VC/vcvarsall.bat
   - ps: |
@@ -26,12 +30,9 @@ before_build:
   - md build
   - cd build
   - cmake .. -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="x64"
-#;C:\R\library\Rcpp\include" 
-#;C:\R\library\Rcpp\libs;C:\R\bin\x86" 
-#-DCMAKE_PREFIX_PATH="C:\R" 
 
 build_script:
-  - cmake --build .
+  - cmake --build . --config %CONFIGURATION%
 
 test_script:
-  - ctest --output-on-failure
+  - ctest --output-on-failure 
