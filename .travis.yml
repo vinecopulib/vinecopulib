@@ -4,21 +4,18 @@ compiler:
   - gcc
 #  - clang TODO!
 
-env:
-  - PYTHONVER=2.7 
-  - PYTHONVER=3.5
+sudo: required
 
 matrix:
   include:
     - os: linux
       dist: trusty
-      sudo: required
+      env: PYTHONVER=3.5
+    - os: linux
+      dist: trusty
+      env: PYTHONVER=2.7
     - os: osx
-      sudo: required
       osx_image: xcode8.2
-  exclude:
-    - os: osx
-    - env: PYTHONVER=3.5 #TODO!
 
 before_install:
   - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
