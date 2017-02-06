@@ -58,10 +58,10 @@ typedef struct
 } ParBicopPMLEData;
 
 double mle_objective(const std::vector<double>& x,
-                    std::vector<double> __attribute__((unused))& grad,
+                    std::vector<double> &,
                     void* data);
 double pmle_objective(const std::vector<double>& x,
-                      std::vector<double> __attribute__((unused))& grad,
+                      std::vector<double> &,
                       void* data);
 
 #endif

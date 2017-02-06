@@ -32,7 +32,7 @@ double ParBicop::calculate_npars()
 
 // the objective function for maximum likelihood estimation
 double mle_objective(const std::vector<double>& x,
-                     std::vector<double> __attribute__((unused))& grad,
+                     std::vector<double> &,
                      void* data)
 {
     ParBicopMLEData* newdata = (ParBicopMLEData*) data;
@@ -46,7 +46,7 @@ double mle_objective(const std::vector<double>& x,
 
 // the objective function for profile maximum likelihood estimation
 double pmle_objective(const std::vector<double>& x,
-                      std::vector<double> __attribute__((unused))& grad,
+                      std::vector<double> &,
                       void* data)
 {
     ParBicopPMLEData* newdata = (ParBicopPMLEData*) data;

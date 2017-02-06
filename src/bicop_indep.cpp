@@ -68,13 +68,13 @@ VecXd IndepBicop::hinv2_default(const MatXd& u)
     return u.col(0);
 }
 
-VecXd IndepBicop::tau_to_parameters(const double __attribute__((unused))& tau)
+VecXd IndepBicop::tau_to_parameters(const double &)
 {
     VecXd pars;
     return pars;
 }
 
-double IndepBicop::parameters_to_tau(const VecXd __attribute__((unused))& parameters)
+double IndepBicop::parameters_to_tau(const VecXd &)
 {
     return 0.0;
 }
