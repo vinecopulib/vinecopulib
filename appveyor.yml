@@ -29,10 +29,10 @@ before_build:
 build_script:
   - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="x64"'
 
-  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Debug 
-  - cmake --build .
-  - ctest --output-on-failure 
+  - cmake --config Debug .. %CMAKE_ARGS% #  -DCMAKE_BUILD_TYPE=Debug 
+  - cmake --config Debug --build .
+  - ctest --config Debug --output-on-failure 
 
-  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release 
-  - cmake --build .
-  - ctest --output-on-failure 
+  - cmake --config Release .. %CMAKE_ARGS% #-DCMAKE_BUILD_TYPE=Release 
+  - cmake --config Release --build .
+  - ctest --config Release --output-on-failure 
