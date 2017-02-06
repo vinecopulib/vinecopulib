@@ -102,6 +102,12 @@ if(R_COMMAND)
     find_library(R_LIBRARY_LAPACK NAMES Rlapack lapack
             HINTS ${R_ROOT_DIR}/lib ${R_ROOT_DIR}/bin/${R_LIB_ARCH}
             DOC "Rlapack library (example libRlapack.a, libRlapack.dylib, etc.).")
+#<TEMP>
+if (WIN32)
+  set(R_LIBRARY_BLAS "")
+  set(R_LIBRARY_LAPACK "")
+endif()
+#</TEMP>
 
     find_library(R_LIBRARY_READLINE readline
             DOC "(Optional) system readline library. Only required if the R libraries were built with readline support.")
