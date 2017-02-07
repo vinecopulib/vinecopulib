@@ -8,12 +8,12 @@ sudo: required
 
 matrix:
   include:
-    - os: linux
-      dist: trusty
-      env: PYTHONVER=3.5
-    - os: linux
-      dist: trusty
-      env: PYTHONVER=2.7
+#    - os: linux
+#      dist: trusty
+#      env: PYTHONVER=3.5
+#    - os: linux
+#      dist: trusty
+#      env: PYTHONVER=2.7
     - os: osx
       osx_image: xcode8.2
       env: PYTHONVER=2.7
@@ -23,7 +23,12 @@ matrix:
       env: PYTHONVER=3.5
 
 before_install:
-  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
+  - if [ $TRAVIS_OS_NAME == linux ]; then export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g"); fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then export PATH=/usr/bin;$PATH; fi
+  - which python 
+  - python --version
+  - false
+
   #- if [ $TRAVIS_OS_NAME == linux ]; then sudo sh -c 'echo "deb https://cloud.r-project.org/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list'; fi
   #- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ zesty main universe"; fi
