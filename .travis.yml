@@ -40,13 +40,8 @@ install:
   - if [ $TRAVIS_OS_NAME == linux ]; then export CMAKE_ARGS="$CMAKE_ARGS -DPYTHON_EXECUTABLE=/usr/bin/python$PYTHONVER -DPYTHON_INCLUDE_DIR=/usr/include/python$PYTHONVER"; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then export CMAKE_ARGS="$CMAKE_ARGS -DEIGEN3_INCLUDE_DIR=/usr/lib/R/site-library/RcppEigen/include/"; fi
 
-
   ### OSX
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt boost-python; fi
-
-  - otool -L /usr/local/opt/boost-python/lib/libboost_python.dylib # /usr/local/Cellar/boost-python/1.63.0/lib/libboost_python.dylib
-  - otool -L /usr/local/opt/boost-python/lib/libboost_numpy.dylib # /usr/local/Cellar/boost-python/1.63.0/lib/libboost_numpy.dylib
-  - false
 
   - if [ $TRAVIS_OS_NAME == osx ]; then rm /usr/local/include/c++; fi # https://github.com/Homebrew/brew/issues/1742#issuecomment-277308817
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install r; fi
@@ -64,7 +59,7 @@ script:
   - mkdir release
   - mkdir debug
   - cd debug
-  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Debug && make && make doc
+  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Debug && VERBOSE=1 make && make doc
   - cd ../bin
   - ./test_bicop_parametric
   - ./test_bicop_class
