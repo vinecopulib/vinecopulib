@@ -24,7 +24,8 @@ matrix:
 
 before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g"); fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then export PATH=/usr/bin;$PATH; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then export PATH=/usr/bin:$PATH; fi
+  - echo $PATH
   - which python 
   - python --version
   - false
