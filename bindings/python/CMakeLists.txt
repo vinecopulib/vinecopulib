@@ -21,8 +21,11 @@ if (APPLE OR WIN32) # Windows & Homebrew convention
 else() # Debian convention
   set(TMP_BOOST_PTHON_COMPONENT "python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 endif()
-find_package(Boost 1.63 COMPONENTS ${TMP_BOOST_PYTHON_COMPONENT} QUIET REQUIRED)
+find_package(Boost 1.63 COMPONENTS ${TMP_BOOST_PYTHON_COMPONENT} REQUIRED)
 unset(TMP_BOOST_PYTHON_COMPONENT)
+#<TEMP!>
+message(${Boost_LIBRARIES})
+#</TEMP!>
 target_link_libraries(pyvinecopulib ${Boost_LIBRARIES})
 target_include_directories(pyvinecopulib PUBLIC ${Boost_INCLUDE_DIRS})
 
