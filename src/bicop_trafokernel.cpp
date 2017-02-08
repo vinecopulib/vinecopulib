@@ -33,7 +33,7 @@ VecXd gaussian_kernel_2d(const MatXd& x)
     return dnorm(x).rowwise().prod();
 }
 
-void TrafokernelBicop::fit(const MatXd& data, __attribute__((unused)) std::string method)
+void TrafokernelBicop::fit(const MatXd& data, std::string)
 {
     // construct default grid (equally spaced on Gaussian scale)
     int m = 30;

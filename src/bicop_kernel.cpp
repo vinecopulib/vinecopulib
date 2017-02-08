@@ -53,7 +53,7 @@ VecXd KernelBicop::hinv2_default(const MatXd& u)
 }
 
 // TODO
-double KernelBicop::parameters_to_tau(const VecXd __attribute__((unused))& parameters)
+double KernelBicop::parameters_to_tau(const VecXd &)
 {
     throw std::runtime_error(
         "parameters_to_tau not yet implemented for kernel estimator"
