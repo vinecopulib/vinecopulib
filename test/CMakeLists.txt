@@ -30,12 +30,10 @@ endforeach()
 #add_executable(runUnitTests gtest.cpp) #${test_SRCS}
 #target_link_libraries(runUnitTests gtest gmock common ${external_libs} ${test_libs} src_test)#
 
-<<<<<<< HEAD
-add_subdirectory(bindings)
-=======
 #<TEMP>
 else()
-    message(WARNING "Compilation of tests temporarily disabled for Windows !")
+    message(WARNING "Compilation of R-related tests temporarily disabled for Windows !")
 endif()
 #</TEMP>
->>>>>>> 332bf6e4aad90c70f03f59cb38aad427681b1036
+
+add_subdirectory(bindings)
