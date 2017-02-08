@@ -8,12 +8,12 @@ sudo: required
 
 matrix:
   include:
-#    - os: linux
-#      dist: trusty
-#      env: PYTHONVER=3.5
-#    - os: linux
-#      dist: trusty
-#      env: PYTHONVER=2.7
+    - os: linux
+      dist: trusty
+      env: PYTHONVER=3.5
+    - os: linux
+      dist: trusty
+      env: PYTHONVER=2.7
     - os: osx
       osx_image: xcode8.2
       env: PYTHONVER=2.7
