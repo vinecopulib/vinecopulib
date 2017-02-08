@@ -39,6 +39,7 @@ install:
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get autoremove; fi # in particular remove old compilers so that new ones are the default
   - if [ $TRAVIS_OS_NAME == linux ]; then export CMAKE_ARGS="$CMAKE_ARGS -DPYTHON_EXECUTABLE=/usr/bin/python$PYTHONVER -DPYTHON_INCLUDE_DIR=/usr/include/python$PYTHONVER"; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then export CMAKE_ARGS="$CMAKE_ARGS -DEIGEN3_INCLUDE_DIR=/usr/lib/R/site-library/RcppEigen/include/"; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then export R_PACKAGES='c("VineCopula")'; fi
 
   ### OSX
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install eigen gsl nlopt boost-python; fi
@@ -47,10 +48,9 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install r; fi
 
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen graphviz; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then export R_PACKAGES='c("Rcpp","RInside","RcppEigen","VineCopula")'; fi
 
   ### Common
-  - if [ $TRAVIS_OS_NAME == linux ]; then export R_PACKAGES='c("VineCopula")'; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then export R_PACKAGES='c("Rcpp","RInside","RcppEigen","VineCopula")'; fi
   - sudo Rscript -e 'withCallingHandlers(install.packages('$R_PACKAGES', repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
 
 script:
