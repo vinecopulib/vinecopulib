@@ -17,15 +17,11 @@ target_link_libraries(pyvinecopulib ${PYTHON_LIBRARIES})
 # informing the Python bindings where to find Boost.Python 
 # NumPy support was introduced in 1.63
 if (APPLE OR WIN32) # Windows & Homebrew convention
-  set(TMP_BOOST_PTHON_COMPONENT "python")
+  set(TMP_BOOST_PYTHON_COMPONENT "python")
 else() # Debian convention
-  set(TMP_BOOST_PTHON_COMPONENT "python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
+  set(TMP_BOOST_PYTHON_COMPONENT "python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 endif()
 find_package(Boost 1.63 COMPONENTS ${TMP_BOOST_PYTHON_COMPONENT} REQUIRED)
-#<TEMP!>
-message(STATUS ${TMP_BOOST_PYTHON_COMPONENT})
-message(STATUS ${Boost_LIBRARIES})
-#</TEMP!>
 unset(TMP_BOOST_PYTHON_COMPONENT)
 target_link_libraries(pyvinecopulib ${Boost_LIBRARIES})
 target_include_directories(pyvinecopulib PUBLIC ${Boost_INCLUDE_DIRS})
