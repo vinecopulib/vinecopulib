@@ -1,0 +1,40 @@
+init:
+  - cmd: C:/"Program Files (x86)"/"Microsoft Visual Studio 12.0"/VC/vcvarsall.bat
+  - ps: |
+        $ErrorActionPreference = "Stop"
+        Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
+        Import-Module '..\appveyor-tool.ps1'
+
+install:
+  - ps: Bootstrap #R
+  - ps: $env:R_LIBS_USER = 'c:\R\library'
+  - travis-tool.sh r_install RcppEigen RInside VineCopula
+
+#TODO: after we get rid of the dependency on R
+#  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
+#  - 7z x eigen.zip -o"C:\projects" -y > nul
+
+  - ps: wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip -OutFile nlopt.zip
+  - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
+  - move C:\projects\nlopt\libnlopt-0.dll C:\projects\nlopt\nlopt.dll
+  - move C:\projects\nlopt\libnlopt-0.def C:\projects\nlopt\nlopt.def
+  - lib /def:C:\projects\nlopt\nlopt.def
+  - move nlopt.lib C:\projects\nlopt\
+  - move nlopt.exp C:\projects\nlopt\
+
+build_script:
+  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="x64"'
+
+  - md build-debug
+  - cd build-debug
+  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Debug
+  - cmake --build .
+  - ctest --output-on-failure 
+  - cd ..
+
+  - md build-release
+  - cd build-release
+  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release
+  - cmake --build .
+  - ctest --output-on-failure 
+  - cd ..
