@@ -17,6 +17,7 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <nlopt.hpp>
 #include "bicop_parametric.hpp"
 
 // calculate number of parameters
