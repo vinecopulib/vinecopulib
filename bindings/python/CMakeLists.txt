@@ -33,9 +33,9 @@ target_include_directories(pyvinecopulib PUBLIC ${EIGEN3_INCLUDE_DIR})
 
 
 # installation (see http://www.cmake.org/pipermail/cmake/2013-March/054138.html)
-if (NOT PYTHONLIBS_VERSION_STRING EQUAL PYTHON_VERSION_STRING)
-    message(FATAL_ERROR "Python libs version (${PYTHONLIBS_VERSION_STRING}) does not match version of the Python interpreter (${PYTHON_VERSION_STRING})")
-endif()
+# <TEMP>
+if (NOT WIN32)
+# </TEMP>
 execute_process (
    COMMAND ${PYTHON_EXECUTABLE} -c
    	"import site, sys; sys.stdout.write(site.PREFIXES[-1])"
@@ -57,3 +57,6 @@ install ( TARGETS pyvinecopulib
      DESTINATION ${PYTHON_SITE_DIR}
      COMPONENT library
 )
+else()
+  message(WARNING "Python package installation temporarily disabled on Windows")
+endif()
