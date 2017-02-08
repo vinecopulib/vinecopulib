@@ -23,7 +23,6 @@ matrix:
       env: PYTHONVER=3.5
 
 before_install:
-  - false
   - if [ $TRAVIS_OS_NAME == linux ]; then export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g"); fi
   - if [ $TRAVIS_OS_NAME == osx ]; then export PATH=/usr/bin:$PATH; fi
 
