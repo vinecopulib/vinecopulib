@@ -22,7 +22,6 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "boost_tools.hpp"
 #include <Eigen/Dense>
-#include <nlopt.hpp>
 #include <random>
 #include <iostream>
 #include <memory>
