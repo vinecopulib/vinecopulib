@@ -3,6 +3,9 @@ add_dependencies(pyvinecopulib git_revision.h)
 if (APPLE)
   set_target_properties(pyvinecopulib PROPERTIES SUFFIX ".so") # defaults to .dylib which is not looked for by Python
 endif()
+if (NOT WIN32)
+  set_target_properties(pyvinecopulib PROPERTIES PREFIX "")
+endif()
 
 
 target_link_libraries(pyvinecopulib vinecopulib)

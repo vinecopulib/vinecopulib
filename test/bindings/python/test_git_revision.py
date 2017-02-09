@@ -1,2 +1,2 @@
-import libpyvinecopulib
-print(libpyvinecopulib.git_revision)
+import pyvinecopulib
+print(pyvinecopulib.git_revision)
