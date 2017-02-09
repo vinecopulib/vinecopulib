@@ -2,6 +2,8 @@ add_library(pyvinecopulib SHARED git_revision.cpp bicop.cpp)
 add_dependencies(pyvinecopulib git_revision.h)
 if (APPLE)
   set_target_properties(pyvinecopulib PROPERTIES SUFFIX ".so") # defaults to .dylib which is not looked for by Python
+elseif (WIN32)
+  set_target_properties(pyvinecopulib PROPERTIES SUFFIX ".pyd") # defaults to .dll which is not looked for by Python
 endif()
 if (NOT WIN32)
   set_target_properties(pyvinecopulib PROPERTIES PREFIX "")
