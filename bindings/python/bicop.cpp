@@ -40,7 +40,7 @@ namespace
 //    }
 }
 
-BOOST_PYTHON_MODULE(libpyvinecopulib)
+BOOST_PYTHON_MODULE(pyvinecopulib)
 {
 //    Py_Initialize();
 //    boost::python::numpy::initialize();
