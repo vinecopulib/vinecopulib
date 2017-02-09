@@ -4,8 +4,11 @@ if (WIN32)
   # https://cmake.org/pipermail/cmake/2010-December/041176.html
   # https://cmake.org/pipermail/cmake-developers/2013-June/019217.html
   find_package(Boost 1.63 COMPONENTS python REQUIRED) #TODO: reuse?
+  find_package(PythonInterp REQUIRED)
+  find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
+  get_filename_component(TMP_PYTHON_LIB_PATH ${PYTHON_LIBRARIES} DIRECTORY)
 
-  set(PATH_STRING "$ENV{PATH};${Boost_LIBRARY_DIRS};${CMAKE_BINARY_DIR}/src/${CMAKE_BUILD_TYPE};${NLOPT_ROOT_DIR}")
+  set(PATH_STRING "$ENV{PATH};${Boost_LIBRARY_DIRS};${CMAKE_BINARY_DIR}/src/${CMAKE_BUILD_TYPE};${NLOPT_ROOT_DIR};${TMP_PYTHON_LIB_PATH}")
   string(REPLACE "\\;" ";" PATH_STRING "${PATH_STRING}")
   string(REPLACE ";" "\\;" PATH_STRING "${PATH_STRING}")
 
