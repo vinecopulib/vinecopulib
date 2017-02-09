@@ -19,11 +19,9 @@ install:
 
   - ps: wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip -OutFile nlopt.zip
   - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
-  - move C:\projects\nlopt\libnlopt-0.dll C:\projects\nlopt\nlopt.dll
-  - move C:\projects\nlopt\libnlopt-0.def C:\projects\nlopt\nlopt.def
   - lib /def:C:\projects\nlopt\nlopt.def
-  - move nlopt.lib C:\projects\nlopt\
-  - move nlopt.exp C:\projects\nlopt\
+  - move libnlopt-0.lib C:\projects\nlopt\
+  - move libnlopt-0.exp C:\projects\nlopt\
 
 build_script:
   - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="x64"'
