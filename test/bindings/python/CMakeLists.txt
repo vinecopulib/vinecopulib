@@ -5,7 +5,7 @@ if (WIN32)
   # https://cmake.org/pipermail/cmake-developers/2013-June/019217.html
   find_package(Boost 1.63 COMPONENTS python REQUIRED) #TODO: reuse?
 
-  set(PATH_STRING "$ENV{PATH};${Boost_LIBRARY_DIRS};${CMAKE_BINARY_DIR}/src/${CMAKE_BUILD_TYPE}")
+  set(PATH_STRING "$ENV{PATH};${Boost_LIBRARY_DIRS};${CMAKE_BINARY_DIR}/src/${CMAKE_BUILD_TYPE};${NLOPT_ROOT_DIR}")
   string(REPLACE "\\;" ";" PATH_STRING "${PATH_STRING}")
   string(REPLACE ";" "\\;" PATH_STRING "${PATH_STRING}")
 
