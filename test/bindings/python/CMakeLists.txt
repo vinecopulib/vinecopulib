@@ -4,8 +4,8 @@ if (WIN32)
   # https://cmake.org/pipermail/cmake/2010-December/041176.html
   # https://cmake.org/pipermail/cmake-developers/2013-June/019217.html
   find_package(Boost 1.63 COMPONENTS python REQUIRED) #TODO: reuse?
-  set_property(TEST python_test_git_revision PROPERTY ENVIRONMENT "PATH=$ENV{PATH};${Boost_LIBRARY_DIRS}")
-  set_property(TEST python_test_git_revision APPEND PROPERTY ENVIRONMENT "PYTHONPATH=$ENV{PYTHONPATH};${CMAKE_BINARY_DIR}/bindings/python/${CMAKE_BUILD_TYPE}")
+  set_property(TEST python_test_git_revision PROPERTY ENVIRONMENT "PATH=$ENV{PATH}\\;${Boost_LIBRARY_DIRS}")
+  set_property(TEST python_test_git_revision APPEND PROPERTY ENVIRONMENT "PYTHONPATH=$ENV{PYTHONPATH}\\;${CMAKE_BINARY_DIR}/bindings/python/${CMAKE_BUILD_TYPE}")
 else()
   set_tests_properties(python_test_git_revision PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/bindings/python${TMP_SFX}")
 endif()
