@@ -1,10 +1,3 @@
-project(Test)
-
-project(Example)
-
-include(CTest)
-enable_testing()
-
 #set(gtest_disable_pthreads on) #needed in MinGW
 include(../cmake/DownloadProject.cmake)
 download_project(
@@ -39,6 +32,8 @@ endforeach()
 
 #<TEMP>
 else()
-    message(WARNING "Compilation of tests temporarily disabled for Windows !")
+    message(WARNING "Compilation of R-related tests temporarily disabled for Windows !")
 endif()
 #</TEMP>
+
+add_subdirectory(bindings)

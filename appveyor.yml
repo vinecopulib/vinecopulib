@@ -1,3 +1,6 @@
+platform: Win32 #TODO: x64
+#TODO: configuration: Debug/Release + same with CMake
+
 init:
   - cmd: C:/"Program Files (x86)"/"Microsoft Visual Studio 12.0"/VC/vcvarsall.bat
   - ps: |
@@ -6,6 +9,9 @@ init:
         Import-Module '..\appveyor-tool.ps1'
 
 install:
+  - choco upgrade cmake # so Boost 1.63 is supported
+  - set path=C:\Program Files\CMake\bin;%path%
+
   - ps: Bootstrap #R
   - ps: $env:R_LIBS_USER = 'c:\R\library'
   - travis-tool.sh r_install RcppEigen RInside VineCopula
@@ -14,16 +20,14 @@ install:
 #  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
 #  - 7z x eigen.zip -o"C:\projects" -y > nul
 
-  - ps: wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip -OutFile nlopt.zip
+  - ps: wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll32.zip -OutFile nlopt.zip
   - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
-  - move C:\projects\nlopt\libnlopt-0.dll C:\projects\nlopt\nlopt.dll
-  - move C:\projects\nlopt\libnlopt-0.def C:\projects\nlopt\nlopt.def
-  - lib /def:C:\projects\nlopt\nlopt.def
-  - move nlopt.lib C:\projects\nlopt\
-  - move nlopt.exp C:\projects\nlopt\
+  - lib /def:C:\projects\nlopt\libnlopt-0.def
+  - move libnlopt-0.lib C:\projects\nlopt\
+  - move libnlopt-0.exp C:\projects\nlopt\
 
 build_script:
-  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="x64"'
+  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="i386"'
 
   - md build-debug
   - cd build-debug
