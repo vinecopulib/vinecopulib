@@ -310,4 +310,18 @@ namespace structselect_tools {
         }
     }
     
+    //! Print the indices for each pair-copula
+    //! @param a vine tree.
+    void print_pc_indices(VineTree& tree) {
+        for (auto e : boost::edges(tree)) {
+            for (auto i : tree[e].conditioning)
+                std::cout << i << " ";
+            std::cout << "| ";
+            for (auto i : tree[e].conditioned)
+                std::cout << i << " ";
+            std::cout << std::endl;
+        } 
+        std::cout << std::endl;
+    }
+    
 }

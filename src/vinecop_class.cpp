@@ -86,6 +86,8 @@ Vinecop::Vinecop(const std::vector<BicopPtr>& pair_copulas, const MatXi& matrix)
 //!     more thanone parameter, the main dependence parameter is found by 
 //!     inverting the Kendall's tau and the remainders by profile likelihood
 //!     optimization.
+//! @param show_trace whether to show a trace of the building progress (default is
+//!     false).
 //! @return The fitted vine copula model.
 Vinecop Vinecop::structure_select(
     const MatXd& data,
@@ -93,7 +95,8 @@ Vinecop Vinecop::structure_select(
     std::vector<int> family_set,
     bool use_rotations,
     bool preselect_families,
-    std::string method
+    std::string method,
+    bool show_trace
 )
 {
     using namespace structselect_tools;
@@ -101,19 +104,26 @@ Vinecop Vinecop::structure_select(
     std::vector<VineTree> trees(d);
     
     trees[0] = make_base_tree(data);
-    trees[1] = select_next_tree(
-        trees[0],
-        selection_criterion,
-        family_set,
-        use_rotations,
-        preselect_families,
-        method
-    );
-    
+    for (int t = 1; t < d; ++t) {
+        trees[t] = select_next_tree(
+            trees[t - 1],
+            selection_criterion,
+            family_set,
+            use_rotations,
+            preselect_families,
+            method
+        );
+        
+        if (show_trace) {
+            std::cout << "Tree " << t - 1 << ":" << std::endl;
+            print_pc_indices(trees[t]);
+        }
+    }
+
+
     Vinecop vinecop(data.cols());
     return vinecop;
 }
-
 
 //! Access to a pair copula
 //! 

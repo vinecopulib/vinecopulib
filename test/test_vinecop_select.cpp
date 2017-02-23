@@ -35,7 +35,15 @@ namespace {
             pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
         Vinecop vinecop(pair_copulas, mat);
         auto u = vinecop.simulate(100);  
-        auto vinecop_fitted = Vinecop::structure_select(u);
+        auto vinecop_fitted = Vinecop::structure_select(
+            u,
+            "bic",                        // selection criterion
+            {0, 1, 2, 3, 4, 5, 6, 1001},  // family set
+            true,                         // allow rotations
+            true,                         // allow pre-selection of families
+            "mle",                        // use mle estimation
+            true                          // show trace
+        );
     }
 }
 

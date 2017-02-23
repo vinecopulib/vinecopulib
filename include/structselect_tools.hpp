@@ -88,6 +88,7 @@ namespace structselect_tools {
         bool preselect_families,
         std::string method
     );
+    void print_pc_indices(VineTree& tree);
 
     // inline/template utility functions ----------------
     template<class T>

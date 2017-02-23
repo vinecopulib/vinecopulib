@@ -36,7 +36,8 @@ public:
         std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
         bool use_rotations = true,
         bool preselect_families = true,
-        std::string method = "mle"
+        std::string method = "mle",
+        bool show_trace = false
     );
 
     BicopPtr get_pair_copula(int tree, int edge);
