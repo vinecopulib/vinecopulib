@@ -76,7 +76,8 @@ Vinecop Vinecop::structure_select(const MatXd& data)
 {
     using namespace structselect_tools;
     int d = data.cols();
-
+    std::vector<VineTree> trees(d);
+    trees[0] = make_base_graph(data);
     
     Vinecop vinecop(data.cols());
     return vinecop;
