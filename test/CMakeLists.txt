@@ -22,7 +22,8 @@ set(unit_tests
         test_bicop_trafokernel
         test_distribution_tools
         test_rvine_matrix
-        test_vinecop_class)
+        test_vinecop_class
+        test_vinecop_select)
         
 foreach(app ${unit_tests})
     add_executable(${app} ${app}.cpp)

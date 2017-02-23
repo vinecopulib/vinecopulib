@@ -29,6 +29,8 @@ public:
     Vinecop() {}
     Vinecop(const int& d);
     Vinecop(const std::vector<BicopPtr>& pair_copulas, const MatXi& matrix);
+    
+    static Vinecop structure_select(const MatXd& data);
 
     BicopPtr get_pair_copula(int tree, int edge);
     int get_family(int tree, int edge);

@@ -18,6 +18,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "include/vinecop_class.hpp"
+#include "include/structselect_tools.hpp"
 
 
 //! Construct a vine copula object of dimension d
@@ -64,6 +65,23 @@ Vinecop::Vinecop(const std::vector<BicopPtr>& pair_copulas, const MatXi& matrix)
     vine_matrix_ = RVineMatrix(matrix);
     pair_copulas_ = pair_copulas;
 }
+
+
+//! Automated model and structure selection for vine copulas
+//! 
+//! Implements the structure selection algorithm of  Dissmann et al. (2013).
+//! 
+//! @param data nxd matrix of copula data.
+Vinecop Vinecop::structure_select(const MatXd& data)
+{
+    using namespace structselect_tools;
+    int d = data.cols();
+
+    
+    Vinecop vinecop(data.cols());
+    return vinecop;
+}
+
 
 //! Access to a pair copula
 //! 
