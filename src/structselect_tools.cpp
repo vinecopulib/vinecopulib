@@ -54,6 +54,54 @@ namespace structselect_tools {
 
         return base_tree;
     }
+    
+    //! Build next tree of the vine
+    //! 
+    //! The next tree is found the following way:
+    //!     1. Edges of the previous tree become edges in the new tree.
+    //!     2. All edges allowed by the proximity condition are added to the new
+    //!        graph.
+    //!     3. Collapse the new graph to a maximum spanning tree for edge weight
+    //!        |tau|.
+    //! 
+    //! @param prev_tree tree T_{k}.
+    //! @param tree T_{k+1}.
+    VineTree build_next_tree(VineTree& prev_tree) 
+    {
+        // edges of old graph become vertices in new graph
+        auto new_tree = edges_as_vertices(prev_tree);
+                
+        return new_tree;
+    }
+    
+    //! Convert edge set into vertex set of a new graph
+    //! 
+    //! Further information about the structure is passed along:
+    //!     - conditioning/conditioned set,
+    //!     - indices of vertices connected by the edge in the previous tree.
+    //! 
+    //! @param tree T_{k}.
+    //! @param A edge-less graph of vertices, each representing one edge of the
+    //! previous tree.
+    VineTree edges_as_vertices(const VineTree& prev_tree) {
+        // start with full graph
+        int d = num_edges(prev_tree);
+        VineTree new_tree(d);
         
+        // cut & paste information from previous tree
+        int i = 0;
+        for (auto e : boost::edges(prev_tree)) {
+            new_tree[i].hfunc1 = prev_tree[e].hfunc1;
+            new_tree[i].hfunc2 = prev_tree[e].hfunc2;
+            new_tree[i].conditioning = prev_tree[e].conditioning;
+            new_tree[i].conditioned = prev_tree[e].conditioned;
+            new_tree[i].prev_edge_indices.reserve(2);
+            new_tree[i].prev_edge_indices.push_back(boost::source(e, prev_tree));
+            new_tree[i].prev_edge_indices.push_back(boost::target(e, prev_tree));
+            ++i;
+        }
+        
+        return new_tree;
+    }
     
 }

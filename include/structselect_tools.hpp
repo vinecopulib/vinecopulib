@@ -64,6 +64,9 @@ namespace structselect_tools {
     
     // functions for manipulation of trees ----------------
     VineTree make_base_tree(const MatXd& data);    
+    VineTree build_next_tree(VineTree& prev_tree);
+    VineTree edges_as_vertices(const VineTree& prev_tree);
+
 
     
     // utility functions ----------------
