@@ -68,9 +68,9 @@ namespace structselect_tools {
     //! @param tree T_{k+1}.
     VineTree build_next_tree(VineTree& prev_tree) 
     {
-        // edges of old graph become vertices in new graph
         auto new_tree = edges_as_vertices(prev_tree);
-                
+        add_allowed_edges(new_tree);
+    
         return new_tree;
     }
     
@@ -103,5 +103,73 @@ namespace structselect_tools {
         
         return new_tree;
     }
+    
+    //! Add edges allowed by the proximity condition
+    //! 
+    //! Also calculates the Kendall's tau for the edge and sets  edge weights
+    //! to 1-|tau| so that the minimum spanning tree algorithm aximizes sum of 
+    //! |tau|.
+    //! 
+    //! @param tree tree of a vine.
+    void add_allowed_edges(VineTree& vine_tree) {
+        for (auto v0 : boost::vertices(vine_tree)) {
+            for (unsigned int v1 = 0; v1 < v0; ++v1) {
+                // check proximity condition: common neighbor in previous tree
+                // (-1 means 'no common neighbor')
+                if (find_common_neighbor(v0, v1, vine_tree) > -1) {
+                    auto pc_data = get_pc_data(v0, v1, vine_tree);
+                    // edge weight is 1 - |tau| 
+                    // -> minimum spanning tree maximizes sum of |tau|
+                    auto w = 1.0 - std::fabs(pairwise_ktau(pc_data));
+                    boost::add_edge(v0, v1, w, vine_tree);
+                }            
+            }
+        }
+    }
+    
+    // Find common neighbor in previous tree
+    // 
+    // @param v0,v1 vertices in the tree.
+    // @param tree the current tree.
+    // @param Gives the index of the vertex in the previous tree that was 
+    // shared by e0, e1, the edge representations of v0, v1.
+    int find_common_neighbor(int v0, int v1, const VineTree& tree) {
+        auto ei0 = tree[v0].prev_edge_indices;
+        auto ei1 = tree[v1].prev_edge_indices;
+        auto ei_common = intersect(ei0, ei1);
+        
+        if (ei_common.size() == 0) 
+            return -1; 
+        else 
+            return ei_common[0];
+    }
+    
+    // Extract pair copula pseudo-observations from h-functions
+    // 
+    // @param v0,v1 vertex indices.
+    // @param tree a vine tree.
+    // @return The pseudo-observations for the pair coula, extracted from
+    // the h-functions calculated in the previous tree.
+    MatXd get_pc_data(int v0, int v1, const VineTree& tree) {
+        int ei_common = find_common_neighbor(v0, v1, tree);
+        int pos0 = find_position(ei_common, tree[v0].prev_edge_indices);
+        int pos1 = find_position(ei_common, tree[v1].prev_edge_indices);
+        
+        int n = std::max(tree[v0].hfunc1.size(), tree[v0].hfunc2.size());
+        MatXd pc_data(n, 2);
+        
+        if (pos0 == 0) {
+            pc_data.col(0) = tree[v0].hfunc1;
+        } else {
+            pc_data.col(0) = tree[v0].hfunc2;
+        }
+        if (pos1 == 0) {
+            pc_data.col(1) = tree[v1].hfunc1;
+        } else {
+            pc_data.col(1) = tree[v1].hfunc2;
+        }
+        
+        return pc_data;
+    }  
     
 }

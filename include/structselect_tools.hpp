@@ -66,10 +66,39 @@ namespace structselect_tools {
     VineTree make_base_tree(const MatXd& data);    
     VineTree build_next_tree(VineTree& prev_tree);
     VineTree edges_as_vertices(const VineTree& prev_tree);
-
-
+    void add_allowed_edges(VineTree& tree);
+    int find_common_neighbor(int v0, int v1, const VineTree& tree);
+    MatXd get_pc_data(int v0, int v1, const VineTree& tree);
     
-    // utility functions ----------------
+    
+
+    // inline/template utility functions ----------------
+    template<class T>
+    std::vector<T> intersect(std::vector<T> x, std::vector<T> y) {
+        std::sort(x.begin(), x.end());
+        std::sort(y.begin(), y.end());
+        std::vector<T> common;
+        std::set_intersection(
+            x.begin(), x.end(),
+            y.begin(), y.end(),
+            std::back_inserter(common)
+        );
+        
+        return common;
+    }
+    
+    template<class T>
+    T find_position(T x, std::vector<T> vec) {
+        return std::distance(vec.begin(), std::find(vec.begin(), vec.end(), x));
+    }
+        
+    inline double pairwise_ktau(MatXd& u) {
+        double tau;
+        int n = u.rows();
+        int two = 2;
+        ktau_matrix(u.data(), &two, &n, &tau);
+        return tau;
+    }
     
 }
 
