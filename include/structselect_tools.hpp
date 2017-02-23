@@ -69,7 +69,7 @@ namespace structselect_tools {
     void add_allowed_edges(VineTree& tree);
     int find_common_neighbor(int v0, int v1, const VineTree& tree);
     MatXd get_pc_data(int v0, int v1, const VineTree& tree);
-    
+    void min_spanning_tree(VineTree &tree);
     
 
     // inline/template utility functions ----------------

@@ -63,6 +63,8 @@ namespace structselect_tools {
     //!        graph.
     //!     3. Collapse the new graph to a maximum spanning tree for edge weight
     //!        |tau|.
+    //!     4. Populate edges with conditioning/conditioned sets and pseudo-
+    //!        observations.
     //! 
     //! @param prev_tree tree T_{k}.
     //! @param tree T_{k+1}.
@@ -70,7 +72,9 @@ namespace structselect_tools {
     {
         auto new_tree = edges_as_vertices(prev_tree);
         add_allowed_edges(new_tree);
-    
+        if (boost::num_vertices(new_tree) > 2)
+            min_spanning_tree(new_tree);
+
         return new_tree;
     }
     
@@ -170,6 +174,25 @@ namespace structselect_tools {
         }
         
         return pc_data;
-    }  
+    }
     
+    //! Collapse a graph to the minimum spanning tree
+    //! 
+    //! @param the input graph.
+    //! @return the input graph with all non-MST edges removed.
+    void min_spanning_tree(VineTree &graph)
+    {
+        int d =  num_vertices(graph);
+        std::vector<int> targets(d);
+        prim_minimum_spanning_tree(graph, targets.data());
+        for (int v1 = 0; v1 < d; ++v1) {
+            for (int v2 = 0; v2 < v1; ++v2) {
+                if ((v2 != targets[v1]) & (v1 != targets[v2])) {
+                    boost::remove_edge(v1, v2, graph);
+                }
+            }
+        }    
+    }
+    
+        
 }
