@@ -1,10 +1,3 @@
-project(Test)
-
-project(Example)
-
-include(CTest)
-enable_testing()
-
 #set(gtest_disable_pthreads on) #needed in MinGW
 include(../cmake/DownloadProject.cmake)
 download_project(
@@ -13,6 +6,10 @@ download_project(
         GIT_TAG             master
         UPDATE_DISCONNECTED 1
 )
+
+#<TEMP>
+if (NOT WIN32)
+#</TEMP>
 
 include_directories(${test_includes} ${external_includes}) #
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
@@ -34,3 +31,11 @@ endforeach()
 
 #add_executable(runUnitTests gtest.cpp) #${test_SRCS}
 #target_link_libraries(runUnitTests gtest gmock common ${external_libs} ${test_libs} src_test)#
+
+#<TEMP>
+else()
+    message(WARNING "Compilation of R-related tests temporarily disabled for Windows !")
+endif()
+#</TEMP>
+
+add_subdirectory(bindings)

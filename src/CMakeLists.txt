@@ -8,3 +8,4 @@ add_library(vinecopulib STATIC
         ${vinecopulib_headers})
 
 target_link_libraries(vinecopulib ${external_libs})
+set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)

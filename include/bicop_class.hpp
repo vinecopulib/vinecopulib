@@ -22,7 +22,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "distribution_tools.hpp"
 #include <Eigen/Dense>
-#include <nlopt.hpp>
+#include <random>
 #include <iostream>
 #include <memory>
 #include <vector>

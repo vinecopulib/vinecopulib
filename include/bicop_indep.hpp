@@ -39,8 +39,8 @@ public:
     VecXd hinv1_default(const MatXd& u);
     VecXd hinv2_default(const MatXd& u);
 
-    VecXd tau_to_parameters(const double __attribute__((unused))& tau);
-    double parameters_to_tau(const VecXd __attribute__((unused))& parameters);
+    VecXd tau_to_parameters(const double &);
+    double parameters_to_tau(const VecXd &);
 };
 
 #endif
