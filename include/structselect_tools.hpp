@@ -23,6 +23,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/graph/graph_utility.hpp>
+#include "rvine_matrix.hpp"
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std
@@ -35,6 +36,36 @@ namespace std
 }
 
 namespace structselect_tools {
+    // boost::graph represenation of a vine tree ----------------
+    struct VertexProperties {
+        std::vector<int> conditioning;
+        std::vector<int> conditioned;
+        std::vector<int> prev_edge_indices;
+        VecXd hfunc1;
+        VecXd hfunc2;
+    };
+    struct EdgeProperties {
+        std::vector<int> conditioning;
+        std::vector<int> conditioned;
+        MatXd pc_data;
+        VecXd hfunc1;
+        VecXd hfunc2;
+        double empirical_tau;
+        BicopPtr pair_copula; 
+    };
+    typedef boost::adjacency_list <
+        boost::vecS,
+        boost::vecS,
+        boost::undirectedS,
+        VertexProperties,
+        boost::property<boost::edge_weight_t, double, EdgeProperties>
+    > VineTree;
+    
+    
+    // functions for manipulation of trees ----------------
+    
+    
+    // utility functions ----------------
     
 }
 
