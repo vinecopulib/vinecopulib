@@ -70,7 +70,7 @@ namespace structselect_tools {
     int find_common_neighbor(int v0, int v1, const VineTree& tree);
     MatXd get_pc_data(int v0, int v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);
-    
+    void add_edge_info(VineTree& tree);
 
     // inline/template utility functions ----------------
     template<class T>
@@ -98,6 +98,27 @@ namespace structselect_tools {
         int two = 2;
         ktau_matrix(u.data(), &two, &n, &tau);
         return tau;
+    }
+    
+    template<class T>
+    std::vector<T> difference(std::vector<T> x, std::vector<T> y) {
+        std::sort(x.begin(), x.end());
+        std::sort(y.begin(), y.end());
+        std::vector<T> different;
+        std::set_difference(
+            x.begin(), x.end(),
+            y.begin(), y.end(),
+            std::back_inserter(different)
+        );
+        
+        return different;
+    } 
+    
+    template<class T>
+    std::vector<T> concatenate(std::vector<T> x, const std::vector<T>& y) {
+        x.reserve(x.size() + y.size());
+        x.insert(x.end(), y.begin(), y.end());
+        return x;
     }
     
 }

@@ -67,14 +67,15 @@ namespace structselect_tools {
     //!        observations.
     //! 
     //! @param prev_tree tree T_{k}.
-    //! @param tree T_{k+1}.
+    //! @return tree T_{k+1}.
     VineTree build_next_tree(VineTree& prev_tree) 
     {
         auto new_tree = edges_as_vertices(prev_tree);
         add_allowed_edges(new_tree);
         if (boost::num_vertices(new_tree) > 2)
             min_spanning_tree(new_tree);
-
+        add_edge_info(new_tree);
+        
         return new_tree;
     }
     
@@ -85,7 +86,7 @@ namespace structselect_tools {
     //!     - indices of vertices connected by the edge in the previous tree.
     //! 
     //! @param tree T_{k}.
-    //! @param A edge-less graph of vertices, each representing one edge of the
+    //! @return A edge-less graph of vertices, each representing one edge of the
     //! previous tree.
     VineTree edges_as_vertices(const VineTree& prev_tree) {
         // start with full graph
@@ -135,7 +136,7 @@ namespace structselect_tools {
     // 
     // @param v0,v1 vertices in the tree.
     // @param tree the current tree.
-    // @param Gives the index of the vertex in the previous tree that was 
+    // @return Gives the index of the vertex in the previous tree that was 
     // shared by e0, e1, the edge representations of v0, v1.
     int find_common_neighbor(int v0, int v1, const VineTree& tree) {
         auto ei0 = tree[v0].prev_edge_indices;
@@ -178,7 +179,7 @@ namespace structselect_tools {
     
     //! Collapse a graph to the minimum spanning tree
     //! 
-    //! @param the input graph.
+    //! @param graph the input graph.
     //! @return the input graph with all non-MST edges removed.
     void min_spanning_tree(VineTree &graph)
     {
@@ -194,5 +195,29 @@ namespace structselect_tools {
         }    
     }
     
+    //! Add conditioning info and data for each edge
+    //! 
+    //! @param tree a vine tree.
+    void add_edge_info(VineTree& tree) {
+        for (auto e : boost::edges(tree)) {
+            // extract vertices connected by this edge
+            auto v0 = boost::source(e, tree);
+            auto v1 = boost::target(e, tree);
+            
+            tree[e].pc_data = get_pc_data(v0, v1, tree);
+            
+            auto v0_indices = tree[v0].conditioning;
+            v0_indices = concatenate(v0_indices, tree[v0].conditioned);
+            auto v1_indices = tree[v1].conditioning;
+            v1_indices = concatenate(v1_indices, tree[v1].conditioned);
+            
+            auto test = intersect(v0_indices, v1_indices);
+            auto d01 = difference(v0_indices, v1_indices);
+            auto d10 = difference(v1_indices, v0_indices);
+            
+            tree[e].conditioning = concatenate(d01, d10);
+            tree[e].conditioned = intersect(v0_indices, v1_indices);
+        }
+    }
         
 }
