@@ -42,16 +42,16 @@ namespace structselect_tools {
             
             // add edge data & info
             base_tree[e].hfunc1 = data.col(boost::target(e, base_tree));
-
+            
             std::vector<int> conditioning(1);
             conditioning[0] = boost::target(e, base_tree);
             base_tree[e].conditioning = conditioning;
-
+            
             std::vector<int> conditioned(0);
             conditioned.reserve(d - 2);
             base_tree[e].conditioned = conditioned;
         }
-
+        
         return base_tree;
     }
     
@@ -71,10 +71,12 @@ namespace structselect_tools {
     VineTree build_next_tree(VineTree& prev_tree) 
     {
         auto new_tree = edges_as_vertices(prev_tree);
+        remove_edge_data(prev_tree); // no longer needed
         add_allowed_edges(new_tree);
         if (boost::num_vertices(new_tree) > 2)
             min_spanning_tree(new_tree);
-        add_edge_info(new_tree);
+        add_edge_info(new_tree);  // for pc estimation and next tree
+        remove_vertex_data(new_tree);  // no longer needed
         
         return new_tree;
     }
@@ -219,5 +221,24 @@ namespace structselect_tools {
             tree[e].conditioned = intersect(v0_indices, v1_indices);
         }
     }
-        
+    
+    //! Remove data (hfunc1/hfunc2/pc_data) from all edges of a vine tree
+    //! @param tree a vine tree.
+    void remove_edge_data(VineTree& tree) {
+        for (auto e : boost::edges(tree)) {
+            tree[e].hfunc1 = VecXd(0);
+            tree[e].hfunc2 = VecXd(0);
+            tree[e].pc_data = MatXd(0, 0);
+        }
+    }
+    
+    //! Remove data (hfunc1/hfunc2/pc_data) from all vertices of a vine tree
+    //! @param tree a vine tr
+    void remove_vertex_data(VineTree& tree) {
+        for (auto v : boost::vertices(tree)) {
+            tree[v].hfunc1 = VecXd(0);
+            tree[v].hfunc2 = VecXd(0);
+        }
+    }
+    
 }

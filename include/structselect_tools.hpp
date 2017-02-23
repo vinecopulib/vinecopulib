@@ -71,6 +71,9 @@ namespace structselect_tools {
     MatXd get_pc_data(int v0, int v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);
     void add_edge_info(VineTree& tree);
+    void remove_edge_data(VineTree& tree);
+    void remove_vertex_data(VineTree& tree);
+
 
     // inline/template utility functions ----------------
     template<class T>
