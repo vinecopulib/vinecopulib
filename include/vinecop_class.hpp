@@ -30,7 +30,14 @@ public:
     Vinecop(const int& d);
     Vinecop(const std::vector<BicopPtr>& pair_copulas, const MatXi& matrix);
     
-    static Vinecop structure_select(const MatXd& data);
+    static Vinecop structure_select(
+        const MatXd& data,
+        std::string selection_criterion = "bic",
+        std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
+        bool use_rotations = true,
+        bool preselect_families = true,
+        std::string method = "mle"
+    );
 
     BicopPtr get_pair_copula(int tree, int edge);
     int get_family(int tree, int edge);

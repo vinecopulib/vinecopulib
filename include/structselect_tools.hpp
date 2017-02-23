@@ -64,7 +64,14 @@ namespace structselect_tools {
     
     // functions for manipulation of trees ----------------
     VineTree make_base_tree(const MatXd& data);    
-    VineTree build_next_tree(VineTree& prev_tree);
+    VineTree select_next_tree(
+        VineTree& prev_tree,
+        std::string selection_criterion,
+        std::vector<int> family_set,
+        bool use_rotations,
+        bool preselect_families,
+        std::string method
+    );
     VineTree edges_as_vertices(const VineTree& prev_tree);
     void add_allowed_edges(VineTree& tree);
     int find_common_neighbor(int v0, int v1, const VineTree& tree);
@@ -73,7 +80,14 @@ namespace structselect_tools {
     void add_edge_info(VineTree& tree);
     void remove_edge_data(VineTree& tree);
     void remove_vertex_data(VineTree& tree);
-
+    void select_pair_copulas(
+        VineTree& tree,
+        std::string selection_criterion,
+        std::vector<int> family_set,
+        bool use_rotations,
+        bool preselect_families,
+        std::string method
+    );
 
     // inline/template utility functions ----------------
     template<class T>

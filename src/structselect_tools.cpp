@@ -55,7 +55,7 @@ namespace structselect_tools {
         return base_tree;
     }
     
-    //! Build next tree of the vine
+    //! Select and fit next tree of the vine
     //! 
     //! The next tree is found the following way:
     //!     1. Edges of the previous tree become edges in the new tree.
@@ -65,10 +65,32 @@ namespace structselect_tools {
     //!        |tau|.
     //!     4. Populate edges with conditioning/conditioned sets and pseudo-
     //!        observations.
+    //!     5. Fit and select a copula model for each edge.
     //! 
     //! @param prev_tree tree T_{k}.
+    //! @param selection_criterion the selection criterion; either "aic" or "bic"
+    //!     (default).
+    //! @param family_set the set of copula families to consider (if empty, then 
+    //!     all families are included; all families are included by default).
+    //! @param use_rotations whether rotations in the familyset are included 
+    //!     (default is true)..
+    //! @param preselect_families whether to exclude families before fitting based 
+    //!     on symmetry properties of the data (default is true).
+    //! @param method indicates the estimation method: either maximum likelihood 
+    //!     estimation (method = "mle", default) or inversion of Kendall's tau 
+    //!     (method = "itau"). When method = "itau" is used with families having 
+    //!     more thanone parameter, the main dependence parameter is found by 
+    //!     inverting the Kendall's tau and the remainders by profile likelihood
+    //!     optimization.
     //! @return tree T_{k+1}.
-    VineTree build_next_tree(VineTree& prev_tree) 
+    VineTree select_next_tree(
+        VineTree& prev_tree,
+        std::string selection_criterion,
+        std::vector<int> family_set,
+        bool use_rotations,
+        bool preselect_families,
+        std::string method
+    ) 
     {
         auto new_tree = edges_as_vertices(prev_tree);
         remove_edge_data(prev_tree); // no longer needed
@@ -77,6 +99,14 @@ namespace structselect_tools {
             min_spanning_tree(new_tree);
         add_edge_info(new_tree);  // for pc estimation and next tree
         remove_vertex_data(new_tree);  // no longer needed
+        select_pair_copulas(
+            new_tree,
+            selection_criterion,
+            family_set,
+            use_rotations,
+            preselect_families,
+            method
+        );
         
         return new_tree;
     }
@@ -233,11 +263,50 @@ namespace structselect_tools {
     }
     
     //! Remove data (hfunc1/hfunc2/pc_data) from all vertices of a vine tree
-    //! @param tree a vine tr
+    //! @param tree a vine tree.
     void remove_vertex_data(VineTree& tree) {
         for (auto v : boost::vertices(tree)) {
             tree[v].hfunc1 = VecXd(0);
             tree[v].hfunc2 = VecXd(0);
+        }
+    }
+    
+    //! Fit and select a pair copula for each edges
+    //! @param tree a vine tree preprocessed with add_edge_info().
+    //! @param selection_criterion the selection criterion; either "aic" or "bic"
+    //!     (default).
+    //! @param family_set the set of copula families to consider (if empty, then 
+    //!     all families are included; all families are included by default).
+    //! @param use_rotations whether rotations in the familyset are included 
+    //!     (default is true)..
+    //! @param preselect_families whether to exclude families before fitting based 
+    //!     on symmetry properties of the data (default is true).
+    //! @param method indicates the estimation method: either maximum likelihood 
+    //!     estimation (method = "mle", default) or inversion of Kendall's tau 
+    //!     (method = "itau"). When method = "itau" is used with families having 
+    //!     more thanone parameter, the main dependence parameter is found by 
+    //!     inverting the Kendall's tau and the remainders by profile likelihood
+    //!     optimization.
+    void select_pair_copulas(
+        VineTree& tree,
+        std::string selection_criterion,
+        std::vector<int> family_set,
+        bool use_rotations,
+        bool preselect_families,
+        std::string method
+    )
+    {
+        for (auto e : boost::edges(tree)) {
+            tree[e].pair_copula = Bicop::select(
+                tree[e].pc_data,
+                selection_criterion,
+                family_set,
+                use_rotations,
+                preselect_families,
+                method
+            );
+            tree[e].hfunc1 = tree[e].pair_copula->hfunc1(tree[e].pc_data);
+            tree[e].hfunc2 = tree[e].pair_copula->hfunc2(tree[e].pc_data);
         }
     }
     

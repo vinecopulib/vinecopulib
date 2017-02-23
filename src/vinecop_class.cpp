@@ -72,15 +72,44 @@ Vinecop::Vinecop(const std::vector<BicopPtr>& pair_copulas, const MatXi& matrix)
 //! Implements the structure selection algorithm of  Dissmann et al. (2013).
 //! 
 //! @param data nxd matrix of copula data.
-Vinecop Vinecop::structure_select(const MatXd& data)
+//! @param selection_criterion the selection criterion; either "aic" or "bic"
+//!     (default).
+//! @param family_set the set of copula families to consider (if empty, then 
+//!     all families are included; all families are included by default).
+//! @param use_rotations whether rotations in the familyset are included 
+//!     (default is true)..
+//! @param preselect_families whether to exclude families before fitting based 
+//!     on symmetry properties of the data (default is true).
+//! @param method indicates the estimation method: either maximum likelihood 
+//!     estimation (method = "mle", default) or inversion of Kendall's tau 
+//!     (method = "itau"). When method = "itau" is used with families having 
+//!     more thanone parameter, the main dependence parameter is found by 
+//!     inverting the Kendall's tau and the remainders by profile likelihood
+//!     optimization.
+//! @return The fitted vine copula model.
+Vinecop Vinecop::structure_select(
+    const MatXd& data,
+    std::string selection_criterion,
+    std::vector<int> family_set,
+    bool use_rotations,
+    bool preselect_families,
+    std::string method
+)
 {
     using namespace structselect_tools;
     int d = data.cols();
     std::vector<VineTree> trees(d);
     
     trees[0] = make_base_tree(data);
-    trees[1] = build_next_tree(trees[0]);
-
+    trees[1] = select_next_tree(
+        trees[0],
+        selection_criterion,
+        family_set,
+        use_rotations,
+        preselect_families,
+        method
+    );
+    
     Vinecop vinecop(data.cols());
     return vinecop;
 }
