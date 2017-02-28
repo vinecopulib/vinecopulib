@@ -31,12 +31,15 @@ namespace {
                2, 5, 2, 5, 2, 0, 0,
                6, 6, 1, 2, 5, 5, 0,
                5, 2, 6, 6, 6, 6, 6;
-        std::vector<BicopPtr> pair_copulas(28);
-        for (auto& pc : pair_copulas)
-            pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
+        std::vector<std::vector<BicopPtr>> pair_copulas = Vinecop::make_pc_store(7);
+        for (auto& tree : pair_copulas) {
+            for (auto& pc : tree) {
+                pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
+            }
+        }
         Vinecop vinecop_parametrized(pair_copulas, mat);
     }
-    
+
     TEST(vinecop_class, pdf_is_correct) {
         MatXi mat(7, 7);
         mat << 4, 0, 0, 0, 0, 0, 0,
@@ -46,9 +49,12 @@ namespace {
                2, 5, 2, 5, 2, 0, 0,
                6, 6, 1, 2, 5, 5, 0,
                5, 2, 6, 6, 6, 6, 6;
-        std::vector<BicopPtr> pair_copulas(28);
-        for (auto& pc : pair_copulas)
-            pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
+        auto pair_copulas = Vinecop::make_pc_store(7);
+        for (auto& tree : pair_copulas) {
+            for (auto& pc : tree) {
+                pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
+            }
+        }
         MatXd u(10, 7);
         u << 0.72, 0.82, 0.18, 0.39, 0.64, 0.27, 0.56,
              0.57, 0.25, 0.98, 0.54, 0.44, 0.66, 0.28,
@@ -67,7 +73,7 @@ namespace {
         Vinecop vinecop(pair_copulas, mat);
         ASSERT_TRUE(vinecop.pdf(u).isApprox(true_pdf, 1e-4));
     }
-    
+
     TEST(vinecop_class, simulate_is_correct) {
         MatXi mat(7, 7);
         mat << 4, 0, 0, 0, 0, 0, 0,
@@ -77,9 +83,12 @@ namespace {
                2, 5, 2, 5, 2, 0, 0,
                6, 6, 1, 2, 5, 5, 0,
                5, 2, 6, 6, 6, 6, 6;
-        std::vector<BicopPtr> pair_copulas(28);
-        for (auto& pc : pair_copulas)
-            pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
+        auto pair_copulas = Vinecop::make_pc_store(7);
+        for (auto& tree : pair_copulas) {
+            for (auto& pc : tree) {
+                pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
+            }
+        }
         MatXd u(10, 7);
         u << 0.72, 0.82, 0.18, 0.39, 0.64, 0.27, 0.56,
              0.57, 0.25, 0.98, 0.54, 0.44, 0.66, 0.28,
@@ -92,7 +101,7 @@ namespace {
              0.57, 0.75, 0.23, 0.38, 0.69, 0.32, 0.90,
              0.82, 0.54, 0.59, 0.55, 0.76, 0.33, 0.56;
         MatXd true_u_vine(10, 7);
-        true_u_vine << 
+        true_u_vine <<
             0.5720, 0.7735, 0.1908, 0.1934, 0.7908, 0.27, 0.8243,
             0.4855, 0.3551, 0.8866, 0.6051, 0.3534, 0.66, 0.2731,
             0.2429, 0.3015, 0.6500, 0.8856, 0.1905, 0.77, 0.2519,
@@ -105,7 +114,7 @@ namespace {
             0.7884, 0.5439, 0.4865, 0.1503, 0.8282, 0.33, 0.5378;
         Vinecop vinecop(pair_copulas, mat);
         vinecop.simulate(10);  // only check if it works
-        ASSERT_TRUE(vinecop.simulate(10, u).isApprox(true_u_vine, 1e-4));  
+        ASSERT_TRUE(vinecop.simulate(10, u).isApprox(true_u_vine, 1e-4));
     }
 }
 
