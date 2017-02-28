@@ -66,7 +66,7 @@ double pmle_objective(const std::vector<double>& x,
 // fit
 void ParBicop::fit(const MatXd &data, std::string method)
 {
-    int npars = calculate_npars();
+    int npars = (int) calculate_npars();
     int n = data.rows();
     int d = 2;
     double tau = 0.0;
@@ -96,7 +96,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 opt.set_xtol_abs(1e-3);
                 opt.set_ftol_rel(1e-2);
                 opt.set_ftol_abs(1e-2);
-                opt.set_maxeval(1e3);
+                opt.set_maxeval((int) 1e3);
 
                 // Set bounds
                 MatXd bounds = get_parameters_bounds();
@@ -158,7 +158,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 opt.set_xtol_abs(1e-3);
                 opt.set_ftol_rel(1e-2);
                 opt.set_ftol_abs(1e-2);
-                opt.set_maxeval(1e3);
+                opt.set_maxeval((int) 1e3);
 
                 // Set bounds
                 MatXd bounds = get_parameters_bounds();
