@@ -256,8 +256,8 @@ namespace structselect_tools {
     //! @param tree a vine tree.
     void remove_edge_data(VineTree& tree) {
         for (auto e : boost::edges(tree)) {
-            tree[e].hfunc1 = VecXd(0);
-            tree[e].hfunc2 = VecXd(0);
+            tree[e].hfunc1 = VecXd();
+            tree[e].hfunc2 = VecXd();
             tree[e].pc_data = MatXd(0, 0);
         }
     }
@@ -266,8 +266,8 @@ namespace structselect_tools {
     //! @param tree a vine tree.
     void remove_vertex_data(VineTree& tree) {
         for (auto v : boost::vertices(tree)) {
-            tree[v].hfunc1 = VecXd(0);
-            tree[v].hfunc2 = VecXd(0);
+            tree[v].hfunc1 = VecXd();
+            tree[v].hfunc2 = VecXd();
         }
     }
     
