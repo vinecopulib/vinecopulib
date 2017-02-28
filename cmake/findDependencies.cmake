@@ -2,7 +2,7 @@
 #set(Boost_USE_MULTITHREADED ON)
 #set(Boost_USE_STATIC_RUNTIME OFF)
 
-find_package(Boost REQUIRED)
+find_package(Boost 1.55 REQUIRED)
 
 set(external_includes ${GSL_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} ${NLOPT_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
 
