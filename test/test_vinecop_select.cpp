@@ -20,7 +20,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include "gtest/gtest.h"
 #include "include/vinecop_class.hpp"
 
-namespace {    
+namespace {
     TEST(vinecop_class, select) {
         MatXi mat(7, 7);
         mat << 4, 0, 0, 0, 0, 0, 0,
@@ -30,20 +30,26 @@ namespace {
                2, 5, 2, 5, 2, 0, 0,
                6, 6, 1, 2, 5, 5, 0,
                5, 2, 6, 6, 6, 6, 6;
-        std::vector<BicopPtr> pair_copulas(28);
-        for (auto& pc : pair_copulas)
-            pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
+        auto pair_copulas = Vinecop::make_pc_store(7);
+        for (auto& tree : pair_copulas) {
+           for (auto& pc : tree) {
+               pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
+           }
+        }
         Vinecop vinecop(pair_copulas, mat);
-        auto u = vinecop.simulate(100);  
+        auto u = vinecop.simulate(100);
         auto vinecop_fitted = Vinecop::structure_select(
             u,
-            "bic",                        // selection criterion
-            {0, 1, 2, 3, 4, 5, 6, 1001},  // family set
-            true,                         // allow rotations
-            true,                         // allow pre-selection of families
-            "mle",                        // use mle estimation
-            true                          // show trace
+            {0, 1, 2, 3, 4, 5, 6},   // family set
+            "mle",                   // use mle estimation
+            "bic",                   // selection criterion
+            true                     // show trace
         );
+        std::cout << vinecop_fitted.get_matrix() << std::endl;
+        // for (int t = 0; t < 6; ++t)
+        //     for (int e = 0; e < 6 - t; ++e)
+        //         std::cout << vinecop_fitted.get_family(t, e) <<
+        //         " " << vinecop_fitted.get_rotation(t, e) << std::endl;
     }
 }
 

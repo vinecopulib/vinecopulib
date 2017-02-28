@@ -23,14 +23,14 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/graph/graph_utility.hpp>
-#include "rvine_matrix.hpp"
+#include "vinecop_class.hpp"
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std
 {
     template <class T>
     T begin(const std::pair<T,T>& eItPair) { return eItPair.first; }
-    
+
     template <class T>
     T end(const std::pair<T,T>& eItPair) { return eItPair.second; }
 }
@@ -47,11 +47,12 @@ namespace structselect_tools {
     struct EdgeProperties {
         std::vector<int> conditioning;
         std::vector<int> conditioned;
+        std::vector<int> all_indices;
         MatXd pc_data;
         VecXd hfunc1;
         VecXd hfunc2;
         double empirical_tau;
-        BicopPtr pair_copula; 
+        BicopPtr pair_copula;
     };
     typedef boost::adjacency_list <
         boost::vecS,
@@ -60,16 +61,14 @@ namespace structselect_tools {
         VertexProperties,
         boost::property<boost::edge_weight_t, double, EdgeProperties>
     > VineTree;
-    
-    
+
+
     // functions for manipulation of trees ----------------
-    VineTree make_base_tree(const MatXd& data);    
+    VineTree make_base_tree(const MatXd& data);
     VineTree select_next_tree(
         VineTree& prev_tree,
-        std::string selection_criterion,
         std::vector<int> family_set,
-        bool use_rotations,
-        bool preselect_families,
+        std::string selection_criterion,
         std::string method
     );
     VineTree edges_as_vertices(const VineTree& prev_tree);
@@ -82,17 +81,23 @@ namespace structselect_tools {
     void remove_vertex_data(VineTree& tree);
     void select_pair_copulas(
         VineTree& tree,
-        std::string selection_criterion,
         std::vector<int> family_set,
-        bool use_rotations,
-        bool preselect_families,
-        std::string method
+        std::string method,
+        std::string selection_criterion
     );
-    void print_pc_indices(VineTree& tree);
+    Vinecop as_vinecop(const std::vector<VineTree>& trees);
+
+    void print_pair_copulas(VineTree& tree);
+    std::string get_pc_index(
+        boost::graph_traits<VineTree>::edge_descriptor e,
+        VineTree& tree
+    );
+
 
     // inline/template utility functions ----------------
     template<class T>
-    std::vector<T> intersect(std::vector<T> x, std::vector<T> y) {
+    std::vector<T> intersect(std::vector<T> x, std::vector<T> y)
+    {
         std::sort(x.begin(), x.end());
         std::sort(y.begin(), y.end());
         std::vector<T> common;
@@ -101,25 +106,28 @@ namespace structselect_tools {
             y.begin(), y.end(),
             std::back_inserter(common)
         );
-        
+
         return common;
     }
-    
+
     template<class T>
-    T find_position(T x, std::vector<T> vec) {
+    T find_position(T x, std::vector<T> vec)
+    {
         return std::distance(vec.begin(), std::find(vec.begin(), vec.end(), x));
     }
-        
-    inline double pairwise_ktau(MatXd& u) {
+
+    inline double pairwise_ktau(MatXd& u)
+    {
         double tau;
         int n = u.rows();
         int two = 2;
         ktau_matrix(u.data(), &two, &n, &tau);
         return tau;
     }
-    
+
     template<class T>
-    std::vector<T> difference(std::vector<T> x, std::vector<T> y) {
+    std::vector<T> difference(std::vector<T> x, std::vector<T> y)
+    {
         std::sort(x.begin(), x.end());
         std::sort(y.begin(), y.end());
         std::vector<T> different;
@@ -128,17 +136,41 @@ namespace structselect_tools {
             y.begin(), y.end(),
             std::back_inserter(different)
         );
-        
+
         return different;
-    } 
-    
+    }
+
     template<class T>
-    std::vector<T> concatenate(std::vector<T> x, const std::vector<T>& y) {
+    std::vector<T> cat(std::vector<T> x, const std::vector<T>& y)
+    {
         x.reserve(x.size() + y.size());
         x.insert(x.end(), y.begin(), y.end());
         return x;
     }
-    
+
+    template<class T>
+    std::vector<T> cat(T x, const std::vector<T>& y)
+    {
+        std::vector<T> out(1);
+        out[0] = x;
+        out.reserve(1 + y.size());
+        out.insert(out.end(), y.begin(), y.end());
+        return out;
+    }
+
+    template<class T>
+    void reverse(std::vector<T>& x)
+    {
+        std::reverse(x.begin(), x.end());
+    }
+
+    template<class T>
+    bool is_same_set(std::vector<T> x, std::vector<T> y)
+    {
+        auto z = intersect(x, y);
+        return ((z.size() == x.size()) & (z.size() == y.size()));
+    }
+
 }
 
 

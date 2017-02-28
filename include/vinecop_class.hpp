@@ -27,16 +27,18 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 class Vinecop {
 public:
     Vinecop() {}
-    Vinecop(const int& d);
-    Vinecop(const std::vector<BicopPtr>& pair_copulas, const MatXi& matrix);
-    
+    Vinecop(int d);
+    Vinecop(
+        const std::vector<std::vector<BicopPtr>>& pair_copulas,
+        const MatXi& matrix
+    );
+
+    static std::vector<std::vector<BicopPtr>> make_pc_store(int d);
     static Vinecop structure_select(
         const MatXd& data,
-        std::string selection_criterion = "bic",
         std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
-        bool use_rotations = true,
-        bool preselect_families = true,
         std::string method = "mle",
+        std::string selection_criterion = "bic",
         bool show_trace = false
     );
 
@@ -44,15 +46,16 @@ public:
     int get_family(int tree, int edge);
     int get_rotation(int tree, int edge);
     VecXd get_parameters(int tree, int edge);
-    
+    MatXi get_matrix() {return vine_matrix_.get_matrix();}
+
     VecXd pdf(const MatXd& u);
     MatXd simulate(int n);
     MatXd simulate(int n, const MatXd& U);
-    
+
 private:
     int d_;
     RVineMatrix vine_matrix_;
-    std::vector<BicopPtr> pair_copulas_;
+    std::vector<std::vector<BicopPtr>> pair_copulas_;
 };
 
 VecXi invert_order(const VecXi& order);
