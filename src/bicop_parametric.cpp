@@ -172,7 +172,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
 
                 // rotate copula and data
                 int rotation = get_rotation();
-                MatXd U = rotate_u(data);
+                MatXd U = cut_and_rotate(data);
                 set_rotation(0);
 
                 // organize data for nlopt

@@ -20,7 +20,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef VINECOPULIB_BICOP_CLASS_HPP
 #define VINECOPULIB_BICOP_CLASS_HPP
 
-#include "boost_tools.hpp"
+#include "distribution_tools.hpp"
 #include <Eigen/Dense>
 #include <random>
 #include <iostream>
@@ -164,7 +164,7 @@ protected:
     //! Data manipulations for rotated families
     //!
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
-    MatXd rotate_u(const MatXd& u);
+    MatXd cut_and_rotate(const MatXd& u);
     MatXd swap_cols(const MatXd& u);
 
     int family_;
@@ -184,9 +184,12 @@ private:
 
 typedef std::shared_ptr<Bicop> BicopPtr;
 double correlation(const MatXd& z);
-template<typename T> bool is_member(T element, std::vector<T> set);
 std::vector<double> get_c1c2(const MatXd& data, double tau);
 bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless);
 VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, int n_iter = 35);
 
+template<typename T> bool is_member(T element, std::vector<T> set)
+{
+    return std::find(set.begin(), set.end(), element) != set.end();
+}
 #endif
