@@ -43,3 +43,8 @@ VecXd EllipticalBicop::tau_to_parameters(const double& tau)
     parameters(0) = sin(tau * M_PI / 2);
     return parameters;
 }
+
+void EllipticalBicop::flip()
+{
+    // nothing to do because elliptical copulas are radially syemmetric
+}

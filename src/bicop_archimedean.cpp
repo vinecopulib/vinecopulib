@@ -58,3 +58,12 @@ VecXd ArchimedeanBicop::hinv2_default(const MatXd& u)
 {
     return hinv(swap_cols(u));
 }
+
+void ArchimedeanBicop::flip()
+{
+    if (rotation_ == 90) {
+        set_rotation(270);
+    } else if (rotation_ == 270) {
+        set_rotation(90);
+    }
+}
