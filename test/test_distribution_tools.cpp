@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "include/boost_tools.hpp"
+#include "include/distribution_tools.hpp"
 #include <gsl/gsl_cdf.h>
 #include <gsl/gsl_randist.h>
 #include <Eigen/Dense>
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 
     time("Boost dnorm:", [m]{ auto a = dnorm(m); });
     time("GSL dnorm:  ", [m]{ auto b = dnorm_gsl(m); });
-    time("Boost pnorm:", [m]{ auto a = pnorm(m); });
+    time("Boost pnom:", [m]{ auto a = pnorm(m); });
     time("GSL pnorm:  ", [m]{ auto b = pnorm_gsl(m); });
     time("Boost qnom:", [m]{ auto a = qnorm(m); });
     time("GSL qnorm:  ", [m]{ auto b = qnorm_gsl(m); });

@@ -230,10 +230,7 @@ std::vector<double> get_c1c2(const MatXd& data, double tau)
 
 VecXd Bicop::pdf(const MatXd& u)
 {
-    if (rotation_ == 0)
-        return pdf_default(u);
-    else
-        return pdf_default(rotate_u(u));
+    return pdf_default(cut_and_rotate(u));
 }
 
 
@@ -241,16 +238,16 @@ VecXd Bicop::hfunc1(const MatXd& u)
 {
     switch (rotation_) {
         case 0:
-            return hfunc1_default(u);
+            return hfunc1_default(cut_and_rotate(u));
 
         case 90:
-            return hfunc2_default(rotate_u(u));
+            return hfunc2_default(cut_and_rotate(u));
 
         case 180:
-            return 1.0 - hfunc1_default(rotate_u(u)).array();
+            return 1.0 - hfunc1_default(cut_and_rotate(u)).array();
 
         case 270:
-            return 1.0 - hfunc2_default(rotate_u(u)).array();
+            return 1.0 - hfunc2_default(cut_and_rotate(u)).array();
 
         default:
             throw std::runtime_error(std::string(
@@ -263,16 +260,16 @@ VecXd Bicop::hfunc2(const MatXd& u)
 {
     switch (rotation_) {
         case 0:
-            return hfunc2_default(u);
+            return hfunc2_default(cut_and_rotate(u));
 
         case 90:
-            return 1.0 - hfunc1_default(rotate_u(u)).array();
+            return 1.0 - hfunc1_default(cut_and_rotate(u)).array();
 
         case 180:
-            return 1.0 - hfunc2_default(rotate_u(u)).array();
+            return 1.0 - hfunc2_default(cut_and_rotate(u)).array();
 
         case 270:
-            return hfunc1_default(rotate_u(u));
+            return hfunc1_default(cut_and_rotate(u));
 
         default:
             throw std::runtime_error(std::string(
@@ -285,16 +282,16 @@ VecXd Bicop::hinv1(const MatXd& u)
 {
     switch (rotation_) {
         case 0:
-            return hinv1_default(u);
+            return hinv1_default(cut_and_rotate(u));
 
         case 90:
-            return hinv2_default(rotate_u(u));
+            return hinv2_default(cut_and_rotate(u));
 
         case 180:
-            return 1.0 - hinv1_default(rotate_u(u)).array();
+            return 1.0 - hinv1_default(cut_and_rotate(u)).array();
 
         case 270:
-            return 1.0 - hinv2_default(rotate_u(u)).array();
+            return 1.0 - hinv2_default(cut_and_rotate(u)).array();
 
         default:
             throw std::runtime_error(std::string(
@@ -307,16 +304,16 @@ VecXd Bicop::hinv2(const MatXd& u)
 {
     switch (rotation_) {
         case 0:
-            return hinv2_default(u);
+            return hinv2_default(cut_and_rotate(u));
 
         case 90:
-            return 1.0 - hinv1_default(rotate_u(u)).array();
+            return 1.0 - hinv1_default(cut_and_rotate(u)).array();
 
         case 180:
-            return 1.0 - hinv2_default(rotate_u(u)).array();
+            return 1.0 - hinv2_default(cut_and_rotate(u)).array();
 
         case 270:
-            return hinv1_default(rotate_u(u));
+            return hinv1_default(cut_and_rotate(u));
 
         default:
             throw std::runtime_error(std::string(
@@ -327,17 +324,9 @@ VecXd Bicop::hinv2(const MatXd& u)
 
 MatXd Bicop::simulate(const int& n)
 {
-    std::random_device rd;
-    std::default_random_engine generator(rd());
-    std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
-    MatXd U = MatXd::Zero(n, 2);
-    for (int i = 0; i < n; ++i) {
-        U(i, 0) = distribution(generator);
-        U(i, 1) = distribution(generator);
-    }
+    MatXd U = simulate_uniform(n, 2);
+    // use inverse Rosenblatt transform to generate a sample from the copula
     U.col(1) = hinv1(U);
-
     return U;
 }
 
@@ -366,33 +355,40 @@ double Bicop::calculate_tau()
     return 999.0;
 }
 
-MatXd Bicop::rotate_u(const MatXd& u)
+MatXd Bicop::cut_and_rotate(const MatXd& u)
 {
-    MatXd u_rotated(u.rows(), u.cols());
+    MatXd u_new(u.rows(), 2);
+    
     // counter-clockwise rotations
     switch (rotation_) {
         case 0:
-            u_rotated = u;
+            u_new = u;
             break;
 
         case 90:
-            u_rotated.col(0) = u.col(1);
-            u_rotated.col(1) = 1.0 - u.col(0).array();
+            u_new.col(0) = u.col(1);
+            u_new.col(1) = 1.0 - u.col(0).array();
             break;
 
         case 180:
-            u_rotated.col(0) = 1.0 - u.col(0).array();
-            u_rotated.col(1) = 1.0 - u.col(1).array();
+            u_new.col(0) = 1.0 - u.col(0).array();
+            u_new.col(1) = 1.0 - u.col(1).array();
             break;
 
         case 270:
-            u_rotated.col(0) = 1.0 - u.col(1).array();
-            u_rotated.col(1) = u.col(0);
+            u_new.col(0) = 1.0 - u.col(1).array();
+            u_new.col(1) = u.col(0);
             break;
     }
+    
+    // truncate to interval [eps, 1 - eps]
+    MatXd eps = MatXd::Constant(u.rows(), 2, 1e-20);
+    u_new = u_new.array().min(1.0 - eps.array());
+    u_new = u_new.array().max(eps.array());
 
-    return u_rotated;
+    return u_new;
 }
+
 
 MatXd Bicop::swap_cols(const MatXd& u)
 {
@@ -485,11 +481,6 @@ void Bicop::check_rotation(const int& rotation)
         throw std::runtime_error(message);
     }
         
-}
-
-template<typename T> bool is_member(T element, std::vector<T> set)
-{
-    return std::find(set.begin(), set.end(), element) != set.end();
 }
 
 double correlation(const MatXd& z)
