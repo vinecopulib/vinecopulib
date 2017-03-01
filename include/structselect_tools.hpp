@@ -86,7 +86,7 @@ namespace structselect_tools {
         std::string selection_criterion
     );
     Vinecop as_vinecop(const std::vector<VineTree>& trees);
-
+    void flip(BicopPtr& bicop);
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(
         boost::graph_traits<VineTree>::edge_descriptor e,

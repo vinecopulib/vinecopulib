@@ -37,7 +37,7 @@ namespace {
            }
         }
         Vinecop vinecop(pair_copulas, mat);
-        auto u = vinecop.simulate(100);
+        auto u = vinecop.simulate(1000);
         auto vinecop_fitted = Vinecop::structure_select(
             u,
             {0, 1, 2, 3, 4, 5, 6},   // family set
@@ -45,11 +45,27 @@ namespace {
             "bic",                   // selection criterion
             true                     // show trace
         );
-        std::cout << vinecop_fitted.get_matrix() << std::endl;
-        // for (int t = 0; t < 6; ++t)
-        //     for (int e = 0; e < 6 - t; ++e)
-        //         std::cout << vinecop_fitted.get_family(t, e) <<
-        //         " " << vinecop_fitted.get_rotation(t, e) << std::endl;
+        auto mat2 = vinecop_fitted.get_matrix();
+        std::cout << mat2 << std::endl;
+        for (int t = 0; t < 6; ++t) {
+            std::cout << "Tree " << t << ":" << std::endl;
+            for (int e = 0; e < 6 - t; ++e) {
+                std::cout << mat2(6 - t, e) << "," <<
+                    mat2(e, e);
+                if (t > 0)
+                    std::cout << " ; ";
+                for (int r = 7 - t; r < 7; ++r) {
+                    std::cout << mat2(r, e);
+                    if (r < 7 - 1)
+                        std::cout << ",";
+                }
+                std::cout << " <-> " <<
+                "fam = " << vinecop_fitted.get_family(t, e) << ", " <<
+                "rot = " << vinecop_fitted.get_rotation(t, e) << ", " <<
+                "par = " << vinecop_fitted.get_parameters(t, e) << std::endl;
+            }
+
+        }
     }
 }
 

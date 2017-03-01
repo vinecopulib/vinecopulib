@@ -24,7 +24,7 @@ set(unit_tests
         test_rvine_matrix
         test_vinecop_class
         test_vinecop_select)
-        
+
 foreach(app ${unit_tests})
     add_executable(${app} ${app}.cpp)
     target_link_libraries(${app} gtest gmock vinecopulib ${external_libs} ${test_libs} src_test)

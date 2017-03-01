@@ -133,7 +133,7 @@ namespace structselect_tools {
 
     //! Add edges allowed by the proximity condition
     //!
-    //! Also calculates the Kendall's tau for the edge and sets  edge weights
+    //! Also calculates the Kendall's tau for the edge and sets edge weights
     //! to 1-|tau| so that the minimum spanning tree algorithm maximizes sum of
     //! |tau|.
     //!
@@ -146,8 +146,6 @@ namespace structselect_tools {
                 // (-1 means 'no common neighbor')
                 if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                     auto pc_data = get_pc_data(v0, v1, vine_tree);
-                    // edge weight is 1 - |tau|
-                    // -> minimum spanning tree maximizes sum of |tau|
                     auto w = 1.0 - std::fabs(pairwise_ktau(pc_data));
                     boost::add_edge(v0, v1, w, vine_tree);
                 }
@@ -224,10 +222,8 @@ namespace structselect_tools {
     void add_edge_info(VineTree& tree)
     {
         for (auto e : boost::edges(tree)) {
-            // extract vertices connected by this edge
             auto v0 = boost::source(e, tree);
             auto v1 = boost::target(e, tree);
-
             tree[e].pc_data = get_pc_data(v0, v1, tree);
 
             auto v0_indices = cat(tree[v0].conditioning, tree[v0].conditioned);
@@ -318,6 +314,7 @@ namespace structselect_tools {
             // assign fitted pair copula to appropriate entry, see
             // Vinecop::get_pair_copula().
             pcs[t - 1][d - t - 1] = trees[t][e0].pair_copula;
+            pcs[t - 1][d - t - 1]->flip();
 
             // initialize running set with full conditioing set of this edge
             auto ned_set = trees[t][e0].conditioned;
@@ -333,15 +330,8 @@ namespace structselect_tools {
                         auto e_new = trees[t - k][e];
                         auto pos = find_position(mat(t, t), e_new.conditioning);
                         mat(t - k - 1, t) = e_new.conditioning[std::abs(1 - pos)];
-                        if (pos == 0) {
-                            reverse(e_new.conditioning);
-                            switch(e_new.pair_copula->get_rotation()) {
-                                case 90:
-                                    e_new.pair_copula->set_rotation(270);
-                                case 270:
-                                    e_new.pair_copula->set_rotation(90);
-                            }
-                        }
+                        if (pos == 0)
+                            e_new.pair_copula->flip();
                         // assign fitted pair copula to appropriate entry, see
                         // Vinecop::get_pair_copula().
                         pcs[t - 1 - k][d - 1 - t] = e_new.pair_copula;

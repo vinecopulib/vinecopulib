@@ -287,7 +287,6 @@ VecXd Vinecop::pdf(const MatXd& u)
 MatXd Vinecop::simulate(int n)
 {
     MatXd U = simulate_uniform(n, d_);
-    // call simulation algorithm
     return simulate(n, U);
 }
 
