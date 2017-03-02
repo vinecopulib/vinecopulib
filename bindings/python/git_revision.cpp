@@ -1,6 +1,5 @@
 #include <boost/python.hpp>
 #include <git_revision.h>
-#include "git_revision.hpp"
 
 void export_git_revision()
 {

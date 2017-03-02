@@ -1,59 +1,48 @@
 #include <boost/python.hpp>
 //#include <boost/python/numpy.hpp>
 
-#include <bicop.hpp>
-
-#include "git_revision.hpp"
+#include <bicop_class.hpp>
 
 namespace 
 {
-    struct bicop_wrap : Bicop, boost::python::wrapper<Bicop>
+    struct bicop_wrap
     {
-        void fit(const MatXd &data, std::string method) 
-        { this->get_override("fit")(data, method); }
+        BicopPtr bicop;
 
-        double calculate_npars() 
-        { return this->get_override("calculate_npars")(); }
+        bicop_wrap(const int& family, const boost::python::object& parameters, const int& rotation)
+        {
+            bicop = Bicop::create(family, boost::python::extract<VecXd>(parameters)(), rotation);
+        }
 
-        double parameters_to_tau(const VecXd& parameters) 
-        { return this->get_override("parametrs_to_tau")(parameters); }
+        bicop_wrap(const int& family, const int& rotation)
+        {
+            bicop = Bicop::create(family, rotation);
+        }
 
-        VecXd pdf_default(const MatXd& u)    
-        { return this->get_override("pdf_default")(u); }
+        int get_family() 
+        { 
+            return bicop->get_family(); 
+        }
 
-        VecXd hfunc1_default(const MatXd& u) 
-        { return this->get_override("hfunc1_default")(u); }
+        int get_rotation() 
+        { 
+            return bicop->get_rotation(); 
+        }
 
-        VecXd hfunc2_default(const MatXd& u) 
-        { return this->get_override("hfunc2_default")(u); }
-
-        VecXd hinv1_default(const MatXd& u)  
-        { return this->get_override("hinv1_default")(u); }
-
-        VecXd hinv2_default(const MatXd& u)  
-        { return this->get_override("hinv2_default")(u); }
+        VecXd get_parameters() 
+        {
+            return bicop->get_parameters();
+        }
     };
-
-//    boost::python::numpy::ndarray hello(const boost::python::numpy::ndarray &arr)
-//    {
-//        return arr;
-//    }
 }
 
-BOOST_PYTHON_MODULE(pyvinecopulib)
+void export_bicop_class()
 {
-//    Py_Initialize();
-//    boost::python::numpy::initialize();
-
-    export_git_revision();
-
     boost::python::class_<bicop_wrap, boost::noncopyable>("bicop", boost::python::no_init)
-        .add_property("rotation", &Bicop::get_rotation, &Bicop::set_rotation)
-        .add_property("parameters", &Bicop::get_parameters, &Bicop::set_parameters)
-        .add_property("family", &Bicop::get_family)
+        .def(boost::python::init<int, int>())
+        .def(boost::python::init<int, boost::python::object, int>())
+        .add_property("rotation", &bicop_wrap::get_rotation)
+        .add_property("parameters", &bicop_wrap::get_parameters)
+        .add_property("family", &bicop_wrap::get_family)
     ;
-
-    // Numpy hellow world
-//    boost::python::def("hello", hello);
 }
-
