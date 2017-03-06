@@ -83,3 +83,8 @@ VecXd GaussBicop::hinv1_default(const MatXd& u)
     hinv = tmp.col(1) * sqrt(1.0 - pow(rho, 2.0)) + rho * tmp.col(0);
     return pnorm(hinv);
 }
+
+VecXd GaussBicop::get_start_parameters(const double tau)
+{
+    return tau_to_parameters(tau);
+}

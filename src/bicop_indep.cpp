@@ -78,3 +78,8 @@ double IndepBicop::parameters_to_tau(const VecXd __attribute__((unused))& parame
 {
     return 0.0;
 }
+
+VecXd IndepBicop::get_start_parameters(const double tau)
+{
+    return tau_to_parameters(tau);
+}

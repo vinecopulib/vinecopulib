@@ -35,6 +35,9 @@ public:
 
     // number of parameters
     double calculate_npars();
+
+private:
+    virtual VecXd get_start_parameters(const double tau) = 0;
 };
 
 

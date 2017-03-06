@@ -43,6 +43,8 @@ public:
     VecXd tau_to_parameters(const double& tau);
     double parameters_to_tau(const VecXd& par);
 
+private:
+    VecXd get_start_parameters(const double tau);
 };
 
 #endif

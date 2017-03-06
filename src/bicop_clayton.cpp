@@ -107,3 +107,8 @@ double ClaytonBicop::parameters_to_tau(const VecXd& parameters)
         tau *= -1;
     return tau;
 }
+
+VecXd ClaytonBicop::get_start_parameters(const double tau)
+{
+    return tau_to_parameters(tau);
+}

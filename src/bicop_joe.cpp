@@ -18,7 +18,6 @@
  */
 
 #include "bicop_joe.hpp"
-#include <cmath>
 
 // constructor
 JoeBicop::JoeBicop()
@@ -175,4 +174,9 @@ double qcondjoe(double* q, double* u, double* de)
         while((v<=0 || v>=1 || fabs(diff)>0.25) & (iter2 <20)) {++iter2; diff/=2.; v+=diff; }
     }
     return(v);
+}
+
+VecXd JoeBicop::get_start_parameters(const double tau)
+{
+    return tau_to_parameters(tau);
 }

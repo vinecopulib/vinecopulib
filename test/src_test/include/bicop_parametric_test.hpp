@@ -65,13 +65,7 @@ public:
         // whether checks need to be done
         needs_check_ = true;
         std::vector<int> rotation_less_fams = {0, 1, 2, 5};
-        bool is_rotless = (
-            std::find(
-                rotation_less_fams.begin(),
-                rotation_less_fams.end(),
-                this->par_bicop_.get_family()
-            )  != rotation_less_fams.end()
-        );
+        bool is_rotless = is_member(this->par_bicop_.get_family(), rotation_less_fams);
         if (is_rotless)
             needs_check_ = (rinstance_ptr->get_rotation() == 0);
     }
@@ -82,7 +76,8 @@ protected:
 };
 
 // Create a list of types, each of which will be used as the test fixture's 'T'
-typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop> ParBicopTypes;
+//typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop, Bb1Bicop> ParBicopTypes;
+typedef ::testing::Types<Bb1Bicop> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);
 
 #endif

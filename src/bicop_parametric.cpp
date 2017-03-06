@@ -41,6 +41,9 @@ double mle_objective(const std::vector<double>& x,
     newdata->bicop->set_parameters(par);
     double nll = newdata->bicop->loglik(newdata->U);
     nll *= -1;
+    //std::cout << "------" << std::endl;
+    //std::cout << nll << std::endl;
+    //std::cout << newdata->bicop->get_parameters() << std::endl;
     return nll;
 }
 
@@ -71,7 +74,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
     double tau = 0.0;
     MatXd newdata = data;
     ktau_matrix(newdata.data(), &d, &n, &tau);
-    VecXd newpar = tau_to_parameters(tau);
+    VecXd newpar = get_start_parameters(tau);
 
     std::string association_direction = get_association_direction();
     if (((tau < 0) & (association_direction.compare("positive") == 0)) |
@@ -82,19 +85,14 @@ void ParBicop::fit(const MatXd &data, std::string method)
     {
         if (method.compare("itau") == 0)
         {
-            if (npars == 1)
-            {
-                set_parameters(newpar);
-            }
-
             if (npars > 1)
             {
                 // Derivatives free optimization
                 nlopt::opt opt(nlopt::LN_BOBYQA, npars - 1);
-                opt.set_xtol_rel(1e-2);
-                opt.set_xtol_abs(1e-3);
-                opt.set_ftol_rel(1e-2);
-                opt.set_ftol_abs(1e-2);
+                opt.set_xtol_rel(1e-6);
+                opt.set_xtol_abs(1e-6);
+                opt.set_ftol_rel(1e-6);
+                opt.set_ftol_abs(1e-6);
                 opt.set_maxeval(1e3);
 
                 // Set bounds
@@ -117,9 +115,8 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 // to store the log-likelihood
                 double nll;
                 // starting value
-                std::vector<double> x = lb;
-                transform(x.begin(), x.end(), x.begin(), bind2nd(std::plus<double>(), 0.1));
-                x[0] = (lb[0] + ub[0]) / 4.0;
+                std::vector<double> x(npars-1);
+                VecXd::Map(&x[0], npars-1) = newpar.block(1,0,npars-1,1);
                 // optimize function
                 try
                 {
@@ -141,22 +138,20 @@ void ParBicop::fit(const MatXd &data, std::string method)
                     throw std::string("Generic failure. ") + err.what();
                 }
 
-                VecXd parameters = VecXd::Ones(x.size() + 1);
-                parameters(0) = newpar(0);
                 for (int i = 0; i < npars-1; ++i)
-                    parameters(i + 1) = x[i];
-                
-                set_parameters(parameters);
+                    newpar(i + 1) = x[i];
             }
+
+            set_parameters(newpar);
         } else if (method.compare("mle") == 0) {
             if (npars != 0)
             {
                 // Derivatives free optimization
                 nlopt::opt opt(nlopt::LN_BOBYQA, npars);
-                opt.set_xtol_rel(1e-3);
-                opt.set_xtol_abs(1e-3);
-                opt.set_ftol_rel(1e-2);
-                opt.set_ftol_abs(1e-2);
+                opt.set_xtol_rel(1e-6);
+                opt.set_xtol_abs(1e-6);
+                opt.set_ftol_rel(1e-6);
+                opt.set_ftol_abs(1e-6);
                 opt.set_maxeval(1e3);
 
                 // Set bounds
@@ -182,10 +177,8 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 // to store the log-likelihood
                 double nll;
                 // starting value
-                std::vector<double> x = lb;
-                transform(x.begin(), x.end(), x.begin(), bind2nd(std::plus<double>(), 0.1));
-                x[0] = newpar(0);
-                // optimize function
+                std::vector<double> x(npars);
+                VecXd::Map(&x[0], npars) = newpar;
                 try
                 {
                     opt.optimize(x, nll);

@@ -146,3 +146,8 @@ double qcondgum(double* q, double* u, double* de)
     z2=pow(pow(a,*de)-pow(z1,*de),1./(*de));
     return(exp(-z2));
 }
+
+VecXd GumbelBicop::get_start_parameters(const double tau)
+{
+    return tau_to_parameters(tau);
+}
