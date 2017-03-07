@@ -191,9 +191,4 @@ VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, const doubl
 
 template<typename T> bool is_member(T element, std::vector<T> set) {
     return std::find(set.begin(), set.end(), element) != set.end(); }
-
-template<typename T> bool is_member(T element, std::vector<T> set)
-{
-    return std::find(set.begin(), set.end(), element) != set.end();
-}
 #endif
