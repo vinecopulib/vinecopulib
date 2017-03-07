@@ -1,10 +1,3 @@
-project(Test)
-
-project(Example)
-
-include(CTest)
-enable_testing()
-
 #set(gtest_disable_pthreads on) #needed in MinGW
 include(../cmake/DownloadProject.cmake)
 download_project(
@@ -13,6 +6,10 @@ download_project(
         GIT_TAG             master
         UPDATE_DISCONNECTED 1
 )
+
+#<TEMP>
+if (NOT WIN32)
+#</TEMP>
 
 include_directories(${test_includes} ${external_includes}) #
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
@@ -23,7 +20,9 @@ set(unit_tests
         test_bicop_class
         test_bicop_select
         test_bicop_trafokernel
-        test_boost_tools)
+        test_distribution_tools
+        test_rvine_matrix
+        test_vinecop_class)
         
 foreach(app ${unit_tests})
     add_executable(${app} ${app}.cpp)
@@ -32,3 +31,11 @@ endforeach()
 
 #add_executable(runUnitTests gtest.cpp) #${test_SRCS}
 #target_link_libraries(runUnitTests gtest gmock common ${external_libs} ${test_libs} src_test)#
+
+#<TEMP>
+else()
+    message(WARNING "Compilation of R-related tests temporarily disabled for Windows !")
+endif()
+#</TEMP>
+
+add_subdirectory(bindings)

@@ -17,49 +17,50 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VINECOPULIB_BOOST_TOOLS_HPP
-#define VINECOPULIB_BOOST_TOOLS_HPP
+#ifndef VINECOPULIB_DISTRIBUTION_TOOLS_HPP
+#define VINECOPULIB_DISTRIBUTION_TOOLS_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/distributions.hpp>
-#include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <Eigen/Dense>
+#include <random>
 
 template<typename T> T dnorm(const T& x)
 {
-    boost::math::normal std_normal;
-    return x.unaryExpr(boost::bind<double>(boost::math::pdf<boost::math::normal,double>, std_normal, _1));
+    boost::math::normal dist;
+    return x.unaryExpr([&dist](double y) {return boost::math::pdf(dist, y);});
 };
 
 template<typename T> T pnorm(const T& x)
 {
-    boost::math::normal std_normal;
-    return x.unaryExpr(boost::bind<double>(boost::math::cdf<boost::math::normal,double>, std_normal, _1));
+    boost::math::normal dist;
+    return x.unaryExpr([&dist](double y) {return boost::math::cdf(dist, y);});
 };
 
 template<typename T> T qnorm(const T& x)
 {
-    boost::math::normal std_normal;
-    return x.unaryExpr(boost::bind<double>(boost::math::quantile<boost::math::normal,double>, std_normal, _1));
+    boost::math::normal dist;
+    return x.unaryExpr([&dist](double y) {return boost::math::quantile(dist, y);});
 };
 
 template<typename T> T dt(const T& x, double nu)
 {
     boost::math::students_t dist(nu);
-    return x.unaryExpr(boost::bind<double>(boost::math::pdf<boost::math::students_t,double>, dist, _1));
+    return x.unaryExpr([&dist](double y) {return boost::math::pdf(dist, y);});
 };
 
 template<typename T> T pt(const T& x, double nu)
 {
     boost::math::students_t dist(nu);
-    return x.unaryExpr(boost::bind<double>(boost::math::cdf<boost::math::students_t,double>, dist, _1));
+    return x.unaryExpr([&dist](double y) {return boost::math::cdf(dist, y);});
 };
 
 template<typename T> T qt(const T& x, double nu)
 {
     boost::math::students_t dist(nu);
-    return x.unaryExpr(boost::bind<double>(boost::math::quantile<boost::math::students_t,double>, dist, _1));
+    return x.unaryExpr([&dist](double y) {return boost::math::quantile(dist, y);});
 };
 
 /* A GSL ALTERNATIVE
@@ -97,5 +98,21 @@ template<typename T> T qt(const T& x, double nu)
     return x.unaryExpr(std::function<double(double)>(tquantile));
 };*/
 
-#endif //VINECOPULIB_BOOST_TOOLS_HPP
+//! Simulate from the multivariate uniform distribution
+//! 
+//! @param n number of observations.
+//! @param d dimension.
+//! 
+//! @return A nxd matrix of independent U[0, 1] random variables.
+inline Eigen::MatrixXd simulate_uniform(int n, int d) 
+{
+    if ((n < 1) | (d < 1))
+        throw std::runtime_error("both n and d must be at least 1.");
+    Eigen::MatrixXd U(n, d);
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    return U.unaryExpr([&](double) { return distribution(generator); });
+}
 
+#endif //VINECOPULIB_DISTRIBUTION_TOOLS_HPP

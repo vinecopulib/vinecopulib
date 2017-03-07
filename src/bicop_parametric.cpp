@@ -17,6 +17,7 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <nlopt.hpp>
 #include "bicop_parametric.hpp"
 
 // calculate number of parameters
@@ -32,7 +33,7 @@ double ParBicop::calculate_npars()
 
 // the objective function for maximum likelihood estimation
 double mle_objective(const std::vector<double>& x,
-                     std::vector<double> __attribute__((unused))& grad,
+                     std::vector<double> &,
                      void* data)
 {
     ParBicopMLEData* newdata = (ParBicopMLEData*) data;
@@ -49,7 +50,7 @@ double mle_objective(const std::vector<double>& x,
 
 // the objective function for profile maximum likelihood estimation
 double pmle_objective(const std::vector<double>& x,
-                      std::vector<double> __attribute__((unused))& grad,
+                      std::vector<double> &,
                       void* data)
 {
     ParBicopPMLEData* newdata = (ParBicopPMLEData*) data;
@@ -68,7 +69,7 @@ double pmle_objective(const std::vector<double>& x,
 // fit
 void ParBicop::fit(const MatXd &data, std::string method)
 {
-    int npars = calculate_npars();
+    int npars = (int) calculate_npars();
     int n = data.rows();
     int d = 2;
     double tau = 0.0;
@@ -80,7 +81,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
     if (((tau < 0) & (association_direction.compare("positive") == 0)) |
         ((tau > 0) & (association_direction.compare("negative") == 0)))
     {
-        std::cout << "The data and copula are not compatible." << std::endl;
+        throw std::runtime_error("The data and copula are not compatible.");
     } else
     {
         if (method.compare("itau") == 0)
@@ -93,7 +94,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 opt.set_xtol_abs(1e-6);
                 opt.set_ftol_rel(1e-6);
                 opt.set_ftol_abs(1e-6);
-                opt.set_maxeval(1e3);
+                opt.set_maxeval((int) 1e3);
 
                 // Set bounds
                 MatXd bounds = get_parameters_bounds();
@@ -152,7 +153,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 opt.set_xtol_abs(1e-6);
                 opt.set_ftol_rel(1e-6);
                 opt.set_ftol_abs(1e-6);
-                opt.set_maxeval(1e3);
+                opt.set_maxeval((int) 1e3);
 
                 // Set bounds
                 MatXd bounds = get_parameters_bounds();
@@ -166,7 +167,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
 
                 // rotate copula and data
                 int rotation = get_rotation();
-                MatXd U = rotate_u(data);
+                MatXd U = cut_and_rotate(data);
                 set_rotation(0);
 
                 // organize data for nlopt
