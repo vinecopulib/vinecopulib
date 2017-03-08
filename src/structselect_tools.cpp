@@ -18,7 +18,6 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "structselect_tools.hpp"
-#include "std_tools.hpp"
 
 namespace structselect_tools {
     
@@ -305,12 +304,12 @@ namespace structselect_tools {
     //! @param trees a vector of trees preprocessed by add_edge_info(); the
     //!     0th entry should be the base graph and is not used.
     //! @return Vinecop object corresponding to the fitted trees.
-    Vinecop as_vinecop(const std::vector<VineTree>& trees)
+    Vinecop as_vinecop(std::vector<VineTree>& trees)
     {
         int d = trees.size();
         MatXi mat = MatXi::Constant(d, d, 0);
         auto pcs = Vinecop::make_pair_copula_store(d);
-
+        
         // loop through columns of the matrix
         for (int t = d - 1 ; t > 0; --t) {
             // start with tree t and fill first two entries by conditioning set
@@ -345,10 +344,22 @@ namespace structselect_tools {
 
                         // start over with conditioning set of next edge
                         ned_set = e_new.conditioned;
+                        
+                        // remove edge (must not be reused in another column!)
+                        int v0 = boost::source(e, trees[t - k]);
+                        int v1 = boost::target(e, trees[t - k]);
+                        boost::remove_edge(v0, v1, trees[t - k]);
+                        break;
                     }
                 }
             }
         }
+        
+        // The first column contains a single element which must be different
+        // from all other diagonal elements. Based on the properties of an 
+        // R-vine matrix, this must be the element next to it. 
+        mat(0, 0) = mat(0, 1);
+        
         // change to user-facing format
         MatXi new_mat = mat.rowwise().reverse().colwise().reverse();
         for (int i = 0; i < d; ++i)

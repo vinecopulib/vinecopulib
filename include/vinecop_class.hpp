@@ -40,7 +40,7 @@ public:
         std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
         std::string method = "mle",
         int truncation_level = std::numeric_limits<int>::max(),
-        MatXi matrix = MatXd(0, 0),
+        MatXi matrix = MatXi(0, 0),
         std::string selection_criterion = "bic",
         bool preselect_families = true,
         bool show_trace = false

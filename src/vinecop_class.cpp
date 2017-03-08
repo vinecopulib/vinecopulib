@@ -246,22 +246,22 @@ VecXd Vinecop::pdf(const MatXd& u)
 
     // initial value must be 1.0 for multiplication
     VecXd vine_density = VecXd::Constant(u.rows(), 1.0);
-
+    
     // temporary storage objects for h-functions
     MatXd direct(n, d);
     MatXd indirect(n, d);
     MatXd u_e(n, 2);
-
+    
     // fill first row of direct matrix with evaluation points;
     // points have tos be reordered to correspond to natural order
     for (int j = 0; j < d; ++j)
         direct.col(j) = u.col(order(j) - 1);
-
+    
     for (int tree = 0; tree < d - 1; ++tree) {
         for (int edge = 0; edge < d - tree - 1; ++edge) {
             // get pair copula for this edge
             BicopPtr edge_copula = get_pair_copula(tree, edge);
-
+    
             // extract evaluation point from hfunction matrices (have been
             // computed in previous tree level)
             int m = max_matrix(tree, edge);
@@ -271,7 +271,7 @@ VecXd Vinecop::pdf(const MatXd& u)
             } else {
                 u_e.col(0) = indirect.col(d - m);
             }
-
+    
             vine_density = vine_density.cwiseProduct(edge_copula->pdf(u_e));
             // h-functions are only evaluated if needed in next step
             if (needed_hfunc1(tree + 1, edge))

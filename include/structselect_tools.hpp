@@ -87,7 +87,7 @@ namespace structselect_tools {
         std::string selection_criterion,
         bool preselect_families
     );
-    Vinecop as_vinecop(const std::vector<VineTree>& trees);
+    Vinecop as_vinecop(std::vector<VineTree>& trees);
     void flip(BicopPtr& bicop);
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(
@@ -171,6 +171,14 @@ namespace structselect_tools {
     {
         auto z = intersect(x, y);
         return ((z.size() == x.size()) & (z.size() == y.size()));
+    }
+    
+    //! Integer sequence starting at 1
+    inline std::vector<int> seq_int(int from, int length)
+    {
+        std::vector<int> seq(length);
+        std::iota(seq.begin(), seq.end(), from);
+        return seq;
     }
 
 }
