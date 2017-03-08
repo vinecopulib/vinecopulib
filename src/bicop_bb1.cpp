@@ -73,7 +73,7 @@ VecXd Bb1Bicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
-// PDF
+/*// PDF
 VecXd Bb1Bicop::pdf_default(const MatXd& u)
 {
     double theta = double(this->parameters_(0));
@@ -130,7 +130,7 @@ VecXd Bb1Bicop::hfunc1_default(const MatXd& u)
     t1 = t1.array().pow(-1-theta);
     f = f.cwiseProduct(t1).cwiseProduct(t2);
     return f;
-}
+}*/
 
 // inverse h-function
 VecXd Bb1Bicop::hinv1_default(const MatXd& u)

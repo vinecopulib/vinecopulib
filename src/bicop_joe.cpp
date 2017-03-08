@@ -80,7 +80,7 @@ VecXd JoeBicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
-// PDF
+/*// PDF
 VecXd JoeBicop::pdf_default(const MatXd& u)
 {
     double theta = double(this->parameters_(0));
@@ -117,7 +117,7 @@ VecXd JoeBicop::hfunc1_default(const MatXd& u)
     f = f.cwiseProduct(t1);
 
     return f;
-}
+}*/
 
 // inverse h-function
 VecXd JoeBicop::hinv1_default(const MatXd& u)

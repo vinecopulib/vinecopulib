@@ -80,7 +80,7 @@ VecXd ClaytonBicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
-// PDF
+/*// PDF
 VecXd ClaytonBicop::pdf_default(const MatXd& u)
 {
     double theta = double(this->parameters_(0));
@@ -114,7 +114,7 @@ VecXd ClaytonBicop::hfunc1_default(const MatXd& u)
     t2 = u.col(0).array().pow(-1-theta);
     f = f.cwiseProduct(t2);
     return f;
-}
+}*/
 
 // inverse h-function
 VecXd ClaytonBicop::hinv1_default(const MatXd& u)

@@ -66,7 +66,7 @@ VecXd GumbelBicop::generator_derivative(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
     auto f = [theta](const double v) {
-        return std::pow(theta-1,std::log(1/v))*(-theta/v);
+        return std::pow(std::log(1/v),theta-1)*(-theta/v);
     };
     return u.unaryExpr(f);
 }
@@ -80,7 +80,7 @@ VecXd GumbelBicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
-// PDF
+/*// PDF
 VecXd GumbelBicop::pdf_default(const MatXd& u)
 {
     double theta = double(this->parameters_(0));
@@ -107,7 +107,7 @@ VecXd GumbelBicop::hfunc1_default(const MatXd& u)
     t = t.array().pow(1/theta-1);
     f = f.cwiseProduct(t).cwiseProduct(t2).cwiseQuotient(u.col(0));
     return f;
-}
+}*/
 
 // inverse h-function
 VecXd GumbelBicop::hinv1_default(const MatXd& u)

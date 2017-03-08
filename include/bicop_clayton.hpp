@@ -37,10 +37,10 @@ public:
     VecXd generator_derivative2(const VecXd& u);
 
     // PDF
-    VecXd pdf_default(const MatXd& u);
+    //VecXd pdf_default(const MatXd& u);
 
     // hfunction
-    VecXd hfunc1_default(const MatXd& u);
+    //VecXd hfunc1_default(const MatXd& u);
 
     // inverse hfunction
     VecXd hinv1_default(const MatXd& u);

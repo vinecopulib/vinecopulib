@@ -58,7 +58,8 @@ VecXd FrankBicop::generator_inv(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
     auto f = [theta](const double v) {
-        return (-1/theta)*std::log(1+std::exp(-theta*v)-std::exp(-v));
+        //return (-1/theta)*std::log(1+std::exp(-theta*v)-std::exp(-v));
+        return (-1/theta)*std::log(1+std::exp(-theta-v)-std::exp(-v));
     };
     return u.unaryExpr(f);
 }
@@ -67,7 +68,7 @@ VecXd FrankBicop::generator_derivative(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
     auto f = [theta](const double v) {
-        return theta*1/(1-std::exp(theta*v));
+        return theta/(1-std::exp(theta*v));
     };
     return u.unaryExpr(f);
 }
@@ -76,13 +77,12 @@ VecXd FrankBicop::generator_derivative2(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
     auto f = [theta](const double v) {
-        return std::pow(theta,2)*std::exp(theta*v)/std::pow(std::exp(theta*v) - 1, 2);
-        //return std::pow(theta,2)/std::pow(std::exp(-theta*v/2)-std::exp(theta*v/2),2);
+        return std::pow(theta,2)/std::pow(std::exp(theta*v/2) - std::exp(-theta*v/2), 2);
     };
     return u.unaryExpr(f);
 }
 
-// PDF
+/*// PDF
 VecXd FrankBicop::pdf_default(const MatXd& u)
 {
     double theta = double(this->parameters_(0));
@@ -108,7 +108,7 @@ VecXd FrankBicop::hfunc1_default(const MatXd& u)
     t1 = - t1 + std::exp(theta)*(t.rowwise().sum() - VecXd::Ones(u.rows()));
     f = f.cwiseQuotient(t1);
     return f;
-}
+}*/
 
 // inverse h-function
 VecXd FrankBicop::hinv1_default(const MatXd& u)
