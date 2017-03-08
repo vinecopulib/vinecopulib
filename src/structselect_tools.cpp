@@ -18,9 +18,10 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "structselect_tools.hpp"
+#include "std_tools.hpp"
 
 namespace structselect_tools {
-
+    
     //! Create base tree of the vine
     //!
     //!  The base tree is a star on d + 1 variables, where the conditioning
@@ -75,12 +76,15 @@ namespace structselect_tools {
     //!     optimization.
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
+    //! @param preselect_families  whether to exclude families before fitting based 
+    //!     on symmetry properties of the data.
     //! @return tree T_{k+1}.
     VineTree select_next_tree(
         VineTree& prev_tree,
         std::vector<int> family_set,
         std::string method,
-        std::string selection_criterion
+        std::string selection_criterion,
+        bool preselect_families
     )
     {
         auto new_tree = edges_as_vertices(prev_tree);
@@ -94,7 +98,8 @@ namespace structselect_tools {
             new_tree,
             family_set,
             method,
-            selection_criterion
+            selection_criterion,
+            preselect_families
         );
 
         return new_tree;
@@ -179,8 +184,7 @@ namespace structselect_tools {
     //     the h-functions calculated in the previous tree.
     MatXd get_pc_data(int v0, int v1, const VineTree& tree)
     {
-        int n = std::max(tree[v0].hfunc1.size(), tree[v0].hfunc2.size());
-        MatXd pc_data(n, 2);
+        MatXd pc_data(tree[v0].hfunc1.size(), 2);
         int ei_common = find_common_neighbor(v0, v1, tree);
         if (find_position(ei_common, tree[v0].prev_edge_indices) == 0) {
             pc_data.col(0) = tree[v0].hfunc1;
@@ -230,8 +234,8 @@ namespace structselect_tools {
             auto v1_indices = cat(tree[v1].conditioning, tree[v1].conditioned);
 
             auto test = intersect(v0_indices, v1_indices);
-            auto d01 = difference(v0_indices, v1_indices);
-            auto d10 = difference(v1_indices, v0_indices);
+            auto d01 = set_diff(v0_indices, v1_indices);
+            auto d10 = set_diff(v1_indices, v0_indices);
 
             tree[e].conditioning = cat(d01, d10);
             tree[e].conditioned = intersect(v0_indices, v1_indices);
@@ -272,11 +276,14 @@ namespace structselect_tools {
     //!     optimization.
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
+    //! @param preselect_families  whether to exclude families before fitting based 
+    //!     on symmetry properties of the data.
     void select_pair_copulas(
         VineTree& tree,
         std::vector<int> family_set,
         std::string method,
-        std::string selection_criterion
+        std::string selection_criterion,
+        bool preselect_families
     )
     {
         for (auto e : boost::edges(tree)) {
@@ -285,7 +292,7 @@ namespace structselect_tools {
                 selection_criterion,
                 family_set,
                 true,  // use_rotations,
-                true,  // preselect_families,
+                preselect_families,
                 method
             );
             tree[e].hfunc1 = tree[e].pair_copula->hfunc1(tree[e].pc_data);
@@ -302,7 +309,7 @@ namespace structselect_tools {
     {
         int d = trees.size();
         MatXi mat = MatXi::Constant(d, d, 0);
-        auto pcs = Vinecop::make_pc_store(d);
+        auto pcs = Vinecop::make_pair_copula_store(d);
 
         // loop through columns of the matrix
         for (int t = d - 1 ; t > 0; --t) {

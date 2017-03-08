@@ -30,7 +30,7 @@ namespace {
                2, 5, 2, 5, 2, 0, 0,
                6, 6, 1, 2, 5, 5, 0,
                5, 2, 6, 6, 6, 6, 6;
-        auto pair_copulas = Vinecop::make_pc_store(7);
+        auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
            for (auto& pc : tree) {
                pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
@@ -38,11 +38,14 @@ namespace {
         }
         Vinecop vinecop(pair_copulas, mat);
         auto u = vinecop.simulate(1000);
-        auto vinecop_fitted = Vinecop::structure_select(
+        auto vinecop_fitted = Vinecop::select(
             u,
             {0, 1, 2, 3, 4, 5, 6},   // family set
             "mle",                   // use mle estimation
+            4,                       // truncation level
+            MatXi(0, 0),             // empty structure matrix (to be selected)
             "bic",                   // selection criterion
+            true,                    // pre-select families
             true                     // show trace
         );
         auto mat2 = vinecop_fitted.get_matrix();

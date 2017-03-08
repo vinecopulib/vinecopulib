@@ -19,7 +19,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "vinecop_class.hpp"
 #include "structselect_tools.hpp"
-
+#include <exception>
 
 //! Construct a vine copula object of dimension d
 //!
@@ -37,7 +37,7 @@ Vinecop::Vinecop(int d)
     vine_matrix_ = RVineMatrix(RVineMatrix::construct_d_vine_matrix(order));
 
     // all pair-copulas are independence
-    pair_copulas_ = make_pc_store(d);
+    pair_copulas_ = make_pair_copula_store(d);
     for (auto& tree : pair_copulas_) {
         for (auto& pc : tree) {
             pc = BicopPtr(new IndepBicop);
@@ -48,7 +48,7 @@ Vinecop::Vinecop(int d)
 //! Construct a vine copula object from a vector<BicopPtr> and structure matrix
 //!
 //! @param pair_copulas a nested vector of BicopPtrs; can be initialized by
-//!     make_pc_store(d).
+//!     make_pair_copula_store(d).
 //! @param matrix R-vine matrix.
 //!
 //! @return a d-dimensional D-vine with variable order 1, ..., d and all
@@ -91,7 +91,7 @@ Vinecop::Vinecop(
 //! @param d dimension of the vine copula.
 //! @return A nested vector such that pc_store(d)[t][e] contains a BicopPtr to
 //!     the pair copula corresponding to tree t and edge e.
-std::vector<std::vector<BicopPtr>> Vinecop::make_pc_store(int d)
+std::vector<std::vector<BicopPtr>> Vinecop::make_pair_copula_store(int d)
 {
     std::vector<std::vector<BicopPtr>> pc_store(d - 1);
     for (int t = 0; t < d - 1; ++t)
@@ -116,33 +116,44 @@ std::vector<std::vector<BicopPtr>> Vinecop::make_pc_store(int d)
 //!     optimization.
 //! @param selection_criterion the selection criterion; either "aic" or "bic"
 //!     (default).
-//! @param show_trace whether to show a trace of the building progress (default is
-//!     false).
+//! @param preselect_families  whether to exclude families before fitting based 
+//!     on symmetry properties of the data.
+//! @param show_trace whether to show a trace of the building progress (default 
+//!     is false).
 //! @return The fitted vine copula model.
-Vinecop Vinecop::structure_select(
+Vinecop Vinecop::select(
     const MatXd& data,
     std::vector<int> family_set,
     std::string method,
+    int truncation_level,
+    MatXi matrix,
     std::string selection_criterion,
+    bool preselect_families,
     bool show_trace
 )
 {
     using namespace structselect_tools;
     int d = data.cols();
+    if (matrix.size() > 0)
+        throw std::runtime_error("fixed matrix selection not implemented yet.");
     std::vector<VineTree> trees(d);
 
     trees[0] = make_base_tree(data);
-    for (int t = 1; t < d; ++t) {
+    for (int t = 1; t < d; ++t) {       
         trees[t] = select_next_tree(
             trees[t - 1],
             family_set,
             method,
-            selection_criterion
+            selection_criterion,
+            preselect_families
         );
         if (show_trace) {
             std::cout << "Tree " << t - 1 << ":" << std::endl;
             print_pair_copulas(trees[t]);
         }
+        // truncate (only allow for Independence copula from here on)
+        if (truncation_level == t)
+            family_set = {0};
     }
 
     return as_vinecop(trees);;

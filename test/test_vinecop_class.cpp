@@ -31,7 +31,7 @@ namespace {
                2, 5, 2, 5, 2, 0, 0,
                6, 6, 1, 2, 5, 5, 0,
                5, 2, 6, 6, 6, 6, 6;
-        std::vector<std::vector<BicopPtr>> pair_copulas = Vinecop::make_pc_store(7);
+        auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
                 pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
@@ -49,7 +49,7 @@ namespace {
                2, 5, 2, 5, 2, 0, 0,
                6, 6, 1, 2, 5, 5, 0,
                5, 2, 6, 6, 6, 6, 6;
-        auto pair_copulas = Vinecop::make_pc_store(7);
+        auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
                 pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
@@ -83,7 +83,7 @@ namespace {
                2, 5, 2, 5, 2, 0, 0,
                6, 6, 1, 2, 5, 5, 0,
                5, 2, 6, 6, 6, 6, 6;
-        auto pair_copulas = Vinecop::make_pc_store(7);
+        auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
                 pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
