@@ -15,7 +15,8 @@ target_include_directories(pyvinecopulib PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 
 # informing the Python bindings where to find Python
-include(findPython.cmake REQUIRED)
+find_package(PythonInterp REQUIRED)
+find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
 target_include_directories(pyvinecopulib PUBLIC ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(pyvinecopulib ${PYTHON_LIBRARIES})
 

@@ -73,25 +73,70 @@ VecXd Bb1Bicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
-VecXd Bb1Bicop::hinv(const MatXd& u)
+// PDF
+VecXd Bb1Bicop::pdf_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    double delta = double(this->parameters_(1));
+
+    VecXd f = VecXd::Ones(u.rows());
+    if (theta > 1e-6 || delta > 1+1e-6)
+    {
+        VecXd t1 = generator(u.col(0));
+        VecXd t2 = generator(u.col(1));
+        VecXd ones = f;
+        f = t1.cwiseProduct(t2);
+        t1 = t1 + t2;
+        t2 = t1.array().pow(1/delta);
+        f = f.cwiseProduct((delta - 1)*theta*ones+(1+delta*theta)*t2);
+
+        t2 = t2 + ones;
+        t1 = t1.array().pow(-2+1/delta);
+        t2 = t2.array().pow(-2-1/theta);
+        f = f.cwiseProduct(t1).cwiseProduct(t2);
+
+        t1 = u.col(0);
+        t2 = u.col(1);
+        t1 = t1.array().pow(theta);
+        t2 = t2.array().pow(theta);
+        t1 = t1 - ones;
+        t2 = t2 - ones;
+        f = f.cwiseQuotient(u.rowwise().prod()).cwiseQuotient(t1).cwiseQuotient(t2);
+    }
+
+    return f;
+}
+
+// hfunction
+VecXd Bb1Bicop::hfunc1_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    double delta = double(this->parameters_(1));
+    VecXd t1 = generator(u.col(0));
+    VecXd t2 = generator(u.col(1));
+    VecXd ones = VecXd::Ones(u.rows());
+    VecXd f = ones;
+    t1 = t1 + t2;
+    t2 = t1.array().pow(1/delta);
+
+    t2 = t2 + ones;
+    t1 = t1.array().pow(-1+1/delta);
+    t2 = t2.array().pow(-1-1/theta);
+    f = f.cwiseProduct(t1).cwiseProduct(t2);
+
+
+    t1 = u.col(0);
+    t2 = t1.unaryExpr([theta, delta](const double v){ return std::pow(std::pow(v,-theta)-1,delta-1);});
+    t1 = t1.array().pow(-1-theta);
+    f = f.cwiseProduct(t1).cwiseProduct(t2);
+    return f;
+}
+
+// inverse h-function
+VecXd Bb1Bicop::hinv1_default(const MatXd& u)
 {
     VecXd hinv = hinv1_num(u);
     return hinv;
-}
-
-// link between Kendall's tau and the par_bicop parameter
-VecXd Bb1Bicop::tau_to_parameters(const double& tau)
-{
-    double delta = double(this->parameters_(1));
-    VecXd tau2 = VecXd::Constant(1, std::fabs(tau));
-    auto f = [this, delta](const VecXd &v) {
-        VecXd par = VecXd::Constant(2, delta);
-        par(0) = v(0);
-        return VecXd::Constant(1, std::fabs(this->parameters_to_tau(par)));
-    };
-    VecXd par = VecXd::Constant(2, delta);
-    par(0) = invert_f(tau2, f, 1+1e-6, 100)(0);
-    return par;
 }
 
 double Bb1Bicop::parameters_to_tau(const VecXd& parameters)

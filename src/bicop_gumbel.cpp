@@ -48,41 +48,69 @@ GumbelBicop::GumbelBicop(const VecXd& parameters, const int& rotation)
 VecXd GumbelBicop::generator(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = u;
-    psi = psi.cwiseInverse().array().log().pow(theta);
-    return psi;
+    auto f = [theta](const double v) {
+        return std::pow(std::log(1/v), theta);
+    };
+    return u.unaryExpr(f);
 }
 VecXd GumbelBicop::generator_inv(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = u;
-    psi = (-1.0) * psi.array().pow(1/theta);
-    psi = psi.array().exp();
-    return psi;
+    auto f = [theta](const double v) {
+        return std::exp(-std::pow(v,1/theta));
+    };
+    return u.unaryExpr(f);
 }
 
 VecXd GumbelBicop::generator_derivative(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = u;
-    psi = psi.cwiseInverse().array().log().pow(theta - 1.0);
-    psi = (-theta) * psi.cwiseQuotient(u);
-    return psi;
+    auto f = [theta](const double v) {
+        return std::pow(theta-1,std::log(1/v))*(-theta/v);
+    };
+    return u.unaryExpr(f);
 }
 
 VecXd GumbelBicop::generator_derivative2(const VecXd& u)
 {
-    double theta = double(this->parameters_(0));;
-    VecXd psi_ilog = u.cwiseInverse().array().log();
-    VecXd psi = (theta - 1.0) * VecXd::Ones(u.size()) + psi_ilog;
-    psi_ilog = psi_ilog.array().pow(theta - 2.0);
-    psi = theta*psi.cwiseProduct(psi_ilog);
-    psi_ilog = u.array().square();
-    psi = psi.cwiseQuotient(psi_ilog);
-    return psi;
+    double theta = double(this->parameters_(0));
+    auto f = [theta](const double v) {
+        return (theta-1-std::log(v))*std::pow(std::log(1/v), theta-2)*(theta/std::pow(v,2));
+    };
+    return u.unaryExpr(f);
 }
 
-VecXd GumbelBicop::hinv(const MatXd& u)
+// PDF
+VecXd GumbelBicop::pdf_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    VecXd t1 = generator(u.col(0));
+    VecXd t2 = generator(u.col(1));
+    VecXd t = t1+t2;
+    t1 = t1.array().pow((theta-1)/theta);
+    t2 = t2.array().pow((theta-1)/theta);
+    VecXd f = generator_inv(t);
+    t = t.unaryExpr([theta](const double v){ return (-1+theta+std::pow(v, 1/theta)) * std::pow(v,-2+1/theta);});
+    f = f.cwiseProduct(t).cwiseProduct(t1).cwiseProduct(t2).cwiseQuotient(u.rowwise().prod());
+    return f;
+}
+
+// hfunction
+VecXd GumbelBicop::hfunc1_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    VecXd t1 = generator(u.col(1));
+    VecXd t2 = generator(u.col(0));
+    VecXd t = t1+t2;
+    t2 = t2.array().pow((theta-1)/theta);
+    VecXd f = generator_inv(t);
+    t = t.array().pow(1/theta-1);
+    f = f.cwiseProduct(t).cwiseProduct(t2).cwiseQuotient(u.col(0));
+    return f;
+}
+
+// inverse h-function
+VecXd GumbelBicop::hinv1_default(const MatXd& u)
 {
     double theta = double(this->parameters_(0));
     double u1, u2;

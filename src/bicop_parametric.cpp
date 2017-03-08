@@ -88,61 +88,68 @@ void ParBicop::fit(const MatXd &data, std::string method)
         {
             if (npars > 1)
             {
-                // Derivatives free optimization
-                nlopt::opt opt(nlopt::LN_BOBYQA, npars - 1);
-                opt.set_xtol_rel(1e-6);
-                opt.set_xtol_abs(1e-6);
-                opt.set_ftol_rel(1e-6);
-                opt.set_ftol_abs(1e-6);
-                opt.set_maxeval((int) 1e3);
-
-                // Set bounds
-                MatXd bounds = get_parameters_bounds();
-                std::vector<double> lb(npars-1);
-                std::vector<double> ub(npars-1);
-                VecXd::Map(&lb[0], npars-1) = bounds.block(1,0,npars-1,1);
-                VecXd::Map(&ub[0], npars-1) = bounds.block(1,1,npars-1,1);
-                
-                opt.set_lower_bounds(lb);
-                opt.set_upper_bounds(ub);
-                
-                // organize data for nlopt
-                MatXd U = data;
-                ParBicopPMLEData my_pmle_data = {U, this, newpar(0), 0};
-                
-                // call to the optimizer
-                opt.set_min_objective(pmle_objective, &my_pmle_data);
-                
-                // to store the log-likelihood
-                double nll;
-                // starting value
-                std::vector<double> x(npars-1);
-                VecXd::Map(&x[0], npars-1) = newpar.block(1,0,npars-1,1);
-                // optimize function
-                try
+                if (family_ != 2)
                 {
-                    opt.optimize(x, nll);
-                } catch (nlopt::roundoff_limited err)
-                {
-                    throw std::string("Halted because roundoff errors limited progress! ") + err.what();
-                } catch (nlopt::forced_stop err)
-                {
-                    throw std::string("Halted because of a forced termination! ") + err.what();
-                } catch (std::invalid_argument err )
-                {
-                    throw std::string("Invalid arguments. ") + err.what();
-                } catch (std::bad_alloc err)
-                {
-                    throw std::string("Ran out of memory. ") + err.what();
-                } catch (std::runtime_error err)
-                {
-                    throw std::string("Generic failure. ") + err.what();
+                    throw std::runtime_error("itau method is not available for tis family.");
                 }
+                else
+                {
+                    // Derivatives free optimization
+                    nlopt::opt opt(nlopt::LN_BOBYQA, npars - 1);
+                    opt.set_xtol_rel(1e-6);
+                    opt.set_xtol_abs(1e-6);
+                    opt.set_ftol_rel(1e-6);
+                    opt.set_ftol_abs(1e-6);
+                    opt.set_maxeval((int) 1e3);
 
-                for (int i = 0; i < npars-1; ++i)
-                    newpar(i + 1) = x[i];
+                    // Set bounds
+                    MatXd bounds = get_parameters_bounds();
+                    std::vector<double> lb(npars-1);
+                    std::vector<double> ub(npars-1);
+                    VecXd eps = VecXd::Constant(npars-1,1e-6);
+                    VecXd::Map(&lb[0], npars-1) = bounds.block(1,0,npars-1,1)+eps;
+                    VecXd::Map(&ub[0], npars-1) = bounds.block(1,1,npars-1,1)-eps;
+
+                    opt.set_lower_bounds(lb);
+                    opt.set_upper_bounds(ub);
+
+                    // organize data for nlopt
+                    MatXd U = data;
+                    ParBicopPMLEData my_pmle_data = {U, this, newpar(0), 0};
+
+                    // call to the optimizer
+                    opt.set_min_objective(pmle_objective, &my_pmle_data);
+
+                    // to store the log-likelihood
+                    double nll;
+                    // starting value
+                    std::vector<double> x(npars-1);
+                    VecXd::Map(&x[0], npars-1) = newpar.block(1,0,npars-1,1);
+                    // optimize function
+                    try
+                    {
+                        opt.optimize(x, nll);
+                    } catch (nlopt::roundoff_limited err)
+                    {
+                        throw std::string("Halted because roundoff errors limited progress! ") + err.what();
+                    } catch (nlopt::forced_stop err)
+                    {
+                        throw std::string("Halted because of a forced termination! ") + err.what();
+                    } catch (std::invalid_argument err )
+                    {
+                        throw std::string("Invalid arguments. ") + err.what();
+                    } catch (std::bad_alloc err)
+                    {
+                        throw std::string("Ran out of memory. ") + err.what();
+                    } catch (std::runtime_error err)
+                    {
+                        throw std::string("Generic failure. ") + err.what();
+                    }
+
+                    for (int i = 0; i < npars-1; ++i)
+                        newpar(i + 1) = x[i];
+                }
             }
-
             set_parameters(newpar);
         } else if (method.compare("mle") == 0) {
             if (npars != 0)
@@ -159,8 +166,9 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 MatXd bounds = get_parameters_bounds();
                 std::vector<double> lb(npars);
                 std::vector<double> ub(npars);
-                VecXd::Map(&lb[0], npars) = bounds.col(0);
-                VecXd::Map(&ub[0], npars) = bounds.col(1);
+                VecXd eps = VecXd::Constant(npars,1e-6);
+                VecXd::Map(&lb[0], npars) = bounds.col(0)+eps;
+                VecXd::Map(&ub[0], npars) = bounds.col(1)-eps;
 
                 opt.set_lower_bounds(lb);
                 opt.set_upper_bounds(ub);

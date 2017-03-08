@@ -49,11 +49,6 @@ namespace {
                                                true,
                                                true,
                                                "mle");
-    //std::cout << "-------" << std::endl;
-    //std::cout << bicop->get_family() << " " << bicop->get_rotation() << std::endl;
-    //std::cout << this->par_bicop_.get_family() << " " << this->par_bicop_.get_rotation() << std::endl;
-    //std::cout << bicop->get_parameters() << std::endl;
-    //std::cout << "-------" << std::endl;
                 int selected_family = bicop->get_family();
                 int true_family = this->par_bicop_.get_family();
                 if (true_family == 3 || true_family == 6)

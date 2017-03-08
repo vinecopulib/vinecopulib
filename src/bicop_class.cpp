@@ -75,13 +75,21 @@ BicopPtr Bicop::select(const MatXd& data,
                      std::string method)
 {
     std::vector<int> all_families = {0, 1, 2, 3, 4, 5, 6, 7, 1001};
+    std::vector<int> itau_families = {0, 1, 2, 3, 4, 5, 6};
     std::vector<int> rotationless_families = {0, 1, 2, 5, 1001};
 
     // If the familyset is empty, use all families.
     // If the familyset is not empty, check that all included families are implemented.
     if (family_set.empty())
     {
-        family_set = all_families;
+        if (method.compare("itau") == 0)
+        {
+            family_set = intersect(all_families, itau_families);
+        }
+        else
+        {
+            family_set = all_families;
+        }
     } else
     {
         bool family_exists = true;
@@ -90,6 +98,11 @@ BicopPtr Bicop::select(const MatXd& data,
             family_exists = is_member(family_set[j], all_families);
             if (!family_exists)
                 throw std::runtime_error(std::string("One of the families is not implemented"));
+        }
+        family_set = intersect(family_set, itau_families);
+        if (family_set.empty())
+        {
+            throw std::runtime_error(std::string("None of the families has method itau available"));
         }
     }
 
@@ -186,10 +199,7 @@ BicopPtr Bicop::select(const MatXd& data,
             fitted_criterion = new_criterion;
             fitted_bicop = new_bicop;
         }
-        //std::cout << families[j] << " " << rotations[j] << " " << new_criterion << std::endl;
-        //std::cout << new_bicop->get_parameters() << std::endl;
      }
-    //std::cout << "----" << std::endl;
     return fitted_bicop;
 
 }
@@ -235,7 +245,9 @@ std::vector<double> get_c1c2(const MatXd& data, double tau)
 
 VecXd Bicop::pdf(const MatXd& u)
 {
-    return pdf_default(cut_and_rotate(u));
+    VecXd f = pdf_default(cut_and_rotate(u));
+    f = f.unaryExpr([](const double x){ return std::min(x,1e16);});
+    return f;
 }
 
 
@@ -360,6 +372,12 @@ double Bicop::calculate_tau()
     return 999.0;
 }
 
+
+VecXd Bicop::tau_to_parameters(const double& tau)
+{
+    throw std::runtime_error("Method not implemented for this family");
+}
+
 MatXd Bicop::cut_and_rotate(const MatXd& u)
 {
     MatXd u_new(u.rows(), 2);
@@ -387,7 +405,7 @@ MatXd Bicop::cut_and_rotate(const MatXd& u)
     }
     
     // truncate to interval [eps, 1 - eps]
-    MatXd eps = MatXd::Constant(u.rows(), 2, 1e-20);
+    MatXd eps = MatXd::Constant(u.rows(), 2, 1-10);
     u_new = u_new.array().min(1.0 - eps.array());
     u_new = u_new.array().max(eps.array());
 

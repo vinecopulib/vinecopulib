@@ -48,16 +48,30 @@ class ParBicopTest : public FakeParBicopTest {
 public:
     void setup_parameters(RInstance *rinstance_ptr) {
         // set family and extracts kendall's tau from the R instance
-        this->set_family(rinstance_ptr, this->par_bicop_.get_family());
+        int family = this->par_bicop_.get_family();
+        this->set_family(rinstance_ptr, family);
         double tau = this->get_tau(rinstance_ptr);
 
         // set the rotion and compute the parameters vector
         this->par_bicop_.set_rotation(rinstance_ptr->get_rotation());
-        VecXd parameters;
-        parameters = this->par_bicop_.tau_to_parameters(tau);
-        if (parameters.size() == 2)
-            parameters(1) = 4.0;
-
+        VecXd parameters = this->par_bicop_.get_parameters();
+        if (parameters.size() < 2)
+        {
+            parameters = this->par_bicop_.tau_to_parameters(tau);
+        }
+        else
+        {
+            if (family == 2)
+            {
+                parameters = this->par_bicop_.tau_to_parameters(tau);
+                parameters(1) = 4;
+            }
+            else // family == 7
+            {
+                parameters(1) = 1.5;
+                parameters(0) = -((2*(1-parameters(1)+parameters(1)*std::fabs(tau)))/(parameters(1)*(-1+std::fabs(tau))));
+            }
+        }
         // set the parameters vector for the ParBicop and R instance
         this->par_bicop_.set_parameters(parameters);
         this->set_parameters(rinstance_ptr, this->par_bicop_.get_parameters());
@@ -76,8 +90,7 @@ protected:
 };
 
 // Create a list of types, each of which will be used as the test fixture's 'T'
-//typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop, Bb1Bicop> ParBicopTypes;
-typedef ::testing::Types<Bb1Bicop> ParBicopTypes;
+typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop, Bb1Bicop> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);
 
 #endif

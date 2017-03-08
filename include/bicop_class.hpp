@@ -133,6 +133,9 @@ public:
     double calculate_tau();  // this will be a generic fall back method
     virtual double parameters_to_tau(const VecXd& parameters) = 0;
 
+    //! Extract the copula parameter from Kendall's tau whenever possible
+    VecXd tau_to_parameters(const double& tau);
+
     //! Getters and setters.
     //! @{
     int get_family() const {return family_;}
@@ -191,4 +194,17 @@ VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, const doubl
 
 template<typename T> bool is_member(T element, std::vector<T> set) {
     return std::find(set.begin(), set.end(), element) != set.end(); }
+
+
+template<typename T> std::vector<T> intersect(std::vector<T> x, std::vector<T> y) {
+    std::sort(x.begin(), x.end());
+    std::sort(y.begin(), y.end());
+    std::vector<T> common;
+    std::set_intersection(
+            x.begin(), x.end(),
+            y.begin(), y.end(),
+            std::back_inserter(common)
+    );
+    return common;
+}
 #endif

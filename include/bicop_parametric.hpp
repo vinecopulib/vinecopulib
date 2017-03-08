@@ -29,7 +29,6 @@ public:
     void fit(const MatXd& data, std::string method);
 
     // link between Kendall's tau and the par_bicop parameter
-    virtual VecXd tau_to_parameters(const double& tau) = 0;
     virtual double parameters_to_tau(const VecXd& parameters) = 0;
     double calculate_tau() {return this->parameters_to_tau(parameters_);}
 
