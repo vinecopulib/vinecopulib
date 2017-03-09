@@ -36,6 +36,8 @@ public:
     double parameters_to_tau(const VecXd &);
     double calculate_npars();
 
+    void flip();
+
 protected:
     InterpolationGrid interp_grid_;
     double npars_;
