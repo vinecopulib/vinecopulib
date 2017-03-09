@@ -43,6 +43,11 @@ InterpolationGrid::InterpolationGrid(const VecXd& grid_points, const MatXd& valu
     values_ = values;
 }
 
+void InterpolationGrid::flip()
+{
+    values_ = values_.transpose();
+}
+
 
 //! Interpolation in two dimensions
 //!

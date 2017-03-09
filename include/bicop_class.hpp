@@ -144,7 +144,10 @@ public:
     void set_rotation(const int& rotation);
     void set_parameters(const VecXd& parameters);
     //! @}
-    
+
+    //! Adjust the copula to a flipping of arguments (u,v) -> (v,u)
+    virtual void flip() = 0;
+
 protected:
     virtual VecXd pdf_default(const MatXd& u) = 0;
     virtual VecXd hfunc1_default(const MatXd& u) = 0;
@@ -173,7 +176,7 @@ protected:
     std::string association_direction_;
     VecXd parameters_;
     MatXd parameters_bounds_;   // first column lower, second column upper
-    
+
 private:
     //! Sanity checks
     //! @{

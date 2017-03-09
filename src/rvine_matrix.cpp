@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "include/rvine_matrix.hpp"
+#include "rvine_matrix.hpp"
 
 
 RVineMatrix::RVineMatrix(const MatXi& matrix)

@@ -41,6 +41,8 @@ public:
     virtual VecXd generator_derivative2(const VecXd& u) = 0;
 
     virtual VecXd hinv(const MatXd& u) = 0;
+
+    void flip();
 };
 
 
