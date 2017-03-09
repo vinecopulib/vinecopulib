@@ -17,6 +17,7 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "bicop_parametric.hpp"
 #include "optimization_tools.hpp"
 
 // calculate number of parameters
@@ -28,6 +29,17 @@ double ParBicop::calculate_npars()
     // otherwise, return length of parameter vector
     return (double) parameters_.size();
 }
+
+/*void remove_row(MatXd& matrix, unsigned int to_remove)
+{
+    unsigned int n = matrix.rows()-1;
+    unsigned int m = matrix.cols();
+
+    if(to_remove < numRows )
+        matrix.block(to_remove,0,numRows-to_remove,numCols) = matrix.block(to_remove+1,0,numRows-to_remove,numCols);
+
+    matrix.conservativeResize(numRows,numCols);
+}*/
 
 // fit
 void ParBicop::fit(const MatXd &data, std::string method)
@@ -75,7 +87,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
             VecXd initial_parameters = newpar;
             if (method == "itau")
             {
-                bounds = bounds.block(1,0,npars,2);
+                bounds = get_parameters_bounds().block(1,0,npars,2);
                 initial_parameters = newpar.block(1,0,npars,1);
                 ParBicopPMLEData my_data = {data, this, newpar(0), 0};
                 optimizer.set_objective(pmle_objective, &my_data);
