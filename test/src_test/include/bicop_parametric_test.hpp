@@ -71,6 +71,18 @@ public:
                 parameters(1) = 1.5;
                 parameters(0) = -((2*(1-parameters(1)+parameters(1)*std::fabs(tau)))/(parameters(1)*(-1+std::fabs(tau))));
             }
+            if (family == 8)
+            {
+                double delta = 1.5;
+                VecXd tau_v = VecXd::Constant(1,std::fabs(tau));
+                auto f = [this, delta](const VecXd &v) {
+                    VecXd par = VecXd::Constant(2, delta);
+                    par(0) = v(0);
+                    return VecXd::Constant(1, std::fabs(this->par_bicop_.parameters_to_tau(par)));
+                };
+                parameters(0) = invert_f(tau_v, f, 1+1e-6, 100)(0);
+                parameters(1) = delta;
+            }
         }
         // set the parameters vector for the ParBicop and R instance
         this->par_bicop_.set_parameters(parameters);

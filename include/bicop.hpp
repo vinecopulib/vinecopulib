@@ -29,6 +29,7 @@ along with vinecopulib.  If not, see "http://www.gnu.org/licenses/".
     //   bicop_kernel
     //   bicop_interpolation
     #include "bicop_bb1.hpp"
+    #include "bicop_bb6.hpp"
     #include "bicop_clayton.hpp"
     #include "bicop_frank.hpp"
     #include "bicop_gauss.hpp"
