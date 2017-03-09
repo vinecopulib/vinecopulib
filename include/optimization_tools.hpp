@@ -28,7 +28,7 @@ namespace optimization_tools {
     //!
     typedef struct
     {
-        MatXd& U; //! The data
+        const MatXd& U; //! The data
         ParBicop* bicop; //! A pointer to the bivariate copula to optimize
         unsigned int mle_objective_calls; //! The number of evaluations of the objective
     } ParBicopMLEData;
@@ -37,7 +37,7 @@ namespace optimization_tools {
     //!
     typedef struct
     {
-        MatXd& U; //! The data
+        const MatXd& U; //! The data
         ParBicop* bicop; //! A pointer to the bivariate copula to optimize
         double par0;  //! The main dependence parameter
         unsigned int pmle_objective_calls; //! The number of evaluations of the objective
@@ -65,6 +65,9 @@ namespace optimization_tools {
         NLoptControls(double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval);
 
 
+        //! Set controls of an optimizer
+        //!
+        //! @param opt Pointer to the optimizer for control setting
         void set_controls(nlopt::opt* opt);
 
         //! Getters and setters.
@@ -88,6 +91,50 @@ namespace optimization_tools {
         //! @}
     };
 
+
+    class Optimizer {
+    public:
+        //! Create an optimizer using the default controls
+        //!
+        //! @param n_parameters Number of parameters to optimize
+        //! @return An optimizer using the default controls.
+        Optimizer(unsigned int n_parameters);
+
+        //! Create an optimizer using the custom controls
+        //!
+        //! @param n_parameters Number of parameters to optimize
+        //! @param xtol_rel Relative tolerance on the parameter value
+        //! @param xtol_abs Absolute tolerance on the parameter value
+        //! @param ftol_rel Relative tolerance on the function value
+        //! @param ftol_abs Absolue tolerance on the function value
+        //! @param maxeval Maximal number of evaluations of the objective
+        //! @return An optimizer using the custom controls.
+        Optimizer(unsigned int n_parameters, double xtol_rel, double xtol_abs,
+                  double ftol_rel, double ftol_abs, int maxeval);
+
+        //! Set the optimizer's bounds
+        //!
+        //! @param bounds A matrix of parameters bounds
+        void set_bounds(MatXd bounds);
+
+        //! Set the optimizer's objective and data
+        //!
+        //! @param f The optimizer's objective function (see nlopt's documentation)
+        //! @param data The optimizer's data (see nlopt's documentation)
+        void set_objective(nlopt::vfunc f, void* f_data);
+
+        //! Solve the optimization problem
+        //!
+        //! @param initial_parameters Vector of starting values
+        //! @return MLE or PMLE
+        VecXd optimize(VecXd initial_parameters);
+
+    private:
+        unsigned int n_parameters_;
+        nlopt::opt opt_;
+        NLoptControls controls_;
+    };
+
     // the objective function for maximum likelihood estimation
     double mle_objective(const std::vector<double>& x,
                          std::vector<double> &,
@@ -98,7 +145,5 @@ namespace optimization_tools {
                           std::vector<double> &,
                           void* data);
 
-    // optimize the likelihood or profile likelihood
-    std::vector<double> optimize(std::vector<double> x, nlopt::opt opt);
 }
 #endif //VINECOPULIB_OPTIMIZATION_TOOLS_HPP

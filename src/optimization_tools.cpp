@@ -21,6 +21,47 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace optimization_tools {
 
+    Optimizer::Optimizer(unsigned int n_parameters)
+    {
+        if (n_parameters < 1)
+        {
+            throw std::runtime_error("n_parameters should be larger than 0.");
+        }
+        n_parameters_ = n_parameters;
+        opt_ = nlopt::opt(nlopt::LN_BOBYQA, n_parameters);
+        controls_ = NLoptControls();
+        controls_.set_controls(&opt_);
+    }
+
+    Optimizer::Optimizer(unsigned int n_parameters, double xtol_rel, double xtol_abs,
+                         double ftol_rel, double ftol_abs, int maxeval)
+    {
+        if (n_parameters < 1)
+        {
+            throw std::runtime_error("n_parameters should be larger than 0.");
+        }
+        n_parameters_ = n_parameters;
+        opt_ = nlopt::opt(nlopt::LN_BOBYQA, n_parameters);
+        controls_ = NLoptControls(xtol_rel, xtol_abs, ftol_rel, ftol_abs, maxeval);
+        controls_.set_controls(&opt_);
+    }
+
+    void Optimizer::set_bounds(MatXd bounds)
+    {
+        if (bounds.rows() != n_parameters_ || bounds.cols() != 2)
+        {
+            throw std::runtime_error("Bounds should be a two column matrix with n_parameters_ rows.");
+        }
+
+        std::vector<double> lb(n_parameters_);
+        std::vector<double> ub(n_parameters_);
+        VecXd eps = VecXd::Constant(n_parameters_,1e-6);
+        VecXd::Map(&lb[0], n_parameters_) = bounds.col(0)+eps;
+        VecXd::Map(&ub[0], n_parameters_) = bounds.col(1)-eps;
+        opt_.set_lower_bounds(lb);
+        opt_.set_upper_bounds(ub);
+    }
+
     NLoptControls::NLoptControls()
     {
         xtol_rel_ = 1e-6;
@@ -110,15 +151,25 @@ namespace optimization_tools {
         return nll;
     }
 
-    // optimize the likelihood or profile likelihood
-    std::vector<double> optimize(std::vector<double> x, nlopt::opt opt)
+    void Optimizer::set_objective(nlopt::vfunc f, void* f_data)
     {
+        opt_.set_min_objective(f, f_data);
+    }
+
+    // optimize the likelihood or profile likelihood
+    VecXd Optimizer::optimize(VecXd initial_parameters)
+    {
+        if (initial_parameters.size() != n_parameters_)
+        {
+            throw std::string("The size of x should be n_parameters_.");
+        }
+
         double nll;
-        std::vector<double> x_new = x;
-        // optimize function
+        std::vector<double> x(n_parameters_);
+        VecXd::Map(&x[0], n_parameters_) = initial_parameters;
         try
         {
-            opt.optimize(x_new, nll);
+            opt_.optimize(x, nll);
         } catch (nlopt::roundoff_limited err)
         {
             throw std::string("Halted because roundoff errors limited progress! ") + err.what();
@@ -134,7 +185,9 @@ namespace optimization_tools {
         } catch (std::runtime_error err)
         {
             throw std::string("Generic failure. ") + err.what();
-        }
-        return x_new;
+        } catch (...) {}
+
+        Eigen::Map<const Eigen::VectorXd> optimized_parameters(&x[0], x.size());
+        return optimized_parameters;
     }
 }

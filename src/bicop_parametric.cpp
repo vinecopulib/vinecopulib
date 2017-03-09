@@ -68,69 +68,38 @@ void ParBicop::fit(const MatXd &data, std::string method)
         if (npars > 0)
         {
             // Create optimizer
-            nlopt::opt opt(nlopt::LN_BOBYQA, npars);
-            NLoptControls nlopt_controls;
-            nlopt_controls.set_controls(&opt);
+            Optimizer optimizer(npars);
 
-            // Set bounds
-            std::vector<double> lb(npars);
-            std::vector<double> ub(npars);
+            // Set bounds and starting values
             MatXd bounds = get_parameters_bounds();
-            VecXd eps = VecXd::Constant(npars,1e-6);
+            VecXd initial_parameters = newpar;
             if (method == "itau")
             {
-                VecXd::Map(&lb[0], npars) = bounds.block(1,0,npars,1)+eps;
-                VecXd::Map(&ub[0], npars) = bounds.block(1,1,npars,1)-eps;
-            } else
-            {
-                VecXd::Map(&lb[0], npars) = bounds.col(0)+eps;
-                VecXd::Map(&ub[0], npars) = bounds.col(1)-eps;
-            }
-            opt.set_lower_bounds(lb);
-            opt.set_upper_bounds(ub);
-
-            // PMLE or MLE
-            if (method == "itau")
-            {
-                // organize data for nlopt
-                MatXd U = data;
-                ParBicopPMLEData my_pmle_data = {U, this, newpar(0), 0};
-
-                // call to the optimizer
-                opt.set_min_objective(pmle_objective, &my_pmle_data);
-
-                // starting value
-                std::vector<double> x(npars);
-                VecXd::Map(&x[0], npars) = newpar.block(1,0,npars,1);
-
-                // optimize function
-                x = optimize(x, opt);
-                for (int i = 0; i < npars; ++i)
-                    newpar(i + 1) = x[i];
-
+                bounds = bounds.block(1,0,npars,2);
+                initial_parameters = newpar.block(1,0,npars,1);
+                ParBicopPMLEData my_data = {data, this, newpar(0), 0};
+                optimizer.set_objective(pmle_objective, &my_data);
             }
             else
             {
-                // organize data for nlopt
-                MatXd U = data;
-                ParBicopMLEData my_mle_data = {U, this, 0};
+                ParBicopMLEData my_data = {data, this, 0};
+                optimizer.set_objective(mle_objective, &my_data);
+            }
 
-                // call to the optimizer
-                opt.set_min_objective(mle_objective, &my_mle_data);
+            optimizer.set_bounds(bounds);
+            VecXd optimized_parameters = optimizer.optimize(initial_parameters);
 
-                // starting value
-                std::vector<double> x(npars);
-                VecXd::Map(&x[0], npars) = newpar;
-
-                // optimize function
-                x = optimize(x, opt);
-
-                // save the new parameters
-                Eigen::Map<const Eigen::VectorXd> parameters(&x[0], x.size());
-                newpar = parameters;
+            if (method == "itau")
+            {
+                newpar.block(1,0,npars,1) = optimized_parameters;
+            }
+            else
+            {
+                newpar = optimized_parameters;
             }
         }
         // set the new parameters
         set_parameters(newpar);
     }
+
 }
