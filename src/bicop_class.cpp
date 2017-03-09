@@ -163,7 +163,7 @@ BicopPtr Bicop::select(const MatXd& data,
         // Estimate the model
         BicopPtr new_bicop = create(families[j], rotations[j]);
         new_bicop->fit(newdata, method);
-
+    
         // Compute the selection criterion
         double new_criterion;
         if (selection_criterion.compare("aic") == 0)
@@ -176,7 +176,7 @@ BicopPtr Bicop::select(const MatXd& data,
         {
             throw std::runtime_error(std::string("Selection criterion not implemented"));
         }
-
+            
         // If the new model is better than the current one, then replace the current model by the new one
         if (new_criterion < fitted_criterion)
         {
@@ -501,7 +501,7 @@ bool preselect_family(double c1, double c2, double tau, int family, int rotation
     {
         if (std::fabs(c1-c2) > 0.3)
         {
-            if (family == 2 || family == 0)
+            if (family == 2 || family == 0 || family == 1001)
             {
                 preselect = true;
             }

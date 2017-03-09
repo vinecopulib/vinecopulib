@@ -18,7 +18,11 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "interpolation_grid.hpp"
+#include "distribution_tools.hpp"
+#include <exception>
+
 // ---------------- Public methods ----------------
+
 
 //! Constructor
 //!
@@ -45,9 +49,8 @@ InterpolationGrid::InterpolationGrid(const VecXd& grid_points, const MatXd& valu
 
 void InterpolationGrid::flip()
 {
-    values_ = values_.transpose();
+    values_.transposeInPlace();
 }
-
 
 //! Interpolation in two dimensions
 //!
