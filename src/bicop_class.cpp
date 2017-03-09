@@ -82,7 +82,7 @@ BicopPtr Bicop::select(const MatXd& data,
     // If the familyset is not empty, check that all included families are implemented.
     if (family_set.empty())
     {
-        if (method.compare("itau") == 0)
+        if (method == "itau")
         {
             family_set = intersect(all_families, itau_families);
         }
@@ -92,11 +92,9 @@ BicopPtr Bicop::select(const MatXd& data,
         }
     } else
     {
-        bool family_exists = true;
         for (unsigned int j = 0; j < family_set.size(); j++)
         {
-            family_exists = is_member(family_set[j], all_families);
-            if (!family_exists)
+            if (!is_member(family_set[j], all_families))
                 throw std::runtime_error(std::string("One of the families is not implemented"));
         }
         family_set = intersect(family_set, itau_families);
@@ -182,13 +180,15 @@ BicopPtr Bicop::select(const MatXd& data,
 
         // Compute the selection criterion
         double new_criterion;
-        if (selection_criterion.compare("aic") == 0)
+        if (selection_criterion == "aic")
         {
             new_criterion = new_bicop->aic(newdata);
-        } else if (selection_criterion.compare("bic") == 0)
+        }
+        else if (selection_criterion == "bic")
         {
             new_criterion = new_bicop->bic(newdata);
-        } else
+        }
+        else
         {
             throw std::runtime_error(std::string("Selection criterion not implemented"));
         }
@@ -444,13 +444,13 @@ VecXd Bicop::hinv2_num(const MatXd &u)
 void Bicop::set_rotation(const int& rotation) {
     check_rotation(rotation);    
     rotation_ = rotation;
-    if ((this->association_direction_).compare("positive") == 0 ||
-            (this->association_direction_).compare("negative") == 0)
+    if (this->association_direction_ == "positive" || this->association_direction_ == "negative")
     {
         if (rotation == 0 || rotation == 180)
         {
             this->association_direction_ = "positive";
-        } else
+        }
+        else
         {
             this->association_direction_ = "negative";
         }

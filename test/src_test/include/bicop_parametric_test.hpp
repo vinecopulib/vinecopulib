@@ -66,7 +66,7 @@ public:
                 parameters = this->par_bicop_.tau_to_parameters(tau);
                 parameters(1) = 4;
             }
-            else // family == 7
+            if (family == 7)
             {
                 parameters(1) = 1.5;
                 parameters(0) = -((2*(1-parameters(1)+parameters(1)*std::fabs(tau)))/(parameters(1)*(-1+std::fabs(tau))));

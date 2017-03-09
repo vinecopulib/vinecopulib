@@ -78,13 +78,13 @@ void ParBicop::fit(const MatXd &data, std::string method)
     VecXd newpar = get_start_parameters(tau);
 
     std::string association_direction = get_association_direction();
-    if (((tau < 0) & (association_direction.compare("positive") == 0)) |
-        ((tau > 0) & (association_direction.compare("negative") == 0)))
+    if ((tau < 0 & association_direction == "positive") | (tau > 0 & association_direction == "negative"))
     {
         throw std::runtime_error("The data and copula are not compatible.");
-    } else
+    }
+    else
     {
-        if (method.compare("itau") == 0)
+        if (method == "itau")
         {
             if (npars > 1)
             {
@@ -151,7 +151,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
                 }
             }
             set_parameters(newpar);
-        } else if (method.compare("mle") == 0) {
+        } else if (method == "mle") {
             if (npars != 0)
             {
                 // Derivatives free optimization
