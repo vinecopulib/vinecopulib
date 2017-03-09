@@ -39,31 +39,4 @@ private:
     virtual VecXd get_start_parameters(const double tau) = 0;
 };
 
-
-//! A helper struct for nlopt maximum likelihood estimation
-//!
-typedef struct
-{
-    MatXd& U; //! The data
-    ParBicop* bicop; //! A pointer to the bivariate copula to optimize
-    unsigned int mle_objective_calls; //! The number of evaluations of the objective
-} ParBicopMLEData;
-
-//! A helper struct for nlopt profile maximum likelihood estimation
-//!
-typedef struct
-{
-    MatXd& U; //! The data
-    ParBicop* bicop; //! A pointer to the bivariate copula to optimize
-    double par0;  //! The main dependence parameter
-    unsigned int pmle_objective_calls; //! The number of evaluations of the objective
-} ParBicopPMLEData;
-
-double mle_objective(const std::vector<double>& x,
-                    std::vector<double> &,
-                    void* data);
-double pmle_objective(const std::vector<double>& x,
-                      std::vector<double> &,
-                      void* data);
-
 #endif

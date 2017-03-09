@@ -48,7 +48,7 @@ public:
     //! Create a bivariate copula using the default contructor
     //!
     //! @param family the copula family.
-    //! @rotation rotation the rotation type.
+    //! @param rotation the rotation type.
     //! @return A pointer to an object that inherits from \c Bicop.
     static std::shared_ptr<Bicop> create(const int& family,
                                          const int& rotation);
@@ -57,7 +57,7 @@ public:
     //!
     //! @param family the copula family.
     //! @param par the copula parameters (must be compatible with family).
-    //! @rotation rotation the rotation type.
+    //! @param rotation the rotation type.
     //! @return A pointer to an object that inherits from \c Bicop.
     static std::shared_ptr<Bicop> create(const int& family,
                                          const VecXd& parameters,
