@@ -64,3 +64,8 @@ double KernelBicop::calculate_npars()
 {
     return npars_;
 }
+
+void KernelBicop::flip()
+{
+    interp_grid_.flip();
+}

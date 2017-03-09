@@ -35,6 +35,8 @@ public:
     InterpolationGrid() {}
     InterpolationGrid(const VecXd& grid_points, const MatXd& values);
 
+    void flip();
+
     VecXd interpolate(const MatXd& x);
     VecXd intergrate_1d(const MatXd& u, const int& cond_var);
     VecXd inv_intergrate_1d(const MatXd& u, const int& cond_var);
