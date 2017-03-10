@@ -21,7 +21,7 @@ along with vinecoplib.  If not, see <http://www.gnu.org/licenses/>.
 
 RInstance::RInstance() {
     // Default sample size
-    int n = 1e4;
+    int n = 5e3;
     n_ = n;
     family_ = 0;
     rotation_ = 0;
