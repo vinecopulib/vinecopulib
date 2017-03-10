@@ -73,13 +73,6 @@ VecXd Bb6Bicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
-// inverse h-function
-VecXd Bb6Bicop::hinv1_default(const MatXd& u)
-{
-    VecXd hinv = hinv1_num(u);
-    return hinv;
-}
-
 double Bb6Bicop::parameters_to_tau(const VecXd& parameters)
 {
     double theta = parameters(0);
@@ -91,12 +84,5 @@ double Bb6Bicop::parameters_to_tau(const VecXd& parameters)
     if ((rotation_ == 90) | (rotation_ == 270))
         tau *= -1;
     return tau;
-}
-
-VecXd Bb6Bicop::get_start_parameters(const double tau)
-{
-    MatXd bounds = this->get_parameters_bounds();
-    VecXd parameters = bounds.col(0) + VecXd::Constant(2, 0.1);
-    return parameters;
 }
 

@@ -73,6 +73,15 @@ VecXd Bb1Bicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
+double Bb1Bicop::parameters_to_tau(const VecXd& parameters)
+{
+    double tau = 1-2/(parameters(1) * (parameters(0) + 2));
+    if ((rotation_ == 90) | (rotation_ == 270))
+        tau *= -1;
+    return tau;
+}
+
+
 /*// PDF
 VecXd Bb1Bicop::pdf_default(const MatXd& u)
 {
@@ -131,25 +140,3 @@ VecXd Bb1Bicop::hfunc1_default(const MatXd& u)
     f = f.cwiseProduct(t1).cwiseProduct(t2);
     return f;
 }*/
-
-// inverse h-function
-VecXd Bb1Bicop::hinv1_default(const MatXd& u)
-{
-    VecXd hinv = hinv1_num(u);
-    return hinv;
-}
-
-double Bb1Bicop::parameters_to_tau(const VecXd& parameters)
-{
-    double tau = 1-2/(parameters(1) * (parameters(0) + 2));
-    if ((rotation_ == 90) | (rotation_ == 270))
-        tau *= -1;
-    return tau;
-}
-
-VecXd Bb1Bicop::get_start_parameters(const double tau)
-{
-    MatXd bounds = this->get_parameters_bounds();
-    VecXd parameters = bounds.col(0) + VecXd::Constant(2, 0.1);
-    return parameters;
-}

@@ -82,6 +82,31 @@ VecXd FrankBicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
+VecXd FrankBicop::tau_to_parameters(const double& tau)
+{
+    VecXd tau2 = VecXd::Constant(1, std::fabs(tau));
+    auto f = [&](const VecXd &v) {
+        return VecXd::Constant(1, std::fabs(parameters_to_tau(v)));
+    };
+    return invert_f(tau2, f, -100+1e-6, 100);
+}
+
+double FrankBicop::parameters_to_tau(const VecXd& parameters)
+{
+    double par = parameters(0);
+    double tau = 1 - 4/par;
+    double d = debyen(std::fabs(par), 1) / std::fabs(par);
+    if (par < 0)
+        d = d - par/2;
+    tau = tau + (4/par) * d;
+    return tau;
+}
+
+VecXd FrankBicop::get_start_parameters(const double tau)
+{
+    return tau_to_parameters(tau);
+}
+
 /*// PDF
 VecXd FrankBicop::pdf_default(const MatXd& u)
 {
@@ -109,35 +134,3 @@ VecXd FrankBicop::hfunc1_default(const MatXd& u)
     f = f.cwiseQuotient(t1);
     return f;
 }*/
-
-// inverse h-function
-VecXd FrankBicop::hinv1_default(const MatXd& u)
-{
-    VecXd hinv = hinv1_num(u);
-    return hinv;
-}
-
-VecXd FrankBicop::tau_to_parameters(const double& tau)
-{
-    VecXd tau2 = VecXd::Constant(1, std::fabs(tau));
-    auto f = [&](const VecXd &v) {
-        return VecXd::Constant(1, std::fabs(parameters_to_tau(v)));
-    };
-    return invert_f(tau2, f, -100+1e-6, 100);
-}
-
-double FrankBicop::parameters_to_tau(const VecXd& parameters)
-{
-    double par = parameters(0);
-    double tau = 1 - 4/par;
-    double d = debyen(std::fabs(par), 1) / std::fabs(par);
-    if (par < 0)
-        d = d - par/2;
-    tau = tau + (4/par) * d;
-    return tau;
-}
-
-VecXd FrankBicop::get_start_parameters(const double tau)
-{
-    return tau_to_parameters(tau);
-}

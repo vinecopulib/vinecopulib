@@ -94,7 +94,7 @@ namespace {
     }
     
     TYPED_TEST(ParBicopTest, bicop_select_itau_bic_is_correct) {
-        std::vector<int> no_itau_families = {7, 8};
+        std::vector<int> no_itau_families = {7, 8, 9, 10};
         std::vector<int> rots = {0, 90, 180, 270};
         std::string selection_criterion = "bic";
         std::vector<int> family_set = {};

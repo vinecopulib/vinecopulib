@@ -80,45 +80,6 @@ VecXd JoeBicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
-/*// PDF
-VecXd JoeBicop::pdf_default(const MatXd& u)
-{
-    double theta = double(this->parameters_(0));
-
-    VecXd f = VecXd::Ones(u.rows());
-    if (theta > 1+1e-6)
-    {
-        MatXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
-        VecXd t1 = t.rowwise().prod();
-        f = t1.unaryExpr([theta](const double v){ return theta-v;});
-
-        t1 = t1.unaryExpr([theta](const double v){ return std::pow(1-v,-2+1/theta);});
-        f = f.cwiseProduct(t1);
-
-        t = u.unaryExpr([theta](const double v){ return std::pow(1-v,-1+theta);});
-        t1 = t.rowwise().prod();
-        f = f.cwiseProduct(t1);
-    }
-    return f;
-}
-
-// hfunction
-VecXd JoeBicop::hfunc1_default(const MatXd& u)
-{
-    double theta = double(this->parameters_(0));
-    MatXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
-    VecXd t1 = t.rowwise().prod();
-    VecXd f = t1.unaryExpr([theta](const double v){ return std::pow(1-v,-1+1/theta);});
-
-    t1 = u.col(0).unaryExpr([theta](const double v){ return std::pow(1-v,-1+theta);});
-    f = f.cwiseProduct(t1);
-
-    t1 = u.col(1).unaryExpr([theta](const double v){ return 1-std::pow(1-v,theta);});
-    f = f.cwiseProduct(t1);
-
-    return f;
-}*/
-
 // inverse h-function
 VecXd JoeBicop::hinv1_default(const MatXd& u)
 {
@@ -212,3 +173,42 @@ VecXd JoeBicop::get_start_parameters(const double tau)
 {
     return tau_to_parameters(tau);
 }
+
+/*// PDF
+VecXd JoeBicop::pdf_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+
+    VecXd f = VecXd::Ones(u.rows());
+    if (theta > 1+1e-6)
+    {
+        MatXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
+        VecXd t1 = t.rowwise().prod();
+        f = t1.unaryExpr([theta](const double v){ return theta-v;});
+
+        t1 = t1.unaryExpr([theta](const double v){ return std::pow(1-v,-2+1/theta);});
+        f = f.cwiseProduct(t1);
+
+        t = u.unaryExpr([theta](const double v){ return std::pow(1-v,-1+theta);});
+        t1 = t.rowwise().prod();
+        f = f.cwiseProduct(t1);
+    }
+    return f;
+}
+
+// hfunction
+VecXd JoeBicop::hfunc1_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    MatXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
+    VecXd t1 = t.rowwise().prod();
+    VecXd f = t1.unaryExpr([theta](const double v){ return std::pow(1-v,-1+1/theta);});
+
+    t1 = u.col(0).unaryExpr([theta](const double v){ return std::pow(1-v,-1+theta);});
+    f = f.cwiseProduct(t1);
+
+    t1 = u.col(1).unaryExpr([theta](const double v){ return 1-std::pow(1-v,theta);});
+    f = f.cwiseProduct(t1);
+
+    return f;
+}*/

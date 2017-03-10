@@ -17,18 +17,19 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPULIB_BICOP_BB1_HPP
-#define VINECOPULIB_BICOP_BB1_HPP
+#ifndef VINECOPULIB_BICOP_BB7_HPP
+#define VINECOPULIB_BICOP_BB7_HPP
 
 #include "bicop_archimedean.hpp"
+#include "integration_tools.hpp"
 
-class Bb1Bicop : public ArchimedeanBicop {
+class Bb7Bicop : public ArchimedeanBicop {
 
 public:
     // constructor
-    Bb1Bicop();
-    Bb1Bicop(const VecXd& parameters);
-    Bb1Bicop(const VecXd& parameters, const int& rotation);
+    Bb7Bicop();
+    Bb7Bicop(const VecXd& parameters);
+    Bb7Bicop(const VecXd& parameters, const int& rotation);
 
     // generator, its inverse and derivatives for the archimedean copula
     VecXd generator(const VecXd& u);

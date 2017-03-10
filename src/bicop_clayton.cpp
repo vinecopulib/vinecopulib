@@ -80,42 +80,6 @@ VecXd ClaytonBicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
-/*// PDF
-VecXd ClaytonBicop::pdf_default(const MatXd& u)
-{
-    double theta = double(this->parameters_(0));
-    VecXd t1 = generator(u.col(0));
-    VecXd t2 = generator(u.col(1));
-    VecXd t = t1+t2;
-    VecXd f = generator_inv(t);
-
-    t1 = u.col(0).array().pow(theta);
-    t2 = u.col(1).array().pow(theta);
-    t = t1 + t2 - t1.cwiseProduct(t2);
-    t = t.array().square();
-
-    t1 = t1.array().pow((theta-1)/theta);
-    t2 = t2.array().pow((theta-1)/theta);
-
-    f = (1+theta)*f.cwiseQuotient(t).cwiseProduct(t1).cwiseProduct(t2);
-    return f;
-}
-
-// hfunction
-VecXd ClaytonBicop::hfunc1_default(const MatXd& u)
-{
-    double theta = double(this->parameters_(0));
-    VecXd t1 = generator(u.col(0));
-    VecXd t2 = generator(u.col(1));
-    VecXd t = t1+t2;
-    VecXd f = generator_inv(t);
-    f = f.array().pow(1+theta);
-
-    t2 = u.col(0).array().pow(-1-theta);
-    f = f.cwiseProduct(t2);
-    return f;
-}*/
-
 // inverse h-function
 VecXd ClaytonBicop::hinv1_default(const MatXd& u)
 {
@@ -154,3 +118,39 @@ VecXd ClaytonBicop::get_start_parameters(const double tau)
 {
     return tau_to_parameters(tau);
 }
+
+/*// PDF
+VecXd ClaytonBicop::pdf_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    VecXd t1 = generator(u.col(0));
+    VecXd t2 = generator(u.col(1));
+    VecXd t = t1+t2;
+    VecXd f = generator_inv(t);
+
+    t1 = u.col(0).array().pow(theta);
+    t2 = u.col(1).array().pow(theta);
+    t = t1 + t2 - t1.cwiseProduct(t2);
+    t = t.array().square();
+
+    t1 = t1.array().pow((theta-1)/theta);
+    t2 = t2.array().pow((theta-1)/theta);
+
+    f = (1+theta)*f.cwiseQuotient(t).cwiseProduct(t1).cwiseProduct(t2);
+    return f;
+}
+
+// hfunction
+VecXd ClaytonBicop::hfunc1_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    VecXd t1 = generator(u.col(0));
+    VecXd t2 = generator(u.col(1));
+    VecXd t = t1+t2;
+    VecXd f = generator_inv(t);
+    f = f.array().pow(1+theta);
+
+    t2 = u.col(0).array().pow(-1-theta);
+    f = f.cwiseProduct(t2);
+    return f;
+}*/

@@ -80,35 +80,6 @@ VecXd GumbelBicop::generator_derivative2(const VecXd& u)
     return u.unaryExpr(f);
 }
 
-/*// PDF
-VecXd GumbelBicop::pdf_default(const MatXd& u)
-{
-    double theta = double(this->parameters_(0));
-    VecXd t1 = generator(u.col(0));
-    VecXd t2 = generator(u.col(1));
-    VecXd t = t1+t2;
-    t1 = t1.array().pow((theta-1)/theta);
-    t2 = t2.array().pow((theta-1)/theta);
-    VecXd f = generator_inv(t);
-    t = t.unaryExpr([theta](const double v){ return (-1+theta+std::pow(v, 1/theta)) * std::pow(v,-2+1/theta);});
-    f = f.cwiseProduct(t).cwiseProduct(t1).cwiseProduct(t2).cwiseQuotient(u.rowwise().prod());
-    return f;
-}
-
-// hfunction
-VecXd GumbelBicop::hfunc1_default(const MatXd& u)
-{
-    double theta = double(this->parameters_(0));
-    VecXd t1 = generator(u.col(1));
-    VecXd t2 = generator(u.col(0));
-    VecXd t = t1+t2;
-    t2 = t2.array().pow((theta-1)/theta);
-    VecXd f = generator_inv(t);
-    t = t.array().pow(1/theta-1);
-    f = f.cwiseProduct(t).cwiseProduct(t2).cwiseQuotient(u.col(0));
-    return f;
-}*/
-
 // inverse h-function
 VecXd GumbelBicop::hinv1_default(const MatXd& u)
 {
@@ -179,3 +150,34 @@ VecXd GumbelBicop::get_start_parameters(const double tau)
 {
     return tau_to_parameters(tau);
 }
+
+
+
+/*// PDF
+VecXd GumbelBicop::pdf_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    VecXd t1 = generator(u.col(0));
+    VecXd t2 = generator(u.col(1));
+    VecXd t = t1+t2;
+    t1 = t1.array().pow((theta-1)/theta);
+    t2 = t2.array().pow((theta-1)/theta);
+    VecXd f = generator_inv(t);
+    t = t.unaryExpr([theta](const double v){ return (-1+theta+std::pow(v, 1/theta)) * std::pow(v,-2+1/theta);});
+    f = f.cwiseProduct(t).cwiseProduct(t1).cwiseProduct(t2).cwiseQuotient(u.rowwise().prod());
+    return f;
+}
+
+// hfunction
+VecXd GumbelBicop::hfunc1_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    VecXd t1 = generator(u.col(1));
+    VecXd t2 = generator(u.col(0));
+    VecXd t = t1+t2;
+    t2 = t2.array().pow((theta-1)/theta);
+    VecXd f = generator_inv(t);
+    t = t.array().pow(1/theta-1);
+    f = f.cwiseProduct(t).cwiseProduct(t2).cwiseQuotient(u.col(0));
+    return f;
+}*/

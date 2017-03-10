@@ -66,14 +66,18 @@ public:
                 parameters = this->par_bicop_.tau_to_parameters(tau);
                 parameters(1) = 4;
             }
-            if (family == 7)
+            else if (family == 7)
             {
                 parameters(1) = 1.5;
                 parameters(0) = -((2*(1-parameters(1)+parameters(1)*std::fabs(tau)))/(parameters(1)*(-1+std::fabs(tau))));
             }
-            if (family == 8)
+            else
             {
                 double delta = 1.5;
+                if (family == 10)
+                {
+                    delta = 0.8;
+                }
                 VecXd tau_v = VecXd::Constant(1,std::fabs(tau));
                 auto f = [this, delta](const VecXd &v) {
                     VecXd par = VecXd::Constant(2, delta);
@@ -102,7 +106,8 @@ protected:
 };
 
 // Create a list of types, each of which will be used as the test fixture's 'T'
-typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop, Bb1Bicop> ParBicopTypes;
+typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop,
+        Bb1Bicop, Bb6Bicop, Bb7Bicop, Bb8Bicop> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);
 
 #endif

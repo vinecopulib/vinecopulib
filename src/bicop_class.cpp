@@ -50,6 +50,12 @@ BicopPtr Bicop::create(const int& family, const int& rotation)
         case 8:
             my_bicop = BicopPtr(new Bb6Bicop());
             break;
+        case 9:
+            my_bicop = BicopPtr(new Bb7Bicop());
+            break;
+        case 10:
+            my_bicop = BicopPtr(new Bb8Bicop());
+            break;
         case 1001:
             my_bicop =  BicopPtr(new TrafokernelBicop());
             break;
@@ -77,7 +83,7 @@ BicopPtr Bicop::select(const MatXd& data,
                      bool preselect_families,
                      std::string method)
 {
-    std::vector<int> all_families = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1001};
+    std::vector<int> all_families = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1001};
     std::vector<int> itau_families = {0, 1, 2, 3, 4, 5, 6};
     std::vector<int> rotationless_families = {0, 1, 2, 5, 1001};
 
@@ -538,7 +544,7 @@ bool preselect_family(double c1, double c2, double tau, int family, int rotation
     } else
     {
         bool is_90or180 = (rotation == 90 || rotation == 180);
-        if (family == 7 || family == 8)
+        if (family == 7 || family == 8 || family == 9 || family == 10)
         {
             if (tau > 0 && (rotation == 0 || rotation == 180))
             {

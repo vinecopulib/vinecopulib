@@ -29,6 +29,7 @@ public:
     VecXd pdf_default(const MatXd& u);
     VecXd hfunc1_default(const MatXd& u);
     VecXd hfunc2_default(const MatXd& u);
+    VecXd hinv1_default(const MatXd& u);
     VecXd hinv2_default(const MatXd& u);
 
     // generator, its inverse and derivatives
@@ -38,6 +39,9 @@ public:
     virtual VecXd generator_derivative2(const VecXd& u) = 0;
 
     void flip();
+
+private:
+    VecXd get_start_parameters(const double tau);
 };
 
 
