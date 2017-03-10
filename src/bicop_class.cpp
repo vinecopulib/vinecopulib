@@ -106,11 +106,12 @@ BicopPtr Bicop::select(const MatXd& data,
             if (!is_member(family_set[j], all_families))
                 throw std::runtime_error(std::string("One of the families is not implemented"));
         }
-        family_set = intersect(family_set, itau_families);
-        if (family_set.empty())
-        {
-            throw std::runtime_error(std::string("None of the families has method itau available"));
+        if (method == "itau") {
+            family_set = intersect(family_set, itau_families);
+            if (family_set.empty())
+                throw std::runtime_error(std::string("None of the families has method itau available"));
         }
+
     }
 
     int n = data.rows();
