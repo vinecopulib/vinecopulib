@@ -58,7 +58,7 @@ namespace {
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
+                pc = Bicop::create(3, VecXd::Constant(1, 3.0), 270);
             }
         }
         Vinecop vinecop(pair_copulas, mat);
@@ -70,10 +70,10 @@ namespace {
     }
             
     TEST(vinecop_class, select_finds_right_structure) {
-        Vinecop fit = Vinecop::select(vc_test.u, {0});
-        vc_test.R.parseEval("fit <- RVineStructureSelect(u, familyset = 0)");
+        Vinecop fit = Vinecop::select(vc_test.u, {3});
+        vc_test.R.parseEval("fit <- RVineStructureSelect(u, familyset = 3)");
         auto matrix = Rcpp::as<MatXi>(vc_test.R.parseEval("fit$Matrix"));
-        std::cout << matrix << std::endl << std::endl;
+        std::cout << vc_test.matrix << std::endl << std::endl;
         std::cout << fit.get_matrix() << std::endl << std::endl;
         // TODO: compare matrices (after chaning matrix style)
     }

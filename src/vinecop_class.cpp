@@ -147,6 +147,7 @@ Vinecop Vinecop::select(
             selection_criterion,
             preselect_families
         );
+        show_trace = true;
         if (show_trace) {
             std::cout << "Tree " << t - 1 << ":" << std::endl;
             print_pair_copulas(trees[t]);
@@ -199,6 +200,7 @@ int Vinecop::get_family(int tree, int edge)
     return get_pair_copula(tree, edge)->get_family();
 }
 
+
 //! Get rotation of a pair copula
 //!
 //! @param tree tree index (starting with 0).
@@ -209,6 +211,7 @@ int Vinecop::get_rotation(int tree, int edge)
 {
     return get_pair_copula(tree, edge)->get_rotation();
 }
+
 
 //! Get parameters of a pair copula
 //!
@@ -320,6 +323,7 @@ MatXd Vinecop::simulate(int n, const MatXd& U)
         ", actual: " << U.rows() << std::endl;
         throw std::runtime_error(message.str().c_str());
     }
+
     MatXd U_vine = U;  // output matrix
 
     //                   (direct + indirect)    (U_vine)       (info matrices)
@@ -337,57 +341,61 @@ MatXd Vinecop::simulate(int n, const MatXd& U)
     }
 
     // info about the vine structure (in upper triangular matrix notation)
-    VecXi order = vine_matrix_.get_matrix().diagonal().reverse();
-    VecXi inverse_order = invert_order(order);
-    MatXi no_matrix     = to_upper_tri(vine_matrix_.in_natural_order());
-    MatXi max_matrix    = to_upper_tri(vine_matrix_.get_max_matrix());
-    MatXb needed_hfunc1 = to_upper_tri(vine_matrix_.get_needed_hfunc1());
-    MatXb needed_hfunc2 = to_upper_tri(vine_matrix_.get_needed_hfunc2());
-
+    VecXi revorder      = vine_matrix_.get_order().reverse();
+    MatXi no_matrix     = vine_matrix_.in_natural_order();
+    MatXi max_matrix    = vine_matrix_.get_max_matrix();
+    MatXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
+    MatXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
+        
     // temporary storage objects for (inverse) h-functions
     typedef Eigen::Matrix<VecXd, Eigen::Dynamic, Eigen::Dynamic> Array3d;
-    Array3d direct(d, d);
-    Array3d indirect(d, d);
+    Array3d hinv2(d, d);
+    Array3d hfunc1(d, d);
 
     // initialize with independent uniforms (corresponding to natural order)
     for (int j = 0; j < d; ++j)
-        direct(j, j) = U.col(order(j) - 1);
-    indirect(0, 0) = direct(0, 0);
+        hinv2(d - j - 1, j) = U.col(revorder(j) - 1);
+    hfunc1(0, d - 1) = hinv2(0, d - 1);
 
     // loop through variables (0 is just the inital uniform)
-    for (int var = 1; var < d; ++var) {
-        for (int tree = var - 1; tree > -1; --tree) {
-            BicopPtr edge_copula = get_pair_copula(tree, d - var - 1);
+    for (int var = d - 2; var > -1; --var) {
+        for (int tree = d - var - 2; tree > -1; --tree) {
+            BicopPtr edge_copula = get_pair_copula(tree, var);
+
             // extract data for conditional pair
             MatXd U_e(n, 2);
             int m = max_matrix(tree, var);
-            U_e.col(1) = direct(tree + 1, var);
+            U_e.col(0) = hinv2(tree + 1, var);
             if (m == no_matrix(tree, var)) {
-                U_e.col(0) = direct(tree, m - 1);
+                U_e.col(1) = hinv2(tree, d - m);
             } else {
-                U_e.col(0) = indirect(tree, m - 1);
+                U_e.col(1) = hfunc1(tree, d - m);
             }
+
             // inverse Rosenblatt transform simulates data for conditional pair
-            direct(tree, var) = edge_copula->hinv1(U_e);
+            hinv2(tree, var) = edge_copula->hinv2(U_e);
+
             // if required at later stage, also calculate hfunc2
             if (var < d_ - 1) {
-                if (needed_hfunc2(tree + 1, var)) {
-                    U_e.col(1) = direct(tree, var);
-                    indirect(tree + 1, var) = edge_copula->hfunc2(U_e);
+                if (needed_hfunc1(tree + 1, var)) {
+                    U_e.col(0) = hinv2(tree, var);
+                    hfunc1(tree + 1, var) = edge_copula->hfunc1(U_e);
                 }
             }
         }
     }
+
     // go back to original order
+    VecXi inverse_order = inverse_permutation(revorder);
     for (int j = 0; j < d; ++j)
-        U_vine.col(j) = direct(0, inverse_order(j));
+        U_vine.col(j) = hinv2(0, inverse_order(j));
 
     return U_vine;
 }
 //! @}
 
 // get indexes for reverting back to old order in simulation routine
-VecXi invert_order(const VecXi& order) {
+VecXi inverse_permutation(const VecXi& order) {
     // start with (0, 1, .., k)
     std::vector<int> indexes(order.size());
     iota(indexes.begin(), indexes.end(), 0);
