@@ -238,25 +238,25 @@ VecXd Vinecop::pdf(const MatXd& u)
     }
 
     // info about the vine structure (reverse rows (!) for more natural indexing)
-    VecXi order         = vine_matrix_.get_matrix().diagonal();
-    MatXi no_matrix     = vine_matrix_.in_natural_order().colwise().reverse();
-    MatXi max_matrix    = vine_matrix_.get_max_matrix().colwise().reverse();
-    MatXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1().colwise().reverse();
-    MatXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2().colwise().reverse();
+    VecXi revorder      = vine_matrix_.get_order().reverse();
+    MatXi no_matrix     = vine_matrix_.in_natural_order();
+    MatXi max_matrix    = vine_matrix_.get_max_matrix();
+    MatXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
+    MatXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
 
     // initial value must be 1.0 for multiplication
     VecXd vine_density = VecXd::Constant(u.rows(), 1.0);
     
     // temporary storage objects for h-functions
-    MatXd direct(n, d);
-    MatXd indirect(n, d);
+    MatXd hfunc1(n, d);
+    MatXd hfunc2(n, d);
     MatXd u_e(n, 2);
     
-    // fill first row of direct matrix with evaluation points;
-    // points have tos be reordered to correspond to natural order
+    // fill first row of hfunc2 matrix with evaluation points;
+    // points have to be reordered to correspond to natural order
     for (int j = 0; j < d; ++j)
-        direct.col(j) = u.col(order(j) - 1);
-    
+        hfunc2.col(j) = u.col(revorder(j) - 1);
+
     for (int tree = 0; tree < d - 1; ++tree) {
         for (int edge = 0; edge < d - tree - 1; ++edge) {
             // get pair copula for this edge
@@ -265,19 +265,19 @@ VecXd Vinecop::pdf(const MatXd& u)
             // extract evaluation point from hfunction matrices (have been
             // computed in previous tree level)
             int m = max_matrix(tree, edge);
-            u_e.col(1) = direct.col(edge);
+            u_e.col(0) = hfunc2.col(edge);
             if (m == no_matrix(tree, edge)) {
-                u_e.col(0) = direct.col(d - m);
+                u_e.col(1) = hfunc2.col(d - m);
             } else {
-                u_e.col(0) = indirect.col(d - m);
+                u_e.col(1) = hfunc1.col(d - m);
             }
-    
+            
             vine_density = vine_density.cwiseProduct(edge_copula->pdf(u_e));
             // h-functions are only evaluated if needed in next step
             if (needed_hfunc1(tree + 1, edge))
-                direct.col(edge) = edge_copula->hfunc1(u_e);
+                hfunc1.col(edge) = edge_copula->hfunc1(u_e);
             if (needed_hfunc2(tree + 1, edge))
-                indirect.col(edge) = edge_copula->hfunc2(u_e);
+                hfunc2.col(edge) = edge_copula->hfunc2(u_e);
         }
     }
 
