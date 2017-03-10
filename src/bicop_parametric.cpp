@@ -58,7 +58,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
         if (method == "itau")
         {
             npars = npars - 1;
-            if (npars > 0 & family_ != 2)
+            if ((npars > 0) & (family_ != 2))
             {
                 throw std::runtime_error("itau method is not available for this family.");
             }
@@ -85,16 +85,15 @@ void ParBicop::fit(const MatXd &data, std::string method)
             // Set bounds and starting values
             MatXd bounds = get_parameters_bounds();
             VecXd initial_parameters = newpar;
+            ParBicopOptData my_data = {data, this, newpar(0), 0};
             if (method == "itau")
             {
                 bounds = get_parameters_bounds().block(1,0,npars,2);
                 initial_parameters = newpar.block(1,0,npars,1);
-                ParBicopPMLEData my_data = {data, this, newpar(0), 0};
                 optimizer.set_objective(pmle_objective, &my_data);
             }
             else
             {
-                ParBicopMLEData my_data = {data, this, 0};
                 optimizer.set_objective(mle_objective, &my_data);
             }
 

@@ -122,11 +122,11 @@ namespace optimization_tools {
 
     // the objective function for maximum likelihood estimation
     double mle_objective(const std::vector<double>& x,
-                         std::vector<double> &,
-                         void* data)
+                         std::vector<double>&,
+                         void* f_data)
     {
-        ParBicopMLEData* newdata = (ParBicopMLEData*) data;
-        ++newdata->mle_objective_calls;
+        ParBicopOptData* newdata = (ParBicopOptData*) f_data;
+        ++newdata->objective_calls;
         Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
         newdata->bicop->set_parameters(par);
         double nll = newdata->bicop->loglik(newdata->U);
@@ -136,11 +136,11 @@ namespace optimization_tools {
 
     // the objective function for profile maximum likelihood estimation
     double pmle_objective(const std::vector<double>& x,
-                          std::vector<double> &,
-                          void* data)
+                          std::vector<double>&,
+                          void* f_data)
     {
-        ParBicopPMLEData* newdata = (ParBicopPMLEData*) data;
-        ++newdata->pmle_objective_calls;
+        ParBicopOptData* newdata = (ParBicopOptData*) f_data;
+        ++newdata->objective_calls;
         VecXd par = VecXd::Ones(x.size()+1);
         par(0) = newdata->par0;
         for (unsigned int i = 0; i < x.size(); ++i)

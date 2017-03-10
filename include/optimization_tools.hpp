@@ -24,24 +24,16 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include "bicop_parametric.hpp"
 
 namespace optimization_tools {
-    //! A helper struct for nlopt maximum likelihood estimation
-    //!
-    typedef struct
-    {
-        const MatXd& U; //! The data
-        ParBicop* bicop; //! A pointer to the bivariate copula to optimize
-        unsigned int mle_objective_calls; //! The number of evaluations of the objective
-    } ParBicopMLEData;
 
-    //! A helper struct for nlopt profile maximum likelihood estimation
+    //! A helper struct for nlopt (profile) maximum likelihood estimation
     //!
     typedef struct
     {
         const MatXd& U; //! The data
         ParBicop* bicop; //! A pointer to the bivariate copula to optimize
         double par0;  //! The main dependence parameter
-        unsigned int pmle_objective_calls; //! The number of evaluations of the objective
-    } ParBicopPMLEData;
+        unsigned int objective_calls; //! The number of evaluations of the objective
+    } ParBicopOptData;
 
     //! A class for the controls to nlopt
     //!
