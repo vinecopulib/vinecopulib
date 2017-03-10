@@ -18,7 +18,6 @@
  */
 
 #include "bicop_joe.hpp"
-#include <cmath>
 
 // constructor
 JoeBicop::JoeBicop()
@@ -48,48 +47,41 @@ JoeBicop::JoeBicop(const VecXd& parameters, const int& rotation)
 VecXd JoeBicop::generator(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = VecXd::Ones(u.size()) - u;
-    psi = psi.array().pow(theta);
-    psi = VecXd::Ones(psi.size()) - psi;
-    psi = (-1) * psi.array().log();
-    return psi;
+    auto f = [theta](const double v) {
+        return (-1)*std::log(1-std::pow(1-v, theta));
+    };
+    return u.unaryExpr(f);
 }
 
 VecXd JoeBicop::generator_inv(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (-1) * u;
-    psi = psi.array().exp();
-    psi = VecXd::Ones(psi.size()) - psi;
-    psi = psi.array().pow(1/theta);
-    psi = VecXd::Ones(psi.size()) - psi;
-    return psi;
+    auto f = [theta](const double v) {
+        return 1-std::pow(1-std::exp(-v),1/theta);
+    };
+    return u.unaryExpr(f);
 }
 
 VecXd JoeBicop::generator_derivative(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = VecXd::Ones(u.size()) - u;
-    VecXd psi2 = psi.array().pow(theta);
-    psi = psi.array().pow(-1+theta);
-    psi2 = VecXd::Ones(psi.size()) - psi2;
-    psi = (-theta) * psi.cwiseQuotient(psi2);
-    return psi;
+    auto f = [theta](const double v) {
+        return (-theta)*std::pow(1-v, theta-1)/(1-std::pow(1-v, theta));
+    };
+    return u.unaryExpr(f);
 }
 
 VecXd JoeBicop::generator_derivative2(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = VecXd::Ones(u.size()) - u;
-    VecXd psi2 = psi.array().pow(theta);
-    psi = psi.array().pow(-2+theta);
-    psi2 = psi2 - VecXd::Ones(psi.size());
-    psi = psi.cwiseQuotient(psi2.cwiseAbs2());
-    psi = theta * psi.cwiseProduct(psi2 + theta * VecXd::Ones(psi.size()));
-    return psi;
+    auto f = [theta](const double v) {
+        return theta*(theta-1+std::pow(1-v, theta))*std::pow(1-v, theta-2)/std::pow(-1+std::pow(1-v, theta),2);
+    };
+    return u.unaryExpr(f);
 }
 
-VecXd JoeBicop::hinv(const MatXd& u)
+// inverse h-function
+VecXd JoeBicop::hinv1_default(const MatXd& u)
 {
     double theta = double(this->parameters_(0));
     double u1, u2;
@@ -106,55 +98,11 @@ VecXd JoeBicop::hinv(const MatXd& u)
 // link between Kendall's tau and the par_bicop parameter
 VecXd JoeBicop::tau_to_parameters(const double& tau)
 {
-    int br = 0, it = 0;
-    double tol = 1e-12, xl = 1 + 1e-6, xh = 100, fl, fh, fm, par;
-
-    fl = fabs(parameters_to_tau(VecXd::Constant(1, xl)) - tau);
-    fh = fabs(parameters_to_tau(VecXd::Constant(1, xh)) - tau);
-    if (fl <= tol) {
-        par = xl;
-        br = 1;
-    }
-    if (fh <= tol) {
-        par = xh;
-        br = 1;
-    }
-
-    while (!br) {
-        par = (xh + xl) / 2.0;
-        fm = parameters_to_tau(VecXd::Constant(1, par)) - tau;
-
-        //stop if values become too close (avoid infinite loop)
-        if (fabs(fm) <= tol) br = 1;
-        if (fabs(xl - xh) <= tol) br = 1;
-
-        if (tau < 0.0)
-        {
-            if (fm > 0.0) {
-                xl = par;
-                fh = fm;
-            } else {
-                xh = par;
-                fl = fm;
-            }
-        } else
-        {
-            if (fm < 0.0) {
-                xl = par;
-                fh = fm;
-            } else {
-                xh = par;
-                fl = fm;
-            }
-        }
-
-        //stop if too many iterations are required (avoid infinite loop)
-        ++it;
-        if (it > 50)
-            br = 1;
-    }
-
-    return VecXd::Constant(1, par);
+    VecXd tau2 = VecXd::Constant(1, std::fabs(tau));
+    auto f = [&](const VecXd &v) {
+        return VecXd::Constant(1, std::fabs(parameters_to_tau(v)));
+    };
+    return invert_f(tau2, f, 1+1e-6, 100);
 }
 
 double JoeBicop::parameters_to_tau(const VecXd& parameters)
@@ -220,3 +168,47 @@ double qcondjoe(double* q, double* u, double* de)
     }
     return(v);
 }
+
+VecXd JoeBicop::get_start_parameters(const double tau)
+{
+    return tau_to_parameters(tau);
+}
+
+/*// PDF
+VecXd JoeBicop::pdf_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+
+    VecXd f = VecXd::Ones(u.rows());
+    if (theta > 1+1e-6)
+    {
+        MatXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
+        VecXd t1 = t.rowwise().prod();
+        f = t1.unaryExpr([theta](const double v){ return theta-v;});
+
+        t1 = t1.unaryExpr([theta](const double v){ return std::pow(1-v,-2+1/theta);});
+        f = f.cwiseProduct(t1);
+
+        t = u.unaryExpr([theta](const double v){ return std::pow(1-v,-1+theta);});
+        t1 = t.rowwise().prod();
+        f = f.cwiseProduct(t1);
+    }
+    return f;
+}
+
+// hfunction
+VecXd JoeBicop::hfunc1_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    MatXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
+    VecXd t1 = t.rowwise().prod();
+    VecXd f = t1.unaryExpr([theta](const double v){ return std::pow(1-v,-1+1/theta);});
+
+    t1 = u.col(0).unaryExpr([theta](const double v){ return std::pow(1-v,-1+theta);});
+    f = f.cwiseProduct(t1);
+
+    t1 = u.col(1).unaryExpr([theta](const double v){ return 1-std::pow(1-v,theta);});
+    f = f.cwiseProduct(t1);
+
+    return f;
+}*/

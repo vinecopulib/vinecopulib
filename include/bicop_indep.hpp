@@ -43,6 +43,9 @@ public:
     double parameters_to_tau(const VecXd &);
 
     void flip();
+
+private:
+    VecXd get_start_parameters(const double tau);
 };
 
 #endif

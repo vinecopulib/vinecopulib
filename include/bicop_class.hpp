@@ -48,7 +48,7 @@ public:
     //! Create a bivariate copula using the default contructor
     //!
     //! @param family the copula family.
-    //! @rotation rotation the rotation type.
+    //! @param rotation the rotation type.
     //! @return A pointer to an object that inherits from \c Bicop.
     static std::shared_ptr<Bicop> create(const int& family,
                                          const int& rotation);
@@ -57,7 +57,7 @@ public:
     //!
     //! @param family the copula family.
     //! @param par the copula parameters (must be compatible with family).
-    //! @rotation rotation the rotation type.
+    //! @param rotation the rotation type.
     //! @return A pointer to an object that inherits from \c Bicop.
     static std::shared_ptr<Bicop> create(const int& family,
                                          const VecXd& parameters,
@@ -133,6 +133,9 @@ public:
     double calculate_tau();  // this will be a generic fall back method
     virtual double parameters_to_tau(const VecXd& parameters) = 0;
 
+    //! Extract the copula parameter from Kendall's tau whenever possible
+    VecXd tau_to_parameters(const double& tau);
+
     //! Getters and setters.
     //! @{
     int get_family() const {return family_;}
@@ -189,10 +192,22 @@ typedef std::shared_ptr<Bicop> BicopPtr;
 double correlation(const MatXd& z);
 std::vector<double> get_c1c2(const MatXd& data, double tau);
 bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless);
-VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, int n_iter = 35);
+VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, const double lb = 1e-20, const double ub = 1-1e-20,
+               int n_iter = 35);
 
-template<typename T> bool is_member(T element, std::vector<T> set)
-{
-    return std::find(set.begin(), set.end(), element) != set.end();
+template<typename T> bool is_member(T element, std::vector<T> set) {
+    return std::find(set.begin(), set.end(), element) != set.end(); }
+
+
+template<typename T> std::vector<T> intersect(std::vector<T> x, std::vector<T> y) {
+    std::sort(x.begin(), x.end());
+    std::sort(y.begin(), y.end());
+    std::vector<T> common;
+    std::set_intersection(
+            x.begin(), x.end(),
+            y.begin(), y.end(),
+            std::back_inserter(common)
+    );
+    return common;
 }
 #endif

@@ -29,39 +29,14 @@ public:
     void fit(const MatXd& data, std::string method);
 
     // link between Kendall's tau and the par_bicop parameter
-    virtual VecXd tau_to_parameters(const double& tau) = 0;
     virtual double parameters_to_tau(const VecXd& parameters) = 0;
     double calculate_tau() {return this->parameters_to_tau(parameters_);}
 
     // number of parameters
     double calculate_npars();
+
+private:
+    virtual VecXd get_start_parameters(const double tau) = 0;
 };
-
-
-//! A helper struct for nlopt maximum likelihood estimation
-//!
-typedef struct
-{
-    MatXd& U; //! The data
-    ParBicop* bicop; //! A pointer to the bivariate copula to optimize
-    unsigned int mle_objective_calls; //! The number of evaluations of the objective
-} ParBicopMLEData;
-
-//! A helper struct for nlopt profile maximum likelihood estimation
-//!
-typedef struct
-{
-    MatXd& U; //! The data
-    ParBicop* bicop; //! A pointer to the bivariate copula to optimize
-    double par0;  //! The main dependence parameter
-    unsigned int pmle_objective_calls; //! The number of evaluations of the objective
-} ParBicopPMLEData;
-
-double mle_objective(const std::vector<double>& x,
-                    std::vector<double> &,
-                    void* data);
-double pmle_objective(const std::vector<double>& x,
-                      std::vector<double> &,
-                      void* data);
 
 #endif

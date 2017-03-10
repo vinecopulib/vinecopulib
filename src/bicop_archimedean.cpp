@@ -51,12 +51,13 @@ VecXd ArchimedeanBicop::hfunc2_default(const MatXd& u)
 
 VecXd ArchimedeanBicop::hinv1_default(const MatXd& u)
 {
-    return hinv(u);
+    VecXd hinv = hinv1_num(u);
+    return hinv;
 }
 
 VecXd ArchimedeanBicop::hinv2_default(const MatXd& u)
 {
-    return hinv(swap_cols(u));
+    return hinv1_default(swap_cols(u));
 }
 
 void ArchimedeanBicop::flip()
@@ -66,4 +67,11 @@ void ArchimedeanBicop::flip()
     } else if (rotation_ == 270) {
         set_rotation(90);
     }
+}
+
+VecXd ArchimedeanBicop::get_start_parameters(const double tau)
+{
+    MatXd bounds = this->get_parameters_bounds();
+    VecXd parameters = bounds.col(0) + VecXd::Constant(2, 0.1);
+    return parameters;
 }

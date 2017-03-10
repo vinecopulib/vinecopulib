@@ -44,6 +44,18 @@ BicopPtr Bicop::create(const int& family, const int& rotation)
         case 6:
             my_bicop = BicopPtr(new JoeBicop());
             break;
+        case 7:
+            my_bicop = BicopPtr(new Bb1Bicop());
+            break;
+        case 8:
+            my_bicop = BicopPtr(new Bb6Bicop());
+            break;
+        case 9:
+            my_bicop = BicopPtr(new Bb7Bicop());
+            break;
+        case 10:
+            my_bicop = BicopPtr(new Bb8Bicop());
+            break;
         case 1001:
             my_bicop =  BicopPtr(new TrafokernelBicop());
             break;
@@ -71,23 +83,35 @@ BicopPtr Bicop::select(const MatXd& data,
                      bool preselect_families,
                      std::string method)
 {
-    std::vector<int> all_families = {0, 1, 2, 3, 4, 5, 6, 1001};
+    std::vector<int> all_families = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1001};
+    std::vector<int> itau_families = {0, 1, 2, 3, 4, 5, 6};
     std::vector<int> rotationless_families = {0, 1, 2, 5, 1001};
 
     // If the familyset is empty, use all families.
     // If the familyset is not empty, check that all included families are implemented.
     if (family_set.empty())
     {
-        family_set = all_families;
+        if (method == "itau")
+        {
+            family_set = intersect(all_families, itau_families);
+        }
+        else
+        {
+            family_set = all_families;
+        }
     } else
     {
-        bool family_exists = true;
         for (unsigned int j = 0; j < family_set.size(); j++)
         {
-            family_exists = is_member(family_set[j], all_families);
-            if (!family_exists)
+            if (!is_member(family_set[j], all_families))
                 throw std::runtime_error(std::string("One of the families is not implemented"));
         }
+        if (method == "itau") {
+            family_set = intersect(family_set, itau_families);
+            if (family_set.empty())
+                throw std::runtime_error(std::string("None of the families has method itau available"));
+        }
+
     }
 
     int n = data.rows();
@@ -166,13 +190,15 @@ BicopPtr Bicop::select(const MatXd& data,
     
         // Compute the selection criterion
         double new_criterion;
-        if (selection_criterion.compare("aic") == 0)
+        if (selection_criterion == "aic")
         {
             new_criterion = new_bicop->aic(newdata);
-        } else if (selection_criterion.compare("bic") == 0)
+        }
+        else if (selection_criterion == "bic")
         {
             new_criterion = new_bicop->bic(newdata);
-        } else
+        }
+        else
         {
             throw std::runtime_error(std::string("Selection criterion not implemented"));
         }
@@ -184,7 +210,6 @@ BicopPtr Bicop::select(const MatXd& data,
             fitted_bicop = new_bicop;
         }
      }
-
     return fitted_bicop;
 
 }
@@ -230,7 +255,9 @@ std::vector<double> get_c1c2(const MatXd& data, double tau)
 
 VecXd Bicop::pdf(const MatXd& u)
 {
-    return pdf_default(cut_and_rotate(u));
+    VecXd f = pdf_default(cut_and_rotate(u));
+    f = f.unaryExpr([](const double x){ return std::min(x,1e16);});
+    return f;
 }
 
 
@@ -355,6 +382,12 @@ double Bicop::calculate_tau()
     return 999.0;
 }
 
+
+VecXd Bicop::tau_to_parameters(const double& tau)
+{
+    throw std::runtime_error("Method not implemented for this family");
+}
+
 MatXd Bicop::cut_and_rotate(const MatXd& u)
 {
     MatXd u_new(u.rows(), 2);
@@ -382,7 +415,7 @@ MatXd Bicop::cut_and_rotate(const MatXd& u)
     }
     
     // truncate to interval [eps, 1 - eps]
-    MatXd eps = MatXd::Constant(u.rows(), 2, 1e-20);
+    MatXd eps = MatXd::Constant(u.rows(), 2, 1-10);
     u_new = u_new.array().min(1.0 - eps.array());
     u_new = u_new.array().max(eps.array());
 
@@ -421,13 +454,13 @@ VecXd Bicop::hinv2_num(const MatXd &u)
 void Bicop::set_rotation(const int& rotation) {
     check_rotation(rotation);    
     rotation_ = rotation;
-    if ((this->association_direction_).compare("positive") == 0 ||
-            (this->association_direction_).compare("negative") == 0)
+    if (this->association_direction_ == "positive" || this->association_direction_ == "negative")
     {
         if (rotation == 0 || rotation == 180)
         {
             this->association_direction_ = "positive";
-        } else
+        }
+        else
         {
             this->association_direction_ = "negative";
         }
@@ -512,6 +545,17 @@ bool preselect_family(double c1, double c2, double tau, int family, int rotation
     } else
     {
         bool is_90or180 = (rotation == 90 || rotation == 180);
+        if (family == 7 || family == 8 || family == 9 || family == 10)
+        {
+            if (tau > 0 && (rotation == 0 || rotation == 180))
+            {
+                preselect = true;
+            }
+            if (tau < 0 && (rotation == 90 || rotation == 270))
+            {
+                preselect = true;
+            }
+        }
         if (c1 - c2 > 0.05)
         {
             if (family == 3)
@@ -558,21 +602,23 @@ bool preselect_family(double c1, double c2, double tau, int family, int rotation
     return preselect;
 }
 
-//! Numerical inversion of a function on [0, 1].
+//! Numerical inversion of a function
 //! 
 //! Computes the inverse \f$f^{-1}\f$ of a function \f$f\f$ by the bisection 
 //! method.
 //! 
 //! @param x evaluation points.
 //! @param f the function to invert.
+//! @param lb lower bound.
+//! @param ub upper bound.
 //! @param n_iter the number of iterations for the bisection (defaults to 35,
 //! guaranteeing an accuracy of 0.5^35 ~= 6e-11). 
 //! 
 //! @return f^{-1}(x).
-VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, int n_iter) 
+VecXd invert_f(const VecXd& x, std::function<VecXd(const VecXd&)> f, const double lb, const double ub, int n_iter)
 {
-    VecXd xl = VecXd::Constant(x.size(), 1e-20);
-    VecXd xh = 1.0 - xl.array();
+    VecXd xl = VecXd::Constant(x.size(), lb);
+    VecXd xh = VecXd::Constant(x.size(), ub);
     VecXd x_tmp = x;
     for (int iter = 0; iter < n_iter; ++iter) {
         x_tmp = (xh + xl) / 2.0;

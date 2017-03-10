@@ -49,98 +49,46 @@ FrankBicop::FrankBicop(const VecXd& parameters, const int& rotation)
 VecXd FrankBicop::generator(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (-theta) * u;
-    psi = psi.array().exp();
-    psi = (psi - VecXd::Ones(psi.size())) / (exp(-theta) - 1);
-    psi = (-1) * psi.array().log();
-    return psi;
+    auto f = [theta](const double v) {
+        return (-1)*std::log((std::exp(-theta*v)-1)/(std::exp(-theta)-1));
+    };
+    return u.unaryExpr(f);
 }
 VecXd FrankBicop::generator_inv(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (-1) * u;
-    psi = (exp(-theta) - 1) * psi.array().exp();
-    psi = psi + VecXd::Ones(psi.size());
-    psi = (-1 / theta) * psi.array().log();
-    return psi;
+    auto f = [theta](const double v) {
+        //return (-1/theta)*std::log(1+std::exp(-theta*v)-std::exp(-v));
+        return (-1/theta)*std::log(1+std::exp(-theta-v)-std::exp(-v));
+    };
+    return u.unaryExpr(f);
 }
 
 VecXd FrankBicop::generator_derivative(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = theta * u;
-    psi = psi.array().exp();
-    psi = VecXd::Ones(psi.size()) - psi;
-    psi = theta * psi.cwiseInverse();
-    return psi;
+    auto f = [theta](const double v) {
+        return theta/(1-std::exp(theta*v));
+    };
+    return u.unaryExpr(f);
 }
 
 VecXd FrankBicop::generator_derivative2(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (-(theta/2) * u).array().exp() - ((theta/2) * u).array().exp();
-    psi = (theta*theta) * psi.cwiseInverse().array().square();
-    return psi;
-}
-
-VecXd FrankBicop::hinv(const MatXd& u)
-{
-    VecXd hinv = hinv1_num(u);
-    return hinv;
+    auto f = [theta](const double v) {
+        return std::pow(theta,2)/std::pow(std::exp(theta*v/2) - std::exp(-theta*v/2), 2);
+    };
+    return u.unaryExpr(f);
 }
 
 VecXd FrankBicop::tau_to_parameters(const double& tau)
 {
-    int br = 0, it = 0;
-    double tol = 1e-12, xl = -100+1e-6, xh = 100, fl, fh, fm, par;
-
-    fl = std::fabs(parameters_to_tau(VecXd::Constant(1, xl)) - tau);
-    fh = std::fabs(parameters_to_tau(VecXd::Constant(1, xh)) - tau);
-    if (fl <= tol) {
-        par = xl;
-        br = 1;
-    }
-    if (fh <= tol) {
-        par = xh;
-        br = 1;
-    }
-
-    while (!br) {
-        par = (xh + xl) / 2.0;
-        fm = parameters_to_tau(VecXd::Constant(1, par)) - tau;
-
-        //stop if values become too close (avoid infinite loop)
-        if (std::fabs(fm) <= tol) br = 1;
-        if (std::fabs(xl - xh) <= tol) br = 1;
-
-        if (tau < 0.0)
-        {
-            if (fm > 0.0) {
-                xl = par;
-                fh = fm;
-            } else {
-                xh = par;
-                fl = fm;
-            }
-        } else
-        {
-            if (fm < 0.0) {
-                xl = par;
-                fh = fm;
-            } else {
-                xh = par;
-                fl = fm;
-            }
-        }
-
-        //stop if too many iterations are required (avoid infinite loop)
-        ++it;
-        if (it > 50)
-            br = 1;
-    }
-
-    VecXd parameters = VecXd::Constant(1, par);
-    return parameters;
+    VecXd tau2 = VecXd::Constant(1, std::fabs(tau));
+    auto f = [&](const VecXd &v) {
+        return VecXd::Constant(1, std::fabs(parameters_to_tau(v)));
+    };
+    return invert_f(tau2, f, -100+1e-6, 100);
 }
 
 double FrankBicop::parameters_to_tau(const VecXd& parameters)
@@ -153,3 +101,36 @@ double FrankBicop::parameters_to_tau(const VecXd& parameters)
     tau = tau + (4/par) * d;
     return tau;
 }
+
+VecXd FrankBicop::get_start_parameters(const double tau)
+{
+    return tau_to_parameters(tau);
+}
+
+/*// PDF
+VecXd FrankBicop::pdf_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    MatXd t = u.unaryExpr([theta](const double v){ return std::exp(theta*v);});
+    VecXd t1 = t.rowwise().prod();
+    VecXd f = theta*(std::exp(theta)-1)*std::exp(theta)*t1;
+
+    t1 = t1 - std::exp(theta)*(t.rowwise().sum() - VecXd::Ones(u.rows()));
+    t1 = t1.array().square();
+
+    f = f.cwiseQuotient(t1);
+    return f;
+}
+
+// hfunction
+VecXd FrankBicop::hfunc1_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    MatXd t = u.unaryExpr([theta](const double v){ return std::exp(theta*v);});
+    VecXd t1 = t.rowwise().prod();
+    VecXd f = std::exp(theta)*(t.col(1) - VecXd::Ones(u.rows()));
+
+    t1 = - t1 + std::exp(theta)*(t.rowwise().sum() - VecXd::Ones(u.rows()));
+    f = f.cwiseQuotient(t1);
+    return f;
+}*/

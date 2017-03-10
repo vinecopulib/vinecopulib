@@ -79,6 +79,11 @@ double IndepBicop::parameters_to_tau(const VecXd &)
     return 0.0;
 }
 
+VecXd IndepBicop::get_start_parameters(const double tau)
+{
+    return tau_to_parameters(tau);
+}
+
 void IndepBicop::flip()
 {
     // nothing to do because independence copula is radially syemmetric
