@@ -48,7 +48,9 @@ public:
 
     BicopPtr get_pair_copula(int tree, int edge);
     int get_family(int tree, int edge);
+    MatXi get_families();
     int get_rotation(int tree, int edge);
+    MatXi get_rotations();
     VecXd get_parameters(int tree, int edge);
     MatXi get_matrix() {return vine_matrix_.get_matrix();}
 

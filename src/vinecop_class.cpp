@@ -139,7 +139,8 @@ Vinecop Vinecop::select(
     std::vector<VineTree> trees(d);
 
     trees[0] = make_base_tree(data);
-    for (int t = 1; t < d; ++t) {       
+    for (int t = 1; t < d; ++t) {
+        // select tree structure and pair copulas     
         trees[t] = select_next_tree(
             trees[t - 1],
             family_set,
@@ -147,11 +148,13 @@ Vinecop Vinecop::select(
             selection_criterion,
             preselect_families
         );
-        show_trace = true;
+        
+        // print out fitted pair-copulas for this tree
         if (show_trace) {
             std::cout << "Tree " << t - 1 << ":" << std::endl;
             print_pair_copulas(trees[t]);
         }
+        
         // truncate (only allow for Independence copula from here on)
         if (truncation_level == t)
             family_set = {0};
@@ -160,7 +163,7 @@ Vinecop Vinecop::select(
     return as_vinecop(trees);;
 }
 
-//! Access to a pair copula
+//! Access a pair copula
 //!
 //! @param tree tree index (starting with 0).
 //! @param edge edge index (starting with 0).
@@ -200,6 +203,20 @@ int Vinecop::get_family(int tree, int edge)
     return get_pair_copula(tree, edge)->get_family();
 }
 
+//! Get families of all pair copulas
+//!
+//! @return A matrix containing the family indices.
+MatXi Vinecop::get_families()
+{
+    MatXi families = MatXi::Constant(d_, d_, 0);
+    for (int tree = 0; tree < d_ - 1; ++tree) {
+        for (int edge = 0; edge < d_ - 1 - tree; ++edge) {
+            families(tree, edge) = get_family(tree, edge);
+        }
+    }
+    
+    return families;
+}
 
 //! Get rotation of a pair copula
 //!
@@ -212,6 +229,20 @@ int Vinecop::get_rotation(int tree, int edge)
     return get_pair_copula(tree, edge)->get_rotation();
 }
 
+//! Get rotations of all pair copulas
+//!
+//! @return A matrix containing the rotations.
+MatXi Vinecop::get_rotations()
+{
+    MatXi rotations = MatXi::Constant(d_, d_, 0);
+    for (int tree = 0; tree < d_ - 1; ++tree) {
+        for (int edge = 0; edge < d_ - 1 - tree; ++edge) {
+            rotations(tree, edge) = get_rotation(tree, edge);
+        }
+    }
+    
+    return rotations;
+}
 
 //! Get parameters of a pair copula
 //!
@@ -223,7 +254,6 @@ VecXd Vinecop::get_parameters(int tree, int edge)
 {
     return get_pair_copula(tree, edge)->get_parameters();
 }
-
 
 //! Probability density function of a vine copula
 //!
