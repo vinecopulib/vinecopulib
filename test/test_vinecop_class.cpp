@@ -19,6 +19,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "gtest/gtest.h"
 #include "include/vinecop_class.hpp"
+#include "include/structselect_tools.hpp"
 #include "src_test/include/vinecop_test.hpp"
 
 namespace {
@@ -70,12 +71,41 @@ namespace {
     }
             
     TEST(vinecop_class, select_finds_right_structure) {
-        Vinecop fit = Vinecop::select(vc_test.u, {3});
-        vc_test.R.parseEval("fit <- RVineStructureSelect(u, familyset = 3)");
-        auto matrix = Rcpp::as<MatXi>(vc_test.R.parseEval("fit$Matrix"));
-        std::cout << vc_test.matrix << std::endl << std::endl;
-        std::cout << fit.get_matrix() << std::endl << std::endl;
-        // TODO: compare matrices (after chaning matrix style)
+        // check whether the same structure appears if we only allow for 
+        // independence (pair-copula estimates differ otherwise)
+        
+        // select structure with VineCopula and vinecopulib
+        Vinecop fit = Vinecop::select(vc_test.u, {0});
+        vc_test.R.parseEval("fit <- RVineStructureSelect(u, familyset = 0)");
+        
+        // get matrices
+        auto m = Rcpp::as<MatXi>(vc_test.R.parseEval("fit$Matrix"));
+        auto vc_matrix = m.colwise().reverse();  // use vinecopulib orientation
+        auto vcl_matrix = fit.get_matrix();
+        
+        // check if the same conditioned sets appear for each tree
+        using namespace structselect_tools;
+        std::vector<std::vector<std::vector<int>>> vc_sets(6), vcl_sets(6);
+        for (int tree = 0; tree < 6; ++tree) {
+            vc_sets[tree].resize(6 - tree);
+            vcl_sets[tree].resize(6 - tree);
+            for (int edge = 0; edge < 6 - tree; ++edge) {
+                vc_sets[tree][edge].resize(2);
+                vc_sets[tree][edge][0] = vc_matrix(tree, edge);
+                vc_sets[tree][edge][1] = vc_matrix(5 - edge, edge);
+                vcl_sets[tree][edge].resize(2);
+                vcl_sets[tree][edge][0] = vc_matrix(tree, edge);
+                vcl_sets[tree][edge][1] = vc_matrix(5 - edge, edge);
+            }
+            for (auto s1 : vc_sets[tree]) {
+                bool is_in_both = false;
+                for (auto s2 : vcl_sets[tree]) {
+                    if (is_same_set(s1, s2))
+                        is_in_both = true;
+                }
+                EXPECT_TRUE(is_in_both);
+            }    
+        }        
     }
 }
 
