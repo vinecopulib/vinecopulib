@@ -122,9 +122,9 @@ MatXb RVineMatrix::get_needed_hfunc1()
     MatXi max_matrix = this->get_max_matrix();
     for (int i = 1; i < d_ - 1; ++i) {
         int j = d_ - i;
-        MatXb is_mat_j = (no_matrix.block(0, 0, j, i).array()  == j);
-        MatXb is_max_j = (max_matrix.block(0, 0, j, i).array() ==  j);
-        MatXb is_different = (!is_mat_j.array() && is_max_j.array());
+        MatXb isnt_mat_j = (no_matrix.block(0, 0, j, i).array() != j);
+        MatXb is_max_j = (max_matrix.block(0, 0, j, i).array() == j);
+        MatXb is_different = (isnt_mat_j.array() && is_max_j.array());
         needed_hfunc1.block(0, i, j, 1) = is_different.rowwise().any();
     }    
     return needed_hfunc1;
