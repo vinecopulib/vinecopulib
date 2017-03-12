@@ -39,6 +39,7 @@ public:
     MatXi get_matrix();
     //! @}
     
+    VecXi get_order();
     MatXi in_natural_order();
     MatXi get_max_matrix();
     MatXb get_needed_hfunc1();

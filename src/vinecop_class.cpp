@@ -139,7 +139,8 @@ Vinecop Vinecop::select(
     std::vector<VineTree> trees(d);
 
     trees[0] = make_base_tree(data);
-    for (int t = 1; t < d; ++t) {       
+    for (int t = 1; t < d; ++t) {
+        // select tree structure and pair copulas     
         trees[t] = select_next_tree(
             trees[t - 1],
             family_set,
@@ -147,10 +148,13 @@ Vinecop Vinecop::select(
             selection_criterion,
             preselect_families
         );
+        
+        // print out fitted pair-copulas for this tree
         if (show_trace) {
             std::cout << "Tree " << t - 1 << ":" << std::endl;
             print_pair_copulas(trees[t]);
         }
+        
         // truncate (only allow for Independence copula from here on)
         if (truncation_level == t)
             family_set = {0};
@@ -159,7 +163,7 @@ Vinecop Vinecop::select(
     return as_vinecop(trees);;
 }
 
-//! Access to a pair copula
+//! Access a pair copula
 //!
 //! @param tree tree index (starting with 0).
 //! @param edge edge index (starting with 0).
@@ -199,6 +203,21 @@ int Vinecop::get_family(int tree, int edge)
     return get_pair_copula(tree, edge)->get_family();
 }
 
+//! Get families of all pair copulas
+//!
+//! @return A matrix containing the family indices.
+MatXi Vinecop::get_families()
+{
+    MatXi families = MatXi::Constant(d_, d_, 0);
+    for (int tree = 0; tree < d_ - 1; ++tree) {
+        for (int edge = 0; edge < d_ - 1 - tree; ++edge) {
+            families(tree, edge) = get_family(tree, edge);
+        }
+    }
+    
+    return families;
+}
+
 //! Get rotation of a pair copula
 //!
 //! @param tree tree index (starting with 0).
@@ -208,6 +227,21 @@ int Vinecop::get_family(int tree, int edge)
 int Vinecop::get_rotation(int tree, int edge)
 {
     return get_pair_copula(tree, edge)->get_rotation();
+}
+
+//! Get rotations of all pair copulas
+//!
+//! @return A matrix containing the rotations.
+MatXi Vinecop::get_rotations()
+{
+    MatXi rotations = MatXi::Constant(d_, d_, 0);
+    for (int tree = 0; tree < d_ - 1; ++tree) {
+        for (int edge = 0; edge < d_ - 1 - tree; ++edge) {
+            rotations(tree, edge) = get_rotation(tree, edge);
+        }
+    }
+    
+    return rotations;
 }
 
 //! Get parameters of a pair copula
@@ -220,7 +254,6 @@ VecXd Vinecop::get_parameters(int tree, int edge)
 {
     return get_pair_copula(tree, edge)->get_parameters();
 }
-
 
 //! Probability density function of a vine copula
 //!
@@ -238,25 +271,25 @@ VecXd Vinecop::pdf(const MatXd& u)
     }
 
     // info about the vine structure (reverse rows (!) for more natural indexing)
-    VecXi order         = vine_matrix_.get_matrix().diagonal();
-    MatXi no_matrix     = vine_matrix_.in_natural_order().colwise().reverse();
-    MatXi max_matrix    = vine_matrix_.get_max_matrix().colwise().reverse();
-    MatXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1().colwise().reverse();
-    MatXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2().colwise().reverse();
+    VecXi revorder      = vine_matrix_.get_order().reverse();
+    MatXi no_matrix     = vine_matrix_.in_natural_order();
+    MatXi max_matrix    = vine_matrix_.get_max_matrix();
+    MatXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
+    MatXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
 
     // initial value must be 1.0 for multiplication
     VecXd vine_density = VecXd::Constant(u.rows(), 1.0);
     
     // temporary storage objects for h-functions
-    MatXd direct(n, d);
-    MatXd indirect(n, d);
+    MatXd hfunc1(n, d);
+    MatXd hfunc2(n, d);
     MatXd u_e(n, 2);
     
-    // fill first row of direct matrix with evaluation points;
-    // points have tos be reordered to correspond to natural order
+    // fill first row of hfunc2 matrix with evaluation points;
+    // points have to be reordered to correspond to natural order
     for (int j = 0; j < d; ++j)
-        direct.col(j) = u.col(order(j) - 1);
-    
+        hfunc2.col(j) = u.col(revorder(j) - 1);
+
     for (int tree = 0; tree < d - 1; ++tree) {
         for (int edge = 0; edge < d - tree - 1; ++edge) {
             // get pair copula for this edge
@@ -265,19 +298,19 @@ VecXd Vinecop::pdf(const MatXd& u)
             // extract evaluation point from hfunction matrices (have been
             // computed in previous tree level)
             int m = max_matrix(tree, edge);
-            u_e.col(1) = direct.col(edge);
+            u_e.col(0) = hfunc2.col(edge);
             if (m == no_matrix(tree, edge)) {
-                u_e.col(0) = direct.col(d - m);
+                u_e.col(1) = hfunc2.col(d - m);
             } else {
-                u_e.col(0) = indirect.col(d - m);
+                u_e.col(1) = hfunc1.col(d - m);
             }
-    
+            
             vine_density = vine_density.cwiseProduct(edge_copula->pdf(u_e));
             // h-functions are only evaluated if needed in next step
             if (needed_hfunc1(tree + 1, edge))
-                direct.col(edge) = edge_copula->hfunc1(u_e);
+                hfunc1.col(edge) = edge_copula->hfunc1(u_e);
             if (needed_hfunc2(tree + 1, edge))
-                indirect.col(edge) = edge_copula->hfunc2(u_e);
+                hfunc2.col(edge) = edge_copula->hfunc2(u_e);
         }
     }
 
@@ -320,6 +353,7 @@ MatXd Vinecop::simulate(int n, const MatXd& U)
         ", actual: " << U.rows() << std::endl;
         throw std::runtime_error(message.str().c_str());
     }
+
     MatXd U_vine = U;  // output matrix
 
     //                   (direct + indirect)    (U_vine)       (info matrices)
@@ -337,57 +371,61 @@ MatXd Vinecop::simulate(int n, const MatXd& U)
     }
 
     // info about the vine structure (in upper triangular matrix notation)
-    VecXi order = vine_matrix_.get_matrix().diagonal().reverse();
-    VecXi inverse_order = invert_order(order);
-    MatXi no_matrix     = to_upper_tri(vine_matrix_.in_natural_order());
-    MatXi max_matrix    = to_upper_tri(vine_matrix_.get_max_matrix());
-    MatXb needed_hfunc1 = to_upper_tri(vine_matrix_.get_needed_hfunc1());
-    MatXb needed_hfunc2 = to_upper_tri(vine_matrix_.get_needed_hfunc2());
-
+    VecXi revorder      = vine_matrix_.get_order().reverse();
+    MatXi no_matrix     = vine_matrix_.in_natural_order();
+    MatXi max_matrix    = vine_matrix_.get_max_matrix();
+    MatXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
+    MatXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
+        
     // temporary storage objects for (inverse) h-functions
     typedef Eigen::Matrix<VecXd, Eigen::Dynamic, Eigen::Dynamic> Array3d;
-    Array3d direct(d, d);
-    Array3d indirect(d, d);
+    Array3d hinv2(d, d);
+    Array3d hfunc1(d, d);
 
     // initialize with independent uniforms (corresponding to natural order)
     for (int j = 0; j < d; ++j)
-        direct(j, j) = U.col(order(j) - 1);
-    indirect(0, 0) = direct(0, 0);
+        hinv2(d - j - 1, j) = U.col(revorder(j) - 1);
+    hfunc1(0, d - 1) = hinv2(0, d - 1);
 
     // loop through variables (0 is just the inital uniform)
-    for (int var = 1; var < d; ++var) {
-        for (int tree = var - 1; tree > -1; --tree) {
-            BicopPtr edge_copula = get_pair_copula(tree, d - var - 1);
+    for (int var = d - 2; var > -1; --var) {
+        for (int tree = d - var - 2; tree > -1; --tree) {
+            BicopPtr edge_copula = get_pair_copula(tree, var);
+
             // extract data for conditional pair
             MatXd U_e(n, 2);
             int m = max_matrix(tree, var);
-            U_e.col(1) = direct(tree + 1, var);
+            U_e.col(0) = hinv2(tree + 1, var);
             if (m == no_matrix(tree, var)) {
-                U_e.col(0) = direct(tree, m - 1);
+                U_e.col(1) = hinv2(tree, d - m);
             } else {
-                U_e.col(0) = indirect(tree, m - 1);
+                U_e.col(1) = hfunc1(tree, d - m);
             }
+
             // inverse Rosenblatt transform simulates data for conditional pair
-            direct(tree, var) = edge_copula->hinv1(U_e);
+            hinv2(tree, var) = edge_copula->hinv2(U_e);
+
             // if required at later stage, also calculate hfunc2
             if (var < d_ - 1) {
-                if (needed_hfunc2(tree + 1, var)) {
-                    U_e.col(1) = direct(tree, var);
-                    indirect(tree + 1, var) = edge_copula->hfunc2(U_e);
+                if (needed_hfunc1(tree + 1, var)) {
+                    U_e.col(0) = hinv2(tree, var);
+                    hfunc1(tree + 1, var) = edge_copula->hfunc1(U_e);
                 }
             }
         }
     }
+
     // go back to original order
+    VecXi inverse_order = inverse_permutation(revorder);
     for (int j = 0; j < d; ++j)
-        U_vine.col(j) = direct(0, inverse_order(j));
+        U_vine.col(j) = hinv2(0, inverse_order(j));
 
     return U_vine;
 }
 //! @}
 
 // get indexes for reverting back to old order in simulation routine
-VecXi invert_order(const VecXi& order) {
+VecXi inverse_permutation(const VecXi& order) {
     // start with (0, 1, .., k)
     std::vector<int> indexes(order.size());
     iota(indexes.begin(), indexes.end(), 0);

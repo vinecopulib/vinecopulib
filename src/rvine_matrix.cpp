@@ -32,6 +32,11 @@ MatXi RVineMatrix::get_matrix()
     return matrix_;
 }
 
+VecXi RVineMatrix::get_order()
+{
+    return matrix_.colwise().reverse().diagonal().reverse();
+}
+
 //! Construct a D-vine matrix 
 //! 
 //! A D-vine is a vine where each tree is a path.
@@ -45,12 +50,12 @@ MatXi RVineMatrix::construct_d_vine_matrix(const VecXi& order)
     MatXi vine_matrix = MatXi::Constant(d, d, 0);
     
     for (int i = 0; i < d; ++i) {
-        vine_matrix(i, i) = order(d - 1 - i);  // diagonal
+        vine_matrix(d - 1 - i, i) = order(d - 1 - i);  // diagonal
     }
     
     for (int i = 1; i < d; ++i) {
         for (int j = 0; j < i; ++j) {
-            vine_matrix(i, j) = order(i - j - 1);  // below diagonal
+            vine_matrix(d - 1 - i, j) = order(i - j - 1);  // below diagonal
         }
     }
 
@@ -91,9 +96,9 @@ MatXi RVineMatrix::in_natural_order()
 MatXi RVineMatrix::get_max_matrix() 
 {
     MatXi max_matrix = this->in_natural_order();
-    for (int i = d_ - 2; i > -1; --i) {
-        for (int j = 0 ; j < i + 1; ++j) {
-            max_matrix(i, j) = max_matrix.block(i, j, 2, 1).maxCoeff();
+    for (int i = 0; i < d_ - 1; ++i) {
+        for (int j = 0 ; j < d_ - i - 1; ++j) {
+            max_matrix(i + 1, j) = max_matrix.block(i, j, 2, 1).maxCoeff();
         }
     }
     return max_matrix;
@@ -112,38 +117,35 @@ MatXi RVineMatrix::get_max_matrix()
 MatXb RVineMatrix::get_needed_hfunc1() 
 {
     MatXb needed_hfunc1 = MatXb::Constant(d_, d_, false);
-    needed_hfunc1.block(1, 0, d_ - 1, 1) = MatXb::Constant(d_ - 1, 1, true);
-        
+    
     MatXi no_matrix = this->in_natural_order();
     MatXi max_matrix = this->get_max_matrix();
     for (int i = 1; i < d_ - 1; ++i) {
         int j = d_ - i;
-        // fill row j with true below the diagonal
-        needed_hfunc1.block(i, i, d_ - i, 1) = MatXb::Constant(d_ - i, 1, true);
-        
-        // for diagonal, check whether matrix and maximum matrix coincide
-        MatXb is_mat_j = (no_matrix.block(i, 0, 1, i).array() == j);
-        MatXb is_max_j = (max_matrix.block(i, 0, 1, i).array() == j);
-        needed_hfunc1(i, i) = (is_mat_j.array() && is_max_j.array()).any();
-    }
-    
+        MatXb isnt_mat_j = (no_matrix.block(0, 0, j, i).array() != j);
+        MatXb is_max_j = (max_matrix.block(0, 0, j, i).array() == j);
+        MatXb is_different = (isnt_mat_j.array() && is_max_j.array());
+        needed_hfunc1.block(0, i, j, 1) = is_different.rowwise().any();
+    }    
     return needed_hfunc1;
 }
 
 MatXb RVineMatrix::get_needed_hfunc2() 
 {
     MatXb needed_hfunc2 = MatXb::Constant(d_, d_, false);
-    
+    needed_hfunc2.block(0, 0, d_ - 1, 1) = MatXb::Constant(d_ - 1, 1, true);
     MatXi no_matrix = this->in_natural_order();
     MatXi max_matrix = this->get_max_matrix();
     for (int i = 1; i < d_ - 1; ++i) {
         int j = d_ - i;
+        // fill column i with true above the diagonal
+        needed_hfunc2.block(0, i, d_ - i, 1) = MatXb::Constant(d_ - i, 1, true);
         // for diagonal, check whether matrix and maximum matrix coincide
-        MatXb isnt_mat_j = (no_matrix.block(i, 0, d_ - i, i).array() != j);
-        MatXb is_max_j = (max_matrix.block(i, 0, d_ - i, i).array() == j);
-        MatXb is_different = (isnt_mat_j.array() && is_max_j.array());
-        needed_hfunc2.block(i, i, d_ - i, 1) = is_different.rowwise().any();
-    }    
+        MatXb is_mat_j = (no_matrix.block(j - 1, 0, 1, i).array() == j);
+        MatXb is_max_j = (max_matrix.block(j - 1, 0, 1, i).array() == j);
+        needed_hfunc2(j - 1, i) = (is_mat_j.array() && is_max_j.array()).any();
+    }
+    
     return needed_hfunc2;
 }
 //! @}
@@ -162,10 +164,10 @@ int relabel_one(const int& x, const VecXi& old_labels, const VecXi& new_labels)
 MatXi relabel_elements(const MatXi& matrix, const VecXi& new_labels)
 {
     int d = matrix.rows();
-    VecXi old_labels = matrix.diagonal();
+    VecXi old_labels = matrix.colwise().reverse().diagonal();
     MatXi new_matrix = MatXi::Zero(d, d);
     for (int i = 0; i < d; ++i) {
-        for (int j = 0; j < i + 1; ++j) {
+        for (int j = 0; j < d - i; ++j) {
             new_matrix(i, j) = relabel_one(matrix(i, j), old_labels, new_labels);
         }
     }

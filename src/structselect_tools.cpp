@@ -150,8 +150,10 @@ namespace structselect_tools {
                 // (-1 means 'no common neighbor')
                 if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                     auto pc_data = get_pc_data(v0, v1, vine_tree);
-                    auto w = 1.0 - std::fabs(pairwise_ktau(pc_data));
-                    boost::add_edge(v0, v1, w, vine_tree);
+                    auto tau = pairwise_ktau(pc_data);
+                    auto w = 1.0 - std::fabs(tau);
+                    auto e = boost::add_edge(v0, v1, w, vine_tree).first;
+                    vine_tree[e].empirical_tau = tau;
                 }
             }
         }
@@ -310,17 +312,17 @@ namespace structselect_tools {
         MatXi mat = MatXi::Constant(d, d, 0);
         auto pcs = Vinecop::make_pair_copula_store(d);
         
-        // loop through columns of the matrix
-        for (int t = d - 1 ; t > 0; --t) {
-            // start with tree t and fill first two entries by conditioning set
+        for (int col = 0; col < d - 1; ++col) {
+            int t = d - 1 - col;
+            // start with highest tree in this column and fill first two 
+            // entries by conditioning set
             auto e0 = *boost::edges(trees[t]).first;
-            mat(t, t) = trees[t][e0].conditioning[0];
-            mat(t - 1, t) = trees[t][e0].conditioning[1];
+            mat(t, col) = trees[t][e0].conditioning[0];
+            mat(t - 1, col) = trees[t][e0].conditioning[1];
 
             // assign fitted pair copula to appropriate entry, see
             // Vinecop::get_pair_copula().
-            pcs[t - 1][d - t - 1] = trees[t][e0].pair_copula;
-            pcs[t - 1][d - t - 1]->flip();
+            pcs[t - 1][col] = trees[t][e0].pair_copula;
 
             // initialize running set with full conditioing set of this edge
             auto ned_set = trees[t][e0].conditioned;
@@ -328,19 +330,19 @@ namespace structselect_tools {
             // iteratively search for an edge in lower tree that shares all indices
             // in the conditioning set + diagonal entry
             for (int k = 1; k < t; ++k) {
-                auto reduced_set = cat(mat(t, t), ned_set);
+                auto reduced_set = cat(mat(t, col), ned_set);
                 for (auto e : boost::edges(trees[t - k])) {
                     if (is_same_set(trees[t - k][e].all_indices, reduced_set)) {
                         // next matrix entry is conditioning variable of new edge
                         // that's not equal to the diagonal entry of this column
                         auto e_new = trees[t - k][e];
-                        auto pos = find_position(mat(t, t), e_new.conditioning);
-                        mat(t - k - 1, t) = e_new.conditioning[std::abs(1 - pos)];
-                        if (pos == 0)
+                        auto pos = find_position(mat(t, col), e_new.conditioning);
+                        mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
+                        if (pos == 1)
                             e_new.pair_copula->flip();
                         // assign fitted pair copula to appropriate entry, see
                         // Vinecop::get_pair_copula().
-                        pcs[t - 1 - k][d - 1 - t] = e_new.pair_copula;
+                        pcs[t - 1 - k][col] = e_new.pair_copula;
 
                         // start over with conditioning set of next edge
                         ned_set = e_new.conditioned;
@@ -354,16 +356,17 @@ namespace structselect_tools {
                 }
             }
         }
-        
-        // The first column contains a single element which must be different
+
+        // The last column contains a single element which must be different
         // from all other diagonal elements. Based on the properties of an 
         // R-vine matrix, this must be the element next to it. 
-        mat(0, 0) = mat(0, 1);
+        mat(0, d - 1) = mat(0, d - 2);
         
-        // change to user-facing format
-        MatXi new_mat = mat.rowwise().reverse().colwise().reverse();
+        // change to user-facing format 
+        // (variable index starting at 1 instead of 0)
+        MatXi new_mat = mat;
         for (int i = 0; i < d; ++i)
-            for (int j = 0; j <= i; ++j)
+            for (int j = 0; j < d - i; ++j)
                 new_mat(i, j) += 1;
 
         return Vinecop(pcs, new_mat);
@@ -380,6 +383,7 @@ namespace structselect_tools {
                 "fam = " << tree[e].pair_copula->get_family() <<
                 ", rot = " << tree[e].pair_copula->get_rotation() <<
                 ", par = " <<  tree[e].pair_copula->get_parameters() <<
+                ", emp_tau = " << tree[e].empirical_tau <<
                 std::endl;
             std::cout << pc_info.str().c_str();
         }

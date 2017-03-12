@@ -43,7 +43,8 @@ public:
         R.parseEval("u <- RVineSim(1000, model)");
         R.parseEval("fit <- RVineStructureSelect(u, familyset = 3)");
         u = Rcpp::as<MatXd>(R.parseEval("u"));
-        matrix = Rcpp::as<MatXi>(R.parseEval("mat"));
+        // C++ representation reverses rows
+        matrix = Rcpp::as<MatXi>(R.parseEval("mat")).colwise().reverse();
     }
     
     RInside R;

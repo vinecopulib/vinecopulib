@@ -48,7 +48,9 @@ public:
 
     BicopPtr get_pair_copula(int tree, int edge);
     int get_family(int tree, int edge);
+    MatXi get_families();
     int get_rotation(int tree, int edge);
+    MatXi get_rotations();
     VecXd get_parameters(int tree, int edge);
     MatXi get_matrix() {return vine_matrix_.get_matrix();}
 
@@ -62,7 +64,7 @@ private:
     std::vector<std::vector<BicopPtr>> pair_copulas_;
 };
 
-VecXi invert_order(const VecXi& order);
+VecXi inverse_permutation(const VecXi& order);
 // reverse columns and rows of an Eigen::Matrix type object
 template<typename Mat>
 Mat to_upper_tri(Mat A) {return A.rowwise().reverse().colwise().reverse();}
