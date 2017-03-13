@@ -10,40 +10,59 @@
 * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
+#include "include/parbicop_test.hpp"
 
-#include "test_tools.hpp"
-#include "gtest/gtest.h"
-#include "rscript.hpp"
-
-class VinecopTest : public ::testing::Test {
-public:
-    VinecopTest() {
-        // write temp files for the test using VineCopula
-        std::string command = std::string(RSCRIPT) + "../test/test_vinecop_parametric.R";
-        system(command.c_str());
-
-        // vine structures (C++ representation reverses rows)
-        model_matrix = read_matxi("temp2").colwise().reverse();
-        vc_matrix = read_matxi("temp3").colwise().reverse();
-
-        // u, pdf, sim
-        MatXd temp = read_matxd("temp");
-        int n = temp.rows();
-        int m = model_matrix.rows();
-        u = temp.block(0,0,n,m);
-        f = temp.block(0,m,n,1);
-        sim = temp.block(0,m+1,n,m);
-
-        // remove temp files
-        system("rm temp temp2 temp3");
+void FakeParBicopTest::set_family(int family, int rotation)
+{
+    std::vector<int> rotation_less_fams = {0, 1, 2, 5};
+    if (is_member(family, rotation_less_fams) || rotation == 0)
+    {
+        family_ = family;
     }
-
-    MatXd u;
-    VecXd f;
-    MatXd sim;
-    MatXi model_matrix;
-    MatXi vc_matrix;
-};
-
-
+    else
+    {
+        if (rotation == 90)
+        {
+            family_ = family + 20;
+        }
+        else if (rotation == 180)
+        {
+            family_ = family + 10;
+        }
+        else
+        {
+            family_ = family + 30;
+        }
+    }
+}
+void FakeParBicopTest::set_parameters(VecXd parameters)
+{
+    if (parameters.size() > 0)
+    {
+        par_ = parameters(0);
+    }
+    if (parameters.size() > 1)
+    {
+        par2_ = parameters(1);
+    }
+}
+void FakeParBicopTest::set_n(int n)
+{
+    n_ = n;
+}
+int FakeParBicopTest::get_family()
+{
+    return family_;
+}
+int FakeParBicopTest::get_n()
+{
+    return n_;
+}
+double FakeParBicopTest::get_par()
+{
+    return par_;
+}
+double FakeParBicopTest::get_par2()
+{
+    return par2_;
+}

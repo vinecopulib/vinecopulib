@@ -10,19 +10,15 @@
 * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "gtest/gtest.h"
 #include "include/vinecop_class.hpp"
 #include "include/structselect_tools.hpp"
 #include "src_test/include/vinecop_test.hpp"
 
 namespace {
-    
-    VinecopTest vc_test;
 
-    TEST(vinecop_class, constructors_without_error) {
+    TEST_F(VinecopTest, constructors_without_error) {
         Vinecop vinecop_default(5);
-        
-        auto mat = vc_test.matrix;
+
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
@@ -30,52 +26,44 @@ namespace {
             }
         }
         
-        Vinecop vinecop_parametrized(pair_copulas, mat);
+        Vinecop vinecop_parametrized(pair_copulas, model_matrix);
     }
 
-    TEST(vinecop_class, pdf_is_correct) {
-        auto mat = vc_test.matrix;
+    TEST_F(VinecopTest, pdf_is_correct) {
+
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
                 pc = Bicop::create(3, VecXd::Constant(1, 3.0), 270);
             }
         }
-        Vinecop vinecop(pair_copulas, mat);
-        
-        auto true_pdf = Rcpp::as<VecXd>(vc_test.R.parseEval("RVinePDF(u, model)"));
-        ASSERT_TRUE(vinecop.pdf(vc_test.u).isApprox(true_pdf, 1e-4));
+        Vinecop vinecop(pair_copulas, model_matrix);
+
+        ASSERT_TRUE(vinecop.pdf(u).isApprox(f, 1e-4));
     }
 
-    TEST(vinecop_class, simulate_is_correct) {
-        auto mat = vc_test.matrix;
+    TEST_F(VinecopTest, simulate_is_correct) {
+
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
                 pc = Bicop::create(3, VecXd::Constant(1, 3.0), 270);
             }
         }
-        Vinecop vinecop(pair_copulas, mat);
-        
-        auto true_sim = Rcpp::as<MatXd>(vc_test.R.parseEval("RVineSim(1000, model, U = u)"));
-        ASSERT_TRUE(vinecop.simulate(1000, vc_test.u).isApprox(true_sim, 1e-4));
-        
+        Vinecop vinecop(pair_copulas, model_matrix);
+
         vinecop.simulate(10);  // only check if it works
+        ASSERT_TRUE(vinecop.simulate(1000, u).isApprox(sim, 1e-4));
     }
-            
-    TEST(vinecop_class, select_finds_right_structure) {
-        // check whether the same structure appears if we only allow for 
+
+    TEST_F(VinecopTest, select_finds_right_structure) {
+        // check whether the same structure appears if we only allow for
         // independence (pair-copula estimates differ otherwise)
-        
-        // select structure with VineCopula and vinecopulib
-        Vinecop fit = Vinecop::select(vc_test.u, {0});
-        vc_test.R.parseEval("fit <- RVineStructureSelect(u, familyset = 0)");
-        
-        // get matrices
-        auto m = Rcpp::as<MatXi>(vc_test.R.parseEval("fit$Matrix"));
-        auto vc_matrix = m.colwise().reverse();  // use vinecopulib orientation
+
+        // select structure and get matrix
+        Vinecop fit = Vinecop::select(u, {0});
         auto vcl_matrix = fit.get_matrix();
-        
+
         // check if the same conditioned sets appear for each tree
         using namespace structselect_tools;
         std::vector<std::vector<std::vector<int>>> vc_sets(6), vcl_sets(6);
@@ -97,8 +85,8 @@ namespace {
                         is_in_both = true;
                 }
                 EXPECT_TRUE(is_in_both);
-            }    
-        }        
+            }
+        }
     }
 }
 

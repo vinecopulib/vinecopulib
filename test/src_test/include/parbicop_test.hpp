@@ -14,38 +14,36 @@
 
 #include "gtest/gtest.h"
 #include "include/bicop.hpp"
-#include "r_instance.hpp"
 
 // Fake test class allowing access to the R instance
 class FakeParBicopTest : public ::testing::Test {
 public:
-    // all the methods are applied to the R instance
-    VecXd eval_in_R(RInstance *rinstance_ptr, std::string eval_fct, int start); // evaluate a function in R
-    void set_family(RInstance *rinstance_ptr, int family);
-    void set_parameters(RInstance *rinstance_ptr, VecXd parameters);
-    void set_rotation(RInstance *rinstance_ptr, int rotation);
-    int get_family(RInstance *rinstance_ptr);
-    VecXd get_parameters(RInstance *rinstance_ptr);
-    int get_rotation(RInstance *rinstance_ptr);
-    int get_n(RInstance *rinstance_ptr);
-    void change_n(RInstance *rinstance_ptr, int n);
-    double get_tau(RInstance *rinstance_ptr);
-    void set_tau(RInstance *rinstance_ptr, double tau);
-    MatXd get_U(RInstance *rinstance_ptr);
+    void set_family(int family, int rotation);
+    void set_parameters(VecXd parameters);
+    void set_n(int n);
+    int get_n();
+    int get_family();
+    double get_par();
+    double get_par2();
+private:
+    int n_;
+    int family_;
+    double par_;
+    double par2_;
 };
 
 // A ParBicop fixture class template
 template <typename T>
 class ParBicopTest : public FakeParBicopTest {
 public:
-    void setup_parameters(RInstance *rinstance_ptr) {
-        // set family and extracts kendall's tau from the R instance
+    void setup_parameters(int rotation = 0) {
+        int n = (int) 2e3;
+        double tau = 0.5; // should be positive
+        this->par_bicop_.set_rotation(rotation);
         int family = this->par_bicop_.get_family();
-        this->set_family(rinstance_ptr, family);
-        double tau = this->get_tau(rinstance_ptr);
+        this->set_family(family, rotation);
+        this->set_n(n);
 
-        // set the rotion and compute the parameters vector
-        this->par_bicop_.set_rotation(rinstance_ptr->get_rotation());
         VecXd parameters = this->par_bicop_.get_parameters();
         if (parameters.size() < 2)
         {
@@ -61,7 +59,7 @@ public:
             else if (family == 7)
             {
                 parameters(1) = 1.5;
-                parameters(0) = -((2*(1-parameters(1)+parameters(1)*std::fabs(tau)))/(parameters(1)*(-1+std::fabs(tau))));
+                parameters(0) = -((2*(1-parameters(1)+parameters(1)*tau))/(parameters(1)*(-1+tau)));
             }
             else
             {
@@ -80,16 +78,25 @@ public:
                 parameters(1) = delta;
             }
         }
-        // set the parameters vector for the ParBicop and R instance
+        // set the parameters vector for the ParBicop
         this->par_bicop_.set_parameters(parameters);
-        this->set_parameters(rinstance_ptr, this->par_bicop_.get_parameters());
 
-        // whether checks need to be done
+        // whether checks need to be done and deal with the rotation for VineCopula
         needs_check_ = true;
         std::vector<int> rotation_less_fams = {0, 1, 2, 5};
-        bool is_rotless = is_member(this->par_bicop_.get_family(), rotation_less_fams);
-        if (is_rotless)
-            needs_check_ = (rinstance_ptr->get_rotation() == 0);
+        if (is_member(this->par_bicop_.get_family(), rotation_less_fams))
+        {
+            needs_check_ = (rotation == 0);
+        }
+        else
+        {
+            if (rotation == 90 || rotation == 270)
+            {
+                parameters = -parameters;
+            }
+        }
+        // set the parameters vector R
+        this->set_parameters(parameters);
     }
 protected:
     ParBicopTest() : par_bicop_() {}
@@ -101,4 +108,3 @@ protected:
 typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop,
         Bb1Bicop, Bb6Bicop, Bb7Bicop, Bb8Bicop> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);
-

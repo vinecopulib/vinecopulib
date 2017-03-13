@@ -7,11 +7,7 @@ download_project(
         UPDATE_DISCONNECTED 1
 )
 
-#<TEMP>
-if (NOT WIN32)
-#</TEMP>
-
-include_directories(${test_includes} ${external_includes}) #
+include_directories(${external_includes} ${CMAKE_BINARY_DIR}/generated/)
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 add_subdirectory(src_test)
 
@@ -31,11 +27,4 @@ endforeach()
 
 #add_executable(runUnitTests gtest.cpp) #${test_SRCS}
 #target_link_libraries(runUnitTests gtest gmock common ${external_libs} ${test_libs} src_test)#
-
-#<TEMP>
-else()
-    message(WARNING "Compilation of R-related tests temporarily disabled for Windows !")
-endif()
-#</TEMP>
-
-add_subdirectory(bindings)
+#add_subdirectory(bindings)

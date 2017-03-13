@@ -15,8 +15,6 @@ include(cmake/findR.cmake                 REQUIRED)
 
 include(cmake/findDependencies.cmake      REQUIRED)
 
-include(cmake/findTestDependencies.cmake  REQUIRED)
-
 include(cmake/compilerDefOpt.cmake        REQUIRED)
 
 include(cmake/paths.cmake                 REQUIRED)

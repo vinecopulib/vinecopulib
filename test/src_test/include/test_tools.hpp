@@ -12,38 +12,13 @@
 
 #pragma once
 
-#include "test_tools.hpp"
-#include "gtest/gtest.h"
-#include "rscript.hpp"
+#include <Eigen/Dense>
+#include <iostream>
+#include <fstream>
 
-class VinecopTest : public ::testing::Test {
-public:
-    VinecopTest() {
-        // write temp files for the test using VineCopula
-        std::string command = std::string(RSCRIPT) + "../test/test_vinecop_parametric.R";
-        system(command.c_str());
+typedef Eigen::MatrixXd MatXd;
+typedef Eigen::MatrixXi MatXi;
 
-        // vine structures (C++ representation reverses rows)
-        model_matrix = read_matxi("temp2").colwise().reverse();
-        vc_matrix = read_matxi("temp3").colwise().reverse();
-
-        // u, pdf, sim
-        MatXd temp = read_matxd("temp");
-        int n = temp.rows();
-        int m = model_matrix.rows();
-        u = temp.block(0,0,n,m);
-        f = temp.block(0,m,n,1);
-        sim = temp.block(0,m+1,n,m);
-
-        // remove temp files
-        system("rm temp temp2 temp3");
-    }
-
-    MatXd u;
-    VecXd f;
-    MatXd sim;
-    MatXi model_matrix;
-    MatXi vc_matrix;
-};
-
+MatXd read_matxd(const char *filename, int max_buffer_size = (int) 1e6);
+MatXi read_matxi(const char *filename, int max_buffer_size = (int) 1e6);
 

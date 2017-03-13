@@ -1,19 +1,18 @@
 # vinecopulib
 [![Build Status](https://travis-ci.org/tvatter/vinecopulib.svg?branch=master)](https://travis-ci.org/tvatter/vinecopulib)
-[![Windows Build status](http://ci.appveyor.com/api/projects/status/github/tvatter/vinecopulib?svg=true)](https://ci.appveyor.com/project/tvatter/vinecopulib)
 
 A C++ library for vine copulas.
 
 ## Requirements
 
-cmake, doxygen, GSL, Eigen3, Rcpp, RInside, RcppEigen, VineCopula
+cmake, doxygen, GSL, Eigen3, VineCopula
 
-Note that Rcpp, RInside RcppEigen and VineCopula are used only for unit-testing the C++ implementation (i.e., comparing with the results from the VineCopula R package).
+Note that VineCopula is used only for unit-testing the C++ implementation (i.e., comparing with the results from the R package).
 A findR.cmake looks for them in the default locations for linux and osx, but problems might occur
 with versions installed from R/RStudio. Therefore, prior to building the library,
 it is recommended to use:
 
-`sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'`
+`sudo Rscript -e 'install.packages("VineCopula", lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'`
 
 ## Compilation
 

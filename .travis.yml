@@ -34,11 +34,10 @@ before_install:
 install:
   ### LINUX
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y libnlopt-dev libgsl0-dev libboost1.63-dev libboost-python1.63-dev python$PYTHONVER-dev; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev r-cran-rcppeigen r-cran-rinside g++; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev g++; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y doxygen doxygen-doc doxygen-gui graphviz; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get autoremove; fi # in particular remove old compilers so that new ones are the default
   - if [ $TRAVIS_OS_NAME == linux ]; then export CMAKE_ARGS="$CMAKE_ARGS -DPYTHON_EXECUTABLE=/usr/bin/python$PYTHONVER -DPYTHON_INCLUDE_DIR=/usr/include/python$PYTHONVER"; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then export CMAKE_ARGS="$CMAKE_ARGS -DEIGEN3_INCLUDE_DIR=/usr/lib/R/site-library/RcppEigen/include/"; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then export R_PACKAGES='c("VineCopula")'; fi
 
   ### OSX
@@ -48,7 +47,7 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install r; fi
 
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen graphviz; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then export R_PACKAGES='c("Rcpp","RInside","RcppEigen","VineCopula")'; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then export R_PACKAGES='c("VineCopula")'; fi
 
   ### Common
   - sudo Rscript -e 'withCallingHandlers(install.packages('$R_PACKAGES', repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
