@@ -23,7 +23,7 @@ MatXd read_matxd(const char *filename, int max_buffer_size)
     using namespace std;
 
     int cols = 0, rows = 0;
-    double buff[max_buffer_size];
+    double* buff = new double[max_buffer_size];
 
     // Read numbers from file into buffer.
     ifstream infile;
@@ -57,5 +57,6 @@ MatXd read_matxd(const char *filename, int max_buffer_size)
         for (int j = 0; j < cols; j++)
             result(i,j) = buff[ cols*i+j ];
 
+    delete [] buff;
     return result;
 };
