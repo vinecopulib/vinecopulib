@@ -4,10 +4,6 @@
  [![WindowsBuildstatus](http://ci.appveyor.com/api/projects/status/github/tvatter/vinecopulib?svg=true)](https://ci.appveyor.com/project/tvatter/vinecopulib)
  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
  
---------------------------------------------
-
-# Overview
-
 #### What are vine copulas?
 
 Vine copulas are a flexible class of dependence models consisting of bivariate
@@ -105,7 +101,7 @@ to use a `std::shared_ptr<Bicop>` (or its alias `BicopPtr`). To create a
 custom bivariate copula model, you can use `Bicop::create()`.
 
 **Example**
-``` c_cpp
+``` cpp
 // 90 degree Clayton with default parameter (corresponds to independence)
 auto clayton = Bicop::create(3, 90);
 
@@ -137,7 +133,7 @@ You can either fit the parameters of a given `Bicop` object with `fit()` or
 select the best fitting model from a set of families with `Bicop::select()`.
 
 **Example**
-``` c_cpp
+``` cpp
 MatXd data = simulate_uniform(100, 2);           // dummy data
 auto clayton = Bicop::create(3, 0);              // create Clayton copula
 
@@ -162,7 +158,7 @@ You can simulate from a model and evaluate the pdf, h-functions, inverse
 h-functions, log-likelihood, AIC, and BIC.
 
 **Example**
-``` c_cpp
+``` cpp
 auto bicop = Bicop::create(1, VecXd::Constant(1, 0.5), 0);
 auto sim_data = bicop->simulate(100);   // simulate 100 observations
 auto pdf  = bicop->pdf(sim_data);
@@ -191,7 +187,7 @@ represented by a `std::vector<std::vector<BicopPtr>>` containing all
 pair-copulas and an [R-vine matrix](#how-to-read-an-r-vine-matrix).
 
 **Example**
-``` c_cpp
+``` cpp
 int d = 3;  // dimension of the model
 
 // specify pair copulas
@@ -252,7 +248,7 @@ additional arguments allow for customization of the fit
 (**TODO:** link to Doxygen page).
 
 **Example**
-``` c_cpp
+``` cpp
 MatXd data = simulate_uniform(100, 3);        // dummy data
 Vinecop fit_default = Vinecop::select(data);  // fit and select model
 ```
@@ -262,7 +258,7 @@ Vinecop fit_default = Vinecop::select(data);  // fit and select model
 You can simulate from a vine copula model and evaluate its density function.
 
 **Example**
-``` c_cpp
+``` cpp
 Vinecop model(5);             // 5-dimensional independence vine
 auto u = model.simulate(100)  // simulate 100 observations
 auto c = model.pdf(u)         // evaluate the density on u
