@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['par0',['par0',['../struct_par_bicop_p_m_l_e_data.html#a21666a007414731f6c32d38814d02cf8',1,'ParBicopPMLEData']]],
-  ['parbicop',['ParBicop',['../class_par_bicop.html',1,'']]],
-  ['parbicopmledata',['ParBicopMLEData',['../struct_par_bicop_m_l_e_data.html',1,'']]],
-  ['parbicoppmledata',['ParBicopPMLEData',['../struct_par_bicop_p_m_l_e_data.html',1,'']]],
-  ['pmle_5fobjective_5fcalls',['pmle_objective_calls',['../struct_par_bicop_p_m_l_e_data.html#a90a2ef2424507c462f8f74a3e5305704',1,'ParBicopPMLEData']]]
+  ['nloptcontrols',['NLoptControls',['../classoptimization__tools_1_1_n_lopt_controls.html',1,'optimization_tools']]],
+  ['nloptcontrols',['NLoptControls',['../classoptimization__tools_1_1_n_lopt_controls.html#a79c68f622a830310faab4b7053404537',1,'optimization_tools::NLoptControls::NLoptControls()'],['../classoptimization__tools_1_1_n_lopt_controls.html#a32a9c83dccfd6465bbe2781461754b53',1,'optimization_tools::NLoptControls::NLoptControls(double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)']]]
 ];

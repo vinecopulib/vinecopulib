@@ -1,14 +1,18 @@
 <map id="Bicop" name="Bicop">
-<area shape="rect" id="node2" href="$class_kernel_bicop.html" title="KernelBicop" alt="" coords="227,79,321,104"/>
-<area shape="rect" id="node4" href="$class_par_bicop.html" title="ParBicop" alt="" coords="366,79,441,104"/>
-<area shape="rect" id="node3" href="$class_trafokernel_bicop.html" title="TrafokernelBicop" alt="" coords="100,152,221,177"/>
-<area shape="rect" id="node5" href="$class_archimedean_bicop.html" title="ArchimedeanBicop" alt="" coords="246,152,379,177"/>
-<area shape="rect" id="node10" href="$class_elliptical_bicop.html" title="EllipticalBicop" alt="" coords="443,152,547,177"/>
-<area shape="rect" id="node13" href="$class_indep_bicop.html" title="IndepBicop" alt="" coords="571,152,659,177"/>
-<area shape="rect" id="node6" href="$class_clayton_bicop.html" title="ClaytonBicop" alt="" coords="5,225,105,251"/>
-<area shape="rect" id="node7" href="$class_frank_bicop.html" title="FrankBicop" alt="" coords="130,225,218,251"/>
-<area shape="rect" id="node8" href="$class_gumbel_bicop.html" title="GumbelBicop" alt="" coords="242,225,343,251"/>
-<area shape="rect" id="node9" href="$class_joe_bicop.html" title="JoeBicop" alt="" coords="368,225,444,251"/>
-<area shape="rect" id="node11" href="$class_gauss_bicop.html" title="GaussBicop" alt="" coords="469,225,562,251"/>
-<area shape="rect" id="node12" href="$class_student_bicop.html" title="StudentBicop" alt="" coords="586,225,687,251"/>
+<area shape="rect" id="node2" href="$class_kernel_bicop.html" title="KernelBicop" alt="" coords="108,228,200,255"/>
+<area shape="rect" id="node4" href="$class_par_bicop.html" title="ParBicop" alt="" coords="117,355,191,381"/>
+<area shape="rect" id="node3" href="$class_trafokernel_bicop.html" title="TrafokernelBicop" alt="" coords="253,183,373,209"/>
+<area shape="rect" id="node5" href="$class_archimedean_bicop.html" title="ArchimedeanBicop" alt="" coords="248,233,379,260"/>
+<area shape="rect" id="node14" href="$class_elliptical_bicop.html" title="EllipticalBicop" alt="" coords="261,392,365,419"/>
+<area shape="rect" id="node17" href="$class_indep_bicop.html" title="IndepBicop" alt="" coords="270,443,357,469"/>
+<area shape="rect" id="node6" href="$class_bb1_bicop.html" title="Bb1Bicop" alt="" coords="437,5,516,32"/>
+<area shape="rect" id="node7" href="$class_bb6_bicop.html" title="Bb6Bicop" alt="" coords="437,56,516,83"/>
+<area shape="rect" id="node8" href="$class_bb7_bicop.html" title="Bb7Bicop" alt="" coords="437,107,516,133"/>
+<area shape="rect" id="node9" href="$class_bb8_bicop.html" title="Bb8Bicop" alt="" coords="437,157,516,184"/>
+<area shape="rect" id="node10" href="$class_clayton_bicop.html" title="ClaytonBicop" alt="" coords="427,208,527,235"/>
+<area shape="rect" id="node11" href="$class_frank_bicop.html" title="FrankBicop" alt="" coords="433,259,521,285"/>
+<area shape="rect" id="node12" href="$class_gumbel_bicop.html" title="GumbelBicop" alt="" coords="427,309,527,336"/>
+<area shape="rect" id="node13" href="$class_joe_bicop.html" title="JoeBicop" alt="" coords="439,360,515,387"/>
+<area shape="rect" id="node15" href="$class_gauss_bicop.html" title="GaussBicop" alt="" coords="430,411,523,437"/>
+<area shape="rect" id="node16" href="$class_student_bicop.html" title="StudentBicop" alt="" coords="427,461,527,488"/>
 </map>

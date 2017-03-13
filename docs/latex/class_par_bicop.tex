@@ -2,8 +2,7 @@
 \label{class_par_bicop}\index{Par\+Bicop@{Par\+Bicop}}
 
 
-Inheritance diagram for Par\+Bicop\+:
-\nopagebreak
+Inheritance diagram for Par\+Bicop\+:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -12,12 +11,11 @@ Inheritance diagram for Par\+Bicop\+:
 \end{figure}
 
 
-Collaboration diagram for Par\+Bicop\+:
-\nopagebreak
+Collaboration diagram for Par\+Bicop\+:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=137pt]{class_par_bicop__coll__graph}
+\includegraphics[width=136pt]{class_par_bicop__coll__graph}
 \end{center}
 \end{figure}
 \subsection*{Public Member Functions}
@@ -25,28 +23,27 @@ Collaboration diagram for Par\+Bicop\+:
 \item 
 void \hyperlink{class_par_bicop_aeab5e7031792bebc04a401a8f135d3a0}{fit} (const Mat\+Xd \&data, std\+::string method)
 \item 
-\mbox{\Hypertarget{class_par_bicop_ae7a6435fa4df9989d38fcbec9666218a}\label{class_par_bicop_ae7a6435fa4df9989d38fcbec9666218a}} 
-virtual Vec\+Xd {\bfseries tau\+\_\+to\+\_\+parameters} (const double \&tau)=0
+virtual double {\bfseries parameters\+\_\+to\+\_\+tau} (const Vec\+Xd \&parameters)=0\hypertarget{class_par_bicop_afa2abb9e5c96798e4c06e79111bb6314}{}\label{class_par_bicop_afa2abb9e5c96798e4c06e79111bb6314}
+
 \item 
-\mbox{\Hypertarget{class_par_bicop_afa2abb9e5c96798e4c06e79111bb6314}\label{class_par_bicop_afa2abb9e5c96798e4c06e79111bb6314}} 
-virtual double {\bfseries parameters\+\_\+to\+\_\+tau} (const Vec\+Xd \&parameters)=0
+double {\bfseries calculate\+\_\+tau} ()\hypertarget{class_par_bicop_af866faf5a92ad12582b50192a033a39c}{}\label{class_par_bicop_af866faf5a92ad12582b50192a033a39c}
+
 \item 
-\mbox{\Hypertarget{class_par_bicop_af866faf5a92ad12582b50192a033a39c}\label{class_par_bicop_af866faf5a92ad12582b50192a033a39c}} 
-double {\bfseries calculate\+\_\+tau} ()
-\item 
-\mbox{\Hypertarget{class_par_bicop_a190d46ae764f081e2901accade366327}\label{class_par_bicop_a190d46ae764f081e2901accade366327}} 
-double \hyperlink{class_par_bicop_a190d46ae764f081e2901accade366327}{calculate\+\_\+npars} ()
+double \hyperlink{class_par_bicop_a190d46ae764f081e2901accade366327}{calculate\+\_\+npars} ()\hypertarget{class_par_bicop_a190d46ae764f081e2901accade366327}{}\label{class_par_bicop_a190d46ae764f081e2901accade366327}
+
 \begin{DoxyCompactList}\small\item\em Get number of parameters. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Additional Inherited Members}
 
 
 \subsection{Member Function Documentation}
-\mbox{\Hypertarget{class_par_bicop_aeab5e7031792bebc04a401a8f135d3a0}\label{class_par_bicop_aeab5e7031792bebc04a401a8f135d3a0}} 
 \index{Par\+Bicop@{Par\+Bicop}!fit@{fit}}
 \index{fit@{fit}!Par\+Bicop@{Par\+Bicop}}
-\subsubsection{\texorpdfstring{fit()}{fit()}}
-{\footnotesize\ttfamily void Par\+Bicop\+::fit (\begin{DoxyParamCaption}\item[{const Mat\+Xd \&}]{data,  }\item[{std\+::string}]{method }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
-
+\subsubsection[{\texorpdfstring{fit(const Mat\+Xd \&data, std\+::string method)}{fit(const MatXd &data, std::string method)}}]{\setlength{\rightskip}{0pt plus 5cm}void Par\+Bicop\+::fit (
+\begin{DoxyParamCaption}
+\item[{const Mat\+Xd \&}]{data, }
+\item[{std\+::string}]{method}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_par_bicop_aeab5e7031792bebc04a401a8f135d3a0}{}\label{class_par_bicop_aeab5e7031792bebc04a401a8f135d3a0}
 fitstats Fit methods and statistics
 
 
@@ -62,5 +59,5 @@ Implements \hyperlink{class_bicop_a0ff40d8054e11ed8aaa4956c7fd84e89}{Bicop}.
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/\+Users/tvatter/\+Dropbox/vinecoplib/vinecopulib/include/bicop\+\_\+parametric.\+hpp\item 
-/\+Users/tvatter/\+Dropbox/vinecoplib/vinecopulib/src/bicop\+\_\+parametric.\+cpp\end{DoxyCompactItemize}
+/home/n5/dev/cpp/vinecopulib/include/bicop\+\_\+parametric.\+hpp\item 
+/home/n5/dev/cpp/vinecopulib/src/bicop\+\_\+parametric.\+cpp\end{DoxyCompactItemize}

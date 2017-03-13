@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mle_5fobjective_5fcalls',['mle_objective_calls',['../struct_par_bicop_m_l_e_data.html#a7348a3ec361c354bcf676f1f8ec7140a',1,'ParBicopMLEData']]]
+  ['objective_5fcalls',['objective_calls',['../structoptimization__tools_1_1_par_bicop_opt_data.html#a30ba76cb34de8ceb44731469a39bc8bb',1,'optimization_tools::ParBicopOptData']]]
 ];
