@@ -11,24 +11,9 @@
 */
 
 #include "include/distribution_tools.hpp"
-#include <gsl/gsl_cdf.h>
-#include <gsl/gsl_randist.h>
 #include <Eigen/Dense>
 #include <chrono>
 #include <iostream>
-
-template<typename T> T dnorm_gsl(const T& x)
-{
-    return x.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf));
-};
-template<typename T> T pnorm_gsl(const T& x)
-{
-    return x.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_P));
-};
-template<typename T> T qnorm_gsl(const T& x)
-{
-    return x.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_Pinv));
-};
 
 template <typename T>
 void time(const std::string label, const T &it)
@@ -46,11 +31,8 @@ int main(int argc, char **argv) {
     m *= 0.5;
 
     time("Boost dnorm:", [m]{ auto a = dnorm(m); });
-    time("GSL dnorm:  ", [m]{ auto b = dnorm_gsl(m); });
     time("Boost pnom:", [m]{ auto a = pnorm(m); });
-    time("GSL pnorm:  ", [m]{ auto b = pnorm_gsl(m); });
     time("Boost qnom:", [m]{ auto a = qnorm(m); });
-    time("GSL qnorm:  ", [m]{ auto b = qnorm_gsl(m); });
 
     return 0;
 }
