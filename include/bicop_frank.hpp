@@ -36,13 +36,12 @@ public:
     VecXd generator_derivative(const VecXd& u);
     VecXd generator_derivative2(const VecXd& u);
 
-    // inverse hfunction
-    VecXd hinv(const MatXd& u);
-
     // link between Kendall's tau and the par_bicop parameter
     VecXd tau_to_parameters(const double& tau);
     double parameters_to_tau(const VecXd& par);
 
+private:
+    VecXd get_start_parameters(const double tau);
 };
 
 #endif

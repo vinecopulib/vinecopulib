@@ -69,7 +69,8 @@ namespace structselect_tools {
         VineTree& prev_tree,
         std::vector<int> family_set,
         std::string selection_criterion,
-        std::string method
+        std::string method,
+        bool preselect_families
     );
     VineTree edges_as_vertices(const VineTree& prev_tree);
     void add_allowed_edges(VineTree& tree);
@@ -83,10 +84,11 @@ namespace structselect_tools {
         VineTree& tree,
         std::vector<int> family_set,
         std::string method,
-        std::string selection_criterion
+        std::string selection_criterion,
+        bool preselect_families
     );
-    Vinecop as_vinecop(const std::vector<VineTree>& trees);
-
+    Vinecop as_vinecop(std::vector<VineTree>& trees);
+    void flip(BicopPtr& bicop);
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(
         boost::graph_traits<VineTree>::edge_descriptor e,
@@ -126,7 +128,7 @@ namespace structselect_tools {
     }
 
     template<class T>
-    std::vector<T> difference(std::vector<T> x, std::vector<T> y)
+    std::vector<T> set_diff(std::vector<T> x, std::vector<T> y)
     {
         std::sort(x.begin(), x.end());
         std::sort(y.begin(), y.end());
@@ -169,6 +171,14 @@ namespace structselect_tools {
     {
         auto z = intersect(x, y);
         return ((z.size() == x.size()) & (z.size() == y.size()));
+    }
+    
+    //! Integer sequence starting at 1
+    inline std::vector<int> seq_int(int from, int length)
+    {
+        std::vector<int> seq(length);
+        std::iota(seq.begin(), seq.end(), from);
+        return seq;
     }
 
 }

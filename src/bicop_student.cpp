@@ -99,3 +99,10 @@ VecXd StudentBicop::hinv1_default(const MatXd& u)
 
     return hinv;
 }
+
+VecXd StudentBicop::get_start_parameters(const double tau)
+{
+    VecXd parameters = tau_to_parameters(tau);
+    parameters(1) = 5;
+    return parameters;
+}

@@ -48,16 +48,46 @@ class ParBicopTest : public FakeParBicopTest {
 public:
     void setup_parameters(RInstance *rinstance_ptr) {
         // set family and extracts kendall's tau from the R instance
-        this->set_family(rinstance_ptr, this->par_bicop_.get_family());
+        int family = this->par_bicop_.get_family();
+        this->set_family(rinstance_ptr, family);
         double tau = this->get_tau(rinstance_ptr);
 
         // set the rotion and compute the parameters vector
         this->par_bicop_.set_rotation(rinstance_ptr->get_rotation());
-        VecXd parameters;
-        parameters = this->par_bicop_.tau_to_parameters(tau);
-        if (parameters.size() == 2)
-            parameters(1) = 4.0;
-
+        VecXd parameters = this->par_bicop_.get_parameters();
+        if (parameters.size() < 2)
+        {
+            parameters = this->par_bicop_.tau_to_parameters(tau);
+        }
+        else
+        {
+            if (family == 2)
+            {
+                parameters = this->par_bicop_.tau_to_parameters(tau);
+                parameters(1) = 4;
+            }
+            else if (family == 7)
+            {
+                parameters(1) = 1.5;
+                parameters(0) = -((2*(1-parameters(1)+parameters(1)*std::fabs(tau)))/(parameters(1)*(-1+std::fabs(tau))));
+            }
+            else
+            {
+                double delta = 1.5;
+                if (family == 10)
+                {
+                    delta = 0.8;
+                }
+                VecXd tau_v = VecXd::Constant(1,std::fabs(tau));
+                auto f = [this, delta](const VecXd &v) {
+                    VecXd par = VecXd::Constant(2, delta);
+                    par(0) = v(0);
+                    return VecXd::Constant(1, std::fabs(this->par_bicop_.parameters_to_tau(par)));
+                };
+                parameters(0) = invert_f(tau_v, f, 1+1e-6, 100)(0);
+                parameters(1) = delta;
+            }
+        }
         // set the parameters vector for the ParBicop and R instance
         this->par_bicop_.set_parameters(parameters);
         this->set_parameters(rinstance_ptr, this->par_bicop_.get_parameters());
@@ -65,13 +95,7 @@ public:
         // whether checks need to be done
         needs_check_ = true;
         std::vector<int> rotation_less_fams = {0, 1, 2, 5};
-        bool is_rotless = (
-            std::find(
-                rotation_less_fams.begin(),
-                rotation_less_fams.end(),
-                this->par_bicop_.get_family()
-            )  != rotation_less_fams.end()
-        );
+        bool is_rotless = is_member(this->par_bicop_.get_family(), rotation_less_fams);
         if (is_rotless)
             needs_check_ = (rinstance_ptr->get_rotation() == 0);
     }
@@ -82,7 +106,8 @@ protected:
 };
 
 // Create a list of types, each of which will be used as the test fixture's 'T'
-typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop> ParBicopTypes;
+typedef ::testing::Types<IndepBicop, GaussBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop,
+        Bb1Bicop, Bb6Bicop, Bb7Bicop, Bb8Bicop> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);
 
 #endif

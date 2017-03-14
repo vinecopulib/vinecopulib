@@ -20,7 +20,6 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef VINECOPULIB_BICOP_INTERPOLATION_HPP
 #define VINECOPULIB_BICOP_INTERPOLATION_HPP
 
-#include <exception>
 #include <Eigen/Dense>
 
 typedef Eigen::VectorXd VecXd;
@@ -34,6 +33,8 @@ class InterpolationGrid {
 public:
     InterpolationGrid() {}
     InterpolationGrid(const VecXd& grid_points, const MatXd& values);
+
+    void flip();
 
     VecXd interpolate(const MatXd& x);
     VecXd intergrate_1d(const MatXd& u, const int& cond_var);

@@ -28,6 +28,10 @@ along with vinecopulib.  If not, see "http://www.gnu.org/licenses/".
     //   bicop_parametric
     //   bicop_kernel
     //   bicop_interpolation
+    #include "bicop_bb1.hpp"
+    #include "bicop_bb6.hpp"
+    #include "bicop_bb7.hpp"
+    #include "bicop_bb8.hpp"
     #include "bicop_clayton.hpp"
     #include "bicop_frank.hpp"
     #include "bicop_gauss.hpp"
@@ -36,5 +40,4 @@ along with vinecopulib.  If not, see "http://www.gnu.org/licenses/".
     #include "bicop_joe.hpp"
     #include "bicop_student.hpp"
     #include "bicop_trafokernel.hpp"
-
 #endif

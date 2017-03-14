@@ -17,31 +17,19 @@ You should have received a copy of the GNU General Public License
 along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VINECOPULIB_BICOP_KERNEL_HPP
-#define VINECOPULIB_BICOP_KERNEL_HPP
+#include "integration_tools.hpp"
 
-#include "interpolation_grid.hpp"
-#include "bicop_class.hpp"
+namespace integration_tools {
 
-class KernelBicop : public Bicop {
-public:
-    KernelBicop();
-
-    VecXd pdf_default(const MatXd& u);
-    VecXd hfunc1_default(const MatXd& u);
-    VecXd hfunc2_default(const MatXd& u);
-    VecXd hinv1_default(const MatXd& u);
-    VecXd hinv2_default(const MatXd& u);
-
-    double parameters_to_tau(const VecXd &);
-    double calculate_npars();
-
-    void flip();
-
-protected:
-    InterpolationGrid interp_grid_;
-    double npars_;
-};
-
-
-#endif
+    double integrate_zero_to_one(std::function<double(double)> f)
+    {
+        boost::numeric::odeint::runge_kutta_dopri5<double> stepper;
+        double lb = 1e-12;
+        double ub = 1.0 - lb;
+        double x = 0.0;
+        integrate_adaptive(boost::numeric::odeint::make_controlled(lb,lb,stepper),
+                           [f](const double /* x */, double &dxdt, const double t) {dxdt = f(t);},
+                           x, lb, ub, lb);
+        return x;
+    }
+}

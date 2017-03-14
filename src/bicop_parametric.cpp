@@ -17,8 +17,8 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <nlopt.hpp>
 #include "bicop_parametric.hpp"
+#include "optimization_tools.hpp"
 
 // calculate number of parameters
 double ParBicop::calculate_npars()
@@ -30,189 +30,87 @@ double ParBicop::calculate_npars()
     return (double) parameters_.size();
 }
 
-
-// the objective function for maximum likelihood estimation
-double mle_objective(const std::vector<double>& x,
-                     std::vector<double> &,
-                     void* data)
+/*void remove_row(MatXd& matrix, unsigned int to_remove)
 {
-    ParBicopMLEData* newdata = (ParBicopMLEData*) data;
-    ++newdata->mle_objective_calls;
-    Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
-    newdata->bicop->set_parameters(par);
-    double nll = newdata->bicop->loglik(newdata->U);
-    nll *= -1;
-    return nll;
-}
+    unsigned int n = matrix.rows()-1;
+    unsigned int m = matrix.cols();
 
-// the objective function for profile maximum likelihood estimation
-double pmle_objective(const std::vector<double>& x,
-                      std::vector<double> &,
-                      void* data)
-{
-    ParBicopPMLEData* newdata = (ParBicopPMLEData*) data;
-    ++newdata->pmle_objective_calls;
-    VecXd par = VecXd::Ones(x.size()+1);
-    par(0) = newdata->par0;
-    for (unsigned int i = 0; i < x.size(); ++i)
-        par(i + 1) = x[i];
-    newdata->bicop->set_parameters(par);
-    double nll = newdata->bicop->loglik(newdata->U);
-    nll *= -1;
-    
-    return nll;
-}
+    if(to_remove < numRows )
+        matrix.block(to_remove,0,numRows-to_remove,numCols) = matrix.block(to_remove+1,0,numRows-to_remove,numCols);
+
+    matrix.conservativeResize(numRows,numCols);
+}*/
 
 // fit
 void ParBicop::fit(const MatXd &data, std::string method)
 {
-    int npars = (int) calculate_npars();
-    int n = data.rows();
-    int d = 2;
-    double tau = 0.0;
-    MatXd newdata = data;
-    ktau_matrix(newdata.data(), &d, &n, &tau);
-    VecXd newpar = tau_to_parameters(tau);
+    if (family_ != 0)
+    {
+        using namespace optimization_tools;
 
-    std::string association_direction = get_association_direction();
-    if (((tau < 0) & (association_direction.compare("positive") == 0)) |
-        ((tau > 0) & (association_direction.compare("negative") == 0)))
-    {
-        throw std::runtime_error("The data and copula are not compatible.");
-    } else
-    {
-        if (method.compare("itau") == 0)
+        std::vector<std::string> methods = {"itau", "mle"};
+        if (!is_member(method, methods))
         {
-            if (npars == 1)
-            {
-                set_parameters(newpar);
-            }
-
-            if (npars > 1)
-            {
-                // Derivatives free optimization
-                nlopt::opt opt(nlopt::LN_BOBYQA, npars - 1);
-                opt.set_xtol_rel(1e-2);
-                opt.set_xtol_abs(1e-3);
-                opt.set_ftol_rel(1e-2);
-                opt.set_ftol_abs(1e-2);
-                opt.set_maxeval((int) 1e3);
-
-                // Set bounds
-                MatXd bounds = get_parameters_bounds();
-                std::vector<double> lb(npars-1);
-                std::vector<double> ub(npars-1);
-                VecXd::Map(&lb[0], npars-1) = bounds.block(1,0,npars-1,1);
-                VecXd::Map(&ub[0], npars-1) = bounds.block(1,1,npars-1,1);
-                
-                opt.set_lower_bounds(lb);
-                opt.set_upper_bounds(ub);
-                
-                // organize data for nlopt
-                MatXd U = data;
-                ParBicopPMLEData my_pmle_data = {U, this, newpar(0), 0};
-                
-                // call to the optimizer
-                opt.set_min_objective(pmle_objective, &my_pmle_data);
-                
-                // to store the log-likelihood
-                double nll;
-                // starting value
-                std::vector<double> x = lb;
-                transform(x.begin(), x.end(), x.begin(), bind2nd(std::plus<double>(), 0.1));
-                x[0] = (lb[0] + ub[0]) / 4.0;
-                // optimize function
-                try
-                {
-                    opt.optimize(x, nll);
-                } catch (nlopt::roundoff_limited err)
-                {
-                    throw std::string("Halted because roundoff errors limited progress! ") + err.what();
-                } catch (nlopt::forced_stop err)
-                {
-                    throw std::string("Halted because of a forced termination! ") + err.what();
-                } catch (std::invalid_argument err )
-                {
-                    throw std::string("Invalid arguments. ") + err.what();
-                } catch (std::bad_alloc err)
-                {
-                    throw std::string("Ran out of memory. ") + err.what();
-                } catch (std::runtime_error err)
-                {
-                    throw std::string("Generic failure. ") + err.what();
-                }
-
-                VecXd parameters = VecXd::Ones(x.size() + 1);
-                parameters(0) = newpar(0);
-                for (int i = 0; i < npars-1; ++i)
-                    parameters(i + 1) = x[i];
-                
-                set_parameters(parameters);
-            }
-        } else if (method.compare("mle") == 0) {
-            if (npars != 0)
-            {
-                // Derivatives free optimization
-                nlopt::opt opt(nlopt::LN_BOBYQA, npars);
-                opt.set_xtol_rel(1e-3);
-                opt.set_xtol_abs(1e-3);
-                opt.set_ftol_rel(1e-2);
-                opt.set_ftol_abs(1e-2);
-                opt.set_maxeval((int) 1e3);
-
-                // Set bounds
-                MatXd bounds = get_parameters_bounds();
-                std::vector<double> lb(npars);
-                std::vector<double> ub(npars);
-                VecXd::Map(&lb[0], npars) = bounds.col(0);
-                VecXd::Map(&ub[0], npars) = bounds.col(1);
-
-                opt.set_lower_bounds(lb);
-                opt.set_upper_bounds(ub);
-
-                // rotate copula and data
-                int rotation = get_rotation();
-                MatXd U = cut_and_rotate(data);
-                set_rotation(0);
-
-                // organize data for nlopt
-                ParBicopMLEData my_mle_data = {U, this, 0};
-                // call to the optimizer
-                opt.set_min_objective(mle_objective, &my_mle_data);
-
-                // to store the log-likelihood
-                double nll;
-                // starting value
-                std::vector<double> x = lb;
-                transform(x.begin(), x.end(), x.begin(), bind2nd(std::plus<double>(), 0.1));
-                x[0] = newpar(0);
-                // optimize function
-                try
-                {
-                    opt.optimize(x, nll);
-                } catch (nlopt::roundoff_limited err)
-                {
-                    throw std::string("Halted because roundoff errors limited progress! ") + err.what();
-                } catch (nlopt::forced_stop err)
-                {
-                    throw std::string("Halted because of a forced termination! ") + err.what();
-                } catch (std::invalid_argument err )
-                {
-                    throw std::string("Invalid arguments. ") + err.what();
-                } catch (std::bad_alloc err)
-                {
-                    throw std::string("Ran out of memory. ") + err.what();
-                } catch (std::runtime_error err)
-                {
-                    throw std::string("Generic failure. ") + err.what();
-                }
-
-                Eigen::Map<const Eigen::VectorXd> parameters(&x[0], x.size());
-                set_parameters(parameters);
-                set_rotation(rotation);
-            }
-        } else {
-            throw std::runtime_error(std::string("Method not implemented"));
+            throw std::runtime_error("Method not implemented.");
         }
+
+        int npars = (int) calculate_npars();
+        if (method == "itau")
+        {
+            npars = npars - 1;
+            if ((npars > 0) & (family_ != 2))
+            {
+                throw std::runtime_error("itau method is not available for this family.");
+            }
+        }
+
+        int n = data.rows();
+        int d = 2;
+        double tau = 0.0;
+        MatXd newdata = data;
+        ktau_matrix(newdata.data(), &d, &n, &tau);
+        VecXd newpar = get_start_parameters(tau);
+
+        std::string association_direction = get_association_direction();
+        if (((tau < 0) & (association_direction == "positive")) | ((tau > 0) & (association_direction == "negative")))
+        {
+            throw std::runtime_error("The data and copula are not compatible.");
+        }
+
+        if (npars > 0)
+        {
+            // Create optimizer
+            Optimizer optimizer(npars);
+
+            // Set bounds and starting values
+            MatXd bounds = get_parameters_bounds();
+            VecXd initial_parameters = newpar;
+            ParBicopOptData my_data = {data, this, newpar(0), 0};
+            if (method == "itau")
+            {
+                bounds = get_parameters_bounds().block(1,0,npars,2);
+                initial_parameters = newpar.block(1,0,npars,1);
+                optimizer.set_objective(pmle_objective, &my_data);
+            }
+            else
+            {
+                optimizer.set_objective(mle_objective, &my_data);
+            }
+
+            optimizer.set_bounds(bounds);
+            VecXd optimized_parameters = optimizer.optimize(initial_parameters);
+
+            if (method == "itau")
+            {
+                newpar.block(1,0,npars,1) = optimized_parameters;
+            }
+            else
+            {
+                newpar = optimized_parameters;
+            }
+        }
+        // set the new parameters
+        set_parameters(newpar);
     }
+
 }

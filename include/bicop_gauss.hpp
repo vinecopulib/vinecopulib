@@ -38,6 +38,9 @@ public:
 
     // inverse hfunction
     VecXd hinv1_default(const MatXd& u);
+
+private:
+    VecXd get_start_parameters(const double tau);
 };
 
 #endif

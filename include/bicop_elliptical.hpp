@@ -24,18 +24,15 @@
 
 class EllipticalBicop : public ParBicop  {
 public:
-    // copula density
-    virtual VecXd pdf_default(const MatXd& u) = 0;
-
     // hfunction and its inverse
-    virtual VecXd hfunc1_default(const MatXd& u) = 0;
     VecXd hfunc2_default(const MatXd& u);
-    virtual VecXd hinv1_default(const MatXd& u) = 0;
     VecXd hinv2_default(const MatXd& u);
 
     // link between Kendall's tau and the par_bicop parameter
     VecXd tau_to_parameters(const double& tau);
     double parameters_to_tau(const VecXd& parameters);
+
+    void flip();
 };
 
 #endif

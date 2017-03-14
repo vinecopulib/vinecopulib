@@ -48,33 +48,40 @@ ClaytonBicop::ClaytonBicop(const VecXd& parameters, const int& rotation)
 VecXd ClaytonBicop::generator(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = u.array().pow(-theta);
-    psi = (psi - VecXd::Ones(psi.size())) / theta;
-    return psi;
+    auto f = [theta](const double v) {
+        return (std::pow(v, -theta)-1)/theta;
+    };
+    return u.unaryExpr(f);
 }
 VecXd ClaytonBicop::generator_inv(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (theta * u + VecXd::Ones(u.size()));
-    psi = psi.array().pow(-1/theta);
-    return psi;
+    auto f = [theta](const double v) {
+        return std::pow(1+theta*v, -1/theta);
+    };
+    return u.unaryExpr(f);
 }
 
 VecXd ClaytonBicop::generator_derivative(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (-1) * u.array().pow(-1-theta);
-    return psi;
+    auto f = [theta](const double v) {
+        return (-1)*std::pow(v, -1-theta);
+    };
+    return u.unaryExpr(f);
 }
 
 VecXd ClaytonBicop::generator_derivative2(const VecXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd psi = (1 + theta) * u.array().pow(-2-theta);
-    return psi;
+    auto f = [theta](const double v) {
+        return (1+theta)*std::pow(v, -2-theta);
+    };
+    return u.unaryExpr(f);
 }
 
-VecXd ClaytonBicop::hinv(const MatXd& u)
+// inverse h-function
+VecXd ClaytonBicop::hinv1_default(const MatXd& u)
 {
     double theta = double(this->parameters_(0));
     VecXd hinv = u.col(0).array().pow(theta + 1.0);
@@ -89,7 +96,6 @@ VecXd ClaytonBicop::hinv(const MatXd& u)
         hinv = hinv1_num(u);
     }
     return hinv;
-
 }
 
 // link between Kendall's tau and the par_bicop parameter
@@ -107,3 +113,44 @@ double ClaytonBicop::parameters_to_tau(const VecXd& parameters)
         tau *= -1;
     return tau;
 }
+
+VecXd ClaytonBicop::get_start_parameters(const double tau)
+{
+    return tau_to_parameters(tau);
+}
+
+/*// PDF
+VecXd ClaytonBicop::pdf_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    VecXd t1 = generator(u.col(0));
+    VecXd t2 = generator(u.col(1));
+    VecXd t = t1+t2;
+    VecXd f = generator_inv(t);
+
+    t1 = u.col(0).array().pow(theta);
+    t2 = u.col(1).array().pow(theta);
+    t = t1 + t2 - t1.cwiseProduct(t2);
+    t = t.array().square();
+
+    t1 = t1.array().pow((theta-1)/theta);
+    t2 = t2.array().pow((theta-1)/theta);
+
+    f = (1+theta)*f.cwiseQuotient(t).cwiseProduct(t1).cwiseProduct(t2);
+    return f;
+}
+
+// hfunction
+VecXd ClaytonBicop::hfunc1_default(const MatXd& u)
+{
+    double theta = double(this->parameters_(0));
+    VecXd t1 = generator(u.col(0));
+    VecXd t2 = generator(u.col(1));
+    VecXd t = t1+t2;
+    VecXd f = generator_inv(t);
+    f = f.array().pow(1+theta);
+
+    t2 = u.col(0).array().pow(-1-theta);
+    f = f.cwiseProduct(t2);
+    return f;
+}*/

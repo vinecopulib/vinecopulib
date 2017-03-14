@@ -20,7 +20,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 #include "structselect_tools.hpp"
 
 namespace structselect_tools {
-
+    
     //! Create base tree of the vine
     //!
     //!  The base tree is a star on d + 1 variables, where the conditioning
@@ -75,12 +75,15 @@ namespace structselect_tools {
     //!     optimization.
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
+    //! @param preselect_families  whether to exclude families before fitting based 
+    //!     on symmetry properties of the data.
     //! @return tree T_{k+1}.
     VineTree select_next_tree(
         VineTree& prev_tree,
         std::vector<int> family_set,
         std::string method,
-        std::string selection_criterion
+        std::string selection_criterion,
+        bool preselect_families
     )
     {
         auto new_tree = edges_as_vertices(prev_tree);
@@ -94,7 +97,8 @@ namespace structselect_tools {
             new_tree,
             family_set,
             method,
-            selection_criterion
+            selection_criterion,
+            preselect_families
         );
 
         return new_tree;
@@ -133,7 +137,7 @@ namespace structselect_tools {
 
     //! Add edges allowed by the proximity condition
     //!
-    //! Also calculates the Kendall's tau for the edge and sets  edge weights
+    //! Also calculates the Kendall's tau for the edge and sets edge weights
     //! to 1-|tau| so that the minimum spanning tree algorithm maximizes sum of
     //! |tau|.
     //!
@@ -146,10 +150,10 @@ namespace structselect_tools {
                 // (-1 means 'no common neighbor')
                 if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                     auto pc_data = get_pc_data(v0, v1, vine_tree);
-                    // edge weight is 1 - |tau|
-                    // -> minimum spanning tree maximizes sum of |tau|
-                    auto w = 1.0 - std::fabs(pairwise_ktau(pc_data));
-                    boost::add_edge(v0, v1, w, vine_tree);
+                    auto tau = pairwise_ktau(pc_data);
+                    auto w = 1.0 - std::fabs(tau);
+                    auto e = boost::add_edge(v0, v1, w, vine_tree).first;
+                    vine_tree[e].empirical_tau = tau;
                 }
             }
         }
@@ -181,8 +185,7 @@ namespace structselect_tools {
     //     the h-functions calculated in the previous tree.
     MatXd get_pc_data(int v0, int v1, const VineTree& tree)
     {
-        int n = std::max(tree[v0].hfunc1.size(), tree[v0].hfunc2.size());
-        MatXd pc_data(n, 2);
+        MatXd pc_data(tree[v0].hfunc1.size(), 2);
         int ei_common = find_common_neighbor(v0, v1, tree);
         if (find_position(ei_common, tree[v0].prev_edge_indices) == 0) {
             pc_data.col(0) = tree[v0].hfunc1;
@@ -224,18 +227,16 @@ namespace structselect_tools {
     void add_edge_info(VineTree& tree)
     {
         for (auto e : boost::edges(tree)) {
-            // extract vertices connected by this edge
             auto v0 = boost::source(e, tree);
             auto v1 = boost::target(e, tree);
-
             tree[e].pc_data = get_pc_data(v0, v1, tree);
 
             auto v0_indices = cat(tree[v0].conditioning, tree[v0].conditioned);
             auto v1_indices = cat(tree[v1].conditioning, tree[v1].conditioned);
 
             auto test = intersect(v0_indices, v1_indices);
-            auto d01 = difference(v0_indices, v1_indices);
-            auto d10 = difference(v1_indices, v0_indices);
+            auto d01 = set_diff(v0_indices, v1_indices);
+            auto d10 = set_diff(v1_indices, v0_indices);
 
             tree[e].conditioning = cat(d01, d10);
             tree[e].conditioned = intersect(v0_indices, v1_indices);
@@ -276,11 +277,14 @@ namespace structselect_tools {
     //!     optimization.
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
+    //! @param preselect_families  whether to exclude families before fitting based 
+    //!     on symmetry properties of the data.
     void select_pair_copulas(
         VineTree& tree,
         std::vector<int> family_set,
         std::string method,
-        std::string selection_criterion
+        std::string selection_criterion,
+        bool preselect_families
     )
     {
         for (auto e : boost::edges(tree)) {
@@ -289,7 +293,7 @@ namespace structselect_tools {
                 selection_criterion,
                 family_set,
                 true,  // use_rotations,
-                true,  // preselect_families,
+                preselect_families,
                 method
             );
             tree[e].hfunc1 = tree[e].pair_copula->hfunc1(tree[e].pc_data);
@@ -302,22 +306,23 @@ namespace structselect_tools {
     //! @param trees a vector of trees preprocessed by add_edge_info(); the
     //!     0th entry should be the base graph and is not used.
     //! @return Vinecop object corresponding to the fitted trees.
-    Vinecop as_vinecop(const std::vector<VineTree>& trees)
+    Vinecop as_vinecop(std::vector<VineTree>& trees)
     {
         int d = trees.size();
         MatXi mat = MatXi::Constant(d, d, 0);
-        auto pcs = Vinecop::make_pc_store(d);
-
-        // loop through columns of the matrix
-        for (int t = d - 1 ; t > 0; --t) {
-            // start with tree t and fill first two entries by conditioning set
+        auto pcs = Vinecop::make_pair_copula_store(d);
+        
+        for (int col = 0; col < d - 1; ++col) {
+            int t = d - 1 - col;
+            // start with highest tree in this column and fill first two 
+            // entries by conditioning set
             auto e0 = *boost::edges(trees[t]).first;
-            mat(t, t) = trees[t][e0].conditioning[0];
-            mat(t - 1, t) = trees[t][e0].conditioning[1];
+            mat(t, col) = trees[t][e0].conditioning[0];
+            mat(t - 1, col) = trees[t][e0].conditioning[1];
 
             // assign fitted pair copula to appropriate entry, see
             // Vinecop::get_pair_copula().
-            pcs[t - 1][d - t - 1] = trees[t][e0].pair_copula;
+            pcs[t - 1][col] = trees[t][e0].pair_copula;
 
             // initialize running set with full conditioing set of this edge
             auto ned_set = trees[t][e0].conditioned;
@@ -325,37 +330,43 @@ namespace structselect_tools {
             // iteratively search for an edge in lower tree that shares all indices
             // in the conditioning set + diagonal entry
             for (int k = 1; k < t; ++k) {
-                auto reduced_set = cat(mat(t, t), ned_set);
+                auto reduced_set = cat(mat(t, col), ned_set);
                 for (auto e : boost::edges(trees[t - k])) {
                     if (is_same_set(trees[t - k][e].all_indices, reduced_set)) {
                         // next matrix entry is conditioning variable of new edge
                         // that's not equal to the diagonal entry of this column
                         auto e_new = trees[t - k][e];
-                        auto pos = find_position(mat(t, t), e_new.conditioning);
-                        mat(t - k - 1, t) = e_new.conditioning[std::abs(1 - pos)];
-                        if (pos == 0) {
-                            reverse(e_new.conditioning);
-                            switch(e_new.pair_copula->get_rotation()) {
-                                case 90:
-                                    e_new.pair_copula->set_rotation(270);
-                                case 270:
-                                    e_new.pair_copula->set_rotation(90);
-                            }
-                        }
+                        auto pos = find_position(mat(t, col), e_new.conditioning);
+                        mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
+                        if (pos == 1)
+                            e_new.pair_copula->flip();
                         // assign fitted pair copula to appropriate entry, see
                         // Vinecop::get_pair_copula().
-                        pcs[t - 1 - k][d - 1 - t] = e_new.pair_copula;
+                        pcs[t - 1 - k][col] = e_new.pair_copula;
 
                         // start over with conditioning set of next edge
                         ned_set = e_new.conditioned;
+                        
+                        // remove edge (must not be reused in another column!)
+                        int v0 = boost::source(e, trees[t - k]);
+                        int v1 = boost::target(e, trees[t - k]);
+                        boost::remove_edge(v0, v1, trees[t - k]);
+                        break;
                     }
                 }
             }
         }
-        // change to user-facing format
-        MatXi new_mat = mat.rowwise().reverse().colwise().reverse();
+
+        // The last column contains a single element which must be different
+        // from all other diagonal elements. Based on the properties of an 
+        // R-vine matrix, this must be the element next to it. 
+        mat(0, d - 1) = mat(0, d - 2);
+        
+        // change to user-facing format 
+        // (variable index starting at 1 instead of 0)
+        MatXi new_mat = mat;
         for (int i = 0; i < d; ++i)
-            for (int j = 0; j <= i; ++j)
+            for (int j = 0; j < d - i; ++j)
                 new_mat(i, j) += 1;
 
         return Vinecop(pcs, new_mat);
@@ -372,6 +383,7 @@ namespace structselect_tools {
                 "fam = " << tree[e].pair_copula->get_family() <<
                 ", rot = " << tree[e].pair_copula->get_rotation() <<
                 ", par = " <<  tree[e].pair_copula->get_parameters() <<
+                ", emp_tau = " << tree[e].empirical_tau <<
                 std::endl;
             std::cout << pc_info.str().c_str();
         }

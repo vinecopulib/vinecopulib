@@ -17,18 +17,19 @@
     along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VINECOPULIB_BICOP_CLAYTON_HPP
-#define VINECOPULIB_BICOP_CLAYTON_HPP
+#ifndef VINECOPULIB_BICOP_BB6_HPP
+#define VINECOPULIB_BICOP_BB6_HPP
 
 #include "bicop_archimedean.hpp"
+#include "integration_tools.hpp"
 
-class ClaytonBicop : public ArchimedeanBicop {
+class Bb6Bicop : public ArchimedeanBicop {
 
 public:
     // constructor
-    ClaytonBicop();
-    ClaytonBicop(const VecXd& parameters);
-    ClaytonBicop(const VecXd& parameters, const int& rotation);
+    Bb6Bicop();
+    Bb6Bicop(const VecXd& parameters);
+    Bb6Bicop(const VecXd& parameters, const int& rotation);
 
     // generator, its inverse and derivatives for the archimedean copula
     VecXd generator(const VecXd& u);
@@ -36,15 +37,8 @@ public:
     VecXd generator_derivative(const VecXd& u);
     VecXd generator_derivative2(const VecXd& u);
 
-    // inverse hfunction
-    VecXd hinv1_default(const MatXd& u);
-
     // link between Kendall's tau and the par_bicop parameter
-    VecXd tau_to_parameters(const double& tau);
-    double parameters_to_tau(const VecXd& parameters);
-
-private:
-    VecXd get_start_parameters(const double tau);
+    double parameters_to_tau(const VecXd& par);
 };
 
 

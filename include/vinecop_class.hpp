@@ -22,6 +22,7 @@ along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "bicop.hpp"
 #include "rvine_matrix.hpp"
+#include <limits>
 
 //! A class for vine copulas
 class Vinecop {
@@ -33,18 +34,23 @@ public:
         const MatXi& matrix
     );
 
-    static std::vector<std::vector<BicopPtr>> make_pc_store(int d);
-    static Vinecop structure_select(
+    static std::vector<std::vector<BicopPtr>> make_pair_copula_store(int d);
+    static Vinecop select(
         const MatXd& data,
         std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
         std::string method = "mle",
+        int truncation_level = std::numeric_limits<int>::max(),
+        MatXi matrix = MatXi(0, 0),
         std::string selection_criterion = "bic",
+        bool preselect_families = true,
         bool show_trace = false
     );
 
     BicopPtr get_pair_copula(int tree, int edge);
     int get_family(int tree, int edge);
+    MatXi get_families();
     int get_rotation(int tree, int edge);
+    MatXi get_rotations();
     VecXd get_parameters(int tree, int edge);
     MatXi get_matrix() {return vine_matrix_.get_matrix();}
 
@@ -58,7 +64,7 @@ private:
     std::vector<std::vector<BicopPtr>> pair_copulas_;
 };
 
-VecXi invert_order(const VecXi& order);
+VecXi inverse_permutation(const VecXi& order);
 // reverse columns and rows of an Eigen::Matrix type object
 template<typename Mat>
 Mat to_upper_tri(Mat A) {return A.rowwise().reverse().colwise().reverse();}

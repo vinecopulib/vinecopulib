@@ -25,20 +25,23 @@ RInstance *rinstance_ptr = new RInstance;
 namespace {
     // Test if the C++ implementation of select method using the mle and bic is correct
     TYPED_TEST(ParBicopTest, bicop_select_mle_bic_is_correct) {
-        std::vector<int> rots = {0, 90, 180, 270};
+        std::vector<int> rotations = {0, 90, 180, 270};
+        std::vector<int> positive_rotations = {0,180};
+        std::vector<int> bb_families = {7, 8, 9, 10};
         std::string selection_criterion = "bic";
-        std::vector<int> family_set = {};
+        int true_family = this->par_bicop_.get_family();
+        std::vector<int> family_set = {0,1,true_family};
         this->setup_parameters(rinstance_ptr);
 
-        for (unsigned int j = 0; j < rots.size(); ++j) {
-            if (rots[j] == 0 || rots[j] == 180)
+        for (unsigned int j = 0; j < rotations.size(); ++j) {
+            if (rotations[j] == 0 || rotations[j] == 180)
             {
                 this->set_tau(rinstance_ptr, fabs(this->get_tau(rinstance_ptr)));
             } else
             {
                 this->set_tau(rinstance_ptr, (-1)*fabs(this->get_tau(rinstance_ptr)));
             }
-            this->set_rotation(rinstance_ptr, rots[j]);
+            this->set_rotation(rinstance_ptr, rotations[j]);
             this->setup_parameters(rinstance_ptr);
 
             if (this->needs_check_) {
@@ -50,52 +53,46 @@ namespace {
                                                true,
                                                "mle");
                 int selected_family = bicop->get_family();
-                int true_family = this->par_bicop_.get_family();
-                if (true_family == 3 || true_family == 6)
+
+                EXPECT_EQ(selected_family, true_family) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
+                if (is_member(true_family,bb_families))
                 {
-                    EXPECT_TRUE(selected_family == 3 || selected_family == 6) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
-                    if (selected_family == true_family)
+                    if (is_member(rotations[j],positive_rotations))
                     {
-                        EXPECT_EQ(bicop->get_rotation(), rots[j]);
+                        EXPECT_TRUE(is_member(bicop->get_rotation(),positive_rotations));
                     }
                     else
                     {
-                        if (rots[j] < 180)
-                        {
-                            EXPECT_EQ(bicop->get_rotation()-180, rots[j]);
-                        }
-                        else
-                        {
-                            EXPECT_EQ(bicop->get_rotation()+180, rots[j]);
-                        }
+                        EXPECT_FALSE(is_member(bicop->get_rotation(),positive_rotations));
                     }
                 } else
                 {
-                    EXPECT_EQ(selected_family, true_family) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
-                    EXPECT_EQ(bicop->get_rotation(), rots[j]);
+                    EXPECT_EQ(bicop->get_rotation(), rotations[j]) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
                 }
             }
         }
     }
     
     TYPED_TEST(ParBicopTest, bicop_select_itau_bic_is_correct) {
-        std::vector<int> rots = {0, 90, 180, 270};
+        std::vector<int> no_itau_families = {7, 8, 9, 10};
+        std::vector<int> rotations = {0, 90, 180, 270};
         std::string selection_criterion = "bic";
-        std::vector<int> family_set = {};
+        int true_family = this->par_bicop_.get_family();
+        std::vector<int> family_set = {0,1,true_family};
         this->setup_parameters(rinstance_ptr);
 
-        for (unsigned int j = 0; j < rots.size(); ++j) {
-            if (rots[j] == 0 || rots[j] == 180)
+        for (unsigned int j = 0; j < rotations.size(); ++j) {
+            if (rotations[j] == 0 || rotations[j] == 180)
             {
                 this->set_tau(rinstance_ptr, fabs(this->get_tau(rinstance_ptr)));
             } else
             {
                 this->set_tau(rinstance_ptr, (-1)*fabs(this->get_tau(rinstance_ptr)));
             }
-            this->set_rotation(rinstance_ptr, rots[j]);
+            this->set_rotation(rinstance_ptr, rotations[j]);
             this->setup_parameters(rinstance_ptr);
 
-            if (this->needs_check_) {
+            if (this->needs_check_ && is_member(this->par_bicop_.get_family(), no_itau_families) == false) {
                 MatXd data = this->par_bicop_.simulate(this->get_n(rinstance_ptr));
                 BicopPtr bicop = Bicop::select(data,
                                                selection_criterion,
@@ -104,30 +101,9 @@ namespace {
                                                true,
                                                "itau");
                 int selected_family = bicop->get_family();
-                int true_family = this->par_bicop_.get_family();
-                if (true_family == 3 || true_family == 6)
-                {
-                    EXPECT_TRUE(selected_family == 3 || selected_family == 6) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
-                    if (selected_family == true_family)
-                    {
-                        EXPECT_EQ(bicop->get_rotation(), rots[j]);
-                    }
-                    else
-                    {
-                        if (rots[j] < 180)
-                        {
-                            EXPECT_EQ(bicop->get_rotation()-180, rots[j]);
-                        }
-                        else
-                        {
-                            EXPECT_EQ(bicop->get_rotation()+180, rots[j]);
-                        }
-                    }
-                } else
-                {
-                    EXPECT_EQ(selected_family, true_family) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
-                    EXPECT_EQ(bicop->get_rotation(), rots[j]);
-                }
+
+                EXPECT_EQ(selected_family, true_family) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
+                EXPECT_EQ(bicop->get_rotation(), rotations[j]) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
             }
         }
     }
