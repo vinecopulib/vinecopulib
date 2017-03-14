@@ -4,21 +4,15 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "gtest/gtest.h"
-#include "include/bicop.hpp"
-#include <iostream>
+#include "src_test/include/trafokernel_test.hpp"
 
 namespace {
 
-    TEST(KernelBicopTest, trafo_kernel_fit) {
-        auto cop = Bicop::create(1001, 0);
-        auto u = simulate_uniform(100, 2);
+    TEST_F(TrafokernelTest, trafo_kernel_fit) {
         cop->fit(u, std::string(""));
     }
 
-    TEST(KernelBicop, trafo_kernel_eval_funcs) {
-        auto cop = Bicop::create(1001, 0);
-        auto u = simulate_uniform(100, 2);
+    TEST_F(TrafokernelTest, trafo_kernel_eval_funcs) {
         cop->fit(u, std::string(""));
 
         EXPECT_GE(cop->pdf(u).minCoeff(), 0.0);
@@ -37,15 +31,12 @@ namespace {
         EXPECT_LE(cop->calculate_npars(), 100.0);
     }
 
-    TEST(KernelBicoptest, trafo_kernel_select) {
-        auto u = simulate_uniform(100, 2);
-        auto cop = Bicop::select(u, {1001});
-        EXPECT_EQ(cop->get_family(), 1001);
+    TEST_F(TrafokernelTest, trafo_kernel_select) {
+        auto newcop = Bicop::select(u, {1001});
+        EXPECT_EQ(newcop->get_family(), 1001);
     }
 
-    TEST(KernelBicoptest, trafo_kernel_flip) {
-        auto u = simulate_uniform(100, 2);
-        auto cop = Bicop::select(u, {1001});
+    TEST_F(TrafokernelTest, trafo_kernel_flip) {
         auto pdf = cop->pdf(u);
         u.col(0).swap(u.col(1));
         cop->flip();
