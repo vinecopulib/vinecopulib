@@ -277,12 +277,10 @@ namespace tools_structselect {
         for (auto e : boost::edges(tree)) {
             tree[e].pair_copula = Bicop::select(
                 tree[e].pc_data,
-                selection_criterion,
                 family_set,
-                true,  // use_rotations,
-                preselect_families,
-                method
-            );
+                method,
+                selection_criterion,
+                preselect_families);
             tree[e].hfunc1 = tree[e].pair_copula->hfunc1(tree[e].pc_data);
             tree[e].hfunc2 = tree[e].pair_copula->hfunc2(tree[e].pc_data);
         }

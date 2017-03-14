@@ -24,10 +24,7 @@ namespace {
             {
                 MatXd data = this->par_bicop_.simulate(this->get_n());
                 BicopPtr bicop = Bicop::select(data,
-                                               selection_criterion,
                                                family_set,
-                                               true,
-                                               true,
                                                "mle");
 
                 int selected_family = bicop->get_family();
@@ -66,10 +63,7 @@ namespace {
             if (this->needs_check_ && tools_stl::is_member(this->par_bicop_.get_family(), no_itau_families) == false) {
                 MatXd data = this->par_bicop_.simulate(this->get_n());
                 BicopPtr bicop = Bicop::select(data,
-                                               selection_criterion,
                                                family_set,
-                                               true,
-                                               true,
                                                "itau");
 
                 int selected_family = bicop->get_family();

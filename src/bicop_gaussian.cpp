@@ -4,10 +4,10 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "bicop_gauss.hpp"
+#include "bicop_gaussian.hpp"
 
 // constructor
-GaussBicop::GaussianBicop()
+GaussianBicop::GaussianBicop()
 {
     family_ = 1;
     family_name_ = "Gaussian";
@@ -18,13 +18,13 @@ GaussBicop::GaussianBicop()
     parameters_bounds_(0, 0) = -1;
 }
 
-GaussBicop::GaussianBicop(const VecXd& parameters)
+GaussianBicop::GaussianBicop(const VecXd& parameters)
 {
     GaussianBicop();
     set_parameters(parameters);
 }
 
-GaussBicop::GaussianBicop(const VecXd& parameters, const int& rotation)
+GaussianBicop::GaussianBicop(const VecXd& parameters, const int& rotation)
 {
     GaussianBicop();
     set_parameters(parameters);
@@ -32,7 +32,7 @@ GaussBicop::GaussianBicop(const VecXd& parameters, const int& rotation)
 }
 
 // PDF
-VecXd GaussBicop::pdf_default(const MatXd& u)
+VecXd GaussianBicop::pdf_default(const MatXd& u)
 {
     // Inverse Cholesky of the correlation matrix
     double rho = double(this->parameters_(0));
@@ -52,7 +52,7 @@ VecXd GaussBicop::pdf_default(const MatXd& u)
 
 
 // Normal h-function
-VecXd GaussBicop::hfunc1_default(const MatXd& u)
+VecXd GaussianBicop::hfunc1_default(const MatXd& u)
 {
     double rho = double(this->parameters_(0));
     VecXd h = VecXd::Zero(u.rows());
@@ -62,7 +62,7 @@ VecXd GaussBicop::hfunc1_default(const MatXd& u)
 }
 
 
-VecXd GaussBicop::hinv1_default(const MatXd& u)
+VecXd GaussianBicop::hinv1_default(const MatXd& u)
 {
     double rho = double(this->parameters_(0));
     VecXd hinv = VecXd::Zero(u.rows());
@@ -71,7 +71,7 @@ VecXd GaussBicop::hinv1_default(const MatXd& u)
     return pnorm(hinv);
 }
 
-VecXd GaussBicop::get_start_parameters(const double tau)
+VecXd GaussianBicop::get_start_parameters(const double tau)
 {
     return tau_to_parameters(tau);
 }

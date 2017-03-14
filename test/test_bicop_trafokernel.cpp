@@ -39,13 +39,13 @@ namespace {
 
     TEST(KernelBicoptest, trafo_kernel_select) {
         auto u = simulate_uniform(100, 2);
-        auto cop = Bicop::select(u, "bic", {1001}, true, true, "mle");
+        auto cop = Bicop::select(u, {1001});
         EXPECT_EQ(cop->get_family(), 1001);
     }
 
     TEST(KernelBicoptest, trafo_kernel_flip) {
         auto u = simulate_uniform(100, 2);
-        auto cop = Bicop::select(u, "bic", {1001}, true, true, "mle");
+        auto cop = Bicop::select(u, {1001});
         auto pdf = cop->pdf(u);
         u.col(0).swap(u.col(1));
         cop->flip();
