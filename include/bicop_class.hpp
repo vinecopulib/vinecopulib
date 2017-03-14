@@ -88,8 +88,5 @@ private:
 };
 
 typedef std::shared_ptr<Bicop> BicopPtr;
-double correlation(const MatXd& z);
 std::vector<double> get_c1c2(const MatXd& data, double tau);
 bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless);
-VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, const double lb = 1e-20, const double ub = 1-1e-20,
-               int n_iter = 35);

@@ -265,7 +265,10 @@ std::vector<double> get_c1c2(const MatXd& data, double tau)
         }
     }
 
-    std::vector<double> c = {correlation(z1.block(0,0,count1-1,2)),correlation(z2.block(0,0,count2-1,2))};
+    std::vector<double> c = {
+        pairwise_cor(z1.block(0,0,count1-1,2)),
+        pairwise_cor(z2.block(0,0,count2-1,2))
+    };
     return c;
 }
 
@@ -591,17 +594,6 @@ void Bicop::check_rotation(const int& rotation)
 }
 //! @}
 
-double correlation(const MatXd& z)
-{
-    double rho;
-    MatXd x = z.rowwise() - z.colwise().mean();
-    MatXd sigma = x.adjoint() * x;
-    rho = sigma(1,0) / sqrt(sigma(0,0) * sigma(1,1));
-
-    return rho;
-}
-
-
 bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless)
 {
     bool preselect = false;
@@ -675,32 +667,4 @@ bool preselect_family(double c1, double c2, double tau, int family, int rotation
         }
     }
     return preselect;
-}
-
-//! Numerical inversion of a function
-//!
-//! Computes the inverse \f$f^{-1}\f$ of a function \f$f\f$ by the bisection
-//! method.
-//!
-//! @param x evaluation points.
-//! @param f the function to invert.
-//! @param lb lower bound.
-//! @param ub upper bound.
-//! @param n_iter the number of iterations for the bisection (defaults to 35,
-//! guaranteeing an accuracy of 0.5^35 ~= 6e-11).
-//!
-//! @return f^{-1}(x).
-VecXd invert_f(const VecXd& x, std::function<VecXd(const VecXd&)> f, const double lb, const double ub, int n_iter)
-{
-    VecXd xl = VecXd::Constant(x.size(), lb);
-    VecXd xh = VecXd::Constant(x.size(), ub);
-    VecXd x_tmp = x;
-    for (int iter = 0; iter < n_iter; ++iter) {
-        x_tmp = (xh + xl) / 2.0;
-        VecXd fm = f(x_tmp) - x;
-        xl = (fm.array() < 0).select(x_tmp, xl);
-        xh = (fm.array() < 0).select(xh, x_tmp);
-    }
-
-    return x_tmp;
 }
