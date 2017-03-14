@@ -12,23 +12,23 @@
 
 #pragma once
 
-    // include all family headers not included yet (alphabetic order);
-    // this automatically includes the headers:
-    //   bicop_class
-    //   bicop_archimedean
-    //   bicop_elliptical
-    //   bicop_parametric
-    //   bicop_kernel
-    //   bicop_interpolation
-    #include "bicop_bb1.hpp"
-    #include "bicop_bb6.hpp"
-    #include "bicop_bb7.hpp"
-    #include "bicop_bb8.hpp"
-    #include "bicop_clayton.hpp"
-    #include "bicop_frank.hpp"
-    #include "bicop_gauss.hpp"
-    #include "bicop_gumbel.hpp"
-    #include "bicop_indep.hpp"
-    #include "bicop_joe.hpp"
-    #include "bicop_student.hpp"
-    #include "bicop_trafokernel.hpp"
+// include all family headers not included yet (alphabetic order);
+// this automatically includes the headers:
+//   bicop_class
+//   bicop_archimedean
+//   bicop_elliptical
+//   bicop_parametric
+//   bicop_kernel
+//   bicop_interpolation
+#include "bicop_bb1.hpp"
+#include "bicop_bb6.hpp"
+#include "bicop_bb7.hpp"
+#include "bicop_bb8.hpp"
+#include "bicop_clayton.hpp"
+#include "bicop_frank.hpp"
+#include "bicop_gauss.hpp"
+#include "bicop_gumbel.hpp"
+#include "bicop_indep.hpp"
+#include "bicop_joe.hpp"
+#include "bicop_student.hpp"
+#include "bicop_trafokernel.hpp"

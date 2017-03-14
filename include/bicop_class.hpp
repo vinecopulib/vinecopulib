@@ -19,8 +19,10 @@
 #include <memory>
 #include <vector>
 #include <exception>
-#include <cmath>
 #include <functional>
+
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
