@@ -13,3 +13,9 @@
 #pragma once
 
 #define RSCRIPT "@RSCRIPT_EXECUTABLE@ --vanilla "
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+    static const std::string rm="del ";
+#else
+    static const std::string rm="rm ";
+#endif

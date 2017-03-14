@@ -12,7 +12,6 @@
 
 #pragma once
 
-
 #include "bicop_archimedean.hpp"
 
 class JoeBicop : public ArchimedeanBicop {

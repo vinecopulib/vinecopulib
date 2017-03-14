@@ -30,5 +30,6 @@ VinecopTest::VinecopTest() {
     sim = temp.block(0,m+1,n,m);
 
     // remove temp files
-    system("rm temp temp2 temp3");
+    command = rm + "temp temp2 temp3";
+    system(command.c_str());
 }
