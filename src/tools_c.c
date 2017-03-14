@@ -5,6 +5,9 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "tools_c.h"
+#include <stdlib.h>
+#include <stdbool.h>
+#include <math.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Function that allocates space and creates a double matrix.

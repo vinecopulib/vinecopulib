@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "include/bicop.hpp"
+#include "include/tools_stl.hpp"
 
 // Fake test class allowing access to the R instance
 class FakeParBicopTest : public ::testing::Test {

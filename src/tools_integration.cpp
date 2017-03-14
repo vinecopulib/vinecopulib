@@ -5,6 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "tools_integration.hpp"
+#include <boost/numeric/odeint.hpp>
 
 namespace tools_integration {
 

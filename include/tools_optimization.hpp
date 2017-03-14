@@ -7,6 +7,7 @@
 #pragma once
 
 #include <nlopt.hpp>
+#include "tools_eigen.hpp"
 #include "bicop_parametric.hpp"
 
 namespace tools_optimization {

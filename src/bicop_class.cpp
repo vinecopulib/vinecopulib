@@ -4,7 +4,12 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
+#include "bicop_class.hpp"
 #include "bicop.hpp"
+#include <exception>
+#include <cmath>
+#include "tools_stl.hpp"
+#include "tools_stats.hpp"
 
 BicopPtr Bicop::create(const int& family, const int& rotation)
 {
@@ -100,11 +105,8 @@ BicopPtr Bicop::select(const MatXd& data,
 
     }
 
-    int n = data.rows();
-    int d = 2;
-    double tau = 0.0;
-    MatXd newdata = data;
-    ktau_matrix(newdata.data(), &d, &n, &tau);
+    auto temp_data = data;
+    auto tau = pairwise_ktau(temp_data);
 
     // When using rotations, add only the ones that yield the appropriate association direction.
     std::vector<int> which_rotations = {0};
@@ -121,7 +123,7 @@ BicopPtr Bicop::select(const MatXd& data,
     double c2 = 0;
     if (preselect_families)
     {
-        std::vector<double> c = get_c1c2(newdata, tau);
+        std::vector<double> c = get_c1c2(temp_data, tau);
         c1 = c[0];
         c2 = c[1];
     }
@@ -169,17 +171,17 @@ BicopPtr Bicop::select(const MatXd& data,
     {
         // Estimate the model
         BicopPtr new_bicop = create(families[j], rotations[j]);
-        new_bicop->fit(newdata, method);
+        new_bicop->fit(temp_data, method);
 
         // Compute the selection criterion
         double new_criterion;
         if (selection_criterion == "aic")
         {
-            new_criterion = new_bicop->aic(newdata);
+            new_criterion = new_bicop->aic(temp_data);
         }
         else if (selection_criterion == "bic")
         {
-            new_criterion = new_bicop->bic(newdata);
+            new_criterion = new_bicop->bic(temp_data);
         }
         else
         {

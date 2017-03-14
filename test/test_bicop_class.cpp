@@ -5,7 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "gtest/gtest.h"
-#include "include/bicop.hpp"
+#include "include/bicop_class.hpp"
 
 namespace {
     // Test if the C++ implementation of the par_to_tau and tau_to_par is correct

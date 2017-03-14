@@ -5,7 +5,8 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_elliptical.hpp"
-
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 VecXd EllipticalBicop::hfunc2_default(const MatXd& u)
 {

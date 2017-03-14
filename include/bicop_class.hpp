@@ -6,24 +6,10 @@
 
 #pragma once
 
-#include <Eigen/Dense>
-#include <random>
-#include <iostream>
 #include <memory>
 #include <vector>
-#include <exception>
-#include <functional>
-#define _USE_MATH_DEFINES
-#include <cmath>
+#include "tools_eigen.hpp"
 
-#include "tools_stl.hpp"
-#include "tools_stats.hpp"
-extern "C" {
-#include "tools_c.h"
-}
-
-typedef Eigen::VectorXd VecXd;
-typedef Eigen::MatrixXd MatXd;
 
 //! A class for bivariate copulas
 //!

@@ -6,7 +6,12 @@
 
 #include "vinecop_class.hpp"
 #include "tools_structselect.hpp"
+#include "bicop_indep.hpp"
+#include "tools_stl.hpp"
+#include "tools_stats.hpp"
+#include <vector>
 #include <exception>
+#include <iostream>
 
 //! Construct a vine copula object of dimension d
 //!
@@ -414,11 +419,10 @@ MatXd Vinecop::simulate(int n, const MatXd& U)
 // get indexes for reverting back to old order in simulation routine
 VecXi inverse_permutation(const VecXi& order) {
     // start with (0, 1, .., k)
-    std::vector<int> indexes(order.size());
-    iota(indexes.begin(), indexes.end(), 0);
+    auto indexes = tools_stl::seq_int(0, order.size());
 
     // get sort indexes by comparing values in order
-    sort(indexes.begin(), indexes.end(),
+    std::sort(indexes.begin(), indexes.end(),
         [&order](int i1, int i2) {return order(i1) < order(i2);});
 
     // convert to VecXi;

@@ -5,7 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "rvine_matrix.hpp"
-
+#include "tools_stl.hpp"
 
 RVineMatrix::RVineMatrix(const MatXi& matrix)
 {

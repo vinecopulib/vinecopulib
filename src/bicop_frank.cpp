@@ -5,7 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_frank.hpp"
-
+#include "tools_c.h"
 
 // constructor
 FrankBicop::FrankBicop()

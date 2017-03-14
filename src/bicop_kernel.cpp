@@ -5,6 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_kernel.hpp"
+#include "tools_stats.hpp"
 
 KernelBicop::KernelBicop()
 {

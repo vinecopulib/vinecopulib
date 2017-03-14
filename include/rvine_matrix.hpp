@@ -6,11 +6,7 @@
 
 #pragma once
 
-#include "bicop.hpp"
-
-typedef Eigen::MatrixXi MatXi;
-typedef Eigen::VectorXi VecXi;
-typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatXb;
+#include "tools_eigen.hpp"
 
 class RVineMatrix {
 public:

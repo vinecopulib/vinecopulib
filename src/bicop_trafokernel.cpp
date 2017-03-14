@@ -6,6 +6,7 @@
 
 #include "bicop_trafokernel.hpp"
 #include "bicop.hpp"
+#include "tools_stats.hpp"
 
 TrafokernelBicop::TrafokernelBicop()
 {

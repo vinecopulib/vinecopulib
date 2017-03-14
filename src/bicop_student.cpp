@@ -5,6 +5,9 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_student.hpp"
+#include "tools_stats.hpp"
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 // constructor
 StudentBicop::StudentBicop()

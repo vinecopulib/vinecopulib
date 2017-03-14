@@ -8,12 +8,10 @@
 
 // include all family headers not included yet (alphabetic order);
 // this automatically includes the headers:
-//   bicop_class
-//   bicop_archimedean
-//   bicop_elliptical
-//   bicop_parametric
-//   bicop_kernel
-//   bicop_interpolation
+#include "bicop_archimedean.hpp"
+#include "bicop_elliptical.hpp"
+#include "bicop_parametric.hpp"
+#include "bicop_kernel.hpp"
 #include "bicop_bb1.hpp"
 #include "bicop_bb6.hpp"
 #include "bicop_bb7.hpp"
