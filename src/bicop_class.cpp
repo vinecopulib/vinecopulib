@@ -64,11 +64,10 @@ BicopPtr Bicop::create(const int& family, const VecXd& parameters, const int& ro
 }
 
 BicopPtr Bicop::select(const MatXd& data,
-                     std::string selection_criterion,
-                     std::vector<int> family_set,
-                     bool use_rotations,
-                     bool preselect_families,
-                     std::string method)
+                       std::vector<int> family_set,
+                       std::string method,
+                       std::string selection_criterion,
+                       bool preselect_families)
 {
     std::vector<int> all_families = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1001};
     std::vector<int> itau_families = {0, 1, 2, 3, 4, 5, 6};
@@ -109,16 +108,13 @@ BicopPtr Bicop::select(const MatXd& data,
 
     // When using rotations, add only the ones that yield the appropriate association direction.
     std::vector<int> which_rotations = {0};
-    if (use_rotations)
+    if (tau < 0)
     {
-        if (tau < 0)
-        {
-            which_rotations.pop_back();
-            which_rotations.push_back(90);
-            which_rotations.push_back(270);
-        } else {
-            which_rotations.push_back(180);
-        }
+        which_rotations.pop_back();
+        which_rotations.push_back(90);
+        which_rotations.push_back(270);
+    } else {
+        which_rotations.push_back(180);
     }
 
     double c1 = 0;

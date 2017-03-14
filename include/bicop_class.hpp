@@ -54,21 +54,19 @@ public:
     //! Select a bivariate copula
     //!
     //! @param data the data to fit the bivariate copula.
-    //! @param selection_criterion the selection criterion ("aic" or "bic").
     //! @param family_set the set of copula families to consider (if empty, then all families are included).
-    //! @param use_rotations whether rotations in the familyset are included.
-    //! @param preselect_families whether to exclude families before fitting based on symmetry properties of the data.
+    //! @param selection_criterion the selection criterion ("aic" or "bic").
     //! @param method indicates the estimation method: either maximum likelihood estimation (method = "mle") or
     //! inversion of Kendall's tau (method = "itau"). When method = "itau" is used with families having more than
     //! one parameter, the main dependence parameter is found by inverting the Kendall's tau and the remainders by a
     //! profile likelihood optimization.
+    //! @param preselect_families whether to exclude families before fitting based on symmetry properties of the data.
     //! @return A pointer to an object that inherits from \c Bicop.
     static std::shared_ptr<Bicop> select(const MatXd& data,
-                                         std::string selection_criterion,
-                                         std::vector<int> family_set,
-                                         bool use_rotations,
-                                         bool preselect_families,
-                                         std::string method);
+                                         std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
+                                         std::string method = "mle",
+                                         std::string selection_criterion = "bic",
+                                         bool preselect_families = true);
 
     //! \defgroup df Copula density
     //!
