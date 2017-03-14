@@ -4,6 +4,8 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
+#include "tools_eigen.hpp"
+
 //! Numerical inversion of a function
 //!
 //! Computes the inverse \f$f^{-1}\f$ of a function \f$f\f$ by the bisection
