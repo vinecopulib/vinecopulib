@@ -6,12 +6,10 @@
 
 #pragma once
 
-#include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/distributions.hpp>
-#include <boost/function.hpp>
-#include <Eigen/Dense>
 #include <random>
+#include "tools_eigen.hpp"
+#include "tools_c.h"
 
 template<typename T> T dnorm(const T& x)
 {
@@ -90,13 +88,22 @@ template<typename T> T qt(const T& x, double nu)
 //! @param d dimension.
 //!
 //! @return A nxd matrix of independent U[0, 1] random variables.
-inline Eigen::MatrixXd simulate_uniform(int n, int d)
+inline MatXd simulate_uniform(int n, int d)
 {
     if ((n < 1) | (d < 1))
         throw std::runtime_error("both n and d must be at least 1.");
-    Eigen::MatrixXd U(n, d);
+    MatXd U(n, d);
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
     return U.unaryExpr([&](double) { return distribution(generator); });
+}
+
+inline double pairwise_ktau(MatXd& u)
+{
+    double tau;
+    int n = u.rows();
+    int two = 2;
+    ktau_matrix(u.data(), &two, &n, &tau);
+    return tau;
 }

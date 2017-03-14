@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <vector>
 #include <algorithm>
 #include <iterator>
 #include <numeric>
@@ -14,8 +15,10 @@ namespace tools_stl {
     
     using namespace std;
 
-    template<typename T> bool is_member(T element, vector<T> set) {
-        return find(set.begin(), set.end(), element) != set.end(); }
+    template<typename T> bool is_member(T element, vector<T> set) 
+    {
+        return find(set.begin(), set.end(), element) != set.end(); 
+    }
 
     template<class T>
     vector<T> intersect(vector<T> x, vector<T> y)

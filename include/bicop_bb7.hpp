@@ -7,7 +7,6 @@
 #pragma once
 
 #include "bicop_archimedean.hpp"
-#include "tools_integration.hpp"
 
 class Bb7Bicop : public ArchimedeanBicop {
 

@@ -5,7 +5,8 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "gtest/gtest.h"
-#include "include/bicop.hpp"
+#include "include/bicop_class.hpp"
+#include "include/tools_stats.hpp"
 #include <iostream>
 
 namespace {

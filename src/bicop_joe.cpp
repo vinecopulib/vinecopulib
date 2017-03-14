@@ -5,6 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_joe.hpp"
+#include <boost/math/special_functions/digamma.hpp>
 
 // constructor
 JoeBicop::JoeBicop()

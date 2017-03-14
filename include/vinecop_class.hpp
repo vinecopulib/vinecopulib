@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "bicop.hpp"
-#include "rvine_matrix.hpp"
 #include <limits>
+#include "bicop_class.hpp"
+#include "rvine_matrix.hpp"
 
 //! A class for vine copulas
 class Vinecop {

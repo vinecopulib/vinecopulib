@@ -7,8 +7,6 @@
 #pragma once
 
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/prim_minimum_spanning_tree.hpp>
-#include <boost/graph/graph_utility.hpp>
 #include "vinecop_class.hpp"
 
 // to allow for (auto e : boost::edges(g)) notation
@@ -81,15 +79,4 @@ namespace tools_structselect {
         VineTree& tree
     );
 
-
-    // inline utility functions ----------------
-
-    inline double pairwise_ktau(MatXd& u)
-    {
-        double tau;
-        int n = u.rows();
-        int two = 2;
-        ktau_matrix(u.data(), &two, &n, &tau);
-        return tau;
-    }
 }

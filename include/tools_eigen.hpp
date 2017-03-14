@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <functional>
+#include <Eigen/Dense>
 
-namespace tools_integration {
-
-    double integrate_zero_to_one(std::function<double(double)> f);
-
-}
+typedef Eigen::VectorXd VecXd;
+typedef Eigen::MatrixXd MatXd;
+typedef Eigen::MatrixXi MatXi;
+typedef Eigen::VectorXi VecXi;
+typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatXb;

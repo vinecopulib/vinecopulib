@@ -6,10 +6,7 @@
 
 #pragma once
 
-#include <Eigen/Dense>
-
-typedef Eigen::VectorXd VecXd;
-typedef Eigen::MatrixXd MatXd;
+#include "tools_eigen.hpp"
 
 //! A class for cubic spline interpolation of bivariate copulas
 //!

@@ -5,6 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_bb7.hpp"
+#include "tools_integration.hpp"
 
 // constructor
 Bb7Bicop::Bb7Bicop()

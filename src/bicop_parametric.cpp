@@ -6,6 +6,8 @@
 
 #include "bicop_parametric.hpp"
 #include "tools_optimization.hpp"
+#include "tools_stl.hpp"
+#include "tools_stats.hpp"
 
 // calculate number of parameters
 double ParBicop::calculate_npars()
@@ -51,11 +53,8 @@ void ParBicop::fit(const MatXd &data, std::string method)
             }
         }
 
-        int n = data.rows();
-        int d = 2;
-        double tau = 0.0;
-        MatXd newdata = data;
-        ktau_matrix(newdata.data(), &d, &n, &tau);
+        MatXd temp_data = data;
+        double tau = pairwise_ktau(temp_data);
         VecXd newpar = get_start_parameters(tau);
 
         std::string association_direction = get_association_direction();

@@ -6,6 +6,7 @@
 
 #include "include/vinecop_class.hpp"
 #include "include/tools_structselect.hpp"
+#include "include/tools_stl.hpp"
 #include "src_test/include/vinecop_test.hpp"
 
 namespace {

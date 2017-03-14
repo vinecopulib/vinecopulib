@@ -5,6 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_gauss.hpp"
+#include "tools_stats.hpp"
 
 // constructor
 GaussBicop::GaussBicop()
