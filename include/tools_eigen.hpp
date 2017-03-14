@@ -20,3 +20,6 @@ VecXd invert_f(
     const double ub = 1-1e-20,
     int n_iter = 35
 );
+
+MatXd read_matxd(const char *filename, int max_buffer_size = (int) 1e6);
+MatXi read_matxi(const char *filename, int max_buffer_size = (int) 1e6);
