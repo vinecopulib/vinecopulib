@@ -1,19 +1,13 @@
-/*
-* The MIT License (MIT)
-*
-* Copyright © 2017 Thibault Vatter and Thomas Nagler
-* 
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+// Copyright © 2017 Thomas Nagler and Thibault Vatter
+//
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
+// vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "structselect_tools.hpp"
 
 namespace structselect_tools {
-    
+
     //! Create base tree of the vine
     //!
     //!  The base tree is a star on d + 1 variables, where the conditioning
@@ -68,7 +62,7 @@ namespace structselect_tools {
     //!     optimization.
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
-    //! @param preselect_families  whether to exclude families before fitting based 
+    //! @param preselect_families  whether to exclude families before fitting based
     //!     on symmetry properties of the data.
     //! @return tree T_{k+1}.
     VineTree select_next_tree(
@@ -270,7 +264,7 @@ namespace structselect_tools {
     //!     optimization.
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
-    //! @param preselect_families  whether to exclude families before fitting based 
+    //! @param preselect_families  whether to exclude families before fitting based
     //!     on symmetry properties of the data.
     void select_pair_copulas(
         VineTree& tree,
@@ -304,10 +298,10 @@ namespace structselect_tools {
         int d = trees.size();
         MatXi mat = MatXi::Constant(d, d, 0);
         auto pcs = Vinecop::make_pair_copula_store(d);
-        
+
         for (int col = 0; col < d - 1; ++col) {
             int t = d - 1 - col;
-            // start with highest tree in this column and fill first two 
+            // start with highest tree in this column and fill first two
             // entries by conditioning set
             auto e0 = *boost::edges(trees[t]).first;
             mat(t, col) = trees[t][e0].conditioning[0];
@@ -339,7 +333,7 @@ namespace structselect_tools {
 
                         // start over with conditioning set of next edge
                         ned_set = e_new.conditioned;
-                        
+
                         // remove edge (must not be reused in another column!)
                         int v0 = boost::source(e, trees[t - k]);
                         int v1 = boost::target(e, trees[t - k]);
@@ -351,11 +345,11 @@ namespace structselect_tools {
         }
 
         // The last column contains a single element which must be different
-        // from all other diagonal elements. Based on the properties of an 
-        // R-vine matrix, this must be the element next to it. 
+        // from all other diagonal elements. Based on the properties of an
+        // R-vine matrix, this must be the element next to it.
         mat(0, d - 1) = mat(0, d - 2);
-        
-        // change to user-facing format 
+
+        // change to user-facing format
         // (variable index starting at 1 instead of 0)
         MatXi new_mat = mat;
         for (int i = 0; i < d; ++i)
