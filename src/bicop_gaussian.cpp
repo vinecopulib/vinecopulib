@@ -7,7 +7,7 @@
 #include "bicop_gauss.hpp"
 
 // constructor
-GaussBicop::GaussBicop()
+GaussBicop::GaussianBicop()
 {
     family_ = 1;
     family_name_ = "Gaussian";
@@ -18,15 +18,15 @@ GaussBicop::GaussBicop()
     parameters_bounds_(0, 0) = -1;
 }
 
-GaussBicop::GaussBicop(const VecXd& parameters)
+GaussBicop::GaussianBicop(const VecXd& parameters)
 {
-    GaussBicop();
+    GaussianBicop();
     set_parameters(parameters);
 }
 
-GaussBicop::GaussBicop(const VecXd& parameters, const int& rotation)
+GaussBicop::GaussianBicop(const VecXd& parameters, const int& rotation)
 {
-    GaussBicop();
+    GaussianBicop();
     set_parameters(parameters);
     set_rotation(rotation);
 }

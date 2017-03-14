@@ -8,13 +8,13 @@
 
 #include "bicop_elliptical.hpp"
 
-class GaussBicop : public EllipticalBicop {
+class GaussianBicop : public EllipticalBicop {
 
 public:
     // constructor
-    GaussBicop();
-    GaussBicop(const VecXd& parameters);
-    GaussBicop(const VecXd& parameters, const int& rotation);
+    GaussianBicop();
+    GaussianBicop(const VecXd& parameters);
+    GaussianBicop(const VecXd& parameters, const int& rotation);
 
     // PDF
     VecXd pdf_default(const MatXd& u);

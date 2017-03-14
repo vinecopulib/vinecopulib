@@ -14,7 +14,7 @@ BicopPtr Bicop::create(const int& family, const int& rotation)
             my_bicop = BicopPtr(new IndepBicop());
             break;
         case 1:
-            my_bicop = BicopPtr(new GaussBicop());
+            my_bicop = BicopPtr(new GaussianBicop());
             break;
         case 2:
             my_bicop = BicopPtr(new StudentBicop());

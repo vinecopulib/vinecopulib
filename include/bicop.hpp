@@ -20,7 +20,7 @@
 #include "bicop_bb8.hpp"
 #include "bicop_clayton.hpp"
 #include "bicop_frank.hpp"
-#include "bicop_gauss.hpp"
+#include "bicop_gaussian.hpp"
 #include "bicop_gumbel.hpp"
 #include "bicop_indep.hpp"
 #include "bicop_joe.hpp"
