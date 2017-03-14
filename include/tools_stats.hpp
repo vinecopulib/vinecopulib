@@ -107,3 +107,13 @@ inline double pairwise_ktau(MatXd& u)
     ktau_matrix(u.data(), &two, &n, &tau);
     return tau;
 }
+
+inline double pairwise_cor(const MatXd& z)
+{
+    double rho;
+    MatXd x = z.rowwise() - z.colwise().mean();
+    MatXd sigma = x.adjoint() * x;
+    rho = sigma(1,0) / sqrt(sigma(0,0) * sigma(1,1));
+
+    return rho;
+}

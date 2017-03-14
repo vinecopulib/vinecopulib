@@ -13,3 +13,13 @@ typedef Eigen::MatrixXd MatXd;
 typedef Eigen::MatrixXi MatXi;
 typedef Eigen::VectorXi VecXi;
 typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatXb;
+
+VecXd invert_f(
+    const VecXd &x, std::function<VecXd(const VecXd&)> f,
+    const double lb = 1e-20,
+    const double ub = 1-1e-20,
+    int n_iter = 35
+);
+
+MatXd read_matxd(const char *filename, int max_buffer_size = (int) 1e6);
+MatXi read_matxi(const char *filename, int max_buffer_size = (int) 1e6);

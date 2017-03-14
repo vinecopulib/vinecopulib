@@ -5,7 +5,6 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "src_test/include/parbicop_test.hpp"
-#include "src_test/include/test_tools.hpp"
 
 namespace {
     // Test if the C++ implementation of select method using the mle and bic is correct
