@@ -88,27 +88,7 @@ namespace structselect_tools {
     );
 
 
-    // inline/template utility functions ----------------
-    template<class T>
-    std::vector<T> intersect(std::vector<T> x, std::vector<T> y)
-    {
-        std::sort(x.begin(), x.end());
-        std::sort(y.begin(), y.end());
-        std::vector<T> common;
-        std::set_intersection(
-            x.begin(), x.end(),
-            y.begin(), y.end(),
-            std::back_inserter(common)
-        );
-
-        return common;
-    }
-
-    template<class T>
-    T find_position(T x, std::vector<T> vec)
-    {
-        return std::distance(vec.begin(), std::find(vec.begin(), vec.end(), x));
-    }
+    // inline utility functions ----------------
 
     inline double pairwise_ktau(MatXd& u)
     {
@@ -118,61 +98,4 @@ namespace structselect_tools {
         ktau_matrix(u.data(), &two, &n, &tau);
         return tau;
     }
-
-    template<class T>
-    std::vector<T> set_diff(std::vector<T> x, std::vector<T> y)
-    {
-        std::sort(x.begin(), x.end());
-        std::sort(y.begin(), y.end());
-        std::vector<T> different;
-        std::set_difference(
-            x.begin(), x.end(),
-            y.begin(), y.end(),
-            std::back_inserter(different)
-        );
-
-        return different;
-    }
-
-    template<class T>
-    std::vector<T> cat(std::vector<T> x, const std::vector<T>& y)
-    {
-        x.reserve(x.size() + y.size());
-        x.insert(x.end(), y.begin(), y.end());
-        return x;
-    }
-
-    template<class T>
-    std::vector<T> cat(T x, const std::vector<T>& y)
-    {
-        std::vector<T> out(1);
-        out[0] = x;
-        out.reserve(1 + y.size());
-        out.insert(out.end(), y.begin(), y.end());
-        return out;
-    }
-
-    template<class T>
-    void reverse(std::vector<T>& x)
-    {
-        std::reverse(x.begin(), x.end());
-    }
-
-    template<class T>
-    bool is_same_set(std::vector<T> x, std::vector<T> y)
-    {
-        auto z = intersect(x, y);
-        return ((z.size() == x.size()) & (z.size() == y.size()));
-    }
-    
-    //! Integer sequence starting at 1
-    inline std::vector<int> seq_int(int from, int length)
-    {
-        std::vector<int> seq(length);
-        std::iota(seq.begin(), seq.end(), from);
-        return seq;
-    }
-
 }
-
-

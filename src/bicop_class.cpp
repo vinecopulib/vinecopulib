@@ -86,7 +86,7 @@ BicopPtr Bicop::select(const MatXd& data,
     {
         if (method == "itau")
         {
-            family_set = intersect(all_families, itau_families);
+            family_set = stl_tools::intersect(all_families, itau_families);
         }
         else
         {
@@ -96,11 +96,11 @@ BicopPtr Bicop::select(const MatXd& data,
     {
         for (unsigned int j = 0; j < family_set.size(); j++)
         {
-            if (!is_member(family_set[j], all_families))
+            if (!stl_tools::is_member(family_set[j], all_families))
                 throw std::runtime_error(std::string("One of the families is not implemented"));
         }
         if (method == "itau") {
-            family_set = intersect(family_set, itau_families);
+            family_set = stl_tools::intersect(family_set, itau_families);
             if (family_set.empty())
                 throw std::runtime_error(std::string("None of the families has method itau available"));
         }
@@ -141,7 +141,7 @@ BicopPtr Bicop::select(const MatXd& data,
     std::vector<int> rotations;
     for (unsigned int j = 0; j < family_set.size(); j++)
     {
-        bool is_rotationless = is_member(family_set[j], rotationless_families);
+        bool is_rotationless = stl_tools::is_member(family_set[j], rotationless_families);
         bool preselect = true;
         if (is_rotationless)
         {
@@ -502,7 +502,7 @@ void Bicop::check_parameters(const VecXd& parameters)
 void Bicop::check_rotation(const int& rotation)
 {
     std::vector<int> allowed_rotations = {0, 90, 180, 270};
-    if (!is_member(rotation, allowed_rotations)) {
+    if (!stl_tools::is_member(rotation, allowed_rotations)) {
         std::string message = "rotation must be one of {0, 90, 180, 270}";
         throw std::runtime_error(message);
     }

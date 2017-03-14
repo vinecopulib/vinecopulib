@@ -15,7 +15,7 @@
 void FakeParBicopTest::set_family(int family, int rotation)
 {
     std::vector<int> rotation_less_fams = {0, 1, 2, 5};
-    if (is_member(family, rotation_less_fams) || rotation == 0)
+    if (stl_tools::is_member(family, rotation_less_fams) || rotation == 0)
     {
         family_ = family;
     }

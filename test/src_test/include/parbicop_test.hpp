@@ -84,7 +84,7 @@ public:
         // whether checks need to be done and deal with the rotation for VineCopula
         needs_check_ = true;
         std::vector<int> rotation_less_fams = {0, 1, 2, 5};
-        if (is_member(this->par_bicop_.get_family(), rotation_less_fams))
+        if (stl_tools::is_member(this->par_bicop_.get_family(), rotation_less_fams))
         {
             needs_check_ = (rotation == 0);
         }

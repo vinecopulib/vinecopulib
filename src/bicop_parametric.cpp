@@ -42,7 +42,7 @@ void ParBicop::fit(const MatXd &data, std::string method)
         using namespace optimization_tools;
 
         std::vector<std::string> methods = {"itau", "mle"};
-        if (!is_member(method, methods))
+        if (!stl_tools::is_member(method, methods))
         {
             throw std::runtime_error("Method not implemented.");
         }

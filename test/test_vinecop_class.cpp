@@ -64,9 +64,6 @@ namespace {
         Vinecop fit = Vinecop::select(u, {0});
         auto vcl_matrix = fit.get_matrix();
 
-        std::cout << vc_matrix << std::endl << std::endl;
-        std::cout << vcl_matrix << std::endl << std::endl;
-
         // check if the same conditioned sets appear for each tree
         using namespace structselect_tools;
         std::vector<std::vector<std::vector<int>>> vc_sets(6), vcl_sets(6);
@@ -85,7 +82,7 @@ namespace {
             for (auto s1 : vc_sets[tree]) {
                 bool is_in_both = false;
                 for (auto s2 : vcl_sets[tree]) {
-                    if (is_same_set(s1, s2))
+                    if (stl_tools::is_same_set(s1, s2))
                         is_in_both = true;
                 }
                 if (!is_in_both)

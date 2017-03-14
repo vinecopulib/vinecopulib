@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include "distribution_tools.hpp"
 #include <Eigen/Dense>
 #include <random>
 #include <iostream>
@@ -20,16 +19,17 @@
 #include <vector>
 #include <exception>
 #include <functional>
-
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-typedef Eigen::VectorXd VecXd;
-typedef Eigen::MatrixXd MatXd;
-
+#include "stl_tools.hpp"
+#include "distribution_tools.hpp"
 extern "C" {
 #include "c_tools.h"
 }
+
+typedef Eigen::VectorXd VecXd;
+typedef Eigen::MatrixXd MatXd;
 
 //! A class for bivariate copulas
 //!
@@ -188,19 +188,3 @@ std::vector<double> get_c1c2(const MatXd& data, double tau);
 bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless);
 VecXd invert_f(const VecXd &x, std::function<VecXd(const VecXd&)> f, const double lb = 1e-20, const double ub = 1-1e-20,
                int n_iter = 35);
-
-template<typename T> bool is_member(T element, std::vector<T> set) {
-    return std::find(set.begin(), set.end(), element) != set.end(); }
-
-
-template<typename T> std::vector<T> intersect(std::vector<T> x, std::vector<T> y) {
-    std::sort(x.begin(), x.end());
-    std::sort(y.begin(), y.end());
-    std::vector<T> common;
-    std::set_intersection(
-            x.begin(), x.end(),
-            y.begin(), y.end(),
-            std::back_inserter(common)
-    );
-    return common;
-}
