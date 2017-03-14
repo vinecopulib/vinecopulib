@@ -40,7 +40,7 @@ void ktau(double *X, double *Y, int *N, double *tau, double *S, double *D, int *
 	double *Y2 = calloc(*N, sizeof(double));
 	double *X2 = calloc(*N, sizeof(double));
 	double *xptr,*yptr; // HJ addition for swapping
-	boolean Iflag, Jflag, Xflag;
+	bool Iflag, Jflag, Xflag;
 	*S = 0.; *D = 0.; *T = 0; *U = 0; *V = 0;
 
 	/* 1.1 Sort X and Y in X order */
