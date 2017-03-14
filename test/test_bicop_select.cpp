@@ -33,15 +33,15 @@ namespace {
                 int selected_family = bicop->get_family();
                 EXPECT_EQ(selected_family, true_family) << bicop->bic(data) << " " << this->par_bicop_.bic(data);
 
-                if (stl_tools::is_member(true_family,bb_families))
+                if (tools_stl::is_member(true_family,bb_families))
                 {
-                    if (stl_tools::is_member(rotations[j],positive_rotations))
+                    if (tools_stl::is_member(rotations[j],positive_rotations))
                     {
-                        EXPECT_TRUE(stl_tools::is_member(bicop->get_rotation(),positive_rotations));
+                        EXPECT_TRUE(tools_stl::is_member(bicop->get_rotation(),positive_rotations));
                     }
                     else
                     {
-                        EXPECT_FALSE(stl_tools::is_member(bicop->get_rotation(),positive_rotations));
+                        EXPECT_FALSE(tools_stl::is_member(bicop->get_rotation(),positive_rotations));
                     }
                 }
                 else
@@ -63,7 +63,7 @@ namespace {
         for (unsigned int j = 0; j < rotations.size(); ++j) {
             this->setup_parameters(rotations[j]);
 
-            if (this->needs_check_ && stl_tools::is_member(this->par_bicop_.get_family(), no_itau_families) == false) {
+            if (this->needs_check_ && tools_stl::is_member(this->par_bicop_.get_family(), no_itau_families) == false) {
                 MatXd data = this->par_bicop_.simulate(this->get_n());
                 BicopPtr bicop = Bicop::select(data,
                                                selection_criterion,

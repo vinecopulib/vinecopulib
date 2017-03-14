@@ -81,7 +81,7 @@ double Bb8Bicop::parameters_to_tau(const VecXd& parameters)
         double tmp = std::pow(1-t*delta,theta);
         return std::log((tmp-1)/(std::pow(1-delta,theta)-1))*(1-t*delta-std::pow(1-t*delta,1-theta));
     };
-    double tau = 1-4/(delta*theta)*integration_tools::integrate_zero_to_one(f);
+    double tau = 1-4/(delta*theta)*tools_integration::integrate_zero_to_one(f);
     if ((rotation_ == 90) | (rotation_ == 270))
         tau *= -1;
     return tau;

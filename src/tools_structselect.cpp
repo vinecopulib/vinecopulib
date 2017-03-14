@@ -4,9 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "structselect_tools.hpp"
+#include "tools_structselect.hpp"
 
-namespace structselect_tools {
+namespace tools_structselect {
 
     //! Create base tree of the vine
     //!
@@ -156,7 +156,7 @@ namespace structselect_tools {
     {
         auto ei0 = tree[v0].prev_edge_indices;
         auto ei1 = tree[v1].prev_edge_indices;
-        auto ei_common = stl_tools::intersect(ei0, ei1);
+        auto ei_common = tools_stl::intersect(ei0, ei1);
 
         if (ei_common.size() == 0)
             return -1;
@@ -174,12 +174,12 @@ namespace structselect_tools {
     {
         MatXd pc_data(tree[v0].hfunc1.size(), 2);
         int ei_common = find_common_neighbor(v0, v1, tree);
-        if (stl_tools::find_position(ei_common, tree[v0].prev_edge_indices) == 0) {
+        if (tools_stl::find_position(ei_common, tree[v0].prev_edge_indices) == 0) {
             pc_data.col(0) = tree[v0].hfunc1;
         } else {
             pc_data.col(0) = tree[v0].hfunc2;
         }
-        if (stl_tools::find_position(ei_common, tree[v1].prev_edge_indices) == 0) {
+        if (tools_stl::find_position(ei_common, tree[v1].prev_edge_indices) == 0) {
             pc_data.col(1) = tree[v1].hfunc1;
         } else {
             pc_data.col(1) = tree[v1].hfunc2;
@@ -218,16 +218,16 @@ namespace structselect_tools {
             auto v1 = boost::target(e, tree);
             tree[e].pc_data = get_pc_data(v0, v1, tree);
 
-            auto v0_indices = stl_tools::cat(tree[v0].conditioning, tree[v0].conditioned);
-            auto v1_indices = stl_tools::cat(tree[v1].conditioning, tree[v1].conditioned);
+            auto v0_indices = tools_stl::cat(tree[v0].conditioning, tree[v0].conditioned);
+            auto v1_indices = tools_stl::cat(tree[v1].conditioning, tree[v1].conditioned);
 
-            auto test = stl_tools::intersect(v0_indices, v1_indices);
-            auto d01 = stl_tools::set_diff(v0_indices, v1_indices);
-            auto d10 = stl_tools::set_diff(v1_indices, v0_indices);
+            auto test = tools_stl::intersect(v0_indices, v1_indices);
+            auto d01 = tools_stl::set_diff(v0_indices, v1_indices);
+            auto d10 = tools_stl::set_diff(v1_indices, v0_indices);
 
-            tree[e].conditioning = stl_tools::cat(d01, d10);
-            tree[e].conditioned = stl_tools::intersect(v0_indices, v1_indices);
-            tree[e].all_indices = stl_tools::cat(tree[e].conditioning, tree[e].conditioned);
+            tree[e].conditioning = tools_stl::cat(d01, d10);
+            tree[e].conditioned = tools_stl::intersect(v0_indices, v1_indices);
+            tree[e].all_indices = tools_stl::cat(tree[e].conditioning, tree[e].conditioned);
         }
     }
 
@@ -317,13 +317,13 @@ namespace structselect_tools {
             // iteratively search for an edge in lower tree that shares all indices
             // in the conditioning set + diagonal entry
             for (int k = 1; k < t; ++k) {
-                auto reduced_set = stl_tools::cat(mat(t, col), ned_set);
+                auto reduced_set = tools_stl::cat(mat(t, col), ned_set);
                 for (auto e : boost::edges(trees[t - k])) {
-                    if (stl_tools::is_same_set(trees[t - k][e].all_indices, reduced_set)) {
+                    if (tools_stl::is_same_set(trees[t - k][e].all_indices, reduced_set)) {
                         // next matrix entry is conditioning variable of new edge
                         // that's not equal to the diagonal entry of this column
                         auto e_new = trees[t - k][e];
-                        auto pos = stl_tools::find_position(mat(t, col), e_new.conditioning);
+                        auto pos = tools_stl::find_position(mat(t, col), e_new.conditioning);
                         mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
                         if (pos == 1)
                             e_new.pair_copula->flip();

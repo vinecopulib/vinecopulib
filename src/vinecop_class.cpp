@@ -5,7 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "vinecop_class.hpp"
-#include "structselect_tools.hpp"
+#include "tools_structselect.hpp"
 #include <exception>
 
 //! Construct a vine copula object of dimension d
@@ -119,7 +119,7 @@ Vinecop Vinecop::select(
     bool show_trace
 )
 {
-    using namespace structselect_tools;
+    using namespace tools_structselect;
     int d = data.cols();
     if (matrix.size() > 0)
         throw std::runtime_error("fixed matrix selection not implemented yet.");

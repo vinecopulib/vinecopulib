@@ -16,10 +16,10 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#include "stl_tools.hpp"
-#include "distribution_tools.hpp"
+#include "tools_stl.hpp"
+#include "tools_stats.hpp"
 extern "C" {
-#include "c_tools.h"
+#include "tools_c.h"
 }
 
 typedef Eigen::VectorXd VecXd;

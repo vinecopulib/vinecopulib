@@ -5,7 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "include/vinecop_class.hpp"
-#include "include/structselect_tools.hpp"
+#include "include/tools_structselect.hpp"
 #include "src_test/include/vinecop_test.hpp"
 
 namespace {
@@ -59,7 +59,7 @@ namespace {
         auto vcl_matrix = fit.get_matrix();
 
         // check if the same conditioned sets appear for each tree
-        using namespace structselect_tools;
+        using namespace tools_structselect;
         std::vector<std::vector<std::vector<int>>> vc_sets(6), vcl_sets(6);
         int pairs_unequal = 0;
         for (int tree = 0; tree < 6; ++tree) {
@@ -76,7 +76,7 @@ namespace {
             for (auto s1 : vc_sets[tree]) {
                 bool is_in_both = false;
                 for (auto s2 : vcl_sets[tree]) {
-                    if (stl_tools::is_same_set(s1, s2))
+                    if (tools_stl::is_same_set(s1, s2))
                         is_in_both = true;
                 }
                 if (!is_in_both)

@@ -4,9 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "optimization_tools.hpp"
+#include "tools_optimization.hpp"
 
-namespace optimization_tools {
+namespace tools_optimization {
 
     Optimizer::Optimizer(unsigned int n_parameters)
     {

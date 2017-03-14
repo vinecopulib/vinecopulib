@@ -62,8 +62,8 @@ MatXi RVineMatrix::construct_d_vine_matrix(const VecXi& order)
 MatXi RVineMatrix::in_natural_order()
 {
     // create vector of new variable labels: d, ..., 1
-    std::vector<int> ivec = stl_tools::seq_int(1, d_);
-    stl_tools::reverse(ivec);
+    std::vector<int> ivec = tools_stl::seq_int(1, d_);
+    tools_stl::reverse(ivec);
     Eigen::Map<VecXi> new_labels(&ivec[0], d_);     // convert to VecXi
 
     return relabel_elements(matrix_, new_labels);

@@ -5,7 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "interpolation_grid.hpp"
-#include "distribution_tools.hpp"
+#include "tools_stats.hpp"
 #include <exception>
 
 // ---------------- Public methods ----------------

@@ -9,7 +9,7 @@
 #include <nlopt.hpp>
 #include "bicop_parametric.hpp"
 
-namespace optimization_tools {
+namespace tools_optimization {
 
     //! A helper struct for nlopt (profile) maximum likelihood estimation
     //!

@@ -16,7 +16,7 @@ set(unit_tests
         test_bicop_class
         test_bicop_select
         test_bicop_trafokernel
-        test_distribution_tools
+        test_tools_stats
         test_rvine_matrix
         test_vinecop_class)
 

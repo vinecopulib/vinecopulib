@@ -5,7 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_parametric.hpp"
-#include "optimization_tools.hpp"
+#include "tools_optimization.hpp"
 
 // calculate number of parameters
 double ParBicop::calculate_npars()
@@ -33,10 +33,10 @@ void ParBicop::fit(const MatXd &data, std::string method)
 {
     if (family_ != 0)
     {
-        using namespace optimization_tools;
+        using namespace tools_optimization;
 
         std::vector<std::string> methods = {"itau", "mle"};
-        if (!stl_tools::is_member(method, methods))
+        if (!tools_stl::is_member(method, methods))
         {
             throw std::runtime_error("Method not implemented.");
         }

@@ -4,9 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "integration_tools.hpp"
+#include "tools_integration.hpp"
 
-namespace integration_tools {
+namespace tools_integration {
 
     double integrate_zero_to_one(std::function<double(double)> f)
     {

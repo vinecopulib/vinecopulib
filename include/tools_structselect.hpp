@@ -21,7 +21,7 @@ namespace std
     T end(const std::pair<T,T>& eItPair) { return eItPair.second; }
 }
 
-namespace structselect_tools {
+namespace tools_structselect {
     // boost::graph represenation of a vine tree ----------------
     struct VertexProperties {
         std::vector<int> conditioning;

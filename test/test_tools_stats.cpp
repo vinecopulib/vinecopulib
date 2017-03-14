@@ -4,7 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "include/distribution_tools.hpp"
+#include "include/tools_stats.hpp"
 #include <Eigen/Dense>
 #include <chrono>
 #include <iostream>

@@ -6,7 +6,7 @@
 
 #pragma once
 
-namespace stl_tools {
+namespace tools_stl {
 
     template<typename T> bool is_member(T element, std::vector<T> set) {
         return std::find(set.begin(), set.end(), element) != set.end(); }

@@ -8,7 +8,7 @@
 
 #include <boost/numeric/odeint.hpp>
 
-namespace integration_tools {
+namespace tools_integration {
 
     double integrate_zero_to_one(std::function<double(double)> f);
 

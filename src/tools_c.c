@@ -4,7 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "c_tools.h"
+#include "tools_c.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Function that allocates space and creates a double matrix.
