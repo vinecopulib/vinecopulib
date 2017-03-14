@@ -1,14 +1,8 @@
-/*
-* The MIT License (MIT)
-*
-* Copyright © 2017 Thibault Vatter and Thomas Nagler
-* 
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+// Copyright © 2017 Thomas Nagler and Thibault Vatter
+//
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
+// vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop.hpp"
 
@@ -52,11 +46,11 @@ BicopPtr Bicop::create(const int& family, const int& rotation)
         case 1001:
             my_bicop =  BicopPtr(new TrafokernelBicop());
             break;
-        
+
         default:
             throw std::runtime_error(std::string("Family not implemented"));
     }
-    
+
     my_bicop->set_rotation(rotation);
     return my_bicop;
 }
@@ -180,7 +174,7 @@ BicopPtr Bicop::select(const MatXd& data,
         // Estimate the model
         BicopPtr new_bicop = create(families[j], rotations[j]);
         new_bicop->fit(newdata, method);
-    
+
         // Compute the selection criterion
         double new_criterion;
         if (selection_criterion == "aic")
@@ -195,7 +189,7 @@ BicopPtr Bicop::select(const MatXd& data,
         {
             throw std::runtime_error(std::string("Selection criterion not implemented"));
         }
-            
+
         // If the new model is better than the current one, then replace the current model by the new one
         if (new_criterion < fitted_criterion)
         {
@@ -384,7 +378,7 @@ VecXd Bicop::tau_to_parameters(const double& tau)
 MatXd Bicop::cut_and_rotate(const MatXd& u)
 {
     MatXd u_new(u.rows(), 2);
-    
+
     // counter-clockwise rotations
     switch (rotation_) {
         case 0:
@@ -406,7 +400,7 @@ MatXd Bicop::cut_and_rotate(const MatXd& u)
             u_new.col(1) = u.col(0);
             break;
     }
-    
+
     // truncate to interval [eps, 1 - eps]
     MatXd eps = MatXd::Constant(u.rows(), 2, 1-10);
     u_new = u_new.array().min(1.0 - eps.array());
@@ -427,7 +421,7 @@ VecXd Bicop::hinv1_num(const MatXd &u)
 {
     MatXd u_new = u;
     auto h1 = [&](const VecXd &v) {
-        u_new.col(1) = v; 
+        u_new.col(1) = v;
         return hfunc1_default(u_new);
     };
     return invert_f(u.col(1), h1);
@@ -437,15 +431,15 @@ VecXd Bicop::hinv2_num(const MatXd &u)
 {
     MatXd u_new = u;
     auto h1 = [&](const VecXd &x) {
-        u_new.col(0) = x; 
+        u_new.col(0) = x;
         return hfunc2_default(u_new);
     };
-    
+
     return invert_f(u.col(0), h1);
 }
 
 void Bicop::set_rotation(const int& rotation) {
-    check_rotation(rotation);    
+    check_rotation(rotation);
     rotation_ = rotation;
     if (this->association_direction_ == "positive" || this->association_direction_ == "negative")
     {
@@ -472,7 +466,7 @@ void Bicop::check_parameters(const VecXd& parameters)
 
     if (parameters.size() != num_pars) {
         std::stringstream message;
-        message << 
+        message <<
             "Wrong size of parameters for " << family_name_ << " copula; " <<
             "expected: " << num_pars << ", " <<
             "actual: " << parameters.size() << std::endl;
@@ -482,14 +476,14 @@ void Bicop::check_parameters(const VecXd& parameters)
         std::stringstream message;
         for (int i = 0; i < num_pars; ++i) {
             if (parameters(i) < parameters_bounds_(i, 0)) {
-                message << 
+                message <<
                     "parameters[" << i << "]" <<
                     " must be larger than " << parameters_bounds_(i, 0) <<
                     " for the " << family_name_ << " copula" << std::endl;
                 throw std::runtime_error(message.str().c_str());
             }
             if (parameters(i) > parameters_bounds_(i, 1)) {
-                message << 
+                message <<
                 "parameters[" << i << "]" <<
                     " must be smaller than " << parameters_bounds_(i, 1) <<
                     " for the " << family_name_ << " copula";
@@ -506,7 +500,7 @@ void Bicop::check_rotation(const int& rotation)
         std::string message = "rotation must be one of {0, 90, 180, 270}";
         throw std::runtime_error(message);
     }
-        
+
 }
 
 double correlation(const MatXd& z)
@@ -596,17 +590,17 @@ bool preselect_family(double c1, double c2, double tau, int family, int rotation
 }
 
 //! Numerical inversion of a function
-//! 
-//! Computes the inverse \f$f^{-1}\f$ of a function \f$f\f$ by the bisection 
+//!
+//! Computes the inverse \f$f^{-1}\f$ of a function \f$f\f$ by the bisection
 //! method.
-//! 
+//!
 //! @param x evaluation points.
 //! @param f the function to invert.
 //! @param lb lower bound.
 //! @param ub upper bound.
 //! @param n_iter the number of iterations for the bisection (defaults to 35,
-//! guaranteeing an accuracy of 0.5^35 ~= 6e-11). 
-//! 
+//! guaranteeing an accuracy of 0.5^35 ~= 6e-11).
+//!
 //! @return f^{-1}(x).
 VecXd invert_f(const VecXd& x, std::function<VecXd(const VecXd&)> f, const double lb, const double ub, int n_iter)
 {

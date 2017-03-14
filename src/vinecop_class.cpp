@@ -1,14 +1,8 @@
-/*
-* The MIT License (MIT)
-*
-* Copyright © 2017 Thibault Vatter and Thomas Nagler
-* 
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+// Copyright © 2017 Thomas Nagler and Thibault Vatter
+//
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
+// vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "vinecop_class.hpp"
 #include "structselect_tools.hpp"
@@ -109,9 +103,9 @@ std::vector<std::vector<BicopPtr>> Vinecop::make_pair_copula_store(int d)
 //!     optimization.
 //! @param selection_criterion the selection criterion; either "aic" or "bic"
 //!     (default).
-//! @param preselect_families  whether to exclude families before fitting based 
+//! @param preselect_families  whether to exclude families before fitting based
 //!     on symmetry properties of the data.
-//! @param show_trace whether to show a trace of the building progress (default 
+//! @param show_trace whether to show a trace of the building progress (default
 //!     is false).
 //! @return The fitted vine copula model.
 Vinecop Vinecop::select(
@@ -133,7 +127,7 @@ Vinecop Vinecop::select(
 
     trees[0] = make_base_tree(data);
     for (int t = 1; t < d; ++t) {
-        // select tree structure and pair copulas     
+        // select tree structure and pair copulas
         trees[t] = select_next_tree(
             trees[t - 1],
             family_set,
@@ -141,13 +135,13 @@ Vinecop Vinecop::select(
             selection_criterion,
             preselect_families
         );
-        
+
         // print out fitted pair-copulas for this tree
         if (show_trace) {
             std::cout << "Tree " << t - 1 << ":" << std::endl;
             print_pair_copulas(trees[t]);
         }
-        
+
         // truncate (only allow for Independence copula from here on)
         if (truncation_level == t)
             family_set = {0};
@@ -207,7 +201,7 @@ MatXi Vinecop::get_families()
             families(tree, edge) = get_family(tree, edge);
         }
     }
-    
+
     return families;
 }
 
@@ -233,7 +227,7 @@ MatXi Vinecop::get_rotations()
             rotations(tree, edge) = get_rotation(tree, edge);
         }
     }
-    
+
     return rotations;
 }
 
@@ -272,12 +266,12 @@ VecXd Vinecop::pdf(const MatXd& u)
 
     // initial value must be 1.0 for multiplication
     VecXd vine_density = VecXd::Constant(u.rows(), 1.0);
-    
+
     // temporary storage objects for h-functions
     MatXd hfunc1(n, d);
     MatXd hfunc2(n, d);
     MatXd u_e(n, 2);
-    
+
     // fill first row of hfunc2 matrix with evaluation points;
     // points have to be reordered to correspond to natural order
     for (int j = 0; j < d; ++j)
@@ -287,7 +281,7 @@ VecXd Vinecop::pdf(const MatXd& u)
         for (int edge = 0; edge < d - tree - 1; ++edge) {
             // get pair copula for this edge
             BicopPtr edge_copula = get_pair_copula(tree, edge);
-    
+
             // extract evaluation point from hfunction matrices (have been
             // computed in previous tree level)
             int m = max_matrix(tree, edge);
@@ -297,7 +291,7 @@ VecXd Vinecop::pdf(const MatXd& u)
             } else {
                 u_e.col(1) = hfunc1.col(d - m);
             }
-            
+
             vine_density = vine_density.cwiseProduct(edge_copula->pdf(u_e));
             // h-functions are only evaluated if needed in next step
             if (needed_hfunc1(tree + 1, edge))
@@ -369,7 +363,7 @@ MatXd Vinecop::simulate(int n, const MatXd& U)
     MatXi max_matrix    = vine_matrix_.get_max_matrix();
     MatXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
     MatXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
-        
+
     // temporary storage objects for (inverse) h-functions
     typedef Eigen::Matrix<VecXd, Eigen::Dynamic, Eigen::Dynamic> Array3d;
     Array3d hinv2(d, d);
