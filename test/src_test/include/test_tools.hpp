@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 
+typedef Eigen::VectorXd VecXd;
 typedef Eigen::MatrixXd MatXd;
 typedef Eigen::MatrixXi MatXi;
 

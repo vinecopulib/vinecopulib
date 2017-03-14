@@ -10,20 +10,25 @@
 * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
+#include "include/vinecop_test.hpp"
 
-#include "test_tools.hpp"
-#include "gtest/gtest.h"
-#include "rscript.hpp"
+VinecopTest::VinecopTest() {
+    // write temp files for the test using VineCopula
+    std::string command = std::string(RSCRIPT) + "../test/test_vinecop_parametric.R";
+    system(command.c_str());
 
-class VinecopTest : public ::testing::Test {
-public:
-    VinecopTest();
-    MatXd u;
-    VecXd f;
-    MatXd sim;
-    MatXi model_matrix;
-    MatXi vc_matrix;
-};
+    // vine structures (C++ representation reverses rows)
+    model_matrix = read_matxi("temp2").colwise().reverse();
+    vc_matrix = read_matxi("temp3").colwise().reverse();
 
+    // u, pdf, sim
+    MatXd temp = read_matxd("temp");
+    int n = temp.rows();
+    int m = model_matrix.rows();
+    u = temp.block(0,0,n,m);
+    f = temp.block(0,m,n,1);
+    sim = temp.block(0,m+1,n,m);
 
+    // remove temp files
+    system("rm temp temp2 temp3");
+}
