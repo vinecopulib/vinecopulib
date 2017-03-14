@@ -6,6 +6,10 @@ family <- as.numeric(args[2])
 par <- as.numeric(args[3])
 par2 <- as.numeric(args[4])
 
+if (!("VineCopula" %in% rownames(installed.packages()))) {
+     install.packages("VineCopula", repos="http://cran.rstudio.com/")
+}
+
 u1 <- runif(n)
 u2 <- runif(n)
 results <- cbind(VineCopula::BiCopPar2Tau(family, par, par2), u1, u2,
