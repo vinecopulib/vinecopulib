@@ -11,6 +11,12 @@
 #include "tools_stl.hpp"
 #include "tools_stats.hpp"
 
+
+//! Create a bivariate copula using the default contructor
+//!
+//! @param family the copula family.
+//! @param rotation the rotation type.
+//! @return A pointer to an object that inherits from \c Bicop.
 BicopPtr Bicop::create(const int& family, const int& rotation)
 {
     BicopPtr my_bicop;
@@ -60,7 +66,12 @@ BicopPtr Bicop::create(const int& family, const int& rotation)
     return my_bicop;
 }
 
-
+//! Create a bivariate copula with a specified parameters vector
+//!
+//! @param family the copula family.
+//! @param par the copula parameters (must be compatible with family).
+//! @param rotation the rotation type.
+//! @return A pointer to an object that inherits from \c Bicop.
 BicopPtr Bicop::create(const int& family, const VecXd& parameters, const int& rotation)
 {
     BicopPtr my_bicop = create(family, rotation);
@@ -68,6 +79,21 @@ BicopPtr Bicop::create(const int& family, const VecXd& parameters, const int& ro
     return my_bicop;
 }
 
+//! Select a bivariate copula
+//!
+//! @param data the data to fit the bivariate copula.
+//! @param selection_criterion the selection criterion ("aic" or "bic").
+//! @param family_set the set of copula families to consider (if empty, then 
+//!     all families are included).
+//! @param use_rotations whether rotations in the familyset are included.
+//! @param preselect_families whether to exclude families before fitting based 
+//!     on symmetry properties of the data.
+//! @param method indicates the estimation method: either maximum likelihood 
+//!     estimation (method = "mle") or inversion of Kendall's tau (method = 
+//!     "itau"). When method = "itau" is used with families having more than one
+//!      parameter, the main dependence parameter is found by inverting the 
+//!      Kendall's tau and the remainders by a profile likelihood optimization.
+//! @return A pointer to an object that inherits from \c Bicop.
 BicopPtr Bicop::select(const MatXd& data,
                      std::string selection_criterion,
                      std::vector<int> family_set,
@@ -109,7 +135,8 @@ BicopPtr Bicop::select(const MatXd& data,
     auto temp_data = data;
     auto tau = pairwise_ktau(temp_data);
 
-    // When using rotations, add only the ones that yield the appropriate association direction.
+    // When using rotations, add only the ones that yield the appropriate 
+    // association direction.
     std::vector<int> which_rotations = {0};
     if (use_rotations)
     {
@@ -242,6 +269,10 @@ std::vector<double> get_c1c2(const MatXd& data, double tau)
     return c;
 }
 
+//! Copula density
+//!
+//! @param u \f$m \times 2\f$ matrix of evaluation points.
+//! @return The copula density evaluated at \c u.
 VecXd Bicop::pdf(const MatXd& u)
 {
     VecXd f = pdf_default(cut_and_rotate(u));
@@ -249,7 +280,23 @@ VecXd Bicop::pdf(const MatXd& u)
     return f;
 }
 
-
+//! \defgroup hfunctions h-functions
+//!
+//! h-functions are defined as one-dimensional integrals over a bivariate
+//! copula density \f$ c \f$,
+//! \f[ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) ds, \f]
+//! \f[ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds. \f]
+//! \c hinv1 is the inverse w.r.t. second argument (conditioned on first),
+//! \c hinv2 is the inverse w.r.t. first argument (conditioned on second),
+//!
+//! \c hfunc1, \c hfunc2, \c hinv1, and \c hinv2 mainly take care that
+//! rotations are properly handled.  They call \c hfunc1_default,
+//! \c hfunc2_default, \c hinv1_default, and hinv2_default which are
+//! family-specific implementations for `rotation = 0`.
+//!
+//! @param u \f$m \times 2\f$ matrix of evaluation points.
+//! @return The (inverse) h-function evaluated at \c u.
+//! @{
 VecXd Bicop::hfunc1(const MatXd& u)
 {
     switch (rotation_) {
@@ -337,7 +384,13 @@ VecXd Bicop::hinv2(const MatXd& u)
             ));
     }
 }
+//! @}
 
+
+//! Simulate from a bivariate copula
+//!
+//! @param n number of observations.
+//! @return Samples from the copula model.
 MatXd Bicop::simulate(const int& n)
 {
     MatXd U = simulate_uniform(n, 2);
@@ -346,6 +399,10 @@ MatXd Bicop::simulate(const int& n)
     return U;
 }
 
+//! Fit statistics
+//!
+//! @param u \f$m \times 2\f$ matrix of observations.
+//! @{
 double Bicop::loglik(const MatXd& u)
 {
     VecXd ll = this->pdf(u);
@@ -362,6 +419,8 @@ double Bicop::bic(const MatXd& u)
 {
     return -2 * this->loglik(u) + this->calculate_npars() * log(u.rows());
 }
+//! @}
+
 
 // TODO: generic fall-back that calculates Kendall's tau based on the pdf:
 // tau = int_0^1 int_0^1 C(u, v) c(u, v) du dv
@@ -371,12 +430,78 @@ double Bicop::calculate_tau()
     return 999.0;
 }
 
-
 VecXd Bicop::tau_to_parameters(const double& tau)
 {
     throw std::runtime_error("Method not implemented for this family");
 }
 
+
+//! Getters and setters.
+//! @{
+int Bicop::get_family() const {return family_;}
+int Bicop::get_rotation() const {return rotation_;}
+std::string Bicop::get_association_direction() const {return association_direction_;}
+VecXd Bicop::get_parameters() const {return parameters_;}
+MatXd Bicop::get_parameters_bounds() const {return parameters_bounds_;}
+
+void Bicop::set_rotation(const int& rotation) {
+    check_rotation(rotation);
+    rotation_ = rotation;
+    if (this->association_direction_ == "positive" || this->association_direction_ == "negative")
+    {
+        if (rotation == 0 || rotation == 180)
+        {
+            this->association_direction_ = "positive";
+        }
+        else
+        {
+            this->association_direction_ = "negative";
+        }
+    }
+}
+
+void Bicop::set_parameters(const VecXd& parameters)
+{
+    check_parameters(parameters);
+    parameters_ = parameters;
+}
+//! @}
+
+//! Numerical inversion of h-functions
+//!
+//! These are generic functions to invert the hfunctions numerically.
+//! They can be used in derived classes to define \c hinv1 and \c hinv2.
+//!
+//! @param u \f$m \times 2\f$ matrix of evaluation points.
+//! @return The numerical inverse of h-functions.
+//! @{
+VecXd Bicop::hinv1_num(const MatXd &u)
+{
+    MatXd u_new = u;
+    auto h1 = [&](const VecXd &v) {
+        u_new.col(1) = v;
+        return hfunc1_default(u_new);
+    };
+    return invert_f(u.col(1), h1);
+}
+
+VecXd Bicop::hinv2_num(const MatXd &u)
+{
+    MatXd u_new = u;
+    auto h1 = [&](const VecXd &x) {
+        u_new.col(0) = x;
+        return hfunc2_default(u_new);
+    };
+
+    return invert_f(u.col(0), h1);
+}
+//! @}
+
+//! Data manipulations for rotated families
+//!
+//! @param u \f$m \times 2\f$ matrix of data.
+//! @return The manipulated data.
+//! @{
 MatXd Bicop::cut_and_rotate(const MatXd& u)
 {
     MatXd u_new(u.rows(), 2);
@@ -418,50 +543,10 @@ MatXd Bicop::swap_cols(const MatXd& u)
     u_swapped.col(0).swap(u_swapped.col(1));
     return u_swapped;
 }
+//! @}
 
-VecXd Bicop::hinv1_num(const MatXd &u)
-{
-    MatXd u_new = u;
-    auto h1 = [&](const VecXd &v) {
-        u_new.col(1) = v;
-        return hfunc1_default(u_new);
-    };
-    return invert_f(u.col(1), h1);
-}
-
-VecXd Bicop::hinv2_num(const MatXd &u)
-{
-    MatXd u_new = u;
-    auto h1 = [&](const VecXd &x) {
-        u_new.col(0) = x;
-        return hfunc2_default(u_new);
-    };
-
-    return invert_f(u.col(0), h1);
-}
-
-void Bicop::set_rotation(const int& rotation) {
-    check_rotation(rotation);
-    rotation_ = rotation;
-    if (this->association_direction_ == "positive" || this->association_direction_ == "negative")
-    {
-        if (rotation == 0 || rotation == 180)
-        {
-            this->association_direction_ = "positive";
-        }
-        else
-        {
-            this->association_direction_ = "negative";
-        }
-    }
-}
-
-void Bicop::set_parameters(const VecXd& parameters)
-{
-    check_parameters(parameters);
-    parameters_ = parameters;
-}
-
+//! Sanity checks
+//! @{
 void Bicop::check_parameters(const VecXd& parameters)
 {
     int num_pars = parameters_bounds_.rows();
@@ -504,6 +589,7 @@ void Bicop::check_rotation(const int& rotation)
     }
 
 }
+//! @}
 
 double correlation(const MatXd& z)
 {
