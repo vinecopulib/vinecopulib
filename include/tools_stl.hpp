@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <algorithm>
+#include <iterator>
+
 namespace tools_stl {
 
     template<typename T> bool is_member(T element, std::vector<T> set) {
