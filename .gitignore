@@ -33,6 +33,7 @@
 *.user
 
 #build, bin and Lion related dirs
+include/git_revision.h
 bin/
 build/
 cmake-build-debug/

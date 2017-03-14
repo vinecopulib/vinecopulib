@@ -26,11 +26,10 @@ public:
                                          const int& rotation);
 
     static std::shared_ptr<Bicop> select(const MatXd& data,
-                                         std::string selection_criterion,
-                                         std::vector<int> family_set,
-                                         bool use_rotations,
-                                         bool preselect_families,
-                                         std::string method);
+                                         std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
+                                         std::string method = "mle",
+                                         std::string selection_criterion = "bic",
+                                         bool preselect_families = true);
 
     VecXd pdf(const MatXd& u);
     VecXd hfunc1(const MatXd& u);
