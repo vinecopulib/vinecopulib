@@ -8,8 +8,8 @@
 
 #include <memory>
 #include <vector>
-#include "tools_eigen.hpp"
 
+#include "tools_eigen.hpp"
 
 //! A class for bivariate copulas
 //!
@@ -87,5 +87,3 @@ private:
 };
 
 typedef std::shared_ptr<Bicop> BicopPtr;
-std::vector<double> get_c1c2(const MatXd& data, double tau);
-bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless);
