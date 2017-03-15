@@ -68,7 +68,7 @@ script:
 
 after_success:
     # Creating report
-  - cd release
+  - cd debug
   - lcov --directory . --capture --output-file coverage.info # capture coverage info
   - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out external includes
   - lcov --remove coverage.info '/Applications/*' --output-file coverage.info # filter out more external includes
