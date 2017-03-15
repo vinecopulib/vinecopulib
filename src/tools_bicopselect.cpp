@@ -7,12 +7,12 @@
 #include "tools_bicopselect.hpp"
 #include "tools_stats.hpp"
 
-std::vector<double> get_c1c2(const MatXd& data, double tau)
+std::vector<double> get_c1c2(const Eigen::MatrixXd& data, double tau)
 {
     int n = data.rows();
-    MatXd x = MatXd::Zero(n,2);
-    MatXd z1 = x;
-    MatXd z2 = x;
+    Eigen::MatrixXd x = Eigen::MatrixXd::Zero(n,2);
+    Eigen::MatrixXd z1 = x;
+    Eigen::MatrixXd z2 = x;
     x = qnorm(data);
     int count1 = 0, count2 = 0;
     for (int j = 0; j < n; ++j) {

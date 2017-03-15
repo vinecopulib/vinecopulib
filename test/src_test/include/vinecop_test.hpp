@@ -10,12 +10,14 @@
 #include "include/tools_eigen.hpp"
 #include "rscript.hpp"
 
+using namespace vinecopulib;
+
 class VinecopTest : public ::testing::Test {
 public:
     VinecopTest();
-    MatXd u;
-    VecXd f;
-    MatXd sim;
-    MatXi model_matrix;
-    MatXi vc_matrix;
+    Eigen::MatrixXd u;
+    Eigen::VectorXd f;
+    Eigen::MatrixXd sim;
+    Eigen::MatrixXi model_matrix;
+    Eigen::MatrixXi vc_matrix;
 };

@@ -8,24 +8,27 @@
 
 #include "bicop_archimedean.hpp"
 
-class FrankBicop : public ArchimedeanBicop {
+namespace vinecopulib
+{
+    class FrankBicop : public ArchimedeanBicop
+    {
+    public:
+        // constructor
+        FrankBicop();
+        FrankBicop(const Eigen::VectorXd& parameters);
+        FrankBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
-public:
-    // constructor
-    FrankBicop();
-    FrankBicop(const VecXd& parameters);
-    FrankBicop(const VecXd& parameters, const int& rotation);
+        // generator, its inverse and derivatives for the archimedean copula
+        Eigen::VectorXd generator(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_inv(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_derivative(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_derivative2(const Eigen::VectorXd& u);
 
-    // generator, its inverse and derivatives for the archimedean copula
-    VecXd generator(const VecXd& u);
-    VecXd generator_inv(const VecXd& u);
-    VecXd generator_derivative(const VecXd& u);
-    VecXd generator_derivative2(const VecXd& u);
+        // link between Kendall's tau and the par_bicop parameter
+        Eigen::VectorXd tau_to_parameters(const double& tau);
+        double parameters_to_tau(const Eigen::VectorXd& par);
 
-    // link between Kendall's tau and the par_bicop parameter
-    VecXd tau_to_parameters(const double& tau);
-    double parameters_to_tau(const VecXd& par);
-
-private:
-    VecXd get_start_parameters(const double tau);
-};
+    private:
+        Eigen::VectorXd get_start_parameters(const double tau);
+    };
+}

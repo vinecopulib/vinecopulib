@@ -8,18 +8,17 @@
 
 #include <Eigen/Dense>
 
-typedef Eigen::VectorXd VecXd;
-typedef Eigen::MatrixXd MatXd;
-typedef Eigen::MatrixXi MatXi;
-typedef Eigen::VectorXi VecXi;
-typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatXb;
+namespace vinecopulib
+{
+    typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
 
-VecXd invert_f(
-    const VecXd &x, std::function<VecXd(const VecXd&)> f,
-    const double lb = 1e-20,
-    const double ub = 1-1e-20,
-    int n_iter = 35
-);
+    Eigen::VectorXd invert_f(
+            const Eigen::VectorXd &x, std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
+            const double lb = 1e-20,
+            const double ub = 1-1e-20,
+            int n_iter = 35
+    );
 
-MatXd read_matxd(const char *filename, int max_buffer_size = (int) 1e6);
-MatXi read_matxi(const char *filename, int max_buffer_size = (int) 1e6);
+    Eigen::MatrixXd read_matxd(const char *filename, int max_buffer_size = (int) 1e6);
+    Eigen::MatrixXi read_matxi(const char *filename, int max_buffer_size = (int) 1e6);
+}

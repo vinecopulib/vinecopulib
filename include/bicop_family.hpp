@@ -8,8 +8,7 @@
 
 #include <vector>
 
-namespace families {
-
+namespace vinecopulib {
     enum class BicopFamily
     {
         Indep,

@@ -8,19 +8,24 @@
 
 #include "bicop_class.hpp"
 
-class ParBicop : public Bicop {
+namespace vinecopulib
+{
+    class ParBicop : public Bicop
+    {
+    public:
+        // fit copula parameters
+        void fit(const Eigen::MatrixXd& data, std::string method);
 
-public:
-    // fit copula parameters
-    void fit(const MatXd& data, std::string method);
+        // link between Kendall's tau and the par_bicop parameter
+        virtual double parameters_to_tau(const Eigen::VectorXd& parameters) = 0;
+        double calculate_tau() {return this->parameters_to_tau(parameters_);}
 
-    // link between Kendall's tau and the par_bicop parameter
-    virtual double parameters_to_tau(const VecXd& parameters) = 0;
-    double calculate_tau() {return this->parameters_to_tau(parameters_);}
+        // number of parameters
+        double calculate_npars();
 
-    // number of parameters
-    double calculate_npars();
+    private:
+        virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
+    };
+}
 
-private:
-    virtual VecXd get_start_parameters(const double tau) = 0;
-};
+

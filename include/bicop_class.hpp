@@ -11,79 +11,81 @@
 
 #include "tools_eigen.hpp"
 
-//! A class for bivariate copulas
-//!
-//! The Bicop class is abstract, you cannot create an instance of this class,
-//! but only of the derived classes.
-class Bicop
+namespace vinecopulib
 {
+    //! A class for bivariate copulas
+    //!
+    //! The Bicop class is abstract, you cannot create an instance of this class,
+    //! but only of the derived classes.
+    class Bicop
+    {
+    public:
+        static std::shared_ptr<Bicop> create(const int& family,
+                                             const int& rotation);
+        static std::shared_ptr<Bicop> create(const int& family,
+                                             const Eigen::VectorXd& parameters,
+                                             const int& rotation);
 
-public:
-    static std::shared_ptr<Bicop> create(const int& family,
-                                         const int& rotation);
-    static std::shared_ptr<Bicop> create(const int& family,
-                                         const VecXd& parameters,
-                                         const int& rotation);
+        static std::shared_ptr<Bicop> select(const Eigen::MatrixXd& data,
+                                             std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
+                                             std::string method = "mle",
+                                             std::string selection_criterion = "bic",
+                                             bool preselect_families = true);
 
-    static std::shared_ptr<Bicop> select(const MatXd& data,
-                                         std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
-                                         std::string method = "mle",
-                                         std::string selection_criterion = "bic",
-                                         bool preselect_families = true);
+        Eigen::VectorXd pdf(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc1(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc2(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv1(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv2(const Eigen::MatrixXd& u);
+        Eigen::MatrixXd simulate(const int& n);
 
-    VecXd pdf(const MatXd& u);
-    VecXd hfunc1(const MatXd& u);
-    VecXd hfunc2(const MatXd& u);
-    VecXd hinv1(const MatXd& u);
-    VecXd hinv2(const MatXd& u);
-    MatXd simulate(const int& n);
+        virtual void fit(const Eigen::MatrixXd &data, std::string method) = 0;
+        double loglik(const Eigen::MatrixXd& u);
+        double aic(const Eigen::MatrixXd& u);
+        double bic(const Eigen::MatrixXd& u);
 
-    virtual void fit(const MatXd &data, std::string method) = 0;
-    double loglik(const MatXd& u);
-    double aic(const MatXd& u);
-    double bic(const MatXd& u);
-
-    virtual double calculate_npars() = 0;
-    double calculate_tau();  // this will be a generic fall back method
-    virtual double parameters_to_tau(const VecXd& parameters) = 0;
-    VecXd tau_to_parameters(const double& tau);
-
-
-    int get_family() const;
-    int get_rotation() const;
-    std::string get_association_direction() const;
-    VecXd get_parameters() const;
-    MatXd get_parameters_bounds() const;
-    void set_rotation(const int& rotation);
-    void set_parameters(const VecXd& parameters);
+        virtual double calculate_npars() = 0;
+        double calculate_tau();  // this will be a generic fall back method
+        virtual double parameters_to_tau(const Eigen::VectorXd& parameters) = 0;
+        Eigen::VectorXd tau_to_parameters(const double& tau);
 
 
-    //! Adjust the copula to a flipping of arguments (u,v) -> (v,u)
-    virtual void flip() = 0;
+        int get_family() const;
+        int get_rotation() const;
+        std::string get_association_direction() const;
+        Eigen::VectorXd get_parameters() const;
+        Eigen::MatrixXd get_parameters_bounds() const;
+        void set_rotation(const int& rotation);
+        void set_parameters(const Eigen::VectorXd& parameters);
 
-protected:
-    virtual VecXd pdf_default(const MatXd& u) = 0;
-    virtual VecXd hfunc1_default(const MatXd& u) = 0;
-    virtual VecXd hfunc2_default(const MatXd& u) = 0;
-    virtual VecXd hinv1_default(const MatXd& u) = 0;
-    virtual VecXd hinv2_default(const MatXd& u) = 0;
 
-    VecXd hinv1_num(const MatXd& u);
-    VecXd hinv2_num(const MatXd& u);
+        //! Adjust the copula to a flipping of arguments (u,v) -> (v,u)
+        virtual void flip() = 0;
 
-    MatXd cut_and_rotate(const MatXd& u);
-    MatXd swap_cols(const MatXd& u);
+    protected:
+        virtual Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u) = 0;
+        virtual Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u) = 0;
+        virtual Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u) = 0;
+        virtual Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u) = 0;
+        virtual Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u) = 0;
 
-    int family_;
-    std::string family_name_;
-    int rotation_;
-    std::string association_direction_;
-    VecXd parameters_;
-    MatXd parameters_bounds_;   // first column lower, second column upper
+        Eigen::VectorXd hinv1_num(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv2_num(const Eigen::MatrixXd& u);
 
-private:
-    void check_parameters(const VecXd& parameters);
-    void check_rotation(const int& rotation);
-};
+        Eigen::MatrixXd cut_and_rotate(const Eigen::MatrixXd& u);
+        Eigen::MatrixXd swap_cols(const Eigen::MatrixXd& u);
 
-typedef std::shared_ptr<Bicop> BicopPtr;
+        int family_;
+        std::string family_name_;
+        int rotation_;
+        std::string association_direction_;
+        Eigen::VectorXd parameters_;
+        Eigen::MatrixXd parameters_bounds_;   // first column lower, second column upper
+
+    private:
+        void check_parameters(const Eigen::VectorXd& parameters);
+        void check_rotation(const int& rotation);
+    };
+
+    typedef std::shared_ptr<Bicop> BicopPtr;
+}

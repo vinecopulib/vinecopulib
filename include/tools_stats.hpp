@@ -8,6 +8,7 @@
 
 #include <boost/math/distributions.hpp>
 #include <random>
+
 #include "tools_eigen.hpp"
 #include "tools_c.h"
 
@@ -88,18 +89,18 @@ template<typename T> T qt(const T& x, double nu)
 //! @param d dimension.
 //!
 //! @return A nxd matrix of independent U[0, 1] random variables.
-inline MatXd simulate_uniform(int n, int d)
+inline Eigen::MatrixXd simulate_uniform(int n, int d)
 {
     if ((n < 1) | (d < 1))
         throw std::runtime_error("both n and d must be at least 1.");
-    MatXd U(n, d);
+    Eigen::MatrixXd U(n, d);
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
     return U.unaryExpr([&](double) { return distribution(generator); });
 }
 
-inline double pairwise_ktau(MatXd& u)
+inline double pairwise_ktau(Eigen::MatrixXd& u)
 {
     double tau;
     int n = u.rows();
@@ -108,11 +109,11 @@ inline double pairwise_ktau(MatXd& u)
     return tau;
 }
 
-inline double pairwise_cor(const MatXd& z)
+inline double pairwise_cor(const Eigen::MatrixXd& z)
 {
     double rho;
-    MatXd x = z.rowwise() - z.colwise().mean();
-    MatXd sigma = x.adjoint() * x;
+    Eigen::MatrixXd x = z.rowwise() - z.colwise().mean();
+    Eigen::MatrixXd sigma = x.adjoint() * x;
     rho = sigma(1,0) / sqrt(sigma(0,0) * sigma(1,1));
 
     return rho;

@@ -16,8 +16,8 @@ namespace tools_optimization {
     //!
     typedef struct
     {
-        const MatXd& U; //! The data
-        ParBicop* bicop; //! A pointer to the bivariate copula to optimize
+        const Eigen::MatrixXd& U; //! The data
+        vinecopulib::ParBicop* bicop; //! A pointer to the bivariate copula to optimize
         double par0;  //! The main dependence parameter
         unsigned int objective_calls; //! The number of evaluations of the objective
     } ParBicopOptData;
@@ -94,7 +94,7 @@ namespace tools_optimization {
         //! Set the optimizer's bounds
         //!
         //! @param bounds A matrix of parameters bounds
-        void set_bounds(MatXd bounds);
+        void set_bounds(Eigen::MatrixXd bounds);
 
         //! Set the optimizer's objective and data
         //!
@@ -104,9 +104,9 @@ namespace tools_optimization {
 
         //! Solve the optimization problem
         //!
-        //! @param initial_parameters Vector of starting values
+        //! @param initial_parameters Eigen::Vector of starting values
         //! @return MLE or PMLE
-        VecXd optimize(VecXd initial_parameters);
+        Eigen::VectorXd optimize(Eigen::VectorXd initial_parameters);
 
     private:
         unsigned int n_parameters_;

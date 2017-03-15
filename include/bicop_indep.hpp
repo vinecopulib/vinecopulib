@@ -8,28 +8,31 @@
 
 #include "bicop_parametric.hpp"
 
-class IndepBicop : public ParBicop {
+namespace vinecopulib
+{
+    class IndepBicop : public ParBicop
+    {
+    public:
+        // constructor
+        IndepBicop();
+        IndepBicop(const Eigen::VectorXd& parameters);
+        IndepBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
-public:
-    // constructor
-    IndepBicop();
-    IndepBicop(const VecXd& parameters);
-    IndepBicop(const VecXd& parameters, const int& rotation);
+        // PDF
+        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
 
-    // PDF
-    VecXd pdf_default(const MatXd& u);
+        // hfunctions and their inverses
+        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
 
-    // hfunctions: the conditioning variable is put second
-    VecXd hfunc1_default(const MatXd& u);
-    VecXd hfunc2_default(const MatXd& u);
-    VecXd hinv1_default(const MatXd& u);
-    VecXd hinv2_default(const MatXd& u);
+        Eigen::VectorXd tau_to_parameters(const double &);
+        double parameters_to_tau(const Eigen::VectorXd &);
 
-    VecXd tau_to_parameters(const double &);
-    double parameters_to_tau(const VecXd &);
+        void flip();
 
-    void flip();
-
-private:
-    VecXd get_start_parameters(const double tau);
-};
+    private:
+        Eigen::VectorXd get_start_parameters(const double tau);
+    };
+}

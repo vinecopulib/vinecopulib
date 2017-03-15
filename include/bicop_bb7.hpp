@@ -8,20 +8,23 @@
 
 #include "bicop_archimedean.hpp"
 
-class Bb7Bicop : public ArchimedeanBicop {
+namespace vinecopulib
+{
+    class Bb7Bicop : public ArchimedeanBicop
+    {
+    public:
+        // constructor
+        Bb7Bicop();
+        Bb7Bicop(const Eigen::VectorXd& parameters);
+        Bb7Bicop(const Eigen::VectorXd& parameters, const int& rotation);
 
-public:
-    // constructor
-    Bb7Bicop();
-    Bb7Bicop(const VecXd& parameters);
-    Bb7Bicop(const VecXd& parameters, const int& rotation);
+        // generator, its inverse and derivatives for the archimedean copula
+        Eigen::VectorXd generator(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_inv(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_derivative(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_derivative2(const Eigen::VectorXd& u);
 
-    // generator, its inverse and derivatives for the archimedean copula
-    VecXd generator(const VecXd& u);
-    VecXd generator_inv(const VecXd& u);
-    VecXd generator_derivative(const VecXd& u);
-    VecXd generator_derivative2(const VecXd& u);
-
-    // link between Kendall's tau and the par_bicop parameter
-    double parameters_to_tau(const VecXd& par);
-};
+        // link between Kendall's tau and the par_bicop parameter
+        double parameters_to_tau(const Eigen::VectorXd& par);
+    };
+}

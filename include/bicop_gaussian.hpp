@@ -8,23 +8,26 @@
 
 #include "bicop_elliptical.hpp"
 
-class GaussianBicop : public EllipticalBicop {
+namespace vinecopulib
+{
+    class GaussianBicop : public EllipticalBicop
+    {
+    public:
+        // constructor
+        GaussianBicop();
+        GaussianBicop(const Eigen::VectorXd& parameters);
+        GaussianBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
-public:
-    // constructor
-    GaussianBicop();
-    GaussianBicop(const VecXd& parameters);
-    GaussianBicop(const VecXd& parameters, const int& rotation);
+        // PDF
+        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
 
-    // PDF
-    VecXd pdf_default(const MatXd& u);
+        // hfunction
+        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
 
-    // hfunction
-    VecXd hfunc1_default(const MatXd& u);
+        // inverse hfunction
+        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
 
-    // inverse hfunction
-    VecXd hinv1_default(const MatXd& u);
-
-private:
-    VecXd get_start_parameters(const double tau);
-};
+    private:
+        Eigen::VectorXd get_start_parameters(const double tau);
+    };
+}

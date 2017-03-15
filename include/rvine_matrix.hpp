@@ -8,31 +8,35 @@
 
 #include "tools_eigen.hpp"
 
-class RVineMatrix {
-public:
-    //! \devgroup constructors Constructors
-    //! @{
-    RVineMatrix() {}
-    RVineMatrix(const MatXi& matrix);
-    //! @}
+namespace vinecopulib
+{
+    class RVineMatrix
+    {
+    public:
+        //! \devgroup constructors Constructors
+        //! @{
+        RVineMatrix() {}
+        RVineMatrix(const Eigen::MatrixXi& matrix);
+        //! @}
 
-    //! Getters
-    //! @{
-    MatXi get_matrix();
-    //! @}
+        //! Getters
+        //! @{
+        Eigen::MatrixXi get_matrix();
+        //! @}
 
-    VecXi get_order();
-    MatXi in_natural_order();
-    MatXi get_max_matrix();
-    MatXb get_needed_hfunc1();
-    MatXb get_needed_hfunc2();
+        Eigen::VectorXi get_order();
+        Eigen::MatrixXi in_natural_order();
+        Eigen::MatrixXi get_max_matrix();
+        MatrixXb get_needed_hfunc1();
+        MatrixXb get_needed_hfunc2();
 
-    static MatXi construct_d_vine_matrix(const VecXi& order);
+        static Eigen::MatrixXi construct_d_vine_matrix(const Eigen::VectorXi& order);
 
-private:
-    int d_;
-    MatXi matrix_;
-};
+    private:
+        int d_;
+        Eigen::MatrixXi matrix_;
+    };
 
-int relabel_one(const int& x, const VecXi& old_labels, const VecXi& new_labels);
-MatXi relabel_elements(const MatXi& matrix, const VecXi& new_labels);
+    int relabel_one(const int& x, const Eigen::VectorXi& old_labels, const Eigen::VectorXi& new_labels);
+    Eigen::MatrixXi relabel_elements(const Eigen::MatrixXi& matrix, const Eigen::VectorXi& new_labels);
+}
