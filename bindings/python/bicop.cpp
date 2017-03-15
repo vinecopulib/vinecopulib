@@ -20,28 +20,28 @@ namespace
 {
     struct bicop_wrap : Bicop, boost::python::wrapper<Bicop>
     {
-        void fit(const MatrixXd &data, std::string method) 
+        void fit(const Eigen::MatrixXd &data, std::string method) 
         { this->get_override("fit")(data, method); }
 
         double calculate_npars() 
         { return this->get_override("calculate_npars")(); }
 
-        double parameters_to_tau(const VectorXd& parameters) 
+        double parameters_to_tau(const Eigen::VectorXd& parameters) 
         { return this->get_override("parametrs_to_tau")(parameters); }
 
-        VectorXd pdf_default(const MatrixXd& u)    
+        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u)    
         { return this->get_override("pdf_default")(u); }
 
-        VectorXd hfunc1_default(const MatrixXd& u) 
+        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u) 
         { return this->get_override("hfunc1_default")(u); }
 
-        VectorXd hfunc2_default(const MatrixXd& u) 
+        Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u) 
         { return this->get_override("hfunc2_default")(u); }
 
-        VectorXd hinv1_default(const MatrixXd& u)  
+        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u)  
         { return this->get_override("hinv1_default")(u); }
 
-        VectorXd hinv2_default(const MatrixXd& u)  
+        Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u)  
         { return this->get_override("hinv2_default")(u); }
     };
 

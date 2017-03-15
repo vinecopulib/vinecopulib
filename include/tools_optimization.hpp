@@ -104,7 +104,7 @@ namespace tools_optimization {
 
         //! Solve the optimization problem
         //!
-        //! @param initial_parameters Vector of starting values
+        //! @param initial_parameters Eigen::Vector of starting values
         //! @return MLE or PMLE
         Eigen::VectorXd optimize(Eigen::VectorXd initial_parameters);
 

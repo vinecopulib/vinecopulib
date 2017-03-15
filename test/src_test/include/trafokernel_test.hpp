@@ -15,5 +15,5 @@ class TrafokernelTest : public ::testing::Test {
 public:
     TrafokernelTest();
     BicopPtr cop;
-    MatrixXd u;
+    Eigen::MatrixXd u;
 };

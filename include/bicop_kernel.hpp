@@ -11,17 +11,18 @@
 
 namespace vinecopulib
 {
-    class KernelBicop : public Bicop {
+    class KernelBicop : public Bicop
+    {
     public:
         KernelBicop();
 
-        VectorXd pdf_default(const MatrixXd& u);
-        VectorXd hfunc1_default(const MatrixXd& u);
-        VectorXd hfunc2_default(const MatrixXd& u);
-        VectorXd hinv1_default(const MatrixXd& u);
-        VectorXd hinv2_default(const MatrixXd& u);
+        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
 
-        double parameters_to_tau(const VectorXd &);
+        double parameters_to_tau(const Eigen::VectorXd &);
         double calculate_npars();
 
         void flip();

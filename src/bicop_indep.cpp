@@ -16,13 +16,13 @@ namespace vinecopulib
         association_direction_ = "none";
     }
 
-    IndepBicop::IndepBicop(const VectorXd& parameters)
+    IndepBicop::IndepBicop(const Eigen::VectorXd& parameters)
     {
         IndepBicop();
         set_parameters(parameters);
     }
 
-    IndepBicop::IndepBicop(const VectorXd& parameters, const int& rotation)
+    IndepBicop::IndepBicop(const Eigen::VectorXd& parameters, const int& rotation)
     {
         IndepBicop();
         set_parameters(parameters);
@@ -30,44 +30,44 @@ namespace vinecopulib
     }
 
 // PDF
-    VectorXd IndepBicop::pdf_default(const MatrixXd& u)
+    Eigen::VectorXd IndepBicop::pdf_default(const Eigen::MatrixXd& u)
     {
-        return VectorXd::Ones(u.rows());
+        return Eigen::VectorXd::Ones(u.rows());
     }
 
 // hfunctions: the conditioning variable is put second
-    VectorXd IndepBicop::hfunc1_default(const MatrixXd& u)
+    Eigen::VectorXd IndepBicop::hfunc1_default(const Eigen::MatrixXd& u)
     {
         return u.col(1);
     }
 
-    VectorXd IndepBicop::hfunc2_default(const MatrixXd& u)
+    Eigen::VectorXd IndepBicop::hfunc2_default(const Eigen::MatrixXd& u)
     {
         return u.col(0);
     }
 
-    VectorXd IndepBicop::hinv1_default(const MatrixXd& u)
+    Eigen::VectorXd IndepBicop::hinv1_default(const Eigen::MatrixXd& u)
     {
         return u.col(1);
     }
 
-    VectorXd IndepBicop::hinv2_default(const MatrixXd& u)
+    Eigen::VectorXd IndepBicop::hinv2_default(const Eigen::MatrixXd& u)
     {
         return u.col(0);
     }
 
-    VectorXd IndepBicop::tau_to_parameters(const double &)
+    Eigen::VectorXd IndepBicop::tau_to_parameters(const double &)
     {
-        VectorXd pars;
+        Eigen::VectorXd pars;
         return pars;
     }
 
-    double IndepBicop::parameters_to_tau(const VectorXd &)
+    double IndepBicop::parameters_to_tau(const Eigen::VectorXd &)
     {
         return 0.0;
     }
 
-    VectorXd IndepBicop::get_start_parameters(const double tau)
+    Eigen::VectorXd IndepBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
     }

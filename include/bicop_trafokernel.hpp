@@ -10,9 +10,10 @@
 
 namespace vinecopulib
 {
-    class TrafokernelBicop : public KernelBicop {
+    class TrafokernelBicop : public KernelBicop
+    {
     public:
         TrafokernelBicop();
-        void fit(const MatrixXd& data, std::string);
+        void fit(const Eigen::MatrixXd& data, std::string);
     };
 }

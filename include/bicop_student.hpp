@@ -10,24 +10,24 @@
 
 namespace vinecopulib
 {
-    class StudentBicop : public EllipticalBicop {
-
+    class StudentBicop : public EllipticalBicop
+    {
     public:
         // constructor
         StudentBicop();
-        StudentBicop(const VectorXd& parameters);
-        StudentBicop(const VectorXd& parameters, const int& rotation);
+        StudentBicop(const Eigen::VectorXd& parameters);
+        StudentBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
         // PDF
-        VectorXd pdf_default(const MatrixXd& u);
+        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
 
         // hfunction
-        VectorXd hfunc1_default(const MatrixXd& u);
+        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
 
         // inverse hfunction
-        VectorXd hinv1_default(const MatrixXd& u);
+        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
 
     private:
-        VectorXd get_start_parameters(const double tau);
+        Eigen::VectorXd get_start_parameters(const double tau);
     };
 }

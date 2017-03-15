@@ -10,32 +10,33 @@
 
 namespace vinecopulib
 {
-    class RVineMatrix {
+    class RVineMatrix
+    {
     public:
         //! \devgroup constructors Constructors
         //! @{
         RVineMatrix() {}
-        RVineMatrix(const MatrixXi& matrix);
+        RVineMatrix(const Eigen::MatrixXi& matrix);
         //! @}
 
         //! Getters
         //! @{
-        MatrixXi get_matrix();
+        Eigen::MatrixXi get_matrix();
         //! @}
 
-        VectorXi get_order();
-        MatrixXi in_natural_order();
-        MatrixXi get_max_matrix();
+        Eigen::VectorXi get_order();
+        Eigen::MatrixXi in_natural_order();
+        Eigen::MatrixXi get_max_matrix();
         MatrixXb get_needed_hfunc1();
         MatrixXb get_needed_hfunc2();
 
-        static MatrixXi construct_d_vine_matrix(const VectorXi& order);
+        static Eigen::MatrixXi construct_d_vine_matrix(const Eigen::VectorXi& order);
 
     private:
         int d_;
-        MatrixXi matrix_;
+        Eigen::MatrixXi matrix_;
     };
 
-    int relabel_one(const int& x, const VectorXi& old_labels, const VectorXi& new_labels);
-    MatrixXi relabel_elements(const MatrixXi& matrix, const VectorXi& new_labels);
+    int relabel_one(const int& x, const Eigen::VectorXi& old_labels, const Eigen::VectorXi& new_labels);
+    Eigen::MatrixXi relabel_elements(const Eigen::MatrixXi& matrix, const Eigen::VectorXi& new_labels);
 }

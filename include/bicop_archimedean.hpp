@@ -10,26 +10,26 @@
 
 namespace vinecopulib
 {
-    class ArchimedeanBicop : public ParBicop {
-
+    class ArchimedeanBicop : public ParBicop
+    {
     public:
         // pdf, hfunctions and inverses
-        VectorXd pdf_default(const MatrixXd& u);
-        VectorXd hfunc1_default(const MatrixXd& u);
-        VectorXd hfunc2_default(const MatrixXd& u);
-        VectorXd hinv1_default(const MatrixXd& u);
-        VectorXd hinv2_default(const MatrixXd& u);
+        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
 
         // generator, its inverse and derivatives
-        virtual VectorXd generator(const VectorXd& u) = 0;
-        virtual VectorXd generator_inv(const VectorXd& u) = 0;
-        virtual VectorXd generator_derivative(const VectorXd& u) = 0;
-        virtual VectorXd generator_derivative2(const VectorXd& u) = 0;
+        virtual Eigen::VectorXd generator(const Eigen::VectorXd& u) = 0;
+        virtual Eigen::VectorXd generator_inv(const Eigen::VectorXd& u) = 0;
+        virtual Eigen::VectorXd generator_derivative(const Eigen::VectorXd& u) = 0;
+        virtual Eigen::VectorXd generator_derivative2(const Eigen::VectorXd& u) = 0;
 
         void flip();
 
     private:
-        VectorXd get_start_parameters(const double tau);
+        Eigen::VectorXd get_start_parameters(const double tau);
     };
 }
 

@@ -18,23 +18,23 @@ namespace vinecopulib
         association_direction_ = "both";
     }
 
-    VectorXd gaussian_kernel_2d(const MatrixXd& x)
+    Eigen::VectorXd gaussian_kernel_2d(const Eigen::MatrixXd& x)
     {
         return dnorm(x).rowwise().prod();
     }
 
-    void TrafokernelBicop::fit(const MatrixXd& data, std::string)
+    void TrafokernelBicop::fit(const Eigen::MatrixXd& data, std::string)
     {
         // construct default grid (equally spaced on Gaussian scale)
         int m = 30;
-        VectorXd grid_points(m);
+        Eigen::VectorXd grid_points(m);
         for (int i = 0; i < m; ++i)
             grid_points(i) = - 3.25 + i * (6.25 / (double) m);
         grid_points = pnorm(grid_points);
 
         // expand the interpolation grid; a matrix with two columns where each row
         // contains one combination of the grid points
-        MatrixXd grid_2d(m * m, 2);
+        Eigen::MatrixXd grid_2d(m * m, 2);
         int k = 0;
         for (int i = 0; i < m; ++i) {
             for (int j = 0; j < m; ++j) {
@@ -45,32 +45,32 @@ namespace vinecopulib
         }
 
         // transform evaluation grid and data by inverse Gaussian cdf
-        MatrixXd z = qnorm(grid_2d);
-        MatrixXd z_data = qnorm(data);
+        Eigen::MatrixXd z = qnorm(grid_2d);
+        Eigen::MatrixXd z_data = qnorm(data);
 
         // apply normal density to z (used later for normalization)
-        MatrixXd phi = dnorm(z);
-        MatrixXd phi_data = dnorm(z_data);
+        Eigen::MatrixXd phi = dnorm(z);
+        Eigen::MatrixXd phi_data = dnorm(z_data);
 
         // find bandwidth matrix
         int n = data.rows();
-        MatrixXd centered = z_data.rowwise() - z_data.colwise().mean();
-        MatrixXd cov = (centered.adjoint() * centered) / double(n - 1);
+        Eigen::MatrixXd centered = z_data.rowwise() - z_data.colwise().mean();
+        Eigen::MatrixXd cov = (centered.adjoint() * centered) / double(n - 1);
 
-        Eigen::SelfAdjointEigenSolver<MatrixXd> takes_root(cov);
-        MatrixXd cov_root = takes_root.operatorSqrt();
-        MatrixXd B =  1.25 * std::pow(n, - 1.0 / 6.0) * cov_root.transpose();
+        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> takes_root(cov);
+        Eigen::MatrixXd cov_root = takes_root.operatorSqrt();
+        Eigen::MatrixXd B =  1.25 * std::pow(n, - 1.0 / 6.0) * cov_root.transpose();
 
         // apply bandwidth matrix
         z = (B.inverse() * z.transpose()).transpose();
         z_data = (B.inverse() * z_data.transpose()).transpose();
 
         // compute estimator on each evaluation point
-        VectorXd kernels(n);
+        Eigen::VectorXd kernels(n);
         double det_B = B.determinant();
         int i = 0;
         int j = 0;
-        MatrixXd values(m, m);
+        Eigen::MatrixXd values(m, m);
         for (int k = 0; k < m * m; ++k) {
             kernels = gaussian_kernel_2d((z_data - z.row(k).replicate(n, 1)));
             values(i, j) = kernels.mean() / (det_B * phi.row(k).prod());
@@ -87,8 +87,8 @@ namespace vinecopulib
         interp_grid_ = InterpolationGrid(grid_points, values);
 
         // compute effective number of parameters
-        double K0 = gaussian_kernel_2d(MatrixXd::Constant(1, 2, 0.0))(0);
-        VectorXd scale = phi_data.rowwise().prod();
+        double K0 = gaussian_kernel_2d(Eigen::MatrixXd::Constant(1, 2, 0.0))(0);
+        Eigen::VectorXd scale = phi_data.rowwise().prod();
         npars_ =  K0 / det_B / (scale.array() * this->pdf(data).array()).mean();
     }
 }

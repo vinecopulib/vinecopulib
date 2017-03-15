@@ -21,7 +21,7 @@ namespace {
 
             if (this->needs_check_)
             {
-                MatrixXd data = this->par_bicop_.simulate(this->get_n());
+                Eigen::MatrixXd data = this->par_bicop_.simulate(this->get_n());
                 BicopPtr bicop = Bicop::select(data,
                                                family_set,
                                                "mle");
@@ -60,7 +60,7 @@ namespace {
             this->setup_parameters(rotations[j]);
 
             if (this->needs_check_ && tools_stl::is_member(this->par_bicop_.get_family(), no_itau_families) == false) {
-                MatrixXd data = this->par_bicop_.simulate(this->get_n());
+                Eigen::MatrixXd data = this->par_bicop_.simulate(this->get_n());
                 BicopPtr bicop = Bicop::select(data,
                                                family_set,
                                                "itau");

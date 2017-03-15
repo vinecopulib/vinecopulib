@@ -15,26 +15,26 @@ namespace vinecopulib
         family_name_ = "Bb7";
         rotation_ = 0;
         association_direction_ = "positive";
-        parameters_ = VectorXd::Ones(2);
-        parameters_bounds_ = MatrixXd::Constant(2, 2, 200);
+        parameters_ = Eigen::VectorXd::Ones(2);
+        parameters_bounds_ = Eigen::MatrixXd::Constant(2, 2, 200);
         parameters_bounds_(0, 0) = 1.0;
         parameters_bounds_(1, 0) = 0.0;
     }
 
-    Bb7Bicop::Bb7Bicop(const VectorXd& parameters)
+    Bb7Bicop::Bb7Bicop(const Eigen::VectorXd& parameters)
     {
         Bb7Bicop();
         set_parameters(parameters);
     }
 
-    Bb7Bicop::Bb7Bicop(const VectorXd& parameters, const int& rotation)
+    Bb7Bicop::Bb7Bicop(const Eigen::VectorXd& parameters, const int& rotation)
     {
         Bb7Bicop();
         set_parameters(parameters);
         set_rotation(rotation);
     }
 
-    VectorXd Bb7Bicop::generator(const VectorXd& u)
+    Eigen::VectorXd Bb7Bicop::generator(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -44,7 +44,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VectorXd Bb7Bicop::generator_inv(const VectorXd& u)
+    Eigen::VectorXd Bb7Bicop::generator_inv(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -54,7 +54,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VectorXd Bb7Bicop::generator_derivative(const VectorXd& u)
+    Eigen::VectorXd Bb7Bicop::generator_derivative(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -64,7 +64,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VectorXd Bb7Bicop::generator_derivative2(const VectorXd& u)
+    Eigen::VectorXd Bb7Bicop::generator_derivative2(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -75,7 +75,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    double Bb7Bicop::parameters_to_tau(const VectorXd& parameters)
+    double Bb7Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
     {
         double theta = parameters(0);
         double delta = parameters(1);

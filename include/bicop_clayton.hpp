@@ -10,27 +10,28 @@
 
 namespace vinecopulib
 {
-    class ClaytonBicop : public ArchimedeanBicop {
+    class ClaytonBicop : public ArchimedeanBicop
+    {
     public:
         // constructor
         ClaytonBicop();
-        ClaytonBicop(const VectorXd& parameters);
-        ClaytonBicop(const VectorXd& parameters, const int& rotation);
+        ClaytonBicop(const Eigen::VectorXd& parameters);
+        ClaytonBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
         // generator, its inverse and derivatives for the archimedean copula
-        VectorXd generator(const VectorXd& u);
-        VectorXd generator_inv(const VectorXd& u);
-        VectorXd generator_derivative(const VectorXd& u);
-        VectorXd generator_derivative2(const VectorXd& u);
+        Eigen::VectorXd generator(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_inv(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_derivative(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_derivative2(const Eigen::VectorXd& u);
 
         // inverse hfunction
-        VectorXd hinv1_default(const MatrixXd& u);
+        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
 
         // link between Kendall's tau and the par_bicop parameter
-        VectorXd tau_to_parameters(const double& tau);
-        double parameters_to_tau(const VectorXd& parameters);
+        Eigen::VectorXd tau_to_parameters(const double& tau);
+        double parameters_to_tau(const Eigen::VectorXd& parameters);
 
     private:
-        VectorXd get_start_parameters(const double tau);
+        Eigen::VectorXd get_start_parameters(const double tau);
     };
 }

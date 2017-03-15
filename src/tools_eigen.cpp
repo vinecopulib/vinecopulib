@@ -24,15 +24,15 @@ namespace vinecopulib
     //! guaranteeing an accuracy of 0.5^35 ~= 6e-11).
     //!
     //! @return f^{-1}(x).
-    VectorXd invert_f(const VectorXd& x, std::function<VectorXd(const VectorXd&)> f,
+    Eigen::VectorXd invert_f(const Eigen::VectorXd& x, std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
                       const double lb, const double ub, int n_iter)
     {
-        VectorXd xl = VectorXd::Constant(x.size(), lb);
-        VectorXd xh = VectorXd::Constant(x.size(), ub);
-        VectorXd x_tmp = x;
+        Eigen::VectorXd xl = Eigen::VectorXd::Constant(x.size(), lb);
+        Eigen::VectorXd xh = Eigen::VectorXd::Constant(x.size(), ub);
+        Eigen::VectorXd x_tmp = x;
         for (int iter = 0; iter < n_iter; ++iter) {
             x_tmp = (xh + xl) / 2.0;
-            VectorXd fm = f(x_tmp) - x;
+            Eigen::VectorXd fm = f(x_tmp) - x;
             xl = (fm.array() < 0).select(x_tmp, xl);
             xh = (fm.array() < 0).select(xh, x_tmp);
         }
@@ -40,14 +40,14 @@ namespace vinecopulib
         return x_tmp;
     }
 
-    MatrixXi read_matxi(const char *filename, int max_buffer_size)
+    Eigen::MatrixXi read_matxi(const char *filename, int max_buffer_size)
     {
-        MatrixXd temp = read_matxd(filename, max_buffer_size);
-        MatrixXi output = temp.cast <int> ();
+        Eigen::MatrixXd temp = read_matxd(filename, max_buffer_size);
+        Eigen::MatrixXi output = temp.cast <int> ();
         return output;
     }
 
-    MatrixXd read_matxd(const char *filename, int max_buffer_size)
+    Eigen::MatrixXd read_matxd(const char *filename, int max_buffer_size)
     {
         using namespace std;
 
@@ -81,7 +81,7 @@ namespace vinecopulib
         rows--;
 
         // Populate matrix with numbers.
-        MatrixXd result(rows,cols);
+        Eigen::MatrixXd result(rows,cols);
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < cols; j++)
                 result(i,j) = buff[ cols*i+j ];

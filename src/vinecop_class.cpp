@@ -25,7 +25,7 @@ namespace vinecopulib
     {
         d_ = d;
         // D-vine with variable order (1, ..., d)
-        VectorXi order(d);
+        Eigen::VectorXi order(d);
         for (int i = 0; i < d; ++i)
             order(i) = i + 1;
         vine_matrix_ = RVineMatrix(RVineMatrix::construct_d_vine_matrix(order));
@@ -49,7 +49,7 @@ namespace vinecopulib
         //!     pair-copulas set to independence
     Vinecop::Vinecop(
             const std::vector<std::vector<BicopPtr>>& pair_copulas,
-            const MatrixXi& matrix
+            const Eigen::MatrixXi& matrix
     )
     {
         d_ = matrix.rows();
@@ -116,11 +116,11 @@ namespace vinecopulib
     //!     is false).
     //! @return The fitted vine copula model.
     Vinecop Vinecop::select(
-            const MatrixXd& data,
+            const Eigen::MatrixXd& data,
             std::vector<int> family_set,
             std::string method,
             int truncation_level,
-            MatrixXi matrix,
+            Eigen::MatrixXi matrix,
             std::string selection_criterion,
             bool preselect_families,
             bool show_trace
@@ -200,9 +200,9 @@ namespace vinecopulib
     //! Get families of all pair copulas
     //!
     //! @return A matrix containing the family indices.
-    MatrixXi Vinecop::get_families()
+    Eigen::MatrixXi Vinecop::get_families()
     {
-        MatrixXi families = MatrixXi::Constant(d_, d_, 0);
+        Eigen::MatrixXi families = Eigen::MatrixXi::Constant(d_, d_, 0);
         for (int tree = 0; tree < d_ - 1; ++tree) {
             for (int edge = 0; edge < d_ - 1 - tree; ++edge) {
                 families(tree, edge) = get_family(tree, edge);
@@ -226,9 +226,9 @@ namespace vinecopulib
     //! Get rotations of all pair copulas
     //!
     //! @return A matrix containing the rotations.
-    MatrixXi Vinecop::get_rotations()
+    Eigen::MatrixXi Vinecop::get_rotations()
     {
-        MatrixXi rotations = MatrixXi::Constant(d_, d_, 0);
+        Eigen::MatrixXi rotations = Eigen::MatrixXi::Constant(d_, d_, 0);
         for (int tree = 0; tree < d_ - 1; ++tree) {
             for (int edge = 0; edge < d_ - 1 - tree; ++edge) {
                 rotations(tree, edge) = get_rotation(tree, edge);
@@ -244,7 +244,7 @@ namespace vinecopulib
     //! @param edge edge index (starting with 0).
     //!
     //! @return An \code Eigen::VectorXd containing the parameters.
-    VectorXd Vinecop::get_parameters(int tree, int edge)
+    Eigen::VectorXd Vinecop::get_parameters(int tree, int edge)
     {
         return get_pair_copula(tree, edge)->get_parameters();
     }
@@ -252,7 +252,7 @@ namespace vinecopulib
     //! Probability density function of a vine copula
     //!
     //! @param u mxd matrix of evaluation points.
-    VectorXd Vinecop::pdf(const MatrixXd& u)
+    Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd& u)
     {
         int d = u.cols();
         int n = u.rows();
@@ -265,19 +265,19 @@ namespace vinecopulib
         }
 
         // info about the vine structure (reverse rows (!) for more natural indexing)
-        VectorXi revorder      = vine_matrix_.get_order().reverse();
-        MatrixXi no_matrix     = vine_matrix_.in_natural_order();
-        MatrixXi max_matrix    = vine_matrix_.get_max_matrix();
+        Eigen::VectorXi revorder      = vine_matrix_.get_order().reverse();
+        Eigen::MatrixXi no_matrix     = vine_matrix_.in_natural_order();
+        Eigen::MatrixXi max_matrix    = vine_matrix_.get_max_matrix();
         MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
         MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
 
         // initial value must be 1.0 for multiplication
-        VectorXd vine_density = VectorXd::Constant(u.rows(), 1.0);
+        Eigen::VectorXd vine_density = Eigen::VectorXd::Constant(u.rows(), 1.0);
 
         // temporary storage objects for h-functions
-        MatrixXd hfunc1(n, d);
-        MatrixXd hfunc2(n, d);
-        MatrixXd u_e(n, 2);
+        Eigen::MatrixXd hfunc1(n, d);
+        Eigen::MatrixXd hfunc2(n, d);
+        Eigen::MatrixXd u_e(n, 2);
 
         // fill first row of hfunc2 matrix with evaluation points;
         // points have to be reordered to correspond to natural order
@@ -322,13 +322,13 @@ namespace vinecopulib
     //! @param U mxd matrix of indpendent uniform random variables.
     //!
     //! @{
-    MatrixXd Vinecop::simulate(int n)
+    Eigen::MatrixXd Vinecop::simulate(int n)
     {
-        MatrixXd U = simulate_uniform(n, d_);
+        Eigen::MatrixXd U = simulate_uniform(n, d_);
         return simulate(n, U);
     }
 
-    MatrixXd Vinecop::simulate(int n, const MatrixXd& U)
+    Eigen::MatrixXd Vinecop::simulate(int n, const Eigen::MatrixXd& U)
     {
         if (n < 1)
             throw std::runtime_error("n must be at least one");
@@ -348,7 +348,7 @@ namespace vinecopulib
             throw std::runtime_error(message.str().c_str());
         }
 
-        MatrixXd U_vine = U;  // output matrix
+        Eigen::MatrixXd U_vine = U;  // output matrix
 
         //                   (direct + indirect)    (U_vine)       (info matrices)
         int bytes_required = (8 * 2 * n * d * d) +  (8 * n * d)  + (4 * 4 * d * d);
@@ -365,14 +365,14 @@ namespace vinecopulib
         }
 
         // info about the vine structure (in upper triangular matrix notation)
-        VectorXi revorder      = vine_matrix_.get_order().reverse();
-        MatrixXi no_matrix     = vine_matrix_.in_natural_order();
-        MatrixXi max_matrix    = vine_matrix_.get_max_matrix();
+        Eigen::VectorXi revorder      = vine_matrix_.get_order().reverse();
+        Eigen::MatrixXi no_matrix     = vine_matrix_.in_natural_order();
+        Eigen::MatrixXi max_matrix    = vine_matrix_.get_max_matrix();
         MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
         MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
 
         // temporary storage objects for (inverse) h-functions
-        typedef Eigen::Matrix<VectorXd, Eigen::Dynamic, Eigen::Dynamic> Array3d;
+        typedef Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> Array3d;
         Array3d hinv2(d, d);
         Array3d hfunc1(d, d);
 
@@ -387,7 +387,7 @@ namespace vinecopulib
                 BicopPtr edge_copula = get_pair_copula(tree, var);
 
                 // extract data for conditional pair
-                MatrixXd U_e(n, 2);
+                Eigen::MatrixXd U_e(n, 2);
                 int m = max_matrix(tree, var);
                 U_e.col(0) = hinv2(tree + 1, var);
                 if (m == no_matrix(tree, var)) {
@@ -410,7 +410,7 @@ namespace vinecopulib
         }
 
         // go back to original order
-        VectorXi inverse_order = inverse_permutation(revorder);
+        Eigen::VectorXi inverse_order = inverse_permutation(revorder);
         for (int j = 0; j < d; ++j)
             U_vine.col(j) = hinv2(0, inverse_order(j));
 
@@ -419,7 +419,7 @@ namespace vinecopulib
     //! @}
 
 // get indexes for reverting back to old order in simulation routine
-    VectorXi inverse_permutation(const VectorXi& order) {
+    Eigen::VectorXi inverse_permutation(const Eigen::VectorXi& order) {
         // start with (0, 1, .., k)
         auto indexes = tools_stl::seq_int(0, order.size());
 
@@ -427,7 +427,7 @@ namespace vinecopulib
         std::sort(indexes.begin(), indexes.end(),
                   [&order](int i1, int i2) {return order(i1) < order(i2);});
 
-        // convert to VectorXi;
-        return Eigen::Map<VectorXi>(&indexes[0], order.size());
+        // convert to Eigen::VectorXi;
+        return Eigen::Map<Eigen::VectorXi>(&indexes[0], order.size());
     }
 }

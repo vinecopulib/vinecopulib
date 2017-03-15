@@ -10,28 +10,29 @@
 
 namespace vinecopulib
 {
-    class IndepBicop : public ParBicop {
+    class IndepBicop : public ParBicop
+    {
     public:
         // constructor
         IndepBicop();
-        IndepBicop(const VectorXd& parameters);
-        IndepBicop(const VectorXd& parameters, const int& rotation);
+        IndepBicop(const Eigen::VectorXd& parameters);
+        IndepBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
         // PDF
-        VectorXd pdf_default(const MatrixXd& u);
+        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
 
-        // hfunctions: the conditioning variable is put second
-        VectorXd hfunc1_default(const MatrixXd& u);
-        VectorXd hfunc2_default(const MatrixXd& u);
-        VectorXd hinv1_default(const MatrixXd& u);
-        VectorXd hinv2_default(const MatrixXd& u);
+        // hfunctions and their inverses
+        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
 
-        VectorXd tau_to_parameters(const double &);
-        double parameters_to_tau(const VectorXd &);
+        Eigen::VectorXd tau_to_parameters(const double &);
+        double parameters_to_tau(const Eigen::VectorXd &);
 
         void flip();
 
     private:
-        VectorXd get_start_parameters(const double tau);
+        Eigen::VectorXd get_start_parameters(const double tau);
     };
 }
