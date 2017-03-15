@@ -3,9 +3,16 @@ include_directories(${PROJECT_BINARY_DIR})
 
 add_subdirectory(src)
 if(BUILD_TESTING)
+    set(unit_tests
+            test_all
+            test_bicop_parametric
+            test_bicop_class
+            test_bicop_select
+            test_bicop_trafokernel
+            test_rvine_matrix
+            test_vinecop_class)
     add_subdirectory(test)
 endif(BUILD_TESTING)
-#add_subdirectory(bindings)
 
 # Add all targets to the build-tree export set
 export(TARGETS  vinecopulib FILE "${PROJECT_BINARY_DIR}/vinecopulibTargets.cmake")
@@ -36,3 +43,10 @@ install(FILES
 
 # Install the export set for use with the install-tree
 install(EXPORT vinecopulibTargets DESTINATION "${INSTALL_CMAKE_DIR}")
+
+# Install the export set for code coverage
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_TESTING)
+    include(cmake/codeCoverage.cmake)
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/coverage)
+    setup_target_for_coverage(${PROJECT_NAME}_coverage test_all coverage)
+endif()
