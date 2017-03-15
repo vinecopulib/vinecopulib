@@ -75,7 +75,7 @@ namespace vinecopulib
     //! @param par the copula parameters (must be compatible with family).
     //! @param rotation the rotation type.
     //! @return A pointer to an object that inherits from \c Bicop.
-    BicopPtr Bicop::create(const int& family, const VecXd& parameters, const int& rotation)
+    BicopPtr Bicop::create(const int& family, const VectorXd& parameters, const int& rotation)
     {
         BicopPtr my_bicop = create(family, rotation);
         my_bicop->set_parameters(parameters);
@@ -97,7 +97,7 @@ namespace vinecopulib
     //!      parameter, the main dependence parameter is found by inverting the 
     //!      Kendall's tau and the remainders by a profile likelihood optimization.
     //! @return A pointer to an object that inherits from \c Bicop.
-    BicopPtr Bicop::select(const MatXd& data,
+    BicopPtr Bicop::select(const MatrixXd& data,
                            std::vector<int> family_set,
                            std::string method,
                            std::string selection_criterion,
@@ -233,9 +233,9 @@ namespace vinecopulib
     //!
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     //! @return The copula density evaluated at \c u.
-    VecXd Bicop::pdf(const MatXd& u)
+    VectorXd Bicop::pdf(const MatrixXd& u)
     {
-        VecXd f = pdf_default(cut_and_rotate(u));
+        VectorXd f = pdf_default(cut_and_rotate(u));
         f = f.unaryExpr([](const double x){ return std::min(x,1e16);});
         return f;
     }
@@ -257,7 +257,7 @@ namespace vinecopulib
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     //! @return The (inverse) h-function evaluated at \c u.
     //! @{
-    VecXd Bicop::hfunc1(const MatXd& u)
+    VectorXd Bicop::hfunc1(const MatrixXd& u)
     {
         switch (rotation_) {
             case 0:
@@ -279,7 +279,7 @@ namespace vinecopulib
         }
     }
 
-    VecXd Bicop::hfunc2(const MatXd& u)
+    VectorXd Bicop::hfunc2(const MatrixXd& u)
     {
         switch (rotation_) {
             case 0:
@@ -301,7 +301,7 @@ namespace vinecopulib
         }
     }
 
-    VecXd Bicop::hinv1(const MatXd& u)
+    VectorXd Bicop::hinv1(const MatrixXd& u)
     {
         switch (rotation_) {
             case 0:
@@ -323,7 +323,7 @@ namespace vinecopulib
         }
     }
 
-    VecXd Bicop::hinv2(const MatXd& u)
+    VectorXd Bicop::hinv2(const MatrixXd& u)
     {
         switch (rotation_) {
             case 0:
@@ -351,9 +351,9 @@ namespace vinecopulib
     //!
     //! @param n number of observations.
     //! @return Samples from the copula model.
-    MatXd Bicop::simulate(const int& n)
+    MatrixXd Bicop::simulate(const int& n)
     {
-        MatXd U = simulate_uniform(n, 2);
+        MatrixXd U = simulate_uniform(n, 2);
         // use inverse Rosenblatt transform to generate a sample from the copula
         U.col(1) = hinv1(U);
         return U;
@@ -363,19 +363,19 @@ namespace vinecopulib
     //!
     //! @param u \f$m \times 2\f$ matrix of observations.
     //! @{
-    double Bicop::loglik(const MatXd& u)
+    double Bicop::loglik(const MatrixXd& u)
     {
-        VecXd ll = this->pdf(u);
+        VectorXd ll = this->pdf(u);
         ll = ll.array().log();
         return ll.sum();
     }
 
-    double Bicop::aic(const MatXd& u)
+    double Bicop::aic(const MatrixXd& u)
     {
         return -2 * this->loglik(u) + 2 * calculate_npars();
     }
 
-    double Bicop::bic(const MatXd& u)
+    double Bicop::bic(const MatrixXd& u)
     {
         return -2 * this->loglik(u) + this->calculate_npars() * log(u.rows());
     }
@@ -390,7 +390,7 @@ namespace vinecopulib
         return 999.0;
     }
 
-    VecXd Bicop::tau_to_parameters(const double& tau)
+    VectorXd Bicop::tau_to_parameters(const double& tau)
     {
         throw std::runtime_error("Method not implemented for this family");
     }
@@ -401,8 +401,8 @@ namespace vinecopulib
     int Bicop::get_family() const {return family_;}
     int Bicop::get_rotation() const {return rotation_;}
     std::string Bicop::get_association_direction() const {return association_direction_;}
-    VecXd Bicop::get_parameters() const {return parameters_;}
-    MatXd Bicop::get_parameters_bounds() const {return parameters_bounds_;}
+    VectorXd Bicop::get_parameters() const {return parameters_;}
+    MatrixXd Bicop::get_parameters_bounds() const {return parameters_bounds_;}
 
     void Bicop::set_rotation(const int& rotation) {
         check_rotation(rotation);
@@ -420,7 +420,7 @@ namespace vinecopulib
         }
     }
 
-    void Bicop::set_parameters(const VecXd& parameters)
+    void Bicop::set_parameters(const VectorXd& parameters)
     {
         check_parameters(parameters);
         parameters_ = parameters;
@@ -435,20 +435,20 @@ namespace vinecopulib
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     //! @return The numerical inverse of h-functions.
     //! @{
-    VecXd Bicop::hinv1_num(const MatXd &u)
+    VectorXd Bicop::hinv1_num(const MatrixXd &u)
     {
-        MatXd u_new = u;
-        auto h1 = [&](const VecXd &v) {
+        MatrixXd u_new = u;
+        auto h1 = [&](const VectorXd &v) {
             u_new.col(1) = v;
             return hfunc1_default(u_new);
         };
         return invert_f(u.col(1), h1);
     }
 
-    VecXd Bicop::hinv2_num(const MatXd &u)
+    VectorXd Bicop::hinv2_num(const MatrixXd &u)
     {
-        MatXd u_new = u;
-        auto h1 = [&](const VecXd &x) {
+        MatrixXd u_new = u;
+        auto h1 = [&](const VectorXd &x) {
             u_new.col(0) = x;
             return hfunc2_default(u_new);
         };
@@ -462,9 +462,9 @@ namespace vinecopulib
     //! @param u \f$m \times 2\f$ matrix of data.
     //! @return The manipulated data.
     //! @{
-    MatXd Bicop::cut_and_rotate(const MatXd& u)
+    MatrixXd Bicop::cut_and_rotate(const MatrixXd& u)
     {
-        MatXd u_new(u.rows(), 2);
+        MatrixXd u_new(u.rows(), 2);
 
         // counter-clockwise rotations
         switch (rotation_) {
@@ -489,7 +489,7 @@ namespace vinecopulib
         }
 
         // truncate to interval [eps, 1 - eps]
-        MatXd eps = MatXd::Constant(u.rows(), 2, 1-10);
+        MatrixXd eps = MatrixXd::Constant(u.rows(), 2, 1-10);
         u_new = u_new.array().min(1.0 - eps.array());
         u_new = u_new.array().max(eps.array());
 
@@ -497,9 +497,9 @@ namespace vinecopulib
     }
 
 
-    MatXd Bicop::swap_cols(const MatXd& u)
+    MatrixXd Bicop::swap_cols(const MatrixXd& u)
     {
-        MatXd u_swapped = u;
+        MatrixXd u_swapped = u;
         u_swapped.col(0).swap(u_swapped.col(1));
         return u_swapped;
     }
@@ -507,7 +507,7 @@ namespace vinecopulib
 
     //! Sanity checks
     //! @{
-    void Bicop::check_parameters(const VecXd& parameters)
+    void Bicop::check_parameters(const VectorXd& parameters)
     {
         int num_pars = parameters_bounds_.rows();
 

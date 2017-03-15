@@ -29,7 +29,7 @@ void FakeParBicopTest::set_family(int family, int rotation)
         }
     }
 }
-void FakeParBicopTest::set_parameters(VecXd parameters)
+void FakeParBicopTest::set_parameters(VectorXd parameters)
 {
     if (parameters.size() > 0)
     {

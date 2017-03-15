@@ -15,61 +15,61 @@ namespace vinecopulib
         family_name_ = "Gaussian";
         rotation_ = 0;
         association_direction_ = "both";
-        parameters_ = VecXd::Zero(1);
-        parameters_bounds_ = MatXd::Ones(1, 2);
+        parameters_ = VectorXd::Zero(1);
+        parameters_bounds_ = MatrixXd::Ones(1, 2);
         parameters_bounds_(0, 0) = -1;
     }
 
-    GaussianBicop::GaussianBicop(const VecXd& parameters)
+    GaussianBicop::GaussianBicop(const VectorXd& parameters)
     {
         GaussianBicop();
         set_parameters(parameters);
     }
 
-    GaussianBicop::GaussianBicop(const VecXd& parameters, const int& rotation)
+    GaussianBicop::GaussianBicop(const VectorXd& parameters, const int& rotation)
     {
         GaussianBicop();
         set_parameters(parameters);
         set_rotation(rotation);
     }
 
-    VecXd GaussianBicop::pdf_default(const MatXd& u)
+    VectorXd GaussianBicop::pdf_default(const MatrixXd& u)
     {
         // Inverse Cholesky of the correlation matrix
         double rho = double(this->parameters_(0));
-        MatXd L = MatXd::Zero(2,2);
+        MatrixXd L = MatrixXd::Zero(2,2);
         L(0,0) = 1;
         L(1,1) = 1/sqrt(1.0-pow(rho,2.0));
         L(0,1) = -rho*L(1,1);
 
         // Compute copula density
-        VecXd f = VecXd::Ones(u.rows());
-        MatXd tmp = qnorm(u);
+        VectorXd f = VectorXd::Ones(u.rows());
+        MatrixXd tmp = qnorm(u);
         f = f.cwiseQuotient(dnorm(tmp).rowwise().prod());
         tmp = tmp*L;
         f = f.cwiseProduct(dnorm(tmp).rowwise().prod());
         return f / sqrt(1.0-pow(rho,2.0));
     }
 
-    VecXd GaussianBicop::hfunc1_default(const MatXd& u)
+    VectorXd GaussianBicop::hfunc1_default(const MatrixXd& u)
     {
         double rho = double(this->parameters_(0));
-        VecXd h = VecXd::Zero(u.rows());
-        MatXd tmp = qnorm(u);
+        VectorXd h = VectorXd::Zero(u.rows());
+        MatrixXd tmp = qnorm(u);
         h = (tmp.col(1) - rho * tmp.col(0)) / sqrt(1.0 - pow(rho, 2.0));
         return pnorm(h);
     }
 
-    VecXd GaussianBicop::hinv1_default(const MatXd& u)
+    VectorXd GaussianBicop::hinv1_default(const MatrixXd& u)
     {
         double rho = double(this->parameters_(0));
-        VecXd hinv = VecXd::Zero(u.rows());
-        MatXd tmp = qnorm(u);
+        VectorXd hinv = VectorXd::Zero(u.rows());
+        MatrixXd tmp = qnorm(u);
         hinv = tmp.col(1) * sqrt(1.0 - pow(rho, 2.0)) + rho * tmp.col(0);
         return pnorm(hinv);
     }
 
-    VecXd GaussianBicop::get_start_parameters(const double tau)
+    VectorXd GaussianBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
     }

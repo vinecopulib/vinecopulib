@@ -16,13 +16,13 @@ namespace vinecopulib
         association_direction_ = "none";
     }
 
-    IndepBicop::IndepBicop(const VecXd& parameters)
+    IndepBicop::IndepBicop(const VectorXd& parameters)
     {
         IndepBicop();
         set_parameters(parameters);
     }
 
-    IndepBicop::IndepBicop(const VecXd& parameters, const int& rotation)
+    IndepBicop::IndepBicop(const VectorXd& parameters, const int& rotation)
     {
         IndepBicop();
         set_parameters(parameters);
@@ -30,44 +30,44 @@ namespace vinecopulib
     }
 
 // PDF
-    VecXd IndepBicop::pdf_default(const MatXd& u)
+    VectorXd IndepBicop::pdf_default(const MatrixXd& u)
     {
-        return VecXd::Ones(u.rows());
+        return VectorXd::Ones(u.rows());
     }
 
 // hfunctions: the conditioning variable is put second
-    VecXd IndepBicop::hfunc1_default(const MatXd& u)
+    VectorXd IndepBicop::hfunc1_default(const MatrixXd& u)
     {
         return u.col(1);
     }
 
-    VecXd IndepBicop::hfunc2_default(const MatXd& u)
+    VectorXd IndepBicop::hfunc2_default(const MatrixXd& u)
     {
         return u.col(0);
     }
 
-    VecXd IndepBicop::hinv1_default(const MatXd& u)
+    VectorXd IndepBicop::hinv1_default(const MatrixXd& u)
     {
         return u.col(1);
     }
 
-    VecXd IndepBicop::hinv2_default(const MatXd& u)
+    VectorXd IndepBicop::hinv2_default(const MatrixXd& u)
     {
         return u.col(0);
     }
 
-    VecXd IndepBicop::tau_to_parameters(const double &)
+    VectorXd IndepBicop::tau_to_parameters(const double &)
     {
-        VecXd pars;
+        VectorXd pars;
         return pars;
     }
 
-    double IndepBicop::parameters_to_tau(const VecXd &)
+    double IndepBicop::parameters_to_tau(const VectorXd &)
     {
         return 0.0;
     }
 
-    VecXd IndepBicop::get_start_parameters(const double tau)
+    VectorXd IndepBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
     }

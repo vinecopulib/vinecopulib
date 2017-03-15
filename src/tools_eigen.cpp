@@ -24,14 +24,15 @@ namespace vinecopulib
     //! guaranteeing an accuracy of 0.5^35 ~= 6e-11).
     //!
     //! @return f^{-1}(x).
-    VecXd invert_f(const VecXd& x, std::function<VecXd(const VecXd&)> f, const double lb, const double ub, int n_iter)
+    VectorXd invert_f(const VectorXd& x, std::function<VectorXd(const VectorXd&)> f,
+                      const double lb, const double ub, int n_iter)
     {
-        VecXd xl = VecXd::Constant(x.size(), lb);
-        VecXd xh = VecXd::Constant(x.size(), ub);
-        VecXd x_tmp = x;
+        VectorXd xl = VectorXd::Constant(x.size(), lb);
+        VectorXd xh = VectorXd::Constant(x.size(), ub);
+        VectorXd x_tmp = x;
         for (int iter = 0; iter < n_iter; ++iter) {
             x_tmp = (xh + xl) / 2.0;
-            VecXd fm = f(x_tmp) - x;
+            VectorXd fm = f(x_tmp) - x;
             xl = (fm.array() < 0).select(x_tmp, xl);
             xh = (fm.array() < 0).select(xh, x_tmp);
         }
@@ -39,14 +40,14 @@ namespace vinecopulib
         return x_tmp;
     }
 
-    MatXi read_matxi(const char *filename, int max_buffer_size)
+    MatrixXi read_matxi(const char *filename, int max_buffer_size)
     {
-        MatXd temp = read_matxd(filename, max_buffer_size);
-        MatXi output = temp.cast <int> ();
+        MatrixXd temp = read_matxd(filename, max_buffer_size);
+        MatrixXi output = temp.cast <int> ();
         return output;
     }
 
-    MatXd read_matxd(const char *filename, int max_buffer_size)
+    MatrixXd read_matxd(const char *filename, int max_buffer_size)
     {
         using namespace std;
 
@@ -80,7 +81,7 @@ namespace vinecopulib
         rows--;
 
         // Populate matrix with numbers.
-        MatXd result(rows,cols);
+        MatrixXd result(rows,cols);
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < cols; j++)
                 result(i,j) = buff[ cols*i+j ];

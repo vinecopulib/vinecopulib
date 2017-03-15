@@ -26,7 +26,7 @@ namespace tools_structselect {
     //!
     //!  @param data nxd matrix of copula data.
     //!  @return A VineTree object containing the base graph.
-    VineTree make_base_tree(const vinecopulib::MatXd& data)
+    VineTree make_base_tree(const Eigen::MatrixXd& data)
     {
         int d = data.cols();
         VineTree base_tree(d);
@@ -177,9 +177,9 @@ namespace tools_structselect {
     // @param tree a vine tree.
     // @return The pseudo-observations for the pair coula, extracted from
     //     the h-functions calculated in the previous tree.
-    vinecopulib::MatXd get_pc_data(int v0, int v1, const VineTree& tree)
+    Eigen::MatrixXd get_pc_data(int v0, int v1, const VineTree& tree)
     {
-        vinecopulib::MatXd pc_data(tree[v0].hfunc1.size(), 2);
+        Eigen::MatrixXd pc_data(tree[v0].hfunc1.size(), 2);
         int ei_common = find_common_neighbor(v0, v1, tree);
         if (find_position(ei_common, tree[v0].prev_edge_indices) == 0) {
             pc_data.col(0) = tree[v0].hfunc1;
@@ -243,9 +243,9 @@ namespace tools_structselect {
     void remove_edge_data(VineTree& tree)
     {
         for (auto e : boost::edges(tree)) {
-            tree[e].hfunc1 = vinecopulib::VecXd();
-            tree[e].hfunc2 = vinecopulib::VecXd();
-            tree[e].pc_data = vinecopulib::MatXd(0, 0);
+            tree[e].hfunc1 = Eigen::VectorXd();
+            tree[e].hfunc2 = Eigen::VectorXd();
+            tree[e].pc_data = Eigen::MatrixXd(0, 0);
         }
     }
 
@@ -254,8 +254,8 @@ namespace tools_structselect {
     void remove_vertex_data(VineTree& tree)
     {
         for (auto v : boost::vertices(tree)) {
-            tree[v].hfunc1 = vinecopulib::VecXd();
-            tree[v].hfunc2 = vinecopulib::VecXd();
+            tree[v].hfunc1 = Eigen::VectorXd();
+            tree[v].hfunc2 = Eigen::VectorXd();
         }
     }
 
@@ -301,7 +301,7 @@ namespace tools_structselect {
     vinecopulib::Vinecop as_vinecop(std::vector<VineTree>& trees)
     {
         int d = trees.size();
-        vinecopulib::MatXi mat = vinecopulib::MatXi::Constant(d, d, 0);
+        Eigen::MatrixXi mat = Eigen::MatrixXi::Constant(d, d, 0);
         auto pcs = vinecopulib::Vinecop::make_pair_copula_store(d);
 
         for (int col = 0; col < d - 1; ++col) {
@@ -356,7 +356,7 @@ namespace tools_structselect {
 
         // change to user-facing format
         // (variable index starting at 1 instead of 0)
-        vinecopulib::MatXi new_mat = mat;
+        Eigen::MatrixXi new_mat = mat;
         for (int i = 0; i < d; ++i)
             for (int j = 0; j < d - i; ++j)
                 new_mat(i, j) += 1;

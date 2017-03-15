@@ -15,26 +15,26 @@ namespace vinecopulib
         family_name_ = "Bb8";
         rotation_ = 0;
         association_direction_ = "positive";
-        parameters_ = VecXd::Ones(2);
-        parameters_bounds_ = MatXd::Constant(2, 2, 1);
+        parameters_ = VectorXd::Ones(2);
+        parameters_bounds_ = MatrixXd::Constant(2, 2, 1);
         parameters_bounds_(0, 1) = 200.0;
         parameters_bounds_(1, 0) = 0.0;
     }
 
-    Bb8Bicop::Bb8Bicop(const VecXd& parameters)
+    Bb8Bicop::Bb8Bicop(const VectorXd& parameters)
     {
         Bb8Bicop();
         set_parameters(parameters);
     }
 
-    Bb8Bicop::Bb8Bicop(const VecXd& parameters, const int& rotation)
+    Bb8Bicop::Bb8Bicop(const VectorXd& parameters, const int& rotation)
     {
         Bb8Bicop();
         set_parameters(parameters);
         set_rotation(rotation);
     }
 
-    VecXd Bb8Bicop::generator(const VecXd& u)
+    VectorXd Bb8Bicop::generator(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -44,7 +44,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd Bb8Bicop::generator_inv(const VecXd& u)
+    VectorXd Bb8Bicop::generator_inv(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -54,7 +54,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd Bb8Bicop::generator_derivative(const VecXd& u)
+    VectorXd Bb8Bicop::generator_derivative(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -64,7 +64,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd Bb8Bicop::generator_derivative2(const VecXd& u)
+    VectorXd Bb8Bicop::generator_derivative2(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -75,7 +75,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    double Bb8Bicop::parameters_to_tau(const VecXd& parameters)
+    double Bb8Bicop::parameters_to_tau(const VectorXd& parameters)
     {
         double theta = parameters(0);
         double delta = parameters(1);

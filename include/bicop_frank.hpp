@@ -15,20 +15,20 @@ namespace vinecopulib
     public:
         // constructor
         FrankBicop();
-        FrankBicop(const VecXd& parameters);
-        FrankBicop(const VecXd& parameters, const int& rotation);
+        FrankBicop(const VectorXd& parameters);
+        FrankBicop(const VectorXd& parameters, const int& rotation);
 
         // generator, its inverse and derivatives for the archimedean copula
-        VecXd generator(const VecXd& u);
-        VecXd generator_inv(const VecXd& u);
-        VecXd generator_derivative(const VecXd& u);
-        VecXd generator_derivative2(const VecXd& u);
+        VectorXd generator(const VectorXd& u);
+        VectorXd generator_inv(const VectorXd& u);
+        VectorXd generator_derivative(const VectorXd& u);
+        VectorXd generator_derivative2(const VectorXd& u);
 
         // link between Kendall's tau and the par_bicop parameter
-        VecXd tau_to_parameters(const double& tau);
-        double parameters_to_tau(const VecXd& par);
+        VectorXd tau_to_parameters(const double& tau);
+        double parameters_to_tau(const VectorXd& par);
 
     private:
-        VecXd get_start_parameters(const double tau);
+        VectorXd get_start_parameters(const double tau);
     };
 }

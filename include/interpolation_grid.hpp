@@ -17,28 +17,28 @@ namespace vinecopulib
     class InterpolationGrid {
     public:
         InterpolationGrid() {}
-        InterpolationGrid(const VecXd& grid_points, const MatXd& values);
+        InterpolationGrid(const VectorXd& grid_points, const MatrixXd& values);
 
         void flip();
 
-        VecXd interpolate(const MatXd& x);
-        VecXd intergrate_1d(const MatXd& u, const int& cond_var);
-        VecXd inv_intergrate_1d(const MatXd& u, const int& cond_var);
+        VectorXd interpolate(const MatrixXd& x);
+        VectorXd intergrate_1d(const MatrixXd& u, const int& cond_var);
+        VectorXd inv_intergrate_1d(const MatrixXd& u, const int& cond_var);
 
     private:
         // Utility functions for spline Interpolation
-        double cubic_poly(const double& x, const VecXd& a);
-        double cubic_indef_integral(const double& x, const VecXd& a);
-        double cubic_integral(const double& lower, const double& upper, const VecXd& a);
-        double inv_cubic_integral(const double& q, const VecXd& a);
-        VecXd find_coefs(const VecXd& vals, const VecXd& grid);
-        double interp_on_grid(const double& x, const VecXd& vals, const VecXd& grid);
+        double cubic_poly(const double& x, const VectorXd& a);
+        double cubic_indef_integral(const double& x, const VectorXd& a);
+        double cubic_integral(const double& lower, const double& upper, const VectorXd& a);
+        double inv_cubic_integral(const double& q, const VectorXd& a);
+        VectorXd find_coefs(const VectorXd& vals, const VectorXd& grid);
+        double interp_on_grid(const double& x, const VectorXd& vals, const VectorXd& grid);
 
         // Utility functions for integration
-        double int_on_grid(const double& upr, const VecXd& vals, const VecXd& grid);
-        double inv_int_on_grid(const double& qq, const VecXd& vals, const VecXd& grid);
+        double int_on_grid(const double& upr, const VectorXd& vals, const VectorXd& grid);
+        double inv_int_on_grid(const double& qq, const VectorXd& vals, const VectorXd& grid);
 
-        VecXd grid_points_;
-        MatXd values_;
+        VectorXd grid_points_;
+        MatrixXd values_;
     };
 }

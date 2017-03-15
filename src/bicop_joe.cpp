@@ -15,25 +15,25 @@ namespace vinecopulib
         family_name_ = "Joe";
         rotation_ = 0;
         association_direction_ = "positive";
-        parameters_ = VecXd::Ones(1);
-        parameters_bounds_ = MatXd::Ones(1, 2);
+        parameters_ = VectorXd::Ones(1);
+        parameters_bounds_ = MatrixXd::Ones(1, 2);
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    JoeBicop::JoeBicop(const VecXd& parameters)
+    JoeBicop::JoeBicop(const VectorXd& parameters)
     {
         JoeBicop();
         set_parameters(parameters);
     }
 
-    JoeBicop::JoeBicop(const VecXd& parameters, const int& rotation)
+    JoeBicop::JoeBicop(const VectorXd& parameters, const int& rotation)
     {
         JoeBicop();
         set_parameters(parameters);
         set_rotation(rotation);
     }
 
-    VecXd JoeBicop::generator(const VecXd& u)
+    VectorXd JoeBicop::generator(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -42,7 +42,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd JoeBicop::generator_inv(const VecXd& u)
+    VectorXd JoeBicop::generator_inv(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -51,7 +51,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd JoeBicop::generator_derivative(const VecXd& u)
+    VectorXd JoeBicop::generator_derivative(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -60,7 +60,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd JoeBicop::generator_derivative2(const VecXd& u)
+    VectorXd JoeBicop::generator_derivative2(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -70,11 +70,11 @@ namespace vinecopulib
     }
 
     // inverse h-function
-    VecXd JoeBicop::hinv1_default(const MatXd& u)
+    VectorXd JoeBicop::hinv1_default(const MatrixXd& u)
     {
         double theta = double(this->parameters_(0));
         double u1, u2;
-        VecXd hinv = VecXd::Zero(u.rows());
+        VectorXd hinv = VectorXd::Zero(u.rows());
         for (int j = 0; j < u.rows(); ++j) {
             u1 = u(j, 1);
             u2 = u(j, 0);
@@ -85,16 +85,16 @@ namespace vinecopulib
     }
 
     // link between Kendall's tau and the par_bicop parameter
-    VecXd JoeBicop::tau_to_parameters(const double& tau)
+    VectorXd JoeBicop::tau_to_parameters(const double& tau)
     {
-        VecXd tau2 = VecXd::Constant(1, std::fabs(tau));
-        auto f = [&](const VecXd &v) {
-            return VecXd::Constant(1, std::fabs(parameters_to_tau(v)));
+        VectorXd tau2 = VectorXd::Constant(1, std::fabs(tau));
+        auto f = [&](const VectorXd &v) {
+            return VectorXd::Constant(1, std::fabs(parameters_to_tau(v)));
         };
         return invert_f(tau2, f, 1+1e-6, 100);
     }
 
-    double JoeBicop::parameters_to_tau(const VecXd& parameters)
+    double JoeBicop::parameters_to_tau(const VectorXd& parameters)
     {
         double par = parameters(0);
         double tau = 2 / par + 1;
@@ -105,7 +105,7 @@ namespace vinecopulib
         return tau;
     }
 
-    VecXd JoeBicop::get_start_parameters(const double tau)
+    VectorXd JoeBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
     }
@@ -165,15 +165,15 @@ double qcondjoe(double* q, double* u, double* de)
 }
 
 /*// PDF
-VecXd JoeBicop::pdf_default(const MatXd& u)
+VectorXd JoeBicop::pdf_default(const MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
 
-    VecXd f = VecXd::Ones(u.rows());
+    VectorXd f = VectorXd::Ones(u.rows());
     if (theta > 1+1e-6)
     {
-        MatXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
-        VecXd t1 = t.rowwise().prod();
+        MatrixXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
+        VectorXd t1 = t.rowwise().prod();
         f = t1.unaryExpr([theta](const double v){ return theta-v;});
 
         t1 = t1.unaryExpr([theta](const double v){ return std::pow(1-v,-2+1/theta);});
@@ -187,12 +187,12 @@ VecXd JoeBicop::pdf_default(const MatXd& u)
 }
 
 // hfunction
-VecXd JoeBicop::hfunc1_default(const MatXd& u)
+VectorXd JoeBicop::hfunc1_default(const MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
-    MatXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
-    VecXd t1 = t.rowwise().prod();
-    VecXd f = t1.unaryExpr([theta](const double v){ return std::pow(1-v,-1+1/theta);});
+    MatrixXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
+    VectorXd t1 = t.rowwise().prod();
+    VectorXd f = t1.unaryExpr([theta](const double v){ return std::pow(1-v,-1+1/theta);});
 
     t1 = u.col(0).unaryExpr([theta](const double v){ return std::pow(1-v,-1+theta);});
     f = f.cwiseProduct(t1);

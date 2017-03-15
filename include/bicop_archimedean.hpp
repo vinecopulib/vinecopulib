@@ -14,22 +14,22 @@ namespace vinecopulib
 
     public:
         // pdf, hfunctions and inverses
-        VecXd pdf_default(const MatXd& u);
-        VecXd hfunc1_default(const MatXd& u);
-        VecXd hfunc2_default(const MatXd& u);
-        VecXd hinv1_default(const MatXd& u);
-        VecXd hinv2_default(const MatXd& u);
+        VectorXd pdf_default(const MatrixXd& u);
+        VectorXd hfunc1_default(const MatrixXd& u);
+        VectorXd hfunc2_default(const MatrixXd& u);
+        VectorXd hinv1_default(const MatrixXd& u);
+        VectorXd hinv2_default(const MatrixXd& u);
 
         // generator, its inverse and derivatives
-        virtual VecXd generator(const VecXd& u) = 0;
-        virtual VecXd generator_inv(const VecXd& u) = 0;
-        virtual VecXd generator_derivative(const VecXd& u) = 0;
-        virtual VecXd generator_derivative2(const VecXd& u) = 0;
+        virtual VectorXd generator(const VectorXd& u) = 0;
+        virtual VectorXd generator_inv(const VectorXd& u) = 0;
+        virtual VectorXd generator_derivative(const VectorXd& u) = 0;
+        virtual VectorXd generator_derivative2(const VectorXd& u) = 0;
 
         void flip();
 
     private:
-        VecXd get_start_parameters(const double tau);
+        VectorXd get_start_parameters(const double tau);
     };
 }
 

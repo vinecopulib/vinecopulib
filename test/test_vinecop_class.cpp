@@ -17,7 +17,7 @@ namespace {
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
+                pc = Bicop::create(3, VectorXd::Constant(1, 3.0), 90);
             }
         }
 
@@ -29,7 +29,7 @@ namespace {
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(3, VecXd::Constant(1, 3.0), 270);
+                pc = Bicop::create(3, VectorXd::Constant(1, 3.0), 270);
             }
         }
         Vinecop vinecop(pair_copulas, model_matrix);
@@ -42,7 +42,7 @@ namespace {
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(3, VecXd::Constant(1, 3.0), 270);
+                pc = Bicop::create(3, VectorXd::Constant(1, 3.0), 270);
             }
         }
         Vinecop vinecop(pair_copulas, model_matrix);

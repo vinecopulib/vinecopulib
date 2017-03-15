@@ -25,16 +25,16 @@ namespace tools_structselect {
         std::vector<int> conditioning;
         std::vector<int> conditioned;
         std::vector<int> prev_edge_indices;
-        vinecopulib::VecXd hfunc1;
-        vinecopulib::VecXd hfunc2;
+        Eigen::VectorXd hfunc1;
+        Eigen::VectorXd hfunc2;
     };
     struct EdgeProperties {
         std::vector<int> conditioning;
         std::vector<int> conditioned;
         std::vector<int> all_indices;
-        vinecopulib::MatXd pc_data;
-        vinecopulib::VecXd hfunc1;
-        vinecopulib::VecXd hfunc2;
+        Eigen::MatrixXd pc_data;
+        Eigen::VectorXd hfunc1;
+        Eigen::VectorXd hfunc2;
         double empirical_tau;
         vinecopulib::BicopPtr pair_copula;
     };
@@ -48,7 +48,7 @@ namespace tools_structselect {
 
 
     // functions for manipulation of trees ----------------
-    VineTree make_base_tree(const vinecopulib::MatXd& data);
+    VineTree make_base_tree(const Eigen::MatrixXd& data);
     VineTree select_next_tree(
         VineTree& prev_tree,
         std::vector<int> family_set,
@@ -59,7 +59,7 @@ namespace tools_structselect {
     VineTree edges_as_vertices(const VineTree& prev_tree);
     void add_allowed_edges(VineTree& tree);
     int find_common_neighbor(int v0, int v1, const VineTree& tree);
-    vinecopulib::MatXd get_pc_data(int v0, int v1, const VineTree& tree);
+    Eigen::MatrixXd get_pc_data(int v0, int v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);
     void add_edge_info(VineTree& tree);
     void remove_edge_data(VineTree& tree);

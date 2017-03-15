@@ -16,7 +16,7 @@ using namespace vinecopulib;
 class FakeParBicopTest : public ::testing::Test {
 public:
     void set_family(int family, int rotation);
-    void set_parameters(VecXd parameters);
+    void set_parameters(VectorXd parameters);
     void set_n(int n);
     int get_n();
     int get_family();
@@ -41,7 +41,7 @@ public:
         this->set_family(family, rotation);
         this->set_n(n);
 
-        VecXd parameters = this->par_bicop_.get_parameters();
+        VectorXd parameters = this->par_bicop_.get_parameters();
         if (parameters.size() < 2)
         {
             parameters = this->par_bicop_.tau_to_parameters(tau);
@@ -65,11 +65,11 @@ public:
                 {
                     delta = 0.8;
                 }
-                VecXd tau_v = vinecopulib::VecXd::Constant(1,std::fabs(tau));
-                auto f = [this, delta](const VecXd &v) {
-                    VecXd par = vinecopulib::VecXd::Constant(2, delta);
+                VectorXd tau_v = Eigen::VectorXd::Constant(1,std::fabs(tau));
+                auto f = [this, delta](const VectorXd &v) {
+                    VectorXd par = Eigen::VectorXd::Constant(2, delta);
                     par(0) = v(0);
-                    return VecXd::Constant(1, std::fabs(this->par_bicop_.parameters_to_tau(par)));
+                    return VectorXd::Constant(1, std::fabs(this->par_bicop_.parameters_to_tau(par)));
                 };
                 parameters(0) = invert_f(tau_v, f, 1+1e-6, 100)(0);
                 parameters(1) = delta;

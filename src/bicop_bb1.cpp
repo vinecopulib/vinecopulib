@@ -15,27 +15,27 @@ namespace vinecopulib
         family_name_ = "Bb1";
         rotation_ = 0;
         association_direction_ = "positive";
-        parameters_ = VecXd::Zero(2);
+        parameters_ = VectorXd::Zero(2);
         parameters_(1) = 1;
-        parameters_bounds_ = MatXd::Constant(2, 2, 200);
+        parameters_bounds_ = MatrixXd::Constant(2, 2, 200);
         parameters_bounds_(0, 0) = 0.0;
         parameters_bounds_(1, 0) = 1.0;
     }
 
-    Bb1Bicop::Bb1Bicop(const VecXd& parameters)
+    Bb1Bicop::Bb1Bicop(const VectorXd& parameters)
     {
         Bb1Bicop();
         set_parameters(parameters);
     }
 
-    Bb1Bicop::Bb1Bicop(const VecXd& parameters, const int& rotation)
+    Bb1Bicop::Bb1Bicop(const VectorXd& parameters, const int& rotation)
     {
         Bb1Bicop();
         set_parameters(parameters);
         set_rotation(rotation);
     }
 
-    VecXd Bb1Bicop::generator(const VecXd& u)
+    VectorXd Bb1Bicop::generator(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -45,7 +45,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd Bb1Bicop::generator_inv(const VecXd& u)
+    VectorXd Bb1Bicop::generator_inv(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -55,7 +55,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd Bb1Bicop::generator_derivative(const VecXd& u)
+    VectorXd Bb1Bicop::generator_derivative(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -65,7 +65,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd Bb1Bicop::generator_derivative2(const VecXd& u)
+    VectorXd Bb1Bicop::generator_derivative2(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
@@ -76,7 +76,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    double Bb1Bicop::parameters_to_tau(const VecXd& parameters)
+    double Bb1Bicop::parameters_to_tau(const VectorXd& parameters)
     {
         double tau = 1-2/(parameters(1) * (parameters(0) + 2));
         if ((rotation_ == 90) | (rotation_ == 270))
@@ -86,17 +86,17 @@ namespace vinecopulib
 }
 
 /*// PDF
-VecXd Bb1Bicop::pdf_default(const MatXd& u)
+VectorXd Bb1Bicop::pdf_default(const MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
     double delta = double(this->parameters_(1));
 
-    VecXd f = VecXd::Ones(u.rows());
+    VectorXd f = VectorXd::Ones(u.rows());
     if (theta > 1e-6 || delta > 1+1e-6)
     {
-        VecXd t1 = generator(u.col(0));
-        VecXd t2 = generator(u.col(1));
-        VecXd ones = f;
+        VectorXd t1 = generator(u.col(0));
+        VectorXd t2 = generator(u.col(1));
+        VectorXd ones = f;
         f = t1.cwiseProduct(t2);
         t1 = t1 + t2;
         t2 = t1.array().pow(1/delta);
@@ -120,14 +120,14 @@ VecXd Bb1Bicop::pdf_default(const MatXd& u)
 }
 
 // hfunction
-VecXd Bb1Bicop::hfunc1_default(const MatXd& u)
+VectorXd Bb1Bicop::hfunc1_default(const MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
     double delta = double(this->parameters_(1));
-    VecXd t1 = generator(u.col(0));
-    VecXd t2 = generator(u.col(1));
-    VecXd ones = VecXd::Ones(u.rows());
-    VecXd f = ones;
+    VectorXd t1 = generator(u.col(0));
+    VectorXd t2 = generator(u.col(1));
+    VectorXd ones = VectorXd::Ones(u.rows());
+    VectorXd f = ones;
     t1 = t1 + t2;
     t2 = t1.array().pow(1/delta);
 

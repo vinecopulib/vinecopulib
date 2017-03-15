@@ -11,7 +11,7 @@ using namespace vinecopulib;
 
 namespace {
     TEST(rvine_matrix, can_convert_to_natural_order) {
-        MatXi mat(7, 7);
+        MatrixXi mat(7, 7);
         mat << 5, 2, 6, 6, 6, 6, 6,
                6, 6, 1, 2, 5, 5, 0,
                2, 5, 2, 5, 2, 0, 0,
@@ -19,7 +19,7 @@ namespace {
                3, 7, 7, 0, 0, 0, 0,
                7, 3, 0, 0, 0, 0, 0,
                4, 0, 0, 0, 0, 0, 0;
-        MatXi true_no_matrix(7, 7);
+        MatrixXi true_no_matrix(7, 7);
         true_no_matrix << 2, 3, 1, 1, 1, 1, 1,
                           1, 1, 4, 3, 2, 2, 0,
                           3, 2, 3, 2, 3, 0, 0,
@@ -32,7 +32,7 @@ namespace {
     }
 
     TEST(rvine_matrix, max_mat_is_correct) {
-        MatXi mat(7, 7);
+        MatrixXi mat(7, 7);
         mat << 5, 2, 6, 6, 6, 6, 6,
                6, 6, 1, 2, 5, 5, 0,
                2, 5, 2, 5, 2, 0, 0,
@@ -40,7 +40,7 @@ namespace {
                3, 7, 7, 0, 0, 0, 0,
                7, 3, 0, 0, 0, 0, 0,
                4, 0, 0, 0, 0, 0, 0;
-        MatXi true_max_matrix(7, 7);
+        MatrixXi true_max_matrix(7, 7);
         true_max_matrix << 2, 3, 1, 1, 1, 1, 1,
                            2, 3, 4, 3, 2, 2, 0,
                            3, 3, 4, 3, 3, 0, 0,
@@ -53,7 +53,7 @@ namespace {
     }
 
     TEST(rvine_matrix, needed_hfunc1_is_correct) {
-        MatXi mat(7, 7);
+        MatrixXi mat(7, 7);
         mat << 5, 2, 6, 6, 6, 6, 6,
                6, 6, 1, 2, 5, 5, 0,
                2, 5, 2, 5, 2, 0, 0,
@@ -61,7 +61,7 @@ namespace {
                3, 7, 7, 0, 0, 0, 0,
                7, 3, 0, 0, 0, 0, 0,
                4, 0, 0, 0, 0, 0, 0;
-        MatXb true_hfunc1(7, 7);
+        MatrixXb true_hfunc1(7, 7);
         true_hfunc1 << 0, 0, 0, 0, 0, 0, 0,
                        0, 0, 0, 0, 1, 1, 0,
                        0, 0, 0, 1, 1, 0, 0,
@@ -74,7 +74,7 @@ namespace {
     }
 
     TEST(rvine_matrix, needed_hfunc2_is_correct) {
-        MatXi mat(7, 7);
+        MatrixXi mat(7, 7);
         mat << 5, 2, 6, 6, 6, 6, 6,
                6, 6, 1, 2, 5, 5, 0,
                2, 5, 2, 5, 2, 0, 0,
@@ -82,7 +82,7 @@ namespace {
                3, 7, 7, 0, 0, 0, 0,
                7, 3, 0, 0, 0, 0, 0,
                4, 0, 0, 0, 0, 0, 0;
-        MatXb true_hfunc2(7, 7);
+        MatrixXb true_hfunc2(7, 7);
         true_hfunc2 << 1, 1, 1, 1, 1, 1, 0,
                        1, 1, 1, 1, 1, 1, 0,
                        1, 1, 1, 1, 1, 0, 0,
@@ -95,9 +95,9 @@ namespace {
     }
 
     TEST(rvine_matrix, construct_d_vine_matrix_is_correct) {
-        VecXi order(7);
+        VectorXi order(7);
         order << 7, 2, 3, 5, 1, 4, 6;
-        MatXi true_d_vine_matrix(7, 7);
+        MatrixXi true_d_vine_matrix(7, 7);
         true_d_vine_matrix << 4, 1, 5, 3, 2, 7, 7,
                               1, 5, 3, 2, 7, 2, 0,
                               5, 3, 2, 7, 3, 0, 0,

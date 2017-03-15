@@ -13,17 +13,17 @@ namespace vinecopulib
     class ParBicop : public Bicop {
     public:
         // fit copula parameters
-        void fit(const MatXd& data, std::string method);
+        void fit(const MatrixXd& data, std::string method);
 
         // link between Kendall's tau and the par_bicop parameter
-        virtual double parameters_to_tau(const VecXd& parameters) = 0;
+        virtual double parameters_to_tau(const VectorXd& parameters) = 0;
         double calculate_tau() {return this->parameters_to_tau(parameters_);}
 
         // number of parameters
         double calculate_npars();
 
     private:
-        virtual VecXd get_start_parameters(const double tau) = 0;
+        virtual VectorXd get_start_parameters(const double tau) = 0;
     };
 }
 

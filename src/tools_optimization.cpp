@@ -33,7 +33,7 @@ namespace tools_optimization {
         controls_.set_controls(&opt_);
     }
 
-    void Optimizer::set_bounds(vinecopulib::MatXd bounds)
+    void Optimizer::set_bounds(Eigen::MatrixXd bounds)
     {
         if (bounds.rows() != n_parameters_ || bounds.cols() != 2)
         {
@@ -42,9 +42,9 @@ namespace tools_optimization {
 
         std::vector<double> lb(n_parameters_);
         std::vector<double> ub(n_parameters_);
-        vinecopulib::VecXd eps = vinecopulib::VecXd::Constant(n_parameters_,1e-6);
-        vinecopulib::VecXd::Map(&lb[0], n_parameters_) = bounds.col(0)+eps;
-        vinecopulib::VecXd::Map(&ub[0], n_parameters_) = bounds.col(1)-eps;
+        Eigen::VectorXd eps = Eigen::VectorXd::Constant(n_parameters_,1e-6);
+        Eigen::VectorXd::Map(&lb[0], n_parameters_) = bounds.col(0)+eps;
+        Eigen::VectorXd::Map(&ub[0], n_parameters_) = bounds.col(1)-eps;
         opt_.set_lower_bounds(lb);
         opt_.set_upper_bounds(ub);
     }
@@ -128,7 +128,7 @@ namespace tools_optimization {
     {
         ParBicopOptData* newdata = (ParBicopOptData*) f_data;
         ++newdata->objective_calls;
-        vinecopulib::VecXd par = vinecopulib::VecXd::Ones(x.size()+1);
+        Eigen::VectorXd par = Eigen::VectorXd::Ones(x.size()+1);
         par(0) = newdata->par0;
         for (unsigned int i = 0; i < x.size(); ++i)
             par(i + 1) = x[i];
@@ -144,7 +144,7 @@ namespace tools_optimization {
     }
 
     // optimize the likelihood or profile likelihood
-    vinecopulib::VecXd Optimizer::optimize(vinecopulib::VecXd initial_parameters)
+    Eigen::VectorXd Optimizer::optimize(Eigen::VectorXd initial_parameters)
     {
         if (initial_parameters.size() != n_parameters_)
         {
@@ -153,7 +153,7 @@ namespace tools_optimization {
 
         double nll;
         std::vector<double> x(n_parameters_);
-        vinecopulib::VecXd::Map(&x[0], n_parameters_) = initial_parameters;
+        Eigen::VectorXd::Map(&x[0], n_parameters_) = initial_parameters;
         try
         {
             opt_.optimize(x, nll);

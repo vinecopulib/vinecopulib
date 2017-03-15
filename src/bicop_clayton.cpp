@@ -15,25 +15,25 @@ namespace vinecopulib
         family_name_ = "Clayton";
         rotation_ = 0;
         association_direction_ = "positive";
-        parameters_ = VecXd::Zero(1);
-        parameters_bounds_ = MatXd::Zero(1, 2);
+        parameters_ = VectorXd::Zero(1);
+        parameters_bounds_ = MatrixXd::Zero(1, 2);
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    ClaytonBicop::ClaytonBicop(const VecXd& parameters)
+    ClaytonBicop::ClaytonBicop(const VectorXd& parameters)
     {
         ClaytonBicop();
         set_parameters(parameters);
     }
 
-    ClaytonBicop::ClaytonBicop(const VecXd& parameters, const int& rotation)
+    ClaytonBicop::ClaytonBicop(const VectorXd& parameters, const int& rotation)
     {
         ClaytonBicop();
         set_parameters(parameters);
         set_rotation(rotation);
     }
 
-    VecXd ClaytonBicop::generator(const VecXd& u)
+    VectorXd ClaytonBicop::generator(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -41,7 +41,7 @@ namespace vinecopulib
         };
         return u.unaryExpr(f);
     }
-    VecXd ClaytonBicop::generator_inv(const VecXd& u)
+    VectorXd ClaytonBicop::generator_inv(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -50,7 +50,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd ClaytonBicop::generator_derivative(const VecXd& u)
+    VectorXd ClaytonBicop::generator_derivative(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -59,7 +59,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd ClaytonBicop::generator_derivative2(const VecXd& u)
+    VectorXd ClaytonBicop::generator_derivative2(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -68,16 +68,16 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd ClaytonBicop::hinv1_default(const MatXd& u)
+    VectorXd ClaytonBicop::hinv1_default(const MatrixXd& u)
     {
         double theta = double(this->parameters_(0));
-        VecXd hinv = u.col(0).array().pow(theta + 1.0);
+        VectorXd hinv = u.col(0).array().pow(theta + 1.0);
         if (theta < 75) {
             hinv = u.col(1).cwiseProduct(hinv);
             hinv = hinv.array().pow(-theta/(theta + 1.0));
-            VecXd x = u.col(0);
+            VectorXd x = u.col(0);
             x = x.array().pow(-theta);
-            hinv = hinv - x + VecXd::Ones(x.size());
+            hinv = hinv - x + VectorXd::Ones(x.size());
             hinv = hinv.array().pow(-1/theta);
         } else {
             hinv = hinv1_num(u);
@@ -85,14 +85,14 @@ namespace vinecopulib
         return hinv;
     }
 
-    VecXd ClaytonBicop::tau_to_parameters(const double& tau)
+    VectorXd ClaytonBicop::tau_to_parameters(const double& tau)
     {
-        VecXd parameters(1);
+        VectorXd parameters(1);
         parameters(0) = 2 * std::fabs(tau) / (1 - std::fabs(tau));
         return parameters;
     }
 
-    double ClaytonBicop::parameters_to_tau(const VecXd& parameters)
+    double ClaytonBicop::parameters_to_tau(const VectorXd& parameters)
     {
         double tau =  parameters(0) / (2 + std::fabs(parameters(0)));
         if ((rotation_ == 90) | (rotation_ == 270))
@@ -100,20 +100,20 @@ namespace vinecopulib
         return tau;
     }
 
-    VecXd ClaytonBicop::get_start_parameters(const double tau)
+    VectorXd ClaytonBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
     }
 }
 
 /*// PDF
-VecXd ClaytonBicop::pdf_default(const MatXd& u)
+VectorXd ClaytonBicop::pdf_default(const MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd t1 = generator(u.col(0));
-    VecXd t2 = generator(u.col(1));
-    VecXd t = t1+t2;
-    VecXd f = generator_inv(t);
+    VectorXd t1 = generator(u.col(0));
+    VectorXd t2 = generator(u.col(1));
+    VectorXd t = t1+t2;
+    VectorXd f = generator_inv(t);
 
     t1 = u.col(0).array().pow(theta);
     t2 = u.col(1).array().pow(theta);
@@ -128,13 +128,13 @@ VecXd ClaytonBicop::pdf_default(const MatXd& u)
 }
 
 // hfunction
-VecXd ClaytonBicop::hfunc1_default(const MatXd& u)
+VectorXd ClaytonBicop::hfunc1_default(const MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
-    VecXd t1 = generator(u.col(0));
-    VecXd t2 = generator(u.col(1));
-    VecXd t = t1+t2;
-    VecXd f = generator_inv(t);
+    VectorXd t1 = generator(u.col(0));
+    VectorXd t2 = generator(u.col(1));
+    VectorXd t = t1+t2;
+    VectorXd f = generator_inv(t);
     f = f.array().pow(1+theta);
 
     t2 = u.col(0).array().pow(-1-theta);

@@ -22,7 +22,7 @@ namespace vinecopulib
     }
 
     // fit
-    void ParBicop::fit(const MatXd &data, std::string method)
+    void ParBicop::fit(const MatrixXd &data, std::string method)
     {
         if (family_ != 0)
         {
@@ -44,9 +44,9 @@ namespace vinecopulib
                 }
             }
 
-            MatXd temp_data = data;
+            MatrixXd temp_data = data;
             double tau = pairwise_ktau(temp_data);
-            VecXd newpar = get_start_parameters(tau);
+            VectorXd newpar = get_start_parameters(tau);
 
             std::string association_direction = get_association_direction();
             if (((tau < 0) & (association_direction == "positive")) | ((tau > 0) & (association_direction == "negative")))
@@ -60,8 +60,8 @@ namespace vinecopulib
                 Optimizer optimizer(npars);
 
                 // Set bounds and starting values
-                MatXd bounds = get_parameters_bounds();
-                VecXd initial_parameters = newpar;
+                MatrixXd bounds = get_parameters_bounds();
+                VectorXd initial_parameters = newpar;
                 ParBicopOptData my_data = {data, this, newpar(0), 0};
                 if (method == "itau")
                 {
@@ -75,7 +75,7 @@ namespace vinecopulib
                 }
 
                 optimizer.set_bounds(bounds);
-                VecXd optimized_parameters = optimizer.optimize(initial_parameters);
+                VectorXd optimized_parameters = optimizer.optimize(initial_parameters);
 
                 if (method == "itau")
                 {
@@ -93,7 +93,7 @@ namespace vinecopulib
     }
 }
 
-/*void remove_row(MatXd& matrix, unsigned int to_remove)
+/*void remove_row(MatrixXd& matrix, unsigned int to_remove)
 {
     unsigned int n = matrix.rows()-1;
     unsigned int m = matrix.cols();

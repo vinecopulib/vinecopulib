@@ -16,7 +16,7 @@ VinecopTest::VinecopTest() {
     vc_matrix = read_matxi("temp3").colwise().reverse();
 
     // u, pdf, sim
-    MatXd temp = read_matxd("temp");
+    MatrixXd temp = read_matxd("temp");
     int n = temp.rows();
     int m = model_matrix.rows();
     u = temp.block(0,0,n,m);

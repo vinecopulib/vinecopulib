@@ -16,7 +16,7 @@ namespace vinecopulib
     //! dimensions.
     //! @param values a dxd matrix of copula density values evaluated at
     //! (grid_points_i, grid_points_j).
-    InterpolationGrid::InterpolationGrid(const VecXd& grid_points, const MatXd& values)
+    InterpolationGrid::InterpolationGrid(const VectorXd& grid_points, const MatrixXd& values)
     {
         if (values.cols() != values.rows()) {
             throw std::runtime_error(
@@ -41,11 +41,11 @@ namespace vinecopulib
     //! Interpolation in two dimensions
     //!
     //! @param x mx2 matrix of evaluation points.
-    VecXd InterpolationGrid::interpolate(const MatXd& x)
+    VectorXd InterpolationGrid::interpolate(const MatrixXd& x)
     {
         int N = x.rows();
         int m = grid_points_.size();
-        VecXd y(4), out(N), a(4), tmpgrid(4), tmpvals(4);
+        VectorXd y(4), out(N), a(4), tmpgrid(4), tmpvals(4);
         int i = 0;
         int j = 0;
         int i0, i3;
@@ -104,12 +104,12 @@ namespace vinecopulib
     //! @param u mx2 matrix of evaluation points
     //! @param cond_var either 1 or 2; the axis considered fixed.
     //!
-    VecXd InterpolationGrid::intergrate_1d(const MatXd& u, const int& cond_var)
+    VectorXd InterpolationGrid::intergrate_1d(const MatrixXd& u, const int& cond_var)
     {
         int n = u.rows();
         int m = grid_points_.size();
-        VecXd tmpvals(m), out(n), tmpa(4), tmpb(4);
-        MatXd tmpgrid(m, 2);
+        VectorXd tmpvals(m), out(n), tmpa(4), tmpb(4);
+        MatrixXd tmpgrid(m, 2);
         double upr = 0.0;
         double tmpint, int1;
         tmpint = 0.0;
@@ -117,12 +117,12 @@ namespace vinecopulib
         for (int i = 0; i < n; ++i) {
             if (cond_var == 1) {
                 upr = u(i, 1);
-                tmpgrid.col(0) = VecXd::Constant(m, u(i, 0));
+                tmpgrid.col(0) = VectorXd::Constant(m, u(i, 0));
                 tmpgrid.col(1) = grid_points_;
             } else if (cond_var == 2) {
                 upr = u(i, 0);
                 tmpgrid.col(0) = grid_points_;
-                tmpgrid.col(1) = VecXd::Constant(m, u(i, 1));
+                tmpgrid.col(1) = VectorXd::Constant(m, u(i, 1));
             }
             tmpvals = interpolate(tmpgrid);
             tmpint = int_on_grid(upr, tmpvals, grid_points_);
@@ -140,9 +140,9 @@ namespace vinecopulib
     //! @param u mx2 matrix of evaluation points
     //! @param cond_var either 1 or 2; the axis considered fixed.
     //!
-    VecXd InterpolationGrid::inv_intergrate_1d(const MatXd& u, const int& cond_var)
+    VectorXd InterpolationGrid::inv_intergrate_1d(const MatrixXd& u, const int& cond_var)
     {
-        VecXd out(u.rows());
+        VectorXd out(u.rows());
 
         for (int i = 0; i < u.rows(); ++i) {
             int br = 0;
@@ -150,7 +150,7 @@ namespace vinecopulib
             double x1 = 1.0;
 
             // evaluation points at boundary
-            MatXd tmpu0(1, 2), tmpu1(1, 2);
+            MatrixXd tmpu0(1, 2), tmpu1(1, 2);
             double q;
             if (cond_var == 1) {
                 q = u(i, 1);
@@ -249,7 +249,7 @@ namespace vinecopulib
     //!
     //! @param x evaluation point.
     //! @param a polynomial coefficients
-    double InterpolationGrid::cubic_poly(const double& x, const VecXd& a)
+    double InterpolationGrid::cubic_poly(const double& x, const VectorXd& a)
     {
         double x2 = x*x;
         double x3 = x2*x;
@@ -260,7 +260,7 @@ namespace vinecopulib
     //!
     //! @param x evaluation point.
     //! @param a polynomial coefficients.
-    double InterpolationGrid::cubic_indef_integral(const double& x, const VecXd& a)
+    double InterpolationGrid::cubic_indef_integral(const double& x, const VectorXd& a)
     {
         double x2 = x*x;
         double x3 = x2*x;
@@ -273,7 +273,7 @@ namespace vinecopulib
     //! @param lower lower limit of the integral.
     //! @param upper upper limit of the integral.
     //! @param a polynomial coefficients.
-    double InterpolationGrid::cubic_integral(const double& lower, const double& upper, const VecXd& a)
+    double InterpolationGrid::cubic_integral(const double& lower, const double& upper, const VectorXd& a)
     {
         return cubic_indef_integral(upper, a) - cubic_indef_integral(lower, a);
     }
@@ -285,7 +285,7 @@ namespace vinecopulib
     //!
     //! The inverse is found by the bisection method with a maximum of 20
     //! iterations.
-    double InterpolationGrid::inv_cubic_integral(const double& q, const VecXd& a)
+    double InterpolationGrid::inv_cubic_integral(const double& q, const VectorXd& a)
     {
         double x0, x1, ql, qh, ans, val;
         ans = 0.0, val = 0.0; x0 = 0.0; x1 = 1.0;
@@ -336,9 +336,9 @@ namespace vinecopulib
     //!
     //! @param vals length 4 vector of function values.
     //! @param grid length 4 vector of grid points.
-    VecXd InterpolationGrid::find_coefs(const VecXd& vals, const VecXd& grid)
+    VectorXd InterpolationGrid::find_coefs(const VectorXd& vals, const VectorXd& grid)
     {
-        VecXd a(4);
+        VectorXd a(4);
 
         double dt0 = grid(1) - grid(0);
         double dt1 = grid(2) - grid(1);
@@ -375,9 +375,9 @@ namespace vinecopulib
     //! @param x evaluation point.
     //! @param vals length 4 vector of function values.
     //! @param grid length 4 vector of grid points.
-    double InterpolationGrid::interp_on_grid(const double& x, const VecXd& vals, const VecXd& grid)
+    double InterpolationGrid::interp_on_grid(const double& x, const VectorXd& vals, const VectorXd& grid)
     {
-        VecXd a = find_coefs(vals, grid);
+        VectorXd a = find_coefs(vals, grid);
         double xev = fmax((x - grid(1)), 0) / (grid(2) - grid(1));
         return cubic_poly(xev, a);
     }
@@ -393,10 +393,10 @@ namespace vinecopulib
     //! @param grid vector of grid points on which vals has been computed.
     //!
     //! @return Integral of interpolation spline defined by (vals, grid).
-    double InterpolationGrid::int_on_grid(const double& upr, const VecXd& vals, const VecXd& grid)
+    double InterpolationGrid::int_on_grid(const double& upr, const VectorXd& vals, const VectorXd& grid)
     {
         int m = grid.size();
-        VecXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
+        VectorXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
         double uprnew, newint;
 
         double tmpint = 0.0;
@@ -437,10 +437,10 @@ namespace vinecopulib
     //! @param grid vector of grid points on which vals has been computed.
     //!
     //! @return Integral of interpolation spline defined by (vals, grid).
-    double InterpolationGrid::inv_int_on_grid(const double& qq, const VecXd& vals, const VecXd& grid)
+    double InterpolationGrid::inv_int_on_grid(const double& qq, const VectorXd& vals, const VectorXd& grid)
     {
         int m = grid.size();
-        VecXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
+        VectorXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
         double uprnew, newint, out, qtest;
         double tmpint = 0.0;
         int tmpk = 0;

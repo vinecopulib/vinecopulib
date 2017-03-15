@@ -15,26 +15,26 @@ namespace vinecopulib
         family_name_ = "Frank";
         rotation_ = 0;
         association_direction_ = "both";
-        parameters_ = VecXd::Zero(1);
-        parameters_bounds_ = MatXd::Zero(1, 2);
+        parameters_ = VectorXd::Zero(1);
+        parameters_bounds_ = MatrixXd::Zero(1, 2);
         parameters_bounds_(0, 0) = -200.0;
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    FrankBicop::FrankBicop(const VecXd& parameters)
+    FrankBicop::FrankBicop(const VectorXd& parameters)
     {
         FrankBicop();
         set_parameters(parameters);
     }
 
-    FrankBicop::FrankBicop(const VecXd& parameters, const int& rotation)
+    FrankBicop::FrankBicop(const VectorXd& parameters, const int& rotation)
     {
         FrankBicop();
         set_parameters(parameters);
         set_rotation(rotation);
     }
 
-    VecXd FrankBicop::generator(const VecXd& u)
+    VectorXd FrankBicop::generator(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -42,7 +42,7 @@ namespace vinecopulib
         };
         return u.unaryExpr(f);
     }
-    VecXd FrankBicop::generator_inv(const VecXd& u)
+    VectorXd FrankBicop::generator_inv(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -52,7 +52,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd FrankBicop::generator_derivative(const VecXd& u)
+    VectorXd FrankBicop::generator_derivative(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -61,7 +61,7 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd FrankBicop::generator_derivative2(const VecXd& u)
+    VectorXd FrankBicop::generator_derivative2(const VectorXd& u)
     {
         double theta = double(this->parameters_(0));
         auto f = [theta](const double v) {
@@ -70,16 +70,16 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    VecXd FrankBicop::tau_to_parameters(const double& tau)
+    VectorXd FrankBicop::tau_to_parameters(const double& tau)
     {
-        VecXd tau2 = VecXd::Constant(1, std::fabs(tau));
-        auto f = [&](const VecXd &v) {
-            return VecXd::Constant(1, std::fabs(parameters_to_tau(v)));
+        VectorXd tau2 = VectorXd::Constant(1, std::fabs(tau));
+        auto f = [&](const VectorXd &v) {
+            return VectorXd::Constant(1, std::fabs(parameters_to_tau(v)));
         };
         return invert_f(tau2, f, -100+1e-6, 100);
     }
 
-    double FrankBicop::parameters_to_tau(const VecXd& parameters)
+    double FrankBicop::parameters_to_tau(const VectorXd& parameters)
     {
         double par = parameters(0);
         double tau = 1 - 4/par;
@@ -90,20 +90,20 @@ namespace vinecopulib
         return tau;
     }
 
-    VecXd FrankBicop::get_start_parameters(const double tau)
+    VectorXd FrankBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
     }
 }
 /*// PDF
-VecXd FrankBicop::pdf_default(const MatXd& u)
+VectorXd FrankBicop::pdf_default(const MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
-    MatXd t = u.unaryExpr([theta](const double v){ return std::exp(theta*v);});
-    VecXd t1 = t.rowwise().prod();
-    VecXd f = theta*(std::exp(theta)-1)*std::exp(theta)*t1;
+    MatrixXd t = u.unaryExpr([theta](const double v){ return std::exp(theta*v);});
+    VectorXd t1 = t.rowwise().prod();
+    VectorXd f = theta*(std::exp(theta)-1)*std::exp(theta)*t1;
 
-    t1 = t1 - std::exp(theta)*(t.rowwise().sum() - VecXd::Ones(u.rows()));
+    t1 = t1 - std::exp(theta)*(t.rowwise().sum() - VectorXd::Ones(u.rows()));
     t1 = t1.array().square();
 
     f = f.cwiseQuotient(t1);
@@ -111,14 +111,14 @@ VecXd FrankBicop::pdf_default(const MatXd& u)
 }
 
 // hfunction
-VecXd FrankBicop::hfunc1_default(const MatXd& u)
+VectorXd FrankBicop::hfunc1_default(const MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
-    MatXd t = u.unaryExpr([theta](const double v){ return std::exp(theta*v);});
-    VecXd t1 = t.rowwise().prod();
-    VecXd f = std::exp(theta)*(t.col(1) - VecXd::Ones(u.rows()));
+    MatrixXd t = u.unaryExpr([theta](const double v){ return std::exp(theta*v);});
+    VectorXd t1 = t.rowwise().prod();
+    VectorXd f = std::exp(theta)*(t.col(1) - VectorXd::Ones(u.rows()));
 
-    t1 = - t1 + std::exp(theta)*(t.rowwise().sum() - VecXd::Ones(u.rows()));
+    t1 = - t1 + std::exp(theta)*(t.rowwise().sum() - VectorXd::Ones(u.rows()));
     f = f.cwiseQuotient(t1);
     return f;
 }*/

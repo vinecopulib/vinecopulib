@@ -15,13 +15,13 @@ namespace vinecopulib
     public:
         KernelBicop();
 
-        VecXd pdf_default(const MatXd& u);
-        VecXd hfunc1_default(const MatXd& u);
-        VecXd hfunc2_default(const MatXd& u);
-        VecXd hinv1_default(const MatXd& u);
-        VecXd hinv2_default(const MatXd& u);
+        VectorXd pdf_default(const MatrixXd& u);
+        VectorXd hfunc1_default(const MatrixXd& u);
+        VectorXd hfunc2_default(const MatrixXd& u);
+        VectorXd hinv1_default(const MatrixXd& u);
+        VectorXd hinv2_default(const MatrixXd& u);
 
-        double parameters_to_tau(const VecXd &);
+        double parameters_to_tau(const VectorXd &);
         double calculate_npars();
 
         void flip();

@@ -14,24 +14,24 @@ namespace vinecopulib
     public:
         // constructor
         IndepBicop();
-        IndepBicop(const VecXd& parameters);
-        IndepBicop(const VecXd& parameters, const int& rotation);
+        IndepBicop(const VectorXd& parameters);
+        IndepBicop(const VectorXd& parameters, const int& rotation);
 
         // PDF
-        VecXd pdf_default(const MatXd& u);
+        VectorXd pdf_default(const MatrixXd& u);
 
         // hfunctions: the conditioning variable is put second
-        VecXd hfunc1_default(const MatXd& u);
-        VecXd hfunc2_default(const MatXd& u);
-        VecXd hinv1_default(const MatXd& u);
-        VecXd hinv2_default(const MatXd& u);
+        VectorXd hfunc1_default(const MatrixXd& u);
+        VectorXd hfunc2_default(const MatrixXd& u);
+        VectorXd hinv1_default(const MatrixXd& u);
+        VectorXd hinv2_default(const MatrixXd& u);
 
-        VecXd tau_to_parameters(const double &);
-        double parameters_to_tau(const VecXd &);
+        VectorXd tau_to_parameters(const double &);
+        double parameters_to_tau(const VectorXd &);
 
         void flip();
 
     private:
-        VecXd get_start_parameters(const double tau);
+        VectorXd get_start_parameters(const double tau);
     };
 }

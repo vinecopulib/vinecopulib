@@ -12,25 +12,25 @@
 
 namespace vinecopulib
 {
-    VecXd EllipticalBicop::hfunc2_default(const MatXd& u)
+    VectorXd EllipticalBicop::hfunc2_default(const MatrixXd& u)
     {
         return hfunc1_default(swap_cols(u));
     }
 
-    VecXd EllipticalBicop::hinv2_default(const MatXd& u)
+    VectorXd EllipticalBicop::hinv2_default(const MatrixXd& u)
     {
         return hinv1_default(swap_cols(u));
     }
 
-    double EllipticalBicop::parameters_to_tau(const VecXd& parameters)
+    double EllipticalBicop::parameters_to_tau(const VectorXd& parameters)
     {
         double tau = (2 / M_PI) * asin(parameters(0));
         return tau;
     }
 
-    VecXd EllipticalBicop::tau_to_parameters(const double& tau)
+    VectorXd EllipticalBicop::tau_to_parameters(const double& tau)
     {
-        VecXd parameters = this->parameters_;
+        VectorXd parameters = this->parameters_;
         parameters(0) = sin(tau * M_PI / 2);
         return parameters;
     }

@@ -15,19 +15,19 @@ namespace vinecopulib
     public:
         // constructor
         StudentBicop();
-        StudentBicop(const VecXd& parameters);
-        StudentBicop(const VecXd& parameters, const int& rotation);
+        StudentBicop(const VectorXd& parameters);
+        StudentBicop(const VectorXd& parameters, const int& rotation);
 
         // PDF
-        VecXd pdf_default(const MatXd& u);
+        VectorXd pdf_default(const MatrixXd& u);
 
         // hfunction
-        VecXd hfunc1_default(const MatXd& u);
+        VectorXd hfunc1_default(const MatrixXd& u);
 
         // inverse hfunction
-        VecXd hinv1_default(const MatXd& u);
+        VectorXd hinv1_default(const MatrixXd& u);
 
     private:
-        VecXd get_start_parameters(const double tau);
+        VectorXd get_start_parameters(const double tau);
     };
 }

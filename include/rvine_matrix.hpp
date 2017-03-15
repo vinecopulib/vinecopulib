@@ -15,27 +15,27 @@ namespace vinecopulib
         //! \devgroup constructors Constructors
         //! @{
         RVineMatrix() {}
-        RVineMatrix(const MatXi& matrix);
+        RVineMatrix(const MatrixXi& matrix);
         //! @}
 
         //! Getters
         //! @{
-        MatXi get_matrix();
+        MatrixXi get_matrix();
         //! @}
 
-        VecXi get_order();
-        MatXi in_natural_order();
-        MatXi get_max_matrix();
-        MatXb get_needed_hfunc1();
-        MatXb get_needed_hfunc2();
+        VectorXi get_order();
+        MatrixXi in_natural_order();
+        MatrixXi get_max_matrix();
+        MatrixXb get_needed_hfunc1();
+        MatrixXb get_needed_hfunc2();
 
-        static MatXi construct_d_vine_matrix(const VecXi& order);
+        static MatrixXi construct_d_vine_matrix(const VectorXi& order);
 
     private:
         int d_;
-        MatXi matrix_;
+        MatrixXi matrix_;
     };
 
-    int relabel_one(const int& x, const VecXi& old_labels, const VecXi& new_labels);
-    MatXi relabel_elements(const MatXi& matrix, const VecXi& new_labels);
+    int relabel_one(const int& x, const VectorXi& old_labels, const VectorXi& new_labels);
+    MatrixXi relabel_elements(const MatrixXi& matrix, const VectorXi& new_labels);
 }

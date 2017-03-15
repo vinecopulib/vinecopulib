@@ -8,23 +8,23 @@
 
 namespace vinecopulib
 {
-    VecXd ArchimedeanBicop::pdf_default(const MatXd& u)
+    VectorXd ArchimedeanBicop::pdf_default(const MatrixXd& u)
     {
-        VecXd f = VecXd::Ones(u.rows());
-        VecXd v = generator(u.col(0)) + generator(u.col(1));
+        VectorXd f = VectorXd::Ones(u.rows());
+        VectorXd v = generator(u.col(0)) + generator(u.col(1));
         f = generator_derivative(u.col(0)).cwiseProduct(generator_derivative(u.col(1)));
-        VecXd numerator = generator_derivative2(generator_inv(v));
-        VecXd denominator = generator_derivative(generator_inv(v)).array().pow(3.0);
+        VectorXd numerator = generator_derivative2(generator_inv(v));
+        VectorXd denominator = generator_derivative(generator_inv(v)).array().pow(3.0);
         f = (-1)*f.cwiseProduct(numerator);
         f = f.cwiseQuotient(denominator);
 
         return f;
     }
 
-    VecXd ArchimedeanBicop::hfunc1_default(const MatXd& u)
+    VectorXd ArchimedeanBicop::hfunc1_default(const MatrixXd& u)
     {
-        VecXd h(u.rows());
-        VecXd v(u.rows());
+        VectorXd h(u.rows());
+        VectorXd v(u.rows());
 
         v = generator(u.col(0)) + generator(u.col(1));
         h = generator_derivative(u.col(0)).cwiseQuotient(generator_derivative(generator_inv(v)));
@@ -32,18 +32,18 @@ namespace vinecopulib
         return h;
     }
 
-    VecXd ArchimedeanBicop::hfunc2_default(const MatXd& u)
+    VectorXd ArchimedeanBicop::hfunc2_default(const MatrixXd& u)
     {
         return hfunc1_default(swap_cols(u));
     }
 
-    VecXd ArchimedeanBicop::hinv1_default(const MatXd& u)
+    VectorXd ArchimedeanBicop::hinv1_default(const MatrixXd& u)
     {
-        VecXd hinv = hinv1_num(u);
+        VectorXd hinv = hinv1_num(u);
         return hinv;
     }
 
-    VecXd ArchimedeanBicop::hinv2_default(const MatXd& u)
+    VectorXd ArchimedeanBicop::hinv2_default(const MatrixXd& u)
     {
         return hinv1_default(swap_cols(u));
     }
@@ -57,10 +57,10 @@ namespace vinecopulib
         }
     }
 
-    VecXd ArchimedeanBicop::get_start_parameters(const double tau)
+    VectorXd ArchimedeanBicop::get_start_parameters(const double tau)
     {
-        MatXd bounds = this->get_parameters_bounds();
-        VecXd parameters = bounds.col(0) + VecXd::Constant(2, 0.1);
+        MatrixXd bounds = this->get_parameters_bounds();
+        VectorXd parameters = bounds.col(0) + VectorXd::Constant(2, 0.1);
         return parameters;
     }
 }

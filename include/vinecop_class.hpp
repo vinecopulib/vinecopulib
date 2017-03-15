@@ -20,16 +20,16 @@ namespace vinecopulib
         Vinecop(int d);
         Vinecop(
                 const std::vector<std::vector<BicopPtr>>& pair_copulas,
-                const MatXi& matrix
+                const MatrixXi& matrix
         );
 
         static std::vector<std::vector<BicopPtr>> make_pair_copula_store(int d);
         static Vinecop select(
-                const MatXd& data,
+                const MatrixXd& data,
                 std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
                 std::string method = "mle",
                 int truncation_level = std::numeric_limits<int>::max(),
-                MatXi matrix = MatXi(0, 0),
+                MatrixXi matrix = MatrixXi(0, 0),
                 std::string selection_criterion = "bic",
                 bool preselect_families = true,
                 bool show_trace = false
@@ -37,15 +37,15 @@ namespace vinecopulib
 
         BicopPtr get_pair_copula(int tree, int edge);
         int get_family(int tree, int edge);
-        MatXi get_families();
+        MatrixXi get_families();
         int get_rotation(int tree, int edge);
-        MatXi get_rotations();
-        VecXd get_parameters(int tree, int edge);
-        MatXi get_matrix() {return vine_matrix_.get_matrix();}
+        MatrixXi get_rotations();
+        VectorXd get_parameters(int tree, int edge);
+        MatrixXi get_matrix() {return vine_matrix_.get_matrix();}
 
-        VecXd pdf(const MatXd& u);
-        MatXd simulate(int n);
-        MatXd simulate(int n, const MatXd& U);
+        VectorXd pdf(const MatrixXd& u);
+        MatrixXd simulate(int n);
+        MatrixXd simulate(int n, const MatrixXd& U);
 
     private:
         int d_;
@@ -53,7 +53,7 @@ namespace vinecopulib
         std::vector<std::vector<BicopPtr>> pair_copulas_;
     };
 
-    VecXi inverse_permutation(const VecXi& order);
+    VectorXi inverse_permutation(const VectorXi& order);
     // reverse columns and rows of an Eigen::Matrix type object
     template<typename Mat>
     Mat to_upper_tri(Mat A) {return A.rowwise().reverse().colwise().reverse();}

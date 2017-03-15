@@ -15,9 +15,9 @@ using namespace vinecopulib;
 class VinecopTest : public ::testing::Test {
 public:
     VinecopTest();
-    MatXd u;
-    VecXd f;
-    MatXd sim;
-    MatXi model_matrix;
-    MatXi vc_matrix;
+    MatrixXd u;
+    VectorXd f;
+    MatrixXd sim;
+    MatrixXi model_matrix;
+    MatrixXi vc_matrix;
 };

@@ -15,16 +15,16 @@ namespace vinecopulib
     public:
         // constructor
         Bb6Bicop();
-        Bb6Bicop(const VecXd& parameters);
-        Bb6Bicop(const VecXd& parameters, const int& rotation);
+        Bb6Bicop(const VectorXd& parameters);
+        Bb6Bicop(const VectorXd& parameters, const int& rotation);
 
         // generator, its inverse and derivatives for the archimedean copula
-        VecXd generator(const VecXd& u);
-        VecXd generator_inv(const VecXd& u);
-        VecXd generator_derivative(const VecXd& u);
-        VecXd generator_derivative2(const VecXd& u);
+        VectorXd generator(const VectorXd& u);
+        VectorXd generator_inv(const VectorXd& u);
+        VectorXd generator_derivative(const VectorXd& u);
+        VectorXd generator_derivative2(const VectorXd& u);
 
         // link between Kendall's tau and the par_bicop parameter
-        double parameters_to_tau(const VecXd& par);
+        double parameters_to_tau(const VectorXd& par);
     };
 }
