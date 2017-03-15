@@ -9,7 +9,6 @@ else()
 endif()
 set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
 
-# Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE)
     set(var INSTALL_${p}_DIR)
     if(NOT IS_ABSOLUTE "${${var}}")
@@ -17,7 +16,7 @@ foreach(p LIB BIN INCLUDE CMAKE)
     endif()
 endforeach()
 
-set(OPT_BIN_DIR ${PROJECT_BINARY_DIR}/../bin${PLATFORM})
+set(LIBRARY_OUTPUT_PATH    ${PROJECT_BINARY_DIR})
+set(TEST_BIN_DIR ${PROJECT_BINARY_DIR}/../bin${PLATFORM})
+set(EXECUTABLE_OUTPUT_PATH ${TEST_BIN_DIR})
 
-set(EXECUTABLE_OUTPUT_PATH ${OPT_BIN_DIR})
-set(LIBRARY_OUTPUT_PATH    ${OPT_BIN_DIR})

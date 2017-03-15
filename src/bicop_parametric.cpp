@@ -45,7 +45,7 @@ namespace vinecopulib
             }
 
             Eigen::MatrixXd temp_data = data;
-            double tau = pairwise_ktau(temp_data);
+            double tau = tools_stats::pairwise_ktau(temp_data);
             Eigen::VectorXd newpar = get_start_parameters(tau);
 
             std::string association_direction = get_association_direction();

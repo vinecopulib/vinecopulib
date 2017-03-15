@@ -24,9 +24,9 @@ int main(int argc, char **argv) {
     Eigen::MatrixXd m = Eigen::MatrixXd::Ones(10000, 10000);
     m *= 0.5;
 
-    time("Boost dnorm:", [m]{ auto a = dnorm(m); });
-    time("Boost pnom:", [m]{ auto a = pnorm(m); });
-    time("Boost qnom:", [m]{ auto a = qnorm(m); });
+    time("Boost tools_stats::dnorm:", [m]{ auto a = tools_stats::dnorm(m); });
+    time("Boost pnom:", [m]{ auto a = tools_stats::pnorm(m); });
+    time("Boost qnom:", [m]{ auto a = tools_stats::qnorm(m); });
 
     return 0;
 }

@@ -324,7 +324,7 @@ namespace vinecopulib
     //! @{
     Eigen::MatrixXd Vinecop::simulate(int n)
     {
-        Eigen::MatrixXd U = simulate_uniform(n, d_);
+        Eigen::MatrixXd U = tools_stats::simulate_uniform(n, d_);
         return simulate(n, U);
     }
 

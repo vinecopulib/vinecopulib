@@ -44,10 +44,10 @@ namespace vinecopulib
 
         // Compute copula density
         Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
-        Eigen::MatrixXd tmp = qnorm(u);
-        f = f.cwiseQuotient(dnorm(tmp).rowwise().prod());
+        Eigen::MatrixXd tmp = tools_stats::qnorm(u);
+        f = f.cwiseQuotient(tools_stats::dnorm(tmp).rowwise().prod());
         tmp = tmp*L;
-        f = f.cwiseProduct(dnorm(tmp).rowwise().prod());
+        f = f.cwiseProduct(tools_stats::dnorm(tmp).rowwise().prod());
         return f / sqrt(1.0-pow(rho,2.0));
     }
 
@@ -55,18 +55,18 @@ namespace vinecopulib
     {
         double rho = double(this->parameters_(0));
         Eigen::VectorXd h = Eigen::VectorXd::Zero(u.rows());
-        Eigen::MatrixXd tmp = qnorm(u);
+        Eigen::MatrixXd tmp = tools_stats::qnorm(u);
         h = (tmp.col(1) - rho * tmp.col(0)) / sqrt(1.0 - pow(rho, 2.0));
-        return pnorm(h);
+        return tools_stats::pnorm(h);
     }
 
     Eigen::VectorXd GaussianBicop::hinv1_default(const Eigen::MatrixXd& u)
     {
         double rho = double(this->parameters_(0));
         Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
-        Eigen::MatrixXd tmp = qnorm(u);
+        Eigen::MatrixXd tmp = tools_stats::qnorm(u);
         hinv = tmp.col(1) * sqrt(1.0 - pow(rho, 2.0)) + rho * tmp.col(0);
-        return pnorm(hinv);
+        return tools_stats::pnorm(hinv);
     }
 
     Eigen::VectorXd GaussianBicop::get_start_parameters(const double tau)

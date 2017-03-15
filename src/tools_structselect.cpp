@@ -144,7 +144,7 @@ namespace tools_structselect {
                 // (-1 means 'no common neighbor')
                 if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                     auto pc_data = get_pc_data(v0, v1, vine_tree);
-                    auto tau = pairwise_ktau(pc_data);
+                    auto tau = tools_stats::pairwise_ktau(pc_data);
                     auto w = 1.0 - std::fabs(tau);
                     auto e = boost::add_edge(v0, v1, w, vine_tree).first;
                     vine_tree[e].empirical_tau = tau;

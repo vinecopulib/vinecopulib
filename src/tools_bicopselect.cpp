@@ -13,7 +13,7 @@ std::vector<double> get_c1c2(const Eigen::MatrixXd& data, double tau)
     Eigen::MatrixXd x = Eigen::MatrixXd::Zero(n,2);
     Eigen::MatrixXd z1 = x;
     Eigen::MatrixXd z2 = x;
-    x = qnorm(data);
+    x = tools_stats::qnorm(data);
     int count1 = 0, count2 = 0;
     for (int j = 0; j < n; ++j) {
         if (tau > 0)
@@ -43,8 +43,8 @@ std::vector<double> get_c1c2(const Eigen::MatrixXd& data, double tau)
     }
 
     std::vector<double> c = {
-            pairwise_cor(z1.block(0,0,count1-1,2)),
-            pairwise_cor(z2.block(0,0,count2-1,2))
+            tools_stats::pairwise_cor(z1.block(0,0,count1-1,2)),
+            tools_stats::pairwise_cor(z2.block(0,0,count2-1,2))
     };
     return c;
 }

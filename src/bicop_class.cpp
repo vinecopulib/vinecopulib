@@ -135,7 +135,7 @@ namespace vinecopulib
         }
 
         auto temp_data = data;
-        auto tau = pairwise_ktau(temp_data);
+        auto tau = tools_stats::pairwise_ktau(temp_data);
 
         // When using rotations, add only the ones that yield the appropriate 
         // association direction.
@@ -353,7 +353,7 @@ namespace vinecopulib
     //! @return Samples from the copula model.
     Eigen::MatrixXd Bicop::simulate(const int& n)
     {
-        Eigen::MatrixXd U = simulate_uniform(n, 2);
+        Eigen::MatrixXd U = tools_stats::simulate_uniform(n, 2);
         // use inverse Rosenblatt transform to generate a sample from the copula
         U.col(1) = hinv1(U);
         return U;
@@ -384,7 +384,7 @@ namespace vinecopulib
 
     // TODO: generic fall-back that calculates Kendall's tau based on the pdf:
     // tau = int_0^1 int_0^1 C(u, v) c(u, v) du dv
-    //     = int_0^1 int_0^1 (int_0^u int_0^v c(s, t) ds dt) c(u, v) du dv
+    //     = int_0^1 int_0^1 (int_0^u int_0^v c(s, t) ds tools_stats::dt) c(u, v) du dv
     double Bicop::calculate_tau()
     {
         return 999.0;

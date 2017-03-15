@@ -20,7 +20,7 @@ namespace vinecopulib
 
     Eigen::VectorXd gaussian_kernel_2d(const Eigen::MatrixXd& x)
     {
-        return dnorm(x).rowwise().prod();
+        return tools_stats::dnorm(x).rowwise().prod();
     }
 
     void TrafokernelBicop::fit(const Eigen::MatrixXd& data, std::string)
@@ -30,7 +30,7 @@ namespace vinecopulib
         Eigen::VectorXd grid_points(m);
         for (int i = 0; i < m; ++i)
             grid_points(i) = - 3.25 + i * (6.25 / (double) m);
-        grid_points = pnorm(grid_points);
+        grid_points = tools_stats::pnorm(grid_points);
 
         // expand the interpolation grid; a matrix with two columns where each row
         // contains one combination of the grid points
@@ -45,14 +45,14 @@ namespace vinecopulib
         }
 
         // transform evaluation grid and data by inverse Gaussian cdf
-        Eigen::MatrixXd z = qnorm(grid_2d);
-        Eigen::MatrixXd z_data = qnorm(data);
+        Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
+        Eigen::MatrixXd z_data = tools_stats::qnorm(data);
 
         // apply normal density to z (used later for normalization)
-        Eigen::MatrixXd phi = dnorm(z);
-        Eigen::MatrixXd phi_data = dnorm(z_data);
+        Eigen::MatrixXd phi = tools_stats::dnorm(z);
+        Eigen::MatrixXd phi_data = tools_stats::dnorm(z_data);
 
-        // find bandwidth matrix
+        // find bandwitools_stats::dth matrix
         int n = data.rows();
         Eigen::MatrixXd centered = z_data.rowwise() - z_data.colwise().mean();
         Eigen::MatrixXd cov = (centered.adjoint() * centered) / double(n - 1);
@@ -61,7 +61,7 @@ namespace vinecopulib
         Eigen::MatrixXd cov_root = takes_root.operatorSqrt();
         Eigen::MatrixXd B =  1.25 * std::pow(n, - 1.0 / 6.0) * cov_root.transpose();
 
-        // apply bandwidth matrix
+        // apply bandwitools_stats::dth matrix
         z = (B.inverse() * z.transpose()).transpose();
         z_data = (B.inverse() * z_data.transpose()).transpose();
 

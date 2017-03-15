@@ -9,5 +9,5 @@
 
 TrafokernelTest::TrafokernelTest() {
     cop = Bicop::create(1001, 0);
-    u = simulate_uniform(100, 2);
+    u = tools_stats::simulate_uniform(100, 2);
 }

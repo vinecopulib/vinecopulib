@@ -16,7 +16,7 @@ namespace vinecopulib
         Eigen::VectorXd grid_points(m);
         for (int i = 0; i < m; ++i)
             grid_points(i) = - 3.25 + i * (6.25 / (double) m);
-        grid_points = pnorm(grid_points);
+        grid_points = tools_stats::pnorm(grid_points);
 
         interp_grid_ = InterpolationGrid(grid_points, Eigen::MatrixXd::Constant(30, 30, 1.0));
     }
