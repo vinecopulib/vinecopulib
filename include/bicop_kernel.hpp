@@ -9,22 +9,25 @@
 #include "interpolation_grid.hpp"
 #include "bicop_class.hpp"
 
-class KernelBicop : public Bicop {
-public:
-    KernelBicop();
+namespace vinecopulib
+{
+    class KernelBicop : public Bicop {
+    public:
+        KernelBicop();
 
-    VecXd pdf_default(const MatXd& u);
-    VecXd hfunc1_default(const MatXd& u);
-    VecXd hfunc2_default(const MatXd& u);
-    VecXd hinv1_default(const MatXd& u);
-    VecXd hinv2_default(const MatXd& u);
+        VecXd pdf_default(const MatXd& u);
+        VecXd hfunc1_default(const MatXd& u);
+        VecXd hfunc2_default(const MatXd& u);
+        VecXd hinv1_default(const MatXd& u);
+        VecXd hinv2_default(const MatXd& u);
 
-    double parameters_to_tau(const VecXd &);
-    double calculate_npars();
+        double parameters_to_tau(const VecXd &);
+        double calculate_npars();
 
-    void flip();
+        void flip();
 
-protected:
-    InterpolationGrid interp_grid_;
-    double npars_;
-};
+    protected:
+        InterpolationGrid interp_grid_;
+        double npars_;
+    };
+}

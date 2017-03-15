@@ -9,6 +9,8 @@
 #include "gtest/gtest.h"
 #include "include/bicop.hpp"
 
+using namespace vinecopulib;
+
 class TrafokernelTest : public ::testing::Test {
 public:
     TrafokernelTest();

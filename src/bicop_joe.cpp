@@ -7,101 +7,108 @@
 #include "bicop_joe.hpp"
 #include <boost/math/special_functions/digamma.hpp>
 
-// constructor
-JoeBicop::JoeBicop()
+namespace vinecopulib
 {
-    family_ = 6;
-    family_name_ = "Joe";
-    rotation_ = 0;
-    association_direction_ = "positive";
-    parameters_ = VecXd::Ones(1);
-    parameters_bounds_ = MatXd::Ones(1, 2);
-    parameters_bounds_(0, 1) = 200.0;
-}
-
-JoeBicop::JoeBicop(const VecXd& parameters)
-{
-    JoeBicop();
-    set_parameters(parameters);
-}
-
-JoeBicop::JoeBicop(const VecXd& parameters, const int& rotation)
-{
-    JoeBicop();
-    set_parameters(parameters);
-    set_rotation(rotation);
-}
-
-VecXd JoeBicop::generator(const VecXd& u)
-{
-    double theta = double(this->parameters_(0));
-    auto f = [theta](const double v) {
-        return (-1)*std::log(1-std::pow(1-v, theta));
-    };
-    return u.unaryExpr(f);
-}
-
-VecXd JoeBicop::generator_inv(const VecXd& u)
-{
-    double theta = double(this->parameters_(0));
-    auto f = [theta](const double v) {
-        return 1-std::pow(1-std::exp(-v),1/theta);
-    };
-    return u.unaryExpr(f);
-}
-
-VecXd JoeBicop::generator_derivative(const VecXd& u)
-{
-    double theta = double(this->parameters_(0));
-    auto f = [theta](const double v) {
-        return (-theta)*std::pow(1-v, theta-1)/(1-std::pow(1-v, theta));
-    };
-    return u.unaryExpr(f);
-}
-
-VecXd JoeBicop::generator_derivative2(const VecXd& u)
-{
-    double theta = double(this->parameters_(0));
-    auto f = [theta](const double v) {
-        return theta*(theta-1+std::pow(1-v, theta))*std::pow(1-v, theta-2)/std::pow(-1+std::pow(1-v, theta),2);
-    };
-    return u.unaryExpr(f);
-}
-
-// inverse h-function
-VecXd JoeBicop::hinv1_default(const MatXd& u)
-{
-    double theta = double(this->parameters_(0));
-    double u1, u2;
-    VecXd hinv = VecXd::Zero(u.rows());
-    for (int j = 0; j < u.rows(); ++j) {
-        u1 = u(j, 1);
-        u2 = u(j, 0);
-        hinv(j) = qcondjoe(&u1, &u2, &theta);
+    JoeBicop::JoeBicop()
+    {
+        family_ = 6;
+        family_name_ = "Joe";
+        rotation_ = 0;
+        association_direction_ = "positive";
+        parameters_ = VecXd::Ones(1);
+        parameters_bounds_ = MatXd::Ones(1, 2);
+        parameters_bounds_(0, 1) = 200.0;
     }
 
-    return hinv;
-}
+    JoeBicop::JoeBicop(const VecXd& parameters)
+    {
+        JoeBicop();
+        set_parameters(parameters);
+    }
 
-// link between Kendall's tau and the par_bicop parameter
-VecXd JoeBicop::tau_to_parameters(const double& tau)
-{
-    VecXd tau2 = VecXd::Constant(1, std::fabs(tau));
-    auto f = [&](const VecXd &v) {
-        return VecXd::Constant(1, std::fabs(parameters_to_tau(v)));
-    };
-    return invert_f(tau2, f, 1+1e-6, 100);
-}
+    JoeBicop::JoeBicop(const VecXd& parameters, const int& rotation)
+    {
+        JoeBicop();
+        set_parameters(parameters);
+        set_rotation(rotation);
+    }
 
-double JoeBicop::parameters_to_tau(const VecXd& parameters)
-{
-    double par = parameters(0);
-    double tau = 2 / par + 1;
-    tau = boost::math::digamma(2.0) - boost::math::digamma(tau);
-    tau = 1 + 2 * tau / (2 - par);
-    if ((rotation_ == 90) | (rotation_ == 270))
-        tau *= -1;
-    return tau;
+    VecXd JoeBicop::generator(const VecXd& u)
+    {
+        double theta = double(this->parameters_(0));
+        auto f = [theta](const double v) {
+            return (-1)*std::log(1-std::pow(1-v, theta));
+        };
+        return u.unaryExpr(f);
+    }
+
+    VecXd JoeBicop::generator_inv(const VecXd& u)
+    {
+        double theta = double(this->parameters_(0));
+        auto f = [theta](const double v) {
+            return 1-std::pow(1-std::exp(-v),1/theta);
+        };
+        return u.unaryExpr(f);
+    }
+
+    VecXd JoeBicop::generator_derivative(const VecXd& u)
+    {
+        double theta = double(this->parameters_(0));
+        auto f = [theta](const double v) {
+            return (-theta)*std::pow(1-v, theta-1)/(1-std::pow(1-v, theta));
+        };
+        return u.unaryExpr(f);
+    }
+
+    VecXd JoeBicop::generator_derivative2(const VecXd& u)
+    {
+        double theta = double(this->parameters_(0));
+        auto f = [theta](const double v) {
+            return theta*(theta-1+std::pow(1-v, theta))*std::pow(1-v, theta-2)/std::pow(-1+std::pow(1-v, theta),2);
+        };
+        return u.unaryExpr(f);
+    }
+
+    // inverse h-function
+    VecXd JoeBicop::hinv1_default(const MatXd& u)
+    {
+        double theta = double(this->parameters_(0));
+        double u1, u2;
+        VecXd hinv = VecXd::Zero(u.rows());
+        for (int j = 0; j < u.rows(); ++j) {
+            u1 = u(j, 1);
+            u2 = u(j, 0);
+            hinv(j) = qcondjoe(&u1, &u2, &theta);
+        }
+
+        return hinv;
+    }
+
+    // link between Kendall's tau and the par_bicop parameter
+    VecXd JoeBicop::tau_to_parameters(const double& tau)
+    {
+        VecXd tau2 = VecXd::Constant(1, std::fabs(tau));
+        auto f = [&](const VecXd &v) {
+            return VecXd::Constant(1, std::fabs(parameters_to_tau(v)));
+        };
+        return invert_f(tau2, f, 1+1e-6, 100);
+    }
+
+    double JoeBicop::parameters_to_tau(const VecXd& parameters)
+    {
+        double par = parameters(0);
+        double tau = 2 / par + 1;
+        tau = boost::math::digamma(2.0) - boost::math::digamma(tau);
+        tau = 1 + 2 * tau / (2 - par);
+        if ((rotation_ == 90) | (rotation_ == 270))
+            tau *= -1;
+        return tau;
+    }
+
+    VecXd JoeBicop::get_start_parameters(const double tau)
+    {
+        return tau_to_parameters(tau);
+    }
 }
 
 // This is copy&paste from the VineCopula package
@@ -155,11 +162,6 @@ double qcondjoe(double* q, double* u, double* de)
         while((v<=0 || v>=1 || fabs(diff)>0.25) & (iter2 <20)) {++iter2; diff/=2.; v+=diff; }
     }
     return(v);
-}
-
-VecXd JoeBicop::get_start_parameters(const double tau)
-{
-    return tau_to_parameters(tau);
 }
 
 /*// PDF

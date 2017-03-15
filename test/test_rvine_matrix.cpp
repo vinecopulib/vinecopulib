@@ -7,6 +7,8 @@
 #include "gtest/gtest.h"
 #include "include/rvine_matrix.hpp"
 
+using namespace vinecopulib;
+
 namespace {
     TEST(rvine_matrix, can_convert_to_natural_order) {
         MatXi mat(7, 7);

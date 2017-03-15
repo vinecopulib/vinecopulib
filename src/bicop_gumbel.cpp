@@ -7,96 +7,101 @@
 #include "bicop_gumbel.hpp"
 #include <cmath>
 
-// constructor
-GumbelBicop::GumbelBicop()
+namespace vinecopulib
 {
-    family_ = 4;
-    family_name_ = "Gumbel";
-    rotation_ = 0;
-    association_direction_ = "positive";
-    parameters_ = VecXd::Ones(1);
-    parameters_bounds_ = MatXd::Ones(1, 2);
-    parameters_bounds_(0, 1) = 200.0;
-}
-
-GumbelBicop::GumbelBicop(const VecXd& parameters)
-{
-    GumbelBicop();
-    set_parameters(parameters);
-}
-
-GumbelBicop::GumbelBicop(const VecXd& parameters, const int& rotation)
-{
-    GumbelBicop();
-    set_parameters(parameters);
-    set_rotation(rotation);
-}
-
-VecXd GumbelBicop::generator(const VecXd& u)
-{
-    double theta = double(this->parameters_(0));
-    auto f = [theta](const double v) {
-        return std::pow(std::log(1/v), theta);
-    };
-    return u.unaryExpr(f);
-}
-VecXd GumbelBicop::generator_inv(const VecXd& u)
-{
-    double theta = double(this->parameters_(0));
-    auto f = [theta](const double v) {
-        return std::exp(-std::pow(v,1/theta));
-    };
-    return u.unaryExpr(f);
-}
-
-VecXd GumbelBicop::generator_derivative(const VecXd& u)
-{
-    double theta = double(this->parameters_(0));
-    auto f = [theta](const double v) {
-        return std::pow(std::log(1/v),theta-1)*(-theta/v);
-    };
-    return u.unaryExpr(f);
-}
-
-VecXd GumbelBicop::generator_derivative2(const VecXd& u)
-{
-    double theta = double(this->parameters_(0));
-    auto f = [theta](const double v) {
-        return (theta-1-std::log(v))*std::pow(std::log(1/v), theta-2)*(theta/std::pow(v,2));
-    };
-    return u.unaryExpr(f);
-}
-
-// inverse h-function
-VecXd GumbelBicop::hinv1_default(const MatXd& u)
-{
-    double theta = double(this->parameters_(0));
-    double u1, u2;
-    VecXd hinv = VecXd::Zero(u.rows());
-    for (int j = 0; j < u.rows(); ++j) {
-        u1 = u(j, 1);
-        u2 = u(j, 0);
-        hinv(j) = qcondgum(&u1, &u2, &theta);
+    GumbelBicop::GumbelBicop()
+    {
+        family_ = 4;
+        family_name_ = "Gumbel";
+        rotation_ = 0;
+        association_direction_ = "positive";
+        parameters_ = VecXd::Ones(1);
+        parameters_bounds_ = MatXd::Ones(1, 2);
+        parameters_bounds_(0, 1) = 200.0;
     }
 
-    return hinv;
+    GumbelBicop::GumbelBicop(const VecXd& parameters)
+    {
+        GumbelBicop();
+        set_parameters(parameters);
+    }
+
+    GumbelBicop::GumbelBicop(const VecXd& parameters, const int& rotation)
+    {
+        GumbelBicop();
+        set_parameters(parameters);
+        set_rotation(rotation);
+    }
+
+    VecXd GumbelBicop::generator(const VecXd& u)
+    {
+        double theta = double(this->parameters_(0));
+        auto f = [theta](const double v) {
+            return std::pow(std::log(1/v), theta);
+        };
+        return u.unaryExpr(f);
+    }
+    VecXd GumbelBicop::generator_inv(const VecXd& u)
+    {
+        double theta = double(this->parameters_(0));
+        auto f = [theta](const double v) {
+            return std::exp(-std::pow(v,1/theta));
+        };
+        return u.unaryExpr(f);
+    }
+
+    VecXd GumbelBicop::generator_derivative(const VecXd& u)
+    {
+        double theta = double(this->parameters_(0));
+        auto f = [theta](const double v) {
+            return std::pow(std::log(1/v),theta-1)*(-theta/v);
+        };
+        return u.unaryExpr(f);
+    }
+
+    VecXd GumbelBicop::generator_derivative2(const VecXd& u)
+    {
+        double theta = double(this->parameters_(0));
+        auto f = [theta](const double v) {
+            return (theta-1-std::log(v))*std::pow(std::log(1/v), theta-2)*(theta/std::pow(v,2));
+        };
+        return u.unaryExpr(f);
+    }
+
+    VecXd GumbelBicop::hinv1_default(const MatXd& u)
+    {
+        double theta = double(this->parameters_(0));
+        double u1, u2;
+        VecXd hinv = VecXd::Zero(u.rows());
+        for (int j = 0; j < u.rows(); ++j) {
+            u1 = u(j, 1);
+            u2 = u(j, 0);
+            hinv(j) = qcondgum(&u1, &u2, &theta);
+        }
+
+        return hinv;
+    }
+
+    VecXd GumbelBicop::tau_to_parameters(const double& tau)
+    {
+        return VecXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
+    }
+
+    double GumbelBicop::parameters_to_tau(const VecXd& parameters)
+    {
+        double tau = (parameters(0) - 1) / parameters(0);
+        if ((rotation_ == 90) | (rotation_ == 270))
+            tau *= -1;
+
+        return tau;
+    }
+
+
+    VecXd GumbelBicop::get_start_parameters(const double tau)
+    {
+        return tau_to_parameters(tau);
+    }
 }
-
-// link between Kendall's tau and the par_bicop parameter
-VecXd GumbelBicop::tau_to_parameters(const double& tau)
-{
-    return VecXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
-}
-
-double GumbelBicop::parameters_to_tau(const VecXd& parameters)
-{
-    double tau = (parameters(0) - 1) / parameters(0);
-    if ((rotation_ == 90) | (rotation_ == 270))
-        tau *= -1;
-
-    return tau;
-}
-
 // This is copy&paste from the VineCopula package
 double qcondgum(double* q, double* u, double* de)
 {
@@ -132,14 +137,6 @@ double qcondgum(double* q, double* u, double* de)
     z2=pow(pow(a,*de)-pow(z1,*de),1./(*de));
     return(exp(-z2));
 }
-
-VecXd GumbelBicop::get_start_parameters(const double tau)
-{
-    return tau_to_parameters(tau);
-}
-
-
-
 /*// PDF
 VecXd GumbelBicop::pdf_default(const MatXd& u)
 {

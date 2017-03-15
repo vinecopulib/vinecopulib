@@ -8,29 +8,31 @@
 
 #include "bicop_archimedean.hpp"
 
-class JoeBicop : public ArchimedeanBicop {
+namespace vinecopulib
+{
+    class JoeBicop : public ArchimedeanBicop {
+    public:
+        // constructor
+        JoeBicop();
+        JoeBicop(const VecXd& parameters);
+        JoeBicop(const VecXd& parameters, const int& rotation);
 
-public:
-    // constructor
-    JoeBicop();
-    JoeBicop(const VecXd& parameters);
-    JoeBicop(const VecXd& parameters, const int& rotation);
+        // generator, its inverse and derivatives for the archimedean copula
+        VecXd generator(const VecXd& u);
+        VecXd generator_inv(const VecXd& u);
+        VecXd generator_derivative(const VecXd& u);
+        VecXd generator_derivative2(const VecXd& u);
 
-    // generator, its inverse and derivatives for the archimedean copula
-    VecXd generator(const VecXd& u);
-    VecXd generator_inv(const VecXd& u);
-    VecXd generator_derivative(const VecXd& u);
-    VecXd generator_derivative2(const VecXd& u);
+        // inverse hfunction
+        VecXd hinv1_default(const MatXd& u);
 
-    // inverse hfunction
-    VecXd hinv1_default(const MatXd& u);
+        // link between Kendall's tau and the par_bicop parameter
+        VecXd tau_to_parameters(const double& tau);
+        double parameters_to_tau(const VecXd& par);
 
-    // link between Kendall's tau and the par_bicop parameter
-    VecXd tau_to_parameters(const double& tau);
-    double parameters_to_tau(const VecXd& par);
-
-private:
-    VecXd get_start_parameters(const double tau);
-};
+    private:
+        VecXd get_start_parameters(const double tau);
+    };
+}
 
 double qcondjoe(double* q, double* u, double* de);

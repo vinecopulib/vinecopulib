@@ -16,8 +16,8 @@ namespace tools_optimization {
     //!
     typedef struct
     {
-        const MatXd& U; //! The data
-        ParBicop* bicop; //! A pointer to the bivariate copula to optimize
+        const vinecopulib::MatXd& U; //! The data
+        vinecopulib::ParBicop* bicop; //! A pointer to the bivariate copula to optimize
         double par0;  //! The main dependence parameter
         unsigned int objective_calls; //! The number of evaluations of the objective
     } ParBicopOptData;
@@ -94,7 +94,7 @@ namespace tools_optimization {
         //! Set the optimizer's bounds
         //!
         //! @param bounds A matrix of parameters bounds
-        void set_bounds(MatXd bounds);
+        void set_bounds(vinecopulib::MatXd bounds);
 
         //! Set the optimizer's objective and data
         //!
@@ -106,7 +106,7 @@ namespace tools_optimization {
         //!
         //! @param initial_parameters Vector of starting values
         //! @return MLE or PMLE
-        VecXd optimize(VecXd initial_parameters);
+        vinecopulib::VecXd optimize(vinecopulib::VecXd initial_parameters);
 
     private:
         unsigned int n_parameters_;

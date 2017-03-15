@@ -8,15 +8,18 @@
 
 #include "bicop_parametric.hpp"
 
-class EllipticalBicop : public ParBicop  {
-public:
-    // hfunction and its inverse
-    VecXd hfunc2_default(const MatXd& u);
-    VecXd hinv2_default(const MatXd& u);
+namespace vinecopulib
+{
+    class EllipticalBicop : public ParBicop  {
+    public:
+        // hfunction and its inverse
+        VecXd hfunc2_default(const MatXd& u);
+        VecXd hinv2_default(const MatXd& u);
 
-    // link between Kendall's tau and the par_bicop parameter
-    VecXd tau_to_parameters(const double& tau);
-    double parameters_to_tau(const VecXd& parameters);
+        // link between Kendall's tau and the par_bicop parameter
+        VecXd tau_to_parameters(const double& tau);
+        double parameters_to_tau(const VecXd& parameters);
 
-    void flip();
-};
+        void flip();
+    };
+}

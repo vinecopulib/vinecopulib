@@ -10,6 +10,8 @@
 #include "include/tools_eigen.hpp"
 #include "rscript.hpp"
 
+using namespace vinecopulib;
+
 class VinecopTest : public ::testing::Test {
 public:
     VinecopTest();

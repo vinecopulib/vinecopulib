@@ -8,8 +8,11 @@
 
 #include "bicop_kernel.hpp"
 
-class TrafokernelBicop : public KernelBicop {
-public:
-    TrafokernelBicop();
-    void fit(const MatXd& data, std::string);
-};
+namespace vinecopulib
+{
+    class TrafokernelBicop : public KernelBicop {
+    public:
+        TrafokernelBicop();
+        void fit(const MatXd& data, std::string);
+    };
+}

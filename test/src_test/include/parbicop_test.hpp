@@ -10,6 +10,8 @@
 #include "include/bicop.hpp"
 #include "include/tools_stl.hpp"
 
+using namespace vinecopulib;
+
 // Fake test class allowing access to the R instance
 class FakeParBicopTest : public ::testing::Test {
 public:
@@ -63,9 +65,9 @@ public:
                 {
                     delta = 0.8;
                 }
-                VecXd tau_v = VecXd::Constant(1,std::fabs(tau));
+                VecXd tau_v = vinecopulib::VecXd::Constant(1,std::fabs(tau));
                 auto f = [this, delta](const VecXd &v) {
-                    VecXd par = VecXd::Constant(2, delta);
+                    VecXd par = vinecopulib::VecXd::Constant(2, delta);
                     par(0) = v(0);
                     return VecXd::Constant(1, std::fabs(this->par_bicop_.parameters_to_tau(par)));
                 };

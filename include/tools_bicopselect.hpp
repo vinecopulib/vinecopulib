@@ -10,5 +10,5 @@
 
 #include "tools_eigen.hpp"
 
-std::vector<double> get_c1c2(const MatXd& data, double tau);
+std::vector<double> get_c1c2(const vinecopulib::MatXd& data, double tau);
 bool preselect_family(double c1, double c2, double tau, int family, int rotation, bool is_rotationless);

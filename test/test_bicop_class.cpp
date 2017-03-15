@@ -7,6 +7,8 @@
 #include "gtest/gtest.h"
 #include "include/bicop_class.hpp"
 
+using namespace vinecopulib;
+
 namespace {
     // Test if the C++ implementation of the par_to_tau and tau_to_par is correct
     TEST(bicop_class, creates_right_copula) {
