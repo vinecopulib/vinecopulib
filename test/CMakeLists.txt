@@ -1,4 +1,4 @@
-#set(gtest_disable_pthreads on) #needed in MinGW
+set(gtest_disable_pthreads on) #needed in MinGW
 include(../cmake/DownloadProject.cmake)
 download_project(
         PROJ                googletest
@@ -25,6 +25,4 @@ foreach(app ${unit_tests})
     target_link_libraries(${app} gtest gmock vinecopulib ${external_libs} ${test_libs} src_test)
 endforeach()
 
-#add_executable(runUnitTests gtest.cpp) #${test_SRCS}
-#target_link_libraries(runUnitTests gtest gmock common ${external_libs} ${test_libs} src_test)#
 #add_subdirectory(bindings)
