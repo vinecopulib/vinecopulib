@@ -77,6 +77,9 @@ script:
   - ./test_rvine_matrix
   - ./test_vinecop_class
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 notifications:
   email:
     - thibault.vatter@gmail.com
