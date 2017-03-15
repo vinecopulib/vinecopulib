@@ -13,9 +13,11 @@ target_link_libraries(vinecopulib ${external_libs})
 
 set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-install(TARGETS vinecopulib
-        EXPORT vinecopulibTargets
-        LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
-        PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/vinecopulib")
+if (NOT WIN32)
+    install(TARGETS vinecopulib
+            EXPORT vinecopulibTargets
+            LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
+            PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/vinecopulib")
+endif()
 
 
