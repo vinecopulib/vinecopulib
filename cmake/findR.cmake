@@ -13,7 +13,7 @@ if(BUILD_TESTING)
     set(CMAKE_FIND_APPBUNDLE ${TEMP_CMAKE_FIND_APPBUNDLE})
 
     if(RSCRIPT_EXECUTABLE)
-        configure_file(${CMAKE_CURRENT_LIST_DIR}/rscript.hpp.txt ${CMAKE_BINARY_DIR}/generated/rscript.hpp)
+        configure_file(${CMAKE_CURRENT_LIST_DIR}/templates/rscript.hpp.in ${CMAKE_BINARY_DIR}/generated/rscript.hpp)
     elseif(RSCRIPT_EXECUTABLE)
         message(SEND_ERROR "FindR.cmake requires the following variables to be set: RSCRIPT_EXECUTABLE")
     endif(RSCRIPT_EXECUTABLE)
