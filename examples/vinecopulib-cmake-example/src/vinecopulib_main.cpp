@@ -7,7 +7,7 @@ int main() {
 
     // print all available families
 	auto family = bicop_families::all;
-	std::cout << "Available families:";
+	std::cout << "Available families : ";
 	for (auto fam : family) {
 		std::cout << get_family_name(fam) << " ";
 	}
