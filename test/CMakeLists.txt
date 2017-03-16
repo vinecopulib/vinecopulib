@@ -1,4 +1,6 @@
 set(gtest_disable_pthreads on) #needed in MinGW
+set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
+
 include(../cmake/DownloadProject.cmake)
 download_project(
         PROJ                googletest
