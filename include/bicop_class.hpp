@@ -21,7 +21,7 @@ namespace vinecopulib
     {
     public:
         static std::shared_ptr<Bicop> create(
-            BicopFamily family = BicopFamily::Indep,
+            BicopFamily family = BicopFamily::indep,
             int rotation = 0
         );
         
@@ -84,9 +84,7 @@ namespace vinecopulib
         Eigen::MatrixXd swap_cols(const Eigen::MatrixXd& u);
 
         BicopFamily family_;
-        std::string family_name_;
         int rotation_;
-        std::string association_direction_;
         Eigen::VectorXd parameters_;
         Eigen::MatrixXd parameters_bounds_;   // first column lower, second column upper
 

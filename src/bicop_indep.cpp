@@ -10,8 +10,7 @@ namespace vinecopulib
 {
     IndepBicop::IndepBicop()
     {
-        family_ = BicopFamily::Indep;
-        family_name_ = "Indep";
+        family_ = BicopFamily::indep;
         rotation_ = 0;
     }
 

@@ -14,7 +14,7 @@ namespace vinecopulib
     // calculate number of parameters
     double ParBicop::calculate_npars() {
         // indepence copula has no parameters
-        if (family_ == BicopFamily::Indep) {
+        if (family_ == BicopFamily::indep) {
             return 0.0;
         }
         // otherwise, return length of parameter vector
@@ -24,7 +24,7 @@ namespace vinecopulib
     // fit
     void ParBicop::fit(const Eigen::MatrixXd &data, std::string method)
     {
-        if (family_ != BicopFamily::Indep) {
+        if (family_ != BicopFamily::indep) {
             using namespace tools_optimization;
 
             std::vector<std::string> methods = {"itau", "mle"};
@@ -35,7 +35,7 @@ namespace vinecopulib
             int npars = (int) calculate_npars();
             if (method == "itau") {
                 npars = npars - 1;
-                if ((npars > 0) & (family_ != BicopFamily::Student)) {
+                if ((npars > 0) & (family_ != BicopFamily::student)) {
                     throw std::runtime_error("itau method is not available for this family.");
                 }
             }

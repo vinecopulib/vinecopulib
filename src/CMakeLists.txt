@@ -20,17 +20,11 @@ set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
 
 if (NOT WIN32)
-    if (BUILD_SHARED_LIBS)
-        install(TARGETS vinecopulib
-                EXPORT vinecopulibTargets
-                LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
-                PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/vinecopulib")
-    else()
-        install(TARGETS vinecopulib
-                EXPORT vinecopulibTargets
-                ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
-                PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/vinecopulib")
-    endif()
+    install(TARGETS vinecopulib
+            EXPORT vinecopulibTargets
+            ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
+            LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
+            PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/vinecopulib")
 endif()
 
 

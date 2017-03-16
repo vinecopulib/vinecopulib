@@ -9,37 +9,37 @@
 void FakeParBicopTest::set_family(BicopFamily family, int rotation)
 {
     switch (family) {
-        case BicopFamily::Indep:
+        case BicopFamily::indep:
             family_ = 0;
             break;
-        case BicopFamily::Gaussian:
+        case BicopFamily::gaussian:
             family_ = 1;
             break;
-        case BicopFamily::Student:
+        case BicopFamily::student:
             family_ = 2;
             break;
-        case BicopFamily::Clayton:
+        case BicopFamily::clayton:
             family_ = 3;
             break;
-        case BicopFamily::Gumbel:
+        case BicopFamily::gumbel:
             family_ = 4;
             break;
-        case BicopFamily::Frank:
+        case BicopFamily::frank:
             family_ = 5;
             break;
-        case BicopFamily::Joe:
+        case BicopFamily::joe:
             family_ = 6;
             break;
-        case BicopFamily::BB1:
+        case BicopFamily::bb1:
             family_ = 7;
             break;
-        case BicopFamily::BB6:
+        case BicopFamily::bb6:
             family_ = 8;
             break;
-        case BicopFamily::BB7:
+        case BicopFamily::bb7:
             family_ = 9;
             break;
-        case BicopFamily::BB8:
+        case BicopFamily::bb8:
             family_ = 10;
             break;
         default:

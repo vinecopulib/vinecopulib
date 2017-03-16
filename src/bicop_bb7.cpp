@@ -11,8 +11,7 @@ namespace vinecopulib
 {
     Bb7Bicop::Bb7Bicop()
     {
-        family_ = BicopFamily::BB7;
-        family_name_ = "BB7";
+        family_ = BicopFamily::bb7;
         rotation_ = 0;
         parameters_ = Eigen::VectorXd::Ones(2);
         parameters_bounds_ = Eigen::MatrixXd::Constant(2, 2, 200);

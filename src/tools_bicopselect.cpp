@@ -61,7 +61,7 @@ bool preselect_family(
     bool preselect = false;
     if (is_rotationless) {
         preselect = true;
-        if ((std::fabs(c1 - c2) > 0.3) & (family == BicopFamily::Frank))
+        if ((std::fabs(c1 - c2) > 0.3) & (family == BicopFamily::frank))
             preselect = false;
     } else {
         if (is_member(family, bicop_families::BB)) {

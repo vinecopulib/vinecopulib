@@ -154,7 +154,7 @@ namespace vinecopulib
 
             // truncate (only allow for Independence copula from here on)
             if (truncation_level == t) {
-                family_set = std::vector<BicopFamily>({BicopFamily::Indep});
+                family_set = std::vector<BicopFamily>({BicopFamily::indep});
             }
         }
 

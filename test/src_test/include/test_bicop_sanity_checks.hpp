@@ -28,15 +28,15 @@ namespace test_bicop_sanity_checks {
     }
     
     TEST(bicop_sanity_checks, catches_parameters_out_of_bounds) {
-            auto cop = Bicop::create(BicopFamily::Gaussian);
+            auto cop = Bicop::create(BicopFamily::gaussian);
             auto wrong_par = Eigen::VectorXd::Constant(1, 1.01);
-            EXPECT_ANY_THROW(Bicop::create(BicopFamily::Gaussian, 0,  wrong_par));
-            EXPECT_ANY_THROW(Bicop::create(BicopFamily::Gaussian, 0, -wrong_par));
+            EXPECT_ANY_THROW(Bicop::create(BicopFamily::gaussian, 0,  wrong_par));
+            EXPECT_ANY_THROW(Bicop::create(BicopFamily::gaussian, 0, -wrong_par));
     }
     
     TEST(bicop_sanity_checks, catches_wrong_rotation) {
-        EXPECT_ANY_THROW(Bicop::create(BicopFamily::Gaussian, -10));
-        EXPECT_ANY_THROW(Bicop::create(BicopFamily::Gaussian, 10));
+        EXPECT_ANY_THROW(Bicop::create(BicopFamily::gaussian, -10));
+        EXPECT_ANY_THROW(Bicop::create(BicopFamily::gaussian, 10));
     }
 
 }

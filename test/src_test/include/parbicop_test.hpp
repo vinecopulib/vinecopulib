@@ -45,15 +45,15 @@ public:
         if (parameters.size() < 2) {
             parameters = this->par_bicop_.tau_to_parameters(tau);
         } else {
-            if (family == BicopFamily::Student) {
+            if (family == BicopFamily::student) {
                 parameters = this->par_bicop_.tau_to_parameters(tau);
                 parameters(1) = 4;
-            } else if (family == BicopFamily::BB1) {
+            } else if (family == BicopFamily::bb1) {
                 parameters(1) = 1.5;
                 parameters(0) = -((2*(1-parameters(1)+parameters(1)*tau))/(parameters(1)*(-1+tau)));
             } else {
                 double delta = 1.5;
-                if (family == BicopFamily::BB8)
+                if (family == BicopFamily::bb8)
                     delta = 0.8;
                 auto tau_v = Eigen::VectorXd::Constant(1, std::fabs(tau));
                 auto f = [this, delta](const Eigen::VectorXd &v) {

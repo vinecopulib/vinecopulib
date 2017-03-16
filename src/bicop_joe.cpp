@@ -11,8 +11,7 @@ namespace vinecopulib
 {
     JoeBicop::JoeBicop()
     {
-        family_ = BicopFamily::Joe;
-        family_name_ = "Joe";
+        family_ = BicopFamily::joe;
         rotation_ = 0;
         parameters_ = Eigen::VectorXd::Ones(1);
         parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);

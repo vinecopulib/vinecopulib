@@ -19,8 +19,8 @@ namespace test_bicop_select {
         std::string selection_criterion = "bic";
         auto true_family = this->par_bicop_.get_family();
         std::vector<BicopFamily> family_set = {
-            BicopFamily::Indep, 
-            BicopFamily::Student, 
+            BicopFamily::indep, 
+            BicopFamily::student, 
             true_family
         };
 
@@ -57,8 +57,8 @@ namespace test_bicop_select {
             std::string selection_criterion = "bic";
             auto true_family = this->par_bicop_.get_family();
             std::vector<BicopFamily> family_set = {
-                BicopFamily::Indep, 
-                BicopFamily::Student, 
+                BicopFamily::indep, 
+                BicopFamily::student, 
                 true_family
             };
             this->setup_parameters();

@@ -15,8 +15,7 @@ namespace vinecopulib
 {
     StudentBicop::StudentBicop()
     {
-        family_ = BicopFamily::Student;
-        family_name_ = "Student";
+        family_ = BicopFamily::student;
         rotation_ = 0;
         parameters_ = Eigen::VectorXd::Zero(2);
         parameters_(1) = 50.0;

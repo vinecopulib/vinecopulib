@@ -12,8 +12,7 @@ namespace vinecopulib
 {
     TrafokernelBicop::TrafokernelBicop()
     {
-        family_ = BicopFamily::TLL0;
-        family_name_ = "TLL0";
+        family_ = BicopFamily::tll0;
         rotation_ = 0;
     }
 

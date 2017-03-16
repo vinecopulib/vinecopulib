@@ -11,10 +11,8 @@ namespace vinecopulib
 {
     GumbelBicop::GumbelBicop()
     {
-        family_ = BicopFamily::Gumbel;
-        family_name_ = "Gumbel";
+        family_ = BicopFamily::gumbel;
         rotation_ = 0;
-        association_direction_ = "positive";
         parameters_ = Eigen::VectorXd::Ones(1);
         parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);
         parameters_bounds_(0, 1) = 200.0;

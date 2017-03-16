@@ -27,40 +27,40 @@ namespace vinecopulib
     {
         BicopPtr new_bicop;
         switch (family) {
-            case BicopFamily::Indep:
+            case BicopFamily::indep:
                 new_bicop = BicopPtr(new IndepBicop());
                 break;
-            case BicopFamily::Gaussian:
+            case BicopFamily::gaussian:
                 new_bicop = BicopPtr(new GaussianBicop());
                 break;
-            case BicopFamily::Student:
+            case BicopFamily::student:
                 new_bicop = BicopPtr(new StudentBicop());
                 break;
-            case BicopFamily::Clayton:
+            case BicopFamily::clayton:
                 new_bicop = BicopPtr(new ClaytonBicop());
                 break;
-            case BicopFamily::Gumbel:
+            case BicopFamily::gumbel:
                 new_bicop = BicopPtr(new GumbelBicop());
                 break;
-            case BicopFamily::Frank:
+            case BicopFamily::frank:
                 new_bicop = BicopPtr(new FrankBicop());
                 break;
-            case BicopFamily::Joe:
+            case BicopFamily::joe:
                 new_bicop = BicopPtr(new JoeBicop());
                 break;
-            case BicopFamily::BB1:
+            case BicopFamily::bb1:
                 new_bicop = BicopPtr(new Bb1Bicop());
                 break;
-            case BicopFamily::BB6:
+            case BicopFamily::bb6:
                 new_bicop = BicopPtr(new Bb6Bicop());
                 break;
-            case BicopFamily::BB7:
+            case BicopFamily::bb7:
                 new_bicop = BicopPtr(new Bb7Bicop());
                 break;
-            case BicopFamily::BB8:
+            case BicopFamily::bb8:
                 new_bicop = BicopPtr(new Bb8Bicop());
                 break;
-            case BicopFamily::TLL0:
+            case BicopFamily::tll0:
                 new_bicop =  BicopPtr(new TrafokernelBicop());
                 break;
 
@@ -373,9 +373,8 @@ namespace vinecopulib
     //! Getters and setters.
     //! @{
     BicopFamily Bicop::get_family() const {return family_;}
-    std::string Bicop::get_family_name() const {return family_name_;};
+    std::string Bicop::get_family_name() const {return vinecopulib::get_family_name(family_);};
     int Bicop::get_rotation() const {return rotation_;}
-    std::string Bicop::get_association_direction() const {return association_direction_;}
     Eigen::VectorXd Bicop::get_parameters() const {return parameters_;}
     Eigen::MatrixXd Bicop::get_parameters_bounds() const {return parameters_bounds_;}
 

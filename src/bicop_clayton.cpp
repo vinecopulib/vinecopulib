@@ -12,8 +12,7 @@ namespace vinecopulib
 {
     ClaytonBicop::ClaytonBicop()
     {
-        family_ = BicopFamily::Clayton;
-        family_name_ = "Clayton";
+        family_ = BicopFamily::clayton;
         rotation_ = 0;
         parameters_ = Eigen::VectorXd::Zero(1);
         parameters_bounds_ = Eigen::MatrixXd::Zero(1, 2);
