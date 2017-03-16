@@ -20,7 +20,7 @@ namespace test_bicop_select {
         auto true_family = this->par_bicop_.get_family();
         std::vector<BicopFamily> family_set = {
             BicopFamily::Indep, 
-            BicopFamily::Gaussian, 
+            BicopFamily::Student, 
             true_family
         };
 
@@ -59,7 +59,7 @@ namespace test_bicop_select {
             auto true_family = this->par_bicop_.get_family();
             std::vector<BicopFamily> family_set = {
                 BicopFamily::Indep, 
-                BicopFamily::Gaussian, 
+                BicopFamily::Student, 
                 true_family
             };
             this->setup_parameters();
