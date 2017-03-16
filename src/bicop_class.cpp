@@ -19,68 +19,72 @@ namespace vinecopulib
     //!
     //! @param family the copula family.
     //! @param rotation the rotation type.
+    //! @param parameters the copula parameters (optional, must be compatible 
+    //!     with family).
     //! @return A pointer to an object that inherits from \c Bicop.
-    BicopPtr Bicop::create(const int& family, const int& rotation)
+    //! @{
+    BicopPtr Bicop::create(BicopFamily family, int rotation)
     {
-        BicopPtr my_bicop;
+        BicopPtr new_bicop;
         switch (family) {
-            case 0:
-                my_bicop = BicopPtr(new IndepBicop());
+            case BicopFamily::Indep:
+                new_bicop = BicopPtr(new IndepBicop());
                 break;
-            case 1:
-                my_bicop = BicopPtr(new GaussianBicop());
+            case BicopFamily::Gaussian:
+                new_bicop = BicopPtr(new GaussianBicop());
                 break;
-            case 2:
-                my_bicop = BicopPtr(new StudentBicop());
+            case BicopFamily::Student:
+                new_bicop = BicopPtr(new StudentBicop());
                 break;
-            case 3:
-                my_bicop = BicopPtr(new ClaytonBicop());
+            case BicopFamily::Clayton:
+                new_bicop = BicopPtr(new ClaytonBicop());
                 break;
-            case 4:
-                my_bicop = BicopPtr(new GumbelBicop());
+            case BicopFamily::Gumbel:
+                new_bicop = BicopPtr(new GumbelBicop());
                 break;
-            case 5:
-                my_bicop = BicopPtr(new FrankBicop());
+            case BicopFamily::Frank:
+                new_bicop = BicopPtr(new FrankBicop());
                 break;
-            case 6:
-                my_bicop = BicopPtr(new JoeBicop());
+            case BicopFamily::Joe:
+                new_bicop = BicopPtr(new JoeBicop());
                 break;
-            case 7:
-                my_bicop = BicopPtr(new Bb1Bicop());
+            case BicopFamily::BB1:
+                new_bicop = BicopPtr(new Bb1Bicop());
                 break;
-            case 8:
-                my_bicop = BicopPtr(new Bb6Bicop());
+            case BicopFamily::BB6:
+                new_bicop = BicopPtr(new Bb6Bicop());
                 break;
-            case 9:
-                my_bicop = BicopPtr(new Bb7Bicop());
+            case BicopFamily::BB7:
+                new_bicop = BicopPtr(new Bb7Bicop());
                 break;
-            case 10:
-                my_bicop = BicopPtr(new Bb8Bicop());
+            case BicopFamily::BB8:
+                new_bicop = BicopPtr(new Bb8Bicop());
                 break;
-            case 1001:
-                my_bicop =  BicopPtr(new TrafokernelBicop());
+            case BicopFamily::TLL0:
+                new_bicop =  BicopPtr(new TrafokernelBicop());
                 break;
 
             default:
                 throw std::runtime_error(std::string("Family not implemented"));
         }
-
-        my_bicop->set_rotation(rotation);
-        return my_bicop;
+        
+        new_bicop->set_rotation(rotation);
+            
+        return new_bicop;
     }
-
-    //! Create a bivariate copula with a specified parameters vector
-    //!
-    //! @param family the copula family.
-    //! @param par the copula parameters (must be compatible with family).
-    //! @param rotation the rotation type.
-    //! @return A pointer to an object that inherits from \c Bicop.
-    BicopPtr Bicop::create(const int& family, const Eigen::VectorXd& parameters, const int& rotation)
+    
+    BicopPtr Bicop::create(
+        BicopFamily family,
+        int rotation,
+        Eigen::VectorXd parameters
+    )
     {
-        BicopPtr my_bicop = create(family, rotation);
-        my_bicop->set_parameters(parameters);
-        return my_bicop;
+        auto new_bicop = Bicop::create(family, rotation);
+        new_bicop->set_parameters(parameters);
+        return new_bicop;
     }
+    
+    //!@}
 
     //! Select a bivariate copula
     //!
@@ -89,106 +93,80 @@ namespace vinecopulib
     //! @param family_set the set of copula families to consider (if empty, then 
     //!     all families are included).
     //! @param use_rotations whether rotations in the familyset are included.
-    //! @param preselect_families whether to exclude families before fitting based 
-    //!     on symmetry properties of the data.
+    //! @param preselect_families whether to exclude families before fitting 
+    //!     based on symmetry properties of the data.
     //! @param method indicates the estimation method: either maximum likelihood 
     //!     estimation (method = "mle") or inversion of Kendall's tau (method = 
-    //!     "itau"). When method = "itau" is used with families having more than one
-    //!      parameter, the main dependence parameter is found by inverting the 
-    //!      Kendall's tau and the remainders by a profile likelihood optimization.
+    //!     "itau"). When method = "itau" is used with families having more than
+    //!     one parameter, the main dependence parameter is found by inverting
+    //!     the Kendall's tau and the remainders by a profile likelihood 
+    //!     optimization.
     //! @return A pointer to an object that inherits from \c Bicop.
-    BicopPtr Bicop::select(const Eigen::MatrixXd& data,
-                           std::vector<int> family_set,
+    BicopPtr Bicop::select(Eigen::MatrixXd& data,
+                           std::vector<BicopFamily> family_set,
                            std::string method,
                            std::string selection_criterion,
                            bool preselect_families)
     {
-        std::vector<int> all_families = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1001};
-        std::vector<int> itau_families = {0, 1, 2, 3, 4, 5, 6};
-        std::vector<int> rotationless_families = {0, 1, 2, 5, 1001};
-
+        using namespace tools_stl;
         // If the familyset is empty, use all families.
         // If the familyset is not empty, check that all included families are implemented.
-        if (family_set.empty())
-        {
-            if (method == "itau")
-            {
-                family_set = tools_stl::intersect(all_families, itau_families);
+        if (family_set.empty()) {
+            if (method == "itau") {
+                family_set = bicop_families::itau;
+            } else {
+                family_set = bicop_families::all;
             }
-            else
-            {
-                family_set = all_families;
-            }
-        } else
-        {
-            for (unsigned int j = 0; j < family_set.size(); j++)
-            {
-                if (!tools_stl::is_member(family_set[j], all_families))
-                    throw std::runtime_error(std::string("One of the families is not implemented"));
+        } else {
+            if (intersect(family_set, bicop_families::all).empty()) {
+                throw std::runtime_error(
+                    std::string("One of the families is not implemented")
+                );    
             }
             if (method == "itau") {
-                family_set = tools_stl::intersect(family_set, itau_families);
-                if (family_set.empty())
-                    throw std::runtime_error(std::string("None of the families has method itau available"));
+                family_set = intersect(family_set, bicop_families::itau);
+                if (family_set.empty()) {
+                    throw std::runtime_error(
+                        std::string("No family with method itau provided")
+                    );
+                }
             }
-
         }
-
-        auto temp_data = data;
-        auto tau = tools_stats::pairwise_ktau(temp_data);
 
         // When using rotations, add only the ones that yield the appropriate 
         // association direction.
-        std::vector<int> which_rotations = {0};
-        if (tau < 0)
-        {
-            which_rotations.pop_back();
-            which_rotations.push_back(90);
-            which_rotations.push_back(270);
+        auto tau = tools_stats::pairwise_ktau(data);
+        std::vector<int> which_rotations;
+        if (tau > 0) {
+            which_rotations = {0, 180};
         } else {
-            which_rotations.push_back(180);
+            which_rotations = {90, 270};
         }
 
-        double c1 = 0;
-        double c2 = 0;
-        if (preselect_families)
-        {
-            std::vector<double> c = get_c1c2(temp_data, tau);
-            c1 = c[0];
-            c2 = c[1];
-        }
+        std::vector<double> c(2);
+        if (preselect_families) 
+            c = get_c1c2(data, tau);
 
         // Create the combinations of families and rotations to estimate
-        std::vector<int> families;
+        std::vector<BicopFamily> families;
         std::vector<int> rotations;
-        for (unsigned int j = 0; j < family_set.size(); j++)
-        {
-            bool is_rotationless = tools_stl::is_member(family_set[j], rotationless_families);
+        for (auto family : family_set) {
+            bool is_rotationless = is_member(family, bicop_families::rotationless);
             bool preselect = true;
-            if (is_rotationless)
-            {
+            if (is_rotationless) {
                 if (preselect_families)
-                {
-                    preselect = preselect_family(c1, c2, tau, family_set[j], 0, is_rotationless);
-                }
-
-                if (preselect)
-                {
-                    families.push_back(family_set[j]);
+                    preselect = preselect_family(c, tau, family, 0, is_rotationless);
+                if (preselect) {
+                    families.push_back(family);
                     rotations.push_back(0);
                 }
             } else {
-                for (unsigned int k = 0; k < which_rotations.size(); k++)
-                {
+                for (auto rotation : which_rotations) {
                     if (preselect_families)
-                    {
-                        preselect = preselect_family(c1, c2, tau, family_set[j], which_rotations[k], is_rotationless);
-                    }
-
-                    if (preselect)
-                    {
-                        families.push_back(family_set[j]);
-                        rotations.push_back(which_rotations[k]);
+                        preselect = preselect_family(c, tau, family, rotation, is_rotationless);
+                    if (preselect) {
+                        families.push_back(family);
+                        rotations.push_back(rotation);
                     }
                 }
             }
@@ -197,30 +175,23 @@ namespace vinecopulib
         // Estimate all models and select the best one using the selection_criterion
         BicopPtr fitted_bicop;
         double fitted_criterion = 1e6;
-        for (unsigned int j = 0; j < families.size(); j++)
-        {
+        for (unsigned int j = 0; j < families.size(); j++) {
             // Estimate the model
             BicopPtr new_bicop = create(families[j], rotations[j]);
-            new_bicop->fit(temp_data, method);
+            new_bicop->fit(data, method);
 
             // Compute the selection criterion
             double new_criterion;
-            if (selection_criterion == "aic")
-            {
-                new_criterion = new_bicop->aic(temp_data);
-            }
-            else if (selection_criterion == "bic")
-            {
-                new_criterion = new_bicop->bic(temp_data);
-            }
-            else
-            {
+            if (selection_criterion == "aic") {
+                new_criterion = new_bicop->aic(data);
+            } else if (selection_criterion == "bic") {
+                new_criterion = new_bicop->bic(data);
+            } else {
                 throw std::runtime_error(std::string("Selection criterion not implemented"));
             }
 
             // If the new model is better than the current one, then replace the current model by the new one
-            if (new_criterion < fitted_criterion)
-            {
+            if (new_criterion < fitted_criterion) {
                 fitted_criterion = new_criterion;
                 fitted_bicop = new_bicop;
             }
@@ -390,7 +361,7 @@ namespace vinecopulib
         return 999.0;
     }
 
-    Eigen::VectorXd Bicop::tau_to_parameters(const double& tau)
+    Eigen::VectorXd Bicop::tau_to_parameters(const double&)
     {
         throw std::runtime_error("Method not implemented for this family");
     }
@@ -398,7 +369,8 @@ namespace vinecopulib
 
     //! Getters and setters.
     //! @{
-    int Bicop::get_family() const {return family_;}
+    BicopFamily Bicop::get_family() const {return family_;}
+    std::string Bicop::get_family_name() const {return family_name_;};
     int Bicop::get_rotation() const {return rotation_;}
     std::string Bicop::get_association_direction() const {return association_direction_;}
     Eigen::VectorXd Bicop::get_parameters() const {return parameters_;}
@@ -407,17 +379,6 @@ namespace vinecopulib
     void Bicop::set_rotation(const int& rotation) {
         check_rotation(rotation);
         rotation_ = rotation;
-        if (this->association_direction_ == "positive" || this->association_direction_ == "negative")
-        {
-            if (rotation == 0 || rotation == 180)
-            {
-                this->association_direction_ = "positive";
-            }
-            else
-            {
-                this->association_direction_ = "negative";
-            }
-        }
     }
 
     void Bicop::set_parameters(const Eigen::VectorXd& parameters)
@@ -510,30 +471,30 @@ namespace vinecopulib
     void Bicop::check_parameters(const Eigen::VectorXd& parameters)
     {
         int num_pars = parameters_bounds_.rows();
-
         if (parameters.size() != num_pars) {
             std::stringstream message;
             message <<
-                    "Wrong size of parameters for " << family_name_ << " copula; " <<
-                    "expected: " << num_pars << ", " <<
-                    "actual: " << parameters.size() << std::endl;
-            throw std::runtime_error(message.str().c_str());
+                "Wrong size of parameters for " << 
+                get_family_name() << " copula; " << 
+                "expected: " << num_pars << ", " <<
+                "actual: " << parameters.size() << std::endl;
+           throw std::runtime_error(message.str().c_str());
         }
         if (num_pars > 0) {
             std::stringstream message;
             for (int i = 0; i < num_pars; ++i) {
                 if (parameters(i) < parameters_bounds_(i, 0)) {
                     message <<
-                            "parameters[" << i << "]" <<
-                            " must be larger than " << parameters_bounds_(i, 0) <<
-                            " for the " << family_name_ << " copula" << std::endl;
+                        "parameters[" << i << "]" <<
+                        " must be larger than " << parameters_bounds_(i, 0) <<
+                        " for " << get_family_name() << " copula" << std::endl;
                     throw std::runtime_error(message.str().c_str());
                 }
                 if (parameters(i) > parameters_bounds_(i, 1)) {
                     message <<
-                            "parameters[" << i << "]" <<
-                            " must be smaller than " << parameters_bounds_(i, 1) <<
-                            " for the " << family_name_ << " copula";
+                        "parameters[" << i << "]" <<
+                        " must be smaller than " << parameters_bounds_(i, 1) <<
+                        " for " << get_family_name() << " copula" << std::endl;
                     throw std::runtime_error(message.str().c_str());
                 }
             }
@@ -547,7 +508,6 @@ namespace vinecopulib
             std::string message = "rotation must be one of {0, 90, 180, 270}";
             throw std::runtime_error(message);
         }
-
     }
     //! @}
 }

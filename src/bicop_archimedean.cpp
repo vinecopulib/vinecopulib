@@ -57,7 +57,7 @@ namespace vinecopulib
         }
     }
 
-    Eigen::VectorXd ArchimedeanBicop::get_start_parameters(const double tau)
+    Eigen::VectorXd ArchimedeanBicop::get_start_parameters(const double)
     {
         Eigen::MatrixXd bounds = this->get_parameters_bounds();
         Eigen::VectorXd parameters = bounds.col(0) + Eigen::VectorXd::Constant(2, 0.1);

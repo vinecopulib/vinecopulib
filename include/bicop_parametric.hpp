@@ -27,5 +27,3 @@ namespace vinecopulib
         virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
     };
 }
-
-

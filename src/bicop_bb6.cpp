@@ -11,26 +11,24 @@ namespace vinecopulib
 {
     Bb6Bicop::Bb6Bicop()
     {
-        family_ = 8;
-        family_name_ = "Bb6";
+        family_ = BicopFamily::BB6;
+        family_name_ = "BB6";
         rotation_ = 0;
-        association_direction_ = "positive";
         parameters_ = Eigen::VectorXd::Ones(2);
         parameters_bounds_ = Eigen::MatrixXd::Constant(2, 2, 200);
         parameters_bounds_(0, 0) = 1.0;
         parameters_bounds_(1, 0) = 1.0;
     }
 
-    Bb6Bicop::Bb6Bicop(const Eigen::VectorXd& parameters)
+    Bb6Bicop::Bb6Bicop(const Eigen::VectorXd& parameters) :
+        Bb6Bicop()
     {
-        Bb6Bicop();
         set_parameters(parameters);
     }
 
-    Bb6Bicop::Bb6Bicop(const Eigen::VectorXd& parameters, const int& rotation)
+    Bb6Bicop::Bb6Bicop(const Eigen::VectorXd& parameters, const int& rotation) :
+        Bb6Bicop(parameters)
     {
-        Bb6Bicop();
-        set_parameters(parameters);
         set_rotation(rotation);
     }
 

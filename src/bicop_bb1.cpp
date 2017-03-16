@@ -11,10 +11,9 @@ namespace vinecopulib
 {
     Bb1Bicop::Bb1Bicop()
     {
-        family_ = 7;
-        family_name_ = "Bb1";
+        family_ = BicopFamily::BB1;
+        family_name_ = "BB1";
         rotation_ = 0;
-        association_direction_ = "positive";
         parameters_ = Eigen::VectorXd::Zero(2);
         parameters_(1) = 1;
         parameters_bounds_ = Eigen::MatrixXd::Constant(2, 2, 200);
@@ -22,16 +21,15 @@ namespace vinecopulib
         parameters_bounds_(1, 0) = 1.0;
     }
 
-    Bb1Bicop::Bb1Bicop(const Eigen::VectorXd& parameters)
+    Bb1Bicop::Bb1Bicop(const Eigen::VectorXd& parameters) : 
+        Bb1Bicop()
     {
-        Bb1Bicop();
         set_parameters(parameters);
     }
 
-    Bb1Bicop::Bb1Bicop(const Eigen::VectorXd& parameters, const int& rotation)
+    Bb1Bicop::Bb1Bicop(const Eigen::VectorXd& parameters, const int& rotation) :
+        Bb1Bicop(parameters)
     {
-        Bb1Bicop();
-        set_parameters(parameters);
         set_rotation(rotation);
     }
 

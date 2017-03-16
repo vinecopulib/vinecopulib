@@ -11,25 +11,23 @@ namespace vinecopulib
 {
     GaussianBicop::GaussianBicop()
     {
-        family_ = 1;
+        family_ = BicopFamily::Gaussian;
         family_name_ = "Gaussian";
         rotation_ = 0;
-        association_direction_ = "both";
         parameters_ = Eigen::VectorXd::Zero(1);
         parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);
         parameters_bounds_(0, 0) = -1;
     }
 
-    GaussianBicop::GaussianBicop(const Eigen::VectorXd& parameters)
+    GaussianBicop::GaussianBicop(const Eigen::VectorXd& parameters) :
+        GaussianBicop()
     {
-        GaussianBicop();
         set_parameters(parameters);
     }
 
-    GaussianBicop::GaussianBicop(const Eigen::VectorXd& parameters, const int& rotation)
+    GaussianBicop::GaussianBicop(const Eigen::VectorXd& parameters, const int& rotation) :
+        GaussianBicop(parameters)
     {
-        GaussianBicop();
-        set_parameters(parameters);
         set_rotation(rotation);
     }
 

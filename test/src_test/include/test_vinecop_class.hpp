@@ -20,7 +20,7 @@ namespace test_vinecop_class {
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(3, Eigen::VectorXd::Constant(1, 3.0), 90);
+                pc = Bicop::create(BicopFamily::Clayton, 90);
             }
         }
 
@@ -30,9 +30,10 @@ namespace test_vinecop_class {
     TEST_F(VinecopTest, pdf_is_correct) {
 
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
+        auto par = Eigen::VectorXd::Constant(1, 3.0);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(3, Eigen::VectorXd::Constant(1, 3.0), 270);
+                pc = Bicop::create(BicopFamily::Clayton, 270, par);
             }
         }
         Vinecop vinecop(pair_copulas, model_matrix);
@@ -43,9 +44,10 @@ namespace test_vinecop_class {
     TEST_F(VinecopTest, simulate_is_correct) {
 
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
+        auto par = Eigen::VectorXd::Constant(1, 3.0);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(3, Eigen::VectorXd::Constant(1, 3.0), 270);
+                pc = Bicop::create(BicopFamily::Clayton, 270, par);
             }
         }
         Vinecop vinecop(pair_copulas, model_matrix);
@@ -59,7 +61,7 @@ namespace test_vinecop_class {
 // independence (pair-copula estimates differ otherwise)
 
 // select structure and get matrix
-        Vinecop fit = Vinecop::select(u, {0});
+        Vinecop fit = Vinecop::select(u, {BicopFamily::Indep});
         auto vcl_matrix = fit.get_matrix();
 
 // check if the same conditioned sets appear for each tree

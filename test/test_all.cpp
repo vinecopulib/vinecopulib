@@ -4,14 +4,14 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "src_test/include/test_bicop_class.hpp"
+#include "src_test/include/test_bicop_sanity_checks.hpp"
 #include "src_test/include/test_bicop_parametric.hpp"
 #include "src_test/include/test_bicop_select.hpp"
 #include "src_test/include/test_bicop_trafokernel.hpp"
 #include "src_test/include/test_rvine_matrix.hpp"
 #include "src_test/include/test_vinecop_class.hpp"
 
-using namespace test_bicop_class;
+using namespace test_bicop_sanity_checks;
 using namespace test_bicop_parametric;
 using namespace test_bicop_select;
 using namespace test_bicop_trafokernel;

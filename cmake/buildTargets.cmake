@@ -6,7 +6,7 @@ if(BUILD_TESTING)
     set(unit_tests
             test_all
             test_bicop_parametric
-            test_bicop_class
+            test_bicop_sanity_checks
             test_bicop_select
             test_bicop_trafokernel
             test_rvine_matrix

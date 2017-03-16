@@ -27,7 +27,7 @@ namespace vinecopulib
         static std::vector<std::vector<BicopPtr>> make_pair_copula_store(int d);
         static Vinecop select(
                 const Eigen::MatrixXd& data,
-                std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
+                std::vector<BicopFamily> family_set = bicop_families::all,
                 std::string method = "mle",
                 int truncation_level = std::numeric_limits<int>::max(),
                 Eigen::MatrixXi matrix = Eigen::MatrixXi(0, 0),
@@ -37,11 +37,12 @@ namespace vinecopulib
         );
 
         BicopPtr get_pair_copula(int tree, int edge);
-        int get_family(int tree, int edge);
-        Eigen::MatrixXi get_families();
+        BicopFamily get_family(int tree, int edge);
+        std::vector<std::vector<BicopFamily>> get_all_families();
         int get_rotation(int tree, int edge);
-        Eigen::MatrixXi get_rotations();
+        std::vector<std::vector<int>> get_all_rotations();
         Eigen::VectorXd get_parameters(int tree, int edge);
+        std::vector<std::vector<Eigen::VectorXd>> get_all_parameters();
         Eigen::MatrixXi get_matrix() {return vine_matrix_.get_matrix();}
 
         Eigen::VectorXd pdf(const Eigen::MatrixXd& u);

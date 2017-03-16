@@ -117,7 +117,7 @@ namespace vinecopulib
     //! @return The fitted vine copula model.
     Vinecop Vinecop::select(
             const Eigen::MatrixXd& data,
-            std::vector<int> family_set,
+            std::vector<BicopFamily> family_set,
             std::string method,
             int truncation_level,
             Eigen::MatrixXi matrix,
@@ -151,7 +151,7 @@ namespace vinecopulib
 
             // truncate (only allow for Independence copula from here on)
             if (truncation_level == t)
-                family_set = {0};
+                family_set = std::vector<BicopFamily>({BicopFamily::Indep});
         }
 
         return as_vinecop(trees);;
@@ -192,20 +192,23 @@ namespace vinecopulib
     //! @param edge edge index (starting with 0).
     //!
     //! @return An \code int containing the family index.
-    int Vinecop::get_family(int tree, int edge)
+    BicopFamily Vinecop::get_family(int tree, int edge)
     {
         return get_pair_copula(tree, edge)->get_family();
     }
-
+    
     //! Get families of all pair copulas
     //!
-    //! @return A matrix containing the family indices.
-    Eigen::MatrixXi Vinecop::get_families()
+    //! @return A nested vector containing in \c vec[t][e] the family for
+    //!     edge e in tree t.
+    std::vector<std::vector<BicopFamily>> Vinecop::get_all_families()
     {
-        Eigen::MatrixXi families = Eigen::MatrixXi::Constant(d_, d_, 0);
+        std::vector<std::vector<BicopFamily>> families(d_ - 1);
+        for (int t = 0; t < d_ - 1; ++t)
+            families[t].resize(d_ - 1 - t);
         for (int tree = 0; tree < d_ - 1; ++tree) {
             for (int edge = 0; edge < d_ - 1 - tree; ++edge) {
-                families(tree, edge) = get_family(tree, edge);
+                families[tree][edge] = get_family(tree, edge);
             }
         }
 
@@ -225,13 +228,16 @@ namespace vinecopulib
 
     //! Get rotations of all pair copulas
     //!
-    //! @return A matrix containing the rotations.
-    Eigen::MatrixXi Vinecop::get_rotations()
+    //! @return A nested vector containing in \c vec[t][e] the rotation for
+    //!     edge e in tree t.
+    std::vector<std::vector<int>> Vinecop::get_all_rotations()
     {
-        Eigen::MatrixXi rotations = Eigen::MatrixXi::Constant(d_, d_, 0);
+        std::vector<std::vector<int>> rotations(d_ - 1);
+        for (int t = 0; t < d_ - 1; ++t)
+            rotations[t].resize(d_ - 1 - t);
         for (int tree = 0; tree < d_ - 1; ++tree) {
             for (int edge = 0; edge < d_ - 1 - tree; ++edge) {
-                rotations(tree, edge) = get_rotation(tree, edge);
+                rotations[tree][edge] = get_rotation(tree, edge);
             }
         }
 
@@ -249,6 +255,24 @@ namespace vinecopulib
         return get_pair_copula(tree, edge)->get_parameters();
     }
 
+    //! Get parameters of all pair copulas
+    //!
+    //! @return A nested vector containing in \c vec[t][e] the parameters for
+    //!     edge e in tree t.
+    std::vector<std::vector<Eigen::VectorXd>> Vinecop::get_all_parameters()
+    {
+        std::vector<std::vector<Eigen::VectorXd>> parameters(d_ - 1);
+        for (int t = 0; t < d_ - 1; ++t)
+            parameters[t].resize(d_ - 1 - t);
+        for (int tree = 0; tree < d_ - 1; ++tree) {
+            for (int edge = 0; edge < d_ - 1 - tree; ++edge) {
+                parameters[tree][edge] = get_parameters(tree, edge);
+            }
+        }
+
+        return parameters;
+    }
+    
     //! Probability density function of a vine copula
     //!
     //! @param u mxd matrix of evaluation points.

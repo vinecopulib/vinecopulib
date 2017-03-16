@@ -11,26 +11,24 @@ namespace vinecopulib
 {
     FrankBicop::FrankBicop()
     {
-        family_ = 5;
+        family_ = BicopFamily::Frank;
         family_name_ = "Frank";
         rotation_ = 0;
-        association_direction_ = "both";
         parameters_ = Eigen::VectorXd::Zero(1);
         parameters_bounds_ = Eigen::MatrixXd::Zero(1, 2);
         parameters_bounds_(0, 0) = -200.0;
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    FrankBicop::FrankBicop(const Eigen::VectorXd& parameters)
+    FrankBicop::FrankBicop(const Eigen::VectorXd& parameters) : 
+        FrankBicop()
     {
-        FrankBicop();
         set_parameters(parameters);
     }
 
-    FrankBicop::FrankBicop(const Eigen::VectorXd& parameters, const int& rotation)
+    FrankBicop::FrankBicop(const Eigen::VectorXd& parameters, const int& rotation) :
+        FrankBicop(parameters)
     {
-        FrankBicop();
-        set_parameters(parameters);
         set_rotation(rotation);
     }
 

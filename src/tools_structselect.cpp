@@ -74,7 +74,7 @@ namespace tools_structselect {
     //! @return tree T_{k+1}.
     VineTree select_next_tree(
         VineTree& prev_tree,
-        std::vector<int> family_set,
+        std::vector<vinecopulib::BicopFamily> family_set,
         std::string method,
         std::string selection_criterion,
         bool preselect_families
@@ -275,7 +275,7 @@ namespace tools_structselect {
     //!     on symmetry properties of the data.
     void select_pair_copulas(
         VineTree& tree,
-        std::vector<int> family_set,
+        std::vector<vinecopulib::BicopFamily> family_set,
         std::string method,
         std::string selection_criterion,
         bool preselect_families
@@ -363,16 +363,19 @@ namespace tools_structselect {
 
         return vinecopulib::Vinecop(pcs, new_mat);
     }
-
+    
+    // TODO: actual printing of familie (only index for now)
+    #include <type_traits>
     //! Print indices, family, and parameters for each pair-copula
     //! @param tree a vine tree.
     void print_pair_copulas(VineTree& tree)
     {
         for (auto e : boost::edges(tree)) {
             std::stringstream pc_info;
+            typedef std::underlying_type<vinecopulib::BicopFamily>::type utype;
             pc_info <<
                 get_pc_index(e, tree) << " <-> " <<
-                "fam = " << tree[e].pair_copula->get_family() <<
+                "fam = " << tree[e].pair_copula->get_family_name() <<
                 ", rot = " << tree[e].pair_copula->get_rotation() <<
                 ", par = " <<  tree[e].pair_copula->get_parameters() <<
                 ", emp_tau = " << tree[e].empirical_tau <<

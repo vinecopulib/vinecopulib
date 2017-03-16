@@ -35,8 +35,8 @@ namespace test_bicop_trafokernel {
     }
 
     TEST_F(TrafokernelTest, trafo_kernel_select) {
-        auto newcop = Bicop::select(u, {1001});
-        EXPECT_EQ(newcop->get_family(), 1001);
+        auto newcop = Bicop::select(u, {BicopFamily::TLL0});
+        EXPECT_EQ(newcop->get_family(), BicopFamily::TLL0);
     }
 
     TEST_F(TrafokernelTest, trafo_kernel_flip) {
