@@ -21,7 +21,7 @@ namespace vinecopulib
     {
     public:
         static std::shared_ptr<Bicop> create(
-            BicopFamily family,
+            BicopFamily family = BicopFamily::Indep,
             int rotation = 0
         );
         

@@ -62,10 +62,12 @@ void FakeParBicopTest::set_family(BicopFamily family, int rotation)
 }
 void FakeParBicopTest::set_parameters(Eigen::VectorXd parameters)
 {
-    if (parameters.size() > 0)
+    if (parameters.size() > 0) {
         par_ = parameters(0);
-    if (parameters.size() > 1)
+    }
+    if (parameters.size() > 1) {
         par2_ = parameters(1);
+    }
 }
 void FakeParBicopTest::set_n(int n)
 {

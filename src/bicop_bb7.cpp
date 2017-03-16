@@ -82,8 +82,9 @@ namespace vinecopulib
             return -4*(std::pow(1-tmp,-delta)-1)/(theta*delta*std::pow(1-v,theta-1)*std::pow(1-tmp,-delta-1));
         };
         double tau = 1+tools_integration::integrate_zero_to_one(f);
-        if ((rotation_ == 90) | (rotation_ == 270))
+        if ((rotation_ == 90) | (rotation_ == 270)) {
             tau *= -1;
+        }
         return tau;
     }
 }

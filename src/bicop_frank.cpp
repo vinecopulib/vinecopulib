@@ -82,8 +82,9 @@ namespace vinecopulib
         double par = parameters(0);
         double tau = 1 - 4/par;
         double d = debyen(std::fabs(par), 1) / std::fabs(par);
-        if (par < 0)
+        if (par < 0) {
             d = d - par/2;
+        }
         tau = tau + (4/par) * d;
         return tau;
     }

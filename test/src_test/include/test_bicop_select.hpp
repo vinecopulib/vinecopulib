@@ -29,7 +29,6 @@ namespace test_bicop_select {
 
             if (this->needs_check_) {
                 auto data = this->par_bicop_.simulate(this->get_n());
-                family_set = {true_family};
                 auto bicop = Bicop::select(data, family_set, "mle");
 
                 auto selected_family = bicop->get_family();

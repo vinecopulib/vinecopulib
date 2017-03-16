@@ -64,28 +64,36 @@ bool preselect_family(
         if ((std::fabs(c1 - c2) > 0.3) & (family == BicopFamily::Frank))
             preselect = false;
     } else {
-        if (is_member(family, vinecopulib::bicop_families::BB)) {
-            if ((tau > 0) && is_member(rotation, {0, 180}))
+        if (is_member(family, bicop_families::BB)) {
+            if ((tau > 0) && is_member(rotation, {0, 180})) {
                 preselect = true;
-            if ((tau < 0) && is_member(rotation, {90, 270}))
+            }
+            if ((tau < 0) && is_member(rotation, {90, 270})) {
                 preselect = true;
+            }
         }
         bool is_90or180 = is_member(rotation, {90, 180});
         if (c1 - c2 > 0.05) {
-            if (is_member(family, bicop_families::lt) & is_90or180) 
-                    preselect = true;
-            if (is_member(family, bicop_families::ut) & !is_90or180)
-                    preselect = true;
+            if (is_member(family, bicop_families::lt) & is_90or180) { 
+                preselect = true;
+            }
+            if (is_member(family, bicop_families::ut) & !is_90or180) {
+                preselect = true;
+            }
         } else if (c1 - c2 < -0.05) {
-            if (is_member(family, bicop_families::lt) & !is_90or180) 
-                    preselect = true;
-            if (is_member(family, bicop_families::ut) & is_90or180)
-                    preselect = true;
+            if (is_member(family, bicop_families::lt) & !is_90or180) { 
+                preselect = true;
+            }
+            if (is_member(family, bicop_families::ut) & is_90or180) {
+                preselect = true;
+            }
         } else {
-            if ((tau > 0) && is_member(rotation, {0, 180}))
+            if ((tau > 0) && is_member(rotation, {0, 180})) {
                 preselect = true;
-            if ((tau < 0) && is_member(rotation, {90, 270}))
+            }
+            if ((tau < 0) && is_member(rotation, {90, 270})) {
                 preselect = true;
+            }
         }
     }
     

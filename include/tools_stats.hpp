@@ -58,8 +58,9 @@ namespace tools_stats
     //! @return A nxd matrix of independent U[0, 1] random variables.
     inline Eigen::MatrixXd simulate_uniform(int n, int d)
     {
-        if ((n < 1) | (d < 1))
-            throw std::runtime_error("both n and d must be at least 1.");
+        if ((n < 1) | (d < 1)) {
+            throw std::runtime_error("both n and d must be at least 1.");        
+        }
         Eigen::MatrixXd U(n, d);
         std::random_device rd;
         std::default_random_engine generator(rd());

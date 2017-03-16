@@ -144,8 +144,9 @@ namespace vinecopulib
         }
 
         std::vector<double> c(2);
-        if (preselect_families) 
+        if (preselect_families) {
             c = get_c1c2(data, tau);
+        }
 
         // Create the combinations of families and rotations to estimate
         std::vector<BicopFamily> families;
@@ -154,16 +155,18 @@ namespace vinecopulib
             bool is_rotationless = is_member(family, bicop_families::rotationless);
             bool preselect = true;
             if (is_rotationless) {
-                if (preselect_families)
+                if (preselect_families) {
                     preselect = preselect_family(c, tau, family, 0, is_rotationless);
+                }
                 if (preselect) {
                     families.push_back(family);
                     rotations.push_back(0);
                 }
             } else {
                 for (auto rotation : which_rotations) {
-                    if (preselect_families)
+                    if (preselect_families) {
                         preselect = preselect_family(c, tau, family, rotation, is_rotationless);
+                    }
                     if (preselect) {
                         families.push_back(family);
                         rotations.push_back(rotation);

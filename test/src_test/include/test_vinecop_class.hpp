@@ -83,11 +83,13 @@ namespace test_vinecop_class {
             for (auto s1 : vc_sets[tree]) {
                 bool is_in_both = false;
                 for (auto s2 : vcl_sets[tree]) {
-                    if (tools_stl::is_same_set(s1, s2))
+                    if (tools_stl::is_same_set(s1, s2)) {
                         is_in_both = true;
+                    }
                 }
-                if (!is_in_both)
+                if (!is_in_both) {
                     ++pairs_unequal;
+                }
             }
         }
         EXPECT_EQ(pairs_unequal, 0);

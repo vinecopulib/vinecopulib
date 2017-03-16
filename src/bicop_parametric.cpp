@@ -14,8 +14,9 @@ namespace vinecopulib
     // calculate number of parameters
     double ParBicop::calculate_npars() {
         // indepence copula has no parameters
-        if (family_ == BicopFamily::Indep)
+        if (family_ == BicopFamily::Indep) {
             return 0.0;
+        }
         // otherwise, return length of parameter vector
         return (double) parameters_.size();
     }
@@ -27,23 +28,27 @@ namespace vinecopulib
             using namespace tools_optimization;
 
             std::vector<std::string> methods = {"itau", "mle"};
-            if (!tools_stl::is_member(method, methods))
+            if (!tools_stl::is_member(method, methods)) {
                 throw std::runtime_error("Method not implemented.");
+            }
 
             int npars = (int) calculate_npars();
             if (method == "itau") {
                 npars = npars - 1;
-                if ((npars > 0) & (family_ != BicopFamily::Student))
+                if ((npars > 0) & (family_ != BicopFamily::Student)) {
                     throw std::runtime_error("itau method is not available for this family.");
+                }
             }
 
             auto temp_data = data;
             double tau = tools_stats::pairwise_ktau(temp_data);
             if (!tools_stl::is_member(family_, bicop_families::rotationless)) {
-                if ((tau > 0) & !tools_stl::is_member(rotation_, {0, 180}))
+                if ((tau > 0) & !tools_stl::is_member(rotation_, {0, 180})) {
                     throw std::runtime_error("Copula cannot handle tau > 0");
-                if ((tau < 0) & !tools_stl::is_member(rotation_, {90, 270}))
+                }
+                if ((tau < 0) & !tools_stl::is_member(rotation_, {90, 270})) {
                     throw std::runtime_error("Copula cannot handle tau < 0");
+                }
             }
 
             auto newpar = get_start_parameters(tau);

@@ -24,8 +24,13 @@ namespace vinecopulib
     //! guaranteeing an accuracy of 0.5^35 ~= 6e-11).
     //!
     //! @return f^{-1}(x).
-    Eigen::VectorXd invert_f(const Eigen::VectorXd& x, std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
-                      const double lb, const double ub, int n_iter)
+    Eigen::VectorXd invert_f(
+        const Eigen::VectorXd& x, 
+        std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
+        const double lb, 
+        const double ub, 
+        int n_iter
+    )
     {
         Eigen::VectorXd xl = Eigen::VectorXd::Constant(x.size(), lb);
         Eigen::VectorXd xh = Eigen::VectorXd::Constant(x.size(), ub);
@@ -57,22 +62,21 @@ namespace vinecopulib
         // Read numbers from file into buffer.
         ifstream infile;
         infile.open(filename);
-        while (! infile.eof())
-        {
+        while (! infile.eof()) {
             string line;
             getline(infile, line);
 
             int temp_cols = 0;
             stringstream stream(line);
-            while(! stream.eof())
-                stream >> buff[cols*rows+temp_cols++];
-
-            if (temp_cols == 0)
+            while(!stream.eof()) {
+                stream >> buff[cols * rows + temp_cols++];
+            }
+            if (temp_cols == 0) {
                 continue;
-
-            if (cols == 0)
+            }
+            if (cols == 0) {
                 cols = temp_cols;
-
+            }
             rows++;
         }
 
@@ -82,9 +86,11 @@ namespace vinecopulib
 
         // Populate matrix with numbers.
         Eigen::MatrixXd result(rows,cols);
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
-                result(i,j) = buff[ cols*i+j ];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                result(i,j) = buff[cols * i + j];
+            }
+        }
 
         delete [] buff;
         return result;

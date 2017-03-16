@@ -142,8 +142,9 @@ namespace vinecopulib
     int relabel_one(const int& x, const Eigen::VectorXi& old_labels, const Eigen::VectorXi& new_labels)
     {
         for (unsigned int i = 0; i < old_labels.size(); ++i) {
-            if (x == old_labels[i])
+            if (x == old_labels[i]) {
                 return new_labels[i];
+            }
         }
         return 0;
     }

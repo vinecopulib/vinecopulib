@@ -83,8 +83,9 @@ namespace tools_structselect {
         auto new_tree = edges_as_vertices(prev_tree);
         remove_edge_data(prev_tree); // no longer needed
         add_allowed_edges(new_tree);
-        if (boost::num_vertices(new_tree) > 2)
+        if (boost::num_vertices(new_tree) > 2) {
             min_spanning_tree(new_tree);
+        }
         add_edge_info(new_tree);  // for pc estimation and next tree
         remove_vertex_data(new_tree);  // no longer needed
         select_pair_copulas(
@@ -165,10 +166,11 @@ namespace tools_structselect {
         auto ei1 = tree[v1].prev_edge_indices;
         auto ei_common = intersect(ei0, ei1);
 
-        if (ei_common.size() == 0)
+        if (ei_common.size() == 0) {
             return -1;
-        else
+        } else {
             return ei_common[0];
+        }
     }
 
     // Extract pair copula pseudo-observations from h-functions
@@ -330,8 +332,9 @@ namespace tools_structselect {
                         auto e_new = trees[t - k][e];
                         auto pos = find_position(mat(t, col), e_new.conditioning);
                         mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
-                        if (pos == 1)
+                        if (pos == 1) {
                             e_new.pair_copula->flip();
+                        }
                         // assign fitted pair copula to appropriate entry, see
                         // vinecopulib::Vinecop::get_pair_copula().
                         pcs[t - 1 - k][col] = e_new.pair_copula;
@@ -372,7 +375,6 @@ namespace tools_structselect {
     {
         for (auto e : boost::edges(tree)) {
             std::stringstream pc_info;
-            typedef std::underlying_type<vinecopulib::BicopFamily>::type utype;
             pc_info <<
                 get_pc_index(e, tree) << " <-> " <<
                 "fam = " << tree[e].pair_copula->get_family_name() <<
