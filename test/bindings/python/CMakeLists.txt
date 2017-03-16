@@ -1,5 +1,5 @@
 find_package(PythonInterp REQUIRED)
-foreach (test_name test_git_revision;test_bicop_class)
+foreach (test_name test_git_revision;test_bicop_class;test_vinecop_class)
   add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.py)
 
   if (WIN32)

@@ -1,4 +1,4 @@
-add_library(pyvinecopulib SHARED git_revision.cpp bicop.cpp converters.cpp pyvinecopulib.cpp)
+add_library(pyvinecopulib SHARED git_revision.cpp bicop.cpp eigen_converters.cpp pyvinecopulib.cpp)
 add_dependencies(pyvinecopulib git_revision.h)
 if (APPLE)
   set_target_properties(pyvinecopulib PROPERTIES SUFFIX ".so") # defaults to .dylib which is not looked for by Python
