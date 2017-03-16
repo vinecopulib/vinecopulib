@@ -1,4 +1,5 @@
 set(gtest_disable_pthreads on) #needed in MinGW
+set(gtest_force_shared_crt on) #needed on Windows
 include(../cmake/DownloadProject.cmake)
 download_project(
         PROJ                googletest
