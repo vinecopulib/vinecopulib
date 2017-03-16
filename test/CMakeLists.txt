@@ -1,5 +1,7 @@
-set(gtest_disable_pthreads on) #needed in MinGW
-set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
+if (WIN32)
+    set(gtest_disable_pthreads on) #needed in MinGW
+    set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
+endif()
 
 include(../cmake/DownloadProject.cmake)
 download_project(

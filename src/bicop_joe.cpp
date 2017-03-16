@@ -98,10 +98,7 @@ namespace vinecopulib
         double tau = 2 / par + 1;
         tau = boost::math::digamma(2.0) - boost::math::digamma(tau);
         tau = 1 + 2 * tau / (2 - par);
-        if ((rotation_ == 90) | (rotation_ == 270)) {
-            tau *= -1;
-        }
-        return tau;
+        return flip_tau(tau);
     }
 
     Eigen::VectorXd JoeBicop::get_start_parameters(const double tau)

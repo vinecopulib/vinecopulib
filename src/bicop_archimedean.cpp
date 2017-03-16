@@ -5,6 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_archimedean.hpp"
+#include "tools_stl.hpp"
 
 namespace vinecopulib
 {
@@ -62,5 +63,14 @@ namespace vinecopulib
         Eigen::MatrixXd bounds = this->get_parameters_bounds();
         Eigen::VectorXd parameters = bounds.col(0) + Eigen::VectorXd::Constant(2, 0.1);
         return parameters;
+    }
+
+    double ArchimedeanBicop::flip_tau(double tau)
+    {
+        double flipped_tau = tau;
+        if (tools_stl::is_member(rotation_, {90, 270})) {
+            flipped_tau *= -1;
+        }
+        return flipped_tau;
     }
 }

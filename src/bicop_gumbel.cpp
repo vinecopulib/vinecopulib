@@ -89,11 +89,7 @@ namespace vinecopulib
     double GumbelBicop::parameters_to_tau(const Eigen::VectorXd& parameters)
     {
         double tau = (parameters(0) - 1) / parameters(0);
-        if ((rotation_ == 90) | (rotation_ == 270)) {
-            tau *= -1;
-        }
-
-        return tau;
+        return flip_tau(tau);
     }
 
 

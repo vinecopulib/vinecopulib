@@ -6,6 +6,7 @@
 
 
 #include "bicop_clayton.hpp"
+#include "tools_stl.hpp"
 
 namespace vinecopulib
 {
@@ -93,10 +94,7 @@ namespace vinecopulib
     double ClaytonBicop::parameters_to_tau(const Eigen::VectorXd& parameters)
     {
         double tau =  parameters(0) / (2 + std::fabs(parameters(0)));
-        if ((rotation_ == 90) | (rotation_ == 270)) {
-            tau *= -1;
-        }
-        return tau;
+        return flip_tau(tau);
     }
 
     Eigen::VectorXd ClaytonBicop::get_start_parameters(const double tau)

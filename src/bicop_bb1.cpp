@@ -77,10 +77,7 @@ namespace vinecopulib
     double Bb1Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
     {
         double tau = 1-2/(parameters(1) * (parameters(0) + 2));
-        if ((rotation_ == 90) | (rotation_ == 270)) {
-            tau *= -1;
-        }
-        return tau;
+        return flip_tau(tau);
     }
 }
 
