@@ -12,7 +12,6 @@
 #include "bicop_family.hpp"
 #include "dlldefines.hpp"
 
-
 namespace vinecopulib
 {
     //! A class for bivariate copulas
