@@ -17,7 +17,7 @@ namespace vinecopulib
     //!
     //! The Bicop class is abstract, you cannot create an instance of this class,
     //! but only of the derived classes.
-    class Bicop
+    class VINECOPULIB_EXPORT Bicop
     {
     public:
         static std::shared_ptr<Bicop> create(

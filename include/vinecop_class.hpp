@@ -14,7 +14,7 @@
 namespace vinecopulib
 {
 //! A class for vine copulas
-    class Vinecop
+    class VINECOPULIB_EXPORT Vinecop
     {
     public:
         Vinecop() {}
