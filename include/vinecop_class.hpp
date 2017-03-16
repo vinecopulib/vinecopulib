@@ -8,6 +8,7 @@
 
 #include <limits>
 
+#include "dlldefines.hpp"
 #include "bicop_class.hpp"
 #include "rvine_matrix.hpp"
 

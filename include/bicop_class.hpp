@@ -10,6 +10,8 @@
 #include <vector>
 #include "tools_eigen.hpp"
 #include "bicop_family.hpp"
+#include "dlldefines.hpp"
+
 
 namespace vinecopulib
 {
