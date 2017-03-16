@@ -5,6 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_family.hpp"
+#include <stdexcept>
 
 namespace vinecopulib {
     std::string get_family_name(BicopFamily family)
