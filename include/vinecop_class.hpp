@@ -47,7 +47,7 @@ namespace vinecopulib
 
         Eigen::VectorXd pdf(const Eigen::MatrixXd& u);
         Eigen::MatrixXd simulate(int n);
-        Eigen::MatrixXd simulate(int n, const Eigen::MatrixXd& U);
+        Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& U);
 
     private:
         int d_;

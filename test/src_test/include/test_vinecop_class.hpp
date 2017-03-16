@@ -53,7 +53,8 @@ namespace test_vinecop_class {
         Vinecop vinecop(pair_copulas, model_matrix);
 
         vinecop.simulate(10);  // only check if it works
-        ASSERT_TRUE(vinecop.simulate(1000, u).isApprox(sim, 1e-4));
+        // check the underlying transformation from independent samples
+        ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
     }
 
     TEST_F(VinecopTest, select_finds_right_structure) {

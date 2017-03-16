@@ -343,17 +343,27 @@ namespace vinecopulib
     //! configuration requiring less than 1GB is n = 1000, d = 200.
     //!
     //! @param n number of observations.
-    //! @param U mxd matrix of indpendent uniform random variables.
-    //!
-    //! @{
+    //! @return Simulated data from the vine copula model.
     Eigen::MatrixXd Vinecop::simulate(int n)
     {
         Eigen::MatrixXd U = tools_stats::simulate_uniform(n, d_);
-        return simulate(n, U);
+        return inverse_rosenblatt(U);
     }
 
-    Eigen::MatrixXd Vinecop::simulate(int n, const Eigen::MatrixXd& U)
+
+    //! Inverse rosenblatt transform for a VineCopula model
+    //! 
+    //! If the problem is too large, it is split recursively into halves (w.r.t
+    //! to n, the number of observations).
+    //! "Too large" means that the required memory will exceed 1 GB. An examplary
+    //! configuration requiring less than 1GB is n = 1000, d = 200.
+    //! 
+    //! @param U mxd matrix of indpendent uniform random variables.
+    //! @return The transformed data corresponds to simulated data from the
+    //!     vine copula model when U are independent unfiorms.
+    Eigen::MatrixXd Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& U)
     {
+        int n = U.rows();
         if (n < 1)
             throw std::runtime_error("n must be at least one");
         int d = U.cols();
@@ -362,13 +372,6 @@ namespace vinecopulib
             message << "U has wrong number of columns; " <<
                     "expected: " << d_ <<
                     ", actual: " << d << std::endl;
-            throw std::runtime_error(message.str().c_str());
-        }
-        if (U.rows() != n) {
-            std::stringstream message;
-            message << "U must have n rows; " <<
-                    "expected: " << n <<
-                    ", actual: " << U.rows() << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
 
@@ -381,10 +384,10 @@ namespace vinecopulib
         if ((n > 1) & (bytes_required > 1e9)) {
             int n_half = n / 2;
             int n_left = n - n_half;
-            U_vine.block(0, 0, n_half, d) =
-                    simulate(n_half, U.block(0, 0, n_half, d));
-            U_vine.block(n_half, 0, n_left, d) =
-                    simulate(n_left, U.block(n_half, 0, n_left, d));
+            U_vine.block(0, 0, n_half, d) = 
+                inverse_rosenblatt(U.block(0, 0, n_half, d));
+            U_vine.block(n_half, 0, n_left, d) = 
+                inverse_rosenblatt(U.block(n_half, 0, n_left, d));
             return U_vine;
         }
 
@@ -440,9 +443,8 @@ namespace vinecopulib
 
         return U_vine;
     }
-    //! @}
 
-// get indexes for reverting back to old order in simulation routine
+    // get indexes for reverting back to old order in simulation routine
     Eigen::VectorXi inverse_permutation(const Eigen::VectorXi& order) {
         // start with (0, 1, .., k)
         auto indexes = tools_stl::seq_int(0, order.size());
