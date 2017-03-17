@@ -41,18 +41,16 @@ target_include_directories(pyvinecopulib PUBLIC ${EIGEN3_INCLUDE_DIR})
 
 # NumPy
 execute_process (
-   COMMAND ${PYTHON_EXECUTABLE} -c
+    COMMAND ${PYTHON_EXECUTABLE} -c
         "import numpy, sys; sys.stdout.write(numpy.get_include())"
-   OUTPUT_VARIABLE NUMPY_INCLUDE_DIR
-   ERROR_QUIET OUTPUT_QUIET
-   RESULT_VARIABLE TMP_STATUS
+    OUTPUT_VARIABLE NUMPY_INCLUDE_DIR
+    RESULT_VARIABLE TMP_STATUS
 )
 if (NOT TMP_STATUS EQUAL 0)
     message(FATAL_ERROR "NumPy not found!")
 endif()
 unset(TMP_STATUS)
 file ( TO_CMAKE_PATH "${NUMPY_INCLUDE_DIR}" NUMPY_INCLUDE_DIR )
-message(STATUS "NumPy include dir: ${NUMPY_INCLUDE_DIR}")
 target_include_directories(pyvinecopulib PUBLIC ${NUMPY_INCLUDE_DIR})
 
 
