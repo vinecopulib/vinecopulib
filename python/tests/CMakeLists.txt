@@ -9,7 +9,7 @@ foreach (test_name test_git_revision;test_bicop_class;test_vinecop_class)
     get_filename_component(TMP_PYTHON_LIB_PATH ${PYTHON_LIBRARIES} DIRECTORY)
 
     # https://cmake.org/pipermail/cmake/2010-December/041176.html
-    set(PATH_STRING "$ENV{PATH};${Boost_LIBRARY_DIRS};${CMAKE_BINARY_DIR}/src/Debug;${NLOPT_ROOT_DIR};${TMP_PYTHON_LIB_PATH}") # TODO hardcoded
+    set(PATH_STRING "$ENV{PATH};${Boost_LIBRARY_DIRS};${CMAKE_BINARY_DIR}/Debug;${NLOPT_ROOT_DIR};${TMP_PYTHON_LIB_PATH}") # TODO hardcoded
     string(REPLACE "\\;" ";" PATH_STRING "${PATH_STRING}")
     string(REPLACE ";" "\\;" PATH_STRING "${PATH_STRING}")
 
