@@ -1,11 +1,31 @@
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 
-add_subdirectory(src)
-
 if(PYTHON_BINDINGS)
     add_subdirectory(python)
 endif()
+
+file(GLOB_RECURSE vinecopulib_sources src/*.cpp src/*.cc src/*c)
+file(GLOB_RECURSE vinecopulib_headers include/*.h include/*.hpp)
+
+include_directories(${external_includes} include)
+
+if (BUILD_SHARED_LIBS)
+    add_library(vinecopulib SHARED ${vinecopulib_sources})
+else()
+    add_library(vinecopulib STATIC ${vinecopulib_sources})
+endif()
+
+include(GenerateExportHeader)
+generate_export_header(vinecopulib)
+
+target_link_libraries(vinecopulib ${external_libs})
+
+set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
 if(BUILD_TESTING)
     set(unit_tests
@@ -21,35 +41,85 @@ endif(BUILD_TESTING)
 
 # Related to code coverage and exports in linux
 if (NOT WIN32)
-    # Add all targets to the build-tree export set
-    export(TARGETS  vinecopulib FILE "${PROJECT_BINARY_DIR}/vinecopulibTargets.cmake")
+    ####
+    # Installation
 
-    # Export the package for use from the build-tree
-    # (this registers the build-tree with a global CMake-registry)
-    export(PACKAGE vinecopulib)
+    # Layout. This works for all platforms:
+    #   * <prefix>/lib/cmake/<PROJECT-NAME>
+    #   * <prefix>/lib/
+    #   * <prefix>/include/
+    set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+    set(include_install_dir "include")
 
-    # Create the vinecopulib-config.cmake and vinecopulib-config-version.cmake files
-    file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${INSTALL_INCLUDE_DIR}")
-    # ... for the build tree
-    set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
-    configure_file(cmake/templates/vinecopulib-config.cmake.in
-            "${PROJECT_BINARY_DIR}/vinecopulib-config.cmake" @ONLY)
-    # ... for the install tree
-    set(CONF_INCLUDE_DIRS "\${VINECOPULIB_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-    configure_file(cmake/templates/vinecopulib-config.cmake.in
-            "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/vinecopulib-config.cmake" @ONLY)
-    # ... for both
-    configure_file(cmake/templates/vinecopulib-config-version.cmake.in
-            "${PROJECT_BINARY_DIR}/vinecopulib-config-version.cmake" @ONLY)
+    set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
-    # Install the vinecopulib-config.cmake and vinecopulib-config-version.cmake
-    install(FILES
-            "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/vinecopulib-config.cmake"
-            "${PROJECT_BINARY_DIR}/vinecopulib-config-version.cmake"
-            DESTINATION "${INSTALL_CMAKE_DIR}")
+    # Configuration
+    set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+    set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+    set(targets_export_name "${PROJECT_NAME}Targets")
 
-    # Install the export set for use with the install-tree
-    install(EXPORT vinecopulibTargets DESTINATION "${INSTALL_CMAKE_DIR}")
+
+    # Include module with fuction 'write_basic_package_version_file'
+    include(CMakePackageConfigHelpers)
+
+    # Configure '<PROJECT-NAME>ConfigVersion.cmake'
+    # Note: PROJECT_VERSION is used as a VERSION
+    write_basic_package_version_file(
+            "${version_config}" COMPATIBILITY SameMajorVersion
+    )
+
+    # Configure '<PROJECT-NAME>Config.cmake'
+    # Use variables:
+    #   * targets_export_name
+    #   * PROJECT_NAME
+    configure_package_config_file(
+            "cmake/templates/Config.cmake.in"
+            "${project_config}"
+            INSTALL_DESTINATION "${config_install_dir}"
+            PATH_VARS include_install_dir
+    )
+
+    # Targets:
+    #   * <prefix>/lib/libvinecopulib.dylib
+    #   * header location after install: <prefix>/include/vinecopulib/*.hpp
+    #   * headers can be included by C++ code `#include <vinecopulib/*.hpp>`
+    install(
+            TARGETS vinecopulib
+            EXPORT "${targets_export_name}"
+            LIBRARY DESTINATION "lib"
+            ARCHIVE DESTINATION "lib"
+            RUNTIME DESTINATION "bin"
+    )
+
+    # Headers:
+    #   * include/vinecopulib/*.hpp -> <prefix>/include/vinecopulib/*.hpp
+    install(
+            FILES ${vinecopulib_headers}
+            DESTINATION "${include_install_dir}/vinecopulib"
+    )
+
+    # Export headers:
+    #   * ${CMAKE_CURRENT_BINARY_DIR}/include_export.h -> <prefix>/include/include_export.h
+    install(
+            FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/vinecopulib_export.h"
+            DESTINATION "${include_install_dir}/vinecopulib"
+    )
+
+    # Config
+    #   * <prefix>/lib/cmake/vinecopulib/vinecopulibConfig.cmake
+    #   * <prefix>/lib/cmake/vinecopulib/vinecopulibConfigVersion.cmake
+    install(
+            FILES "${project_config}" "${version_config}"
+            DESTINATION "${config_install_dir}"
+    )
+
+    # Config
+    #   * <prefix>/lib/cmake/vinecopulib/vinecopulibTargets.cmake
+    install(
+            EXPORT "${targets_export_name}"
+            DESTINATION "${config_install_dir}"
+    )
 
     # Install the export set for code coverage
     if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_TESTING)
