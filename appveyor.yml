@@ -25,6 +25,8 @@ install:
   - move libnlopt-0.lib C:\projects\nlopt\
   - move libnlopt-0.exp C:\projects\nlopt\
 
+  - pip install numpy
+
 build_script:
   - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt"'
 
