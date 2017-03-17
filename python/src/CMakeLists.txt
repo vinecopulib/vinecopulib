@@ -50,7 +50,9 @@ execute_process (
 if (NOT TMP_STATUS EQUAL 0)
     message(FATAL_ERROR "NumPy not found!")
 endif()
+unset(TMP_STATUS)
 file ( TO_CMAKE_PATH "${NUMPY_INCLUDE_DIR}" NUMPY_INCLUDE_DIR )
+message(STATUS "NumPy include dir: ${NUMPY_INCLUDE_DIR}")
 target_include_directories(pyvinecopulib PUBLIC ${NUMPY_INCLUDE_DIR})
 
 
