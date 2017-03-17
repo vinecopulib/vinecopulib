@@ -17,6 +17,6 @@ foreach (test_name test_git_revision;test_bicop_class;test_vinecop_class)
     set_property(TEST ${test_name} PROPERTY ENVIRONMENT "PATH=${PATH_STRING}")
     set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/python/src//Debug") #TODO: Debug hardcoded!
   else()
-    #set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}")
+    set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}")
   endif()
 endforeach()
