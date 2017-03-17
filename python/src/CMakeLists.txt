@@ -39,6 +39,16 @@ target_include_directories(pyvinecopulib PUBLIC ${Boost_INCLUDE_DIRS})
 target_include_directories(pyvinecopulib PUBLIC ${EIGEN3_INCLUDE_DIR})
 
 
+# NumPy
+execute_process (
+   COMMAND ${PYTHON_EXECUTABLE} -c
+        "import numpy, sys; sys.stdout.write(numpy.get_include())"
+   OUTPUT_VARIABLE NUMPY_INCLUDE_DIR
+)
+file ( TO_CMAKE_PATH "${NUMPY_INCLUDE_DIR}" NUMPY_INCLUDE_DIR )
+target_include_directories(pyvinecopulib PUBLIC ${NUMPY_INCLUDE_DIR})
+
+
 # installation (see http://www.cmake.org/pipermail/cmake/2013-March/054138.html)
 # <TEMP>
 if (NOT WIN32)
