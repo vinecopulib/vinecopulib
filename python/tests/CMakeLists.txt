@@ -1,6 +1,6 @@
 find_package(PythonInterp REQUIRED)
 foreach (test_name test_git_revision;test_bicop_class;test_vinecop_class)
-  add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.py)
+  add_test(NAME ${test_name} WORKING_DIRECTORY ${CMAKE_BINARY_DIR} COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.py)
 
   if (WIN32)
     find_package(Boost 1.63 COMPONENTS python REQUIRED) #TODO: reuse?
@@ -17,6 +17,6 @@ foreach (test_name test_git_revision;test_bicop_class;test_vinecop_class)
     set_property(TEST ${test_name} PROPERTY ENVIRONMENT "PATH=${PATH_STRING}")
     set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/python/src//Debug") #TODO: Debug hardcoded!
   else()
-    set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}")
+    #set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}")
   endif()
 endforeach()
