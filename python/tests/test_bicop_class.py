@@ -2,8 +2,8 @@ import pyvinecopulib as pvcl
 
 # TODO: test no default constructor
 
-bicop = pvcl.bicop(1, [1], 90)
-assert bicop.family == 1
+bicop = pvcl.bicop(pvcl.BicopFamily.gaussian, 90, [1])
+assert bicop.family == pvcl.BicopFamily.gaussian
 assert len(bicop.parameters) == 1 
 assert bicop.parameters[0] == 1
 assert bicop.rotation == 90

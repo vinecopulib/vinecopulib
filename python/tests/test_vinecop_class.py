@@ -6,9 +6,9 @@ vinecop = pvcl.vinecop()
 
 # 2-arg ctor
 vinecop = pvcl.vinecop([
-  [pvcl.bicop(3, [1], 90),    pvcl.bicop(2, [1,2], 180),  pvcl.bicop(1, [1], 270) ],
-  [pvcl.bicop(2, [1,2], 180), pvcl.bicop(3, [1], 90)                              ],
-  [pvcl.bicop(1, [1], 270)                                                        ]
+  [pvcl.bicop(pvcl.BicopFamily.clayton,   90, [1]  ), pvcl.bicop(pvcl.BicopFamily.student,  180, [1,2]), pvcl.bicop(pvcl.BicopFamily.clayton, 270, [1]) ],
+  [pvcl.bicop(pvcl.BicopFamily.student,  180, [1,2]), pvcl.bicop(pvcl.BicopFamily.gaussian,  90, [1]  )                          ],
+  [pvcl.bicop(pvcl.BicopFamily.gaussian, 270, [1]  )                                                     ]
 ], np.array([
   [1,1,1,1],
   [1,1,1,0],
@@ -18,10 +18,10 @@ vinecop = pvcl.vinecop([
 
 # accessors
 print(vinecop.rotation(1,1))
-print(vinecop.rotations)
+#print(vinecop.all_rotations)
 print(vinecop.parameters(0,1))
 print(vinecop.family(0,0))
-print(vinecop.families)
+#print(vinecop.all_families)
 print(vinecop.matrix)
 #print(vinecop.pair_copula(0,0)) - TODO
 

@@ -87,6 +87,25 @@ namespace
     };
 }
 
+void export_family_enums()
+{
+    boost::python::enum_<vinecopulib::BicopFamily>("BicopFamily")
+        .value("indep",    vinecopulib::BicopFamily::indep)
+        .value("gaussian", vinecopulib::BicopFamily::gaussian)
+        .value("student",  vinecopulib::BicopFamily::student)
+        .value("clayton",  vinecopulib::BicopFamily::clayton)
+        .value("gumbel",   vinecopulib::BicopFamily::gumbel)
+        .value("frank",    vinecopulib::BicopFamily::frank)
+        .value("joe",      vinecopulib::BicopFamily::joe)
+        .value("bb1",      vinecopulib::BicopFamily::bb1)
+        .value("bb6",      vinecopulib::BicopFamily::bb6)
+        .value("bb7",      vinecopulib::BicopFamily::bb7)
+        .value("bb8",      vinecopulib::BicopFamily::bb8)
+        .value("tll0",     vinecopulib::BicopFamily::tll0)
+        .export_values()
+        ;
+}
+
 void export_bicop_class()
 {
     boost::python::class_<bicop_wrap, boost::noncopyable>("bicop", boost::python::no_init)
@@ -114,7 +133,7 @@ void export_vinecop_class()
         .def("all_parameters",  &vinecopulib::Vinecop::get_all_parameters)
         .def("family",      &vinecopulib::Vinecop::get_family)
         .add_property("all_families", &vinecopulib::Vinecop::get_all_families)
-        .add_property("matrix",      &vinecopulib::Vinecop::get_matrix)
+        .add_property("matrix",       &vinecopulib::Vinecop::get_matrix)
         //.def("pair_copula", &vinecopulib::Vinecop::get_pair_copula) - TODO!
         .def("pdf",         &vinecopulib::Vinecop::pdf)
         .def("simulate", &vinecopulib::Vinecop::simulate) 
@@ -129,7 +148,7 @@ void export_vinecop_class()
             boost::python::arg("selection_criterion"),
             boost::python::arg("preselect_families"),
             boost::python::arg("show_trace")
-        ))
+        )) // TODO: bp::return_value_policy<bp::manage_new_object>()
         //.staticmethod("structure_select")
 // TODO is make_pc_store needed???
 //        .def("make_pair_copula_store", &vinecopulib::Vinecop::make_pc_store)
