@@ -41,4 +41,4 @@ build_script:
   - cmake --build .
   - ctest -C Release --output-on-failure
   - cd ../bin
-  - ./test_all
+  - test_all.exe
