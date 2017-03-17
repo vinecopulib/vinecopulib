@@ -61,7 +61,7 @@ script:
   - cmake .. $CMAKE_ARGS -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug && make vinecopulib_coverage
   - make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
   - cd ../release
-  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release && make && make install && make doc
+  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
   - make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
   - cd ../bin
   - ./test_all

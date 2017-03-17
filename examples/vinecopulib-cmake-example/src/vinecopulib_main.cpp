@@ -13,16 +13,16 @@ int main() {
 	}
 	std::cout << "\n";
 
-	// create Clayton copula and simulate from the model
-	auto model = Bicop::create(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1,1));
-    auto data = model->simulate(1e3);
+	// create Gumbel copula and simulate from the model
+	auto model = Bicop::create(BicopFamily::gumbel, 0, Eigen::VectorXd::Constant(1,2));
+    auto data = model->simulate(2e3);
     std::cout << "Created Model | family: " << model->get_family_name() << ", ";
 	std::cout << "rotation: " <<  model->get_rotation() << ", ";
     std::cout << "parameter: " << model->get_parameters() << std::endl;
 
 	// fit and select family
 	auto fitted = Bicop::select(data);
-	std::cout << "Created Model | family: " << fitted->get_family_name() << ", ";
+	std::cout << "Fitted Model (sample size = 2e3) | family: " << fitted->get_family_name() << ", ";
 	std::cout << "rotation: " <<  fitted->get_rotation() << ", ";
 	std::cout << "parameter: " << fitted->get_parameters() << std::endl;
 

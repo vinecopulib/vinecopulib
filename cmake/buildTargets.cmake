@@ -15,9 +15,6 @@ endif()
 include(GenerateExportHeader)
 generate_export_header(vinecopulib)
 
-# TODO: remove header that should not be public
-#set_target_properties(vinecopulib PROPERTIES PUBLIC_HEADER "${vinecopulib_headers}")
-
 target_link_libraries(vinecopulib ${external_libs})
 
 set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -56,7 +53,6 @@ if (NOT WIN32)
     set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
     set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
     set(targets_export_name "${PROJECT_NAME}Targets")
-    set(namespace "${PROJECT_NAME}::")
 
 
     # Include module with fuction 'write_basic_package_version_file'
@@ -118,7 +114,6 @@ if (NOT WIN32)
     #   * <prefix>/lib/cmake/vinecopulib/vinecopulibTargets.cmake
     install(
             EXPORT "${targets_export_name}"
-            NAMESPACE "${namespace}"
             DESTINATION "${config_install_dir}"
     )
 
