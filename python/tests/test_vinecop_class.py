@@ -25,8 +25,11 @@ print(vinecop.family(0,0))
 print(vinecop.matrix)
 #print(vinecop.pair_copula(0,0)) - TODO
 
-# 2-arg simulate
-#vinecop.simulate(3, np.array([
+# simulate
+#data = vinecop.simulate(100)
+
+# inverse_rosenblatt
+#data = vinecop.inverse_rosenblatt(np.array([
 #  [ 1, 2, 3], 
 #  [ 4, 5, 6], 
 #  [ 7, 8, 9], 
