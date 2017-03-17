@@ -34,7 +34,7 @@ template <typename T>
 class ParBicopTest : public FakeParBicopTest {
 public:
     void setup_parameters(int rotation = 0) {
-        int n = (int) 2e3;
+        int n = (int) 5e3;
         double tau = 0.5; // should be positive
         this->par_bicop_.set_rotation(rotation);
         auto family = this->par_bicop_.get_family();
