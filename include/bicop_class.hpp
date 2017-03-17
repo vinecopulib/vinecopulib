@@ -10,6 +10,7 @@
 #include <vector>
 #include "tools_eigen.hpp"
 #include "bicop_family.hpp"
+#include "dlldefines.hpp"
 
 namespace vinecopulib
 {
@@ -17,7 +18,7 @@ namespace vinecopulib
     //!
     //! The Bicop class is abstract, you cannot create an instance of this class,
     //! but only of the derived classes.
-    class Bicop
+    class VINECOPULIB_EXPORT Bicop
     {
     public:
         static std::shared_ptr<Bicop> create(
