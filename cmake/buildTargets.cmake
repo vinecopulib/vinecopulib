@@ -16,7 +16,7 @@ include(GenerateExportHeader)
 generate_export_header(vinecopulib)
 
 # TODO: remove header that should not be public
-# set_target_properties(vinecopulib PROPERTIES PUBLIC_HEADER "${vinecopulib_headers}")
+#set_target_properties(vinecopulib PROPERTIES PUBLIC_HEADER "${vinecopulib_headers}")
 
 target_link_libraries(vinecopulib ${external_libs})
 
@@ -89,15 +89,14 @@ if (NOT WIN32)
             LIBRARY DESTINATION "lib"
             ARCHIVE DESTINATION "lib"
             RUNTIME DESTINATION "bin"
-            PUBLIC_HEADER DESTINATION "${include_install_dir}/vinecopulib"
     )
 
     # Headers:
     #   * include/vinecopulib/*.hpp -> <prefix>/include/vinecopulib/*.hpp
-    #install(
-    #        FILES ${vinecopulib_headers}
-    #        DESTINATION "${include_install_dir}/vinecopulib"
-    #)
+    install(
+            FILES ${vinecopulib_headers}
+            DESTINATION "${include_install_dir}/vinecopulib"
+    )
 
     # Export headers:
     #   * ${CMAKE_CURRENT_BINARY_DIR}/include_export.h -> <prefix>/include/include_export.h
