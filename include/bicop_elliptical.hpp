@@ -1,38 +1,26 @@
-/*
-    Copyright 2016 Thibault Vatter, Thomas Nagler
+// Copyright © 2017 Thomas Nagler and Thibault Vatter
+//
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
+// vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-    This file is part of vinecopulib.
-
-    vinecopulib is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    vinecopulib is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-#ifndef VINECOPULIB_BICOP_ELLIPTICAL_HPP
-#define VINECOPULIB_BICOP_ELLIPTICAL_HPP
+#pragma once
 
 #include "bicop_parametric.hpp"
 
-class EllipticalBicop : public ParBicop  {
-public:
-    // hfunction and its inverse
-    VecXd hfunc2_default(const MatXd& u);
-    VecXd hinv2_default(const MatXd& u);
+namespace vinecopulib
+{
+    class EllipticalBicop : public ParBicop
+    {
+    public:
+        // hfunction and its inverse
+        Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
 
-    // link between Kendall's tau and the par_bicop parameter
-    VecXd tau_to_parameters(const double& tau);
-    double parameters_to_tau(const VecXd& parameters);
+        // link between Kendall's tau and the par_bicop parameter
+        Eigen::VectorXd tau_to_parameters(const double& tau);
+        double parameters_to_tau(const Eigen::VectorXd& parameters);
 
-    void flip();
-};
-
-#endif
+        void flip();
+    };
+}

@@ -1,60 +1,45 @@
-/*
-Copyright 2016 Thibault Vatter, Thomas Nagler
+// Copyright © 2017 Thomas Nagler and Thibault Vatter
+//
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
+// vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-This file is part of vinecopulib.
+#pragma once
 
-vinecopulib is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+#include "tools_eigen.hpp"
 
-vinecopulib is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+namespace vinecopulib
+{
+    //! A class for cubic spline interpolation of bivariate copulas
+    //!
+    //! The class is used for implementing kernel estimators. It makes storing the
+    //! observations obsolete and allows for fast numerical integration.
+    class InterpolationGrid
+    {
+    public:
+        InterpolationGrid() {}
+        InterpolationGrid(const Eigen::VectorXd& grid_points, const Eigen::MatrixXd& values);
 
-You should have received a copy of the GNU General Public License
-along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
-*/
+        void flip();
 
-#ifndef VINECOPULIB_BICOP_INTERPOLATION_HPP
-#define VINECOPULIB_BICOP_INTERPOLATION_HPP
+        Eigen::VectorXd interpolate(const Eigen::MatrixXd& x);
+        Eigen::VectorXd intergrate_1d(const Eigen::MatrixXd& u, const int& cond_var);
+        Eigen::VectorXd inv_intergrate_1d(const Eigen::MatrixXd& u, const int& cond_var);
 
-#include <Eigen/Dense>
+    private:
+        // Utility functions for spline Interpolation
+        double cubic_poly(const double& x, const Eigen::VectorXd& a);
+        double cubic_indef_integral(const double& x, const Eigen::VectorXd& a);
+        double cubic_integral(const double& lower, const double& upper, const Eigen::VectorXd& a);
+        double inv_cubic_integral(const double& q, const Eigen::VectorXd& a);
+        Eigen::VectorXd find_coefs(const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);
+        double interp_on_grid(const double& x, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);
 
-typedef Eigen::VectorXd VecXd;
-typedef Eigen::MatrixXd MatXd;
+        // Utility functions for integration
+        double int_on_grid(const double& upr, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);
+        double inv_int_on_grid(const double& qq, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);
 
-//! A class for cubic spline interpolation of bivariate copulas
-//!
-//! The class is used for implementing kernel estimators. It makes storing the
-//! observations obsolete and allows for fast numerical integration.
-class InterpolationGrid {
-public:
-    InterpolationGrid() {}
-    InterpolationGrid(const VecXd& grid_points, const MatXd& values);
-
-    void flip();
-
-    VecXd interpolate(const MatXd& x);
-    VecXd intergrate_1d(const MatXd& u, const int& cond_var);
-    VecXd inv_intergrate_1d(const MatXd& u, const int& cond_var);
-
-private:
-    // Utility functions for spline Interpolation
-    double cubic_poly(const double& x, const VecXd& a);
-    double cubic_indef_integral(const double& x, const VecXd& a);
-    double cubic_integral(const double& lower, const double& upper, const VecXd& a);
-    double inv_cubic_integral(const double& q, const VecXd& a);
-    VecXd find_coefs(const VecXd& vals, const VecXd& grid);
-    double interp_on_grid(const double& x, const VecXd& vals, const VecXd& grid);
-
-    // Utility functions for integration
-    double int_on_grid(const double& upr, const VecXd& vals, const VecXd& grid);
-    double inv_int_on_grid(const double& qq, const VecXd& vals, const VecXd& grid);
-
-    VecXd grid_points_;
-    MatXd values_;
-};
-
-#endif
+        Eigen::VectorXd grid_points_;
+        Eigen::MatrixXd values_;
+    };
+}

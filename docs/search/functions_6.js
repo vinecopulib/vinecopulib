@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['select',['select',['../class_bicop.html#a6b1c154595bb17cd73f81cb4f563a776',1,'Bicop']]],
-  ['simulate',['simulate',['../class_bicop.html#afa62d40a17e096cc0f7e769fb2a1285d',1,'Bicop']]]
+  ['nloptcontrols',['NLoptControls',['../classoptimization__tools_1_1_n_lopt_controls.html#a79c68f622a830310faab4b7053404537',1,'optimization_tools::NLoptControls::NLoptControls()'],['../classoptimization__tools_1_1_n_lopt_controls.html#a32a9c83dccfd6465bbe2781461754b53',1,'optimization_tools::NLoptControls::NLoptControls(double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)']]]
 ];

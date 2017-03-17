@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['trafokernelbicop',['TrafokernelBicop',['../class_trafokernel_bicop.html',1,'']]]
+  ['rvinematrix',['RVineMatrix',['../class_r_vine_matrix.html',1,'RVineMatrix'],['../class_r_vine_matrix.html#ab58141cea327509270023fc7ea28fc4a',1,'RVineMatrix::RVineMatrix()']]]
 ];

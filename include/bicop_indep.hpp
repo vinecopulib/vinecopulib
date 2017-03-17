@@ -1,51 +1,38 @@
-/*
-    Copyright 2016 Thibault Vatter, Thomas Nagler
+// Copyright © 2017 Thomas Nagler and Thibault Vatter
+//
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
+// vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-    This file is part of vinecopulib.
-
-    vinecopulib is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    vinecopulib is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-#ifndef VINECOPULIB_BICOP_INDEP_HPP
-#define VINECOPULIB_BICOP_INDEP_HPP
+#pragma once
 
 #include "bicop_parametric.hpp"
 
-class IndepBicop : public ParBicop {
+namespace vinecopulib
+{
+    class IndepBicop : public ParBicop
+    {
+    public:
+        // constructor
+        IndepBicop();
+        IndepBicop(const Eigen::VectorXd& parameters);
+        IndepBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
-public:
-    // constructor
-    IndepBicop();
-    IndepBicop(const VecXd& parameters);
-    IndepBicop(const VecXd& parameters, const int& rotation);
+        // PDF
+        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
 
-    // PDF
-    VecXd pdf_default(const MatXd& u);
+        // hfunctions and their inverses
+        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
 
-    // hfunctions: the conditioning variable is put second
-    VecXd hfunc1_default(const MatXd& u);
-    VecXd hfunc2_default(const MatXd& u);
-    VecXd hinv1_default(const MatXd& u);
-    VecXd hinv2_default(const MatXd& u);
+        Eigen::VectorXd tau_to_parameters(const double &);
+        double parameters_to_tau(const Eigen::VectorXd &);
 
-    VecXd tau_to_parameters(const double &);
-    double parameters_to_tau(const VecXd &);
+        void flip();
 
-    void flip();
-
-private:
-    VecXd get_start_parameters(const double tau);
-};
-
-#endif
+    private:
+        Eigen::VectorXd get_start_parameters(const double tau);
+    };
+}

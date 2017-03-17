@@ -1,0 +1,110 @@
+\hypertarget{classoptimization__tools_1_1_n_lopt_controls}{}\section{optimization\+\_\+tools\+:\+:N\+Lopt\+Controls Class Reference}
+\label{classoptimization__tools_1_1_n_lopt_controls}\index{optimization\+\_\+tools\+::\+N\+Lopt\+Controls@{optimization\+\_\+tools\+::\+N\+Lopt\+Controls}}
+
+
+{\ttfamily \#include $<$optimization\+\_\+tools.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classoptimization__tools_1_1_n_lopt_controls_a79c68f622a830310faab4b7053404537}{N\+Lopt\+Controls} ()
+\item 
+\hyperlink{classoptimization__tools_1_1_n_lopt_controls_a32a9c83dccfd6465bbe2781461754b53}{N\+Lopt\+Controls} (double xtol\+\_\+rel, double xtol\+\_\+abs, double ftol\+\_\+rel, double ftol\+\_\+abs, int maxeval)
+\item 
+void \hyperlink{classoptimization__tools_1_1_n_lopt_controls_abadc98747c00b03d2ca1438a90e0f7ea}{set\+\_\+controls} (nlopt\+::opt $\ast$opt)
+\end{DoxyCompactItemize}
+{\bf }\par
+\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{classoptimization__tools_1_1_n_lopt_controls_a3b9ab6936b1058c3e54b06740ef3ea98}{get\+\_\+xtol\+\_\+rel} ()
+\item 
+double {\bfseries get\+\_\+xtol\+\_\+abs} ()\hypertarget{classoptimization__tools_1_1_n_lopt_controls_a499c5dc12d817d4bfbf9e0299d3ee59d}{}\label{classoptimization__tools_1_1_n_lopt_controls_a499c5dc12d817d4bfbf9e0299d3ee59d}
+
+\item 
+double {\bfseries get\+\_\+ftol\+\_\+rel} ()\hypertarget{classoptimization__tools_1_1_n_lopt_controls_ad969617f00cfc10828de474d8280ac2b}{}\label{classoptimization__tools_1_1_n_lopt_controls_ad969617f00cfc10828de474d8280ac2b}
+
+\item 
+double {\bfseries get\+\_\+ftol\+\_\+abs} ()\hypertarget{classoptimization__tools_1_1_n_lopt_controls_ab6a7f0d0199b9c66a79fa35f19acee04}{}\label{classoptimization__tools_1_1_n_lopt_controls_ab6a7f0d0199b9c66a79fa35f19acee04}
+
+\item 
+double {\bfseries get\+\_\+maxeval} ()\hypertarget{classoptimization__tools_1_1_n_lopt_controls_a931388e375b0001c18c839a1bc412c45}{}\label{classoptimization__tools_1_1_n_lopt_controls_a931388e375b0001c18c839a1bc412c45}
+
+\end{DoxyCompactItemize}
+
+
+
+\subsection{Detailed Description}
+A class for the controls to nlopt 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{optimization\+\_\+tools\+::\+N\+Lopt\+Controls@{optimization\+\_\+tools\+::\+N\+Lopt\+Controls}!N\+Lopt\+Controls@{N\+Lopt\+Controls}}
+\index{N\+Lopt\+Controls@{N\+Lopt\+Controls}!optimization\+\_\+tools\+::\+N\+Lopt\+Controls@{optimization\+\_\+tools\+::\+N\+Lopt\+Controls}}
+\subsubsection[{\texorpdfstring{N\+Lopt\+Controls()}{NLoptControls()}}]{\setlength{\rightskip}{0pt plus 5cm}optimization\+\_\+tools\+::\+N\+Lopt\+Controls\+::\+N\+Lopt\+Controls (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classoptimization__tools_1_1_n_lopt_controls_a79c68f622a830310faab4b7053404537}{}\label{classoptimization__tools_1_1_n_lopt_controls_a79c68f622a830310faab4b7053404537}
+Create controls using the default contructor
+
+\begin{DoxyReturn}{Returns}
+The default N\+Lopt controls. 
+\end{DoxyReturn}
+\index{optimization\+\_\+tools\+::\+N\+Lopt\+Controls@{optimization\+\_\+tools\+::\+N\+Lopt\+Controls}!N\+Lopt\+Controls@{N\+Lopt\+Controls}}
+\index{N\+Lopt\+Controls@{N\+Lopt\+Controls}!optimization\+\_\+tools\+::\+N\+Lopt\+Controls@{optimization\+\_\+tools\+::\+N\+Lopt\+Controls}}
+\subsubsection[{\texorpdfstring{N\+Lopt\+Controls(double xtol\+\_\+rel, double xtol\+\_\+abs, double ftol\+\_\+rel, double ftol\+\_\+abs, int maxeval)}{NLoptControls(double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)}}]{\setlength{\rightskip}{0pt plus 5cm}optimization\+\_\+tools\+::\+N\+Lopt\+Controls\+::\+N\+Lopt\+Controls (
+\begin{DoxyParamCaption}
+\item[{double}]{xtol\+\_\+rel, }
+\item[{double}]{xtol\+\_\+abs, }
+\item[{double}]{ftol\+\_\+rel, }
+\item[{double}]{ftol\+\_\+abs, }
+\item[{int}]{maxeval}
+\end{DoxyParamCaption}
+)}\hypertarget{classoptimization__tools_1_1_n_lopt_controls_a32a9c83dccfd6465bbe2781461754b53}{}\label{classoptimization__tools_1_1_n_lopt_controls_a32a9c83dccfd6465bbe2781461754b53}
+Create controls by passing the arguments
+
+
+\begin{DoxyParams}{Parameters}
+{\em xtol\+\_\+rel} & Relative tolerance on the parameter value \\
+\hline
+{\em xtol\+\_\+abs} & Absolute tolerance on the parameter value \\
+\hline
+{\em ftol\+\_\+rel} & Relative tolerance on the function value \\
+\hline
+{\em ftol\+\_\+abs} & Absolue tolerance on the function value \\
+\hline
+{\em maxeval} & Maximal number of evaluations of the objective \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Custom N\+Lopt controls. 
+\end{DoxyReturn}
+
+
+\subsection{Member Function Documentation}
+\index{optimization\+\_\+tools\+::\+N\+Lopt\+Controls@{optimization\+\_\+tools\+::\+N\+Lopt\+Controls}!get\+\_\+xtol\+\_\+rel@{get\+\_\+xtol\+\_\+rel}}
+\index{get\+\_\+xtol\+\_\+rel@{get\+\_\+xtol\+\_\+rel}!optimization\+\_\+tools\+::\+N\+Lopt\+Controls@{optimization\+\_\+tools\+::\+N\+Lopt\+Controls}}
+\subsubsection[{\texorpdfstring{get\+\_\+xtol\+\_\+rel()}{get_xtol_rel()}}]{\setlength{\rightskip}{0pt plus 5cm}double optimization\+\_\+tools\+::\+N\+Lopt\+Controls\+::get\+\_\+xtol\+\_\+rel (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classoptimization__tools_1_1_n_lopt_controls_a3b9ab6936b1058c3e54b06740ef3ea98}{}\label{classoptimization__tools_1_1_n_lopt_controls_a3b9ab6936b1058c3e54b06740ef3ea98}
+Getters and setters. \index{optimization\+\_\+tools\+::\+N\+Lopt\+Controls@{optimization\+\_\+tools\+::\+N\+Lopt\+Controls}!set\+\_\+controls@{set\+\_\+controls}}
+\index{set\+\_\+controls@{set\+\_\+controls}!optimization\+\_\+tools\+::\+N\+Lopt\+Controls@{optimization\+\_\+tools\+::\+N\+Lopt\+Controls}}
+\subsubsection[{\texorpdfstring{set\+\_\+controls(nlopt\+::opt $\ast$opt)}{set_controls(nlopt::opt *opt)}}]{\setlength{\rightskip}{0pt plus 5cm}void optimization\+\_\+tools\+::\+N\+Lopt\+Controls\+::set\+\_\+controls (
+\begin{DoxyParamCaption}
+\item[{nlopt\+::opt $\ast$}]{opt}
+\end{DoxyParamCaption}
+)}\hypertarget{classoptimization__tools_1_1_n_lopt_controls_abadc98747c00b03d2ca1438a90e0f7ea}{}\label{classoptimization__tools_1_1_n_lopt_controls_abadc98747c00b03d2ca1438a90e0f7ea}
+Set controls of an optimizer
+
+
+\begin{DoxyParams}{Parameters}
+{\em opt} & Pointer to the optimizer for control setting \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/n5/dev/cpp/vinecopulib/include/optimization\+\_\+tools.\+hpp\item 
+/home/n5/dev/cpp/vinecopulib/src/optimization\+\_\+tools.\+cpp\end{DoxyCompactItemize}

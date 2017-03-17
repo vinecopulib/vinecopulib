@@ -9,6 +9,9 @@
 \item 
 \hyperlink{class_interpolation_grid_aed2639844689b97483d665feb5d0d0f7}{Interpolation\+Grid} (const Vec\+Xd \&grid\+\_\+points, const Mat\+Xd \&values)
 \item 
+void {\bfseries flip} ()\hypertarget{class_interpolation_grid_a07cca3a1e214f98fc9bafa2a6379f789}{}\label{class_interpolation_grid_a07cca3a1e214f98fc9bafa2a6379f789}
+
+\item 
 Vec\+Xd \hyperlink{class_interpolation_grid_a9e65596940b5e561ef6332d2559feb57}{interpolate} (const Mat\+Xd \&x)
 \item 
 Vec\+Xd \hyperlink{class_interpolation_grid_a90af7bd3f2646109be939fc48b2284ca}{intergrate\+\_\+1d} (const Mat\+Xd \&u, const int \&cond\+\_\+var)
@@ -23,12 +26,14 @@ A class for cubic spline interpolation of bivariate copulas
 The class is used for implementing kernel estimators. It makes storing the observations obsolete and allows for fast numerical integration. 
 
 \subsection{Constructor \& Destructor Documentation}
-\mbox{\Hypertarget{class_interpolation_grid_aed2639844689b97483d665feb5d0d0f7}\label{class_interpolation_grid_aed2639844689b97483d665feb5d0d0f7}} 
 \index{Interpolation\+Grid@{Interpolation\+Grid}!Interpolation\+Grid@{Interpolation\+Grid}}
 \index{Interpolation\+Grid@{Interpolation\+Grid}!Interpolation\+Grid@{Interpolation\+Grid}}
-\subsubsection{\texorpdfstring{Interpolation\+Grid()}{InterpolationGrid()}}
-{\footnotesize\ttfamily Interpolation\+Grid\+::\+Interpolation\+Grid (\begin{DoxyParamCaption}\item[{const Vec\+Xd \&}]{grid\+\_\+points,  }\item[{const Mat\+Xd \&}]{values }\end{DoxyParamCaption})}
-
+\subsubsection[{\texorpdfstring{Interpolation\+Grid(const Vec\+Xd \&grid\+\_\+points, const Mat\+Xd \&values)}{InterpolationGrid(const VecXd &grid_points, const MatXd &values)}}]{\setlength{\rightskip}{0pt plus 5cm}Interpolation\+Grid\+::\+Interpolation\+Grid (
+\begin{DoxyParamCaption}
+\item[{const Vec\+Xd \&}]{grid\+\_\+points, }
+\item[{const Mat\+Xd \&}]{values}
+\end{DoxyParamCaption}
+)}\hypertarget{class_interpolation_grid_aed2639844689b97483d665feb5d0d0f7}{}\label{class_interpolation_grid_aed2639844689b97483d665feb5d0d0f7}
 Constructor
 
 
@@ -41,12 +46,14 @@ Constructor
 
 
 \subsection{Member Function Documentation}
-\mbox{\Hypertarget{class_interpolation_grid_a90af7bd3f2646109be939fc48b2284ca}\label{class_interpolation_grid_a90af7bd3f2646109be939fc48b2284ca}} 
 \index{Interpolation\+Grid@{Interpolation\+Grid}!intergrate\+\_\+1d@{intergrate\+\_\+1d}}
 \index{intergrate\+\_\+1d@{intergrate\+\_\+1d}!Interpolation\+Grid@{Interpolation\+Grid}}
-\subsubsection{\texorpdfstring{intergrate\+\_\+1d()}{intergrate\_1d()}}
-{\footnotesize\ttfamily Vec\+Xd Interpolation\+Grid\+::intergrate\+\_\+1d (\begin{DoxyParamCaption}\item[{const Mat\+Xd \&}]{u,  }\item[{const int \&}]{cond\+\_\+var }\end{DoxyParamCaption})}
-
+\subsubsection[{\texorpdfstring{intergrate\+\_\+1d(const Mat\+Xd \&u, const int \&cond\+\_\+var)}{intergrate_1d(const MatXd &u, const int &cond_var)}}]{\setlength{\rightskip}{0pt plus 5cm}Vec\+Xd Interpolation\+Grid\+::intergrate\+\_\+1d (
+\begin{DoxyParamCaption}
+\item[{const Mat\+Xd \&}]{u, }
+\item[{const int \&}]{cond\+\_\+var}
+\end{DoxyParamCaption}
+)}\hypertarget{class_interpolation_grid_a90af7bd3f2646109be939fc48b2284ca}{}\label{class_interpolation_grid_a90af7bd3f2646109be939fc48b2284ca}
 Integrate the grid along one axis
 
 
@@ -56,12 +63,13 @@ Integrate the grid along one axis
 {\em cond\+\_\+var} & either 1 or 2; the axis considered fixed. \\
 \hline
 \end{DoxyParams}
-\mbox{\Hypertarget{class_interpolation_grid_a9e65596940b5e561ef6332d2559feb57}\label{class_interpolation_grid_a9e65596940b5e561ef6332d2559feb57}} 
 \index{Interpolation\+Grid@{Interpolation\+Grid}!interpolate@{interpolate}}
 \index{interpolate@{interpolate}!Interpolation\+Grid@{Interpolation\+Grid}}
-\subsubsection{\texorpdfstring{interpolate()}{interpolate()}}
-{\footnotesize\ttfamily Vec\+Xd Interpolation\+Grid\+::interpolate (\begin{DoxyParamCaption}\item[{const Mat\+Xd \&}]{x }\end{DoxyParamCaption})}
-
+\subsubsection[{\texorpdfstring{interpolate(const Mat\+Xd \&x)}{interpolate(const MatXd &x)}}]{\setlength{\rightskip}{0pt plus 5cm}Vec\+Xd Interpolation\+Grid\+::interpolate (
+\begin{DoxyParamCaption}
+\item[{const Mat\+Xd \&}]{x}
+\end{DoxyParamCaption}
+)}\hypertarget{class_interpolation_grid_a9e65596940b5e561ef6332d2559feb57}{}\label{class_interpolation_grid_a9e65596940b5e561ef6332d2559feb57}
 Interpolation in two dimensions
 
 
@@ -69,12 +77,14 @@ Interpolation in two dimensions
 {\em x} & mx2 matrix of evaluation points. \\
 \hline
 \end{DoxyParams}
-\mbox{\Hypertarget{class_interpolation_grid_aba233f98f869c2aeff0d920a1dd477d6}\label{class_interpolation_grid_aba233f98f869c2aeff0d920a1dd477d6}} 
 \index{Interpolation\+Grid@{Interpolation\+Grid}!inv\+\_\+intergrate\+\_\+1d@{inv\+\_\+intergrate\+\_\+1d}}
 \index{inv\+\_\+intergrate\+\_\+1d@{inv\+\_\+intergrate\+\_\+1d}!Interpolation\+Grid@{Interpolation\+Grid}}
-\subsubsection{\texorpdfstring{inv\+\_\+intergrate\+\_\+1d()}{inv\_intergrate\_1d()}}
-{\footnotesize\ttfamily Vec\+Xd Interpolation\+Grid\+::inv\+\_\+intergrate\+\_\+1d (\begin{DoxyParamCaption}\item[{const Mat\+Xd \&}]{u,  }\item[{const int \&}]{cond\+\_\+var }\end{DoxyParamCaption})}
-
+\subsubsection[{\texorpdfstring{inv\+\_\+intergrate\+\_\+1d(const Mat\+Xd \&u, const int \&cond\+\_\+var)}{inv_intergrate_1d(const MatXd &u, const int &cond_var)}}]{\setlength{\rightskip}{0pt plus 5cm}Vec\+Xd Interpolation\+Grid\+::inv\+\_\+intergrate\+\_\+1d (
+\begin{DoxyParamCaption}
+\item[{const Mat\+Xd \&}]{u, }
+\item[{const int \&}]{cond\+\_\+var}
+\end{DoxyParamCaption}
+)}\hypertarget{class_interpolation_grid_aba233f98f869c2aeff0d920a1dd477d6}{}\label{class_interpolation_grid_aba233f98f869c2aeff0d920a1dd477d6}
 Inverse of integral along one axis of the grid
 
 
@@ -88,5 +98,5 @@ Inverse of integral along one axis of the grid
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/\+Users/tvatter/\+Dropbox/vinecoplib/vinecopulib/include/interpolation\+\_\+grid.\+hpp\item 
-/\+Users/tvatter/\+Dropbox/vinecoplib/vinecopulib/src/interpolation\+\_\+grid.\+cpp\end{DoxyCompactItemize}
+/home/n5/dev/cpp/vinecopulib/include/interpolation\+\_\+grid.\+hpp\item 
+/home/n5/dev/cpp/vinecopulib/src/interpolation\+\_\+grid.\+cpp\end{DoxyCompactItemize}

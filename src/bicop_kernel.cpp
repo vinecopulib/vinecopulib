@@ -1,71 +1,62 @@
-/*
-Copyright 2016 Thibault Vatter, Thomas Nagler
-
-This file is part of vinecopulib.
-
-vinecopulib is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-vinecopulib is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// Copyright © 2017 Thomas Nagler and Thibault Vatter
+//
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
+// vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_kernel.hpp"
+#include "tools_stats.hpp"
 
-KernelBicop::KernelBicop()
+namespace vinecopulib
 {
-    // construct default grid (equally spaced on Gaussian scale)
-    int m = 30;
-    VecXd grid_points(m);
-    for (int i = 0; i < m; ++i)
-        grid_points(i) = - 3.25 + i * (6.25 / (double) m);
-    grid_points = pnorm(grid_points);
+    KernelBicop::KernelBicop()
+    {
+        // construct default grid (equally spaced on Gaussian scale)
+        int m = 30;
+        Eigen::VectorXd grid_points(m);
+        for (int i = 0; i < m; ++i)
+            grid_points(i) = - 3.25 + i * (6.25 / (double) m);
+        grid_points = tools_stats::pnorm(grid_points);
 
-    interp_grid_ = InterpolationGrid(grid_points, MatXd::Constant(30, 30, 1.0));
-}
+        interp_grid_ = InterpolationGrid(grid_points, Eigen::MatrixXd::Constant(30, 30, 1.0));
+    }
 
-VecXd KernelBicop::pdf_default(const MatXd& u)
-{
-    return interp_grid_.interpolate(u);
-}
-VecXd KernelBicop::hfunc1_default(const MatXd& u)
-{
-    return interp_grid_.intergrate_1d(u, 1);
-}
-VecXd KernelBicop::hfunc2_default(const MatXd& u)
-{
-    return interp_grid_.intergrate_1d(u, 2);
-}
-VecXd KernelBicop::hinv1_default(const MatXd& u)
-{
-    return hinv1_num(u);
-}
-VecXd KernelBicop::hinv2_default(const MatXd& u)
-{
-    return hinv2_num(u);
-}
+    Eigen::VectorXd KernelBicop::pdf_default(const Eigen::MatrixXd& u)
+    {
+        return interp_grid_.interpolate(u);
+    }
+    Eigen::VectorXd KernelBicop::hfunc1_default(const Eigen::MatrixXd& u)
+    {
+        return interp_grid_.intergrate_1d(u, 1);
+    }
+    Eigen::VectorXd KernelBicop::hfunc2_default(const Eigen::MatrixXd& u)
+    {
+        return interp_grid_.intergrate_1d(u, 2);
+    }
+    Eigen::VectorXd KernelBicop::hinv1_default(const Eigen::MatrixXd& u)
+    {
+        return hinv1_num(u);
+    }
+    Eigen::VectorXd KernelBicop::hinv2_default(const Eigen::MatrixXd& u)
+    {
+        return hinv2_num(u);
+    }
 
-// TODO
-double KernelBicop::parameters_to_tau(const VecXd &)
-{
-    throw std::runtime_error(
-        "parameters_to_tau not yet implemented for kernel estimator"
-    );
-}
+    // TODO
+    double KernelBicop::parameters_to_tau(const Eigen::VectorXd &)
+    {
+        throw std::runtime_error(
+                "parameters_to_tau not yet implemented for kernel estimator"
+        );
+    }
 
-double KernelBicop::calculate_npars()
-{
-    return npars_;
-}
+    double KernelBicop::calculate_npars()
+    {
+        return npars_;
+    }
 
-void KernelBicop::flip()
-{
-    interp_grid_.flip();
+    void KernelBicop::flip()
+    {
+        interp_grid_.flip();
+    }
 }

@@ -1,45 +1,30 @@
-/*
-    Copyright 2016 Thibault Vatter, Thomas Nagler
+// Copyright © 2017 Thomas Nagler and Thibault Vatter
+//
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
+// vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-    This file is part of vinecopulib.
-
-    vinecopulib is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    vinecopulib is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-#ifndef VINECOPULIB_BICOP_BB7_HPP
-#define VINECOPULIB_BICOP_BB7_HPP
+#pragma once
 
 #include "bicop_archimedean.hpp"
-#include "integration_tools.hpp"
 
-class Bb7Bicop : public ArchimedeanBicop {
+namespace vinecopulib
+{
+    class Bb7Bicop : public ArchimedeanBicop
+    {
+    public:
+        // constructor
+        Bb7Bicop();
+        Bb7Bicop(const Eigen::VectorXd& parameters);
+        Bb7Bicop(const Eigen::VectorXd& parameters, const int& rotation);
 
-public:
-    // constructor
-    Bb7Bicop();
-    Bb7Bicop(const VecXd& parameters);
-    Bb7Bicop(const VecXd& parameters, const int& rotation);
+        // generator, its inverse and derivatives for the archimedean copula
+        Eigen::VectorXd generator(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_inv(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_derivative(const Eigen::VectorXd& u);
+        Eigen::VectorXd generator_derivative2(const Eigen::VectorXd& u);
 
-    // generator, its inverse and derivatives for the archimedean copula
-    VecXd generator(const VecXd& u);
-    VecXd generator_inv(const VecXd& u);
-    VecXd generator_derivative(const VecXd& u);
-    VecXd generator_derivative2(const VecXd& u);
-
-    // link between Kendall's tau and the par_bicop parameter
-    double parameters_to_tau(const VecXd& par);
-};
-
-
-#endif
+        // link between Kendall's tau and the par_bicop parameter
+        double parameters_to_tau(const Eigen::VectorXd& par);
+    };
+}

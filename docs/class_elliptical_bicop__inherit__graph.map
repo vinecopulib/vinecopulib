@@ -1,6 +1,6 @@
 <map id="EllipticalBicop" name="EllipticalBicop">
-<area shape="rect" id="node4" href="$class_gauss_bicop.html" title="GaussBicop" alt="" coords="5,225,99,251"/>
-<area shape="rect" id="node5" href="$class_student_bicop.html" title="StudentBicop" alt="" coords="123,225,224,251"/>
-<area shape="rect" id="node2" href="$class_par_bicop.html" title="ParBicop" alt="" coords="74,79,150,104"/>
-<area shape="rect" id="node3" href="$class_bicop.html" title="Bicop" alt="" coords="85,5,139,31"/>
+<area shape="rect" id="node4" href="$class_gauss_bicop.html" title="GaussBicop" alt="" coords="5,229,99,256"/>
+<area shape="rect" id="node5" href="$class_student_bicop.html" title="StudentBicop" alt="" coords="123,229,223,256"/>
+<area shape="rect" id="node2" href="$class_par_bicop.html" title="ParBicop" alt="" coords="75,80,149,107"/>
+<area shape="rect" id="node3" href="$class_bicop.html" title="Bicop" alt="" coords="85,5,139,32"/>
 </map>

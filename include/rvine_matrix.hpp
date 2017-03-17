@@ -1,58 +1,42 @@
-/*
-Copyright 2016 Thibault Vatter, Thomas Nagler
+// Copyright © 2017 Thomas Nagler and Thibault Vatter
+//
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
+// vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-This file is part of vinecopulib.
+#pragma once
 
-vinecopulib is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+#include "tools_eigen.hpp"
 
-vinecopulib is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+namespace vinecopulib
+{
+    class RVineMatrix
+    {
+    public:
+        //! \devgroup constructors Constructors
+        //! @{
+        RVineMatrix() {}
+        RVineMatrix(const Eigen::MatrixXi& matrix);
+        //! @}
 
-You should have received a copy of the GNU General Public License
-along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
-*/
+        //! Getters
+        //! @{
+        Eigen::MatrixXi get_matrix();
+        //! @}
 
-#ifndef VINECOPULIB_RVINE_MATRIX_HPP
-#define VINECOPULIB_RVINE_MATRIX_HPP
+        Eigen::VectorXi get_order();
+        Eigen::MatrixXi in_natural_order();
+        Eigen::MatrixXi get_max_matrix();
+        MatrixXb get_needed_hfunc1();
+        MatrixXb get_needed_hfunc2();
 
-#include "bicop.hpp"
+        static Eigen::MatrixXi construct_d_vine_matrix(const Eigen::VectorXi& order);
 
-typedef Eigen::MatrixXi MatXi;
-typedef Eigen::VectorXi VecXi;
-typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatXb;
+    private:
+        int d_;
+        Eigen::MatrixXi matrix_;
+    };
 
-class RVineMatrix {    
-public:
-    //! \devgroup constructors Constructors
-    //! @{
-    RVineMatrix() {}
-    RVineMatrix(const MatXi& matrix);
-    //! @}
-    
-    //! Getters
-    //! @{
-    MatXi get_matrix();
-    //! @}
-    
-    VecXi get_order();
-    MatXi in_natural_order();
-    MatXi get_max_matrix();
-    MatXb get_needed_hfunc1();
-    MatXb get_needed_hfunc2();
-
-    static MatXi construct_d_vine_matrix(const VecXi& order);
-
-private:
-    int d_;
-    MatXi matrix_;
-};
-
-int relabel_one(const int& x, const VecXi& old_labels, const VecXi& new_labels);
-MatXi relabel_elements(const MatXi& matrix, const VecXi& new_labels);
-
-#endif
+    int relabel_one(const int& x, const Eigen::VectorXi& old_labels, const Eigen::VectorXi& new_labels);
+    Eigen::MatrixXi relabel_elements(const Eigen::MatrixXi& matrix, const Eigen::VectorXi& new_labels);
+}

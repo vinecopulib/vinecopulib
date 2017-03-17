@@ -1,36 +1,91 @@
-/*
-    Copyright 2016 Thibault Vatter, Thomas Nagler
-
-    This file is part of vinecopulib.
-
-    vinecopulib is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    vinecopulib is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with vinecopulib.  If not, see <http://www.gnu.org/licenses/>.
- */
+// Copyright © 2017 Thomas Nagler and Thibault Vatter
+//
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
+// vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop_parametric.hpp"
-#include "optimization_tools.hpp"
+#include "tools_optimization.hpp"
+#include "tools_stl.hpp"
+#include "tools_stats.hpp"
 
-// calculate number of parameters
-double ParBicop::calculate_npars()
+namespace vinecopulib
 {
-    // indepence copula has no parameters
-    if (family_ == 0)
-        return 0.0;
-    // otherwise, return length of parameter vector
-    return (double) parameters_.size();
+    // calculate number of parameters
+    double ParBicop::calculate_npars() {
+        // indepence copula has no parameters
+        if (family_ == BicopFamily::indep) {
+            return 0.0;
+        }
+        // otherwise, return length of parameter vector
+        return (double) parameters_.size();
+    }
+
+    // fit
+    void ParBicop::fit(const Eigen::MatrixXd &data, std::string method)
+    {
+        if (family_ != BicopFamily::indep) {
+            using namespace tools_optimization;
+
+            std::vector<std::string> methods = {"itau", "mle"};
+            if (!tools_stl::is_member(method, methods)) {
+                throw std::runtime_error("Method not implemented.");
+            }
+
+            int npars = (int) calculate_npars();
+            if (method == "itau") {
+                npars = npars - 1;
+                if ((npars > 0) & (family_ != BicopFamily::student)) {
+                    throw std::runtime_error("itau method is not available for this family.");
+                }
+            }
+
+            auto temp_data = data;
+            double tau = tools_stats::pairwise_ktau(temp_data);
+            if (!tools_stl::is_member(family_, bicop_families::rotationless)) {
+                if ((tau > 0) & !tools_stl::is_member(rotation_, {0, 180})) {
+                    throw std::runtime_error("Copula cannot handle tau > 0");
+                }
+                if ((tau < 0) & !tools_stl::is_member(rotation_, {90, 270})) {
+                    throw std::runtime_error("Copula cannot handle tau < 0");
+                }
+            }
+
+            auto newpar = get_start_parameters(tau);
+            if (npars > 0) {
+                // Create optimizer
+                Optimizer optimizer(npars);
+
+                // Set bounds and starting values
+                auto bounds = get_parameters_bounds();
+                auto initial_parameters = newpar;
+                ParBicopOptData my_data = {data, this, newpar(0), 0};
+                if (method == "itau") {
+                    bounds = get_parameters_bounds().block(1, 0, npars, 2);
+                    initial_parameters = newpar.block(1, 0, npars, 1);
+                    optimizer.set_objective(pmle_objective, &my_data);
+                } else {
+                    optimizer.set_objective(mle_objective, &my_data);
+                }
+
+                optimizer.set_bounds(bounds);
+                auto optimized_parameters = optimizer.optimize(initial_parameters);
+
+                if (method == "itau") {
+                    newpar.block(1, 0, npars, 1) = optimized_parameters;
+                } else {
+                    newpar = optimized_parameters;
+                }
+            }
+            
+            // set the new parameters
+            set_parameters(newpar);
+        }
+    }
+    
 }
 
-/*void remove_row(MatXd& matrix, unsigned int to_remove)
+/*void remove_row(Eigen::MatrixXd& matrix, unsigned int to_remove)
 {
     unsigned int n = matrix.rows()-1;
     unsigned int m = matrix.cols();
@@ -40,77 +95,3 @@ double ParBicop::calculate_npars()
 
     matrix.conservativeResize(numRows,numCols);
 }*/
-
-// fit
-void ParBicop::fit(const MatXd &data, std::string method)
-{
-    if (family_ != 0)
-    {
-        using namespace optimization_tools;
-
-        std::vector<std::string> methods = {"itau", "mle"};
-        if (!is_member(method, methods))
-        {
-            throw std::runtime_error("Method not implemented.");
-        }
-
-        int npars = (int) calculate_npars();
-        if (method == "itau")
-        {
-            npars = npars - 1;
-            if ((npars > 0) & (family_ != 2))
-            {
-                throw std::runtime_error("itau method is not available for this family.");
-            }
-        }
-
-        int n = data.rows();
-        int d = 2;
-        double tau = 0.0;
-        MatXd newdata = data;
-        ktau_matrix(newdata.data(), &d, &n, &tau);
-        VecXd newpar = get_start_parameters(tau);
-
-        std::string association_direction = get_association_direction();
-        if (((tau < 0) & (association_direction == "positive")) | ((tau > 0) & (association_direction == "negative")))
-        {
-            throw std::runtime_error("The data and copula are not compatible.");
-        }
-
-        if (npars > 0)
-        {
-            // Create optimizer
-            Optimizer optimizer(npars);
-
-            // Set bounds and starting values
-            MatXd bounds = get_parameters_bounds();
-            VecXd initial_parameters = newpar;
-            ParBicopOptData my_data = {data, this, newpar(0), 0};
-            if (method == "itau")
-            {
-                bounds = get_parameters_bounds().block(1,0,npars,2);
-                initial_parameters = newpar.block(1,0,npars,1);
-                optimizer.set_objective(pmle_objective, &my_data);
-            }
-            else
-            {
-                optimizer.set_objective(mle_objective, &my_data);
-            }
-
-            optimizer.set_bounds(bounds);
-            VecXd optimized_parameters = optimizer.optimize(initial_parameters);
-
-            if (method == "itau")
-            {
-                newpar.block(1,0,npars,1) = optimized_parameters;
-            }
-            else
-            {
-                newpar = optimized_parameters;
-            }
-        }
-        // set the new parameters
-        set_parameters(newpar);
-    }
-
-}
