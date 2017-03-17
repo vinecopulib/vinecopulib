@@ -19,8 +19,11 @@ namespace test_bicop_parametric {
         command = command + " "  + std::to_string(this->get_family());
         command = command + " "  + std::to_string(this->get_par());
         command = command + " "  + std::to_string(this->get_par2());
-        system(command.c_str());
-
+        int sys_exit_code = system(command.c_str());
+        if (sys_exit_code != 0) {
+            throw std::runtime_error("error in system call");
+        }
+        
         if (this->needs_check_) {
             Eigen::MatrixXd results = read_matxd("temp");
             Eigen::VectorXd par = this->par_bicop_.get_parameters();

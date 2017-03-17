@@ -5,11 +5,12 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "include/vinecop_test.hpp"
+#include <stdexcept>
 
 VinecopTest::VinecopTest() {
     // write temp files for the test using VineCopula
     std::string command = std::string(RSCRIPT) + "../test/test_vinecop_parametric.R";
-    system(command.c_str());
+    int sys_exit_code = system(command.c_str());
 
     // vine structures (C++ representation reverses rows)
     model_matrix = read_matxi("temp2").colwise().reverse();
@@ -25,5 +26,8 @@ VinecopTest::VinecopTest() {
 
     // remove temp files
     command = rm + "temp temp2 temp3";
-    system(command.c_str());
+    sys_exit_code += system(command.c_str());
+    if (sys_exit_code != 0) {
+        throw std::runtime_error("error in system call");
+    }
 }
