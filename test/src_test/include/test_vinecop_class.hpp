@@ -20,7 +20,7 @@ namespace test_vinecop_class {
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(3, Eigen::VectorXd::Constant(1, 3.0), 90);
+                pc = Bicop::create(BicopFamily::clayton, 90);
             }
         }
 
@@ -30,9 +30,10 @@ namespace test_vinecop_class {
     TEST_F(VinecopTest, pdf_is_correct) {
 
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
+        auto par = Eigen::VectorXd::Constant(1, 3.0);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(3, Eigen::VectorXd::Constant(1, 3.0), 270);
+                pc = Bicop::create(BicopFamily::clayton, 270, par);
             }
         }
         Vinecop vinecop(pair_copulas, model_matrix);
@@ -43,15 +44,17 @@ namespace test_vinecop_class {
     TEST_F(VinecopTest, simulate_is_correct) {
 
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
+        auto par = Eigen::VectorXd::Constant(1, 3.0);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(3, Eigen::VectorXd::Constant(1, 3.0), 270);
+                pc = Bicop::create(BicopFamily::clayton, 270, par);
             }
         }
         Vinecop vinecop(pair_copulas, model_matrix);
 
         vinecop.simulate(10);  // only check if it works
-        ASSERT_TRUE(vinecop.simulate(1000, u).isApprox(sim, 1e-4));
+        // check the underlying transformation from independent samples
+        ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
     }
 
     TEST_F(VinecopTest, select_finds_right_structure) {
@@ -59,7 +62,7 @@ namespace test_vinecop_class {
 // independence (pair-copula estimates differ otherwise)
 
 // select structure and get matrix
-        Vinecop fit = Vinecop::select(u, {0});
+        Vinecop fit = Vinecop::select(u, {BicopFamily::indep});
         auto vcl_matrix = fit.get_matrix();
 
 // check if the same conditioned sets appear for each tree
@@ -80,11 +83,13 @@ namespace test_vinecop_class {
             for (auto s1 : vc_sets[tree]) {
                 bool is_in_both = false;
                 for (auto s2 : vcl_sets[tree]) {
-                    if (tools_stl::is_same_set(s1, s2))
+                    if (tools_stl::is_same_set(s1, s2)) {
                         is_in_both = true;
+                    }
                 }
-                if (!is_in_both)
+                if (!is_in_both) {
                     ++pairs_unequal;
+                }
             }
         }
         EXPECT_EQ(pairs_unequal, 0);

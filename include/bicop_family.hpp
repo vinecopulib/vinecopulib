@@ -7,29 +7,124 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 namespace vinecopulib {
+    //! Bivariate copula families
     enum class BicopFamily
     {
-        Indep,
-        Gaussian,
-        Student,
-        Clayton,
-        Gumbel,
-        Frank,
-        Joe,
-        BB1,
-        BB6,
-        BB7,
-        BB8,
-        TLL0
+        indep,
+        gaussian,
+        student,
+        clayton,
+        gumbel,
+        frank,
+        joe,
+        bb1,
+        bb6,
+        bb7,
+        bb8,
+        tll0
     };
 
-    const std::vector<BicopFamily> families_parameteric = {Indep, Gaussian, Student, Clayton, Gumbel, Frank, Joe,
-                                                           BB1, BB6, BB7, BB8};
-    const std::vector<BicopFamily> families_nonparametric = {TLL0};
-    const std::vector<BicopFamily> families_elliptical = {Gaussian, Student};
-    const std::vector<BicopFamily> families_archimedean = {Clayton, Gumbel, Frank, Joe, BB1, BB6, BB7, BB8};
-    const std::vector<BicopFamily> families_rotationless = {Indep, Gaussian, Student, Frank, TLL0};
-    const std::vector<BicopFamily> families_itau = {Indep, Gaussian, Student, Clayton, Gumbel, Frank, Joe};
-}
+    std::string get_family_name(BicopFamily family);
+    
+    namespace bicop_families {
+                
+        const std::vector<BicopFamily> all = {
+            BicopFamily::indep,
+            BicopFamily::gaussian,
+            BicopFamily::student,
+            BicopFamily::clayton,
+            BicopFamily::gumbel,
+            BicopFamily::frank,
+            BicopFamily::joe,
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8,
+            BicopFamily::tll0
+        };
+        const std::vector<BicopFamily> parametric = {
+            BicopFamily::gaussian,
+            BicopFamily::student,
+            BicopFamily::clayton,
+            BicopFamily::gumbel,
+            BicopFamily::frank,
+            BicopFamily::joe,
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        };
+        const std::vector<BicopFamily> nonparametric = {
+            BicopFamily::indep,
+            BicopFamily::tll0
+        };
+        const std::vector<BicopFamily> one_par = {
+            BicopFamily::gaussian,
+            BicopFamily::clayton,
+            BicopFamily::gumbel,
+            BicopFamily::frank,
+            BicopFamily::joe,
+        }; 
+        const std::vector<BicopFamily> two_par = {
+            BicopFamily::student,
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        };    
+        const std::vector<BicopFamily> elliptical = {
+            BicopFamily::gaussian, 
+            BicopFamily::student
+        };
+        const std::vector<BicopFamily> archimedean = {
+            BicopFamily::clayton, 
+            BicopFamily::gumbel, 
+            BicopFamily::frank, 
+            BicopFamily::joe, 
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        };
+        const std::vector<BicopFamily> BB = {
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        };        
+        const std::vector<BicopFamily> rotationless = {
+            BicopFamily::indep, 
+            BicopFamily::gaussian, 
+            BicopFamily::student, 
+            BicopFamily::frank, 
+            BicopFamily::tll0
+        };
+        const std::vector<BicopFamily> lt = {
+            BicopFamily::clayton, 
+            BicopFamily::bb1, 
+            BicopFamily::bb7
+        };  
+        const std::vector<BicopFamily> ut = {
+            BicopFamily::gumbel, 
+            BicopFamily::joe, 
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        };      
+        const std::vector<BicopFamily> itau = {
+            BicopFamily::indep, 
+            BicopFamily::gaussian, 
+            BicopFamily::student, 
+            BicopFamily::clayton, 
+            BicopFamily::gumbel, 
+            BicopFamily::frank, 
+            BicopFamily::joe
+        };
+        
+    } // end of namespace BicopFamilies
+    
+} // end of namespace vinecopulib

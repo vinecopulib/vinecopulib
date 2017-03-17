@@ -4,9 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "src_test/include/test_bicop_class.hpp"
+#include "src_test/include/test_bicop_sanity_checks.hpp"
 
-using namespace test_bicop_class;
+using namespace test_bicop_sanity_checks;
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

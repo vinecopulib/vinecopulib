@@ -61,10 +61,16 @@ script:
   - cmake .. $CMAKE_ARGS -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug && make vinecopulib_coverage
   - make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
   - cd ../release
-  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release && make && make doc
+  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
   - make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
   - cd ../bin
   - ./test_all
+  - cd ../examples/vinecopulib-cmake-example
+  - mkdir build
+  - cd build
+  - cmake .. && make
+  - cd ../bin
+  - ./vinecopulib_main
 
 after_success:
     # Creating report
@@ -72,7 +78,8 @@ after_success:
   - lcov --directory . --capture --output-file coverage.info # capture coverage info
   - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out external includes
   - lcov --remove coverage.info '/Applications/*' --output-file coverage.info # filter out more external includes
-  - lcov --remove coverage.info '*test*' --output-file coverage.info # filter out test
+  - lcov --remove coverage.info '*test*' --output-file coverage.info # filter out tests
+  - lcov --remove coverage.info '*examples*' --output-file coverage.info # filter out examples
   - lcov --list coverage.info #debug info
   # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"

@@ -15,7 +15,7 @@ using namespace vinecopulib;
 // Fake test class allowing access to the R instance
 class FakeParBicopTest : public ::testing::Test {
 public:
-    void set_family(int family, int rotation);
+    void set_family(BicopFamily family, int rotation);
     void set_parameters(Eigen::VectorXd parameters);
     void set_n(int n);
     int get_n();
@@ -37,39 +37,30 @@ public:
         int n = (int) 2e3;
         double tau = 0.5; // should be positive
         this->par_bicop_.set_rotation(rotation);
-        int family = this->par_bicop_.get_family();
+        auto family = this->par_bicop_.get_family();
         this->set_family(family, rotation);
         this->set_n(n);
 
-        Eigen::VectorXd parameters = this->par_bicop_.get_parameters();
-        if (parameters.size() < 2)
-        {
+        auto parameters = this->par_bicop_.get_parameters();
+        if (parameters.size() < 2) {
             parameters = this->par_bicop_.tau_to_parameters(tau);
-        }
-        else
-        {
-            if (family == 2)
-            {
+        } else {
+            if (family == BicopFamily::student) {
                 parameters = this->par_bicop_.tau_to_parameters(tau);
                 parameters(1) = 4;
-            }
-            else if (family == 7)
-            {
+            } else if (family == BicopFamily::bb1) {
                 parameters(1) = 1.5;
                 parameters(0) = -((2*(1-parameters(1)+parameters(1)*tau))/(parameters(1)*(-1+tau)));
-            }
-            else
-            {
+            } else {
                 double delta = 1.5;
-                if (family == 10)
-                {
+                if (family == BicopFamily::bb8)
                     delta = 0.8;
-                }
-                Eigen::VectorXd tau_v = Eigen::VectorXd::Constant(1,std::fabs(tau));
+                auto tau_v = Eigen::VectorXd::Constant(1, std::fabs(tau));
                 auto f = [this, delta](const Eigen::VectorXd &v) {
                     Eigen::VectorXd par = Eigen::VectorXd::Constant(2, delta);
                     par(0) = v(0);
-                    return Eigen::VectorXd::Constant(1, std::fabs(this->par_bicop_.parameters_to_tau(par)));
+                    auto tau = this->par_bicop_.parameters_to_tau(par);
+                    return Eigen::VectorXd::Constant(1, std::fabs(tau));
                 };
                 parameters(0) = invert_f(tau_v, f, 1+1e-6, 100)(0);
                 parameters(1) = delta;
@@ -80,17 +71,11 @@ public:
 
         // whether checks need to be done and deal with the rotation for VineCopula
         needs_check_ = true;
-        std::vector<int> rotation_less_fams = {0, 1, 2, 5};
-        if (tools_stl::is_member(this->par_bicop_.get_family(), rotation_less_fams))
-        {
+        if (tools_stl::is_member(family, bicop_families::rotationless)) {
             needs_check_ = (rotation == 0);
-        }
-        else
-        {
-            if (rotation == 90 || rotation == 270)
-            {
-                parameters = -parameters;
-            }
+        } else {
+            if (tools_stl::is_member(rotation, {90, 270}))
+                parameters *= -1;
         }
         // set the parameters vector R
         this->set_parameters(parameters);
@@ -102,6 +87,8 @@ protected:
 };
 
 // Create a list of types, each of which will be used as the test fixture's 'T'
-typedef ::testing::Types<IndepBicop, GaussianBicop, StudentBicop, ClaytonBicop, GumbelBicop, FrankBicop, JoeBicop,
-        Bb1Bicop, Bb6Bicop, Bb7Bicop, Bb8Bicop> ParBicopTypes;
+typedef ::testing::Types<
+    IndepBicop, GaussianBicop, StudentBicop, ClaytonBicop, GumbelBicop, 
+    FrankBicop, JoeBicop, Bb1Bicop, Bb6Bicop, Bb7Bicop, Bb8Bicop
+> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);

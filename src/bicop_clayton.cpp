@@ -6,30 +6,28 @@
 
 
 #include "bicop_clayton.hpp"
+#include "tools_stl.hpp"
 
 namespace vinecopulib
 {
     ClaytonBicop::ClaytonBicop()
     {
-        family_ = 3;
-        family_name_ = "Clayton";
+        family_ = BicopFamily::clayton;
         rotation_ = 0;
-        association_direction_ = "positive";
         parameters_ = Eigen::VectorXd::Zero(1);
         parameters_bounds_ = Eigen::MatrixXd::Zero(1, 2);
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    ClaytonBicop::ClaytonBicop(const Eigen::VectorXd& parameters)
+    ClaytonBicop::ClaytonBicop(const Eigen::VectorXd& parameters) :
+        ClaytonBicop()
     {
-        ClaytonBicop();
         set_parameters(parameters);
     }
 
-    ClaytonBicop::ClaytonBicop(const Eigen::VectorXd& parameters, const int& rotation)
+    ClaytonBicop::ClaytonBicop(const Eigen::VectorXd& parameters, const int& rotation) :
+        ClaytonBicop(parameters)
     {
-        ClaytonBicop();
-        set_parameters(parameters);
         set_rotation(rotation);
     }
 
@@ -95,9 +93,7 @@ namespace vinecopulib
     double ClaytonBicop::parameters_to_tau(const Eigen::VectorXd& parameters)
     {
         double tau =  parameters(0) / (2 + std::fabs(parameters(0)));
-        if ((rotation_ == 90) | (rotation_ == 270))
-            tau *= -1;
-        return tau;
+        return flip_tau(tau);
     }
 
     Eigen::VectorXd ClaytonBicop::get_start_parameters(const double tau)

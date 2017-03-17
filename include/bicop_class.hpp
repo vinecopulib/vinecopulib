@@ -8,8 +8,8 @@
 
 #include <memory>
 #include <vector>
-
 #include "tools_eigen.hpp"
+#include "bicop_family.hpp"
 
 namespace vinecopulib
 {
@@ -20,17 +20,24 @@ namespace vinecopulib
     class Bicop
     {
     public:
-        static std::shared_ptr<Bicop> create(const int& family,
-                                             const int& rotation);
-        static std::shared_ptr<Bicop> create(const int& family,
-                                             const Eigen::VectorXd& parameters,
-                                             const int& rotation);
+        static std::shared_ptr<Bicop> create(
+            BicopFamily family = BicopFamily::indep,
+            int rotation = 0
+        );
+        
+        static std::shared_ptr<Bicop> create(
+            BicopFamily family,
+            int rotation,
+            Eigen::VectorXd parameters
+        );
 
-        static std::shared_ptr<Bicop> select(const Eigen::MatrixXd& data,
-                                             std::vector<int> family_set = {0, 1, 2, 3, 4, 5, 6, 1001},
-                                             std::string method = "mle",
-                                             std::string selection_criterion = "bic",
-                                             bool preselect_families = true);
+        static std::shared_ptr<Bicop> select(
+            Eigen::MatrixXd& data,
+            std::vector<BicopFamily> family_set = bicop_families::all,
+            std::string method = "mle",
+            std::string selection_criterion = "bic",
+            bool preselect_families = true
+        );
 
         Eigen::VectorXd pdf(const Eigen::MatrixXd& u);
         Eigen::VectorXd hfunc1(const Eigen::MatrixXd& u);
@@ -50,7 +57,8 @@ namespace vinecopulib
         Eigen::VectorXd tau_to_parameters(const double& tau);
 
 
-        int get_family() const;
+        BicopFamily get_family() const;
+        std::string get_family_name() const;
         int get_rotation() const;
         std::string get_association_direction() const;
         Eigen::VectorXd get_parameters() const;
@@ -75,10 +83,8 @@ namespace vinecopulib
         Eigen::MatrixXd cut_and_rotate(const Eigen::MatrixXd& u);
         Eigen::MatrixXd swap_cols(const Eigen::MatrixXd& u);
 
-        int family_;
-        std::string family_name_;
+        BicopFamily family_;
         int rotation_;
-        std::string association_direction_;
         Eigen::VectorXd parameters_;
         Eigen::MatrixXd parameters_bounds_;   // first column lower, second column upper
 

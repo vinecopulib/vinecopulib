@@ -28,6 +28,8 @@ namespace vinecopulib
 
         void flip();
 
+    protected:
+        double flip_tau(double tau);
     private:
         Eigen::VectorXd get_start_parameters(const double tau);
     };

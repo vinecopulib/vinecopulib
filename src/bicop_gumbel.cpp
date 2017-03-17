@@ -11,25 +11,22 @@ namespace vinecopulib
 {
     GumbelBicop::GumbelBicop()
     {
-        family_ = 4;
-        family_name_ = "Gumbel";
+        family_ = BicopFamily::gumbel;
         rotation_ = 0;
-        association_direction_ = "positive";
         parameters_ = Eigen::VectorXd::Ones(1);
         parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    GumbelBicop::GumbelBicop(const Eigen::VectorXd& parameters)
+    GumbelBicop::GumbelBicop(const Eigen::VectorXd& parameters) :
+        GumbelBicop()
     {
-        GumbelBicop();
         set_parameters(parameters);
     }
 
-    GumbelBicop::GumbelBicop(const Eigen::VectorXd& parameters, const int& rotation)
+    GumbelBicop::GumbelBicop(const Eigen::VectorXd& parameters, const int& rotation) :
+        GumbelBicop(parameters)
     {
-        GumbelBicop();
-        set_parameters(parameters);
         set_rotation(rotation);
     }
 
@@ -90,10 +87,7 @@ namespace vinecopulib
     double GumbelBicop::parameters_to_tau(const Eigen::VectorXd& parameters)
     {
         double tau = (parameters(0) - 1) / parameters(0);
-        if ((rotation_ == 90) | (rotation_ == 270))
-            tau *= -1;
-
-        return tau;
+        return flip_tau(tau);
     }
 
 

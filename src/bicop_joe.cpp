@@ -11,25 +11,22 @@ namespace vinecopulib
 {
     JoeBicop::JoeBicop()
     {
-        family_ = 6;
-        family_name_ = "Joe";
+        family_ = BicopFamily::joe;
         rotation_ = 0;
-        association_direction_ = "positive";
         parameters_ = Eigen::VectorXd::Ones(1);
         parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    JoeBicop::JoeBicop(const Eigen::VectorXd& parameters)
+    JoeBicop::JoeBicop(const Eigen::VectorXd& parameters) :
+        JoeBicop()
     {
-        JoeBicop();
         set_parameters(parameters);
     }
 
-    JoeBicop::JoeBicop(const Eigen::VectorXd& parameters, const int& rotation)
+    JoeBicop::JoeBicop(const Eigen::VectorXd& parameters, const int& rotation) :
+        JoeBicop(parameters)
     {
-        JoeBicop();
-        set_parameters(parameters);
         set_rotation(rotation);
     }
 
@@ -100,9 +97,7 @@ namespace vinecopulib
         double tau = 2 / par + 1;
         tau = boost::math::digamma(2.0) - boost::math::digamma(tau);
         tau = 1 + 2 * tau / (2 - par);
-        if ((rotation_ == 90) | (rotation_ == 270))
-            tau *= -1;
-        return tau;
+        return flip_tau(tau);
     }
 
     Eigen::VectorXd JoeBicop::get_start_parameters(const double tau)

@@ -8,6 +8,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include "vinecop_class.hpp"
+#include "bicop_family.hpp"
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std
@@ -51,7 +52,7 @@ namespace tools_structselect {
     VineTree make_base_tree(const Eigen::MatrixXd& data);
     VineTree select_next_tree(
         VineTree& prev_tree,
-        std::vector<int> family_set,
+        std::vector<vinecopulib::BicopFamily> family_set,
         std::string selection_criterion,
         std::string method,
         bool preselect_families
@@ -66,7 +67,7 @@ namespace tools_structselect {
     void remove_vertex_data(VineTree& tree);
     void select_pair_copulas(
         VineTree& tree,
-        std::vector<int> family_set,
+        std::vector<vinecopulib::BicopFamily> family_set,
         std::string method,
         std::string selection_criterion,
         bool preselect_families

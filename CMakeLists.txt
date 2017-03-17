@@ -18,8 +18,6 @@ include(cmake/findDoxygen.cmake           REQUIRED)
 
 include(cmake/compilerDefOpt.cmake        REQUIRED)
 
-include(cmake/paths.cmake                 REQUIRED)
-
 include(cmake/buildTargets.cmake          REQUIRED)
 
 include(cmake/printInfo.cmake             REQUIRED)

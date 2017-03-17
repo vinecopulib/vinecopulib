@@ -55,9 +55,19 @@ namespace vinecopulib
             bool found_i = false;
             bool found_j = false;
             for (int k = 1; k < (m-1); ++k) {
-                if ((x(n, 0) >= grid_points_(k))) i = k; else found_i = true;
-                if ((x(n, 1) >= grid_points_(k))) j = k; else found_j = true;
-                if (found_i & found_j) break;
+                if ((x(n, 0) >= grid_points_(k))) { 
+                    i = k;
+                } else {
+                    found_i = true;
+                }
+                if ((x(n, 1) >= grid_points_(k))) {
+                    j = k;
+                } else {
+                    found_j = true;
+                }
+                if (found_i & found_j) {
+                    break;
+                }
             }
 
             // construct grid for first direction
@@ -229,11 +239,13 @@ namespace vinecopulib
                 }
 
                 // stop if values are close enough
-                if (::fabs(x0 - x1) <= tol)
+                if (::fabs(x0 - x1) <= tol) {
                     br = 1;
+                }
 
-                if (br == 1)
+                if (br == 1) {
                     break;
+                }
             }
 
             out(i) = ans;

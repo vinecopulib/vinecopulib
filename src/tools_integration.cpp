@@ -15,9 +15,11 @@ namespace tools_integration {
         double lb = 1e-12;
         double ub = 1.0 - lb;
         double x = 0.0;
+        auto ifunc = [f](const double /* x */, double &dxdt, const double t) {
+            dxdt = f(t);
+        };
         integrate_adaptive(boost::numeric::odeint::make_controlled(lb,lb,stepper),
-                           [f](const double /* x */, double &dxdt, const double t) {dxdt = f(t);},
-                           x, lb, ub, lb);
+                           ifunc, x, lb, ub, lb);
         return x;
     }
 }

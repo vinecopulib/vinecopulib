@@ -15,10 +15,8 @@ namespace vinecopulib
 {
     StudentBicop::StudentBicop()
     {
-        family_ = 2;
-        family_name_ = "t";
+        family_ = BicopFamily::student;
         rotation_ = 0;
-        association_direction_ = "both";
         parameters_ = Eigen::VectorXd::Zero(2);
         parameters_(1) = 50.0;
         parameters_bounds_ = Eigen::MatrixXd::Ones(2, 2);
@@ -27,16 +25,15 @@ namespace vinecopulib
         parameters_bounds_(1, 1) = 50.0;
     }
 
-    StudentBicop::StudentBicop(const Eigen::VectorXd& parameters)
+    StudentBicop::StudentBicop(const Eigen::VectorXd& parameters) :       
+        StudentBicop()
     {
-        StudentBicop();
         set_parameters(parameters);
     }
 
-    StudentBicop::StudentBicop(const Eigen::VectorXd& parameters, const int& rotation)
+    StudentBicop::StudentBicop(const Eigen::VectorXd& parameters, const int& rotation) :
+        StudentBicop(parameters)
     {
-        StudentBicop();
-        set_parameters(parameters);
         set_rotation(rotation);
     }
 

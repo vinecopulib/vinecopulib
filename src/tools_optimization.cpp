@@ -10,8 +10,7 @@ namespace tools_optimization {
 
     Optimizer::Optimizer(unsigned int n_parameters)
     {
-        if (n_parameters < 1)
-        {
+        if (n_parameters < 1) {
             throw std::runtime_error("n_parameters should be larger than 0.");
         }
         n_parameters_ = n_parameters;
@@ -23,8 +22,7 @@ namespace tools_optimization {
     Optimizer::Optimizer(unsigned int n_parameters, double xtol_rel, double xtol_abs,
                          double ftol_rel, double ftol_abs, int maxeval)
     {
-        if (n_parameters < 1)
-        {
+        if (n_parameters < 1) {
             throw std::runtime_error("n_parameters should be larger than 0.");
         }
         n_parameters_ = n_parameters;
@@ -35,9 +33,10 @@ namespace tools_optimization {
 
     void Optimizer::set_bounds(Eigen::MatrixXd bounds)
     {
-        if (bounds.rows() != n_parameters_ || bounds.cols() != 2)
-        {
-            throw std::runtime_error("Bounds should be a two column matrix with n_parameters_ rows.");
+        if (bounds.rows() != n_parameters_ || bounds.cols() != 2) {
+            throw std::runtime_error(
+                "Bounds should be a two column matrix with n_parameters_ rows."
+            );
         }
 
         std::vector<double> lb(n_parameters_);
@@ -70,24 +69,19 @@ namespace tools_optimization {
 
     void NLoptControls::check_parameters(double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)
     {
-        if (xtol_rel <= 0 || xtol_rel > 1)
-        {
+        if (xtol_rel <= 0 || xtol_rel > 1) {
             throw std::runtime_error("xtol_rel should be in (0,1]");
         }
-        if (ftol_rel <= 0 || ftol_rel > 1)
-        {
+        if (ftol_rel <= 0 || ftol_rel > 1) {
             throw std::runtime_error("ftol_rel should be in (0,1]");
         }
-        if (xtol_abs <= 0)
-        {
+        if (xtol_abs <= 0) {
             throw std::runtime_error("xtol_abs should be larger than 0");
         }
-        if (ftol_abs <= 0)
-        {
+        if (ftol_abs <= 0) {
             throw std::runtime_error("ftol_abs should be larger than 0");
         }
-        if (maxeval <= 0)
-        {
+        if (maxeval <= 0) {
             throw std::runtime_error("maxeval should be larger than 0");
         }
     }
@@ -130,8 +124,9 @@ namespace tools_optimization {
         ++newdata->objective_calls;
         Eigen::VectorXd par = Eigen::VectorXd::Ones(x.size()+1);
         par(0) = newdata->par0;
-        for (unsigned int i = 0; i < x.size(); ++i)
+        for (unsigned int i = 0; i < x.size(); ++i) {
             par(i + 1) = x[i];
+        }
         newdata->bicop->set_parameters(par);
         double nll = newdata->bicop->loglik(newdata->U);
         nll *= -1;
@@ -146,33 +141,28 @@ namespace tools_optimization {
     // optimize the likelihood or profile likelihood
     Eigen::VectorXd Optimizer::optimize(Eigen::VectorXd initial_parameters)
     {
-        if (initial_parameters.size() != n_parameters_)
-        {
+        if (initial_parameters.size() != n_parameters_) {
             throw std::string("The size of x should be n_parameters_.");
         }
 
         double nll;
         std::vector<double> x(n_parameters_);
         Eigen::VectorXd::Map(&x[0], n_parameters_) = initial_parameters;
-        try
-        {
+        try {
             opt_.optimize(x, nll);
-        } catch (nlopt::roundoff_limited err)
-        {
+        } catch (nlopt::roundoff_limited err) {
             throw std::string("Halted because roundoff errors limited progress! ") + err.what();
-        } catch (nlopt::forced_stop err)
-        {
+        } catch (nlopt::forced_stop err) {
             throw std::string("Halted because of a forced termination! ") + err.what();
-        } catch (std::invalid_argument err )
-        {
+        } catch (std::invalid_argument err) {
             throw std::string("Invalid arguments. ") + err.what();
-        } catch (std::bad_alloc err)
-        {
+        } catch (std::bad_alloc err) {
             throw std::string("Ran out of memory. ") + err.what();
-        } catch (std::runtime_error err)
-        {
+        } catch (std::runtime_error err) {
             throw std::string("Generic failure. ") + err.what();
-        } catch (...) {}
+        } catch (...) {
+            // do nothing for other errors (results are fine)
+        }
 
         Eigen::Map<const Eigen::VectorXd> optimized_parameters(&x[0], x.size());
         return optimized_parameters;

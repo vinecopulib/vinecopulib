@@ -11,26 +11,23 @@ namespace vinecopulib
 {
     Bb7Bicop::Bb7Bicop()
     {
-        family_ = 9;
-        family_name_ = "Bb7";
+        family_ = BicopFamily::bb7;
         rotation_ = 0;
-        association_direction_ = "positive";
         parameters_ = Eigen::VectorXd::Ones(2);
         parameters_bounds_ = Eigen::MatrixXd::Constant(2, 2, 200);
         parameters_bounds_(0, 0) = 1.0;
         parameters_bounds_(1, 0) = 0.0;
     }
 
-    Bb7Bicop::Bb7Bicop(const Eigen::VectorXd& parameters)
+    Bb7Bicop::Bb7Bicop(const Eigen::VectorXd& parameters) :
+        Bb7Bicop()
     {
-        Bb7Bicop();
         set_parameters(parameters);
     }
 
-    Bb7Bicop::Bb7Bicop(const Eigen::VectorXd& parameters, const int& rotation)
+    Bb7Bicop::Bb7Bicop(const Eigen::VectorXd& parameters, const int& rotation) :
+        Bb7Bicop(parameters)
     {
-        Bb7Bicop();
-        set_parameters(parameters);
         set_rotation(rotation);
     }
 
@@ -84,8 +81,6 @@ namespace vinecopulib
             return -4*(std::pow(1-tmp,-delta)-1)/(theta*delta*std::pow(1-v,theta-1)*std::pow(1-tmp,-delta-1));
         };
         double tau = 1+tools_integration::integrate_zero_to_one(f);
-        if ((rotation_ == 90) | (rotation_ == 270))
-            tau *= -1;
-        return tau;
+        return flip_tau(tau);
     }
 }

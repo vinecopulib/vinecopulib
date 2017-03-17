@@ -10,22 +10,19 @@ namespace vinecopulib
 {
     IndepBicop::IndepBicop()
     {
-        family_ = 0;
-        family_name_ = "Independence";
+        family_ = BicopFamily::indep;
         rotation_ = 0;
-        association_direction_ = "none";
     }
 
-    IndepBicop::IndepBicop(const Eigen::VectorXd& parameters)
+    IndepBicop::IndepBicop(const Eigen::VectorXd& parameters) :
+        IndepBicop()
     {
-        IndepBicop();
         set_parameters(parameters);
     }
 
-    IndepBicop::IndepBicop(const Eigen::VectorXd& parameters, const int& rotation)
+    IndepBicop::IndepBicop(const Eigen::VectorXd& parameters, const int& rotation) :
+        IndepBicop(parameters)
     {
-        IndepBicop();
-        set_parameters(parameters);
         set_rotation(rotation);
     }
 
