@@ -22,7 +22,7 @@ namespace vinecopulib
         Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
         Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
 
-        double parameters_to_tau(const Eigen::VectorXd &);
+        double parameters_to_tau(const std::vector<Eigen::MatrixXd>&);
         double calculate_npars();
 
         void flip();

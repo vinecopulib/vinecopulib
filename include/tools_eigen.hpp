@@ -13,7 +13,8 @@ namespace vinecopulib
     typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
 
     Eigen::VectorXd invert_f(
-            const Eigen::VectorXd &x, std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
+            const Eigen::VectorXd &x, 
+            std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
             const double lb = 1e-20,
             const double ub = 1-1e-20,
             int n_iter = 35

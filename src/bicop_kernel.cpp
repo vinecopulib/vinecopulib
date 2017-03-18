@@ -16,9 +16,10 @@ namespace vinecopulib
         Eigen::VectorXd grid_points(m);
         for (int i = 0; i < m; ++i)
             grid_points(i) = - 3.25 + i * (6.25 / (double) m);
-        grid_points = tools_stats::pnorm(grid_points);
-
-        interp_grid_ = InterpolationGrid(grid_points, Eigen::MatrixXd::Constant(30, 30, 1.0));
+        interp_grid_ = InterpolationGrid(
+            tools_stats::pnorm(grid_points), 
+            Eigen::MatrixXd::Constant(30, 30, 1.0)  // independence
+        );
     }
 
     Eigen::VectorXd KernelBicop::pdf_default(const Eigen::MatrixXd& u)
@@ -43,7 +44,7 @@ namespace vinecopulib
     }
 
     // TODO
-    double KernelBicop::parameters_to_tau(const Eigen::VectorXd &)
+    double KernelBicop::parameters_to_tau(const std::vector<Eigen::MatrixXd>&)
     {
         throw std::runtime_error(
                 "parameters_to_tau not yet implemented for kernel estimator"

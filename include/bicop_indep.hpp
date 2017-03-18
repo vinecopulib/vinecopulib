@@ -15,8 +15,6 @@ namespace vinecopulib
     public:
         // constructor
         IndepBicop();
-        IndepBicop(const Eigen::VectorXd& parameters);
-        IndepBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
         // PDF
         Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
@@ -27,12 +25,12 @@ namespace vinecopulib
         Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
         Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
 
-        Eigen::VectorXd tau_to_parameters(const double &);
-        double parameters_to_tau(const Eigen::VectorXd &);
+        std::vector<Eigen::MatrixXd> tau_to_parameters(const double &);
+        double parameters_to_tau(const std::vector<Eigen::MatrixXd>&);
 
         void flip();
 
     private:
-        Eigen::VectorXd get_start_parameters(const double tau);
+        std::vector<Eigen::MatrixXd> get_start_parameters(const double tau);
     };
 }

@@ -13,26 +13,20 @@ namespace vinecopulib
     class JoeBicop : public ArchimedeanBicop
     {
     public:
-        // constructor
         JoeBicop();
-        JoeBicop(const Eigen::VectorXd& parameters);
-        JoeBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
-        // generator, its inverse and derivatives for the archimedean copula
         Eigen::VectorXd generator(const Eigen::VectorXd& u);
         Eigen::VectorXd generator_inv(const Eigen::VectorXd& u);
         Eigen::VectorXd generator_derivative(const Eigen::VectorXd& u);
         Eigen::VectorXd generator_derivative2(const Eigen::VectorXd& u);
 
-        // inverse hfunction
         Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
 
-        // link between Kendall's tau and the par_bicop parameter
-        Eigen::VectorXd tau_to_parameters(const double& tau);
-        double parameters_to_tau(const Eigen::VectorXd& par);
+        std::vector<Eigen::MatrixXd> tau_to_parameters(const double& tau);
+        double parameters_to_tau(const std::vector<Eigen::MatrixXd>& par);
 
     private:
-        Eigen::VectorXd get_start_parameters(const double tau);
+        std::vector<Eigen::MatrixXd> get_start_parameters(const double tau);
     };
 }
 

@@ -16,7 +16,7 @@ using namespace vinecopulib;
 class FakeParBicopTest : public ::testing::Test {
 public:
     void set_family(BicopFamily family, int rotation);
-    void set_parameters(Eigen::VectorXd parameters);
+    void set_parameters(std::vector<Eigen::MatrixXd> parameters);
     void set_n(int n);
     int get_n();
     int get_family();
@@ -42,28 +42,29 @@ public:
         this->set_n(n);
 
         auto parameters = this->par_bicop_.get_parameters();
-        if (parameters.size() < 2) {
+        if (tools_stl::is_member(family, bicop_families::itau)) {
             parameters = this->par_bicop_.tau_to_parameters(tau);
-        } else {
             if (family == BicopFamily::student) {
-                parameters = this->par_bicop_.tau_to_parameters(tau);
-                parameters(1) = 4;
-            } else if (family == BicopFamily::bb1) {
-                parameters(1) = 1.5;
-                parameters(0) = -((2*(1-parameters(1)+parameters(1)*tau))/(parameters(1)*(-1+tau)));
+                parameters[0](1) = 4;
+            }    
+        } else {
+            if (family == BicopFamily::bb1) {
+                parameters[0](1) = 1.5;
+                parameters[0](0) = -((2*(1-parameters[0](1)+parameters[0](1)*tau))/(parameters[0](1)*(-1+tau)));
             } else {
                 double delta = 1.5;
                 if (family == BicopFamily::bb8)
                     delta = 0.8;
                 auto tau_v = Eigen::VectorXd::Constant(1, std::fabs(tau));
                 auto f = [this, delta](const Eigen::VectorXd &v) {
-                    Eigen::VectorXd par = Eigen::VectorXd::Constant(2, delta);
-                    par(0) = v(0);
+                    std::vector<Eigen::MatrixXd> par(1);
+                    par[0].resize(2, 1);
+                    par[0] << v(0), delta;
                     auto tau = this->par_bicop_.parameters_to_tau(par);
                     return Eigen::VectorXd::Constant(1, std::fabs(tau));
                 };
-                parameters(0) = invert_f(tau_v, f, 1+1e-6, 100)(0);
-                parameters(1) = delta;
+                parameters[0](0) = invert_f(tau_v, f, 1 + 1e-6, 100)(0);
+                parameters[0](1) = delta;
             }
         }
         // set the parameters vector for the ParBicop
@@ -75,7 +76,7 @@ public:
             needs_check_ = (rotation == 0);
         } else {
             if (tools_stl::is_member(rotation, {90, 270}))
-                parameters *= -1;
+                parameters[0] *= -1;
         }
         // set the parameters vector R
         this->set_parameters(parameters);
@@ -88,7 +89,7 @@ protected:
 
 // Create a list of types, each of which will be used as the test fixture's 'T'
 typedef ::testing::Types<
-    IndepBicop, GaussianBicop, StudentBicop, ClaytonBicop, GumbelBicop, 
+    //IndepBicop, GaussianBicop, StudentBicop, ClaytonBicop, GumbelBicop, 
     FrankBicop, JoeBicop, Bb1Bicop, Bb6Bicop, Bb7Bicop, Bb8Bicop
 > ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);

@@ -13,29 +13,18 @@ namespace vinecopulib
     {
         family_ = BicopFamily::bb1;
         rotation_ = 0;
-        parameters_ = Eigen::VectorXd::Zero(2);
-        parameters_(1) = 1;
-        parameters_bounds_ = Eigen::MatrixXd::Constant(2, 2, 200);
-        parameters_bounds_(0, 0) = 0.0;
-        parameters_bounds_(1, 0) = 1.0;
-    }
-
-    Bb1Bicop::Bb1Bicop(const Eigen::VectorXd& parameters) : 
-        Bb1Bicop()
-    {
-        set_parameters(parameters);
-    }
-
-    Bb1Bicop::Bb1Bicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        Bb1Bicop(parameters)
-    {
-        set_rotation(rotation);
+        parameters_ = {Eigen::VectorXd(2)};
+        parameters_lower_bounds_ = {Eigen::VectorXd(2)};
+        parameters_upper_bounds_ = {Eigen::VectorXd(2)};
+        parameters_[0] << 0, 1;
+        parameters_lower_bounds_[0] << 0, 1;
+        parameters_upper_bounds_[0] << 200, 200;
     }
 
     Eigen::VectorXd Bb1Bicop::generator(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
+        double theta = double(this->parameters_[0](0));
+        double delta = double(this->parameters_[0](1));
         auto f = [theta, delta](const double v) {
             return std::pow(std::pow(v, -theta) - 1, delta);
         };
@@ -44,8 +33,8 @@ namespace vinecopulib
 
     Eigen::VectorXd Bb1Bicop::generator_inv(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
+        double theta = double(this->parameters_[0](0));
+        double delta = double(this->parameters_[0](1));
         auto f = [theta, delta](const double v) {
             return std::pow(std::pow(v, 1/delta) + 1, -1/theta);
         };
@@ -54,8 +43,8 @@ namespace vinecopulib
 
     Eigen::VectorXd Bb1Bicop::generator_derivative(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
+        double theta = double(this->parameters_[0](0));
+        double delta = double(this->parameters_[0](1));
         auto f = [theta, delta](const double v) {
             return -delta * theta * std::pow(v, -(1 + theta))*std::pow(std::pow(v, -theta) - 1, delta - 1);
         };
@@ -64,8 +53,8 @@ namespace vinecopulib
 
     Eigen::VectorXd Bb1Bicop::generator_derivative2(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
+        double theta = double(this->parameters_[0](0));
+        double delta = double(this->parameters_[0](1));
         auto f = [theta, delta](const double v) {
             double res = delta * theta * std::pow(std::pow(v, -theta) - 1, delta) / std::pow(std::pow(v, theta) - 1, 2);
             return res * (1 + delta * theta - (1 + theta) * std::pow(v, theta)) / std::pow(v, 2);
@@ -73,9 +62,11 @@ namespace vinecopulib
         return u.unaryExpr(f);
     }
 
-    double Bb1Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
+    double Bb1Bicop::parameters_to_tau(
+        const std::vector<Eigen::MatrixXd>& parameters
+    )
     {
-        double tau = 1-2/(parameters(1) * (parameters(0) + 2));
+        double tau = 1 - 2 / (parameters[0](1) * (parameters[0](0) + 2));
         return flip_tau(tau);
     }
 }
@@ -83,8 +74,8 @@ namespace vinecopulib
 /*// PDF
 Eigen::VectorXd Bb1Bicop::pdf_default(const Eigen::MatrixXd& u)
 {
-    double theta = double(this->parameters_(0));
-    double delta = double(this->parameters_(1));
+    double theta = double(this->parameters_[0](0));
+    double delta = double(this->parameters_[0](1));
 
     Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
     if (theta > 1e-6 || delta > 1+1e-6)
@@ -117,8 +108,8 @@ Eigen::VectorXd Bb1Bicop::pdf_default(const Eigen::MatrixXd& u)
 // hfunction
 Eigen::VectorXd Bb1Bicop::hfunc1_default(const Eigen::MatrixXd& u)
 {
-    double theta = double(this->parameters_(0));
-    double delta = double(this->parameters_(1));
+    double theta = double(this->parameters_[0](0));
+    double delta = double(this->parameters_[0](1));
     Eigen::VectorXd t1 = generator(u.col(0));
     Eigen::VectorXd t2 = generator(u.col(1));
     Eigen::VectorXd ones = Eigen::VectorXd::Ones(u.rows());

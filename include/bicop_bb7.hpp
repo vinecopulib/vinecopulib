@@ -13,18 +13,13 @@ namespace vinecopulib
     class Bb7Bicop : public ArchimedeanBicop
     {
     public:
-        // constructor
         Bb7Bicop();
-        Bb7Bicop(const Eigen::VectorXd& parameters);
-        Bb7Bicop(const Eigen::VectorXd& parameters, const int& rotation);
 
-        // generator, its inverse and derivatives for the archimedean copula
         Eigen::VectorXd generator(const Eigen::VectorXd& u);
         Eigen::VectorXd generator_inv(const Eigen::VectorXd& u);
         Eigen::VectorXd generator_derivative(const Eigen::VectorXd& u);
         Eigen::VectorXd generator_derivative2(const Eigen::VectorXd& u);
 
-        // link between Kendall's tau and the par_bicop parameter
-        double parameters_to_tau(const Eigen::VectorXd& par);
+        double parameters_to_tau(const std::vector<Eigen::MatrixXd>& par);
     };
 }
