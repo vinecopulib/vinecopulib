@@ -76,7 +76,7 @@ namespace vinecopulib
     BicopPtr Bicop::create(
         BicopFamily family,
         int rotation,
-        Eigen::VectorXd parameters
+        const std::vector<Eigen::MatrixXd>& parameters
     )
     {
         auto new_bicop = Bicop::create(family, rotation);
@@ -364,26 +364,59 @@ namespace vinecopulib
         return 999.0;
     }
 
-    Eigen::VectorXd Bicop::tau_to_parameters(const double&)
+    double Bicop::parameters_to_tau(const std::vector<Eigen::MatrixXd>&)
     {
-        throw std::runtime_error("Method not implemented for this family");
+        throw std::runtime_error(
+            "parameters_to_tau not implemented for this family"
+        );
+    }
+    
+    std::vector<Eigen::MatrixXd> Bicop::tau_to_parameters(const double&)
+    {
+        throw std::runtime_error(
+            "tau_to_parameters not implemented for this family"
+        );
     }
 
 
     //! Getters and setters.
     //! @{
-    BicopFamily Bicop::get_family() const {return family_;}
-    std::string Bicop::get_family_name() const {return vinecopulib::get_family_name(family_);};
-    int Bicop::get_rotation() const {return rotation_;}
-    Eigen::VectorXd Bicop::get_parameters() const {return parameters_;}
-    Eigen::MatrixXd Bicop::get_parameters_bounds() const {return parameters_bounds_;}
+    BicopFamily Bicop::get_family() const 
+    {
+        return family_;
+    }
+    
+    std::string Bicop::get_family_name() const 
+    {
+        return vinecopulib::get_family_name(family_);
+    }
+    
+    int Bicop::get_rotation() const 
+    {
+        return rotation_;
+    }
+    
+    std::vector<Eigen::MatrixXd> Bicop::get_parameters() const
+    {
+        return parameters_;
+    }
+    
+    std::vector<Eigen::MatrixXd> Bicop::get_parameters_lower_bounds() const
+    {
+        return parameters_lower_bounds_;
+    }
+    
+    std::vector<Eigen::MatrixXd> Bicop::get_parameters_upper_bounds() const
+    {
+        return parameters_upper_bounds_;
+    }
 
     void Bicop::set_rotation(const int& rotation) {
         check_rotation(rotation);
         rotation_ = rotation;
     }
 
-    void Bicop::set_parameters(const Eigen::VectorXd& parameters)
+    void Bicop::set_parameters(const std::vector<Eigen::MatrixXd>& parameters)
     {
         check_parameters(parameters);
         parameters_ = parameters;
@@ -470,40 +503,101 @@ namespace vinecopulib
 
     //! Sanity checks
     //! @{
-    void Bicop::check_parameters(const Eigen::VectorXd& parameters)
+    void Bicop::check_parameters(
+        const std::vector<Eigen::MatrixXd>& parameters
+    )
     {
-        int num_pars = parameters_bounds_.rows();
-        if (parameters.size() != num_pars) {
+        check_parameters_size(parameters);
+        check_parameters_entries_size(parameters);
+        check_parameters_entries_lower(parameters);
+        check_parameters_entries_upper(parameters);
+    }
+    
+    void Bicop::check_parameters_size(
+        const std::vector<Eigen::MatrixXd>& parameters
+    )
+    {
+        if (parameters.size() != parameters_.size()) {
             std::stringstream message;
             message <<
                 "Wrong size of parameters for " << 
                 get_family_name() << " copula; " << 
-                "expected: " << num_pars << ", " <<
-                "actual: " << parameters.size() << std::endl;
+                "expected: " << parameters_.size() << ", " <<
+                "actual: " << parameters.size() << 
+                std::endl;
            throw std::runtime_error(message.str().c_str());
         }
-        if (num_pars > 0) {
-            std::stringstream message;
-            for (int i = 0; i < num_pars; ++i) {
-                if (parameters(i) < parameters_bounds_(i, 0)) {
+    }
+    
+    void Bicop::check_parameters_entries_size(
+        const std::vector<Eigen::MatrixXd>& parameters
+    )
+    {
+        for (unsigned int t = 0; t < parameters.size(); ++t) {
+            if (parameters[t].rows() != parameters_[t].rows()) {
+                std::stringstream message;
+                message <<
+                    "parameters[" << t << "] has wrong number of rows " << 
+                    "for " << get_family_name() << " copula; " << 
+                    "expected: " << parameters_[t].rows() << ", " <<
+                    "actual: " << parameters[t].rows() << 
+                    std::endl;
+                throw std::runtime_error(message.str().c_str());
+            }
+            if (parameters[t].cols() != parameters_[t].cols()) {
+                std::stringstream message;
+                message <<
+                    "parameters[" << t << "] has wrong number of columns " << 
+                    "for " << get_family_name() << " copula; " << 
+                    "expected: " << parameters_[t].cols() << ", " <<
+                    "actual: " << parameters[t].cols() << 
+                    std::endl;
+                throw std::runtime_error(message.str().c_str());
+            }
+        }
+    }
+    
+    void Bicop::check_parameters_entries_lower(
+        const std::vector<Eigen::MatrixXd>& parameters
+    )
+    {
+        for (unsigned int t = 0; t < parameters.size(); ++t) {
+            if (parameters_lower_bounds_[t].size() > 0) {
+                std::stringstream message;
+                auto lb = &parameters_lower_bounds_[t];
+                if ((parameters[t].array() < (*lb).array()).any()) {
                     message <<
-                        "parameters[" << i << "]" <<
-                        " must be larger than " << parameters_bounds_(i, 0) <<
-                        " for " << get_family_name() << " copula" << std::endl;
-                    throw std::runtime_error(message.str().c_str());
-                }
-                if (parameters(i) > parameters_bounds_(i, 1)) {
-                    message <<
-                        "parameters[" << i << "]" <<
-                        " must be smaller than " << parameters_bounds_(i, 1) <<
-                        " for " << get_family_name() << " copula" << std::endl;
-                    throw std::runtime_error(message.str().c_str());
+                        "parameters[" << t << "]" << "exceeds lower bound " << 
+                        " for " << get_family_name() << " copula; \n" << 
+                        "bound: \n" << parameters_lower_bounds_[t] << "\n" <<
+                        "actual: " << parameters[t] << "\n";
+                    throw std::runtime_error(message.str().c_str());  
                 }
             }
         }
     }
-
-    void Bicop::check_rotation(const int& rotation)
+    
+    void Bicop::check_parameters_entries_upper(
+        const std::vector<Eigen::MatrixXd>& parameters
+    )
+    {
+        for (unsigned int t = 0; t < parameters.size(); ++t) {
+            if (parameters_upper_bounds_[t].size() > 0) {
+                std::stringstream message;
+                auto ub = &parameters_upper_bounds_[t];
+                if ((parameters[t].array() > (*ub).array()).any()) {
+                    message <<
+                        "parameters[" << t << "]" << "exceeds upper bound " << 
+                        " for " << get_family_name() << " copula; \n" << 
+                        "bound: \n" << parameters_upper_bounds_[t] << "\n" <<
+                        "actual: " << parameters[t] << "\n";
+                    throw std::runtime_error(message.str().c_str());  
+                }
+            }
+        }
+    }
+    
+    void Bicop::check_rotation(int rotation)
     {
         std::vector<int> allowed_rotations = {0, 90, 180, 270};
         if (!tools_stl::is_member(rotation, allowed_rotations)) {

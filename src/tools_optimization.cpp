@@ -31,19 +31,20 @@ namespace tools_optimization {
         controls_.set_controls(&opt_);
     }
 
-    void Optimizer::set_bounds(Eigen::MatrixXd bounds)
+    void Optimizer::set_bounds(
+        Eigen::VectorXd lower_bound, 
+        Eigen::VectorXd upper_bound
+    )
     {
-        if (bounds.rows() != n_parameters_ || bounds.cols() != 2) {
-            throw std::runtime_error(
-                "Bounds should be a two column matrix with n_parameters_ rows."
-            );
+        if (std::max(lower_bound.size(), upper_bound.size()) != n_parameters_) {
+            throw std::runtime_error("bounds have to be of size n_parameters_");
         }
 
         std::vector<double> lb(n_parameters_);
         std::vector<double> ub(n_parameters_);
         Eigen::VectorXd eps = Eigen::VectorXd::Constant(n_parameters_,1e-6);
-        Eigen::VectorXd::Map(&lb[0], n_parameters_) = bounds.col(0)+eps;
-        Eigen::VectorXd::Map(&ub[0], n_parameters_) = bounds.col(1)-eps;
+        Eigen::VectorXd::Map(&lb[0], n_parameters_) = lower_bound + eps;
+        Eigen::VectorXd::Map(&ub[0], n_parameters_) = upper_bound - eps;
         opt_.set_lower_bounds(lb);
         opt_.set_upper_bounds(ub);
     }
@@ -109,7 +110,7 @@ namespace tools_optimization {
         ParBicopOptData* newdata = (ParBicopOptData*) f_data;
         ++newdata->objective_calls;
         Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
-        newdata->bicop->set_parameters(par);
+        newdata->bicop->set_parameters({par});
         double nll = newdata->bicop->loglik(newdata->U);
         nll *= -1;
         return nll;
@@ -127,7 +128,7 @@ namespace tools_optimization {
         for (unsigned int i = 0; i < x.size(); ++i) {
             par(i + 1) = x[i];
         }
-        newdata->bicop->set_parameters(par);
+        newdata->bicop->set_parameters({par});
         double nll = newdata->bicop->loglik(newdata->U);
         nll *= -1;
         return nll;

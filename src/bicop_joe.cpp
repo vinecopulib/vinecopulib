@@ -13,26 +13,17 @@ namespace vinecopulib
     {
         family_ = BicopFamily::joe;
         rotation_ = 0;
-        parameters_ = Eigen::VectorXd::Ones(1);
-        parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);
-        parameters_bounds_(0, 1) = 200.0;
-    }
-
-    JoeBicop::JoeBicop(const Eigen::VectorXd& parameters) :
-        JoeBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    JoeBicop::JoeBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        JoeBicop(parameters)
-    {
-        set_rotation(rotation);
+        parameters_ = {Eigen::VectorXd(1)};
+        parameters_lower_bounds_ = {Eigen::VectorXd(1)};
+        parameters_upper_bounds_ = {Eigen::VectorXd(1)};
+        parameters_[0] << 1;
+        parameters_lower_bounds_[0] << 1;
+        parameters_upper_bounds_[0] << 200;
     }
 
     Eigen::VectorXd JoeBicop::generator(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return (-1)*std::log(1-std::pow(1-v, theta));
         };
@@ -41,7 +32,7 @@ namespace vinecopulib
 
     Eigen::VectorXd JoeBicop::generator_inv(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return 1-std::pow(1-std::exp(-v),1/theta);
         };
@@ -50,7 +41,7 @@ namespace vinecopulib
 
     Eigen::VectorXd JoeBicop::generator_derivative(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return (-theta)*std::pow(1-v, theta-1)/(1-std::pow(1-v, theta));
         };
@@ -59,7 +50,7 @@ namespace vinecopulib
 
     Eigen::VectorXd JoeBicop::generator_derivative2(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return theta*(theta-1+std::pow(1-v, theta))*std::pow(1-v, theta-2)/std::pow(-1+std::pow(1-v, theta),2);
         };
@@ -69,7 +60,7 @@ namespace vinecopulib
     // inverse h-function
     Eigen::VectorXd JoeBicop::hinv1_default(const Eigen::MatrixXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         double u1, u2;
         Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
         for (int j = 0; j < u.rows(); ++j) {
@@ -82,25 +73,25 @@ namespace vinecopulib
     }
 
     // link between Kendall's tau and the par_bicop parameter
-    Eigen::VectorXd JoeBicop::tau_to_parameters(const double& tau)
+    std::vector<Eigen::MatrixXd> JoeBicop::tau_to_parameters(const double& tau)
     {
         Eigen::VectorXd tau2 = Eigen::VectorXd::Constant(1, std::fabs(tau));
         auto f = [&](const Eigen::VectorXd &v) {
-            return Eigen::VectorXd::Constant(1, std::fabs(parameters_to_tau(v)));
+            return Eigen::VectorXd::Constant(1, std::fabs(parameters_to_tau({v})));
         };
-        return invert_f(tau2, f, 1+1e-6, 100);
+        return {invert_f(tau2, f, 1 + 1e-6, 100)};
     }
 
-    double JoeBicop::parameters_to_tau(const Eigen::VectorXd& parameters)
+    double JoeBicop::parameters_to_tau(const std::vector<Eigen::MatrixXd>& parameters)
     {
-        double par = parameters(0);
+        double par = parameters[0](0);
         double tau = 2 / par + 1;
         tau = boost::math::digamma(2.0) - boost::math::digamma(tau);
         tau = 1 + 2 * tau / (2 - par);
         return flip_tau(tau);
     }
 
-    Eigen::VectorXd JoeBicop::get_start_parameters(const double tau)
+    std::vector<Eigen::MatrixXd> JoeBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
     }
@@ -162,7 +153,7 @@ double qcondjoe(double* q, double* u, double* de)
 /*// PDF
 Eigen::VectorXd JoeBicop::pdf_default(const Eigen::MatrixXd& u)
 {
-    double theta = double(this->parameters_(0));
+    double theta = double(this->parameters_[0](0));
 
     Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
     if (theta > 1+1e-6)
@@ -184,7 +175,7 @@ Eigen::VectorXd JoeBicop::pdf_default(const Eigen::MatrixXd& u)
 // hfunction
 Eigen::VectorXd JoeBicop::hfunc1_default(const Eigen::MatrixXd& u)
 {
-    double theta = double(this->parameters_(0));
+    double theta = double(this->parameters_[0](0));
     Eigen::MatrixXd t = u.unaryExpr([theta](const double v){ return -1+std::pow(1-v,theta);});
     Eigen::VectorXd t1 = t.rowwise().prod();
     Eigen::VectorXd f = t1.unaryExpr([theta](const double v){ return std::pow(1-v,-1+1/theta);});

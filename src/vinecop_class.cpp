@@ -254,7 +254,7 @@ namespace vinecopulib
     //! @param edge edge index (starting with 0).
     //!
     //! @return An \code Eigen::VectorXd containing the parameters.
-    Eigen::VectorXd Vinecop::get_parameters(int tree, int edge)
+    std::vector<Eigen::MatrixXd> Vinecop::get_parameters(int tree, int edge)
     {
         return get_pair_copula(tree, edge)->get_parameters();
     }
@@ -263,9 +263,9 @@ namespace vinecopulib
     //!
     //! @return A nested vector containing in \c vec[t][e] the parameters for
     //!     edge e in tree t.
-    std::vector<std::vector<Eigen::VectorXd>> Vinecop::get_all_parameters()
+    std::vector<std::vector<std::vector<Eigen::MatrixXd>>> Vinecop::get_all_parameters()
     {
-        std::vector<std::vector<Eigen::VectorXd>> parameters(d_ - 1);
+        std::vector<std::vector<std::vector<Eigen::MatrixXd>>> parameters(d_ - 1);
         for (int t = 0; t < d_ - 1; ++t)
             parameters[t].resize(d_ - 1 - t);
         for (int tree = 0; tree < d_ - 1; ++tree) {

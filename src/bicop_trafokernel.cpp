@@ -14,6 +14,10 @@ namespace vinecopulib
     {
         family_ = BicopFamily::tll0;
         rotation_ = 0;
+        parameters_ = {
+            Eigen::VectorXd::Constant(1, 1),  // multiplier
+            Eigen::Matrix2d::Identity()       // bandwidth matrix
+        };
     }
 
     Eigen::VectorXd gaussian_kernel_2d(const Eigen::MatrixXd& x)
@@ -58,6 +62,7 @@ namespace vinecopulib
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> takes_root(cov);
         Eigen::MatrixXd cov_root = takes_root.operatorSqrt();
         Eigen::MatrixXd B =  1.25 * std::pow(n, - 1.0 / 6.0) * cov_root.transpose();
+        parameters_[1] = B;
 
         // apply bandwitools_stats::dth matrix
         z = (B.inverse() * z.transpose()).transpose();

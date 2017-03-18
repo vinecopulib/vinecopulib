@@ -379,7 +379,6 @@ namespace tools_structselect {
                 get_pc_index(e, tree) << " <-> " <<
                 "fam = " << tree[e].pair_copula->get_family_name() <<
                 ", rot = " << tree[e].pair_copula->get_rotation() <<
-                ", par = " <<  tree[e].pair_copula->get_parameters() <<
                 ", emp_tau = " << tree[e].empirical_tau <<
                 std::endl;
             std::cout << pc_info.str().c_str();

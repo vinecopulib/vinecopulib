@@ -13,21 +13,12 @@ namespace vinecopulib
     class GaussianBicop : public EllipticalBicop
     {
     public:
-        // constructor
         GaussianBicop();
-        GaussianBicop(const Eigen::VectorXd& parameters);
-        GaussianBicop(const Eigen::VectorXd& parameters, const int& rotation);
-
-        // PDF
         Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
-
-        // hfunction
         Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
-
-        // inverse hfunction
         Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
 
     private:
-        Eigen::VectorXd get_start_parameters(const double tau);
+        std::vector<Eigen::MatrixXd> get_start_parameters(const double tau);
     };
 }

@@ -13,27 +13,17 @@ namespace vinecopulib
     {
         family_ = BicopFamily::frank;
         rotation_ = 0;
-        parameters_ = Eigen::VectorXd::Zero(1);
-        parameters_bounds_ = Eigen::MatrixXd::Zero(1, 2);
-        parameters_bounds_(0, 0) = -200.0;
-        parameters_bounds_(0, 1) = 200.0;
-    }
-
-    FrankBicop::FrankBicop(const Eigen::VectorXd& parameters) : 
-        FrankBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    FrankBicop::FrankBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        FrankBicop(parameters)
-    {
-        set_rotation(rotation);
+        parameters_ = {Eigen::VectorXd(1)};
+        parameters_lower_bounds_ = {Eigen::VectorXd(1)};
+        parameters_upper_bounds_ = {Eigen::VectorXd(1)};
+        parameters_[0] << 0;
+        parameters_lower_bounds_[0] << -200;
+        parameters_upper_bounds_[0] << 200;
     }
 
     Eigen::VectorXd FrankBicop::generator(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return (-1)*std::log((std::exp(-theta*v)-1)/(std::exp(-theta)-1));
         };
@@ -41,7 +31,7 @@ namespace vinecopulib
     }
     Eigen::VectorXd FrankBicop::generator_inv(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             //return (-1/theta)*std::log(1+std::exp(-theta*v)-std::exp(-v));
             return (-1/theta)*std::log(1+std::exp(-theta-v)-std::exp(-v));
@@ -51,7 +41,7 @@ namespace vinecopulib
 
     Eigen::VectorXd FrankBicop::generator_derivative(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return theta/(1-std::exp(theta*v));
         };
@@ -60,35 +50,34 @@ namespace vinecopulib
 
     Eigen::VectorXd FrankBicop::generator_derivative2(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return std::pow(theta,2)/std::pow(std::exp(theta*v/2) - std::exp(-theta*v/2), 2);
         };
         return u.unaryExpr(f);
     }
 
-    Eigen::VectorXd FrankBicop::tau_to_parameters(const double& tau)
+    std::vector<Eigen::MatrixXd> FrankBicop::tau_to_parameters(const double& tau)
     {
         Eigen::VectorXd tau2 = Eigen::VectorXd::Constant(1, std::fabs(tau));
         auto f = [&](const Eigen::VectorXd &v) {
-            return Eigen::VectorXd::Constant(1, std::fabs(parameters_to_tau(v)));
+            return Eigen::VectorXd::Constant(1, std::fabs(parameters_to_tau({v})));
         };
-        return invert_f(tau2, f, -100+1e-6, 100);
+        return {invert_f(tau2, f, -100 + 1e-6, 100)};
     }
 
-    double FrankBicop::parameters_to_tau(const Eigen::VectorXd& parameters)
+    double FrankBicop::parameters_to_tau(const std::vector<Eigen::MatrixXd>& parameters)
     {
-        double par = parameters(0);
-        double tau = 1 - 4/par;
-        double d = debyen(std::fabs(par), 1) / std::fabs(par);
+        double par = parameters[0](0);
+        double tau = 1 - 4 / par;
+        double deb = debyen(std::fabs(par), 1) / std::fabs(par);
         if (par < 0) {
-            d = d - par/2;
+            deb = deb - par / 2;
         }
-        tau = tau + (4/par) * d;
-        return tau;
+        return tau + (4 / par) * deb;
     }
 
-    Eigen::VectorXd FrankBicop::get_start_parameters(const double tau)
+    std::vector<Eigen::MatrixXd> FrankBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
     }
@@ -96,7 +85,7 @@ namespace vinecopulib
 /*// PDF
 Eigen::VectorXd FrankBicop::pdf_default(const Eigen::MatrixXd& u)
 {
-    double theta = double(this->parameters_(0));
+    double theta = double(this->parameters_[0](0));
     Eigen::MatrixXd t = u.unaryExpr([theta](const double v){ return std::exp(theta*v);});
     Eigen::VectorXd t1 = t.rowwise().prod();
     Eigen::VectorXd f = theta*(std::exp(theta)-1)*std::exp(theta)*t1;
@@ -111,7 +100,7 @@ Eigen::VectorXd FrankBicop::pdf_default(const Eigen::MatrixXd& u)
 // hfunction
 Eigen::VectorXd FrankBicop::hfunc1_default(const Eigen::MatrixXd& u)
 {
-    double theta = double(this->parameters_(0));
+    double theta = double(this->parameters_[0](0));
     Eigen::MatrixXd t = u.unaryExpr([theta](const double v){ return std::exp(theta*v);});
     Eigen::VectorXd t1 = t.rowwise().prod();
     Eigen::VectorXd f = std::exp(theta)*(t.col(1) - Eigen::VectorXd::Ones(u.rows()));

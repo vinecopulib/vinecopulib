@@ -13,26 +13,17 @@ namespace vinecopulib
     {
         family_ = BicopFamily::gumbel;
         rotation_ = 0;
-        parameters_ = Eigen::VectorXd::Ones(1);
-        parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);
-        parameters_bounds_(0, 1) = 200.0;
-    }
-
-    GumbelBicop::GumbelBicop(const Eigen::VectorXd& parameters) :
-        GumbelBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    GumbelBicop::GumbelBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        GumbelBicop(parameters)
-    {
-        set_rotation(rotation);
+        parameters_ = {Eigen::VectorXd(1)};
+        parameters_lower_bounds_ = {Eigen::VectorXd(1)};
+        parameters_upper_bounds_ = {Eigen::VectorXd(1)};
+        parameters_[0] << 1;
+        parameters_lower_bounds_[0] << 1;
+        parameters_upper_bounds_[0] << 200;
     }
 
     Eigen::VectorXd GumbelBicop::generator(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return std::pow(std::log(1/v), theta);
         };
@@ -40,7 +31,7 @@ namespace vinecopulib
     }
     Eigen::VectorXd GumbelBicop::generator_inv(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return std::exp(-std::pow(v,1/theta));
         };
@@ -49,7 +40,7 @@ namespace vinecopulib
 
     Eigen::VectorXd GumbelBicop::generator_derivative(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return std::pow(std::log(1/v),theta-1)*(-theta/v);
         };
@@ -58,7 +49,7 @@ namespace vinecopulib
 
     Eigen::VectorXd GumbelBicop::generator_derivative2(const Eigen::VectorXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         auto f = [theta](const double v) {
             return (theta-1-std::log(v))*std::pow(std::log(1/v), theta-2)*(theta/std::pow(v,2));
         };
@@ -67,7 +58,7 @@ namespace vinecopulib
 
     Eigen::VectorXd GumbelBicop::hinv1_default(const Eigen::MatrixXd& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(this->parameters_[0](0));
         double u1, u2;
         Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
         for (int j = 0; j < u.rows(); ++j) {
@@ -79,19 +70,19 @@ namespace vinecopulib
         return hinv;
     }
 
-    Eigen::VectorXd GumbelBicop::tau_to_parameters(const double& tau)
+    std::vector<Eigen::MatrixXd> GumbelBicop::tau_to_parameters(const double& tau)
     {
-        return Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
+        return {Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)))};
     }
 
-    double GumbelBicop::parameters_to_tau(const Eigen::VectorXd& parameters)
+    double GumbelBicop::parameters_to_tau(const std::vector<Eigen::MatrixXd>& parameters)
     {
-        double tau = (parameters(0) - 1) / parameters(0);
+        double tau = (parameters[0](0) - 1) / parameters[0](0);
         return flip_tau(tau);
     }
 
 
-    Eigen::VectorXd GumbelBicop::get_start_parameters(const double tau)
+    std::vector<Eigen::MatrixXd> GumbelBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
     }
@@ -134,7 +125,7 @@ double qcondgum(double* q, double* u, double* de)
 /*// PDF
 Eigen::VectorXd GumbelBicop::pdf_default(const Eigen::MatrixXd& u)
 {
-    double theta = double(this->parameters_(0));
+    double theta = double(this->parameters_[0](0));
     Eigen::VectorXd t1 = generator(u.col(0));
     Eigen::VectorXd t2 = generator(u.col(1));
     Eigen::VectorXd t = t1+t2;
@@ -149,7 +140,7 @@ Eigen::VectorXd GumbelBicop::pdf_default(const Eigen::MatrixXd& u)
 // hfunction
 Eigen::VectorXd GumbelBicop::hfunc1_default(const Eigen::MatrixXd& u)
 {
-    double theta = double(this->parameters_(0));
+    double theta = double(this->parameters_[0](0));
     Eigen::VectorXd t1 = generator(u.col(1));
     Eigen::VectorXd t2 = generator(u.col(0));
     Eigen::VectorXd t = t1+t2;

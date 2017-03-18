@@ -26,7 +26,7 @@ namespace test_bicop_parametric {
         
         if (this->needs_check_) {
             Eigen::MatrixXd results = read_matxd("temp");
-            Eigen::VectorXd par = this->par_bicop_.get_parameters();
+            std::vector<Eigen::MatrixXd> par = this->par_bicop_.get_parameters();
             ASSERT_TRUE(fabs(this->par_bicop_.parameters_to_tau(par) - results(0,0)) < 1e-4);
         }
     }

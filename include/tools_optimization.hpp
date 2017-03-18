@@ -94,7 +94,10 @@ namespace tools_optimization {
         //! Set the optimizer's bounds
         //!
         //! @param bounds A matrix of parameters bounds
-        void set_bounds(Eigen::MatrixXd bounds);
+        void set_bounds(
+            Eigen::VectorXd lower_bound,
+             Eigen::VectorXd upper_bound
+         );
 
         //! Set the optimizer's objective and data
         //!

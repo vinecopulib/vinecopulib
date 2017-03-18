@@ -60,13 +60,13 @@ void FakeParBicopTest::set_family(BicopFamily family, int rotation)
         }
     }
 }
-void FakeParBicopTest::set_parameters(Eigen::VectorXd parameters)
+void FakeParBicopTest::set_parameters(std::vector<Eigen::MatrixXd> parameters)
 {
-    if (parameters.size() > 0) {
-        par_ = parameters(0);
+    if (parameters[0].size() > 0) {
+        par_ = parameters[0](0);
     }
-    if (parameters.size() > 1) {
-        par2_ = parameters(1);
+    if (parameters[0].size() > 1) {
+        par2_ = parameters[0](1);
     }
 }
 void FakeParBicopTest::set_n(int n)

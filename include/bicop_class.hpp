@@ -28,7 +28,7 @@ namespace vinecopulib
         static std::shared_ptr<Bicop> create(
             BicopFamily family,
             int rotation,
-            Eigen::VectorXd parameters
+            const std::vector<Eigen::MatrixXd>& parameters
         );
 
         static std::shared_ptr<Bicop> select(
@@ -53,19 +53,17 @@ namespace vinecopulib
 
         virtual double calculate_npars() = 0;
         double calculate_tau();  // this will be a generic fall back method
-        virtual double parameters_to_tau(const Eigen::VectorXd& parameters) = 0;
-        Eigen::VectorXd tau_to_parameters(const double& tau);
-
+        double parameters_to_tau(const std::vector<Eigen::MatrixXd>& parameters);
+        std::vector<Eigen::MatrixXd> tau_to_parameters(const double& tau);
 
         BicopFamily get_family() const;
         std::string get_family_name() const;
         int get_rotation() const;
-        std::string get_association_direction() const;
-        Eigen::VectorXd get_parameters() const;
-        Eigen::MatrixXd get_parameters_bounds() const;
+        std::vector<Eigen::MatrixXd> get_parameters() const;
+        std::vector<Eigen::MatrixXd> get_parameters_lower_bounds() const;
+        std::vector<Eigen::MatrixXd> get_parameters_upper_bounds() const;
         void set_rotation(const int& rotation);
-        void set_parameters(const Eigen::VectorXd& parameters);
-
+        void set_parameters(const std::vector<Eigen::MatrixXd>& parameters);
 
         //! Adjust the copula to a flipping of arguments (u,v) -> (v,u)
         virtual void flip() = 0;
@@ -82,15 +80,21 @@ namespace vinecopulib
 
         Eigen::MatrixXd cut_and_rotate(const Eigen::MatrixXd& u);
         Eigen::MatrixXd swap_cols(const Eigen::MatrixXd& u);
+        
+        void check_parameters(const std::vector<Eigen::MatrixXd>& parameters); 
 
         BicopFamily family_;
         int rotation_;
-        Eigen::VectorXd parameters_;
-        Eigen::MatrixXd parameters_bounds_;   // first column lower, second column upper
+        std::vector<Eigen::MatrixXd> parameters_;
+        std::vector<Eigen::MatrixXd> parameters_lower_bounds_;  
+        std::vector<Eigen::MatrixXd> parameters_upper_bounds_;  
 
     private:
-        void check_parameters(const Eigen::VectorXd& parameters);
-        void check_rotation(const int& rotation);
+        void check_parameters_size(const std::vector<Eigen::MatrixXd>& parameters);
+        void check_parameters_entries_size(const std::vector<Eigen::MatrixXd>& parameters);
+        void check_parameters_entries_lower(const std::vector<Eigen::MatrixXd>& parameters);
+        void check_parameters_entries_upper(const std::vector<Eigen::MatrixXd>& parameters);
+        void check_rotation(int rotation);
     };
 
     typedef std::shared_ptr<Bicop> BicopPtr;

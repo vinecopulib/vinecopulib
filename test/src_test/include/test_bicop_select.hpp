@@ -23,18 +23,18 @@ namespace test_bicop_select {
             BicopFamily::gaussian, 
             true_family
         };
-
+    
         for (auto rotation : rotations) {
             this->setup_parameters(rotation);
-
+    
             if (this->needs_check_) {
                 auto data = this->par_bicop_.simulate(this->get_n());
                 auto bicop = Bicop::select(data, family_set, "mle");
-
+    
                 auto selected_family = bicop->get_family();
                 EXPECT_EQ(selected_family, true_family) << 
                     bicop->bic(data) << " " << this->par_bicop_.bic(data);
-
+    
                 if (is_member(true_family, bicop_families::BB)) {
                     int rot_sel = bicop->get_rotation();
                     if (is_member(rotation, positive_rotations)) {
@@ -49,7 +49,7 @@ namespace test_bicop_select {
             }
         }
     }
-
+    
     TYPED_TEST(ParBicopTest, bicop_select_itau_bic_is_correct) {
         if (is_member(this->par_bicop_.get_family(), bicop_families::itau)) {
             std::vector<int> no_itau_families = {7, 8, 9, 10};
@@ -62,13 +62,13 @@ namespace test_bicop_select {
                 true_family
             };
             this->setup_parameters();
-
+    
             for (auto rotation : rotations) {
                 this->setup_parameters(rotation);
                 if (this->needs_check_) {
                     auto data = this->par_bicop_.simulate(this->get_n());
                     auto bicop = Bicop::select(data, family_set, "itau");
-
+    
                     auto selected_family = bicop->get_family();
                     EXPECT_EQ(selected_family, true_family) << 
                         bicop->bic(data) << " " << this->par_bicop_.bic(data);

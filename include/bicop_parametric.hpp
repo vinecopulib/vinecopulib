@@ -17,13 +17,13 @@ namespace vinecopulib
         void fit(const Eigen::MatrixXd& data, std::string method);
 
         // link between Kendall's tau and the par_bicop parameter
-        virtual double parameters_to_tau(const Eigen::VectorXd& parameters) = 0;
+        virtual double parameters_to_tau(const std::vector<Eigen::MatrixXd>& parameters) = 0;
         double calculate_tau() {return this->parameters_to_tau(parameters_);}
 
         // number of parameters
         double calculate_npars();
 
     private:
-        virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
+        virtual std::vector<Eigen::MatrixXd> get_start_parameters(const double tau) = 0;
     };
 }

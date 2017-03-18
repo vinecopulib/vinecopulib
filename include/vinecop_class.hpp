@@ -41,8 +41,8 @@ namespace vinecopulib
         std::vector<std::vector<BicopFamily>> get_all_families();
         int get_rotation(int tree, int edge);
         std::vector<std::vector<int>> get_all_rotations();
-        Eigen::VectorXd get_parameters(int tree, int edge);
-        std::vector<std::vector<Eigen::VectorXd>> get_all_parameters();
+        std::vector<Eigen::MatrixXd> get_parameters(int tree, int edge);
+        std::vector<std::vector<std::vector<Eigen::MatrixXd>>> get_all_parameters();
         Eigen::MatrixXi get_matrix() {return vine_matrix_.get_matrix();}
 
         Eigen::VectorXd pdf(const Eigen::MatrixXd& u);

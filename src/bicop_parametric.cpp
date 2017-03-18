@@ -18,7 +18,7 @@ namespace vinecopulib
             return 0.0;
         }
         // otherwise, return length of parameter vector
-        return (double) parameters_.size();
+        return (double) parameters_[0].size();
     }
 
     // fit
@@ -36,7 +36,9 @@ namespace vinecopulib
             if (method == "itau") {
                 npars = npars - 1;
                 if ((npars > 0) & (family_ != BicopFamily::student)) {
-                    throw std::runtime_error("itau method is not available for this family.");
+                    throw std::runtime_error(
+                        "itau method is not available for this family."
+                    );
                 }
             }
 
@@ -57,24 +59,28 @@ namespace vinecopulib
                 Optimizer optimizer(npars);
 
                 // Set bounds and starting values
-                auto bounds = get_parameters_bounds();
-                auto initial_parameters = newpar;
-                ParBicopOptData my_data = {data, this, newpar(0), 0};
+                auto lb = get_parameters_lower_bounds()[0];
+                auto ub = get_parameters_upper_bounds()[0];
+                auto initial_parameters = newpar[0];
+                ParBicopOptData my_data = {data, this, newpar[0](0), 0};
                 if (method == "itau") {
-                    bounds = get_parameters_bounds().block(1, 0, npars, 2);
-                    initial_parameters = newpar.block(1, 0, npars, 1);
+                    lb.resize(1, 1);
+                    lb(0) = get_parameters_lower_bounds()[0](1);
+                    ub.resize(1, 1);
+                    ub(0) = get_parameters_upper_bounds()[0](1);
+                    initial_parameters = Eigen::VectorXd::Constant(1, newpar[0](1));
                     optimizer.set_objective(pmle_objective, &my_data);
                 } else {
                     optimizer.set_objective(mle_objective, &my_data);
                 }
 
-                optimizer.set_bounds(bounds);
+                optimizer.set_bounds(lb, ub);
                 auto optimized_parameters = optimizer.optimize(initial_parameters);
 
                 if (method == "itau") {
-                    newpar.block(1, 0, npars, 1) = optimized_parameters;
+                    newpar[0](1) = optimized_parameters(0);
                 } else {
-                    newpar = optimized_parameters;
+                    newpar[0] = optimized_parameters;
                 }
             }
             
@@ -84,14 +90,3 @@ namespace vinecopulib
     }
     
 }
-
-/*void remove_row(Eigen::MatrixXd& matrix, unsigned int to_remove)
-{
-    unsigned int n = matrix.rows()-1;
-    unsigned int m = matrix.cols();
-
-    if(to_remove < numRows )
-        matrix.block(to_remove,0,numRows-to_remove,numCols) = matrix.block(to_remove+1,0,numRows-to_remove,numCols);
-
-    matrix.conservativeResize(numRows,numCols);
-}*/
