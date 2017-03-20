@@ -11,7 +11,7 @@ namespace vinecopulib
 {
     Eigen::VectorXd ArchimedeanBicop::pdf_default(const Eigen::MatrixXd& u)
     {
-        auto f = [this](const double u, const double v) {
+        auto f = [this](const double& u, const double& v) {
             double temp = generator_inv(generator(u) + generator(v));
             temp = generator_derivative2(temp)/std::pow(generator_derivative(temp), 3.0);
             return (-1)*generator_derivative(u)*generator_derivative(v)*temp;
@@ -21,7 +21,7 @@ namespace vinecopulib
 
     Eigen::VectorXd ArchimedeanBicop::hfunc1_default(const Eigen::MatrixXd& u)
     {
-        auto f = [this](const double u, const double v) {
+        auto f = [this](const double& u, const double& v) {
             double temp = generator_inv(generator(u) + generator(v));
             return generator_derivative(u)/generator_derivative(temp);
         };
