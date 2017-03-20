@@ -30,39 +30,25 @@ namespace vinecopulib
         set_rotation(rotation);
     }
 
-    Eigen::VectorXd GumbelBicop::generator(const Eigen::VectorXd& u)
+    double GumbelBicop::generator(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        auto f = [&theta](const double& v) {
-            return std::pow(std::log(1/v), theta);
-        };
-        return u.unaryExpr(f);
+        return std::pow(std::log(1/u), this->parameters_(0));
     }
-    Eigen::VectorXd GumbelBicop::generator_inv(const Eigen::VectorXd& u)
+    double GumbelBicop::generator_inv(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        auto f = [&theta](const double& v) {
-            return std::exp(-std::pow(v,1/theta));
-        };
-        return u.unaryExpr(f);
+        return std::exp(-std::pow(u,1/this->parameters_(0)));
     }
 
-    Eigen::VectorXd GumbelBicop::generator_derivative(const Eigen::VectorXd& u)
+    double GumbelBicop::generator_derivative(const double& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [&theta](const double& v) {
-            return std::pow(std::log(1/v),theta-1)*(-theta/v);
-        };
-        return u.unaryExpr(f);
+        return std::pow(std::log(1/u),theta-1)*(-theta/u);
     }
 
-    Eigen::VectorXd GumbelBicop::generator_derivative2(const Eigen::VectorXd& u)
+    double GumbelBicop::generator_derivative2(const double& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [&theta](const double& v) {
-            return (theta-1-std::log(v))*std::pow(std::log(1/v), theta-2)*(theta/std::pow(v,2));
-        };
-        return u.unaryExpr(f);
+        return (theta-1-std::log(u))*std::pow(std::log(1/u), theta-2)*(theta/std::pow(u,2));
     }
 
     Eigen::VectorXd GumbelBicop::hinv1_default(const Eigen::MatrixXd& u)
@@ -132,7 +118,7 @@ double qcondgum(double* q, double* u, double* de)
     return(exp(-z2));
 }
 /*// PDF
-Eigen::VectorXd GumbelBicop::pdf_default(const Eigen::MatrixXd& u)
+double GumbelBicop:pdf_default(const Eigen::MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
     Eigen::VectorXd t1 = generator(u.col(0));
@@ -147,7 +133,7 @@ Eigen::VectorXd GumbelBicop::pdf_default(const Eigen::MatrixXd& u)
 }
 
 // hfunction
-Eigen::VectorXd GumbelBicop::hfunc1_default(const Eigen::MatrixXd& u)
+double GumbelBicop:hfunc1_default(const Eigen::MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
     Eigen::VectorXd t1 = generator(u.col(1));

@@ -31,39 +31,26 @@ namespace vinecopulib
         set_rotation(rotation);
     }
 
-    Eigen::VectorXd ClaytonBicop::generator(const Eigen::VectorXd& u)
+    double ClaytonBicop::generator(const double& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [&theta](const double& v) {
-            return (std::pow(v, -theta)-1)/theta;
-        };
-        return u.unaryExpr(f);
+        return (std::pow(u, -theta)-1)/theta;
     }
-    Eigen::VectorXd ClaytonBicop::generator_inv(const Eigen::VectorXd& u)
+    double ClaytonBicop::generator_inv(const double& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [&theta](const double& v) {
-            return std::pow(1+theta*v, -1/theta);
-        };
-        return u.unaryExpr(f);
+        return std::pow(1+theta*u, -1/theta);
     }
 
-    Eigen::VectorXd ClaytonBicop::generator_derivative(const Eigen::VectorXd& u)
+    double ClaytonBicop::generator_derivative(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        auto f = [&theta](const double& v) {
-            return (-1)*std::pow(v, -1-theta);
-        };
-        return u.unaryExpr(f);
+        return (-1)*std::pow(u, -1-this->parameters_(0));
     }
 
-    Eigen::VectorXd ClaytonBicop::generator_derivative2(const Eigen::VectorXd& u)
+    double ClaytonBicop::generator_derivative2(const double& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [&theta](const double& v) {
-            return (1+theta)*std::pow(v, -2-theta);
-        };
-        return u.unaryExpr(f);
+        return (1+theta)*std::pow(u, -2-theta);
     }
 
     Eigen::VectorXd ClaytonBicop::hinv1_default(const Eigen::MatrixXd& u)
@@ -103,7 +90,7 @@ namespace vinecopulib
 }
 
 /*// PDF
-Eigen::VectorXd ClaytonBicop::pdf_default(const Eigen::MatrixXd& u)
+double ClaytonBicop::pdf_default(const Eigen::MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
     Eigen::VectorXd t1 = generator(u.col(0));
@@ -124,7 +111,7 @@ Eigen::VectorXd ClaytonBicop::pdf_default(const Eigen::MatrixXd& u)
 }
 
 // hfunction
-Eigen::VectorXd ClaytonBicop::hfunc1_default(const Eigen::MatrixXd& u)
+double ClaytonBicop::hfunc1_default(const Eigen::MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
     Eigen::VectorXd t1 = generator(u.col(0));

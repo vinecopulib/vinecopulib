@@ -31,45 +31,33 @@ namespace vinecopulib
         set_rotation(rotation);
     }
 
-    Eigen::VectorXd Bb8Bicop::generator(const Eigen::VectorXd& u)
+    double Bb8Bicop::generator(const double& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            return -std::log((1-std::pow(1-delta*v,theta))/(1-std::pow(1-delta,theta)));
-        };
-        return u.unaryExpr(f);
+        return -std::log((1-std::pow(1-delta*u,theta))/(1-std::pow(1-delta,theta)));
     }
 
-    Eigen::VectorXd Bb8Bicop::generator_inv(const Eigen::VectorXd& u)
+    double Bb8Bicop::generator_inv(const double& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            return (1-std::pow(1+std::exp(-v)*(std::pow(1-delta,theta)-1),1/theta))/delta;
-        };
-        return u.unaryExpr(f);
+        return (1-std::pow(1+std::exp(-u)*(std::pow(1-delta,theta)-1),1/theta))/delta;
     }
 
-    Eigen::VectorXd Bb8Bicop::generator_derivative(const Eigen::VectorXd& u)
+    double Bb8Bicop::generator_derivative(const double& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            return -delta*theta*std::pow(1-delta*v,theta-1)/(1-std::pow(1-delta*v,theta));
-        };
-        return u.unaryExpr(f);
+        return -delta*theta*std::pow(1-delta*u,theta-1)/(1-std::pow(1-delta*u,theta));
     }
 
-    Eigen::VectorXd Bb8Bicop::generator_derivative2(const Eigen::VectorXd& u)
+    double Bb8Bicop::generator_derivative2(const double& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            double tmp = std::pow(1-delta*v,theta);
-            return std::pow(delta,2)*theta*std::pow(1-delta*v,theta-2)*(theta-1+tmp)/std::pow(tmp-1,2);
-        };
-        return u.unaryExpr(f);
+        double tmp = std::pow(1-delta*u,theta);
+        return std::pow(delta,2)*theta*std::pow(1-delta*u,theta-2)*(theta-1+tmp)/std::pow(tmp-1,2);
     }
 
     double Bb8Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)

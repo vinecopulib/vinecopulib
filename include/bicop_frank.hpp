@@ -19,10 +19,10 @@ namespace vinecopulib
         FrankBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
         // generator, its inverse and derivatives for the archimedean copula
-        Eigen::VectorXd generator(const Eigen::VectorXd& u);
-        Eigen::VectorXd generator_inv(const Eigen::VectorXd& u);
-        Eigen::VectorXd generator_derivative(const Eigen::VectorXd& u);
-        Eigen::VectorXd generator_derivative2(const Eigen::VectorXd& u);
+        double generator(const double& u);
+        double generator_inv(const double& u);
+        double generator_derivative(const double& u);
+        double generator_derivative2(const double& u);
 
         // link between Kendall's tau and the par_bicop parameter
         Eigen::VectorXd tau_to_parameters(const double& tau);

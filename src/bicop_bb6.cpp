@@ -31,47 +31,31 @@ namespace vinecopulib
         set_rotation(rotation);
     }
 
-    Eigen::VectorXd Bb6Bicop::generator(const Eigen::VectorXd& u)
+    double Bb6Bicop::generator(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            return std::pow((-1)*std::log(1-std::pow(1-v,theta)), delta);
-        };
-        return u.unaryExpr(f);
+        return std::pow((-1)*std::log(1-std::pow(1-u,this->parameters_(0))), this->parameters_(1));
     }
 
-    Eigen::VectorXd Bb6Bicop::generator_inv(const Eigen::VectorXd& u)
+    double Bb6Bicop::generator_inv(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            return 1-std::pow(1-std::exp((-1)*std::pow(v, 1/delta)), 1/theta);
-        };
-        return u.unaryExpr(f);
+        return 1-std::pow(1-std::exp((-1)*std::pow(u, 1/this->parameters_(1))), 1/this->parameters_(0));
     }
 
-    Eigen::VectorXd Bb6Bicop::generator_derivative(const Eigen::VectorXd& u)
+    double Bb6Bicop::generator_derivative(const double& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            double res = delta * theta *std::pow((-1)*std::log(1-std::pow(1-v,theta)),delta-1);
-            return res*std::pow(1-v,theta-1)/(std::pow(1-v,theta)-1);
-        };
-        return u.unaryExpr(f);
+        double res = delta * theta *std::pow((-1)*std::log(1-std::pow(1-u,theta)),delta-1);
+        return res*std::pow(1-u,theta-1)/(std::pow(1-u,theta)-1);
     }
 
-    Eigen::VectorXd Bb6Bicop::generator_derivative2(const Eigen::VectorXd& u)
+    double Bb6Bicop::generator_derivative2(const double& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            double tmp = std::pow(1-v,theta);
-            double res = std::pow((-1)*std::log(1-tmp),delta-2)*((delta-1)*theta*tmp-(tmp+theta-1)*std::log(1-tmp));
-            return res*delta*theta*std::pow(1-v, theta-2)/std::pow(tmp - 1,2);
-        };
-        return u.unaryExpr(f);
+        double tmp = std::pow(1-u,theta);
+        double res = std::pow((-1)*std::log(1-tmp),delta-2)*((delta-1)*theta*tmp-(tmp+theta-1)*std::log(1-tmp));
+        return res*delta*theta*std::pow(1-u, theta-2)/std::pow(tmp - 1,2);
     }
 
     double Bb6Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)

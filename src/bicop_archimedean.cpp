@@ -11,26 +11,21 @@ namespace vinecopulib
 {
     Eigen::VectorXd ArchimedeanBicop::pdf_default(const Eigen::MatrixXd& u)
     {
-        Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
-        Eigen::VectorXd v = generator(u.col(0)) + generator(u.col(1));
-        f = generator_derivative(u.col(0)).cwiseProduct(generator_derivative(u.col(1)));
-        Eigen::VectorXd numerator = generator_derivative2(generator_inv(v));
-        Eigen::VectorXd denominator = generator_derivative(generator_inv(v)).array().pow(3.0);
-        f = (-1)*f.cwiseProduct(numerator);
-        f = f.cwiseQuotient(denominator);
-
-        return f;
+        auto f = [this](const double u, const double v) {
+            double temp = generator_inv(generator(u) + generator(v));
+            temp = generator_derivative2(temp)/std::pow(generator_derivative(temp), 3.0);
+            return (-1)*generator_derivative(u)*generator_derivative(v)*temp;
+        };
+        return u.col(0).binaryExpr(u.col(1), f);
     }
 
     Eigen::VectorXd ArchimedeanBicop::hfunc1_default(const Eigen::MatrixXd& u)
     {
-        Eigen::VectorXd h(u.rows());
-        Eigen::VectorXd v(u.rows());
-
-        v = generator(u.col(0)) + generator(u.col(1));
-        h = generator_derivative(u.col(0)).cwiseQuotient(generator_derivative(generator_inv(v)));
-
-        return h;
+        auto f = [this](const double u, const double v) {
+            double temp = generator_inv(generator(u) + generator(v));
+            return generator_derivative(u)/generator_derivative(temp);
+        };
+        return u.col(0).binaryExpr(u.col(1), f);
     }
 
     Eigen::VectorXd ArchimedeanBicop::hfunc2_default(const Eigen::MatrixXd& u)
