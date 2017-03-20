@@ -5,6 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "tools_optimization.hpp"
+#include <iostream>
 
 namespace tools_optimization {
 
@@ -35,7 +36,7 @@ namespace tools_optimization {
     {
         if (bounds.rows() != n_parameters_ || bounds.cols() != 2) {
             throw std::runtime_error(
-                "Bounds should be a two column matrix with n_parameters_ rows."
+                    "Bounds should be a two column matrix with n_parameters_ rows."
             );
         }
 
@@ -103,15 +104,30 @@ namespace tools_optimization {
 
     // the objective function for maximum likelihood estimation
     double mle_objective(const std::vector<double>& x,
-                         std::vector<double>&,
+                         std::vector<double>& grad,
                          void* f_data)
     {
         ParBicopOptData* newdata = (ParBicopOptData*) f_data;
         ++newdata->objective_calls;
         Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
         newdata->bicop->set_parameters(par);
-        double nll = newdata->bicop->loglik(newdata->U);
-        nll *= -1;
+        double nll = (-1)*newdata->bicop->loglik(newdata->U);
+        // gradient by finite differencing (doesn't work too well)
+        if (!grad.empty()) {
+            double dpar = 1e-4;
+            double eps = 1e-6;
+            Eigen::MatrixXd bounds = newdata->bicop->get_parameters_bounds();
+            for (unsigned int i=0; i<x.size(); i++) {
+                Eigen::VectorXd par2 = par;
+                par2(i) = par2(i) + dpar;
+                par2(i) = std::max(par2(i), bounds(i,0)+eps);
+                par2(i) = std::min(par2(i), bounds(i,1)-eps);
+                newdata->bicop->set_parameters(par2);
+                double nll2 = (-1)*newdata->bicop->loglik(newdata->U);
+                grad[i] = (nll2 - nll)/dpar;
+            }
+        }
+
         return nll;
     }
 

@@ -116,7 +116,7 @@ namespace tools_optimization {
 
     // the objective function for maximum likelihood estimation
     double mle_objective(const std::vector<double>& x,
-                         std::vector<double> &,
+                         std::vector<double>& grad,
                          void* data);
 
     // the objective function for profile maximum likelihood estimation
