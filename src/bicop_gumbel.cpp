@@ -33,7 +33,7 @@ namespace vinecopulib
     Eigen::VectorXd GumbelBicop::generator(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return std::pow(std::log(1/v), theta);
         };
         return u.unaryExpr(f);
@@ -41,7 +41,7 @@ namespace vinecopulib
     Eigen::VectorXd GumbelBicop::generator_inv(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return std::exp(-std::pow(v,1/theta));
         };
         return u.unaryExpr(f);
@@ -50,7 +50,7 @@ namespace vinecopulib
     Eigen::VectorXd GumbelBicop::generator_derivative(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return std::pow(std::log(1/v),theta-1)*(-theta/v);
         };
         return u.unaryExpr(f);
@@ -59,7 +59,7 @@ namespace vinecopulib
     Eigen::VectorXd GumbelBicop::generator_derivative2(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return (theta-1-std::log(v))*std::pow(std::log(1/v), theta-2)*(theta/std::pow(v,2));
         };
         return u.unaryExpr(f);

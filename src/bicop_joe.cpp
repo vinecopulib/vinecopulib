@@ -33,7 +33,7 @@ namespace vinecopulib
     Eigen::VectorXd JoeBicop::generator(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return (-1)*std::log(1-std::pow(1-v, theta));
         };
         return u.unaryExpr(f);
@@ -42,7 +42,7 @@ namespace vinecopulib
     Eigen::VectorXd JoeBicop::generator_inv(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return 1-std::pow(1-std::exp(-v),1/theta);
         };
         return u.unaryExpr(f);
@@ -51,7 +51,7 @@ namespace vinecopulib
     Eigen::VectorXd JoeBicop::generator_derivative(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return (-theta)*std::pow(1-v, theta-1)/(1-std::pow(1-v, theta));
         };
         return u.unaryExpr(f);
@@ -60,7 +60,7 @@ namespace vinecopulib
     Eigen::VectorXd JoeBicop::generator_derivative2(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return theta*(theta-1+std::pow(1-v, theta))*std::pow(1-v, theta-2)/std::pow(-1+std::pow(1-v, theta),2);
         };
         return u.unaryExpr(f);
