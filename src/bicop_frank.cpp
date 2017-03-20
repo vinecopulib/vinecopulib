@@ -34,7 +34,7 @@ namespace vinecopulib
     Eigen::VectorXd FrankBicop::generator(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return (-1)*std::log((std::exp(-theta*v)-1)/(std::exp(-theta)-1));
         };
         return u.unaryExpr(f);
@@ -42,7 +42,7 @@ namespace vinecopulib
     Eigen::VectorXd FrankBicop::generator_inv(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             //return (-1/theta)*std::log(1+std::exp(-theta*v)-std::exp(-v));
             return (-1/theta)*std::log(1+std::exp(-theta-v)-std::exp(-v));
         };
@@ -52,7 +52,7 @@ namespace vinecopulib
     Eigen::VectorXd FrankBicop::generator_derivative(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return theta/(1-std::exp(theta*v));
         };
         return u.unaryExpr(f);
@@ -61,7 +61,7 @@ namespace vinecopulib
     Eigen::VectorXd FrankBicop::generator_derivative2(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return std::pow(theta,2)/std::pow(std::exp(theta*v/2) - std::exp(-theta*v/2), 2);
         };
         return u.unaryExpr(f);

@@ -35,7 +35,7 @@ namespace vinecopulib
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [theta, delta](const double v) {
+        auto f = [&theta, &delta](const double& v) {
             return std::pow(1-std::pow(1-v,theta),-delta)-1;
         };
         return u.unaryExpr(f);
@@ -45,7 +45,7 @@ namespace vinecopulib
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [theta, delta](const double v) {
+        auto f = [&theta, &delta](const double& v) {
             return 1-std::pow(1-std::pow(1+v,-1/delta),1/theta);
         };
         return u.unaryExpr(f);
@@ -55,7 +55,7 @@ namespace vinecopulib
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [theta, delta](const double v) {
+        auto f = [&theta, &delta](const double& v) {
             return -delta*theta*std::pow(1-std::pow(1-v,theta),-1-delta)*std::pow(1-v,theta-1);
         };
         return u.unaryExpr(f);
@@ -65,7 +65,7 @@ namespace vinecopulib
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [theta, delta](const double v) {
+        auto f = [&theta, &delta](const double& v) {
             double tmp = std::pow(1-v,theta);
             return delta*theta*std::pow(1-tmp,-2-delta)*std::pow(1-v,theta-2)*(theta-1+(1+delta*theta)*tmp);
         };
@@ -76,7 +76,7 @@ namespace vinecopulib
     {
         double theta = parameters(0);
         double delta = parameters(1);
-        auto f = [theta, delta](const double v) {
+        auto f = [&theta, &delta](const double& v) {
             double tmp = std::pow(1-v,theta);
             return -4*(std::pow(1-tmp,-delta)-1)/(theta*delta*std::pow(1-v,theta-1)*std::pow(1-tmp,-delta-1));
         };

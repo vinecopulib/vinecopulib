@@ -34,7 +34,7 @@ namespace vinecopulib
     Eigen::VectorXd ClaytonBicop::generator(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return (std::pow(v, -theta)-1)/theta;
         };
         return u.unaryExpr(f);
@@ -42,7 +42,7 @@ namespace vinecopulib
     Eigen::VectorXd ClaytonBicop::generator_inv(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return std::pow(1+theta*v, -1/theta);
         };
         return u.unaryExpr(f);
@@ -51,7 +51,7 @@ namespace vinecopulib
     Eigen::VectorXd ClaytonBicop::generator_derivative(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return (-1)*std::pow(v, -1-theta);
         };
         return u.unaryExpr(f);
@@ -60,7 +60,7 @@ namespace vinecopulib
     Eigen::VectorXd ClaytonBicop::generator_derivative2(const Eigen::VectorXd& u)
     {
         double theta = double(this->parameters_(0));
-        auto f = [theta](const double v) {
+        auto f = [&theta](const double& v) {
             return (1+theta)*std::pow(v, -2-theta);
         };
         return u.unaryExpr(f);

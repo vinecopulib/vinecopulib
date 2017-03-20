@@ -35,7 +35,7 @@ namespace vinecopulib
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [theta, delta](const double v) {
+        auto f = [&theta, &delta](const double& v) {
             return std::pow((-1)*std::log(1-std::pow(1-v,theta)), delta);
         };
         return u.unaryExpr(f);
@@ -45,7 +45,7 @@ namespace vinecopulib
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [theta, delta](const double v) {
+        auto f = [&theta, &delta](const double& v) {
             return 1-std::pow(1-std::exp((-1)*std::pow(v, 1/delta)), 1/theta);
         };
         return u.unaryExpr(f);
@@ -55,7 +55,7 @@ namespace vinecopulib
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [theta, delta](const double v) {
+        auto f = [&theta, &delta](const double& v) {
             double res = delta * theta *std::pow((-1)*std::log(1-std::pow(1-v,theta)),delta-1);
             return res*std::pow(1-v,theta-1)/(std::pow(1-v,theta)-1);
         };
@@ -66,7 +66,7 @@ namespace vinecopulib
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [theta, delta](const double v) {
+        auto f = [&theta, &delta](const double& v) {
             double tmp = std::pow(1-v,theta);
             double res = std::pow((-1)*std::log(1-tmp),delta-2)*((delta-1)*theta*tmp-(tmp+theta-1)*std::log(1-tmp));
             return res*delta*theta*std::pow(1-v, theta-2)/std::pow(tmp - 1,2);
@@ -78,7 +78,7 @@ namespace vinecopulib
     {
         double theta = parameters(0);
         double delta = parameters(1);
-        auto f = [theta, delta](const double v) {
+        auto f = [&theta, &delta](const double& v) {
             return -4/(delta*theta)*std::log(1-std::pow(1-v,theta))*(1-v-std::pow(1-v,-theta)+std::pow(1-v,-theta)*v);
         };
         double tau = 1+tools_integration::integrate_zero_to_one(f);
