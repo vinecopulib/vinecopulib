@@ -166,7 +166,7 @@ namespace tools_structselect {
         } else if (tree_criterion == "hoeffd") {
             w = 1.0 - (30*tools_stats::pairwise_hoeffd(data)+0.5)/1.5;
         } else if (tree_criterion == "rho") {
-            w = 1.0 - std::fabs(tools_stats::pairwise_cor(data);
+            w = 1.0 - std::fabs(tools_stats::pairwise_cor(data));
         } else {
             throw std::runtime_error("tree criterion not implemented");
         }
