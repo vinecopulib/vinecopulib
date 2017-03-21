@@ -77,7 +77,8 @@ namespace vinecopulib
 
     Eigen::VectorXd StudentBicop::get_start_parameters(const double tau)
     {
-        Eigen::VectorXd parameters = tau_to_parameters(tau);
+        Eigen::VectorXd parameters = get_parameters();
+        parameters(0) = sin(tau * M_PI / 2);;
         parameters(1) = 5;
         return parameters;
     }

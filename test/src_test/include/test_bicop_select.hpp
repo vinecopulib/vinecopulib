@@ -17,7 +17,7 @@ namespace test_bicop_select {
         std::vector<int> rotations = {0, 90, 180, 270};
         std::vector<int> positive_rotations = {0, 180};
         std::string selection_criterion = "bic";
-        auto true_family = this->bicop_->get_family();
+        auto true_family = this->par_bicop_.get_family();
         std::vector<BicopFamily> family_set = {
             BicopFamily::indep, 
             BicopFamily::gaussian, 
@@ -51,24 +51,23 @@ namespace test_bicop_select {
     }
 
     TYPED_TEST(ParBicopTest, bicop_select_itau_bic_is_correct) {
-        if (is_member(this->bicop_->get_family(), bicop_families::itau)) {
+        if (is_member(this->par_bicop_.get_family(), bicop_families::itau)) {
             std::vector<int> no_itau_families = {7, 8, 9, 10};
             std::vector<int> rotations = {0, 90, 180, 270};
             std::string selection_criterion = "bic";
-            auto true_family = this->bicop_->get_family();
+            auto true_family = this->par_bicop_.get_family();
             std::vector<BicopFamily> family_set = {
                 BicopFamily::indep, 
                 BicopFamily::gaussian, 
                 true_family
             };
-            this->setup_parameters();
 
             for (auto rotation : rotations) {
                 this->setup_parameters(rotation);
+
                 if (this->needs_check_) {
                     auto data = this->bicop_->simulate(this->get_n());
                     auto bicop = Bicop::select(data, family_set, "itau");
-
                     auto selected_family = bicop->get_family();
                     EXPECT_EQ(selected_family, true_family) << 
                         bicop->bic(data) << " " << this->bicop_->bic(data);

@@ -52,7 +52,6 @@ namespace vinecopulib
         double bic(const Eigen::MatrixXd& u);
 
         virtual double calculate_npars() = 0;
-        double calculate_tau();  // this will be a generic fall back method
         virtual double parameters_to_tau(const Eigen::VectorXd& parameters) = 0;
         Eigen::VectorXd tau_to_parameters(const double& tau);
 

@@ -9,6 +9,9 @@
 #include "gtest/gtest.h"
 #include "include/bicop.hpp"
 #include "include/tools_stl.hpp"
+#ifndef M_PI
+#define M_PI       3.14159265358979323846
+#endif
 
 using namespace vinecopulib;
 
@@ -47,7 +50,7 @@ public:
             parameters = bicop_->tau_to_parameters(tau);
         } else {
             if (family == BicopFamily::student) {
-                parameters = bicop_->tau_to_parameters(tau);
+                parameters(0) = sin(tau * M_PI / 2);
                 parameters(1) = 4;
             } else if (family == BicopFamily::bb1) {
                 parameters(1) = 1.5;
@@ -94,5 +97,4 @@ typedef ::testing::Types<
     IndepBicop, GaussianBicop, StudentBicop, ClaytonBicop, GumbelBicop,
     FrankBicop, JoeBicop, Bb1Bicop, Bb6Bicop, Bb7Bicop, Bb8Bicop
 > ParBicopTypes;
-typedef ::testing::Types<GaussianBicop> ParBicopTypes;
 TYPED_TEST_CASE(ParBicopTest, ParBicopTypes);

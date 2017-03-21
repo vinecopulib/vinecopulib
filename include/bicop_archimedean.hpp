@@ -12,7 +12,7 @@ namespace vinecopulib
 {
     class ArchimedeanBicop : public ParBicop
     {
-    public:
+    private:
         // pdf, hfunctions and inverses
         Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
         Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
@@ -27,11 +27,9 @@ namespace vinecopulib
         virtual double generator_derivative2(const double& u) = 0;
 
         void flip();
-
+        Eigen::VectorXd get_start_parameters(const double tau);
     protected:
         double flip_tau(double tau);
-    private:
-        Eigen::VectorXd get_start_parameters(const double tau);
     };
 }
 
