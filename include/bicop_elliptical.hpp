@@ -14,8 +14,12 @@ namespace vinecopulib
     {
     private:
         // hfunction and its inverse
-        Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u);
-        Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc2_default(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
+        Eigen::VectorXd hinv2_default(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
 
         // link between Kendall's tau and the par_bicop parameter
         double parameters_to_tau(const Eigen::VectorXd& parameters);

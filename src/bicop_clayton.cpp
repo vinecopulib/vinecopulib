@@ -14,9 +14,12 @@ namespace vinecopulib
     {
         family_ = BicopFamily::clayton;
         rotation_ = 0;
-        parameters_ = Eigen::VectorXd::Zero(1);
-        parameters_bounds_ = Eigen::MatrixXd::Zero(1, 2);
-        parameters_bounds_(0, 1) = 200.0;
+        parameters_ = Eigen::VectorXd(1);
+        parameters_lower_bounds_ = Eigen::VectorXd(1);
+        parameters_upper_bounds_ = Eigen::VectorXd(1);
+        parameters_ << 0;
+        parameters_lower_bounds_ << 0;
+        parameters_upper_bounds_ << 200;
     }
 
     double ClaytonBicop::generator(const double& u)
@@ -41,7 +44,9 @@ namespace vinecopulib
         return (1+theta)*std::pow(u, -2-theta);
     }
 
-    Eigen::VectorXd ClaytonBicop::hinv1_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd ClaytonBicop::hinv1_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2> & u
+    )
     {
         double theta = double(this->parameters_(0));
         Eigen::VectorXd hinv = u.col(0).array().pow(theta + 1.0);
@@ -58,7 +63,7 @@ namespace vinecopulib
         return hinv;
     }
 
-    Eigen::VectorXd ClaytonBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd ClaytonBicop::tau_to_parameters_default(const double& tau)
     {
         Eigen::VectorXd parameters(1);
         parameters(0) = 2 * std::fabs(tau) / (1 - std::fabs(tau));

@@ -25,6 +25,6 @@ namespace vinecopulib
 
         // link between Kendall's tau and the par_bicop parameter
         double parameters_to_tau(const Eigen::VectorXd& par);
-        Eigen::VectorXd tau_to_parameters_default(const double& tau);
+        Eigen::MatrixXd tau_to_parameters_default(const double& tau);
     };
 }

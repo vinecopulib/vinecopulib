@@ -9,7 +9,10 @@
 #include "tools_stl.hpp"
 #include <cmath>
 
-std::vector<double> get_c1c2(const Eigen::MatrixXd& data, double tau)
+std::vector<double> get_c1c2(
+    const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+    double tau
+)
 {
     int n = data.rows();
     Eigen::MatrixXd x = Eigen::MatrixXd::Zero(n, 2);

@@ -13,9 +13,12 @@ namespace vinecopulib
     {
         family_ = BicopFamily::joe;
         rotation_ = 0;
-        parameters_ = Eigen::VectorXd::Ones(1);
-        parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);
-        parameters_bounds_(0, 1) = 200.0;
+        parameters_ = Eigen::VectorXd(1);
+        parameters_lower_bounds_ = Eigen::VectorXd(1);
+        parameters_upper_bounds_ = Eigen::VectorXd(1);
+        parameters_ << 1;
+        parameters_lower_bounds_ << 1;
+        parameters_upper_bounds_ << 200;
     }
 
     double JoeBicop::generator(const double& u)
@@ -41,7 +44,9 @@ namespace vinecopulib
     }
 
     // inverse h-function
-    Eigen::VectorXd JoeBicop::hinv1_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd JoeBicop::hinv1_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         double theta = double(this->parameters_(0));
         double u1, u2;
@@ -56,7 +61,7 @@ namespace vinecopulib
     }
 
     // link between Kendall's tau and the par_bicop parameter
-    Eigen::VectorXd JoeBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd JoeBicop::tau_to_parameters_default(const double& tau)
     {
         Eigen::VectorXd tau2 = Eigen::VectorXd::Constant(1, std::fabs(tau));
         auto f = [&](const Eigen::VectorXd &v) {
@@ -134,7 +139,7 @@ double qcondjoe(double* q, double* u, double* de)
 }
 
 /*// PDF
-double JoeBicop:pdf_default(const Eigen::MatrixXd& u)
+double JoeBicop:pdf_default(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
 {
     double theta = double(this->parameters_(0));
 

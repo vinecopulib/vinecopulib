@@ -16,43 +16,52 @@ namespace vinecopulib
     {
         family_ = BicopFamily::gaussian;
         rotation_ = 0;
-        parameters_ = Eigen::VectorXd::Zero(1);
-        parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);
-        parameters_bounds_(0, 0) = -1;
+        parameters_ = Eigen::VectorXd(1);
+        parameters_lower_bounds_ = Eigen::VectorXd(1);
+        parameters_upper_bounds_ = Eigen::VectorXd(1);
+        parameters_ << 0;
+        parameters_lower_bounds_ << -1;
+        parameters_upper_bounds_ << 1;
     }
 
-    Eigen::VectorXd GaussianBicop::pdf_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd GaussianBicop::pdf_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         // Inverse Cholesky of the correlation matrix
         double rho = double(this->parameters_(0));
-        Eigen::MatrixXd L = Eigen::MatrixXd::Zero(2,2);
+        Eigen::Matrix2d L;
         L(0,0) = 1;
         L(1,1) = 1/sqrt(1.0-pow(rho,2.0));
         L(0,1) = -rho*L(1,1);
 
         // Compute copula density
         Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
-        Eigen::MatrixXd tmp = tools_stats::qnorm(u);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qnorm(u);
         f = f.cwiseQuotient(tools_stats::dnorm(tmp).rowwise().prod());
         tmp = tmp*L;
         f = f.cwiseProduct(tools_stats::dnorm(tmp).rowwise().prod());
         return f / sqrt(1.0-pow(rho,2.0));
     }
 
-    Eigen::VectorXd GaussianBicop::hfunc1_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd GaussianBicop::hfunc1_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         double rho = double(this->parameters_(0));
         Eigen::VectorXd h = Eigen::VectorXd::Zero(u.rows());
-        Eigen::MatrixXd tmp = tools_stats::qnorm(u);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qnorm(u);
         h = (tmp.col(1) - rho * tmp.col(0)) / sqrt(1.0 - pow(rho, 2.0));
         return tools_stats::pnorm(h);
     }
 
-    Eigen::VectorXd GaussianBicop::hinv1_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd GaussianBicop::hinv1_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         double rho = double(this->parameters_(0));
         Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
-        Eigen::MatrixXd tmp = tools_stats::qnorm(u);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qnorm(u);
         hinv = tmp.col(1) * sqrt(1.0 - pow(rho, 2.0)) + rho * tmp.col(0);
         return tools_stats::pnorm(hinv);
     }
@@ -62,7 +71,7 @@ namespace vinecopulib
         return tau_to_parameters(tau);
     }
 
-    Eigen::VectorXd GaussianBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd GaussianBicop::tau_to_parameters_default(const double& tau)
     {
         Eigen::VectorXd parameters = this->parameters_;
         parameters(0) = sin(tau * M_PI / 2);

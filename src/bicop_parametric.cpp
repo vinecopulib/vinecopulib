@@ -22,7 +22,10 @@ namespace vinecopulib
     }
 
     // fit
-    void ParBicop::fit(const Eigen::MatrixXd &data, std::string method)
+    void ParBicop::fit(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+        std::string method
+    )
     {
         if (family_ != BicopFamily::indep) {
             using namespace tools_optimization;
@@ -57,22 +60,26 @@ namespace vinecopulib
                 Optimizer optimizer(npars);
 
                 // Set bounds and starting values
-                auto bounds = get_parameters_bounds();
+                auto lb = get_parameters_lower_bounds();
+                auto ub = get_parameters_upper_bounds();
                 auto initial_parameters = newpar;
                 ParBicopOptData my_data = {data, this, newpar(0), 0};
                 if (method == "itau") {
-                    bounds = get_parameters_bounds().block(1, 0, npars, 2);
-                    initial_parameters = newpar.block(1, 0, npars, 1);
-                    optimizer.set_objective(pmle_objective, &my_data);
+                      lb.resize(1, 1);
+                      lb(0) = get_parameters_lower_bounds()(1);
+                      ub.resize(1, 1);
+                      ub(0) = get_parameters_upper_bounds()(1);
+                      initial_parameters = Eigen::VectorXd::Constant(1, newpar(1));
+                      optimizer.set_objective(pmle_objective, &my_data);
                 } else {
-                    optimizer.set_objective(mle_objective, &my_data);
+                      optimizer.set_objective(mle_objective, &my_data);
                 }
 
-                optimizer.set_bounds(bounds);
+                // optimize and store result
+                optimizer.set_bounds(lb, ub);
                 auto optimized_parameters = optimizer.optimize(initial_parameters);
-
                 if (method == "itau") {
-                    newpar.block(1, 0, npars, 1) = optimized_parameters;
+                    newpar(1) = optimized_parameters(0);
                 } else {
                     newpar = optimized_parameters;
                 }

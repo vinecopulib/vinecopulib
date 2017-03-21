@@ -67,7 +67,7 @@ namespace tools_stats
         return U.unaryExpr([&](double) { return distribution(generator); });
     }
 
-    Eigen::VectorXd to_pseudo_obs(
+    Eigen::VectorXd to_pseudo_obs_1d(
             Eigen::VectorXd x,
             std::string ties_method = "average"
     );
@@ -76,9 +76,9 @@ namespace tools_stats
             std::string ties_method = "average"
     );
 
-    double pairwise_hoeffd(Eigen::MatrixXd& x);
-    double pairwise_ktau(Eigen::MatrixXd& u);
-    double pairwise_cor(const Eigen::MatrixXd& z);
+    double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
+    double pairwise_ktau(Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+    double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z);
 }
 
 /* A GSL ALTERNATIVE

@@ -15,6 +15,8 @@ namespace vinecopulib
     public:
         TrafokernelBicop();
     private:
-        void fit(const Eigen::MatrixXd& data, std::string);
+        void fit(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, std::string
+        );
     };
 }

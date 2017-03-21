@@ -47,10 +47,9 @@ public:
 
         auto parameters = bicop_->get_parameters();
         if (parameters.size() < 2) {
-            parameters = bicop_->tau_to_parameters(tau);
+            parameters = bicop_->tau_to_parameters(tau); 
         } else {
             if (family == BicopFamily::student) {
-                parameters(0) = sin(tau * M_PI / 2);
                 parameters(1) = 4;
             } else if (family == BicopFamily::bb1) {
                 parameters(1) = 1.5;
@@ -61,12 +60,12 @@ public:
                     delta = 0.8;
                 auto tau_v = Eigen::VectorXd::Constant(1, std::fabs(tau));
                 auto f = [this, delta](const Eigen::VectorXd &v) {
-                    Eigen::VectorXd par = Eigen::VectorXd::Constant(2, delta);
-                    par(0) = v(0);
+                    Eigen::VectorXd par(2);
+                    par << v(0), delta;
                     auto tau = bicop_->parameters_to_tau(par);
                     return Eigen::VectorXd::Constant(1, std::fabs(tau));
                 };
-                parameters(0) = invert_f(tau_v, f, 1+1e-6, 100)(0);
+                parameters(0) = invert_f(tau_v, f, 1 + 1e-6, 100)(0);
                 parameters(1) = delta;
             }
         }
@@ -85,6 +84,7 @@ public:
         // set the parameters vector for R
         this->set_parameters(parameters);
     }
+    
 protected:
     ParBicopTest() : par_bicop_() {}
     T par_bicop_;

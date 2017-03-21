@@ -32,19 +32,16 @@ namespace tools_optimization {
         controls_.set_controls(&opt_);
     }
 
-    void Optimizer::set_bounds(Eigen::MatrixXd bounds)
+    void Optimizer::set_bounds(
+        const Eigen::MatrixXd& lower_bounds,
+        const Eigen::MatrixXd& upper_bounds
+     )
     {
-        if (bounds.rows() != n_parameters_ || bounds.cols() != 2) {
-            throw std::runtime_error(
-                    "Bounds should be a two column matrix with n_parameters_ rows."
-            );
-        }
-
         std::vector<double> lb(n_parameters_);
         std::vector<double> ub(n_parameters_);
-        Eigen::VectorXd eps = Eigen::VectorXd::Constant(n_parameters_,1e-6);
-        Eigen::VectorXd::Map(&lb[0], n_parameters_) = bounds.col(0)+eps;
-        Eigen::VectorXd::Map(&ub[0], n_parameters_) = bounds.col(1)-eps;
+        double eps = 1e-6;
+        Eigen::VectorXd::Map(&lb[0], n_parameters_) = lower_bounds.array() + eps;
+        Eigen::VectorXd::Map(&ub[0], n_parameters_) = upper_bounds.array() - eps;
         opt_.set_lower_bounds(lb);
         opt_.set_upper_bounds(ub);
     }
@@ -104,7 +101,7 @@ namespace tools_optimization {
 
     // the objective function for maximum likelihood estimation
     double mle_objective(const std::vector<double>& x,
-                         std::vector<double>& grad,
+                         std::vector<double>&,
                          void* f_data)
     {
         ParBicopOptData* newdata = (ParBicopOptData*) f_data;
@@ -112,21 +109,6 @@ namespace tools_optimization {
         Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
         newdata->bicop->set_parameters(par);
         double nll = (-1)*newdata->bicop->loglik(newdata->U);
-        // gradient by finite differencing (doesn't work too well)
-        if (!grad.empty()) {
-            double dpar = 1e-4;
-            double eps = 1e-6;
-            Eigen::MatrixXd bounds = newdata->bicop->get_parameters_bounds();
-            for (unsigned int i=0; i<x.size(); i++) {
-                Eigen::VectorXd par2 = par;
-                par2(i) = par2(i) + dpar;
-                par2(i) = std::max(par2(i), bounds(i,0)+eps);
-                par2(i) = std::min(par2(i), bounds(i,1)-eps);
-                newdata->bicop->set_parameters(par2);
-                double nll2 = (-1)*newdata->bicop->loglik(newdata->U);
-                grad[i] = (nll2 - nll)/dpar;
-            }
-        }
 
         return nll;
     }

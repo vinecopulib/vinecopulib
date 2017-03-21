@@ -16,7 +16,10 @@ namespace vinecopulib
     //! dimensions.
     //! @param values a dxd matrix of copula density values evaluated at
     //! (grid_points_i, grid_points_j).
-    InterpolationGrid::InterpolationGrid(const Eigen::VectorXd& grid_points, const Eigen::MatrixXd& values)
+    InterpolationGrid::InterpolationGrid(
+        const Eigen::VectorXd& grid_points, 
+        const Eigen::MatrixXd& values
+    )
     {
         if (values.cols() != values.rows()) {
             throw std::runtime_error(
@@ -114,7 +117,10 @@ namespace vinecopulib
     //! @param u mx2 matrix of evaluation points
     //! @param cond_var either 1 or 2; the axis considered fixed.
     //!
-    Eigen::VectorXd InterpolationGrid::intergrate_1d(const Eigen::MatrixXd& u, const int& cond_var)
+    Eigen::VectorXd InterpolationGrid::intergrate_1d(
+        const Eigen::MatrixXd& u, 
+        const int& cond_var
+    )
     {
         int n = u.rows();
         int m = grid_points_.size();
@@ -150,7 +156,10 @@ namespace vinecopulib
     //! @param u mx2 matrix of evaluation points
     //! @param cond_var either 1 or 2; the axis considered fixed.
     //!
-    Eigen::VectorXd InterpolationGrid::inv_intergrate_1d(const Eigen::MatrixXd& u, const int& cond_var)
+    Eigen::VectorXd InterpolationGrid::inv_intergrate_1d(
+        const Eigen::MatrixXd& u,
+        const int& cond_var
+    )
     {
         Eigen::VectorXd out(u.rows());
 
@@ -261,7 +270,10 @@ namespace vinecopulib
     //!
     //! @param x evaluation point.
     //! @param a polynomial coefficients
-    double InterpolationGrid::cubic_poly(const double& x, const Eigen::VectorXd& a)
+    double InterpolationGrid::cubic_poly(
+        const double& x, 
+        const Eigen::VectorXd& a
+    )
     {
         double x2 = x*x;
         double x3 = x2*x;
@@ -272,7 +284,10 @@ namespace vinecopulib
     //!
     //! @param x evaluation point.
     //! @param a polynomial coefficients.
-    double InterpolationGrid::cubic_indef_integral(const double& x, const Eigen::VectorXd& a)
+    double InterpolationGrid::cubic_indef_integral(
+        const double& x,
+        const Eigen::VectorXd& a
+    )
     {
         double x2 = x*x;
         double x3 = x2*x;
@@ -285,7 +300,11 @@ namespace vinecopulib
     //! @param lower lower limit of the integral.
     //! @param upper upper limit of the integral.
     //! @param a polynomial coefficients.
-    double InterpolationGrid::cubic_integral(const double& lower, const double& upper, const Eigen::VectorXd& a)
+    double InterpolationGrid::cubic_integral(
+        const double& lower, 
+        const double& upper, 
+        const Eigen::VectorXd& a
+    )
     {
         return cubic_indef_integral(upper, a) - cubic_indef_integral(lower, a);
     }
@@ -297,7 +316,10 @@ namespace vinecopulib
     //!
     //! The inverse is found by the bisection method with a maximum of 20
     //! iterations.
-    double InterpolationGrid::inv_cubic_integral(const double& q, const Eigen::VectorXd& a)
+    double InterpolationGrid::inv_cubic_integral(
+        const double& q, 
+        const Eigen::VectorXd& a
+    )
     {
         double x0, x1, ql, qh, ans, val;
         ans = 0.0, val = 0.0; x0 = 0.0; x1 = 1.0;
@@ -348,7 +370,10 @@ namespace vinecopulib
     //!
     //! @param vals length 4 vector of function values.
     //! @param grid length 4 vector of grid points.
-    Eigen::VectorXd InterpolationGrid::find_coefs(const Eigen::VectorXd& vals, const Eigen::VectorXd& grid)
+    Eigen::VectorXd InterpolationGrid::find_coefs(
+        const Eigen::VectorXd& vals, 
+        const Eigen::VectorXd& grid
+    )
     {
         Eigen::VectorXd a(4);
 
@@ -387,7 +412,11 @@ namespace vinecopulib
     //! @param x evaluation point.
     //! @param vals length 4 vector of function values.
     //! @param grid length 4 vector of grid points.
-    double InterpolationGrid::interp_on_grid(const double& x, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid)
+    double InterpolationGrid::interp_on_grid(
+        const double& x, 
+        const Eigen::VectorXd& vals, 
+        const Eigen::VectorXd& grid
+    )
     {
         Eigen::VectorXd a = find_coefs(vals, grid);
         double xev = fmax((x - grid(1)), 0) / (grid(2) - grid(1));
@@ -405,7 +434,11 @@ namespace vinecopulib
     //! @param grid vector of grid points on which vals has been computed.
     //!
     //! @return Integral of interpolation spline defined by (vals, grid).
-    double InterpolationGrid::int_on_grid(const double& upr, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid)
+    double InterpolationGrid::int_on_grid(
+        const double& upr,
+        const Eigen::VectorXd& vals, 
+        const Eigen::VectorXd& grid
+    )
     {
         int m = grid.size();
         Eigen::VectorXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
@@ -449,7 +482,11 @@ namespace vinecopulib
     //! @param grid vector of grid points on which vals has been computed.
     //!
     //! @return Integral of interpolation spline defined by (vals, grid).
-    double InterpolationGrid::inv_int_on_grid(const double& qq, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid)
+    double InterpolationGrid::inv_int_on_grid(
+        const double& qq, 
+        const Eigen::VectorXd& vals,
+        const Eigen::VectorXd& grid
+    )
     {
         int m = grid.size();
         Eigen::VectorXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
