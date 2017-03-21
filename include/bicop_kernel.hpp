@@ -16,6 +16,7 @@ namespace vinecopulib
     public:
         KernelBicop();
 
+    private:
         Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
         Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
         Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u);
@@ -23,6 +24,7 @@ namespace vinecopulib
         Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
 
         double parameters_to_tau(const Eigen::VectorXd &);
+        Eigen::VectorXd tau_to_parameters_default(const double& tau);
         double calculate_npars();
 
         void flip();

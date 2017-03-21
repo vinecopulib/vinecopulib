@@ -14,25 +14,11 @@ namespace vinecopulib
         rotation_ = 0;
     }
 
-    IndepBicop::IndepBicop(const Eigen::VectorXd& parameters) :
-        IndepBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    IndepBicop::IndepBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        IndepBicop(parameters)
-    {
-        set_rotation(rotation);
-    }
-
-// PDF
     Eigen::VectorXd IndepBicop::pdf_default(const Eigen::MatrixXd& u)
     {
         return Eigen::VectorXd::Ones(u.rows());
     }
 
-// hfunctions: the conditioning variable is put second
     Eigen::VectorXd IndepBicop::hfunc1_default(const Eigen::MatrixXd& u)
     {
         return u.col(1);
@@ -53,7 +39,7 @@ namespace vinecopulib
         return u.col(0);
     }
 
-    Eigen::VectorXd IndepBicop::tau_to_parameters(const double &)
+    Eigen::VectorXd IndepBicop::tau_to_parameters_default(const double &)
     {
         Eigen::VectorXd pars;
         return pars;
@@ -66,7 +52,7 @@ namespace vinecopulib
 
     Eigen::VectorXd IndepBicop::get_start_parameters(const double tau)
     {
-        return tau_to_parameters(tau);
+        return tau_to_parameters_default(tau);
     }
 
     void IndepBicop::flip()

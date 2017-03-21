@@ -25,18 +25,6 @@ namespace vinecopulib
         parameters_bounds_(1, 1) = 50.0;
     }
 
-    StudentBicop::StudentBicop(const Eigen::VectorXd& parameters) :       
-        StudentBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    StudentBicop::StudentBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        StudentBicop(parameters)
-    {
-        set_rotation(rotation);
-    }
-
     Eigen::VectorXd StudentBicop::pdf_default(const Eigen::MatrixXd& u)
     {
         double rho = double(this->parameters_(0));
@@ -92,5 +80,10 @@ namespace vinecopulib
         Eigen::VectorXd parameters = tau_to_parameters(tau);
         parameters(1) = 5;
         return parameters;
+    }
+
+    Eigen::VectorXd StudentBicop::tau_to_parameters_default(const double& tau)
+    {
+        return vinecopulib::no_tau_to_parameters(tau);
     }
 }

@@ -15,9 +15,8 @@ namespace vinecopulib
     public:
         // constructor
         JoeBicop();
-        JoeBicop(const Eigen::VectorXd& parameters);
-        JoeBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
+    private:
         // generator, its inverse and derivatives for the archimedean copula
         double generator(const double& u);
         double generator_inv(const double& u);
@@ -28,10 +27,9 @@ namespace vinecopulib
         Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
 
         // link between Kendall's tau and the par_bicop parameter
-        Eigen::VectorXd tau_to_parameters(const double& tau);
+        Eigen::VectorXd tau_to_parameters_default(const double& tau);
         double parameters_to_tau(const Eigen::VectorXd& par);
 
-    private:
         Eigen::VectorXd get_start_parameters(const double tau);
     };
 }

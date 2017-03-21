@@ -28,15 +28,8 @@ namespace vinecopulib
         return tau;
     }
 
-    Eigen::VectorXd EllipticalBicop::tau_to_parameters(const double& tau)
-    {
-        Eigen::VectorXd parameters = this->parameters_;
-        parameters(0) = sin(tau * M_PI / 2);
-        return parameters;
-    }
-
     void EllipticalBicop::flip()
     {
-        // nothing to do because elliptical copulas are radially syemmetric
+        // nothing to do because elliptical copulas are radially symmetric
     }
 }

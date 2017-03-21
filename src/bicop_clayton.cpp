@@ -19,18 +19,6 @@ namespace vinecopulib
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    ClaytonBicop::ClaytonBicop(const Eigen::VectorXd& parameters) :
-        ClaytonBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    ClaytonBicop::ClaytonBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        ClaytonBicop(parameters)
-    {
-        set_rotation(rotation);
-    }
-
     double ClaytonBicop::generator(const double& u)
     {
         double theta = double(this->parameters_(0));
@@ -70,7 +58,7 @@ namespace vinecopulib
         return hinv;
     }
 
-    Eigen::VectorXd ClaytonBicop::tau_to_parameters(const double& tau)
+    Eigen::VectorXd ClaytonBicop::tau_to_parameters_default(const double& tau)
     {
         Eigen::VectorXd parameters(1);
         parameters(0) = 2 * std::fabs(tau) / (1 - std::fabs(tau));
@@ -85,7 +73,7 @@ namespace vinecopulib
 
     Eigen::VectorXd ClaytonBicop::get_start_parameters(const double tau)
     {
-        return tau_to_parameters(tau);
+        return tau_to_parameters_default(tau);
     }
 }
 

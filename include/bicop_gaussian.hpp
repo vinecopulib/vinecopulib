@@ -15,9 +15,8 @@ namespace vinecopulib
     public:
         // constructor
         GaussianBicop();
-        GaussianBicop(const Eigen::VectorXd& parameters);
-        GaussianBicop(const Eigen::VectorXd& parameters, const int& rotation);
 
+    private:
         // PDF
         Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
 
@@ -27,7 +26,8 @@ namespace vinecopulib
         // inverse hfunction
         Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
 
-    private:
+        Eigen::VectorXd tau_to_parameters_default(const double& tau);
+
         Eigen::VectorXd get_start_parameters(const double tau);
     };
 }

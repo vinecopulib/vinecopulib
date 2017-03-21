@@ -19,18 +19,6 @@ namespace vinecopulib
         parameters_bounds_(1, 0) = 0.0;
     }
 
-    Bb8Bicop::Bb8Bicop(const Eigen::VectorXd& parameters) : 
-        Bb8Bicop()
-    {
-        set_parameters(parameters);
-    }
-
-    Bb8Bicop::Bb8Bicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        Bb8Bicop(parameters)
-    {
-        set_rotation(rotation);
-    }
-
     double Bb8Bicop::generator(const double& u)
     {
         double theta = double(this->parameters_(0));
@@ -70,5 +58,10 @@ namespace vinecopulib
         };
         double tau = 1-4/(delta*theta)*tools_integration::integrate_zero_to_one(f);
         return flip_tau(tau);
+    }
+
+    Eigen::VectorXd Bb8Bicop::tau_to_parameters_default(const double& tau)
+    {
+        return vinecopulib::no_tau_to_parameters(tau);
     }
 }

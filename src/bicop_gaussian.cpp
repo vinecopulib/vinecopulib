@@ -18,18 +18,6 @@ namespace vinecopulib
         parameters_bounds_(0, 0) = -1;
     }
 
-    GaussianBicop::GaussianBicop(const Eigen::VectorXd& parameters) :
-        GaussianBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    GaussianBicop::GaussianBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        GaussianBicop(parameters)
-    {
-        set_rotation(rotation);
-    }
-
     Eigen::VectorXd GaussianBicop::pdf_default(const Eigen::MatrixXd& u)
     {
         // Inverse Cholesky of the correlation matrix
@@ -69,5 +57,12 @@ namespace vinecopulib
     Eigen::VectorXd GaussianBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
+    }
+
+    Eigen::VectorXd GaussianBicop::tau_to_parameters_default(const double& tau)
+    {
+        Eigen::VectorXd parameters = this->parameters_;
+        parameters(0) = sin(tau * M_PI / 2);
+        return parameters;
     }
 }

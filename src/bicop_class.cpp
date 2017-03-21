@@ -364,11 +364,15 @@ namespace vinecopulib
         return 999.0;
     }
 
-    Eigen::VectorXd Bicop::tau_to_parameters(const double&)
+    Eigen::VectorXd Bicop::tau_to_parameters(const double& tau)
+    {
+        return tau_to_parameters_default(tau);
+    }
+
+    Eigen::VectorXd no_tau_to_parameters(const double&)
     {
         throw std::runtime_error("Method not implemented for this family");
     }
-
 
     //! Getters and setters.
     //! @{
