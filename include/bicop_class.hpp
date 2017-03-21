@@ -52,7 +52,6 @@ namespace vinecopulib
         double bic(const Eigen::MatrixXd& u);
 
         virtual double calculate_npars() = 0;
-        double calculate_tau();  // this will be a generic fall back method
         virtual double parameters_to_tau(const Eigen::VectorXd& parameters) = 0;
         Eigen::VectorXd tau_to_parameters(const double& tau);
 
@@ -76,6 +75,7 @@ namespace vinecopulib
         virtual Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u) = 0;
         virtual Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u) = 0;
         virtual Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u) = 0;
+        virtual Eigen::VectorXd tau_to_parameters_default(const double& tau) = 0;
 
         Eigen::VectorXd hinv1_num(const Eigen::MatrixXd& u);
         Eigen::VectorXd hinv2_num(const Eigen::MatrixXd& u);
@@ -94,4 +94,5 @@ namespace vinecopulib
     };
 
     typedef std::shared_ptr<Bicop> BicopPtr;
+    Eigen::VectorXd no_tau_to_parameters(const double&);
 }

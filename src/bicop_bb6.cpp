@@ -19,18 +19,6 @@ namespace vinecopulib
         parameters_bounds_(1, 0) = 1.0;
     }
 
-    Bb6Bicop::Bb6Bicop(const Eigen::VectorXd& parameters) :
-        Bb6Bicop()
-    {
-        set_parameters(parameters);
-    }
-
-    Bb6Bicop::Bb6Bicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        Bb6Bicop(parameters)
-    {
-        set_rotation(rotation);
-    }
-
     double Bb6Bicop::generator(const double& u)
     {
         return std::pow((-1)*std::log(1-std::pow(1-u,this->parameters_(0))), this->parameters_(1));
@@ -67,5 +55,10 @@ namespace vinecopulib
         };
         double tau = 1+tools_integration::integrate_zero_to_one(f);
         return flip_tau(tau);
+    }
+
+    Eigen::VectorXd Bb6Bicop::tau_to_parameters_default(const double& tau)
+    {
+        return vinecopulib::no_tau_to_parameters(tau);
     }
 }

@@ -6,6 +6,9 @@
 
 #include "bicop_gaussian.hpp"
 #include "tools_stats.hpp"
+#ifndef M_PI
+#define M_PI       3.14159265358979323846
+#endif
 
 namespace vinecopulib
 {
@@ -16,18 +19,6 @@ namespace vinecopulib
         parameters_ = Eigen::VectorXd::Zero(1);
         parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);
         parameters_bounds_(0, 0) = -1;
-    }
-
-    GaussianBicop::GaussianBicop(const Eigen::VectorXd& parameters) :
-        GaussianBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    GaussianBicop::GaussianBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        GaussianBicop(parameters)
-    {
-        set_rotation(rotation);
     }
 
     Eigen::VectorXd GaussianBicop::pdf_default(const Eigen::MatrixXd& u)
@@ -69,5 +60,12 @@ namespace vinecopulib
     Eigen::VectorXd GaussianBicop::get_start_parameters(const double tau)
     {
         return tau_to_parameters(tau);
+    }
+
+    Eigen::VectorXd GaussianBicop::tau_to_parameters_default(const double& tau)
+    {
+        Eigen::VectorXd parameters = this->parameters_;
+        parameters(0) = sin(tau * M_PI / 2);
+        return parameters;
     }
 }

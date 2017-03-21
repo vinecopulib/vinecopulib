@@ -355,20 +355,15 @@ namespace vinecopulib
     }
     //! @}
 
-
-    // TODO: generic fall-back that calculates Kendall's tau based on the pdf:
-    // tau = int_0^1 int_0^1 C(u, v) c(u, v) du dv
-    //     = int_0^1 int_0^1 (int_0^u int_0^v c(s, t) ds tools_stats::dt) c(u, v) du dv
-    double Bicop::calculate_tau()
+    Eigen::VectorXd Bicop::tau_to_parameters(const double& tau)
     {
-        return 999.0;
+        return tau_to_parameters_default(tau);
     }
 
-    Eigen::VectorXd Bicop::tau_to_parameters(const double&)
+    Eigen::VectorXd no_tau_to_parameters(const double&)
     {
         throw std::runtime_error("Method not implemented for this family");
     }
-
 
     //! Getters and setters.
     //! @{

@@ -15,9 +15,8 @@ namespace vinecopulib
     public:
         // constructor
         Bb8Bicop();
-        Bb8Bicop(const Eigen::VectorXd& parameters);
-        Bb8Bicop(const Eigen::VectorXd& parameters, const int& rotation);
 
+    private:
         // generator, its inverse and derivatives for the archimedean copula
         double generator(const double& u);
         double generator_inv(const double& u);
@@ -26,5 +25,6 @@ namespace vinecopulib
 
         // link between Kendall's tau and the par_bicop parameter
         double parameters_to_tau(const Eigen::VectorXd& par);
+        Eigen::VectorXd tau_to_parameters_default(const double& tau);
     };
 }

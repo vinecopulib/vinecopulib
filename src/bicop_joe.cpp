@@ -18,18 +18,6 @@ namespace vinecopulib
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    JoeBicop::JoeBicop(const Eigen::VectorXd& parameters) :
-        JoeBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    JoeBicop::JoeBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        JoeBicop(parameters)
-    {
-        set_rotation(rotation);
-    }
-
     double JoeBicop::generator(const double& u)
     {
         return (-1)*std::log(1-std::pow(1-u, this->parameters_(0)));
@@ -68,7 +56,7 @@ namespace vinecopulib
     }
 
     // link between Kendall's tau and the par_bicop parameter
-    Eigen::VectorXd JoeBicop::tau_to_parameters(const double& tau)
+    Eigen::VectorXd JoeBicop::tau_to_parameters_default(const double& tau)
     {
         Eigen::VectorXd tau2 = Eigen::VectorXd::Constant(1, std::fabs(tau));
         auto f = [&](const Eigen::VectorXd &v) {
@@ -88,7 +76,7 @@ namespace vinecopulib
 
     Eigen::VectorXd JoeBicop::get_start_parameters(const double tau)
     {
-        return tau_to_parameters(tau);
+        return tau_to_parameters_default(tau);
     }
 }
 

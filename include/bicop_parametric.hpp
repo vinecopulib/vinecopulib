@@ -12,18 +12,9 @@ namespace vinecopulib
 {
     class ParBicop : public Bicop
     {
-    public:
-        // fit copula parameters
-        void fit(const Eigen::MatrixXd& data, std::string method);
-
-        // link between Kendall's tau and the par_bicop parameter
-        virtual double parameters_to_tau(const Eigen::VectorXd& parameters) = 0;
-        double calculate_tau() {return this->parameters_to_tau(parameters_);}
-
-        // number of parameters
-        double calculate_npars();
-
     private:
+        void fit(const Eigen::MatrixXd& data, std::string method);
+        double calculate_npars();
         virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
     };
 }

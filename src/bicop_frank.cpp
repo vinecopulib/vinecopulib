@@ -19,18 +19,6 @@ namespace vinecopulib
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    FrankBicop::FrankBicop(const Eigen::VectorXd& parameters) : 
-        FrankBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    FrankBicop::FrankBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        FrankBicop(parameters)
-    {
-        set_rotation(rotation);
-    }
-
     double FrankBicop::generator(const double& u)
     {
         double theta = double(this->parameters_(0));
@@ -54,7 +42,7 @@ namespace vinecopulib
         return std::pow(theta,2)/std::pow(std::exp(theta*u/2) - std::exp(-theta*u/2), 2);
     }
 
-    Eigen::VectorXd FrankBicop::tau_to_parameters(const double& tau)
+    Eigen::VectorXd FrankBicop::tau_to_parameters_default(const double& tau)
     {
         Eigen::VectorXd tau2 = Eigen::VectorXd::Constant(1, std::fabs(tau));
         auto f = [&](const Eigen::VectorXd &v) {
@@ -77,7 +65,7 @@ namespace vinecopulib
 
     Eigen::VectorXd FrankBicop::get_start_parameters(const double tau)
     {
-        return tau_to_parameters(tau);
+        return tau_to_parameters_default(tau);
     }
 }
 /*// PDF

@@ -18,18 +18,6 @@ namespace vinecopulib
         parameters_bounds_(0, 1) = 200.0;
     }
 
-    GumbelBicop::GumbelBicop(const Eigen::VectorXd& parameters) :
-        GumbelBicop()
-    {
-        set_parameters(parameters);
-    }
-
-    GumbelBicop::GumbelBicop(const Eigen::VectorXd& parameters, const int& rotation) :
-        GumbelBicop(parameters)
-    {
-        set_rotation(rotation);
-    }
-
     double GumbelBicop::generator(const double& u)
     {
         return std::pow(std::log(1/u), this->parameters_(0));
@@ -65,7 +53,7 @@ namespace vinecopulib
         return hinv;
     }
 
-    Eigen::VectorXd GumbelBicop::tau_to_parameters(const double& tau)
+    Eigen::VectorXd GumbelBicop::tau_to_parameters_default(const double& tau)
     {
         return Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
     }
@@ -79,7 +67,7 @@ namespace vinecopulib
 
     Eigen::VectorXd GumbelBicop::get_start_parameters(const double tau)
     {
-        return tau_to_parameters(tau);
+        return tau_to_parameters_default(tau);
     }
 }
 // This is copy&paste from the VineCopula package

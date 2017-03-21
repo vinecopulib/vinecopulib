@@ -59,4 +59,9 @@ namespace vinecopulib
     {
         interp_grid_.flip();
     }
+
+    Eigen::VectorXd KernelBicop::tau_to_parameters_default(const double& tau)
+    {
+        return vinecopulib::no_tau_to_parameters(tau);
+    }
 }
