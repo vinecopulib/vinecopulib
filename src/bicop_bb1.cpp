@@ -32,45 +32,29 @@ namespace vinecopulib
         set_rotation(rotation);
     }
 
-    Eigen::VectorXd Bb1Bicop::generator(const Eigen::VectorXd& u)
+    double Bb1Bicop::generator(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            return std::pow(std::pow(v, -theta) - 1, delta);
-        };
-        return u.unaryExpr(f);
+        return std::pow(std::pow(u, -this->parameters_(0)) - 1, this->parameters_(1));
     }
 
-    Eigen::VectorXd Bb1Bicop::generator_inv(const Eigen::VectorXd& u)
+    double Bb1Bicop::generator_inv(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            return std::pow(std::pow(v, 1/delta) + 1, -1/theta);
-        };
-        return u.unaryExpr(f);
+        return std::pow(std::pow(u, 1/this->parameters_(1)) + 1, -1/this->parameters_(0));
     }
 
-    Eigen::VectorXd Bb1Bicop::generator_derivative(const Eigen::VectorXd& u)
+    double Bb1Bicop::generator_derivative(const double& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            return -delta * theta * std::pow(v, -(1 + theta))*std::pow(std::pow(v, -theta) - 1, delta - 1);
-        };
-        return u.unaryExpr(f);
+        return -delta * theta * std::pow(u, -(1 + theta))*std::pow(std::pow(u, -theta) - 1, delta - 1);
     }
 
-    Eigen::VectorXd Bb1Bicop::generator_derivative2(const Eigen::VectorXd& u)
+    double Bb1Bicop::generator_derivative2(const double& u)
     {
         double theta = double(this->parameters_(0));
         double delta = double(this->parameters_(1));
-        auto f = [&theta, &delta](const double& v) {
-            double res = delta * theta * std::pow(std::pow(v, -theta) - 1, delta) / std::pow(std::pow(v, theta) - 1, 2);
-            return res * (1 + delta * theta - (1 + theta) * std::pow(v, theta)) / std::pow(v, 2);
-        };
-        return u.unaryExpr(f);
+        double res = delta * theta * std::pow(std::pow(u, -theta) - 1, delta) / std::pow(std::pow(u, theta) - 1, 2);
+        return res * (1 + delta * theta - (1 + theta) * std::pow(u, theta)) / std::pow(u, 2);
     }
 
     double Bb1Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
@@ -81,7 +65,7 @@ namespace vinecopulib
 }
 
 /*// PDF
-Eigen::VectorXd Bb1Bicop::pdf_default(const Eigen::MatrixXd& u)
+double Bb1Bicop::pdf_default(const Eigen::MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
     double delta = double(this->parameters_(1));
@@ -115,7 +99,7 @@ Eigen::VectorXd Bb1Bicop::pdf_default(const Eigen::MatrixXd& u)
 }
 
 // hfunction
-Eigen::VectorXd Bb1Bicop::hfunc1_default(const Eigen::MatrixXd& u)
+double Bb1Bicop::hfunc1_default(const Eigen::MatrixXd& u)
 {
     double theta = double(this->parameters_(0));
     double delta = double(this->parameters_(1));

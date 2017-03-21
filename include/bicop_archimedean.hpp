@@ -21,10 +21,10 @@ namespace vinecopulib
         Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
 
         // generator, its inverse and derivatives
-        virtual Eigen::VectorXd generator(const Eigen::VectorXd& u) = 0;
-        virtual Eigen::VectorXd generator_inv(const Eigen::VectorXd& u) = 0;
-        virtual Eigen::VectorXd generator_derivative(const Eigen::VectorXd& u) = 0;
-        virtual Eigen::VectorXd generator_derivative2(const Eigen::VectorXd& u) = 0;
+        virtual double generator(const double& u) = 0;
+        virtual double generator_inv(const double& u) = 0;
+        virtual double generator_derivative(const double& u) = 0;
+        virtual double generator_derivative2(const double& u) = 0;
 
         void flip();
 
