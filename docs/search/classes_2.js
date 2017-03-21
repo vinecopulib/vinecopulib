@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['claytonbicop',['ClaytonBicop',['../class_clayton_bicop.html',1,'']]]
+  ['claytonbicop',['ClaytonBicop',['../classvinecopulib_1_1_clayton_bicop.html',1,'vinecopulib']]]
 ];

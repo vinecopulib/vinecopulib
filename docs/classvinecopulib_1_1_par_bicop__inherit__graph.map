@@ -1,0 +1,16 @@
+<map id="vinecopulib::ParBicop" name="vinecopulib::ParBicop">
+<area shape="rect" id="node3" href="$classvinecopulib_1_1_archimedean_bicop.html" title="vinecopulib::Archimedean\lBicop" alt="" coords="381,201,551,242"/>
+<area shape="rect" id="node12" href="$classvinecopulib_1_1_elliptical_bicop.html" title="vinecopulib::EllipticalBicop" alt="" coords="377,411,555,437"/>
+<area shape="rect" id="node15" href="$classvinecopulib_1_1_indep_bicop.html" title="vinecopulib::IndepBicop" alt="" coords="386,461,546,488"/>
+<area shape="rect" id="node2" href="$classvinecopulib_1_1_bicop.html" title="vinecopulib::Bicop" alt="" coords="5,411,133,437"/>
+<area shape="rect" id="node4" href="$classvinecopulib_1_1_bb1_bicop.html" title="vinecopulib::Bb1Bicop" alt="" coords="619,5,769,32"/>
+<area shape="rect" id="node5" href="$classvinecopulib_1_1_bb6_bicop.html" title="vinecopulib::Bb6Bicop" alt="" coords="619,56,769,83"/>
+<area shape="rect" id="node6" href="$classvinecopulib_1_1_bb7_bicop.html" title="vinecopulib::Bb7Bicop" alt="" coords="619,107,769,133"/>
+<area shape="rect" id="node7" href="$classvinecopulib_1_1_bb8_bicop.html" title="vinecopulib::Bb8Bicop" alt="" coords="619,157,769,184"/>
+<area shape="rect" id="node8" href="$classvinecopulib_1_1_clayton_bicop.html" title="vinecopulib::ClaytonBicop" alt="" coords="607,208,781,235"/>
+<area shape="rect" id="node9" href="$classvinecopulib_1_1_frank_bicop.html" title="vinecopulib::FrankBicop" alt="" coords="613,259,775,285"/>
+<area shape="rect" id="node10" href="$classvinecopulib_1_1_gumbel_bicop.html" title="vinecopulib::GumbelBicop" alt="" coords="607,309,781,336"/>
+<area shape="rect" id="node11" href="$classvinecopulib_1_1_joe_bicop.html" title="vinecopulib::JoeBicop" alt="" coords="619,360,769,387"/>
+<area shape="rect" id="node13" href="$classvinecopulib_1_1_gaussian_bicop.html" title="vinecopulib::GaussianBicop" alt="" coords="603,411,785,437"/>
+<area shape="rect" id="node14" href="$classvinecopulib_1_1_student_bicop.html" title="vinecopulib::StudentBicop" alt="" coords="607,461,781,488"/>
+</map>

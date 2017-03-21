@@ -92,34 +92,35 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga67c3d22228770488c70bdf69ee096317"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga67c3d22228770488c70bdf69ee096317"></a>
-VecXd&#160;</td><td class="memItemRight" valign="bottom"><b>Bicop::hfunc1</b> (const MatXd &amp;u)</td></tr>
-<tr class="separator:ga67c3d22228770488c70bdf69ee096317"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2aaa33ca89f748cba38c28e3e0ab92c3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga2aaa33ca89f748cba38c28e3e0ab92c3"></a>
-VecXd&#160;</td><td class="memItemRight" valign="bottom"><b>Bicop::hfunc2</b> (const MatXd &amp;u)</td></tr>
-<tr class="separator:ga2aaa33ca89f748cba38c28e3e0ab92c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga61e9a1af49a11fdf215ab74a544ce955"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga61e9a1af49a11fdf215ab74a544ce955"></a>
-VecXd&#160;</td><td class="memItemRight" valign="bottom"><b>Bicop::hinv1</b> (const MatXd &amp;u)</td></tr>
-<tr class="separator:ga61e9a1af49a11fdf215ab74a544ce955"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga36fddab47d9b8291ddaeaf5735ca24da"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga36fddab47d9b8291ddaeaf5735ca24da"></a>
-VecXd&#160;</td><td class="memItemRight" valign="bottom"><b>Bicop::hinv2</b> (const MatXd &amp;u)</td></tr>
-<tr class="separator:ga36fddab47d9b8291ddaeaf5735ca24da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga130fda62cd61c7acdef5db75fffdd89e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga130fda62cd61c7acdef5db75fffdd89e"></a>
+Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>vinecopulib::Bicop::hfunc1</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:ga130fda62cd61c7acdef5db75fffdd89e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4c9b50f99797ec374f5057cc54db2bd8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga4c9b50f99797ec374f5057cc54db2bd8"></a>
+Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>vinecopulib::Bicop::hfunc2</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:ga4c9b50f99797ec374f5057cc54db2bd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3cc8b161ec6efdb3b34d2efa9185bf44"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga3cc8b161ec6efdb3b34d2efa9185bf44"></a>
+Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>vinecopulib::Bicop::hinv1</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:ga3cc8b161ec6efdb3b34d2efa9185bf44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3e33ec227b6b7182e327399201cad382"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga3e33ec227b6b7182e327399201cad382"></a>
+Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>vinecopulib::Bicop::hinv2</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:ga3e33ec227b6b7182e327399201cad382"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>h-functions are defined as one-dimensional integrals over a bivariate copula density <img class="formulaInl" alt="$ c $" src="form_3.png"/>, </p><p class="formulaDsp">
-<img class="formulaDsp" alt="\[ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) ds, \]" src="form_4.png"/>
+<p>h-functions are defined as one-dimensional integrals over a bivariate copula density <img class="formulaInl" alt="$ c $" src="form_1.png"/>, </p><p class="formulaDsp">
+<img class="formulaDsp" alt="\[ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) ds, \]" src="form_2.png"/>
 </p>
  <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds. \]" src="form_5.png"/>
+<img class="formulaDsp" alt="\[ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds. \]" src="form_3.png"/>
 </p>
 <p> <code>hinv1</code> is the inverse w.r.t. second argument (conditioned on first), <code>hinv2</code> is the inverse w.r.t. first argument (conditioned on second),</p>
 <p><code>hfunc1</code>, <code>hfunc2</code>, <code>hinv1</code>, and <code>hinv2</code> mainly take care that rotations are properly handled. They call <code>hfunc1_default</code>, <code>hfunc2_default</code>, <code>hinv1_default</code>, and hinv2_default which are family-specific implementations for <code>rotation = 0</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">u</td><td><img class="formulaInl" alt="$m \times 2$" src="form_2.png"/> matrix of evaluation points. </td></tr>
+    <tr><td class="paramname">u</td><td><img class="formulaInl" alt="$m \times 2$" src="form_0.png"/> matrix of evaluation points. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>The (inverse) h-function evaluated at <code>u</code>. </dd></dl>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.8-->
 <!-- start footer part -->
@@ -129,7 +130,7 @@ VecXd&#160;</td><td class="memItemRight" valign="bottom"><b>Bicop::hinv2</b> (co
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 13 2017 18:24:11 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 22 2017 00:05:38 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

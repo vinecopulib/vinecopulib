@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['par0',['par0',['../structoptimization__tools_1_1_par_bicop_opt_data.html#ae975b618fc0f6b1c5c17b430b3fdc582',1,'optimization_tools::ParBicopOptData']]],
-  ['parbicop',['ParBicop',['../class_par_bicop.html',1,'']]],
-  ['parbicopoptdata',['ParBicopOptData',['../structoptimization__tools_1_1_par_bicop_opt_data.html',1,'optimization_tools']]]
+  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html',1,'vinecopulib']]],
+  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html#a657aaae02c7f9bca12b3c43f475ac884',1,'vinecopulib::RVineMatrix']]]
 ];

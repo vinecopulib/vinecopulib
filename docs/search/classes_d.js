@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['studentbicop',['StudentBicop',['../class_student_bicop.html',1,'']]]
+  ['vinecop',['Vinecop',['../classvinecopulib_1_1_vinecop.html',1,'vinecopulib']]]
 ];
