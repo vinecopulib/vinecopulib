@@ -5,8 +5,9 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "tools_stats.hpp"
-#include <exception>
-#include <algorithm>
+#include "tools_stl.hpp"
+#include "tools_c.h"
+#include <iostream>
 
 namespace tools_stats {
     
@@ -31,7 +32,7 @@ namespace tools_stats {
     {
         int n = x.size();
         std::vector<double> xvec(x.data(), x.data() + n);
-        auto order = get_order(xvec);
+        auto order = tools_stl::get_order(xvec);
         if (ties_method == "first") {
             for (auto i : order)
                 x[order[i]] = i + 1;
@@ -72,5 +73,60 @@ namespace tools_stats {
         }
 
         return x / (x.size() + 1.0);
+    }
+
+    double pairwise_ktau(Eigen::MatrixXd& u)
+    {
+        double tau;
+        int n = u.rows();
+        int two = 2;
+        ktau_matrix(u.data(), &two, &n, &tau);
+        return tau;
+    }
+
+    double pairwise_cor(const Eigen::MatrixXd& z)
+    {
+        double rho;
+        Eigen::MatrixXd x = z.rowwise() - z.colwise().mean();
+        Eigen::MatrixXd sigma = x.adjoint() * x;
+        rho = sigma(1,0) / sqrt(sigma(0,0) * sigma(1,1));
+
+        return rho;
+    }
+
+    double pairwise_hoeffd(Eigen::MatrixXd x)
+    {
+        int n = x.rows();
+
+        // Compute the ranks
+        auto R = to_pseudo_obs(x);
+        R = (n+1.0)*R;
+
+        // Compute Q, with Qi the number of points with both columns less than
+        // their ith value
+        Eigen::VectorXd Q(n);
+        Eigen::MatrixXd tmp = Eigen::MatrixXd::Ones(n, 2);
+        for(int i=0; i<n; i++) {
+            tmp.col(0) = Eigen::VectorXd::Constant(n,x(i,0));
+            tmp.col(1) = Eigen::VectorXd::Constant(n,x(i,1));
+            tmp = (x-tmp).unaryExpr([](double v){
+                double res = 0.0;
+                if(v < 0.0) {
+                    res = 1.0;
+                }
+                return res;
+            });
+            Q(i) = tmp.rowwise().prod().sum();
+        }
+
+        Eigen::MatrixXd ones = Eigen::MatrixXd::Ones(n, 2);
+        double A = (R-ones).cwiseProduct(R-2*ones).rowwise().prod().sum();
+        double B = (R-2*ones).rowwise().prod().cwiseProduct(Q).sum();
+        double C = Q.cwiseProduct(Q-ones.col(0)).sum();
+
+        double D = (A - 2*(n-2)*B + (n-2)*(n-3)*C);
+        D /= (n*(n-1)*(n-2)*(n-3)*(n-4));
+
+        return D;
     }
 }

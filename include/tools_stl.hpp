@@ -15,6 +15,19 @@ namespace tools_stl {
     
     using namespace std;
 
+    template<typename T>
+    std::vector<int> get_order(const std::vector<T>& x)
+    {
+        std::vector<int> order(x.size());
+        std::iota(order.begin(), order.end(), 0);
+        std::sort(
+                order.begin(),
+                order.end(),
+                [&] (int i, int j) -> bool {return (x[i] < x[j]);}
+        );
+        return order;
+    }
+
     template<typename T> bool is_member(T element, vector<T> set) 
     {
         return find(set.begin(), set.end(), element) != set.end(); 

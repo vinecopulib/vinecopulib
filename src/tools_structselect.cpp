@@ -68,7 +68,7 @@ namespace tools_structselect {
     //!     inverting the Kendall's tau and the remainders by profile likelihood
     //!     optimization.
     //! @param tree_criterion the criterion for selecting the maximum spanning
-    //!     tree (only "tau" implemented so far).
+    //!     tree ("tau", "hoeffd" and "rho" implemented so far).
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
     //! @param preselect_families  whether to exclude families before fitting based
@@ -141,7 +141,7 @@ namespace tools_structselect {
     //!
     //! @param vine_tree tree of a vine.
     //! @param tree_criterion the criterion for selecting the maximum spanning
-    //!     tree (only "tau" implemented so far).
+    //!     tree ("tau", "hoeffd" and "rho" implemented so far).
     void add_allowed_edges(VineTree& vine_tree, std::string tree_criterion)
     {
         for (auto v0 : boost::vertices(vine_tree)) {
@@ -163,6 +163,10 @@ namespace tools_structselect {
         double w;
         if (tree_criterion == "tau") {
             w = 1.0 - std::fabs(tools_stats::pairwise_ktau(data));
+        } else if (tree_criterion == "hoeffd") {
+            w = 1.0 - (30*tools_stats::pairwise_hoeffd(data)+0.5)/1.5;
+        } else if (tree_criterion == "rho") {
+            w = 1.0 - std::fabs(tools_stats::pairwise_cor(data);
         } else {
             throw std::runtime_error("tree criterion not implemented");
         }
