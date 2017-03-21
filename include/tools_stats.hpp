@@ -86,6 +86,22 @@ namespace tools_stats
 
         return rho;
     }
+    
+    template<typename T>
+    std::vector<int> get_order(const std::vector<T>& x)
+    {
+        std::vector<int> order(x.size());
+        std::iota(order.begin(), order.end(), 0);
+        std::sort(
+            order.begin(),
+            order.end(),
+            [&] (int i, int j) -> bool {return (x[i] < x[j]);}
+        );
+        return order;
+    }
+
+    Eigen::VectorXd to_pseudo_obs(Eigen::VectorXd x, std::string ties_method = "average");
+    Eigen::MatrixXd to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method = "average");
 }
 
 /* A GSL ALTERNATIVE
