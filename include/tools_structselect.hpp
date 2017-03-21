@@ -36,7 +36,7 @@ namespace tools_structselect {
         Eigen::MatrixXd pc_data;
         Eigen::VectorXd hfunc1;
         Eigen::VectorXd hfunc2;
-        double empirical_tau;
+        double weight;
         vinecopulib::BicopPtr pair_copula;
     };
     typedef boost::adjacency_list <
@@ -53,12 +53,14 @@ namespace tools_structselect {
     VineTree select_next_tree(
         VineTree& prev_tree,
         std::vector<vinecopulib::BicopFamily> family_set,
-        std::string selection_criterion,
         std::string method,
+        std::string tree_criterion,
+        std::string selection_criterion,
         bool preselect_families
     );
     VineTree edges_as_vertices(const VineTree& prev_tree);
-    void add_allowed_edges(VineTree& tree);
+    void add_allowed_edges(VineTree& tree, std::string tree_criterion);
+    double get_edge_weight(Eigen::MatrixXd& data, std::string tree_criterion);
     int find_common_neighbor(int v0, int v1, const VineTree& tree);
     Eigen::MatrixXd get_pc_data(int v0, int v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);

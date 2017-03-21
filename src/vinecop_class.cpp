@@ -123,6 +123,7 @@ namespace vinecopulib
             std::string method,
             int truncation_level,
             Eigen::MatrixXi matrix,
+            std::string tree_criterion,
             std::string selection_criterion,
             bool preselect_families,
             bool show_trace
@@ -142,6 +143,7 @@ namespace vinecopulib
                     trees[t - 1],
                     family_set,
                     method,
+                    tree_criterion,
                     selection_criterion,
                     preselect_families
             );
