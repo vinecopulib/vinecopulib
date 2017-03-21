@@ -2,7 +2,6 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 
 file(GLOB_RECURSE vinecopulib_sources src/*.cpp src/*.cc src/*c)
-#file(GLOB_RECURSE vinecopulib_headers include/*.h include/*.hpp)
 file(GLOB_RECURSE vinecopulib_public_headers
         include/bicop_class.hpp
         include/bicop_family.hpp
@@ -26,7 +25,9 @@ target_link_libraries(vinecopulib ${external_libs})
 
 set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
+if (WIN32)
+    set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
+endif()
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
