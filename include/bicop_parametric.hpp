@@ -12,13 +12,9 @@ namespace vinecopulib
 {
     class ParBicop : public Bicop
     {
-    public:
-        // fit copula parameters
-        void fit(const Eigen::MatrixXd& data, std::string method);
-
     private:
+        void fit(const Eigen::MatrixXd& data, std::string method);
         double calculate_npars();
-
         virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
     };
 }

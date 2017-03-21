@@ -14,6 +14,7 @@ namespace vinecopulib
     {
     public:
         TrafokernelBicop();
+    private:
         void fit(const Eigen::MatrixXd& data, std::string);
     };
 }
