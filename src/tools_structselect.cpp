@@ -52,8 +52,8 @@ namespace tools_structselect {
     //!     1. Edges of the previous tree become edges in the new tree.
     //!     2. All edges allowed by the proximity condition are added to the new
     //!        graph.
-    //!     3. Collapse the new graph to a maximum spanning tree for edge weight
-    //!        |tau|.
+    //!     3. Collapse the new graph to a maximum spanning tree for edge 
+    //!        weight.
     //!     4. Populate edges with conditioning/conditioned sets and pseudo-
     //!        observations.
     //!     5. Fit and select a copula model for each edge.
@@ -61,12 +61,14 @@ namespace tools_structselect {
     //! @param prev_tree tree T_{k}.
     //! @param family_set the set of copula families to consider (if empty, then
     //!     all families are included; all families are included by default).
-    //! @param method indi::cates the estimation method: either maximum likelihood
+    //! @param method indicates the estimation method: either maximum likelihood
     //!     estimation (method = "mle", default) or inversion of Kendall's tau
     //!     (method = "itau"). When method = "itau" is used with families having
     //!     more thanone parameter, the main dependence parameter is found by
     //!     inverting the Kendall's tau and the remainders by profile likelihood
     //!     optimization.
+    //! @param tree_criterion the criterion for selecting the maximum spanning
+    //!     tree (only "tau" implemented so far).
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
     //! @param preselect_families  whether to exclude families before fitting based
@@ -76,13 +78,14 @@ namespace tools_structselect {
         VineTree& prev_tree,
         std::vector<vinecopulib::BicopFamily> family_set,
         std::string method,
+        std::string tree_criterion,
         std::string selection_criterion,
         bool preselect_families
     )
     {
         auto new_tree = edges_as_vertices(prev_tree);
         remove_edge_data(prev_tree); // no longer needed
-        add_allowed_edges(new_tree);
+        add_allowed_edges(new_tree, tree_criterion);
         if (boost::num_vertices(new_tree) > 2) {
             min_spanning_tree(new_tree);
         }
@@ -136,8 +139,10 @@ namespace tools_structselect {
     //! to 1-|tau| so that the minimum spanning tree algorithm maximizes sum of
     //! |tau|.
     //!
-    //! @param tree tree of a vine.
-    void add_allowed_edges(VineTree& vine_tree)
+    //! @param vine_tree tree of a vine.
+    //! @param tree_criterion the criterion for selecting the maximum spanning
+    //!     tree (only "tau" implemented so far).
+    void add_allowed_edges(VineTree& vine_tree, std::string tree_criterion)
     {
         for (auto v0 : boost::vertices(vine_tree)) {
             for (unsigned int v1 = 0; v1 < v0; ++v1) {
@@ -145,13 +150,24 @@ namespace tools_structselect {
                 // (-1 means 'no common neighbor')
                 if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                     auto pc_data = get_pc_data(v0, v1, vine_tree);
-                    auto tau = tools_stats::pairwise_ktau(pc_data);
-                    auto w = 1.0 - std::fabs(tau);
+                    auto w = get_edge_weight(pc_data, tree_criterion);
                     auto e = boost::add_edge(v0, v1, w, vine_tree).first;
-                    vine_tree[e].empirical_tau = tau;
+                    vine_tree[e].weight = w;
                 }
             }
         }
+    }
+    
+    double get_edge_weight(Eigen::MatrixXd& data, std::string tree_criterion) 
+    {
+        double w;
+        if (tree_criterion == "tau") {
+            w = 1.0 - std::fabs(tools_stats::pairwise_ktau(data));
+        } else {
+            throw std::runtime_error("tree criterion not implemented");
+        }
+        
+        return w;
     }
 
     // Find common neighbor in previous tree
@@ -367,8 +383,6 @@ namespace tools_structselect {
         return vinecopulib::Vinecop(pcs, new_mat);
     }
     
-    // TODO: actual printing of familie (only index for now)
-    #include <type_traits>
     //! Print indices, family, and parameters for each pair-copula
     //! @param tree a vine tree.
     void print_pair_copulas(VineTree& tree)
@@ -380,7 +394,6 @@ namespace tools_structselect {
                 "fam = " << tree[e].pair_copula->get_family_name() <<
                 ", rot = " << tree[e].pair_copula->get_rotation() <<
                 ", par = " <<  tree[e].pair_copula->get_parameters() <<
-                ", emp_tau = " << tree[e].empirical_tau <<
                 std::endl;
             std::cout << pc_info.str().c_str();
         }

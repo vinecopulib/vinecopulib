@@ -31,6 +31,7 @@ namespace vinecopulib
                 std::string method = "mle",
                 int truncation_level = std::numeric_limits<int>::max(),
                 Eigen::MatrixXi matrix = Eigen::MatrixXi(0, 0),
+                std::string tree_criterion = "tau",
                 std::string selection_criterion = "bic",
                 bool preselect_families = true,
                 bool show_trace = false
