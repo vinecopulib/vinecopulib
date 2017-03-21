@@ -10,7 +10,6 @@
 #include <random>
 
 #include "tools_eigen.hpp"
-#include "tools_c.h"
 
 namespace tools_stats
 {
@@ -68,40 +67,18 @@ namespace tools_stats
         return U.unaryExpr([&](double) { return distribution(generator); });
     }
 
-    inline double pairwise_ktau(Eigen::MatrixXd& u)
-    {
-        double tau;
-        int n = u.rows();
-        int two = 2;
-        ktau_matrix(u.data(), &two, &n, &tau);
-        return tau;
-    }
+    Eigen::VectorXd to_pseudo_obs(
+            Eigen::VectorXd x,
+            std::string ties_method = "average"
+    );
+    Eigen::MatrixXd to_pseudo_obs(
+            Eigen::MatrixXd x,
+            std::string ties_method = "average"
+    );
 
-    inline double pairwise_cor(const Eigen::MatrixXd& z)
-    {
-        double rho;
-        Eigen::MatrixXd x = z.rowwise() - z.colwise().mean();
-        Eigen::MatrixXd sigma = x.adjoint() * x;
-        rho = sigma(1,0) / sqrt(sigma(0,0) * sigma(1,1));
-
-        return rho;
-    }
-    
-    template<typename T>
-    std::vector<int> get_order(const std::vector<T>& x)
-    {
-        std::vector<int> order(x.size());
-        std::iota(order.begin(), order.end(), 0);
-        std::sort(
-            order.begin(),
-            order.end(),
-            [&] (int i, int j) -> bool {return (x[i] < x[j]);}
-        );
-        return order;
-    }
-
-    Eigen::VectorXd to_pseudo_obs(Eigen::VectorXd x, std::string ties_method = "average");
-    Eigen::MatrixXd to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method = "average");
+    double pairwise_hoeffd(Eigen::MatrixXd& x);
+    double pairwise_ktau(Eigen::MatrixXd& u);
+    double pairwise_cor(const Eigen::MatrixXd& z);
 }
 
 /* A GSL ALTERNATIVE
