@@ -2,7 +2,13 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 
 file(GLOB_RECURSE vinecopulib_sources src/*.cpp src/*.cc src/*c)
-file(GLOB_RECURSE vinecopulib_headers include/*.h include/*.hpp)
+#file(GLOB_RECURSE vinecopulib_headers include/*.h include/*.hpp)
+file(GLOB_RECURSE vinecopulib_public_headers
+        include/bicop_class.hpp
+        include/bicop_family.hpp
+        include/rvine_matrix.hpp
+        include/tools_eigen.hpp
+        include/vinecop_class.hpp)
 
 include_directories(${external_includes} include)
 
@@ -12,8 +18,9 @@ else()
     add_library(vinecopulib STATIC ${vinecopulib_sources})
 endif()
 
-include(GenerateExportHeader)
-generate_export_header(vinecopulib)
+# TODO: Properly use VINECOPULIB_EXPORT to reduce the number of exports
+#include(GenerateExportHeader)
+#generate_export_header(vinecopulib)
 
 target_link_libraries(vinecopulib ${external_libs})
 
@@ -77,8 +84,6 @@ if (NOT WIN32)
 
     # Targets:
     #   * <prefix>/lib/libvinecopulib.dylib
-    #   * header location after install: <prefix>/include/vinecopulib/*.hpp
-    #   * headers can be included by C++ code `#include <vinecopulib/*.hpp>`
     install(
             TARGETS vinecopulib
             EXPORT "${targets_export_name}"
@@ -90,17 +95,18 @@ if (NOT WIN32)
     # Headers:
     #   * include/vinecopulib/*.hpp -> <prefix>/include/vinecopulib/*.hpp
     install(
-            FILES ${vinecopulib_headers}
+            FILES ${vinecopulib_public_headers}
             DESTINATION "${include_install_dir}/vinecopulib"
     )
 
+    # TODO: Properly use VINECOPULIB_EXPORT to reduce the number of exports
     # Export headers:
     #   * ${CMAKE_CURRENT_BINARY_DIR}/include_export.h -> <prefix>/include/include_export.h
-    install(
-            FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/vinecopulib_export.h"
-            DESTINATION "${include_install_dir}/vinecopulib"
-    )
+    #install(
+    #        FILES
+    #        "${CMAKE_CURRENT_BINARY_DIR}/vinecopulib_export.h"
+    #        DESTINATION "${include_install_dir}/vinecopulib"
+    #)
 
     # Config
     #   * <prefix>/lib/cmake/vinecopulib/vinecopulibConfig.cmake
