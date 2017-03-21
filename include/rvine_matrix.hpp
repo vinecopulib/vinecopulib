@@ -21,14 +21,14 @@ namespace vinecopulib
 
         //! Getters
         //! @{
-        Eigen::MatrixXi get_matrix();
+        Eigen::MatrixXi get_matrix() const;
         //! @}
 
-        Eigen::VectorXi get_order();
-        Eigen::MatrixXi in_natural_order();
-        Eigen::MatrixXi get_max_matrix();
-        MatrixXb get_needed_hfunc1();
-        MatrixXb get_needed_hfunc2();
+        Eigen::VectorXi get_order() const;
+        Eigen::MatrixXi in_natural_order() const;
+        Eigen::MatrixXi get_max_matrix() const;
+        MatrixXb get_needed_hfunc1() const;
+        MatrixXb get_needed_hfunc2() const;
 
         static Eigen::MatrixXi construct_d_vine_matrix(const Eigen::VectorXi& order);
 

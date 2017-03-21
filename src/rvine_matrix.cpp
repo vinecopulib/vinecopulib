@@ -16,12 +16,12 @@ namespace vinecopulib
         matrix_ = matrix;
     }
 
-    Eigen::MatrixXi RVineMatrix::get_matrix()
+    Eigen::MatrixXi RVineMatrix::get_matrix() const
     {
         return matrix_;
     }
 
-    Eigen::VectorXi RVineMatrix::get_order()
+    Eigen::VectorXi RVineMatrix::get_order() const
     {
         return matrix_.colwise().reverse().diagonal().reverse();
     }
@@ -61,7 +61,7 @@ namespace vinecopulib
     //! @parameter matrix initial R-vine matrix.
     //!
     //! @return An Eigen::MatrixXi containing the matrix in natural order.
-    Eigen::MatrixXi RVineMatrix::in_natural_order()
+    Eigen::MatrixXi RVineMatrix::in_natural_order() const
     {
         // create vector of new variable labels: d, ..., 1
         std::vector<int> ivec = tools_stl::seq_int(1, d_);
@@ -81,7 +81,7 @@ namespace vinecopulib
     //! @parameter no_matrix initial R-vine matrix, assumed to be in natural order.
     //!
     //! @return An Eigen::MatrixXi containing the maximum matrix
-    Eigen::MatrixXi RVineMatrix::get_max_matrix()
+    Eigen::MatrixXi RVineMatrix::get_max_matrix() const
     {
         Eigen::MatrixXi max_matrix = this->in_natural_order();
         for (int i = 0; i < d_ - 1; ++i) {
@@ -102,7 +102,7 @@ namespace vinecopulib
     //! whether hfunc1/2 is needed for a given pair copula.
     //!
     //! @{
-    MatrixXb RVineMatrix::get_needed_hfunc1()
+    MatrixXb RVineMatrix::get_needed_hfunc1() const
     {
         MatrixXb needed_hfunc1 = MatrixXb::Constant(d_, d_, false);
 
@@ -118,7 +118,7 @@ namespace vinecopulib
         return needed_hfunc1;
     }
 
-    MatrixXb RVineMatrix::get_needed_hfunc2()
+    MatrixXb RVineMatrix::get_needed_hfunc2() const
     {
         MatrixXb needed_hfunc2 = MatrixXb::Constant(d_, d_, false);
         needed_hfunc2.block(0, 0, d_ - 1, 1) = MatrixXb::Constant(d_ - 1, 1, true);

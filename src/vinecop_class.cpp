@@ -168,7 +168,7 @@ namespace vinecopulib
     //!
     //! @return A \code std::shared_ptr (alias \code BicopPtr) to a \code Bicop
     //!     object.
-    BicopPtr Vinecop::get_pair_copula(int tree, int edge)
+    BicopPtr Vinecop::get_pair_copula(int tree, int edge) const
     {
         if (tree > d_ - 2) {
             std::stringstream message;
@@ -196,7 +196,7 @@ namespace vinecopulib
     //! @param edge edge index (starting with 0).
     //!
     //! @return An \code int containing the family index.
-    BicopFamily Vinecop::get_family(int tree, int edge)
+    BicopFamily Vinecop::get_family(int tree, int edge) const
     {
         return get_pair_copula(tree, edge)->get_family();
     }
@@ -205,7 +205,7 @@ namespace vinecopulib
     //!
     //! @return A nested vector containing in \c vec[t][e] the family for
     //!     edge e in tree t.
-    std::vector<std::vector<BicopFamily>> Vinecop::get_all_families()
+    std::vector<std::vector<BicopFamily>> Vinecop::get_all_families() const
     {
         std::vector<std::vector<BicopFamily>> families(d_ - 1);
         for (int t = 0; t < d_ - 1; ++t)
@@ -225,7 +225,7 @@ namespace vinecopulib
     //! @param edge edge index (starting with 0).
     //!
     //! @return An \code int containing the rotation.
-    int Vinecop::get_rotation(int tree, int edge)
+    int Vinecop::get_rotation(int tree, int edge) const
     {
         return get_pair_copula(tree, edge)->get_rotation();
     }
@@ -234,7 +234,7 @@ namespace vinecopulib
     //!
     //! @return A nested vector containing in \c vec[t][e] the rotation for
     //!     edge e in tree t.
-    std::vector<std::vector<int>> Vinecop::get_all_rotations()
+    std::vector<std::vector<int>> Vinecop::get_all_rotations() const
     {
         std::vector<std::vector<int>> rotations(d_ - 1);
         for (int t = 0; t < d_ - 1; ++t)
@@ -254,7 +254,7 @@ namespace vinecopulib
     //! @param edge edge index (starting with 0).
     //!
     //! @return An \code Eigen::VectorXd containing the parameters.
-    Eigen::VectorXd Vinecop::get_parameters(int tree, int edge)
+    Eigen::VectorXd Vinecop::get_parameters(int tree, int edge) const
     {
         return get_pair_copula(tree, edge)->get_parameters();
     }
@@ -263,7 +263,7 @@ namespace vinecopulib
     //!
     //! @return A nested vector containing in \c vec[t][e] the parameters for
     //!     edge e in tree t.
-    std::vector<std::vector<Eigen::VectorXd>> Vinecop::get_all_parameters()
+    std::vector<std::vector<Eigen::VectorXd>> Vinecop::get_all_parameters() const
     {
         std::vector<std::vector<Eigen::VectorXd>> parameters(d_ - 1);
         for (int t = 0; t < d_ - 1; ++t)
@@ -276,6 +276,14 @@ namespace vinecopulib
 
         return parameters;
     }
+    
+    //! Get structure matrix of a vine copula
+    //! 
+    //! @return Structure matrix.
+    Eigen::MatrixXi Vinecop::get_matrix() const
+    {
+        return vine_matrix_.get_matrix();
+    } 
     
     //! Probability density function of a vine copula
     //!

@@ -36,14 +36,14 @@ namespace vinecopulib
                 bool show_trace = false
         );
 
-        BicopPtr get_pair_copula(int tree, int edge);
-        BicopFamily get_family(int tree, int edge);
-        std::vector<std::vector<BicopFamily>> get_all_families();
-        int get_rotation(int tree, int edge);
-        std::vector<std::vector<int>> get_all_rotations();
-        Eigen::VectorXd get_parameters(int tree, int edge);
-        std::vector<std::vector<Eigen::VectorXd>> get_all_parameters();
-        Eigen::MatrixXi get_matrix() {return vine_matrix_.get_matrix();}
+        BicopPtr get_pair_copula(int tree, int edge) const;
+        BicopFamily get_family(int tree, int edge) const;
+        std::vector<std::vector<BicopFamily>> get_all_families() const;
+        int get_rotation(int tree, int edge) const;
+        std::vector<std::vector<int>> get_all_rotations() const;
+        Eigen::VectorXd get_parameters(int tree, int edge) const;
+        std::vector<std::vector<Eigen::VectorXd>> get_all_parameters() const;
+        Eigen::MatrixXi get_matrix() const;
 
         Eigen::VectorXd pdf(const Eigen::MatrixXd& u);
         Eigen::MatrixXd simulate(int n);
