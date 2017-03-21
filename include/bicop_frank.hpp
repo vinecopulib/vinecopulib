@@ -24,7 +24,7 @@ namespace vinecopulib
         double generator_derivative2(const double& u);
 
         // link between Kendall's tau and the par_bicop parameter
-        Eigen::VectorXd tau_to_parameters_default(const double& tau);
+        Eigen::MatrixXd tau_to_parameters_default(const double& tau);
         double parameters_to_tau(const Eigen::VectorXd& par);
 
         Eigen::VectorXd get_start_parameters(const double tau);

@@ -14,11 +14,11 @@ namespace vinecopulib
     {
     private:
         // pdf, hfunctions and inverses
-        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
-        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
-        Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u);
-        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
-        Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd pdf_default(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+        Eigen::VectorXd hfunc1_default(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+        Eigen::VectorXd hfunc2_default(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+        Eigen::VectorXd hinv1_default(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+        Eigen::VectorXd hinv2_default(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
 
         // generator, its inverse and derivatives
         virtual double generator(const double& u) = 0;
@@ -32,4 +32,3 @@ namespace vinecopulib
         double flip_tau(double tau);
     };
 }
-

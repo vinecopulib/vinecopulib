@@ -18,15 +18,21 @@ namespace vinecopulib
 
     private:
         // PDF
-        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd pdf_default(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
 
         // hfunction
-        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hfunc1_default(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
 
         // inverse hfunction
-        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u);
+        Eigen::VectorXd hinv1_default(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
 
-        Eigen::VectorXd tau_to_parameters_default(const double& tau);
+        Eigen::MatrixXd tau_to_parameters_default(const double& tau);
 
         Eigen::VectorXd get_start_parameters(const double tau);
     };

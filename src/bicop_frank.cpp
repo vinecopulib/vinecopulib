@@ -13,10 +13,12 @@ namespace vinecopulib
     {
         family_ = BicopFamily::frank;
         rotation_ = 0;
-        parameters_ = Eigen::VectorXd::Zero(1);
-        parameters_bounds_ = Eigen::MatrixXd::Zero(1, 2);
-        parameters_bounds_(0, 0) = -200.0;
-        parameters_bounds_(0, 1) = 200.0;
+        parameters_ = Eigen::VectorXd(1);
+        parameters_lower_bounds_ = Eigen::VectorXd(1);
+        parameters_upper_bounds_ = Eigen::VectorXd(1);
+        parameters_ << 0;
+        parameters_lower_bounds_ << -200;
+        parameters_upper_bounds_ << 200;
     }
 
     double FrankBicop::generator(const double& u)
@@ -42,7 +44,7 @@ namespace vinecopulib
         return std::pow(theta,2)/std::pow(std::exp(theta*u/2) - std::exp(-theta*u/2), 2);
     }
 
-    Eigen::VectorXd FrankBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd FrankBicop::tau_to_parameters_default(const double& tau)
     {
         Eigen::VectorXd tau2 = Eigen::VectorXd::Constant(1, std::fabs(tau));
         auto f = [&](const Eigen::VectorXd &v) {

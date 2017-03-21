@@ -158,7 +158,10 @@ namespace tools_structselect {
         }
     }
     
-    double get_edge_weight(Eigen::MatrixXd& data, std::string tree_criterion) 
+    double get_edge_weight(
+        Eigen::Matrix<double, Eigen::Dynamic, 2> 
+        data, std::string tree_criterion
+    ) 
     {
         double w;
         if (tree_criterion == "tau") {
@@ -268,7 +271,7 @@ namespace tools_structselect {
         for (auto e : boost::edges(tree)) {
             tree[e].hfunc1 = Eigen::VectorXd();
             tree[e].hfunc2 = Eigen::VectorXd();
-            tree[e].pc_data = Eigen::MatrixXd(0, 0);
+            tree[e].pc_data = Eigen::Matrix<double, Eigen::Dynamic, 2>(0, 2);
         }
     }
 

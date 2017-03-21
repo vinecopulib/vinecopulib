@@ -9,7 +9,9 @@
 
 namespace vinecopulib
 {
-    Eigen::VectorXd ArchimedeanBicop::pdf_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd ArchimedeanBicop::pdf_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         auto f = [this](const double& u, const double& v) {
             double temp = generator_inv(generator(u) + generator(v));
@@ -19,7 +21,9 @@ namespace vinecopulib
         return u.col(0).binaryExpr(u.col(1), f);
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hfunc1_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd ArchimedeanBicop::hfunc1_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         auto f = [this](const double& u, const double& v) {
             double temp = generator_inv(generator(u) + generator(v));
@@ -28,18 +32,24 @@ namespace vinecopulib
         return u.col(0).binaryExpr(u.col(1), f);
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hfunc2_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd ArchimedeanBicop::hfunc2_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         return hfunc1_default(swap_cols(u));
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hinv1_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd ArchimedeanBicop::hinv1_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         Eigen::VectorXd hinv = hinv1_num(u);
         return hinv;
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hinv2_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd ArchimedeanBicop::hinv2_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         return hinv1_default(swap_cols(u));
     }
@@ -55,8 +65,8 @@ namespace vinecopulib
 
     Eigen::VectorXd ArchimedeanBicop::get_start_parameters(const double)
     {
-        Eigen::MatrixXd bounds = this->get_parameters_bounds();
-        Eigen::VectorXd parameters = bounds.col(0) + Eigen::VectorXd::Constant(2, 0.1);
+        Eigen::MatrixXd lb = this->get_parameters_lower_bounds();
+        Eigen::VectorXd parameters = lb + Eigen::VectorXd::Constant(2, 0.1);
         return parameters;
     }
 

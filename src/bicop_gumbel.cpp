@@ -13,9 +13,12 @@ namespace vinecopulib
     {
         family_ = BicopFamily::gumbel;
         rotation_ = 0;
-        parameters_ = Eigen::VectorXd::Ones(1);
-        parameters_bounds_ = Eigen::MatrixXd::Ones(1, 2);
-        parameters_bounds_(0, 1) = 200.0;
+        parameters_ = Eigen::VectorXd(1);
+        parameters_lower_bounds_ = Eigen::VectorXd(1);
+        parameters_upper_bounds_ = Eigen::VectorXd(1);
+        parameters_ << 1;
+        parameters_lower_bounds_ << 1;
+        parameters_upper_bounds_ << 200;
     }
 
     double GumbelBicop::generator(const double& u)
@@ -39,7 +42,9 @@ namespace vinecopulib
         return (theta-1-std::log(u))*std::pow(std::log(1/u), theta-2)*(theta/std::pow(u,2));
     }
 
-    Eigen::VectorXd GumbelBicop::hinv1_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd GumbelBicop::hinv1_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         double theta = double(this->parameters_(0));
         double u1, u2;
@@ -53,7 +58,7 @@ namespace vinecopulib
         return hinv;
     }
 
-    Eigen::VectorXd GumbelBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd GumbelBicop::tau_to_parameters_default(const double& tau)
     {
         return Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
     }

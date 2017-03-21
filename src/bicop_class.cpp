@@ -102,7 +102,7 @@ namespace vinecopulib
     //!     the Kendall's tau and the remainders by a profile likelihood 
     //!     optimization.
     //! @return A pointer to an object that inherits from \c Bicop.
-    BicopPtr Bicop::select(Eigen::MatrixXd& data,
+    BicopPtr Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
                            std::vector<BicopFamily> family_set,
                            std::string method,
                            std::string selection_criterion,
@@ -207,7 +207,7 @@ namespace vinecopulib
     //!
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     //! @return The copula density evaluated at \c u.
-    Eigen::VectorXd Bicop::pdf(const Eigen::MatrixXd& u)
+    Eigen::VectorXd Bicop::pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         Eigen::VectorXd f = pdf_default(cut_and_rotate(u));
         f = f.unaryExpr([](const double x){ return std::min(x,1e16);});
@@ -231,7 +231,7 @@ namespace vinecopulib
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     //! @return The (inverse) h-function evaluated at \c u.
     //! @{
-    Eigen::VectorXd Bicop::hfunc1(const Eigen::MatrixXd& u)
+    Eigen::VectorXd Bicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         switch (rotation_) {
             case 0:
@@ -253,7 +253,7 @@ namespace vinecopulib
         }
     }
 
-    Eigen::VectorXd Bicop::hfunc2(const Eigen::MatrixXd& u)
+    Eigen::VectorXd Bicop::hfunc2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         switch (rotation_) {
             case 0:
@@ -275,7 +275,7 @@ namespace vinecopulib
         }
     }
 
-    Eigen::VectorXd Bicop::hinv1(const Eigen::MatrixXd& u)
+    Eigen::VectorXd Bicop::hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         switch (rotation_) {
             case 0:
@@ -297,7 +297,7 @@ namespace vinecopulib
         }
     }
 
-    Eigen::VectorXd Bicop::hinv2(const Eigen::MatrixXd& u)
+    Eigen::VectorXd Bicop::hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         switch (rotation_) {
             case 0:
@@ -325,9 +325,10 @@ namespace vinecopulib
     //!
     //! @param n number of observations.
     //! @return Samples from the copula model.
-    Eigen::MatrixXd Bicop::simulate(const int& n)
+    Eigen::Matrix<double, Eigen::Dynamic, 2> Bicop::simulate(const int& n)
     {
-        Eigen::MatrixXd U = tools_stats::simulate_uniform(n, 2);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> U =
+            tools_stats::simulate_uniform(n, 2);
         // use inverse Rosenblatt transform to generate a sample from the copula
         U.col(1) = hinv1(U);
         return U;
@@ -337,25 +338,25 @@ namespace vinecopulib
     //!
     //! @param u \f$m \times 2\f$ matrix of observations.
     //! @{
-    double Bicop::loglik(const Eigen::MatrixXd& u)
+    double Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         Eigen::VectorXd ll = this->pdf(u);
         ll = ll.array().log();
         return ll.sum();
     }
 
-    double Bicop::aic(const Eigen::MatrixXd& u)
+    double Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         return -2 * this->loglik(u) + 2 * calculate_npars();
     }
 
-    double Bicop::bic(const Eigen::MatrixXd& u)
+    double Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         return -2 * this->loglik(u) + this->calculate_npars() * log(u.rows());
     }
     //! @}
 
-    Eigen::VectorXd Bicop::tau_to_parameters(const double& tau)
+    Eigen::MatrixXd Bicop::tau_to_parameters(const double& tau)
     {
         return tau_to_parameters_default(tau);
     }
@@ -367,18 +368,42 @@ namespace vinecopulib
 
     //! Getters and setters.
     //! @{
-    BicopFamily Bicop::get_family() const {return family_;}
-    std::string Bicop::get_family_name() const {return vinecopulib::get_family_name(family_);};
-    int Bicop::get_rotation() const {return rotation_;}
-    Eigen::VectorXd Bicop::get_parameters() const {return parameters_;}
-    Eigen::MatrixXd Bicop::get_parameters_bounds() const {return parameters_bounds_;}
+    BicopFamily Bicop::get_family() const 
+    {
+        return family_;
+    }
+    
+    std::string Bicop::get_family_name() const 
+    {
+        return vinecopulib::get_family_name(family_);
+    };
+    
+    int Bicop::get_rotation() const
+    {
+        return rotation_;
+    }
+    
+    Eigen::MatrixXd Bicop::get_parameters() const 
+    {
+        return parameters_;
+    }
+    
+    Eigen::MatrixXd Bicop::get_parameters_lower_bounds() const 
+    {
+        return parameters_lower_bounds_;
+    }
+    
+    Eigen::MatrixXd Bicop::get_parameters_upper_bounds() const 
+    {
+        return parameters_upper_bounds_;
+    }
 
     void Bicop::set_rotation(const int& rotation) {
         check_rotation(rotation);
         rotation_ = rotation;
     }
 
-    void Bicop::set_parameters(const Eigen::VectorXd& parameters)
+    void Bicop::set_parameters(const Eigen::MatrixXd& parameters)
     {
         check_parameters(parameters);
         parameters_ = parameters;
@@ -393,9 +418,9 @@ namespace vinecopulib
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     //! @return The numerical inverse of h-functions.
     //! @{
-    Eigen::VectorXd Bicop::hinv1_num(const Eigen::MatrixXd &u)
+    Eigen::VectorXd Bicop::hinv1_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
     {
-        Eigen::MatrixXd u_new = u;
+        Eigen::Matrix<double, Eigen::Dynamic, 2> u_new = u;
         auto h1 = [&](const Eigen::VectorXd &v) {
             u_new.col(1) = v;
             return hfunc1_default(u_new);
@@ -403,9 +428,9 @@ namespace vinecopulib
         return invert_f(u.col(1), h1);
     }
 
-    Eigen::VectorXd Bicop::hinv2_num(const Eigen::MatrixXd &u)
+    Eigen::VectorXd Bicop::hinv2_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
     {
-        Eigen::MatrixXd u_new = u;
+        Eigen::Matrix<double, Eigen::Dynamic, 2> u_new = u;
         auto h1 = [&](const Eigen::VectorXd &x) {
             u_new.col(0) = x;
             return hfunc2_default(u_new);
@@ -420,9 +445,11 @@ namespace vinecopulib
     //! @param u \f$m \times 2\f$ matrix of data.
     //! @return The manipulated data.
     //! @{
-    Eigen::MatrixXd Bicop::cut_and_rotate(const Eigen::MatrixXd& u)
+    Eigen::Matrix<double, Eigen::Dynamic, 2> Bicop::cut_and_rotate(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
-        Eigen::MatrixXd u_new(u.rows(), 2);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> u_new(u.rows(), 2);
 
         // counter-clockwise rotations
         switch (rotation_) {
@@ -447,7 +474,8 @@ namespace vinecopulib
         }
 
         // truncate to interval [eps, 1 - eps]
-        Eigen::MatrixXd eps = Eigen::MatrixXd::Constant(u.rows(), 2, 1-10);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> eps = 
+            Eigen::Matrix<double, Eigen::Dynamic, 2>::Constant(u.rows(), 2, 1-10);
         u_new = u_new.array().min(1.0 - eps.array());
         u_new = u_new.array().max(eps.array());
 
@@ -455,45 +483,78 @@ namespace vinecopulib
     }
 
 
-    Eigen::MatrixXd Bicop::swap_cols(const Eigen::MatrixXd& u)
+    Eigen::Matrix<double, Eigen::Dynamic, 2> Bicop::swap_cols(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
-        Eigen::MatrixXd u_swapped = u;
+        Eigen::Matrix<double, Eigen::Dynamic, 2> u_swapped = u;
         u_swapped.col(0).swap(u_swapped.col(1));
         return u_swapped;
     }
     //! @}
 
+    
     //! Sanity checks
     //! @{
-    void Bicop::check_parameters(const Eigen::VectorXd& parameters)
+    void Bicop::check_parameters(const Eigen::MatrixXd& parameters)
     {
-        int num_pars = parameters_bounds_.rows();
-        if (parameters.size() != num_pars) {
-            std::stringstream message;
-            message <<
-                "Wrong size of parameters for " << 
-                get_family_name() << " copula; " << 
-                "expected: " << num_pars << ", " <<
-                "actual: " << parameters.size() << std::endl;
-           throw std::runtime_error(message.str().c_str());
+        check_parameters_size(parameters);
+        check_parameters_lower(parameters);
+        check_parameters_upper(parameters);
+    }
+    
+    
+    void Bicop::check_parameters_size(const Eigen::MatrixXd& parameters)
+    {
+        if (parameters.size() != parameters_.size()) {
+            if (parameters.rows() != parameters_.rows()) {
+                std::stringstream message;
+                message <<
+                    "parameters have has wrong number of rows " << 
+                    "for " << get_family_name() << " copula; " << 
+                    "expected: " << parameters_.rows() << ", " <<
+                    "actual: " << parameters.rows() << std::endl;
+                throw std::runtime_error(message.str().c_str());
+            }
+            if (parameters.cols() != parameters_.cols()) {
+                std::stringstream message;
+                message <<
+                    "parameters have wrong number of columns " << 
+                    "for " << get_family_name() << " copula; " << 
+                    "expected: " << parameters_.cols() << ", " <<
+                    "actual: " << parameters.cols() << std::endl;
+                throw std::runtime_error(message.str().c_str());
+            }
         }
-        if (num_pars > 0) {
+    }
+    
+    
+    void Bicop::check_parameters_lower(const Eigen::MatrixXd& parameters)
+    {
+        if (parameters_lower_bounds_.size() > 0) {
             std::stringstream message;
-            for (int i = 0; i < num_pars; ++i) {
-                if (parameters(i) < parameters_bounds_(i, 0)) {
-                    message <<
-                        "parameters[" << i << "]" <<
-                        " must be larger than " << parameters_bounds_(i, 0) <<
-                        " for " << get_family_name() << " copula" << std::endl;
-                    throw std::runtime_error(message.str().c_str());
-                }
-                if (parameters(i) > parameters_bounds_(i, 1)) {
-                    message <<
-                        "parameters[" << i << "]" <<
-                        " must be smaller than " << parameters_bounds_(i, 1) <<
-                        " for " << get_family_name() << " copula" << std::endl;
-                    throw std::runtime_error(message.str().c_str());
-                }
+            if ((parameters.array() < parameters_lower_bounds_.array()).any()) {
+                message <<
+                    "parameters exceed lower bound " << 
+                    " for " << get_family_name() << " copula; \n" << 
+                    "bound: \n" << parameters_lower_bounds_ << "\n" <<
+                    "actual: " << parameters << "\n";
+                throw std::runtime_error(message.str().c_str());  
+            }
+        }
+    }
+    
+    void Bicop::check_parameters_upper(const Eigen::MatrixXd& parameters)
+    {
+        if (parameters_upper_bounds_.size() > 0) {
+            std::stringstream message;
+            if ((parameters.array() > parameters_upper_bounds_.array()).any()) {
+                message <<
+                    "parameters exceed upper bound " << 
+                    " for " << get_family_name() << " copula; \n" << 
+                    "bound: \n" << parameters_upper_bounds_ << "\n" <<
+                    "actual: " << parameters << "\n";
+                throw std::runtime_error(message.str().c_str());  
             }
         }
     }

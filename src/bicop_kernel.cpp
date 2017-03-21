@@ -10,34 +10,45 @@
 namespace vinecopulib
 {
     KernelBicop::KernelBicop()
-    {
-        // construct default grid (equally spaced on Gaussian scale)
-        int m = 30;
-        Eigen::VectorXd grid_points(m);
-        for (int i = 0; i < m; ++i)
-            grid_points(i) = - 3.25 + i * (6.25 / (double) m);
-        grid_points = tools_stats::pnorm(grid_points);
+     {
+         // construct default grid (equally spaced on Gaussian scale)
+         int m = 30;
+         Eigen::VectorXd grid_points(m);
+         for (int i = 0; i < m; ++i)
+             grid_points(i) = - 3.25 + i * (6.25 / (double) m);
+         interp_grid_ = InterpolationGrid(
+             tools_stats::pnorm(grid_points), 
+             Eigen::MatrixXd::Constant(30, 30, 1.0)  // independence
+         );
+     }
 
-        interp_grid_ = InterpolationGrid(grid_points, Eigen::MatrixXd::Constant(30, 30, 1.0));
-    }
-
-    Eigen::VectorXd KernelBicop::pdf_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd KernelBicop::pdf_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         return interp_grid_.interpolate(u);
     }
-    Eigen::VectorXd KernelBicop::hfunc1_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd KernelBicop::hfunc1_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         return interp_grid_.intergrate_1d(u, 1);
     }
-    Eigen::VectorXd KernelBicop::hfunc2_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd KernelBicop::hfunc2_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         return interp_grid_.intergrate_1d(u, 2);
     }
-    Eigen::VectorXd KernelBicop::hinv1_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd KernelBicop::hinv1_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         return hinv1_num(u);
     }
-    Eigen::VectorXd KernelBicop::hinv2_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd KernelBicop::hinv2_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         return hinv2_num(u);
     }
@@ -60,7 +71,7 @@ namespace vinecopulib
         interp_grid_.flip();
     }
 
-    Eigen::VectorXd KernelBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd KernelBicop::tau_to_parameters_default(const double& tau)
     {
         return vinecopulib::no_tau_to_parameters(tau);
     }

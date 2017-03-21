@@ -11,7 +11,10 @@
 #include "tools_eigen.hpp"
 #include "bicop_family.hpp"
 
-std::vector<double> get_c1c2(const Eigen::MatrixXd& data, double tau);
+std::vector<double> get_c1c2(
+    const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+    double tau
+ );
 bool preselect_family(
     std::vector<double> c, 
     double tau, 

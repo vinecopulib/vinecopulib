@@ -22,12 +22,12 @@ namespace tools_stats {
     Eigen::MatrixXd to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method)
     {
         for (unsigned int j = 0; j < x.cols(); ++j)
-            x.col(j) = to_pseudo_obs((Eigen::VectorXd) x.col(j), ties_method);
+            x.col(j) = to_pseudo_obs_1d((Eigen::VectorXd) x.col(j), ties_method);
 
         return x;
     }
 
-    Eigen::VectorXd to_pseudo_obs(Eigen::VectorXd x, std::string ties_method)
+    Eigen::VectorXd to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
     {
         int n = x.size();
         std::vector<double> xvec(x.data(), x.data() + n);
@@ -74,7 +74,7 @@ namespace tools_stats {
         return x / (x.size() + 1.0);
     }
 
-    double pairwise_ktau(Eigen::MatrixXd& u)
+    double pairwise_ktau(Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         double tau;
         int n = u.rows();
@@ -83,17 +83,17 @@ namespace tools_stats {
         return tau;
     }
 
-    double pairwise_cor(const Eigen::MatrixXd& z)
+    double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z)
     {
         double rho;
-        Eigen::MatrixXd x = z.rowwise() - z.colwise().mean();
+        auto x = z.rowwise() - z.colwise().mean();
         Eigen::MatrixXd sigma = x.adjoint() * x;
         rho = sigma(1,0) / sqrt(sigma(0,0) * sigma(1,1));
 
         return rho;
     }
 
-    double pairwise_hoeffd(Eigen::MatrixXd& x)
+    double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
     {
         int n = x.rows();
 
@@ -104,7 +104,7 @@ namespace tools_stats {
         // Compute Q, with Qi the number of points with both columns less than
         // their ith value
         Eigen::VectorXd Q(n);
-        Eigen::MatrixXd tmp = Eigen::MatrixXd::Ones(n, 2);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = Eigen::MatrixXd::Ones(n, 2);
         for(int i=0; i<n; i++) {
             tmp.col(0) = Eigen::VectorXd::Constant(n,x(i,0));
             tmp.col(1) = Eigen::VectorXd::Constant(n,x(i,1));
@@ -118,7 +118,7 @@ namespace tools_stats {
             Q(i) = tmp.rowwise().prod().sum();
         }
 
-        Eigen::MatrixXd ones = Eigen::MatrixXd::Ones(n, 2);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> ones = Eigen::MatrixXd::Ones(n, 2);
         double A = (R-ones).cwiseProduct(R-2*ones).rowwise().prod().sum();
         double B = (R-2*ones).rowwise().prod().cwiseProduct(Q).sum();
         double C = Q.cwiseProduct(Q-ones.col(0)).sum();

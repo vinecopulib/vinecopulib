@@ -16,12 +16,17 @@ namespace vinecopulib
         rotation_ = 0;
     }
 
-    Eigen::VectorXd gaussian_kernel_2d(const Eigen::MatrixXd& x)
+    Eigen::VectorXd gaussian_kernel_2d(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& x
+    )
     {
         return tools_stats::dnorm(x).rowwise().prod();
     }
 
-    void TrafokernelBicop::fit(const Eigen::MatrixXd& data, std::string)
+    void TrafokernelBicop::fit(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, 
+        std::string
+    )
     {
         // construct default grid (equally spaced on Gaussian scale)
         int m = 30;
@@ -32,7 +37,7 @@ namespace vinecopulib
 
         // expand the interpolation grid; a matrix with two columns where each row
         // contains one combination of the grid points
-        Eigen::MatrixXd grid_2d(m * m, 2);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> grid_2d(m * m, 2);
         int k = 0;
         for (int i = 0; i < m; ++i) {
             for (int j = 0; j < m; ++j) {
@@ -43,21 +48,22 @@ namespace vinecopulib
         }
 
         // transform evaluation grid and data by inverse Gaussian cdf
-        Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
-        Eigen::MatrixXd z_data = tools_stats::qnorm(data);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> z = tools_stats::qnorm(grid_2d);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> z_data = tools_stats::qnorm(data);
 
         // apply normal density to z (used later for normalization)
-        Eigen::MatrixXd phi = tools_stats::dnorm(z);
-        Eigen::MatrixXd phi_data = tools_stats::dnorm(z_data);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> phi = tools_stats::dnorm(z);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> phi_data = tools_stats::dnorm(z_data);
 
         // find bandwitools_stats::dth matrix
         int n = data.rows();
-        Eigen::MatrixXd centered = z_data.rowwise() - z_data.colwise().mean();
-        Eigen::MatrixXd cov = (centered.adjoint() * centered) / double(n - 1);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> centered =
+            z_data.rowwise() - z_data.colwise().mean();
+        Eigen::Matrix2d cov = (centered.adjoint() * centered) / double(n - 1);
 
-        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> takes_root(cov);
-        Eigen::MatrixXd cov_root = takes_root.operatorSqrt();
-        Eigen::MatrixXd B =  1.25 * std::pow(n, - 1.0 / 6.0) * cov_root.transpose();
+        Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> takes_root(cov);
+        Eigen::Matrix2d cov_root = takes_root.operatorSqrt();
+        Eigen::Matrix2d B =  1.25 * std::pow(n, - 1.0 / 6.0) * cov_root.transpose();
 
         // apply bandwitools_stats::dth matrix
         z = (B.inverse() * z.transpose()).transpose();

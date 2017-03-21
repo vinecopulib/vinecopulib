@@ -33,7 +33,7 @@ namespace tools_structselect {
         std::vector<int> conditioning;
         std::vector<int> conditioned;
         std::vector<int> all_indices;
-        Eigen::MatrixXd pc_data;
+        Eigen::Matrix<double, Eigen::Dynamic, 2> pc_data;
         Eigen::VectorXd hfunc1;
         Eigen::VectorXd hfunc2;
         double weight;
@@ -60,7 +60,10 @@ namespace tools_structselect {
     );
     VineTree edges_as_vertices(const VineTree& prev_tree);
     void add_allowed_edges(VineTree& tree, std::string tree_criterion);
-    double get_edge_weight(Eigen::MatrixXd& data, std::string tree_criterion);
+    double get_edge_weight(
+        Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+        std::string tree_criterion
+     );
     int find_common_neighbor(int v0, int v1, const VineTree& tree);
     Eigen::MatrixXd get_pc_data(int v0, int v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);

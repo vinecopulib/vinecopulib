@@ -6,7 +6,6 @@
 
 #include "vinecop_class.hpp"
 #include "tools_structselect.hpp"
-#include "bicop_indep.hpp"
 #include "tools_stl.hpp"
 #include "tools_stats.hpp"
 #include <vector>
@@ -35,7 +34,7 @@ namespace vinecopulib
         pair_copulas_ = make_pair_copula_store(d);
         for (auto& tree : pair_copulas_) {
             for (auto& pc : tree) {
-                pc = BicopPtr(new IndepBicop);
+                pc = Bicop::create(BicopFamily::indep);
             }
         }
     }

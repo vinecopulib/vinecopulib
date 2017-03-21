@@ -12,12 +12,16 @@
 
 namespace vinecopulib
 {
-    Eigen::VectorXd EllipticalBicop::hfunc2_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd EllipticalBicop::hfunc2_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         return hfunc1_default(swap_cols(u));
     }
 
-    Eigen::VectorXd EllipticalBicop::hinv2_default(const Eigen::MatrixXd& u)
+    Eigen::VectorXd EllipticalBicop::hinv2_default(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
     {
         return hinv1_default(swap_cols(u));
     }
