@@ -164,6 +164,7 @@ namespace tools_structselect {
         if (tree_criterion == "tau") {
             w = 1.0 - std::fabs(tools_stats::pairwise_ktau(data));
         } else if (tree_criterion == "hoeffd") {
+            // scale to [0,1]
             w = 1.0 - (30*tools_stats::pairwise_hoeffd(data)+0.5)/1.5;
         } else if (tree_criterion == "rho") {
             w = 1.0 - std::fabs(tools_stats::pairwise_cor(data));

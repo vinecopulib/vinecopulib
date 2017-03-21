@@ -7,7 +7,6 @@
 #include "tools_stats.hpp"
 #include "tools_stl.hpp"
 #include "tools_c.h"
-#include <iostream>
 
 namespace tools_stats {
     
@@ -94,7 +93,7 @@ namespace tools_stats {
         return rho;
     }
 
-    double pairwise_hoeffd(Eigen::MatrixXd x)
+    double pairwise_hoeffd(Eigen::MatrixXd& x)
     {
         int n = x.rows();
 
