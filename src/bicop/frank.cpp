@@ -70,30 +70,3 @@ namespace vinecopulib
         return tau_to_parameters_default(tau);
     }
 }
-/*// PDF
-double FrankBicop::pdf_default(const Eigen::MatrixXd& u)
-{
-    double theta = double(this->parameters_(0));
-    Eigen::MatrixXd t = u.unaryExpr([theta](const double v){ return std::exp(theta*v);});
-    Eigen::VectorXd t1 = t.rowwise().prod();
-    Eigen::VectorXd f = theta*(std::exp(theta)-1)*std::exp(theta)*t1;
-
-    t1 = t1 - std::exp(theta)*(t.rowwise().sum() - Eigen::VectorXd::Ones(u.rows()));
-    t1 = t1.array().square();
-
-    f = f.cwiseQuotient(t1);
-    return f;
-}
-
-// hfunction
-double FrankBicop::hfunc1_default(const Eigen::MatrixXd& u)
-{
-    double theta = double(this->parameters_(0));
-    Eigen::MatrixXd t = u.unaryExpr([theta](const double v){ return std::exp(theta*v);});
-    Eigen::VectorXd t1 = t.rowwise().prod();
-    Eigen::VectorXd f = std::exp(theta)*(t.col(1) - Eigen::VectorXd::Ones(u.rows()));
-
-    t1 = - t1 + std::exp(theta)*(t.rowwise().sum() - Eigen::VectorXd::Ones(u.rows()));
-    f = f.cwiseQuotient(t1);
-    return f;
-}*/

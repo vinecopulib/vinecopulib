@@ -110,31 +110,3 @@ double qcondgum(double* q, double* u, double* de)
     z2=pow(pow(a,*de)-pow(z1,*de),1./(*de));
     return(exp(-z2));
 }
-/*// PDF
-double GumbelBicop:pdf_default(const Eigen::MatrixXd& u)
-{
-    double theta = double(this->parameters_(0));
-    Eigen::VectorXd t1 = generator(u.col(0));
-    Eigen::VectorXd t2 = generator(u.col(1));
-    Eigen::VectorXd t = t1+t2;
-    t1 = t1.array().pow((theta-1)/theta);
-    t2 = t2.array().pow((theta-1)/theta);
-    Eigen::VectorXd f = generator_inv(t);
-    t = t.unaryExpr([theta](const double v){ return (-1+theta+std::pow(v, 1/theta)) * std::pow(v,-2+1/theta);});
-    f = f.cwiseProduct(t).cwiseProduct(t1).cwiseProduct(t2).cwiseQuotient(u.rowwise().prod());
-    return f;
-}
-
-// hfunction
-double GumbelBicop:hfunc1_default(const Eigen::MatrixXd& u)
-{
-    double theta = double(this->parameters_(0));
-    Eigen::VectorXd t1 = generator(u.col(1));
-    Eigen::VectorXd t2 = generator(u.col(0));
-    Eigen::VectorXd t = t1+t2;
-    t2 = t2.array().pow((theta-1)/theta);
-    Eigen::VectorXd f = generator_inv(t);
-    t = t.array().pow(1/theta-1);
-    f = f.cwiseProduct(t).cwiseProduct(t2).cwiseQuotient(u.col(0));
-    return f;
-}*/

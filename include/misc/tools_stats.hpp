@@ -80,38 +80,3 @@ namespace tools_stats
     double pairwise_ktau(Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
     double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z);
 }
-
-/* A GSL ALTERNATIVE
- *
-#include <gsl/gsl_cdf.h>
-#include <gsl/gsl_randist.h>
-#include <functional>
-
-template<typename T> T dnorm(const T& x)
-{
-    return x.unaryExpr(std::ptr_fun(gsl_ran_ugaussian_pdf));
-};
-template<typename T> T pnorm(const T& x)
-{
-    return x.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_P));
-};
-template<typename T> T qnorm(const T& x)
-{
-    return x.unaryExpr(std::ptr_fun(gsl_cdf_ugaussian_Pinv));
-};
-
-template<typename T> T dt(const T& x, double nu)
-{
-    auto tpdf = std::bind(gsl_ran_tdist_pdf, std::placeholders::_1, nu);
-    return x.unaryExpr(std::function<double(double)>(tpdf));
-};
-template<typename T> T pt(const T& x, double nu)
-{
-    auto tcdf = std::bind(gsl_cdf_tdist_P, std::placeholders::_1, nu);
-    return x.unaryExpr(std::function<double(double)>(tcdf));
-};
-template<typename T> T qt(const T& x, double nu)
-{
-    auto tquantile = std::bind(gsl_cdf_tdist_Pinv, std::placeholders::_1, nu);
-    return x.unaryExpr(std::function<double(double)>(tquantile));
-};*/

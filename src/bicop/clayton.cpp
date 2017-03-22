@@ -81,39 +81,3 @@ namespace vinecopulib
         return tau_to_parameters_default(tau);
     }
 }
-
-/*// PDF
-double ClaytonBicop::pdf_default(const Eigen::MatrixXd& u)
-{
-    double theta = double(this->parameters_(0));
-    Eigen::VectorXd t1 = generator(u.col(0));
-    Eigen::VectorXd t2 = generator(u.col(1));
-    Eigen::VectorXd t = t1+t2;
-    Eigen::VectorXd f = generator_inv(t);
-
-    t1 = u.col(0).array().pow(theta);
-    t2 = u.col(1).array().pow(theta);
-    t = t1 + t2 - t1.cwiseProduct(t2);
-    t = t.array().square();
-
-    t1 = t1.array().pow((theta-1)/theta);
-    t2 = t2.array().pow((theta-1)/theta);
-
-    f = (1+theta)*f.cwiseQuotient(t).cwiseProduct(t1).cwiseProduct(t2);
-    return f;
-}
-
-// hfunction
-double ClaytonBicop::hfunc1_default(const Eigen::MatrixXd& u)
-{
-    double theta = double(this->parameters_(0));
-    Eigen::VectorXd t1 = generator(u.col(0));
-    Eigen::VectorXd t2 = generator(u.col(1));
-    Eigen::VectorXd t = t1+t2;
-    Eigen::VectorXd f = generator_inv(t);
-    f = f.array().pow(1+theta);
-
-    t2 = u.col(0).array().pow(-1-theta);
-    f = f.cwiseProduct(t2);
-    return f;
-}*/
