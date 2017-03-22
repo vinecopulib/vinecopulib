@@ -7,9 +7,9 @@
 #pragma once
 
 #include "vinecop_test.hpp"
-#include "include/vinecop_class.hpp"
-#include "include/tools_structselect.hpp"
-#include "include/tools_stl.hpp"
+#include "include/vinecop/vinecop_class.hpp"
+#include "include/vinecop/tools_structselect.hpp"
+#include "include/misc/tools_stl.hpp"
 
 namespace test_vinecop_class {
     using namespace vinecopulib;

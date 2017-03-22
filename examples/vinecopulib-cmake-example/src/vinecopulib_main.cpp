@@ -1,4 +1,4 @@
-#include <bicop_class.hpp>
+#include <vinecopulib.hpp>
 #include <iostream>
 
 using namespace vinecopulib;

@@ -6,14 +6,17 @@
 
 #pragma once
 
-#include "gtest/gtest.h"
-#include "include/bicop/bicop.hpp"
+#include "bicop/bicop_kernel.hpp"
 
-using namespace vinecopulib;
-
-class TrafokernelTest : public ::testing::Test {
-public:
-    TrafokernelTest();
-    BicopPtr cop;
-    Eigen::MatrixXd u;
-};
+namespace vinecopulib
+{
+    class TrafokernelBicop : public KernelBicop
+    {
+    public:
+        TrafokernelBicop();
+    private:
+        void fit(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, std::string
+        );
+    };
+}

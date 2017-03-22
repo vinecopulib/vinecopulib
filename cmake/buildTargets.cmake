@@ -2,12 +2,10 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 
 file(GLOB_RECURSE vinecopulib_sources src/*.cpp src/*.cc src/*c)
-file(GLOB_RECURSE vinecopulib_public_headers
-        include/bicop_class.hpp
-        include/bicop_family.hpp
-        include/rvine_matrix.hpp
-        include/tools_eigen.hpp
-        include/vinecop_class.hpp)
+file(GLOB_RECURSE vinecopulib_bicop_headers include/bicop/*.hpp)
+file(GLOB_RECURSE vinecopulib_vinecop_headers include/vinecop/*.hpp)
+file(GLOB_RECURSE vinecopulib_misc_headers include/misc/*.hpp)
+file(GLOB_RECURSE vinecopulib_main_header include/vinecopulib.hpp)
 
 include_directories(${external_includes} include)
 
@@ -94,10 +92,25 @@ if (NOT WIN32)
     )
 
     # Headers:
-    #   * include/vinecopulib/*.hpp -> <prefix>/include/vinecopulib/*.hpp
+    #   * include/vinecopulib/vinecopulib -> <prefix>/include/vinecopulib/vinecopulib
+    #   * include/vinecopulib/bicop/*.hpp -> <prefix>/include/vinecopulib/bicop/*.hpp
+    #   * include/vinecopulib/vinecop/*.hpp -> <prefix>/include/vinecopulib/vinecop/*.hpp
+    #   * include/vinecopulib/misc/*.hpp -> <prefix>/include/vinecopulib/misc/*.hpp
     install(
-            FILES ${vinecopulib_public_headers}
-            DESTINATION "${include_install_dir}/vinecopulib"
+            FILES ${vinecopulib_main_header}
+            DESTINATION "${include_install_dir}"
+    )
+    install(
+            FILES ${vinecopulib_bicop_headers}
+            DESTINATION "${include_install_dir}/vinecopulib/bicop"
+    )
+    install(
+            FILES ${vinecopulib_vinecop_headers}
+            DESTINATION "${include_install_dir}/vinecopulib/vinecop"
+    )
+    install(
+            FILES ${vinecopulib_misc_headers}
+            DESTINATION "${include_install_dir}/vinecopulib/misc"
     )
 
     # TODO: Properly use VINECOPULIB_EXPORT to reduce the number of exports
