@@ -7,8 +7,8 @@
 #pragma once
 
 #include <boost/graph/adjacency_list.hpp>
-#include "vinecop/vinecop_class.hpp"
-#include "bicop/bicop_family.hpp"
+#include "vinecop/class.hpp"
+#include "bicop/family.hpp"
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std

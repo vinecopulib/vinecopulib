@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "misc/tools_eigen.hpp"
-#include "bicop/bicop_family.hpp"
+#include "bicop/family.hpp"
 
 std::vector<double> get_c1c2(
     const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,

@@ -8,7 +8,7 @@
 
 #include <nlopt.hpp>
 #include "misc/tools_eigen.hpp"
-#include "bicop/bicop_parametric.hpp"
+#include "bicop/parametric.hpp"
 
 namespace tools_optimization {
 
