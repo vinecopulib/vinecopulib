@@ -34,7 +34,7 @@ namespace vinecopulib
         pair_copulas_ = make_pair_copula_store(d);
         for (auto& tree : pair_copulas_) {
             for (auto& pc : tree) {
-                pc = Bicop::Bicop(BicopFamily::indep);
+                pc = Bicop(BicopFamily::indep);
             }
         }
     }
@@ -109,6 +109,9 @@ namespace vinecopulib
     //!     more thanone parameter, the main dependence parameter is found by
     //!     inverting the Kendall's tau and the remainders by profile likelihood
     //!     optimization.
+    //! @param truncation_level the truncation level.
+    //! @param threshold the threshold.
+    //! @param matrix the structure matrix (not yet implemented).
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
     //! @param preselect_families  whether to exclude families before fitting based
@@ -121,6 +124,7 @@ namespace vinecopulib
             std::vector<BicopFamily> family_set,
             std::string method,
             int truncation_level,
+            double threshold,
             Eigen::MatrixXi matrix,
             std::string tree_criterion,
             std::string selection_criterion,
@@ -142,6 +146,7 @@ namespace vinecopulib
                     trees[t - 1],
                     family_set,
                     method,
+                    threshold,
                     tree_criterion,
                     selection_criterion,
                     preselect_families
@@ -155,7 +160,7 @@ namespace vinecopulib
 
             // truncate (only allow for Independence copula from here on)
             if (truncation_level == t) {
-                family_set = std::vector<BicopFamily>({BicopFamily::indep});
+                family_set = {BicopFamily::indep};
             }
         }
 
