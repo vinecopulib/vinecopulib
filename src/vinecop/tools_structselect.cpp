@@ -308,14 +308,14 @@ namespace tools_structselect {
     )
     {
         for (auto e : boost::edges(tree)) {
-            tree[e].pair_copula = vinecopulib::Bicop::select(
+            tree[e].pair_copula = vinecopulib::Bicop(
                 tree[e].pc_data,
                 family_set,
                 method,
                 selection_criterion,
                 preselect_families);
-            tree[e].hfunc1 = tree[e].pair_copula->hfunc1(tree[e].pc_data);
-            tree[e].hfunc2 = tree[e].pair_copula->hfunc2(tree[e].pc_data);
+            tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
+            tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
         }
     }
 
@@ -357,7 +357,7 @@ namespace tools_structselect {
                         auto pos = find_position(mat(t, col), e_new.conditioning);
                         mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
                         if (pos == 1) {
-                            e_new.pair_copula->flip();
+                            e_new.pair_copula.flip();
                         }
                         // assign fitted pair copula to appropriate entry, see
                         // vinecopulib::Vinecop::get_pair_copula().
@@ -399,9 +399,9 @@ namespace tools_structselect {
             std::stringstream pc_info;
             pc_info <<
                 get_pc_index(e, tree) << " <-> " <<
-                "fam = " << tree[e].pair_copula->get_family_name() <<
-                ", rot = " << tree[e].pair_copula->get_rotation() <<
-                ", par = " <<  tree[e].pair_copula->get_parameters() <<
+                "fam = " << tree[e].pair_copula.get_family_name() <<
+                ", rot = " << tree[e].pair_copula.get_rotation() <<
+                ", par = " <<  tree[e].pair_copula.get_parameters() <<
                 std::endl;
             std::cout << pc_info.str().c_str();
         }

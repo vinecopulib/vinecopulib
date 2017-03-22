@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "bicop/class.hpp"
+#include "bicop/abstract.hpp"
 
 namespace vinecopulib
 {
-    class ParBicop : public Bicop
+    class ParBicop : public AbstractBicop
     {
     private:
         void fit(

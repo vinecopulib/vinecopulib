@@ -5,7 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "bicop/trafokernel.hpp"
-#include "bicop/bicop.hpp"
+#include "bicop/family.hpp"
 #include "misc/tools_stats.hpp"
 
 namespace vinecopulib

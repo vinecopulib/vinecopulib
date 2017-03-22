@@ -7,7 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/bicop/class.hpp"
+#include "include/bicop/abstract.hpp"
 #include "include/bicop/tools_bicopselect.hpp"
 
 namespace test_bicop_sanity_checks {

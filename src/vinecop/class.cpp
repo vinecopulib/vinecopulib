@@ -34,21 +34,21 @@ namespace vinecopulib
         pair_copulas_ = make_pair_copula_store(d);
         for (auto& tree : pair_copulas_) {
             for (auto& pc : tree) {
-                pc = Bicop::create(BicopFamily::indep);
+                pc = Bicop::Bicop(BicopFamily::indep);
             }
         }
     }
 
-    //! Construct a vine copula object from a vector<BicopPtr> and structure matrix
+    //! Construct a vine copula object from a vector<Bicop> and structure matrix
     //!
-    //! @param pair_copulas a nested vector of BicopPtrs; can be initialized by
+    //! @param pair_copulas a nested vector of Bicops; can be initialized by
     //!     make_pair_copula_store(d).
     //! @param matrix R-vine matrix.
     //!
     //! @return a d-dimensional D-vine with variable order 1, ..., d and all
     //!     pair-copulas set to independence
     Vinecop::Vinecop(
-            const std::vector<std::vector<BicopPtr>>& pair_copulas,
+            const std::vector<std::vector<Bicop>>& pair_copulas,
             const Eigen::MatrixXi& matrix
     )
     {
@@ -83,11 +83,11 @@ namespace vinecopulib
     //! Initialize object for storing pair copulas
     //!
     //! @param d dimension of the vine copula.
-    //! @return A nested vector such that pc_store(d)[t][e] contains a BicopPtr to
+    //! @return A nested vector such that pc_store(d)[t][e] contains a Bicop for
     //!     the pair copula corresponding to tree t and edge e.
-    std::vector<std::vector<BicopPtr>> Vinecop::make_pair_copula_store(int d)
+    std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(int d)
     {
-        std::vector<std::vector<BicopPtr>> pc_store(d - 1);
+        std::vector<std::vector<Bicop>> pc_store(d - 1);
         for (int t = 0; t < d - 1; ++t) {
             pc_store[t].resize(d - 1 - t);
         }
@@ -167,9 +167,8 @@ namespace vinecopulib
     //! @param tree tree index (starting with 0).
     //! @param edge edge index (starting with 0).
     //!
-    //! @return A \code std::shared_ptr (alias \code BicopPtr) to a \code Bicop
-    //!     object.
-    BicopPtr Vinecop::get_pair_copula(int tree, int edge) const
+    //! @return A \code Bicop object.
+    Bicop Vinecop::get_pair_copula(int tree, int edge) const
     {
         if (tree > d_ - 2) {
             std::stringstream message;
@@ -199,7 +198,7 @@ namespace vinecopulib
     //! @return An \code int containing the family index.
     BicopFamily Vinecop::get_family(int tree, int edge) const
     {
-        return get_pair_copula(tree, edge)->get_family();
+        return get_pair_copula(tree, edge).get_family();
     }
     
     //! Get families of all pair copulas
@@ -228,7 +227,7 @@ namespace vinecopulib
     //! @return An \code int containing the rotation.
     int Vinecop::get_rotation(int tree, int edge) const
     {
-        return get_pair_copula(tree, edge)->get_rotation();
+        return get_pair_copula(tree, edge).get_rotation();
     }
 
     //! Get rotations of all pair copulas
@@ -257,7 +256,7 @@ namespace vinecopulib
     //! @return An \code Eigen::VectorXd containing the parameters.
     Eigen::VectorXd Vinecop::get_parameters(int tree, int edge) const
     {
-        return get_pair_copula(tree, edge)->get_parameters();
+        return get_pair_copula(tree, edge).get_parameters();
     }
 
     //! Get parameters of all pair copulas
@@ -324,7 +323,7 @@ namespace vinecopulib
         for (int tree = 0; tree < d - 1; ++tree) {
             for (int edge = 0; edge < d - tree - 1; ++edge) {
                 // get pair copula for this edge
-                BicopPtr edge_copula = get_pair_copula(tree, edge);
+                Bicop edge_copula = get_pair_copula(tree, edge);
 
                 // extract evaluation point from hfunction matrices (have been
                 // computed in previous tree level)
@@ -336,13 +335,13 @@ namespace vinecopulib
                     u_e.col(1) = hfunc1.col(d - m);
                 }
 
-                vine_density = vine_density.cwiseProduct(edge_copula->pdf(u_e));
+                vine_density = vine_density.cwiseProduct(edge_copula.pdf(u_e));
                 // h-functions are only evaluated if needed in next step
                 if (needed_hfunc1(tree + 1, edge)) {
-                    hfunc1.col(edge) = edge_copula->hfunc1(u_e);
+                    hfunc1.col(edge) = edge_copula.hfunc1(u_e);
                 }
                 if (needed_hfunc2(tree + 1, edge)) {
-                    hfunc2.col(edge) = edge_copula->hfunc2(u_e);
+                    hfunc2.col(edge) = edge_copula.hfunc2(u_e);
                 }
             }
         }
@@ -427,7 +426,7 @@ namespace vinecopulib
         // loop through variables (0 is just the inital uniform)
         for (int var = d - 2; var > -1; --var) {
             for (int tree = d - var - 2; tree > -1; --tree) {
-                BicopPtr edge_copula = get_pair_copula(tree, var);
+                Bicop edge_copula = get_pair_copula(tree, var);
 
                 // extract data for conditional pair
                 Eigen::MatrixXd U_e(n, 2);
@@ -440,13 +439,13 @@ namespace vinecopulib
                 }
 
                 // inverse Rosenblatt transform simulates data for conditional pair
-                hinv2(tree, var) = edge_copula->hinv2(U_e);
+                hinv2(tree, var) = edge_copula.hinv2(U_e);
 
                 // if required at later stage, also calculate hfunc2
                 if (var < d_ - 1) {
                     if (needed_hfunc1(tree + 1, var)) {
                         U_e.col(0) = hinv2(tree, var);
-                        hfunc1(tree + 1, var) = edge_copula->hfunc1(U_e);
+                        hfunc1(tree + 1, var) = edge_copula.hfunc1(U_e);
                     }
                 }
             }

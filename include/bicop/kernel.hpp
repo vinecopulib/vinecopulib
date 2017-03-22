@@ -7,11 +7,11 @@
 #pragma once
 
 #include "misc/interpolation_grid.hpp"
-#include "bicop/class.hpp"
+#include "bicop/abstract.hpp"
 
 namespace vinecopulib
 {
-    class KernelBicop : public Bicop
+    class KernelBicop : public AbstractBicop
     {
     public:
         KernelBicop();
