@@ -6,12 +6,13 @@
 
 #pragma once
 
-// include all family headers not included yet (alphabetic order);
+// include all family headers (alphabetic order);
 // this automatically includes the headers:
-#include "bicop/bicop_archimedean.hpp"
-#include "bicop/bicop_elliptical.hpp"
-#include "bicop/bicop_parametric.hpp"
-#include "bicop/bicop_kernel.hpp"
+// bicop_class.hpp
+// bicop_archimedean.hpp
+// bicop_elliptical.hpp
+// bicop_parametric.hpp
+// bicop_kernel.hpp
 #include "bicop/bicop_bb1.hpp"
 #include "bicop/bicop_bb6.hpp"
 #include "bicop/bicop_bb7.hpp"
