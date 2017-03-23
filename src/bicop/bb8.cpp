@@ -12,7 +12,6 @@ namespace vinecopulib
     Bb8Bicop::Bb8Bicop()
     {
         family_ = BicopFamily::bb8;
-        rotation_ = 0;
         parameters_ = Eigen::VectorXd(2);
         parameters_lower_bounds_ = Eigen::VectorXd(2);
         parameters_upper_bounds_ = Eigen::VectorXd(2);
@@ -58,8 +57,7 @@ namespace vinecopulib
             double tmp = std::pow(1-t*delta,theta);
             return std::log((tmp-1)/(std::pow(1-delta,theta)-1))*(1-t*delta-std::pow(1-t*delta,1-theta));
         };
-        double tau = 1-4/(delta*theta)*tools_integration::integrate_zero_to_one(f);
-        return flip_tau(tau);
+        return 1 - 4/(delta*theta)*tools_integration::integrate_zero_to_one(f);
     }
 
     Eigen::MatrixXd Bb8Bicop::tau_to_parameters(const double& tau)

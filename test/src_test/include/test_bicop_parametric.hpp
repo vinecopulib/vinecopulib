@@ -15,51 +15,52 @@ namespace test_bicop_parametric {
 
     // Test if the C++ implementation of the basic methods is correct
     TEST_P(ParBicopTest, parametric_bicop_is_correct) {
-        std::string command = std::string(RSCRIPT) + "../test/test_bicop_parametric.R";
-        command = command + " "  + std::to_string(get_n());
-        command = command + " "  + std::to_string(get_family());
-        command = command + " "  + std::to_string(get_par());
-        command = command + " "  + std::to_string(get_par2());
-        int sys_exit_code = system(command.c_str());
-        if (sys_exit_code != 0) {
-            throw std::runtime_error("error in system call");
-        }
-
         if (needs_check_) {
+            std::string command = std::string(RSCRIPT);
+            command += "../test/test_bicop_parametric.R";
+            command += " "  + std::to_string(get_n());
+            command += " "  + std::to_string(get_family());
+            command += " "  + std::to_string(get_par());
+            command += " "  + std::to_string(get_par2());
+            int sys_exit_code = system(command.c_str());
+            if (sys_exit_code != 0) {
+                throw std::runtime_error("error in system call");
+            }
+            
             int n = get_n();
-
+    
             Eigen::MatrixXd results = read_matxd("temp");
             Eigen::VectorXd par = bicop_.get_parameters();
             ASSERT_TRUE(fabs(bicop_.parameters_to_tau(par) -
                                      results(0,0)) < 1e-4);
-
+    
             // evaluate pdf in C++
             Eigen::VectorXd f = bicop_.pdf(results.block(0,1,n,2));
-
+    
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,3,n,1), 1e-4));
-
+    
             // evaluate hfunc1 in C++
             f = bicop_.hfunc1(results.block(0,1,n,2));
-
+    
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,4,n,1), 1e-4));
-
+    
             // evaluate hfunc2 in C++
             f = bicop_.hfunc2(results.block(0,1,n,2));
-
+    
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,5,n,1), 1e-4));
-
+    
             // evaluate hinv1 in C++
             f = bicop_.hinv1(results.block(0,1,n,2));
-
+    
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,6,n,1), 1e-4));
-
+    
             // evaluate hinv2 in C++
             f = bicop_.hinv2(results.block(0,1,n,2));
-
+    
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,7,n,1), 1e-4));
         }

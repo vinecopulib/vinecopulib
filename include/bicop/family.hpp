@@ -126,6 +126,17 @@ namespace vinecopulib {
             BicopFamily::joe
         };
         
+        const std::vector<BicopFamily> flip_by_rotation = {
+            BicopFamily::clayton,
+            BicopFamily::gumbel,
+            BicopFamily::frank,
+            BicopFamily::joe,
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        };
+        
     } // end of namespace BicopFamilies
     
 } // end of namespace vinecopulib

@@ -32,8 +32,4 @@ namespace vinecopulib
         return tau;
     }
 
-    void EllipticalBicop::flip()
-    {
-        // nothing to do because elliptical copulas are radially symmetric
-    }
 }

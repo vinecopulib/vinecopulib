@@ -22,10 +22,8 @@ namespace vinecopulib
     }
 
     // fit
-    void ParBicop::fit(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-        std::string method
-    )
+    void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+        std::string method)
     {
         if (family_ != BicopFamily::indep) {
             using namespace tools_optimization;
@@ -39,23 +37,14 @@ namespace vinecopulib
             if (method == "itau") {
                 npars = npars - 1;
                 if ((npars > 0) & (family_ != BicopFamily::student)) {
-                    throw std::runtime_error("itau method is not available for this family.");
+                    throw std::runtime_error(
+                        "itau method is not available for this family.");
                 }
             }
 
             auto temp_data = data;
             double tau = tools_stats::pairwise_ktau(temp_data);
-            if (!tools_stl::is_member(family_, bicop_families::rotationless)) {
-                if ((tau > 0) & !tools_stl::is_member(rotation_, {0, 180})) {
-                    throw std::runtime_error("Copula cannot handle tau > 0");
-                }
-                if ((tau < 0) & !tools_stl::is_member(rotation_, {90, 270})) {
-                    throw std::runtime_error("Copula cannot handle tau < 0");
-                }
-            }
-
             auto newpar = get_start_parameters(tau);
-            temp_data = cut_and_rotate(data);
             if (npars > 0) {
                 // Create optimizer
                 Optimizer optimizer(npars);
@@ -70,7 +59,7 @@ namespace vinecopulib
                       lb(0) = get_parameters_lower_bounds()(1);
                       ub.resize(1, 1);
                       ub(0) = get_parameters_upper_bounds()(1);
-                      initial_parameters = Eigen::VectorXd::Constant(1, newpar(1));
+                      initial_parameters = newpar.tail(1);
                       optimizer.set_objective(pmle_objective, &my_data);
                 } else {
                       optimizer.set_objective(mle_objective, &my_data);

@@ -17,11 +17,9 @@ namespace test_bicop_sanity_checks {
             EXPECT_ANY_THROW(Bicop(family, 0, Eigen::VectorXd::Zero(1)));
         }
         for (auto family : bicop_families::one_par) {
-            EXPECT_ANY_THROW(Bicop(family, 0, Eigen::VectorXd()));
             EXPECT_ANY_THROW(Bicop(family, 0, Eigen::VectorXd::Zero(2)));
         }
         for (auto family : bicop_families::two_par) {
-            EXPECT_ANY_THROW(Bicop(family, 0, Eigen::VectorXd()));
             EXPECT_ANY_THROW(Bicop(family, 0, Eigen::VectorXd::Zero(1)));
         }
     }

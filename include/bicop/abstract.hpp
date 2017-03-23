@@ -43,23 +43,20 @@ namespace vinecopulib
     protected:
         // Factories
         static std::shared_ptr<AbstractBicop> create(
-            BicopFamily family = BicopFamily::indep, int rotation = 0);
-        static std::shared_ptr<AbstractBicop> create(BicopFamily family,
-            int rotation, const Eigen::MatrixXd& parameters);
+            BicopFamily family = BicopFamily::indep,
+            const Eigen::MatrixXd& parameters = Eigen::MatrixXd());
 
         // Getters and setters
         BicopFamily get_family() const;
         std::string get_family_name() const;
-        int get_rotation() const;
         std::string get_association_direction() const;
         Eigen::MatrixXd get_parameters() const;
         Eigen::MatrixXd get_parameters_lower_bounds() const;
         Eigen::MatrixXd get_parameters_upper_bounds() const;
-        void set_rotation(const int& rotation);
         void set_parameters(const Eigen::MatrixXd& parameters);
+        void flip();
 
         // Virtual methods
-        virtual void flip() = 0;
         virtual void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 std::string method) = 0;
         virtual double calculate_npars() = 0;
@@ -81,14 +78,9 @@ namespace vinecopulib
                 const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
         Eigen::VectorXd hinv2_num(
                 const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
-        Eigen::Matrix<double, Eigen::Dynamic, 2> cut_and_rotate(
-                const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
-        Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
-                const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
 
         // Data members
         BicopFamily family_;
-        int rotation_;
         Eigen::MatrixXd parameters_;
         Eigen::MatrixXd parameters_lower_bounds_;
         Eigen::MatrixXd parameters_upper_bounds_;
@@ -98,7 +90,6 @@ namespace vinecopulib
         void check_parameters_size(const Eigen::MatrixXd& parameters);
         void check_parameters_upper(const Eigen::MatrixXd& parameters);
         void check_parameters_lower(const Eigen::MatrixXd& parameters);
-        void check_rotation(const int& rotation);
     };
 
     typedef std::shared_ptr<AbstractBicop> BicopPtr;

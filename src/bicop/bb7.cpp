@@ -12,7 +12,6 @@ namespace vinecopulib
     Bb7Bicop::Bb7Bicop()
     {
         family_ = BicopFamily::bb7;
-        rotation_ = 0;
         parameters_ = Eigen::VectorXd(2);
         parameters_lower_bounds_ = Eigen::VectorXd(2);
         parameters_upper_bounds_ = Eigen::VectorXd(2);
@@ -58,8 +57,7 @@ namespace vinecopulib
             double tmp = std::pow(1-v,theta);
             return -4*(std::pow(1-tmp,-delta)-1)/(theta*delta*std::pow(1-v,theta-1)*std::pow(1-tmp,-delta-1));
         };
-        double tau = 1+tools_integration::integrate_zero_to_one(f);
-        return flip_tau(tau);
+        return 1 + tools_integration::integrate_zero_to_one(f);
     }
 
     Eigen::MatrixXd Bb7Bicop::tau_to_parameters(const double& tau)

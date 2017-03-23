@@ -13,7 +13,6 @@ namespace vinecopulib
     TrafokernelBicop::TrafokernelBicop()
     {
         family_ = BicopFamily::tll0;
-        rotation_ = 0;
     }
 
     Eigen::VectorXd gaussian_kernel_2d(

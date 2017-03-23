@@ -54,7 +54,7 @@ namespace vinecopulib
     }
 
     // TODO
-    double KernelBicop::parameters_to_tau(const Eigen::VectorXd &)
+    double KernelBicop::parameters_to_tau(const Eigen::VectorXd&)
     {
         throw std::runtime_error(
                 "parameters_to_tau not yet implemented for kernel estimator"

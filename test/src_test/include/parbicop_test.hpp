@@ -35,15 +35,17 @@ protected:
     Bicop bicop_;
     bool needs_check_;
     virtual void SetUp() {
-        bicop_ = Bicop(::testing::get<0>(GetParam()),
-                       ::testing::get<1>(GetParam()));
         n_ = (int) 5e3;
-        double tau = 0.5; // should be positive
-        int rotation = bicop_.get_rotation();
-        auto family = bicop_.get_family();
+        auto family = ::testing::get<0>(GetParam());
+        auto rotation = ::testing::get<1>(GetParam());
+        if (tools_stl::is_member(family, bicop_families::rotationless)) {
+            bicop_ = Bicop(family);
+        } else {
+            bicop_ = Bicop(family, rotation);
+        }
 
         set_family(family, rotation);
-
+        double tau = 0.5; // should be positive
         auto parameters = bicop_.get_parameters();
         if (parameters.size() < 2) {
             parameters = bicop_.tau_to_parameters(tau);

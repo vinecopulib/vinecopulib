@@ -12,7 +12,6 @@ namespace vinecopulib
     FrankBicop::FrankBicop()
     {
         family_ = BicopFamily::frank;
-        rotation_ = 0;
         parameters_ = Eigen::VectorXd(1);
         parameters_lower_bounds_ = Eigen::VectorXd(1);
         parameters_upper_bounds_ = Eigen::VectorXd(1);

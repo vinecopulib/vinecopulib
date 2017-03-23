@@ -26,7 +26,6 @@ namespace vinecopulib
         virtual double generator_derivative(const double& u) = 0;
         virtual double generator_derivative2(const double& u) = 0;
 
-        void flip();
         Eigen::VectorXd get_start_parameters(const double tau);
     protected:
         double flip_tau(double tau);

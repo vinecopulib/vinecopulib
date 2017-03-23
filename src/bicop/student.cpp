@@ -16,7 +16,6 @@ namespace vinecopulib
     StudentBicop::StudentBicop()
     {
         family_ = BicopFamily::student;
-        rotation_ = 0;
         parameters_ = Eigen::VectorXd(2);
         parameters_lower_bounds_ = Eigen::VectorXd(2);
         parameters_upper_bounds_ = Eigen::VectorXd(2);

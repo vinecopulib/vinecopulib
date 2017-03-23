@@ -8,6 +8,8 @@
 
 #include "abstract.hpp"
 
+
+
 namespace vinecopulib {
     class Bicop
     {
@@ -32,7 +34,7 @@ namespace vinecopulib {
         Eigen::MatrixXd get_parameters() const;
         Eigen::MatrixXd get_parameters_lower_bounds() const;
         Eigen::MatrixXd get_parameters_upper_bounds() const;
-        void set_rotation(const int& rotation);
+        void set_rotation(int rotation);
         void set_parameters(const Eigen::MatrixXd& parameters);
 
         // Stats methods
@@ -44,10 +46,8 @@ namespace vinecopulib {
         Eigen::Matrix<double,Eigen::Dynamic,2> simulate(const int& n);
 
         // Methods modifying the family/rotation/parameters
-        void fit(
-                const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                std::string method
-        );
+        void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+                std::string method);
         void select(
                 Eigen::Matrix<double, Eigen::Dynamic, 2> data,
                 std::vector<BicopFamily> family_set = bicop_families::all,
@@ -69,7 +69,12 @@ namespace vinecopulib {
         Eigen::MatrixXd tau_to_parameters(const double& tau);
 
     private:
+        Eigen::Matrix<double, Eigen::Dynamic, 2> cut_and_rotate(
+                const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+        void check_rotation(int rotation);
+
         BicopPtr get_bicop();
         BicopPtr bicop_;
+        int rotation_;
     };
 }

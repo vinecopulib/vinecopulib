@@ -21,11 +21,9 @@ namespace vinecopulib
     Bicop::Bicop(BicopFamily family, int rotation, 
         const Eigen::MatrixXd& parameters)
     {
-        if (parameters.size() == 0) {
-            bicop_ = AbstractBicop::create(family, rotation);
-        } else {
-            bicop_ = AbstractBicop::create(family, rotation, parameters);
-        }
+        bicop_ = AbstractBicop::create(family, parameters);
+        // family must be set before checking the rotation
+        set_rotation(rotation);
     }
     
     // Selection Constructors (see Bicop::select())
@@ -46,7 +44,7 @@ namespace vinecopulib
     //! @return The copula density evaluated at \c u.
     Eigen::VectorXd Bicop::pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
-        Eigen::VectorXd f = bicop_->pdf(bicop_->cut_and_rotate(u));
+        Eigen::VectorXd f = bicop_->pdf(cut_and_rotate(u));
         f = f.unaryExpr([](const double x){ return std::min(x,1e16);});
         return f;
     }
@@ -70,18 +68,18 @@ namespace vinecopulib
     //! @{
     Eigen::VectorXd Bicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
-        switch (bicop_->rotation_) {
+        switch (rotation_) {
             case 0:
-                return bicop_->hfunc1(bicop_->cut_and_rotate(u));
+                return bicop_->hfunc1(cut_and_rotate(u));
 
             case 90:
-                return bicop_->hfunc2(bicop_->cut_and_rotate(u));
+                return bicop_->hfunc2(cut_and_rotate(u));
 
             case 180:
-                return 1.0 - bicop_->hfunc1(bicop_->cut_and_rotate(u)).array();
+                return 1.0 - bicop_->hfunc1(cut_and_rotate(u)).array();
 
             case 270:
-                return 1.0 - bicop_->hfunc2(bicop_->cut_and_rotate(u)).array();
+                return 1.0 - bicop_->hfunc2(cut_and_rotate(u)).array();
 
             default:
                 throw std::runtime_error(std::string(
@@ -92,18 +90,18 @@ namespace vinecopulib
 
     Eigen::VectorXd Bicop::hfunc2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
-        switch (bicop_->rotation_) {
+        switch (rotation_) {
             case 0:
-                return bicop_->hfunc2(bicop_->cut_and_rotate(u));
+                return bicop_->hfunc2(cut_and_rotate(u));
 
             case 90:
-                return 1.0 - bicop_->hfunc1(bicop_->cut_and_rotate(u)).array();
+                return 1.0 - bicop_->hfunc1(cut_and_rotate(u)).array();
 
             case 180:
-                return 1.0 - bicop_->hfunc2(bicop_->cut_and_rotate(u)).array();
+                return 1.0 - bicop_->hfunc2(cut_and_rotate(u)).array();
 
             case 270:
-                return bicop_->hfunc1(bicop_->cut_and_rotate(u));
+                return bicop_->hfunc1(cut_and_rotate(u));
 
             default:
                 throw std::runtime_error(std::string(
@@ -114,18 +112,18 @@ namespace vinecopulib
 
     Eigen::VectorXd Bicop::hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
-        switch (bicop_->rotation_) {
+        switch (rotation_) {
             case 0:
-                return bicop_->hinv1(bicop_->cut_and_rotate(u));
+                return bicop_->hinv1(cut_and_rotate(u));
 
             case 90:
-                return bicop_->hinv2(bicop_->cut_and_rotate(u));
+                return bicop_->hinv2(cut_and_rotate(u));
 
             case 180:
-                return 1.0 - bicop_->hinv1(bicop_->cut_and_rotate(u)).array();
+                return 1.0 - bicop_->hinv1(cut_and_rotate(u)).array();
 
             case 270:
-                return 1.0 - bicop_->hinv2(bicop_->cut_and_rotate(u)).array();
+                return 1.0 - bicop_->hinv2(cut_and_rotate(u)).array();
 
             default:
                 throw std::runtime_error(std::string(
@@ -136,18 +134,18 @@ namespace vinecopulib
 
     Eigen::VectorXd Bicop::hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
-        switch (bicop_->rotation_) {
+        switch (rotation_) {
             case 0:
-                return bicop_->hinv2(bicop_->cut_and_rotate(u));
+                return bicop_->hinv2(cut_and_rotate(u));
 
             case 90:
-                return 1.0 - bicop_->hinv1(bicop_->cut_and_rotate(u)).array();
+                return 1.0 - bicop_->hinv1(cut_and_rotate(u)).array();
 
             case 180:
-                return 1.0 - bicop_->hinv2(bicop_->cut_and_rotate(u)).array();
+                return 1.0 - bicop_->hinv2(cut_and_rotate(u)).array();
 
             case 270:
-                return bicop_->hinv1(bicop_->cut_and_rotate(u));
+                return bicop_->hinv1(cut_and_rotate(u));
 
             default:
                 throw std::runtime_error(std::string(
@@ -198,9 +196,12 @@ namespace vinecopulib
 
     double Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
     {
-        return bicop_->parameters_to_tau(parameters);
+        double tau = bicop_->parameters_to_tau(parameters);
+        if (tools_stl::is_member(rotation_, {90, 270})) {
+            tau *= -1;
+        }
+        return tau;
     }
-
 
     BicopFamily Bicop::get_family() const 
     {
@@ -214,7 +215,7 @@ namespace vinecopulib
     
     int Bicop::get_rotation() const
     {
-        return bicop_->get_rotation();
+        return rotation_;
     }
     
     Eigen::MatrixXd Bicop::get_parameters() const 
@@ -222,8 +223,9 @@ namespace vinecopulib
         return bicop_->get_parameters();
     }
 
-    void Bicop::set_rotation(const int& rotation) {
-        bicop_->set_rotation(rotation);
+    void Bicop::set_rotation(int rotation) {
+        check_rotation(rotation);
+        rotation_ = rotation;
     }
 
     void Bicop::set_parameters(const Eigen::MatrixXd& parameters)
@@ -238,7 +240,16 @@ namespace vinecopulib
 
     void Bicop::flip()
     {
-        bicop_->flip();
+        BicopFamily family = bicop_->get_family();
+        if (tools_stl::is_member(family, bicop_families::flip_by_rotation)) {
+            if (rotation_ == 90) {
+                set_rotation(270);
+            } else if (rotation_ == 270) {
+                set_rotation(90);
+            }
+        } else {
+            bicop_->flip();    
+        }
     }
 
     BicopPtr Bicop::get_bicop()
@@ -246,12 +257,10 @@ namespace vinecopulib
         return bicop_;
     };
 
-    void Bicop::fit(
-            const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-            std::string method
-    )
+    void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+            std::string method)
     {
-        bicop_->fit(data,method);
+        bicop_->fit(cut_and_rotate(data), method);
     }
     
     //! Select a bivariate copula
@@ -350,11 +359,13 @@ namespace vinecopulib
 
         // Estimate all models and select the best one using the selection_criterion
         BicopPtr fitted_bicop;
+        int fitted_rotation;
         double fitted_criterion = 1e6;
         for (unsigned int j = 0; j < families.size(); j++) {
             // Estimate the model
-            bicop_ = AbstractBicop::create(families[j], rotations[j]);
-            bicop_->fit(data, method);
+            bicop_ = AbstractBicop::create(families[j]);
+            rotation_ = rotations[j];
+            bicop_->fit(cut_and_rotate(data), method);
 
             // Compute the selection criterion
             double new_criterion;
@@ -363,16 +374,19 @@ namespace vinecopulib
             } else if (selection_criterion == "bic") {
                 new_criterion = bic(data);
             } else {
-                throw std::runtime_error(std::string("Selection criterion not implemented"));
+                throw std::runtime_error("Selection criterion not implemented");
             }
 
             // If the new model is better than the current one, then replace the current model by the new one
             if (new_criterion < fitted_criterion) {
                 fitted_criterion = new_criterion;
                 fitted_bicop = bicop_;
+                fitted_rotation = rotation_;
             }
         }
+        
         bicop_ = fitted_bicop;
+        rotation_ = fitted_rotation;
     }
 
     void Bicop::print()
@@ -383,5 +397,62 @@ namespace vinecopulib
                 ", parameters = " << get_parameters() << std::endl;
 
         std::cout << info.str().c_str();
+    }
+    
+    //! Data manipulations for rotated families
+    //!
+    //! @param u \f$m \times 2\f$ matrix of data.
+    //! @return The manipulated data.
+    //! @{
+    Eigen::Matrix<double, Eigen::Dynamic, 2> Bicop::cut_and_rotate(
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+    {
+        Eigen::Matrix<double, Eigen::Dynamic, 2> u_new(u.rows(), 2);
+
+        // counter-clockwise rotations
+        switch (rotation_) {
+            case 0:
+                u_new = u;
+                break;
+
+            case 90:
+                u_new.col(0) = u.col(1);
+                u_new.col(1) = 1.0 - u.col(0).array();
+                break;
+
+            case 180:
+                u_new.col(0) = 1.0 - u.col(0).array();
+                u_new.col(1) = 1.0 - u.col(1).array();
+                break;
+
+            case 270:
+                u_new.col(0) = 1.0 - u.col(1).array();
+                u_new.col(1) = u.col(0);
+                break;
+        }
+
+        // truncate to interval [eps, 1 - eps]
+        Eigen::Matrix<double, Eigen::Dynamic, 2> eps = 
+            Eigen::Matrix<double, Eigen::Dynamic, 2>::Constant(u.rows(), 2, 1e-10);
+        u_new = u_new.array().min(1.0 - eps.array());
+        u_new = u_new.array().max(eps.array());
+
+        return u_new;
+    }
+    //! @}
+    
+    void Bicop::check_rotation(int rotation)
+    {
+        using namespace tools_stl;
+        std::vector<int> allowed_rotations = {0, 90, 180, 270};
+        if (!is_member(rotation, allowed_rotations)) {
+            throw std::runtime_error("rotation must be one of {0, 90, 180, 270}");
+        }
+        if (is_member(bicop_->get_family(), bicop_families::rotationless)) {
+            if (rotation != 0) {
+                throw std::runtime_error("rotation must be 0 for the " + 
+                    bicop_->get_family_name() + " copula");
+            }
+        }
     }
 }

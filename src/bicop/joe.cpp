@@ -12,7 +12,6 @@ namespace vinecopulib
     JoeBicop::JoeBicop()
     {
         family_ = BicopFamily::joe;
-        rotation_ = 0;
         parameters_ = Eigen::VectorXd(1);
         parameters_lower_bounds_ = Eigen::VectorXd(1);
         parameters_upper_bounds_ = Eigen::VectorXd(1);
@@ -75,8 +74,7 @@ namespace vinecopulib
         double par = parameters(0);
         double tau = 2 / par + 1;
         tau = boost::math::digamma(2.0) - boost::math::digamma(tau);
-        tau = 1 + 2 * tau / (2 - par);
-        return flip_tau(tau);
+        return  1 + 2 * tau / (2 - par);
     }
 
     Eigen::VectorXd JoeBicop::get_start_parameters(const double tau)

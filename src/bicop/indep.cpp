@@ -11,7 +11,6 @@ namespace vinecopulib
     IndepBicop::IndepBicop()
     {
         family_ = BicopFamily::indep;
-        rotation_ = 0;
     }
 
     Eigen::VectorXd IndepBicop::pdf(

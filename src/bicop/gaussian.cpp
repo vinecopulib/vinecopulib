@@ -15,7 +15,6 @@ namespace vinecopulib
     GaussianBicop::GaussianBicop()
     {
         family_ = BicopFamily::gaussian;
-        rotation_ = 0;
         parameters_ = Eigen::VectorXd(1);
         parameters_lower_bounds_ = Eigen::VectorXd(1);
         parameters_upper_bounds_ = Eigen::VectorXd(1);

@@ -33,7 +33,8 @@ namespace vinecopulib
     //!     with family).
     //! @return A pointer to an object that inherits from \c Bicop.
     //! @{
-    BicopPtr AbstractBicop::create(BicopFamily family, int rotation)
+    BicopPtr AbstractBicop::create(BicopFamily family, 
+        const Eigen::MatrixXd& parameters)
     {
         BicopPtr new_bicop;
         switch (family) {
@@ -78,19 +79,13 @@ namespace vinecopulib
                 throw std::runtime_error(std::string("Family not implemented"));
         }
         
-        new_bicop->set_rotation(rotation);
+        if (parameters.size() > 0) {
+            new_bicop->set_parameters(parameters);
+        }
             
         return new_bicop;
     }
-    
-    BicopPtr AbstractBicop::create(BicopFamily family, int rotation,
-        const Eigen::MatrixXd& parameters)
-    {
-        auto new_bicop = AbstractBicop::create(family, rotation);
-        new_bicop->set_parameters(parameters);
-        return new_bicop;
-    }
-    
+        
     //!@}
 
     Eigen::VectorXd no_tau_to_parameters(const double&)
@@ -110,11 +105,6 @@ namespace vinecopulib
         return vinecopulib::get_family_name(family_);
     };
     
-    int AbstractBicop::get_rotation() const
-    {
-        return rotation_;
-    }
-    
     Eigen::MatrixXd AbstractBicop::get_parameters() const 
     {
         return parameters_;
@@ -130,17 +120,21 @@ namespace vinecopulib
         return parameters_upper_bounds_;
     }
 
-    void AbstractBicop::set_rotation(const int& rotation) {
-        check_rotation(rotation);
-        rotation_ = rotation;
-    }
-
     void AbstractBicop::set_parameters(const Eigen::MatrixXd& parameters)
     {
         check_parameters(parameters);
         parameters_ = parameters;
     }
     //! @}
+    
+    //! Adjust the copula to flipped columns
+    void AbstractBicop::flip()
+    {
+        // Most parametric families can be flipped by changing the rotation. 
+        // This is done in Bicop::flip() directly. All other families need to
+        // override this method.
+    }
+    
 
     //! Numerical inversion of h-functions
     //!
@@ -169,59 +163,6 @@ namespace vinecopulib
         };
 
         return invert_f(u.col(0), h1);
-    }
-    //! @}
-
-    //! Data manipulations for rotated families
-    //!
-    //! @param u \f$m \times 2\f$ matrix of data.
-    //! @return The manipulated data.
-    //! @{
-    Eigen::Matrix<double, Eigen::Dynamic, 2> AbstractBicop::cut_and_rotate(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
-    )
-    {
-        Eigen::Matrix<double, Eigen::Dynamic, 2> u_new(u.rows(), 2);
-
-        // counter-clockwise rotations
-        switch (rotation_) {
-            case 0:
-                u_new = u;
-                break;
-
-            case 90:
-                u_new.col(0) = u.col(1);
-                u_new.col(1) = 1.0 - u.col(0).array();
-                break;
-
-            case 180:
-                u_new.col(0) = 1.0 - u.col(0).array();
-                u_new.col(1) = 1.0 - u.col(1).array();
-                break;
-
-            case 270:
-                u_new.col(0) = 1.0 - u.col(1).array();
-                u_new.col(1) = u.col(0);
-                break;
-        }
-
-        // truncate to interval [eps, 1 - eps]
-        Eigen::Matrix<double, Eigen::Dynamic, 2> eps = 
-            Eigen::Matrix<double, Eigen::Dynamic, 2>::Constant(u.rows(), 2, 1e-10);
-        u_new = u_new.array().min(1.0 - eps.array());
-        u_new = u_new.array().max(eps.array());
-
-        return u_new;
-    }
-
-
-    Eigen::Matrix<double, Eigen::Dynamic, 2> AbstractBicop::swap_cols(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
-    )
-    {
-        Eigen::Matrix<double, Eigen::Dynamic, 2> u_swapped = u;
-        u_swapped.col(0).swap(u_swapped.col(1));
-        return u_swapped;
     }
     //! @}
 
@@ -291,13 +232,5 @@ namespace vinecopulib
         }
     }
 
-    void AbstractBicop::check_rotation(const int& rotation)
-    {
-        std::vector<int> allowed_rotations = {0, 90, 180, 270};
-        if (!tools_stl::is_member(rotation, allowed_rotations)) {
-            std::string message = "rotation must be one of {0, 90, 180, 270}";
-            throw std::runtime_error(message);
-        }
-    }
     //! @}
 }
