@@ -34,7 +34,7 @@ namespace vinecopulib
         pair_copulas_ = make_pair_copula_store(d);
         for (auto& tree : pair_copulas_) {
             for (auto& pc : tree) {
-                pc = Bicop::Bicop(BicopFamily::indep);
+                pc = Bicop(BicopFamily::indep);
             }
         }
     }

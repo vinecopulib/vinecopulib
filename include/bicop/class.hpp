@@ -63,6 +63,7 @@ namespace vinecopulib {
         double bic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
 
         // Misc
+        void print();
         double calculate_npars();
         double parameters_to_tau(const Eigen::VectorXd& parameters);
         Eigen::MatrixXd tau_to_parameters(const double& tau);

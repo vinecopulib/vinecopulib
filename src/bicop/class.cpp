@@ -9,6 +9,8 @@
 #include "misc/tools_stats.hpp"
 #include "misc/tools_stl.hpp"
 
+#include <iostream>
+
 namespace vinecopulib
 {
     Bicop::Bicop()
@@ -362,6 +364,7 @@ namespace vinecopulib
     {
         bicop_->fit(data,method);
     }
+
     void Bicop::select(
             Eigen::Matrix<double, Eigen::Dynamic, 2> data,
             std::vector<BicopFamily> family_set,
@@ -373,5 +376,15 @@ namespace vinecopulib
         Bicop bicop(data, family_set, method,
                     selection_criterion, preselect_families);
         bicop_ = bicop.get_bicop();
+    }
+
+    void Bicop::print()
+    {
+        std::stringstream info;
+        info << "family = " << get_family_name() <<
+                ", rotation = " << get_rotation() <<
+                ", parameters = " << get_parameters() << std::endl;
+
+        std::cout << info.str().c_str();
     }
 }
