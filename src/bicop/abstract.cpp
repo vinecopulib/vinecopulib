@@ -210,7 +210,7 @@ namespace vinecopulib
 
         // truncate to interval [eps, 1 - eps]
         Eigen::Matrix<double, Eigen::Dynamic, 2> eps = 
-            Eigen::Matrix<double, Eigen::Dynamic, 2>::Constant(u.rows(), 2, 1-10);
+            Eigen::Matrix<double, Eigen::Dynamic, 2>::Constant(u.rows(), 2, 1e-10);
         u_new = u_new.array().min(1.0 - eps.array());
         u_new = u_new.array().max(eps.array());
 
