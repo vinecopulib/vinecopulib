@@ -1,6 +1,6 @@
 find_package(PythonInterp REQUIRED)
 foreach (test_name test_git_revision;test_bicop_class;test_vinecop_class)
-  add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.py)
+  add_test(NAME ${test_name} WORKING_DIRECTORY ${CMAKE_BINARY_DIR} COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.py)
 
   if (WIN32)
     find_package(Boost 1.63 COMPONENTS python REQUIRED) #TODO: reuse?
