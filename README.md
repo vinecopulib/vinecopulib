@@ -199,7 +199,7 @@ int d = 3;  // dimension of the model
 // specify pair copulas
 auto pair_copulas = Vinecop::make_pair_copula_store(3);  
 for (int tree = 0; tree < d - 1; ++tree) {
-    for (for int edge = 0; edge < d - 1 - tree; ++edge) {
+    for (int edge = 0; edge < d - 1 - tree; ++edge) {
         // 90 degree Clayton with parameter 3.0
         pair_copulas[tree][edge] = Bicop::create(3, VecXd::Constant(1, 3.0), 90);
     }

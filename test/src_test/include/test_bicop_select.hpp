@@ -20,7 +20,7 @@ namespace test_bicop_select {
         auto true_family = this->par_bicop_.get_family();
         std::vector<BicopFamily> family_set = {
             BicopFamily::indep, 
-            BicopFamily::student, 
+            BicopFamily::gaussian, 
             true_family
         };
 
@@ -28,12 +28,12 @@ namespace test_bicop_select {
             this->setup_parameters(rotation);
 
             if (this->needs_check_) {
-                auto data = this->par_bicop_.simulate(this->get_n());
+                auto data = this->bicop_->simulate(this->get_n());
                 auto bicop = Bicop::select(data, family_set, "mle");
 
                 auto selected_family = bicop->get_family();
                 EXPECT_EQ(selected_family, true_family) << 
-                    bicop->bic(data) << " " << this->par_bicop_.bic(data);
+                    bicop->bic(data) << " " << this->bicop_->bic(data);
 
                 if (is_member(true_family, bicop_families::BB)) {
                     int rot_sel = bicop->get_rotation();
@@ -44,7 +44,7 @@ namespace test_bicop_select {
                     }
                 } else {
                     EXPECT_EQ(bicop->get_rotation(), rotation) << 
-                        bicop->bic(data) << " " << this->par_bicop_.bic(data);
+                        bicop->bic(data) << " " << this->bicop_->bic(data);
                 }
             }
         }
@@ -58,22 +58,21 @@ namespace test_bicop_select {
             auto true_family = this->par_bicop_.get_family();
             std::vector<BicopFamily> family_set = {
                 BicopFamily::indep, 
-                BicopFamily::student, 
+                BicopFamily::gaussian, 
                 true_family
             };
-            this->setup_parameters();
 
             for (auto rotation : rotations) {
                 this->setup_parameters(rotation);
-                if (this->needs_check_) {
-                    auto data = this->par_bicop_.simulate(this->get_n());
-                    auto bicop = Bicop::select(data, family_set, "itau");
 
+                if (this->needs_check_) {
+                    auto data = this->bicop_->simulate(this->get_n());
+                    auto bicop = Bicop::select(data, family_set, "itau");
                     auto selected_family = bicop->get_family();
                     EXPECT_EQ(selected_family, true_family) << 
-                        bicop->bic(data) << " " << this->par_bicop_.bic(data);
+                        bicop->bic(data) << " " << this->bicop_->bic(data);
                     EXPECT_EQ(bicop->get_rotation(), rotation) << 
-                        bicop->bic(data) << " " << this->par_bicop_.bic(data);
+                        bicop->bic(data) << " " << this->bicop_->bic(data);
                 }
             }
         }

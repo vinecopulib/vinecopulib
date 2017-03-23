@@ -7,8 +7,8 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/bicop_class.hpp"
-#include "include/tools_bicopselect.hpp"
+#include "include/bicop/class.hpp"
+#include "include/bicop/tools_bicopselect.hpp"
 
 namespace test_bicop_sanity_checks {
     using namespace vinecopulib;

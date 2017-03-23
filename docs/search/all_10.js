@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['tau_5fto_5fparameters',['tau_to_parameters',['../class_bicop.html#af20cc82a278f7c5a40dca399402caf10',1,'Bicop']]],
-  ['trafokernelbicop',['TrafokernelBicop',['../class_trafokernel_bicop.html',1,'']]]
+  ['vinecopulib_3a_20a_20c_2b_2b_20library_20for_20vine_20copula_20modeling',['vinecopulib: a C++ library for vine copula modeling',['../index.html',1,'']]],
+  ['vinecop',['Vinecop',['../classvinecopulib_1_1_vinecop.html',1,'vinecopulib']]]
 ];

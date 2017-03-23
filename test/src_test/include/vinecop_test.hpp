@@ -7,7 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/tools_eigen.hpp"
+#include "include/misc/tools_eigen.hpp"
 #include "rscript.hpp"
 
 using namespace vinecopulib;

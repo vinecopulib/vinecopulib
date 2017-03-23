@@ -7,9 +7,9 @@
 #pragma once
 
 #include "vinecop_test.hpp"
-#include "include/vinecop_class.hpp"
-#include "include/tools_structselect.hpp"
-#include "include/tools_stl.hpp"
+#include "include/vinecop/class.hpp"
+#include "include/vinecop/tools_structselect.hpp"
+#include "include/misc/tools_stl.hpp"
 
 namespace test_vinecop_class {
     using namespace vinecopulib;
@@ -58,14 +58,14 @@ namespace test_vinecop_class {
     }
 
     TEST_F(VinecopTest, select_finds_right_structure) {
-// check whether the same structure appears if we only allow for
-// independence (pair-copula estimates differ otherwise)
+        // check whether the same structure appears if we only allow for
+        // independence (pair-copula estimates differ otherwise)
 
-// select structure and get matrix
+        // select structure and get matrix
         Vinecop fit = Vinecop::select(u, {BicopFamily::indep});
         auto vcl_matrix = fit.get_matrix();
 
-// check if the same conditioned sets appear for each tree
+        // check if the same conditioned sets appear for each tree
         using namespace tools_structselect;
         std::vector<std::vector<std::vector<int>>> vc_sets(6), vcl_sets(6);
         int pairs_unequal = 0;

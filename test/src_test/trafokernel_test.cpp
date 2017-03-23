@@ -5,7 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "include/trafokernel_test.hpp"
-#include "include/tools_stats.hpp"
+#include "include/misc/tools_stats.hpp"
 
 TrafokernelTest::TrafokernelTest() {
     cop = Bicop::create(vinecopulib::BicopFamily::tll0, 0);

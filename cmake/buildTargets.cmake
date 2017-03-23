@@ -6,7 +6,10 @@ if(PYTHON_BINDINGS)
 endif()
 
 file(GLOB_RECURSE vinecopulib_sources src/*.cpp src/*.cc src/*c)
-file(GLOB_RECURSE vinecopulib_headers include/*.h include/*.hpp)
+file(GLOB_RECURSE vinecopulib_bicop_headers include/bicop/*.hpp)
+file(GLOB_RECURSE vinecopulib_vinecop_headers include/vinecop/*.hpp)
+file(GLOB_RECURSE vinecopulib_misc_headers include/misc/*.hpp)
+file(GLOB_RECURSE vinecopulib_main_header include/vinecopulib.hpp)
 
 include_directories(${external_includes} include)
 
@@ -16,14 +19,17 @@ else()
     add_library(vinecopulib STATIC ${vinecopulib_sources})
 endif()
 
-include(GenerateExportHeader)
-generate_export_header(vinecopulib)
+# TODO: Properly use VINECOPULIB_EXPORT to reduce the number of exports
+#include(GenerateExportHeader)
+#generate_export_header(vinecopulib)
 
 target_link_libraries(vinecopulib ${external_libs})
 
 set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
+if (WIN32)
+    set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
+endif()
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
@@ -81,8 +87,6 @@ if (NOT WIN32)
 
     # Targets:
     #   * <prefix>/lib/libvinecopulib.dylib
-    #   * header location after install: <prefix>/include/vinecopulib/*.hpp
-    #   * headers can be included by C++ code `#include <vinecopulib/*.hpp>`
     install(
             TARGETS vinecopulib
             EXPORT "${targets_export_name}"
@@ -92,19 +96,35 @@ if (NOT WIN32)
     )
 
     # Headers:
-    #   * include/vinecopulib/*.hpp -> <prefix>/include/vinecopulib/*.hpp
+    #   * include/vinecopulib/vinecopulib -> <prefix>/include/vinecopulib/vinecopulib
+    #   * include/vinecopulib/bicop/*.hpp -> <prefix>/include/vinecopulib/bicop/*.hpp
+    #   * include/vinecopulib/vinecop/*.hpp -> <prefix>/include/vinecopulib/vinecop/*.hpp
+    #   * include/vinecopulib/misc/*.hpp -> <prefix>/include/vinecopulib/misc/*.hpp
     install(
-            FILES ${vinecopulib_headers}
-            DESTINATION "${include_install_dir}/vinecopulib"
+            FILES ${vinecopulib_main_header}
+            DESTINATION "${include_install_dir}"
+    )
+    install(
+            FILES ${vinecopulib_bicop_headers}
+            DESTINATION "${include_install_dir}/vinecopulib/bicop"
+    )
+    install(
+            FILES ${vinecopulib_vinecop_headers}
+            DESTINATION "${include_install_dir}/vinecopulib/vinecop"
+    )
+    install(
+            FILES ${vinecopulib_misc_headers}
+            DESTINATION "${include_install_dir}/vinecopulib/misc"
     )
 
+    # TODO: Properly use VINECOPULIB_EXPORT to reduce the number of exports
     # Export headers:
     #   * ${CMAKE_CURRENT_BINARY_DIR}/include_export.h -> <prefix>/include/include_export.h
-    install(
-            FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/vinecopulib_export.h"
-            DESTINATION "${include_install_dir}/vinecopulib"
-    )
+    #install(
+    #        FILES
+    #        "${CMAKE_CURRENT_BINARY_DIR}/vinecopulib_export.h"
+    #        DESTINATION "${include_install_dir}/vinecopulib"
+    #)
 
     # Config
     #   * <prefix>/lib/cmake/vinecopulib/vinecopulibConfig.cmake

@@ -19,12 +19,16 @@ namespace test_bicop_parametric {
         command = command + " "  + std::to_string(this->get_family());
         command = command + " "  + std::to_string(this->get_par());
         command = command + " "  + std::to_string(this->get_par2());
-        system(command.c_str());
+        int sys_exit_code = system(command.c_str());
+        if (sys_exit_code != 0) {
+            throw std::runtime_error("error in system call");
+        }
 
         if (this->needs_check_) {
             Eigen::MatrixXd results = read_matxd("temp");
-            Eigen::VectorXd par = this->par_bicop_.get_parameters();
-            ASSERT_TRUE(fabs(this->par_bicop_.parameters_to_tau(par) - results(0,0)) < 1e-4);
+            Eigen::VectorXd par = this->bicop_->get_parameters();
+            ASSERT_TRUE(fabs(this->bicop_->parameters_to_tau(par) -
+                                     results(0,0)) < 1e-4);
         }
     }
 
@@ -36,7 +40,7 @@ namespace test_bicop_parametric {
             Eigen::MatrixXd results = read_matxd("temp");
 
             // evaluate in C++
-            Eigen::VectorXd f = this->par_bicop_.pdf(results.block(0,1,n,2));
+            Eigen::VectorXd f = this->bicop_->pdf(results.block(0,1,n,2));
 
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,3,n,1), 1e-4));
@@ -52,7 +56,7 @@ namespace test_bicop_parametric {
             Eigen::MatrixXd results = read_matxd("temp");
 
             // evaluate in C++
-            Eigen::VectorXd f = this->par_bicop_.hfunc1(results.block(0,1,n,2));
+            Eigen::VectorXd f = this->bicop_->hfunc1(results.block(0,1,n,2));
 
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,4,n,1), 1e-4));
@@ -67,7 +71,7 @@ namespace test_bicop_parametric {
             Eigen::MatrixXd results = read_matxd("temp");
 
             // evaluate in C++
-            Eigen::VectorXd f = this->par_bicop_.hfunc2(results.block(0,1,n,2));
+            Eigen::VectorXd f = this->bicop_->hfunc2(results.block(0,1,n,2));
 
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,5,n,1), 1e-4));
@@ -82,7 +86,7 @@ namespace test_bicop_parametric {
             Eigen::MatrixXd results = read_matxd("temp");
 
             // evaluate in C++
-            Eigen::VectorXd f = this->par_bicop_.hinv1(results.block(0,1,n,2));
+            Eigen::VectorXd f = this->bicop_->hinv1(results.block(0,1,n,2));
 
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,6,n,1), 1e-4));
@@ -97,7 +101,7 @@ namespace test_bicop_parametric {
             Eigen::MatrixXd results = read_matxd("temp");
 
             // evaluate in C++
-            Eigen::VectorXd f = this->par_bicop_.hinv2(results.block(0,1,n,2));
+            Eigen::VectorXd f = this->bicop_->hinv2(results.block(0,1,n,2));
 
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,7,n,1), 1e-4));

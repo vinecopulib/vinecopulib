@@ -1,0 +1,316 @@
+\hypertarget{classvinecopulib_1_1_bicop}{}\section{vinecopulib\+:\+:Bicop Class Reference}
+\label{classvinecopulib_1_1_bicop}\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+
+
+{\ttfamily \#include $<$bicop\+\_\+class.\+hpp$>$}
+
+
+
+Inheritance diagram for vinecopulib\+:\+:Bicop\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classvinecopulib_1_1_bicop__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a83dc7214e4bb1bfe59285ca05407d646}{pdf} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
+\item 
+Eigen\+::\+Vector\+Xd {\bfseries hfunc1} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
+\item 
+Eigen\+::\+Vector\+Xd {\bfseries hfunc2} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
+\item 
+Eigen\+::\+Vector\+Xd {\bfseries hinv1} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
+\item 
+Eigen\+::\+Vector\+Xd {\bfseries hinv2} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
+\item 
+Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \hyperlink{classvinecopulib_1_1_bicop_aeb87bea4283dacfa5e609356c020f85d}{simulate} (const int \&n)
+\item 
+virtual void {\bfseries fit} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&data, std\+::string method)=0\hypertarget{classvinecopulib_1_1_bicop_a4f0bf601256a692fde44f2f5a841cb43}{}\label{classvinecopulib_1_1_bicop_a4f0bf601256a692fde44f2f5a841cb43}
+
+\item 
+virtual double {\bfseries calculate\+\_\+npars} ()=0\hypertarget{classvinecopulib_1_1_bicop_ad183131404bde979da0969f82317a288}{}\label{classvinecopulib_1_1_bicop_ad183131404bde979da0969f82317a288}
+
+\item 
+virtual double {\bfseries parameters\+\_\+to\+\_\+tau} (const Eigen\+::\+Vector\+Xd \&parameters)=0\hypertarget{classvinecopulib_1_1_bicop_a70854b18c889b6ff23519c745b139905}{}\label{classvinecopulib_1_1_bicop_a70854b18c889b6ff23519c745b139905}
+
+\item 
+Eigen\+::\+Matrix\+Xd {\bfseries tau\+\_\+to\+\_\+parameters} (const double \&tau)\hypertarget{classvinecopulib_1_1_bicop_a5809ddc9884f6fb66fe53289be348913}{}\label{classvinecopulib_1_1_bicop_a5809ddc9884f6fb66fe53289be348913}
+
+\item 
+std\+::string {\bfseries get\+\_\+association\+\_\+direction} () const \hypertarget{classvinecopulib_1_1_bicop_abfef8396fef667444fa83f6fed1c038d}{}\label{classvinecopulib_1_1_bicop_abfef8396fef667444fa83f6fed1c038d}
+
+\item 
+virtual void \hyperlink{classvinecopulib_1_1_bicop_ac8f9520ba401ca554b3e4e2bb4a95cdf}{flip} ()=0\hypertarget{classvinecopulib_1_1_bicop_ac8f9520ba401ca554b3e4e2bb4a95cdf}{}\label{classvinecopulib_1_1_bicop_ac8f9520ba401ca554b3e4e2bb4a95cdf}
+
+\begin{DoxyCompactList}\small\item\em Adjust the copula to a flipping of arguments (u,v) -\/$>$ (v,u) \end{DoxyCompactList}\end{DoxyCompactItemize}
+{\bf }\par
+\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{classvinecopulib_1_1_bicop_ae8bcc0c3265cc86565333a0cfd3d619d}{loglik} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
+\item 
+double {\bfseries aic} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)\hypertarget{classvinecopulib_1_1_bicop_a9287fec95519fea64a2ae80f5888c709}{}\label{classvinecopulib_1_1_bicop_a9287fec95519fea64a2ae80f5888c709}
+
+\item 
+double {\bfseries bic} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)\hypertarget{classvinecopulib_1_1_bicop_ac1f480d13b3464260c2dd6aa88b2e130}{}\label{classvinecopulib_1_1_bicop_ac1f480d13b3464260c2dd6aa88b2e130}
+
+\end{DoxyCompactItemize}
+
+{\bf }\par
+\begin{DoxyCompactItemize}
+\item 
+Bicop\+Family \hyperlink{classvinecopulib_1_1_bicop_a68ab3556ee3bb3d02814fd978573bf3b}{get\+\_\+family} () const 
+\item 
+std\+::string {\bfseries get\+\_\+family\+\_\+name} () const \hypertarget{classvinecopulib_1_1_bicop_a4d4fbc0fdca17564c23f4814d5d2fbe7}{}\label{classvinecopulib_1_1_bicop_a4d4fbc0fdca17564c23f4814d5d2fbe7}
+
+\item 
+int {\bfseries get\+\_\+rotation} () const \hypertarget{classvinecopulib_1_1_bicop_ab8e52577a50fbfc57277f9240d8eac03}{}\label{classvinecopulib_1_1_bicop_ab8e52577a50fbfc57277f9240d8eac03}
+
+\item 
+Eigen\+::\+Matrix\+Xd {\bfseries get\+\_\+parameters} () const \hypertarget{classvinecopulib_1_1_bicop_a93ab0dd89826e50b209ea3760f251f2f}{}\label{classvinecopulib_1_1_bicop_a93ab0dd89826e50b209ea3760f251f2f}
+
+\item 
+Eigen\+::\+Matrix\+Xd {\bfseries get\+\_\+parameters\+\_\+lower\+\_\+bounds} () const \hypertarget{classvinecopulib_1_1_bicop_a35bd07862fbce9dd2b78c0d25c8e8352}{}\label{classvinecopulib_1_1_bicop_a35bd07862fbce9dd2b78c0d25c8e8352}
+
+\item 
+Eigen\+::\+Matrix\+Xd {\bfseries get\+\_\+parameters\+\_\+upper\+\_\+bounds} () const \hypertarget{classvinecopulib_1_1_bicop_a5ac1336e4640af7ebaa8b6dc7147eb89}{}\label{classvinecopulib_1_1_bicop_a5ac1336e4640af7ebaa8b6dc7147eb89}
+
+\item 
+void {\bfseries set\+\_\+rotation} (const int \&rotation)\hypertarget{classvinecopulib_1_1_bicop_a8781e97362a14f86ecf547e6c5257a44}{}\label{classvinecopulib_1_1_bicop_a8781e97362a14f86ecf547e6c5257a44}
+
+\item 
+void {\bfseries set\+\_\+parameters} (const Eigen\+::\+Matrix\+Xd \&parameters)\hypertarget{classvinecopulib_1_1_bicop_ac8d1d4266b0fd7e2f971d0149f881ef9}{}\label{classvinecopulib_1_1_bicop_ac8d1d4266b0fd7e2f971d0149f881ef9}
+
+\end{DoxyCompactItemize}
+
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::shared\+\_\+ptr$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ \hyperlink{classvinecopulib_1_1_bicop_a24fe355af519622ee62efb83bf2f2085}{select} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ data, std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=\char`\"{}mle\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true)
+\end{DoxyCompactItemize}
+{\bf }\par
+\begin{DoxyCompactItemize}
+\item 
+static std\+::shared\+\_\+ptr$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ \hyperlink{classvinecopulib_1_1_bicop_a0b2045fa99e5d3aa76a3518426002b19}{create} (Bicop\+Family family=Bicop\+Family\+::indep, int rotation=0)
+\item 
+static std\+::shared\+\_\+ptr$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ {\bfseries create} (Bicop\+Family family, int rotation, Eigen\+::\+Vector\+Xd parameters)\hypertarget{classvinecopulib_1_1_bicop_a2e2d12a9063ada973caf1bdc0380e722}{}\label{classvinecopulib_1_1_bicop_a2e2d12a9063ada973caf1bdc0380e722}
+
+\end{DoxyCompactItemize}
+
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual Eigen\+::\+Vector\+Xd {\bfseries pdf\+\_\+default} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)=0\hypertarget{classvinecopulib_1_1_bicop_ab7ca8f265c7246a619324b6a2b9b33cb}{}\label{classvinecopulib_1_1_bicop_ab7ca8f265c7246a619324b6a2b9b33cb}
+
+\item 
+virtual Eigen\+::\+Vector\+Xd {\bfseries hfunc1\+\_\+default} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)=0\hypertarget{classvinecopulib_1_1_bicop_a158a311fcf681027811785702452b888}{}\label{classvinecopulib_1_1_bicop_a158a311fcf681027811785702452b888}
+
+\item 
+virtual Eigen\+::\+Vector\+Xd {\bfseries hfunc2\+\_\+default} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)=0\hypertarget{classvinecopulib_1_1_bicop_a7f23a0b1fc04c483a0dcf489700a0f30}{}\label{classvinecopulib_1_1_bicop_a7f23a0b1fc04c483a0dcf489700a0f30}
+
+\item 
+virtual Eigen\+::\+Vector\+Xd {\bfseries hinv1\+\_\+default} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)=0\hypertarget{classvinecopulib_1_1_bicop_acb3ae8d10e8af947d2edd78f960b5f78}{}\label{classvinecopulib_1_1_bicop_acb3ae8d10e8af947d2edd78f960b5f78}
+
+\item 
+virtual Eigen\+::\+Vector\+Xd {\bfseries hinv2\+\_\+default} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)=0\hypertarget{classvinecopulib_1_1_bicop_a2b9ccdd26482622c2487b0440b0621b1}{}\label{classvinecopulib_1_1_bicop_a2b9ccdd26482622c2487b0440b0621b1}
+
+\item 
+virtual Eigen\+::\+Matrix\+Xd {\bfseries tau\+\_\+to\+\_\+parameters\+\_\+default} (const double \&tau)=0\hypertarget{classvinecopulib_1_1_bicop_aaa9065f566b333feccafbe19e17f3052}{}\label{classvinecopulib_1_1_bicop_aaa9065f566b333feccafbe19e17f3052}
+
+\end{DoxyCompactItemize}
+{\bf }\par
+\begin{DoxyCompactItemize}
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a1220ac0456ae1a26c586cdc55258fabd}{hinv1\+\_\+num} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
+\item 
+Eigen\+::\+Vector\+Xd {\bfseries hinv2\+\_\+num} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)\hypertarget{classvinecopulib_1_1_bicop_a36a542f48c3c453397d8a097e0e97ca3}{}\label{classvinecopulib_1_1_bicop_a36a542f48c3c453397d8a097e0e97ca3}
+
+\end{DoxyCompactItemize}
+
+{\bf }\par
+\begin{DoxyCompactItemize}
+\item 
+Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \hyperlink{classvinecopulib_1_1_bicop_a72bef78e15ecce5a195c71ab7abf030c}{cut\+\_\+and\+\_\+rotate} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
+\item 
+Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ {\bfseries swap\+\_\+cols} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)\hypertarget{classvinecopulib_1_1_bicop_aaa768f5957af2b4d043e6a29b0500573}{}\label{classvinecopulib_1_1_bicop_aaa768f5957af2b4d043e6a29b0500573}
+
+\end{DoxyCompactItemize}
+
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Bicop\+Family {\bfseries family\+\_\+}\hypertarget{classvinecopulib_1_1_bicop_aba9d36d57f3c7aaa8e119f52e0d732ea}{}\label{classvinecopulib_1_1_bicop_aba9d36d57f3c7aaa8e119f52e0d732ea}
+
+\item 
+int {\bfseries rotation\+\_\+}\hypertarget{classvinecopulib_1_1_bicop_a8730514d4d92ef8ec400a3336d5f1f4d}{}\label{classvinecopulib_1_1_bicop_a8730514d4d92ef8ec400a3336d5f1f4d}
+
+\item 
+Eigen\+::\+Matrix\+Xd {\bfseries parameters\+\_\+}\hypertarget{classvinecopulib_1_1_bicop_a0cf5f9ed3e49f48d561cedc81d08cf07}{}\label{classvinecopulib_1_1_bicop_a0cf5f9ed3e49f48d561cedc81d08cf07}
+
+\item 
+Eigen\+::\+Matrix\+Xd {\bfseries parameters\+\_\+lower\+\_\+bounds\+\_\+}\hypertarget{classvinecopulib_1_1_bicop_a3cefe4b2d05df4e92682660702609983}{}\label{classvinecopulib_1_1_bicop_a3cefe4b2d05df4e92682660702609983}
+
+\item 
+Eigen\+::\+Matrix\+Xd {\bfseries parameters\+\_\+upper\+\_\+bounds\+\_\+}\hypertarget{classvinecopulib_1_1_bicop_aac56fc06af8639918bf07d3f558b5435}{}\label{classvinecopulib_1_1_bicop_aac56fc06af8639918bf07d3f558b5435}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A class for bivariate copulas
+
+The \hyperlink{classvinecopulib_1_1_bicop}{Bicop} class is abstract, you cannot create an instance of this class, but only of the derived classes. 
+
+\subsection{Member Function Documentation}
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!create@{create}}
+\index{create@{create}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection[{\texorpdfstring{create(\+Bicop\+Family family=\+Bicop\+Family\+::indep, int rotation=0)}{create(BicopFamily family=BicopFamily::indep, int rotation=0)}}]{\setlength{\rightskip}{0pt plus 5cm}Bicop\+Ptr vinecopulib\+::\+Bicop\+::create (
+\begin{DoxyParamCaption}
+\item[{Bicop\+Family}]{family = {\ttfamily BicopFamily\+:\+:indep}, }
+\item[{int}]{rotation = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{classvinecopulib_1_1_bicop_a0b2045fa99e5d3aa76a3518426002b19}{}\label{classvinecopulib_1_1_bicop_a0b2045fa99e5d3aa76a3518426002b19}
+Create a bivariate copula using the default contructor
+
+
+\begin{DoxyParams}{Parameters}
+{\em family} & the copula family. \\
+\hline
+{\em rotation} & the rotation type. \\
+\hline
+{\em parameters} & the copula parameters (optional, must be compatible with family). \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A pointer to an object that inherits from {\ttfamily \hyperlink{classvinecopulib_1_1_bicop}{Bicop}}. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!cut\+\_\+and\+\_\+rotate@{cut\+\_\+and\+\_\+rotate}}
+\index{cut\+\_\+and\+\_\+rotate@{cut\+\_\+and\+\_\+rotate}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection[{\texorpdfstring{cut\+\_\+and\+\_\+rotate(const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)}{cut_and_rotate(const Eigen::Matrix< double, Eigen::Dynamic, 2 > &u)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ vinecopulib\+::\+Bicop\+::cut\+\_\+and\+\_\+rotate (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classvinecopulib_1_1_bicop_a72bef78e15ecce5a195c71ab7abf030c}{}\label{classvinecopulib_1_1_bicop_a72bef78e15ecce5a195c71ab7abf030c}
+Data manipulations for rotated families
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $m \times 2$ matrix of data. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The manipulated data. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!get\+\_\+family@{get\+\_\+family}}
+\index{get\+\_\+family@{get\+\_\+family}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection[{\texorpdfstring{get\+\_\+family() const }{get_family() const }}]{\setlength{\rightskip}{0pt plus 5cm}Bicop\+Family vinecopulib\+::\+Bicop\+::get\+\_\+family (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_bicop_a68ab3556ee3bb3d02814fd978573bf3b}{}\label{classvinecopulib_1_1_bicop_a68ab3556ee3bb3d02814fd978573bf3b}
+Getters and setters. \index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!hinv1\+\_\+num@{hinv1\+\_\+num}}
+\index{hinv1\+\_\+num@{hinv1\+\_\+num}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection[{\texorpdfstring{hinv1\+\_\+num(const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)}{hinv1_num(const Eigen::Matrix< double, Eigen::Dynamic, 2 > &u)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::\+Bicop\+::hinv1\+\_\+num (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classvinecopulib_1_1_bicop_a1220ac0456ae1a26c586cdc55258fabd}{}\label{classvinecopulib_1_1_bicop_a1220ac0456ae1a26c586cdc55258fabd}
+Numerical inversion of h-\/functions
+
+These are generic functions to invert the hfunctions numerically. They can be used in derived classes to define {\ttfamily hinv1} and {\ttfamily hinv2}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $m \times 2$ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The numerical inverse of h-\/functions. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!loglik@{loglik}}
+\index{loglik@{loglik}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection[{\texorpdfstring{loglik(const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)}{loglik(const Eigen::Matrix< double, Eigen::Dynamic, 2 > &u)}}]{\setlength{\rightskip}{0pt plus 5cm}double vinecopulib\+::\+Bicop\+::loglik (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_bicop_ae8bcc0c3265cc86565333a0cfd3d619d}{}\label{classvinecopulib_1_1_bicop_ae8bcc0c3265cc86565333a0cfd3d619d}
+Fit statistics
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $m \times 2$ matrix of observations. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!pdf@{pdf}}
+\index{pdf@{pdf}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection[{\texorpdfstring{pdf(const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)}{pdf(const Eigen::Matrix< double, Eigen::Dynamic, 2 > &u)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::\+Bicop\+::pdf (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_bicop_a83dc7214e4bb1bfe59285ca05407d646}{}\label{classvinecopulib_1_1_bicop_a83dc7214e4bb1bfe59285ca05407d646}
+Copula density
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $m \times 2$ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The copula density evaluated at {\ttfamily u}. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!select@{select}}
+\index{select@{select}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection[{\texorpdfstring{select(\+Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ data, std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=""mle"", std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true)}{select(Eigen::Matrix< double, Eigen::Dynamic, 2 > data, std::vector< BicopFamily > family_set=bicop_families::all, std::string method="mle", std::string selection_criterion="bic", bool preselect_families=true)}}]{\setlength{\rightskip}{0pt plus 5cm}Bicop\+Ptr vinecopulib\+::\+Bicop\+::select (
+\begin{DoxyParamCaption}
+\item[{Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$}]{data, }
+\item[{std\+::vector$<$ Bicop\+Family $>$}]{family\+\_\+set = {\ttfamily bicop\+\_\+families\+:\+:all}, }
+\item[{std\+::string}]{method = {\ttfamily \char`\"{}mle\char`\"{}}, }
+\item[{std\+::string}]{selection\+\_\+criterion = {\ttfamily \char`\"{}bic\char`\"{}}, }
+\item[{bool}]{preselect\+\_\+families = {\ttfamily true}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{classvinecopulib_1_1_bicop_a24fe355af519622ee62efb83bf2f2085}{}\label{classvinecopulib_1_1_bicop_a24fe355af519622ee62efb83bf2f2085}
+Select a bivariate copula
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & the data to fit the bivariate copula. \\
+\hline
+{\em selection\+\_\+criterion} & the selection criterion (\char`\"{}aic\char`\"{} or \char`\"{}bic\char`\"{}). \\
+\hline
+{\em family\+\_\+set} & the set of copula families to consider (if empty, then all families are included). \\
+\hline
+{\em use\+\_\+rotations} & whether rotations in the familyset are included. \\
+\hline
+{\em preselect\+\_\+families} & whether to exclude families before fitting based on symmetry properties of the data. \\
+\hline
+{\em method} & indicates the estimation method\+: either maximum likelihood estimation (method = \char`\"{}mle\char`\"{}) or inversion of Kendall\textquotesingle{}s tau (method = \char`\"{}itau\char`\"{}). When method = \char`\"{}itau\char`\"{} is used with families having more than one parameter, the main dependence parameter is found by inverting the Kendall\textquotesingle{}s tau and the remainders by a profile likelihood optimization. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A pointer to an object that inherits from {\ttfamily \hyperlink{classvinecopulib_1_1_bicop}{Bicop}}. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!simulate@{simulate}}
+\index{simulate@{simulate}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection[{\texorpdfstring{simulate(const int \&n)}{simulate(const int &n)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ vinecopulib\+::\+Bicop\+::simulate (
+\begin{DoxyParamCaption}
+\item[{const int \&}]{n}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_bicop_aeb87bea4283dacfa5e609356c020f85d}{}\label{classvinecopulib_1_1_bicop_aeb87bea4283dacfa5e609356c020f85d}
+Simulate from a bivariate copula
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & number of observations. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Samples from the copula model. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/n5/dev/cpp/vinecopulib/include/bicop\+\_\+class.\+hpp\item 
+/home/n5/dev/cpp/vinecopulib/src/bicop\+\_\+class.\+cpp\end{DoxyCompactItemize}

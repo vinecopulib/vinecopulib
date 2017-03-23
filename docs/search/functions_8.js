@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['rvinematrix',['RVineMatrix',['../class_r_vine_matrix.html#ab58141cea327509270023fc7ea28fc4a',1,'RVineMatrix']]]
+  ['select',['select',['../classvinecopulib_1_1_bicop.html#a24fe355af519622ee62efb83bf2f2085',1,'vinecopulib::Bicop']]],
+  ['simulate',['simulate',['../classvinecopulib_1_1_bicop.html#aeb87bea4283dacfa5e609356c020f85d',1,'vinecopulib::Bicop']]]
 ];

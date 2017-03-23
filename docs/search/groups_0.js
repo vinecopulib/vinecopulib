@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['copula_20density',['Copula density',['../group__df.html',1,'']]]
+  ['h_2dfunctions',['h-functions',['../group__hfunctions.html',1,'']]]
 ];
