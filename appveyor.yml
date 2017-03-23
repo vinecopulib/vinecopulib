@@ -1,5 +1,5 @@
 platform: 
-  - Win32
+#  - Win32
   - x64
 #TODO: configuration: Debug/Release + same with CMake
 
@@ -9,7 +9,7 @@ init:
           $env:PROGRAM_FILES="Program Files (x86)"
           $env:NLOPT_ZIP="nlopt-2.4.2-dll32.zip"
         } Else {
-          $env:PROGRAM_FILES="Program Files"
+          $env:PROGRAM_FILES="Program Files (x86)"
           $env:NLOPT_ZIP="nlopt-2.4.2-dll64.zip"
         }
   - cmd: C:/"%PROGRAM_FILES%"/"Microsoft Visual Studio 12.0"/VC/vcvarsall.bat
