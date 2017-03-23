@@ -4,6 +4,11 @@ if (WIN32)
 endif()
 
 include(../cmake/DownloadProject.cmake)
+
+if (POLICY CMP0048)
+  # cmake warns if loaded from a min-3.0-required parent dir, so silence the warning:
+  cmake_policy(SET CMP0048 OLD)
+endif()
 download_project(
         PROJ                googletest
         GIT_REPOSITORY      https://github.com/google/googletest.git

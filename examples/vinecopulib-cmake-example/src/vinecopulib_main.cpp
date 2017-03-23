@@ -23,6 +23,6 @@ int main() {
 	auto fitted = Bicop(data);
 	std::cout << "Fitted Model (sample size = 2e3) | ";
     fitted.print();
-    std::cout << "bla";
-	return 0;
+
+    return 0;
 }
