@@ -1,7 +1,15 @@
-platform: Win32 #TODO: x64
+platform: 
+  - Win32
+  - x64
 #TODO: configuration: Debug/Release + same with CMake
 
 init:
+  - ps: |
+        If ($env:platform -Match "Win32") {
+          $env:NLOPT_ZIP="nlopt-2.4.2-dll32.zip"
+        } Else {
+          $env:NLOPT_ZIP="nlopt-2.4.2-dll64.zip"
+        }
   - cmd: C:/"Program Files (x86)"/"Microsoft Visual Studio 12.0"/VC/vcvarsall.bat
   - ps: |
         $ErrorActionPreference = "Stop"
@@ -19,7 +27,7 @@ install:
   - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
   - 7z x eigen.zip -o"C:\projects" -y > nul
 
-  - ps: wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll32.zip -OutFile nlopt.zip
+  - ps: wget "http://ab-initio.mit.edu/nlopt/$env:NLOPT_ZIP" -OutFile nlopt.zip
   - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
   - lib /def:C:\projects\nlopt\libnlopt-0.def
   - move libnlopt-0.lib C:\projects\nlopt\
