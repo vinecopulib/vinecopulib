@@ -389,14 +389,14 @@ namespace vinecopulib
         rotation_ = fitted_rotation;
     }
 
-    void Bicop::print()
+    std::string Bicop::str()
     {
-        std::stringstream info;
-        info << "family = " << get_family_name() <<
-                ", rotation = " << get_rotation() <<
-                ", parameters = " << get_parameters() << std::endl;
+        std::stringstream bicop_str;
+        bicop_str << "family = "    << get_family_name() <<
+                  ", rotation = "   << get_rotation() <<
+                  ", parameters = " << get_parameters();
 
-        std::cout << info.str().c_str();
+        return bicop_str.str().c_str();
     }
     
     //! Data manipulations for rotated families
