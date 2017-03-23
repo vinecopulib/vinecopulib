@@ -11,6 +11,18 @@
 
 namespace vinecopulib
 {
+    
+    //! Swap the columns of a two-column matrix
+    //! @param u the matrix.
+    //! @return a new matrix v with v.col(0) = u.col(1), v.col(1) = u.col(0).
+    Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
+         Eigen::Matrix<double, Eigen::Dynamic, 2> u)
+    {
+        u.col(0).swap(u.col(1));
+        return u;
+    }
+    
+    
     //! Numerical inversion of a function
     //!
     //! Computes the inverse \f$f^{-1}\f$ of a function \f$f\f$ by the bisection

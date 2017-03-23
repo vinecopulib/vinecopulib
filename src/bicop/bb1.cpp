@@ -12,7 +12,6 @@ namespace vinecopulib
     Bb1Bicop::Bb1Bicop()
     {
         family_ = BicopFamily::bb1;
-        rotation_ = 0;
         parameters_ = Eigen::VectorXd(2);
         parameters_lower_bounds_ = Eigen::VectorXd(2);
         parameters_upper_bounds_ = Eigen::VectorXd(2);
@@ -49,11 +48,10 @@ namespace vinecopulib
 
     double Bb1Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
     {
-        double tau = 1-2/(parameters(1) * (parameters(0) + 2));
-        return flip_tau(tau);
+        return 1 - 2 / (parameters(1) * (parameters(0) + 2));
     }
 
-    Eigen::MatrixXd Bb1Bicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd Bb1Bicop::tau_to_parameters(const double& tau)
     {
         return vinecopulib::no_tau_to_parameters(tau);
     }

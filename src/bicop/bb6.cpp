@@ -12,7 +12,6 @@ namespace vinecopulib
     Bb6Bicop::Bb6Bicop()
     {
         family_ = BicopFamily::bb6;
-        rotation_ = 0;
         parameters_ = Eigen::VectorXd(2);
         parameters_lower_bounds_ = Eigen::VectorXd(2);
         parameters_upper_bounds_ = Eigen::VectorXd(2);
@@ -55,11 +54,10 @@ namespace vinecopulib
         auto f = [&theta, &delta](const double& v) {
             return -4/(delta*theta)*std::log(1-std::pow(1-v,theta))*(1-v-std::pow(1-v,-theta)+std::pow(1-v,-theta)*v);
         };
-        double tau = 1+tools_integration::integrate_zero_to_one(f);
-        return flip_tau(tau);
+        return 1 + tools_integration::integrate_zero_to_one(f);
     }
 
-    Eigen::MatrixXd Bb6Bicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd Bb6Bicop::tau_to_parameters(const double& tau)
     {
         return vinecopulib::no_tau_to_parameters(tau);
     }

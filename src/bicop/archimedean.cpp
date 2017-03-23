@@ -9,7 +9,7 @@
 
 namespace vinecopulib
 {
-    Eigen::VectorXd ArchimedeanBicop::pdf_default(
+    Eigen::VectorXd ArchimedeanBicop::pdf(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -21,7 +21,7 @@ namespace vinecopulib
         return u.col(0).binaryExpr(u.col(1), f);
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hfunc1_default(
+    Eigen::VectorXd ArchimedeanBicop::hfunc1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -32,14 +32,14 @@ namespace vinecopulib
         return u.col(0).binaryExpr(u.col(1), f);
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hfunc2_default(
+    Eigen::VectorXd ArchimedeanBicop::hfunc2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return hfunc1_default(swap_cols(u));
+        return hfunc1(swap_cols(u));
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hinv1_default(
+    Eigen::VectorXd ArchimedeanBicop::hinv1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -47,35 +47,17 @@ namespace vinecopulib
         return hinv;
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hinv2_default(
+    Eigen::VectorXd ArchimedeanBicop::hinv2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return hinv1_default(swap_cols(u));
+        return hinv1(swap_cols(u));
     }
-
-    void ArchimedeanBicop::flip()
-    {
-        if (rotation_ == 90) {
-            set_rotation(270);
-        } else if (rotation_ == 270) {
-            set_rotation(90);
-        }
-    }
-
+    
     Eigen::VectorXd ArchimedeanBicop::get_start_parameters(const double)
     {
         Eigen::MatrixXd lb = this->get_parameters_lower_bounds();
         Eigen::VectorXd parameters = lb + Eigen::VectorXd::Constant(2, 0.1);
         return parameters;
-    }
-
-    double ArchimedeanBicop::flip_tau(double tau)
-    {
-        double flipped_tau = tau;
-        if (tools_stl::is_member(rotation_, {90, 270})) {
-            flipped_tau *= -1;
-        }
-        return flipped_tau;
     }
 }

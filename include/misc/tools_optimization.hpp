@@ -116,15 +116,4 @@ namespace tools_optimization {
         nlopt::opt opt_;
         NLoptControls controls_;
     };
-
-    // the objective function for maximum likelihood estimation
-    double mle_objective(const std::vector<double>& x,
-                         std::vector<double>& grad,
-                         void* data);
-
-    // the objective function for profile maximum likelihood estimation
-    double pmle_objective(const std::vector<double>& x,
-                          std::vector<double> &,
-                          void* data);
-
 }

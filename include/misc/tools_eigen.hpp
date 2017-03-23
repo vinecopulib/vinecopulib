@@ -12,13 +12,16 @@ namespace vinecopulib
 {
     typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
 
+    Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
+         Eigen::Matrix<double, Eigen::Dynamic, 2> u);
+    
     Eigen::VectorXd invert_f(
             const Eigen::VectorXd &x, std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
             const double lb = 1e-20,
             const double ub = 1-1e-20,
             int n_iter = 35
     );
-
+    
     Eigen::MatrixXd read_matxd(const char *filename, int max_buffer_size = (int) 1e6);
     Eigen::MatrixXi read_matxi(const char *filename, int max_buffer_size = (int) 1e6);
 }
