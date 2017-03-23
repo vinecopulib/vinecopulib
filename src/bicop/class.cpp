@@ -27,23 +27,8 @@ namespace vinecopulib
             bicop_ = AbstractBicop::create(family, rotation, parameters);
         }
     }
-
-    //! Select a bivariate copula
-    //!
-    //! @param data the data to fit the bivariate copula.
-    //! @param selection_criterion the selection criterion ("aic" or "bic").
-    //! @param family_set the set of copula families to consider (if empty, then
-    //!     all families are included).
-    //! @param use_rotations whether rotations in the familyset are included.
-    //! @param preselect_families whether to exclude families before fitting
-    //!     based on symmetry properties of the data.
-    //! @param method indicates the estimation method: either maximum likelihood
-    //!     estimation (method = "mle") or inversion of Kendall's tau (method =
-    //!     "itau"). When method = "itau" is used with families having more than
-    //!     one parameter, the main dependence parameter is found by inverting
-    //!     the Kendall's tau and the remainders by a profile likelihood
-    //!     optimization.
-    //! @return A pointer to an object that inherits from \c Bicop.
+    
+    // Selection Constructors (see Bicop::select())
     Bicop::Bicop(
             Eigen::Matrix<double, Eigen::Dynamic, 2> data,
             std::vector<BicopFamily> family_set,
@@ -51,101 +36,7 @@ namespace vinecopulib
             std::string selection_criterion,
             bool preselect_families)
     {
-        using namespace tools_stl;
-        // If the familyset is empty, use all families.
-        // If the familyset is not empty, check that all included families are implemented.
-        if (family_set.empty()) {
-            if (method == "itau") {
-                family_set = bicop_families::itau;
-            } else {
-                family_set = bicop_families::all;
-            }
-        } else {
-            if (intersect(family_set, bicop_families::all).empty()) {
-                throw std::runtime_error(
-                        std::string("One of the families is not implemented")
-                );
-            }
-            if (method == "itau") {
-                family_set = intersect(family_set, bicop_families::itau);
-                if (family_set.empty()) {
-                    throw std::runtime_error(
-                            std::string("No family with method itau provided")
-                    );
-                }
-            }
-        }
-
-        // When using rotations, add only the ones that yield the appropriate
-        // association direction.
-        auto tau = tools_stats::pairwise_ktau(data);
-        std::vector<int> which_rotations;
-        if (tau > 0) {
-            which_rotations = {0, 180};
-        } else {
-            which_rotations = {90, 270};
-        }
-
-        std::vector<double> c(2);
-        if (preselect_families) {
-            c = get_c1c2(data, tau);
-        }
-
-        // Create the combinations of families and rotations to estimate
-        std::vector<BicopFamily> families;
-        std::vector<int> rotations;
-        for (auto family : family_set) {
-            bool is_rotationless = is_member(family,
-                                             bicop_families::rotationless);
-            bool preselect = true;
-            if (is_rotationless) {
-                if (preselect_families) {
-                    preselect = preselect_family(c, tau, family,
-                                                 0, is_rotationless);
-                }
-                if (preselect) {
-                    families.push_back(family);
-                    rotations.push_back(0);
-                }
-            } else {
-                for (auto rotation : which_rotations) {
-                    if (preselect_families) {
-                        preselect = preselect_family(c, tau, family,
-                                                     rotation, is_rotationless);
-                    }
-                    if (preselect) {
-                        families.push_back(family);
-                        rotations.push_back(rotation);
-                    }
-                }
-            }
-        }
-
-        // Estimate all models and select the best one using the selection_criterion
-        BicopPtr fitted_bicop;
-        double fitted_criterion = 1e6;
-        for (unsigned int j = 0; j < families.size(); j++) {
-            // Estimate the model
-            bicop_ = AbstractBicop::create(families[j], rotations[j]);
-            bicop_->fit(data, method);
-
-            // Compute the selection criterion
-            double new_criterion;
-            if (selection_criterion == "aic") {
-                new_criterion = aic(data);
-            } else if (selection_criterion == "bic") {
-                new_criterion = bic(data);
-            } else {
-                throw std::runtime_error(std::string("Selection criterion not implemented"));
-            }
-
-            // If the new model is better than the current one, then replace the current model by the new one
-            if (new_criterion < fitted_criterion) {
-                fitted_criterion = new_criterion;
-                fitted_bicop = bicop_;
-            }
-        }
-        bicop_ = fitted_bicop;
+        select(data, family_set, method, selection_criterion, preselect_families);
     }
 
 
@@ -364,7 +255,23 @@ namespace vinecopulib
     {
         bicop_->fit(data,method);
     }
-
+    
+    //! Select a bivariate copula
+    //!
+    //! @param data the data to fit the bivariate copula.
+    //! @param selection_criterion the selection criterion ("aic" or "bic").
+    //! @param family_set the set of copula families to consider (if empty, then
+    //!     all families are included).
+    //! @param use_rotations whether rotations in the familyset are included.
+    //! @param preselect_families whether to exclude families before fitting
+    //!     based on symmetry properties of the data.
+    //! @param method indicates the estimation method: either maximum likelihood
+    //!     estimation (method = "mle") or inversion of Kendall's tau (method =
+    //!     "itau"). When method = "itau" is used with families having more than
+    //!     one parameter, the main dependence parameter is found by inverting
+    //!     the Kendall's tau and the remainders by a profile likelihood
+    //!     optimization.
+    //! @return A pointer to an object that inherits from \c Bicop.
     void Bicop::select(
             Eigen::Matrix<double, Eigen::Dynamic, 2> data,
             std::vector<BicopFamily> family_set,
@@ -373,9 +280,101 @@ namespace vinecopulib
             bool preselect_families
     )
     {
-        Bicop bicop(data, family_set, method,
-                    selection_criterion, preselect_families);
-        bicop_ = bicop.get_bicop();
+        using namespace tools_stl;
+        // If the familyset is empty, use all families.
+        // If the familyset is not empty, check that all included families are implemented.
+        if (family_set.empty()) {
+            if (method == "itau") {
+                family_set = bicop_families::itau;
+            } else {
+                family_set = bicop_families::all;
+            }
+        } else {
+            if (intersect(family_set, bicop_families::all).empty()) {
+                throw std::runtime_error(
+                        std::string("One of the families is not implemented")
+                );
+            }
+            if (method == "itau") {
+                family_set = intersect(family_set, bicop_families::itau);
+                if (family_set.empty()) {
+                    throw std::runtime_error(
+                            std::string("No family with method itau provided")
+                    );
+                }
+            }
+        }
+
+        // When using rotations, add only the ones that yield the appropriate
+        // association direction.
+        auto tau = tools_stats::pairwise_ktau(data);
+        std::vector<int> which_rotations;
+        if (tau > 0) {
+            which_rotations = {0, 180};
+        } else {
+            which_rotations = {90, 270};
+        }
+
+        std::vector<double> c(2);
+        if (preselect_families) {
+            c = get_c1c2(data, tau);
+        }
+
+        // Create the combinations of families and rotations to estimate
+        std::vector<BicopFamily> families;
+        std::vector<int> rotations;
+        for (auto family : family_set) {
+            bool is_rotationless = is_member(family,
+                                             bicop_families::rotationless);
+            bool preselect = true;
+            if (is_rotationless) {
+                if (preselect_families) {
+                    preselect = preselect_family(c, tau, family,
+                                                 0, is_rotationless);
+                }
+                if (preselect) {
+                    families.push_back(family);
+                    rotations.push_back(0);
+                }
+            } else {
+                for (auto rotation : which_rotations) {
+                    if (preselect_families) {
+                        preselect = preselect_family(c, tau, family,
+                                                     rotation, is_rotationless);
+                    }
+                    if (preselect) {
+                        families.push_back(family);
+                        rotations.push_back(rotation);
+                    }
+                }
+            }
+        }
+
+        // Estimate all models and select the best one using the selection_criterion
+        BicopPtr fitted_bicop;
+        double fitted_criterion = 1e6;
+        for (unsigned int j = 0; j < families.size(); j++) {
+            // Estimate the model
+            bicop_ = AbstractBicop::create(families[j], rotations[j]);
+            bicop_->fit(data, method);
+
+            // Compute the selection criterion
+            double new_criterion;
+            if (selection_criterion == "aic") {
+                new_criterion = aic(data);
+            } else if (selection_criterion == "bic") {
+                new_criterion = bic(data);
+            } else {
+                throw std::runtime_error(std::string("Selection criterion not implemented"));
+            }
+
+            // If the new model is better than the current one, then replace the current model by the new one
+            if (new_criterion < fitted_criterion) {
+                fitted_criterion = new_criterion;
+                fitted_bicop = bicop_;
+            }
+        }
+        bicop_ = fitted_bicop;
     }
 
     void Bicop::print()
