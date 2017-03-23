@@ -552,8 +552,7 @@ namespace vinecopulib
                 } else {
                     if (threshold != 0) {
                         double crit = tools_structselect::get_tree_criterion(
-                            u_e, threshold_criterion, threshold
-                        );
+                            u_e, threshold_criterion, threshold);
                         if (crit > 1 - threshold) {
                             pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
                         }
