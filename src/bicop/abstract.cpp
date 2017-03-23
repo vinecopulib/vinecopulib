@@ -83,11 +83,8 @@ namespace vinecopulib
         return new_bicop;
     }
     
-    BicopPtr AbstractBicop::create(
-        BicopFamily family,
-        int rotation,
-        Eigen::VectorXd parameters
-    )
+    BicopPtr AbstractBicop::create(BicopFamily family, int rotation,
+        const Eigen::MatrixXd& parameters)
     {
         auto new_bicop = AbstractBicop::create(family, rotation);
         new_bicop->set_parameters(parameters);

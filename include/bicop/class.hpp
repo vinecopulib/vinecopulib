@@ -14,8 +14,8 @@ namespace vinecopulib {
     public:
         // Constructors
         Bicop();
-        Bicop(BicopFamily family, int rotation = 0);
-        Bicop(BicopFamily family, int rotation, Eigen::VectorXd parameters);
+        Bicop(BicopFamily family, int rotation = 0,
+            const Eigen::MatrixXd& parameters = Eigen::MatrixXd());
         Bicop(
                 Eigen::Matrix<double, Eigen::Dynamic, 2> data,
                 std::vector<BicopFamily> family_set = bicop_families::all,

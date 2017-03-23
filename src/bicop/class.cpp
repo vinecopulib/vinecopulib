@@ -17,15 +17,15 @@ namespace vinecopulib
     {
         bicop_ = AbstractBicop::create();
     }
-
-    Bicop::Bicop(BicopFamily family, int rotation)
-    {
-        bicop_ = AbstractBicop::create(family, rotation);
-    }
     
-    Bicop::Bicop(BicopFamily family, int rotation, Eigen::VectorXd parameters)
+    Bicop::Bicop(BicopFamily family, int rotation, 
+        const Eigen::MatrixXd& parameters)
     {
-        bicop_ = AbstractBicop::create(family, rotation, parameters);
+        if (parameters.size() == 0) {
+            bicop_ = AbstractBicop::create(family, rotation);
+        } else {
+            bicop_ = AbstractBicop::create(family, rotation, parameters);
+        }
     }
 
     //! Select a bivariate copula

@@ -36,26 +36,16 @@ namespace vinecopulib
     {
     friend class Bicop;
     friend double tools_optimization::mle_objective(
-            const std::vector<double>& x,
-            std::vector<double>& grad,
-            void* data
-    );
+        const std::vector<double>& x, std::vector<double>& grad, void* data);
     friend double tools_optimization::pmle_objective(
-            const std::vector<double>& x,
-            std::vector<double>& grad,
-            void* data
-    );
+        const std::vector<double>& x, std::vector<double>& grad, void* data);
+    
     protected:
         // Factories
         static std::shared_ptr<AbstractBicop> create(
-            BicopFamily family = BicopFamily::indep,
-            int rotation = 0
-        );
-        static std::shared_ptr<AbstractBicop> create(
-            BicopFamily family,
-            int rotation,
-            Eigen::VectorXd parameters
-        );
+            BicopFamily family = BicopFamily::indep, int rotation = 0);
+        static std::shared_ptr<AbstractBicop> create(BicopFamily family,
+            int rotation, const Eigen::MatrixXd& parameters);
 
         // Getters and setters
         BicopFamily get_family() const;
@@ -70,8 +60,7 @@ namespace vinecopulib
 
         // Virtual methods
         virtual void flip() = 0;
-        virtual void fit(
-                const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+        virtual void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 std::string method) = 0;
         virtual double calculate_npars() = 0;
         virtual double parameters_to_tau(const Eigen::VectorXd& parameters) = 0;
