@@ -177,9 +177,7 @@ namespace vinecopulib
     //! @{
     double Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
-        Eigen::VectorXd ll = pdf(u);
-        ll = ll.array().log();
-        return ll.sum();
+        return pdf(u).array().log().sum();
     }
 
     double Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
