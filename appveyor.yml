@@ -26,10 +26,10 @@ install:
   - ps: $env:R_LIBS_USER = 'c:\R\library'
   - travis-tool.sh r_install VineCopula
 
-  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
+  - wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
   - 7z x eigen.zip -o"C:\projects" -y > nul
 
-  - ps: wget http://ab-initio.mit.edu/nlopt/%NLOPT_ZIP% -OutFile nlopt.zip
+  - wget http://ab-initio.mit.edu/nlopt/%NLOPT_ZIP% -OutFile nlopt.zip
   - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
   - lib /def:C:\projects\nlopt\libnlopt-0.def
   - move libnlopt-0.lib C:\projects\nlopt\
