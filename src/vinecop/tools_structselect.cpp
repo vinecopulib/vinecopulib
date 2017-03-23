@@ -138,9 +138,8 @@ namespace tools_structselect {
 
     //! Add edges allowed by the proximity condition
     //!
-    //! Also calculates the Kendall's tau for the edge and sets edge weights
-    //! to 1-|tau| so that the minimum spanning tree algorithm maximizes sum of
-    //! |tau|.
+    //! Also calculates the edge weight (e.g., 1-|tau| for tree_criterion = 
+    //! "itau").
     //!
     //! @param vine_tree tree of a vine.
     //! @param tree_criterion the criterion for selecting the maximum spanning
@@ -158,19 +157,16 @@ namespace tools_structselect {
                 // (-1 means 'no common neighbor')
                 if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                     auto pc_data = get_pc_data(v0, v1, vine_tree);
-                    auto w = get_edge_weight(pc_data, tree_criterion, threshold);
+                    auto w = get_tree_criterion(pc_data, tree_criterion, threshold);
                     auto e = boost::add_edge(v0, v1, w, vine_tree).first;
                     vine_tree[e].weight = w;
                 }
             }
         }
     }
-    
-    double get_edge_weight(
-        Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
-        std::string tree_criterion,
-        double threshold
-    ) 
+        
+    double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
+        std::string tree_criterion, double threshold) 
     {
         double w;
         if (tree_criterion == "tau") {

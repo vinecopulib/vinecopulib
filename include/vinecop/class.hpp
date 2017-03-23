@@ -31,11 +31,21 @@ namespace vinecopulib
                 std::string method = "mle",
                 int truncation_level = std::numeric_limits<int>::max(),
                 double threshold = 0.0,
-                Eigen::MatrixXi matrix = Eigen::MatrixXi(0, 0),
                 std::string tree_criterion = "tau",
                 std::string selection_criterion = "bic",
                 bool preselect_families = true,
                 bool show_trace = false
+        );
+        static Vinecop family_select(
+                const Eigen::MatrixXd& data,
+                const Eigen::MatrixXi& matrix,
+                std::vector<BicopFamily> family_set = bicop_families::all,
+                std::string method = "mle",
+                int truncation_level = std::numeric_limits<int>::max(),
+                double threshold = 0.0,
+                std::string threshold_criterion = "tau",
+                std::string selection_criterion = "bic",
+                bool preselect_families = true
         );
 
         Bicop get_pair_copula(int tree, int edge) const;

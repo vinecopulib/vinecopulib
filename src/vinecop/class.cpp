@@ -111,7 +111,8 @@ namespace vinecopulib
     //!     optimization.
     //! @param truncation_level the truncation level.
     //! @param threshold the threshold.
-    //! @param matrix the structure matrix (not yet implemented).
+    //! @param tree_criterion the criterion for selecting the maximum spanning
+    //!     tree ("tau", "hoeffd" and "rho" implemented so far).
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
     //! @param preselect_families  whether to exclude families before fitting based
@@ -125,7 +126,6 @@ namespace vinecopulib
             std::string method,
             int truncation_level,
             double threshold,
-            Eigen::MatrixXi matrix,
             std::string tree_criterion,
             std::string selection_criterion,
             bool preselect_families,
@@ -134,9 +134,6 @@ namespace vinecopulib
     {
         using namespace tools_structselect;
         int d = data.cols();
-        if (matrix.size() > 0) {
-            throw std::runtime_error("fixed matrix selection not implemented yet.");
-        }
         std::vector<VineTree> trees(d);
 
         trees[0] = make_base_tree(data);
@@ -327,9 +324,6 @@ namespace vinecopulib
 
         for (int tree = 0; tree < d - 1; ++tree) {
             for (int edge = 0; edge < d - tree - 1; ++edge) {
-                // get pair copula for this edge
-                Bicop edge_copula = get_pair_copula(tree, edge);
-
                 // extract evaluation point from hfunction matrices (have been
                 // computed in previous tree level)
                 int m = max_matrix(tree, edge);
@@ -339,8 +333,10 @@ namespace vinecopulib
                 } else {
                     u_e.col(1) = hfunc1.col(d - m);
                 }
-
+                
+                Bicop edge_copula = get_pair_copula(tree, edge);
                 vine_density = vine_density.cwiseProduct(edge_copula.pdf(u_e));
+                
                 // h-functions are only evaluated if needed in next step
                 if (needed_hfunc1(tree + 1, edge)) {
                     hfunc1.col(edge) = edge_copula.hfunc1(u_e);
@@ -475,5 +471,113 @@ namespace vinecopulib
 
         // convert to Eigen::VectorXi;
         return Eigen::Map<Eigen::VectorXi>(&indexes[0], order.size());
+    }
+    
+    //! Automated pair-copula selection for vine copulas
+    //!
+    //! Automatically selects all pair-copula families and fits all parameters.
+    //!
+    //! @param data nxd matrix of copula data.
+    //! @param matrix the structure matrix.
+    //! @param family_set the set of copula families to consider (if empty, then
+    //!     all families are included; all families are included by default).
+    //! @param method indicates the estimation method: either maximum likelihood
+    //!     estimation (method = "mle", default) or inversion of Kendall's tau
+    //!     (method = "itau"). When method = "itau" is used with families having
+    //!     more thanone parameter, the main dependence parameter is found by
+    //!     inverting the Kendall's tau and the remainders by profile likelihood
+    //!     optimization.
+    //! @param truncation_level the truncation level.
+    //! @param threshold for thresholded vines (0 = no threshold).
+    //! @param threshold_criterion the crriterion for thresholding.
+    //! @param selection_criterion the selection criterion; either "aic" or "bic"
+    //!     (default).
+    //! @param preselect_families  whether to exclude families before fitting based
+    //!     on symmetry properties of the data.
+    //! @return The fitted vine copula model.
+    Vinecop Vinecop::family_select(
+            const Eigen::MatrixXd& data,
+            const Eigen::MatrixXi& matrix,
+            std::vector<BicopFamily> family_set,
+            std::string method,
+            int truncation_level,
+            double threshold,
+            std::string threshold_criterion,
+            std::string selection_criterion,
+            bool preselect_families
+    )
+    {
+        int d = data.cols();
+        if (d != matrix.cols()) {
+            throw std::runtime_error(
+                "dimensions of matrix and data don't match\n"
+            );
+        }
+
+        // info about the vine structure
+        RVineMatrix rvine_matrix(matrix);
+        Eigen::VectorXi revorder    = rvine_matrix.get_order().reverse();
+        Eigen::MatrixXi no_matrix   = rvine_matrix.in_natural_order();
+        Eigen::MatrixXi max_matrix  = rvine_matrix.get_max_matrix();
+        MatrixXb needed_hfunc1 = rvine_matrix.get_needed_hfunc1();
+        MatrixXb needed_hfunc2 = rvine_matrix.get_needed_hfunc2();
+
+        // temporary storage objects for h-functions
+        int n = data.rows();
+        Eigen::MatrixXd hfunc1(n, d);
+        Eigen::MatrixXd hfunc2(n, d);
+        Eigen::MatrixXd u_e(n, 2);
+
+        // fill first row of hfunc2 matrix with evaluation points;
+        // points have to be reordered to correspond to natural order
+        for (int j = 0; j < d; ++j)
+            hfunc2.col(j) = data.col(revorder(j) - 1);
+            
+        auto pair_copulas = make_pair_copula_store(d);
+        for (int tree = 0; tree < d - 1; ++tree) {
+            for (int edge = 0; edge < d - tree - 1; ++edge) {
+                // extract evaluation point from hfunction matrices (have been
+                // computed in previous tree level)
+                int m = max_matrix(tree, edge);
+                u_e.col(0) = hfunc2.col(edge);
+                if (m == no_matrix(tree, edge)) {
+                    u_e.col(1) = hfunc2.col(d - m);
+                } else {
+                    u_e.col(1) = hfunc1.col(d - m);
+                }
+                
+                // select pair-copula
+                if (tree > truncation_level) {
+                    pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
+                } else {
+                    if (threshold != 0) {
+                        double crit = tools_structselect::get_tree_criterion(
+                            u_e, threshold_criterion, threshold
+                        );
+                        if (crit > 1 - threshold) {
+                            pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
+                        }
+                    } else {
+                        pair_copulas[tree][edge] = Bicop(
+                            u_e,
+                            family_set,
+                            method,
+                            selection_criterion,
+                            preselect_families
+                        );
+                    }
+                }
+
+                // h-functions are only evaluated if needed in next step
+                if (needed_hfunc1(tree + 1, edge)) {
+                    hfunc1.col(edge) = pair_copulas[tree][edge].hfunc1(u_e);
+                }
+                if (needed_hfunc2(tree + 1, edge)) {
+                    hfunc2.col(edge) = pair_copulas[tree][edge].hfunc2(u_e);
+                }
+            }
+        }
+
+        return Vinecop(pair_copulas, matrix);
     }
 }
