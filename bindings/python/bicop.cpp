@@ -29,20 +29,20 @@ namespace
         double parameters_to_tau(const Eigen::VectorXd& parameters) 
         { return this->get_override("parametrs_to_tau")(parameters); }
 
-        Eigen::VectorXd pdf_default(const Eigen::MatrixXd& u)    
-        { return this->get_override("pdf_default")(u); }
+        Eigen::VectorXd pdf(const Eigen::MatrixXd& u)    
+        { return this->get_override("pdf")(u); }
 
-        Eigen::VectorXd hfunc1_default(const Eigen::MatrixXd& u) 
-        { return this->get_override("hfunc1_default")(u); }
+        Eigen::VectorXd hfunc1(const Eigen::MatrixXd& u) 
+        { return this->get_override("hfunc1")(u); }
 
-        Eigen::VectorXd hfunc2_default(const Eigen::MatrixXd& u) 
-        { return this->get_override("hfunc2_default")(u); }
+        Eigen::VectorXd hfunc2(const Eigen::MatrixXd& u) 
+        { return this->get_override("hfunc2")(u); }
 
-        Eigen::VectorXd hinv1_default(const Eigen::MatrixXd& u)  
-        { return this->get_override("hinv1_default")(u); }
+        Eigen::VectorXd hinv1(const Eigen::MatrixXd& u)  
+        { return this->get_override("hinv1")(u); }
 
-        Eigen::VectorXd hinv2_default(const Eigen::MatrixXd& u)  
-        { return this->get_override("hinv2_default")(u); }
+        Eigen::VectorXd hinv2(const Eigen::MatrixXd& u)  
+        { return this->get_override("hinv2")(u); }
     };
 
 //    boost::python::numpy::ndarray hello(const boost::python::numpy::ndarray &arr)

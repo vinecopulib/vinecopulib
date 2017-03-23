@@ -15,12 +15,12 @@ namespace test_vinecop_class {
     using namespace vinecopulib;
 
     TEST_F(VinecopTest, constructors_without_error) {
-        Vinecop vinecop_default(5);
+        Vinecop vinecop(5);
 
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(BicopFamily::clayton, 90);
+                pc = Bicop(BicopFamily::clayton, 90);
             }
         }
 
@@ -33,7 +33,7 @@ namespace test_vinecop_class {
         auto par = Eigen::VectorXd::Constant(1, 3.0);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(BicopFamily::clayton, 270, par);
+                pc = Bicop(BicopFamily::clayton, 270, par);
             }
         }
         Vinecop vinecop(pair_copulas, model_matrix);
@@ -47,7 +47,7 @@ namespace test_vinecop_class {
         auto par = Eigen::VectorXd::Constant(1, 3.0);
         for (auto& tree : pair_copulas) {
             for (auto& pc : tree) {
-                pc = Bicop::create(BicopFamily::clayton, 270, par);
+                pc = Bicop(BicopFamily::clayton, 270, par);
             }
         }
         Vinecop vinecop(pair_copulas, model_matrix);

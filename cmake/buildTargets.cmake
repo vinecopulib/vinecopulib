@@ -34,7 +34,6 @@ if(BUILD_TESTING)
             test_all
             test_bicop_parametric
             test_bicop_sanity_checks
-            test_bicop_select
             test_bicop_trafokernel
             test_rvine_matrix
             test_vinecop_class)

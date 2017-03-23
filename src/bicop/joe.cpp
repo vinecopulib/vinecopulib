@@ -44,7 +44,7 @@ namespace vinecopulib
     }
 
     // inverse h-function
-    Eigen::VectorXd JoeBicop::hinv1_default(
+    Eigen::VectorXd JoeBicop::hinv1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -61,7 +61,7 @@ namespace vinecopulib
     }
 
     // link between Kendall's tau and the par_bicop parameter
-    Eigen::MatrixXd JoeBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd JoeBicop::tau_to_parameters(const double& tau)
     {
         Eigen::VectorXd tau2 = Eigen::VectorXd::Constant(1, std::fabs(tau));
         auto f = [&](const Eigen::VectorXd &v) {
@@ -81,7 +81,7 @@ namespace vinecopulib
 
     Eigen::VectorXd JoeBicop::get_start_parameters(const double tau)
     {
-        return tau_to_parameters_default(tau);
+        return tau_to_parameters(tau);
     }
 }
 

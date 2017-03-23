@@ -22,31 +22,31 @@ namespace vinecopulib
          );
      }
 
-    Eigen::VectorXd KernelBicop::pdf_default(
+    Eigen::VectorXd KernelBicop::pdf(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
         return interp_grid_.interpolate(u);
     }
-    Eigen::VectorXd KernelBicop::hfunc1_default(
+    Eigen::VectorXd KernelBicop::hfunc1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
         return interp_grid_.intergrate_1d(u, 1);
     }
-    Eigen::VectorXd KernelBicop::hfunc2_default(
+    Eigen::VectorXd KernelBicop::hfunc2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
         return interp_grid_.intergrate_1d(u, 2);
     }
-    Eigen::VectorXd KernelBicop::hinv1_default(
+    Eigen::VectorXd KernelBicop::hinv1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
         return hinv1_num(u);
     }
-    Eigen::VectorXd KernelBicop::hinv2_default(
+    Eigen::VectorXd KernelBicop::hinv2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -71,7 +71,7 @@ namespace vinecopulib
         interp_grid_.flip();
     }
 
-    Eigen::MatrixXd KernelBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd KernelBicop::tau_to_parameters(const double& tau)
     {
         return vinecopulib::no_tau_to_parameters(tau);
     }

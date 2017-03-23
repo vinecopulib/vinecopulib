@@ -42,7 +42,7 @@ namespace vinecopulib
         return (theta-1-std::log(u))*std::pow(std::log(1/u), theta-2)*(theta/std::pow(u,2));
     }
 
-    Eigen::VectorXd GumbelBicop::hinv1_default(
+    Eigen::VectorXd GumbelBicop::hinv1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -58,7 +58,7 @@ namespace vinecopulib
         return hinv;
     }
 
-    Eigen::MatrixXd GumbelBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd GumbelBicop::tau_to_parameters(const double& tau)
     {
         return Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
     }
@@ -72,7 +72,7 @@ namespace vinecopulib
 
     Eigen::VectorXd GumbelBicop::get_start_parameters(const double tau)
     {
-        return tau_to_parameters_default(tau);
+        return tau_to_parameters(tau);
     }
 }
 // This is copy&paste from the VineCopula package

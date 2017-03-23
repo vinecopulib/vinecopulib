@@ -24,7 +24,7 @@ namespace vinecopulib
         parameters_upper_bounds_ << 1;
     }
 
-    Eigen::VectorXd GaussianBicop::pdf_default(
+    Eigen::VectorXd GaussianBicop::pdf(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -44,7 +44,7 @@ namespace vinecopulib
         return f / sqrt(1.0-pow(rho,2.0));
     }
 
-    Eigen::VectorXd GaussianBicop::hfunc1_default(
+    Eigen::VectorXd GaussianBicop::hfunc1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -55,7 +55,7 @@ namespace vinecopulib
         return tools_stats::pnorm(h);
     }
 
-    Eigen::VectorXd GaussianBicop::hinv1_default(
+    Eigen::VectorXd GaussianBicop::hinv1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -71,7 +71,7 @@ namespace vinecopulib
         return tau_to_parameters(tau);
     }
 
-    Eigen::MatrixXd GaussianBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd GaussianBicop::tau_to_parameters(const double& tau)
     {
         Eigen::VectorXd parameters = this->parameters_;
         parameters(0) = sin(tau * M_PI / 2);

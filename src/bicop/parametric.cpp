@@ -55,6 +55,7 @@ namespace vinecopulib
             }
 
             auto newpar = get_start_parameters(tau);
+            temp_data = cut_and_rotate(data);
             if (npars > 0) {
                 // Create optimizer
                 Optimizer optimizer(npars);
@@ -63,7 +64,7 @@ namespace vinecopulib
                 auto lb = get_parameters_lower_bounds();
                 auto ub = get_parameters_upper_bounds();
                 auto initial_parameters = newpar;
-                ParBicopOptData my_data = {data, this, newpar(0), 0};
+                ParBicopOptData my_data = {temp_data, this, newpar(0), 0};
                 if (method == "itau") {
                       lb.resize(1, 1);
                       lb(0) = get_parameters_lower_bounds()(1);

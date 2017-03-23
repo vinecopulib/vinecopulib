@@ -46,6 +46,7 @@ namespace vinecopulib {
             BicopFamily::tll0
         };
         const std::vector<BicopFamily> parametric = {
+            BicopFamily::indep,
             BicopFamily::gaussian,
             BicopFamily::student,
             BicopFamily::clayton,

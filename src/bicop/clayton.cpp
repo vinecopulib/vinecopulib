@@ -44,7 +44,7 @@ namespace vinecopulib
         return (1+theta)*std::pow(u, -2-theta);
     }
 
-    Eigen::VectorXd ClaytonBicop::hinv1_default(
+    Eigen::VectorXd ClaytonBicop::hinv1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2> & u
     )
     {
@@ -63,7 +63,7 @@ namespace vinecopulib
         return hinv;
     }
 
-    Eigen::MatrixXd ClaytonBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd ClaytonBicop::tau_to_parameters(const double& tau)
     {
         Eigen::VectorXd parameters(1);
         parameters(0) = 2 * std::fabs(tau) / (1 - std::fabs(tau));
@@ -78,6 +78,6 @@ namespace vinecopulib
 
     Eigen::VectorXd ClaytonBicop::get_start_parameters(const double tau)
     {
-        return tau_to_parameters_default(tau);
+        return tau_to_parameters(tau);
     }
 }

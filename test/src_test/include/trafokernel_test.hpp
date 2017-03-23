@@ -7,13 +7,13 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/bicop/bicop.hpp"
+#include "include/bicop/class.hpp"
 
 using namespace vinecopulib;
 
 class TrafokernelTest : public ::testing::Test {
 public:
     TrafokernelTest();
-    BicopPtr cop;
+    Bicop bicop_;
     Eigen::MatrixXd u;
 };

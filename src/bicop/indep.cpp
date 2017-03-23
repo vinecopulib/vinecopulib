@@ -14,42 +14,42 @@ namespace vinecopulib
         rotation_ = 0;
     }
 
-    Eigen::VectorXd IndepBicop::pdf_default(
+    Eigen::VectorXd IndepBicop::pdf(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
         return Eigen::VectorXd::Ones(u.rows());
     }
 
-    Eigen::VectorXd IndepBicop::hfunc1_default(
+    Eigen::VectorXd IndepBicop::hfunc1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
         return u.col(1);
     }
 
-    Eigen::VectorXd IndepBicop::hfunc2_default(
+    Eigen::VectorXd IndepBicop::hfunc2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
         return u.col(0);
     }
 
-    Eigen::VectorXd IndepBicop::hinv1_default(
+    Eigen::VectorXd IndepBicop::hinv1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
         return u.col(1);
     }
 
-    Eigen::VectorXd IndepBicop::hinv2_default(
+    Eigen::VectorXd IndepBicop::hinv2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
         return u.col(0);
     }
 
-    Eigen::MatrixXd IndepBicop::tau_to_parameters_default(const double &)
+    Eigen::MatrixXd IndepBicop::tau_to_parameters(const double &)
     {
         Eigen::VectorXd pars(0);
         return pars;
@@ -62,7 +62,7 @@ namespace vinecopulib
 
     Eigen::VectorXd IndepBicop::get_start_parameters(const double tau)
     {
-        return tau_to_parameters_default(tau);
+        return tau_to_parameters(tau);
     }
 
     void IndepBicop::flip()

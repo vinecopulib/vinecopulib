@@ -9,7 +9,7 @@
 
 namespace vinecopulib
 {
-    Eigen::VectorXd ArchimedeanBicop::pdf_default(
+    Eigen::VectorXd ArchimedeanBicop::pdf(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -21,7 +21,7 @@ namespace vinecopulib
         return u.col(0).binaryExpr(u.col(1), f);
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hfunc1_default(
+    Eigen::VectorXd ArchimedeanBicop::hfunc1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -32,14 +32,14 @@ namespace vinecopulib
         return u.col(0).binaryExpr(u.col(1), f);
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hfunc2_default(
+    Eigen::VectorXd ArchimedeanBicop::hfunc2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return hfunc1_default(swap_cols(u));
+        return hfunc1(swap_cols(u));
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hinv1_default(
+    Eigen::VectorXd ArchimedeanBicop::hinv1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -47,11 +47,11 @@ namespace vinecopulib
         return hinv;
     }
 
-    Eigen::VectorXd ArchimedeanBicop::hinv2_default(
+    Eigen::VectorXd ArchimedeanBicop::hinv2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return hinv1_default(swap_cols(u));
+        return hinv1(swap_cols(u));
     }
 
     void ArchimedeanBicop::flip()

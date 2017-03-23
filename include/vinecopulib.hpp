@@ -1,2 +1,2 @@
-#include <bicop/abstract.hpp>
+#include <bicop/class.hpp>
 #include <vinecop/class.hpp>

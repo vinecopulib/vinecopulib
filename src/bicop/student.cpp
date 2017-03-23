@@ -25,7 +25,7 @@ namespace vinecopulib
         parameters_upper_bounds_ << 1, 50;
     }
 
-    Eigen::VectorXd StudentBicop::pdf_default(
+    Eigen::VectorXd StudentBicop::pdf(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -45,7 +45,7 @@ namespace vinecopulib
         return f;
     }
 
-    Eigen::VectorXd StudentBicop::hfunc1_default(
+    Eigen::VectorXd StudentBicop::hfunc1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -61,7 +61,7 @@ namespace vinecopulib
         return h;
     }
 
-    Eigen::VectorXd StudentBicop::hinv1_default(
+    Eigen::VectorXd StudentBicop::hinv1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
@@ -89,7 +89,7 @@ namespace vinecopulib
         return parameters;
     }
 
-    Eigen::MatrixXd StudentBicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd StudentBicop::tau_to_parameters(const double& tau)
     {
         return vinecopulib::no_tau_to_parameters(tau);
     }

@@ -59,7 +59,7 @@ namespace vinecopulib
         return flip_tau(tau);
     }
 
-    Eigen::MatrixXd Bb6Bicop::tau_to_parameters_default(const double& tau)
+    Eigen::MatrixXd Bb6Bicop::tau_to_parameters(const double& tau)
     {
         return vinecopulib::no_tau_to_parameters(tau);
     }
