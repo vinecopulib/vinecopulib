@@ -51,7 +51,7 @@ namespace vinecopulib
 
     Eigen::MatrixXd IndepBicop::tau_to_parameters_default(const double &)
     {
-        Eigen::VectorXd pars(0);
+        Eigen::VectorXd pars;
         return pars;
     }
 

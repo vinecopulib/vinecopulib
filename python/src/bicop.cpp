@@ -12,8 +12,8 @@
 */
 #include <boost/python.hpp>
 
-#include <bicop_class.hpp>
-#include <vinecop_class.hpp>
+#include <bicop/class.hpp>
+#include <vinecop/class.hpp>
 
 namespace 
 {
