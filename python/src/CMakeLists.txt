@@ -1,5 +1,5 @@
-add_library(pyvinecopulib SHARED git_revision.cpp bicop.cpp)
-add_dependencies(pyvinecopulib git_revision.h)
+add_library(pyvinecopulib SHARED git_revision.cpp bicop.cpp eigen_converters.cpp pyvinecopulib.cpp)
+add_dependencies(pyvinecopulib git_revision.hpp)
 if (APPLE)
   set_target_properties(pyvinecopulib PROPERTIES SUFFIX ".so") # defaults to .dylib which is not looked for by Python
 elseif (WIN32)
@@ -22,13 +22,12 @@ target_link_libraries(pyvinecopulib ${PYTHON_LIBRARIES})
 
 
 # informing the Python bindings where to find Boost.Python 
-# NumPy support was introduced in 1.63
 if (APPLE OR WIN32) # Windows & Homebrew convention
   set(TMP_BOOST_PYTHON_COMPONENT "python")
 else() # Debian convention
   set(TMP_BOOST_PYTHON_COMPONENT "python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 endif()
-find_package(Boost 1.63 COMPONENTS ${TMP_BOOST_PYTHON_COMPONENT} REQUIRED)
+find_package(Boost COMPONENTS ${TMP_BOOST_PYTHON_COMPONENT} REQUIRED)
 unset(TMP_BOOST_PYTHON_COMPONENT)
 target_link_libraries(pyvinecopulib ${Boost_LIBRARIES})
 target_include_directories(pyvinecopulib PUBLIC ${Boost_INCLUDE_DIRS})
@@ -37,6 +36,21 @@ target_include_directories(pyvinecopulib PUBLIC ${Boost_INCLUDE_DIRS})
 # Eigen
 #TODO: find_package() ...
 target_include_directories(pyvinecopulib PUBLIC ${EIGEN3_INCLUDE_DIR})
+
+
+# NumPy
+execute_process (
+    COMMAND ${PYTHON_EXECUTABLE} -c
+        "import numpy, sys; sys.stdout.write(numpy.get_include())"
+    OUTPUT_VARIABLE NUMPY_INCLUDE_DIR
+    RESULT_VARIABLE TMP_STATUS
+)
+if (NOT TMP_STATUS EQUAL 0)
+    message(FATAL_ERROR "NumPy not found!")
+endif()
+unset(TMP_STATUS)
+file ( TO_CMAKE_PATH "${NUMPY_INCLUDE_DIR}" NUMPY_INCLUDE_DIR )
+target_include_directories(pyvinecopulib PUBLIC ${NUMPY_INCLUDE_DIR})
 
 
 # installation (see http://www.cmake.org/pipermail/cmake/2013-March/054138.html)
