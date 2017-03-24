@@ -1,12 +1,12 @@
 <map id="vinecopulib::ArchimedeanBicop" name="vinecopulib::ArchimedeanBicop">
-<area shape="rect" id="node4" href="$classvinecopulib_1_1_bb1_bicop.html" title="vinecopulib::Bb1Bicop" alt="" coords="607,5,758,32"/>
-<area shape="rect" id="node5" href="$classvinecopulib_1_1_bb6_bicop.html" title="vinecopulib::Bb6Bicop" alt="" coords="607,56,758,83"/>
-<area shape="rect" id="node6" href="$classvinecopulib_1_1_bb7_bicop.html" title="vinecopulib::Bb7Bicop" alt="" coords="607,107,758,133"/>
-<area shape="rect" id="node7" href="$classvinecopulib_1_1_bb8_bicop.html" title="vinecopulib::Bb8Bicop" alt="" coords="607,157,758,184"/>
-<area shape="rect" id="node8" href="$classvinecopulib_1_1_clayton_bicop.html" title="vinecopulib::ClaytonBicop" alt="" coords="596,208,769,235"/>
-<area shape="rect" id="node9" href="$classvinecopulib_1_1_frank_bicop.html" title="vinecopulib::FrankBicop" alt="" coords="602,259,763,285"/>
-<area shape="rect" id="node10" href="$classvinecopulib_1_1_gumbel_bicop.html" title="vinecopulib::GumbelBicop" alt="" coords="596,309,769,336"/>
-<area shape="rect" id="node11" href="$classvinecopulib_1_1_joe_bicop.html" title="vinecopulib::JoeBicop" alt="" coords="608,360,757,387"/>
-<area shape="rect" id="node2" href="$classvinecopulib_1_1_par_bicop.html" title="vinecopulib::ParBicop" alt="" coords="181,183,329,209"/>
-<area shape="rect" id="node3" href="$classvinecopulib_1_1_bicop.html" title="vinecopulib::Bicop" alt="" coords="5,183,133,209"/>
+<area shape="rect" id="node4" href="$classvinecopulib_1_1_bb1_bicop.html" title="vinecopulib::Bb1Bicop" alt="" coords="657,5,807,32"/>
+<area shape="rect" id="node5" href="$classvinecopulib_1_1_bb6_bicop.html" title="vinecopulib::Bb6Bicop" alt="" coords="657,56,807,83"/>
+<area shape="rect" id="node6" href="$classvinecopulib_1_1_bb7_bicop.html" title="vinecopulib::Bb7Bicop" alt="" coords="657,107,807,133"/>
+<area shape="rect" id="node7" href="$classvinecopulib_1_1_bb8_bicop.html" title="vinecopulib::Bb8Bicop" alt="" coords="657,157,807,184"/>
+<area shape="rect" id="node8" href="$classvinecopulib_1_1_clayton_bicop.html" title="vinecopulib::ClaytonBicop" alt="" coords="645,208,819,235"/>
+<area shape="rect" id="node9" href="$classvinecopulib_1_1_frank_bicop.html" title="vinecopulib::FrankBicop" alt="" coords="651,259,813,285"/>
+<area shape="rect" id="node10" href="$classvinecopulib_1_1_gumbel_bicop.html" title="vinecopulib::GumbelBicop" alt="" coords="645,309,819,336"/>
+<area shape="rect" id="node11" href="$classvinecopulib_1_1_joe_bicop.html" title="vinecopulib::JoeBicop" alt="" coords="657,360,807,387"/>
+<area shape="rect" id="node2" href="$classvinecopulib_1_1_par_bicop.html" title="vinecopulib::ParBicop" alt="" coords="231,183,379,209"/>
+<area shape="rect" id="node3" href="$classvinecopulib_1_1_abstract_bicop.html" title="vinecopulib::AbstractBicop" alt="" coords="5,183,183,209"/>
 </map>

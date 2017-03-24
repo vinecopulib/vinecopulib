@@ -17,6 +17,12 @@
 <script type="text/javascript">
   $(document).ready(function() { init_search(); });
 </script>
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
         <link href="doxygen.css" rel="stylesheet" type="text/css" />
         <link href="customdoxygen.css" rel="stylesheet" type="text/css"/>
         <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
@@ -46,7 +52,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -107,24 +112,39 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>A class for vine copulas.  
  <a href="classvinecopulib_1_1_vinecop.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="vinecop__class_8hpp_source.html">vinecop_class.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="vinecop_2class_8hpp_source.html">class.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7c6bae90feba9d70bf692e4d50d02bc7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7c6bae90feba9d70bf692e4d50d02bc7"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Vinecop</b> (int d)</td></tr>
 <tr class="separator:a7c6bae90feba9d70bf692e4d50d02bc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37559eece324ec4ecf8ae13c6eb82a3c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37559eece324ec4ecf8ae13c6eb82a3c"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Vinecop</b> (const std::vector&lt; std::vector&lt; BicopPtr &gt;&gt; &amp;pair_copulas, const Eigen::MatrixXi &amp;matrix)</td></tr>
-<tr class="separator:a37559eece324ec4ecf8ae13c6eb82a3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c121e831581227e6ed75387d1babfff"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c121e831581227e6ed75387d1babfff"></a>
-BicopPtr&#160;</td><td class="memItemRight" valign="bottom"><b>get_pair_copula</b> (int tree, int edge) const </td></tr>
-<tr class="separator:a0c121e831581227e6ed75387d1babfff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a013a9d4eef7eb5e615a18bb3c36fd5dc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a013a9d4eef7eb5e615a18bb3c36fd5dc"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Vinecop</b> (const std::vector&lt; std::vector&lt; <a class="el" href="classvinecopulib_1_1_bicop.html">Bicop</a> &gt;&gt; &amp;pair_copulas, const Eigen::MatrixXi &amp;matrix)</td></tr>
+<tr class="separator:a013a9d4eef7eb5e615a18bb3c36fd5dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a561fc84ab874520e6dab9107fc45579a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a561fc84ab874520e6dab9107fc45579a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Vinecop</b> (const Eigen::MatrixXi &amp;matrix)</td></tr>
+<tr class="separator:a561fc84ab874520e6dab9107fc45579a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae74d750f9f59c33cbb2047347c44a530"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae74d750f9f59c33cbb2047347c44a530"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Vinecop</b> (const Eigen::MatrixXd &amp;data, const Eigen::MatrixXi &amp;matrix=Eigen::MatrixXi(), std::vector&lt; <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=bicop_families::all, std::string method=&quot;mle&quot;, int truncation_level=std::numeric_limits&lt; int &gt;::max(), double threshold=0.0, std::string tree_criterion=&quot;tau&quot;, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true, bool show_trace=false)</td></tr>
+<tr class="separator:ae74d750f9f59c33cbb2047347c44a530"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f9f35b5973e0da272770706af77dc11"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6f9f35b5973e0da272770706af77dc11"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>select_all</b> (const Eigen::MatrixXd &amp;data, std::vector&lt; <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=bicop_families::all, std::string method=&quot;mle&quot;, int truncation_level=std::numeric_limits&lt; int &gt;::max(), double threshold=0.0, std::string tree_criterion=&quot;tau&quot;, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true, bool show_trace=false)</td></tr>
+<tr class="separator:a6f9f35b5973e0da272770706af77dc11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab80845e262fa37613f09d1f98d722cc8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab80845e262fa37613f09d1f98d722cc8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>select_families</b> (const Eigen::MatrixXd &amp;data, std::vector&lt; <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=bicop_families::all, std::string method=&quot;mle&quot;, int truncation_level=std::numeric_limits&lt; int &gt;::max(), double threshold=0.0, std::string threshold_criterion=&quot;tau&quot;, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true, bool show_trace=false)</td></tr>
+<tr class="separator:ab80845e262fa37613f09d1f98d722cc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22262e99414e23dbe7c7f0e773041185"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a22262e99414e23dbe7c7f0e773041185"></a>
+<a class="el" href="classvinecopulib_1_1_bicop.html">Bicop</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_pair_copula</b> (int tree, int edge) const </td></tr>
+<tr class="separator:a22262e99414e23dbe7c7f0e773041185"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a2edf23e011ec024e9863e14c12923b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7a2edf23e011ec024e9863e14c12923b"></a>
+std::vector&lt; std::vector&lt; <a class="el" href="classvinecopulib_1_1_bicop.html">Bicop</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>get_all_pair_copulas</b> () const </td></tr>
+<tr class="separator:a7a2edf23e011ec024e9863e14c12923b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2b5aecbe06c5219919f5b3c7436f1da"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab2b5aecbe06c5219919f5b3c7436f1da"></a>
-BicopFamily&#160;</td><td class="memItemRight" valign="bottom"><b>get_family</b> (int tree, int edge) const </td></tr>
+<a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_family</b> (int tree, int edge) const </td></tr>
 <tr class="separator:ab2b5aecbe06c5219919f5b3c7436f1da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b07344bedafeb618982f480240a5f15"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8b07344bedafeb618982f480240a5f15"></a>
-std::vector&lt; std::vector&lt; BicopFamily &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>get_all_families</b> () const </td></tr>
+std::vector&lt; std::vector&lt; <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>get_all_families</b> () const </td></tr>
 <tr class="separator:a8b07344bedafeb618982f480240a5f15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfa48760cc636cadce6fa875a883922a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abfa48760cc636cadce6fa875a883922a"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>get_rotation</b> (int tree, int edge) const </td></tr>
@@ -153,17 +173,14 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>inverse_ro
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:af0f675bde31f0711e642dd7b65161ef4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af0f675bde31f0711e642dd7b65161ef4"></a>
-static std::vector&lt; std::vector&lt; BicopPtr &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>make_pair_copula_store</b> (int d)</td></tr>
-<tr class="separator:af0f675bde31f0711e642dd7b65161ef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a2806138d4ec5aca9db47813968fe11"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6a2806138d4ec5aca9db47813968fe11"></a>
-static <a class="el" href="classvinecopulib_1_1_vinecop.html">Vinecop</a>&#160;</td><td class="memItemRight" valign="bottom"><b>select</b> (const Eigen::MatrixXd &amp;data, std::vector&lt; BicopFamily &gt; family_set=bicop_families::all, std::string method=&quot;mle&quot;, int truncation_level=std::numeric_limits&lt; int &gt;::max(), Eigen::MatrixXi matrix=Eigen::MatrixXi(0, 0), std::string tree_criterion=&quot;tau&quot;, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true, bool show_trace=false)</td></tr>
-<tr class="separator:a6a2806138d4ec5aca9db47813968fe11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a237cdc2972b21f7db452b07f830dc9ab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a237cdc2972b21f7db452b07f830dc9ab"></a>
+static std::vector&lt; std::vector&lt; <a class="el" href="classvinecopulib_1_1_bicop.html">Bicop</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>make_pair_copula_store</b> (int d)</td></tr>
+<tr class="separator:a237cdc2972b21f7db452b07f830dc9ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A class for vine copulas. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/n5/dev/cpp/vinecopulib/include/<a class="el" href="vinecop__class_8hpp_source.html">vinecop_class.hpp</a></li>
+<li>/home/n5/dev/cpp/vinecopulib/include/vinecop/<a class="el" href="vinecop_2class_8hpp_source.html">class.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.8-->
@@ -174,7 +191,7 @@ static <a class="el" href="classvinecopulib_1_1_vinecop.html">Vinecop</a>&#160;<
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 22 2017 00:05:38 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 24 2017 20:26:12 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -17,6 +17,12 @@
 <script type="text/javascript">
   $(document).ready(function() { init_search(); });
 </script>
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
         <link href="doxygen.css" rel="stylesheet" type="text/css" />
         <link href="customdoxygen.css" rel="stylesheet" type="text/css"/>
         <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
@@ -106,17 +112,17 @@ Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>vinecopuli
 <tr class="separator:ga3e33ec227b6b7182e327399201cad382"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>h-functions are defined as one-dimensional integrals over a bivariate copula density <img class="formulaInl" alt="$ c $" src="form_1.png"/>, </p><p class="formulaDsp">
-<img class="formulaDsp" alt="\[ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) ds, \]" src="form_2.png"/>
+<p>h-functions are defined as one-dimensional integrals over a bivariate copula density \( c \), </p><p class="formulaDsp">
+\[ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) ds, \]
 </p>
  <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds. \]" src="form_3.png"/>
+\[ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds. \]
 </p>
 <p> <code>hinv1</code> is the inverse w.r.t. second argument (conditioned on first), <code>hinv2</code> is the inverse w.r.t. first argument (conditioned on second),</p>
-<p><code>hfunc1</code>, <code>hfunc2</code>, <code>hinv1</code>, and <code>hinv2</code> mainly take care that rotations are properly handled. They call <code>hfunc1_default</code>, <code>hfunc2_default</code>, <code>hinv1_default</code>, and hinv2_default which are family-specific implementations for <code>rotation = 0</code>.</p>
+<p><code>hfunc1</code>, <code>hfunc2</code>, <code>hinv1</code>, and <code>hinv2</code> mainly take care that rotations are properly handled. They call <code>hfunc1</code>, <code>hfunc2</code>, <code>hinv1_default</code>, and hinv2_default which are family-specific implementations for <code>rotation = 0</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">u</td><td><img class="formulaInl" alt="$m \times 2$" src="form_0.png"/> matrix of evaluation points. </td></tr>
+    <tr><td class="paramname">u</td><td>\(m \times 2\) matrix of evaluation points. </td></tr>
   </table>
   </dd>
 </dl>
@@ -130,7 +136,7 @@ Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>vinecopuli
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 22 2017 00:05:38 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 24 2017 18:40:07 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

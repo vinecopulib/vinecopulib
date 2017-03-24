@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['parbicop',['ParBicop',['../classvinecopulib_1_1_par_bicop.html',1,'vinecopulib']]],
-  ['pdf',['pdf',['../classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646',1,'vinecopulib::Bicop']]]
+  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html',1,'vinecopulib']]],
+  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html#a657aaae02c7f9bca12b3c43f475ac884',1,'vinecopulib::RVineMatrix']]]
 ];

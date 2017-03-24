@@ -11,6 +11,7 @@
 
 
 namespace vinecopulib {
+    //! A class for bivariate copula models
     class Bicop
     {
     public:
@@ -30,10 +31,7 @@ namespace vinecopulib {
         BicopFamily get_family() const;
         std::string get_family_name() const;
         int get_rotation() const;
-        std::string get_association_direction() const;
         Eigen::MatrixXd get_parameters() const;
-        Eigen::MatrixXd get_parameters_lower_bounds() const;
-        Eigen::MatrixXd get_parameters_upper_bounds() const;
         void set_rotation(int rotation);
         void set_parameters(const Eigen::MatrixXd& parameters);
 
@@ -69,6 +67,8 @@ namespace vinecopulib {
         Eigen::MatrixXd tau_to_parameters(const double& tau);
 
     private:
+        Eigen::MatrixXd get_parameters_lower_bounds() const;
+        Eigen::MatrixXd get_parameters_upper_bounds() const;
         Eigen::Matrix<double, Eigen::Dynamic, 2> cut_and_rotate(
                 const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
         void check_rotation(int rotation);

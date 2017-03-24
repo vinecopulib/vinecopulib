@@ -9,22 +9,24 @@
 #include <vector>
 #include <string>
 
+//! @file family.hpp
+
 namespace vinecopulib {
-    //! Bivariate copula families
+    /// identifies bivariate copula families.
     enum class BicopFamily
     {
-        indep,
-        gaussian,
-        student,
-        clayton,
-        gumbel,
-        frank,
-        joe,
-        bb1,
-        bb6,
-        bb7,
-        bb8,
-        tll0
+        indep,         ///< Independence
+        gaussian,      ///< Independence
+        student,       ///< Independence
+        clayton,       ///< Independence
+        gumbel,        ///< Independence
+        frank,         ///< Independence
+        joe,           ///< Independence
+        bb1,           ///< Independence
+        bb6,           ///< Independence
+        bb7,           ///< Independence
+        bb8,           ///< Independence
+        tll0           ///< Independence
     };
 
     std::string get_family_name(BicopFamily family);

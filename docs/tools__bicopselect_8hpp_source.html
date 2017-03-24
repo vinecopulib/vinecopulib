@@ -8,7 +8,7 @@
         <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
         <meta name="generator" content="Doxygen 1.8.11"/>
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <title>vinecopulib: /home/n5/dev/cpp/vinecopulib/include/tools_bicopselect.hpp Source File</title>
+        <title>vinecopulib: /home/n5/dev/cpp/vinecopulib/include/bicop/tools_bicopselect.hpp Source File</title>
         <!--<link href="tabs.css" rel="stylesheet" type="text/css"/>-->
         <script type="text/javascript" src="dynsections.js"></script>
         <link href="search/search.css" rel="stylesheet" type="text/css"/>
@@ -17,6 +17,12 @@
 <script type="text/javascript">
   $(document).ready(function() { init_search(); });
 </script>
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
         <link href="doxygen.css" rel="stylesheet" type="text/css" />
         <link href="customdoxygen.css" rel="stylesheet" type="text/css"/>
         <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
@@ -46,7 +52,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -88,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_70ad399171270448a2eb4d6c366fcb4a.html">bicop</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -96,7 +101,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">tools_bicopselect.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright © 2017 Thomas Nagler and Thibault Vatter</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// This file is part of the vinecopulib library and licensed under the terms of</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// the MIT license. For a copy, see the LICENSE file in the root directory of</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// vinecopulib or https://tvatter.github.io/vinecopulib/.</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#pragma once</span></div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;tools_eigen.hpp&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;bicop_family.hpp&quot;</span></div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;std::vector&lt;double&gt; get_c1c2(</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keyword">const</span> Eigen::Matrix&lt;double, Eigen::Dynamic, 2&gt;&amp; data,</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="keywordtype">double</span> tau</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; );</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keywordtype">bool</span> preselect_family(</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    std::vector&lt;double&gt; c, </div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keywordtype">double</span> tau, </div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    vinecopulib::BicopFamily family, </div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keywordtype">int</span> rotation, </div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordtype">bool</span> is_rotationless</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;);</div></div><!-- fragment --></div><!-- contents -->
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright © 2017 Thomas Nagler and Thibault Vatter</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// This file is part of the vinecopulib library and licensed under the terms of</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// the MIT license. For a copy, see the LICENSE file in the root directory of</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// vinecopulib or https://tvatter.github.io/vinecopulib/.</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#pragma once</span></div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;misc/tools_eigen.hpp&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="family_8hpp.html">bicop/family.hpp</a>&quot;</span></div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;std::vector&lt;double&gt; get_c1c2(</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keyword">const</span> Eigen::Matrix&lt;double, Eigen::Dynamic, 2&gt;&amp; data,</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="keywordtype">double</span> tau</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; );</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keywordtype">bool</span> preselect_family(</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    std::vector&lt;double&gt; c, </div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keywordtype">double</span> tau, </div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <a class="code" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">vinecopulib::BicopFamily</a> family, </div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keywordtype">int</span> rotation, </div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordtype">bool</span> is_rotationless</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;);</div><div class="ttc" id="family_8hpp_html_a42e95cc06d33896199caab0c11ad44f3"><div class="ttname"><a href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">vinecopulib::BicopFamily</a></div><div class="ttdeci">BicopFamily</div><div class="ttdoc">identifies bivariate copula families. </div><div class="ttdef"><b>Definition:</b> family.hpp:16</div></div>
+<div class="ttc" id="family_8hpp_html"><div class="ttname"><a href="family_8hpp.html">family.hpp</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.8-->
 <!-- start footer part -->
 </div>
@@ -105,7 +112,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 22 2017 00:05:38 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 24 2017 20:26:12 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['mainpage_2eh',['mainpage.h',['../mainpage_8h.html',1,'']]]
+  ['parbicop',['ParBicop',['../classvinecopulib_1_1_par_bicop.html',1,'vinecopulib']]],
+  ['pdf',['pdf',['../classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646',1,'vinecopulib::Bicop']]]
 ];

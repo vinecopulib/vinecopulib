@@ -7,7 +7,7 @@ A class for vine copulas.
 
 
 
-{\ttfamily \#include $<$vinecop\+\_\+class.\+hpp$>$}
+{\ttfamily \#include $<$class.\+hpp$>$}
 
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
@@ -15,16 +15,31 @@ A class for vine copulas.
 {\bfseries Vinecop} (int d)\hypertarget{classvinecopulib_1_1_vinecop_a7c6bae90feba9d70bf692e4d50d02bc7}{}\label{classvinecopulib_1_1_vinecop_a7c6bae90feba9d70bf692e4d50d02bc7}
 
 \item 
-{\bfseries Vinecop} (const std\+::vector$<$ std\+::vector$<$ Bicop\+Ptr $>$$>$ \&pair\+\_\+copulas, const Eigen\+::\+Matrix\+Xi \&matrix)\hypertarget{classvinecopulib_1_1_vinecop_a37559eece324ec4ecf8ae13c6eb82a3c}{}\label{classvinecopulib_1_1_vinecop_a37559eece324ec4ecf8ae13c6eb82a3c}
+{\bfseries Vinecop} (const std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$$>$ \&pair\+\_\+copulas, const Eigen\+::\+Matrix\+Xi \&matrix)\hypertarget{classvinecopulib_1_1_vinecop_a013a9d4eef7eb5e615a18bb3c36fd5dc}{}\label{classvinecopulib_1_1_vinecop_a013a9d4eef7eb5e615a18bb3c36fd5dc}
 
 \item 
-Bicop\+Ptr {\bfseries get\+\_\+pair\+\_\+copula} (int tree, int edge) const \hypertarget{classvinecopulib_1_1_vinecop_a0c121e831581227e6ed75387d1babfff}{}\label{classvinecopulib_1_1_vinecop_a0c121e831581227e6ed75387d1babfff}
+{\bfseries Vinecop} (const Eigen\+::\+Matrix\+Xi \&matrix)\hypertarget{classvinecopulib_1_1_vinecop_a561fc84ab874520e6dab9107fc45579a}{}\label{classvinecopulib_1_1_vinecop_a561fc84ab874520e6dab9107fc45579a}
 
 \item 
-Bicop\+Family {\bfseries get\+\_\+family} (int tree, int edge) const \hypertarget{classvinecopulib_1_1_vinecop_ab2b5aecbe06c5219919f5b3c7436f1da}{}\label{classvinecopulib_1_1_vinecop_ab2b5aecbe06c5219919f5b3c7436f1da}
+{\bfseries Vinecop} (const Eigen\+::\+Matrix\+Xd \&data, const Eigen\+::\+Matrix\+Xi \&matrix=Eigen\+::\+Matrix\+Xi(), std\+::vector$<$ \hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=\char`\"{}mle\char`\"{}, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), double threshold=0.\+0, std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool show\+\_\+trace=false)\hypertarget{classvinecopulib_1_1_vinecop_ae74d750f9f59c33cbb2047347c44a530}{}\label{classvinecopulib_1_1_vinecop_ae74d750f9f59c33cbb2047347c44a530}
 
 \item 
-std\+::vector$<$ std\+::vector$<$ Bicop\+Family $>$ $>$ {\bfseries get\+\_\+all\+\_\+families} () const \hypertarget{classvinecopulib_1_1_vinecop_a8b07344bedafeb618982f480240a5f15}{}\label{classvinecopulib_1_1_vinecop_a8b07344bedafeb618982f480240a5f15}
+void {\bfseries select\+\_\+all} (const Eigen\+::\+Matrix\+Xd \&data, std\+::vector$<$ \hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=\char`\"{}mle\char`\"{}, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), double threshold=0.\+0, std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool show\+\_\+trace=false)\hypertarget{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{}\label{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}
+
+\item 
+void {\bfseries select\+\_\+families} (const Eigen\+::\+Matrix\+Xd \&data, std\+::vector$<$ \hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=\char`\"{}mle\char`\"{}, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), double threshold=0.\+0, std\+::string threshold\+\_\+criterion=\char`\"{}tau\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool show\+\_\+trace=false)\hypertarget{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{}\label{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}
+
+\item 
+\hyperlink{classvinecopulib_1_1_bicop}{Bicop} {\bfseries get\+\_\+pair\+\_\+copula} (int tree, int edge) const \hypertarget{classvinecopulib_1_1_vinecop_a22262e99414e23dbe7c7f0e773041185}{}\label{classvinecopulib_1_1_vinecop_a22262e99414e23dbe7c7f0e773041185}
+
+\item 
+std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ $>$ {\bfseries get\+\_\+all\+\_\+pair\+\_\+copulas} () const \hypertarget{classvinecopulib_1_1_vinecop_a7a2edf23e011ec024e9863e14c12923b}{}\label{classvinecopulib_1_1_vinecop_a7a2edf23e011ec024e9863e14c12923b}
+
+\item 
+\hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} {\bfseries get\+\_\+family} (int tree, int edge) const \hypertarget{classvinecopulib_1_1_vinecop_ab2b5aecbe06c5219919f5b3c7436f1da}{}\label{classvinecopulib_1_1_vinecop_ab2b5aecbe06c5219919f5b3c7436f1da}
+
+\item 
+std\+::vector$<$ std\+::vector$<$ \hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ $>$ {\bfseries get\+\_\+all\+\_\+families} () const \hypertarget{classvinecopulib_1_1_vinecop_a8b07344bedafeb618982f480240a5f15}{}\label{classvinecopulib_1_1_vinecop_a8b07344bedafeb618982f480240a5f15}
 
 \item 
 int {\bfseries get\+\_\+rotation} (int tree, int edge) const \hypertarget{classvinecopulib_1_1_vinecop_abfa48760cc636cadce6fa875a883922a}{}\label{classvinecopulib_1_1_vinecop_abfa48760cc636cadce6fa875a883922a}
@@ -54,10 +69,7 @@ Eigen\+::\+Matrix\+Xd {\bfseries inverse\+\_\+rosenblatt} (const Eigen\+::\+Matr
 \subsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-static std\+::vector$<$ std\+::vector$<$ Bicop\+Ptr $>$ $>$ {\bfseries make\+\_\+pair\+\_\+copula\+\_\+store} (int d)\hypertarget{classvinecopulib_1_1_vinecop_af0f675bde31f0711e642dd7b65161ef4}{}\label{classvinecopulib_1_1_vinecop_af0f675bde31f0711e642dd7b65161ef4}
-
-\item 
-static \hyperlink{classvinecopulib_1_1_vinecop}{Vinecop} {\bfseries select} (const Eigen\+::\+Matrix\+Xd \&data, std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=\char`\"{}mle\char`\"{}, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), Eigen\+::\+Matrix\+Xi matrix=Eigen\+::\+Matrix\+Xi(0, 0), std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool show\+\_\+trace=false)\hypertarget{classvinecopulib_1_1_vinecop_a6a2806138d4ec5aca9db47813968fe11}{}\label{classvinecopulib_1_1_vinecop_a6a2806138d4ec5aca9db47813968fe11}
+static std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ $>$ {\bfseries make\+\_\+pair\+\_\+copula\+\_\+store} (int d)\hypertarget{classvinecopulib_1_1_vinecop_a237cdc2972b21f7db452b07f830dc9ab}{}\label{classvinecopulib_1_1_vinecop_a237cdc2972b21f7db452b07f830dc9ab}
 
 \end{DoxyCompactItemize}
 
@@ -67,4 +79,4 @@ A class for vine copulas.
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/home/n5/dev/cpp/vinecopulib/include/vinecop\+\_\+class.\+hpp\end{DoxyCompactItemize}
+/home/n5/dev/cpp/vinecopulib/include/vinecop/class.\+hpp\end{DoxyCompactItemize}

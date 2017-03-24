@@ -1,0 +1,268 @@
+\hypertarget{family_8hpp}{}\section{/home/n5/dev/cpp/vinecopulib/include/bicop/family.hpp File Reference}
+\label{family_8hpp}\index{/home/n5/dev/cpp/vinecopulib/include/bicop/family.\+hpp@{/home/n5/dev/cpp/vinecopulib/include/bicop/family.\+hpp}}
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+Include dependency graph for family.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{family_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{family_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{vinecopulib\+::\+Bicop\+Family} \{ \\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::indep}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::gaussian}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::student}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::clayton}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::gumbel}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::frank}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::joe}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::bb1}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::bb6}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::bb7}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::bb8}, 
+\\*
+{\bfseries vinecopulib\+::\+Bicop\+Family\+::tll0}
+ \}\hypertarget{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{}\label{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}
+\begin{DoxyCompactList}\small\item\em identifies bivariate copula families. \end{DoxyCompactList}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string {\bfseries vinecopulib\+::get\+\_\+family\+\_\+name} (Bicop\+Family family)\hypertarget{family_8cpp_ac46553ae5f99072f65e9d3254d2c526d}{}\label{family_8cpp_ac46553ae5f99072f65e9d3254d2c526d}
+
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::all}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::parametric}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::nonparametric}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::one\+\_\+par}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::two\+\_\+par}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::elliptical}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::archimedean}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::\+BB}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::rotationless}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::lt}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::ut}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::itau}
+\item 
+const std\+::vector$<$ Bicop\+Family $>$ {\bfseries vinecopulib\+::bicop\+\_\+families\+::flip\+\_\+by\+\_\+rotation}
+\end{DoxyCompactItemize}
+
+
+\subsection{Variable Documentation}
+\index{family.\+hpp@{family.\+hpp}!all@{all}}
+\index{all@{all}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{all}{all}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::all}\hypertarget{family_8hpp_file_a5214a513f41ec23b74782aab96ea6774}{}\label{family_8hpp_file_a5214a513f41ec23b74782aab96ea6774}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::indep,
+            BicopFamily::gaussian,
+            BicopFamily::student,
+            BicopFamily::clayton,
+            BicopFamily::gumbel,
+            BicopFamily::frank,
+            BicopFamily::joe,
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8,
+            BicopFamily::tll0
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!archimedean@{archimedean}}
+\index{archimedean@{archimedean}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{archimedean}{archimedean}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::archimedean}\hypertarget{family_8hpp_file_a714863b69ae59ac48c7fb2be45cd2619}{}\label{family_8hpp_file_a714863b69ae59ac48c7fb2be45cd2619}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::clayton, 
+            BicopFamily::gumbel, 
+            BicopFamily::frank, 
+            BicopFamily::joe, 
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!BB@{BB}}
+\index{BB@{BB}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{BB}{BB}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::\+BB}\hypertarget{family_8hpp_file_aea9f7383b4bbbe47d4862f25e6bb8ad8}{}\label{family_8hpp_file_aea9f7383b4bbbe47d4862f25e6bb8ad8}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!elliptical@{elliptical}}
+\index{elliptical@{elliptical}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{elliptical}{elliptical}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::elliptical}\hypertarget{family_8hpp_file_a24b790671c9f4b25e57ecbc3505232fb}{}\label{family_8hpp_file_a24b790671c9f4b25e57ecbc3505232fb}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::gaussian, 
+            BicopFamily::student
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!flip\+\_\+by\+\_\+rotation@{flip\+\_\+by\+\_\+rotation}}
+\index{flip\+\_\+by\+\_\+rotation@{flip\+\_\+by\+\_\+rotation}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{flip\+\_\+by\+\_\+rotation}{flip_by_rotation}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::flip\+\_\+by\+\_\+rotation}\hypertarget{family_8hpp_file_ae1ae1673e3d4a9c57bd9df074e17a3b9}{}\label{family_8hpp_file_ae1ae1673e3d4a9c57bd9df074e17a3b9}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::clayton,
+            BicopFamily::gumbel,
+            BicopFamily::frank,
+            BicopFamily::joe,
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!itau@{itau}}
+\index{itau@{itau}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{itau}{itau}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::itau}\hypertarget{family_8hpp_file_af92a2e71f03e2280276533def655760d}{}\label{family_8hpp_file_af92a2e71f03e2280276533def655760d}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::indep, 
+            BicopFamily::gaussian, 
+            BicopFamily::student, 
+            BicopFamily::clayton, 
+            BicopFamily::gumbel, 
+            BicopFamily::frank, 
+            BicopFamily::joe
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!lt@{lt}}
+\index{lt@{lt}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{lt}{lt}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::lt}\hypertarget{family_8hpp_file_a5a5f349f07638768ff8b1bb2ae90d102}{}\label{family_8hpp_file_a5a5f349f07638768ff8b1bb2ae90d102}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::clayton, 
+            BicopFamily::bb1, 
+            BicopFamily::bb7
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!nonparametric@{nonparametric}}
+\index{nonparametric@{nonparametric}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{nonparametric}{nonparametric}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::nonparametric}\hypertarget{family_8hpp_file_a01c7c990cc34b1b74d115858a52fcdc5}{}\label{family_8hpp_file_a01c7c990cc34b1b74d115858a52fcdc5}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::indep,
+            BicopFamily::tll0
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!one\+\_\+par@{one\+\_\+par}}
+\index{one\+\_\+par@{one\+\_\+par}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{one\+\_\+par}{one_par}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::one\+\_\+par}\hypertarget{family_8hpp_file_aba503484b0a13cfb0e67c026e2f295d4}{}\label{family_8hpp_file_aba503484b0a13cfb0e67c026e2f295d4}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::gaussian,
+            BicopFamily::clayton,
+            BicopFamily::gumbel,
+            BicopFamily::frank,
+            BicopFamily::joe,
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!parametric@{parametric}}
+\index{parametric@{parametric}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{parametric}{parametric}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::parametric}\hypertarget{family_8hpp_file_a76d66bb6cb03ae4de1cef3d1ed70ac16}{}\label{family_8hpp_file_a76d66bb6cb03ae4de1cef3d1ed70ac16}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::indep,
+            BicopFamily::gaussian,
+            BicopFamily::student,
+            BicopFamily::clayton,
+            BicopFamily::gumbel,
+            BicopFamily::frank,
+            BicopFamily::joe,
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!rotationless@{rotationless}}
+\index{rotationless@{rotationless}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{rotationless}{rotationless}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::rotationless}\hypertarget{family_8hpp_file_ac221bc84c32d2836692ed40d89439928}{}\label{family_8hpp_file_ac221bc84c32d2836692ed40d89439928}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::indep, 
+            BicopFamily::gaussian, 
+            BicopFamily::student, 
+            BicopFamily::frank, 
+            BicopFamily::tll0
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!two\+\_\+par@{two\+\_\+par}}
+\index{two\+\_\+par@{two\+\_\+par}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{two\+\_\+par}{two_par}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::two\+\_\+par}\hypertarget{family_8hpp_file_ad5871c39b4ee62bd44fa851d7d70c7ca}{}\label{family_8hpp_file_ad5871c39b4ee62bd44fa851d7d70c7ca}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::student,
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        \}
+\end{DoxyCode}
+\index{family.\+hpp@{family.\+hpp}!ut@{ut}}
+\index{ut@{ut}!family.\+hpp@{family.\+hpp}}
+\subsubsection[{\texorpdfstring{ut}{ut}}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$Bicop\+Family$>$ vinecopulib\+::bicop\+\_\+families\+::ut}\hypertarget{family_8hpp_file_af754a2d2697709c204dda0473215f9cd}{}\label{family_8hpp_file_af754a2d2697709c204dda0473215f9cd}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+            BicopFamily::gumbel, 
+            BicopFamily::joe, 
+            BicopFamily::bb1, 
+            BicopFamily::bb6, 
+            BicopFamily::bb7, 
+            BicopFamily::bb8
+        \}
+\end{DoxyCode}

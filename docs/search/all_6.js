@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['h_2dfunctions',['h-functions',['../group__hfunctions.html',1,'']]],
-  ['hinv1_5fnum',['hinv1_num',['../classvinecopulib_1_1_bicop.html#a1220ac0456ae1a26c586cdc55258fabd',1,'vinecopulib::Bicop']]]
+  ['hinv1_5fnum',['hinv1_num',['../classvinecopulib_1_1_abstract_bicop.html#a7dc5b05857ece56b7e336e1175387a8e',1,'vinecopulib::AbstractBicop']]]
 ];
