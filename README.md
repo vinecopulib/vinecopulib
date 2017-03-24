@@ -62,11 +62,12 @@ To build the library, you'll need:
 
    * [a C++11-compatible    compiler](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers),
    * [CMake](https://cmake.org/),
-   * [Doxygen](http://www.stack.nl/~dimitri/doxygen/),
    * [Boost 1.63](http://www.boost.org/),
    * [Eigen 3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page),
-   * [NLopt](http://ab-initio.mit.edu/wiki/index.php/NLopt).
-   * [R](https://www.r-project.org/about.html) with [VineCopula](https://github.com/tnagler/VineCopula) installed.
+   * [NLopt](http://ab-initio.mit.edu/wiki/index.php/NLopt),
+      * [Doxygen](http://www.stack.nl/~dimitri/doxygen/),
+   * [R](https://www.r-project.org/about.html),
+   * [VineCopula](https://github.com/tnagler/VineCopula).
      
 
 Note that R and VineCopula are used only for unit-testing 
