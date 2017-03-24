@@ -6,12 +6,15 @@ endif()
 include(../cmake/DownloadProject.cmake)
 download_project(
         PROJ                googletest
-        GIT_REPOSITORY      https://github.com/google/googletest.git
+#        GIT_REPOSITORY      https://github.com/google/googletest.git 
+        GIT_REPOSITORY      git@github.com:google/googletest.git
         GIT_TAG             master
         UPDATE_DISCONNECTED 1
 )
 
-include_directories(${external_includes} ${CMAKE_BINARY_DIR}/generated/)
+include_directories(SYSTEM ${external_includes})
+include_directories(${CMAKE_BINARY_DIR}/generated/)
+include_directories(${CMAKE_SOURCE_DIR})
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 add_subdirectory(src_test)
 
