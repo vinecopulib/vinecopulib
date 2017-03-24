@@ -27,18 +27,7 @@ namespace vinecopulib
         Vinecop(const Eigen::MatrixXi& matrix);
         Vinecop(
                 const Eigen::MatrixXd& data,
-                std::vector<BicopFamily> family_set = bicop_families::all,
-                std::string method = "mle",
-                int truncation_level = std::numeric_limits<int>::max(),
-                double threshold = 0.0,
-                std::string tree_criterion = "tau",
-                std::string selection_criterion = "bic",
-                bool preselect_families = true,
-                bool show_trace = false
-        );
-        Vinecop(
-                const Eigen::MatrixXd& data,
-                const Eigen::MatrixXi& matrix,
+                const Eigen::MatrixXi& matrix = Eigen::MatrixXi(),
                 std::vector<BicopFamily> family_set = bicop_families::all,
                 std::string method = "mle",
                 int truncation_level = std::numeric_limits<int>::max(),
@@ -51,7 +40,7 @@ namespace vinecopulib
 
 
         static std::vector<std::vector<Bicop>> make_pair_copula_store(int d);
-        void select(
+        void select_all(
                 const Eigen::MatrixXd& data,
                 std::vector<BicopFamily> family_set = bicop_families::all,
                 std::string method = "mle",
@@ -62,7 +51,7 @@ namespace vinecopulib
                 bool preselect_families = true,
                 bool show_trace = false
         );
-        void family_select(
+        void select_families(
                 const Eigen::MatrixXd& data,
                 std::vector<BicopFamily> family_set = bicop_families::all,
                 std::string method = "mle",
@@ -71,7 +60,7 @@ namespace vinecopulib
                 std::string threshold_criterion = "tau",
                 std::string selection_criterion = "bic",
                 bool preselect_families = true,
-                bool show_trace = false // TODO
+                bool show_trace = false
         );
 
         Bicop get_pair_copula(int tree, int edge) const;
