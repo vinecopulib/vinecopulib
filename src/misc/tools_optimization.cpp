@@ -110,14 +110,7 @@ namespace tools_optimization {
         ++newdata->objective_calls;
         Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
         newdata->bicop->set_parameters(par);
-        Eigen::VectorXd f = newdata->bicop->pdf(newdata->U);
-        double nll = (-1)*f.array().log().sum();
-        if (std::isnan(nll)) {
-            // Remove nans from ll
-            nll = (-1)*tools_stats::loglik_stable(f);
-        }
-
-        return nll;
+        return (-1)*newdata->bicop->pdf(newdata->U).array().log().sum();
     }
 
     // the objective function for profile maximum likelihood estimation

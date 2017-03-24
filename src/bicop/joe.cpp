@@ -6,6 +6,8 @@
 
 #include "bicop/joe.hpp"
 #include <boost/math/special_functions/digamma.hpp>
+#include <boost/math/special_functions/expm1.hpp>
+#include <boost/math/special_functions/log1p.hpp>
 
 namespace vinecopulib
 {
@@ -22,12 +24,12 @@ namespace vinecopulib
 
     double JoeBicop::generator(const double& u)
     {
-        return (-1)*std::log(1-std::pow(1-u, this->parameters_(0)));
+        return (-1)*log1p(-std::pow(1-u, this->parameters_(0)));
     }
 
     double JoeBicop::generator_inv(const double& u)
     {
-        return 1-std::pow(1-std::exp(-u),1/this->parameters_(0));
+        return 1-std::pow(-expm1(-u),1/this->parameters_(0));
     }
 
     double JoeBicop::generator_derivative(const double& u)

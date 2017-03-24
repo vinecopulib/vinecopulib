@@ -130,16 +130,4 @@ namespace tools_stats {
 
         return D;
     }
-
-    double loglik_stable(Eigen::VectorXd& f)
-    {
-        Eigen::VectorXd newf = f.unaryExpr([](double v) {
-            double res = v;
-            if (std::isnan(v)) {
-                return 1.0;
-            }
-            return res;
-        });
-        return newf.array().log().sum();
-    }
 }

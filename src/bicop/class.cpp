@@ -175,14 +175,7 @@ namespace vinecopulib
     //! @{
     double Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
-        Eigen::VectorXd f = pdf(u);
-        double ll = f.array().log().sum();
-
-        if (std::isnan(ll)) {
-            // Remove nans from ll
-            ll = tools_stats::loglik_stable(f);
-        }
-        return ll;
+        return pdf(u).array().log().sum();
     }
 
     double Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
