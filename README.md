@@ -208,6 +208,8 @@ association (`indep`,`gaussian`, `student`, `frank`, `tll0`)
 `bb6`, `bb7`, and `bb8`)
 * `itau` families for which estimation by Kendall's tau inversion is available
 (`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
+* `flip_by_rotation` families which can be flipped by rotation (currently 
+equivalent to `archimedean`)
 
 **Example**
 ``` cpp
