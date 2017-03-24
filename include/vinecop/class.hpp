@@ -10,6 +10,7 @@
 
 #include "bicop/class.hpp"
 #include "vinecop/rvine_matrix.hpp"
+#include "vinecop/tools_structselect.hpp"
 
 namespace vinecopulib
 {
@@ -23,9 +24,23 @@ namespace vinecopulib
                 const std::vector<std::vector<Bicop>>& pair_copulas,
                 const Eigen::MatrixXi& matrix
         );
+        Vinecop(const Eigen::MatrixXi& matrix);
+        Vinecop(
+                const Eigen::MatrixXd& data,
+                const Eigen::MatrixXi& matrix = Eigen::MatrixXi(),
+                std::vector<BicopFamily> family_set = bicop_families::all,
+                std::string method = "mle",
+                int truncation_level = std::numeric_limits<int>::max(),
+                double threshold = 0.0,
+                std::string tree_criterion = "tau",
+                std::string selection_criterion = "bic",
+                bool preselect_families = true,
+                bool show_trace = false
+        );
+
 
         static std::vector<std::vector<Bicop>> make_pair_copula_store(int d);
-        static Vinecop select(
+        void select_all(
                 const Eigen::MatrixXd& data,
                 std::vector<BicopFamily> family_set = bicop_families::all,
                 std::string method = "mle",
@@ -36,19 +51,20 @@ namespace vinecopulib
                 bool preselect_families = true,
                 bool show_trace = false
         );
-        static Vinecop family_select(
+        void select_families(
                 const Eigen::MatrixXd& data,
-                const Eigen::MatrixXi& matrix,
                 std::vector<BicopFamily> family_set = bicop_families::all,
                 std::string method = "mle",
                 int truncation_level = std::numeric_limits<int>::max(),
                 double threshold = 0.0,
                 std::string threshold_criterion = "tau",
                 std::string selection_criterion = "bic",
-                bool preselect_families = true
+                bool preselect_families = true,
+                bool show_trace = false
         );
 
         Bicop get_pair_copula(int tree, int edge) const;
+        std::vector<std::vector<Bicop>> get_all_pair_copulas() const;
         BicopFamily get_family(int tree, int edge) const;
         std::vector<std::vector<BicopFamily>> get_all_families() const;
         int get_rotation(int tree, int edge) const;
@@ -65,6 +81,7 @@ namespace vinecopulib
         int d_;
         RVineMatrix vine_matrix_;
         std::vector<std::vector<Bicop>> pair_copulas_;
+        void update_vinecop(std::vector<tools_structselect::VineTree>& trees);
     };
 
     Eigen::VectorXi inverse_permutation(const Eigen::VectorXi& order);
