@@ -70,30 +70,98 @@ Optionally, you'll need:
    * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations),
    * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to build the unit tests).
      
-Note that a `findR.cmake` looks for R and VineCopula in the default locations for linux and 
-osx, but problems might occur with versions installed from R/RStudio. Therefore, prior to building the library, it is recommended to use:
+Note that a `findR.cmake` looks for R and VineCopula in the default locations 
+for linux and osx, but problems might occur with versions installed from 
+R/RStudio. Therefore, prior to building the library, it is recommended to use:
 
-`sudo Rscript -e 'install.packages(c("VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'`
+`sudo Rscript -e 'install.packages(c("VineCopula"), lib="/usr/lib/R/library", 
+repos="http://cran.rstudio.com/")'`
 
 
 ### How to build the library
+
+The one liner (from the root folder):
+
+`mkdir build && cd build && cmake .. && make && make doc && 
+sudo make install && bin/test_all`
 
 | Step | Shell command  |
 |-----------------------|------------------------------------|
 | Create a build folder  | `mkdir build` |
 | Move to the created folder  | `cd build` |
-|  Create the `MakeFile` via cmake  |  `cmake .. ` or `cmake .. -DCMAKE_BUILD_TYPE=Debug` (Debug mode with ASAN)  |
-|  To avoid compiling the unit tests, create the `MakeFile` via cmake  |  `cmake .. -DBUILD_TESTING=OFF`   |
-| Compile the library | `make` or `make -j n` where `n` is the number of cores  |
+|  Create the `MakeFile` via cmake  |  `cmake .. ` or 
+`cmake .. -DCMAKE_BUILD_TYPE=Debug` (Debug mode with ASAN)  |
+|  To avoid compiling the unit tests, create the `MakeFile` via cmake  |  
+`cmake .. -DBUILD_TESTING=OFF`   |
+| Compile the library | `make` or `make -j n` where `n` is the number of cores |
 | Build the documentation (optional)  | `make doc` |
 | Install the library on linux/OSX (optional)  | `sudo make install` |
 | Run unit tests (optional)  |  `bin/[test_executable]` |
 
-In one step:
-
-`mkdir build && cd build && cmake .. && make && make doc && sudo make install && bin/test_all`
-
 ------------------------------------------------
+
+### How to include the library in other projects
+
+Using `make install`, vinecopulib is installed in the usual location of the 
+system, namely
+
+* `<prefix>/lib/` (for the shared library),
+* `<prefix>/include/` (for the headers),
+* `<prefix>/lib/cmake/vinecopulib` (to allow cmake to find the library 
+with `find_package`),
+
+where `<prefix>` is e.g. `/usr/` or `/usr/local`. Note that
+`make install` only copies `vinecopulib.hpp` in `<prefix>/include/` and 
+puts the other headers in a subfolder `<prefix>/include/vinecopulib`, but using 
+`#include <vinecopulib.hpp>` is enough to load both bivariate and vine functions.
+
+The easiest way to include vinecopulib in another project (and to avoid writing makefiles) 
+is to use CMake. For instance, an example projet where the source code to be linked could contain
+* a `CMakeLists.txt` file for the project's setup,
+* a subfolder `src` for the source code, containing
+    * the source code,
+    * another `CMakeLists.txt` file for the project libraries and executables.
+ 
+The top-level `CMakeLists.txt` could be:
+```cmake
+cmake_minimum_required(VERSION 3.2)
+
+set(CMAKE_CXX_STANDARD 11)
+
+project(Example)
+
+# Setting default folders
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+# C++ compile flags
+set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O2 -DNDEBUG")
+
+# Find vinecopulib package and dependencies
+find_package(vinecopulib                  REQUIRED)
+find_package(Boost 1.63                   REQUIRED)
+include(cmake/findEigen3.cmake            REQUIRED)
+include(cmake/findNlopt.cmake             REQUIRED)
+
+# Set required variables for includes and libraries
+set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${NLOPT_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
+set(external_libs ${VINECOPULIB_LIBRARIES} ${NLOPT_LIBRARIES} ${Boost_LIBRARIES})
+
+# Include subdirectory with project sources
+add_subdirectory(src)
+```
+Assuming a single `main.cpp` source file (with `#include <vinecopulib.hpp>` at 
+the top), the `CMakeLists.txt` file in `/src/` 
+could then be:
+```cmake
+# Include header files
+include_directories(${external_includes})
+
+# Add main executable
+add_executable(main main.cpp)
+
+# Link to vinecopulib and dependencies
+target_link_libraries(vinecopulib_main ${external_libs})
+```
 
 ## Bivariate copula models
 

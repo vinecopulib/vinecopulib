@@ -41,7 +41,7 @@ if (NOT WIN32)
     # Installation
 
     # Layout. This works for all platforms:
-    #   * <prefix>/lib/cmake/<PROJECT-NAME>
+    #   * <prefix>/lib/cmake/vinecopulib
     #   * <prefix>/lib/
     #   * <prefix>/include/
     set(config_install_dir "lib/cmake/${PROJECT_NAME}")
