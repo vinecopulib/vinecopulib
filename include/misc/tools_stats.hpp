@@ -79,4 +79,6 @@ namespace tools_stats
     double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
     double pairwise_ktau(Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
     double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z);
+
+    double loglik_stable(Eigen::VectorXd& f);
 }

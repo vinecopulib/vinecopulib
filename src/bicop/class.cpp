@@ -9,7 +9,7 @@
 #include "misc/tools_stats.hpp"
 #include "misc/tools_stl.hpp"
 
-#include <iostream>
+#include <cmath>
 
 namespace vinecopulib
 {
@@ -175,7 +175,14 @@ namespace vinecopulib
     //! @{
     double Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
-        return pdf(u).array().log().sum();
+        Eigen::VectorXd f = pdf(u);
+        double ll = f.array().log().sum();
+
+        if (std::isnan(ll)) {
+            // Remove nans from ll
+            ll = tools_stats::loglik_stable(f);
+        }
+        return ll;
     }
 
     double Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)

@@ -13,7 +13,7 @@ namespace test_bicop_parametric {
     using namespace vinecopulib;
     using namespace tools_stl;
 
-    // Test if the C++ implementation of the basic methods is correct
+    /*// Test if the C++ implementation of the basic methods is correct
     TEST_P(ParBicopTest, parametric_bicop_is_correct) {
         if (needs_check_) {
             std::string cmd = std::string(RSCRIPT) + std::string(TEST_BICOP);
@@ -66,7 +66,7 @@ namespace test_bicop_parametric {
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,7,n,1), 1e-4)) << bicop_.str();
         }
-    }
+    }*/
 
     // Test if the C++ implementation of select method using the mle is correct
     TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct) {
@@ -104,7 +104,7 @@ namespace test_bicop_parametric {
         }
     }
 
-    // Test if the C++ implementation of select method using itau is correct
+/*    // Test if the C++ implementation of select method using itau is correct
     TEST_P(ParBicopTest, bicop_select_itau_bic_is_correct) {
         if (is_member(bicop_.get_family(), bicop_families::itau)) {
             std::string selection_criterion = "bic";
@@ -135,6 +135,14 @@ namespace test_bicop_parametric {
             testing::Combine(
                     testing::ValuesIn(bicop_families::parametric),
                     testing::ValuesIn({0,90})
+            )
+    );*/
+    INSTANTIATE_TEST_CASE_P(
+            ParBicopTest,
+            ParBicopTest,
+            testing::Combine(
+            testing::Values(BicopFamily::joe),
+            testing::ValuesIn({0,90,180,270})
             )
     );
 }

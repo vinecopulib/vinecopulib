@@ -8,8 +8,6 @@
 
 #include "abstract.hpp"
 
-
-
 namespace vinecopulib {
     class Bicop
     {

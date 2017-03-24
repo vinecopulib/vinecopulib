@@ -5,7 +5,9 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "misc/tools_optimization.hpp"
-#include <iostream>
+#include "misc/tools_stats.hpp"
+
+#include <cmath>
 
 namespace tools_optimization {
 
@@ -108,7 +110,12 @@ namespace tools_optimization {
         ++newdata->objective_calls;
         Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
         newdata->bicop->set_parameters(par);
-        double nll = (-1)*newdata->bicop->pdf(newdata->U).array().log().sum();
+        Eigen::VectorXd f = newdata->bicop->pdf(newdata->U);
+        double nll = (-1)*f.array().log().sum();
+        if (std::isnan(nll)) {
+            // Remove nans from ll
+            nll = (-1)*tools_stats::loglik_stable(f);
+        }
 
         return nll;
     }

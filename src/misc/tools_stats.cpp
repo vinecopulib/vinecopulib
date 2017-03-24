@@ -8,6 +8,8 @@
 #include "misc/tools_stl.hpp"
 #include "misc/tools_c.h"
 
+#include <cmath>
+
 namespace tools_stats {
     
     //! Empirical probability integral transform
@@ -127,5 +129,17 @@ namespace tools_stats {
         D /= (n*(n-1)*(n-2)*(n-3)*(n-4));
 
         return D;
+    }
+
+    double loglik_stable(Eigen::VectorXd& f)
+    {
+        Eigen::VectorXd newf = f.unaryExpr([](double v) {
+            double res = v;
+            if (std::isnan(v)) {
+                return 1.0;
+            }
+            return res;
+        });
+        return newf.array().log().sum();
     }
 }
