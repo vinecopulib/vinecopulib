@@ -5,7 +5,6 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "vinecop/class.hpp"
-#include "vinecop/tools_structselect.hpp"
 #include "misc/tools_stl.hpp"
 #include "misc/tools_stats.hpp"
 #include <vector>
@@ -45,8 +44,7 @@ namespace vinecopulib
     //!     make_pair_copula_store(d).
     //! @param matrix R-vine matrix.
     //!
-    //! @return a d-dimensional D-vine with variable order 1, ..., d and all
-    //!     pair-copulas set to independence
+    //! @return a d-dimensional D-vine with variable order 1, ..., d
     Vinecop::Vinecop(
             const std::vector<std::vector<Bicop>>& pair_copulas,
             const Eigen::MatrixXi& matrix
@@ -75,9 +73,76 @@ namespace vinecopulib
             }
         }
 
-        // D-vine with variable order (1, ..., d)
         vine_matrix_ = RVineMatrix(matrix);
         pair_copulas_ = pair_copulas;
+    }
+
+    Vinecop::Vinecop(
+            const Eigen::MatrixXd& data,
+            std::vector<BicopFamily> family_set,
+            std::string method,
+            int truncation_level,
+            double threshold,
+            std::string tree_criterion,
+            std::string selection_criterion,
+            bool preselect_families,
+            bool show_trace
+    )
+    {
+        d_ = data.cols();
+        pair_copulas_ = make_pair_copula_store(d_);
+        select(data, family_set, method, truncation_level, threshold,
+               tree_criterion, selection_criterion, preselect_families,
+               show_trace);
+    }
+
+    Vinecop::Vinecop(
+            const Eigen::MatrixXd& data,
+            const Eigen::MatrixXi& matrix,
+            std::vector<BicopFamily> family_set,
+            std::string method,
+            int truncation_level,
+            double threshold,
+            std::string tree_criterion,
+            std::string selection_criterion,
+            bool preselect_families,
+            bool show_trace
+    )
+    {
+        d_ = matrix.cols();
+        int d = data.cols();
+        if (d != d_) {
+            std::stringstream message;
+            message << "data has wrong number of columns; " <<
+                    "expected: " << d_ <<
+                    ", actual: " << d << std::endl;
+            throw std::runtime_error(message.str().c_str());
+        }
+        vine_matrix_ = RVineMatrix(matrix);
+        pair_copulas_ = make_pair_copula_store(d);
+        family_select(data, family_set, method, truncation_level, threshold,
+                      tree_criterion, selection_criterion, preselect_families,
+                      show_trace);
+    }
+
+    //! Construct a vine copula object from a structure matrix
+    //!
+    //! @param matrix R-vine matrix.
+    //!
+    //! @return a d-dimensional D-vine with variable order 1, ..., d and all
+    //!     pair-copulas set to independence
+    Vinecop::Vinecop(const Eigen::MatrixXi& matrix)
+    {
+        d_ = matrix.rows();
+        vine_matrix_ = RVineMatrix(matrix);
+
+        // all pair-copulas are independence
+        pair_copulas_ = make_pair_copula_store(d_);
+        for (auto& tree : pair_copulas_) {
+            for (auto& pc : tree) {
+                pc = Bicop(BicopFamily::indep);
+            }
+        }
     }
 
     //! Initialize object for storing pair copulas
@@ -120,7 +185,7 @@ namespace vinecopulib
     //! @param show_trace whether to show a trace of the building progress (default
     //!     is false).
     //! @return The fitted vine copula model.
-    Vinecop Vinecop::select(
+    void Vinecop::select(
             const Eigen::MatrixXd& data,
             std::vector<BicopFamily> family_set,
             std::string method,
@@ -134,6 +199,13 @@ namespace vinecopulib
     {
         using namespace tools_structselect;
         int d = data.cols();
+        if (d != d_) {
+            std::stringstream message;
+            message << "data has wrong number of columns; " <<
+                    "expected: " << d_ <<
+                    ", actual: " << d << std::endl;
+            throw std::runtime_error(message.str().c_str());
+        }
         std::vector<VineTree> trees(d);
 
         trees[0] = make_base_tree(data);
@@ -161,7 +233,7 @@ namespace vinecopulib
             }
         }
 
-        return as_vinecop(trees);;
+        update_vinecop(trees);
     }
 
     //! Access a pair copula
@@ -190,6 +262,14 @@ namespace vinecopulib
             throw std::runtime_error(message.str().c_str());
         }
         return pair_copulas_[tree][edge];
+    }
+
+    //! Access all pair copulas
+    //!
+    //! @return A \code std::vector<std::vector<Bicop>> object.
+    std::vector<std::vector<Bicop>> Vinecop::get_all_pair_copulas() const
+    {
+        return pair_copulas_;
     }
 
     //! Get family of a pair copula
@@ -495,32 +575,33 @@ namespace vinecopulib
     //! @param preselect_families  whether to exclude families before fitting based
     //!     on symmetry properties of the data.
     //! @return The fitted vine copula model.
-    Vinecop Vinecop::family_select(
+    void Vinecop::family_select(
             const Eigen::MatrixXd& data,
-            const Eigen::MatrixXi& matrix,
             std::vector<BicopFamily> family_set,
             std::string method,
             int truncation_level,
             double threshold,
             std::string threshold_criterion,
             std::string selection_criterion,
-            bool preselect_families
+            bool preselect_families,
+            bool show_trace
     )
     {
         int d = data.cols();
-        if (d != matrix.cols()) {
-            throw std::runtime_error(
-                "dimensions of matrix and data don't match\n"
-            );
+        if (d != d_) {
+            std::stringstream message;
+            message << "data has wrong number of columns; " <<
+                    "expected: " << d_ <<
+                    ", actual: " << d << std::endl;
+            throw std::runtime_error(message.str().c_str());
         }
 
         // info about the vine structure
-        RVineMatrix rvine_matrix(matrix);
-        Eigen::VectorXi revorder    = rvine_matrix.get_order().reverse();
-        Eigen::MatrixXi no_matrix   = rvine_matrix.in_natural_order();
-        Eigen::MatrixXi max_matrix  = rvine_matrix.get_max_matrix();
-        MatrixXb needed_hfunc1 = rvine_matrix.get_needed_hfunc1();
-        MatrixXb needed_hfunc2 = rvine_matrix.get_needed_hfunc2();
+        Eigen::VectorXi revorder    = vine_matrix_.get_order().reverse();
+        Eigen::MatrixXi no_matrix   = vine_matrix_.in_natural_order();
+        Eigen::MatrixXi max_matrix  = vine_matrix_.get_max_matrix();
+        MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
+        MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
 
         // temporary storage objects for h-functions
         int n = data.rows();
@@ -548,16 +629,16 @@ namespace vinecopulib
                 
                 // select pair-copula
                 if (tree > truncation_level) {
-                    pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
+                    pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
                 } else {
                     if (threshold != 0) {
                         double crit = tools_structselect::get_tree_criterion(
                             u_e, threshold_criterion, threshold);
                         if (crit > 1 - threshold) {
-                            pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
+                            pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
                         }
                     } else {
-                        pair_copulas[tree][edge] = Bicop(
+                        pair_copulas_[tree][edge] = Bicop(
                             u_e,
                             family_set,
                             method,
@@ -569,14 +650,84 @@ namespace vinecopulib
 
                 // h-functions are only evaluated if needed in next step
                 if (needed_hfunc1(tree + 1, edge)) {
-                    hfunc1.col(edge) = pair_copulas[tree][edge].hfunc1(u_e);
+                    hfunc1.col(edge) = pair_copulas_[tree][edge].hfunc1(u_e);
                 }
                 if (needed_hfunc2(tree + 1, edge)) {
-                    hfunc2.col(edge) = pair_copulas[tree][edge].hfunc2(u_e);
+                    hfunc2.col(edge) = pair_copulas_[tree][edge].hfunc2(u_e);
+                }
+            }
+        }
+    }
+
+    //! Update Vinecop object using the fitted trees
+    //!
+    //! @param trees a vector of trees preprocessed by add_edge_info(); the
+    //!     0th entry should be the base graph and is not used.
+    void Vinecop::update_vinecop(std::vector<tools_structselect::VineTree>& trees)
+    {
+        using namespace tools_structselect;
+        using namespace tools_stl;
+        int d = trees.size();
+        Eigen::MatrixXi mat = Eigen::MatrixXi::Constant(d, d, 0);
+
+        for (int col = 0; col < d - 1; ++col) {
+            int t = d - 1 - col;
+            // start with highest tree in this column and fill first two
+            // entries by conditioning set
+            auto e0 = *boost::edges(trees[t]).first;
+            mat(t, col) = trees[t][e0].conditioning[0];
+            mat(t - 1, col) = trees[t][e0].conditioning[1];
+
+            // assign fitted pair copula to appropriate entry, see
+            // vinecopulib::Vinecop::get_pair_copula().
+            pair_copulas_[t - 1][col] = trees[t][e0].pair_copula;
+
+            // initialize running set with full conditioing set of this edge
+            auto ned_set = trees[t][e0].conditioned;
+
+            // iteratively search for an edge in lower tree that shares all indices
+            // in the conditioning set + diagonal entry
+            for (int k = 1; k < t; ++k) {
+                auto reduced_set = cat(mat(t, col), ned_set);
+                for (auto e : boost::edges(trees[t - k])) {
+                    if (is_same_set(trees[t - k][e].all_indices, reduced_set)) {
+                        // next matrix entry is conditioning variable of new edge
+                        // that's not equal to the diagonal entry of this column
+                        auto e_new = trees[t - k][e];
+                        auto pos = find_position(mat(t, col), e_new.conditioning);
+                        mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
+                        if (pos == 1) {
+                            e_new.pair_copula.flip();
+                        }
+                        // assign fitted pair copula to appropriate entry, see
+                        // vinecopulib::Vinecop::get_pair_copula().
+                        pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
+
+                        // start over with conditioning set of next edge
+                        ned_set = e_new.conditioned;
+
+                        // remove edge (must not be reused in another column!)
+                        int v0 = boost::source(e, trees[t - k]);
+                        int v1 = boost::target(e, trees[t - k]);
+                        boost::remove_edge(v0, v1, trees[t - k]);
+                        break;
+                    }
                 }
             }
         }
 
-        return Vinecop(pair_copulas, matrix);
+        // The last column contains a single element which must be different
+        // from all other diagonal elements. Based on the properties of an
+        // R-vine matrix, this must be the element next to it.
+        mat(0, d - 1) = mat(0, d - 2);
+
+        // change to user-facing format
+        // (variable index starting at 1 instead of 0)
+        Eigen::MatrixXi new_mat = mat;
+        for (int i = 0; i < d; ++i)
+            for (int j = 0; j < d - i; ++j)
+                new_mat(i, j) += 1;
+
+        vine_matrix_ = RVineMatrix(new_mat);
     }
 }
