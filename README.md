@@ -64,17 +64,14 @@ To build the library, you'll need:
    * [CMake](https://cmake.org/),
    * [Boost 1.63](http://www.boost.org/),
    * [Eigen 3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page),
-   * [NLopt](http://ab-initio.mit.edu/wiki/index.php/NLopt),
-      * [Doxygen](http://www.stack.nl/~dimitri/doxygen/),
-   * [R](https://www.r-project.org/about.html),
-   * [VineCopula](https://github.com/tnagler/VineCopula).
+   * [NLopt](http://ab-initio.mit.edu/wiki/index.php/NLopt).
+   
+Optionally, you'll need:
+   * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations),
+   * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to build the unit tests).
      
-
-Note that R and VineCopula are used only for unit-testing 
-the C++ implementation (i.e., comparing with the results from the VineCopula R 
-package). A `findR.cmake` looks for them in the default locations for linux and 
-osx, but problems might occur with versions installed from R/RStudio. Therefore,
- prior to building the library, it is recommended to use:
+Note that a `findR.cmake` looks for R and VineCopula in the default locations for linux and 
+osx, but problems might occur with versions installed from R/RStudio. Therefore, prior to building the library, it is recommended to use:
 
 `sudo Rscript -e 'install.packages(c("VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'`
 
@@ -89,8 +86,12 @@ osx, but problems might occur with versions installed from R/RStudio. Therefore,
 |  To avoid compiling the unit tests, create the `MakeFile` via cmake  |  `cmake .. -DBUILD_TESTING=OFF`   |
 | Compile the library | `make` or `make -j n` where `n` is the number of cores  |
 | Build the documentation (optional)  | `make doc` |
-| Install the library (on linux/OSX)  | `make install` |
-| Run unit tests (optional)  |  `/bin/[test_executable]` |
+| Install the library on linux/OSX (optional)  | `sudo make install` |
+| Run unit tests (optional)  |  `bin/[test_executable]` |
+
+In one step:
+
+`mkdir build && cd build && cmake .. && make && make doc && sudo make install && bin/test_all`
 
 ------------------------------------------------
 
