@@ -24,12 +24,12 @@ namespace vinecopulib
 
     double JoeBicop::generator(const double& u)
     {
-        return (-1)*log1p(-std::pow(1-u, this->parameters_(0)));
+        return (-1)*boost::math::log1p(-std::pow(1-u, this->parameters_(0)));
     }
 
     double JoeBicop::generator_inv(const double& u)
     {
-        return 1-std::pow(-expm1(-u),1/this->parameters_(0));
+        return 1-std::pow(-boost::math::expm1(-u),1/this->parameters_(0));
     }
 
     double JoeBicop::generator_derivative(const double& u)
@@ -41,7 +41,8 @@ namespace vinecopulib
     double JoeBicop::generator_derivative2(const double& u)
     {
         double theta = double(this->parameters_(0));
-        return theta*(theta-1+std::pow(1-u, theta))*std::pow(1-u, theta-2)/std::pow(-1+std::pow(1-u, theta),2);
+        double res = theta*(theta-1+std::pow(1-u, theta));
+        return res*std::pow(1-u, theta-2)/std::pow(-1+std::pow(1-u, theta),2);
     }
 
     // inverse h-function

@@ -22,31 +22,33 @@ namespace vinecopulib
 
     double Bb7Bicop::generator(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
+        double theta = double(parameters_(0));
+        double delta = double(parameters_(1));
         return std::pow(1-std::pow(1-u,theta),-delta)-1;
     }
 
     double Bb7Bicop::generator_inv(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
+        double theta = double(parameters_(0));
+        double delta = double(parameters_(1));
         return 1-std::pow(1-std::pow(1+u,-1/delta),1/theta);
     }
 
     double Bb7Bicop::generator_derivative(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
-        return -delta*theta*std::pow(1-std::pow(1-u,theta),-1-delta)*std::pow(1-u,theta-1);
+        double theta = double(parameters_(0));
+        double delta = double(parameters_(1));
+        double res = delta*theta*std::pow(1-std::pow(1-u,theta),-1-delta);
+        return -res*std::pow(1-u,theta-1);
     }
 
     double Bb7Bicop::generator_derivative2(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
+        double theta = double(parameters_(0));
+        double delta = double(parameters_(1));
         double tmp = std::pow(1-u,theta);
-        return delta*theta*std::pow(1-tmp,-2-delta)*std::pow(1-u,theta-2)*(theta-1+(1+delta*theta)*tmp);
+        double res = delta*theta*std::pow(1-tmp,-2-delta)*std::pow(1-u,theta-2);
+        return res*(theta-1+(1+delta*theta)*tmp);
     }
 
     double Bb7Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
@@ -55,7 +57,8 @@ namespace vinecopulib
         double delta = parameters(1);
         auto f = [&theta, &delta](const double& v) {
             double tmp = std::pow(1-v,theta);
-            return -4*(std::pow(1-tmp,-delta)-1)/(theta*delta*std::pow(1-v,theta-1)*std::pow(1-tmp,-delta-1));
+            double res = -4*(std::pow(1-tmp,-delta)-1)/(theta*delta);
+            return res/(std::pow(1-v,theta-1)*std::pow(1-tmp,-delta-1));
         };
         return 1 + tools_integration::integrate_zero_to_one(f);
     }

@@ -23,27 +23,29 @@ namespace vinecopulib
 
     double Bb1Bicop::generator(const double& u)
     {
-        return std::pow(std::pow(u, -this->parameters_(0)) - 1, this->parameters_(1));
+        return std::pow(std::pow(u, -parameters_(0)) - 1, parameters_(1));
     }
 
     double Bb1Bicop::generator_inv(const double& u)
     {
-        return std::pow(std::pow(u, 1/this->parameters_(1)) + 1, -1/this->parameters_(0));
+        return std::pow(std::pow(u, 1/parameters_(1)) + 1, -1/parameters_(0));
     }
 
     double Bb1Bicop::generator_derivative(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
-        return -delta * theta * std::pow(u, -(1 + theta))*std::pow(std::pow(u, -theta) - 1, delta - 1);
+        double theta = double(parameters_(0));
+        double delta = double(parameters_(1));
+        double res = -delta * theta * std::pow(u, -(1 + theta));
+        return res*std::pow(std::pow(u, -theta) - 1, delta - 1);
     }
 
     double Bb1Bicop::generator_derivative2(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
-        double res = delta * theta * std::pow(std::pow(u, -theta) - 1, delta) / std::pow(std::pow(u, theta) - 1, 2);
-        return res * (1 + delta * theta - (1 + theta) * std::pow(u, theta)) / std::pow(u, 2);
+        double theta = double(parameters_(0));
+        double delta = double(parameters_(1));
+        double res = delta * theta * std::pow(std::pow(u, -theta) - 1, delta);
+        res /= (std::pow(std::pow(u, theta) - 1, 2)*std::pow(u, 2));
+        return res * (1 + delta * theta - (1 + theta) * std::pow(u, theta));
     }
 
     double Bb1Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
