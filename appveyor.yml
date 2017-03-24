@@ -52,3 +52,7 @@ build_script:
   - cmake --build .
   - ctest -C Release --output-on-failure
   - cd ..
+
+on_success:
+  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build-debug\Debug\vinecopulib.* build-release\Debug\vinecopulib.*
+  - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
