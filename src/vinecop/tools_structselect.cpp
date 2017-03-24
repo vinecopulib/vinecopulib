@@ -67,6 +67,7 @@ namespace tools_structselect {
     //!     more thanone parameter, the main dependence parameter is found by
     //!     inverting the Kendall's tau and the remainders by profile likelihood
     //!     optimization.
+    //! @param threshold for thresholded vines.
     //! @param tree_criterion the criterion for selecting the maximum spanning
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
@@ -78,6 +79,7 @@ namespace tools_structselect {
         VineTree& prev_tree,
         std::vector<vinecopulib::BicopFamily> family_set,
         std::string method,
+        double threshold,
         std::string tree_criterion,
         std::string selection_criterion,
         bool preselect_families
@@ -85,7 +87,7 @@ namespace tools_structselect {
     {
         auto new_tree = edges_as_vertices(prev_tree);
         remove_edge_data(prev_tree); // no longer needed
-        add_allowed_edges(new_tree, tree_criterion);
+        add_allowed_edges(new_tree, tree_criterion, threshold);
         if (boost::num_vertices(new_tree) > 2) {
             min_spanning_tree(new_tree);
         }
@@ -95,6 +97,7 @@ namespace tools_structselect {
             new_tree,
             family_set,
             method,
+            threshold,
             selection_criterion,
             preselect_families
         );
@@ -135,14 +138,18 @@ namespace tools_structselect {
 
     //! Add edges allowed by the proximity condition
     //!
-    //! Also calculates the Kendall's tau for the edge and sets edge weights
-    //! to 1-|tau| so that the minimum spanning tree algorithm maximizes sum of
-    //! |tau|.
+    //! Also calculates the edge weight (e.g., 1-|tau| for tree_criterion = 
+    //! "itau").
     //!
     //! @param vine_tree tree of a vine.
     //! @param tree_criterion the criterion for selecting the maximum spanning
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).
-    void add_allowed_edges(VineTree& vine_tree, std::string tree_criterion)
+    //! @param threshold for thresholded vines.
+    void add_allowed_edges(
+        VineTree& vine_tree, 
+        std::string tree_criterion,
+        double threshold
+    )
     {
         for (auto v0 : boost::vertices(vine_tree)) {
             for (unsigned int v1 = 0; v1 < v0; ++v1) {
@@ -150,18 +157,16 @@ namespace tools_structselect {
                 // (-1 means 'no common neighbor')
                 if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                     auto pc_data = get_pc_data(v0, v1, vine_tree);
-                    auto w = get_edge_weight(pc_data, tree_criterion);
+                    auto w = get_tree_criterion(pc_data, tree_criterion, threshold);
                     auto e = boost::add_edge(v0, v1, w, vine_tree).first;
                     vine_tree[e].weight = w;
                 }
             }
         }
     }
-    
-    double get_edge_weight(
-        Eigen::Matrix<double, Eigen::Dynamic, 2> 
-        data, std::string tree_criterion
-    ) 
+        
+    double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
+        std::string tree_criterion, double threshold) 
     {
         double w;
         if (tree_criterion == "tau") {
@@ -173,6 +178,9 @@ namespace tools_structselect {
             w = 1.0 - std::fabs(tools_stats::pairwise_cor(data));
         } else {
             throw std::runtime_error("tree criterion not implemented");
+        }
+        if (w > 1 - threshold) {
+            w = 1.0;
         }
         
         return w;
@@ -295,6 +303,7 @@ namespace tools_structselect {
     //!     more thanone parameter, the main dependence parameter is found by
     //!     inverting the Kendall's tau and the remainders by profile likelihood
     //!     optimization.
+    //! @param the threshold for thresholded vines.
     //! @param selection_criterion the selection criterion; either "aic" or "bic"
     //!     (default).
     //! @param preselect_families  whether to exclude families before fitting based
@@ -303,17 +312,24 @@ namespace tools_structselect {
         VineTree& tree,
         std::vector<vinecopulib::BicopFamily> family_set,
         std::string method,
+        double threshold,
         std::string selection_criterion,
         bool preselect_families
     )
     {
         for (auto e : boost::edges(tree)) {
-            tree[e].pair_copula = vinecopulib::Bicop(
-                tree[e].pc_data,
-                family_set,
-                method,
-                selection_criterion,
-                preselect_families);
+            if (tree[e].weight > 1 - threshold) {
+                tree[e].pair_copula = vinecopulib::Bicop();
+            } else {
+                tree[e].pair_copula = vinecopulib::Bicop(
+                    tree[e].pc_data,
+                    family_set,
+                    method,
+                    selection_criterion,
+                    preselect_families
+                );
+            }
+
             tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
             tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
         }

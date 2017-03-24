@@ -54,16 +54,22 @@ namespace tools_structselect {
         VineTree& prev_tree,
         std::vector<vinecopulib::BicopFamily> family_set,
         std::string method,
+        double threshold,
         std::string tree_criterion,
         std::string selection_criterion,
         bool preselect_families
     );
     VineTree edges_as_vertices(const VineTree& prev_tree);
-    void add_allowed_edges(VineTree& tree, std::string tree_criterion);
-    double get_edge_weight(
-        Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-        std::string tree_criterion
-     );
+    void add_allowed_edges(
+        VineTree& tree, 
+        std::string tree_criterion,
+        double threshold
+    );
+    double get_tree_criterion(
+        Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
+        std::string tree_criterion,
+        double threshold
+    );
     int find_common_neighbor(int v0, int v1, const VineTree& tree);
     Eigen::MatrixXd get_pc_data(int v0, int v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);
@@ -74,6 +80,7 @@ namespace tools_structselect {
         VineTree& tree,
         std::vector<vinecopulib::BicopFamily> family_set,
         std::string method,
+        double threshold,
         std::string selection_criterion,
         bool preselect_families
     );

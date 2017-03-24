@@ -56,6 +56,23 @@ namespace test_vinecop_class {
         // check the underlying transformation from independent samples
         ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
     }
+    
+    TEST_F(VinecopTest, family_select_finds_true_rotations) {
+
+        auto pair_copulas = Vinecop::make_pair_copula_store(7);
+        auto par = Eigen::VectorXd::Constant(1, 3.0);
+        for (auto& tree : pair_copulas) {
+            for (auto& pc : tree) {
+                pc = Bicop(BicopFamily::clayton, 270, par);
+            }
+        }
+        Vinecop vinecop(pair_copulas, model_matrix);
+
+        auto u = vinecop.simulate(50000);
+        auto fit = Vinecop::family_select(u, model_matrix, 
+            {BicopFamily::clayton}, "itau");
+        EXPECT_EQ(vinecop.get_all_rotations(), fit.get_all_rotations());
+    }
 
     TEST_F(VinecopTest, select_finds_right_structure) {
         // check whether the same structure appears if we only allow for
