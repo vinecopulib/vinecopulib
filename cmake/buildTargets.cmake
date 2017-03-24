@@ -21,13 +21,8 @@ target_link_libraries(vinecopulib ${external_libs})
 
 set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-if (WIN32)
-    set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
-endif()
-
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
-
 if(BUILD_TESTING)
+    set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
     set(unit_tests
             test_all
             test_bicop_parametric
@@ -36,9 +31,11 @@ if(BUILD_TESTING)
             test_rvine_matrix
             test_vinecop_class)
     add_subdirectory(test)
+    file(GLOB_RECURSE r_scripts cmake/templates/*R)
+    file(COPY ${r_scripts} DESTINATION ${PROJECT_BINARY_DIR}/test)
 endif(BUILD_TESTING)
 
-# Related to code coverage and exports in linux
+# Related to exports for linux/mac and code coverage
 if (NOT WIN32)
     ####
     # Installation
@@ -140,4 +137,8 @@ if (NOT WIN32)
         file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/coverage)
         setup_target_for_coverage(${PROJECT_NAME}_coverage test_all coverage)
     endif()
+else()
+    set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
+
+    # TODO: Configure windows install
 endif()

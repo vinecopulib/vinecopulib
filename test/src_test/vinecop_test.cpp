@@ -9,8 +9,8 @@
 
 VinecopTest::VinecopTest() {
     // write temp files for the test using VineCopula
-    std::string command = std::string(RSCRIPT) + "../test/test_vinecop_parametric.R";
-    int sys_exit_code = system(command.c_str());
+    std::string cmd = std::string(RSCRIPT) + std::string(TEST_VINECOP);
+    int sys_exit_code = system(cmd.c_str());
 
     // vine structures (C++ representation reverses rows)
     model_matrix = read_matxi("temp2").colwise().reverse();
@@ -25,8 +25,8 @@ VinecopTest::VinecopTest() {
     sim = temp.block(0,m+1,n,m);
 
     // remove temp files
-    command = rm + "temp temp2 temp3";
-    sys_exit_code += system(command.c_str());
+    cmd = rm + "temp temp2 temp3";
+    sys_exit_code += system(cmd.c_str());
     if (sys_exit_code != 0) {
         throw std::runtime_error("error in system call");
     }
