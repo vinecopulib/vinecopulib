@@ -16,13 +16,11 @@ int main() {
 	// create Gumbel copula and simulate from the model
 	auto model = Bicop(BicopFamily::gumbel, 0, Eigen::VectorXd::Constant(1,2));
     auto data = model.simulate(2e3);
-    std::cout << "Created Model | ";  
-    model.print();
+    std::cout << "Created Model | " << model.str() << std::endl;
 
     // select family and fit
 	auto fitted = Bicop(data);
-	std::cout << "Fitted Model (sample size = 2e3) | ";
-    fitted.print();
+	std::cout << "Fitted Model (sample size = 2e3) | " << fitted.str() << std::endl;
 
     return 0;
 }
