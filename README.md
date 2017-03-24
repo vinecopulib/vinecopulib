@@ -5,7 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
  
 #### What are vine copulas?
->>>>>>> clean-up
 
 Vine copulas are a flexible class of dependence models consisting of bivariate
 building blocks (see e.g., Aas et al., 2009). You can find a comprehensive list
@@ -22,12 +21,12 @@ Advantages over VineCopula are
 * interfaces to both both R and python (coming soon)
 * a sleaker and more modern API,
 * shorter runtimes, especially in high dimensions,
-* nonparametric and multi-parameter families (coming soon).
+* nonparametric and multi-parameter families.
 
 #### Status
  
-The library is under active development and is heading towards its first release
-(planned for end of March). The API is still rather unstable. We are also 
+The library is under active development and the first release (0.0.0.0) was
+on March 24, 2017. The API is still rather unstable. We are also 
 working on interfaces for R and python.
 
 
@@ -64,21 +63,19 @@ To build the library, you'll need:
    * [a C++11-compatible    compiler](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers),
    * [CMake](https://cmake.org/),
    * [Doxygen](http://www.stack.nl/~dimitri/doxygen/),
+   * [Boost 1.63](http://www.boost.org/),
    * [Eigen 3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page),
-   * [R](https://www.r-project.org/about.html) with the following libraries 
-     installed: 
-     [Rcpp](https://github.com/RcppCore/Rcpp), 
-     [RInside](https://github.com/eddelbuettel/rinside), 
-     [RcppEigen](https://github.com/RcppCore/RcppEigen), 
-     [VineCopula](https://github.com/tnagler/VineCopula)
+   * [NLopt](http://ab-initio.mit.edu/wiki/index.php/NLopt).
+   * [R](https://www.r-project.org/about.html) with [VineCopula](https://github.com/tnagler/VineCopula) installed.
+     
 
-Note that Rcpp, RInside RcppEigen and VineCopula are used only for unit-testing 
+Note that R and VineCopula are used only for unit-testing 
 the C++ implementation (i.e., comparing with the results from the VineCopula R 
 package). A `findR.cmake` looks for them in the default locations for linux and 
-osx, but problems might occurwith versions installed from R/RStudio. Therefore,
+osx, but problems might occur with versions installed from R/RStudio. Therefore,
  prior to building the library, it is recommended to use:
 
-`sudo Rscript -e 'install.packages(c("Rcpp","RInside","RcppEigen","VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'`
+`sudo Rscript -e 'install.packages(c("VineCopula"), lib="/usr/lib/R/library", repos="http://cran.rstudio.com/")'`
 
 
 ### How to build the library
@@ -87,17 +84,19 @@ osx, but problems might occurwith versions installed from R/RStudio. Therefore,
 |-----------------------|------------------------------------|
 | Create a build folder  | `mkdir build` |
 | Move to the created folder  | `cd build` |
-|  Create the `MakeFile` via cmake  |  `cmake .. -DCMAKE_BUILD_TYPE=Release` (recommended), or `cmake .. -DCMAKE_BUILD_TYPE=Debug` (Debug mode with ASAN)  | 
-| Generate the executable (located in `../bin`) | `make` or `make -j n` where `n` is the number of cores  |
+|  Create the `MakeFile` via cmake  |  `cmake .. ` or `cmake .. -DCMAKE_BUILD_TYPE=Debug` (Debug mode with ASAN)  |
+|  To avoid compiling the unit tests, create the `MakeFile` via cmake  |  `cmake .. -DBUILD_TESTING=OFF`   |
+| Compile the library | `make` or `make -j n` where `n` is the number of cores  |
 | Build the documentation (optional)  | `make doc` |
-| Run unit tests (optional)  |  `./../bin/[test_executable]` |
+| Install the library (on linux/OSX)  | `make install` |
+| Run unit tests (optional)  |  `/bin/[test_executable]` |
 
 ------------------------------------------------
 
 ## Bivariate copula models
 
 Bivariate copula models are implemented as the `Bicop` class. To use this class in
-your code, include the header `"bicop.hpp"` at the top of your source
+your code, include the header `bicop.hpp` at the top of your source
 
 ### Set up a custom bivariate copula model
 
