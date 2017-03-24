@@ -9,8 +9,6 @@
 #include "misc/tools_stats.hpp"
 #include "misc/tools_stl.hpp"
 
-#include <cmath>
-
 namespace vinecopulib
 {
     Bicop::Bicop()

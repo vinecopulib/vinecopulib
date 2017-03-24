@@ -64,9 +64,13 @@ void ParBicopTest::set_parameters(Eigen::VectorXd parameters)
 {
     if (parameters.size() > 0) {
         par_ = parameters(0);
+    } else {
+        par_ = 0;
     }
     if (parameters.size() > 1) {
         par2_ = parameters(1);
+    } else {
+        par2_ = 0;
     }
 }
 int ParBicopTest::get_family()

@@ -8,8 +8,6 @@
 #include "misc/tools_stl.hpp"
 #include "misc/tools_c.h"
 
-#include <cmath>
-
 namespace tools_stats {
     
     //! Empirical probability integral transform
