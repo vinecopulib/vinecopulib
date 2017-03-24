@@ -43,7 +43,6 @@ build_script:
   - cd build-debug
   - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Debug
   - cmake --build .
-  - ..\bin\Debug\test_all.exe
   - ctest -C Debug --output-on-failure
   - cd ..
 
@@ -54,3 +53,6 @@ build_script:
   - ctest -C Release --output-on-failure
   - cd ..
 
+  - cd bin\Debug
+  - set path=%PATH%;C:/projects/vinecopulib/bin/Debug
+  - test_all.exe
