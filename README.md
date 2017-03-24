@@ -165,41 +165,72 @@ target_link_libraries(vinecopulib_main ${external_libs})
 
 ## Bivariate copula models
 
-Bivariate copula models are implemented as the `Bicop` class. To use this class in
-your code, include the header `bicop.hpp` at the top of your source
+Bivariate copula models are implemented as the `Bicop` class, and `BicopFamily` 
+is a closely related enum class describing the type or "family" of copula.
+
+To use bivariate copula models in your code, include the header 
+`vinecopulib/bicop/class.hpp` (or simply `vinecopulib.hpp`) at the top of 
+your source.
+
+### Implemented bivariate copula families
+
+| type          | name                  | BicopFamily |
+|---------------|-----------------------|-------|
+| -             | Independence          | indep     |
+| Elliptical    | Gaussian              | gaussian     |
+| "             | Student t             | student     |
+| Archimedean   | Clayton               | clayton     |
+| "             | Gumbel                | gumbel     |
+| "             | Frank                 | frank     |
+| "             | Joe                   | joe     |  
+| "             | BB1                   | bb1     |  
+| "             | BB6                   | bb6     |  
+| "             | BB7                   | bb7     |  
+| "             | BB8                   | bb8    |  
+| Nonparametric | Transformation kernel | tll0  | 
+
+Note that several convenience vectors of families are included in the 
+sub-namespace `bicop_families`:
+* `all` contains all the families
+* `parametric` contains the parametric families (all except `tll0`)
+* `nonparametric` contains the nonparametric families (`indep` and `tll0`)
+* `one_par` contains the parametric families with a single parameter 
+(`gaussian`, `clayton`, `gumbel`, `frank`, and `joe`)
+* `two_par` contains the parametric families with two parameters
+(`student`, `bb1`, `bb6`, `bb7`, and `bb8`)
+* `elliptical` contains the elliptical families
+* `archimedean` contains the archimedean families
+* `BB` contains the BB families
+* `rotationless` contains the families that cover both positive and negative
+association (`indep`,`gaussian`, `student`, `frank`, `tll0`)
+* `lt` families that display lower-tail dependence (`clayton`, `bb1`, `bb7`)
+* `ut` families that display upper-tail dependence (`gumbel`, `joe`, `bb1`, 
+`bb6`, `bb7`, and `bb8`)
+* `itau` families for which estimation by Kendall's tau inversion is available
+(`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
+
+**Example**
+``` cpp
+// print all available families
+std::cout << "Available families : ";
+for (auto family : vinecopulib::bicop_families::all) {
+		std::cout << get_family_name(family) << " ";
+}
+```
 
 ### Set up a custom bivariate copula model
 
-`Bicop` is an abstract class which means you cannot instantiate an object of 
-this class directly, but only through a pointer. The vinecopulib standard is 
-to use a `std::shared_ptr<Bicop>` (or its alias `BicopPtr`). To create a 
-custom bivariate copula model, you can use `Bicop::create()`.
 
 **Example**
 ``` cpp
 // 90 degree Clayton with default parameter (corresponds to independence)
-auto clayton = Bicop::create(3, 90);
+auto clayton = Bicop(3, 90);
 
 // Gauss copula with parameter 0.5
-auto gauss = Bicop::create(1, VecXd::Constant(1, 0.5), 0);
+auto gauss = Bicop(1, 0, VecXd::Constant(1, 0.5));
 ```
 
-### Implemented bivariate copula families
 
-| type          | name                  | index |
-|---------------|-----------------------|-------|
-| -             | Independence          | 0     |
-| Elliptical    | Gaussian              | 1     |
-| "             | Student t             | 2     |
-| Archimedean   | Clayton               | 3     |
-| "             | Gumbel                | 4     |
-| "             | Frank                 | 5     |
-| "             | Joe                   | 6     |  
-| "             | BB1                   | 7     |  
-| "             | BB6                   | 8     |  
-| "             | BB7                   | 9     |  
-| "             | BB8                   | 10    |  
-| Nonparametric | Transformation kernel | 1001  | 
 
 
 ### Fit and select a bivariate copula
