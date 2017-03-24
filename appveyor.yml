@@ -3,14 +3,6 @@ platform:
   - x64
 #TODO: configuration: Debug/Release + same with CMake
 
-artifacts:
-  - path: 'build-debug\Debug\vinecopulib.*'
-    name: Debug
-    type: zip
-  - path: 'build-release\Debug\vinecopulib.dll'
-    name: Release
-    type: zip
-
 init:
   - ps: |
         If ($env:platform -Match "Win32") {
@@ -58,6 +50,6 @@ build_script:
   - ctest -C Release --output-on-failure
   - cd ..
 
-after_build:
-  - appveyor PushArtifact Debug
-  - appveyor PushArtifact Release
+on_success:
+  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%-%Configuration%.zip build-debug\Debug\vinecopulib.*
+  - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%-%Configuration%.zip
