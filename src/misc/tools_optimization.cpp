@@ -52,7 +52,7 @@ namespace tools_optimization {
         xtol_abs_ = 1e-6;
         ftol_rel_ = 1e-6;
         ftol_abs_ = 1e-6;
-        maxeval_ = 1e3;
+        maxeval_ = 1000;
     }
 
     NLoptControls::NLoptControls(double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)

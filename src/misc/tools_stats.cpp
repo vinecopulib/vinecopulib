@@ -21,7 +21,7 @@ namespace tools_stats {
     //! @return Psuedo-observations of the copula, i.e. F_X(X) (column-wise)
     Eigen::MatrixXd to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method)
     {
-        for (unsigned int j = 0; j < x.cols(); ++j)
+        for (int j = 0; j < x.cols(); ++j)
             x.col(j) = to_pseudo_obs_1d((Eigen::VectorXd) x.col(j), ties_method);
 
         return x;
