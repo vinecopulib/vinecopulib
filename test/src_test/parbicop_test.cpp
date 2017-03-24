@@ -6,7 +6,7 @@
 
 #include "include/parbicop_test.hpp"
 
-void FakeParBicopTest::set_family(BicopFamily family, int rotation)
+void ParBicopTest::set_family(BicopFamily family, int rotation)
 {
     switch (family) {
         case BicopFamily::indep:
@@ -60,7 +60,7 @@ void FakeParBicopTest::set_family(BicopFamily family, int rotation)
         }
     }
 }
-void FakeParBicopTest::set_parameters(Eigen::VectorXd parameters)
+void ParBicopTest::set_parameters(Eigen::VectorXd parameters)
 {
     if (parameters.size() > 0) {
         par_ = parameters(0);
@@ -69,23 +69,19 @@ void FakeParBicopTest::set_parameters(Eigen::VectorXd parameters)
         par2_ = parameters(1);
     }
 }
-void FakeParBicopTest::set_n(int n)
-{
-    n_ = n;
-}
-int FakeParBicopTest::get_family()
+int ParBicopTest::get_family()
 {
     return family_;
 }
-int FakeParBicopTest::get_n()
+int ParBicopTest::get_n()
 {
     return n_;
 }
-double FakeParBicopTest::get_par()
+double ParBicopTest::get_par()
 {
     return par_;
 }
-double FakeParBicopTest::get_par2()
+double ParBicopTest::get_par2()
 {
     return par2_;
 }

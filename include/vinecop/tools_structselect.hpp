@@ -37,7 +37,7 @@ namespace tools_structselect {
         Eigen::VectorXd hfunc1;
         Eigen::VectorXd hfunc2;
         double weight;
-        vinecopulib::BicopPtr pair_copula;
+        vinecopulib::Bicop pair_copula;
     };
     typedef boost::adjacency_list <
         boost::vecS,
@@ -78,7 +78,7 @@ namespace tools_structselect {
         bool preselect_families
     );
     vinecopulib::Vinecop as_vinecop(std::vector<VineTree>& trees);
-    void flip(vinecopulib::BicopPtr& bicop);
+    //void flip(vinecopulib::Bicop& bicop);
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(
         boost::graph_traits<VineTree>::edge_descriptor e,

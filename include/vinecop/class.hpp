@@ -20,11 +20,11 @@ namespace vinecopulib
         Vinecop() {}
         Vinecop(int d);
         Vinecop(
-                const std::vector<std::vector<BicopPtr>>& pair_copulas,
+                const std::vector<std::vector<Bicop>>& pair_copulas,
                 const Eigen::MatrixXi& matrix
         );
 
-        static std::vector<std::vector<BicopPtr>> make_pair_copula_store(int d);
+        static std::vector<std::vector<Bicop>> make_pair_copula_store(int d);
         static Vinecop select(
                 const Eigen::MatrixXd& data,
                 std::vector<BicopFamily> family_set = bicop_families::all,
@@ -37,7 +37,7 @@ namespace vinecopulib
                 bool show_trace = false
         );
 
-        BicopPtr get_pair_copula(int tree, int edge) const;
+        Bicop get_pair_copula(int tree, int edge) const;
         BicopFamily get_family(int tree, int edge) const;
         std::vector<std::vector<BicopFamily>> get_all_families() const;
         int get_rotation(int tree, int edge) const;
@@ -53,7 +53,7 @@ namespace vinecopulib
     private:
         int d_;
         RVineMatrix vine_matrix_;
-        std::vector<std::vector<BicopPtr>> pair_copulas_;
+        std::vector<std::vector<Bicop>> pair_copulas_;
     };
 
     Eigen::VectorXi inverse_permutation(const Eigen::VectorXi& order);

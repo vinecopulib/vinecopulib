@@ -18,27 +18,26 @@ namespace vinecopulib
 
     private:
         // PDF
-        Eigen::VectorXd pdf_default(
+        Eigen::VectorXd pdf(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
 
         // hfunctions and their inverses
-        Eigen::VectorXd hfunc1_default(
+        Eigen::VectorXd hfunc1(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
-        Eigen::VectorXd hfunc2_default(
+        Eigen::VectorXd hfunc2(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
-        Eigen::VectorXd hinv1_default(
+        Eigen::VectorXd hinv1(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
-        Eigen::VectorXd hinv2_default(
+        Eigen::VectorXd hinv2(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
 
         Eigen::MatrixXd tau_to_parameters(const double &);
         double parameters_to_tau(const Eigen::VectorXd &);
-        Eigen::MatrixXd tau_to_parameters_default(const double&);
 
         void flip();
 

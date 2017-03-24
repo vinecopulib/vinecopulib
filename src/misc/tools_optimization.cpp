@@ -108,7 +108,7 @@ namespace tools_optimization {
         ++newdata->objective_calls;
         Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
         newdata->bicop->set_parameters(par);
-        double nll = (-1)*newdata->bicop->loglik(newdata->U);
+        double nll = (-1)*newdata->bicop->pdf(newdata->U).array().log().sum();
 
         return nll;
     }
@@ -126,7 +126,7 @@ namespace tools_optimization {
             par(i + 1) = x[i];
         }
         newdata->bicop->set_parameters(par);
-        double nll = newdata->bicop->loglik(newdata->U);
+        double nll = newdata->bicop->pdf(newdata->U).array().log().sum();
         nll *= -1;
         return nll;
     }

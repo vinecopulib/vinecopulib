@@ -7,39 +7,38 @@
 #pragma once
 
 #include "misc/interpolation_grid.hpp"
-#include "bicop/class.hpp"
+#include "bicop/abstract.hpp"
 
 namespace vinecopulib
 {
-    class KernelBicop : public Bicop
+    class KernelBicop : public AbstractBicop
     {
     public:
         KernelBicop();
 
-    private:
-        Eigen::VectorXd pdf_default(
+    protected:
+        Eigen::VectorXd pdf(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
-        Eigen::VectorXd hfunc1_default(
+        Eigen::VectorXd hfunc1(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
-        Eigen::VectorXd hfunc2_default(
+        Eigen::VectorXd hfunc2(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
-        Eigen::VectorXd hinv1_default(
+        Eigen::VectorXd hinv1(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
-        Eigen::VectorXd hinv2_default(
+        Eigen::VectorXd hinv2(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
 
         double parameters_to_tau(const Eigen::VectorXd &);
-        Eigen::MatrixXd tau_to_parameters_default(const double& tau);
+        Eigen::MatrixXd tau_to_parameters(const double& tau);
         double calculate_npars();
 
         void flip();
 
-    protected:
         InterpolationGrid interp_grid_;
         double npars_;
     };
