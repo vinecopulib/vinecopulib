@@ -22,31 +22,35 @@ namespace vinecopulib
 
     double Bb8Bicop::generator(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
-        return -std::log((1-std::pow(1-delta*u,theta))/(1-std::pow(1-delta,theta)));
+        double theta = double(parameters_(0));
+        double delta = double(parameters_(1));
+        double res = (1-std::pow(1-delta*u,theta));
+        return -std::log(res/(1-std::pow(1-delta,theta)));
     }
 
     double Bb8Bicop::generator_inv(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
-        return (1-std::pow(1+std::exp(-u)*(std::pow(1-delta,theta)-1),1/theta))/delta;
+        double theta = double(parameters_(0));
+        double delta = double(parameters_(1));
+        double res = std::exp(-u)*(std::pow(1-delta,theta)-1);
+        return (1-std::pow(1+res,1/theta))/delta;
     }
 
     double Bb8Bicop::generator_derivative(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
-        return -delta*theta*std::pow(1-delta*u,theta-1)/(1-std::pow(1-delta*u,theta));
+        double theta = double(parameters_(0));
+        double delta = double(parameters_(1));
+        double res = delta*theta*std::pow(1-delta*u,theta-1);
+        return -res/(1-std::pow(1-delta*u,theta));
     }
 
     double Bb8Bicop::generator_derivative2(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        double delta = double(this->parameters_(1));
+        double theta = double(parameters_(0));
+        double delta = double(parameters_(1));
         double tmp = std::pow(1-delta*u,theta);
-        return std::pow(delta,2)*theta*std::pow(1-delta*u,theta-2)*(theta-1+tmp)/std::pow(tmp-1,2);
+        double res = std::pow(delta,2)*theta*std::pow(1-delta*u,theta-2);
+        return res*(theta-1+tmp)/std::pow(tmp-1,2);
     }
 
     double Bb8Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
@@ -55,7 +59,8 @@ namespace vinecopulib
         double delta = parameters(1);
         auto f = [theta, delta](const double t) {
             double tmp = std::pow(1-t*delta,theta);
-            return std::log((tmp-1)/(std::pow(1-delta,theta)-1))*(1-t*delta-std::pow(1-t*delta,1-theta));
+            double res = std::log((tmp-1)/(std::pow(1-delta,theta)-1));
+            return res*(1-t*delta-std::pow(1-t*delta,1-theta));
         };
         return 1 - 4/(delta*theta)*tools_integration::integrate_zero_to_one(f);
     }

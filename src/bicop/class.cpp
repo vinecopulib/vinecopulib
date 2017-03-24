@@ -9,8 +9,6 @@
 #include "misc/tools_stats.hpp"
 #include "misc/tools_stl.hpp"
 
-#include <iostream>
-
 namespace vinecopulib
 {
     Bicop::Bicop()
@@ -359,7 +357,7 @@ namespace vinecopulib
 
         // Estimate all models and select the best one using the selection_criterion
         BicopPtr fitted_bicop;
-        int fitted_rotation;
+        int fitted_rotation = 0;
         double fitted_criterion = 1e6;
         for (unsigned int j = 0; j < families.size(); j++) {
             // Estimate the model

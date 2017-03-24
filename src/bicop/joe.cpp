@@ -6,6 +6,8 @@
 
 #include "bicop/joe.hpp"
 #include <boost/math/special_functions/digamma.hpp>
+#include <boost/math/special_functions/expm1.hpp>
+#include <boost/math/special_functions/log1p.hpp>
 
 namespace vinecopulib
 {
@@ -22,24 +24,25 @@ namespace vinecopulib
 
     double JoeBicop::generator(const double& u)
     {
-        return (-1)*std::log(1-std::pow(1-u, this->parameters_(0)));
+        return (-1)*boost::math::log1p(-std::pow(1-u, parameters_(0)));
     }
 
     double JoeBicop::generator_inv(const double& u)
     {
-        return 1-std::pow(1-std::exp(-u),1/this->parameters_(0));
+        return 1-std::pow(-boost::math::expm1(-u),1/parameters_(0));
     }
 
     double JoeBicop::generator_derivative(const double& u)
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(parameters_(0));
         return (-theta)*std::pow(1-u, theta-1)/(1-std::pow(1-u, theta));
     }
 
     double JoeBicop::generator_derivative2(const double& u)
     {
-        double theta = double(this->parameters_(0));
-        return theta*(theta-1+std::pow(1-u, theta))*std::pow(1-u, theta-2)/std::pow(-1+std::pow(1-u, theta),2);
+        double theta = double(parameters_(0));
+        double res = theta*(theta-1+std::pow(1-u, theta));
+        return res*std::pow(1-u, theta-2)/std::pow(-1+std::pow(1-u, theta),2);
     }
 
     // inverse h-function
@@ -47,7 +50,7 @@ namespace vinecopulib
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        double theta = double(this->parameters_(0));
+        double theta = double(parameters_(0));
         double u1, u2;
         Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
         for (int j = 0; j < u.rows(); ++j) {
