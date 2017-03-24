@@ -1,6 +1,3 @@
-#include_directories(${PROJECT_SOURCE_DIR})
-#include_directories(${PROJECT_BINARY_DIR})
-
 file(GLOB_RECURSE vinecopulib_sources src/*.cpp src/*.cc src/*c)
 file(GLOB_RECURSE vinecopulib_bicop_headers include/bicop/*.hpp)
 file(GLOB_RECURSE vinecopulib_vinecop_headers include/vinecop/*.hpp)
