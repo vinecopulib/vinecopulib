@@ -40,9 +40,10 @@ minimal documentation.
 - [Getting started](#getting-started)
 	- [Requirements](#requirements)
 	- [How to build the library](#how-to-build-the-library)
+	- [How to include the library in other projects](#how-to-inlude-the-library-in-other-projects)
 - [Bivariate copula models](#bivariate-copula-models)
-	- [Set up a custom bivariate copula model](#set-up-a-custom-bivariate-copula-model)
 	- [Implemented bivariate copula families](#implemented-bivariate-copula-families)
+	- [Set up a custom bivariate copula model](#set-up-a-custom-bivariate-copula-model)
 	- [Fit and select a bivariate copula](#fit-and-select-a-bivariate-copula)
 	- [Work with a bivariate copula model](#work-with-a-bivariate-copula-model)
 - [Vine copula models](#vine-copula-models)
@@ -121,6 +122,8 @@ is to use CMake. For instance, an example projet where the source code to be lin
     * another `CMakeLists.txt` file for the project libraries and executables.
  
 The top-level `CMakeLists.txt` could be:
+
+**Example**
 ```cmake
 cmake_minimum_required(VERSION 3.2)
 
@@ -150,6 +153,8 @@ add_subdirectory(src)
 Assuming a single `main.cpp` source file (with `#include <vinecopulib.hpp>` at 
 the top), the `CMakeLists.txt` file in `/src/` 
 could then be:
+
+**Example**
 ```cmake
 # Include header files
 include_directories(${external_includes})
@@ -208,6 +213,7 @@ association (`indep`,`gaussian`, `student`, `frank`, `tll0`)
 (`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
 * `flip_by_rotation` families which can be flipped by rotation (currently 
 equivalent to `archimedean`)
+
 
 **Example**
 ``` cpp
