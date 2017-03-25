@@ -8,9 +8,31 @@
 #include "misc/tools_stl.hpp"
 #include "misc/tools_c.h"
 
+//! @file misc/tools_stats.cpp
+
+//! Utilities for statistical analysis
 namespace tools_stats {
     
-    //! Empirical probability integral transform
+    //! simulates from the multivariate uniform distribution
+    //!
+    //! @param n number of observations.
+    //! @param d dimension.
+    //!
+    //! @return An \f$ n \times d \f$ matrix of independent 
+    //! \f$ \mathrm{U}[0, 1] \f$ random variables.
+    inline Eigen::MatrixXd simulate_uniform(int n, int d)
+    {
+        if ((n < 1) | (d < 1)) {
+            throw std::runtime_error("both n and d must be at least 1.");        
+        }
+        Eigen::MatrixXd U(n, d);
+        std::random_device rd;
+        std::default_random_engine generator(rd());
+        std::uniform_real_distribution<double> distribution(0.0, 1.0);
+        return U.unaryExpr([&](double) { return distribution(generator); });
+    }
+    
+    //! applies the empirical probability integral transform to a data matrix.
     //!
     //! Gives pseudo-observations from the copula by applying the empirical
     //! distribution function (scaled by n + 1) to each margin/column.
@@ -26,7 +48,16 @@ namespace tools_stats {
 
         return x;
     }
-
+    
+    //! applies the empirical probability integral transform to a data vector.
+    //!
+    //! Gives pseudo-observations from the copula by applying the empirical
+    //! distribution function (scaled by n + 1) to each margin/column.
+    //!
+    //! @param x a vector of real numbers.
+    //! @param ties_method indicates how to treat ties; same as in R, see
+    //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
+    //! @return Psuedo-observations of the copula, i.e. F_X(X) (column-wise)
     Eigen::VectorXd to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
     {
         int n = x.size();
@@ -73,7 +104,9 @@ namespace tools_stats {
 
         return x / (x.size() + 1.0);
     }
-
+    
+    //! calculates the pairwise Kendall's \f$ \tau \f$.
+    //! @param u an \f$ n \times 2 \f$ matrix of observations.
     double pairwise_ktau(Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         double tau;
@@ -83,6 +116,8 @@ namespace tools_stats {
         return tau;
     }
 
+    //! calculates the pairwise correlation.
+    //! @param u an \f$ n \times 2 \f$ matrix of observations.
     double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z)
     {
         double rho;
@@ -93,6 +128,8 @@ namespace tools_stats {
         return rho;
     }
 
+    //! calculates the pair-wise Hoeffding's D.
+    //! @param u an \f$ n \times 2 \f$ matrix of observations.
     double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
     {
         int n = x.rows();

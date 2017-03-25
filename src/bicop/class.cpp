@@ -11,6 +11,7 @@
 
 #include <iostream>
 
+//! Tools for bivariate and vine copula modeling
 namespace vinecopulib
 {
     

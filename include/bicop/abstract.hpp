@@ -28,10 +28,11 @@ namespace tools_optimization
 
 namespace vinecopulib
 {
-    //! A class for bivariate copulas
+    //! @brief An abstract class for bivariate copula families
     //!
-    //! The Bicop class is abstract, you cannot create an instance of this class,
-    //! but only of the derived classes.
+    //! This class is used in the implementation underlying the Bicop class. 
+    //! Users should not use AbstractBicop or derived classes directly, but 
+    //! always work with the Bicop interface.
     class AbstractBicop
     {
     friend class Bicop;
