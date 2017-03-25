@@ -15,10 +15,10 @@ namespace tools_optimization {
     //! @brief A helper struct for (profile) maximum likelihood estimation
     typedef struct
     {
-        const Eigen::MatrixXd& U; //! The data
-        vinecopulib::ParBicop* bicop; //! A pointer to the bivariate copula to optimize
-        double par0;  //! The main dependence parameter
-        unsigned int objective_calls; //! The number of evaluations of the objective
+        const Eigen::MatrixXd& U; //!< the data.
+        vinecopulib::ParBicop* bicop; //!< a pointer to the bivariate copula to optimize.
+        double par0;  //!< main dependence parameter.
+        unsigned int objective_calls; //!< number of evaluations of the objective.
     } ParBicopOptData;
 
     //! @brief A class for the controls to NLopt

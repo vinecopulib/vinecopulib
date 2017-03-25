@@ -86,10 +86,7 @@ namespace vinecopulib
         RVineMatrix vine_matrix_;
         std::vector<std::vector<Bicop>> pair_copulas_;
         void update_vinecop(std::vector<tools_structselect::VineTree>& trees);
+        Eigen::VectorXi inverse_permutation(const Eigen::VectorXi& order);
     };
 
-    Eigen::VectorXi inverse_permutation(const Eigen::VectorXi& order);
-    // reverse columns and rows of an Eigen::Matrix type object
-    template<typename Mat>
-    Mat to_upper_tri(Mat A) {return A.rowwise().reverse().colwise().reverse();}
 }

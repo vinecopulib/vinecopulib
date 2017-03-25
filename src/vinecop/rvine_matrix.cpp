@@ -10,7 +10,7 @@
 namespace vinecopulib
 {
     //! instantiates an RVineMatrix object.
-    //! @param a valid R-vine matrix (this is not checked so far!).
+    //! @param matrix a valid R-vine matrix (this is not checked so far!).
     RVineMatrix::RVineMatrix(const Eigen::MatrixXi& matrix)
     {
         d_ = matrix.rows();
@@ -60,8 +60,6 @@ namespace vinecopulib
     //! Natural order means that the counter-diagonal has entries (d, ..., 1). We 
     //! convert to natural order by relabeling the variables. Most algorithms for 
     //! estimation and evaluation assume that the R-vine matrix is in natural order.
-    //!
-    //! @param matrix initial R-vine matrix.
     Eigen::MatrixXi RVineMatrix::in_natural_order() const
     {
         // create vector of new variable labels: d, ..., 1
@@ -78,8 +76,6 @@ namespace vinecopulib
     //! the (elementwise) maximum of a row and the row below (starting from the
     //! bottom). It is used in estimation and evaluation algorithms to find the right
     //! pseudo observations for an edge.
-    //!
-    //! @param no_matrix initial R-vine matrix, assumed to be in natural order.
     Eigen::MatrixXi RVineMatrix::get_max_matrix() const
     {
         Eigen::MatrixXi max_matrix = this->in_natural_order();

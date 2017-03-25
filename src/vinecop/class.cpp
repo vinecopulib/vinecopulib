@@ -207,7 +207,6 @@ namespace vinecopulib
     //! automatically selects all pair-copula families and fits all parameters.
     //!
     //! @param data nxd matrix of copula data.
-    //! @param matrix the structure matrix.
     //! @param family_set the set of copula families to consider (if empty, then
     //!     all families are included; all families are included by default).
     //! @param method see Bicop::fit().
@@ -216,6 +215,7 @@ namespace vinecopulib
     //! @param threshold_criterion the criterion for thresholding.
     //! @param selection_criterion see Bicop::select().
     //! @param preselect_families see Bicop::select().
+    //! @param show_trace (not implemented yet).
     //! @return The fitted vine copula model.
     void Vinecop::select_families(const Eigen::MatrixXd& data,
             std::vector<BicopFamily> family_set, std::string method, 
@@ -669,7 +669,7 @@ namespace vinecopulib
     }
     
     // get indexes for reverting back to old order in simulation routine
-    Eigen::VectorXi inverse_permutation(const Eigen::VectorXi& order) {
+    Eigen::VectorXi Vinecop::inverse_permutation(const Eigen::VectorXi& order) {
         // start with (0, 1, .., k)
         auto indexes = tools_stl::seq_int(0, order.size());
     

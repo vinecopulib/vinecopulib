@@ -105,31 +105,32 @@ namespace tools_stats {
         return x / (x.size() + 1.0);
     }
     
+    //! @name Pairwise dependence measures
+    //! @param x an \f$ n \times 2 \f$ matrix of observations.
+    //! @{
+      
     //! calculates the pairwise Kendall's \f$ \tau \f$.
-    //! @param u an \f$ n \times 2 \f$ matrix of observations.
-    double pairwise_ktau(Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+    double pairwise_ktau(Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
     {
         double tau;
-        int n = u.rows();
+        int n = x.rows();
         int two = 2;
         ktau_matrix(u.data(), &two, &n, &tau);
         return tau;
     }
 
     //! calculates the pairwise correlation.
-    //! @param u an \f$ n \times 2 \f$ matrix of observations.
-    double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z)
+    double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
     {
         double rho;
-        auto x = z.rowwise() - z.colwise().mean();
-        Eigen::MatrixXd sigma = x.adjoint() * x;
+        auto z = x.rowwise() - x.colwise().mean();
+        Eigen::MatrixXd sigma = z.adjoint() * z;
         rho = sigma(1,0) / sqrt(sigma(0,0) * sigma(1,1));
 
         return rho;
     }
 
     //! calculates the pair-wise Hoeffding's D.
-    //! @param u an \f$ n \times 2 \f$ matrix of observations.
     double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
     {
         int n = x.rows();
@@ -165,4 +166,6 @@ namespace tools_stats {
 
         return D;
     }
+    
+    //! @}
 }

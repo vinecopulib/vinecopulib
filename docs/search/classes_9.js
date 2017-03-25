@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['parbicop',['ParBicop',['../classvinecopulib_1_1_par_bicop.html',1,'vinecopulib']]]
+  ['nloptcontrols',['NLoptControls',['../classtools__optimization_1_1_n_lopt_controls.html',1,'tools_optimization']]]
 ];

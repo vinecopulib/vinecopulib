@@ -2,6 +2,11 @@
 \label{classvinecopulib_1_1_abstract_bicop}\index{vinecopulib\+::\+Abstract\+Bicop@{vinecopulib\+::\+Abstract\+Bicop}}
 
 
+An abstract class for bivariate copula families.  
+
+
+
+
 {\ttfamily \#include $<$abstract.\+hpp$>$}
 
 
@@ -15,9 +20,6 @@ Inheritance diagram for vinecopulib\+:\+:Abstract\+Bicop\+:\nopagebreak
 \end{figure}
 \subsection*{Protected Member Functions}
 \begin{DoxyCompactItemize}
-\item 
-std\+::string {\bfseries get\+\_\+association\+\_\+direction} () const \hypertarget{classvinecopulib_1_1_abstract_bicop_a5eb314dcf55efcfc022b909f521d520b}{}\label{classvinecopulib_1_1_abstract_bicop_a5eb314dcf55efcfc022b909f521d520b}
-
 \item 
 void \hyperlink{classvinecopulib_1_1_abstract_bicop_a4e62970bb8e533f97f66c280c1a908cf}{flip} ()\hypertarget{classvinecopulib_1_1_abstract_bicop_a4e62970bb8e533f97f66c280c1a908cf}{}\label{classvinecopulib_1_1_abstract_bicop_a4e62970bb8e533f97f66c280c1a908cf}
 
@@ -52,7 +54,7 @@ virtual Eigen\+::\+Matrix\+Xd {\bfseries tau\+\_\+to\+\_\+parameters} (const dou
 {\bf }\par
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} \hyperlink{classvinecopulib_1_1_abstract_bicop_a61878ff0664fa099f6f6ca4b7ad7833a}{get\+\_\+family} () const 
+\hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} \hyperlink{classvinecopulib_1_1_abstract_bicop_a61878ff0664fa099f6f6ca4b7ad7833a}{get\+\_\+family} () const 
 \item 
 std\+::string {\bfseries get\+\_\+family\+\_\+name} () const \hypertarget{classvinecopulib_1_1_abstract_bicop_a294c3d6614fb1d42b4846599292f3197}{}\label{classvinecopulib_1_1_abstract_bicop_a294c3d6614fb1d42b4846599292f3197}
 
@@ -83,13 +85,13 @@ Eigen\+::\+Vector\+Xd {\bfseries hinv2\+\_\+num} (const Eigen\+::\+Matrix$<$ dou
 {\bf }\par
 \begin{DoxyCompactItemize}
 \item 
-static std\+::shared\+\_\+ptr$<$ \hyperlink{classvinecopulib_1_1_abstract_bicop}{Abstract\+Bicop} $>$ \hyperlink{classvinecopulib_1_1_abstract_bicop_afefe048baabaa8cd14e849e66a45c428}{create} (\hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} family=Bicop\+Family\+::indep, const Eigen\+::\+Matrix\+Xd \&parameters=Eigen\+::\+Matrix\+Xd())
+static std\+::shared\+\_\+ptr$<$ \hyperlink{classvinecopulib_1_1_abstract_bicop}{Abstract\+Bicop} $>$ \hyperlink{classvinecopulib_1_1_abstract_bicop_afefe048baabaa8cd14e849e66a45c428}{create} (\hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} family=\hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65}{Bicop\+Family\+::indep}, const Eigen\+::\+Matrix\+Xd \&parameters=Eigen\+::\+Matrix\+Xd())
 \end{DoxyCompactItemize}
 
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} {\bfseries family\+\_\+}\hypertarget{classvinecopulib_1_1_abstract_bicop_a0b731d28eefd359b1e15951d5e58f093}{}\label{classvinecopulib_1_1_abstract_bicop_a0b731d28eefd359b1e15951d5e58f093}
+\hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} {\bfseries family\+\_\+}\hypertarget{classvinecopulib_1_1_abstract_bicop_a0b731d28eefd359b1e15951d5e58f093}{}\label{classvinecopulib_1_1_abstract_bicop_a0b731d28eefd359b1e15951d5e58f093}
 
 \item 
 Eigen\+::\+Matrix\+Xd {\bfseries parameters\+\_\+}\hypertarget{classvinecopulib_1_1_abstract_bicop_a38f60d7c268c71bf93cfbb4203724478}{}\label{classvinecopulib_1_1_abstract_bicop_a38f60d7c268c71bf93cfbb4203724478}
@@ -106,20 +108,26 @@ Eigen\+::\+Matrix\+Xd {\bfseries parameters\+\_\+upper\+\_\+bounds\+\_\+}\hypert
 \item 
 class {\bfseries Bicop}\hypertarget{classvinecopulib_1_1_abstract_bicop_af3db9e73153fd7fa7bb69657e7cb949d}{}\label{classvinecopulib_1_1_abstract_bicop_af3db9e73153fd7fa7bb69657e7cb949d}
 
+\item 
+double {\bfseries tools\+\_\+optimization\+::mle\+\_\+objective} (const std\+::vector$<$ double $>$ \&x, std\+::vector$<$ double $>$ \&grad, void $\ast$data)\hypertarget{classvinecopulib_1_1_abstract_bicop_ac0e8ae7fffff069ed9476a97d8bfac19}{}\label{classvinecopulib_1_1_abstract_bicop_ac0e8ae7fffff069ed9476a97d8bfac19}
+
+\item 
+double {\bfseries tools\+\_\+optimization\+::pmle\+\_\+objective} (const std\+::vector$<$ double $>$ \&x, std\+::vector$<$ double $>$ \&grad, void $\ast$data)\hypertarget{classvinecopulib_1_1_abstract_bicop_ae671e9f66df15a190329d53c802f70ef}{}\label{classvinecopulib_1_1_abstract_bicop_ae671e9f66df15a190329d53c802f70ef}
+
 \end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
-A class for bivariate copulas
+An abstract class for bivariate copula families. 
 
-The \hyperlink{classvinecopulib_1_1_bicop}{Bicop} class is abstract, you cannot create an instance of this class, but only of the derived classes. 
+This class is used in the implementation underlying the \hyperlink{classvinecopulib_1_1_bicop}{Bicop} class. Users should not use \hyperlink{classvinecopulib_1_1_abstract_bicop}{Abstract\+Bicop} or derived classes directly, but always work with the \hyperlink{classvinecopulib_1_1_bicop}{Bicop} interface. 
 
 \subsection{Member Function Documentation}
 \index{vinecopulib\+::\+Abstract\+Bicop@{vinecopulib\+::\+Abstract\+Bicop}!create@{create}}
 \index{create@{create}!vinecopulib\+::\+Abstract\+Bicop@{vinecopulib\+::\+Abstract\+Bicop}}
-\subsubsection[{\texorpdfstring{create(\+Bicop\+Family family=\+Bicop\+Family\+::indep, const Eigen\+::\+Matrix\+Xd \&parameters=\+Eigen\+::\+Matrix\+Xd())}{create(BicopFamily family=BicopFamily::indep, const Eigen::MatrixXd &parameters=Eigen::MatrixXd())}}]{\setlength{\rightskip}{0pt plus 5cm}Bicop\+Ptr vinecopulib\+::\+Abstract\+Bicop\+::create (
+\subsubsection[{\texorpdfstring{create(\+Bicop\+Family family=\+Bicop\+Family\+::indep, const Eigen\+::\+Matrix\+Xd \&parameters=\+Eigen\+::\+Matrix\+Xd())}{create(BicopFamily family=BicopFamily::indep, const Eigen::MatrixXd &parameters=Eigen::MatrixXd())}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Bicop\+Ptr} vinecopulib\+::\+Abstract\+Bicop\+::create (
 \begin{DoxyParamCaption}
-\item[{{\bf Bicop\+Family}}]{family = {\ttfamily BicopFamily\+:\+:indep}, }
+\item[{{\bf Bicop\+Family}}]{family = {\ttfamily {\bf Bicop\+Family\+::indep}}, }
 \item[{const Eigen\+::\+Matrix\+Xd \&}]{parameters = {\ttfamily Eigen\+:\+:MatrixXd()}}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\hypertarget{classvinecopulib_1_1_abstract_bicop_afefe048baabaa8cd14e849e66a45c428}{}\label{classvinecopulib_1_1_abstract_bicop_afefe048baabaa8cd14e849e66a45c428}
@@ -129,13 +137,11 @@ Create a bivariate copula using the default contructor
 \begin{DoxyParams}{Parameters}
 {\em family} & the copula family. \\
 \hline
-{\em rotation} & the rotation type. \\
-\hline
 {\em parameters} & the copula parameters (optional, must be compatible with family). \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-A pointer to an object that inherits from {\ttfamily \hyperlink{classvinecopulib_1_1_bicop}{Bicop}}. 
+A pointer to an object that inherits from \hyperlink{classvinecopulib_1_1_abstract_bicop}{Abstract\+Bicop}. 
 \end{DoxyReturn}
 \index{vinecopulib\+::\+Abstract\+Bicop@{vinecopulib\+::\+Abstract\+Bicop}!get\+\_\+family@{get\+\_\+family}}
 \index{get\+\_\+family@{get\+\_\+family}!vinecopulib\+::\+Abstract\+Bicop@{vinecopulib\+::\+Abstract\+Bicop}}

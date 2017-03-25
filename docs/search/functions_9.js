@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['parameters_5fto_5ftau',['parameters_to_tau',['../classvinecopulib_1_1_bicop.html#aa25436353dee76e4368fb941a7efa257',1,'vinecopulib::Bicop']]],
-  ['pdf',['pdf',['../classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646',1,'vinecopulib::Bicop::pdf()'],['../classvinecopulib_1_1_vinecop.html#adf3760b8dd2b6d3a9cae5426188d4489',1,'vinecopulib::Vinecop::pdf()']]]
+  ['make_5fpair_5fcopula_5fstore',['make_pair_copula_store',['../classvinecopulib_1_1_vinecop.html#a17132eaa4b61b54d6d1c83aaa08744be',1,'vinecopulib::Vinecop']]],
+  ['mle_5fobjective',['mle_objective',['../namespacetools__optimization.html#af0ad8465d57bf8b2f414a6fb84cb7daf',1,'tools_optimization']]]
 ];

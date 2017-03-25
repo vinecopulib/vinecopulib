@@ -15,7 +15,7 @@ namespace vinecopulib
         family_ = BicopFamily::tll0;
     }
 
-    Eigen::VectorXd gaussian_kernel_2d(
+    Eigen::VectorXd TrafokernelBicop::gaussian_kernel_2d(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& x
     )
     {

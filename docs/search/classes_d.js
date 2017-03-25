@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['vinecop',['Vinecop',['../classvinecopulib_1_1_vinecop.html',1,'vinecopulib']]]
+  ['studentbicop',['StudentBicop',['../classvinecopulib_1_1_student_bicop.html',1,'vinecopulib']]]
 ];

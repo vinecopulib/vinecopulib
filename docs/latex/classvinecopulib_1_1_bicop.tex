@@ -15,9 +15,9 @@ A class for bivariate copula models.
 \hyperlink{classvinecopulib_1_1_bicop_acfa522fb0bea4aca8fade87c18bcf921}{Bicop} ()\hypertarget{classvinecopulib_1_1_bicop_acfa522fb0bea4aca8fade87c18bcf921}{}\label{classvinecopulib_1_1_bicop_acfa522fb0bea4aca8fade87c18bcf921}
 
 \begin{DoxyCompactList}\small\item\em creates the independence copula. \end{DoxyCompactList}\item 
-\hyperlink{classvinecopulib_1_1_bicop_ab27f789e001e30f2fed7f9ecefdeffb0}{Bicop} (\hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} family, int rotation=0, const Eigen\+::\+Matrix\+Xd \&parameters=Eigen\+::\+Matrix\+Xd())
+\hyperlink{classvinecopulib_1_1_bicop_ab27f789e001e30f2fed7f9ecefdeffb0}{Bicop} (\hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} family, int rotation=0, const Eigen\+::\+Matrix\+Xd \&parameters=Eigen\+::\+Matrix\+Xd())
 \item 
-\hyperlink{classvinecopulib_1_1_bicop_a87d5c10cb7b6a9c07dc3b2a38da91ee5}{Bicop} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ data, std\+::vector$<$ \hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=\char`\"{}mle\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true)
+\hyperlink{classvinecopulib_1_1_bicop_a87d5c10cb7b6a9c07dc3b2a38da91ee5}{Bicop} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ data, std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=\hyperlink{namespacevinecopulib_1_1bicop__families_a5214a513f41ec23b74782aab96ea6774}{bicop\+\_\+families\+::all}, std\+::string method=\char`\"{}mle\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true)
 \item 
 Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a83dc7214e4bb1bfe59285ca05407d646}{pdf} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
 \item 
@@ -33,7 +33,7 @@ Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \hyperlink{classvinecopul
 \item 
 void \hyperlink{classvinecopulib_1_1_bicop_a266fa8d13e8ed1e96937e4208a99955d}{fit} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&data, std\+::string method)
 \item 
-void \hyperlink{classvinecopulib_1_1_bicop_af04ef20ec08d02222059ba2b72084ad0}{select} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ data, std\+::vector$<$ \hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=\char`\"{}mle\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true)
+void \hyperlink{classvinecopulib_1_1_bicop_af04ef20ec08d02222059ba2b72084ad0}{select} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ data, std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=\hyperlink{namespacevinecopulib_1_1bicop__families_a5214a513f41ec23b74782aab96ea6774}{bicop\+\_\+families\+::all}, std\+::string method=\char`\"{}mle\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true)
 \item 
 double \hyperlink{classvinecopulib_1_1_bicop_ae8bcc0c3265cc86565333a0cfd3d619d}{loglik} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
 \item 
@@ -50,7 +50,7 @@ Eigen\+::\+Matrix\+Xd \hyperlink{classvinecopulib_1_1_bicop_a5809ddc9884f6fb66fe
 \begin{Indent}{\bf Getters and setters}\par
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{family_8hpp_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} {\bfseries get\+\_\+family} () const \hypertarget{classvinecopulib_1_1_bicop_a68ab3556ee3bb3d02814fd978573bf3b}{}\label{classvinecopulib_1_1_bicop_a68ab3556ee3bb3d02814fd978573bf3b}
+\hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} {\bfseries get\+\_\+family} () const \hypertarget{classvinecopulib_1_1_bicop_a68ab3556ee3bb3d02814fd978573bf3b}{}\label{classvinecopulib_1_1_bicop_a68ab3556ee3bb3d02814fd978573bf3b}
 
 \item 
 std\+::string {\bfseries get\+\_\+family\+\_\+name} () const \hypertarget{classvinecopulib_1_1_bicop_a4d4fbc0fdca17564c23f4814d5d2fbe7}{}\label{classvinecopulib_1_1_bicop_a4d4fbc0fdca17564c23f4814d5d2fbe7}
@@ -108,7 +108,7 @@ creates a specific bivariate copula model.
 \subsubsection[{\texorpdfstring{Bicop(\+Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ data, std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=""mle"", std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true)}{Bicop(Eigen::Matrix< double, Eigen::Dynamic, 2 > data, std::vector< BicopFamily > family_set=bicop_families::all, std::string method="mle", std::string selection_criterion="bic", bool preselect_families=true)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Bicop\+::\+Bicop (
 \begin{DoxyParamCaption}
 \item[{Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$}]{data, }
-\item[{std\+::vector$<$ {\bf Bicop\+Family} $>$}]{family\+\_\+set = {\ttfamily bicop\+\_\+families\+:\+:all}, }
+\item[{std\+::vector$<$ {\bf Bicop\+Family} $>$}]{family\+\_\+set = {\ttfamily {\bf bicop\+\_\+families\+::all}}, }
 \item[{std\+::string}]{method = {\ttfamily \char`\"{}mle\char`\"{}}, }
 \item[{std\+::string}]{selection\+\_\+criterion = {\ttfamily \char`\"{}bic\char`\"{}}, }
 \item[{bool}]{preselect\+\_\+families = {\ttfamily true}}
@@ -261,7 +261,7 @@ The log-\/likelihood is defined as \[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{
 \item[{const Eigen\+::\+Vector\+Xd \&}]{parameters}
 \end{DoxyParamCaption}
 )}\hypertarget{classvinecopulib_1_1_bicop_aa25436353dee76e4368fb941a7efa257}{}\label{classvinecopulib_1_1_bicop_aa25436353dee76e4368fb941a7efa257}
-converts the parameters to the Kendall\textquotesingle{}s $ tau $ for the current family (works for all families but {\ttfamily Bicop\+Family\+::tll0}).
+converts the parameters to the Kendall\textquotesingle{}s $ tau $ for the current family (works for all families but {\ttfamily \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3acd36652e61e82e7935de462b329cc8e6}{Bicop\+Family\+::tll0}}).
 
 
 \begin{DoxyParams}{Parameters}
@@ -290,7 +290,7 @@ The copula density evaluated at {\ttfamily u}.
 \subsubsection[{\texorpdfstring{select(\+Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ data, std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=""mle"", std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true)}{select(Eigen::Matrix< double, Eigen::Dynamic, 2 > data, std::vector< BicopFamily > family_set=bicop_families::all, std::string method="mle", std::string selection_criterion="bic", bool preselect_families=true)}}]{\setlength{\rightskip}{0pt plus 5cm}void vinecopulib\+::\+Bicop\+::select (
 \begin{DoxyParamCaption}
 \item[{Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$}]{data, }
-\item[{std\+::vector$<$ {\bf Bicop\+Family} $>$}]{family\+\_\+set = {\ttfamily bicop\+\_\+families\+:\+:all}, }
+\item[{std\+::vector$<$ {\bf Bicop\+Family} $>$}]{family\+\_\+set = {\ttfamily {\bf bicop\+\_\+families\+::all}}, }
 \item[{std\+::string}]{method = {\ttfamily \char`\"{}mle\char`\"{}}, }
 \item[{std\+::string}]{selection\+\_\+criterion = {\ttfamily \char`\"{}bic\char`\"{}}, }
 \item[{bool}]{preselect\+\_\+families = {\ttfamily true}}

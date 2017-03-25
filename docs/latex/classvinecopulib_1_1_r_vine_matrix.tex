@@ -73,7 +73,7 @@ A regular vine (R-\/vine) matrix encodes the structure of a vine. An examplary m
 )}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a5872c479d4a7de9c2ddc64cdb0909ef9}{}\label{classvinecopulib_1_1_r_vine_matrix_a5872c479d4a7de9c2ddc64cdb0909ef9}
 instantiates an \hyperlink{classvinecopulib_1_1_r_vine_matrix}{R\+Vine\+Matrix} object. 
 \begin{DoxyParams}{Parameters}
-{\em a} & valid R-\/vine matrix (this is not checked so far!). \\
+{\em matrix} & a valid R-\/vine matrix (this is not checked so far!). \\
 \hline
 \end{DoxyParams}
 
@@ -104,14 +104,7 @@ A D-\/vine is a vine where each tree is a path.
 ) const}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a674074d4e248868a01155a25f775ae3a}{}\label{classvinecopulib_1_1_r_vine_matrix_a674074d4e248868a01155a25f775ae3a}
 extracts the maximum matrix.
 
-The maximum matrix is derived from an R-\/vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge.
-
-
-\begin{DoxyParams}{Parameters}
-{\em no\+\_\+matrix} & initial R-\/vine matrix, assumed to be in natural order. \\
-\hline
-\end{DoxyParams}
-\index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}}
+The maximum matrix is derived from an R-\/vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge. \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}}
 \index{get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
 \subsubsection[{\texorpdfstring{get\+\_\+needed\+\_\+hfunc1() const }{get_needed_hfunc1() const }}]{\setlength{\rightskip}{0pt plus 5cm}Matrix\+Xb vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+needed\+\_\+hfunc1 (
 \begin{DoxyParamCaption}
@@ -134,14 +127,7 @@ extracts a matrix indicating which of the second h-\/functions are needed (it is
 ) const}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a88673df07f4aae0e0e0a65faff2418b6}{}\label{classvinecopulib_1_1_r_vine_matrix_a88673df07f4aae0e0e0a65faff2418b6}
 extracts the R-\/vine matrix in natural order.
 
-Natural order means that the counter-\/diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-\/vine matrix is in natural order.
-
-
-\begin{DoxyParams}{Parameters}
-{\em matrix} & initial R-\/vine matrix. \\
-\hline
-\end{DoxyParams}
-
+Natural order means that the counter-\/diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-\/vine matrix is in natural order. 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 

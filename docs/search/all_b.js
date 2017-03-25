@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['mainpage_2eh',['mainpage.h',['../mainpage_8h.html',1,'']]],
-  ['make_5fpair_5fcopula_5fstore',['make_pair_copula_store',['../classvinecopulib_1_1_vinecop.html#a17132eaa4b61b54d6d1c83aaa08744be',1,'vinecopulib::Vinecop']]]
+  ['loglik',['loglik',['../classvinecopulib_1_1_bicop.html#ae8bcc0c3265cc86565333a0cfd3d619d',1,'vinecopulib::Bicop']]],
+  ['lt',['lt',['../namespacevinecopulib_1_1bicop__families.html#a5a5f349f07638768ff8b1bb2ae90d102',1,'vinecopulib::bicop_families']]]
 ];

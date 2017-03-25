@@ -840,7 +840,8 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = ../include/misc/interpolation_grid.hpp 
+EXCLUDE                = ../include/misc/interpolation_grid.hpp \
+                         ../src/misc/interpolation_grid.cpp 
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -867,7 +868,28 @@ EXCLUDE_PATTERNS       =
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = tools_stl::* tools_structselect::*
+EXCLUDE_SYMBOLS        = tools_stl::* \ 
+                         tools_structselect::* \
+                         *no_tau_to_parameters* \
+                         *relabel_one* \
+                         *relabel_elements* \
+                         vinecopulib::AbstractBicop::* \
+                         vinecopulib::ParBicop::* \
+                         vinecopulib::KernelBicop::* \
+                         vinecopulib::EllipticalBicop::* \
+                         vinecopulib::ArchimedeanBicop::* \                    
+                         vinecopulib::IndepBicop::* \
+                         vinecopulib::GaussianBicop::* \
+                         vinecopulib::StudentBicop::* \
+                         vinecopulib::ClaytonBicop::* \
+                         vinecopulib::GumbelBicop::* \
+                         vinecopulib::FrankBicop::* \
+                         vinecopulib::JoeBicop::* \
+                         vinecopulib::Bb1Bicop::* \
+                         vinecopulib::Bb6Bicop::* \
+                         vinecopulib::Bb7Bicop::* \
+                         vinecopulib::Bb8Bicop::* \
+                         vinecopulib::Tll0Bicop::* 
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include

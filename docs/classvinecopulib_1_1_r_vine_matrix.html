@@ -52,6 +52,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -96,7 +97,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>vinecopulib</b></li><li class="navelem"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html">RVineMatrix</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacevinecopulib.html">vinecopulib</a></li><li class="navelem"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html">RVineMatrix</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -163,7 +164,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>instantiates an <a class="el" href="classvinecopulib_1_1_r_vine_matrix.html" title="A class for regular vine matrices. ">RVineMatrix</a> object. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">a</td><td>valid R-vine matrix (this is not checked so far!). </td></tr>
+    <tr><td class="paramname">matrix</td><td>a valid R-vine matrix (this is not checked so far!). </td></tr>
   </table>
   </dd>
 </dl>
@@ -216,13 +217,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>extracts the maximum matrix.</p>
-<p>The maximum matrix is derived from an R-vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">no_matrix</td><td>initial R-vine matrix, assumed to be in natural order. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>The maximum matrix is derived from an R-vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge. </p>
 
 </div>
 </div>
@@ -271,13 +266,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>extracts the R-vine matrix in natural order.</p>
-<p>Natural order means that the counter-diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-vine matrix is in natural order.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">matrix</td><td>initial R-vine matrix. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Natural order means that the counter-diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-vine matrix is in natural order. </p>
 
 </div>
 </div>
@@ -294,7 +283,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 25 2017 15:26:28 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Mar 25 2017 17:39:45 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -185,7 +185,7 @@ namespace tools_optimization {
     //! Set the optimizer's objective and data
     //!
     //! @param f The optimizer's objective function (see nlopt's documentation)
-    //! @param data The optimizer's data (see nlopt's documentation)
+    //! @param f_data The optimizer's data (see nlopt's documentation)
     void Optimizer::set_objective(nlopt::vfunc f, void* f_data)
     {
         opt_.set_min_objective(f, f_data);

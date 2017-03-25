@@ -50,7 +50,6 @@ namespace vinecopulib
         // Getters and setters
         BicopFamily get_family() const;
         std::string get_family_name() const;
-        std::string get_association_direction() const;
         Eigen::MatrixXd get_parameters() const;
         Eigen::MatrixXd get_parameters_lower_bounds() const;
         Eigen::MatrixXd get_parameters_upper_bounds() const;
@@ -92,7 +91,8 @@ namespace vinecopulib
         void check_parameters_upper(const Eigen::MatrixXd& parameters);
         void check_parameters_lower(const Eigen::MatrixXd& parameters);
     };
-
+    
+    //! A shared pointer to an object of class AbstracBicop.
     typedef std::shared_ptr<AbstractBicop> BicopPtr;
     Eigen::VectorXd no_tau_to_parameters(const double&);
 }

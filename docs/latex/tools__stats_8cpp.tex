@@ -1,0 +1,44 @@
+\hypertarget{tools__stats_8cpp}{}\section{/home/n5/dev/cpp/vinecopulib/src/misc/tools\+\_\+stats.cpp File Reference}
+\label{tools__stats_8cpp}\index{/home/n5/dev/cpp/vinecopulib/src/misc/tools\+\_\+stats.\+cpp@{/home/n5/dev/cpp/vinecopulib/src/misc/tools\+\_\+stats.\+cpp}}
+{\ttfamily \#include \char`\"{}misc/tools\+\_\+stats.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}misc/tools\+\_\+stl.\+hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}misc/tools\+\_\+c.\+h\char`\"{}}\\*
+Include dependency graph for tools\+\_\+stats.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tools__stats_8cpp__incl}
+\end{center}
+\end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacetools__stats}{tools\+\_\+stats}
+\begin{DoxyCompactList}\small\item\em Utilities for statistical analysis. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacetools__stats_ad857f9c70a10a498f3c449225500f4c0}{tools\+\_\+stats\+::simulate\+\_\+uniform} (int n, int d)
+\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacetools__stats_a88048bc643d51f30f099c33eb2f61598}{tools\+\_\+stats\+::to\+\_\+pseudo\+\_\+obs} (Eigen\+::\+Matrix\+Xd x, std\+::string ties\+\_\+method)
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{namespacetools__stats_af09c24563535c110aea492a30eed3d3e}{tools\+\_\+stats\+::to\+\_\+pseudo\+\_\+obs\+\_\+1d} (Eigen\+::\+Vector\+Xd x, std\+::string ties\+\_\+method)
+\end{DoxyCompactItemize}
+\begin{Indent}{\bf Pairwise dependence measures}\par
+{\em 
+\begin{DoxyParams}{Parameters}
+{\em x} & an $ n \times 2 $ matrix of observations. \\
+\hline
+\end{DoxyParams}
+}\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{namespacetools__stats_aba1c21a7a90e6fefb3d92876469f401e}{tools\+\_\+stats\+::pairwise\+\_\+ktau} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&x)\hypertarget{namespacetools__stats_aba1c21a7a90e6fefb3d92876469f401e}{}\label{namespacetools__stats_aba1c21a7a90e6fefb3d92876469f401e}
+
+\begin{DoxyCompactList}\small\item\em calculates the pairwise Kendall\textquotesingle{}s $ \tau $. \end{DoxyCompactList}\item 
+double \hyperlink{namespacetools__stats_ada062011e2c2a18d7258a39ad0722b7e}{tools\+\_\+stats\+::pairwise\+\_\+cor} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&x)\hypertarget{namespacetools__stats_ada062011e2c2a18d7258a39ad0722b7e}{}\label{namespacetools__stats_ada062011e2c2a18d7258a39ad0722b7e}
+
+\begin{DoxyCompactList}\small\item\em calculates the pairwise correlation. \end{DoxyCompactList}\item 
+double \hyperlink{namespacetools__stats_a48cbea62b23e33bacaf08ed439c189ca}{tools\+\_\+stats\+::pairwise\+\_\+hoeffd} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&x)\hypertarget{namespacetools__stats_a48cbea62b23e33bacaf08ed439c189ca}{}\label{namespacetools__stats_a48cbea62b23e33bacaf08ed439c189ca}
+
+\begin{DoxyCompactList}\small\item\em calculates the pair-\/wise Hoeffding\textquotesingle{}s D. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}

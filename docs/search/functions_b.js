@@ -1,10 +1,5 @@
 var searchData=
 [
-  ['select',['select',['../classvinecopulib_1_1_bicop.html#af04ef20ec08d02222059ba2b72084ad0',1,'vinecopulib::Bicop']]],
-  ['select_5fall',['select_all',['../classvinecopulib_1_1_vinecop.html#a6f9f35b5973e0da272770706af77dc11',1,'vinecopulib::Vinecop']]],
-  ['select_5ffamilies',['select_families',['../classvinecopulib_1_1_vinecop.html#ab80845e262fa37613f09d1f98d722cc8',1,'vinecopulib::Vinecop']]],
-  ['set_5fparameters',['set_parameters',['../classvinecopulib_1_1_bicop.html#ac8d1d4266b0fd7e2f971d0149f881ef9',1,'vinecopulib::Bicop']]],
-  ['set_5frotation',['set_rotation',['../classvinecopulib_1_1_bicop.html#a4e359624560a089273b25dc74879bd16',1,'vinecopulib::Bicop']]],
-  ['simulate',['simulate',['../classvinecopulib_1_1_bicop.html#aeb87bea4283dacfa5e609356c020f85d',1,'vinecopulib::Bicop::simulate()'],['../classvinecopulib_1_1_vinecop.html#aa675aac119538648d60368a3572d1b5c',1,'vinecopulib::Vinecop::simulate()']]],
-  ['str',['str',['../classvinecopulib_1_1_bicop.html#a94b889d56f478dbeb156be4e31af5de5',1,'vinecopulib::Bicop']]]
+  ['optimize',['optimize',['../classtools__optimization_1_1_optimizer.html#aebe310592043a99931f7999753a65577',1,'tools_optimization::Optimizer']]],
+  ['optimizer',['Optimizer',['../classtools__optimization_1_1_optimizer.html#ad942cc446b8521f23188609e5bcc5997',1,'tools_optimization::Optimizer::Optimizer(unsigned int n_parameters)'],['../classtools__optimization_1_1_optimizer.html#ad8188b4e87bc3922785eded421dae611',1,'tools_optimization::Optimizer::Optimizer(unsigned int n_parameters, double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)']]]
 ];
