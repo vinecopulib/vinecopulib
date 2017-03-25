@@ -222,43 +222,100 @@ for (auto family : vinecopulib::bicop_families::all) {
 
 ### Set up a custom bivariate copula model
 
+There are essentially two ways of setting-up bivariate copulas:
+* with known parameters,
+* from data (i.e., with estimated parameters).
 
+The constructor with known parameters takes 3 arguments:
+* The copula family (default to `indep`)
+* The rotation (default to `0`)
+* The parameters (default to parameters corresponding to an independence copula)
 **Example**
 ``` cpp
-// 90 degree Clayton with default parameter (corresponds to independence)
-auto clayton = Bicop(3, 90);
+// 90 degree rotated Clayton with default parameter (corresponds to independence)
+auto clayton = Bicop(BicopFamily::clayton, 90);
 
 // Gauss copula with parameter 0.5
-auto gauss = Bicop(1, 0, VecXd::Constant(1, 0.5));
+auto gauss = Bicop(BicopFamily::gaussian, 0,  VecXd::Constant(1, 0.5));
 ```
-
-
-
+The constructor from data takes the same arguments as the select method described 
+below.
 
 ### Fit and select a bivariate copula
 
 You can either fit the parameters of a given `Bicop` object with `fit()` or
-select the best fitting model from a set of families with `Bicop::select()`.
+select the best fitting model from a set of families with `select()`. 
 
 **Example**
 ``` cpp
-MatXd data = simulate_uniform(100, 2);           // dummy data
-auto clayton = Bicop::create(3, 0);              // create Clayton copula
+// create a Gauss copula with parameter 0.5 and simulate 1e3 observations
+auto model = Bicop(BicopFamily::gaussian, 0,  VecXd::Constant(1, 0.5));             
+auto data = model.simulate(1e3);
 
-// fit parameter of this copula
-clayton->fit(data);
+// instantiate a gaussian copula with default parameters and fit to data
+auto fitted = Bicop(BicopFamily::gaussian);
+fitted.fit(data);
 std::cout << 
     "estimated parameter: " <<
-    clayton->get_parameters() << 
+    fitted.get_parameters() << 
     "\n";
     
-// fit and select family
-auto bicop_selected = Bicop::select(data);
+// assign another family to the same variable and fit to data
+fitted = Bicop(BicopFamily::student);
+fitted.fit(data);
 std::cout << 
-    "family: " << bicop_selected->get_family() <<
-    "rotation: " <<  bicop_selected->get_rotation() <<
+    "estimated parameter: " <<
+    fitted.get_parameters() << 
+    "\n";
+
+// alternatively, assign to a family and fit automatically
+fitted = select(data);
+std::cout << 
+    "family: " << fitted.get_family_name() <<
+    "rotation: " <<  fitted.get_rotation() <<
     "\n";
 ```
+As it's arguably the most important function of the `Bicop` class, it's worth 
+understanding the arguments of `select()`:
+* `Eigen::Matrix<double, Eigen::Dynamic, 2> data` should be in $(0,1)^2$.
+* `std::vector<BicopFamily> family_set` describes the set of family to select 
+from. It can take a user specified vector of 
+families or any of those mentioned above (default is `bicop_families::all`).
+* `std::string method` describes the estimation method. It can take `"mle"` 
+(default, for maximum-likelihood estimation) and 
+`"itau"` (for Kendall's tau inversion, although only available for families 
+included in `bicop_families::itau`). Note that nonparametric families have 
+specialized methods for which no specification is required.
+* `std::string selection_criterion` describes the criterion to compare the 
+families. It can take either `"bic"`(default) or `"aic"`.
+* `bool preselect_families` describes a heuristic preselection method (default 
+is `true`) based on symmetry properties of the data (e.g., the unrotated 
+Clayton won't be preselected if the data displays upper-tail dependence). 
+
+As mentioned above, the arguments of `select()` can be used as arguments to 
+construct a new object directly:
+``` cpp
+// instantiate an archimedean copula by selecting the "best" family according to
+// the BIC and parameters corresponding to the MLE
+auto best_archimedean = Bicop(data, bicop_families::archimedean);
+fitted.fit(data);
+std::cout << 
+    "family: " << best_archimedean.get_family_name() <<
+    "rotation: " <<  best_archimedean.get_rotation() <<
+    best_archimedean.get_parameters() << 
+    "\n"
+    
+// instantiate a bivariate copula by selecting the "best" family according to
+// the AIC and parameters corresponding to Kendall's tau inversion
+auto best_itau = Bicop(data, bicop_families::itau, "itau", "aic");
+fitted.fit(data);
+std::cout << 
+    "family: " << best_itau.get_family_name() <<
+    "rotation: " <<  best_itau.get_rotation() <<
+    best_itau.get_parameters() << 
+    "\n"
+```
+
 
 ### Work with a bivariate copula model
 
