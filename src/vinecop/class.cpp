@@ -4,7 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "vinecop_class.hpp"
+#include "vinecop/class.hpp"
 #include "misc/tools_stl.hpp"
 #include "misc/tools_stats.hpp"
 #include <vector>

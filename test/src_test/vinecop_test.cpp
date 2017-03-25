@@ -13,11 +13,11 @@ VinecopTest::VinecopTest() {
     int sys_exit_code = system(cmd.c_str());
 
     // vine structures (C++ representation reverses rows)
-    model_matrix = read_matxi("temp2").colwise().reverse();
-    vc_matrix = read_matxi("temp3").colwise().reverse();
+    model_matrix = tools_eigen::read_matxi("temp2").colwise().reverse();
+    vc_matrix = tools_eigen::read_matxi("temp3").colwise().reverse();
 
     // u, pdf, sim
-    Eigen::MatrixXd temp = read_matxd("temp");
+    Eigen::MatrixXd temp = tools_eigen::read_matxd("temp");
     int n = temp.rows();
     int m = model_matrix.rows();
     u = temp.block(0,0,n,m);

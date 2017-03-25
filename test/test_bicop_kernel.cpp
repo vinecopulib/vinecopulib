@@ -6,7 +6,7 @@
 
 #include "src_test/include/test_bicop_kernel.hpp"
 
-using namespace test_bicop_trafokernel;
+using namespace test_bicop_kernel;
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

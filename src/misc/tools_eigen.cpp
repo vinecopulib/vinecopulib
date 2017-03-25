@@ -9,7 +9,7 @@
 
 #include "misc/tools_eigen.hpp"
 
-namespace vinecopulib
+namespace tools_eigen
 {
     
     //! swap the columns of a two-column matrix
@@ -34,13 +34,9 @@ namespace vinecopulib
     //! guaranteeing an accuracy of 0.5^35 ~= 6e-11).
     //!
     //! @return \f$ f^{-1}(x) \f$.
-    Eigen::VectorXd invert_f(
-        const Eigen::VectorXd& x, 
+    Eigen::VectorXd invert_f(const Eigen::VectorXd& x, 
         std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
-        const double lb, 
-        const double ub, 
-        int n_iter
-    )
+        const double lb,  const double ub, int n_iter)
     {
         Eigen::VectorXd xl = Eigen::VectorXd::Constant(x.size(), lb);
         Eigen::VectorXd xh = Eigen::VectorXd::Constant(x.size(), ub);

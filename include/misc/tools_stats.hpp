@@ -19,21 +19,21 @@ namespace tools_stats
     //! @{
 
     //! evaluates the density function.
-    Eigen::MatrixXd dnorm(const Eigen::MatrixXd& x)
+    inline Eigen::MatrixXd dnorm(const Eigen::MatrixXd& x)
     {
         boost::math::normal dist;
         return x.unaryExpr([&dist](double y) {return boost::math::pdf(dist, y);});
     };
 
     //! evaluates the distribution function.
-    Eigen::MatrixXd pnorm(const Eigen::MatrixXd& x)
+    inline Eigen::MatrixXd pnorm(const Eigen::MatrixXd& x)
     {
         boost::math::normal dist;
         return x.unaryExpr([&dist](double y) {return boost::math::cdf(dist, y);});
     };
     
     //! evaluates the quantile function.
-    Eigen::MatrixXd T qnorm(const Eigen::MatrixXd& x)
+    inline Eigen::MatrixXd qnorm(const Eigen::MatrixXd& x)
     {
         boost::math::normal dist;
         return x.unaryExpr([&dist](double y) {return boost::math::quantile(dist, y);});
@@ -47,21 +47,21 @@ namespace tools_stats
     //! @{
     
     //! evaluates the density function.
-    Eigen::MatrixXd dt(const Eigen::MatrixXd& x, double nu)
+    inline Eigen::MatrixXd dt(const Eigen::MatrixXd& x, double nu)
     {
         boost::math::students_t dist(nu);
         return x.unaryExpr([&dist](double y) {return boost::math::pdf(dist, y);});
     };
 
     //! evaluates the distribution function.
-    Eigen::MatrixXd pt(const Eigen::MatrixXd& x, double nu)
+    inline Eigen::MatrixXd pt(const Eigen::MatrixXd& x, double nu)
     {
         boost::math::students_t dist(nu);
         return x.unaryExpr([&dist](double y) {return boost::math::cdf(dist, y);});
     };
     
     //! evaluates the  quantile function.
-    Eigen::MatrixXd qt(const Eigen::MatrixXd& x, double nu)
+    inline Eigen::MatrixXd qt(const Eigen::MatrixXd& x, double nu)
     {
         boost::math::students_t dist(nu);
         return x.unaryExpr([&dist](double y) {return boost::math::quantile(dist, y);});

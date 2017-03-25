@@ -21,7 +21,7 @@
 #include "bicop/indep.hpp"
 #include "bicop/joe.hpp"
 #include "bicop/student.hpp"
-#include "bicop/trafokernel.hpp"
+#include "bicop/tll0.hpp"
 
 namespace vinecopulib
 {
@@ -71,7 +71,7 @@ namespace vinecopulib
                 new_bicop = BicopPtr(new Bb8Bicop());
                 break;
             case BicopFamily::tll0:
-                new_bicop =  BicopPtr(new TrafokernelBicop());
+                new_bicop =  BicopPtr(new Tll0Bicop());
                 break;
 
             default:
@@ -150,7 +150,7 @@ namespace vinecopulib
             u_new.col(1) = v;
             return hfunc1(u_new);
         };
-        return invert_f(u.col(1), h1);
+        return tools_eigen::invert_f(u.col(1), h1);
     }
 
     Eigen::VectorXd AbstractBicop::hinv2_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
@@ -161,7 +161,7 @@ namespace vinecopulib
             return hfunc2(u_new);
         };
 
-        return invert_f(u.col(0), h1);
+        return tools_eigen::invert_f(u.col(0), h1);
     }
     //! @}
 

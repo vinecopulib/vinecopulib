@@ -16,14 +16,14 @@ namespace vinecopulib
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return hfunc1(swap_cols(u));
+        return hfunc1(tools_eigen::swap_cols(u));
     }
 
     Eigen::VectorXd EllipticalBicop::hinv2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return hinv1(swap_cols(u));
+        return hinv1(tools_eigen::swap_cols(u));
     }
 
     double EllipticalBicop::parameters_to_tau(const Eigen::VectorXd& parameters)

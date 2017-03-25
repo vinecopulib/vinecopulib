@@ -8,7 +8,7 @@
 
 #include "kernel_test.hpp"
 
-namespace test_bicop_trafokernel {
+namespace test_bicop_kernel {
     using namespace vinecopulib;
 
     TEST_F(TrafokernelTest, trafo_kernel_fit) {

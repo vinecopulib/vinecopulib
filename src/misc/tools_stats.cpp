@@ -20,7 +20,7 @@ namespace tools_stats {
     //!
     //! @return An \f$ n \times d \f$ matrix of independent 
     //! \f$ \mathrm{U}[0, 1] \f$ random variables.
-    inline Eigen::MatrixXd simulate_uniform(int n, int d)
+    Eigen::MatrixXd simulate_uniform(int n, int d)
     {
         if ((n < 1) | (d < 1)) {
             throw std::runtime_error("both n and d must be at least 1.");        
@@ -115,7 +115,7 @@ namespace tools_stats {
         double tau;
         int n = x.rows();
         int two = 2;
-        ktau_matrix(u.data(), &two, &n, &tau);
+        ktau_matrix(x.data(), &two, &n, &tau);
         return tau;
     }
 

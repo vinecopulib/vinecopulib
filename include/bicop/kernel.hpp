@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "misc/interpolation_grid.hpp"
+#include "misc/tools_interpolation.hpp"
 #include "bicop/abstract.hpp"
 
 namespace vinecopulib

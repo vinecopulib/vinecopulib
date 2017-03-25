@@ -28,7 +28,7 @@ namespace test_bicop_parametric {
             
             int n = get_n();
     
-            Eigen::MatrixXd results = read_matxd("temp");
+            Eigen::MatrixXd results = tools_eigen::read_matxd("temp");
 
             // Remove temp file
             cmd = rm + "temp";

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "misc/tools_eigen.hpp"
+using namespace tools_eigen;
 
 namespace vinecopulib
 {
