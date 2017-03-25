@@ -494,17 +494,25 @@ of `select_all()` and `select_families()` can be used as arguments to a
  **Example**
 ``` cpp
 // specify the dimension of the model
-int d = 5;
+int d = 4;
 
 // simulate dummy data
 MatXd data = simulate_uniform(100, d);
 
 // instantiate a vine from data using the default arguments
 Vinecop best_vine(data);
+
+// alternatively, instantiate a structure matrix...
+Eigen::MatrixXi mat;
+mat << 1, 1, 1, 1,
+       2, 2, 2, 0,
+       3, 3, 0, 0
+       4, 0, 0, 0;
     
-// instantiate a vine copula using Kendall's tau inversion for parameters 
+// ... and instantiate a vine copula from data using the custom structure, 
+// Kendall's tau inversion for parameters 
 // estimation and a truncation after the second tree
-Vinecop best_truncated_archimedean(data, bicop_families::itau, "itau", 2);
+Vinecop custom_vine(data, mat, bicop_families::itau, "itau", 2);
 ```
 
 ### Work with a vine copula model
