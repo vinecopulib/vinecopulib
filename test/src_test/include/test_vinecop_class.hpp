@@ -9,6 +9,7 @@
 #include "vinecop_test.hpp"
 #include "include/vinecop/class.hpp"
 #include "include/vinecop/tools_structselect.hpp"
+#include "include/misc/tools_stats.hpp"
 #include "include/misc/tools_stl.hpp"
 
 namespace test_vinecop_class {
@@ -55,6 +56,25 @@ namespace test_vinecop_class {
         vinecop.simulate(10);  // only check if it works
         // check the underlying transformation from independent samples
         ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
+    }
+
+    TEST_F(VinecopTest, aic_bic_are_correct) {
+
+        int d = 7;
+        auto data = tools_stats::simulate_uniform(1e3, 7);
+        Vinecop true_model(d);
+
+        auto pair_copulas = Vinecop::make_pair_copula_store(d);
+        auto par = Eigen::VectorXd::Constant(1, 3.0);
+        for (auto& tree : pair_copulas) {
+            for (auto& pc : tree) {
+                pc = Bicop(BicopFamily::clayton, 0, par);
+            }
+        }
+        Vinecop complex_model(pair_copulas, model_matrix);
+
+        ASSERT_TRUE(true_model.aic(data) < complex_model.aic(data));
+        ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
     }
     
     TEST_F(VinecopTest, family_select_finds_true_rotations) {
