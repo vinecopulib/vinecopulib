@@ -11,7 +11,10 @@
 
 
 namespace vinecopulib {
-    //! A class for bivariate copula models
+    //! @brief A class for bivariate copula models.
+    //! 
+    //! The copula model is fully characterized by the family, rotation,
+    //! and parameters. 
     class Bicop
     {
     public:
@@ -43,6 +46,7 @@ namespace vinecopulib {
         Eigen::VectorXd hinv2(const Eigen::Matrix<double,Eigen::Dynamic,2>& u);
         Eigen::Matrix<double,Eigen::Dynamic,2> simulate(const int& n);
 
+
         // Methods modifying the family/rotation/parameters
         void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 std::string method);
@@ -53,7 +57,6 @@ namespace vinecopulib {
                 std::string selection_criterion = "bic",
                 bool preselect_families = true
         );
-        void flip();
 
         // Fit statistics
         double loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
@@ -65,6 +68,7 @@ namespace vinecopulib {
         double calculate_npars();
         double parameters_to_tau(const Eigen::VectorXd& parameters);
         Eigen::MatrixXd tau_to_parameters(const double& tau);
+        void flip();
 
     private:
         Eigen::MatrixXd get_parameters_lower_bounds() const;

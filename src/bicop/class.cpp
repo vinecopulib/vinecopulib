@@ -14,30 +14,18 @@
 namespace vinecopulib
 {
     
-    /// @name Constructors
-    /// 
-    /// There are several ways to construct a `Bicop` object. The copula model
-    /// is fully characterized by the family, rotation, and parameters. You can
-    /// construct a model directly from these characteristics or use the 
-    /// data-driven constructor (see select()).
-    /// 
-    /// @param family the copula family.
-    /// @param rotation the rotation of the copula; one of 0, 90, 180, or 270 
-    ///     (for Independence, Gaussian, Student, Frank, and nonparametric 
-    ///     families, only 0 is allowed).
-    /// @param parameters the copula parameters.
-    /// @param data see select().
-    /// @param family_set see select().
-    /// @param method see select().
-    /// @param selection_criterion see select().
-    /// @param preselect_families see select().
-    /// 
-    /// @{
+    //! creates the independence copula.
     Bicop::Bicop()
     {
         bicop_ = AbstractBicop::create();
     }
     
+    //! creates a specific bivariate copula model.
+    //! @param family the copula family.
+    //! @param rotation the rotation of the copula; one of 0, 90, 180, or 270 
+    //!     (for Independence, Gaussian, Student, Frank, and nonparametric 
+    //!     families, only 0 is allowed).
+    //! @param parameters the copula parameters.
     Bicop::Bicop(BicopFamily family, int rotation, 
         const Eigen::MatrixXd& parameters)
     {
@@ -46,6 +34,12 @@ namespace vinecopulib
         set_rotation(rotation);
     }
     
+    //! equivalent to `Bicop cop; cop.select(data, family_set, ...)`.
+    //! @param data see select().
+    //! @param family_set see select().
+    //! @param method see select().
+    //! @param selection_criterion see select().
+    //! @param preselect_families see select().
     Bicop::Bicop(
             Eigen::Matrix<double, Eigen::Dynamic, 2> data,
             std::vector<BicopFamily> family_set,
@@ -68,20 +62,9 @@ namespace vinecopulib
         return f;
     }
 
-    //! @name h-functions
-    //!
-    //! calculates h-functions and their inverse. h-functions are defined as 
-    //! one-dimensional integrals over a bivariate copula density \f$ c \f$,
-    /// \f{align*}{
-    ///     h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) ds, \qquad
-    ///     h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds.
-    ///  \f}
-    //! `hinv1` is the inverse w.r.t. the second argument (conditioned on first),
-    //! `hinv2` is the inverse w.r.t. the first argument (conditioned on second).
-    //!
+    //! calculates the first h-function, i.e., 
+    //! \f$ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) \f$.
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
-    //! @return The (inverse) h-function evaluated at `u`.
-    //! @{
     Eigen::VectorXd Bicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         switch (rotation_) {
@@ -104,6 +87,9 @@ namespace vinecopulib
         }
     }
 
+    //! calculates the second h-function, i.e., 
+    //! \f$ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) \f$.
+    //! @param u \f$m \times 2\f$ matrix of evaluation points.
     Eigen::VectorXd Bicop::hfunc2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         switch (rotation_) {
@@ -126,6 +112,9 @@ namespace vinecopulib
         }
     }
 
+    //! calculates the inverse of \f$ h_1 f\f$ (see hfunc1()) w.r.t. the second 
+    //! argument.
+    //! @param u \f$m \times 2\f$ matrix of evaluation points.
     Eigen::VectorXd Bicop::hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         switch (rotation_) {
@@ -148,6 +137,9 @@ namespace vinecopulib
         }
     }
 
+    //! calculates the inverse of \f$ h_2 f\f$ (see hfunc2()) w.r.t. the first 
+    //! argument.
+    //! @param u \f$m \times 2\f$ matrix of evaluation points.
     Eigen::VectorXd Bicop::hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         switch (rotation_) {
@@ -171,7 +163,7 @@ namespace vinecopulib
     }
     //! @}
 
-
+    
     //! simulates from a bivariate copula.
     //!
     //! @param n number of observations.
@@ -185,69 +177,73 @@ namespace vinecopulib
         return U;
     }
 
-    //! @anchor fit_statistics
-    //! @name Fit statistics
+    //! calculates the log-likelihood.
     //! 
-    //! Calculates fit statistics for a bivariate copula. The log-likelihood,
-    //! Aikaike information criterion (AIC), and Bayesian information criterion
-    //! (BIC) are defined as
-    /// \f{align*}{
-    ///     \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \quad
-    ///     \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \quad
-    ///     \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p,     
-    /// \f}
-    /// where \f$ c \f$ is the copula density pdf() and  \f$ p \f$ is the 
-    /// (effective) number of parameters of the model. 
-    /// The loglikehood is used for model fitting, the others for selecting 
-    /// between fitted models.  The AIC is consistent for nonparametric models,
-    /// the BIC is more conservative and consistent for parametric models.
-    /// The effective number of parameters is the actual number of parameters 
-    //! for parameteric families. For nonparametric families, there is another
-    //! definition that is conceptually similar in the sense that it can be used
-    //! in the calculation of fit statistics.
-    //! 
+    //! The log-likelihood is defined as
+    //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \f]
+    //! where \f$ c \f$ is the copula density pdf() and  \f$ p \f$ is the 
+    //! (effective) number of parameters of the model, see calculate_npars(). 
     //! 
     //! @param u \f$n \times 2\f$ matrix of observations.
-    //! @return The fit statistic for the model and observations `u`.
-    //! @{
     double Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         return pdf(u).array().log().sum();
     }
 
+    //! calculates the Akaike information criterion (AIC).
+    //! 
+    //! The AIC is defined as
+    //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
+    //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the 
+    //! (effective) number of parameters of the model, see loglik() and 
+    //! calculate_npars(). The AIC is a consistent model selection criterion 
+    //! for nonparametric models.
+    //! 
+    //! @param u \f$n \times 2\f$ matrix of observations.
     double Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         return -2 * loglik(u) + 2 * calculate_npars();
     }
 
+    //! calculates the Bayesian information criterion (BIC).
+    //! 
+    //! The BIC is defined as
+    //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
+    //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the 
+    //! (effective) number of parameters of the model, see loglik() and 
+    //! calculate_npars(). The BIC is a consistent model selection criterion 
+    //! for nonparametric models.
+    //! 
+    //! @param u \f$n \times 2\f$ matrix of observations.
     double Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         return -2 * loglik(u) + calculate_npars() * log(u.rows());
     }
     
+    //! calculates the effective number of parameters.
+    //! 
+    //! Returns the actual number of parameters for parameteric families. For 
+    //! nonparametric families, there is a conceptually similar definition in 
+    //! the sense that it can be used in the calculation of fit statistics.
     double Bicop::calculate_npars()
     {
         return bicop_->calculate_npars();
     }
-    //! @}
-    
-    
-    //! @name Conversion between Parameters and Kendall's tau 
+        
+    //! converts a Kendall's \f$ \tau \f$ to the copula parameters of the 
+    //! current family (only works for one-parameter families).
     //! 
-    //! Currently `parameters_to_tau()` works for all families but 
-    //! `BicopFamily::tll0`. `tau_to_parameters()` only works for one-parameter
-    //! families.
-    //! 
-    //! @param tau 
-    //! @param parameters 
-    //! @return The tau/parameters corresponding to parameters/tau for the 
-    //!     current family.
-    //! @{
+    //! @param tau a value in \f$ (-1, 1) \f$.
     Eigen::MatrixXd Bicop::tau_to_parameters(const double& tau)
     {
         return bicop_->tau_to_parameters(tau);
     }
 
+    //! converts the parameters to the Kendall's \f$ tau \f$ for the current
+    //! family (works for all families but `BicopFamily::tll0`). 
+    //! 
+    //! @param parameters the parameters (must be a valid parametrization of
+    //!     the current family).
     double Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
     {
         double tau = bicop_->parameters_to_tau(parameters);
@@ -256,12 +252,8 @@ namespace vinecopulib
         }
         return tau;
     }
-    //! @}
     
     //! @name Getters and setters
-    //! 
-    //! @param rotation 
-    //! @param parameters 
     //! 
     //! @{
     BicopFamily Bicop::get_family() const 
@@ -283,12 +275,14 @@ namespace vinecopulib
     {
         return bicop_->get_parameters();
     }
-
+    
+    //! @param rotation 
     void Bicop::set_rotation(int rotation) {
         check_rotation(rotation);
         rotation_ = rotation;
     }
-
+    
+    //! @param parameters 
     void Bicop::set_parameters(const Eigen::MatrixXd& parameters)
     {
         bicop_->set_parameters(parameters);
@@ -297,9 +291,8 @@ namespace vinecopulib
     
     
     //! @name Utilities
-    //! 
-    //! `flip()` adjust's the copula model to a change in the variable order.
-    //! `str()` summarizes the model into a string (can be used for printing).
+    //! @{
+    //! adjust's the copula model to a change in the variable order.
     void Bicop::flip()
     {
         BicopFamily family = bicop_->get_family();
@@ -314,6 +307,7 @@ namespace vinecopulib
         }
     }
     
+    //! summarizes the model into a string (can be used for printing).
     std::string Bicop::str()
     {
         std::stringstream bicop_str;
@@ -331,31 +325,39 @@ namespace vinecopulib
     };
     
     
-    //! Estimation and selection of bivariate copula models
+
+    //! fits a bivariate copula (with fixed family) to data.
     //! 
     //! For parametric models, two different methods are available. `"mle"` fits
     //! the parameters by maximum-likelihood. `"itau"` uses inversion of 
     //! Kendall's \f$ \tau \f$, but is only available for one-parameter families
     //! and the Student t copula. For the latter, there is a one-to-one 
     //! transformation for the first parameter, the second is found by profile
-    //! likelihood optimization (with accuracy of at least 0.5). nonparametric
+    //! likelihood optimization (with accuracy of at least 0.5). Nonparametric
     //! families have specialized methods, no specification is required.
     //! 
     //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
     //!     \f$(0, 1)^2 \f$.
-    //! @param family_set the set of copula families to consider (if empty, then
-    //!     all families are included).
     //! @param method the fit method; possible choices: `"mle"`, `"itau"`.
-    //! @param selection_criterion the selection criterion (`"aic"` or `"bic"`).
-    //! @param preselect_families whether to exclude families before fitting
-    //!     based on symmetry properties of the data.
-    //! @{
     void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
             std::string method)
     {
         bicop_->fit(cut_and_rotate(data), method);
     }
-
+    
+    //! selects the best fitting model.
+    //! 
+    //! The function calls fit() for all families in `family_set`)  and selects
+    //! the best fitting model by either BIC or AIC, see bic() and aic().
+    //! 
+    //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
+    //!     \f$(0, 1)^2 \f$.
+    //! @param method the fit method, see fit().
+    //! @param family_set the set of copula families to consider (if empty, then
+    //!     all families are included).
+    //! @param selection_criterion the selection criterion (`"aic"` or `"bic"`).
+    //! @param preselect_families whether to exclude families before fitting
+    //!     based on symmetry properties of the data.
     void Bicop::select(
             Eigen::Matrix<double, Eigen::Dynamic, 2> data,
             std::vector<BicopFamily> family_set,
@@ -465,13 +467,11 @@ namespace vinecopulib
         bicop_ = fitted_bicop;
         rotation_ = fitted_rotation;
     }
-    //! @}
     
     //! Data manipulations for rotated families
     //!
     //! @param u \f$m \times 2\f$ matrix of data.
     //! @return The manipulated data.
-    //! @{
     Eigen::Matrix<double, Eigen::Dynamic, 2> Bicop::cut_and_rotate(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
@@ -507,7 +507,6 @@ namespace vinecopulib
 
         return u_new;
     }
-    //! @}
     
     void Bicop::check_rotation(int rotation)
     {
