@@ -89,9 +89,8 @@ sudo make install && bin/test_all`
 |-----------------------|------------------------------------|
 | Create a build folder  | `mkdir build` |
 | Move to the created folder  | `cd build` |
-|  Create the `MakeFile` via cmake  |  `cmake .. ` or 
-`cmake .. -DCMAKE_BUILD_TYPE=Debug` (Debug mode with ASAN)  |
-|  To avoid compiling the unit tests, create the `MakeFile` via cmake  | `cmake .. -DBUILD_TESTING=OFF`|
+|  Create the `MakeFile` via cmake  |  `cmake .. ` or `cmake .. -DCMAKE_BUILD_TYPE=Debug` (Debug mode with ASAN)  |
+|  Create the `MakeFile` while avoiding compiling the unit tests  | `cmake .. -DBUILD_TESTING=OFF`|
 | Compile the library | `make` or `make -j n` where `n` is the number of cores |
 | Build the documentation (optional)  | `make doc` |
 | Install the library on linux/OSX (optional)  | `sudo make install` |
