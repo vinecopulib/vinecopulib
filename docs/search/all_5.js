@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['gaussianbicop',['GaussianBicop',['../classvinecopulib_1_1_gaussian_bicop.html',1,'vinecopulib']]],
-  ['get_5ffamily',['get_family',['../classvinecopulib_1_1_bicop.html#a68ab3556ee3bb3d02814fd978573bf3b',1,'vinecopulib::Bicop']]],
-  ['get_5fmatrix',['get_matrix',['../classvinecopulib_1_1_r_vine_matrix.html#aef1ea47e9fcbcd32337b2db508b25fdb',1,'vinecopulib::RVineMatrix']]],
-  ['get_5fmax_5fmatrix',['get_max_matrix',['../classvinecopulib_1_1_r_vine_matrix.html#a674074d4e248868a01155a25f775ae3a',1,'vinecopulib::RVineMatrix']]],
-  ['get_5fneeded_5fhfunc1',['get_needed_hfunc1',['../classvinecopulib_1_1_r_vine_matrix.html#a6303fc1f643fdf793c867ca7e08e42bc',1,'vinecopulib::RVineMatrix']]],
-  ['gumbelbicop',['GumbelBicop',['../classvinecopulib_1_1_gumbel_bicop.html',1,'vinecopulib']]]
+  ['family_2ehpp',['family.hpp',['../family_8hpp.html',1,'']]],
+  ['fit',['fit',['../classvinecopulib_1_1_bicop.html#a266fa8d13e8ed1e96937e4208a99955d',1,'vinecopulib::Bicop']]],
+  ['flip',['flip',['../classvinecopulib_1_1_abstract_bicop.html#a4e62970bb8e533f97f66c280c1a908cf',1,'vinecopulib::AbstractBicop']]],
+  ['flip_5fby_5frotation',['flip_by_rotation',['../namespacevinecopulib_1_1bicop__families.html#ae1ae1673e3d4a9c57bd9df074e17a3b9',1,'vinecopulib::bicop_families']]],
+  ['frank',['frank',['../namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3a26253c50741faa9c2e2b836773c69fe6',1,'vinecopulib']]],
+  ['frankbicop',['FrankBicop',['../classvinecopulib_1_1_frank_bicop.html',1,'vinecopulib']]]
 ];

@@ -9,6 +9,10 @@
 #include "abstract.hpp"
 
 namespace vinecopulib {
+    //! @brief A class for bivariate copula models.
+    //! 
+    //! The copula model is fully characterized by the family, rotation,
+    //! and parameters. 
     class Bicop
     {
     public:
@@ -28,10 +32,7 @@ namespace vinecopulib {
         BicopFamily get_family() const;
         std::string get_family_name() const;
         int get_rotation() const;
-        std::string get_association_direction() const;
         Eigen::MatrixXd get_parameters() const;
-        Eigen::MatrixXd get_parameters_lower_bounds() const;
-        Eigen::MatrixXd get_parameters_upper_bounds() const;
         void set_rotation(int rotation);
         void set_parameters(const Eigen::MatrixXd& parameters);
 
@@ -43,6 +44,7 @@ namespace vinecopulib {
         Eigen::VectorXd hinv2(const Eigen::Matrix<double,Eigen::Dynamic,2>& u);
         Eigen::Matrix<double,Eigen::Dynamic,2> simulate(const int& n);
 
+
         // Methods modifying the family/rotation/parameters
         void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 std::string method);
@@ -53,7 +55,6 @@ namespace vinecopulib {
                 std::string selection_criterion = "bic",
                 bool preselect_families = true
         );
-        void flip();
 
         // Fit statistics
         double loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
@@ -65,8 +66,11 @@ namespace vinecopulib {
         double calculate_npars();
         double parameters_to_tau(const Eigen::VectorXd& parameters);
         Eigen::MatrixXd tau_to_parameters(const double& tau);
+        void flip();
 
     private:
+        Eigen::MatrixXd get_parameters_lower_bounds() const;
+        Eigen::MatrixXd get_parameters_upper_bounds() const;
         Eigen::Matrix<double, Eigen::Dynamic, 2> cut_and_rotate(
                 const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
         void check_rotation(int rotation);

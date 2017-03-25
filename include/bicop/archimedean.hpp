@@ -10,6 +10,14 @@
 
 namespace vinecopulib
 {
+    //! @brief An abstract class for Archimedean copula families
+    //!
+    //! This class is used in the implementation underlying the Bicop class. 
+    //! Users should not use AbstractBicop or derived classes directly, but 
+    //! always work with the Bicop interface.
+    //! 
+    //! @literature
+    //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
     class ArchimedeanBicop : public ParBicop
     {
     private:
@@ -27,7 +35,5 @@ namespace vinecopulib
         virtual double generator_derivative2(const double& u) = 0;
 
         Eigen::VectorXd get_start_parameters(const double tau);
-    protected:
-        double flip_tau(double tau);
     };
 }

@@ -1,4 +1,4 @@
 <map id="vinecopulib::ArchimedeanBicop" name="vinecopulib::ArchimedeanBicop">
-<area shape="rect" id="node2" href="$classvinecopulib_1_1_par_bicop.html" title="vinecopulib::ParBicop" alt="" coords="17,80,165,107"/>
-<area shape="rect" id="node3" href="$classvinecopulib_1_1_bicop.html" title="vinecopulib::Bicop" alt="" coords="27,5,155,32"/>
+<area shape="rect" id="node2" href="$classvinecopulib_1_1_par_bicop.html" title="An abstract class for parametric copula families. " alt="" coords="20,80,168,107"/>
+<area shape="rect" id="node3" href="$classvinecopulib_1_1_abstract_bicop.html" title="An abstract class for bivariate copula families. " alt="" coords="5,5,183,32"/>
 </map>

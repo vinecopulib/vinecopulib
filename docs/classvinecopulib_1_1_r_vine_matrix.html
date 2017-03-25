@@ -17,6 +17,12 @@
 <script type="text/javascript">
   $(document).ready(function() { init_search(); });
 </script>
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
         <link href="doxygen.css" rel="stylesheet" type="text/css" />
         <link href="customdoxygen.css" rel="stylesheet" type="text/css"/>
         <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
@@ -46,7 +52,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -91,7 +97,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>vinecopulib</b></li><li class="navelem"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html">RVineMatrix</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacevinecopulib.html">vinecopulib</a></li><li class="navelem"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html">RVineMatrix</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -103,30 +109,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">vinecopulib::RVineMatrix Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>A class for regular vine matrices.  
+ <a href="classvinecopulib_1_1_r_vine_matrix.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rvine__matrix_8hpp_source.html">rvine_matrix.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a5872c479d4a7de9c2ddc64cdb0909ef9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a5872c479d4a7de9c2ddc64cdb0909ef9">RVineMatrix</a> (const Eigen::MatrixXi &amp;matrix)</td></tr>
+<tr class="separator:a5872c479d4a7de9c2ddc64cdb0909ef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef1ea47e9fcbcd32337b2db508b25fdb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef1ea47e9fcbcd32337b2db508b25fdb"></a>
+Eigen::MatrixXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#aef1ea47e9fcbcd32337b2db508b25fdb">get_matrix</a> () const </td></tr>
+<tr class="memdesc:aef1ea47e9fcbcd32337b2db508b25fdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">extract the matrix. <br /></td></tr>
+<tr class="separator:aef1ea47e9fcbcd32337b2db508b25fdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ce7f93504e7c219ca9da89e1d97a34b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ce7f93504e7c219ca9da89e1d97a34b"></a>
-Eigen::VectorXi&#160;</td><td class="memItemRight" valign="bottom"><b>get_order</b> () const </td></tr>
+Eigen::VectorXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a8ce7f93504e7c219ca9da89e1d97a34b">get_order</a> () const </td></tr>
+<tr class="memdesc:a8ce7f93504e7c219ca9da89e1d97a34b"><td class="mdescLeft">&#160;</td><td class="mdescRight">extracts the variable order in the R-vine. <br /></td></tr>
 <tr class="separator:a8ce7f93504e7c219ca9da89e1d97a34b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88673df07f4aae0e0e0a65faff2418b6"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a88673df07f4aae0e0e0a65faff2418b6">in_natural_order</a> () const </td></tr>
 <tr class="separator:a88673df07f4aae0e0e0a65faff2418b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a674074d4e248868a01155a25f775ae3a"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a674074d4e248868a01155a25f775ae3a">get_max_matrix</a> () const </td></tr>
 <tr class="separator:a674074d4e248868a01155a25f775ae3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
-<tr class="memitem:a657aaae02c7f9bca12b3c43f475ac884"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a657aaae02c7f9bca12b3c43f475ac884">RVineMatrix</a> ()</td></tr>
-<tr class="separator:a657aaae02c7f9bca12b3c43f475ac884"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5872c479d4a7de9c2ddc64cdb0909ef9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5872c479d4a7de9c2ddc64cdb0909ef9"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>RVineMatrix</b> (const Eigen::MatrixXi &amp;matrix)</td></tr>
-<tr class="separator:a5872c479d4a7de9c2ddc64cdb0909ef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
-<tr class="memitem:aef1ea47e9fcbcd32337b2db508b25fdb"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#aef1ea47e9fcbcd32337b2db508b25fdb">get_matrix</a> () const </td></tr>
-<tr class="separator:aef1ea47e9fcbcd32337b2db508b25fdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
 <tr class="memitem:a6303fc1f643fdf793c867ca7e08e42bc"><td class="memItemLeft" align="right" valign="top">MatrixXb&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a6303fc1f643fdf793c867ca7e08e42bc">get_needed_hfunc1</a> () const </td></tr>
 <tr class="separator:a6303fc1f643fdf793c867ca7e08e42bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ac32cf10a966ba567142e9b36106746"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ac32cf10a966ba567142e9b36106746"></a>
-MatrixXb&#160;</td><td class="memItemRight" valign="bottom"><b>get_needed_hfunc2</b> () const </td></tr>
+<tr class="memitem:a7ac32cf10a966ba567142e9b36106746"><td class="memItemLeft" align="right" valign="top">MatrixXb&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a7ac32cf10a966ba567142e9b36106746">get_needed_hfunc2</a> () const </td></tr>
 <tr class="separator:a7ac32cf10a966ba567142e9b36106746"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
@@ -134,28 +141,33 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a7b3c8952acd3a29559369f0fae0ad9b3"><td class="memItemLeft" align="right" valign="top">static Eigen::MatrixXi&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a7b3c8952acd3a29559369f0fae0ad9b3">construct_d_vine_matrix</a> (const Eigen::VectorXi &amp;order)</td></tr>
 <tr class="separator:a7b3c8952acd3a29559369f0fae0ad9b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a657aaae02c7f9bca12b3c43f475ac884"></a>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A class for regular vine matrices. </p>
+<p>A regular vine (R-vine) matrix encodes the structure of a vine. An examplary matrix is </p><div class="fragment"><div class="line">1 1 1 1</div><div class="line">2 2 2 0</div><div class="line">3 3 0 0</div><div class="line">4 0 0 0</div></div><!-- fragment --><p> which encodes the following pair-copulas: </p><div class="fragment"><div class="line">| tree | edge | pair-copulas   |</div><div class="line">|------|------|----------------|</div><div class="line">| 0    | 0    | `(4, 1)`       |</div><div class="line">|      | 1    | `(3, 1)`       |</div><div class="line">|      | 2    | `(2, 1)`       |</div><div class="line">| 1    | 0    | `(4, 2; 1)`    |</div><div class="line">|      | 1    | `(3, 2; 1)`    |</div><div class="line">| 2    | 0    | `(4, 3; 2, 1)` |</div></div><!-- fragment --><p> Denoting by <code>M[i][j]</code> the matrix entry in row <code>i</code> and column <code>j</code> (starting at 0), the pair-copula index for edge <code>e</code> in tree <code>t</code> of a <code>d</code> dimensional vine is <code>(M[d - 1 - t][e], M[t][e]; M[t - 1][e], ..., M[0][e])</code>. Less formally,</p><ol type="1">
+<li>Start with the counter-diagonal element of column <code>e</code> (first conditioned variable).</li>
+<li>Jump up to the element in row <code>t</code> (second conditioned variable).</li>
+<li>Gather all entries further up in column <code>e</code> (conditioning set). </li>
+</ol>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a5872c479d4a7de9c2ddc64cdb0909ef9"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">vinecopulib::RVineMatrix::RVineMatrix </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const Eigen::MatrixXi &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<p>constructors Constructors </p>
+<p>instantiates an <a class="el" href="classvinecopulib_1_1_r_vine_matrix.html" title="A class for regular vine matrices. ">RVineMatrix</a> object. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">matrix</td><td>a valid R-vine matrix (this is not checked so far!). </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -181,31 +193,14 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Construct a D-vine matrix</p>
+<p>constructs a D-vine matrix.</p>
 <p>A D-vine is a vine where each tree is a path.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">order</td><td>order of the variables</td></tr>
+    <tr><td class="paramname">order</td><td>order of the variables. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>An Eigen::MatrixXi describing the D-vine structure. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="aef1ea47e9fcbcd32337b2db508b25fdb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Eigen::MatrixXi vinecopulib::RVineMatrix::get_matrix </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Getters </p>
 
 </div>
 </div>
@@ -221,10 +216,8 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get maximum matrix</p>
-<p>The maximum matrix is derived from an R-vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge.</p>
-<p>no_matrix initial R-vine matrix, assumed to be in natural order.</p>
-<dl class="section return"><dt>Returns</dt><dd>An Eigen::MatrixXi containing the maximum matrix </dd></dl>
+<p>extracts the maximum matrix.</p>
+<p>The maximum matrix is derived from an R-vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge. </p>
 
 </div>
 </div>
@@ -240,10 +233,23 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Obtain matrix indicating which h-functions are needed</p>
-<p>It is usually not necessary to apply both h-functions for each pair-copula.</p>
-<p>no_matrix initial R-vine matrix (assumed to be in natural order).</p>
-<dl class="section return"><dt>Returns</dt><dd>An Eigen::Matrix&lt;bool, Eigen::Dynamic, Eigen::Dynamic&gt; indicating whether hfunc1/2 is needed for a given pair copula. </dd></dl>
+<p>extracts a matrix indicating which of the first h-functions are needed (it is usually not necessary to apply both h-functions for each pair-copula). </p>
+
+</div>
+</div>
+<a class="anchor" id="a7ac32cf10a966ba567142e9b36106746"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MatrixXb vinecopulib::RVineMatrix::get_needed_hfunc2 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>extracts a matrix indicating which of the second h-functions are needed (it is usually not necessary to apply both h-functions for each pair-copula). </p>
 
 </div>
 </div>
@@ -259,16 +265,14 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Reorder R-vine matrix to natural order</p>
-<p>Natural order means that the diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the matrix is in natural order.</p>
-<p>matrix initial R-vine matrix.</p>
-<dl class="section return"><dt>Returns</dt><dd>An Eigen::MatrixXi containing the matrix in natural order. </dd></dl>
+<p>extracts the R-vine matrix in natural order.</p>
+<p>Natural order means that the counter-diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-vine matrix is in natural order. </p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/home/n5/dev/cpp/vinecopulib/include/<a class="el" href="rvine__matrix_8hpp_source.html">rvine_matrix.hpp</a></li>
-<li>/home/n5/dev/cpp/vinecopulib/src/rvine_matrix.cpp</li>
+<li>/home/n5/dev/cpp/vinecopulib/include/vinecop/<a class="el" href="rvine__matrix_8hpp_source.html">rvine_matrix.hpp</a></li>
+<li>/home/n5/dev/cpp/vinecopulib/src/vinecop/rvine_matrix.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.8-->
@@ -279,7 +283,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 22 2017 00:05:38 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Mar 25 2017 17:39:45 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

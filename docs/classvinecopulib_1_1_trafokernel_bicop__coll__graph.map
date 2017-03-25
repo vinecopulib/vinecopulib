@@ -1,5 +1,4 @@
 <map id="vinecopulib::TrafokernelBicop" name="vinecopulib::TrafokernelBicop">
-<area shape="rect" id="node2" href="$classvinecopulib_1_1_kernel_bicop.html" title="vinecopulib::KernelBicop" alt="" coords="79,95,244,121"/>
-<area shape="rect" id="node3" href="$classvinecopulib_1_1_bicop.html" title="vinecopulib::Bicop" alt="" coords="5,5,133,32"/>
-<area shape="rect" id="node4" href="$classvinecopulib_1_1_interpolation_grid.html" title="vinecopulib::InterpolationGrid" alt="" coords="158,5,349,32"/>
+<area shape="rect" id="node2" href="$classvinecopulib_1_1_kernel_bicop.html" title="An abstract class for kernel copulas. " alt="" coords="11,80,177,107"/>
+<area shape="rect" id="node3" href="$classvinecopulib_1_1_abstract_bicop.html" title="An abstract class for bivariate copula families. " alt="" coords="5,5,183,32"/>
 </map>

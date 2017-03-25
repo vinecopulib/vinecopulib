@@ -28,10 +28,9 @@ namespace vinecopulib
     //! Create a bivariate copula using the default contructor
     //!
     //! @param family the copula family.
-    //! @param rotation the rotation type.
     //! @param parameters the copula parameters (optional, must be compatible 
     //!     with family).
-    //! @return A pointer to an object that inherits from \c Bicop.
+    //! @return A pointer to an object that inherits from AbstractBicop.
     //! @{
     BicopPtr AbstractBicop::create(BicopFamily family, 
         const Eigen::MatrixXd& parameters)

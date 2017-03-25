@@ -12,51 +12,32 @@
 
 namespace tools_optimization {
 
-    //! A helper struct for nlopt (profile) maximum likelihood estimation
-    //!
+    //! @brief A helper struct for (profile) maximum likelihood estimation
     typedef struct
     {
-        const Eigen::MatrixXd& U; //! The data
-        vinecopulib::ParBicop* bicop; //! A pointer to the bivariate copula to optimize
-        double par0;  //! The main dependence parameter
-        unsigned int objective_calls; //! The number of evaluations of the objective
+        const Eigen::MatrixXd& U; //!< the data.
+        vinecopulib::ParBicop* bicop; //!< a pointer to the bivariate copula to optimize.
+        double par0;  //!< main dependence parameter.
+        unsigned int objective_calls; //!< number of evaluations of the objective.
     } ParBicopOptData;
 
-    //! A class for the controls to nlopt
-    //!
+    //! @brief A class for the controls to NLopt
     class NLoptControls
     {
     public:
 
-        //! Create controls using the default contructor
-        //!
-        //! @return The default NLopt controls.
         NLoptControls();
+        NLoptControls(double xtol_rel, double xtol_abs, double ftol_rel, 
+            double ftol_abs, int maxeval);
 
-        //! Create controls by passing the arguments
-        //!
-        //! @param xtol_rel Relative tolerance on the parameter value
-        //! @param xtol_abs Absolute tolerance on the parameter value
-        //! @param ftol_rel Relative tolerance on the function value
-        //! @param ftol_abs Absolue tolerance on the function value
-        //! @param maxeval Maximal number of evaluations of the objective
-        //! @return Custom NLopt controls.
-        NLoptControls(double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval);
-
-
-        //! Set controls of an optimizer
-        //!
-        //! @param opt Pointer to the optimizer for control setting
         void set_controls(nlopt::opt* opt);
 
-        //! Getters and setters.
-        //! @{
         double get_xtol_rel();
         double get_xtol_abs();
         double get_ftol_rel();
         double get_ftol_abs();
         double get_maxeval();
-        //! @}
+
     private:
         double xtol_rel_; //! Relative tolerance on the parameter value
         double xtol_abs_; //! Absolute tolerance on the parameter value
@@ -66,49 +47,22 @@ namespace tools_optimization {
 
         //! Sanity checks
         //! @{
-        void check_parameters(double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval);
+        void check_parameters(double xtol_rel, double xtol_abs, double ftol_rel,
+             double ftol_abs, int maxeval);
         //! @}
     };
 
-
+    //! @brief A class for optimization (wrapping NLopt).
     class Optimizer {
     public:
-        //! Create an optimizer using the default controls
-        //!
-        //! @param n_parameters Number of parameters to optimize
-        //! @return An optimizer using the default controls.
         Optimizer(unsigned int n_parameters);
-
-        //! Create an optimizer using the custom controls
-        //!
-        //! @param n_parameters Number of parameters to optimize
-        //! @param xtol_rel Relative tolerance on the parameter value
-        //! @param xtol_abs Absolute tolerance on the parameter value
-        //! @param ftol_rel Relative tolerance on the function value
-        //! @param ftol_abs Absolue tolerance on the function value
-        //! @param maxeval Maximal number of evaluations of the objective
-        //! @return An optimizer using the custom controls.
         Optimizer(unsigned int n_parameters, double xtol_rel, double xtol_abs,
                   double ftol_rel, double ftol_abs, int maxeval);
-
-        //! Set the optimizer's bounds
-        //!
-        //! @param bounds A matrix of parameters bounds
-        void set_bounds(
-            const Eigen::MatrixXd& lower_bounds,
-            const Eigen::MatrixXd& upper_bounds
-        );
-
-        //! Set the optimizer's objective and data
-        //!
-        //! @param f The optimizer's objective function (see nlopt's documentation)
-        //! @param data The optimizer's data (see nlopt's documentation)
+        
+        void set_bounds(const Eigen::MatrixXd& lower_bounds,
+            const Eigen::MatrixXd& upper_bounds);
         void set_objective(nlopt::vfunc f, void* f_data);
 
-        //! Solve the optimization problem
-        //!
-        //! @param initial_parameters Eigen::Vector of starting values
-        //! @return MLE or PMLE
         Eigen::VectorXd optimize(Eigen::VectorXd initial_parameters);
 
     private:

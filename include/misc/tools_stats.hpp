@@ -13,60 +13,62 @@
 
 namespace tools_stats
 {
-    template<typename T> T dnorm(const T& x)
+    //! @name Standard normal distribution
+    //! 
+    //! @param x evaluation points.
+    //! @{
+
+    //! evaluates the density function.
+    Eigen::MatrixXd dnorm(const Eigen::MatrixXd& x)
     {
         boost::math::normal dist;
         return x.unaryExpr([&dist](double y) {return boost::math::pdf(dist, y);});
     };
 
-    template<typename T> T pnorm(const T& x)
+    //! evaluates the distribution function.
+    Eigen::MatrixXd pnorm(const Eigen::MatrixXd& x)
     {
         boost::math::normal dist;
         return x.unaryExpr([&dist](double y) {return boost::math::cdf(dist, y);});
     };
-
-    template<typename T> T qnorm(const T& x)
+    
+    //! evaluates the quantile function.
+    Eigen::MatrixXd T qnorm(const Eigen::MatrixXd& x)
     {
         boost::math::normal dist;
         return x.unaryExpr([&dist](double y) {return boost::math::quantile(dist, y);});
     };
-
-    template<typename T> T dt(const T& x, double nu)
+    //! @}
+    
+    //! @name Student t distribution
+    //! The mean is assumed to be zero.
+    //! @param x evaluation points.
+    //! @param nu degrees of freedom parameter.
+    //! @{
+    
+    //! evaluates the density function.
+    Eigen::MatrixXd dt(const Eigen::MatrixXd& x, double nu)
     {
         boost::math::students_t dist(nu);
         return x.unaryExpr([&dist](double y) {return boost::math::pdf(dist, y);});
     };
 
-    template<typename T> T pt(const T& x, double nu)
+    //! evaluates the distribution function.
+    Eigen::MatrixXd pt(const Eigen::MatrixXd& x, double nu)
     {
         boost::math::students_t dist(nu);
         return x.unaryExpr([&dist](double y) {return boost::math::cdf(dist, y);});
     };
-
-    template<typename T> T qt(const T& x, double nu)
+    
+    //! evaluates the  quantile function.
+    Eigen::MatrixXd qt(const Eigen::MatrixXd& x, double nu)
     {
         boost::math::students_t dist(nu);
         return x.unaryExpr([&dist](double y) {return boost::math::quantile(dist, y);});
     };
+    //! @}
 
-    //! Simulate from the multivariate uniform distribution
-    //!
-    //! @param n number of observations.
-    //! @param d dimension.
-    //!
-    //! @return A nxd matrix of independent U[0, 1] random variables.
-    inline Eigen::MatrixXd simulate_uniform(int n, int d)
-    {
-        if ((n < 1) | (d < 1)) {
-            throw std::runtime_error("both n and d must be at least 1.");        
-        }
-        Eigen::MatrixXd U(n, d);
-        std::random_device rd;
-        std::default_random_engine generator(rd());
-        std::uniform_real_distribution<double> distribution(0.0, 1.0);
-        return U.unaryExpr([&](double) { return distribution(generator); });
-    }
-
+    Eigen::MatrixXd simulate_uniform(int n, int d);
     Eigen::VectorXd to_pseudo_obs_1d(
             Eigen::VectorXd x,
             std::string ties_method = "average"

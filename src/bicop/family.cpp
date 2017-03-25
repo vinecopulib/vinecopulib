@@ -8,6 +8,8 @@
 #include <stdexcept>
 
 namespace vinecopulib {
+    //! converts a BicopFamily into a string with its name.
+    //! @param family the family.
     std::string get_family_name(BicopFamily family)
     {
         std::string family_name;

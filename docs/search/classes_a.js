@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html',1,'vinecopulib']]]
+  ['optimizer',['Optimizer',['../classtools__optimization_1_1_optimizer.html',1,'tools_optimization']]]
 ];

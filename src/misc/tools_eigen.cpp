@@ -12,9 +12,9 @@
 namespace vinecopulib
 {
     
-    //! Swap the columns of a two-column matrix
+    //! swap the columns of a two-column matrix
     //! @param u the matrix.
-    //! @return a new matrix v with v.col(0) = u.col(1), v.col(1) = u.col(0).
+    //! @return a new matrix v with `v.col(0) = u.col(1)`, `v.col(1) = u.col(0)`.
     Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
          Eigen::Matrix<double, Eigen::Dynamic, 2> u)
     {
@@ -23,10 +23,8 @@ namespace vinecopulib
     }
     
     
-    //! Numerical inversion of a function
-    //!
-    //! Computes the inverse \f$f^{-1}\f$ of a function \f$f\f$ by the bisection
-    //! method.
+    //! computes the inverse \f$ f^{-1} \f$ of a function \f$ f \f$ by the
+    //! bisection method.
     //!
     //! @param x evaluation points.
     //! @param f the function to invert.
@@ -35,7 +33,7 @@ namespace vinecopulib
     //! @param n_iter the number of iterations for the bisection (defaults to 35,
     //! guaranteeing an accuracy of 0.5^35 ~= 6e-11).
     //!
-    //! @return f^{-1}(x).
+    //! @return \f$ f^{-1}(x) \f$.
     Eigen::VectorXd invert_f(
         const Eigen::VectorXd& x, 
         std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
@@ -56,7 +54,14 @@ namespace vinecopulib
 
         return x_tmp;
     }
-
+    
+    //! reads data from a file to an Eigen matrix of integers.
+    //! 
+    //! The function is currently **not safe** and may cause crashes when the 
+    //! arguments are specified incorrectly.
+    //! 
+    //! @param filename the name of the file to read from.
+    //! @param max_buffer_size the maximal buffer size.
     Eigen::MatrixXi read_matxi(const char *filename, int max_buffer_size)
     {
         Eigen::MatrixXd temp = read_matxd(filename, max_buffer_size);
@@ -64,6 +69,13 @@ namespace vinecopulib
         return output;
     }
 
+    //! reads data from a file to an Eigen matrix of doubles.
+    //! 
+    //! The function is currently **not safe** and may cause crashes when the 
+    //! arguments are specified incorrectly.
+    //! 
+    //! @param filename the name of the file to read from.
+    //! @param max_buffer_size the maximal buffer size.
     Eigen::MatrixXd read_matxd(const char *filename, int max_buffer_size)
     {
         using namespace std;
@@ -107,4 +119,6 @@ namespace vinecopulib
         delete [] buff;
         return result;
     };
+    
+    //! @}
 }

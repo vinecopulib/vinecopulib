@@ -17,6 +17,12 @@
 <script type="text/javascript">
   $(document).ready(function() { init_search(); });
 </script>
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
         <link href="doxygen.css" rel="stylesheet" type="text/css" />
         <link href="customdoxygen.css" rel="stylesheet" type="text/css"/>
         <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
@@ -46,7 +52,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -91,7 +97,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>vinecopulib</b></li><li class="navelem"><a class="el" href="classvinecopulib_1_1_gumbel_bicop.html">GumbelBicop</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacevinecopulib.html">vinecopulib</a></li><li class="navelem"><a class="el" href="classvinecopulib_1_1_gumbel_bicop.html">GumbelBicop</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -101,14 +107,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">vinecopulib::GumbelBicop Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>The Gumbel copula.  
+ <a href="classvinecopulib_1_1_gumbel_bicop.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="gumbel_8hpp_source.html">gumbel.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for vinecopulib::GumbelBicop:</div>
 <div class="dyncontent">
 <div class="center"><img src="classvinecopulib_1_1_gumbel_bicop__inherit__graph.png" border="0" usemap="#vinecopulib_1_1_gumbel_bicop_inherit__map" alt="Inheritance graph"/></div>
 <map name="vinecopulib_1_1_gumbel_bicop_inherit__map" id="vinecopulib_1_1_gumbel_bicop_inherit__map">
-<area shape="rect" id="node2" href="classvinecopulib_1_1_archimedean_bicop.html" title="vinecopulib::Archimedean\lBicop" alt="" coords="7,155,177,196"/>
-<area shape="rect" id="node3" href="classvinecopulib_1_1_par_bicop.html" title="vinecopulib::ParBicop" alt="" coords="18,80,166,107"/>
-<area shape="rect" id="node4" href="classvinecopulib_1_1_bicop.html" title="vinecopulib::Bicop" alt="" coords="28,5,156,32"/>
+<area shape="rect" id="node2" href="classvinecopulib_1_1_archimedean_bicop.html" title="An abstract class for Archimedean copula families. " alt="" coords="9,155,179,196"/>
+<area shape="rect" id="node3" href="classvinecopulib_1_1_par_bicop.html" title="An abstract class for parametric copula families. " alt="" coords="20,80,168,107"/>
+<area shape="rect" id="node4" href="classvinecopulib_1_1_abstract_bicop.html" title="An abstract class for bivariate copula families. " alt="" coords="5,5,183,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -116,111 +127,65 @@ Collaboration diagram for vinecopulib::GumbelBicop:</div>
 <div class="dyncontent">
 <div class="center"><img src="classvinecopulib_1_1_gumbel_bicop__coll__graph.png" border="0" usemap="#vinecopulib_1_1_gumbel_bicop_coll__map" alt="Collaboration graph"/></div>
 <map name="vinecopulib_1_1_gumbel_bicop_coll__map" id="vinecopulib_1_1_gumbel_bicop_coll__map">
-<area shape="rect" id="node2" href="classvinecopulib_1_1_archimedean_bicop.html" title="vinecopulib::Archimedean\lBicop" alt="" coords="7,155,177,196"/>
-<area shape="rect" id="node3" href="classvinecopulib_1_1_par_bicop.html" title="vinecopulib::ParBicop" alt="" coords="18,80,166,107"/>
-<area shape="rect" id="node4" href="classvinecopulib_1_1_bicop.html" title="vinecopulib::Bicop" alt="" coords="28,5,156,32"/>
+<area shape="rect" id="node2" href="classvinecopulib_1_1_archimedean_bicop.html" title="An abstract class for Archimedean copula families. " alt="" coords="9,155,179,196"/>
+<area shape="rect" id="node3" href="classvinecopulib_1_1_par_bicop.html" title="An abstract class for parametric copula families. " alt="" coords="20,80,168,107"/>
+<area shape="rect" id="node4" href="classvinecopulib_1_1_abstract_bicop.html" title="An abstract class for bivariate copula families. " alt="" coords="5,5,183,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pub_methods_classvinecopulib_1_1_bicop"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvinecopulib_1_1_bicop')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvinecopulib_1_1_bicop.html">vinecopulib::Bicop</a></td></tr>
-<tr class="memitem:a83dc7214e4bb1bfe59285ca05407d646 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646">pdf</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:a83dc7214e4bb1bfe59285ca05407d646 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga130fda62cd61c7acdef5db75fffdd89e inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">
-Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>hfunc1</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:ga130fda62cd61c7acdef5db75fffdd89e inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4c9b50f99797ec374f5057cc54db2bd8 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">
-Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>hfunc2</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:ga4c9b50f99797ec374f5057cc54db2bd8 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3cc8b161ec6efdb3b34d2efa9185bf44 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">
-Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>hinv1</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:ga3cc8b161ec6efdb3b34d2efa9185bf44 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3e33ec227b6b7182e327399201cad382 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">
-Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>hinv2</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:ga3e33ec227b6b7182e327399201cad382 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb87bea4283dacfa5e609356c020f85d inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#aeb87bea4283dacfa5e609356c020f85d">simulate</a> (const int &amp;n)</td></tr>
-<tr class="separator:aeb87bea4283dacfa5e609356c020f85d inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5809ddc9884f6fb66fe53289be348913 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5809ddc9884f6fb66fe53289be348913"></a>
-Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>tau_to_parameters</b> (const double &amp;tau)</td></tr>
-<tr class="separator:a5809ddc9884f6fb66fe53289be348913 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abfef8396fef667444fa83f6fed1c038d inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abfef8396fef667444fa83f6fed1c038d"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_association_direction</b> () const </td></tr>
-<tr class="separator:abfef8396fef667444fa83f6fed1c038d inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8bcc0c3265cc86565333a0cfd3d619d inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#ae8bcc0c3265cc86565333a0cfd3d619d">loglik</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:ae8bcc0c3265cc86565333a0cfd3d619d inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9287fec95519fea64a2ae80f5888c709 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9287fec95519fea64a2ae80f5888c709"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>aic</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:a9287fec95519fea64a2ae80f5888c709 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1f480d13b3464260c2dd6aa88b2e130 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac1f480d13b3464260c2dd6aa88b2e130"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>bic</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:ac1f480d13b3464260c2dd6aa88b2e130 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68ab3556ee3bb3d02814fd978573bf3b inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">BicopFamily&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a68ab3556ee3bb3d02814fd978573bf3b">get_family</a> () const </td></tr>
-<tr class="separator:a68ab3556ee3bb3d02814fd978573bf3b inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d4fbc0fdca17564c23f4814d5d2fbe7 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4d4fbc0fdca17564c23f4814d5d2fbe7"></a>
+<tr class="inherit_header pro_methods_classvinecopulib_1_1_abstract_bicop"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classvinecopulib_1_1_abstract_bicop')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classvinecopulib_1_1_abstract_bicop.html">vinecopulib::AbstractBicop</a></td></tr>
+<tr class="memitem:a4e62970bb8e533f97f66c280c1a908cf inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e62970bb8e533f97f66c280c1a908cf"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_abstract_bicop.html#a4e62970bb8e533f97f66c280c1a908cf">flip</a> ()</td></tr>
+<tr class="memdesc:a4e62970bb8e533f97f66c280c1a908cf inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust the copula to flipped columns. <br /></td></tr>
+<tr class="separator:a4e62970bb8e533f97f66c280c1a908cf inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61878ff0664fa099f6f6ca4b7ad7833a inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_abstract_bicop.html#a61878ff0664fa099f6f6ca4b7ad7833a">get_family</a> () const </td></tr>
+<tr class="separator:a61878ff0664fa099f6f6ca4b7ad7833a inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a294c3d6614fb1d42b4846599292f3197 inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a294c3d6614fb1d42b4846599292f3197"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_family_name</b> () const </td></tr>
-<tr class="separator:a4d4fbc0fdca17564c23f4814d5d2fbe7 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8e52577a50fbfc57277f9240d8eac03 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab8e52577a50fbfc57277f9240d8eac03"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>get_rotation</b> () const </td></tr>
-<tr class="separator:ab8e52577a50fbfc57277f9240d8eac03 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93ab0dd89826e50b209ea3760f251f2f inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a93ab0dd89826e50b209ea3760f251f2f"></a>
+<tr class="separator:a294c3d6614fb1d42b4846599292f3197 inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5de117aa32e3e53ef787d517f965f1bc inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5de117aa32e3e53ef787d517f965f1bc"></a>
 Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>get_parameters</b> () const </td></tr>
-<tr class="separator:a93ab0dd89826e50b209ea3760f251f2f inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35bd07862fbce9dd2b78c0d25c8e8352 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a35bd07862fbce9dd2b78c0d25c8e8352"></a>
+<tr class="separator:a5de117aa32e3e53ef787d517f965f1bc inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7d234b7d647269f21b1904ab17d0a6b inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7d234b7d647269f21b1904ab17d0a6b"></a>
 Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>get_parameters_lower_bounds</b> () const </td></tr>
-<tr class="separator:a35bd07862fbce9dd2b78c0d25c8e8352 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ac1336e4640af7ebaa8b6dc7147eb89 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ac1336e4640af7ebaa8b6dc7147eb89"></a>
+<tr class="separator:ae7d234b7d647269f21b1904ab17d0a6b inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac772d0c6e28b845a44a721568ac9bbe2 inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac772d0c6e28b845a44a721568ac9bbe2"></a>
 Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>get_parameters_upper_bounds</b> () const </td></tr>
-<tr class="separator:a5ac1336e4640af7ebaa8b6dc7147eb89 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8781e97362a14f86ecf547e6c5257a44 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8781e97362a14f86ecf547e6c5257a44"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_rotation</b> (const int &amp;rotation)</td></tr>
-<tr class="separator:a8781e97362a14f86ecf547e6c5257a44 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8d1d4266b0fd7e2f971d0149f881ef9 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8d1d4266b0fd7e2f971d0149f881ef9"></a>
+<tr class="separator:ac772d0c6e28b845a44a721568ac9bbe2 inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80596978ad8ec752a442f4a41dd0aedc inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a80596978ad8ec752a442f4a41dd0aedc"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>set_parameters</b> (const Eigen::MatrixXd &amp;parameters)</td></tr>
-<tr class="separator:ac8d1d4266b0fd7e2f971d0149f881ef9 inherit pub_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_static_methods_classvinecopulib_1_1_bicop"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classvinecopulib_1_1_bicop')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classvinecopulib_1_1_bicop.html">vinecopulib::Bicop</a></td></tr>
-<tr class="memitem:a24fe355af519622ee62efb83bf2f2085 inherit pub_static_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classvinecopulib_1_1_bicop.html">Bicop</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a24fe355af519622ee62efb83bf2f2085">select</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; data, std::vector&lt; BicopFamily &gt; family_set=bicop_families::all, std::string method=&quot;mle&quot;, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true)</td></tr>
-<tr class="separator:a24fe355af519622ee62efb83bf2f2085 inherit pub_static_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b2045fa99e5d3aa76a3518426002b19 inherit pub_static_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classvinecopulib_1_1_bicop.html">Bicop</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a0b2045fa99e5d3aa76a3518426002b19">create</a> (BicopFamily family=BicopFamily::indep, int rotation=0)</td></tr>
-<tr class="separator:a0b2045fa99e5d3aa76a3518426002b19 inherit pub_static_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e2d12a9063ada973caf1bdc0380e722 inherit pub_static_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e2d12a9063ada973caf1bdc0380e722"></a>
-static std::shared_ptr&lt; <a class="el" href="classvinecopulib_1_1_bicop.html">Bicop</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> (BicopFamily family, int rotation, Eigen::VectorXd parameters)</td></tr>
-<tr class="separator:a2e2d12a9063ada973caf1bdc0380e722 inherit pub_static_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_classvinecopulib_1_1_archimedean_bicop"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classvinecopulib_1_1_archimedean_bicop')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classvinecopulib_1_1_archimedean_bicop.html">vinecopulib::ArchimedeanBicop</a></td></tr>
-<tr class="memitem:a7ded3792cb1eebe53e97076f2e681137 inherit pro_methods_classvinecopulib_1_1_archimedean_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ded3792cb1eebe53e97076f2e681137"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>flip_tau</b> (double tau)</td></tr>
-<tr class="separator:a7ded3792cb1eebe53e97076f2e681137 inherit pro_methods_classvinecopulib_1_1_archimedean_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_classvinecopulib_1_1_bicop"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classvinecopulib_1_1_bicop')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classvinecopulib_1_1_bicop.html">vinecopulib::Bicop</a></td></tr>
-<tr class="memitem:a1220ac0456ae1a26c586cdc55258fabd inherit pro_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a1220ac0456ae1a26c586cdc55258fabd">hinv1_num</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:a1220ac0456ae1a26c586cdc55258fabd inherit pro_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36a542f48c3c453397d8a097e0e97ca3 inherit pro_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a36a542f48c3c453397d8a097e0e97ca3"></a>
+<tr class="separator:a80596978ad8ec752a442f4a41dd0aedc inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7dc5b05857ece56b7e336e1175387a8e inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_abstract_bicop.html#a7dc5b05857ece56b7e336e1175387a8e">hinv1_num</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:a7dc5b05857ece56b7e336e1175387a8e inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e1077b6f22785f1f4c5fa09b47dae7a inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8e1077b6f22785f1f4c5fa09b47dae7a"></a>
 Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>hinv2_num</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:a36a542f48c3c453397d8a097e0e97ca3 inherit pro_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72bef78e15ecce5a195c71ab7abf030c inherit pro_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a72bef78e15ecce5a195c71ab7abf030c">cut_and_rotate</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:a72bef78e15ecce5a195c71ab7abf030c inherit pro_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa768f5957af2b4d043e6a29b0500573 inherit pro_methods_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaa768f5957af2b4d043e6a29b0500573"></a>
-Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>swap_cols</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:aaa768f5957af2b4d043e6a29b0500573 inherit pro_methods_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_attribs_classvinecopulib_1_1_bicop"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classvinecopulib_1_1_bicop')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classvinecopulib_1_1_bicop.html">vinecopulib::Bicop</a></td></tr>
-<tr class="memitem:aba9d36d57f3c7aaa8e119f52e0d732ea inherit pro_attribs_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba9d36d57f3c7aaa8e119f52e0d732ea"></a>
-BicopFamily&#160;</td><td class="memItemRight" valign="bottom"><b>family_</b></td></tr>
-<tr class="separator:aba9d36d57f3c7aaa8e119f52e0d732ea inherit pro_attribs_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8730514d4d92ef8ec400a3336d5f1f4d inherit pro_attribs_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8730514d4d92ef8ec400a3336d5f1f4d"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>rotation_</b></td></tr>
-<tr class="separator:a8730514d4d92ef8ec400a3336d5f1f4d inherit pro_attribs_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cf5f9ed3e49f48d561cedc81d08cf07 inherit pro_attribs_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0cf5f9ed3e49f48d561cedc81d08cf07"></a>
+<tr class="separator:a8e1077b6f22785f1f4c5fa09b47dae7a inherit pro_methods_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_static_methods_classvinecopulib_1_1_abstract_bicop"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classvinecopulib_1_1_abstract_bicop')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classvinecopulib_1_1_abstract_bicop.html">vinecopulib::AbstractBicop</a></td></tr>
+<tr class="memitem:afefe048baabaa8cd14e849e66a45c428 inherit pro_static_methods_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classvinecopulib_1_1_abstract_bicop.html">AbstractBicop</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_abstract_bicop.html#afefe048baabaa8cd14e849e66a45c428">create</a> (<a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> family=<a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65">BicopFamily::indep</a>, const Eigen::MatrixXd &amp;parameters=Eigen::MatrixXd())</td></tr>
+<tr class="separator:afefe048baabaa8cd14e849e66a45c428 inherit pro_static_methods_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classvinecopulib_1_1_abstract_bicop"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classvinecopulib_1_1_abstract_bicop')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classvinecopulib_1_1_abstract_bicop.html">vinecopulib::AbstractBicop</a></td></tr>
+<tr class="memitem:a0b731d28eefd359b1e15951d5e58f093 inherit pro_attribs_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0b731d28eefd359b1e15951d5e58f093"></a>
+<a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a>&#160;</td><td class="memItemRight" valign="bottom"><b>family_</b></td></tr>
+<tr class="separator:a0b731d28eefd359b1e15951d5e58f093 inherit pro_attribs_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38f60d7c268c71bf93cfbb4203724478 inherit pro_attribs_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a38f60d7c268c71bf93cfbb4203724478"></a>
 Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>parameters_</b></td></tr>
-<tr class="separator:a0cf5f9ed3e49f48d561cedc81d08cf07 inherit pro_attribs_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cefe4b2d05df4e92682660702609983 inherit pro_attribs_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3cefe4b2d05df4e92682660702609983"></a>
+<tr class="separator:a38f60d7c268c71bf93cfbb4203724478 inherit pro_attribs_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac35229a8c8ab553321f6e4deba646d58 inherit pro_attribs_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac35229a8c8ab553321f6e4deba646d58"></a>
 Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>parameters_lower_bounds_</b></td></tr>
-<tr class="separator:a3cefe4b2d05df4e92682660702609983 inherit pro_attribs_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac56fc06af8639918bf07d3f558b5435 inherit pro_attribs_classvinecopulib_1_1_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac56fc06af8639918bf07d3f558b5435"></a>
+<tr class="separator:ac35229a8c8ab553321f6e4deba646d58 inherit pro_attribs_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab60ca983aac95c3ead7c07db1d227ee inherit pro_attribs_classvinecopulib_1_1_abstract_bicop"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab60ca983aac95c3ead7c07db1d227ee"></a>
 Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>parameters_upper_bounds_</b></td></tr>
-<tr class="separator:aac56fc06af8639918bf07d3f558b5435 inherit pro_attribs_classvinecopulib_1_1_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:aab60ca983aac95c3ead7c07db1d227ee inherit pro_attribs_classvinecopulib_1_1_abstract_bicop"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following files:<ul>
-<li>/home/n5/dev/cpp/vinecopulib/include/<a class="el" href="bicop__gumbel_8hpp_source.html">bicop_gumbel.hpp</a></li>
-<li>/home/n5/dev/cpp/vinecopulib/src/bicop_gumbel.cpp</li>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The Gumbel copula. </p>
+<p>This class is used in the implementation underlying the <a class="el" href="classvinecopulib_1_1_bicop.html" title="A class for bivariate copula models. ">Bicop</a> class. Users should not use <a class="el" href="classvinecopulib_1_1_abstract_bicop.html" title="An abstract class for bivariate copula families. ">AbstractBicop</a> or derived classes directly, but always work with the <a class="el" href="classvinecopulib_1_1_bicop.html" title="A class for bivariate copula models. ">Bicop</a> interface.</p>
+<p>Joe, Harry. Dependence modeling with copulas. CRC Press, 2014. </p>
+</div><hr/>The documentation for this class was generated from the following files:<ul>
+<li>/home/n5/dev/cpp/vinecopulib/include/bicop/<a class="el" href="gumbel_8hpp_source.html">gumbel.hpp</a></li>
+<li>/home/n5/dev/cpp/vinecopulib/src/bicop/gumbel.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.8-->
@@ -231,7 +196,7 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>parameters
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 22 2017 00:05:38 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Mar 25 2017 17:39:45 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

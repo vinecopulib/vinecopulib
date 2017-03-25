@@ -2,69 +2,418 @@
 \label{classvinecopulib_1_1_vinecop}\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
 
 
-A class for vine copulas.  
+A class for vine copula models.  
 
 
 
 
-{\ttfamily \#include $<$vinecop\+\_\+class.\+hpp$>$}
+{\ttfamily \#include $<$class.\+hpp$>$}
 
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-{\bfseries Vinecop} (int d)\hypertarget{classvinecopulib_1_1_vinecop_a7c6bae90feba9d70bf692e4d50d02bc7}{}\label{classvinecopulib_1_1_vinecop_a7c6bae90feba9d70bf692e4d50d02bc7}
-
+\hyperlink{classvinecopulib_1_1_vinecop_a7c6bae90feba9d70bf692e4d50d02bc7}{Vinecop} (int d)
 \item 
-{\bfseries Vinecop} (const std\+::vector$<$ std\+::vector$<$ Bicop\+Ptr $>$$>$ \&pair\+\_\+copulas, const Eigen\+::\+Matrix\+Xi \&matrix)\hypertarget{classvinecopulib_1_1_vinecop_a37559eece324ec4ecf8ae13c6eb82a3c}{}\label{classvinecopulib_1_1_vinecop_a37559eece324ec4ecf8ae13c6eb82a3c}
-
+\hyperlink{classvinecopulib_1_1_vinecop_a561fc84ab874520e6dab9107fc45579a}{Vinecop} (const Eigen\+::\+Matrix\+Xi \&matrix)
 \item 
-Bicop\+Ptr {\bfseries get\+\_\+pair\+\_\+copula} (int tree, int edge) const \hypertarget{classvinecopulib_1_1_vinecop_a0c121e831581227e6ed75387d1babfff}{}\label{classvinecopulib_1_1_vinecop_a0c121e831581227e6ed75387d1babfff}
-
+\hyperlink{classvinecopulib_1_1_vinecop_a013a9d4eef7eb5e615a18bb3c36fd5dc}{Vinecop} (const std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$$>$ \&pair\+\_\+copulas, const Eigen\+::\+Matrix\+Xi \&matrix)
 \item 
-Bicop\+Family {\bfseries get\+\_\+family} (int tree, int edge) const \hypertarget{classvinecopulib_1_1_vinecop_ab2b5aecbe06c5219919f5b3c7436f1da}{}\label{classvinecopulib_1_1_vinecop_ab2b5aecbe06c5219919f5b3c7436f1da}
-
+\hyperlink{classvinecopulib_1_1_vinecop_ae74d750f9f59c33cbb2047347c44a530}{Vinecop} (const Eigen\+::\+Matrix\+Xd \&data, const Eigen\+::\+Matrix\+Xi \&matrix=Eigen\+::\+Matrix\+Xi(), std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=\hyperlink{namespacevinecopulib_1_1bicop__families_a5214a513f41ec23b74782aab96ea6774}{bicop\+\_\+families\+::all}, std\+::string method=\char`\"{}mle\char`\"{}, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), double threshold=0.\+0, std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool show\+\_\+trace=false)
 \item 
-std\+::vector$<$ std\+::vector$<$ Bicop\+Family $>$ $>$ {\bfseries get\+\_\+all\+\_\+families} () const \hypertarget{classvinecopulib_1_1_vinecop_a8b07344bedafeb618982f480240a5f15}{}\label{classvinecopulib_1_1_vinecop_a8b07344bedafeb618982f480240a5f15}
-
+void \hyperlink{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{select\+\_\+all} (const Eigen\+::\+Matrix\+Xd \&data, std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=\hyperlink{namespacevinecopulib_1_1bicop__families_a5214a513f41ec23b74782aab96ea6774}{bicop\+\_\+families\+::all}, std\+::string method=\char`\"{}mle\char`\"{}, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), double threshold=0.\+0, std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool show\+\_\+trace=false)
 \item 
-int {\bfseries get\+\_\+rotation} (int tree, int edge) const \hypertarget{classvinecopulib_1_1_vinecop_abfa48760cc636cadce6fa875a883922a}{}\label{classvinecopulib_1_1_vinecop_abfa48760cc636cadce6fa875a883922a}
-
+void \hyperlink{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{select\+\_\+families} (const Eigen\+::\+Matrix\+Xd \&data, std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=\hyperlink{namespacevinecopulib_1_1bicop__families_a5214a513f41ec23b74782aab96ea6774}{bicop\+\_\+families\+::all}, std\+::string method=\char`\"{}mle\char`\"{}, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), double threshold=0.\+0, std\+::string threshold\+\_\+criterion=\char`\"{}tau\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool show\+\_\+trace=false)
 \item 
-std\+::vector$<$ std\+::vector$<$ int $>$ $>$ {\bfseries get\+\_\+all\+\_\+rotations} () const \hypertarget{classvinecopulib_1_1_vinecop_a33715bd84261180ea637275f9d8b881b}{}\label{classvinecopulib_1_1_vinecop_a33715bd84261180ea637275f9d8b881b}
-
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_vinecop_adf3760b8dd2b6d3a9cae5426188d4489}{pdf} (const Eigen\+::\+Matrix\+Xd \&u)
 \item 
-Eigen\+::\+Vector\+Xd {\bfseries get\+\_\+parameters} (int tree, int edge) const \hypertarget{classvinecopulib_1_1_vinecop_a2ddcc85cb5f2c05edd9093fe863812f6}{}\label{classvinecopulib_1_1_vinecop_a2ddcc85cb5f2c05edd9093fe863812f6}
-
+Eigen\+::\+Matrix\+Xd \hyperlink{classvinecopulib_1_1_vinecop_aa675aac119538648d60368a3572d1b5c}{simulate} (int n)
 \item 
-std\+::vector$<$ std\+::vector$<$ Eigen\+::\+Vector\+Xd $>$ $>$ {\bfseries get\+\_\+all\+\_\+parameters} () const \hypertarget{classvinecopulib_1_1_vinecop_ae1f173e30760405a445ec7d2ad8d41ea}{}\label{classvinecopulib_1_1_vinecop_ae1f173e30760405a445ec7d2ad8d41ea}
-
-\item 
-Eigen\+::\+Matrix\+Xi {\bfseries get\+\_\+matrix} () const \hypertarget{classvinecopulib_1_1_vinecop_aaac38f862f3b8ffd68ca04564fd0cf06}{}\label{classvinecopulib_1_1_vinecop_aaac38f862f3b8ffd68ca04564fd0cf06}
-
-\item 
-Eigen\+::\+Vector\+Xd {\bfseries pdf} (const Eigen\+::\+Matrix\+Xd \&u)\hypertarget{classvinecopulib_1_1_vinecop_adf3760b8dd2b6d3a9cae5426188d4489}{}\label{classvinecopulib_1_1_vinecop_adf3760b8dd2b6d3a9cae5426188d4489}
-
-\item 
-Eigen\+::\+Matrix\+Xd {\bfseries simulate} (int n)\hypertarget{classvinecopulib_1_1_vinecop_aa675aac119538648d60368a3572d1b5c}{}\label{classvinecopulib_1_1_vinecop_aa675aac119538648d60368a3572d1b5c}
-
-\item 
-Eigen\+::\+Matrix\+Xd {\bfseries inverse\+\_\+rosenblatt} (const Eigen\+::\+Matrix\+Xd \&U)\hypertarget{classvinecopulib_1_1_vinecop_a3d8819be948be348b6b3f30495b364ff}{}\label{classvinecopulib_1_1_vinecop_a3d8819be948be348b6b3f30495b364ff}
-
+Eigen\+::\+Matrix\+Xd \hyperlink{classvinecopulib_1_1_vinecop_a3d8819be948be348b6b3f30495b364ff}{inverse\+\_\+rosenblatt} (const Eigen\+::\+Matrix\+Xd \&U)
 \end{DoxyCompactItemize}
+\begin{Indent}{\bf Getters}\par
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classvinecopulib_1_1_bicop}{Bicop} \hyperlink{classvinecopulib_1_1_vinecop_a22262e99414e23dbe7c7f0e773041185}{get\+\_\+pair\+\_\+copula} (int tree, int edge) const 
+\item 
+\hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} \hyperlink{classvinecopulib_1_1_vinecop_ab2b5aecbe06c5219919f5b3c7436f1da}{get\+\_\+family} (int tree, int edge) const 
+\item 
+int \hyperlink{classvinecopulib_1_1_vinecop_abfa48760cc636cadce6fa875a883922a}{get\+\_\+rotation} (int tree, int edge) const 
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_vinecop_a2ddcc85cb5f2c05edd9093fe863812f6}{get\+\_\+parameters} (int tree, int edge) const 
+\item 
+Eigen\+::\+Matrix\+Xi \hyperlink{classvinecopulib_1_1_vinecop_aaac38f862f3b8ffd68ca04564fd0cf06}{get\+\_\+matrix} () const \hypertarget{classvinecopulib_1_1_vinecop_aaac38f862f3b8ffd68ca04564fd0cf06}{}\label{classvinecopulib_1_1_vinecop_aaac38f862f3b8ffd68ca04564fd0cf06}
+
+\begin{DoxyCompactList}\small\item\em extracts the structure matrix of the vine copula model. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_acb041d08afd6b7efac4f3769273300d7}{get\+\_\+all\+\_\+pair\+\_\+copulas} () const 
+\item 
+std\+::vector$<$ std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_adcb572c440756a00dfaea0188caffb85}{get\+\_\+all\+\_\+families} () const 
+\item 
+std\+::vector$<$ std\+::vector$<$ int $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_a7cbfca10a16e4c45f4b5d94343b5fc20}{get\+\_\+all\+\_\+rotations} () const 
+\item 
+std\+::vector$<$ std\+::vector$<$ Eigen\+::\+Vector\+Xd $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_a3ab6a85281503d42f3a07036001bd657}{get\+\_\+all\+\_\+parameters} () const 
+\end{DoxyCompactItemize}
+\end{Indent}
 \subsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-static std\+::vector$<$ std\+::vector$<$ Bicop\+Ptr $>$ $>$ {\bfseries make\+\_\+pair\+\_\+copula\+\_\+store} (int d)\hypertarget{classvinecopulib_1_1_vinecop_af0f675bde31f0711e642dd7b65161ef4}{}\label{classvinecopulib_1_1_vinecop_af0f675bde31f0711e642dd7b65161ef4}
-
-\item 
-static \hyperlink{classvinecopulib_1_1_vinecop}{Vinecop} {\bfseries select} (const Eigen\+::\+Matrix\+Xd \&data, std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=\char`\"{}mle\char`\"{}, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), Eigen\+::\+Matrix\+Xi matrix=Eigen\+::\+Matrix\+Xi(0, 0), std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool show\+\_\+trace=false)\hypertarget{classvinecopulib_1_1_vinecop_a6a2806138d4ec5aca9db47813968fe11}{}\label{classvinecopulib_1_1_vinecop_a6a2806138d4ec5aca9db47813968fe11}
-
+static std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_a17132eaa4b61b54d6d1c83aaa08744be}{make\+\_\+pair\+\_\+copula\+\_\+store} (int d)
 \end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
-A class for vine copulas. 
+A class for vine copula models. 
 
-The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+A vine copula model is characterized by the structure matrix (see \hyperlink{classvinecopulib_1_1_r_vine_matrix}{R\+Vine\+Matrix}) and the pair-\/copulas. 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{Vinecop(int d)}{Vinecop(int d)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
+\begin{DoxyParamCaption}
+\item[{int}]{d}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_a7c6bae90feba9d70bf692e4d50d02bc7}{}\label{classvinecopulib_1_1_vinecop_a7c6bae90feba9d70bf692e4d50d02bc7}
+creates a D-\/vine on {\ttfamily d} variables with all pair-\/copulas set to independence. 
+\begin{DoxyParams}{Parameters}
+{\em d} & the dimension (= number of variables) of the model. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{Vinecop(const Eigen\+::\+Matrix\+Xi \&matrix)}{Vinecop(const Eigen::MatrixXi &matrix)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xi \&}]{matrix}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_a561fc84ab874520e6dab9107fc45579a}{}\label{classvinecopulib_1_1_vinecop_a561fc84ab874520e6dab9107fc45579a}
+creates a vine copula with structure specified by an R-\/vine matrix; all pair-\/copulas are set to independence. 
+\begin{DoxyParams}{Parameters}
+{\em matrix} & an R-\/vine matrix. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{Vinecop(const std\+::vector$<$ std\+::vector$<$ Bicop $>$$>$ \&pair\+\_\+copulas, const Eigen\+::\+Matrix\+Xi \&matrix)}{Vinecop(const std::vector< std::vector< Bicop >> &pair_copulas, const Eigen::MatrixXi &matrix)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
+\begin{DoxyParamCaption}
+\item[{const std\+::vector$<$ std\+::vector$<$ {\bf Bicop} $>$$>$ \&}]{pair\+\_\+copulas, }
+\item[{const Eigen\+::\+Matrix\+Xi \&}]{matrix}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_a013a9d4eef7eb5e615a18bb3c36fd5dc}{}\label{classvinecopulib_1_1_vinecop_a013a9d4eef7eb5e615a18bb3c36fd5dc}
+creates an arbitrary vine copula model. 
+\begin{DoxyParams}{Parameters}
+{\em pair\+\_\+copulas} & \hyperlink{classvinecopulib_1_1_bicop}{Bicop} objects specifying the pair-\/copulas, see \hyperlink{classvinecopulib_1_1_vinecop_a17132eaa4b61b54d6d1c83aaa08744be}{make\+\_\+pair\+\_\+copula\+\_\+store()}. \\
+\hline
+{\em matrix} & an R-\/vine matrix specifying the vine structure. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{Vinecop(const Eigen\+::\+Matrix\+Xd \&data, const Eigen\+::\+Matrix\+Xi \&matrix=\+Eigen\+::\+Matrix\+Xi(), std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=""mle"", int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), double threshold=0.\+0, std\+::string tree\+\_\+criterion=""tau"", std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true, bool show\+\_\+trace=false)}{Vinecop(const Eigen::MatrixXd &data, const Eigen::MatrixXi &matrix=Eigen::MatrixXi(), std::vector< BicopFamily > family_set=bicop_families::all, std::string method="mle", int truncation_level=std::numeric_limits< int >::max(), double threshold=0.0, std::string tree_criterion="tau", std::string selection_criterion="bic", bool preselect_families=true, bool show_trace=false)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{data, }
+\item[{const Eigen\+::\+Matrix\+Xi \&}]{matrix = {\ttfamily Eigen\+:\+:MatrixXi()}, }
+\item[{std\+::vector$<$ {\bf Bicop\+Family} $>$}]{family\+\_\+set = {\ttfamily {\bf bicop\+\_\+families\+::all}}, }
+\item[{std\+::string}]{method = {\ttfamily \char`\"{}mle\char`\"{}}, }
+\item[{int}]{truncation\+\_\+level = {\ttfamily std\+:\+:numeric\+\_\+limits$<$int$>$\+:\+:max()}, }
+\item[{double}]{threshold = {\ttfamily 0.0}, }
+\item[{std\+::string}]{tree\+\_\+criterion = {\ttfamily \char`\"{}tau\char`\"{}}, }
+\item[{std\+::string}]{selection\+\_\+criterion = {\ttfamily \char`\"{}bic\char`\"{}}, }
+\item[{bool}]{preselect\+\_\+families = {\ttfamily true}, }
+\item[{bool}]{show\+\_\+trace = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_ae74d750f9f59c33cbb2047347c44a530}{}\label{classvinecopulib_1_1_vinecop_ae74d750f9f59c33cbb2047347c44a530}
+constructs a vine copula model from data.
+
+The function creates a model and calls \hyperlink{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{select\+\_\+all()} (when {\ttfamily matrix} is empty) or \hyperlink{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{select\+\_\+families()} (when matrix is specified).
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & an $ n \times d $ matrix of observations. \\
+\hline
+{\em matrix} & either an empty matrix (default) or an R-\/vine structure matrix, see \hyperlink{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{select\+\_\+families()}. \\
+\hline
+{\em family\+\_\+set} & see \hyperlink{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{select\+\_\+all()} / \hyperlink{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{select\+\_\+families()}. \\
+\hline
+{\em method} & see \hyperlink{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{select\+\_\+all()} / \hyperlink{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{select\+\_\+families()}. \\
+\hline
+{\em truncation\+\_\+level} & see \hyperlink{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{select\+\_\+all()} / \hyperlink{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{select\+\_\+families()}. \\
+\hline
+{\em threshold} & see \hyperlink{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{select\+\_\+all()} / \hyperlink{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{select\+\_\+families()}. \\
+\hline
+{\em tree\+\_\+criterion} & see \hyperlink{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{select\+\_\+all()}. \\
+\hline
+{\em selection\+\_\+criterion} & see \hyperlink{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{select\+\_\+all()} / \hyperlink{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{select\+\_\+families()}. \\
+\hline
+{\em preselect\+\_\+families} & see \hyperlink{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{select\+\_\+all()} / \hyperlink{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{select\+\_\+families()}. \\
+\hline
+{\em show\+\_\+trace} & see \hyperlink{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{select\+\_\+all()} / \hyperlink{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{select\+\_\+families()}. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+families@{get\+\_\+all\+\_\+families}}
+\index{get\+\_\+all\+\_\+families@{get\+\_\+all\+\_\+families}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{get\+\_\+all\+\_\+families() const }{get_all_families() const }}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$ {\bf Bicop\+Family} $>$ $>$ vinecopulib\+::\+Vinecop\+::get\+\_\+all\+\_\+families (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_vinecop_adcb572c440756a00dfaea0188caffb85}{}\label{classvinecopulib_1_1_vinecop_adcb572c440756a00dfaea0188caffb85}
+extracts the families of all pair copulas.
+
+\begin{DoxyReturn}{Returns}
+a nested std\+::vector with entry {\ttfamily \mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} corresponding to edge {\ttfamily e} in tree {\ttfamily t}. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+pair\+\_\+copulas@{get\+\_\+all\+\_\+pair\+\_\+copulas}}
+\index{get\+\_\+all\+\_\+pair\+\_\+copulas@{get\+\_\+all\+\_\+pair\+\_\+copulas}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{get\+\_\+all\+\_\+pair\+\_\+copulas() const }{get_all_pair_copulas() const }}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$ {\bf Bicop} $>$ $>$ vinecopulib\+::\+Vinecop\+::get\+\_\+all\+\_\+pair\+\_\+copulas (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_vinecop_acb041d08afd6b7efac4f3769273300d7}{}\label{classvinecopulib_1_1_vinecop_acb041d08afd6b7efac4f3769273300d7}
+extracts all pair copulas.
+
+\begin{DoxyReturn}{Returns}
+a nested std\+::vector with entry {\ttfamily \mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} corresponding to edge {\ttfamily e} in tree {\ttfamily t}. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+parameters@{get\+\_\+all\+\_\+parameters}}
+\index{get\+\_\+all\+\_\+parameters@{get\+\_\+all\+\_\+parameters}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{get\+\_\+all\+\_\+parameters() const }{get_all_parameters() const }}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$ Eigen\+::\+Vector\+Xd $>$ $>$ vinecopulib\+::\+Vinecop\+::get\+\_\+all\+\_\+parameters (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_vinecop_a3ab6a85281503d42f3a07036001bd657}{}\label{classvinecopulib_1_1_vinecop_a3ab6a85281503d42f3a07036001bd657}
+extracts the parameters of all pair copulas.
+
+\begin{DoxyReturn}{Returns}
+a nested std\+::vector with entry {\ttfamily \mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} corresponding to edge {\ttfamily e} in tree {\ttfamily t}. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+rotations@{get\+\_\+all\+\_\+rotations}}
+\index{get\+\_\+all\+\_\+rotations@{get\+\_\+all\+\_\+rotations}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{get\+\_\+all\+\_\+rotations() const }{get_all_rotations() const }}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$ int $>$ $>$ vinecopulib\+::\+Vinecop\+::get\+\_\+all\+\_\+rotations (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_vinecop_a7cbfca10a16e4c45f4b5d94343b5fc20}{}\label{classvinecopulib_1_1_vinecop_a7cbfca10a16e4c45f4b5d94343b5fc20}
+extracts the rotations of all pair copulas.
+
+\begin{DoxyReturn}{Returns}
+a nested std\+::vector with entry {\ttfamily \mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} corresponding to edge {\ttfamily e} in tree {\ttfamily t}. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+family@{get\+\_\+family}}
+\index{get\+\_\+family@{get\+\_\+family}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{get\+\_\+family(int tree, int edge) const }{get_family(int tree, int edge) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Bicop\+Family} vinecopulib\+::\+Vinecop\+::get\+\_\+family (
+\begin{DoxyParamCaption}
+\item[{int}]{tree, }
+\item[{int}]{edge}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_vinecop_ab2b5aecbe06c5219919f5b3c7436f1da}{}\label{classvinecopulib_1_1_vinecop_ab2b5aecbe06c5219919f5b3c7436f1da}
+extracts the family of a pair copula.
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index (starting with 0). \\
+\hline
+{\em edge} & edge index (starting with 0). \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+pair\+\_\+copula@{get\+\_\+pair\+\_\+copula}}
+\index{get\+\_\+pair\+\_\+copula@{get\+\_\+pair\+\_\+copula}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{get\+\_\+pair\+\_\+copula(int tree, int edge) const }{get_pair_copula(int tree, int edge) const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Bicop} vinecopulib\+::\+Vinecop\+::get\+\_\+pair\+\_\+copula (
+\begin{DoxyParamCaption}
+\item[{int}]{tree, }
+\item[{int}]{edge}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_vinecop_a22262e99414e23dbe7c7f0e773041185}{}\label{classvinecopulib_1_1_vinecop_a22262e99414e23dbe7c7f0e773041185}
+extracts a pair copula.
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index (starting with 0). \\
+\hline
+{\em edge} & edge index (starting with 0). \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+parameters@{get\+\_\+parameters}}
+\index{get\+\_\+parameters@{get\+\_\+parameters}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{get\+\_\+parameters(int tree, int edge) const }{get_parameters(int tree, int edge) const }}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::\+Vinecop\+::get\+\_\+parameters (
+\begin{DoxyParamCaption}
+\item[{int}]{tree, }
+\item[{int}]{edge}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_vinecop_a2ddcc85cb5f2c05edd9093fe863812f6}{}\label{classvinecopulib_1_1_vinecop_a2ddcc85cb5f2c05edd9093fe863812f6}
+extracts the parameters of a pair copula.
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index (starting with 0). \\
+\hline
+{\em edge} & edge index (starting with 0). \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+rotation@{get\+\_\+rotation}}
+\index{get\+\_\+rotation@{get\+\_\+rotation}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{get\+\_\+rotation(int tree, int edge) const }{get_rotation(int tree, int edge) const }}]{\setlength{\rightskip}{0pt plus 5cm}int vinecopulib\+::\+Vinecop\+::get\+\_\+rotation (
+\begin{DoxyParamCaption}
+\item[{int}]{tree, }
+\item[{int}]{edge}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_vinecop_abfa48760cc636cadce6fa875a883922a}{}\label{classvinecopulib_1_1_vinecop_abfa48760cc636cadce6fa875a883922a}
+extracts the rotation of a pair copula.
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index (starting with 0). \\
+\hline
+{\em edge} & edge index (starting with 0). \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!inverse\+\_\+rosenblatt@{inverse\+\_\+rosenblatt}}
+\index{inverse\+\_\+rosenblatt@{inverse\+\_\+rosenblatt}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{inverse\+\_\+rosenblatt(const Eigen\+::\+Matrix\+Xd \&\+U)}{inverse_rosenblatt(const Eigen::MatrixXd &U)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::\+Vinecop\+::inverse\+\_\+rosenblatt (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{U}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_a3d8819be948be348b6b3f30495b364ff}{}\label{classvinecopulib_1_1_vinecop_a3d8819be948be348b6b3f30495b364ff}
+calculates the inverse Rosenblatt transform for a vine copula model.
+
+The inverse Rosenblatt transform can be used for simulation\+: the function applied to independent uniform variates resembles simulated data from the vine copula model.
+
+If the problem is too large, it is split recursively into halves (w.\+r.\+t. n, the number of observations). \char`\"{}\+Too large\char`\"{} means that the required memory will exceed 1 GB. An examplary configuration requiring less than 1 GB is $ n = 1000 $, $d = 200$.
+
+
+\begin{DoxyParams}{Parameters}
+{\em U} & $ n \times d $ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!make\+\_\+pair\+\_\+copula\+\_\+store@{make\+\_\+pair\+\_\+copula\+\_\+store}}
+\index{make\+\_\+pair\+\_\+copula\+\_\+store@{make\+\_\+pair\+\_\+copula\+\_\+store}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{make\+\_\+pair\+\_\+copula\+\_\+store(int d)}{make_pair_copula_store(int d)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$ {\bf Bicop} $>$ $>$ vinecopulib\+::\+Vinecop\+::make\+\_\+pair\+\_\+copula\+\_\+store (
+\begin{DoxyParamCaption}
+\item[{int}]{d}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{classvinecopulib_1_1_vinecop_a17132eaa4b61b54d6d1c83aaa08744be}{}\label{classvinecopulib_1_1_vinecop_a17132eaa4b61b54d6d1c83aaa08744be}
+Initialize object for storing pair copulas
+
+
+\begin{DoxyParams}{Parameters}
+{\em d} & dimension of the vine copula. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A nested vector such that {\ttfamily pc\+\_\+store\mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} contains a \hyperlink{classvinecopulib_1_1_bicop}{Bicop} object for the pair copula corresponding to tree {\ttfamily t} and edge {\ttfamily e}. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!pdf@{pdf}}
+\index{pdf@{pdf}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{pdf(const Eigen\+::\+Matrix\+Xd \&u)}{pdf(const Eigen::MatrixXd &u)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::\+Vinecop\+::pdf (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{u}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_adf3760b8dd2b6d3a9cae5426188d4489}{}\label{classvinecopulib_1_1_vinecop_adf3760b8dd2b6d3a9cae5426188d4489}
+calculates the density function of the vine copula model.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $ n \times d $ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!select\+\_\+all@{select\+\_\+all}}
+\index{select\+\_\+all@{select\+\_\+all}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{select\+\_\+all(const Eigen\+::\+Matrix\+Xd \&data, std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=""mle"", int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), double threshold=0.\+0, std\+::string tree\+\_\+criterion=""tau"", std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true, bool show\+\_\+trace=false)}{select_all(const Eigen::MatrixXd &data, std::vector< BicopFamily > family_set=bicop_families::all, std::string method="mle", int truncation_level=std::numeric_limits< int >::max(), double threshold=0.0, std::string tree_criterion="tau", std::string selection_criterion="bic", bool preselect_families=true, bool show_trace=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void vinecopulib\+::\+Vinecop\+::select\+\_\+all (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{data, }
+\item[{std\+::vector$<$ {\bf Bicop\+Family} $>$}]{family\+\_\+set = {\ttfamily {\bf bicop\+\_\+families\+::all}}, }
+\item[{std\+::string}]{method = {\ttfamily \char`\"{}mle\char`\"{}}, }
+\item[{int}]{truncation\+\_\+level = {\ttfamily std\+:\+:numeric\+\_\+limits$<$int$>$\+:\+:max()}, }
+\item[{double}]{threshold = {\ttfamily 0.0}, }
+\item[{std\+::string}]{tree\+\_\+criterion = {\ttfamily \char`\"{}tau\char`\"{}}, }
+\item[{std\+::string}]{selection\+\_\+criterion = {\ttfamily \char`\"{}bic\char`\"{}}, }
+\item[{bool}]{preselect\+\_\+families = {\ttfamily true}, }
+\item[{bool}]{show\+\_\+trace = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}{}\label{classvinecopulib_1_1_vinecop_a6f9f35b5973e0da272770706af77dc11}
+automatically fits and selects a vine copula model by the algorithm of
+
+Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013). {\itshape Selecting and estimating regular vine copulae and application to financial returns.} Computational Statistics \& Data Analysis, 59 (1), 52-\/69.
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & nxd matrix of copula data. \\
+\hline
+{\em family\+\_\+set} & the set of copula families to consider (if empty, then all families are included; all families are included by default). \\
+\hline
+{\em method} & see see \hyperlink{classvinecopulib_1_1_bicop_a266fa8d13e8ed1e96937e4208a99955d}{Bicop\+::fit()}. \\
+\hline
+{\em truncation\+\_\+level} & for truncated vines. \\
+\hline
+{\em threshold} & for thresholded vines (0 = no threshold). \\
+\hline
+{\em tree\+\_\+criterion} & the criterion for selecting the maximum spanning tree (\char`\"{}tau\char`\"{}, \char`\"{}hoeffd\char`\"{} and \char`\"{}rho\char`\"{} implemented so far). \\
+\hline
+{\em selection\+\_\+criterion} & see \hyperlink{classvinecopulib_1_1_bicop_af04ef20ec08d02222059ba2b72084ad0}{Bicop\+::select()}. \\
+\hline
+{\em preselect\+\_\+families} & see \hyperlink{classvinecopulib_1_1_bicop_af04ef20ec08d02222059ba2b72084ad0}{Bicop\+::select()}. \\
+\hline
+{\em show\+\_\+trace} & whether to show a trace of the building progress. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!select\+\_\+families@{select\+\_\+families}}
+\index{select\+\_\+families@{select\+\_\+families}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{select\+\_\+families(const Eigen\+::\+Matrix\+Xd \&data, std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string method=""mle"", int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), double threshold=0.\+0, std\+::string threshold\+\_\+criterion=""tau"", std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true, bool show\+\_\+trace=false)}{select_families(const Eigen::MatrixXd &data, std::vector< BicopFamily > family_set=bicop_families::all, std::string method="mle", int truncation_level=std::numeric_limits< int >::max(), double threshold=0.0, std::string threshold_criterion="tau", std::string selection_criterion="bic", bool preselect_families=true, bool show_trace=false)}}]{\setlength{\rightskip}{0pt plus 5cm}void vinecopulib\+::\+Vinecop\+::select\+\_\+families (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{data, }
+\item[{std\+::vector$<$ {\bf Bicop\+Family} $>$}]{family\+\_\+set = {\ttfamily {\bf bicop\+\_\+families\+::all}}, }
+\item[{std\+::string}]{method = {\ttfamily \char`\"{}mle\char`\"{}}, }
+\item[{int}]{truncation\+\_\+level = {\ttfamily std\+:\+:numeric\+\_\+limits$<$int$>$\+:\+:max()}, }
+\item[{double}]{threshold = {\ttfamily 0.0}, }
+\item[{std\+::string}]{threshold\+\_\+criterion = {\ttfamily \char`\"{}tau\char`\"{}}, }
+\item[{std\+::string}]{selection\+\_\+criterion = {\ttfamily \char`\"{}bic\char`\"{}}, }
+\item[{bool}]{preselect\+\_\+families = {\ttfamily true}, }
+\item[{bool}]{show\+\_\+trace = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}{}\label{classvinecopulib_1_1_vinecop_ab80845e262fa37613f09d1f98d722cc8}
+automatically selects all pair-\/copula families and fits all parameters.
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & nxd matrix of copula data. \\
+\hline
+{\em family\+\_\+set} & the set of copula families to consider (if empty, then all families are included; all families are included by default). \\
+\hline
+{\em method} & see \hyperlink{classvinecopulib_1_1_bicop_a266fa8d13e8ed1e96937e4208a99955d}{Bicop\+::fit()}. \\
+\hline
+{\em truncation\+\_\+level} & for truncated vines. \\
+\hline
+{\em threshold} & for thresholded vines (0 = no threshold). \\
+\hline
+{\em threshold\+\_\+criterion} & the criterion for thresholding. \\
+\hline
+{\em selection\+\_\+criterion} & see \hyperlink{classvinecopulib_1_1_bicop_af04ef20ec08d02222059ba2b72084ad0}{Bicop\+::select()}. \\
+\hline
+{\em preselect\+\_\+families} & see \hyperlink{classvinecopulib_1_1_bicop_af04ef20ec08d02222059ba2b72084ad0}{Bicop\+::select()}. \\
+\hline
+{\em show\+\_\+trace} & (not implemented yet). \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The fitted vine copula model. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!simulate@{simulate}}
+\index{simulate@{simulate}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{simulate(int n)}{simulate(int n)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::\+Vinecop\+::simulate (
+\begin{DoxyParamCaption}
+\item[{int}]{n}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_aa675aac119538648d60368a3572d1b5c}{}\label{classvinecopulib_1_1_vinecop_aa675aac119538648d60368a3572d1b5c}
+simulates from a vine copula model, see \hyperlink{classvinecopulib_1_1_vinecop_a3d8819be948be348b6b3f30495b364ff}{inverse\+\_\+rosenblatt()}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & number of observations. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/n5/dev/cpp/vinecopulib/include/vinecop\+\_\+class.\+hpp\end{DoxyCompactItemize}
+/home/n5/dev/cpp/vinecopulib/include/vinecop/class.\+hpp\item 
+/home/n5/dev/cpp/vinecopulib/src/vinecop/class.\+cpp\end{DoxyCompactItemize}

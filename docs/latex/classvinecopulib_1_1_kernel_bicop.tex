@@ -2,11 +2,20 @@
 \label{classvinecopulib_1_1_kernel_bicop}\index{vinecopulib\+::\+Kernel\+Bicop@{vinecopulib\+::\+Kernel\+Bicop}}
 
 
+An abstract class for kernel copulas.  
+
+
+
+
+{\ttfamily \#include $<$kernel.\+hpp$>$}
+
+
+
 Inheritance diagram for vinecopulib\+:\+:Kernel\+Bicop\+:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=204pt]{classvinecopulib_1_1_kernel_bicop__inherit__graph}
+\includegraphics[width=213pt]{classvinecopulib_1_1_kernel_bicop__inherit__graph}
 \end{center}
 \end{figure}
 
@@ -15,13 +24,43 @@ Collaboration diagram for vinecopulib\+:\+:Kernel\+Bicop\+:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=338pt]{classvinecopulib_1_1_kernel_bicop__coll__graph}
+\includegraphics[width=213pt]{classvinecopulib_1_1_kernel_bicop__coll__graph}
 \end{center}
 \end{figure}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Eigen\+::\+Vector\+Xd {\bfseries pdf} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)\hypertarget{classvinecopulib_1_1_kernel_bicop_a307624ad91ab1fd38ae7933fab0a5f6a}{}\label{classvinecopulib_1_1_kernel_bicop_a307624ad91ab1fd38ae7933fab0a5f6a}
+
+\item 
+Eigen\+::\+Vector\+Xd {\bfseries hfunc1} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)\hypertarget{classvinecopulib_1_1_kernel_bicop_a08a6961d233bc977e583b5253c6089dc}{}\label{classvinecopulib_1_1_kernel_bicop_a08a6961d233bc977e583b5253c6089dc}
+
+\item 
+Eigen\+::\+Vector\+Xd {\bfseries hfunc2} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)\hypertarget{classvinecopulib_1_1_kernel_bicop_ae4983795f404cca9c4a6af15d41b104a}{}\label{classvinecopulib_1_1_kernel_bicop_ae4983795f404cca9c4a6af15d41b104a}
+
+\item 
+Eigen\+::\+Vector\+Xd {\bfseries hinv1} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)\hypertarget{classvinecopulib_1_1_kernel_bicop_aca726ccdf9a1551fb342dd7e60de1f84}{}\label{classvinecopulib_1_1_kernel_bicop_aca726ccdf9a1551fb342dd7e60de1f84}
+
+\item 
+Eigen\+::\+Vector\+Xd {\bfseries hinv2} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)\hypertarget{classvinecopulib_1_1_kernel_bicop_a809dc2c7f0a67d217e0fe9651a625a6b}{}\label{classvinecopulib_1_1_kernel_bicop_a809dc2c7f0a67d217e0fe9651a625a6b}
+
+\item 
+double {\bfseries parameters\+\_\+to\+\_\+tau} (const Eigen\+::\+Vector\+Xd \&)\hypertarget{classvinecopulib_1_1_kernel_bicop_a1c00a74e12159b2c06487cf1b3ccff00}{}\label{classvinecopulib_1_1_kernel_bicop_a1c00a74e12159b2c06487cf1b3ccff00}
+
+\item 
+Eigen\+::\+Matrix\+Xd {\bfseries tau\+\_\+to\+\_\+parameters} (const double \&tau)\hypertarget{classvinecopulib_1_1_kernel_bicop_a510489f8f985c04c4f692e12ab2d1bf0}{}\label{classvinecopulib_1_1_kernel_bicop_a510489f8f985c04c4f692e12ab2d1bf0}
+
+\item 
+double {\bfseries calculate\+\_\+npars} ()\hypertarget{classvinecopulib_1_1_kernel_bicop_a33f736d5f443399f1f4dbe54b386aba3}{}\label{classvinecopulib_1_1_kernel_bicop_a33f736d5f443399f1f4dbe54b386aba3}
+
+\item 
+void {\bfseries flip} ()\hypertarget{classvinecopulib_1_1_kernel_bicop_abc23a81271f970b9c99dd6ed727c170f}{}\label{classvinecopulib_1_1_kernel_bicop_abc23a81271f970b9c99dd6ed727c170f}
+
+\end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{classvinecopulib_1_1_interpolation_grid}{Interpolation\+Grid} {\bfseries interp\+\_\+grid\+\_\+}\hypertarget{classvinecopulib_1_1_kernel_bicop_aa8cfe1dd0786d692562252de05c46588}{}\label{classvinecopulib_1_1_kernel_bicop_aa8cfe1dd0786d692562252de05c46588}
+Interpolation\+Grid {\bfseries interp\+\_\+grid\+\_\+}\hypertarget{classvinecopulib_1_1_kernel_bicop_aa8cfe1dd0786d692562252de05c46588}{}\label{classvinecopulib_1_1_kernel_bicop_aa8cfe1dd0786d692562252de05c46588}
 
 \item 
 double {\bfseries npars\+\_\+}\hypertarget{classvinecopulib_1_1_kernel_bicop_a1b49a0a2630e71079c08ebdca79b06b6}{}\label{classvinecopulib_1_1_kernel_bicop_a1b49a0a2630e71079c08ebdca79b06b6}
@@ -30,7 +69,16 @@ double {\bfseries npars\+\_\+}\hypertarget{classvinecopulib_1_1_kernel_bicop_a1b
 \subsection*{Additional Inherited Members}
 
 
+\subsection{Detailed Description}
+An abstract class for kernel copulas. 
+
+Evaluation functions of kernel estimators are implemented efficiently using spline interpolation, see Nagler (2016).
+
+This class is used in the implementation underlying the \hyperlink{classvinecopulib_1_1_bicop}{Bicop} class. Users should not use \hyperlink{classvinecopulib_1_1_abstract_bicop}{Abstract\+Bicop} or derived classes directly, but always work with the \hyperlink{classvinecopulib_1_1_bicop}{Bicop} interface.
+
+Nagler, Thomas. {\itshape kdecopula\+: An R Package for the Kernel Estimation of Copula Densities}. ar\+Xiv\+:1603.\+04229 \mbox{[}stat.\+CO\mbox{]}, 2016 
+
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/n5/dev/cpp/vinecopulib/include/bicop\+\_\+kernel.\+hpp\item 
-/home/n5/dev/cpp/vinecopulib/src/bicop\+\_\+kernel.\+cpp\end{DoxyCompactItemize}
+/home/n5/dev/cpp/vinecopulib/include/bicop/kernel.\+hpp\item 
+/home/n5/dev/cpp/vinecopulib/src/bicop/kernel.\+cpp\end{DoxyCompactItemize}
