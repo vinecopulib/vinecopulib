@@ -7,8 +7,10 @@
 #### What are vine copulas?
 
 Vine copulas are a flexible class of dependence models consisting of bivariate
-building blocks (see e.g., Aas et al., 2009). You can find a comprehensive list
-of publications and other materials on vine-copula.org.
+building blocks (see e.g., 
+[Aas et al., 2009](https://mediatum.ub.tum.de/doc/1083600/1083600.pdf)). 
+You can find a comprehensive list of publications and other materials on 
+[vine-copula.org](http://www.statistics.ma.tum.de/en/research/vine-copula-models/).
 
 #### What is vinecopulib?
 
@@ -25,9 +27,9 @@ Advantages over VineCopula are
 
 #### Status
  
-The library is under active development and the first release (0.0.0.0) was
-on March 24, 2017. The API is still rather unstable. We are also 
-working on interfaces for R and python.
+The first release (0.0.0.0) was on March XXX, 2017. While we did our best to 
+design an user-friendly API, the library is still under active development and 
+changes are to be expected. We are also working on interfaces for R and python.
 
 
 # Documentation
@@ -61,15 +63,15 @@ minimal documentation.
 
 To build the library, you'll need:
 
-   * [a C++11-compatible    compiler](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers),
-   * [CMake](https://cmake.org/),
-   * [Boost 1.63](http://www.boost.org/),
-   * [Eigen 3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page),
-   * [NLopt](http://ab-initio.mit.edu/wiki/index.php/NLopt).
+   * [a C++11-compatible    compiler](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers)
+   * [CMake](https://cmake.org/)
+   * [Boost 1.63](http://www.boost.org/)
+   * [Eigen 3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page)
+   * [NLopt](http://ab-initio.mit.edu/wiki/index.php/NLopt)
    
 Optionally, you'll need:
-   * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations),
-   * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to build the unit tests).
+   * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
+   * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to build the unit tests)
      
 Note that a `findR.cmake` looks for R and VineCopula in the default locations 
 for linux and osx, but problems might occur with versions installed from 
@@ -90,8 +92,8 @@ sudo make install && bin/test_all`
 |-----------------------|------------------------------------|
 | Create a build folder  | `mkdir build` |
 | Move to the created folder  | `cd build` |
-|  Create the `MakeFile` via cmake  |  `cmake .. ` (for the `Release` version) or `cmake .. -DCMAKE_BUILD_TYPE=Debug` (for the `Debug` mode)  |
-|  Create the `MakeFile` via cmake while avoiding compiling the unit tests  | `cmake .. -DBUILD_TESTING=OFF`|
+| Create the `MakeFile` via cmake  |  `cmake .. ` (for the `Release` version, or with `-DCMAKE_BUILD_TYPE=Debug` for the `Debug` mode)  |
+| Create the `MakeFile` via cmake without unit tests  | `cmake .. -DBUILD_TESTING=OFF`|
 | Compile the library | `make` or `make -j n` where `n` is the number of cores |
 | Build the documentation (optional)  | `make doc` |
 | Install the library on linux/OSX (optional)  | `sudo make install` |
@@ -497,7 +499,7 @@ int d = 5;
 MatXd data = simulate_uniform(100, d);
 
 // instantiate a vine from data using the default arguments
-Vinecop best_vine(data, bicop_families::archimedean);
+Vinecop best_vine(data);
     
 // instantiate a vine copula using Kendall's tau inversion for parameters 
 // estimation and a truncation after the second tree
