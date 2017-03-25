@@ -104,18 +104,11 @@ namespace vinecopulib
     //! @param selection_criterion see select_all() / select_families().
     //! @param preselect_families see select_all() / select_families().
     //! @param show_trace  see select_all() / select_families().
-    Vinecop::Vinecop(
-            const Eigen::MatrixXd& data,
-            const Eigen::MatrixXi& matrix,
-            std::vector<BicopFamily> family_set,
-            std::string method,
-            int truncation_level,
-            double threshold,
-            std::string tree_criterion,
-            std::string selection_criterion,
-            bool preselect_families,
-            bool show_trace
-    )
+    Vinecop::Vinecop(const Eigen::MatrixXd& data, const Eigen::MatrixXi& matrix,
+            std::vector<BicopFamily> family_set, std::string method,
+            int truncation_level, double threshold, std::string tree_criterion,
+            std::string selection_criterion, bool preselect_families,
+            bool show_trace)
     {
         int d = data.cols();
         d_ = d;
@@ -166,17 +159,11 @@ namespace vinecopulib
     //! @param selection_criterion see Bicop::select().
     //! @param preselect_families see Bicop::select().
     //! @param show_trace whether to show a trace of the building progress.
-    void Vinecop::select_all(
-            const Eigen::MatrixXd& data,
-            std::vector<BicopFamily> family_set,
-            std::string method,
-            int truncation_level,
-            double threshold,
-            std::string tree_criterion,
-            std::string selection_criterion,
-            bool preselect_families,
-            bool show_trace
-    )
+    void Vinecop::select_all(const Eigen::MatrixXd& data,
+            std::vector<BicopFamily> family_set, std::string method,
+            int truncation_level, double threshold, std::string tree_criterion,
+            std::string selection_criterion, bool preselect_families,
+            bool show_trace)
     {
         using namespace tools_structselect;
         int d = data.cols();
@@ -230,17 +217,11 @@ namespace vinecopulib
     //! @param selection_criterion see Bicop::select().
     //! @param preselect_families see Bicop::select().
     //! @return The fitted vine copula model.
-    void Vinecop::select_families(
-            const Eigen::MatrixXd& data,
-            std::vector<BicopFamily> family_set,
-            std::string method,
-            int truncation_level,
-            double threshold,
-            std::string threshold_criterion,
-            std::string selection_criterion,
-            bool preselect_families,
-            bool show_trace
-    )
+    void Vinecop::select_families(const Eigen::MatrixXd& data,
+            std::vector<BicopFamily> family_set, std::string method, 
+            int truncation_level, double threshold,
+            std::string threshold_criterion, std::string selection_criterion,
+            bool preselect_families, bool show_trace)
     {
         int d = data.cols();
         if (d != d_) {
