@@ -51,6 +51,7 @@ protected:
             parameters = bicop_.tau_to_parameters(tau);
         } else {
             if (family == BicopFamily::student) {
+                parameters(0) = sin(tau * M_PI / 2);
                 parameters(1) = 4;
             } else if (family == BicopFamily::bb1) {
                 parameters(1) = 1.5;

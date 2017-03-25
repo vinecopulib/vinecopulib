@@ -5,7 +5,9 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "misc/tools_optimization.hpp"
-#include <iostream>
+#include "misc/tools_stats.hpp"
+
+#include <cmath>
 
 //! Utilities for numerical optimization (based on NLopt)
 namespace tools_optimization {
@@ -156,9 +158,7 @@ namespace tools_optimization {
         ++newdata->objective_calls;
         Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
         newdata->bicop->set_parameters(par);
-        double nll = (-1)*newdata->bicop->pdf(newdata->U).array().log().sum();
-
-        return nll;
+        return (-1)*newdata->bicop->pdf(newdata->U).array().log().sum();
     }
 
     //! evaluates the objective function for profile maximum likelihood 

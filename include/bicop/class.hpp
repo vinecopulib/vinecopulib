@@ -8,8 +8,6 @@
 
 #include "abstract.hpp"
 
-
-
 namespace vinecopulib {
     //! @brief A class for bivariate copula models.
     //! 
