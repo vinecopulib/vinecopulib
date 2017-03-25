@@ -27,7 +27,7 @@ Advantages over VineCopula are
 
 #### Status
  
-The first release (0.0.0.0) was on March XXX, 2017. While we did our best to 
+Version 0.0.0.0 was released on March XXX, 2017. While we did our best to 
 design an user-friendly API, the library is still under active development and 
 changes are to be expected. We are also working on interfaces for R and python.
 
@@ -36,8 +36,7 @@ changes are to be expected. We are also working on interfaces for R and python.
 
 Below, we give a brief overview of the most important functionality. The full 
 set of classes and methods can be found in the 
-[Doxygen documenation](https://tvatter.github.io/vinecopulib/) along with 
-minimal documentation.
+[Doxygen documentation](https://tvatter.github.io/vinecopulib/).
 
 - [Getting started](#getting-started)
 	- [Requirements](#requirements)
@@ -92,12 +91,14 @@ sudo make install && bin/test_all`
 |-----------------------|------------------------------------|
 | Create a build folder  | `mkdir build` |
 | Move to the created folder  | `cd build` |
-| Create the `MakeFile` via cmake  |  `cmake .. ` (for the `Release` version, or with `-DCMAKE_BUILD_TYPE=Debug` for the `Debug` mode)  |
-| Create the `MakeFile` via cmake without unit tests  | `cmake .. -DBUILD_TESTING=OFF`|
+| Create the `MakeFile` via cmake  |  `cmake .. ` (or `cmake .. -DCMAKE_BUILD_TYPE=Debug` for the `Debug` mode)  |
 | Compile the library | `make` or `make -j n` where `n` is the number of cores |
 | Build the documentation (optional)  | `make doc` |
 | Install the library on linux/OSX (optional)  | `sudo make install` |
 | Run unit tests (optional)  |  `bin/[test_executable]` |
+
+To create a `MakeFile` via cmake that allows to avoid compiling the unit tests, 
+one can use `cmake .. -DBUILD_TESTING=OFF`.
 
 ------------------------------------------------
 
