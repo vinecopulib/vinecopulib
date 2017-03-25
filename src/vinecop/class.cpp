@@ -99,29 +99,29 @@ namespace vinecopulib
     //! @param family_set see select_all() / select_families().
     //! @param method see select_all() / select_families().
     //! @param truncation_level see select_all() / select_families().
-    //! @param threshold see select_all() / select_families().
     //! @param tree_criterion see select_all().
+    //! @param threshold see select_all() / select_families().
     //! @param selection_criterion see select_all() / select_families().
     //! @param preselect_families see select_all() / select_families().
     //! @param show_trace  see select_all() / select_families().
     Vinecop::Vinecop(const Eigen::MatrixXd& data, const Eigen::MatrixXi& matrix,
-            std::vector<BicopFamily> family_set, std::string method,
-            int truncation_level, double threshold, std::string tree_criterion,
-            std::string selection_criterion, bool preselect_families,
-            bool show_trace)
+                     std::vector<BicopFamily> family_set, std::string method,
+                     int truncation_level, std::string tree_criterion,
+                     double threshold, std::string selection_criterion,
+                     bool preselect_families, bool show_trace)
     {
         int d = data.cols();
         d_ = d;
         pair_copulas_ = make_pair_copula_store(d_);
         if (matrix.cols() > 0) {
             vine_matrix_ = RVineMatrix(matrix);
-            select_families(data, family_set, method, truncation_level, threshold,
-                            tree_criterion, selection_criterion, 
+            select_families(data, family_set, method, truncation_level,
+                            tree_criterion, threshold, selection_criterion,
                             preselect_families, show_trace);
         } else {
-            select_all(data, family_set, method, truncation_level, threshold,
-                       tree_criterion, selection_criterion, preselect_families,
-                       show_trace);            
+            select_all(data, family_set, method, truncation_level,
+                       tree_criterion, threshold, selection_criterion,
+                       preselect_families, show_trace);
         }
     }
 
@@ -141,9 +141,10 @@ namespace vinecopulib
     }
     
     
-    //! automatically fits and selects a vine copula model by the algorithm of
+    //! automatically fits and selects a vine copula model
     //! 
-    //! Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013). 
+    //! Selection of the structure is performed using the algorithm of
+    //! Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013).
     //! *Selecting and estimating regular vine copulae and application to 
     //! financial returns.* Computational Statistics & Data Analysis, 59 (1), 
     //! 52-69.
@@ -153,17 +154,18 @@ namespace vinecopulib
     //!     all families are included; all families are included by default).
     //! @param method see see Bicop::fit().
     //! @param truncation_level for truncated vines.
-    //! @param threshold for thresholded vines (0 = no threshold).
     //! @param tree_criterion the criterion for selecting the maximum spanning
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).
+    //! @param threshold for thresholded vines (0 = no threshold).
     //! @param selection_criterion see Bicop::select().
     //! @param preselect_families see Bicop::select().
     //! @param show_trace whether to show a trace of the building progress.
     void Vinecop::select_all(const Eigen::MatrixXd& data,
-            std::vector<BicopFamily> family_set, std::string method,
-            int truncation_level, double threshold, std::string tree_criterion,
-            std::string selection_criterion, bool preselect_families,
-            bool show_trace)
+                             std::vector<BicopFamily> family_set,
+                             std::string method, int truncation_level,
+                             std::string tree_criterion, double threshold,
+                             std::string selection_criterion,
+                             bool preselect_families, bool show_trace)
     {
         using namespace tools_structselect;
         int d = data.cols();
@@ -211,17 +213,19 @@ namespace vinecopulib
     //!     all families are included; all families are included by default).
     //! @param method see Bicop::fit().
     //! @param truncation_level for truncated vines.
-    //! @param threshold for thresholded vines (0 = no threshold).
     //! @param threshold_criterion the criterion for thresholding.
+    //! @param threshold for thresholded vines (0 = no threshold).
     //! @param selection_criterion see Bicop::select().
     //! @param preselect_families see Bicop::select().
     //! @param show_trace (not implemented yet).
     //! @return The fitted vine copula model.
     void Vinecop::select_families(const Eigen::MatrixXd& data,
-            std::vector<BicopFamily> family_set, std::string method, 
-            int truncation_level, double threshold,
-            std::string threshold_criterion, std::string selection_criterion,
-            bool preselect_families, bool show_trace)
+                                  std::vector<BicopFamily> family_set,
+                                  std::string method, int truncation_level,
+                                  std::string threshold_criterion,
+                                  double threshold,
+                                  std::string selection_criterion,
+                                  bool preselect_families, bool show_trace)
     {
         int d = data.cols();
         if (d != d_) {
@@ -569,6 +573,63 @@ namespace vinecopulib
         Eigen::MatrixXd U = tools_stats::simulate_uniform(n, d_);
         return inverse_rosenblatt(U);
     }
+
+    //! calculates the log-likelihood.
+    //!
+    //! The log-likelihood is defined as
+    //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \f]
+    //! where \f$ c \f$ is the copula density pdf().
+    //!
+    //! @param u \f$n \times d\f$ matrix of observations.
+    double Vinecop::loglik(const Eigen::MatrixXd& u)
+    {
+        return pdf(u).array().log().sum();
+    }
+
+    //! calculates the Akaike information criterion (AIC).
+    //!
+    //! The AIC is defined as
+    //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
+    //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
+    //! (effective) number of parameters of the model, see loglik() and
+    //! calculate_npars(). The AIC is a consistent model selection criterion
+    //! for nonparametric models.
+    //!
+    //! @param u \f$n \times 2\f$ matrix of observations.
+    double Vinecop::aic(const Eigen::MatrixXd& u)
+    {
+        return -2 * loglik(u) + 2 * calculate_npars();
+    }
+
+    //! calculates the Bayesian information criterion (BIC).
+    //!
+    //! The BIC is defined as
+    //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
+    //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
+    //! (effective) number of parameters of the model, see loglik() and
+    //! calculate_npars(). The BIC is a consistent model selection criterion
+    //! for nonparametric models.
+    //!
+    //! @param u \f$n \times 2\f$ matrix of observations.
+    double Vinecop::bic(const Eigen::MatrixXd& u)
+    {
+        return -2 * loglik(u) + calculate_npars() * log(u.rows());
+    }
+
+    //! calculates the effective number of parameters.
+    //!
+    //! Returns sum of the number of parameters for all pair copulas (see
+    //! Bicop::calculate_npars()).
+    double Vinecop::calculate_npars()
+    {
+        double npars = 0.0;
+        for (auto& tree : pair_copulas_) {
+            for (auto& pc : tree) {
+                npars += pc.calculate_npars();
+            }
+        }
+        return npars;
+    }
     
     
     //! calculates the inverse Rosenblatt transform for a vine copula model.
@@ -584,13 +645,13 @@ namespace vinecopulib
     //! \f$d = 200\f$.
     //! 
     //! @param U \f$ n \times d \f$ matrix of evaluation points.
-    Eigen::MatrixXd Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& U)
+    Eigen::MatrixXd Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u)
     {
-        int n = U.rows();
+        int n = u.rows();
         if (n < 1) {
             throw std::runtime_error("n must be at least one");
         }
-        int d = U.cols();
+        int d = u.cols();
         if (d != d_) {
             std::stringstream message;
             message << "U has wrong number of columns; " <<
@@ -599,7 +660,7 @@ namespace vinecopulib
             throw std::runtime_error(message.str().c_str());
         }
     
-        Eigen::MatrixXd U_vine = U;  // output matrix
+        Eigen::MatrixXd U_vine = u;  // output matrix
     
         //                   (direct + indirect)    (U_vine)       (info matrices)
         int bytes_required = (8 * 2 * n * d * d) +  (8 * n * d)  + (4 * 4 * d * d);
@@ -609,9 +670,9 @@ namespace vinecopulib
             int n_half = n / 2;
             int n_left = n - n_half;
             U_vine.block(0, 0, n_half, d) = 
-                inverse_rosenblatt(U.block(0, 0, n_half, d));
+                inverse_rosenblatt(u.block(0, 0, n_half, d));
             U_vine.block(n_half, 0, n_left, d) = 
-                inverse_rosenblatt(U.block(n_half, 0, n_left, d));
+                inverse_rosenblatt(u.block(n_half, 0, n_left, d));
             return U_vine;
         }
     
@@ -629,7 +690,7 @@ namespace vinecopulib
     
         // initialize with independent uniforms (corresponding to natural order)
         for (int j = 0; j < d; ++j)
-            hinv2(d - j - 1, j) = U.col(revorder(j) - 1);
+            hinv2(d - j - 1, j) = u.col(revorder(j) - 1);
         hfunc1(0, d - 1) = hinv2(0, d - 1);
     
         // loop through variables (0 is just the inital uniform)
