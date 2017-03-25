@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['simulate',['simulate',['../classvinecopulib_1_1_bicop.html#aeb87bea4283dacfa5e609356c020f85d',1,'vinecopulib::Bicop']]]
+  ['loglik',['loglik',['../classvinecopulib_1_1_bicop.html#ae8bcc0c3265cc86565333a0cfd3d619d',1,'vinecopulib::Bicop']]]
 ];

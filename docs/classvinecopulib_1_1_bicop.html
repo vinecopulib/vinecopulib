@@ -115,44 +115,43 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aeb87bea4283dacfa5e609356c020f85d"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#aeb87bea4283dacfa5e609356c020f85d">simulate</a> (const int &amp;n)</td></tr>
-<tr class="separator:aeb87bea4283dacfa5e609356c020f85d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Constructors</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>There are several ways to construct a <code><a class="el" href="classvinecopulib_1_1_bicop.html" title="A class for bivariate copula models. ">Bicop</a></code> object. The copula model is fully characterized by the family, rotation, and parameters. You can construct a model directly from these characteristics or use the data-driven constructor (see select()).</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">family</td><td>the copula family. </td></tr>
-    <tr><td class="paramname">rotation</td><td>the rotation of the copula; one of 0, 90, 180, or 270 (for Independence, Gaussian, Student, Frank, and nonparametric families, only 0 is allowed). </td></tr>
-    <tr><td class="paramname">parameters</td><td>the copula parameters. </td></tr>
-    <tr><td class="paramname">data</td><td>see select(). </td></tr>
-    <tr><td class="paramname">family_set</td><td>see select(). </td></tr>
-    <tr><td class="paramname">method</td><td>see select(). </td></tr>
-    <tr><td class="paramname">selection_criterion</td><td>see select(). </td></tr>
-    <tr><td class="paramname">preselect_families</td><td>see select(). </td></tr>
-  </table>
-  </dd>
-</dl>
-</div></td></tr>
 <tr class="memitem:acfa522fb0bea4aca8fade87c18bcf921"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acfa522fb0bea4aca8fade87c18bcf921"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Bicop</b> ()</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#acfa522fb0bea4aca8fade87c18bcf921">Bicop</a> ()</td></tr>
+<tr class="memdesc:acfa522fb0bea4aca8fade87c18bcf921"><td class="mdescLeft">&#160;</td><td class="mdescRight">creates the independence copula. <br /></td></tr>
 <tr class="separator:acfa522fb0bea4aca8fade87c18bcf921"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab27f789e001e30f2fed7f9ecefdeffb0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab27f789e001e30f2fed7f9ecefdeffb0"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Bicop</b> (<a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> family, int rotation=0, const Eigen::MatrixXd &amp;parameters=Eigen::MatrixXd())</td></tr>
+<tr class="memitem:ab27f789e001e30f2fed7f9ecefdeffb0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#ab27f789e001e30f2fed7f9ecefdeffb0">Bicop</a> (<a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> family, int rotation=0, const Eigen::MatrixXd &amp;parameters=Eigen::MatrixXd())</td></tr>
 <tr class="separator:ab27f789e001e30f2fed7f9ecefdeffb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87d5c10cb7b6a9c07dc3b2a38da91ee5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a87d5c10cb7b6a9c07dc3b2a38da91ee5"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Bicop</b> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; data, std::vector&lt; <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=bicop_families::all, std::string method=&quot;mle&quot;, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true)</td></tr>
+<tr class="memitem:a87d5c10cb7b6a9c07dc3b2a38da91ee5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a87d5c10cb7b6a9c07dc3b2a38da91ee5">Bicop</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; data, std::vector&lt; <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=bicop_families::all, std::string method=&quot;mle&quot;, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true)</td></tr>
 <tr class="separator:a87d5c10cb7b6a9c07dc3b2a38da91ee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83dc7214e4bb1bfe59285ca05407d646"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646">pdf</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
 <tr class="separator:a83dc7214e4bb1bfe59285ca05407d646"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a130fda62cd61c7acdef5db75fffdd89e"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a130fda62cd61c7acdef5db75fffdd89e">hfunc1</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:a130fda62cd61c7acdef5db75fffdd89e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c9b50f99797ec374f5057cc54db2bd8"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a4c9b50f99797ec374f5057cc54db2bd8">hfunc2</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:a4c9b50f99797ec374f5057cc54db2bd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cc8b161ec6efdb3b34d2efa9185bf44"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a3cc8b161ec6efdb3b34d2efa9185bf44">hinv1</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:a3cc8b161ec6efdb3b34d2efa9185bf44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e33ec227b6b7182e327399201cad382"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a3e33ec227b6b7182e327399201cad382">hinv2</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:a3e33ec227b6b7182e327399201cad382"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb87bea4283dacfa5e609356c020f85d"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#aeb87bea4283dacfa5e609356c020f85d">simulate</a> (const int &amp;n)</td></tr>
+<tr class="separator:aeb87bea4283dacfa5e609356c020f85d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a266fa8d13e8ed1e96937e4208a99955d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a266fa8d13e8ed1e96937e4208a99955d">fit</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;data, std::string method)</td></tr>
+<tr class="separator:a266fa8d13e8ed1e96937e4208a99955d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af04ef20ec08d02222059ba2b72084ad0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#af04ef20ec08d02222059ba2b72084ad0">select</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; data, std::vector&lt; <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=bicop_families::all, std::string method=&quot;mle&quot;, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true)</td></tr>
+<tr class="separator:af04ef20ec08d02222059ba2b72084ad0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8bcc0c3265cc86565333a0cfd3d619d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#ae8bcc0c3265cc86565333a0cfd3d619d">loglik</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:ae8bcc0c3265cc86565333a0cfd3d619d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9287fec95519fea64a2ae80f5888c709"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a9287fec95519fea64a2ae80f5888c709">aic</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:a9287fec95519fea64a2ae80f5888c709"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1f480d13b3464260c2dd6aa88b2e130"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#ac1f480d13b3464260c2dd6aa88b2e130">bic</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:ac1f480d13b3464260c2dd6aa88b2e130"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f3b3b83c54a9e1d809fdee058f3eb11"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a9f3b3b83c54a9e1d809fdee058f3eb11">calculate_npars</a> ()</td></tr>
+<tr class="separator:a9f3b3b83c54a9e1d809fdee058f3eb11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa25436353dee76e4368fb941a7efa257"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#aa25436353dee76e4368fb941a7efa257">parameters_to_tau</a> (const Eigen::VectorXd &amp;parameters)</td></tr>
+<tr class="separator:aa25436353dee76e4368fb941a7efa257"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5809ddc9884f6fb66fe53289be348913"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a5809ddc9884f6fb66fe53289be348913">tau_to_parameters</a> (const double &amp;tau)</td></tr>
+<tr class="separator:a5809ddc9884f6fb66fe53289be348913"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Getters and setters</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">rotation</td><td></td></tr>
-    <tr><td class="paramname">parameters</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-</div></td></tr>
 <tr class="memitem:a68ab3556ee3bb3d02814fd978573bf3b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a68ab3556ee3bb3d02814fd978573bf3b"></a>
 <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_family</b> () const </td></tr>
 <tr class="separator:a68ab3556ee3bb3d02814fd978573bf3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,99 +164,191 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>get_rotation</b> () co
 <tr class="memitem:a93ab0dd89826e50b209ea3760f251f2f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a93ab0dd89826e50b209ea3760f251f2f"></a>
 Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>get_parameters</b> () const </td></tr>
 <tr class="separator:a93ab0dd89826e50b209ea3760f251f2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e359624560a089273b25dc74879bd16"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e359624560a089273b25dc74879bd16"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_rotation</b> (int rotation)</td></tr>
+<tr class="memitem:a4e359624560a089273b25dc74879bd16"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a4e359624560a089273b25dc74879bd16">set_rotation</a> (int rotation)</td></tr>
 <tr class="separator:a4e359624560a089273b25dc74879bd16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8d1d4266b0fd7e2f971d0149f881ef9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8d1d4266b0fd7e2f971d0149f881ef9"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_parameters</b> (const Eigen::MatrixXd &amp;parameters)</td></tr>
+<tr class="memitem:ac8d1d4266b0fd7e2f971d0149f881ef9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#ac8d1d4266b0fd7e2f971d0149f881ef9">set_parameters</a> (const Eigen::MatrixXd &amp;parameters)</td></tr>
 <tr class="separator:ac8d1d4266b0fd7e2f971d0149f881ef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">h-functions</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>calculates h-functions and their inverse. h-functions are defined as one-dimensional integrals over a bivariate copula density \( c \), </p><p class="formulaDsp">
-\begin{align*} h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) ds, \qquad h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds. \end{align*}
-</p>
-<p> <code>hinv1</code> is the inverse w.r.t. the second argument (conditioned on first), <code>hinv2</code> is the inverse w.r.t. the first argument (conditioned on second).</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">u</td><td>\(m \times 2\) matrix of evaluation points. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The (inverse) h-function evaluated at <code>u</code>. </dd></dl>
-</div></td></tr>
-<tr class="memitem:a130fda62cd61c7acdef5db75fffdd89e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a130fda62cd61c7acdef5db75fffdd89e"></a>
-Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>hfunc1</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:a130fda62cd61c7acdef5db75fffdd89e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c9b50f99797ec374f5057cc54db2bd8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c9b50f99797ec374f5057cc54db2bd8"></a>
-Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>hfunc2</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:a4c9b50f99797ec374f5057cc54db2bd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cc8b161ec6efdb3b34d2efa9185bf44"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3cc8b161ec6efdb3b34d2efa9185bf44"></a>
-Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>hinv1</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:a3cc8b161ec6efdb3b34d2efa9185bf44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e33ec227b6b7182e327399201cad382"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3e33ec227b6b7182e327399201cad382"></a>
-Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><b>hinv2</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:a3e33ec227b6b7182e327399201cad382"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
-<tr class="memitem:a266fa8d13e8ed1e96937e4208a99955d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a266fa8d13e8ed1e96937e4208a99955d">fit</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;data, std::string method)</td></tr>
-<tr class="separator:a266fa8d13e8ed1e96937e4208a99955d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af04ef20ec08d02222059ba2b72084ad0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af04ef20ec08d02222059ba2b72084ad0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>select</b> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; data, std::vector&lt; <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=bicop_families::all, std::string method=&quot;mle&quot;, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true)</td></tr>
-<tr class="separator:af04ef20ec08d02222059ba2b72084ad0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Utilities</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p><code>flip()</code> adjust's the copula model to a change in the variable order. <code>str()</code> summarizes the model into a string (can be used for printing). </p>
+<tr><td colspan="2"><div class="groupText"><p>adjust's the copula model to a change in the variable order. </p>
 </div></td></tr>
+<tr class="memitem:a94b889d56f478dbeb156be4e31af5de5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94b889d56f478dbeb156be4e31af5de5"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a94b889d56f478dbeb156be4e31af5de5">str</a> ()</td></tr>
+<tr class="memdesc:a94b889d56f478dbeb156be4e31af5de5"><td class="mdescLeft">&#160;</td><td class="mdescRight">summarizes the model into a string (can be used for printing). <br /></td></tr>
+<tr class="separator:a94b889d56f478dbeb156be4e31af5de5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59b7087b3857350df25ff684ab96f377"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a59b7087b3857350df25ff684ab96f377"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
 <tr class="separator:a59b7087b3857350df25ff684ab96f377"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94b889d56f478dbeb156be4e31af5de5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94b889d56f478dbeb156be4e31af5de5"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>str</b> ()</td></tr>
-<tr class="separator:a94b889d56f478dbeb156be4e31af5de5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Fit statistics</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="fit_statistics"></a></p>
-<p>Calculates fit statistics for a bivariate copula. The log-likelihood, Aikaike information criterion (AIC), and Bayesian information criterion (BIC) are defined as </p><p class="formulaDsp">
-\begin{align*} \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \quad \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \quad \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \end{align*}
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A class for bivariate copula models. </p>
+<p>The copula model is fully characterized by the family, rotation, and parameters. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="ab27f789e001e30f2fed7f9ecefdeffb0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vinecopulib::Bicop::Bicop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a>&#160;</td>
+          <td class="paramname"><em>family</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>rotation</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>parameters</em> = <code>Eigen::MatrixXd()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>creates a specific bivariate copula model. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">family</td><td>the copula family. </td></tr>
+    <tr><td class="paramname">rotation</td><td>the rotation of the copula; one of 0, 90, 180, or 270 (for Independence, Gaussian, Student, Frank, and nonparametric families, only 0 is allowed). </td></tr>
+    <tr><td class="paramname">parameters</td><td>the copula parameters. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a87d5c10cb7b6a9c07dc3b2a38da91ee5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vinecopulib::Bicop::Bicop </td>
+          <td>(</td>
+          <td class="paramtype">Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt;&#160;</td>
+          <td class="paramname"><em>family_set</em> = <code>bicop_families::all</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>method</em> = <code>&quot;mle&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>selection_criterion</em> = <code>&quot;bic&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>preselect_families</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>equivalent to <code><a class="el" href="classvinecopulib_1_1_bicop.html" title="A class for bivariate copula models. ">Bicop</a> cop; cop.select(data, family_set, ...)</code>. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>see <a class="el" href="classvinecopulib_1_1_bicop.html#af04ef20ec08d02222059ba2b72084ad0">select()</a>. </td></tr>
+    <tr><td class="paramname">family_set</td><td>see <a class="el" href="classvinecopulib_1_1_bicop.html#af04ef20ec08d02222059ba2b72084ad0">select()</a>. </td></tr>
+    <tr><td class="paramname">method</td><td>see <a class="el" href="classvinecopulib_1_1_bicop.html#af04ef20ec08d02222059ba2b72084ad0">select()</a>. </td></tr>
+    <tr><td class="paramname">selection_criterion</td><td>see <a class="el" href="classvinecopulib_1_1_bicop.html#af04ef20ec08d02222059ba2b72084ad0">select()</a>. </td></tr>
+    <tr><td class="paramname">preselect_families</td><td>see <a class="el" href="classvinecopulib_1_1_bicop.html#af04ef20ec08d02222059ba2b72084ad0">select()</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a9287fec95519fea64a2ae80f5888c709"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double vinecopulib::Bicop::aic </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>u</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>calculates the Akaike information criterion (AIC).</p>
+<p>The AIC is defined as </p><p class="formulaDsp">
+\[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \]
 </p>
-<p> where \( c \) is the copula density <a class="el" href="classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646">pdf()</a> and \( p \) is the (effective) number of parameters of the model. The loglikehood is used for model fitting, the others for selecting between fitted models. The AIC is consistent for nonparametric models, the BIC is more conservative and consistent for parametric models. The effective number of parameters is the actual number of parameters for parameteric families. For nonparametric families, there is another definition that is conceptually similar in the sense that it can be used in the calculation of fit statistics.</p>
+<p> where \( \mathrm{loglik} \) is the log-liklihood and \( p \) is the (effective) number of parameters of the model, see <a class="el" href="classvinecopulib_1_1_bicop.html#ae8bcc0c3265cc86565333a0cfd3d619d">loglik()</a> and <a class="el" href="classvinecopulib_1_1_bicop.html#a9f3b3b83c54a9e1d809fdee058f3eb11">calculate_npars()</a>. The AIC is a consistent model selection criterion for nonparametric models.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">u</td><td>\(n \times 2\) matrix of observations. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The fit statistic for the model and observations <code>u</code>. </dd></dl>
-</div></td></tr>
-<tr class="memitem:ae8bcc0c3265cc86565333a0cfd3d619d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8bcc0c3265cc86565333a0cfd3d619d"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>loglik</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:ae8bcc0c3265cc86565333a0cfd3d619d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9287fec95519fea64a2ae80f5888c709"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9287fec95519fea64a2ae80f5888c709"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>aic</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:a9287fec95519fea64a2ae80f5888c709"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1f480d13b3464260c2dd6aa88b2e130"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac1f480d13b3464260c2dd6aa88b2e130"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>bic</b> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
-<tr class="separator:ac1f480d13b3464260c2dd6aa88b2e130"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f3b3b83c54a9e1d809fdee058f3eb11"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9f3b3b83c54a9e1d809fdee058f3eb11"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>calculate_npars</b> ()</td></tr>
-<tr class="separator:a9f3b3b83c54a9e1d809fdee058f3eb11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Conversion between Parameters and Kendall's tau</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>Currently <code>parameters_to_tau()</code> works for all families but <code>BicopFamily::tll0</code>. <code>tau_to_parameters()</code> only works for one-parameter families.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac1f480d13b3464260c2dd6aa88b2e130"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double vinecopulib::Bicop::bic </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>u</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>calculates the Bayesian information criterion (BIC).</p>
+<p>The BIC is defined as </p><p class="formulaDsp">
+\[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \]
+</p>
+<p> where \( \mathrm{loglik} \) is the log-liklihood and \( p \) is the (effective) number of parameters of the model, see <a class="el" href="classvinecopulib_1_1_bicop.html#ae8bcc0c3265cc86565333a0cfd3d619d">loglik()</a> and <a class="el" href="classvinecopulib_1_1_bicop.html#a9f3b3b83c54a9e1d809fdee058f3eb11">calculate_npars()</a>. The BIC is a consistent model selection criterion for nonparametric models.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">tau</td><td></td></tr>
-    <tr><td class="paramname">parameters</td><td></td></tr>
+    <tr><td class="paramname">u</td><td>\(n \times 2\) matrix of observations. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The tau/parameters corresponding to parameters/tau for the current family. </dd></dl>
-</div></td></tr>
-<tr class="memitem:aa25436353dee76e4368fb941a7efa257"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa25436353dee76e4368fb941a7efa257"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>parameters_to_tau</b> (const Eigen::VectorXd &amp;parameters)</td></tr>
-<tr class="separator:aa25436353dee76e4368fb941a7efa257"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5809ddc9884f6fb66fe53289be348913"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5809ddc9884f6fb66fe53289be348913"></a>
-Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>tau_to_parameters</b> (const double &amp;tau)</td></tr>
-<tr class="separator:a5809ddc9884f6fb66fe53289be348913"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A class for bivariate copula models. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+
+</div>
+</div>
+<a class="anchor" id="a9f3b3b83c54a9e1d809fdee058f3eb11"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double vinecopulib::Bicop::calculate_npars </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>calculates the effective number of parameters.</p>
+<p>Returns the actual number of parameters for parameteric families. For nonparametric families, there is a conceptually similar definition in the sense that it can be used in the calculation of fit statistics. </p>
+
+</div>
+</div>
 <a class="anchor" id="a266fa8d13e8ed1e96937e4208a99955d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -281,15 +372,150 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>tau_to_par
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Estimation and selection of bivariate copula models</p>
-<p>For parametric models, two different methods are available. <code>"mle"</code> fits the parameters by maximum-likelihood. <code>"itau"</code> uses inversion of Kendall's \( \tau \), but is only available for one-parameter families and the Student t copula. For the latter, there is a one-to-one transformation for the first parameter, the second is found by profile likelihood optimization (with accuracy of at least 0.5). nonparametric families have specialized methods, no specification is required.</p>
+<p>fits a bivariate copula (with fixed family) to data.</p>
+<p>For parametric models, two different methods are available. <code>"mle"</code> fits the parameters by maximum-likelihood. <code>"itau"</code> uses inversion of Kendall's \( \tau \), but is only available for one-parameter families and the Student t copula. For the latter, there is a one-to-one transformation for the first parameter, the second is found by profile likelihood optimization (with accuracy of at least 0.5). Nonparametric families have specialized methods, no specification is required.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>an \( n \times 2 \) matrix of observations contained in \((0, 1)^2 \). </td></tr>
-    <tr><td class="paramname">family_set</td><td>the set of copula families to consider (if empty, then all families are included). </td></tr>
     <tr><td class="paramname">method</td><td>the fit method; possible choices: <code>"mle"</code>, <code>"itau"</code>. </td></tr>
-    <tr><td class="paramname">selection_criterion</td><td>the selection criterion (<code>"aic"</code> or <code>"bic"</code>). </td></tr>
-    <tr><td class="paramname">preselect_families</td><td>whether to exclude families before fitting based on symmetry properties of the data. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a130fda62cd61c7acdef5db75fffdd89e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::VectorXd vinecopulib::Bicop::hfunc1 </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>u</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>calculates the first h-function, i.e., \( h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) \). </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">u</td><td>\(m \times 2\) matrix of evaluation points. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a4c9b50f99797ec374f5057cc54db2bd8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::VectorXd vinecopulib::Bicop::hfunc2 </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>u</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>calculates the second h-function, i.e., \( h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) \). </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">u</td><td>\(m \times 2\) matrix of evaluation points. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a3cc8b161ec6efdb3b34d2efa9185bf44"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::VectorXd vinecopulib::Bicop::hinv1 </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>u</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>calculates the inverse of \( h_1 f\) (see <a class="el" href="classvinecopulib_1_1_bicop.html#a130fda62cd61c7acdef5db75fffdd89e">hfunc1()</a>) w.r.t. the second argument. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">u</td><td>\(m \times 2\) matrix of evaluation points. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a3e33ec227b6b7182e327399201cad382"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::VectorXd vinecopulib::Bicop::hinv2 </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>u</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>calculates the inverse of \( h_2 f\) (see <a class="el" href="classvinecopulib_1_1_bicop.html#a4c9b50f99797ec374f5057cc54db2bd8">hfunc2()</a>) w.r.t. the first argument. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">u</td><td>\(m \times 2\) matrix of evaluation points. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ae8bcc0c3265cc86565333a0cfd3d619d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double vinecopulib::Bicop::loglik </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>u</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>calculates the log-likelihood.</p>
+<p>The log-likelihood is defined as </p><p class="formulaDsp">
+\[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \]
+</p>
+<p> where \( c \) is the copula density <a class="el" href="classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646">pdf()</a> and \( p \) is the (effective) number of parameters of the model, see <a class="el" href="classvinecopulib_1_1_bicop.html#a9f3b3b83c54a9e1d809fdee058f3eb11">calculate_npars()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">u</td><td>\(n \times 2\) matrix of observations. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="aa25436353dee76e4368fb941a7efa257"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double vinecopulib::Bicop::parameters_to_tau </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>parameters</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>converts the parameters to the Kendall's \( tau \) for the current family (works for all families but <code>BicopFamily::tll0</code>).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parameters</td><td>the parameters (must be a valid parametrization of the current family). </td></tr>
   </table>
   </dd>
 </dl>
@@ -320,6 +546,106 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>tau_to_par
 
 </div>
 </div>
+<a class="anchor" id="af04ef20ec08d02222059ba2b72084ad0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vinecopulib::Bicop::select </td>
+          <td>(</td>
+          <td class="paramtype">Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="family_8hpp.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt;&#160;</td>
+          <td class="paramname"><em>family_set</em> = <code>bicop_families::all</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>method</em> = <code>&quot;mle&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>selection_criterion</em> = <code>&quot;bic&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>preselect_families</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>selects the best fitting model.</p>
+<p>The function calls <a class="el" href="classvinecopulib_1_1_bicop.html#a266fa8d13e8ed1e96937e4208a99955d">fit()</a> for all families in <code>family_set</code>) and selects the best fitting model by either BIC or AIC, see <a class="el" href="classvinecopulib_1_1_bicop.html#ac1f480d13b3464260c2dd6aa88b2e130">bic()</a> and <a class="el" href="classvinecopulib_1_1_bicop.html#a9287fec95519fea64a2ae80f5888c709">aic()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>an \( n \times 2 \) matrix of observations contained in \((0, 1)^2 \). </td></tr>
+    <tr><td class="paramname">method</td><td>the fit method, see <a class="el" href="classvinecopulib_1_1_bicop.html#a266fa8d13e8ed1e96937e4208a99955d">fit()</a>. </td></tr>
+    <tr><td class="paramname">family_set</td><td>the set of copula families to consider (if empty, then all families are included). </td></tr>
+    <tr><td class="paramname">selection_criterion</td><td>the selection criterion (<code>"aic"</code> or <code>"bic"</code>). </td></tr>
+    <tr><td class="paramname">preselect_families</td><td>whether to exclude families before fitting based on symmetry properties of the data. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ac8d1d4266b0fd7e2f971d0149f881ef9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vinecopulib::Bicop::set_parameters </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>parameters</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parameters</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a4e359624560a089273b25dc74879bd16"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vinecopulib::Bicop::set_rotation </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>rotation</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rotation</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="aeb87bea4283dacfa5e609356c020f85d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -344,6 +670,29 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>tau_to_par
 
 </div>
 </div>
+<a class="anchor" id="a5809ddc9884f6fb66fe53289be348913"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::MatrixXd vinecopulib::Bicop::tau_to_parameters </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>tau</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>converts a Kendall's \( \tau \) to the copula parameters of the current family (only works for one-parameter families).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tau</td><td>a value in \( (-1, 1) \). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/n5/dev/cpp/vinecopulib/include/bicop/<a class="el" href="bicop_2class_8hpp_source.html">class.hpp</a></li>
 <li>/home/n5/dev/cpp/vinecopulib/src/bicop/class.cpp</li>
@@ -357,7 +706,7 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>tau_to_par
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 24 2017 20:26:12 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Mar 25 2017 15:26:28 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

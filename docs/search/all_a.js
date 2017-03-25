@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mainpage_2eh',['mainpage.h',['../mainpage_8h.html',1,'']]]
+  ['loglik',['loglik',['../classvinecopulib_1_1_bicop.html#ae8bcc0c3265cc86565333a0cfd3d619d',1,'vinecopulib::Bicop']]]
 ];

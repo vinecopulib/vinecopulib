@@ -1,39 +1,33 @@
 \hypertarget{classvinecopulib_1_1_r_vine_matrix}{}\section{vinecopulib\+:\+:R\+Vine\+Matrix Class Reference}
 \label{classvinecopulib_1_1_r_vine_matrix}\index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
+
+
+A class for regular vine matrices.  
+
+
+
+
+{\ttfamily \#include $<$rvine\+\_\+matrix.\+hpp$>$}
+
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-Eigen\+::\+Vector\+Xi {\bfseries get\+\_\+order} () const \hypertarget{classvinecopulib_1_1_r_vine_matrix_a8ce7f93504e7c219ca9da89e1d97a34b}{}\label{classvinecopulib_1_1_r_vine_matrix_a8ce7f93504e7c219ca9da89e1d97a34b}
-
+\hyperlink{classvinecopulib_1_1_r_vine_matrix_a5872c479d4a7de9c2ddc64cdb0909ef9}{R\+Vine\+Matrix} (const Eigen\+::\+Matrix\+Xi \&matrix)
 \item 
+Eigen\+::\+Matrix\+Xi \hyperlink{classvinecopulib_1_1_r_vine_matrix_aef1ea47e9fcbcd32337b2db508b25fdb}{get\+\_\+matrix} () const \hypertarget{classvinecopulib_1_1_r_vine_matrix_aef1ea47e9fcbcd32337b2db508b25fdb}{}\label{classvinecopulib_1_1_r_vine_matrix_aef1ea47e9fcbcd32337b2db508b25fdb}
+
+\begin{DoxyCompactList}\small\item\em extract the matrix. \end{DoxyCompactList}\item 
+Eigen\+::\+Vector\+Xi \hyperlink{classvinecopulib_1_1_r_vine_matrix_a8ce7f93504e7c219ca9da89e1d97a34b}{get\+\_\+order} () const \hypertarget{classvinecopulib_1_1_r_vine_matrix_a8ce7f93504e7c219ca9da89e1d97a34b}{}\label{classvinecopulib_1_1_r_vine_matrix_a8ce7f93504e7c219ca9da89e1d97a34b}
+
+\begin{DoxyCompactList}\small\item\em extracts the variable order in the R-\/vine. \end{DoxyCompactList}\item 
 Eigen\+::\+Matrix\+Xi \hyperlink{classvinecopulib_1_1_r_vine_matrix_a88673df07f4aae0e0e0a65faff2418b6}{in\+\_\+natural\+\_\+order} () const 
 \item 
 Eigen\+::\+Matrix\+Xi \hyperlink{classvinecopulib_1_1_r_vine_matrix_a674074d4e248868a01155a25f775ae3a}{get\+\_\+max\+\_\+matrix} () const 
-\end{DoxyCompactItemize}
-{\bf }\par
-\begin{DoxyCompactItemize}
-\item 
-\hyperlink{classvinecopulib_1_1_r_vine_matrix_a657aaae02c7f9bca12b3c43f475ac884}{R\+Vine\+Matrix} ()
-\item 
-{\bfseries R\+Vine\+Matrix} (const Eigen\+::\+Matrix\+Xi \&matrix)\hypertarget{classvinecopulib_1_1_r_vine_matrix_a5872c479d4a7de9c2ddc64cdb0909ef9}{}\label{classvinecopulib_1_1_r_vine_matrix_a5872c479d4a7de9c2ddc64cdb0909ef9}
-
-\end{DoxyCompactItemize}
-
-{\bf }\par
-\begin{DoxyCompactItemize}
-\item 
-Eigen\+::\+Matrix\+Xi \hyperlink{classvinecopulib_1_1_r_vine_matrix_aef1ea47e9fcbcd32337b2db508b25fdb}{get\+\_\+matrix} () const 
-\end{DoxyCompactItemize}
-
-{\bf }\par
-\begin{DoxyCompactItemize}
 \item 
 Matrix\+Xb \hyperlink{classvinecopulib_1_1_r_vine_matrix_a6303fc1f643fdf793c867ca7e08e42bc}{get\+\_\+needed\+\_\+hfunc1} () const 
 \item 
-Matrix\+Xb {\bfseries get\+\_\+needed\+\_\+hfunc2} () const \hypertarget{classvinecopulib_1_1_r_vine_matrix_a7ac32cf10a966ba567142e9b36106746}{}\label{classvinecopulib_1_1_r_vine_matrix_a7ac32cf10a966ba567142e9b36106746}
-
+Matrix\+Xb \hyperlink{classvinecopulib_1_1_r_vine_matrix_a7ac32cf10a966ba567142e9b36106746}{get\+\_\+needed\+\_\+hfunc2} () const 
 \end{DoxyCompactItemize}
-
 \subsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -41,15 +35,48 @@ static Eigen\+::\+Matrix\+Xi \hyperlink{classvinecopulib_1_1_r_vine_matrix_a7b3c
 \end{DoxyCompactItemize}
 
 
+\subsection{Detailed Description}
+A class for regular vine matrices. 
+
+A regular vine (R-\/vine) matrix encodes the structure of a vine. An examplary matrix is 
+\begin{DoxyCode}
+1 1 1 1
+2 2 2 0
+3 3 0 0
+4 0 0 0
+\end{DoxyCode}
+ which encodes the following pair-\/copulas\+: 
+\begin{DoxyCode}
+| tree | edge | pair-copulas   |
+|------|------|----------------|
+| 0    | 0    | `(4, 1)`       |
+|      | 1    | `(3, 1)`       |
+|      | 2    | `(2, 1)`       |
+| 1    | 0    | `(4, 2; 1)`    |
+|      | 1    | `(3, 2; 1)`    |
+| 2    | 0    | `(4, 3; 2, 1)` |
+\end{DoxyCode}
+ Denoting by {\ttfamily M\mbox{[}i\mbox{]}\mbox{[}j\mbox{]}} the matrix entry in row {\ttfamily i} and column {\ttfamily j} (starting at 0), the pair-\/copula index for edge {\ttfamily e} in tree {\ttfamily t} of a {\ttfamily d} dimensional vine is {\ttfamily (M\mbox{[}d -\/ 1 -\/ t\mbox{]}\mbox{[}e\mbox{]}, M\mbox{[}t\mbox{]}\mbox{[}e\mbox{]}; M\mbox{[}t -\/ 1\mbox{]}\mbox{[}e\mbox{]}, ..., M\mbox{[}0\mbox{]}\mbox{[}e\mbox{]})}. Less formally,
+\begin{DoxyEnumerate}
+\item Start with the counter-\/diagonal element of column {\ttfamily e} (first conditioned variable).
+\item Jump up to the element in row {\ttfamily t} (second conditioned variable).
+\item Gather all entries further up in column {\ttfamily e} (conditioning set). 
+\end{DoxyEnumerate}
+
 \subsection{Constructor \& Destructor Documentation}
 \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!R\+Vine\+Matrix@{R\+Vine\+Matrix}}
 \index{R\+Vine\+Matrix@{R\+Vine\+Matrix}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
-\subsubsection[{\texorpdfstring{R\+Vine\+Matrix()}{RVineMatrix()}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+R\+Vine\+Matrix\+::\+R\+Vine\+Matrix (
+\subsubsection[{\texorpdfstring{R\+Vine\+Matrix(const Eigen\+::\+Matrix\+Xi \&matrix)}{RVineMatrix(const Eigen::MatrixXi &matrix)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+R\+Vine\+Matrix\+::\+R\+Vine\+Matrix (
 \begin{DoxyParamCaption}
-{}
+\item[{const Eigen\+::\+Matrix\+Xi \&}]{matrix}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a657aaae02c7f9bca12b3c43f475ac884}{}\label{classvinecopulib_1_1_r_vine_matrix_a657aaae02c7f9bca12b3c43f475ac884}
-constructors Constructors 
+)}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a5872c479d4a7de9c2ddc64cdb0909ef9}{}\label{classvinecopulib_1_1_r_vine_matrix_a5872c479d4a7de9c2ddc64cdb0909ef9}
+instantiates an \hyperlink{classvinecopulib_1_1_r_vine_matrix}{R\+Vine\+Matrix} object. 
+\begin{DoxyParams}{Parameters}
+{\em a} & valid R-\/vine matrix (this is not checked so far!). \\
+\hline
+\end{DoxyParams}
+
 
 \subsection{Member Function Documentation}
 \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!construct\+\_\+d\+\_\+vine\+\_\+matrix@{construct\+\_\+d\+\_\+vine\+\_\+matrix}}
@@ -59,41 +86,31 @@ constructors Constructors
 \item[{const Eigen\+::\+Vector\+Xi \&}]{order}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a7b3c8952acd3a29559369f0fae0ad9b3}{}\label{classvinecopulib_1_1_r_vine_matrix_a7b3c8952acd3a29559369f0fae0ad9b3}
-Construct a D-\/vine matrix
+constructs a D-\/vine matrix.
 
 A D-\/vine is a vine where each tree is a path.
 
 
 \begin{DoxyParams}{Parameters}
-{\em order} & order of the variables\\
+{\em order} & order of the variables. \\
 \hline
 \end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-An Eigen\+::\+Matrix\+Xi describing the D-\/vine structure. 
-\end{DoxyReturn}
-\index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+matrix@{get\+\_\+matrix}}
-\index{get\+\_\+matrix@{get\+\_\+matrix}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
-\subsubsection[{\texorpdfstring{get\+\_\+matrix() const }{get_matrix() const }}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xi vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+matrix (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-) const}\hypertarget{classvinecopulib_1_1_r_vine_matrix_aef1ea47e9fcbcd32337b2db508b25fdb}{}\label{classvinecopulib_1_1_r_vine_matrix_aef1ea47e9fcbcd32337b2db508b25fdb}
-Getters \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+max\+\_\+matrix@{get\+\_\+max\+\_\+matrix}}
+\index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+max\+\_\+matrix@{get\+\_\+max\+\_\+matrix}}
 \index{get\+\_\+max\+\_\+matrix@{get\+\_\+max\+\_\+matrix}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
 \subsubsection[{\texorpdfstring{get\+\_\+max\+\_\+matrix() const }{get_max_matrix() const }}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xi vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+max\+\_\+matrix (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 ) const}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a674074d4e248868a01155a25f775ae3a}{}\label{classvinecopulib_1_1_r_vine_matrix_a674074d4e248868a01155a25f775ae3a}
-Get maximum matrix
+extracts the maximum matrix.
 
 The maximum matrix is derived from an R-\/vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge.
 
-no\+\_\+matrix initial R-\/vine matrix, assumed to be in natural order.
 
-\begin{DoxyReturn}{Returns}
-An Eigen\+::\+Matrix\+Xi containing the maximum matrix 
-\end{DoxyReturn}
+\begin{DoxyParams}{Parameters}
+{\em no\+\_\+matrix} & initial R-\/vine matrix, assumed to be in natural order. \\
+\hline
+\end{DoxyParams}
 \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}}
 \index{get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
 \subsubsection[{\texorpdfstring{get\+\_\+needed\+\_\+hfunc1() const }{get_needed_hfunc1() const }}]{\setlength{\rightskip}{0pt plus 5cm}Matrix\+Xb vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+needed\+\_\+hfunc1 (
@@ -101,31 +118,29 @@ An Eigen\+::\+Matrix\+Xi containing the maximum matrix
 {}
 \end{DoxyParamCaption}
 ) const}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a6303fc1f643fdf793c867ca7e08e42bc}{}\label{classvinecopulib_1_1_r_vine_matrix_a6303fc1f643fdf793c867ca7e08e42bc}
-Obtain matrix indicating which h-\/functions are needed
-
-It is usually not necessary to apply both h-\/functions for each pair-\/copula.
-
-no\+\_\+matrix initial R-\/vine matrix (assumed to be in natural order).
-
-\begin{DoxyReturn}{Returns}
-An Eigen\+::\+Matrix$<$bool, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic$>$ indicating whether hfunc1/2 is needed for a given pair copula. 
-\end{DoxyReturn}
-\index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!in\+\_\+natural\+\_\+order@{in\+\_\+natural\+\_\+order}}
+extracts a matrix indicating which of the first h-\/functions are needed (it is usually not necessary to apply both h-\/functions for each pair-\/copula). \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+needed\+\_\+hfunc2@{get\+\_\+needed\+\_\+hfunc2}}
+\index{get\+\_\+needed\+\_\+hfunc2@{get\+\_\+needed\+\_\+hfunc2}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
+\subsubsection[{\texorpdfstring{get\+\_\+needed\+\_\+hfunc2() const }{get_needed_hfunc2() const }}]{\setlength{\rightskip}{0pt plus 5cm}Matrix\+Xb vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+needed\+\_\+hfunc2 (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a7ac32cf10a966ba567142e9b36106746}{}\label{classvinecopulib_1_1_r_vine_matrix_a7ac32cf10a966ba567142e9b36106746}
+extracts a matrix indicating which of the second h-\/functions are needed (it is usually not necessary to apply both h-\/functions for each pair-\/copula). \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!in\+\_\+natural\+\_\+order@{in\+\_\+natural\+\_\+order}}
 \index{in\+\_\+natural\+\_\+order@{in\+\_\+natural\+\_\+order}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
 \subsubsection[{\texorpdfstring{in\+\_\+natural\+\_\+order() const }{in_natural_order() const }}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xi vinecopulib\+::\+R\+Vine\+Matrix\+::in\+\_\+natural\+\_\+order (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 ) const}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a88673df07f4aae0e0e0a65faff2418b6}{}\label{classvinecopulib_1_1_r_vine_matrix_a88673df07f4aae0e0e0a65faff2418b6}
-Reorder R-\/vine matrix to natural order
+extracts the R-\/vine matrix in natural order.
 
-Natural order means that the diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the matrix is in natural order.
+Natural order means that the counter-\/diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-\/vine matrix is in natural order.
 
-matrix initial R-\/vine matrix.
 
-\begin{DoxyReturn}{Returns}
-An Eigen\+::\+Matrix\+Xi containing the matrix in natural order. 
-\end{DoxyReturn}
+\begin{DoxyParams}{Parameters}
+{\em matrix} & initial R-\/vine matrix. \\
+\hline
+\end{DoxyParams}
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}

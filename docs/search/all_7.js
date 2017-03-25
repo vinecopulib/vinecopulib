@@ -6,5 +6,6 @@ var searchData=
   ['interpolate',['interpolate',['../classvinecopulib_1_1_interpolation_grid.html#a7fe207d7f864d2b05654c5efb5e27f35',1,'vinecopulib::InterpolationGrid']]],
   ['interpolationgrid',['InterpolationGrid',['../classvinecopulib_1_1_interpolation_grid.html',1,'vinecopulib']]],
   ['interpolationgrid',['InterpolationGrid',['../classvinecopulib_1_1_interpolation_grid.html#a9e63e4af3a252454eeae6df38fd8e0ca',1,'vinecopulib::InterpolationGrid']]],
-  ['inv_5fintergrate_5f1d',['inv_intergrate_1d',['../classvinecopulib_1_1_interpolation_grid.html#a087c7e9b9c6087b6cbbb8ba7b7292582',1,'vinecopulib::InterpolationGrid']]]
+  ['inv_5fintergrate_5f1d',['inv_intergrate_1d',['../classvinecopulib_1_1_interpolation_grid.html#a087c7e9b9c6087b6cbbb8ba7b7292582',1,'vinecopulib::InterpolationGrid']]],
+  ['inverse_5frosenblatt',['inverse_rosenblatt',['../classvinecopulib_1_1_vinecop.html#a3d8819be948be348b6b3f30495b364ff',1,'vinecopulib::Vinecop']]]
 ];

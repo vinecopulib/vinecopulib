@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['simulate',['simulate',['../classvinecopulib_1_1_bicop.html#aeb87bea4283dacfa5e609356c020f85d',1,'vinecopulib::Bicop']]],
-  ['studentbicop',['StudentBicop',['../classvinecopulib_1_1_student_bicop.html',1,'vinecopulib']]]
+  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html',1,'vinecopulib']]],
+  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html#a5872c479d4a7de9c2ddc64cdb0909ef9',1,'vinecopulib::RVineMatrix']]]
 ];
