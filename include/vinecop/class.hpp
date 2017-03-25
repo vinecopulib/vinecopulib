@@ -14,17 +14,20 @@
 
 namespace vinecopulib
 {
-//! A class for vine copulas
+    //! @brief A class for vine copula models
+    //! 
+    //! A vine copula model is characterized by the structure matrix (see
+    //! RVineMatrix) and the pair-copulas.
     class Vinecop
     {
     public:
         Vinecop() {}
         Vinecop(int d);
+        Vinecop(const Eigen::MatrixXi& matrix);
         Vinecop(
                 const std::vector<std::vector<Bicop>>& pair_copulas,
                 const Eigen::MatrixXi& matrix
         );
-        Vinecop(const Eigen::MatrixXi& matrix);
         Vinecop(
                 const Eigen::MatrixXd& data,
                 const Eigen::MatrixXi& matrix = Eigen::MatrixXi(),
@@ -64,14 +67,15 @@ namespace vinecopulib
         );
 
         Bicop get_pair_copula(int tree, int edge) const;
-        std::vector<std::vector<Bicop>> get_all_pair_copulas() const;
         BicopFamily get_family(int tree, int edge) const;
-        std::vector<std::vector<BicopFamily>> get_all_families() const;
         int get_rotation(int tree, int edge) const;
-        std::vector<std::vector<int>> get_all_rotations() const;
         Eigen::VectorXd get_parameters(int tree, int edge) const;
-        std::vector<std::vector<Eigen::VectorXd>> get_all_parameters() const;
         Eigen::MatrixXi get_matrix() const;
+
+        std::vector<std::vector<Bicop>> get_all_pair_copulas() const;
+        std::vector<std::vector<BicopFamily>> get_all_families() const;
+        std::vector<std::vector<int>> get_all_rotations() const;
+        std::vector<std::vector<Eigen::VectorXd>> get_all_parameters() const;
 
         Eigen::VectorXd pdf(const Eigen::MatrixXd& u);
         Eigen::MatrixXd simulate(int n);
