@@ -97,8 +97,8 @@ sudo make install && bin/test_all`
 | Install the library on linux/OSX (optional)  | `sudo make install` |
 | Run unit tests (optional)  |  `bin/[test_executable]` |
 
-To create a `MakeFile` via cmake that allows to avoid compiling the unit tests, 
-one can use `cmake .. -DBUILD_TESTING=OFF`.
+To compile the library without unit tests, the `MakeFile` can be created via
+ `cmake .. -DBUILD_TESTING=OFF`.
 
 ------------------------------------------------
 
