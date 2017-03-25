@@ -234,6 +234,8 @@ The constructor with known parameters takes 3 arguments:
 * The copula family (default to `indep`)
 * The rotation (default to `0`)
 * The parameters (default to parameters corresponding to an independence copula)
+
+
 **Example**
 ``` cpp
 // 90 degree rotated Clayton with default parameter (corresponds to independence)
@@ -242,8 +244,8 @@ Bicop clayton(BicopFamily::clayton, 90);
 // Gauss copula with parameter 0.5
 Bicop gauss(BicopFamily::gaussian, 0,  VecXd::Constant(1, 0.5));
 ```
-The constructor from data takes the same arguments as the select method described 
-below.
+The constructor from data takes the same arguments as the select method and is
+described in the next section.
 
 ### Fit and select a bivariate copula
 
@@ -297,8 +299,11 @@ families. It can take either `"bic"`(default) or `"aic"`.
 is `true`) based on symmetry properties of the data (e.g., the unrotated 
 Clayton won't be preselected if the data displays upper-tail dependence). 
 
-As mentioned above, the arguments of `select()` can be used as arguments to a
+As mentioned [above](#set-up-a-custom-bivariate-copula-model), the arguments 
+of `select()` can be used as arguments to a
  constructor allowing to instantiate a new object directly:
+ 
+ **Example**
 ``` cpp
 // instantiate an archimedean copula by selecting the "best" family according to
 // the BIC and parameters corresponding to the MLE
@@ -440,27 +445,87 @@ Denoting by `M[i][j]` the matrix entry in row `i` and column `j` (starting at
 ### Fit and select a vine copula model
 
 The method `select_all()` performs parameter estimation and automatic 
-model selection when the vine structure is unknown, 
-using the sequential procedure proposed by
+model selection when the vine structure is unknown (i.e., it modifies the 
+structure of the object), using the sequential procedure proposed by
  [Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf). 
- Alternatively, `select_families()`
-The only mandatory argument is the data (stored in a `Eigen::MatrixXd`), 
-additional arguments allow for customization of the fit 
-(**TODO:** link to Doxygen page).
+ Alternatively, `select_families()` performs parameter estimation and automatic 
+ model selection for a known structure (i.e., using the structure of the 
+ object). In both cases, the only mandatory argument is the data 
+ (stored in a `Eigen::MatrixXd`), while additional arguments allow for 
+ customization of the fit.
 
 **Example**
 ``` cpp
-MatXd data = simulate_uniform(100, 3);        // dummy data
-Vinecop fit_default = Vinecop::select(data);  // fit and select model
+// specify the dimension of the model
+int d = 5;
+
+// simulate dummy data
+MatXd data = simulate_uniform(100, d);
+
+// instantiate a D-vine and select the families
+Vinecop model(d);
+model.select_families(data);
+
+// alternatively, select the structure along with the families
+model.select_all(data);
+```
+
+Note that the arguments to `select_all()` and `select_families()` are similar to 
+those of `select()` for `Bicop` objects. Additionally, there are three arguments 
+that allow to control the structure selection:
+* `int truncation_level` describes the tree after which `family_set` is set to
+`{BicopFamily::indep}`. In other words, all pair copulas in trees lower than 
+`truncation_level` (default to none) are "selected" as independence copulas.
+* `std::string tree_criterion` describes the criterion used to construct the 
+minimum spanning tree (see 
+[Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf)). 
+It can take `"tau"` (default) for Kendall's tau, `"rho"` for Spearman's rho,
+or `"hoeffd"` for Hoeffding's D (suited for non-monotonic relationships).
+* `double threshold` describes a value (default is 0) of `tree_criterion` under 
+which the corresponding pair-copula is set to independence.
+
+As mentioned [above](#set-up-a-custom-vine-copula-model), the arguments 
+of `select_all()` and `select_families()` can be used as arguments to a
+ constructor allowing to instantiate a new object directly:
+ 
+ **Example**
+``` cpp
+// specify the dimension of the model
+int d = 5;
+
+// simulate dummy data
+MatXd data = simulate_uniform(100, d);
+
+// instantiate a vine from data using the default arguments
+Vinecop best_vine(data, bicop_families::archimedean);
+    
+// instantiate a vine copula using Kendall's tau inversion for parameters 
+// estimation and a truncation after the second tree
+Vinecop best_truncated_archimedean(data, bicop_families::itau, "itau", 2);
 ```
 
 ### Work with a vine copula model
 
-You can simulate from a vine copula model and evaluate its density function.
+You can simulate from a vine copula model, evaluate its density, log-likelihood,
+ AIC and BIC.
 
 **Example**
 ``` cpp
-Vinecop model(5);             // 5-dimensional independence vine
-auto u = model.simulate(100)  // simulate 100 observations
-auto c = model.pdf(u)         // evaluate the density on u
+// 5-dimensional independence vine
+Vinecop model(5);           
+  
+// simulate 100 observations
+auto data = model.simulate(100)  
+
+// evaluate the density
+auto pdf = model.pdf(data)
+
+// evaluate the log-likelihood
+auto ll = model.loglik(data)
+
+// evaluate the AIC
+auto aic = model.aic(data)
+
+// evaluate the BIC
+auto bic = model.bic(data)
 ```
