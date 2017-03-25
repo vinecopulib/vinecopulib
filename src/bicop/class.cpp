@@ -182,8 +182,7 @@ namespace vinecopulib
     //! 
     //! The log-likelihood is defined as
     //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \f]
-    //! where \f$ c \f$ is the copula density pdf() and  \f$ p \f$ is the 
-    //! (effective) number of parameters of the model, see calculate_npars(). 
+    //! where \f$ c \f$ is the copula density pdf().
     //! 
     //! @param u \f$n \times 2\f$ matrix of observations.
     double Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
