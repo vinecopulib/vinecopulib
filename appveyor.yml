@@ -39,26 +39,28 @@ before_build:
 build_script:
   - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt"'
 
-  - md build-debug
-  - cd build-debug
-  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Debug
-  - cmake --build .
+  - md build
+  - cd build
+  - cmake .. %CMAKE_ARGS% 
+  - set path_orig=%path%
+
+  - cmake --build . --config Debug
   - ctest -C Debug --output-on-failure
-  - set path=%PATH%;C:/projects/vinecopulib/bin/Debug;C:/projects/nlopt;
+  - set path=%path_orig%;C:\projects\vinecopulib\build\Debug;C:\projects\nlopt
   - bin\test_all.exe
-  - cd ..
 
-  - md build-release
-  - cd build-release
-  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release
-  - cmake --build .
+  - cmake --build . --config Release
   - ctest -C Release --output-on-failure
-  - cd ..
+  - set path=%path_orig%;C:\projects\vinecopulib\build\Release;C:\projects\nlopt
+  - bin\test_all.exe
 
+  - cd ..
   
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_success:
-  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build-debug\Debug\vinecopulib.* build-release\Debug\vinecopulib.*
+  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build\Debug\vinecopulib.* build\Debug\vinecopulib.*
+  - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
+  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build\Release\vinecopulib.* build\Debug\vinecopulib.*
   - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
