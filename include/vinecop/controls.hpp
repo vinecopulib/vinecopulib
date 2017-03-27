@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <limits>
+
 #include "bicop/controls.hpp"
 
 namespace vinecopulib {

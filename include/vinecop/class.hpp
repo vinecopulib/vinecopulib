@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <limits>
-
 #include "bicop/class.hpp"
 #include "rvine_matrix.hpp"
 #include "tools_structselect.hpp"
