@@ -75,32 +75,19 @@ namespace tools_structselect {
     //! @param preselect_families  whether to exclude families before fitting based
     //!     on symmetry properties of the data.
     //! @return tree T_{k+1}.
-    VineTree select_next_tree(
-        VineTree& prev_tree,
-        std::vector<vinecopulib::BicopFamily> family_set,
-        std::string method,
-        double threshold,
-        std::string tree_criterion,
-        std::string selection_criterion,
-        bool preselect_families
-    )
+    VineTree select_next_tree(VineTree& prev_tree,
+                              vinecopulib::ControlsVinecop& controls)
     {
         auto new_tree = edges_as_vertices(prev_tree);
         remove_edge_data(prev_tree); // no longer needed
-        add_allowed_edges(new_tree, tree_criterion, threshold);
+        add_allowed_edges(new_tree, controls.get_tree_criterion(),
+                          controls.get_threshold());
         if (boost::num_vertices(new_tree) > 2) {
             min_spanning_tree(new_tree);
         }
         add_edge_info(new_tree);  // for pc estimation and next tree
         remove_vertex_data(new_tree);  // no longer needed
-        select_pair_copulas(
-            new_tree,
-            family_set,
-            method,
-            threshold,
-            selection_criterion,
-            preselect_families
-        );
+        select_pair_copulas(new_tree, controls);
 
         return new_tree;
     }
@@ -308,26 +295,18 @@ namespace tools_structselect {
     //!     (default).
     //! @param preselect_families  whether to exclude families before fitting based
     //!     on symmetry properties of the data.
-    void select_pair_copulas(
-        VineTree& tree,
-        std::vector<vinecopulib::BicopFamily> family_set,
-        std::string method,
-        double threshold,
-        std::string selection_criterion,
-        bool preselect_families
-    )
+    void select_pair_copulas(VineTree& tree,
+                             vinecopulib::ControlsVinecop& controls)
     {
+        // Controls for selecting the pair copulas
+        vinecopulib::ControlsBicop controls_bicop(controls.get_controlsbicop());
+
         for (auto e : boost::edges(tree)) {
-            if (tree[e].weight > 1 - threshold) {
+            if (tree[e].weight > 1 - controls.get_threshold()) {
                 tree[e].pair_copula = vinecopulib::Bicop();
             } else {
-                tree[e].pair_copula = vinecopulib::Bicop(
-                    tree[e].pc_data,
-                    family_set,
-                    method,
-                    selection_criterion,
-                    preselect_families
-                );
+                tree[e].pair_copula = vinecopulib::Bicop(tree[e].pc_data,
+                                                         controls_bicop);
             }
 
             tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);

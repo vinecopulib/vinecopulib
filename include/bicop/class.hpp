@@ -7,6 +7,7 @@
 #pragma once
 
 #include "abstract.hpp"
+#include "controls.hpp"
 
 namespace vinecopulib {
     //! @brief A class for bivariate copula models.
@@ -19,14 +20,9 @@ namespace vinecopulib {
         // Constructors
         Bicop();
         Bicop(BicopFamily family, int rotation = 0,
-            const Eigen::MatrixXd& parameters = Eigen::MatrixXd());
-        Bicop(
-                Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                std::vector<BicopFamily> family_set = bicop_families::all,
-                std::string method = "mle",
-                std::string selection_criterion = "bic",
-                bool preselect_families = true
-        );
+              const Eigen::MatrixXd& parameters = Eigen::MatrixXd());
+        Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+              ControlsBicop controls = ControlsBicop());
 
         // Getters and setters
         BicopFamily get_family() const;
@@ -47,14 +43,9 @@ namespace vinecopulib {
 
         // Methods modifying the family/rotation/parameters
         void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                std::string method);
-        void select(
-                Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                std::vector<BicopFamily> family_set = bicop_families::all,
-                std::string method = "mle",
-                std::string selection_criterion = "bic",
-                bool preselect_families = true
-        );
+                 ControlsBicop controls = ControlsBicop());
+        void select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+                    ControlsBicop controls = ControlsBicop());
 
         // Fit statistics
         double loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);

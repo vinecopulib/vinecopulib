@@ -8,6 +8,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include "bicop/class.hpp"
+#include "controls.hpp"
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std
@@ -49,40 +50,21 @@ namespace tools_structselect {
 
     // functions for manipulation of trees ----------------
     VineTree make_base_tree(const Eigen::MatrixXd& data);
-    VineTree select_next_tree(
-        VineTree& prev_tree,
-        std::vector<vinecopulib::BicopFamily> family_set,
-        std::string method,
-        double threshold,
-        std::string tree_criterion,
-        std::string selection_criterion,
-        bool preselect_families
-    );
+    VineTree select_next_tree(VineTree& prev_tree,
+                              vinecopulib::ControlsVinecop& controls);
     VineTree edges_as_vertices(const VineTree& prev_tree);
-    void add_allowed_edges(
-        VineTree& tree, 
-        std::string tree_criterion,
-        double threshold
-    );
-    double get_tree_criterion(
-        Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
-        std::string tree_criterion,
-        double threshold
-    );
+    void add_allowed_edges(VineTree& tree, std::string tree_criterion,
+                           double threshold);
+    double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+                              std::string tree_criterion, double threshold);
     int find_common_neighbor(int v0, int v1, const VineTree& tree);
     Eigen::MatrixXd get_pc_data(int v0, int v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);
     void add_edge_info(VineTree& tree);
     void remove_edge_data(VineTree& tree);
     void remove_vertex_data(VineTree& tree);
-    void select_pair_copulas(
-        VineTree& tree,
-        std::vector<vinecopulib::BicopFamily> family_set,
-        std::string method,
-        double threshold,
-        std::string selection_criterion,
-        bool preselect_families
-    );
+    void select_pair_copulas(VineTree& tree,
+                             vinecopulib::ControlsVinecop& controls);
 
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(

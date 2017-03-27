@@ -15,8 +15,7 @@ namespace vinecopulib {
     class ControlsBicop
     {
     public:
-        // Constructors
-        ControlsBicop();
+        // Constructor
         ControlsBicop(std::vector<BicopFamily> family_set = bicop_families::all,
                      std::string parametric_method = "mle",
                      std::string selection_criterion = "bic",

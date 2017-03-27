@@ -71,18 +71,14 @@ namespace test_bicop_parametric {
     // Test if the C++ implementation of select method using the mle is correct
     TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct) {
         std::vector<int> positive_rotations = {0, 180};
-        std::string selection_criterion = "bic";
         auto true_family = bicop_.get_family_name();
         auto true_rotation = bicop_.get_rotation();
-        std::vector<BicopFamily> family_set = {
-                BicopFamily::indep,
-                BicopFamily::gaussian,
-                bicop_.get_family()
-        };
+        ControlsBicop controls({BicopFamily::indep, BicopFamily::gaussian,
+                                bicop_.get_family()}, "mle", "bic");
 
         if (needs_check_) {
             auto data = bicop_.simulate(get_n());
-            auto bicop = Bicop(data, family_set, "mle");
+            auto bicop = Bicop(data, controls);
 
             auto selected_family = bicop.get_family_name();
             EXPECT_EQ(selected_family, true_family) <<
@@ -107,18 +103,14 @@ namespace test_bicop_parametric {
     // Test if the C++ implementation of select method using itau is correct
     TEST_P(ParBicopTest, bicop_select_itau_bic_is_correct) {
         if (is_member(bicop_.get_family(), bicop_families::itau)) {
-            std::string selection_criterion = "bic";
             auto true_family = bicop_.get_family_name();
             auto true_rotation = bicop_.get_rotation();
-            std::vector<BicopFamily> family_set = {
-                    BicopFamily::indep,
-                    BicopFamily::gaussian,
-                    bicop_.get_family()
-            };
+            ControlsBicop controls({BicopFamily::indep, BicopFamily::gaussian,
+                                    bicop_.get_family()}, "itau", "bic");
 
             if (needs_check_) {
                 auto data = bicop_.simulate(get_n());
-                auto bicop = Bicop(data, family_set, "itau");
+                auto bicop = Bicop(data, controls);
                 auto selected_family = bicop.get_family_name();
                 EXPECT_EQ(selected_family, true_family) <<
                     bicop.bic(data) << " " << bicop_.bic(data);

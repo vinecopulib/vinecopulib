@@ -10,20 +10,14 @@
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib
 {
-    //! creates the default controls for fitting bivariate copula models.
-    ControlsBicop::ControlsBicop()
-    {
-        family_set_ = bicop_families::all;
-        parametric_method_ = "mle";
-        selection_criterion_ = "bic";
-        preselect_families_ = true;
-    }
-    
-    //! creates custom controls for fitting bivariate copula models.
-    //! @param family_set the family set
-    //! @param parametric_method
-    //! @param selection_criterion
-    //! @param preselect_families
+    //! creates the controls for fitting bivariate copula models.
+    //! @param family_set the set of copula families to consider (if empty, then
+    //!     all families are included).
+    //! @param parametric_method the fit method for parametric families;
+    //!     possible choices: `"mle"`, `"itau"`.
+    //! @param selection_criterion the selection criterion (`"aic"` or `"bic"`).
+    //! @param preselect_families whether to exclude families before fitting
+    //!     based on symmetry properties of the data.
     ControlsBicop::ControlsBicop(std::vector<BicopFamily> family_set,
                                  std::string parametric_method,
                                  std::string selection_criterion,
@@ -37,6 +31,8 @@ namespace vinecopulib
         preselect_families_ = preselect_families;
     }
 
+    //! Sanity checks
+    //! @{
     void ControlsBicop::check_parametric_method(std::string parametric_method)
     {
         if (!tools_stl::is_member(parametric_method, {"itau", "mle"}))
@@ -52,7 +48,10 @@ namespace vinecopulib
             throw std::runtime_error("selection_criterion should be aic or bic");
         }
     }
+    //! @}
 
+    //! Getters and setters.
+    //! @{
     std::vector<BicopFamily> ControlsBicop::get_family_set()
     {
         return family_set_;
@@ -94,4 +93,5 @@ namespace vinecopulib
     {
         preselect_families_ = preselect_families;
     }
+    //! @}
 }

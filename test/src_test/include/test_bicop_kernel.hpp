@@ -12,11 +12,11 @@ namespace test_bicop_kernel {
     using namespace vinecopulib;
 
     TEST_F(TrafokernelTest, trafo_kernel_fit) {
-        bicop_.fit(u, std::string(""));
+        bicop_.fit(u);
     }
 
     TEST_F(TrafokernelTest, trafo_kernel_eval_funcs) {
-        bicop_.fit(u, std::string(""));
+        bicop_.fit(u);
 
         EXPECT_GE(bicop_.pdf(u).minCoeff(), 0.0);
 
@@ -35,7 +35,7 @@ namespace test_bicop_kernel {
     }
 
     TEST_F(TrafokernelTest, trafo_kernel_select) {
-        auto newcop = Bicop(u, {BicopFamily::tll0});
+        auto newcop = Bicop(u, ControlsBicop({BicopFamily::tll0}));
         EXPECT_EQ(newcop.get_family(), BicopFamily::tll0);
     }
 
