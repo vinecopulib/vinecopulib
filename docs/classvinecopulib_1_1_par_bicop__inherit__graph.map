@@ -1,0 +1,16 @@
+<map id="vinecopulib::ParBicop" name="vinecopulib::ParBicop">
+<area shape="rect" id="node3" href="$classvinecopulib_1_1_archimedean_bicop.html" title="An abstract class for Archimedean copula families. " alt="" coords="430,201,601,242"/>
+<area shape="rect" id="node12" href="$classvinecopulib_1_1_elliptical_bicop.html" title="An abstract class for elliptical copula families. " alt="" coords="427,411,604,437"/>
+<area shape="rect" id="node15" href="$classvinecopulib_1_1_indep_bicop.html" title="The independence copula. " alt="" coords="435,461,595,488"/>
+<area shape="rect" id="node2" href="$classvinecopulib_1_1_abstract_bicop.html" title="An abstract class for bivariate copula families. " alt="" coords="5,411,183,437"/>
+<area shape="rect" id="node4" href="$classvinecopulib_1_1_bb1_bicop.html" title="The BB1 copula. " alt="" coords="668,5,819,32"/>
+<area shape="rect" id="node5" href="$classvinecopulib_1_1_bb6_bicop.html" title="The BB6 copula. " alt="" coords="668,56,819,83"/>
+<area shape="rect" id="node6" href="$classvinecopulib_1_1_bb7_bicop.html" title="The BB7 copula. " alt="" coords="668,107,819,133"/>
+<area shape="rect" id="node7" href="$classvinecopulib_1_1_bb8_bicop.html" title="The BB8 copula. " alt="" coords="668,157,819,184"/>
+<area shape="rect" id="node8" href="$classvinecopulib_1_1_clayton_bicop.html" title="The Clayton copula. " alt="" coords="657,208,830,235"/>
+<area shape="rect" id="node9" href="$classvinecopulib_1_1_frank_bicop.html" title="The Frank copula. " alt="" coords="663,259,824,285"/>
+<area shape="rect" id="node10" href="$classvinecopulib_1_1_gumbel_bicop.html" title="The Gumbel copula. " alt="" coords="657,309,830,336"/>
+<area shape="rect" id="node11" href="$classvinecopulib_1_1_joe_bicop.html" title="The Joe copula. " alt="" coords="669,360,818,387"/>
+<area shape="rect" id="node13" href="$classvinecopulib_1_1_gaussian_bicop.html" title="The Gaussian copula. " alt="" coords="652,411,835,437"/>
+<area shape="rect" id="node14" href="$classvinecopulib_1_1_student_bicop.html" title="The Student t copula. " alt="" coords="657,461,830,488"/>
+</map>

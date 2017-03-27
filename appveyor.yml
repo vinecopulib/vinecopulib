@@ -1,7 +1,17 @@
-platform: Win32 #TODO: x64
+platform: 
+  - x86
+  - x64
 #TODO: configuration: Debug/Release + same with CMake
 
 init:
+  - ps: |
+        If ($env:platform -Match "x86") {
+          $env:NLOPT_ZIP="nlopt-2.4.2-dll32.zip"
+          $env:CMAKE_GEN_PLAT="Win32"
+        } Else {
+          $env:NLOPT_ZIP="nlopt-2.4.2-dll64.zip"
+          $env:CMAKE_GEN_PLAT="x64"
+        }
   - cmd: C:/"Program Files (x86)"/"Microsoft Visual Studio 12.0"/VC/vcvarsall.bat
   - ps: |
         $ErrorActionPreference = "Stop"
@@ -14,31 +24,37 @@ install:
 
   - ps: Bootstrap #R
   - ps: $env:R_LIBS_USER = 'c:\R\library'
-  - travis-tool.sh r_install RcppEigen RInside VineCopula
+  - travis-tool.sh r_install VineCopula
 
-#TODO: after we get rid of the dependency on R
-#  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
-#  - 7z x eigen.zip -o"C:\projects" -y > nul
+  - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
+  - 7z x eigen.zip -o"C:\projects" -y > nul
 
-  - ps: wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll32.zip -OutFile nlopt.zip
+  - ps: wget "http://ab-initio.mit.edu/nlopt/$env:NLOPT_ZIP" -OutFile nlopt.zip
   - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
-  - lib /def:C:\projects\nlopt\libnlopt-0.def
+  - lib /def:C:\projects\nlopt\libnlopt-0.def /machine:%platform%
   - move libnlopt-0.lib C:\projects\nlopt\
   - move libnlopt-0.exp C:\projects\nlopt\
 
+before_build:
+- del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+
 build_script:
-  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\R\library\RcppEigen\include" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt" -DR_LIB_ARCH="i386"'
+  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt"'
 
   - md build-debug
   - cd build-debug
-  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Debug
+  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Debug -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%"
   - cmake --build .
-  - ctest -C Debug --output-on-failure 
+  - ctest -C Debug --output-on-failure
   - cd ..
 
   - md build-release
   - cd build-release
-  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release
+  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%"
   - cmake --build .
-  - ctest -C Release --output-on-failure 
+  - ctest -C Release --output-on-failure
   - cd ..
+
+on_success:
+  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build-debug\Debug\vinecopulib.* build-release\Debug\vinecopulib.*
+  - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip

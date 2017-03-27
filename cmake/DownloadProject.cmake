@@ -139,9 +139,9 @@ function(download_project)
     # Create and build a separate CMake project to carry out the download.
     # If we've already previously done these steps, they will not cause
     # anything to be updated, so extra rebuilds of the project won't occur.
-    configure_file("${_DownloadProjectDir}/DownloadProject.CMakeLists.txt"
+    configure_file("${_DownloadProjectDir}/templates/DownloadProject.CMakeLists.txt.in"
             "${DL_ARGS_DOWNLOAD_DIR}/CMakeLists.txt")
-    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+    execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -G "${CMAKE_GENERATOR}" .
             RESULT_VARIABLE result
             ${OUTPUT_QUIET}
             WORKING_DIRECTORY "${DL_ARGS_DOWNLOAD_DIR}"

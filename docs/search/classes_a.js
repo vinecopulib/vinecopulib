@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['studentbicop',['StudentBicop',['../class_student_bicop.html',1,'']]]
+  ['optimizer',['Optimizer',['../classtools__optimization_1_1_optimizer.html',1,'tools_optimization']]]
 ];

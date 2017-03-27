@@ -1,0 +1,49 @@
+\hypertarget{namespacetools__optimization}{}\section{tools\+\_\+optimization Namespace Reference}
+\label{namespacetools__optimization}\index{tools\+\_\+optimization@{tools\+\_\+optimization}}
+
+
+Utilities for numerical optimization (based on N\+Lopt)  
+
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classtools__optimization_1_1_n_lopt_controls}{N\+Lopt\+Controls}
+\begin{DoxyCompactList}\small\item\em A class for the controls to N\+Lopt. \end{DoxyCompactList}\item 
+class \hyperlink{classtools__optimization_1_1_optimizer}{Optimizer}
+\begin{DoxyCompactList}\small\item\em A class for optimization (wrapping N\+Lopt). \end{DoxyCompactList}\item 
+struct \hyperlink{structtools__optimization_1_1_par_bicop_opt_data}{Par\+Bicop\+Opt\+Data}
+\begin{DoxyCompactList}\small\item\em A helper struct for (profile) maximum likelihood estimation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{Indent}{\bf (Pseudo-\/) maximum likelihood estimation}\par
+{\em 
+\begin{DoxyParams}{Parameters}
+{\em x} & the parameters. \\
+\hline
+{\em f\+\_\+data} & a pointer to a \hyperlink{structtools__optimization_1_1_par_bicop_opt_data}{Par\+Bicop\+Opt\+Data} object. \\
+\hline
+\end{DoxyParams}
+}\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{namespacetools__optimization_af0ad8465d57bf8b2f414a6fb84cb7daf}{mle\+\_\+objective} (const std\+::vector$<$ double $>$ \&x, std\+::vector$<$ double $>$ \&, void $\ast$f\+\_\+data)\hypertarget{namespacetools__optimization_af0ad8465d57bf8b2f414a6fb84cb7daf}{}\label{namespacetools__optimization_af0ad8465d57bf8b2f414a6fb84cb7daf}
+
+\begin{DoxyCompactList}\small\item\em evaluates the objective function for maximum likelihood estimation. \end{DoxyCompactList}\item 
+double \hyperlink{namespacetools__optimization_aa87593437ba7768621ea1f772f11c931}{pmle\+\_\+objective} (const std\+::vector$<$ double $>$ \&x, std\+::vector$<$ double $>$ \&, void $\ast$f\+\_\+data)
+\end{DoxyCompactItemize}
+\end{Indent}
+
+
+\subsection{Detailed Description}
+Utilities for numerical optimization (based on N\+Lopt) 
+
+\subsection{Function Documentation}
+\index{tools\+\_\+optimization@{tools\+\_\+optimization}!pmle\+\_\+objective@{pmle\+\_\+objective}}
+\index{pmle\+\_\+objective@{pmle\+\_\+objective}!tools\+\_\+optimization@{tools\+\_\+optimization}}
+\subsubsection[{\texorpdfstring{pmle\+\_\+objective(const std\+::vector$<$ double $>$ \&x, std\+::vector$<$ double $>$ \&, void $\ast$f\+\_\+data)}{pmle_objective(const std::vector< double > &x, std::vector< double > &, void *f_data)}}]{\setlength{\rightskip}{0pt plus 5cm}double tools\+\_\+optimization\+::pmle\+\_\+objective (
+\begin{DoxyParamCaption}
+\item[{const std\+::vector$<$ double $>$ \&}]{x, }
+\item[{std\+::vector$<$ double $>$ \&}]{, }
+\item[{void $\ast$}]{f\+\_\+data}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetools__optimization_aa87593437ba7768621ea1f772f11c931}{}\label{namespacetools__optimization_aa87593437ba7768621ea1f772f11c931}
+evaluates the objective function for profile maximum likelihood estimation. 

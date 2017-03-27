@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['indepbicop',['IndepBicop',['../class_indep_bicop.html',1,'']]],
-  ['interpolationgrid',['InterpolationGrid',['../class_interpolation_grid.html',1,'']]]
+  ['indepbicop',['IndepBicop',['../classvinecopulib_1_1_indep_bicop.html',1,'vinecopulib']]],
+  ['interpolationgrid',['InterpolationGrid',['../classvinecopulib_1_1_interpolation_grid.html',1,'vinecopulib']]]
 ];

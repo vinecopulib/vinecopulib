@@ -1,0 +1,112 @@
+\hypertarget{namespacetools__eigen}{}\section{tools\+\_\+eigen Namespace Reference}
+\label{namespacetools__eigen}\index{tools\+\_\+eigen@{tools\+\_\+eigen}}
+
+
+Tools for working with Eigen types.  
+
+
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef Eigen\+::\+Matrix$<$ bool, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{namespacetools__eigen_ad496806a2d02c8e881330d95e0c150aa}{Matrix\+Xb}\hypertarget{namespacetools__eigen_ad496806a2d02c8e881330d95e0c150aa}{}\label{namespacetools__eigen_ad496806a2d02c8e881330d95e0c150aa}
+
+\begin{DoxyCompactList}\small\item\em An {\ttfamily Eigen\+::\+Matrix} containing {\ttfamily bool}s (similar to {\ttfamily Eigen\+::\+Matrix\+Xd}). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \hyperlink{namespacetools__eigen_a5ec97cf8c69d2dd29c7d60fc5554bac0}{swap\+\_\+cols} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ u)
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{namespacetools__eigen_ad9c98ebe3d1a6722dc31aae311e62be0}{invert\+\_\+f} (const Eigen\+::\+Vector\+Xd \&x, std\+::function$<$ Eigen\+::\+Vector\+Xd(const Eigen\+::\+Vector\+Xd \&)$>$ f, const double lb, const double ub, int n\+\_\+iter)
+\item 
+Eigen\+::\+Matrix\+Xi \hyperlink{namespacetools__eigen_aa35ace9c5f71fa76cb545f011b34095e}{read\+\_\+matxi} (const char $\ast$filename, int max\+\_\+buffer\+\_\+size)
+\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacetools__eigen_a37c4357e7ae885e9e4d80e0242f4854e}{read\+\_\+matxd} (const char $\ast$filename, int max\+\_\+buffer\+\_\+size)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Tools for working with Eigen types. 
+
+\subsection{Function Documentation}
+\index{tools\+\_\+eigen@{tools\+\_\+eigen}!invert\+\_\+f@{invert\+\_\+f}}
+\index{invert\+\_\+f@{invert\+\_\+f}!tools\+\_\+eigen@{tools\+\_\+eigen}}
+\subsubsection[{\texorpdfstring{invert\+\_\+f(const Eigen\+::\+Vector\+Xd \&x, std\+::function$<$ Eigen\+::\+Vector\+Xd(const Eigen\+::\+Vector\+Xd \&)$>$ f, const double lb, const double ub, int n\+\_\+iter)}{invert_f(const Eigen::VectorXd &x, std::function< Eigen::VectorXd(const Eigen::VectorXd &)> f, const double lb, const double ub, int n_iter)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd tools\+\_\+eigen\+::invert\+\_\+f (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Vector\+Xd \&}]{x, }
+\item[{std\+::function$<$ Eigen\+::\+Vector\+Xd(const Eigen\+::\+Vector\+Xd \&)$>$}]{f, }
+\item[{const double}]{lb, }
+\item[{const double}]{ub, }
+\item[{int}]{n\+\_\+iter}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetools__eigen_ad9c98ebe3d1a6722dc31aae311e62be0}{}\label{namespacetools__eigen_ad9c98ebe3d1a6722dc31aae311e62be0}
+computes the inverse $ f^{-1} $ of a function $ f $ by the bisection method.
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & evaluation points. \\
+\hline
+{\em f} & the function to invert. \\
+\hline
+{\em lb} & lower bound. \\
+\hline
+{\em ub} & upper bound. \\
+\hline
+{\em n\+\_\+iter} & the number of iterations for the bisection (defaults to 35, guaranteeing an accuracy of 0.\+5$^\wedge$35 $\sim$= 6e-\/11).\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$ f^{-1}(x) $. 
+\end{DoxyReturn}
+\index{tools\+\_\+eigen@{tools\+\_\+eigen}!read\+\_\+matxd@{read\+\_\+matxd}}
+\index{read\+\_\+matxd@{read\+\_\+matxd}!tools\+\_\+eigen@{tools\+\_\+eigen}}
+\subsubsection[{\texorpdfstring{read\+\_\+matxd(const char $\ast$filename, int max\+\_\+buffer\+\_\+size)}{read_matxd(const char *filename, int max_buffer_size)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd tools\+\_\+eigen\+::read\+\_\+matxd (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{filename, }
+\item[{int}]{max\+\_\+buffer\+\_\+size}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetools__eigen_a37c4357e7ae885e9e4d80e0242f4854e}{}\label{namespacetools__eigen_a37c4357e7ae885e9e4d80e0242f4854e}
+reads data from a file to an Eigen matrix of doubles.
+
+The function is currently {\bfseries not safe} and may cause crashes when the arguments are specified incorrectly.
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & the name of the file to read from. \\
+\hline
+{\em max\+\_\+buffer\+\_\+size} & the maximal buffer size. \\
+\hline
+\end{DoxyParams}
+\index{tools\+\_\+eigen@{tools\+\_\+eigen}!read\+\_\+matxi@{read\+\_\+matxi}}
+\index{read\+\_\+matxi@{read\+\_\+matxi}!tools\+\_\+eigen@{tools\+\_\+eigen}}
+\subsubsection[{\texorpdfstring{read\+\_\+matxi(const char $\ast$filename, int max\+\_\+buffer\+\_\+size)}{read_matxi(const char *filename, int max_buffer_size)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xi tools\+\_\+eigen\+::read\+\_\+matxi (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{filename, }
+\item[{int}]{max\+\_\+buffer\+\_\+size}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetools__eigen_aa35ace9c5f71fa76cb545f011b34095e}{}\label{namespacetools__eigen_aa35ace9c5f71fa76cb545f011b34095e}
+reads data from a file to an Eigen matrix of integers.
+
+The function is currently {\bfseries not safe} and may cause crashes when the arguments are specified incorrectly.
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & the name of the file to read from. \\
+\hline
+{\em max\+\_\+buffer\+\_\+size} & the maximal buffer size. \\
+\hline
+\end{DoxyParams}
+\index{tools\+\_\+eigen@{tools\+\_\+eigen}!swap\+\_\+cols@{swap\+\_\+cols}}
+\index{swap\+\_\+cols@{swap\+\_\+cols}!tools\+\_\+eigen@{tools\+\_\+eigen}}
+\subsubsection[{\texorpdfstring{swap\+\_\+cols(\+Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ u)}{swap_cols(Eigen::Matrix< double, Eigen::Dynamic, 2 > u)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ tools\+\_\+eigen\+::swap\+\_\+cols (
+\begin{DoxyParamCaption}
+\item[{Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$}]{u}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetools__eigen_a5ec97cf8c69d2dd29c7d60fc5554bac0}{}\label{namespacetools__eigen_a5ec97cf8c69d2dd29c7d60fc5554bac0}
+swap the columns of a two-\/column matrix 
+\begin{DoxyParams}{Parameters}
+{\em u} & the matrix. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a new matrix v with {\ttfamily v.\+col(0) = u.\+col(1)}, {\ttfamily v.\+col(1) = u.\+col(0)}. 
+\end{DoxyReturn}

@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['select',['select',['../class_bicop.html#a6b1c154595bb17cd73f81cb4f563a776',1,'Bicop']]],
-  ['simulate',['simulate',['../class_bicop.html#afa62d40a17e096cc0f7e769fb2a1285d',1,'Bicop']]]
+  ['hfunc1',['hfunc1',['../classvinecopulib_1_1_bicop.html#a130fda62cd61c7acdef5db75fffdd89e',1,'vinecopulib::Bicop']]],
+  ['hfunc2',['hfunc2',['../classvinecopulib_1_1_bicop.html#a4c9b50f99797ec374f5057cc54db2bd8',1,'vinecopulib::Bicop']]],
+  ['hinv1',['hinv1',['../classvinecopulib_1_1_bicop.html#a3cc8b161ec6efdb3b34d2efa9185bf44',1,'vinecopulib::Bicop']]],
+  ['hinv1_5fnum',['hinv1_num',['../classvinecopulib_1_1_abstract_bicop.html#a7dc5b05857ece56b7e336e1175387a8e',1,'vinecopulib::AbstractBicop']]],
+  ['hinv2',['hinv2',['../classvinecopulib_1_1_bicop.html#a3e33ec227b6b7182e327399201cad382',1,'vinecopulib::Bicop']]]
 ];

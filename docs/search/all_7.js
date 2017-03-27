@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['indepbicop',['IndepBicop',['../class_indep_bicop.html',1,'']]],
-  ['intergrate_5f1d',['intergrate_1d',['../class_interpolation_grid.html#a90af7bd3f2646109be939fc48b2284ca',1,'InterpolationGrid']]],
-  ['interpolate',['interpolate',['../class_interpolation_grid.html#a9e65596940b5e561ef6332d2559feb57',1,'InterpolationGrid']]],
-  ['interpolationgrid',['InterpolationGrid',['../class_interpolation_grid.html',1,'InterpolationGrid'],['../class_interpolation_grid.html#aed2639844689b97483d665feb5d0d0f7',1,'InterpolationGrid::InterpolationGrid()']]],
-  ['inv_5fintergrate_5f1d',['inv_intergrate_1d',['../class_interpolation_grid.html#aba233f98f869c2aeff0d920a1dd477d6',1,'InterpolationGrid']]]
+  ['hfunc1',['hfunc1',['../classvinecopulib_1_1_bicop.html#a130fda62cd61c7acdef5db75fffdd89e',1,'vinecopulib::Bicop']]],
+  ['hfunc2',['hfunc2',['../classvinecopulib_1_1_bicop.html#a4c9b50f99797ec374f5057cc54db2bd8',1,'vinecopulib::Bicop']]],
+  ['hinv1',['hinv1',['../classvinecopulib_1_1_bicop.html#a3cc8b161ec6efdb3b34d2efa9185bf44',1,'vinecopulib::Bicop']]],
+  ['hinv1_5fnum',['hinv1_num',['../classvinecopulib_1_1_abstract_bicop.html#a7dc5b05857ece56b7e336e1175387a8e',1,'vinecopulib::AbstractBicop']]],
+  ['hinv2',['hinv2',['../classvinecopulib_1_1_bicop.html#a3e33ec227b6b7182e327399201cad382',1,'vinecopulib::Bicop']]]
 ];
