@@ -22,6 +22,10 @@ Inheritance diagram for vinecopulib\+:\+:Fit\+Controls\+Bicop\+:\nopagebreak
 \begin{DoxyCompactItemize}
 \item 
 \hyperlink{classvinecopulib_1_1_fit_controls_bicop_a544d095b0ef0a99e08b8ca60a5753fbe}{Fit\+Controls\+Bicop} (std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=\hyperlink{namespacevinecopulib_1_1bicop__families_a5214a513f41ec23b74782aab96ea6774}{bicop\+\_\+families\+::all}, std\+::string parametric\+\_\+method=\char`\"{}mle\char`\"{}, double nonparametric\+\_\+mult=1.\+0, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true)
+\item 
+\hyperlink{classvinecopulib_1_1_fit_controls_bicop_a6a2fc00794c9dd9d598ac9948e7b98e4}{Fit\+Controls\+Bicop} (std\+::string parametric\+\_\+method)
+\item 
+\hyperlink{classvinecopulib_1_1_fit_controls_bicop_a4fc0ec257a3501ebfa15ea36f821cdec}{Fit\+Controls\+Bicop} (double nonparametric\+\_\+mult)
 \end{DoxyCompactItemize}
 {\bf }\par
 \begin{DoxyCompactItemize}
@@ -84,6 +88,30 @@ creates the controls for fitting bivariate copula models.
 {\em selection\+\_\+criterion} & the selection criterion ({\ttfamily \char`\"{}aic\char`\"{}} or {\ttfamily \char`\"{}bic\char`\"{}}). \\
 \hline
 {\em preselect\+\_\+families} & whether to exclude families before fitting based on symmetry properties of the data. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Fit\+Controls\+Bicop@{vinecopulib\+::\+Fit\+Controls\+Bicop}!Fit\+Controls\+Bicop@{Fit\+Controls\+Bicop}}
+\index{Fit\+Controls\+Bicop@{Fit\+Controls\+Bicop}!vinecopulib\+::\+Fit\+Controls\+Bicop@{vinecopulib\+::\+Fit\+Controls\+Bicop}}
+\subsubsection[{\texorpdfstring{Fit\+Controls\+Bicop(std\+::string parametric\+\_\+method)}{FitControlsBicop(std::string parametric_method)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Fit\+Controls\+Bicop\+::\+Fit\+Controls\+Bicop (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{parametric\+\_\+method}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_fit_controls_bicop_a6a2fc00794c9dd9d598ac9948e7b98e4}{}\label{classvinecopulib_1_1_fit_controls_bicop_a6a2fc00794c9dd9d598ac9948e7b98e4}
+
+\begin{DoxyParams}{Parameters}
+{\em parametric\+\_\+method} & the fit method for parametric families; possible choices\+: {\ttfamily \char`\"{}mle\char`\"{}}, {\ttfamily \char`\"{}itau\char`\"{}}. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Fit\+Controls\+Bicop@{vinecopulib\+::\+Fit\+Controls\+Bicop}!Fit\+Controls\+Bicop@{Fit\+Controls\+Bicop}}
+\index{Fit\+Controls\+Bicop@{Fit\+Controls\+Bicop}!vinecopulib\+::\+Fit\+Controls\+Bicop@{vinecopulib\+::\+Fit\+Controls\+Bicop}}
+\subsubsection[{\texorpdfstring{Fit\+Controls\+Bicop(double nonparametric\+\_\+mult)}{FitControlsBicop(double nonparametric_mult)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Fit\+Controls\+Bicop\+::\+Fit\+Controls\+Bicop (
+\begin{DoxyParamCaption}
+\item[{double}]{nonparametric\+\_\+mult}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_fit_controls_bicop_a4fc0ec257a3501ebfa15ea36f821cdec}{}\label{classvinecopulib_1_1_fit_controls_bicop_a4fc0ec257a3501ebfa15ea36f821cdec}
+
+\begin{DoxyParams}{Parameters}
+{\em nonparametric\+\_\+mult} & a factor with which the smoothing parameters are multiplied. \\
 \hline
 \end{DoxyParams}
 
