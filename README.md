@@ -27,7 +27,7 @@ Advantages over VineCopula are
 
 #### Status
  
-Version 0.0.0.0 was released on March XXX, 2017. While we did our best to 
+Version 0.0.0.0 was released on March 27, 2017. While we did our best to 
 design an user-friendly API, the library is still under active development and 
 changes are to be expected. We are also working on interfaces for R and python.
 
