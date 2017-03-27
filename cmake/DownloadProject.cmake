@@ -141,7 +141,7 @@ function(download_project)
     # anything to be updated, so extra rebuilds of the project won't occur.
     configure_file("${_DownloadProjectDir}/DownloadProject.CMakeLists.txt"
             "${DL_ARGS_DOWNLOAD_DIR}/CMakeLists.txt")
-    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+    execute_process(COMMAND ${CMAKE_COMMAND} -Wno-dev -G "${CMAKE_GENERATOR}" .
             RESULT_VARIABLE result
             ${OUTPUT_QUIET}
             WORKING_DIRECTORY "${DL_ARGS_DOWNLOAD_DIR}"
