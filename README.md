@@ -286,7 +286,7 @@ std::cout <<
 ```
 As it's arguably the most important function of the `Bicop` class, it's worth 
 understanding the second arguments of `select()`, namely an object of the class
-`ControlsBicop`, which contain four data members:
+`FitControlsBicop`, which contain four data members:
 * `std::vector<BicopFamily> family_set` describes the set of family to select 
 from. It can take a user specified vector of 
 families or any of those mentioned above (default is `bicop_families::all`).
@@ -309,7 +309,7 @@ of `select()` can be used as arguments to a
 ``` cpp
 // instantiate an archimedean copula by selecting the "best" family according to
 // the BIC and parameters corresponding to the MLE
-Bicop best_archimedean(data, ControlsBicop(bicop_families::archimedean));
+Bicop best_archimedean(data, FitControlsBicop(bicop_families::archimedean));
 std::cout << 
     "family: " << best_archimedean.get_family_name() <<
     "rotation: " <<  best_archimedean.get_rotation() <<
@@ -318,7 +318,7 @@ std::cout <<
     
 // instantiate a bivariate copula by selecting the "best" family according to
 // the AIC and parameters corresponding to Kendall's tau inversion
-Bicop best_itau(data, ControlsBicop(bicop_families::itau, "itau", "aic"));
+Bicop best_itau(data, FitControlsBicop(bicop_families::itau, "itau", 1.0, "aic"));
 std::cout << 
     "family: " << best_itau.get_family_name() <<
     "rotation: " <<  best_itau.get_rotation() <<
@@ -474,7 +474,7 @@ model.select_all(data);
 
 Note that the second argument to `select_all()` and `select_families()` is 
 similar to the one of `select()` for `Bicop` objects. Objects of the class 
-`ControlsVinecop` inherit from `ControlsBicop` and extend them with three
+`FitControlsVinecop` inherit from `FitControlsBicop` and extend them with three
 additional data members to control the structure selection:
 * `int truncation_level` describes the tree after which `family_set` is set to
 `{BicopFamily::indep}`. In other words, all pair copulas in trees lower than 
@@ -512,7 +512,7 @@ M << 1, 1, 1, 1,
 // ... and instantiate a vine copula from data using the custom structure, 
 // Kendall's tau inversion for parameters 
 // estimation and a truncation after the second tree
-Vinecop custom_vine(data, M, ControlsVinecop(bicop_families::itau, "itau", 2);)
+Vinecop custom_vine(data, M, FitControlsVinecop(bicop_families::itau, "itau", 1.0, 2);)
 ```
 
 ### Work with a vine copula model
