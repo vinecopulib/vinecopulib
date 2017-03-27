@@ -21,7 +21,9 @@ namespace vinecopulib {
                          double nonparametric_mult = 1.0,
                          std::string selection_criterion = "bic",
                          bool preselect_families = true);
-
+        FitControlsBicop(std::string parametric_method);
+        FitControlsBicop(double nonparametric_mult);
+        
         // Getters
         std::vector<BicopFamily> get_family_set() const;
         std::string get_parametric_method() const;

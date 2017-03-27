@@ -33,6 +33,22 @@ namespace vinecopulib
         set_preselect_families(preselect_families);
     }
 
+    //! @param parametric_method the fit method for parametric families;
+    //!     possible choices: `"mle"`, `"itau"`.    
+    FitControlsBicop::FitControlsBicop(std::string parametric_method) : 
+        FitControlsBicop()
+    {
+        set_parametric_method(parametric_method);
+    }
+
+    //! @param nonparametric_mult a factor with which the smoothing parameters
+    //!     are multiplied.
+    FitControlsBicop::FitControlsBicop(double nonparametric_mult) : 
+        FitControlsBicop()
+    {
+        set_nonparametric_mult(nonparametric_mult);
+    }
+    
     //! Sanity checks
     //! @{    
     void FitControlsBicop::check_parametric_method(std::string parametric_method)
