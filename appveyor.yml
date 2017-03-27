@@ -54,5 +54,5 @@ build_script:
   - cd ..
 
   - cd bin\Debug
-  - set path=%PATH%;C:/projects/vinecopulib/bin/Debug
+  - set path=%PATH%;C:/projects/vinecopulib/bin/Debug;C:/projects/nlopt;
   - test_all.exe
