@@ -30,13 +30,14 @@ namespace vinecopulib
     //! @param preselect_families see ControlsBicop.
     //! @param show_trace whether to show a trace of the building progress.
     ControlsVinecop::ControlsVinecop(std::vector<BicopFamily> family_set,
-                                     std::string method, int truncation_level,
+                                     std::string parametric_method,
+                                     int truncation_level,
                                      std::string tree_criterion,
                                      double threshold,
                                      std::string selection_criterion,
                                      bool preselect_families,
                                      bool show_trace) :
-            ControlsBicop(family_set, method, selection_criterion,
+            ControlsBicop(family_set, parametric_method, selection_criterion,
                           preselect_families)
     {
         check_truncation_level(truncation_level);
