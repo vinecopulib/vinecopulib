@@ -12,7 +12,7 @@
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 
 namespace tools_structselect {
-    
+
     using namespace tools_stl;
 
     //! Create base tree of the vine
@@ -59,21 +59,7 @@ namespace tools_structselect {
     //!     5. Fit and select a copula model for each edge.
     //!
     //! @param prev_tree tree T_{k}.
-    //! @param family_set the set of copula families to consider (if empty, then
-    //!     all families are included; all families are included by default).
-    //! @param method indicates the estimation method: either maximum likelihood
-    //!     estimation (method = "mle", default) or inversion of Kendall's tau
-    //!     (method = "itau"). When method = "itau" is used with families having
-    //!     more thanone parameter, the main dependence parameter is found by
-    //!     inverting the Kendall's tau and the remainders by profile likelihood
-    //!     optimization.
-    //! @param threshold for thresholded vines.
-    //! @param tree_criterion the criterion for selecting the maximum spanning
-    //!     tree ("tau", "hoeffd" and "rho" implemented so far).
-    //! @param selection_criterion the selection criterion; either "aic" or "bic"
-    //!     (default).
-    //! @param preselect_families  whether to exclude families before fitting based
-    //!     on symmetry properties of the data.
+    //! @param controls the controls for fitting a vine copula (see FitControlsVinecop)
     //! @return tree T_{k+1}.
     VineTree select_next_tree(VineTree& prev_tree,
                               vinecopulib::FitControlsVinecop& controls)
@@ -125,7 +111,7 @@ namespace tools_structselect {
 
     //! Add edges allowed by the proximity condition
     //!
-    //! Also calculates the edge weight (e.g., 1-|tau| for tree_criterion = 
+    //! Also calculates the edge weight (e.g., 1-|tau| for tree_criterion =
     //! "itau").
     //!
     //! @param vine_tree tree of a vine.
@@ -133,9 +119,9 @@ namespace tools_structselect {
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).
     //! @param threshold for thresholded vines.
     void add_allowed_edges(
-        VineTree& vine_tree, 
-        std::string tree_criterion,
-        double threshold
+            VineTree& vine_tree,
+            std::string tree_criterion,
+            double threshold
     )
     {
         for (auto v0 : boost::vertices(vine_tree)) {
@@ -151,9 +137,9 @@ namespace tools_structselect {
             }
         }
     }
-        
-    double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
-        std::string tree_criterion, double threshold) 
+
+    double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+                              std::string tree_criterion, double threshold)
     {
         double w;
         if (tree_criterion == "tau") {
@@ -169,7 +155,7 @@ namespace tools_structselect {
         if (w > 1 - threshold) {
             w = 1.0;
         }
-        
+
         return w;
     }
 
@@ -282,19 +268,7 @@ namespace tools_structselect {
 
     //! Fit and select a pair copula for each edges
     //! @param tree a vine tree preprocessed with add_edge_info().
-    //! @param family_set the set of copula families to consider (if empty, then
-    //!     all families are included; all families are included by default).
-    //! @param method indicates the estimation method: either maximum likelihood
-    //!     estimation (method = "mle", default) or inversion of Kendall's tau
-    //!     (method = "itau"). When method = "itau" is used with families having
-    //!     more thanone parameter, the main dependence parameter is found by
-    //!     inverting the Kendall's tau and the remainders by profile likelihood
-    //!     optimization.
-    //! @param the threshold for thresholded vines.
-    //! @param selection_criterion the selection criterion; either "aic" or "bic"
-    //!     (default).
-    //! @param preselect_families  whether to exclude families before fitting based
-    //!     on symmetry properties of the data.
+    //! @param controls the controls for fitting a vine copula (see FitControlsVinecop)
     void select_pair_copulas(VineTree& tree,
                              vinecopulib::FitControlsVinecop& controls)
     {
@@ -313,7 +287,7 @@ namespace tools_structselect {
             tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
         }
     }
-    
+
     //! Print indices, family, and parameters for each pair-copula
     //! @param tree a vine tree.
     void print_pair_copulas(VineTree& tree)
@@ -321,11 +295,11 @@ namespace tools_structselect {
         for (auto e : boost::edges(tree)) {
             std::stringstream pc_info;
             pc_info <<
-                get_pc_index(e, tree) << " <-> " <<
-                "fam = " << tree[e].pair_copula.get_family_name() <<
-                ", rot = " << tree[e].pair_copula.get_rotation() <<
-                ", par = " <<  tree[e].pair_copula.get_parameters() <<
-                std::endl;
+                    get_pc_index(e, tree) << " <-> " <<
+                    "fam = " << tree[e].pair_copula.get_family_name() <<
+                    ", rot = " << tree[e].pair_copula.get_rotation() <<
+                    ", par = " <<  tree[e].pair_copula.get_parameters() <<
+                    std::endl;
             std::cout << pc_info.str().c_str();
         }
     }
@@ -333,6 +307,32 @@ namespace tools_structselect {
     //! Get edge index for the vine (like 1, 2; 3)
     //! @param e a descriptor for the edge.
     //! @param tree a vine tree.
+    std::string get_pc_index(
+            boost::graph_traits<VineTree>::edge_descriptor e,
+            VineTree& tree
+    )
+    {
+        std::stringstream index;
+        // add 1 everywhere for user-facing representation (boost::graph starts
+        // at 0)
+        index <<
+              tree[e].conditioning[0] + 1 <<
+              "," <<
+              tree[e].conditioning[1] + 1;
+        if (tree[e].conditioned.size() > 0) {
+            index << " ; ";
+            for (unsigned int i = 0; i < tree[e].conditioned.size(); ++i) {
+                index << tree[e].conditioned[i] + 1;
+                if (i < tree[e].conditioned.size() - 1)
+                    index << ",";
+            }
+        }
+
+        return index.str().c_str();
+    }
+
+}
+//! @param tree a vine tree.
     std::string get_pc_index(
         boost::graph_traits<VineTree>::edge_descriptor e,
         VineTree& tree
