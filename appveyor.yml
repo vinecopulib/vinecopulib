@@ -56,6 +56,9 @@ build_script:
   - cd bin\Debug
   - set path=%PATH%;C:/projects/vinecopulib/bin/Debug;C:/projects/nlopt;
   - test_all.exe
+  
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_success:
   - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build-debug\Debug\vinecopulib.* build-release\Debug\vinecopulib.*
