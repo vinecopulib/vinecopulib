@@ -1,4 +1,8 @@
 var searchData=
 [
-  ['bicop',['Bicop',['../class_bicop.html',1,'Bicop'],['../struct_par_bicop_m_l_e_data.html#a3dc24c78fe0aaefcda18379eea833d2e',1,'ParBicopMLEData::bicop()'],['../struct_par_bicop_p_m_l_e_data.html#a45c8c88af2c9c945952e8a7f904b0a0a',1,'ParBicopPMLEData::bicop()']]]
+  ['bb1bicop',['Bb1Bicop',['../classvinecopulib_1_1_bb1_bicop.html',1,'vinecopulib']]],
+  ['bb6bicop',['Bb6Bicop',['../classvinecopulib_1_1_bb6_bicop.html',1,'vinecopulib']]],
+  ['bb7bicop',['Bb7Bicop',['../classvinecopulib_1_1_bb7_bicop.html',1,'vinecopulib']]],
+  ['bb8bicop',['Bb8Bicop',['../classvinecopulib_1_1_bb8_bicop.html',1,'vinecopulib']]],
+  ['bicop',['Bicop',['../classvinecopulib_1_1_bicop.html',1,'vinecopulib']]]
 ];

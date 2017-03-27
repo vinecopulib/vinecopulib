@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['trafokernelbicop',['TrafokernelBicop',['../class_trafokernel_bicop.html',1,'']]]
+  ['studentbicop',['StudentBicop',['../classvinecopulib_1_1_student_bicop.html',1,'vinecopulib']]]
 ];

@@ -1,4 +1,8 @@
-#set(gtest_disable_pthreads on) #needed in MinGW
+if (WIN32)
+    set(gtest_disable_pthreads on) #needed in MinGW
+    set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
+endif()
+
 include(../cmake/DownloadProject.cmake)
 download_project(
         PROJ                googletest
@@ -7,35 +11,13 @@ download_project(
         UPDATE_DISCONNECTED 1
 )
 
-#<TEMP>
-if (NOT WIN32)
-#</TEMP>
-
-include_directories(${test_includes} ${external_includes}) #
+include_directories(${external_includes} ${CMAKE_BINARY_DIR}/generated/)
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 add_subdirectory(src_test)
-
-set(unit_tests
-        test_bicop_parametric
-        test_bicop_class
-        test_bicop_select
-        test_bicop_trafokernel
-        test_distribution_tools
-        test_rvine_matrix
-        test_vinecop_class)
 
 foreach(app ${unit_tests})
     add_executable(${app} ${app}.cpp)
     target_link_libraries(${app} gtest gmock vinecopulib ${external_libs} ${test_libs} src_test)
 endforeach()
 
-#add_executable(runUnitTests gtest.cpp) #${test_SRCS}
-#target_link_libraries(runUnitTests gtest gmock common ${external_libs} ${test_libs} src_test)#
-
-#<TEMP>
-else()
-    message(WARNING "Compilation of R-related tests temporarily disabled for Windows !")
-endif()
-#</TEMP>
-
-add_subdirectory(bindings)
+#add_subdirectory(bindings)

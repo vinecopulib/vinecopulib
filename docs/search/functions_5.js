@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rotate_5fu',['rotate_u',['../class_bicop.html#aea1c2388f6312078d943dd31f91f065f',1,'Bicop']]]
+  ['loglik',['loglik',['../classvinecopulib_1_1_bicop.html#ae8bcc0c3265cc86565333a0cfd3d619d',1,'vinecopulib::Bicop']]]
 ];

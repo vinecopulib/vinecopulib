@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['archimedeanbicop',['ArchimedeanBicop',['../class_archimedean_bicop.html',1,'']]]
+  ['archimedeanbicop',['ArchimedeanBicop',['../classvinecopulib_1_1_archimedean_bicop.html',1,'vinecopulib']]]
 ];

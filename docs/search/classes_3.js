@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ellipticalbicop',['EllipticalBicop',['../class_elliptical_bicop.html',1,'']]]
+  ['ellipticalbicop',['EllipticalBicop',['../classvinecopulib_1_1_elliptical_bicop.html',1,'vinecopulib']]]
 ];
