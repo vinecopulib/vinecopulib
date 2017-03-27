@@ -332,29 +332,3 @@ namespace tools_structselect {
     }
 
 }
-//! @param tree a vine tree.
-    std::string get_pc_index(
-        boost::graph_traits<VineTree>::edge_descriptor e,
-        VineTree& tree
-     )
-     {
-        std::stringstream index;
-        // add 1 everywhere for user-facing representation (boost::graph starts
-        // at 0)
-        index <<
-            tree[e].conditioning[0] + 1 <<
-            "," <<
-            tree[e].conditioning[1] + 1;
-        if (tree[e].conditioned.size() > 0) {
-            index << " ; ";
-            for (unsigned int i = 0; i < tree[e].conditioned.size(); ++i) {
-                index << tree[e].conditioned[i] + 1;
-                if (i < tree[e].conditioned.size() - 1)
-                    index << ",";
-                }
-        }
-
-        return index.str().c_str();
-    }
-
-}
