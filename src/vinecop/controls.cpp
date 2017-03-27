@@ -21,7 +21,7 @@ namespace vinecopulib
 
     //! creates custom controls for fitting vine copula models.
     //! @param family_set see ControlsBicop.
-    //! @param method see ControlsBicop.
+    //! @param parametric_method see ControlsBicop.
     //! @param truncation_level for truncated vines.
     //! @param tree_criterion the criterion for selecting the maximum spanning
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).

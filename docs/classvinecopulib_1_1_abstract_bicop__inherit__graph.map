@@ -1,10 +1,10 @@
 <map id="vinecopulib::AbstractBicop" name="vinecopulib::AbstractBicop">
-<area shape="rect" id="node2" href="$classvinecopulib_1_1_kernel_bicop.html" title="An abstract class for kernel copulas. " alt="" coords="231,192,396,219"/>
-<area shape="rect" id="node4" href="$classvinecopulib_1_1_par_bicop.html" title="An abstract class for parametric copula families. " alt="" coords="239,339,387,365"/>
-<area shape="rect" id="node3" href="$classvinecopulib_1_1_trafokernel_bicop.html" title="The transformation local&#45;constant likelihood estimator. " alt="" coords="453,161,613,202"/>
+<area shape="rect" id="node2" href="$classvinecopulib_1_1_kernel_bicop.html" title="An abstract class for kernel copulas. " alt="" coords="231,199,396,225"/>
+<area shape="rect" id="node4" href="$classvinecopulib_1_1_par_bicop.html" title="An abstract class for parametric copula families. " alt="" coords="239,341,387,368"/>
+<area shape="rect" id="node3" href="$classvinecopulib_1_1_tll0_bicop.html" title="The transformation local&#45;constant likelihood estimator. " alt="" coords="458,175,607,201"/>
 <area shape="rect" id="node5" href="$classvinecopulib_1_1_archimedean_bicop.html" title="An abstract class for Archimedean copula families. " alt="" coords="447,226,618,267"/>
-<area shape="rect" id="node14" href="$classvinecopulib_1_1_elliptical_bicop.html" title="An abstract class for elliptical copula families. " alt="" coords="444,387,621,413"/>
-<area shape="rect" id="node17" href="$classvinecopulib_1_1_indep_bicop.html" title="The independence copula. " alt="" coords="453,437,613,464"/>
+<area shape="rect" id="node14" href="$classvinecopulib_1_1_elliptical_bicop.html" title="An abstract class for elliptical copula families. " alt="" coords="444,388,621,415"/>
+<area shape="rect" id="node17" href="$classvinecopulib_1_1_indep_bicop.html" title="The independence copula. " alt="" coords="453,439,613,465"/>
 <area shape="rect" id="node6" href="$classvinecopulib_1_1_bb1_bicop.html" title="The BB1 copula. " alt="" coords="685,5,836,32"/>
 <area shape="rect" id="node7" href="$classvinecopulib_1_1_bb6_bicop.html" title="The BB6 copula. " alt="" coords="685,56,836,83"/>
 <area shape="rect" id="node8" href="$classvinecopulib_1_1_bb7_bicop.html" title="The BB7 copula. " alt="" coords="685,107,836,133"/>

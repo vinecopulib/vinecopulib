@@ -599,7 +599,7 @@ namespace vinecopulib
     //! examplary configuration requiring less than 1 GB is \f$ n = 1000 \f$, 
     //! \f$d = 200\f$.
     //! 
-    //! @param U \f$ n \times d \f$ matrix of evaluation points.
+    //! @param u \f$ n \times d \f$ matrix of evaluation points.
     Eigen::MatrixXd Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u)
     {
         int n = u.rows();
