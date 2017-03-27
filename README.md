@@ -285,9 +285,8 @@ std::cout <<
     "\n";
 ```
 As it's arguably the most important function of the `Bicop` class, it's worth 
-understanding the arguments of `select()`:
-* `Eigen::Matrix<double, Eigen::Dynamic, 2> data` is the data to fit from and 
-it should be in (0,1).
+understanding the second arguments of `select()`, namely an object of the class
+`FitControlsBicop`, which contain four data members:
 * `std::vector<BicopFamily> family_set` describes the set of family to select 
 from. It can take a user specified vector of 
 families or any of those mentioned above (default is `bicop_families::all`).
@@ -310,7 +309,7 @@ of `select()` can be used as arguments to a
 ``` cpp
 // instantiate an archimedean copula by selecting the "best" family according to
 // the BIC and parameters corresponding to the MLE
-Bicop best_archimedean(data, bicop_families::archimedean);
+Bicop best_archimedean(data, FitControlsBicop(bicop_families::archimedean));
 std::cout << 
     "family: " << best_archimedean.get_family_name() <<
     "rotation: " <<  best_archimedean.get_rotation() <<
@@ -319,7 +318,7 @@ std::cout <<
     
 // instantiate a bivariate copula by selecting the "best" family according to
 // the AIC and parameters corresponding to Kendall's tau inversion
-Bicop best_itau(data, bicop_families::itau, "itau", "aic");
+Bicop best_itau(data, FitControlsBicop(bicop_families::itau, "itau", 1.0, "aic"));
 std::cout << 
     "family: " << best_itau.get_family_name() <<
     "rotation: " <<  best_itau.get_rotation() <<
@@ -454,7 +453,7 @@ structure of the object), using the sequential procedure proposed by
  Alternatively, `select_families()` performs parameter estimation and automatic 
  model selection for a known structure (i.e., using the structure of the 
  object). In both cases, the only mandatory argument is the data 
- (stored in a `Eigen::MatrixXd`), while additional arguments allow for 
+ (stored in a `Eigen::MatrixXd`), while controls argument allow for 
  customization of the fit.
 
 **Example**
@@ -473,9 +472,10 @@ model.select_families(data);
 model.select_all(data);
 ```
 
-Note that the arguments to `select_all()` and `select_families()` are similar to 
-those of `select()` for `Bicop` objects. Additionally, there are three arguments 
-that allow to control the structure selection:
+Note that the second argument to `select_all()` and `select_families()` is 
+similar to the one of `select()` for `Bicop` objects. Objects of the class 
+`FitControlsVinecop` inherit from `FitControlsBicop` and extend them with three
+additional data members to control the structure selection:
 * `int truncation_level` describes the tree after which `family_set` is set to
 `{BicopFamily::indep}`. In other words, all pair copulas in trees lower than 
 `truncation_level` (default to none) are "selected" as independence copulas.
@@ -503,16 +503,16 @@ MatXd data = simulate_uniform(100, d);
 Vinecop best_vine(data);
 
 // alternatively, instantiate a structure matrix...
-Eigen::MatrixXi mat;
-mat << 1, 1, 1, 1,
-       2, 2, 2, 0,
-       3, 3, 0, 0
-       4, 0, 0, 0;
+Eigen::MatrixXi M;
+M << 1, 1, 1, 1,
+     2, 2, 2, 0,
+     3, 3, 0, 0
+     4, 0, 0, 0;
     
 // ... and instantiate a vine copula from data using the custom structure, 
 // Kendall's tau inversion for parameters 
 // estimation and a truncation after the second tree
-Vinecop custom_vine(data, mat, bicop_families::itau, "itau", 2);
+Vinecop custom_vine(data, M, FitControlsVinecop(bicop_families::itau, "itau", 1.0, 2);)
 ```
 
 ### Work with a vine copula model

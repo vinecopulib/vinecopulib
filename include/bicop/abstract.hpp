@@ -58,7 +58,7 @@ namespace vinecopulib
 
         // Virtual methods
         virtual void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                std::string method) = 0;
+                std::string method, double mult) = 0;
         virtual double calculate_npars() = 0;
         virtual double parameters_to_tau(const Eigen::VectorXd& parameters) = 0;
         virtual Eigen::VectorXd pdf(

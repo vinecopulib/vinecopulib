@@ -27,28 +27,21 @@ namespace vinecopulib
     //!     (for Independence, Gaussian, Student, Frank, and nonparametric 
     //!     families, only 0 is allowed).
     //! @param parameters the copula parameters.
-    Bicop::Bicop(BicopFamily family, int rotation, 
-        const Eigen::MatrixXd& parameters)
+    Bicop::Bicop(BicopFamily family, int rotation,
+                 const Eigen::MatrixXd& parameters)
     {
         bicop_ = AbstractBicop::create(family, parameters);
         // family must be set before checking the rotation
         set_rotation(rotation);
     }
     
-    //! equivalent to `Bicop cop; cop.select(data, family_set, ...)`.
+    //! equivalent to `Bicop cop; cop.select(data, controls)`.
     //! @param data see select().
-    //! @param family_set see select().
-    //! @param method see select().
-    //! @param selection_criterion see select().
-    //! @param preselect_families see select().
-    Bicop::Bicop(
-            Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-            std::vector<BicopFamily> family_set,
-            std::string method,
-            std::string selection_criterion,
-            bool preselect_families)
+    //! @param controls see select().
+    Bicop::Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+                 FitControlsBicop controls)
     {
-        select(data, family_set, method, selection_criterion, preselect_families);
+        select(data, controls);
     }
 
 
@@ -338,11 +331,13 @@ namespace vinecopulib
     //! 
     //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
     //!     \f$(0, 1)^2 \f$.
-    //! @param method the fit method; possible choices: `"mle"`, `"itau"`.
+    //! @param controls the controls (see FitControlsBicop).
     void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-            std::string method)
+                    FitControlsBicop controls)
     {
-        bicop_->fit(cut_and_rotate(data), method);
+
+        bicop_->fit(cut_and_rotate(data), controls.get_parametric_method(),
+                    controls.get_nonparametric_mult());
     }
     
     //! selects the best fitting model.
@@ -352,21 +347,17 @@ namespace vinecopulib
     //! 
     //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
     //!     \f$(0, 1)^2 \f$.
-    //! @param method the fit method, see fit().
-    //! @param family_set the set of copula families to consider (if empty, then
-    //!     all families are included).
-    //! @param selection_criterion the selection criterion (`"aic"` or `"bic"`).
-    //! @param preselect_families whether to exclude families before fitting
-    //!     based on symmetry properties of the data.
-    void Bicop::select(
-            Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-            std::vector<BicopFamily> family_set,
-            std::string method,
-            std::string selection_criterion,
-            bool preselect_families
-    )
+    //! @param controls the controls (see FitControlsBicop).
+    void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+                       FitControlsBicop controls)
     {
         using namespace tools_stl;
+        std::vector<BicopFamily> family_set = controls.get_family_set();
+        std::string method = controls.get_parametric_method();
+        double mult = controls.get_nonparametric_mult();
+        std::string selection_criterion = controls.get_selection_criterion();
+        bool preselect_families = controls.get_preselect_families();
+
         // If the familyset is empty, use all families.
         // If the familyset is not empty, check that all included families are implemented.
         if (family_set.empty()) {
@@ -444,7 +435,7 @@ namespace vinecopulib
             // Estimate the model
             bicop_ = AbstractBicop::create(families[j]);
             rotation_ = rotations[j];
-            bicop_->fit(cut_and_rotate(data), method);
+            bicop_->fit(cut_and_rotate(data), method, mult);
 
             // Compute the selection criterion
             double new_criterion;
@@ -456,7 +447,8 @@ namespace vinecopulib
                 throw std::runtime_error("Selection criterion not implemented");
             }
 
-            // If the new model is better than the current one, then replace the current model by the new one
+            // If the new model is better than the current one,
+            // then replace the current model by the new one
             if (new_criterion < fitted_criterion) {
                 fitted_criterion = new_criterion;
                 fitted_bicop = bicop_;

@@ -90,39 +90,31 @@ namespace vinecopulib
     
     //! constructs a vine copula model from data. 
     //! 
-    //! The function creates a model and calls select_all() (when `matrix` is
-    //! empty) or select_families() (when matrix is specified).
+    //! The function creates a model and calls select_family().
     //! 
     //! @param data an \f$ n \times d \f$ matrix of observations.
     //! @param matrix either an empty matrix (default) or an R-vine structure 
     //!     matrix, see select_families().
-    //! @param family_set see select_all() / select_families().
-    //! @param method see select_all() / select_families().
-    //! @param truncation_level see select_all() / select_families().
-    //! @param tree_criterion see select_all().
-    //! @param threshold see select_all() / select_families().
-    //! @param selection_criterion see select_all() / select_families().
-    //! @param preselect_families see select_all() / select_families().
-    //! @param show_trace  see select_all() / select_families().
+    //! @param controls see FitControlsVinecop.
     Vinecop::Vinecop(const Eigen::MatrixXd& data, const Eigen::MatrixXi& matrix,
-                     std::vector<BicopFamily> family_set, std::string method,
-                     int truncation_level, std::string tree_criterion,
-                     double threshold, std::string selection_criterion,
-                     bool preselect_families, bool show_trace)
+                     FitControlsVinecop controls)
     {
-        int d = data.cols();
-        d_ = d;
+        d_ = data.cols();
         pair_copulas_ = make_pair_copula_store(d_);
-        if (matrix.cols() > 0) {
-            vine_matrix_ = RVineMatrix(matrix);
-            select_families(data, family_set, method, truncation_level,
-                            tree_criterion, threshold, selection_criterion,
-                            preselect_families, show_trace);
-        } else {
-            select_all(data, family_set, method, truncation_level,
-                       tree_criterion, threshold, selection_criterion,
-                       preselect_families, show_trace);
-        }
+        vine_matrix_ = RVineMatrix(matrix);
+        select_families(data, controls);
+    }
+
+    //! constructs a vine copula model from data.
+    //!
+    //! The function creates a model and calls select_all().
+    //!
+    //! @param data an \f$ n \times d \f$ matrix of observations.
+    //! @param controls see FitControlsVinecop.
+    Vinecop::Vinecop(const Eigen::MatrixXd& data, FitControlsVinecop controls)
+    {
+        d_ = data.cols();
+        select_all(data, controls);
     }
 
     //! Initialize object for storing pair copulas
@@ -150,22 +142,9 @@ namespace vinecopulib
     //! 52-69.
     //!
     //! @param data nxd matrix of copula data.
-    //! @param family_set the set of copula families to consider (if empty, then
-    //!     all families are included; all families are included by default).
-    //! @param method see see Bicop::fit().
-    //! @param truncation_level for truncated vines.
-    //! @param tree_criterion the criterion for selecting the maximum spanning
-    //!     tree ("tau", "hoeffd" and "rho" implemented so far).
-    //! @param threshold for thresholded vines (0 = no threshold).
-    //! @param selection_criterion see Bicop::select().
-    //! @param preselect_families see Bicop::select().
-    //! @param show_trace whether to show a trace of the building progress.
+    //! @param controls the controls to the algorithm (see FitControlsVinecop).
     void Vinecop::select_all(const Eigen::MatrixXd& data,
-                             std::vector<BicopFamily> family_set,
-                             std::string method, int truncation_level,
-                             std::string tree_criterion, double threshold,
-                             std::string selection_criterion,
-                             bool preselect_families, bool show_trace)
+                             FitControlsVinecop controls)
     {
         using namespace tools_structselect;
         int d = data.cols();
@@ -181,25 +160,17 @@ namespace vinecopulib
         trees[0] = make_base_tree(data);
         for (int t = 1; t < d; ++t) {
             // select tree structure and pair copulas
-            trees[t] = select_next_tree(
-                    trees[t - 1],
-                    family_set,
-                    method,
-                    threshold,
-                    tree_criterion,
-                    selection_criterion,
-                    preselect_families
-            );
+            trees[t] = select_next_tree(trees[t - 1], controls);
     
             // print out fitted pair-copulas for this tree
-            if (show_trace) {
+            if (controls.get_show_trace()) {
                 std::cout << "Tree " << t - 1 << ":" << std::endl;
                 print_pair_copulas(trees[t]);
             }
     
             // truncate (only allow for Independence copula from here on)
-            if (truncation_level == t) {
-                family_set = {BicopFamily::indep};
+            if (controls.get_truncation_level() == t) {
+                controls.set_family_set({BicopFamily::indep});
             }
         }
     
@@ -209,24 +180,11 @@ namespace vinecopulib
     //! automatically selects all pair-copula families and fits all parameters.
     //!
     //! @param data nxd matrix of copula data.
-    //! @param family_set the set of copula families to consider (if empty, then
-    //!     all families are included; all families are included by default).
-    //! @param method see Bicop::fit().
-    //! @param truncation_level for truncated vines.
-    //! @param threshold_criterion the criterion for thresholding.
-    //! @param threshold for thresholded vines (0 = no threshold).
-    //! @param selection_criterion see Bicop::select().
-    //! @param preselect_families see Bicop::select().
-    //! @param show_trace (not implemented yet).
-    //! @return The fitted vine copula model.
+    //! @param controls the controls to the algorithm (see FitControlsVinecop).
     void Vinecop::select_families(const Eigen::MatrixXd& data,
-                                  std::vector<BicopFamily> family_set,
-                                  std::string method, int truncation_level,
-                                  std::string threshold_criterion,
-                                  double threshold,
-                                  std::string selection_criterion,
-                                  bool preselect_families, bool show_trace)
+                                  FitControlsVinecop controls)
     {
+
         int d = data.cols();
         if (d != d_) {
             std::stringstream message;
@@ -235,7 +193,9 @@ namespace vinecopulib
                     ", actual: " << d << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
-    
+        // Controls for selecting the pair copulas
+        FitControlsBicop controls_bicop = controls.get_fit_controls_bicop();
+
         // info about the vine structure
         Eigen::VectorXi revorder    = vine_matrix_.get_order().reverse();
         Eigen::MatrixXi no_matrix   = vine_matrix_.in_natural_order();
@@ -268,23 +228,18 @@ namespace vinecopulib
                 }
                 
                 // select pair-copula
-                if (tree > truncation_level) {
+                if (tree > controls.get_truncation_level()) {
                     pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
                 } else {
-                    if (threshold != 0) {
+                    if (controls.get_threshold() != 0) {
                         double crit = tools_structselect::get_tree_criterion(
-                            u_e, threshold_criterion, threshold);
-                        if (crit > 1 - threshold) {
+                                u_e, controls.get_tree_criterion(),
+                                controls.get_threshold());
+                        if (crit > 1 - controls.get_threshold()) {
                             pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
                         }
                     } else {
-                        pair_copulas_[tree][edge] = Bicop(
-                            u_e,
-                            family_set,
-                            method,
-                            selection_criterion,
-                            preselect_families
-                        );
+                        pair_copulas_[tree][edge] = Bicop(u_e, controls_bicop);
                     }
                 }
     
@@ -296,7 +251,7 @@ namespace vinecopulib
                     hfunc2.col(edge) = pair_copulas_[tree][edge].hfunc2(u_e);
                 }
                 
-                if (show_trace) {
+                if (controls.get_show_trace()) {
                     // TODO: print edge index + pair copula
                 }
             }
@@ -644,7 +599,7 @@ namespace vinecopulib
     //! examplary configuration requiring less than 1 GB is \f$ n = 1000 \f$, 
     //! \f$d = 200\f$.
     //! 
-    //! @param U \f$ n \times d \f$ matrix of evaluation points.
+    //! @param u \f$ n \times d \f$ matrix of evaluation points.
     Eigen::MatrixXd Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u)
     {
         int n = u.rows();

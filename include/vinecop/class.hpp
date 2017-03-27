@@ -6,11 +6,9 @@
 
 #pragma once
 
-#include <limits>
-
 #include "bicop/class.hpp"
-#include "vinecop/rvine_matrix.hpp"
-#include "vinecop/tools_structselect.hpp"
+#include "rvine_matrix.hpp"
+#include "tools_structselect.hpp"
 
 namespace vinecopulib
 {
@@ -25,46 +23,18 @@ namespace vinecopulib
         Vinecop() {}
         Vinecop(int d);
         Vinecop(const Eigen::MatrixXi& matrix);
-        Vinecop(
-                const std::vector<std::vector<Bicop>>& pair_copulas,
-                const Eigen::MatrixXi& matrix
-        );
-        Vinecop(
-                const Eigen::MatrixXd& data,
-                const Eigen::MatrixXi& matrix = Eigen::MatrixXi(),
-                std::vector<BicopFamily> family_set = bicop_families::all,
-                std::string method = "mle",
-                int truncation_level = std::numeric_limits<int>::max(),
-                std::string tree_criterion = "tau",
-                double threshold = 0.0,
-                std::string selection_criterion = "bic",
-                bool preselect_families = true,
-                bool show_trace = false
-        );
+        Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
+                const Eigen::MatrixXi& matrix);
+        Vinecop(const Eigen::MatrixXd& data,
+                FitControlsVinecop controls = FitControlsVinecop());
+        Vinecop(const Eigen::MatrixXd& data, const Eigen::MatrixXi& matrix,
+                FitControlsVinecop controls = FitControlsVinecop());
 
         // Methods modifying structure and/or families and parameters
-        void select_all(
-                const Eigen::MatrixXd& data,
-                std::vector<BicopFamily> family_set = bicop_families::all,
-                std::string method = "mle",
-                int truncation_level = std::numeric_limits<int>::max(),
-                std::string tree_criterion = "tau",
-                double threshold = 0.0,
-                std::string selection_criterion = "bic",
-                bool preselect_families = true,
-                bool show_trace = false
-        );
-        void select_families(
-                const Eigen::MatrixXd& data,
-                std::vector<BicopFamily> family_set = bicop_families::all,
-                std::string method = "mle",
-                int truncation_level = std::numeric_limits<int>::max(),
-                std::string threshold_criterion = "tau",
-                double threshold = 0.0,
-                std::string selection_criterion = "bic",
-                bool preselect_families = true,
-                bool show_trace = false
-        );
+        void select_all(const Eigen::MatrixXd& data,
+                        FitControlsVinecop controls = FitControlsVinecop());
+        void select_families(const Eigen::MatrixXd& data,
+                             FitControlsVinecop controls = FitControlsVinecop());
 
         // Getters for a single pair copula
         Bicop get_pair_copula(int tree, int edge) const;
