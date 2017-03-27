@@ -26,8 +26,7 @@ namespace vinecopulib
     private:
         Eigen::VectorXd gaussian_kernel_2d(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
-        void fit(
-            const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, std::string
-        );
+        void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, 
+                 std::string, double mult);
     };
 }

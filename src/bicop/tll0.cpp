@@ -22,10 +22,8 @@ namespace vinecopulib
         return tools_stats::dnorm(x).rowwise().prod();
     }
 
-    void Tll0Bicop::fit(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, 
-        std::string
-    )
+    void Tll0Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, 
+                        std::string, double mult)
     {
         // construct default grid (equally spaced on Gaussian scale)
         int m = 30;
@@ -62,7 +60,8 @@ namespace vinecopulib
 
         Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> takes_root(cov);
         Eigen::Matrix2d cov_root = takes_root.operatorSqrt();
-        Eigen::Matrix2d B =  1.25 * std::pow(n, - 1.0 / 6.0) * cov_root.transpose();
+        Eigen::Matrix2d B = 1.25 * std::pow(n, - 1.0 / 6.0) * cov_root.transpose();
+        B *= mult;
 
         // apply bandwitools_stats::dth matrix
         z = (B.inverse() * z.transpose()).transpose();

@@ -19,7 +19,7 @@ namespace vinecopulib
     {
     private:
         void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-             std::string method);
+             std::string method, double);
         double calculate_npars();
         virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
     };

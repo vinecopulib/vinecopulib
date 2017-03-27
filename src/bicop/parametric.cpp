@@ -23,7 +23,7 @@ namespace vinecopulib
 
     // fit
     void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-        std::string method)
+                       std::string method, double)
     {
         if (family_ != BicopFamily::indep) {
             using namespace tools_optimization;

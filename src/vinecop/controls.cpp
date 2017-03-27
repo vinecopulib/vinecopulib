@@ -22,6 +22,7 @@ namespace vinecopulib
     //! creates custom controls for fitting vine copula models.
     //! @param family_set see ControlsBicop.
     //! @param parametric_method see ControlsBicop.
+    //! @param nonparametric_mult see ControlsBicop.
     //! @param truncation_level for truncated vines.
     //! @param tree_criterion the criterion for selecting the maximum spanning
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).
@@ -31,14 +32,15 @@ namespace vinecopulib
     //! @param show_trace whether to show a trace of the building progress.
     ControlsVinecop::ControlsVinecop(std::vector<BicopFamily> family_set,
                                      std::string parametric_method,
+                                     double nonparametric_mult,
                                      int truncation_level,
                                      std::string tree_criterion,
                                      double threshold,
                                      std::string selection_criterion,
                                      bool preselect_families,
                                      bool show_trace) :
-            ControlsBicop(family_set, parametric_method, selection_criterion,
-                          preselect_families)
+            ControlsBicop(family_set, parametric_method, nonparametric_mult, 
+                          selection_criterion, preselect_families)
     {
         check_truncation_level(truncation_level);
         check_threshold(threshold);
@@ -122,6 +124,7 @@ namespace vinecopulib
     ControlsBicop ControlsVinecop::get_controlsbicop()
     {
         ControlsBicop controls_bicop(get_family_set(), get_parametric_method(),
+                                     get_nonparametric_mult(),
                                      get_selection_criterion(),
                                      get_preselect_families());
         return controls_bicop;

@@ -20,6 +20,7 @@ namespace vinecopulib {
         ControlsVinecop();
         ControlsVinecop(std::vector<BicopFamily> family_set,
                         std::string parametric_method = "mle",
+                        double nonparametric_mult = 1.0,
                         int truncation_level = std::numeric_limits<int>::max(),
                         std::string tree_criterion = "tau",
                         double threshold = 0.0,

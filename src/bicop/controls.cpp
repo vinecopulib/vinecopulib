@@ -15,24 +15,26 @@ namespace vinecopulib
     //!     all families are included).
     //! @param parametric_method the fit method for parametric families;
     //!     possible choices: `"mle"`, `"itau"`.
+    //! @param nonparametric_mult a factor with which the smoothing parameters
+    //!     are multiplied.
     //! @param selection_criterion the selection criterion (`"aic"` or `"bic"`).
     //! @param preselect_families whether to exclude families before fitting
     //!     based on symmetry properties of the data.
     ControlsBicop::ControlsBicop(std::vector<BicopFamily> family_set,
                                  std::string parametric_method,
+                                 double nonparametric_mult,
                                  std::string selection_criterion,
                                  bool preselect_families)
     {
-        check_parametric_method(parametric_method);
-        check_selection_criterion(selection_criterion);
-        family_set_ = family_set;
-        parametric_method_ = parametric_method;
-        selection_criterion_ = selection_criterion;
-        preselect_families_ = preselect_families;
+        set_family_set(family_set);
+        set_parametric_method(parametric_method);
+        set_nonparametric_mult(nonparametric_mult);
+        set_selection_criterion(selection_criterion);
+        set_preselect_families(preselect_families);
     }
 
     //! Sanity checks
-    //! @{
+    //! @{    
     void ControlsBicop::check_parametric_method(std::string parametric_method)
     {
         if (!tools_stl::is_member(parametric_method, {"itau", "mle"}))
@@ -41,6 +43,14 @@ namespace vinecopulib
         }
     }
 
+    void ControlsBicop::check_nonparametric_mult(double nonparametric_mult)
+    {
+        if (nonparametric_mult <= 0.0)
+        {
+            throw std::runtime_error("nonparametric_mult must be positive");
+        }
+    }
+    
     void ControlsBicop::check_selection_criterion(std::string selection_criterion)
     {
         if (!tools_stl::is_member(selection_criterion, {"aic", "bic"}))
@@ -52,22 +62,27 @@ namespace vinecopulib
 
     //! Getters and setters.
     //! @{
-    std::vector<BicopFamily> ControlsBicop::get_family_set()
+    std::vector<BicopFamily> ControlsBicop::get_family_set() const
     {
         return family_set_;
     }
 
-    std::string ControlsBicop::get_parametric_method()
+    std::string ControlsBicop::get_parametric_method() const
     {
         return parametric_method_;
     }
+    
+    double ControlsBicop::get_nonparametric_mult() const 
+    {
+        return nonparametric_mult_;
+    }
 
-    std::string ControlsBicop::get_selection_criterion()
+    std::string ControlsBicop::get_selection_criterion() const
     {
         return selection_criterion_;
     }
 
-    bool ControlsBicop::get_preselect_families()
+    bool ControlsBicop::get_preselect_families() const
     {
         return preselect_families_;
     }
@@ -81,6 +96,12 @@ namespace vinecopulib
     {
         check_parametric_method(parametric_method);
         parametric_method_ = parametric_method;
+    }
+    
+    void ControlsBicop::set_nonparametric_mult(double nonparametric_mult)
+    {
+        check_nonparametric_mult(nonparametric_mult);
+        nonparametric_mult_ = nonparametric_mult;
     }
 
     void ControlsBicop::set_selection_criterion(std::string selection_criterion)

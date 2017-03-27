@@ -336,7 +336,8 @@ namespace vinecopulib
                     ControlsBicop controls)
     {
 
-        bicop_->fit(cut_and_rotate(data), controls.get_parametric_method());
+        bicop_->fit(cut_and_rotate(data), controls.get_parametric_method(),
+                    controls.get_nonparametric_mult());
     }
     
     //! selects the best fitting model.
@@ -353,6 +354,7 @@ namespace vinecopulib
         using namespace tools_stl;
         std::vector<BicopFamily> family_set = controls.get_family_set();
         std::string method = controls.get_parametric_method();
+        double mult = controls.get_nonparametric_mult();
         std::string selection_criterion = controls.get_selection_criterion();
         bool preselect_families = controls.get_preselect_families();
 
@@ -433,7 +435,7 @@ namespace vinecopulib
             // Estimate the model
             bicop_ = AbstractBicop::create(families[j]);
             rotation_ = rotations[j];
-            bicop_->fit(cut_and_rotate(data), method);
+            bicop_->fit(cut_and_rotate(data), method, mult);
 
             // Compute the selection criterion
             double new_criterion;
