@@ -4,7 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "bicop/controls.hpp"
+#include "bicop/fit_controls.hpp"
 #include "misc/tools_stl.hpp"
 
 //! Tools for bivariate and vine copula modeling
@@ -20,11 +20,11 @@ namespace vinecopulib
     //! @param selection_criterion the selection criterion (`"aic"` or `"bic"`).
     //! @param preselect_families whether to exclude families before fitting
     //!     based on symmetry properties of the data.
-    ControlsBicop::ControlsBicop(std::vector<BicopFamily> family_set,
-                                 std::string parametric_method,
-                                 double nonparametric_mult,
-                                 std::string selection_criterion,
-                                 bool preselect_families)
+    FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
+                                       std::string parametric_method,
+                                       double nonparametric_mult,
+                                       std::string selection_criterion,
+                                       bool preselect_families)
     {
         set_family_set(family_set);
         set_parametric_method(parametric_method);
@@ -35,7 +35,7 @@ namespace vinecopulib
 
     //! Sanity checks
     //! @{    
-    void ControlsBicop::check_parametric_method(std::string parametric_method)
+    void FitControlsBicop::check_parametric_method(std::string parametric_method)
     {
         if (!tools_stl::is_member(parametric_method, {"itau", "mle"}))
         {
@@ -43,7 +43,7 @@ namespace vinecopulib
         }
     }
 
-    void ControlsBicop::check_nonparametric_mult(double nonparametric_mult)
+    void FitControlsBicop::check_nonparametric_mult(double nonparametric_mult)
     {
         if (nonparametric_mult <= 0.0)
         {
@@ -51,7 +51,7 @@ namespace vinecopulib
         }
     }
     
-    void ControlsBicop::check_selection_criterion(std::string selection_criterion)
+    void FitControlsBicop::check_selection_criterion(std::string selection_criterion)
     {
         if (!tools_stl::is_member(selection_criterion, {"aic", "bic"}))
         {
@@ -62,55 +62,55 @@ namespace vinecopulib
 
     //! Getters and setters.
     //! @{
-    std::vector<BicopFamily> ControlsBicop::get_family_set() const
+    std::vector<BicopFamily> FitControlsBicop::get_family_set() const
     {
         return family_set_;
     }
 
-    std::string ControlsBicop::get_parametric_method() const
+    std::string FitControlsBicop::get_parametric_method() const
     {
         return parametric_method_;
     }
     
-    double ControlsBicop::get_nonparametric_mult() const 
+    double FitControlsBicop::get_nonparametric_mult() const 
     {
         return nonparametric_mult_;
     }
 
-    std::string ControlsBicop::get_selection_criterion() const
+    std::string FitControlsBicop::get_selection_criterion() const
     {
         return selection_criterion_;
     }
 
-    bool ControlsBicop::get_preselect_families() const
+    bool FitControlsBicop::get_preselect_families() const
     {
         return preselect_families_;
     }
 
-    void ControlsBicop::set_family_set(std::vector<BicopFamily> family_set)
+    void FitControlsBicop::set_family_set(std::vector<BicopFamily> family_set)
     {
         family_set_ = family_set;
     }
 
-    void ControlsBicop::set_parametric_method(std::string parametric_method)
+    void FitControlsBicop::set_parametric_method(std::string parametric_method)
     {
         check_parametric_method(parametric_method);
         parametric_method_ = parametric_method;
     }
     
-    void ControlsBicop::set_nonparametric_mult(double nonparametric_mult)
+    void FitControlsBicop::set_nonparametric_mult(double nonparametric_mult)
     {
         check_nonparametric_mult(nonparametric_mult);
         nonparametric_mult_ = nonparametric_mult;
     }
 
-    void ControlsBicop::set_selection_criterion(std::string selection_criterion)
+    void FitControlsBicop::set_selection_criterion(std::string selection_criterion)
     {
         check_selection_criterion(selection_criterion);
         selection_criterion_ = selection_criterion;
     }
 
-    void ControlsBicop::set_preselect_families(bool preselect_families)
+    void FitControlsBicop::set_preselect_families(bool preselect_families)
     {
         preselect_families_ = preselect_families;
     }

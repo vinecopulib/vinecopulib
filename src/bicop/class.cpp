@@ -39,7 +39,7 @@ namespace vinecopulib
     //! @param data see select().
     //! @param controls see select().
     Bicop::Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                 ControlsBicop controls)
+                 FitControlsBicop controls)
     {
         select(data, controls);
     }
@@ -331,9 +331,9 @@ namespace vinecopulib
     //! 
     //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
     //!     \f$(0, 1)^2 \f$.
-    //! @param controls the controls (see ControlsBicop).
+    //! @param controls the controls (see FitControlsBicop).
     void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                    ControlsBicop controls)
+                    FitControlsBicop controls)
     {
 
         bicop_->fit(cut_and_rotate(data), controls.get_parametric_method(),
@@ -347,9 +347,9 @@ namespace vinecopulib
     //! 
     //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
     //!     \f$(0, 1)^2 \f$.
-    //! @param controls the controls (see ControlsBicop).
+    //! @param controls the controls (see FitControlsBicop).
     void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                       ControlsBicop controls)
+                       FitControlsBicop controls)
     {
         using namespace tools_stl;
         std::vector<BicopFamily> family_set = controls.get_family_set();

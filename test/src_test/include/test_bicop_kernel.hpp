@@ -35,7 +35,7 @@ namespace test_bicop_kernel {
     }
 
     TEST_F(TrafokernelTest, trafo_kernel_select) {
-        auto newcop = Bicop(u, ControlsBicop({BicopFamily::tll0}));
+        auto newcop = Bicop(u, FitControlsBicop({BicopFamily::tll0}));
         EXPECT_EQ(newcop.get_family(), BicopFamily::tll0);
     }
 

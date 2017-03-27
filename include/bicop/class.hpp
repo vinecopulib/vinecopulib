@@ -7,7 +7,7 @@
 #pragma once
 
 #include "abstract.hpp"
-#include "controls.hpp"
+#include "fit_controls.hpp"
 
 namespace vinecopulib {
     //! @brief A class for bivariate copula models.
@@ -22,7 +22,7 @@ namespace vinecopulib {
         Bicop(BicopFamily family, int rotation = 0,
               const Eigen::MatrixXd& parameters = Eigen::MatrixXd());
         Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-              ControlsBicop controls = ControlsBicop());
+              FitControlsBicop controls = FitControlsBicop());
 
         // Getters and setters
         BicopFamily get_family() const;
@@ -43,9 +43,9 @@ namespace vinecopulib {
 
         // Methods modifying the family/rotation/parameters
         void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                 ControlsBicop controls = ControlsBicop());
+                 FitControlsBicop controls = FitControlsBicop());
         void select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                    ControlsBicop controls = ControlsBicop());
+                    FitControlsBicop controls = FitControlsBicop());
 
         // Fit statistics
         double loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);

@@ -95,9 +95,9 @@ namespace vinecopulib
     //! @param data an \f$ n \times d \f$ matrix of observations.
     //! @param matrix either an empty matrix (default) or an R-vine structure 
     //!     matrix, see select_families().
-    //! @param controls see ControlsVinecop.
+    //! @param controls see FitControlsVinecop.
     Vinecop::Vinecop(const Eigen::MatrixXd& data, const Eigen::MatrixXi& matrix,
-                     ControlsVinecop controls)
+                     FitControlsVinecop controls)
     {
         d_ = data.cols();
         pair_copulas_ = make_pair_copula_store(d_);
@@ -110,8 +110,8 @@ namespace vinecopulib
     //! The function creates a model and calls select_all().
     //!
     //! @param data an \f$ n \times d \f$ matrix of observations.
-    //! @param controls see ControlsVinecop.
-    Vinecop::Vinecop(const Eigen::MatrixXd& data, ControlsVinecop controls)
+    //! @param controls see FitControlsVinecop.
+    Vinecop::Vinecop(const Eigen::MatrixXd& data, FitControlsVinecop controls)
     {
         d_ = data.cols();
         select_all(data, controls);
@@ -142,9 +142,9 @@ namespace vinecopulib
     //! 52-69.
     //!
     //! @param data nxd matrix of copula data.
-    //! @param controls the controls to the algorithm (see ControlsVinecop).
+    //! @param controls the controls to the algorithm (see FitControlsVinecop).
     void Vinecop::select_all(const Eigen::MatrixXd& data,
-                             ControlsVinecop controls)
+                             FitControlsVinecop controls)
     {
         using namespace tools_structselect;
         int d = data.cols();
@@ -180,9 +180,9 @@ namespace vinecopulib
     //! automatically selects all pair-copula families and fits all parameters.
     //!
     //! @param data nxd matrix of copula data.
-    //! @param controls the controls to the algorithm (see ControlsVinecop).
+    //! @param controls the controls to the algorithm (see FitControlsVinecop).
     void Vinecop::select_families(const Eigen::MatrixXd& data,
-                                  ControlsVinecop controls)
+                                  FitControlsVinecop controls)
     {
 
         int d = data.cols();
@@ -194,7 +194,7 @@ namespace vinecopulib
             throw std::runtime_error(message.str().c_str());
         }
         // Controls for selecting the pair copulas
-        ControlsBicop controls_bicop = controls.get_controlsbicop();
+        FitControlsBicop controls_bicop = controls.get_fit_controls_bicop();
 
         // info about the vine structure
         Eigen::VectorXi revorder    = vine_matrix_.get_order().reverse();

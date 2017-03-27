@@ -12,15 +12,15 @@
 namespace vinecopulib {
     //! @brief A class for controlling fit of bivariate copula models.
     //!
-    class ControlsBicop
+    class FitControlsBicop
     {
     public:
         // Constructor
-        ControlsBicop(std::vector<BicopFamily> family_set = bicop_families::all,
-                     std::string parametric_method = "mle",
-                     double nonparametric_mult = 1.0,
-                     std::string selection_criterion = "bic",
-                     bool preselect_families = true);
+        FitControlsBicop(std::vector<BicopFamily> family_set = bicop_families::all,
+                         std::string parametric_method = "mle",
+                         double nonparametric_mult = 1.0,
+                         std::string selection_criterion = "bic",
+                         bool preselect_families = true);
 
         // Getters
         std::vector<BicopFamily> get_family_set() const;

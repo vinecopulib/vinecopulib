@@ -26,15 +26,15 @@ namespace vinecopulib
         Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
                 const Eigen::MatrixXi& matrix);
         Vinecop(const Eigen::MatrixXd& data,
-                ControlsVinecop controls = ControlsVinecop());
+                FitControlsVinecop controls = FitControlsVinecop());
         Vinecop(const Eigen::MatrixXd& data, const Eigen::MatrixXi& matrix,
-                ControlsVinecop controls = ControlsVinecop());
+                FitControlsVinecop controls = FitControlsVinecop());
 
         // Methods modifying structure and/or families and parameters
         void select_all(const Eigen::MatrixXd& data,
-                        ControlsVinecop controls = ControlsVinecop());
+                        FitControlsVinecop controls = FitControlsVinecop());
         void select_families(const Eigen::MatrixXd& data,
-                             ControlsVinecop controls = ControlsVinecop());
+                             FitControlsVinecop controls = FitControlsVinecop());
 
         // Getters for a single pair copula
         Bicop get_pair_copula(int tree, int edge) const;

@@ -1,6 +1,6 @@
 <map id="/home/n5/dev/cpp/vinecopulib/include/bicop/family.hpp" name="/home/n5/dev/cpp/vinecopulib/include/bicop/family.hpp">
 <area shape="rect" id="node2" href="$abstract_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/bicop/abstract.hpp" alt="" coords="463,95,657,136"/>
-<area shape="rect" id="node24" href="$bicop_2controls_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/bicop/controls.hpp" alt="" coords="244,95,439,136"/>
+<area shape="rect" id="node24" href="$bicop_2fit__controls_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/bicop/fit_controls.hpp" alt="" coords="244,95,439,136"/>
 <area shape="rect" id="node26" href="$tools__bicopselect_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/bicop/tools_bicopselect.hpp" alt="" coords="681,95,913,136"/>
 <area shape="rect" id="node3" href="$bicop_2class_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/bicop/class.hpp" alt="" coords="244,184,439,225"/>
 <area shape="rect" id="node7" href="$kernel_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/bicop/kernel.hpp" alt="" coords="463,184,657,225"/>
@@ -23,5 +23,5 @@
 <area shape="rect" id="node18" href="$joe_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/bicop/joe.hpp" alt="" coords="1035,363,1229,404"/>
 <area shape="rect" id="node20" href="$gaussian_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/bicop/gaussian.hpp" alt="" coords="2128,363,2323,404"/>
 <area shape="rect" id="node21" href="$student_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/bicop/student.hpp" alt="" coords="2347,363,2541,404"/>
-<area shape="rect" id="node25" href="$vinecop_2controls_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecop/controls.hpp" alt="" coords="25,184,220,225"/>
+<area shape="rect" id="node25" href="$vinecop_2fit__controls_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecop/fit_controls.hpp" alt="" coords="10,184,219,225"/>
 </map>

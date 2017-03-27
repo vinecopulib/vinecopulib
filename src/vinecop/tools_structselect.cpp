@@ -76,7 +76,7 @@ namespace tools_structselect {
     //!     on symmetry properties of the data.
     //! @return tree T_{k+1}.
     VineTree select_next_tree(VineTree& prev_tree,
-                              vinecopulib::ControlsVinecop& controls)
+                              vinecopulib::FitControlsVinecop& controls)
     {
         auto new_tree = edges_as_vertices(prev_tree);
         remove_edge_data(prev_tree); // no longer needed
@@ -284,7 +284,7 @@ namespace tools_structselect {
     //! @param tree a vine tree preprocessed with add_edge_info().
     //! @param family_set the set of copula families to consider (if empty, then
     //!     all families are included; all families are included by default).
-    //! @param method indi::cates the estimation method: either maximum likelihood
+    //! @param method indicates the estimation method: either maximum likelihood
     //!     estimation (method = "mle", default) or inversion of Kendall's tau
     //!     (method = "itau"). When method = "itau" is used with families having
     //!     more thanone parameter, the main dependence parameter is found by
@@ -296,10 +296,10 @@ namespace tools_structselect {
     //! @param preselect_families  whether to exclude families before fitting based
     //!     on symmetry properties of the data.
     void select_pair_copulas(VineTree& tree,
-                             vinecopulib::ControlsVinecop& controls)
+                             vinecopulib::FitControlsVinecop& controls)
     {
         // Controls for selecting the pair copulas
-        vinecopulib::ControlsBicop controls_bicop(controls.get_controlsbicop());
+        vinecopulib::FitControlsBicop controls_bicop(controls.get_fit_controls_bicop());
 
         for (auto e : boost::edges(tree)) {
             if (tree[e].weight > 1 - controls.get_threshold()) {

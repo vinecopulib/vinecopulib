@@ -153,12 +153,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>construct_d_vine_matrix()
 : <a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a7b3c8952acd3a29559369f0fae0ad9b3">vinecopulib::RVineMatrix</a>
 </li>
-<li>ControlsBicop()
-: <a class="el" href="classvinecopulib_1_1_controls_bicop.html#a42b951eecd5e78ffffb4b53c8de89abd">vinecopulib::ControlsBicop</a>
-</li>
-<li>ControlsVinecop()
-: <a class="el" href="classvinecopulib_1_1_controls_vinecop.html#a52054b73961271e179f7eaf74b4152de">vinecopulib::ControlsVinecop</a>
-</li>
 <li>create()
 : <a class="el" href="classvinecopulib_1_1_abstract_bicop.html#afefe048baabaa8cd14e849e66a45c428">vinecopulib::AbstractBicop</a>
 </li>
@@ -167,7 +161,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <h3><a class="anchor" id="index_f"></a>- f -</h3><ul>
 <li>fit()
-: <a class="el" href="classvinecopulib_1_1_bicop.html#a03641733a341c836303de39989730681">vinecopulib::Bicop</a>
+: <a class="el" href="classvinecopulib_1_1_bicop.html#a2d509a8b404a73ef17f04a0678e90a71">vinecopulib::Bicop</a>
+</li>
+<li>FitControlsBicop()
+: <a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#a544d095b0ef0a99e08b8ca60a5753fbe">vinecopulib::FitControlsBicop</a>
+</li>
+<li>FitControlsVinecop()
+: <a class="el" href="classvinecopulib_1_1_fit_controls_vinecop.html#ad101d135c8d8fe66046d931947f45bef">vinecopulib::FitControlsVinecop</a>
 </li>
 <li>flip()
 : <a class="el" href="classvinecopulib_1_1_abstract_bicop.html#a4e62970bb8e533f97f66c280c1a908cf">vinecopulib::AbstractBicop</a>
@@ -193,7 +193,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 , <a class="el" href="classvinecopulib_1_1_vinecop.html#ab2b5aecbe06c5219919f5b3c7436f1da">vinecopulib::Vinecop</a>
 </li>
 <li>get_family_set()
-: <a class="el" href="classvinecopulib_1_1_controls_bicop.html#a1e930543d95446b957921025a64c2b62">vinecopulib::ControlsBicop</a>
+: <a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#a8ea096aec62cbca55641941c9b4cf8f8">vinecopulib::FitControlsBicop</a>
 </li>
 <li>get_ftol_abs()
 : <a class="el" href="classtools__optimization_1_1_n_lopt_controls.html#a0ad0764bb8afefb9ee22f82d3c2d8405">tools_optimization::NLoptControls</a>
@@ -230,7 +230,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classvinecopulib_1_1_vinecop.html#abfa48760cc636cadce6fa875a883922a">vinecopulib::Vinecop</a>
 </li>
 <li>get_truncation_level()
-: <a class="el" href="classvinecopulib_1_1_controls_vinecop.html#a9a6594010a93cc00ac9afcc0a90aa528">vinecopulib::ControlsVinecop</a>
+: <a class="el" href="classvinecopulib_1_1_fit_controls_vinecop.html#af405b1b6776984dd4d0c99797c6484f6">vinecopulib::FitControlsVinecop</a>
 </li>
 <li>get_xtol_abs()
 : <a class="el" href="classtools__optimization_1_1_n_lopt_controls.html#ade4ee01928ec765014bd262ef461d4f9">tools_optimization::NLoptControls</a>
@@ -334,13 +334,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <h3><a class="anchor" id="index_s"></a>- s -</h3><ul>
 <li>select()
-: <a class="el" href="classvinecopulib_1_1_bicop.html#a7342390fe2ef9f25ebec68c4a59d2499">vinecopulib::Bicop</a>
+: <a class="el" href="classvinecopulib_1_1_bicop.html#af20af5c3ba6565628987b4784e9ac348">vinecopulib::Bicop</a>
 </li>
 <li>select_all()
-: <a class="el" href="classvinecopulib_1_1_vinecop.html#a66c719029f9ca51eb10aeeec2d1e57ec">vinecopulib::Vinecop</a>
+: <a class="el" href="classvinecopulib_1_1_vinecop.html#ad6cbb6b69c41f13a6e5e46ece44c0f78">vinecopulib::Vinecop</a>
 </li>
 <li>select_families()
-: <a class="el" href="classvinecopulib_1_1_vinecop.html#aca8e4eef8a1a4d04830c360edef60c9b">vinecopulib::Vinecop</a>
+: <a class="el" href="classvinecopulib_1_1_vinecop.html#a15ca60a0770dab0786b134fc80d1e77d">vinecopulib::Vinecop</a>
 </li>
 <li>set_bounds()
 : <a class="el" href="classtools__optimization_1_1_optimizer.html#ab2993e639db413bbb0e85ee53cacf912">tools_optimization::Optimizer</a>
@@ -388,7 +388,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 27 2017 17:04:08 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Mar 27 2017 17:57:30 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

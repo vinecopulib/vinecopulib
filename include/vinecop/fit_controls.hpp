@@ -8,44 +8,44 @@
 
 #include <limits>
 
-#include "bicop/controls.hpp"
+#include "bicop/fit_controls.hpp"
 
 namespace vinecopulib {
     //! @brief A class for controlling fit of bivariate copula models.
     //!
-    class ControlsVinecop : public ControlsBicop
+    class FitControlsVinecop : public FitControlsBicop
     {
     public:
         // Constructor
-        ControlsVinecop();
-        ControlsVinecop(std::vector<BicopFamily> family_set,
-                        std::string parametric_method = "mle",
-                        double nonparametric_mult = 1.0,
-                        int truncation_level = std::numeric_limits<int>::max(),
-                        std::string tree_criterion = "tau",
-                        double threshold = 0.0,
-                        std::string selection_criterion = "bic",
-                        bool preselect_families = true,
-                        bool show_trace = false);
-        ControlsVinecop(const ControlsBicop controls,
-                        int truncation_level = std::numeric_limits<int>::max(),
-                        std::string tree_criterion = "tau",
-                        double threshold = 0.0,
-                        bool show_trace = false);
+        FitControlsVinecop();
+        FitControlsVinecop(std::vector<BicopFamily> family_set,
+                           std::string parametric_method = "mle",
+                           double nonparametric_mult = 1.0,
+                           int truncation_level = std::numeric_limits<int>::max(),
+                           std::string tree_criterion = "tau",
+                           double threshold = 0.0,
+                           std::string selection_criterion = "bic",
+                           bool preselect_families = true,
+                           bool show_trace = false);
+        FitControlsVinecop(const FitControlsBicop controls,
+                           int truncation_level = std::numeric_limits<int>::max(),
+                           std::string tree_criterion = "tau",
+                           double threshold = 0.0,
+                           bool show_trace = false);
 
         // Getters
         int get_truncation_level();
         std::string get_tree_criterion();
         double get_threshold();
         bool get_show_trace();
-        ControlsBicop get_controlsbicop();
+        FitControlsBicop get_fit_controls_bicop();
 
         // Setters
         void set_truncation_level(int truncation_level);
         void set_tree_criterion(std::string tree_criterion);
         void set_threshold(double threshold);
         void set_show_trace(bool show_trace);
-        void set_controlsbicop(ControlsBicop controls);
+        void set_fit_controls_bicop(FitControlsBicop controls);
 
     private:
         int truncation_level_;

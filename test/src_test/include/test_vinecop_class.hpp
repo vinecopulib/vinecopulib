@@ -90,7 +90,7 @@ namespace test_vinecop_class {
 
         auto u = vinecop.simulate(1e5);
         Vinecop fit(u, model_matrix,
-                    ControlsVinecop({BicopFamily::clayton}, "itau"));
+                    FitControlsVinecop({BicopFamily::clayton}, "itau"));
         EXPECT_EQ(vinecop.get_all_rotations(), fit.get_all_rotations());
     }
 
@@ -100,7 +100,7 @@ namespace test_vinecop_class {
 
         // select structure and get matrix
         Vinecop fit(7);
-        fit.select_all(u, ControlsVinecop({BicopFamily::indep}));
+        fit.select_all(u, FitControlsVinecop({BicopFamily::indep}));
         auto vcl_matrix = fit.get_matrix();
 
         // check if the same conditioned sets appear for each tree

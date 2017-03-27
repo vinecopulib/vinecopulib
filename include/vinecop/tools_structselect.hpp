@@ -8,7 +8,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include "bicop/class.hpp"
-#include "controls.hpp"
+#include "fit_controls.hpp"
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std
@@ -51,7 +51,7 @@ namespace tools_structselect {
     // functions for manipulation of trees ----------------
     VineTree make_base_tree(const Eigen::MatrixXd& data);
     VineTree select_next_tree(VineTree& prev_tree,
-                              vinecopulib::ControlsVinecop& controls);
+                              vinecopulib::FitControlsVinecop& controls);
     VineTree edges_as_vertices(const VineTree& prev_tree);
     void add_allowed_edges(VineTree& tree, std::string tree_criterion,
                            double threshold);
@@ -64,7 +64,7 @@ namespace tools_structselect {
     void remove_edge_data(VineTree& tree);
     void remove_vertex_data(VineTree& tree);
     void select_pair_copulas(VineTree& tree,
-                             vinecopulib::ControlsVinecop& controls);
+                             vinecopulib::FitControlsVinecop& controls);
 
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(
