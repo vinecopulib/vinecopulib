@@ -47,12 +47,12 @@ build_script:
   - cmake --build . --config Debug
   - ctest -C Debug --output-on-failure
   - set path=%path_orig%;C:\projects\vinecopulib\build\Debug;C:\projects\nlopt
-  - bin\test_all.exe
+  - bin\Debug\test_all.exe
 
   - cmake --build . --config Release
   - ctest -C Release --output-on-failure
   - set path=%path_orig%;C:\projects\vinecopulib\build\Release;C:\projects\nlopt
-  - bin\test_all.exe
+  - bin\Debug\test_all.exe
 
   - cd ..
   
