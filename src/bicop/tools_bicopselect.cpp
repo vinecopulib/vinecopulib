@@ -59,12 +59,11 @@ bool preselect_family(
 {
     using namespace vinecopulib;
     using namespace tools_stl;
-    int c1 = c[0];
-    int c2 = c[1];
+
     bool preselect = false;
     if (is_rotationless) {
         preselect = true;
-        if ((std::fabs(c1 - c2) > 0.3) & (family == BicopFamily::frank))
+        if ((std::fabs(c[0] - c[1]) > 0.3) & (family == BicopFamily::frank))
             preselect = false;
     } else {
         if (is_member(family, bicop_families::BB)) {
@@ -76,14 +75,14 @@ bool preselect_family(
             }
         }
         bool is_90or180 = is_member(rotation, {90, 180});
-        if (c1 - c2 > 0.05) {
+        if (c[0] - c[1] > 0.05) {
             if (is_member(family, bicop_families::lt) & is_90or180) { 
                 preselect = true;
             }
             if (is_member(family, bicop_families::ut) & !is_90or180) {
                 preselect = true;
             }
-        } else if (c1 - c2 < -0.05) {
+        } else if (c[0] - c[1] < -0.05) {
             if (is_member(family, bicop_families::lt) & !is_90or180) { 
                 preselect = true;
             }

@@ -8,8 +8,10 @@
 
 #include <Eigen/Dense>
 
-namespace vinecopulib
+//! Tools for working with Eigen types
+namespace tools_eigen
 {
+    //! An `Eigen::Matrix` containing `bool`s (similar to `Eigen::MatrixXd`).
     typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
 
     Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(

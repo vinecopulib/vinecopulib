@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['flip',['flip',['../classvinecopulib_1_1_bicop.html#ac8f9520ba401ca554b3e4e2bb4a95cdf',1,'vinecopulib::Bicop']]],
-  ['frankbicop',['FrankBicop',['../classvinecopulib_1_1_frank_bicop.html',1,'vinecopulib']]]
+  ['elliptical',['elliptical',['../namespacevinecopulib_1_1bicop__families.html#a24b790671c9f4b25e57ecbc3505232fb',1,'vinecopulib::bicop_families']]],
+  ['ellipticalbicop',['EllipticalBicop',['../classvinecopulib_1_1_elliptical_bicop.html',1,'vinecopulib']]]
 ];

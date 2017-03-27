@@ -56,3 +56,7 @@ build_script:
   - cd bin\Debug
   - set path=%PATH%;C:/projects/vinecopulib/bin/Debug;C:/projects/nlopt;
   - test_all.exe
+
+on_success:
+  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build-debug\Debug\vinecopulib.* build-release\Debug\vinecopulib.*
+  - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip

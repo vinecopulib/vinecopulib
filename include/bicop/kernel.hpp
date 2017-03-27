@@ -6,11 +6,23 @@
 
 #pragma once
 
-#include "misc/interpolation_grid.hpp"
+#include "misc/tools_interpolation.hpp"
 #include "bicop/abstract.hpp"
 
 namespace vinecopulib
 {
+    //! @brief An abstract class for kernel copulas
+    //! 
+    //! Evaluation functions of kernel estimators are implemented efficiently 
+    //! using spline interpolation, see Nagler (2016). 
+    //!
+    //! This class is used in the implementation underlying the Bicop class. 
+    //! Users should not use AbstractBicop or derived classes directly, but 
+    //! always work with the Bicop interface.
+    //! 
+    //! @literature
+    //! Nagler, Thomas. *kdecopula: An R Package for the Kernel Estimation of 
+    //! Copula Densities*. arXiv:1603.04229 [stat.CO], 2016
     class KernelBicop : public AbstractBicop
     {
     public:

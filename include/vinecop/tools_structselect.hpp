@@ -7,8 +7,7 @@
 #pragma once
 
 #include <boost/graph/adjacency_list.hpp>
-#include "vinecop/class.hpp"
-#include "bicop/family.hpp"
+#include "bicop/class.hpp"
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std
@@ -84,8 +83,7 @@ namespace tools_structselect {
         std::string selection_criterion,
         bool preselect_families
     );
-    vinecopulib::Vinecop as_vinecop(std::vector<VineTree>& trees);
-    //void flip(vinecopulib::Bicop& bicop);
+
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(
         boost::graph_traits<VineTree>::edge_descriptor e,

@@ -54,7 +54,6 @@ install:
 
 script:
   - echo $CMAKE_ARGS
-  - mkdir bin
   - mkdir release
   - mkdir debug
   - cd debug
@@ -63,8 +62,7 @@ script:
   - cd ../release
   - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
   - make test || cat Testing/Temporary/LastTest.log / # "/" intentional! (just to make cat exit with an error code)
-  - cd ../bin
-  - ./test_all
+  - bin/test_all
   - cd ../examples/vinecopulib-cmake-example
   - mkdir build
   - cd build

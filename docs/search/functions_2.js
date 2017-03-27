@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['get_5ffamily',['get_family',['../classvinecopulib_1_1_bicop.html#a68ab3556ee3bb3d02814fd978573bf3b',1,'vinecopulib::Bicop']]],
-  ['get_5fmatrix',['get_matrix',['../classvinecopulib_1_1_r_vine_matrix.html#aef1ea47e9fcbcd32337b2db508b25fdb',1,'vinecopulib::RVineMatrix']]],
-  ['get_5fmax_5fmatrix',['get_max_matrix',['../classvinecopulib_1_1_r_vine_matrix.html#a674074d4e248868a01155a25f775ae3a',1,'vinecopulib::RVineMatrix']]],
-  ['get_5fneeded_5fhfunc1',['get_needed_hfunc1',['../classvinecopulib_1_1_r_vine_matrix.html#a6303fc1f643fdf793c867ca7e08e42bc',1,'vinecopulib::RVineMatrix']]]
+  ['calculate_5fnpars',['calculate_npars',['../classvinecopulib_1_1_bicop.html#a9f3b3b83c54a9e1d809fdee058f3eb11',1,'vinecopulib::Bicop']]],
+  ['construct_5fd_5fvine_5fmatrix',['construct_d_vine_matrix',['../classvinecopulib_1_1_r_vine_matrix.html#a7b3c8952acd3a29559369f0fae0ad9b3',1,'vinecopulib::RVineMatrix']]],
+  ['create',['create',['../classvinecopulib_1_1_abstract_bicop.html#afefe048baabaa8cd14e849e66a45c428',1,'vinecopulib::AbstractBicop']]]
 ];

@@ -10,6 +10,14 @@
 
 namespace vinecopulib
 {
+    //! @brief The Clayton copula
+    //!
+    //! This class is used in the implementation underlying the Bicop class. 
+    //! Users should not use AbstractBicop or derived classes directly, but 
+    //! always work with the Bicop interface.
+    //! 
+    //! @literature
+    //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
     class ClaytonBicop : public ArchimedeanBicop
     {
     public:

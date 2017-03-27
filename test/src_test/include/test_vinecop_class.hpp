@@ -9,6 +9,7 @@
 #include "vinecop_test.hpp"
 #include "include/vinecop/class.hpp"
 #include "include/vinecop/tools_structselect.hpp"
+#include "include/misc/tools_stats.hpp"
 #include "include/misc/tools_stl.hpp"
 
 namespace test_vinecop_class {
@@ -56,6 +57,25 @@ namespace test_vinecop_class {
         // check the underlying transformation from independent samples
         ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
     }
+
+    TEST_F(VinecopTest, aic_bic_are_correct) {
+
+        int d = 7;
+        auto data = tools_stats::simulate_uniform(1e3, 7);
+        Vinecop true_model(d);
+
+        auto pair_copulas = Vinecop::make_pair_copula_store(d);
+        auto par = Eigen::VectorXd::Constant(1, 3.0);
+        for (auto& tree : pair_copulas) {
+            for (auto& pc : tree) {
+                pc = Bicop(BicopFamily::clayton, 0, par);
+            }
+        }
+        Vinecop complex_model(pair_copulas, model_matrix);
+
+        ASSERT_TRUE(true_model.aic(data) < complex_model.aic(data));
+        ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
+    }
     
     TEST_F(VinecopTest, family_select_finds_true_rotations) {
 
@@ -68,9 +88,8 @@ namespace test_vinecop_class {
         }
         Vinecop vinecop(pair_copulas, model_matrix);
 
-        auto u = vinecop.simulate(50000);
-        auto fit = Vinecop::family_select(u, model_matrix, 
-            {BicopFamily::clayton}, "itau");
+        auto u = vinecop.simulate(1e5);
+        Vinecop fit(u, model_matrix, {BicopFamily::clayton}, "itau");
         EXPECT_EQ(vinecop.get_all_rotations(), fit.get_all_rotations());
     }
 
@@ -79,7 +98,8 @@ namespace test_vinecop_class {
         // independence (pair-copula estimates differ otherwise)
 
         // select structure and get matrix
-        Vinecop fit = Vinecop::select(u, {BicopFamily::indep});
+        Vinecop fit(7);
+        fit.select_all(u, {BicopFamily::indep});
         auto vcl_matrix = fit.get_matrix();
 
         // check if the same conditioned sets appear for each tree

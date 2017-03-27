@@ -10,6 +10,14 @@
 
 namespace vinecopulib
 {
+    //! @brief The BB7 copula
+    //!
+    //! This class is used in the implementation underlying the Bicop class. 
+    //! Users should not use AbstractBicop or derived classes directly, but 
+    //! always work with the Bicop interface.
+    //! 
+    //! @literature
+    //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
     class Bb7Bicop : public ArchimedeanBicop
     {
     public:

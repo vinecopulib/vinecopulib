@@ -28,10 +28,11 @@ namespace tools_optimization
 
 namespace vinecopulib
 {
-    //! A class for bivariate copulas
+    //! @brief An abstract class for bivariate copula families
     //!
-    //! The Bicop class is abstract, you cannot create an instance of this class,
-    //! but only of the derived classes.
+    //! This class is used in the implementation underlying the Bicop class. 
+    //! Users should not use AbstractBicop or derived classes directly, but 
+    //! always work with the Bicop interface.
     class AbstractBicop
     {
     friend class Bicop;
@@ -49,7 +50,6 @@ namespace vinecopulib
         // Getters and setters
         BicopFamily get_family() const;
         std::string get_family_name() const;
-        std::string get_association_direction() const;
         Eigen::MatrixXd get_parameters() const;
         Eigen::MatrixXd get_parameters_lower_bounds() const;
         Eigen::MatrixXd get_parameters_upper_bounds() const;
@@ -91,7 +91,8 @@ namespace vinecopulib
         void check_parameters_upper(const Eigen::MatrixXd& parameters);
         void check_parameters_lower(const Eigen::MatrixXd& parameters);
     };
-
+    
+    //! A shared pointer to an object of class AbstracBicop.
     typedef std::shared_ptr<AbstractBicop> BicopPtr;
     Eigen::VectorXd no_tau_to_parameters(const double&);
 }

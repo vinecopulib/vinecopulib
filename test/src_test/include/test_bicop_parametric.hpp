@@ -16,20 +16,27 @@ namespace test_bicop_parametric {
     // Test if the C++ implementation of the basic methods is correct
     TEST_P(ParBicopTest, parametric_bicop_is_correct) {
         if (needs_check_) {
-            std::string command = std::string(RSCRIPT);
-            command += "../test/test_bicop_parametric.R";
-            command += " "  + std::to_string(get_n());
-            command += " "  + std::to_string(get_family());
-            command += " "  + std::to_string(get_par());
-            command += " "  + std::to_string(get_par2());
-            int sys_exit_code = system(command.c_str());
+            std::string cmd = std::string(RSCRIPT) + std::string(TEST_BICOP);
+            cmd += " "  + std::to_string(get_n());
+            cmd += " "  + std::to_string(get_family());
+            cmd += " "  + std::to_string(get_par());
+            cmd += " "  + std::to_string(get_par2());
+            int sys_exit_code = system(cmd.c_str());
             if (sys_exit_code != 0) {
                 throw std::runtime_error("error in system call");
             }
             
             int n = get_n();
     
-            Eigen::MatrixXd results = read_matxd("temp");
+            Eigen::MatrixXd results = tools_eigen::read_matxd("temp");
+
+            // Remove temp file
+            cmd = rm + "temp";
+            sys_exit_code += system(cmd.c_str());
+            if (sys_exit_code != 0) {
+                throw std::runtime_error("error in system call");
+            }
+
             Eigen::VectorXd par = bicop_.get_parameters();
             auto absdiff = fabs(bicop_.parameters_to_tau(par) - results(0,0));
             ASSERT_TRUE(absdiff < 1e-4) << bicop_.str();

@@ -60,6 +60,13 @@ namespace vinecopulib
                       ub.resize(1, 1);
                       ub(0) = get_parameters_upper_bounds()(1);
                       initial_parameters = newpar.tail(1);
+                      if (family_ == BicopFamily::student) {
+                          // the df parameter doesn't need to be estimated as
+                          // accurately
+                          ub(0) = 15;
+                          optimizer = Optimizer(npars, 1e-2, 5e-1, 1e-4, 1e-4, 100);
+                          optimizer.set_objective(pmle_objective, &my_data);
+                      }
                       optimizer.set_objective(pmle_objective, &my_data);
                 } else {
                       optimizer.set_objective(mle_objective, &my_data);

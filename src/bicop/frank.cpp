@@ -49,7 +49,7 @@ namespace vinecopulib
         auto f = [&](const Eigen::VectorXd &v) {
             return Eigen::VectorXd::Constant(1, std::fabs(parameters_to_tau(v)));
         };
-        return invert_f(tau2, f, -100+1e-6, 100);
+        return tools_eigen::invert_f(tau2, f, -100+1e-6, 100);
     }
 
     double FrankBicop::parameters_to_tau(const Eigen::VectorXd& parameters)

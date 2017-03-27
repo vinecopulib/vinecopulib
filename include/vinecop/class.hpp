@@ -10,65 +10,94 @@
 
 #include "bicop/class.hpp"
 #include "vinecop/rvine_matrix.hpp"
+#include "vinecop/tools_structselect.hpp"
 
 namespace vinecopulib
 {
-//! A class for vine copulas
+    //! @brief A class for vine copula models
+    //! 
+    //! A vine copula model is characterized by the structure matrix (see
+    //! RVineMatrix) and the pair-copulas.
     class Vinecop
     {
     public:
+        // Constructors
         Vinecop() {}
         Vinecop(int d);
+        Vinecop(const Eigen::MatrixXi& matrix);
         Vinecop(
                 const std::vector<std::vector<Bicop>>& pair_copulas,
                 const Eigen::MatrixXi& matrix
         );
-
-        static std::vector<std::vector<Bicop>> make_pair_copula_store(int d);
-        static Vinecop select(
+        Vinecop(
                 const Eigen::MatrixXd& data,
+                const Eigen::MatrixXi& matrix = Eigen::MatrixXi(),
                 std::vector<BicopFamily> family_set = bicop_families::all,
                 std::string method = "mle",
                 int truncation_level = std::numeric_limits<int>::max(),
-                double threshold = 0.0,
                 std::string tree_criterion = "tau",
+                double threshold = 0.0,
                 std::string selection_criterion = "bic",
                 bool preselect_families = true,
                 bool show_trace = false
         );
-        static Vinecop family_select(
+
+        // Methods modifying structure and/or families and parameters
+        void select_all(
                 const Eigen::MatrixXd& data,
-                const Eigen::MatrixXi& matrix,
                 std::vector<BicopFamily> family_set = bicop_families::all,
                 std::string method = "mle",
                 int truncation_level = std::numeric_limits<int>::max(),
+                std::string tree_criterion = "tau",
                 double threshold = 0.0,
-                std::string threshold_criterion = "tau",
                 std::string selection_criterion = "bic",
-                bool preselect_families = true
+                bool preselect_families = true,
+                bool show_trace = false
+        );
+        void select_families(
+                const Eigen::MatrixXd& data,
+                std::vector<BicopFamily> family_set = bicop_families::all,
+                std::string method = "mle",
+                int truncation_level = std::numeric_limits<int>::max(),
+                std::string threshold_criterion = "tau",
+                double threshold = 0.0,
+                std::string selection_criterion = "bic",
+                bool preselect_families = true,
+                bool show_trace = false
         );
 
+        // Getters for a single pair copula
         Bicop get_pair_copula(int tree, int edge) const;
         BicopFamily get_family(int tree, int edge) const;
-        std::vector<std::vector<BicopFamily>> get_all_families() const;
         int get_rotation(int tree, int edge) const;
-        std::vector<std::vector<int>> get_all_rotations() const;
         Eigen::VectorXd get_parameters(int tree, int edge) const;
-        std::vector<std::vector<Eigen::VectorXd>> get_all_parameters() const;
         Eigen::MatrixXi get_matrix() const;
 
+        // Getters for all pair copulas
+        std::vector<std::vector<Bicop>> get_all_pair_copulas() const;
+        std::vector<std::vector<BicopFamily>> get_all_families() const;
+        std::vector<std::vector<int>> get_all_rotations() const;
+        std::vector<std::vector<Eigen::VectorXd>> get_all_parameters() const;
+
+        // Stats methods
         Eigen::VectorXd pdf(const Eigen::MatrixXd& u);
         Eigen::MatrixXd simulate(int n);
-        Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& U);
+        Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& u);
 
+        // Fit statistics
+        double calculate_npars();
+        double loglik(const Eigen::MatrixXd& u);
+        double aic(const Eigen::MatrixXd& u);
+        double bic(const Eigen::MatrixXd& u);
+
+        // Misc methods
+        static std::vector<std::vector<Bicop>> make_pair_copula_store(int d);
     private:
         int d_;
         RVineMatrix vine_matrix_;
         std::vector<std::vector<Bicop>> pair_copulas_;
+        void update_vinecop(std::vector<tools_structselect::VineTree>& trees);
+        Eigen::VectorXi inverse_permutation(const Eigen::VectorXi& order);
     };
 
-    Eigen::VectorXi inverse_permutation(const Eigen::VectorXi& order);
-    // reverse columns and rows of an Eigen::Matrix type object
-    template<typename Mat>
-    Mat to_upper_tri(Mat A) {return A.rowwise().reverse().colwise().reverse();}
 }

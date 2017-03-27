@@ -51,6 +51,7 @@ protected:
             parameters = bicop_.tau_to_parameters(tau);
         } else {
             if (family == BicopFamily::student) {
+                parameters(0) = sin(tau * M_PI / 2);
                 parameters(1) = 4;
             } else if (family == BicopFamily::bb1) {
                 parameters(1) = 1.5;
@@ -67,7 +68,7 @@ protected:
                     auto tau = bicop_.parameters_to_tau(par);
                     return Eigen::VectorXd::Constant(1, std::fabs(tau));
                 };
-                parameters(0) = invert_f(tau_v, f, 1 + 1e-6, 100)(0);
+                parameters(0) = tools_eigen::invert_f(tau_v, f, 1 + 1e-6, 100)(0);
                 parameters(1) = delta;
             }
         }

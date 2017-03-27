@@ -7,23 +7,46 @@
 #pragma once
 
 #include "misc/tools_eigen.hpp"
+using namespace tools_eigen;
 
 namespace vinecopulib
 {
+    //! @brief A class for regular vine matrices.
+    //! 
+    //! A regular vine (R-vine) matrix encodes the structure of a vine.
+    //!     An examplary matrix is
+    //! ```
+    //! 1 1 1 1
+    //! 2 2 2 0
+    //! 3 3 0 0
+    //! 4 0 0 0
+    //! ```
+    //! which encodes the following pair-copulas:
+    //! ```
+    //! | tree | edge | pair-copulas   |
+    //! |------|------|----------------|
+    //! | 0    | 0    | `(4, 1)`       |
+    //! |      | 1    | `(3, 1)`       |
+    //! |      | 2    | `(2, 1)`       |
+    //! | 1    | 0    | `(4, 2; 1)`    |
+    //! |      | 1    | `(3, 2; 1)`    |
+    //! | 2    | 0    | `(4, 3; 2, 1)` |
+    //! ```
+    //! Denoting by `M[i][j]` the matrix entry in row `i` and column `j` (starting at
+    //! 0), the pair-copula index for edge `e` in tree `t` of a `d` dimensional vine is
+    //! `(M[d - 1 - t][e], M[t][e]; M[t - 1][e], ..., M[0][e])`. Less formally,
+    //! 1. Start with the counter-diagonal element of column `e` (first conditioned 
+    //!    variable).
+    //! 2. Jump up to the element in row `t` (second conditioned variable).
+    //! 3. Gather all entries further up in column `e` (conditioning set).
+    //! 
     class RVineMatrix
     {
     public:
-        //! \devgroup constructors Constructors
-        //! @{
         RVineMatrix() {}
         RVineMatrix(const Eigen::MatrixXi& matrix);
-        //! @}
 
-        //! Getters
-        //! @{
         Eigen::MatrixXi get_matrix() const;
-        //! @}
-
         Eigen::VectorXi get_order() const;
         Eigen::MatrixXi in_natural_order() const;
         Eigen::MatrixXi get_max_matrix() const;

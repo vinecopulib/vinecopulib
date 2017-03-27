@@ -9,31 +9,34 @@
 
 namespace vinecopulib
 {
+    //! instantiates an RVineMatrix object.
+    //! @param matrix a valid R-vine matrix (this is not checked so far!).
     RVineMatrix::RVineMatrix(const Eigen::MatrixXi& matrix)
     {
         d_ = matrix.rows();
         // TODO: sanity checks for input matrix
         matrix_ = matrix;
     }
-
+    
+    //! extract the matrix.
     Eigen::MatrixXi RVineMatrix::get_matrix() const
     {
         return matrix_;
     }
-
+    
+    //! extracts the variable order in the R-vine.
     Eigen::VectorXi RVineMatrix::get_order() const
     {
         return matrix_.colwise().reverse().diagonal().reverse();
     }
 
-    //! Construct a D-vine matrix
+    //! constructs a D-vine matrix.
     //!
     //! A D-vine is a vine where each tree is a path.
     //!
-    //! @param order order of the variables
-    //!
-    //! @return An Eigen::MatrixXi describing the D-vine structure.
-    Eigen::MatrixXi RVineMatrix::construct_d_vine_matrix(const Eigen::VectorXi& order)
+    //! @param order order of the variables.
+    Eigen::MatrixXi RVineMatrix::construct_d_vine_matrix(
+        const Eigen::VectorXi& order)
     {
         int d = order.size();
         Eigen::MatrixXi vine_matrix = Eigen::MatrixXi::Constant(d, d, 0);
@@ -52,15 +55,11 @@ namespace vinecopulib
     }
 
 
-    //! Reorder R-vine matrix to natural order
+    //! extracts the R-vine matrix in natural order.
     //!
-    //! Natural order means that the diagonal has entries (d, ..., 1). We convert
-    //! to natural order by relabeling the variables. Most algorithms for estimation
-    //! and evaluation assume that the matrix is in natural order.
-    //!
-    //! @parameter matrix initial R-vine matrix.
-    //!
-    //! @return An Eigen::MatrixXi containing the matrix in natural order.
+    //! Natural order means that the counter-diagonal has entries (d, ..., 1). We 
+    //! convert to natural order by relabeling the variables. Most algorithms for 
+    //! estimation and evaluation assume that the R-vine matrix is in natural order.
     Eigen::MatrixXi RVineMatrix::in_natural_order() const
     {
         // create vector of new variable labels: d, ..., 1
@@ -71,16 +70,12 @@ namespace vinecopulib
         return relabel_elements(matrix_, new_labels);
     }
 
-    //! Get maximum matrix
+    //! extracts the maximum matrix.
     //!
     //! The maximum matrix is derived from an R-vine matrix by iteratively computing
     //! the (elementwise) maximum of a row and the row below (starting from the
     //! bottom). It is used in estimation and evaluation algorithms to find the right
     //! pseudo observations for an edge.
-    //!
-    //! @parameter no_matrix initial R-vine matrix, assumed to be in natural order.
-    //!
-    //! @return An Eigen::MatrixXi containing the maximum matrix
     Eigen::MatrixXi RVineMatrix::get_max_matrix() const
     {
         Eigen::MatrixXi max_matrix = this->in_natural_order();
@@ -92,16 +87,9 @@ namespace vinecopulib
         return max_matrix;
     }
 
-    //! Obtain matrix indicating which h-functions are needed
-    //!
-    //! It is usually not necessary to apply both h-functions for each pair-copula.
-    //!
-    //! @parameter no_matrix initial R-vine matrix (assumed to be in natural order).
-    //!
-    //! @return An Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> indicating
-    //! whether hfunc1/2 is needed for a given pair copula.
-    //!
-    //! @{
+    //! extracts a matrix indicating which of the first h-functions are needed 
+    //! (it is usually not necessary to apply both h-functions for each 
+    //! pair-copula).
     MatrixXb RVineMatrix::get_needed_hfunc1() const
     {
         MatrixXb needed_hfunc1 = MatrixXb::Constant(d_, d_, false);
@@ -117,7 +105,10 @@ namespace vinecopulib
         }
         return needed_hfunc1;
     }
-
+    
+    //! extracts a matrix indicating which of the second h-functions are needed 
+    //! (it is usually not necessary to apply both h-functions for each 
+    //! pair-copula).
     MatrixXb RVineMatrix::get_needed_hfunc2() const
     {
         MatrixXb needed_hfunc2 = MatrixXb::Constant(d_, d_, false);
@@ -138,10 +129,11 @@ namespace vinecopulib
     }
     //! @}
 
-// translates matrix_entry from old to new labels
-    int relabel_one(const int& x, const Eigen::VectorXi& old_labels, const Eigen::VectorXi& new_labels)
+    // translates matrix_entry from old to new labels
+    int relabel_one(const int& x, const Eigen::VectorXi& old_labels, 
+        const Eigen::VectorXi& new_labels)
     {
-        for (unsigned int i = 0; i < old_labels.size(); ++i) {
+        for (int i = 0; i < old_labels.size(); ++i) {
             if (x == old_labels[i]) {
                 return new_labels[i];
             }
@@ -149,8 +141,9 @@ namespace vinecopulib
         return 0;
     }
 
-// relabels all elements of the matrix (upper triangle assumed to be 0)
-    Eigen::MatrixXi relabel_elements(const Eigen::MatrixXi& matrix, const Eigen::VectorXi& new_labels)
+    // relabels all elements of the matrix (upper triangle assumed to be 0)
+    Eigen::MatrixXi relabel_elements(const Eigen::MatrixXi& matrix, 
+        const Eigen::VectorXi& new_labels)
     {
         int d = matrix.rows();
         Eigen::VectorXi old_labels = matrix.colwise().reverse().diagonal();
