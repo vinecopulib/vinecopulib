@@ -286,7 +286,7 @@ std::cout <<
 ```
 As it's arguably the most important function of the `Bicop` class, it's worth 
 understanding the second arguments of `select()`, namely an object of the class
-`FitControlsBicop`, which contain four data members:
+`FitControlsBicop`, which contain five data members:
 * `std::vector<BicopFamily> family_set` describes the set of family to select 
 from. It can take a user specified vector of 
 families or any of those mentioned above (default is `bicop_families::all`).
@@ -295,6 +295,8 @@ families or any of those mentioned above (default is `bicop_families::all`).
 `"itau"` (for Kendall's tau inversion, although only available for families 
 included in `bicop_families::itau`). Note that nonparametric families have 
 specialized methods for which no specification is required.
+* `double nonparametric_mult` a factor with which the smoothing parameters
+are multiplied.
 * `std::string selection_criterion` describes the criterion to compare the 
 families. It can take either `"bic"`(default) or `"aic"`.
 * `bool preselect_families` describes a heuristic preselection method (default 
