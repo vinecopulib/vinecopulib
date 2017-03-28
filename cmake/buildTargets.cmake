@@ -29,6 +29,7 @@ if(BUILD_TESTING)
             test_bicop_sanity_checks
             test_bicop_kernel
             test_rvine_matrix
+            test_tools_stats
             test_vinecop_class)
     add_subdirectory(test)
     file(GLOB_RECURSE r_scripts cmake/templates/*R)

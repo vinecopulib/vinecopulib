@@ -78,7 +78,7 @@ namespace tools_stats
             std::string ties_method = "average"
     );
 
-    double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
+    double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2> x);
     double pairwise_ktau(Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
     double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z);
 }

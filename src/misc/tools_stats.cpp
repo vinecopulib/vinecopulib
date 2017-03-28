@@ -131,7 +131,7 @@ namespace tools_stats {
     }
 
     //! calculates the pair-wise Hoeffding's D.
-    double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
+    double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2> x)
     {
         int n = x.rows();
 
@@ -164,7 +164,7 @@ namespace tools_stats {
         double D = (A - 2*(n-2)*B + (n-2)*(n-3)*C);
         D /= (n*(n-1)*(n-2)*(n-3)*(n-4));
 
-        return D;
+        return 30.0*D;
     }
     
     //! @}
