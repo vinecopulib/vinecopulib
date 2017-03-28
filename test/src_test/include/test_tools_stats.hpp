@@ -18,10 +18,9 @@ namespace test_tools_stats {
 
         // X1 = (1,...,n) and X2 = (n, ..., 1)
         // X = (X1, X2)
-        Eigen::MatrixXi Xi(n,2);
-        Xi.col(0) = Eigen::VectorXi::LinSpaced(n,1,n);
-        Xi.col(1) = Eigen::VectorXi::LinSpaced(n,n,1);
-        Eigen::MatrixXd X = Xi.cast <double> ();
+        Eigen::MatrixXd X(n,2);
+        X.col(0) = Eigen::VectorXd::LinSpaced(n,1,n);
+        X.col(1) = Eigen::VectorXd::LinSpaced(n,n,1);
 
         // U = pobs(X)
         Eigen::MatrixXd U = tools_stats::to_pseudo_obs(X);
@@ -37,11 +36,9 @@ namespace test_tools_stats {
 
         // X1 = (1,...,n) and X2 = (n, ..., 1)
         // X = (X1, X2)
-        Eigen::MatrixXi Xi(n,2);
-        Xi.col(0) = Eigen::VectorXi::LinSpaced(n,1,n);
-        Xi.col(1) = Eigen::VectorXi::LinSpaced(n,n,1);
         Eigen::MatrixXd X(n,2);
-        X = Xi.cast <double> ();
+        X.col(0) = Eigen::VectorXd::LinSpaced(n,1,n);
+        X.col(1) = Eigen::VectorXd::LinSpaced(n,n,1);
 
         // Perfect dependence
         double computed_hoeffd = tools_stats::pairwise_hoeffd(X);
