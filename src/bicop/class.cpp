@@ -19,6 +19,7 @@ namespace vinecopulib
     Bicop::Bicop()
     {
         bicop_ = AbstractBicop::create();
+        rotation_ = 0;
     }
     
     //! creates a specific bivariate copula model.
