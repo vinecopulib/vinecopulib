@@ -17,6 +17,7 @@ namespace test_vinecop_class {
 
     TEST_F(VinecopTest, constructors_without_error) {
         Vinecop vinecop(5);
+        Vinecop vinecop_indep(model_matrix);
 
         auto pair_copulas = Vinecop::make_pair_copula_store(7);
         for (auto& tree : pair_copulas) {
@@ -26,6 +27,42 @@ namespace test_vinecop_class {
         }
 
         Vinecop vinecop_parametrized(pair_copulas, model_matrix);
+    }
+
+    TEST_F(VinecopTest, getters_are_correct) {
+        auto pair_copulas = Vinecop::make_pair_copula_store(7);
+        for (auto& tree : pair_copulas) {
+            for (auto& pc : tree) {
+                pc = Bicop(BicopFamily::clayton, 90);
+            }
+        }
+        Vinecop vinecop(pair_copulas, model_matrix);
+
+        for (auto& tree : vinecop.get_all_families()) {
+            for (auto& fam : tree) {
+                EXPECT_EQ(fam, BicopFamily::clayton);
+            }
+        }
+
+        for (auto& tree : vinecop.get_all_pair_copulas()) {
+            for (auto& pc : tree) {
+                EXPECT_EQ(pc.get_family(), BicopFamily::clayton);
+                EXPECT_EQ(pc.get_rotation(), 90);
+            }
+        }
+
+        for (auto& tree : vinecop.get_all_parameters()) {
+            for (auto& par : tree) {
+                EXPECT_EQ(par.size(), 1);
+                EXPECT_EQ(par(0), 0);
+            }
+        }
+
+        for (auto& tree : vinecop.get_all_rotations()) {
+            for (auto& rot : tree) {
+                EXPECT_EQ(rot, 90);
+            }
+        }
     }
 
     TEST_F(VinecopTest, pdf_is_correct) {
