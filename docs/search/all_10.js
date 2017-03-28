@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['qnorm',['qnorm',['../namespacetools__stats.html#a1d771ac8853f0645315ce40c962a93a4',1,'tools_stats']]],
+  ['qnorm',['qnorm',['../namespacetools__stats.html#acc57d04fffc7a8d39a60fa5e2292cb99',1,'tools_stats']]],
   ['qt',['qt',['../namespacetools__stats.html#a285a8ae16aea054b21c9d29966776db5',1,'tools_stats']]]
 ];

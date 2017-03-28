@@ -32,8 +32,8 @@ namespace vinecopulib
     //!     with family).
     //! @return A pointer to an object that inherits from AbstractBicop.
     //! @{
-    BicopPtr AbstractBicop::create(BicopFamily family, 
-        const Eigen::MatrixXd& parameters)
+    BicopPtr AbstractBicop::create(BicopFamily family,
+                                   const Eigen::MatrixXd& parameters)
     {
         BicopPtr new_bicop;
         switch (family) {

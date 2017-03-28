@@ -1,0 +1,151 @@
+\hypertarget{classvinecopulib_1_1_controls_vinecop}{}\section{vinecopulib\+:\+:Controls\+Vinecop Class Reference}
+\label{classvinecopulib_1_1_controls_vinecop}\index{vinecopulib\+::\+Controls\+Vinecop@{vinecopulib\+::\+Controls\+Vinecop}}
+
+
+A class for controlling fit of bivariate copula models.  
+
+
+
+
+{\ttfamily \#include $<$controls.\+hpp$>$}
+
+
+
+Inheritance diagram for vinecopulib\+:\+:Controls\+Vinecop\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{classvinecopulib_1_1_controls_vinecop__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for vinecopulib\+:\+:Controls\+Vinecop\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{classvinecopulib_1_1_controls_vinecop__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classvinecopulib_1_1_controls_vinecop_a52054b73961271e179f7eaf74b4152de}{Controls\+Vinecop} ()\hypertarget{classvinecopulib_1_1_controls_vinecop_a52054b73961271e179f7eaf74b4152de}{}\label{classvinecopulib_1_1_controls_vinecop_a52054b73961271e179f7eaf74b4152de}
+
+\begin{DoxyCompactList}\small\item\em creates default controls for fitting vine copula models. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_controls_vinecop_add9c80d717ee3443456b81b1c79611a4}{Controls\+Vinecop} (std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set, std\+::string parametric\+\_\+method=\char`\"{}mle\char`\"{}, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, double threshold=0.\+0, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool show\+\_\+trace=false)
+\item 
+\hyperlink{classvinecopulib_1_1_controls_vinecop_aa63e4b40ed55179657052b15b5eed872}{Controls\+Vinecop} (const \hyperlink{classvinecopulib_1_1_controls_bicop}{Controls\+Bicop} controls, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, double threshold=0.\+0, bool show\+\_\+trace=false)
+\end{DoxyCompactItemize}
+{\bf }\par
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{classvinecopulib_1_1_controls_vinecop_a9a6594010a93cc00ac9afcc0a90aa528}{get\+\_\+truncation\+\_\+level} ()
+\item 
+std\+::string {\bfseries get\+\_\+tree\+\_\+criterion} ()\hypertarget{classvinecopulib_1_1_controls_vinecop_a3f0de9473037e26a6355f90c7a47731f}{}\label{classvinecopulib_1_1_controls_vinecop_a3f0de9473037e26a6355f90c7a47731f}
+
+\item 
+double {\bfseries get\+\_\+threshold} ()\hypertarget{classvinecopulib_1_1_controls_vinecop_a46b8dfe678921b5e77b4f34a029a97fe}{}\label{classvinecopulib_1_1_controls_vinecop_a46b8dfe678921b5e77b4f34a029a97fe}
+
+\item 
+bool {\bfseries get\+\_\+show\+\_\+trace} ()\hypertarget{classvinecopulib_1_1_controls_vinecop_acf86362e4dc3833bae6458c0fd04e475}{}\label{classvinecopulib_1_1_controls_vinecop_acf86362e4dc3833bae6458c0fd04e475}
+
+\item 
+\hyperlink{classvinecopulib_1_1_controls_bicop}{Controls\+Bicop} {\bfseries get\+\_\+controlsbicop} ()\hypertarget{classvinecopulib_1_1_controls_vinecop_a9cfbbaf0937a479b500acd068552c05e}{}\label{classvinecopulib_1_1_controls_vinecop_a9cfbbaf0937a479b500acd068552c05e}
+
+\item 
+void {\bfseries set\+\_\+truncation\+\_\+level} (int truncation\+\_\+level)\hypertarget{classvinecopulib_1_1_controls_vinecop_aa8fda5af03d29fd6c3ef87a02440f18a}{}\label{classvinecopulib_1_1_controls_vinecop_aa8fda5af03d29fd6c3ef87a02440f18a}
+
+\item 
+void {\bfseries set\+\_\+tree\+\_\+criterion} (std\+::string tree\+\_\+criterion)\hypertarget{classvinecopulib_1_1_controls_vinecop_a98e8d9a1c16561b3c7656051b8c5566a}{}\label{classvinecopulib_1_1_controls_vinecop_a98e8d9a1c16561b3c7656051b8c5566a}
+
+\item 
+void {\bfseries set\+\_\+threshold} (double threshold)\hypertarget{classvinecopulib_1_1_controls_vinecop_afec26a669e5cf91455c5889b067931ef}{}\label{classvinecopulib_1_1_controls_vinecop_afec26a669e5cf91455c5889b067931ef}
+
+\item 
+void {\bfseries set\+\_\+show\+\_\+trace} (bool show\+\_\+trace)\hypertarget{classvinecopulib_1_1_controls_vinecop_ac000317ea2163cfb8b0359f8d5ee988c}{}\label{classvinecopulib_1_1_controls_vinecop_ac000317ea2163cfb8b0359f8d5ee988c}
+
+\item 
+void {\bfseries set\+\_\+controlsbicop} (\hyperlink{classvinecopulib_1_1_controls_bicop}{Controls\+Bicop} controls)\hypertarget{classvinecopulib_1_1_controls_vinecop_a3c72537634ac8f74704b18d66c754e73}{}\label{classvinecopulib_1_1_controls_vinecop_a3c72537634ac8f74704b18d66c754e73}
+
+\end{DoxyCompactItemize}
+
+
+
+\subsection{Detailed Description}
+A class for controlling fit of bivariate copula models. 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{vinecopulib\+::\+Controls\+Vinecop@{vinecopulib\+::\+Controls\+Vinecop}!Controls\+Vinecop@{Controls\+Vinecop}}
+\index{Controls\+Vinecop@{Controls\+Vinecop}!vinecopulib\+::\+Controls\+Vinecop@{vinecopulib\+::\+Controls\+Vinecop}}
+\subsubsection[{\texorpdfstring{Controls\+Vinecop(std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set, std\+::string parametric\+\_\+method=""mle"", int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), std\+::string tree\+\_\+criterion=""tau"", double threshold=0.\+0, std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true, bool show\+\_\+trace=false)}{ControlsVinecop(std::vector< BicopFamily > family_set, std::string parametric_method="mle", int truncation_level=std::numeric_limits< int >::max(), std::string tree_criterion="tau", double threshold=0.0, std::string selection_criterion="bic", bool preselect_families=true, bool show_trace=false)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Controls\+Vinecop\+::\+Controls\+Vinecop (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ {\bf Bicop\+Family} $>$}]{family\+\_\+set, }
+\item[{std\+::string}]{parametric\+\_\+method = {\ttfamily \char`\"{}mle\char`\"{}}, }
+\item[{int}]{truncation\+\_\+level = {\ttfamily std\+:\+:numeric\+\_\+limits$<$int$>$\+:\+:max()}, }
+\item[{std\+::string}]{tree\+\_\+criterion = {\ttfamily \char`\"{}tau\char`\"{}}, }
+\item[{double}]{threshold = {\ttfamily 0.0}, }
+\item[{std\+::string}]{selection\+\_\+criterion = {\ttfamily \char`\"{}bic\char`\"{}}, }
+\item[{bool}]{preselect\+\_\+families = {\ttfamily true}, }
+\item[{bool}]{show\+\_\+trace = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_controls_vinecop_add9c80d717ee3443456b81b1c79611a4}{}\label{classvinecopulib_1_1_controls_vinecop_add9c80d717ee3443456b81b1c79611a4}
+creates custom controls for fitting vine copula models. 
+\begin{DoxyParams}{Parameters}
+{\em family\+\_\+set} & see \hyperlink{classvinecopulib_1_1_controls_bicop}{Controls\+Bicop}. \\
+\hline
+{\em parametric\+\_\+method} & see \hyperlink{classvinecopulib_1_1_controls_bicop}{Controls\+Bicop}. \\
+\hline
+{\em truncation\+\_\+level} & for truncated vines. \\
+\hline
+{\em tree\+\_\+criterion} & the criterion for selecting the maximum spanning tree (\char`\"{}tau\char`\"{}, \char`\"{}hoeffd\char`\"{} and \char`\"{}rho\char`\"{} implemented so far). \\
+\hline
+{\em threshold} & for thresholded vines (0 = no threshold). \\
+\hline
+{\em selection\+\_\+criterion} & see \hyperlink{classvinecopulib_1_1_controls_bicop}{Controls\+Bicop}. \\
+\hline
+{\em preselect\+\_\+families} & see \hyperlink{classvinecopulib_1_1_controls_bicop}{Controls\+Bicop}. \\
+\hline
+{\em show\+\_\+trace} & whether to show a trace of the building progress. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Controls\+Vinecop@{vinecopulib\+::\+Controls\+Vinecop}!Controls\+Vinecop@{Controls\+Vinecop}}
+\index{Controls\+Vinecop@{Controls\+Vinecop}!vinecopulib\+::\+Controls\+Vinecop@{vinecopulib\+::\+Controls\+Vinecop}}
+\subsubsection[{\texorpdfstring{Controls\+Vinecop(const Controls\+Bicop controls, int truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ int $>$\+::max(), std\+::string tree\+\_\+criterion=""tau"", double threshold=0.\+0, bool show\+\_\+trace=false)}{ControlsVinecop(const ControlsBicop controls, int truncation_level=std::numeric_limits< int >::max(), std::string tree_criterion="tau", double threshold=0.0, bool show_trace=false)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Controls\+Vinecop\+::\+Controls\+Vinecop (
+\begin{DoxyParamCaption}
+\item[{const {\bf Controls\+Bicop}}]{controls, }
+\item[{int}]{truncation\+\_\+level = {\ttfamily std\+:\+:numeric\+\_\+limits$<$int$>$\+:\+:max()}, }
+\item[{std\+::string}]{tree\+\_\+criterion = {\ttfamily \char`\"{}tau\char`\"{}}, }
+\item[{double}]{threshold = {\ttfamily 0.0}, }
+\item[{bool}]{show\+\_\+trace = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_controls_vinecop_aa63e4b40ed55179657052b15b5eed872}{}\label{classvinecopulib_1_1_controls_vinecop_aa63e4b40ed55179657052b15b5eed872}
+creates custom controls for fitting vine copula models. 
+\begin{DoxyParams}{Parameters}
+{\em truncation\+\_\+level} & for truncated vines. \\
+\hline
+{\em tree\+\_\+criterion} & the criterion for selecting the maximum spanning tree (\char`\"{}tau\char`\"{}, \char`\"{}hoeffd\char`\"{} and \char`\"{}rho\char`\"{} implemented so far). \\
+\hline
+{\em threshold} & for thresholded vines (0 = no threshold). \\
+\hline
+{\em show\+\_\+trace} & whether to show a trace of the building progress. \\
+\hline
+{\em controls} & see \hyperlink{classvinecopulib_1_1_controls_bicop}{Controls\+Bicop}. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\index{vinecopulib\+::\+Controls\+Vinecop@{vinecopulib\+::\+Controls\+Vinecop}!get\+\_\+truncation\+\_\+level@{get\+\_\+truncation\+\_\+level}}
+\index{get\+\_\+truncation\+\_\+level@{get\+\_\+truncation\+\_\+level}!vinecopulib\+::\+Controls\+Vinecop@{vinecopulib\+::\+Controls\+Vinecop}}
+\subsubsection[{\texorpdfstring{get\+\_\+truncation\+\_\+level()}{get_truncation_level()}}]{\setlength{\rightskip}{0pt plus 5cm}int vinecopulib\+::\+Controls\+Vinecop\+::get\+\_\+truncation\+\_\+level (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_controls_vinecop_a9a6594010a93cc00ac9afcc0a90aa528}{}\label{classvinecopulib_1_1_controls_vinecop_a9a6594010a93cc00ac9afcc0a90aa528}
+Getters and setters. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/n5/dev/cpp/vinecopulib/include/vinecop/controls.\+hpp\item 
+/home/n5/dev/cpp/vinecopulib/src/vinecop/controls.\+cpp\end{DoxyCompactItemize}
