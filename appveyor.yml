@@ -1,7 +1,6 @@
 platform: 
   - x86
   - x64
-#TODO: configuration: Debug/Release + same with CMake
 
 init:
   - ps: |
@@ -41,20 +40,24 @@ before_build:
 build_script:
   - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt"'
 
-  - md build-debug
-  - cd build-debug
-  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Debug -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%"
-  - cmake --build .
-  - ctest -C Debug --output-on-failure
-  - cd ..
+  - md build
+  - cd build
+  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%"
+  - set path_orig=%path%
 
-  - md build-release
-  - cd build-release
-  - cmake .. %CMAKE_ARGS% -DCMAKE_BUILD_TYPE=Release -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%"
-  - cmake --build .
-  - ctest -C Release --output-on-failure
+  - cmake --build . --config Debug
+  - set path=%path_orig%;C:\projects\vinecopulib\build\Debug;C:\projects\nlopt
+  - #bin\Debug\test_all.exe
+
+  - cmake --build . --config Release
+  - set path=%path_orig%;C:\projects\vinecopulib\build\Release;C:\projects\nlopt
+  - #bin\Release\test_all.exe
+
   - cd ..
+  
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_success:
-  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build-debug\Debug\vinecopulib.* build-release\Debug\vinecopulib.*
+  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build\Debug\vinecopulib.* build\Release\vinecopulib.*
   - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
