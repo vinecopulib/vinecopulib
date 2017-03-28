@@ -61,5 +61,3 @@ build_script:
 on_success:
   - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build\Debug\vinecopulib.* build\Debug\vinecopulib.*
   - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
-  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build\Release\vinecopulib.* build\Debug\vinecopulib.*
-  - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
