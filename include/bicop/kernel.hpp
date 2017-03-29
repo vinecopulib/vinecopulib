@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "misc/tools_interpolation.hpp"
 #include "bicop/abstract.hpp"
 

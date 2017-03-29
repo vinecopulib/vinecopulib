@@ -9,19 +9,17 @@
 #include "misc/tools_stl.hpp"
 #include <cmath>
 
-std::vector<double> get_c1c2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-    double tau
-)
+std::vector<double> get_c1c2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+                             double tau)
 {
-    int n = data.rows();
+    size_t n = data.rows();
     Eigen::MatrixXd x = Eigen::MatrixXd::Zero(n, 2);
     Eigen::MatrixXd z1 = x;
     Eigen::MatrixXd z2 = x;
     x = tools_stats::qnorm(data);
     
     int count1 = 0, count2 = 0;
-    for (int j = 0; j < n; ++j) {
+    for (size_t j = 0; j < n; ++j) {
         if (tau > 0) {
             if ((x(j, 0) > 0) && (x(j, 1) > 0)) {
                 z1.row(count1) = x.row(j);
@@ -49,13 +47,9 @@ std::vector<double> get_c1c2(
     };
 }
 
-bool preselect_family(
-    std::vector<double> c, 
-    double tau, 
-    vinecopulib::BicopFamily family, 
-    int rotation, 
-    bool is_rotationless
-)
+bool preselect_family(std::vector<double> c, double tau, 
+                      vinecopulib::BicopFamily family,  int rotation, 
+                      bool is_rotationless)
 {
     using namespace vinecopulib;
     using namespace tools_stl;

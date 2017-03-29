@@ -25,5 +25,6 @@ namespace tools_eigen
     );
     
     Eigen::MatrixXd read_matxd(const char *filename, int max_buffer_size = (int) 1e6);
-    Eigen::MatrixXi read_matxi(const char *filename, int max_buffer_size = (int) 1e6);
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
+        const char *filename, int max_buffer_size = (int) 1e6);
 }

@@ -10,20 +10,21 @@
 #include <algorithm>
 #include <iterator>
 #include <numeric>
+#include <cstddef>
 
 namespace tools_stl {
     
     using namespace std;
 
     template<typename T>
-    std::vector<int> get_order(const std::vector<T>& x)
+    std::vector<size_t> get_order(const std::vector<T>& x)
     {
-        std::vector<int> order(x.size());
+        std::vector<size_t> order(x.size());
         std::iota(order.begin(), order.end(), 0);
         std::sort(
                 order.begin(),
                 order.end(),
-                [&] (int i, int j) -> bool {return (x[i] < x[j]);}
+                [&] (size_t i, size_t j) -> bool {return (x[i] < x[j]);}
         );
         return order;
     }
@@ -49,7 +50,7 @@ namespace tools_stl {
     }
 
     template<class T>
-    T find_position(T x, vector<T> vec)
+    size_t find_position(T x, vector<T> vec)
     {
         return distance(vec.begin(), find(vec.begin(), vec.end(), x));
     }
@@ -101,9 +102,9 @@ namespace tools_stl {
     }
 
     //! Integer sequence starting at 1
-    inline vector<int> seq_int(int from, int length)
+    inline vector<size_t> seq_int(size_t from, size_t length)
     {
-        vector<int> seq(length);
+        vector<size_t> seq(length);
         iota(seq.begin(), seq.end(), from);
         return seq;
     }

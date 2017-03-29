@@ -98,7 +98,7 @@ namespace test_vinecop_class {
     TEST_F(VinecopTest, aic_bic_are_correct) {
 
         int d = 7;
-        auto data = tools_stats::simulate_uniform(1e3, 7);
+        auto data = tools_stats::simulate_uniform(1000, 7);
         Vinecop true_model(d);
 
         auto pair_copulas = Vinecop::make_pair_copula_store(d);
@@ -125,7 +125,7 @@ namespace test_vinecop_class {
         }
         Vinecop vinecop(pair_copulas, model_matrix);
 
-        auto u = vinecop.simulate(1e5);
+        auto u = vinecop.simulate(100000);
         Vinecop fit(u, model_matrix,
                     FitControlsVinecop({BicopFamily::clayton}, "itau"));
         EXPECT_EQ(vinecop.get_all_rotations(), fit.get_all_rotations());
@@ -142,7 +142,7 @@ namespace test_vinecop_class {
 
         // check if the same conditioned sets appear for each tree
         using namespace tools_structselect;
-        std::vector<std::vector<std::vector<int>>> vc_sets(6), vcl_sets(6);
+        std::vector<std::vector<std::vector<size_t>>> vc_sets(6), vcl_sets(6);
         int pairs_unequal = 0;
         for (int tree = 0; tree < 6; ++tree) {
             vc_sets[tree].resize(6 - tree);

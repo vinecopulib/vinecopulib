@@ -47,12 +47,12 @@ script:
   - cd ../release
   - cmake .. -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
   - bin/test_all
-  - cd ../examples/vinecopulib-cmake-example
+  - cd ../examples/bicop
   - mkdir build
   - cd build
   - cmake .. && make
   - cd ../bin
-  - ./vinecopulib_main
+  - ./main
 
 after_success:
     # Creating report
