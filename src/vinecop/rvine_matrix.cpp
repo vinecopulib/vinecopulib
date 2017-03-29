@@ -11,7 +11,7 @@ namespace vinecopulib
 {
     //! instantiates an RVineMatrix object.
     //! @param matrix a valid R-vine matrix (this is not checked so far!).
-    RVineMatrix::RVineMatrix(const Eigen::MatrixXi& matrix)
+    RVineMatrix::RVineMatrix(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix)
     {
         d_ = matrix.rows();
         // TODO: sanity checks for input matrix
@@ -19,13 +19,13 @@ namespace vinecopulib
     }
     
     //! extract the matrix.
-    Eigen::MatrixXi RVineMatrix::get_matrix() const
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> RVineMatrix::get_matrix() const
     {
         return matrix_;
     }
     
     //! extracts the variable order in the R-vine.
-    Eigen::VectorXi RVineMatrix::get_order() const
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> RVineMatrix::get_order() const
     {
         return matrix_.colwise().reverse().diagonal().reverse();
     }
@@ -35,18 +35,19 @@ namespace vinecopulib
     //! A D-vine is a vine where each tree is a path.
     //!
     //! @param order order of the variables.
-    Eigen::MatrixXi RVineMatrix::construct_d_vine_matrix(
-        const Eigen::VectorXi& order)
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> RVineMatrix::construct_d_vine_matrix(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order)
     {
-        int d = order.size();
-        Eigen::MatrixXi vine_matrix = Eigen::MatrixXi::Constant(d, d, 0);
+        size_t d = order.size();
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> vine_matrix(d, d);
+        vine_matrix.array() = 0;
 
-        for (int i = 0; i < d; ++i) {
+        for (size_t i = 0; i < d; ++i) {
             vine_matrix(d - 1 - i, i) = order(d - 1 - i);  // diagonal
         }
 
-        for (int i = 1; i < d; ++i) {
-            for (int j = 0; j < i; ++j) {
+        for (size_t i = 1; i < d; ++i) {
+            for (size_t j = 0; j < i; ++j) {
                 vine_matrix(d - 1 - i, j) = order(i - j - 1);  // below diagonal
             }
         }
@@ -60,12 +61,12 @@ namespace vinecopulib
     //! Natural order means that the counter-diagonal has entries (d, ..., 1). We 
     //! convert to natural order by relabeling the variables. Most algorithms for 
     //! estimation and evaluation assume that the R-vine matrix is in natural order.
-    Eigen::MatrixXi RVineMatrix::in_natural_order() const
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> RVineMatrix::in_natural_order() const
     {
         // create vector of new variable labels: d, ..., 1
-        std::vector<int> ivec = tools_stl::seq_int(1, d_);
+        std::vector<size_t> ivec = tools_stl::seq_int(1, d_);
         tools_stl::reverse(ivec);
-        Eigen::Map<Eigen::VectorXi> new_labels(&ivec[0], d_);     // convert to Eigen::VectorXi
+        Eigen::Map<Eigen::Matrix<size_t, Eigen::Dynamic, 1>> new_labels(&ivec[0], d_);
 
         return relabel_elements(matrix_, new_labels);
     }
@@ -76,11 +77,11 @@ namespace vinecopulib
     //! the (elementwise) maximum of a row and the row below (starting from the
     //! bottom). It is used in estimation and evaluation algorithms to find the right
     //! pseudo observations for an edge.
-    Eigen::MatrixXi RVineMatrix::get_max_matrix() const
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> RVineMatrix::get_max_matrix() const
     {
-        Eigen::MatrixXi max_matrix = this->in_natural_order();
-        for (int i = 0; i < d_ - 1; ++i) {
-            for (int j = 0 ; j < d_ - i - 1; ++j) {
+        auto max_matrix = this->in_natural_order();
+        for (size_t i = 0; i < d_ - 1; ++i) {
+            for (size_t j = 0 ; j < d_ - i - 1; ++j) {
                 max_matrix(i + 1, j) = max_matrix.block(i, j, 2, 1).maxCoeff();
             }
         }
@@ -94,10 +95,10 @@ namespace vinecopulib
     {
         MatrixXb needed_hfunc1 = MatrixXb::Constant(d_, d_, false);
 
-        Eigen::MatrixXi no_matrix = this->in_natural_order();
-        Eigen::MatrixXi max_matrix = this->get_max_matrix();
-        for (int i = 1; i < d_ - 1; ++i) {
-            int j = d_ - i;
+        auto no_matrix = this->in_natural_order();
+        auto max_matrix = this->get_max_matrix();
+        for (size_t i = 1; i < d_ - 1; ++i) {
+            size_t j = d_ - i;
             MatrixXb isnt_mat_j = (no_matrix.block(0, 0, j, i).array() != j);
             MatrixXb is_max_j = (max_matrix.block(0, 0, j, i).array() == j);
             MatrixXb is_different = (isnt_mat_j.array() && is_max_j.array());
@@ -113,10 +114,10 @@ namespace vinecopulib
     {
         MatrixXb needed_hfunc2 = MatrixXb::Constant(d_, d_, false);
         needed_hfunc2.block(0, 0, d_ - 1, 1) = MatrixXb::Constant(d_ - 1, 1, true);
-        Eigen::MatrixXi no_matrix = this->in_natural_order();
-        Eigen::MatrixXi max_matrix = this->get_max_matrix();
-        for (int i = 1; i < d_ - 1; ++i) {
-            int j = d_ - i;
+        auto no_matrix  = this->in_natural_order();
+        auto max_matrix = this->get_max_matrix();
+        for (size_t i = 1; i < d_ - 1; ++i) {
+            size_t j = d_ - i;
             // fill column i with true above the diagonal
             needed_hfunc2.block(0, i, d_ - i, 1) = MatrixXb::Constant(d_ - i, 1, true);
             // for diagonal, check whether matrix and maximum matrix coincide
@@ -130,8 +131,9 @@ namespace vinecopulib
     //! @}
 
     // translates matrix_entry from old to new labels
-    int relabel_one(const int& x, const Eigen::VectorXi& old_labels, 
-        const Eigen::VectorXi& new_labels)
+    int relabel_one(size_t x, 
+        const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& old_labels, 
+        const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& new_labels)
     {
         for (int i = 0; i < old_labels.size(); ++i) {
             if (x == old_labels[i]) {
@@ -142,14 +144,15 @@ namespace vinecopulib
     }
 
     // relabels all elements of the matrix (upper triangle assumed to be 0)
-    Eigen::MatrixXi relabel_elements(const Eigen::MatrixXi& matrix, 
-        const Eigen::VectorXi& new_labels)
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> relabel_elements(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix, 
+        const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& new_labels)
     {
-        int d = matrix.rows();
-        Eigen::VectorXi old_labels = matrix.colwise().reverse().diagonal();
-        Eigen::MatrixXi new_matrix = Eigen::MatrixXi::Zero(d, d);
-        for (int i = 0; i < d; ++i) {
-            for (int j = 0; j < d - i; ++j) {
+        size_t d = matrix.rows();
+        auto old_labels = matrix.colwise().reverse().diagonal();
+        auto new_matrix = matrix;
+        for (size_t i = 0; i < d; ++i) {
+            for (size_t j = 0; j < d - i; ++j) {
                 new_matrix(i, j) = relabel_one(matrix(i, j), old_labels, new_labels);
             }
         }

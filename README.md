@@ -406,7 +406,7 @@ for (int tree = 0; tree < d - 1; ++tree) {
 }
 
 // specify a structure matrix
-Eigen::MatrixXi mat;
+Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat;
 mat << 1, 1, 1,
        2, 2, 0,
        3, 0, 0;
@@ -505,7 +505,7 @@ MatXd data = simulate_uniform(100, d);
 Vinecop best_vine(data);
 
 // alternatively, instantiate a structure matrix...
-Eigen::MatrixXi M;
+Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> M;
 M << 1, 1, 1, 1,
      2, 2, 2, 0,
      3, 3, 0, 0
