@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -We
 
 # Find vinecopulib package and dependencies
 find_package(vinecopulib                  REQUIRED)
-find_package(Boost 1.63                   REQUIRED)
+find_package(Boost 1.56                   REQUIRED)
 include(cmake/findEigen3.cmake            REQUIRED)
 include(cmake/findNlopt.cmake             REQUIRED)
 
