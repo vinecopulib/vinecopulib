@@ -162,7 +162,7 @@ namespace tools_structselect {
     // @param tree the current tree.
     // @return Gives the index of the vertex in the previous tree that was
     //     shared by e0, e1, the edge representations of v0, v1.
-    int find_common_neighbor(size_t v0, size_t v1, const VineTree& tree)
+    size_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree)
     {
         auto ei0 = tree[v0].prev_edge_indices;
         auto ei1 = tree[v1].prev_edge_indices;

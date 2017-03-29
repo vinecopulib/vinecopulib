@@ -58,7 +58,7 @@ namespace tools_structselect {
                            double threshold);
     double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
                               std::string tree_criterion, double threshold);
-    int find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
+    size_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
     Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);
     void add_edge_info(VineTree& tree);
@@ -68,9 +68,7 @@ namespace tools_structselect {
                              vinecopulib::FitControlsVinecop& controls);
 
     void print_pair_copulas(VineTree& tree);
-    std::string get_pc_index(
-        boost::graph_traits<VineTree>::edge_descriptor e,
-        VineTree& tree
-    );
+    std::string get_pc_index(boost::graph_traits<VineTree>::edge_descriptor e,
+                             VineTree& tree);
 
 }
