@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <boost/graph/adjacency_list.hpp>
 #include "bicop/class.hpp"
 #include "fit_controls.hpp"
@@ -23,16 +24,16 @@ namespace std
 namespace tools_structselect {
     // boost::graph represenation of a vine tree ----------------
     struct VertexProperties {
-        std::vector<int> conditioning;
-        std::vector<int> conditioned;
-        std::vector<int> prev_edge_indices;
+        std::vector<size_t> conditioning;
+        std::vector<size_t> conditioned;
+        std::vector<size_t> prev_edge_indices;
         Eigen::VectorXd hfunc1;
         Eigen::VectorXd hfunc2;
     };
     struct EdgeProperties {
-        std::vector<int> conditioning;
-        std::vector<int> conditioned;
-        std::vector<int> all_indices;
+        std::vector<size_t> conditioning;
+        std::vector<size_t> conditioned;
+        std::vector<size_t> all_indices;
         Eigen::Matrix<double, Eigen::Dynamic, 2> pc_data;
         Eigen::VectorXd hfunc1;
         Eigen::VectorXd hfunc2;
@@ -57,8 +58,8 @@ namespace tools_structselect {
                            double threshold);
     double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
                               std::string tree_criterion, double threshold);
-    int find_common_neighbor(int v0, int v1, const VineTree& tree);
-    Eigen::MatrixXd get_pc_data(int v0, int v1, const VineTree& tree);
+    ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
+    Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);
     void add_edge_info(VineTree& tree);
     void remove_edge_data(VineTree& tree);
@@ -67,9 +68,7 @@ namespace tools_structselect {
                              vinecopulib::FitControlsVinecop& controls);
 
     void print_pair_copulas(VineTree& tree);
-    std::string get_pc_index(
-        boost::graph_traits<VineTree>::edge_descriptor e,
-        VineTree& tree
-    );
+    std::string get_pc_index(boost::graph_traits<VineTree>::edge_descriptor e,
+                             VineTree& tree);
 
 }

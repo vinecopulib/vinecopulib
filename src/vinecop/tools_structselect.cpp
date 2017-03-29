@@ -28,10 +28,10 @@ namespace tools_structselect {
     //!  @return A VineTree object containing the base graph.
     VineTree make_base_tree(const Eigen::MatrixXd& data)
     {
-        int d = data.cols();
+        size_t d = data.cols();
         VineTree base_tree(d);
         // a star connects the root node (d) with all other nodes
-        for (int target = 0; target < d; ++target) {
+        for (size_t target = 0; target < d; ++target) {
             // add edge and extract edge iterator
             auto e = add_edge(d, target, base_tree).first;
 
@@ -90,7 +90,7 @@ namespace tools_structselect {
     VineTree edges_as_vertices(const VineTree& prev_tree)
     {
         // start with full graph
-        int d = num_edges(prev_tree);
+        size_t d = num_edges(prev_tree);
         VineTree new_tree(d);
 
         // cut & paste information from previous tree
@@ -118,14 +118,11 @@ namespace tools_structselect {
     //! @param tree_criterion the criterion for selecting the maximum spanning
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).
     //! @param threshold for thresholded vines.
-    void add_allowed_edges(
-            VineTree& vine_tree,
-            std::string tree_criterion,
-            double threshold
-    )
+    void add_allowed_edges(VineTree& vine_tree, std::string tree_criterion,
+                           double threshold)
     {
         for (auto v0 : boost::vertices(vine_tree)) {
-            for (unsigned int v1 = 0; v1 < v0; ++v1) {
+            for (size_t v1 = 0; v1 < v0; ++v1) {
                 // check proximity condition: common neighbor in previous tree
                 // (-1 means 'no common neighbor')
                 if (find_common_neighbor(v0, v1, vine_tree) > -1) {
@@ -165,7 +162,7 @@ namespace tools_structselect {
     // @param tree the current tree.
     // @return Gives the index of the vertex in the previous tree that was
     //     shared by e0, e1, the edge representations of v0, v1.
-    int find_common_neighbor(int v0, int v1, const VineTree& tree)
+    ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree)
     {
         auto ei0 = tree[v0].prev_edge_indices;
         auto ei1 = tree[v1].prev_edge_indices;
@@ -184,10 +181,10 @@ namespace tools_structselect {
     // @param tree a vine tree.
     // @return The pseudo-observations for the pair coula, extracted from
     //     the h-functions calculated in the previous tree.
-    Eigen::MatrixXd get_pc_data(int v0, int v1, const VineTree& tree)
+    Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree)
     {
         Eigen::MatrixXd pc_data(tree[v0].hfunc1.size(), 2);
-        int ei_common = find_common_neighbor(v0, v1, tree);
+        size_t ei_common = find_common_neighbor(v0, v1, tree);
         if (find_position(ei_common, tree[v0].prev_edge_indices) == 0) {
             pc_data.col(0) = tree[v0].hfunc1;
         } else {
@@ -208,11 +205,11 @@ namespace tools_structselect {
     //! @return the input graph with all non-MST edges removed.
     void min_spanning_tree(VineTree &graph)
     {
-        int d =  num_vertices(graph);
-        std::vector<int> targets(d);
+        size_t d =  num_vertices(graph);
+        std::vector<size_t> targets(d);
         prim_minimum_spanning_tree(graph, targets.data());
-        for (int v1 = 0; v1 < d; ++v1) {
-            for (int v2 = 0; v2 < v1; ++v2) {
+        for (size_t v1 = 0; v1 < d; ++v1) {
+            for (size_t v2 = 0; v2 < v1; ++v2) {
                 if ((v2 != targets[v1]) & (v1 != targets[v2])) {
                     boost::remove_edge(v1, v2, graph);
                 }

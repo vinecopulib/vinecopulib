@@ -31,14 +31,14 @@ namespace vinecopulib
     //! @param preselect_families see FitControlsBicop.
     //! @param show_trace whether to show a trace of the building progress.
     FitControlsVinecop::FitControlsVinecop(std::vector<BicopFamily> family_set,
-                                     std::string parametric_method,
-                                     double nonparametric_mult,
-                                     int truncation_level,
-                                     std::string tree_criterion,
-                                     double threshold,
-                                     std::string selection_criterion,
-                                     bool preselect_families,
-                                     bool show_trace) :
+                                           std::string parametric_method,
+                                           double nonparametric_mult,
+                                           size_t truncation_level,
+                                           std::string tree_criterion,
+                                           double threshold,
+                                           std::string selection_criterion,
+                                           bool preselect_families,
+                                           bool show_trace) :
             FitControlsBicop(family_set, parametric_method, nonparametric_mult, 
                              selection_criterion, preselect_families)
     {
@@ -60,10 +60,10 @@ namespace vinecopulib
     //! @param show_trace whether to show a trace of the building progress.
     //! @param controls see FitControlsBicop.
     FitControlsVinecop::FitControlsVinecop(const FitControlsBicop controls,
-                                     int truncation_level,
-                                     std::string tree_criterion,
-                                     double threshold,
-                                     bool show_trace) :
+                                           size_t truncation_level,
+                                           std::string tree_criterion,
+                                           double threshold,
+                                           bool show_trace) :
             FitControlsBicop(controls)
     {
         check_truncation_level(truncation_level);
@@ -78,7 +78,7 @@ namespace vinecopulib
 
     //! Sanity checks
     //! @{
-    void FitControlsVinecop::check_truncation_level(int truncation_level)
+    void FitControlsVinecop::check_truncation_level(size_t truncation_level)
     {
         if (truncation_level < 1) {
             throw std::runtime_error("truncation_level should greater than 1");
@@ -101,7 +101,7 @@ namespace vinecopulib
 
     //! Getters and setters.
     //! @{
-    int FitControlsVinecop::get_truncation_level()
+    size_t FitControlsVinecop::get_truncation_level()
     {
         return truncation_level_;
     }
@@ -131,7 +131,7 @@ namespace vinecopulib
         return controls_bicop;
     }
 
-    void FitControlsVinecop::set_truncation_level(int truncation_level)
+    void FitControlsVinecop::set_truncation_level(size_t truncation_level)
     {
         check_truncation_level(truncation_level);
         truncation_level_ = truncation_level;

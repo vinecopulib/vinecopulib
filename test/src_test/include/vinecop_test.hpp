@@ -16,6 +16,6 @@ public:
     Eigen::MatrixXd u;
     Eigen::VectorXd f;
     Eigen::MatrixXd sim;
-    Eigen::MatrixXi model_matrix;
-    Eigen::MatrixXi vc_matrix;
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> model_matrix;
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> vc_matrix;
 };

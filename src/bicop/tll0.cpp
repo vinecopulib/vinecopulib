@@ -26,18 +26,18 @@ namespace vinecopulib
                         std::string, double mult)
     {
         // construct default grid (equally spaced on Gaussian scale)
-        int m = 30;
+        size_t m = 30;
         Eigen::VectorXd grid_points(m);
-        for (int i = 0; i < m; ++i)
+        for (size_t i = 0; i < m; ++i)
             grid_points(i) = - 3.25 + i * (6.25 / (double) m);
         grid_points = tools_stats::pnorm(grid_points);
 
         // expand the interpolation grid; a matrix with two columns where each row
         // contains one combination of the grid points
         Eigen::Matrix<double, Eigen::Dynamic, 2> grid_2d(m * m, 2);
-        int k = 0;
-        for (int i = 0; i < m; ++i) {
-            for (int j = 0; j < m; ++j) {
+        size_t k = 0;
+        for (size_t i = 0; i < m; ++i) {
+            for (size_t j = 0; j < m; ++j) {
                 grid_2d(k, 0) = grid_points(i);
                 grid_2d(k, 1) = grid_points(j);
                 ++k;
@@ -53,7 +53,7 @@ namespace vinecopulib
         Eigen::Matrix<double, Eigen::Dynamic, 2> phi_data = tools_stats::dnorm(z_data);
 
         // find bandwitools_stats::dth matrix
-        int n = data.rows();
+        size_t n = data.rows();
         Eigen::Matrix<double, Eigen::Dynamic, 2> centered =
             z_data.rowwise() - z_data.colwise().mean();
         Eigen::Matrix2d cov = (centered.adjoint() * centered) / double(n - 1);
@@ -70,10 +70,10 @@ namespace vinecopulib
         // compute estimator on each evaluation point
         Eigen::VectorXd kernels(n);
         double det_B = B.determinant();
-        int i = 0;
-        int j = 0;
+        size_t i = 0;
+        size_t j = 0;
         Eigen::MatrixXd values(m, m);
-        for (int k = 0; k < m * m; ++k) {
+        for (size_t k = 0; k < m * m; ++k) {
             kernels = gaussian_kernel_2d((z_data - z.row(k).replicate(n, 1)));
             values(i, j) = kernels.mean() / (det_B * phi.row(k).prod());
             ++i;
