@@ -52,6 +52,8 @@ build_script:
   - cmake --build . --config Release
   - set path=%path_orig%;C:\projects\vinecopulib\build\Release;C:\projects\nlopt
   - #bin\Release\test_all.exe
+  
+  - cmake --build . --config Release --target install
 
   - cd ..
   

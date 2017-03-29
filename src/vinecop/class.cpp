@@ -115,6 +115,7 @@ namespace vinecopulib
     Vinecop::Vinecop(const Eigen::MatrixXd& data, FitControlsVinecop controls)
     {
         d_ = data.cols();
+        pair_copulas_ = make_pair_copula_store(d_);
         select_all(data, controls);
     }
 
