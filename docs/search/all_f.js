@@ -1,7 +1,7 @@
 var searchData=
 [
   ['pairwise_5fcor',['pairwise_cor',['../namespacetools__stats.html#ada062011e2c2a18d7258a39ad0722b7e',1,'tools_stats']]],
-  ['pairwise_5fhoeffd',['pairwise_hoeffd',['../namespacetools__stats.html#a48cbea62b23e33bacaf08ed439c189ca',1,'tools_stats']]],
+  ['pairwise_5fhoeffd',['pairwise_hoeffd',['../namespacetools__stats.html#a937dc78ae41420f0726847d94016ba86',1,'tools_stats']]],
   ['pairwise_5fktau',['pairwise_ktau',['../namespacetools__stats.html#aba1c21a7a90e6fefb3d92876469f401e',1,'tools_stats']]],
   ['par0',['par0',['../structtools__optimization_1_1_par_bicop_opt_data.html#a54aa5382c1a500e06db5003a7a7ff54b',1,'tools_optimization::ParBicopOptData']]],
   ['parameters_5fto_5ftau',['parameters_to_tau',['../classvinecopulib_1_1_bicop.html#aa25436353dee76e4368fb941a7efa257',1,'vinecopulib::Bicop']]],
