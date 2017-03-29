@@ -58,7 +58,7 @@ namespace tools_structselect {
                            double threshold);
     double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
                               std::string tree_criterion, double threshold);
-    size_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
+    ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
     Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);
     void add_edge_info(VineTree& tree);
