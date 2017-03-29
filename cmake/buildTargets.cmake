@@ -20,6 +20,7 @@ endif()
 target_link_libraries(vinecopulib ${external_libs})
 
 set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
 
 if(BUILD_TESTING)
     set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
@@ -39,7 +40,6 @@ if(BUILD_TESTING)
 endif(BUILD_TESTING)
 
 # Related to exports for linux/mac and code coverage
-if (NOT WIN32)
     ####
     # Installation
 
@@ -134,14 +134,12 @@ if (NOT WIN32)
             DESTINATION "${config_install_dir}"
     )
 
+if (NOT WIN32)
     # Install the export set for code coverage
     if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_TESTING)
         include(cmake/codeCoverage.cmake)
         file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/coverage)
         setup_target_for_coverage(${PROJECT_NAME}_coverage test_all coverage)
     endif()
-else()
-    set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
-
-    # TODO: Configure windows install
 endif()
+
