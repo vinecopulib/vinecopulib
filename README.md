@@ -398,15 +398,15 @@ Vinecop default_model(d);
 auto pair_copulas = Vinecop::make_pair_copula_store(3);  
 
 // specify the pair copulas
-for (int tree = 0; tree < d - 1; ++tree) {
-    for (int edge = 0; edge < d - 1 - tree; ++edge) {
-        // 90 degree Clayton with parameter 3.0
-        pair_copulas[tree][edge] = Bicop(3, VecXd::Constant(1, 3.0), 90);
+auto par = Eigen::VectorXd::Constant(1, 3.0);
+for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+        pc = Bicop(BicopFamily::clayton, 270, par);
     }
 }
 
 // specify a structure matrix
-Eigen::MatrixXi mat;
+Eigen::MatrixXi mat(3,3);
 mat << 1, 1, 1,
        2, 2, 0,
        3, 0, 0;
@@ -464,7 +464,7 @@ structure of the object), using the sequential procedure proposed by
 int d = 5;
 
 // simulate dummy data
-MatXd data = simulate_uniform(100, d);
+Eigen::MatrixXd data = simulate_uniform(100, d);
 
 // instantiate a D-vine and select the families
 Vinecop model(d);
