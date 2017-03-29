@@ -11,6 +11,7 @@ namespace vinecopulib
     IndepBicop::IndepBicop()
     {
         family_ = BicopFamily::indep;
+        parameters_ = Eigen::MatrixXd();
     }
 
     Eigen::VectorXd IndepBicop::pdf(

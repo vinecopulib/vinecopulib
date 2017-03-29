@@ -10,6 +10,7 @@
 #include <vector>
 #include <exception>
 #include <iostream>
+#include <boost/graph/copy.hpp> 
 
 namespace vinecopulib
 {
@@ -157,26 +158,147 @@ namespace vinecopulib
                     ", actual: " << d << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
+        
+        // automatic selection of sparsity parameters is implemented separately
+        // below
+        if (controls.needs_sparse_select()) {
+            sparse_select_all(data, controls);
+            return ;
+        }
+        
+        // initialize 
         std::vector<VineTree> trees(d);
-    
         trees[0] = make_base_tree(data);
         for (size_t t = 1; t < d; ++t) {
             // select tree structure and pair copulas
             trees[t] = select_next_tree(trees[t - 1], controls);
-    
+        
             // print out fitted pair-copulas for this tree
             if (controls.get_show_trace()) {
                 std::cout << "Tree " << t - 1 << ":" << std::endl;
                 print_pair_copulas(trees[t]);
             }
-    
+        
             // truncate (only allow for Independence copula from here on)
             if (controls.get_truncation_level() == t) {
                 controls.set_family_set({BicopFamily::indep});
             }
         }
-    
+        
         update_vinecop(trees);
+    }
+    
+    void Vinecop::sparse_select_all(const Eigen::MatrixXd& data,
+                                    FitControlsVinecop controls)
+    {
+        using namespace tools_structselect;
+        size_t d = data.cols();
+        size_t n = data.rows();
+        
+        // family set must be reset after each iteration of the threshold search
+        auto family_set = controls.get_family_set();
+        // we always need to keep the fitted trees to avoid fitting the same 
+        // copula twice
+        std::vector<VineTree> trees_opt(d);
+
+        std::vector<double> thresholded_crits;
+        if (controls.get_select_threshold()) {
+            // initialize thrshold with maximum pairwise |tau| (all pairs get 
+            // thresholded)
+            auto all_taus = tools_stats::ktau_matrix(data);
+            for (size_t i = 1; i < d; ++i) {
+                for (size_t j = 0; j < i; ++j) {
+                    thresholded_crits.push_back(all_taus(i, j));
+                }
+            }
+        }
+        
+        double crit_opt = 0.0;
+        bool needs_break = false;
+        std::vector<VineTree> trees(d);
+        while (!needs_break) { 
+            // initialize 
+            trees[0] = make_base_tree(data);
+            
+            // restore family set in case previous threshold iteration also 
+            // truncated the model
+            controls.set_family_set(family_set);  
+            
+            // decrease the threshold
+            if (controls.get_select_threshold()) {
+                controls.set_threshold(get_next_threshold(thresholded_crits));
+                if (controls.get_show_trace()) {
+                    std::cout << 
+                        "threshold: " << controls.get_threshold() << "\n";
+                }
+            }
+            
+            // helper variables for checking whether an optimum was found
+            double loglik = 0.0;
+            double npars = 0.0;
+            double crit = 0.0;     
+            double crit_trunc = 0.0;     
+            
+            for (size_t t = 1; t < d; ++t) {
+                // select tree structure and pair copulas
+                trees[t] = select_next_tree(trees[t - 1], controls, trees_opt[t]);
+                
+                // update fit statistics
+                loglik += get_tree_loglik(trees[t]);
+                npars += get_tree_npars(trees[t]);
+                crit_trunc = calculate_gic(loglik, npars, n);
+                if (controls.get_show_trace()) {
+                    std::cout << "criterion : " << crit_opt << std::endl;
+                }
+
+                if (controls.get_select_truncation_level()) {
+                    if (crit_trunc >= crit) {
+                        // crit did not improve, set this and all remaining trees
+                        // to independence
+                        for (auto e : boost::edges(trees[t])) {
+                            trees[t][e].pair_copula = Bicop();
+                        }
+                        controls.set_family_set({BicopFamily::indep});
+                    } else {
+                        crit = crit_trunc; 
+                    }
+                } else {
+                    crit = crit_trunc; 
+                }
+
+                // print out fitted pair-copulas for this tree
+                if (controls.get_show_trace()) {
+                    std::cout << "Tree " << t - 1 << ":" << std::endl;
+                    print_pair_copulas(trees[t]);
+                }
+
+                // truncate (only allow for Independence copula from here on)
+                if (controls.get_truncation_level() == t) {
+                    controls.set_family_set({BicopFamily::indep});
+                }
+            }
+
+            if (crit >= crit_opt) {
+                if (crit == 0.0) {
+                    // independence model is optimal
+                    trees_opt = trees;
+                }
+                // the previous model was the best one
+                needs_break = true;
+            } else {
+                thresholded_crits = get_thresholded_edge_crits(trees, controls);
+                for (size_t t = 0; t < d; ++t) {
+                    trees_opt[t] = trees[t];
+                }
+                crit_opt = crit;
+                // while loop is only for threshold selection
+                needs_break = needs_break | !controls.get_select_threshold();
+                // threshold is too close to 0
+                needs_break = needs_break | (controls.get_threshold() < 0.01);
+            }
+        }
+
+        update_vinecop(trees_opt);
     }
     
     //! automatically selects all pair-copula families and fits all parameters.
@@ -186,7 +308,7 @@ namespace vinecopulib
     void Vinecop::select_families(const Eigen::MatrixXd& data,
                                   FitControlsVinecop controls)
     {
-
+        using namespace tools_structselect;
         size_t d = data.cols();
         if (d != d_) {
             std::stringstream message;
@@ -199,7 +321,8 @@ namespace vinecopulib
         FitControlsBicop controls_bicop = controls.get_fit_controls_bicop();
 
         // info about the vine structure
-        Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
+        Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = 
+            vine_matrix_.get_order().reverse();
         auto no_matrix  = vine_matrix_.in_natural_order();
         auto max_matrix = vine_matrix_.get_max_matrix();
         MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
@@ -234,10 +357,8 @@ namespace vinecopulib
                     pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
                 } else {
                     if (controls.get_threshold() != 0) {
-                        double crit = tools_structselect::get_tree_criterion(
-                                u_e, controls.get_tree_criterion(),
-                                controls.get_threshold());
-                        if (crit > 1 - controls.get_threshold()) {
+                        double crit = calculate_criterion(u_e, controls);
+                        if (crit < controls.get_threshold()) {
                             pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
                         }
                     } else {

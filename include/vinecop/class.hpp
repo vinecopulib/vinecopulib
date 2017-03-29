@@ -66,8 +66,12 @@ namespace vinecopulib
         size_t d_;
         RVineMatrix vine_matrix_;
         std::vector<std::vector<Bicop>> pair_copulas_;
+        
         void update_vinecop(std::vector<tools_structselect::VineTree>& trees);
-        Eigen::Matrix<size_t, Eigen::Dynamic, 1> inverse_permutation(const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
+        void sparse_select_all(const Eigen::MatrixXd& data,
+                               FitControlsVinecop controls);
+        Eigen::Matrix<size_t, Eigen::Dynamic, 1> inverse_permutation(
+            const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
     };
 
 }

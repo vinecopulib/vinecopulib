@@ -17,6 +17,8 @@ namespace vinecopulib
         threshold_ = 0.0;
         tree_criterion_ = "tau";
         show_trace_ = false;
+        select_truncation_level_ = false;
+        select_threshold_ = false;
     }
 
     //! creates custom controls for fitting vine copula models.
@@ -38,7 +40,9 @@ namespace vinecopulib
                                            double threshold,
                                            std::string selection_criterion,
                                            bool preselect_families,
-                                           bool show_trace) :
+                                           bool show_trace,
+                                           bool select_truncation_level,
+                                           bool select_threshold) :
             FitControlsBicop(family_set, parametric_method, nonparametric_mult, 
                              selection_criterion, preselect_families)
     {
@@ -50,6 +54,8 @@ namespace vinecopulib
         threshold_ = threshold;
         tree_criterion_ = tree_criterion;
         show_trace_ = show_trace;
+        select_truncation_level_ = select_truncation_level;
+        select_threshold_ = select_threshold;
     }
 
     //! creates custom controls for fitting vine copula models.
@@ -63,7 +69,9 @@ namespace vinecopulib
                                            size_t truncation_level,
                                            std::string tree_criterion,
                                            double threshold,
-                                           bool show_trace) :
+                                           bool show_trace,
+                                           bool select_truncation_level,
+                                           bool select_threshold) :
             FitControlsBicop(controls)
     {
         check_truncation_level(truncation_level);
@@ -74,6 +82,8 @@ namespace vinecopulib
         threshold_ = threshold;
         tree_criterion_ = tree_criterion;
         show_trace_ = show_trace;
+        select_truncation_level_ = select_truncation_level;
+        select_threshold_ = select_threshold;
     }
 
     //! Sanity checks
@@ -121,6 +131,21 @@ namespace vinecopulib
         return show_trace_;
     }
 
+    bool FitControlsVinecop::get_select_truncation_level()
+    {
+        return select_truncation_level_;
+    }
+    
+    bool FitControlsVinecop::get_select_threshold()
+    {
+        return select_threshold_;
+    }
+    
+    bool FitControlsVinecop::needs_sparse_select()
+    {
+        return (select_truncation_level_ | select_threshold_);
+    }
+    
     FitControlsBicop FitControlsVinecop::get_fit_controls_bicop()
     {
         FitControlsBicop controls_bicop(get_family_set(), 
@@ -152,6 +177,16 @@ namespace vinecopulib
     void FitControlsVinecop::set_show_trace(bool show_trace)
     {
         show_trace_ = show_trace;
+    }
+    
+    void FitControlsVinecop::set_select_truncation_level(bool select_truncation_level)
+    {
+        select_truncation_level_ = select_truncation_level;
+    }
+    
+    void FitControlsVinecop::set_select_threshold(bool select_threshold)
+    {
+        select_threshold_ = select_threshold;
     }
 
     void FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)

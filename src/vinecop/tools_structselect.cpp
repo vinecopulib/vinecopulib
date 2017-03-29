@@ -59,21 +59,23 @@ namespace tools_structselect {
     //!     5. Fit and select a copula model for each edge.
     //!
     //! @param prev_tree tree T_{k}.
-    //! @param controls the controls for fitting a vine copula (see FitControlsVinecop)
+    //! @param controls the controls for fitting a vine copula 
+    //!     (see FitControlsVinecop).
+    //! @param tree_opt the current optimal tree (used only for sparse selection).
     //! @return tree T_{k+1}.
     VineTree select_next_tree(VineTree& prev_tree,
-                              vinecopulib::FitControlsVinecop& controls)
+                              vinecopulib::FitControlsVinecop& controls,
+                              const VineTree& tree_opt)
     {
         auto new_tree = edges_as_vertices(prev_tree);
         remove_edge_data(prev_tree); // no longer needed
-        add_allowed_edges(new_tree, controls.get_tree_criterion(),
-                          controls.get_threshold());
+        add_allowed_edges(new_tree, controls);
         if (boost::num_vertices(new_tree) > 2) {
             min_spanning_tree(new_tree);
         }
         add_edge_info(new_tree);  // for pc estimation and next tree
         remove_vertex_data(new_tree);  // no longer needed
-        select_pair_copulas(new_tree, controls);
+        select_pair_copulas(new_tree, controls, tree_opt);
 
         return new_tree;
     }
@@ -118,8 +120,8 @@ namespace tools_structselect {
     //! @param tree_criterion the criterion for selecting the maximum spanning
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).
     //! @param threshold for thresholded vines.
-    void add_allowed_edges(VineTree& vine_tree, std::string tree_criterion,
-                           double threshold)
+    void add_allowed_edges(VineTree& vine_tree, 
+                           vinecopulib::FitControlsVinecop& controls)
     {
         for (auto v0 : boost::vertices(vine_tree)) {
             for (size_t v1 = 0; v1 < v0; ++v1) {
@@ -127,34 +129,35 @@ namespace tools_structselect {
                 // (-1 means 'no common neighbor')
                 if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                     auto pc_data = get_pc_data(v0, v1, vine_tree);
-                    auto w = get_tree_criterion(pc_data, tree_criterion, threshold);
+                    double crit = calculate_criterion(pc_data, controls);
+                    double w = 
+                        1.0 - (double)(crit > controls.get_threshold()) * crit;
                     auto e = boost::add_edge(v0, v1, w, vine_tree).first;
                     vine_tree[e].weight = w;
+                    vine_tree[e].crit = crit;
                 }
             }
         }
     }
 
-    double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                              std::string tree_criterion, double threshold)
+    double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+                               vinecopulib::FitControlsVinecop& controls)
     {
         double w;
-        if (tree_criterion == "tau") {
-            w = 1.0 - std::fabs(tools_stats::pairwise_ktau(data));
-        } else if (tree_criterion == "hoeffd") {
+        if (controls.get_tree_criterion() == "tau") {
+            w = std::fabs(tools_stats::pairwise_ktau(data));
+        } else if (controls.get_tree_criterion() == "hoeffd") {
             // scale to [0,1]
-            w = 1.0 - (30*tools_stats::pairwise_hoeffd(data)+0.5)/1.5;
-        } else if (tree_criterion == "rho") {
-            w = 1.0 - std::fabs(tools_stats::pairwise_cor(data));
+            w = (30*tools_stats::pairwise_hoeffd(data)+0.5)/1.5;
+        } else if (controls.get_tree_criterion() == "rho") {
+            w = std::fabs(tools_stats::pairwise_cor(data));
         } else {
             throw std::runtime_error("tree criterion not implemented");
-        }
-        if (w > 1 - threshold) {
-            w = 1.0;
         }
 
         return w;
     }
+
 
     // Find common neighbor in previous tree
     //
@@ -265,25 +268,133 @@ namespace tools_structselect {
 
     //! Fit and select a pair copula for each edges
     //! @param tree a vine tree preprocessed with add_edge_info().
-    //! @param controls the controls for fitting a vine copula (see FitControlsVinecop)
+    //! @param controls the controls for fitting a vine copula (see 
+    //!     FitControlsVinecop).
+    //! @param tree_opt the current optimal tree (used only for sparse 
+    //!     selection).
     void select_pair_copulas(VineTree& tree,
                              vinecopulib::FitControlsVinecop& controls)
     {
-        // Controls for selecting the pair copulas
-        vinecopulib::FitControlsBicop controls_bicop(controls.get_fit_controls_bicop());
-
         for (auto e : boost::edges(tree)) {
-            if (tree[e].weight > 1 - controls.get_threshold()) {
+            if (tree[e].crit < controls.get_threshold()) {
                 tree[e].pair_copula = vinecopulib::Bicop();
             } else {
-                tree[e].pair_copula = vinecopulib::Bicop(tree[e].pc_data,
-                                                         controls_bicop);
+                tree[e].pair_copula = vinecopulib::Bicop(tree[e].pc_data, controls);
             }
 
             tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
             tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
         }
     }
+    
+    void select_pair_copulas(VineTree& tree,
+                             vinecopulib::FitControlsVinecop& controls,
+                             const VineTree& tree_opt)
+    {
+        for (auto e : boost::edges(tree)) {
+            bool is_thresholded = (tree[e].crit < controls.get_threshold());
+            bool used_old_fit = false;
+            // the formula is quite arbitrary, but sufficient for 
+            // identifying situations where fits can be re-used
+            tree[e].fit_id = tree[e].pc_data(0) - tree[e].pc_data(1); 
+            tree[e].fit_id += 5.0 * (double) is_thresholded;
+            if (boost::num_edges(tree_opt) > 0) {
+                auto old_fit = find_old_fit(tree[e].fit_id, tree_opt);
+                if (old_fit.second)  {  // second indicates if match was found
+                    // data and thresholding status haven't changed, 
+                    // we can use old fit
+                    used_old_fit = true;
+                    tree[e].pair_copula = tree_opt[old_fit.first].pair_copula;
+                }
+            }
+            if (!used_old_fit) {
+                if (is_thresholded) {
+                    tree[e].pair_copula = vinecopulib::Bicop();
+                } else {
+                    tree[e].pair_copula.select(tree[e].pc_data, controls);
+                }
+            }
+            
+            tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
+            tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
+            tree[e].loglik = tree[e].pair_copula.loglik(tree[e].pc_data);
+            tree[e].npars  = tree[e].pair_copula.calculate_npars();
+        }
+    }
+    
+    std::vector<double> get_thresholded_edge_crits(
+        const std::vector<VineTree>& trees,
+        vinecopulib::FitControlsVinecop& controls
+    )
+    {
+        std::vector<double> out;
+        for (size_t t = 1; t < trees.size(); ++t) {
+            for (auto e : boost::edges(trees[t])) {
+                if (trees[t][e].crit < controls.get_threshold()) {
+                    out.push_back(trees[t][e].crit);
+                }
+            }
+        }
+        
+        return out;
+    }
+    
+    double get_next_threshold(std::vector<double>& thresholded_crits,
+                              double learning_rate)
+    {
+        if (thresholded_crits.size() == 0) {
+            return 0.0;
+        }
+        // sort in descending order
+        std::sort(thresholded_crits.begin(), thresholded_crits.end());
+        std::reverse(thresholded_crits.begin(), thresholded_crits.end());
+        size_t m = thresholded_crits.size();
+        // pick threshold that changes at least <rate>% of the pair-copulas
+        return thresholded_crits[std::ceil(m * learning_rate) - 1];
+    }
+    
+    
+    FoundEdge find_old_fit(double fit_id, const VineTree& old_graph) 
+    {
+        auto edge = boost::edge(0, 1, old_graph).first;
+        bool fit_with_same_id = false;
+        for (auto e : boost::edges(old_graph)) {
+            if (fit_id == old_graph[e].fit_id) {
+                fit_with_same_id = true;
+                edge = e;
+            }
+        }
+        return std::make_pair(edge, fit_with_same_id);
+    }
+    
+    
+    double get_tree_loglik(const VineTree& tree)
+    {
+        double ll = 0.0;
+        for (const auto& e : boost::edges(tree)) {
+            ll += tree[e].loglik;
+        }
+        return ll;
+    }
+    
+    double get_tree_npars(const VineTree& tree)
+    {
+        double npars = 0.0;
+        for (const auto& e : boost::edges(tree)) {
+            npars += tree[e].npars;
+        }
+        return npars;
+    }
+    
+    double calculate_gic(double loglik, double npars, int n)
+    {
+        double log_npars = std::log(npars);
+        if (npars == 0.0) {
+            log_npars = 0.0;
+        }
+        return -2 * loglik + std::log(std::log(n)) * log_npars * npars;
+    }
+    
 
     //! Print indices, family, and parameters for each pair-copula
     //! @param tree a vine tree.

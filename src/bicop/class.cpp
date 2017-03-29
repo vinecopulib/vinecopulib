@@ -45,7 +45,6 @@ namespace vinecopulib
         select(data, controls);
     }
 
-
     //! evaluates the copula density.
     //!
     //! @param u \f$n \times 2\f$ matrix of evaluation points.

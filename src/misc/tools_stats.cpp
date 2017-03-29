@@ -7,6 +7,7 @@
 #include "misc/tools_stats.hpp"
 #include "misc/tools_stl.hpp"
 #include "misc/tools_c.h"
+#include <iostream>
 
 //! @file misc/tools_stats.cpp
 
@@ -115,7 +116,7 @@ namespace tools_stats {
         double tau;
         int n = (int) x.rows();
         int two = 2;
-        ktau_matrix(x.data(), &two, &n, &tau);
+        ktau_matrix_c(x.data(), &two, &n, &tau);
         return tau;
     }
 
@@ -165,6 +166,24 @@ namespace tools_stats {
         D /= (n*(n-1)*(n-2)*(n-3)*(n-4));
 
         return 30.0*D;
+    }
+
+    Eigen::MatrixXd ktau_matrix(const Eigen::MatrixXd& x)
+    {
+        int n = x.rows();
+        int d = x.cols();
+        Eigen::MatrixXd tau(d, d);
+        tau.diagonal() = Eigen::VectorXd::Constant(d, 1.0);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> pair_data(n, 2);
+        for (int i = 1; i < d; ++i) {
+            for (int j = 0; j < i; ++j) {
+                pair_data.col(0) = x.col(i);
+                pair_data.col(1) = x.col(j);
+                tau(i, j) = pairwise_ktau(pair_data);
+                tau(j, i) = tau(i, j);
+            }
+        }
+        return tau;
     }
     
     //! @}
