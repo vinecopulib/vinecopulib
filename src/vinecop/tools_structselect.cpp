@@ -28,10 +28,10 @@ namespace tools_structselect {
     //!  @return A VineTree object containing the base graph.
     VineTree make_base_tree(const Eigen::MatrixXd& data)
     {
-        int d = data.cols();
+        size_t d = data.cols();
         VineTree base_tree(d);
         // a star connects the root node (d) with all other nodes
-        for (int target = 0; target < d; ++target) {
+        for (size_t target = 0; target < d; ++target) {
             // add edge and extract edge iterator
             auto e = add_edge(d, target, base_tree).first;
 

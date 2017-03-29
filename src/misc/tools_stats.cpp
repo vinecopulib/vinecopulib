@@ -65,7 +65,7 @@ namespace tools_stats {
         auto order = tools_stl::get_order(xvec);
         if (ties_method == "first") {
             for (auto i : order)
-                x[order[i]] = i + 1;
+                x[order[i]] = (double) (i + 1);
         } else if (ties_method == "average") {
             for (size_t i = 0, reps; i < n; i += reps) {
                 // find replications
@@ -94,7 +94,7 @@ namespace tools_stats {
                 std::iota(rvals.begin(), rvals.end(), 0);  // 0, 1, 2, ...
                 std::random_shuffle(rvals.begin(), rvals.end(), sim);
                 for (size_t k = 0; k < reps; ++k)
-                    x[order[i + k]] = i + 1 + rvals[k];
+                    x[order[i + k]] = (double) (i + 1 + rvals[k]);
             }
         } else {
             std::stringstream msg;

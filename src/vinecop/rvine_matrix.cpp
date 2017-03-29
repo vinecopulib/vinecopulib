@@ -131,7 +131,7 @@ namespace vinecopulib
     //! @}
 
     // translates matrix_entry from old to new labels
-    int relabel_one(size_t x, 
+    size_t relabel_one(size_t x, 
         const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& old_labels, 
         const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& new_labels)
     {
