@@ -24,20 +24,17 @@ namespace vinecopulib
 
         Eigen::VectorXd interpolate(const Eigen::MatrixXd& x);
         Eigen::VectorXd intergrate_1d(const Eigen::MatrixXd& u, const int& cond_var);
-        Eigen::VectorXd inv_intergrate_1d(const Eigen::MatrixXd& u, const int& cond_var);
 
     private:
         // Utility functions for spline Interpolation
         double cubic_poly(const double& x, const Eigen::VectorXd& a);
         double cubic_indef_integral(const double& x, const Eigen::VectorXd& a);
         double cubic_integral(const double& lower, const double& upper, const Eigen::VectorXd& a);
-        double inv_cubic_integral(const double& q, const Eigen::VectorXd& a);
         Eigen::VectorXd find_coefs(const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);
         double interp_on_grid(const double& x, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);
 
         // Utility functions for integration
         double int_on_grid(const double& upr, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);
-        double inv_int_on_grid(const double& qq, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);
 
         Eigen::VectorXd grid_points_;
         Eigen::MatrixXd values_;
