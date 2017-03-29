@@ -25,7 +25,7 @@ namespace test_vinecop_sanity_checks {
 
     TEST(vinecop_sanity_checks, catches_wrong_size) {
         auto pair_copulas = Vinecop::make_pair_copula_store(3);
-        Eigen::MatrixXi mat(3,3);
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(3,3);
         mat << 2,2,2,1,1,0,3,0,0;
         Vinecop vinecop(pair_copulas, mat);
 

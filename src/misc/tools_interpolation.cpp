@@ -7,6 +7,7 @@
 #include "misc/tools_interpolation.hpp"
 #include "misc/tools_stats.hpp"
 #include <exception>
+#include <iostream>
 
 namespace vinecopulib
 {
@@ -46,18 +47,18 @@ namespace vinecopulib
     //! @param x mx2 matrix of evaluation points.
     Eigen::VectorXd InterpolationGrid::interpolate(const Eigen::MatrixXd& x)
     {
-        int N = x.rows();
-        int m = grid_points_.size();
+        ptrdiff_t N = x.rows();
+        ptrdiff_t m = grid_points_.size();
         Eigen::VectorXd y(4), out(N), a(4), tmpgrid(4), tmpvals(4);
-        int i = 0;
-        int j = 0;
-        int i0, i3;
+        ptrdiff_t i = 0;
+        ptrdiff_t j = 0;
+        ptrdiff_t i0, i3;
 
-        for (int n = 0; n < N; ++n) {
+        for (ptrdiff_t n = 0; n < N; ++n) {
             // find cell
             bool found_i = false;
             bool found_j = false;
-            for (int k = 1; k < (m-1); ++k) {
+            for (ptrdiff_t k = 1; k < (m-1); ++k) {
                 if ((x(n, 0) >= grid_points_(k))) { 
                     i = k;
                 } else {
@@ -74,7 +75,7 @@ namespace vinecopulib
             }
 
             // construct grid for first direction
-            i0 = std::max(i-1, 0);
+            i0 = std::max(i-1, (ptrdiff_t) 0);
             i3 = std::min(i+2, m-1);
             tmpgrid(0) = grid_points_(i0);
             tmpgrid(1) = grid_points_(i);
@@ -82,11 +83,11 @@ namespace vinecopulib
             tmpgrid(3) = grid_points_(i3);
 
             // interpolate in one direction (four times)
-            for (int s = 0; s < 4; ++s) {
-                i0 = std::max(i-1, 0);
+            for (ptrdiff_t s = 0; s < 4; ++s) {
+                i0 = std::max(i-1, (ptrdiff_t) 0);
                 i3 = std::min(i+2, m-1);
-                int jj = std::min(m-1, j-1+s);
-                jj = std::max(0, jj);
+                ptrdiff_t jj = std::min(m-1, j-1+s);
+                jj = std::max((ptrdiff_t) 0, jj);
 
                 tmpvals(0) = values_(i0,  jj);
                 tmpvals(1) = values_(i,   jj);
@@ -98,13 +99,13 @@ namespace vinecopulib
             }
 
             // use these four points to interpolate in the remaining direction#
-            i0 = std::max(j-1, 0);
+            i0 = std::max(j-1, (ptrdiff_t) 0);
             i3 = std::min(j+2, m-1);
             tmpgrid(0) = grid_points_(i0);
             tmpgrid(1) = grid_points_(j);
             tmpgrid(2) = grid_points_(j+1);
             tmpgrid(3) = grid_points_(i3);
-
+            
             out(n) = interp_on_grid(x(n, 1), y, tmpgrid);
             out(n) = fmax(out(n), 1e-15);
         }
@@ -117,20 +118,18 @@ namespace vinecopulib
     //! @param u mx2 matrix of evaluation points
     //! @param cond_var either 1 or 2; the axis considered fixed.
     //!
-    Eigen::VectorXd InterpolationGrid::intergrate_1d(
-        const Eigen::MatrixXd& u, 
-        const int& cond_var
-    )
+    Eigen::VectorXd InterpolationGrid::intergrate_1d(const Eigen::MatrixXd& u, 
+                                                     size_t cond_var)
     {
-        int n = u.rows();
-        int m = grid_points_.size();
+        ptrdiff_t n = u.rows();
+        ptrdiff_t m = grid_points_.size();
         Eigen::VectorXd tmpvals(m), out(n), tmpa(4), tmpb(4);
         Eigen::MatrixXd tmpgrid(m, 2);
         double upr = 0.0;
         double tmpint, int1;
         tmpint = 0.0;
-
-        for (int i = 0; i < n; ++i) {
+        
+        for (ptrdiff_t i = 0; i < n; ++i) {
             if (cond_var == 1) {
                 upr = u(i, 1);
                 tmpgrid.col(0) = Eigen::VectorXd::Constant(m, u(i, 0));
@@ -142,7 +141,7 @@ namespace vinecopulib
             }
             tmpvals = interpolate(tmpgrid);
             tmpint = int_on_grid(upr, tmpvals, grid_points_);
-            int1 =  int_on_grid(1.0, tmpvals, grid_points_);
+            int1 = int_on_grid(1.0, tmpvals, grid_points_);
             out(i) = tmpint/int1;
             out(i) = fmax(out(i), 1e-10);
             out(i) = fmin(out(i), 1-1e-10);
@@ -157,10 +156,7 @@ namespace vinecopulib
     //!
     //! @param x evaluation point.
     //! @param a polynomial coefficients
-    double InterpolationGrid::cubic_poly(
-        const double& x, 
-        const Eigen::VectorXd& a
-    )
+    double InterpolationGrid::cubic_poly(const double& x, const Eigen::VectorXd& a)
     {
         double x2 = x*x;
         double x3 = x2*x;
@@ -171,10 +167,8 @@ namespace vinecopulib
     //!
     //! @param x evaluation point.
     //! @param a polynomial coefficients.
-    double InterpolationGrid::cubic_indef_integral(
-        const double& x,
-        const Eigen::VectorXd& a
-    )
+    double InterpolationGrid::cubic_indef_integral(const double& x,
+                                                   const Eigen::VectorXd& a)
     {
         double x2 = x*x;
         double x3 = x2*x;
@@ -187,11 +181,9 @@ namespace vinecopulib
     //! @param lower lower limit of the integral.
     //! @param upper upper limit of the integral.
     //! @param a polynomial coefficients.
-    double InterpolationGrid::cubic_integral(
-        const double& lower, 
-        const double& upper, 
-        const Eigen::VectorXd& a
-    )
+    double InterpolationGrid::cubic_integral(const double& lower, 
+                                             const double& upper, 
+                                             const Eigen::VectorXd& a)
     {
         return cubic_indef_integral(upper, a) - cubic_indef_integral(lower, a);
     }
@@ -200,10 +192,8 @@ namespace vinecopulib
     //!
     //! @param vals length 4 vector of function values.
     //! @param grid length 4 vector of grid points.
-    Eigen::VectorXd InterpolationGrid::find_coefs(
-        const Eigen::VectorXd& vals, 
-        const Eigen::VectorXd& grid
-    )
+    Eigen::VectorXd InterpolationGrid::find_coefs(const Eigen::VectorXd& vals, 
+                                                  const Eigen::VectorXd& grid)
     {
         Eigen::VectorXd a(4);
 
@@ -242,11 +232,9 @@ namespace vinecopulib
     //! @param x evaluation point.
     //! @param vals length 4 vector of function values.
     //! @param grid length 4 vector of grid points.
-    double InterpolationGrid::interp_on_grid(
-        const double& x, 
-        const Eigen::VectorXd& vals, 
-        const Eigen::VectorXd& grid
-    )
+    double InterpolationGrid::interp_on_grid(const double& x, 
+                                             const Eigen::VectorXd& vals, 
+                                             const Eigen::VectorXd& grid)
     {
         Eigen::VectorXd a = find_coefs(vals, grid);
         double xev = fmax((x - grid(1)), 0) / (grid(2) - grid(1));
@@ -264,13 +252,11 @@ namespace vinecopulib
     //! @param grid vector of grid points on which vals has been computed.
     //!
     //! @return Integral of interpolation spline defined by (vals, grid).
-    double InterpolationGrid::int_on_grid(
-        const double& upr,
-        const Eigen::VectorXd& vals, 
-        const Eigen::VectorXd& grid
-    )
+    double InterpolationGrid::int_on_grid(const double& upr,
+                                          const Eigen::VectorXd& vals, 
+                                          const Eigen::VectorXd& grid)
     {
-        int m = grid.size();
+        ptrdiff_t m = grid.size();
         Eigen::VectorXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
         double uprnew, newint;
 
@@ -278,17 +264,17 @@ namespace vinecopulib
 
         if (upr > grid(0)) {
             // go up the grid and integrate
-            for (int k = 0; k < m-1; ++k) {
+            for (ptrdiff_t k = 0; k < m-1; ++k) {
                 // stop loop if fully integrated
                 if (upr < grid(k)) break;
 
                 // select length 4 subvectors and calculate spline coefficients
-                tmpvals(0) = vals(std::max(k-1, 0));
+                tmpvals(0) = vals(std::max(k-1, (ptrdiff_t) 0));
                 tmpvals(1) = vals(k);
                 tmpvals(2) = vals(k+1);
                 tmpvals(3) = vals(std::min(k+2, m-1));
 
-                tmpgrid(0) = grid(std::max(k-1, 0));
+                tmpgrid(0) = grid(std::max(k-1, (ptrdiff_t) 0));
                 tmpgrid(1) = grid(k);
                 tmpgrid(2) = grid(k+1);
                 tmpgrid(3) = grid(std::min(k+2, m-1));

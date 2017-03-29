@@ -44,22 +44,27 @@ namespace vinecopulib
     {
     public:
         RVineMatrix() {}
-        RVineMatrix(const Eigen::MatrixXi& matrix);
+        RVineMatrix(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix);
 
-        Eigen::MatrixXi get_matrix() const;
-        Eigen::VectorXi get_order() const;
-        Eigen::MatrixXi in_natural_order() const;
-        Eigen::MatrixXi get_max_matrix() const;
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
+        Eigen::Matrix<size_t, Eigen::Dynamic, 1> get_order() const;
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> in_natural_order() const;
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_max_matrix() const;
         MatrixXb get_needed_hfunc1() const;
         MatrixXb get_needed_hfunc2() const;
 
-        static Eigen::MatrixXi construct_d_vine_matrix(const Eigen::VectorXi& order);
+        static Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> construct_d_vine_matrix(
+            const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
 
     private:
-        int d_;
-        Eigen::MatrixXi matrix_;
+        size_t d_;
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> matrix_;
     };
 
-    int relabel_one(const int& x, const Eigen::VectorXi& old_labels, const Eigen::VectorXi& new_labels);
-    Eigen::MatrixXi relabel_elements(const Eigen::MatrixXi& matrix, const Eigen::VectorXi& new_labels);
+    int relabel_one(const int& x, 
+        const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& old_labels, 
+        const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& new_labels);
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> relabel_elements(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix, 
+        const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& new_labels);
 }

@@ -23,7 +23,7 @@ namespace vinecopulib
         void flip();
 
         Eigen::VectorXd interpolate(const Eigen::MatrixXd& x);
-        Eigen::VectorXd intergrate_1d(const Eigen::MatrixXd& u, const int& cond_var);
+        Eigen::VectorXd intergrate_1d(const Eigen::MatrixXd& u, size_t cond_var);
 
     private:
         // Utility functions for spline Interpolation

@@ -29,10 +29,10 @@ int main() {
 
 
     // specify a structure matrix
-    Eigen::MatrixXi mat(3,3);
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(3,3);
     mat << 1, 1, 1,
-            2, 2, 0,
-            3, 0, 0;
+           2, 2, 0,
+           3, 0, 0;
 
     // instantiate a custom model using pair_copulas and
     Vinecop custom_model(pair_copulas, mat);

@@ -22,7 +22,6 @@ namespace tools_eigen
         return u;
     }
     
-    
     //! computes the inverse \f$ f^{-1} \f$ of a function \f$ f \f$ by the
     //! bisection method.
     //!
@@ -58,10 +57,11 @@ namespace tools_eigen
     //! 
     //! @param filename the name of the file to read from.
     //! @param max_buffer_size the maximal buffer size.
-    Eigen::MatrixXi read_matxi(const char *filename, int max_buffer_size)
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
+        const char *filename, int max_buffer_size)
     {
         Eigen::MatrixXd temp = read_matxd(filename, max_buffer_size);
-        Eigen::MatrixXi output = temp.cast <int> ();
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> output = temp.cast <size_t> ();
         return output;
     }
 
