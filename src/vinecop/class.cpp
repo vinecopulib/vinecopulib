@@ -295,7 +295,7 @@ namespace vinecopulib
                         // next matrix entry is conditioning variable of new edge
                         // that's not equal to the diagonal entry of this column
                         auto e_new = trees[t - k][e];
-                        auto pos = find_position(mat(t, col), e_new.conditioning);
+                        ptrdiff_t pos = find_position(mat(t, col), e_new.conditioning);
                         mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
                         if (pos == 1) {
                             e_new.pair_copula.flip();
