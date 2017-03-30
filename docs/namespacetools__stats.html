@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.0.0.0</a>
+                    <a class="navbar-brand">vinecopulib 0.0.1</a>
                 </div>
             </div>
         </nav>
@@ -107,8 +107,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad857f9c70a10a498f3c449225500f4c0"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#ad857f9c70a10a498f3c449225500f4c0">simulate_uniform</a> (int n, int d)</td></tr>
-<tr class="separator:ad857f9c70a10a498f3c449225500f4c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27efa963bb26b0bfc68139f0ef59fcf0"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#a27efa963bb26b0bfc68139f0ef59fcf0">simulate_uniform</a> (size_t n, size_t d)</td></tr>
+<tr class="separator:a27efa963bb26b0bfc68139f0ef59fcf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88048bc643d51f30f099c33eb2f61598"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#a88048bc643d51f30f099c33eb2f61598">to_pseudo_obs</a> (Eigen::MatrixXd x, std::string ties_method)</td></tr>
 <tr class="separator:a88048bc643d51f30f099c33eb2f61598"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af09c24563535c110aea492a30eed3d3e"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#af09c24563535c110aea492a30eed3d3e">to_pseudo_obs_1d</a> (Eigen::VectorXd x, std::string ties_method)</td></tr>
@@ -129,10 +129,10 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="na
 double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#ada062011e2c2a18d7258a39ad0722b7e">pairwise_cor</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;x)</td></tr>
 <tr class="memdesc:ada062011e2c2a18d7258a39ad0722b7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pairwise correlation. <br /></td></tr>
 <tr class="separator:ada062011e2c2a18d7258a39ad0722b7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48cbea62b23e33bacaf08ed439c189ca"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a48cbea62b23e33bacaf08ed439c189ca"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#a48cbea62b23e33bacaf08ed439c189ca">pairwise_hoeffd</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;x)</td></tr>
-<tr class="memdesc:a48cbea62b23e33bacaf08ed439c189ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pair-wise Hoeffding's D. <br /></td></tr>
-<tr class="separator:a48cbea62b23e33bacaf08ed439c189ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a937dc78ae41420f0726847d94016ba86"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a937dc78ae41420f0726847d94016ba86"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#a937dc78ae41420f0726847d94016ba86">pairwise_hoeffd</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; x)</td></tr>
+<tr class="memdesc:a937dc78ae41420f0726847d94016ba86"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pair-wise Hoeffding's D. <br /></td></tr>
+<tr class="separator:a937dc78ae41420f0726847d94016ba86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Standard normal distribution</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -178,20 +178,20 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utilities for statistical analysis. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ad857f9c70a10a498f3c449225500f4c0"></a>
+<a class="anchor" id="a27efa963bb26b0bfc68139f0ef59fcf0"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">Eigen::MatrixXd tools_stats::simulate_uniform </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>n</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>d</em>&#160;</td>
         </tr>
         <tr>
@@ -294,7 +294,7 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 27 2017 21:29:11 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 30 2017 01:00:05 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

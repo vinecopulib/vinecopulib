@@ -27,8 +27,8 @@ Advantages over VineCopula are
 
 #### Status
  
-Version 0.0.0.0 was released on March 27, 2017. While we did our best to 
-design an user-friendly API, the library is still under active development and 
+Version 0.0.1 was released on March 29, 2017. While we did our best to 
+design a user-friendly API, the library is still under active development and 
 changes are to be expected. We are also working on interfaces for R and python.
 
 
@@ -36,7 +36,7 @@ changes are to be expected. We are also working on interfaces for R and python.
 
 Below, we give a brief overview of the most important functionality. The full 
 set of classes and methods can be found in the 
-[Doxygen documentation](https://tvatter.github.io/vinecopulib/).
+[API documentation](https://vinecopulib.github.io/vinecopulib/).
 
 - [Getting started](#getting-started)
 	- [Requirements](#requirements)
@@ -70,7 +70,7 @@ To build the library, you'll need:
    
 Optionally, you'll need:
    * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
-   * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to build the unit tests)
+   * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
      
 Note that a `findR.cmake` looks for R and VineCopula in the default locations 
 for linux and osx, but problems might occur with versions installed from 
@@ -176,7 +176,7 @@ is a closely related enum class describing the type or "family" of copula.
 
 To use bivariate copula models in your code, include the header 
 `vinecopulib/bicop/class.hpp` (or simply `vinecopulib.hpp`) at the top of 
-your source.
+your source file.
 
 ### Implemented bivariate copula families
 
@@ -207,15 +207,8 @@ sub-namespace `bicop_families`:
 * `elliptical` contains the elliptical families
 * `archimedean` contains the archimedean families
 * `BB` contains the BB families
-* `rotationless` contains the families that cover both positive and negative
-association (`indep`,`gaussian`, `student`, `frank`, `tll0`)
-* `lt` families that display lower-tail dependence (`clayton`, `bb1`, `bb7`)
-* `ut` families that display upper-tail dependence (`gumbel`, `joe`, `bb1`, 
-`bb6`, `bb7`, and `bb8`)
 * `itau` families for which estimation by Kendall's tau inversion is available
 (`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
-* `flip_by_rotation` families which can be flipped by rotation (currently 
-equivalent to `archimedean`)
 
 
 **Example**
@@ -278,7 +271,7 @@ std::cout <<
     "\n";
 
 // alternatively, assign to a family and fit automatically
-fitted = select(data);
+fitted.select(data);
 std::cout << 
     "family: " << fitted.get_family_name() <<
     "rotation: " <<  fitted.get_rotation() <<
@@ -290,8 +283,8 @@ understanding the second arguments of `select()`, namely an object of the class
 * `std::vector<BicopFamily> family_set` describes the set of family to select 
 from. It can take a user specified vector of 
 families or any of those mentioned above (default is `bicop_families::all`).
-* `std::string method` describes the estimation method. It can take `"mle"` 
-(default, for maximum-likelihood estimation) and 
+* `std::string parametric_method` describes the estimation method. It can take 
+  `"mle"` (default, for maximum-likelihood estimation) and 
 `"itau"` (for Kendall's tau inversion, although only available for families 
 included in `bicop_families::itau`). Note that nonparametric families have 
 specialized methods for which no specification is required.
@@ -365,7 +358,7 @@ auto bic  = bicop.bic(sim_data);
 
 Vine copula models are implemented in the class `Vinecop`. To use this class in
 your code, include the header include the header `vinecopulib/vinecop/class.hpp` 
-(or simply `vinecopulib.hpp`) at the top of your source. This automatically 
+(or simply `vinecopulib.hpp`) at the top of your source file. This automatically 
 enables all features for bivariate copula models.
 
 ### Set up a custom vine copula model
