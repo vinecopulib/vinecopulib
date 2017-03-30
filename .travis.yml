@@ -50,7 +50,7 @@ script:
   - cd ../examples/bicop
   - mkdir build
   - cd build
-  - cmake .. && make
+  - cmake .. && VERBOSE=1 make
   - cd ../bin
   - ./main
 
