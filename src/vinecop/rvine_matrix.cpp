@@ -40,7 +40,7 @@ namespace vinecopulib
     {
         size_t d = order.size();
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> vine_matrix(d, d);
-        vine_matrix.array() = 0;
+        vine_matrix.fill(0);
 
         for (size_t i = 0; i < d; ++i) {
             vine_matrix(d - 1 - i, i) = order(d - 1 - i);  // diagonal
