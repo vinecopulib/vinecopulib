@@ -166,7 +166,9 @@ namespace vinecopulib
     
             // print out fitted pair-copulas for this tree
             if (controls.get_show_trace()) {
+                #ifndef INTERFACED_FROM_R  // cout is not allowed for R packages
                 std::cout << "Tree " << t - 1 << ":" << std::endl;
+                #endif
                 print_pair_copulas(trees[t]);
             }
     

@@ -8,7 +8,7 @@
 #include <vinecopulib/bicop/tools_bicopselect.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
-
+#include <interface_options.hpp>
 #include <iostream>
 
 //! Tools for bivariate and vine copula modeling

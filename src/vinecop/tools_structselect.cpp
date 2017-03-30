@@ -297,7 +297,9 @@ namespace tools_structselect {
                     ", rot = " << tree[e].pair_copula.get_rotation() <<
                     ", par = " <<  tree[e].pair_copula.get_parameters() <<
                     std::endl;
+            #ifndef INTERFACED_FROM_R  // cout is not allowed for R packages
             std::cout << pc_info.str().c_str();
+            #endif
         }
     }
 
