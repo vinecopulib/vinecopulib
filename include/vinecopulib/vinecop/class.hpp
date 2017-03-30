@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "bicop/class.hpp"
-#include "rvine_matrix.hpp"
-#include "tools_structselect.hpp"
+#include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/vinecop/rvine_matrix.hpp>
+#include <vinecopulib/vinecop/tools_structselect.hpp>
 
 namespace vinecopulib
 {

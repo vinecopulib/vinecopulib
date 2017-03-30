@@ -7,7 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/vinecop/rvine_matrix.hpp"
+#include <vinecopulib/vinecop/rvine_matrix.hpp>
 
 namespace test_rvine_matrix {
     using namespace vinecopulib;

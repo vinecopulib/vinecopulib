@@ -7,8 +7,8 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/misc/tools_stats.hpp"
-#include "include/misc/tools_stl.hpp"
+#include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 
 namespace test_tools_stats {
 

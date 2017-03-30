@@ -4,8 +4,8 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "misc/tools_optimization.hpp"
-#include "misc/tools_stats.hpp"
+#include <vinecopulib/misc/tools_optimization.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
 
 #include <cmath>
 

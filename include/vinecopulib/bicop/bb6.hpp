@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "bicop/archimedean.hpp"
+#include <vinecopulib/bicop/archimedean.hpp>
 
 namespace vinecopulib
 {
-    //! @brief The BB1 copula
+    //! @brief The BB6 copula
     //!
     //! This class is used in the implementation underlying the Bicop class. 
     //! Users should not use AbstractBicop or derived classes directly, but 
@@ -18,11 +18,11 @@ namespace vinecopulib
     //! 
     //! @literature
     //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
-    class Bb1Bicop : public ArchimedeanBicop
+    class Bb6Bicop : public ArchimedeanBicop
     {
     public:
         // constructor
-        Bb1Bicop();
+        Bb6Bicop();
 
     private:
         // generator, its inverse and derivatives for the archimedean copula

@@ -9,7 +9,7 @@
 #include <boost/math/distributions.hpp>
 #include <random>
 
-#include "misc/tools_eigen.hpp"
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace tools_stats
 {

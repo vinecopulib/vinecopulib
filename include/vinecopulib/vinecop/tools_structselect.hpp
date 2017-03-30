@@ -8,8 +8,8 @@
 
 #include <cstddef>
 #include <boost/graph/adjacency_list.hpp>
-#include "bicop/class.hpp"
-#include "fit_controls.hpp"
+#include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/vinecop/fit_controls.hpp>
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std

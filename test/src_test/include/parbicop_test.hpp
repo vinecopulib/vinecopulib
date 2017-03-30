@@ -7,8 +7,8 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/misc/tools_stl.hpp"
-#include "bicop/class.hpp"
+#include <vinecopulib/misc/tools_stl.hpp>
+#include <vinecopulib/bicop/class.hpp>
 
 #ifndef M_PI
 #define M_PI       3.14159265358979323846

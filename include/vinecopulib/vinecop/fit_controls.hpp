@@ -8,7 +8,7 @@
 
 #include <limits>
 
-#include "bicop/fit_controls.hpp"
+#include <vinecopulib/bicop/fit_controls.hpp>
 
 namespace vinecopulib {
     //! @brief A class for controlling fit of bivariate copula models.

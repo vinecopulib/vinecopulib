@@ -4,9 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "vinecop/tools_structselect.hpp"
-#include "misc/tools_stl.hpp"
-#include "misc/tools_stats.hpp"
+#include <vinecopulib/vinecop/tools_structselect.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
 #include <iostream>
 #include <cmath>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
