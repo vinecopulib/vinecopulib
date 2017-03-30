@@ -270,7 +270,7 @@ namespace vinecopulib
         using namespace tools_stl;
         size_t d = trees.size();
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d, d);
-        mat.array() = 0;
+        mat.fill(0);
     
         for (size_t col = 0; col < d - 1; ++col) {
             size_t t = d - 1 - col;
