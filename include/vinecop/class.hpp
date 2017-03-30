@@ -21,13 +21,13 @@ namespace vinecopulib
     public:
         // Constructors
         Vinecop() {}
-        Vinecop(int d);
-        Vinecop(const Eigen::MatrixXi& matrix);
+        Vinecop(size_t d);
+        Vinecop(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix);
         Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
-                const Eigen::MatrixXi& matrix);
+                const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix);
         Vinecop(const Eigen::MatrixXd& data,
                 FitControlsVinecop controls = FitControlsVinecop());
-        Vinecop(const Eigen::MatrixXd& data, const Eigen::MatrixXi& matrix,
+        Vinecop(const Eigen::MatrixXd& data, const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
                 FitControlsVinecop controls = FitControlsVinecop());
 
         // Methods modifying structure and/or families and parameters
@@ -37,11 +37,11 @@ namespace vinecopulib
                              FitControlsVinecop controls = FitControlsVinecop());
 
         // Getters for a single pair copula
-        Bicop get_pair_copula(int tree, int edge) const;
-        BicopFamily get_family(int tree, int edge) const;
-        int get_rotation(int tree, int edge) const;
-        Eigen::VectorXd get_parameters(int tree, int edge) const;
-        Eigen::MatrixXi get_matrix() const;
+        Bicop get_pair_copula(size_t tree, size_t edge) const;
+        BicopFamily get_family(size_t tree, size_t edge) const;
+        int get_rotation(size_t tree, size_t edge) const;
+        Eigen::VectorXd get_parameters(size_t tree, size_t edge) const;
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
         // Getters for all pair copulas
         std::vector<std::vector<Bicop>> get_all_pair_copulas() const;
@@ -51,7 +51,7 @@ namespace vinecopulib
 
         // Stats methods
         Eigen::VectorXd pdf(const Eigen::MatrixXd& u);
-        Eigen::MatrixXd simulate(int n);
+        Eigen::MatrixXd simulate(size_t n);
         Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& u);
 
         // Fit statistics
@@ -61,13 +61,13 @@ namespace vinecopulib
         double bic(const Eigen::MatrixXd& u);
 
         // Misc methods
-        static std::vector<std::vector<Bicop>> make_pair_copula_store(int d);
+        static std::vector<std::vector<Bicop>> make_pair_copula_store(size_t d);
     private:
-        int d_;
+        size_t d_;
         RVineMatrix vine_matrix_;
         std::vector<std::vector<Bicop>> pair_copulas_;
         void update_vinecop(std::vector<tools_structselect::VineTree>& trees);
-        Eigen::VectorXi inverse_permutation(const Eigen::VectorXi& order);
+        Eigen::Matrix<size_t, Eigen::Dynamic, 1> inverse_permutation(const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
     };
 
 }

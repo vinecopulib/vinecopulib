@@ -12,9 +12,9 @@ namespace vinecopulib
     KernelBicop::KernelBicop()
      {
          // construct default grid (equally spaced on Gaussian scale)
-         int m = 30;
+         size_t m = 30;
          Eigen::VectorXd grid_points(m);
-         for (int i = 0; i < m; ++i)
+         for (size_t i = 0; i < m; ++i)
              grid_points(i) = - 3.25 + i * (6.25 / (double) m);
          interp_grid_ = InterpolationGrid(
              tools_stats::pnorm(grid_points), 

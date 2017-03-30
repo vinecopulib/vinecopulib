@@ -1,7 +1,7 @@
 # vinecopulib
-[![Build Status](https://travis-ci.org/tvatter/vinecopulib.svg?branch=master)](https://travis-ci.org/tvatter/vinecopulib)
-[![Windows Build status](http://ci.appveyor.com/api/projects/status/github/tvatter/vinecopulib?svg=true)](https://ci.appveyor.com/project/tvatter/vinecopulib)
-[![Coverage Status](https://img.shields.io/codecov/c/github/tvatter/vinecopulib/master.svg)](https://codecov.io/github/tvatter/vinecopulib?branch=master)
+[![Build Status](https://travis-ci.org/vinecopulib/vinecopulib.svg?branch=master)](https://travis-ci.org/vinecopulib/vinecopulib)
+[![Windows Build status](http://ci.appveyor.com/api/projects/status/github/vinecopulib/vinecopulib?svg=true)](https://ci.appveyor.com/project/vinecopulib/vinecopulib)
+[![Coverage Status](https://img.shields.io/codecov/c/github/vinecopulib/vinecopulib/master.svg)](https://codecov.io/github/vinecopulib/vinecopulib?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
  
 #### What are vine copulas?
@@ -27,8 +27,8 @@ Advantages over VineCopula are
 
 #### Status
  
-Version 0.0.0.0 was released on March 27, 2017. While we did our best to 
-design an user-friendly API, the library is still under active development and 
+Version 0.0.1 was released on March 29, 2017. While we did our best to 
+design a user-friendly API, the library is still under active development and 
 changes are to be expected. We are also working on interfaces for R and python.
 
 
@@ -36,7 +36,7 @@ changes are to be expected. We are also working on interfaces for R and python.
 
 Below, we give a brief overview of the most important functionality. The full 
 set of classes and methods can be found in the 
-[Doxygen documentation](https://tvatter.github.io/vinecopulib/).
+[API documentation](https://vinecopulib.github.io/vinecopulib/).
 
 - [Getting started](#getting-started)
 	- [Requirements](#requirements)
@@ -70,7 +70,7 @@ To build the library, you'll need:
    
 Optionally, you'll need:
    * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
-   * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to build the unit tests)
+   * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
      
 Note that a `findR.cmake` looks for R and VineCopula in the default locations 
 for linux and osx, but problems might occur with versions installed from 
@@ -176,7 +176,7 @@ is a closely related enum class describing the type or "family" of copula.
 
 To use bivariate copula models in your code, include the header 
 `vinecopulib/bicop/class.hpp` (or simply `vinecopulib.hpp`) at the top of 
-your source.
+your source file.
 
 ### Implemented bivariate copula families
 
@@ -207,15 +207,8 @@ sub-namespace `bicop_families`:
 * `elliptical` contains the elliptical families
 * `archimedean` contains the archimedean families
 * `BB` contains the BB families
-* `rotationless` contains the families that cover both positive and negative
-association (`indep`,`gaussian`, `student`, `frank`, `tll0`)
-* `lt` families that display lower-tail dependence (`clayton`, `bb1`, `bb7`)
-* `ut` families that display upper-tail dependence (`gumbel`, `joe`, `bb1`, 
-`bb6`, `bb7`, and `bb8`)
 * `itau` families for which estimation by Kendall's tau inversion is available
 (`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
-* `flip_by_rotation` families which can be flipped by rotation (currently 
-equivalent to `archimedean`)
 
 
 **Example**
@@ -278,7 +271,7 @@ std::cout <<
     "\n";
 
 // alternatively, assign to a family and fit automatically
-fitted = select(data);
+fitted.select(data);
 std::cout << 
     "family: " << fitted.get_family_name() <<
     "rotation: " <<  fitted.get_rotation() <<
@@ -290,8 +283,8 @@ understanding the second arguments of `select()`, namely an object of the class
 * `std::vector<BicopFamily> family_set` describes the set of family to select 
 from. It can take a user specified vector of 
 families or any of those mentioned above (default is `bicop_families::all`).
-* `std::string method` describes the estimation method. It can take `"mle"` 
-(default, for maximum-likelihood estimation) and 
+* `std::string parametric_method` describes the estimation method. It can take 
+  `"mle"` (default, for maximum-likelihood estimation) and 
 `"itau"` (for Kendall's tau inversion, although only available for families 
 included in `bicop_families::itau`). Note that nonparametric families have 
 specialized methods for which no specification is required.
@@ -365,7 +358,7 @@ auto bic  = bicop.bic(sim_data);
 
 Vine copula models are implemented in the class `Vinecop`. To use this class in
 your code, include the header include the header `vinecopulib/vinecop/class.hpp` 
-(or simply `vinecopulib.hpp`) at the top of your source. This automatically 
+(or simply `vinecopulib.hpp`) at the top of your source file. This automatically 
 enables all features for bivariate copula models.
 
 ### Set up a custom vine copula model
@@ -398,15 +391,15 @@ Vinecop default_model(d);
 auto pair_copulas = Vinecop::make_pair_copula_store(3);  
 
 // specify the pair copulas
-for (int tree = 0; tree < d - 1; ++tree) {
-    for (int edge = 0; edge < d - 1 - tree; ++edge) {
-        // 90 degree Clayton with parameter 3.0
-        pair_copulas[tree][edge] = Bicop(3, VecXd::Constant(1, 3.0), 90);
+auto par = Eigen::VectorXd::Constant(1, 3.0);
+for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+        pc = Bicop(BicopFamily::clayton, 270, par);
     }
 }
 
 // specify a structure matrix
-Eigen::MatrixXi mat;
+Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(3, 3);
 mat << 1, 1, 1,
        2, 2, 0,
        3, 0, 0;
@@ -464,7 +457,7 @@ structure of the object), using the sequential procedure proposed by
 int d = 5;
 
 // simulate dummy data
-MatXd data = simulate_uniform(100, d);
+Eigen::MatrixXd data = simulate_uniform(100, d);
 
 // instantiate a D-vine and select the families
 Vinecop model(d);
@@ -505,7 +498,7 @@ MatXd data = simulate_uniform(100, d);
 Vinecop best_vine(data);
 
 // alternatively, instantiate a structure matrix...
-Eigen::MatrixXi M;
+Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> M;
 M << 1, 1, 1, 1,
      2, 2, 2, 0,
      3, 3, 0, 0
