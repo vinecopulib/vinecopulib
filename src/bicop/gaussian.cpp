@@ -4,8 +4,8 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "bicop/gaussian.hpp"
-#include "misc/tools_stats.hpp"
+#include <vinecopulib/bicop/gaussian.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
 #ifndef M_PI
 #define M_PI       3.14159265358979323846
 #endif

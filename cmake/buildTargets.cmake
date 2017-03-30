@@ -1,7 +1,7 @@
 file(GLOB_RECURSE vinecopulib_sources src/*.cpp src/*.cc src/*c)
-file(GLOB_RECURSE vinecopulib_bicop_headers include/bicop/*.hpp)
-file(GLOB_RECURSE vinecopulib_vinecop_headers include/vinecop/*.hpp)
-file(GLOB_RECURSE vinecopulib_misc_headers include/misc/*.hpp)
+file(GLOB_RECURSE vinecopulib_bicop_headers include/vinecopulib/bicop/*.hpp)
+file(GLOB_RECURSE vinecopulib_vinecop_headers include/vinecopulib/vinecop/*.hpp)
+file(GLOB_RECURSE vinecopulib_misc_headers include/vinecopulib/misc/*.hpp)
 file(GLOB_RECURSE vinecopulib_main_header include/vinecopulib.hpp)
 
 include_directories(SYSTEM ${external_includes})

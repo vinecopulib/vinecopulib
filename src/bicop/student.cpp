@@ -4,8 +4,8 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "bicop/student.hpp"
-#include "misc/tools_stats.hpp"
+#include <vinecopulib/bicop/student.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
 #include <cmath>
 #ifndef M_PI
 #define M_PI       3.14159265358979323846

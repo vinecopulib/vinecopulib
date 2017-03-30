@@ -4,9 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "bicop/tools_bicopselect.hpp"
-#include "misc/tools_stats.hpp"
-#include "misc/tools_stl.hpp"
+#include <vinecopulib/bicop/tools_bicopselect.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 #include <cmath>
 
 std::vector<double> get_c1c2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,

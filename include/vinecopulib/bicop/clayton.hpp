@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "bicop/archimedean.hpp"
+#include <vinecopulib/bicop/archimedean.hpp>
 
 namespace vinecopulib
 {
-    //! @brief The Joe copula
+    //! @brief The Clayton copula
     //!
     //! This class is used in the implementation underlying the Bicop class. 
     //! Users should not use AbstractBicop or derived classes directly, but 
@@ -18,11 +18,11 @@ namespace vinecopulib
     //! 
     //! @literature
     //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
-    class JoeBicop : public ArchimedeanBicop
+    class ClaytonBicop : public ArchimedeanBicop
     {
     public:
         // constructor
-        JoeBicop();
+        ClaytonBicop();
 
     private:
         // generator, its inverse and derivatives for the archimedean copula
@@ -38,10 +38,8 @@ namespace vinecopulib
 
         // link between Kendall's tau and the par_bicop parameter
         Eigen::MatrixXd tau_to_parameters(const double& tau);
-        double parameters_to_tau(const Eigen::VectorXd& par);
+        double parameters_to_tau(const Eigen::VectorXd& parameters);
 
         Eigen::VectorXd get_start_parameters(const double tau);
     };
 }
-
-double qcondjoe(double* q, double* u, double* de);

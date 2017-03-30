@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "bicop/parametric.hpp"
+#include <vinecopulib/bicop/elliptical.hpp>
 
 namespace vinecopulib
 {
-    //! @brief The independence copula
+    //! @brief The Gaussian copula
     //!
     //! This class is used in the implementation underlying the Bicop class. 
     //! Users should not use AbstractBicop or derived classes directly, but 
@@ -18,11 +18,11 @@ namespace vinecopulib
     //! 
     //! @literature
     //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
-    class IndepBicop : public ParBicop
+    class GaussianBicop : public EllipticalBicop
     {
     public:
         // constructor
-        IndepBicop();
+        GaussianBicop();
 
     private:
         // PDF
@@ -30,24 +30,17 @@ namespace vinecopulib
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
 
-        // hfunctions and their inverses
+        // hfunction
         Eigen::VectorXd hfunc1(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
-        Eigen::VectorXd hfunc2(
-            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
-        );
+
+        // inverse hfunction
         Eigen::VectorXd hinv1(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
-        Eigen::VectorXd hinv2(
-            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
-        );
 
-        Eigen::MatrixXd tau_to_parameters(const double &);
-        double parameters_to_tau(const Eigen::VectorXd &);
-
-        void flip();
+        Eigen::MatrixXd tau_to_parameters(const double& tau);
 
         Eigen::VectorXd get_start_parameters(const double tau);
     };

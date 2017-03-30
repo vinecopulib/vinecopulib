@@ -7,7 +7,7 @@
 #pragma once
 
 #include <vector>
-#include "family.hpp"
+#include <vinecopulib/bicop/family.hpp>
 
 namespace vinecopulib {
     //! @brief A class for controlling fit of bivariate copula models.

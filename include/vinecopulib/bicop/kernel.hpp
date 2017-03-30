@@ -7,8 +7,8 @@
 #pragma once
 
 #include <cstddef>
-#include "misc/tools_interpolation.hpp"
-#include "bicop/abstract.hpp"
+#include <vinecopulib/misc/tools_interpolation.hpp>
+#include <vinecopulib/bicop/abstract.hpp>
 
 namespace vinecopulib
 {

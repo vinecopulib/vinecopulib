@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "bicop/parametric.hpp"
+#include <vinecopulib/bicop/parametric.hpp>
 
 namespace vinecopulib
 {

@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "bicop/archimedean.hpp"
+#include <vinecopulib/bicop/parametric.hpp>
 
 namespace vinecopulib
 {
-    //! @brief The Gumbel copula
+    //! @brief The independence copula
     //!
     //! This class is used in the implementation underlying the Bicop class. 
     //! Users should not use AbstractBicop or derived classes directly, but 
@@ -18,30 +18,37 @@ namespace vinecopulib
     //! 
     //! @literature
     //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
-    class GumbelBicop : public ArchimedeanBicop
+    class IndepBicop : public ParBicop
     {
     public:
         // constructor
-        GumbelBicop();
+        IndepBicop();
 
     private:
-        // generator, its inverse and derivatives for the archimedean copula
-        double generator(const double& u);
-        double generator_inv(const double& u);
-        double generator_derivative(const double& u);
-        double generator_derivative2(const double& u);
-
-        // inverse hfunction
-        Eigen::VectorXd hinv1(
+        // PDF
+        Eigen::VectorXd pdf(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
 
-        // link between Kendall's tau and the par_bicop parameter
-        Eigen::MatrixXd tau_to_parameters(const double& tau);
-        double parameters_to_tau(const Eigen::VectorXd& parameters);
+        // hfunctions and their inverses
+        Eigen::VectorXd hfunc1(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
+        Eigen::VectorXd hfunc2(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
+        Eigen::VectorXd hinv1(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
+        Eigen::VectorXd hinv2(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
+
+        Eigen::MatrixXd tau_to_parameters(const double &);
+        double parameters_to_tau(const Eigen::VectorXd &);
+
+        void flip();
 
         Eigen::VectorXd get_start_parameters(const double tau);
     };
 }
-
-double qcondgum(double* q, double* u, double* de);

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/bicop/class.hpp"
+#include <vinecopulib/bicop/class.hpp>
 
 using namespace vinecopulib;
 
