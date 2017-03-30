@@ -8,5 +8,5 @@ endif()
 
 install(
   FILES ${CMAKE_SOURCE_DIR}/include/git_revision.hpp
-  DESTINATION "${include_install_dir}"
+  DESTINATION "${include_install_dir}/vinecopulib/"
 )
