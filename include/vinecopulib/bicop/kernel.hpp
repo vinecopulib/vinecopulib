@@ -52,7 +52,7 @@ namespace vinecopulib
 
         void flip();
 
-        InterpolationGrid interp_grid_;
+        tools_interpolation::InterpolationGrid interp_grid_;
         double npars_;
     };
 }

@@ -12,22 +12,22 @@
 #include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/bicop/family.hpp>
 
-// Pre-declaration to allow AbtractBicop to befriend the two functions
-namespace tools_optimization
-{
-    // the objective function for maximum likelihood estimation
-    double mle_objective(const std::vector<double>& x,
-                         std::vector<double>& grad,
-                         void* data);
-
-    // the objective function for profile maximum likelihood estimation
-    double pmle_objective(const std::vector<double>& x,
-                          std::vector<double> &,
-                          void* data);
-}
-
 namespace vinecopulib
 {
+    // Pre-declaration to allow AbtractBicop to befriend the two functions
+    namespace tools_optimization
+    {
+        // the objective function for maximum likelihood estimation
+        double mle_objective(const std::vector<double>& x,
+                             std::vector<double>& grad,
+                             void* data);
+
+        // the objective function for profile maximum likelihood estimation
+        double pmle_objective(const std::vector<double>& x,
+                              std::vector<double> &,
+                              void* data);
+    }
+    
     //! @brief An abstract class for bivariate copula families
     //!
     //! This class is used in the implementation underlying the Bicop class. 

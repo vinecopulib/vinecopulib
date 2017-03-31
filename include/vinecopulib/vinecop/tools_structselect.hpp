@@ -20,6 +20,7 @@ namespace std
     template <class T>
     T end(const std::pair<T,T>& eItPair) { return eItPair.second; }
 }
+namespace vinecopulib {
 
 namespace tools_structselect {
     // boost::graph represenation of a vine tree ----------------
@@ -70,5 +71,7 @@ namespace tools_structselect {
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(boost::graph_traits<VineTree>::edge_descriptor e,
                              VineTree& tree);
+
+}
 
 }

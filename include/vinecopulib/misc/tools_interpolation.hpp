@@ -8,8 +8,9 @@
 
 #include <vinecopulib/misc/tools_eigen.hpp>
 
-namespace vinecopulib
-{
+namespace vinecopulib {
+    
+namespace tools_interpolation {
     //! A class for cubic spline interpolation of bivariate copulas
     //!
     //! The class is used for implementing kernel estimators. It makes storing the
@@ -38,5 +39,7 @@ namespace vinecopulib
 
         Eigen::VectorXd grid_points_;
         Eigen::MatrixXd values_;
-    };
+    };    
+}
+
 }

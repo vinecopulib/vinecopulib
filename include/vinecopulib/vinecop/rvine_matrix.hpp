@@ -7,10 +7,10 @@
 #pragma once
 
 #include <vinecopulib/misc/tools_eigen.hpp>
-using namespace tools_eigen;
 
 namespace vinecopulib
 {
+    using namespace tools_eigen;
     //! @brief A class for regular vine matrices.
     //! 
     //! A regular vine (R-vine) matrix encodes the structure of a vine.
