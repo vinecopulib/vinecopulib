@@ -19,7 +19,7 @@ namespace vinecopulib {
         inline void print(std::string text)
         {
             #ifndef INTERFACED_FROM_R
-
+                std::cout << text;
             #else
                 Rcpp::cout << text;
             #endif
