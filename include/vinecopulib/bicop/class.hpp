@@ -8,6 +8,7 @@
 
 #include <vinecopulib/bicop/abstract.hpp>
 #include <vinecopulib/bicop/fit_controls.hpp>
+#include <vinecopulib/misc/interface_options.hpp>
 
 namespace vinecopulib {
     //! @brief A class for bivariate copula models.

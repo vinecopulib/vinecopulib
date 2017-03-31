@@ -7,7 +7,7 @@
 #include <vinecopulib/vinecop/tools_structselect.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <iostream>
+
 #include <cmath>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 
@@ -297,9 +297,7 @@ namespace tools_structselect {
                     ", rot = " << tree[e].pair_copula.get_rotation() <<
                     ", par = " <<  tree[e].pair_copula.get_parameters() <<
                     std::endl;
-            #ifndef INTERFACED_FROM_R  // cout is not allowed for R packages
-            std::cout << pc_info.str().c_str();
-            #endif
+            cout << pc_info.str().c_str();
         }
     }
 

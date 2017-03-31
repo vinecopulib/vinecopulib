@@ -8,3 +8,10 @@
 
 // interface specfifc #defines can be set here 
 // (R package does: #define INTERFACED_FROM_R)
+
+#ifndef INTERFACED_FROM_R  // cout is not allowed for R packages
+    #include <iostream>
+    #define cout std::cout
+#else
+    #define cout Rcpp::Rcout
+#endif
