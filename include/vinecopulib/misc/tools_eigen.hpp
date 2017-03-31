@@ -8,6 +8,8 @@
 
 #include <Eigen/Dense>
 
+namespace vinecopulib {
+
 //! Tools for working with Eigen types
 namespace tools_eigen
 {
@@ -27,4 +29,6 @@ namespace tools_eigen
     Eigen::MatrixXd read_matxd(const char *filename, int max_buffer_size = (int) 1e6);
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
         const char *filename, int max_buffer_size = (int) 1e6);
+}
+
 }

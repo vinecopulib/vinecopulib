@@ -12,6 +12,8 @@
 #include <numeric>
 #include <cstddef>
 
+namespace vinecopulib {
+
 namespace tools_stl {
     
     using namespace std;
@@ -108,4 +110,6 @@ namespace tools_stl {
         iota(seq.begin(), seq.end(), from);
         return seq;
     }
+}
+
 }

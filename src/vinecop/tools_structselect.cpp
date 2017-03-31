@@ -11,6 +11,8 @@
 #include <cmath>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 
+namespace vinecopulib {
+    
 namespace tools_structselect {
 
     using namespace tools_stl;
@@ -327,5 +329,7 @@ namespace tools_structselect {
 
         return index.str().c_str();
     }
+
+}
 
 }

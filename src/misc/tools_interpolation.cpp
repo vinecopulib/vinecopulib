@@ -9,8 +9,9 @@
 #include <exception>
 #include <iostream>
 
-namespace vinecopulib
-{
+namespace vinecopulib {
+
+namespace tools_interpolation {
     //! Constructor
     //!
     //! @param grid_points an ascending sequence of grid_points; used in both
@@ -290,4 +291,6 @@ namespace vinecopulib
 
         return tmpint;
     }
+}
+
 }

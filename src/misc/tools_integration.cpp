@@ -7,6 +7,8 @@
 #include <vinecopulib/misc/tools_integration.hpp>
 #include <boost/numeric/odeint.hpp>
 
+namespace vinecopulib {
+
 namespace tools_integration {
 
     double integrate_zero_to_one(std::function<double(double)> f)
@@ -22,4 +24,6 @@ namespace tools_integration {
                            ifunc, x, lb, ub, lb);
         return x;
     }
+}
+
 }

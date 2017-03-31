@@ -10,6 +10,8 @@
 
 //! @file misc/tools_stats.cpp
 
+namespace vinecopulib {
+    
 //! Utilities for statistical analysis
 namespace tools_stats {
     
@@ -168,4 +170,6 @@ namespace tools_stats {
     }
     
     //! @}
+}
+
 }

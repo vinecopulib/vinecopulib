@@ -10,6 +10,8 @@
 #include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/bicop/parametric.hpp>
 
+namespace vinecopulib {
+
 namespace tools_optimization {
 
     //! @brief A helper struct for (profile) maximum likelihood estimation
@@ -70,4 +72,6 @@ namespace tools_optimization {
         nlopt::opt opt_;
         NLoptControls controls_;
     };
+}
+
 }
