@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.0.1</a>
+                    <a class="navbar-brand">vinecopulib 0.0.2</a>
                 </div>
             </div>
         </nav>
@@ -105,35 +105,38 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">tools_stats.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;misc/tools_stats.hpp&quot;</code><br />
-<code>#include &quot;misc/tools_stl.hpp&quot;</code><br />
-<code>#include &quot;misc/tools_c.h&quot;</code><br />
+<div class="textblock"><code>#include &lt;vinecopulib/misc/tools_stats.hpp&gt;</code><br />
+<code>#include &lt;vinecopulib/misc/tools_stl.hpp&gt;</code><br />
+<code>#include &lt;vinecopulib/misc/tools_c.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for tools_stats.cpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="tools__stats_8cpp__incl.png" border="0" usemap="#_2home_2n5_2dev_2cpp_2vinecopulib_2src_2misc_2tools__stats_8cpp" alt=""/></div>
 <map name="_2home_2n5_2dev_2cpp_2vinecopulib_2src_2misc_2tools__stats_8cpp" id="_2home_2n5_2dev_2cpp_2vinecopulib_2src_2misc_2tools__stats_8cpp">
-<area shape="rect" id="node2" href="tools__stats_8hpp_source.html" title="misc/tools_stats.hpp" alt="" coords="243,95,386,121"/>
-<area shape="rect" id="node7" href="tools__stl_8hpp_source.html" title="misc/tools_stl.hpp" alt="" coords="579,95,707,121"/>
-<area shape="rect" id="node13" href="tools__c_8h_source.html" title="misc/tools_c.h" alt="" coords="731,95,837,121"/>
-<area shape="rect" id="node5" href="tools__eigen_8hpp_source.html" title="misc/tools_eigen.hpp" alt="" coords="306,169,451,196"/>
+<area shape="rect" id="node2" href="tools__stats_8hpp_source.html" title="vinecopulib/misc/tools\l_stats.hpp" alt="" coords="241,95,391,136"/>
+<area shape="rect" id="node7" href="tools__stl_8hpp_source.html" title="vinecopulib/misc/tools\l_stl.hpp" alt="" coords="573,95,723,136"/>
+<area shape="rect" id="node13" href="tools__c_8h_source.html" title="vinecopulib/misc/tools_c.h" alt="" coords="748,102,924,129"/>
+<area shape="rect" id="node5" href="tools__eigen_8hpp_source.html" title="vinecopulib/misc/tools\l_eigen.hpp" alt="" coords="306,184,457,225"/>
 </map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
-<tr class="memitem:namespacetools__stats"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html">tools_stats</a></td></tr>
-<tr class="memdesc:namespacetools__stats"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utilities for statistical analysis. <br /></td></tr>
+<tr class="memitem:namespacevinecopulib"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib.html">vinecopulib</a></td></tr>
+<tr class="memdesc:namespacevinecopulib"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tools for bivariate and vine copula modeling. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespacevinecopulib_1_1tools__stats"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html">vinecopulib::tools_stats</a></td></tr>
+<tr class="memdesc:namespacevinecopulib_1_1tools__stats"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utilities for statistical analysis. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a27efa963bb26b0bfc68139f0ef59fcf0"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#a27efa963bb26b0bfc68139f0ef59fcf0">tools_stats::simulate_uniform</a> (size_t n, size_t d)</td></tr>
-<tr class="separator:a27efa963bb26b0bfc68139f0ef59fcf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88048bc643d51f30f099c33eb2f61598"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#a88048bc643d51f30f099c33eb2f61598">tools_stats::to_pseudo_obs</a> (Eigen::MatrixXd x, std::string ties_method)</td></tr>
-<tr class="separator:a88048bc643d51f30f099c33eb2f61598"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af09c24563535c110aea492a30eed3d3e"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#af09c24563535c110aea492a30eed3d3e">tools_stats::to_pseudo_obs_1d</a> (Eigen::VectorXd x, std::string ties_method)</td></tr>
-<tr class="separator:af09c24563535c110aea492a30eed3d3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78efaf3caf538201cdb881dd2780b242"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a78efaf3caf538201cdb881dd2780b242">vinecopulib::tools_stats::simulate_uniform</a> (size_t n, size_t d)</td></tr>
+<tr class="separator:a78efaf3caf538201cdb881dd2780b242"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afda41507cee7cba84602e28e56cfcd99"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#afda41507cee7cba84602e28e56cfcd99">vinecopulib::tools_stats::to_pseudo_obs</a> (Eigen::MatrixXd x, std::string ties_method)</td></tr>
+<tr class="separator:afda41507cee7cba84602e28e56cfcd99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e4849a2a908703a68e92e0c0633237f"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a9e4849a2a908703a68e92e0c0633237f">vinecopulib::tools_stats::to_pseudo_obs_1d</a> (Eigen::VectorXd x, std::string ties_method)</td></tr>
+<tr class="separator:a9e4849a2a908703a68e92e0c0633237f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Pairwise dependence measures</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -142,18 +145,18 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 </div></td></tr>
-<tr class="memitem:aba1c21a7a90e6fefb3d92876469f401e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba1c21a7a90e6fefb3d92876469f401e"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#aba1c21a7a90e6fefb3d92876469f401e">tools_stats::pairwise_ktau</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;x)</td></tr>
-<tr class="memdesc:aba1c21a7a90e6fefb3d92876469f401e"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pairwise Kendall's \( \tau \). <br /></td></tr>
-<tr class="separator:aba1c21a7a90e6fefb3d92876469f401e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada062011e2c2a18d7258a39ad0722b7e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada062011e2c2a18d7258a39ad0722b7e"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#ada062011e2c2a18d7258a39ad0722b7e">tools_stats::pairwise_cor</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;x)</td></tr>
-<tr class="memdesc:ada062011e2c2a18d7258a39ad0722b7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pairwise correlation. <br /></td></tr>
-<tr class="separator:ada062011e2c2a18d7258a39ad0722b7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a937dc78ae41420f0726847d94016ba86"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a937dc78ae41420f0726847d94016ba86"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetools__stats.html#a937dc78ae41420f0726847d94016ba86">tools_stats::pairwise_hoeffd</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; x)</td></tr>
-<tr class="memdesc:a937dc78ae41420f0726847d94016ba86"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pair-wise Hoeffding's D. <br /></td></tr>
-<tr class="separator:a937dc78ae41420f0726847d94016ba86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1ed1d0ae4e304aef8c05737b4bfd024"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa1ed1d0ae4e304aef8c05737b4bfd024"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#aa1ed1d0ae4e304aef8c05737b4bfd024">vinecopulib::tools_stats::pairwise_ktau</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;x)</td></tr>
+<tr class="memdesc:aa1ed1d0ae4e304aef8c05737b4bfd024"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pairwise Kendall's \( \tau \). <br /></td></tr>
+<tr class="separator:aa1ed1d0ae4e304aef8c05737b4bfd024"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad076513f9a531a015bb0eaff098a8271"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad076513f9a531a015bb0eaff098a8271"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#ad076513f9a531a015bb0eaff098a8271">vinecopulib::tools_stats::pairwise_cor</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;x)</td></tr>
+<tr class="memdesc:ad076513f9a531a015bb0eaff098a8271"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pairwise correlation. <br /></td></tr>
+<tr class="separator:ad076513f9a531a015bb0eaff098a8271"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adda97526e428173da49899ef449560cf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adda97526e428173da49899ef449560cf"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#adda97526e428173da49899ef449560cf">vinecopulib::tools_stats::pairwise_hoeffd</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; x)</td></tr>
+<tr class="memdesc:adda97526e428173da49899ef449560cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pair-wise Hoeffding's D. <br /></td></tr>
+<tr class="separator:adda97526e428173da49899ef449560cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.8-->
@@ -164,7 +167,7 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="na
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 30 2017 01:00:05 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 31 2017 21:36:44 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
