@@ -9,8 +9,6 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
-#include <iostream>
-
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib
 {
