@@ -21,7 +21,7 @@ namespace vinecopulib {
             #ifndef INTERFACED_FROM_R
                 std::cout << text;
             #else
-                Rcpp::cout << text;
+                Rcpp::Rcout << text;
             #endif
         };
     }
