@@ -7,7 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/misc/tools_eigen.hpp"
+#include <vinecopulib/misc/tools_eigen.hpp>
 #include "rscript.hpp"
 
 class VinecopTest : public ::testing::Test {

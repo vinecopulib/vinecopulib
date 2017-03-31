@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "bicop/archimedean.hpp"
+#include <vinecopulib/bicop/parametric.hpp>
 
 namespace vinecopulib
 {
-    //! @brief The Clayton copula
+    //! @brief An abstract class for elliptical copula families
     //!
     //! This class is used in the implementation underlying the Bicop class. 
     //! Users should not use AbstractBicop or derived classes directly, but 
@@ -18,28 +18,18 @@ namespace vinecopulib
     //! 
     //! @literature
     //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
-    class ClaytonBicop : public ArchimedeanBicop
+    class EllipticalBicop : public ParBicop
     {
-    public:
-        // constructor
-        ClaytonBicop();
-
     private:
-        // generator, its inverse and derivatives for the archimedean copula
-        double generator(const double& u);
-        double generator_inv(const double& u);
-        double generator_derivative(const double& u);
-        double generator_derivative2(const double& u);
-
-        // inverse hfunction
-        Eigen::VectorXd hinv1(
+        // hfunction and its inverse
+        Eigen::VectorXd hfunc2(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
+        Eigen::VectorXd hinv2(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
 
         // link between Kendall's tau and the par_bicop parameter
-        Eigen::MatrixXd tau_to_parameters(const double& tau);
         double parameters_to_tau(const Eigen::VectorXd& parameters);
-
-        Eigen::VectorXd get_start_parameters(const double tau);
     };
 }

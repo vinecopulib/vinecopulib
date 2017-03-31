@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "abstract.hpp"
-#include "fit_controls.hpp"
+#include <vinecopulib/bicop/abstract.hpp>
+#include <vinecopulib/bicop/fit_controls.hpp>
 
 namespace vinecopulib {
     //! @brief A class for bivariate copula models.

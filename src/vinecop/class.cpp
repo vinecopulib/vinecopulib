@@ -4,9 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "vinecop/class.hpp"
-#include "misc/tools_stl.hpp"
-#include "misc/tools_stats.hpp"
+#include <vinecopulib/vinecop/class.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
 #include <vector>
 #include <exception>
 #include <iostream>
@@ -270,7 +270,7 @@ namespace vinecopulib
         using namespace tools_stl;
         size_t d = trees.size();
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d, d);
-        mat.array() = 0;
+        mat.fill(0);
     
         for (size_t col = 0; col < d - 1; ++col) {
             size_t t = d - 1 - col;

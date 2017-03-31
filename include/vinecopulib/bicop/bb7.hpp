@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "bicop/parametric.hpp"
+#include <vinecopulib/bicop/archimedean.hpp>
 
 namespace vinecopulib
 {
-    //! @brief An abstract class for elliptical copula families
+    //! @brief The BB7 copula
     //!
     //! This class is used in the implementation underlying the Bicop class. 
     //! Users should not use AbstractBicop or derived classes directly, but 
@@ -18,18 +18,21 @@ namespace vinecopulib
     //! 
     //! @literature
     //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
-    class EllipticalBicop : public ParBicop
+    class Bb7Bicop : public ArchimedeanBicop
     {
+    public:
+        // constructor
+        Bb7Bicop();
+
     private:
-        // hfunction and its inverse
-        Eigen::VectorXd hfunc2(
-            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
-        );
-        Eigen::VectorXd hinv2(
-            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
-        );
+        // generator, its inverse and derivatives for the archimedean copula
+        double generator(const double& u);
+        double generator_inv(const double& u);
+        double generator_derivative(const double& u);
+        double generator_derivative2(const double& u);
 
         // link between Kendall's tau and the par_bicop parameter
-        double parameters_to_tau(const Eigen::VectorXd& parameters);
+        double parameters_to_tau(const Eigen::VectorXd& par);
+        Eigen::MatrixXd tau_to_parameters(const double& tau);
     };
 }

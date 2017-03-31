@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "bicop/kernel.hpp"
+#include <vinecopulib/bicop/kernel.hpp>
 
 namespace vinecopulib
 {

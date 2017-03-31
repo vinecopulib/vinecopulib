@@ -9,8 +9,8 @@
 #include <memory>
 #include <vector>
 
-#include "misc/tools_eigen.hpp"
-#include "bicop/family.hpp"
+#include <vinecopulib/misc/tools_eigen.hpp>
+#include <vinecopulib/bicop/family.hpp>
 
 // Pre-declaration to allow AbtractBicop to befriend the two functions
 namespace tools_optimization

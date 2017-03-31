@@ -4,8 +4,8 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "vinecop/rvine_matrix.hpp"
-#include "misc/tools_stl.hpp"
+#include <vinecopulib/vinecop/rvine_matrix.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 
 namespace vinecopulib
 {
@@ -40,7 +40,7 @@ namespace vinecopulib
     {
         size_t d = order.size();
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> vine_matrix(d, d);
-        vine_matrix.array() = 0;
+        vine_matrix.fill(0);
 
         for (size_t i = 0; i < d; ++i) {
             vine_matrix(d - 1 - i, i) = order(d - 1 - i);  // diagonal

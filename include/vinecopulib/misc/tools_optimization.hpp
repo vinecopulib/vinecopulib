@@ -7,8 +7,8 @@
 #pragma once
 
 #include <nlopt.hpp>
-#include "misc/tools_eigen.hpp"
-#include "bicop/parametric.hpp"
+#include <vinecopulib/misc/tools_eigen.hpp>
+#include <vinecopulib/bicop/parametric.hpp>
 
 namespace tools_optimization {
 
