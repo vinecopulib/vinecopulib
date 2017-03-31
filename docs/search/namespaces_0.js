@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['tools_5feigen',['tools_eigen',['../namespacetools__eigen.html',1,'']]],
-  ['tools_5foptimization',['tools_optimization',['../namespacetools__optimization.html',1,'']]],
-  ['tools_5fstats',['tools_stats',['../namespacetools__stats.html',1,'']]]
+  ['bicop_5ffamilies',['bicop_families',['../namespacevinecopulib_1_1bicop__families.html',1,'vinecopulib']]],
+  ['tools_5feigen',['tools_eigen',['../namespacevinecopulib_1_1tools__eigen.html',1,'vinecopulib']]],
+  ['tools_5foptimization',['tools_optimization',['../namespacevinecopulib_1_1tools__optimization.html',1,'vinecopulib']]],
+  ['tools_5fstats',['tools_stats',['../namespacevinecopulib_1_1tools__stats.html',1,'vinecopulib']]],
+  ['vinecopulib',['vinecopulib',['../namespacevinecopulib.html',1,'']]]
 ];

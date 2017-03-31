@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['optimizer',['Optimizer',['../classtools__optimization_1_1_optimizer.html',1,'tools_optimization']]]
+  ['optimizer',['Optimizer',['../classvinecopulib_1_1tools__optimization_1_1_optimizer.html',1,'vinecopulib::tools_optimization']]]
 ];
