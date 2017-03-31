@@ -4,12 +4,12 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include "vinecop/class.hpp"
-#include "misc/tools_stl.hpp"
-#include "misc/tools_stats.hpp"
-#include <vector>
+#include <vinecopulib/vinecop/class.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
+
 #include <exception>
-#include <iostream>
+#include <vector>
 
 namespace vinecopulib
 {
@@ -166,7 +166,9 @@ namespace vinecopulib
     
             // print out fitted pair-copulas for this tree
             if (controls.get_show_trace()) {
-                std::cout << "Tree " << t - 1 << ":" << std::endl;
+                std::stringstream tree_info;
+                tree_info << "Tree " << t - 1 << ":" << std::endl;
+                tools_interface::print(tree_info.str().c_str());
                 print_pair_copulas(trees[t]);
             }
     
@@ -270,7 +272,7 @@ namespace vinecopulib
         using namespace tools_stl;
         size_t d = trees.size();
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d, d);
-        mat.array() = 0;
+        mat.fill(0);
     
         for (size_t col = 0; col < d - 1; ++col) {
             size_t t = d - 1 - col;

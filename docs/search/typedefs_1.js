@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['matrixxb',['MatrixXb',['../namespacetools__eigen.html#ad496806a2d02c8e881330d95e0c150aa',1,'tools_eigen']]]
+  ['matrixxb',['MatrixXb',['../namespacevinecopulib_1_1tools__eigen.html#a2fcd63009df35741859f44f1e41931f9',1,'vinecopulib::tools_eigen']]]
 ];

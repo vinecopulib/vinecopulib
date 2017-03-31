@@ -1,6 +1,6 @@
 # vinecopulib
 [![Build Status](https://travis-ci.org/vinecopulib/vinecopulib.svg?branch=master)](https://travis-ci.org/vinecopulib/vinecopulib)
-[![Windows Build status](http://ci.appveyor.com/api/projects/status/github/vinecopulib/vinecopulib?svg=true)](https://ci.appveyor.com/project/vinecopulib/vinecopulib)
+[![Windows Build status](http://ci.appveyor.com/api/projects/status/github/vinecopulib/vinecopulib?branch=master&svg=true)](https://ci.appveyor.com/project/vinecopulib/vinecopulib/branch/master)
 [![Coverage Status](https://img.shields.io/codecov/c/github/vinecopulib/vinecopulib/master.svg)](https://codecov.io/github/vinecopulib/vinecopulib?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
  
@@ -27,7 +27,8 @@ Advantages over VineCopula are
 
 #### Status
  
-Version 0.0.1 was released on March 29, 2017. While we did our best to 
+Version [0.0.2](https://github.com/vinecopulib/vinecopulib/releases) was 
+released on March 31, 2017. While we did our best to 
 design a user-friendly API, the library is still under active development and 
 changes are to be expected. We are also working on interfaces for R and python.
 

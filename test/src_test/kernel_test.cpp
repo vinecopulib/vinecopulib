@@ -5,7 +5,7 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include "include/kernel_test.hpp"
-#include "include/misc/tools_stats.hpp"
+#include <vinecopulib/misc/tools_stats.hpp>
 
 TrafokernelTest::TrafokernelTest() {
     bicop_ = Bicop(vinecopulib::BicopFamily::tll0, 0);

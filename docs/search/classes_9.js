@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nloptcontrols',['NLoptControls',['../classtools__optimization_1_1_n_lopt_controls.html',1,'tools_optimization']]]
+  ['nloptcontrols',['NLoptControls',['../classvinecopulib_1_1tools__optimization_1_1_n_lopt_controls.html',1,'vinecopulib::tools_optimization']]]
 ];

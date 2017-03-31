@@ -7,8 +7,8 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/misc/tools_stats.hpp"
-#include "include/misc/tools_stl.hpp"
+#include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 
 namespace test_tools_stats {
 
@@ -23,7 +23,7 @@ namespace test_tools_stats {
         X.col(1) = Eigen::VectorXd::LinSpaced(n,n,1);
 
         // U = pobs(X)
-        Eigen::MatrixXd U = tools_stats::to_pseudo_obs(X);
+        Eigen::MatrixXd U = vinecopulib::tools_stats::to_pseudo_obs(X);
         for (int i = 0; i < 9; i++) {
             EXPECT_NEAR(U(i,0), (i+1.0)*0.1, 1e-2);
             EXPECT_NEAR(U(i,1), 1.0-(i+1.0)*0.1, 1e-2);
@@ -41,14 +41,14 @@ namespace test_tools_stats {
         X.col(1) = Eigen::VectorXd::LinSpaced(n,n,1);
 
         // Perfect dependence
-        double computed_hoeffd = tools_stats::pairwise_hoeffd(X);
+        double computed_hoeffd = vinecopulib::tools_stats::pairwise_hoeffd(X);
         double true_hoeffd = 1.0;
         EXPECT_NEAR(computed_hoeffd, true_hoeffd, 1e-3);
 
         // Independence
         Eigen::MatrixXd X2(5,2);
         X2 << -2,4,-1,1,0,0,1,2,2,3;
-        computed_hoeffd = tools_stats::pairwise_hoeffd(X2);
+        computed_hoeffd = vinecopulib::tools_stats::pairwise_hoeffd(X2);
         true_hoeffd = 0.0;
         EXPECT_NEAR(computed_hoeffd, true_hoeffd, 1e-3);
     }

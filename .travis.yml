@@ -50,7 +50,7 @@ script:
   - cd ../examples/bicop
   - mkdir build
   - cd build
-  - cmake .. && make
+  - cmake .. && VERBOSE=1 make
   - cd ../bin
   - ./main
 
@@ -65,7 +65,3 @@ after_success:
   - lcov --list coverage.info #debug info
   # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
-
-notifications:
-  email:
-    - thibault.vatter@gmail.com
