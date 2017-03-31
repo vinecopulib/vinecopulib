@@ -9,9 +9,20 @@
 // interface specfifc #defines can be set here 
 // (R package does: #define INTERFACED_FROM_R)
 
-#ifndef INTERFACED_FROM_R  // cout is not allowed for R packages
+#ifndef INTERFACED_FROM_R
     #include <iostream>
-    #define cout std::cout
-#else
-    #define cout Rcpp::Rcout
 #endif
+
+namespace vinecopulib {
+
+    namespace tools_interface {
+        inline void print(std::string text)
+        {
+            #ifndef INTERFACED_FROM_R
+
+            #else
+                Rcpp::cout << text;
+            #endif
+        };
+    }
+}

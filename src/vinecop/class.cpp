@@ -5,7 +5,6 @@
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
 #include <vinecopulib/vinecop/class.hpp>
-#include <vinecopulib/misc/interface_options.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 
@@ -167,7 +166,9 @@ namespace vinecopulib
     
             // print out fitted pair-copulas for this tree
             if (controls.get_show_trace()) {
-                cout << "Tree " << t - 1 << ":" << std::endl;
+                std::stringstream tree_info;
+                tree_info << "Tree " << t - 1 << ":" << std::endl;
+                tools_interface::print(tree_info.str().c_str());
                 print_pair_copulas(trees[t]);
             }
     

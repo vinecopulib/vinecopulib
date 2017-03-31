@@ -291,13 +291,9 @@ namespace tools_structselect {
     {
         for (auto e : boost::edges(tree)) {
             std::stringstream pc_info;
-            pc_info <<
-                    get_pc_index(e, tree) << " <-> " <<
-                    "fam = " << tree[e].pair_copula.get_family_name() <<
-                    ", rot = " << tree[e].pair_copula.get_rotation() <<
-                    ", par = " <<  tree[e].pair_copula.get_parameters() <<
-                    std::endl;
-            cout << pc_info.str().c_str();
+            pc_info << get_pc_index(e, tree) << " <-> " <<
+                        tree[e].pair_copula.str() << std::endl;
+            vinecopulib::tools_interface::print(pc_info.str().c_str());
         }
     }
 
