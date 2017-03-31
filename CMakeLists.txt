@@ -21,5 +21,3 @@ include(cmake/compilerDefOpt.cmake        REQUIRED)
 include(cmake/buildTargets.cmake          REQUIRED)
 
 include(cmake/printInfo.cmake             REQUIRED)
-
-include(cmake/gitRevision.cmake           REQUIRED)
