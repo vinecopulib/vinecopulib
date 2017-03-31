@@ -6,6 +6,7 @@
 
 #include <vinecopulib/vinecop/fit_controls.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
+#include <exception>
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib
