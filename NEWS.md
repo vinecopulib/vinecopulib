@@ -10,7 +10,7 @@ MAJOR CHANGES
     * removed abitility to extract the git revision (#124).
 
     * new header `misc/tools_interface.hpp` where interface-specific behavior
-      can be defined (for exaple, a custom version of `std::cout`) (#136).
+      can be defined (for example, a custom version of `std::cout`) (#136).
 
 BUG FIXES
 
