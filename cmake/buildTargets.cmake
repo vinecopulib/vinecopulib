@@ -85,7 +85,7 @@ endif(BUILD_TESTING)
             EXPORT "${targets_export_name}"
             LIBRARY DESTINATION "lib"
             ARCHIVE DESTINATION "lib"
-            RUNTIME DESTINATION "bin"
+            RUNTIME DESTINATION "lib" # on Windows, the dll file is categorised as RUNTIME
     )
 
     # Headers:
