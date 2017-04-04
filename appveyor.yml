@@ -62,7 +62,7 @@ build_script:
   - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_PREFIX_PATH=C:\projects\vinecopulib-install
   - cmake --build . --config Release
   - cd ..\bin\Release
-  - main.exe
+  - #main.exe
   - cd ..\..\..\..
   
 #on_finish:
