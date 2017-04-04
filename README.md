@@ -413,7 +413,7 @@ described [below](#fit-and-select-a-vine-copula-model).
 
 ### How to read the R-vine matrix
 
-The R-vine matrix notation in vinecopulib different from the one in VineCopula.
+The R-vine matrix notation in vinecopulib is different from the one in VineCopula.
 An example matrix is
 ```
 1 1 1 1
