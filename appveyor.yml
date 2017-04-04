@@ -54,8 +54,15 @@ build_script:
   - #bin\Release\test_all.exe
   
   - cmake --build . --config Release --target install
-
   - cd ..
+  
+  - cd examples/bicop
+  - md build
+  - cd build
+  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%"
+  - cmake --build . --config Release
+  - ../bin/main.exe
+  - cd ../../..
   
 #on_finish:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
