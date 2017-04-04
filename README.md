@@ -389,7 +389,7 @@ int d = 3;
 Vinecop default_model(d);
 
 // alternatively, instantiate a std::vector<std::vector<Bicop>> object
-auto pair_copulas = Vinecop::make_pair_copula_store(3);  
+auto pair_copulas = Vinecop::make_pair_copula_store(d);  
 
 // specify the pair copulas
 auto par = Eigen::VectorXd::Constant(1, 3.0);
