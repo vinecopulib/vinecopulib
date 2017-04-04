@@ -61,9 +61,9 @@ build_script:
   - cd build
   - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_PREFIX_PATH=C:\projects\vinecopulib-install
   - cmake --build . --config Release
-  - cd ..\bin
+  - cd ..\bin\Release
   - main.exe
-  - cd ..\..\..
+  - cd ..\..\..\..
   
 #on_finish:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
