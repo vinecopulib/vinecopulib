@@ -209,8 +209,8 @@ namespace vinecopulib
                 message <<
                     "parameters exceed lower bound " << 
                     "for " << get_family_name() << " copula; \n" << 
-                    "bound: " << parameters_lower_bounds_ << "\n" <<
-                    "actual: " << parameters << "\n";
+                    "bound:\n" << parameters_lower_bounds_ << "\n" <<
+                    "actual:\n" << parameters << "\n";
                 throw std::runtime_error(message.str().c_str());  
             }
         }
@@ -224,8 +224,8 @@ namespace vinecopulib
                 message <<
                     "parameters exceed upper bound " << 
                     "for " << get_family_name() << " copula; \n" << 
-                    "bound: " << parameters_upper_bounds_ << "\n" <<
-                    "actual: " << parameters << "\n";
+                    "bound:\n" << parameters_upper_bounds_ << "\n" <<
+                    "actual:\n" << parameters << "\n";
                 throw std::runtime_error(message.str().c_str());  
             }
         }
