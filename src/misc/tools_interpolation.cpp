@@ -24,14 +24,11 @@ namespace tools_interpolation {
     )
     {
         if (values.cols() != values.rows()) {
-            throw std::runtime_error(
-                    "values must be a quadratic matrix"
-            );
+            throw std::runtime_error("values must be a quadratic matrix");
         }
         if (grid_points.size() != values.rows()) {
             throw std::runtime_error(
-                    "number of grid_points must equal dimension of values"
-            );
+                    "number of grid_points must equal dimension of values");
         }
 
         grid_points_ = grid_points;
