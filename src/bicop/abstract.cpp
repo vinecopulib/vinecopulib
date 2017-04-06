@@ -208,7 +208,7 @@ namespace vinecopulib
             if ((parameters.array() < parameters_lower_bounds_.array()).any()) {
                 message <<
                     "parameters exceed lower bound " << 
-                    " for " << get_family_name() << " copula; \n" << 
+                    "for " << get_family_name() << " copula; \n" << 
                     "bound: " << parameters_lower_bounds_ << "\n" <<
                     "actual: " << parameters << "\n";
                 throw std::runtime_error(message.str().c_str());  
@@ -223,7 +223,7 @@ namespace vinecopulib
             if ((parameters.array() > parameters_upper_bounds_.array()).any()) {
                 message <<
                     "parameters exceed upper bound " << 
-                    " for " << get_family_name() << " copula; \n" << 
+                    "for " << get_family_name() << " copula; \n" << 
                     "bound: " << parameters_upper_bounds_ << "\n" <<
                     "actual: " << parameters << "\n";
                 throw std::runtime_error(message.str().c_str());  
