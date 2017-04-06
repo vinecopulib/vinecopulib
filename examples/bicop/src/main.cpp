@@ -11,7 +11,7 @@ int main() {
 	for (auto fam : family) {
 		std::cout << get_family_name(fam) << " ";
 	}
-	std::cout << "\n";
+	std::cout << std::endl;
 
 	// create Gumbel copula and simulate from the model
 	auto model = Bicop(BicopFamily::gumbel, 0, Eigen::VectorXd::Constant(1,2));
