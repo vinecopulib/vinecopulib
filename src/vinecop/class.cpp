@@ -126,6 +126,10 @@ namespace vinecopulib
     //!     object for the pair copula corresponding to tree `t` and edge `e`.
     std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(size_t d)
     {
+        if (d < 2) {
+            throw std::runtime_error("the dimension should be larger than 1");
+        }
+
         std::vector<std::vector<Bicop>> pc_store(d - 1);
         for (size_t t = 0; t < d - 1; ++t) {
             pc_store[t].resize(d - 1 - t);
