@@ -65,10 +65,10 @@ namespace vinecopulib
         if (pair_copulas.size() != d_ - 1) {
             std::stringstream message;
             message <<
-                    "size of of pair_copulas does not match dimension of matrix (" <<
-                    d_ << ")" <<
-                    "expected size:" << d_ - 1 << ", "<<
-                    "actual size:" << pair_copulas.size() << std::endl;
+                    "size of pair_copulas does not match dimension of matrix (" <<
+                    d_ << "); " <<
+                    "expected size: " << d_ - 1 << ", "<<
+                    "actual size: " << pair_copulas.size() << std::endl;
             throw std::runtime_error(message.str().c_str());
 
         }
@@ -76,10 +76,10 @@ namespace vinecopulib
             if (pair_copulas[t].size() != d_ - 1 - t) {
                 std::stringstream message;
                 message <<
-                        "size of of pair_copulas[" << t << "] " <<
-                        "does not match dimension of matrix (" << d_ << ")" <<
-                        "expected size:" << d_ - 1 - t << ", "<<
-                        "actual size:" << pair_copulas[t].size() << std::endl;
+                        "size of pair_copulas[" << t << "] " <<
+                        "does not match dimension of matrix (" << d_ << "); " <<
+                        "expected size: " << d_ - 1 - t << ", "<<
+                        "actual size: " << pair_copulas[t].size() << std::endl;
                 throw std::runtime_error(message.str().c_str());
             }
         }
