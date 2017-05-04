@@ -1,6 +1,6 @@
 platform: 
   - x86
-  - x64
+#  - x64
 
 init:
   - ps: |
@@ -28,9 +28,8 @@ install:
 
   - git clone git://github.com/stevengj/nlopt
   - cd nlopt
-  - cmake -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\nlopt-install .
+  - cmake -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\nlopt-install -DCMAKE_INSTALL_BINDIR=c:\projects\nlopt-install\lib .
   - cmake --build . --config Release --target install
-  - move c:\projects\nlopt-install\bin\nlopt.dll c:\projects\nlopt-install\lib\ 
   - cd ..
 
 before_build:
@@ -64,8 +63,8 @@ build_script:
   - main.exe
   - cd ..\..\..\..
   
-#on_finish:
-#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_success:
   - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build\Debug\vinecopulib.* build\Release\vinecopulib.*
