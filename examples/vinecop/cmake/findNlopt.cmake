@@ -22,9 +22,9 @@ set ( NLOPT_INCLUDE_DIRS ${NLOPT_INCLUDE_DIR} )
 # set NLOPT_LIBRARY
 find_library ( NLOPT_LIBRARY
         NAMES
-        ${TMP_NLOPT_NAME}
-        DOC
         nlopt
+        DOC
+        "Nlopt library location"
         )
 
 # set NLOPT_LIBRARIES
