@@ -31,6 +31,7 @@ namespace vinecopulib
         L(0,0) = 1;
         L(1,1) = 1/sqrt(1.0-pow(rho,2.0));
         L(0,1) = -rho*L(1,1);
+        L(1,0) = 0;
 
         // Compute copula density
         Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
