@@ -20,14 +20,9 @@ find_path ( NLOPT_INCLUDE_DIR
 set ( NLOPT_INCLUDE_DIRS ${NLOPT_INCLUDE_DIR} )
 
 # set NLOPT_LIBRARY
-if (WIN32)
-  set(TMP_NLOPT_NAME "libnlopt-0")
-else()
-  set(TMP_NLOPT_NAME "nlopt")
-endif()
 find_library ( NLOPT_LIBRARY
         NAMES
-        ${TMP_NLOPT_NAME}
+        nlopt
         DOC
         "Nlopt library location"
         )
