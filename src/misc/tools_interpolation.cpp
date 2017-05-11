@@ -158,7 +158,7 @@ namespace tools_interpolation {
         double upr, tmpint, tmpint1;
         ptrdiff_t n = u.rows();
         ptrdiff_t m = grid_points_.size();
-        Eigen::VectorXd tmpvals(m), tmpsvals2(m), out(n);
+        Eigen::VectorXd tmpvals(m), tmpvals2(m), out(n);
         Eigen::MatrixXd tmpgrid(m, 2);
         tmpgrid.col(1) = grid_points_;
 
@@ -168,11 +168,11 @@ namespace tools_interpolation {
                 tmpgrid.col(0) = Eigen::VectorXd::Constant(m,  grid_points_(k));
                 tmpvals = interpolate(tmpgrid);
                 tmpint = int_on_grid(upr, tmpvals, grid_points_);
-                tmpsvals2(i) = tmpint;
+                tmpvals2(i) = tmpint;
             }
             upr = u(i, 0);
-            tmpint = int_on_grid(upr, tmpsvals2, grid_points_);
-            tmpint1 = int_on_grid(1.0, tmpvals, grid_points_);
+            tmpint = int_on_grid(upr, tmpvals2, grid_points_);
+            tmpint1 = int_on_grid(1.0, tmpvals2, grid_points_);
             out(i) = tmpint/tmpint1;
             out(i) = fmax(out(i), 1e-10);
             out(i) = fmin(out(i), 1-1e-10);
