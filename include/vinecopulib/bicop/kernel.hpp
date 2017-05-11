@@ -33,6 +33,9 @@ namespace vinecopulib
         Eigen::VectorXd pdf(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
+        Eigen::VectorXd cdf(
+                const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+        );
         Eigen::VectorXd hfunc1(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
         );
