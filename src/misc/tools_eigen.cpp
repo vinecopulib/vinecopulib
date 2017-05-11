@@ -52,8 +52,8 @@ namespace tools_eigen
         return x_tmp;
     }
 
-    // expand a vector into a matrix with two columns where each row
-    // contains one combination of the vector elements
+    //! expand a vector into a matrix with two columns where each row
+    //! contains one combination of the vector elements
     //!
     //! @param grid_points the vector to expand.
     Eigen::Matrix<double, Eigen::Dynamic, 2> expand_grid(
