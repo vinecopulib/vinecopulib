@@ -39,16 +39,17 @@ install:
   ### Common
   - sudo Rscript -e 'withCallingHandlers(install.packages('$R_PACKAGES', repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
 
-  - cd ..
-  - git clone https://github.com/stevengj/nlopt.git
-  - cd nlopt
-  - mkdir build
-  - cd build
-  - cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release
-  - make
-  - sudo make install
-  - cd ../..
-  - cd vinecopulib
+  - if [ $TRAVIS_OS_NAME == linux ]; then cd ..; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then git clone https://github.com/stevengj/nlopt.git; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then cd nlopt; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then mkdir build; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then cd build; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then make; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo make install; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then cd ../..; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then cd vinecopulib; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install --HEAD nlopt; fi
   
 
 script:
