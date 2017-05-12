@@ -10,14 +10,10 @@ matrix:
   include:
     - os: linux
       dist: trusty
-      env: INTEL_COMPILER=true
+      env: COMPILER=icc
     - os: linux
       dist: trusty
       compiler: clang
-      env: INTEL_COMPILER=false
-    - os: linux
-      dist: trusty
-      env: INTEL_COMPILER=false
     - os: linux
       dist: trusty
     - os: osx
@@ -27,17 +23,17 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ]; then export PATH=/usr/bin:$PATH; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ zesty main universe"; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
-  - if [ $TRAVIS_OS_NAME == linux & $INTEL_COMPILER=true ]; then wget -q -O /dev/stdout \
-                                                                   'https://raw.githubusercontent.com/nemequ/icc-travis/master/install-icc.sh' | \
-                                                                   /bin/sh; fi
-  - if [ $TRAVIS_OS_NAME == linux & $INTEL_COMPILER=true ]; then ./install-icc.sh; fi
+  - if [ $COMPILER == icc ]; then wget -q -O /dev/stdout \
+                                 'https://raw.githubusercontent.com/nemequ/icc-travis/master/install-icc.sh' | \
+                                 /bin/sh; fi
+  - if [ $COMPILER == icc ]; then ./install-icc.sh; fi
 
 install:
   ### LINUX
   ## INTEL COMPILER
-  - if [ $TRAVIS_OS_NAME == linux & $INTEL_COMPILER=true ]; then source ~/.bashrc; fi
-  - if [ $TRAVIS_OS_NAME == linux & $INTEL_COMPILER=true ]; then CC=icc; fi
-  - if [ $TRAVIS_OS_NAME == linux & $INTEL_COMPILER=true ]; then CXX=icpc; fi
+  - if [ $COMPILER == icc ]; then source ~/.bashrc; fi
+  - if [ $COMPILER == icc ]; then CC=icc; fi
+  - if [ $COMPILER == icc ]; then CXX=icpc; fi
   ## COMMON
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y lcov libnlopt-dev libgsl0-dev libeigen3-dev libboost1.63-dev; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev g++; fi
@@ -73,7 +69,7 @@ script:
   - ./main
 
 after_script:
-  - if [ $TRAVIS_OS_NAME == linux & $INTEL_COMPILER=true ]; then '[[ ! -z "${INTEL_INSTALL_PATH}" ]] && uninstall_intel_software'; fi
+  - if [ $COMPILER == icc ]; then '[[ ! -z "${INTEL_INSTALL_PATH}" ]] && uninstall_intel_software'; fi
 
 after_success:
   # Creating report
