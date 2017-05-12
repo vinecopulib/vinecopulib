@@ -367,16 +367,12 @@ namespace vinecopulib
             }
         } else {
             if (intersect(family_set, bicop_families::all).empty()) {
-                throw std::runtime_error(
-                        std::string("One of the families is not implemented")
-                );
+                throw std::runtime_error("One of the families is not implemented");
             }
             if (method == "itau") {
                 family_set = intersect(family_set, bicop_families::itau);
                 if (family_set.empty()) {
-                    throw std::runtime_error(
-                            std::string("No family with method itau provided")
-                    );
+                    throw std::runtime_error("No family with method itau provided");
                 }
             }
         }
@@ -393,7 +389,8 @@ namespace vinecopulib
 
         std::vector<double> c(2);
         if (preselect_families) {
-            c = get_c1c2(data, tau);
+            rotation_ = 0;
+            c = get_c1c2(cut_and_rotate(data), tau);
         }
 
         // Create the combinations of families and rotations to estimate
