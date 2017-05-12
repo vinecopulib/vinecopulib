@@ -23,9 +23,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ]; then export PATH=/usr/bin:$PATH; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ zesty main universe"; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
-  - if [ $COMPILER == icc ]; then wget -q -O /dev/stdout \
-                                 'https://raw.githubusercontent.com/nemequ/icc-travis/master/install-icc.sh' | \
-                                 /bin/sh; fi
+  - if [ $COMPILER == icc ]; then wget "https://raw.githubusercontent.com/nemequ/icc-travis/master/install-icc.sh"; fi
   - if [ $COMPILER == icc ]; then ./install-icc.sh; fi
 
 install:
