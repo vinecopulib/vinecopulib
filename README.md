@@ -67,11 +67,18 @@ To build the library, you'll need:
    * [CMake](https://cmake.org/)
    * [Boost 1.63](http://www.boost.org/)
    * [Eigen 3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page)
-   * [NLopt](http://ab-initio.mit.edu/wiki/index.php/NLopt)
+   * [NLopt](https://github.com/stevengj/nlopt)
 
 Optionally, you'll need:
    * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
    * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
+
+Since NLopt has not had a release for over three years (as of May 2017) while 
+some maintanance work is done on the github repo, we suggest using the github
+version (and not the release from ab-initio.mit.edu) what is assumed in the
+vinecopulib's CMake scripts. OSX users can easily obtain the github version 
+using Homebrew with `brew install --HEAD nlopt`, Windows and Linux users
+are encouraged to compile nlopt manually from source.
 
 Note that a `findR.cmake` looks for R and VineCopula in the default locations
 for linux and osx, but problems might occur with versions installed from
@@ -79,7 +86,6 @@ R/RStudio. Therefore, prior to building the library, it is recommended to use:
 
 `sudo Rscript -e 'install.packages(c("VineCopula"), lib="/usr/lib/R/library",
 repos="http://cran.rstudio.com/")'`
-
 
 ### How to build the library
 
