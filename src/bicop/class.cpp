@@ -55,6 +55,36 @@ namespace vinecopulib
         return f;
     }
 
+    //! evaluates the copula distribution.
+    //!
+    //! @param u \f$n \times 2\f$ matrix of evaluation points.
+    //! @return The copula distribution evaluated at \c u.
+    Eigen::VectorXd Bicop::cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+    {
+        Eigen::VectorXd p = bicop_->cdf(cut_and_rotate(u));
+        switch (rotation_) {
+            case 0:
+                return p;
+
+            case 90:
+                return u.col(1) - p;
+
+            case 180: {
+                Eigen::VectorXd f = Eigen::VectorXd::Ones(p.rows());
+                f = f - u.rowwise().sum();
+                return p - f;
+            }
+
+            case 270:
+                return u.col(0) - p;
+
+            default:
+                throw std::runtime_error(std::string(
+                        "rotation can only take values in {0, 90, 180, 270}"
+                ));
+        }
+    }
+
     //! calculates the first h-function, i.e., 
     //! \f$ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) \f$.
     //! @param u \f$m \times 2\f$ matrix of evaluation points.

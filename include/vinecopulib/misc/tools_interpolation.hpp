@@ -25,6 +25,7 @@ namespace tools_interpolation {
 
         Eigen::VectorXd interpolate(const Eigen::MatrixXd& x);
         Eigen::VectorXd intergrate_1d(const Eigen::MatrixXd& u, size_t cond_var);
+        Eigen::VectorXd intergrate_2d(const Eigen::MatrixXd& u);
 
     private:
         // Utility functions for spline Interpolation
@@ -39,7 +40,7 @@ namespace tools_interpolation {
 
         Eigen::VectorXd grid_points_;
         Eigen::MatrixXd values_;
-    };    
+    };
 }
 
 }

@@ -28,6 +28,12 @@ namespace vinecopulib
     {
         return interp_grid_.interpolate(u);
     }
+    Eigen::VectorXd KernelBicop::cdf(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
+    {
+        return interp_grid_.intergrate_2d(u);
+    }
     Eigen::VectorXd KernelBicop::hfunc1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )

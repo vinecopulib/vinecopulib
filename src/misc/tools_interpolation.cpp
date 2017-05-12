@@ -148,6 +148,39 @@ namespace tools_interpolation {
         return out;
     }
 
+    //! Integrate the grid along the two axis
+    //!
+    //! @param u mx2 matrix of evaluation points
+    //!
+    Eigen::VectorXd InterpolationGrid::intergrate_2d(const Eigen::MatrixXd& u)
+    {
+
+        double upr, tmpint, tmpint1;
+        ptrdiff_t n = u.rows();
+        ptrdiff_t m = grid_points_.size();
+        Eigen::VectorXd tmpvals(m), tmpvals2(m), out(n);
+        Eigen::MatrixXd tmpgrid(m, 2);
+        tmpgrid.col(1) = grid_points_;
+
+        for (ptrdiff_t i = 0; i < n; ++i) {
+            upr = u(i, 1);
+            for (ptrdiff_t k = 0; k < m-1; ++k) {
+                tmpgrid.col(0) = Eigen::VectorXd::Constant(m,  grid_points_(k));
+                tmpvals = interpolate(tmpgrid);
+                tmpint = int_on_grid(upr, tmpvals, grid_points_);
+                tmpvals2(i) = tmpint;
+            }
+            upr = u(i, 0);
+            tmpint = int_on_grid(upr, tmpvals2, grid_points_);
+            tmpint1 = int_on_grid(1.0, tmpvals2, grid_points_);
+            out(i) = tmpint/tmpint1;
+            out(i) = fmax(out(i), 1e-10);
+            out(i) = fmin(out(i), 1-1e-10);
+        }
+
+        return out;
+    }
+
 // ---------------- Utility functions for spline interpolation ----------------
 
     //! Evaluate a cubic polynomial

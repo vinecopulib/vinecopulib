@@ -21,6 +21,16 @@ namespace vinecopulib
         return u.col(0).binaryExpr(u.col(1), f);
     }
 
+    Eigen::VectorXd ArchimedeanBicop::cdf(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
+    {
+        auto f = [this](const double& u, const double& v) {
+            return generator_inv(generator(u) + generator(v));
+        };
+        return u.col(0).binaryExpr(u.col(1), f);
+    }
+
     Eigen::VectorXd ArchimedeanBicop::hfunc1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
