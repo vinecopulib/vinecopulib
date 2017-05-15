@@ -10,6 +10,9 @@ matrix:
   include:
     - os: linux
       dist: trusty
+      env: COMPILER=icc
+    - os: linux
+      dist: trusty
     - os: osx
       osx_image: xcode8.2
 
@@ -52,13 +55,17 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install --HEAD nlopt; fi
   
 
+  - if [ $COMPILER == icc ]; then wget "https://raw.githubusercontent.com/nemequ/icc-travis/master/install-icc.sh"; fi
+  - if [ $COMPILER == icc ]; then sudo sh install-icc.sh; fi
+  - if [ $COMPILER == icc ]; then source ~/.bashrc; fi
+
 script:
   - mkdir release
   - mkdir debug
   - cd debug
   - cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug && make vinecopulib_coverage
   - cd ../release
-  - cmake .. -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
+  - cmake .. -DCMAKE_BUILD_TYPE=Release $([ "${COMPILER}" == "icc" ] && echo "-DCMAKE_CXX_COMPILER=icpc -DCMAKE_C_COMPILER=icc" || echo "") && make && sudo make install && make doc
   - bin/test_all
   - cd ../examples/bicop
   - mkdir build
