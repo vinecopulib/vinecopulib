@@ -29,7 +29,7 @@ before_install:
 
 install:
   ### LINUX
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y lcov libgsl0-dev libeigen3-dev libboost1.63-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y lcov libnlopt-dev libgsl0-dev libeigen3-dev libboost1.63-dev; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev g++; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y doxygen doxygen-doc doxygen-gui graphviz; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get autoremove; fi # in particular remove old compilers so that new ones are the default
@@ -47,9 +47,6 @@ install:
   ### Common
   - sudo Rscript -e 'withCallingHandlers(install.packages('$R_PACKAGES', repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
 
-  - if [ $COMPILER == icc ]; then CC=icc; fi
-  - if [ $COMPILER == icc ]; then CXX=icpc; fi
-  - if [ $COMPILER == icc ]; then sudo apt-get install --no-install-recommends -t zesty -y libnlopt-dev; fi
 script:
   - mkdir release
   - mkdir debug
