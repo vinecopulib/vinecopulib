@@ -7,12 +7,12 @@ matrix:
     - os: linux
       dist: trusty
       env: COMPILER=icc
-    - os: linux
-      dist: trusty
-      env: COMPILER=clang
-    - os: linux
-      dist: trusty
-      env: COMPILER=gcc
+#    - os: linux
+#      dist: trusty
+#      env: COMPILER=clang
+#    - os: linux
+#      dist: trusty
+#      env: COMPILER=gcc
 #    - os: osx
 #      osx_image: xcode8.2
 
@@ -50,18 +50,18 @@ install:
 script:
   - mkdir release
   - mkdir debug
-  - cd debug
-  - cmake .. $CMAKE_ARGS -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
-  - if [ $COMPILER == gcc ]; then make vinecopulib_coverage; else make; fi
+  #- cd debug
+  #- cmake .. $CMAKE_ARGS -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+  #- if [ $COMPILER == gcc ]; then make vinecopulib_coverage; else make; fi
   - cd ../release
   - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
   - bin/test_all
-  - cd ../examples/bicop
-  - mkdir build
-  - cd build
-  - cmake .. $CMAKE_ARGS && VERBOSE=1 make
-  - cd ../bin
-  - ./main
+  #- cd ../examples/bicop
+  #- mkdir build
+  #- cd build
+  #- cmake .. $CMAKE_ARGS && VERBOSE=1 make
+  #- cd ../bin
+  #- ./main
 
 after_script:
   - if [ $COMPILER == icc ]; then '[[ ! -z "${INTEL_INSTALL_PATH}" ]] && uninstall_intel_software'; fi
