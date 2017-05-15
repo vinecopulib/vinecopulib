@@ -29,7 +29,7 @@ before_install:
   - if [ $COMPILER == icc ]; then source ~/.bashrc; fi
   - if [ $COMPILER == icc ]; then export CMAKE_ARGS="-DCMAKE_CXX_COMPILER=icpc -DCMAKE_C_COMPILER=icc"; fi
   - if [ $COMPILER == clang ]; then export CMAKE_ARGS="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"; fi
-  - if [ $COMPILER == gcc ]; then export CMAKE_ARGS="-DCMAKE_CODE_COVERAGE=ON"; fi
+  - if [ $COMPILER == gcc ]; then export CMAKE_ARGS="-DCODE_COVERAGE=ON"; fi
 
 install:
   ### LINUX
@@ -55,7 +55,8 @@ script:
   - mkdir release
   - mkdir debug
   - cd debug
-  - cmake .. $CMAKE_ARGS -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug && make vinecopulib_coverage
+  - cmake .. $CMAKE_ARGS -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+  - if [ $COMPILER == gcc ]; then make vinecopulib_coverage else make; fi
   - cd ../release
   - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
   - bin/test_all
@@ -71,12 +72,12 @@ after_script:
 
 after_success:
   # Creating report
-  - if [ $COMPILER == gcc ]; cd debug; fi
-  - if [ $COMPILER == gcc ]; lcov --directory . --capture --output-file coverage.info; fi # capture coverage info
-  - if [ $COMPILER == gcc ]; lcov --remove coverage.info '/usr/*' --output-file coverage.info; fi # filter out external includes
-  - if [ $COMPILER == gcc ]; lcov --remove coverage.info '/Applications/*' --output-file coverage.info; fi # filter out more external includes
-  - if [ $COMPILER == gcc ]; lcov --remove coverage.info '*test*' --output-file coverage.info; fi # filter out tests
-  - if [ $COMPILER == gcc ]; lcov --remove coverage.info '*examples*' --output-file coverage.info; fi # filter out examples
-  - if [ $COMPILER == gcc ]; lcov --list coverage.info; fi #debug info
+  - if [ $COMPILER == gcc ]; then cd debug; fi
+  - if [ $COMPILER == gcc ]; then lcov --directory . --capture --output-file coverage.info; fi # capture coverage info
+  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '/usr/*' --output-file coverage.info; fi # filter out external includes
+  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '/Applications/*' --output-file coverage.info; fi # filter out more external includes
+  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '*test*' --output-file coverage.info; fi # filter out tests
+  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '*examples*' --output-file coverage.info; fi # filter out examples
+  - if [ $COMPILER == gcc ]; then lcov --list coverage.info; fi #debug info
   # Uploading report to CodeCov
-  - if [ $COMPILER == gcc ]; bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"; fi
+  - if [ $COMPILER == gcc ]; then bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"; fi
