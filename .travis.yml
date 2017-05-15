@@ -50,7 +50,7 @@ install:
 script:
   - mkdir release
   - mkdir debug
-  #- cd debug
+  - cd debug
   #- cmake .. $CMAKE_ARGS -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
   #- if [ $COMPILER == gcc ]; then make vinecopulib_coverage; else make; fi
   - cd ../release
