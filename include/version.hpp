@@ -24,5 +24,3 @@
 //  number, y is the minor version number, and z is the patch level if not 0.
 
 #define VINECOPULIB_LIB_VERSION "0_0_3"
-
-#endif
