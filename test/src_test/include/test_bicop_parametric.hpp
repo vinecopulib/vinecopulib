@@ -12,6 +12,7 @@
 namespace test_bicop_parametric {
     using namespace vinecopulib;
     using namespace tools_stl;
+    std::vector<int> rotations = {0,90};
 
     // Test if the C++ implementation of the basic methods is correct
     TEST_P(ParBicopTest, parametric_bicop_is_correct) {
@@ -126,7 +127,7 @@ namespace test_bicop_parametric {
             ParBicopTest,
             testing::Combine(
                     testing::ValuesIn(bicop_families::parametric),
-                    testing::ValuesIn({0,90})
+                    testing::ValuesIn(rotations)
             )
     );
 }
