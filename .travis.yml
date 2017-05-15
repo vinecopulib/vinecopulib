@@ -14,9 +14,9 @@ matrix:
     - os: linux
       dist: trusty
       env: COMPILER=clang
-#    - os: linux
-#      dist: trusty
-#      env: COMPILER=gcc
+    - os: linux
+      dist: trusty
+      env: COMPILER=gcc
 #    - os: osx
 #      osx_image: xcode8.2
 
@@ -29,6 +29,7 @@ before_install:
   - if [ $COMPILER == icc ]; then source ~/.bashrc; fi
   - if [ $COMPILER == icc ]; then export CMAKE_ARGS="-DCMAKE_CXX_COMPILER=icpc -DCMAKE_C_COMPILER=icc"; fi
   - if [ $COMPILER == clang ]; then export CMAKE_ARGS="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"; fi
+  - if [ $COMPILER == gcc ]; then export CMAKE_ARGS="-DCMAKE_CODE_COVERAGE=ON"; fi
 
 install:
   ### LINUX
