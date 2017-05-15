@@ -16,6 +16,7 @@ matrix:
       env: COMPILER=clang
 #    - os: linux
 #      dist: trusty
+#      env: COMPILER=gcc
 #    - os: osx
 #      osx_image: xcode8.2
 
@@ -60,7 +61,7 @@ script:
   - cd ../examples/bicop
   - mkdir build
   - cd build
-  - cmake .. && VERBOSE=1 make
+  - cmake .. $CMAKE_ARGS && VERBOSE=1 make
   - cd ../bin
   - ./main
 
@@ -69,12 +70,12 @@ after_script:
 
 after_success:
   # Creating report
-  - cd debug
-  - lcov --directory . --capture --output-file coverage.info # capture coverage info
-  - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out external includes
-  - lcov --remove coverage.info '/Applications/*' --output-file coverage.info # filter out more external includes
-  - lcov --remove coverage.info '*test*' --output-file coverage.info # filter out tests
-  - lcov --remove coverage.info '*examples*' --output-file coverage.info # filter out examples
-  - lcov --list coverage.info #debug info
+  - if [ $COMPILER == gcc ]; cd debug; fi
+  - if [ $COMPILER == gcc ]; lcov --directory . --capture --output-file coverage.info; fi # capture coverage info
+  - if [ $COMPILER == gcc ]; lcov --remove coverage.info '/usr/*' --output-file coverage.info; fi # filter out external includes
+  - if [ $COMPILER == gcc ]; lcov --remove coverage.info '/Applications/*' --output-file coverage.info; fi # filter out more external includes
+  - if [ $COMPILER == gcc ]; lcov --remove coverage.info '*test*' --output-file coverage.info; fi # filter out tests
+  - if [ $COMPILER == gcc ]; lcov --remove coverage.info '*examples*' --output-file coverage.info; fi # filter out examples
+  - if [ $COMPILER == gcc ]; lcov --list coverage.info; fi #debug info
   # Uploading report to CodeCov
-  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+  - if [ $COMPILER == gcc ]; bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"; fi
