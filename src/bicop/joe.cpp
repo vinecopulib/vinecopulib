@@ -132,8 +132,8 @@ double qcondjoe(double* q, double* u, double* de)
         c21 = -t9*t15*t16;
         pdf = -t8/t19*t31+t8*(*de)*t2*t13*t23*t16+t9*t31;
         iter++;
-        if(boost::math::isnan(pdf) ||
-                boost::math::isnan(c21) ) { diff/=-2.; }  // added for de>=30
+        if((boost::math::isnan)(pdf) ||
+                (boost::math::isnan)(c21) ) { diff/=-2.; }  // added for de>=30
         else diff=(c21-*q)/pdf;
         v-=diff;
         int iter2 = 0;

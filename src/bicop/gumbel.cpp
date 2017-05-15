@@ -91,9 +91,9 @@ double qcondgum(double* q, double* u, double* de)
     {
         g=a+de1*log(a)+con;
         gp=1.+de1/a;
-        if (boost::math::isnan(g) ||
-                boost::math::isnan(gp) ||
-                boost::math::isnan(g/gp) ) {
+        if ((boost::math::isnan)(g) ||
+                (boost::math::isnan)(gp) ||
+                (boost::math::isnan)(g/gp) ) {
             // added for de>50
             dif/=-2.;
         } else {
