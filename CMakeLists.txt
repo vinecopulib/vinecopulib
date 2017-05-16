@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 set(CMAKE_CXX_STANDARD 11)
 
-project(vinecopulib VERSION 0.0.1)
+project(vinecopulib VERSION 0.0.3)
 
 include(cmake/options.cmake               REQUIRED)
 

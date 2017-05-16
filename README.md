@@ -2,23 +2,23 @@
 [![Build Status](https://travis-ci.org/vinecopulib/vinecopulib.svg?branch=master)](https://travis-ci.org/vinecopulib/vinecopulib)
 [![Windows Build status](http://ci.appveyor.com/api/projects/status/github/vinecopulib/vinecopulib?branch=master&svg=true)](https://ci.appveyor.com/project/vinecopulib/vinecopulib/branch/master)
 [![Coverage Status](https://img.shields.io/codecov/c/github/vinecopulib/vinecopulib/master.svg)](https://codecov.io/github/vinecopulib/vinecopulib?branch=master)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
- 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 #### What are vine copulas?
 
 Vine copulas are a flexible class of dependence models consisting of bivariate
-building blocks (see e.g., 
-[Aas et al., 2009](https://mediatum.ub.tum.de/doc/1083600/1083600.pdf)). 
-You can find a comprehensive list of publications and other materials on 
+building blocks (see e.g.,
+[Aas et al., 2009](https://mediatum.ub.tum.de/doc/1083600/1083600.pdf)).
+You can find a comprehensive list of publications and other materials on
 [vine-copula.org](http://www.statistics.ma.tum.de/en/research/vine-copula-models/).
 
 #### What is vinecopulib?
 
-vinecopulib is a C++ library for vine copula models based on 
-[Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). It provides 
-high-perfomance implementations of the core features of the popular 
-[VineCopula R library](https://github.com/tnagler/VineCopula), in particular 
-inference algorithms for both vine copula and bivariate copula models. 
+vinecopulib is a C++ library for vine copula models based on
+[Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). It provides
+high-perfomance implementations of the core features of the popular
+[VineCopula R library](https://github.com/tnagler/VineCopula), in particular
+inference algorithms for both vine copula and bivariate copula models.
 Advantages over VineCopula are  
 * interfaces to both both R and python (coming soon)
 * a sleaker and more modern API,
@@ -26,23 +26,24 @@ Advantages over VineCopula are
 * nonparametric and multi-parameter families.
 
 #### Status
- 
-Version [0.0.2](https://github.com/vinecopulib/vinecopulib/releases) was 
-released on March 31, 2017. While we did our best to 
-design a user-friendly API, the library is still under active development and 
+
+Version [0.0.2](https://github.com/vinecopulib/vinecopulib/releases) was
+released on March 31, 2017. While we did our best to
+design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for R and python.
 
 
 # Documentation
 
-Below, we give a brief overview of the most important functionality. The full 
-set of classes and methods can be found in the 
+Below, we give a brief overview of the most important functionality. The full
+set of classes and methods can be found in the
 [API documentation](https://vinecopulib.github.io/vinecopulib/).
 
 - [Getting started](#getting-started)
 	- [Requirements](#requirements)
 	- [How to build the library](#how-to-build-the-library)
 	- [How to include the library in other projects](#how-to-inlude-the-library-in-other-projects)
+	- [Namespaces](#namespaces)
 - [Bivariate copula models](#bivariate-copula-models)
 	- [Implemented bivariate copula families](#implemented-bivariate-copula-families)
 	- [Set up a custom bivariate copula model](#set-up-a-custom-bivariate-copula-model)
@@ -63,29 +64,34 @@ set of classes and methods can be found in the
 
 To build the library, you'll need:
 
-   * [a C++11-compatible    compiler](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers)
-   * [CMake](https://cmake.org/)
-   * [Boost 1.63](http://www.boost.org/)
-   * [Eigen 3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page)
-   * [NLopt](http://ab-initio.mit.edu/wiki/index.php/NLopt)
-   
+   * [a C++11-compatible compiler (tested with GCC 6.3.0 and Clang 3.5.0 on Linux and AppleClang 8.0.0 on OSX)](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers)
+   * [CMake 3.2 (or later)](https://cmake.org/)
+   * [Boost 1.56 (or later)](http://www.boost.org/)
+   * [Eigen 3.3 (or later)](http://eigen.tuxfamily.org/index.php?title=Main_Page)
+   * [NLopt](https://github.com/stevengj/nlopt)
+
 Optionally, you'll need:
    * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
    * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
-     
-Note that a `findR.cmake` looks for R and VineCopula in the default locations 
-for linux and osx, but problems might occur with versions installed from 
+
+Since NLopt has not had a release for over three years (as of May 2017) while 
+some maintanance work is done on the github repo, we suggest using the github
+version (and not the release from ab-initio.mit.edu). OSX users can easily 
+obtain the github version using Homebrew with `brew install --HEAD nlopt`, 
+Windows and Linux users are encouraged to compile nlopt manually from source.
+
+Note that a `findR.cmake` looks for R and VineCopula in the default locations
+for linux and osx, but problems might occur with versions installed from
 R/RStudio. Therefore, prior to building the library, it is recommended to use:
 
-`sudo Rscript -e 'install.packages(c("VineCopula"), lib="/usr/lib/R/library", 
+`sudo Rscript -e 'install.packages(c("VineCopula"), lib="/usr/lib/R/library",
 repos="http://cran.rstudio.com/")'`
-
 
 ### How to build the library
 
 The one liner (from the root folder):
 
-`mkdir build && cd build && cmake .. && make && make doc && 
+`mkdir build && cd build && cmake .. && make && make doc &&
 sudo make install && bin/test_all`
 
 | Step | Shell command  |
@@ -105,26 +111,26 @@ To compile the library without unit tests, the `MakeFile` can be created via
 
 ### How to include the library in other projects
 
-Using `make install`, vinecopulib is installed in the usual location of the 
+Using `make install`, vinecopulib is installed in the usual location of the
 system, namely
 
 * `<prefix>/lib/` (for the shared library),
 * `<prefix>/include/` (for the headers),
-* `<prefix>/lib/cmake/vinecopulib` (to allow cmake to find the library 
+* `<prefix>/lib/cmake/vinecopulib` (to allow cmake to find the library
 with `find_package`),
 
 where `<prefix>` is e.g. `/usr/` or `/usr/local`. Note that
-`make install` only copies `vinecopulib.hpp` in `<prefix>/include/` and 
-puts the other headers in a subfolder `<prefix>/include/vinecopulib`, but using 
+`make install` only copies `vinecopulib.hpp` in `<prefix>/include/` and
+puts the other headers in a subfolder `<prefix>/include/vinecopulib`, but using
 `#include <vinecopulib.hpp>` is enough to load both bivariate and vine functions.
 
-The easiest way to include vinecopulib in another project (and to avoid writing makefiles) 
+The easiest way to include vinecopulib in another project (and to avoid writing makefiles)
 is to use CMake. For instance, an example projet where the source code to be linked could contain
 * a `CMakeLists.txt` file for the project's setup,
 * a subfolder `src` for the source code, containing
     * the source code,
     * another `CMakeLists.txt` file for the project libraries and executables.
- 
+
 The top-level `CMakeLists.txt` could be:
 
 **Example**
@@ -143,7 +149,7 @@ set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -We
 
 # Find vinecopulib package and dependencies
 find_package(vinecopulib                  REQUIRED)
-find_package(Boost 1.63                   REQUIRED)
+find_package(Boost 1.56                   REQUIRED)
 include(cmake/findEigen3.cmake            REQUIRED)
 include(cmake/findNlopt.cmake             REQUIRED)
 
@@ -154,8 +160,8 @@ set(external_libs ${VINECOPULIB_LIBRARIES} ${NLOPT_LIBRARIES} ${Boost_LIBRARIES}
 # Include subdirectory with project sources
 add_subdirectory(src)
 ```
-Assuming a single `main.cpp` source file (with `#include <vinecopulib.hpp>` at 
-the top), the `CMakeLists.txt` file in `/src/` 
+Assuming a single `main.cpp` source file (with `#include <vinecopulib.hpp>` at
+the top), the `CMakeLists.txt` file in `/src/`
 could then be:
 
 **Example**
@@ -167,16 +173,25 @@ include_directories(${external_includes})
 add_executable(main main.cpp)
 
 # Link to vinecopulib and dependencies
-target_link_libraries(vinecopulib_main ${external_libs})
+target_link_libraries(main ${external_libs})
 ```
+
+### Namespaces
+In the examples mentioned above, it is assumed that `using namespace vinecopulib;` 
+is used. While the namespace `vinecopulib` contains the most important 
+functionalities described below, there are a few others that are available to the user:
+-  `bicop_families`: convenience definitions of sets of bivariate copula families 
+-  `tools_eigen`: tools for working with Eigen types 
+-  `tools_optimization`: utilities for numerical optimization (based on NLopt) 
+-  `tools_stats`: utilities for statistical analysis 
 
 ## Bivariate copula models
 
-Bivariate copula models are implemented as the `Bicop` class, and `BicopFamily` 
+Bivariate copula models are implemented as the `Bicop` class, and `BicopFamily`
 is a closely related enum class describing the type or "family" of copula.
 
-To use bivariate copula models in your code, include the header 
-`vinecopulib/bicop/class.hpp` (or simply `vinecopulib.hpp`) at the top of 
+To use bivariate copula models in your code, include the header
+`vinecopulib/bicop/class.hpp` (or simply `vinecopulib.hpp`) at the top of
 your source file.
 
 ### Implemented bivariate copula families
@@ -194,14 +209,14 @@ your source file.
 | "             | BB6                   | bb6     |  
 | "             | BB7                   | bb7     |  
 | "             | BB8                   | bb8    |  
-| Nonparametric | Transformation kernel | tll0  | 
+| Nonparametric | Transformation kernel | tll0  |
 
-Note that several convenience vectors of families are included in the 
+Note that several convenience vectors of families are included in the
 sub-namespace `bicop_families`:
 * `all` contains all the families
 * `parametric` contains the parametric families (all except `tll0`)
 * `nonparametric` contains the nonparametric families (`indep` and `tll0`)
-* `one_par` contains the parametric families with a single parameter 
+* `one_par` contains the parametric families with a single parameter
 (`gaussian`, `clayton`, `gumbel`, `frank`, and `joe`)
 * `two_par` contains the parametric families with two parameters
 (`student`, `bb1`, `bb6`, `bb7`, and `bb8`)
@@ -247,7 +262,7 @@ described in the next section.
 ### Fit and select a bivariate copula
 
 You can either fit the parameters of a given `Bicop` object with `fit()` or
-select the best fitting model from a set of families with `select()`. 
+select the best fitting model from a set of families with `select()`.
 
 **Example**
 ``` cpp
@@ -258,74 +273,74 @@ auto data = model.simulate(1e3);
 // instantiate a gaussian copula with default parameters and fit to data
 Bicop fitted(BicopFamily::gaussian);
 fitted.fit(data);
-std::cout << 
+std::cout <<
     "estimated parameter: " <<
-    fitted.get_parameters() << 
-    "\n";
-    
+    fitted.get_parameters() <<
+    std::endl;
+
 // assign another family to the same variable and fit to data
 fitted = Bicop(BicopFamily::student);
 fitted.fit(data);
-std::cout << 
+std::cout <<
     "estimated parameter: " <<
-    fitted.get_parameters() << 
-    "\n";
+    fitted.get_parameters() <<
+    std::endl;
 
 // alternatively, assign to a family and fit automatically
 fitted.select(data);
-std::cout << 
+std::cout <<
     "family: " << fitted.get_family_name() <<
     "rotation: " <<  fitted.get_rotation() <<
-    "\n";
+    std::endl;
 ```
-As it's arguably the most important function of the `Bicop` class, it's worth 
+As it's arguably the most important function of the `Bicop` class, it's worth
 understanding the second arguments of `select()`, namely an object of the class
 `FitControlsBicop`, which contain five data members:
-* `std::vector<BicopFamily> family_set` describes the set of family to select 
-from. It can take a user specified vector of 
+* `std::vector<BicopFamily> family_set` describes the set of family to select
+from. It can take a user specified vector of
 families or any of those mentioned above (default is `bicop_families::all`).
-* `std::string parametric_method` describes the estimation method. It can take 
-  `"mle"` (default, for maximum-likelihood estimation) and 
-`"itau"` (for Kendall's tau inversion, although only available for families 
-included in `bicop_families::itau`). Note that nonparametric families have 
+* `std::string parametric_method` describes the estimation method. It can take
+  `"mle"` (default, for maximum-likelihood estimation) and
+`"itau"` (for Kendall's tau inversion, although only available for families
+included in `bicop_families::itau`). Note that nonparametric families have
 specialized methods for which no specification is required.
 * `double nonparametric_mult` a factor with which the smoothing parameters
 are multiplied.
-* `std::string selection_criterion` describes the criterion to compare the 
+* `std::string selection_criterion` describes the criterion to compare the
 families. It can take either `"bic"`(default) or `"aic"`.
-* `bool preselect_families` describes a heuristic preselection method (default 
-is `true`) based on symmetry properties of the data (e.g., the unrotated 
-Clayton won't be preselected if the data displays upper-tail dependence). 
+* `bool preselect_families` describes a heuristic preselection method (default
+is `true`) based on symmetry properties of the data (e.g., the unrotated
+Clayton won't be preselected if the data displays upper-tail dependence).
 
-As mentioned [above](#set-up-a-custom-bivariate-copula-model), the arguments 
+As mentioned [above](#set-up-a-custom-bivariate-copula-model), the arguments
 of `select()` can be used as arguments to a
  constructor allowing to instantiate a new object directly:
- 
+
  **Example**
 ``` cpp
 // instantiate an archimedean copula by selecting the "best" family according to
 // the BIC and parameters corresponding to the MLE
 Bicop best_archimedean(data, FitControlsBicop(bicop_families::archimedean));
-std::cout << 
+std::cout <<
     "family: " << best_archimedean.get_family_name() <<
     "rotation: " <<  best_archimedean.get_rotation() <<
-    best_archimedean.get_parameters() << 
-    "\n"
-    
+    best_archimedean.get_parameters() <<
+    std::endl
+
 // instantiate a bivariate copula by selecting the "best" family according to
 // the AIC and parameters corresponding to Kendall's tau inversion
 Bicop best_itau(data, FitControlsBicop(bicop_families::itau, "itau", 1.0, "aic"));
-std::cout << 
+std::cout <<
     "family: " << best_itau.get_family_name() <<
     "rotation: " <<  best_itau.get_rotation() <<
-    best_itau.get_parameters() << 
-    "\n"
+    best_itau.get_parameters() <<
+    std::endl
 ```
 
 
 ### Work with a bivariate copula model
 
-You can simulate from a model and evaluate the pdf, h-functions, inverse 
+You can simulate from a model and evaluate the pdf, h-functions, inverse
 h-functions, log-likelihood, AIC, and BIC.
 
 **Example**
@@ -358,26 +373,26 @@ auto bic  = bicop.bic(sim_data);
 ## Vine copula models
 
 Vine copula models are implemented in the class `Vinecop`. To use this class in
-your code, include the header include the header `vinecopulib/vinecop/class.hpp` 
-(or simply `vinecopulib.hpp`) at the top of your source file. This automatically 
+your code, include the header include the header `vinecopulib/vinecop/class.hpp`
+(or simply `vinecopulib.hpp`) at the top of your source file. This automatically
 enables all features for bivariate copula models.
 
 ### Set up a custom vine copula model
 
 Custom models can be created through the constructor of `Vinecop`. A model is
-represented by a `std::vector<std::vector<Bicop>>` containing all 
+represented by a `std::vector<std::vector<Bicop>>` containing all
 pair-copulas and an [R-vine matrix](#how-to-read-an-r-vine-matrix).
 
-Similarly to bivariate copulas, there are essentially two ways of setting-up 
+Similarly to bivariate copulas, there are essentially two ways of setting-up
 vine copulas:
 * with known parameters,
 * from data (i.e., with estimated parameters).
 
 The constructor with known parameters has two versions:
-* one for which the only argument is the dimension, allowing to set-up a D-vine 
+* one for which the only argument is the dimension, allowing to set-up a D-vine
 with only independence copulas,
-* and one for which the two arguments are a matrix of integers (i.e., and 
-[R-vine matrix](#how-to-read-an-r-vine-matrix)) and a 
+* and one for which the two arguments are a matrix of integers (i.e., and
+[R-vine matrix](#how-to-read-an-r-vine-matrix)) and a
 `std::vector<std::vector<Bicop>>` containing all pair-copulas.
 
 **Example**
@@ -408,7 +423,7 @@ mat << 1, 1, 1,
 // instantiate the custom model
 Vinecop custom_model(pair_copulas, mat);
 ```
-The constructors from data take the same arguments as the two select methods 
+The constructors from data take the same arguments as the two select methods
 described [below](#fit-and-select-a-vine-copula-model).
 
 ### How to read the R-vine matrix
@@ -435,21 +450,21 @@ which encodes the following pair-copulas:
 Denoting by `M[i][j]` the matrix entry in row `i` and column `j` (starting at
 0), the pair-copula index for edge `e` in tree `t` of a `d` dimensional vine is
 `(M[d - 1 - t][e], M[t][e]; M[t - 1][e], ..., M[0][e])`. Less formally,
-1. Start with the counter-diagonal element of column `e` (first conditioned 
+1. Start with the counter-diagonal element of column `e` (first conditioned
    variable).
 2. Jump up to the element in row `t` (second conditioned variable).
 3. Gather all entries further up in column `e` (conditioning set).
 
 ### Fit and select a vine copula model
 
-The method `select_all()` performs parameter estimation and automatic 
-model selection when the vine structure is unknown (i.e., it modifies the 
+The method `select_all()` performs parameter estimation and automatic
+model selection when the vine structure is unknown (i.e., it modifies the
 structure of the object), using the sequential procedure proposed by
- [Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf). 
- Alternatively, `select_families()` performs parameter estimation and automatic 
- model selection for a known structure (i.e., using the structure of the 
- object). In both cases, the only mandatory argument is the data 
- (stored in a `Eigen::MatrixXd`), while controls argument allow for 
+ [Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf).
+ Alternatively, `select_families()` performs parameter estimation and automatic
+ model selection for a known structure (i.e., using the structure of the
+ object). In both cases, the only mandatory argument is the data
+ (stored in a `Eigen::MatrixXd`), while controls argument allow for
  customization of the fit.
 
 **Example**
@@ -458,7 +473,7 @@ structure of the object), using the sequential procedure proposed by
 int d = 5;
 
 // simulate dummy data
-Eigen::MatrixXd data = simulate_uniform(100, d);
+Eigen::MatrixXd data = tools_stats::simulate_uniform(100, d);
 
 // instantiate a D-vine and select the families
 Vinecop model(d);
@@ -468,25 +483,25 @@ model.select_families(data);
 model.select_all(data);
 ```
 
-Note that the second argument to `select_all()` and `select_families()` is 
-similar to the one of `select()` for `Bicop` objects. Objects of the class 
+Note that the second argument to `select_all()` and `select_families()` is
+similar to the one of `select()` for `Bicop` objects. Objects of the class
 `FitControlsVinecop` inherit from `FitControlsBicop` and extend them with three
 additional data members to control the structure selection:
 * `int truncation_level` describes the tree after which `family_set` is set to
-`{BicopFamily::indep}`. In other words, all pair copulas in trees lower than 
+`{BicopFamily::indep}`. In other words, all pair copulas in trees lower than
 `truncation_level` (default to none) are "selected" as independence copulas.
-* `std::string tree_criterion` describes the criterion used to construct the 
-minimum spanning tree (see 
-[Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf)). 
+* `std::string tree_criterion` describes the criterion used to construct the
+minimum spanning tree (see
+[Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf)).
 It can take `"tau"` (default) for Kendall's tau, `"rho"` for Spearman's rho,
 or `"hoeffd"` for Hoeffding's D (suited for non-monotonic relationships).
-* `double threshold` describes a value (default is 0) of `tree_criterion` under 
+* `double threshold` describes a value (default is 0) of `tree_criterion` under
 which the corresponding pair-copula is set to independence.
 
-As mentioned [above](#set-up-a-custom-vine-copula-model), the arguments 
+As mentioned [above](#set-up-a-custom-vine-copula-model), the arguments
 of `select_all()` and `select_families()` can be used as arguments to a
  constructor allowing to instantiate a new object directly:
- 
+
  **Example**
 ``` cpp
 // specify the dimension of the model
@@ -504,9 +519,9 @@ M << 1, 1, 1, 1,
      2, 2, 2, 0,
      3, 3, 0, 0
      4, 0, 0, 0;
-    
-// ... and instantiate a vine copula from data using the custom structure, 
-// Kendall's tau inversion for parameters 
+
+// ... and instantiate a vine copula from data using the custom structure,
+// Kendall's tau inversion for parameters
 // estimation and a truncation after the second tree
 Vinecop custom_vine(data, M, FitControlsVinecop(bicop_families::itau, "itau", 1.0, 2);)
 ```
@@ -520,7 +535,7 @@ You can simulate from a vine copula model, evaluate its density, log-likelihood,
 ``` cpp
 // 5-dimensional independence vine
 Vinecop model(5);           
-  
+
 // simulate 100 observations
 auto data = model.simulate(100)  
 

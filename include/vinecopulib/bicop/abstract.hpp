@@ -63,6 +63,8 @@ namespace vinecopulib
         virtual double parameters_to_tau(const Eigen::VectorXd& parameters) = 0;
         virtual Eigen::VectorXd pdf(
                 const Eigen::Matrix<double, Eigen::Dynamic, 2>& u) = 0;
+        virtual Eigen::VectorXd cdf(
+                const Eigen::Matrix<double, Eigen::Dynamic, 2>& u) = 0;
         virtual Eigen::VectorXd hfunc1(
                 const Eigen::Matrix<double, Eigen::Dynamic, 2>& u) = 0;
         virtual Eigen::VectorXd hfunc2(

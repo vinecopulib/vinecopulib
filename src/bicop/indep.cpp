@@ -20,6 +20,13 @@ namespace vinecopulib
         return Eigen::VectorXd::Ones(u.rows());
     }
 
+    Eigen::VectorXd IndepBicop::cdf(
+            const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
+    )
+    {
+        return u.rowwise().prod();
+    }
+
     Eigen::VectorXd IndepBicop::hfunc1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )

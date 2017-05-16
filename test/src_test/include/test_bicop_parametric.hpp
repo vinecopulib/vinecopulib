@@ -45,26 +45,31 @@ namespace test_bicop_parametric {
             Eigen::VectorXd f = bicop_.pdf(results.block(0,1,n,2));
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,3,n,1), 1e-4)) << bicop_.str();
+
+            // evaluate cdf in C++
+            f = bicop_.cdf(results.block(0,1,n,2));
+            // assert approximate equality
+            ASSERT_TRUE(f.isApprox(results.block(0,4,n,1), 1e-4)) << bicop_.str();
     
             // evaluate hfunc1 in C++
             f = bicop_.hfunc1(results.block(0,1,n,2));
             // assert approximate equality
-            ASSERT_TRUE(f.isApprox(results.block(0,4,n,1), 1e-4)) << bicop_.str();
+            ASSERT_TRUE(f.isApprox(results.block(0,5,n,1), 1e-4)) << bicop_.str();
     
             // evaluate hfunc2 in C++
             f = bicop_.hfunc2(results.block(0,1,n,2));
             // assert approximate equality
-            ASSERT_TRUE(f.isApprox(results.block(0,5,n,1), 1e-4)) << bicop_.str();
+            ASSERT_TRUE(f.isApprox(results.block(0,6,n,1), 1e-4)) << bicop_.str();
     
             // evaluate hinv1 in C++
             f = bicop_.hinv1(results.block(0,1,n,2));
             // assert approximate equality
-            ASSERT_TRUE(f.isApprox(results.block(0,6,n,1), 1e-4)) << bicop_.str();
+            ASSERT_TRUE(f.isApprox(results.block(0,7,n,1), 1e-4)) << bicop_.str();
     
             // evaluate hinv2 in C++
             f = bicop_.hinv2(results.block(0,1,n,2));
             // assert approximate equality
-            ASSERT_TRUE(f.isApprox(results.block(0,7,n,1), 1e-4)) << bicop_.str();
+            ASSERT_TRUE(f.isApprox(results.block(0,8,n,1), 1e-4)) << bicop_.str();
         }
     }
 

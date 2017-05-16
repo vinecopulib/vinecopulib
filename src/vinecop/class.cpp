@@ -65,10 +65,10 @@ namespace vinecopulib
         if (pair_copulas.size() != d_ - 1) {
             std::stringstream message;
             message <<
-                    "size of of pair_copulas does not match dimension of matrix (" <<
-                    d_ << ")" <<
-                    "expected size:" << d_ - 1 << ", "<<
-                    "actual size:" << pair_copulas.size() << std::endl;
+                    "size of pair_copulas does not match dimension of matrix (" <<
+                    d_ << "); " <<
+                    "expected size: " << d_ - 1 << ", "<<
+                    "actual size: " << pair_copulas.size() << std::endl;
             throw std::runtime_error(message.str().c_str());
 
         }
@@ -76,10 +76,10 @@ namespace vinecopulib
             if (pair_copulas[t].size() != d_ - 1 - t) {
                 std::stringstream message;
                 message <<
-                        "size of of pair_copulas[" << t << "] " <<
-                        "does not match dimension of matrix (" << d_ << ")" <<
-                        "expected size:" << d_ - 1 - t << ", "<<
-                        "actual size:" << pair_copulas[t].size() << std::endl;
+                        "size of pair_copulas[" << t << "] " <<
+                        "does not match dimension of matrix (" << d_ << "); " <<
+                        "expected size: " << d_ - 1 - t << ", "<<
+                        "actual size: " << pair_copulas[t].size() << std::endl;
                 throw std::runtime_error(message.str().c_str());
             }
         }
@@ -126,6 +126,10 @@ namespace vinecopulib
     //!     object for the pair copula corresponding to tree `t` and edge `e`.
     std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(size_t d)
     {
+        if (d < 2) {
+            throw std::runtime_error("the dimension should be larger than 1");
+        }
+
         std::vector<std::vector<Bicop>> pc_store(d - 1);
         for (size_t t = 0; t < d - 1; ++t) {
             pc_store[t].resize(d - 1 - t);

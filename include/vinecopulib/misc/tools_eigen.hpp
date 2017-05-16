@@ -25,6 +25,10 @@ namespace tools_eigen
             const double ub = 1-1e-20,
             int n_iter = 35
     );
+
+    Eigen::Matrix<double, Eigen::Dynamic, 2> expand_grid(
+            const Eigen::VectorXd& grid_points
+    );
     
     Eigen::MatrixXd read_matxd(const char *filename, int max_buffer_size = (int) 1e6);
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
