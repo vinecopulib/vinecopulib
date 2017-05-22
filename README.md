@@ -125,7 +125,8 @@ The following CMake flags (given with example values) will likely come handy:
 -DEIGEN3_INCLUDE_DIR=c:\local\eigen-eigen-da9b4e14c255
 -DCMAKE_PREFIX_PATH=c:\local\nlopt-install
 -DCMAKE_INSTALL_PREFIX=c:\local\vinecopulib-install
--DCMAKE_GEN_PLAT=x64
+-DCMAKE_GENERATOR_PLATFORM=x64
+-DBOOST_DEBUG=1
 ```
 
 ------------------------------------------------
