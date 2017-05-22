@@ -61,9 +61,9 @@ set of classes and methods can be found in the
 
 ### Requirements
 
-To build the library, you'll need:
+To build the library, you'll need at minimum:
 
-   * [a C++11-compatible    compiler](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers)
+   * [a C++11-compatible compiler](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers)
    * [CMake](https://cmake.org/)
    * [Boost 1.63](http://www.boost.org/)
    * [Eigen 3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page)
@@ -89,7 +89,7 @@ repos="http://cran.rstudio.com/")'`
 
 ### How to build the library
 
-The one liner (from the root folder):
+The unix one liner (from the root folder):
 
 `mkdir build && cd build && cmake .. && make && make doc &&
 sudo make install && bin/test_all`
@@ -106,6 +106,27 @@ sudo make install && bin/test_all`
 
 To compile the library without unit tests, the `MakeFile` can be created via
  `cmake .. -DBUILD_TESTING=OFF`.
+ 
+On Windows, CMake will generate Visual Studio files instead of Makefiles,
+the following sequence of commands can be used to perform compilation using the command prompt:
+```
+md build
+cd build
+cmake ..
+cmake --build . --config Debug
+cmake --build . --config Release
+cmake --build . --config Release --target install
+```
+Instead of the `cmake --build` commands, the generated `vinecopulib.sln` file can be open in the Visual Studio GUI.
+
+The following CMake flags (given with example values) will likely come handy:
+```
+-DBOOST_ROOT=c:\local\boost_1_63_0
+-DEIGEN3_INCLUDE_DIR=c:\local\eigen-eigen-da9b4e14c255
+-DCMAKE_PREFIX_PATH=c:\local\nlopt-install
+-DCMAKE_INSTALL_PREFIX=c:\local\vinecopulib-install
+-DCMAKE_GEN_PLAT=x64
+```
 
 ------------------------------------------------
 
@@ -150,8 +171,8 @@ set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -We
 # Find vinecopulib package and dependencies
 find_package(vinecopulib                  REQUIRED)
 find_package(Boost 1.63                   REQUIRED)
+find_package(NLopt                        REQUIRED)
 include(cmake/findEigen3.cmake            REQUIRED)
-include(cmake/findNlopt.cmake             REQUIRED)
 
 # Set required variables for includes and libraries
 set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${NLOPT_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
