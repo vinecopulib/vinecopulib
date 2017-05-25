@@ -226,10 +226,20 @@ namespace tools_stats {
         return tmp;
     }();
 
+    //! simulates from the multivariate Generalized Halton Sequence
+    //!
+    //! For more information on Generalized Halton Sequence, see
+    //! Faure, H., Lemieux, C. (2009). Generalized Halton Sequences in 2008:
+    //! A Comparative Study. ACM-TOMACS 19(4), Article 15.
+    //!
+    //! @param n number of observations.
+    //! @param d dimension.
+    //!
+    //! @return An \f$ n \times d \f$ matrix of quasi-random
+    //! \f$ \mathrm{U}[0, 1] \f$ variables.
     Eigen::MatrixXd ghalton(size_t n, size_t d) {
 
         Eigen::MatrixXd res(d, n);
-
 
         // Coefficients of the shift
         Eigen::MatrixXi shcoeff(d, 32);
