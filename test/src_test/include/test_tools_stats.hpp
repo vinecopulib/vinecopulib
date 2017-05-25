@@ -56,7 +56,7 @@ namespace test_tools_stats {
         EXPECT_NEAR(computed_hoeffd, true_hoeffd, 1e-3);
     }
 
-    TEST(test_tools_stats, ghaston_is_correct) {
+    TEST(test_tools_stats, ghalton_is_correct) {
 
         size_t d = 2;
         size_t n = 1e1;
