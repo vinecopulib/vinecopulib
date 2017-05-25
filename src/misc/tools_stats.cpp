@@ -4,7 +4,6 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://tvatter.github.io/vinecopulib/.
 
-#include <iostream>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_c.h>
@@ -229,10 +228,11 @@ namespace tools_stats {
 
     Eigen::MatrixXd ghalton(size_t n, size_t d) {
 
-        Eigen::MatrixXd res = Eigen::MatrixXd::Zero(d, n);
+        Eigen::MatrixXd res(d, n);
 
 
-        Eigen::MatrixXi shcoeff = Eigen::MatrixXi::Zero(d, 32); // the coefficients of the shift
+        // Coefficients of the shift
+        Eigen::MatrixXi shcoeff(d, 32);
         Eigen::VectorXi base = primes.block(0,0,d,1);
         Eigen::MatrixXd u =  Eigen::VectorXd::Zero(d, 1);
         auto U = simulate_uniform(d,32);

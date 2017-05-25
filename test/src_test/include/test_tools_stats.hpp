@@ -70,25 +70,16 @@ namespace test_tools_stats {
         Eigen::VectorXd x(N), p(n), x2(N), p2(n);
         p2 = Eigen::VectorXd::Zero(n);
         for (size_t i = 0; i < n; i++) {
-            x = U.col(0).binaryExpr(cop.hinv1(U),
-                                    [i, u](const double& u1,
-                                           const double& u2) {
+            auto f = [i, u](const double& u1, const double& u2) {
                 if (u1 <= u(i,0) && u2 <= u(i,1)) {
                     return 1.0;
                 } else {
                     return 0.0;
                 }
-            });
+            };
+            x = U.col(0).binaryExpr(cop.hinv1(U), f);
             p(i) = x.sum()/N;
-            x2 = U2.col(0).binaryExpr(cop.hinv1(U2),
-                                    [i, u](const double& u1,
-                                           const double& u2) {
-                                        if (u1 <= u(i,0) && u2 <= u(i,1)) {
-                                            return 1.0;
-                                        } else {
-                                            return 0.0;
-                                        }
-                                    });
+            x2 = U2.col(0).binaryExpr(cop.hinv1(U2), f);
             p2(i) = x2.sum()/N;
         }
 
