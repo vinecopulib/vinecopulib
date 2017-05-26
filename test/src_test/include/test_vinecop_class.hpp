@@ -78,6 +78,26 @@ namespace test_vinecop_class {
     
         ASSERT_TRUE(vinecop.pdf(u).isApprox(f, 1e-4));
     }
+
+    TEST_F(VinecopTest, cdf_is_correct) {
+
+        // Create a bivariate copula and a corresponding vine with two variables
+        auto pair_copulas = Vinecop::make_pair_copula_store(2);
+        auto par = Eigen::VectorXd::Constant(1, 0.5);
+        auto bicop = Bicop(BicopFamily::gaussian, 0, par);
+        for (auto& tree : pair_copulas) {
+            for (auto& pc : tree) {
+                pc = Bicop(BicopFamily::gaussian, 0, par);
+            }
+        }
+        Eigen::Matrix<size_t, 2, 2> matrix;
+        matrix << 2,0,1,1;
+        Vinecop vinecop(pair_copulas, matrix);
+
+        // Test whether the analytic and simulated versions are "close" enough
+        auto U = vinecop.simulate(1e1);
+        ASSERT_TRUE(vinecop.cdf(U, 1e5).isApprox(bicop.cdf(U), 1e-2));
+    }
     
     TEST_F(VinecopTest, simulate_is_correct) {
     
