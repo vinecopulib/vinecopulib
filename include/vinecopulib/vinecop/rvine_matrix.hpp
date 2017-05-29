@@ -57,6 +57,8 @@ namespace vinecopulib
             const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
 
     private:
+        void check_matrix() const;
+        
         size_t d_;
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> matrix_;
     };

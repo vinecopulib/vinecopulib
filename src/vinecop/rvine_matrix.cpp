@@ -129,6 +129,62 @@ namespace vinecopulib
         return needed_hfunc2;
     }
     //! @}
+    
+    void RVineMatrix::check_matrix() const
+    {
+        using namespace tools_stl;
+        std::string not_valid_msg = "not a valid R-vine matrix: ";
+        std::string problem;
+        
+        problem = "the lower right triangle must only contain zeros";
+        size_t sum_lwr = 0;
+        for (size_t j = 1; j < d_; ++j) {
+                sum_lwr += matrix_.block(d_ - j, j, j, 0).array().sum();
+                if (sum_lwr != 0) {
+                    throw std::runtime_error(not_valid_msg + problem);
+                }            
+        }
+        
+        problem = "the upper left triangle can only contain numbers \
+                   between and d (number of variables).";
+        size_t min_upr = d_;
+        size_t max_upr = 0;
+        for (size_t j = 0; j < d_; ++j) {
+            min_upr = std::min(max_upr, matrix_.block(0, j, j, 0).maxCoeff());
+            max_upr = std::max(max_upr, matrix_.block(0, j, j, 0).maxCoeff());
+            if ((max_upr > d_) | (min_upr < 1)) {
+                throw std::runtime_error(not_valid_msg + problem);
+            }
+        }
+        
+        problem = "the antidiagonal must contain the numbers 1, 2, ..., d \
+                   (the number of variables)";
+        auto diag = matrix_.colwise().reverse().diagonal();
+        std::vector<size_t> diag_vec(d_);
+        Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&diag_vec[0], d_) = diag;
+        if (!is_same_set(diag_vec, seq_int(1, d_))) {
+            throw std::runtime_error(not_valid_msg + problem);
+        }
+        
+        
+        auto no_matrix = in_natural_order();
+        problem = "the antidiagonal entry of a column must not be \
+                   contained in any column further to the right; \
+                   all entries of a column must be contained \
+                   in all columns left of that column ";
+        // In natural order: column j only contains indices 0:(d - j).
+        bool ok = true;
+        for (size_t j = 0; j < d_; ++j) {
+            std::vector<size_t> col_vec(d_);
+            Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&col_vec[0], d_) = no_matrix.col(j);
+            ok = ok & is_same_set(col_vec, seq_int(0, d_ - j));
+            if (!ok) {
+                throw std::runtime_error(not_valid_msg + problem);
+            }
+        }
+        
+        // TODO: check for simplifying assumption
+    }
 
     // translates matrix_entry from old to new labels
     size_t relabel_one(size_t x, 
