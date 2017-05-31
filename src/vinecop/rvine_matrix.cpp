@@ -6,7 +6,7 @@
 
 #include <vinecopulib/vinecop/rvine_matrix.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
-
+#include <iostream>
 namespace vinecopulib
 {
     //! instantiates an RVineMatrix object.
@@ -14,8 +14,8 @@ namespace vinecopulib
     RVineMatrix::RVineMatrix(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix)
     {
         d_ = matrix.rows();
-        // TODO: sanity checks for input matrix
         matrix_ = matrix;
+        check_matrix();
     }
     
     //! extract the matrix.
@@ -151,12 +151,13 @@ namespace vinecopulib
     }
     
     void RVineMatrix::check_upper_tri() const {
-        std::string problem = "the upper left triangle can only contain numbers\
-                               between and d (number of variables).";
+        std::string problem;
+        problem += "the upper left triangle can only contain numbers ";
+        problem += "between 1 and d (number of variables).";
         size_t min_upr = d_;
         size_t max_upr = 0;
         for (size_t j = 0; j < d_; ++j) {
-            min_upr = std::min(max_upr, matrix_.block(0, j, j, 0).maxCoeff());
+            min_upr = std::min(min_upr, matrix_.block(0, j, j, 0).maxCoeff());
             max_upr = std::max(max_upr, matrix_.block(0, j, j, 0).maxCoeff());
             if ((max_upr > d_) | (min_upr < 1)) {
                 throw std::runtime_error("not a valid R-vine matrix: " + problem);
@@ -165,8 +166,9 @@ namespace vinecopulib
     }
     
     void RVineMatrix::check_antidiagonal() const {    
-        std::string problem = "the antidiagonal must contain the numbers \
-                               1, 2, ..., d (the number of variables)";
+        std::string problem;
+        problem += "the antidiagonal must contain the numbers ";
+        problem += "1, 2, ..., d (the number of variables)";
         auto diag = matrix_.colwise().reverse().diagonal();
         std::vector<size_t> diag_vec(d_);
         Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&diag_vec[0], d_) = diag;
@@ -176,18 +178,21 @@ namespace vinecopulib
     }
     
     void RVineMatrix::check_columns() const {
+        using namespace tools_stl;
         auto no_matrix = in_natural_order();
-        std::string problem = "the antidiagonal entry of a column must not be \
-                               contained in any column further to the right; \
-                               all entries of a column must be contained \
-                               in all columns left of that column ";
-        // In natural order: column j only contains indices 0:(d - j).
+        std::string problem;
+        problem += "the antidiagonal entry of a column must not be ";
+        problem += "contained in any column further to the right; ";
+        problem += "all entries of a column must be contained ";
+        problem += "in all columns left of that column.";
+        
+        // In natural order: column j only contains indices 1:(d - j).
         bool ok = true;
         for (size_t j = 0; j < d_; ++j) {
-            std::vector<size_t> col_vec(d_);
-            Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&col_vec[0], d_) = 
-                no_matrix.col(j);
-            ok = ok & tools_stl::is_same_set(col_vec, tools_stl::seq_int(0, d_-j));
+            std::vector<size_t> col_vec(d_ - j);
+            Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&col_vec[0], d_ - j) = 
+                no_matrix.block(0, j, d_ - j, 0);
+            ok = ok & is_same_set(col_vec, seq_int(1, d_ - j));
             if (!ok) {
                 throw std::runtime_error("not a valid R-vine matrix: " + problem);
             }
