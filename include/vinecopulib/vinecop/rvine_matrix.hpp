@@ -58,6 +58,10 @@ namespace vinecopulib
 
     private:
         void check_matrix() const;
+        void check_lower_tri() const;
+        void check_upper_tri() const;
+        void check_antidiagonal() const;
+        void check_columns() const;
         
         size_t d_;
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> matrix_;
