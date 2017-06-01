@@ -6,7 +6,7 @@
 
 #include <vinecopulib/vinecop/rvine_matrix.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
-#include <iostream>
+
 namespace vinecopulib
 {
     //! instantiates an RVineMatrix object.
@@ -143,7 +143,6 @@ namespace vinecopulib
         std::string problem = "the lower right triangle must only contain zeros";
         size_t sum_lwr = 0;
         for (size_t j = 1; j < d_; ++j) {
-            // std::cout << matrix_.block(d_ - j, j, j, 1) << std::endl << std::endl;
             sum_lwr += matrix_.block(d_ - j, j, j, 1).array().sum();
             if (sum_lwr != 0) {
                 throw std::runtime_error("not a valid R-vine matrix: " + problem);
@@ -158,8 +157,8 @@ namespace vinecopulib
         size_t min_upr = d_;
         size_t max_upr = 0;
         for (size_t j = 0; j < d_; ++j) {
-            min_upr = std::min(min_upr, matrix_.block(0, j, j, 0).maxCoeff());
-            max_upr = std::max(max_upr, matrix_.block(0, j, j, 0).maxCoeff());
+            min_upr = std::min(min_upr, matrix_.block(0, j, j + 1, 1).maxCoeff());
+            max_upr = std::max(max_upr, matrix_.block(0, j, j + 1, 1).maxCoeff());
             if ((max_upr > d_) | (min_upr < 1)) {
                 throw std::runtime_error("not a valid R-vine matrix: " + problem);
             }
@@ -192,7 +191,7 @@ namespace vinecopulib
         for (size_t j = 0; j < d_; ++j) {
             std::vector<size_t> col_vec(d_ - j);
             Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&col_vec[0], d_ - j) = 
-                no_matrix.block(0, j, d_ - j, 0);
+                no_matrix.block(0, j, d_ - j, 1);
             ok = ok & is_same_set(col_vec, seq_int(1, d_ - j));
             if (!ok) {
                 throw std::runtime_error("not a valid R-vine matrix: " + problem);
