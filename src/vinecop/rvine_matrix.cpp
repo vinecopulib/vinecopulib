@@ -143,10 +143,11 @@ namespace vinecopulib
         std::string problem = "the lower right triangle must only contain zeros";
         size_t sum_lwr = 0;
         for (size_t j = 1; j < d_; ++j) {
-                sum_lwr += matrix_.block(d_ - j, j, j, 0).array().sum();
-                if (sum_lwr != 0) {
-                    throw std::runtime_error("not a valid R-vine matrix: " + problem);
-                }            
+            // std::cout << matrix_.block(d_ - j, j, j, 1) << std::endl << std::endl;
+            sum_lwr += matrix_.block(d_ - j, j, j, 1).array().sum();
+            if (sum_lwr != 0) {
+                throw std::runtime_error("not a valid R-vine matrix: " + problem);
+            }            
         }
     }
     

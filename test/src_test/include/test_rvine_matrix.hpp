@@ -122,27 +122,26 @@ namespace test_rvine_matrix {
         // should pass without errors
         auto rvm = RVineMatrix(mat);
         
-        // // lower tri must contain zeros
-        // auto wrong_mat = mat;
-        // wrong_mat(6, 6) = -1;
-        // rvm = RVineMatrix(wrong_mat);
-        // EXPECT_ANY_THROW(RVineMatrix(wrong_mat));
-        // 
-        // // upper tri must only contain 1, ..., d
-        // wrong_mat = mat;
-        // wrong_mat(0, 0) = 9;
-        // EXPECT_ANY_THROW(RVineMatrix(wrong_mat));
-        // wrong_mat(0, 0) = 0;
-        // EXPECT_ANY_THROW(RVineMatrix(wrong_mat));
-        // 
-        // // diagonal elements cannot appear further to the right
-        // wrong_mat = mat;
-        // wrong_mat(0, 1) = 4;
-        // EXPECT_ANY_THROW(RVineMatrix(wrong_mat));
-        // 
-        // // all numbers in a column most appear in each column to the left
-        // wrong_mat = mat;
-        // wrong_mat(0, 0) = 4;
-        // EXPECT_ANY_THROW(RVineMatrix(wrong_mat));
+        // lower tri must contain zeros
+        auto wrong_mat = mat;
+        wrong_mat(6, 6) = 1;
+        EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+        
+        // upper tri must only contain 1, ..., d
+        wrong_mat = mat;
+        wrong_mat(0, 0) = 9;
+        EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+        wrong_mat(0, 0) = 0;
+        EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+        
+        // diagonal elements cannot appear further to the right
+        wrong_mat = mat;
+        wrong_mat(0, 1) = 4;
+        EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+        
+        // all numbers in a column most appear in each column to the left
+        wrong_mat = mat;
+        wrong_mat(0, 0) = 4;
+        EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
     }
 }
