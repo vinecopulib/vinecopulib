@@ -62,7 +62,10 @@ namespace vinecopulib
     {
     public:
         RVineMatrix() {}
-        RVineMatrix(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix);
+        RVineMatrix(
+            const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
+            bool check = true
+        );
 
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> get_order() const;
@@ -71,11 +74,10 @@ namespace vinecopulib
         MatrixXb get_needed_hfunc1() const;
         MatrixXb get_needed_hfunc2() const;
 
-        static Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> construct_d_vine_matrix(
-            const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
+        static Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> 
+        construct_d_vine_matrix(const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
 
     private:
-        void check_matrix() const;
         void check_lower_tri() const;
         void check_upper_tri() const;
         void check_antidiagonal() const;

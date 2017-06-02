@@ -10,12 +10,22 @@
 namespace vinecopulib
 {
     //! instantiates an RVineMatrix object.
-    //! @param matrix a valid R-vine matrix (this is not checked so far!).
-    RVineMatrix::RVineMatrix(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix)
+    //! @param matrix a valid R-vine matrix.
+    //! @param check whether the matrix shall be checked for validity.
+    RVineMatrix::RVineMatrix(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
+        bool check
+    )
     {
         d_ = matrix.rows();
         matrix_ = matrix;
-        check_matrix();
+        if (check) {
+            check_lower_tri();
+            check_upper_tri();
+            check_antidiagonal();
+            check_columns();
+            check_proximity_condition();
+        }
     }
     
     //! extract the matrix.
@@ -130,15 +140,6 @@ namespace vinecopulib
     }
     //! @}
     
-    void RVineMatrix::check_matrix() const
-    {
-        check_lower_tri();
-        check_upper_tri();
-        check_antidiagonal();
-        check_columns();       
-        check_proximity_condition();
-    }
-    
     void RVineMatrix::check_lower_tri() const {
         std::string problem = "the lower right triangle must only contain zeros";
         size_t sum_lwr = 0;
@@ -157,8 +158,8 @@ namespace vinecopulib
         size_t min_upr = d_;
         size_t max_upr = 0;
         for (size_t j = 0; j < d_; ++j) {
-            min_upr = std::min(min_upr, matrix_.col(j).head(j + 1).maxCoeff());
-            max_upr = std::max(max_upr, matrix_.col(j).head(j + 1).maxCoeff());
+            min_upr = std::min(min_upr, matrix_.col(j).head(d_ - j).minCoeff());
+            max_upr = std::max(max_upr, matrix_.col(j).head(d_ - j).maxCoeff());
             if ((max_upr > d_) | (min_upr < 1)) {
                 throw std::runtime_error("not a valid R-vine matrix: " + problem);
             }
@@ -213,8 +214,8 @@ namespace vinecopulib
                 // the pair (v0, D0) has to be matched in another column
                 bool found = false;
                 
-                // search antidiagonal right of column e for v0
-                // columns with less then t entries can be ommitted
+                // search antidiagonal right of column e for v0,
+                // columns with less then t entries can be omitted
                 for (size_t j = e + 1; j < d_ - t; ++j) {
                     if (matrix_(d_ - j - 1, j) != v0) {
                         continue;
@@ -234,8 +235,8 @@ namespace vinecopulib
                     continue;
                 }
                 
-                // otherwise search row above t
-                // columns with less then t entries can be ommitted
+                // otherwise search row above t,
+                // columns with less then t entries can be omitted
                 for (size_t j = e + 1; j < d_ - t; ++j) {
                     if (matrix_(t - 1, j) != v0) {
                         continue;
