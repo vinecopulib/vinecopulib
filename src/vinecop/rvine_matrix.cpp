@@ -168,7 +168,7 @@ namespace vinecopulib
     void RVineMatrix::check_antidiagonal() const {    
         std::string problem;
         problem += "the antidiagonal must contain the numbers ";
-        problem += "1, 2, ..., d (the number of variables)";
+        problem += "1, ..., d (the number of variables)";
         auto diag = matrix_.colwise().reverse().diagonal();
         std::vector<size_t> diag_vec(d_);
         Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&diag_vec[0], d_) = diag;
@@ -184,7 +184,7 @@ namespace vinecopulib
         problem += "the antidiagonal entry of a column must not be ";
         problem += "contained in any column further to the right; ";
         problem += "the entries of a column must be contained ";
-        problem += "in all columns left of that column.";
+        problem += "in all columns to the left.";
         
         // In natural order: column j only contains indices 1:(d - j).
         bool ok = true;
