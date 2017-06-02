@@ -32,7 +32,7 @@ namespace test_rvine_matrix {
         RVineMatrix rvine_matrix(mat);
         EXPECT_EQ(rvine_matrix.in_natural_order(), true_no_matrix);
     }
-
+    
     TEST(rvine_matrix, max_mat_is_correct) {
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
         mat << 5, 2, 6, 6, 6, 6, 6,
@@ -53,7 +53,7 @@ namespace test_rvine_matrix {
         RVineMatrix rvine_matrix(mat);
         EXPECT_EQ(rvine_matrix.get_max_matrix(), true_max_matrix);
     }
-
+    
     TEST(rvine_matrix, needed_hfunc1_is_correct) {
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
         mat << 5, 2, 6, 6, 6, 6, 6,
@@ -74,7 +74,7 @@ namespace test_rvine_matrix {
         RVineMatrix rvine_matrix(mat);
         EXPECT_EQ(rvine_matrix.get_needed_hfunc1(), true_hfunc1);
     }
-
+    
     TEST(rvine_matrix, needed_hfunc2_is_correct) {
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
         mat << 5, 2, 6, 6, 6, 6, 6,
@@ -95,7 +95,7 @@ namespace test_rvine_matrix {
         RVineMatrix rvine_matrix(mat);
         EXPECT_EQ(rvine_matrix.get_needed_hfunc2(), true_hfunc2);
     }
-
+    
     TEST(rvine_matrix, construct_d_vine_matrix_is_correct) {
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> order(7);
         order << 7, 2, 3, 5, 1, 4, 6;
@@ -142,6 +142,12 @@ namespace test_rvine_matrix {
         // all numbers in a column most appear in each column to the left
         wrong_mat = mat;
         wrong_mat(0, 0) = 4;
+        EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+        
+        // proximity condition
+        wrong_mat = mat;
+        wrong_mat(3, 1) = 7;
+        wrong_mat(4, 1) = 1;
         EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
     }
 }

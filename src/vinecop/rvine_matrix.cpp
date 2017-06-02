@@ -136,7 +136,7 @@ namespace vinecopulib
         check_upper_tri();
         check_antidiagonal();
         check_columns();       
-        // TODO: check for proximity condition
+        check_proximity_condition();
     }
     
     void RVineMatrix::check_lower_tri() const {
@@ -157,8 +157,8 @@ namespace vinecopulib
         size_t min_upr = d_;
         size_t max_upr = 0;
         for (size_t j = 0; j < d_; ++j) {
-            min_upr = std::min(min_upr, matrix_.block(0, j, j + 1, 1).maxCoeff());
-            max_upr = std::max(max_upr, matrix_.block(0, j, j + 1, 1).maxCoeff());
+            min_upr = std::min(min_upr, matrix_.col(j).head(j + 1).maxCoeff());
+            max_upr = std::max(max_upr, matrix_.col(j).head(j + 1).maxCoeff());
             if ((max_upr > d_) | (min_upr < 1)) {
                 throw std::runtime_error("not a valid R-vine matrix: " + problem);
             }
@@ -183,7 +183,7 @@ namespace vinecopulib
         std::string problem;
         problem += "the antidiagonal entry of a column must not be ";
         problem += "contained in any column further to the right; ";
-        problem += "all entries of a column must be contained ";
+        problem += "the entries of a column must be contained ";
         problem += "in all columns left of that column.";
         
         // In natural order: column j only contains indices 1:(d - j).
@@ -191,14 +191,84 @@ namespace vinecopulib
         for (size_t j = 0; j < d_; ++j) {
             std::vector<size_t> col_vec(d_ - j);
             Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&col_vec[0], d_ - j) = 
-                no_matrix.block(0, j, d_ - j, 1);
+                no_matrix.col(j).head(d_ - j);
             ok = ok & is_same_set(col_vec, seq_int(1, d_ - j));
             if (!ok) {
                 throw std::runtime_error("not a valid R-vine matrix: " + problem);
             }
         }
     }
-
+    
+    void RVineMatrix::check_proximity_condition() const {
+        using namespace tools_stl;
+        for (size_t t = 1; t < d_ - 1; ++t) {
+            for (size_t e = 0; e < d_ - t - 1; ++e) {
+                // non-diagonal conditioned variable
+                double v0 = matrix_(t, e);
+                // conditioning set
+                std::vector<size_t> D0(t);
+                Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&D0[0], t) = 
+                    matrix_.col(e).head(t);
+                
+                // the pair (v0, D0) has to be matched in another column
+                bool found = false;
+                
+                // search antidiagonal right of column e for v0
+                // columns with less then t entries can be ommitted
+                for (size_t j = e + 1; j < d_ - t; ++j) {
+                    if (matrix_(d_ - j - 1, j) != v0) {
+                        continue;
+                    }
+                    // check if conditioning sets coincide
+                    std::vector<size_t> D(t);
+                    Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&D[0], t) = 
+                        matrix_.col(j).head(t);
+                    if (is_same_set(D0, D)) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                // if (v0, D0) was matched, continue with next pair-copula
+                if (found) {
+                    continue;
+                }
+                
+                // otherwise search row above t
+                // columns with less then t entries can be ommitted
+                for (size_t j = e + 1; j < d_ - t; ++j) {
+                    if (matrix_(t - 1, j) != v0) {
+                        continue;
+                    }
+                    // check if conditioning sets coincide
+                    std::vector<size_t> D(t);
+                    Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&D[0], t - 1) = 
+                        matrix_.col(j).head(t - 1);
+                    D[t - 1] = matrix_(d_ - j - 1, j); // add antidiagonal element
+                    if (is_same_set(D0, D)) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    std::stringstream problem;
+                    problem << 
+                        "not a valid R-vine matrix: " <<
+                        "proximity contition violated; " <<
+                        "cannot extract conditional distribution (" <<
+                        v0 << " | ";
+                    for (size_t i = 0; i < D0.size() - 1; ++i) {
+                        problem << D0[i] << ", ";
+                    }
+                    problem << D0[D0.size() - 1] << ") from pair-copulas.";
+                    throw std::runtime_error(problem.str().c_str());
+                }
+            }
+        }
+    }
+    
+    
     // translates matrix_entry from old to new labels
     size_t relabel_one(size_t x, 
         const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& old_labels, 
