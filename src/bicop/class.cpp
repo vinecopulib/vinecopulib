@@ -325,7 +325,7 @@ namespace vinecopulib
                 set_rotation(90);
             }
         } else {
-            bicop_->flip();    
+            bicop_->flip();
         }
     }
     
