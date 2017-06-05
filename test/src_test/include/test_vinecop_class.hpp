@@ -91,7 +91,8 @@ namespace test_vinecop_class {
             }
         }
         Eigen::Matrix<size_t, 2, 2> matrix;
-        matrix << 2,0,1,1;
+        matrix << 1, 1,
+                  2, 0;
         Vinecop vinecop(pair_copulas, matrix);
 
         // Test whether the analytic and simulated versions are "close" enough

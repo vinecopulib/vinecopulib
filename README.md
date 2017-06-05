@@ -468,6 +468,23 @@ Denoting by `M[i][j]` the matrix entry in row `i` and column `j` (starting at
 2. Jump up to the element in row `t` (second conditioned variable).
 3. Gather all entries further up in column `e` (conditioning set).
 
+A valid R-vine matrix must satisfy several conditions which are checked
+when `RVineMatrix()` is called:
+1. The lower right triangle must only contain zeros.
+2. The upper left triangle can only contain numbers between 1 and d.
+3. The antidiagonal must contain the numbers 1, ..., d.
+4. The antidiagonal entry of a column must not be contained in any 
+   column further to the right.
+5. The entries of a column must be contained in all columns to the left.
+6. The proximity condition must hold: For all t = 1, ..., d - 2 and 
+   e = 0, ..., d - t - 1 there must exist an index j > d, such that 
+   `(M[t, e], {M[0, e], ..., M[t-1, e]})` equals either
+   `(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})` or 
+   `(M[t-1, j], {M[d-j-1, j], M[0, j], ..., M[t-2, j]})`.
+
+Condition 6 already implies conditions 2-5, but is more difficult to
+check by hand.
+
 ### Fit and select a vine copula model
 
 The method `select_all()` performs parameter estimation and automatic
