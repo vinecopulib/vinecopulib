@@ -32,9 +32,9 @@ namespace vinecopulib
         // Getters and setters
         BicopFamily get_family() const;
         std::string get_family_name() const;
-        virtual Eigen::MatrixXd get_parameters() const;
-        virtual void set_parameters(const Eigen::MatrixXd& parameters);
-        virtual void flip();
+        virtual Eigen::MatrixXd get_parameters() const = 0;
+        virtual void set_parameters(const Eigen::MatrixXd& parameters) = 0;
+        virtual void flip() = 0;
 
         // Virtual methods
         virtual void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
