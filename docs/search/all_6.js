@@ -23,6 +23,8 @@ var searchData=
   ['get_5ftruncation_5flevel',['get_truncation_level',['../classvinecopulib_1_1_fit_controls_vinecop.html#afa52dd1f64f6a89ba59ad80374c268a0',1,'vinecopulib::FitControlsVinecop']]],
   ['get_5fxtol_5fabs',['get_xtol_abs',['../classvinecopulib_1_1tools__optimization_1_1_n_lopt_controls.html#a65494c81f12ff414259fd72593c545a6',1,'vinecopulib::tools_optimization::NLoptControls']]],
   ['get_5fxtol_5frel',['get_xtol_rel',['../classvinecopulib_1_1tools__optimization_1_1_n_lopt_controls.html#a27400ff85f220911c2937ca16dd51697',1,'vinecopulib::tools_optimization::NLoptControls']]],
+  ['ghalton',['ghalton',['../namespacevinecopulib_1_1tools__stats.html#ae0ba8000d0941c82677df06ce6d1d564',1,'vinecopulib::tools_stats']]],
+  ['ghalton_5fmax_5fdim',['ghalton_max_dim',['../tools__stats_8cpp.html#a311ce58bd6b4dd3b194e1e113917dab1',1,'tools_stats.cpp']]],
   ['gumbel',['gumbel',['../namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3a7bfb9d9ee5abbfa800e56bbe62db9bbe',1,'vinecopulib']]],
   ['gumbelbicop',['GumbelBicop',['../classvinecopulib_1_1_gumbel_bicop.html',1,'vinecopulib']]]
 ];

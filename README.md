@@ -27,8 +27,8 @@ Advantages over VineCopula are
 
 #### Status
 
-Version [0.0.2](https://github.com/vinecopulib/vinecopulib/releases) was
-released on March 31, 2017. While we did our best to
+Version [0.0.3](https://github.com/vinecopulib/vinecopulib/releases) was
+released on June 5, 2017. While we did our best to
 design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for R and Python.
 
@@ -74,10 +74,10 @@ Optionally, you'll need:
    * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
    * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
 
-Since NLopt has not had a release for over three years (as of May 2017) while 
+Since NLopt has not had a release for over three years (as of May 2017) while
 some maintanance work is done on the github repo, we suggest using the github
-version (and not the release from ab-initio.mit.edu). OSX users can easily 
-obtain the github version using Homebrew with `brew install --HEAD nlopt`, 
+version (and not the release from ab-initio.mit.edu). OSX users can easily
+obtain the github version using Homebrew with `brew install --HEAD nlopt`,
 Windows and Linux users are encouraged to compile nlopt manually from source.
 
 Note that a `findR.cmake` looks for R and VineCopula in the default locations
@@ -106,7 +106,7 @@ sudo make install && bin/test_all`
 
 To compile the library without unit tests, the `MakeFile` can be created via
  `cmake .. -DBUILD_TESTING=OFF`.
- 
+
 On Windows, CMake will generate Visual Studio files instead of Makefiles,
 the following sequence of commands can be used to perform compilation using the command prompt:
 ```
@@ -199,13 +199,13 @@ target_link_libraries(main ${external_libs})
 ```
 
 ### Namespaces
-In the examples mentioned above, it is assumed that `using namespace vinecopulib;` 
-is used. While the namespace `vinecopulib` contains the most important 
+In the examples mentioned above, it is assumed that `using namespace vinecopulib;`
+is used. While the namespace `vinecopulib` contains the most important
 functionalities described below, there are a few others that are available to the user:
--  `bicop_families`: convenience definitions of sets of bivariate copula families 
--  `tools_eigen`: tools for working with Eigen types 
--  `tools_optimization`: utilities for numerical optimization (based on NLopt) 
--  `tools_stats`: utilities for statistical analysis 
+-  `bicop_families`: convenience definitions of sets of bivariate copula families
+-  `tools_eigen`: tools for working with Eigen types
+-  `tools_optimization`: utilities for numerical optimization (based on NLopt)
+-  `tools_stats`: utilities for statistical analysis
 
 ## Bivariate copula models
 
@@ -482,13 +482,13 @@ when `RVineMatrix()` is called:
 1. The lower right triangle must only contain zeros.
 2. The upper left triangle can only contain numbers between 1 and d.
 3. The antidiagonal must contain the numbers 1, ..., d.
-4. The antidiagonal entry of a column must not be contained in any 
+4. The antidiagonal entry of a column must not be contained in any
    column further to the right.
 5. The entries of a column must be contained in all columns to the left.
-6. The proximity condition must hold: For all t = 1, ..., d - 2 and 
-   e = 0, ..., d - t - 1 there must exist an index j > d, such that 
+6. The proximity condition must hold: For all t = 1, ..., d - 2 and
+   e = 0, ..., d - t - 1 there must exist an index j > d, such that
    `(M[t, e], {M[0, e], ..., M[t-1, e]})` equals either
-   `(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})` or 
+   `(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})` or
    `(M[t-1, j], {M[d-j-1, j], M[0, j], ..., M[t-2, j]})`.
 
 Condition 6 already implies conditions 2-5, but is more difficult to

@@ -1,11 +1,5 @@
 var searchData=
 [
-  ['pairwise_5fcor',['pairwise_cor',['../namespacevinecopulib_1_1tools__stats.html#ad076513f9a531a015bb0eaff098a8271',1,'vinecopulib::tools_stats']]],
-  ['pairwise_5fhoeffd',['pairwise_hoeffd',['../namespacevinecopulib_1_1tools__stats.html#adda97526e428173da49899ef449560cf',1,'vinecopulib::tools_stats']]],
-  ['pairwise_5fktau',['pairwise_ktau',['../namespacevinecopulib_1_1tools__stats.html#aa1ed1d0ae4e304aef8c05737b4bfd024',1,'vinecopulib::tools_stats']]],
-  ['parameters_5fto_5ftau',['parameters_to_tau',['../classvinecopulib_1_1_bicop.html#aa25436353dee76e4368fb941a7efa257',1,'vinecopulib::Bicop']]],
-  ['pdf',['pdf',['../classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646',1,'vinecopulib::Bicop::pdf()'],['../classvinecopulib_1_1_vinecop.html#adf3760b8dd2b6d3a9cae5426188d4489',1,'vinecopulib::Vinecop::pdf()']]],
-  ['pmle_5fobjective',['pmle_objective',['../namespacevinecopulib_1_1tools__optimization.html#a8e87f5c5ee5463aded9dfa45e6c0d3f0',1,'vinecopulib::tools_optimization']]],
-  ['pnorm',['pnorm',['../namespacevinecopulib_1_1tools__stats.html#aa380a12540c4749e14049cdd0b163352',1,'vinecopulib::tools_stats']]],
-  ['pt',['pt',['../namespacevinecopulib_1_1tools__stats.html#a1f65dc25a8284fe4629f092969e2861a',1,'vinecopulib::tools_stats']]]
+  ['optimize',['optimize',['../classvinecopulib_1_1tools__optimization_1_1_optimizer.html#a3c4fcd7a4d3a792d2a9e57349f271764',1,'vinecopulib::tools_optimization::Optimizer']]],
+  ['optimizer',['Optimizer',['../classvinecopulib_1_1tools__optimization_1_1_optimizer.html#a1514592e4adccdcc544bb32654e81da1',1,'vinecopulib::tools_optimization::Optimizer::Optimizer(unsigned int n_parameters)'],['../classvinecopulib_1_1tools__optimization_1_1_optimizer.html#a43190e80f015257e203c134826857c7c',1,'vinecopulib::tools_optimization::Optimizer::Optimizer(unsigned int n_parameters, double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)']]]
 ];
