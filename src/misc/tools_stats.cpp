@@ -2,7 +2,7 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
@@ -11,21 +11,21 @@
 //! @file misc/tools_stats.cpp
 
 namespace vinecopulib {
-    
+
 //! Utilities for statistical analysis
 namespace tools_stats {
-    
+
     //! simulates from the multivariate uniform distribution
     //!
     //! @param n number of observations.
     //! @param d dimension.
     //!
-    //! @return An \f$ n \times d \f$ matrix of independent 
+    //! @return An \f$ n \times d \f$ matrix of independent
     //! \f$ \mathrm{U}[0, 1] \f$ random variables.
     Eigen::MatrixXd simulate_uniform(size_t n, size_t d)
     {
         if ((n < 1) | (d < 1)) {
-            throw std::runtime_error("both n and d must be at least 1.");        
+            throw std::runtime_error("both n and d must be at least 1.");
         }
         Eigen::MatrixXd U(n, d);
         std::random_device rd;
@@ -33,7 +33,7 @@ namespace tools_stats {
         std::uniform_real_distribution<double> distribution(0.0, 1.0);
         return U.unaryExpr([&](double) { return distribution(generator); });
     }
-    
+
     //! applies the empirical probability integral transform to a data matrix.
     //!
     //! Gives pseudo-observations from the copula by applying the empirical
@@ -50,7 +50,7 @@ namespace tools_stats {
 
         return x;
     }
-    
+
     //! applies the empirical probability integral transform to a data vector.
     //!
     //! Gives pseudo-observations from the copula by applying the empirical
@@ -106,11 +106,11 @@ namespace tools_stats {
 
         return x / (x.size() + 1.0);
     }
-    
+
     //! @name Pairwise dependence measures
     //! @param x an \f$ n \times 2 \f$ matrix of observations.
     //! @{
-      
+
     //! calculates the pairwise Kendall's \f$ \tau \f$.
     double pairwise_ktau(Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
     {
@@ -168,12 +168,14 @@ namespace tools_stats {
 
         return 30.0*D;
     }
-    
+
     //! @}
 
+
+    //! Maximal dimension allowed for generalized Halton quasi Monte Carlo.
     #define ghalton_max_dim 360
 
-    // Primes for ghalton()
+    //! Primes for ghalton()
     static Eigen::Matrix<int, ghalton_max_dim, 1> primes = [] {
         Eigen::Matrix<int, ghalton_max_dim, 1> tmp;
         tmp << 2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71, 73,79,83,89,97,101,

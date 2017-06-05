@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['optimize',['optimize',['../classvinecopulib_1_1tools__optimization_1_1_optimizer.html#a3c4fcd7a4d3a792d2a9e57349f271764',1,'vinecopulib::tools_optimization::Optimizer']]],
-  ['optimizer',['Optimizer',['../classvinecopulib_1_1tools__optimization_1_1_optimizer.html#a1514592e4adccdcc544bb32654e81da1',1,'vinecopulib::tools_optimization::Optimizer::Optimizer(unsigned int n_parameters)'],['../classvinecopulib_1_1tools__optimization_1_1_optimizer.html#a43190e80f015257e203c134826857c7c',1,'vinecopulib::tools_optimization::Optimizer::Optimizer(unsigned int n_parameters, double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)']]]
+  ['nloptcontrols',['NLoptControls',['../classvinecopulib_1_1tools__optimization_1_1_n_lopt_controls.html#aaa09bb2bbf7dcbfcaaae4921b053c502',1,'vinecopulib::tools_optimization::NLoptControls::NLoptControls()'],['../classvinecopulib_1_1tools__optimization_1_1_n_lopt_controls.html#aa8f12e7923d8dc5a28a49c6f23f204db',1,'vinecopulib::tools_optimization::NLoptControls::NLoptControls(double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)']]]
 ];

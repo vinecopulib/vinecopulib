@@ -1,5 +1,6 @@
-\hypertarget{namespacevinecopulib_1_1tools__eigen}{}\section{vinecopulib\+:\+:tools\+\_\+eigen Namespace Reference}
+\hypertarget{namespacevinecopulib_1_1tools__eigen}{\section{vinecopulib\+:\+:tools\+\_\+eigen Namespace Reference}
 \label{namespacevinecopulib_1_1tools__eigen}\index{vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}}
+}
 
 
 Tools for working with Eigen types.  
@@ -8,17 +9,23 @@ Tools for working with Eigen types.
 \subsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
-typedef Eigen\+::\+Matrix$<$ bool, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{namespacevinecopulib_1_1tools__eigen_a2fcd63009df35741859f44f1e41931f9}{Matrix\+Xb}\hypertarget{namespacevinecopulib_1_1tools__eigen_a2fcd63009df35741859f44f1e41931f9}{}\label{namespacevinecopulib_1_1tools__eigen_a2fcd63009df35741859f44f1e41931f9}
+\hypertarget{namespacevinecopulib_1_1tools__eigen_a2fcd63009df35741859f44f1e41931f9}{typedef Eigen\+::\+Matrix$<$ bool, \\*
+Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{namespacevinecopulib_1_1tools__eigen_a2fcd63009df35741859f44f1e41931f9}{Matrix\+Xb}}\label{namespacevinecopulib_1_1tools__eigen_a2fcd63009df35741859f44f1e41931f9}
 
 \begin{DoxyCompactList}\small\item\em An {\ttfamily Eigen\+::\+Matrix} containing {\ttfamily bool}s (similar to {\ttfamily Eigen\+::\+Matrix\+Xd}). \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \hyperlink{namespacevinecopulib_1_1tools__eigen_a87f5c90d47fb6baffc84ad28a82d8f0e}{swap\+\_\+cols} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ u)
+Eigen\+::\+Matrix$<$ double, \\*
+Eigen\+::\+Dynamic, 2 $>$ \hyperlink{namespacevinecopulib_1_1tools__eigen_a87f5c90d47fb6baffc84ad28a82d8f0e}{swap\+\_\+cols} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ u)
 \item 
 Eigen\+::\+Vector\+Xd \hyperlink{namespacevinecopulib_1_1tools__eigen_a164995419e7e473fc4cec081ce4bcb85}{invert\+\_\+f} (const Eigen\+::\+Vector\+Xd \&x, std\+::function$<$ Eigen\+::\+Vector\+Xd(const Eigen\+::\+Vector\+Xd \&)$>$ f, const double lb, const double ub, int n\+\_\+iter)
 \item 
-Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{namespacevinecopulib_1_1tools__eigen_ac9f84f6a2e75bf8b559e5b0845abd782}{read\+\_\+matxs} (const char $\ast$filename, int max\+\_\+buffer\+\_\+size)
+Eigen\+::\+Matrix$<$ double, \\*
+Eigen\+::\+Dynamic, 2 $>$ \hyperlink{namespacevinecopulib_1_1tools__eigen_a231dcb246ee7c996b822084e436a1c95}{expand\+\_\+grid} (const Eigen\+::\+Vector\+Xd \&grid\+\_\+points)
+\item 
+Eigen\+::\+Matrix$<$ size\+\_\+t, \\*
+Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{namespacevinecopulib_1_1tools__eigen_ac9f84f6a2e75bf8b559e5b0845abd782}{read\+\_\+matxs} (const char $\ast$filename, int max\+\_\+buffer\+\_\+size)
 \item 
 Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__eigen_adccba44df8156221d52f2d9ffbe321de}{read\+\_\+matxd} (const char $\ast$filename, int max\+\_\+buffer\+\_\+size)
 \end{DoxyCompactItemize}
@@ -28,9 +35,23 @@ Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__eigen_adccba44df
 Tools for working with Eigen types. 
 
 \subsection{Function Documentation}
-\index{vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}!invert\+\_\+f@{invert\+\_\+f}}
+\hypertarget{namespacevinecopulib_1_1tools__eigen_a231dcb246ee7c996b822084e436a1c95}{\index{vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}!expand\+\_\+grid@{expand\+\_\+grid}}
+\index{expand\+\_\+grid@{expand\+\_\+grid}!vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}}
+\subsubsection[{expand\+\_\+grid}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ vinecopulib\+::tools\+\_\+eigen\+::expand\+\_\+grid (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Vector\+Xd \&}]{grid\+\_\+points}
+\end{DoxyParamCaption}
+)}}\label{namespacevinecopulib_1_1tools__eigen_a231dcb246ee7c996b822084e436a1c95}
+expand a vector into a matrix with two columns where each row contains one combination of the vector elements
+
+
+\begin{DoxyParams}{Parameters}
+{\em grid\+\_\+points} & the vector to expand. \\
+\hline
+\end{DoxyParams}
+\hypertarget{namespacevinecopulib_1_1tools__eigen_a164995419e7e473fc4cec081ce4bcb85}{\index{vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}!invert\+\_\+f@{invert\+\_\+f}}
 \index{invert\+\_\+f@{invert\+\_\+f}!vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}}
-\subsubsection[{\texorpdfstring{invert\+\_\+f(const Eigen\+::\+Vector\+Xd \&x, std\+::function$<$ Eigen\+::\+Vector\+Xd(const Eigen\+::\+Vector\+Xd \&)$>$ f, const double lb, const double ub, int n\+\_\+iter)}{invert_f(const Eigen::VectorXd &x, std::function< Eigen::VectorXd(const Eigen::VectorXd &)> f, const double lb, const double ub, int n_iter)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::tools\+\_\+eigen\+::invert\+\_\+f (
+\subsubsection[{invert\+\_\+f}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::tools\+\_\+eigen\+::invert\+\_\+f (
 \begin{DoxyParamCaption}
 \item[{const Eigen\+::\+Vector\+Xd \&}]{x, }
 \item[{std\+::function$<$ Eigen\+::\+Vector\+Xd(const Eigen\+::\+Vector\+Xd \&)$>$}]{f, }
@@ -38,7 +59,7 @@ Tools for working with Eigen types.
 \item[{const double}]{ub, }
 \item[{int}]{n\+\_\+iter}
 \end{DoxyParamCaption}
-)}\hypertarget{namespacevinecopulib_1_1tools__eigen_a164995419e7e473fc4cec081ce4bcb85}{}\label{namespacevinecopulib_1_1tools__eigen_a164995419e7e473fc4cec081ce4bcb85}
+)}}\label{namespacevinecopulib_1_1tools__eigen_a164995419e7e473fc4cec081ce4bcb85}
 computes the inverse $ f^{-1} $ of a function $ f $ by the bisection method.
 
 
@@ -57,14 +78,14 @@ computes the inverse $ f^{-1} $ of a function $ f $ by the bisection method.
 \begin{DoxyReturn}{Returns}
 $ f^{-1}(x) $. 
 \end{DoxyReturn}
-\index{vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}!read\+\_\+matxd@{read\+\_\+matxd}}
+\hypertarget{namespacevinecopulib_1_1tools__eigen_adccba44df8156221d52f2d9ffbe321de}{\index{vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}!read\+\_\+matxd@{read\+\_\+matxd}}
 \index{read\+\_\+matxd@{read\+\_\+matxd}!vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}}
-\subsubsection[{\texorpdfstring{read\+\_\+matxd(const char $\ast$filename, int max\+\_\+buffer\+\_\+size)}{read_matxd(const char *filename, int max_buffer_size)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+eigen\+::read\+\_\+matxd (
+\subsubsection[{read\+\_\+matxd}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+eigen\+::read\+\_\+matxd (
 \begin{DoxyParamCaption}
 \item[{const char $\ast$}]{filename, }
 \item[{int}]{max\+\_\+buffer\+\_\+size}
 \end{DoxyParamCaption}
-)}\hypertarget{namespacevinecopulib_1_1tools__eigen_adccba44df8156221d52f2d9ffbe321de}{}\label{namespacevinecopulib_1_1tools__eigen_adccba44df8156221d52f2d9ffbe321de}
+)}}\label{namespacevinecopulib_1_1tools__eigen_adccba44df8156221d52f2d9ffbe321de}
 reads data from a file to an Eigen matrix of doubles.
 
 The function is currently {\bfseries not safe} and may cause crashes when the arguments are specified incorrectly.
@@ -76,14 +97,14 @@ The function is currently {\bfseries not safe} and may cause crashes when the ar
 {\em max\+\_\+buffer\+\_\+size} & the maximal buffer size. \\
 \hline
 \end{DoxyParams}
-\index{vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}!read\+\_\+matxs@{read\+\_\+matxs}}
+\hypertarget{namespacevinecopulib_1_1tools__eigen_ac9f84f6a2e75bf8b559e5b0845abd782}{\index{vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}!read\+\_\+matxs@{read\+\_\+matxs}}
 \index{read\+\_\+matxs@{read\+\_\+matxs}!vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}}
-\subsubsection[{\texorpdfstring{read\+\_\+matxs(const char $\ast$filename, int max\+\_\+buffer\+\_\+size)}{read_matxs(const char *filename, int max_buffer_size)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ vinecopulib\+::tools\+\_\+eigen\+::read\+\_\+matxs (
+\subsubsection[{read\+\_\+matxs}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ vinecopulib\+::tools\+\_\+eigen\+::read\+\_\+matxs (
 \begin{DoxyParamCaption}
 \item[{const char $\ast$}]{filename, }
 \item[{int}]{max\+\_\+buffer\+\_\+size}
 \end{DoxyParamCaption}
-)}\hypertarget{namespacevinecopulib_1_1tools__eigen_ac9f84f6a2e75bf8b559e5b0845abd782}{}\label{namespacevinecopulib_1_1tools__eigen_ac9f84f6a2e75bf8b559e5b0845abd782}
+)}}\label{namespacevinecopulib_1_1tools__eigen_ac9f84f6a2e75bf8b559e5b0845abd782}
 reads data from a file to an Eigen matrix of integers.
 
 The function is currently {\bfseries not safe} and may cause crashes when the arguments are specified incorrectly.
@@ -95,13 +116,13 @@ The function is currently {\bfseries not safe} and may cause crashes when the ar
 {\em max\+\_\+buffer\+\_\+size} & the maximal buffer size. \\
 \hline
 \end{DoxyParams}
-\index{vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}!swap\+\_\+cols@{swap\+\_\+cols}}
+\hypertarget{namespacevinecopulib_1_1tools__eigen_a87f5c90d47fb6baffc84ad28a82d8f0e}{\index{vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}!swap\+\_\+cols@{swap\+\_\+cols}}
 \index{swap\+\_\+cols@{swap\+\_\+cols}!vinecopulib\+::tools\+\_\+eigen@{vinecopulib\+::tools\+\_\+eigen}}
-\subsubsection[{\texorpdfstring{swap\+\_\+cols(\+Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ u)}{swap_cols(Eigen::Matrix< double, Eigen::Dynamic, 2 > u)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ vinecopulib\+::tools\+\_\+eigen\+::swap\+\_\+cols (
+\subsubsection[{swap\+\_\+cols}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ vinecopulib\+::tools\+\_\+eigen\+::swap\+\_\+cols (
 \begin{DoxyParamCaption}
 \item[{Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$}]{u}
 \end{DoxyParamCaption}
-)}\hypertarget{namespacevinecopulib_1_1tools__eigen_a87f5c90d47fb6baffc84ad28a82d8f0e}{}\label{namespacevinecopulib_1_1tools__eigen_a87f5c90d47fb6baffc84ad28a82d8f0e}
+)}}\label{namespacevinecopulib_1_1tools__eigen_a87f5c90d47fb6baffc84ad28a82d8f0e}
 swap the columns of a two-\/column matrix 
 \begin{DoxyParams}{Parameters}
 {\em u} & the matrix. \\

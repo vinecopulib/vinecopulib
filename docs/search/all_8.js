@@ -4,6 +4,7 @@ var searchData=
   ['indep',['indep',['../namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65',1,'vinecopulib']]],
   ['indepbicop',['IndepBicop',['../classvinecopulib_1_1_indep_bicop.html',1,'vinecopulib']]],
   ['intergrate_5f1d',['intergrate_1d',['../classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid.html#abe7711ab9183964ce99f43dccb097299',1,'vinecopulib::tools_interpolation::InterpolationGrid']]],
+  ['intergrate_5f2d',['intergrate_2d',['../classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid.html#a2e0e9281bca1d290de2c21871649008b',1,'vinecopulib::tools_interpolation::InterpolationGrid']]],
   ['interpolate',['interpolate',['../classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid.html#adee449dd69cee82748f02f9133069fc1',1,'vinecopulib::tools_interpolation::InterpolationGrid']]],
   ['interpolationgrid',['InterpolationGrid',['../classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid.html',1,'vinecopulib::tools_interpolation']]],
   ['interpolationgrid',['InterpolationGrid',['../classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid.html#a2cc351aee4b943dba785881b893b35b2',1,'vinecopulib::tools_interpolation::InterpolationGrid']]],

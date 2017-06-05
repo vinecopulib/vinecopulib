@@ -1,5 +1,6 @@
-\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid}{}\section{vinecopulib\+:\+:tools\+\_\+interpolation\+:\+:Interpolation\+Grid Class Reference}
+\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid}{\section{vinecopulib\+:\+:tools\+\_\+interpolation\+:\+:Interpolation\+Grid Class Reference}
 \label{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid}\index{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}}
+}
 
 
 {\ttfamily \#include $<$tools\+\_\+interpolation.\+hpp$>$}
@@ -9,12 +10,14 @@
 \item 
 \hyperlink{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a2cc351aee4b943dba785881b893b35b2}{Interpolation\+Grid} (const Eigen\+::\+Vector\+Xd \&grid\+\_\+points, const Eigen\+::\+Matrix\+Xd \&values)
 \item 
-void {\bfseries flip} ()\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a9eec97102cfbb146cda8f6f4d4fc0794}{}\label{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a9eec97102cfbb146cda8f6f4d4fc0794}
+\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a9eec97102cfbb146cda8f6f4d4fc0794}{void {\bfseries flip} ()}\label{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a9eec97102cfbb146cda8f6f4d4fc0794}
 
 \item 
 Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_adee449dd69cee82748f02f9133069fc1}{interpolate} (const Eigen\+::\+Matrix\+Xd \&x)
 \item 
 Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_abe7711ab9183964ce99f43dccb097299}{intergrate\+\_\+1d} (const Eigen\+::\+Matrix\+Xd \&u, size\+\_\+t cond\+\_\+var)
+\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a2e0e9281bca1d290de2c21871649008b}{intergrate\+\_\+2d} (const Eigen\+::\+Matrix\+Xd \&u)
 \end{DoxyCompactItemize}
 
 
@@ -24,14 +27,14 @@ A class for cubic spline interpolation of bivariate copulas
 The class is used for implementing kernel estimators. It makes storing the observations obsolete and allows for fast numerical integration. 
 
 \subsection{Constructor \& Destructor Documentation}
-\index{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}!Interpolation\+Grid@{Interpolation\+Grid}}
+\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a2cc351aee4b943dba785881b893b35b2}{\index{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}!Interpolation\+Grid@{Interpolation\+Grid}}
 \index{Interpolation\+Grid@{Interpolation\+Grid}!vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}}
-\subsubsection[{\texorpdfstring{Interpolation\+Grid(const Eigen\+::\+Vector\+Xd \&grid\+\_\+points, const Eigen\+::\+Matrix\+Xd \&values)}{InterpolationGrid(const Eigen::VectorXd &grid_points, const Eigen::MatrixXd &values)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid\+::\+Interpolation\+Grid (
+\subsubsection[{Interpolation\+Grid}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid\+::\+Interpolation\+Grid (
 \begin{DoxyParamCaption}
 \item[{const Eigen\+::\+Vector\+Xd \&}]{grid\+\_\+points, }
 \item[{const Eigen\+::\+Matrix\+Xd \&}]{values}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a2cc351aee4b943dba785881b893b35b2}{}\label{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a2cc351aee4b943dba785881b893b35b2}
+)}}\label{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a2cc351aee4b943dba785881b893b35b2}
 Constructor
 
 
@@ -44,14 +47,14 @@ Constructor
 
 
 \subsection{Member Function Documentation}
-\index{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}!intergrate\+\_\+1d@{intergrate\+\_\+1d}}
+\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_abe7711ab9183964ce99f43dccb097299}{\index{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}!intergrate\+\_\+1d@{intergrate\+\_\+1d}}
 \index{intergrate\+\_\+1d@{intergrate\+\_\+1d}!vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}}
-\subsubsection[{\texorpdfstring{intergrate\+\_\+1d(const Eigen\+::\+Matrix\+Xd \&u, size\+\_\+t cond\+\_\+var)}{intergrate_1d(const Eigen::MatrixXd &u, size_t cond_var)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid\+::intergrate\+\_\+1d (
+\subsubsection[{intergrate\+\_\+1d}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid\+::intergrate\+\_\+1d (
 \begin{DoxyParamCaption}
 \item[{const Eigen\+::\+Matrix\+Xd \&}]{u, }
 \item[{size\+\_\+t}]{cond\+\_\+var}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_abe7711ab9183964ce99f43dccb097299}{}\label{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_abe7711ab9183964ce99f43dccb097299}
+)}}\label{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_abe7711ab9183964ce99f43dccb097299}
 Integrate the grid along one axis
 
 
@@ -61,13 +64,27 @@ Integrate the grid along one axis
 {\em cond\+\_\+var} & either 1 or 2; the axis considered fixed. \\
 \hline
 \end{DoxyParams}
-\index{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}!interpolate@{interpolate}}
+\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a2e0e9281bca1d290de2c21871649008b}{\index{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}!intergrate\+\_\+2d@{intergrate\+\_\+2d}}
+\index{intergrate\+\_\+2d@{intergrate\+\_\+2d}!vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}}
+\subsubsection[{intergrate\+\_\+2d}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid\+::intergrate\+\_\+2d (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{u}
+\end{DoxyParamCaption}
+)}}\label{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_a2e0e9281bca1d290de2c21871649008b}
+Integrate the grid along the two axis
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & mx2 matrix of evaluation points \\
+\hline
+\end{DoxyParams}
+\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_adee449dd69cee82748f02f9133069fc1}{\index{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}!interpolate@{interpolate}}
 \index{interpolate@{interpolate}!vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid@{vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid}}
-\subsubsection[{\texorpdfstring{interpolate(const Eigen\+::\+Matrix\+Xd \&x)}{interpolate(const Eigen::MatrixXd &x)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid\+::interpolate (
+\subsubsection[{interpolate}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::tools\+\_\+interpolation\+::\+Interpolation\+Grid\+::interpolate (
 \begin{DoxyParamCaption}
 \item[{const Eigen\+::\+Matrix\+Xd \&}]{x}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_adee449dd69cee82748f02f9133069fc1}{}\label{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_adee449dd69cee82748f02f9133069fc1}
+)}}\label{classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid_adee449dd69cee82748f02f9133069fc1}
 Interpolation in two dimensions
 
 
@@ -79,5 +96,5 @@ Interpolation in two dimensions
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/n5/dev/cpp/vinecopulib/include/vinecopulib/misc/tools\+\_\+interpolation.\+hpp\item 
-/home/n5/dev/cpp/vinecopulib/src/misc/tools\+\_\+interpolation.\+cpp\end{DoxyCompactItemize}
+vinecopulib/include/vinecopulib/misc/tools\+\_\+interpolation.\+hpp\item 
+vinecopulib/src/misc/tools\+\_\+interpolation.\+cpp\end{DoxyCompactItemize}

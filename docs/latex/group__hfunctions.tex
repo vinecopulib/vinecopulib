@@ -1,0 +1,30 @@
+\hypertarget{group__hfunctions}{\section{h-\/functions}
+\label{group__hfunctions}\index{h-\/functions@{h-\/functions}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__hfunctions_ga67c3d22228770488c70bdf69ee096317}{Vec\+Xd {\bfseries Bicop\+::hfunc1} (const Mat\+Xd \&u)}\label{group__hfunctions_ga67c3d22228770488c70bdf69ee096317}
+
+\item 
+\hypertarget{group__hfunctions_ga2aaa33ca89f748cba38c28e3e0ab92c3}{Vec\+Xd {\bfseries Bicop\+::hfunc2} (const Mat\+Xd \&u)}\label{group__hfunctions_ga2aaa33ca89f748cba38c28e3e0ab92c3}
+
+\item 
+\hypertarget{group__hfunctions_ga61e9a1af49a11fdf215ab74a544ce955}{Vec\+Xd {\bfseries Bicop\+::hinv1} (const Mat\+Xd \&u)}\label{group__hfunctions_ga61e9a1af49a11fdf215ab74a544ce955}
+
+\item 
+\hypertarget{group__hfunctions_ga36fddab47d9b8291ddaeaf5735ca24da}{Vec\+Xd {\bfseries Bicop\+::hinv2} (const Mat\+Xd \&u)}\label{group__hfunctions_ga36fddab47d9b8291ddaeaf5735ca24da}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+h-\/functions are defined as one-\/dimensional integrals over a bivariate copula density $ c $, \[ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) ds, \] \[ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds. \] {\ttfamily hinv1} is the inverse w.\+r.\+t. second argument (conditioned on first), {\ttfamily hinv2} is the inverse w.\+r.\+t. first argument (conditioned on second),
+
+{\ttfamily hfunc1}, {\ttfamily hfunc2}, {\ttfamily hinv1}, and {\ttfamily hinv2} mainly take care that rotations are properly handled. They call {\ttfamily hfunc1\+\_\+default}, {\ttfamily hfunc2\+\_\+default}, {\ttfamily hinv1\+\_\+default}, and hinv2\+\_\+default which are family-\/specific implementations for {\ttfamily rotation = 0}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $m \times 2$ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}

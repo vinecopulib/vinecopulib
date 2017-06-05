@@ -27,8 +27,8 @@ Advantages over VineCopula are
 
 #### Status
 
-Version [0.0.2](https://github.com/vinecopulib/vinecopulib/releases) was
-released on March 31, 2017. While we did our best to
+Version [0.0.3](https://github.com/vinecopulib/vinecopulib/releases) was
+released on June 5, 2017. While we did our best to
 design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for R and Python.
 
@@ -43,6 +43,7 @@ set of classes and methods can be found in the
 	- [Requirements](#requirements)
 	- [How to build the library](#how-to-build-the-library)
 	- [How to include the library in other projects](#how-to-inlude-the-library-in-other-projects)
+	- [Namespaces](#namespaces)
 - [Bivariate copula models](#bivariate-copula-models)
 	- [Implemented bivariate copula families](#implemented-bivariate-copula-families)
 	- [Set up a custom bivariate copula model](#set-up-a-custom-bivariate-copula-model)
@@ -63,22 +64,21 @@ set of classes and methods can be found in the
 
 To build the library, you'll need at minimum:
 
-   * [a C++11-compatible compiler](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers)
-   * [CMake](https://cmake.org/)
-   * [Boost 1.63](http://www.boost.org/)
-   * [Eigen 3.3](http://eigen.tuxfamily.org/index.php?title=Main_Page)
+   * [a C++11-compatible compiler (tested with GCC 6.3.0 and Clang 3.5.0 on Linux and AppleClang 8.0.0 on OSX)](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers)
+   * [CMake 3.2 (or later)](https://cmake.org/)
+   * [Boost 1.56 (or later)](http://www.boost.org/)
+   * [Eigen 3.3 (or later)](http://eigen.tuxfamily.org/index.php?title=Main_Page)
    * [NLopt](https://github.com/stevengj/nlopt)
 
 Optionally, you'll need:
    * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
    * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
 
-Since NLopt has not had a release for over three years (as of May 2017) while 
+Since NLopt has not had a release for over three years (as of May 2017) while
 some maintanance work is done on the github repo, we suggest using the github
-version (and not the release from ab-initio.mit.edu) what is assumed in the
-vinecopulib's CMake scripts. OSX users can easily obtain the github version 
-using Homebrew with `brew install --HEAD nlopt`, Windows and Linux users
-are encouraged to compile nlopt manually from source.
+version (and not the release from ab-initio.mit.edu). OSX users can easily
+obtain the github version using Homebrew with `brew install --HEAD nlopt`,
+Windows and Linux users are encouraged to compile nlopt manually from source.
 
 Note that a `findR.cmake` looks for R and VineCopula in the default locations
 for linux and osx, but problems might occur with versions installed from
@@ -106,7 +106,7 @@ sudo make install && bin/test_all`
 
 To compile the library without unit tests, the `MakeFile` can be created via
  `cmake .. -DBUILD_TESTING=OFF`.
- 
+
 On Windows, CMake will generate Visual Studio files instead of Makefiles,
 the following sequence of commands can be used to perform compilation using the command prompt:
 ```
@@ -171,7 +171,7 @@ set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -We
 
 # Find vinecopulib package and dependencies
 find_package(vinecopulib                  REQUIRED)
-find_package(Boost 1.63                   REQUIRED)
+find_package(Boost 1.56                   REQUIRED)
 find_package(NLopt                        REQUIRED)
 include(cmake/findEigen3.cmake            REQUIRED)
 
@@ -195,8 +195,17 @@ include_directories(${external_includes})
 add_executable(main main.cpp)
 
 # Link to vinecopulib and dependencies
-target_link_libraries(vinecopulib_main ${external_libs})
+target_link_libraries(main ${external_libs})
 ```
+
+### Namespaces
+In the examples mentioned above, it is assumed that `using namespace vinecopulib;`
+is used. While the namespace `vinecopulib` contains the most important
+functionalities described below, there are a few others that are available to the user:
+-  `bicop_families`: convenience definitions of sets of bivariate copula families
+-  `tools_eigen`: tools for working with Eigen types
+-  `tools_optimization`: utilities for numerical optimization (based on NLopt)
+-  `tools_stats`: utilities for statistical analysis
 
 ## Bivariate copula models
 
@@ -417,7 +426,7 @@ int d = 3;
 Vinecop default_model(d);
 
 // alternatively, instantiate a std::vector<std::vector<Bicop>> object
-auto pair_copulas = Vinecop::make_pair_copula_store(3);  
+auto pair_copulas = Vinecop::make_pair_copula_store(d);  
 
 // specify the pair copulas
 auto par = Eigen::VectorXd::Constant(1, 3.0);
@@ -441,7 +450,7 @@ described [below](#fit-and-select-a-vine-copula-model).
 
 ### How to read the R-vine matrix
 
-The R-vine matrix notation in vinecopulib different from the one in VineCopula.
+The R-vine matrix notation in vinecopulib is different from the one in VineCopula.
 An example matrix is
 ```
 1 1 1 1
@@ -473,13 +482,13 @@ when `RVineMatrix()` is called:
 1. The lower right triangle must only contain zeros.
 2. The upper left triangle can only contain numbers between 1 and d.
 3. The antidiagonal must contain the numbers 1, ..., d.
-4. The antidiagonal entry of a column must not be contained in any 
+4. The antidiagonal entry of a column must not be contained in any
    column further to the right.
 5. The entries of a column must be contained in all columns to the left.
-6. The proximity condition must hold: For all t = 1, ..., d - 2 and 
-   e = 0, ..., d - t - 1 there must exist an index j > d, such that 
+6. The proximity condition must hold: For all t = 1, ..., d - 2 and
+   e = 0, ..., d - t - 1 there must exist an index j > d, such that
    `(M[t, e], {M[0, e], ..., M[t-1, e]})` equals either
-   `(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})` or 
+   `(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})` or
    `(M[t-1, j], {M[d-j-1, j], M[0, j], ..., M[t-2, j]})`.
 
 Condition 6 already implies conditions 2-5, but is more difficult to
@@ -503,7 +512,7 @@ structure of the object), using the sequential procedure proposed by
 int d = 5;
 
 // simulate dummy data
-Eigen::MatrixXd data = simulate_uniform(100, d);
+Eigen::MatrixXd data = tools_stats::simulate_uniform(100, d);
 
 // instantiate a D-vine and select the families
 Vinecop model(d);

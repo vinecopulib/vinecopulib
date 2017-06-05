@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['in_5fnatural_5forder',['in_natural_order',['../classvinecopulib_1_1_r_vine_matrix.html#a4e63d8b01e1d89284ca28192676b8a3f',1,'vinecopulib::RVineMatrix']]],
-  ['intergrate_5f1d',['intergrate_1d',['../classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid.html#abe7711ab9183964ce99f43dccb097299',1,'vinecopulib::tools_interpolation::InterpolationGrid']]],
-  ['interpolate',['interpolate',['../classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid.html#adee449dd69cee82748f02f9133069fc1',1,'vinecopulib::tools_interpolation::InterpolationGrid']]],
-  ['interpolationgrid',['InterpolationGrid',['../classvinecopulib_1_1tools__interpolation_1_1_interpolation_grid.html#a2cc351aee4b943dba785881b893b35b2',1,'vinecopulib::tools_interpolation::InterpolationGrid']]],
-  ['inverse_5frosenblatt',['inverse_rosenblatt',['../classvinecopulib_1_1_vinecop.html#ac64ae8072851ea1cd4ed7143cac92933',1,'vinecopulib::Vinecop']]],
-  ['invert_5ff',['invert_f',['../namespacevinecopulib_1_1tools__eigen.html#a164995419e7e473fc4cec081ce4bcb85',1,'vinecopulib::tools_eigen']]]
+  ['hfunc1',['hfunc1',['../classvinecopulib_1_1_bicop.html#a130fda62cd61c7acdef5db75fffdd89e',1,'vinecopulib::Bicop']]],
+  ['hfunc2',['hfunc2',['../classvinecopulib_1_1_bicop.html#a4c9b50f99797ec374f5057cc54db2bd8',1,'vinecopulib::Bicop']]],
+  ['hinv1',['hinv1',['../classvinecopulib_1_1_bicop.html#a3cc8b161ec6efdb3b34d2efa9185bf44',1,'vinecopulib::Bicop']]],
+  ['hinv1_5fnum',['hinv1_num',['../classvinecopulib_1_1_abstract_bicop.html#a7dc5b05857ece56b7e336e1175387a8e',1,'vinecopulib::AbstractBicop']]],
+  ['hinv2',['hinv2',['../classvinecopulib_1_1_bicop.html#a3e33ec227b6b7182e327399201cad382',1,'vinecopulib::Bicop']]]
 ];
