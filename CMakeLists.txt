@@ -6,12 +6,6 @@ project(vinecopulib VERSION 0.0.3)
 
 include(cmake/options.cmake               REQUIRED)
 
-include(cmake/findEigen3.cmake            REQUIRED)
-
-include(cmake/findNlopt.cmake             REQUIRED)
-
-include(cmake/findR.cmake                 REQUIRED)
-
 include(cmake/findDependencies.cmake      REQUIRED)
 
 include(cmake/findDoxygen.cmake           REQUIRED)
