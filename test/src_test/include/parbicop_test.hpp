@@ -38,10 +38,6 @@ protected:
         if (tools_stl::is_member(family, bicop_families::rotationless)) {
             bicop_ = Bicop(family);
         } else {
-            std::cout << "here" << std::endl;
-            std::cout << get_family_name(family) << std::endl;
-            std::cout << rotation << std::endl;
-            std::cout << "here2" << std::endl;
             bicop_ = Bicop(family, rotation);
         }
 

@@ -23,7 +23,6 @@
 #include <vinecopulib/bicop/student.hpp>
 #include <vinecopulib/bicop/tll0.hpp>
 
-#include <iostream>
 namespace vinecopulib
 {
     //! Create a bivariate copula using the default contructor
@@ -36,24 +35,18 @@ namespace vinecopulib
     BicopPtr AbstractBicop::create(BicopFamily family,
                                    const Eigen::MatrixXd& parameters)
     {
-        std::cout << "create" << std::endl;
-        //std::cout << vinecopulib::get_family_name(family) << std::endl;
         BicopPtr new_bicop;
         switch (family) {
             case BicopFamily::indep:
-                std::cout << vinecopulib::get_family_name(family) << std::endl;
                 new_bicop = BicopPtr(new IndepBicop());
                 break;
             case BicopFamily::gaussian:
-                std::cout << vinecopulib::get_family_name(family) << std::endl;
                 new_bicop = BicopPtr(new GaussianBicop());
                 break;
             case BicopFamily::student:
-                std::cout << vinecopulib::get_family_name(family) << std::endl;
                 new_bicop = BicopPtr(new StudentBicop());
                 break;
             case BicopFamily::clayton:
-                std::cout << vinecopulib::get_family_name(family) << std::endl;
                 new_bicop = BicopPtr(new ClaytonBicop());
                 break;
             case BicopFamily::gumbel:
@@ -84,9 +77,6 @@ namespace vinecopulib
             default:
                 throw std::runtime_error(std::string("Family not implemented"));
         }
-
-        std::cout << "create2" << std::endl;
-        std::cout << new_bicop->get_family_name() << std::endl;
         
         if (parameters.size() > 0) {
             new_bicop->set_parameters(parameters);

@@ -45,7 +45,6 @@ namespace vinecopulib
         void flip();
 
         // Data members
-        BicopFamily family_;
         Eigen::MatrixXd parameters_;
         Eigen::MatrixXd parameters_lower_bounds_;
         Eigen::MatrixXd parameters_upper_bounds_;
