@@ -11,6 +11,13 @@
 namespace test_bicop_kernel {
     using namespace vinecopulib;
 
+    TEST_F(TrafokernelTest, trafo_kernel_sanity_checks) {
+        auto values = bicop_.get_parameters();
+        EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0,0,30,1)));
+        EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0,0,1,30)));
+        EXPECT_ANY_THROW(bicop_.set_parameters(-1*values));
+    }
+
     TEST_F(TrafokernelTest, trafo_kernel_fit) {
         bicop_.fit(u);
     }

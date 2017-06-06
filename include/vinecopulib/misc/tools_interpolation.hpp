@@ -21,6 +21,8 @@ namespace tools_interpolation {
         InterpolationGrid() {}
         InterpolationGrid(const Eigen::VectorXd& grid_points, const Eigen::MatrixXd& values);
 
+        Eigen::MatrixXd get_values() const;
+        void set_values(const Eigen::MatrixXd& values);
         void flip();
 
         Eigen::VectorXd interpolate(const Eigen::MatrixXd& x);

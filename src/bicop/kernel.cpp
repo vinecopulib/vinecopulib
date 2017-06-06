@@ -18,7 +18,7 @@ namespace vinecopulib
              grid_points(i) = - 3.25 + i * (6.25 / (double) m);
          interp_grid_ = tools_interpolation::InterpolationGrid(
              tools_stats::pnorm(grid_points), 
-             Eigen::MatrixXd::Constant(30, 30, 1.0)  // independence
+             Eigen::MatrixXd::Constant(m, m, 1.0)  // independence
          );
      }
 
@@ -70,6 +70,21 @@ namespace vinecopulib
     double KernelBicop::calculate_npars()
     {
         return npars_;
+    }
+
+    Eigen::MatrixXd KernelBicop::get_parameters() const
+    {
+        return interp_grid_.get_values();
+    }
+
+    void KernelBicop::set_parameters(const Eigen::MatrixXd& parameters)
+    {
+        if (parameters.minCoeff() < 0 ) {
+            std::stringstream message;
+            message << "density should be larger than 0. ";
+            throw std::runtime_error(message.str().c_str());
+        }
+        interp_grid_.set_values(parameters);
     }
 
     void KernelBicop::flip()

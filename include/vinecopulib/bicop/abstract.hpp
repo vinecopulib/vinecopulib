@@ -14,20 +14,6 @@
 
 namespace vinecopulib
 {
-    // Pre-declaration to allow AbtractBicop to befriend the two functions
-    namespace tools_optimization
-    {
-        // the objective function for maximum likelihood estimation
-        double mle_objective(const std::vector<double>& x,
-                             std::vector<double>& grad,
-                             void* data);
-
-        // the objective function for profile maximum likelihood estimation
-        double pmle_objective(const std::vector<double>& x,
-                              std::vector<double> &,
-                              void* data);
-    }
-    
     //! @brief An abstract class for bivariate copula families
     //!
     //! This class is used in the implementation underlying the Bicop class. 
@@ -36,10 +22,6 @@ namespace vinecopulib
     class AbstractBicop
     {
     friend class Bicop;
-    friend double tools_optimization::mle_objective(
-        const std::vector<double>& x, std::vector<double>& grad, void* data);
-    friend double tools_optimization::pmle_objective(
-        const std::vector<double>& x, std::vector<double>& grad, void* data);
     
     protected:
         // Factories
@@ -50,11 +32,9 @@ namespace vinecopulib
         // Getters and setters
         BicopFamily get_family() const;
         std::string get_family_name() const;
-        Eigen::MatrixXd get_parameters() const;
-        Eigen::MatrixXd get_parameters_lower_bounds() const;
-        Eigen::MatrixXd get_parameters_upper_bounds() const;
-        void set_parameters(const Eigen::MatrixXd& parameters);
-        void flip();
+        virtual Eigen::MatrixXd get_parameters() const = 0;
+        virtual void set_parameters(const Eigen::MatrixXd& parameters) = 0;
+        virtual void flip() = 0;
 
         // Virtual methods
         virtual void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
@@ -83,15 +63,6 @@ namespace vinecopulib
 
         // Data members
         BicopFamily family_;
-        Eigen::MatrixXd parameters_;
-        Eigen::MatrixXd parameters_lower_bounds_;
-        Eigen::MatrixXd parameters_upper_bounds_;
-
-    private:
-        void check_parameters(const Eigen::MatrixXd& parameters);
-        void check_parameters_size(const Eigen::MatrixXd& parameters);
-        void check_parameters_upper(const Eigen::MatrixXd& parameters);
-        void check_parameters_lower(const Eigen::MatrixXd& parameters);
     };
     
     //! A shared pointer to an object of class AbstracBicop.

@@ -53,6 +53,8 @@ namespace vinecopulib
         Eigen::MatrixXd tau_to_parameters(const double& tau);
         double calculate_npars();
 
+        Eigen::MatrixXd get_parameters() const;
+        void set_parameters(const Eigen::MatrixXd& parameters);
         void flip();
 
         tools_interpolation::InterpolationGrid interp_grid_;

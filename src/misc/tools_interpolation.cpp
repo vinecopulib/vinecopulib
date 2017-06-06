@@ -35,6 +35,35 @@ namespace tools_interpolation {
         values_ = values;
     }
 
+    Eigen::MatrixXd InterpolationGrid::get_values() const
+    {
+        return values_;
+    }
+
+    void InterpolationGrid::set_values(const Eigen::MatrixXd& values)
+    {
+        if (values.size() != values_.size()) {
+            if (values.rows() != values_.rows()) {
+                std::stringstream message;
+                message <<
+                        "values have has wrong number of rows; " <<
+                        "expected: " << values_.rows() << ", " <<
+                        "actual: " << values.rows() << std::endl;
+                throw std::runtime_error(message.str().c_str());
+            }
+            if (values.cols() != values_.cols()) {
+                std::stringstream message;
+                message <<
+                        "values have wrong number of columns; " <<
+                        "expected: " << values_.cols() << ", " <<
+                        "actual: " << values.cols() << std::endl;
+                throw std::runtime_error(message.str().c_str());
+            }
+        }
+
+        values_ = values;
+    }
+
     void InterpolationGrid::flip()
     {
         values_.transposeInPlace();
