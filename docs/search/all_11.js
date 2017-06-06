@@ -1,8 +1,12 @@
 var searchData=
 [
-  ['read_5fmatxd',['read_matxd',['../namespacevinecopulib_1_1tools__eigen.html#adccba44df8156221d52f2d9ffbe321de',1,'vinecopulib::tools_eigen']]],
-  ['read_5fmatxs',['read_matxs',['../namespacevinecopulib_1_1tools__eigen.html#ac9f84f6a2e75bf8b559e5b0845abd782',1,'vinecopulib::tools_eigen']]],
-  ['rotationless',['rotationless',['../namespacevinecopulib_1_1bicop__families.html#ac221bc84c32d2836692ed40d89439928',1,'vinecopulib::bicop_families']]],
-  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html',1,'vinecopulib']]],
-  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html#a966316e211937ae11e840ef7540a492f',1,'vinecopulib::RVineMatrix']]]
+  ['select',['select',['../classvinecopulib_1_1_bicop.html#af20af5c3ba6565628987b4784e9ac348',1,'vinecopulib::Bicop']]],
+  ['select_5fall',['select_all',['../classvinecopulib_1_1_vinecop.html#ad6cbb6b69c41f13a6e5e46ece44c0f78',1,'vinecopulib::Vinecop']]],
+  ['select_5ffamilies',['select_families',['../classvinecopulib_1_1_vinecop.html#a15ca60a0770dab0786b134fc80d1e77d',1,'vinecopulib::Vinecop']]],
+  ['set_5fparameters',['set_parameters',['../classvinecopulib_1_1_bicop.html#ac8d1d4266b0fd7e2f971d0149f881ef9',1,'vinecopulib::Bicop']]],
+  ['set_5frotation',['set_rotation',['../classvinecopulib_1_1_bicop.html#a4e359624560a089273b25dc74879bd16',1,'vinecopulib::Bicop']]],
+  ['simulate',['simulate',['../classvinecopulib_1_1_bicop.html#aeb87bea4283dacfa5e609356c020f85d',1,'vinecopulib::Bicop::simulate()'],['../classvinecopulib_1_1_vinecop.html#aa88f63a1fa62dce205c4c197d9deb152',1,'vinecopulib::Vinecop::simulate()']]],
+  ['simulate_5funiform',['simulate_uniform',['../namespacevinecopulib_1_1tools__stats.html#a78efaf3caf538201cdb881dd2780b242',1,'vinecopulib::tools_stats']]],
+  ['str',['str',['../classvinecopulib_1_1_bicop.html#a94b889d56f478dbeb156be4e31af5de5',1,'vinecopulib::Bicop']]],
+  ['student',['student',['../namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3acd73502828457d15655bbd7a63fb0bc8',1,'vinecopulib']]]
 ];
