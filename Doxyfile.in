@@ -868,8 +868,14 @@ EXCLUDE_PATTERNS       =
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = tools_stl::* \
-                         tools_structselect::* \
+EXCLUDE_SYMBOLS        = vinecopulib::tools_eigen vinecopulib::tools_eigen::* \
+                         vinecopulib::tools_integration vinecopulib::tools_integration::* \
+                         vinecopulib::tools_interface vinecopulib::tools_interface::* \
+                         vinecopulib::tools_interpolation vinecopulib::tools_interpolation::* \
+                         vinecopulib::tools_optimization vinecopulib::tools_optimization::* \
+                         vinecopulib::tools_stl vinecopulib::tools_stl::* \
+                         vinecopulib::tools_bicopselect vinecopulib::tools_bicopselect::* \
+                         vinecopulib::tools_structselect vinecopulib::tools_structselect::* \
                          *no_tau_to_parameters* \
                          *relabel_one* \
                          *relabel_elements* \
