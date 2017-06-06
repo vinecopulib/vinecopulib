@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['hfunc1',['hfunc1',['../classvinecopulib_1_1_bicop.html#a130fda62cd61c7acdef5db75fffdd89e',1,'vinecopulib::Bicop']]],
-  ['hfunc2',['hfunc2',['../classvinecopulib_1_1_bicop.html#a4c9b50f99797ec374f5057cc54db2bd8',1,'vinecopulib::Bicop']]],
-  ['hinv1',['hinv1',['../classvinecopulib_1_1_bicop.html#a3cc8b161ec6efdb3b34d2efa9185bf44',1,'vinecopulib::Bicop']]],
-  ['hinv1_5fnum',['hinv1_num',['../classvinecopulib_1_1_abstract_bicop.html#a7dc5b05857ece56b7e336e1175387a8e',1,'vinecopulib::AbstractBicop']]],
-  ['hinv2',['hinv2',['../classvinecopulib_1_1_bicop.html#a3e33ec227b6b7182e327399201cad382',1,'vinecopulib::Bicop']]]
+  ['in_5fnatural_5forder',['in_natural_order',['../classvinecopulib_1_1_r_vine_matrix.html#a4e63d8b01e1d89284ca28192676b8a3f',1,'vinecopulib::RVineMatrix']]],
+  ['inverse_5frosenblatt',['inverse_rosenblatt',['../classvinecopulib_1_1_vinecop.html#ac64ae8072851ea1cd4ed7143cac92933',1,'vinecopulib::Vinecop']]]
 ];
