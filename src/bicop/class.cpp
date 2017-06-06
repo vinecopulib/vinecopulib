@@ -31,6 +31,8 @@ namespace vinecopulib
     {
         bicop_ = AbstractBicop::create(family, parameters);
         // family must be set before checking the rotation
+        std::cout << "Bicop" << std::endl;
+        std::cout << get_family_name() << std::endl;
         set_rotation(rotation);
     }
     
@@ -528,6 +530,8 @@ namespace vinecopulib
     
     void Bicop::check_rotation(int rotation)
     {
+        std::cout << "check" << std::endl;
+        std::cout << get_family_name() << std::endl;
         using namespace tools_stl;
         std::vector<int> allowed_rotations = {0, 90, 180, 270};
         if (!is_member(rotation, allowed_rotations)) {
