@@ -201,10 +201,8 @@ target_link_libraries(main ${external_libs})
 ### Namespaces
 In the examples mentioned above, it is assumed that `using namespace vinecopulib;`
 is used. While the namespace `vinecopulib` contains the most important
-functionalities described below, there are a few others that are available to the user:
+functionalities described below, there are a two others that are available to the user:
 -  `bicop_families`: convenience definitions of sets of bivariate copula families
--  `tools_eigen`: tools for working with Eigen types
--  `tools_optimization`: utilities for numerical optimization (based on NLopt)
 -  `tools_stats`: utilities for statistical analysis
 
 ## Bivariate copula models
