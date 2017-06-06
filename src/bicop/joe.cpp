@@ -4,6 +4,8 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <cmath>
+
 #include <vinecopulib/bicop/joe.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/expm1.hpp>
