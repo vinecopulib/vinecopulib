@@ -122,12 +122,17 @@ namespace test_rvine_matrix {
         // should pass without errors
         auto rvm = RVineMatrix(mat);
         
-        // lower tri must contain zeros
+        // must be quadratic
         auto wrong_mat = mat;
+        wrong_mat = mat.block(0, 0, 4, 5);
+        EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+
+        // lower right triangle must contain zeros
+        wrong_mat = mat;
         wrong_mat(6, 6) = 1;
         EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
         
-        // upper tri must only contain 1, ..., d
+        // upper left triangle must only contain 1, ..., d
         wrong_mat = mat;
         wrong_mat(0, 0) = 9;
         EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
