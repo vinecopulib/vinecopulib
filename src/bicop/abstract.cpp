@@ -73,6 +73,7 @@ namespace vinecopulib
             case BicopFamily::tll0:
                 new_bicop =  BicopPtr(new Tll0Bicop());
                 break;
+
             default:
                 throw std::runtime_error(std::string("Family not implemented"));
         }
