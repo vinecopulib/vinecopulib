@@ -13,6 +13,8 @@ Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a78efaf3ca
 Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_afda41507cee7cba84602e28e56cfcd99}{to\+\_\+pseudo\+\_\+obs} (Eigen\+::\+Matrix\+Xd x, std\+::string ties\+\_\+method)
 \item 
 Eigen\+::\+Vector\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a9e4849a2a908703a68e92e0c0633237f}{to\+\_\+pseudo\+\_\+obs\+\_\+1d} (Eigen\+::\+Vector\+Xd x, std\+::string ties\+\_\+method)
+\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_ae0ba8000d0941c82677df06ce6d1d564}{ghalton} (size\+\_\+t n, size\+\_\+t d)
 \end{DoxyCompactItemize}
 \begin{Indent}{\bf Pairwise dependence measures}\par
 {\em 
@@ -76,6 +78,28 @@ Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a17eb427c3
 Utilities for statistical analysis. 
 
 \subsection{Function Documentation}
+\index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!ghalton@{ghalton}}
+\index{ghalton@{ghalton}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
+\subsubsection[{\texorpdfstring{ghalton(size\+\_\+t n, size\+\_\+t d)}{ghalton(size_t n, size_t d)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+stats\+::ghalton (
+\begin{DoxyParamCaption}
+\item[{size\+\_\+t}]{n, }
+\item[{size\+\_\+t}]{d}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacevinecopulib_1_1tools__stats_ae0ba8000d0941c82677df06ce6d1d564}{}\label{namespacevinecopulib_1_1tools__stats_ae0ba8000d0941c82677df06ce6d1d564}
+simulates from the multivariate Generalized Halton Sequence
+
+For more information on Generalized Halton Sequence, see Faure, H., Lemieux, C. (2009). Generalized Halton Sequences in 2008\+: A Comparative Study. A\+C\+M-\/\+T\+O\+M\+A\+CS 19(4), Article 15.
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & number of observations. \\
+\hline
+{\em d} & dimension.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An $ n \times d $ matrix of quasi-\/random $ \mathrm{U}[0, 1] $ variables. 
+\end{DoxyReturn}
 \index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!simulate\+\_\+uniform@{simulate\+\_\+uniform}}
 \index{simulate\+\_\+uniform@{simulate\+\_\+uniform}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
 \subsubsection[{\texorpdfstring{simulate\+\_\+uniform(size\+\_\+t n, size\+\_\+t d)}{simulate_uniform(size_t n, size_t d)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+stats\+::simulate\+\_\+uniform (

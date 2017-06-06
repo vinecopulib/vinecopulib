@@ -1,6 +1,0 @@
-<map id="vinecopulib::EllipticalBicop" name="vinecopulib::EllipticalBicop">
-<area shape="rect" id="node4" href="$classvinecopulib_1_1_gaussian_bicop.html" title="The Gaussian copula. " alt="" coords="5,229,188,256"/>
-<area shape="rect" id="node5" href="$classvinecopulib_1_1_student_bicop.html" title="The Student t copula. " alt="" coords="213,229,386,256"/>
-<area shape="rect" id="node2" href="$classvinecopulib_1_1_par_bicop.html" title="An abstract class for parametric copula families. " alt="" coords="124,80,272,107"/>
-<area shape="rect" id="node3" href="$classvinecopulib_1_1_abstract_bicop.html" title="An abstract class for bivariate copula families. " alt="" coords="109,5,287,32"/>
-</map>

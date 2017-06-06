@@ -28,6 +28,8 @@ void \hyperlink{classvinecopulib_1_1_vinecop_a15ca60a0770dab0786b134fc80d1e77d}{
 \item 
 Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_vinecop_adf3760b8dd2b6d3a9cae5426188d4489}{pdf} (const Eigen\+::\+Matrix\+Xd \&u)
 \item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_vinecop_a379620d0bc7dd3cf5254517520cb3849}{cdf} (const Eigen\+::\+Matrix\+Xd \&u, const size\+\_\+t N=1e4)
+\item 
 Eigen\+::\+Matrix\+Xd \hyperlink{classvinecopulib_1_1_vinecop_aa88f63a1fa62dce205c4c197d9deb152}{simulate} (size\+\_\+t n)
 \item 
 Eigen\+::\+Matrix\+Xd \hyperlink{classvinecopulib_1_1_vinecop_ac64ae8072851ea1cd4ed7143cac92933}{inverse\+\_\+rosenblatt} (const Eigen\+::\+Matrix\+Xd \&u)
@@ -200,7 +202,24 @@ The B\+IC is defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \] wh
 )}\hypertarget{classvinecopulib_1_1_vinecop_a507ad836872f9f702eed22ba25212515}{}\label{classvinecopulib_1_1_vinecop_a507ad836872f9f702eed22ba25212515}
 calculates the effective number of parameters.
 
-Returns sum of the number of parameters for all pair copulas (see \hyperlink{classvinecopulib_1_1_bicop_a9f3b3b83c54a9e1d809fdee058f3eb11}{Bicop\+::calculate\+\_\+npars()}). \index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+families@{get\+\_\+all\+\_\+families}}
+Returns sum of the number of parameters for all pair copulas (see \hyperlink{classvinecopulib_1_1_bicop_a9f3b3b83c54a9e1d809fdee058f3eb11}{Bicop\+::calculate\+\_\+npars()}). \index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!cdf@{cdf}}
+\index{cdf@{cdf}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{cdf(const Eigen\+::\+Matrix\+Xd \&u, const size\+\_\+t N=1e4)}{cdf(const Eigen::MatrixXd &u, const size_t N=1e4)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::\+Vinecop\+::cdf (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{u, }
+\item[{const size\+\_\+t}]{N = {\ttfamily 1e4}}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_a379620d0bc7dd3cf5254517520cb3849}{}\label{classvinecopulib_1_1_vinecop_a379620d0bc7dd3cf5254517520cb3849}
+calculates the cumulative distribution of the vine copula model.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $ n \times d $ matrix of evaluation points. \\
+\hline
+{\em N} & integer for the number of quasi-\/random numbers to draw to evaluate the distribution (default\+: 1e4). \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+families@{get\+\_\+all\+\_\+families}}
 \index{get\+\_\+all\+\_\+families@{get\+\_\+all\+\_\+families}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
 \subsubsection[{\texorpdfstring{get\+\_\+all\+\_\+families() const }{get_all_families() const }}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ std\+::vector$<$ {\bf Bicop\+Family} $>$ $>$ vinecopulib\+::\+Vinecop\+::get\+\_\+all\+\_\+families (
 \begin{DoxyParamCaption}
@@ -435,5 +454,5 @@ simulates from a vine copula model, see \hyperlink{classvinecopulib_1_1_vinecop_
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/n5/dev/cpp/vinecopulib/include/vinecopulib/vinecop/class.\+hpp\item 
-/home/n5/dev/cpp/vinecopulib/src/vinecop/class.\+cpp\end{DoxyCompactItemize}
+vinecopulib/include/vinecopulib/vinecop/class.\+hpp\item 
+vinecopulib/src/vinecop/class.\+cpp\end{DoxyCompactItemize}

@@ -12,7 +12,7 @@ A class for regular vine matrices.
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{classvinecopulib_1_1_r_vine_matrix_a4aaaa0d65dc215fe086b02ca6240dccc}{R\+Vine\+Matrix} (const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix)
+\hyperlink{classvinecopulib_1_1_r_vine_matrix_a966316e211937ae11e840ef7540a492f}{R\+Vine\+Matrix} (const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, bool check=true)
 \item 
 Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{classvinecopulib_1_1_r_vine_matrix_a37c79233fca1e56e1535cbb37f8d3177}{get\+\_\+matrix} () const \hypertarget{classvinecopulib_1_1_r_vine_matrix_a37c79233fca1e56e1535cbb37f8d3177}{}\label{classvinecopulib_1_1_r_vine_matrix_a37c79233fca1e56e1535cbb37f8d3177}
 
@@ -24,9 +24,9 @@ Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hy
 \item 
 Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{classvinecopulib_1_1_r_vine_matrix_aef8bbe14451d023e1c9c113e3812f574}{get\+\_\+max\+\_\+matrix} () const 
 \item 
-\hyperlink{namespacevinecopulib_1_1tools__eigen_a2fcd63009df35741859f44f1e41931f9}{Matrix\+Xb} \hyperlink{classvinecopulib_1_1_r_vine_matrix_a6303fc1f643fdf793c867ca7e08e42bc}{get\+\_\+needed\+\_\+hfunc1} () const 
+Matrix\+Xb \hyperlink{classvinecopulib_1_1_r_vine_matrix_a6303fc1f643fdf793c867ca7e08e42bc}{get\+\_\+needed\+\_\+hfunc1} () const 
 \item 
-\hyperlink{namespacevinecopulib_1_1tools__eigen_a2fcd63009df35741859f44f1e41931f9}{Matrix\+Xb} \hyperlink{classvinecopulib_1_1_r_vine_matrix_a7ac32cf10a966ba567142e9b36106746}{get\+\_\+needed\+\_\+hfunc2} () const 
+Matrix\+Xb \hyperlink{classvinecopulib_1_1_r_vine_matrix_a7ac32cf10a966ba567142e9b36106746}{get\+\_\+needed\+\_\+hfunc2} () const 
 \end{DoxyCompactItemize}
 \subsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
@@ -60,20 +60,35 @@ A regular vine (R-\/vine) matrix encodes the structure of a vine. An examplary m
 \begin{DoxyEnumerate}
 \item Start with the counter-\/diagonal element of column {\ttfamily e} (first conditioned variable).
 \item Jump up to the element in row {\ttfamily t} (second conditioned variable).
-\item Gather all entries further up in column {\ttfamily e} (conditioning set). 
+\item Gather all entries further up in column {\ttfamily e} (conditioning set).
 \end{DoxyEnumerate}
+
+A valid R-\/vine matrix must satisfy several conditions which are checked when {\ttfamily R\+Vine\+Matrix()} is called\+:
+\begin{DoxyEnumerate}
+\item The lower right triangle must only contain zeros.
+\item The upper left triangle can only contain numbers between 1 and d.
+\item The antidiagonal must contain the numbers 1, ..., d.
+\item The antidiagonal entry of a column must not be contained in any column further to the right.
+\item The entries of a column must be contained in all columns to the left.
+\item The proximity condition must hold\+: For all t = 1, ..., d -\/ 2 and e = 0, ..., d -\/ t -\/ 1 there must exist an index j $>$ d, such that {\ttfamily (M\mbox{[}t, e\mbox{]}, \{M\mbox{[}0, e\mbox{]}, ..., M\mbox{[}t-\/1, e\mbox{]}\})} equals either {\ttfamily (M\mbox{[}d-\/j-\/1, j\mbox{]}, \{M\mbox{[}0, j\mbox{]}, ..., M\mbox{[}t-\/1, j\mbox{]}\})} or {\ttfamily (M\mbox{[}t-\/1, j\mbox{]}, \{M\mbox{[}d-\/j-\/1, j\mbox{]}, M\mbox{[}0, j\mbox{]}, ..., M\mbox{[}t-\/2, j\mbox{]}\})}.
+\end{DoxyEnumerate}
+
+Condition 6 already implies conditions 2-\/5, but is more difficult to check by hand. 
 
 \subsection{Constructor \& Destructor Documentation}
 \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!R\+Vine\+Matrix@{R\+Vine\+Matrix}}
 \index{R\+Vine\+Matrix@{R\+Vine\+Matrix}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
-\subsubsection[{\texorpdfstring{R\+Vine\+Matrix(const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix)}{RVineMatrix(const Eigen::Matrix< size_t, Eigen::Dynamic, Eigen::Dynamic > &matrix)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+R\+Vine\+Matrix\+::\+R\+Vine\+Matrix (
+\subsubsection[{\texorpdfstring{R\+Vine\+Matrix(const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, bool check=true)}{RVineMatrix(const Eigen::Matrix< size_t, Eigen::Dynamic, Eigen::Dynamic > &matrix, bool check=true)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+R\+Vine\+Matrix\+::\+R\+Vine\+Matrix (
 \begin{DoxyParamCaption}
-\item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{matrix}
+\item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{matrix, }
+\item[{bool}]{check = {\ttfamily true}}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a4aaaa0d65dc215fe086b02ca6240dccc}{}\label{classvinecopulib_1_1_r_vine_matrix_a4aaaa0d65dc215fe086b02ca6240dccc}
+)}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a966316e211937ae11e840ef7540a492f}{}\label{classvinecopulib_1_1_r_vine_matrix_a966316e211937ae11e840ef7540a492f}
 instantiates an \hyperlink{classvinecopulib_1_1_r_vine_matrix}{R\+Vine\+Matrix} object. 
 \begin{DoxyParams}{Parameters}
-{\em matrix} & a valid R-\/vine matrix (this is not checked so far!). \\
+{\em matrix} & a valid R-\/vine matrix. \\
+\hline
+{\em check} & whether the matrix shall be checked for validity. \\
 \hline
 \end{DoxyParams}
 
@@ -106,14 +121,14 @@ extracts the maximum matrix.
 
 The maximum matrix is derived from an R-\/vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge. \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}}
 \index{get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
-\subsubsection[{\texorpdfstring{get\+\_\+needed\+\_\+hfunc1() const }{get_needed_hfunc1() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Matrix\+Xb} vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+needed\+\_\+hfunc1 (
+\subsubsection[{\texorpdfstring{get\+\_\+needed\+\_\+hfunc1() const }{get_needed_hfunc1() const }}]{\setlength{\rightskip}{0pt plus 5cm}Matrix\+Xb vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+needed\+\_\+hfunc1 (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 ) const}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a6303fc1f643fdf793c867ca7e08e42bc}{}\label{classvinecopulib_1_1_r_vine_matrix_a6303fc1f643fdf793c867ca7e08e42bc}
 extracts a matrix indicating which of the first h-\/functions are needed (it is usually not necessary to apply both h-\/functions for each pair-\/copula). \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+needed\+\_\+hfunc2@{get\+\_\+needed\+\_\+hfunc2}}
 \index{get\+\_\+needed\+\_\+hfunc2@{get\+\_\+needed\+\_\+hfunc2}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
-\subsubsection[{\texorpdfstring{get\+\_\+needed\+\_\+hfunc2() const }{get_needed_hfunc2() const }}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Matrix\+Xb} vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+needed\+\_\+hfunc2 (
+\subsubsection[{\texorpdfstring{get\+\_\+needed\+\_\+hfunc2() const }{get_needed_hfunc2() const }}]{\setlength{\rightskip}{0pt plus 5cm}Matrix\+Xb vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+needed\+\_\+hfunc2 (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -131,5 +146,5 @@ Natural order means that the counter-\/diagonal has entries (d, ..., 1). We conv
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/n5/dev/cpp/vinecopulib/include/vinecopulib/vinecop/rvine\+\_\+matrix.\+hpp\item 
-/home/n5/dev/cpp/vinecopulib/src/vinecop/rvine\+\_\+matrix.\+cpp\end{DoxyCompactItemize}
+vinecopulib/include/vinecopulib/vinecop/rvine\+\_\+matrix.\+hpp\item 
+vinecopulib/src/vinecop/rvine\+\_\+matrix.\+cpp\end{DoxyCompactItemize}
