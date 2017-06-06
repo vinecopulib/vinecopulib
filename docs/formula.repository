@@ -1,6 +1,0 @@
-\form#0:$f^{-1}$
-\form#1:$f$
-\form#2:$m \times 2$
-\form#3:$ c $
-\form#4:\[ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) ds, \]
-\form#5:\[ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) ds. \]
