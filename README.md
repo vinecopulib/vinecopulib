@@ -28,7 +28,7 @@ Advantages over VineCopula are
 #### Status
 
 Version [0.0.3](https://github.com/vinecopulib/vinecopulib/releases) was
-released on June 5, 2017. While we did our best to
+released on June 7, 2017. While we did our best to
 design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for R and Python.
 
@@ -467,9 +467,8 @@ which encodes the following pair-copulas:
 |      | 1    | `(3, 2; 1)`    |
 | 2    | 0    | `(4, 3; 2, 1)` |
 
-Denoting by `M[i][j]` the matrix entry in row `i` and column `j` (starting at
-0), the pair-copula index for edge `e` in tree `t` of a `d` dimensional vine is
-`(M[d - 1 - t][e], M[t][e]; M[t - 1][e], ..., M[0][e])`. Less formally,
+Denoting by `M[i, j]` the matrix entry in row `i` and column `j`, the pair-copula index for edge `e` in tree `t` of a `d` dimensional vine is
+`(M[d - 1 - t, e], M[t, e]; M[t - 1, e], ..., M[0, e])`. Less formally,
 1. Start with the counter-diagonal element of column `e` (first conditioned
    variable).
 2. Jump up to the element in row `t` (second conditioned variable).
