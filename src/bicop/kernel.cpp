@@ -6,7 +6,6 @@
 
 #include <vinecopulib/bicop/kernel.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <iostream>
 
 namespace vinecopulib
 {
