@@ -5,10 +5,8 @@ platform:
 init:
   - ps: |
         If ($env:platform -Match "x86") {
-          $env:NLOPT_ZIP="nlopt-2.4.2-dll32.zip"
           $env:CMAKE_GEN_PLAT="Win32"
         } Else {
-          $env:NLOPT_ZIP="nlopt-2.4.2-dll64.zip"
           $env:CMAKE_GEN_PLAT="x64"
         }
   - cmd: C:/"Program Files (x86)"/"Microsoft Visual Studio 12.0"/VC/vcvarsall.bat
@@ -16,6 +14,7 @@ init:
         $ErrorActionPreference = "Stop"
         Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
+  - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
 
 install:
   - choco upgrade cmake # so Boost 1.63 is supported
@@ -28,34 +27,43 @@ install:
   - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
   - 7z x eigen.zip -o"C:\projects" -y > nul
 
-  - ps: wget "http://ab-initio.mit.edu/nlopt/$env:NLOPT_ZIP" -OutFile nlopt.zip
-  - 7z x nlopt.zip -o"C:\projects\nlopt" -y > nul
-  - lib /def:C:\projects\nlopt\libnlopt-0.def /machine:%platform%
-  - move libnlopt-0.lib C:\projects\nlopt\
-  - move libnlopt-0.exp C:\projects\nlopt\
-
-before_build:
-- del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+  - cd ..
+  - git clone git://github.com/stevengj/nlopt
+  - cd nlopt
+  - cmake -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\nlopt-install -DCMAKE_INSTALL_BINDIR=c:\projects\nlopt-install\lib .
+  - cmake --build . --config Release --target install
+  - set path=%path%;C:\projects\nlopt-install\lib
+  - ctest -C Release --output-on-failure
+  - cd ..
+  - cd vinecopulib
 
 build_script:
-  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:\Libraries\boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255" -DCMAKE_LIBRARY_PATH="C:\projects\nlopt" -DCMAKE_INCLUDE_PATH="C:\projects\nlopt"'
+  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:/Libraries/boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255" -DCMAKE_PREFIX_PATH="C:\projects\nlopt-install"'
 
   - md build
   - cd build
-  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%"
+  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install
   - set path_orig=%path%
 
   - cmake --build . --config Debug
-  - set path=%path_orig%;C:\projects\vinecopulib\build\Debug;C:\projects\nlopt
-  - #bin\Debug\test_all.exe
+  - set path=%path_orig%;C:\projects\vinecopulib\build\Debug
+  - bin\Debug\test_all.exe
 
   - cmake --build . --config Release
-  - set path=%path_orig%;C:\projects\vinecopulib\build\Release;C:\projects\nlopt
-  - #bin\Release\test_all.exe
+  - set path=%path_orig%;C:\projects\vinecopulib\build\Release
+  - bin\Release\test_all.exe
   
   - cmake --build . --config Release --target install
-
   - cd ..
+  
+  - cd examples/bicop
+  - md build
+  - cd build
+  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_PREFIX_PATH="C:\projects\vinecopulib-install;C:\projects\nlopt-install"
+  - cmake --build . --config Release
+  - cd ..\bin\Release
+  - main.exe
+  - cd ..\..\..\..
   
 #on_finish:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

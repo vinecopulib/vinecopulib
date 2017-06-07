@@ -2,7 +2,7 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #pragma once
 
@@ -10,6 +10,13 @@
 
 namespace test_bicop_kernel {
     using namespace vinecopulib;
+
+    TEST_F(TrafokernelTest, trafo_kernel_sanity_checks) {
+        auto values = bicop_.get_parameters();
+        EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0,0,30,1)));
+        EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0,0,1,30)));
+        EXPECT_ANY_THROW(bicop_.set_parameters(-1*values));
+    }
 
     TEST_F(TrafokernelTest, trafo_kernel_fit) {
         bicop_.fit(u);

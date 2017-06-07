@@ -2,7 +2,7 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #pragma once
 
@@ -35,5 +35,13 @@ namespace test_bicop_sanity_checks {
         EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, -10));
         EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 10));
     }
-
+    
+    TEST(bicop_sanity_checks, select_can_handle_zeros_and_ones) {
+        Bicop bicop;
+        auto u = bicop.simulate(10);
+        u(0, 0) = 0.0;
+        u(1, 0) = 1.0;
+        EXPECT_NO_THROW(bicop.select(u));
+    }
+    
 }

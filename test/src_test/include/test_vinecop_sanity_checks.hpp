@@ -2,12 +2,13 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #pragma once
 
 #include "gtest/gtest.h"
 #include <vinecopulib/vinecop/class.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
 
 namespace test_vinecop_sanity_checks {
     using namespace vinecopulib;
@@ -31,6 +32,10 @@ namespace test_vinecop_sanity_checks {
 
         Eigen::MatrixXd U = Eigen::MatrixXd::Constant(4,4,0.5);
         EXPECT_ANY_THROW(vinecop.pdf(U));
+        EXPECT_ANY_THROW(vinecop.cdf(U));
+        Vinecop vinecop2(361);
+        auto U2 = tools_stats::simulate_uniform(1, 361);
+        EXPECT_ANY_THROW(vinecop2.cdf(U2));
         EXPECT_ANY_THROW(vinecop.inverse_rosenblatt(U));
         EXPECT_ANY_THROW(vinecop.select_all(U));
         EXPECT_ANY_THROW(vinecop.select_families(U));

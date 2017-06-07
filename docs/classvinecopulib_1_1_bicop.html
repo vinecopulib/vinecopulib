@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.0.2</a>
+                    <a class="navbar-brand">vinecopulib 0.0.3</a>
                 </div>
             </div>
         </nav>
@@ -126,6 +126,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:afc8b465d9e02a3df1c25f7c1e7ac9240"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83dc7214e4bb1bfe59285ca05407d646"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646">pdf</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
 <tr class="separator:a83dc7214e4bb1bfe59285ca05407d646"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a153d7e766388066eda14577c5a6332cc"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a153d7e766388066eda14577c5a6332cc">cdf</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
+<tr class="separator:a153d7e766388066eda14577c5a6332cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a130fda62cd61c7acdef5db75fffdd89e"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a130fda62cd61c7acdef5db75fffdd89e">hfunc1</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
 <tr class="separator:a130fda62cd61c7acdef5db75fffdd89e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c9b50f99797ec374f5057cc54db2bd8"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a4c9b50f99797ec374f5057cc54db2bd8">hfunc2</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
@@ -326,6 +328,30 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
 </div><div class="memdoc">
 <p>calculates the effective number of parameters.</p>
 <p>Returns the actual number of parameters for parameteric families. For nonparametric families, there is a conceptually similar definition in the sense that it can be used in the calculation of fit statistics. </p>
+
+</div>
+</div>
+<a class="anchor" id="a153d7e766388066eda14577c5a6332cc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::VectorXd vinecopulib::Bicop::cdf </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>u</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>evaluates the copula distribution.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">u</td><td>\(n \times 2\) matrix of evaluation points. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The copula distribution evaluated at <code>u</code>. </dd></dl>
 
 </div>
 </div>
@@ -653,8 +679,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/home/n5/dev/cpp/vinecopulib/include/vinecopulib/bicop/<a class="el" href="bicop_2class_8hpp_source.html">class.hpp</a></li>
-<li>/home/n5/dev/cpp/vinecopulib/src/bicop/class.cpp</li>
+<li>vinecopulib/include/vinecopulib/bicop/<a class="el" href="bicop_2class_8hpp_source.html">class.hpp</a></li>
+<li>vinecopulib/src/bicop/class.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.8-->
@@ -665,7 +691,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 31 2017 21:36:44 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jun 6 2017 12:41:24 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

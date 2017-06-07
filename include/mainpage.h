@@ -1,21 +1,21 @@
 /** @file mainpage.h
 * @brief api_docs
 *
-*/ 
+*/
 /** @mainpage vinecopulib: a C++ library for vine copula modeling
 *
 * @authors Thomas Nagler and Thibault Vatter
-*  
+*
 * This is the API documentation for the vinecopulib C++ library. It provides
-* functionality for statistical dependence modeling with bivariate and vine 
-* copulas. For a more high-level overview see 
+* functionality for statistical dependence modeling with bivariate and vine
+* copulas. For a more high-level overview see
 * <a href="https://github.com/tvatter/vinecopulib/blob/master/README.md">README</a>.
 *
 * @section license License
 *
 * The MIT License (MIT)
 *
-* Copyright © 2017 Thibault Vatter and Thomas Nagler
+* Copyright © 2017 Thomas Nagler and Thibault Vatter
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of
 * this software and associated documentation files (the “Software”), to deal in
