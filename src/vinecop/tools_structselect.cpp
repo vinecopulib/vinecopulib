@@ -302,7 +302,7 @@ namespace tools_structselect {
             bool used_old_fit = false;
             // the formula is quite arbitrary, but sufficient for 
             // identifying situations where fits can be re-used
-            tree[e].fit_id = tree[e].pc_data(0) - tree[e].pc_data(1); 
+            tree[e].fit_id = tree[e].pc_data(0, 0) - 2 * tree[e].pc_data(0, 1); 
             tree[e].fit_id += 5.0 * (double) is_thresholded;
             if (boost::num_edges(tree_opt) > 0) {
                 auto old_fit = find_old_fit(tree[e].fit_id, tree_opt);
