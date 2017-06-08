@@ -62,6 +62,8 @@ namespace tools_structselect {
     VineTree edges_as_vertices(const VineTree& prev_tree);
     void add_allowed_edges(VineTree& tree, std::string tree_criterion,
                            double threshold);
+    double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
+                               std::string tree_criterion);
     double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
                               std::string tree_criterion, double threshold);
     ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
@@ -72,6 +74,23 @@ namespace tools_structselect {
     void remove_vertex_data(VineTree& tree);
     void select_pair_copulas(VineTree& tree,
                              vinecopulib::FitControlsVinecop& controls);
+
+    void select_pair_copulas(VineTree& tree,
+        vinecopulib::FitControlsVinecop& controls,
+        const VineTree& tree_opt);
+    typedef std::pair<
+    boost::graph_traits<VineTree>::edge_descriptor, 
+    bool
+    > FoundEdge;
+    FoundEdge find_old_fit(double fit_id, const VineTree& old_graph);
+    std::vector<double> get_thresholded_edge_crits(
+        const std::vector<VineTree>& trees,
+        vinecopulib::FitControlsVinecop& controls);
+    double get_next_threshold(std::vector<double>& thresholded_crits,
+                              double learning_rate = 0.025);
+    double get_tree_loglik(const VineTree& tree);
+    double get_tree_npars(const VineTree& tree);
+    double calculate_gic(double loglik, double npars, int n);
 
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(boost::graph_traits<VineTree>::edge_descriptor e,

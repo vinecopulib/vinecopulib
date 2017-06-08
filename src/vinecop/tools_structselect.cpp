@@ -124,7 +124,8 @@ namespace tools_structselect {
     //! @param tree_criterion the criterion for selecting the maximum spanning
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).
     //! @param threshold for thresholded vines.
-    void add_allowed_edges(VineTree& vine_tree, std::string tree_criterion,
+    void add_allowed_edges(VineTree& vine_tree, 
+                           std::string tree_criterion,
                            double threshold)
     {
         for (auto v0 : boost::vertices(vine_tree)) {
@@ -133,9 +134,8 @@ namespace tools_structselect {
                 // (-1 means 'no common neighbor')
                 if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                     auto pc_data = get_pc_data(v0, v1, vine_tree);
-                    double crit = calculate_criterion(pc_data, controls);
-                    double w = 
-                        1.0 - (double)(crit > controls.get_threshold()) * crit;
+                    double crit = calculate_criterion(pc_data, tree_criterion);
+                    double w = 1.0 - (double)(crit > threshold) * crit;
                     auto e = boost::add_edge(v0, v1, w, vine_tree).first;
                     vine_tree[e].weight = w;
                     vine_tree[e].crit = crit;
@@ -143,20 +143,21 @@ namespace tools_structselect {
             }
         }
     }
-
+    
+    //! Calculate criterion for tree selection
+    //! @param data observations.
+    //! @param tree_criterion the criterion.
     double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                               vinecopulib::FitControlsVinecop& controls)
+                               std::string tree_criterion)
     {
-        double w;
-        if (controls.get_tree_criterion() == "tau") {
+        double w = 0.0;
+        if (tree_criterion == "tau") {
             w = std::fabs(tools_stats::pairwise_ktau(data));
-        } else if (controls.get_tree_criterion() == "hoeffd") {
+        } else if (tree_criterion == "hoeffd") {
             // scale to [0,1]
             w = (30*tools_stats::pairwise_hoeffd(data)+0.5)/1.5;
-        } else if (controls.get_tree_criterion() == "rho") {
+        } else if (tree_criterion == "rho") {
             w = std::fabs(tools_stats::pairwise_cor(data));
-        } else {
-            throw std::runtime_error("tree criterion not implemented");
         }
 
         return w;
@@ -276,6 +277,7 @@ namespace tools_structselect {
     //!     FitControlsVinecop).
     //! @param tree_opt the current optimal tree (used only for sparse 
     //!     selection).
+    //! @{
     void select_pair_copulas(VineTree& tree,
                              vinecopulib::FitControlsVinecop& controls)
     {
@@ -325,7 +327,10 @@ namespace tools_structselect {
             tree[e].npars  = tree[e].pair_copula.calculate_npars();
         }
     }
+    //! @}
     
+    
+    //! extracts all criterion values that got thresholded to zero.
     std::vector<double> get_thresholded_edge_crits(
         const std::vector<VineTree>& trees,
         vinecopulib::FitControlsVinecop& controls
@@ -343,6 +348,9 @@ namespace tools_structselect {
         return out;
     }
     
+    //! chooses threshold for next iteration such that at a proportion of at 
+    //! least `learning_rate` of the previously thresholded pairs become 
+    //! non-thresholded.
     double get_next_threshold(std::vector<double>& thresholded_crits,
                               double learning_rate)
     {
@@ -357,7 +365,7 @@ namespace tools_structselect {
         return thresholded_crits[std::ceil(m * learning_rate) - 1];
     }
     
-    
+    //! finds the fitted pair-copula from the previous iteration.
     FoundEdge find_old_fit(double fit_id, const VineTree& old_graph) 
     {
         auto edge = boost::edge(0, 1, old_graph).first;
@@ -371,7 +379,7 @@ namespace tools_structselect {
         return std::make_pair(edge, fit_with_same_id);
     }
     
-    
+    //! calculates the log-likelihood of a tree.
     double get_tree_loglik(const VineTree& tree)
     {
         double ll = 0.0;
@@ -381,6 +389,7 @@ namespace tools_structselect {
         return ll;
     }
     
+    //! calculates the numbers of parameters of a tree.
     double get_tree_npars(const VineTree& tree)
     {
         double npars = 0.0;
@@ -390,6 +399,7 @@ namespace tools_structselect {
         return npars;
     }
     
+    //! calculates the Generalized Information Criterion.
     double calculate_gic(double loglik, double npars, int n)
     {
         double log_npars = std::log(npars);

@@ -321,7 +321,6 @@ namespace vinecopulib
     void Vinecop::select_families(const Eigen::MatrixXd& data,
                                   FitControlsVinecop controls)
     {
-
         size_t d = data.cols();
         if (d != d_) {
             std::stringstream message;
@@ -369,7 +368,10 @@ namespace vinecopulib
                     pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
                 } else {
                     if (controls.get_threshold() != 0) {
-                        double crit = calculate_criterion(u_e, controls);
+                        double crit = tools_structselect::calculate_criterion(
+                            u_e, 
+                            controls.get_tree_criterion()
+                        );
                         if (crit < controls.get_threshold()) {
                             pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
                         }
