@@ -39,7 +39,9 @@ namespace vinecopulib
                         FitControlsVinecop controls = FitControlsVinecop());
         void select_families(const Eigen::MatrixXd& data,
                              FitControlsVinecop controls = FitControlsVinecop());
-
+        void sparse_select_all(const Eigen::MatrixXd& data,
+                               FitControlsVinecop controls = FitControlsVinecop());
+        
         // Getters for a single pair copula
         Bicop get_pair_copula(size_t tree, size_t edge) const;
         BicopFamily get_family(size_t tree, size_t edge) const;

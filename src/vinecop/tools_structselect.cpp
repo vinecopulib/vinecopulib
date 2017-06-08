@@ -71,7 +71,9 @@ namespace tools_structselect {
     {
         auto new_tree = edges_as_vertices(prev_tree);
         remove_edge_data(prev_tree); // no longer needed
-        add_allowed_edges(new_tree, controls);
+        add_allowed_edges(new_tree, 
+                          controls.get_tree_criterion(),
+                          controls.get_threshold());
         if (boost::num_vertices(new_tree) > 2) {
             min_spanning_tree(new_tree);
         }
