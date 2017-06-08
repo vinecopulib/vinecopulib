@@ -170,7 +170,70 @@ namespace tools_stats {
     }
 
     //! @}
-
+     
+    //! @name Dependence measure matrices
+    //! @param x an \f$ n \times d \f$ matrix of observations.
+    //! @{
+    
+    //! calculates matrix of pairwise Kendall's \f$ \tau \f$s.
+    Eigen::MatrixXd ktau_matrix(const Eigen::MatrixXd& x)
+    {
+        int n = x.rows();
+        int d = x.cols();
+        Eigen::MatrixXd tau(d, d);
+        tau.diagonal() = Eigen::VectorXd::Constant(d, 1.0);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> pair_data(n, 2);
+        for (int i = 1; i < d; ++i) {
+            for (int j = 0; j < i; ++j) {
+                pair_data.col(0) = x.col(i);
+                pair_data.col(1) = x.col(j);
+                tau(i, j) = pairwise_ktau(pair_data);
+                tau(j, i) = tau(i, j);
+            }
+        }
+        return tau;
+    }
+    
+    //! calculates the correlation matrix.
+    Eigen::MatrixXd cor_matrix(const Eigen::MatrixXd& x)
+    {
+        int n = x.rows();
+        int d = x.cols();
+        Eigen::MatrixXd rho(d, d);
+        rho.diagonal() = Eigen::VectorXd::Constant(d, 1.0);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> pair_data(n, 2);
+        for (int i = 1; i < d; ++i) {
+            for (int j = 0; j < i; ++j) {
+                pair_data.col(0) = x.col(i);
+                pair_data.col(1) = x.col(j);
+                rho(i, j) = pairwise_cor(pair_data);
+                rho(j, i) = rho(i, j);
+            }
+        }
+        return rho;
+    }
+    
+    //! calculates matrix of pairwise Hoeffding's Ds.
+    Eigen::MatrixXd hoeffd_matrix(const Eigen::MatrixXd& x)
+    {
+        int n = x.rows();
+        int d = x.cols();
+        Eigen::MatrixXd hoeffd(d, d);
+        hoeffd.diagonal() = Eigen::VectorXd::Constant(d, 1.0);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> pair_data(n, 2);
+        for (int i = 1; i < d; ++i) {
+            for (int j = 0; j < i; ++j) {
+                pair_data.col(0) = x.col(i);
+                pair_data.col(1) = x.col(j);
+                hoeffd(i, j) = pairwise_hoeffd(pair_data);
+                hoeffd(j, i) = hoeffd(i, j);
+            }
+        }
+        return hoeffd;
+    } 
+    
+    //! @}
+    
 
     //! Maximal dimension allowed for generalized Halton quasi Monte Carlo.
     #define ghalton_max_dim 360

@@ -76,9 +76,13 @@ namespace tools_stats
     Eigen::MatrixXd to_pseudo_obs(Eigen::MatrixXd x,
                                   std::string ties_method = "average");
 
-    double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2> x);
     double pairwise_ktau(Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
     double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z);
+    double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2> x);
+    Eigen::MatrixXd ktau_matrix(const Eigen::MatrixXd& x);
+    Eigen::MatrixXd cor_matrix(const Eigen::MatrixXd& x);
+    Eigen::MatrixXd hoeffd_matrix(const Eigen::MatrixXd& x);
+    
     Eigen::MatrixXd ghalton(size_t n, size_t d);
 }
 
