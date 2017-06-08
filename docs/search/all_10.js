@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['qnorm',['qnorm',['../namespacetools__stats.html#acc57d04fffc7a8d39a60fa5e2292cb99',1,'tools_stats']]],
-  ['qt',['qt',['../namespacetools__stats.html#a285a8ae16aea054b21c9d29966776db5',1,'tools_stats']]]
+  ['rotationless',['rotationless',['../namespacevinecopulib_1_1bicop__families.html#ac221bc84c32d2836692ed40d89439928',1,'vinecopulib::bicop_families']]],
+  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html',1,'vinecopulib']]],
+  ['rvinematrix',['RVineMatrix',['../classvinecopulib_1_1_r_vine_matrix.html#a966316e211937ae11e840ef7540a492f',1,'vinecopulib::RVineMatrix']]]
 ];

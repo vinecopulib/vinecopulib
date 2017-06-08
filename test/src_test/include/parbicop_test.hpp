@@ -2,17 +2,14 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #pragma once
 
 #include "gtest/gtest.h"
-#include "include/misc/tools_stl.hpp"
-#include "bicop/class.hpp"
-
-#ifndef M_PI
-#define M_PI       3.14159265358979323846
-#endif
+#include <vinecopulib/misc/tools_stl.hpp>
+#include <vinecopulib/bicop/class.hpp>
+#include <boost/math/constants/constants.hpp>
 
 using namespace vinecopulib;
 
@@ -51,7 +48,7 @@ protected:
             parameters = bicop_.tau_to_parameters(tau);
         } else {
             if (family == BicopFamily::student) {
-                parameters(0) = sin(tau * M_PI / 2);
+                parameters(0) = sin(tau * boost::math::constants::pi<double>() / 2);
                 parameters(1) = 4;
             } else if (family == BicopFamily::bb1) {
                 parameters(1) = 1.5;

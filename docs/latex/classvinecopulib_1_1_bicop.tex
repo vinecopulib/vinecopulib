@@ -21,6 +21,8 @@ A class for bivariate copula models.
 \item 
 Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a83dc7214e4bb1bfe59285ca05407d646}{pdf} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
 \item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a153d7e766388066eda14577c5a6332cc}{cdf} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
+\item 
 Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a130fda62cd61c7acdef5db75fffdd89e}{hfunc1} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
 \item 
 Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a4c9b50f99797ec374f5057cc54db2bd8}{hfunc2} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)
@@ -162,7 +164,24 @@ The B\+IC is defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \] wh
 )}\hypertarget{classvinecopulib_1_1_bicop_a9f3b3b83c54a9e1d809fdee058f3eb11}{}\label{classvinecopulib_1_1_bicop_a9f3b3b83c54a9e1d809fdee058f3eb11}
 calculates the effective number of parameters.
 
-Returns the actual number of parameters for parameteric families. For nonparametric families, there is a conceptually similar definition in the sense that it can be used in the calculation of fit statistics. \index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!fit@{fit}}
+Returns the actual number of parameters for parameteric families. For nonparametric families, there is a conceptually similar definition in the sense that it can be used in the calculation of fit statistics. \index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!cdf@{cdf}}
+\index{cdf@{cdf}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection[{\texorpdfstring{cdf(const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u)}{cdf(const Eigen::Matrix< double, Eigen::Dynamic, 2 > &u)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::\+Bicop\+::cdf (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_bicop_a153d7e766388066eda14577c5a6332cc}{}\label{classvinecopulib_1_1_bicop_a153d7e766388066eda14577c5a6332cc}
+evaluates the copula distribution.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The copula distribution evaluated at {\ttfamily u}. 
+\end{DoxyReturn}
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!fit@{fit}}
 \index{fit@{fit}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
 \subsubsection[{\texorpdfstring{fit(const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&data, Fit\+Controls\+Bicop controls=\+Fit\+Controls\+Bicop())}{fit(const Eigen::Matrix< double, Eigen::Dynamic, 2 > &data, FitControlsBicop controls=FitControlsBicop())}}]{\setlength{\rightskip}{0pt plus 5cm}void vinecopulib\+::\+Bicop\+::fit (
 \begin{DoxyParamCaption}
@@ -354,5 +373,5 @@ converts a Kendall\textquotesingle{}s $ \tau $ to the copula parameters of the c
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/n5/dev/cpp/vinecopulib/include/bicop/class.\+hpp\item 
-/home/n5/dev/cpp/vinecopulib/src/bicop/class.\+cpp\end{DoxyCompactItemize}
+vinecopulib/include/vinecopulib/bicop/class.\+hpp\item 
+vinecopulib/src/bicop/class.\+cpp\end{DoxyCompactItemize}

@@ -1,4 +1,10 @@
 var searchData=
 [
-  ['nloptcontrols',['NLoptControls',['../classtools__optimization_1_1_n_lopt_controls.html#a52cd5fa51d62766df824ca9818750332',1,'tools_optimization::NLoptControls::NLoptControls()'],['../classtools__optimization_1_1_n_lopt_controls.html#a2998eafd73b87482eae2c096dbca9a18',1,'tools_optimization::NLoptControls::NLoptControls(double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)']]]
+  ['pairwise_5fcor',['pairwise_cor',['../namespacevinecopulib_1_1tools__stats.html#ad076513f9a531a015bb0eaff098a8271',1,'vinecopulib::tools_stats']]],
+  ['pairwise_5fhoeffd',['pairwise_hoeffd',['../namespacevinecopulib_1_1tools__stats.html#adda97526e428173da49899ef449560cf',1,'vinecopulib::tools_stats']]],
+  ['pairwise_5fktau',['pairwise_ktau',['../namespacevinecopulib_1_1tools__stats.html#aa1ed1d0ae4e304aef8c05737b4bfd024',1,'vinecopulib::tools_stats']]],
+  ['parameters_5fto_5ftau',['parameters_to_tau',['../classvinecopulib_1_1_bicop.html#aa25436353dee76e4368fb941a7efa257',1,'vinecopulib::Bicop']]],
+  ['pdf',['pdf',['../classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646',1,'vinecopulib::Bicop::pdf()'],['../classvinecopulib_1_1_vinecop.html#adf3760b8dd2b6d3a9cae5426188d4489',1,'vinecopulib::Vinecop::pdf()']]],
+  ['pnorm',['pnorm',['../namespacevinecopulib_1_1tools__stats.html#aa380a12540c4749e14049cdd0b163352',1,'vinecopulib::tools_stats']]],
+  ['pt',['pt',['../namespacevinecopulib_1_1tools__stats.html#a1f65dc25a8284fe4629f092969e2861a',1,'vinecopulib::tools_stats']]]
 ];

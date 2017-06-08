@@ -2,10 +2,11 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include "vinecop/fit_controls.hpp"
-#include "misc/tools_stl.hpp"
+#include <vinecopulib/vinecop/fit_controls.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
+#include <exception>
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib
@@ -40,9 +41,7 @@ namespace vinecopulib
                                            double threshold,
                                            std::string selection_criterion,
                                            bool preselect_families,
-                                           bool show_trace,
-                                           bool select_truncation_level,
-                                           bool select_threshold) :
+                                           bool show_trace) :
             FitControlsBicop(family_set, parametric_method, nonparametric_mult, 
                              selection_criterion, preselect_families)
     {
@@ -69,9 +68,7 @@ namespace vinecopulib
                                            size_t truncation_level,
                                            std::string tree_criterion,
                                            double threshold,
-                                           bool show_trace,
-                                           bool select_truncation_level,
-                                           bool select_threshold) :
+                                           bool show_trace) :
             FitControlsBicop(controls)
     {
         check_truncation_level(truncation_level);

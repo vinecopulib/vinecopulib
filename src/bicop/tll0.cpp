@@ -2,11 +2,11 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include "bicop/tll0.hpp"
-#include "bicop/family.hpp"
-#include "misc/tools_stats.hpp"
+#include <vinecopulib/bicop/tll0.hpp>
+#include <vinecopulib/bicop/family.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
 
 namespace vinecopulib
 {
@@ -34,15 +34,7 @@ namespace vinecopulib
 
         // expand the interpolation grid; a matrix with two columns where each row
         // contains one combination of the grid points
-        Eigen::Matrix<double, Eigen::Dynamic, 2> grid_2d(m * m, 2);
-        size_t k = 0;
-        for (size_t i = 0; i < m; ++i) {
-            for (size_t j = 0; j < m; ++j) {
-                grid_2d(k, 0) = grid_points(i);
-                grid_2d(k, 1) = grid_points(j);
-                ++k;
-            }
-        }
+        auto grid_2d = tools_eigen::expand_grid(grid_points);
 
         // transform evaluation grid and data by inverse Gaussian cdf
         Eigen::Matrix<double, Eigen::Dynamic, 2> z = tools_stats::qnorm(grid_2d);
@@ -86,7 +78,7 @@ namespace vinecopulib
         // for interpolation, we shift the limiting gridpoints to 0 and 1
         grid_points(0) = 0.0;
         grid_points(m - 1) = 1.0;
-        interp_grid_ = InterpolationGrid(grid_points, values);
+        interp_grid_ = tools_interpolation::InterpolationGrid(grid_points, values);
 
         // compute effective number of parameters
         double K0 = gaussian_kernel_2d(Eigen::MatrixXd::Constant(1, 2, 0.0))(0);

@@ -2,14 +2,12 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include "bicop/class.hpp"
-#include "bicop/tools_bicopselect.hpp"
-#include "misc/tools_stats.hpp"
-#include "misc/tools_stl.hpp"
-
-#include <iostream>
+#include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/bicop/tools_bicopselect.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib
@@ -35,7 +33,7 @@ namespace vinecopulib
         // family must be set before checking the rotation
         set_rotation(rotation);
     }
-    
+
     //! equivalent to `Bicop cop; cop.select(data, controls)`.
     //! @param data see select().
     //! @param controls see select().
@@ -56,7 +54,37 @@ namespace vinecopulib
         return f;
     }
 
-    //! calculates the first h-function, i.e., 
+    //! evaluates the copula distribution.
+    //!
+    //! @param u \f$n \times 2\f$ matrix of evaluation points.
+    //! @return The copula distribution evaluated at \c u.
+    Eigen::VectorXd Bicop::cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+    {
+        Eigen::VectorXd p = bicop_->cdf(cut_and_rotate(u));
+        switch (rotation_) {
+            case 0:
+                return p;
+
+            case 90:
+                return u.col(1) - p;
+
+            case 180: {
+                Eigen::VectorXd f = Eigen::VectorXd::Ones(p.rows());
+                f = f - u.rowwise().sum();
+                return p - f;
+            }
+
+            case 270:
+                return u.col(0) - p;
+
+            default:
+                throw std::runtime_error(std::string(
+                        "rotation can only take values in {0, 90, 180, 270}"
+                ));
+        }
+    }
+
+    //! calculates the first h-function, i.e.,
     //! \f$ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) \f$.
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     Eigen::VectorXd Bicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
@@ -81,7 +109,7 @@ namespace vinecopulib
         }
     }
 
-    //! calculates the second h-function, i.e., 
+    //! calculates the second h-function, i.e.,
     //! \f$ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) \f$.
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     Eigen::VectorXd Bicop::hfunc2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
@@ -106,7 +134,7 @@ namespace vinecopulib
         }
     }
 
-    //! calculates the inverse of \f$ h_1 f\f$ (see hfunc1()) w.r.t. the second 
+    //! calculates the inverse of \f$ h_1 f\f$ (see hfunc1()) w.r.t. the second
     //! argument.
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     Eigen::VectorXd Bicop::hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
@@ -131,7 +159,7 @@ namespace vinecopulib
         }
     }
 
-    //! calculates the inverse of \f$ h_2 f\f$ (see hfunc2()) w.r.t. the first 
+    //! calculates the inverse of \f$ h_2 f\f$ (see hfunc2()) w.r.t. the first
     //! argument.
     //! @param u \f$m \times 2\f$ matrix of evaluation points.
     Eigen::VectorXd Bicop::hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
@@ -157,7 +185,7 @@ namespace vinecopulib
     }
     //! @}
 
-    
+
     //! simulates from a bivariate copula.
     //!
     //! @param n number of observations.
@@ -172,11 +200,11 @@ namespace vinecopulib
     }
 
     //! calculates the log-likelihood.
-    //! 
+    //!
     //! The log-likelihood is defined as
     //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \f]
     //! where \f$ c \f$ is the copula density pdf().
-    //! 
+    //!
     //! @param u \f$n \times 2\f$ matrix of observations.
     double Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
@@ -184,14 +212,14 @@ namespace vinecopulib
     }
 
     //! calculates the Akaike information criterion (AIC).
-    //! 
+    //!
     //! The AIC is defined as
     //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
-    //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the 
-    //! (effective) number of parameters of the model, see loglik() and 
-    //! calculate_npars(). The AIC is a consistent model selection criterion 
+    //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
+    //! (effective) number of parameters of the model, see loglik() and
+    //! calculate_npars(). The AIC is a consistent model selection criterion
     //! for nonparametric models.
-    //! 
+    //!
     //! @param u \f$n \times 2\f$ matrix of observations.
     double Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
@@ -199,33 +227,33 @@ namespace vinecopulib
     }
 
     //! calculates the Bayesian information criterion (BIC).
-    //! 
+    //!
     //! The BIC is defined as
     //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
-    //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the 
-    //! (effective) number of parameters of the model, see loglik() and 
-    //! calculate_npars(). The BIC is a consistent model selection criterion 
+    //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
+    //! (effective) number of parameters of the model, see loglik() and
+    //! calculate_npars(). The BIC is a consistent model selection criterion
     //! for nonparametric models.
-    //! 
+    //!
     //! @param u \f$n \times 2\f$ matrix of observations.
     double Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
     {
         return -2 * loglik(u) + calculate_npars() * log(u.rows());
     }
-    
+
     //! calculates the effective number of parameters.
-    //! 
-    //! Returns the actual number of parameters for parameteric families. For 
-    //! nonparametric families, there is a conceptually similar definition in 
+    //!
+    //! Returns the actual number of parameters for parameteric families. For
+    //! nonparametric families, there is a conceptually similar definition in
     //! the sense that it can be used in the calculation of fit statistics.
     double Bicop::calculate_npars()
     {
         return bicop_->calculate_npars();
     }
-        
-    //! converts a Kendall's \f$ \tau \f$ to the copula parameters of the 
+
+    //! converts a Kendall's \f$ \tau \f$ to the copula parameters of the
     //! current family (only works for one-parameter families).
-    //! 
+    //!
     //! @param tau a value in \f$ (-1, 1) \f$.
     Eigen::MatrixXd Bicop::tau_to_parameters(const double& tau)
     {
@@ -233,8 +261,8 @@ namespace vinecopulib
     }
 
     //! converts the parameters to the Kendall's \f$ tau \f$ for the current
-    //! family (works for all families but `BicopFamily::tll0`). 
-    //! 
+    //! family (works for all families but `BicopFamily::tll0`).
+    //!
     //! @param parameters the parameters (must be a valid parametrization of
     //!     the current family).
     double Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
@@ -245,44 +273,44 @@ namespace vinecopulib
         }
         return tau;
     }
-    
+
     //! @name Getters and setters
-    //! 
+    //!
     //! @{
-    BicopFamily Bicop::get_family() const 
+    BicopFamily Bicop::get_family() const
     {
         return bicop_->get_family();
     }
-    
-    std::string Bicop::get_family_name() const 
+
+    std::string Bicop::get_family_name() const
     {
         return bicop_->get_family_name();
     };
-    
+
     int Bicop::get_rotation() const
     {
         return rotation_;
     }
-    
-    Eigen::MatrixXd Bicop::get_parameters() const 
+
+    Eigen::MatrixXd Bicop::get_parameters() const
     {
         return bicop_->get_parameters();
     }
-    
-    //! @param rotation 
+
+    //! @param rotation
     void Bicop::set_rotation(int rotation) {
         check_rotation(rotation);
         rotation_ = rotation;
     }
-    
-    //! @param parameters 
+
+    //! @param parameters
     void Bicop::set_parameters(const Eigen::MatrixXd& parameters)
     {
         bicop_->set_parameters(parameters);
     }
     //! @}
-    
-    
+
+
     //! @name Utilities
     //! @{
     //! adjust's the copula model to a change in the variable order.
@@ -296,10 +324,10 @@ namespace vinecopulib
                 set_rotation(90);
             }
         } else {
-            bicop_->flip();    
+            bicop_->flip();
         }
     }
-    
+
     //! summarizes the model into a string (can be used for printing).
     std::string Bicop::str()
     {
@@ -316,19 +344,19 @@ namespace vinecopulib
     {
         return bicop_;
     };
-    
-    
+
+
 
     //! fits a bivariate copula (with fixed family) to data.
-    //! 
+    //!
     //! For parametric models, two different methods are available. `"mle"` fits
-    //! the parameters by maximum-likelihood. `"itau"` uses inversion of 
+    //! the parameters by maximum-likelihood. `"itau"` uses inversion of
     //! Kendall's \f$ \tau \f$, but is only available for one-parameter families
-    //! and the Student t copula. For the latter, there is a one-to-one 
+    //! and the Student t copula. For the latter, there is a one-to-one
     //! transformation for the first parameter, the second is found by profile
     //! likelihood optimization (with accuracy of at least 0.5). Nonparametric
     //! families have specialized methods, no specification is required.
-    //! 
+    //!
     //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
     //!     \f$(0, 1)^2 \f$.
     //! @param controls the controls (see FitControlsBicop).
@@ -339,12 +367,12 @@ namespace vinecopulib
         bicop_->fit(cut_and_rotate(data), controls.get_parametric_method(),
                     controls.get_nonparametric_mult());
     }
-    
+
     //! selects the best fitting model.
-    //! 
+    //!
     //! The function calls fit() for all families in `family_set`)  and selects
     //! the best fitting model by either BIC or AIC, see bic() and aic().
-    //! 
+    //!
     //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
     //!     \f$(0, 1)^2 \f$.
     //! @param controls the controls (see FitControlsBicop).
@@ -368,16 +396,12 @@ namespace vinecopulib
             }
         } else {
             if (intersect(family_set, bicop_families::all).empty()) {
-                throw std::runtime_error(
-                        std::string("One of the families is not implemented")
-                );
+                throw std::runtime_error("One of the families is not implemented");
             }
             if (method == "itau") {
                 family_set = intersect(family_set, bicop_families::itau);
                 if (family_set.empty()) {
-                    throw std::runtime_error(
-                            std::string("No family with method itau provided")
-                    );
+                    throw std::runtime_error("No family with method itau provided");
                 }
             }
         }
@@ -394,7 +418,8 @@ namespace vinecopulib
 
         std::vector<double> c(2);
         if (preselect_families) {
-            c = get_c1c2(data, tau);
+            rotation_ = 0;
+            c = get_c1c2(cut_and_rotate(data), tau);
         }
 
         // Create the combinations of families and rotations to estimate
@@ -455,11 +480,11 @@ namespace vinecopulib
                 fitted_rotation = rotation_;
             }
         }
-        
+
         bicop_ = fitted_bicop;
         rotation_ = fitted_rotation;
     }
-    
+
     //! Data manipulations for rotated families
     //!
     //! @param u \f$m \times 2\f$ matrix of data.
@@ -492,14 +517,14 @@ namespace vinecopulib
         }
 
         // truncate to interval [eps, 1 - eps]
-        Eigen::Matrix<double, Eigen::Dynamic, 2> eps = 
+        Eigen::Matrix<double, Eigen::Dynamic, 2> eps =
             Eigen::Matrix<double, Eigen::Dynamic, 2>::Constant(u.rows(), 2, 1e-10);
         u_new = u_new.array().min(1.0 - eps.array());
         u_new = u_new.array().max(eps.array());
 
         return u_new;
     }
-    
+
     void Bicop::check_rotation(int rotation)
     {
         using namespace tools_stl;

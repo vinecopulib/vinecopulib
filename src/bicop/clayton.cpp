@@ -2,11 +2,11 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 
-#include "bicop/clayton.hpp"
-#include "misc/tools_stl.hpp"
+#include <vinecopulib/bicop/clayton.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 
 namespace vinecopulib
 {

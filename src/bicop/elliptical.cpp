@@ -2,9 +2,9 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include "bicop/elliptical.hpp"
+#include <vinecopulib/bicop/elliptical.hpp>
 #include <cmath>
 #ifndef M_PI
 #define M_PI       3.14159265358979323846
