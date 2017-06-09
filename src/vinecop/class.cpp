@@ -161,15 +161,10 @@ namespace vinecopulib
                              FitControlsVinecop controls)
     {
         using namespace tools_select::structure;
-        size_t d = data.cols();
-        if (d != d_) {
-            std::stringstream message;
-            message << "data has wrong number of columns; " <<
-                    "expected: " << d_ <<
-                    ", actual: " << d << std::endl;
-            throw std::runtime_error(message.str().c_str());
-        }
         
+        size_t d = data.cols();
+        check_data_dim(d);
+
         // automatic selection of sparsity parameters is implemented separately
         // below
         if (controls.needs_sparse_select()) {
@@ -348,229 +343,14 @@ namespace vinecopulib
     {
         using namespace tools_select::families;
         size_t d = data.cols();
-        size_t n = data.rows();
-        if (d != d_) {
-            std::stringstream message;
-            message << "data has wrong number of columns; " <<
-                    "expected: " << d_ <<
-                    ", actual: " << d << std::endl;
-            throw std::runtime_error(message.str().c_str());
-        }
+        check_data_dim(d);
         
-        // automatic selection of sparsity parameters is implemented separately
-        // below
-        if (controls.needs_sparse_select()) {
-            // sparse_select_families(data, controls);
-            return ;
-        }
-        
-        // Controls for selecting the pair copulas
-        FitControlsBicop controls_bicop = controls.get_fit_controls_bicop();
-
-        auto fc = init_fit_container(vine_matrix_, n, d);    
-        // fill first row of hfunc2 matrix with evaluation points;
-        // points have to be reordered to correspond to natural order
-        for (size_t j = 0; j < d; ++j) {
-            fc.hfunc2.col(j) = data.col(fc.order.reverse()(j) - 1);
-        }
-        
-        Eigen::MatrixXd u_e(n, 2);    
+        auto fc = init_fit_container(vine_matrix_, data);    
         for (size_t tree = 0; tree < d - 1; ++tree) {
-            for (size_t edge = 0; edge < d - tree - 1; ++edge) {
-                // extract evaluation point from hfunction matrices (have been
-                // computed in previous tree level)
-                size_t m = fc.max_matrix(tree, edge);
-                u_e.col(0) = fc.hfunc2.col(edge);
-                if (m == fc.no_matrix(tree, edge)) {
-                    u_e.col(1) = fc.hfunc2.col(d - m);
-                } else {
-                    u_e.col(1) = fc.hfunc1.col(d - m);
-                }
-                
-                // select pair-copula
-                if (tree > controls.get_truncation_level()) {
-                    fc.pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
-                } else {
-                    if (controls.get_threshold() != 0) {
-                        double crit = tools_select::calculate_criterion(
-                            u_e, 
-                            controls.get_tree_criterion()
-                        );
-                        if (crit < controls.get_threshold()) {
-                            fc.pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
-                        }
-                    } else {
-                        fc.pair_copulas[tree][edge] = Bicop(u_e, controls_bicop);
-                    }
-                }
-    
-                // h-functions are only evaluated if needed in next step
-                if (fc.needed_hfunc1(tree + 1, edge)) {
-                    fc.hfunc1.col(edge) = fc.pair_copulas[tree][edge].hfunc1(u_e);
-                }
-                if (fc.needed_hfunc2(tree + 1, edge)) {
-                    fc.hfunc2.col(edge) = fc.pair_copulas[tree][edge].hfunc2(u_e);
-                }
-                
-                if (controls.get_show_trace()) {
-                    // TODO: print edge index + pair copula
-                }
-            }
+            select_next_tree(fc, controls);
         }
     }
      
-    // void Vinecop::sparse_select_families(const Eigen::MatrixXd& data,
-    //                                      FitControlsVinecop controls)
-    // {
-    //     size_t d = data.cols();
-    //     if (d != d_) {
-    //         std::stringstream message;
-    //         message << "data has wrong number of columns; " <<
-    //                 "expected: " << d_ <<
-    //                 ", actual: " << d << std::endl;
-    //         throw std::runtime_error(message.str().c_str());
-    //     }
-    //     // Controls for selecting the pair copulas
-    //     FitControlsBicop controls_bicop = controls.get_fit_controls_bicop();
-    // 
-    //     // info about the vine structure
-    //     Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
-    //     auto no_matrix  = vine_matrix_.in_natural_order();
-    //     auto max_matrix = vine_matrix_.get_max_matrix();
-    //     MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
-    //     MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
-    // 
-    //     // temporary storage objects for h-functions
-    //     size_t n = data.rows();
-    //     Eigen::MatrixXd hfunc1(n, d);
-    //     Eigen::MatrixXd hfunc2(n, d);
-    //     Eigen::MatrixXd u_e(n, 2);
-    // 
-    //     // fill first row of hfunc2 matrix with evaluation points;
-    //     // points have to be reordered to correspond to natural order
-    //     for (size_t j = 0; j < d; ++j)
-    //         hfunc2.col(j) = data.col(revorder(j) - 1);
-    //         
-    //     auto pair_copulas = make_pair_copula_store(d);
-    //     for (size_t tree = 0; tree < d - 1; ++tree) {
-    //         for (size_t edge = 0; edge < d - tree - 1; ++edge) {
-    //             // extract evaluation point from hfunction matrices (have been
-    //             // computed in previous tree level)
-    //             size_t m = max_matrix(tree, edge);
-    //             u_e.col(0) = hfunc2.col(edge);
-    //             if (m == no_matrix(tree, edge)) {
-    //                 u_e.col(1) = hfunc2.col(d - m);
-    //             } else {
-    //                 u_e.col(1) = hfunc1.col(d - m);
-    //             }
-    //             
-    //             // select pair-copula
-    //             if (tree > controls.get_truncation_level()) {
-    //                 pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
-    //             } else {
-    //                 if (controls.get_threshold() != 0) {
-    //                     double crit = tools_select::structure::calculate_criterion(
-    //                         u_e, 
-    //                         controls.get_tree_criterion()
-    //                     );
-    //                     if (crit < controls.get_threshold()) {
-    //                         pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
-    //                     }
-    //                 } else {
-    //                     pair_copulas_[tree][edge] = Bicop(u_e, controls_bicop);
-    //                 }
-    //             }
-    // 
-    //             // h-functions are only evaluated if needed in next step
-    //             if (needed_hfunc1(tree + 1, edge)) {
-    //                 hfunc1.col(edge) = pair_copulas_[tree][edge].hfunc1(u_e);
-    //             }
-    //             if (needed_hfunc2(tree + 1, edge)) {
-    //                 hfunc2.col(edge) = pair_copulas_[tree][edge].hfunc2(u_e);
-    //             }
-    //             
-    //             if (controls.get_show_trace()) {
-    //                 // TODO: print edge index + pair copula
-    //             }
-    //         }
-    //     }
-    // }
-    
-    //! Update Vinecop object using the fitted trees
-    //!
-    //! @param trees a vector of trees preprocessed by add_edge_info(); the
-    //!     0th entry should be the base graph and is not used.
-    void Vinecop::update_vinecop(std::vector<tools_select::structure::VineTree>& trees)
-    {
-        using namespace tools_select::structure;
-        using namespace tools_stl;
-        size_t d = trees.size();
-        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d, d);
-        mat.fill(0);
-    
-        for (size_t col = 0; col < d - 1; ++col) {
-            size_t t = d - 1 - col;
-            // start with highest tree in this column and fill first two
-            // entries by conditioning set
-            auto e0 = *boost::edges(trees[t]).first;
-            mat(t, col) = trees[t][e0].conditioning[0];
-            mat(t - 1, col) = trees[t][e0].conditioning[1];
-    
-            // assign fitted pair copula to appropriate entry, see
-            // vinecopulib::Vinecop::get_pair_copula().
-            pair_copulas_[t - 1][col] = trees[t][e0].pair_copula;
-    
-            // initialize running set with full conditioing set of this edge
-            auto ned_set = trees[t][e0].conditioned;
-    
-            // iteratively search for an edge in lower tree that shares all indices
-            // in the conditioning set + diagonal entry
-            for (size_t k = 1; k < t; ++k) {
-                auto reduced_set = cat(mat(t, col), ned_set);
-                for (auto e : boost::edges(trees[t - k])) {
-                    if (is_same_set(trees[t - k][e].all_indices, reduced_set)) {
-                        // next matrix entry is conditioning variable of new edge
-                        // that's not equal to the diagonal entry of this column
-                        auto e_new = trees[t - k][e];
-                        ptrdiff_t pos = find_position(mat(t, col), e_new.conditioning);
-                        mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
-                        if (pos == 1) {
-                            e_new.pair_copula.flip();
-                        }
-                        // assign fitted pair copula to appropriate entry, see
-                        // vinecopulib::Vinecop::get_pair_copula().
-                        pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
-    
-                        // start over with conditioning set of next edge
-                        ned_set = e_new.conditioned;
-    
-                        // remove edge (must not be reused in another column!)
-                        size_t v0 = boost::source(e, trees[t - k]);
-                        size_t v1 = boost::target(e, trees[t - k]);
-                        boost::remove_edge(v0, v1, trees[t - k]);
-                        break;
-                    }
-                }
-            }
-        }
-    
-        // The last column contains a single element which must be different
-        // from all other diagonal elements. Based on the properties of an
-        // R-vine matrix, this must be the element next to it.
-        mat(0, d - 1) = mat(0, d - 2);
-    
-        // change to user-facing format
-        // (variable index starting at 1 instead of 0)
-        auto new_mat = mat;
-        for (size_t i = 0; i < d; ++i) {
-            for (size_t j = 0; j < d - i; ++j) {
-                new_mat(i, j) += 1;    
-            }
-        }
-    
-        vine_matrix_ = RVineMatrix(new_mat);
-    }
-    
     //! @name Getters
     //! @{
 
@@ -972,6 +752,95 @@ namespace vinecopulib
         return U_vine;
     }
     
+    //! checks if dimension d of the data matches the dimension of the vine.
+    //! @param d number of columns in the data.
+    void Vinecop::check_data_dim(size_t d)
+    {
+        if (d != d_) {
+            std::stringstream message;
+            message << "data has wrong number of columns; " <<
+                    "expected: " << d_ <<
+                    ", actual: " << d << std::endl;
+            throw std::runtime_error(message.str().c_str());
+        }
+    }  
+    
+   
+   //! Update Vinecop object using the fitted trees
+   //!
+   //! @param trees a vector of trees preprocessed by add_edge_info(); the
+   //!     0th entry should be the base graph and is not used.
+   void Vinecop::update_vinecop(std::vector<tools_select::structure::VineTree>& trees)
+   {
+       using namespace tools_select::structure;
+       using namespace tools_stl;
+       size_t d = trees.size();
+       Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d, d);
+       mat.fill(0);
+   
+       for (size_t col = 0; col < d - 1; ++col) {
+           size_t t = d - 1 - col;
+           // start with highest tree in this column and fill first two
+           // entries by conditioning set
+           auto e0 = *boost::edges(trees[t]).first;
+           mat(t, col) = trees[t][e0].conditioning[0];
+           mat(t - 1, col) = trees[t][e0].conditioning[1];
+   
+           // assign fitted pair copula to appropriate entry, see
+           // vinecopulib::Vinecop::get_pair_copula().
+           pair_copulas_[t - 1][col] = trees[t][e0].pair_copula;
+   
+           // initialize running set with full conditioing set of this edge
+           auto ned_set = trees[t][e0].conditioned;
+   
+           // iteratively search for an edge in lower tree that shares all indices
+           // in the conditioning set + diagonal entry
+           for (size_t k = 1; k < t; ++k) {
+               auto reduced_set = cat(mat(t, col), ned_set);
+               for (auto e : boost::edges(trees[t - k])) {
+                   if (is_same_set(trees[t - k][e].all_indices, reduced_set)) {
+                       // next matrix entry is conditioning variable of new edge
+                       // that's not equal to the diagonal entry of this column
+                       auto e_new = trees[t - k][e];
+                       ptrdiff_t pos = find_position(mat(t, col), e_new.conditioning);
+                       mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
+                       if (pos == 1) {
+                           e_new.pair_copula.flip();
+                       }
+                       // assign fitted pair copula to appropriate entry, see
+                       // vinecopulib::Vinecop::get_pair_copula().
+                       pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
+   
+                       // start over with conditioning set of next edge
+                       ned_set = e_new.conditioned;
+   
+                       // remove edge (must not be reused in another column!)
+                       size_t v0 = boost::source(e, trees[t - k]);
+                       size_t v1 = boost::target(e, trees[t - k]);
+                       boost::remove_edge(v0, v1, trees[t - k]);
+                       break;
+                   }
+               }
+           }
+       }
+   
+       // The last column contains a single element which must be different
+       // from all other diagonal elements. Based on the properties of an
+       // R-vine matrix, this must be the element next to it.
+       mat(0, d - 1) = mat(0, d - 2);
+   
+       // change to user-facing format
+       // (variable index starting at 1 instead of 0)
+       auto new_mat = mat;
+       for (size_t i = 0; i < d; ++i) {
+           for (size_t j = 0; j < d - i; ++j) {
+               new_mat(i, j) += 1;    
+           }
+       }
+   
+       vine_matrix_ = RVineMatrix(new_mat);
+   }
+       
     // get indexes for reverting back to old order in simulation routine
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> Vinecop::inverse_permutation(
         const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order) {

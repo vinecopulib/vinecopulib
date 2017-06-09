@@ -33,19 +33,27 @@ double calculate_gic(double loglik, double npars, int n);
 namespace families {
     
     struct FitContainer {
+        // dimensionality of the problem
+        size_t n;
+        size_t d;
+        // info about the vine structure
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> order;
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> no_matrix;
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> max_matrix;
         tools_eigen::MatrixXb needed_hfunc1;
         tools_eigen::MatrixXb needed_hfunc2;
+        // temporary storage objects for h-functions
         Eigen::MatrixXd hfunc1;
         Eigen::MatrixXd hfunc2;
-        size_t trees_fitted;
-        std::vector<std::vector<Bicop>> pair_copulas;
+        size_t trees_fitted;  // counter for already fitted trees
+        std::vector<std::vector<Bicop>> pair_copulas;    // fitted pair copulas
     };
     
-    FitContainer init_fit_container(const RVineMatrix& rvm, size_t n, size_t d);
+    FitContainer init_fit_container(const RVineMatrix& rvm, 
+                                    const Eigen::MatrixXd& data);    
+    void select_next_tree(FitContainer& fc, FitControlsVinecop& controls);
 }
+
 
 namespace structure {
     

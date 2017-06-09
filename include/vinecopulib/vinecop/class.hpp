@@ -72,11 +72,13 @@ namespace vinecopulib
 
         // Misc methods
         static std::vector<std::vector<Bicop>> make_pair_copula_store(size_t d);
+        
     private:
         size_t d_;
         RVineMatrix vine_matrix_;
         std::vector<std::vector<Bicop>> pair_copulas_;
         
+        void check_data_dim(size_t d);
         void update_vinecop(std::vector<tools_select::structure::VineTree>& trees);
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> inverse_permutation(const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
     };

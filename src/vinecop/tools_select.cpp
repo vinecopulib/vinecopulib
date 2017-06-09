@@ -47,9 +47,15 @@ double calculate_gic(double loglik, double npars, int n)
 
 namespace families {
         
-    FitContainer init_fit_container(const RVineMatrix& rvm, size_t n, size_t d)
+    FitContainer init_fit_container(const RVineMatrix& rvm, 
+                                    const Eigen::MatrixXd& data)
     {
+        size_t n = data.rows();
+        size_t d = data.cols();
         FitContainer fc = {
+            // dimensionality of the problem
+            n,
+            d,
             // info about the vine structure
             rvm.get_order(),
             rvm.in_natural_order(),
@@ -63,7 +69,59 @@ namespace families {
             Vinecop::make_pair_copula_store(d)  // fitted pair copulas
         };
         
+        // fill first row of hfunc2 matrix with evaluation points;
+        // points have to be reordered to correspond to natural order
+        for (size_t j = 0; j < d; ++j) {
+            fc.hfunc2.col(j) = data.col(fc.order.reverse()(j) - 1);
+        }
+        
         return fc;
+    }
+    
+    void select_next_tree(FitContainer& fc, FitControlsVinecop& controls)
+    {
+        Eigen::MatrixXd u_e(fc.n, 2);
+        size_t tree = fc.trees_fitted + 1;
+        for (size_t edge = 0; edge < fc.d - tree - 1; ++edge) {
+            // extract evaluation point from hfunction matrices (have been
+            // computed in previous tree level)
+            size_t m = fc.max_matrix(tree, edge);
+            u_e.col(0) = fc.hfunc2.col(edge);
+            if (m == fc.no_matrix(tree, edge)) {
+                u_e.col(1) = fc.hfunc2.col(fc.d - m);
+            } else {
+                u_e.col(1) = fc.hfunc1.col(fc.d - m);
+            }
+            
+            // select pair-copula
+            if (tree > controls.get_truncation_level()) {
+                fc.pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
+            } else {
+                if (controls.get_threshold() != 0) {
+                    double crit = tools_select::calculate_criterion(
+                        u_e, 
+                        controls.get_tree_criterion()
+                    );
+                    if (crit < controls.get_threshold()) {
+                        fc.pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
+                    }
+                } else {
+                    fc.pair_copulas[tree][edge] = Bicop(u_e, controls);
+                }
+            }
+
+            // h-functions are only evaluated if needed in next step
+            if (fc.needed_hfunc1(tree + 1, edge)) {
+                fc.hfunc1.col(edge) = fc.pair_copulas[tree][edge].hfunc1(u_e);
+            }
+            if (fc.needed_hfunc2(tree + 1, edge)) {
+                fc.hfunc2.col(edge) = fc.pair_copulas[tree][edge].hfunc2(u_e);
+            }
+            
+            if (controls.get_show_trace()) {
+                // TODO: print edge index + pair copula
+            }
+        }
     }
 }
 
