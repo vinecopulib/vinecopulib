@@ -27,6 +27,8 @@ namespace tools_select {
 
 double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
                            std::string tree_criterion);
+Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd& data, 
+                                           std::string tree_criterion);
 double calculate_gic(double loglik, double npars, int n);
 
 

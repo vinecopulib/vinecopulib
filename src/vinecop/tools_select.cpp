@@ -27,12 +27,31 @@ double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
         w = std::fabs(tools_stats::pairwise_ktau(data));
     } else if (tree_criterion == "hoeffd") {
         // scale to [0,1]
-        w = (30*tools_stats::pairwise_hoeffd(data)+0.5)/1.5;
+        w = (30 * tools_stats::pairwise_hoeffd(data) + 0.5) / 1.5;
     } else if (tree_criterion == "rho") {
         w = std::fabs(tools_stats::pairwise_cor(data));
     }
-
+    
     return w;
+}
+
+//! Calculates maximal criterion for tree selection.
+//! @param data observations.
+//! @param tree_criterion the criterion.
+Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd& data, 
+                                           std::string tree_criterion)
+{
+    Eigen::MatrixXd w;
+    if (tree_criterion == "tau") {
+        w = tools_stats::ktau_matrix(data);
+    } else if (tree_criterion == "hoeffd") {
+        // scale to [0,1]
+        w = (30 * tools_stats::hoeffd_matrix(data).array() + 0.5) / 1.5;
+    } else if (tree_criterion == "rho") {
+        w = tools_stats::cor_matrix(data);
+    }
+
+    return w.array().abs();
 }
 
 //! calculates the Generalized Information Criterion.

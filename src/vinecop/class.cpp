@@ -199,6 +199,7 @@ namespace vinecopulib
     void Vinecop::sparse_select_all(const Eigen::MatrixXd& data,
                                     FitControlsVinecop controls)
     {
+        using namespace tools_select;
         using namespace tools_select::structure;
         size_t d = data.cols();
         size_t n = data.rows();
@@ -213,10 +214,11 @@ namespace vinecopulib
         if (controls.get_select_threshold()) {
             // initialize thrshold with maximum pairwise |tau| (all pairs get 
             // thresholded)
-            auto all_taus = tools_stats::ktau_matrix(data);
+            auto tree_crit = controls.get_tree_criterion();
+            auto pairwise_crits = calculate_criterion_matrix(data, tree_crit);
             for (size_t i = 1; i < d; ++i) {
                 for (size_t j = 0; j < i; ++j) {
-                    thresholded_crits.push_back(all_taus(i, j));
+                    thresholded_crits.push_back(pairwise_crits(i, j));
                 }
             }
         }
