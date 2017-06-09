@@ -8,7 +8,7 @@
 
 #include "vinecop_test.hpp"
 #include <vinecopulib/vinecop/class.hpp>
-#include <vinecopulib/vinecop/tools_structselect.hpp>
+#include <vinecopulib/vinecop/tools_select.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
