@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.0.2</a>
+                    <a class="navbar-brand">vinecopulib 0.0.3</a>
                 </div>
             </div>
         </nav>
@@ -133,6 +133,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a15ca60a0770dab0786b134fc80d1e77d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf3760b8dd2b6d3a9cae5426188d4489"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_vinecop.html#adf3760b8dd2b6d3a9cae5426188d4489">pdf</a> (const Eigen::MatrixXd &amp;u)</td></tr>
 <tr class="separator:adf3760b8dd2b6d3a9cae5426188d4489"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a379620d0bc7dd3cf5254517520cb3849"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_vinecop.html#a379620d0bc7dd3cf5254517520cb3849">cdf</a> (const Eigen::MatrixXd &amp;u, const size_t N=1e4)</td></tr>
+<tr class="separator:a379620d0bc7dd3cf5254517520cb3849"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa88f63a1fa62dce205c4c197d9deb152"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_vinecop.html#aa88f63a1fa62dce205c4c197d9deb152">simulate</a> (size_t n)</td></tr>
 <tr class="separator:aa88f63a1fa62dce205c4c197d9deb152"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac64ae8072851ea1cd4ed7143cac92933"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_vinecop.html#ac64ae8072851ea1cd4ed7143cac92933">inverse_rosenblatt</a> (const Eigen::MatrixXd &amp;u)</td></tr>
@@ -399,6 +401,40 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>calculates the effective number of parameters.</p>
 <p>Returns sum of the number of parameters for all pair copulas (see <a class="el" href="classvinecopulib_1_1_bicop.html#a9f3b3b83c54a9e1d809fdee058f3eb11">Bicop::calculate_npars()</a>). </p>
+
+</div>
+</div>
+<a class="anchor" id="a379620d0bc7dd3cf5254517520cb3849"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::VectorXd vinecopulib::Vinecop::cdf </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>u</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>N</em> = <code>1e4</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>calculates the cumulative distribution of the vine copula model.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">u</td><td>\( n \times d \) matrix of evaluation points. </td></tr>
+    <tr><td class="paramname">N</td><td>integer for the number of quasi-random numbers to draw to evaluate the distribution (default: 1e4). </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -806,8 +842,8 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/home/n5/dev/cpp/vinecopulib/include/vinecopulib/vinecop/<a class="el" href="vinecop_2class_8hpp_source.html">class.hpp</a></li>
-<li>/home/n5/dev/cpp/vinecopulib/src/vinecop/class.cpp</li>
+<li>vinecopulib/include/vinecopulib/vinecop/<a class="el" href="vinecop_2class_8hpp_source.html">class.hpp</a></li>
+<li>vinecopulib/src/vinecop/class.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.8-->
@@ -818,7 +854,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 31 2017 21:36:44 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jun 6 2017 12:41:24 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

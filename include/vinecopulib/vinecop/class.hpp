@@ -2,7 +2,7 @@
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
-// vinecopulib or https://tvatter.github.io/vinecopulib/.
+// vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #pragma once
 
@@ -22,13 +22,17 @@ namespace vinecopulib
         // Constructors
         Vinecop() {}
         Vinecop(size_t d);
-        Vinecop(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix);
+        Vinecop(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
+                bool check_matrix = true);
         Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
-                const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix);
+                const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
+                bool check_matrix = true);
         Vinecop(const Eigen::MatrixXd& data,
                 FitControlsVinecop controls = FitControlsVinecop());
-        Vinecop(const Eigen::MatrixXd& data, const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
-                FitControlsVinecop controls = FitControlsVinecop());
+        Vinecop(const Eigen::MatrixXd& data, 
+                const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
+                FitControlsVinecop controls = FitControlsVinecop(),
+                bool check_matrix = true);
 
         // Methods modifying structure and/or families and parameters
         void select_all(const Eigen::MatrixXd& data,
@@ -51,6 +55,7 @@ namespace vinecopulib
 
         // Stats methods
         Eigen::VectorXd pdf(const Eigen::MatrixXd& u);
+        Eigen::VectorXd cdf(const Eigen::MatrixXd& u, const size_t N = 1e4);
         Eigen::MatrixXd simulate(size_t n);
         Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& u);
 

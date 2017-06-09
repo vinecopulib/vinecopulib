@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['elliptical',['elliptical',['../namespacevinecopulib_1_1bicop__families.html#a24b790671c9f4b25e57ecbc3505232fb',1,'vinecopulib::bicop_families']]],
-  ['ellipticalbicop',['EllipticalBicop',['../classvinecopulib_1_1_elliptical_bicop.html',1,'vinecopulib']]]
+  ['elliptical',['elliptical',['../namespacevinecopulib_1_1bicop__families.html#a24b790671c9f4b25e57ecbc3505232fb',1,'vinecopulib::bicop_families']]]
 ];

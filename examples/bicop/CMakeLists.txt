@@ -15,8 +15,8 @@ endif()
 # Find vinecopulib package and dependencies
 find_package(vinecopulib                  REQUIRED)
 find_package(Boost 1.56                   REQUIRED)
+find_package(NLopt                        REQUIRED)
 include(cmake/findEigen3.cmake            REQUIRED)
-include(cmake/findNlopt.cmake             REQUIRED)
 
 # Set required variables for includes and libraries
 set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${NLOPT_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})

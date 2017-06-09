@@ -1,27 +1,6 @@
-<map id="/home/n5/dev/cpp/vinecopulib/include/vinecopulib/bicop/family.hpp" name="/home/n5/dev/cpp/vinecopulib/include/vinecopulib/bicop/family.hpp">
-<area shape="rect" id="node2" href="$abstract_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/abstract.hpp" alt="" coords="443,109,637,165"/>
-<area shape="rect" id="node24" href="$bicop_2fit__controls_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/fit_controls.hpp" alt="" coords="224,109,419,165"/>
-<area shape="rect" id="node26" href="$tools__bicopselect_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/tools_bicopselect.hpp" alt="" coords="661,109,856,165"/>
-<area shape="rect" id="node3" href="$bicop_2class_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/class.hpp" alt="" coords="224,213,419,269"/>
-<area shape="rect" id="node7" href="$kernel_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/kernel.hpp" alt="" coords="443,213,637,269"/>
-<area shape="rect" id="node9" href="$parametric_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/parametric.hpp" alt="" coords="1780,213,1975,269"/>
-<area shape="rect" id="node4" href="$vinecop_2class_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/vinecop\l/class.hpp" alt="" coords="89,421,284,477"/>
-<area shape="rect" id="node5" href="$vinecopulib_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib.hpp" alt="" coords="156,525,351,567"/>
-<area shape="rect" id="node6" href="$tools__structselect_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/vinecop\l/tools_structselect.hpp" alt="" coords="39,317,233,373"/>
-<area shape="rect" id="node8" href="$tll0_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/tll0.hpp" alt="" coords="443,317,637,373"/>
-<area shape="rect" id="node10" href="$archimedean_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/archimedean.hpp" alt="" coords="1233,317,1428,373"/>
-<area shape="rect" id="node19" href="$elliptical_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/elliptical.hpp" alt="" coords="1780,317,1975,373"/>
-<area shape="rect" id="node22" href="$indep_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/indep.hpp" alt="" coords="1999,317,2193,373"/>
-<area shape="rect" id="node23" href="$tools__optimization_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/misc\l/tools_optimization.hpp" alt="" coords="2217,317,2412,373"/>
-<area shape="rect" id="node11" href="$bb1_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/bb1.hpp" alt="" coords="1233,421,1428,477"/>
-<area shape="rect" id="node12" href="$bb6_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/bb6.hpp" alt="" coords="1452,421,1647,477"/>
-<area shape="rect" id="node13" href="$bb7_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/bb7.hpp" alt="" coords="1671,421,1865,477"/>
-<area shape="rect" id="node14" href="$bb8_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/bb8.hpp" alt="" coords="1889,421,2084,477"/>
-<area shape="rect" id="node15" href="$clayton_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/clayton.hpp" alt="" coords="359,421,553,477"/>
-<area shape="rect" id="node16" href="$frank_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/frank.hpp" alt="" coords="577,421,772,477"/>
-<area shape="rect" id="node17" href="$gumbel_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/gumbel.hpp" alt="" coords="796,421,991,477"/>
-<area shape="rect" id="node18" href="$joe_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/joe.hpp" alt="" coords="1015,421,1209,477"/>
-<area shape="rect" id="node20" href="$gaussian_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/gaussian.hpp" alt="" coords="2108,421,2303,477"/>
-<area shape="rect" id="node21" href="$student_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/bicop\l/student.hpp" alt="" coords="2327,421,2521,477"/>
-<area shape="rect" id="node25" href="$vinecop_2fit__controls_8hpp_source.html" title="/home/n5/dev/cpp/vinecopulib\l/include/vinecopulib/vinecop\l/fit_controls.hpp" alt="" coords="5,213,200,269"/>
+<map id="vinecopulib/include/vinecopulib/bicop/family.hpp" name="vinecopulib/include/vinecopulib/bicop/family.hpp">
+<area shape="rect" id="node2" href="$bicop_2fit__controls_8hpp_source.html" title="vinecopulib/include\l/vinecopulib/bicop/fit\l_controls.hpp" alt="" coords="121,95,263,151"/>
+<area shape="rect" id="node3" href="$bicop_2class_8hpp_source.html" title="vinecopulib/include\l/vinecopulib/bicop/class.hpp" alt="" coords="5,206,192,247"/>
+<area shape="rect" id="node5" href="$vinecop_2fit__controls_8hpp_source.html" title="vinecopulib/include\l/vinecopulib/vinecop\l/fit_controls.hpp" alt="" coords="217,199,357,255"/>
+<area shape="rect" id="node4" href="$vinecop_2class_8hpp_source.html" title="vinecopulib/include\l/vinecopulib/vinecop\l/class.hpp" alt="" coords="29,303,169,359"/>
 </map>

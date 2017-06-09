@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['optimize',['optimize',['../classvinecopulib_1_1tools__optimization_1_1_optimizer.html#a3c4fcd7a4d3a792d2a9e57349f271764',1,'vinecopulib::tools_optimization::Optimizer']]],
-  ['optimizer',['Optimizer',['../classvinecopulib_1_1tools__optimization_1_1_optimizer.html#a1514592e4adccdcc544bb32654e81da1',1,'vinecopulib::tools_optimization::Optimizer::Optimizer(unsigned int n_parameters)'],['../classvinecopulib_1_1tools__optimization_1_1_optimizer.html#a43190e80f015257e203c134826857c7c',1,'vinecopulib::tools_optimization::Optimizer::Optimizer(unsigned int n_parameters, double xtol_rel, double xtol_abs, double ftol_rel, double ftol_abs, int maxeval)']]]
+  ['qnorm',['qnorm',['../namespacevinecopulib_1_1tools__stats.html#a4772a68417aa49b50e69c957db8533f7',1,'vinecopulib::tools_stats']]],
+  ['qt',['qt',['../namespacevinecopulib_1_1tools__stats.html#a17eb427c3a562c72d2e87438da1cd279',1,'vinecopulib::tools_stats']]]
 ];
