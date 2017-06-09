@@ -44,6 +44,27 @@ double calculate_gic(double loglik, double npars, int n)
     return -2 * loglik + std::log(std::log(n)) * log_npars * npars;
 }
 
+namespace families {
+    
+    using namespace vinecopulib;
+    
+    FitContainer init_fit_container(const RVineMatrix& rvm, size_t n, size_t d)
+    {
+        FitContainer fc = {
+            rvm.get_order(),
+            rvm.in_natural_order(),
+            rvm.get_max_matrix(),
+            rvm.get_needed_hfunc1(),
+            rvm.get_needed_hfunc2(),
+            Eigen::MatrixXd::Zero(n, d),
+            Eigen::MatrixXd::Zero(n, d),
+            0
+        };
+        
+        return fc;
+    }
+}
+
 namespace structure {
     
     using namespace tools_stl;

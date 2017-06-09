@@ -10,6 +10,8 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/vinecop/fit_controls.hpp>
+#include <vinecopulib/vinecop/rvine_matrix.hpp>
+
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std
@@ -23,12 +25,33 @@ namespace std
 namespace vinecopulib {
 
 namespace tools_select {
-    
+
 double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
                            std::string tree_criterion);
 double calculate_gic(double loglik, double npars, int n);
 
+
+namespace families {
+    
+    using namespace tools_select;
+    using namespace vinecopulib;
+
+    struct FitContainer {
+        Eigen::Matrix<size_t, Eigen::Dynamic, 1> order;
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> no_matrix;
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> max_matrix;
+        tools_eigen::MatrixXb needed_hfunc1;
+        tools_eigen::MatrixXb needed_hfunc2;
+        Eigen::MatrixXd hfunc1;
+        Eigen::MatrixXd hfunc2;
+        size_t trees_fitted;
+    };
+    
+    FitContainer init_fit_container(const RVineMatrix& rvm, size_t n, size_t d);
+}
+
 namespace structure {
+    
     using namespace tools_select;
     // boost::graph represenation of a vine tree ----------------
     struct VertexProperties {
