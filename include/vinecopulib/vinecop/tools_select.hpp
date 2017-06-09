@@ -31,31 +31,48 @@ Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd& data,
                                            std::string tree_criterion);
 double calculate_gic(double loglik, double npars, int n);
 
-
-namespace families {
+class VinecopSelector 
+{
+public:
+    VinecopSelector() {}
+    ~VinecopSelector() {}
     
-    struct FitContainer {
-        // dimensionality of the problem
-        size_t n;
-        size_t d;
-        // info about the vine structure
-        Eigen::Matrix<size_t, Eigen::Dynamic, 1> order;
-        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> no_matrix;
-        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> max_matrix;
-        tools_eigen::MatrixXb needed_hfunc1;
-        tools_eigen::MatrixXb needed_hfunc2;
-        // temporary storage objects for h-functions
-        Eigen::MatrixXd hfunc1;
-        Eigen::MatrixXd hfunc2;
-        size_t trees_fitted;  // counter for already fitted trees
-        std::vector<std::vector<Bicop>> pair_copulas;    // fitted pair copulas
-    };
+    virtual void select_next_tree() = 0;
+    virtual void show_trace() = 0;
+    virtual std::vector<std::vector<Bicop>> get_pair_copulas() = 0;
     
-    FitContainer init_fit_container(const RVineMatrix& rvm, 
-                                    const Eigen::MatrixXd& data);    
-    void select_next_tree(FitContainer& fc, FitControlsVinecop& controls);
-}
+protected:
+    size_t trees_fitted_;
+    FitControlsVinecop controls_;
+};
 
+class FamilySelector : public VinecopSelector 
+{
+public:
+    FamilySelector(const Eigen::MatrixXd& data, 
+                   const RVineMatrix& vine_matrix,
+                   const FitControlsVinecop& controls);
+    ~FamilySelector() {}
+    
+    void select_next_tree();
+    void show_trace() {}  // TODO
+    std::vector<std::vector<Bicop>> get_pair_copulas() {return pair_copulas_;}
+    
+private:
+    // dimensionality of the problem
+    size_t n_;
+    size_t d_;
+    // info about the vine structure
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> order_;
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> no_matrix_;
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> max_matrix_;
+    tools_eigen::MatrixXb needed_hfunc1_;
+    tools_eigen::MatrixXb needed_hfunc2_;
+    // temporary storage objects for h-functions
+    Eigen::MatrixXd hfunc1_;
+    Eigen::MatrixXd hfunc2_;
+    std::vector<std::vector<Bicop>> pair_copulas_;  // fitted pair copulas
+};
 
 namespace structure {
     

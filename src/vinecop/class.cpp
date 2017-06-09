@@ -75,7 +75,6 @@ namespace vinecopulib
                     "expected size: " << d_ - 1 << ", "<<
                     "actual size: " << pair_copulas.size() << std::endl;
             throw std::runtime_error(message.str().c_str());
-
         }
         for (size_t t = 0; t < d_ - 1; ++t) {
             if (pair_copulas[t].size() != d_ - 1 - t) {
@@ -343,14 +342,14 @@ namespace vinecopulib
     void Vinecop::select_families(const Eigen::MatrixXd& data,
                                   FitControlsVinecop controls)
     {
-        using namespace tools_select::families;
         size_t d = data.cols();
         check_data_dim(d);
-        
-        auto fc = init_fit_container(vine_matrix_, data);    
+        tools_select::FamilySelector selector(data, vine_matrix_, controls);
+
         for (size_t tree = 0; tree < d - 1; ++tree) {
-            select_next_tree(fc, controls);
+            selector.select_next_tree();
         }
+        pair_copulas_ = selector.get_pair_copulas();
     }
      
     //! @name Getters
