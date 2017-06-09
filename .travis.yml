@@ -81,7 +81,6 @@ after_script:
 
 after_success:
   # Creating report
-<<<<<<< HEAD
   - if [ $COMPILER == gcc ]; then cd debug; fi
   - if [ $COMPILER == gcc ]; then lcov --directory . --capture --output-file coverage.info; fi # capture coverage info
   - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '/usr/*' --output-file coverage.info; fi # filter out external includes
@@ -91,14 +90,3 @@ after_success:
   - if [ $COMPILER == gcc ]; then lcov --list coverage.info; fi #debug info
   # Uploading report to CodeCov
   - if [ $COMPILER == gcc ]; then bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"; fi
-=======
-  - if [ $TRAVIS_OS_NAME == linux ]; then cd debug; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then lcov --directory . --capture --output-file coverage.info; fi # capture coverage info
-  - if [ $TRAVIS_OS_NAME == linux ]; then lcov --remove coverage.info '/usr/*' --output-file coverage.info; fi # filter out external includes
-  - if [ $TRAVIS_OS_NAME == linux ]; then lcov --remove coverage.info '/Applications/*' --output-file coverage.info; fi # filter out more external includes
-  - if [ $TRAVIS_OS_NAME == linux ]; then lcov --remove coverage.info '*test*' --output-file coverage.info; fi # filter out tests
-  - if [ $TRAVIS_OS_NAME == linux ]; then lcov --remove coverage.info '*examples*' --output-file coverage.info; fi # filter out examples
-  - if [ $TRAVIS_OS_NAME == linux ]; then lcov --list coverage.info; fi #debug info
-  # Uploading report to CodeCov
-  - if [ $TRAVIS_OS_NAME == linux ]; then bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"; fi
->>>>>>> dev
