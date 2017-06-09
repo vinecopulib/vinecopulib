@@ -7,6 +7,7 @@
 #include <vinecopulib/vinecop/tools_select.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib/vinecop/class.hpp>
 
 #include <cmath>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
@@ -45,20 +46,21 @@ double calculate_gic(double loglik, double npars, int n)
 }
 
 namespace families {
-    
-    using namespace vinecopulib;
-    
+        
     FitContainer init_fit_container(const RVineMatrix& rvm, size_t n, size_t d)
     {
         FitContainer fc = {
+            // info about the vine structure
             rvm.get_order(),
             rvm.in_natural_order(),
             rvm.get_max_matrix(),
             rvm.get_needed_hfunc1(),
             rvm.get_needed_hfunc2(),
+            // temporary storage objects for h-functions
             Eigen::MatrixXd::Zero(n, d),
             Eigen::MatrixXd::Zero(n, d),
-            0
+            0,  // counter for already fitted trees
+            Vinecop::make_pair_copula_store(d)  // fitted pair copulas
         };
         
         return fc;

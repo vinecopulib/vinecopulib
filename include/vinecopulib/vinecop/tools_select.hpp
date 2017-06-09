@@ -12,7 +12,6 @@
 #include <vinecopulib/vinecop/fit_controls.hpp>
 #include <vinecopulib/vinecop/rvine_matrix.hpp>
 
-
 // to allow for (auto e : boost::edges(g)) notation
 namespace std
 {
@@ -33,9 +32,6 @@ double calculate_gic(double loglik, double npars, int n);
 
 namespace families {
     
-    using namespace tools_select;
-    using namespace vinecopulib;
-
     struct FitContainer {
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> order;
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> no_matrix;
@@ -45,6 +41,7 @@ namespace families {
         Eigen::MatrixXd hfunc1;
         Eigen::MatrixXd hfunc2;
         size_t trees_fitted;
+        std::vector<std::vector<Bicop>> pair_copulas;
     };
     
     FitContainer init_fit_container(const RVineMatrix& rvm, size_t n, size_t d);
@@ -52,7 +49,6 @@ namespace families {
 
 namespace structure {
     
-    using namespace tools_select;
     // boost::graph represenation of a vine tree ----------------
     struct VertexProperties {
         std::vector<size_t> conditioning;

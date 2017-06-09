@@ -268,7 +268,7 @@ namespace vinecopulib
                 // update fit statistics
                 loglik += get_tree_loglik(trees[t]);
                 npars += get_tree_npars(trees[t]);
-                gic_trunc = calculate_gic(loglik, npars, n);
+                gic_trunc = tools_select::calculate_gic(loglik, npars, n);
 
                 if (controls.get_select_truncation_level()) {
                     if (gic_trunc >= gic) {
@@ -346,7 +346,9 @@ namespace vinecopulib
     void Vinecop::select_families(const Eigen::MatrixXd& data,
                                   FitControlsVinecop controls)
     {
+        using namespace tools_select::families;
         size_t d = data.cols();
+        size_t n = data.rows();
         if (d != d_) {
             std::stringstream message;
             message << "data has wrong number of columns; " <<
@@ -365,60 +367,49 @@ namespace vinecopulib
         // Controls for selecting the pair copulas
         FitControlsBicop controls_bicop = controls.get_fit_controls_bicop();
 
-        // info about the vine structure
-        Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
-        auto no_matrix  = vine_matrix_.in_natural_order();
-        auto max_matrix = vine_matrix_.get_max_matrix();
-        MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
-        MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
-    
-        // temporary storage objects for h-functions
-        size_t n = data.rows();
-        Eigen::MatrixXd hfunc1(n, d);
-        Eigen::MatrixXd hfunc2(n, d);
-        Eigen::MatrixXd u_e(n, 2);
-    
+        auto fc = init_fit_container(vine_matrix_, n, d);    
         // fill first row of hfunc2 matrix with evaluation points;
         // points have to be reordered to correspond to natural order
-        for (size_t j = 0; j < d; ++j)
-            hfunc2.col(j) = data.col(revorder(j) - 1);
-            
-        auto pair_copulas = make_pair_copula_store(d);
+        for (size_t j = 0; j < d; ++j) {
+            fc.hfunc2.col(j) = data.col(fc.order.reverse()(j) - 1);
+        }
+        
+        Eigen::MatrixXd u_e(n, 2);    
         for (size_t tree = 0; tree < d - 1; ++tree) {
             for (size_t edge = 0; edge < d - tree - 1; ++edge) {
                 // extract evaluation point from hfunction matrices (have been
                 // computed in previous tree level)
-                size_t m = max_matrix(tree, edge);
-                u_e.col(0) = hfunc2.col(edge);
-                if (m == no_matrix(tree, edge)) {
-                    u_e.col(1) = hfunc2.col(d - m);
+                size_t m = fc.max_matrix(tree, edge);
+                u_e.col(0) = fc.hfunc2.col(edge);
+                if (m == fc.no_matrix(tree, edge)) {
+                    u_e.col(1) = fc.hfunc2.col(d - m);
                 } else {
-                    u_e.col(1) = hfunc1.col(d - m);
+                    u_e.col(1) = fc.hfunc1.col(d - m);
                 }
                 
                 // select pair-copula
                 if (tree > controls.get_truncation_level()) {
-                    pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
+                    fc.pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
                 } else {
                     if (controls.get_threshold() != 0) {
-                        double crit = tools_select::structure::calculate_criterion(
+                        double crit = tools_select::calculate_criterion(
                             u_e, 
                             controls.get_tree_criterion()
                         );
                         if (crit < controls.get_threshold()) {
-                            pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
+                            fc.pair_copulas[tree][edge] = Bicop(BicopFamily::indep);
                         }
                     } else {
-                        pair_copulas_[tree][edge] = Bicop(u_e, controls_bicop);
+                        fc.pair_copulas[tree][edge] = Bicop(u_e, controls_bicop);
                     }
                 }
     
                 // h-functions are only evaluated if needed in next step
-                if (needed_hfunc1(tree + 1, edge)) {
-                    hfunc1.col(edge) = pair_copulas_[tree][edge].hfunc1(u_e);
+                if (fc.needed_hfunc1(tree + 1, edge)) {
+                    fc.hfunc1.col(edge) = fc.pair_copulas[tree][edge].hfunc1(u_e);
                 }
-                if (needed_hfunc2(tree + 1, edge)) {
-                    hfunc2.col(edge) = pair_copulas_[tree][edge].hfunc2(u_e);
+                if (fc.needed_hfunc2(tree + 1, edge)) {
+                    fc.hfunc2.col(edge) = fc.pair_copulas[tree][edge].hfunc2(u_e);
                 }
                 
                 if (controls.get_show_trace()) {
