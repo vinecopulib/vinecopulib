@@ -212,15 +212,15 @@ namespace tools_optimization {
         try {
             opt_.optimize(x, nll);
         } catch (nlopt::roundoff_limited err) {
-            throw std::runtime_error("Halted because roundoff errors limited progress! ") + err.what();
+            throw std::runtime_error(std::string("Halted because roundoff errors limited progress! ") + err.what());
         } catch (nlopt::forced_stop err) {
-            throw std::runtime_error("Halted because of a forced termination! ") + err.what();
+            throw std::runtime_error(std::string("Halted because of a forced termination! ") + err.what());
         } catch (std::invalid_argument err) {
-            throw std::runtime_error("Invalid arguments. ") + err.what();
+            throw std::runtime_error(std::string("Invalid arguments. ") + err.what());
         } catch (std::bad_alloc err) {
-            throw std::runtime_error("Ran out of memory. ") + err.what();
+            throw std::runtime_error(std::string("Ran out of memory. ") + err.what());
         } catch (std::runtime_error err) {
-            throw std::runtime_error("Generic failure. ") + err.what();
+            throw std::runtime_error(std::string("Generic failure. ") + err.what());
         } catch (...) {
             // do nothing for other errors (results are fine)
         }
