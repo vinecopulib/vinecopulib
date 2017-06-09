@@ -23,8 +23,13 @@ namespace std
 namespace vinecopulib {
 
 namespace tools_select {
+    
+double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
+                           std::string tree_criterion);
+double calculate_gic(double loglik, double npars, int n);
 
 namespace structure {
+    using namespace tools_select;
     // boost::graph represenation of a vine tree ----------------
     struct VertexProperties {
         std::vector<size_t> conditioning;
@@ -64,10 +69,6 @@ namespace structure {
     VineTree edges_as_vertices(const VineTree& prev_tree);
     void add_allowed_edges(VineTree& tree, std::string tree_criterion,
                            double threshold);
-    double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data, 
-                               std::string tree_criterion);
-    double get_tree_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                              std::string tree_criterion, double threshold);
     ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
     Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);
@@ -92,7 +93,6 @@ namespace structure {
                               double learning_rate = 0.025);
     double get_tree_loglik(const VineTree& tree);
     double get_tree_npars(const VineTree& tree);
-    double calculate_gic(double loglik, double npars, int n);
 
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(boost::graph_traits<VineTree>::edge_descriptor e,

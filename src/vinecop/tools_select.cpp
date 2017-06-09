@@ -15,9 +15,38 @@ namespace vinecopulib {
     
 namespace tools_select {
     
-using namespace tools_stl;
+//! Calculate criterion for tree selection
+//! @param data observations.
+//! @param tree_criterion the criterion.
+double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+                           std::string tree_criterion)
+{
+    double w = 0.0;
+    if (tree_criterion == "tau") {
+        w = std::fabs(tools_stats::pairwise_ktau(data));
+    } else if (tree_criterion == "hoeffd") {
+        // scale to [0,1]
+        w = (30*tools_stats::pairwise_hoeffd(data)+0.5)/1.5;
+    } else if (tree_criterion == "rho") {
+        w = std::fabs(tools_stats::pairwise_cor(data));
+    }
+
+    return w;
+}
+
+//! calculates the Generalized Information Criterion.
+double calculate_gic(double loglik, double npars, int n)
+{
+    double log_npars = std::log(npars);
+    if (npars == 0.0) {
+        log_npars = 0.0;
+    }
+    return -2 * loglik + std::log(std::log(n)) * log_npars * npars;
+}
 
 namespace structure {
+    
+    using namespace tools_stl;
 
     //! Create base tree of the vine
     //!
@@ -145,26 +174,6 @@ namespace structure {
             }
         }
     }
-    
-    //! Calculate criterion for tree selection
-    //! @param data observations.
-    //! @param tree_criterion the criterion.
-    double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                               std::string tree_criterion)
-    {
-        double w = 0.0;
-        if (tree_criterion == "tau") {
-            w = std::fabs(tools_stats::pairwise_ktau(data));
-        } else if (tree_criterion == "hoeffd") {
-            // scale to [0,1]
-            w = (30*tools_stats::pairwise_hoeffd(data)+0.5)/1.5;
-        } else if (tree_criterion == "rho") {
-            w = std::fabs(tools_stats::pairwise_cor(data));
-        }
-
-        return w;
-    }
-
 
     // Find common neighbor in previous tree
     //
@@ -400,17 +409,6 @@ namespace structure {
         }
         return npars;
     }
-    
-    //! calculates the Generalized Information Criterion.
-    double calculate_gic(double loglik, double npars, int n)
-    {
-        double log_npars = std::log(npars);
-        if (npars == 0.0) {
-            log_npars = 0.0;
-        }
-        return -2 * loglik + std::log(std::log(n)) * log_npars * npars;
-    }
-    
 
     //! Print indices, family, and parameters for each pair-copula
     //! @param tree a vine tree.
