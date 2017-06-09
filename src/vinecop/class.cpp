@@ -160,7 +160,7 @@ namespace vinecopulib
     void Vinecop::select_all(const Eigen::MatrixXd& data,
                              FitControlsVinecop controls)
     {
-        using namespace tools_structselect;
+        using namespace tools_select::structure;
         size_t d = data.cols();
         if (d != d_) {
             std::stringstream message;
@@ -187,7 +187,7 @@ namespace vinecopulib
             // print out fitted pair-copulas for this tree
             if (controls.get_show_trace()) {
                 std::stringstream tree_info;
-                tree_info << "Tree " << t - 1 << ":" << std::endl;
+                tree_info << "** Tree: " << t - 1 << std::endl;
                 tools_interface::print(tree_info.str().c_str());
                 print_pair_copulas(trees[t]);
             }
@@ -204,7 +204,7 @@ namespace vinecopulib
     void Vinecop::sparse_select_all(const Eigen::MatrixXd& data,
                                     FitControlsVinecop controls)
     {
-        using namespace tools_structselect;
+        using namespace tools_select::structure;
         size_t d = data.cols();
         size_t n = data.rows();
         
@@ -354,6 +354,14 @@ namespace vinecopulib
                     ", actual: " << d << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
+        
+        // automatic selection of sparsity parameters is implemented separately
+        // below
+        if (controls.needs_sparse_select()) {
+            // sparse_select_families(data, controls);
+            return ;
+        }
+        
         // Controls for selecting the pair copulas
         FitControlsBicop controls_bicop = controls.get_fit_controls_bicop();
 
@@ -393,7 +401,7 @@ namespace vinecopulib
                     pair_copulas_[tree][edge] = Bicop(BicopFamily::indep);
                 } else {
                     if (controls.get_threshold() != 0) {
-                        double crit = tools_structselect::calculate_criterion(
+                        double crit = tools_select::structure::calculate_criterion(
                             u_e, 
                             controls.get_tree_criterion()
                         );
@@ -419,14 +427,14 @@ namespace vinecopulib
             }
         }
     }
-    
+
     //! Update Vinecop object using the fitted trees
     //!
     //! @param trees a vector of trees preprocessed by add_edge_info(); the
     //!     0th entry should be the base graph and is not used.
-    void Vinecop::update_vinecop(std::vector<tools_structselect::VineTree>& trees)
+    void Vinecop::update_vinecop(std::vector<tools_select::structure::VineTree>& trees)
     {
-        using namespace tools_structselect;
+        using namespace tools_select::structure;
         using namespace tools_stl;
         size_t d = trees.size();
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d, d);

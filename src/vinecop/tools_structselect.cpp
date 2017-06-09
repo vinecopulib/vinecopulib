@@ -13,9 +13,11 @@
 
 namespace vinecopulib {
     
-namespace tools_structselect {
+namespace tools_select {
+    
+using namespace tools_stl;
 
-    using namespace tools_stl;
+namespace structure {
 
     //! Create base tree of the vine
     //!
@@ -448,6 +450,8 @@ namespace tools_structselect {
 
         return index.str().c_str();
     }
+
+}
 
 }
 

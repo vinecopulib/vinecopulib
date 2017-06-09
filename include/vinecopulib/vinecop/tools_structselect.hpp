@@ -22,7 +22,9 @@ namespace std
 }
 namespace vinecopulib {
 
-namespace tools_structselect {
+namespace tools_select {
+
+namespace structure {
     // boost::graph represenation of a vine tree ----------------
     struct VertexProperties {
         std::vector<size_t> conditioning;
@@ -95,6 +97,8 @@ namespace tools_structselect {
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(boost::graph_traits<VineTree>::edge_descriptor e,
                              VineTree& tree);
+
+}
 
 }
 

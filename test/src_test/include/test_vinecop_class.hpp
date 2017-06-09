@@ -169,7 +169,7 @@ namespace test_vinecop_class {
         auto vcl_matrix = fit.get_matrix();
     
         // check if the same conditioned sets appear for each tree
-        using namespace tools_structselect;
+        using namespace tools_select::structure;
         std::vector<std::vector<std::vector<size_t>>> vc_sets(6), vcl_sets(6);
         int pairs_unequal = 0;
         for (int tree = 0; tree < 6; ++tree) {
