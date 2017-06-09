@@ -39,8 +39,8 @@ namespace vinecopulib
                         FitControlsVinecop controls = FitControlsVinecop());
         void select_families(const Eigen::MatrixXd& data,
                              FitControlsVinecop controls = FitControlsVinecop());
-        void sparse_select_all(const Eigen::MatrixXd& data,
-                               FitControlsVinecop controls = FitControlsVinecop());
+        // void sparse_select_all(const Eigen::MatrixXd& data,
+        //                        FitControlsVinecop controls = FitControlsVinecop());
         // void sparse_select_families(const Eigen::MatrixXd& data,
         //                             FitControlsVinecop controls = FitControlsVinecop());
 
@@ -79,7 +79,7 @@ namespace vinecopulib
         std::vector<std::vector<Bicop>> pair_copulas_;
         
         void check_data_dim(size_t d);
-        void update_vinecop(std::vector<tools_select::structure::VineTree>& trees);
+        void update_vinecop(std::vector<tools_select::VineTree>& trees);
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> inverse_permutation(const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
     };
 

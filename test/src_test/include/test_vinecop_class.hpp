@@ -134,69 +134,68 @@ namespace test_vinecop_class {
     //     ASSERT_TRUE(true_model.aic(data) < complex_model.aic(data));
     //     ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
     // }
-    
-    TEST_F(VinecopTest, family_select_finds_true_rotations) {
-
-        auto pair_copulas = Vinecop::make_pair_copula_store(7);
-        auto par = Eigen::VectorXd::Constant(1, 3.0);
-        for (auto& tree : pair_copulas) {
-            for (auto& pc : tree) {
-                pc = Bicop(BicopFamily::clayton, 270, par);
-            }
-        }
-        Vinecop vinecop(pair_copulas, model_matrix);
-        
-        auto u = vinecop.simulate(10000);
-        Vinecop fit(u, model_matrix,
-                    FitControlsVinecop({BicopFamily::clayton}, "itau"));
-            
-        // don't check last two trees to avoid random failures because of
-        // estimation uncertainty
-        auto true_rots = vinecop.get_all_rotations();
-        auto fitd_rots = fit.get_all_rotations();
-        true_rots.erase(true_rots.end() - 2, true_rots.end());
-        fitd_rots.erase(fitd_rots.end() - 2, fitd_rots.end());
-        EXPECT_EQ(true_rots, fitd_rots);
-    }
     // 
-    // TEST_F(VinecopTest, select_finds_right_structure) {
-    //     // check whether the same structure appears if we only allow for
-    //     // independence (pair-copula estimates differ otherwise)
+    // TEST_F(VinecopTest, family_select_finds_true_rotations) {
     // 
-    //     // select structure and get matrix
-    //     Vinecop fit(7);
-    //     fit.select_all(u, FitControlsVinecop({BicopFamily::indep}));
-    //     auto vcl_matrix = fit.get_matrix();
-    // 
-    //     // check if the same conditioned sets appear for each tree
-    //     using namespace tools_select::structure;
-    //     std::vector<std::vector<std::vector<size_t>>> vc_sets(6), vcl_sets(6);
-    //     int pairs_unequal = 0;
-    //     for (int tree = 0; tree < 6; ++tree) {
-    //         vc_sets[tree].resize(6 - tree);
-    //         vcl_sets[tree].resize(6 - tree);
-    //         for (int edge = 0; edge < 6 - tree; ++edge) {
-    //             vc_sets[tree][edge].resize(2);
-    //             vc_sets[tree][edge][0] = vc_matrix(tree, edge);
-    //             vc_sets[tree][edge][1] = vc_matrix(6 - edge, edge);
-    //             vcl_sets[tree][edge].resize(2);
-    //             vcl_sets[tree][edge][0] = vcl_matrix(tree, edge);
-    //             vcl_sets[tree][edge][1] = vcl_matrix(6 - edge, edge);
-    //         }
-    //         for (auto s1 : vc_sets[tree]) {
-    //             bool is_in_both = false;
-    //             for (auto s2 : vcl_sets[tree]) {
-    //                 if (tools_stl::is_same_set(s1, s2)) {
-    //                     is_in_both = true;
-    //                 }
-    //             }
-    //             if (!is_in_both) {
-    //                 ++pairs_unequal;
-    //             }
+    //     auto pair_copulas = Vinecop::make_pair_copula_store(7);
+    //     auto par = Eigen::VectorXd::Constant(1, 3.0);
+    //     for (auto& tree : pair_copulas) {
+    //         for (auto& pc : tree) {
+    //             pc = Bicop(BicopFamily::clayton, 270, par);
     //         }
     //     }
-    //     EXPECT_EQ(pairs_unequal, 0);
+    //     Vinecop vinecop(pair_copulas, model_matrix);
+    //     
+    //     auto u = vinecop.simulate(10000);
+    //     Vinecop fit(u, model_matrix,
+    //                 FitControlsVinecop({BicopFamily::clayton}, "itau"));
+    //         
+    //     // don't check last two trees to avoid random failures because of
+    //     // estimation uncertainty
+    //     auto true_rots = vinecop.get_all_rotations();
+    //     auto fitd_rots = fit.get_all_rotations();
+    //     true_rots.erase(true_rots.end() - 2, true_rots.end());
+    //     fitd_rots.erase(fitd_rots.end() - 2, fitd_rots.end());
+    //     EXPECT_EQ(true_rots, fitd_rots);
     // }
+    // 
+    TEST_F(VinecopTest, select_finds_right_structure) {
+        // check whether the same structure appears if we only allow for
+        // independence (pair-copula estimates differ otherwise)
+    
+        // select structure and get matrix
+        Vinecop fit(7);
+        fit.select_all(u, FitControlsVinecop({BicopFamily::indep}));
+        auto vcl_matrix = fit.get_matrix();
+    
+        // check if the same conditioned sets appear for each tree
+        std::vector<std::vector<std::vector<size_t>>> vc_sets(6), vcl_sets(6);
+        int pairs_unequal = 0;
+        for (int tree = 0; tree < 6; ++tree) {
+            vc_sets[tree].resize(6 - tree);
+            vcl_sets[tree].resize(6 - tree);
+            for (int edge = 0; edge < 6 - tree; ++edge) {
+                vc_sets[tree][edge].resize(2);
+                vc_sets[tree][edge][0] = vc_matrix(tree, edge);
+                vc_sets[tree][edge][1] = vc_matrix(6 - edge, edge);
+                vcl_sets[tree][edge].resize(2);
+                vcl_sets[tree][edge][0] = vcl_matrix(tree, edge);
+                vcl_sets[tree][edge][1] = vcl_matrix(6 - edge, edge);
+            }
+            for (auto s1 : vc_sets[tree]) {
+                bool is_in_both = false;
+                for (auto s2 : vcl_sets[tree]) {
+                    if (tools_stl::is_same_set(s1, s2)) {
+                        is_in_both = true;
+                    }
+                }
+                if (!is_in_both) {
+                    ++pairs_unequal;
+                }
+            }
+        }
+        EXPECT_EQ(pairs_unequal, 0);
+    }
     // 
     // TEST_F(VinecopTest, sparse_threshold_selection) {
     //     FitControlsVinecop controls(bicop_families::itau, "itau");

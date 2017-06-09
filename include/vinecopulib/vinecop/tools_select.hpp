@@ -39,9 +39,11 @@ public:
     
     virtual void select_next_tree() = 0;
     virtual void show_trace() = 0;
-    virtual std::vector<std::vector<Bicop>> get_pair_copulas() = 0;
-    
+    void truncate();
+
 protected:
+    size_t n_;
+    size_t d_;
     size_t trees_fitted_;
     FitControlsVinecop controls_;
 };
@@ -59,9 +61,6 @@ public:
     std::vector<std::vector<Bicop>> get_pair_copulas() {return pair_copulas_;}
     
 private:
-    // dimensionality of the problem
-    size_t n_;
-    size_t d_;
     // info about the vine structure
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> order_;
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> no_matrix_;
@@ -74,39 +73,53 @@ private:
     std::vector<std::vector<Bicop>> pair_copulas_;  // fitted pair copulas
 };
 
-namespace structure {
+
+// boost::graph represenation of a vine tree ----------------
+struct VertexProperties {
+    std::vector<size_t> conditioning;
+    std::vector<size_t> conditioned;
+    std::vector<size_t> prev_edge_indices;
+    Eigen::VectorXd hfunc1;
+    Eigen::VectorXd hfunc2;
+};
+struct EdgeProperties {
+    std::vector<size_t> conditioning;
+    std::vector<size_t> conditioned;
+    std::vector<size_t> all_indices;
+    Eigen::Matrix<double, Eigen::Dynamic, 2> pc_data;
+    Eigen::VectorXd hfunc1;
+    Eigen::VectorXd hfunc2;
+    double weight;
+    double crit;
+    vinecopulib::Bicop pair_copula;
+    double loglik;
+    double npars;
+    double fit_id;
+};
+typedef boost::adjacency_list <
+    boost::vecS,
+    boost::vecS,
+    boost::undirectedS,
+    VertexProperties,
+    boost::property<boost::edge_weight_t, double, EdgeProperties>
+> VineTree;
+
+typedef std::pair<
+boost::graph_traits<VineTree>::edge_descriptor, 
+bool
+> FoundEdge;
+
+class StructureSelector : public VinecopSelector
+{
+public:
+    StructureSelector(const Eigen::MatrixXd& data, 
+                      const FitControlsVinecop& controls);
+    ~StructureSelector() {}
+    void select_next_tree();
+    void show_trace();
+    std::vector<VineTree> get_vine_trees() {return trees_;}
     
-    // boost::graph represenation of a vine tree ----------------
-    struct VertexProperties {
-        std::vector<size_t> conditioning;
-        std::vector<size_t> conditioned;
-        std::vector<size_t> prev_edge_indices;
-        Eigen::VectorXd hfunc1;
-        Eigen::VectorXd hfunc2;
-    };
-    struct EdgeProperties {
-        std::vector<size_t> conditioning;
-        std::vector<size_t> conditioned;
-        std::vector<size_t> all_indices;
-        Eigen::Matrix<double, Eigen::Dynamic, 2> pc_data;
-        Eigen::VectorXd hfunc1;
-        Eigen::VectorXd hfunc2;
-        double weight;
-        double crit;
-        vinecopulib::Bicop pair_copula;
-        double loglik;
-        double npars;
-        double fit_id;
-    };
-    typedef boost::adjacency_list <
-        boost::vecS,
-        boost::vecS,
-        boost::undirectedS,
-        VertexProperties,
-        boost::property<boost::edge_weight_t, double, EdgeProperties>
-    > VineTree;
-
-
+private:
     // functions for manipulation of trees ----------------
     VineTree make_base_tree(const Eigen::MatrixXd& data);
     VineTree select_next_tree(VineTree& prev_tree,
@@ -127,10 +140,6 @@ namespace structure {
     void select_pair_copulas(VineTree& tree,
         vinecopulib::FitControlsVinecop& controls,
         const VineTree& tree_opt);
-    typedef std::pair<
-    boost::graph_traits<VineTree>::edge_descriptor, 
-    bool
-    > FoundEdge;
     FoundEdge find_old_fit(double fit_id, const VineTree& old_graph);
     std::vector<double> get_thresholded_edge_crits(
         const std::vector<VineTree>& trees,
@@ -143,8 +152,9 @@ namespace structure {
     void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(boost::graph_traits<VineTree>::edge_descriptor e,
                              VineTree& tree);
-
-}
+    
+    std::vector<VineTree> trees_;
+};
 
 }
 
