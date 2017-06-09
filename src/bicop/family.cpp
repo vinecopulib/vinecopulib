@@ -36,7 +36,7 @@ namespace vinecopulib {
 
     //! converts a string name into a BicopFamily.
     //! @param family the family name.
-    BicopFamily get_family(std::string family)
+    BicopFamily get_family_enum(std::string family)
     {
         return family_names.right.at(family);
     };

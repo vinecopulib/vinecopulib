@@ -24,6 +24,12 @@ namespace vinecopulib {
               const Eigen::MatrixXd& parameters = Eigen::MatrixXd());
         Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
               FitControlsBicop controls = FitControlsBicop());
+        Bicop(const char *filename);
+        Bicop(boost::property_tree::ptree input);
+
+        // Serialize
+        boost::property_tree::ptree to_ptree();
+        void to_json(const char *filename);
 
         // Getters and setters
         BicopFamily get_family() const;
