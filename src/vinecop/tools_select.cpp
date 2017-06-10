@@ -143,6 +143,7 @@ StructureSelector::StructureSelector(const Eigen::MatrixXd& data,
     trees_ = std::vector<VineTree>(d_);
     trees_[0] = make_base_tree(data);
     controls_ = controls;
+    trees_fitted_ = 0;
 }
 
 void StructureSelector::show_trace()
@@ -210,9 +211,9 @@ void StructureSelector::select_next_tree()
     if (boost::num_vertices(new_tree) > 2) {
         min_spanning_tree(new_tree);
     }
-    add_edge_info(new_tree);  // for pc estimation and next tree
+    add_edge_info(new_tree);       // for pc estimation and next tree
     remove_vertex_data(new_tree);  // no longer needed
-    auto tree_opt = VineTree();  // TODO
+    auto tree_opt = VineTree();    // TODO
     select_pair_copulas(new_tree, controls_, tree_opt);
 
     trees_[++trees_fitted_] =  new_tree;

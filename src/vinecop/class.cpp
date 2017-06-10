@@ -177,16 +177,17 @@ namespace vinecopulib
             // select tree structure and pair copulas
             selector.select_next_tree();
         
-            // print out fitted pair-copulas for this tree
             if (controls.get_show_trace()) {
+                // print fitted pair-copulas for this tree
                 selector.show_trace();
             }
-        
-            // truncate (only allow for Independence copula from here on)
+            
             if (controls.get_truncation_level() == t + 1) {
+                // only allow for Independence copula from here on
                 selector.truncate();
             }
         }
+        
         auto trees = selector.get_vine_trees();
         update_vinecop(trees);
     }
