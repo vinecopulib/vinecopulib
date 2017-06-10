@@ -187,9 +187,9 @@ namespace vinecopulib
                 selector.truncate();
             }
         }
-        
-        auto trees = selector.get_vine_trees();
-        update_vinecop(trees);
+        selector.finalize();
+        vine_matrix_ = selector.get_rvine_matrix();
+        pair_copulas_ = selector.get_pair_copulas();
     }
     
     // void Vinecop::sparse_select_all(const Eigen::MatrixXd& data,
@@ -328,7 +328,7 @@ namespace vinecopulib
     //             needs_break = needs_break | (controls.get_threshold() < 0.01);
     //         }
     //     }
-    // 
+    //     // selector.finalize();
     //     // update_vinecop(trees_opt);
     // }
     
@@ -763,82 +763,7 @@ namespace vinecopulib
         }
     }  
     
-   
-   //! Update Vinecop object using the fitted trees
-   //!
-   //! @param trees a vector of trees preprocessed by add_edge_info(); the
-   //!     0th entry should be the base graph and is not used.
-   void Vinecop::update_vinecop(std::vector<tools_select::VineTree>& trees)
-   {
-       using namespace tools_select;
-       using namespace tools_stl;
-       size_t d = trees.size();
-       Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d, d);
-       mat.fill(0);
-   
-       for (size_t col = 0; col < d - 1; ++col) {
-           size_t t = d - 1 - col;
-           // start with highest tree in this column and fill first two
-           // entries by conditioning set
-           auto e0 = *boost::edges(trees[t]).first;
-           mat(t, col) = trees[t][e0].conditioning[0];
-           mat(t - 1, col) = trees[t][e0].conditioning[1];
-   
-           // assign fitted pair copula to appropriate entry, see
-           // vinecopulib::Vinecop::get_pair_copula().
-           pair_copulas_[t - 1][col] = trees[t][e0].pair_copula;
-   
-           // initialize running set with full conditioing set of this edge
-           auto ned_set = trees[t][e0].conditioned;
-   
-           // iteratively search for an edge in lower tree that shares all indices
-           // in the conditioning set + diagonal entry
-           for (size_t k = 1; k < t; ++k) {
-               auto reduced_set = cat(mat(t, col), ned_set);
-               for (auto e : boost::edges(trees[t - k])) {
-                   if (is_same_set(trees[t - k][e].all_indices, reduced_set)) {
-                       // next matrix entry is conditioning variable of new edge
-                       // that's not equal to the diagonal entry of this column
-                       auto e_new = trees[t - k][e];
-                       ptrdiff_t pos = find_position(mat(t, col), e_new.conditioning);
-                       mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
-                       if (pos == 1) {
-                           e_new.pair_copula.flip();
-                       }
-                       // assign fitted pair copula to appropriate entry, see
-                       // vinecopulib::Vinecop::get_pair_copula().
-                       pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
-   
-                       // start over with conditioning set of next edge
-                       ned_set = e_new.conditioned;
-   
-                       // remove edge (must not be reused in another column!)
-                       size_t v0 = boost::source(e, trees[t - k]);
-                       size_t v1 = boost::target(e, trees[t - k]);
-                       boost::remove_edge(v0, v1, trees[t - k]);
-                       break;
-                   }
-               }
-           }
-       }
-   
-       // The last column contains a single element which must be different
-       // from all other diagonal elements. Based on the properties of an
-       // R-vine matrix, this must be the element next to it.
-       mat(0, d - 1) = mat(0, d - 2);
-   
-       // change to user-facing format
-       // (variable index starting at 1 instead of 0)
-       auto new_mat = mat;
-       for (size_t i = 0; i < d; ++i) {
-           for (size_t j = 0; j < d - i; ++j) {
-               new_mat(i, j) += 1;    
-           }
-       }
-   
-       vine_matrix_ = RVineMatrix(new_mat);
-   }
-       
+          
     // get indexes for reverting back to old order in simulation routine
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> Vinecop::inverse_permutation(
         const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order) {
@@ -853,5 +778,4 @@ namespace vinecopulib
         return Eigen::Map<Eigen::Matrix<size_t, Eigen::Dynamic, 1>>(&indexes[0], order.size());
     }
 
-    
 }

@@ -36,16 +36,26 @@ class VinecopSelector
 public:
     VinecopSelector() {}
     ~VinecopSelector() {}
+
+    std::vector<std::vector<Bicop>> get_pair_copulas() const;
+    RVineMatrix get_rvine_matrix() const;
     
-    virtual void select_next_tree() = 0;
-    virtual void show_trace() = 0;
     void truncate();
+    void finalize() {}  // can be overridden
+
+    //! selects the next tree, starting from current state of the selector 
+    //! (tracked by `trees_fitted_` data member).
+    virtual void select_next_tree() = 0;
+    //! prints pair copulas for recently fitted tree.
+    virtual void show_trace() = 0;
 
 protected:
     size_t n_;
     size_t d_;
     size_t trees_fitted_;
     FitControlsVinecop controls_;
+    RVineMatrix vine_matrix_;
+    std::vector<std::vector<Bicop>> pair_copulas_;
 };
 
 class FamilySelector : public VinecopSelector 
@@ -58,8 +68,8 @@ public:
     
     void select_next_tree();
     void show_trace() {}  // TODO
-    std::vector<std::vector<Bicop>> get_pair_copulas() {return pair_copulas_;}
-    
+    void finalize() {}
+
 private:
     // info about the vine structure
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> order_;
@@ -70,7 +80,6 @@ private:
     // temporary storage objects for h-functions
     Eigen::MatrixXd hfunc1_;
     Eigen::MatrixXd hfunc2_;
-    std::vector<std::vector<Bicop>> pair_copulas_;  // fitted pair copulas
 };
 
 
@@ -117,7 +126,7 @@ public:
     ~StructureSelector() {}
     void select_next_tree();
     void show_trace();
-    std::vector<VineTree> get_vine_trees() {return trees_;}
+    void finalize();
     
 private:
     // functions for manipulation of trees ----------------

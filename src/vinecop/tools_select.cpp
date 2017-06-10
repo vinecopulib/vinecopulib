@@ -66,11 +66,22 @@ double calculate_gic(double loglik, double npars, int n)
     return -2 * loglik + std::log(std::log(n)) * log_npars * npars;
 }
 
+std::vector<std::vector<Bicop>> VinecopSelector::get_pair_copulas() const
+{
+        return pair_copulas_;
+}
+
+RVineMatrix VinecopSelector::get_rvine_matrix() const
+{
+    return vine_matrix_;
+}
+
+//! truncates the vine copula at the current tree level (tracked by 
+//! `trees_fitted_` data member).
 void VinecopSelector::truncate() 
 {
     controls_.set_family_set({BicopFamily::indep});
 }
-
 
 FamilySelector::FamilySelector(const Eigen::MatrixXd& data, 
                                const RVineMatrix& rvm,
@@ -91,8 +102,9 @@ FamilySelector::FamilySelector(const Eigen::MatrixXd& data,
         hfunc2_.col(j) = data.col(order_.reverse()(j) - 1);
     }
     trees_fitted_ = 0;
-    pair_copulas_ = Vinecop::make_pair_copula_store(d_);
     controls_ = controls;
+    vine_matrix_ = rvm;
+    pair_copulas_ = Vinecop::make_pair_copula_store(d_);
 }
 
 void FamilySelector::select_next_tree()
@@ -135,6 +147,7 @@ void FamilySelector::select_next_tree()
     }
 }
 
+
 StructureSelector::StructureSelector(const Eigen::MatrixXd& data, 
                                      const FitControlsVinecop& controls)
 {
@@ -144,45 +157,7 @@ StructureSelector::StructureSelector(const Eigen::MatrixXd& data,
     trees_[0] = make_base_tree(data);
     controls_ = controls;
     trees_fitted_ = 0;
-}
-
-void StructureSelector::show_trace()
-{
-    std::stringstream tree_info;
-    tree_info << "** Tree: " << trees_fitted_ << std::endl;
-    tools_interface::print(tree_info.str().c_str());
-    print_pair_copulas(trees_[trees_fitted_]);
-}
-
-//! Create base tree of the vine
-//!
-//!  The base tree is a star on d + 1 variables, where the conditioning
-//!  set of each edge consists of a single number. When building the next
-//!  tree, the edges become vertices. Because the base graph was a star
-//!  all edges are allowed by the proximity condition, and the edges will
-//!  have a conditioning set consisting of the two vertex indices. This
-//!  will be the first actual tree of the vine.
-//!
-//!  @param data nxd matrix of copula data.
-//!  @return A VineTree object containing the base graph.
-VineTree StructureSelector::make_base_tree(const Eigen::MatrixXd& data)
-{
-    size_t d = data.cols();
-    VineTree base_tree(d);
-    // a star connects the root node (d) with all other nodes
-    for (size_t target = 0; target < d; ++target) {
-        // add edge and extract edge iterator
-        auto e = add_edge(d, target, base_tree).first;
-
-        // inititialize hfunc1 with actual data for variable "target"
-        base_tree[e].hfunc1 = data.col(boost::target(e, base_tree));
-        // identify edge with variable "target" and initialize sets
-        base_tree[e].conditioning.reserve(2);
-        base_tree[e].conditioning.push_back(boost::target(e, base_tree));
-        base_tree[e].conditioned.reserve(d - 2);
-    }
-
-    return base_tree;
+    pair_copulas_ = Vinecop::make_pair_copula_store(d_);
 }
 
 //! Select and fit next tree of the vine
@@ -215,6 +190,115 @@ void StructureSelector::select_next_tree()
     select_pair_copulas(new_tree, tree_opt);
 
     trees_[++trees_fitted_] =  new_tree;
+}
+
+//! prints pair copulas for recently fitted tree.
+void StructureSelector::show_trace()
+{
+    std::stringstream tree_info;
+    tree_info << "** Tree: " << trees_fitted_ << std::endl;
+    tools_interface::print(tree_info.str().c_str());
+    print_pair_copulas(trees_[trees_fitted_]);
+}
+
+void StructureSelector::finalize()
+{
+    using namespace tools_stl;
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d_, d_);
+    mat.fill(0);
+
+    for (size_t col = 0; col < d_ - 1; ++col) {
+        size_t t = d_ - 1 - col;
+        // start with highest tree in this column and fill first two
+        // entries by conditioning set
+        auto e0 = *boost::edges(trees_[t]).first;
+        mat(t, col) = trees_[t][e0].conditioning[0];
+        mat(t - 1, col) = trees_[t][e0].conditioning[1];
+
+        // assign fitted pair copula to appropriate entry, see
+        // vinecopulib::Vinecop::get_pair_copula().
+        pair_copulas_[t - 1][col] = trees_[t][e0].pair_copula;
+
+        // initialize running set with full conditioing set of this edge
+        auto ned_set = trees_[t][e0].conditioned;
+
+        // iteratively search for an edge in lower tree that shares all indices
+        // in the conditioning set + diagonal entry
+        for (size_t k = 1; k < t; ++k) {
+            auto reduced_set = cat(mat(t, col), ned_set);
+            for (auto e : boost::edges(trees_[t - k])) {
+                if (is_same_set(trees_[t - k][e].all_indices, reduced_set)) {
+                    // next matrix entry is conditioning variable of new edge
+                    // that's not equal to the diagonal entry of this column
+                    auto e_new = trees_[t - k][e];
+                    ptrdiff_t pos = find_position(mat(t, col), e_new.conditioning);
+                    mat(t - k - 1, col) = e_new.conditioning[std::abs(1 - pos)];
+                    if (pos == 1) {
+                        e_new.pair_copula.flip();
+                    }
+                    // assign fitted pair copula to appropriate entry, see
+                    // vinecopulib::Vinecop::get_pair_copula().
+                    pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
+
+                    // start over with conditioning set of next edge
+                    ned_set = e_new.conditioned;
+
+                    // remove edge (must not be reused in another column!)
+                    size_t v0 = boost::source(e, trees_[t - k]);
+                    size_t v1 = boost::target(e, trees_[t - k]);
+                    boost::remove_edge(v0, v1, trees_[t - k]);
+                    break;
+                }
+            }
+        }
+    }
+
+    // The last column contains a single element which must be different
+    // from all other diagonal elements. Based on the properties of an
+    // R-vine matrix, this must be the element next to it.
+    mat(0, d_ - 1) = mat(0, d_ - 2);
+
+    // change to user-facing format
+    // (variable index starting at 1 instead of 0)
+    auto new_mat = mat;
+    for (size_t i = 0; i < d_; ++i) {
+        for (size_t j = 0; j < d_ - i; ++j) {
+            new_mat(i, j) += 1;    
+        }
+    }
+
+    vine_matrix_ = RVineMatrix(new_mat);
+}
+
+//! Create base tree of the vine
+//!
+//!  The base tree is a star on d + 1 variables, where the conditioning
+//!  set of each edge consists of a single number. When building the next
+//!  tree, the edges become vertices. Because the base graph was a star
+//!  all edges are allowed by the proximity condition, and the edges will
+//!  have a conditioning set consisting of the two vertex indices. This
+//!  will be the first actual tree of the vine.
+//!
+//!  @param data nxd matrix of copula data.
+//!  @return A VineTree object containing the base graph.
+VineTree StructureSelector::make_base_tree(const Eigen::MatrixXd& data)
+{
+    size_t d = data.cols();
+    VineTree base_tree(d);
+    // a star connects the root node (d) with all other nodes
+    for (size_t target = 0; target < d; ++target) {
+        // add edge and extract edge iterator
+        auto e = add_edge(d, target, base_tree).first;
+
+        // inititialize hfunc1 with actual data for variable "target"
+        base_tree[e].hfunc1 = data.col(boost::target(e, base_tree));
+        // identify edge with variable "target" and initialize sets
+        base_tree[e].conditioning.reserve(2);
+        base_tree[e].conditioning.push_back(boost::target(e, base_tree));
+        base_tree[e].conditioned.reserve(d - 2);
+    }
+
+    return base_tree;
 }
 
 //! Convert edge set into vertex set of a new graph
