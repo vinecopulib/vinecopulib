@@ -122,28 +122,18 @@ public:
 private:
     // functions for manipulation of trees ----------------
     VineTree make_base_tree(const Eigen::MatrixXd& data);
-    VineTree select_next_tree(VineTree& prev_tree,
-                              vinecopulib::FitControlsVinecop& controls,
-                              const VineTree& tree_opt = VineTree());
     VineTree edges_as_vertices(const VineTree& prev_tree);
-    void add_allowed_edges(VineTree& tree, std::string tree_criterion,
-                           double threshold);
+    void add_allowed_edges(VineTree& tree);
     ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
     Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
     void min_spanning_tree(VineTree &tree);
     void add_edge_info(VineTree& tree);
     void remove_edge_data(VineTree& tree);
     void remove_vertex_data(VineTree& tree);
-    void select_pair_copulas(VineTree& tree,
-                             vinecopulib::FitControlsVinecop& controls);
-
-    void select_pair_copulas(VineTree& tree,
-        vinecopulib::FitControlsVinecop& controls,
-        const VineTree& tree_opt);
+    void select_pair_copulas(VineTree& tree);
+    void select_pair_copulas(VineTree& tree, const VineTree& tree_opt);
     FoundEdge find_old_fit(double fit_id, const VineTree& old_graph);
-    std::vector<double> get_thresholded_edge_crits(
-        const std::vector<VineTree>& trees,
-        vinecopulib::FitControlsVinecop& controls);
+    std::vector<double> thresholded_crits(const std::vector<VineTree>& trees);
     double get_next_threshold(std::vector<double>& thresholded_crits,
                               double learning_rate = 0.025);
     double get_tree_loglik(const VineTree& tree);

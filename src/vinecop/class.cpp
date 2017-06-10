@@ -317,7 +317,7 @@ namespace vinecopulib
     //             // the previous model was the best one
     //             needs_break = true;
     //         } else {
-    //             thresholded_crits = get_thresholded_edge_crits(trees, controls);
+    //             thresholded_crits = thresholded_crits(trees);
     //             for (size_t t = 0; t < d; ++t) {
     //                 trees_opt[t] = trees[t];
     //             }

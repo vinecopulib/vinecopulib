@@ -205,16 +205,14 @@ void StructureSelector::select_next_tree()
 {
     auto new_tree = edges_as_vertices(trees_[trees_fitted_]);
     remove_edge_data(trees_[trees_fitted_]); // no longer needed
-    add_allowed_edges(new_tree, 
-                      controls_.get_tree_criterion(),
-                      controls_.get_threshold());
+    add_allowed_edges(new_tree);
     if (boost::num_vertices(new_tree) > 2) {
         min_spanning_tree(new_tree);
     }
     add_edge_info(new_tree);       // for pc estimation and next tree
     remove_vertex_data(new_tree);  // no longer needed
     auto tree_opt = VineTree();    // TODO
-    select_pair_copulas(new_tree, controls_, tree_opt);
+    select_pair_copulas(new_tree, tree_opt);
 
     trees_[++trees_fitted_] =  new_tree;
 }
@@ -256,13 +254,10 @@ VineTree StructureSelector::edges_as_vertices(const VineTree& prev_tree)
 //! "itau").
 //!
 //! @param vine_tree tree of a vine.
-//! @param tree_criterion the criterion for selecting the maximum spanning
-//!     tree ("tau", "hoeffd" and "rho" implemented so far).
-//! @param threshold for thresholded vines.
-void StructureSelector::add_allowed_edges(VineTree& vine_tree, 
-                                          std::string tree_criterion,
-                                          double threshold)
+void StructureSelector::add_allowed_edges(VineTree& vine_tree)
 {
+    std::string tree_criterion = controls_.get_tree_criterion();
+    double threshold = controls_.get_threshold();
     for (auto v0 : boost::vertices(vine_tree)) {
         for (size_t v1 = 0; v1 < v0; ++v1) {
             // check proximity condition: common neighbor in previous tree
@@ -390,19 +385,16 @@ void StructureSelector::remove_vertex_data(VineTree& tree)
 
 //! Fit and select a pair copula for each edges
 //! @param tree a vine tree preprocessed with add_edge_info().
-//! @param controls the controls for fitting a vine copula (see 
-//!     FitControlsVinecop).
 //! @param tree_opt the current optimal tree (used only for sparse 
 //!     selection).
 //! @{
-void StructureSelector::select_pair_copulas(VineTree& tree,
-                                            FitControlsVinecop& controls)
+void StructureSelector::select_pair_copulas(VineTree& tree)
 {
     for (auto e : boost::edges(tree)) {
-        if (tree[e].crit < controls.get_threshold()) {
+        if (tree[e].crit < controls_.get_threshold()) {
             tree[e].pair_copula = vinecopulib::Bicop();
         } else {
-            tree[e].pair_copula = vinecopulib::Bicop(tree[e].pc_data, controls);
+            tree[e].pair_copula = vinecopulib::Bicop(tree[e].pc_data, controls_);
         }
 
         tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
@@ -411,11 +403,10 @@ void StructureSelector::select_pair_copulas(VineTree& tree,
 }
 
 void StructureSelector::select_pair_copulas(VineTree& tree,
-                                            FitControlsVinecop& controls,
                                             const VineTree& tree_opt)
 {
     for (auto e : boost::edges(tree)) {
-        bool is_thresholded = (tree[e].crit < controls.get_threshold());
+        bool is_thresholded = (tree[e].crit < controls_.get_threshold());
         bool used_old_fit = false;
         // the formula is quite arbitrary, but sufficient for 
         // identifying situations where fits can be re-used
@@ -434,7 +425,7 @@ void StructureSelector::select_pair_copulas(VineTree& tree,
             if (is_thresholded) {
                 tree[e].pair_copula = vinecopulib::Bicop();
             } else {
-                tree[e].pair_copula.select(tree[e].pc_data, controls);
+                tree[e].pair_copula.select(tree[e].pc_data, controls_);
             }
         }
         
@@ -448,14 +439,13 @@ void StructureSelector::select_pair_copulas(VineTree& tree,
 
 
 //! extracts all criterion values that got thresholded to zero.
-std::vector<double> StructureSelector::get_thresholded_edge_crits(
-    const std::vector<VineTree>& trees,
-    FitControlsVinecop& controls)
+std::vector<double> StructureSelector::thresholded_crits(
+    const std::vector<VineTree>& trees)
 {
     std::vector<double> out;
     for (size_t t = 1; t < trees.size(); ++t) {
         for (auto e : boost::edges(trees[t])) {
-            if (trees[t][e].crit < controls.get_threshold()) {
+            if (trees[t][e].crit < controls_.get_threshold()) {
                 out.push_back(trees[t][e].crit);
             }
         }
