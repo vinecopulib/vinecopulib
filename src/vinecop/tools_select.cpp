@@ -83,6 +83,22 @@ void VinecopSelector::truncate()
     controls_.set_family_set({BicopFamily::indep});
 }
 
+void VinecopSelector::select_all_trees()
+{
+    for (size_t t = 0; t < d_ - 1; ++t) {
+        select_next_tree();  // select pair copulas (+ structure) of tree t
+    
+        if (controls_.get_show_trace()) {
+            show_trace();  // print fitted pair-copulas for this tree
+        }
+        
+        if (controls_.get_truncation_level() == t + 1) {
+            truncate();  // only allow for Independence copula from here on
+        }
+    }
+    finalize();
+}
+
 FamilySelector::FamilySelector(const Eigen::MatrixXd& data, 
                                const RVineMatrix& rvm,
                                const FitControlsVinecop& controls)
@@ -266,7 +282,6 @@ void StructureSelector::finalize()
             new_mat(i, j) += 1;    
         }
     }
-
     vine_matrix_ = RVineMatrix(new_mat);
 }
 

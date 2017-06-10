@@ -159,10 +159,7 @@ namespace vinecopulib
     void Vinecop::select_all(const Eigen::MatrixXd& data,
                              FitControlsVinecop controls)
     {
-        using namespace tools_select;
-        
-        size_t d = data.cols();
-        check_data_dim(d);
+        check_data_dim(data);
 
         // automatic selection of sparsity parameters is implemented separately
         // below
@@ -172,22 +169,8 @@ namespace vinecopulib
         }
         
         // initialize 
-        StructureSelector selector(data, controls);
-        for (size_t t = 0; t < d - 1; ++t) {
-            // select tree structure and pair copulas
-            selector.select_next_tree();
-        
-            if (controls.get_show_trace()) {
-                // print fitted pair-copulas for this tree
-                selector.show_trace();
-            }
-            
-            if (controls.get_truncation_level() == t + 1) {
-                // only allow for Independence copula from here on
-                selector.truncate();
-            }
-        }
-        selector.finalize();
+        tools_select::StructureSelector selector(data, controls);
+        selector.select_all_trees();
         vine_matrix_ = selector.get_rvine_matrix();
         pair_copulas_ = selector.get_pair_copulas();
     }
@@ -339,13 +322,9 @@ namespace vinecopulib
     void Vinecop::select_families(const Eigen::MatrixXd& data,
                                   FitControlsVinecop controls)
     {
-        size_t d = data.cols();
-        check_data_dim(d);
+        check_data_dim(data);
         tools_select::FamilySelector selector(data, vine_matrix_, controls);
-
-        for (size_t tree = 0; tree < d - 1; ++tree) {
-            selector.select_next_tree();
-        }
+        selector.select_all_trees();
         pair_copulas_ = selector.get_pair_copulas();
     }
      
@@ -751,14 +730,14 @@ namespace vinecopulib
     }
     
     //! checks if dimension d of the data matches the dimension of the vine.
-    //! @param d number of columns in the data.
-    void Vinecop::check_data_dim(size_t d)
+    void Vinecop::check_data_dim(const Eigen::MatrixXd& data)
     {
-        if (d != d_) {
+        size_t d_data = data.cols();
+        if (d_data != d_) {
             std::stringstream message;
             message << "data has wrong number of columns; " <<
                     "expected: " << d_ <<
-                    ", actual: " << d << std::endl;
+                    ", actual: " << d_data << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
     }  

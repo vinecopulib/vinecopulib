@@ -41,13 +41,14 @@ public:
     RVineMatrix get_rvine_matrix() const;
     
     void truncate();
-    void finalize() {}  // can be overridden
+    void select_all_trees();
 
     //! selects the next tree, starting from current state of the selector 
     //! (tracked by `trees_fitted_` data member).
     virtual void select_next_tree() = 0;
     //! prints pair copulas for recently fitted tree.
     virtual void show_trace() = 0;
+    virtual void finalize() = 0;
 
 protected:
     size_t n_;

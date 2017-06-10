@@ -78,7 +78,7 @@ namespace vinecopulib
         RVineMatrix vine_matrix_;
         std::vector<std::vector<Bicop>> pair_copulas_;
         
-        void check_data_dim(size_t d);
+        void check_data_dim(const Eigen::MatrixXd& data);
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> inverse_permutation(const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
     };
 
