@@ -40,7 +40,7 @@ public:
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
     RVineMatrix get_rvine_matrix() const;
     
-    void select_all_trees();
+    void select_all_trees(const Eigen::MatrixXd& data);
     void sparse_select_all_trees(const Eigen::MatrixXd& data);
 
 protected:
@@ -65,7 +65,7 @@ protected:
     FitControlsVinecop controls_;
     RVineMatrix vine_matrix_;
     std::vector<std::vector<Bicop>> pair_copulas_;
-    
+
 private:
     double get_next_threshold(std::vector<double>& thresholded_crits);
 };
@@ -82,18 +82,17 @@ public:
     void show_trace() {}  // TODO
     void finalize() {}
     
-     // TODO
-    double get_loglik_of_tree(size_t t) {return 0.0;}
-    double get_npars_of_tree(size_t t) {return 0.0;}
-    void set_tree_to_indep(size_t t) {}
-    void print_pair_copulas_of_tree(size_t) {}
-    std::vector<double> get_thresholded_crits() {
-        return std::vector<double>(1);
-    }
-    void set_current_fit_as_opt() {}
-    void initialize_new_fit(const Eigen::MatrixXd& data) {}
+    double get_loglik_of_tree(size_t t);
+    double get_npars_of_tree(size_t t);
+    void set_tree_to_indep(size_t t);
+    void print_pair_copulas_of_tree(size_t);
+    std::vector<double> get_thresholded_crits();
+    void set_current_fit_as_opt();
+    void initialize_new_fit(const Eigen::MatrixXd& data);
     
 private:
+    std::string get_pc_index(size_t tree, size_t edge);
+    
     // info about the vine structure
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> order_;
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> no_matrix_;
@@ -103,6 +102,11 @@ private:
     // temporary storage objects for h-functions
     Eigen::MatrixXd hfunc1_;
     Eigen::MatrixXd hfunc2_;
+    // for sparse selection
+    Eigen::MatrixXd loglik_;
+    Eigen::MatrixXd npars_;
+    Eigen::MatrixXd crits_;
+    std::vector<std::vector<Bicop>> pair_copulas_opt_;
 };
 
 

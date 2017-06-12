@@ -197,12 +197,16 @@ namespace test_vinecop_class {
         EXPECT_EQ(pairs_unequal, 0);
     }
     
+    
+    // in what follows, we only check if funs run without error ----------
+    
     TEST_F(VinecopTest, sparse_threshold_selection) {
         FitControlsVinecop controls(bicop_families::itau, "itau");
         controls.set_select_threshold(true);
         // controls.set_show_trace(true);
         Vinecop fit(7);
         fit.select_all(u, controls);
+        fit.select_families(u, controls);
     }
     
     TEST_F(VinecopTest, sparse_truncation_selection) {
@@ -211,6 +215,7 @@ namespace test_vinecop_class {
         // controls.set_show_trace(true);
         Vinecop fit(7);
         fit.select_all(u, controls);
+        fit.select_families(u, controls);
     }
     
     TEST_F(VinecopTest, sparse_both_selection) {
@@ -220,5 +225,6 @@ namespace test_vinecop_class {
         // controls.set_show_trace(true);
         Vinecop fit(7);
         fit.select_all(u, controls);
+        fit.select_families(u, controls);
     }
 }

@@ -83,8 +83,9 @@ void VinecopSelector::truncate()
     controls_.set_family_set({BicopFamily::indep});
 }
 
-void VinecopSelector::select_all_trees()
+void VinecopSelector::select_all_trees(const Eigen::MatrixXd& data)
 {
+    initialize_new_fit(data);
     for (size_t t = 0; t < d_ - 1; ++t) {
         select_tree(t);  // select pair copulas (+ structure) of tree t
     
@@ -116,6 +117,8 @@ void VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
                 thresholded_crits.push_back(pairwise_crits(i, j));
             }
         }
+        // this is suboptimal for fixed structures, because several iterations
+        // have to be run before first non-thresholded copula appears.
     }
     
     double gic_opt = 0.0;
@@ -202,16 +205,17 @@ void VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
             msg.str("");  // clear stream
         }
         
-        if (gic >= gic_opt) {
-            if (gic == 0.0) {
-                // independence model is optimal
-                set_current_fit_as_opt();
-            }
-            // the previous model was the best one
+        // prepare for possible next iteration
+        thresholded_crits = get_thresholded_crits();        
+        set_current_fit_as_opt();
+
+        if (gic == 0.0) {
+            // stil independence, threshold needs to be reduced further
+        } else if (gic >= gic_opt) {
+            // new model is optimal
             needs_break = true;
         } else {
-            thresholded_crits = get_thresholded_crits();
-            set_current_fit_as_opt();
+            // optimum hasn't been found
             gic_opt = gic;
             // while loop is only for threshold selection
             needs_break = needs_break | !controls_.get_select_threshold();
@@ -254,12 +258,6 @@ FamilySelector::FamilySelector(const Eigen::MatrixXd& data,
     needed_hfunc2_ = rvm.get_needed_hfunc2();
     hfunc1_ = Eigen::MatrixXd::Zero(n_, d_);
     hfunc2_ = Eigen::MatrixXd::Zero(n_, d_);
-    // fill first row of hfunc2 matrix with evaluation points;
-    // points have to be reordered to correspond to natural order
-    for (size_t j = 0; j < d_; ++j) {
-        hfunc2_.col(j) = data.col(order_.reverse()(j) - 1);
-    }
-    trees_fitted_ = 0;
     controls_ = controls;
     vine_matrix_ = rvm;
     pair_copulas_ = Vinecop::make_pair_copula_store(d_);
@@ -268,6 +266,7 @@ FamilySelector::FamilySelector(const Eigen::MatrixXd& data,
 void FamilySelector::select_tree(size_t t)
 {
     Eigen::MatrixXd u_e(n_, 2);
+    double crit = 0.0;
     for (size_t edge = 0; edge < d_ - t - 1; ++edge) {
         // extract evaluation point from hfunction matrices (have been
         // computed in previous tree level)
@@ -284,14 +283,19 @@ void FamilySelector::select_tree(size_t t)
             pair_copulas_[t][edge] = Bicop(BicopFamily::indep);
         } else {
             if (controls_.get_threshold() != 0) {
-                double crit = 
-                    calculate_criterion(u_e, controls_.get_tree_criterion());
+                crit = calculate_criterion(u_e, controls_.get_tree_criterion());
                 if (crit < controls_.get_threshold()) {
                     pair_copulas_[t][edge] = Bicop(BicopFamily::indep);
                 }
             } else {
                 pair_copulas_[t][edge] = Bicop(u_e, controls_);
             }
+        }
+                
+        if (controls_.needs_sparse_select()) {
+            loglik_(t, edge) = pair_copulas_[t][edge].loglik(u_e);
+            npars_(t, edge)  = pair_copulas_[t][edge].calculate_npars();
+            crits_(t, edge)  = crit;
         }
         
         // h-functions are only evaluated if needed in next step
@@ -304,6 +308,94 @@ void FamilySelector::select_tree(size_t t)
     }
 }
 
+double FamilySelector::get_loglik_of_tree(size_t t) 
+{
+    double ll = 0.0;
+    for (size_t edge = 0; edge < d_ - t - 1; ++edge) {
+        ll += loglik_(t, edge);
+    }
+    
+    return ll;
+}
+
+double FamilySelector::get_npars_of_tree(size_t t)
+{
+    double np = 0.0;
+    for (size_t edge = 0; edge < d_ - t - 1; ++edge) {
+        np += npars_(t, edge);
+    }
+    
+    return np;
+}
+
+void FamilySelector::set_tree_to_indep(size_t t) 
+{
+    for (size_t edge = 0; edge < d_ - t - 1; ++edge) {
+        pair_copulas_[t][edge] = Bicop();
+    }
+}
+
+// TODO
+void FamilySelector::print_pair_copulas_of_tree(size_t t)
+{
+    for (size_t e = 0; e < d_ - t - 1; ++e) {
+        std::stringstream pc_info;
+        pc_info << get_pc_index(t, e) << " <-> " <<
+                    pair_copulas_[t][e].str() << std::endl;
+        vinecopulib::tools_interface::print(pc_info.str().c_str());
+    }
+}
+
+std::vector<double> FamilySelector::get_thresholded_crits() {
+    std::vector<double> crits;
+    for (size_t t = 0; t < d_ - 1; ++t) {
+        for (size_t e = 0; e < d_ - t - 1; ++e) {
+            if (crits_(t, e) < controls_.get_threshold()) {
+                crits.push_back(crits_(t, e));
+            }
+        }
+    }
+    
+    return crits;
+}
+
+void FamilySelector::set_current_fit_as_opt() 
+{
+    pair_copulas_opt_ = pair_copulas_;
+}
+
+void FamilySelector::initialize_new_fit(const Eigen::MatrixXd& data) 
+{
+    // fill first row of hfunc2 matrix with evaluation points;
+    // points have to be reordered to correspond to natural order
+    for (size_t j = 0; j < d_; ++j) {
+        hfunc2_.col(j) = data.col(order_.reverse()(j) - 1);
+    }
+    trees_fitted_ = 0;
+    loglik_ = Eigen::MatrixXd::Zero(d_, d_);
+    npars_  = Eigen::MatrixXd::Zero(d_, d_);
+    crits_  = Eigen::MatrixXd::Zero(d_, d_);
+}
+
+std::string FamilySelector::get_pc_index(size_t tree, size_t edge)
+{
+    std::stringstream index;
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat = vine_matrix_.get_matrix();
+    index << mat(tree, d_ - tree - 1) << "," << mat(tree, edge);
+    if (tree > 0) {
+        index << " | ";
+        for (size_t k = tree - 1; ; k--) {
+            index << mat(k, edge);
+            if (k > 0) {
+                index << ",";
+            } else {
+                break;
+            }
+        }
+    }
+    return index.str().c_str();
+}
+
 
 StructureSelector::StructureSelector(const Eigen::MatrixXd& data, 
                                      const FitControlsVinecop& controls)
@@ -311,10 +403,8 @@ StructureSelector::StructureSelector(const Eigen::MatrixXd& data,
     n_ = data.rows();
     d_ = data.cols();
     trees_ = std::vector<VineTree>(d_);
-    trees_[0] = make_base_tree(data);
     trees_opt_ = trees_;  // for sparse selection
     controls_ = controls;
-    trees_fitted_ = 0;
     pair_copulas_ = Vinecop::make_pair_copula_store(d_);
 }
 
@@ -473,16 +563,16 @@ void StructureSelector::print_pair_copulas_of_tree(size_t t)
 //! extracts all criterion values that got thresholded to zero.
 std::vector<double> StructureSelector::get_thresholded_crits()
 {
-    std::vector<double> out;
+    std::vector<double> crits;
     for (size_t t = 1; t < trees_.size(); ++t) {
         for (auto e : boost::edges(trees_[t])) {
             if (trees_[t][e].crit < controls_.get_threshold()) {
-                out.push_back(trees_[t][e].crit);
+                crits.push_back(trees_[t][e].crit);
             }
         }
     }
     
-    return out;
+    return crits;
 }
 
 void StructureSelector::set_current_fit_as_opt() 
@@ -493,6 +583,7 @@ void StructureSelector::set_current_fit_as_opt()
 void StructureSelector::initialize_new_fit(const Eigen::MatrixXd& data) 
 {
     trees_[0] = make_base_tree(data);
+    trees_fitted_ = 0;
 }
 
 //! Create base tree of the vine
@@ -702,19 +793,23 @@ void StructureSelector::select_pair_copulas(VineTree& tree,
     for (auto e : boost::edges(tree)) {
         bool is_thresholded = (tree[e].crit < controls_.get_threshold());
         bool used_old_fit = false;
-        // the formula is quite arbitrary, but sufficient for 
-        // identifying situations where fits can be re-used
-        tree[e].fit_id = tree[e].pc_data(0, 0) - 2 * tree[e].pc_data(0, 1); 
-        tree[e].fit_id += 5.0 * (double) is_thresholded;
-        if (boost::num_edges(tree_opt) > 0) {
-            auto old_fit = find_old_fit(tree[e].fit_id, tree_opt);
-            if (old_fit.second)  {  // second indicates if match was found
-                // data and thresholding status haven't changed, 
-                // we can use old fit
-                used_old_fit = true;
-                tree[e].pair_copula = tree_opt[old_fit.first].pair_copula;
+        
+        if (controls_.needs_sparse_select()) {
+            // the formula is quite arbitrary, but sufficient for 
+            // identifying situations where fits can be re-used
+            tree[e].fit_id = tree[e].pc_data(0, 0) - 2 * tree[e].pc_data(0, 1); 
+            tree[e].fit_id += 5.0 * (double) is_thresholded;
+            if (boost::num_edges(tree_opt) > 0) {
+                auto old_fit = find_old_fit(tree[e].fit_id, tree_opt);
+                if (old_fit.second)  {  // second indicates if match was found
+                    // data and thresholding status haven't changed, 
+                    // we can use old fit
+                    used_old_fit = true;
+                    tree[e].pair_copula = tree_opt[old_fit.first].pair_copula;
+                }
             }
         }
+
         if (!used_old_fit) {
             if (is_thresholded) {
                 tree[e].pair_copula = vinecopulib::Bicop();
@@ -725,8 +820,10 @@ void StructureSelector::select_pair_copulas(VineTree& tree,
         
         tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
         tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
-        tree[e].loglik = tree[e].pair_copula.loglik(tree[e].pc_data);
-        tree[e].npars  = tree[e].pair_copula.calculate_npars();
+        if (controls_.needs_sparse_select()) {
+            tree[e].loglik = tree[e].pair_copula.loglik(tree[e].pc_data);
+            tree[e].npars  = tree[e].pair_copula.calculate_npars();
+        }
     }
 }
 
@@ -761,7 +858,7 @@ std::string StructureSelector::get_pc_index(
           "," <<
           tree[e].conditioning[1] + 1;
     if (tree[e].conditioned.size() > 0) {
-        index << " ; ";
+        index << " | ";
         for (unsigned int i = 0; i < tree[e].conditioned.size(); ++i) {
             index << tree[e].conditioned[i] + 1;
             if (i < tree[e].conditioned.size() - 1)

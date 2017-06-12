@@ -160,30 +160,16 @@ namespace vinecopulib
                              FitControlsVinecop controls)
     {
         check_data_dim(data);
-
-        // automatic selection of sparsity parameters is implemented separately
-        // below
+        tools_select::StructureSelector selector(data, controls);
         if (controls.needs_sparse_select()) {
-            sparse_select_all(data, controls);
-            return ;
+            selector.sparse_select_all_trees(data);
+        } else {
+            selector.select_all_trees(data);
         }
+        vine_matrix_ = selector.get_rvine_matrix();
+        pair_copulas_ = selector.get_pair_copulas();
+    }
         
-        // initialize 
-        tools_select::StructureSelector selector(data, controls);
-        selector.select_all_trees();
-        vine_matrix_ = selector.get_rvine_matrix();
-        pair_copulas_ = selector.get_pair_copulas();
-    }
-    
-    void Vinecop::sparse_select_all(const Eigen::MatrixXd& data,
-                                    FitControlsVinecop controls)
-    {
-        tools_select::StructureSelector selector(data, controls);
-        selector.sparse_select_all_trees(data);
-        vine_matrix_ = selector.get_rvine_matrix();
-        pair_copulas_ = selector.get_pair_copulas();
-    }
-    
     //! automatically selects all pair-copula families and fits all parameters.
     //!
     //! @param data nxd matrix of copula data.
@@ -193,10 +179,14 @@ namespace vinecopulib
     {
         check_data_dim(data);
         tools_select::FamilySelector selector(data, vine_matrix_, controls);
-        selector.select_all_trees();
+        if (controls.needs_sparse_select()) {
+            selector.sparse_select_all_trees(data);
+        } else {
+            selector.select_all_trees(data);
+        }
         pair_copulas_ = selector.get_pair_copulas();
     }
-     
+
     //! @name Getters
     //! @{
 
