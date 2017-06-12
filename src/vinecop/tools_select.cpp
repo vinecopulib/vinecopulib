@@ -90,7 +90,10 @@ void VinecopSelector::select_all_trees(const Eigen::MatrixXd& data)
         select_tree(t);  // select pair copulas (+ structure) of tree t
     
         if (controls_.get_show_trace()) {
-            show_trace();  // print fitted pair-copulas for this tree
+            std::stringstream tree_heading;
+            tree_heading << "** Tree: " << t << std::endl;
+            tools_interface::print(tree_heading.str().c_str());
+            print_pair_copulas_of_tree(t);
         }
         
         if (controls_.get_truncation_level() == t + 1) {
@@ -437,15 +440,6 @@ void StructureSelector::select_tree(size_t t)
     select_pair_copulas(new_tree, trees_opt_[t + 1]);
 
     trees_[t + 1] = new_tree;
-}
-
-//! prints pair copulas for recently fitted tree.
-void StructureSelector::show_trace()
-{
-    std::stringstream tree_info;
-    tree_info << "** Tree: " << trees_fitted_ << std::endl;
-    tools_interface::print(tree_info.str().c_str());
-    print_pair_copulas_of_tree(trees_fitted_);
 }
 
 void StructureSelector::finalize()

@@ -47,8 +47,6 @@ protected:
     void truncate();
     //! selects tree of vine copula, assuming all previous trees have been fit.
     virtual void select_tree(size_t t) = 0;
-    //! prints pair copulas for recently fitted tree.
-    virtual void show_trace() = 0;
     virtual void finalize() = 0;
     
     virtual double get_loglik_of_tree(size_t t) = 0;
@@ -79,7 +77,6 @@ public:
     ~FamilySelector() {}
     
     void select_tree(size_t t);
-    void show_trace() {}  // TODO
     void finalize() {}
     
     double get_loglik_of_tree(size_t t);
@@ -152,7 +149,6 @@ public:
                       const FitControlsVinecop& controls);
     ~StructureSelector() {}
     void select_tree(size_t t);
-    void show_trace();
     void finalize();
     
     double get_loglik_of_tree(size_t t);
