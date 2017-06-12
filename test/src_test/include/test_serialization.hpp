@@ -36,6 +36,14 @@ namespace test_serialization {
         auto vc = Vinecop(d);
         vc.to_json("temp");
         auto vc2 = Vinecop("temp");
+
+        // Remove temp file
+        std::string cmd = rm + "temp";
+        int sys_exit_code = system(cmd.c_str());
+        if (sys_exit_code != 0) {
+            throw std::runtime_error("error in system call");
+        }
+
         for (size_t tree = 0; tree < d - 1; ++tree) {
             for (size_t edge = 0; edge < d - tree - 1; ++edge) {
                 EXPECT_EQ(vc2.get_rotation(tree, edge), 0);
