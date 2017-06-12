@@ -79,3 +79,5 @@ namespace vinecopulib {
         int rotation_;
     };
 }
+
+boost::property_tree::ptree json_to_ptree(const char *filename);
