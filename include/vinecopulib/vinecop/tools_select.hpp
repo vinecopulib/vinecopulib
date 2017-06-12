@@ -40,23 +40,34 @@ public:
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
     RVineMatrix get_rvine_matrix() const;
     
-    void truncate();
     void select_all_trees();
+    void sparse_select_all_trees(const Eigen::MatrixXd& data);
 
-    //! selects the next tree, starting from current state of the selector 
-    //! (tracked by `trees_fitted_` data member).
-    virtual void select_next_tree() = 0;
+protected:
+    void truncate();
+    //! selects tree of vine copula, assuming all previous trees have been fit.
+    virtual void select_tree(size_t t) = 0;
     //! prints pair copulas for recently fitted tree.
     virtual void show_trace() = 0;
     virtual void finalize() = 0;
+    
+    virtual double get_loglik_of_tree(size_t t) = 0;
+    virtual double get_npars_of_tree(size_t t) = 0;
+    virtual void set_tree_to_indep(size_t t) = 0;
+    virtual void print_pair_copulas_of_tree(size_t) = 0;
+    virtual std::vector<double> get_thresholded_crits() = 0;
+    virtual void set_current_fit_as_opt() = 0;
+    virtual void initialize_new_fit(const Eigen::MatrixXd& data) = 0;
 
-protected:
     size_t n_;
     size_t d_;
     size_t trees_fitted_;
     FitControlsVinecop controls_;
     RVineMatrix vine_matrix_;
     std::vector<std::vector<Bicop>> pair_copulas_;
+    
+private:
+    double get_next_threshold(std::vector<double>& thresholded_crits);
 };
 
 class FamilySelector : public VinecopSelector 
@@ -67,10 +78,21 @@ public:
                    const FitControlsVinecop& controls);
     ~FamilySelector() {}
     
-    void select_next_tree();
+    void select_tree(size_t t);
     void show_trace() {}  // TODO
     void finalize() {}
-
+    
+     // TODO
+    double get_loglik_of_tree(size_t t) {return 0.0;}
+    double get_npars_of_tree(size_t t) {return 0.0;}
+    void set_tree_to_indep(size_t t) {}
+    void print_pair_copulas_of_tree(size_t) {}
+    std::vector<double> get_thresholded_crits() {
+        return std::vector<double>(1);
+    }
+    void set_current_fit_as_opt() {}
+    void initialize_new_fit(const Eigen::MatrixXd& data) {}
+    
 private:
     // info about the vine structure
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> order_;
@@ -84,7 +106,7 @@ private:
 };
 
 
-// boost::graph represenation of a vine tree ----------------
+// boost::graph represenation of a vine tree
 struct VertexProperties {
     std::vector<size_t> conditioning;
     std::vector<size_t> conditioned;
@@ -125,9 +147,17 @@ public:
     StructureSelector(const Eigen::MatrixXd& data, 
                       const FitControlsVinecop& controls);
     ~StructureSelector() {}
-    void select_next_tree();
+    void select_tree(size_t t);
     void show_trace();
     void finalize();
+    
+    double get_loglik_of_tree(size_t t);
+    double get_npars_of_tree(size_t t); 
+    void set_tree_to_indep(size_t t);
+    void print_pair_copulas_of_tree(size_t);
+    std::vector<double> get_thresholded_crits();
+    void set_current_fit_as_opt();
+    void initialize_new_fit(const Eigen::MatrixXd& data);
     
 private:
     // functions for manipulation of trees ----------------
@@ -140,20 +170,15 @@ private:
     void add_edge_info(VineTree& tree);
     void remove_edge_data(VineTree& tree);
     void remove_vertex_data(VineTree& tree);
-    void select_pair_copulas(VineTree& tree);
     void select_pair_copulas(VineTree& tree, const VineTree& tree_opt);
     FoundEdge find_old_fit(double fit_id, const VineTree& old_graph);
-    std::vector<double> thresholded_crits(const std::vector<VineTree>& trees);
-    double get_next_threshold(std::vector<double>& thresholded_crits,
-                              double learning_rate = 0.025);
     double get_tree_loglik(const VineTree& tree);
     double get_tree_npars(const VineTree& tree);
-
-    void print_pair_copulas(VineTree& tree);
     std::string get_pc_index(boost::graph_traits<VineTree>::edge_descriptor e,
                              VineTree& tree);
     
     std::vector<VineTree> trees_;
+    std::vector<VineTree> trees_opt_;  // for sparse selction
 };
 
 }

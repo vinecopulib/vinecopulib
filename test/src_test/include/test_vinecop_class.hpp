@@ -196,29 +196,29 @@ namespace test_vinecop_class {
         }
         EXPECT_EQ(pairs_unequal, 0);
     }
-    // 
-    // TEST_F(VinecopTest, sparse_threshold_selection) {
-    //     FitControlsVinecop controls(bicop_families::itau, "itau");
-    //     controls.set_select_threshold(true);
-    //     // controls.set_show_trace(true);
-    //     Vinecop fit(7);
-    //     fit.select_all(u, controls);
-    // }
-    // 
-    // TEST_F(VinecopTest, sparse_truncation_selection) {
-    //     FitControlsVinecop controls(bicop_families::itau, "itau");
-    //     controls.set_select_truncation_level(true);
-    //     // controls.set_show_trace(true);
-    //     Vinecop fit(7);
-    //     fit.select_all(u, controls);
-    // }
-    // 
-    // TEST_F(VinecopTest, sparse_both_selection) {
-    //     FitControlsVinecop controls(bicop_families::itau, "itau");
-    //     controls.set_select_truncation_level(true);
-    //     controls.set_select_threshold(true);
-    //     // controls.set_show_trace(true);
-    //     Vinecop fit(7);
-    //     fit.select_all(u, controls);
-    // }
+    
+    TEST_F(VinecopTest, sparse_threshold_selection) {
+        FitControlsVinecop controls(bicop_families::itau, "itau");
+        controls.set_select_threshold(true);
+        // controls.set_show_trace(true);
+        Vinecop fit(7);
+        fit.select_all(u, controls);
+    }
+    
+    TEST_F(VinecopTest, sparse_truncation_selection) {
+        FitControlsVinecop controls(bicop_families::itau, "itau");
+        controls.set_select_truncation_level(true);
+        // controls.set_show_trace(true);
+        Vinecop fit(7);
+        fit.select_all(u, controls);
+    }
+    
+    TEST_F(VinecopTest, sparse_both_selection) {
+        FitControlsVinecop controls(bicop_families::itau, "itau");
+        controls.set_select_truncation_level(true);
+        controls.set_select_threshold(true);
+        // controls.set_show_trace(true);
+        Vinecop fit(7);
+        fit.select_all(u, controls);
+    }
 }

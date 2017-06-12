@@ -39,8 +39,8 @@ namespace vinecopulib
                         FitControlsVinecop controls = FitControlsVinecop());
         void select_families(const Eigen::MatrixXd& data,
                              FitControlsVinecop controls = FitControlsVinecop());
-        // void sparse_select_all(const Eigen::MatrixXd& data,
-        //                        FitControlsVinecop controls = FitControlsVinecop());
+        void sparse_select_all(const Eigen::MatrixXd& data,
+                               FitControlsVinecop controls = FitControlsVinecop());
         // void sparse_select_families(const Eigen::MatrixXd& data,
         //                             FitControlsVinecop controls = FitControlsVinecop());
 
