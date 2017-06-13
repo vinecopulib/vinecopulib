@@ -9,6 +9,7 @@
 #include <vinecopulib/bicop/abstract.hpp>
 #include <vinecopulib/bicop/fit_controls.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
+#include <vinecopulib/misc/tools_serialization.hpp>
 
 namespace vinecopulib {
     //! @brief A class for bivariate copula models.
@@ -79,5 +80,3 @@ namespace vinecopulib {
         int rotation_;
     };
 }
-
-boost::property_tree::ptree json_to_ptree(const char *filename);

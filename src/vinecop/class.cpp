@@ -11,8 +11,6 @@
 #include <exception>
 #include <vector>
 
-#include <boost/property_tree/json_parser.hpp>
-
 namespace vinecopulib
 {
     //! creates a D-vine on `d` variables with all pair-copulas set to 
@@ -104,7 +102,7 @@ namespace vinecopulib
 
         typedef boost::property_tree::ptree pt;
 
-        auto matrix = tools_eigen::ptree_to_matrix<size_t>(
+        auto matrix = tools_serialization::ptree_to_matrix<size_t>(
                 input.get_child("matrix"));
         vine_matrix_ = RVineMatrix(matrix, check_matrix);
         d_ = (size_t) matrix.rows();
@@ -126,7 +124,8 @@ namespace vinecopulib
     //! @param check_matrix whether to check if the `"matrix"` node represents
     //!      a valid R-vine matrix.
     Vinecop::Vinecop(const char *filename, bool check_matrix) :
-            Vinecop(json_to_ptree(filename), check_matrix) {}
+            Vinecop(tools_serialization::json_to_ptree(filename),
+                    check_matrix) {}
 
     //! constructs a vine copula model from data. 
     //! 
@@ -189,7 +188,7 @@ namespace vinecopulib
         }
 
         output.add_child("pair copulas", pair_copulas);
-        auto matrix_node = tools_eigen::matrix_to_ptree(get_matrix());
+        auto matrix_node = tools_serialization::matrix_to_ptree(get_matrix());
         output.add_child("matrix", matrix_node);
 
         return output;
