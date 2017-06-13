@@ -34,8 +34,7 @@ double calculate_gic(double loglik, double npars, int n);
 class VinecopSelector 
 {
 public:
-    VinecopSelector() {}
-    ~VinecopSelector() {}
+    virtual ~VinecopSelector() = 0;
 
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
     RVineMatrix get_rvine_matrix() const;

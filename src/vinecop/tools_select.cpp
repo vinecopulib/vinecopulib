@@ -62,6 +62,9 @@ double calculate_gic(double loglik, double npars, int n)
     return -2 * loglik + std::log(std::log(n)) * log_npars * npars;
 }
 
+// needs to be defined
+VinecopSelector::~VinecopSelector() {}
+
 std::vector<std::vector<Bicop>> VinecopSelector::get_pair_copulas() const
 {
         return pair_copulas_;
