@@ -10,7 +10,6 @@
 #include "rscript.hpp"
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/vinecop/class.hpp>
-#include <iostream>
 
 namespace test_serialization {
     using namespace vinecopulib;
@@ -35,11 +34,8 @@ namespace test_serialization {
     TEST(serialization, vinecop_serialization) {
         size_t d = 5;
         auto vc = Vinecop(d);
-        std::cout << "im here" << std::endl;
         vc.to_json("temp");
-        std::cout << "im here2" << std::endl;
         auto vc2 = Vinecop("temp");
-        std::cout << "im here3" << std::endl;
 
         // Remove temp file
         std::string cmd = rm + "temp";

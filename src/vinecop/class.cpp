@@ -10,6 +10,7 @@
 
 #include <exception>
 #include <vector>
+#include <iostream>
 
 namespace vinecopulib
 {
@@ -102,9 +103,12 @@ namespace vinecopulib
 
         typedef boost::property_tree::ptree pt;
 
+        std::cout << "im here" << std::endl;
         auto matrix = tools_serialization::ptree_to_matrix<size_t>(
                 input.get_child("matrix"));
+        std::cout << "im here2" << std::endl;
         vine_matrix_ = RVineMatrix(matrix, check_matrix);
+        std::cout << "im here3" << std::endl;
         d_ = (size_t) matrix.rows();
 
         pair_copulas_ = make_pair_copula_store(d_);
