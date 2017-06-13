@@ -28,7 +28,7 @@ namespace vinecopulib {
                            bool preselect_families = true,
                            bool select_truncation_level = false,
                            bool select_threshold = false,
-                           bool show_trace = false,);
+                           bool show_trace = false);
         FitControlsVinecop(const FitControlsBicop controls,
                            size_t truncation_level = std::numeric_limits<size_t>::max(),
                            std::string tree_criterion = "tau",

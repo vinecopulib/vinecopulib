@@ -32,6 +32,10 @@ namespace vinecopulib
     //! @param threshold for thresholded vines (0 = no threshold).
     //! @param selection_criterion see FitControlsBicop.
     //! @param preselect_families see FitControlsBicop.
+    //! @param select_truncation_level whether the truncation shall be selected
+    //!     automatically.
+    //! @param select_threshold whether the threshold parameter shall be 
+    //!     selected automatically.
     //! @param show_trace whether to show a trace of the building progress.
     FitControlsVinecop::FitControlsVinecop(std::vector<BicopFamily> family_set,
                                            std::string parametric_method,
@@ -65,6 +69,10 @@ namespace vinecopulib
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).
     //! @param threshold for thresholded vines (0 = no threshold).
     //! @param show_trace whether to show a trace of the building progress.
+    //! @param select_truncation_level whether the truncation shall be selected
+    //!     automatically.
+    //! @param select_threshold whether the threshold parameter shall be 
+    //!     selected automatically.
     //! @param controls see FitControlsBicop.
     FitControlsVinecop::FitControlsVinecop(const FitControlsBicop controls,
                                            size_t truncation_level,
