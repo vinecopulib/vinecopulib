@@ -10,7 +10,6 @@
 
 #include <exception>
 #include <vector>
-#include <iostream>
 
 namespace vinecopulib
 {
@@ -114,9 +113,6 @@ namespace vinecopulib
             for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
                 boost::property_tree::ptree pc_node = tree_node.get_child(
                         "pc" + std::to_string(edge));
-                boost::property_tree::write_json(std::cout, pc_node);
-                Bicop pc(pc_node);
-                std::cout << pc.str() << std::endl;
                 pair_copulas_[tree][edge] = Bicop(pc_node);
             }
         }

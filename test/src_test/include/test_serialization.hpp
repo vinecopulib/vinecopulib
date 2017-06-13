@@ -15,7 +15,7 @@ namespace test_serialization {
     using namespace vinecopulib;
 
     TEST(serialization, bicop_serialization) {
-        auto pc = Bicop(BicopFamily::bb1);
+        auto pc = Bicop();
         pc.to_json("temp");
         Bicop pc2("temp");
 
