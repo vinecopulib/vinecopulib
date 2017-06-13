@@ -231,8 +231,7 @@ namespace tools_select {
     }
     
     //! chooses threshold for next iteration such that at a proportion of at 
-    //! least `learning_rate` of the previously thresholded pairs become 
-    //! non-thresholded.
+    //! least 2.5% of the previously thresholded pairs become non-thresholded.
     double VinecopSelector::get_next_threshold(
         std::vector<double>& thresholded_crits)
     {
