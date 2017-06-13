@@ -15,14 +15,6 @@ namespace test_serialization {
     using namespace vinecopulib;
 
     TEST(serialization, bicop_serialization) {
-        Eigen::MatrixXd mat;
-        std::cout << "im here" << std::endl;
-        boost::property_tree::write_json("temp", tools_serialization::matrix_to_ptree(mat));
-        std::cout << "im here2" << std::endl;
-        auto mat_node = tools_serialization::json_to_ptree("temp");
-        std::cout << "im here3" << std::endl;
-        auto mat2 = tools_serialization::ptree_to_matrix<double>(mat_node);
-        std::cout << "im here4" << std::endl;
 
         auto pc = Bicop(BicopFamily::bb1);
         pc.to_json("temp");
@@ -41,6 +33,7 @@ namespace test_serialization {
     }
 
     TEST(serialization, vinecop_serialization) {
+
         size_t d = 5;
         auto vc = Vinecop(d);
         vc.to_json("temp");
