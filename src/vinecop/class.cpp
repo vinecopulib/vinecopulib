@@ -103,19 +103,18 @@ namespace vinecopulib
 
         typedef boost::property_tree::ptree pt;
 
-        std::cout << "im here" << std::endl;
         auto matrix = tools_serialization::ptree_to_matrix<size_t>(
                 input.get_child("matrix"));
-        std::cout << "im here2" << std::endl;
         vine_matrix_ = RVineMatrix(matrix, check_matrix);
-        std::cout << "im here3" << std::endl;
         d_ = (size_t) matrix.rows();
 
         pair_copulas_ = make_pair_copula_store(d_);
         pt pcs_node = input.get_child("pair copulas");
         for (size_t tree = 0; tree < d_ - 1; ++tree) {
+            std::cout << "tree" + std::to_string(tree) << std::endl;
             pt tree_node = pcs_node.get_child("tree" + std::to_string(tree));
             for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
+                std::cout << "edge" + std::to_string(edge) << std::endl;
                 pt pc_node = tree_node.get_child("pc" + std::to_string(edge));
                 pair_copulas_[tree][edge] = Bicop(pc_node);
             }
