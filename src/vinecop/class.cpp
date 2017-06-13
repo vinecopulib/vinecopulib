@@ -102,7 +102,7 @@ namespace vinecopulib
     Vinecop::Vinecop(boost::property_tree::ptree input, bool check_matrix) {
 
         typedef boost::property_tree::ptree pt;
-
+        boost::property_tree::write_json(std::cout, input);
         auto matrix = tools_serialization::ptree_to_matrix<size_t>(
                 input.get_child("matrix"));
         vine_matrix_ = RVineMatrix(matrix, check_matrix);
@@ -116,6 +116,7 @@ namespace vinecopulib
             for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
                 std::cout << "edge" + std::to_string(edge) << std::endl;
                 pt pc_node = tree_node.get_child("pc" + std::to_string(edge));
+                boost::property_tree::write_json(std::cout, pc_node);
                 pair_copulas_[tree][edge] = Bicop(pc_node);
             }
         }
