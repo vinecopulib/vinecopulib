@@ -26,7 +26,7 @@ double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
 {
     double w = 0.0;
     if (tree_criterion == "tau") {
-        w = std::fabs(tools_stats::pairwise_ktau(data));
+        w = std::fabs(tools_stats::pairwise_tau(data));
     } else if (tree_criterion == "hoeffd") {
         // scale to [0,1]
         w = (30 * tools_stats::pairwise_hoeffd(data) + 0.5) / 1.5;
@@ -43,14 +43,10 @@ double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
 Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd& data, 
                                            std::string tree_criterion)
 {
-    Eigen::MatrixXd w;
-    if (tree_criterion == "tau") {
-        w = tools_stats::ktau_matrix(data);
-    } else if (tree_criterion == "hoeffd") {
-        // scale to [0,1]
-        w = (30 * tools_stats::hoeffd_matrix(data).array() + 0.5) / 1.5;
-    } else if (tree_criterion == "rho") {
-        w = tools_stats::cor_matrix(data);
+    Eigen::MatrixXd w = tools_stats::dependence_matrix(data, tree_criterion);
+    if (tree_criterion == "hoeffd") {
+        // hoeefd needs to be scaled to [0,1]
+        w = (w.array() + 0.5) / 1.5;
     }
 
     return w.array().abs();
