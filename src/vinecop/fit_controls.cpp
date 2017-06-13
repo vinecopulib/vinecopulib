@@ -17,9 +17,9 @@ namespace vinecopulib
         truncation_level_ = std::numeric_limits<int>::max();
         threshold_ = 0.0;
         tree_criterion_ = "tau";
-        show_trace_ = false;
         select_truncation_level_ = false;
         select_threshold_ = false;
+        show_trace_ = false;
     }
 
     //! creates custom controls for fitting vine copula models.
@@ -41,9 +41,9 @@ namespace vinecopulib
                                            double threshold,
                                            std::string selection_criterion,
                                            bool preselect_families,
-                                           bool show_trace,
                                            bool select_truncation_level,
-                                           bool select_threshold) :
+                                           bool select_threshold,
+                                           bool show_trace) :
             FitControlsBicop(family_set, parametric_method, nonparametric_mult, 
                              selection_criterion, preselect_families)
     {
@@ -70,9 +70,9 @@ namespace vinecopulib
                                            size_t truncation_level,
                                            std::string tree_criterion,
                                            double threshold,
-                                           bool show_trace,
                                            bool select_truncation_level,
-                                           bool select_threshold) :
+                                           bool select_threshold,
+                                           bool show_trace) :
             FitControlsBicop(controls)
     {
         check_truncation_level(truncation_level);

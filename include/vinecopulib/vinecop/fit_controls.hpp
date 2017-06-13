@@ -26,16 +26,16 @@ namespace vinecopulib {
                            double threshold = 0.0,
                            std::string selection_criterion = "bic",
                            bool preselect_families = true,
-                           bool show_trace = false,
                            bool select_truncation_level = false,
-                           bool select_threshold = false);
+                           bool select_threshold = false,
+                           bool show_trace = false,);
         FitControlsVinecop(const FitControlsBicop controls,
                            size_t truncation_level = std::numeric_limits<size_t>::max(),
                            std::string tree_criterion = "tau",
                            double threshold = 0.0,
-                           bool show_trace = false,
                            bool select_truncation_level = false,
-                           bool select_threshold = false);
+                           bool select_threshold = false,
+                           bool show_trace = false);
 
         // Getters
         size_t get_truncation_level();
