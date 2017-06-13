@@ -15,7 +15,16 @@ namespace test_serialization {
     using namespace vinecopulib;
 
     TEST(serialization, bicop_serialization) {
-        auto pc = Bicop();
+        Eigen::MatrixXd mat;
+        std::cout << "im here" << std::endl;
+        boost::property_tree::write_json("temp", tools_serialization::matrix_to_ptree(mat));
+        std::cout << "im here2" << std::endl;
+        auto mat_node = tools_serialization::json_to_ptree("temp");
+        std::cout << "im here3" << std::endl;
+        auto mat2 = tools_serialization::ptree_to_matrix<double>(mat_node);
+        std::cout << "im here4" << std::endl;
+
+        auto pc = Bicop(BicopFamily::bb1);
         pc.to_json("temp");
         Bicop pc2("temp");
 
@@ -43,7 +52,7 @@ namespace test_serialization {
         if (sys_exit_code != 0) {
             throw std::runtime_error("error in system call");
         }
-        std::cout << "im here4" << std::endl;
+
         for (size_t tree = 0; tree < d - 1; ++tree) {
             for (size_t edge = 0; edge < d - tree - 1; ++edge) {
                 EXPECT_EQ(vc2.get_rotation(tree, edge), 0);

@@ -72,7 +72,11 @@ namespace tools_serialization {
             }
         }
 
-        Eigen::MatrixXd matrix = Eigen::MatrixXd::Map(&vec[0], rows, cols);
+        Eigen::MatrixXd matrix;
+        if (cols != 0) {
+            matrix = Eigen::MatrixXd::Map(&vec[0], rows, cols);
+        }
+
         return matrix.cast <T>();
     };
 
