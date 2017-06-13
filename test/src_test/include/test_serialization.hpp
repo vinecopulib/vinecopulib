@@ -10,6 +10,7 @@
 #include "rscript.hpp"
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/vinecop/class.hpp>
+#include <iostream>
 
 namespace test_serialization {
     using namespace vinecopulib;
@@ -34,8 +35,11 @@ namespace test_serialization {
     TEST(serialization, vinecop_serialization) {
         size_t d = 5;
         auto vc = Vinecop(d);
+        std::cout << "im here" << std::endl;
         vc.to_json("temp");
+        std::cout << "im here2" << std::endl;
         auto vc2 = Vinecop("temp");
+        std::cout << "im here3" << std::endl;
 
         // Remove temp file
         std::string cmd = rm + "temp";
@@ -43,7 +47,7 @@ namespace test_serialization {
         if (sys_exit_code != 0) {
             throw std::runtime_error("error in system call");
         }
-
+        std::cout << "im here4" << std::endl;
         for (size_t tree = 0; tree < d - 1; ++tree) {
             for (size_t edge = 0; edge < d - tree - 1; ++edge) {
                 EXPECT_EQ(vc2.get_rotation(tree, edge), 0);
