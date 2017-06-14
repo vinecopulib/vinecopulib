@@ -31,6 +31,7 @@ if(BUILD_TESTING)
             test_bicop_sanity_checks
             test_bicop_kernel
             test_rvine_matrix
+            test_serialization
             test_tools_stats
             test_vinecop_class
             test_vinecop_sanity_checks)

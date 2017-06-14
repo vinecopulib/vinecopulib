@@ -43,6 +43,51 @@ namespace vinecopulib
         select(data, controls);
     }
 
+    //! creates from a boost::property_tree::ptree object
+    //! @param input the boost::property_tree::ptree object to convert from
+    //! (see to_ptree() for the structure of the input).
+    Bicop::Bicop(boost::property_tree::ptree input) :
+            Bicop(
+                    get_family_enum(input.get<std::string>("family")),
+                    input.get<int>("rotation"),
+                    tools_serialization::ptree_to_matrix<double>(input.get_child("parameters"))
+            ) {}
+
+    //! creates from a JSON file
+    //! @filename the name of the JSON file to read (see to_ptree() for the
+    //! structure of the file).
+    Bicop::Bicop(const char *filename) :
+            Bicop(tools_serialization::json_to_ptree(filename)) {}
+
+    //! Convert the copula into a boost::property_tree::ptree object
+    //!
+    //! The boost::property_tree::ptree is contains of three values named
+    //! `"family"`, `"rotation"`, `"parameters"`, respectively a string
+    //! for the family name, an integer for the rotation, and an Eigen::MatrixXd
+    //! for the parameters.
+    //!
+    //! @return the boost::property_tree::ptree object containing the copula.
+    boost::property_tree::ptree Bicop::to_ptree()
+    {
+        boost::property_tree::ptree output;
+
+        output.put("family", get_family_name());
+        output.put("rotation", rotation_);
+        auto mat_node = tools_serialization::matrix_to_ptree(get_parameters());
+        output.add_child("parameters", mat_node);
+
+        return output;
+    }
+
+    //! Write the copula object into a JSON file
+    //!
+    //! See to_ptree() for the structure of the file.
+    //!
+    //! @param filename the name of the file to write.
+    void Bicop::to_json(const char *filename)
+    {
+        boost::property_tree::write_json(filename, to_ptree());
+    }
 
     //! evaluates the copula density.
     //!

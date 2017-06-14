@@ -388,6 +388,29 @@ auto aic  = bicop.aic(sim_data);
 auto bic  = bicop.bic(sim_data);
 ```
 
+Bivariate copula models can also be written to and constructed from JSON files 
+and `boost::property_tree::ptree` objects:
+
+```
+// Gauss copula with parameter 0.5
+Bicop bicop(BicopFamily::gaussian, 0,  VecXd::Constant(1, 0.5));
+
+// Save as a ptree object
+boost::property_tree::ptree bicop_node = bicop.to_ptree();
+
+// Write into a JSON file
+boost::property_tree::write_json("myfile.JSON", bicop_node);
+
+// Equivalently
+bicop.to_json("myfile.JSON");
+
+// Then a new Bicop can be constructed from the ptree object
+Bicop bicop2(bicop_node);
+
+// Or from the JSON file
+Bicop bicop3("myfile.JSON");
+```
+
 ------------------------------------------------
 
 ## Vine copula models
@@ -586,4 +609,27 @@ auto aic = model.aic(data)
 
 // evaluate the BIC
 auto bic = model.bic(data)
+```
+
+Vine copula models can also be written to and constructed from JSON files 
+and `boost::property_tree::ptree` objects:
+
+```
+// 5-dimensional vine copula
+Vinecop vinecop(5);
+
+// Save as a ptree object
+boost::property_tree::ptree vinecop_node = vinecop.to_ptree();
+
+// Write into a JSON file
+boost::property_tree::write_json("myfile.JSON", vinecop_node);
+
+// Equivalently
+vinecop.to_json("myfile.JSON");
+
+// Then a new Bicop can be constructed from the ptree object
+Vinecop vinecop2(vinecop_node);
+
+// Or from the JSON file
+Vinecop vinecop2("myfile.JSON");
 ```
