@@ -82,8 +82,6 @@ namespace tools_stats
     double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2> x);
     Eigen::MatrixXd dependence_matrix(const Eigen::MatrixXd& x, 
                                       const std::string& measure);
-    Eigen::MatrixXd cor_matrix(const Eigen::MatrixXd& x);
-    Eigen::MatrixXd hoeffd_matrix(const Eigen::MatrixXd& x);
     
     Eigen::MatrixXd ghalton(size_t n, size_t d);
 }
