@@ -22,11 +22,7 @@ using namespace test_tools_stats;
 using namespace test_vinecop_class;
 using namespace test_vinecop_sanity_checks;
 
-#include <iostream>
-
 int main(int argc, char **argv) {
-    std::cout << "im here" << std::endl;
     ::testing::InitGoogleTest(&argc, argv);
-    std::cout << "im still here" << std::endl;
     return RUN_ALL_TESTS();
 }
