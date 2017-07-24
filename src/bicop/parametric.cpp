@@ -72,6 +72,13 @@ namespace vinecopulib
 
             auto temp_data = data;
             double tau = tools_stats::pairwise_ktau(temp_data);
+            if (std::abs(tau) < 0.01) {
+                tau = 0.01;
+                if (tau < 0) tau *= -1.0;
+            } else if (std::abs(1.0 - tau) < 0.01) {
+                tau = 0.9;
+                if (tau < 0) tau *= -1.0;
+            }
             auto newpar = get_start_parameters(tau);
             if (npars > 0) {
                 // Create optimizer
