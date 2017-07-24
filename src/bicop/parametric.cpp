@@ -72,12 +72,12 @@ namespace vinecopulib
 
             auto temp_data = data;
             double tau = tools_stats::pairwise_ktau(temp_data);
+            double sign = 1.0;
+            if (tau < 0) sign = -1.0;
             if (std::abs(tau) < 0.01) {
-                tau = 0.01;
-                if (tau < 0) tau *= -1.0;
+                tau = 0.01 * sign;
             } else if (std::abs(1.0 - tau) < 0.01) {
-                tau = 0.9;
-                if (tau < 0) tau *= -1.0;
+                tau = 0.9 * sign;
             }
             auto newpar = get_start_parameters(tau);
             if (npars > 0) {
