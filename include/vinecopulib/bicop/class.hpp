@@ -64,7 +64,7 @@ namespace vinecopulib {
         // Misc
         std::string str();
         double calculate_npars();
-        double parameters_to_tau(const Eigen::VectorXd& parameters);
+        double parameters_to_tau(const Eigen::MatrixXd& parameters);
         Eigen::MatrixXd tau_to_parameters(const double& tau);
         void flip();
 

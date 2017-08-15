@@ -17,16 +17,16 @@ namespace test_bicop_kernel {
         EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0,0,1,30)));
         EXPECT_ANY_THROW(bicop_.set_parameters(-1*values));
     }
-
+    
     TEST_F(TrafokernelTest, trafo_kernel_fit) {
         bicop_.fit(u);
     }
-
+    
     TEST_F(TrafokernelTest, trafo_kernel_eval_funcs) {
         bicop_.fit(u);
-
+    
         EXPECT_GE(bicop_.pdf(u).minCoeff(), 0.0);
-
+    
         EXPECT_GE(bicop_.hfunc1(u).minCoeff(), 0.0);
         EXPECT_GE(bicop_.hfunc2(u).minCoeff(), 0.0);
         EXPECT_GE(bicop_.hinv1(u).minCoeff(), 0.0);
@@ -40,12 +40,12 @@ namespace test_bicop_kernel {
         EXPECT_GE(bicop_.calculate_npars(), 0.0);
         EXPECT_LE(bicop_.calculate_npars(), 100.0);
     }
-
+    
     TEST_F(TrafokernelTest, trafo_kernel_select) {
         auto newcop = Bicop(u, FitControlsBicop({BicopFamily::tll0}));
         EXPECT_EQ(newcop.get_family(), BicopFamily::tll0);
     }
-
+    
     TEST_F(TrafokernelTest, trafo_kernel_flip) {
         auto pdf = bicop_.pdf(u);
         u.col(0).swap(u.col(1));
@@ -53,4 +53,5 @@ namespace test_bicop_kernel {
         auto pdf_flipped = bicop_.pdf(u);
         EXPECT_TRUE(pdf.isApprox(pdf_flipped, 1e-10));
     }
+
 }

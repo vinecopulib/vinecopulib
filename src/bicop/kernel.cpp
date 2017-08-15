@@ -59,9 +59,11 @@ namespace vinecopulib
         return hinv2_num(u);
     }
 
-    double KernelBicop::parameters_to_tau(const Eigen::VectorXd&)
+    double KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
     {
+        set_parameters(parameters);
         Eigen::Matrix<double, Eigen::Dynamic, 2> U = tools_stats::ghalton(1e3, 2);
+        U.col(1) = hinv1(U);
         return tools_stats::pairwise_ktau(U);
     }
 

@@ -64,7 +64,7 @@ namespace vinecopulib
         return Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
     }
 
-    double GumbelBicop::parameters_to_tau(const Eigen::VectorXd& parameters)
+    double GumbelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
     {
         return (parameters(0) - 1) / parameters(0);
     }
