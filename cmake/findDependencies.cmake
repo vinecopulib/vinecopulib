@@ -19,9 +19,17 @@ else ( NLOPT_INCLUDE_DIRS )
     include(cmake/findNLopt.cmake            REQUIRED)
 endif()
 
+set(STAN_VERSION "2.16.0")
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/findStan.cmake)
 
+set(STAN_MATH_VERSION "2.16.0")
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/findStanMath.cmake)
 
-
-set(external_includes ${EIGEN3_INCLUDE_DIR} ${NLOPT_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+set(external_includes
+        ${EIGEN3_INCLUDE_DIR}
+        ${NLOPT_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
+        ${STAN_INCLUDE_DIRS}
+        ${STAN_MATH_INCLUDE_DIRS})
 
 set(external_libs ${CMAKE_THREAD_LIBS_INIT} ${NLOPT_LIBRARIES} ${Boost_LIBRARIES})
