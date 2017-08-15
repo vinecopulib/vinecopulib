@@ -1,5 +1,5 @@
 if(NOT WIN32)
-    set (CMAKE_CXX_FLAGS                "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type")
+    set (CMAKE_CXX_FLAGS                "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -DFUSION_MAX_VECTOR_SIZE=12")
     set (CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG ")
     set (CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
     if(WARNINGS_AS_ERRORS)

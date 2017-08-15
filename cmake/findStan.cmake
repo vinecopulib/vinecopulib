@@ -13,9 +13,6 @@ if(NOT EXISTS ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/stan/version.hpp)
     file(COPY ${PROJECT_BINARY_DIR}/${STAN}/src/stan/
             DESTINATION ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/stan)
 
-    file(COPY ${PROJECT_BINARY_DIR}/${STAN}/src/test/test-models/stanc.cpp
-            DESTINATION ${PROJECT_BINARY_DIR}/stan-build/)
-
     if(NOT EXISTS ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/stan/version.hpp)
         message(SEND_ERROR "Not able to find or download stan.")
     endif()

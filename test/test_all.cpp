@@ -22,18 +22,7 @@ using namespace test_tools_stats;
 using namespace test_vinecop_class;
 using namespace test_vinecop_sanity_checks;
 
-//int main(int argc, char **argv) {
-//    ::testing::InitGoogleTest(&argc, argv);
-//    return RUN_ALL_TESTS();
-//}
-
-#include <stan/lang/ast.hpp>
-int main(int argc, const char* argv[]) {
-    std::string mystring;
-    if (stan::lang::is_nonempty(mystring)) {
-        return 0;
-    } else {
-        return 1;
-    }
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
-
