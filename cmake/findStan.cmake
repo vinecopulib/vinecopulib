@@ -1,6 +1,6 @@
 set(STAN "stan-${STAN_VERSION}")
 
-if(NOT EXISTS ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/version.hpp)
+if(NOT EXISTS ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/stan/version.hpp)
     set(STAN_GITHUB https://github.com/stan-dev/stan)
     file(DOWNLOAD
             ${STAN_GITHUB}/archive/v${STAN_VERSION}.tar.gz
@@ -11,9 +11,12 @@ if(NOT EXISTS ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/version.hpp)
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 
     file(COPY ${PROJECT_BINARY_DIR}/${STAN}/src/stan/
-            DESTINATION ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan)
+            DESTINATION ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/stan)
 
-    if(NOT EXISTS ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/version.hpp)
+    file(COPY ${PROJECT_BINARY_DIR}/${STAN}/src/test/test-models/stanc.cpp
+            DESTINATION ${PROJECT_BINARY_DIR}/stan-build/)
+
+    if(NOT EXISTS ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/stan/version.hpp)
         message(SEND_ERROR "Not able to find or download stan.")
     endif()
 endif()

@@ -1,3 +1,4 @@
+file(GLOB_RECURSE stan_sources ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/*.cpp)
 file(GLOB_RECURSE vinecopulib_sources src/*.cpp src/*.cc src/*c)
 file(GLOB_RECURSE vinecopulib_bicop_headers include/vinecopulib/bicop/*.hpp)
 file(GLOB_RECURSE vinecopulib_vinecop_headers include/vinecopulib/vinecop/*.hpp)
@@ -9,9 +10,9 @@ include_directories(SYSTEM ${external_includes})
 include_directories(include)
 
 if (BUILD_SHARED_LIBS)
-    add_library(vinecopulib SHARED ${vinecopulib_sources})
+    add_library(vinecopulib SHARED ${stan_sources} ${vinecopulib_sources})
 else()
-    add_library(vinecopulib STATIC ${vinecopulib_sources})
+    add_library(vinecopulib STATIC ${stan_sources} ${vinecopulib_sources})
 endif()
 
 # TODO: Properly use VINECOPULIB_EXPORT to reduce the number of exports
