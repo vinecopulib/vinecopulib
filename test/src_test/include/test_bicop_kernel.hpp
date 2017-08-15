@@ -53,5 +53,10 @@ namespace test_bicop_kernel {
         auto pdf_flipped = bicop_.pdf(u);
         EXPECT_TRUE(pdf.isApprox(pdf_flipped, 1e-10));
     }
-
+    
+    TEST_F(TrafokernelTest, trafo_kernel_tau) {
+        double tau = bicop_.parameters_to_tau(bicop_.get_parameters());
+        EXPECT_GE(tau, -1.0);
+        EXPECT_LE(tau, 1.0);
+    }
 }
