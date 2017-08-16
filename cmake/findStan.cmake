@@ -18,6 +18,11 @@ if(NOT EXISTS ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan_headers/stan/vers
             DESTINATION ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan_headers/stan
             FILES_MATCHING PATTERN "*.h")
 
+    if (BUILD_TESTING)
+        file(COPY ${PROJECT_BINARY_DIR}/${STAN}/src/test/test-models/good/optimization/rosenbrock.stan
+                DESTINATION ${PROJECT_BINARY_DIR}/bin)
+    endif()
+
     if(NOT EXISTS ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan_headers/stan/version.hpp)
         message(SEND_ERROR "Not able to find or download stan.")
     endif()

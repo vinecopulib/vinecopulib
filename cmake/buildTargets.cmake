@@ -30,6 +30,7 @@ target_link_libraries(stanc stan)
 
 if(BUILD_TESTING)
     set(unit_tests
+            test_stan
             test_all
             test_bicop_parametric
             test_bicop_sanity_checks
