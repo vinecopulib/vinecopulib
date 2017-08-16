@@ -141,12 +141,9 @@ install(
         DESTINATION "${config_install_dir}"
 )
 
-if (NOT WIN32)
-    # Install the export set for code coverage
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_TESTING AND CODE_COVERAGE)
-        include(cmake/codeCoverage.cmake)
-        file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/coverage)
-        setup_target_for_coverage(${PROJECT_NAME}_coverage test_all coverage)
-    endif()
+# Install the export set for code coverage
+if(NOT WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_TESTING AND CODE_COVERAGE)
+    include(cmake/codeCoverage.cmake)
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/coverage)
+    setup_target_for_coverage(${PROJECT_NAME}_coverage test_all coverage)
 endif()
-

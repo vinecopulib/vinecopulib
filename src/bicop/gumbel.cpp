@@ -5,6 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/bicop/gumbel.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 #include <cmath>
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 

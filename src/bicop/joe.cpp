@@ -5,6 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/bicop/joe.hpp>
+#include <cmath>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/log1p.hpp>

@@ -23,6 +23,9 @@ namespace vinecopulib
     {
     friend class Bicop;
     
+    public:
+        virtual ~AbstractBicop() = 0;
+        
     protected:
         // Factories
         static std::shared_ptr<AbstractBicop> create(
