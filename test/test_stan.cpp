@@ -5,6 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include "src_test/include/test_stan.hpp"
+#include "src_test/include/test_stan2.hpp"
 
 using namespace test_stan;
 

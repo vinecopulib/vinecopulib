@@ -27,7 +27,6 @@ set(external_includes
         ${EIGEN3_INCLUDE_DIR}
         ${NLOPT_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS}
-        ${STAN_INCLUDE_DIRS}
-        ${STAN_MATH_INCLUDE_DIRS})
+        ${STAN_INCLUDE_DIRS})
 
 set(external_libs ${CMAKE_THREAD_LIBS_INIT} ${NLOPT_LIBRARIES} ${Boost_LIBRARIES})
