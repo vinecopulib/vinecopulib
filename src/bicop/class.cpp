@@ -311,7 +311,7 @@ namespace vinecopulib
     //!
     //! @param parameters the parameters (must be a valid parametrization of
     //!     the current family).
-    double Bicop::parameters_to_tau(const Eigen::VectorXd& parameters)
+    double Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
     {
         double tau = bicop_->parameters_to_tau(parameters);
         if (tools_stl::is_member(rotation_, {90, 270})) {

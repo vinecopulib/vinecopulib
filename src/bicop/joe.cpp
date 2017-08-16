@@ -74,7 +74,7 @@ namespace vinecopulib
         return tools_eigen::invert_f(tau2, f, 1+1e-6, 100);
     }
 
-    double JoeBicop::parameters_to_tau(const Eigen::VectorXd& parameters)
+    double JoeBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
     {
         double par = parameters(0);
         double tau = 2 / par + 1;
