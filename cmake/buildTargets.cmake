@@ -1,7 +1,3 @@
-file(GLOB_RECURSE stan_sources_inst
-        ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/stan/lang/*_inst.cpp)
-file(GLOB_RECURSE stan_sources_def
-        ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan/stan/lang/*_def.cpp)
 file(GLOB_RECURSE vinecopulib_sources src/*.cpp src/*.cc src/*c)
 file(GLOB_RECURSE vinecopulib_bicop_headers include/vinecopulib/bicop/*.hpp)
 file(GLOB_RECURSE vinecopulib_vinecop_headers include/vinecopulib/vinecop/*.hpp)
@@ -12,29 +8,27 @@ file(GLOB_RECURSE vinecopulib_version_header include/version.hpp)
 include_directories(SYSTEM ${external_includes})
 include_directories(include)
 
+add_library(stan STATIC ${stan_sources_inst} ${stan_sources_def})
 if (BUILD_SHARED_LIBS)
-    add_library(vinecopulib SHARED
-            ${stan_sources_inst}
-            ${stan_sources_def}
-            ${vinecopulib_sources})
+    add_library(vinecopulib SHARED ${vinecopulib_sources})
 else()
-    add_library(vinecopulib STATIC
-            ${stan_sources_inst}
-            ${stan_sources_def}
-            ${vinecopulib_sources})
+    add_library(vinecopulib STATIC ${vinecopulib_sources})
 endif()
 
 # TODO: Properly use VINECOPULIB_EXPORT to reduce the number of exports
 #include(GenerateExportHeader)
 #generate_export_header(vinecopulib)
 
-target_link_libraries(vinecopulib ${external_libs})
+target_link_libraries(vinecopulib ${external_libs} stan)
 
 set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
 
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+add_executable(stanc ${stanc_source})
+target_link_libraries(stanc stan)
+
 if(BUILD_TESTING)
-    set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
     set(unit_tests
             test_all
             test_bicop_parametric
@@ -93,7 +87,7 @@ configure_package_config_file(
 # Targets:
 #   * <prefix>/lib/libvinecopulib.dylib
 install(
-        TARGETS vinecopulib
+        TARGETS vinecopulib stan
         EXPORT "${targets_export_name}"
         LIBRARY DESTINATION "lib"
         ARCHIVE DESTINATION "lib"

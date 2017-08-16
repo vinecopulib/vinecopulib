@@ -8,6 +8,7 @@
 
 #include "parbicop_test.hpp"
 #include "rscript.hpp"
+#include <vinecopulib/misc/tools_os.hpp>
 
 namespace test_bicop_parametric {
     using namespace vinecopulib;
@@ -32,7 +33,7 @@ namespace test_bicop_parametric {
             Eigen::MatrixXd results = tools_eigen::read_matxd("temp");
 
             // Remove temp file
-            cmd = rm + "temp";
+            cmd = tools_os::rm + "temp";
             sys_exit_code += system(cmd.c_str());
             if (sys_exit_code != 0) {
                 throw std::runtime_error("error in system call");

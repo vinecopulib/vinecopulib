@@ -20,10 +20,8 @@ else ( NLOPT_INCLUDE_DIRS )
 endif()
 
 set(STAN_VERSION "2.16.0")
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/findStan.cmake)
-
 set(STAN_MATH_VERSION "2.16.0")
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/findStanMath.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/findStan.cmake)
 
 set(external_includes
         ${EIGEN3_INCLUDE_DIR}

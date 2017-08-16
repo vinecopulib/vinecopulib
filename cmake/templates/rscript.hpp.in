@@ -9,9 +9,3 @@
 #define RSCRIPT "@RSCRIPT_EXECUTABLE@ --vanilla "
 #define TEST_BICOP "@PROJECT_BINARY_DIR@/test/test_bicop_parametric.R"
 #define TEST_VINECOP "@PROJECT_BINARY_DIR@/test/test_vinecop_parametric.R"
-
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-    static const std::string rm="del ";
-#else
-    static const std::string rm="rm ";
-#endif

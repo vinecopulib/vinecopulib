@@ -25,7 +25,7 @@ VinecopTest::VinecopTest() {
     sim = temp.block(0,m+1,n,m);
 
     // remove temp files
-    cmd = rm + "temp temp2 temp3";
+    cmd = vinecopulib::tools_os::rm + "temp temp2 temp3";
     sys_exit_code += system(cmd.c_str());
     if (sys_exit_code != 0) {
         throw std::runtime_error("error in system call");

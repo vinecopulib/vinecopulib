@@ -7,7 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "rscript.hpp"
+#include <vinecopulib/misc/tools_os.hpp>
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/vinecop/class.hpp>
 
@@ -21,7 +21,7 @@ namespace test_serialization {
         Bicop pc2("temp");
 
         // Remove temp file
-        std::string cmd = rm + "temp";
+        std::string cmd = tools_os::rm + "temp";
         int sys_exit_code = system(cmd.c_str());
         if (sys_exit_code != 0) {
                 throw std::runtime_error("error in system call");
@@ -40,7 +40,7 @@ namespace test_serialization {
         auto vc2 = Vinecop("temp");
 
         // Remove temp file
-        std::string cmd = rm + "temp";
+        std::string cmd = tools_os::rm + "temp";
         int sys_exit_code = system(cmd.c_str());
         if (sys_exit_code != 0) {
             throw std::runtime_error("error in system call");
