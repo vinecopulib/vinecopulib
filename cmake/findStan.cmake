@@ -51,5 +51,5 @@ file(GLOB_RECURSE stan_sources_inst
 file(GLOB_RECURSE stan_sources_def
         ${PROJECT_BINARY_DIR}/${STAN}/src/stan/lang/*_def.cpp)
 
-set(stanc_source ${PROJECT_BINARY_DIR}/${STAN}/src/test/test-models/stanc.cpp)
+#set(stanc_source ${PROJECT_BINARY_DIR}/${STAN}/src/test/test-models/stanc.cpp)
 set(STAN_INCLUDE_DIRS ${PROJECT_BINARY_DIR}/generated/vinecopulib/stan_headers)

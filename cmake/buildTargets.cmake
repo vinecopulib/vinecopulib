@@ -24,11 +24,11 @@ target_link_libraries(vinecopulib ${external_libs} stan)
 set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-add_executable(stanc ${stanc_source})
-target_link_libraries(stanc stan)
+#add_executable(stanc ${stanc_source})
+#target_link_libraries(stanc stan)
 
 if(BUILD_TESTING)
+    set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
     set(unit_tests
             test_stan
             test_all
