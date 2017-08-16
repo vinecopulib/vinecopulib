@@ -29,14 +29,14 @@ before_install:
 
 install:
   ### LINUX
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y lcov libgsl0-dev libeigen3-dev libboost1.63-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y lcov libgsl0-dev libeigen3-dev libboost1.62-dev; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev g++; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y doxygen doxygen-doc doxygen-gui graphviz; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get autoremove; fi # in particular remove old compilers so that new ones are the default
   - if [ $TRAVIS_OS_NAME == linux ]; then export R_PACKAGES='c("VineCopula")'; fi
 
   ### OSX
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew upgrade && brew tap homebrew/science && brew install lcov eigen gsl; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew upgrade && brew tap homebrew/science && brew install gcc lcov eigen gsl; fi
 
   - if [ $TRAVIS_OS_NAME == osx ]; then rm /usr/local/include/c++; fi # https://github.com/Homebrew/brew/issues/1742#issuecomment-277308817
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install r; fi
