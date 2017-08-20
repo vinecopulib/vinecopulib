@@ -59,8 +59,8 @@ namespace vinecopulib
         double det_irB = irB.determinant();
         Eigen::Matrix2d iB = B.inverse();
 
-        Eigen::MatrixXd z = (irB.inverse() * x.transpose()).transpose();
-        Eigen::MatrixXd z_data = (irB.inverse() * x_data.transpose()).transpose();
+        Eigen::MatrixXd z = (irB * x.transpose()).transpose();
+        Eigen::MatrixXd z_data = (irB * x_data.transpose()).transpose();
 
         size_t n = x.rows();
         size_t m = x_data.rows();
