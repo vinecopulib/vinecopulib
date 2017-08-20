@@ -8,7 +8,6 @@
 #include <vinecopulib/bicop/family.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 
-#include <iostream>
 namespace vinecopulib
 {
     TllBicop::TllBicop()
@@ -61,55 +60,39 @@ namespace vinecopulib
         Eigen::Matrix2d iB = B.inverse();
 
         Eigen::MatrixXd z = (irB.inverse() * x.transpose()).transpose();
-        Eigen::MatrixXd z_data = (B.inverse() * x_data.transpose()).transpose();
+        Eigen::MatrixXd z_data = (irB.inverse() * x_data.transpose()).transpose();
 
         size_t n = x.rows();
         size_t m = x_data.rows();
         double f0;
         Eigen::Vector2d f1, b;
         Eigen::MatrixXd f2, S;
-        Eigen::MatrixXd zz(n,2), zz2(n,2), kernels(n,2);
-        Eigen::VectorXd res = Eigen::VectorXd::Constant(1, n);
+        Eigen::VectorXd kernels(m);
+        Eigen::MatrixXd zz(m, 2), zz2(m, 2);
+        Eigen::VectorXd res = Eigen::VectorXd::Ones(n);
         if (method == "linear") {
             S = B;
         }
-        std::cout << method << std::endl;
         for (size_t k = 0; k < n; ++k) {
-            std::cout << k << std::endl;
-            std::cout << "--" << std::endl;
             zz = z_data - z.row(k).replicate(m, 1);
             kernels = gaussian_kernel_2d(zz);
             f0 = kernels.mean() * det_irB;
             if (method != "constant") {
-                std::cout << k << std::endl;
-                std::cout << "--" << std::endl;
                 zz = (irB.inverse() * zz.transpose()).transpose();
                 f1(0) = zz.col(0).cwiseProduct(kernels).mean() * det_irB;
                 f1(1) = zz.col(1).cwiseProduct(kernels).mean() * det_irB;
                 if (method == "linear") {
-                    std::cout << "imhere" << std::endl;
                     b(0) = f1(0) / f0;
                     b(1) = f1(1) / f0;
                 } else {
-                    std::cout << k << std::endl;
-                    std::cout << "--" << std::endl;
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
                     f2 = zz.transpose() * zz2 * det_irB -  iB * f0;
                     b = B * f1 / f0;
                     S = ((B * f2 * B) / f0 + B - b * b.transpose()).inverse();
-                    std::cout << k << std::endl;
-                    std::cout << "--" << std::endl;
-                    std::cout << S << std::endl;
-                    std::cout << "--" << std::endl;
-                    std::cout << S.determinant() << std::endl;
-                    std::cout << "--" << std::endl;
                     res(k) *= std::pow(S.determinant() / det_irB, 1/2);
                 }
-                std::cout << "--" << std::endl;
                 res(k) *= std::exp(- (1 / 2) * double(b.transpose() * S * b));
-                std::cout << k << std::endl;
-                std::cout << "--------------" << std::endl;
             }
             res(k) *= f0;
         }

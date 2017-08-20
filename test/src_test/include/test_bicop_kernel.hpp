@@ -11,19 +11,19 @@
 namespace test_bicop_kernel {
     using namespace vinecopulib;
 
-    TEST_F(TrafokernelTest, trafo_kernel_sanity_checks) {
+    TEST_P(TrafokernelTest, trafo_kernel_sanity_checks) {
         auto values = bicop_.get_parameters();
         EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0,0,30,1)));
         EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0,0,1,30)));
         EXPECT_ANY_THROW(bicop_.set_parameters(-1*values));
     }
     
-    TEST_F(TrafokernelTest, trafo_kernel_fit) {
-        bicop_.fit(u);
+    TEST_P(TrafokernelTest, trafo_kernel_fit) {
+        bicop_.fit(u, controls);
     }
     
-    TEST_F(TrafokernelTest, trafo_kernel_eval_funcs) {
-        bicop_.fit(u);
+    TEST_P(TrafokernelTest, trafo_kernel_eval_funcs) {
+        bicop_.fit(u, controls);
     
         EXPECT_GE(bicop_.pdf(u).minCoeff(), 0.0);
     
@@ -41,12 +41,12 @@ namespace test_bicop_kernel {
         EXPECT_LE(bicop_.calculate_npars(), 100.0);
     }
     
-    TEST_F(TrafokernelTest, trafo_kernel_select) {
+    TEST_P(TrafokernelTest, trafo_kernel_select) {
         auto newcop = Bicop(u, FitControlsBicop({BicopFamily::tll}));
         EXPECT_EQ(newcop.get_family(), BicopFamily::tll);
     }
     
-    TEST_F(TrafokernelTest, trafo_kernel_flip) {
+    TEST_P(TrafokernelTest, trafo_kernel_flip) {
         auto pdf = bicop_.pdf(u);
         u.col(0).swap(u.col(1));
         bicop_.flip();
@@ -54,9 +54,16 @@ namespace test_bicop_kernel {
         EXPECT_TRUE(pdf.isApprox(pdf_flipped, 1e-10));
     }
     
-    TEST_F(TrafokernelTest, trafo_kernel_tau) {
+    TEST_P(TrafokernelTest, trafo_kernel_tau) {
         double tau = bicop_.parameters_to_tau(bicop_.get_parameters());
         EXPECT_GE(tau, -1.0);
         EXPECT_LE(tau, 1.0);
     }
+
+
+    INSTANTIATE_TEST_CASE_P(
+            TrafokernelTest,
+            TrafokernelTest,
+            ::testing::Values("constant", "linear", "quadratic")
+    );
 }

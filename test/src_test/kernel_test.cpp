@@ -9,5 +9,6 @@
 
 TrafokernelTest::TrafokernelTest() {
     bicop_ = Bicop(vinecopulib::BicopFamily::tll, 0);
+    controls = FitControlsBicop(GetParam(), 1.0);
     u = tools_stats::simulate_uniform(100, 2);
 }
