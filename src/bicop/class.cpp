@@ -409,8 +409,14 @@ namespace vinecopulib
     void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                     FitControlsBicop controls)
     {
-
-        bicop_->fit(cut_and_rotate(data), controls.get_parametric_method(),
+        std::string method;
+        if (tools_stl::is_member(bicop_->get_family(),
+                                 bicop_families::parametric)) {
+            method = controls.get_parametric_method();
+        } else {
+            method = controls.get_nonparametric_method();
+        }
+        bicop_->fit(cut_and_rotate(data), method,
                     controls.get_nonparametric_mult());
     }
 

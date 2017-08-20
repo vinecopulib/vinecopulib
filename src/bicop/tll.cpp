@@ -73,18 +73,26 @@ namespace vinecopulib
         if (method == "linear") {
             S = B;
         }
+        std::cout << method << std::endl;
         for (size_t k = 0; k < n; ++k) {
+            std::cout << k << std::endl;
+            std::cout << "--" << std::endl;
             zz = z_data - z.row(k).replicate(m, 1);
             kernels = gaussian_kernel_2d(zz);
             f0 = kernels.mean() * det_irB;
             if (method != "constant") {
+                std::cout << k << std::endl;
+                std::cout << "--" << std::endl;
                 zz = (irB.inverse() * zz.transpose()).transpose();
                 f1(0) = zz.col(0).cwiseProduct(kernels).mean() * det_irB;
                 f1(1) = zz.col(1).cwiseProduct(kernels).mean() * det_irB;
                 if (method == "linear") {
+                    std::cout << "imhere" << std::endl;
                     b(0) = f1(0) / f0;
                     b(1) = f1(1) / f0;
                 } else {
+                    std::cout << k << std::endl;
+                    std::cout << "--" << std::endl;
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
                     f2 = zz.transpose() * zz2 * det_irB -  iB * f0;
