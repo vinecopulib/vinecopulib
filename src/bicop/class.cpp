@@ -307,7 +307,7 @@ namespace vinecopulib
     }
 
     //! converts the parameters to the Kendall's \f$ tau \f$ for the current
-    //! family (works for all families but `BicopFamily::tll0`).
+    //! family (works for all families but `BicopFamily::tll`).
     //!
     //! @param parameters the parameters (must be a valid parametrization of
     //!     the current family).

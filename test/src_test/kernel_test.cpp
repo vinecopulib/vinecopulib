@@ -8,6 +8,6 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 
 TrafokernelTest::TrafokernelTest() {
-    bicop_ = Bicop(vinecopulib::BicopFamily::tll0, 0);
+    bicop_ = Bicop(vinecopulib::BicopFamily::tll, 0);
     u = tools_stats::simulate_uniform(100, 2);
 }
