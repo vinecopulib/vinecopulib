@@ -128,17 +128,10 @@ namespace vinecopulib
 
         // compute the density estimator
         Eigen::VectorXd f = ftll(z, z_data, B, method);
-        size_t i = 0;
-        size_t j = 0;
+        
+        // store values in mxm grid
         Eigen::MatrixXd values(m, m);
-        for (size_t k = 0; k < m * m; ++k) {
-            values(j, i) = f(k);
-            ++i;
-            if (i % m == 0) {
-                i = 0;
-                ++j;
-            }
-        }
+        values = Eigen::Map<Eigen::MatrixXd>(f.data(), m, m).transpose();
 
         // for interpolation, we shift the limiting gridpoints to 0 and 1
         grid_points(0) = 0.0;
