@@ -48,14 +48,25 @@ namespace vinecopulib
         return mult * cov;
     }
 
+    Eigen::Matrix2d chol22(const Eigen::Matrix2d& B) {
+
+        Eigen::Matrix2d rB;
+
+        rB(0,0) = std::sqrt(B(0,0));
+        rB(0,1) = 0.0;
+        rB(1,0) = B(1,0) / rB(0,0);
+        rB(1,1) = std::sqrt( B(1, 1) - rB(1, 0) * rB(1, 0));
+
+        return rB;
+    }
+
     Eigen::VectorXd TllBicop::ftll(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& x_data,
-            Eigen::Matrix2d& B,
+            const Eigen::Matrix2d& B,
             std::string method)
     {
-        Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> takes_root(B);
-        Eigen::Matrix2d irB = takes_root.operatorSqrt().inverse();
+        Eigen::Matrix2d irB = chol22(B).inverse();
         double det_irB = irB.determinant();
         Eigen::Matrix2d iB = B.inverse();
 
@@ -118,17 +129,16 @@ namespace vinecopulib
         Eigen::Matrix<double, Eigen::Dynamic, 2> z = tools_stats::qnorm(grid_2d);
         Eigen::Matrix<double, Eigen::Dynamic, 2> z_data = tools_stats::qnorm(data);
 
-        // apply normal density to z (used later for normalization)
-        Eigen::Matrix<double, Eigen::Dynamic, 2> phi = tools_stats::dnorm(z);
-        Eigen::Matrix<double, Eigen::Dynamic, 2> phi_data = tools_stats::dnorm(z_data);
-
         // find bandwidth matrix
         Eigen::Matrix2d B = bandwidth(z_data, method);
         B *= mult;
 
         // compute the density estimator
         Eigen::VectorXd f = ftll(z, z_data, B, method);
-        
+
+        // apply normal density to z (used later for normalization)
+        f = f.cwiseQuotient(tools_stats::dnorm(z).rowwise().prod());
+
         // store values in mxm grid
         Eigen::MatrixXd values(m, m);
         values = Eigen::Map<Eigen::MatrixXd>(f.data(), m, m).transpose();
@@ -140,7 +150,7 @@ namespace vinecopulib
 
         // compute effective number of parameters
         double K0 = gaussian_kernel_2d(Eigen::MatrixXd::Constant(1, 2, 0.0))(0);
-        Eigen::VectorXd scale = phi_data.rowwise().prod();
+        Eigen::VectorXd scale = tools_stats::dnorm(z_data).rowwise().prod();
         npars_ =  K0 / B.determinant() / (scale.array() * this->pdf(data).array()).mean();
     }
 }
