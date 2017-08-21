@@ -87,17 +87,14 @@ namespace vinecopulib
             f0 = kernels.mean();
             if (method != "constant") {
                 zz = (irB * zz.transpose()).transpose();
-                b(0) = zz.col(0).cwiseProduct(kernels).mean() / f0;
-                b(1) = zz.col(1).cwiseProduct(kernels).mean() / f0;
+                b = zz.cwiseProduct(kernels.replicate(1, 2)).colwise().mean() / f0;
                 if (method == "quadratic") {
-                    zz2.col(0) = zz.col(0).cwiseProduct(kernels) /
-                            (f0 * (double) n);
-                    zz2.col(1) = zz.col(1).cwiseProduct(kernels) /
-                            (f0 * (double) n);
+                    zz2 = zz.cwiseProduct(kernels.replicate(1, 2)) /
+                          (f0 * (double) n);
                     b = B * b;
                     S = (B * (zz.transpose() * zz2) * B -
-                            b * b.transpose()).inverse();
-                    res(k) *= std::pow(S.determinant(), 0.5) / det_irB;
+                         b * b.transpose()).inverse();
+                    res(k) *= std::sqrt(S.determinant()) / det_irB;
                 }
                 res(k) *= std::exp(- 0.5 * double(b.transpose() * S * b));
             }
@@ -137,7 +134,7 @@ namespace vinecopulib
         // store values in mxm grid
         Eigen::MatrixXd values(m, m);
         values = Eigen::Map<Eigen::MatrixXd>(f.data(), m, m).transpose();
-
+        
         // for interpolation, we shift the limiting gridpoints to 0 and 1
         grid_points(0) = 0.0;
         grid_points(m - 1) = 1.0;
