@@ -68,7 +68,6 @@ namespace vinecopulib
     {
         Eigen::Matrix2d irB = chol22(B).inverse();
         double det_irB = irB.determinant();
-        Eigen::Matrix2d iB = B.inverse();
 
         Eigen::MatrixXd z = (irB * x.transpose()).transpose();
         Eigen::MatrixXd z_data = (irB * x_data.transpose()).transpose();
@@ -76,8 +75,8 @@ namespace vinecopulib
         size_t m = x.rows();
         size_t n = x_data.rows();
         double f0;
-        Eigen::Vector2d f1, b;
-        Eigen::MatrixXd f2, S(B);
+        Eigen::Vector2d b;
+        Eigen::Matrix2d S(B);
         Eigen::VectorXd kernels(n);
         Eigen::MatrixXd zz(n, 2), zz2(n, 2);
         Eigen::VectorXd res = Eigen::VectorXd::Ones(m);
@@ -85,25 +84,22 @@ namespace vinecopulib
         for (size_t k = 0; k < m; ++k) {
             zz = z_data - z.row(k).replicate(n, 1);
             kernels = gaussian_kernel_2d(zz);
-            f0 = kernels.mean() * det_irB;
+            f0 = kernels.mean();
             if (method != "constant") {
                 zz = (irB * zz.transpose()).transpose();
-                f1(0) = zz.col(0).cwiseProduct(kernels).mean() * det_irB;
-                f1(1) = zz.col(1).cwiseProduct(kernels).mean() * det_irB;
-                if (method == "linear") {
-                    b(0) = f1(0) / f0;
-                    b(1) = f1(1) / f0;
-                } else {
+                b(0) = zz.col(0).cwiseProduct(kernels).mean() / f0;
+                b(1) = zz.col(1).cwiseProduct(kernels).mean() / f0;
+                if (method == "quadratic") {
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
-                    f2 = zz.transpose() * zz2 * det_irB / (double) n -  iB * f0;
-                    b = B * f1 / f0;
-                    S = ((B * f2 * B) / f0 + B - b * b.transpose()).inverse();
-                    res(k) *= std::pow(S.determinant() / det_irB, 0.5);
+                    b = B * b;
+                    S = B * (zz.transpose() * zz2) * B / (f0 * (double) n);
+                    S = (S - b * b.transpose()).inverse();
+                    res(k) *= std::pow(S.determinant(), 0.5) / det_irB;
                 }
                 res(k) *= std::exp(- 0.5 * double(b.transpose() * S * b));
             }
-            res(k) *= f0;
+            res(k) *= f0 * det_irB;
         }
 
         return res;
