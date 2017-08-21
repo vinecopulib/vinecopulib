@@ -91,7 +91,7 @@ namespace vinecopulib
                 b(1) = zz.col(1).cwiseProduct(kernels).mean() / f0;
                 if (method == "quadratic") {
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
-                    zz2.col(0) = zz.col(0).cwiseProduct(kernels);
+                    zz2.col(1) = zz.col(1).cwiseProduct(kernels);
                     b = B * b;
                     S = B * (zz.transpose() * zz2) * B / (f0 * (double) n);
                     S = (S - b * b.transpose()).inverse();
@@ -101,7 +101,6 @@ namespace vinecopulib
             }
             res(k) *= f0 * det_irB;
         }
-
         return res;
     }
 
