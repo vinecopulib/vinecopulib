@@ -7,6 +7,7 @@
 #include <vinecopulib/vinecop/rvine_matrix.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
+#include <iostream>
 namespace vinecopulib
 {
     //! instantiates an RVineMatrix object.
@@ -66,6 +67,42 @@ namespace vinecopulib
         }
 
         return vine_matrix;
+    }
+
+    //! check whether an edge belong to the implied structure
+    //!
+    //! @param conditioned the conditioned set.
+    //! @param conditioning the conditioning set.
+    bool RVineMatrix::belong_to_structure(const std::vector<size_t> conditioned,
+                                          const std::vector<size_t> conditioning) {
+        if (conditioned.size() != 2) {
+            throw std::runtime_error("conditioned should have size 2 ");
+        }
+
+        size_t tree = conditioning.size();
+        std::vector<size_t> conditioning_test(tree);
+        std::vector<size_t> conditioned_test(2);
+        bool res = false;
+        std::cout << tree << std::endl;
+        if (tree + 2 <= d_) {
+            for (size_t i = 0; i < d_ - tree - 1; ++i) {
+                conditioned_test[0] = matrix_(tree, i);
+                conditioned_test[1] = matrix_(d_ - 1 - i, i);
+                bool conditioned_ok = tools_stl::is_same_set(conditioned,
+                                                             conditioned_test);
+                if (conditioned_ok) {
+                    auto cond = matrix_.block(0, i, tree, 1);
+                    Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&conditioning_test[0], tree) = cond;
+                    res = tools_stl::is_same_set(conditioning,
+                                                 conditioning_test);
+                }
+
+                if (res)
+                    break;
+            }
+        }
+
+        return res;
     }
 
 

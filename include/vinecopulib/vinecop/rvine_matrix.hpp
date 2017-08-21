@@ -75,6 +75,8 @@ namespace vinecopulib
 
         static Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> 
         construct_d_vine_matrix(const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order);
+        bool belong_to_structure(const std::vector<size_t> conditioned,
+                                 const std::vector<size_t> conditioning);
 
     private:
         void check_if_quadratic() const;
