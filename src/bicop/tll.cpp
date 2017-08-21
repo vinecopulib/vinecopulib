@@ -77,19 +77,17 @@ namespace vinecopulib
         size_t m = x_data.rows();
         double f0;
         Eigen::Vector2d f1, b;
-        Eigen::MatrixXd f2, S;
+        Eigen::MatrixXd f2, S(B);
         Eigen::VectorXd kernels(m);
         Eigen::MatrixXd zz(m, 2), zz2(m, 2);
         Eigen::VectorXd res = Eigen::VectorXd::Ones(n);
-        if (method == "linear") {
-            S = B;
-        }
+
         for (size_t k = 0; k < n; ++k) {
             zz = z_data - z.row(k).replicate(m, 1);
             kernels = gaussian_kernel_2d(zz);
             f0 = kernels.mean() * det_irB;
             if (method != "constant") {
-                zz = (irB.inverse() * zz.transpose()).transpose();
+                zz = (irB * zz.transpose()).transpose();
                 f1(0) = zz.col(0).cwiseProduct(kernels).mean() * det_irB;
                 f1(1) = zz.col(1).cwiseProduct(kernels).mean() * det_irB;
                 if (method == "linear") {
@@ -98,12 +96,12 @@ namespace vinecopulib
                 } else {
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
-                    f2 = zz.transpose() * zz2 * det_irB -  iB * f0;
+                    f2 = zz.transpose() * zz2 * det_irB / (double) m -  iB * f0;
                     b = B * f1 / f0;
                     S = ((B * f2 * B) / f0 + B - b * b.transpose()).inverse();
-                    res(k) *= std::pow(S.determinant() / det_irB, 1/2);
+                    res(k) *= std::pow(S.determinant() / det_irB, 0.5);
                 }
-                res(k) *= std::exp(- (1 / 2) * double(b.transpose() * S * b));
+                res(k) *= std::exp(- 0.5 * double(b.transpose() * S * b));
             }
             res(k) *= f0;
         }
