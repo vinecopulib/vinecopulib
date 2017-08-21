@@ -51,7 +51,7 @@ namespace vinecopulib
     Eigen::VectorXd TllBicop::ftll(
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
             const Eigen::Matrix<double, Eigen::Dynamic, 2>& x_data,
-            Eigen::Matrix2d B,
+            Eigen::Matrix2d& B,
             std::string method)
     {
         Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> takes_root(B);
