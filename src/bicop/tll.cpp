@@ -87,8 +87,7 @@ namespace vinecopulib
             f0 = kernels.mean();
             if (method != "constant") {
                 zz = (irB * zz.transpose()).transpose();
-                b(0) = zz.col(0).cwiseProduct(kernels).mean() / f0;
-                b(1) = zz.col(1).cwiseProduct(kernels).mean() / f0;
+                b = zz.cwiseProduct(kernels).colwise().mean() / f0;
                 if (method == "quadratic") {
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
                     zz2.col(0) = zz.col(0).cwiseProduct(kernels);
