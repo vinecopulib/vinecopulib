@@ -89,8 +89,7 @@ namespace vinecopulib
                 zz = (irB * zz.transpose()).transpose();
                 b = zz.cwiseProduct(kernels).colwise().mean() / f0;
                 if (method == "quadratic") {
-                    zz2.col(0) = zz.col(0).cwiseProduct(kernels);
-                    zz2.col(0) = zz.col(0).cwiseProduct(kernels);
+                    zz2 = zz.cwiseProduct(kernels);
                     b = B * b;
                     S = B * (zz.transpose() * zz2) * B / (f0 * (double) n);
                     S = (S - b * b.transpose()).inverse();
