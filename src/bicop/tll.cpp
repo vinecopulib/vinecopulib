@@ -90,11 +90,13 @@ namespace vinecopulib
                 b(0) = zz.col(0).cwiseProduct(kernels).mean() / f0;
                 b(1) = zz.col(1).cwiseProduct(kernels).mean() / f0;
                 if (method == "quadratic") {
-                    zz2.col(0) = zz.col(0).cwiseProduct(kernels);
-                    zz2.col(1) = zz.col(1).cwiseProduct(kernels);
+                    zz2.col(0) = zz.col(0).cwiseProduct(kernels) /
+                            (f0 * (double) n);
+                    zz2.col(1) = zz.col(1).cwiseProduct(kernels) /
+                            (f0 * (double) n);
                     b = B * b;
-                    S = B * (zz.transpose() * zz2) * B / (f0 * (double) n);
-                    S = (S - b * b.transpose()).inverse();
+                    S = (B * (zz.transpose() * zz2) * B -
+                            b * b.transpose()).inverse();
                     res(k) *= std::pow(S.determinant(), 0.5) / det_irB;
                 }
                 res(k) *= std::exp(- 0.5 * double(b.transpose() * S * b));
