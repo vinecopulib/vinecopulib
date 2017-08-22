@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include <vinecopulib/vinecop/rvine_matrix.hpp>
+#include <iostream>
 
 namespace test_rvine_matrix {
     using namespace vinecopulib;
@@ -120,14 +121,15 @@ namespace test_rvine_matrix {
                7, 3, 0, 0, 0, 0, 0,
                4, 0, 0, 0, 0, 0, 0;
         RVineMatrix rvine_matrix(mat);
-
+        
         // conditioned set size is equal to 2
         std::vector<size_t> conditioned0 = {0,1,2,3};
         std::vector<size_t> conditioning0 = {0,1,2,3};
         EXPECT_ANY_THROW(rvine_matrix.belongs_to_structure(conditioned0,
                                                            conditioning0));
+        
         std::vector<size_t> conditioned1 = {4, 5};
-        std::vector<size_t> conditioning1 = {};
+        std::vector<size_t> conditioning1(0);
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned1,
                                                       conditioning1));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned1,
@@ -139,14 +141,13 @@ namespace test_rvine_matrix {
                                                        conditioning1));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned1,
                                                        conditioning0));
-
         conditioned1[0] = 5;
         conditioned1[1] = 6;
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned1,
                                                       conditioning1));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned1,
                                                        conditioning0));
-
+        
         std::vector<size_t> conditioned2 = {4, 6};
         std::vector<size_t> conditioning2 = {5};
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned2,
@@ -158,7 +159,6 @@ namespace test_rvine_matrix {
         conditioning2[0] = 6;
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
                                                        conditioning2));
-
         conditioned2[0] = 2;
         conditioned2[1] = 5;
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned2,
@@ -167,7 +167,7 @@ namespace test_rvine_matrix {
                                                        conditioning1));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
                                                        conditioning0));
-
+        
         std::vector<size_t> conditioned3 = {1, 5};
         std::vector<size_t> conditioning3 = {6, 2};
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned3,
