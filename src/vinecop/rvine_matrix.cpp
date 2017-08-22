@@ -98,13 +98,13 @@ namespace vinecopulib
             for (size_t i = 0; i < d_ - tree - 1; ++i) {
                 conditioned_mat = {matrix_(d_ - 1 - i, i), matrix_(tree, i)};
                 if (conditioned == conditioned_mat) {
+                    // conditioned sets equal, need to check conditioning set
                     if (tree == 0) {
                         return true;  // conditioning set is empty for tree == 0
                     }
                     auto cond = matrix_.col(i).head(tree);
                     Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(
-                        &conditioning_test[0], tree
-                    ) = cond;
+                        &conditioning_test[0], tree) = cond;
                     if (tools_stl::is_same_set(conditioning, conditioning_mat)) {
                         return true;
                     }
