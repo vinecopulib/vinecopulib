@@ -371,26 +371,21 @@ namespace tools_select {
 
     bool FamilySelector::belongs_to_structure(size_t v0, size_t v1,
                                               const VineTree& vine_tree) {
-        
         // -1 means no common neighbor in previous tree
         if (find_common_neighbor(v0, v1, vine_tree) > -1) {
-            // conditioned sets
-            auto conditioned0 = vine_tree[v0].conditioned;
-            auto conditioned1 = vine_tree[v1].conditioned;
-
             std::vector<size_t> conditioning;
             std::vector<size_t> conditioned(2);
-            if (conditioned0.size() == 1) {
-                conditioned = {conditioned0[0], conditioned1[0]};
+            if (vine_tree[v0].conditioned.size() == 1) {
+                // first tree
+                conditioned = cat(vine_tree[v0].conditioned,
+                                  vine_tree[v1].conditioned);
                 conditioning = {};
             } else {
-                // add conditioning sets
-                auto all0 = cat(conditioned0, vine_tree[v0].conditioning);
-                auto all1 = cat(conditioned1, vine_tree[v1].conditioning);
-
                 // compute new conditioned/conditioning sets
-                conditioned = set_sym_diff(all0, all1);
-                conditioning = intersect(all0, all1);
+                conditioned = set_sym_diff(vine_tree[v0].all_indices,
+                                           vine_tree[v1].all_indices);
+                conditioning = intersect(vine_tree[v0].all_indices,
+                                         vine_tree[v1].all_indices);
             }
 
             // to convert from vinecop to rvine_matrix indices
