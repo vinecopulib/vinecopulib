@@ -17,6 +17,8 @@ namespace vinecopulib
         truncation_level_ = std::numeric_limits<int>::max();
         threshold_ = 0.0;
         tree_criterion_ = "tau";
+        select_truncation_level_ = false;
+        select_threshold_ = false;
         show_trace_ = false;
     }
 
@@ -30,6 +32,10 @@ namespace vinecopulib
     //! @param threshold for thresholded vines (0 = no threshold).
     //! @param selection_criterion see FitControlsBicop.
     //! @param preselect_families see FitControlsBicop.
+    //! @param select_truncation_level whether the truncation shall be selected
+    //!     automatically.
+    //! @param select_threshold whether the threshold parameter shall be 
+    //!     selected automatically.
     //! @param show_trace whether to show a trace of the building progress.
     FitControlsVinecop::FitControlsVinecop(std::vector<BicopFamily> family_set,
                                            std::string parametric_method,
@@ -40,6 +46,8 @@ namespace vinecopulib
                                            double threshold,
                                            std::string selection_criterion,
                                            bool preselect_families,
+                                           bool select_truncation_level,
+                                           bool select_threshold,
                                            bool show_trace) :
             FitControlsBicop(family_set,
                              parametric_method,
@@ -56,6 +64,8 @@ namespace vinecopulib
         threshold_ = threshold;
         tree_criterion_ = tree_criterion;
         show_trace_ = show_trace;
+        select_truncation_level_ = select_truncation_level;
+        select_threshold_ = select_threshold;
     }
 
     //! creates custom controls for fitting vine copula models.
@@ -64,11 +74,17 @@ namespace vinecopulib
     //!     tree ("tau", "hoeffd" and "rho" implemented so far).
     //! @param threshold for thresholded vines (0 = no threshold).
     //! @param show_trace whether to show a trace of the building progress.
+    //! @param select_truncation_level whether the truncation shall be selected
+    //!     automatically.
+    //! @param select_threshold whether the threshold parameter shall be 
+    //!     selected automatically.
     //! @param controls see FitControlsBicop.
     FitControlsVinecop::FitControlsVinecop(const FitControlsBicop controls,
                                            size_t truncation_level,
                                            std::string tree_criterion,
                                            double threshold,
+                                           bool select_truncation_level,
+                                           bool select_threshold,
                                            bool show_trace) :
             FitControlsBicop(controls)
     {
@@ -80,6 +96,8 @@ namespace vinecopulib
         threshold_ = threshold;
         tree_criterion_ = tree_criterion;
         show_trace_ = show_trace;
+        select_truncation_level_ = select_truncation_level;
+        select_threshold_ = select_threshold;
     }
 
     //! Sanity checks
@@ -127,6 +145,21 @@ namespace vinecopulib
         return show_trace_;
     }
 
+    bool FitControlsVinecop::get_select_truncation_level()
+    {
+        return select_truncation_level_;
+    }
+        
+    bool FitControlsVinecop::get_select_threshold()
+    {
+        return select_threshold_;
+    }
+    
+    bool FitControlsVinecop::needs_sparse_select()
+    {
+        return (select_truncation_level_ | select_threshold_);
+    }
+    
     FitControlsBicop FitControlsVinecop::get_fit_controls_bicop()
     {
         FitControlsBicop controls_bicop(get_family_set(), 
@@ -159,6 +192,16 @@ namespace vinecopulib
     void FitControlsVinecop::set_show_trace(bool show_trace)
     {
         show_trace_ = show_trace;
+    }
+    
+    void FitControlsVinecop::set_select_truncation_level(bool select_truncation_level)
+    {
+        select_truncation_level_ = select_truncation_level;
+    }
+    
+    void FitControlsVinecop::set_select_threshold(bool select_threshold)
+    {
+        select_threshold_ = select_threshold;
     }
 
     void FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)

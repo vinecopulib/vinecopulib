@@ -5,7 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/bicop/class.hpp>
-#include <vinecopulib/bicop/tools_bicopselect.hpp>
+#include <vinecopulib/bicop/tools_select.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
@@ -462,7 +462,7 @@ namespace vinecopulib
 
         // When using rotations, add only the ones that yield the appropriate
         // association direction.
-        auto tau = tools_stats::pairwise_ktau(data);
+        auto tau = tools_stats::pairwise_tau(data);
         std::vector<int> which_rotations;
         if (tau > 0) {
             which_rotations = {0, 180};
