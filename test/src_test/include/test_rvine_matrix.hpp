@@ -179,8 +179,6 @@ namespace test_rvine_matrix {
                                                       conditioning0));
 
     }
-
-
     
     TEST(rvine_matrix, rvine_matrix_sanity_checks_work) {
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
@@ -226,5 +224,9 @@ namespace test_rvine_matrix {
         wrong_mat(3, 1) = 7;
         wrong_mat(4, 1) = 1;
         EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+
+        // row and col should be smaller than d_
+        EXPECT_ANY_THROW(rvm.get_element(8, 0));
+        EXPECT_ANY_THROW(rvm.get_element(0, 8));
     }
 }

@@ -93,10 +93,10 @@ namespace tools_select {
         void initialize_new_fit(const Eigen::MatrixXd& data);
 
         virtual void add_allowed_edges(VineTree& tree) = 0;
+        Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
         ptrdiff_t find_common_neighbor(size_t v0, size_t v1,
                                        const VineTree& tree);
-        Eigen::MatrixXd get_pc_data(size_t v0, size_t v1,
-                                    const VineTree& tree);
+
     
         size_t n_;
         size_t d_;
@@ -145,6 +145,7 @@ namespace tools_select {
 
     private:
         RVineMatrix vine_matrix_;
+        bool v0_;
         void add_allowed_edges(VineTree& tree);
         bool belong_to_structure(size_t v0, size_t v1,
                                  const VineTree& vine_tree,

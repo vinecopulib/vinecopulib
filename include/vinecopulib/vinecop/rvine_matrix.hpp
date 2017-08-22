@@ -66,6 +66,7 @@ namespace vinecopulib
             bool check = true
         );
 
+        size_t get_element(size_t row, size_t col) const;
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> get_order() const;
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> in_natural_order() const;

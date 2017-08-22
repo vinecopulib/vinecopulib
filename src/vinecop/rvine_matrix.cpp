@@ -28,7 +28,20 @@ namespace vinecopulib
             check_proximity_condition();
         }
     }
-    
+
+    //! extract matrix_(row, col)
+    //!
+    //! \param row
+    //! \param col
+    //! \return matrix_(row, col)
+    size_t RVineMatrix::get_element(size_t row, size_t col) const
+    {
+        if (row >= d_ || col >= d_) {
+            throw std::runtime_error("row and col should be < d");
+        }
+        return matrix_(row, col);
+    }
+
     //! extract the matrix.
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> 
     RVineMatrix::get_matrix() const
