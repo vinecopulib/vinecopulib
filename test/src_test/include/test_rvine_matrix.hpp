@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include <vinecopulib/vinecop/rvine_matrix.hpp>
+#include <iostream>
 
 namespace test_rvine_matrix {
     using namespace vinecopulib;
@@ -120,56 +121,70 @@ namespace test_rvine_matrix {
                7, 3, 0, 0, 0, 0, 0,
                4, 0, 0, 0, 0, 0, 0;
         RVineMatrix rvine_matrix(mat);
-
+        
+        std::cout << "created matrix" << std::endl;
         // conditioned set size is equal to 2
         std::vector<size_t> conditioned0 = {0,1,2,3};
         std::vector<size_t> conditioning0 = {0,1,2,3};
+        std::cout << "created conditioned0" << std::endl;
         EXPECT_ANY_THROW(rvine_matrix.belongs_to_structure(conditioned0,
                                                            conditioning0));
+        std::cout << "checked conditioned0" << std::endl;
         std::vector<size_t> conditioned1 = {4, 5};
         std::vector<size_t> conditioning1 = {};
+        std::cout << "created conditioned1" << std::endl;
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned1,
                                                       conditioning1));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned1,
                                                        conditioning0));
+        std::cout << "checked conditioned1" << std::endl;
         conditioned1[0] = 5;
         conditioned1[1] = 4;
+        std::cout << "modified conditioned1" << std::endl;
         // only allow for correctly ordered conditioned set
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned1,
                                                        conditioning1));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned1,
                                                        conditioning0));
-
+        std::cout << "checked conditioned1" << std::endl;
         conditioned1[0] = 5;
         conditioned1[1] = 6;
+        std::cout << "modified conditioned1" << std::endl;
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned1,
                                                       conditioning1));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned1,
                                                        conditioning0));
-
+        std::cout << "checked conditioned1" << std::endl;
+        
         std::vector<size_t> conditioned2 = {4, 6};
         std::vector<size_t> conditioning2 = {5};
+        std::cout << "created conditioned2" << std::endl;
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned2,
                                                       conditioning2));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
                                                        conditioning1));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
                                                        conditioning0));
+        std::cout << "checked conditioned2" << std::endl;
         conditioning2[0] = 6;
+        std::cout << "modified conditioned2" << std::endl;
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
                                                        conditioning2));
-
+        std::cout << "checked conditioned2" << std::endl;
         conditioned2[0] = 2;
         conditioned2[1] = 5;
+        std::cout << "modified conditioned2" << std::endl;
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned2,
                                                       conditioning2));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
                                                        conditioning1));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
                                                        conditioning0));
-
+        std::cout << "checked conditioned2" << std::endl;
+        
         std::vector<size_t> conditioned3 = {1, 5};
         std::vector<size_t> conditioning3 = {6, 2};
+        std::cout << "created conditioned3" << std::endl;
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned3,
                                                       conditioning3));
         ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned3,
