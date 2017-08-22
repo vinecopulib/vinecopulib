@@ -300,10 +300,9 @@ namespace tools_select {
     }
 
     bool FamilySelector::belong_to_structure(size_t v0, size_t v1,
-                                             const VineTree& vine_tree,
-                                             const RVineMatrix& vine_matrix) {
-
-        bool res = false;
+                                             const VineTree& vine_tree) {
+        
+        // -1 means no common neighbor in previous tree
         if (find_common_neighbor(v0, v1, vine_tree) > -1) {
             // conditioned sets
             auto conditioned0 = vine_tree[v0].conditioned;
@@ -331,25 +330,11 @@ namespace tools_select {
             add_one(conditioning);
 
             // check whether the edge belongs to the structure
-            res = vine_matrix_.belong_to_structure(conditioned,
-                                                   conditioning);
-
-            if (res) {
-                std::vector<size_t> conditioned_test;
-                auto tree = conditioning.size();
-                for (size_t i = 0; i < d_ - tree - 1; ++i) {
-                    conditioned_test = {vine_matrix_.get_element(d_-1-i, i),
-                                        vine_matrix_.get_element(tree, i)};
-                    if (tools_stl::is_same_set(conditioned, conditioned_test)) {
-                        v0_ = conditioned[0] == conditioned_test[0];
-                        break;
-                    }
-                }
-
-            }
+            return vine_matrix_.belong_to_structure(conditioned, conditioning);
         }
-
-        return res;
+        
+        // there was no common neighbor
+        return false;
     }
 
     //! Add edges allowed by vine matrix structure
@@ -360,19 +345,15 @@ namespace tools_select {
         double w = 1.0;
         std::string tree_criterion = controls_.get_tree_criterion();
         for (auto v0 : boost::vertices(vine_tree)) {
-            for (size_t v1 = 0; v1 < v0; ++v1) {
+            for (auto v1 : boost::vertices(vine_tree)) {
+                if (v0 == v1) continue;
                 // check proximity condition: common neighbor in previous tree
                 // (-1 means 'no common neighbor')
-                if (belong_to_structure(v0, v1, vine_tree, vine_matrix_)) {
+                if (belong_to_structure(v0, v1, vine_tree)) {
                     Eigen::MatrixXd pc_data;
                     boost::graph_traits<VineTree>::edge_descriptor e;
-                    if (v0_) {
-                        pc_data = get_pc_data(v0, v1, vine_tree);
-                        e = boost::add_edge(v0, v1, w, vine_tree).first;
-                    } else {
-                        pc_data = get_pc_data(v1, v0, vine_tree);
-                        e = boost::add_edge(v1, v0, w, vine_tree).first;
-                    }
+                    pc_data = get_pc_data(v0, v1, vine_tree);
+                    e = boost::add_edge(v0, v1, w, vine_tree).first;
                     double crit = calculate_criterion(pc_data, tree_criterion);
                     vine_tree[e].weight = w;
                     vine_tree[e].crit = crit;
