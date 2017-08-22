@@ -145,10 +145,11 @@ namespace test_vinecop_class {
             }
         }
         Vinecop vinecop(pair_copulas, model_matrix);
-        
         auto u = vinecop.simulate(10000);
-        Vinecop fit(u, model_matrix,
-                    FitControlsVinecop({BicopFamily::clayton}, "itau"));
+        
+        auto controls = FitControlsVinecop({BicopFamily::clayton}, "itau");
+        // controls.set_show_trace(true);
+        Vinecop fit(u, model_matrix, controls);
             
         // don't check last two trees to avoid random failures because of
         // estimation uncertainty
@@ -197,9 +198,7 @@ namespace test_vinecop_class {
         EXPECT_EQ(pairs_unequal, 0);
     }
     
-    
     // in what follows, we only check if funs run without error ----------
-    
     TEST_F(VinecopTest, sparse_threshold_selection) {
         FitControlsVinecop controls(bicop_families::itau, "itau");
         controls.set_select_threshold(true);

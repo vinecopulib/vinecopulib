@@ -29,7 +29,7 @@ namespace vinecopulib
                 bool check_matrix = true);
         Vinecop(const Eigen::MatrixXd& data,
                 FitControlsVinecop controls = FitControlsVinecop());
-        Vinecop(const Eigen::MatrixXd& data, 
+        Vinecop(const Eigen::MatrixXd& data,
                 const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
                 FitControlsVinecop controls = FitControlsVinecop(),
                 bool check_matrix = true);

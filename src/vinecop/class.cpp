@@ -136,7 +136,7 @@ namespace vinecopulib
     //! @param controls see FitControlsVinecop.
     //! @param check_matrix whether to check if `matrix` is a valid R-vine 
     //!     matrix.
-    Vinecop::Vinecop(const Eigen::MatrixXd& data, 
+    Vinecop::Vinecop(const Eigen::MatrixXd& data,
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
         FitControlsVinecop controls,
         bool check_matrix)
