@@ -33,27 +33,46 @@ namespace test_tools_stats {
         }
     }
 
-    TEST(test_tools_stats, hoeffd_is_correct) {
-
-        int n = 9;
-
-        // X1 = (1,...,n) and X2 = (n, ..., 1)
-        // X = (X1, X2)
-        Eigen::MatrixXd X(n,2);
-        X.col(0) = Eigen::VectorXd::LinSpaced(n,1,n);
-        X.col(1) = Eigen::VectorXd::LinSpaced(n,n,1);
-
-        // Perfect dependence
-        double computed_hoeffd = tools_stats::pairwise_hoeffd(X);
-        double true_hoeffd = 1.0;
-        EXPECT_NEAR(computed_hoeffd, true_hoeffd, 1e-3);
-
+    TEST(test_tools_stats, pairwise_dep_measures_are_correct) {    
         // Independence
-        Eigen::MatrixXd X2(5,2);
-        X2 << -2,4,-1,1,0,0,1,2,2,3;
-        computed_hoeffd = tools_stats::pairwise_hoeffd(X2);
-        true_hoeffd = 0.0;
-        EXPECT_NEAR(computed_hoeffd, true_hoeffd, 1e-3);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> X(10, 2);
+        X <<  4,  6,
+              7,  3,
+              1,  8,
+              9, 10,
+             10,  5,
+              6,  7,
+              5,  9,
+              8,  1,
+              3,  2,
+              2,  4;
+        X = X.array() / 10.0;
+        EXPECT_NEAR(tools_stats::pairwise_tau(X),    0.0, 5e-1);
+        EXPECT_NEAR(tools_stats::pairwise_cor(X),    0.0, 5e-1);
+        EXPECT_NEAR(tools_stats::pairwise_rho(X),    0.0, 5e-1);
+        EXPECT_NEAR(tools_stats::pairwise_hoeffd(X), 0.0, 5e-1);
+        
+        // Perfect (negative) dependence        
+        X.col(1) = 1.0 - X.col(0).array();
+        EXPECT_NEAR(tools_stats::pairwise_tau(X),   -1.0, 1e-3);
+        EXPECT_NEAR(tools_stats::pairwise_cor(X),   -1.0, 1e-3);
+        EXPECT_NEAR(tools_stats::pairwise_rho(X),   -1.0, 1e-3);
+        EXPECT_NEAR(tools_stats::pairwise_hoeffd(X), 1.0, 1e-3);
+
+
+    }
+    
+    TEST(test_tools_stats, dependence_matrix_works) {
+        auto u = tools_stats::simulate_uniform(10, 4);
+        auto mat = tools_stats::dependence_matrix(u, "tau");
+        EXPECT_TRUE((mat.diagonal().array() == 1.0).all());
+        EXPECT_TRUE(mat(0, 1) == mat(1, 0));
+
+        // only check if it works from here one
+        tools_stats::dependence_matrix(u, "cor");
+        tools_stats::dependence_matrix(u, "rho");
+        tools_stats::dependence_matrix(u, "hoeffd");
+        EXPECT_ANY_THROW(tools_stats::dependence_matrix(u, "other"));
     }
 
     TEST(test_tools_stats, ghalton_is_correct) {
