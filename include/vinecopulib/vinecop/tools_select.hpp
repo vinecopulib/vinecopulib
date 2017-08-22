@@ -83,7 +83,7 @@ namespace tools_select {
         //! selects tree of vine copula, assuming all previous trees have 
         //! been fit.
         void select_tree(size_t t);
-        void finalize();
+        virtual void finalize() = 0;
 
         double get_loglik_of_tree(size_t t);
         double get_npars_of_tree(size_t t);
@@ -134,6 +134,7 @@ namespace tools_select {
         
     private:
         void add_allowed_edges(VineTree& tree);
+        void finalize();
     };
 
     class FamilySelector : public VinecopSelector
@@ -149,6 +150,7 @@ namespace tools_select {
         void add_allowed_edges(VineTree& tree);
         bool belongs_to_structure(size_t v0, size_t v1, 
                                   const VineTree& vine_tree);
+        void finalize();
     };
     
 }
