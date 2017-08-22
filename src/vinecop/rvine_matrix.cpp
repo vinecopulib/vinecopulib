@@ -7,7 +7,6 @@
 #include <vinecopulib/vinecop/rvine_matrix.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
-#include <iostream>
 namespace vinecopulib
 {
     //! instantiates an RVineMatrix object.
@@ -83,7 +82,6 @@ namespace vinecopulib
         std::vector<size_t> conditioning_test(tree);
         std::vector<size_t> conditioned_test(2);
         bool res = false;
-        std::cout << tree << std::endl;
         if (tree + 2 <= d_) {
             for (size_t i = 0; i < d_ - tree - 1; ++i) {
                 conditioned_test[0] = matrix_(tree, i);

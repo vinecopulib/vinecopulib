@@ -30,83 +30,7 @@ namespace tools_select {
     Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd& data, 
                                                std::string tree_criterion);
     double calculate_gic(double loglik, double npars, int n);
-    
-    class VinecopSelector 
-    {
-    public:
-        virtual ~VinecopSelector() = 0;
-    
-        std::vector<std::vector<Bicop>> get_pair_copulas() const;
-        RVineMatrix get_rvine_matrix() const;
-        
-        void select_all_trees(const Eigen::MatrixXd& data);
-        void sparse_select_all_trees(const Eigen::MatrixXd& data);
-    
-    protected:
-        void truncate();
-        //! selects tree of vine copula, assuming all previous trees have 
-        //! been fit.
-        virtual void select_tree(size_t t) = 0;
-        virtual void finalize() = 0;
-        
-        virtual double get_loglik_of_tree(size_t t) = 0;
-        virtual double get_npars_of_tree(size_t t) = 0;
-        virtual void set_tree_to_indep(size_t t) = 0;
-        virtual void print_pair_copulas_of_tree(size_t) = 0;
-        virtual std::vector<double> get_thresholded_crits() = 0;
-        virtual void set_current_fit_as_opt() = 0;
-        virtual void initialize_new_fit(const Eigen::MatrixXd& data) = 0;
-    
-        size_t n_;
-        size_t d_;
-        size_t trees_fitted_;
-        FitControlsVinecop controls_;
-        RVineMatrix vine_matrix_;
-        std::vector<std::vector<Bicop>> pair_copulas_;
-    
-    private:
-        double get_next_threshold(std::vector<double>& thresholded_crits);
-    };
-    
-    class FamilySelector : public VinecopSelector 
-    {
-    public:
-        FamilySelector(const Eigen::MatrixXd& data, 
-                       const RVineMatrix& vine_matrix,
-                       const FitControlsVinecop& controls);
-        ~FamilySelector() {}
-        
-        void select_tree(size_t t);
-        void finalize() {}
-        
-        double get_loglik_of_tree(size_t t);
-        double get_npars_of_tree(size_t t);
-        void set_tree_to_indep(size_t t);
-        void print_pair_copulas_of_tree(size_t);
-        std::vector<double> get_thresholded_crits();
-        void set_current_fit_as_opt();
-        void initialize_new_fit(const Eigen::MatrixXd& data);
-        
-    private:
-        std::string get_pc_index(size_t tree, size_t edge);
-        
-        // info about the vine structure
-        Eigen::Matrix<size_t, Eigen::Dynamic, 1> order_;
-        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> no_matrix_;
-        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> max_matrix_;
-        tools_eigen::MatrixXb needed_hfunc1_;
-        tools_eigen::MatrixXb needed_hfunc2_;
-        // temporary storage objects for h-functions
-        Eigen::MatrixXd hfunc1_;
-        Eigen::MatrixXd hfunc2_;
-        // for sparse selection
-        Eigen::MatrixXd loglik_;
-        Eigen::MatrixXd npars_;
-        Eigen::MatrixXd crits_;
-        std::vector<std::vector<Bicop>> pair_copulas_opt_;
-    };
-    
-    
+
     // boost::graph represenation of a vine tree
     struct VertexProperties {
         std::vector<size_t> conditioning;
@@ -130,44 +54,64 @@ namespace tools_select {
         double fit_id;
     };
     typedef boost::adjacency_list <
-        boost::vecS,
-        boost::vecS,
-        boost::undirectedS,
-        VertexProperties,
-        boost::property<boost::edge_weight_t, double, EdgeProperties>
+            boost::vecS,
+            boost::vecS,
+            boost::undirectedS,
+            VertexProperties,
+            boost::property<boost::edge_weight_t, double, EdgeProperties>
     > VineTree;
-    
+
     typedef std::pair<
-    boost::graph_traits<VineTree>::edge_descriptor, 
-    bool
+            boost::graph_traits<VineTree>::edge_descriptor,
+            bool
     > FoundEdge;
     
-    class StructureSelector : public VinecopSelector
+    class VinecopSelector 
     {
     public:
-        StructureSelector(const Eigen::MatrixXd& data, 
-                          const FitControlsVinecop& controls);
-        ~StructureSelector() {}
+        virtual ~VinecopSelector() = 0;
+    
+        std::vector<std::vector<Bicop>> get_pair_copulas() const;
+        RVineMatrix get_rvine_matrix() const;
+        
+        void select_all_trees(const Eigen::MatrixXd& data);
+        void sparse_select_all_trees(const Eigen::MatrixXd& data);
+    
+    protected:
+        void truncate();
+        //! selects tree of vine copula, assuming all previous trees have 
+        //! been fit.
         void select_tree(size_t t);
         void finalize();
-        
+
         double get_loglik_of_tree(size_t t);
-        double get_npars_of_tree(size_t t); 
+        double get_npars_of_tree(size_t t);
         void set_tree_to_indep(size_t t);
         void print_pair_copulas_of_tree(size_t);
         std::vector<double> get_thresholded_crits();
         void set_current_fit_as_opt();
         void initialize_new_fit(const Eigen::MatrixXd& data);
-        
+
+        virtual void add_allowed_edges(VineTree& tree) = 0;
+        ptrdiff_t find_common_neighbor(size_t v0, size_t v1,
+                                       const VineTree& tree);
+        Eigen::MatrixXd get_pc_data(size_t v0, size_t v1,
+                                    const VineTree& tree);
+    
+        size_t n_;
+        size_t d_;
+        size_t trees_fitted_;
+        FitControlsVinecop controls_;
+        RVineMatrix vine_matrix_;
+        std::vector<std::vector<Bicop>> pair_copulas_;
+        std::vector<VineTree> trees_;
+        std::vector<VineTree> trees_opt_;  // for sparse selction
+    
     private:
+        double get_next_threshold(std::vector<double>& thresholded_crits);
         // functions for manipulation of trees ----------------
         VineTree make_base_tree(const Eigen::MatrixXd& data);
         VineTree edges_as_vertices(const VineTree& prev_tree);
-        void add_allowed_edges(VineTree& tree);
-        ptrdiff_t find_common_neighbor(size_t v0, size_t v1, 
-                                       const VineTree& tree);
-        Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, 
-                                    const VineTree& tree);
         void min_spanning_tree(VineTree &tree);
         void add_edge_info(VineTree& tree);
         void remove_edge_data(VineTree& tree);
@@ -178,9 +122,33 @@ namespace tools_select {
         double get_tree_npars(const VineTree& tree);
         std::string get_pc_index(boost::graph_traits<VineTree>::edge_descriptor e,
                                  VineTree& tree);
+    };
+    
+    class StructureSelector : public VinecopSelector
+    {
+    public:
+        StructureSelector(const Eigen::MatrixXd& data, 
+                          const FitControlsVinecop& controls);
+        ~StructureSelector() {}
         
-        std::vector<VineTree> trees_;
-        std::vector<VineTree> trees_opt_;  // for sparse selction
+    private:
+        void add_allowed_edges(VineTree& tree);
+    };
+
+    class FamilySelector : public VinecopSelector
+    {
+    public:
+        FamilySelector(const Eigen::MatrixXd& data,
+                       const RVineMatrix& vine_matrix,
+                       const FitControlsVinecop& controls);
+        ~FamilySelector() {}
+
+    private:
+        RVineMatrix vine_matrix_;
+        void add_allowed_edges(VineTree& tree);
+        bool belong_to_structure(size_t v0, size_t v1,
+                                 const VineTree& vine_tree,
+                                 const RVineMatrix& vine_matrix);
     };
     
 }
