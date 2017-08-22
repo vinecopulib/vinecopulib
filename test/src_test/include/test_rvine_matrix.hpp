@@ -110,7 +110,7 @@ namespace test_rvine_matrix {
         EXPECT_EQ(RVineMatrix::construct_d_vine_matrix(order), true_d_vine_matrix);
     }
 
-    TEST(rvine_matrix, belong_to_structure_is_correct) {
+    TEST(rvine_matrix, belongs_to_structure_is_correct) {
 
 
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
@@ -126,57 +126,57 @@ namespace test_rvine_matrix {
         // conditioned set size is equal to 2
         std::vector<size_t> conditioning0 = {0,1,2,3};
         std::vector<size_t> conditioned0 = {0,1,2,3};
-        EXPECT_ANY_THROW(rvine_matrix.belong_to_structure(conditioned0,
-                                                          conditioning0));
+        EXPECT_ANY_THROW(rvine_matrix.belongs_to_structure(conditioned0,
+                                                           conditioning0));
         std::vector<size_t> conditioning1 = {};
         std::vector<size_t> conditioned1 = {4, 5};
-        ASSERT_TRUE(rvine_matrix.belong_to_structure(conditioned1,
-                                                     conditioning1));
-        ASSERT_FALSE(rvine_matrix.belong_to_structure(conditioned1,
-                                                      conditioning0));
+        ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned1,
+                                                      conditioning1));
+        ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned1,
+                                                       conditioning0));
         conditioned1[0] = 5;
         conditioned1[1] = 4;
-        ASSERT_TRUE(rvine_matrix.belong_to_structure(conditioned1,
-                                                     conditioning1));
-        ASSERT_FALSE(rvine_matrix.belong_to_structure(conditioned1,
-                                                      conditioning0));
+        ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned1,
+                                                      conditioning1));
+        ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned1,
+                                                       conditioning0));
 
         conditioned1[0] = 6;
         conditioned1[1] = 5;
-        ASSERT_TRUE(rvine_matrix.belong_to_structure(conditioned1,
-                                                     conditioning1));
-        ASSERT_FALSE(rvine_matrix.belong_to_structure(conditioned1,
-                                                      conditioning0));
+        ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned1,
+                                                      conditioning1));
+        ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned1,
+                                                       conditioning0));
 
         std::vector<size_t> conditioning2 = {5};
         std::vector<size_t> conditioned2 = {4, 6};
-        ASSERT_TRUE(rvine_matrix.belong_to_structure(conditioned2,
-                                                     conditioning2));
-        ASSERT_FALSE(rvine_matrix.belong_to_structure(conditioned2,
-                                                      conditioning1));
-        ASSERT_FALSE(rvine_matrix.belong_to_structure(conditioned2,
-                                                      conditioning0));
-        conditioning2[0] = 6;
-        ASSERT_FALSE(rvine_matrix.belong_to_structure(conditioned2,
+        ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned2,
                                                       conditioning2));
+        ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
+                                                       conditioning1));
+        ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
+                                                       conditioning0));
+        conditioning2[0] = 6;
+        ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
+                                                       conditioning2));
 
         conditioned2[0] = 5;
         conditioned2[1] = 2;
-        ASSERT_TRUE(rvine_matrix.belong_to_structure(conditioned2,
-                                                     conditioning2));
-        ASSERT_FALSE(rvine_matrix.belong_to_structure(conditioned2,
-                                                      conditioning1));
-        ASSERT_FALSE(rvine_matrix.belong_to_structure(conditioned2,
-                                                      conditioning0));
+        ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned2,
+                                                      conditioning2));
+        ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
+                                                       conditioning1));
+        ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned2,
+                                                       conditioning0));
 
         std::vector<size_t> conditioning3 = {6, 2};
         std::vector<size_t> conditioned3 = {1, 5};
-        ASSERT_TRUE(rvine_matrix.belong_to_structure(conditioned3,
-                                                     conditioning3));
-        ASSERT_FALSE(rvine_matrix.belong_to_structure(conditioned3,
-                                                      conditioning1));
-        ASSERT_FALSE(rvine_matrix.belong_to_structure(conditioned3,
-                                                      conditioning0));
+        ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned3,
+                                                      conditioning3));
+        ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned3,
+                                                       conditioning1));
+        ASSERT_FALSE(rvine_matrix.belongs_to_structure(conditioned3,
+                                                       conditioning0));
 
     }
     
