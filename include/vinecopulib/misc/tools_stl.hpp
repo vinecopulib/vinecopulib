@@ -52,21 +52,6 @@ namespace tools_stl {
     }
 
     template<class T>
-    vector<T> set_sym_diff(vector<T> x, vector<T> y)
-    {
-        sort(x.begin(), x.end());
-        sort(y.begin(), y.end());
-        vector<T> different;
-        set_symmetric_difference(
-                x.begin(), x.end(),
-                y.begin(), y.end(),
-                back_inserter(different)
-        );
-
-        return different;
-    }
-
-    template<class T>
     size_t find_position(T x, vector<T> vec)
     {
         return distance(vec.begin(), find(vec.begin(), vec.end(), x));
@@ -103,6 +88,14 @@ namespace tools_stl {
         out.reserve(1 + y.size());
         out.insert(out.end(), y.begin(), y.end());
         return out;
+    }
+    
+    template<class T>
+    vector<T> set_sym_diff(vector<T> x, vector<T> y)
+    {
+        vector<T> dxy = set_diff(x, y);
+        auto dyx = set_diff(y, x);
+        return cat(dxy, dyx);
     }
 
     template<class T>
