@@ -64,7 +64,7 @@ install:
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo make install; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then cd ../..; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then cd vinecopulib; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install --HEAD nlopt; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install --without-numpy --HEAD nlopt; fi
   
 
 script:
