@@ -131,7 +131,7 @@ namespace test_rvine_matrix {
                                                            conditioning0));
         std::cout << "checked conditioned0" << std::endl;
         std::vector<size_t> conditioned1 = {4, 5};
-        std::vector<size_t> conditioning1 = {};
+        std::vector<size_t> conditioning1(0);
         std::cout << "created conditioned1" << std::endl;
         ASSERT_TRUE(rvine_matrix.belongs_to_structure(conditioned1,
                                                       conditioning1));
