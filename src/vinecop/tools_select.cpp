@@ -379,7 +379,7 @@ namespace tools_select {
                 // first tree
                 conditioned = cat(vine_tree[v0].conditioned,
                                   vine_tree[v1].conditioned);
-                conditioning = {};
+                conditioning = std::vector<size_t>(0);
             } else {
                 // compute new conditioned/conditioning sets
                 conditioned = set_sym_diff(vine_tree[v0].all_indices,

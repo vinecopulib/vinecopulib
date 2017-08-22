@@ -100,7 +100,7 @@ namespace vinecopulib
                 conditioned_test[0] = matrix_(d_ - 1 - i, i);
                 conditioned_test[1] = matrix_(tree, i);
                 bool conditioned_ok = (conditioned == conditioned_test);
-                if (conditioned_ok) {
+                if (conditioned_ok & (tree > 0)) {
                     auto cond = matrix_.col(i).head(tree);
                     Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&conditioning_test[0], tree) = cond;
                     res = tools_stl::is_same_set(conditioning, conditioning_test);
