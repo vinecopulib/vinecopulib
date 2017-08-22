@@ -35,6 +35,7 @@ namespace tools_select {
     struct VertexProperties {
         std::vector<size_t> conditioning;
         std::vector<size_t> conditioned;
+        std::vector<size_t> all_indices;
         std::vector<size_t> prev_edge_indices;
         Eigen::VectorXd hfunc1;
         Eigen::VectorXd hfunc2;
@@ -82,7 +83,7 @@ namespace tools_select {
         //! selects tree of vine copula, assuming all previous trees have 
         //! been fit.
         void select_tree(size_t t);
-        void finalize();
+        virtual void finalize() = 0;
 
         double get_loglik_of_tree(size_t t);
         double get_npars_of_tree(size_t t);
@@ -133,6 +134,7 @@ namespace tools_select {
         
     private:
         void add_allowed_edges(VineTree& tree);
+        void finalize();
     };
 
     class FamilySelector : public VinecopSelector
@@ -145,11 +147,10 @@ namespace tools_select {
 
     private:
         RVineMatrix vine_matrix_;
-        bool v0_;
         void add_allowed_edges(VineTree& tree);
-        bool belong_to_structure(size_t v0, size_t v1,
-                                 const VineTree& vine_tree,
-                                 const RVineMatrix& vine_matrix);
+        bool belongs_to_structure(size_t v0, size_t v1, 
+                                  const VineTree& vine_tree);
+        void finalize();
     };
     
 }

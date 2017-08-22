@@ -298,30 +298,94 @@ namespace tools_select {
             }
         }
     }
+    
+    void StructureSelector::finalize()
+    {
+        using namespace tools_stl;
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d_, d_);
+        mat.fill(0);
+    
+        for (size_t col = 0; col < d_ - 1; ++col) {
+            size_t t = d_ - 1 - col;
+            // start with highest tree in this column and fill first two
+            // entries by conditioned set
+            auto e0 = *boost::edges(trees_[t]).first;
+            mat(t, col) = trees_[t][e0].conditioned[0];
+            mat(t - 1, col) = trees_[t][e0].conditioned[1];
+    
+            // assign fitted pair copula to appropriate entry, see
+            // vinecopulib::Vinecop::get_pair_copula().
+            pair_copulas_[t - 1][col] = trees_[t][e0].pair_copula;
+    
+            // initialize running set with full conditioing set of this edge
+            auto ning_set = trees_[t][e0].conditioning;
+    
+            // iteratively search for an edge in lower tree that shares all 
+            // indices in the conditioned set + diagonal entry
+            for (size_t k = 1; k < t; ++k) {
+                auto reduced_set = cat(mat(t, col), ning_set);
+                for (auto e : boost::edges(trees_[t - k])) {
+                    if (is_same_set(trees_[t - k][e].all_indices, reduced_set)) {
+                        // next matrix entry is conditioned variable of new edge
+                        // that's not equal to the diagonal entry of this column
+                        auto e_new = trees_[t - k][e];
+                        ptrdiff_t pos = 
+                            find_position(mat(t, col), e_new.conditioned);
+                        mat(t - k - 1, col) = 
+                            e_new.conditioned[std::abs(1 - pos)];
+                        if (pos == 1) {
+                            e_new.pair_copula.flip();
+                        }
+                        // assign fitted pair copula to appropriate entry, see
+                        // vinecopulib::Vinecop::get_pair_copula().
+                        pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
+    
+                        // start over with conditioned set of next edge
+                        ning_set = e_new.conditioning;
+    
+                        // remove edge (must not be reused in another column!)
+                        size_t v0 = boost::source(e, trees_[t - k]);
+                        size_t v1 = boost::target(e, trees_[t - k]);
+                        boost::remove_edge(v0, v1, trees_[t - k]);
+                        break;
+                    }
+                }
+            }
+        }
+    
+        // The last column contains a single element which must be different
+        // from all other diagonal elements. Based on the properties of an
+        // R-vine matrix, this must be the element next to it.
+        mat(0, d_ - 1) = mat(0, d_ - 2);
+    
+        // change to user-facing format
+        // (variable index starting at 1 instead of 0)
+        auto new_mat = mat;
+        for (size_t i = 0; i < d_; ++i) {
+            for (size_t j = 0; j < d_ - i; ++j) {
+                new_mat(i, j) += 1;    
+            }
+        }
+        vine_matrix_ = RVineMatrix(new_mat);
+    }
 
-    bool FamilySelector::belong_to_structure(size_t v0, size_t v1,
-                                             const VineTree& vine_tree,
-                                             const RVineMatrix& vine_matrix) {
-
-        bool res = false;
+    bool FamilySelector::belongs_to_structure(size_t v0, size_t v1,
+                                              const VineTree& vine_tree) {
+        // -1 means no common neighbor in previous tree
         if (find_common_neighbor(v0, v1, vine_tree) > -1) {
-            // conditioned sets
-            auto conditioned0 = vine_tree[v0].conditioned;
-            auto conditioned1 = vine_tree[v1].conditioned;
-
             std::vector<size_t> conditioning;
             std::vector<size_t> conditioned(2);
-            if (conditioned0.size() == 1) {
-                conditioned = {conditioned0[0], conditioned1[0]};
+            if (vine_tree[v0].conditioned.size() == 1) {
+                // first tree
+                conditioned = cat(vine_tree[v0].conditioned,
+                                  vine_tree[v1].conditioned);
                 conditioning = {};
             } else {
-                // add conditioning sets
-                auto all0 = cat(conditioned0, vine_tree[v0].conditioning);
-                auto all1 = cat(conditioned1, vine_tree[v1].conditioning);
-
                 // compute new conditioned/conditioning sets
-                conditioned = set_sym_diff(all0, all1);
-                conditioning = intersect(all0, all1);
+                conditioned = set_sym_diff(vine_tree[v0].all_indices,
+                                           vine_tree[v1].all_indices);
+                conditioning = intersect(vine_tree[v0].all_indices,
+                                         vine_tree[v1].all_indices);
             }
 
             // to convert from vinecop to rvine_matrix indices
@@ -331,25 +395,11 @@ namespace tools_select {
             add_one(conditioning);
 
             // check whether the edge belongs to the structure
-            res = vine_matrix_.belong_to_structure(conditioned,
-                                                   conditioning);
-
-            if (res) {
-                std::vector<size_t> conditioned_test;
-                auto tree = conditioning.size();
-                for (size_t i = 0; i < d_ - tree - 1; ++i) {
-                    conditioned_test = {vine_matrix_.get_element(d_-1-i, i),
-                                        vine_matrix_.get_element(tree, i)};
-                    if (tools_stl::is_same_set(conditioned, conditioned_test)) {
-                        v0_ = conditioned[0] == conditioned_test[0];
-                        break;
-                    }
-                }
-
-            }
+            return vine_matrix_.belongs_to_structure(conditioned, conditioning);
         }
-
-        return res;
+        
+        // there was no common neighbor
+        return false;
     }
 
     //! Add edges allowed by vine matrix structure
@@ -360,19 +410,15 @@ namespace tools_select {
         double w = 1.0;
         std::string tree_criterion = controls_.get_tree_criterion();
         for (auto v0 : boost::vertices(vine_tree)) {
-            for (size_t v1 = 0; v1 < v0; ++v1) {
-                // check proximity condition: common neighbor in previous tree
-                // (-1 means 'no common neighbor')
-                if (belong_to_structure(v0, v1, vine_tree, vine_matrix_)) {
+            for (auto v1 : boost::vertices(vine_tree)) {
+                if (v0 == v1) continue;
+                // check whether edege (v0, v1) belongs to the structure
+                // given in rvine_matrix_
+                if (belongs_to_structure(v0, v1, vine_tree)) {
                     Eigen::MatrixXd pc_data;
                     boost::graph_traits<VineTree>::edge_descriptor e;
-                    if (v0_) {
-                        pc_data = get_pc_data(v0, v1, vine_tree);
-                        e = boost::add_edge(v0, v1, w, vine_tree).first;
-                    } else {
-                        pc_data = get_pc_data(v1, v0, vine_tree);
-                        e = boost::add_edge(v1, v0, w, vine_tree).first;
-                    }
+                    pc_data = get_pc_data(v0, v1, vine_tree);
+                    e = boost::add_edge(v0, v1, w, vine_tree).first;
                     double crit = calculate_criterion(pc_data, tree_criterion);
                     vine_tree[e].weight = w;
                     vine_tree[e].crit = crit;
@@ -380,6 +426,19 @@ namespace tools_select {
             }
         }
     }
+    
+    void FamilySelector::finalize()
+    {
+        for (size_t tree = 0; tree < d_ - 1; tree++) {
+            int edge = 0;
+            // trees_[0] is base tree, vine copula starts at trees_[1]
+            for (auto e : boost::edges(trees_[tree + 1])) {
+                pair_copulas_[tree][edge] = trees_[tree + 1][e].pair_copula;
+                edge++;
+            }
+        }
+    }
+
 
     //! Extract pair copula pseudo-observations from h-functions
     //!
@@ -388,7 +447,7 @@ namespace tools_select {
     //! @return The pseudo-observations for the pair coula, extracted from
     //!     the h-functions calculated in the previous tree.
     Eigen::MatrixXd VinecopSelector::get_pc_data(size_t v0, size_t v1,
-                                                   const VineTree& tree)
+                                                 const VineTree& tree)
     {
         Eigen::MatrixXd pc_data(tree[v0].hfunc1.size(), 2);
         size_t ei_common = find_common_neighbor(v0, v1, tree);
@@ -429,6 +488,7 @@ namespace tools_select {
         remove_edge_data(trees_[t]); // no longer needed
         add_allowed_edges(new_tree);
         if (boost::num_vertices(new_tree) > 2) {
+            // has no effect in FamilySelector
             min_spanning_tree(new_tree);
         }
         add_edge_info(new_tree);       // for pc estimation and next tree
@@ -437,78 +497,7 @@ namespace tools_select {
     
         trees_[t + 1] = new_tree;
     }
-    
-    void VinecopSelector::finalize()
-    {
-        using namespace tools_stl;
-        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d_, d_);
-        mat.fill(0);
-    
-        for (size_t col = 0; col < d_ - 1; ++col) {
-            size_t t = d_ - 1 - col;
-            // start with highest tree in this column and fill first two
-            // entries by conditioned set
-            auto e0 = *boost::edges(trees_[t]).first;
-            mat(t, col) = trees_[t][e0].conditioned[0];
-            mat(t - 1, col) = trees_[t][e0].conditioned[1];
-    
-            // assign fitted pair copula to appropriate entry, see
-            // vinecopulib::Vinecop::get_pair_copula().
-            pair_copulas_[t - 1][col] = trees_[t][e0].pair_copula;
-    
-            // initialize running set with full conditioing set of this edge
-            auto ned_set = trees_[t][e0].conditioning;
-    
-            // iteratively search for an edge in lower tree that shares all 
-            // indices in the conditioned set + diagonal entry
-            for (size_t k = 1; k < t; ++k) {
-                auto reduced_set = cat(mat(t, col), ned_set);
-                for (auto e : boost::edges(trees_[t - k])) {
-                    if (is_same_set(trees_[t - k][e].all_indices, reduced_set)) {
-                        // next matrix entry is conditioned variable of new edge
-                        // that's not equal to the diagonal entry of this column
-                        auto e_new = trees_[t - k][e];
-                        ptrdiff_t pos = 
-                            find_position(mat(t, col), e_new.conditioned);
-                        mat(t - k - 1, col) = 
-                            e_new.conditioned[std::abs(1 - pos)];
-                        if (pos == 1) {
-                            e_new.pair_copula.flip();
-                        }
-                        // assign fitted pair copula to appropriate entry, see
-                        // vinecopulib::Vinecop::get_pair_copula().
-                        pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
-    
-                        // start over with conditioned set of next edge
-                        ned_set = e_new.conditioning;
-    
-                        // remove edge (must not be reused in another column!)
-                        size_t v0 = boost::source(e, trees_[t - k]);
-                        size_t v1 = boost::target(e, trees_[t - k]);
-                        boost::remove_edge(v0, v1, trees_[t - k]);
-                        break;
-                    }
-                }
-            }
-        }
-    
-        // The last column contains a single element which must be different
-        // from all other diagonal elements. Based on the properties of an
-        // R-vine matrix, this must be the element next to it.
-        mat(0, d_ - 1) = mat(0, d_ - 2);
-    
-        // change to user-facing format
-        // (variable index starting at 1 instead of 0)
-        auto new_mat = mat;
-        for (size_t i = 0; i < d_; ++i) {
-            for (size_t j = 0; j < d_ - i; ++j) {
-                new_mat(i, j) += 1;    
-            }
-        }
-        vine_matrix_ = RVineMatrix(new_mat);
-    }
-    
-    
+        
     //! calculates the log-likelihood of a tree.
     double VinecopSelector::get_loglik_of_tree(size_t t)
     {
@@ -604,6 +593,7 @@ namespace tools_select {
             base_tree[e].conditioned.reserve(2);
             base_tree[e].conditioned.push_back(boost::target(e, base_tree));
             base_tree[e].conditioning.reserve(d - 2);
+            base_tree[e].all_indices = base_tree[e].conditioned;
         }
     
         return base_tree;
@@ -631,6 +621,7 @@ namespace tools_select {
             new_tree[i].hfunc2 = prev_tree[e].hfunc2;
             new_tree[i].conditioned = prev_tree[e].conditioned;
             new_tree[i].conditioning = prev_tree[e].conditioning;
+            new_tree[i].all_indices = prev_tree[e].all_indices;
             new_tree[i].prev_edge_indices.reserve(2);
             new_tree[i].prev_edge_indices.push_back(boost::source(e, prev_tree));
             new_tree[i].prev_edge_indices.push_back(boost::target(e, prev_tree));
@@ -688,17 +679,11 @@ namespace tools_select {
         for (auto e : boost::edges(tree)) {
             auto v0 = boost::source(e, tree);
             auto v1 = boost::target(e, tree);
-            tree[e].pc_data = get_pc_data(v0, v1, tree);
-    
-            auto v0_indices = cat(tree[v0].conditioned, tree[v0].conditioning);
-            auto v1_indices = cat(tree[v1].conditioned, tree[v1].conditioning);
-    
-            auto test = intersect(v0_indices, v1_indices);
-            auto d01 = set_diff(v0_indices, v1_indices);
-            auto d10 = set_diff(v1_indices, v0_indices);
-    
-            tree[e].conditioned = cat(d01, d10);
-            tree[e].conditioning = intersect(v0_indices, v1_indices);
+            tree[e].pc_data = get_pc_data(v0, v1, tree);        
+            tree[e].conditioned = set_sym_diff(tree[v0].all_indices,
+                                               tree[v1].all_indices);
+            tree[e].conditioning = intersect(tree[v0].all_indices,
+                                             tree[v1].all_indices);
             tree[e].all_indices = cat(tree[e].conditioned, tree[e].conditioning);
         }
     }
