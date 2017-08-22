@@ -92,26 +92,28 @@ namespace vinecopulib
         }
 
         size_t tree = conditioning.size();
-        std::vector<size_t> conditioning_test(tree);
-        std::vector<size_t> conditioned_test(2);
-        bool res = false;
+        std::vector<size_t> conditioning_mat(tree);
+        std::vector<size_t> conditioned_mat(2);
         if (tree + 2 <= d_) {
             for (size_t i = 0; i < d_ - tree - 1; ++i) {
-                conditioned_test[0] = matrix_(d_ - 1 - i, i);
-                conditioned_test[1] = matrix_(tree, i);
-                bool conditioned_ok = (conditioned == conditioned_test);
-                if (conditioned_ok & (tree > 0)) {
+                conditioned_mat = {matrix_(d_ - 1 - i, i), matrix_(tree, i)};
+                if (conditioned == conditioned_mat) {
+                    if (tree == 0) {
+                        return true;  // conditioning set is empty for tree == 0
+                    }
                     auto cond = matrix_.col(i).head(tree);
-                    Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&conditioning_test[0], tree) = cond;
-                    res = tools_stl::is_same_set(conditioning, conditioning_test);
+                    Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(
+                        &conditioning_test[0], tree
+                    ) = cond;
+                    if (tools_stl::is_same_set(conditioning, conditioning_mat)) {
+                        return true;
+                    }
                 }
-
-                if (res)
-                    break;
             }
         }
-
-        return res;
+        
+        // edge is not contained in the structure implied by the matrix
+        return false;
     }
 
 
