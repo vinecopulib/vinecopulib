@@ -225,8 +225,10 @@ namespace vinecopulib
         grid_points(m - 1) = 1.0;
         interp_grid_ = tools_interpolation::InterpolationGrid(grid_points, values);
         
-        // compute effective degrees of freedom via interpolation
+        // compute effective degrees of freedom via interpolation ---------
         Eigen::VectorXd infl_vec = ll_fit.col(1);
+        // stabilize interpolation by restricting to plausible range
+        infl_vec = infl_vec.array().min(1.0).max(-1.0);
         Eigen::MatrixXd infl(m, m);
         infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), m, m).transpose();
         // don't normalize margins of the EDF! (norm_times = 0)
