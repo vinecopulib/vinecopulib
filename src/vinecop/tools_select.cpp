@@ -347,8 +347,8 @@ namespace tools_select {
         for (auto v0 : boost::vertices(vine_tree)) {
             for (auto v1 : boost::vertices(vine_tree)) {
                 if (v0 == v1) continue;
-                // check proximity condition: common neighbor in previous tree
-                // (-1 means 'no common neighbor')
+                // check whether edege (v0, v1) belongs to the structure
+                // given in rvine_matrix_
                 if (belongs_to_structure(v0, v1, vine_tree)) {
                     Eigen::MatrixXd pc_data;
                     boost::graph_traits<VineTree>::edge_descriptor e;
@@ -369,7 +369,7 @@ namespace tools_select {
     //! @return The pseudo-observations for the pair coula, extracted from
     //!     the h-functions calculated in the previous tree.
     Eigen::MatrixXd VinecopSelector::get_pc_data(size_t v0, size_t v1,
-                                                   const VineTree& tree)
+                                                 const VineTree& tree)
     {
         Eigen::MatrixXd pc_data(tree[v0].hfunc1.size(), 2);
         size_t ei_common = find_common_neighbor(v0, v1, tree);
@@ -438,12 +438,12 @@ namespace tools_select {
             pair_copulas_[t - 1][col] = trees_[t][e0].pair_copula;
     
             // initialize running set with full conditioing set of this edge
-            auto ned_set = trees_[t][e0].conditioning;
+            auto ning_set = trees_[t][e0].conditioning;
     
             // iteratively search for an edge in lower tree that shares all 
             // indices in the conditioned set + diagonal entry
             for (size_t k = 1; k < t; ++k) {
-                auto reduced_set = cat(mat(t, col), ned_set);
+                auto reduced_set = cat(mat(t, col), ning_set);
                 for (auto e : boost::edges(trees_[t - k])) {
                     if (is_same_set(trees_[t - k][e].all_indices, reduced_set)) {
                         // next matrix entry is conditioned variable of new edge
@@ -461,7 +461,7 @@ namespace tools_select {
                         pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
     
                         // start over with conditioned set of next edge
-                        ned_set = e_new.conditioning;
+                        ning_set = e_new.conditioning;
     
                         // remove edge (must not be reused in another column!)
                         size_t v0 = boost::source(e, trees_[t - k]);
