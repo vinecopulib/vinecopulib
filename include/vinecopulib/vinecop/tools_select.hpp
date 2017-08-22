@@ -147,8 +147,8 @@ namespace tools_select {
     private:
         RVineMatrix vine_matrix_;
         void add_allowed_edges(VineTree& tree);
-        bool belong_to_structure(size_t v0, size_t v1, 
-                                 const VineTree& vine_tree);
+        bool belongs_to_structure(size_t v0, size_t v1, 
+                                  const VineTree& vine_tree);
     };
     
 }

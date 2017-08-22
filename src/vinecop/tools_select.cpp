@@ -299,8 +299,8 @@ namespace tools_select {
         }
     }
 
-    bool FamilySelector::belong_to_structure(size_t v0, size_t v1,
-                                             const VineTree& vine_tree) {
+    bool FamilySelector::belongs_to_structure(size_t v0, size_t v1,
+                                              const VineTree& vine_tree) {
         
         // -1 means no common neighbor in previous tree
         if (find_common_neighbor(v0, v1, vine_tree) > -1) {
@@ -330,7 +330,7 @@ namespace tools_select {
             add_one(conditioning);
 
             // check whether the edge belongs to the structure
-            return vine_matrix_.belong_to_structure(conditioned, conditioning);
+            return vine_matrix_.belongs_to_structure(conditioned, conditioning);
         }
         
         // there was no common neighbor
@@ -349,7 +349,7 @@ namespace tools_select {
                 if (v0 == v1) continue;
                 // check proximity condition: common neighbor in previous tree
                 // (-1 means 'no common neighbor')
-                if (belong_to_structure(v0, v1, vine_tree)) {
+                if (belongs_to_structure(v0, v1, vine_tree)) {
                     Eigen::MatrixXd pc_data;
                     boost::graph_traits<VineTree>::edge_descriptor e;
                     pc_data = get_pc_data(v0, v1, vine_tree);

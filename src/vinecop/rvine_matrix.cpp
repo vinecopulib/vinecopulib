@@ -85,8 +85,8 @@ namespace vinecopulib
     //!
     //! @param conditioned the conditioned set.
     //! @param conditioning the conditioning set.
-    bool RVineMatrix::belong_to_structure(const std::vector<size_t> conditioned,
-                                          const std::vector<size_t> conditioning) {
+    bool RVineMatrix::belongs_to_structure(const std::vector<size_t> conditioned,
+                                           const std::vector<size_t> conditioning) {
         if (conditioned.size() != 2) {
             throw std::runtime_error("conditioned should have size 2 ");
         }
@@ -103,8 +103,7 @@ namespace vinecopulib
                 if (conditioned_ok) {
                     auto cond = matrix_.col(i).head(tree);
                     Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&conditioning_test[0], tree) = cond;
-                    res = tools_stl::is_same_set(conditioning,
-                                                 conditioning_test);
+                    res = tools_stl::is_same_set(conditioning, conditioning_test);
                 }
 
                 if (res)
