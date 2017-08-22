@@ -585,6 +585,7 @@ namespace tools_select {
             base_tree[e].conditioned.reserve(2);
             base_tree[e].conditioned.push_back(boost::target(e, base_tree));
             base_tree[e].conditioning.reserve(d - 2);
+            base_tree[e].all_indices = base_tree[e].conditioned;
         }
     
         return base_tree;
@@ -612,6 +613,7 @@ namespace tools_select {
             new_tree[i].hfunc2 = prev_tree[e].hfunc2;
             new_tree[i].conditioned = prev_tree[e].conditioned;
             new_tree[i].conditioning = prev_tree[e].conditioning;
+            new_tree[i].all_indices = prev_tree[e].all_indices;
             new_tree[i].prev_edge_indices.reserve(2);
             new_tree[i].prev_edge_indices.push_back(boost::source(e, prev_tree));
             new_tree[i].prev_edge_indices.push_back(boost::target(e, prev_tree));
@@ -669,17 +671,11 @@ namespace tools_select {
         for (auto e : boost::edges(tree)) {
             auto v0 = boost::source(e, tree);
             auto v1 = boost::target(e, tree);
-            tree[e].pc_data = get_pc_data(v0, v1, tree);
-    
-            auto v0_indices = cat(tree[v0].conditioned, tree[v0].conditioning);
-            auto v1_indices = cat(tree[v1].conditioned, tree[v1].conditioning);
-    
-            auto test = intersect(v0_indices, v1_indices);
-            auto d01 = set_diff(v0_indices, v1_indices);
-            auto d10 = set_diff(v1_indices, v0_indices);
-    
-            tree[e].conditioned = cat(d01, d10);
-            tree[e].conditioning = intersect(v0_indices, v1_indices);
+            tree[e].pc_data = get_pc_data(v0, v1, tree);        
+            tree[e].conditioned = set_sym_diff(tree[v0].all_indices,
+                                               tree[v1].all_indices);
+            tree[e].conditioning = intersect(tree[v0].all_indices,
+                                             tree[v1].all_indices);
             tree[e].all_indices = cat(tree[e].conditioned, tree[e].conditioning);
         }
     }
