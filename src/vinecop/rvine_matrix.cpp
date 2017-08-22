@@ -104,7 +104,7 @@ namespace vinecopulib
                     }
                     auto cond = matrix_.col(i).head(tree);
                     Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(
-                        &conditioning_test[0], tree) = cond;
+                        &conditioning_mat[0], tree) = cond;
                     if (tools_stl::is_same_set(conditioning, conditioning_mat)) {
                         return true;
                     }
