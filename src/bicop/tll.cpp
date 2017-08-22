@@ -44,7 +44,7 @@ namespace vinecopulib
             } else {
                 degree = 2.0;
             }
-            mult = std::pow(2.0, degree) * std::pow(n, - 1.0 / (2.0 * degree + 1.0));
+            mult = 1.5 * std::pow(n, - 1.0 / (2.0 * degree + 1.0));
         }
         
         return mult * cov;
