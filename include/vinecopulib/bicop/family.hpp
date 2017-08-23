@@ -26,7 +26,7 @@ namespace vinecopulib {
         bb6,           ///< BB6 copula
         bb7,           ///< BB7 copula
         bb8,           ///< BB8 copula
-        tll0           ///< Transformation local-constant likelihood kernel estimator
+        tll           ///< Transformation local-constant likelihood kernel estimator
     };
 
     std::string get_family_name(BicopFamily family);
@@ -48,7 +48,7 @@ namespace vinecopulib {
             BicopFamily::bb6, 
             BicopFamily::bb7, 
             BicopFamily::bb8,
-            BicopFamily::tll0
+            BicopFamily::tll
         };
         
         //! All parametric families
@@ -69,7 +69,7 @@ namespace vinecopulib {
         //! All nonparametric families
         const std::vector<BicopFamily> nonparametric = {
             BicopFamily::indep,
-            BicopFamily::tll0
+            BicopFamily::tll
         };
         
         //! All one-parameter families
@@ -123,7 +123,7 @@ namespace vinecopulib {
             BicopFamily::gaussian, 
             BicopFamily::student, 
             BicopFamily::frank, 
-            BicopFamily::tll0
+            BicopFamily::tll
         };
         
         //! Families with stronger dependence in the lower tail

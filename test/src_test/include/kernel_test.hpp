@@ -11,9 +11,10 @@
 
 using namespace vinecopulib;
 
-class TrafokernelTest : public ::testing::Test {
+class TrafokernelTest : public ::testing::TestWithParam<std::string > {
 public:
     TrafokernelTest();
     Bicop bicop_;
+    FitControlsBicop controls;
     Eigen::MatrixXd u;
 };

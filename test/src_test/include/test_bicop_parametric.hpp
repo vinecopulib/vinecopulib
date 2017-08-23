@@ -80,7 +80,11 @@ namespace test_bicop_parametric {
         auto true_family = bicop_.get_family_name();
         auto true_rotation = bicop_.get_rotation();
         FitControlsBicop controls({BicopFamily::indep, BicopFamily::gaussian,
-                                  bicop_.get_family()}, "mle", 1.0, "bic");
+                                  bicop_.get_family()},
+                                  "mle",
+                                  "quadratic",
+                                  1.0,
+                                  "bic");
 
         if (needs_check_) {
             auto data = bicop_.simulate(get_n());
@@ -112,7 +116,11 @@ namespace test_bicop_parametric {
             auto true_family = bicop_.get_family_name();
             auto true_rotation = bicop_.get_rotation();
             FitControlsBicop controls({BicopFamily::indep, BicopFamily::gaussian,
-                                      bicop_.get_family()}, "itau", 1.0, "bic");
+                                      bicop_.get_family()},
+                                      "itau",
+                                      "quadratic",
+                                      1.0,
+                                      "bic");
 
             if (needs_check_) {
                 auto data = bicop_.simulate(get_n());
