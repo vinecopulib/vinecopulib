@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.0.3</a>
+                    <a class="navbar-brand">vinecopulib 0.1.0</a>
                 </div>
             </div>
         </nav>
@@ -124,12 +124,12 @@ Inheritance diagram for vinecopulib::FitControlsBicop:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a544d095b0ef0a99e08b8ca60a5753fbe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#a544d095b0ef0a99e08b8ca60a5753fbe">FitControlsBicop</a> (std::vector&lt; <a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=<a class="el" href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774">bicop_families::all</a>, std::string parametric_method=&quot;mle&quot;, double nonparametric_mult=1.0, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true)</td></tr>
-<tr class="separator:a544d095b0ef0a99e08b8ca60a5753fbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2530bab0592e6bea474416685e405698"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#a2530bab0592e6bea474416685e405698">FitControlsBicop</a> (std::vector&lt; <a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=<a class="el" href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774">bicop_families::all</a>, std::string parametric_method=&quot;mle&quot;, std::string nonparametric_method=&quot;quadratic&quot;, double nonparametric_mult=1.0, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true)</td></tr>
+<tr class="separator:a2530bab0592e6bea474416685e405698"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a2fc00794c9dd9d598ac9948e7b98e4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#a6a2fc00794c9dd9d598ac9948e7b98e4">FitControlsBicop</a> (std::string parametric_method)</td></tr>
 <tr class="separator:a6a2fc00794c9dd9d598ac9948e7b98e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4fc0ec257a3501ebfa15ea36f821cdec"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#a4fc0ec257a3501ebfa15ea36f821cdec">FitControlsBicop</a> (double nonparametric_mult)</td></tr>
-<tr class="separator:a4fc0ec257a3501ebfa15ea36f821cdec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1dfc8d80eba3ce6cfa8bf21fe49cc1a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#af1dfc8d80eba3ce6cfa8bf21fe49cc1a">FitControlsBicop</a> (std::string nonparametric_method, double nonparametric_mult)</td></tr>
+<tr class="separator:af1dfc8d80eba3ce6cfa8bf21fe49cc1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader"></div></td></tr>
 <tr class="memitem:a8ea096aec62cbca55641941c9b4cf8f8"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#a8ea096aec62cbca55641941c9b4cf8f8">get_family_set</a> () const </td></tr>
 <tr class="separator:a8ea096aec62cbca55641941c9b4cf8f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,7 +137,7 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A class for controlling fit of bivariate copula models. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a544d095b0ef0a99e08b8ca60a5753fbe"></a>
+<a class="anchor" id="a2530bab0592e6bea474416685e405698"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -152,6 +152,12 @@ Public Member Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">std::string&#160;</td>
           <td class="paramname"><em>parametric_method</em> = <code>&quot;mle&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>nonparametric_method</em> = <code>&quot;quadratic&quot;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -182,6 +188,7 @@ Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">family_set</td><td>the set of copula families to consider (if empty, then all families are included). </td></tr>
     <tr><td class="paramname">parametric_method</td><td>the fit method for parametric families; possible choices: <code>"mle"</code>, <code>"itau"</code>. </td></tr>
+    <tr><td class="paramname">nonparametric_method</td><td>the fit method for the local-likelihood nonparametric family (TLLs); possible choices: <code>"constant"</code>, <code>"linear"</code>, <code>"quadratic"</code>. </td></tr>
     <tr><td class="paramname">nonparametric_mult</td><td>a factor with which the smoothing parameters are multiplied. </td></tr>
     <tr><td class="paramname">selection_criterion</td><td>the selection criterion (<code>"aic"</code> or <code>"bic"</code>). </td></tr>
     <tr><td class="paramname">preselect_families</td><td>whether to exclude families before fitting based on symmetry properties of the data. </td></tr>
@@ -213,21 +220,32 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4fc0ec257a3501ebfa15ea36f821cdec"></a>
+<a class="anchor" id="af1dfc8d80eba3ce6cfa8bf21fe49cc1a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">vinecopulib::FitControlsBicop::FitControlsBicop </td>
           <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>nonparametric_mult</em></td><td>)</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>nonparametric_method</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>nonparametric_mult</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramname">nonparametric_method</td><td>the fit method for the local-likelihood nonparametric family (TLLs); possible choices: <code>"constant"</code>, <code>"linear"</code>, <code>"quadratic"</code>. </td></tr>
     <tr><td class="paramname">nonparametric_mult</td><td>a factor with which the smoothing parameters are multiplied. </td></tr>
   </table>
   </dd>
@@ -265,7 +283,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 6 2017 12:41:24 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Aug 23 2017 12:45:44 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

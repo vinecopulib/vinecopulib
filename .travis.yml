@@ -1,42 +1,58 @@
 language: cpp
 
-#compiler: 
-#  - gcc
-#  - clang TODO!
-
 sudo: required
 
 matrix:
   include:
+#    - os: linux
+#      dist: trusty
+#      env: COMPILER=icc
     - os: linux
       dist: trusty
+      env: COMPILER=clang
+    - os: linux
+      dist: trusty
+      env: COMPILER=gcc
     - os: osx
       osx_image: xcode8.2
 
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ]; then export PATH=/usr/bin:$PATH; fi
-
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ zesty main universe"; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
+  - if [ $COMPILER == icc ]; then wget "https://raw.githubusercontent.com/nemequ/icc-travis/master/install-icc.sh"; fi
+  - if [ $COMPILER == icc ]; then sudo sh install-icc.sh; fi
+  - if [ $COMPILER == icc ]; then source ~/.bashrc; fi
+  - if [ $COMPILER == icc ]; then export CMAKE_ARGS="-DCMAKE_CXX_COMPILER=icpc -DCMAKE_C_COMPILER=icc"; fi
+  - if [ $COMPILER == clang ]; then export CMAKE_ARGS="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"; fi
+  - if [ $COMPILER == gcc ]; then export CMAKE_ARGS="-DCODE_COVERAGE=ON"; fi
 
 install:
   ### LINUX
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y lcov libgsl0-dev libeigen3-dev libboost1.63-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y lcov libgsl0-dev libeigen3-dev libboost1.62-dev; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev g++; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y doxygen doxygen-doc doxygen-gui graphviz; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get autoremove; fi # in particular remove old compilers so that new ones are the default
-  - if [ $TRAVIS_OS_NAME == linux ]; then export R_PACKAGES='c("VineCopula")'; fi
+
 
   ### OSX
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew tap homebrew/science && brew install lcov eigen gsl; fi
-
+  - if [ $TRAVIS_OS_NAME == "osx" ]; then /usr/bin/yes | pip uninstall numpy; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then rm /usr/local/include/c++; fi # https://github.com/Homebrew/brew/issues/1742#issuecomment-277308817
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install gcc; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew tap homebrew/science && brew install lcov eigen gsl; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install r; fi
-
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen graphviz; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then export R_PACKAGES='c("VineCopula")'; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then mkdir ~/.R; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then touch ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then echo "CC=/usr/local/bin/gcc-7" >> ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then echo "CXX=/usr/local/bin/g++-7" >> ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then echo "CXX11=/usr/local/bin/g++-7" >> ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then echo "FC=/usr/local/bin/gfortran-7" >> ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then echo "F77=/usr/local/bin/gfortran-7" >> ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then cat ~/.R/Makevars; fi
 
   ### Common
+  - export R_PACKAGES='c("VineCopula")'
   - sudo Rscript -e 'withCallingHandlers(install.packages('$R_PACKAGES', repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
 
   - if [ $TRAVIS_OS_NAME == linux ]; then cd ..; fi
@@ -44,37 +60,41 @@ install:
   - if [ $TRAVIS_OS_NAME == linux ]; then cd nlopt; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then mkdir build; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then cd build; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then make; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo make install; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then cd ../..; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then cd vinecopulib; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install --HEAD nlopt; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install --without-numpy --HEAD nlopt; fi
   
 
 script:
   - mkdir release
   - mkdir debug
   - cd debug
-  - cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug && make vinecopulib_coverage
+  - cmake .. $CMAKE_ARGS -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+  - if [ $COMPILER == gcc ]; then make vinecopulib_coverage; else make; fi
   - cd ../release
-  - cmake .. -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
+  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
   - bin/test_all
   - cd ../examples/bicop
   - mkdir build
   - cd build
-  - cmake .. && VERBOSE=1 make
+  - cmake .. $CMAKE_ARGS && VERBOSE=1 make
   - cd ../bin
   - ./main
 
+after_script:
+  - if [ $COMPILER == icc ]; then '[[ ! -z "${INTEL_INSTALL_PATH}" ]] && uninstall_intel_software'; fi
+
 after_success:
   # Creating report
-  - cd debug
-  - lcov --directory . --capture --output-file coverage.info # capture coverage info
-  - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out external includes
-  - lcov --remove coverage.info '/Applications/*' --output-file coverage.info # filter out more external includes
-  - lcov --remove coverage.info '*test*' --output-file coverage.info # filter out tests
-  - lcov --remove coverage.info '*examples*' --output-file coverage.info # filter out examples
-  - lcov --list coverage.info #debug info
+  - if [ $COMPILER == gcc ]; then cd debug; fi
+  - if [ $COMPILER == gcc ]; then lcov --directory . --capture --output-file coverage.info; fi # capture coverage info
+  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '/usr/*' --output-file coverage.info; fi # filter out external includes
+  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '/Applications/*' --output-file coverage.info; fi # filter out more external includes
+  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '*test*' --output-file coverage.info; fi # filter out tests
+  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '*examples*' --output-file coverage.info; fi # filter out examples
+  - if [ $COMPILER == gcc ]; then lcov --list coverage.info; fi #debug info
   # Uploading report to CodeCov
-  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+  - if [ $COMPILER == gcc ]; then bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"; fi

@@ -14,6 +14,8 @@ Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_afda41507c
 \item 
 Eigen\+::\+Vector\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a9e4849a2a908703a68e92e0c0633237f}{to\+\_\+pseudo\+\_\+obs\+\_\+1d} (Eigen\+::\+Vector\+Xd x, std\+::string ties\+\_\+method)
 \item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_ae2eca8e0fc4ac2d7eeb0226845214847}{dependence\+\_\+matrix} (const Eigen\+::\+Matrix\+Xd \&x, const std\+::string \&measure)
+\item 
 Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_ae0ba8000d0941c82677df06ce6d1d564}{ghalton} (size\+\_\+t n, size\+\_\+t d)
 \end{DoxyCompactItemize}
 \begin{Indent}{\bf Pairwise dependence measures}\par
@@ -24,12 +26,15 @@ Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_ae0ba8000d
 \end{DoxyParams}
 }\begin{DoxyCompactItemize}
 \item 
-double \hyperlink{namespacevinecopulib_1_1tools__stats_aa1ed1d0ae4e304aef8c05737b4bfd024}{pairwise\+\_\+ktau} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&x)\hypertarget{namespacevinecopulib_1_1tools__stats_aa1ed1d0ae4e304aef8c05737b4bfd024}{}\label{namespacevinecopulib_1_1tools__stats_aa1ed1d0ae4e304aef8c05737b4bfd024}
+double \hyperlink{namespacevinecopulib_1_1tools__stats_a48d674c978d8a9b657b3ab82ed42de4b}{pairwise\+\_\+tau} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&x)\hypertarget{namespacevinecopulib_1_1tools__stats_a48d674c978d8a9b657b3ab82ed42de4b}{}\label{namespacevinecopulib_1_1tools__stats_a48d674c978d8a9b657b3ab82ed42de4b}
 
 \begin{DoxyCompactList}\small\item\em calculates the pairwise Kendall\textquotesingle{}s $ \tau $. \end{DoxyCompactList}\item 
 double \hyperlink{namespacevinecopulib_1_1tools__stats_ad076513f9a531a015bb0eaff098a8271}{pairwise\+\_\+cor} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&x)\hypertarget{namespacevinecopulib_1_1tools__stats_ad076513f9a531a015bb0eaff098a8271}{}\label{namespacevinecopulib_1_1tools__stats_ad076513f9a531a015bb0eaff098a8271}
 
-\begin{DoxyCompactList}\small\item\em calculates the pairwise correlation. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em calculates the pairwise Pearson correlation. \end{DoxyCompactList}\item 
+double \hyperlink{namespacevinecopulib_1_1tools__stats_af45a0930d65c0392e35deab25f687711}{pairwise\+\_\+rho} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ x)\hypertarget{namespacevinecopulib_1_1tools__stats_af45a0930d65c0392e35deab25f687711}{}\label{namespacevinecopulib_1_1tools__stats_af45a0930d65c0392e35deab25f687711}
+
+\begin{DoxyCompactList}\small\item\em calculates the pairwise Spearman\textquotesingle{}s $ \rho $. \end{DoxyCompactList}\item 
 double \hyperlink{namespacevinecopulib_1_1tools__stats_adda97526e428173da49899ef449560cf}{pairwise\+\_\+hoeffd} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ x)\hypertarget{namespacevinecopulib_1_1tools__stats_adda97526e428173da49899ef449560cf}{}\label{namespacevinecopulib_1_1tools__stats_adda97526e428173da49899ef449560cf}
 
 \begin{DoxyCompactList}\small\item\em calculates the pair-\/wise Hoeffding\textquotesingle{}s D. \end{DoxyCompactList}\end{DoxyCompactItemize}
@@ -78,6 +83,24 @@ Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a17eb427c3
 Utilities for statistical analysis. 
 
 \subsection{Function Documentation}
+\index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!dependence\+\_\+matrix@{dependence\+\_\+matrix}}
+\index{dependence\+\_\+matrix@{dependence\+\_\+matrix}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
+\subsubsection[{\texorpdfstring{dependence\+\_\+matrix(const Eigen\+::\+Matrix\+Xd \&x, const std\+::string \&measure)}{dependence_matrix(const Eigen::MatrixXd &x, const std::string &measure)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+stats\+::dependence\+\_\+matrix (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{x, }
+\item[{const std\+::string \&}]{measure}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacevinecopulib_1_1tools__stats_ae2eca8e0fc4ac2d7eeb0226845214847}{}\label{namespacevinecopulib_1_1tools__stats_ae2eca8e0fc4ac2d7eeb0226845214847}
+calculates a matrix of pairwise dependence measures. 
+\begin{DoxyParams}{Parameters}
+{\em x} & an $ n \times d $ matrix of observations. \\
+\hline
+{\em measure} & either {\ttfamily \char`\"{}cor\char`\"{}} for Pearson correlation, {\ttfamily \char`\"{}tau\char`\"{}} for Kendall\textquotesingle{}s $ \tau $, {\ttfamily \char`\"{}rho\char`\"{}} for Spearman\textquotesingle{}s $ \rho $, or {\ttfamily \char`\"{}hoeffd\char`\"{}} for Hoeffding\textquotesingle{}s $ D $. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a quadratic matrix of pairwise dependence measures. 
+\end{DoxyReturn}
 \index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!ghalton@{ghalton}}
 \index{ghalton@{ghalton}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
 \subsubsection[{\texorpdfstring{ghalton(size\+\_\+t n, size\+\_\+t d)}{ghalton(size_t n, size_t d)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+stats\+::ghalton (

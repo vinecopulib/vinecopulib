@@ -14,13 +14,21 @@ A class for vine copula models.
 \item 
 \hyperlink{classvinecopulib_1_1_vinecop_a391541e2795d06a848d5a17fe3496a63}{Vinecop} (size\+\_\+t d)
 \item 
-\hyperlink{classvinecopulib_1_1_vinecop_ab44ab72bb062123dabe8c1a5c569f0c0}{Vinecop} (const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix)
+\hyperlink{classvinecopulib_1_1_vinecop_a9aa43135a9319e20573a72f01c82cd3b}{Vinecop} (const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, bool check\+\_\+matrix=true)
 \item 
-\hyperlink{classvinecopulib_1_1_vinecop_a4e6f60c2ddb191f0fe083dda346d0dd1}{Vinecop} (const std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$$>$ \&pair\+\_\+copulas, const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix)
+\hyperlink{classvinecopulib_1_1_vinecop_a48f302a8c97dce27619b70aeb257fe96}{Vinecop} (const std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$$>$ \&pair\+\_\+copulas, const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, bool check\+\_\+matrix=true)
 \item 
 \hyperlink{classvinecopulib_1_1_vinecop_a1bba8d207a21b5d0c76660af40383822}{Vinecop} (const Eigen\+::\+Matrix\+Xd \&data, \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} controls=\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}())
 \item 
-\hyperlink{classvinecopulib_1_1_vinecop_a4c97ed6f0af4e4cb726a26629ad73c6b}{Vinecop} (const Eigen\+::\+Matrix\+Xd \&data, const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} controls=\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}())
+\hyperlink{classvinecopulib_1_1_vinecop_aa38ebdd3582482fad7d1ace027a9c162}{Vinecop} (const Eigen\+::\+Matrix\+Xd \&data, const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} controls=\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}(), bool check\+\_\+matrix=true)
+\item 
+\hyperlink{classvinecopulib_1_1_vinecop_ad6ab9327b34a6e7fe4e8fcb0e8cf0d82}{Vinecop} (const char $\ast$filename, bool check\+\_\+matrix=true)
+\item 
+\hyperlink{classvinecopulib_1_1_vinecop_a899449d750e92e220dda904287b39b07}{Vinecop} (boost\+::property\+\_\+tree\+::ptree input, bool check\+\_\+matrix=true)
+\item 
+boost\+::property\+\_\+tree\+::ptree \hyperlink{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}{to\+\_\+ptree} ()
+\item 
+void \hyperlink{classvinecopulib_1_1_vinecop_ad6f8b8fb042f3958eda9641548bc3bcb}{to\+\_\+json} (const char $\ast$filename)
 \item 
 void \hyperlink{classvinecopulib_1_1_vinecop_ad6cbb6b69c41f13a6e5e46ece44c0f78}{select\+\_\+all} (const Eigen\+::\+Matrix\+Xd \&data, \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} controls=\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}())
 \item 
@@ -92,29 +100,35 @@ creates a D-\/vine on {\ttfamily d} variables with all pair-\/copulas set to ind
 \end{DoxyParams}
 \index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
 \index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
-\subsubsection[{\texorpdfstring{Vinecop(const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix)}{Vinecop(const Eigen::Matrix< size_t, Eigen::Dynamic, Eigen::Dynamic > &matrix)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
+\subsubsection[{\texorpdfstring{Vinecop(const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, bool check\+\_\+matrix=true)}{Vinecop(const Eigen::Matrix< size_t, Eigen::Dynamic, Eigen::Dynamic > &matrix, bool check_matrix=true)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
 \begin{DoxyParamCaption}
-\item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{matrix}
+\item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{matrix, }
+\item[{bool}]{check\+\_\+matrix = {\ttfamily true}}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1_vinecop_ab44ab72bb062123dabe8c1a5c569f0c0}{}\label{classvinecopulib_1_1_vinecop_ab44ab72bb062123dabe8c1a5c569f0c0}
+)}\hypertarget{classvinecopulib_1_1_vinecop_a9aa43135a9319e20573a72f01c82cd3b}{}\label{classvinecopulib_1_1_vinecop_a9aa43135a9319e20573a72f01c82cd3b}
 creates a vine copula with structure specified by an R-\/vine matrix; all pair-\/copulas are set to independence. 
 \begin{DoxyParams}{Parameters}
 {\em matrix} & an R-\/vine matrix. \\
 \hline
+{\em check\+\_\+matrix} & whether to check if {\ttfamily matrix} is a valid R-\/vine matrix. \\
+\hline
 \end{DoxyParams}
 \index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
 \index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
-\subsubsection[{\texorpdfstring{Vinecop(const std\+::vector$<$ std\+::vector$<$ Bicop $>$$>$ \&pair\+\_\+copulas, const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix)}{Vinecop(const std::vector< std::vector< Bicop >> &pair_copulas, const Eigen::Matrix< size_t, Eigen::Dynamic, Eigen::Dynamic > &matrix)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
+\subsubsection[{\texorpdfstring{Vinecop(const std\+::vector$<$ std\+::vector$<$ Bicop $>$$>$ \&pair\+\_\+copulas, const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, bool check\+\_\+matrix=true)}{Vinecop(const std::vector< std::vector< Bicop >> &pair_copulas, const Eigen::Matrix< size_t, Eigen::Dynamic, Eigen::Dynamic > &matrix, bool check_matrix=true)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
 \begin{DoxyParamCaption}
 \item[{const std\+::vector$<$ std\+::vector$<$ {\bf Bicop} $>$$>$ \&}]{pair\+\_\+copulas, }
-\item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{matrix}
+\item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{matrix, }
+\item[{bool}]{check\+\_\+matrix = {\ttfamily true}}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1_vinecop_a4e6f60c2ddb191f0fe083dda346d0dd1}{}\label{classvinecopulib_1_1_vinecop_a4e6f60c2ddb191f0fe083dda346d0dd1}
+)}\hypertarget{classvinecopulib_1_1_vinecop_a48f302a8c97dce27619b70aeb257fe96}{}\label{classvinecopulib_1_1_vinecop_a48f302a8c97dce27619b70aeb257fe96}
 creates an arbitrary vine copula model. 
 \begin{DoxyParams}{Parameters}
 {\em pair\+\_\+copulas} & \hyperlink{classvinecopulib_1_1_bicop}{Bicop} objects specifying the pair-\/copulas, see \hyperlink{classvinecopulib_1_1_vinecop_a44f2ca25c3e08fa0e185539d8d29f13b}{make\+\_\+pair\+\_\+copula\+\_\+store()}. \\
 \hline
 {\em matrix} & an R-\/vine matrix specifying the vine structure. \\
+\hline
+{\em check\+\_\+matrix} & whether to check if {\ttfamily matrix} is a valid R-\/vine matrix. \\
 \hline
 \end{DoxyParams}
 \index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
@@ -138,13 +152,14 @@ The function creates a model and calls \hyperlink{classvinecopulib_1_1_vinecop_a
 \end{DoxyParams}
 \index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
 \index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
-\subsubsection[{\texorpdfstring{Vinecop(const Eigen\+::\+Matrix\+Xd \&data, const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, Fit\+Controls\+Vinecop controls=\+Fit\+Controls\+Vinecop())}{Vinecop(const Eigen::MatrixXd &data, const Eigen::Matrix< size_t, Eigen::Dynamic, Eigen::Dynamic > &matrix, FitControlsVinecop controls=FitControlsVinecop())}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
+\subsubsection[{\texorpdfstring{Vinecop(const Eigen\+::\+Matrix\+Xd \&data, const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, Fit\+Controls\+Vinecop controls=\+Fit\+Controls\+Vinecop(), bool check\+\_\+matrix=true)}{Vinecop(const Eigen::MatrixXd &data, const Eigen::Matrix< size_t, Eigen::Dynamic, Eigen::Dynamic > &matrix, FitControlsVinecop controls=FitControlsVinecop(), bool check_matrix=true)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
 \begin{DoxyParamCaption}
 \item[{const Eigen\+::\+Matrix\+Xd \&}]{data, }
 \item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{matrix, }
-\item[{{\bf Fit\+Controls\+Vinecop}}]{controls = {\ttfamily {\bf Fit\+Controls\+Vinecop}()}}
+\item[{{\bf Fit\+Controls\+Vinecop}}]{controls = {\ttfamily {\bf Fit\+Controls\+Vinecop}()}, }
+\item[{bool}]{check\+\_\+matrix = {\ttfamily true}}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1_vinecop_a4c97ed6f0af4e4cb726a26629ad73c6b}{}\label{classvinecopulib_1_1_vinecop_a4c97ed6f0af4e4cb726a26629ad73c6b}
+)}\hypertarget{classvinecopulib_1_1_vinecop_aa38ebdd3582482fad7d1ace027a9c162}{}\label{classvinecopulib_1_1_vinecop_aa38ebdd3582482fad7d1ace027a9c162}
 constructs a vine copula model from data.
 
 The function creates a model and calls select\+\_\+family().
@@ -156,6 +171,38 @@ The function creates a model and calls select\+\_\+family().
 {\em matrix} & either an empty matrix (default) or an R-\/vine structure matrix, see \hyperlink{classvinecopulib_1_1_vinecop_a15ca60a0770dab0786b134fc80d1e77d}{select\+\_\+families()}. \\
 \hline
 {\em controls} & see \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}. \\
+\hline
+{\em check\+\_\+matrix} & whether to check if {\ttfamily matrix} is a valid R-\/vine matrix. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{Vinecop(const char $\ast$filename, bool check\+\_\+matrix=true)}{Vinecop(const char *filename, bool check_matrix=true)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{filename, }
+\item[{bool}]{check\+\_\+matrix = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_ad6ab9327b34a6e7fe4e8fcb0e8cf0d82}{}\label{classvinecopulib_1_1_vinecop_ad6ab9327b34a6e7fe4e8fcb0e8cf0d82}
+creates from a J\+S\+ON file 
+\begin{DoxyParams}{Parameters}
+{\em filename} & the name of the J\+S\+ON file to read (see \hyperlink{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}{to\+\_\+ptree()} for the structure of the file). \\
+\hline
+{\em check\+\_\+matrix} & whether to check if the {\ttfamily \char`\"{}matrix\char`\"{}} node represents a valid R-\/vine matrix. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{Vinecop(boost\+::property\+\_\+tree\+::ptree input, bool check\+\_\+matrix=true)}{Vinecop(boost::property_tree::ptree input, bool check_matrix=true)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Vinecop\+::\+Vinecop (
+\begin{DoxyParamCaption}
+\item[{boost\+::property\+\_\+tree\+::ptree}]{input, }
+\item[{bool}]{check\+\_\+matrix = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_a899449d750e92e220dda904287b39b07}{}\label{classvinecopulib_1_1_vinecop_a899449d750e92e220dda904287b39b07}
+creates from a boost\+::property\+\_\+tree\+::ptree object 
+\begin{DoxyParams}{Parameters}
+{\em input} & the boost\+::property\+\_\+tree\+::ptree object to convert from (see \hyperlink{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}{to\+\_\+ptree()} for the structure of the input). \\
+\hline
+{\em check\+\_\+matrix} & whether to check if the {\ttfamily \char`\"{}matrix\char`\"{}} node represents a valid R-\/vine matrix. \\
 \hline
 \end{DoxyParams}
 
@@ -450,6 +497,36 @@ simulates from a vine copula model, see \hyperlink{classvinecopulib_1_1_vinecop_
 {\em n} & number of observations. \\
 \hline
 \end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!to\+\_\+json@{to\+\_\+json}}
+\index{to\+\_\+json@{to\+\_\+json}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{to\+\_\+json(const char $\ast$filename)}{to_json(const char *filename)}}]{\setlength{\rightskip}{0pt plus 5cm}void vinecopulib\+::\+Vinecop\+::to\+\_\+json (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{filename}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_ad6f8b8fb042f3958eda9641548bc3bcb}{}\label{classvinecopulib_1_1_vinecop_ad6f8b8fb042f3958eda9641548bc3bcb}
+Write the copula object into a J\+S\+ON file
+
+See \hyperlink{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}{to\+\_\+ptree()} for the structure of the file.
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & the name of the file to write. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!to\+\_\+ptree@{to\+\_\+ptree}}
+\index{to\+\_\+ptree@{to\+\_\+ptree}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection[{\texorpdfstring{to\+\_\+ptree()}{to_ptree()}}]{\setlength{\rightskip}{0pt plus 5cm}boost\+::property\+\_\+tree\+::ptree vinecopulib\+::\+Vinecop\+::to\+\_\+ptree (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}{}\label{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}
+Convert the copula into a boost\+::property\+\_\+tree\+::ptree object
+
+The ptree object contains two nodes \+: {\ttfamily \char`\"{}matrix\char`\"{}} and {\ttfamily \char`\"{}pair copulas\char`\"{}}. The former is encodes the R-\/\+Vine structure and the latter is a list of child nodes for the trees ({\ttfamily \char`\"{}tree1\char`\"{}}, {\ttfamily \char`\"{}tree2\char`\"{}}, etc), each containing a list of child nodes for the edges ({\ttfamily \char`\"{}pc1\char`\"{}}, {\ttfamily \char`\"{}pc2\char`\"{}}, etc). See \hyperlink{classvinecopulib_1_1_bicop_ab0caeb35ca5958f6927e8b0687b54893}{Bicop\+::to\+\_\+ptree()} for the encoding of pair-\/copulas.
+
+\begin{DoxyReturn}{Returns}
+the boost\+::property\+\_\+tree\+::ptree object containing the copula. 
+\end{DoxyReturn}
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}

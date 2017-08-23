@@ -1,3 +1,41 @@
+# vinecopulib 0.1.0 (August 23, 2017)
+
+NEW FEATURES
+ 
+   * read/write `Bicop` and `Vinecop` objects (#205) using 
+     `boost::property_tree::ptree` with `to_ptree()`, `to_json()`, and 
+     constructors taking `const char *filename` or a 
+     `boost::property_tree::ptree` for both classes.
+     
+   * sparse selection of vine copulas (#206) using new data members in 
+     `FitControlsVinecop`:
+        * `bool select_truncation_level` whether the truncation is selected 
+           automatically.
+        * `bool select_threshold` whether the threshold parameter is selected 
+           automatically.
+        * `double threshold` sets a fixed threshold parameter.
+        
+   * local likelihood estimators (#216) have been implemented by refactoring the 
+     `tll0` family into a more general `tll` family, where approximations of 
+     degrees zero, one and two can be fitted by setting the new 
+     `std::string nonparametric_method` data member of `FitControlsBicop` 
+     respectively as `constant`, `linear` and `quadratic` (default).
+     
+   * Kendall's tau (#211) and normalization (#215) for kernel estimators.
+     
+   * support for clang compiler on linux (#201, #202, #203).
+   
+   * option to omit R-vine matrix check in `Vinecop` constructors (#198).
+     
+BUG FIXES
+
+   * replacing throw `std::string` with throw `std::runtime_error` in 
+    `tools_opimization.cpp` (#204).
+   
+   * ensure valid starting parameters in `Bicop::fit()` (#209, #210).
+   
+   * fix appveyor and travis problems (#208, #212, #213).
+
 # vinecopulib 0.0.3 (June 7, 2017)
 
 NEW FEATURES

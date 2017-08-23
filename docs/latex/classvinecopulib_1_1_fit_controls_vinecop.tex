@@ -33,9 +33,9 @@ Collaboration diagram for vinecopulib\+:\+:Fit\+Controls\+Vinecop\+:\nopagebreak
 \hyperlink{classvinecopulib_1_1_fit_controls_vinecop_ad101d135c8d8fe66046d931947f45bef}{Fit\+Controls\+Vinecop} ()\hypertarget{classvinecopulib_1_1_fit_controls_vinecop_ad101d135c8d8fe66046d931947f45bef}{}\label{classvinecopulib_1_1_fit_controls_vinecop_ad101d135c8d8fe66046d931947f45bef}
 
 \begin{DoxyCompactList}\small\item\em creates default controls for fitting vine copula models. \end{DoxyCompactList}\item 
-\hyperlink{classvinecopulib_1_1_fit_controls_vinecop_a0e908bcfa9eb6768d19dd711a6d11ad3}{Fit\+Controls\+Vinecop} (std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set, std\+::string parametric\+\_\+method=\char`\"{}mle\char`\"{}, double nonparametric\+\_\+mult=1.\+0, size\+\_\+t truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ size\+\_\+t $>$\+::max(), std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, double threshold=0.\+0, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool show\+\_\+trace=false)
+\hyperlink{classvinecopulib_1_1_fit_controls_vinecop_af0550d369be595665d0d9e8f6709a74c}{Fit\+Controls\+Vinecop} (std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set, std\+::string parametric\+\_\+method=\char`\"{}mle\char`\"{}, std\+::string nonparametric\+\_\+method=\char`\"{}quadratic\char`\"{}, double nonparametric\+\_\+mult=1.\+0, size\+\_\+t truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ size\+\_\+t $>$\+::max(), std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, double threshold=0.\+0, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true, bool select\+\_\+truncation\+\_\+level=false, bool select\+\_\+threshold=false, bool show\+\_\+trace=false)
 \item 
-\hyperlink{classvinecopulib_1_1_fit_controls_vinecop_ac755f0c41c3322cdd773a7a75ae98e7c}{Fit\+Controls\+Vinecop} (const \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop} controls, size\+\_\+t truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ size\+\_\+t $>$\+::max(), std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, double threshold=0.\+0, bool show\+\_\+trace=false)
+\hyperlink{classvinecopulib_1_1_fit_controls_vinecop_a21e1351edcb735b959342384f3dae212}{Fit\+Controls\+Vinecop} (const \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop} controls, size\+\_\+t truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ size\+\_\+t $>$\+::max(), std\+::string tree\+\_\+criterion=\char`\"{}tau\char`\"{}, double threshold=0.\+0, bool select\+\_\+truncation\+\_\+level=false, bool select\+\_\+threshold=false, bool show\+\_\+trace=false)
 \end{DoxyCompactItemize}
 {\bf }\par
 \begin{DoxyCompactItemize}
@@ -51,24 +51,29 @@ A class for controlling fit of bivariate copula models.
 \subsection{Constructor \& Destructor Documentation}
 \index{vinecopulib\+::\+Fit\+Controls\+Vinecop@{vinecopulib\+::\+Fit\+Controls\+Vinecop}!Fit\+Controls\+Vinecop@{Fit\+Controls\+Vinecop}}
 \index{Fit\+Controls\+Vinecop@{Fit\+Controls\+Vinecop}!vinecopulib\+::\+Fit\+Controls\+Vinecop@{vinecopulib\+::\+Fit\+Controls\+Vinecop}}
-\subsubsection[{\texorpdfstring{Fit\+Controls\+Vinecop(std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set, std\+::string parametric\+\_\+method=""mle"", double nonparametric\+\_\+mult=1.\+0, size\+\_\+t truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ size\+\_\+t $>$\+::max(), std\+::string tree\+\_\+criterion=""tau"", double threshold=0.\+0, std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true, bool show\+\_\+trace=false)}{FitControlsVinecop(std::vector< BicopFamily > family_set, std::string parametric_method="mle", double nonparametric_mult=1.0, size_t truncation_level=std::numeric_limits< size_t >::max(), std::string tree_criterion="tau", double threshold=0.0, std::string selection_criterion="bic", bool preselect_families=true, bool show_trace=false)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Fit\+Controls\+Vinecop\+::\+Fit\+Controls\+Vinecop (
+\subsubsection[{\texorpdfstring{Fit\+Controls\+Vinecop(std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set, std\+::string parametric\+\_\+method=""mle"", std\+::string nonparametric\+\_\+method=""quadratic"", double nonparametric\+\_\+mult=1.\+0, size\+\_\+t truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ size\+\_\+t $>$\+::max(), std\+::string tree\+\_\+criterion=""tau"", double threshold=0.\+0, std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true, bool select\+\_\+truncation\+\_\+level=false, bool select\+\_\+threshold=false, bool show\+\_\+trace=false)}{FitControlsVinecop(std::vector< BicopFamily > family_set, std::string parametric_method="mle", std::string nonparametric_method="quadratic", double nonparametric_mult=1.0, size_t truncation_level=std::numeric_limits< size_t >::max(), std::string tree_criterion="tau", double threshold=0.0, std::string selection_criterion="bic", bool preselect_families=true, bool select_truncation_level=false, bool select_threshold=false, bool show_trace=false)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Fit\+Controls\+Vinecop\+::\+Fit\+Controls\+Vinecop (
 \begin{DoxyParamCaption}
 \item[{std\+::vector$<$ {\bf Bicop\+Family} $>$}]{family\+\_\+set, }
 \item[{std\+::string}]{parametric\+\_\+method = {\ttfamily \char`\"{}mle\char`\"{}}, }
+\item[{std\+::string}]{nonparametric\+\_\+method = {\ttfamily \char`\"{}quadratic\char`\"{}}, }
 \item[{double}]{nonparametric\+\_\+mult = {\ttfamily 1.0}, }
 \item[{size\+\_\+t}]{truncation\+\_\+level = {\ttfamily std\+:\+:numeric\+\_\+limits$<$size\+\_\+t$>$\+:\+:max()}, }
 \item[{std\+::string}]{tree\+\_\+criterion = {\ttfamily \char`\"{}tau\char`\"{}}, }
 \item[{double}]{threshold = {\ttfamily 0.0}, }
 \item[{std\+::string}]{selection\+\_\+criterion = {\ttfamily \char`\"{}bic\char`\"{}}, }
 \item[{bool}]{preselect\+\_\+families = {\ttfamily true}, }
+\item[{bool}]{select\+\_\+truncation\+\_\+level = {\ttfamily false}, }
+\item[{bool}]{select\+\_\+threshold = {\ttfamily false}, }
 \item[{bool}]{show\+\_\+trace = {\ttfamily false}}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1_fit_controls_vinecop_a0e908bcfa9eb6768d19dd711a6d11ad3}{}\label{classvinecopulib_1_1_fit_controls_vinecop_a0e908bcfa9eb6768d19dd711a6d11ad3}
+)}\hypertarget{classvinecopulib_1_1_fit_controls_vinecop_af0550d369be595665d0d9e8f6709a74c}{}\label{classvinecopulib_1_1_fit_controls_vinecop_af0550d369be595665d0d9e8f6709a74c}
 creates custom controls for fitting vine copula models. 
 \begin{DoxyParams}{Parameters}
 {\em family\+\_\+set} & see \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}. \\
 \hline
 {\em parametric\+\_\+method} & see \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}. \\
+\hline
+{\em nonparametric\+\_\+method} & see \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}. \\
 \hline
 {\em nonparametric\+\_\+mult} & see \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}. \\
 \hline
@@ -82,20 +87,26 @@ creates custom controls for fitting vine copula models.
 \hline
 {\em preselect\+\_\+families} & see \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}. \\
 \hline
+{\em select\+\_\+truncation\+\_\+level} & whether the truncation shall be selected automatically. \\
+\hline
+{\em select\+\_\+threshold} & whether the threshold parameter shall be selected automatically. \\
+\hline
 {\em show\+\_\+trace} & whether to show a trace of the building progress. \\
 \hline
 \end{DoxyParams}
 \index{vinecopulib\+::\+Fit\+Controls\+Vinecop@{vinecopulib\+::\+Fit\+Controls\+Vinecop}!Fit\+Controls\+Vinecop@{Fit\+Controls\+Vinecop}}
 \index{Fit\+Controls\+Vinecop@{Fit\+Controls\+Vinecop}!vinecopulib\+::\+Fit\+Controls\+Vinecop@{vinecopulib\+::\+Fit\+Controls\+Vinecop}}
-\subsubsection[{\texorpdfstring{Fit\+Controls\+Vinecop(const Fit\+Controls\+Bicop controls, size\+\_\+t truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ size\+\_\+t $>$\+::max(), std\+::string tree\+\_\+criterion=""tau"", double threshold=0.\+0, bool show\+\_\+trace=false)}{FitControlsVinecop(const FitControlsBicop controls, size_t truncation_level=std::numeric_limits< size_t >::max(), std::string tree_criterion="tau", double threshold=0.0, bool show_trace=false)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Fit\+Controls\+Vinecop\+::\+Fit\+Controls\+Vinecop (
+\subsubsection[{\texorpdfstring{Fit\+Controls\+Vinecop(const Fit\+Controls\+Bicop controls, size\+\_\+t truncation\+\_\+level=std\+::numeric\+\_\+limits$<$ size\+\_\+t $>$\+::max(), std\+::string tree\+\_\+criterion=""tau"", double threshold=0.\+0, bool select\+\_\+truncation\+\_\+level=false, bool select\+\_\+threshold=false, bool show\+\_\+trace=false)}{FitControlsVinecop(const FitControlsBicop controls, size_t truncation_level=std::numeric_limits< size_t >::max(), std::string tree_criterion="tau", double threshold=0.0, bool select_truncation_level=false, bool select_threshold=false, bool show_trace=false)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Fit\+Controls\+Vinecop\+::\+Fit\+Controls\+Vinecop (
 \begin{DoxyParamCaption}
 \item[{const {\bf Fit\+Controls\+Bicop}}]{controls, }
 \item[{size\+\_\+t}]{truncation\+\_\+level = {\ttfamily std\+:\+:numeric\+\_\+limits$<$size\+\_\+t$>$\+:\+:max()}, }
 \item[{std\+::string}]{tree\+\_\+criterion = {\ttfamily \char`\"{}tau\char`\"{}}, }
 \item[{double}]{threshold = {\ttfamily 0.0}, }
+\item[{bool}]{select\+\_\+truncation\+\_\+level = {\ttfamily false}, }
+\item[{bool}]{select\+\_\+threshold = {\ttfamily false}, }
 \item[{bool}]{show\+\_\+trace = {\ttfamily false}}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1_fit_controls_vinecop_ac755f0c41c3322cdd773a7a75ae98e7c}{}\label{classvinecopulib_1_1_fit_controls_vinecop_ac755f0c41c3322cdd773a7a75ae98e7c}
+)}\hypertarget{classvinecopulib_1_1_fit_controls_vinecop_a21e1351edcb735b959342384f3dae212}{}\label{classvinecopulib_1_1_fit_controls_vinecop_a21e1351edcb735b959342384f3dae212}
 creates custom controls for fitting vine copula models. 
 \begin{DoxyParams}{Parameters}
 {\em truncation\+\_\+level} & for truncated vines. \\
@@ -105,6 +116,10 @@ creates custom controls for fitting vine copula models.
 {\em threshold} & for thresholded vines (0 = no threshold). \\
 \hline
 {\em show\+\_\+trace} & whether to show a trace of the building progress. \\
+\hline
+{\em select\+\_\+truncation\+\_\+level} & whether the truncation shall be selected automatically. \\
+\hline
+{\em select\+\_\+threshold} & whether the threshold parameter shall be selected automatically. \\
 \hline
 {\em controls} & see \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}. \\
 \hline

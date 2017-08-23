@@ -21,11 +21,11 @@ Inheritance diagram for vinecopulib\+:\+:Fit\+Controls\+Bicop\+:\nopagebreak
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{classvinecopulib_1_1_fit_controls_bicop_a544d095b0ef0a99e08b8ca60a5753fbe}{Fit\+Controls\+Bicop} (std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=\hyperlink{namespacevinecopulib_1_1bicop__families_a5214a513f41ec23b74782aab96ea6774}{bicop\+\_\+families\+::all}, std\+::string parametric\+\_\+method=\char`\"{}mle\char`\"{}, double nonparametric\+\_\+mult=1.\+0, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true)
+\hyperlink{classvinecopulib_1_1_fit_controls_bicop_a2530bab0592e6bea474416685e405698}{Fit\+Controls\+Bicop} (std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ family\+\_\+set=\hyperlink{namespacevinecopulib_1_1bicop__families_a5214a513f41ec23b74782aab96ea6774}{bicop\+\_\+families\+::all}, std\+::string parametric\+\_\+method=\char`\"{}mle\char`\"{}, std\+::string nonparametric\+\_\+method=\char`\"{}quadratic\char`\"{}, double nonparametric\+\_\+mult=1.\+0, std\+::string selection\+\_\+criterion=\char`\"{}bic\char`\"{}, bool preselect\+\_\+families=true)
 \item 
 \hyperlink{classvinecopulib_1_1_fit_controls_bicop_a6a2fc00794c9dd9d598ac9948e7b98e4}{Fit\+Controls\+Bicop} (std\+::string parametric\+\_\+method)
 \item 
-\hyperlink{classvinecopulib_1_1_fit_controls_bicop_a4fc0ec257a3501ebfa15ea36f821cdec}{Fit\+Controls\+Bicop} (double nonparametric\+\_\+mult)
+\hyperlink{classvinecopulib_1_1_fit_controls_bicop_af1dfc8d80eba3ce6cfa8bf21fe49cc1a}{Fit\+Controls\+Bicop} (std\+::string nonparametric\+\_\+method, double nonparametric\+\_\+mult)
 \end{DoxyCompactItemize}
 {\bf }\par
 \begin{DoxyCompactItemize}
@@ -41,20 +41,23 @@ A class for controlling fit of bivariate copula models.
 \subsection{Constructor \& Destructor Documentation}
 \index{vinecopulib\+::\+Fit\+Controls\+Bicop@{vinecopulib\+::\+Fit\+Controls\+Bicop}!Fit\+Controls\+Bicop@{Fit\+Controls\+Bicop}}
 \index{Fit\+Controls\+Bicop@{Fit\+Controls\+Bicop}!vinecopulib\+::\+Fit\+Controls\+Bicop@{vinecopulib\+::\+Fit\+Controls\+Bicop}}
-\subsubsection[{\texorpdfstring{Fit\+Controls\+Bicop(std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string parametric\+\_\+method=""mle"", double nonparametric\+\_\+mult=1.\+0, std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true)}{FitControlsBicop(std::vector< BicopFamily > family_set=bicop_families::all, std::string parametric_method="mle", double nonparametric_mult=1.0, std::string selection_criterion="bic", bool preselect_families=true)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Fit\+Controls\+Bicop\+::\+Fit\+Controls\+Bicop (
+\subsubsection[{\texorpdfstring{Fit\+Controls\+Bicop(std\+::vector$<$ Bicop\+Family $>$ family\+\_\+set=bicop\+\_\+families\+::all, std\+::string parametric\+\_\+method=""mle"", std\+::string nonparametric\+\_\+method=""quadratic"", double nonparametric\+\_\+mult=1.\+0, std\+::string selection\+\_\+criterion=""bic"", bool preselect\+\_\+families=true)}{FitControlsBicop(std::vector< BicopFamily > family_set=bicop_families::all, std::string parametric_method="mle", std::string nonparametric_method="quadratic", double nonparametric_mult=1.0, std::string selection_criterion="bic", bool preselect_families=true)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Fit\+Controls\+Bicop\+::\+Fit\+Controls\+Bicop (
 \begin{DoxyParamCaption}
 \item[{std\+::vector$<$ {\bf Bicop\+Family} $>$}]{family\+\_\+set = {\ttfamily {\bf bicop\+\_\+families\+::all}}, }
 \item[{std\+::string}]{parametric\+\_\+method = {\ttfamily \char`\"{}mle\char`\"{}}, }
+\item[{std\+::string}]{nonparametric\+\_\+method = {\ttfamily \char`\"{}quadratic\char`\"{}}, }
 \item[{double}]{nonparametric\+\_\+mult = {\ttfamily 1.0}, }
 \item[{std\+::string}]{selection\+\_\+criterion = {\ttfamily \char`\"{}bic\char`\"{}}, }
 \item[{bool}]{preselect\+\_\+families = {\ttfamily true}}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1_fit_controls_bicop_a544d095b0ef0a99e08b8ca60a5753fbe}{}\label{classvinecopulib_1_1_fit_controls_bicop_a544d095b0ef0a99e08b8ca60a5753fbe}
+)}\hypertarget{classvinecopulib_1_1_fit_controls_bicop_a2530bab0592e6bea474416685e405698}{}\label{classvinecopulib_1_1_fit_controls_bicop_a2530bab0592e6bea474416685e405698}
 creates the controls for fitting bivariate copula models. 
 \begin{DoxyParams}{Parameters}
 {\em family\+\_\+set} & the set of copula families to consider (if empty, then all families are included). \\
 \hline
 {\em parametric\+\_\+method} & the fit method for parametric families; possible choices\+: {\ttfamily \char`\"{}mle\char`\"{}}, {\ttfamily \char`\"{}itau\char`\"{}}. \\
+\hline
+{\em nonparametric\+\_\+method} & the fit method for the local-\/likelihood nonparametric family (T\+L\+Ls); possible choices\+: {\ttfamily \char`\"{}constant\char`\"{}}, {\ttfamily \char`\"{}linear\char`\"{}}, {\ttfamily \char`\"{}quadratic\char`\"{}}. \\
 \hline
 {\em nonparametric\+\_\+mult} & a factor with which the smoothing parameters are multiplied. \\
 \hline
@@ -77,13 +80,16 @@ creates the controls for fitting bivariate copula models.
 \end{DoxyParams}
 \index{vinecopulib\+::\+Fit\+Controls\+Bicop@{vinecopulib\+::\+Fit\+Controls\+Bicop}!Fit\+Controls\+Bicop@{Fit\+Controls\+Bicop}}
 \index{Fit\+Controls\+Bicop@{Fit\+Controls\+Bicop}!vinecopulib\+::\+Fit\+Controls\+Bicop@{vinecopulib\+::\+Fit\+Controls\+Bicop}}
-\subsubsection[{\texorpdfstring{Fit\+Controls\+Bicop(double nonparametric\+\_\+mult)}{FitControlsBicop(double nonparametric_mult)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Fit\+Controls\+Bicop\+::\+Fit\+Controls\+Bicop (
+\subsubsection[{\texorpdfstring{Fit\+Controls\+Bicop(std\+::string nonparametric\+\_\+method, double nonparametric\+\_\+mult)}{FitControlsBicop(std::string nonparametric_method, double nonparametric_mult)}}]{\setlength{\rightskip}{0pt plus 5cm}vinecopulib\+::\+Fit\+Controls\+Bicop\+::\+Fit\+Controls\+Bicop (
 \begin{DoxyParamCaption}
+\item[{std\+::string}]{nonparametric\+\_\+method, }
 \item[{double}]{nonparametric\+\_\+mult}
 \end{DoxyParamCaption}
-)}\hypertarget{classvinecopulib_1_1_fit_controls_bicop_a4fc0ec257a3501ebfa15ea36f821cdec}{}\label{classvinecopulib_1_1_fit_controls_bicop_a4fc0ec257a3501ebfa15ea36f821cdec}
+)}\hypertarget{classvinecopulib_1_1_fit_controls_bicop_af1dfc8d80eba3ce6cfa8bf21fe49cc1a}{}\label{classvinecopulib_1_1_fit_controls_bicop_af1dfc8d80eba3ce6cfa8bf21fe49cc1a}
 
 \begin{DoxyParams}{Parameters}
+{\em nonparametric\+\_\+method} & the fit method for the local-\/likelihood nonparametric family (T\+L\+Ls); possible choices\+: {\ttfamily \char`\"{}constant\char`\"{}}, {\ttfamily \char`\"{}linear\char`\"{}}, {\ttfamily \char`\"{}quadratic\char`\"{}}. \\
+\hline
 {\em nonparametric\+\_\+mult} & a factor with which the smoothing parameters are multiplied. \\
 \hline
 \end{DoxyParams}

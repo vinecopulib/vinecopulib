@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.0.3</a>
+                    <a class="navbar-brand">vinecopulib 0.1.0</a>
                 </div>
             </div>
         </nav>
@@ -143,6 +143,8 @@ Functions</h2></td></tr>
 <tr class="separator:afda41507cee7cba84602e28e56cfcd99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e4849a2a908703a68e92e0c0633237f"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a9e4849a2a908703a68e92e0c0633237f">vinecopulib::tools_stats::to_pseudo_obs_1d</a> (Eigen::VectorXd x, std::string ties_method)</td></tr>
 <tr class="separator:a9e4849a2a908703a68e92e0c0633237f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2eca8e0fc4ac2d7eeb0226845214847"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#ae2eca8e0fc4ac2d7eeb0226845214847">vinecopulib::tools_stats::dependence_matrix</a> (const Eigen::MatrixXd &amp;x, const std::string &amp;measure)</td></tr>
+<tr class="separator:ae2eca8e0fc4ac2d7eeb0226845214847"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0ba8000d0941c82677df06ce6d1d564"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#ae0ba8000d0941c82677df06ce6d1d564">vinecopulib::tools_stats::ghalton</a> (size_t n, size_t d)</td></tr>
 <tr class="separator:ae0ba8000d0941c82677df06ce6d1d564"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Pairwise dependence measures</div></td></tr>
@@ -153,14 +155,18 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 </div></td></tr>
-<tr class="memitem:aa1ed1d0ae4e304aef8c05737b4bfd024"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa1ed1d0ae4e304aef8c05737b4bfd024"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#aa1ed1d0ae4e304aef8c05737b4bfd024">vinecopulib::tools_stats::pairwise_ktau</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;x)</td></tr>
-<tr class="memdesc:aa1ed1d0ae4e304aef8c05737b4bfd024"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pairwise Kendall's \( \tau \). <br /></td></tr>
-<tr class="separator:aa1ed1d0ae4e304aef8c05737b4bfd024"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48d674c978d8a9b657b3ab82ed42de4b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a48d674c978d8a9b657b3ab82ed42de4b"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a48d674c978d8a9b657b3ab82ed42de4b">vinecopulib::tools_stats::pairwise_tau</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;x)</td></tr>
+<tr class="memdesc:a48d674c978d8a9b657b3ab82ed42de4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pairwise Kendall's \( \tau \). <br /></td></tr>
+<tr class="separator:a48d674c978d8a9b657b3ab82ed42de4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad076513f9a531a015bb0eaff098a8271"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad076513f9a531a015bb0eaff098a8271"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#ad076513f9a531a015bb0eaff098a8271">vinecopulib::tools_stats::pairwise_cor</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;x)</td></tr>
-<tr class="memdesc:ad076513f9a531a015bb0eaff098a8271"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pairwise correlation. <br /></td></tr>
+<tr class="memdesc:ad076513f9a531a015bb0eaff098a8271"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pairwise Pearson correlation. <br /></td></tr>
 <tr class="separator:ad076513f9a531a015bb0eaff098a8271"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af45a0930d65c0392e35deab25f687711"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af45a0930d65c0392e35deab25f687711"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#af45a0930d65c0392e35deab25f687711">vinecopulib::tools_stats::pairwise_rho</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; x)</td></tr>
+<tr class="memdesc:af45a0930d65c0392e35deab25f687711"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pairwise Spearman's \( \rho \). <br /></td></tr>
+<tr class="separator:af45a0930d65c0392e35deab25f687711"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adda97526e428173da49899ef449560cf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adda97526e428173da49899ef449560cf"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#adda97526e428173da49899ef449560cf">vinecopulib::tools_stats::pairwise_hoeffd</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; x)</td></tr>
 <tr class="memdesc:adda97526e428173da49899ef449560cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pair-wise Hoeffding's D. <br /></td></tr>
@@ -175,7 +181,7 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="na
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 6 2017 12:41:24 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Aug 23 2017 12:45:44 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

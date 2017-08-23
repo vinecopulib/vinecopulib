@@ -12,6 +12,7 @@
 namespace test_bicop_parametric {
     using namespace vinecopulib;
     using namespace tools_stl;
+    std::vector<int> rotations = {0,90};
 
     // Test if the C++ implementation of the basic methods is correct
     TEST_P(ParBicopTest, parametric_bicop_is_correct) {
@@ -79,7 +80,11 @@ namespace test_bicop_parametric {
         auto true_family = bicop_.get_family_name();
         auto true_rotation = bicop_.get_rotation();
         FitControlsBicop controls({BicopFamily::indep, BicopFamily::gaussian,
-                                  bicop_.get_family()}, "mle", 1.0, "bic");
+                                  bicop_.get_family()},
+                                  "mle",
+                                  "quadratic",
+                                  1.0,
+                                  "bic");
 
         if (needs_check_) {
             auto data = bicop_.simulate(get_n());
@@ -111,7 +116,11 @@ namespace test_bicop_parametric {
             auto true_family = bicop_.get_family_name();
             auto true_rotation = bicop_.get_rotation();
             FitControlsBicop controls({BicopFamily::indep, BicopFamily::gaussian,
-                                      bicop_.get_family()}, "itau", 1.0, "bic");
+                                      bicop_.get_family()},
+                                      "itau",
+                                      "quadratic",
+                                      1.0,
+                                      "bic");
 
             if (needs_check_) {
                 auto data = bicop_.simulate(get_n());
@@ -131,7 +140,7 @@ namespace test_bicop_parametric {
             ParBicopTest,
             testing::Combine(
                     testing::ValuesIn(bicop_families::parametric),
-                    testing::ValuesIn({0,90})
+                    testing::ValuesIn(rotations)
             )
     );
 }
