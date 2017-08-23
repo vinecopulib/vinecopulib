@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.0.3</a>
+                    <a class="navbar-brand">vinecopulib 0.1.0</a>
                 </div>
             </div>
         </nav>
@@ -124,6 +124,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab27f789e001e30f2fed7f9ecefdeffb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc8b465d9e02a3df1c25f7c1e7ac9240"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#afc8b465d9e02a3df1c25f7c1e7ac9240">Bicop</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; data, <a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html">FitControlsBicop</a> controls=<a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html">FitControlsBicop</a>())</td></tr>
 <tr class="separator:afc8b465d9e02a3df1c25f7c1e7ac9240"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebe3a41e3f23817f0234fa789c443a98"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#aebe3a41e3f23817f0234fa789c443a98">Bicop</a> (const char *filename)</td></tr>
+<tr class="separator:aebe3a41e3f23817f0234fa789c443a98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ecfc508b6aa5ed5b67515eb5c116986"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a1ecfc508b6aa5ed5b67515eb5c116986">Bicop</a> (boost::property_tree::ptree input)</td></tr>
+<tr class="separator:a1ecfc508b6aa5ed5b67515eb5c116986"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0caeb35ca5958f6927e8b0687b54893"><td class="memItemLeft" align="right" valign="top">boost::property_tree::ptree&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#ab0caeb35ca5958f6927e8b0687b54893">to_ptree</a> ()</td></tr>
+<tr class="separator:ab0caeb35ca5958f6927e8b0687b54893"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25dedf56f3b62160642a706478f0d53c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a25dedf56f3b62160642a706478f0d53c">to_json</a> (const char *filename)</td></tr>
+<tr class="separator:a25dedf56f3b62160642a706478f0d53c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83dc7214e4bb1bfe59285ca05407d646"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a83dc7214e4bb1bfe59285ca05407d646">pdf</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
 <tr class="separator:a83dc7214e4bb1bfe59285ca05407d646"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a153d7e766388066eda14577c5a6332cc"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a153d7e766388066eda14577c5a6332cc">cdf</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u)</td></tr>
@@ -150,8 +158,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac1f480d13b3464260c2dd6aa88b2e130"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f3b3b83c54a9e1d809fdee058f3eb11"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a9f3b3b83c54a9e1d809fdee058f3eb11">calculate_npars</a> ()</td></tr>
 <tr class="separator:a9f3b3b83c54a9e1d809fdee058f3eb11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa25436353dee76e4368fb941a7efa257"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#aa25436353dee76e4368fb941a7efa257">parameters_to_tau</a> (const Eigen::VectorXd &amp;parameters)</td></tr>
-<tr class="separator:aa25436353dee76e4368fb941a7efa257"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1390070f8ae6b6995bbdaf34cd7ea887"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a1390070f8ae6b6995bbdaf34cd7ea887">parameters_to_tau</a> (const Eigen::MatrixXd &amp;parameters)</td></tr>
+<tr class="separator:a1390070f8ae6b6995bbdaf34cd7ea887"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5809ddc9884f6fb66fe53289be348913"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a5809ddc9884f6fb66fe53289be348913">tau_to_parameters</a> (const double &amp;tau)</td></tr>
 <tr class="separator:a5809ddc9884f6fb66fe53289be348913"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Getters and setters</div></td></tr>
@@ -253,6 +261,50 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
   <table class="params">
     <tr><td class="paramname">data</td><td>see <a class="el" href="classvinecopulib_1_1_bicop.html#af20af5c3ba6565628987b4784e9ac348">select()</a>. </td></tr>
     <tr><td class="paramname">controls</td><td>see <a class="el" href="classvinecopulib_1_1_bicop.html#af20af5c3ba6565628987b4784e9ac348">select()</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="aebe3a41e3f23817f0234fa789c443a98"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vinecopulib::Bicop::Bicop </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>creates from a JSON file </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>the name of the JSON file to read (see <a class="el" href="classvinecopulib_1_1_bicop.html#ab0caeb35ca5958f6927e8b0687b54893">to_ptree()</a> for the structure of the file). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a1ecfc508b6aa5ed5b67515eb5c116986"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vinecopulib::Bicop::Bicop </td>
+          <td>(</td>
+          <td class="paramtype">boost::property_tree::ptree&#160;</td>
+          <td class="paramname"><em>input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>creates from a boost::property_tree::ptree object </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input</td><td>the boost::property_tree::ptree object to convert from (see <a class="el" href="classvinecopulib_1_1_bicop.html#ab0caeb35ca5958f6927e8b0687b54893">to_ptree()</a> for the structure of the input). </td></tr>
   </table>
   </dd>
 </dl>
@@ -505,20 +557,20 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aa25436353dee76e4368fb941a7efa257"></a>
+<a class="anchor" id="a1390070f8ae6b6995bbdaf34cd7ea887"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">double vinecopulib::Bicop::parameters_to_tau </td>
           <td>(</td>
-          <td class="paramtype">const Eigen::VectorXd &amp;&#160;</td>
+          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
           <td class="paramname"><em>parameters</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>converts the parameters to the Kendall's \( tau \) for the current family (works for all families but <code><a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3acd36652e61e82e7935de462b329cc8e6" title="Transformation local-constant likelihood kernel estimator. ">BicopFamily::tll0</a></code>).</p>
+<p>converts the parameters to the Kendall's \( tau \) for the current family (works for all families but <code><a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3a9b0d6b8b82f0af7ca85d5a216f97f5b8" title="Transformation local likelihood kernel estimator. ">BicopFamily::tll</a></code>).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">parameters</td><td>the parameters (must be a valid parametrization of the current family). </td></tr>
@@ -678,6 +730,48 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a25dedf56f3b62160642a706478f0d53c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vinecopulib::Bicop::to_json </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Write the copula object into a JSON file</p>
+<p>See <a class="el" href="classvinecopulib_1_1_bicop.html#ab0caeb35ca5958f6927e8b0687b54893">to_ptree()</a> for the structure of the file.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>the name of the file to write. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ab0caeb35ca5958f6927e8b0687b54893"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::property_tree::ptree vinecopulib::Bicop::to_ptree </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Convert the copula into a boost::property_tree::ptree object</p>
+<p>The boost::property_tree::ptree is contains of three values named <code>"family"</code>, <code>"rotation"</code>, <code>"parameters"</code>, respectively a string for the family name, an integer for the rotation, and an Eigen::MatrixXd for the parameters.</p>
+<dl class="section return"><dt>Returns</dt><dd>the boost::property_tree::ptree object containing the copula. </dd></dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>vinecopulib/include/vinecopulib/bicop/<a class="el" href="bicop_2class_8hpp_source.html">class.hpp</a></li>
 <li>vinecopulib/src/bicop/class.cpp</li>
@@ -691,7 +785,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 6 2017 12:41:24 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Aug 23 2017 12:45:44 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

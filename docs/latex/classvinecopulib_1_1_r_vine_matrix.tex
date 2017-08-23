@@ -14,6 +14,8 @@ A class for regular vine matrices.
 \item 
 \hyperlink{classvinecopulib_1_1_r_vine_matrix_a966316e211937ae11e840ef7540a492f}{R\+Vine\+Matrix} (const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, bool check=true)
 \item 
+size\+\_\+t \hyperlink{classvinecopulib_1_1_r_vine_matrix_a873a94d9065ec4e70f43245c5841741b}{get\+\_\+element} (size\+\_\+t row, size\+\_\+t col) const 
+\item 
 Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{classvinecopulib_1_1_r_vine_matrix_a37c79233fca1e56e1535cbb37f8d3177}{get\+\_\+matrix} () const \hypertarget{classvinecopulib_1_1_r_vine_matrix_a37c79233fca1e56e1535cbb37f8d3177}{}\label{classvinecopulib_1_1_r_vine_matrix_a37c79233fca1e56e1535cbb37f8d3177}
 
 \begin{DoxyCompactList}\small\item\em extract the matrix. \end{DoxyCompactList}\item 
@@ -27,6 +29,8 @@ Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hy
 Matrix\+Xb \hyperlink{classvinecopulib_1_1_r_vine_matrix_a6303fc1f643fdf793c867ca7e08e42bc}{get\+\_\+needed\+\_\+hfunc1} () const 
 \item 
 Matrix\+Xb \hyperlink{classvinecopulib_1_1_r_vine_matrix_a7ac32cf10a966ba567142e9b36106746}{get\+\_\+needed\+\_\+hfunc2} () const 
+\item 
+bool \hyperlink{classvinecopulib_1_1_r_vine_matrix_a9ac94374329ca2cfee92ce676c7f1c2a}{belongs\+\_\+to\+\_\+structure} (const std\+::vector$<$ size\+\_\+t $>$ conditioned, const std\+::vector$<$ size\+\_\+t $>$ conditioning)
 \end{DoxyCompactItemize}
 \subsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
@@ -56,7 +60,7 @@ A regular vine (R-\/vine) matrix encodes the structure of a vine. An examplary m
 |      | 1    | `(3, 2; 1)`    |
 | 2    | 0    | `(4, 3; 2, 1)` |
 \end{DoxyCode}
- Denoting by {\ttfamily M\mbox{[}i\mbox{]}\mbox{[}j\mbox{]}} the matrix entry in row {\ttfamily i} and column {\ttfamily j} (starting at 0), the pair-\/copula index for edge {\ttfamily e} in tree {\ttfamily t} of a {\ttfamily d} dimensional vine is {\ttfamily (M\mbox{[}d -\/ 1 -\/ t\mbox{]}\mbox{[}e\mbox{]}, M\mbox{[}t\mbox{]}\mbox{[}e\mbox{]}; M\mbox{[}t -\/ 1\mbox{]}\mbox{[}e\mbox{]}, ..., M\mbox{[}0\mbox{]}\mbox{[}e\mbox{]})}. Less formally,
+ Denoting by {\ttfamily M\mbox{[}i, j\mbox{]}} the matrix entry in row {\ttfamily i} and column {\ttfamily j}, the pair-\/copula index for edge {\ttfamily e} in tree {\ttfamily t} of a {\ttfamily d} dimensional vine is {\ttfamily (M\mbox{[}d -\/ 1 -\/ t, e\mbox{]}, M\mbox{[}t, e\mbox{]}; M\mbox{[}t -\/ 1, e\mbox{]}, ..., M\mbox{[}0, e\mbox{]})}. Less formally,
 \begin{DoxyEnumerate}
 \item Start with the counter-\/diagonal element of column {\ttfamily e} (first conditioned variable).
 \item Jump up to the element in row {\ttfamily t} (second conditioned variable).
@@ -94,6 +98,23 @@ instantiates an \hyperlink{classvinecopulib_1_1_r_vine_matrix}{R\+Vine\+Matrix} 
 
 
 \subsection{Member Function Documentation}
+\index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!belongs\+\_\+to\+\_\+structure@{belongs\+\_\+to\+\_\+structure}}
+\index{belongs\+\_\+to\+\_\+structure@{belongs\+\_\+to\+\_\+structure}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
+\subsubsection[{\texorpdfstring{belongs\+\_\+to\+\_\+structure(const std\+::vector$<$ size\+\_\+t $>$ conditioned, const std\+::vector$<$ size\+\_\+t $>$ conditioning)}{belongs_to_structure(const std::vector< size_t > conditioned, const std::vector< size_t > conditioning)}}]{\setlength{\rightskip}{0pt plus 5cm}bool vinecopulib\+::\+R\+Vine\+Matrix\+::belongs\+\_\+to\+\_\+structure (
+\begin{DoxyParamCaption}
+\item[{const std\+::vector$<$ size\+\_\+t $>$}]{conditioned, }
+\item[{const std\+::vector$<$ size\+\_\+t $>$}]{conditioning}
+\end{DoxyParamCaption}
+)}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a9ac94374329ca2cfee92ce676c7f1c2a}{}\label{classvinecopulib_1_1_r_vine_matrix_a9ac94374329ca2cfee92ce676c7f1c2a}
+check whether an edge belong to the implied structure
+
+
+\begin{DoxyParams}{Parameters}
+{\em conditioned} & the conditioned set. \\
+\hline
+{\em conditioning} & the conditioning set. \\
+\hline
+\end{DoxyParams}
 \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!construct\+\_\+d\+\_\+vine\+\_\+matrix@{construct\+\_\+d\+\_\+vine\+\_\+matrix}}
 \index{construct\+\_\+d\+\_\+vine\+\_\+matrix@{construct\+\_\+d\+\_\+vine\+\_\+matrix}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
 \subsubsection[{\texorpdfstring{construct\+\_\+d\+\_\+vine\+\_\+matrix(const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, 1 $>$ \&order)}{construct_d_vine_matrix(const Eigen::Matrix< size_t, Eigen::Dynamic, 1 > &order)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ vinecopulib\+::\+R\+Vine\+Matrix\+::construct\+\_\+d\+\_\+vine\+\_\+matrix (
@@ -110,6 +131,26 @@ A D-\/vine is a vine where each tree is a path.
 {\em order} & order of the variables. \\
 \hline
 \end{DoxyParams}
+\index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+element@{get\+\_\+element}}
+\index{get\+\_\+element@{get\+\_\+element}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
+\subsubsection[{\texorpdfstring{get\+\_\+element(size\+\_\+t row, size\+\_\+t col) const }{get_element(size_t row, size_t col) const }}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+element (
+\begin{DoxyParamCaption}
+\item[{size\+\_\+t}]{row, }
+\item[{size\+\_\+t}]{col}
+\end{DoxyParamCaption}
+) const}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a873a94d9065ec4e70f43245c5841741b}{}\label{classvinecopulib_1_1_r_vine_matrix_a873a94d9065ec4e70f43245c5841741b}
+extract matrix\+\_\+(row, col)
+
+
+\begin{DoxyParams}{Parameters}
+{\em row} & \\
+\hline
+{\em col} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+matrix\+\_\+(row, col) 
+\end{DoxyReturn}
 \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+max\+\_\+matrix@{get\+\_\+max\+\_\+matrix}}
 \index{get\+\_\+max\+\_\+matrix@{get\+\_\+max\+\_\+matrix}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
 \subsubsection[{\texorpdfstring{get\+\_\+max\+\_\+matrix() const }{get_max_matrix() const }}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+max\+\_\+matrix (
