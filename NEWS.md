@@ -9,9 +9,11 @@ NEW FEATURES
      
    * sparse selection of vine copulas (#206) using new data members in 
      `FitControlsVinecop`:
-        * `threshold` what does it do?
-        * `select_truncation_level` what does it do?
-        * `select_threshold` what does it do?
+        * `double threshold` for thresholded vines
+        * `bool select_truncation_level` whether the truncation is selected 
+           automatically
+        * `bool select_threshold` whether the threshold parameter is selected 
+           automatically
         
    * local likelihood estimators (#216) have been implemented by refactoring the 
      `tll0` family into a more general `tll` family, where approximations of 
