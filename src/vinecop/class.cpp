@@ -118,7 +118,7 @@ namespace vinecopulib
     }
 
     //! creates from a JSON file
-    //! @filename the name of the JSON file to read (see to_ptree() for the
+    //! @param filename the name of the JSON file to read (see to_ptree() for the
     //! structure of the file).
     //! @param check_matrix whether to check if the `"matrix"` node represents
     //!      a valid R-vine matrix.
@@ -167,9 +167,6 @@ namespace vinecopulib
     //! child nodes for the trees (`"tree1"`, `"tree2"`, etc), each containing
     //! a list of child nodes for the edges (`"pc1"`, `"pc2"`, etc).
     //! See Bicop::to_ptree() for the encoding of pair-copulas.
-    //!
-    //! @param check_matrix whether to check if the `"matrix"` node represents
-    //!      a valid R-vine matrix.
     //!
     //! @return the boost::property_tree::ptree object containing the copula.
     boost::property_tree::ptree Vinecop::to_ptree()
