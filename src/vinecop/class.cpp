@@ -8,7 +8,7 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 
-#include <exception>
+#include <stdexcept>
 #include <vector>
 
 namespace vinecopulib
