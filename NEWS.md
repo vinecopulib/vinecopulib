@@ -9,7 +9,6 @@ NEW FEATURES
      
    * sparse selection of vine copulas (#206) using new data members in 
      `FitControlsVinecop`:
-        * `double threshold` for thresholded vines
         * `bool select_truncation_level` whether the truncation is selected 
            automatically
         * `bool select_threshold` whether the threshold parameter is selected 
@@ -18,8 +17,8 @@ NEW FEATURES
    * local likelihood estimators (#216) have been implemented by refactoring the 
      `tll0` family into a more general `tll` family, where approximations of 
      degrees zero, one and two can be fitted by setting the new 
-     `nonparametric_method_` data member of `FitControlsBicop` respectively 
-     as `constant`, `linear` and `quadratic` (default).
+     `std::string nonparametric_method` data member of `FitControlsBicop` 
+     respectively as `constant`, `linear` and `quadratic` (default).
      
    * Kendall's tau (#211) and normalization (#215) for kernel estimators
      

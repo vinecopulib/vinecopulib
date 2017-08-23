@@ -229,13 +229,13 @@ your source file.
 | "             | BB6                   | bb6     |  
 | "             | BB7                   | bb7     |  
 | "             | BB8                   | bb8    |  
-| Nonparametric | Transformation kernel | tll0  |
+| Nonparametric | Transformation kernel | tll  |
 
 Note that several convenience vectors of families are included in the
 sub-namespace `bicop_families`:
 * `all` contains all the families
-* `parametric` contains the parametric families (all except `tll0`)
-* `nonparametric` contains the nonparametric families (`indep` and `tll0`)
+* `parametric` contains the parametric families (all except `tll`)
+* `nonparametric` contains the nonparametric families (`indep` and `tll`)
 * `one_par` contains the parametric families with a single parameter
 (`gaussian`, `clayton`, `gumbel`, `frank`, and `joe`)
 * `two_par` contains the parametric families with two parameters
@@ -314,16 +314,19 @@ std::cout <<
     std::endl;
 ```
 As it's arguably the most important function of the `Bicop` class, it's worth
-understanding the second arguments of `select()`, namely an object of the class
-`FitControlsBicop`, which contain five data members:
+understanding the second argument of `select()`, namely an object of the class
+`FitControlsBicop`, which contain six data members:
 * `std::vector<BicopFamily> family_set` describes the set of family to select
 from. It can take a user specified vector of
 families or any of those mentioned above (default is `bicop_families::all`).
 * `std::string parametric_method` describes the estimation method. It can take
   `"mle"` (default, for maximum-likelihood estimation) and
 `"itau"` (for Kendall's tau inversion, although only available for families
-included in `bicop_families::itau`). Note that nonparametric families have
-specialized methods for which no specification is required.
+included in `bicop_families::itau`). 
+* `std::string nonparametric_method` describes the degree of the density 
+approximation for the transformation kernel estimator. It can take 
+`constant`, `linear` and `quadratic` (default) for approximations of 
+degree zero, one and two.
 * `double nonparametric_mult` a factor with which the smoothing parameters
 are multiplied.
 * `std::string selection_criterion` describes the criterion to compare the
@@ -556,6 +559,10 @@ It can take `"tau"` (default) for Kendall's tau, `"rho"` for Spearman's rho,
 or `"hoeffd"` for Hoeffding's D (suited for non-monotonic relationships).
 * `double threshold` describes a value (default is 0) of `tree_criterion` under
 which the corresponding pair-copula is set to independence.
+* `bool select_truncation_level` can be set to true to select the truncation 
+level automatically (default is `false`).
+* `bool select_threshold` can be set to true to select the threshold parameter 
+automatically (default is `false`).
 
 As mentioned [above](#set-up-a-custom-vine-copula-model), the arguments
 of `select_all()` and `select_families()` can be used as arguments to a
@@ -587,8 +594,8 @@ Vinecop custom_vine(data, M, FitControlsVinecop(bicop_families::itau, "itau", 1.
 
 ### Work with a vine copula model
 
-You can simulate from a vine copula model, evaluate its density, log-likelihood,
- AIC and BIC.
+You can simulate from a vine copula model, evaluate its density, distribution, 
+log-likelihood, AIC and BIC.
 
 **Example**
 ``` cpp
@@ -600,6 +607,9 @@ auto data = model.simulate(100)
 
 // evaluate the density
 auto pdf = model.pdf(data)
+
+// evaluate the distribution
+auto cdf = model.cdf(data)
 
 // evaluate the log-likelihood
 auto ll = model.loglik(data)
