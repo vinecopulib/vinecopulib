@@ -17,9 +17,9 @@ NEW FEATURES
         
    * local likelihood estimators (#216) have been implemented by refactoring the 
      `tll0` family into a more general `tll` family, where approximations of 
-     degrees zero, one and two can be fitted by setting the new `nonpar_method` 
-     data member of `FitControlsBicop` respectively as `constant`, `linear` 
-     and `quadratic` (default).
+     degrees zero, one and two can be fitted by setting the new 
+     `nonparametric_method_` data member of `FitControlsBicop` respectively 
+     as `constant`, `linear` and `quadratic` (default).
      
    * Kendall's tau (#211) and normalization (#215) for kernel estimators
      
