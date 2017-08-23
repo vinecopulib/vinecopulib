@@ -10,9 +10,10 @@ NEW FEATURES
    * sparse selection of vine copulas (#206) using new data members in 
      `FitControlsVinecop`:
         * `bool select_truncation_level` whether the truncation is selected 
-           automatically
+           automatically.
         * `bool select_threshold` whether the threshold parameter is selected 
-           automatically
+           automatically.
+        * `double threshold` sets a fixed threshold parameter.
         
    * local likelihood estimators (#216) have been implemented by refactoring the 
      `tll0` family into a more general `tll` family, where approximations of 
@@ -20,20 +21,20 @@ NEW FEATURES
      `std::string nonparametric_method` data member of `FitControlsBicop` 
      respectively as `constant`, `linear` and `quadratic` (default).
      
-   * Kendall's tau (#211) and normalization (#215) for kernel estimators
+   * Kendall's tau (#211) and normalization (#215) for kernel estimators.
      
-   * support for clang compiler on linux (#201, #202, #203)
+   * support for clang compiler on linux (#201, #202, #203).
    
-   * allow to allow to omit R-vine matrix check in `Vinecop` constructors (#198)
+   * option to omit R-vine matrix check in `Vinecop` constructors (#198).
      
 BUG FIXES
 
    * replacing throw `std::string` with throw `std::runtime_error` in 
-    `tools_opimization.cpp` (#204)
+    `tools_opimization.cpp` (#204).
    
-   * ensure valid starting parameters in `Bicop::fit` (#209, #210)
+   * ensure valid starting parameters in `Bicop::fit()` (#209, #210).
    
-   * fix appveyor and travis problems (#208, #212, #213)
+   * fix appveyor and travis problems (#208, #212, #213).
 
 # vinecopulib 0.0.3 (June 7, 2017)
 
