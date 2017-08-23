@@ -54,7 +54,7 @@ namespace vinecopulib
             ) {}
 
     //! creates from a JSON file
-    //! @filename the name of the JSON file to read (see to_ptree() for the
+    //! @param filename the name of the JSON file to read (see to_ptree() for the
     //! structure of the file).
     Bicop::Bicop(const char *filename) :
             Bicop(tools_serialization::json_to_ptree(filename)) {}
