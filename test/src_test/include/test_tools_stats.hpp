@@ -12,7 +12,6 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 
 using namespace vinecopulib;
-
 namespace test_tools_stats {
 
     TEST(test_tools_stats, to_pseudo_obs_is_correct) {

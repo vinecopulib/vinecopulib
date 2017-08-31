@@ -4,18 +4,11 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#pragma once
+#include "src_test/include/test_tools_integration.hpp"
 
-#include <functional>
-#include <vinecopulib/misc/tools_eigen.hpp>
+using namespace test_tools_integration;
 
-namespace vinecopulib {
-
-namespace tools_integration {
-
-    double integrate_zero_to_one(std::function<double(double)> f);
-    Eigen::Matrix<double, Eigen::Dynamic, 2> legendre_rule(size_t N = 25);
-
-}
-
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
