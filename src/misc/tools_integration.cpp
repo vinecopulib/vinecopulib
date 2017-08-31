@@ -7,6 +7,9 @@
 #include <vinecopulib/misc/tools_integration.hpp>
 #include <boost/numeric/odeint.hpp>
 #include <cmath>
+#ifndef M_PI
+#define M_PI       3.14159265358979323846
+#endif
 
 namespace vinecopulib {
 
