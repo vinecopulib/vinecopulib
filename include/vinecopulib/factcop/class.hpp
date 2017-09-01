@@ -18,17 +18,15 @@ namespace vinecopulib
         // Constructors
         Factcop() {}
         Factcop(size_t d);
-        /*Factcop(size_t d, const Eigen::Matrix<bool,
-                Eigen::Dynamic, Eigen::Dynamic>& groups);
-        Factcop(size_t d, const Eigen::Matrix<bool,
-                Eigen::Dynamic, Eigen::Dynamic>& factors);*/
+        Factcop(Eigen::Matrix<size_t, Eigen::Dynamic, 1> groups);
 
-        std::vector<std::vector<Bicop>> Factcop::make_pair_copula_store(
-                size_t f,
-                size_t g);
+        std::vector<std::vector<Bicop>> make_pair_copula_store(size_t f,
+                                                               size_t g);
 
     private:
         size_t d_;
+        size_t ngroups_;
+        size_t nfactors_;
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> groups_;
         Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> factors_;
         std::vector<std::vector<Bicop>> pair_copulas_;
