@@ -34,6 +34,12 @@ changes are to be expected. We are also working on interfaces for
 [R](https://github.com/vinecopulib/rvinecopulib) and
 [Python](https://github.com/vinecopulib/pyvinecopulib).
 
+#### Contact
+
+If you have any questions regarding the library, feel free to
+[open an issue](https://github.com/vinecopulib/vinecopulib/issues/new) or
+send a mail to <info@vinecopulib.org>.
+
 
 # Documentation
 
