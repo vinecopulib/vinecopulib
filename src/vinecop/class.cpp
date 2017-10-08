@@ -656,7 +656,7 @@ namespace vinecopulib
             for (size_t j = 0; j < d; ++j)
                 U_vine.col(j) = hinv2(0, inverse_order(j));
         } else {
-            U_vine.col(1) = get_pair_copula(0, 0).hinv2(u);
+            U_vine.col(0) = get_pair_copula(0, 0).hinv2(u);
         }
 
         return U_vine;
