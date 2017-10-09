@@ -115,6 +115,11 @@ namespace vinecopulib
                     res(k) *= std::sqrt(S.determinant()) / det_irB;
                 }
                 res(k) *= std::exp(- 0.5 * double(b.transpose() * S * b));
+                if (std::isnan(res(k)) | std::isinf(res(k))) {
+                    // inverse operation might go wrong due to rounding when
+                    // true value is equal or close to zero
+                    res(k) = 0.0;
+                }
             }
             res(k, 0) *= f0;
             res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method);
