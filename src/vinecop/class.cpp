@@ -13,7 +13,7 @@
 
 namespace vinecopulib
 {
-    //! creates a D-vine on `d` variables with all pair-copulas set to 
+    //! creates a D-vine on `d` variables with all pair-copulas set to
     //! independence.
     //! @param d the dimension (= number of variables) of the model.
     Vinecop::Vinecop(size_t d)
@@ -35,11 +35,11 @@ namespace vinecopulib
             }
         }
     }
-    
+
     //! creates a vine copula with structure specified by an R-vine matrix; all
     //! pair-copulas are set to independence.
     //! @param matrix an R-vine matrix.
-    //! @param check_matrix whether to check if `matrix` is a valid R-vine 
+    //! @param check_matrix whether to check if `matrix` is a valid R-vine
     //!     matrix.
     Vinecop::Vinecop(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
         bool check_matrix)
@@ -55,12 +55,12 @@ namespace vinecopulib
             }
         }
     }
-    
+
     //! creates an arbitrary vine copula model.
-    //! @param pair_copulas Bicop objects specifying the pair-copulas, see 
+    //! @param pair_copulas Bicop objects specifying the pair-copulas, see
     //!     make_pair_copula_store().
     //! @param matrix an R-vine matrix specifying the vine structure.
-    //! @param check_matrix whether to check if `matrix` is a valid R-vine 
+    //! @param check_matrix whether to check if `matrix` is a valid R-vine
     //!     matrix.
     Vinecop::Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
@@ -126,15 +126,15 @@ namespace vinecopulib
             Vinecop(tools_serialization::json_to_ptree(filename),
                     check_matrix) {}
 
-    //! constructs a vine copula model from data. 
-    //! 
+    //! constructs a vine copula model from data.
+    //!
     //! The function creates a model and calls select_family().
-    //! 
+    //!
     //! @param data an \f$ n \times d \f$ matrix of observations.
-    //! @param matrix either an empty matrix (default) or an R-vine structure 
+    //! @param matrix either an empty matrix (default) or an R-vine structure
     //!     matrix, see select_families().
     //! @param controls see FitControlsVinecop.
-    //! @param check_matrix whether to check if `matrix` is a valid R-vine 
+    //! @param check_matrix whether to check if `matrix` is a valid R-vine
     //!     matrix.
     Vinecop::Vinecop(const Eigen::MatrixXd& data,
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
@@ -203,7 +203,7 @@ namespace vinecopulib
     //! Initialize object for storing pair copulas
     //!
     //! @param d dimension of the vine copula.
-    //! @return A nested vector such that `pc_store[t][e]` contains a Bicop 
+    //! @return A nested vector such that `pc_store[t][e]` contains a Bicop
     //!     object for the pair copula corresponding to tree `t` and edge `e`.
     std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(size_t d)
     {
@@ -215,17 +215,17 @@ namespace vinecopulib
         for (size_t t = 0; t < d - 1; ++t) {
             pc_store[t].resize(d - 1 - t);
         }
-    
+
         return pc_store;
     }
-    
-    
+
+
     //! automatically fits and selects a vine copula model
-    //! 
+    //!
     //! Selection of the structure is performed using the algorithm of
     //! Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013).
-    //! *Selecting and estimating regular vine copulae and application to 
-    //! financial returns.* Computational Statistics & Data Analysis, 59 (1), 
+    //! *Selecting and estimating regular vine copulae and application to
+    //! financial returns.* Computational Statistics & Data Analysis, 59 (1),
     //! 52-69.
     //!
     //! @param data nxd matrix of copula data.
@@ -243,7 +243,7 @@ namespace vinecopulib
         vine_matrix_ = selector.get_rvine_matrix();
         pair_copulas_ = selector.get_pair_copulas();
     }
-        
+
     //! automatically selects all pair-copula families and fits all parameters.
     //!
     //! @param data nxd matrix of copula data.
@@ -289,16 +289,16 @@ namespace vinecopulib
         }
         return pair_copulas_[tree][edge];
     }
-    
+
     //! extracts all pair copulas.
-    //! 
+    //!
     //! @return a nested std::vector with entry `[t][e]` corresponding to
     //! edge `e` in tree `t`.
     std::vector<std::vector<Bicop>> Vinecop::get_all_pair_copulas() const
     {
         return pair_copulas_;
     }
-    
+
     //! extracts the family of a pair copula.
     //!
     //! @param tree tree index (starting with 0).
@@ -307,7 +307,7 @@ namespace vinecopulib
     {
         return get_pair_copula(tree, edge).get_family();
     }
-    
+
     //! extracts the families of all pair copulas.
     //!
     //! @return a nested std::vector with entry `[t][e]` corresponding to
@@ -322,10 +322,10 @@ namespace vinecopulib
                 families[tree][edge] = get_family(tree, edge);
             }
         }
-    
+
         return families;
     }
-    
+
     //! extracts the rotation of a pair copula.
     //!
     //! @param tree tree index (starting with 0).
@@ -334,7 +334,7 @@ namespace vinecopulib
     {
         return get_pair_copula(tree, edge).get_rotation();
     }
-    
+
     //! extracts the rotations of all pair copulas.
     //!
     //! @return a nested std::vector with entry `[t][e]` corresponding to
@@ -349,10 +349,10 @@ namespace vinecopulib
                 rotations[tree][edge] = get_rotation(tree, edge);
             }
         }
-    
+
         return rotations;
     }
-    
+
     //! extracts the parameters of a pair copula.
     //!
     //! @param tree tree index (starting with 0).
@@ -361,7 +361,7 @@ namespace vinecopulib
     {
         return get_pair_copula(tree, edge).get_parameters();
     }
-    
+
     //! extracts the parameters of all pair copulas.
     //!
     //! @return a nested std::vector with entry `[t][e]` corresponding to
@@ -376,18 +376,18 @@ namespace vinecopulib
                 parameters[tree][edge] = get_parameters(tree, edge);
             }
         }
-    
+
         return parameters;
     }
-    
+
     //! extracts the structure matrix of the vine copula model.
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> Vinecop::get_matrix() const
     {
         return vine_matrix_.get_matrix();
-    } 
-    
+    }
+
     //! @}
-    
+
     //! calculates the density function of the vine copula model.
     //!
     //! @param u \f$ n \times d \f$ matrix of evaluation points.
@@ -402,27 +402,27 @@ namespace vinecopulib
                     ", actual: " << d << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
-    
+
         // info about the vine structure (reverse rows (!) for more natural indexing)
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
         auto no_matrix  = vine_matrix_.in_natural_order();
         auto max_matrix = vine_matrix_.get_max_matrix();
         MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
         MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
-    
+
         // initial value must be 1.0 for multiplication
         Eigen::VectorXd vine_density = Eigen::VectorXd::Constant(u.rows(), 1.0);
-    
+
         // temporary storage objects for h-functions
         Eigen::MatrixXd hfunc1(n, d);
         Eigen::MatrixXd hfunc2(n, d);
         Eigen::MatrixXd u_e(n, 2);
-    
+
         // fill first row of hfunc2 matrix with evaluation points;
         // points have to be reordered to correspond to natural order
         for (size_t j = 0; j < d; ++j)
             hfunc2.col(j) = u.col(revorder(j) - 1);
-    
+
         for (size_t tree = 0; tree < d - 1; ++tree) {
             tools_interface::check_user_interrupt(n * d > 1e5);
             for (size_t edge = 0; edge < d - tree - 1; ++edge) {
@@ -436,10 +436,10 @@ namespace vinecopulib
                 } else {
                     u_e.col(1) = hfunc1.col(d - m);
                 }
-                
+
                 Bicop edge_copula = get_pair_copula(tree, edge);
                 vine_density = vine_density.cwiseProduct(edge_copula.pdf(u_e));
-                
+
                 // h-functions are only evaluated if needed in next step
                 if (needed_hfunc1(tree + 1, edge)) {
                     hfunc1.col(edge) = edge_copula.hfunc1(u_e);
@@ -449,7 +449,7 @@ namespace vinecopulib
                 }
             }
         }
-    
+
         return vine_density;
     }
 
@@ -497,9 +497,9 @@ namespace vinecopulib
 
         return vine_distribution/((double) N);
     }
-    
+
     //! simulates from a vine copula model, see inverse_rosenblatt().
-    //! 
+    //!
     //! @param n number of observations.
     Eigen::MatrixXd Vinecop::simulate(size_t n) const
     {
@@ -563,20 +563,20 @@ namespace vinecopulib
         }
         return npars;
     }
-    
-    
+
+
     //! calculates the inverse Rosenblatt transform for a vine copula model.
-    //! 
-    //! The inverse Rosenblatt transform can be used for simulation: the 
+    //!
+    //! The inverse Rosenblatt transform can be used for simulation: the
     //! function applied to independent uniform variates resembles simulated
     //! data from the vine copula model.
-    //! 
+    //!
     //! If the problem is too large, it is split recursively into halves (w.r.t.
     //! n, the number of observations).
-    //! "Too large" means that the required memory will exceed 1 GB. An 
-    //! examplary configuration requiring less than 1 GB is \f$ n = 1000 \f$, 
+    //! "Too large" means that the required memory will exceed 1 GB. An
+    //! examplary configuration requiring less than 1 GB is \f$ n = 1000 \f$,
     //! \f$d = 200\f$.
-    //! 
+    //!
     //! @param u \f$ n \times d \f$ matrix of evaluation points.
     Eigen::MatrixXd Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u) const
     {
@@ -592,9 +592,9 @@ namespace vinecopulib
                     ", actual: " << d << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
-    
+
         Eigen::MatrixXd U_vine = u;  // output matrix
-    
+
         //                   (direct + indirect)    (U_vine)       (info matrices)
         size_t bytes_required = (8 * 2 * n * d * d) +  (8 * n * d)  + (4 * 4 * d * d);
         // if the problem is too large (requires more than 1 GB memory), split
@@ -602,9 +602,9 @@ namespace vinecopulib
         if ((n > 1) & (bytes_required > 1e9)) {
             size_t n_half = n / 2;
             size_t n_left = n - n_half;
-            U_vine.block(0, 0, n_half, d) = 
+            U_vine.block(0, 0, n_half, d) =
                 inverse_rosenblatt(u.block(0, 0, n_half, d));
-            U_vine.block(n_half, 0, n_left, d) = 
+            U_vine.block(n_half, 0, n_left, d) =
                 inverse_rosenblatt(u.block(n_half, 0, n_left, d));
             return U_vine;
         }
@@ -660,12 +660,12 @@ namespace vinecopulib
             for (size_t j = 0; j < d; ++j)
                 U_vine.col(j) = hinv2(0, inverse_order(j));
         } else {
-            U_vine.col(1) = get_pair_copula(0, 0).hinv1(u);
+            U_vine.col(0) = get_pair_copula(0, 0).hinv2(u);
         }
-    
+
         return U_vine;
     }
-    
+
     //! checks if dimension d of the data matches the dimension of the vine.
     void Vinecop::check_data_dim(const Eigen::MatrixXd& data)
     {
@@ -677,19 +677,19 @@ namespace vinecopulib
                     ", actual: " << d_data << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
-    }  
-    
-          
+    }
+
+
     // get indexes for reverting back to old order in simulation routine
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> Vinecop::inverse_permutation(
         const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& order) const {
         // start with (0, 1, .., k)
         auto indexes = tools_stl::seq_int(0, order.size());
-    
+
         // get sort indexes by comparing values in order
         std::sort(indexes.begin(), indexes.end(),
                   [&order](size_t i1, size_t i2) {return order(i1) < order(i2);});
-    
+
         // convert to Eigen::Matrix<size_t, Eigen::Dynamic, 1>;
         return Eigen::Map<Eigen::Matrix<size_t, Eigen::Dynamic, 1>>(&indexes[0], order.size());
     }
