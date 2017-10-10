@@ -30,9 +30,15 @@ Advantages over VineCopula are
 Version [0.1.0](https://github.com/vinecopulib/vinecopulib/releases) was
 released on August 23, 2017. While we did our best to
 design a user-friendly API, the library is still under active development and
-changes are to be expected. We are also working on interfaces for 
-[R](https://github.com/vinecopulib/rvinecopulib) and 
+changes are to be expected. We are also working on interfaces for
+[R](https://github.com/vinecopulib/rvinecopulib) and
 [Python](https://github.com/vinecopulib/pyvinecopulib).
+
+#### Contact
+
+If you have any questions regarding the library, feel free to
+[open an issue](https://github.com/vinecopulib/vinecopulib/issues/new) or
+send a mail to <info@vinecopulib.org>.
 
 
 # Documentation
@@ -324,10 +330,10 @@ families or any of those mentioned above (default is `bicop_families::all`).
 * `std::string parametric_method` describes the estimation method. It can take
   `"mle"` (default, for maximum-likelihood estimation) and
 `"itau"` (for Kendall's tau inversion, although only available for families
-included in `bicop_families::itau`). 
-* `std::string nonparametric_method` describes the degree of the density 
-approximation for the transformation kernel estimator. It can take 
-`constant`, `linear` and `quadratic` (default) for approximations of 
+included in `bicop_families::itau`).
+* `std::string nonparametric_method` describes the degree of the density
+approximation for the transformation kernel estimator. It can take
+`constant`, `linear` and `quadratic` (default) for approximations of
 degree zero, one and two.
 * `double nonparametric_mult` a factor with which the smoothing parameters
 are multiplied.
@@ -354,7 +360,9 @@ std::cout <<
 
 // instantiate a bivariate copula by selecting the "best" family according to
 // the AIC and parameters corresponding to Kendall's tau inversion
-Bicop best_itau(data, FitControlsBicop(bicop_families::itau, "itau", 1.0, "aic"));
+FitControlsBicop controls(bicop_families::itau, "itau");
+controls.set_selection_criterion("aic");
+Bicop best_itau(data, controls));
 std::cout <<
     "family: " << best_itau.get_family_name() <<
     "rotation: " <<  best_itau.get_rotation() <<
@@ -393,7 +401,7 @@ auto aic  = bicop.aic(sim_data);
 auto bic  = bicop.bic(sim_data);
 ```
 
-Bivariate copula models can also be written to and constructed from JSON files 
+Bivariate copula models can also be written to and constructed from JSON files
 and `boost::property_tree::ptree` objects:
 
 ```
@@ -561,9 +569,9 @@ It can take `"tau"` (default) for Kendall's tau, `"rho"` for Spearman's rho,
 or `"hoeffd"` for Hoeffding's D (suited for non-monotonic relationships).
 * `double threshold` describes a value (default is 0) of `tree_criterion` under
 which the corresponding pair-copula is set to independence.
-* `bool select_truncation_level` can be set to true to select the truncation 
+* `bool select_truncation_level` can be set to true to select the truncation
 level automatically (default is `false`).
-* `bool select_threshold` can be set to true to select the threshold parameter 
+* `bool select_threshold` can be set to true to select the threshold parameter
 automatically (default is `false`).
 
 As mentioned [above](#set-up-a-custom-vine-copula-model), the arguments
@@ -591,12 +599,14 @@ M << 1, 1, 1, 1,
 // ... and instantiate a vine copula from data using the custom structure,
 // Kendall's tau inversion for parameters
 // estimation and a truncation after the second tree
-Vinecop custom_vine(data, M, FitControlsVinecop(bicop_families::itau, "itau", 1.0, 2);)
+FitControlsVinecop controls(bicop_families::itau, "itau");
+controls.set_truncation_level(2);
+Vinecop custom_vine(data, M, controls);
 ```
 
 ### Work with a vine copula model
 
-You can simulate from a vine copula model, evaluate its density, distribution, 
+You can simulate from a vine copula model, evaluate its density, distribution,
 log-likelihood, AIC and BIC.
 
 **Example**
@@ -623,7 +633,7 @@ auto aic = model.aic(data)
 auto bic = model.bic(data)
 ```
 
-Vine copula models can also be written to and constructed from JSON files 
+Vine copula models can also be written to and constructed from JSON files
 and `boost::property_tree::ptree` objects:
 
 ```
