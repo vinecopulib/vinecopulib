@@ -96,12 +96,12 @@ namespace tools_interpolation {
         ptrdiff_t N = x.rows();
         ptrdiff_t m = grid_points_.size();
         Eigen::VectorXd y(4), out(N), a(4), tmpgrid(4), tmpvals(4);
-        ptrdiff_t i = 0;
-        ptrdiff_t j = 0;
-        ptrdiff_t i0, i3;
+        ptrdiff_t i, j, i0, i3;
 
         for (ptrdiff_t n = 0; n < N; ++n) {
             // find cell
+            i = 0;
+            j = 0;
             bool found_i = false;
             bool found_j = false;
             for (ptrdiff_t k = 1; k < (m-1); ++k) {
