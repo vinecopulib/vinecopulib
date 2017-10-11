@@ -60,7 +60,7 @@ install:
   - cd nlopt
   - mkdir build
   - cd build
-  - cmake .. $CMAKE_ARGS -DNLOPT_MATLAB=OFF -DNLOPT_CXX=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+  - cmake .. $CMAKE_ARGS -DNLOPT_MATLAB=OFF -DNLOPT_CXX=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
   - make
   - sudo make install
   - cd ../../vinecopulib
