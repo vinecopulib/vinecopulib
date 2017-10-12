@@ -26,6 +26,10 @@ before_install:
   - if [ $COMPILER == icc ]; then export CMAKE_ARGS="-DCMAKE_CXX_COMPILER=icpc -DCMAKE_C_COMPILER=icc"; fi
   - if [ $COMPILER == clang ]; then export CMAKE_ARGS="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"; fi
   - if [ $COMPILER == gcc ]; then export CMAKE_ARGS="-DCODE_COVERAGE=ON"; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then export CMAKE_PREFIX="-DCMAKE_INSTALL_PREFIX=/usr/local/”; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then export CMAKE_PREFIX="-DCMAKE_INSTALL_PREFIX=/usr/"; fi
+
+
 
 install:
   ### LINUX
@@ -60,7 +64,7 @@ install:
   - cd nlopt
   - mkdir build
   - cd build
-  - cmake .. $CMAKE_ARGS -DNLOPT_MATLAB=OFF -DNLOPT_CXX=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+  - cmake .. $CMAKE_ARGS $CMAKE_PREFIX -DNLOPT_MATLAB=OFF -DNLOPT_CXX=ON -DCMAKE_BUILD_TYPE=Release
   - make
   - sudo make install
   - cd ../../vinecopulib
