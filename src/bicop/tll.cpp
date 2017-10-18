@@ -7,6 +7,7 @@
 #include <vinecopulib/bicop/tll.hpp>
 #include <vinecopulib/bicop/family.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
+#include <boost/math/special_functions/fpclassify.hpp> // isnan
 
 namespace vinecopulib
 {
@@ -115,7 +116,8 @@ namespace vinecopulib
                     res(k) *= std::sqrt(S.determinant()) / det_irB;
                 }
                 res(k) *= std::exp(- 0.5 * double(b.transpose() * S * b));
-                if (std::isnan(res(k)) | std::isinf(res(k))) {
+                if ((boost::math::isnan)(res(k)) |
+                        (boost::math::isinf)(res(k))) {
                     // inverse operation might go wrong due to rounding when
                     // true value is equal or close to zero
                     res(k) = 0.0;
