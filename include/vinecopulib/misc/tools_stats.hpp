@@ -8,13 +8,13 @@
 
 #include <boost/math/distributions.hpp>
 #include <random>
-
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
 
 namespace tools_stats
 {
+
     //! @name Standard normal distribution
     //! 
     //! @param x evaluation points.
@@ -24,21 +24,24 @@ namespace tools_stats
     inline Eigen::MatrixXd dnorm(const Eigen::MatrixXd& x)
     {
         boost::math::normal dist;
-        return x.unaryExpr([&dist](double y) {return boost::math::pdf(dist, y);});
+        auto f = [&dist](double y) {return boost::math::pdf(dist, y);};
+        return tools_eigen::unaryExpr_or_nan(x, f);
     };
 
     //! evaluates the distribution function.
     inline Eigen::MatrixXd pnorm(const Eigen::MatrixXd& x)
     {
         boost::math::normal dist;
-        return x.unaryExpr([&dist](double y) {return boost::math::cdf(dist, y);});
+        auto f = [&dist](double y) {return boost::math::cdf(dist, y);};
+        return tools_eigen::unaryExpr_or_nan(x, f);
     };
     
     //! evaluates the quantile function.
     inline Eigen::MatrixXd qnorm(const Eigen::MatrixXd& x)
     {
         boost::math::normal dist;
-        return x.unaryExpr([&dist](double y) {return boost::math::quantile(dist, y);});
+        auto f = [&dist](double y) {return boost::math::quantile(dist, y);};
+        return tools_eigen::unaryExpr_or_nan(x, f);
     };
     //! @}
     
@@ -52,21 +55,24 @@ namespace tools_stats
     inline Eigen::MatrixXd dt(const Eigen::MatrixXd& x, double nu)
     {
         boost::math::students_t dist(nu);
-        return x.unaryExpr([&dist](double y) {return boost::math::pdf(dist, y);});
+        auto f = [&dist](double y) {return boost::math::pdf(dist, y);};
+        return tools_eigen::unaryExpr_or_nan(x, f);
     };
 
     //! evaluates the distribution function.
     inline Eigen::MatrixXd pt(const Eigen::MatrixXd& x, double nu)
     {
         boost::math::students_t dist(nu);
-        return x.unaryExpr([&dist](double y) {return boost::math::cdf(dist, y);});
+        auto f = [&dist](double y) {return boost::math::cdf(dist, y);};
+        return tools_eigen::unaryExpr_or_nan(x, f);
     };
     
     //! evaluates the  quantile function.
     inline Eigen::MatrixXd qt(const Eigen::MatrixXd& x, double nu)
     {
         boost::math::students_t dist(nu);
-        return x.unaryExpr([&dist](double y) {return boost::math::quantile(dist, y);});
+        auto f = [&dist](double y) {return boost::math::quantile(dist, y);};
+        return tools_eigen::unaryExpr_or_nan(x, f);
     };
     //! @}
 

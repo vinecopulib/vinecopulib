@@ -102,4 +102,12 @@ namespace test_tools_stats {
             ASSERT_TRUE(p.isApprox(cop.cdf(u), 1e-2));
 
     }
+
+    TEST(test_tools_stats, dpq_are_nan_safe) {
+        Eigen::VectorXd X = Eigen::VectorXd::Random(1e1);
+        X(0) = std::numeric_limits<double>::quiet_NaN();
+        EXPECT_NO_THROW(tools_stats::dnorm(X));
+        EXPECT_NO_THROW(tools_stats::pnorm(X));
+        EXPECT_NO_THROW(tools_stats::qnorm(tools_stats::pnorm(X)));
+    }
 }

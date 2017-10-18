@@ -11,12 +11,34 @@
 #include <iterator>
 #include <numeric>
 #include <cstddef>
+#include <boost/math/special_functions/fpclassify.hpp> // isnan
+#include <limits>
 
 namespace vinecopulib {
 
 namespace tools_stl {
     
     using namespace std;
+
+    template<typename T, typename V>
+    V unaryFunc_or_nan(T f, V y)
+    {
+        if ((boost::math::isnan)(y)) {
+            return std::numeric_limits<V>::quiet_NaN();
+        } else {
+            return f(y);
+        }
+    };
+
+    template<typename T, typename V>
+    V binaryFunc_or_nan(T f, V u1, V u2)
+    {
+        if ((boost::math::isnan)(u1) | (boost::math::isnan)(u2)) {
+            return std::numeric_limits<V>::quiet_NaN();
+        } else {
+            return f(u1, u2);
+        }
+    };
 
     template<typename T>
     std::vector<size_t> get_order(const std::vector<T>& x)
