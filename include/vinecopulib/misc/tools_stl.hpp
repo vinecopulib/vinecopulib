@@ -20,6 +20,11 @@ namespace tools_stl {
     
     using namespace std;
 
+    template<class... T> void unused(T&&...)
+    {
+
+    }
+
     template<typename T, typename V>
     V unaryFunc_or_nan(T f, V y)
     {

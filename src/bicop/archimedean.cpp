@@ -18,7 +18,7 @@ namespace vinecopulib
             temp = generator_derivative2(temp)/std::pow(generator_derivative(temp), 3.0);
             return (-1)*generator_derivative(u)*generator_derivative(v)*temp;
         };
-        return u.col(0).binaryExpr(u.col(1), f);
+        return tools_eigen::binaryExpr_or_nan(u, f);
     }
 
     Eigen::VectorXd ArchimedeanBicop::cdf(
@@ -28,7 +28,7 @@ namespace vinecopulib
         auto f = [this](const double& u, const double& v) {
             return generator_inv(generator(u) + generator(v));
         };
-        return u.col(0).binaryExpr(u.col(1), f);
+        return tools_eigen::binaryExpr_or_nan(u, f);
     }
 
     Eigen::VectorXd ArchimedeanBicop::hfunc1(
@@ -39,7 +39,7 @@ namespace vinecopulib
             double temp = generator_inv(generator(u) + generator(v));
             return generator_derivative(u)/generator_derivative(temp);
         };
-        return u.col(0).binaryExpr(u.col(1), f);
+        return tools_eigen::binaryExpr_or_nan(u, f);
     }
 
     Eigen::VectorXd ArchimedeanBicop::hfunc2(

@@ -43,7 +43,8 @@ namespace tools_eigen
          Eigen::Matrix<double, Eigen::Dynamic, 2> u);
     
     Eigen::VectorXd invert_f(
-            const Eigen::VectorXd &x, std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
+            const Eigen::VectorXd &x,
+            std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
             const double lb = 1e-20,
             const double ub = 1-1e-20,
             int n_iter = 35
@@ -53,7 +54,8 @@ namespace tools_eigen
             const Eigen::VectorXd& grid_points
     );
 
-    Eigen::MatrixXd read_matxd(const char *filename, int max_buffer_size = (int) 1e6);
+    Eigen::MatrixXd read_matxd(const char *filename,
+                               int max_buffer_size = (int) 1e6);
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
         const char *filename, int max_buffer_size = (int) 1e6);
 }
