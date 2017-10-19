@@ -39,6 +39,7 @@ namespace tools_interpolation {
         double cubic_integral(const double& lower, const double& upper, const Eigen::VectorXd& a);
         Eigen::VectorXd find_coefs(const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);
         double interp_on_grid(const double& x, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);
+        Eigen::Matrix<ptrdiff_t, 1, 2> get_ij(double x0, double x1, ptrdiff_t m);
 
         // Utility functions for integration
         double int_on_grid(const double& upr, const Eigen::VectorXd& vals, const Eigen::VectorXd& grid);

@@ -41,36 +41,55 @@ namespace test_bicop_parametric {
             Eigen::VectorXd par = bicop_.get_parameters();
             auto absdiff = fabs(bicop_.parameters_to_tau(par) - results(0,0));
             ASSERT_TRUE(absdiff < 1e-4) << bicop_.str();
+
+            // Get u-data
+            Eigen::MatrixXd u = results.block(0,1,n,2);
     
             // evaluate pdf in C++
-            Eigen::VectorXd f = bicop_.pdf(results.block(0,1,n,2));
+            Eigen::VectorXd f = bicop_.pdf(u);
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,3,n,1), 1e-4)) << bicop_.str();
 
             // evaluate cdf in C++
-            f = bicop_.cdf(results.block(0,1,n,2));
+            f = bicop_.cdf(u);
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,4,n,1), 1e-4)) << bicop_.str();
     
             // evaluate hfunc1 in C++
-            f = bicop_.hfunc1(results.block(0,1,n,2));
+            f = bicop_.hfunc1(u);
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,5,n,1), 1e-4)) << bicop_.str();
     
             // evaluate hfunc2 in C++
-            f = bicop_.hfunc2(results.block(0,1,n,2));
+            f = bicop_.hfunc2(u);
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,6,n,1), 1e-4)) << bicop_.str();
     
             // evaluate hinv1 in C++
-            f = bicop_.hinv1(results.block(0,1,n,2));
+            f = bicop_.hinv1(u);
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,7,n,1), 1e-4)) << bicop_.str();
     
             // evaluate hinv2 in C++
-            f = bicop_.hinv2(results.block(0,1,n,2));
+            f = bicop_.hinv2(u);
             // assert approximate equality
             ASSERT_TRUE(f.isApprox(results.block(0,8,n,1), 1e-4)) << bicop_.str();
+
+            u(0,0) = std::numeric_limits<double>::quiet_NaN();
+            u(1,1) = std::numeric_limits<double>::quiet_NaN();
+            EXPECT_NO_THROW(bicop_.pdf(u.block(0,0,10,2))) << bicop_.str();
+            EXPECT_TRUE(bicop_.pdf(u.block(0,0,1,2)).array().isNaN()(0)) << bicop_.str();
+            EXPECT_NO_THROW(bicop_.cdf(u.block(0,0,10,2))) << bicop_.str();
+            EXPECT_TRUE(bicop_.cdf(u.block(0,0,1,2)).array().isNaN()(0)) << bicop_.str();
+            EXPECT_NO_THROW(bicop_.hfunc1(u.block(0,0,10,2))) << bicop_.str();
+            EXPECT_TRUE(bicop_.hfunc1(u.block(0,0,1,2)).array().isNaN()(0)) << bicop_.str();
+            EXPECT_NO_THROW(bicop_.hinv1(u.block(0,0,10,2))) << bicop_.str();
+            EXPECT_TRUE(bicop_.hinv1(u.block(0,0,1,2)).array().isNaN()(0)) << bicop_.str();
+            EXPECT_NO_THROW(bicop_.hfunc2(u.block(0,0,10,2))) << bicop_.str();
+            EXPECT_TRUE(bicop_.hfunc2(u.block(0,0,1,2)).array().isNaN()(0)) << bicop_.str();
+            EXPECT_NO_THROW(bicop_.hinv2(u.block(0,0,10,2))) << bicop_.str();
+            EXPECT_TRUE(bicop_.hinv2(u.block(0,0,1,2)).array().isNaN()(0)) << bicop_.str();
+            EXPECT_NO_THROW(bicop_.loglik(u.block(0,0,10,2))) << bicop_.str();
         }
     }
 

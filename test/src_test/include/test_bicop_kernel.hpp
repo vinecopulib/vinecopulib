@@ -24,21 +24,36 @@ namespace test_bicop_kernel {
     
     TEST_P(TrafokernelTest, trafo_kernel_eval_funcs) {
         bicop_.fit(u, controls);
-    
+
         EXPECT_GE(bicop_.pdf(u).minCoeff(), 0.0);
-    
+        EXPECT_GE(bicop_.cdf(u).minCoeff(), 0.0);
         EXPECT_GE(bicop_.hfunc1(u).minCoeff(), 0.0);
         EXPECT_GE(bicop_.hfunc2(u).minCoeff(), 0.0);
         EXPECT_GE(bicop_.hinv1(u).minCoeff(), 0.0);
         EXPECT_GE(bicop_.hinv2(u).minCoeff(), 0.0);
-        
+        EXPECT_LE(bicop_.cdf(u).maxCoeff(), 1.0);
         EXPECT_LE(bicop_.hfunc1(u).maxCoeff(), 1.0);
         EXPECT_LE(bicop_.hfunc2(u).maxCoeff(), 1.0);
         EXPECT_LE(bicop_.hinv1(u).maxCoeff(), 1.0);
         EXPECT_LE(bicop_.hinv2(u).maxCoeff(), 1.0);
-        
         EXPECT_GE(bicop_.calculate_npars(), 0.0);
         EXPECT_LE(bicop_.calculate_npars(), 100.0);
+
+        u(0,0) = std::numeric_limits<double>::quiet_NaN();
+        u(1,1) = std::numeric_limits<double>::quiet_NaN();
+        EXPECT_NO_THROW(bicop_.pdf(u.block(0,0,10,2)));
+        EXPECT_TRUE(bicop_.pdf(u.block(0,0,1,2)).array().isNaN()(0));
+        EXPECT_NO_THROW(bicop_.cdf(u.block(0,0,10,2)));
+        EXPECT_TRUE(bicop_.cdf(u.block(0,0,1,2)).array().isNaN()(0));
+        EXPECT_NO_THROW(bicop_.hfunc1(u.block(0,0,10,2)));
+        EXPECT_TRUE(bicop_.hfunc1(u.block(0,0,1,2)).array().isNaN()(0));
+        EXPECT_NO_THROW(bicop_.hinv1(u.block(0,0,10,2)));
+        EXPECT_TRUE(bicop_.hinv1(u.block(0,0,1,2)).array().isNaN()(0));
+        EXPECT_NO_THROW(bicop_.hfunc2(u.block(0,0,10,2)));
+        EXPECT_TRUE(bicop_.hfunc2(u.block(0,0,1,2)).array().isNaN()(0));
+        EXPECT_NO_THROW(bicop_.hinv2(u.block(0,0,10,2)));
+        EXPECT_TRUE(bicop_.hinv2(u.block(0,0,1,2)).array().isNaN()(0));
+        EXPECT_NO_THROW(bicop_.loglik(u.block(0,0,10,2)));
     }
     
     TEST_P(TrafokernelTest, trafo_kernel_select) {

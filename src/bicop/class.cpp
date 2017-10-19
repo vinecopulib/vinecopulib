@@ -261,7 +261,7 @@ namespace vinecopulib
     //! @param u \f$n \times 2\f$ matrix of observations.
     double Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u) const
     {
-        return pdf(u).array().log().sum();
+        return pdf(tools_eigen::nan_omit(u)).array().log().sum();
     }
 
     //! calculates the Akaike information criterion (AIC).
@@ -423,7 +423,7 @@ namespace vinecopulib
         } else {
             method = controls.get_nonparametric_method();
         }
-        bicop_->fit(cut_and_rotate(data), method,
+        bicop_->fit(tools_eigen::nan_omit(cut_and_rotate(data)), method,
                     controls.get_nonparametric_mult());
     }
 
@@ -447,6 +447,10 @@ namespace vinecopulib
         std::string selection_criterion = controls.get_selection_criterion();
         bool preselect_families = controls.get_preselect_families();
 
+        // Remove nans
+        Eigen::Matrix<double, Eigen::Dynamic, 2> data_no_nans =
+                tools_eigen::nan_omit(data);
+
         // If the familyset is empty, use all families.
         // If the familyset is not empty, check that all included families are implemented.
         if (family_set.empty()) {
@@ -469,7 +473,7 @@ namespace vinecopulib
 
         // When using rotations, add only the ones that yield the appropriate
         // association direction.
-        auto tau = tools_stats::pairwise_tau(data);
+        auto tau = tools_stats::pairwise_tau(data_no_nans);
         std::vector<int> which_rotations;
         if (tau > 0) {
             which_rotations = {0, 180};
@@ -480,7 +484,7 @@ namespace vinecopulib
         std::vector<double> c(2);
         if (preselect_families) {
             rotation_ = 0;
-            c = get_c1c2(cut_and_rotate(data), tau);
+            c = get_c1c2(cut_and_rotate(data_no_nans), tau);
         }
 
         // Create the combinations of families and rotations to estimate
@@ -528,14 +532,14 @@ namespace vinecopulib
             } else {
                 method = nonparametric_method;
             }
-            bicop_->fit(cut_and_rotate(data), method, mult);
+            bicop_->fit(cut_and_rotate(data_no_nans), method, mult);
 
             // Compute the selection criterion
             double new_criterion;
             if (selection_criterion == "aic") {
-                new_criterion = aic(data);
+                new_criterion = aic(data_no_nans);
             } else if (selection_criterion == "bic") {
-                new_criterion = bic(data);
+                new_criterion = bic(data_no_nans);
             } else {
                 throw std::runtime_error("Selection criterion not implemented");
             }
@@ -587,8 +591,8 @@ namespace vinecopulib
         // truncate to interval [eps, 1 - eps]
         Eigen::Matrix<double, Eigen::Dynamic, 2> eps =
             Eigen::Matrix<double, Eigen::Dynamic, 2>::Constant(u.rows(), 2, 1e-10);
-        u_new = u_new.array().min(1.0 - eps.array());
-        u_new = u_new.array().max(eps.array());
+        u_new = (1.0 - eps.array()).min(u_new.array());
+        u_new = eps.array().max(u_new.array());
 
         return u_new;
     }

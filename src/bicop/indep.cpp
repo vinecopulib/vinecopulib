@@ -18,7 +18,12 @@ namespace vinecopulib
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return Eigen::VectorXd::Ones(u.rows());
+        auto f = [](double u1, double u2) {
+            tools_stl::unused(u1);
+            tools_stl::unused(u2);
+            return 1.0;
+        };
+        return tools_eigen::binaryExpr_or_nan(u, f);
     }
 
     Eigen::VectorXd IndepBicop::cdf(
@@ -32,28 +37,44 @@ namespace vinecopulib
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return u.col(1);
+        auto f = [](double u1, double u2) {
+            tools_stl::unused(u1);
+            return u2;
+        };
+        return tools_eigen::binaryExpr_or_nan(u, f);
     }
 
     Eigen::VectorXd IndepBicop::hfunc2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return u.col(0);
+        auto f = [](double u1, double u2) {
+            tools_stl::unused(u2);
+            return u1;
+        };
+        return tools_eigen::binaryExpr_or_nan(u, f);
     }
 
     Eigen::VectorXd IndepBicop::hinv1(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return u.col(1);
+        auto f = [](double u1, double u2) {
+            tools_stl::unused(u1);
+            return u2;
+        };
+        return tools_eigen::binaryExpr_or_nan(u, f);
     }
 
     Eigen::VectorXd IndepBicop::hinv2(
         const Eigen::Matrix<double, Eigen::Dynamic, 2>& u
     )
     {
-        return u.col(0);
+        auto f = [](double u1, double u2) {
+            tools_stl::unused(u2);
+            return u1;
+        };
+        return tools_eigen::binaryExpr_or_nan(u, f);
     }
 
     Eigen::MatrixXd IndepBicop::tau_to_parameters(const double &)

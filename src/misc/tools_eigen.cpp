@@ -13,6 +13,48 @@ namespace vinecopulib {
 
 namespace tools_eigen
 {
+
+    //! remove rows of a matrix which contain nan values
+    //! @param x the matrix.
+    //! @return a new matrix without the rows containing nan values
+    Eigen::MatrixXd nan_omit(const Eigen::MatrixXd& x)
+    {
+        // find rows with nans
+        Eigen::Matrix<bool, 1, Eigen::Dynamic> nans = x.array().isNaN().matrix().rowwise().any();
+
+        // copy data to not modify input
+        Eigen::MatrixXd out = x;
+        size_t last = x.rows() - 1;
+        for (size_t i = 0; i < last + 1;)
+        {
+            // put nan rows at the end
+            if (nans(i)) {
+                out.row(i).swap(out.row(last));
+                nans.segment<1>(i).swap(nans.segment<1>(last));
+                --last;
+            }
+            else {
+                ++i;
+            }
+        }
+        out.conservativeResize(last + 1, out.cols());
+
+        return out;
+
+        /* Version that copy each non-nan row
+        // allocate output matrix
+        Eigen::MatrixXd out(x.rows() - nans.count(), x.cols());
+
+        // fill output matrix
+        Eigen::Index j = 0;
+        for(Eigen::Index i = 0; i < x.rows(); ++i)
+        {
+            if(!nans(i))
+                out.row(j++) = x.row(i);
+        }
+
+        return out;*/
+    }
     
     //! swap the columns of a two-column matrix
     //! @param u the matrix.

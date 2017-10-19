@@ -88,75 +88,80 @@ namespace tools_interpolation {
         }
     }
 
+    Eigen::Matrix<ptrdiff_t, 1, 2> InterpolationGrid::get_ij(
+            double x0, double x1, ptrdiff_t m
+    )
+    {
+        Eigen::Matrix<ptrdiff_t, 1, 2> out;
+        out << 0, 0;
+        bool found_i = false;
+        bool found_j = false;
+        for (ptrdiff_t k = 1; k < (m-1); ++k) {
+            if ((x0 >= grid_points_(k))) {
+                out(0) = k;
+            } else {
+                found_i = true;
+            }
+            if ((x1 >= grid_points_(k))) {
+                out(1) = k;
+            } else {
+                found_j = true;
+            }
+            if (found_i & found_j) {
+                break;
+            }
+        }
+        return out;
+    }
+
     //! Interpolation in two dimensions
     //!
     //! @param x mx2 matrix of evaluation points.
     Eigen::VectorXd InterpolationGrid::interpolate(const Eigen::MatrixXd& x)
     {
-        ptrdiff_t N = x.rows();
+        Eigen::VectorXd y(4), tmpgrid(4), tmpvals(4);
         ptrdiff_t m = grid_points_.size();
-        Eigen::VectorXd y(4), out(N), a(4), tmpgrid(4), tmpvals(4);
-        ptrdiff_t i, j, i0, i3;
+        auto f = [&m, this, &y, &tmpgrid, &tmpvals](double x0, double x1) {
+            ptrdiff_t i0, i3;
 
-        for (ptrdiff_t n = 0; n < N; ++n) {
-            // find cell
-            i = 0;
-            j = 0;
-            bool found_i = false;
-            bool found_j = false;
-            for (ptrdiff_t k = 1; k < (m-1); ++k) {
-                if ((x(n, 0) >= grid_points_(k))) { 
-                    i = k;
-                } else {
-                    found_i = true;
-                }
-                if ((x(n, 1) >= grid_points_(k))) {
-                    j = k;
-                } else {
-                    found_j = true;
-                }
-                if (found_i & found_j) {
-                    break;
-                }
-            }
-
+            Eigen::Matrix<ptrdiff_t, 1, 2> ij = this->get_ij(x0, x1, m);
             // construct grid for first direction
-            i0 = std::max(i-1, (ptrdiff_t) 0);
-            i3 = std::min(i+2, m-1);
-            tmpgrid(0) = grid_points_(i0);
-            tmpgrid(1) = grid_points_(i);
-            tmpgrid(2) = grid_points_(i+1);
-            tmpgrid(3) = grid_points_(i3);
+            i0 = std::max(ij(0)-1, (ptrdiff_t) 0);
+            i3 = std::min(ij(0)+2, m-1);
+            tmpgrid(0) = this->grid_points_(i0);
+            tmpgrid(1) = this->grid_points_(ij(0));
+            tmpgrid(2) = this->grid_points_(ij(0)+1);
+            tmpgrid(3) = this->grid_points_(i3);
 
             // interpolate in one direction (four times)
             for (ptrdiff_t s = 0; s < 4; ++s) {
-                i0 = std::max(i-1, (ptrdiff_t) 0);
-                i3 = std::min(i+2, m-1);
-                ptrdiff_t jj = std::min(m-1, j-1+s);
+                i0 = std::max(ij(0)-1, (ptrdiff_t) 0);
+                i3 = std::min(ij(0)+2, m-1);
+                ptrdiff_t jj = std::min(m-1, ij(1)-1+s);
                 jj = std::max((ptrdiff_t) 0, jj);
 
-                tmpvals(0) = values_(i0,  jj);
-                tmpvals(1) = values_(i,   jj);
-                tmpvals(2) = values_(i+1, jj);
-                tmpvals(3) = values_(i3,  jj);
+                tmpvals(0) = this->values_(i0,  jj);
+                tmpvals(1) = this->values_(ij(0),   jj);
+                tmpvals(2) = this->values_(ij(0)+1, jj);
+                tmpvals(3) = this->values_(i3,  jj);
 
-                y(s) = interp_on_grid(x(n, 0), tmpvals, tmpgrid);
+                y(s) = this->interp_on_grid(x0, tmpvals, tmpgrid);
                 y(s) = fmax(y(s), 0.0);
             }
 
             // use these four points to interpolate in the remaining direction#
-            i0 = std::max(j-1, (ptrdiff_t) 0);
-            i3 = std::min(j+2, m-1);
-            tmpgrid(0) = grid_points_(i0);
-            tmpgrid(1) = grid_points_(j);
-            tmpgrid(2) = grid_points_(j+1);
-            tmpgrid(3) = grid_points_(i3);
-            
-            out(n) = interp_on_grid(x(n, 1), y, tmpgrid);
-            out(n) = fmax(out(n), 1e-15);
-        }
+            i0 = std::max(ij(1)-1, (ptrdiff_t) 0);
+            i3 = std::min(ij(1)+2, m-1);
+            tmpgrid(0) = this->grid_points_(i0);
+            tmpgrid(1) = this->grid_points_(ij(1));
+            tmpgrid(2) = this->grid_points_(ij(1)+1);
+            tmpgrid(3) = this->grid_points_(i3);
 
-        return out;
+            double out = this->interp_on_grid(x1, y, tmpgrid);
+            return fmax(out, 1e-15);
+        };
+
+        return tools_eigen::binaryExpr_or_nan(x, f);
     }
 
     //! Integrate the grid along one axis
@@ -167,33 +172,30 @@ namespace tools_interpolation {
     Eigen::VectorXd InterpolationGrid::intergrate_1d(const Eigen::MatrixXd& u, 
                                                      size_t cond_var)
     {
-        ptrdiff_t n = u.rows();
         ptrdiff_t m = grid_points_.size();
-        Eigen::VectorXd tmpvals(m), out(n), tmpa(4), tmpb(4);
+        Eigen::VectorXd tmpvals(m);
         Eigen::MatrixXd tmpgrid(m, 2);
-        double upr = 0.0;
-        double tmpint, int1;
-        tmpint = 0.0;
-        
-        for (ptrdiff_t i = 0; i < n; ++i) {
+
+        auto f = [this, m, cond_var, &tmpvals, &tmpgrid] (double u1, double u2) {
+            double upr = 0.0;
+            double tmpint = 0.0, int1;
             if (cond_var == 1) {
-                upr = u(i, 1);
-                tmpgrid.col(0) = Eigen::VectorXd::Constant(m, u(i, 0));
+                upr = u2;
+                tmpgrid.col(0) = Eigen::VectorXd::Constant(m, u1);
                 tmpgrid.col(1) = grid_points_;
             } else if (cond_var == 2) {
-                upr = u(i, 0);
+                upr = u1;
                 tmpgrid.col(0) = grid_points_;
-                tmpgrid.col(1) = Eigen::VectorXd::Constant(m, u(i, 1));
+                tmpgrid.col(1) = Eigen::VectorXd::Constant(m, u2);
             }
             tmpvals = interpolate(tmpgrid);
             tmpint = int_on_grid(upr, tmpvals, grid_points_);
             int1 = int_on_grid(1.0, tmpvals, grid_points_);
-            out(i) = tmpint/int1;
-            out(i) = fmax(out(i), 1e-10);
-            out(i) = fmin(out(i), 1-1e-10);
-        }
 
-        return out;
+            return fmin(fmax(tmpint/int1, 1e-10), 1-1e-10);
+        };
+
+        return tools_eigen::binaryExpr_or_nan(u, f);
     }
 
     //! Integrate the grid along the two axis
@@ -202,31 +204,27 @@ namespace tools_interpolation {
     //!
     Eigen::VectorXd InterpolationGrid::intergrate_2d(const Eigen::MatrixXd& u)
     {
-
-        double upr, tmpint, tmpint1;
-        ptrdiff_t n = u.rows();
         ptrdiff_t m = grid_points_.size();
-        Eigen::VectorXd tmpvals(m), tmpvals2(m), out(n);
+        Eigen::VectorXd tmpvals(m), tmpvals2(m);
         Eigen::MatrixXd tmpgrid(m, 2);
         tmpgrid.col(1) = grid_points_;
 
-        for (ptrdiff_t i = 0; i < n; ++i) {
-            upr = u(i, 1);
-            for (ptrdiff_t k = 0; k < m-1; ++k) {
+        auto f = [this, m, &tmpvals, &tmpvals2, &tmpgrid] (double u1, double u2) {
+            double upr, tmpint, tmpint1;
+            upr = u2;
+            for (ptrdiff_t k = 0; k < m; ++k) {
                 tmpgrid.col(0) = Eigen::VectorXd::Constant(m,  grid_points_(k));
                 tmpvals = interpolate(tmpgrid);
                 tmpint = int_on_grid(upr, tmpvals, grid_points_);
-                tmpvals2(i) = tmpint;
+                tmpvals2(k) = tmpint;
             }
-            upr = u(i, 0);
+            upr = u1;
             tmpint = int_on_grid(upr, tmpvals2, grid_points_);
             tmpint1 = int_on_grid(1.0, tmpvals2, grid_points_);
-            out(i) = tmpint/tmpint1;
-            out(i) = fmax(out(i), 1e-10);
-            out(i) = fmin(out(i), 1-1e-10);
-        }
+            return fmin(fmax(tmpint/tmpint1, 1e-10), 1-1e-10);
+        };
 
-        return out;
+        return tools_eigen::binaryExpr_or_nan(u, f);
     }
 
 // ---------------- Utility functions for spline interpolation ----------------
