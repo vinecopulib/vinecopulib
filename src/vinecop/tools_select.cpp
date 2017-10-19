@@ -26,16 +26,19 @@ namespace tools_select {
                                std::string tree_criterion)
     {
         double w = 0.0;
+        Eigen::Matrix<double, Eigen::Dynamic, 2> data_no_nan =
+                tools_eigen::nan_omit(data);
+        double freq = ((double) data_no_nan.rows())/((double) data.rows());
         if (tree_criterion == "tau") {
-            w = std::fabs(tools_stats::pairwise_tau(data));
+            w = std::fabs(tools_stats::pairwise_tau(data_no_nan));
         } else if (tree_criterion == "hoeffd") {
             // scale to [0,1]
-            w = (30 * tools_stats::pairwise_hoeffd(data) + 0.5) / 1.5;
+            w = (30 * tools_stats::pairwise_hoeffd(data_no_nan) + 0.5) / 1.5;
         } else if (tree_criterion == "rho") {
-            w = std::fabs(tools_stats::pairwise_cor(data));
+            w = std::fabs(tools_stats::pairwise_cor(data_no_nan));
         }
         
-        return w;
+        return w * std::sqrt(freq);
     }
     
     //! Calculates maximal criterion for tree selection.
@@ -44,13 +47,20 @@ namespace tools_select {
     Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd& data, 
                                                std::string tree_criterion)
     {
-        Eigen::MatrixXd w = tools_stats::dependence_matrix(data, tree_criterion);
-        if (tree_criterion == "hoeffd") {
-            // hoeefd needs to be scaled to [0,1]
-            w = (w.array() + 0.5) / 1.5;
+        size_t n = data.rows();
+        size_t d = data.cols();
+        Eigen::MatrixXd mat(d, d);
+        mat.diagonal() = Eigen::VectorXd::Constant(d, 1.0);
+        Eigen::Matrix<double, Eigen::Dynamic, 2> pair_data(n, 2);
+        for (size_t i = 1; i < d; ++i) {
+            for (size_t j = 0; j < i; ++j) {
+                pair_data.col(0) = data.col(i);
+                pair_data.col(1) = data.col(j);
+                mat(i, j) = calculate_criterion(pair_data, tree_criterion);
+                mat(j, i) = mat(i, j);
+            }
         }
-    
-        return w.array().abs();
+        return mat;
     }
     
     //! calculates the Generalized Information Criterion.
