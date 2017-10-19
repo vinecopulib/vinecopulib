@@ -39,6 +39,8 @@ namespace tools_eigen
                                    });
     };
 
+    Eigen::MatrixXd nan_omit(const Eigen::MatrixXd& x);
+
     Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
          Eigen::Matrix<double, Eigen::Dynamic, 2> u);
     

@@ -89,6 +89,7 @@ namespace test_bicop_parametric {
             EXPECT_TRUE(bicop_.hfunc2(u.block(0,0,1,2)).array().isNaN()(0)) << bicop_.str();
             EXPECT_NO_THROW(bicop_.hinv2(u.block(0,0,10,2))) << bicop_.str();
             EXPECT_TRUE(bicop_.hinv2(u.block(0,0,1,2)).array().isNaN()(0)) << bicop_.str();
+            EXPECT_NO_THROW(bicop_.loglik(u.block(0,0,10,2))) << bicop_.str();
         }
     }
 
