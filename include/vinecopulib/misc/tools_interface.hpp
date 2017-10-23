@@ -52,8 +52,14 @@ namespace vinecopulib {
         
         inline size_t get_num_threads()
         {
-            char* num_char = std::getenv("VINECOPULIB_NUM_CORES");
-            return std::max(std::atoi(num_char), 1);
+            char* num_char = std::getenv("VINECOPULIB_NUM_THREADS");
+            std::cout << "VINECOPULIB_NUM_THREADS = " << std::atoi(num_char) << "\n";
+            // use at least one thread
+            unsigned int num = std::max(std::atoi(num_char), 1);
+            // don't use more threads than supported by the system
+            num = std::min(num, std::thread::hardware_concurrency());
+            
+            return num;
         }
     }
 }
