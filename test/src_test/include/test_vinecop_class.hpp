@@ -168,8 +168,8 @@ namespace test_vinecop_class {
         fit1.select_all(u, controls);
         controls.set_num_threads(2);
         fit2.select_all(u, controls);
-        EXPECT_EQ(fit1.get_all_families(), fit1.get_all_families());
-        EXPECT_EQ(fit1.get_all_parameters(), fit1.get_all_parameters());
+        EXPECT_EQ(fit1.get_all_families(), fit2.get_all_families());
+        EXPECT_EQ(fit1.get_all_parameters(), fit2.get_all_parameters());
     }
     
     TEST_F(VinecopTest, select_finds_right_structure) {
