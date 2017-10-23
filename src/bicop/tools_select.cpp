@@ -30,7 +30,7 @@ std::vector<Bicop> create_candidate_bicops(
     } else {
         which_rotations = {90, 270};
     }
-    
+
     // create Bicop objects for all valid family/rotation combinations
     std::vector<Bicop> new_bicops;
     for (auto& fam : families) {
@@ -41,7 +41,7 @@ std::vector<Bicop> create_candidate_bicops(
             new_bicops.push_back(Bicop(fam, which_rotations[1]));
         }
     }
-    
+
     // remove combinations based on symmetry characteristics
     if (controls.get_preselect_families()) {
         preselect_candidates(new_bicops, data, tau);
@@ -80,14 +80,14 @@ void preselect_candidates(std::vector<Bicop>& bicops,
                           double tau)
 {
     auto c = get_c1c2(data, tau);
-    for (auto bicop_it = bicops.begin(); bicop_it != bicops.end();) {
-        bool is_selected = preselect_family(c, tau, *bicop_it);
-        if (!is_selected) {
-            bicops.erase(bicop_it);
-        } else {
-            bicop_it++;
-        }
-    }
+    bicops.erase(
+        std::remove_if(
+            bicops.begin(), 
+            bicops.end(), 
+            [&] (const Bicop& cop) { return !(preselect_family(c, tau, cop)); }
+        ),
+        bicops.end()
+    );
 }
 
 std::vector<double> get_c1c2(

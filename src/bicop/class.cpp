@@ -451,10 +451,10 @@ namespace vinecopulib
         std::mutex m;
         auto fit_and_compare = [&] (Bicop cop) {
             tools_interface::check_user_interrupt();
-            
+
             // Estimate the model
             cop.fit(data, controls);
-        
+
             // Compute the selection criterion
             double new_criterion;
             if (controls.get_selection_criterion() == "aic") {
@@ -462,7 +462,7 @@ namespace vinecopulib
             } else {
                 new_criterion = cop.bic(data);
             }
-        
+
             // the following block modifies thread-external variables
             // and is thus shielded by a mutex
             {
@@ -471,7 +471,7 @@ namespace vinecopulib
                 // then replace the current model by the new one
                 if (new_criterion < fitted_criterion) {
                     fitted_criterion = new_criterion;
-                    bicop_ = cop.bicop_;
+                    bicop_ = cop.get_bicop();
                     rotation_ = cop.get_rotation();
                 }
             }
