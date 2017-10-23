@@ -443,9 +443,11 @@ namespace vinecopulib
         data = tools_eigen::nan_omit(data);
         std::vector<Bicop> bicops = create_candidate_bicops(data, controls);
 
-        // Estimate all models and select the best one using the selection_criterion
+        // Estimate all models and select the best one using the 
+        // selection_criterion
         double fitted_criterion = 1e6;
-        for (auto cop : bicops) {
+        std::mutex m;
+        auto fit_and_compare = [&] (Bicop cop) {
             tools_interface::check_user_interrupt();
             
             // Estimate the model
@@ -459,13 +461,30 @@ namespace vinecopulib
                 new_criterion = cop.bic(data);
             }
         
-            // If the new model is better than the current one,
-            // then replace the current model by the new one
-            if (new_criterion < fitted_criterion) {
-                fitted_criterion = new_criterion;
-                bicop_ = cop.bicop_;
-                rotation_ = cop.get_rotation();
+            // the following block modifies thread-external variables
+            // and is thus shielded by a mutex
+            {
+                std::lock_guard<std::mutex> lk(m);
+                // If the new model is better than the current one,
+                // then replace the current model by the new one
+                if (new_criterion < fitted_criterion) {
+                    fitted_criterion = new_criterion;
+                    bicop_ = cop.bicop_;
+                    rotation_ = cop.get_rotation();
+                }
             }
+        };
+        
+        if (controls.get_num_threads() <= 1) {
+            for (auto& cop : bicops) {
+                fit_and_compare(cop);
+            }
+        } else {
+            tools_parallel::ThreadPool pool(controls.get_num_threads());
+            for (auto cop : bicops) {
+                pool.push(fit_and_compare, cop);
+            }
+            pool.join();
         }
     }
     
