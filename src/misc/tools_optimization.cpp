@@ -180,19 +180,19 @@ namespace tools_optimization {
                                controls_.get_maxeval(),
                                working_space);
         } catch (std::invalid_argument err) {
-            delete x;
-            delete lb;
-            delete ub;
+            delete[] x;
+            delete[] lb;
+            delete[] ub;
             throw std::runtime_error(std::string("Invalid arguments. ") + err.what());
         } catch (std::bad_alloc err) {
-            delete x;
-            delete lb;
-            delete ub;
+            delete[] x;
+            delete[] lb;
+            delete[] ub;
             throw std::runtime_error(std::string("Ran out of memory. ") + err.what());
         } catch (std::runtime_error err) {
-            delete x;
-            delete lb;
-            delete ub;
+            delete[] x;
+            delete[] lb;
+            delete[] ub;
             throw std::runtime_error(std::string("Generic failure. ") + err.what());
         } catch (...) {
             // do nothing for other errors (results are fine)
@@ -202,9 +202,9 @@ namespace tools_optimization {
         for (size_t i=0; i < n_parameters_; i++) {
             optimized_parameters(i) = x[i];
         }
-        delete x;
-        delete lb;
-        delete ub;
+        delete[] x;
+        delete[] lb;
+        delete[] ub;
         return optimized_parameters;
     }
 }
