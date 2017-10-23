@@ -429,7 +429,7 @@ namespace tools_select {
                 // given in rvine_matrix_
                 if (belongs_to_structure(v0, v1, vine_tree)) {
                     Eigen::MatrixXd pc_data;
-                    boost::graph_traits<VineTree>::edge_descriptor e;
+                    EdgeIterator e;
                     pc_data = get_pc_data(v0, v1, vine_tree);
                     e = boost::add_edge(v0, v1, w, vine_tree).first;
                     double crit = calculate_criterion(pc_data, tree_criterion);
@@ -786,10 +786,8 @@ namespace tools_select {
     //! Get edge index for the vine (like 1, 2; 3)
     //! @param e a descriptor for the edge.
     //! @param tree a vine tree.
-    std::string VinecopSelector::get_pc_index(
-            boost::graph_traits<VineTree>::edge_descriptor e,
-            VineTree& tree
-    )
+    std::string VinecopSelector::get_pc_index(const EdgeIterator& e, 
+                                              const VineTree& tree)
     {
         std::stringstream index;
         // add 1 everywhere for user-facing representation (boost::graph 
