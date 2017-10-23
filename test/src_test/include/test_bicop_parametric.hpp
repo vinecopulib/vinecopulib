@@ -109,6 +109,9 @@ namespace test_bicop_parametric {
             auto data = bicop_.simulate(get_n());
             auto bicop = Bicop(data, controls);
 
+            //std::cout << bicop_.str() << std::endl;
+            //std::cout << bicop.str() << std::endl;
+
             auto selected_family = bicop.get_family_name();
             EXPECT_EQ(selected_family, true_family) <<
                 bicop_.str() << std::endl <<

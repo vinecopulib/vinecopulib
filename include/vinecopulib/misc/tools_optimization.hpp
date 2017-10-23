@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <nlopt.hpp>
+#include <vinecopulib/misc/tools_bobyqa.hpp>
 #include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/bicop/parametric.hpp>
 
@@ -23,54 +23,52 @@ namespace tools_optimization {
         unsigned int objective_calls; //!< number of evaluations of the objective.
     } ParBicopOptData;
 
-    //! @brief A class for the controls to NLopt
-    class NLoptControls
+    //! @brief A class for the controls to Bobyqa
+    class BobyqaControls
     {
     public:
 
-        NLoptControls();
-        NLoptControls(double xtol_rel, double xtol_abs, double ftol_rel, 
-            double ftol_abs, int maxeval);
+        BobyqaControls();
+        BobyqaControls(double initial_trust_region,
+                       double final_trust_region,
+                       int maxeval);
 
-        void set_controls(nlopt::opt* opt);
-
-        double get_xtol_rel();
-        double get_xtol_abs();
-        double get_ftol_rel();
-        double get_ftol_abs();
-        double get_maxeval();
+        double get_initial_trust_region();
+        double get_final_trust_region();
+        int get_maxeval();
 
     private:
-        double xtol_rel_; //! Relative tolerance on the parameter value
-        double xtol_abs_; //! Absolute tolerance on the parameter value
-        double ftol_rel_; //! Relative tolerance on the function value
-        double ftol_abs_; //! Absolute tolerance on the function value
+        double initial_trust_region_; //! Initial trust region
+        double final_trust_region_; //! Final trust region
         int maxeval_; //! Maximal number of evaluations of the objective
 
         //! Sanity checks
         //! @{
-        void check_parameters(double xtol_rel, double xtol_abs, double ftol_rel,
-             double ftol_abs, int maxeval);
+        void check_parameters(double initial_trust_region,
+                              double final_trust_region,
+                              int maxeval);
         //! @}
     };
 
-    //! @brief A class for optimization (wrapping NLopt).
+    //! @brief A class for optimization (wrapping Bobyqa).
     class Optimizer {
     public:
-        Optimizer(unsigned int n_parameters);
-        Optimizer(unsigned int n_parameters, double xtol_rel, double xtol_abs,
-                  double ftol_rel, double ftol_abs, int maxeval);
-        
-        void set_bounds(const Eigen::MatrixXd& lower_bounds,
-            const Eigen::MatrixXd& upper_bounds);
-        void set_objective(nlopt::vfunc f, void* f_data);
+        Optimizer(unsigned int n_parameters,
+                  const Eigen::MatrixXd& lower_bounds,
+                  const Eigen::MatrixXd& upper_bounds);
+        void set_controls(double initial_trust_region,
+                          double final_trust_region,
+                          int maxeval);
 
-        Eigen::VectorXd optimize(Eigen::VectorXd initial_parameters);
+        Eigen::VectorXd optimize(Eigen::VectorXd initial_parameters,
+                                 tools_bobyqa::BobyqaClosureFunction objective,
+                                 void* f_data);
 
     private:
         unsigned int n_parameters_;
-        nlopt::opt opt_;
-        NLoptControls controls_;
+        BobyqaControls controls_;
+        Eigen::MatrixXd lb_;
+        Eigen::MatrixXd ub_;
     };
 }
 

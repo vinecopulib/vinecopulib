@@ -58,16 +58,6 @@ install:
   ### Common
   - export R_PACKAGES='c("VineCopula")'
   - sudo Rscript -e 'withCallingHandlers(install.packages('$R_PACKAGES', repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
-
-  - cd ..
-  - git clone https://github.com/stevengj/nlopt.git
-  - cd nlopt
-  - mkdir build
-  - cd build
-  - cmake .. $CMAKE_ARGS $CMAKE_PREFIX -DNLOPT_MATLAB=OFF -DNLOPT_CXX=ON -DCMAKE_BUILD_TYPE=Release
-  - make
-  - sudo make install
-  - cd ../../vinecopulib
   
 
 script:

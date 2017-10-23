@@ -9,6 +9,7 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <iostream>
+#include <vinecopulib/misc/tools_bobyqa.hpp>
 
 namespace vinecopulib
 {
@@ -75,9 +76,6 @@ namespace vinecopulib
             double tau = tools_stats::pairwise_tau(temp_data);
             auto newpar = get_start_parameters(tau);
             if (npars > 0) {
-                // Create optimizer
-                Optimizer optimizer(npars);
-
                 // Set bounds and starting values
                 auto lb = get_parameters_lower_bounds();
                 auto ub = get_parameters_upper_bounds();
@@ -94,6 +92,7 @@ namespace vinecopulib
                 auto initial_parameters = get_start_parameters(tau);
                 
                 ParBicopOptData my_data = {temp_data, this, initial_parameters(0), 0};
+                tools_bobyqa::BobyqaClosureFunction objective = mle_objective;
                 if (method == "itau") {
                       lb.resize(1, 1);
                       lb(0) = get_parameters_lower_bounds()(1);
@@ -104,17 +103,15 @@ namespace vinecopulib
                           // the df parameter doesn't need to be estimated as
                           // accurately
                           ub(0) = 15;
-                          optimizer = Optimizer(npars, 1e-2, 5e-1, 1e-4, 1e-4, 100);
-                          optimizer.set_objective(pmle_objective, &my_data);
                       }
-                      optimizer.set_objective(pmle_objective, &my_data);
-                } else {
-                      optimizer.set_objective(mle_objective, &my_data);
+                    objective = pmle_objective;
                 }
 
+                // create optimizer
+                Optimizer optimizer(npars, lb, ub);
+
                 // optimize and store result
-                optimizer.set_bounds(lb, ub);
-                auto optimized_parameters = optimizer.optimize(initial_parameters);
+                auto optimized_parameters = optimizer.optimize(initial_parameters, objective, &my_data);
                 if (method == "itau") {
                     newpar(1) = optimized_parameters(0);
                 } else {
