@@ -154,21 +154,21 @@ namespace tools_optimization {
 
         //const int number_interpolation_conditions = (n_parameters_ + 1) *
         //        (n_parameters_ + 2)/2;
-        const int number_interpolation_conditions = n_parameters_ + 3;
-        const std::size_t ws_size = (number_interpolation_conditions + 5) *
-                                            (number_interpolation_conditions
-                                             + n_parameters_) +
-                3*n_parameters_*(n_parameters_ + 5)/2;
-        double working_space[ws_size];
+        int number_interpolation_conditions = n_parameters_ + 3;
+        std::size_t ws_size = (number_interpolation_conditions + 5) *
+                              (number_interpolation_conditions
+                               + n_parameters_) +
+                              3*n_parameters_*(n_parameters_ + 5)/2;
+        double* working_space = new double[ws_size];
 
-        double lb[n_parameters_];
-        double ub[n_parameters_];
+        double* lb = new double[n_parameters_];
+        double* ub = new double[n_parameters_];
         double eps = 1e-6;
-        Eigen::VectorXd::Map(&lb[0], n_parameters_) = lb_.array() + eps;
-        Eigen::VectorXd::Map(&ub[0], n_parameters_) = ub_.array() - eps;
+        Eigen::VectorXd::Map(lb, n_parameters_) = lb_.array() + eps;
+        Eigen::VectorXd::Map(ub, n_parameters_) = ub_.array() - eps;
 
-        double x[n_parameters_];
-        Eigen::VectorXd::Map(&x[0], n_parameters_) = initial_parameters;
+        double* x = new double[n_parameters_];
+        Eigen::VectorXd::Map(x, n_parameters_) = initial_parameters;
         try {
             auto f = [&](long n, const double *x) -> double {
                 return objective(data, n, x);};
@@ -180,16 +180,31 @@ namespace tools_optimization {
                                controls_.get_maxeval(),
                                working_space);
         } catch (std::invalid_argument err) {
+            delete x;
+            delete lb;
+            delete ub;
             throw std::runtime_error(std::string("Invalid arguments. ") + err.what());
         } catch (std::bad_alloc err) {
+            delete x;
+            delete lb;
+            delete ub;
             throw std::runtime_error(std::string("Ran out of memory. ") + err.what());
         } catch (std::runtime_error err) {
+            delete x;
+            delete lb;
+            delete ub;
             throw std::runtime_error(std::string("Generic failure. ") + err.what());
         } catch (...) {
             // do nothing for other errors (results are fine)
         }
 
-        Eigen::Map<const Eigen::VectorXd> optimized_parameters(&x[0], n_parameters_);
+        Eigen::VectorXd optimized_parameters(n_parameters_);
+        for (size_t i=0; i < n_parameters_; i++) {
+            optimized_parameters(i) = x[i];
+        }
+        delete x;
+        delete lb;
+        delete ub;
         return optimized_parameters;
     }
 }
