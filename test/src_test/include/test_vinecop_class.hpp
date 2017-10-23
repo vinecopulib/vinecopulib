@@ -160,6 +160,18 @@ namespace test_vinecop_class {
         EXPECT_EQ(true_rots, fitd_rots);
     }
     
+    TEST_F(VinecopTest, runs_multi_threaded) {
+        FitControlsVinecop controls(bicop_families::itau, "itau");
+        controls.set_select_truncation_level(true);
+        // controls.set_show_trace(true);
+        Vinecop fit1(7), fit2(7);
+        fit1.select_all(u, controls);
+        controls.set_num_threads(2);
+        fit2.select_all(u, controls);
+        EXPECT_EQ(fit1.get_all_families(), fit1.get_all_families());
+        EXPECT_EQ(fit1.get_all_parameters(), fit1.get_all_parameters());
+    }
+    
     TEST_F(VinecopTest, select_finds_right_structure) {
         // check whether the same structure appears if we only allow for
         // independence (pair-copula estimates differ otherwise)
