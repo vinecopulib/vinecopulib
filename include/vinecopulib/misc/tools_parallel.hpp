@@ -9,6 +9,7 @@
 #include <thread>
 #include <vector>
 #include <queue>
+#include <future>
 #include <condition_variable>
 #include <memory>
 
