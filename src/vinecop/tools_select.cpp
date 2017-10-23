@@ -731,6 +731,7 @@ namespace tools_select {
                                               const VineTree& tree_opt)
     {
         auto select_pc = [&] (EdgeIterator e) -> void {
+            tools_interface::check_user_interrupt();
             bool is_thresholded = (tree[e].crit < controls_.get_threshold());
             bool used_old_fit = false;
             
