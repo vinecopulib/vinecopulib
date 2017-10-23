@@ -730,7 +730,7 @@ namespace tools_select {
     void VinecopSelector::select_pair_copulas(VineTree& tree,
                                               const VineTree& tree_opt)
     {
-        for (auto e : boost::edges(tree)) {
+        auto select_pc = [&] (EdgeIterator e) -> void {
             bool is_thresholded = (tree[e].crit < controls_.get_threshold());
             bool used_old_fit = false;
             
@@ -750,7 +750,7 @@ namespace tools_select {
                     }
                 }
             }
-    
+
             if (!used_old_fit) {
                 if (is_thresholded) {
                     tree[e].pair_copula = vinecopulib::Bicop();
@@ -758,13 +758,25 @@ namespace tools_select {
                     tree[e].pair_copula.select(tree[e].pc_data, controls_);
                 }
             }
-            
+                        
             tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
             tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
             if (controls_.needs_sparse_select()) {
                 tree[e].loglik = tree[e].pair_copula.loglik(tree[e].pc_data);
                 tree[e].npars  = tree[e].pair_copula.calculate_npars();
             }
+        };
+        
+        if (controls_.get_num_threads() <= 1) {
+            for (auto e : boost::edges(tree)) {
+                select_pc(e);
+            }
+        } else {
+            tools_parallel::ThreadPool pool(controls_.get_num_threads());
+            for (auto e : boost::edges(tree)) {
+                pool.push(select_pc, e);
+            }
+            pool.join();
         }
     }
     
