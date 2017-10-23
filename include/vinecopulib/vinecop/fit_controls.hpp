@@ -47,7 +47,6 @@ namespace vinecopulib {
         bool get_show_trace();
         bool get_select_truncation_level();
         bool get_select_threshold();
-        size_t get_num_threads();
         bool needs_sparse_select();
         FitControlsBicop get_fit_controls_bicop();
 
@@ -58,7 +57,6 @@ namespace vinecopulib {
         void set_show_trace(bool show_trace);
         void set_select_truncation_level(bool select_truncation_level);
         void set_select_threshold(bool select_threshold);
-        void set_num_threads(size_t num_threads);
         void set_fit_controls_bicop(FitControlsBicop controls);
 
     private:
@@ -68,11 +66,9 @@ namespace vinecopulib {
         bool show_trace_;
         bool select_truncation_level_;
         bool select_threshold_;
-        size_t num_threads_;
 
         void check_truncation_level(size_t truncation_level);
         void check_tree_criterion(std::string tree_criterion);
         void check_threshold(double threshold);
-        size_t process_num_threads(size_t num_threads);
     };
 }

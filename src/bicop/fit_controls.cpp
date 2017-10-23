@@ -7,6 +7,7 @@
 #include <vinecopulib/bicop/fit_controls.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <stdexcept>
+#include <thread>
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib
@@ -24,12 +25,16 @@ namespace vinecopulib
     //! @param selection_criterion the selection criterion (`"aic"` or `"bic"`).
     //! @param preselect_families whether to exclude families before fitting
     //!     based on symmetry properties of the data.
+    //! @param num_threads number of concurrent threads to use while fitting
+    //!     copulas for different families; never uses more than the number
+    //!     returned by `std::thread::hardware_concurrency()``.
     FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
                                        std::string parametric_method,
                                        std::string nonparametric_method,
                                        double nonparametric_mult,
                                        std::string selection_criterion,
-                                       bool preselect_families)
+                                       bool preselect_families,
+                                       size_t num_threads)
     {
         set_family_set(family_set);
         set_parametric_method(parametric_method);
@@ -37,6 +42,7 @@ namespace vinecopulib
         set_nonparametric_mult(nonparametric_mult);
         set_selection_criterion(selection_criterion);
         set_preselect_families(preselect_families);
+        set_num_threads(num_threads);
     }
 
     //! @param parametric_method the fit method for parametric families;
@@ -118,6 +124,11 @@ namespace vinecopulib
         return nonparametric_mult_;
     }
 
+    size_t FitControlsBicop::get_num_threads()
+    {
+        return num_threads_;
+    }
+
     std::string FitControlsBicop::get_selection_criterion() const
     {
         return selection_criterion_;
@@ -160,6 +171,22 @@ namespace vinecopulib
     void FitControlsBicop::set_preselect_families(bool preselect_families)
     {
         preselect_families_ = preselect_families;
+    }
+    
+    void FitControlsBicop::set_num_threads(size_t num_threads)
+    {
+        num_threads_ = process_num_threads(num_threads);
+    }
+    
+    size_t FitControlsBicop::process_num_threads(size_t num_threads)
+    {
+        // use at least one thread
+        num_threads = std::max(num_threads, (size_t) 1);
+        // don't use more threads than supported by the system
+        size_t max_threads = std::thread::hardware_concurrency();
+        num_threads = std::min(num_threads, max_threads);
+        
+        return num_threads;
     }
     //! @}
 }
