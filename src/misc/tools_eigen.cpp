@@ -20,7 +20,13 @@ namespace tools_eigen
     Eigen::MatrixXd nan_omit(const Eigen::MatrixXd& x)
     {
         // find rows with nans
-        Eigen::Matrix<bool, 1, Eigen::Dynamic> nans = x.array().isNaN().matrix().rowwise().any();
+        Eigen::Matrix<bool, 1, Eigen::Dynamic> 
+        nans = x.array().isNaN().matrix().rowwise().any();
+        
+        // if there is no nan, just return x
+        if (!nans.array().any()) {
+            return x;
+        }
 
         // copy data to not modify input
         Eigen::MatrixXd out = x;
