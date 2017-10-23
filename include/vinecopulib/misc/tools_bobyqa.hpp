@@ -1107,7 +1107,7 @@ namespace vinecopulib {
                         ihq = (iq + iq * iq) / 2;
                         vquad += xq * (gopt[iq] + 0.5 * xq * hq[ihq]);
                         if (ip > 0) {
-                            iw = std::max(ihp, ihq) - std::abs(ip - iq);
+                            iw = std::max(ihp, ihq) - std::labs(ip - iq);
                             vquad += xp * xq * hq[iw];
                         }
                     }
@@ -1175,7 +1175,7 @@ namespace vinecopulib {
                             hq[ihp] += temp * square(ptsaux[(ip << 1) + 1]);
                             if (iq > 0) {
                                 hq[ihq] += temp * square(ptsaux[(iq << 1) + 1]);
-                                iw = std::max(ihp, ihq) - std::abs(iq - ip);
+                                iw = std::max(ihp, ihq) - std::labs(iq - ip);
                                 hq[iw] += temp * ptsaux[(ip << 1) + 1] *
                                           ptsaux[(iq << 1) + 1];
                             }
