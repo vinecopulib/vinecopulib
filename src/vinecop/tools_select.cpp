@@ -255,7 +255,7 @@ namespace tools_select {
         // pick threshold that changes at least alpha*100 % of the pair-copulas
         double alpha = 0.025;
         size_t m = thresholded_crits.size();
-        return thresholded_crits[std::ceil(m * alpha) - 1];
+        return thresholded_crits[std::ceil((double) m * alpha) - 1];
     }
     
     
