@@ -728,7 +728,7 @@ namespace tools_select {
     //! @param tree_opt the current optimal tree (used only for sparse 
     //!     selection).
     void VinecopSelector::select_pair_copulas(VineTree& tree,
-                                                const VineTree& tree_opt)
+                                              const VineTree& tree_opt)
     {
         for (auto e : boost::edges(tree)) {
             bool is_thresholded = (tree[e].crit < controls_.get_threshold());
@@ -770,7 +770,7 @@ namespace tools_select {
     
     //! finds the fitted pair-copula from the previous iteration.
     FoundEdge VinecopSelector::find_old_fit(double fit_id,
-                                              const VineTree& old_graph) 
+                                            const VineTree& old_graph) 
     {
         auto edge = boost::edge(0, 1, old_graph).first;
         bool fit_with_same_id = false;
