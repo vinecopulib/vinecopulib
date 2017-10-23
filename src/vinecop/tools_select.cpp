@@ -768,16 +768,24 @@ namespace tools_select {
             }
         };
         
-        if (controls_.get_num_threads() <= 1) {
+        size_t num_threads = controls_.get_num_threads();
+        if (num_threads <= 1) {
             for (auto e : boost::edges(tree)) {
                 select_pc(e);
             }
         } else {
-            tools_parallel::ThreadPool pool(controls_.get_num_threads());
+            // make sure that Bicop.select() doesn't spawn new threads
+            controls_.set_num_threads(1);
+            
+            // run tasks in thread pool
+            tools_parallel::ThreadPool pool(num_threads);
             for (auto e : boost::edges(tree)) {
                 pool.push(select_pc, e);
             }
             pool.join();
+            
+            // reset num_threads before fitting next tree
+            controls_.set_num_threads(num_threads);
         }
     }
     
