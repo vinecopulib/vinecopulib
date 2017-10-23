@@ -21,6 +21,7 @@
 #ifdef INTERFACED_FROM_R
     namespace tools_parallel {
         typedef ThreadPool RcppThread::ThreadPool;
+        typedef process_num_threads RcppThread::process_num_threads;
     }
 #else
     #include <vinecopulib/misc/tools_parallel.hpp>
@@ -48,18 +49,6 @@ namespace vinecopulib {
                     RcppThread::checkUserInterrupt();
                 #endif
             }
-        }
-        
-        inline size_t get_num_threads()
-        {
-            char* num_char = std::getenv("VINECOPULIB_NUM_THREADS");
-            std::cout << "VINECOPULIB_NUM_THREADS = " << std::atoi(num_char) << "\n";
-            // use at least one thread
-            unsigned int num = std::max(std::atoi(num_char), 1);
-            // don't use more threads than supported by the system
-            num = std::min(num, std::thread::hardware_concurrency());
-            
-            return num;
         }
     }
 }

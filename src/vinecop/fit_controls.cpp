@@ -7,6 +7,7 @@
 #include <vinecopulib/vinecop/fit_controls.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <stdexcept>
+#include <thread>
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib
@@ -20,6 +21,7 @@ namespace vinecopulib
         select_truncation_level_ = false;
         select_threshold_ = false;
         show_trace_ = false;
+        num_threads_ = 1;
     }
 
     //! creates custom controls for fitting vine copula models.
@@ -38,6 +40,9 @@ namespace vinecopulib
     //! @param select_threshold whether the threshold parameter shall be 
     //!     selected automatically.
     //! @param show_trace whether to show a trace of the building progress.
+    //! @param num_threads number of concurrent threads to use while fitting
+    //!     pair copulas within a tree; never uses more than the number returned
+    //!     by `std::thread::hardware_concurrency()``.
     FitControlsVinecop::FitControlsVinecop(std::vector<BicopFamily> family_set,
                                            std::string parametric_method,
                                            std::string nonparametric_method,
@@ -49,7 +54,8 @@ namespace vinecopulib
                                            bool preselect_families,
                                            bool select_truncation_level,
                                            bool select_threshold,
-                                           bool show_trace) :
+                                           bool show_trace,
+                                           size_t num_threads) :
             FitControlsBicop(family_set,
                              parametric_method,
                              nonparametric_method,
@@ -62,11 +68,12 @@ namespace vinecopulib
         check_tree_criterion(tree_criterion);
 
         truncation_level_ = truncation_level;
-        threshold_ = threshold;
         tree_criterion_ = tree_criterion;
-        show_trace_ = show_trace;
+        threshold_ = threshold;
         select_truncation_level_ = select_truncation_level;
         select_threshold_ = select_threshold;
+        show_trace_ = show_trace;
+        num_threads_ = process_num_threads(num_threads);
     }
 
     //! creates custom controls for fitting vine copula models.
@@ -80,13 +87,17 @@ namespace vinecopulib
     //! @param select_threshold whether the threshold parameter shall be 
     //!     selected automatically.
     //! @param controls see FitControlsBicop.
+    //! @param num_threads number of concurrent threads to use while fitting
+    //!     pair copulas within a tree; never uses more than the number returned
+    //!     by `std::thread::hardware_concurrency()``.
     FitControlsVinecop::FitControlsVinecop(const FitControlsBicop controls,
                                            size_t truncation_level,
                                            std::string tree_criterion,
                                            double threshold,
                                            bool select_truncation_level,
                                            bool select_threshold,
-                                           bool show_trace) :
+                                           bool show_trace,
+                                           size_t num_threads) :
             FitControlsBicop(controls)
     {
         check_truncation_level(truncation_level);
@@ -94,11 +105,12 @@ namespace vinecopulib
         check_tree_criterion(tree_criterion);
 
         truncation_level_ = truncation_level;
-        threshold_ = threshold;
         tree_criterion_ = tree_criterion;
-        show_trace_ = show_trace;
+        threshold_ = threshold;
         select_truncation_level_ = select_truncation_level;
         select_threshold_ = select_threshold;
+        show_trace_ = show_trace;
+        num_threads_ = process_num_threads(num_threads);
     }
 
     //! Sanity checks
@@ -121,6 +133,16 @@ namespace vinecopulib
         if (threshold < 0 || threshold > 1) {
             throw std::runtime_error("threshold should be in [0,1]");
         }
+    }
+    size_t FitControlsVinecop::process_num_threads(size_t num_threads)
+    {
+        // use at least one thread
+        num_threads = std::max(num_threads, (size_t) 1);
+        // don't use more threads than supported by the system
+        size_t max_threads = std::thread::hardware_concurrency();
+        num_threads = std::min(num_threads, max_threads);
+        
+        return num_threads;
     }
     //! @}
 
@@ -154,6 +176,11 @@ namespace vinecopulib
     bool FitControlsVinecop::get_select_threshold()
     {
         return select_threshold_;
+    }
+    
+    size_t FitControlsVinecop::get_num_threads()
+    {
+        return num_threads_;
     }
     
     bool FitControlsVinecop::needs_sparse_select()
@@ -203,6 +230,11 @@ namespace vinecopulib
     void FitControlsVinecop::set_select_threshold(bool select_threshold)
     {
         select_threshold_ = select_threshold;
+    }
+    
+    void FitControlsVinecop::set_num_threads(size_t num_threads)
+    {
+        num_threads_ = process_num_threads(num_threads);
     }
 
     void FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)
