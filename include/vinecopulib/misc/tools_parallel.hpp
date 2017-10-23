@@ -11,6 +11,7 @@
 #include <queue>
 #include <condition_variable>
 #include <memory>
+#include <future>
 
 namespace tools_parallel {
 
