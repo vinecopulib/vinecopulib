@@ -9,6 +9,7 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
+#include <mutex>
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib
@@ -438,125 +439,36 @@ namespace vinecopulib
     void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
                        FitControlsBicop controls)
     {
-        using namespace tools_stl;
-        std::vector<BicopFamily> family_set = controls.get_family_set();
-        std::string parametric_method = controls.get_parametric_method();
-        std::string nonparametric_method = controls.get_nonparametric_method();
-        std::string method;
-        double mult = controls.get_nonparametric_mult();
-        std::string selection_criterion = controls.get_selection_criterion();
-        bool preselect_families = controls.get_preselect_families();
-
-        // Remove nans
-        Eigen::Matrix<double, Eigen::Dynamic, 2> data_no_nans =
-                tools_eigen::nan_omit(data);
-
-        // If the familyset is empty, use all families.
-        // If the familyset is not empty, check that all included families are implemented.
-        if (family_set.empty()) {
-            if (parametric_method == "itau") {
-                family_set = bicop_families::itau;
-            } else {
-                family_set = bicop_families::all;
-            }
-        } else {
-            if (intersect(family_set, bicop_families::all).empty()) {
-                throw std::runtime_error("One of the families is not implemented");
-            }
-            if (parametric_method == "itau") {
-                family_set = intersect(family_set, bicop_families::itau);
-                if (family_set.empty()) {
-                    throw std::runtime_error("No family with method itau provided");
-                }
-            }
-        }
-
-        // When using rotations, add only the ones that yield the appropriate
-        // association direction.
-        auto tau = tools_stats::pairwise_tau(data_no_nans);
-        std::vector<int> which_rotations;
-        if (tau > 0) {
-            which_rotations = {0, 180};
-        } else {
-            which_rotations = {90, 270};
-        }
-
-        std::vector<double> c(2);
-        if (preselect_families) {
-            rotation_ = 0;
-            c = get_c1c2(cut_and_rotate(data_no_nans), tau);
-        }
-
-        // Create the combinations of families and rotations to estimate
-        std::vector<BicopFamily> families;
-        std::vector<int> rotations;
-        for (auto family : family_set) {
-            bool is_rotationless = is_member(family,
-                                             bicop_families::rotationless);
-            bool preselect = true;
-            if (is_rotationless) {
-                if (preselect_families) {
-                    preselect = preselect_family(c, tau, family,
-                                                 0, is_rotationless);
-                }
-                if (preselect) {
-                    families.push_back(family);
-                    rotations.push_back(0);
-                }
-            } else {
-                for (auto rotation : which_rotations) {
-                    if (preselect_families) {
-                        preselect = preselect_family(c, tau, family,
-                                                     rotation, is_rotationless);
-                    }
-                    if (preselect) {
-                        families.push_back(family);
-                        rotations.push_back(rotation);
-                    }
-                }
-            }
-        }
+        using namespace tools_select;
+        data = tools_eigen::nan_omit(data);
+        std::vector<Bicop> bicops = create_candidate_bicops(data, controls);
 
         // Estimate all models and select the best one using the selection_criterion
-        BicopPtr fitted_bicop;
-        int fitted_rotation = 0;
         double fitted_criterion = 1e6;
-        for (unsigned int j = 0; j < families.size(); j++) {
+        for (auto cop : bicops) {
             tools_interface::check_user_interrupt();
+            
             // Estimate the model
-            bicop_ = AbstractBicop::create(families[j]);
-            rotation_ = rotations[j];
-            if (tools_stl::is_member(bicop_->get_family(),
-                                     bicop_families::parametric)) {
-                method = parametric_method;
-            } else {
-                method = nonparametric_method;
-            }
-            bicop_->fit(cut_and_rotate(data_no_nans), method, mult);
-
+            cop.fit(data, controls);
+        
             // Compute the selection criterion
             double new_criterion;
-            if (selection_criterion == "aic") {
-                new_criterion = aic(data_no_nans);
-            } else if (selection_criterion == "bic") {
-                new_criterion = bic(data_no_nans);
+            if (controls.get_selection_criterion() == "aic") {
+                new_criterion = cop.aic(data);
             } else {
-                throw std::runtime_error("Selection criterion not implemented");
+                new_criterion = cop.bic(data);
             }
-
+        
             // If the new model is better than the current one,
             // then replace the current model by the new one
             if (new_criterion < fitted_criterion) {
                 fitted_criterion = new_criterion;
-                fitted_bicop = bicop_;
-                fitted_rotation = rotation_;
+                bicop_ = cop.bicop_;
+                rotation_ = cop.get_rotation();
             }
         }
-
-        bicop_ = fitted_bicop;
-        rotation_ = fitted_rotation;
     }
-
+    
     //! Data manipulations for rotated families
     //!
     //! @param u \f$m \times 2\f$ matrix of data.

@@ -9,10 +9,91 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <cmath>
 
-std::vector<double> get_c1c2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-                             double tau)
+namespace vinecopulib {
+namespace tools_select {
+    
+//! returns only those rotations that yield the appropriate
+//! association direction.
+//! @param data captured by reference to avoid data copies b/c of pairwise_tau;
+//!     should NOT be modified though.
+std::vector<Bicop> create_candidate_bicops(
+    Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+    const FitControlsBicop& controls)
 {
-    using namespace vinecopulib::tools_stats;
+    std::vector<BicopFamily> families = get_candidate_families(controls);
+    
+    // check whether dependence is negative or positive
+    double tau = tools_stats::pairwise_tau(data);
+    std::vector<int> which_rotations;
+    if (tau > 0) {
+        which_rotations = {0, 180};
+    } else {
+        which_rotations = {90, 270};
+    }
+    
+    // create Bicop objects for all valid family/rotation combinations
+    std::vector<Bicop> new_bicops;
+    for (auto& fam : families) {
+        if (tools_stl::is_member(fam, bicop_families::rotationless)) {
+            new_bicops.push_back(Bicop(fam, 0));
+        } else {
+            new_bicops.push_back(Bicop(fam, which_rotations[0]));
+            new_bicops.push_back(Bicop(fam, which_rotations[1]));
+        }
+    }
+    
+    // remove combinations based on symmetry characteristics
+    if (controls.get_preselect_families()) {
+        preselect_candidates(new_bicops, data, tau);
+    }
+    
+    return new_bicops;
+}
+
+std::vector<BicopFamily> get_candidate_families(const FitControlsBicop& controls)
+{
+    //! adjusts the family_set according to parameteric_method. 
+    std::vector<BicopFamily> family_set = controls.get_family_set();
+    if (family_set.empty()) {
+        // use all (allowed) families
+        if (controls.get_parametric_method() == "itau") {
+            family_set = bicop_families::itau;
+        } else {
+            family_set = bicop_families::all;
+        }
+    } else {
+        if (controls.get_parametric_method() == "itau") {
+            family_set = tools_stl::intersect(family_set, bicop_families::itau);
+            if (family_set.empty()) {
+                throw std::runtime_error("No family with method itau provided");
+            }
+        }
+    }
+        
+    return family_set;
+}
+
+//! removes candidates whose symmetry properties does not correspond to those
+//! of the data.
+void preselect_candidates(std::vector<Bicop>& bicops, 
+                          const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+                          double tau)
+{
+    auto c = get_c1c2(data, tau);
+    for (auto bicop_it = bicops.begin(); bicop_it != bicops.end();) {
+        bool is_selected = preselect_family(c, tau, *bicop_it);
+        if (!is_selected) {
+            bicops.erase(bicop_it);
+        } else {
+            bicop_it++;
+        }
+    }
+}
+
+std::vector<double> get_c1c2(
+    const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, double tau)
+{
+    using namespace tools_stats;
     size_t n = data.rows();
     Eigen::MatrixXd x = Eigen::MatrixXd::Zero(n, 2);
     Eigen::MatrixXd z1 = x;
@@ -58,15 +139,14 @@ std::vector<double> get_c1c2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& dat
     return {c1, c2};
 }
 
-bool preselect_family(std::vector<double> c, double tau, 
-                      vinecopulib::BicopFamily family,  int rotation, 
-                      bool is_rotationless)
+bool preselect_family(std::vector<double> c, double tau, const Bicop& bicop)
 {
-    using namespace vinecopulib;
     using namespace tools_stl;
+    BicopFamily family = bicop.get_family();
+    int rotation = bicop.get_rotation();
 
     bool preselect = false;
-    if (is_rotationless) {
+    if (is_member(family, bicop_families::rotationless)) {
         preselect = true;
         if ((std::fabs(c[0] - c[1]) > 0.3) & (family == BicopFamily::frank))
             preselect = false;
@@ -105,4 +185,9 @@ bool preselect_family(std::vector<double> c, double tau,
     }
     
     return preselect;
+}
+
+ 
+}
+    
 }
