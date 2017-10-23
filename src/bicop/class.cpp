@@ -441,6 +441,8 @@ namespace vinecopulib
     {
         using namespace tools_select;
         data = tools_eigen::nan_omit(data);
+        rotation_ = 0;
+        data = cut_and_rotate(data);
         std::vector<Bicop> bicops = create_candidate_bicops(data, controls);
 
         // Estimate all models and select the best one using the 
