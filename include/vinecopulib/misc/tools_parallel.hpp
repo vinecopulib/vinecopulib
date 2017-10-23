@@ -78,9 +78,9 @@ public:
     template<class F, class... Args>
     auto push(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
     {
-        // create pacakged task on the heap to avoid stack overlows.
+        // create packaged task on the heap to avoid stack overlows.
         auto job = std::make_shared<std::packaged_task<decltype(f(args...))()>>(
-            [&f, &args...] { return f(args...); }
+            [&f, args...] { return f(args...); }
         );
 
         // add job to the queue
