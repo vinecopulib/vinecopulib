@@ -14,14 +14,10 @@ namespace vinecopulib
     namespace tools_optimization
     {
         // the objective function for maximum likelihood estimation
-        double mle_objective(const std::vector<double>& x,
-                             std::vector<double>& grad,
-                             void* data);
+        double mle_objective(void *f_data, long n, const double *x);
 
         // the objective function for profile maximum likelihood estimation
-        double pmle_objective(const std::vector<double>& x,
-                              std::vector<double> &,
-                              void* data);
+        double pmle_objective(void *f_data, long n, const double *x);
     }
 
     //! @brief An abstract class for parametric copula families
@@ -31,10 +27,10 @@ namespace vinecopulib
     //! always work with the Bicop interface.
     class ParBicop : public AbstractBicop
     {
-    friend double tools_optimization::mle_objective(
-        const std::vector<double>& x, std::vector<double>& grad, void* data);
-    friend double tools_optimization::pmle_objective(
-        const std::vector<double>& x, std::vector<double>& grad, void* data);
+    friend double tools_optimization::mle_objective(void *f_data, long n,
+                                                    const double *x);
+    friend double tools_optimization::pmle_objective(void *f_data, long n,
+                                                     const double *x);
 
     protected:
         // Getters and setters

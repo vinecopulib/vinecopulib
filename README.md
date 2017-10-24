@@ -76,17 +76,10 @@ To build the library, you'll need at minimum:
    * [CMake 3.2 (or later)](https://cmake.org/)
    * [Boost 1.56 (or later)](http://www.boost.org/)
    * [Eigen 3.3 (or later)](http://eigen.tuxfamily.org/index.php?title=Main_Page)
-   * [NLopt](https://github.com/stevengj/nlopt)
 
 Optionally, you'll need:
    * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
    * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
-
-Since NLopt has not had a release for over three years (as of May 2017) while
-some maintanance work is done on the github repo, we suggest using the github
-version (and not the release from ab-initio.mit.edu). OSX users can easily
-obtain the github version using Homebrew with `brew install --HEAD nlopt`,
-Windows and Linux users are encouraged to compile nlopt manually from source.
 
 Note that a `findR.cmake` looks for R and VineCopula in the default locations
 for linux and osx, but problems might occur with versions installed from
@@ -131,7 +124,6 @@ The following CMake flags (given with example values) will likely come handy:
 ```
 -DBOOST_ROOT=c:\local\boost_1_63_0
 -DEIGEN3_INCLUDE_DIR=c:\local\eigen-eigen-da9b4e14c255
--DCMAKE_PREFIX_PATH=c:\local\nlopt-install
 -DCMAKE_INSTALL_PREFIX=c:\local\vinecopulib-install
 -DCMAKE_GENERATOR_PLATFORM=x64
 -DBOOST_DEBUG=1
@@ -180,12 +172,11 @@ set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -We
 # Find vinecopulib package and dependencies
 find_package(vinecopulib                  REQUIRED)
 find_package(Boost 1.56                   REQUIRED)
-find_package(NLopt                        REQUIRED)
 include(cmake/findEigen3.cmake            REQUIRED)
 
 # Set required variables for includes and libraries
-set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${NLOPT_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
-set(external_libs ${VINECOPULIB_LIBRARIES} ${NLOPT_LIBRARIES} ${Boost_LIBRARIES})
+set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
+set(external_libs ${VINECOPULIB_LIBRARIES} ${Boost_LIBRARIES})
 
 # Include subdirectory with project sources
 add_subdirectory(src)

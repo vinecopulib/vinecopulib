@@ -7,115 +7,83 @@
 #include <vinecopulib/misc/tools_optimization.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 
-#include <cmath>
-
 namespace vinecopulib {
     
-//! Utilities for numerical optimization (based on NLopt)
+//! Utilities for numerical optimization (based on Bobyqa)
 namespace tools_optimization {
 
-    //! creates an Optimizer using the default controls, see NLoptControls.
+    //! creates an Optimizer using the default controls, see BobyqaControls.
     //!
     //! @param n_parameters Number of parameters to optimize
-    Optimizer::Optimizer(unsigned int n_parameters)
-    {
-        if (n_parameters < 1) {
-            throw std::runtime_error("n_parameters should be larger than 0.");
-        }
-        n_parameters_ = n_parameters;
-        opt_ = nlopt::opt(nlopt::LN_BOBYQA, n_parameters);
-        controls_ = NLoptControls();
-        controls_.set_controls(&opt_);
-    }
-
-    //! creates an optimizer using custom controls.
-    //!
-    //! @param n_parameters number of parameters to optimize.
-    //! @param xtol_rel relative tolerance on the parameter value.
-    //! @param xtol_abs absolute tolerance on the parameter value.
-    //! @param ftol_rel relative tolerance on the function value.
-    //! @param ftol_abs absolue tolerance on the function value.
-    //! @param maxeval maximal number of evaluations of the objective.
-    Optimizer::Optimizer(unsigned int n_parameters, double xtol_rel, double xtol_abs,
-                         double ftol_rel, double ftol_abs, int maxeval)
-    {
-        if (n_parameters < 1) {
-            throw std::runtime_error("n_parameters should be larger than 0.");
-        }
-        n_parameters_ = n_parameters;
-        opt_ = nlopt::opt(nlopt::LN_BOBYQA, n_parameters);
-        controls_ = NLoptControls(xtol_rel, xtol_abs, ftol_rel, ftol_abs, maxeval);
-        controls_.set_controls(&opt_);
-    }
-
-    
-    //! sets the optimizer's bounds.
     //! @param lower_bounds
     //! @param upper_bounds
-    void Optimizer::set_bounds(const Eigen::MatrixXd& lower_bounds,
-        const Eigen::MatrixXd& upper_bounds)
+    //! @param objective The optimizer's objective function
+    Optimizer::Optimizer(unsigned int n_parameters,
+                         const Eigen::MatrixXd& lower_bounds,
+                         const Eigen::MatrixXd& upper_bounds)
     {
-        std::vector<double> lb(n_parameters_);
-        std::vector<double> ub(n_parameters_);
-        double eps = 1e-6;
-        Eigen::VectorXd::Map(&lb[0], n_parameters_) = lower_bounds.array() + eps;
-        Eigen::VectorXd::Map(&ub[0], n_parameters_) = upper_bounds.array() - eps;
-        opt_.set_lower_bounds(lb);
-        opt_.set_upper_bounds(ub);
+        if (n_parameters < 1) {
+            throw std::runtime_error("n_parameters should be larger than 0.");
+        }
+        n_parameters_ = n_parameters;
+        controls_ = BobyqaControls();
+        lb_ = lower_bounds;
+        ub_ = upper_bounds;
+    }
+
+    //! set the optimizer's controls.
+    //!
+    //! @param initial_trust_region initial trust region.
+    //! @param final_trust_region final trust region.
+    //! @param maxeval maximal number of evaluations of the objective.
+    void Optimizer::set_controls(double initial_trust_region,
+                                 double final_trust_region,
+                                 int maxeval)
+    {
+        controls_ = BobyqaControls(initial_trust_region,
+                                   final_trust_region,
+                                   maxeval);
     }
 
     //! Create controls using the default contructor
     //! 
     //! The defaults are 
     //! ```
-    //! xtol_rel_ = 1e-6;
-    //! xtol_abs_ = 1e-6;
-    //! ftol_rel_ = 1e-6;
-    //! ftol_abs_ = 1e-6;
+    //! initial_trust_region_ = 1e-3;
+    //! final_trust_region_ = 1e3;
     //! maxeval_ = 1000;
     //! ```
-    NLoptControls::NLoptControls()
+    BobyqaControls::BobyqaControls()
     {
-        xtol_rel_ = 1e-6;
-        xtol_abs_ = 1e-6;
-        ftol_rel_ = 1e-6;
-        ftol_abs_ = 1e-6;
+        initial_trust_region_ = 1e-3;
+        final_trust_region_ = 1e3;
         maxeval_ = 1000;
     }
 
     //! Create controls by passing the arguments
     //!
-    //! @param xtol_rel relative tolerance on the parameter value.
-    //! @param xtol_abs absolute tolerance on the parameter value.
-    //! @param ftol_rel relative tolerance on the function value.
-    //! @param ftol_abs absolue tolerance on the function value.
+    //! @param initial_trust_region initial trust region.
+    //! @param final_trust_region final trust region.
     //! @param maxeval maximal number of evaluations of the objective.
-    NLoptControls::NLoptControls(double xtol_rel, double xtol_abs, 
-        double ftol_rel, double ftol_abs, int maxeval)
+    BobyqaControls::BobyqaControls(double initial_trust_region,
+                                   double final_trust_region,
+                                   int maxeval)
     {
-        check_parameters(xtol_rel, xtol_abs, ftol_rel, ftol_abs, maxeval);
-        xtol_rel_ = xtol_rel;
-        xtol_abs_ = xtol_abs;
-        ftol_rel_ = ftol_rel;
-        ftol_abs_ = ftol_abs;
+        check_parameters(initial_trust_region, final_trust_region, maxeval);
+        initial_trust_region_ = initial_trust_region;
+        final_trust_region_ = final_trust_region;
         maxeval_ = maxeval;
     }
 
-    void NLoptControls::check_parameters(double xtol_rel, double xtol_abs, 
-                                         double ftol_rel, double ftol_abs, 
-                                         int maxeval)
+    void BobyqaControls::check_parameters(double initial_trust_region,
+                                          double final_trust_region,
+                                          int maxeval)
     {
-        if (xtol_rel <= 0 || xtol_rel > 1) {
-            throw std::runtime_error("xtol_rel should be in (0,1]");
+        if (initial_trust_region <= 0) {
+            throw std::runtime_error("initial_trust_region should be larger than 0");
         }
-        if (ftol_rel <= 0 || ftol_rel > 1) {
-            throw std::runtime_error("ftol_rel should be in (0,1]");
-        }
-        if (xtol_abs <= 0) {
-            throw std::runtime_error("xtol_abs should be larger than 0");
-        }
-        if (ftol_abs <= 0) {
-            throw std::runtime_error("ftol_abs should be larger than 0");
+        if (final_trust_region <= 0) {
+            throw std::runtime_error("final_trust_region should be larger than 0");
         }
         if (maxeval <= 0) {
             throw std::runtime_error("maxeval should be larger than 0");
@@ -125,57 +93,42 @@ namespace tools_optimization {
     //! @name Getters and setters
     //! @{
     
-    //! @return the relative tolerance on the parameter value. 
-    double NLoptControls::get_xtol_rel() {return xtol_rel_;};
-    //! @return the absolute tolerance on the parameter value. 
-    double NLoptControls::get_xtol_abs() {return xtol_abs_;};
-    //! @return the relative tolerance on the function value.
-    double NLoptControls::get_ftol_rel() {return ftol_rel_;};
-    //! @return the absolute tolerance on the function value.
-    double NLoptControls::get_ftol_abs() {return ftol_abs_;};
+    //! @return the initial trust region.
+    double BobyqaControls::get_initial_trust_region() {return initial_trust_region_;};
+    //! @return the final trust region.
+    double BobyqaControls::get_final_trust_region() {return final_trust_region_;};
     //! @return the maximal number of evaluations of the objective.
-    double NLoptControls::get_maxeval() {return maxeval_;};
-    
-    //! sets controls of an Optimizer
-    //! @param opt Pointer to the optimizer for control setting
-    void NLoptControls::set_controls(nlopt::opt* opt)
-    {
-        opt->set_xtol_rel(xtol_rel_);
-        opt->set_xtol_abs(xtol_abs_);
-        opt->set_ftol_rel(ftol_rel_);
-        opt->set_ftol_abs(ftol_abs_);
-        opt->set_maxeval(maxeval_);
-    };
+    int BobyqaControls::get_maxeval() {return maxeval_;};
+
     //! @}
 
     //! @name (Pseudo-) maximum likelihood estimation
-    //! @param x the parameters.
     //! @param f_data a pointer to a ParBicopOptData object.
+    //! @param n number of parameters.
+    //! @param x the parameters.
     //! @{
     
     //! evaluates the objective function for maximum likelihood estimation.
-    double mle_objective(const std::vector<double>& x,
-                         std::vector<double>&,
-                         void* f_data)
+    double mle_objective(void *f_data, long n, const double *x)
+
+
     {
         ParBicopOptData* newdata = (ParBicopOptData*) f_data;
         ++newdata->objective_calls;
-        Eigen::Map<const Eigen::VectorXd> par(&x[0], x.size());
+        Eigen::Map<const Eigen::VectorXd> par(&x[0], n);
         newdata->bicop->set_parameters(par);
         return (-1)*newdata->bicop->pdf(newdata->U).array().log().sum();
     }
 
     //! evaluates the objective function for profile maximum likelihood 
     //! estimation.
-    double pmle_objective(const std::vector<double>& x,
-                          std::vector<double>&,
-                          void* f_data)
+    double pmle_objective(void *f_data, long n, const double *x)
     {
         ParBicopOptData* newdata = (ParBicopOptData*) f_data;
         ++newdata->objective_calls;
-        Eigen::VectorXd par = Eigen::VectorXd::Ones(x.size()+1);
+        Eigen::VectorXd par = Eigen::VectorXd::Ones(n+1);
         par(0) = newdata->par0;
-        for (unsigned int i = 0; i < x.size(); ++i) {
+        for (unsigned int i = 0; i < n; ++i) {
             par(i + 1) = x[i];
         }
         newdata->bicop->set_parameters(par);
@@ -186,46 +139,75 @@ namespace tools_optimization {
     
     //! @}
 
-    //! Set the optimizer's objective and data
-    //!
-    //! @param f The optimizer's objective function (see nlopt's documentation)
-    //! @param f_data The optimizer's data (see nlopt's documentation)
-    void Optimizer::set_objective(nlopt::vfunc f, void* f_data)
-    {
-        opt_.set_min_objective(f, f_data);
-    }
-
     //! solve the optimization problem.
     //!
     //! @param initial_parameters of starting values for the optimization
     //!     algorithm.
     //! @return the optimal parameters.
-    Eigen::VectorXd Optimizer::optimize(Eigen::VectorXd initial_parameters)
+    Eigen::VectorXd Optimizer::optimize(Eigen::VectorXd initial_parameters,
+                                        tools_bobyqa::BobyqaClosureFunction objective,
+                                        void* data)
     {
         if (initial_parameters.size() != n_parameters_) {
             throw std::runtime_error("The size of x should be n_parameters_.");
         }
 
-        double nll;
-        std::vector<double> x(n_parameters_);
-        Eigen::VectorXd::Map(&x[0], n_parameters_) = initial_parameters;
+        //const int number_interpolation_conditions = (n_parameters_ + 1) *
+        //        (n_parameters_ + 2)/2;
+        int number_interpolation_conditions = n_parameters_ + 3;
+        std::size_t ws_size = (number_interpolation_conditions + 5) *
+                              (number_interpolation_conditions
+                               + n_parameters_) +
+                              3*n_parameters_*(n_parameters_ + 5)/2;
+        double* working_space = new double[ws_size];
+
+        double* lb = new double[n_parameters_];
+        double* ub = new double[n_parameters_];
+        double eps = 1e-6;
+        Eigen::VectorXd::Map(lb, n_parameters_) = lb_.array() + eps;
+        Eigen::VectorXd::Map(ub, n_parameters_) = ub_.array() - eps;
+
+        double* x = new double[n_parameters_];
+        Eigen::VectorXd::Map(x, n_parameters_) = initial_parameters;
+        Eigen::VectorXd optimized_parameters(n_parameters_);
+        std::string err_msg = "";
         try {
-            opt_.optimize(x, nll);
-        } catch (nlopt::roundoff_limited err) {
-            throw std::runtime_error(std::string("Halted because roundoff errors limited progress! ") + err.what());
-        } catch (nlopt::forced_stop err) {
-            throw std::runtime_error(std::string("Halted because of a forced termination! ") + err.what());
+            auto f = [&](long n, const double *x) -> double {
+                return objective(data, n, x);
+            };
+            tools_bobyqa::impl(f, n_parameters_,
+                               number_interpolation_conditions,
+                               x, lb, ub,
+                               controls_.get_initial_trust_region(),
+                               controls_.get_final_trust_region(),
+                               controls_.get_maxeval(),
+                               working_space);
+                               
+            // convert result to VectorXd
+            for (size_t i=0; i < n_parameters_; i++) {
+                optimized_parameters(i) = x[i];
+            }
         } catch (std::invalid_argument err) {
-            throw std::runtime_error(std::string("Invalid arguments. ") + err.what());
+            err_msg = std::string("Invalid arguments. ") + err.what();
         } catch (std::bad_alloc err) {
-            throw std::runtime_error(std::string("Ran out of memory. ") + err.what());
+            err_msg = std::string("Ran out of memory. ") + err.what();
         } catch (std::runtime_error err) {
-            throw std::runtime_error(std::string("Generic failure. ") + err.what());
+            err_msg = std::string("Generic failure. ") + err.what();
         } catch (...) {
             // do nothing for other errors (results are fine)
         }
-
-        Eigen::Map<const Eigen::VectorXd> optimized_parameters(&x[0], x.size());
+        
+        // delete dynamically allocated objects
+        delete[] x;
+        delete[] lb;
+        delete[] ub;
+        delete[] working_space;
+        
+        // throw error if optimization failed
+        if (err_msg != "") {
+            throw std::runtime_error(err_msg);
+        }
+        
         return optimized_parameters;
     }
 }
