@@ -13,6 +13,7 @@
 class VinecopTest : public ::testing::Test {
 public:
     VinecopTest();
+
     Eigen::MatrixXd u;
     Eigen::VectorXd f;
     Eigen::MatrixXd sim;
