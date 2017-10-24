@@ -169,6 +169,7 @@ namespace tools_optimization {
 
         double* x = new double[n_parameters_];
         Eigen::VectorXd::Map(x, n_parameters_) = initial_parameters;
+        Eigen::VectorXd optimized_parameters(n_parameters_);
         std::string err_msg = "";
         try {
             auto f = [&](long n, const double *x) -> double {
@@ -181,6 +182,11 @@ namespace tools_optimization {
                                controls_.get_final_trust_region(),
                                controls_.get_maxeval(),
                                working_space);
+                               
+            // convert result to VectorXd
+            for (size_t i=0; i < n_parameters_; i++) {
+                optimized_parameters(i) = x[i];
+            }
         } catch (std::invalid_argument err) {
             err_msg = std::string("Invalid arguments. ") + err.what();
         } catch (std::bad_alloc err) {
@@ -189,12 +195,6 @@ namespace tools_optimization {
             err_msg = std::string("Generic failure. ") + err.what();
         } catch (...) {
             // do nothing for other errors (results are fine)
-        }
-        
-        // convert result to VectorXd
-        Eigen::VectorXd optimized_parameters(n_parameters_);
-        for (size_t i=0; i < n_parameters_; i++) {
-            optimized_parameters(i) = x[i];
         }
         
         // delete dynamically allocated objects
