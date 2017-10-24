@@ -241,7 +241,7 @@ sub-namespace `bicop_families`:
 (`student`, `bb1`, `bb6`, `bb7`, and `bb8`)
 * `elliptical` contains the elliptical families
 * `archimedean` contains the archimedean families
-* `BB` contains the BB families
+* `bb` contains the BB families
 * `itau` families for which estimation by Kendall's tau inversion is available
 (`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
 

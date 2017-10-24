@@ -117,7 +117,7 @@ namespace test_bicop_parametric {
                 bicop_.str() << std::endl <<
                 bicop.bic(data) << " " << bicop_.bic(data);
 
-            if (is_member(bicop_.get_family(), bicop_families::BB)) {
+            if (is_member(bicop_.get_family(), bicop_families::bb)) {
                 int rot_sel = bicop.get_rotation();
                 if (is_member(true_rotation, positive_rotations)) {
                     EXPECT_TRUE(is_member(rot_sel, positive_rotations));
