@@ -168,6 +168,11 @@ namespace tools_select {
                     msg << "** Tree: " << t;
                 }
                 
+                if (controls_.get_truncation_level() == t) {
+                    set_tree_to_indep(t);
+                    truncate();
+                }
+                
                 // select pair copulas (and possibly tree structure)
                 select_tree(t);
                                                 
@@ -182,7 +187,7 @@ namespace tools_select {
                         // to independence
                         set_tree_to_indep(t);
                         truncate();
-                        controls_.set_truncation_level(t - 1);
+                        controls_.set_truncation_level(t);
                     } else {
                         gic = gic_trunc; 
                     }
@@ -196,11 +201,7 @@ namespace tools_select {
                     }
                     msg << std::endl;
                 }
-            
-                if (controls_.get_truncation_level() == t) {
-                    truncate();
-                }
-                
+
                 // print trace for this tree level
                 if (controls_.get_show_trace()) {
                     tools_interface::print(msg.str().c_str());
@@ -224,9 +225,7 @@ namespace tools_select {
             thresholded_crits = get_thresholded_crits();        
             set_current_fit_as_opt();
     
-            if (gic == 0.0) {
-                // stil independence, threshold needs to be reduced further
-            } else if (gic >= gic_opt) {
+            if (gic >= gic_opt) {
                 // new model is optimal
                 needs_break = true;
             } else {
