@@ -160,9 +160,8 @@ namespace test_vinecop_class {
         EXPECT_EQ(true_rots, fitd_rots);
     }
     
-    TEST_F(VinecopTest, runs_multi_threaded) {
+    TEST_F(VinecopTest, works_multi_threaded) {
         FitControlsVinecop controls(bicop_families::itau, "itau");
-        controls.set_select_truncation_level(true);
         // controls.set_show_trace(true);
         Vinecop fit1(7), fit2(7);
         fit1.select_all(u, controls);
@@ -213,6 +212,15 @@ namespace test_vinecop_class {
     TEST_F(VinecopTest, sparse_threshold_selection) {
         FitControlsVinecop controls(bicop_families::itau, "itau");
         controls.set_select_threshold(true);
+        // controls.set_show_trace(true);
+        Vinecop fit(7);
+        fit.select_all(u, controls);
+        fit.select_families(u, controls);
+    }
+    
+    TEST_F(VinecopTest, fixed_truncation) {
+        FitControlsVinecop controls({BicopFamily::indep});
+        controls.set_truncation_level(2);
         // controls.set_show_trace(true);
         Vinecop fit(7);
         fit.select_all(u, controls);
