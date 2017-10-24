@@ -255,7 +255,7 @@ namespace tools_select {
         // pick threshold that changes at least alpha*100 % of the pair-copulas
         double alpha = 0.025;
         size_t m = thresholded_crits.size();
-        return thresholded_crits[std::ceil(m * alpha) - 1];
+        return thresholded_crits[std::ceil((double) m * alpha) - 1];
     }
     
     
@@ -429,7 +429,7 @@ namespace tools_select {
                 // given in rvine_matrix_
                 if (belongs_to_structure(v0, v1, vine_tree)) {
                     Eigen::MatrixXd pc_data;
-                    boost::graph_traits<VineTree>::edge_descriptor e;
+                    EdgeIterator e;
                     pc_data = get_pc_data(v0, v1, vine_tree);
                     e = boost::add_edge(v0, v1, w, vine_tree).first;
                     double crit = calculate_criterion(pc_data, tree_criterion);
@@ -728,9 +728,10 @@ namespace tools_select {
     //! @param tree_opt the current optimal tree (used only for sparse 
     //!     selection).
     void VinecopSelector::select_pair_copulas(VineTree& tree,
-                                                const VineTree& tree_opt)
+                                              const VineTree& tree_opt)
     {
-        for (auto e : boost::edges(tree)) {
+        auto select_pc = [&] (EdgeIterator e) -> void {
+            tools_interface::check_user_interrupt();
             bool is_thresholded = (tree[e].crit < controls_.get_threshold());
             bool used_old_fit = false;
             
@@ -750,7 +751,7 @@ namespace tools_select {
                     }
                 }
             }
-    
+
             if (!used_old_fit) {
                 if (is_thresholded) {
                     tree[e].pair_copula = vinecopulib::Bicop();
@@ -758,19 +759,39 @@ namespace tools_select {
                     tree[e].pair_copula.select(tree[e].pc_data, controls_);
                 }
             }
-            
+                        
             tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
             tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
             if (controls_.needs_sparse_select()) {
                 tree[e].loglik = tree[e].pair_copula.loglik(tree[e].pc_data);
                 tree[e].npars  = tree[e].pair_copula.calculate_npars();
             }
+        };
+        
+        size_t num_threads = controls_.get_num_threads();
+        if (num_threads <= 1) {
+            for (auto e : boost::edges(tree)) {
+                select_pc(e);
+            }
+        } else {
+            // make sure that Bicop.select() doesn't spawn new threads
+            controls_.set_num_threads(1);
+            
+            // run tasks in thread pool
+            tools_parallel::ThreadPool pool(num_threads);
+            for (auto e : boost::edges(tree)) {
+                pool.push(select_pc, e);
+            }
+            pool.join();
+            
+            // reset num_threads before fitting next tree
+            controls_.set_num_threads(num_threads);
         }
     }
     
     //! finds the fitted pair-copula from the previous iteration.
     FoundEdge VinecopSelector::find_old_fit(double fit_id,
-                                              const VineTree& old_graph) 
+                                            const VineTree& old_graph) 
     {
         auto edge = boost::edge(0, 1, old_graph).first;
         bool fit_with_same_id = false;
@@ -786,10 +807,8 @@ namespace tools_select {
     //! Get edge index for the vine (like 1, 2; 3)
     //! @param e a descriptor for the edge.
     //! @param tree a vine tree.
-    std::string VinecopSelector::get_pc_index(
-            boost::graph_traits<VineTree>::edge_descriptor e,
-            VineTree& tree
-    )
+    std::string VinecopSelector::get_pc_index(const EdgeIterator& e, 
+                                              const VineTree& tree)
     {
         std::stringstream index;
         // add 1 everywhere for user-facing representation (boost::graph 

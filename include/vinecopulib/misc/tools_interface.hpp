@@ -12,13 +12,23 @@
 
 // interface specific headers
 #ifdef INTERFACED_FROM_R
-    #include <RcppEigen.h>
-    // [[Rcpp::depends(RcppProgress)]]
-    #include <progress.hpp>
+    #include <RcppThread.h>
 #else
     #include <iostream>
 #endif
 
+// parallel backend
+#ifdef INTERFACED_FROM_R
+    namespace tools_parallel {
+        typedef ThreadPool RcppThread::ThreadPool;
+        typedef process_num_threads RcppThread::process_num_threads;
+    }
+#else
+    #include <vinecopulib/misc/tools_parallel.hpp>
+#endif
+
+// for std::getenv() and std::atol()
+#include <cstdlib>
 
 namespace vinecopulib {
 
@@ -28,7 +38,7 @@ namespace vinecopulib {
             #ifndef INTERFACED_FROM_R
                 std::cout << text;
             #else
-                Rcpp::Rcout << text;
+                RcppThread::Rcout << text;
             #endif
         }
     
@@ -36,9 +46,7 @@ namespace vinecopulib {
         {
             if (do_check) {
                 #ifdef INTERFACED_FROM_R
-                    if (Progress::check_abort()) {
-                        throw std::runtime_error("C++ call interrupted by user");
-                    }
+                    RcppThread::checkUserInterrupt();
                 #endif
             }
         }

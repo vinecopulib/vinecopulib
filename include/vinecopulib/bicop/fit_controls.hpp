@@ -21,7 +21,8 @@ namespace vinecopulib {
                          std::string nonparametric_method = "quadratic",
                          double nonparametric_mult = 1.0,
                          std::string selection_criterion = "bic",
-                         bool preselect_families = true);
+                         bool preselect_families = true,
+                         size_t num_threads = 1);
         FitControlsBicop(std::string parametric_method);
         FitControlsBicop(std::string nonparametric_method,
                          double nonparametric_mult);
@@ -33,6 +34,7 @@ namespace vinecopulib {
         double get_nonparametric_mult() const;
         std::string get_selection_criterion() const;
         bool get_preselect_families() const;
+        size_t get_num_threads();
 
         // Setters
         void set_family_set(std::vector<BicopFamily> family_set);
@@ -41,6 +43,7 @@ namespace vinecopulib {
         void set_nonparametric_mult(double nonparametric_mult);
         void set_selection_criterion(std::string selection_criterion);
         void set_preselect_families(bool preselect_families);
+        void set_num_threads(size_t num_threads);
 
     private:
         std::vector<BicopFamily> family_set_;
@@ -49,10 +52,12 @@ namespace vinecopulib {
         double nonparametric_mult_;
         std::string selection_criterion_;
         bool preselect_families_;
+        size_t num_threads_;
 
         void check_parametric_method(std::string parametric_method);
         void check_nonparametric_method(std::string nonparametric_method);
         void check_nonparametric_mult(double nonparametric_mult);
         void check_selection_criterion(std::string selection_criterion);
+        size_t process_num_threads(size_t num_threads);
     };
 }

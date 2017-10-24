@@ -62,10 +62,8 @@ namespace tools_select {
             boost::property<boost::edge_weight_t, double, EdgeProperties>
     > VineTree;
 
-    typedef std::pair<
-            boost::graph_traits<VineTree>::edge_descriptor,
-            bool
-    > FoundEdge;
+    typedef boost::graph_traits<VineTree>::edge_descriptor EdgeIterator;
+    typedef std::pair<EdgeIterator, bool> FoundEdge;
     
     class VinecopSelector 
     {
@@ -121,8 +119,7 @@ namespace tools_select {
         FoundEdge find_old_fit(double fit_id, const VineTree& old_graph);
         double get_tree_loglik(const VineTree& tree);
         double get_tree_npars(const VineTree& tree);
-        std::string get_pc_index(boost::graph_traits<VineTree>::edge_descriptor e,
-                                 VineTree& tree);
+        std::string get_pc_index(const EdgeIterator& e, const VineTree& tree);
     };
     
     class StructureSelector : public VinecopSelector
