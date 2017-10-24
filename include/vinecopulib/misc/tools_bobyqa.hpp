@@ -2653,74 +2653,8 @@ namespace vinecopulib {
                           w + ivl - 1, w + iw - 1);
         }
 
-        typedef double (*BobyqaFunction)(long n, const double *x);
-
         typedef double (*BobyqaClosureFunction)(void *data, long n,
                                                 const double *x);
-
-        typedef double (*BobyqaClosureFunctionConst)(const void *data, long n,
-                                                     const double *x);
-
-        typedef struct {
-            void *const data;
-            BobyqaClosureFunction function;
-        } BobyqaClosure;
-
-        typedef struct {
-            const void *const data;
-            const BobyqaClosureFunctionConst function;
-        } BobyqaClosureConst;
-
-        inline double bobyqa(
-                const BobyqaFunction function,
-                const long n,
-                const long npt,
-                double *x,
-                const double *xl,
-                const double *xu,
-                const double rhobeg,
-                const double rhoend,
-                const long maxfun,
-                double *w
-        ) {
-            return impl([=](long n, const double *x) -> double {
-                return function(n, x);
-            }, n, npt, x, xl, xu, rhobeg, rhoend, maxfun, w);
-        };
-
-        inline double bobyqa_closure(
-                BobyqaClosure *const closure,
-                const long n,
-                const long npt,
-                double *x,
-                const double *xl,
-                const double *xu,
-                const double rhobeg,
-                const double rhoend,
-                const long maxfun,
-                double *w
-        ) {
-            return impl([&](long n, const double *x) -> double {
-                return closure->function(closure->data, n, x);
-            }, n, npt, x, xl, xu, rhobeg, rhoend, maxfun, w);
-        };
-
-        inline double bobyqa_closure_const(
-                const BobyqaClosureConst *const closure,
-                const long n,
-                const long npt,
-                double *x,
-                const double *xl,
-                const double *xu,
-                const double rhobeg,
-                const double rhoend,
-                const long maxfun,
-                double *w
-        ) {
-            return impl([&](long n, const double *x) -> double {
-                return closure->function(closure->data, n, x);
-            }, n, npt, x, xl, xu, rhobeg, rhoend, maxfun, w);
-        };
 
     }
 }
