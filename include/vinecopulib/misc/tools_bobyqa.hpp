@@ -9,6 +9,7 @@
 #pragma once
 
 #include <cmath>
+#include <cstdlib>
 #include <algorithm>
 
 namespace vinecopulib {
