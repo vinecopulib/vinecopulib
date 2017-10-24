@@ -109,7 +109,7 @@ namespace vinecopulib {
         };
         
         //! All BB copulas
-        const std::vector<BicopFamily> BB = {
+        const std::vector<BicopFamily> bb = {
             BicopFamily::bb1, 
             BicopFamily::bb6, 
             BicopFamily::bb7, 
