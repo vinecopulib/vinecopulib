@@ -323,7 +323,7 @@ std::cout <<
 ```
 As it's arguably the most important function of the `Bicop` class, it's worth
 understanding the second argument of `select()`, namely an object of the class
-`FitControlsBicop`, which contain six data members:
+`FitControlsBicop`, which contain seven data members:
 * `std::vector<BicopFamily> family_set` describes the set of family to select
 from. It can take a user specified vector of
 families or any of those mentioned above (default is `bicop_families::all`).
@@ -342,6 +342,8 @@ families. It can take either `"bic"`(default) or `"aic"`.
 * `bool preselect_families` describes a heuristic preselection method (default
 is `true`) based on symmetry properties of the data (e.g., the unrotated
 Clayton won't be preselected if the data displays upper-tail dependence).
+* `size_t num_threads` number of threads to run in parallel when fitting
+several families.
 
 As mentioned [above](#set-up-a-custom-bivariate-copula-model), the arguments
 of `select()` can be used as arguments to a
@@ -557,7 +559,7 @@ model.select_all(data);
 
 Note that the second argument to `select_all()` and `select_families()` is
 similar to the one of `select()` for `Bicop` objects. Objects of the class
-`FitControlsVinecop` inherit from `FitControlsBicop` and extend them with three
+`FitControlsVinecop` inherit from `FitControlsBicop` and extend them with 
 additional data members to control the structure selection:
 * `int truncation_level` describes the tree after which `family_set` is set to
 `{BicopFamily::indep}`. In other words, all pair copulas in trees lower than
@@ -573,6 +575,8 @@ which the corresponding pair-copula is set to independence.
 level automatically (default is `false`).
 * `bool select_threshold` can be set to true to select the threshold parameter
 automatically (default is `false`).
+* `size_t num_threads` number of threads to run in parallel when fitting pair 
+copulas within one tree.
 
 As mentioned [above](#set-up-a-custom-vine-copula-model), the arguments
 of `select_all()` and `select_families()` can be used as arguments to a
@@ -601,6 +605,7 @@ M << 1, 1, 1, 1,
 // estimation and a truncation after the second tree
 FitControlsVinecop controls(bicop_families::itau, "itau");
 controls.set_truncation_level(2);
+controls.set_num_threads(4);  // parallelize with 4 threads
 Vinecop custom_vine(data, M, controls);
 ```
 
