@@ -169,9 +169,12 @@ namespace tools_optimization {
 
         double* x = new double[n_parameters_];
         Eigen::VectorXd::Map(x, n_parameters_) = initial_parameters;
+        Eigen::VectorXd optimized_parameters(n_parameters_);
+        std::string err_msg = "";
         try {
             auto f = [&](long n, const double *x) -> double {
-                return objective(data, n, x);};
+                return objective(data, n, x);
+            };
             tools_bobyqa::impl(f, n_parameters_,
                                number_interpolation_conditions,
                                x, lb, ub,
@@ -179,32 +182,32 @@ namespace tools_optimization {
                                controls_.get_final_trust_region(),
                                controls_.get_maxeval(),
                                working_space);
+                               
+            // convert result to VectorXd
+            for (size_t i=0; i < n_parameters_; i++) {
+                optimized_parameters(i) = x[i];
+            }
         } catch (std::invalid_argument err) {
-            delete[] x;
-            delete[] lb;
-            delete[] ub;
-            throw std::runtime_error(std::string("Invalid arguments. ") + err.what());
+            err_msg = std::string("Invalid arguments. ") + err.what();
         } catch (std::bad_alloc err) {
-            delete[] x;
-            delete[] lb;
-            delete[] ub;
-            throw std::runtime_error(std::string("Ran out of memory. ") + err.what());
+            err_msg = std::string("Ran out of memory. ") + err.what();
         } catch (std::runtime_error err) {
-            delete[] x;
-            delete[] lb;
-            delete[] ub;
-            throw std::runtime_error(std::string("Generic failure. ") + err.what());
+            err_msg = std::string("Generic failure. ") + err.what();
         } catch (...) {
             // do nothing for other errors (results are fine)
         }
-
-        Eigen::VectorXd optimized_parameters(n_parameters_);
-        for (size_t i=0; i < n_parameters_; i++) {
-            optimized_parameters(i) = x[i];
-        }
+        
+        // delete dynamically allocated objects
         delete[] x;
         delete[] lb;
         delete[] ub;
+        delete[] working_space;
+        
+        // throw error if optimization failed
+        if (err_msg != "") {
+            throw std::runtime_error(err_msg);
+        }
+        
         return optimized_parameters;
     }
 }
