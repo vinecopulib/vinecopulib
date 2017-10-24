@@ -107,7 +107,8 @@ namespace tools_select {
             }
             
             if (controls_.get_truncation_level() == t + 1) {
-                truncate();  // only allow for Independence copula from here on
+                // don't need to fit the remaining trees
+                break;
             }
         }
         finalize(controls_.get_truncation_level());
