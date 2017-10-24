@@ -205,6 +205,7 @@ namespace tools_optimization {
         delete[] x;
         delete[] lb;
         delete[] ub;
+        delete[] working_space;
         return optimized_parameters;
     }
 }
