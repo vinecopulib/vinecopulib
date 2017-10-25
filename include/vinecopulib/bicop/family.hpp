@@ -109,7 +109,7 @@ const std::vector<BicopFamily> archimedean = {
 };
 
 //! All BB copulas
-const std::vector<BicopFamily> BB = {
+const std::vector<BicopFamily> bb = {
     BicopFamily::bb1,
     BicopFamily::bb6,
     BicopFamily::bb7,
@@ -167,7 +167,6 @@ const std::vector<BicopFamily> flip_by_rotation = {
 };
 
 } // end of namespace BicopFamilies
-
 } // end of namespace vinecopulib
 
 #include <vinecopulib/bicop/implementation/family.ipp>

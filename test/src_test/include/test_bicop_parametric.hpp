@@ -130,7 +130,7 @@ TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct) {
                                                 bicop.bic(data) << " "
                                                 << bicop_.bic(data);
 
-        if (is_member(bicop_.get_family(), bicop_families::BB)) {
+        if (is_member(bicop_.get_family(), bicop_families::bb)) {
             int rot_sel = bicop.get_rotation();
             if (is_member(true_rotation, positive_rotations)) {
                 EXPECT_TRUE(is_member(rot_sel, positive_rotations));
@@ -164,11 +164,9 @@ TEST_P(ParBicopTest, bicop_select_itau_bic_is_correct) {
             auto data = bicop_.simulate(get_n());
             auto bicop = Bicop(data, controls);
             auto selected_family = bicop.get_family_name();
-            EXPECT_EQ(selected_family, true_family) <<
-                                                    bicop.bic(data) << " "
+            EXPECT_EQ(selected_family, true_family) << bicop.bic(data) << " "
                                                     << bicop_.bic(data);
-            EXPECT_EQ(bicop.get_rotation(), true_rotation) <<
-                                                           bicop_.str()
+            EXPECT_EQ(bicop.get_rotation(), true_rotation) << bicop_.str()
                                                            << std::endl <<
                                                            bicop.bic(data)
                                                            << " "
