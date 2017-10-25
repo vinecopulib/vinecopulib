@@ -67,6 +67,7 @@ namespace vinecopulib {
         bool select_truncation_level_;
         bool select_threshold_;
 
+        void check_truncation_level(size_t truncation_level);
         void check_tree_criterion(std::string tree_criterion);
         void check_threshold(double threshold);
     };
