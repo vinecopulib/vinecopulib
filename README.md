@@ -273,7 +273,7 @@ The constructor with known parameters takes 3 arguments:
 Bicop clayton(BicopFamily::clayton, 90);
 
 // Gauss copula with parameter 0.5
-Bicop gauss(BicopFamily::gaussian, 0,  VecXd::Constant(1, 0.5));
+Bicop gauss(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
 ```
 The constructor from data takes the same arguments as the select method and is
 described in the next section.
@@ -286,7 +286,7 @@ select the best fitting model from a set of families with `select()`.
 **Example**
 ``` cpp
 // create a Gauss copula with parameter 0.5 and simulate 1e3 observations
-Bicop model(BicopFamily::gaussian, 0,  VecXd::Constant(1, 0.5));             
+Bicop model(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));             
 auto data = model.simulate(1e3);
 
 // instantiate a gaussian copula with default parameters and fit to data
@@ -372,7 +372,7 @@ h-functions, log-likelihood, AIC, and BIC.
 **Example**
 ``` cpp
 // Gauss copula with parameter 0.5
-Bicop bicop(BicopFamily::gaussian, 0,  VecXd::Constant(1, 0.5));
+Bicop bicop(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
 
 // Simulate 100 observations
 auto sim_data = bicop.simulate(100);
@@ -399,7 +399,7 @@ and `boost::property_tree::ptree` objects:
 
 ```
 // Gauss copula with parameter 0.5
-Bicop bicop(BicopFamily::gaussian, 0,  VecXd::Constant(1, 0.5));
+Bicop bicop(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
 
 // Save as a ptree object
 boost::property_tree::ptree bicop_node = bicop.to_ptree();
@@ -579,7 +579,7 @@ of `select_all()` and `select_families()` can be used as arguments to a
 int d = 4;
 
 // simulate dummy data
-MatXd data = simulate_uniform(100, d);
+Eigen::MatrixXd data = simulate_uniform(100, d);
 
 // instantiate a vine from data using the default arguments
 Vinecop best_vine(data);
