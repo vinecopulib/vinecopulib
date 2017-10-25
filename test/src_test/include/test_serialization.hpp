@@ -34,9 +34,21 @@ namespace test_serialization {
 
     TEST(serialization, vinecop_serialization) {
 
+        // create vine with 5 variables, 2-truncated
         size_t d = 5;
-        auto vc = Vinecop(d);
+        Vinecop vc(d);
+        auto pc_store = Vinecop::make_pair_copula_store(d, 2);
+        for (auto& tree : pc_store) {
+            for (auto& pc : tree) {
+                pc = Bicop(BicopFamily::bb1, 90);
+            }
+        }
+        vc = Vinecop(pc_store, vc.get_matrix());
+        
+        // serialize
         vc.to_json("temp");
+        
+        // unserialize
         auto vc2 = Vinecop("temp");
 
         // Remove temp file
@@ -45,13 +57,9 @@ namespace test_serialization {
         if (sys_exit_code != 0) {
             throw std::runtime_error("error in system call");
         }
-
-        for (size_t tree = 0; tree < d - 1; ++tree) {
-            for (size_t edge = 0; edge < d - tree - 1; ++edge) {
-                EXPECT_EQ(vc2.get_rotation(tree, edge), 0);
-                EXPECT_EQ(vc2.get_family(tree, edge), BicopFamily::indep);
-            }
-        }
+        
+        EXPECT_EQ(vc.get_all_rotations(), vc2.get_all_rotations());
+        EXPECT_EQ(vc.get_all_families(), vc2.get_all_families());
     }
     
 }
