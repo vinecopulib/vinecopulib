@@ -338,7 +338,7 @@ namespace tools_select {
             tools_interface::check_user_interrupt();
             // matrix above trunc_lvl will be filled more efficiently later
             size_t t = std::min(trunc_lvl, d_ - 1 - col);
-            // * start with highest tree in this column
+            // start with highest tree in this column
             for (auto e : boost::edges(trees_[t])) {
                 // find an edge that contains a leaf
                 size_t v0 = boost::source(e, trees_[t]);
@@ -346,23 +346,23 @@ namespace tools_select {
                 size_t min_deg = std::min(boost::out_degree(v0, trees_[t]), 
                                           boost::out_degree(v1, trees_[t]));
                 if (min_deg > 1) {
-                    continue;  // not a laef
+                    continue;  // not a leaf
                 }
                 // find position of leaf in the edge
                 ptrdiff_t pos = (boost::out_degree(v1, trees_[t]) == 1);
                 if (pos == 1) {
                     trees_[t][e].pair_copula.flip();
                 }
-                // fill diagonal entry with leaf indexe
+                // fill diagonal entry with leaf index
                 mat(d_ - 1 - col, col) = trees_[t][e].conditioned[pos];
-                // entry in row t - 1 is other index of the edge
+                // entry in row t-1 is other index of the edge
                 mat(t - 1, col) = trees_[t][e].conditioned[std::abs(1 - pos)];
                 
                 // assign fitted pair copula to appropriate entry, see
                 // `Vinecop::get_pair_copula()`.
                 pair_copulas_[t - 1][col] = trees_[t][e].pair_copula;
                 
-                // initialize running set with full conditioing set of this edge
+                // initialize running set with full conditioning set of this edge
                 ning_set = trees_[t][e].conditioning;
                 
                 // remove edge (must not be reused in another column!)
@@ -420,7 +420,7 @@ namespace tools_select {
         // fill missing entries in case vine was truncated
         RVineMatrix::complete_matrix(mat, trunc_lvl);
         
-        // reutrn as RVineMatrix
+        // return as RVineMatrix
         vine_matrix_ = RVineMatrix(mat);
     }
 

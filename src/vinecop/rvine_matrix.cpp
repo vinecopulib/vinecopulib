@@ -368,7 +368,7 @@ namespace vinecopulib
         {
             using namespace tools_stl;
             size_t d = mat.cols();
-            // max d - 2 off-diagonal entries in each column
+            // there are max d-2 off-diagonal entries in each column
             for (size_t t = t_start; t < d - 1; ++t) {
                 // for each column, get all indices it already contains
                 std::vector<std::vector<size_t>> all_indices(d - t);
@@ -390,8 +390,7 @@ namespace vinecopulib
                             // allowed entry in column e0 is the element of the 
                             // conditioned set that is not contained in column e0
                             mat(t, e0) = set_diff(ned_set, all_indices[e0])[0];
-                            // continue with next column
-                            break;
+                            break;  // continue with next column
                         }
                     }
                 }
