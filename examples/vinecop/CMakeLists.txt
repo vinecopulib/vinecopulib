@@ -14,10 +14,11 @@ set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -We
 find_package(vinecopulib                  REQUIRED)
 find_package(Boost 1.56                   REQUIRED)
 include(cmake/findEigen3.cmake            REQUIRED)
+find_package(Threads                      REQUIRED)
 
 # Set required variables for includes and libraries
 set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
-set(external_libs ${VINECOPULIB_LIBRARIES} ${Boost_LIBRARIES})
+set(external_libs ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES})
 
 # Include subdirectory with project sources
 add_subdirectory(src)

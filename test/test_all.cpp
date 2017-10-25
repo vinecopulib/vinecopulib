@@ -23,7 +23,6 @@ using namespace test_vinecop_class;
 using namespace test_vinecop_sanity_checks;
 
 
-
 int main(int argc, char **argv) {
 
     ::testing::InitGoogleTest(&argc, argv);

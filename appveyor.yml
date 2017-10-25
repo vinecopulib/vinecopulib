@@ -61,6 +61,6 @@ build_script:
 #on_finish:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
-on_success:
-  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build\Debug\vinecopulib.* build\Release\vinecopulib.*
-  - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
+#on_success:
+#  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build\Debug\vinecopulib.* build\Release\vinecopulib.*
+#  - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip

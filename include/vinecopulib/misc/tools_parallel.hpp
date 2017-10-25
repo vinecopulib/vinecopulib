@@ -20,54 +20,55 @@ class ThreadPool {
 public:
 
     ThreadPool() = default;
-    ThreadPool(ThreadPool&) = delete;
-    ThreadPool(const ThreadPool&) = delete;
+
+    ThreadPool(ThreadPool &&) = delete;
+
+    ThreadPool(const ThreadPool &) = delete;
 
     //! constructs a thread pool with `nThreads` threads.
     //! @param nThreads number of threads to create.
-    ThreadPool(size_t nThreads) : stopped_(false)
-    {
+    ThreadPool(size_t nThreads) : stopped_(false) {
         for (size_t t = 0; t < nThreads; t++) {
             pool_.emplace_back([this] {
-                // observe thread pool as long there are jobs or pool has been
-                // stopped
-                while (!stopped_ | !jobs_.empty()) {
-                    std::function<void()> job;
-                    {
-                        // thread must hold the lock while modifying shared
-                        // variables
-                        std::unique_lock<std::mutex> lk(m_);
+                                   // observe thread pool as long there are jobs or pool has been
+                                   // stopped
+                                   while (!stopped_ | !jobs_.empty()) {
+                                       std::function<void()> job;
+                                       {
+                                           // thread must hold the lock while modifying shared
+                                           // variables
+                                           std::unique_lock<std::mutex> lk(m_);
 
-                        // wait for new job or stop signal
-                        cv_.wait(lk, [this] {
-                            return stopped_ || !jobs_.empty();
-                        });
+                                           // wait for new job or stop signal
+                                           cv_.wait(lk, [this] {
+                                               return stopped_ || !jobs_.empty();
+                                           });
 
-                        // check if there are any jobs left in the queue
-                        if (jobs_.empty())
-                            continue;
+                                           // check if there are any jobs left in the queue
+                                           if (jobs_.empty())
+                                               continue;
 
-                        // take job from the queue
-                        job = std::move(jobs_.front());
-                        jobs_.pop();
-                    }
+                                           // take job from the queue
+                                           job = std::move(jobs_.front());
+                                           jobs_.pop();
+                                       }
 
-                    // execute job
-                    job();
-                }
-            }
+                                       // execute job
+                                       job();
+                                   }
+                               }
             );
         }
     }
 
-    ~ThreadPool()
-    {
+    ~ThreadPool() {
         join();
     }
 
     // assignment operators
-    ThreadPool& operator=(const ThreadPool&) = delete;
-    ThreadPool& operator=(ThreadPool&& other) = default;
+    ThreadPool &operator=(const ThreadPool &) = delete;
+
+    ThreadPool &operator=(ThreadPool &&other) = default;
 
     //! pushes new jobs to the thread pool.
     //! @param f a function taking an arbitrary number of arguments.
@@ -76,8 +77,7 @@ public:
     //! @return an `std::shared_future`, where the user can get the result and
     //!   rethrow the catched exceptions.
     template<class F, class... Args>
-    auto push(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
-    {
+    auto push(F &&f, Args &&... args) -> std::future<decltype(f(args...))> {
         // create packaged task on the heap to avoid stack overlows.
         auto job = std::make_shared<std::packaged_task<decltype(f(args...))()>>(
             [&f, args...] { return f(args...); }
@@ -88,7 +88,7 @@ public:
             std::unique_lock<std::mutex> lk(m_);
             if (stopped_)
                 throw std::runtime_error("cannot push to stopped thread pool");
-            jobs_.emplace([job] () { (*job)(); });
+            jobs_.emplace([job]() { (*job)(); });
         }
 
         // signal a waiting worker that there's a new job
@@ -99,8 +99,7 @@ public:
     }
 
     //! waits for all jobs to finish and joins all threads.
-    void join()
-    {
+    void join() {
         // signal all threads to stop
         {
             std::unique_lock<std::mutex> lk(m_);
