@@ -96,8 +96,8 @@ TEST_F(VinecopTest, cdf_is_correct) {
     Vinecop vinecop(pair_copulas, matrix);
 
     // Test whether the analytic and simulated versions are "close" enough
-    auto U = vinecop.simulate(1e1);
-    ASSERT_TRUE(vinecop.cdf(U, 1e5).isApprox(bicop.cdf(U), 1e-2));
+    auto U = vinecop.simulate(10);
+    ASSERT_TRUE(vinecop.cdf(U, 10000).isApprox(bicop.cdf(U), 1e-2));
 }
 
 TEST_F(VinecopTest, simulate_is_correct) {

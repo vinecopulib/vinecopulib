@@ -78,8 +78,8 @@ TEST(test_tools_stats, dependence_matrix_works) {
 TEST(test_tools_stats, ghalton_is_correct) {
 
     size_t d = 2;
-    size_t n = 1e1;
-    size_t N = 1e4;
+    size_t n = 10;
+    size_t N = 1000;
 
     auto cop = Bicop(BicopFamily::gaussian);
     auto u = cop.simulate(n);
@@ -106,7 +106,7 @@ TEST(test_tools_stats, ghalton_is_correct) {
 }
 
 TEST(test_tools_stats, dpq_are_nan_safe) {
-    Eigen::VectorXd X = Eigen::VectorXd::Random(1e1);
+    Eigen::VectorXd X = Eigen::VectorXd::Random(10);
     X(0) = std::numeric_limits<double>::quiet_NaN();
     EXPECT_NO_THROW(tools_stats::dnorm(X));
     EXPECT_NO_THROW(tools_stats::pnorm(X));

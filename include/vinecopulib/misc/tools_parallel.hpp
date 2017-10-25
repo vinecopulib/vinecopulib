@@ -21,7 +21,7 @@ public:
 
     ThreadPool() = default;
 
-    ThreadPool(ThreadPool &) = delete;
+    ThreadPool(ThreadPool &&) = delete;
 
     ThreadPool(const ThreadPool &) = delete;
 

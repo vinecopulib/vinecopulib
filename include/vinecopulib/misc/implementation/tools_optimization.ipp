@@ -123,7 +123,7 @@ inline double pmle_objective(void *f_data, long n, const double *x) {
     ++newdata->objective_calls;
     Eigen::VectorXd par = Eigen::VectorXd::Ones(n + 1);
     par(0) = newdata->par0;
-    for (unsigned int i = 0; i < n; ++i) {
+    for (long i = 0; i < n; ++i) {
         par(i + 1) = x[i];
     }
     newdata->bicop->set_parameters(par);
