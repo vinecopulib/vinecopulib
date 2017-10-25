@@ -188,7 +188,12 @@ namespace tools_select {
                         // to independence
                         set_tree_to_indep(t);
                         truncate();
-                        controls_.set_truncation_level(t);
+                        if (!controls_.get_select_threshold()) {
+                            // if threshold is fixed, no need to go further
+                            controls_.set_truncation_level(t);
+                            needs_break = true;   // stops gic-search
+                            break;                // stops loop over trees
+                        }
                     } else {
                         gic = gic_trunc; 
                     }
@@ -225,8 +230,18 @@ namespace tools_select {
             // prepare for possible next iteration
             thresholded_crits = get_thresholded_crits();        
             set_current_fit_as_opt();
-    
-            if (gic >= gic_opt) {
+
+            if (gic == 0.0) {
+                if (controls_.get_select_threshold()) {
+                    // everything is independent, threshold needs to be 
+                    // reduced further
+                    continue;
+                } else {
+                    // threshold is fixed, optimal truncation level has 
+                    // been found
+                    needs_break = true;
+                }
+            } else if (gic >= gic_opt) {
                 // new model is optimal
                 needs_break = true;
             } else {
