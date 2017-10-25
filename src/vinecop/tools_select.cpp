@@ -86,8 +86,7 @@ namespace tools_select {
         return vine_matrix_;
     }
     
-    //! truncates the vine copula at the current tree level (tracked by 
-    //! `trees_fitted_` data member).
+    //! truncates the vine copula at the current tree level 
     void VinecopSelector::truncate() 
     {
         controls_.set_family_set({BicopFamily::indep});
@@ -165,15 +164,10 @@ namespace tools_select {
             double gic_trunc = 0.0;   
             
             for (size_t t = 0; t < d_ - 1; ++t) {
-                if (controls_.get_show_trace()) {
-                    msg << "** Tree: " << t;
-                }
-                
                 if (controls_.get_truncation_level() == t) {
-                    set_tree_to_indep(t);
-                    truncate();
+                    break;  // don't need to fit the remaining trees
                 }
-                
+                                
                 // select pair copulas (and possibly tree structure)
                 select_tree(t);
                                                 
@@ -182,15 +176,14 @@ namespace tools_select {
                 npars += get_npars_of_tree(t);
                 gic_trunc = calculate_gic(loglik, npars, n_);
                 
+                // gic comparison
                 if (controls_.get_select_truncation_level()) {
                     if (gic_trunc >= gic) {
-                        // gic did not improve, set this and all remaining trees
-                        // to independence
+                        // gic did not improve, set this tree to independence
                         set_tree_to_indep(t);
-                        truncate();
                         if (!controls_.get_select_threshold()) {
                             // if threshold is fixed, no need to go further
-                            controls_.set_truncation_level(t);
+                            controls_.set_truncation_level(std::max(t, (size_t) 1));
                             needs_break = true;   // stops gic-search
                             break;                // stops loop over trees
                         }
@@ -200,25 +193,19 @@ namespace tools_select {
                 } else {
                     gic = gic_trunc; 
                 }
-                
+
+                // print trace for this tree level
                 if (controls_.get_show_trace()) {
+                    msg << "** Tree: " << t;
                     if (controls_.get_select_truncation_level()) {
                         msg << ", GIC: " << gic_trunc;
                     }
                     msg << std::endl;
-                }
-
-                // print trace for this tree level
-                if (controls_.get_show_trace()) {
                     tools_interface::print(msg.str().c_str());
                     msg.str("");  // clear stream
                     // print fitted pair-copulas for this tree
-                    if (controls_.get_show_trace()) {
-                        tools_interface::print(msg.str().c_str());
-                        msg.str("");  // clear stream
-                        print_pair_copulas_of_tree(t);
-                    }
-                }    
+                    print_pair_copulas_of_tree(t);
+                }              
             }
             
             if (controls_.get_show_trace()) {
@@ -228,9 +215,10 @@ namespace tools_select {
             }
             
             // prepare for possible next iteration
-            thresholded_crits = get_thresholded_crits();        
+            thresholded_crits = get_thresholded_crits();
             set_current_fit_as_opt();
 
+            // check whether gic-optimal model has been found
             if (gic == 0.0) {
                 if (controls_.get_select_threshold()) {
                     // everything is independent, threshold needs to be 
@@ -253,7 +241,6 @@ namespace tools_select {
                 needs_break = needs_break | (controls_.get_threshold() < 0.01);
             }
         }
-        
         finalize(controls_.get_truncation_level());
     }
     
@@ -620,7 +607,6 @@ namespace tools_select {
     void VinecopSelector::initialize_new_fit(const Eigen::MatrixXd& data)
     {
         trees_[0] = make_base_tree(data);
-        trees_fitted_ = 0;
     }
     
     //! Create base tree of the vine
