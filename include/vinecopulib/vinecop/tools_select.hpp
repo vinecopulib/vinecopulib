@@ -115,7 +115,7 @@ namespace tools_select {
         void add_edge_info(VineTree& tree);
         void remove_edge_data(VineTree& tree);
         void remove_vertex_data(VineTree& tree);
-        void select_pair_copulas(VineTree& tree, const VineTree& tree_opt);
+        void select_pair_copulas(VineTree& tree, const VineTree& tree_opt = VineTree());
         FoundEdge find_old_fit(double fit_id, const VineTree& old_graph);
         double get_tree_loglik(const VineTree& tree);
         double get_tree_npars(const VineTree& tree);

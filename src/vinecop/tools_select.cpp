@@ -268,8 +268,7 @@ namespace tools_select {
     {
         n_ = data.rows();
         d_ = data.cols();
-        trees_ = std::vector<VineTree>(d_);
-        trees_opt_ = trees_;  // for sparse selection
+        trees_.resize(1);
         controls_ = controls;
         pair_copulas_ = Vinecop::make_pair_copula_store(d_);
         vine_matrix_ = vine_matrix;
@@ -280,8 +279,7 @@ namespace tools_select {
     {
         n_ = data.rows();
         d_ = data.cols();
-        trees_ = std::vector<VineTree>(d_);
-        trees_opt_ = trees_;  // for sparse selection
+        trees_.resize(1);
         controls_ = controls;
         pair_copulas_ = Vinecop::make_pair_copula_store(d_);
     }
@@ -324,7 +322,7 @@ namespace tools_select {
         for (size_t col = 0; col < d_ - 1; ++col) {
             tools_interface::check_user_interrupt();
             // matrix above trunc_lvl will be filled more efficiently later
-            size_t t = std::min(trunc_lvl, d_ - 1 - col);
+            size_t t = std::max(std::min(trunc_lvl, d_ - 1 - col), (size_t) 1);
             // start with highest tree in this column
             for (auto e : boost::edges(trees_[t])) {
                 // find an edge that contains a leaf
@@ -536,8 +534,13 @@ namespace tools_select {
         }
         add_edge_info(new_tree);       // for pc estimation and next tree
         remove_vertex_data(new_tree);  // no longer needed
-        select_pair_copulas(new_tree, trees_opt_[t + 1]);
-    
+        if (trees_opt_.size() > t + 1) {
+            select_pair_copulas(new_tree, trees_opt_[t + 1]);
+        } else {
+            select_pair_copulas(new_tree);
+        }
+        // make sure there is space for new tree
+        trees_.resize(t + 2);
         trees_[t + 1] = new_tree;
     }
         
