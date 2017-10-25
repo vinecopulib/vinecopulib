@@ -203,16 +203,19 @@ namespace vinecopulib
     //! Initialize object for storing pair copulas
     //!
     //! @param d dimension of the vine copula.
-    //! @return A nested vector such that `pc_store[t][e]` contains a Bicop
+    //! @param truncation_level a truncation level (optional).
+    //! @return A nested vector such that `pc_store[t][e]` contains a Bicop.
     //!     object for the pair copula corresponding to tree `t` and edge `e`.
-    std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(size_t d)
+    std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(size_t d,
+        size_t truncation_level)
     {
         if (d < 2) {
             throw std::runtime_error("the dimension should be larger than 1");
         }
-
-        std::vector<std::vector<Bicop>> pc_store(d - 1);
-        for (size_t t = 0; t < d - 1; ++t) {
+        
+        size_t n_trees = std::min(d - 1, truncation_level);
+        std::vector<std::vector<Bicop>> pc_store(n_trees);
+        for (size_t t = 0; t < n_trees; ++t) {
             pc_store[t].resize(d - 1 - t);
         }
 

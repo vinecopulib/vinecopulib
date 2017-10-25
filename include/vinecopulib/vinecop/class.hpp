@@ -72,7 +72,8 @@ namespace vinecopulib
         double bic(const Eigen::MatrixXd& u) const;
 
         // Misc methods
-        static std::vector<std::vector<Bicop>> make_pair_copula_store(size_t d);
+        static std::vector<std::vector<Bicop>> make_pair_copula_store(size_t d,
+            size_t truncation_level = std::numeric_limits<size_t>::max());
         
     private:
         size_t d_;
