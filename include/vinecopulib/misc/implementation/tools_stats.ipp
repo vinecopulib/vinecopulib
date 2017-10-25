@@ -5,7 +5,6 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/misc/tools_stl.hpp>
-#include <vinecopulib/misc/tools_c.h>
 
 //! @file misc/tools_stats.ipp
 
@@ -111,10 +110,135 @@ to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method) {
 
 //! calculates the pairwise Kendall's \f$ \tau \f$.
 inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x) {
-    double tau;
-    int n = (int) x.rows();
-    int two = 2;
-    ktau_matrix_c(x.data(), &two, &n, &tau);
+    // C++ translation of a C code given by Shing (Eric) Fu, Feng Zhu, Guang
+    // (Jack) Yang, and Harry Joe, based on work of the method by Knight (1966)
+
+    // Defining variables
+    size_t K, L, I, J, Iend, Jend, i, j, m;
+    bool Iflag, Jflag, Xflag;
+    size_t T = 0, U = 0, V = 0;
+    double tau = 0., S = 0., D = 0.;
+
+    size_t N = x.rows();
+    Eigen::Matrix<double, Eigen::Dynamic, 2> x2(N, 2);
+
+    /* 1.1 Sort X and Y in X order */
+    /* Break ties in X according to Y */
+    K = 1;
+    do {
+        L = 0;
+        do {
+            I = L;
+            J = (I + K) < (N) ? (I + K) : (N);
+            Iend = J;
+            Jend = (J + K) < (N) ? (J + K) : (N);
+            do {
+                Iflag = (I < Iend);
+                Jflag = (J < Jend);
+                if (Iflag & Jflag) {
+                    Xflag = ((x(I, 0) > x(J, 0)) |
+                             ((x(I, 0) == x(J, 0)) & (x(I, 1) > x(J, 1))));
+                } else {
+                    Xflag = false;
+                }
+                if ((Iflag & !Jflag) | (Iflag & Jflag & !Xflag)) {
+                    x2(L, 0) = x(I, 0);
+                    x2(L, 1) = x(I, 1);
+                    I++;
+                    L++;
+                };
+                if ((!Iflag && Jflag) | (Iflag && Jflag && Xflag)) {
+                    x2(L, 0) = x(J, 0);
+                    x2(L, 1) = x(J, 1);
+                    J++;
+                    L++;
+                };
+            } while (Iflag | Jflag);
+        } while (L < N);
+
+        // Swap columns
+        x.col(0).swap(x2.col(0));
+        x.col(1).swap(x2.col(1));
+        K *= 2;
+    } while (K < N);
+
+    /* 1.2 Count pairs of tied X, T */
+    j = 1;
+    m = 1;
+    for (i = 1; i < N; i++)
+        if (x(i, 0) == x(i - 1, 0)) {
+            j++;
+            if (x(i, 1) == x(i - 1, 1))
+                m++;
+        } else if (j > 1) {
+            T += j * (j - 1) / 2;
+            if (m > 1)
+                V += m * (m - 1) / 2;
+            j = 1;
+            m = 1;
+        };
+    T += j * (j - 1) / 2;
+    V += m * (m - 1) / 2;
+
+    /* 2.1 Sort Y again and count exchanges, S */
+    /* Keep original relative order if tied */
+    K = 1;
+    do {
+        L = 0;
+        do {
+            I = L;
+            J = (I + K) < (N) ? (I + K) : (N);
+            Iend = J;
+            Jend = (J + K) < (N) ? (J + K) : (N);
+            do {
+                Iflag = (I < Iend);
+                Jflag = (J < Jend);
+                if (Iflag & Jflag) {
+                    Xflag = (x(I, 1) > x(J, 1));
+                } else {
+                    Xflag = false;
+                }
+                if ((Iflag & !Jflag) | (Iflag & Jflag & !Xflag)) {
+                    x2(L, 0) = x(I, 0);
+                    x2(L, 1) = x(I, 1);
+                    I++;
+                    L++;
+                };
+                if ((!Iflag && Jflag) | (Iflag && Jflag && Xflag)) {
+                    x2(L, 0) = x(J, 0);
+                    x2(L, 1) = x(J, 1);
+                    S += Iend - I;
+                    J++;
+                    L++;
+                };
+            } while ((Iflag | Jflag));
+        } while (L < N);
+
+        // Swap columns
+        x.col(0).swap(x2.col(0));
+        x.col(1).swap(x2.col(1));
+        K *= 2;
+    } while (K < N);
+
+    /* 2.2 Count pairs of tied Y, U */
+    j = 1;
+    for (i = 1; i < N; i++)
+        if (x(i, 1) == x(i - 1, 1))
+            j++;
+        else if (j > 1) {
+            U += j * (j - 1) / 2;
+            j = 1;
+        };
+    U += j * (j - 1) / 2;
+
+
+    /* 3. Calc. Kendall's Score and Denominator */
+    D = 0.5 * N * (N - 1);
+    S = D - (2. * S + T + U - V);
+    //if(T > 0 | U > 0) // adjust for ties
+    D = sqrt((D - T) * (D - U));
+    tau = S / D;
+
     return tau;
 }
 
@@ -327,6 +451,309 @@ inline Eigen::MatrixXd ghalton(size_t n, size_t d) {
     }
 
     return res.transpose();
+}
+
+//! Compute bivariate t probabilities
+//!
+//! Based on the method described by
+//! Dunnett, C.W. and M. Sobel, (1954),
+//! A bivariate generalization of Student's t-distribution
+//! with tables for certain special cases,
+//! Biometrika 41, pp. 153-169. Translated from the Fortran routines of
+//! Alan Genz (www.math.wsu.edu/faculty/genz/software/fort77/mvtdstpack.f).
+//!
+//! @param z an \f$ n \times 2 \f$ matrix of evaluation points.
+//! @param nu number of degrees of freedom.
+//! @param rho correlation.
+//!
+//! @return An \f$ n \times 1 \f$ vector of probabilities.
+inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
+                            int nu, double rho) {
+    size_t i1;
+    double d1, d2, d3;
+    static int hs, ks;
+    static double hkn, hpk, hrk, krh, bvt, ors, snu, gmph, gmpk, hkrn,
+        qhrk, xnkh, xnhk, btnckh, btnchk, btpdkh, btpdhk;
+
+    snu = sqrt((double) nu);
+    ors = 1 - pow(rho, 2.0);
+
+    size_t n = z.rows();
+    Eigen::VectorXd p(n);
+
+    for (size_t l = 0; l < n; l++) {
+        hrk = z(l, 0) - rho * z(l, 1);
+        krh = z(l, 1) - rho * z(l, 0);
+        if (fabs(hrk) + ors > 0.) {
+            /* Computing 2nd power */
+            d1 = hrk;
+            /* Computing 2nd power */
+            d2 = hrk;
+            /* Computing 2nd power */
+            d3 = z(l, 1);
+            xnhk = d1 * d1 / (d2 * d2 + ors * (nu + d3 * d3));
+            /* Computing 2nd power */
+            d1 = krh;
+            /* Computing 2nd power */
+            d2 = krh;
+            /* Computing 2nd power */
+            d3 = z(l, 0);
+            xnkh = d1 * d1 / (d2 * d2 + ors * (nu + d3 * d3));
+        } else {
+            xnhk = 0.;
+            xnkh = 0.;
+        }
+        d1 = z(l, 0) - rho * z(l, 1);
+        hs = (int) (d1 >= 0 ? 1 : -1);//d_sign(&c_b91, &d1);
+        d1 = z(l, 1) - rho * z(l, 0);
+        ks = (int) (d1 >= 0 ? 1 : -1);
+        if (nu % 2 == 0) {
+            bvt = atan2(sqrt(ors), -rho) / 6.2831853071795862;
+            /* Computing 2nd power */
+            d1 = z(l, 0);
+            gmph = z(l, 0) / sqrt((nu + d1 * d1) * 16);
+            /* Computing 2nd power */
+            d1 = z(l, 1);
+            gmpk = z(l, 1) / sqrt((nu + d1 * d1) * 16);
+            btnckh = atan2(sqrt(xnkh), sqrt(1 - xnkh)) * 2 /
+                     3.14159265358979323844;
+            btpdkh = sqrt(xnkh * (1 - xnkh)) * 2 / 3.14159265358979323844;
+            btnchk = atan2(sqrt(xnhk), sqrt(1 - xnhk)) * 2 /
+                     3.14159265358979323844;
+            btpdhk = sqrt(xnhk * (1 - xnhk)) * 2 / 3.14159265358979323844;
+            i1 = nu / 2;
+            for (size_t j = 1; j <= i1; ++j) {
+                bvt += gmph * (ks * btnckh + 1);
+                bvt += gmpk * (hs * btnchk + 1);
+                btnckh += btpdkh;
+                btpdkh = (j << 1) * btpdkh * (1 - xnkh) / ((j << 1) + 1);
+                btnchk += btpdhk;
+                btpdhk = (j << 1) * btpdhk * (1 - xnhk) / ((j << 1) + 1);
+                /* Computing 2nd power */
+                d1 = z(l, 0);
+                gmph = gmph * ((j << 1) - 1) / ((j << 1) * (d1 * d1 / nu + 1)
+                );
+                /* Computing 2nd power */
+                d1 = z(l, 1);
+                gmpk = gmpk * ((j << 1) - 1) / ((j << 1) * (d1 * d1 / nu + 1)
+                );
+            }
+        } else {
+            /* Computing 2nd power */
+            d1 = z(l, 0);
+            /* Computing 2nd power */
+            d2 = z(l, 1);
+            qhrk = sqrt(
+                d1 * d1 + d2 * d2 - rho * 2 * z(l, 0) * z(l, 1) + nu * ors);
+            hkrn = z(l, 0) * z(l, 1) + rho * nu;
+            hkn = z(l, 0) * z(l, 1) - nu;
+            hpk = z(l, 0) + z(l, 1);
+            bvt =
+                atan2(-snu * (hkn * qhrk + hpk * hkrn), hkn * hkrn - nu * hpk *
+                                                                     qhrk) /
+                6.2831853071795862;
+            if (bvt < -1e-15) {
+                bvt += 1;
+            }
+            /* Computing 2nd power */
+            d1 = z(l, 0);
+            gmph = z(l, 0) / (snu * 6.2831853071795862 * (d1 * d1 / nu + 1));
+            /* Computing 2nd power */
+            d1 = z(l, 1);
+            gmpk = z(l, 1) / (snu * 6.2831853071795862 * (d1 * d1 / nu + 1));
+            btnckh = sqrt(xnkh);
+            btpdkh = btnckh;
+            btnchk = sqrt(xnhk);
+            btpdhk = btnchk;
+            i1 = (nu - 1) / 2;
+            for (size_t j = 1; j <= i1; ++j) {
+                bvt += gmph * (ks * btnckh + 1);
+                bvt += gmpk * (hs * btnchk + 1);
+                btpdkh = ((j << 1) - 1) * btpdkh * (1 - xnkh) / (j << 1);
+                btnckh += btpdkh;
+                btpdhk = ((j << 1) - 1) * btpdhk * (1 - xnhk) / (j << 1);
+                btnchk += btpdhk;
+                /* Computing 2nd power */
+                d1 = z(l, 0);
+                gmph = (j << 1) * gmph / (((j << 1) + 1) * (d1 * d1 / nu + 1)
+                );
+                /* Computing 2nd power */
+                d1 = z(l, 1);
+                gmpk = (j << 1) * gmpk / (((j << 1) + 1) * (d1 * d1 / nu + 1)
+                );
+            }
+        }
+        p(l) = bvt;
+    }
+
+    return p;
+}
+
+//! Compute bivariate normal probabilities
+//!
+//! A function for computing bivariate normal probabilities;
+//! developed using Drezner, Z. and Wesolowsky, G. O. (1989),
+//! On the Computation of the Bivariate Normal Integral,
+//! J. Stat. Comput. Simul.. 35 pp. 101-107.
+//! with extensive modications for double precisions by
+//! Alan Genz and Yihong Ge. Translated from the Fortran routines of
+//! Alan Genz (www.math.wsu.edu/faculty/genz/software/fort77/mvtdstpack.f).
+//!
+//! @param z an \f$ n \times 2 \f$ matrix of evaluation points.
+//! @param rho correlation.
+//!
+//! @return An \f$ n \times 1 \f$ vector of probabilities.
+inline Eigen::VectorXd
+pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
+        double rho) {
+
+    static struct {
+        double e_1[3];
+        double fill_2[7];
+        double e_3[6];
+        double fill_4[4];
+        double e_5[10];
+    } equiv_112 = {{.1713244923791705,  .3607615730481384, .4679139345726904},
+                   {0},
+                   {.04717533638651177, .1069393259953183,
+                                                           .1600783285433464,  .2031674267230659,
+                       .2334925365383547, .2491470458134029},
+                   {0},
+                   {.01761400713915212, .04060142980038694,
+                                                           .06267204833410906, .08327674157670475,
+                       .1019301198172404, .1181945319615184,
+                       .1316886384491766, .1420961093183821,
+                       .1491729864726037, .1527533871307259}};
+    auto w = ((double *) &equiv_112);
+
+    static struct {
+        double e_1[3];
+        double fill_2[7];
+        double e_3[6];
+        double fill_4[4];
+        double e_5[10];
+    } equiv_113 = {{-.9324695142031522, -.6612093864662647, -.238619186083197},
+                   {0},
+                   {-.9815606342467191, -.904117256370475,  -.769902674194305,
+                                                                                -.5873179542866171, -.3678314989981802, -.1252334085114692},
+                   {0},
+                   {-.9931285991850949, -.9639719272779138,
+                                                            -.9122344282513259, -.8391169718222188,
+                                                                                                    -.7463319064601508, -.636053680726515,
+                       -.5108670019508271, -.3737060887154196,
+                       -.2277858511416451, -.07652652113349733}};
+    auto x = ((double *) &equiv_113);
+
+
+    boost::math::normal dist;
+    auto phi = [&dist](double y) { return boost::math::cdf(dist, y); };
+
+    size_t lg, ng;
+    if (fabs(rho) < .3f) {
+        ng = 1;
+        lg = 3;
+    } else if (fabs(rho) < .75f) {
+        ng = 2;
+        lg = 6;
+    } else {
+        ng = 3;
+        lg = 10;
+    }
+
+    auto f = [ng, lg, rho, x, w, phi](double h, double k) {
+        size_t i1;
+        double a, b, c, d, d1, d2, as, bs, hk, hs, sn, rs, xs, bvn, asr;
+        h = -h;
+        k = -k;
+        hk = h * k;
+        bvn = 0.;
+        if (fabs(rho) < .925f) {
+            hs = (h * h + k * k) / 2;
+            asr = asin(rho);
+            i1 = lg;
+            for (size_t i = 1; i <= i1; ++i) {
+                sn = sin(asr * (x[i + ng * 10 - 11] + 1) / 2);
+                bvn +=
+                    w[i + ng * 10 - 11] * exp((sn * hk - hs) / (1 - sn * sn));
+                sn = sin(asr * (-x[i + ng * 10 - 11] + 1) / 2);
+                bvn +=
+                    w[i + ng * 10 - 11] * exp((sn * hk - hs) / (1 - sn * sn));
+            }
+            d1 = -h;
+            d2 = -k;
+            bvn = bvn * asr / 12.566370614359172 + phi(d1) * phi(d2);
+        } else {
+            if (rho < 0.) {
+                k = -k;
+                hk = -hk;
+            }
+            if (fabs(rho) < 1.) {
+                as = (1 - rho) * (rho + 1);
+                a = sqrt(as);
+                /* Computing 2nd power */
+                d1 = h - k;
+                bs = d1 * d1;
+                c = (4 - hk) / 8;
+                d = (12 - hk) / 16;
+                bvn = a * exp(-(bs / as + hk) / 2) * (1 - c * (bs - as) * (1 -
+                                                                           d *
+                                                                           bs /
+                                                                           5) /
+                                                          3 +
+                                                      c * d * as * as / 5);
+                if (hk > -160.) {
+                    b = sqrt(bs);
+                    d1 = -b / a;
+                    bvn -= exp(-hk / 2) * sqrt(6.283185307179586) * phi(d1)
+                           * b * (1 - c * bs * (1 - d * bs / 5) / 3);
+                }
+                a /= 2;
+                i1 = lg;
+                for (size_t i = 1; i <= i1; ++i) {
+                    /* Computing 2nd power */
+                    d1 = a * (x[i + ng * 10 - 11] + 1);
+                    xs = d1 * d1;
+                    rs = sqrt(1 - xs);
+                    bvn += a * w[i + ng * 10 - 11] * (exp(-bs / (xs * 2) - hk /
+                                                                           (rs +
+                                                                            1)) /
+                                                      rs -
+                                                      exp(-(bs / xs + hk) / 2) *
+                                                      (c * xs
+                                                       * (d * xs + 1) + 1));
+                    /* Computing 2nd power */
+                    d1 = -x[i + ng * 10 - 11] + 1;
+                    xs = as * (d1 * d1) / 4;
+                    rs = sqrt(1 - xs);
+                    /* Computing 2nd power */
+                    d1 = rs + 1;
+                    bvn += a * w[i + ng * 10 - 11] * exp(-(bs / xs + hk) / 2) *
+                           (exp(-hk * xs / (d1 * d1 * 2)) / rs - (c * xs *
+                                                                  (d * xs +
+                                                                   1) + 1));
+                }
+                bvn = -bvn / 6.283185307179586;
+            }
+            if (rho > 0.) {
+                d1 = -std::max(h, k);
+                bvn += phi(d1);
+            } else {
+                bvn = -bvn;
+                if (k > h) {
+                    if (h < 0.) {
+                        bvn = bvn + phi(k) - phi(h);
+                    } else {
+                        d1 = -h;
+                        d2 = -k;
+                        bvn = bvn + phi(d1) - phi(d2);
+                    }
+                }
+            }
+        }
+        return bvn;
+    };
+
+    return tools_eigen::binaryExpr_or_nan(z, f);
 }
 }
 

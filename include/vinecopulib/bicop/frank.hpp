@@ -41,4 +41,6 @@ private:
 };
 }
 
+double debyen(const double x, const int n);
+
 #include <vinecopulib/bicop/implementation/frank.ipp>

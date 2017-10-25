@@ -371,9 +371,13 @@ inline void Bicop::flip() {
 //! summarizes the model into a string (can be used for printing).
 inline std::string Bicop::str() const {
     std::stringstream bicop_str;
-    bicop_str << "family = " << get_family_name() <<
-              ", rotation = " << get_rotation() <<
-              ", parameters = " << get_parameters();
+    bicop_str << get_family_name();
+    if (get_rotation() != 0) {
+        bicop_str << " " << get_rotation() << "°";
+    }
+    if (get_family() != BicopFamily::indep) {
+        bicop_str << ", parameters = " << get_parameters();
+    }
 
     return bicop_str.str().c_str();
 }

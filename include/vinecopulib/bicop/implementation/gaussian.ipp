@@ -5,7 +5,6 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <vinecopulib/misc/tools_c.h>
 #include <boost/math/constants/constants.hpp>
 
 namespace vinecopulib {
@@ -42,23 +41,8 @@ inline Eigen::VectorXd GaussianBicop::pdf(
 inline Eigen::VectorXd GaussianBicop::cdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 ) {
-    ptrdiff_t n = u.rows();
-    Eigen::VectorXd p = Eigen::VectorXd::Ones(u.rows());
-    double rho = double(this->parameters_(0));
-
-    double abseps = 0.001, releps = 0, error = 0;
-    int d = 2, nu = 0, maxpts = 25000, inform;
-    std::vector<double> lower(2), upper(2);
-    std::vector<int> infin(2);
-
-    auto v = tools_stats::qnorm(u);
-    for (ptrdiff_t i = 0; i < n; i++) {
-        upper[0] = v(i, 0);
-        upper[1] = v(i, 1);
-        mvtdst_(&d, &nu, &lower[0], &upper[0], &infin[0], &rho,
-                &lower[0], &maxpts, &abseps, &releps, &error, &p(i), &inform);
-    }
-    return p;
+    return tools_stats::pbvnorm(tools_stats::qnorm(u),
+                                double(this->parameters_(0)));
 }
 
 inline Eigen::VectorXd GaussianBicop::hfunc1(

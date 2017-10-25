@@ -89,6 +89,12 @@ Eigen::MatrixXd dependence_matrix(const Eigen::MatrixXd &x,
                                   const std::string &measure);
 
 Eigen::MatrixXd ghalton(size_t n, size_t d);
+
+Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
+                     int nu, double rho);
+
+Eigen::VectorXd pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
+                        double rho);
 }
 
 }

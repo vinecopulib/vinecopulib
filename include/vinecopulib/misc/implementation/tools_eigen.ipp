@@ -77,29 +77,29 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
 //!
 //! @return \f$ f^{-1}(x) \f$.
 inline Eigen::VectorXd invert_f(const Eigen::VectorXd &x,
-                                std::function< Eigen::VectorXd(
-    const Eigen::VectorXd &)
+                                std::function<Eigen::VectorXd(
+                                    const Eigen::VectorXd &)
 
-> f,
-const double lb,
-const double ub,
-int n_iter
+                                > f,
+                                const double lb,
+                                const double ub,
+                                int n_iter
 ) {
-Eigen::VectorXd xl = Eigen::VectorXd::Constant(x.size(), lb);
-Eigen::VectorXd xh = Eigen::VectorXd::Constant(x.size(), ub);
-Eigen::VectorXd x_tmp = x;
-for (
-int iter = 0;
-iter<n_iter;
-++iter) {
-x_tmp = (xh + xl) / 2.0;
-Eigen::VectorXd fm = f(x_tmp) - x;
-xl = (fm.array() < 0).select(x_tmp, xl);
-xh = (fm.array() < 0).select(xh, x_tmp);
-}
+    Eigen::VectorXd xl = Eigen::VectorXd::Constant(x.size(), lb);
+    Eigen::VectorXd xh = Eigen::VectorXd::Constant(x.size(), ub);
+    Eigen::VectorXd x_tmp = x;
+    for (
+        int iter = 0;
+        iter < n_iter;
+        ++iter) {
+        x_tmp = (xh + xl) / 2.0;
+        Eigen::VectorXd fm = f(x_tmp) - x;
+        xl = (fm.array() < 0).select(x_tmp, xl);
+        xh = (fm.array() < 0).select(xh, x_tmp);
+    }
 
-return
-x_tmp;
+    return
+        x_tmp;
 }
 
 //! expand a vector into a matrix with two columns where each row
@@ -128,10 +128,10 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> expand_grid(
 //!
 //! @param filename the name of the file to read from.
 //! @param max_buffer_size the maximal buffer size.
-inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
+inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
     const char *filename, int max_buffer_size) {
     Eigen::MatrixXd temp = read_matxd(filename, max_buffer_size);
-    Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> output = temp.cast<size_t>();
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> output = temp.cast<size_t>();
     return output;
 }
 
