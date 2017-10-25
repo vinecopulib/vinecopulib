@@ -270,7 +270,6 @@ namespace tools_select {
         d_ = data.cols();
         trees_.resize(1);
         controls_ = controls;
-        pair_copulas_ = Vinecop::make_pair_copula_store(d_);
         vine_matrix_ = vine_matrix;
     }
 
@@ -281,7 +280,6 @@ namespace tools_select {
         d_ = data.cols();
         trees_.resize(1);
         controls_ = controls;
-        pair_copulas_ = Vinecop::make_pair_copula_store(d_);
     }
 
     //! Add edges allowed by the proximity condition
@@ -314,10 +312,10 @@ namespace tools_select {
     void StructureSelector::finalize(size_t trunc_lvl)
     {
         using namespace tools_stl;
+        pair_copulas_ = Vinecop::make_pair_copula_store(d_, trunc_lvl);
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d_, d_);
         mat.fill(0);
         std::vector<size_t> ning_set;
-        
         // fill matrix column by column
         for (size_t col = 0; col < d_ - 1; ++col) {
             tools_interface::check_user_interrupt();
@@ -470,7 +468,8 @@ namespace tools_select {
     
     void FamilySelector::finalize(size_t trunc_lvl)
     {
-        for (size_t tree = 0; tree < std::min(d_ - 1, trunc_lvl); tree++) {
+        pair_copulas_ = Vinecop::make_pair_copula_store(d_, trunc_lvl);
+        for (size_t tree = 0; tree < pair_copulas_.size(); tree++) {
             int edge = 0;
             // trees_[0] is base tree, vine copula starts at trees_[1]
             for (auto e : boost::edges(trees_[tree + 1])) {

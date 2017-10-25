@@ -24,16 +24,12 @@ namespace vinecopulib
         for (size_t i = 0; i < d; ++i) {
             order(i) = i + 1;
         }
-        vine_matrix_ = RVineMatrix(RVineMatrix::construct_d_vine_matrix(order),
-                                   false);  // don't check if R-vine matrix
-
-        // all pair-copulas are independence
-        pair_copulas_ = make_pair_copula_store(d);
-        for (auto& tree : pair_copulas_) {
-            for (auto& pc : tree) {
-                pc = Bicop(BicopFamily::indep);
-            }
-        }
+        auto mat = RVineMatrix::construct_d_vine_matrix(order);
+        
+        // don't check for validity of R-vine matrix
+        vine_matrix_ = RVineMatrix(mat, false); 
+        
+        // pair_copulas_ empty = everything independence 
     }
 
     //! creates a vine copula with structure specified by an R-vine matrix; all
@@ -46,14 +42,7 @@ namespace vinecopulib
     {
         d_ = matrix.rows();
         vine_matrix_ = RVineMatrix(matrix, check_matrix);
-
-        // all pair-copulas are independence
-        pair_copulas_ = make_pair_copula_store(d_);
-        for (auto& tree : pair_copulas_) {
-            for (auto& pc : tree) {
-                pc = Bicop(BicopFamily::indep);
-            }
-        }
+        // pair_copulas_ empty = everything independence
     }
 
     //! creates an arbitrary vine copula model.
@@ -67,16 +56,15 @@ namespace vinecopulib
         bool check_matrix)
     {
         d_ = matrix.rows();
-        if (pair_copulas.size() != d_ - 1) {
+        if (pair_copulas.size() > d_ - 1) {
             std::stringstream message;
             message <<
-                    "size of pair_copulas does not match dimension of matrix (" <<
-                    d_ << "); " <<
-                    "expected size: " << d_ - 1 << ", "<<
+                    "pair_copulas is too large; " <<
+                    "expected size: < " << d_ - 1 << ", "<<
                     "actual size: " << pair_copulas.size() << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
-        for (size_t t = 0; t < d_ - 1; ++t) {
+        for (size_t t = 0; t < pair_copulas.size(); ++t) {
             if (pair_copulas[t].size() != d_ - 1 - t) {
                 std::stringstream message;
                 message <<
@@ -104,14 +92,21 @@ namespace vinecopulib
         vine_matrix_ = RVineMatrix(matrix, check_matrix);
         d_ = (size_t) matrix.rows();
 
-        pair_copulas_ = make_pair_copula_store(d_);
         boost::property_tree::ptree pcs_node = input.get_child("pair copulas");
         for (size_t tree = 0; tree < d_ - 1; ++tree) {
-            boost::property_tree::ptree tree_node = pcs_node.get_child(
-                    "tree" + std::to_string(tree));
+            boost::property_tree::ptree tree_node;
+            try {
+                tree_node = pcs_node.get_child("tree" + std::to_string(tree));
+            } catch (...) {
+                break;  // vine was truncated, no more trees to parse
+            }
+            // reserve space for pair copulas of this tree
+            pair_copulas_.resize(tree + 1);
+            pair_copulas_[tree].resize(d_ - tree - 1);
+            
             for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
-                boost::property_tree::ptree pc_node = tree_node.get_child(
-                        "pc" + std::to_string(edge));
+                boost::property_tree::ptree pc_node = 
+                    tree_node.get_child("pc" + std::to_string(edge));
                 pair_copulas_[tree][edge] = Bicop(pc_node);
             }
         }
@@ -142,7 +137,6 @@ namespace vinecopulib
         bool check_matrix)
     {
         d_ = data.cols();
-        pair_copulas_ = make_pair_copula_store(d_);
         vine_matrix_ = RVineMatrix(matrix, check_matrix);
         select_families(data, controls);
     }
@@ -156,7 +150,6 @@ namespace vinecopulib
     Vinecop::Vinecop(const Eigen::MatrixXd& data, FitControlsVinecop controls)
     {
         d_ = data.cols();
-        pair_copulas_ = make_pair_copula_store(d_);
         select_all(data, controls);
     }
 
@@ -174,7 +167,7 @@ namespace vinecopulib
         boost::property_tree::ptree output;
 
         boost::property_tree::ptree pair_copulas;
-        for (size_t tree = 0; tree < d_ - 1; ++tree) {
+        for (size_t tree = 0; tree < pair_copulas_.size(); ++tree) {
             boost::property_tree::ptree tree_node;
             for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
                 tree_node.add_child("pc"+std::to_string(edge),
@@ -290,6 +283,10 @@ namespace vinecopulib
                     "tree level: " <<  tree  << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
+        if (tree >= pair_copulas_.size()) {
+            // vine is truncated
+            return Bicop();
+        }
         return pair_copulas_[tree][edge];
     }
 
@@ -317,10 +314,9 @@ namespace vinecopulib
     //! edge `e` in tree `t`.
     std::vector<std::vector<BicopFamily>> Vinecop::get_all_families() const
     {
-        std::vector<std::vector<BicopFamily>> families(d_ - 1);
-        for (size_t t = 0; t < d_ - 1; ++t)
-            families[t].resize(d_ - 1 - t);
-        for (size_t tree = 0; tree < d_ - 1; ++tree) {
+        std::vector<std::vector<BicopFamily>> families(pair_copulas_.size());
+        for (size_t tree = 0; tree < pair_copulas_.size(); ++tree) {
+            families[tree].resize(d_ - 1 - tree);
             for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
                 families[tree][edge] = get_family(tree, edge);
             }
@@ -344,10 +340,9 @@ namespace vinecopulib
     //! edge `e` in tree `t`.
     std::vector<std::vector<int>> Vinecop::get_all_rotations() const
     {
-        std::vector<std::vector<int>> rotations(d_ - 1);
-        for (size_t t = 0; t < d_ - 1; ++t)
-            rotations[t].resize(d_ - 1 - t);
-        for (size_t tree = 0; tree < d_ - 1; ++tree) {
+        std::vector<std::vector<int>> rotations(pair_copulas_.size());
+        for (size_t tree = 0; tree < pair_copulas_.size(); ++tree) {
+            rotations[tree].resize(d_ - 1 - tree);
             for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
                 rotations[tree][edge] = get_rotation(tree, edge);
             }
@@ -371,10 +366,10 @@ namespace vinecopulib
     //! edge `e` in tree `t`.
     std::vector<std::vector<Eigen::VectorXd>> Vinecop::get_all_parameters() const
     {
-        std::vector<std::vector<Eigen::VectorXd>> parameters(d_ - 1);
-        for (size_t t = 0; t < d_ - 1; ++t)
-            parameters[t].resize(d_ - 1 - t);
-        for (size_t tree = 0; tree < d_ - 1; ++tree) {
+        std::vector<std::vector<Eigen::VectorXd>> 
+            parameters(pair_copulas_.size());
+        for (size_t tree = 0; tree < parameters.size(); ++tree) {
+            parameters[tree].resize(d_ - 1 - tree);
             for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
                 parameters[tree][edge] = get_parameters(tree, edge);
             }
