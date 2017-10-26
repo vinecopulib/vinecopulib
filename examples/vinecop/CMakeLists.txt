@@ -18,7 +18,7 @@ find_package(Threads                      REQUIRED)
 
 # Set required variables for includes and libraries
 set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
-set(external_libs ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES})
+set(external_libs ${VINECOPULIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 # Include subdirectory with project sources
 add_subdirectory(src)
