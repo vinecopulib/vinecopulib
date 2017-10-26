@@ -359,7 +359,7 @@ inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> relabel_elements(
 //! @param t_start the tree level from where the matrix needs to be filled.
 //! @return a valid R-vine structure matrix (= passing all 
 //!     checks in `RVineMatrix()`).
-void RVineMatrix::complete_matrix(
+inline void RVineMatrix::complete_matrix(
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat, 
     size_t t_start) {
     using namespace tools_stl;
