@@ -62,6 +62,16 @@ if(BUILD_SHARED_LIBS)
 
         # Generate new header
         file(WRITE ${header_file} "${file_content}")
+        # If header does not exists or has changed, generate new header file
+        if(EXISTS "${header_file}")
+            file(READ ${header_file} old_content)
+            string(COMPARE NOTEQUAL "${file_content}" "${old_content}" has_changed)
+            if(has_changed)
+                file(WRITE ${header_file} "${file_content}")
+            endif()
+        else()
+            file(WRITE ${header_file} "${file_content}")
+        endif()
     endforeach ()
 
     file(GLOB_RECURSE vinecopulib_main_hpp ${vinecopulib_includes}/vinecopulib.hpp)
