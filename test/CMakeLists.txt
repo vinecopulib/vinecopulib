@@ -13,7 +13,7 @@ download_project(
 )
 
 include_directories(SYSTEM ${external_includes})
-include_directories(${CMAKE_BINARY_DIR}/generated/)
+include_directories(${CMAKE_BINARY_DIR}/generated/test/)
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 add_subdirectory(src_test)
 

@@ -10,6 +10,8 @@ include(cmake/findDependencies.cmake      REQUIRED)
 
 include(cmake/findDoxygen.cmake           REQUIRED)
 
+include(cmake/findHeaders.cmake           REQUIRED)
+
 include(cmake/compilerDefOpt.cmake        REQUIRED)
 
 include(cmake/buildTargets.cmake          REQUIRED)
