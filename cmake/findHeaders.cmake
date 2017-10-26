@@ -60,8 +60,6 @@ if(BUILD_SHARED_LIBS)
         string(REGEX REPLACE "#include <${ipp_file}>" ""
                 file_content "${file_content}")
 
-        # Generate new header
-        file(WRITE ${header_file} "${file_content}")
         # If header does not exists or has changed, generate new header file
         if(EXISTS "${header_file}")
             file(READ ${header_file} old_content)
