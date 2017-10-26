@@ -14,29 +14,22 @@
 #ifdef INTERFACED_FROM_R
     #include <RcppThread.h>
 #else
-
     #include <iostream>
-
 #endif
 
 // parallel backend
 #ifdef INTERFACED_FROM_R
-namespace tools_parallel {
-    typedef ThreadPool RcppThread::ThreadPool;
-    typedef process_num_threads RcppThread::process_num_threads;
-}
+    namespace tools_parallel { typedef RcppThread::ThreadPool ThreadPool; }
 #else
-
     #include <vinecopulib/misc/tools_parallel.hpp>
-
 #endif
 
 // for std::getenv() and std::atol()
 #include <cstdlib>
 
 namespace vinecopulib {
-
 namespace tools_interface {
+
 inline void print(std::string text) {
 #ifndef INTERFACED_FROM_R
     std::cout << text;
@@ -52,5 +45,6 @@ inline void check_user_interrupt(bool do_check = true) {
 #endif
     }
 }
+
 }
 }
