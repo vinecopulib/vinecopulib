@@ -79,13 +79,9 @@ public:
     void sparse_select_all_trees(const Eigen::MatrixXd &data);
 
 protected:
-    void truncate();
-
-    //! selects tree of vine copula, assuming all previous trees have
-    //! been fit.
     void select_tree(size_t t);
 
-    virtual void finalize() = 0;
+    virtual void finalize(size_t trunc_lvl) = 0;
 
     double get_loglik_of_tree(size_t t);
 
@@ -111,7 +107,6 @@ protected:
 
     size_t n_;
     size_t d_;
-    size_t trees_fitted_;
     FitControlsVinecop controls_;
     RVineMatrix vine_matrix_;
     std::vector<std::vector<Bicop>> pair_copulas_;
@@ -134,7 +129,8 @@ private:
 
     void remove_vertex_data(VineTree &tree);
 
-    void select_pair_copulas(VineTree &tree, const VineTree &tree_opt);
+    void select_pair_copulas(VineTree& tree, 
+                             const VineTree& tree_opt = VineTree());
 
     FoundEdge find_old_fit(double fit_id, const VineTree &old_graph);
 
@@ -156,7 +152,7 @@ public:
 private:
     void add_allowed_edges(VineTree &tree);
 
-    void finalize();
+    void finalize(size_t trunc_lvl);
 };
 
 class FamilySelector : public VinecopSelector {
@@ -176,7 +172,7 @@ private:
     bool belongs_to_structure(size_t v0, size_t v1,
                               const VineTree &vine_tree);
 
-    void finalize();
+    void finalize(size_t trunc_lvl);
 };
 
 }

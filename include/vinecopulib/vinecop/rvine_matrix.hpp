@@ -88,6 +88,10 @@ public:
 
     bool belongs_to_structure(const std::vector<size_t> conditioned,
                               const std::vector<size_t> conditioning);
+                              
+    static void complete_matrix(
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat, 
+        size_t t_start);
 
 private:
     void check_if_quadratic() const;
