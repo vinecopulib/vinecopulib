@@ -24,9 +24,6 @@
     #include <vinecopulib/misc/tools_parallel.hpp>
 #endif
 
-// for std::getenv() and std::atol()
-#include <cstdlib>
-
 namespace vinecopulib {
 namespace tools_interface {
 
