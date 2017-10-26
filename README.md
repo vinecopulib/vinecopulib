@@ -14,21 +14,21 @@ You can find a comprehensive list of publications and other materials on
 
 #### What is vinecopulib?
 
-vinecopulib is a C++ library for vine copula models based on
+vinecopulib is an header-only C++ library for vine copula models based on
 [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). It provides
-high-perfomance implementations of the core features of the popular
+high-performance implementations of the core features of the popular
 [VineCopula R library](https://github.com/tnagler/VineCopula), in particular
 inference algorithms for both vine copula and bivariate copula models.
 Advantages over VineCopula are  
-* interfaces to both both R and Python (coming soon)
+* a stand-alone C++ library with interfaces to both R and Python,
 * a sleaker and more modern API,
-* shorter runtimes, especially in high dimensions,
+* shorter runtimes and lower memory consumption, especially in high dimensions,
 * nonparametric and multi-parameter families.
 
 #### Status
 
-Version [0.1.0](https://github.com/vinecopulib/vinecopulib/releases) was
-released on August 23, 2017. While we did our best to
+Version [0.2.0](https://github.com/vinecopulib/vinecopulib/releases) was
+released on October 27, 2017. While we did our best to
 design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for
 [R](https://github.com/vinecopulib/rvinecopulib) and
@@ -89,6 +89,11 @@ R/RStudio. Therefore, prior to building the library, it is recommended to use:
 repos="http://cran.rstudio.com/")'`
 
 ### How to build the library
+
+By default, vinecopulib is header-only. It means that we use the CMake build 
+system, but only to build the documentation and unit-tests, and to automate 
+installation. If you just want to use vinecopulib, you can use the header files 
+(located in the`includes`folder) right away. Note that we use the 
 
 The unix one liner (from the root folder):
 
