@@ -31,9 +31,6 @@ namespace tools_parallel {
 
 #endif
 
-// for std::getenv() and std::atol()
-#include <cstdlib>
-
 namespace vinecopulib {
 
 namespace tools_interface {
