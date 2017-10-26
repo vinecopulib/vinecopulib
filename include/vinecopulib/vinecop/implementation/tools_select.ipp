@@ -81,6 +81,28 @@ inline RVineMatrix VinecopSelector::get_rvine_matrix() const {
     return vine_matrix_;
 }
 
+//! Initialize object for storing pair copulas
+//!
+//! @param d dimension of the vine copula.
+//! @param truncation_level a truncation level (optional).
+//! @return A nested vector such that `pc_store[t][e]` contains a Bicop.
+//!     object for the pair copula corresponding to tree `t` and edge `e`.
+inline std::vector<std::vector<Bicop>> VinecopSelector::make_pair_copula_store(
+    size_t d,
+    size_t truncation_level) {
+    if (d < 2) {
+        throw std::runtime_error("the dimension should be larger than 1");
+    }
+    
+    size_t n_trees = std::min(d - 1, truncation_level);
+    std::vector<std::vector<Bicop>> pc_store(n_trees);
+    for (size_t t = 0; t < n_trees; ++t) {
+        pc_store[t].resize(d - 1 - t);
+    }
+
+    return pc_store;
+}
+
 inline void VinecopSelector::select_all_trees(const Eigen::MatrixXd &data) {
     initialize_new_fit(data);
     for (size_t t = 0; t < d_ - 1; ++t) {
@@ -250,7 +272,6 @@ inline double VinecopSelector::get_next_threshold(
 
 inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
                                       const RVineMatrix &vine_matrix,
-                                      const std::vector<std::vector<Bicop>> &pair_copulas,
                                       const FitControlsVinecop &controls) {
     n_ = data.rows();
     d_ = data.cols();
@@ -260,7 +281,6 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
 }
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
-                                            const std::vector<std::vector<Bicop>> &pair_copulas,
                                             const FitControlsVinecop &controls) {
     n_ = data.rows();
     d_ = data.cols();
@@ -296,7 +316,7 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree) {
 
 inline void StructureSelector::finalize(size_t trunc_lvl) {
     using namespace tools_stl;
-    pair_copulas_ = Vinecop::make_pair_copula_store(d_, trunc_lvl);
+    pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d_, d_);
     mat.fill(0);
     std::vector<size_t> ning_set;
@@ -451,7 +471,7 @@ inline void FamilySelector::add_allowed_edges(VineTree &vine_tree) {
 }
 
 inline void FamilySelector::finalize(size_t trunc_lvl) {
-    pair_copulas_ = Vinecop::make_pair_copula_store(d_, trunc_lvl);
+    pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
     for (size_t tree = 0; tree < pair_copulas_.size(); tree++) {
         int edge = 0;
         // trees_[0] is base tree, vine copula starts at trees_[1]
@@ -514,8 +534,13 @@ inline void VinecopSelector::select_tree(size_t t) {
     }
     add_edge_info(new_tree);       // for pc estimation and next tree
     remove_vertex_data(new_tree);  // no longer needed
-    select_pair_copulas(new_tree, trees_opt_[t + 1]);
-
+    if (trees_opt_.size() > t + 1) {
+        select_pair_copulas(new_tree, trees_opt_[t + 1]);
+    } else {
+        select_pair_copulas(new_tree);
+    }
+    // make sure there is space for new tree
+    trees_.resize(t + 2);
     trees_[t + 1] = new_tree;
 }
 
@@ -751,7 +776,7 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
                 tree[e].pair_copula.select(tree[e].pc_data, controls_);
             }
         }
-
+        
         tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
         tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
         if (controls_.needs_sparse_select()) {
@@ -759,7 +784,7 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
             tree[e].npars = tree[e].pair_copula.calculate_npars();
         }
     };
-
+    
     size_t num_threads = controls_.get_num_threads();
     if (num_threads <= 1) {
         for (auto e : boost::edges(tree)) {

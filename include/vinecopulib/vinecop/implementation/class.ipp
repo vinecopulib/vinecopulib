@@ -130,6 +130,7 @@ inline Vinecop::Vinecop(const char *filename, bool check_matrix) :
 inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
                         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
                         FitControlsVinecop controls,
+                        bool check_matrix) {
     d_ = data.cols();
     vine_matrix_ = RVineMatrix(matrix, check_matrix);
     select_families(data, controls);
@@ -190,19 +191,11 @@ inline void Vinecop::to_json(const char *filename) {
 //! @param truncation_level a truncation level (optional).
 //! @return A nested vector such that `pc_store[t][e]` contains a Bicop.
 //!     object for the pair copula corresponding to tree `t` and edge `e`.
-inline std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(size_t d,
+inline std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(
+    size_t d,
     size_t truncation_level) {
-    if (d < 2) {
-        throw std::runtime_error("the dimension should be larger than 1");
-    }
-    
-    size_t n_trees = std::min(d - 1, truncation_level);
-    std::vector<std::vector<Bicop>> pc_store(n_trees);
-    for (size_t t = 0; t < n_trees; ++t) {
-        pc_store[t].resize(d - 1 - t);
-    }
-
-    return pc_store;
+    return tools_select::VinecopSelector::make_pair_copula_store(
+        d, truncation_level);
 }
 
 
@@ -219,7 +212,7 @@ inline std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(size_t d,
 inline void Vinecop::select_all(const Eigen::MatrixXd &data,
                                 FitControlsVinecop controls) {
     check_data_dim(data);
-    tools_select::StructureSelector selector(data, pair_copulas_, controls);
+    tools_select::StructureSelector selector(data, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
     } else {
@@ -236,8 +229,7 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
 inline void Vinecop::select_families(const Eigen::MatrixXd &data,
                                      FitControlsVinecop controls) {
     check_data_dim(data);
-    tools_select::FamilySelector selector(data, vine_matrix_, pair_copulas_,
-                                          controls);
+    tools_select::FamilySelector selector(data, vine_matrix_, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
     } else {

@@ -73,6 +73,10 @@ public:
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
     RVineMatrix get_rvine_matrix() const;
+    
+    static std::vector<std::vector<Bicop>> make_pair_copula_store(
+        size_t d,
+        size_t truncation_level);
 
     void select_all_trees(const Eigen::MatrixXd &data);
 
@@ -144,7 +148,6 @@ private:
 class StructureSelector : public VinecopSelector {
 public:
     StructureSelector(const Eigen::MatrixXd &data,
-                      const std::vector<std::vector<Bicop>> &pair_copulas,
                       const FitControlsVinecop &controls);
 
     ~StructureSelector() {}
@@ -159,7 +162,6 @@ class FamilySelector : public VinecopSelector {
 public:
     FamilySelector(const Eigen::MatrixXd &data,
                    const RVineMatrix &vine_matrix,
-                   const std::vector<std::vector<Bicop>> &pair_copulas,
                    const FitControlsVinecop &controls);
 
     ~FamilySelector() {}
