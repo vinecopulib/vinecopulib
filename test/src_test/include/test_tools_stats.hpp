@@ -7,6 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
+#include "test_vinecop_sanity_checks.hpp"
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
@@ -110,7 +111,7 @@ TEST(test_tools_stats, ghalton_is_correct) {
 
 }
 
-TEST(test_tools_stats, dpq_are_nan_safe) {
+TEST(test_tools_stats, dpqnorm_are_nan_safe) {
     Eigen::VectorXd X = Eigen::VectorXd::Random(10);
     X(0) = std::numeric_limits<double>::quiet_NaN();
     EXPECT_NO_THROW(tools_stats::dnorm(X));
@@ -127,5 +128,13 @@ TEST(test_tools_stats, dpt_are_nan_safe) {
     EXPECT_NO_THROW(tools_stats::qt(tools_stats::pt(X, nu), nu));
 }
 
+TEST(test_tools_stats, pbvt_and_pbvnorm_are_nan_safe) {
+    Eigen::MatrixXd X = Eigen::MatrixXd::Random(10, 2);
+    X(0) = std::numeric_limits<double>::quiet_NaN();
+    double rho = -0.5;
+    int nu = 5;
+    EXPECT_NO_THROW(tools_stats::pbvt(X, nu, rho));
+    EXPECT_NO_THROW(tools_stats::pbvnorm(X, rho));
+}
 
 }
