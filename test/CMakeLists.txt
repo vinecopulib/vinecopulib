@@ -13,11 +13,11 @@ download_project(
 )
 
 include_directories(SYSTEM ${external_includes})
-include_directories(${CMAKE_BINARY_DIR}/generated/)
+include_directories(${CMAKE_BINARY_DIR}/generated/test/)
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 add_subdirectory(src_test)
 
 foreach (app ${unit_tests})
     add_executable(${app} ${app}.cpp)
-    target_link_libraries(${app} gtest gmock vinecopulib ${external_libs} ${test_libs} src_test)
+    target_link_libraries(${app} gtest vinecopulib ${CMAKE_THREAD_LIBS_INIT} ${test_libs} src_test)
 endforeach ()
