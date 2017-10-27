@@ -92,26 +92,39 @@ repos="http://cran.rstudio.com/")'`
 
 By default, vinecopulib is header-only. It means that we use the CMake build 
 system, but only to build the documentation and unit-tests, and to automate 
-installation. If you just want to use vinecopulib, you can use the header files 
-(located in the`includes`folder) right away. Note that we use the 
+installation (i.e., place headers in the usual location). 
+If you just want to use vinecopulib, you can use the header files 
+(located in the`includes`folder) right away. 
 
 The unix one liner (from the root folder):
 
 `mkdir build && cd build && cmake .. && make && make doc &&
 sudo make install && bin/test_all`
 
+Alternatively, we provide an option to precompile compiled the library in 
+order to save building time (and memory) via the CMake option 
+`VINECOPULIB_SHARED_LIB`. In this case, source files are generated from header 
+files and the CMake build system additionally allows to install the 
+.dylib/.so/.dll object.
+
+The unix one liner (from the root folder):
+
+`mkdir build && cd build && cmake .. -DVINECOPULIB_SHARED_LIB && make && 
+make doc && sudo make install && bin/test_all`
+
 | Step | Shell command  |
 |-----------------------|------------------------------------|
 | Create a build folder  | `mkdir build` |
 | Move to the created folder  | `cd build` |
-| Create the `MakeFile` via cmake  |  `cmake .. ` (or `cmake .. -DCMAKE_BUILD_TYPE=Debug` for the `Debug` mode)  |
+| Create the `MakeFile` via cmake  |  `cmake .. ` (or `cmake .. -DVINECOPULIB_SHARED_LIB=ON` for the compiled version)  |
 | Compile the library | `make` or `make -j n` where `n` is the number of cores |
 | Build the documentation (optional)  | `make doc` |
 | Install the library on linux/OSX (optional)  | `sudo make install` |
 | Run unit tests (optional)  |  `bin/[test_executable]` |
 
-To compile the library without unit tests, the `MakeFile` can be created via
- `cmake .. -DBUILD_TESTING=OFF`.
+To install the library without unit tests, the `MakeFile` can be created via
+ `cmake .. -DBUILD_TESTING=OFF`. Additionally, a `Debug` mode is available via 
+ `cmake .. -DCMAKE_BUILD_TYPE=Debug`.
 
 On Windows, CMake will generate Visual Studio files instead of Makefiles,
 the following sequence of commands can be used to perform compilation using the command prompt:
@@ -123,7 +136,10 @@ cmake --build . --config Debug
 cmake --build . --config Release
 cmake --build . --config Release --target install
 ```
-Instead of the `cmake --build` commands, the generated `vinecopulib.sln` file can be open in the Visual Studio GUI.
+Instead of the `cmake --build` commands, the generated `vinecopulib.sln` file can be open in the Visual Studio GUI. Furthermore, 
+as for linux systems, the third line can be replaced by
+ `cmake .. -DVINECOPULIB_SHARED_LIB=ON` to generate the source files in order 
+ to compile vinecopulib in non-header-only mode.
 
 The following CMake flags (given with example values) will likely come handy:
 ```
@@ -141,8 +157,8 @@ The following CMake flags (given with example values) will likely come handy:
 Using `make install`, vinecopulib is installed in the usual location of the
 system, namely
 
-* `<prefix>/lib/` (for the shared library),
 * `<prefix>/include/` (for the headers),
+* `<prefix>/lib/` (for the shared library when `VINECOPULIB_SHARED_LIB=ON` is used),
 * `<prefix>/lib/cmake/vinecopulib` (to allow cmake to find the library
 with `find_package`),
 
@@ -166,13 +182,15 @@ cmake_minimum_required(VERSION 3.2)
 
 set(CMAKE_CXX_STANDARD 11)
 
-project(Example)
+project (Example)
 
 # Setting default folders
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # C++ compile flags
-set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O2 -DNDEBUG")
+if (NOT WIN32)
+  set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O2 -DNDEBUG")
+endif()
 
 # Find vinecopulib package and dependencies
 find_package(vinecopulib                  REQUIRED)
@@ -181,7 +199,7 @@ include(cmake/findEigen3.cmake            REQUIRED)
 
 # Set required variables for includes and libraries
 set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
-set(external_libs ${VINECOPULIB_LIBRARIES} ${Boost_LIBRARIES})
+set(external_libs ${VINECOPULIB_LIBRARIES}) # if vinecopulib has been built as a shared lib (does nothing otherwise)
 
 # Include subdirectory with project sources
 add_subdirectory(src)
@@ -195,10 +213,10 @@ could then be:
 # Include header files
 include_directories(${external_includes})
 
-# Add main executable
+# Add vinecopulib_main executable
 add_executable(main main.cpp)
 
-# Link to vinecopulib and dependencies
+# Link to vinecopulib if vinecopulib has been built as a shared lib (does nothing otherwise)
 target_link_libraries(main ${external_libs})
 ```
 
