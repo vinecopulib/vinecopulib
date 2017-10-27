@@ -19,6 +19,9 @@ NEW FEATURES
 
 BUG FIXES
 
+   * error thrown whenever `Vinecop` or `Bicop` constructors are called with
+    datasets containing a single row (#251).
+     
    * ensure `const` correctness of `Vinecop` and `Bicop` member functions 
      (#225).
    
