@@ -354,6 +354,8 @@ inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters) {
 
 //! @name Utilities
 //! @{
+//! useful functions for bivariate copulas
+
 //! adjust's the copula model to a change in the variable order.
 inline void Bicop::flip() {
     BicopFamily family = bicop_->get_family();
