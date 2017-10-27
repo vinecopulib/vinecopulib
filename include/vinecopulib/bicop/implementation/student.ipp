@@ -7,7 +7,6 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <boost/math/constants/constants.hpp>
 
-#include <iostream>
 namespace vinecopulib {
 inline StudentBicop::StudentBicop()
 {
