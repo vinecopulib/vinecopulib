@@ -7,7 +7,8 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 
 namespace vinecopulib {
-inline KernelBicop::KernelBicop() {
+inline KernelBicop::KernelBicop()
+{
     // construct default grid (equally spaced on Gaussian scale)
     size_t m = 30;
     Eigen::VectorXd grid_points(m);
@@ -21,42 +22,49 @@ inline KernelBicop::KernelBicop() {
 
 inline Eigen::VectorXd KernelBicop::pdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     return interp_grid_.interpolate(u);
 }
 
 inline Eigen::VectorXd KernelBicop::cdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     return interp_grid_.intergrate_2d(u);
 }
 
 inline Eigen::VectorXd KernelBicop::hfunc1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     return interp_grid_.intergrate_1d(u, 1);
 }
 
 inline Eigen::VectorXd KernelBicop::hfunc2(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     return interp_grid_.intergrate_1d(u, 2);
 }
 
 inline Eigen::VectorXd KernelBicop::hinv1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     return hinv1_num(u);
 }
 
 inline Eigen::VectorXd KernelBicop::hinv2(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     return hinv2_num(u);
 }
 
 inline double
-KernelBicop::parameters_to_tau(const Eigen::MatrixXd &parameters) {
+KernelBicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
+{
     set_parameters(parameters);
     Eigen::Matrix<double, Eigen::Dynamic, 2> U =
         tools_stats::ghalton((size_t) 1e3, (size_t) 2);
@@ -64,15 +72,18 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd &parameters) {
     return tools_stats::pairwise_tau(U);
 }
 
-inline double KernelBicop::calculate_npars() {
+inline double KernelBicop::calculate_npars()
+{
     return npars_;
 }
 
-inline Eigen::MatrixXd KernelBicop::get_parameters() const {
+inline Eigen::MatrixXd KernelBicop::get_parameters() const
+{
     return interp_grid_.get_values();
 }
 
-inline void KernelBicop::set_parameters(const Eigen::MatrixXd &parameters) {
+inline void KernelBicop::set_parameters(const Eigen::MatrixXd &parameters)
+{
     if (parameters.minCoeff() < 0) {
         std::stringstream message;
         message << "density should be larger than 0. ";
@@ -81,11 +92,13 @@ inline void KernelBicop::set_parameters(const Eigen::MatrixXd &parameters) {
     interp_grid_.set_values(parameters);
 }
 
-inline void KernelBicop::flip() {
+inline void KernelBicop::flip()
+{
     interp_grid_.flip();
 }
 
-inline Eigen::MatrixXd KernelBicop::tau_to_parameters(const double &tau) {
+inline Eigen::MatrixXd KernelBicop::tau_to_parameters(const double &tau)
+{
     return vinecopulib::no_tau_to_parameters(tau);
 }
 }

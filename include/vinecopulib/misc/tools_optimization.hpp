@@ -15,7 +15,8 @@ namespace vinecopulib {
 namespace tools_optimization {
 
 //! @brief A helper struct for (profile) maximum likelihood estimation
-typedef struct {
+typedef struct
+{
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &U; //!< the data.
     vinecopulib::ParBicop *bicop; //!< a pointer to the bivariate copula to optimize.
     double par0;  //!< main dependence parameter.
@@ -23,7 +24,8 @@ typedef struct {
 } ParBicopOptData;
 
 //! @brief A class for the controls to Bobyqa
-class BobyqaControls {
+class BobyqaControls
+{
 public:
 
     BobyqaControls();
@@ -52,7 +54,8 @@ private:
 };
 
 //! @brief A class for optimization (wrapping Bobyqa).
-class Optimizer {
+class Optimizer
+{
 public:
     Optimizer(unsigned int n_parameters,
               const Eigen::MatrixXd &lower_bounds,

@@ -21,7 +21,8 @@ const double sqrt_2 = std::sqrt(2.0);
 const double sqrt_0_5 = std::sqrt(0.5);
 const double one_plus_sqrt_2 = 1.0 + sqrt_2;
 
-inline constexpr double square(const double x) {
+inline constexpr double square(const double x)
+{
     return x * x;
 }
 
@@ -45,7 +46,8 @@ inline void altmov(
     double *const glag,
     double *const hcol,
     double *const w
-) {
+)
+{
     /* Local variables */
     double gw, diff;
     long ilbd, isbd;
@@ -393,7 +395,8 @@ void prelim(
     const double *const su,
     long &nf,
     long &kopt
-) {
+)
+{
     /* Local variables */
     long ih, nfm;
     long nfx = 0, ipt = 0, jpt = 0;
@@ -584,7 +587,8 @@ void prelim(
 
 }
 
-inline double less_abs(double lhs, double rhs) {
+inline double less_abs(double lhs, double rhs)
+{
     return std::abs(lhs) < std::abs(rhs);
 };
 
@@ -599,7 +603,8 @@ inline void update(
     const double denom,
     const long knew,
     double *const w
-) {
+)
+{
     /*     The arrays BMAT and ZMAT are updated, as required by the new position */
     /*     of the interpolation point that has the index KNEW. The vector VLAG has */
     /*     N+NPT components, set on entry to the first NPT and last N components */
@@ -711,7 +716,8 @@ void rescue(
     double *const ptsaux,
     double *const ptsid,
     double *const w
-) {
+)
+{
     /* Local variables */
     long ih, jp, iq, iw;
     double xp = 0, xq = 0, den = 0;
@@ -1209,7 +1215,8 @@ inline void trsbox(
     double *const hred,
     double *const dsq,
     double *const crvmin
-) {
+)
+{
     /* Local variables */
     double ds;
     long iu;
@@ -1692,7 +1699,8 @@ double bobyqb(
     double *const d,
     double *const vlag,
     double *const w
-) {
+)
+{
     /* Local variables */
     double f = 0;
     long ih, nf, jp;
@@ -2532,7 +2540,8 @@ double impl(
     const double rhoend,
     const long maxfun,
     double *w
-) {
+)
+{
     /*     This subroutine seeks the least value of a function of many variables, */
     /*     by applying a trust region method that forms quadratic models by */
     /*     interpolation. There is usually some freedom in the interpolation */

@@ -17,7 +17,8 @@ namespace vinecopulib {
 //!
 //! @literature
 //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
-class ArchimedeanBicop : public ParBicop {
+class ArchimedeanBicop : public ParBicop
+{
 private:
     // pdf, hfunctions and inverses
     Eigen::VectorXd pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u);

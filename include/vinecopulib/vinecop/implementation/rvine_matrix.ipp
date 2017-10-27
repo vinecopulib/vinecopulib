@@ -13,7 +13,8 @@ namespace vinecopulib {
 inline RVineMatrix::RVineMatrix(
     const Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
     bool check
-) {
+)
+{
     d_ = matrix.rows();
     matrix_ = matrix;
     if (check) {
@@ -26,12 +27,13 @@ inline RVineMatrix::RVineMatrix(
     }
 }
 
-//! extract matrix_(row, col)
+//! extract matrix(row, col)
 //!
 //! \param row
 //! \param col
-//! \return matrix_(row, col)
-inline size_t RVineMatrix::get_element(size_t row, size_t col) const {
+//! \return matrix(row, col)
+inline size_t RVineMatrix::get_element(size_t row, size_t col) const
+{
     if (row >= d_ || col >= d_) {
         throw std::runtime_error("row and col should be < d");
     }
@@ -39,24 +41,27 @@ inline size_t RVineMatrix::get_element(size_t row, size_t col) const {
 }
 
 //! extract the matrix.
+//!
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
-RVineMatrix::get_matrix() const {
+RVineMatrix::get_matrix() const
+{
     return matrix_;
 }
 
 //! extracts the variable order in the R-vine.
-inline Eigen::Matrix<size_t, Eigen::Dynamic, 1> RVineMatrix::get_order() const {
+//!
+inline Eigen::Matrix<size_t, Eigen::Dynamic, 1> RVineMatrix::get_order() const
+{
     return matrix_.colwise().reverse().diagonal().reverse();
 }
 
-//! constructs a D-vine matrix.
-//!
-//! A D-vine is a vine where each tree is a path.
+//! constructs a D-vine matrix, where each tree is a path.
 //!
 //! @param order order of the variables.
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
 RVineMatrix::construct_d_vine_matrix(
-    const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &order) {
+    const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &order)
+{
     size_t d = order.size();
     Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> vine_matrix(d, d);
     vine_matrix.fill(0);
@@ -79,15 +84,16 @@ RVineMatrix::construct_d_vine_matrix(
 //! @param conditioned the conditioned set.
 //! @param conditioning the conditioning set.
 inline bool
-RVineMatrix::belongs_to_structure(const std::vector<size_t> conditioned,
-                                  const std::vector<size_t> conditioning) {
+RVineMatrix::belongs_to_structure(const std::vector <size_t> conditioned,
+                                  const std::vector <size_t> conditioning)
+{
     if (conditioned.size() != 2) {
         throw std::runtime_error("conditioned should have size 2 ");
     }
 
     size_t tree = conditioning.size();
-    std::vector<size_t> conditioning_mat(tree);
-    std::vector<size_t> conditioned_mat(2);
+    std::vector <size_t> conditioning_mat(tree);
+    std::vector <size_t> conditioned_mat(2);
     if (tree + 2 <= d_) {
         for (size_t i = 0; i < d_ - tree - 1; ++i) {
             conditioned_mat = {matrix_(d_ - 1 - i, i), matrix_(tree, i)};
@@ -111,15 +117,15 @@ RVineMatrix::belongs_to_structure(const std::vector<size_t> conditioned,
 }
 
 
-//! extracts the R-vine matrix in natural order.
-//!
-//! Natural order means that the counter-diagonal has entries (d, ..., 1). We
+//! extracts the R-vine matrix in natural order, which means that the
+//! counter-diagonal has entries (d, ..., 1). We
 //! convert to natural order by relabeling the variables. Most algorithms for
 //! estimation and evaluation assume that the R-vine matrix is in natural order.
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
-RVineMatrix::in_natural_order() const {
+RVineMatrix::in_natural_order() const
+{
     // create vector of new variable labels: d, ..., 1
-    std::vector<size_t> ivec = tools_stl::seq_int(1, d_);
+    std::vector <size_t> ivec = tools_stl::seq_int(1, d_);
     tools_stl::reverse(ivec);
     Eigen::Map <Eigen::Matrix<size_t, Eigen::Dynamic, 1>> new_labels(&ivec[0],
                                                                      d_);
@@ -127,14 +133,14 @@ RVineMatrix::in_natural_order() const {
     return relabel_elements(matrix_, new_labels);
 }
 
-//! extracts the maximum matrix.
-//!
-//! The maximum matrix is derived from an R-vine matrix by iteratively computing
+//! extracts the maximum matrix, which is derived from an R-vine matrix by
+//! iteratively computing
 //! the (elementwise) maximum of a row and the row below (starting from the
 //! bottom). It is used in estimation and evaluation algorithms to find the right
 //! pseudo observations for an edge.
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
-RVineMatrix::get_max_matrix() const {
+RVineMatrix::get_max_matrix() const
+{
     auto max_matrix = this->in_natural_order();
     for (size_t i = 0; i < d_ - 1; ++i) {
         for (size_t j = 0; j < d_ - i - 1; ++j) {
@@ -147,7 +153,8 @@ RVineMatrix::get_max_matrix() const {
 //! extracts a matrix indicating which of the first h-functions are needed
 //! (it is usually not necessary to apply both h-functions for each
 //! pair-copula).
-inline MatrixXb RVineMatrix::get_needed_hfunc1() const {
+inline MatrixXb RVineMatrix::get_needed_hfunc1() const
+{
     MatrixXb needed_hfunc1 = MatrixXb::Constant(d_, d_, false);
 
     auto no_matrix = this->in_natural_order();
@@ -165,7 +172,8 @@ inline MatrixXb RVineMatrix::get_needed_hfunc1() const {
 //! extracts a matrix indicating which of the second h-functions are needed
 //! (it is usually not necessary to apply both h-functions for each
 //! pair-copula).
-inline MatrixXb RVineMatrix::get_needed_hfunc2() const {
+inline MatrixXb RVineMatrix::get_needed_hfunc2() const
+{
     MatrixXb needed_hfunc2 = MatrixXb::Constant(d_, d_, false);
     needed_hfunc2.block(0, 0, d_ - 1, 1) = MatrixXb::Constant(d_ - 1, 1, true);
     auto no_matrix = this->in_natural_order();
@@ -186,14 +194,16 @@ inline MatrixXb RVineMatrix::get_needed_hfunc2() const {
 //! @}
 
 
-inline void RVineMatrix::check_if_quadratic() const {
+inline void RVineMatrix::check_if_quadratic() const
+{
     std::string problem = "must be quadratic.";
     if (matrix_.rows() != matrix_.cols()) {
         throw std::runtime_error("not a valid R-vine matrix: " + problem);
     }
 }
 
-inline void RVineMatrix::check_lower_tri() const {
+inline void RVineMatrix::check_lower_tri() const
+{
     std::string problem = "the lower right triangle must only contain zeros";
     size_t sum_lwr = 0;
     for (size_t j = 1; j < d_; ++j) {
@@ -204,7 +214,8 @@ inline void RVineMatrix::check_lower_tri() const {
     }
 }
 
-inline void RVineMatrix::check_upper_tri() const {
+inline void RVineMatrix::check_upper_tri() const
+{
     std::string problem;
     problem += "the upper left triangle can only contain numbers ";
     problem += "between 1 and d (number of variables).";
@@ -219,19 +230,21 @@ inline void RVineMatrix::check_upper_tri() const {
     }
 }
 
-inline void RVineMatrix::check_antidiagonal() const {
+inline void RVineMatrix::check_antidiagonal() const
+{
     std::string problem;
     problem += "the antidiagonal must contain the numbers ";
     problem += "1, ..., d (the number of variables)";
     auto diag = matrix_.colwise().reverse().diagonal();
-    std::vector<size_t> diag_vec(d_);
+    std::vector <size_t> diag_vec(d_);
     Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&diag_vec[0], d_) = diag;
     if (!tools_stl::is_same_set(diag_vec, tools_stl::seq_int(1, d_))) {
         throw std::runtime_error("not a valid R-vine matrix: " + problem);
     }
 }
 
-inline void RVineMatrix::check_columns() const {
+inline void RVineMatrix::check_columns() const
+{
     using namespace tools_stl;
     auto no_matrix = in_natural_order();
     std::string problem;
@@ -243,7 +256,7 @@ inline void RVineMatrix::check_columns() const {
     // In natural order: column j only contains indices 1:(d - j).
     bool ok = true;
     for (size_t j = 0; j < d_; ++j) {
-        std::vector<size_t> col_vec(d_ - j);
+        std::vector <size_t> col_vec(d_ - j);
         Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&col_vec[0], d_ - j) =
             no_matrix.col(j).head(d_ - j);
         ok = ok & is_same_set(col_vec, seq_int(1, d_ - j));
@@ -253,14 +266,15 @@ inline void RVineMatrix::check_columns() const {
     }
 }
 
-inline void RVineMatrix::check_proximity_condition() const {
+inline void RVineMatrix::check_proximity_condition() const
+{
     using namespace tools_stl;
     for (size_t t = 1; t < d_ - 1; ++t) {
         for (size_t e = 0; e < d_ - t - 1; ++e) {
             // non-diagonal conditioned variable
             double v0 = matrix_(t, e);
             // conditioning set
-            std::vector<size_t> D0(t);
+            std::vector <size_t> D0(t);
             Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&D0[0], t) =
                 matrix_.col(e).head(t);
 
@@ -274,7 +288,7 @@ inline void RVineMatrix::check_proximity_condition() const {
                     continue;
                 }
                 // check if conditioning sets coincide
-                std::vector<size_t> D(t);
+                std::vector <size_t> D(t);
                 Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&D[0], t) =
                     matrix_.col(j).head(t);
                 if (is_same_set(D0, D)) {
@@ -295,7 +309,7 @@ inline void RVineMatrix::check_proximity_condition() const {
                     continue;
                 }
                 // check if conditioning sets coincide
-                std::vector<size_t> D(t);
+                std::vector <size_t> D(t);
                 Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&D[0], t - 1) =
                     matrix_.col(j).head(t - 1);
                 D[t - 1] = matrix_(d_ - j - 1, j); // add antidiagonal element
@@ -326,7 +340,8 @@ inline void RVineMatrix::check_proximity_condition() const {
 // translates matrix_entry from old to new labels
 inline size_t relabel_one(size_t x,
                           const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &old_labels,
-                          const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &new_labels) {
+                          const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &new_labels)
+{
     for (int i = 0; i < old_labels.size(); ++i) {
         if (x == old_labels[i]) {
             return new_labels[i];
@@ -338,7 +353,8 @@ inline size_t relabel_one(size_t x,
 // relabels all elements of the matrix (upper triangle assumed to be 0)
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> relabel_elements(
     const Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
-    const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &new_labels) {
+    const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &new_labels)
+{
     size_t d = matrix.rows();
     auto old_labels = matrix.colwise().reverse().diagonal();
     auto new_matrix = matrix;
@@ -360,21 +376,22 @@ inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> relabel_elements(
 //! @return a valid R-vine structure matrix (= passing all 
 //!     checks in `RVineMatrix()`).
 inline void RVineMatrix::complete_matrix(
-    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat, 
-    size_t t_start) {
+    Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &mat,
+    size_t t_start)
+{
     using namespace tools_stl;
     size_t d = mat.cols();
     // there are max d-2 off-diagonal entries in each column
     for (size_t t = t_start; t < d - 1; ++t) {
         // for each column, get all indices it already contains
-        std::vector<std::vector<size_t>> all_indices(d - t);
-        std::vector<size_t> tmp(t);
+        std::vector <std::vector<size_t>> all_indices(d - t);
+        std::vector <size_t> tmp(t);
         for (size_t e = 0; e < d - t; e++) {
             Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&tmp[0], t) =
-            mat.col(e).head(t);
+                mat.col(e).head(t);
             all_indices[e] = cat(mat(d - 1 - e, e), tmp);
         }
-        
+
         // fill row t column by column
         for (size_t e0 = 0; e0 < d - t; e0++) {
             // check all columns to the right of e0

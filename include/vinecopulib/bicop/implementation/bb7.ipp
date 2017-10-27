@@ -7,7 +7,8 @@
 #include <vinecopulib/misc/tools_integration.hpp>
 
 namespace vinecopulib {
-inline Bb7Bicop::Bb7Bicop() {
+inline Bb7Bicop::Bb7Bicop()
+{
     family_ = BicopFamily::bb7;
     parameters_ = Eigen::VectorXd(2);
     parameters_lower_bounds_ = Eigen::VectorXd(2);
@@ -17,19 +18,22 @@ inline Bb7Bicop::Bb7Bicop() {
     parameters_upper_bounds_ << 200, 200;
 }
 
-inline double Bb7Bicop::generator(const double &u) {
+inline double Bb7Bicop::generator(const double &u)
+{
     double theta = double(parameters_(0));
     double delta = double(parameters_(1));
     return std::pow(1 - std::pow(1 - u, theta), -delta) - 1;
 }
 
-inline double Bb7Bicop::generator_inv(const double &u) {
+inline double Bb7Bicop::generator_inv(const double &u)
+{
     double theta = double(parameters_(0));
     double delta = double(parameters_(1));
     return 1 - std::pow(1 - std::pow(1 + u, -1 / delta), 1 / theta);
 }
 
-inline double Bb7Bicop::generator_derivative(const double &u) {
+inline double Bb7Bicop::generator_derivative(const double &u)
+{
     double theta = double(parameters_(0));
     double delta = double(parameters_(1));
     double res =
@@ -37,7 +41,8 @@ inline double Bb7Bicop::generator_derivative(const double &u) {
     return -res * std::pow(1 - u, theta - 1);
 }
 
-inline double Bb7Bicop::generator_derivative2(const double &u) {
+inline double Bb7Bicop::generator_derivative2(const double &u)
+{
     double theta = double(parameters_(0));
     double delta = double(parameters_(1));
     double tmp = std::pow(1 - u, theta);
@@ -46,7 +51,8 @@ inline double Bb7Bicop::generator_derivative2(const double &u) {
     return res * (theta - 1 + (1 + delta * theta) * tmp);
 }
 
-inline double Bb7Bicop::parameters_to_tau(const Eigen::MatrixXd &parameters) {
+inline double Bb7Bicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
+{
     double theta = parameters(0);
     double delta = parameters(1);
     auto f = [&theta, &delta](const double &v) {
@@ -58,7 +64,8 @@ inline double Bb7Bicop::parameters_to_tau(const Eigen::MatrixXd &parameters) {
     return 1 + tools_integration::integrate_zero_to_one(f);
 }
 
-inline Eigen::MatrixXd Bb7Bicop::tau_to_parameters(const double &tau) {
+inline Eigen::MatrixXd Bb7Bicop::tau_to_parameters(const double &tau)
+{
     return vinecopulib::no_tau_to_parameters(tau);
 }
 }

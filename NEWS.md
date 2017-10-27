@@ -1,3 +1,38 @@
+# vinecopulib 0.2.0 (October 27, 2017)
+ 
+LIBRARY TYPE
+
+   * library is now header only by default (#246), with an option to compile it
+     as a shared library (#249).
+
+DEPENDENCIES
+
+   * removed dependency on `NLopt` (#239).
+
+NEW FEATURES
+ 
+   * NA handling (#237, #238).
+   
+   * parallelized selection/estimation of (pair-) copulas (#240).
+   
+   * efficient storage and fitting of truncated vines (#248).
+
+BUG FIXES
+
+   * error thrown whenever `Vinecop` or `Bicop` constructors are called with
+    datasets containing a single row (#251).
+     
+   * ensure `const` correctness of `Vinecop` and `Bicop` member functions 
+     (#225).
+   
+   * made order of inverse Rosenblatt consistent for d = 2 and d > 2 (#232).
+   
+   * fixed bug in interpolation near upper right corner (#233).
+   
+   * interpolation grid is now symmetric around (0.5, 0.5) (#234).
+   
+   * stabilize quadratic tll estimator near zero (#235).
+   
 # vinecopulib 0.1.0 (August 23, 2017)
 
 NEW FEATURES

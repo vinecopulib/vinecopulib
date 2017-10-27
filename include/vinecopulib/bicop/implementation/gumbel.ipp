@@ -9,7 +9,8 @@
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 
 namespace vinecopulib {
-inline GumbelBicop::GumbelBicop() {
+inline GumbelBicop::GumbelBicop()
+{
     family_ = BicopFamily::gumbel;
     parameters_ = Eigen::VectorXd(1);
     parameters_lower_bounds_ = Eigen::VectorXd(1);
@@ -19,20 +20,24 @@ inline GumbelBicop::GumbelBicop() {
     parameters_upper_bounds_ << 200;
 }
 
-inline double GumbelBicop::generator(const double &u) {
+inline double GumbelBicop::generator(const double &u)
+{
     return std::pow(std::log(1 / u), this->parameters_(0));
 }
 
-inline double GumbelBicop::generator_inv(const double &u) {
+inline double GumbelBicop::generator_inv(const double &u)
+{
     return std::exp(-std::pow(u, 1 / this->parameters_(0)));
 }
 
-inline double GumbelBicop::generator_derivative(const double &u) {
+inline double GumbelBicop::generator_derivative(const double &u)
+{
     double theta = double(this->parameters_(0));
     return std::pow(std::log(1 / u), theta - 1) * (-theta / u);
 }
 
-inline double GumbelBicop::generator_derivative2(const double &u) {
+inline double GumbelBicop::generator_derivative2(const double &u)
+{
     double theta = double(this->parameters_(0));
     return (theta - 1 - std::log(u)) * std::pow(std::log(1 / u), theta - 2) *
            (theta / std::pow(u, 2));
@@ -40,7 +45,8 @@ inline double GumbelBicop::generator_derivative2(const double &u) {
 
 inline Eigen::VectorXd GumbelBicop::hinv1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     double theta = double(this->parameters_(0));
     double u1, u2;
     Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
@@ -57,22 +63,26 @@ inline Eigen::VectorXd GumbelBicop::hinv1(
     return hinv;
 }
 
-inline Eigen::MatrixXd GumbelBicop::tau_to_parameters(const double &tau) {
+inline Eigen::MatrixXd GumbelBicop::tau_to_parameters(const double &tau)
+{
     return Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
 }
 
 inline double
-GumbelBicop::parameters_to_tau(const Eigen::MatrixXd &parameters) {
+GumbelBicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
+{
     return (parameters(0) - 1) / parameters(0);
 }
 
-inline Eigen::VectorXd GumbelBicop::get_start_parameters(const double tau) {
+inline Eigen::VectorXd GumbelBicop::get_start_parameters(const double tau)
+{
     return tau_to_parameters(tau);
 }
 }
 
 // This is copy&paste from the VineCopula package
-inline double qcondgum(double *q, double *u, double *de) {
+inline double qcondgum(double *q, double *u, double *de)
+{
     double a, p, g, gp, z1, z2, con, de1, dif;
     double mxdif;
     int iter;

@@ -19,7 +19,8 @@ namespace tools_optimization {
 //! @param objective The optimizer's objective function
 inline Optimizer::Optimizer(unsigned int n_parameters,
                             const Eigen::MatrixXd &lower_bounds,
-                            const Eigen::MatrixXd &upper_bounds) {
+                            const Eigen::MatrixXd &upper_bounds)
+{
     if (n_parameters < 1) {
         throw std::runtime_error("n_parameters should be larger than 0.");
     }
@@ -36,7 +37,8 @@ inline Optimizer::Optimizer(unsigned int n_parameters,
 //! @param maxeval maximal number of evaluations of the objective.
 inline void Optimizer::set_controls(double initial_trust_region,
                                     double final_trust_region,
-                                    int maxeval) {
+                                    int maxeval)
+{
     controls_ = BobyqaControls(initial_trust_region,
                                final_trust_region,
                                maxeval);
@@ -50,7 +52,8 @@ inline void Optimizer::set_controls(double initial_trust_region,
 //! final_trust_region_ = 1e3;
 //! maxeval_ = 1000;
 //! ```
-inline BobyqaControls::BobyqaControls() {
+inline BobyqaControls::BobyqaControls()
+{
     initial_trust_region_ = 1e-3;
     final_trust_region_ = 1e3;
     maxeval_ = 1000;
@@ -63,7 +66,8 @@ inline BobyqaControls::BobyqaControls() {
 //! @param maxeval maximal number of evaluations of the objective.
 inline BobyqaControls::BobyqaControls(double initial_trust_region,
                                       double final_trust_region,
-                                      int maxeval) {
+                                      int maxeval)
+{
     check_parameters(initial_trust_region, final_trust_region, maxeval);
     initial_trust_region_ = initial_trust_region;
     final_trust_region_ = final_trust_region;
@@ -72,7 +76,8 @@ inline BobyqaControls::BobyqaControls(double initial_trust_region,
 
 inline void BobyqaControls::check_parameters(double initial_trust_region,
                                              double final_trust_region,
-                                             int maxeval) {
+                                             int maxeval)
+{
     if (initial_trust_region <= 0) {
         throw std::runtime_error(
             "initial_trust_region should be larger than 0");
@@ -90,14 +95,23 @@ inline void BobyqaControls::check_parameters(double initial_trust_region,
 
 //! @return the initial trust region.
 inline double
-BobyqaControls::get_initial_trust_region() { return initial_trust_region_; };
+BobyqaControls::get_initial_trust_region()
+{
+    return initial_trust_region_;
+};
 
 //! @return the final trust region.
 inline double
-BobyqaControls::get_final_trust_region() { return final_trust_region_; };
+BobyqaControls::get_final_trust_region()
+{
+    return final_trust_region_;
+};
 
 //! @return the maximal number of evaluations of the objective.
-inline int BobyqaControls::get_maxeval() { return maxeval_; };
+inline int BobyqaControls::get_maxeval()
+{
+    return maxeval_;
+};
 
 //! @}
 
@@ -108,7 +122,8 @@ inline int BobyqaControls::get_maxeval() { return maxeval_; };
 //! @{
 
 //! evaluates the objective function for maximum likelihood estimation.
-inline double mle_objective(void *f_data, long n, const double *x) {
+inline double mle_objective(void *f_data, long n, const double *x)
+{
     ParBicopOptData *newdata = (ParBicopOptData *) f_data;
     ++newdata->objective_calls;
     Eigen::Map<const Eigen::VectorXd> par(&x[0], n);
@@ -118,7 +133,8 @@ inline double mle_objective(void *f_data, long n, const double *x) {
 
 //! evaluates the objective function for profile maximum likelihood
 //! estimation.
-inline double pmle_objective(void *f_data, long n, const double *x) {
+inline double pmle_objective(void *f_data, long n, const double *x)
+{
     ParBicopOptData *newdata = (ParBicopOptData *) f_data;
     ++newdata->objective_calls;
     Eigen::VectorXd par = Eigen::VectorXd::Ones(n + 1);
@@ -141,7 +157,8 @@ inline double pmle_objective(void *f_data, long n, const double *x) {
 //! @return the optimal parameters.
 inline Eigen::VectorXd Optimizer::optimize(Eigen::VectorXd initial_parameters,
                                            tools_bobyqa::BobyqaClosureFunction objective,
-                                           void *data) {
+                                           void *data)
+{
     if (initial_parameters.size() != n_parameters_) {
         throw std::runtime_error("The size of x should be n_parameters_.");
     }

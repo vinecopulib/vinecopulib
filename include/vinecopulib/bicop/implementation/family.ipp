@@ -10,7 +10,7 @@
 
 namespace vinecopulib {
 
-typedef boost::bimap<BicopFamily, std::string> family_bimap;
+typedef boost::bimap <BicopFamily, std::string> family_bimap;
 const family_bimap family_names =
     boost::assign::list_of<family_bimap::relation>
         (BicopFamily::indep, "Independence")
@@ -28,13 +28,15 @@ const family_bimap family_names =
 
 //! converts a BicopFamily into a string with its name.
 //! @param family the family.
-inline std::string get_family_name(BicopFamily family) {
+inline std::string get_family_name(BicopFamily family)
+{
     return family_names.left.at(family);
 };
 
 //! converts a string name into a BicopFamily.
 //! @param family the family name.
-inline BicopFamily get_family_enum(std::string family) {
+inline BicopFamily get_family_enum(std::string family)
+{
     return family_names.right.at(family);
 };
 }

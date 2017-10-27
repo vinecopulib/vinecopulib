@@ -16,7 +16,8 @@ namespace vinecopulib {
 //!
 //! The copula model is fully characterized by the family, rotation,
 //! and parameters.
-class Bicop {
+class Bicop
+{
 public:
     // Constructors
     Bicop();

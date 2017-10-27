@@ -7,7 +7,8 @@
 #include <vinecopulib/misc/tools_integration.hpp>
 
 namespace vinecopulib {
-inline Bb8Bicop::Bb8Bicop() {
+inline Bb8Bicop::Bb8Bicop()
+{
     family_ = BicopFamily::bb8;
     parameters_ = Eigen::VectorXd(2);
     parameters_lower_bounds_ = Eigen::VectorXd(2);
@@ -17,28 +18,32 @@ inline Bb8Bicop::Bb8Bicop() {
     parameters_upper_bounds_ << 200, 1;
 }
 
-inline double Bb8Bicop::generator(const double &u) {
+inline double Bb8Bicop::generator(const double &u)
+{
     double theta = double(parameters_(0));
     double delta = double(parameters_(1));
     double res = (1 - std::pow(1 - delta * u, theta));
     return -std::log(res / (1 - std::pow(1 - delta, theta)));
 }
 
-inline double Bb8Bicop::generator_inv(const double &u) {
+inline double Bb8Bicop::generator_inv(const double &u)
+{
     double theta = double(parameters_(0));
     double delta = double(parameters_(1));
     double res = std::exp(-u) * (std::pow(1 - delta, theta) - 1);
     return (1 - std::pow(1 + res, 1 / theta)) / delta;
 }
 
-inline double Bb8Bicop::generator_derivative(const double &u) {
+inline double Bb8Bicop::generator_derivative(const double &u)
+{
     double theta = double(parameters_(0));
     double delta = double(parameters_(1));
     double res = delta * theta * std::pow(1 - delta * u, theta - 1);
     return -res / (1 - std::pow(1 - delta * u, theta));
 }
 
-inline double Bb8Bicop::generator_derivative2(const double &u) {
+inline double Bb8Bicop::generator_derivative2(const double &u)
+{
     double theta = double(parameters_(0));
     double delta = double(parameters_(1));
     double tmp = std::pow(1 - delta * u, theta);
@@ -47,7 +52,8 @@ inline double Bb8Bicop::generator_derivative2(const double &u) {
     return res * (theta - 1 + tmp) / std::pow(tmp - 1, 2);
 }
 
-inline double Bb8Bicop::parameters_to_tau(const Eigen::MatrixXd &parameters) {
+inline double Bb8Bicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
+{
     double theta = parameters(0);
     double delta = parameters(1);
     auto f = [theta, delta](const double t) {
@@ -59,7 +65,8 @@ inline double Bb8Bicop::parameters_to_tau(const Eigen::MatrixXd &parameters) {
            4 / (delta * theta) * tools_integration::integrate_zero_to_one(f);
 }
 
-inline Eigen::MatrixXd Bb8Bicop::tau_to_parameters(const double &tau) {
+inline Eigen::MatrixXd Bb8Bicop::tau_to_parameters(const double &tau)
+{
     return vinecopulib::no_tau_to_parameters(tau);
 }
 }

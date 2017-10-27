@@ -8,7 +8,8 @@
 #include <boost/math/constants/constants.hpp>
 
 namespace vinecopulib {
-inline GaussianBicop::GaussianBicop() {
+inline GaussianBicop::GaussianBicop()
+{
     family_ = BicopFamily::gaussian;
     parameters_ = Eigen::VectorXd(1);
     parameters_lower_bounds_ = Eigen::VectorXd(1);
@@ -20,7 +21,8 @@ inline GaussianBicop::GaussianBicop() {
 
 inline Eigen::VectorXd GaussianBicop::pdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     // Inverse Cholesky of the correlation matrix
     double rho = double(this->parameters_(0));
     Eigen::Matrix2d L;
@@ -40,14 +42,16 @@ inline Eigen::VectorXd GaussianBicop::pdf(
 
 inline Eigen::VectorXd GaussianBicop::cdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     return tools_stats::pbvnorm(tools_stats::qnorm(u),
                                 double(this->parameters_(0)));
 }
 
 inline Eigen::VectorXd GaussianBicop::hfunc1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     double rho = double(this->parameters_(0));
     Eigen::VectorXd h = Eigen::VectorXd::Zero(u.rows());
     Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qnorm(u);
@@ -57,7 +61,8 @@ inline Eigen::VectorXd GaussianBicop::hfunc1(
 
 inline Eigen::VectorXd GaussianBicop::hinv1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     double rho = double(this->parameters_(0));
     Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
     Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qnorm(u);
@@ -65,11 +70,13 @@ inline Eigen::VectorXd GaussianBicop::hinv1(
     return tools_stats::pnorm(hinv);
 }
 
-inline Eigen::VectorXd GaussianBicop::get_start_parameters(const double tau) {
+inline Eigen::VectorXd GaussianBicop::get_start_parameters(const double tau)
+{
     return tau_to_parameters(tau);
 }
 
-inline Eigen::MatrixXd GaussianBicop::tau_to_parameters(const double &tau) {
+inline Eigen::MatrixXd GaussianBicop::tau_to_parameters(const double &tau)
+{
     Eigen::VectorXd parameters = this->parameters_;
     parameters(0) = sin(tau * boost::math::constants::pi<double>() / 2);
     return parameters;

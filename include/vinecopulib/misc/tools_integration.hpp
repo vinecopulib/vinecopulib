@@ -13,7 +13,8 @@ namespace vinecopulib {
 
 namespace tools_integration {
 
-inline double integrate_zero_to_one(std::function<double(double)> f) {
+inline double integrate_zero_to_one(std::function<double(double)> f)
+{
     boost::numeric::odeint::runge_kutta_dopri5<double> stepper;
     double lb = 1e-12;
     double ub = 1.0 - lb;

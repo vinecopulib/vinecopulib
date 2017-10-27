@@ -11,31 +11,37 @@
 #include <vinecopulib/misc/tools_bobyqa.hpp>
 
 namespace vinecopulib {
-inline Eigen::MatrixXd ParBicop::get_parameters() const {
+inline Eigen::MatrixXd ParBicop::get_parameters() const
+{
     return parameters_;
 }
 
-inline Eigen::MatrixXd ParBicop::get_parameters_lower_bounds() const {
+inline Eigen::MatrixXd ParBicop::get_parameters_lower_bounds() const
+{
     return parameters_lower_bounds_;
 }
 
-inline Eigen::MatrixXd ParBicop::get_parameters_upper_bounds() const {
+inline Eigen::MatrixXd ParBicop::get_parameters_upper_bounds() const
+{
     return parameters_upper_bounds_;
 }
 
-inline void ParBicop::set_parameters(const Eigen::MatrixXd &parameters) {
+inline void ParBicop::set_parameters(const Eigen::MatrixXd &parameters)
+{
     check_parameters(parameters);
     parameters_ = parameters;
 }
 
-inline void ParBicop::flip() {
+inline void ParBicop::flip()
+{
     // Most parametric families can be flipped by changing the rotation.
     // This is done in Bicop::flip() directly. All other families need to
     // override this method.
 }
 
 // calculate number of parameters
-inline double ParBicop::calculate_npars() {
+inline double ParBicop::calculate_npars()
+{
     // indepence copula has no parameters
     if (family_ == BicopFamily::indep) {
         return 0.0;
@@ -46,11 +52,12 @@ inline double ParBicop::calculate_npars() {
 
 // fit
 inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                          std::string method, double) {
+                          std::string method, double)
+{
     if (family_ != BicopFamily::indep) {
         using namespace tools_optimization;
 
-        std::vector<std::string> methods = {"itau", "mle"};
+        std::vector <std::string> methods = {"itau", "mle"};
         if (!tools_stl::is_member(method, methods)) {
             throw std::runtime_error("Method not implemented.");
         }
@@ -75,7 +82,8 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
             // ensure that starting values are sufficiently separated from
             // bounds
             double sign = 1.0;
-            if (tau < 0) sign = -1.0;
+            if (tau < 0)
+                sign = -1.0;
             if (std::abs(tau) < 0.01) {
                 tau = 0.01 * sign;
             } else if (std::abs(tau) > 0.9) {
@@ -120,14 +128,16 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 
 //! Sanity checks
 //! @{
-inline void ParBicop::check_parameters(const Eigen::MatrixXd &parameters) {
+inline void ParBicop::check_parameters(const Eigen::MatrixXd &parameters)
+{
     check_parameters_size(parameters);
     check_parameters_lower(parameters);
     check_parameters_upper(parameters);
 }
 
 
-inline void ParBicop::check_parameters_size(const Eigen::MatrixXd &parameters) {
+inline void ParBicop::check_parameters_size(const Eigen::MatrixXd &parameters)
+{
     if (parameters.size() != parameters_.size()) {
         if (parameters.rows() != parameters_.rows()) {
             std::stringstream message;
@@ -152,7 +162,8 @@ inline void ParBicop::check_parameters_size(const Eigen::MatrixXd &parameters) {
 
 
 inline void
-ParBicop::check_parameters_lower(const Eigen::MatrixXd &parameters) {
+ParBicop::check_parameters_lower(const Eigen::MatrixXd &parameters)
+{
     if (parameters_lower_bounds_.size() > 0) {
         std::stringstream message;
         if ((parameters.array() < parameters_lower_bounds_.array()).any()) {
@@ -168,7 +179,8 @@ ParBicop::check_parameters_lower(const Eigen::MatrixXd &parameters) {
 }
 
 inline void
-ParBicop::check_parameters_upper(const Eigen::MatrixXd &parameters) {
+ParBicop::check_parameters_upper(const Eigen::MatrixXd &parameters)
+{
     if (parameters_upper_bounds_.size() > 0) {
         std::stringstream message;
         if ((parameters.array() > parameters_upper_bounds_.array()).any()) {

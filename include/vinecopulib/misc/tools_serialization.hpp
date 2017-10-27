@@ -21,7 +21,8 @@ namespace tools_serialization {
 //! @return the corresponding boost::property_tree::ptree.
 template<class T>
 inline boost::property_tree::ptree matrix_to_ptree(
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix) {
+    Eigen::Matrix <T, Eigen::Dynamic, Eigen::Dynamic> matrix)
+{
     size_t rows = matrix.rows();
     size_t cols = matrix.cols();
 
@@ -44,8 +45,9 @@ inline boost::property_tree::ptree matrix_to_ptree(
 //! @param iroot the boost::property_tree::ptree to convert.
 //! @return the corresponding Eigen::Matrix.
 template<typename T>
-inline Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> ptree_to_matrix(
-    const boost::property_tree::ptree input) {
+inline Eigen::Matrix <T, Eigen::Dynamic, Eigen::Dynamic> ptree_to_matrix(
+    const boost::property_tree::ptree input)
+{
 
     std::vector<double> vec;
     size_t rows = 0;
@@ -78,7 +80,8 @@ inline Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> ptree_to_matrix(
     return matrix.cast<T>();
 };
 
-inline boost::property_tree::ptree json_to_ptree(const char *filename) {
+inline boost::property_tree::ptree json_to_ptree(const char *filename)
+{
     boost::property_tree::ptree output;
     boost::property_tree::read_json(filename, output);
     return output;

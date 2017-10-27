@@ -20,7 +20,8 @@ namespace tools_stats {
 //!
 //! @return An \f$ n \times d \f$ matrix of independent
 //! \f$ \mathrm{U}[0, 1] \f$ random variables.
-inline Eigen::MatrixXd simulate_uniform(size_t n, size_t d) {
+inline Eigen::MatrixXd simulate_uniform(size_t n, size_t d)
+{
     if ((n < 1) | (d < 1)) {
         throw std::runtime_error("both n and d must be at least 1.");
     }
@@ -41,7 +42,8 @@ inline Eigen::MatrixXd simulate_uniform(size_t n, size_t d) {
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
 //! @return Psuedo-observations of the copula, i.e. F_X(X) (column-wise)
 inline Eigen::MatrixXd
-to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method) {
+to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method)
+{
     for (int j = 0; j < x.cols(); ++j)
         x.col(j) = to_pseudo_obs_1d((Eigen::VectorXd) x.col(j), ties_method);
 
@@ -58,7 +60,8 @@ to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method) {
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
 //! @return Psuedo-observations of the copula, i.e. F_X(X) (column-wise)
 inline Eigen::VectorXd
-to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method) {
+to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
+{
     size_t n = x.size();
     std::vector<double> xvec(x.data(), x.data() + n);
     auto order = tools_stl::get_order(xvec);
@@ -89,7 +92,7 @@ to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method) {
             while ((i + reps < n) && (x[order[i]] == x[order[i + reps]]))
                 ++reps;
             // assign random rank between ties
-            std::vector<size_t> rvals(reps);
+            std::vector <size_t> rvals(reps);
             std::iota(rvals.begin(), rvals.end(), 0);  // 0, 1, 2, ...
             std::random_shuffle(rvals.begin(), rvals.end(), sim);
             for (size_t k = 0; k < reps; ++k)
@@ -109,7 +112,8 @@ to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method) {
 //! @{
 
 //! calculates the pairwise Kendall's \f$ \tau \f$.
-inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x) {
+inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
+{
     // C++ translation of a C code given by Shing (Eric) Fu, Feng Zhu, Guang
     // (Jack) Yang, and Harry Joe, based on work of the method by Knight (1966)
 
@@ -243,7 +247,8 @@ inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x) {
 }
 
 //! calculates the pairwise Pearson correlation.
-inline double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2> &x) {
+inline double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
+{
     double rho;
     auto z = x.rowwise() - x.colwise().mean();
     Eigen::MatrixXd sigma = z.adjoint() * z;
@@ -253,7 +258,8 @@ inline double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2> &x) {
 }
 
 //! calculates the pairwise Spearman's \f$ \rho \f$.
-inline double pairwise_rho(Eigen::Matrix<double, Eigen::Dynamic, 2> x) {
+inline double pairwise_rho(Eigen::Matrix<double, Eigen::Dynamic, 2> x)
+{
     x = to_pseudo_obs(x);
     double rho;
     auto z = x.rowwise() - x.colwise().mean();
@@ -264,7 +270,8 @@ inline double pairwise_rho(Eigen::Matrix<double, Eigen::Dynamic, 2> x) {
 }
 
 //! calculates the pair-wise Hoeffding's D.
-inline double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2> x) {
+inline double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2> x)
+{
     size_t n = x.rows();
 
     // Compute the ranks
@@ -308,7 +315,8 @@ inline double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2> x) {
 //!     or `"hoeffd"` for Hoeffding's \f$ D \f$.
 //! @return a quadratic matrix of pairwise dependence measures.
 inline Eigen::MatrixXd dependence_matrix(const Eigen::MatrixXd &x,
-                                         const std::string &measure) {
+                                         const std::string &measure)
+{
     int n = x.rows();
     int d = x.cols();
     Eigen::MatrixXd mat(d, d);
@@ -405,7 +413,8 @@ static Eigen::Matrix<int, ghalton_max_dim, 1> permTN2 = [] {
 //!
 //! @return An \f$ n \times d \f$ matrix of quasi-random
 //! \f$ \mathrm{U}[0, 1] \f$ variables.
-inline Eigen::MatrixXd ghalton(size_t n, size_t d) {
+inline Eigen::MatrixXd ghalton(size_t n, size_t d)
+{
 
     Eigen::MatrixXd res(d, n);
 
@@ -468,7 +477,8 @@ inline Eigen::MatrixXd ghalton(size_t n, size_t d) {
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
 inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
-                            int nu, double rho) {
+                            int nu, double rho)
+{
     size_t i1;
     double d1, d2, d3;
     static int hs, ks;
@@ -605,9 +615,11 @@ inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
 inline Eigen::VectorXd
 pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
-        double rho) {
+        double rho)
+{
 
-    static struct {
+    static struct
+    {
         double e_1[3];
         double fill_2[7];
         double e_3[6];
@@ -626,7 +638,8 @@ pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
                        .1491729864726037, .1527533871307259}};
     auto w = ((double *) &equiv_112);
 
-    static struct {
+    static struct
+    {
         double e_1[3];
         double fill_2[7];
         double e_3[6];

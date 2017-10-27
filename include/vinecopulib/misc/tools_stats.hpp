@@ -14,60 +14,81 @@ namespace vinecopulib {
 
 namespace tools_stats {
 
-//! @name Standard normal distribution
+
+//! Density function of the Standard normal distribution
 //!
 //! @param x evaluation points.
-//! @{
-
-//! evaluates the density function.
-inline Eigen::MatrixXd dnorm(const Eigen::MatrixXd &x) {
+//!
+//! @return An \f$ n \times d \f$ matrix of evaluated densities.
+inline Eigen::MatrixXd dnorm(const Eigen::MatrixXd &x)
+{
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
 };
 
-//! evaluates the distribution function.
-inline Eigen::MatrixXd pnorm(const Eigen::MatrixXd &x) {
+//! Distribution function of the Standard normal distribution
+//!
+//! @param x evaluation points.
+//!
+//! @return An \f$ n \times d \f$ matrix of evaluated probabilities.
+inline Eigen::MatrixXd pnorm(const Eigen::MatrixXd &x)
+{
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
 };
 
-//! evaluates the quantile function.
-inline Eigen::MatrixXd qnorm(const Eigen::MatrixXd &x) {
+//! Quantile function of the Standard normal distribution
+//!
+//! @param x evaluation points.
+//!
+//! @return An \f$ n \times d \f$ matrix of evaluated quantiles.
+inline Eigen::MatrixXd qnorm(const Eigen::MatrixXd &x)
+{
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
 };
-//! @}
 
-//! @name Student t distribution
-//! The mean is assumed to be zero.
+//! Density function of the Student t distribution
+//!
 //! @param x evaluation points.
 //! @param nu degrees of freedom parameter.
-//! @{
-
-//! evaluates the density function.
-inline Eigen::MatrixXd dt(const Eigen::MatrixXd &x, double nu) {
+//!
+//! @return An \f$ n \times d \f$ matrix of evaluated densities.
+inline Eigen::MatrixXd dt(const Eigen::MatrixXd &x, double nu)
+{
     boost::math::students_t dist(nu);
     auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
 };
 
-//! evaluates the distribution function.
-inline Eigen::MatrixXd pt(const Eigen::MatrixXd &x, double nu) {
+//! Distribution function of the Student t distribution
+//!
+//! @param x evaluation points.
+//! @param nu degrees of freedom parameter.
+//!
+//! @return An \f$ n \times d \f$ matrix of evaluated probabilities.
+inline Eigen::MatrixXd pt(const Eigen::MatrixXd &x, double nu)
+{
     boost::math::students_t dist(nu);
     auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
 };
 
-//! evaluates the  quantile function.
-inline Eigen::MatrixXd qt(const Eigen::MatrixXd &x, double nu) {
+//! Quantile function of the Student t distribution
+//!
+//! @param x evaluation points.
+//! @param nu degrees of freedom parameter.
+//!
+//! @return An \f$ n \times d \f$ matrix of evaluated quantiles.
+inline Eigen::MatrixXd qt(const Eigen::MatrixXd &x, double nu)
+{
     boost::math::students_t dist(nu);
     auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
 };
-//! @}
 
 Eigen::MatrixXd simulate_uniform(size_t n, size_t d);
 

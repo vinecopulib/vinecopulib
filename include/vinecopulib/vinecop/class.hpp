@@ -15,25 +15,28 @@ namespace vinecopulib {
 //!
 //! A vine copula model is characterized by the structure matrix (see
 //! RVineMatrix) and the pair-copulas.
-class Vinecop {
+class Vinecop
+{
 public:
     // Constructors
-    Vinecop() {}
+    Vinecop()
+    {
+    }
 
     Vinecop(size_t d);
 
-    Vinecop(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
+    Vinecop(const Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
             bool check_matrix = true);
 
-    Vinecop(const std::vector<std::vector<Bicop>> &pair_copulas,
-            const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
+    Vinecop(const std::vector <std::vector<Bicop>> &pair_copulas,
+            const Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
             bool check_matrix = true);
 
     Vinecop(const Eigen::MatrixXd &data,
             FitControlsVinecop controls = FitControlsVinecop());
 
     Vinecop(const Eigen::MatrixXd &data,
-            const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
+            const Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
             FitControlsVinecop controls = FitControlsVinecop(),
             bool check_matrix = true);
 
@@ -62,16 +65,16 @@ public:
 
     Eigen::VectorXd get_parameters(size_t tree, size_t edge) const;
 
-    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
+    Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
     // Getters for all pair copulas
-    std::vector<std::vector<Bicop>> get_all_pair_copulas() const;
+    std::vector <std::vector<Bicop>> get_all_pair_copulas() const;
 
-    std::vector<std::vector<BicopFamily>> get_all_families() const;
+    std::vector <std::vector<BicopFamily>> get_all_families() const;
 
-    std::vector<std::vector<int>> get_all_rotations() const;
+    std::vector <std::vector<int>> get_all_rotations() const;
 
-    std::vector<std::vector<Eigen::VectorXd>> get_all_parameters() const;
+    std::vector <std::vector<Eigen::VectorXd>> get_all_parameters() const;
 
     // Stats methods
     Eigen::VectorXd pdf(const Eigen::MatrixXd &u) const;
@@ -92,13 +95,13 @@ public:
     double bic(const Eigen::MatrixXd &u) const;
 
     // Misc methods
-    static std::vector<std::vector<Bicop>> make_pair_copula_store(size_t d,
-        size_t truncation_level = std::numeric_limits<size_t>::max());
+    static std::vector <std::vector<Bicop>> make_pair_copula_store(size_t d,
+                                                                   size_t truncation_level = std::numeric_limits<size_t>::max());
 
 private:
     size_t d_;
     RVineMatrix vine_matrix_;
-    std::vector<std::vector<Bicop>> pair_copulas_;
+    std::vector <std::vector<Bicop>> pair_copulas_;
 
     void check_data_dim(const Eigen::MatrixXd &data);
 

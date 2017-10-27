@@ -23,7 +23,8 @@ namespace vinecopulib {
 //! @literature
 //! Nagler, Thomas. *kdecopula: An R Package for the Kernel Estimation of
 //! Copula Densities*. arXiv:1603.04229 [stat.CO], 2016
-class KernelBicop : public AbstractBicop {
+class KernelBicop : public AbstractBicop
+{
 public:
     KernelBicop();
 

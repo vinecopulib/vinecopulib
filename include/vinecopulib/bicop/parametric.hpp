@@ -23,7 +23,8 @@ double pmle_objective(void *f_data, long n, const double *x);
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but
 //! always work with the Bicop interface.
-class ParBicop : public AbstractBicop {
+class ParBicop : public AbstractBicop
+{
     friend double tools_optimization::mle_objective(void *f_data, long n,
                                                     const double *x);
 

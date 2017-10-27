@@ -15,10 +15,16 @@
 // to allow for (auto e : boost::edges(g)) notation
 namespace std {
 template<class T>
-T begin(const std::pair<T, T> &eItPair) { return eItPair.first; }
+T begin(const std::pair<T, T> &eItPair)
+{
+    return eItPair.first;
+}
 
 template<class T>
-T end(const std::pair<T, T> &eItPair) { return eItPair.second; }
+T end(const std::pair<T, T> &eItPair)
+{
+    return eItPair.second;
+}
 }
 namespace vinecopulib {
 
@@ -33,7 +39,8 @@ Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
 double calculate_gic(double loglik, double npars, int n);
 
 // boost::graph represenation of a vine tree
-struct VertexProperties {
+struct VertexProperties
+{
     std::vector<size_t> conditioning;
     std::vector<size_t> conditioned;
     std::vector<size_t> all_indices;
@@ -41,7 +48,8 @@ struct VertexProperties {
     Eigen::VectorXd hfunc1;
     Eigen::VectorXd hfunc2;
 };
-struct EdgeProperties {
+struct EdgeProperties
+{
     std::vector<size_t> conditioning;
     std::vector<size_t> conditioned;
     std::vector<size_t> all_indices;
@@ -55,25 +63,26 @@ struct EdgeProperties {
     double npars;
     double fit_id;
 };
-typedef boost::adjacency_list<
-    boost::vecS,
-    boost::vecS,
-    boost::undirectedS,
-    VertexProperties,
-    boost::property<boost::edge_weight_t, double, EdgeProperties>
+typedef boost::adjacency_list <
+boost::vecS,
+boost::vecS,
+boost::undirectedS,
+VertexProperties,
+boost::property<boost::edge_weight_t, double, EdgeProperties>
 > VineTree;
 
 typedef boost::graph_traits<VineTree>::edge_descriptor EdgeIterator;
 typedef std::pair<EdgeIterator, bool> FoundEdge;
 
-class VinecopSelector {
+class VinecopSelector
+{
 public:
     virtual ~VinecopSelector() = 0;
 
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
     RVineMatrix get_rvine_matrix() const;
-    
+
     static std::vector<std::vector<Bicop>> make_pair_copula_store(
         size_t d,
         size_t truncation_level);
@@ -133,8 +142,8 @@ private:
 
     void remove_vertex_data(VineTree &tree);
 
-    void select_pair_copulas(VineTree& tree, 
-                             const VineTree& tree_opt = VineTree());
+    void select_pair_copulas(VineTree &tree,
+                             const VineTree &tree_opt = VineTree());
 
     FoundEdge find_old_fit(double fit_id, const VineTree &old_graph);
 
@@ -145,12 +154,15 @@ private:
     std::string get_pc_index(const EdgeIterator &e, const VineTree &tree);
 };
 
-class StructureSelector : public VinecopSelector {
+class StructureSelector : public VinecopSelector
+{
 public:
     StructureSelector(const Eigen::MatrixXd &data,
                       const FitControlsVinecop &controls);
 
-    ~StructureSelector() {}
+    ~StructureSelector()
+    {
+    }
 
 private:
     void add_allowed_edges(VineTree &tree);
@@ -158,13 +170,16 @@ private:
     void finalize(size_t trunc_lvl);
 };
 
-class FamilySelector : public VinecopSelector {
+class FamilySelector : public VinecopSelector
+{
 public:
     FamilySelector(const Eigen::MatrixXd &data,
                    const RVineMatrix &vine_matrix,
                    const FitControlsVinecop &controls);
 
-    ~FamilySelector() {}
+    ~FamilySelector()
+    {
+    }
 
 private:
     RVineMatrix vine_matrix_;
