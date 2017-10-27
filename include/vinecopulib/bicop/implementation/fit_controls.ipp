@@ -25,7 +25,7 @@ namespace vinecopulib {
 //!     based on symmetry properties of the data.
 //! @param num_threads number of concurrent threads to use while fitting
 //!     copulas for different families; never uses more than the number
-//!     returned by `std::thread::hardware_concurrency()``.
+//!     returned by `std::thread::hardware_concurrency()`.
 inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
                                           std::string parametric_method,
                                           std::string nonparametric_method,
