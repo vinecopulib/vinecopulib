@@ -426,6 +426,9 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
                           FitControlsBicop controls) {
     using namespace tools_select;
     data = tools_eigen::nan_omit(data);
+    if (data.rows() == 1) {
+        throw std::runtime_error("data must have more than one (non-nan) row");
+    }
     rotation_ = 0;
     data = cut_and_rotate(data);
     std::vector<Bicop> bicops = create_candidate_bicops(data, controls);

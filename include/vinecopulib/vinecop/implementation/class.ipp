@@ -132,6 +132,9 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
                         FitControlsVinecop controls,
                         bool check_matrix) {
     d_ = data.cols();
+    if (data.rows() == 1) {
+        throw std::runtime_error("data must have more than one row");
+    }
     vine_matrix_ = RVineMatrix(matrix, check_matrix);
     select_families(data, controls);
 }
@@ -145,6 +148,9 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
 inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
                         FitControlsVinecop controls) {
     d_ = data.cols();
+    if (data.rows() == 1) {
+        throw std::runtime_error("data must have more than one row");
+    }
     select_all(data, controls);
 }
 
