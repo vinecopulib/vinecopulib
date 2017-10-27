@@ -21,6 +21,18 @@ Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_ae0ba8000d
 Eigen\+::\+Vector\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a1e81bac0b4e1e9e0158b800a7db0d1af}{pbvt} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&z, int nu, double rho)
 \item 
 Eigen\+::\+Vector\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a6867eea2d193c7e5d78b30b9991397ad}{pbvnorm} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&z, double rho)
+\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a249880b93e82211207869f94821de440}{dnorm} (const Eigen\+::\+Matrix\+Xd \&x)
+\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_aa380a12540c4749e14049cdd0b163352}{pnorm} (const Eigen\+::\+Matrix\+Xd \&x)
+\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a4772a68417aa49b50e69c957db8533f7}{qnorm} (const Eigen\+::\+Matrix\+Xd \&x)
+\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_abc09bc02add2d7b7781aa42a406be7d9}{dt} (const Eigen\+::\+Matrix\+Xd \&x, double nu)
+\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a1f65dc25a8284fe4629f092969e2861a}{pt} (const Eigen\+::\+Matrix\+Xd \&x, double nu)
+\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a17eb427c3a562c72d2e87438da1cd279}{qt} (const Eigen\+::\+Matrix\+Xd \&x, double nu)
 \end{DoxyCompactItemize}
 \begin{Indent}{\bf Pairwise dependence measures}\par
 {\em 
@@ -42,44 +54,6 @@ double \hyperlink{namespacevinecopulib_1_1tools__stats_af45a0930d65c0392e35deab2
 double \hyperlink{namespacevinecopulib_1_1tools__stats_adda97526e428173da49899ef449560cf}{pairwise\+\_\+hoeffd} (Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ x)\hypertarget{namespacevinecopulib_1_1tools__stats_adda97526e428173da49899ef449560cf}{}\label{namespacevinecopulib_1_1tools__stats_adda97526e428173da49899ef449560cf}
 
 \begin{DoxyCompactList}\small\item\em calculates the pair-\/wise Hoeffding\textquotesingle{}s D. \end{DoxyCompactList}\end{DoxyCompactItemize}
-\end{Indent}
-\begin{Indent}{\bf Standard normal distribution}\par
-{\em 
-\begin{DoxyParams}{Parameters}
-{\em x} & evaluation points. \\
-\hline
-\end{DoxyParams}
-}\begin{DoxyCompactItemize}
-\item 
-Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a249880b93e82211207869f94821de440}{dnorm} (const Eigen\+::\+Matrix\+Xd \&x)\hypertarget{namespacevinecopulib_1_1tools__stats_a249880b93e82211207869f94821de440}{}\label{namespacevinecopulib_1_1tools__stats_a249880b93e82211207869f94821de440}
-
-\begin{DoxyCompactList}\small\item\em evaluates the density function. \end{DoxyCompactList}\item 
-Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_aa380a12540c4749e14049cdd0b163352}{pnorm} (const Eigen\+::\+Matrix\+Xd \&x)\hypertarget{namespacevinecopulib_1_1tools__stats_aa380a12540c4749e14049cdd0b163352}{}\label{namespacevinecopulib_1_1tools__stats_aa380a12540c4749e14049cdd0b163352}
-
-\begin{DoxyCompactList}\small\item\em evaluates the distribution function. \end{DoxyCompactList}\item 
-Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a4772a68417aa49b50e69c957db8533f7}{qnorm} (const Eigen\+::\+Matrix\+Xd \&x)\hypertarget{namespacevinecopulib_1_1tools__stats_a4772a68417aa49b50e69c957db8533f7}{}\label{namespacevinecopulib_1_1tools__stats_a4772a68417aa49b50e69c957db8533f7}
-
-\begin{DoxyCompactList}\small\item\em evaluates the quantile function. \end{DoxyCompactList}\end{DoxyCompactItemize}
-\end{Indent}
-\begin{Indent}{\bf Student t distribution}\par
-{\em The mean is assumed to be zero. 
-\begin{DoxyParams}{Parameters}
-{\em x} & evaluation points. \\
-\hline
-{\em nu} & degrees of freedom parameter. \\
-\hline
-\end{DoxyParams}
-}\begin{DoxyCompactItemize}
-\item 
-Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_abc09bc02add2d7b7781aa42a406be7d9}{dt} (const Eigen\+::\+Matrix\+Xd \&x, double nu)\hypertarget{namespacevinecopulib_1_1tools__stats_abc09bc02add2d7b7781aa42a406be7d9}{}\label{namespacevinecopulib_1_1tools__stats_abc09bc02add2d7b7781aa42a406be7d9}
-
-\begin{DoxyCompactList}\small\item\em evaluates the density function. \end{DoxyCompactList}\item 
-Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a1f65dc25a8284fe4629f092969e2861a}{pt} (const Eigen\+::\+Matrix\+Xd \&x, double nu)\hypertarget{namespacevinecopulib_1_1tools__stats_a1f65dc25a8284fe4629f092969e2861a}{}\label{namespacevinecopulib_1_1tools__stats_a1f65dc25a8284fe4629f092969e2861a}
-
-\begin{DoxyCompactList}\small\item\em evaluates the distribution function. \end{DoxyCompactList}\item 
-Eigen\+::\+Matrix\+Xd \hyperlink{namespacevinecopulib_1_1tools__stats_a17eb427c3a562c72d2e87438da1cd279}{qt} (const Eigen\+::\+Matrix\+Xd \&x, double nu)\hypertarget{namespacevinecopulib_1_1tools__stats_a17eb427c3a562c72d2e87438da1cd279}{}\label{namespacevinecopulib_1_1tools__stats_a17eb427c3a562c72d2e87438da1cd279}
-
-\begin{DoxyCompactList}\small\item\em evaluates the quantile function. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \end{Indent}
 
 
@@ -104,6 +78,43 @@ calculates a matrix of pairwise dependence measures.
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
 a quadratic matrix of pairwise dependence measures. 
+\end{DoxyReturn}
+\index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!dnorm@{dnorm}}
+\index{dnorm@{dnorm}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
+\subsubsection[{\texorpdfstring{dnorm(const Eigen\+::\+Matrix\+Xd \&x)}{dnorm(const Eigen::MatrixXd &x)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+stats\+::dnorm (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{namespacevinecopulib_1_1tools__stats_a249880b93e82211207869f94821de440}{}\label{namespacevinecopulib_1_1tools__stats_a249880b93e82211207869f94821de440}
+Density function of the Standard normal distribution
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & evaluation points.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An $ n \times d $ matrix of evaluated densities. 
+\end{DoxyReturn}
+\index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!dt@{dt}}
+\index{dt@{dt}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
+\subsubsection[{\texorpdfstring{dt(const Eigen\+::\+Matrix\+Xd \&x, double nu)}{dt(const Eigen::MatrixXd &x, double nu)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+stats\+::dt (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{x, }
+\item[{double}]{nu}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{namespacevinecopulib_1_1tools__stats_abc09bc02add2d7b7781aa42a406be7d9}{}\label{namespacevinecopulib_1_1tools__stats_abc09bc02add2d7b7781aa42a406be7d9}
+Density function of the Student t distribution
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & evaluation points. \\
+\hline
+{\em nu} & degrees of freedom parameter.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An $ n \times d $ matrix of evaluated densities. 
 \end{DoxyReturn}
 \index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!ghalton@{ghalton}}
 \index{ghalton@{ghalton}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
@@ -173,6 +184,80 @@ Based on the method described by Dunnett, C.\+W. and M. Sobel, (1954), A bivaria
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
 An $ n \times 1 $ vector of probabilities. 
+\end{DoxyReturn}
+\index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!pnorm@{pnorm}}
+\index{pnorm@{pnorm}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
+\subsubsection[{\texorpdfstring{pnorm(const Eigen\+::\+Matrix\+Xd \&x)}{pnorm(const Eigen::MatrixXd &x)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+stats\+::pnorm (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{namespacevinecopulib_1_1tools__stats_aa380a12540c4749e14049cdd0b163352}{}\label{namespacevinecopulib_1_1tools__stats_aa380a12540c4749e14049cdd0b163352}
+Distribution function of the Standard normal distribution
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & evaluation points.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An $ n \times d $ matrix of evaluated probabilities. 
+\end{DoxyReturn}
+\index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!pt@{pt}}
+\index{pt@{pt}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
+\subsubsection[{\texorpdfstring{pt(const Eigen\+::\+Matrix\+Xd \&x, double nu)}{pt(const Eigen::MatrixXd &x, double nu)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+stats\+::pt (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{x, }
+\item[{double}]{nu}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{namespacevinecopulib_1_1tools__stats_a1f65dc25a8284fe4629f092969e2861a}{}\label{namespacevinecopulib_1_1tools__stats_a1f65dc25a8284fe4629f092969e2861a}
+Distribution function of the Student t distribution
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & evaluation points. \\
+\hline
+{\em nu} & degrees of freedom parameter.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An $ n \times d $ matrix of evaluated probabilities. 
+\end{DoxyReturn}
+\index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!qnorm@{qnorm}}
+\index{qnorm@{qnorm}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
+\subsubsection[{\texorpdfstring{qnorm(const Eigen\+::\+Matrix\+Xd \&x)}{qnorm(const Eigen::MatrixXd &x)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+stats\+::qnorm (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{namespacevinecopulib_1_1tools__stats_a4772a68417aa49b50e69c957db8533f7}{}\label{namespacevinecopulib_1_1tools__stats_a4772a68417aa49b50e69c957db8533f7}
+Quantile function of the Standard normal distribution
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & evaluation points.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An $ n \times d $ matrix of evaluated quantiles. 
+\end{DoxyReturn}
+\index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!qt@{qt}}
+\index{qt@{qt}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}
+\subsubsection[{\texorpdfstring{qt(const Eigen\+::\+Matrix\+Xd \&x, double nu)}{qt(const Eigen::MatrixXd &x, double nu)}}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix\+Xd vinecopulib\+::tools\+\_\+stats\+::qt (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix\+Xd \&}]{x, }
+\item[{double}]{nu}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{namespacevinecopulib_1_1tools__stats_a17eb427c3a562c72d2e87438da1cd279}{}\label{namespacevinecopulib_1_1tools__stats_a17eb427c3a562c72d2e87438da1cd279}
+Quantile function of the Student t distribution
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & evaluation points. \\
+\hline
+{\em nu} & degrees of freedom parameter.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An $ n \times d $ matrix of evaluated quantiles. 
 \end{DoxyReturn}
 \index{vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}!simulate\+\_\+uniform@{simulate\+\_\+uniform}}
 \index{simulate\+\_\+uniform@{simulate\+\_\+uniform}!vinecopulib\+::tools\+\_\+stats@{vinecopulib\+::tools\+\_\+stats}}

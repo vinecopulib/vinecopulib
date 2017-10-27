@@ -175,19 +175,22 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>get_rotation</b> () co
 <tr class="memitem:a93ab0dd89826e50b209ea3760f251f2f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a93ab0dd89826e50b209ea3760f251f2f"></a>
 Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><b>get_parameters</b> () const </td></tr>
 <tr class="separator:a93ab0dd89826e50b209ea3760f251f2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e359624560a089273b25dc74879bd16"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a4e359624560a089273b25dc74879bd16">set_rotation</a> (int rotation)</td></tr>
+<tr class="memitem:a4e359624560a089273b25dc74879bd16"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e359624560a089273b25dc74879bd16"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_rotation</b> (int rotation)</td></tr>
 <tr class="separator:a4e359624560a089273b25dc74879bd16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8d1d4266b0fd7e2f971d0149f881ef9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#ac8d1d4266b0fd7e2f971d0149f881ef9">set_parameters</a> (const Eigen::MatrixXd &amp;parameters)</td></tr>
+<tr class="memitem:ac8d1d4266b0fd7e2f971d0149f881ef9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8d1d4266b0fd7e2f971d0149f881ef9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_parameters</b> (const Eigen::MatrixXd &amp;parameters)</td></tr>
 <tr class="separator:ac8d1d4266b0fd7e2f971d0149f881ef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Utilities</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>adjust's the copula model to a change in the variable order. </p>
+<tr><td colspan="2"><div class="groupText"><p>useful functions for bivariate copulas </p>
 </div></td></tr>
 <tr class="memitem:abe2b1406729a15c22e9588b0c38c4047"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abe2b1406729a15c22e9588b0c38c4047"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#abe2b1406729a15c22e9588b0c38c4047">str</a> () const </td></tr>
 <tr class="memdesc:abe2b1406729a15c22e9588b0c38c4047"><td class="mdescLeft">&#160;</td><td class="mdescRight">summarizes the model into a string (can be used for printing). <br /></td></tr>
 <tr class="separator:abe2b1406729a15c22e9588b0c38c4047"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59b7087b3857350df25ff684ab96f377"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a59b7087b3857350df25ff684ab96f377"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a59b7087b3857350df25ff684ab96f377">flip</a> ()</td></tr>
+<tr class="memdesc:a59b7087b3857350df25ff684ab96f377"><td class="mdescLeft">&#160;</td><td class="mdescRight">adjust's the copula model to a change in the variable order. <br /></td></tr>
 <tr class="separator:a59b7087b3857350df25ff684ab96f377"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -273,7 +276,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>equivalent to <code><a class="el" href="classvinecopulib_1_1_bicop.html" title="A class for bivariate copula models. ">Bicop</a> cop; cop.select(data, controls)</code>. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>create a copula model from the data, equivalent to <code><a class="el" href="classvinecopulib_1_1_bicop.html" title="A class for bivariate copula models. ">Bicop</a> cop; cop.select(data, controls)</code>. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>see <a class="el" href="classvinecopulib_1_1_bicop.html#af20af5c3ba6565628987b4784e9ac348">select()</a>. </td></tr>
     <tr><td class="paramname">controls</td><td>see <a class="el" href="classvinecopulib_1_1_bicop.html#af20af5c3ba6565628987b4784e9ac348">select()</a>. </td></tr>
@@ -365,8 +368,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>calculates the Akaike information criterion (AIC).</p>
-<p>The AIC is defined as </p><p class="formulaDsp">
+<p>calculates the Akaike information criterion (AIC), defined as </p><p class="formulaDsp">
 \[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \]
 </p>
 <p> where \( \mathrm{loglik} \) is the log-liklihood and \( p \) is the (effective) number of parameters of the model, see <a class="el" href="classvinecopulib_1_1_bicop.html#ad1ee397f2273ed07ba1d5d2ebff7ef1f">loglik()</a> and <a class="el" href="classvinecopulib_1_1_bicop.html#a6fbc58e9d4cd565e805347083cbcc63d">calculate_npars()</a>. The AIC is a consistent model selection criterion for nonparametric models.</p>
@@ -400,8 +402,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>calculates the Bayesian information criterion (BIC).</p>
-<p>The BIC is defined as </p><p class="formulaDsp">
+<p>calculates the Bayesian information criterion (BIC), defined as </p><p class="formulaDsp">
 \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \]
 </p>
 <p> where \( \mathrm{loglik} \) is the log-liklihood and \( p \) is the (effective) number of parameters of the model, see <a class="el" href="classvinecopulib_1_1_bicop.html#ad1ee397f2273ed07ba1d5d2ebff7ef1f">loglik()</a> and <a class="el" href="classvinecopulib_1_1_bicop.html#a6fbc58e9d4cd565e805347083cbcc63d">calculate_npars()</a>. The BIC is a consistent model selection criterion for nonparametric models.</p>
@@ -434,7 +435,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>calculates the effective number of parameters.</p>
 <p>Returns the actual number of parameters for parameteric families. For nonparametric families, there is a conceptually similar definition in the sense that it can be used in the calculation of fit statistics. </p>
 
 </div>
@@ -655,8 +655,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>calculates the log-likelihood.</p>
-<p>The log-likelihood is defined as </p><p class="formulaDsp">
+<p>calculates the log-likelihood, defined as </p><p class="formulaDsp">
 \[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \]
 </p>
 <p> where \( c \) is the copula density <a class="el" href="classvinecopulib_1_1_bicop.html#a0ee385fbc68736ebc6ddd52188686108">pdf()</a>.</p>
@@ -763,72 +762,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>selects the best fitting model.</p>
-<p>The function calls <a class="el" href="classvinecopulib_1_1_bicop.html#a2d509a8b404a73ef17f04a0678e90a71">fit()</a> for all families in <code>family_set</code>) and selects the best fitting model by either BIC or AIC, see <a class="el" href="classvinecopulib_1_1_bicop.html#a5935f84a33d80dbe7cbc6d071a1e8d75">bic()</a> and <a class="el" href="classvinecopulib_1_1_bicop.html#afa2b49c6c6da183f8cb365981d4d559c">aic()</a>.</p>
+<p>selects the best fitting model, by calling <a class="el" href="classvinecopulib_1_1_bicop.html#a2d509a8b404a73ef17f04a0678e90a71">fit()</a> for all families in <code>family_set</code> and selecting the best fitting model by either BIC or AIC, see <a class="el" href="classvinecopulib_1_1_bicop.html#a5935f84a33d80dbe7cbc6d071a1e8d75">bic()</a> and <a class="el" href="classvinecopulib_1_1_bicop.html#afa2b49c6c6da183f8cb365981d4d559c">aic()</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>an \( n \times 2 \) matrix of observations contained in \((0, 1)^2 \). </td></tr>
     <tr><td class="paramname">controls</td><td>the controls (see <a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html" title="A class for controlling fit of bivariate copula models. ">FitControlsBicop</a>). </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ac8d1d4266b0fd7e2f971d0149f881ef9"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void vinecopulib::Bicop::set_parameters </td>
-          <td>(</td>
-          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
-          <td class="paramname"><em>parameters</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">parameters</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="a4e359624560a089273b25dc74879bd16"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void vinecopulib::Bicop::set_rotation </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>rotation</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">rotation</td><td></td></tr>
   </table>
   </dd>
 </dl>
@@ -969,7 +907,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>flip</b> ()</td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Oct 27 2017 04:39:58 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 27 2017 05:09:44 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

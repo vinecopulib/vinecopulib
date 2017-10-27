@@ -121,13 +121,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a966316e211937ae11e840ef7540a492f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a873a94d9065ec4e70f43245c5841741b"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a873a94d9065ec4e70f43245c5841741b">get_element</a> (size_t row, size_t col) const </td></tr>
 <tr class="separator:a873a94d9065ec4e70f43245c5841741b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37c79233fca1e56e1535cbb37f8d3177"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37c79233fca1e56e1535cbb37f8d3177"></a>
-Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a37c79233fca1e56e1535cbb37f8d3177">get_matrix</a> () const </td></tr>
-<tr class="memdesc:a37c79233fca1e56e1535cbb37f8d3177"><td class="mdescLeft">&#160;</td><td class="mdescRight">extract the matrix. <br /></td></tr>
+<tr class="memitem:a37c79233fca1e56e1535cbb37f8d3177"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a37c79233fca1e56e1535cbb37f8d3177">get_matrix</a> () const </td></tr>
 <tr class="separator:a37c79233fca1e56e1535cbb37f8d3177"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71554c734c3cbb4c066c1f17fe94a284"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a71554c734c3cbb4c066c1f17fe94a284"></a>
-Eigen::Matrix&lt; size_t, Eigen::Dynamic, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a71554c734c3cbb4c066c1f17fe94a284">get_order</a> () const </td></tr>
-<tr class="memdesc:a71554c734c3cbb4c066c1f17fe94a284"><td class="mdescLeft">&#160;</td><td class="mdescRight">extracts the variable order in the R-vine. <br /></td></tr>
+<tr class="memitem:a71554c734c3cbb4c066c1f17fe94a284"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; size_t, Eigen::Dynamic, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a71554c734c3cbb4c066c1f17fe94a284">get_order</a> () const </td></tr>
 <tr class="separator:a71554c734c3cbb4c066c1f17fe94a284"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e63d8b01e1d89284ca28192676b8a3f"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a4e63d8b01e1d89284ca28192676b8a3f">in_natural_order</a> () const </td></tr>
 <tr class="separator:a4e63d8b01e1d89284ca28192676b8a3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -311,8 +307,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>constructs a D-vine matrix.</p>
-<p>A D-vine is a vine where each tree is a path.</p>
+<p>constructs a D-vine matrix, where each tree is a path.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">order</td><td>order of the variables. </td></tr>
@@ -353,7 +348,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>extract matrix_(row, col)</p>
+<p>extract matrix(row, col)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">row</td><td></td></tr>
@@ -361,7 +356,31 @@ Static Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>matrix_(row, col) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>matrix(row, col) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a37c79233fca1e56e1535cbb37f8d3177"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; vinecopulib::RVineMatrix::get_matrix </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>extract the matrix. </p>
 
 </div>
 </div>
@@ -385,8 +404,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>extracts the maximum matrix.</p>
-<p>The maximum matrix is derived from an R-vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge. </p>
+<p>extracts the maximum matrix, which is derived from an R-vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge. </p>
 
 </div>
 </div>
@@ -438,6 +456,30 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a71554c734c3cbb4c066c1f17fe94a284"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::Matrix&lt; size_t, Eigen::Dynamic, 1 &gt; vinecopulib::RVineMatrix::get_order </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>extracts the variable order in the R-vine. </p>
+
+</div>
+</div>
 <a class="anchor" id="a4e63d8b01e1d89284ca28192676b8a3f"></a>
 <div class="memitem">
 <div class="memproto">
@@ -458,8 +500,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>extracts the R-vine matrix in natural order.</p>
-<p>Natural order means that the counter-diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-vine matrix is in natural order. </p>
+<p>extracts the R-vine matrix in natural order, which means that the counter-diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-vine matrix is in natural order. </p>
 
 </div>
 </div>
@@ -476,7 +517,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Oct 27 2017 04:39:58 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 27 2017 05:09:44 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

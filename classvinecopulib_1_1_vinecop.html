@@ -336,8 +336,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>constructs a vine copula model from data.</p>
-<p>The function creates a model and calls <a class="el" href="classvinecopulib_1_1_vinecop.html#ad6cbb6b69c41f13a6e5e46ece44c0f78">select_all()</a>.</p>
+<p>constructs a vine copula model from data by creating a model and calling <a class="el" href="classvinecopulib_1_1_vinecop.html#ad6cbb6b69c41f13a6e5e46ece44c0f78">select_all()</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>an \( n \times d \) matrix of observations. </td></tr>
@@ -391,8 +390,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>constructs a vine copula model from data.</p>
-<p>The function creates a model and calls select_family().</p>
+<p>constructs a vine copula model from data by creating a model and calling select_family().</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>an \( n \times d \) matrix of observations. </td></tr>
@@ -509,8 +507,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>calculates the Akaike information criterion (AIC).</p>
-<p>The AIC is defined as </p><p class="formulaDsp">
+<p>calculates the Akaike information criterion (AIC), whic is defined as </p><p class="formulaDsp">
 \[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \]
 </p>
 <p> where \( \mathrm{loglik} \) is the log-liklihood and \( p \) is the (effective) number of parameters of the model, see <a class="el" href="classvinecopulib_1_1_vinecop.html#a70fcdd664b8698981d5dd1e62ef774b5">loglik()</a> and <a class="el" href="classvinecopulib_1_1_vinecop.html#a1dbef6faadcd231396d5cfd5c785cf24">calculate_npars()</a>. The AIC is a consistent model selection criterion for nonparametric models.</p>
@@ -544,8 +541,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>calculates the Bayesian information criterion (BIC).</p>
-<p>The BIC is defined as </p><p class="formulaDsp">
+<p>calculates the Bayesian information criterion (BIC), which is defined as </p><p class="formulaDsp">
 \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \]
 </p>
 <p> where \( \mathrm{loglik} \) is the log-liklihood and \( p \) is the (effective) number of parameters of the model, see <a class="el" href="classvinecopulib_1_1_vinecop.html#a70fcdd664b8698981d5dd1e62ef774b5">loglik()</a> and <a class="el" href="classvinecopulib_1_1_vinecop.html#a1dbef6faadcd231396d5cfd5c785cf24">calculate_npars()</a>. The BIC is a consistent model selection criterion for nonparametric models.</p>
@@ -578,8 +574,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>calculates the effective number of parameters.</p>
-<p>Returns sum of the number of parameters for all pair copulas (see <a class="el" href="classvinecopulib_1_1_bicop.html#a6fbc58e9d4cd565e805347083cbcc63d">Bicop::calculate_npars()</a>). </p>
+<p>returns sum of the number of parameters for all pair copulas (see <a class="el" href="classvinecopulib_1_1_bicop.html#a6fbc58e9d4cd565e805347083cbcc63d">Bicop::calculate_npars()</a>). </p>
 
 </div>
 </div>
@@ -914,8 +909,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>calculates the inverse Rosenblatt transform for a vine copula model.</p>
-<p>The inverse Rosenblatt transform can be used for simulation: the function applied to independent uniform variates resembles simulated data from the vine copula model.</p>
+<p>calculates the inverse Rosenblatt transform for a vine copula model, which can be used for simulation: the function applied to independent uniform variates resembles simulated data from the vine copula model.</p>
 <p>If the problem is too large, it is split recursively into halves (w.r.t. n, the number of observations). "Too large" means that the required memory will exceed 1 GB. An examplary configuration requiring less than 1 GB is \( n = 1000 \), \(d = 200\).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -947,8 +941,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>calculates the log-likelihood.</p>
-<p>The log-likelihood is defined as </p><p class="formulaDsp">
+<p>calculates the log-likelihood, which is defined as </p><p class="formulaDsp">
 \[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \]
 </p>
 <p> where \( c \) is the copula density <a class="el" href="classvinecopulib_1_1_vinecop.html#a488cb8865a6b018d1cb98d0cf12f3c81">pdf()</a>.</p>
@@ -1066,8 +1059,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>automatically fits and selects a vine copula model</p>
-<p>Selection of the structure is performed using the algorithm of Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013). <em>Selecting and estimating regular vine copulae and application to financial returns.</em> Computational Statistics &amp; Data Analysis, 59 (1), 52-69.</p>
+<p>automatically fits and selects a vine copula model. Selection of the structure is performed using the algorithm of Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013). <em>Selecting and estimating regular vine copulae and application to financial returns.</em> Computational Statistics &amp; Data Analysis, 59 (1), 52-69.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>nxd matrix of copula data. </td></tr>
@@ -1172,8 +1164,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Write the copula object into a JSON file</p>
-<p>See <a class="el" href="classvinecopulib_1_1_vinecop.html#a5543cc3ef415c850ac71d092e4f4a0aa">to_ptree()</a> for the structure of the file.</p>
+<p>Write the copula object into a JSON file. See <a class="el" href="classvinecopulib_1_1_vinecop.html#a5543cc3ef415c850ac71d092e4f4a0aa">to_ptree()</a> for the structure of the file.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">filename</td><td>the name of the file to write. </td></tr>
@@ -1203,8 +1194,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Convert the copula into a boost::property_tree::ptree object</p>
-<p>The ptree object contains two nodes : <code>"matrix"</code> and <code>"pair copulas"</code>. The former is encodes the R-Vine structure and the latter is a list of child nodes for the trees (<code>"tree1"</code>, <code>"tree2"</code>, etc), each containing a list of child nodes for the edges (<code>"pc1"</code>, <code>"pc2"</code>, etc). See <a class="el" href="classvinecopulib_1_1_bicop.html#a74aeb9fd66cee77afd30c8a29dbd5040">Bicop::to_ptree()</a> for the encoding of pair-copulas.</p>
+<p>Convert the copula into a boost::property_tree::ptree object, which contains two nodes : <code>"matrix"</code> and <code>"pair copulas"</code>. The former is encodes the R-Vine structure and the latter is a list of child nodes for the trees (<code>"tree1"</code>, <code>"tree2"</code>, etc), each containing a list of child nodes for the edges (<code>"pc1"</code>, <code>"pc2"</code>, etc). See <a class="el" href="classvinecopulib_1_1_bicop.html#a74aeb9fd66cee77afd30c8a29dbd5040">Bicop::to_ptree()</a> for the encoding of pair-copulas.</p>
 <dl class="section return"><dt>Returns</dt><dd>the boost::property_tree::ptree object containing the copula. </dd></dl>
 
 </div>
@@ -1222,7 +1212,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Oct 27 2017 04:39:58 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 27 2017 05:09:44 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

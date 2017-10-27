@@ -139,9 +139,7 @@ creates an arbitrary vine copula model.
 \item[{{\bf Fit\+Controls\+Vinecop}}]{controls = {\ttfamily {\bf Fit\+Controls\+Vinecop}()}}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_vinecop_a1bba8d207a21b5d0c76660af40383822}{}\label{classvinecopulib_1_1_vinecop_a1bba8d207a21b5d0c76660af40383822}
-constructs a vine copula model from data.
-
-The function creates a model and calls \hyperlink{classvinecopulib_1_1_vinecop_ad6cbb6b69c41f13a6e5e46ece44c0f78}{select\+\_\+all()}.
+constructs a vine copula model from data by creating a model and calling \hyperlink{classvinecopulib_1_1_vinecop_ad6cbb6b69c41f13a6e5e46ece44c0f78}{select\+\_\+all()}.
 
 
 \begin{DoxyParams}{Parameters}
@@ -160,9 +158,7 @@ The function creates a model and calls \hyperlink{classvinecopulib_1_1_vinecop_a
 \item[{bool}]{check\+\_\+matrix = {\ttfamily true}}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_vinecop_aa38ebdd3582482fad7d1ace027a9c162}{}\label{classvinecopulib_1_1_vinecop_aa38ebdd3582482fad7d1ace027a9c162}
-constructs a vine copula model from data.
-
-The function creates a model and calls select\+\_\+family().
+constructs a vine copula model from data by creating a model and calling select\+\_\+family().
 
 
 \begin{DoxyParams}{Parameters}
@@ -215,9 +211,7 @@ creates from a boost\+::property\+\_\+tree\+::ptree object
 \item[{const Eigen\+::\+Matrix\+Xd \&}]{u}
 \end{DoxyParamCaption}
 ) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_vinecop_a46065cced188399d7baffb21cbbdf00b}{}\label{classvinecopulib_1_1_vinecop_a46065cced188399d7baffb21cbbdf00b}
-calculates the Akaike information criterion (A\+IC).
-
-The A\+IC is defined as \[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ p $ is the (effective) number of parameters of the model, see \hyperlink{classvinecopulib_1_1_vinecop_a70fcdd664b8698981d5dd1e62ef774b5}{loglik()} and \hyperlink{classvinecopulib_1_1_vinecop_a1dbef6faadcd231396d5cfd5c785cf24}{calculate\+\_\+npars()}. The A\+IC is a consistent model selection criterion for nonparametric models.
+calculates the Akaike information criterion (A\+IC), whic is defined as \[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ p $ is the (effective) number of parameters of the model, see \hyperlink{classvinecopulib_1_1_vinecop_a70fcdd664b8698981d5dd1e62ef774b5}{loglik()} and \hyperlink{classvinecopulib_1_1_vinecop_a1dbef6faadcd231396d5cfd5c785cf24}{calculate\+\_\+npars()}. The A\+IC is a consistent model selection criterion for nonparametric models.
 
 
 \begin{DoxyParams}{Parameters}
@@ -231,9 +225,7 @@ The A\+IC is defined as \[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \] where $
 \item[{const Eigen\+::\+Matrix\+Xd \&}]{u}
 \end{DoxyParamCaption}
 ) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_vinecop_a9a55f28dcede1b40c70722714f229cd6}{}\label{classvinecopulib_1_1_vinecop_a9a55f28dcede1b40c70722714f229cd6}
-calculates the Bayesian information criterion (B\+IC).
-
-The B\+IC is defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ p $ is the (effective) number of parameters of the model, see \hyperlink{classvinecopulib_1_1_vinecop_a70fcdd664b8698981d5dd1e62ef774b5}{loglik()} and \hyperlink{classvinecopulib_1_1_vinecop_a1dbef6faadcd231396d5cfd5c785cf24}{calculate\+\_\+npars()}. The B\+IC is a consistent model selection criterion for nonparametric models.
+calculates the Bayesian information criterion (B\+IC), which is defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ p $ is the (effective) number of parameters of the model, see \hyperlink{classvinecopulib_1_1_vinecop_a70fcdd664b8698981d5dd1e62ef774b5}{loglik()} and \hyperlink{classvinecopulib_1_1_vinecop_a1dbef6faadcd231396d5cfd5c785cf24}{calculate\+\_\+npars()}. The B\+IC is a consistent model selection criterion for nonparametric models.
 
 
 \begin{DoxyParams}{Parameters}
@@ -247,9 +239,7 @@ The B\+IC is defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \] wh
 {}
 \end{DoxyParamCaption}
 ) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_vinecop_a1dbef6faadcd231396d5cfd5c785cf24}{}\label{classvinecopulib_1_1_vinecop_a1dbef6faadcd231396d5cfd5c785cf24}
-calculates the effective number of parameters.
-
-Returns sum of the number of parameters for all pair copulas (see \hyperlink{classvinecopulib_1_1_bicop_a6fbc58e9d4cd565e805347083cbcc63d}{Bicop\+::calculate\+\_\+npars()}). \index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!cdf@{cdf}}
+returns sum of the number of parameters for all pair copulas (see \hyperlink{classvinecopulib_1_1_bicop_a6fbc58e9d4cd565e805347083cbcc63d}{Bicop\+::calculate\+\_\+npars()}). \index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!cdf@{cdf}}
 \index{cdf@{cdf}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
 \subsubsection[{\texorpdfstring{cdf(const Eigen\+::\+Matrix\+Xd \&u, const size\+\_\+t N=1e4) const }{cdf(const Eigen::MatrixXd &u, const size_t N=1e4) const }}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Vector\+Xd vinecopulib\+::\+Vinecop\+::cdf (
 \begin{DoxyParamCaption}
@@ -389,9 +379,7 @@ extracts the rotation of a pair copula.
 \item[{const Eigen\+::\+Matrix\+Xd \&}]{u}
 \end{DoxyParamCaption}
 ) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_vinecop_a71e7e9e14dacca516a8d88417a54ac70}{}\label{classvinecopulib_1_1_vinecop_a71e7e9e14dacca516a8d88417a54ac70}
-calculates the inverse Rosenblatt transform for a vine copula model.
-
-The inverse Rosenblatt transform can be used for simulation\+: the function applied to independent uniform variates resembles simulated data from the vine copula model.
+calculates the inverse Rosenblatt transform for a vine copula model, which can be used for simulation\+: the function applied to independent uniform variates resembles simulated data from the vine copula model.
 
 If the problem is too large, it is split recursively into halves (w.\+r.\+t. n, the number of observations). \char`\"{}\+Too large\char`\"{} means that the required memory will exceed 1 GB. An examplary configuration requiring less than 1 GB is $ n = 1000 $, $d = 200$.
 
@@ -407,9 +395,7 @@ If the problem is too large, it is split recursively into halves (w.\+r.\+t. n, 
 \item[{const Eigen\+::\+Matrix\+Xd \&}]{u}
 \end{DoxyParamCaption}
 ) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_vinecop_a70fcdd664b8698981d5dd1e62ef774b5}{}\label{classvinecopulib_1_1_vinecop_a70fcdd664b8698981d5dd1e62ef774b5}
-calculates the log-\/likelihood.
-
-The log-\/likelihood is defined as \[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \] where $ c $ is the copula density \hyperlink{classvinecopulib_1_1_vinecop_a488cb8865a6b018d1cb98d0cf12f3c81}{pdf()}.
+calculates the log-\/likelihood, which is defined as \[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \] where $ c $ is the copula density \hyperlink{classvinecopulib_1_1_vinecop_a488cb8865a6b018d1cb98d0cf12f3c81}{pdf()}.
 
 
 \begin{DoxyParams}{Parameters}
@@ -458,9 +444,7 @@ calculates the density function of the vine copula model.
 \item[{{\bf Fit\+Controls\+Vinecop}}]{controls = {\ttfamily {\bf Fit\+Controls\+Vinecop}()}}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_vinecop_ad6cbb6b69c41f13a6e5e46ece44c0f78}{}\label{classvinecopulib_1_1_vinecop_ad6cbb6b69c41f13a6e5e46ece44c0f78}
-automatically fits and selects a vine copula model
-
-Selection of the structure is performed using the algorithm of Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013). {\itshape Selecting and estimating regular vine copulae and application to financial returns.} Computational Statistics \& Data Analysis, 59 (1), 52-\/69.
+automatically fits and selects a vine copula model. Selection of the structure is performed using the algorithm of Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013). {\itshape Selecting and estimating regular vine copulae and application to financial returns.} Computational Statistics \& Data Analysis, 59 (1), 52-\/69.
 
 
 \begin{DoxyParams}{Parameters}
@@ -507,9 +491,7 @@ simulates from a vine copula model, see \hyperlink{classvinecopulib_1_1_vinecop_
 \item[{const char $\ast$}]{filename}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_vinecop_ad6f8b8fb042f3958eda9641548bc3bcb}{}\label{classvinecopulib_1_1_vinecop_ad6f8b8fb042f3958eda9641548bc3bcb}
-Write the copula object into a J\+S\+ON file
-
-See \hyperlink{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}{to\+\_\+ptree()} for the structure of the file.
+Write the copula object into a J\+S\+ON file. See \hyperlink{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}{to\+\_\+ptree()} for the structure of the file.
 
 
 \begin{DoxyParams}{Parameters}
@@ -523,9 +505,7 @@ See \hyperlink{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}{t
 {}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}{}\label{classvinecopulib_1_1_vinecop_a5543cc3ef415c850ac71d092e4f4a0aa}
-Convert the copula into a boost\+::property\+\_\+tree\+::ptree object
-
-The ptree object contains two nodes \+: {\ttfamily \char`\"{}matrix\char`\"{}} and {\ttfamily \char`\"{}pair copulas\char`\"{}}. The former is encodes the R-\/\+Vine structure and the latter is a list of child nodes for the trees ({\ttfamily \char`\"{}tree1\char`\"{}}, {\ttfamily \char`\"{}tree2\char`\"{}}, etc), each containing a list of child nodes for the edges ({\ttfamily \char`\"{}pc1\char`\"{}}, {\ttfamily \char`\"{}pc2\char`\"{}}, etc). See \hyperlink{classvinecopulib_1_1_bicop_a74aeb9fd66cee77afd30c8a29dbd5040}{Bicop\+::to\+\_\+ptree()} for the encoding of pair-\/copulas.
+Convert the copula into a boost\+::property\+\_\+tree\+::ptree object, which contains two nodes \+: {\ttfamily \char`\"{}matrix\char`\"{}} and {\ttfamily \char`\"{}pair copulas\char`\"{}}. The former is encodes the R-\/\+Vine structure and the latter is a list of child nodes for the trees ({\ttfamily \char`\"{}tree1\char`\"{}}, {\ttfamily \char`\"{}tree2\char`\"{}}, etc), each containing a list of child nodes for the edges ({\ttfamily \char`\"{}pc1\char`\"{}}, {\ttfamily \char`\"{}pc2\char`\"{}}, etc). See \hyperlink{classvinecopulib_1_1_bicop_a74aeb9fd66cee77afd30c8a29dbd5040}{Bicop\+::to\+\_\+ptree()} for the encoding of pair-\/copulas.
 
 \begin{DoxyReturn}{Returns}
 the boost\+::property\+\_\+tree\+::ptree object containing the copula. 

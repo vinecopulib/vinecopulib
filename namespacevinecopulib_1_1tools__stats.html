@@ -125,6 +125,18 @@ Functions</h2></td></tr>
 <tr class="separator:a1e81bac0b4e1e9e0158b800a7db0d1af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6867eea2d193c7e5d78b30b9991397ad"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a6867eea2d193c7e5d78b30b9991397ad">pbvnorm</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;z, double rho)</td></tr>
 <tr class="separator:a6867eea2d193c7e5d78b30b9991397ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a249880b93e82211207869f94821de440"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a249880b93e82211207869f94821de440">dnorm</a> (const Eigen::MatrixXd &amp;x)</td></tr>
+<tr class="separator:a249880b93e82211207869f94821de440"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa380a12540c4749e14049cdd0b163352"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#aa380a12540c4749e14049cdd0b163352">pnorm</a> (const Eigen::MatrixXd &amp;x)</td></tr>
+<tr class="separator:aa380a12540c4749e14049cdd0b163352"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4772a68417aa49b50e69c957db8533f7"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a4772a68417aa49b50e69c957db8533f7">qnorm</a> (const Eigen::MatrixXd &amp;x)</td></tr>
+<tr class="separator:a4772a68417aa49b50e69c957db8533f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc09bc02add2d7b7781aa42a406be7d9"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#abc09bc02add2d7b7781aa42a406be7d9">dt</a> (const Eigen::MatrixXd &amp;x, double nu)</td></tr>
+<tr class="separator:abc09bc02add2d7b7781aa42a406be7d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f65dc25a8284fe4629f092969e2861a"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a1f65dc25a8284fe4629f092969e2861a">pt</a> (const Eigen::MatrixXd &amp;x, double nu)</td></tr>
+<tr class="separator:a1f65dc25a8284fe4629f092969e2861a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17eb427c3a562c72d2e87438da1cd279"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a17eb427c3a562c72d2e87438da1cd279">qt</a> (const Eigen::MatrixXd &amp;x, double nu)</td></tr>
+<tr class="separator:a17eb427c3a562c72d2e87438da1cd279"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Pairwise dependence measures</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -149,47 +161,6 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="na
 double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#adda97526e428173da49899ef449560cf">pairwise_hoeffd</a> (Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; x)</td></tr>
 <tr class="memdesc:adda97526e428173da49899ef449560cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the pair-wise Hoeffding's D. <br /></td></tr>
 <tr class="separator:adda97526e428173da49899ef449560cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Standard normal distribution</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>evaluation points. </td></tr>
-  </table>
-  </dd>
-</dl>
-</div></td></tr>
-<tr class="memitem:a249880b93e82211207869f94821de440"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a249880b93e82211207869f94821de440"></a>
-Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a249880b93e82211207869f94821de440">dnorm</a> (const Eigen::MatrixXd &amp;x)</td></tr>
-<tr class="memdesc:a249880b93e82211207869f94821de440"><td class="mdescLeft">&#160;</td><td class="mdescRight">evaluates the density function. <br /></td></tr>
-<tr class="separator:a249880b93e82211207869f94821de440"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa380a12540c4749e14049cdd0b163352"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa380a12540c4749e14049cdd0b163352"></a>
-Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#aa380a12540c4749e14049cdd0b163352">pnorm</a> (const Eigen::MatrixXd &amp;x)</td></tr>
-<tr class="memdesc:aa380a12540c4749e14049cdd0b163352"><td class="mdescLeft">&#160;</td><td class="mdescRight">evaluates the distribution function. <br /></td></tr>
-<tr class="separator:aa380a12540c4749e14049cdd0b163352"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4772a68417aa49b50e69c957db8533f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4772a68417aa49b50e69c957db8533f7"></a>
-Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a4772a68417aa49b50e69c957db8533f7">qnorm</a> (const Eigen::MatrixXd &amp;x)</td></tr>
-<tr class="memdesc:a4772a68417aa49b50e69c957db8533f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">evaluates the quantile function. <br /></td></tr>
-<tr class="separator:a4772a68417aa49b50e69c957db8533f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Student t distribution</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>The mean is assumed to be zero. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>evaluation points. </td></tr>
-    <tr><td class="paramname">nu</td><td>degrees of freedom parameter. </td></tr>
-  </table>
-  </dd>
-</dl>
-</div></td></tr>
-<tr class="memitem:abc09bc02add2d7b7781aa42a406be7d9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc09bc02add2d7b7781aa42a406be7d9"></a>
-Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#abc09bc02add2d7b7781aa42a406be7d9">dt</a> (const Eigen::MatrixXd &amp;x, double nu)</td></tr>
-<tr class="memdesc:abc09bc02add2d7b7781aa42a406be7d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">evaluates the density function. <br /></td></tr>
-<tr class="separator:abc09bc02add2d7b7781aa42a406be7d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f65dc25a8284fe4629f092969e2861a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1f65dc25a8284fe4629f092969e2861a"></a>
-Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a1f65dc25a8284fe4629f092969e2861a">pt</a> (const Eigen::MatrixXd &amp;x, double nu)</td></tr>
-<tr class="memdesc:a1f65dc25a8284fe4629f092969e2861a"><td class="mdescLeft">&#160;</td><td class="mdescRight">evaluates the distribution function. <br /></td></tr>
-<tr class="separator:a1f65dc25a8284fe4629f092969e2861a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17eb427c3a562c72d2e87438da1cd279"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17eb427c3a562c72d2e87438da1cd279"></a>
-Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevinecopulib_1_1tools__stats.html#a17eb427c3a562c72d2e87438da1cd279">qt</a> (const Eigen::MatrixXd &amp;x, double nu)</td></tr>
-<tr class="memdesc:a17eb427c3a562c72d2e87438da1cd279"><td class="mdescLeft">&#160;</td><td class="mdescRight">evaluates the quantile function. <br /></td></tr>
-<tr class="separator:a17eb427c3a562c72d2e87438da1cd279"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utilities for statistical analysis. </p>
@@ -233,6 +204,81 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a quadratic matrix of pairwise dependence measures. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a249880b93e82211207869f94821de440"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::MatrixXd vinecopulib::tools_stats::dnorm </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Density function of the Standard normal distribution</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>evaluation points.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An \( n \times d \) matrix of evaluated densities. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="abc09bc02add2d7b7781aa42a406be7d9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::MatrixXd vinecopulib::tools_stats::dt </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>nu</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Density function of the Student t distribution</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>evaluation points. </td></tr>
+    <tr><td class="paramname">nu</td><td>degrees of freedom parameter.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An \( n \times d \) matrix of evaluated densities. </dd></dl>
 
 </div>
 </div>
@@ -372,6 +418,156 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An \( n \times 1 \) vector of probabilities. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa380a12540c4749e14049cdd0b163352"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::MatrixXd vinecopulib::tools_stats::pnorm </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Distribution function of the Standard normal distribution</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>evaluation points.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An \( n \times d \) matrix of evaluated probabilities. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1f65dc25a8284fe4629f092969e2861a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::MatrixXd vinecopulib::tools_stats::pt </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>nu</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Distribution function of the Student t distribution</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>evaluation points. </td></tr>
+    <tr><td class="paramname">nu</td><td>degrees of freedom parameter.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An \( n \times d \) matrix of evaluated probabilities. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a4772a68417aa49b50e69c957db8533f7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::MatrixXd vinecopulib::tools_stats::qnorm </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Quantile function of the Standard normal distribution</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>evaluation points.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An \( n \times d \) matrix of evaluated quantiles. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a17eb427c3a562c72d2e87438da1cd279"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::MatrixXd vinecopulib::tools_stats::qt </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::MatrixXd &amp;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>nu</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Quantile function of the Student t distribution</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>evaluation points. </td></tr>
+    <tr><td class="paramname">nu</td><td>degrees of freedom parameter.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An \( n \times d \) matrix of evaluated quantiles. </dd></dl>
 
 </div>
 </div>
@@ -515,7 +711,7 @@ Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Oct 27 2017 04:39:58 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 27 2017 05:09:44 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
