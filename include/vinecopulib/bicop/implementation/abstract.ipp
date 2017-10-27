@@ -24,7 +24,9 @@
 
 namespace vinecopulib {
 //! virtual destructor
-inline AbstractBicop::~AbstractBicop() {}
+inline AbstractBicop::~AbstractBicop()
+{
+}
 
 //! Create a bivariate copula using the default contructor
 //!
@@ -34,7 +36,8 @@ inline AbstractBicop::~AbstractBicop() {}
 //! @return A pointer to an object that inherits from AbstractBicop.
 //! @{
 inline BicopPtr AbstractBicop::create(BicopFamily family,
-                                      const Eigen::MatrixXd &parameters) {
+                                      const Eigen::MatrixXd &parameters)
+{
     BicopPtr new_bicop;
     switch (family) {
         case BicopFamily::indep:
@@ -87,17 +90,20 @@ inline BicopPtr AbstractBicop::create(BicopFamily family,
 
 //!@}
 
-inline Eigen::VectorXd no_tau_to_parameters(const double &) {
+inline Eigen::VectorXd no_tau_to_parameters(const double &)
+{
     throw std::runtime_error("Method not implemented for this family");
 }
 
 //! Getters and setters.
 //! @{
-inline BicopFamily AbstractBicop::get_family() const {
+inline BicopFamily AbstractBicop::get_family() const
+{
     return family_;
 }
 
-inline std::string AbstractBicop::get_family_name() const {
+inline std::string AbstractBicop::get_family_name() const
+{
     return vinecopulib::get_family_name(family_);
 };
 //! @}
@@ -113,7 +119,8 @@ inline std::string AbstractBicop::get_family_name() const {
 //! @return The numerical inverse of h-functions.
 //! @{
 inline Eigen::VectorXd
-AbstractBicop::hinv1_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) {
+AbstractBicop::hinv1_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+{
     Eigen::Matrix<double, Eigen::Dynamic, 2> u_new = u;
     auto h1 = [&](const Eigen::VectorXd &v) {
         u_new.col(1) = v;
@@ -130,7 +137,8 @@ AbstractBicop::hinv1_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) {
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv2_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) {
+AbstractBicop::hinv2_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+{
     Eigen::Matrix<double, Eigen::Dynamic, 2> u_new = u;
     auto h1 = [&](const Eigen::VectorXd &x) {
         u_new.col(0) = x;

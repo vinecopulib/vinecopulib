@@ -6,7 +6,8 @@
 
 namespace vinecopulib {
 
-inline FrankBicop::FrankBicop() {
+inline FrankBicop::FrankBicop()
+{
     family_ = BicopFamily::frank;
     parameters_ = Eigen::VectorXd(1);
     parameters_lower_bounds_ = Eigen::VectorXd(1);
@@ -16,28 +17,33 @@ inline FrankBicop::FrankBicop() {
     parameters_upper_bounds_ << 200;
 }
 
-inline double FrankBicop::generator(const double &u) {
+inline double FrankBicop::generator(const double &u)
+{
     double theta = double(this->parameters_(0));
     return (-1) * std::log((std::exp(-theta * u) - 1) / (std::exp(-theta) - 1));
 }
 
-inline double FrankBicop::generator_inv(const double &u) {
+inline double FrankBicop::generator_inv(const double &u)
+{
     double theta = double(this->parameters_(0));
     return (-1 / theta) * std::log(1 + std::exp(-theta - u) - std::exp(-u));
 }
 
-inline double FrankBicop::generator_derivative(const double &u) {
+inline double FrankBicop::generator_derivative(const double &u)
+{
     double theta = double(this->parameters_(0));
     return theta / (1 - std::exp(theta * u));
 }
 
-inline double FrankBicop::generator_derivative2(const double &u) {
+inline double FrankBicop::generator_derivative2(const double &u)
+{
     double theta = double(this->parameters_(0));
     return std::pow(theta, 2) /
            std::pow(std::exp(theta * u / 2) - std::exp(-theta * u / 2), 2);
 }
 
-inline Eigen::MatrixXd FrankBicop::tau_to_parameters(const double &tau) {
+inline Eigen::MatrixXd FrankBicop::tau_to_parameters(const double &tau)
+{
     Eigen::VectorXd tau2 = Eigen::VectorXd::Constant(1, std::fabs(tau));
     auto f = [&](const Eigen::VectorXd &v) {
         return Eigen::VectorXd::Constant(1, std::fabs(parameters_to_tau(v)));
@@ -45,7 +51,8 @@ inline Eigen::MatrixXd FrankBicop::tau_to_parameters(const double &tau) {
     return tools_eigen::invert_f(tau2, f, -100 + 1e-6, 100);
 }
 
-inline double FrankBicop::parameters_to_tau(const Eigen::MatrixXd &parameters) {
+inline double FrankBicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
+{
     double par = parameters(0);
     double tau = 1 - 4 / par;
     double d = debyen(std::fabs(par), 1) / std::fabs(par);
@@ -56,7 +63,8 @@ inline double FrankBicop::parameters_to_tau(const Eigen::MatrixXd &parameters) {
     return tau;
 }
 
-inline Eigen::VectorXd FrankBicop::get_start_parameters(const double tau) {
+inline Eigen::VectorXd FrankBicop::get_start_parameters(const double tau)
+{
     return tau_to_parameters(tau);
 }
 }
@@ -77,7 +85,8 @@ inline Eigen::VectorXd FrankBicop::get_start_parameters(const double tau) {
  @author Richard J. Mathar
  @since 2007-10-31 implemented range n=8..10
 */
-inline double debyen(const double x, const int n) {
+inline double debyen(const double x, const int n)
+{
     if (x <= 0.)
         return 0.;
     if (n < 1 || n > 20)

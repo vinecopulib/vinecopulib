@@ -21,7 +21,8 @@ namespace tools_interpolation {
 //! @param norm_times how many times the normalization routine should run.
 inline InterpolationGrid::InterpolationGrid(const Eigen::VectorXd &grid_points,
                                             const Eigen::MatrixXd &values,
-                                            int norm_times) {
+                                            int norm_times)
+{
     if (values.cols() != values.rows()) {
         throw std::runtime_error("values must be a quadratic matrix");
     }
@@ -35,12 +36,14 @@ inline InterpolationGrid::InterpolationGrid(const Eigen::VectorXd &grid_points,
     normalize_margins(norm_times);
 }
 
-inline Eigen::MatrixXd InterpolationGrid::get_values() const {
+inline Eigen::MatrixXd InterpolationGrid::get_values() const
+{
     return values_;
 }
 
 inline void InterpolationGrid::set_values(const Eigen::MatrixXd &values,
-                                          int norm_times) {
+                                          int norm_times)
+{
     if (values.size() != values_.size()) {
         if (values.rows() != values_.rows()) {
             std::stringstream message;
@@ -64,14 +67,16 @@ inline void InterpolationGrid::set_values(const Eigen::MatrixXd &values,
     normalize_margins(norm_times);
 }
 
-inline void InterpolationGrid::flip() {
+inline void InterpolationGrid::flip()
+{
     values_.transposeInPlace();
 }
 
 //! renormalizes the estimate to uniform margins
 //!
 //! @param times how many times the normalization routine should run.
-inline void InterpolationGrid::normalize_margins(int times) {
+inline void InterpolationGrid::normalize_margins(int times)
+{
     size_t m = grid_points_.size();
     for (int k = 0; k < times; ++k) {
         for (size_t i = 0; i < m; ++i) {
@@ -85,7 +90,8 @@ inline void InterpolationGrid::normalize_margins(int times) {
 
 inline Eigen::Matrix<ptrdiff_t, 1, 2> InterpolationGrid::get_ij(
     double x0, double x1, ptrdiff_t m
-) {
+)
+{
     Eigen::Matrix<ptrdiff_t, 1, 2> out;
     out << 0, 0;
     bool found_i = false;
@@ -112,7 +118,8 @@ inline Eigen::Matrix<ptrdiff_t, 1, 2> InterpolationGrid::get_ij(
 //!
 //! @param x mx2 matrix of evaluation points.
 inline Eigen::VectorXd
-InterpolationGrid::interpolate(const Eigen::MatrixXd &x) {
+InterpolationGrid::interpolate(const Eigen::MatrixXd &x)
+{
     Eigen::VectorXd y(4), tmpgrid(4), tmpvals(4);
     ptrdiff_t m = grid_points_.size();
     auto f = [&m, this, &y, &tmpgrid, &tmpvals](double x0, double x1) {
@@ -165,7 +172,8 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd &x) {
 //!
 inline Eigen::VectorXd
 InterpolationGrid::intergrate_1d(const Eigen::MatrixXd &u,
-                                 size_t cond_var) {
+                                 size_t cond_var)
+{
     ptrdiff_t m = grid_points_.size();
     Eigen::VectorXd tmpvals(m);
     Eigen::MatrixXd tmpgrid(m, 2);
@@ -197,7 +205,8 @@ InterpolationGrid::intergrate_1d(const Eigen::MatrixXd &u,
 //! @param u mx2 matrix of evaluation points
 //!
 inline Eigen::VectorXd
-InterpolationGrid::intergrate_2d(const Eigen::MatrixXd &u) {
+InterpolationGrid::intergrate_2d(const Eigen::MatrixXd &u)
+{
     ptrdiff_t m = grid_points_.size();
     Eigen::VectorXd tmpvals(m), tmpvals2(m);
     Eigen::MatrixXd tmpgrid(m, 2);
@@ -228,7 +237,8 @@ InterpolationGrid::intergrate_2d(const Eigen::MatrixXd &u) {
 //! @param x evaluation point.
 //! @param a polynomial coefficients
 inline double
-InterpolationGrid::cubic_poly(const double &x, const Eigen::VectorXd &a) {
+InterpolationGrid::cubic_poly(const double &x, const Eigen::VectorXd &a)
+{
     double x2 = x * x;
     double x3 = x2 * x;
     return a(0) + a(1) * x + a(2) * x2 + a(3) * x3;
@@ -239,7 +249,8 @@ InterpolationGrid::cubic_poly(const double &x, const Eigen::VectorXd &a) {
 //! @param x evaluation point.
 //! @param a polynomial coefficients.
 inline double InterpolationGrid::cubic_indef_integral(const double &x,
-                                                      const Eigen::VectorXd &a) {
+                                                      const Eigen::VectorXd &a)
+{
     double x2 = x * x;
     double x3 = x2 * x;
     double x4 = x3 * x;
@@ -253,7 +264,8 @@ inline double InterpolationGrid::cubic_indef_integral(const double &x,
 //! @param a polynomial coefficients.
 inline double InterpolationGrid::cubic_integral(const double &lower,
                                                 const double &upper,
-                                                const Eigen::VectorXd &a) {
+                                                const Eigen::VectorXd &a)
+{
     return cubic_indef_integral(upper, a) - cubic_indef_integral(lower, a);
 }
 
@@ -263,7 +275,8 @@ inline double InterpolationGrid::cubic_integral(const double &lower,
 //! @param grid length 4 vector of grid points.
 inline Eigen::VectorXd
 InterpolationGrid::find_coefs(const Eigen::VectorXd &vals,
-                              const Eigen::VectorXd &grid) {
+                              const Eigen::VectorXd &grid)
+{
     Eigen::VectorXd a(4);
 
     double dt0 = grid(1) - grid(0);
@@ -271,9 +284,12 @@ InterpolationGrid::find_coefs(const Eigen::VectorXd &vals,
     double dt2 = grid(3) - grid(2);
 
     /* check for repeated points (important for boundaries) */
-    if (dt1 < 1e-4) dt1 = 1.0;
-    if (dt0 < 1e-4) dt0 = dt1;
-    if (dt2 < 1e-4) dt2 = dt1;
+    if (dt1 < 1e-4)
+        dt1 = 1.0;
+    if (dt0 < 1e-4)
+        dt0 = dt1;
+    if (dt2 < 1e-4)
+        dt2 = dt1;
 
     // compute tangents when parameterized in (t1,t2)
     double dx1 = (vals(1) - vals(0)) / dt0;
@@ -303,7 +319,8 @@ InterpolationGrid::find_coefs(const Eigen::VectorXd &vals,
 //! @param grid length 4 vector of grid points.
 inline double InterpolationGrid::interp_on_grid(const double &x,
                                                 const Eigen::VectorXd &vals,
-                                                const Eigen::VectorXd &grid) {
+                                                const Eigen::VectorXd &grid)
+{
     Eigen::VectorXd a = find_coefs(vals, grid);
     double xev = fmax((x - grid(1)), 0) / (grid(2) - grid(1));
     return cubic_poly(xev, a);
@@ -322,7 +339,8 @@ inline double InterpolationGrid::interp_on_grid(const double &x,
 //! @return Integral of interpolation spline defined by (vals, grid).
 inline double InterpolationGrid::int_on_grid(const double &upr,
                                              const Eigen::VectorXd &vals,
-                                             const Eigen::VectorXd &grid) {
+                                             const Eigen::VectorXd &grid)
+{
     ptrdiff_t m = grid.size();
     Eigen::VectorXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
     double uprnew, newint;
@@ -333,7 +351,8 @@ inline double InterpolationGrid::int_on_grid(const double &upr,
         // go up the grid and integrate
         for (ptrdiff_t k = 0; k < m - 1; ++k) {
             // stop loop if fully integrated
-            if (upr < grid(k)) break;
+            if (upr < grid(k))
+                break;
 
             // select length 4 subvectors and calculate spline coefficients
             tmpvals(0) = vals(std::max(k - 1, (ptrdiff_t) 0));

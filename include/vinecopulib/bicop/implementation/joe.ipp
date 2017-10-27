@@ -11,7 +11,8 @@
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 
 namespace vinecopulib {
-inline JoeBicop::JoeBicop() {
+inline JoeBicop::JoeBicop()
+{
     family_ = BicopFamily::joe;
     parameters_ = Eigen::VectorXd(1);
     parameters_lower_bounds_ = Eigen::VectorXd(1);
@@ -21,20 +22,24 @@ inline JoeBicop::JoeBicop() {
     parameters_upper_bounds_ << 200;
 }
 
-inline double JoeBicop::generator(const double &u) {
+inline double JoeBicop::generator(const double &u)
+{
     return (-1) * boost::math::log1p(-std::pow(1 - u, parameters_(0)));
 }
 
-inline double JoeBicop::generator_inv(const double &u) {
+inline double JoeBicop::generator_inv(const double &u)
+{
     return 1 - std::pow(-boost::math::expm1(-u), 1 / parameters_(0));
 }
 
-inline double JoeBicop::generator_derivative(const double &u) {
+inline double JoeBicop::generator_derivative(const double &u)
+{
     double theta = double(parameters_(0));
     return (-theta) * std::pow(1 - u, theta - 1) / (1 - std::pow(1 - u, theta));
 }
 
-inline double JoeBicop::generator_derivative2(const double &u) {
+inline double JoeBicop::generator_derivative2(const double &u)
+{
     double theta = double(parameters_(0));
     double res = theta * (theta - 1 + std::pow(1 - u, theta));
     return res * std::pow(1 - u, theta - 2) /
@@ -44,7 +49,8 @@ inline double JoeBicop::generator_derivative2(const double &u) {
 // inverse h-function
 inline Eigen::VectorXd JoeBicop::hinv1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     double theta = double(parameters_(0));
     double u1, u2;
     Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
@@ -62,7 +68,8 @@ inline Eigen::VectorXd JoeBicop::hinv1(
 }
 
 // link between Kendall's tau and the par_bicop parameter
-inline Eigen::MatrixXd JoeBicop::tau_to_parameters(const double &tau) {
+inline Eigen::MatrixXd JoeBicop::tau_to_parameters(const double &tau)
+{
     Eigen::VectorXd tau2 = Eigen::VectorXd::Constant(1, std::fabs(tau));
     auto f = [&](const Eigen::VectorXd &v) {
         return Eigen::VectorXd::Constant(1, std::fabs(parameters_to_tau(v)));
@@ -70,20 +77,23 @@ inline Eigen::MatrixXd JoeBicop::tau_to_parameters(const double &tau) {
     return tools_eigen::invert_f(tau2, f, 1 + 1e-6, 100);
 }
 
-inline double JoeBicop::parameters_to_tau(const Eigen::MatrixXd &parameters) {
+inline double JoeBicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
+{
     double par = parameters(0);
     double tau = 2 / par + 1;
     tau = boost::math::digamma(2.0) - boost::math::digamma(tau);
     return 1 + 2 * tau / (2 - par);
 }
 
-inline Eigen::VectorXd JoeBicop::get_start_parameters(const double tau) {
+inline Eigen::VectorXd JoeBicop::get_start_parameters(const double tau)
+{
     return tau_to_parameters(tau);
 }
 }
 
 // This is copy&paste from the VineCopula package
-inline double qcondjoe(double *q, double *u, double *de) {
+inline double qcondjoe(double *q, double *u, double *de)
+{
     double t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t13, t15, t16, t19, t23, t28, t31;
     double c21, pdf;
     int iter;
@@ -129,8 +139,11 @@ inline double qcondjoe(double *q, double *u, double *de) {
         pdf = -t8 / t19 * t31 + t8 * (*de) * t2 * t13 * t23 * t16 + t9 * t31;
         iter++;
         if ((boost::math::isnan)(pdf) ||
-            (boost::math::isnan)(c21)) { diff /= -2.; }  // added for de>=30
-        else diff = (c21 - *q) / pdf;
+            (boost::math::isnan)(c21)) {
+            diff /= -2.;
+        }  // added for de>=30
+        else
+            diff = (c21 - *q) / pdf;
         v -= diff;
         int iter2 = 0;
         while ((v <= 0 || v >= 1 || fabs(diff) > 0.25) & (iter2 < 20)) {

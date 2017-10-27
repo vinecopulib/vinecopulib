@@ -9,7 +9,8 @@
 namespace vinecopulib {
 inline Eigen::VectorXd ArchimedeanBicop::pdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     auto f = [this](const double &u, const double &v) {
         double temp = generator_inv(generator(u) + generator(v));
         temp = generator_derivative2(temp) /
@@ -21,7 +22,8 @@ inline Eigen::VectorXd ArchimedeanBicop::pdf(
 
 inline Eigen::VectorXd ArchimedeanBicop::cdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     auto f = [this](const double &u, const double &v) {
         return generator_inv(generator(u) + generator(v));
     };
@@ -30,7 +32,8 @@ inline Eigen::VectorXd ArchimedeanBicop::cdf(
 
 inline Eigen::VectorXd ArchimedeanBicop::hfunc1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     auto f = [this](const double &u, const double &v) {
         double temp = generator_inv(generator(u) + generator(v));
         return generator_derivative(u) / generator_derivative(temp);
@@ -40,24 +43,28 @@ inline Eigen::VectorXd ArchimedeanBicop::hfunc1(
 
 inline Eigen::VectorXd ArchimedeanBicop::hfunc2(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     return hfunc1(tools_eigen::swap_cols(u));
 }
 
 inline Eigen::VectorXd ArchimedeanBicop::hinv1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     Eigen::VectorXd hinv = hinv1_num(u);
     return hinv;
 }
 
 inline Eigen::VectorXd ArchimedeanBicop::hinv2(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     return hinv1(tools_eigen::swap_cols(u));
 }
 
-inline Eigen::VectorXd ArchimedeanBicop::get_start_parameters(const double) {
+inline Eigen::VectorXd ArchimedeanBicop::get_start_parameters(const double)
+{
     Eigen::MatrixXd lb = this->get_parameters_lower_bounds();
     Eigen::VectorXd parameters = lb + Eigen::VectorXd::Constant(2, 0.1);
     return parameters;

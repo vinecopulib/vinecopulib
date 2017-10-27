@@ -18,7 +18,8 @@ namespace vinecopulib {
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but
 //! always work with the Bicop interface.
-class AbstractBicop {
+class AbstractBicop
+{
     friend class Bicop;
 
 public:
@@ -26,7 +27,7 @@ public:
 
 protected:
     // Factories
-    static std::shared_ptr<AbstractBicop> create(
+    static std::shared_ptr <AbstractBicop> create(
         BicopFamily family = BicopFamily::indep,
         const Eigen::MatrixXd &parameters = Eigen::MatrixXd());
 
@@ -81,7 +82,7 @@ protected:
 };
 
 //! A shared pointer to an object of class AbstracBicop.
-typedef std::shared_ptr<AbstractBicop> BicopPtr;
+typedef std::shared_ptr <AbstractBicop> BicopPtr;
 
 Eigen::VectorXd no_tau_to_parameters(const double &);
 }

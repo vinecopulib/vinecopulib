@@ -14,7 +14,8 @@
 namespace vinecopulib {
 
 //! creates the independence copula.
-inline Bicop::Bicop() {
+inline Bicop::Bicop()
+{
     bicop_ = AbstractBicop::create();
     rotation_ = 0;
 }
@@ -26,7 +27,8 @@ inline Bicop::Bicop() {
 //!     families, only 0 is allowed).
 //! @param parameters the copula parameters.
 inline Bicop::Bicop(BicopFamily family, int rotation,
-                    const Eigen::MatrixXd &parameters) {
+                    const Eigen::MatrixXd &parameters)
+{
     bicop_ = AbstractBicop::create(family, parameters);
     // family must be set before checking the rotation
     set_rotation(rotation);
@@ -37,7 +39,8 @@ inline Bicop::Bicop(BicopFamily family, int rotation,
 //! @param data see select().
 //! @param controls see select().
 inline Bicop::Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                    FitControlsBicop controls) {
+                    FitControlsBicop controls)
+{
     select(data, controls);
 }
 
@@ -50,13 +53,17 @@ inline Bicop::Bicop(boost::property_tree::ptree input) :
         input.get<int>("rotation"),
         tools_serialization::ptree_to_matrix<double>(
             input.get_child("parameters"))
-    ) {}
+    )
+{
+}
 
 //! creates from a JSON file
 //! @param filename the name of the JSON file to read (see to_ptree() for the
 //! structure of the file).
 inline Bicop::Bicop(const char *filename) :
-    Bicop(tools_serialization::json_to_ptree(filename)) {}
+    Bicop(tools_serialization::json_to_ptree(filename))
+{
+}
 
 //! Convert the copula into a boost::property_tree::ptree object
 //!
@@ -66,7 +73,8 @@ inline Bicop::Bicop(const char *filename) :
 //! for the parameters.
 //!
 //! @return the boost::property_tree::ptree object containing the copula.
-inline boost::property_tree::ptree Bicop::to_ptree() const {
+inline boost::property_tree::ptree Bicop::to_ptree() const
+{
     boost::property_tree::ptree output;
 
     output.put("family", get_family_name());
@@ -82,7 +90,8 @@ inline boost::property_tree::ptree Bicop::to_ptree() const {
 //! See to_ptree() for the structure of the file.
 //!
 //! @param filename the name of the file to write.
-inline void Bicop::to_json(const char *filename) const {
+inline void Bicop::to_json(const char *filename) const
+{
     boost::property_tree::write_json(filename, to_ptree());
 }
 
@@ -92,7 +101,8 @@ inline void Bicop::to_json(const char *filename) const {
 //! @return The copula density evaluated at \c u.
 inline Eigen::VectorXd
 Bicop::pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
-const {
+const
+{
     Eigen::VectorXd f = bicop_->pdf(cut_and_rotate(u));
     f = f.unaryExpr([](const double x) { return std::min(x, 1e16); });
     return f;
@@ -104,7 +114,8 @@ const {
 //! @return The copula distribution evaluated at \c u.
 inline Eigen::VectorXd
 Bicop::cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
-const {
+const
+{
     Eigen::VectorXd p = bicop_->cdf(cut_and_rotate(u));
     switch (rotation_) {
         case 0:
@@ -134,7 +145,8 @@ const {
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 inline Eigen::VectorXd
 Bicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
-const {
+const
+{
     switch (rotation_) {
         case 0:
             return bicop_->hfunc1(cut_and_rotate(u));
@@ -160,7 +172,8 @@ const {
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 inline Eigen::VectorXd
 Bicop::hfunc2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
-const {
+const
+{
     switch (rotation_) {
         case 0:
             return bicop_->hfunc2(cut_and_rotate(u));
@@ -186,7 +199,8 @@ const {
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 inline Eigen::VectorXd
 Bicop::hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
-const {
+const
+{
     switch (rotation_) {
         case 0:
             return bicop_->hinv1(cut_and_rotate(u));
@@ -212,7 +226,8 @@ const {
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 inline Eigen::VectorXd
 Bicop::hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
-const {
+const
+{
     switch (rotation_) {
         case 0:
             return bicop_->hinv2(cut_and_rotate(u));
@@ -240,7 +255,8 @@ const {
 //! @param n number of observations.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2>
-Bicop::simulate(const int &n) const {
+Bicop::simulate(const int &n) const
+{
     Eigen::Matrix<double, Eigen::Dynamic, 2> U =
         tools_stats::simulate_uniform(n, 2);
     // use inverse Rosenblatt transform to generate a sample from the copula
@@ -254,7 +270,8 @@ Bicop::simulate(const int &n) const {
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 inline double
-Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const {
+Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
+{
     return pdf(tools_eigen::nan_omit(u)).array().log().sum();
 }
 
@@ -267,7 +284,8 @@ Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const {
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 inline double
-Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const {
+Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
+{
     return -2 * loglik(u) + 2 * calculate_npars();
 }
 
@@ -280,14 +298,16 @@ Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const {
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 inline double
-Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const {
+Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
+{
     return -2 * loglik(u) + calculate_npars() * log(u.rows());
 }
 
 //! Returns the actual number of parameters for parameteric families. For
 //! nonparametric families, there is a conceptually similar definition in
 //! the sense that it can be used in the calculation of fit statistics.
-inline double Bicop::calculate_npars() const {
+inline double Bicop::calculate_npars() const
+{
     return bicop_->calculate_npars();
 }
 
@@ -295,7 +315,8 @@ inline double Bicop::calculate_npars() const {
 //! current family (only works for one-parameter families).
 //!
 //! @param tau a value in \f$ (-1, 1) \f$.
-inline Eigen::MatrixXd Bicop::tau_to_parameters(const double &tau) const {
+inline Eigen::MatrixXd Bicop::tau_to_parameters(const double &tau) const
+{
     return bicop_->tau_to_parameters(tau);
 }
 
@@ -305,7 +326,8 @@ inline Eigen::MatrixXd Bicop::tau_to_parameters(const double &tau) const {
 //! @param parameters the parameters (must be a valid parametrization of
 //!     the current family).
 inline double
-Bicop::parameters_to_tau(const Eigen::MatrixXd &parameters) const {
+Bicop::parameters_to_tau(const Eigen::MatrixXd &parameters) const
+{
     double tau = bicop_->parameters_to_tau(parameters);
     if (tools_stl::is_member(rotation_, {90, 270})) {
         tau *= -1;
@@ -316,28 +338,34 @@ Bicop::parameters_to_tau(const Eigen::MatrixXd &parameters) const {
 //! @name Getters and setters
 //!
 //! @{
-inline BicopFamily Bicop::get_family() const {
+inline BicopFamily Bicop::get_family() const
+{
     return bicop_->get_family();
 }
 
-inline std::string Bicop::get_family_name() const {
+inline std::string Bicop::get_family_name() const
+{
     return bicop_->get_family_name();
 };
 
-inline int Bicop::get_rotation() const {
+inline int Bicop::get_rotation() const
+{
     return rotation_;
 }
 
-inline Eigen::MatrixXd Bicop::get_parameters() const {
+inline Eigen::MatrixXd Bicop::get_parameters() const
+{
     return bicop_->get_parameters();
 }
 
-inline void Bicop::set_rotation(int rotation) {
+inline void Bicop::set_rotation(int rotation)
+{
     check_rotation(rotation);
     rotation_ = rotation;
 }
 
-inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters) {
+inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters)
+{
     bicop_->set_parameters(parameters);
 }
 //! @}
@@ -348,7 +376,8 @@ inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters) {
 //! useful functions for bivariate copulas
 
 //! adjust's the copula model to a change in the variable order.
-inline void Bicop::flip() {
+inline void Bicop::flip()
+{
     BicopFamily family = bicop_->get_family();
     if (tools_stl::is_member(family, bicop_families::flip_by_rotation)) {
         if (rotation_ == 90) {
@@ -362,7 +391,8 @@ inline void Bicop::flip() {
 }
 
 //! summarizes the model into a string (can be used for printing).
-inline std::string Bicop::str() const {
+inline std::string Bicop::str() const
+{
     std::stringstream bicop_str;
     bicop_str << get_family_name();
     if (get_rotation() != 0) {
@@ -376,7 +406,8 @@ inline std::string Bicop::str() const {
 }
 //! @}
 
-inline BicopPtr Bicop::get_bicop() const {
+inline BicopPtr Bicop::get_bicop() const
+{
     return bicop_;
 };
 
@@ -395,7 +426,8 @@ inline BicopPtr Bicop::get_bicop() const {
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
 inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                       FitControlsBicop controls) {
+                       FitControlsBicop controls)
+{
     std::string method;
     if (tools_stl::is_member(bicop_->get_family(),
                              bicop_families::parametric)) {
@@ -415,7 +447,8 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
 inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                          FitControlsBicop controls) {
+                          FitControlsBicop controls)
+{
     using namespace tools_select;
     data = tools_eigen::nan_omit(data);
     if (data.rows() == 1) {
@@ -423,7 +456,7 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
     }
     rotation_ = 0;
     data = cut_and_rotate(data);
-    std::vector<Bicop> bicops = create_candidate_bicops(data, controls);
+    std::vector <Bicop> bicops = create_candidate_bicops(data, controls);
 
     // Estimate all models and select the best one using the
     // selection_criterion
@@ -446,7 +479,7 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
         // the following block modifies thread-external variables
         // and is thus shielded by a mutex
         {
-            std::lock_guard<std::mutex> lk(m);
+            std::lock_guard <std::mutex> lk(m);
             // If the new model is better than the current one,
             // then replace the current model by the new one
             if (new_criterion < fitted_criterion) {
@@ -475,7 +508,8 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
 //! @param u \f$m \times 2\f$ matrix of data.
 //! @return The manipulated data.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2> Bicop::cut_and_rotate(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const {
+    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
+{
     Eigen::Matrix<double, Eigen::Dynamic, 2> u_new(u.rows(), 2);
 
     // counter-clockwise rotations
@@ -509,7 +543,8 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> Bicop::cut_and_rotate(
     return u_new;
 }
 
-inline void Bicop::check_rotation(int rotation) const {
+inline void Bicop::check_rotation(int rotation) const
+{
     using namespace tools_stl;
     std::vector<int> allowed_rotations = {0, 90, 180, 270};
     if (!is_member(rotation, allowed_rotations)) {

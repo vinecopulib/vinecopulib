@@ -15,9 +15,12 @@ namespace tools_interpolation {
 //!
 //! The class is used for implementing kernel estimators. It makes storing the
 //! observations obsolete and allows for fast numerical integration.
-class InterpolationGrid {
+class InterpolationGrid
+{
 public:
-    InterpolationGrid() {}
+    InterpolationGrid()
+    {
+    }
 
     InterpolationGrid(const Eigen::VectorXd &grid_points,
                       const Eigen::MatrixXd &values,

@@ -17,7 +17,8 @@ namespace vinecopulib {
 //!
 //! @literature
 //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
-class Bb1Bicop : public ArchimedeanBicop {
+class Bb1Bicop : public ArchimedeanBicop
+{
 public:
     // constructor
     Bb1Bicop();

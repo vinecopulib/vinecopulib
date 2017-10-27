@@ -13,7 +13,8 @@
 
 namespace vinecopulib {
 //! @brief A bivariate copula family identifier.
-enum class BicopFamily {
+enum class BicopFamily
+{
     indep,         ///< Independence copula
     gaussian,      ///< Gaussian copula
     student,       ///< Student t copula
@@ -38,7 +39,7 @@ namespace bicop_families {
 
 //! All implemented families
 //!
-const std::vector<BicopFamily> all = {
+const std::vector <BicopFamily> all = {
     BicopFamily::indep,
     BicopFamily::gaussian,
     BicopFamily::student,
@@ -55,7 +56,7 @@ const std::vector<BicopFamily> all = {
 
 //! All parametric families
 //!
-const std::vector<BicopFamily> parametric = {
+const std::vector <BicopFamily> parametric = {
     BicopFamily::indep,
     BicopFamily::gaussian,
     BicopFamily::student,
@@ -71,14 +72,14 @@ const std::vector<BicopFamily> parametric = {
 
 //! All nonparametric families
 //!
-const std::vector<BicopFamily> nonparametric = {
+const std::vector <BicopFamily> nonparametric = {
     BicopFamily::indep,
     BicopFamily::tll
 };
 
 //! All one-parameter families
 //!
-const std::vector<BicopFamily> one_par = {
+const std::vector <BicopFamily> one_par = {
     BicopFamily::gaussian,
     BicopFamily::clayton,
     BicopFamily::gumbel,
@@ -88,7 +89,7 @@ const std::vector<BicopFamily> one_par = {
 
 //! All two-parameter families
 //!
-const std::vector<BicopFamily> two_par = {
+const std::vector <BicopFamily> two_par = {
     BicopFamily::student,
     BicopFamily::bb1,
     BicopFamily::bb6,
@@ -98,14 +99,14 @@ const std::vector<BicopFamily> two_par = {
 
 //! All elliptical copulas
 //!
-const std::vector<BicopFamily> elliptical = {
+const std::vector <BicopFamily> elliptical = {
     BicopFamily::gaussian,
     BicopFamily::student
 };
 
 //! All Archimedean copulas
 //!
-const std::vector<BicopFamily> archimedean = {
+const std::vector <BicopFamily> archimedean = {
     BicopFamily::clayton,
     BicopFamily::gumbel,
     BicopFamily::frank,
@@ -118,7 +119,7 @@ const std::vector<BicopFamily> archimedean = {
 
 //! All BB copulas
 //!
-const std::vector<BicopFamily> bb = {
+const std::vector <BicopFamily> bb = {
     BicopFamily::bb1,
     BicopFamily::bb6,
     BicopFamily::bb7,
@@ -127,7 +128,7 @@ const std::vector<BicopFamily> bb = {
 
 //! All copulas that don't have a rotation (because they already cover
 //! positive and negative dependence)
-const std::vector<BicopFamily> rotationless = {
+const std::vector <BicopFamily> rotationless = {
     BicopFamily::indep,
     BicopFamily::gaussian,
     BicopFamily::student,
@@ -137,7 +138,7 @@ const std::vector<BicopFamily> rotationless = {
 
 //! Families with stronger dependence in the lower tail
 //!
-const std::vector<BicopFamily> lt = {
+const std::vector <BicopFamily> lt = {
     BicopFamily::clayton,
     BicopFamily::bb1,
     BicopFamily::bb7
@@ -145,7 +146,7 @@ const std::vector<BicopFamily> lt = {
 
 //! Families with stronger dependence in the upper tail
 //!
-const std::vector<BicopFamily> ut = {
+const std::vector <BicopFamily> ut = {
     BicopFamily::gumbel,
     BicopFamily::joe,
     BicopFamily::bb1,
@@ -156,7 +157,7 @@ const std::vector<BicopFamily> ut = {
 
 //! Families for which `method = "itau"` is available in Bicop::fit()
 //!
-const std::vector<BicopFamily> itau = {
+const std::vector <BicopFamily> itau = {
     BicopFamily::indep,
     BicopFamily::gaussian,
     BicopFamily::student,
@@ -168,7 +169,7 @@ const std::vector<BicopFamily> itau = {
 
 //! Families that can be flipped by adjusting the rotation.
 //!
-const std::vector<BicopFamily> flip_by_rotation = {
+const std::vector <BicopFamily> flip_by_rotation = {
     BicopFamily::clayton,
     BicopFamily::gumbel,
     BicopFamily::frank,

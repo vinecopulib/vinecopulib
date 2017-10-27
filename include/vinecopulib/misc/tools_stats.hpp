@@ -20,7 +20,8 @@ namespace tools_stats {
 //! @param x evaluation points.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated densities.
-inline Eigen::MatrixXd dnorm(const Eigen::MatrixXd &x) {
+inline Eigen::MatrixXd dnorm(const Eigen::MatrixXd &x)
+{
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
@@ -31,7 +32,8 @@ inline Eigen::MatrixXd dnorm(const Eigen::MatrixXd &x) {
 //! @param x evaluation points.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated probabilities.
-inline Eigen::MatrixXd pnorm(const Eigen::MatrixXd &x) {
+inline Eigen::MatrixXd pnorm(const Eigen::MatrixXd &x)
+{
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
@@ -42,7 +44,8 @@ inline Eigen::MatrixXd pnorm(const Eigen::MatrixXd &x) {
 //! @param x evaluation points.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated quantiles.
-inline Eigen::MatrixXd qnorm(const Eigen::MatrixXd &x) {
+inline Eigen::MatrixXd qnorm(const Eigen::MatrixXd &x)
+{
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
@@ -54,7 +57,8 @@ inline Eigen::MatrixXd qnorm(const Eigen::MatrixXd &x) {
 //! @param nu degrees of freedom parameter.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated densities.
-inline Eigen::MatrixXd dt(const Eigen::MatrixXd &x, double nu) {
+inline Eigen::MatrixXd dt(const Eigen::MatrixXd &x, double nu)
+{
     boost::math::students_t dist(nu);
     auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
@@ -66,7 +70,8 @@ inline Eigen::MatrixXd dt(const Eigen::MatrixXd &x, double nu) {
 //! @param nu degrees of freedom parameter.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated probabilities.
-inline Eigen::MatrixXd pt(const Eigen::MatrixXd &x, double nu) {
+inline Eigen::MatrixXd pt(const Eigen::MatrixXd &x, double nu)
+{
     boost::math::students_t dist(nu);
     auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
@@ -78,7 +83,8 @@ inline Eigen::MatrixXd pt(const Eigen::MatrixXd &x, double nu) {
 //! @param nu degrees of freedom parameter.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated quantiles.
-inline Eigen::MatrixXd qt(const Eigen::MatrixXd &x, double nu) {
+inline Eigen::MatrixXd qt(const Eigen::MatrixXd &x, double nu)
+{
     boost::math::students_t dist(nu);
     auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);

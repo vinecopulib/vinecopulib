@@ -14,7 +14,8 @@ namespace tools_eigen {
 //! remove rows of a matrix which contain nan values
 //! @param x the matrix.
 //! @return a new matrix without the rows containing nan values
-inline Eigen::MatrixXd nan_omit(const Eigen::MatrixXd &x) {
+inline Eigen::MatrixXd nan_omit(const Eigen::MatrixXd &x)
+{
     // find rows with nans
     Eigen::Matrix<bool, 1, Eigen::Dynamic>
         nans = x.array().isNaN().matrix().rowwise().any();
@@ -60,7 +61,8 @@ inline Eigen::MatrixXd nan_omit(const Eigen::MatrixXd &x) {
 //! @param u the matrix.
 //! @return a new matrix v with `v.col(0) = u.col(1)`, `v.col(1) = u.col(0)`.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
-    Eigen::Matrix<double, Eigen::Dynamic, 2> u) {
+    Eigen::Matrix<double, Eigen::Dynamic, 2> u)
+{
     u.col(0).swap(u.col(1));
     return u;
 }
@@ -77,29 +79,29 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
 //!
 //! @return \f$ f^{-1}(x) \f$.
 inline Eigen::VectorXd invert_f(const Eigen::VectorXd &x,
-                                std::function<Eigen::VectorXd(
-                                    const Eigen::VectorXd &)
+                                std::function< Eigen::VectorXd(
+    const Eigen::VectorXd &)
 
-                                > f,
-                                const double lb,
-                                const double ub,
-                                int n_iter
+> f,
+const double lb,
+const double ub,
+int n_iter
 ) {
-    Eigen::VectorXd xl = Eigen::VectorXd::Constant(x.size(), lb);
-    Eigen::VectorXd xh = Eigen::VectorXd::Constant(x.size(), ub);
-    Eigen::VectorXd x_tmp = x;
-    for (
-        int iter = 0;
-        iter < n_iter;
-        ++iter) {
-        x_tmp = (xh + xl) / 2.0;
-        Eigen::VectorXd fm = f(x_tmp) - x;
-        xl = (fm.array() < 0).select(x_tmp, xl);
-        xh = (fm.array() < 0).select(xh, x_tmp);
-    }
+Eigen::VectorXd xl = Eigen::VectorXd::Constant(x.size(), lb);
+Eigen::VectorXd xh = Eigen::VectorXd::Constant(x.size(), ub);
+Eigen::VectorXd x_tmp = x;
+for (
+int iter = 0;
+iter<n_iter;
+++iter) {
+x_tmp = (xh + xl) / 2.0;
+Eigen::VectorXd fm = f(x_tmp) - x;
+xl = (fm.array() < 0).select(x_tmp, xl);
+xh = (fm.array() < 0).select(xh, x_tmp);
+}
 
-    return
-        x_tmp;
+return
+x_tmp;
 }
 
 //! expand a vector into a matrix with two columns where each row
@@ -107,7 +109,8 @@ inline Eigen::VectorXd invert_f(const Eigen::VectorXd &x,
 //!
 //! @param grid_points the vector to expand.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2> expand_grid(
-    const Eigen::VectorXd &grid_points) {
+    const Eigen::VectorXd &grid_points)
+{
     ptrdiff_t m = grid_points.size();
     Eigen::Matrix<double, Eigen::Dynamic, 2> grid_2d(m * m, 2);
     ptrdiff_t k = 0;
@@ -128,10 +131,11 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> expand_grid(
 //!
 //! @param filename the name of the file to read from.
 //! @param max_buffer_size the maximal buffer size.
-inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
-    const char *filename, int max_buffer_size) {
+inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
+    const char *filename, int max_buffer_size)
+{
     Eigen::MatrixXd temp = read_matxd(filename, max_buffer_size);
-    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> output = temp.cast<size_t>();
+    Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> output = temp.cast<size_t>();
     return output;
 }
 
@@ -142,7 +146,8 @@ inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
 //!
 //! @param filename the name of the file to read from.
 //! @param max_buffer_size the maximal buffer size.
-inline Eigen::MatrixXd read_matxd(const char *filename, int max_buffer_size) {
+inline Eigen::MatrixXd read_matxd(const char *filename, int max_buffer_size)
+{
     using namespace std;
 
     int cols = 0, rows = 0;

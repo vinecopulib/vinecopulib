@@ -16,7 +16,8 @@
 namespace tools_parallel {
 
 //! Implemenation of the thread pool pattern similar to RcppThread.
-class ThreadPool {
+class ThreadPool
+{
 public:
 
     ThreadPool() = default;
@@ -27,7 +28,8 @@ public:
 
     //! constructs a thread pool with `nThreads` threads.
     //! @param nThreads number of threads to create.
-    ThreadPool(size_t nThreads) : stopped_(false) {
+    ThreadPool(size_t nThreads) : stopped_(false)
+    {
         for (size_t t = 0; t < nThreads; t++) {
             pool_.emplace_back([this] {
                                    // observe thread pool as long there are jobs or pool has been
@@ -37,7 +39,7 @@ public:
                                        {
                                            // thread must hold the lock while modifying shared
                                            // variables
-                                           std::unique_lock<std::mutex> lk(m_);
+                                           std::unique_lock <std::mutex> lk(m_);
 
                                            // wait for new job or stop signal
                                            cv_.wait(lk, [this] {
@@ -61,7 +63,8 @@ public:
         }
     }
 
-    ~ThreadPool() {
+    ~ThreadPool()
+    {
         join();
     }
 
@@ -77,15 +80,17 @@ public:
     //! @return an `std::shared_future`, where the user can get the result and
     //!   rethrow the catched exceptions.
     template<class F, class... Args>
-    auto push(F &&f, Args &&... args) -> std::future<decltype(f(args...))> {
+    auto push(F &&f, Args &&... args) -> std::future<decltype(f(args...))>
+    {
         // create packaged task on the heap to avoid stack overlows.
-        auto job = std::make_shared<std::packaged_task<decltype(f(args...))()>>(
-            [&f, args...] { return f(args...); }
-        );
+        auto job =
+            std::make_shared < std::packaged_task < decltype(f(args...))() >> (
+                [&f, args...] { return f(args...); }
+            );
 
         // add job to the queue
         {
-            std::unique_lock<std::mutex> lk(m_);
+            std::unique_lock <std::mutex> lk(m_);
             if (stopped_)
                 throw std::runtime_error("cannot push to stopped thread pool");
             jobs_.emplace([job]() { (*job)(); });
@@ -99,10 +104,11 @@ public:
     }
 
     //! waits for all jobs to finish and joins all threads.
-    void join() {
+    void join()
+    {
         // signal all threads to stop
         {
-            std::unique_lock<std::mutex> lk(m_);
+            std::unique_lock <std::mutex> lk(m_);
             stopped_ = true;
         }
         cv_.notify_all();
@@ -116,8 +122,8 @@ public:
     }
 
 private:
-    std::vector<std::thread> pool_;            // worker threads in the pool
-    std::queue<std::function<void()>> jobs_;  // the task queue
+    std::vector <std::thread> pool_;            // worker threads in the pool
+    std::queue <std::function<void()>> jobs_;  // the task queue
 
     // variables for synchronization between workers
     std::mutex m_;

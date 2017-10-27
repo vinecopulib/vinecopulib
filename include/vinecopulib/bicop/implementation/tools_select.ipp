@@ -14,10 +14,11 @@ namespace tools_select {
 //! association direction.
 //! @param data captured by reference to avoid data copies b/c of pairwise_tau;
 //!     should NOT be modified though.
-inline std::vector<Bicop> create_candidate_bicops(
+inline std::vector <Bicop> create_candidate_bicops(
     Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-    const FitControlsBicop &controls) {
-    std::vector<BicopFamily> families = get_candidate_families(controls);
+    const FitControlsBicop &controls)
+{
+    std::vector <BicopFamily> families = get_candidate_families(controls);
 
     // check whether dependence is negative or positive
     double tau = tools_stats::pairwise_tau(data);
@@ -29,7 +30,7 @@ inline std::vector<Bicop> create_candidate_bicops(
     }
 
     // create Bicop objects for all valid family/rotation combinations
-    std::vector<Bicop> new_bicops;
+    std::vector <Bicop> new_bicops;
     for (auto &fam : families) {
         if (tools_stl::is_member(fam, bicop_families::rotationless)) {
             new_bicops.push_back(Bicop(fam, 0));
@@ -47,10 +48,11 @@ inline std::vector<Bicop> create_candidate_bicops(
     return new_bicops;
 }
 
-inline std::vector<BicopFamily>
-get_candidate_families(const FitControlsBicop &controls) {
+inline std::vector <BicopFamily>
+get_candidate_families(const FitControlsBicop &controls)
+{
     //! adjusts the family_set according to parameteric_method.
-    std::vector<BicopFamily> family_set = controls.get_family_set();
+    std::vector <BicopFamily> family_set = controls.get_family_set();
     if (family_set.empty()) {
         // use all (allowed) families
         if (controls.get_parametric_method() == "itau") {
@@ -72,9 +74,10 @@ get_candidate_families(const FitControlsBicop &controls) {
 
 //! removes candidates whose symmetry properties does not correspond to those
 //! of the data.
-inline void preselect_candidates(std::vector<Bicop> &bicops,
+inline void preselect_candidates(std::vector <Bicop> &bicops,
                                  const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                                 double tau) {
+                                 double tau)
+{
     auto c = get_c1c2(data, tau);
     bicops.erase(
         std::remove_if(
@@ -87,7 +90,8 @@ inline void preselect_candidates(std::vector<Bicop> &bicops,
 }
 
 inline std::vector<double> get_c1c2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data, double tau) {
+    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data, double tau)
+{
     using namespace tools_stats;
     size_t n = data.rows();
     Eigen::MatrixXd x = Eigen::MatrixXd::Zero(n, 2);
@@ -135,7 +139,8 @@ inline std::vector<double> get_c1c2(
 }
 
 inline bool
-preselect_family(std::vector<double> c, double tau, const Bicop &bicop) {
+preselect_family(std::vector<double> c, double tau, const Bicop &bicop)
+{
     using namespace tools_stl;
     BicopFamily family = bicop.get_family();
     int rotation = bicop.get_rotation();

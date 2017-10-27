@@ -8,7 +8,8 @@
 #include <boost/math/constants/constants.hpp>
 
 namespace vinecopulib {
-inline StudentBicop::StudentBicop() {
+inline StudentBicop::StudentBicop()
+{
     family_ = BicopFamily::student;
     parameters_ = Eigen::VectorXd(2);
     parameters_lower_bounds_ = Eigen::VectorXd(2);
@@ -20,7 +21,8 @@ inline StudentBicop::StudentBicop() {
 
 inline Eigen::VectorXd StudentBicop::pdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));
     Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
@@ -41,7 +43,8 @@ inline Eigen::VectorXd StudentBicop::pdf(
 
 inline Eigen::VectorXd StudentBicop::cdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     int nu = (int) double(this->parameters_(1));
     return tools_stats::pbvt(tools_stats::qt(u, nu),
                              nu, double(this->parameters_(0)));
@@ -49,7 +52,8 @@ inline Eigen::VectorXd StudentBicop::cdf(
 
 inline Eigen::VectorXd StudentBicop::hfunc1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));
     Eigen::VectorXd h = Eigen::VectorXd::Ones(u.rows());
@@ -65,7 +69,8 @@ inline Eigen::VectorXd StudentBicop::hfunc1(
 
 inline Eigen::VectorXd StudentBicop::hinv1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-) {
+)
+{
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));
     Eigen::VectorXd hinv = Eigen::VectorXd::Ones(u.rows());
@@ -82,14 +87,16 @@ inline Eigen::VectorXd StudentBicop::hinv1(
     return hinv;
 }
 
-inline Eigen::VectorXd StudentBicop::get_start_parameters(const double tau) {
+inline Eigen::VectorXd StudentBicop::get_start_parameters(const double tau)
+{
     Eigen::VectorXd parameters = get_parameters();
     parameters(0) = sin(tau * boost::math::constants::pi<double>() / 2);;
     parameters(1) = 5;
     return parameters;
 }
 
-inline Eigen::MatrixXd StudentBicop::tau_to_parameters(const double &tau) {
+inline Eigen::MatrixXd StudentBicop::tau_to_parameters(const double &tau)
+{
     return vinecopulib::no_tau_to_parameters(tau);
 }
 }

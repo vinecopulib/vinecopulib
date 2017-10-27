@@ -17,7 +17,8 @@ namespace vinecopulib {
 //!
 //! @literature
 //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
-class StudentBicop : public EllipticalBicop {
+class StudentBicop : public EllipticalBicop
+{
 public:
     // constructor
     StudentBicop();

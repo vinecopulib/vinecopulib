@@ -10,7 +10,8 @@
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib {
 //! creates default controls for fitting vine copula models.
-inline FitControlsVinecop::FitControlsVinecop() : FitControlsBicop() {
+inline FitControlsVinecop::FitControlsVinecop() : FitControlsBicop()
+{
     truncation_level_ = std::numeric_limits<int>::max();
     threshold_ = 0.0;
     tree_criterion_ = "tau";
@@ -39,7 +40,7 @@ inline FitControlsVinecop::FitControlsVinecop() : FitControlsBicop() {
 //!     pair copulas within a tree; never uses more than the number returned
 //!     by `std::thread::hardware_concurrency()`.
 inline FitControlsVinecop::FitControlsVinecop(
-    std::vector<BicopFamily> family_set,
+    std::vector <BicopFamily> family_set,
     std::string parametric_method,
     std::string nonparametric_method,
     double nonparametric_mult,
@@ -57,7 +58,8 @@ inline FitControlsVinecop::FitControlsVinecop(
                      nonparametric_method,
                      nonparametric_mult,
                      selection_criterion,
-                     preselect_families) {
+                     preselect_families)
+{
     set_truncation_level(truncation_level);
     set_tree_criterion(tree_criterion);
     set_threshold(threshold);
@@ -89,7 +91,8 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop controls,
                                               bool select_threshold,
                                               bool show_trace,
                                               size_t num_threads) :
-    FitControlsBicop(controls) {
+    FitControlsBicop(controls)
+{
     set_truncation_level(truncation_level);
     set_tree_criterion(tree_criterion);
     set_threshold(threshold);
@@ -102,20 +105,23 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop controls,
 //! Sanity checks
 //! @{
 inline void
-FitControlsVinecop::check_truncation_level(size_t truncation_level) {
+FitControlsVinecop::check_truncation_level(size_t truncation_level)
+{
     if (truncation_level < 1) {
         throw std::runtime_error("truncation_level should be at least 1");
     }
 }
 
 inline void
-FitControlsVinecop::check_tree_criterion(std::string tree_criterion) {
+FitControlsVinecop::check_tree_criterion(std::string tree_criterion)
+{
     if (!tools_stl::is_member(tree_criterion, {"tau", "rho", "hoeffd"})) {
         throw std::runtime_error("tree_criterion should be tau, rho or hoeffd");
     }
 }
 
-inline void FitControlsVinecop::check_threshold(double threshold) {
+inline void FitControlsVinecop::check_threshold(double threshold)
+{
     if (threshold < 0 || threshold > 1) {
         throw std::runtime_error("threshold should be in [0,1]");
     }
@@ -124,35 +130,43 @@ inline void FitControlsVinecop::check_threshold(double threshold) {
 
 //! Getters and setters.
 //! @{
-inline size_t FitControlsVinecop::get_truncation_level() {
+inline size_t FitControlsVinecop::get_truncation_level()
+{
     return truncation_level_;
 }
 
-inline std::string FitControlsVinecop::get_tree_criterion() {
+inline std::string FitControlsVinecop::get_tree_criterion()
+{
     return tree_criterion_;
 }
 
-inline double FitControlsVinecop::get_threshold() {
+inline double FitControlsVinecop::get_threshold()
+{
     return threshold_;
 }
 
-inline bool FitControlsVinecop::get_show_trace() {
+inline bool FitControlsVinecop::get_show_trace()
+{
     return show_trace_;
 }
 
-inline bool FitControlsVinecop::get_select_truncation_level() {
+inline bool FitControlsVinecop::get_select_truncation_level()
+{
     return select_truncation_level_;
 }
 
-inline bool FitControlsVinecop::get_select_threshold() {
+inline bool FitControlsVinecop::get_select_threshold()
+{
     return select_threshold_;
 }
 
-inline bool FitControlsVinecop::needs_sparse_select() {
+inline bool FitControlsVinecop::needs_sparse_select()
+{
     return (select_truncation_level_ | select_threshold_);
 }
 
-inline FitControlsBicop FitControlsVinecop::get_fit_controls_bicop() {
+inline FitControlsBicop FitControlsVinecop::get_fit_controls_bicop()
+{
     FitControlsBicop controls_bicop(get_family_set(),
                                     get_parametric_method(),
                                     get_nonparametric_method(),
@@ -162,37 +176,44 @@ inline FitControlsBicop FitControlsVinecop::get_fit_controls_bicop() {
     return controls_bicop;
 }
 
-inline void FitControlsVinecop::set_truncation_level(size_t truncation_level) {
+inline void FitControlsVinecop::set_truncation_level(size_t truncation_level)
+{
     check_truncation_level(truncation_level);
     truncation_level_ = truncation_level;
 }
 
-inline void FitControlsVinecop::set_tree_criterion(std::string tree_criterion) {
+inline void FitControlsVinecop::set_tree_criterion(std::string tree_criterion)
+{
     check_tree_criterion(tree_criterion);
     tree_criterion_ = tree_criterion;
 }
 
-inline void FitControlsVinecop::set_threshold(double threshold) {
+inline void FitControlsVinecop::set_threshold(double threshold)
+{
     check_threshold(threshold);
     threshold_ = threshold;
 }
 
-inline void FitControlsVinecop::set_show_trace(bool show_trace) {
+inline void FitControlsVinecop::set_show_trace(bool show_trace)
+{
     show_trace_ = show_trace;
 }
 
 inline void
-FitControlsVinecop::set_select_truncation_level(bool select_truncation_level) {
+FitControlsVinecop::set_select_truncation_level(bool select_truncation_level)
+{
     select_truncation_level_ = select_truncation_level;
 }
 
-inline void FitControlsVinecop::set_select_threshold(bool select_threshold) {
+inline void FitControlsVinecop::set_select_threshold(bool select_threshold)
+{
     select_threshold_ = select_threshold;
 }
 
 
 inline void
-FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls) {
+FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)
+{
     set_family_set(controls.get_family_set());
     set_parametric_method(controls.get_parametric_method());
     set_selection_criterion(get_selection_criterion());

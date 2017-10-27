@@ -9,13 +9,15 @@
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 
 namespace vinecopulib {
-inline TllBicop::TllBicop() {
+inline TllBicop::TllBicop()
+{
     family_ = BicopFamily::tll;
 }
 
 inline Eigen::VectorXd TllBicop::gaussian_kernel_2d(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &x
-) {
+)
+{
     return tools_stats::dnorm(x).rowwise().prod();
 }
 
@@ -24,7 +26,8 @@ inline Eigen::VectorXd TllBicop::gaussian_kernel_2d(
 inline Eigen::Matrix2d TllBicop::select_bandwidth(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
     std::string method
-) {
+)
+{
     size_t n = x.rows();
     Eigen::Matrix<double, Eigen::Dynamic, 2> centered =
         x.rowwise() - x.colwise().mean();
@@ -47,7 +50,8 @@ inline Eigen::Matrix2d TllBicop::select_bandwidth(
 }
 
 //! calculates the cholesky root of a 2x2 matrix.
-inline Eigen::Matrix2d chol22(const Eigen::Matrix2d &B) {
+inline Eigen::Matrix2d chol22(const Eigen::Matrix2d &B)
+{
 
     Eigen::Matrix2d rB;
 
@@ -72,7 +76,8 @@ inline Eigen::MatrixXd TllBicop::fit_local_likelihood(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &x_data,
     const Eigen::Matrix2d &B,
-    std::string method) {
+    std::string method)
+{
     size_t m = x.rows();       // number of evaluation points
     size_t n = x_data.rows();  // number of observations
 
@@ -132,7 +137,8 @@ inline double TllBicop::calculate_infl(const size_t &n,
                                        const Eigen::Matrix2d &B,
                                        const double &det_irB,
                                        const Eigen::Matrix2d &S,
-                                       const std::string &method) {
+                                       const std::string &method)
+{
     Eigen::MatrixXd M;
     if (method == "constant") {
         M = Eigen::MatrixXd::Constant(1, 1, f0);
@@ -192,7 +198,8 @@ inline double TllBicop::calculate_infl(const size_t &n,
 
 
 inline void TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                          std::string method, double mult) {
+                          std::string method, double mult)
+{
     // construct default grid (equally spaced on Gaussian scale)
     size_t m = 30;
     Eigen::VectorXd grid_points(m);
