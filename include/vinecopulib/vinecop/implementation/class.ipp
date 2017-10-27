@@ -117,9 +117,8 @@ inline Vinecop::Vinecop(const char *filename, bool check_matrix) :
     Vinecop(tools_serialization::json_to_ptree(filename),
             check_matrix) {}
 
-//! constructs a vine copula model from data.
-//!
-//! The function creates a model and calls select_family().
+//! constructs a vine copula model from data by creating a model and calling
+//! select_family().
 //!
 //! @param data an \f$ n \times d \f$ matrix of observations.
 //! @param matrix either an empty matrix (default) or an R-vine structure
@@ -139,9 +138,8 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
     select_families(data, controls);
 }
 
-//! constructs a vine copula model from data.
-//!
-//! The function creates a model and calls select_all().
+//! constructs a vine copula model from data by creating a model and
+//! calling select_all().
 //!
 //! @param data an \f$ n \times d \f$ matrix of observations.
 //! @param controls see FitControlsVinecop.
@@ -154,9 +152,8 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
     select_all(data, controls);
 }
 
-//! Convert the copula into a boost::property_tree::ptree object
-//!
-//! The ptree object contains two nodes : `"matrix"` and `"pair copulas"`.
+//! Convert the copula into a boost::property_tree::ptree object, which
+//! contains two nodes : `"matrix"` and `"pair copulas"`.
 //! The former is encodes the R-Vine structure and the latter is a list of
 //! child nodes for the trees (`"tree1"`, `"tree2"`, etc), each containing
 //! a list of child nodes for the edges (`"pc1"`, `"pc2"`, etc).
@@ -182,9 +179,8 @@ inline boost::property_tree::ptree Vinecop::to_ptree() {
     return output;
 }
 
-//! Write the copula object into a JSON file
-//!
-//! See to_ptree() for the structure of the file.
+//! Write the copula object into a JSON file. See to_ptree() for the structure
+//! of the file.
 //!
 //! @param filename the name of the file to write.
 inline void Vinecop::to_json(const char *filename) {
@@ -205,9 +201,8 @@ inline std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(
 }
 
 
-//! automatically fits and selects a vine copula model
-//!
-//! Selection of the structure is performed using the algorithm of
+//! automatically fits and selects a vine copula model. Selection of the
+//! structure is performed using the algorithm of
 //! Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013).
 //! *Selecting and estimating regular vine copulae and application to
 //! financial returns.* Computational Statistics & Data Analysis, 59 (1),
@@ -483,9 +478,7 @@ inline Eigen::MatrixXd Vinecop::simulate(size_t n) const {
     return inverse_rosenblatt(U);
 }
 
-//! calculates the log-likelihood.
-//!
-//! The log-likelihood is defined as
+//! calculates the log-likelihood, which is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \f]
 //! where \f$ c \f$ is the copula density pdf().
 //!
@@ -494,9 +487,7 @@ inline double Vinecop::loglik(const Eigen::MatrixXd &u) const {
     return pdf(u).array().log().sum();
 }
 
-//! calculates the Akaike information criterion (AIC).
-//!
-//! The AIC is defined as
+//! calculates the Akaike information criterion (AIC), whic is defined as
 //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
 //! (effective) number of parameters of the model, see loglik() and
@@ -508,9 +499,7 @@ inline double Vinecop::aic(const Eigen::MatrixXd &u) const {
     return -2 * loglik(u) + 2 * calculate_npars();
 }
 
-//! calculates the Bayesian information criterion (BIC).
-//!
-//! The BIC is defined as
+//! calculates the Bayesian information criterion (BIC), which is defined as
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
 //! (effective) number of parameters of the model, see loglik() and
@@ -522,9 +511,7 @@ inline double Vinecop::bic(const Eigen::MatrixXd &u) const {
     return -2 * loglik(u) + calculate_npars() * log(u.rows());
 }
 
-//! calculates the effective number of parameters.
-//!
-//! Returns sum of the number of parameters for all pair copulas (see
+//! returns sum of the number of parameters for all pair copulas (see
 //! Bicop::calculate_npars()).
 inline double Vinecop::calculate_npars() const {
     double npars = 0.0;
@@ -537,9 +524,8 @@ inline double Vinecop::calculate_npars() const {
 }
 
 
-//! calculates the inverse Rosenblatt transform for a vine copula model.
-//!
-//! The inverse Rosenblatt transform can be used for simulation: the
+//! calculates the inverse Rosenblatt transform for a vine copula model,
+//! which can be used for simulation: the
 //! function applied to independent uniform variates resembles simulated
 //! data from the vine copula model.
 //!
