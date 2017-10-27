@@ -351,4 +351,45 @@ inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> relabel_elements(
 
     return new_matrix;
 }
+
+//! completes an R-vine matrix that has only been filled for the first couple
+//! of trees.
+//! @param mat R-vine matrix where counter-diagonal and upper block have been 
+//!     filled; entries in between may still be 0.
+//! @param t_start the tree level from where the matrix needs to be filled.
+//! @return a valid R-vine structure matrix (= passing all 
+//!     checks in `RVineMatrix()`).
+inline void RVineMatrix::complete_matrix(
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat, 
+    size_t t_start) {
+    using namespace tools_stl;
+    size_t d = mat.cols();
+    // there are max d-2 off-diagonal entries in each column
+    for (size_t t = t_start; t < d - 1; ++t) {
+        // for each column, get all indices it already contains
+        std::vector<std::vector<size_t>> all_indices(d - t);
+        std::vector<size_t> tmp(t);
+        for (size_t e = 0; e < d - t; e++) {
+            Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&tmp[0], t) =
+            mat.col(e).head(t);
+            all_indices[e] = cat(mat(d - 1 - e, e), tmp);
+        }
+        
+        // fill row t column by column
+        for (size_t e0 = 0; e0 < d - t; e0++) {
+            // check all columns to the right of e0
+            for (size_t e1 = e0 + 1; e1 < d - t; e1++) {
+                // get possible conditioned sets joining edges e0 and e1
+                auto ned_set = set_sym_diff(all_indices[e0], all_indices[e1]);
+                // a valid conditioned set has two elements
+                if (ned_set.size() == 2) {
+                    // allowed entry in column e0 is the element of the 
+                    // conditioned set that is not contained in column e0
+                    mat(t, e0) = set_diff(ned_set, all_indices[e0])[0];
+                    break;  // continue with next column
+                }
+            }
+        }
+    }
+}
 }

@@ -40,10 +40,7 @@ TEST(vinecop_sanity_checks, catches_wrong_size) {
     EXPECT_ANY_THROW(vinecop.select_all(U));
     EXPECT_ANY_THROW(vinecop.select_families(U));
 
-    pair_copulas.pop_back();
-    EXPECT_ANY_THROW(Vinecop(pair_copulas, mat));
-    pair_copulas = Vinecop::make_pair_copula_store(3);
-    pair_copulas[0].pop_back();
+    pair_copulas.resize(4);  // too many
     EXPECT_ANY_THROW(Vinecop(pair_copulas, mat));
 }
 }

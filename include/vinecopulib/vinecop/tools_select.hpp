@@ -73,19 +73,19 @@ public:
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
     RVineMatrix get_rvine_matrix() const;
+    
+    static std::vector<std::vector<Bicop>> make_pair_copula_store(
+        size_t d,
+        size_t truncation_level);
 
     void select_all_trees(const Eigen::MatrixXd &data);
 
     void sparse_select_all_trees(const Eigen::MatrixXd &data);
 
 protected:
-    void truncate();
-
-    //! selects tree of vine copula, assuming all previous trees have
-    //! been fit.
     void select_tree(size_t t);
 
-    virtual void finalize() = 0;
+    virtual void finalize(size_t trunc_lvl) = 0;
 
     double get_loglik_of_tree(size_t t);
 
@@ -111,7 +111,6 @@ protected:
 
     size_t n_;
     size_t d_;
-    size_t trees_fitted_;
     FitControlsVinecop controls_;
     RVineMatrix vine_matrix_;
     std::vector<std::vector<Bicop>> pair_copulas_;
@@ -134,7 +133,8 @@ private:
 
     void remove_vertex_data(VineTree &tree);
 
-    void select_pair_copulas(VineTree &tree, const VineTree &tree_opt);
+    void select_pair_copulas(VineTree& tree, 
+                             const VineTree& tree_opt = VineTree());
 
     FoundEdge find_old_fit(double fit_id, const VineTree &old_graph);
 
@@ -148,7 +148,6 @@ private:
 class StructureSelector : public VinecopSelector {
 public:
     StructureSelector(const Eigen::MatrixXd &data,
-                      const std::vector<std::vector<Bicop>> &pair_copulas,
                       const FitControlsVinecop &controls);
 
     ~StructureSelector() {}
@@ -156,14 +155,13 @@ public:
 private:
     void add_allowed_edges(VineTree &tree);
 
-    void finalize();
+    void finalize(size_t trunc_lvl);
 };
 
 class FamilySelector : public VinecopSelector {
 public:
     FamilySelector(const Eigen::MatrixXd &data,
                    const RVineMatrix &vine_matrix,
-                   const std::vector<std::vector<Bicop>> &pair_copulas,
                    const FitControlsVinecop &controls);
 
     ~FamilySelector() {}
@@ -176,7 +174,7 @@ private:
     bool belongs_to_structure(size_t v0, size_t v1,
                               const VineTree &vine_tree);
 
-    void finalize();
+    void finalize(size_t trunc_lvl);
 };
 
 }

@@ -67,7 +67,7 @@ script:
   - cmake .. $CMAKE_ARGS -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
   - if [ $COMPILER == gcc ]; then make vinecopulib_coverage; else make; fi
   - cd ../release
-  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
+  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make && sudo make install
   - bin/test_all
   - cd ../examples/bicop
   - mkdir build

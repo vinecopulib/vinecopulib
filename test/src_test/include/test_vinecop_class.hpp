@@ -160,7 +160,7 @@ TEST_F(VinecopTest, family_select_finds_true_rotations) {
     EXPECT_EQ(true_rots, fitd_rots);
 }
 
-TEST_F(VinecopTest, runs_multi_threaded) {
+TEST_F(VinecopTest, works_multi_threaded) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_truncation_level(true);
     // controls.set_show_trace(true);
@@ -210,6 +210,15 @@ TEST_F(VinecopTest, select_finds_right_structure) {
 }
 
 // in what follows, we only check if funs run without error ----------
+TEST_F(VinecopTest, fixed_truncation) {
+    FitControlsVinecop controls({BicopFamily::indep});
+    controls.set_truncation_level(2);
+    // controls.set_show_trace(true);
+    Vinecop fit(7);
+    fit.select_all(u, controls);
+    fit.select_families(u, controls);
+}
+
 TEST_F(VinecopTest, sparse_threshold_selection) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_threshold(true);
@@ -223,6 +232,7 @@ TEST_F(VinecopTest, sparse_truncation_selection) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_truncation_level(true);
     // controls.set_show_trace(true);
+    u = tools_stats::simulate_uniform(1e2, 7);
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);
