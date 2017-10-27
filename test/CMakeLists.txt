@@ -19,5 +19,5 @@ add_subdirectory(src_test)
 
 foreach (app ${unit_tests})
     add_executable(${app} ${app}.cpp)
-    target_link_libraries(${app} gtest vinecopulib ${external_libs} ${test_libs} src_test)
+    target_link_libraries(${app} gtest vinecopulib ${test_libs} src_test)
 endforeach ()

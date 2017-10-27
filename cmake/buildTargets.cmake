@@ -3,8 +3,6 @@ if (BUILD_SHARED_LIBS)
     include_directories(${vinecopulib_includes})
 
     add_library(vinecopulib SHARED ${vinecopulib_sources})
-
-    target_link_libraries(vinecopulib ${external_libs})
     set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
     set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
 else()
