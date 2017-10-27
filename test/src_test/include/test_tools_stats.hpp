@@ -31,8 +31,11 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct) {
         EXPECT_NEAR(U(i, 0), (i + 1.0) * 0.1, 1e-2);
         EXPECT_NEAR(U(i, 1), 1.0 - (i + 1.0) * 0.1, 1e-2);
     }
-    EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X, "random"));
-    EXPECT_ANY_THROW(tools_stats::to_pseudo_obs(X, "something"));
+
+    Eigen::MatrixXd X2 = tools_stats::simulate_uniform(100, 2);
+    EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X2, "random"));
+    EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X2, "first"));
+    EXPECT_ANY_THROW(tools_stats::to_pseudo_obs(X2, "something"));
 }
 
 TEST(test_tools_stats, pairwise_dep_measures_are_correct) {
@@ -114,4 +117,15 @@ TEST(test_tools_stats, dpq_are_nan_safe) {
     EXPECT_NO_THROW(tools_stats::pnorm(X));
     EXPECT_NO_THROW(tools_stats::qnorm(tools_stats::pnorm(X)));
 }
+
+TEST(test_tools_stats, dpt_are_nan_safe) {
+    Eigen::VectorXd X = Eigen::VectorXd::Random(10);
+    X(0) = std::numeric_limits<double>::quiet_NaN();
+    double nu = 4.0;
+    EXPECT_NO_THROW(tools_stats::dt(X, nu));
+    EXPECT_NO_THROW(tools_stats::pt(X, nu));
+    EXPECT_NO_THROW(tools_stats::qt(tools_stats::pt(X, nu), nu));
+}
+
+
 }
