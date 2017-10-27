@@ -31,6 +31,8 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct) {
         EXPECT_NEAR(U(i, 0), (i + 1.0) * 0.1, 1e-2);
         EXPECT_NEAR(U(i, 1), 1.0 - (i + 1.0) * 0.1, 1e-2);
     }
+    EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X, "random"));
+    EXPECT_ANY_THROW(tools_stats::to_pseudo_obs(X, "something"));
 }
 
 TEST(test_tools_stats, pairwise_dep_measures_are_correct) {
