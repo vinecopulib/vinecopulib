@@ -26,11 +26,11 @@ inline RVineMatrix::RVineMatrix(
     }
 }
 
-//! extract matrix_(row, col)
+//! extract matrix(row, col)
 //!
 //! \param row
 //! \param col
-//! \return matrix_(row, col)
+//! \return matrix(row, col)
 inline size_t RVineMatrix::get_element(size_t row, size_t col) const {
     if (row >= d_ || col >= d_) {
         throw std::runtime_error("row and col should be < d");
@@ -39,19 +39,19 @@ inline size_t RVineMatrix::get_element(size_t row, size_t col) const {
 }
 
 //! extract the matrix.
+//!
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
 RVineMatrix::get_matrix() const {
     return matrix_;
 }
 
 //! extracts the variable order in the R-vine.
+//!
 inline Eigen::Matrix<size_t, Eigen::Dynamic, 1> RVineMatrix::get_order() const {
     return matrix_.colwise().reverse().diagonal().reverse();
 }
 
-//! constructs a D-vine matrix.
-//!
-//! A D-vine is a vine where each tree is a path.
+//! constructs a D-vine matrix, where each tree is a path.
 //!
 //! @param order order of the variables.
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
@@ -111,9 +111,8 @@ RVineMatrix::belongs_to_structure(const std::vector<size_t> conditioned,
 }
 
 
-//! extracts the R-vine matrix in natural order.
-//!
-//! Natural order means that the counter-diagonal has entries (d, ..., 1). We
+//! extracts the R-vine matrix in natural order, which means that the
+//! counter-diagonal has entries (d, ..., 1). We
 //! convert to natural order by relabeling the variables. Most algorithms for
 //! estimation and evaluation assume that the R-vine matrix is in natural order.
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
@@ -127,9 +126,8 @@ RVineMatrix::in_natural_order() const {
     return relabel_elements(matrix_, new_labels);
 }
 
-//! extracts the maximum matrix.
-//!
-//! The maximum matrix is derived from an R-vine matrix by iteratively computing
+//! extracts the maximum matrix, which is derived from an R-vine matrix by
+//! iteratively computing
 //! the (elementwise) maximum of a row and the row below (starting from the
 //! bottom). It is used in estimation and evaluation algorithms to find the right
 //! pseudo observations for an edge.
