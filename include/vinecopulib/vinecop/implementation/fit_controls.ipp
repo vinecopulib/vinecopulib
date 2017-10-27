@@ -37,7 +37,7 @@ inline FitControlsVinecop::FitControlsVinecop() : FitControlsBicop() {
 //! @param show_trace whether to show a trace of the building progress.
 //! @param num_threads number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number returned
-//!     by `std::thread::hardware_concurrency()``.
+//!     by `std::thread::hardware_concurrency()`.
 inline FitControlsVinecop::FitControlsVinecop(
     std::vector<BicopFamily> family_set,
     std::string parametric_method,
