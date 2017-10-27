@@ -45,7 +45,7 @@ build_script:
 
   - cd ..
   - cd build_shared_libs
-  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install
+  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install
   - set path_orig=%path%
 
   - cmake --build . --config Release

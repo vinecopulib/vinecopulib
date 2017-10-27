@@ -1,4 +1,4 @@
-if (BUILD_SHARED_LIBS)
+if (VINECOPULIB_SHARED_LIB)
     include_directories(SYSTEM ${external_includes})
     include_directories(${vinecopulib_includes})
 
@@ -72,7 +72,7 @@ configure_package_config_file(
 
 # Targets:
 #   * <prefix>/lib/libvinecopulib.dylib
-if (BUILD_SHARED_LIBS)
+if (VINECOPULIB_SHARED_LIB)
     install(TARGETS vinecopulib
             EXPORT "${targets_export_name}"
             LIBRARY DESTINATION "lib"
@@ -110,7 +110,7 @@ install(
         FILES ${misc_hpp}
         DESTINATION "${include_install_dir}/vinecopulib/misc"
 )
-if (NOT BUILD_SHARED_LIBS)
+if (NOT VINECOPULIB_SHARED_LIB)
     install(
             FILES ${vinecopulib_bicop_ipp}
             DESTINATION "${include_install_dir}/vinecopulib/bicop/implementation"
