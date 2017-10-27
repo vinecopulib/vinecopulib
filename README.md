@@ -14,7 +14,7 @@ You can find a comprehensive list of publications and other materials on
 
 #### What is vinecopulib?
 
-vinecopulib is an header-only C++ library for vine copula models based on
+vinecopulib is a header-only C++ library for vine copula models based on
 [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). It provides
 high-performance implementations of the core features of the popular
 [VineCopula R library](https://github.com/tnagler/VineCopula), in particular
@@ -81,12 +81,18 @@ Optionally, you'll need:
    * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
    * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
 
-Note that a `findR.cmake` looks for R and VineCopula in the default locations
-for linux and osx, but problems might occur with versions installed from
-R/RStudio. Therefore, prior to building the library, it is recommended to use:
-
-`sudo Rscript -e 'install.packages(c("VineCopula"), lib="/usr/lib/R/library",
-repos="http://cran.rstudio.com/")'`
+Note that:
+ 
+   * The [C++11 thread support library](http://en.cppreference.com/w/cpp/thread), 
+   available along with any C++11 compiler on 
+   OSX/Windows/most-linux-distributions, is used for multithreading.
+   * A `findR.cmake` looks for R and VineCopula in the default locations for 
+   linux and osx, but problems might occur with versions installed from
+   R/RStudio. Therefore, prior to building the library, it is recommended to 
+   use:
+   
+   `sudo Rscript -e 'install.packages(c("VineCopula"), lib="/usr/lib/R/library",
+   repos="http://cran.rstudio.com/")'`
 
 ### How to build the library
 
@@ -196,10 +202,16 @@ endif()
 find_package(vinecopulib                  REQUIRED)
 find_package(Boost 1.56                   REQUIRED)
 include(cmake/findEigen3.cmake            REQUIRED)
+find_package(Threads                      REQUIRED)
 
 # Set required variables for includes and libraries
+# In the second line
+#   * VINECOPULIB_LIBRARIES is needed if vinecopulib has been built as a
+#     shared lib (does nothing otherwise).
+#   * CMAKE_THREAD_LIBS_INIT is needed for some linux systems
+#     (but does nothing on OSX/Windows).
 set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
-set(external_libs ${VINECOPULIB_LIBRARIES}) # if vinecopulib has been built as a shared lib (does nothing otherwise)
+set(external_libs ${VINECOPULIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 # Include subdirectory with project sources
 add_subdirectory(src)
@@ -213,11 +225,12 @@ could then be:
 # Include header files
 include_directories(${external_includes})
 
-# Add vinecopulib_main executable
+# Add main executable
 add_executable(main main.cpp)
 
-# Link to vinecopulib if vinecopulib has been built as a shared lib (does nothing otherwise)
-target_link_libraries(main ${external_libs})
+# Link to vinecopulib if vinecopulib has been built as a shared lib
+# and to pthreads on some linux systems (does nothing otherwise)
+target_link_libraries(main ${VINECOPULIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 ```
 
 ### Namespaces
