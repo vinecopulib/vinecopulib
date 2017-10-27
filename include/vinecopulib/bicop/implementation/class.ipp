@@ -32,6 +32,7 @@ inline Bicop::Bicop(BicopFamily family, int rotation,
     set_rotation(rotation);
 }
 
+//! create a copula model from the data,
 //! equivalent to `Bicop cop; cop.select(data, controls)`.
 //! @param data see select().
 //! @param controls see select().
@@ -247,9 +248,7 @@ Bicop::simulate(const int &n) const {
     return U;
 }
 
-//! calculates the log-likelihood.
-//!
-//! The log-likelihood is defined as
+//! calculates the log-likelihood, defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \f]
 //! where \f$ c \f$ is the copula density pdf().
 //!
@@ -259,9 +258,7 @@ Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const {
     return pdf(tools_eigen::nan_omit(u)).array().log().sum();
 }
 
-//! calculates the Akaike information criterion (AIC).
-//!
-//! The AIC is defined as
+//! calculates the Akaike information criterion (AIC), defined as
 //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
 //! (effective) number of parameters of the model, see loglik() and
@@ -274,9 +271,7 @@ Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const {
     return -2 * loglik(u) + 2 * calculate_npars();
 }
 
-//! calculates the Bayesian information criterion (BIC).
-//!
-//! The BIC is defined as
+//! calculates the Bayesian information criterion (BIC), defined as
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
 //! (effective) number of parameters of the model, see loglik() and
@@ -289,8 +284,6 @@ Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const {
     return -2 * loglik(u) + calculate_npars() * log(u.rows());
 }
 
-//! calculates the effective number of parameters.
-//!
 //! Returns the actual number of parameters for parameteric families. For
 //! nonparametric families, there is a conceptually similar definition in
 //! the sense that it can be used in the calculation of fit statistics.
@@ -339,13 +332,11 @@ inline Eigen::MatrixXd Bicop::get_parameters() const {
     return bicop_->get_parameters();
 }
 
-//! @param rotation
 inline void Bicop::set_rotation(int rotation) {
     check_rotation(rotation);
     rotation_ = rotation;
 }
 
-//! @param parameters
 inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters) {
     bicop_->set_parameters(parameters);
 }
@@ -416,10 +407,9 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 controls.get_nonparametric_mult());
 }
 
-//! selects the best fitting model.
-//!
-//! The function calls fit() for all families in `family_set`)  and selects
-//! the best fitting model by either BIC or AIC, see bic() and aic().
+//! selects the best fitting model, by calling fit() for all families in
+//! `family_set` and selecting the best fitting model by either BIC or AIC,
+//! see bic() and aic().
 //!
 //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
 //!     \f$(0, 1)^2 \f$.
