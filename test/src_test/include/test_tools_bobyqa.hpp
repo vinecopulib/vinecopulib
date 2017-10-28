@@ -46,7 +46,6 @@ TEST(test_tools_bobyqa, const_function) {
     ASSERT_TRUE(fabs(result.second) < 1e-5);
     ASSERT_TRUE(fabs(result.first(0)) < 1e-5);
     ASSERT_TRUE(fabs(result.first(1)) < 1e-5);
-
 }
 
 TEST(test_tools_bobyqa, complex_quadratic_function) {
@@ -68,7 +67,6 @@ TEST(test_tools_bobyqa, complex_quadratic_function) {
     ub << 5.0, 5.0;
     x << 0.0, -sqrt(5.0);
 
-
     const double initial_trust_region_radius = 1e-3;
     const double final_trust_region_radius = 1e3;
     const long max_function_calls_count = 22;
@@ -83,7 +81,6 @@ TEST(test_tools_bobyqa, complex_quadratic_function) {
     ASSERT_TRUE(fabs(result.second + 142.99689) < 1e-5);
     ASSERT_TRUE(fabs(result.first(0) + 4.0) < 1e-5);
     ASSERT_TRUE(fabs(result.first(1) + 2.11803) < 1e-5);
-
 }
 
 
