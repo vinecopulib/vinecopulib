@@ -93,7 +93,8 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 
             ParBicopOptData my_data = {temp_data, this, initial_parameters(0),
                                        0};
-            tools_bobyqa::BobyqaClosureFunction objective = mle_objective;
+            std::function<double(void *, long, const double *)> objective =
+                mle_objective;
             if (method == "itau") {
                 lb.resize(1, 1);
                 lb(0) = get_parameters_lower_bounds()(1);
@@ -198,14 +199,3 @@ ParBicop::check_parameters_upper(const Eigen::MatrixXd &parameters)
 //! @}
 
 }
-
-/*void remove_row(Eigen::MatrixXd& matrix, unsigned int to_remove)
-{
-    unsigned int n = matrix.rows()-1;
-    unsigned int m = matrix.cols();
-
-    if(to_remove < numRows )
-        matrix.block(to_remove,0,numRows-to_remove,numCols) = matrix.block(to_remove+1,0,numRows-to_remove,numCols);
-
-    matrix.conservativeResize(numRows,numCols);
-}*/
