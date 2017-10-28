@@ -2118,11 +2118,11 @@ std::pair<Eigen::VectorXd, double> bobyqa(
 )
 {
     if (npt < n + 2 || npt > (n + 2) * (n + 1) / 2) {
-        std::__throw_runtime_error("NPT is not in the required interval.");
+        throw std::runtime_error("NPT is not in the required interval.");
     }
 
     if ((ub - lb).minCoeff() < rhobeg + rhobeg) {
-        std::__throw_runtime_error("ub - lb should be greater than "
+        throw std::runtime_error("ub - lb should be greater than "
                                        "rhobeg + rhobeg.");
     }
 
