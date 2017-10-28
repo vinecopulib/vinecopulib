@@ -108,7 +108,23 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 }
                 objective = pmle_objective;
             }
-
+            
+            // refine search interval for Brent algorithm        
+            if (tools_stl::is_member(family_, bicop_families::one_par)) {
+                auto lb2 = lb;
+                auto ub2 = ub;
+                if (tools_stl::is_member(family_, bicop_families::rotationless)) {
+                    lb = tau_to_parameters(std::max(std::fabs(tau)-0.1, 1e-10));
+                    ub = tau_to_parameters(std::min(std::fabs(tau)+0.1, 0.95));
+                } else {
+                    lb = tau_to_parameters(std::max(tau-0.1, -0.99));
+                    ub = tau_to_parameters(std::min(tau+0.1, 0.99));                    
+                }
+                // make sure that parameter bounds are respected
+                lb = lb2.cwiseMax(lb);
+                ub = ub2.cwiseMin(ub);
+            }
+            
             // create optimizer
             Optimizer optimizer(npars, lb, ub);
 
