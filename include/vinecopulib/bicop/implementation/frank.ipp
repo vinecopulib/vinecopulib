@@ -13,8 +13,8 @@ inline FrankBicop::FrankBicop()
     parameters_lower_bounds_ = Eigen::VectorXd(1);
     parameters_upper_bounds_ = Eigen::VectorXd(1);
     parameters_ << 0;
-    parameters_lower_bounds_ << -200;
-    parameters_upper_bounds_ << 200;
+    parameters_lower_bounds_ << -30;
+    parameters_upper_bounds_ << 30;
 }
 
 inline double FrankBicop::generator(const double &u)
