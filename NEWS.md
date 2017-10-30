@@ -1,4 +1,4 @@
-# vinecopulib 0.2.0 (October 27, 2017)
+# vinecopulib 0.2.0 (October 30, 2017)
  
 LIBRARY TYPE
 
@@ -16,6 +16,12 @@ NEW FEATURES
    * parallelized selection/estimation of (pair-) copulas (#240).
    
    * efficient storage and fitting of truncated vines (#248).
+   
+   * Brent line search for (profile-) maximum-likelihood estimation of 
+     one-parameter families (#255).
+     
+   * more restrictive parameter bounds for Archimedean families, ensuring 
+     their numerical stability (#256).
 
 BUG FIXES
 
@@ -31,7 +37,10 @@ BUG FIXES
    
    * interpolation grid is now symmetric around (0.5, 0.5) (#234).
    
-   * stabilize quadratic tll estimator near zero (#235).
+   * stabilized quadratic tll estimator near zero (#235).
+   
+   * stabilized Archimedean pdfs (#256).
+
    
 # vinecopulib 0.1.0 (August 23, 2017)
 
