@@ -23,45 +23,29 @@ TEST(test_tools_bobyqa, const_function) {
 
     const long variables_count = 2;
     const long number_of_interpolation_conditions = variables_count + 2;
-    const long ws_size = (number_of_interpolation_conditions + 5) *
-                         (number_of_interpolation_conditions
-                          + variables_count) +
-                         3 * variables_count * (variables_count + 5) / 2;
 
+    Eigen::VectorXd lb(2);
+    Eigen::VectorXd ub(2);
+    Eigen::VectorXd x(2);
 
-    double *lb = new double[variables_count];
-    double *ub = new double[variables_count];
-    double *x = new double[variables_count];
-    double *working_space = new double[ws_size];
-
-    lb[0] = -1.0;
-    lb[1] = -1.0;
-    ub[0] = 1.0;
-    ub[1] = 1.0;
-    x[0] = 0.0;
-    x[1] = 0.0;
+    lb << -1.0, -1.0;
+    ub << 1.0, 1.0;
+    x << 0.0, 0.0;
 
     const double initial_trust_region_radius = 1e-3;
     const double final_trust_region_radius = 1e3;
     const long max_function_calls_count = 5;
 
-    double result = tools_bobyqa::impl(f, variables_count,
+    auto result = tools_bobyqa::bobyqa(f, variables_count,
                                        number_of_interpolation_conditions,
                                        x, lb, ub,
                                        initial_trust_region_radius,
                                        final_trust_region_radius,
-                                       max_function_calls_count,
-                                       working_space);
+                                       max_function_calls_count);
 
-    ASSERT_TRUE(fabs(result) < 1e-6);
-    ASSERT_TRUE(fabs(x[0]) < 1e-6);
-    ASSERT_TRUE(fabs(x[1]) < 1e-6);
-
-    // delete dynamically allocated objects
-    delete[] x;
-    delete[] lb;
-    delete[] ub;
-    delete[] working_space;
+    ASSERT_TRUE(fabs(result.second) < 1e-5);
+    ASSERT_TRUE(fabs(result.first(0)) < 1e-5);
+    ASSERT_TRUE(fabs(result.first(1)) < 1e-5);
 }
 
 TEST(test_tools_bobyqa, complex_quadratic_function) {
@@ -74,45 +58,29 @@ TEST(test_tools_bobyqa, complex_quadratic_function) {
     const long variables_count = 2;
     const long number_of_interpolation_conditions =
         (variables_count + 1)*(variables_count + 2)/2;
-    const long ws_size = (number_of_interpolation_conditions + 5) *
-                          (number_of_interpolation_conditions
-                           + variables_count) +
-                          3 * variables_count * (variables_count + 5) / 2;
 
+    Eigen::VectorXd lb(2);
+    Eigen::VectorXd ub(2);
+    Eigen::VectorXd x(2);
 
-    double *lb = new double[variables_count];
-    double *ub = new double[variables_count];
-    double *x = new double[variables_count];
-    double *working_space = new double[ws_size];
-
-    lb[0] = -4.0;
-    lb[1] = -3.0;
-    ub[0] = 5.0;
-    ub[1] = 5.0;
-    x[0] = 0.0;
-    x[1] = -sqrt(5.0);
+    lb << -4.0, -3.0;
+    ub << 5.0, 5.0;
+    x << 0.0, -sqrt(5.0);
 
     const double initial_trust_region_radius = 1e-3;
     const double final_trust_region_radius = 1e3;
     const long max_function_calls_count = 22;
 
-    double result = tools_bobyqa::impl(f, variables_count,
+    auto result = tools_bobyqa::bobyqa(f, variables_count,
                                        number_of_interpolation_conditions,
                                        x, lb, ub,
                                        initial_trust_region_radius,
                                        final_trust_region_radius,
-                                       max_function_calls_count,
-                                       working_space);
+                                       max_function_calls_count);
 
-    ASSERT_TRUE(fabs(result + 142.9968943799848) < 1e-6);
-    ASSERT_TRUE(fabs(x[0] + 4.0) < 1e-6);
-    ASSERT_TRUE(fabs(x[1] + 2.11803398875050552) < 1e-6);
-
-    // delete dynamically allocated objects
-    delete[] x;
-    delete[] lb;
-    delete[] ub;
-    delete[] working_space;
+    ASSERT_TRUE(fabs(result.second + 142.99689) < 1e-5);
+    ASSERT_TRUE(fabs(result.first(0) + 4.0) < 1e-5);
+    ASSERT_TRUE(fabs(result.first(1) + 2.11803) < 1e-5);
 }
 
 
@@ -126,45 +94,29 @@ TEST(test_tools_bobyqa, quadratic_function_with_jump) {
     const long variables_count = 2;
     const long number_of_interpolation_conditions =
         (variables_count + 1)*(variables_count + 2)/2;
-    const long ws_size = (number_of_interpolation_conditions + 5) *
-                         (number_of_interpolation_conditions
-                          + variables_count) +
-                         3 * variables_count * (variables_count + 5) / 2;
 
+    Eigen::VectorXd lb(2);
+    Eigen::VectorXd ub(2);
+    Eigen::VectorXd x(2);
 
-    double *lb = new double[variables_count];
-    double *ub = new double[variables_count];
-    double *x = new double[variables_count];
-    double *working_space = new double[ws_size];
-
-    lb[0] = -1.0;
-    lb[1] = -1.0;
-    ub[0] = 1.0;
-    ub[1] = 1.0;
-    x[0] = 0.5;
-    x[1] = 0.5;
+    lb << -1.0, -1.0;
+    ub << 1.0, 1.0;
+    x << 0.5, 0.5;
 
     const double initial_trust_region_radius = 1e-3;
     const double final_trust_region_radius = 1e3;
-    const long max_function_calls_count = 8;
+    const long max_function_calls_count = 22;
 
-    double result = tools_bobyqa::impl(f, variables_count,
+    auto result = tools_bobyqa::bobyqa(f, variables_count,
                                        number_of_interpolation_conditions,
                                        x, lb, ub,
                                        initial_trust_region_radius,
                                        final_trust_region_radius,
-                                       max_function_calls_count,
-                                       working_space);
+                                       max_function_calls_count);
 
-    ASSERT_TRUE(fabs(result - 0.497004933606359666) < 1e-6);
-    ASSERT_TRUE(fabs(x[0] - 0.49899993347109322661) < 1e-6);
-    ASSERT_TRUE(fabs(x[1] - 0.49800000000221306128) < 1e-6);
-
-    // delete dynamically allocated objects
-    delete[] x;
-    delete[] lb;
-    delete[] ub;
-    delete[] working_space;
+        ASSERT_TRUE(fabs(result.second - 0.49700) < 1e-5);
+        ASSERT_TRUE(fabs(result.first(0) - 0.49899) < 1e-5);
+        ASSERT_TRUE(fabs(result.first(1) - 0.49800) < 1e-5);
 }
 
 }

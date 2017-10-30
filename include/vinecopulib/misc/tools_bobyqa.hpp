@@ -11,6 +11,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <algorithm>
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
 
@@ -2103,8 +2104,72 @@ double impl(
                   w + ivl - 1, w + iw - 1);
 }
 
-typedef double (*BobyqaClosureFunction)(void *data, long n,
-                                        const double *x);
+template<class Function>
+std::pair<Eigen::VectorXd, double> bobyqa(
+    const Function &function,
+    const long n,
+    const long npt,
+    Eigen::VectorXd initial_parameters,
+    Eigen::VectorXd lb,
+    Eigen::VectorXd ub,
+    const double rhobeg,
+    const double rhoend,
+    const long maxfun
+)
+{
+    if (npt < n + 2 || npt > (n + 2) * (n + 1) / 2) {
+        throw std::runtime_error("NPT is not in the required interval.");
+    }
+
+    if ((ub - lb).minCoeff() < rhobeg + rhobeg) {
+        throw std::runtime_error("ub - lb should be greater than "
+                                       "rhobeg + rhobeg.");
+    }
+
+    std::size_t ws_size = (npt + 5) * (npt + n) + 3 * n * (n + 5) / 2;
+    double *w = new double[ws_size];
+    double *xl = new double[n];
+    double *xu = new double[n];
+    double eps = 1e-6;
+    Eigen::VectorXd::Map(xl, n) = lb.array() + eps;
+    Eigen::VectorXd::Map(xu, n) = ub.array() - eps;
+
+    double *x = new double[n];
+    Eigen::VectorXd::Map(x, n) = initial_parameters;
+
+    Eigen::VectorXd optimized_parameters = initial_parameters;
+    double optimum = 0.0;
+    std::string err_msg = "";
+    try {
+        optimum = tools_bobyqa::impl(function, n, npt, x, xl, xu,
+                                     rhobeg, rhoend, maxfun, w);
+        for (size_t i = 0; i < (size_t) n; i++) {
+            optimized_parameters(i) = x[i];
+        }
+    } catch (std::invalid_argument err) {
+        err_msg = std::string("Invalid arguments. ") + err.what();
+    } catch (std::bad_alloc err) {
+        err_msg = std::string("Ran out of memory. ") + err.what();
+    } catch (std::runtime_error err) {
+        err_msg = std::string("Generic failure. ") + err.what();
+    } catch (...) {
+        // do nothing for other errors (results are fine)
+    }
+
+    // delete dynamically allocated objects
+    delete[] x;
+    delete[] xl;
+    delete[] xu;
+    delete[] w;
+
+    // throw error if optimization failed
+    if (err_msg != "") {
+        throw std::runtime_error(err_msg);
+    }
+
+    std::pair<Eigen::VectorXd, double> result(optimized_parameters, optimum);
+    return result;
+}
 
 }
 }
