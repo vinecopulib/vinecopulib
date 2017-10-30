@@ -1,7 +1,9 @@
 if(NOT WIN32)
-    set (CMAKE_CXX_FLAGS                "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type")
-    set (CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG ")
-    set (CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
+
+    set(CMAKE_CXX_FLAGS                "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type")
+    set(CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG ")
+    set(CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
+
     if(WARNINGS_AS_ERRORS)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werr")
     endif()
@@ -14,7 +16,6 @@ if(NOT WIN32)
         endif()
     endif()
 
-
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
         if(NOT EXISTS ${CMAKE_CXX_COMPILER})
@@ -26,5 +27,5 @@ if(NOT WIN32)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
     endif()
 else()
-# TODO!
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()

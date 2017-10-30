@@ -15,12 +15,17 @@ endif()
 # Find vinecopulib package and dependencies
 find_package(vinecopulib                  REQUIRED)
 find_package(Boost 1.56                   REQUIRED)
-find_package(NLopt                        REQUIRED)
 include(cmake/findEigen3.cmake            REQUIRED)
+find_package(Threads                      REQUIRED)
 
 # Set required variables for includes and libraries
-set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${NLOPT_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
-set(external_libs ${VINECOPULIB_LIBRARIES} ${NLOPT_LIBRARIES} ${Boost_LIBRARIES})
+# In the second line
+#   * VINECOPULIB_LIBRARIES is needed if vinecopulib has been built as a
+#     shared lib (does nothing otherwise).
+#   * CMAKE_THREAD_LIBS_INIT is needed for some linux systems
+#     (but does nothing on OSX/Windows).
+set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
+set(external_libs ${VINECOPULIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 # Include subdirectory with project sources
 add_subdirectory(src)

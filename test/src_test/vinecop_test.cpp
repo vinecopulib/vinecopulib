@@ -13,16 +13,18 @@ VinecopTest::VinecopTest() {
     int sys_exit_code = system(cmd.c_str());
 
     // vine structures (C++ representation reverses rows)
-    model_matrix = vinecopulib::tools_eigen::read_matxs("temp2").colwise().reverse();
-    vc_matrix = vinecopulib::tools_eigen::read_matxs("temp3").colwise().reverse();
+    model_matrix = vinecopulib::tools_eigen::read_matxs(
+        "temp2").colwise().reverse();
+    vc_matrix = vinecopulib::tools_eigen::read_matxs(
+        "temp3").colwise().reverse();
 
     // u, pdf, sim
     Eigen::MatrixXd temp = vinecopulib::tools_eigen::read_matxd("temp");
     size_t n = temp.rows();
     size_t m = model_matrix.rows();
-    u = temp.block(0,0,n,m);
-    f = temp.block(0,m,n,1);
-    sim = temp.block(0,m+1,n,m);
+    u = temp.block(0, 0, n, m);
+    f = temp.block(0, m, n, 1);
+    sim = temp.block(0, m + 1, n, m);
 
     // remove temp files
     cmd = rm + "temp temp2 temp3";
