@@ -6,8 +6,7 @@
 
 #include "include/parbicop_test.hpp"
 
-void ParBicopTest::set_family(BicopFamily family, int rotation)
-{
+void ParBicopTest::set_family(BicopFamily family, int rotation) {
     switch (family) {
         case BicopFamily::indep:
             family_ = 0;
@@ -42,10 +41,9 @@ void ParBicopTest::set_family(BicopFamily family, int rotation)
         case BicopFamily::bb8:
             family_ = 10;
             break;
-        default:
-            ;
+        default:;
     }
-    
+
     if (!tools_stl::is_member(family, bicop_families::rotationless)) {
         switch (rotation) {
             case 90:
@@ -60,8 +58,8 @@ void ParBicopTest::set_family(BicopFamily family, int rotation)
         }
     }
 }
-void ParBicopTest::set_parameters(Eigen::VectorXd parameters)
-{
+
+void ParBicopTest::set_parameters(Eigen::VectorXd parameters) {
     if (parameters.size() > 0) {
         par_ = parameters(0);
     } else {
@@ -73,19 +71,19 @@ void ParBicopTest::set_parameters(Eigen::VectorXd parameters)
         par2_ = 0;
     }
 }
-int ParBicopTest::get_family()
-{
+
+int ParBicopTest::get_family() {
     return family_;
 }
-int ParBicopTest::get_n()
-{
+
+int ParBicopTest::get_n() {
     return n_;
 }
-double ParBicopTest::get_par()
-{
+
+double ParBicopTest::get_par() {
     return par_;
 }
-double ParBicopTest::get_par2()
-{
+
+double ParBicopTest::get_par2() {
     return par2_;
 }

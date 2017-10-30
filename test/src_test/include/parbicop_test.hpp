@@ -15,15 +15,20 @@ using namespace vinecopulib;
 
 // Test class for parametric bivariate copulas
 class ParBicopTest :
-        public ::testing::TestWithParam<::testing::tuple<BicopFamily, int>>
-{
+    public ::testing::TestWithParam<::testing::tuple<BicopFamily, int>> {
 public:
     void set_family(BicopFamily family, int rotation);
+
     void set_parameters(Eigen::VectorXd parameters);
+
     int get_n();
+
     int get_family();
+
     double get_par();
+
     double get_par2();
+
 protected:
     int n_;
     int family_;
@@ -31,6 +36,7 @@ protected:
     double par2_;
     Bicop bicop_;
     bool needs_check_;
+
     virtual void SetUp() {
         n_ = (int) 5e3;
         auto family = ::testing::get<0>(GetParam());
@@ -48,12 +54,14 @@ protected:
             parameters = bicop_.tau_to_parameters(tau);
         } else {
             if (family == BicopFamily::student) {
-                parameters(0) = sin(tau * boost::math::constants::pi<double>() / 2);
+                parameters(0) = sin(
+                    tau * boost::math::constants::pi<double>() / 2);
                 parameters(1) = 4;
             } else if (family == BicopFamily::bb1) {
                 parameters(1) = 1.5;
-                parameters(0) = -(2*(1-parameters(1)+parameters(1)*tau));
-                parameters(0) /= (parameters(1)*(-1+tau));
+                parameters(0) = -(2 *
+                                  (1 - parameters(1) + parameters(1) * tau));
+                parameters(0) /= (parameters(1) * (-1 + tau));
             } else {
                 double delta = 1.5;
                 if (family == BicopFamily::bb8)
@@ -65,7 +73,8 @@ protected:
                     auto tau = bicop_.parameters_to_tau(par);
                     return Eigen::VectorXd::Constant(1, std::fabs(tau));
                 };
-                parameters(0) = tools_eigen::invert_f(tau_v, f, 1 + 1e-6, 100)(0);
+                parameters(0) = tools_eigen::invert_f(tau_v, f, 1 + 1e-6, 100)(
+                    0);
                 parameters(1) = delta;
             }
         }

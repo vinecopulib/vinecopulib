@@ -26,6 +26,10 @@ before_install:
   - if [ $COMPILER == icc ]; then export CMAKE_ARGS="-DCMAKE_CXX_COMPILER=icpc -DCMAKE_C_COMPILER=icc"; fi
   - if [ $COMPILER == clang ]; then export CMAKE_ARGS="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"; fi
   - if [ $COMPILER == gcc ]; then export CMAKE_ARGS="-DCODE_COVERAGE=ON"; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then export CMAKE_PREFIX="-DCMAKE_INSTALL_PREFIX=/usr/local"; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then export CMAKE_PREFIX="-DCMAKE_INSTALL_PREFIX=/usr"; fi
+
+
 
 install:
   ### LINUX
@@ -54,18 +58,6 @@ install:
   ### Common
   - export R_PACKAGES='c("VineCopula")'
   - sudo Rscript -e 'withCallingHandlers(install.packages('$R_PACKAGES', repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
-
-  - if [ $TRAVIS_OS_NAME == linux ]; then cd ..; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then git clone https://github.com/stevengj/nlopt.git; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then cd nlopt; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then mkdir build; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then cd build; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then make; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo make install; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then cd ../..; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then cd vinecopulib; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install --without-numpy --HEAD nlopt; fi
   
 
 script:
@@ -74,8 +66,9 @@ script:
   - cd debug
   - cmake .. $CMAKE_ARGS -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
   - if [ $COMPILER == gcc ]; then make vinecopulib_coverage; else make; fi
+  - if [ $COMPILER == gcc ]; then bash <(curl -s https://codecov.io/bash) -f /home/travis/build/vinecopulib/vinecopulib/debug/coverage.info; fi
   - cd ../release
-  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release && make && sudo make install && make doc
+  - cmake .. $CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make && sudo make install
   - bin/test_all
   - cd ../examples/bicop
   - mkdir build
@@ -86,15 +79,3 @@ script:
 
 after_script:
   - if [ $COMPILER == icc ]; then '[[ ! -z "${INTEL_INSTALL_PATH}" ]] && uninstall_intel_software'; fi
-
-after_success:
-  # Creating report
-  - if [ $COMPILER == gcc ]; then cd debug; fi
-  - if [ $COMPILER == gcc ]; then lcov --directory . --capture --output-file coverage.info; fi # capture coverage info
-  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '/usr/*' --output-file coverage.info; fi # filter out external includes
-  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '/Applications/*' --output-file coverage.info; fi # filter out more external includes
-  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '*test*' --output-file coverage.info; fi # filter out tests
-  - if [ $COMPILER == gcc ]; then lcov --remove coverage.info '*examples*' --output-file coverage.info; fi # filter out examples
-  - if [ $COMPILER == gcc ]; then lcov --list coverage.info; fi #debug info
-  # Uploading report to CodeCov
-  - if [ $COMPILER == gcc ]; then bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"; fi

@@ -28,42 +28,37 @@ install:
   - 7z x eigen.zip -o"C:\projects" -y > nul
 
   - cd ..
-  - git clone git://github.com/stevengj/nlopt
-  - cd nlopt
-  - sed -i '26i#define NLOPT_DLL' .\api\nlopt.h
-  - sed -i '27i#define NLOPT_DLL_EXPORT' .\api\nlopt.h
-  - sed -i '$i\#undef NLOPT_DLL' .\api\nlopt.h
-  - sed -i '$i\#undef NLOPT_DLL_EXPORT' .\api\nlopt.h
-  - cmake -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\nlopt-install -DCMAKE_INSTALL_BINDIR=c:\projects\nlopt-install\lib .
-  - cmake --build . --config Release --target install
-  - set path=%path%;C:\projects\nlopt-install\lib
-  - ctest -C Release --output-on-failure
-  - cd ..
   - cd vinecopulib
 
 build_script:
-  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:/Libraries/boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255" -DCMAKE_PREFIX_PATH="C:\projects\nlopt-install"'
+  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:/Libraries/boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255"'
 
-  - md build
-  - cd build
+  - md build_header_only
+  - md build_shared_libs
+
+  - cd build_header_only
   - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install
   - set path_orig=%path%
-
   - cmake --build . --config Debug
-  - set path=%path_orig%;C:\projects\vinecopulib\build\Debug
+  - set path=%path_orig%;C:\projects\vinecopulib\build_header_only\Debug
   - bin\Debug\test_all.exe
 
-  - cmake --build . --config Release
-  - set path=%path_orig%;C:\projects\vinecopulib\build\Release
-  - bin\Release\test_all.exe
-  
-  - cmake --build . --config Release --target install
   - cd ..
-  
+  - cd build_shared_libs
+  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install
+  - set path_orig=%path%
+
+  - cmake --build . --config Release
+  - set path=%path_orig%;C:\projects\vinecopulib\build_shared_libs\Release
+  - bin\Release\test_all.exe
+
+  - cmake --build . --config Release --target install
+
+  - cd ..
   - cd examples/bicop
   - md build
   - cd build
-  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_PREFIX_PATH="C:\projects\vinecopulib-install;C:\projects\nlopt-install"
+  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_PREFIX_PATH="C:\projects\vinecopulib-install;"
   - cmake --build . --config Release
   - cd ..\bin\Release
   - main.exe
@@ -73,5 +68,5 @@ build_script:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_success:
-  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build\Debug\vinecopulib.* build\Release\vinecopulib.*
+  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build_shared_libs\Release\vinecopulib.*
   - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip

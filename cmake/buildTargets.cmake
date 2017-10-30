@@ -1,27 +1,17 @@
-file(GLOB_RECURSE vinecopulib_sources src/*.cpp src/*.cc src/*c)
-file(GLOB_RECURSE vinecopulib_bicop_headers include/vinecopulib/bicop/*.hpp)
-file(GLOB_RECURSE vinecopulib_vinecop_headers include/vinecopulib/vinecop/*.hpp)
-file(GLOB_RECURSE vinecopulib_misc_headers include/vinecopulib/misc/*.hpp)
-file(GLOB_RECURSE vinecopulib_main_header include/vinecopulib.hpp)
-file(GLOB_RECURSE vinecopulib_version_header include/version.hpp)
+if (VINECOPULIB_SHARED_LIB)
+    include_directories(SYSTEM ${external_includes})
+    include_directories(${vinecopulib_includes})
 
-include_directories(SYSTEM ${external_includes})
-include_directories(include)
-
-if (BUILD_SHARED_LIBS)
     add_library(vinecopulib SHARED ${vinecopulib_sources})
+    target_link_libraries(vinecopulib ${CMAKE_THREAD_LIBS_INIT})
+    set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
+    set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
 else()
-    add_library(vinecopulib STATIC ${vinecopulib_sources})
+    add_library(vinecopulib INTERFACE)
+    target_include_directories(vinecopulib INTERFACE
+            $<BUILD_INTERFACE:${vinecopulib_includes}>
+            $<INSTALL_INTERFACE:include/vinecopulib>)
 endif()
-
-# TODO: Properly use VINECOPULIB_EXPORT to reduce the number of exports
-#include(GenerateExportHeader)
-#generate_export_header(vinecopulib)
-
-target_link_libraries(vinecopulib ${external_libs})
-
-set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
-set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
 
 if(BUILD_TESTING)
     set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
@@ -30,8 +20,10 @@ if(BUILD_TESTING)
             test_bicop_parametric
             test_bicop_sanity_checks
             test_bicop_kernel
+            test_bicop_select
             test_rvine_matrix
             test_serialization
+            test_tools_bobyqa
             test_tools_stats
             test_vinecop_class
             test_vinecop_sanity_checks)
@@ -82,13 +74,17 @@ configure_package_config_file(
 
 # Targets:
 #   * <prefix>/lib/libvinecopulib.dylib
-install(
-        TARGETS vinecopulib
-        EXPORT "${targets_export_name}"
-        LIBRARY DESTINATION "lib"
-        ARCHIVE DESTINATION "lib"
-        RUNTIME DESTINATION "lib" # on Windows, the dll file is categorised as RUNTIME
-)
+if (VINECOPULIB_SHARED_LIB)
+    install(TARGETS vinecopulib
+            EXPORT "${targets_export_name}"
+            LIBRARY DESTINATION "lib"
+            ARCHIVE DESTINATION "lib"
+            RUNTIME DESTINATION "lib" # on Windows, the dll file is categorised as RUNTIME
+    )
+else()
+    install(TARGETS vinecopulib EXPORT "${targets_export_name}")
+endif()
+
 
 # Headers:
 #   * include/vinecopulib.hpp -> <prefix>/include/vinecopulib.hpp
@@ -97,34 +93,39 @@ install(
 #   * include/vinecopulib/vinecop/*.hpp -> <prefix>/include/vinecopulib/vinecop/*.hpp
 #   * include/vinecopulib/misc/*.hpp -> <prefix>/include/vinecopulib/misc/*.hpp
 install(
-        FILES ${vinecopulib_main_header}
+        FILES ${main_hpp}
         DESTINATION "${include_install_dir}"
 )
 install(
-        FILES ${vinecopulib_version_header}
+        FILES ${version_hpp}
         DESTINATION "${include_install_dir}/vinecopulib"
 )
 install(
-        FILES ${vinecopulib_bicop_headers}
+        FILES ${bicop_hpp}
         DESTINATION "${include_install_dir}/vinecopulib/bicop"
 )
 install(
-        FILES ${vinecopulib_vinecop_headers}
+        FILES ${vinecop_hpp}
         DESTINATION "${include_install_dir}/vinecopulib/vinecop"
 )
 install(
-        FILES ${vinecopulib_misc_headers}
+        FILES ${misc_hpp}
         DESTINATION "${include_install_dir}/vinecopulib/misc"
 )
-
-# TODO: Properly use VINECOPULIB_EXPORT to reduce the number of exports
-# Export headers:
-#   * ${CMAKE_CURRENT_BINARY_DIR}/include_export.h -> <prefix>/include/include_export.h
-#install(
-#        FILES
-#        "${CMAKE_CURRENT_BINARY_DIR}/vinecopulib_export.h"
-#        DESTINATION "${include_install_dir}/vinecopulib"
-#)
+if (NOT VINECOPULIB_SHARED_LIB)
+    install(
+            FILES ${vinecopulib_bicop_ipp}
+            DESTINATION "${include_install_dir}/vinecopulib/bicop/implementation"
+    )
+    install(
+            FILES ${vinecopulib_vinecop_ipp}
+            DESTINATION "${include_install_dir}/vinecopulib/vinecop/implementation"
+    )
+    install(
+            FILES ${vinecopulib_misc_ipp}
+            DESTINATION "${include_install_dir}/vinecopulib/misc/implementation"
+    )
+endif()
 
 # Config
 #   * <prefix>/lib/cmake/vinecopulib/vinecopulibConfig.cmake
