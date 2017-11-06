@@ -15,7 +15,7 @@
     #include <RcppThread.h>
     #define cout Rcout
     namespace std {
-        typedef Rcout RcppThread::Rcout;
+        extern RcppThread::RPrinter Rcout;
     }
 #else
     #include <iostream>
