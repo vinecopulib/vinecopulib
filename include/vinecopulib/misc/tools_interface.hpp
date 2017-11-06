@@ -22,6 +22,8 @@
     namespace tools_parallel { 
         typedef RcppThread::ThreadPool ThreadPool; 
     }
+#else
+    #include <vinecopulib/misc/tools_thread.hpp>
 #endif
 
 namespace vinecopulib {
