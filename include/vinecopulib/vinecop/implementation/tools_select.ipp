@@ -355,7 +355,6 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     mat.fill(0);
     std::vector <size_t> ning_set;
     // fill matrix column by column
-    std::cout << "finalizing " << std::endl;
     for (size_t col = 0; col < d_ - 1; ++col) {
         tools_interface::check_user_interrupt();
         // matrix above trunc_lvl will be filled more efficiently later
@@ -441,11 +440,9 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
         }
     }
     // fill missing entries in case vine was truncated
-    std::cout << "completing matrix" << std::endl;
     RVineMatrix::complete_matrix(mat, trunc_lvl, controls_.get_num_threads());
 
     // return as RVineMatrix
-    std::cout << "constructing matrix" << std::endl;
     vine_matrix_ = RVineMatrix(mat, false);
 }
 
@@ -569,28 +566,20 @@ inline Eigen::MatrixXd VinecopSelector::get_pc_data(size_t v0, size_t v1,
 //!     selection).
 inline void VinecopSelector::select_tree(size_t t)
 {
-    std::cout << "begin tree " << t << std::endl;
     auto new_tree = edges_as_vertices(trees_[t]);
-    std::cout << "removing edge data " << std::endl;
-    remove_edge_data(trees_[t]); // no longer neede
-    std::cout << "adding  edges " << std::endl;
+    remove_edge_data(trees_[t]); // no longer needed
     add_allowed_edges(new_tree);
-    std::cout << "max span tree " << std::endl;
     if (boost::num_vertices(new_tree) > 2) {
         // has no effect in FamilySelector
         min_spanning_tree(new_tree);
     }
-    std::cout << "adding edge info " << std::endl;
     add_edge_info(new_tree);       // for pc estimation and next tree
-    std::cout << "removing vertex data" << std::endl;
     remove_vertex_data(new_tree);  // no longer needed
-    std::cout << "selecting pair copulas " << std::endl;
     if (trees_opt_.size() > t + 1) {
         select_pair_copulas(new_tree, trees_opt_[t + 1]);
     } else {
         select_pair_copulas(new_tree);
     }
-    std::cout << "assigning " << std::endl;
     // make sure there is space for new tree
     trees_.resize(t + 2);
     trees_[t + 1] = new_tree;
