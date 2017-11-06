@@ -21,7 +21,7 @@ using namespace tools_stl;
 //! Calculate criterion for tree selection
 //! @param data observations.
 //! @param tree_criterion the criterion.
-inline double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+inline double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
                                   std::string tree_criterion)
 {
     double w = 0.0;
@@ -140,7 +140,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
 
     std::vector<double> thresholded_crits;
     if (controls_.get_select_threshold()) {
-        // initialize threshold with maximum pairwise |tau| (all pairs get 
+        // initialize threshold with maximum pairwise |tau| (all pairs get
         // thresholded)
         auto tree_crit = controls_.get_tree_criterion();
         auto pairwise_crits = calculate_criterion_matrix(data, tree_crit);
@@ -149,8 +149,8 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
                 thresholded_crits.push_back(pairwise_crits(i, j));
             }
         }
-        // this is suboptimal for fixed structures, because several 
-        // iterations have to be run before first non-thresholded copula 
+        // this is suboptimal for fixed structures, because several
+        // iterations have to be run before first non-thresholded copula
         // appears.
     }
 
@@ -158,7 +158,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
     bool needs_break = false;
     std::stringstream msg;
     while (!needs_break) {
-        // restore family set in case previous threshold iteration also 
+        // restore family set in case previous threshold iteration also
         // truncated the model
         controls_.set_family_set(family_set);
         initialize_new_fit(data);
@@ -240,11 +240,11 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         // check whether gic-optimal model has been found
         if (gic == 0.0) {
             if (controls_.get_select_threshold()) {
-                // everything is independent, threshold needs to be 
+                // everything is independent, threshold needs to be
                 // reduced further
                 continue;
             } else {
-                // threshold is fixed, optimal truncation level has 
+                // threshold is fixed, optimal truncation level has
                 // been found
                 needs_break = true;
             }
@@ -311,8 +311,10 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
 {
     std::string tree_criterion = controls_.get_tree_criterion();
     double threshold = controls_.get_threshold();
-    for (auto v0 : boost::vertices(vine_tree)) {
-        tools_interface::check_user_interrupt(v0 % 10000 == 0);
+
+    std::mutex m;
+    auto add_edge = [&] (size_t v0) {
+        tools_interface::check_user_interrupt(v0 % 50 == 0);
         for (size_t v1 = 0; v1 < v0; ++v1) {
             // check proximity condition: common neighbor in previous tree
             // (-1 means 'no common neighbor')
@@ -320,11 +322,28 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
                 auto pc_data = get_pc_data(v0, v1, vine_tree);
                 double crit = calculate_criterion(pc_data, tree_criterion);
                 double w = 1.0 - (double) (crit >= threshold) * crit;
-                auto e = boost::add_edge(v0, v1, w, vine_tree).first;
-                vine_tree[e].weight = w;
-                vine_tree[e].crit = crit;
+                {
+                    std::lock_guard<std::mutex> lk(m);
+                    auto e = boost::add_edge(v0, v1, w, vine_tree).first;
+                    vine_tree[e].weight = w;
+                    vine_tree[e].crit = crit;
+                }
             }
         }
+    };
+
+    size_t num_threads = controls_.get_num_threads();
+    if (num_threads <= 1) {
+        for (auto v0 : boost::vertices(vine_tree)) {
+            add_edge(v0);
+        }
+    } else {
+        // run tasks in thread pool
+        tools_parallel::ThreadPool pool(num_threads);
+        for (auto v0 : boost::vertices(vine_tree)) {
+            pool.push(add_edge, v0);
+        }
+        pool.join();
     }
 }
 
@@ -336,6 +355,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     mat.fill(0);
     std::vector <size_t> ning_set;
     // fill matrix column by column
+    std::cout << "finalizing " << std::endl;
     for (size_t col = 0; col < d_ - 1; ++col) {
         tools_interface::check_user_interrupt();
         // matrix above trunc_lvl will be filled more efficiently later
@@ -376,7 +396,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
         for (size_t k = 1; k < t; ++k) {
             auto check_set = cat(mat(d_ - 1 - col, col), ning_set);
             for (auto e : boost::edges(trees_[t - k])) {
-                // search for an edge in lower tree that shares all 
+                // search for an edge in lower tree that shares all
                 // indices in the conditioning set + diagonal entry
                 if (!is_same_set(trees_[t - k][e].all_indices, check_set)) {
                     continue;
@@ -421,10 +441,12 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
         }
     }
     // fill missing entries in case vine was truncated
-    RVineMatrix::complete_matrix(mat, trunc_lvl);
+    std::cout << "completing matrix" << std::endl;
+    RVineMatrix::complete_matrix(mat, trunc_lvl, controls_.get_num_threads());
 
     // return as RVineMatrix
-    vine_matrix_ = RVineMatrix(mat);
+    std::cout << "constructing matrix" << std::endl;
+    vine_matrix_ = RVineMatrix(mat, false);
 }
 
 inline bool FamilySelector::belongs_to_structure(size_t v0, size_t v1,
@@ -547,20 +569,28 @@ inline Eigen::MatrixXd VinecopSelector::get_pc_data(size_t v0, size_t v1,
 //!     selection).
 inline void VinecopSelector::select_tree(size_t t)
 {
+    std::cout << "begin tree " << t << std::endl;
     auto new_tree = edges_as_vertices(trees_[t]);
-    remove_edge_data(trees_[t]); // no longer needed
+    std::cout << "removing edge data " << std::endl;
+    remove_edge_data(trees_[t]); // no longer neede
+    std::cout << "adding  edges " << std::endl;
     add_allowed_edges(new_tree);
+    std::cout << "max span tree " << std::endl;
     if (boost::num_vertices(new_tree) > 2) {
         // has no effect in FamilySelector
         min_spanning_tree(new_tree);
     }
+    std::cout << "adding edge info " << std::endl;
     add_edge_info(new_tree);       // for pc estimation and next tree
+    std::cout << "removing vertex data" << std::endl;
     remove_vertex_data(new_tree);  // no longer needed
+    std::cout << "selecting pair copulas " << std::endl;
     if (trees_opt_.size() > t + 1) {
         select_pair_copulas(new_tree, trees_opt_[t + 1]);
     } else {
         select_pair_copulas(new_tree);
     }
+    std::cout << "assigning " << std::endl;
     // make sure there is space for new tree
     trees_.resize(t + 2);
     trees_[t + 1] = new_tree;
