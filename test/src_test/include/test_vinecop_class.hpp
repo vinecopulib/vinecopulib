@@ -168,7 +168,9 @@ TEST_F(VinecopTest, works_multi_threaded) {
     fit1.select_all(u, controls);
     controls.set_num_threads(2);
     fit2.select_all(u, controls);
-    EXPECT_EQ(fit1.get_all_families(), fit2.get_all_families());
+    // check for equality in likelihood, since the pair copulas may be stored
+    // in a different order when running in parallel
+    EXPECT_DOUBLE_EQ(fit1.loglik(u), fit2.loglik(u));
 }
 
 TEST_F(VinecopTest, select_finds_right_structure) {
