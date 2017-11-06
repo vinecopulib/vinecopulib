@@ -346,7 +346,7 @@ inline BicopFamily Bicop::get_family() const
 inline std::string Bicop::get_family_name() const
 {
     return bicop_->get_family_name();
-};
+}
 
 inline int Bicop::get_rotation() const
 {
@@ -409,8 +409,7 @@ inline std::string Bicop::str() const
 inline BicopPtr Bicop::get_bicop() const
 {
     return bicop_;
-};
-
+}
 
 //! fits a bivariate copula (with fixed family) to data.
 //!
