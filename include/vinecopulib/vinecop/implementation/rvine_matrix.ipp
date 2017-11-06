@@ -409,19 +409,10 @@ inline void RVineMatrix::complete_matrix(
                 }
             }
         };
-
-        if (num_threads <= 1) {
-            for (size_t e0 = 0; e0 < d - t; e0++) {
-                complete_column(e0);
-            }
-        } else {
-            // run tasks in thread pool
-            tools_parallel::ThreadPool pool(num_threads);
-            for (size_t e0 = 0; e0 < d - t; e0++) {
-                pool.push(complete_column, e0);
-            }
-            pool.join();
-        }
+        
+        tools_parallel::map_on_pool(complete_column, 
+                                    seq_int(0, d - t), 
+                                    num_threads);
     }
 }
 }

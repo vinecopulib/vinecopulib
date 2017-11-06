@@ -14,18 +14,15 @@
 #ifdef INTERFACED_FROM_R
     #include <RcppThread.h>
 #else
-
     #include <iostream>
-
 #endif
 
 // parallel backend
+#include <vinecopulib/misc/tools_parallel.hpp>
 #ifdef INTERFACED_FROM_R
-namespace tools_parallel { typedef RcppThread::ThreadPool ThreadPool; }
-#else
-
-    #include <vinecopulib/misc/tools_parallel.hpp>
-
+    namespace tools_parallel { 
+        typedef RcppThread::ThreadPool ThreadPool; 
+    }
 #endif
 
 namespace vinecopulib {

@@ -331,20 +331,10 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
             }
         }
     };
-
-    size_t num_threads = controls_.get_num_threads();
-    if (num_threads <= 1) {
-        for (auto v0 : boost::vertices(vine_tree)) {
-            add_edge(v0);
-        }
-    } else {
-        // run tasks in thread pool
-        tools_parallel::ThreadPool pool(num_threads);
-        for (auto v0 : boost::vertices(vine_tree)) {
-            pool.push(add_edge, v0);
-        }
-        pool.join();
-    }
+    
+    tools_parallel::map_on_pool(add_edge, 
+                                boost::vertices(vine_tree), 
+                                controls_.get_num_threads());
 }
 
 inline void StructureSelector::finalize(size_t trunc_lvl)
@@ -840,26 +830,14 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
             tree[e].npars = tree[e].pair_copula.calculate_npars();
         }
     };
-
+    
+    // make sure that Bicop.select() doesn't spawn new threads
     size_t num_threads = controls_.get_num_threads();
-    if (num_threads <= 1) {
-        for (auto e : boost::edges(tree)) {
-            select_pc(e);
-        }
-    } else {
-        // make sure that Bicop.select() doesn't spawn new threads
-        controls_.set_num_threads(1);
-
-        // run tasks in thread pool
-        tools_parallel::ThreadPool pool(num_threads);
-        for (auto e : boost::edges(tree)) {
-            pool.push(select_pc, e);
-        }
-        pool.join();
-
-        // reset num_threads before fitting next tree
-        controls_.set_num_threads(num_threads);
-    }
+    controls_.set_num_threads(1);
+    tools_parallel::map_on_pool(select_pc, 
+                                boost::edges(tree), 
+                                num_threads);
+    controls_.set_num_threads(num_threads);
 }
 
 //! finds the fitted pair-copula from the previous iteration.

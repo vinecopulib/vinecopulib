@@ -489,18 +489,10 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
             }
         }
     };
-
-    if (controls.get_num_threads() <= 1) {
-        for (auto &cop : bicops) {
-            fit_and_compare(cop);
-        }
-    } else {
-        tools_parallel::ThreadPool pool(controls.get_num_threads());
-        for (auto cop : bicops) {
-            pool.push(fit_and_compare, cop);
-        }
-        pool.join();
-    }
+    
+    tools_parallel::map_on_pool(fit_and_compare, 
+                                bicops, 
+                                controls.get_num_threads());
 }
 
 //! Data manipulations for rotated families
