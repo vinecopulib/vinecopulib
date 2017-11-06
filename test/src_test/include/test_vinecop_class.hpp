@@ -170,7 +170,7 @@ TEST_F(VinecopTest, works_multi_threaded) {
     fit2.select_all(u, controls);
     // check for equality in likelihood, since the pair copulas may be stored
     // in a different order when running in parallel
-    EXPECT_DOUBLE_EQ(fit1.loglik(u), fit2.loglik(u));
+    EXPECT_NEAR(fit1.loglik(u), fit2.loglik(u), 1e-2);
 }
 
 TEST_F(VinecopTest, select_finds_right_structure) {
