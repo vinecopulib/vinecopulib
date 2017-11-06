@@ -90,7 +90,7 @@ inline Vinecop::Vinecop(boost::property_tree::ptree input, bool check_matrix)
     auto matrix =
         tools_serialization::ptree_to_matrix<size_t>(input.get_child("matrix"));
     vine_matrix_ = RVineMatrix(matrix, check_matrix);
-    d_ = (size_t) matrix.rows();
+    d_ = static_cast<size_t>(matrix.rows());
 
     boost::property_tree::ptree pcs_node = input.get_child("pair copulas");
     for (size_t tree = 0; tree < d_ - 1; ++tree) {
@@ -491,7 +491,7 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N) const
         vine_distribution(i) = (x <= 0.0).count();
     }
 
-    return vine_distribution / ((double) N);
+    return vine_distribution / static_cast<double>(N);
 }
 
 //! simulates from a vine copula model, see inverse_rosenblatt().
@@ -636,7 +636,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
                 hinv2(tree, var) = edge_copula.hinv2(U_e);
 
                 // if required at later stage, also calculate hfunc2
-                if (var < (ptrdiff_t) d_ - 1) {
+                if (var < static_cast<ptrdiff_t>(d_) - 1) {
                     if (needed_hfunc1(tree + 1, var)) {
                         U_e.col(0) = hinv2(tree, var);
                         hfunc1(tree + 1, var) = edge_copula.hfunc1(U_e);

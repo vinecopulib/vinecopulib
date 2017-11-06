@@ -38,7 +38,7 @@ protected:
     bool needs_check_;
 
     virtual void SetUp() {
-        n_ = (int) 5e3;
+        n_ = static_cast<int>(5e3);
         auto family = ::testing::get<0>(GetParam());
         auto rotation = ::testing::get<1>(GetParam());
         if (tools_stl::is_member(family, bicop_families::rotationless)) {
@@ -70,8 +70,8 @@ protected:
                 auto f = [this, delta](const Eigen::VectorXd &v) {
                     Eigen::VectorXd par(2);
                     par << v(0), delta;
-                    auto tau = bicop_.parameters_to_tau(par);
-                    return Eigen::VectorXd::Constant(1, std::fabs(tau));
+                    auto tt = bicop_.parameters_to_tau(par);
+                    return Eigen::VectorXd::Constant(1, std::fabs(tt));
                 };
                 parameters(0) = tools_eigen::invert_f(tau_v, f, 1 + 1e-6, 100)(
                     0);

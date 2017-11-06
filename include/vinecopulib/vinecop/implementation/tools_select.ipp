@@ -27,7 +27,7 @@ inline double calculate_criterion(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
     double w = 0.0;
     Eigen::Matrix<double, Eigen::Dynamic, 2> data_no_nan =
         tools_eigen::nan_omit(data);
-    double freq = ((double) data_no_nan.rows()) / ((double) data.rows());
+    double freq = static_cast<double>(data_no_nan.rows()) / static_cast<double>(data.rows());
     if (tree_criterion == "tau") {
         w = std::fabs(tools_stats::pairwise_tau(data_no_nan));
     } else if (tree_criterion == "hoeffd") {
@@ -202,7 +202,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
                     set_tree_to_indep(t);
                     if (!controls_.get_select_threshold()) {
                         // if threshold is fixed, no need to go further
-                        controls_.set_truncation_level(std::max(t, (size_t) 1));
+                        controls_.set_truncation_level(std::max(t, static_cast<size_t>(1)));
                         needs_break = true;   // stops gic-search
                         break;                // stops loop over trees
                     }
@@ -277,7 +277,7 @@ inline double VinecopSelector::get_next_threshold(
     // pick threshold that changes at least alpha*100 % of the pair-copulas
     double alpha = 0.025;
     size_t m = thresholded_crits.size();
-    return thresholded_crits[std::ceil((double) m * alpha) - 1];
+    return thresholded_crits[std::ceil(static_cast<double>(m) * alpha) - 1];
 }
 
 
@@ -319,7 +319,7 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
             if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                 auto pc_data = get_pc_data(v0, v1, vine_tree);
                 double crit = calculate_criterion(pc_data, tree_criterion);
-                double w = 1.0 - (double) (crit >= threshold) * crit;
+                double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
                 auto e = boost::add_edge(v0, v1, w, vine_tree).first;
                 vine_tree[e].weight = w;
                 vine_tree[e].crit = crit;
@@ -339,7 +339,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     for (size_t col = 0; col < d_ - 1; ++col) {
         tools_interface::check_user_interrupt();
         // matrix above trunc_lvl will be filled more efficiently later
-        size_t t = std::max(std::min(trunc_lvl, d_ - 1 - col), (size_t) 1);
+        size_t t = std::max(std::min(trunc_lvl, d_ - 1 - col), static_cast<size_t>(1));
         // start with highest tree in this column
         for (auto e : boost::edges(trees_[t])) {
             // find an edge that contains a leaf
@@ -794,7 +794,7 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
             // identifying situations where fits can be re-used
             tree[e].fit_id =
                 tree[e].pc_data(0, 0) - 2 * tree[e].pc_data(0, 1);
-            tree[e].fit_id += 5.0 * (double) is_thresholded;
+            tree[e].fit_id += 5.0 * static_cast<double>(is_thresholded);
             if (boost::num_edges(tree_opt) > 0) {
                 auto old_fit = find_old_fit(tree[e].fit_id, tree_opt);
                 if (old_fit.second) {  // indicates if match was found
