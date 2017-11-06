@@ -98,13 +98,13 @@ Eigen::VectorXd to_pseudo_obs_1d(Eigen::VectorXd x,
 Eigen::MatrixXd to_pseudo_obs(Eigen::MatrixXd x,
                               std::string ties_method = "average");
 
-double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &u);
+double pairwise_tau(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
 
-double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z);
+double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
 
-double pairwise_rho(Eigen::Matrix<double, Eigen::Dynamic, 2> z);
+double pairwise_rho(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
 
-double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2> x);
+double pairwise_hoeffd(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
 
 Eigen::MatrixXd dependence_matrix(const Eigen::MatrixXd &x,
                                   const std::string &measure);

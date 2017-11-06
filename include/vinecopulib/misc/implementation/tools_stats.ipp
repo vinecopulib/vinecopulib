@@ -112,7 +112,7 @@ to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
 //! @{
 
 //! calculates the pairwise Kendall's \f$ \tau \f$.
-inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
+inline double pairwise_tau(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
 {
     // C++ translation of a C code given by Shing (Eric) Fu, Feng Zhu, Guang
     // (Jack) Yang, and Harry Joe, based on work of the method by Knight (1966)
@@ -122,8 +122,9 @@ inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
     bool Iflag, Jflag, Xflag;
     size_t T = 0, U = 0, V = 0;
     double tau = 0., S = 0., D = 0.;
+    auto x1 = x;
 
-    size_t N = x.rows();
+    size_t N = x1.rows();
     Eigen::Matrix<double, Eigen::Dynamic, 2> x2(N, 2);
 
     /* 1.1 Sort X and Y in X order */
@@ -140,20 +141,20 @@ inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
                 Iflag = (I < Iend);
                 Jflag = (J < Jend);
                 if (Iflag & Jflag) {
-                    Xflag = ((x(I, 0) > x(J, 0)) |
-                             ((x(I, 0) == x(J, 0)) & (x(I, 1) > x(J, 1))));
+                    Xflag = ((x1(I, 0) > x1(J, 0)) |
+                             ((x1(I, 0) == x1(J, 0)) & (x1(I, 1) > x1(J, 1))));
                 } else {
                     Xflag = false;
                 }
                 if ((Iflag & !Jflag) | (Iflag & Jflag & !Xflag)) {
-                    x2(L, 0) = x(I, 0);
-                    x2(L, 1) = x(I, 1);
+                    x2(L, 0) = x1(I, 0);
+                    x2(L, 1) = x1(I, 1);
                     I++;
                     L++;
                 };
                 if ((!Iflag && Jflag) | (Iflag && Jflag && Xflag)) {
-                    x2(L, 0) = x(J, 0);
-                    x2(L, 1) = x(J, 1);
+                    x2(L, 0) = x1(J, 0);
+                    x2(L, 1) = x1(J, 1);
                     J++;
                     L++;
                 };
@@ -161,8 +162,8 @@ inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
         } while (L < N);
 
         // Swap columns
-        x.col(0).swap(x2.col(0));
-        x.col(1).swap(x2.col(1));
+        x1.col(0).swap(x2.col(0));
+        x1.col(1).swap(x2.col(1));
         K *= 2;
     } while (K < N);
 
@@ -170,9 +171,9 @@ inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
     j = 1;
     m = 1;
     for (i = 1; i < N; i++)
-        if (x(i, 0) == x(i - 1, 0)) {
+        if (x1(i, 0) == x1(i - 1, 0)) {
             j++;
-            if (x(i, 1) == x(i - 1, 1))
+            if (x1(i, 1) == x1(i - 1, 1))
                 m++;
         } else if (j > 1) {
             T += j * (j - 1) / 2;
@@ -198,19 +199,19 @@ inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
                 Iflag = (I < Iend);
                 Jflag = (J < Jend);
                 if (Iflag & Jflag) {
-                    Xflag = (x(I, 1) > x(J, 1));
+                    Xflag = (x1(I, 1) > x1(J, 1));
                 } else {
                     Xflag = false;
                 }
                 if ((Iflag & !Jflag) | (Iflag & Jflag & !Xflag)) {
-                    x2(L, 0) = x(I, 0);
-                    x2(L, 1) = x(I, 1);
+                    x2(L, 0) = x1(I, 0);
+                    x2(L, 1) = x1(I, 1);
                     I++;
                     L++;
                 };
                 if ((!Iflag && Jflag) | (Iflag && Jflag && Xflag)) {
-                    x2(L, 0) = x(J, 0);
-                    x2(L, 1) = x(J, 1);
+                    x2(L, 0) = x1(J, 0);
+                    x2(L, 1) = x1(J, 1);
                     S += Iend - I;
                     J++;
                     L++;
@@ -219,15 +220,15 @@ inline double pairwise_tau(Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
         } while (L < N);
 
         // Swap columns
-        x.col(0).swap(x2.col(0));
-        x.col(1).swap(x2.col(1));
+        x1.col(0).swap(x2.col(0));
+        x1.col(1).swap(x2.col(1));
         K *= 2;
     } while (K < N);
 
     /* 2.2 Count pairs of tied Y, U */
     j = 1;
     for (i = 1; i < N; i++)
-        if (x(i, 1) == x(i - 1, 1))
+        if (x1(i, 1) == x1(i - 1, 1))
             j++;
         else if (j > 1) {
             U += j * (j - 1) / 2;
@@ -258,11 +259,11 @@ inline double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
 }
 
 //! calculates the pairwise Spearman's \f$ \rho \f$.
-inline double pairwise_rho(Eigen::Matrix<double, Eigen::Dynamic, 2> x)
+inline double pairwise_rho(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
 {
-    x = to_pseudo_obs(x);
+    auto z = to_pseudo_obs(x);
     double rho;
-    auto z = x.rowwise() - x.colwise().mean();
+    z = x.rowwise() - x.colwise().mean();
     Eigen::MatrixXd sigma = z.adjoint() * z;
     rho = sigma(1, 0) / sqrt(sigma(0, 0) * sigma(1, 1));
 
@@ -270,7 +271,7 @@ inline double pairwise_rho(Eigen::Matrix<double, Eigen::Dynamic, 2> x)
 }
 
 //! calculates the pair-wise Hoeffding's D.
-inline double pairwise_hoeffd(Eigen::Matrix<double, Eigen::Dynamic, 2> x)
+inline double pairwise_hoeffd(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
 {
     size_t n = x.rows();
 
