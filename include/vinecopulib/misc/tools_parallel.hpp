@@ -13,6 +13,11 @@
 #include <condition_variable>
 #include <memory>
 
+#ifdef INTERFACED_FROM_R
+    // import interruptible ThreadPool from RcppThread
+    #include <vinecopulib/misc/tools_interface.hpp>
+#endif
+
 namespace tools_parallel {
 
 #ifndef INTERFACED_FROM_R
@@ -88,51 +93,48 @@ namespace tools_parallel {
                     [&f, args...] { return f(args...); }
                 );
                 
-                // add job to the queue
-                {
-                    std::unique_lock <std::mutex> lk(m_);
-                    if (stopped_)
-                    throw std::runtime_error("cannot push to stopped thread pool");
-                    jobs_.emplace([job]() { (*job)(); });
-                }
-                
-                // signal a waiting worker that there's a new job
-                cv_.notify_one();
-                
-                // return future result of the job
-                return job->get_future();
-            }
-            
-            //! waits for all jobs to finish and joins all threads.
-            void join()
+            // add job to the queue
             {
-                // signal all threads to stop
-                {
-                    std::unique_lock <std::mutex> lk(m_);
-                    stopped_ = true;
-                }
-                cv_.notify_all();
-                
-                // join threads if not done already
-                if (pool_[0].joinable()) {
-                    for (auto &worker : pool_) {
-                        worker.join();
-                    }
-                }
+                std::unique_lock <std::mutex> lk(m_);
+                if (stopped_)
+                throw std::runtime_error("cannot push to stopped thread pool");
+                jobs_.emplace([job]() { (*job)(); });
             }
             
-        private:
-            std::vector <std::thread> pool_;            // worker threads
-            std::queue <std::function<void()>> jobs_;  // the task queue
+            // signal a waiting worker that there's a new job
+            cv_.notify_one();
             
-            // variables for synchronization between workers
-            std::mutex m_;
-            std::condition_variable cv_;
-            bool stopped_;
-        };
-#else
-    // forward declare ThreadPool from tools_interface.hpp
-    class ThreadPool;
+            // return future result of the job
+            return job->get_future();
+        }
+            
+        //! waits for all jobs to finish and joins all threads.
+        void join()
+        {
+            // signal all threads to stop
+            {
+                std::unique_lock <std::mutex> lk(m_);
+                stopped_ = true;
+            }
+            cv_.notify_all();
+            
+            // join threads if not done already
+            if (pool_[0].joinable()) {
+                for (auto &worker : pool_) {
+                    worker.join();
+                }
+            }
+        }
+            
+    private:
+        std::vector <std::thread> pool_;            // worker threads
+        std::queue <std::function<void()>> jobs_;  // the task queue
+        
+        // variables for synchronization between workers
+        std::mutex m_;
+        std::condition_variable cv_;
+        bool stopped_;
+    };
 #endif
 
 //! maps a function on a list of items, possibly running tasks in parallel.

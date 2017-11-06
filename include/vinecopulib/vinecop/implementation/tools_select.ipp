@@ -6,6 +6,7 @@
 
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib/misc/tools_parallel.hpp>
 
 #include <cmath>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>

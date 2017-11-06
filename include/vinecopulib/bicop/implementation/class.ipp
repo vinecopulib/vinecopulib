@@ -8,6 +8,7 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
+#include <vinecopulib/misc/tools_parallel.hpp>
 #include <mutex>
 
 //! Tools for bivariate and vine copula modeling
