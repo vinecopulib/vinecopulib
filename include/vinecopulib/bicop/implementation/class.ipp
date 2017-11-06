@@ -300,7 +300,7 @@ Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 inline double
 Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 {
-    return -2 * loglik(u) + calculate_npars() * log(u.rows());
+    return -2 * loglik(u) + calculate_npars() * log(static_cast<double>(u.rows()));
 }
 
 //! Returns the actual number of parameters for parameteric families. For

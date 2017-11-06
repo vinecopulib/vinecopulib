@@ -536,7 +536,7 @@ inline double Vinecop::aic(const Eigen::MatrixXd &u) const
 //! @param u \f$n \times 2\f$ matrix of observations.
 inline double Vinecop::bic(const Eigen::MatrixXd &u) const
 {
-    return -2 * loglik(u) + calculate_npars() * log(u.rows());
+    return -2 * loglik(u) + calculate_npars() * log(static_cast<double>(u.rows()));
 }
 
 //! returns sum of the number of parameters for all pair copulas (see
