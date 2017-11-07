@@ -145,11 +145,11 @@ TEST_F(VinecopTest, family_select_finds_true_rotations) {
         }
     }
     Vinecop vinecop(pair_copulas, model_matrix);
-    auto u = vinecop.simulate(10000);
+    auto data = vinecop.simulate(10000);
 
     auto controls = FitControlsVinecop({BicopFamily::clayton}, "itau");
     // controls.set_show_trace(true);
-    Vinecop fit(u, model_matrix, controls);
+    Vinecop fit(data, model_matrix, controls);
 
     // don't check last two trees to avoid random failures because of
     // estimation uncertainty
@@ -168,7 +168,9 @@ TEST_F(VinecopTest, works_multi_threaded) {
     fit1.select_all(u, controls);
     controls.set_num_threads(2);
     fit2.select_all(u, controls);
-    EXPECT_EQ(fit1.get_all_families(), fit2.get_all_families());
+    // check for equality in likelihood, since the pair copulas may be stored
+    // in a different order when running in parallel
+    EXPECT_NEAR(fit1.loglik(u), fit2.loglik(u), 1e-2);
 }
 
 TEST_F(VinecopTest, select_finds_right_structure) {
