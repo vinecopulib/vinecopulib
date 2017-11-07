@@ -1,3 +1,22 @@
+# vinecopulib 0.2.1 (November 7, 2017)
+
+NEW FEATURES
+
+   * refactor `std::cout` replacement for R-interface (#260) 
+
+   * cosmetic changes for cross-platform compatibility and 
+   addition of a `STRICT_COMPILER` option for gcc (#261)
+   
+   * more parallelization whenever possible, new function `map_on_pool()` for 
+   ThreadPool construction/call, refactor include of `RcppThread::ThreadPool` 
+   for R-compatibility, put ThreadPool class in `tools_thread.hpp` (#259)
+   
+   * make arguments of pairwise dependence measures consistent (#258)
+
+BUG FIXES
+
+   * add `codecov.yml` to properly ignore test folder (#257)
+
 # vinecopulib 0.2.0 (October 30, 2017)
  
 LIBRARY TYPE
@@ -135,4 +154,4 @@ BUG FIXES
 
 # vinecopulib 0.0.1 (March 29, 2017)
 
-Initial rlease.
+Initial release.
