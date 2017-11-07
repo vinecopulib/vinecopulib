@@ -131,7 +131,7 @@ TEST(test_tools_stats, dpt_are_nan_safe) {
 TEST(test_tools_stats, pbvt_and_pbvnorm_are_nan_safe) {
     Eigen::MatrixXd X = Eigen::MatrixXd::Random(10, 2);
     X(0) = std::numeric_limits<double>::quiet_NaN();
-    double rho = -0.5;
+    double rho = -0.95;
     int nu = 5;
     EXPECT_NO_THROW(tools_stats::pbvt(X, nu, rho));
     EXPECT_NO_THROW(tools_stats::pbvnorm(X, rho));

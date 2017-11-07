@@ -1,3 +1,23 @@
+# vinecopulib 0.2.1 (November 7, 2017)
+
+NEW FEATURES
+
+   * faster vine copula estimation and selection by parallelizing further 
+     sub-routines (#259).
+
+   * enhanced cross-platform compatibility and addition of a `STRICT_COMPILER`
+     option for gcc (#261).
+        
+   * increased precision of maximum-likelihood estimators (#264).
+   
+BUG FIXES
+
+   * made arguments of pairwise dependence measures consistent (#258).
+   
+   * fixed `itau` estimation method for Frank copulas (only allowed for positive
+     parameters) (#263).
+
+
 # vinecopulib 0.2.0 (October 30, 2017)
  
 LIBRARY TYPE
@@ -135,4 +155,4 @@ BUG FIXES
 
 # vinecopulib 0.0.1 (March 29, 2017)
 
-Initial rlease.
+Initial release.
