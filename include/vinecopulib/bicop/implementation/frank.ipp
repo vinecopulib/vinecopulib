@@ -135,7 +135,7 @@ inline double debyen(const double x, const int n)
         };
 
         /* constrained to the list of nzetan[] given above */
-        if ((unsigned long) n >= sizeof(nzetan) / sizeof(double))
+        if (static_cast<unsigned long>(n) >= sizeof(nzetan) / sizeof(double))
             return -1.;
 
         /* n!*zeta(n) is the integral for x=infinity , 27.1.3 */
@@ -146,8 +146,8 @@ inline double debyen(const double x, const int n)
         */
         static int kLim[] = {0, 0, 0, 13, 10, 8, 7, 6, 5, 5, 4, 4, 4, 3};
 
-        const int kmax = ((unsigned long) x < sizeof(kLim) / sizeof(int))
-                         ? kLim[(int) x] : 3;
+        const int kmax = (static_cast<unsigned long>(x) < sizeof(kLim) / sizeof(int))
+                         ? kLim[static_cast<int>(x)] : 3;
         /* Abramowitz Stegun 27.1.2 */
         int k;
         for (k = 1; k <= kmax; k++) {
@@ -258,6 +258,6 @@ inline double debyen(const double x, const int n)
                 break;
         }
         sum += 1. / n - x / (2 * (1 + n));
-        return sum * pow(x, (double) n);
+        return sum * pow(x, static_cast<double>(n));
     }
 }

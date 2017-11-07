@@ -45,7 +45,8 @@ inline Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method)
 {
     for (int j = 0; j < x.cols(); ++j)
-        x.col(j) = to_pseudo_obs_1d((Eigen::VectorXd) x.col(j), ties_method);
+        x.col(j) = to_pseudo_obs_1d(static_cast<Eigen::VectorXd>(x.col(j)),
+                                    ties_method);
 
     return x;
 }
@@ -67,7 +68,7 @@ to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
     auto order = tools_stl::get_order(xvec);
     if (ties_method == "first") {
         for (auto i : order)
-            x[order[i]] = (double) (i + 1);
+            x[order[i]] = static_cast<double>(i + 1);
     } else if (ties_method == "average") {
         for (size_t i = 0, reps; i < n; i += reps) {
             // find replications
@@ -96,7 +97,7 @@ to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
             std::iota(rvals.begin(), rvals.end(), 0);  // 0, 1, 2, ...
             std::random_shuffle(rvals.begin(), rvals.end(), sim);
             for (size_t k = 0; k < reps; ++k)
-                x[order[i + k]] = (double) (i + 1 + rvals[k]);
+                x[order[i + k]] = static_cast<double>(i + 1 + rvals[k]);
         }
     } else {
         std::stringstream msg;
@@ -436,11 +437,11 @@ inline Eigen::MatrixXd ghalton(size_t n, size_t d)
     Eigen::MatrixXi coeff(d, 32);
     Eigen::VectorXi tmp(d);
     int k;
-    auto mod = [](const int &u, const int &v) { return u % v; };
+    auto mod = [](const int &u1, const int &u2) { return u1 % u2; };
     for (size_t i = 1; i < n; i++) {
 
         // Find i in the prime base
-        tmp = Eigen::VectorXi::Constant(d, (int) i);
+        tmp = Eigen::VectorXi::Constant(d, static_cast<int>(i));
         coeff = Eigen::MatrixXi::Zero(d, 32);
         k = 0;
         while ((tmp.maxCoeff() > 0) && (k < 32)) {
@@ -480,7 +481,7 @@ inline Eigen::MatrixXd ghalton(size_t n, size_t d)
 inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
                             int nu, double rho)
 {
-    double snu = sqrt((double) nu);
+    double snu = sqrt(static_cast<double>(nu));
     double ors = 1 - pow(rho, 2.0);
 
     auto f = [snu, nu, ors, rho](double h, double k) {
@@ -511,9 +512,9 @@ inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
             xnkh = 0.;
         }
         d1 = h - rho * k;
-        hs = (int) (d1 >= 0 ? 1 : -1);//d_sign(&c_b91, &d1);
+        hs = static_cast<int>(d1 >= 0 ? 1 : -1);//d_sign(&c_b91, &d1);
         d1 = k - rho * h;
-        ks = (int) (d1 >= 0 ? 1 : -1);
+        ks = static_cast<int>(d1 >= 0 ? 1 : -1);
         if (nu % 2 == 0) {
             bvt = atan2(sqrt(ors), -rho) / 6.2831853071795862;
             /* Computing 2nd power */
@@ -528,7 +529,7 @@ inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
             btnchk = atan2(sqrt(xnhk), sqrt(1 - xnhk)) * 2 /
                      3.14159265358979323844;
             btpdhk = sqrt(xnhk * (1 - xnhk)) * 2 / 3.14159265358979323844;
-            size_t i1 = (size_t) (nu / 2);
+            size_t i1 = static_cast<size_t>(nu / 2);
             for (size_t j = 1; j <= i1; ++j) {
                 bvt += gmph * (ks * btnckh + 1);
                 bvt += gmpk * (hs * btnchk + 1);
@@ -572,7 +573,7 @@ inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
             btpdkh = btnckh;
             btnchk = sqrt(xnhk);
             btpdhk = btnchk;
-            size_t i1 = (size_t) ((nu - 1) / 2);
+            size_t i1 = static_cast<size_t>((nu - 1) / 2);
             for (size_t j = 1; j <= i1; ++j) {
                 bvt += gmph * (ks * btnckh + 1);
                 bvt += gmpk * (hs * btnchk + 1);
@@ -633,7 +634,7 @@ pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
                        .1019301198172404, .1181945319615184,
                        .1316886384491766, .1420961093183821,
                        .1491729864726037, .1527533871307259}};
-    auto w = ((double *) &equiv_112);
+    auto w = reinterpret_cast<double *>(&equiv_112);
 
     static struct
     {
@@ -652,7 +653,7 @@ pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
                                                                                                     -.7463319064601508, -.636053680726515,
                        -.5108670019508271, -.3737060887154196,
                        -.2277858511416451, -.07652652113349733}};
-    auto x = ((double *) &equiv_113);
+    auto x = reinterpret_cast<double *>(&equiv_113);
 
 
     boost::math::normal dist;

@@ -25,7 +25,7 @@ inline Eigen::MatrixXd dnorm(const Eigen::MatrixXd &x)
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
-};
+}
 
 //! Distribution function of the Standard normal distribution
 //!
@@ -37,7 +37,7 @@ inline Eigen::MatrixXd pnorm(const Eigen::MatrixXd &x)
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
-};
+}
 
 //! Quantile function of the Standard normal distribution
 //!
@@ -49,7 +49,7 @@ inline Eigen::MatrixXd qnorm(const Eigen::MatrixXd &x)
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
-};
+}
 
 //! Density function of the Student t distribution
 //!
@@ -62,7 +62,7 @@ inline Eigen::MatrixXd dt(const Eigen::MatrixXd &x, double nu)
     boost::math::students_t dist(nu);
     auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
-};
+}
 
 //! Distribution function of the Student t distribution
 //!
@@ -75,7 +75,7 @@ inline Eigen::MatrixXd pt(const Eigen::MatrixXd &x, double nu)
     boost::math::students_t dist(nu);
     auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
-};
+}
 
 //! Quantile function of the Student t distribution
 //!
@@ -88,7 +88,7 @@ inline Eigen::MatrixXd qt(const Eigen::MatrixXd &x, double nu)
     boost::math::students_t dist(nu);
     auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
-};
+}
 
 Eigen::MatrixXd simulate_uniform(size_t n, size_t d);
 

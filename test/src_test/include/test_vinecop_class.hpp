@@ -145,11 +145,11 @@ TEST_F(VinecopTest, family_select_finds_true_rotations) {
         }
     }
     Vinecop vinecop(pair_copulas, model_matrix);
-    auto u = vinecop.simulate(10000);
+    auto data = vinecop.simulate(10000);
 
     auto controls = FitControlsVinecop({BicopFamily::clayton}, "itau");
     // controls.set_show_trace(true);
-    Vinecop fit(u, model_matrix, controls);
+    Vinecop fit(data, model_matrix, controls);
 
     // don't check last two trees to avoid random failures because of
     // estimation uncertainty
