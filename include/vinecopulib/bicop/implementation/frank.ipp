@@ -6,6 +6,7 @@
 
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/log1p.hpp>
+#include <boost/math/tools/minima.hpp>
 
 namespace vinecopulib {
 
@@ -47,16 +48,19 @@ inline double FrankBicop::generator_derivative2(const double &u)
 
 inline Eigen::MatrixXd FrankBicop::tau_to_parameters(const double &tau)
 {
-    Eigen::VectorXd tau2 = Eigen::VectorXd::Constant(1, std::fabs(tau));
-    auto f = [&](const Eigen::VectorXd &v) {
-        return Eigen::VectorXd::Constant(1, std::fabs(parameters_to_tau(v)));
+    Eigen::VectorXd tau0 = Eigen::VectorXd::Constant(1, tau);
+    auto f = [&](const Eigen::VectorXd &par) {
+        return Eigen::VectorXd::Constant(1, parameters_to_tau(par));
     };
-    return tools_eigen::invert_f(tau2, f, -100 + 1e-6, 100);
+    return tools_eigen::invert_f(tau0, f, -35 + 1e-6, 35 - 1e-5);
 }
 
 inline double FrankBicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
 {
     double par = parameters(0);
+    if (std::fabs(par) < 1e-5) {
+        return 0.0;
+    }
     double tau = 1 - 4 / par;
     double d = debyen(std::fabs(par), 1) / std::fabs(par);
     if (par < 0) {
