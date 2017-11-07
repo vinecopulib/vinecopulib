@@ -13,6 +13,10 @@
 // interface specific headers
 #ifdef INTERFACED_FROM_R
     #include <RcppThread.h>
+    #define cout Rcout
+    namespace std {
+        extern RcppThread::RPrinter Rcout;
+    }
 #else
     #include <iostream>
 #endif
@@ -28,15 +32,6 @@
 
 namespace vinecopulib {
 namespace tools_interface {
-
-inline void print(std::string text)
-{
-#ifndef INTERFACED_FROM_R
-    std::cout << text;
-#else
-    RcppThread::Rcout << text;
-#endif
-}
 
 inline void check_user_interrupt(bool do_check = true)
 {

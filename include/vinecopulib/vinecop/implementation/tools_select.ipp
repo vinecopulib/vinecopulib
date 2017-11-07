@@ -120,8 +120,7 @@ inline void VinecopSelector::select_all_trees(const Eigen::MatrixXd &data)
 
         if (controls_.get_show_trace()) {
             std::stringstream tree_heading;
-            tree_heading << "** Tree: " << t << std::endl;
-            tools_interface::print(tree_heading.str().c_str());
+            std::cout << "** Tree: " << t << std::endl;
             print_pair_copulas_of_tree(t);
         }
 
@@ -157,7 +156,6 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
 
     double gic_opt = 0.0;
     bool needs_break = false;
-    std::stringstream msg;
     while (!needs_break) {
         // restore family set in case previous threshold iteration also
         // truncated the model
@@ -168,12 +166,10 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         if (controls_.get_select_threshold()) {
             controls_.set_threshold(get_next_threshold(thresholded_crits));
             if (controls_.get_show_trace()) {
-                msg <<
+                std::cout <<
                     "***** threshold: " <<
                     controls_.get_threshold() <<
                     std::endl;
-                tools_interface::print(msg.str().c_str());
-                msg.str("");  // clear stream
             }
         }
 
@@ -216,22 +212,18 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
 
             // print trace for this tree level
             if (controls_.get_show_trace()) {
-                msg << "** Tree: " << t;
+                std::cout << "** Tree: " << t;
                 if (controls_.get_select_truncation_level()) {
-                    msg << ", GIC: " << gic_trunc;
+                    std::cout << ", GIC: " << gic_trunc;
                 }
-                msg << std::endl;
-                tools_interface::print(msg.str().c_str());
-                msg.str("");  // clear stream
+                std::cout << std::endl;
                 // print fitted pair-copulas for this tree
                 print_pair_copulas_of_tree(t);
             }
         }
 
         if (controls_.get_show_trace()) {
-            msg << "--> GIC = " << gic << std::endl << std::endl;
-            tools_interface::print(msg.str().c_str());
-            msg.str("");  // clear stream
+            std::cout << "--> GIC = " << gic << std::endl << std::endl;
         }
 
         // prepare for possible next iteration
@@ -612,10 +604,9 @@ inline void VinecopSelector::print_pair_copulas_of_tree(size_t t)
 {
     // trees_[0] is the base tree, see make_base_tree()
     for (auto e : boost::edges(trees_[t + 1])) {
-        std::stringstream pc_info;
-        pc_info << get_pc_index(e, trees_[t + 1]) << " <-> " <<
-                trees_[t + 1][e].pair_copula.str() << std::endl;
-        vinecopulib::tools_interface::print(pc_info.str().c_str());
+        std::cout << 
+            get_pc_index(e, trees_[t + 1]) << " <-> " <<
+            trees_[t + 1][e].pair_copula.str() << std::endl;
     }
 }
 
