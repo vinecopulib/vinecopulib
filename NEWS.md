@@ -2,20 +2,21 @@
 
 NEW FEATURES
 
-   * refactor `std::cout` replacement for R-interface (#260) 
+   * faster vine copula estimation and selection by parallelizing further 
+     sub-routines (#259).
 
-   * cosmetic changes for cross-platform compatibility and 
-   addition of a `STRICT_COMPILER` option for gcc (#261)
+   * enhanced cross-platform compatibility and addition of a `STRICT_COMPILER`
+     option for gcc (#261).
+        
+   * increased precision of maximum-likelihood estimators (#264).
    
-   * more parallelization whenever possible, new function `map_on_pool()` for 
-   ThreadPool construction/call, refactor include of `RcppThread::ThreadPool` 
-   for R-compatibility, put ThreadPool class in `tools_thread.hpp` (#259)
-   
-   * make arguments of pairwise dependence measures consistent (#258)
-
 BUG FIXES
 
-   * add `codecov.yml` to properly ignore test folder (#257)
+   * made arguments of pairwise dependence measures consistent (#258).
+   
+   * fixed `itau` estimation method for Frank copulas (only allowed for positive
+     parameters) (#263).
+
 
 # vinecopulib 0.2.0 (October 30, 2017)
  
