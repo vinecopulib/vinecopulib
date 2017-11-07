@@ -49,13 +49,13 @@ inline void Optimizer::set_controls(double initial_trust_region,
 //!
 //! The defaults are
 //! ```
-//! initial_trust_region_ = 1e-3;
+//! initial_trust_region_ = 1e-4;
 //! final_trust_region_ = 1e3;
 //! maxeval_ = 1000;
 //! ```
 inline BobyqaControls::BobyqaControls()
 {
-    initial_trust_region_ = 1e-3;
+    initial_trust_region_ = 1e-4;
     final_trust_region_ = 1e3;
     maxeval_ = 1000;
 }
