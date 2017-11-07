@@ -74,7 +74,10 @@ inline Eigen::MatrixXd JoeBicop::tau_to_parameters(const double &tau)
     auto f = [&](const Eigen::VectorXd &v) {
         return Eigen::VectorXd::Constant(1, std::fabs(parameters_to_tau(v)));
     };
-    return tools_eigen::invert_f(tau0, f, 1 + 1e-6, 70 - 1e-6);
+    return tools_eigen::invert_f(tau0, 
+                                 f, 
+                                 parameters_lower_bounds_(0) + 1e-6, 
+                                 parameters_upper_bounds_(0) - 1e-6);
 }
 
 inline double JoeBicop::parameters_to_tau(const Eigen::MatrixXd &parameters)

@@ -6,7 +6,6 @@
 
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/log1p.hpp>
-#include <boost/math/tools/minima.hpp>
 
 namespace vinecopulib {
 
@@ -52,7 +51,10 @@ inline Eigen::MatrixXd FrankBicop::tau_to_parameters(const double &tau)
     auto f = [&](const Eigen::VectorXd &par) {
         return Eigen::VectorXd::Constant(1, parameters_to_tau(par));
     };
-    return tools_eigen::invert_f(tau0, f, -35 + 1e-6, 35 - 1e-5);
+    return tools_eigen::invert_f(tau0, 
+                                 f, 
+                                 parameters_lower_bounds_(0) + 1e-6, 
+                                 parameters_upper_bounds_(0) - 1e-5);
 }
 
 inline double FrankBicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
