@@ -35,7 +35,7 @@ bool \hyperlink{classvinecopulib_1_1_r_vine_matrix_a9ac94374329ca2cfee92ce676c7f
 \item 
 static Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{classvinecopulib_1_1_r_vine_matrix_ad523b84e2ea41eba4eb982eb9b39471b}{construct\+\_\+d\+\_\+vine\+\_\+matrix} (const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, 1 $>$ \&order)
 \item 
-static void \hyperlink{classvinecopulib_1_1_r_vine_matrix_a89aa5b0f2d11630ec9aaac995c08695e}{complete\+\_\+matrix} (Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&mat, size\+\_\+t t\+\_\+start)
+static void \hyperlink{classvinecopulib_1_1_r_vine_matrix_ae27243770904a218e4e1e5b939ad46fb}{complete\+\_\+matrix} (Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&mat, size\+\_\+t t\+\_\+start, size\+\_\+t num\+\_\+threads=1)
 \end{DoxyCompactItemize}
 
 
@@ -117,12 +117,13 @@ check whether an edge belong to the implied structure
 \end{DoxyParams}
 \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!complete\+\_\+matrix@{complete\+\_\+matrix}}
 \index{complete\+\_\+matrix@{complete\+\_\+matrix}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
-\subsubsection[{\texorpdfstring{complete\+\_\+matrix(\+Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&mat, size\+\_\+t t\+\_\+start)}{complete_matrix(Eigen::Matrix< size_t, Eigen::Dynamic, Eigen::Dynamic > &mat, size_t t_start)}}]{\setlength{\rightskip}{0pt plus 5cm}void vinecopulib\+::\+R\+Vine\+Matrix\+::complete\+\_\+matrix (
+\subsubsection[{\texorpdfstring{complete\+\_\+matrix(\+Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&mat, size\+\_\+t t\+\_\+start, size\+\_\+t num\+\_\+threads=1)}{complete_matrix(Eigen::Matrix< size_t, Eigen::Dynamic, Eigen::Dynamic > &mat, size_t t_start, size_t num_threads=1)}}]{\setlength{\rightskip}{0pt plus 5cm}void vinecopulib\+::\+R\+Vine\+Matrix\+::complete\+\_\+matrix (
 \begin{DoxyParamCaption}
 \item[{Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{mat, }
-\item[{size\+\_\+t}]{t\+\_\+start}
+\item[{size\+\_\+t}]{t\+\_\+start, }
+\item[{size\+\_\+t}]{num\+\_\+threads = {\ttfamily 1}}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a89aa5b0f2d11630ec9aaac995c08695e}{}\label{classvinecopulib_1_1_r_vine_matrix_a89aa5b0f2d11630ec9aaac995c08695e}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{classvinecopulib_1_1_r_vine_matrix_ae27243770904a218e4e1e5b939ad46fb}{}\label{classvinecopulib_1_1_r_vine_matrix_ae27243770904a218e4e1e5b939ad46fb}
 completes an R-\/vine matrix that has only been filled for the first couple of trees. 
 \begin{DoxyParams}{Parameters}
 {\em mat} & R-\/vine matrix where counter-\/diagonal and upper block have been filled; entries in between may still be 0. \\
