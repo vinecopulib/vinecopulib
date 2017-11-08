@@ -24,4 +24,16 @@ TEST(bicop_select, works_in_parallel) {
     EXPECT_EQ(fit1.get_parameters(), fit2.get_parameters());
 }
 
+TEST(bicop_select, allows_all_selcrits) {
+    Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
+    auto u = cop.simulate(15);
+    FitControlsBicop controls;
+    controls.set_selection_criterion("loglik");
+    cop.select(u, controls);
+    controls.set_selection_criterion("aic");
+    cop.select(u, controls);
+    controls.set_selection_criterion("bic");
+    cop.select(u, controls);
+}
+
 }
