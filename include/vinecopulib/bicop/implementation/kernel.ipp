@@ -13,7 +13,7 @@ inline KernelBicop::KernelBicop()
     size_t m = 30;
     Eigen::VectorXd grid_points(m);
     for (size_t i = 0; i < m; ++i)
-        grid_points(i) = -3.25 + i * (6.25 / static_cast<double>(m));
+        grid_points(i) = -3.25 + i * (6.5 / static_cast<double>(m - 1));
     interp_grid_ = tools_interpolation::InterpolationGrid(
         tools_stats::pnorm(grid_points),
         Eigen::MatrixXd::Constant(m, m, 1.0)  // independence
