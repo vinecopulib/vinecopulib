@@ -27,8 +27,8 @@ Advantages over VineCopula are
 
 #### Status
 
-Version [0.2.1](https://github.com/vinecopulib/vinecopulib/releases) was
-released on November 7, 2017. While we did our best to
+Version [0.2.2](https://github.com/vinecopulib/vinecopulib/releases) was
+released on November 9, 2017. While we did our best to
 design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for
 [R](https://github.com/vinecopulib/rvinecopulib) and
@@ -365,7 +365,7 @@ degree zero, one and two.
 * `double nonparametric_mult` a factor with which the smoothing parameters
 are multiplied.
 * `std::string selection_criterion` describes the criterion to compare the
-families. It can take either `"bic"`(default) or `"aic"`.
+families. It can take either `"loglik"`, `"aic"`, or `"bic"`(default).
 * `bool preselect_families` describes a heuristic preselection method (default
 is `true`) based on symmetry properties of the data (e.g., the unrotated
 Clayton won't be preselected if the data displays upper-tail dependence).
