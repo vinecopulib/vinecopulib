@@ -1,3 +1,15 @@
+# vinecopulib 0.2.2 (November 9, 2017)
+
+NEW FEATURES
+
+   * allow `"loglik"` as selection criterion (#267).
+
+   
+BUG FIXES
+ 
+   * make interpolation grid symmetric around (0.5, 0.5) again (#268).
+
+
 # vinecopulib 0.2.1 (November 7, 2017)
 
 NEW FEATURES
