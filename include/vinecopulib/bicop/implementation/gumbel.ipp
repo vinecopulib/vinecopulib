@@ -76,7 +76,10 @@ GumbelBicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
 
 inline Eigen::VectorXd GumbelBicop::get_start_parameters(const double tau)
 {
-    return tau_to_parameters(tau);
+    Eigen::VectorXd par = tau_to_parameters(tau);
+    par = par.cwiseMax(parameters_lower_bounds_);
+    par = par.cwiseMin(parameters_upper_bounds_);
+    return par;
 }
 }
 
