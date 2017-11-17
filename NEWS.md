@@ -1,3 +1,17 @@
+# vinecopulib 0.2.3 (November 17, 2017)
+
+NEW FEATURES
+
+   * direct implementation of archimedean pdfs (#274)
+
+BUG FIXES
+
+   * add safeguards for bicop/vinecop when not enough data (#273)
+
+   * fix segfault problem in complete_matrix() (#272)
+
+   * make get_start_parameters() respect the bounds (#271)
+
 # vinecopulib 0.2.2 (November 9, 2017)
 
 NEW FEATURES
