@@ -1,4 +1,4 @@
-# vinecopulib 0.2.3 (November 17, 2017)
+# vinecopulib 0.2.3 (November 18, 2017)
 
 NEW FEATURES
 

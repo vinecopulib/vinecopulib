@@ -28,7 +28,7 @@ Advantages over VineCopula are
 #### Status
 
 Version [0.2.3](https://github.com/vinecopulib/vinecopulib/releases) was
-released on November 17, 2017. While we did our best to
+released on November 18, 2017. While we did our best to
 design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for
 [R](https://github.com/vinecopulib/rvinecopulib) and
