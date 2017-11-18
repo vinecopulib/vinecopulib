@@ -1,10 +1,25 @@
+# vinecopulib 0.2.3 (November 18, 2017)
+
+NEW FEATURES
+
+   * faster implementation of Archimedean pdfs (#274).
+
+BUG FIXES
+
+   * add safeguards for estimation of `Bicop`/`Vinecop` objects with 
+     insufficient data (#273).
+
+   * fix segfault issue in completing a truncated vine fit (#272).
+
+   * make `par_method = "itau"` respect the parameter bounds (#271).
+
+
 # vinecopulib 0.2.2 (November 9, 2017)
 
 NEW FEATURES
 
    * allow `"loglik"` as selection criterion (#267).
 
-   
 BUG FIXES
  
    * make interpolation grid symmetric around (0.5, 0.5) again (#268).
