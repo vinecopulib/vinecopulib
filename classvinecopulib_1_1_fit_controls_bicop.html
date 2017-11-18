@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.2.1</a>
+                    <a class="navbar-brand">vinecopulib 0.2.3</a>
                 </div>
             </div>
         </nav>
@@ -203,7 +203,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">parametric_method</td><td>the fit method for parametric families; possible choices: <code>"mle"</code>, <code>"itau"</code>. </td></tr>
     <tr><td class="paramname">nonparametric_method</td><td>the fit method for the local-likelihood nonparametric family (TLLs); possible choices: <code>"constant"</code>, <code>"linear"</code>, <code>"quadratic"</code>. </td></tr>
     <tr><td class="paramname">nonparametric_mult</td><td>a factor with which the smoothing parameters are multiplied. </td></tr>
-    <tr><td class="paramname">selection_criterion</td><td>the selection criterion (<code>"aic"</code> or <code>"bic"</code>). </td></tr>
+    <tr><td class="paramname">selection_criterion</td><td>the selection criterion (<code>"loglik"</code>, <code>"aic"</code> or <code>"bic"</code>). </td></tr>
     <tr><td class="paramname">preselect_families</td><td>whether to exclude families before fitting based on symmetry properties of the data. </td></tr>
     <tr><td class="paramname">num_threads</td><td>number of concurrent threads to use while fitting copulas for different families; never uses more than the number returned by <code>std::thread::hardware_concurrency()</code>. </td></tr>
   </table>
@@ -321,7 +321,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 8 2017 13:32:26 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Nov 18 2017 14:54:22 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
