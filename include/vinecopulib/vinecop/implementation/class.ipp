@@ -618,13 +618,13 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
         hfunc1(0, d - 1) = hinv2(0, d - 1);
 
         // loop through variables (0 is just the inital uniform)
+        size_t trunc_lvl = pair_copulas_.size();
         for (ptrdiff_t var = d - 2; var >= 0; --var) {
             tools_interface::check_user_interrupt(n * d > 1e5);
-            size_t trunc_lvl = pair_copulas_.size();
             if (trunc_lvl < d_ - 1) {
                 hinv2(trunc_lvl, var) = hinv2(d - var - 1, var);
             }
-            size_t tree_start = std::min(trunc_lvl, d - var - 2);
+            size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
             for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
                 Bicop edge_copula = get_pair_copula(tree, var);
 
