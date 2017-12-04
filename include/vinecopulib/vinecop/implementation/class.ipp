@@ -418,8 +418,9 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
     // points have to be reordered to correspond to natural order
     for (size_t j = 0; j < d; ++j)
         hfunc2.col(j) = u.col(revorder(j) - 1);
-
-    for (size_t tree = 0; tree < d - 1; ++tree) {
+        
+    size_t trunc_lvl = pair_copulas_.size();
+    for (size_t tree = 0; tree < trunc_lvl; ++tree) {
         tools_interface::check_user_interrupt(n * d > 1e5);
         for (size_t edge = 0; edge < d - tree - 1; ++edge) {
             tools_interface::check_user_interrupt(edge % 100 == 0);
