@@ -1,4 +1,4 @@
-# vinecopulib 0.2.4 (December 28, 2017)
+# vinecopulib 0.2.4 (December 29, 2017)
 
 BUG FIXES
 
@@ -8,6 +8,7 @@ BUG FIXES
    (#278 and #280)
 
    * default initialize Rcout (#277).
+
 
 # vinecopulib 0.2.3 (November 18, 2017)
 
