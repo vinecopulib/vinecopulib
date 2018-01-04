@@ -15,7 +15,7 @@ You can find a comprehensive list of publications and other materials on
 #### What is vinecopulib?
 
 vinecopulib is a header-only C++ library for vine copula models based on
-[Eigen](http://eigen.tuxfamily.org/index.p  hp?title=Main_Page). It provides
+[Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). It provides
 high-performance implementations of the core features of the popular
 [VineCopula R library](https://github.com/tnagler/VineCopula), in particular
 inference algorithms for both vine copula and bivariate copula models.
