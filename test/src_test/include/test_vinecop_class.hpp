@@ -67,7 +67,7 @@ TEST_F(VinecopTest, getters_are_correct) {
 
 TEST_F(VinecopTest, pdf_is_correct) {
 
-    auto pair_copulas = Vinecop::make_pair_copula_store(7);
+    auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
     auto par = Eigen::VectorXd::Constant(1, 3.0);
     for (auto &tree : pair_copulas) {
         for (auto &pc : tree) {
@@ -92,7 +92,7 @@ TEST_F(VinecopTest, cdf_is_correct) {
     }
     Eigen::Matrix<size_t, 2, 2> matrix;
     matrix << 1, 1,
-        2, 0;
+              2, 0;
     Vinecop vinecop(pair_copulas, matrix);
 
     // Test whether the analytic and simulated versions are "close" enough
@@ -102,7 +102,7 @@ TEST_F(VinecopTest, cdf_is_correct) {
 
 TEST_F(VinecopTest, simulate_is_correct) {
 
-    auto pair_copulas = Vinecop::make_pair_copula_store(7);
+    auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
     auto par = Eigen::VectorXd::Constant(1, 3.0);
     for (auto &tree : pair_copulas) {
         for (auto &pc : tree) {
@@ -111,9 +111,10 @@ TEST_F(VinecopTest, simulate_is_correct) {
     }
     Vinecop vinecop(pair_copulas, model_matrix);
 
-    vinecop.simulate(10);  // only check if it works
+    // only check if it works
+    vinecop.simulate(10);  
     // check the underlying transformation from independent samples
-    ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
+    ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));    
 }
 
 TEST_F(VinecopTest, aic_bic_are_correct) {
