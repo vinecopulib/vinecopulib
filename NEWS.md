@@ -1,3 +1,15 @@
+# vinecopulib 0.2.4 (December 29, 2017)
+
+BUG FIXES
+
+   * adapt Vinecop's `simulate()` and `pdf()` to truncated vines (#279) 
+
+   * make bb8 lower bound ensure feasible computations in `parameters_to_tau()` 
+   (#278 and #280)
+
+   * default initialize Rcout (#277).
+
+
 # vinecopulib 0.2.3 (November 18, 2017)
 
 NEW FEATURES
