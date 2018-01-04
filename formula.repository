@@ -1,0 +1,26 @@
+\form#0:$n \times 2$
+\form#1:$ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) $
+\form#2:$m \times 2$
+\form#3:$ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) $
+\form#4:$ h_1 f$
+\form#5:$ h_2 f$
+\form#6:$ n \times 2 $
+\form#7:\[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \]
+\form#8:$ c $
+\form#9:\[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \]
+\form#10:$ \mathrm{loglik} $
+\form#11:$ p $
+\form#12:\[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \]
+\form#13:$ \tau $
+\form#14:$ (-1, 1) $
+\form#15:$ tau $
+\form#16:$(0, 1)^2 $
+\form#17:$ n \times d $
+\form#18:$ \mathrm{U}[0, 1] $
+\form#19:$ \rho $
+\form#20:$ D $
+\form#21:$ n \times 1 $
+\form#22:\[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \]
+\form#23:$n \times d$
+\form#24:$ n = 1000 $
+\form#25:$d = 200$
