@@ -190,6 +190,9 @@ private:
                               const VineTree &vine_tree);
 
     void finalize(size_t trunc_lvl);
+    
+    size_t find_column_in_matrix(const std::vector<size_t>& conditioned);
+
 };
 
 }
