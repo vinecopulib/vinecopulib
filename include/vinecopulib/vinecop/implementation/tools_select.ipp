@@ -227,12 +227,8 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
 
         // check whether gic-optimal model has been found
         if (gic == 0.0) {
-            if (controls_.get_select_threshold()) {
-                // everything is independent, threshold needs to be
-                // reduced further
-                set_current_fit_as_opt();
-                continue;
-            } else {
+            set_current_fit_as_opt();
+            if (!controls_.get_select_threshold()) {
                 // threshold is fixed, optimal truncation level has
                 // been found
                 needs_break = true;
@@ -290,6 +286,7 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
     trees_.resize(1);
     controls_ = controls;
     vine_matrix_ = vine_matrix;
+    threshold_ = 0.0;
 }
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
@@ -299,6 +296,7 @@ inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
     d_ = data.cols();
     trees_.resize(1);
     controls_ = controls;
+    threshold_ = 0.0;
 }
 
 //! Add edges allowed by the proximity condition
