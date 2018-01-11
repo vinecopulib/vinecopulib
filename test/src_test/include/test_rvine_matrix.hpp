@@ -31,7 +31,7 @@ TEST(rvine_matrix, can_convert_to_natural_order) {
         5, 6, 0, 0, 0, 0, 0,
         7, 0, 0, 0, 0, 0, 0;
     RVineMatrix rvine_matrix(mat);
-    EXPECT_EQ(rvine_matrix.in_natural_order(), true_no_matrix);
+    EXPECT_EQ(rvine_matrix.get_natural_order(), true_no_matrix);
 }
 
 TEST(rvine_matrix, max_mat_is_correct) {
