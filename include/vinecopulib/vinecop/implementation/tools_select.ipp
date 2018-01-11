@@ -162,6 +162,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         // restore family set in case previous threshold iteration also
         // truncated the model
         controls_.set_family_set(family_set);
+        controls_.set_truncation_level(std::numeric_limits<size_t>::max());
         initialize_new_fit(data);
 
         // decrease the threshold
@@ -182,7 +183,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         double gic_trunc = 0.0;
 
         for (size_t t = 0; t < d_ - 1; ++t) {
-            if (controls_.get_truncation_level() == t) {
+            if (controls_.get_truncation_level() < t) {
                 break;  // don't need to fit the remaining trees
             }
 
@@ -195,18 +196,13 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             gic_trunc = calculate_gic(loglik, npars, n_);
 
             // gic comparison
-            if (controls_.get_select_truncation_level()) {
-                if (gic_trunc >= gic) {
-                    // gic did not improve, set this tree to independence
-                    set_tree_to_indep(t);
-                    if (!controls_.get_select_threshold()) {
-                        // if threshold is fixed, no need to go further
-                        controls_.set_truncation_level(std::max(t, static_cast<size_t>(1)));
-                        needs_break = true;   // stops gic-search
-                        break;                // stops loop over trees
-                    }
-                } else {
-                    gic = gic_trunc;
+            if (controls_.get_select_truncation_level() & (gic_trunc >= gic)) {
+                // gic did not improve, set this tree to independence
+                set_tree_to_indep(t);
+                controls_.set_truncation_level(t);
+                if (!controls_.get_select_threshold()) {
+                    // if threshold is fixed, no need to go further
+                    needs_break = true;   // stops gic-search
                 }
             } else {
                 gic = gic_trunc;
@@ -228,15 +224,13 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             std::cout << "--> GIC = " << gic << std::endl << std::endl;
         }
 
-        // prepare for possible next iteration
-        thresholded_crits = get_thresholded_crits();
-        set_current_fit_as_opt();
 
         // check whether gic-optimal model has been found
         if (gic == 0.0) {
             if (controls_.get_select_threshold()) {
                 // everything is independent, threshold needs to be
                 // reduced further
+                set_current_fit_as_opt();
                 continue;
             } else {
                 // threshold is fixed, optimal truncation level has
@@ -244,19 +238,30 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
                 needs_break = true;
             }
         } else if (gic >= gic_opt) {
-            // new model is optimal
+            // old model is optimal
             needs_break = true;
         } else {
             // optimum hasn't been found
+            set_current_fit_as_opt();
             gic_opt = gic;
             // while loop is only for threshold selection
             needs_break = needs_break | !controls_.get_select_threshold();
             // threshold is too close to 0
             needs_break = needs_break | (controls_.get_threshold() < 0.01);
+            // prepare for possible next iteration
+            thresholded_crits = get_thresholded_crits();
         }
     }
+    trees_ = trees_opt_;
     finalize(controls_.get_truncation_level());
 }
+
+// extracts the current threshold value
+double VinecopSelector::get_threshold() const
+{
+    return threshold_;
+}
+
 
 //! chooses threshold for next iteration such that at a proportion of at
 //! least 2.5% of the previously thresholded pairs become non-thresholded.
@@ -639,6 +644,7 @@ inline std::vector<double> VinecopSelector::get_thresholded_crits()
 
 inline void VinecopSelector::set_current_fit_as_opt()
 {
+    threshold_ = controls_.get_threshold();
     trees_opt_ = trees_;
 }
 
@@ -806,7 +812,7 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
             // the formula is quite arbitrary, but sufficient for
             // identifying situations where fits can be re-used
             tree[e].fit_id =
-                tree[e].pc_data(0, 0) - 2 * tree[e].pc_data(0, 1);
+                (tree[e].pc_data.col(0) - 2 * tree[e].pc_data.col(1)).sum();
             tree[e].fit_id += 5.0 * static_cast<double>(is_thresholded);
             if (boost::num_edges(tree_opt) > 0) {
                 auto old_fit = find_old_fit(tree[e].fit_id, tree_opt);

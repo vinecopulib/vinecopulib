@@ -107,8 +107,8 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop controls,
 inline void
 FitControlsVinecop::check_truncation_level(size_t truncation_level)
 {
-    if (truncation_level < 1) {
-        throw std::runtime_error("truncation_level should be at least 1");
+    if (truncation_level < 0) {
+        throw std::runtime_error("truncation_level should be positive");
     }
 }
 

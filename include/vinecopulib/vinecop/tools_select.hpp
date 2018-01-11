@@ -90,6 +90,8 @@ public:
     void select_all_trees(const Eigen::MatrixXd &data);
 
     void sparse_select_all_trees(const Eigen::MatrixXd &data);
+    
+    double get_threshold() const;
 
 protected:
     void select_tree(size_t t);
@@ -124,7 +126,9 @@ protected:
     RVineMatrix vine_matrix_;
     std::vector<std::vector<Bicop>> pair_copulas_;
     std::vector<VineTree> trees_;
-    std::vector<VineTree> trees_opt_;  // for sparse selction
+    // for sparse selction
+    std::vector<VineTree> trees_opt_;
+    double threshold_;
 
 private:
     double get_next_threshold(std::vector<double> &thresholded_crits);
