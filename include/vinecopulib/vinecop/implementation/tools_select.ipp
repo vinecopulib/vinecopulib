@@ -227,10 +227,8 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
 
         // check whether gic-optimal model has been found
         if (gic == 0.0) {
-            set_current_fit_as_opt();
             if (!controls_.get_select_threshold()) {
-                // threshold is fixed, optimal truncation level has
-                // been found
+                // threshold is fixed, optimal truncation level has been found
                 needs_break = true;
             }
         } else if (gic >= gic_opt) {
@@ -346,7 +344,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     for (size_t col = 0; col < d_ - 1; ++col) {
         tools_interface::check_user_interrupt();
         // matrix above trunc_lvl will be filled more efficiently later
-        size_t t = std::max(std::min(trunc_lvl, d_ - 1 - col), static_cast<size_t>(1));
+        size_t t = std::min(trunc_lvl, d_ - 1 - col);
         // start with highest tree in this column
         for (auto e : boost::edges(trees_[t])) {
             // find an edge that contains a leaf
