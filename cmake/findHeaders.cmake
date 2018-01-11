@@ -4,7 +4,7 @@ if(VINECOPULIB_SHARED_LIB)
     set(vinecopulib_generated_sources ${CMAKE_BINARY_DIR}/generated/src)
     set(vinecopulib_generated_includes ${CMAKE_BINARY_DIR}/generated/include)
 
-    string(CONCAT license "// Copyright © 2017 Thomas Nagler and Thibault Vatter \n"
+    string(CONCAT license "// Copyright © 2018 Thomas Nagler and Thibault Vatter \n"
             "// \n"
             "// This file is part of the vinecopulib library and licensed under the terms of \n"
             "// the MIT license. For a copy, see the LICENSE file in the root directory of \n"
