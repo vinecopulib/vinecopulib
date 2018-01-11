@@ -6,13 +6,13 @@ NEW FEATURES
      the vine structure (#292).
      
    * the selected threshold parameter can be returned from the `Vinecop` 
-     object.
+     object (#290).
 
 BUG FIXES
 
    * fix storage order of pair copulas when structure is fixed (#289).
    
-   * fixed selection algorithm for threshold and truncation level (#290).
+   * fixed selection algorithm for threshold and truncation level (#290, #294).
 
 
 # vinecopulib 0.2.4 (December 29, 2017)
