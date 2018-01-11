@@ -105,14 +105,6 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop controls,
 //! Sanity checks
 //! @{
 inline void
-FitControlsVinecop::check_truncation_level(size_t truncation_level)
-{
-    if (truncation_level < 0) {
-        throw std::runtime_error("truncation_level should be positive");
-    }
-}
-
-inline void
 FitControlsVinecop::check_tree_criterion(std::string tree_criterion)
 {
     if (!tools_stl::is_member(tree_criterion, {"tau", "rho", "hoeffd"})) {
@@ -178,7 +170,6 @@ inline FitControlsBicop FitControlsVinecop::get_fit_controls_bicop()
 
 inline void FitControlsVinecop::set_truncation_level(size_t truncation_level)
 {
-    check_truncation_level(truncation_level);
     truncation_level_ = truncation_level;
 }
 
