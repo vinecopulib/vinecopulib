@@ -497,13 +497,23 @@ inline void FamilySelector::finalize(size_t trunc_lvl)
 {
     pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
     for (size_t tree = 0; tree < pair_copulas_.size(); tree++) {
-        int edge = 0;
-        // trees_[0] is base tree, vine copula starts at trees_[1]
         for (auto e : boost::edges(trees_[tree + 1])) {
+            // check in which column of the matrix the pair-copula e is
+            size_t edge = find_column_in_matrix(trees_[tree + 1][e].conditioned);
+            // trees_[0] is base tree, vine copula starts at trees_[1]
             pair_copulas_[tree][edge] = trees_[tree + 1][e].pair_copula;
             edge++;
         }
     }
+}
+
+inline size_t FamilySelector::find_column_in_matrix(
+    const std::vector<size_t>& conditioned)
+{
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> inds =
+        vine_matrix_.get_order().reverse();
+    std::vector<size_t> vinds(inds.data(), inds.data() + inds.rows());
+    return tools_stl::find_position(conditioned[0] + 1, vinds);
 }
 
 

@@ -161,6 +161,26 @@ TEST_F(VinecopTest, family_select_finds_true_rotations) {
     EXPECT_EQ(true_rots, fitd_rots);
 }
 
+TEST_F(VinecopTest, family_select_returns_pcs_in_right_order) {
+
+    auto pair_copulas = Vinecop::make_pair_copula_store(7);
+    auto par = Eigen::VectorXd::Constant(1, 3.0);
+    for (auto &tree : pair_copulas) {
+        for (auto &pc : tree) {
+            pc = Bicop(BicopFamily::clayton, 270, par);
+        }
+    }
+    Vinecop vinecop(pair_copulas, model_matrix);
+    auto data = vinecop.simulate(10000);
+
+    auto controls = FitControlsVinecop(bicop_families::itau, "itau");
+    // controls.set_show_trace(true);
+    Vinecop fit_struct(data, controls);
+    Vinecop fit_fam(data, fit_struct.get_matrix(), controls);
+
+    EXPECT_EQ(fit_struct.get_all_parameters(), fit_fam.get_all_parameters());
+}
+
 TEST_F(VinecopTest, works_multi_threaded) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_truncation_level(true);
