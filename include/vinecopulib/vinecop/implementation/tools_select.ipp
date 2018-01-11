@@ -256,6 +256,13 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
     finalize(controls_.get_truncation_level());
 }
 
+// extracts the current threshold value
+double VinecopSelector::get_threshold() const
+{
+    return threshold_;
+}
+
+
 //! chooses threshold for next iteration such that at a proportion of at
 //! least 2.5% of the previously thresholded pairs become non-thresholded.
 inline double VinecopSelector::get_next_threshold(
@@ -627,6 +634,7 @@ inline std::vector<double> VinecopSelector::get_thresholded_crits()
 
 inline void VinecopSelector::set_current_fit_as_opt()
 {
+    threshold_ = controls_.get_threshold();
     trees_opt_ = trees_;
 }
 

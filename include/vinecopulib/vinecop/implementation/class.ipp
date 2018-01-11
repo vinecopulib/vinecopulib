@@ -29,6 +29,7 @@ inline Vinecop::Vinecop(size_t d)
     vine_matrix_ = RVineMatrix(mat, false);
 
     // pair_copulas_ empty = everything independence 
+    threshold_ = 0.0;
 }
 
 //! creates a vine copula with structure specified by an R-vine matrix; all
@@ -43,7 +44,7 @@ inline Vinecop::Vinecop(
     d_ = matrix.rows();
     vine_matrix_ = RVineMatrix(matrix, check_matrix);
     // pair_copulas_ empty = everything independence
-
+    threshold_ = 0.0;
 }
 
 //! creates an arbitrary vine copula model.
@@ -79,6 +80,7 @@ inline Vinecop::Vinecop(const std::vector <std::vector<Bicop>> &pair_copulas,
 
     vine_matrix_ = RVineMatrix(matrix, check_matrix);
     pair_copulas_ = pair_copulas;
+    threshold_ = 0.0;
 }
 
 //! creates from a boost::property_tree::ptree object
@@ -229,6 +231,7 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
     tools_select::StructureSelector selector(data, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
+        threshold_ = selector.get_threshold();
     } else {
         selector.select_all_trees(data);
     }
@@ -247,6 +250,7 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
     tools_select::FamilySelector selector(data, vine_matrix_, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
+        threshold_ = selector.get_threshold();
     } else {
         selector.select_all_trees(data);
     }
@@ -381,6 +385,14 @@ Vinecop::get_matrix() const
 {
     return vine_matrix_.get_matrix();
 }
+
+//! extracts the threshold (usually zero except `select_threshold == TRUE` in
+//! `FitControlsVinecop()`).
+double Vinecop::get_threshold() const
+{
+    return threshold_;
+}
+
 
 //! @}
 
