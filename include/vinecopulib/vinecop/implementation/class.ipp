@@ -401,7 +401,7 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
 
     // info about the vine structure (reverse rows (!) for more natural indexing)
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
-    auto no_matrix = vine_matrix_.in_natural_order();
+    auto no_matrix = vine_matrix_.get_natural_order();
     auto max_matrix = vine_matrix_.get_max_matrix();
     MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
     MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
@@ -602,7 +602,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
     if (d > 2) {
         // info about the vine structure (in upper triangular matrix notation)
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
-        auto no_matrix = vine_matrix_.in_natural_order();
+        auto no_matrix = vine_matrix_.get_natural_order();
         auto max_matrix = vine_matrix_.get_max_matrix();
         MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
         MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
