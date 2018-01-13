@@ -345,7 +345,6 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
 
 inline void StructureSelector::finalize(size_t trunc_lvl)
 {
-    std::cout << "start finalizing" << std::endl;
     using namespace tools_stl;
     pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
     Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d_, d_);
@@ -353,18 +352,15 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     std::vector <size_t> ning_set;
     // fill matrix column by column
     for (size_t col = 0; col < d_ - 1; ++col) {
-        std::cout << "col = " << col << std::endl;
         tools_interface::check_user_interrupt();
         // matrix above trunc_lvl will be filled more efficiently later
         size_t t = 
             std::max(std::min(trunc_lvl, d_ - 1 - col), static_cast<size_t>(1));
-        std::cout << "t = " << t << std::endl;
         // start with highest tree in this column
         for (auto e : boost::edges(trees_[t])) {
             // find an edge that contains a leaf
             size_t v0 = boost::source(e, trees_[t]);
             size_t v1 = boost::target(e, trees_[t]);
-            std::cout << "edge: " << v0 << ", " << v1 << std::endl;
             size_t min_deg = std::min(boost::out_degree(v0, trees_[t]),
                                       boost::out_degree(v1, trees_[t]));
             if (min_deg > 1) {
@@ -375,7 +371,6 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
             if (pos == 1) {
                 trees_[t][e].pair_copula.flip();
             }
-            std::cout << "fill matrix" << std::endl;
             // fill diagonal entry with leaf index
             mat(d_ - 1 - col, col) = trees_[t][e].conditioned[pos];
             // entry in row t-1 is other index of the edge
@@ -391,14 +386,12 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
             ning_set = trees_[t][e].conditioning;
 
             // remove edge (must not be reused in another column!)
-            std::cout << "remove edge" << std::endl;
             boost::remove_edge(v0, v1, trees_[t]);
             break;
         }
 
         // fill column bottom to top
         for (size_t k = 1; k < t; ++k) {
-            std::cout << "fill column at row " << t - k - 1 << std::endl;
             auto check_set = cat(mat(d_ - 1 - col, col), ning_set);
             for (auto e : boost::edges(trees_[t - k])) {
                 // search for an edge in lower tree that shares all
@@ -406,7 +399,6 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
                 if (!is_same_set(trees_[t - k][e].all_indices, check_set)) {
                     continue;
                 }
-                std::cout << "found edge " << t - k - 1 << std::endl;
                 // found suitable edge ->
                 // next matrix entry is conditioned variable of new edge
                 // that's not equal to the diagonal entry of this column
@@ -419,7 +411,6 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
 
                 // assign fitted pair copula to appropriate entry, see
                 // Vinecop::get_pair_copula().
-                std::cout << "assigning pc" << std::endl;
                 pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
 
                 // start over with conditioned set of next edge
@@ -428,9 +419,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
                 // remove edge (must not be reused in another column!)
                 size_t v0 = boost::source(e, trees_[t - k]);
                 size_t v1 = boost::target(e, trees_[t - k]);
-                std::cout << "removing edge" << std::endl;
                 boost::remove_edge(v0, v1, trees_[t - k]);
-                std::cout << "done " << t - k - 1 << std::endl;
                 break;
             }
         }
@@ -450,13 +439,9 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     }
     
     // fill missing entries in case vine was truncated
-    std::cout << "filling matrix" << std::endl;
-    std::cout << mat << std::endl;
     RVineMatrix::complete_matrix(mat, trunc_lvl, controls_.get_num_threads());
 
     // return as RVineMatrix
-    std::cout << "create RVM" << std::endl;
-    std::cout << mat << std::endl;
     vine_matrix_ = RVineMatrix(mat, false);
 }
 
