@@ -261,7 +261,7 @@ inline void VinecopSelector::set_tree_to_indep(size_t t)
 }
 
 // extracts the current threshold value
-double VinecopSelector::get_threshold() const
+inline double VinecopSelector::get_threshold() const
 {
     return threshold_;
 }
