@@ -409,9 +409,15 @@ inline void RVineMatrix::complete_matrix(
         // for each column, get all indices it already contains
         std::vector <std::vector<size_t>> all_indices(d - t);
         std::vector <size_t> tmp(t);
+        std::cout << "collecting all indices" << std::endl;
         for (size_t e = 0; e < d - t; e++) {
-            Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&tmp[0], t) =
-                mat.col(e).head(t);
+            std::cout << "column " << e << std::endl;
+            if (t > 0) {
+                std::cout << "get " << std::endl;
+                Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&tmp[0], t) =
+                    mat.col(e).head(t);
+            }
+            std::cout << "cat " << std::endl;
             all_indices[e] = cat(mat(d - 1 - e, e), tmp);
         }
 
@@ -433,7 +439,7 @@ inline void RVineMatrix::complete_matrix(
                 }
             }
         };
-        
+        std::cout << "filling column" << std::endl;
         tools_parallel::map_on_pool(complete_column, 
                                     seq_int(0, d - t), 
                                     num_threads);
