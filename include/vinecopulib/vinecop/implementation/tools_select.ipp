@@ -451,10 +451,12 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     
     // fill missing entries in case vine was truncated
     std::cout << "filling matrix" << std::endl;
+    std::cout << mat << std::endl;
     RVineMatrix::complete_matrix(mat, trunc_lvl, controls_.get_num_threads());
 
     // return as RVineMatrix
     std::cout << "create RVM" << std::endl;
+    std::cout << mat << std::endl;
     vine_matrix_ = RVineMatrix(mat, false);
 }
 
