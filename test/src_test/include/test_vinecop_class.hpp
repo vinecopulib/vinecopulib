@@ -253,7 +253,7 @@ using namespace vinecopulib;
 
 TEST_F(VinecopTest, sparse_truncation_selection) {
     // FitControlsVinecop controls(bicop_families::itau, "itau");
-    FitControlsVinecop controls(BicopFamily::indep, "itau");
+    FitControlsVinecop controls({BicopFamily::indep}, "itau");
     controls.set_select_truncation_level(true);
     controls.set_show_trace(true);
     u = tools_stats::simulate_uniform(1e2, 7);
