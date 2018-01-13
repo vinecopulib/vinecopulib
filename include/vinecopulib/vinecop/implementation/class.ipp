@@ -388,7 +388,7 @@ Vinecop::get_matrix() const
 
 //! extracts the threshold (usually zero except `select_threshold == TRUE` in
 //! `FitControlsVinecop()`).
-double Vinecop::get_threshold() const
+inline double Vinecop::get_threshold() const
 {
     return threshold_;
 }
