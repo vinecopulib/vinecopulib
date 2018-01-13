@@ -383,8 +383,9 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
 
             // assign fitted pair copula to appropriate entry, see
             // `Vinecop::get_pair_copula()`.
-            if (trunc_lvl > 0)
+            if (trunc_lvl > 0) {
                 pair_copulas_[t - 1][col] = trees_[t][e].pair_copula;
+            }
 
             // initialize running set with full conditioning set of this edge
             ning_set = trees_[t][e].conditioning;
@@ -395,8 +396,9 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
             break;
         }
 
-        // fill column btom to top
+        // fill column bottom to top
         for (size_t k = 1; k < t; ++k) {
+            std::cout << "fill column at row " << t - k - 1 << std::endl;
             auto check_set = cat(mat(d_ - 1 - col, col), ning_set);
             for (auto e : boost::edges(trees_[t - k])) {
                 // search for an edge in lower tree that shares all
@@ -404,12 +406,12 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
                 if (!is_same_set(trees_[t - k][e].all_indices, check_set)) {
                     continue;
                 }
+                std::cout << "found edge " << t - k - 1 << std::endl;
                 // found suitable edge ->
                 // next matrix entry is conditioned variable of new edge
                 // that's not equal to the diagonal entry of this column
                 auto e_new = trees_[t - k][e];
-                ptrdiff_t pos = (mat(d_ - 1 - col, col) ==
-                                 e_new.conditioned[1]);
+                ptrdiff_t pos = (mat(d_ - 1 - col, col) == e_new.conditioned[1]);
                 if (pos == 1) {
                     e_new.pair_copula.flip();
                 }
@@ -417,6 +419,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
 
                 // assign fitted pair copula to appropriate entry, see
                 // Vinecop::get_pair_copula().
+                std::cout << "assigning pc" << std::endl;
                 pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
 
                 // start over with conditioned set of next edge
@@ -425,7 +428,9 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
                 // remove edge (must not be reused in another column!)
                 size_t v0 = boost::source(e, trees_[t - k]);
                 size_t v1 = boost::target(e, trees_[t - k]);
+                std::cout << "removing edge" << std::endl;
                 boost::remove_edge(v0, v1, trees_[t - k]);
+                std::cout << "done " << t - k - 1 << std::endl;
                 break;
             }
         }
@@ -443,10 +448,13 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
             mat(i, j) += 1;
         }
     }
+    
     // fill missing entries in case vine was truncated
+    std::cout << "filling matrix" << std::endl;
     RVineMatrix::complete_matrix(mat, trunc_lvl, controls_.get_num_threads());
 
     // return as RVineMatrix
+    std::cout << "create RVM" << std::endl;
     vine_matrix_ = RVineMatrix(mat, false);
 }
 
