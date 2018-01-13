@@ -1,4 +1,4 @@
-// Copyright © 2017 Thomas Nagler and Thibault Vatter
+// Copyright © 2018 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -410,8 +410,10 @@ inline void RVineMatrix::complete_matrix(
         std::vector <std::vector<size_t>> all_indices(d - t);
         std::vector <size_t> tmp(t);
         for (size_t e = 0; e < d - t; e++) {
-            Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&tmp[0], t) =
-                mat.col(e).head(t);
+            if (t > 0) {
+                Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&tmp[0], t) =
+                    mat.col(e).head(t);
+            }
             all_indices[e] = cat(mat(d - 1 - e, e), tmp);
         }
 
@@ -433,7 +435,6 @@ inline void RVineMatrix::complete_matrix(
                 }
             }
         };
-        
         tools_parallel::map_on_pool(complete_column, 
                                     seq_int(0, d - t), 
                                     num_threads);
