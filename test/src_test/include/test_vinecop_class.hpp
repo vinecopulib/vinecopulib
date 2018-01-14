@@ -1,4 +1,4 @@
-// Copyright © 2017 Thomas Nagler and Thibault Vatter
+// Copyright © 2018 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -159,6 +159,26 @@ TEST_F(VinecopTest, family_select_finds_true_rotations) {
     true_rots.erase(true_rots.end() - 2, true_rots.end());
     fitd_rots.erase(fitd_rots.end() - 2, fitd_rots.end());
     EXPECT_EQ(true_rots, fitd_rots);
+}
+
+TEST_F(VinecopTest, family_select_returns_pcs_in_right_order) {
+
+    auto pair_copulas = Vinecop::make_pair_copula_store(7);
+    auto par = Eigen::VectorXd::Constant(1, 3.0);
+    for (auto &tree : pair_copulas) {
+        for (auto &pc : tree) {
+            pc = Bicop(BicopFamily::clayton, 270, par);
+        }
+    }
+    Vinecop vinecop(pair_copulas, model_matrix);
+    auto data = vinecop.simulate(10000);
+
+    auto controls = FitControlsVinecop(bicop_families::itau, "itau");
+    // controls.set_show_trace(true);
+    Vinecop fit_struct(data, controls);
+    Vinecop fit_fam(data, fit_struct.get_matrix(), controls);
+
+    EXPECT_EQ(fit_struct.get_all_parameters(), fit_fam.get_all_parameters());
 }
 
 TEST_F(VinecopTest, works_multi_threaded) {
