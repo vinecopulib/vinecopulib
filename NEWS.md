@@ -1,3 +1,21 @@
+# vinecopulib 0.2.5 (January 14, 2018)
+
+NEW FEATURES
+
+   * speed up vine copula algorithms by pre-computing information related to 
+     the vine structure (#292).
+     
+   * the selected threshold parameter can be returned from the `Vinecop` 
+     object (#290).
+
+BUG FIXES
+
+   * fix storage order of pair copulas when structure is fixed (#289).
+   
+   * fixed selection algorithm for threshold and truncation level (#290, #294,
+     #295).
+
+
 # vinecopulib 0.2.4 (December 29, 2017)
 
 BUG FIXES
