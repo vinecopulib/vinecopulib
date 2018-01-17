@@ -75,6 +75,28 @@ inline double calculate_gic(double loglik, double npars, int n)
     return -2 * loglik + std::log(std::log(n)) * log_npars * npars;
 }
 
+inline double calculate_mbic(double loglik, 
+                             double npars,
+                             Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps,
+                             size_t d, 
+                             double p, 
+                             size_t n)
+{
+    auto sq0 = seq_int(1, d - 1);
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> sq(d - 1);
+    auto ps = Eigen::VectorXd(d - 1);
+    for (size_t i = 0; i < d - 1; i++) {
+        sq(i) = sq0[i];
+        ps(i) = std::pow(p, sq0[i]);
+    }
+    double log_prior = (
+        non_indeps.cast<double>().array() * ps.array().log() +
+        (d - non_indeps.array() - sq.array()).cast<double>() * 
+        (1 - ps.array()).log()
+    ).sum();
+    return -2 * loglik + std::log(n) * npars - 2 * log_prior;    
+}
+
 // needs to be defined
 inline VinecopSelector::~VinecopSelector()
 {
@@ -181,6 +203,8 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         double npars = 0.0;
         double gic = 0.0;
         double gic_trunc = 0.0;
+        Eigen::Matrix<size_t, Eigen::Dynamic, 1> num_non_indeps(d_ - 1);
+        num_non_indeps.setZero();
 
         for (size_t t = 0; t < d_ - 1; ++t) {
             if (controls_.get_truncation_level() < t) {
@@ -193,7 +217,14 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             // update fit statistics
             loglik += get_loglik_of_tree(t);
             npars += get_npars_of_tree(t);
-            gic_trunc = calculate_gic(loglik, npars, n_);
+            num_non_indeps(t) = get_num_non_indeps_of_tree(t);
+            num_non_indeps(t) = get_num_non_indeps_of_tree(t);
+            gic_trunc = calculate_mbic(loglik, 
+                                       npars,
+                                       num_non_indeps,
+                                       d_,
+                                       0.9,
+                                       n_);
 
             // print trace for this tree level
             if (controls_.get_show_trace()) {
@@ -614,6 +645,17 @@ inline double VinecopSelector::get_npars_of_tree(size_t t)
         npars += trees_[t + 1][e].npars;
     }
     return npars;
+}
+
+//! calculates the numbers of independence copulas in a tree.
+inline size_t VinecopSelector::get_num_non_indeps_of_tree(size_t t)
+{
+    size_t num_non_indeps = 0;
+    // trees_[0] is base tree, see make_base_tree()
+    for (const auto &e : boost::edges(trees_[t + 1])) {
+        num_non_indeps += static_cast<double>(trees_[t + 1][e].npars > 0);
+    }
+    return num_non_indeps;
 }
 
 

@@ -38,6 +38,13 @@ Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
 
 double calculate_gic(double loglik, double npars, int n);
 
+double calculate_mbic(double loglik, 
+                      double npars,
+                      Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps,
+                      size_t d, 
+                      double p, 
+                      size_t n);
+
 // boost::graph represenation of a vine tree
 struct VertexProperties
 {
@@ -154,6 +161,8 @@ private:
     double get_tree_loglik(const VineTree &tree);
 
     double get_tree_npars(const VineTree &tree);
+    
+    size_t get_num_non_indeps_of_tree(size_t t);
 
     std::string get_pc_index(const EdgeIterator &e, const VineTree &tree);
 };
