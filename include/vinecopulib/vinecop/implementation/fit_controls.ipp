@@ -122,42 +122,42 @@ inline void FitControlsVinecop::check_threshold(double threshold)
 
 //! Getters and setters.
 //! @{
-inline size_t FitControlsVinecop::get_truncation_level()
+inline size_t FitControlsVinecop::get_truncation_level() const
 {
     return truncation_level_;
 }
 
-inline std::string FitControlsVinecop::get_tree_criterion()
+inline std::string FitControlsVinecop::get_tree_criterion() const
 {
     return tree_criterion_;
 }
 
-inline double FitControlsVinecop::get_threshold()
+inline double FitControlsVinecop::get_threshold() const
 {
     return threshold_;
 }
 
-inline bool FitControlsVinecop::get_show_trace()
+inline bool FitControlsVinecop::get_show_trace() const
 {
     return show_trace_;
 }
 
-inline bool FitControlsVinecop::get_select_truncation_level()
+inline bool FitControlsVinecop::get_select_truncation_level() const
 {
     return select_truncation_level_;
 }
 
-inline bool FitControlsVinecop::get_select_threshold()
+inline bool FitControlsVinecop::get_select_threshold() const
 {
     return select_threshold_;
 }
 
-inline bool FitControlsVinecop::needs_sparse_select()
+inline bool FitControlsVinecop::needs_sparse_select() const
 {
     return (select_truncation_level_ | select_threshold_);
 }
 
-inline FitControlsBicop FitControlsVinecop::get_fit_controls_bicop()
+inline FitControlsBicop FitControlsVinecop::get_fit_controls_bicop() const
 {
     FitControlsBicop controls_bicop(get_family_set(),
                                     get_parametric_method(),

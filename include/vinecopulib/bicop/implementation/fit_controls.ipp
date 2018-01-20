@@ -33,6 +33,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector <BicopFamily> family_set,
                                           double nonparametric_mult,
                                           std::string selection_criterion,
                                           bool preselect_families,
+                                          double pi,
                                           size_t num_threads)
 {
     set_family_set(family_set);
@@ -41,6 +42,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector <BicopFamily> family_set,
     set_nonparametric_mult(nonparametric_mult);
     set_selection_criterion(selection_criterion);
     set_preselect_families(preselect_families);
+    set_pi(pi);
     set_num_threads(num_threads);
 }
 
@@ -96,9 +98,19 @@ FitControlsBicop::check_nonparametric_mult(double nonparametric_mult)
 inline void
 FitControlsBicop::check_selection_criterion(std::string selection_criterion)
 {
-    if (!tools_stl::is_member(selection_criterion, {"loglik", "aic", "bic"})) {
+    std::vector<std::string> allowed_crits = 
+        {"loglik", "aic", "bic", "mbic", "vbic"};
+    if (!tools_stl::is_member(selection_criterion, allowed_crits)) {
         throw std::runtime_error(
-            "selection_criterion should be 'loglik', 'aic', or 'bic'");
+            "selection_criterion should be 'loglik', 'aic', 'bic', or 'mbic'");
+    }
+}
+
+inline void
+FitControlsBicop::check_pi(double pi)
+{
+    if (!(pi > 0.0) | !(pi < 1.0)) {
+        throw std::runtime_error("pi must be in the interval (0, 1)");
     }
 }
 //! @}
@@ -140,6 +152,11 @@ inline bool FitControlsBicop::get_preselect_families() const
     return preselect_families_;
 }
 
+inline double FitControlsBicop::get_pi() const
+{
+    return pi_;
+}
+
 inline void
 FitControlsBicop::set_family_set(std::vector <BicopFamily> family_set)
 {
@@ -177,6 +194,12 @@ FitControlsBicop::set_selection_criterion(std::string selection_criterion)
 inline void FitControlsBicop::set_preselect_families(bool preselect_families)
 {
     preselect_families_ = preselect_families;
+}
+
+inline void FitControlsBicop::set_pi(double pi)
+{
+    check_pi(pi);
+    pi_ = pi;
 }
 
 inline void FitControlsBicop::set_num_threads(size_t num_threads)

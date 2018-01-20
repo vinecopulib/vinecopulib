@@ -136,6 +136,7 @@ protected:
     // for sparse selction
     std::vector<VineTree> trees_opt_;
     double threshold_;
+    double pi0_; // initial prior probability for vBIC
 
 private:
     double get_next_threshold(std::vector<double> &thresholded_crits);

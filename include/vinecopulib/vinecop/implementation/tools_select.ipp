@@ -66,7 +66,7 @@ inline Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
 }
 
 //! calculates the Generalized Information Criterion.
-inline double calculate_gic(double loglik, double npars, int n)
+inline double calculate_vbic(double loglik, double npars, int n)
 {
     double log_npars = std::log(npars);
     if (npars == 0.0) {
@@ -178,7 +178,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         // appears.
     }
 
-    double gic_opt = 0.0;
+    double vbic_opt = 0.0;
     bool needs_break = false;
     while (!needs_break) {
         // restore family set in case previous threshold iteration also
@@ -201,8 +201,8 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         // helper variables for checking whether an optimum was found
         double loglik = 0.0;
         double npars = 0.0;
-        double gic = 0.0;
-        double gic_trunc = 0.0;
+        double vbic = 0.0;
+        double vbic_trunc = 0.0;
         Eigen::Matrix<size_t, Eigen::Dynamic, 1> num_non_indeps(d_ - 1);
         num_non_indeps.setZero();
 
@@ -219,7 +219,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             npars += get_npars_of_tree(t);
             num_non_indeps(t) = get_num_non_indeps_of_tree(t);
             num_non_indeps(t) = get_num_non_indeps_of_tree(t);
-            gic_trunc = calculate_mbic(loglik, 
+            vbic_trunc = calculate_mbic(loglik, 
                                        npars,
                                        num_non_indeps,
                                        d_,
@@ -230,16 +230,16 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             if (controls_.get_show_trace()) {
                 std::cout << "** Tree: " << t;
                 if (controls_.get_select_truncation_level()) {
-                    std::cout << ", GIC: " << gic_trunc;
+                    std::cout << ", vBIC: " << vbic_trunc;
                 }
                 std::cout << std::endl;
                 // print fitted pair-copulas for this tree
                 print_pair_copulas_of_tree(t);
             }
             
-            // gic comparison
-            if (controls_.get_select_truncation_level() & (gic_trunc >= gic)) {
-                // gic did not improve, truncate
+            // vbic comparison
+            if (controls_.get_select_truncation_level() & (vbic_trunc >= vbic)) {
+                // vbic did not improve, truncate
                 controls_.set_truncation_level(t);
                 set_tree_to_indep(t);
                 set_current_fit_as_opt();
@@ -248,29 +248,29 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
                     needs_break = true;
                 }
             } else {
-                gic = gic_trunc;
+                vbic = vbic_trunc;
             }
         }
 
         if (controls_.get_show_trace()) {
-            std::cout << "--> GIC = " << gic << std::endl << std::endl;
+            std::cout << "--> vBIC = " << vbic << std::endl << std::endl;
         }
 
 
-        // check whether gic-optimal model has been found
-        if (gic == 0.0) {
+        // check whether vbic-optimal model has been found
+        if (vbic == 0.0) {
             set_current_fit_as_opt();
             if (!controls_.get_select_threshold()) {
                 // threshold is fixed, optimal truncation level has been found
                 needs_break = true;
             }
-        } else if (gic >= gic_opt) {
+        } else if (vbic >= vbic_opt) {
             // old model is optimal
             needs_break = true;
         } else {
             // optimum hasn't been found
             set_current_fit_as_opt();
-            gic_opt = gic;
+            vbic_opt = vbic;
             // while loop is only for threshold selection
             needs_break = needs_break | !controls_.get_select_threshold();
             // threshold is too close to 0
@@ -326,6 +326,7 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
     controls_ = controls;
     vine_matrix_ = vine_matrix;
     threshold_ = controls.get_threshold();
+    pi0_ = controls.get_pi();
 }
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
@@ -336,6 +337,7 @@ inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
     trees_.resize(1);
     controls_ = controls;
     threshold_ = controls.get_threshold();
+    pi0_ = controls.get_pi();
 }
 
 //! Add edges allowed by the proximity condition
@@ -615,6 +617,10 @@ inline void VinecopSelector::select_tree(size_t t)
     }
     add_edge_info(new_tree);       // for pc estimation and next tree
     remove_vertex_data(new_tree);  // no longer needed
+    if (controls_.get_selection_criterion() == "vbic") {
+        // adjust prior probability to tree level
+        controls_.set_pi(std::pow(pi0_, t + 1));
+    }
     if (trees_opt_.size() > t + 1) {
         select_pair_copulas(new_tree, trees_opt_[t + 1]);
     } else {
