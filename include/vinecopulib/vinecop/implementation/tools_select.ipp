@@ -65,38 +65,6 @@ inline Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
     return mat;
 }
 
-//! calculates the Generalized Information Criterion.
-inline double calculate_vbic(double loglik, double npars, int n)
-{
-    double log_npars = std::log(npars);
-    if (npars == 0.0) {
-        log_npars = 0.0;
-    }
-    return -2 * loglik + std::log(std::log(n)) * log_npars * npars;
-}
-
-inline double calculate_vbic(double loglik, 
-                             double npars,
-                             Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps,
-                             size_t d, 
-                             double p, 
-                             size_t n)
-{
-    auto sq0 = seq_int(1, d - 1);
-    Eigen::Matrix<size_t, Eigen::Dynamic, 1> sq(d - 1);
-    auto ps = Eigen::VectorXd(d - 1);
-    for (size_t i = 0; i < d - 1; i++) {
-        sq(i) = sq0[i];
-        ps(i) = std::pow(p, sq0[i]);
-    }
-    double log_prior = (
-        non_indeps.cast<double>().array() * ps.array().log() +
-        (d - non_indeps.array() - sq.array()).cast<double>() * 
-        (1 - ps.array()).log()
-    ).sum();
-    return -2 * loglik + std::log(n) * npars - 2 * log_prior;    
-}
-
 // needs to be defined
 inline VinecopSelector::~VinecopSelector()
 {
@@ -199,13 +167,9 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         }
 
         // helper variables for checking whether an optimum was found
-        double loglik = 0.0;
-        double npars = 0.0;
         double vbic = 0.0;
         double vbic_trunc = 0.0;
-        Eigen::Matrix<size_t, Eigen::Dynamic, 1> num_non_indeps(d_ - 1);
-        num_non_indeps.setZero();
-
+        
         for (size_t t = 0; t < d_ - 1; ++t) {
             if (controls_.get_truncation_level() < t) {
                 break;  // don't need to fit the remaining trees
@@ -215,16 +179,12 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             select_tree(t);
 
             // update fit statistics
-            loglik += get_loglik_of_tree(t);
-            npars += get_npars_of_tree(t);
-            num_non_indeps(t) = get_num_non_indeps_of_tree(t);
-            num_non_indeps(t) = get_num_non_indeps_of_tree(t);
-            vbic_trunc = calculate_vbic(loglik, 
-                                       npars,
-                                       num_non_indeps,
-                                       d_,
-                                       0.9,
-                                       n_);
+            vbic_trunc += tree_vbic(get_loglik_of_tree(t), 
+                                    get_npars_of_tree(t),
+                                    std::pow(pi0_, t + 1),
+                                    get_num_non_indeps_of_tree(t),
+                                    d_ - t - 1 - get_num_non_indeps_of_tree(t),
+                                    n_);
 
             // print trace for this tree level
             if (controls_.get_show_trace()) {
@@ -692,15 +652,28 @@ inline std::vector<double> VinecopSelector::get_thresholded_crits()
     return crits;
 }
 
+inline void VinecopSelector::initialize_new_fit(const Eigen::MatrixXd &data)
+{
+    trees_[0] = make_base_tree(data);
+}
+
 inline void VinecopSelector::set_current_fit_as_opt()
 {
     threshold_ = controls_.get_threshold();
     trees_opt_ = trees_;
 }
 
-inline void VinecopSelector::initialize_new_fit(const Eigen::MatrixXd &data)
+inline double VinecopSelector::tree_vbic(double loglik, 
+                                         double npars,
+                                         double pi, 
+                                         size_t non_indeps,
+                                         size_t indeps,
+                                         size_t n)
 {
-    trees_[0] = make_base_tree(data);
+    double log_prior = 
+        static_cast<double>(non_indeps) * std::log(pi) +
+        static_cast<double>(indeps) * std::log(1.0 - pi);
+    return -2 * loglik + std::log(n) * npars - 2 * log_prior;    
 }
 
 //! Create base tree of the vine

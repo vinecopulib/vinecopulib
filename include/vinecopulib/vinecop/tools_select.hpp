@@ -36,14 +36,6 @@ double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
 Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
                                            std::string tree_criterion);
 
-double calculate_gic(double loglik, double npars, int n);
-
-double calculate_mbic(double loglik, 
-                      double npars,
-                      Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps,
-                      size_t d, 
-                      double p, 
-                      size_t n);
 
 // boost::graph represenation of a vine tree
 struct VertexProperties
@@ -114,11 +106,18 @@ protected:
     void print_pair_copulas_of_tree(size_t);
 
     std::vector<double> get_thresholded_crits();
+    
+    void initialize_new_fit(const Eigen::MatrixXd &data);
 
     void set_current_fit_as_opt();
 
-    void initialize_new_fit(const Eigen::MatrixXd &data);
-
+    double tree_vbic(double loglik, 
+                     double npars,
+                     double pi, 
+                     size_t non_indeps,
+                     size_t indeps,
+                     size_t n);
+    
     virtual void add_allowed_edges(VineTree &tree) = 0;
 
     Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree &tree);

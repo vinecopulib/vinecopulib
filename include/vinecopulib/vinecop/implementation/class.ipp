@@ -575,9 +575,8 @@ inline double Vinecop::vbic(const Eigen::MatrixXd &u, double pi) const
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps(d_ - 1);
     non_indeps.setZero();
     for (size_t t = 0; t < d_ - 1; t++) {
-        if (t > all_fams.size() - 1) {
-            non_indeps(t) = 0;
-            continue;
+        if (t == all_fams.size()) {
+            break;
         }
         for (size_t e = 0; e < d_ - 1 - t; e++) {
             if (all_fams[t][e] == BicopFamily::indep) {
