@@ -75,7 +75,7 @@ inline double calculate_vbic(double loglik, double npars, int n)
     return -2 * loglik + std::log(std::log(n)) * log_npars * npars;
 }
 
-inline double calculate_mbic(double loglik, 
+inline double calculate_vbic(double loglik, 
                              double npars,
                              Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps,
                              size_t d, 
@@ -219,7 +219,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             npars += get_npars_of_tree(t);
             num_non_indeps(t) = get_num_non_indeps_of_tree(t);
             num_non_indeps(t) = get_num_non_indeps_of_tree(t);
-            vbic_trunc = calculate_mbic(loglik, 
+            vbic_trunc = calculate_vbic(loglik, 
                                        npars,
                                        num_non_indeps,
                                        d_,

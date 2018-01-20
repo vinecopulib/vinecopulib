@@ -306,12 +306,13 @@ Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 
 //! calculates the modified Bayesian information criterion
 //! (mBIC), defined as
-//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p,  - 2 * log(pi) \f]
+//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p
+//!  - 2 (I log(pi) + (1 - I) log(1 - pi) \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
-//! (effective) number of parameters of the model, and \f$ pi \f$ is the prior
-//! probability of having a non-independence copula; see loglik() and
-//! calculate_npars(). The vBIC is a consistent model selection criterion
-//! for parametric sparse vine copula models.
+//! (effective) number of parameters of the model, \f$ pi \f$ is the prior
+//! probability of having a non-independence copula and \f$ I \f$ is an indicator
+//! for the family being non-independence; see loglik() and
+//! calculate_npars().
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 //! @param pi prior probability of a non-independence copula.

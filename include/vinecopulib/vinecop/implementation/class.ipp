@@ -553,6 +553,51 @@ inline double Vinecop::bic(const Eigen::MatrixXd &u) const
     return -2 * loglik(u) + calculate_npars() * log(static_cast<double>(u.rows()));
 }
 
+//! calculates the vine copula Bayesian information criterion (vBIC), which is 
+//! defined as
+//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, - 2 * 
+//! \sum_{t=1}^(d - 1) \{m_t log(pi^t) - (d - t - m_t) log(1 - pi^t)\}  \f]
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
+//! (effective) number of parameters of the model, \f$ t \f$ is the tree level 
+//! \f$ pi \f$ is the priorprobability of having a non-independence copula and 
+//! \f$ m_t \f$ is the number of non-independence copulas in tree \f$ t \f$; 
+//! see loglik() and calculate_npars(). The vBIC is a consistent model 
+//! selection criterion for parametric sparse vine copula models.
+//!
+//! @param u \f$n \times 2\f$ matrix of observations.
+inline double Vinecop::vbic(const Eigen::MatrixXd &u, double pi) const
+{
+    auto all_fams = get_all_families();
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps(d_ - 1);
+    for (size_t t = 0; t < d_ - 1; t++) {
+        if (t > all_fams.size() - 1) {
+            non_indeps(t) = 0;
+            continue;
+        }
+        for (size_t e = 0; e < d_ - 1 - t; e++) {
+            if (all_fams[t][e] == BicopFamily::indep) {
+                non_indeps(t)++;
+            }
+        }
+    }
+    auto sq0 = tools_stl::seq_int(1, d_ - 1);
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> sq(d_ - 1);
+    auto pis = Eigen::VectorXd(d_ - 1);
+    for (size_t i = 0; i < d_ - 1; i++) {
+        sq(i) = sq0[i];
+        pis(i) = std::pow(pi, sq0[i]);
+    }
+    double npars = this->calculate_npars();
+    double n = static_cast<double>(u.rows());
+    double ll = this->loglik(u);
+    double log_prior = (
+        non_indeps.cast<double>().array() * pis.array().log() +
+        (d_ - non_indeps.array() - sq.array()).cast<double>() * 
+        (1 - pis.array()).log()
+    ).sum();
+    return -2 * ll + std::log(n) * npars - 2 * log_prior;    
+}
+
 //! returns sum of the number of parameters for all pair copulas (see
 //! Bicop::calculate_npars()).
 inline double Vinecop::calculate_npars() const
