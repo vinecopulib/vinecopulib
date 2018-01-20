@@ -565,6 +565,7 @@ inline double Vinecop::bic(const Eigen::MatrixXd &u) const
 //! selection criterion for parametric sparse vine copula models.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
+//! @param pi baseline prior probability of a non-independence copula.
 inline double Vinecop::vbic(const Eigen::MatrixXd &u, double pi) const
 {
     auto all_fams = get_all_families();
