@@ -568,8 +568,12 @@ inline double Vinecop::bic(const Eigen::MatrixXd &u) const
 //! @param pi baseline prior probability of a non-independence copula.
 inline double Vinecop::vbic(const Eigen::MatrixXd &u, double pi) const
 {
+    if (!(pi > 0.0) | !(pi < 1.0)) {
+        throw std::runtime_error("pi must be in the interval (0, 1)");
+    }    
     auto all_fams = get_all_families();
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps(d_ - 1);
+    non_indeps.setZero();
     for (size_t t = 0; t < d_ - 1; t++) {
         if (t > all_fams.size() - 1) {
             non_indeps(t) = 0;
@@ -596,7 +600,7 @@ inline double Vinecop::vbic(const Eigen::MatrixXd &u, double pi) const
         (d_ - non_indeps.array() - sq.array()).cast<double>() * 
         (1 - pis.array()).log()
     ).sum();
-    return -2 * ll + std::log(n) * npars - 2 * log_prior;    
+    return -2 * ll + std::log(n) * npars - 2 * log_prior;       
 }
 
 //! returns sum of the number of parameters for all pair copulas (see
