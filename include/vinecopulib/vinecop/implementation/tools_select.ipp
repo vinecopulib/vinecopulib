@@ -325,7 +325,7 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
     trees_.resize(1);
     controls_ = controls;
     vine_matrix_ = vine_matrix;
-    threshold_ = 0.0;
+    threshold_ = controls.get_threshold();
 }
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
@@ -335,7 +335,7 @@ inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
     d_ = data.cols();
     trees_.resize(1);
     controls_ = controls;
-    threshold_ = 0.0;
+    threshold_ = controls.get_threshold();
 }
 
 //! Add edges allowed by the proximity condition

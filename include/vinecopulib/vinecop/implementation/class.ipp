@@ -231,10 +231,10 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
     tools_select::StructureSelector selector(data, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
-        threshold_ = selector.get_threshold();
     } else {
         selector.select_all_trees(data);
     }
+    threshold_ = selector.get_threshold();
     vine_matrix_ = selector.get_rvine_matrix();
     pair_copulas_ = selector.get_pair_copulas();
 }
@@ -250,10 +250,10 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
     tools_select::FamilySelector selector(data, vine_matrix_, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
-        threshold_ = selector.get_threshold();
     } else {
         selector.select_all_trees(data);
     }
+    threshold_ = selector.get_threshold();
     pair_copulas_ = selector.get_pair_copulas();
 }
 
