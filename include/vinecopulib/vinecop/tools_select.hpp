@@ -96,6 +96,8 @@ protected:
     void select_tree(size_t t);
 
     virtual void finalize(size_t trunc_lvl) = 0;
+    
+    double get_vbic_of_tree(size_t t);
 
     double get_loglik_of_tree(size_t t);
 
@@ -111,12 +113,6 @@ protected:
 
     void set_current_fit_as_opt();
 
-    double tree_vbic(double loglik, 
-                     double npars,
-                     double pi, 
-                     size_t non_indeps,
-                     size_t indeps,
-                     size_t n);
     
     virtual void add_allowed_edges(VineTree &tree) = 0;
 

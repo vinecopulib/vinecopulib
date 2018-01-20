@@ -178,13 +178,8 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             // select pair copulas (and possibly tree structure)
             select_tree(t);
 
-            // update fit statistics
-            vbic_trunc += tree_vbic(get_loglik_of_tree(t), 
-                                    get_npars_of_tree(t),
-                                    std::pow(pi0_, t + 1),
-                                    get_num_non_indeps_of_tree(t),
-                                    d_ - t - 1 - get_num_non_indeps_of_tree(t),
-                                    n_);
+            // update fit statistic
+            vbic_trunc += get_vbic_of_tree(t);
 
             // print trace for this tree level
             if (controls_.get_show_trace()) {
@@ -591,6 +586,20 @@ inline void VinecopSelector::select_tree(size_t t)
     trees_[t + 1] = new_tree;
 }
 
+inline double VinecopSelector::get_vbic_of_tree(size_t t)
+{
+    double loglik = get_loglik_of_tree(t);
+    double npars = get_npars_of_tree(t);
+    size_t non_indeps = get_num_non_indeps_of_tree(t);
+    size_t indeps = d_ - t - 1 - non_indeps;
+    double pi = std::pow(pi0_, t + 1);
+    double log_prior = 
+        static_cast<double>(non_indeps) * std::log(pi) +
+        static_cast<double>(indeps) * std::log(1.0 - pi);
+    return -2 * loglik + std::log(n_) * npars - 2 * log_prior;    
+}
+
+
 //! calculates the log-likelihood of a tree.
 inline double VinecopSelector::get_loglik_of_tree(size_t t)
 {
@@ -661,19 +670,6 @@ inline void VinecopSelector::set_current_fit_as_opt()
 {
     threshold_ = controls_.get_threshold();
     trees_opt_ = trees_;
-}
-
-inline double VinecopSelector::tree_vbic(double loglik, 
-                                         double npars,
-                                         double pi, 
-                                         size_t non_indeps,
-                                         size_t indeps,
-                                         size_t n)
-{
-    double log_prior = 
-        static_cast<double>(non_indeps) * std::log(pi) +
-        static_cast<double>(indeps) * std::log(1.0 - pi);
-    return -2 * loglik + std::log(n) * npars - 2 * log_prior;    
 }
 
 //! Create base tree of the vine
