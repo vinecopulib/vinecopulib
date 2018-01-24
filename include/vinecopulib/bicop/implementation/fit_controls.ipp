@@ -24,8 +24,8 @@ namespace vinecopulib {
 //!     or `"bic"`).
 //! @param preselect_families whether to exclude families before fitting
 //!     based on symmetry properties of the data.
-//! @param psi0 only for `selection_criterion = "mbicv"): prior probability of
-//!     non-independence copula in the first tree.
+//! @param psi0 only for `selection_criterion = "mbic"): prior probability of
+//!     non-independence.
 //! @param num_threads number of concurrent threads to use while fitting
 //!     copulas for different families; never uses more than the number
 //!     returned by `std::thread::hardware_concurrency()`.
@@ -44,7 +44,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector <BicopFamily> family_set,
     set_nonparametric_mult(nonparametric_mult);
     set_selection_criterion(selection_criterion);
     set_preselect_families(preselect_families);
-    set_pi(pi);
+    set_psi0(psi0);
     set_num_threads(num_threads);
 }
 
@@ -109,10 +109,10 @@ FitControlsBicop::check_selection_criterion(std::string selection_criterion)
 }
 
 inline void
-FitControlsBicop::check_pi(double pi)
+FitControlsBicop::check_psi0(double psi0)
 {
-    if (!(pi > 0.0) | !(pi < 1.0)) {
-        throw std::runtime_error("pi must be in the interval (0, 1)");
+    if (!(psi0 > 0.0) | !(psi0 < 1.0)) {
+        throw std::runtime_error("psi0 must be in the interval (0, 1)");
     }
 }
 //! @}
@@ -154,9 +154,9 @@ inline bool FitControlsBicop::get_preselect_families() const
     return preselect_families_;
 }
 
-inline double FitControlsBicop::get_pi() const
+inline double FitControlsBicop::get_psi0() const
 {
-    return pi_;
+    return psi0_;
 }
 
 inline void
@@ -198,10 +198,10 @@ inline void FitControlsBicop::set_preselect_families(bool preselect_families)
     preselect_families_ = preselect_families;
 }
 
-inline void FitControlsBicop::set_pi(double pi)
+inline void FitControlsBicop::set_psi0(double psi0)
 {
-    check_pi(pi);
-    pi_ = pi;
+    check_psi0(psi0);
+    psi0_ = psi0;
 }
 
 inline void FitControlsBicop::set_num_threads(size_t num_threads)

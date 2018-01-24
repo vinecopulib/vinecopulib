@@ -281,7 +281,7 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
     controls_ = controls;
     vine_matrix_ = vine_matrix;
     threshold_ = controls.get_threshold();
-    pi0_ = controls.get_pi();
+    psi0_ = controls.get_psi0();
 }
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
@@ -292,7 +292,7 @@ inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
     trees_.resize(1);
     controls_ = controls;
     threshold_ = controls.get_threshold();
-    pi0_ = controls.get_pi();
+    psi0_ = controls.get_psi0();
 }
 
 //! Add edges allowed by the proximity condition
@@ -574,7 +574,7 @@ inline void VinecopSelector::select_tree(size_t t)
     remove_vertex_data(new_tree);  // no longer needed
     if (controls_.get_selection_criterion() == "mbicv") {
         // adjust prior probability to tree level
-        controls_.set_pi(std::pow(pi0_, t + 1));
+        controls_.set_psi0(std::pow(psi0_, t + 1));
     }
     if (trees_opt_.size() > t + 1) {
         select_pair_copulas(new_tree, trees_opt_[t + 1]);
@@ -592,10 +592,10 @@ inline double VinecopSelector::get_mbicv_of_tree(size_t t)
     double npars = get_npars_of_tree(t);
     size_t non_indeps = get_num_non_indeps_of_tree(t);
     size_t indeps = d_ - t - 1 - non_indeps;
-    double pi = std::pow(pi0_, t + 1);
+    double psi0 = std::pow(psi0_, t + 1);
     double log_prior = 
-        static_cast<double>(non_indeps) * std::log(pi) +
-        static_cast<double>(indeps) * std::log(1.0 - pi);
+        static_cast<double>(non_indeps) * std::log(psi0) +
+        static_cast<double>(indeps) * std::log(1.0 - psi0);
     return -2 * loglik + std::log(n_) * npars - 2 * log_prior;    
 }
 

@@ -22,7 +22,7 @@ public:
                      double nonparametric_mult = 1.0,
                      std::string selection_criterion = "bic",
                      bool preselect_families = true,
-                     double pi = 0.9,
+                     double psi0 = 0.9,
                      size_t num_threads = 1);
 
     FitControlsBicop(std::string parametric_method);
@@ -43,7 +43,7 @@ public:
 
     bool get_preselect_families() const;
     
-    double get_pi() const;
+    double get_psi0() const;
 
     size_t get_num_threads();
 
@@ -60,7 +60,7 @@ public:
 
     void set_preselect_families(bool preselect_families);
     
-    void set_pi(double pi);
+    void set_psi0(double psi0);
 
     void set_num_threads(size_t num_threads);
 
@@ -71,7 +71,7 @@ private:
     double nonparametric_mult_;
     std::string selection_criterion_;
     bool preselect_families_;
-    double pi_;
+    double psi0_;
     size_t num_threads_;
 
     void check_parametric_method(std::string parametric_method);
@@ -82,7 +82,7 @@ private:
 
     void check_selection_criterion(std::string selection_criterion);
     
-    void check_pi(double pi);
+    void check_psi0(double psi0);
 
     size_t process_num_threads(size_t num_threads);
 };
