@@ -97,7 +97,7 @@ protected:
 
     virtual void finalize(size_t trunc_lvl) = 0;
     
-    double get_vbic_of_tree(size_t t);
+    double get_mbicv_of_tree(size_t t);
 
     double get_loglik_of_tree(size_t t);
 
@@ -131,7 +131,7 @@ protected:
     // for sparse selction
     std::vector<VineTree> trees_opt_;
     double threshold_;
-    double pi0_; // initial prior probability for vBIC
+    double pi0_; // initial prior probability for mbicv
 
 private:
     double get_next_threshold(std::vector<double> &thresholded_crits);

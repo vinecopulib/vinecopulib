@@ -24,6 +24,8 @@ namespace vinecopulib {
 //!     or `"bic"`).
 //! @param preselect_families whether to exclude families before fitting
 //!     based on symmetry properties of the data.
+//! @param psi0 only for `selection_criterion = "mbicv"): prior probability of
+//!     non-independence copula in the first tree.
 //! @param num_threads number of concurrent threads to use while fitting
 //!     copulas for different families; never uses more than the number
 //!     returned by `std::thread::hardware_concurrency()`.
@@ -33,7 +35,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector <BicopFamily> family_set,
                                           double nonparametric_mult,
                                           std::string selection_criterion,
                                           bool preselect_families,
-                                          double pi,
+                                          double psi0,
                                           size_t num_threads)
 {
     set_family_set(family_set);
@@ -99,7 +101,7 @@ inline void
 FitControlsBicop::check_selection_criterion(std::string selection_criterion)
 {
     std::vector<std::string> allowed_crits = 
-        {"loglik", "aic", "bic", "mbic", "vbic"};
+        {"loglik", "aic", "bic", "mbic", "mbicv"};
     if (!tools_stl::is_member(selection_criterion, allowed_crits)) {
         throw std::runtime_error(
             "selection_criterion should be 'loglik', 'aic', 'bic', or 'mbic'");

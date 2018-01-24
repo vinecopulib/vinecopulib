@@ -146,7 +146,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         // appears.
     }
 
-    double vbic_opt = 0.0;
+    double mbicv_opt = 0.0;
     bool needs_break = false;
     while (!needs_break) {
         // restore family set in case previous threshold iteration also
@@ -167,8 +167,8 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         }
 
         // helper variables for checking whether an optimum was found
-        double vbic = 0.0;
-        double vbic_trunc = 0.0;
+        double mbicv = 0.0;
+        double mbicv_trunc = 0.0;
         
         for (size_t t = 0; t < d_ - 1; ++t) {
             if (controls_.get_truncation_level() < t) {
@@ -179,22 +179,22 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             select_tree(t);
 
             // update fit statistic
-            vbic_trunc += get_vbic_of_tree(t);
+            mbicv_trunc += get_mbicv_of_tree(t);
 
             // print trace for this tree level
             if (controls_.get_show_trace()) {
                 std::cout << "** Tree: " << t;
                 if (controls_.get_select_truncation_level()) {
-                    std::cout << ", vBIC: " << vbic_trunc;
+                    std::cout << ", mbicv: " << mbicv_trunc;
                 }
                 std::cout << std::endl;
                 // print fitted pair-copulas for this tree
                 print_pair_copulas_of_tree(t);
             }
             
-            // vbic comparison
-            if (controls_.get_select_truncation_level() & (vbic_trunc >= vbic)) {
-                // vbic did not improve, truncate
+            // mbicv comparison
+            if (controls_.get_select_truncation_level() & (mbicv_trunc >= mbicv)) {
+                // mbicv did not improve, truncate
                 controls_.set_truncation_level(t);
                 set_tree_to_indep(t);
                 set_current_fit_as_opt();
@@ -203,29 +203,29 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
                     needs_break = true;
                 }
             } else {
-                vbic = vbic_trunc;
+                mbicv = mbicv_trunc;
             }
         }
 
         if (controls_.get_show_trace()) {
-            std::cout << "--> vBIC = " << vbic << std::endl << std::endl;
+            std::cout << "--> mbicv = " << mbicv << std::endl << std::endl;
         }
 
 
-        // check whether vbic-optimal model has been found
-        if (vbic == 0.0) {
+        // check whether mbicv-optimal model has been found
+        if (mbicv == 0.0) {
             set_current_fit_as_opt();
             if (!controls_.get_select_threshold()) {
                 // threshold is fixed, optimal truncation level has been found
                 needs_break = true;
             }
-        } else if (vbic >= vbic_opt) {
+        } else if (mbicv >= mbicv_opt) {
             // old model is optimal
             needs_break = true;
         } else {
             // optimum hasn't been found
             set_current_fit_as_opt();
-            vbic_opt = vbic;
+            mbicv_opt = mbicv;
             // while loop is only for threshold selection
             needs_break = needs_break | !controls_.get_select_threshold();
             // threshold is too close to 0
@@ -572,7 +572,7 @@ inline void VinecopSelector::select_tree(size_t t)
     }
     add_edge_info(new_tree);       // for pc estimation and next tree
     remove_vertex_data(new_tree);  // no longer needed
-    if (controls_.get_selection_criterion() == "vbic") {
+    if (controls_.get_selection_criterion() == "mbicv") {
         // adjust prior probability to tree level
         controls_.set_pi(std::pow(pi0_, t + 1));
     }
@@ -586,7 +586,7 @@ inline void VinecopSelector::select_tree(size_t t)
     trees_[t + 1] = new_tree;
 }
 
-inline double VinecopSelector::get_vbic_of_tree(size_t t)
+inline double VinecopSelector::get_mbicv_of_tree(size_t t)
 {
     double loglik = get_loglik_of_tree(t);
     double npars = get_npars_of_tree(t);

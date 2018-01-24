@@ -553,20 +553,20 @@ inline double Vinecop::bic(const Eigen::MatrixXd &u) const
     return -2 * loglik(u) + calculate_npars() * log(static_cast<double>(u.rows()));
 }
 
-//! calculates the vine copula Bayesian information criterion (vBIC), which is 
-//! defined as
-//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, - 2 * 
-//! \sum_{t=1}^(d - 1) \{m_t log(pi^t) - (d - t - m_t) log(1 - pi^t)\}  \f]
-//! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
+//! calculates the modified Bayesian information criterion for vines (mBICV), 
+//! which is defined as
+//! \f[ \mathrm{mBICV} = -2\, \mathrm{loglik} +  \ln(n) \nu, - 2 * 
+//! \sum_{t=1}^(d - 1) \{q_t log(\psi_0^t) - (d - t - q_t) log(1 -\psi_0^t)\}\f]
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood, \f$ \nu \f$ is the
 //! (effective) number of parameters of the model, \f$ t \f$ is the tree level 
-//! \f$ pi \f$ is the priorprobability of having a non-independence copula and 
-//! \f$ m_t \f$ is the number of non-independence copulas in tree \f$ t \f$; 
-//! see loglik() and calculate_npars(). The vBIC is a consistent model 
-//! selection criterion for parametric sparse vine copula models.
+//! \f$ \psi_0 \f$ is the prior probability of having a non-independence copula 
+//! in the first tree, and \f$ q_t \f$ is the number of non-independence copulas
+//! in tree \f$ t \f$; The vBIC is a consistent model selection criterion for 
+//! parametric sparse vine copula models when \f$ d = o(\sqrt{n \ln n})\f.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 //! @param pi baseline prior probability of a non-independence copula.
-inline double Vinecop::vbic(const Eigen::MatrixXd &u, double pi) const
+inline double Vinecop::mbicv(const Eigen::MatrixXd &u, double pi) const
 {
     if (!(pi > 0.0) | !(pi < 1.0)) {
         throw std::runtime_error("pi must be in the interval (0, 1)");

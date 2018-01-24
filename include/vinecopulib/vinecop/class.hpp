@@ -97,11 +97,11 @@ public:
 
     double bic(const Eigen::MatrixXd &u) const;
     
-    double vbic(const Eigen::MatrixXd &u, double pi) const;
+    double mbicv(const Eigen::MatrixXd &u, double pi) const;
 
     // Misc methods
     static std::vector <std::vector<Bicop>> make_pair_copula_store(size_t d,
-                                                                   size_t truncation_level = std::numeric_limits<size_t>::max());
+        size_t truncation_level = std::numeric_limits<size_t>::max());
 
 private:
     size_t d_;
