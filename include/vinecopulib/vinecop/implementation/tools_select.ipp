@@ -265,7 +265,7 @@ inline double VinecopSelector::get_next_threshold(
     std::sort(thresholded_crits.begin(), thresholded_crits.end());
     std::reverse(thresholded_crits.begin(), thresholded_crits.end());
     // pick threshold that changes at least alpha*100 % of the pair-copulas
-    double alpha = 0.025;
+    double alpha = 0.05;
     size_t m = thresholded_crits.size();
     return thresholded_crits[std::ceil(static_cast<double>(m) * alpha) - 1];
 }

@@ -579,7 +579,7 @@ inline double Vinecop::vbic(const Eigen::MatrixXd &u, double pi) const
             break;
         }
         for (size_t e = 0; e < d_ - 1 - t; e++) {
-            if (all_fams[t][e] == BicopFamily::indep) {
+            if (all_fams[t][e] != BicopFamily::indep) {
                 non_indeps(t)++;
             }
         }
