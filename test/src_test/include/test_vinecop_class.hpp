@@ -245,7 +245,7 @@ TEST_F(VinecopTest, fixed_truncation) {
 TEST_F(VinecopTest, sparse_threshold_selection) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_threshold(true);
-    controls.set_show_trace(true);
+    // controls.set_show_trace(true);
     controls.set_selection_criterion("mbicv");
     Vinecop fit(7);
     fit.select_all(u, controls);

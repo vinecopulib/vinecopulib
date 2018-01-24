@@ -21,8 +21,8 @@ public:
                      std::string nonparametric_method = "quadratic",
                      double nonparametric_mult = 1.0,
                      std::string selection_criterion = "bic",
-                     bool preselect_families = true,
                      double psi0 = 0.9,
+                     bool preselect_families = true,
                      size_t num_threads = 1);
 
     FitControlsBicop(std::string parametric_method);

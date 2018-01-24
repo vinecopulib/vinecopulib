@@ -48,6 +48,7 @@ inline FitControlsVinecop::FitControlsVinecop(
     std::string tree_criterion,
     double threshold,
     std::string selection_criterion,
+    double psi0,
     bool preselect_families,
     bool select_truncation_level,
     bool select_threshold,
@@ -58,6 +59,7 @@ inline FitControlsVinecop::FitControlsVinecop(
                      nonparametric_method,
                      nonparametric_mult,
                      selection_criterion,
+                     psi0,
                      preselect_families)
 {
     set_truncation_level(truncation_level);

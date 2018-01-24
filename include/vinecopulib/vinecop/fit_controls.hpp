@@ -27,6 +27,7 @@ public:
                        std::string tree_criterion = "tau",
                        double threshold = 0.0,
                        std::string selection_criterion = "bic",
+                       double psi0 = 0.9,
                        bool preselect_families = true,
                        bool select_truncation_level = false,
                        bool select_threshold = false,
