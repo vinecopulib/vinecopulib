@@ -79,7 +79,7 @@ if (VINECOPULIB_SHARED_LIB)
             EXPORT "${targets_export_name}"
             LIBRARY DESTINATION "lib"
             ARCHIVE DESTINATION "lib"
-            RUNTIME DESTINATION "lib" # on Windows, the dll file is categorised as RUNTIME
+            RUNTIME DESTINATION "bin" # on Windows, the dll file is categorised as RUNTIME
     )
 else()
     install(TARGETS vinecopulib EXPORT "${targets_export_name}")
