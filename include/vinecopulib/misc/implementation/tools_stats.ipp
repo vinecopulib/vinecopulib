@@ -281,7 +281,7 @@ inline Eigen::VectorXd win(const Eigen::VectorXd &x, size_t wl = 5) {
     return result;
 }
 
-//! helper routine for ace
+//! helper routine for ace (In R, this would be win(x[ind], wl)[ranks])
 inline Eigen::VectorXd cef(const Eigen::VectorXd &x,
                     const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &ind,
                     const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &ranks,
@@ -304,23 +304,26 @@ inline Eigen::VectorXd cef(const Eigen::VectorXd &x,
 
 //! alternating conditional expectation algorithm
 inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
-    size_t wl = 0,
-    size_t oi = 100,
-    size_t ii = 10,
-    double ocrit = 2e-15,
-    double icrit = 1e-4) {
+    const Eigen::Matrix<double, Eigen::Dynamic, 2>& x, // data
+    size_t wl = 0, // window length for the smoother
+    size_t outer_iter_max = 100, // max number of outer iterations
+    size_t inner_iter_max = 10, // max number of inner iterations
+    double outer_abs_tol = 2e-15, // outer stopping criterion
+    double inner_abs_tol = 1e-4) { // inner stopping criterion
 
+    // sample size and memory allocation for the outer/inner loops
     size_t n = x.rows();
+    Eigen::VectorXd tmp(n);
+
+    // default window size
     double n_dbl = static_cast<double>(n);
     if (wl == 0) {
         wl = std::ceil(n_dbl/20);
     }
 
+    // assign order/ranks to ind/ranks
     Eigen::Matrix<size_t, Eigen::Dynamic, 2> ind(n, 2);
     Eigen::Matrix<size_t, Eigen::Dynamic, 2> ranks(n, 2);
-    Eigen::VectorXd tmp(n);
-
     for (size_t i = 0; i < 2; i++) {
         std::vector<double> xvec(x.data() + n * i, x.data() + n * (i + 1));
         auto order = tools_stl::get_order(xvec);
@@ -329,39 +332,63 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
             ranks(order[j], i) = j;
         }
     }
+
+    // initialize output
     Eigen::MatrixXd phi = ranks.cast<double>();;
     phi.array() -= (n_dbl - 1.0)/2.0 - 1.0;
     phi /= std::sqrt(n_dbl * (n_dbl - 1.0) / 12.0);
 
-    size_t oi1 = 1;
-    double oeps = 1.0;
-    double ocrit1 = 1.0;
+    // initialize variables for the outer loop
+    size_t outer_iter = 1;
+    double outer_eps = 1.0;
+    double outer_abs_err = 1.0;
 
-    while (oi1 <= oi && ocrit1 > ocrit) {
-        size_t ii1 = 1;
-        double ieps = 1.0;
-        double icrit1 = 1.0;
+    // outer loop (expectation of the first variable given the second)
+    while (outer_iter <= outer_iter_max && outer_abs_err > outer_abs_tol) {
 
-        while(ii1 <= ii && icrit1 > icrit) {
+        // initialize variables for the inner loop
+        size_t inner_iter = 1;
+        double inner_eps = 1.0;
+        double inner_abs_err = 1.0;
+
+        // inner loop (expectation of the second variable given the first)
+        while(inner_iter <= inner_iter_max && inner_abs_err > inner_abs_tol) {
+
+            // conditional expectation
             phi.col(1) = cef(phi.col(0), ind.col(1), ranks.col(1), wl);
-            icrit1 = ieps;
+
+            // center and standardize
+            double m1 = phi.col(1).sum() / n_dbl;
+            phi.col(1).array() -= m1;
+            double s1 = std::sqrt(phi.col(1).cwiseAbs2().sum() / (n_dbl - 1));
+            phi.col(1) /= s1;
+
+            // compute error and increase step
+            inner_abs_err = inner_eps;
             tmp = (phi.col(1) - phi.col(0));
-            ieps = tmp.cwiseAbs2().sum()/n_dbl;
-            icrit1 = std::fabs(icrit1-ieps);
-            ii1 = ii1 + 1;
+            inner_eps = tmp.cwiseAbs2().sum() / n_dbl;
+            inner_abs_err = std::fabs(inner_abs_err - inner_eps);
+            inner_iter = inner_iter + 1;
         }
 
+        // conditional expectation
         phi.col(0) = cef(phi.col(1) , ind.col(0), ranks.col(0), wl);
-        double m0 = phi.col(0).sum()/n_dbl;
+
+        // center and standardize
+        double m0 = phi.col(0).sum() / n_dbl;
         phi.col(0).array() -= m0;
-        double s0 = std::sqrt(phi.col(0).cwiseAbs2().sum()/(n_dbl - 1));
+        double s0 = std::sqrt(phi.col(0).cwiseAbs2().sum() / (n_dbl - 1));
         phi.col(0) /= s0;
-        ocrit1 = oeps;
+
+        // compute error and increase step
+        outer_abs_err = outer_eps;
         tmp = (phi.col(1) - phi.col(0));
-        oeps = tmp.cwiseAbs2().sum()/n_dbl;
-        ocrit1 = std::fabs(ocrit1-oeps);
-        oi1 = oi1+1;
+        outer_eps = tmp.cwiseAbs2().sum() / n_dbl;
+        outer_abs_err = std::fabs(outer_abs_err - outer_eps);
+        outer_iter = outer_iter + 1;
     }
+
+    // return result
     return phi;
 }
 
