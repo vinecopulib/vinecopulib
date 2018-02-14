@@ -5,6 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/misc/tools_stl.hpp>
+#include <unsupported/Eigen/FFT>
 
 //! @file misc/tools_stats.ipp
 
@@ -259,6 +260,118 @@ inline double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
     return rho;
 }
 
+//! window smoother
+inline Eigen::VectorXd win(const Eigen::VectorXd &x, size_t wl = 5) {
+    size_t n = x.size();
+    Eigen::VectorXd xx = Eigen::VectorXd::Zero(n + 2 * wl);
+    Eigen::VectorXd yy = Eigen::VectorXd::Zero(n + 2 * wl);
+    xx.block(2 * wl, 0, n, 1) = x;
+    yy.block(0, 0, 2 * wl + 1, 1) = Eigen::VectorXd::Ones(2 * wl + 1);
+
+    Eigen::FFT<double> fft;
+    Eigen::VectorXcd tmp1 = fft.fwd(xx);
+    Eigen::VectorXcd tmp2 = fft.fwd(yy);
+    tmp2 = tmp2.conjugate();
+    tmp1 = tmp1.cwiseProduct(tmp2);
+    tmp2 = fft.inv(tmp1);
+    Eigen::VectorXd result = tmp2.real().block(wl, 0, n, 1);
+    result /= 2.0 * static_cast<double>(wl) + 1.0;
+    result.block(0, 0, wl, 1) = Eigen::VectorXd::Constant(wl, result(wl));
+    result.block(n - wl, 0, wl, 1) = Eigen::VectorXd::Constant(wl, result(n - wl- 1));
+    return result;
+}
+
+//! helper routine for ace
+inline Eigen::VectorXd cef(const Eigen::VectorXd &x,
+                    const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &ind,
+                    const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &ranks,
+                    size_t wl = 5) {
+
+    size_t n_ind = ind.size();
+    Eigen::VectorXd cey(n_ind);
+    for (size_t i = 0; i < n_ind; i++) {
+        cey(i) = x(ind(i));
+    }
+    cey = win(cey, wl);
+
+    size_t n_ranks = ranks.size();
+    Eigen::VectorXd result(n_ranks);
+    for (size_t i = 0; i < n_ranks; i++) {
+        result(i) = cey(ranks(i));
+    }
+    return result;
+}
+
+//! alternating conditional expectation algorithm
+inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
+    const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
+    size_t wl = 0,
+    size_t oi = 100,
+    size_t ii = 10,
+    double ocrit = 2e-15,
+    double icrit = 1e-4) {
+
+    size_t n = x.rows();
+    double n_dbl = static_cast<double>(n);
+    if (wl == 0) {
+        wl = std::ceil(n_dbl/20);
+    }
+
+    Eigen::Matrix<size_t, Eigen::Dynamic, 2> ind(n, 2);
+    Eigen::Matrix<size_t, Eigen::Dynamic, 2> ranks(n, 2);
+    Eigen::VectorXd tmp(n);
+
+    for (size_t i = 0; i < 2; i++) {
+        std::vector<double> xvec(x.data() + n * i, x.data() + n * (i + 1));
+        auto order = tools_stl::get_order(xvec);
+        for (auto j : order) {
+            ind(j, i) = order[j];
+            ranks(order[j], i) = j;
+        }
+    }
+    Eigen::MatrixXd phi = ranks.cast<double>();;
+    phi.array() -= (n_dbl - 1.0)/2.0 - 1.0;
+    phi /= std::sqrt(n_dbl * (n_dbl - 1.0) / 12.0);
+
+    size_t oi1 = 1;
+    double oeps = 1.0;
+    double ocrit1 = 1.0;
+
+    while (oi1 <= oi && ocrit1 > ocrit) {
+        size_t ii1 = 1;
+        double ieps = 1.0;
+        double icrit1 = 1.0;
+
+        while(ii1 <= ii && icrit1 > icrit) {
+            phi.col(1) = cef(phi.col(0), ind.col(1), ranks.col(1), wl);
+            icrit1 = ieps;
+            tmp = (phi.col(1) - phi.col(0));
+            ieps = tmp.cwiseAbs2().sum()/n_dbl;
+            icrit1 = std::fabs(icrit1-ieps);
+            ii1 = ii1 + 1;
+        }
+
+        phi.col(0) = cef(phi.col(1) , ind.col(0), ranks.col(0), wl);
+        double m0 = phi.col(0).sum()/n_dbl;
+        phi.col(0).array() -= m0;
+        double s0 = std::sqrt(phi.col(0).cwiseAbs2().sum()/(n_dbl - 1));
+        phi.col(0) /= s0;
+        ocrit1 = oeps;
+        tmp = (phi.col(1) - phi.col(0));
+        oeps = tmp.cwiseAbs2().sum()/n_dbl;
+        ocrit1 = std::fabs(ocrit1-oeps);
+        oi1 = oi1+1;
+    }
+    return phi;
+}
+
+//! calculates the pairwise maximum correlation coefficient.
+inline double pairwise_mcor(const Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
+{
+    Eigen::Matrix<double, Eigen::Dynamic, 2> phi = ace(x);
+    return pairwise_cor(phi);
+}
+
 //! calculates the pairwise Spearman's \f$ \rho \f$.
 inline double pairwise_rho(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
 {
@@ -332,6 +445,8 @@ inline Eigen::MatrixXd dependence_matrix(const Eigen::MatrixXd &x,
                 mat(i, j) = pairwise_tau(pair_data);
             } else if (measure == "cor") {
                 mat(i, j) = pairwise_cor(pair_data);
+            } else if (measure == "mcor") {
+                mat(i, j) = pairwise_mcor(pair_data);
             } else if (measure == "rho") {
                 mat(i, j) = pairwise_rho(pair_data);
             } else if (measure == "hoeffd") {
@@ -492,7 +607,7 @@ inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
 
         double hrk = h - rho * k;
         double krh = k - rho * h;
-        if (fabs(hrk) + ors > 0.) {
+        if (std::fabs(hrk) + ors > 0.) {
             /* Computing 2nd power */
             d1 = hrk;
             /* Computing 2nd power */
@@ -660,10 +775,10 @@ pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
     auto phi = [&dist](double y) { return boost::math::cdf(dist, y); };
 
     size_t lg, ng;
-    if (fabs(rho) < .3f) {
+    if (std::fabs(rho) < .3f) {
         ng = 1;
         lg = 3;
-    } else if (fabs(rho) < .75f) {
+    } else if (std::fabs(rho) < .75f) {
         ng = 2;
         lg = 6;
     } else {
@@ -678,7 +793,7 @@ pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
         k = -k;
         hk = h * k;
         bvn = 0.;
-        if (fabs(rho) < .925f) {
+        if (std::fabs(rho) < .925f) {
             hs = (h * h + k * k) / 2;
             asr = asin(rho);
             i1 = lg;
@@ -698,7 +813,7 @@ pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
                 k = -k;
                 hk = -hk;
             }
-            if (fabs(rho) < 1.) {
+            if (std::fabs(rho) < 1.) {
                 as = (1 - rho) * (rho + 1);
                 a = sqrt(as);
                 /* Computing 2nd power */
