@@ -18,6 +18,7 @@ matrix:
 
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ]; then export PATH=/usr/bin:$PATH; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ xenial main universe"; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
   - if [ $COMPILER == icc ]; then wget "https://raw.githubusercontent.com/nemequ/icc-travis/master/install-icc.sh"; fi
   - if [ $COMPILER == icc ]; then sudo sh install-icc.sh; fi
@@ -32,8 +33,9 @@ before_install:
 
 install:
   ### LINUX
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install lcov libgsl0-dev libeigen3-dev libboost1.54-dev; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install r-base-dev doxygen doxygen-doc doxygen-gui graphviz; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t xenial -y lcov libgsl0-dev libeigen3-dev libboost1.58-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t xenial -y r-base-dev g++; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t xenial -y doxygen doxygen-doc doxygen-gui graphviz; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get autoremove; fi # in particular remove old compilers so that new ones are the default
 
 
