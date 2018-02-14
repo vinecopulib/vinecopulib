@@ -18,7 +18,7 @@ matrix:
 
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ]; then export PATH=/usr/bin:$PATH; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ zesty main universe"; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ xenial main universe"; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
   - if [ $COMPILER == icc ]; then wget "https://raw.githubusercontent.com/nemequ/icc-travis/master/install-icc.sh"; fi
   - if [ $COMPILER == icc ]; then sudo sh install-icc.sh; fi
@@ -33,19 +33,17 @@ before_install:
 
 install:
   ### LINUX
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y lcov libgsl0-dev libeigen3-dev libboost1.62-dev; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y r-base-dev g++; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t zesty -y doxygen doxygen-doc doxygen-gui graphviz; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t xenial -y lcov libgsl0-dev libeigen3-dev libboost1.58-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t xenial -y r-base-dev g++; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install --no-install-recommends -t xenial -y doxygen doxygen-doc doxygen-gui graphviz; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get autoremove; fi # in particular remove old compilers so that new ones are the default
 
 
   ### OSX
   - if [ $TRAVIS_OS_NAME == osx ]; then /usr/bin/yes | pip2 uninstall numpy; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then rm /usr/local/include/c++; fi # https://github.com/Homebrew/brew/issues/1742#issuecomment-277308817
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install gcc; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew tap homebrew/science && brew install lcov eigen gsl; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install r; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install doxygen graphviz; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew update; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install gcc lcov eigen gsl r doxygen graphviz; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then mkdir ~/.R; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then touch ~/.R/Makevars; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then echo "CC=/usr/local/bin/gcc-7" >> ~/.R/Makevars; fi
