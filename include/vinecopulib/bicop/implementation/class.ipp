@@ -295,13 +295,39 @@ Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
 //! (effective) number of parameters of the model, see loglik() and
 //! calculate_npars(). The BIC is a consistent model selection criterion
-//! for nonparametric models.
+//! for parametric models.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 inline double
 Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 {
     return -2 * loglik(u) + calculate_npars() * log(static_cast<double>(u.rows()));
+}
+
+//! calculates the modified Bayesian information criterion
+//! (mBIC), defined as
+//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \nu \ln(n)
+//!  - 2 (I log(\psi_0) + (1 - I) log(1 - \psi_0) \f]
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ \nu \f$ is the
+//! (effective) number of parameters of the model, \f$ \psi_0 \f$ is the prior
+//! probability of having a non-independence copula and \f$ I \f$ is an indicator
+//! for the family being non-independence; see loglik() and
+//! calculate_npars().
+//!
+//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param psi0 prior probability of a non-independence copula.
+inline double
+Bicop::mbic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u, const double psi0) 
+const
+{
+    bool is_indep = (this->get_family() == BicopFamily::indep);
+    double npars = this->calculate_npars();
+    double n = static_cast<double>(u.rows());
+    double ll = this->loglik(u);
+    double log_prior = 
+        static_cast<double>(!is_indep) * std::log(psi0) +
+        static_cast<double>(is_indep) * std::log(1.0 - psi0);
+    return -2 * ll + std::log(n) * npars - 2 * log_prior;
 }
 
 //! Returns the actual number of parameters for parameteric families. For
@@ -476,8 +502,10 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
                 new_criterion = -cop.loglik(data);
             } else if (controls.get_selection_criterion() == "aic") {
                 new_criterion = cop.aic(data);
-            } else {
+            } else if (controls.get_selection_criterion() == "bic") {
                 new_criterion = cop.bic(data);
+            } else {
+                new_criterion = cop.mbic(data, controls.get_psi0());
             }
 
             // the following block modifies thread-external variables

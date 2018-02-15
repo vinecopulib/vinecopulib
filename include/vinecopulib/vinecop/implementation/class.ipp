@@ -231,10 +231,10 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
     tools_select::StructureSelector selector(data, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
-        threshold_ = selector.get_threshold();
     } else {
         selector.select_all_trees(data);
     }
+    threshold_ = selector.get_threshold();
     vine_matrix_ = selector.get_rvine_matrix();
     pair_copulas_ = selector.get_pair_copulas();
 }
@@ -250,10 +250,10 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
     tools_select::FamilySelector selector(data, vine_matrix_, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
-        threshold_ = selector.get_threshold();
     } else {
         selector.select_all_trees(data);
     }
+    threshold_ = selector.get_threshold();
     pair_copulas_ = selector.get_pair_copulas();
 }
 
@@ -551,6 +551,55 @@ inline double Vinecop::aic(const Eigen::MatrixXd &u) const
 inline double Vinecop::bic(const Eigen::MatrixXd &u) const
 {
     return -2 * loglik(u) + calculate_npars() * log(static_cast<double>(u.rows()));
+}
+
+//! calculates the modified Bayesian information criterion for vines (mBICV), 
+//! which is defined as
+//! \f[ \mathrm{mBICV} = -2\, \mathrm{loglik} +  \ln(n) \nu, - 2 * 
+//! \sum_{t=1}^(d - 1) \{q_t log(\psi_0^t) - (d - t - q_t) log(1 -\psi_0^t)\}\f]
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood, \f$ \nu \f$ is the
+//! (effective) number of parameters of the model, \f$ t \f$ is the tree level 
+//! \f$ \psi_0 \f$ is the prior probability of having a non-independence copula 
+//! in the first tree, and \f$ q_t \f$ is the number of non-independence copulas
+//! in tree \f$ t \f$; The vBIC is a consistent model selection criterion for 
+//! parametric sparse vine copula models when \f$ d = o(\sqrt{n \ln n})\f.
+//!
+//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param pi baseline prior probability of a non-independence copula.
+inline double Vinecop::mbicv(const Eigen::MatrixXd &u, double pi) const
+{
+    if (!(pi > 0.0) | !(pi < 1.0)) {
+        throw std::runtime_error("pi must be in the interval (0, 1)");
+    }    
+    auto all_fams = get_all_families();
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps(d_ - 1);
+    non_indeps.setZero();
+    for (size_t t = 0; t < d_ - 1; t++) {
+        if (t == all_fams.size()) {
+            break;
+        }
+        for (size_t e = 0; e < d_ - 1 - t; e++) {
+            if (all_fams[t][e] != BicopFamily::indep) {
+                non_indeps(t)++;
+            }
+        }
+    }
+    auto sq0 = tools_stl::seq_int(1, d_ - 1);
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> sq(d_ - 1);
+    auto pis = Eigen::VectorXd(d_ - 1);
+    for (size_t i = 0; i < d_ - 1; i++) {
+        sq(i) = sq0[i];
+        pis(i) = std::pow(pi, sq0[i]);
+    }
+    double npars = this->calculate_npars();
+    double n = static_cast<double>(u.rows());
+    double ll = this->loglik(u);
+    double log_prior = (
+        non_indeps.cast<double>().array() * pis.array().log() +
+        (d_ - non_indeps.array() - sq.array()).cast<double>() * 
+        (1 - pis.array()).log()
+    ).sum();
+    return -2 * ll + std::log(n) * npars - 2 * log_prior;       
 }
 
 //! returns sum of the number of parameters for all pair copulas (see
