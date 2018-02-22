@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.2.4</a>
+                    <a class="navbar-brand">vinecopulib 0.2.6</a>
                 </div>
             </div>
         </nav>
@@ -125,8 +125,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a37c79233fca1e56e1535cbb37f8d3177"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71554c734c3cbb4c066c1f17fe94a284"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; size_t, Eigen::Dynamic, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a71554c734c3cbb4c066c1f17fe94a284">get_order</a> () const </td></tr>
 <tr class="separator:a71554c734c3cbb4c066c1f17fe94a284"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e63d8b01e1d89284ca28192676b8a3f"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a4e63d8b01e1d89284ca28192676b8a3f">in_natural_order</a> () const </td></tr>
-<tr class="separator:a4e63d8b01e1d89284ca28192676b8a3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a181177080ec418e66931e01160f05f54"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a181177080ec418e66931e01160f05f54">get_natural_order</a> () const </td></tr>
+<tr class="separator:a181177080ec418e66931e01160f05f54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef8bbe14451d023e1c9c113e3812f574"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#aef8bbe14451d023e1c9c113e3812f574">get_max_matrix</a> () const </td></tr>
 <tr class="separator:aef8bbe14451d023e1c9c113e3812f574"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6303fc1f643fdf793c867ca7e08e42bc"><td class="memItemLeft" align="right" valign="top">MatrixXb&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_r_vine_matrix.html#a6303fc1f643fdf793c867ca7e08e42bc">get_needed_hfunc1</a> () const </td></tr>
@@ -283,8 +283,9 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>completes an R-vine matrix that has only been filled for the first couple of trees. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">mat</td><td>R-vine matrix where counter-diagonal and upper block have been filled; entries in between may still be 0. </td></tr>
+    <tr><td class="paramname">mat</td><td>R-vine matrix where counter-diagonal and upper block have been filled; entries in between may still be 0 for truncated vines. </td></tr>
     <tr><td class="paramname">t_start</td><td>the tree level from where the matrix needs to be filled. </td></tr>
+    <tr><td class="paramname">num_threads</td><td>number of parallel threads to use. </td></tr>
   </table>
   </dd>
 </dl>
@@ -414,6 +415,30 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a181177080ec418e66931e01160f05f54"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; vinecopulib::RVineMatrix::get_natural_order </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>extracts the R-vine matrix in natural order, which means that the counter-diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-vine matrix is in natural order. </p>
+
+</div>
+</div>
 <a class="anchor" id="a6303fc1f643fdf793c867ca7e08e42bc"></a>
 <div class="memitem">
 <div class="memproto">
@@ -486,30 +511,6 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4e63d8b01e1d89284ca28192676b8a3f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; vinecopulib::RVineMatrix::in_natural_order </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>extracts the R-vine matrix in natural order, which means that the counter-diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-vine matrix is in natural order. </p>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>vinecopulib/include/vinecopulib/vinecop/<a class="el" href="rvine__matrix_8hpp_source.html">rvine_matrix.hpp</a></li>
 <li>vinecopulib/include/vinecopulib/vinecop/implementation/rvine_matrix.ipp</li>
@@ -523,7 +524,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 18:37:02 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Feb 22 2018 22:16:26 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

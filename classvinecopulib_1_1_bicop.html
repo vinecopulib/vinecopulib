@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.2.4</a>
+                    <a class="navbar-brand">vinecopulib 0.2.6</a>
                 </div>
             </div>
         </nav>
@@ -156,6 +156,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:afa2b49c6c6da183f8cb365981d4d559c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5935f84a33d80dbe7cbc6d071a1e8d75"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a5935f84a33d80dbe7cbc6d071a1e8d75">bic</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u) const </td></tr>
 <tr class="separator:a5935f84a33d80dbe7cbc6d071a1e8d75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c2c27bc6d39cc970b739b0b40f4bcad"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a8c2c27bc6d39cc970b739b0b40f4bcad">mbic</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;u, const double pi) const </td></tr>
+<tr class="separator:a8c2c27bc6d39cc970b739b0b40f4bcad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fbc58e9d4cd565e805347083cbcc63d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#a6fbc58e9d4cd565e805347083cbcc63d">calculate_npars</a> () const </td></tr>
 <tr class="separator:a6fbc58e9d4cd565e805347083cbcc63d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac244ca18350854951708a360e5e508ed"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_bicop.html#ac244ca18350854951708a360e5e508ed">parameters_to_tau</a> (const Eigen::MatrixXd &amp;parameters) const </td></tr>
@@ -405,7 +407,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>calculates the Bayesian information criterion (BIC), defined as </p><p class="formulaDsp">
 \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \]
 </p>
-<p> where \( \mathrm{loglik} \) is the log-liklihood and \( p \) is the (effective) number of parameters of the model, see <a class="el" href="classvinecopulib_1_1_bicop.html#ad1ee397f2273ed07ba1d5d2ebff7ef1f">loglik()</a> and <a class="el" href="classvinecopulib_1_1_bicop.html#a6fbc58e9d4cd565e805347083cbcc63d">calculate_npars()</a>. The BIC is a consistent model selection criterion for nonparametric models.</p>
+<p> where \( \mathrm{loglik} \) is the log-liklihood and \( p \) is the (effective) number of parameters of the model, see <a class="el" href="classvinecopulib_1_1_bicop.html#ad1ee397f2273ed07ba1d5d2ebff7ef1f">loglik()</a> and <a class="el" href="classvinecopulib_1_1_bicop.html#a6fbc58e9d4cd565e805347083cbcc63d">calculate_npars()</a>. The BIC is a consistent model selection criterion for parametric models.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">u</td><td>\(n \times 2\) matrix of observations. </td></tr>
@@ -668,6 +670,51 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a class="anchor" id="a8c2c27bc6d39cc970b739b0b40f4bcad"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double vinecopulib::Bicop::mbic </td>
+          <td>(</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, Eigen::Dynamic, 2 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>u</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>psi0</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>calculates the modified Bayesian information criterion (mBIC), defined as </p><p class="formulaDsp">
+\[ \mathrm{BIC} = -2\, \mathrm{loglik} + \nu \ln(n) //! - 2 (I log(\psi_0) + (1 - I) log(1 - \psi_0) \]
+</p>
+<p> where \( \mathrm{loglik} \) is the log-liklihood and \( \nu \) is the (effective) number of parameters of the model, \( \psi_0 \) is the prior probability of having a non-independence copula and \( I \) is an indicator for the family being non-independence; see <a class="el" href="classvinecopulib_1_1_bicop.html#ad1ee397f2273ed07ba1d5d2ebff7ef1f">loglik()</a> and <a class="el" href="classvinecopulib_1_1_bicop.html#a6fbc58e9d4cd565e805347083cbcc63d">calculate_npars()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">u</td><td>\(n \times 2\) matrix of observations. </td></tr>
+    <tr><td class="paramname">psi0</td><td>prior probability of a non-independence copula. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="ac244ca18350854951708a360e5e508ed"></a>
 <div class="memitem">
 <div class="memproto">
@@ -907,7 +954,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 18:37:02 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Feb 22 2018 22:16:26 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

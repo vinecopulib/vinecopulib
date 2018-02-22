@@ -20,7 +20,7 @@ Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hy
 \item 
 Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, 1 $>$ \hyperlink{classvinecopulib_1_1_r_vine_matrix_a71554c734c3cbb4c066c1f17fe94a284}{get\+\_\+order} () const 
 \item 
-Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{classvinecopulib_1_1_r_vine_matrix_a4e63d8b01e1d89284ca28192676b8a3f}{in\+\_\+natural\+\_\+order} () const 
+Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{classvinecopulib_1_1_r_vine_matrix_a181177080ec418e66931e01160f05f54}{get\+\_\+natural\+\_\+order} () const 
 \item 
 Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{classvinecopulib_1_1_r_vine_matrix_aef8bbe14451d023e1c9c113e3812f574}{get\+\_\+max\+\_\+matrix} () const 
 \item 
@@ -126,9 +126,11 @@ check whether an edge belong to the implied structure
 )\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\hypertarget{classvinecopulib_1_1_r_vine_matrix_ae27243770904a218e4e1e5b939ad46fb}{}\label{classvinecopulib_1_1_r_vine_matrix_ae27243770904a218e4e1e5b939ad46fb}
 completes an R-\/vine matrix that has only been filled for the first couple of trees. 
 \begin{DoxyParams}{Parameters}
-{\em mat} & R-\/vine matrix where counter-\/diagonal and upper block have been filled; entries in between may still be 0. \\
+{\em mat} & R-\/vine matrix where counter-\/diagonal and upper block have been filled; entries in between may still be 0 for truncated vines. \\
 \hline
 {\em t\+\_\+start} & the tree level from where the matrix needs to be filled. \\
+\hline
+{\em num\+\_\+threads} & number of parallel threads to use. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
@@ -182,7 +184,14 @@ extract the matrix. \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\
 {}
 \end{DoxyParamCaption}
 ) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_r_vine_matrix_aef8bbe14451d023e1c9c113e3812f574}{}\label{classvinecopulib_1_1_r_vine_matrix_aef8bbe14451d023e1c9c113e3812f574}
-extracts the maximum matrix, which is derived from an R-\/vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge. \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}}
+extracts the maximum matrix, which is derived from an R-\/vine matrix by iteratively computing the (elementwise) maximum of a row and the row below (starting from the bottom). It is used in estimation and evaluation algorithms to find the right pseudo observations for an edge. \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+natural\+\_\+order@{get\+\_\+natural\+\_\+order}}
+\index{get\+\_\+natural\+\_\+order@{get\+\_\+natural\+\_\+order}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
+\subsubsection[{\texorpdfstring{get\+\_\+natural\+\_\+order() const }{get_natural_order() const }}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+natural\+\_\+order (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a181177080ec418e66931e01160f05f54}{}\label{classvinecopulib_1_1_r_vine_matrix_a181177080ec418e66931e01160f05f54}
+extracts the R-\/vine matrix in natural order, which means that the counter-\/diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-\/vine matrix is in natural order. \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}}
 \index{get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
 \subsubsection[{\texorpdfstring{get\+\_\+needed\+\_\+hfunc1() const }{get_needed_hfunc1() const }}]{\setlength{\rightskip}{0pt plus 5cm}Matrix\+Xb vinecopulib\+::\+R\+Vine\+Matrix\+::get\+\_\+needed\+\_\+hfunc1 (
 \begin{DoxyParamCaption}
@@ -203,14 +212,7 @@ extracts a matrix indicating which of the second h-\/functions are needed (it is
 {}
 \end{DoxyParamCaption}
 ) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a71554c734c3cbb4c066c1f17fe94a284}{}\label{classvinecopulib_1_1_r_vine_matrix_a71554c734c3cbb4c066c1f17fe94a284}
-extracts the variable order in the R-\/vine. \index{vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}!in\+\_\+natural\+\_\+order@{in\+\_\+natural\+\_\+order}}
-\index{in\+\_\+natural\+\_\+order@{in\+\_\+natural\+\_\+order}!vinecopulib\+::\+R\+Vine\+Matrix@{vinecopulib\+::\+R\+Vine\+Matrix}}
-\subsubsection[{\texorpdfstring{in\+\_\+natural\+\_\+order() const }{in_natural_order() const }}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ vinecopulib\+::\+R\+Vine\+Matrix\+::in\+\_\+natural\+\_\+order (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_r_vine_matrix_a4e63d8b01e1d89284ca28192676b8a3f}{}\label{classvinecopulib_1_1_r_vine_matrix_a4e63d8b01e1d89284ca28192676b8a3f}
-extracts the R-\/vine matrix in natural order, which means that the counter-\/diagonal has entries (d, ..., 1). We convert to natural order by relabeling the variables. Most algorithms for estimation and evaluation assume that the R-\/vine matrix is in natural order. 
+extracts the variable order in the R-\/vine. 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 

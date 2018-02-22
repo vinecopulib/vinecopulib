@@ -51,6 +51,8 @@ double \hyperlink{classvinecopulib_1_1_bicop_afa2b49c6c6da183f8cb365981d4d559c}{
 \item 
 double \hyperlink{classvinecopulib_1_1_bicop_a5935f84a33d80dbe7cbc6d071a1e8d75}{bic} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u) const 
 \item 
+double \hyperlink{classvinecopulib_1_1_bicop_a8c2c27bc6d39cc970b739b0b40f4bcad}{mbic} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u, const double pi) const 
+\item 
 double \hyperlink{classvinecopulib_1_1_bicop_a6fbc58e9d4cd565e805347083cbcc63d}{calculate\+\_\+npars} () const 
 \item 
 double \hyperlink{classvinecopulib_1_1_bicop_ac244ca18350854951708a360e5e508ed}{parameters\+\_\+to\+\_\+tau} (const Eigen\+::\+Matrix\+Xd \&parameters) const 
@@ -178,7 +180,7 @@ calculates the Akaike information criterion (A\+IC), defined as \[ \mathrm{AIC} 
 \item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u}
 \end{DoxyParamCaption}
 ) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_bicop_a5935f84a33d80dbe7cbc6d071a1e8d75}{}\label{classvinecopulib_1_1_bicop_a5935f84a33d80dbe7cbc6d071a1e8d75}
-calculates the Bayesian information criterion (B\+IC), defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ p $ is the (effective) number of parameters of the model, see \hyperlink{classvinecopulib_1_1_bicop_ad1ee397f2273ed07ba1d5d2ebff7ef1f}{loglik()} and \hyperlink{classvinecopulib_1_1_bicop_a6fbc58e9d4cd565e805347083cbcc63d}{calculate\+\_\+npars()}. The B\+IC is a consistent model selection criterion for nonparametric models.
+calculates the Bayesian information criterion (B\+IC), defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ p $ is the (effective) number of parameters of the model, see \hyperlink{classvinecopulib_1_1_bicop_ad1ee397f2273ed07ba1d5d2ebff7ef1f}{loglik()} and \hyperlink{classvinecopulib_1_1_bicop_a6fbc58e9d4cd565e805347083cbcc63d}{calculate\+\_\+npars()}. The B\+IC is a consistent model selection criterion for parametric models.
 
 
 \begin{DoxyParams}{Parameters}
@@ -288,6 +290,23 @@ calculates the log-\/likelihood, defined as \[ \mathrm{loglik} = \sum_{i = 1}^n 
 
 \begin{DoxyParams}{Parameters}
 {\em u} & $n \times 2$ matrix of observations. \\
+\hline
+\end{DoxyParams}
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!mbic@{mbic}}
+\index{mbic@{mbic}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection[{\texorpdfstring{mbic(const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u, const double pi) const }{mbic(const Eigen::Matrix< double, Eigen::Dynamic, 2 > &u, const double pi) const }}]{\setlength{\rightskip}{0pt plus 5cm}double vinecopulib\+::\+Bicop\+::mbic (
+\begin{DoxyParamCaption}
+\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u, }
+\item[{const double}]{psi0}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classvinecopulib_1_1_bicop_a8c2c27bc6d39cc970b739b0b40f4bcad}{}\label{classvinecopulib_1_1_bicop_a8c2c27bc6d39cc970b739b0b40f4bcad}
+calculates the modified Bayesian information criterion (m\+B\+IC), defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \nu \ln(n) //! - 2 (I log(\psi_0) + (1 - I) log(1 - \psi_0) \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ \nu $ is the (effective) number of parameters of the model, $ \psi_0 $ is the prior probability of having a non-\/independence copula and $ I $ is an indicator for the family being non-\/independence; see \hyperlink{classvinecopulib_1_1_bicop_ad1ee397f2273ed07ba1d5d2ebff7ef1f}{loglik()} and \hyperlink{classvinecopulib_1_1_bicop_a6fbc58e9d4cd565e805347083cbcc63d}{calculate\+\_\+npars()}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of observations. \\
+\hline
+{\em psi0} & prior probability of a non-\/independence copula. \\
 \hline
 \end{DoxyParams}
 \index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!parameters\+\_\+to\+\_\+tau@{parameters\+\_\+to\+\_\+tau}}

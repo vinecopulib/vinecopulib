@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['in_5fnatural_5forder',['in_natural_order',['../classvinecopulib_1_1_r_vine_matrix.html#a4e63d8b01e1d89284ca28192676b8a3f',1,'vinecopulib::RVineMatrix']]],
-  ['inverse_5frosenblatt',['inverse_rosenblatt',['../classvinecopulib_1_1_vinecop.html#a71e7e9e14dacca516a8d88417a54ac70',1,'vinecopulib::Vinecop']]]
+  ['loglik',['loglik',['../classvinecopulib_1_1_bicop.html#ad1ee397f2273ed07ba1d5d2ebff7ef1f',1,'vinecopulib::Bicop']]]
 ];

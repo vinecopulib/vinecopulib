@@ -34,7 +34,7 @@
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand">vinecopulib 0.2.4</a>
+                    <a class="navbar-brand">vinecopulib 0.2.6</a>
                 </div>
             </div>
         </nav>
@@ -124,8 +124,8 @@ Inheritance diagram for vinecopulib::FitControlsBicop:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa94ab9c21f19900d1bf34c43bf59e50d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#aa94ab9c21f19900d1bf34c43bf59e50d">FitControlsBicop</a> (std::vector&lt; <a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=<a class="el" href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774">bicop_families::all</a>, std::string parametric_method=&quot;mle&quot;, std::string nonparametric_method=&quot;quadratic&quot;, double nonparametric_mult=1.0, std::string selection_criterion=&quot;bic&quot;, bool preselect_families=true, size_t num_threads=1)</td></tr>
-<tr class="separator:aa94ab9c21f19900d1bf34c43bf59e50d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a005b6b7011f1472207dd506127ac1cd9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#a005b6b7011f1472207dd506127ac1cd9">FitControlsBicop</a> (std::vector&lt; <a class="el" href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3">BicopFamily</a> &gt; family_set=<a class="el" href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774">bicop_families::all</a>, std::string parametric_method=&quot;mle&quot;, std::string nonparametric_method=&quot;quadratic&quot;, double nonparametric_mult=1.0, std::string selection_criterion=&quot;bic&quot;, double psi0=0.9, bool preselect_families=true, size_t num_threads=1)</td></tr>
+<tr class="separator:a005b6b7011f1472207dd506127ac1cd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a2fc00794c9dd9d598ac9948e7b98e4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#a6a2fc00794c9dd9d598ac9948e7b98e4">FitControlsBicop</a> (std::string parametric_method)</td></tr>
 <tr class="separator:a6a2fc00794c9dd9d598ac9948e7b98e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1dfc8d80eba3ce6cfa8bf21fe49cc1a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvinecopulib_1_1_fit_controls_bicop.html#af1dfc8d80eba3ce6cfa8bf21fe49cc1a">FitControlsBicop</a> (std::string nonparametric_method, double nonparametric_mult)</td></tr>
@@ -136,7 +136,7 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A class for controlling fit of bivariate copula models. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aa94ab9c21f19900d1bf34c43bf59e50d"></a>
+<a class="anchor" id="a005b6b7011f1472207dd506127ac1cd9"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -176,6 +176,12 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>psi0</em> = <code>0.9</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">bool&#160;</td>
           <td class="paramname"><em>preselect_families</em> = <code>true</code>, </td>
         </tr>
@@ -204,6 +210,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">nonparametric_method</td><td>the fit method for the local-likelihood nonparametric family (TLLs); possible choices: <code>"constant"</code>, <code>"linear"</code>, <code>"quadratic"</code>. </td></tr>
     <tr><td class="paramname">nonparametric_mult</td><td>a factor with which the smoothing parameters are multiplied. </td></tr>
     <tr><td class="paramname">selection_criterion</td><td>the selection criterion (<code>"loglik"</code>, <code>"aic"</code> or <code>"bic"</code>). </td></tr>
+    <tr><td class="paramname">psi0</td><td>only for `selection_criterion = "mbic"): prior probability of non-independence. </td></tr>
     <tr><td class="paramname">preselect_families</td><td>whether to exclude families before fitting based on symmetry properties of the data. </td></tr>
     <tr><td class="paramname">num_threads</td><td>number of concurrent threads to use while fitting copulas for different families; never uses more than the number returned by <code>std::thread::hardware_concurrency()</code>. </td></tr>
   </table>
@@ -321,7 +328,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 18:37:02 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Feb 22 2018 22:16:26 for vinecopulib by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
