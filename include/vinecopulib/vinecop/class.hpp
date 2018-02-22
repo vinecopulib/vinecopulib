@@ -109,7 +109,7 @@ private:
     std::vector <std::vector<Bicop>> pair_copulas_;
     double threshold_;
 
-    void check_data_dim(const Eigen::MatrixXd &data);
+    void check_data_dim(const Eigen::MatrixXd &data) const;
 
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> inverse_permutation(
         const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &order) const;
