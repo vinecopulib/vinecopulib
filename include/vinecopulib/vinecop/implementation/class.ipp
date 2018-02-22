@@ -227,7 +227,9 @@ inline std::vector <std::vector<Bicop>> Vinecop::make_pair_copula_store(
 inline void Vinecop::select_all(const Eigen::MatrixXd &data,
                                 FitControlsVinecop controls)
 {
+    tools_eigen::check_if_in_unit_cube(data);
     check_data_dim(data);
+    
     tools_select::StructureSelector selector(data, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
@@ -246,7 +248,9 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
 inline void Vinecop::select_families(const Eigen::MatrixXd &data,
                                      FitControlsVinecop controls)
 {
+    tools_eigen::check_if_in_unit_cube(data);
     check_data_dim(data);
+    
     tools_select::FamilySelector selector(data, vine_matrix_, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
@@ -401,16 +405,11 @@ inline double Vinecop::get_threshold() const
 //! @param u \f$ n \times d \f$ matrix of evaluation points.
 inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
 {
+    tools_eigen::check_if_in_unit_cube(u);
+    check_data_dim(u);
     size_t d = u.cols();
     size_t n = u.rows();
-    if (d != d_) {
-        std::stringstream message;
-        message << "u has wrong number of columns. " <<
-                "expected: " << d_ <<
-                ", actual: " << d << std::endl;
-        throw std::runtime_error(message.str().c_str());
-    }
-
+    
     // info about the vine structure (reverse rows (!) for more natural indexing)
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
     auto no_matrix = vine_matrix_.get_natural_order();
@@ -470,6 +469,8 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
 inline Eigen::VectorXd
 Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N) const
 {
+    tools_eigen::check_if_in_unit_cube(u);
+    check_data_dim(u);
     if (d_ > 360) {
         std::stringstream message;
         message << "cumulative distribution available for models of " <<
@@ -631,18 +632,13 @@ inline double Vinecop::calculate_npars() const
 inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
 {
+    tools_eigen::check_if_in_unit_cube(u);
+    check_data_dim(u);
     size_t n = u.rows();
     if (n < 1) {
         throw std::runtime_error("n must be at least one");
     }
     size_t d = u.cols();
-    if (d != d_) {
-        std::stringstream message;
-        message << "U has wrong number of columns; " <<
-                "expected: " << d_ <<
-                ", actual: " << d << std::endl;
-        throw std::runtime_error(message.str().c_str());
-    }
 
     Eigen::MatrixXd U_vine = u;  // output matrix
 
@@ -725,7 +721,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
 }
 
 //! checks if dimension d of the data matches the dimension of the vine.
-inline void Vinecop::check_data_dim(const Eigen::MatrixXd &data)
+inline void Vinecop::check_data_dim(const Eigen::MatrixXd &data) const
 {
     size_t d_data = data.cols();
     if (d_data != d_) {
