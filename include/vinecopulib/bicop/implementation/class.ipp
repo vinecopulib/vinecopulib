@@ -104,6 +104,7 @@ inline Eigen::VectorXd
 Bicop::pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
 const
 {
+    tools_eigen::check_if_in_unit_cube(u);
     Eigen::VectorXd f = bicop_->pdf(cut_and_rotate(u));
     f = f.unaryExpr([](const double x) { return std::min(x, 1e16); });
     return f;
@@ -117,6 +118,7 @@ inline Eigen::VectorXd
 Bicop::cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
 const
 {
+    tools_eigen::check_if_in_unit_cube(u);
     Eigen::VectorXd p = bicop_->cdf(cut_and_rotate(u));
     switch (rotation_) {
         case 0:
@@ -148,6 +150,7 @@ inline Eigen::VectorXd
 Bicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
 const
 {
+    tools_eigen::check_if_in_unit_cube(u);
     switch (rotation_) {
         case 0:
             return bicop_->hfunc1(cut_and_rotate(u));
@@ -175,6 +178,7 @@ inline Eigen::VectorXd
 Bicop::hfunc2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
 const
 {
+    tools_eigen::check_if_in_unit_cube(u);
     switch (rotation_) {
         case 0:
             return bicop_->hfunc2(cut_and_rotate(u));
@@ -202,6 +206,7 @@ inline Eigen::VectorXd
 Bicop::hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
 const
 {
+    tools_eigen::check_if_in_unit_cube(u);
     switch (rotation_) {
         case 0:
             return bicop_->hinv1(cut_and_rotate(u));
@@ -229,6 +234,7 @@ inline Eigen::VectorXd
 Bicop::hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
 const
 {
+    tools_eigen::check_if_in_unit_cube(u);
     switch (rotation_) {
         case 0:
             return bicop_->hinv2(cut_and_rotate(u));
@@ -461,6 +467,7 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     } else {
         method = controls.get_nonparametric_method();
     }
+    tools_eigen::check_if_in_unit_cube(data);
     bicop_->fit(tools_eigen::nan_omit(cut_and_rotate(data)), method,
                 controls.get_nonparametric_mult());
 }
@@ -477,6 +484,7 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
 {
     using namespace tools_select;
     data = tools_eigen::nan_omit(data);
+    tools_eigen::check_if_in_unit_cube(data);
 
     if (data.rows() < 10) {
         bicop_ = AbstractBicop::create();
