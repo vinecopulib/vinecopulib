@@ -1,3 +1,19 @@
+# vinecopulib 0.2.6 (February 22, 2018)
+
+NEW FEATURES
+
+   * add checks for data in (0, 1) (#305).
+
+   * add scaling by `mcor` to estimate the bandwidth of `TllBicop` (#302) .
+     
+   * add mBICV to select the truncation level and threshold (#304).
+
+BUG FIXES
+   
+   * improve Windows build (#301, #302).
+   
+   * fix `hoeffd` in `calculate_criterion` (#297).
+
 # vinecopulib 0.2.5 (January 14, 2018)
 
 NEW FEATURES
