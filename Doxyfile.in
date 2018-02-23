@@ -38,7 +38,7 @@ PROJECT_NAME           = vinecopulib
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 0.2.5
+PROJECT_NUMBER         = 0.2.6
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -829,6 +829,9 @@ EXCLUDE_PATTERNS       =
 EXCLUDE_SYMBOLS        = *relabel_one* \
                          *relabel_elements* \
                          *BicopPtr* \
+                         *ace* \
+                         *cef* \
+                         *win*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include

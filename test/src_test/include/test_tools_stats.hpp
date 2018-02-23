@@ -76,6 +76,7 @@ TEST(test_tools_stats, dependence_matrix_works) {
 
     // only check if it works from here one
     tools_stats::dependence_matrix(u, "cor");
+    tools_stats::dependence_matrix(u, "mcor");
     tools_stats::dependence_matrix(u, "rho");
     tools_stats::dependence_matrix(u, "hoeffd");
     EXPECT_ANY_THROW(tools_stats::dependence_matrix(u, "other"));
