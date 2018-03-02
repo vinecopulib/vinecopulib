@@ -4,17 +4,17 @@ sudo: required
 
 matrix:
   include:
+    - os: linux
+      dist: trusty
+      env: COMPILER=icc
 #    - os: linux
 #      dist: trusty
-#      env: COMPILER=icc
-    - os: linux
-      dist: trusty
-      env: COMPILER=clang
-    - os: linux
-      dist: trusty
-      env: COMPILER=gcc
-    - os: osx
-      osx_image: xcode8.3
+#      env: COMPILER=clang
+#    - os: linux
+#      dist: trusty
+#      env: COMPILER=gcc
+#    - os: osx
+#      osx_image: xcode8.3
 
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ]; then export PATH=/usr/bin:$PATH; fi
