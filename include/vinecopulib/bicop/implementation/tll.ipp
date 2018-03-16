@@ -94,7 +94,6 @@ inline Eigen::MatrixXd TllBicop::fit_local_likelihood(
 
 
     Eigen::MatrixXd res(m, 2);
-    res.col(0) = Eigen::VectorXd::Ones(m);  // result will be a product
     Eigen::VectorXd kernels(n);
     double f0;
     Eigen::Vector2d f1;
@@ -105,6 +104,7 @@ inline Eigen::MatrixXd TllBicop::fit_local_likelihood(
         zz = z_data - z.row(k).replicate(n, 1);
         kernels = gaussian_kernel_2d(zz) * det_irB;;
         f0 = kernels.mean();
+        res(k, 0) = f0;
         if (method != "constant") {
             zz = (irB * zz.transpose()).transpose();
             f1 = zz.cwiseProduct(kernels.replicate(1, 2)).colwise().mean();
@@ -115,17 +115,16 @@ inline Eigen::MatrixXd TllBicop::fit_local_likelihood(
                 b = B * b;
                 S = (B * (zz.transpose() * zz2) * B -
                      b * b.transpose()).inverse();
-                res(k) *= std::sqrt(S.determinant()) / det_irB;
+                res(k, 0) *= std::sqrt(S.determinant()) / det_irB;
             }
-            res(k) *= std::exp(-0.5 * double(b.transpose() * S * b));
+            res(k, 0) *= std::exp(-0.5 * double(b.transpose() * S * b));
             if ((boost::math::isnan)(res(k)) |
                 (boost::math::isinf)(res(k))) {
                 // inverse operation might go wrong due to rounding when
                 // true value is equal or close to zero
-                res(k) = 0.0;
+                res(k, 0) = 0.0;
             }
         }
-        res(k, 0) *= f0;
         res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method);
     }
 
@@ -194,7 +193,7 @@ inline double TllBicop::calculate_infl(const size_t &n,
         M(4, 5) = M(5, 4);
     }
 
-    double infl = gaussian_kernel_2d(Eigen::MatrixXd::Zero(1, 2))(0) * det_irB;
+    double infl = gaussian_kernel_2d(Eigen::MatrixXd::Zero(1, 2))(0);
     infl *= M.inverse()(0, 0) / static_cast<double>(n);
     return infl;
 }
