@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['tau_5fto_5fparameters',['tau_to_parameters',['../classvinecopulib_1_1_bicop.html#afd2d6a3ae7349d06f79a3c2e5877c17e',1,'vinecopulib::Bicop']]],
-  ['to_5fjson',['to_json',['../classvinecopulib_1_1_bicop.html#a7a4f0d508461a5a44ef1fbb2cd4dd29e',1,'vinecopulib::Bicop']]],
-  ['to_5fpseudo_5fobs',['to_pseudo_obs',['../namespacevinecopulib_1_1tools__stats.html#afda41507cee7cba84602e28e56cfcd99',1,'vinecopulib::tools_stats']]],
-  ['to_5fpseudo_5fobs_5f1d',['to_pseudo_obs_1d',['../namespacevinecopulib_1_1tools__stats.html#a9e4849a2a908703a68e92e0c0633237f',1,'vinecopulib::tools_stats']]],
-  ['to_5fptree',['to_ptree',['../classvinecopulib_1_1_bicop.html#a74aeb9fd66cee77afd30c8a29dbd5040',1,'vinecopulib::Bicop']]]
+  ['select',['select',['../classvinecopulib_1_1_bicop.html#af20af5c3ba6565628987b4784e9ac348',1,'vinecopulib::Bicop']]],
+  ['select_5fall',['select_all',['../classvinecopulib_1_1_vinecop.html#ad6cbb6b69c41f13a6e5e46ece44c0f78',1,'vinecopulib::Vinecop']]],
+  ['select_5ffamilies',['select_families',['../classvinecopulib_1_1_vinecop.html#a15ca60a0770dab0786b134fc80d1e77d',1,'vinecopulib::Vinecop']]],
+  ['simulate',['simulate',['../classvinecopulib_1_1_bicop.html#a79e63e141e636908fe6727d5bed222a3',1,'vinecopulib::Bicop::simulate()'],['../classvinecopulib_1_1_vinecop.html#a7fbf4609f4f35ef3018b573596bc02a1',1,'vinecopulib::Vinecop::simulate()']]],
+  ['simulate_5funiform',['simulate_uniform',['../namespacevinecopulib_1_1tools__stats.html#a78efaf3caf538201cdb881dd2780b242',1,'vinecopulib::tools_stats']]],
+  ['str',['str',['../classvinecopulib_1_1_bicop.html#abe2b1406729a15c22e9588b0c38c4047',1,'vinecopulib::Bicop']]]
 ];

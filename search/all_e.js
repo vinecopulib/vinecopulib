@@ -9,7 +9,7 @@ var searchData=
   ['parametric',['parametric',['../namespacevinecopulib_1_1bicop__families.html#a76d66bb6cb03ae4de1cef3d1ed70ac16',1,'vinecopulib::bicop_families']]],
   ['pbvnorm',['pbvnorm',['../namespacevinecopulib_1_1tools__stats.html#a6867eea2d193c7e5d78b30b9991397ad',1,'vinecopulib::tools_stats']]],
   ['pbvt',['pbvt',['../namespacevinecopulib_1_1tools__stats.html#a1e81bac0b4e1e9e0158b800a7db0d1af',1,'vinecopulib::tools_stats']]],
-  ['pdf',['pdf',['../classvinecopulib_1_1_bicop.html#a0ee385fbc68736ebc6ddd52188686108',1,'vinecopulib::Bicop']]],
+  ['pdf',['pdf',['../classvinecopulib_1_1_bicop.html#a0ee385fbc68736ebc6ddd52188686108',1,'vinecopulib::Bicop::pdf()'],['../classvinecopulib_1_1_vinecop.html#a488cb8865a6b018d1cb98d0cf12f3c81',1,'vinecopulib::Vinecop::pdf()']]],
   ['pnorm',['pnorm',['../namespacevinecopulib_1_1tools__stats.html#aa380a12540c4749e14049cdd0b163352',1,'vinecopulib::tools_stats']]],
   ['pt',['pt',['../namespacevinecopulib_1_1tools__stats.html#a1f65dc25a8284fe4629f092969e2861a',1,'vinecopulib::tools_stats']]]
 ];
