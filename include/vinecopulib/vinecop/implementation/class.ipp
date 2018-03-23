@@ -12,6 +12,7 @@
 #include <vector>
 
 namespace vinecopulib {
+
 //! creates a D-vine on `d` variables with all pair-copulas set to
 //! independence.
 //! @param d the dimension (= number of variables) of the model.
@@ -563,7 +564,7 @@ inline double Vinecop::bic(const Eigen::MatrixXd &u) const
 //! \f$ \psi_0 \f$ is the prior probability of having a non-independence copula 
 //! in the first tree, and \f$ q_t \f$ is the number of non-independence copulas
 //! in tree \f$ t \f$; The vBIC is a consistent model selection criterion for 
-//! parametric sparse vine copula models when \f$ d = o(\sqrt{n \ln n})\f.
+//! parametric sparse vine copula models when \f$ d = o(\sqrt{n \ln n})\f$.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 //! @param pi baseline prior probability of a non-independence copula.
