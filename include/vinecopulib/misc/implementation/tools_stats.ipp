@@ -259,7 +259,8 @@ inline double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
 }
 
 //! window smoother
-inline Eigen::VectorXd win(const Eigen::VectorXd &x, size_t wl = 5) {
+inline Eigen::VectorXd win(const Eigen::VectorXd &x, size_t wl = 5) 
+{
     size_t n = x.size();
     Eigen::VectorXd xx = Eigen::VectorXd::Zero(n + 2 * wl);
     Eigen::VectorXd yy = Eigen::VectorXd::Zero(n + 2 * wl);
@@ -283,8 +284,8 @@ inline Eigen::VectorXd win(const Eigen::VectorXd &x, size_t wl = 5) {
 inline Eigen::VectorXd cef(const Eigen::VectorXd &x,
                     const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &ind,
                     const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &ranks,
-                    size_t wl = 5) {
-
+                    size_t wl = 5) 
+{
     size_t n_ind = ind.size();
     Eigen::VectorXd cey(n_ind);
     for (size_t i = 0; i < n_ind; i++) {
@@ -307,8 +308,8 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
     size_t outer_iter_max = 100, // max number of outer iterations
     size_t inner_iter_max = 10, // max number of inner iterations
     double outer_abs_tol = 2e-15, // outer stopping criterion
-    double inner_abs_tol = 1e-4) { // inner stopping criterion
-
+    double inner_abs_tol = 1e-4) // inner stopping criterion
+{
     // sample size and memory allocation for the outer/inner loops
     size_t n = x.rows();
     Eigen::VectorXd tmp(n);
@@ -343,7 +344,6 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
 
     // outer loop (expectation of the first variable given the second)
     while (outer_iter <= outer_iter_max && outer_abs_err > outer_abs_tol) {
-
         // initialize variables for the inner loop
         size_t inner_iter = 1;
         double inner_eps = 1.0;
@@ -351,7 +351,6 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
 
         // inner loop (expectation of the second variable given the first)
         while(inner_iter <= inner_iter_max && inner_abs_err > inner_abs_tol) {
-
             // conditional expectation
             phi.col(1) = cef(phi.col(0), ind.col(1), ranks.col(1), wl);
 
