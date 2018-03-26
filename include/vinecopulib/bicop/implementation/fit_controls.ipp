@@ -22,6 +22,7 @@ namespace vinecopulib {
 //!     are multiplied.
 //! @param selection_criterion the selection criterion (`"loglik"`, `"aic"` 
 //!     or `"bic"`).
+//! @param weights a vector of weights for the observations.
 //! @param psi0 only for `selection_criterion = "mbic"): prior probability of
 //!     non-independence.
 //! @param preselect_families whether to exclude families before fitting
@@ -34,6 +35,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector <BicopFamily> family_set,
                                           std::string nonparametric_method,
                                           double nonparametric_mult,
                                           std::string selection_criterion,
+                                          const Eigen::VectorXd& weights,
                                           double psi0,
                                           bool preselect_families,
                                           size_t num_threads)
@@ -43,6 +45,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector <BicopFamily> family_set,
     set_nonparametric_method(nonparametric_method);
     set_nonparametric_mult(nonparametric_mult);
     set_selection_criterion(selection_criterion);
+    set_weights(weights);
     set_preselect_families(preselect_families);
     set_psi0(psi0);
     set_num_threads(num_threads);
@@ -149,6 +152,11 @@ inline std::string FitControlsBicop::get_selection_criterion() const
     return selection_criterion_;
 }
 
+inline Eigen::VectorXd FitControlsBicop::get_weights() const
+{
+    return weights_;
+}
+
 inline bool FitControlsBicop::get_preselect_families() const
 {
     return preselect_families_;
@@ -191,6 +199,12 @@ FitControlsBicop::set_selection_criterion(std::string selection_criterion)
 {
     check_selection_criterion(selection_criterion);
     selection_criterion_ = selection_criterion;
+}
+
+inline void FitControlsBicop::set_weights(const Eigen::VectorXd& weights)
+{
+    // store standardized weights (should sum up to number of observations)
+    weights_ = weights / weights.sum() * weights.size();
 }
 
 inline void FitControlsBicop::set_preselect_families(bool preselect_families)
