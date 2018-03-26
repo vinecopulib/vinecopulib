@@ -46,7 +46,9 @@ private:
                           const std::string &method);
 
     void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-             std::string method, double mult);
+             std::string method, 
+             double mult, 
+             const Eigen::VectorXd& weights);
 };
 }
 

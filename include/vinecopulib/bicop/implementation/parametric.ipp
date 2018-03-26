@@ -52,7 +52,8 @@ inline double ParBicop::calculate_npars()
 
 // fit
 inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                          std::string method, double)
+                          std::string method, double, 
+                          const Eigen::VectorXd& weights)
 {
     if (family_ != BicopFamily::indep) {
         using namespace tools_optimization;
@@ -90,9 +91,10 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 tau = 0.9 * sign;
             }
             auto initial_parameters = get_start_parameters(tau);
-
+            
             ParBicopOptData my_data = {temp_data, this, initial_parameters(0),
                                        0};
+
             std::function<double(void *, long, const double *)> objective =
                 mle_objective;
             if (method == "itau") {

@@ -468,8 +468,10 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         method = controls.get_nonparametric_method();
     }
     tools_eigen::check_if_in_unit_cube(data);
-    bicop_->fit(tools_eigen::nan_omit(cut_and_rotate(data)), method,
-                controls.get_nonparametric_mult());
+    bicop_->fit(tools_eigen::nan_omit(cut_and_rotate(data)), 
+                method,
+                controls.get_nonparametric_mult(),
+                controls.get_weights());
 }
 
 //! selects the best fitting model, by calling fit() for all families in

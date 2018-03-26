@@ -201,7 +201,9 @@ inline double TllBicop::calculate_infl(const size_t &n,
 
 
 inline void TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                          std::string method, double mult)
+                          std::string method, 
+                          double mult, 
+                          const Eigen::VectorXd& weights)
 {
     // construct default grid (equally spaced on Gaussian scale)
     size_t m = 30;
