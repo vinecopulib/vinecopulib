@@ -400,13 +400,7 @@ inline double pairwise_mcor(const Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
 //! calculates the pairwise Spearman's \f$ \rho \f$.
 inline double pairwise_rho(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
 {
-    auto z = to_pseudo_obs(x);
-    double rho;
-    z = x.rowwise() - x.colwise().mean();
-    Eigen::MatrixXd sigma = z.adjoint() * z;
-    rho = sigma(1, 0) / sqrt(sigma(0, 0) * sigma(1, 1));
-
-    return rho;
+    return pairwise_cor(to_pseudo_obs(x));
 }
 
 //! calculates the pair-wise Hoeffding's D.
