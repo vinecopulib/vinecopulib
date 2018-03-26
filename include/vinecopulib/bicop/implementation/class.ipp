@@ -468,6 +468,11 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         method = controls.get_nonparametric_method();
     }
     tools_eigen::check_if_in_unit_cube(data);
+    
+    if (controls.get_weights().size() == 0) {
+        controls.set_weights(Eigen::VectorXd::Ones(data.rows()));
+    }
+    
     bicop_->fit(tools_eigen::nan_omit(cut_and_rotate(data)), 
                 method,
                 controls.get_nonparametric_mult(),
