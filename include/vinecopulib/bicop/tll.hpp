@@ -35,7 +35,8 @@ private:
         const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
         const Eigen::Matrix<double, Eigen::Dynamic, 2> &x_data,
         const Eigen::Matrix2d &B,
-        std::string method);
+        std::string method,
+        const Eigen::VectorXd& weights);
 
     double calculate_infl(const size_t &n,
                           const double &f0,
@@ -43,7 +44,8 @@ private:
                           const Eigen::Matrix2d &B,
                           const double &det_irB,
                           const Eigen::Matrix2d &S,
-                          const std::string &method);
+                          const std::string &method,
+                          const double& weight);
 
     void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
              std::string method, 

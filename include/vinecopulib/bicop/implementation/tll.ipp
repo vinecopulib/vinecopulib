@@ -73,13 +73,15 @@ inline Eigen::Matrix2d chol22(const Eigen::Matrix2d &B)
 //! @param B bandwidth matrix.
 //! @param method order of local polynomial approximation; either `"constant"`,
 //!   `"linear"`, or `"quadratic"`.
+//! @param weights vector of weights for the observations
 //! @return a two-column matrix; first column is estimated density, second
 //!    column is influence of evaluation point.
 inline Eigen::MatrixXd TllBicop::fit_local_likelihood(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &x_data,
     const Eigen::Matrix2d &B,
-    std::string method)
+    std::string method,
+    const Eigen::VectorXd& weights)
 {
     size_t m = x.rows();       // number of evaluation points
     size_t n = x_data.rows();  // number of observations
@@ -103,7 +105,8 @@ inline Eigen::MatrixXd TllBicop::fit_local_likelihood(
     Eigen::MatrixXd zz(n, 2), zz2(n, 2);
     for (size_t k = 0; k < m; ++k) {
         zz = z_data - z.row(k).replicate(n, 1);
-        kernels = gaussian_kernel_2d(zz) * det_irB;;
+        kernels = gaussian_kernel_2d(zz) * det_irB;
+        kernels = kernels.cwiseProduct(weights);
         f0 = kernels.mean();
         if (method != "constant") {
             zz = (irB * zz.transpose()).transpose();
@@ -126,7 +129,7 @@ inline Eigen::MatrixXd TllBicop::fit_local_likelihood(
             }
         }
         res(k, 0) *= f0;
-        res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method);
+        res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, weights(k));
     }
 
     return res;
@@ -140,7 +143,8 @@ inline double TllBicop::calculate_infl(const size_t &n,
                                        const Eigen::Matrix2d &B,
                                        const double &det_irB,
                                        const Eigen::Matrix2d &S,
-                                       const std::string &method)
+                                       const std::string &method,
+                                       const double& weight)
 {
     Eigen::MatrixXd M;
     if (method == "constant") {
@@ -195,7 +199,7 @@ inline double TllBicop::calculate_infl(const size_t &n,
     }
 
     double infl = gaussian_kernel_2d(Eigen::MatrixXd::Zero(1, 2))(0) * det_irB;
-    infl *= M.inverse()(0, 0) / static_cast<double>(n);
+    infl *= M.inverse()(0, 0) * weight / static_cast<double>(n);
     return infl;
 }
 
@@ -225,7 +229,7 @@ inline void TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     B *= mult;
 
     // compute the density estimator (first column estimate, second influence)
-    Eigen::MatrixXd ll_fit = fit_local_likelihood(z, z_data, B, method);
+    Eigen::MatrixXd ll_fit = fit_local_likelihood(z, z_data, B, method, weights);
 
     // transform density estimate to copula scale
     Eigen::VectorXd c =
