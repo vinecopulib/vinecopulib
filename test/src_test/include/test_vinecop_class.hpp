@@ -63,6 +63,12 @@ TEST_F(VinecopTest, getters_are_correct) {
             EXPECT_EQ(rot, 90);
         }
     }
+    
+    for (auto &tree : vinecop.get_all_taus()) {
+        for (auto &tau : tree) {
+            ASSERT_TRUE(fabs(tau) < 1e-4);
+        }
+    }
 }
 
 TEST_F(VinecopTest, pdf_is_correct) {

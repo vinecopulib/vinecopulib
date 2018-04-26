@@ -64,6 +64,8 @@ public:
     int get_rotation(size_t tree, size_t edge) const;
 
     Eigen::VectorXd get_parameters(size_t tree, size_t edge) const;
+    
+    double get_tau(size_t tree, size_t edge) const;
 
     Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
@@ -75,6 +77,8 @@ public:
     std::vector <std::vector<int>> get_all_rotations() const;
 
     std::vector <std::vector<Eigen::VectorXd>> get_all_parameters() const;
+    
+    std::vector <std::vector<double>> get_all_taus() const;
     
     // getter for the threshold
     double get_threshold() const;
