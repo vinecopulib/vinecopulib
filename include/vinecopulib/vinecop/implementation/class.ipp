@@ -369,7 +369,7 @@ inline Eigen::MatrixXd Vinecop::get_parameters(size_t tree, size_t edge) const
 //!
 //! @param tree tree index (starting with 0).
 //! @param edge edge index (starting with 0).
-double Vinecop::get_tau(size_t tree, size_t edge) const
+inline double Vinecop::get_tau(size_t tree, size_t edge) const
 {
     return get_pair_copula(tree, edge).get_tau();
 }
