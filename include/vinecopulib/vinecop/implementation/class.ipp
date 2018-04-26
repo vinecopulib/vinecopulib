@@ -360,7 +360,7 @@ inline std::vector <std::vector<int>> Vinecop::get_all_rotations() const
 //!
 //! @param tree tree index (starting with 0).
 //! @param edge edge index (starting with 0).
-inline Eigen::VectorXd Vinecop::get_parameters(size_t tree, size_t edge) const
+inline Eigen::MatrixXd Vinecop::get_parameters(size_t tree, size_t edge) const
 {
     return get_pair_copula(tree, edge).get_parameters();
 }
@@ -379,10 +379,10 @@ double Vinecop::get_tau(size_t tree, size_t edge) const
 //!
 //! @return a nested std::vector with entry `[t][e]` corresponding to
 //! edge `e` in tree `t`.
-inline std::vector <std::vector<Eigen::VectorXd>>
+inline std::vector <std::vector<Eigen::MatrixXd>>
 Vinecop::get_all_parameters() const
 {
-    std::vector <std::vector<Eigen::VectorXd>>
+    std::vector <std::vector<Eigen::MatrixXd>>
         parameters(pair_copulas_.size());
     for (size_t tree = 0; tree < parameters.size(); ++tree) {
         parameters[tree].resize(d_ - 1 - tree);

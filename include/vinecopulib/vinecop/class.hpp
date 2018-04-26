@@ -63,7 +63,7 @@ public:
 
     int get_rotation(size_t tree, size_t edge) const;
 
-    Eigen::VectorXd get_parameters(size_t tree, size_t edge) const;
+    Eigen::MatrixXd get_parameters(size_t tree, size_t edge) const;
     
     double get_tau(size_t tree, size_t edge) const;
 
@@ -76,7 +76,7 @@ public:
 
     std::vector <std::vector<int>> get_all_rotations() const;
 
-    std::vector <std::vector<Eigen::VectorXd>> get_all_parameters() const;
+    std::vector <std::vector<Eigen::MatrixXd>> get_all_parameters() const;
     
     std::vector <std::vector<double>> get_all_taus() const;
     
