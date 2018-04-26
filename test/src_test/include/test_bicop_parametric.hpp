@@ -38,8 +38,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct) {
             throw std::runtime_error("error in system call");
         }
 
-        Eigen::VectorXd par = bicop_.get_parameters();
-        auto absdiff = fabs(bicop_.parameters_to_tau(par) - results(0, 0));
+        auto absdiff = fabs(bicop_.get_tau() - results(0, 0));
         ASSERT_TRUE(absdiff < 1e-4) << bicop_.str();
 
         // Get u-data
