@@ -106,8 +106,9 @@ const
 {
     tools_eigen::check_if_in_unit_cube(u);
     Eigen::VectorXd f = bicop_->pdf(cut_and_rotate(u));
-    f = f.unaryExpr([](const double x) { return std::min(x, 1e16); });
-    return f;
+    return tools_eigen::unaryExpr_or_nan(f, [](const double& x) { 
+        return std::max(DBL_MIN, std::min(x, DBL_MAX));
+    });
 }
 
 //! evaluates the copula distribution.
