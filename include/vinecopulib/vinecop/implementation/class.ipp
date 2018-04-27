@@ -360,19 +360,29 @@ inline std::vector <std::vector<int>> Vinecop::get_all_rotations() const
 //!
 //! @param tree tree index (starting with 0).
 //! @param edge edge index (starting with 0).
-inline Eigen::VectorXd Vinecop::get_parameters(size_t tree, size_t edge) const
+inline Eigen::MatrixXd Vinecop::get_parameters(size_t tree, size_t edge) const
 {
     return get_pair_copula(tree, edge).get_parameters();
 }
+
+//! extracts the Kendall's \f$ tau \f$ of a pair copula.
+//!
+//! @param tree tree index (starting with 0).
+//! @param edge edge index (starting with 0).
+inline double Vinecop::get_tau(size_t tree, size_t edge) const
+{
+    return get_pair_copula(tree, edge).get_tau();
+}
+
 
 //! extracts the parameters of all pair copulas.
 //!
 //! @return a nested std::vector with entry `[t][e]` corresponding to
 //! edge `e` in tree `t`.
-inline std::vector <std::vector<Eigen::VectorXd>>
+inline std::vector <std::vector<Eigen::MatrixXd>>
 Vinecop::get_all_parameters() const
 {
-    std::vector <std::vector<Eigen::VectorXd>>
+    std::vector <std::vector<Eigen::MatrixXd>>
         parameters(pair_copulas_.size());
     for (size_t tree = 0; tree < parameters.size(); ++tree) {
         parameters[tree].resize(d_ - 1 - tree);
@@ -382,6 +392,23 @@ Vinecop::get_all_parameters() const
     }
 
     return parameters;
+}
+
+//! extracts the Kendall's \f$ tau \f$s of all pair copulas.
+//!
+//! @return a nested std::vector with entry `[t][e]` corresponding to
+//! edge `e` in tree `t`.
+inline std::vector <std::vector<double>> Vinecop::get_all_taus() const
+{
+    std::vector <std::vector<double>> taus(pair_copulas_.size());
+    for (size_t tree = 0; tree < taus.size(); ++tree) {
+        taus[tree].resize(d_ - 1 - tree);
+        for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
+            taus[tree][edge] = get_tau(tree, edge);
+        }
+    }
+
+    return taus;
 }
 
 //! extracts the structure matrix of the vine copula model.

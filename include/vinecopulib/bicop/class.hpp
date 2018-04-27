@@ -45,6 +45,8 @@ public:
     int get_rotation() const;
 
     Eigen::MatrixXd get_parameters() const;
+    
+    double get_tau() const;
 
     void set_rotation(int rotation);
 

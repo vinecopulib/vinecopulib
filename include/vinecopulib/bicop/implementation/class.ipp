@@ -391,6 +391,11 @@ inline Eigen::MatrixXd Bicop::get_parameters() const
     return bicop_->get_parameters();
 }
 
+inline double Bicop::get_tau() const
+{
+    return parameters_to_tau(bicop_->get_parameters());
+}
+
 inline void Bicop::set_rotation(int rotation)
 {
     check_rotation(rotation);
