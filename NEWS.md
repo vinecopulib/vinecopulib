@@ -1,3 +1,22 @@
+# vinecopulib 0.2.8 (May 2, 2018)
+
+NEW FEATURES
+
+   * new getters for Kendall's tau (#319).
+
+BUG FIXES
+   
+   * fix truncation of pdf values (#320).
+   
+   * use increased search interval for parameter estimation when initial fit is 
+     unreasonable (#322).
+     
+   * ensure that boundaries are respected for Joe's `hinv` methods (#323).
+
+   * improve numerical stability by more restrictive parameter bounds for Joe 
+     and BB7 copulas (#324, #325). 
+
+
 # vinecopulib 0.2.7 (March 1, 2018)
 
 NEW FEATURES
