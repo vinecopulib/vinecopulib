@@ -18,6 +18,7 @@ namespace vinecopulib {
 inline Bicop::Bicop()
 {
     bicop_ = AbstractBicop::create();
+    bicop_->set_loglik();
     rotation_ = 0;
 }
 
@@ -31,6 +32,7 @@ inline Bicop::Bicop(BicopFamily family, int rotation,
                     const Eigen::MatrixXd &parameters)
 {
     bicop_ = AbstractBicop::create(family, parameters);
+    bicop_->set_loglik();
     // family must be set before checking the rotation
     set_rotation(rotation);
 }
@@ -392,6 +394,11 @@ inline Eigen::MatrixXd Bicop::get_parameters() const
     return bicop_->get_parameters();
 }
 
+inline double Bicop::get_loglik() const
+{
+    return bicop_->get_loglik();
+}
+
 inline double Bicop::get_tau() const
 {
     return parameters_to_tau(bicop_->get_parameters());
@@ -401,11 +408,13 @@ inline void Bicop::set_rotation(int rotation)
 {
     check_rotation(rotation);
     rotation_ = rotation;
+    bicop_->set_loglik();
 }
 
 inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters)
 {
     bicop_->set_parameters(parameters);
+    bicop_->set_loglik();
 }
 //! @}
 

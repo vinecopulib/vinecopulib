@@ -48,6 +48,8 @@ public:
     
     double get_tau() const;
 
+    double get_loglik() const;
+
     void set_rotation(int rotation);
 
     void set_parameters(const Eigen::MatrixXd &parameters);

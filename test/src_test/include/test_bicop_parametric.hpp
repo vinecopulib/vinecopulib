@@ -119,6 +119,7 @@ TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct) {
     if (needs_check_) {
         auto data = bicop_.simulate(get_n());
         auto bicop = Bicop(data, controls);
+        EXPECT_EQ(bicop.loglik(data), bicop.get_loglik());
 
         //std::cout << bicop_.str() << std::endl;
         //std::cout << bicop.str() << std::endl;

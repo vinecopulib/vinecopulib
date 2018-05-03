@@ -58,6 +58,7 @@ TEST_P(TrafokernelTest, trafo_kernel_eval_funcs) {
 
 TEST_P(TrafokernelTest, trafo_kernel_select) {
     auto newcop = Bicop(u, controls);
+    EXPECT_EQ(newcop.loglik(u), newcop.get_loglik());
     EXPECT_EQ(newcop.get_family(), BicopFamily::tll);
 }
 
