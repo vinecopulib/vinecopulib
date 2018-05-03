@@ -173,5 +173,13 @@ inline double qcondjoe(double *q, double *u, double *de)
             v += diff;
         }
     }
-    return (v);
+
+    // make sure that boundaries are respected
+    if (v <= 0) {
+        v = 1e-10;
+    } else if (v >= 1) {
+        v = 1 - 1e-10;
+    }
+    
+    return v;
 }
