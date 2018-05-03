@@ -47,7 +47,7 @@ inline Eigen::Matrix2d TllBicop::select_bandwidth(
     }
     double mcor = tools_stats::pairwise_mcor(x);
     double cor = tools_stats::pairwise_cor(x);
-    double scale = std::pow(std::fabs(cor / mcor), mcor);
+    double scale = std::pow(std::fabs(cor / mcor), 0.5 * mcor);
 
     return mult * cov * scale;
 }
