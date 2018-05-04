@@ -54,7 +54,7 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then cat ~/.R/Makevars; fi
 
   ### Common
-  - export R_PACKAGES='c("VineCopula")'
+  - export R_PACKAGES='c("RcppArmadilo", "VineCopula")'
   - sudo Rscript -e 'withCallingHandlers(install.packages('$R_PACKAGES', repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
   
 
