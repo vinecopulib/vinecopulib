@@ -256,6 +256,7 @@ TEST_F(VinecopTest, sparse_threshold_selection) {
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);
+    EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 
 TEST_F(VinecopTest, sparse_truncation_selection) {
@@ -266,6 +267,7 @@ TEST_F(VinecopTest, sparse_truncation_selection) {
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);
+    EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 
 TEST_F(VinecopTest, sparse_both_selection) {
@@ -276,5 +278,6 @@ TEST_F(VinecopTest, sparse_both_selection) {
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);
+    EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 }

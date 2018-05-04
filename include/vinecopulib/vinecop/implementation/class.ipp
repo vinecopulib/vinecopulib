@@ -31,6 +31,7 @@ inline Vinecop::Vinecop(size_t d)
 
     // pair_copulas_ empty = everything independence 
     threshold_ = 0.0;
+    loglik_ = 0;
 }
 
 //! creates a vine copula with structure specified by an R-vine matrix; all
@@ -46,6 +47,7 @@ inline Vinecop::Vinecop(
     vine_matrix_ = RVineMatrix(matrix, check_matrix);
     // pair_copulas_ empty = everything independence
     threshold_ = 0.0;
+    loglik_ = 0;
 }
 
 //! creates an arbitrary vine copula model.
@@ -82,6 +84,7 @@ inline Vinecop::Vinecop(const std::vector <std::vector<Bicop>> &pair_copulas,
     vine_matrix_ = RVineMatrix(matrix, check_matrix);
     pair_copulas_ = pair_copulas;
     threshold_ = 0.0;
+    loglik_ = 0;
 }
 
 //! creates from a boost::property_tree::ptree object
@@ -114,6 +117,9 @@ inline Vinecop::Vinecop(boost::property_tree::ptree input, bool check_matrix)
             pair_copulas_[tree][edge] = Bicop(pc_node);
         }
     }
+
+    threshold_ = 0;
+    loglik_ = 0;
 }
 
 //! creates from a JSON file
@@ -238,6 +244,7 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
         selector.select_all_trees(data);
     }
     threshold_ = selector.get_threshold();
+    loglik_ = selector.get_loglik();
     vine_matrix_ = selector.get_rvine_matrix();
     pair_copulas_ = selector.get_pair_copulas();
 }
@@ -259,6 +266,7 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
         selector.select_all_trees(data);
     }
     threshold_ = selector.get_threshold();
+    loglik_ = selector.get_loglik();
     pair_copulas_ = selector.get_pair_copulas();
 }
 
@@ -416,6 +424,12 @@ inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
 Vinecop::get_matrix() const
 {
     return vine_matrix_.get_matrix();
+}
+
+//! extracts the log-likelihood (zero when model not fitted to data).
+inline double Vinecop::get_loglik() const
+{
+    return loglik_;
 }
 
 //! extracts the threshold (usually zero except `select_threshold == TRUE` in
