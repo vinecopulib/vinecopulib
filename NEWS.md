@@ -3,7 +3,9 @@
 NEW FEATURES
 
    * new getters for Kendall's tau (#319).
-
+   
+   * log-likelihood computed and saved as part of the fits (#327).
+ 
 BUG FIXES
    
    * fix truncation of pdf values (#320).
