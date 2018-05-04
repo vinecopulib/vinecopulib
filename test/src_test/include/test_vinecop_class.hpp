@@ -69,6 +69,8 @@ TEST_F(VinecopTest, getters_are_correct) {
             ASSERT_TRUE(fabs(tau) < 1e-4);
         }
     }
+
+    EXPECT_ANY_THROW(vinecop.get_loglik());
 }
 
 TEST_F(VinecopTest, pdf_is_correct) {

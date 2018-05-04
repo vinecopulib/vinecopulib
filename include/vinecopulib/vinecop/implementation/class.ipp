@@ -31,7 +31,7 @@ inline Vinecop::Vinecop(size_t d)
 
     // pair_copulas_ empty = everything independence 
     threshold_ = 0.0;
-    loglik_ = 0;
+    loglik_ = NAN;
 }
 
 //! creates a vine copula with structure specified by an R-vine matrix; all
@@ -47,7 +47,7 @@ inline Vinecop::Vinecop(
     vine_matrix_ = RVineMatrix(matrix, check_matrix);
     // pair_copulas_ empty = everything independence
     threshold_ = 0.0;
-    loglik_ = 0;
+    loglik_ = NAN;
 }
 
 //! creates an arbitrary vine copula model.
@@ -84,7 +84,7 @@ inline Vinecop::Vinecop(const std::vector <std::vector<Bicop>> &pair_copulas,
     vine_matrix_ = RVineMatrix(matrix, check_matrix);
     pair_copulas_ = pair_copulas;
     threshold_ = 0.0;
-    loglik_ = 0;
+    loglik_ = NAN;
 }
 
 //! creates from a boost::property_tree::ptree object
@@ -119,7 +119,7 @@ inline Vinecop::Vinecop(boost::property_tree::ptree input, bool check_matrix)
     }
 
     threshold_ = 0;
-    loglik_ = 0;
+    loglik_ = NAN;
 }
 
 //! creates from a JSON file
@@ -429,6 +429,9 @@ Vinecop::get_matrix() const
 //! extracts the log-likelihood (zero when model not fitted to data).
 inline double Vinecop::get_loglik() const
 {
+    if (std::isnan(loglik_)) {
+        throw std::runtime_error("copula has not been fitted from data ");
+    }
     return loglik_;
 }
 

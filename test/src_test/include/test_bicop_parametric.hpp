@@ -101,6 +101,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct) {
         EXPECT_TRUE(bicop_.hinv2(u.block(0, 0, 1, 2)).array().isNaN()(0))
                         << bicop_.str();
         EXPECT_NO_THROW(bicop_.loglik(u.block(0, 0, 10, 2))) << bicop_.str();
+        EXPECT_ANY_THROW(bicop_.get_loglik());
     }
 }
 

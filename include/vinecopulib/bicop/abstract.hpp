@@ -38,7 +38,7 @@ protected:
 
     double get_loglik() const;
 
-    void set_loglik(const double loglik = 0.0);
+    void set_loglik(const double loglik = NAN);
 
     virtual Eigen::MatrixXd get_parameters() const = 0;
 
