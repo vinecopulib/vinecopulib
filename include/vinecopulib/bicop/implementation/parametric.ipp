@@ -155,6 +155,9 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 
         // set the new parameters
         set_parameters(newpar);
+        set_loglik(pdf(temp_data).array().log().sum());
+    } else {
+        set_loglik(0.0);
     }
 }
 

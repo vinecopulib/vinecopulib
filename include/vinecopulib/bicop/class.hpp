@@ -20,9 +20,7 @@ class Bicop
 {
 public:
     // Constructors
-    Bicop();
-
-    Bicop(BicopFamily family, int rotation = 0,
+    Bicop(BicopFamily family = BicopFamily::indep, int rotation = 0,
           const Eigen::MatrixXd &parameters = Eigen::MatrixXd());
 
     Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
@@ -47,6 +45,8 @@ public:
     Eigen::MatrixXd get_parameters() const;
     
     double get_tau() const;
+
+    double get_loglik() const;
 
     void set_rotation(int rotation);
 

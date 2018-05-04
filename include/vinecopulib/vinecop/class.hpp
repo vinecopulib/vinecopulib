@@ -83,6 +83,9 @@ public:
     // getter for the threshold
     double get_threshold() const;
 
+    // getter for the loglik
+    double get_loglik() const;
+
     // Stats methods
     Eigen::VectorXd pdf(const Eigen::MatrixXd &u) const;
 
@@ -112,6 +115,7 @@ private:
     RVineMatrix vine_matrix_;
     std::vector <std::vector<Bicop>> pair_copulas_;
     double threshold_;
+    double loglik_;
 
     void check_data_dim(const Eigen::MatrixXd &data) const;
 

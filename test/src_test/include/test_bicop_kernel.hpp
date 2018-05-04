@@ -16,6 +16,7 @@ TEST_P(TrafokernelTest, trafo_kernel_sanity_checks) {
     EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0, 0, 30, 1)));
     EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0, 0, 1, 30)));
     EXPECT_ANY_THROW(bicop_.set_parameters(-1 * values));
+
 }
 
 TEST_P(TrafokernelTest, trafo_kernel_fit) {
@@ -38,6 +39,7 @@ TEST_P(TrafokernelTest, trafo_kernel_eval_funcs) {
     EXPECT_LE(bicop_.hinv2(u).maxCoeff(), 1.0);
     EXPECT_GE(bicop_.calculate_npars(), 0.0);
     EXPECT_LE(bicop_.calculate_npars(), 100.0);
+    EXPECT_EQ(bicop_.get_loglik(), bicop_.loglik(u));
 
     u(0, 0) = std::numeric_limits<double>::quiet_NaN();
     u(1, 1) = std::numeric_limits<double>::quiet_NaN();
@@ -58,6 +60,7 @@ TEST_P(TrafokernelTest, trafo_kernel_eval_funcs) {
 
 TEST_P(TrafokernelTest, trafo_kernel_select) {
     auto newcop = Bicop(u, controls);
+    EXPECT_EQ(newcop.loglik(u), newcop.get_loglik());
     EXPECT_EQ(newcop.get_family(), BicopFamily::tll);
 }
 

@@ -247,5 +247,6 @@ inline void TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     auto infl_grid = tools_interpolation::InterpolationGrid(grid_points, infl,
                                                             0);
     npars_ = infl_grid.interpolate(data).sum();
+    set_loglik(pdf(data).array().log().sum());
 }
 }
