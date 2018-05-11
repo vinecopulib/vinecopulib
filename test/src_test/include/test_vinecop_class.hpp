@@ -63,6 +63,14 @@ TEST_F(VinecopTest, getters_are_correct) {
             EXPECT_EQ(rot, 90);
         }
     }
+    
+    for (auto &tree : vinecop.get_all_taus()) {
+        for (auto &tau : tree) {
+            ASSERT_TRUE(fabs(tau) < 1e-4);
+        }
+    }
+
+    EXPECT_ANY_THROW(vinecop.get_loglik());
 }
 
 TEST_F(VinecopTest, pdf_is_correct) {
@@ -250,6 +258,7 @@ TEST_F(VinecopTest, sparse_threshold_selection) {
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);
+    EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 
 TEST_F(VinecopTest, sparse_truncation_selection) {
@@ -260,6 +269,7 @@ TEST_F(VinecopTest, sparse_truncation_selection) {
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);
+    EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 
 TEST_F(VinecopTest, sparse_both_selection) {
@@ -270,5 +280,6 @@ TEST_F(VinecopTest, sparse_both_selection) {
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);
+    EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 }
