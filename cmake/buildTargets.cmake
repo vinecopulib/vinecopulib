@@ -13,6 +13,8 @@ else()
             $<INSTALL_INTERFACE:include/vinecopulib>)
 endif()
 
+target_link_libraries(vinecopulib wdm)
+
 if(BUILD_TESTING)
     set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
     set(unit_tests
