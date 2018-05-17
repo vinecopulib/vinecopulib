@@ -37,6 +37,8 @@ inline FitControlsVinecop::FitControlsVinecop() : FitControlsBicop()
 //!     non-independence.
 //! @param preselect_families whether to exclude families before fitting
 //!     based on symmetry properties of the data.
+//! @param tree_criterion the criterion for selecting the maximum spanning
+//!     tree ("tau", "hoeffd", "rho", and "mcor" implemented so far).
 //! @param select_truncation_level whether the truncation shall be selected
 //!     automatically.
 //! @param select_threshold whether the threshold parameter shall be
