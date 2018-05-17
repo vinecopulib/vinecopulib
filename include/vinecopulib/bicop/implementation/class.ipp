@@ -491,10 +491,7 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     }
     tools_eigen::check_if_in_unit_cube(data);
     
-    if (controls.get_weights().size() == 0) {
-        controls.set_weights(Eigen::VectorXd::Ones(data.rows()));
-    }
-    
+    check_weight_size(controls.get_weights(), data);
     bicop_->fit(tools_eigen::nan_omit(cut_and_rotate(data)), 
                 method,
                 controls.get_nonparametric_mult(),
@@ -616,6 +613,14 @@ inline void Bicop::check_rotation(int rotation) const
             throw std::runtime_error("rotation must be 0 for the " +
                                      bicop_->get_family_name() + " copula");
         }
+    }
+}
+
+inline void Bicop::check_weight_size(const Eigen::VectorXd& weights,
+                                     const Eigen::MatrixXd& data) const
+{
+    if ((weights.size() > 0) & (weights.size() != data.rows())) {
+        throw std::runtime_error("sizes of weights and data don't match.");
     }
 }
 }

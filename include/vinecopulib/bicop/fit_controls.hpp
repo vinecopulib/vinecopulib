@@ -63,7 +63,7 @@ public:
     void set_selection_criterion(std::string selection_criterion);
     
     void set_weights(const Eigen::VectorXd& weights);
-
+    
     void set_preselect_families(bool preselect_families);
     
     void set_psi0(double psi0);

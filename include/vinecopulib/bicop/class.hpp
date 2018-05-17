@@ -111,6 +111,9 @@ private:
         const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
 
     void check_rotation(int rotation) const;
+    
+    void check_weight_size(const Eigen::VectorXd& weights, 
+                           const Eigen::MatrixXd& data) const;
 
     BicopPtr get_bicop() const;
 

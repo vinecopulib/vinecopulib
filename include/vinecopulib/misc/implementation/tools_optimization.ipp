@@ -129,13 +129,12 @@ inline double mle_objective(void *f_data, long n, const double *x)
     ++newdata->objective_calls;
     Eigen::Map<const Eigen::VectorXd> par(&x[0], n);
     newdata->bicop->set_parameters(par);
-<<<<<<< HEAD
-    return -(
-        newdata->bicop->pdf(newdata->U).array().log() * newdata->weights.array()
-    ).sum();
-=======
-    return -newdata->bicop->pdf(newdata->U).array().log().sum();
->>>>>>> dev
+    if (newdata->weights.size() > 0) {
+        return -(newdata->bicop->pdf(newdata->U).array().log() * 
+                    newdata->weights.array()).sum();
+    } else {
+        return -newdata->bicop->pdf(newdata->U).array().log().sum();
+    }
 }
 
 //! evaluates the objective function for profile maximum likelihood
@@ -150,13 +149,13 @@ inline double pmle_objective(void *f_data, long n, const double *x)
         par(i + 1) = x[i];
     }
     newdata->bicop->set_parameters(par);
-<<<<<<< HEAD
-    return -(
-        newdata->bicop->pdf(newdata->U).array().log() * newdata->weights.array()
-    ).sum();
-=======
-    return -newdata->bicop->pdf(newdata->U).array().log().sum();
->>>>>>> dev
+    if (newdata->weights.size() > 0) {
+        return -(newdata->bicop->pdf(newdata->U).array().log() * 
+                    newdata->weights.array()).sum();
+    } else {
+        return -newdata->bicop->pdf(newdata->U).array().log().sum();
+    }
+
 }
 
 //! @}

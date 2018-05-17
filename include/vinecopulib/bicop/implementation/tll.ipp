@@ -106,7 +106,8 @@ inline Eigen::MatrixXd TllBicop::fit_local_likelihood(
     for (size_t k = 0; k < m; ++k) {
         zz = z_data - z.row(k).replicate(n, 1);
         kernels = gaussian_kernel_2d(zz) * det_irB;
-        kernels = kernels.cwiseProduct(weights);
+        if (weights.size() > 0)
+            kernels = kernels.cwiseProduct(weights);
         f0 = kernels.mean();
         if (method != "constant") {
             zz = (irB * zz.transpose()).transpose();
@@ -129,7 +130,11 @@ inline Eigen::MatrixXd TllBicop::fit_local_likelihood(
             }
         }
         res(k, 0) *= f0;
-        res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, weights(k));
+        if (weights.size() > 0) {
+            res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, weights(k));
+        } else {
+            res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, 1.0);
+        }
     }
 
     return res;
