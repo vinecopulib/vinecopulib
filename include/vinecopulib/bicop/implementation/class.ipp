@@ -275,8 +275,8 @@ Bicop::simulate(const int &n) const
 //! where \f$ c \f$ is the copula density pdf().
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
-inline double
-Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u = Eigen::MatrixXd()) const
+inline double Bicop::loglik(
+    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u = Eigen::MatrixXd()) const
 {
     if (u.rows() < 1) {
         return get_loglik();
@@ -531,14 +531,29 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
 
             // Compute the selection criterion
             double new_criterion;
+            double ll = cop.get_loglik();
             if (controls.get_selection_criterion() == "loglik") {
-                new_criterion = -cop.get_loglik();
+                new_criterion = -ll;
             } else if (controls.get_selection_criterion() == "aic") {
-                new_criterion = cop.aic(data);
-            } else if (controls.get_selection_criterion() == "bic") {
-                new_criterion = cop.bic(data);
+                new_criterion = -2 * ll + 2 * cop.calculate_npars();
             } else {
-                new_criterion = cop.mbic(data, controls.get_psi0());
+                double n_eff = static_cast<double>(data.rows());
+                if (controls.get_weights().size() > 0) {
+                    n_eff = std::pow(controls.get_weights().sum(), 2);
+                    n_eff /= controls.get_weights().array().pow(2).sum();
+                }
+                double npars = this->calculate_npars();
+                // BIC
+                new_criterion = -2 * ll + log(n_eff) * npars;
+                if (controls.get_selection_criterion() == "mbic") {
+                    // correction for mBIC
+                    bool is_indep = (this->get_family() == BicopFamily::indep);
+                    double psi0 = controls.get_psi0();
+                    double log_prior = 
+                        static_cast<double>(!is_indep) * log(psi0) +
+                        static_cast<double>(is_indep) * log(1.0 - psi0);
+                    new_criterion -= 2 * log_prior;
+                }
             }
 
             // the following block modifies thread-external variables
