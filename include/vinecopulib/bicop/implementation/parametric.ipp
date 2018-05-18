@@ -9,6 +9,7 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <iostream>
 #include <vinecopulib/misc/tools_bobyqa.hpp>
+#include <wdm/eigen.hpp>
 
 namespace vinecopulib {
 inline Eigen::MatrixXd ParBicop::get_parameters() const
@@ -73,7 +74,7 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         }
 
         auto temp_data = data;
-        double tau = tools_stats::pairwise_tau(temp_data);
+        double tau = wdm::wdm(temp_data, "tau")(0, 1);
         auto newpar = get_start_parameters(tau);
         if (npars > 0) {
             // Set bounds and starting values

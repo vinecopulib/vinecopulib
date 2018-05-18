@@ -9,9 +9,9 @@
 #include <vinecopulib/misc/tools_parallel.hpp>
 
 #include <cmath>
-#include <boost/graph/prim_minimum_spanning_tree.hpp>
-
 #include <iostream>
+#include <boost/graph/prim_minimum_spanning_tree.hpp>
+#include <wdm/eigen.hpp>
 
 namespace vinecopulib {
 
@@ -30,14 +30,10 @@ inline double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>
         tools_eigen::nan_omit(data);
     double freq = static_cast<double>(data_no_nan.rows()) / static_cast<double>(data.rows());
     if (data_no_nan.rows() > 10) {
-        if (tree_criterion == "tau") {
-            w = tools_stats::pairwise_tau(data_no_nan);
-        } else if (tree_criterion == "hoeffd") {
-            w = tools_stats::pairwise_hoeffd(data_no_nan);
-        } else if (tree_criterion == "rho") {
-            w = tools_stats::pairwise_cor(data_no_nan);
-        } else if (tree_criterion == "mcor") {
+        if (tree_criterion == "mcor") {
             w = tools_stats::pairwise_mcor(data_no_nan);
+        } else {
+            w = wdm::wdm(data_no_nan, tree_criterion)(0, 1);
         }
     }
 

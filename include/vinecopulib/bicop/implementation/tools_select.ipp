@@ -7,12 +7,13 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <cmath>
+#include <wdm/eigen.hpp>
 
 namespace vinecopulib {
 namespace tools_select {
 //! returns only those rotations that yield the appropriate
 //! association direction.
-//! @param data captured by reference to avoid data copies b/c of pairwise_tau;
+//! @param data captured by reference to avoid data copies;
 //!     should NOT be modified though.
 inline std::vector <Bicop> create_candidate_bicops(
     Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
@@ -21,7 +22,7 @@ inline std::vector <Bicop> create_candidate_bicops(
     std::vector <BicopFamily> families = get_candidate_families(controls);
 
     // check whether dependence is negative or positive
-    double tau = tools_stats::pairwise_tau(data);
+    double tau = wdm::wdm(data, "tau")(0, 1);
     std::vector<int> which_rotations;
     if (tau > 0) {
         which_rotations = {0, 180};
@@ -127,12 +128,12 @@ inline std::vector<double> get_c1c2(
     if (count1 == 0) {
         c1 = 0.0;
     } else {
-        c1 = pairwise_cor(z1.block(0, 0, count1 - 1, 2));
+        c1 = wdm::wdm(z1.block(0, 0, count1 - 1, 2), "cor")(0, 1);
     }
     if (count2 == 0) {
         c2 = 0.0;
     } else {
-        c2 = pairwise_cor(z2.block(0, 0, count2 - 1, 2));
+        c2 = wdm::wdm(z2.block(0, 0, count2 - 1, 2), "cor")(0, 1);
     }
 
     return {c1, c2};

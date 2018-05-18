@@ -7,6 +7,7 @@
 #include <vinecopulib/bicop/family.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
+#include <wdm/eigen.hpp>
 
 namespace vinecopulib {
 inline TllBicop::TllBicop()
@@ -46,7 +47,7 @@ inline Eigen::Matrix2d TllBicop::select_bandwidth(
         mult = 1.5 * std::pow(n, -1.0 / (2.0 * degree + 1.0));
     }
     double mcor = tools_stats::pairwise_mcor(x);
-    double cor = tools_stats::pairwise_cor(x);
+    double cor = wdm::wdm(x, "cor")(0, 1);
     double scale = std::pow(std::fabs(cor / mcor), 0.5 * mcor);
 
     return mult * cov * scale;
