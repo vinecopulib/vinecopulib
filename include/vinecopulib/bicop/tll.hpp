@@ -29,7 +29,8 @@ private:
 
     Eigen::Matrix2d select_bandwidth(
         const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
-        std::string method);
+        std::string method,
+        const Eigen::VectorXd& weights);
 
     Eigen::MatrixXd fit_local_likelihood(
         const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,

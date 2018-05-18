@@ -22,7 +22,7 @@ inline std::vector <Bicop> create_candidate_bicops(
     std::vector <BicopFamily> families = get_candidate_families(controls);
 
     // check whether dependence is negative or positive
-    double tau = wdm::wdm(data, "tau")(0, 1);
+    double tau = wdm::wdm(data, "tau", controls.get_weights())(0, 1);
     std::vector<int> which_rotations;
     if (tau > 0) {
         which_rotations = {0, 180};
@@ -43,7 +43,7 @@ inline std::vector <Bicop> create_candidate_bicops(
 
     // remove combinations based on symmetry characteristics
     if (controls.get_preselect_families()) {
-        preselect_candidates(new_bicops, data, tau);
+        preselect_candidates(new_bicops, data, tau, controls.get_weights());
     }
 
     return new_bicops;
@@ -77,9 +77,10 @@ get_candidate_families(const FitControlsBicop &controls)
 //! of the data.
 inline void preselect_candidates(std::vector <Bicop> &bicops,
                                  const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                                 double tau)
+                                 double tau,
+                                 const Eigen::VectorXd& weights)
 {
-    auto c = get_c1c2(data, tau);
+    auto c = get_c1c2(data, tau, weights);
     bicops.erase(
         std::remove_if(
             bicops.begin(),
@@ -91,7 +92,9 @@ inline void preselect_candidates(std::vector <Bicop> &bicops,
 }
 
 inline std::vector<double> get_c1c2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data, double tau)
+    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data, 
+    double tau,
+    const Eigen::VectorXd& weights)
 {
     using namespace tools_stats;
     size_t n = data.rows();
@@ -128,12 +131,12 @@ inline std::vector<double> get_c1c2(
     if (count1 == 0) {
         c1 = 0.0;
     } else {
-        c1 = wdm::wdm(z1.block(0, 0, count1 - 1, 2), "cor")(0, 1);
+        c1 = wdm::wdm(z1.block(0, 0, count1 - 1, 2), "cor", weights)(0, 1);
     }
     if (count2 == 0) {
         c2 = 0.0;
     } else {
-        c2 = wdm::wdm(z2.block(0, 0, count2 - 1, 2), "cor")(0, 1);
+        c2 = wdm::wdm(z2.block(0, 0, count2 - 1, 2), "cor", weights)(0, 1);
     }
 
     return {c1, c2};

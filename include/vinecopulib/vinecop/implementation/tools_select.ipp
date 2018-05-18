@@ -22,8 +22,10 @@ using namespace tools_stl;
 //! Calculate criterion for tree selection
 //! @param data observations.
 //! @param tree_criterion the criterion.
+//! @param weights vector of weights for each observation (can be empty).
 inline double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-                                  std::string tree_criterion)
+                                  std::string tree_criterion,
+                                  const Eigen::VectorXd& weights)
 {
     double w = 0.0;
     Eigen::Matrix<double, Eigen::Dynamic, 2> data_no_nan =
@@ -33,7 +35,7 @@ inline double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>
         if (tree_criterion == "mcor") {
             w = tools_stats::pairwise_mcor(data_no_nan);
         } else {
-            w = wdm::wdm(data_no_nan, tree_criterion)(0, 1);
+            w = wdm::wdm(data_no_nan, tree_criterion, weights)(0, 1);
         }
     }
 
@@ -43,8 +45,10 @@ inline double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>
 //! Calculates maximal criterion for tree selection.
 //! @param data observations.
 //! @param tree_criterion the criterion.
+//! @param weights vector of weights for each observation (can be empty).
 inline Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
-                                                  std::string tree_criterion)
+                                                  std::string tree_criterion,
+                                                  const Eigen::VectorXd& weights)
 {
     size_t n = data.rows();
     size_t d = data.cols();
@@ -55,7 +59,7 @@ inline Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
         for (size_t j = 0; j < i; ++j) {
             pair_data.col(0) = data.col(i);
             pair_data.col(1) = data.col(j);
-            mat(i, j) = calculate_criterion(pair_data, tree_criterion);
+            mat(i, j) = calculate_criterion(pair_data, tree_criterion, weights);
             mat(j, i) = mat(i, j);
         }
     }
@@ -135,10 +139,12 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         // initialize threshold with maximum pairwise |tau| (all pairs get
         // thresholded)
         auto tree_crit = controls_.get_tree_criterion();
-        auto pairwise_crits = calculate_criterion_matrix(data, tree_crit);
+        auto crits = calculate_criterion_matrix(data, 
+                                                tree_crit, 
+                                                controls_.get_weights());
         for (size_t i = 1; i < d_; ++i) {
             for (size_t j = 0; j < i; ++j) {
-                thresholded_crits.push_back(pairwise_crits(i, j));
+                thresholded_crits.push_back(crits(i, j));
             }
         }
         // this is suboptimal for fixed structures, because several
@@ -324,7 +330,9 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
             // (-1 means 'no common neighbor')
             if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                 auto pc_data = get_pc_data(v0, v1, vine_tree);
-                double crit = calculate_criterion(pc_data, tree_criterion);
+                double crit = calculate_criterion(pc_data, 
+                                                  tree_criterion,
+                                                  controls_.get_weights());
                 double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
                 {
                     std::lock_guard<std::mutex> lk(m);
@@ -497,7 +505,9 @@ inline void FamilySelector::add_allowed_edges(VineTree &vine_tree)
                 EdgeIterator e;
                 pc_data = get_pc_data(v0, v1, vine_tree);
                 e = boost::add_edge(v0, v1, w, vine_tree).first;
-                double crit = calculate_criterion(pc_data, tree_criterion);
+                double crit = calculate_criterion(pc_data, 
+                                                  tree_criterion,
+                                                  controls_.get_weights());
                 vine_tree[e].weight = w;
                 vine_tree[e].crit = crit;
             }

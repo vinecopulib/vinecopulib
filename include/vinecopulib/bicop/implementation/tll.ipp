@@ -26,13 +26,15 @@ inline Eigen::VectorXd TllBicop::gaussian_kernel_2d(
 //! times appropriate factor).
 inline Eigen::Matrix2d TllBicop::select_bandwidth(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
-    std::string method
+    std::string method,
+    const Eigen::VectorXd& weights
 )
 {
     size_t n = x.rows();
-    Eigen::Matrix<double, Eigen::Dynamic, 2> centered =
-        x.rowwise() - x.colwise().mean();
-    Eigen::Matrix2d cov = (centered.adjoint() * centered) / double(n - 1);
+    double cor = wdm::wdm(x, "cor", weights)(0, 1);
+    Eigen::Matrix2d cov = Eigen::MatrixXd::Identity(2, 2);
+    cov(0, 1) = cor;
+    cov(1, 0) = cor;
 
     double mult;
     if (method == "constant") {
@@ -47,7 +49,6 @@ inline Eigen::Matrix2d TllBicop::select_bandwidth(
         mult = 1.5 * std::pow(n, -1.0 / (2.0 * degree + 1.0));
     }
     double mcor = tools_stats::pairwise_mcor(x);
-    double cor = wdm::wdm(x, "cor")(0, 1);
     double scale = std::pow(std::fabs(cor / mcor), 0.5 * mcor);
 
     return mult * cov * scale;
@@ -231,7 +232,7 @@ inline void TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     Eigen::Matrix<double, Eigen::Dynamic, 2> z_data = tools_stats::qnorm(data);
 
     // find bandwidth matrix
-    Eigen::Matrix2d B = select_bandwidth(z_data, method);
+    Eigen::Matrix2d B = select_bandwidth(z_data, method, weights);
     B *= mult;
 
     // compute the density estimator (first column estimate, second influence)
