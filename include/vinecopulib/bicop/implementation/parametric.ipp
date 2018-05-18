@@ -57,33 +57,36 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                           double, 
                           const Eigen::VectorXd& weights)
 {
-    if (family_ != BicopFamily::indep) {
-        using namespace tools_optimization;
+    if (family_ == BicopFamily::indep) {
+        // almost nothing to do
+        set_loglik(0.0);
+        return;
+    }
+    
+    using namespace tools_optimization;
+    std::vector <std::string> methods = {"itau", "mle"};
+    if (!tools_stl::is_member(method, methods)) {
+        throw std::runtime_error("Method not implemented.");
+    }
 
-        std::vector <std::string> methods = {"itau", "mle"};
-        if (!tools_stl::is_member(method, methods)) {
-            throw std::runtime_error("Method not implemented.");
+    int npars = static_cast<int>(calculate_npars());
+    if (method == "itau") {
+        npars = npars - 1;
+        if ((npars > 0) & (family_ != BicopFamily::student)) {
+            throw std::runtime_error(
+                "itau method is not available for this family.");
         }
+    }
 
-        int npars = static_cast<int>(calculate_npars());
-        if (method == "itau") {
-            npars = npars - 1;
-            if ((npars > 0) & (family_ != BicopFamily::student)) {
-                throw std::runtime_error(
-                    "itau method is not available for this family.");
-            }
-        }
-
-        auto temp_data = data;
-        double tau = wdm::wdm(temp_data, "tau", weights)(0, 1);
-        auto newpar = get_start_parameters(tau);
+    double tau = wdm::wdm(data, "tau", weights)(0, 1);
+    auto newpar = get_start_parameters(tau);
+    
+    if (npars > 0) {
         // Set bounds and starting values
         auto lb = get_parameters_lower_bounds();
         auto ub = get_parameters_upper_bounds();
 
-        // ensure that starting values are sufficiently separated from
-        // ensure that starting values are sufficiently separated from
-        // bounds
+        // ensure that starting values are sufficiently separated from bounds
         double sign = 1.0;
         if (tau < 0)
             sign = -1.0;
@@ -93,8 +96,13 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
             tau = 0.9 * sign;
         }
         auto initial_parameters = get_start_parameters(tau);
-        ParBicopOptData my_data = {temp_data, this, initial_parameters(0),
-                                   0, weights, 0};
+        ParBicopOptData my_data = {
+            data,
+            this,
+            initial_parameters(0), 
+            0, 
+            weights, 
+        0};
         std::function<double(void *, long, const double *)> objective =
             mle_objective;
         if (method == "itau") {
@@ -104,29 +112,28 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
             ub(0) = get_parameters_upper_bounds()(1);
             initial_parameters = newpar.tail(1);
             if (family_ == BicopFamily::student) {
-                // the df parameter doesn't need to be estimated as
-                // accurately
+                // the df parameter doesn't need to be estimated as accurately
                 ub(0) = 15;
             }
             objective = pmle_objective;
         }
-        
+            
         // refine search interval for Brent algorithm        
         if (tools_stl::is_member(family_, bicop_families::one_par)) {
             auto lb2 = lb;
             auto ub2 = ub;
             if (tools_stl::is_member(family_, bicop_families::rotationless)) {
-                lb = tau_to_parameters(std::max(std::fabs(tau)-0.1, 1e-10));
-                ub = tau_to_parameters(std::min(std::fabs(tau)+0.1, 0.95));
+                lb = tau_to_parameters(std::max(std::fabs(tau) - 0.1, 1e-10));
+                ub = tau_to_parameters(std::min(std::fabs(tau) + 0.1, 0.95));
             } else {
-                lb = tau_to_parameters(std::max(tau-0.1, -0.99));
-                ub = tau_to_parameters(std::min(tau+0.1, 0.99));                    
+                lb = tau_to_parameters(std::max(tau - 0.1, -0.99));
+                ub = tau_to_parameters(std::min(tau + 0.1, 0.99));                    
             }
             // make sure that parameter bounds are respected
             lb = lb2.cwiseMax(lb);
             ub = ub2.cwiseMin(ub);
         }
-        
+            
         // create optimizer
         Optimizer optimizer(npars, lb, ub);
 
@@ -154,10 +161,17 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
             newpar = optimized_parameters;
         }
         // set the new parameters
-        set_parameters(newpar);
         set_loglik(-my_data.objective_min);
-    } else {
-        set_loglik(0.0);
+    }
+    set_parameters(newpar);
+    
+    if (npars == 0) {
+        // loglik has not been computed
+        if (weights.size() > 0) {
+            set_loglik((pdf(data).array().log() * weights.array()).sum());
+        } else {
+            set_loglik(pdf(data).array().log().sum());
+        }
     }
 }
 
