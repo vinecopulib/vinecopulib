@@ -115,7 +115,7 @@ protected:
     
     void initialize_new_fit(const Eigen::MatrixXd &data);
 
-    void set_current_fit_as_opt();
+    void set_current_fit_as_opt(const double& loglik);
 
     
     virtual void add_allowed_edges(VineTree &tree) = 0;

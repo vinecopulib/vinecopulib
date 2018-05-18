@@ -175,6 +175,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         // helper variables for checking whether an optimum was found
         double mbicv = 0.0;
         double mbicv_trunc = 0.0;
+        double loglik = 0.0;
 
         for (size_t t = 0; t < d_ - 1; ++t) {
             if (controls_.get_truncation_level() < t) {
@@ -205,26 +206,25 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
                 // mbicv did not improve, truncate
                 controls_.set_truncation_level(t);
                 set_tree_to_indep(t);
-                set_current_fit_as_opt();
+                set_current_fit_as_opt(loglik);
                 if (!controls_.get_select_threshold()) {
-                    // if threshold is fixed, no need to go further
-                    needs_break = true;
+                    needs_break = true;  // fixed threshold, no need to continue
                 }
             } else {
                 mbicv = mbicv_trunc;
-                loglik_ += loglik_tree;
+                loglik += loglik_tree;
             }
         }
 
         if (controls_.get_show_trace()) {
             std::cout << "--> mbicv = " << mbicv
-                << ", loglik = " << loglik_ << std::endl << std::endl;
+                << ", loglik = " << loglik << std::endl << std::endl;
         }
 
 
         // check whether mbicv-optimal model has been found
         if (mbicv == 0.0) {
-            set_current_fit_as_opt();
+            set_current_fit_as_opt(loglik);
             if (!controls_.get_select_threshold()) {
                 // threshold is fixed, optimal truncation level has been found
                 needs_break = true;
@@ -234,7 +234,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             needs_break = true;
         } else {
             // optimum hasn't been found
-            set_current_fit_as_opt();
+            set_current_fit_as_opt(loglik);
             mbicv_opt = mbicv;
             // while loop is only for threshold selection
             needs_break = needs_break | !controls_.get_select_threshold();
@@ -615,7 +615,12 @@ inline double VinecopSelector::get_mbicv_of_tree(size_t t, double loglik)
     double log_prior = 
         static_cast<double>(non_indeps) * std::log(psi0) +
         static_cast<double>(indeps) * std::log(1.0 - psi0);
-    return -2 * loglik + std::log(n_) * npars - 2 * log_prior;    
+        double n_eff = static_cast<double>(n_);
+        if (controls_.get_weights().size() > 0) {
+            n_eff = std::pow(controls_.get_weights().sum(), 2);
+            n_eff /= controls_.get_weights().array().pow(2).sum();
+        }
+    return -2 * loglik + std::log(n_eff) * npars - 2 * log_prior;    
 }
 
 
@@ -683,13 +688,13 @@ inline std::vector<double> VinecopSelector::get_thresholded_crits()
 inline void VinecopSelector::initialize_new_fit(const Eigen::MatrixXd &data)
 {
     trees_[0] = make_base_tree(data);
-    loglik_ = 0;
 }
 
-inline void VinecopSelector::set_current_fit_as_opt()
+inline void VinecopSelector::set_current_fit_as_opt(const double& loglik)
 {
     threshold_ = controls_.get_threshold();
     trees_opt_ = trees_;
+    loglik_ = loglik;
 }
 
 //! Create base tree of the vine
