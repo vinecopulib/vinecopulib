@@ -196,12 +196,18 @@ TEST_F(VinecopTest, works_multi_threaded) {
     Vinecop fit1(u, controls);
     controls.set_num_threads(2);
     Vinecop fit2(u, controls);
+    
     // check for equality in likelihood, since the pair copulas may be stored
     // in a different order when running in parallel
-    EXPECT_NEAR(fit1.get_loglik(), fit2.get_loglik(), 1e-2);
+    EXPECT_NEAR(fit1.loglik(u), fit2.loglik(u), 1e-2);
     
+    // check if parallel evaluators have same output as single threaded ones
+    EXPECT_EQ(fit2.pdf(u, 2), fit2.pdf(u));
+    EXPECT_EQ(fit2.inverse_rosenblatt(u, 2), fit2.inverse_rosenblatt(u));
+
     //just check that it works 
-    fit2.simulate(999, 2);
+    fit2.simulate(2, 4);
+    fit2.cdf(u, 100, 2);
 }
 
 TEST_F(VinecopTest, select_finds_right_structure) {
