@@ -31,11 +31,12 @@ TEST(test_weights, allows_nans) {
 }
 
 TEST(test_weights, works_in_bicop_select) {
+    // if half of the weights are zero
     auto u = tools_stats::simulate_uniform(200, 2);
     Eigen::VectorXd w = Eigen::VectorXd::Zero(200);
     w.head(100) = Eigen::VectorXd::Ones(100);
     
-    FitControlsBicop controls;
+    FitControlsBicop controls(bicop_families::parametric);
     auto cop_uw = Bicop(u.block(0, 0, 100, 2), controls);
     controls.set_weights(w);
     auto cop_w = Bicop(u, controls);
@@ -44,16 +45,19 @@ TEST(test_weights, works_in_bicop_select) {
 }
 
 TEST(test_weights, works_in_vinecop_select) {
+    // if half of the weights are zero
     auto u = tools_stats::simulate_uniform(200, 7);
     Eigen::VectorXd w = Eigen::VectorXd::Zero(200);
     w.head(100) = Eigen::VectorXd::Ones(100);
     
-    FitControlsBicop controls;
+    FitControlsBicop controls(bicop_families::parametric);
     auto cop_uw = Vinecop(u.block(0, 0, 100, 7), controls);
     controls.set_weights(w);
     auto cop_w = Vinecop(u, controls);
     EXPECT_EQ(cop_uw.get_all_families(), cop_w.get_all_families());
     EXPECT_EQ(cop_uw.get_all_parameters(), cop_w.get_all_parameters());
+    
+    
 }
 
 }
