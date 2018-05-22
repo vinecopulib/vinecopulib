@@ -13,8 +13,6 @@ else()
             $<INSTALL_INTERFACE:include/vinecopulib>)
 endif()
 
-target_link_libraries(vinecopulib wdm)
-
 if(BUILD_TESTING)
     set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
     set(unit_tests
@@ -94,6 +92,7 @@ endif()
 #   * include/vinecopulib/bicop/*.hpp -> <prefix>/include/vinecopulib/bicop/*.hpp
 #   * include/vinecopulib/vinecop/*.hpp -> <prefix>/include/vinecopulib/vinecop/*.hpp
 #   * include/vinecopulib/misc/*.hpp -> <prefix>/include/vinecopulib/misc/*.hpp
+#   * wdm/include/*.hpp -> <prefix>/include/vinecopulib/wdm/*.hpp
 install(
         FILES ${main_hpp}
         DESTINATION "${include_install_dir}"
@@ -113,6 +112,14 @@ install(
 install(
         FILES ${misc_hpp}
         DESTINATION "${include_install_dir}/vinecopulib/misc"
+)
+install(
+        FILES ${wdm_main}
+        DESTINATION "${include_install_dir}/vinecopulib/wdm"
+)
+install(
+        FILES ${wdm_hpp}
+        DESTINATION "${include_install_dir}/vinecopulib/wdm/wdm"
 )
 if (NOT VINECOPULIB_SHARED_LIB)
     install(

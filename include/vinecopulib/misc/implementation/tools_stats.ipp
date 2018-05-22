@@ -6,7 +6,7 @@
 
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <unsupported/Eigen/FFT>
-#include <wdm/eigen.hpp>
+#include <vinecopulib/wdm/wdm/eigen.hpp>
 
 namespace vinecopulib {
 

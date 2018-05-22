@@ -5,7 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <wdm/eigen.hpp>
+#include <vinecopulib/wdm/wdm/eigen.hpp>
 
 namespace vinecopulib {
 inline KernelBicop::KernelBicop()

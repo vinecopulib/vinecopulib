@@ -11,7 +11,7 @@
 #include <cmath>
 #include <iostream>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
-#include <wdm/eigen.hpp>
+#include <vinecopulib/wdm/wdm/eigen.hpp>
 
 namespace vinecopulib {
 

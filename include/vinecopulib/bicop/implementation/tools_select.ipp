@@ -7,7 +7,7 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <cmath>
-#include <wdm/eigen.hpp>
+#include <vinecopulib/wdm/wdm/eigen.hpp>
 
 namespace vinecopulib {
 namespace tools_select {
