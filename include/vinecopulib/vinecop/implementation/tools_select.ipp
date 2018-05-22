@@ -6,7 +6,7 @@
 
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <vinecopulib/misc/tools_parallel.hpp>
+#include <vinecopulib/misc/tools_thread.hpp>
 
 #include <cmath>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
@@ -340,9 +340,9 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
         }
     };
     
-    tools_parallel::map_on_pool(add_edge, 
-                                boost::vertices(vine_tree), 
-                                controls_.get_num_threads());
+    tools_thread::ThreadPool pool(controls_.get_num_threads());
+    for (const auto& v0 : boost::vertices(vine_tree))
+        pool.push(add_edge, v0);
 }
 
 inline void StructureSelector::finalize(size_t trunc_lvl)
@@ -877,9 +877,9 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
     // make sure that Bicop.select() doesn't spawn new threads
     size_t num_threads = controls_.get_num_threads();
     controls_.set_num_threads(1);
-    tools_parallel::map_on_pool(select_pc, 
-                                boost::edges(tree), 
-                                num_threads);
+    tools_thread::ThreadPool pool(num_threads);
+    for (const auto& e : boost::edges(tree))
+        pool.push(select_pc, e);
     controls_.set_num_threads(num_threads);
 }
 

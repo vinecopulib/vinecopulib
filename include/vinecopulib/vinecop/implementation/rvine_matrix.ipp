@@ -5,7 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/misc/tools_stl.hpp>
-#include <vinecopulib/misc/tools_parallel.hpp>
+#include <vinecopulib/misc/tools_thread.hpp>
 
 namespace vinecopulib {
 //! instantiates an RVineMatrix object.
@@ -436,9 +436,10 @@ inline void RVineMatrix::complete_matrix(
                 }
             }
         };
-        tools_parallel::map_on_pool(complete_column, 
-                                    seq_int(0, d - t), 
-                                    num_threads);
+        
+        tools_thread::ThreadPool pool(num_threads);
+        for (size_t e0 = 0; e0 < d - t; e0++)
+            pool.push(complete_column, e0);
     }
 }
 }

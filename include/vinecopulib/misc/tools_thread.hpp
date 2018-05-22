@@ -13,7 +13,7 @@
 #include <condition_variable>
 #include <memory>
 
-namespace tools_parallel {
+namespace tools_thread {
 
 //! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool {
