@@ -89,11 +89,14 @@ public:
     // Stats methods
     Eigen::VectorXd pdf(const Eigen::MatrixXd &u) const;
 
-    Eigen::VectorXd cdf(const Eigen::MatrixXd &u, const size_t N = 1e4) const;
+    Eigen::VectorXd cdf(const Eigen::MatrixXd &u, 
+                        size_t N = 1e4,
+                        size_t num_threads = 1) const;
 
-    Eigen::MatrixXd simulate(size_t n) const;
+    Eigen::MatrixXd simulate(size_t n, size_t num_threads = 1) const;
 
-    Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd &u) const;
+    Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd &u, 
+                                       size_t num_threads = 1) const;
 
     // Fit statistics
     double calculate_npars() const;

@@ -120,7 +120,7 @@ TEST_F(VinecopTest, simulate_is_correct) {
     Vinecop vinecop(pair_copulas, model_matrix);
 
     // only check if it works
-    vinecop.simulate(10);  
+    vinecop.simulate(10);
     // check the underlying transformation from independent samples
     ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));    
 }
@@ -193,13 +193,15 @@ TEST_F(VinecopTest, works_multi_threaded) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_truncation_level(true);
     // controls.set_show_trace(true);
-    Vinecop fit1(7), fit2(7);
-    fit1.select_all(u, controls);
+    Vinecop fit1(u, controls);
     controls.set_num_threads(2);
-    fit2.select_all(u, controls);
+    Vinecop fit2(u, controls);
     // check for equality in likelihood, since the pair copulas may be stored
     // in a different order when running in parallel
-    EXPECT_NEAR(fit1.loglik(u), fit2.loglik(u), 1e-2);
+    EXPECT_NEAR(fit1.get_loglik(), fit2.get_loglik(), 1e-2);
+    
+    //just check that it works 
+    fit2.simulate(999, 2);
 }
 
 TEST_F(VinecopTest, select_finds_right_structure) {
