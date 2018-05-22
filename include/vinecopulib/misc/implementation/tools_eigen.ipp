@@ -26,7 +26,7 @@ inline void remove_nans(Eigen::MatrixXd &x)
     x.conservativeResize(last + 1, x.cols());
 }
 
-//! remove rows of a matrix which contain nan values
+//! remove rows of a matrix which contain nan values or have zero weight
 //! @param x the matrix.
 //! @param a vector of weights that is either empty or whose size is equal to
 //!   the number of columns of x.
@@ -35,12 +35,14 @@ inline void remove_nans(Eigen::MatrixXd &x, Eigen::VectorXd &weights)
     if ((weights.size() > 0) & (weights.size() != x.rows()))
         throw std::runtime_error("sizes of x and weights don't match.");
     
-    // if a row has nan, move it to the end
+    // if a row has nan or weight is zero, move it to the end
     size_t last = x.rows() - 1;
     for (size_t i = 0; i < last + 1; i++) {
         bool row_has_nan = x.row(i).array().isNaN().any();
-        if (weights.size() > 0)
+        if (weights.size() > 0) {
             row_has_nan = row_has_nan | (boost::math::isnan)(weights(i));
+            row_has_nan = row_has_nan | (weights(i) == 0.0);
+        }
         if (row_has_nan) {
             if (weights.size() > 0)
                 std::swap(weights(i), weights(last));

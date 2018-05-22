@@ -26,7 +26,8 @@ if(BUILD_TESTING)
             test_tools_bobyqa
             test_tools_stats
             test_vinecop_class
-            test_vinecop_sanity_checks)
+            test_vinecop_sanity_checks
+            test_weights)
 
     add_subdirectory(test)
     file(GLOB_RECURSE r_scripts cmake/templates/*R)

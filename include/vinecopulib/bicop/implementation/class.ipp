@@ -496,7 +496,7 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     }
     tools_eigen::check_if_in_unit_cube(data);
     
-    check_weight_size(controls.get_weights(), data);
+    check_weights_size(controls.get_weights(), data);
     Eigen::MatrixXd data_no_nan = data;
     {
         auto w = controls.get_weights();
@@ -520,6 +520,7 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                           FitControlsBicop controls)
 {
     using namespace tools_select;
+    check_weights_size(controls.get_weights(), data);
     Eigen::MatrixXd data_no_nan = data;
     {
         auto w = controls.get_weights();
@@ -647,8 +648,8 @@ inline void Bicop::check_rotation(int rotation) const
     }
 }
 
-inline void Bicop::check_weight_size(const Eigen::VectorXd& weights,
-                                     const Eigen::MatrixXd& data) const
+inline void Bicop::check_weights_size(const Eigen::VectorXd& weights,
+                                      const Eigen::MatrixXd& data) const
 {
     if ((weights.size() > 0) & (weights.size() != data.rows())) {
         throw std::runtime_error("sizes of weights and data don't match.");
