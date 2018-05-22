@@ -14,6 +14,26 @@
 #include <memory>
 
 namespace tools_thread {
+    
+struct Batch {
+    size_t begin;
+    size_t size;
+};
+
+inline std::vector<Batch> create_batches(size_t num_tasks, size_t num_batches)
+{
+    std::vector<Batch> batches(num_batches);
+    size_t i = 0;
+    size_t k = 0;
+    size_t min_size = num_tasks / num_batches;
+    ptrdiff_t rem_size = num_tasks % num_batches;
+    while (i < num_tasks - 1) {
+        batches[k] = Batch{i, min_size + (rem_size-- > 0)};
+        i += batches[k++].size;
+    }
+    
+    return batches;
+}
 
 //! Implemenation of the thread pool pattern based on `Thread`.
 class ThreadPool {

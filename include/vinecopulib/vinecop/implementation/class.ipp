@@ -474,7 +474,7 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
     // points have to be reordered to correspond to natural order
     for (size_t j = 0; j < d; ++j)
         hfunc2.col(j) = u.col(revorder(j) - 1);
-        
+    
     size_t trunc_lvl = pair_copulas_.size();
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
         tools_interface::check_user_interrupt(n * d > 1e5);
@@ -717,7 +717,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u, size_t num_threads) const
     auto max_matrix = vine_matrix_.get_max_matrix();
     MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
     
-    auto do_batch = [&](size_t batch_begin, size_t batch_size) {
+    auto do_batch = [&](const tools_thread::Batch& batch) {
         if (d > 2) {
             // temporary storage objects for (inverse) h-functions
             Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> 
@@ -728,8 +728,8 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u, size_t num_threads) const
             // initialize with independent uniforms (corresponding to natural 
             // order)
             for (size_t j = 0; j < d; ++j) {
-                hinv2(d - j - 1, j) = u.block(batch_begin, revorder(j) - 1, 
-                                              batch_size, 1);
+                hinv2(d - j - 1, j) = u.block(batch.begin, revorder(j) - 1, 
+                                              batch.size, 1);
             }
             hfunc1(0, d - 1) = hinv2(0, d - 1);
 
@@ -745,7 +745,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u, size_t num_threads) const
                     Bicop edge_copula = get_pair_copula(tree, var);
 
                     // extract data for conditional pair
-                    Eigen::MatrixXd U_e(batch_size, 2);
+                    Eigen::MatrixXd U_e(batch.size, 2);
                     size_t m = max_matrix(tree, var);
                     U_e.col(0) = hinv2(tree + 1, var);
                     if (m == no_matrix(tree, var)) {
@@ -770,30 +770,19 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u, size_t num_threads) const
 
             // go back to original order
             for (size_t j = 0; j < d; j++) {
-                U_vine.block(batch_begin, j, batch_size, 1) = 
+                U_vine.block(batch.begin, j, batch.size, 1) = 
                     hinv2(0, inverse_order(j));
             }
         } else {
-            U_vine.block(batch_begin, 0, batch_size, 1) = 
+            U_vine.block(batch.begin, 0, batch.size, 1) = 
                 get_pair_copula(0, 0).hinv2(u);
         }
     };
     
-    std::vector<size_t> batch_begin(num_threads);
-    std::vector<size_t> batch_size(num_threads);
-    size_t i = 0;
-    size_t batch = 0;
-    size_t min_size = n / num_threads;
-    ptrdiff_t rem_size = n % num_threads;
-    while (i < n - 1) {
-        batch_begin[batch] = i;
-        batch_size[batch] = min_size + (rem_size-- > 0);
-        i += batch_size[batch++];
-    }
-    
     tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
-    for (size_t batch = 0; batch < num_threads; batch++) 
-        pool.push(do_batch, batch_begin[batch], batch_size[batch]);
+    auto batches = tools_thread::create_batches(n, num_threads);
+    for (const auto &batch : batches) 
+        pool.push(do_batch, batch);
     pool.join();
         
     return U_vine;
