@@ -112,8 +112,8 @@ private:
 
     void check_rotation(int rotation) const;
     
-    void check_weight_size(const Eigen::VectorXd& weights, 
-                           const Eigen::MatrixXd& data) const;
+    void check_weights_size(const Eigen::VectorXd& weights, 
+                            const Eigen::MatrixXd& data) const;
 
     BicopPtr get_bicop() const;
 
