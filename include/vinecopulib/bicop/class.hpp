@@ -78,7 +78,7 @@ public:
     void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
              FitControlsBicop controls = FitControlsBicop());
 
-    void select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+    void select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 FitControlsBicop controls = FitControlsBicop());
 
     // Fit statistics

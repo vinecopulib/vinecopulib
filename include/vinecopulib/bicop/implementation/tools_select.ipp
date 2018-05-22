@@ -16,7 +16,7 @@ namespace tools_select {
 //! @param data captured by reference to avoid data copies;
 //!     should NOT be modified though.
 inline std::vector <Bicop> create_candidate_bicops(
-    Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     const FitControlsBicop &controls)
 {
     std::vector <BicopFamily> families = get_candidate_families(controls);

@@ -281,7 +281,9 @@ inline double Bicop::loglik(
     if (u.rows() < 1) {
         return get_loglik();
     } else {
-        return pdf(tools_eigen::nan_omit(u)).array().log().sum();
+        Eigen::MatrixXd u_no_nan = u;
+        tools_eigen::remove_nans(u_no_nan);
+        return pdf(u_no_nan).array().log().sum();
     }
 }
 
@@ -310,7 +312,10 @@ Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 inline double
 Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 {
-    return -2 * loglik(u) + calculate_npars() * log(static_cast<double>(u.rows()));
+    Eigen::MatrixXd u_no_nan = u;
+    tools_eigen::remove_nans(u_no_nan);
+    double n = static_cast<double>(u_no_nan.rows());
+    return -2 * loglik(u_no_nan) + calculate_npars() * log(n);
 }
 
 //! calculates the modified Bayesian information criterion
@@ -492,7 +497,13 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     tools_eigen::check_if_in_unit_cube(data);
     
     check_weight_size(controls.get_weights(), data);
-    bicop_->fit(tools_eigen::nan_omit(cut_and_rotate(data)), 
+    Eigen::MatrixXd data_no_nan = data;
+    {
+        auto w = controls.get_weights();
+        tools_eigen::remove_nans(data_no_nan, w);
+        controls.set_weights(w);
+    }
+    bicop_->fit(cut_and_rotate(data_no_nan), 
                 method,
                 controls.get_nonparametric_mult(),
                 controls.get_weights());
@@ -505,19 +516,24 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
-inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
+inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                           FitControlsBicop controls)
 {
     using namespace tools_select;
-    data = tools_eigen::nan_omit(data);
-    tools_eigen::check_if_in_unit_cube(data);
+    Eigen::MatrixXd data_no_nan = data;
+    {
+        auto w = controls.get_weights();
+        tools_eigen::remove_nans(data_no_nan, w);
+        controls.set_weights(w);
+    }
+    tools_eigen::check_if_in_unit_cube(data_no_nan);
 
     bicop_ = AbstractBicop::create();
     rotation_ = 0;
     bicop_->set_loglik(0.0);
-    if (data.rows() >= 10) {
-        data = cut_and_rotate(data);
-        std::vector <Bicop> bicops = create_candidate_bicops(data, controls);
+    if (data_no_nan.rows() >= 10) {
+        data_no_nan = cut_and_rotate(data_no_nan);
+        std::vector <Bicop> bicops = create_candidate_bicops(data_no_nan, controls);
 
         // Estimate all models and select the best one using the
         // selection_criterion
@@ -527,7 +543,7 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
             tools_interface::check_user_interrupt();
 
             // Estimate the model
-            cop.fit(data, controls);
+            cop.fit(data_no_nan, controls);
 
             // Compute the selection criterion
             double new_criterion;
@@ -537,7 +553,7 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
             } else if (controls.get_selection_criterion() == "aic") {
                 new_criterion = -2 * ll + 2 * cop.calculate_npars();
             } else {
-                double n_eff = static_cast<double>(data.rows());
+                double n_eff = static_cast<double>(data_no_nan.rows());
                 if (controls.get_weights().size() > 0) {
                     n_eff = std::pow(controls.get_weights().sum(), 2);
                     n_eff /= controls.get_weights().array().pow(2).sum();

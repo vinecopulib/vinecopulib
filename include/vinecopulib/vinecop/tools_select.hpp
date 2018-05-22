@@ -32,7 +32,7 @@ namespace tools_select {
 
 double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
                            std::string tree_criterion,
-                           const Eigen::VectorXd& weights);
+                           Eigen::VectorXd weights);
 
 Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
                                            std::string tree_criterion,
