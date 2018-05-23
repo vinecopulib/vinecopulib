@@ -106,6 +106,10 @@ TEST_F(VinecopTest, cdf_is_correct) {
     // Test whether the analytic and simulated versions are "close" enough
     auto U = vinecop.simulate(10);
     ASSERT_TRUE(vinecop.cdf(U, 10000).isApprox(bicop.cdf(U), 1e-2));
+
+    // verify that qrng stuff works
+    Vinecop vinecop2(301);
+    vinecop.simulate(10, true);
 }
 
 TEST_F(VinecopTest, simulate_is_correct) {
@@ -122,7 +126,12 @@ TEST_F(VinecopTest, simulate_is_correct) {
     // only check if it works
     vinecop.simulate(10);  
     // check the underlying transformation from independent samples
-    ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));    
+    ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
+
+    // verify that qrng stuff works
+    vinecop.simulate(10, true);
+    Vinecop vinecop2(301);
+    vinecop.simulate(10, true);
 }
 
 TEST_F(VinecopTest, aic_bic_are_correct) {
