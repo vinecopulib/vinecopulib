@@ -112,6 +112,22 @@ TEST(test_tools_stats, ghalton_is_correct) {
 
 }
 
+TEST(test_tools_stats, seed_works) {
+
+    size_t d = 2;
+    size_t n = 10;
+    std::vector<int> v = {1, 2, 3};
+
+    auto U1 = tools_stats::simulate_uniform(n, d);
+    auto U2 = tools_stats::simulate_uniform(n, d);
+    auto U3 = tools_stats::simulate_uniform(n, d, v);
+
+    ASSERT_TRUE(U1.cwiseEqual(U2).all());
+    ASSERT_TRUE(U1.cwiseNotEqual(U3).all());
+
+
+}
+
 TEST(test_tools_stats, dpqnorm_are_nan_safe) {
     Eigen::VectorXd X = Eigen::VectorXd::Random(10);
     X(0) = std::numeric_limits<double>::quiet_NaN();

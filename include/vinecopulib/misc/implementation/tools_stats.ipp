@@ -16,20 +16,20 @@ namespace tools_stats {
 //!
 //! @param n number of observations.
 //! @param d dimension.
-//! @param seed seed of the random number generator.
+//! @param seeds seeds of the random number generator.
 //!
 //! @return An \f$ n \times d \f$ matrix of independent
 //! \f$ \mathrm{U}[0, 1] \f$ random variables.
 inline Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
-                                        const size_t& seed)
+                                        const std::vector<int>& seeds)
 {
     if ((n < 1) | (d < 1)) {
         throw std::runtime_error("both n and d must be at least 1.");
     }
 
     // initialize random engine and uniform distribution
-    std::default_random_engine generator;
-    generator.seed(seed);
+    std::seed_seq seq(seeds.begin(), seeds.end());
+    std::mt19937 generator(seq);
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
     Eigen::MatrixXd U(n, d);

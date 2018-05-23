@@ -72,7 +72,7 @@ public:
     hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
 
     Eigen::Matrix<double, Eigen::Dynamic, 2>
-    simulate(const size_t &n, const size_t& seed = 0) const;
+    simulate(const size_t &n, const std::vector<int>& seeds =  {1, 2, 3, 4}) const;
 
 
     // Methods modifying the family/rotation/parameters

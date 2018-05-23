@@ -91,7 +91,7 @@ inline Eigen::MatrixXd qt(const Eigen::MatrixXd &x, double nu)
 }
 
 Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
-                                 const size_t& bla = 1);
+                                 const std::vector<int>& seeds =  {1, 2, 3, 4});
 
 Eigen::VectorXd to_pseudo_obs_1d(Eigen::VectorXd x,
                                  std::string ties_method = "average");
