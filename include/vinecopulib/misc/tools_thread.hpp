@@ -20,22 +20,20 @@ struct Batch {
     size_t size;
 };
 
-inline std::vector<Batch> create_batches(size_t num_tasks, size_t num_batches)
+inline std::vector<Batch> create_batches(size_t num_tasks, size_t num_threads)
 {
-    std::vector<Batch> batches(num_batches);
-    size_t i = 0;
-    size_t k = 0;
-    size_t min_size = num_tasks / num_batches;
-    ptrdiff_t rem_size = num_tasks % num_batches;
-    while (i < num_tasks - 1) {
+    std::vector<Batch> batches(std::min(num_tasks, num_threads));
+    size_t min_size = num_tasks / num_threads;
+    ptrdiff_t rem_size = num_tasks % num_threads;
+    for (size_t i = 0, k = 0; i < num_tasks; k++) {
         batches[k] = Batch{i, min_size + (rem_size-- > 0)};
-        i += batches[k++].size;
+        i += batches[k].size;
     }
     
     return batches;
 }
 
-//! Implemenation of the thread pool pattern based on `Thread`.
+//! Implementation of the thread pool pattern based on `std::thread`.
 class ThreadPool {
 public:
 
@@ -44,7 +42,8 @@ public:
     ThreadPool(const ThreadPool&) = delete;
 
     //! constructs a thread pool with `nThreads` threads.
-    //! @param nThreads number of threads to create.
+    //! @param nThreads number of threads to create; 0 means that all work
+    //!   pushed to the pool will be done sequentially in the main thread.
     ThreadPool(size_t nThreads) : num_busy_(0), stopped_(false)
     {
         for (size_t t = 0; t < nThreads; t++) {
@@ -65,7 +64,7 @@ public:
                     if (jobs_.empty())
                         continue;
 
-                    // take job from the queue
+                    // take job from the queue and signal that worker is busy
                     std::function<void()> job = std::move(jobs_.front());
                     jobs_.pop();
                     num_busy_++;
