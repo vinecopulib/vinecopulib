@@ -71,7 +71,8 @@ public:
     Eigen::VectorXd
     hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
 
-    Eigen::Matrix<double, Eigen::Dynamic, 2> simulate(const int &n) const;
+    Eigen::Matrix<double, Eigen::Dynamic, 2>
+    simulate(const size_t &n, const size_t& seed = 0) const;
 
 
     // Methods modifying the family/rotation/parameters

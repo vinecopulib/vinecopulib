@@ -90,7 +90,8 @@ inline Eigen::MatrixXd qt(const Eigen::MatrixXd &x, double nu)
     return tools_eigen::unaryExpr_or_nan(x, f);
 }
 
-Eigen::MatrixXd simulate_uniform(size_t n, size_t d);
+Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
+                                 const size_t& bla = 1);
 
 Eigen::VectorXd to_pseudo_obs_1d(Eigen::VectorXd x,
                                  std::string ties_method = "average");

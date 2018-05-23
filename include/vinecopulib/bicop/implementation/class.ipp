@@ -259,12 +259,14 @@ const
 //! simulates from a bivariate copula.
 //!
 //! @param n number of observations.
+//! @param seed seed of the random number generator.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2>
-Bicop::simulate(const int &n) const
+Bicop::simulate(const size_t& n, const size_t& seed) const
 {
     Eigen::Matrix<double, Eigen::Dynamic, 2> U =
-        tools_stats::simulate_uniform(n, 2);
+        tools_stats::simulate_uniform(n, 2, seed);
+
     // use inverse Rosenblatt transform to generate a sample from the copula
     U.col(1) = hinv1(U);
     return U;
