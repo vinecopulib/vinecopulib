@@ -405,8 +405,14 @@ inline void RVineMatrix::complete_matrix(
 {
     using namespace tools_stl;
     size_t d = mat.cols();
+
+    // the row indices
+    std::vector<size_t> rows(d) ;
+    std::iota(std::begin(rows), std::end(rows), 0);
+
     // there are max d-2 off-diagonal entries in each column
     for (size_t t = t_start; t < d - 1; ++t) {
+
         // for each column, get all indices it already contains
         std::vector <std::vector<size_t>> all_indices(d - t);
         std::vector <size_t> tmp(t);
@@ -438,8 +444,8 @@ inline void RVineMatrix::complete_matrix(
         };
         
         tools_thread::ThreadPool pool(num_threads);
-        for (size_t e0 = 0; e0 < d - t; e0++)
-            pool.push(complete_column, e0);
+        pool.map(complete_column, rows);
+        rows.pop_back();
     }
 }
 }
