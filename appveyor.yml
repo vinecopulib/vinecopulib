@@ -40,7 +40,7 @@ install:
   - cd vinecopulib
 
 build_script:
-  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:/Libraries/boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255" -DWDM_DIR=C:/projects/wdm-install/lib/cmake/wdm'
+  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:/Libraries/boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255" -DCMAKE_PREFIX_PATH=C:/projects/wdm-install/lib/cmake'
 
   - md build_header_only
   - md build_shared_libs
