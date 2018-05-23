@@ -63,7 +63,7 @@ install:
   - cd wdm
   - mkdir build
   - cd build
-  - cmake .. -DBUILD_TESTING=OFF & sudo make install
+  - cmake .. & sudo make install
   - cd ../..
 
 script:
