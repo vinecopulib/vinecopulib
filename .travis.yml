@@ -57,7 +57,14 @@ install:
   ### Common
   - export R_PACKAGES='c("VineCopula")'
   - sudo Rscript -e 'withCallingHandlers(install.packages('$R_PACKAGES', repos="http://cran.rstudio.com/"), warning=function(x) { message(x); quit(status=1, save="no") })'
-  
+
+  ## Install wdm
+  - git clone https://github.com/tnagler/wdm.git
+  - cd wdm
+  - mkdir build
+  - cd build
+  - cmake .. -DBUILD_TESTING=OFF & sudo make install
+  - cd ../..
 
 script:
   - mkdir release

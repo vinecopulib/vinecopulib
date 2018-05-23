@@ -28,10 +28,19 @@ install:
   - 7z x eigen.zip -o"C:\projects" -y > nul
 
   - cd ..
+  - git clone https://github.com/tnagler/wdm.git
+  - cd wdm
+  - mkdir build
+  - cd build
+  - cmake .. -DBOOST_ROOT=C:/Libraries/boost_1_63_0 -DBUILD_TESTING=OFF -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\wdm-install
+  - set path_orig=%path%
+  - cmake --build . --config Release --target install
+  - cd ../..
+
   - cd vinecopulib
 
 build_script:
-  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:/Libraries/boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255"'
+  - ps: $env:CMAKE_ARGS = '-DBOOST_ROOT=C:/Libraries/boost_1_63_0 -DEIGEN3_INCLUDE_DIR="C:\projects\eigen-eigen-da9b4e14c255" -DWDM_ROOT=C:\projects\wdm-install'
 
   - md build_header_only
   - md build_shared_libs
