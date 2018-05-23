@@ -139,7 +139,7 @@ inline double FitControlsBicop::get_nonparametric_mult() const
     return nonparametric_mult_;
 }
 
-inline size_t FitControlsBicop::get_num_threads()
+inline size_t FitControlsBicop::get_num_threads() const
 {
     return num_threads_;
 }

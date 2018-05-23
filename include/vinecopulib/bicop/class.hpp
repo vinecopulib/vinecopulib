@@ -20,15 +20,16 @@ class Bicop
 {
 public:
     // Constructors
-    Bicop(BicopFamily family = BicopFamily::indep, int rotation = 0,
+    Bicop(const BicopFamily family = BicopFamily::indep,
+          const int rotation = 0,
           const Eigen::MatrixXd &parameters = Eigen::MatrixXd());
 
-    Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-          FitControlsBicop controls = FitControlsBicop());
+    Bicop(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+          const FitControlsBicop controls = FitControlsBicop());
 
     Bicop(const char *filename);
 
-    Bicop(boost::property_tree::ptree input);
+    Bicop(const boost::property_tree::ptree input);
 
     // Serialize
     boost::property_tree::ptree to_ptree() const;
@@ -48,7 +49,7 @@ public:
 
     double get_loglik() const;
 
-    void set_rotation(int rotation);
+    void set_rotation(const int rotation);
 
     void set_parameters(const Eigen::MatrixXd &parameters);
 
@@ -77,10 +78,10 @@ public:
 
     // Methods modifying the family/rotation/parameters
     void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-             FitControlsBicop controls = FitControlsBicop());
+             const FitControlsBicop controls = FitControlsBicop());
 
-    void select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                FitControlsBicop controls = FitControlsBicop());
+    void select(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+                const FitControlsBicop controls = FitControlsBicop());
 
     // Fit statistics
     double loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;

@@ -20,7 +20,7 @@ namespace vinecopulib {
 //!     (for Independence, Gaussian, Student, Frank, and nonparametric
 //!     families, only 0 is allowed).
 //! @param parameters the copula parameters.
-inline Bicop::Bicop(BicopFamily family, int rotation,
+inline Bicop::Bicop(const BicopFamily family, const int rotation,
                     const Eigen::MatrixXd &parameters)
 {
     bicop_ = AbstractBicop::create(family, parameters);
@@ -37,8 +37,8 @@ inline Bicop::Bicop(BicopFamily family, int rotation,
 //! equivalent to `Bicop cop; cop.select(data, controls)`.
 //! @param data see select().
 //! @param controls see select().
-inline Bicop::Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                    FitControlsBicop controls)
+inline Bicop::Bicop(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+                    const FitControlsBicop controls)
 {
     select(data, controls);
 }
@@ -46,7 +46,7 @@ inline Bicop::Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
 //! creates from a boost::property_tree::ptree object
 //! @param input the boost::property_tree::ptree object to convert from
 //! (see to_ptree() for the structure of the input).
-inline Bicop::Bicop(boost::property_tree::ptree input) :
+inline Bicop::Bicop(const boost::property_tree::ptree input) :
     Bicop(
         get_family_enum(input.get<std::string>("family")),
         input.get<int>("rotation"),
@@ -411,7 +411,7 @@ inline double Bicop::get_tau() const
     return parameters_to_tau(bicop_->get_parameters());
 }
 
-inline void Bicop::set_rotation(int rotation)
+inline void Bicop::set_rotation(const int rotation)
 {
     check_rotation(rotation);
     rotation_ = rotation;
@@ -482,7 +482,7 @@ inline BicopPtr Bicop::get_bicop() const
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
 inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                       FitControlsBicop controls)
+                       const FitControlsBicop controls)
 {
     std::string method;
     if (tools_stl::is_member(bicop_->get_family(),
@@ -503,19 +503,19 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
-inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                          FitControlsBicop controls)
+inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+                          const FitControlsBicop controls)
 {
     using namespace tools_select;
-    data = tools_eigen::nan_omit(data);
-    tools_eigen::check_if_in_unit_cube(data);
+    auto newdata = tools_eigen::nan_omit(data);
+    tools_eigen::check_if_in_unit_cube(newdata);
 
     bicop_ = AbstractBicop::create();
     rotation_ = 0;
     bicop_->set_loglik(0.0);
-    if (data.rows() >= 10) {
-        data = cut_and_rotate(data);
-        std::vector <Bicop> bicops = create_candidate_bicops(data, controls);
+    if (newdata.rows() >= 10) {
+        newdata = cut_and_rotate(newdata);
+        std::vector <Bicop> bicops = create_candidate_bicops(newdata, controls);
 
         // Estimate all models and select the best one using the
         // selection_criterion
@@ -525,18 +525,18 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
             tools_interface::check_user_interrupt();
 
             // Estimate the model
-            cop.fit(data, controls);
+            cop.fit(newdata, controls);
 
             // Compute the selection criterion
             double new_criterion;
             if (controls.get_selection_criterion() == "loglik") {
                 new_criterion = -cop.get_loglik();
             } else if (controls.get_selection_criterion() == "aic") {
-                new_criterion = cop.aic(data);
+                new_criterion = cop.aic(newdata);
             } else if (controls.get_selection_criterion() == "bic") {
-                new_criterion = cop.bic(data);
+                new_criterion = cop.bic(newdata);
             } else {
-                new_criterion = cop.mbic(data, controls.get_psi0());
+                new_criterion = cop.mbic(newdata, controls.get_psi0());
             }
 
             // the following block modifies thread-external variables
