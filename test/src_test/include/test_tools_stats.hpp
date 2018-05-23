@@ -82,7 +82,7 @@ TEST(test_tools_stats, dependence_matrix_works) {
     EXPECT_ANY_THROW(tools_stats::dependence_matrix(u, "other"));
 }
 
-TEST(test_tools_stats, ghalton_is_correct) {
+TEST(test_tools_stats, qrng_are_correct) {
 
     size_t d = 2;
     size_t n = 10;
@@ -91,9 +91,10 @@ TEST(test_tools_stats, ghalton_is_correct) {
     auto cop = Bicop(BicopFamily::gaussian);
     auto u = cop.simulate(n);
     auto U = tools_stats::ghalton(N, d);
+    auto U1 = tools_stats::sobol(N, d);
     auto U2 = tools_stats::simulate_uniform(N, d);
 
-    Eigen::VectorXd x(N), p(n), x2(N), p2(n);
+    Eigen::VectorXd x(N), p(n), p1(N), x2(N), p2(n);
     p2 = Eigen::VectorXd::Zero(n);
     for (size_t i = 0; i < n; i++) {
         auto f = [i, u](const double &u1, const double &u2) {
@@ -101,12 +102,16 @@ TEST(test_tools_stats, ghalton_is_correct) {
         };
         x = U.col(0).binaryExpr(cop.hinv1(U), f);
         p(i) = x.sum() / N;
+        x = U1.col(0).binaryExpr(cop.hinv1(U1), f);
+        p1(i) = x.sum() / N;
         x2 = U2.col(0).binaryExpr(cop.hinv1(U2), f);
         p2(i) = x2.sum() / N;
     }
 
-    if (p2.isApprox(cop.cdf(u), 1e-2)) {
-        ASSERT_TRUE(p.isApprox(cop.cdf(u), 1e-2));
+    x = cop.cdf(u);
+    if (p2.isApprox(x, 1e-2)) {
+        ASSERT_TRUE(p.isApprox(x, 1e-2));
+        ASSERT_TRUE(p1.isApprox(x, 1e-2));
     }
 
 
