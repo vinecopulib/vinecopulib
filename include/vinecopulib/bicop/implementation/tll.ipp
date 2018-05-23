@@ -7,7 +7,7 @@
 #include <vinecopulib/bicop/family.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
-#include <vinecopulib/wdm/wdm/eigen.hpp>
+#include <wdm/eigen.hpp>
 
 namespace vinecopulib {
 inline TllBicop::TllBicop()
