@@ -345,9 +345,8 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
             }
         }
     };
-    
-    for (const auto& v0 : boost::vertices(vine_tree))
-        pool_->push(add_edge, v0);
+
+    pool_->map(add_edge, boost::vertices(vine_tree));
     pool_->wait();
 }
 
@@ -883,8 +882,7 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
     // make sure that Bicop.select() doesn't spawn new threads
     size_t num_threads = controls_.get_num_threads();
     controls_.set_num_threads(1);
-    for (const auto& e : boost::edges(tree))
-        pool_->push(select_pc, e);
+    pool_->map(select_pc, boost::edges(tree));
     pool_->wait();
     controls_.set_num_threads(num_threads);
 }
