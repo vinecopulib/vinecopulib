@@ -514,15 +514,15 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
 inline Eigen::VectorXd
 Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N) const
 {
-    tools_eigen::check_if_in_unit_cube(u);
-    check_data_dim(u);
-    if (d_ > 360) {
+    if (d_ > 21201) {
         std::stringstream message;
         message << "cumulative distribution available for models of " <<
-                "dimension 360 or less. This model's dimension: " << d_
+                "dimension 21201 or less. This model's dimension: " << d_
                 << std::endl;
         throw std::runtime_error(message.str().c_str());
     }
+    tools_eigen::check_if_in_unit_cube(u);
+    check_data_dim(u);
 
     size_t d = u.cols();
     size_t n = u.rows();
@@ -535,7 +535,12 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N) const
     }
 
     // Simulate N quasi-random numbers from the vine model
-    auto U = tools_stats::ghalton(N, d);
+    Eigen::MatrixXd U(N, d);
+    if (d > 300) {
+        U = tools_stats::sobol(N, d);
+    } else {
+        U = tools_stats::ghalton(N, d);
+    }
     U = inverse_rosenblatt(U);
 
     // Alternative: simulate N pseudo-random numbers from the vine model
@@ -557,10 +562,23 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N) const
 //! simulates from a vine copula model, see inverse_rosenblatt().
 //!
 //! @param n number of observations.
-inline Eigen::MatrixXd Vinecop::simulate(const size_t n,
+//! @param qrng set to true for quasi-random numbers.
+//! @param seed seed of the random number generator.
+//! @return An \f$ n \times d \f$ matrix of samples from the copula model.
+inline Eigen::MatrixXd Vinecop::simulate(const size_t n, const bool qrng,
                                          const std::vector<int>& seeds) const
 {
-    Eigen::MatrixXd U = tools_stats::simulate_uniform(n, d_, seeds);
+    Eigen::MatrixXd U(n, d_);
+    if (qrng) {
+        if (d_ > 300) {
+            U = tools_stats::sobol(n, d_);
+        } else {
+            U = tools_stats::ghalton(n, d_);
+        }
+    } else {
+        U = tools_stats::simulate_uniform(n, d_, seeds);
+    }
+
     return inverse_rosenblatt(U);
 }
 
