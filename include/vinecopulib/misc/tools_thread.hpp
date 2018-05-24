@@ -101,7 +101,7 @@ public:
     template<class F, class... Args>
     auto push(F&& f, Args&&... args) -> std::future<decltype(f(args...))>
     {
-        // create pacakged task on the heap to avoid stack overlows.
+        // create packaged task on the heap to avoid stack overflows.
         auto job = std::make_shared<std::packaged_task<decltype(f(args...))()>>(
             [&f, args...] { return f(args...); }
         );
@@ -151,6 +151,18 @@ public:
                     worker.join();
             }
         }
+    }
+
+    //! maps a function on a list of items, possibly running tasks in parallel.
+    //! @param f function to be mapped.
+    //! @param items an objects containing the items on which `f` shall be mapped;
+    //!     must allow for `auto` loops (i.e., `std::begin(I)`/`std::end(I)` must be
+    //!     defined).
+    template<class F, class I>
+    void map(F&& f, I &&items)
+    {
+        for (const auto &item : items)
+            push(f, item);
     }
 
 private:

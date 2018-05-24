@@ -511,10 +511,9 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
     };
     
     tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
-    auto batches = tools_thread::create_batches(n, num_threads);
-    for (const auto &batch : batches) 
-        pool.push(do_batch, batch);
-
+    pool.map(do_batch, tools_thread::create_batches(n, num_threads));
+    pool.join();
+        
     return vine_density;
 }
 
@@ -790,9 +789,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u, size_t num_threads) const
     };
     
     tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
-    auto batches = tools_thread::create_batches(n, num_threads);
-    for (const auto &batch : batches) 
-        pool.push(do_batch, batch);
+    pool.map(do_batch, tools_thread::create_batches(n, num_threads));
     pool.join();
         
     return U_vine;

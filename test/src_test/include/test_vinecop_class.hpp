@@ -179,7 +179,7 @@ TEST_F(VinecopTest, family_select_returns_pcs_in_right_order) {
         }
     }
     Vinecop vinecop(pair_copulas, model_matrix);
-    auto data = vinecop.simulate(10000);
+    auto data = vinecop.simulate(1000);
 
     auto controls = FitControlsVinecop(bicop_families::itau, "itau");
     // controls.set_show_trace(true);
@@ -192,7 +192,7 @@ TEST_F(VinecopTest, family_select_returns_pcs_in_right_order) {
 TEST_F(VinecopTest, works_multi_threaded) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_truncation_level(true);
-    // controls.set_show_trace(true);
+    
     Vinecop fit1(u, controls);
     controls.set_num_threads(2);
     Vinecop fit2(u, controls);
@@ -206,7 +206,7 @@ TEST_F(VinecopTest, works_multi_threaded) {
     EXPECT_EQ(fit2.inverse_rosenblatt(u, 2), fit2.inverse_rosenblatt(u));
 
     //just check that it works 
-    fit2.simulate(2, 4);
+    fit2.simulate(2, 3);
     fit2.cdf(u, 100, 2);
 }
 

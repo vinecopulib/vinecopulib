@@ -552,8 +552,7 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
         };
 
         tools_thread::ThreadPool pool(controls.get_num_threads());
-        for (const auto& candidate: bicops)
-            pool.push(fit_and_compare, candidate);
+        pool.map(fit_and_compare, bicops);
     }
 }
 
