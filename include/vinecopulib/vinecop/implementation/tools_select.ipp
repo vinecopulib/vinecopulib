@@ -284,7 +284,8 @@ inline double VinecopSelector::get_next_threshold(
     // pick threshold that changes at least alpha*100 % of the pair-copulas
     double alpha = 0.05;
     size_t m = thresholded_crits.size();
-    return thresholded_crits[std::ceil(static_cast<double>(m) * alpha) - 1];
+    double new_index = std::ceil(static_cast<double>(m) * alpha) - 1;
+    return thresholded_crits[static_cast<size_t>(new_index)];
 }
 
 
@@ -653,7 +654,7 @@ inline size_t VinecopSelector::get_num_non_indeps_of_tree(size_t t)
     size_t num_non_indeps = 0;
     // trees_[0] is base tree, see make_base_tree()
     for (const auto &e : boost::edges(trees_[t + 1])) {
-        num_non_indeps += static_cast<double>(trees_[t + 1][e].npars > 0);
+        num_non_indeps += static_cast<size_t>(trees_[t + 1][e].npars > 0);
     }
     return num_non_indeps;
 }

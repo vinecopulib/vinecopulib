@@ -265,7 +265,7 @@ TEST_F(VinecopTest, sparse_truncation_selection) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_truncation_level(true);
     // controls.set_show_trace(true);
-    u = tools_stats::simulate_uniform(1e2, 7);
+    u = tools_stats::simulate_uniform(100, 7);
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);

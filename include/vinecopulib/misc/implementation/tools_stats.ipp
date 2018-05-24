@@ -167,7 +167,7 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
     // default window size
     double n_dbl = static_cast<double>(n);
     if (wl == 0) {
-        wl = std::ceil(n_dbl/5);
+        wl = static_cast<size_t>(std::ceil(n_dbl/5));
     }
 
     // assign order/ranks to ind/ranks
