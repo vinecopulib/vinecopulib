@@ -88,14 +88,19 @@ public:
     double get_loglik() const;
 
     // Stats methods
-    Eigen::VectorXd pdf(const Eigen::MatrixXd &u) const;
+    Eigen::VectorXd pdf(const Eigen::MatrixXd &u, const size_t num_threads = 1) const;
 
-    Eigen::VectorXd cdf(const Eigen::MatrixXd &u, const size_t N = 1e4) const;
+    Eigen::VectorXd cdf(const Eigen::MatrixXd &u, 
+                        const size_t N = 1e4,
+                        const size_t num_threads = 1) const;
 
-    Eigen::MatrixXd simulate(const size_t n, const bool qrng = false,
+    Eigen::MatrixXd simulate(const size_t n, 
+                             const bool qrng = false, 
+                             const size_t num_threads = 1,
                              const std::vector<int>& seeds =  {1, 2, 3, 4}) const;
 
-    Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd &u) const;
+    Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd &u, 
+                                       const size_t num_threads = 1) const;
 
     // Fit statistics
     double calculate_npars() const;

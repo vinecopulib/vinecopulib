@@ -448,7 +448,11 @@ inline double Vinecop::get_threshold() const
 //! calculates the density function of the vine copula model.
 //!
 //! @param u \f$ n \times d \f$ matrix of evaluation points.
-inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
+//! @param num_threads the number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
+inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u, 
+                                    const size_t num_threads) const
 {
     tools_eigen::check_if_in_unit_cube(u);
     check_data_dim(u);
@@ -464,45 +468,52 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
 
     // initial value must be 1.0 for multiplication
     Eigen::VectorXd vine_density = Eigen::VectorXd::Constant(u.rows(), 1.0);
+    
+    auto do_batch = [&](const tools_thread::Batch& b) {
+        // temporary storage objects for h-functions
+        Eigen::MatrixXd hfunc1(b.size, d);
+        Eigen::MatrixXd hfunc2(b.size, d);
+        Eigen::MatrixXd u_e(b.size, 2);
 
-    // temporary storage objects for h-functions
-    Eigen::MatrixXd hfunc1(n, d);
-    Eigen::MatrixXd hfunc2(n, d);
-    Eigen::MatrixXd u_e(n, 2);
-
-    // fill first row of hfunc2 matrix with evaluation points;
-    // points have to be reordered to correspond to natural order
-    for (size_t j = 0; j < d; ++j)
-        hfunc2.col(j) = u.col(revorder(j) - 1);
+        // fill first row of hfunc2 matrix with evaluation points;
+        // points have to be reordered to correspond to natural order
+        for (size_t j = 0; j < d; ++j)
+            hfunc2.col(j) = u.block(b.begin, revorder(j) - 1, b.size, 1);
+            
+            size_t trunc_lvl = pair_copulas_.size();
+            for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+                tools_interface::check_user_interrupt(n * d > 1e5);
+                for (size_t edge = 0; edge < d - tree - 1; ++edge) {
+                    tools_interface::check_user_interrupt(edge % 100 == 0);
+                    // extract evaluation point from hfunction matrices (have been
+                    // computed in previous tree level)
+                    size_t m = max_matrix(tree, edge);
+                    u_e.col(0) = hfunc2.col(edge);
+                    if (m == no_matrix(tree, edge)) {
+                        u_e.col(1) = hfunc2.col(d - m);
+                    } else {
+                        u_e.col(1) = hfunc1.col(d - m);
+                    }
+                    
+                    Bicop edge_copula = get_pair_copula(tree, edge);
+                    vine_density.segment(b.begin, b.size) = 
+                        vine_density.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e));
+                    
+                    // h-functions are only evaluated if needed in next step
+                    if (needed_hfunc1(tree + 1, edge)) {
+                        hfunc1.col(edge) = edge_copula.hfunc1(u_e);
+                    }
+                    if (needed_hfunc2(tree + 1, edge)) {
+                        hfunc2.col(edge) = edge_copula.hfunc2(u_e);
+                    }
+                }
+            }
+    };
+    
+    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
+    pool.map(do_batch, tools_thread::create_batches(n, num_threads));
+    pool.join();
         
-    size_t trunc_lvl = pair_copulas_.size();
-    for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-        tools_interface::check_user_interrupt(n * d > 1e5);
-        for (size_t edge = 0; edge < d - tree - 1; ++edge) {
-            tools_interface::check_user_interrupt(edge % 100 == 0);
-            // extract evaluation point from hfunction matrices (have been
-            // computed in previous tree level)
-            size_t m = max_matrix(tree, edge);
-            u_e.col(0) = hfunc2.col(edge);
-            if (m == no_matrix(tree, edge)) {
-                u_e.col(1) = hfunc2.col(d - m);
-            } else {
-                u_e.col(1) = hfunc1.col(d - m);
-            }
-
-            Bicop edge_copula = get_pair_copula(tree, edge);
-            vine_density = vine_density.cwiseProduct(edge_copula.pdf(u_e));
-
-            // h-functions are only evaluated if needed in next step
-            if (needed_hfunc1(tree + 1, edge)) {
-                hfunc1.col(edge) = edge_copula.hfunc1(u_e);
-            }
-            if (needed_hfunc2(tree + 1, edge)) {
-                hfunc2.col(edge) = edge_copula.hfunc2(u_e);
-            }
-        }
-    }
-
     return vine_density;
 }
 
@@ -511,8 +522,11 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
 //! @param u \f$ n \times d \f$ matrix of evaluation points.
 //! @param N integer for the number of quasi-random numbers to draw
 //! to evaluate the distribution (default: 1e4).
+//! @param num_threads the number of threads to use for computations; if greater
+//!   than 1, the function will generate `n` samples concurrently in 
+//!   `num_threads` batches.
 inline Eigen::VectorXd
-Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N) const
+Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N, const size_t num_threads) const
 {
     if (d_ > 21201) {
         std::stringstream message;
@@ -541,7 +555,7 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N) const
     } else {
         U = tools_stats::ghalton(N, d);
     }
-    U = inverse_rosenblatt(U);
+    U = inverse_rosenblatt(U, num_threads);
 
     // Alternative: simulate N pseudo-random numbers from the vine model
     //auto U = simulate(N);
@@ -563,9 +577,14 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N) const
 //!
 //! @param n number of observations.
 //! @param qrng set to true for quasi-random numbers.
+//! @param num_threads the number of threads to use for computations; if greater
+//!   than 1, the function will generate `n` samples concurrently in 
+//!   `num_threads` batches.
 //! @param seed seed of the random number generator.
 //! @return An \f$ n \times d \f$ matrix of samples from the copula model.
-inline Eigen::MatrixXd Vinecop::simulate(const size_t n, const bool qrng,
+inline Eigen::MatrixXd Vinecop::simulate(const size_t n, 
+                                         const bool qrng,
+                                         const size_t num_threads,
                                          const std::vector<int>& seeds) const
 {
     Eigen::MatrixXd U(n, d_);
@@ -579,7 +598,7 @@ inline Eigen::MatrixXd Vinecop::simulate(const size_t n, const bool qrng,
         U = tools_stats::simulate_uniform(n, d_, seeds);
     }
 
-    return inverse_rosenblatt(U);
+    return inverse_rosenblatt(U, num_threads);
 }
 
 //! calculates the log-likelihood, which is defined as
@@ -693,8 +712,11 @@ inline double Vinecop::calculate_npars() const
 //! \f$d = 200\f$.
 //!
 //! @param u \f$ n \times d \f$ matrix of evaluation points.
+//! @param num_threads the number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
 inline Eigen::MatrixXd
-Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
+Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u, const size_t num_threads) const
 {
     tools_eigen::check_if_in_unit_cube(u);
     check_data_dim(u);
@@ -720,67 +742,76 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
         return U_vine;
     }
 
-    if (d > 2) {
-        // info about the vine structure (in upper triangular matrix notation)
-        Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
-        auto no_matrix = vine_matrix_.get_natural_order();
-        auto max_matrix = vine_matrix_.get_max_matrix();
-        MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
-        MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
+    // info about the vine structure (in upper triangular matrix notation)
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
+    auto inverse_order = inverse_permutation(revorder);
+    auto no_matrix = vine_matrix_.get_natural_order();
+    auto max_matrix = vine_matrix_.get_max_matrix();
+    MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
+    
+    auto do_batch = [&](const tools_thread::Batch& b) {
+        if (d > 2) {
+            // temporary storage objects for (inverse) h-functions
+            Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> 
+                hinv2(d, d);
+            Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> 
+                hfunc1(d, d);
 
-        // temporary storage objects for (inverse) h-functions
-        Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> hinv2(d,
-                                                                              d);
-        Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> hfunc1(d,
-                                                                               d);
-
-        // initialize with independent uniforms (corresponding to natural order)
-        for (size_t j = 0; j < d; ++j)
-            hinv2(d - j - 1, j) = u.col(revorder(j) - 1);
-        hfunc1(0, d - 1) = hinv2(0, d - 1);
-
-        // loop through variables (0 is just the inital uniform)
-        size_t trunc_lvl = pair_copulas_.size();
-        for (ptrdiff_t var = d - 2; var >= 0; --var) {
-            tools_interface::check_user_interrupt(n * d > 1e5);
-            if (trunc_lvl < d_ - 1) {
-                hinv2(trunc_lvl, var) = hinv2(d - var - 1, var);
+            // initialize with independent uniforms (corresponding to natural 
+            // order)
+            for (size_t j = 0; j < d; ++j) {
+                hinv2(d - j - 1, j) = u.block(b.begin, revorder(j) - 1, b.size, 1);
             }
-            size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
-            for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
-                Bicop edge_copula = get_pair_copula(tree, var);
+            hfunc1(0, d - 1) = hinv2(0, d - 1);
 
-                // extract data for conditional pair
-                Eigen::MatrixXd U_e(n, 2);
-                size_t m = max_matrix(tree, var);
-                U_e.col(0) = hinv2(tree + 1, var);
-                if (m == no_matrix(tree, var)) {
-                    U_e.col(1) = hinv2(tree, d - m);
-                } else {
-                    U_e.col(1) = hfunc1(tree, d - m);
+            // loop through variables (0 is just the inital uniform)
+            size_t trunc_lvl = pair_copulas_.size();
+            for (ptrdiff_t var = d - 2; var >= 0; --var) {
+                tools_interface::check_user_interrupt(n * d > 1e5);
+                if (trunc_lvl < d_ - 1) {
+                    hinv2(trunc_lvl, var) = hinv2(d - var - 1, var);
                 }
+                size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
+                for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
+                    Bicop edge_copula = get_pair_copula(tree, var);
 
-                // inverse Rosenblatt transform simulates data for conditional pair
-                hinv2(tree, var) = edge_copula.hinv2(U_e);
+                    // extract data for conditional pair
+                    Eigen::MatrixXd U_e(b.size, 2);
+                    size_t m = max_matrix(tree, var);
+                    U_e.col(0) = hinv2(tree + 1, var);
+                    if (m == no_matrix(tree, var)) {
+                        U_e.col(1) = hinv2(tree, d - m);
+                    } else {
+                        U_e.col(1) = hfunc1(tree, d - m);
+                    }
 
-                // if required at later stage, also calculate hfunc2
-                if (var < static_cast<ptrdiff_t>(d_) - 1) {
-                    if (needed_hfunc1(tree + 1, var)) {
-                        U_e.col(0) = hinv2(tree, var);
-                        hfunc1(tree + 1, var) = edge_copula.hfunc1(U_e);
+                    // inverse Rosenblatt transform simulates data for 
+                    // conditional pair
+                    hinv2(tree, var) = edge_copula.hinv2(U_e);
+
+                    // if required at later stage, also calculate hfunc2
+                    if (var < static_cast<ptrdiff_t>(d_) - 1) {
+                        if (needed_hfunc1(tree + 1, var)) {
+                            U_e.col(0) = hinv2(tree, var);
+                            hfunc1(tree + 1, var) = edge_copula.hfunc1(U_e);
+                        }
                     }
                 }
             }
+
+            // go back to original order
+            for (size_t j = 0; j < d; j++) {
+                U_vine.block(b.begin, j, b.size, 1) = hinv2(0, inverse_order(j));
+            }
+        } else {
+            U_vine.block(b.begin, 0, b.size, 1) = get_pair_copula(0, 0).hinv2(u);
         }
-
-        // go back to original order
-        auto inverse_order = inverse_permutation(revorder);
-        for (size_t j = 0; j < d; ++j)
-            U_vine.col(j) = hinv2(0, inverse_order(j));
-    } else {
-        U_vine.col(0) = get_pair_copula(0, 0).hinv2(u);
-    }
-
+    };
+    
+    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
+    pool.map(do_batch, tools_thread::create_batches(n, num_threads));
+    pool.join();
+        
     return U_vine;
 }
 
