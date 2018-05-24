@@ -153,16 +153,29 @@ inline Eigen::VectorXd cef(const Eigen::VectorXd &x,
 
 //! alternating conditional expectation algorithm
 inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2>& x, // data
-    size_t wl = 0, // window length for the smoother
-    size_t outer_iter_max = 100, // max number of outer iterations
-    size_t inner_iter_max = 10, // max number of inner iterations
-    double outer_abs_tol = 2e-15, // outer stopping criterion
-    double inner_abs_tol = 1e-4) // inner stopping criterion
+        const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, // data
+        const Eigen::VectorXd& weights = Eigen::VectorXd(), // weights
+        size_t wl = 0, // window length for the smoother
+        size_t outer_iter_max = 100, // max number of outer iterations
+        size_t inner_iter_max = 10, // max number of inner iterations
+        double outer_abs_tol = 2e-15, // outer stopping criterion
+        double inner_abs_tol = 1e-4) // inner stopping criterion
 {
     // sample size and memory allocation for the outer/inner loops
-    size_t n = x.rows();
+    size_t n = data.rows();
     Eigen::VectorXd tmp(n);
+
+    size_t nw = weights.size();
+    Eigen::VectorXd w(n);
+    if (nw == 0) {
+        w = Eigen::VectorXd::Ones(n);
+    } else {
+        if (nw != n) {
+            throw std::runtime_error("weights should have a length equal to "
+                                         "the number of rows in data");
+        }
+        w = weights;
+    }
 
     // default window size
     double n_dbl = static_cast<double>(n);
@@ -174,7 +187,7 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
     Eigen::Matrix<size_t, Eigen::Dynamic, 2> ind(n, 2);
     Eigen::Matrix<size_t, Eigen::Dynamic, 2> ranks(n, 2);
     for (size_t i = 0; i < 2; i++) {
-        std::vector<double> xvec(x.data() + n * i, x.data() + n * (i + 1));
+        std::vector<double> xvec(data.data() + n * i, data.data() + n * (i + 1));
         auto order = tools_stl::get_order(xvec);
         for (auto j : order) {
             ind(j, i) = order[j];
@@ -183,9 +196,13 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
     }
 
     // initialize output
-    Eigen::MatrixXd phi = ranks.cast<double>();;
+    Eigen::Matrix<double, Eigen::Dynamic, 2> phi = ranks.cast<double>();
     phi.array() -= (n_dbl - 1.0)/2.0 - 1.0;
     phi /= std::sqrt(n_dbl * (n_dbl - 1.0) / 12.0);
+    if (nw > 0) {
+        phi.col(0) = phi.col(0).cwiseProduct(w);
+        phi.col(1) = phi.col(1).cwiseProduct(w);
+    }
 
     // initialize variables for the outer loop
     size_t outer_iter = 1;
@@ -202,7 +219,9 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
         // inner loop (expectation of the second variable given the first)
         while(inner_iter <= inner_iter_max && inner_abs_err > inner_abs_tol) {
             // conditional expectation
-            phi.col(1) = cef(phi.col(0), ind.col(1), ranks.col(1), wl);
+            phi.col(1) = cef(phi.col(0).cwiseProduct(w) , ind.col(1),
+                             ranks.col(1), wl);
+
 
             // center and standardize
             double m1 = phi.col(1).sum() / n_dbl;
@@ -219,7 +238,8 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
         }
 
         // conditional expectation
-        phi.col(0) = cef(phi.col(1) , ind.col(0), ranks.col(0), wl);
+        phi.col(0) = cef(phi.col(1).cwiseProduct(w) , ind.col(0),
+                         ranks.col(0), wl);
 
         // center and standardize
         double m0 = phi.col(0).sum() / n_dbl;
@@ -240,10 +260,12 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
 }
 
 //! calculates the pairwise maximum correlation coefficient.
-inline double pairwise_mcor(const Eigen::Matrix<double, Eigen::Dynamic, 2> &x)
+inline double pairwise_mcor(
+    const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
+    const Eigen::VectorXd &weights)
 {
-    Eigen::Matrix<double, Eigen::Dynamic, 2> phi = ace(x);
-    return wdm::wdm(phi, "cor")(0, 1);
+    Eigen::Matrix<double, Eigen::Dynamic, 2> phi = ace(x, weights);
+    return wdm::wdm(phi, "cor", weights)(0, 1);
 }
 //! @}
 

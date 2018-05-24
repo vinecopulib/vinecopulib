@@ -98,7 +98,8 @@ Eigen::VectorXd to_pseudo_obs_1d(Eigen::VectorXd x,
 Eigen::MatrixXd to_pseudo_obs(Eigen::MatrixXd x,
                               std::string ties_method = "average");
 
-double pairwise_mcor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
+double pairwise_mcor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
+                     const Eigen::VectorXd &weights = Eigen::VectorXd());
 
 Eigen::MatrixXd ghalton(size_t n, size_t d);
 

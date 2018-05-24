@@ -33,7 +33,7 @@ inline double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>
     double freq = static_cast<double>(data_no_nan.rows()) / data.rows();
     if (data_no_nan.rows() > 10) {
         if (tree_criterion == "mcor") {
-            w = tools_stats::pairwise_mcor(data_no_nan);
+            w = tools_stats::pairwise_mcor(data_no_nan, weights);
         } else {
             w = wdm::wdm(data_no_nan, tree_criterion, weights)(0, 1);
         }

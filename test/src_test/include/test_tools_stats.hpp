@@ -69,6 +69,24 @@ TEST(test_tools_stats, ghalton_is_correct) {
 
 }
 
+
+TEST(test_tools_stats, mcor_works) {
+    Eigen::MatrixXd Z = tools_stats::simulate_uniform(1000, 2);
+    Z = tools_stats::qnorm(Z);
+    Z.block(0, 1, 500, 1) =
+        Z.block(0, 1, 500, 1) + Z.block(0, 0, 500, 1).cwiseAbs2();
+    auto a1 = tools_stats::pairwise_mcor(Z);
+    Eigen::VectorXd weights = Eigen::VectorXd::Ones(1000);
+    auto a2 = tools_stats::pairwise_mcor(Z, weights);
+    ASSERT_TRUE(std::fabs(a1 - a2) < 1e-4);
+
+    a1 = tools_stats::pairwise_mcor(Z.block(0, 0, 500, 2));
+    weights.block(500, 0, 500, 1) = Eigen::VectorXd::Zero(500);
+    a2 = tools_stats::pairwise_mcor(Z, weights);
+    ASSERT_TRUE(std::fabs(a1 - a2) < 0.05);
+
+}
+
 TEST(test_tools_stats, dpqnorm_are_nan_safe) {
     Eigen::VectorXd X = Eigen::VectorXd::Random(10);
     X(0) = std::numeric_limits<double>::quiet_NaN();
