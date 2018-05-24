@@ -25,7 +25,7 @@ public:
           const Eigen::MatrixXd &parameters = Eigen::MatrixXd());
 
     Bicop(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-          const FitControlsBicop controls = FitControlsBicop());
+          const FitControlsBicop &controls = FitControlsBicop());
 
     Bicop(const char *filename);
 
@@ -78,10 +78,10 @@ public:
 
     // Methods modifying the family/rotation/parameters
     void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-             const FitControlsBicop controls = FitControlsBicop());
+             const FitControlsBicop &controls = FitControlsBicop());
 
     void select(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-                const FitControlsBicop controls = FitControlsBicop());
+                const FitControlsBicop &controls = FitControlsBicop());
 
     // Fit statistics
     double loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;

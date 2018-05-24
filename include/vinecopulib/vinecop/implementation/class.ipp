@@ -161,7 +161,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
 //! @param data an \f$ n \times d \f$ matrix of observations.
 //! @param controls see FitControlsVinecop.
 inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
-                        const FitControlsVinecop controls)
+                        const FitControlsVinecop &controls)
 {
     d_ = data.cols();
     if (data.rows() == 1) {
@@ -232,7 +232,7 @@ inline std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(
 //! @param data nxd matrix of copula data.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void Vinecop::select_all(const Eigen::MatrixXd &data,
-                                const FitControlsVinecop controls)
+                                const FitControlsVinecop &controls)
 {
     tools_eigen::check_if_in_unit_cube(data);
     check_data_dim(data);
@@ -254,7 +254,7 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
 //! @param data nxd matrix of copula data.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void Vinecop::select_families(const Eigen::MatrixXd &data,
-                                     const FitControlsVinecop controls)
+                                     const FitControlsVinecop &controls)
 {
     tools_eigen::check_if_in_unit_cube(data);
     check_data_dim(data);

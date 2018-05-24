@@ -33,7 +33,7 @@ public:
             const bool check_matrix = true);
 
     Vinecop(const Eigen::MatrixXd &data,
-            const FitControlsVinecop controls = FitControlsVinecop());
+            const FitControlsVinecop &controls = FitControlsVinecop());
 
     Vinecop(const Eigen::MatrixXd &data,
             const Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
@@ -52,10 +52,10 @@ public:
 
     // Methods modifying structure and/or families and parameters
     void select_all(const Eigen::MatrixXd &data,
-                    const FitControlsVinecop controls = FitControlsVinecop());
+                    const FitControlsVinecop &controls = FitControlsVinecop());
 
     void select_families(const Eigen::MatrixXd &data,
-                         const FitControlsVinecop controls = FitControlsVinecop());
+                         const FitControlsVinecop &controls = FitControlsVinecop());
 
     // Getters for a single pair copula
     Bicop get_pair_copula(size_t tree, size_t edge) const;

@@ -38,7 +38,7 @@ inline Bicop::Bicop(const BicopFamily family, const int rotation,
 //! @param data see select().
 //! @param controls see select().
 inline Bicop::Bicop(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-                    const FitControlsBicop controls)
+                    const FitControlsBicop &controls)
 {
     select(data, controls);
 }
@@ -482,7 +482,7 @@ inline BicopPtr Bicop::get_bicop() const
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
 inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                       const FitControlsBicop controls)
+                       const FitControlsBicop &controls)
 {
     std::string method;
     if (tools_stl::is_member(bicop_->get_family(),
@@ -504,7 +504,7 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
 inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                          const FitControlsBicop controls)
+                          const FitControlsBicop &controls)
 {
     using namespace tools_select;
     auto newdata = tools_eigen::nan_omit(data);
