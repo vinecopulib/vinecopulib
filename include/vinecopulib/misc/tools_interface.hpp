@@ -23,7 +23,7 @@
 
 // parallel backend
 #ifdef INTERFACED_FROM_R
-    namespace tools_parallel { 
+    namespace tools_thread { 
         typedef RcppThread::ThreadPool ThreadPool; 
     }
 #else

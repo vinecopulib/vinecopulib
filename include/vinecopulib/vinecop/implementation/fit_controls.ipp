@@ -95,7 +95,7 @@ inline FitControlsVinecop::FitControlsVinecop(
 //! @param num_threads number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number returned
 //!     by `std::thread::hardware_concurrency()``.
-inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop controls,
+inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop &controls,
                                               size_t truncation_level,
                                               std::string tree_criterion,
                                               double threshold,

@@ -8,7 +8,7 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
-#include <vinecopulib/misc/tools_parallel.hpp>
+#include <vinecopulib/misc/tools_thread.hpp>
 #include <mutex>
 
 //! Tools for bivariate and vine copula modeling
@@ -20,7 +20,7 @@ namespace vinecopulib {
 //!     (for Independence, Gaussian, Student, Frank, and nonparametric
 //!     families, only 0 is allowed).
 //! @param parameters the copula parameters.
-inline Bicop::Bicop(BicopFamily family, int rotation,
+inline Bicop::Bicop(const BicopFamily family, const int rotation,
                     const Eigen::MatrixXd &parameters)
 {
     bicop_ = AbstractBicop::create(family, parameters);
@@ -37,8 +37,8 @@ inline Bicop::Bicop(BicopFamily family, int rotation,
 //! equivalent to `Bicop cop; cop.select(data, controls)`.
 //! @param data see select().
 //! @param controls see select().
-inline Bicop::Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
-                    FitControlsBicop controls)
+inline Bicop::Bicop(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+                    const FitControlsBicop &controls)
 {
     select(data, controls);
 }
@@ -46,7 +46,7 @@ inline Bicop::Bicop(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
 //! creates from a boost::property_tree::ptree object
 //! @param input the boost::property_tree::ptree object to convert from
 //! (see to_ptree() for the structure of the input).
-inline Bicop::Bicop(boost::property_tree::ptree input) :
+inline Bicop::Bicop(const boost::property_tree::ptree input) :
     Bicop(
         get_family_enum(input.get<std::string>("family")),
         input.get<int>("rotation"),
@@ -259,12 +259,21 @@ const
 //! simulates from a bivariate copula.
 //!
 //! @param n number of observations.
+//! @param qrng set to true for quasi-random numbers.
+//! @param seed seed of the random number generator.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2>
-Bicop::simulate(const int &n) const
+Bicop::simulate(const size_t& n, 
+                const bool qrng,
+                const std::vector<int>& seeds) const
 {
-    Eigen::Matrix<double, Eigen::Dynamic, 2> U =
-        tools_stats::simulate_uniform(n, 2);
+    Eigen::Matrix<double, Eigen::Dynamic, 2> U;
+    if (qrng) {
+        U = tools_stats::ghalton(n, 2);
+    } else {
+        U = tools_stats::simulate_uniform(n, 2, seeds);
+    }
+
     // use inverse Rosenblatt transform to generate a sample from the copula
     U.col(1) = hinv1(U);
     return U;
@@ -414,7 +423,7 @@ inline double Bicop::get_tau() const
     return parameters_to_tau(bicop_->get_parameters());
 }
 
-inline void Bicop::set_rotation(int rotation)
+inline void Bicop::set_rotation(const int rotation)
 {
     check_rotation(rotation);
     rotation_ = rotation;
@@ -485,7 +494,7 @@ inline BicopPtr Bicop::get_bicop() const
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
 inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                       FitControlsBicop controls)
+                       const FitControlsBicop &controls)
 {
     std::string method;
     if (tools_stl::is_member(bicop_->get_family(),
@@ -496,17 +505,15 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     }
     tools_eigen::check_if_in_unit_cube(data);
     
-    check_weights_size(controls.get_weights(), data);
+    auto w = controls.get_weights();
     Eigen::MatrixXd data_no_nan = data;
-    {
-        auto w = controls.get_weights();
-        tools_eigen::remove_nans(data_no_nan, w);
-        controls.set_weights(w);
-    }
+    check_weights_size(w, data);
+    tools_eigen::remove_nans(data_no_nan, w);
+
     bicop_->fit(cut_and_rotate(data_no_nan), 
                 method,
                 controls.get_nonparametric_mult(),
-                controls.get_weights());
+                w);
 }
 
 //! selects the best fitting model, by calling fit() for all families in
@@ -587,9 +594,8 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
             }
         };
 
-        tools_parallel::map_on_pool(fit_and_compare,
-                                    bicops,
-                                    controls.get_num_threads());
+        tools_thread::ThreadPool pool(controls.get_num_threads());
+        pool.map(fit_and_compare, bicops);
     }
 }
 

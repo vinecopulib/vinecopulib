@@ -4,6 +4,8 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <vinecopulib/misc/tools_stats_ghalton.hpp>
+#include <vinecopulib/misc/tools_stats_sobol.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <unsupported/Eigen/FFT>
 #include <wdm/eigen.hpp>
@@ -17,18 +19,23 @@ namespace tools_stats {
 //!
 //! @param n number of observations.
 //! @param d dimension.
+//! @param seeds seeds of the random number generator.
 //!
 //! @return An \f$ n \times d \f$ matrix of independent
 //! \f$ \mathrm{U}[0, 1] \f$ random variables.
-inline Eigen::MatrixXd simulate_uniform(size_t n, size_t d)
+inline Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
+                                        const std::vector<int>& seeds)
 {
     if ((n < 1) | (d < 1)) {
         throw std::runtime_error("both n and d must be at least 1.");
     }
-    Eigen::MatrixXd U(n, d);
-    std::random_device rd;
-    std::default_random_engine generator(rd());
+
+    // initialize random engine and uniform distribution
+    std::seed_seq seq(seeds.begin(), seeds.end());
+    std::mt19937 generator(seq);
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
+
+    Eigen::MatrixXd U(n, d);
     return U.unaryExpr([&](double) { return distribution(generator); });
 }
 
@@ -305,6 +312,7 @@ static Eigen::Matrix<int, ghalton_max_dim, 1> permTN2 = [] {
     return tmp;
 }();
 
+
 //! simulates from the multivariate Generalized Halton Sequence
 //!
 //! For more information on Generalized Halton Sequence, see
@@ -316,14 +324,14 @@ static Eigen::Matrix<int, ghalton_max_dim, 1> permTN2 = [] {
 //!
 //! @return An \f$ n \times d \f$ matrix of quasi-random
 //! \f$ \mathrm{U}[0, 1] \f$ variables.
-inline Eigen::MatrixXd ghalton(size_t n, size_t d)
+inline Eigen::MatrixXd ghalton(const size_t n, const size_t d)
 {
 
     Eigen::MatrixXd res(d, n);
 
     // Coefficients of the shift
     Eigen::MatrixXi shcoeff(d, 32);
-    Eigen::VectorXi base = primes.block(0, 0, d, 1);
+    Eigen::VectorXi base = tools_ghalton::primes.block(0, 0, d, 1);
     Eigen::MatrixXd u = Eigen::VectorXd::Zero(d, 1);
     auto U = simulate_uniform(d, 32);
     for (int k = 31; k >= 0; k--) {
@@ -334,7 +342,7 @@ inline Eigen::MatrixXd ghalton(size_t n, size_t d)
     }
     res.block(0, 0, d, 1) = u;
 
-    Eigen::VectorXi perm = permTN2.block(0, 0, d, 1);
+    Eigen::VectorXi perm = tools_ghalton::permTN2.block(0, 0, d, 1);
     Eigen::MatrixXi coeff(d, 32);
     Eigen::VectorXi tmp(d);
     int k;
@@ -363,6 +371,92 @@ inline Eigen::MatrixXd ghalton(size_t n, size_t d)
     }
 
     return res.transpose();
+}
+
+//! simulates from the multivariate Sobol sequence
+//!
+//! For more information on the Sobol sequence, see S. Joe and F. Y. Kuo
+//! (2008), Constructing Sobol  sequences with better two-dimensional
+//! projections, SIAM J. Sci. Comput. 30, 2635–2654.
+//!
+//! @param n number of observations.
+//! @param d dimension.
+//!
+//! @return An \f$ n \times d \f$ matrix of quasi-random
+//! \f$ \mathrm{U}[0, 1] \f$ variables.
+inline Eigen::MatrixXd sobol(const size_t n, const size_t d)
+{
+
+    // output matrix
+    Eigen::MatrixXd output = Eigen::MatrixXd::Zero(n, d);
+
+    // L = max number of bits needed
+    size_t L = static_cast<size_t>(std::ceil(log(static_cast<double>(n))/log(2.0)));
+
+    // C(i) = index from the right of the first zero bit of i + 1
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> C(n);
+    C(0) = 1;
+    for (size_t i = 1; i < n ; i++) {
+        C(i) = 1;
+        size_t value = i;
+        while (value & 1) {
+            value >>= 1;
+            C(i)++;
+        }
+    }
+
+    // Compute the first dimension
+
+    // Compute direction numbers scaled by pow(2,32)
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> V(L);
+    for (size_t i = 0; i < L; i++) {
+        V(i) = std::pow(2, 32 - (i + 1)); // all m's = 1
+    }
+
+    //
+    // // Evalulate X scaled by pow(2,32)
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1> X(n);
+    X(0) = 0;
+    for (size_t i = 1; i < n; i++) {
+        X(i) = X(i - 1) ^ V(C(i - 1) - 1);
+    }
+    output.block(0, 0, n, 1) = X.cast<double> ();
+
+    // Compute the remaining dimensions
+    for (size_t j = 0; j < d - 1; j++) {
+
+        // Get parameters from static vectors
+        size_t a = tools_sobol::a_sobol[j];
+        size_t s = tools_sobol::s_sobol[j];
+
+        Eigen::Map<Eigen::Matrix<size_t,Eigen::Dynamic,1> >
+            m(tools_sobol::minit_sobol[j], s);
+
+        // Compute direction numbers scaled by pow(2,32)
+        Eigen::Matrix<size_t, Eigen::Dynamic, 1> V(L);
+        for (size_t i = 0; i < std::min(L, s); i++) V(i) = m(i) << (32 - (i + 1));
+
+        if (L > s) {
+            for (size_t i = s; i < L; i++) {
+                V(i) = V(i - s) ^ (V(i - s) >> s);
+                for (size_t k = 0; k < s - 1; k++) {
+                    V(i) ^= (((a >> (s - 2 - k)) & 1) * V(i - k - 1));
+                }
+            }
+        }
+
+        // Evalulate X
+        X(0) = 0;
+        for (size_t i = 1; i < n; i++) {
+            X(i) = X(i - 1) ^ V(C(i - 1) - 1);
+        }
+        output.block(0, j + 1, n, 1) = X.cast <double> ();
+    }
+
+    // Scale output by pow(2,32)
+    output /= std::pow(2.0, 32);
+
+    return output;
 }
 
 //! Compute bivariate t probabilities
