@@ -514,8 +514,6 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
 inline Eigen::VectorXd
 Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N) const
 {
-    tools_eigen::check_if_in_unit_cube(u);
-    check_data_dim(u);
     if (d_ > 21201) {
         std::stringstream message;
         message << "cumulative distribution available for models of " <<
@@ -523,6 +521,8 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N) const
                 << std::endl;
         throw std::runtime_error(message.str().c_str());
     }
+    tools_eigen::check_if_in_unit_cube(u);
+    check_data_dim(u);
 
     size_t d = u.cols();
     size_t n = u.rows();
