@@ -14,7 +14,7 @@
 #include <memory>
 
 namespace tools_thread {
-    
+
 struct Batch {
     size_t begin;
     size_t size;
