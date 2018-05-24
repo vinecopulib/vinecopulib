@@ -33,9 +33,10 @@ TEST(vinecop_sanity_checks, catches_wrong_size) {
     Eigen::MatrixXd U = Eigen::MatrixXd::Constant(4, 4, 0.5);
     EXPECT_ANY_THROW(vinecop.pdf(U));
     EXPECT_ANY_THROW(vinecop.cdf(U));
-    Vinecop vinecop2(361);
-    auto U2 = tools_stats::simulate_uniform(1, 361);
-    EXPECT_ANY_THROW(vinecop2.cdf(U2));
+    // This is too slow/memory consuming for the given current rvine-matrices
+    // Vinecop vinecop2(21202);
+    // auto U2 = tools_stats::simulate_uniform(1, 21202);
+    // EXPECT_ANY_THROW(vinecop2.cdf(U2));
     EXPECT_ANY_THROW(vinecop.inverse_rosenblatt(U));
     EXPECT_ANY_THROW(vinecop.select_all(U));
     EXPECT_ANY_THROW(vinecop.select_families(U));

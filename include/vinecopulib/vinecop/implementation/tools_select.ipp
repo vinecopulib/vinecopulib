@@ -6,7 +6,7 @@
 
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <vinecopulib/misc/tools_parallel.hpp>
+#include <vinecopulib/misc/tools_thread.hpp>
 
 #include <cmath>
 #include <iostream>
@@ -284,7 +284,8 @@ inline double VinecopSelector::get_next_threshold(
     // pick threshold that changes at least alpha*100 % of the pair-copulas
     double alpha = 0.05;
     size_t m = thresholded_crits.size();
-    return thresholded_crits[std::ceil(static_cast<double>(m) * alpha) - 1];
+    double new_index = std::ceil(static_cast<double>(m) * alpha) - 1;
+    return thresholded_crits[static_cast<size_t>(new_index)];
 }
 
 
@@ -299,6 +300,9 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
     vine_matrix_ = vine_matrix;
     threshold_ = controls.get_threshold();
     psi0_ = controls.get_psi0();
+    pool_ = std::unique_ptr<tools_thread::ThreadPool>(
+        new tools_thread::ThreadPool(controls.get_num_threads())
+    );
 }
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
@@ -310,6 +314,9 @@ inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
     controls_ = controls;
     threshold_ = controls.get_threshold();
     psi0_ = controls.get_psi0();
+    pool_ = std::unique_ptr<tools_thread::ThreadPool>(
+        new tools_thread::ThreadPool(controls.get_num_threads())
+    );
 }
 
 //! Add edges allowed by the proximity condition
@@ -344,10 +351,9 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
             }
         }
     };
-    
-    tools_parallel::map_on_pool(add_edge, 
-                                boost::vertices(vine_tree), 
-                                controls_.get_num_threads());
+
+    pool_->map(add_edge, boost::vertices(vine_tree));
+    pool_->wait();
 }
 
 inline void StructureSelector::finalize(size_t trunc_lvl)
@@ -653,7 +659,7 @@ inline size_t VinecopSelector::get_num_non_indeps_of_tree(size_t t)
     size_t num_non_indeps = 0;
     // trees_[0] is base tree, see make_base_tree()
     for (const auto &e : boost::edges(trees_[t + 1])) {
-        num_non_indeps += static_cast<double>(trees_[t + 1][e].npars > 0);
+        num_non_indeps += static_cast<size_t>(trees_[t + 1][e].npars > 0);
     }
     return num_non_indeps;
 }
@@ -889,9 +895,8 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
     // make sure that Bicop.select() doesn't spawn new threads
     size_t num_threads = controls_.get_num_threads();
     controls_.set_num_threads(1);
-    tools_parallel::map_on_pool(select_pc, 
-                                boost::edges(tree), 
-                                num_threads);
+    pool_->map(select_pc, boost::edges(tree));
+    pool_->wait();
     controls_.set_num_threads(num_threads);
 }
 

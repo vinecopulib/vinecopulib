@@ -11,6 +11,7 @@
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/vinecop/fit_controls.hpp>
 #include <vinecopulib/vinecop/rvine_matrix.hpp>
+#include <vinecopulib/misc/tools_interface.hpp>
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std {
@@ -137,6 +138,7 @@ protected:
     double loglik_;
     double threshold_;
     double psi0_; // initial prior probability for mbicv
+    std::unique_ptr<tools_thread::ThreadPool> pool_;
 
 private:
     double get_next_threshold(std::vector<double> &thresholded_crits);

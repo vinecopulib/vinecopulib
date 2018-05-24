@@ -49,7 +49,7 @@ public:
     
     double get_psi0() const;
 
-    size_t get_num_threads();
+    size_t get_num_threads() const;
 
     // Setters
     void set_family_set(std::vector <BicopFamily> family_set);
