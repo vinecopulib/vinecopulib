@@ -63,7 +63,8 @@ install:
   - cd wdm
   - mkdir build
   - cd build
-  - cmake .. & sudo make install
+  - cmake ..
+  - sudo make install
   - cd ../..
 
 script:
