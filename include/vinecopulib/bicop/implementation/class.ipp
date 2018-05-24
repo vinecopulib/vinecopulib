@@ -549,7 +549,7 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         std::mutex m;
         auto fit_and_compare = [&](Bicop cop) {
             tools_interface::check_user_interrupt();
-
+            
             // Estimate the model
             cop.fit(data_no_nan, controls);
 
@@ -566,9 +566,9 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                     n_eff = std::pow(controls.get_weights().sum(), 2);
                     n_eff /= controls.get_weights().array().pow(2).sum();
                 }
-                double npars = this->calculate_npars();
-                // BIC
-                new_criterion = -2 * ll + log(n_eff) * npars;
+                double npars = cop.calculate_npars();
+                
+                new_criterion = -2 * ll + log(n_eff) * npars;  // BIC
                 if (controls.get_selection_criterion() == "mbic") {
                     // correction for mBIC
                     bool is_indep = (this->get_family() == BicopFamily::indep);
