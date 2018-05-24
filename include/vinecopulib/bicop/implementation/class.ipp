@@ -8,7 +8,7 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
-#include <vinecopulib/misc/tools_parallel.hpp>
+#include <vinecopulib/misc/tools_thread.hpp>
 #include <mutex>
 
 //! Tools for bivariate and vine copula modeling
@@ -551,9 +551,8 @@ inline void Bicop::select(Eigen::Matrix<double, Eigen::Dynamic, 2> data,
             }
         };
 
-        tools_parallel::map_on_pool(fit_and_compare,
-                                    bicops,
-                                    controls.get_num_threads());
+        tools_thread::ThreadPool pool(controls.get_num_threads());
+        pool.map(fit_and_compare, bicops);
     }
 }
 
