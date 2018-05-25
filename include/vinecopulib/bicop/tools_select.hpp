@@ -25,10 +25,13 @@ std::vector <BicopFamily> get_candidate_families(
 void preselect_candidates(
     std::vector <Bicop> &bicops,
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-    double tau);
+    double tau,
+    const Eigen::VectorXd& weights);
 
 std::vector<double> get_c1c2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data, double tau);
+    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data, 
+    double tau,
+    const Eigen::VectorXd& weights);
 
 bool preselect_family(std::vector<double> c, double tau, const Bicop &bicop);
 

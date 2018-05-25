@@ -263,7 +263,8 @@ const
 //! @param seed seed of the random number generator.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2>
-Bicop::simulate(const size_t& n, const bool qrng,
+Bicop::simulate(const size_t& n, 
+                const bool qrng,
                 const std::vector<int>& seeds) const
 {
     Eigen::Matrix<double, Eigen::Dynamic, 2> U;
@@ -283,13 +284,15 @@ Bicop::simulate(const size_t& n, const bool qrng,
 //! where \f$ c \f$ is the copula density pdf().
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
-inline double
-Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u = Eigen::MatrixXd()) const
+inline double Bicop::loglik(
+    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u = Eigen::MatrixXd()) const
 {
     if (u.rows() < 1) {
         return get_loglik();
     } else {
-        return pdf(tools_eigen::nan_omit(u)).array().log().sum();
+        Eigen::MatrixXd u_no_nan = u;
+        tools_eigen::remove_nans(u_no_nan);
+        return pdf(u_no_nan).array().log().sum();
     }
 }
 
@@ -318,7 +321,10 @@ Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 inline double
 Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 {
-    return -2 * loglik(u) + calculate_npars() * log(static_cast<double>(u.rows()));
+    Eigen::MatrixXd u_no_nan = u;
+    tools_eigen::remove_nans(u_no_nan);
+    double n = static_cast<double>(u_no_nan.rows());
+    return -2 * loglik(u_no_nan) + calculate_npars() * log(n);
 }
 
 //! calculates the modified Bayesian information criterion
@@ -498,8 +504,16 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         method = controls.get_nonparametric_method();
     }
     tools_eigen::check_if_in_unit_cube(data);
-    bicop_->fit(tools_eigen::nan_omit(cut_and_rotate(data)), method,
-                controls.get_nonparametric_mult());
+    
+    auto w = controls.get_weights();
+    Eigen::MatrixXd data_no_nan = data;
+    check_weights_size(w, data);
+    tools_eigen::remove_nans(data_no_nan, w);
+
+    bicop_->fit(cut_and_rotate(data_no_nan), 
+                method,
+                controls.get_nonparametric_mult(),
+                w);
 }
 
 //! selects the best fitting model, by calling fit() for all families in
@@ -510,18 +524,24 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
 inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                          const FitControlsBicop &controls)
+                          FitControlsBicop controls)
 {
     using namespace tools_select;
-    auto newdata = tools_eigen::nan_omit(data);
-    tools_eigen::check_if_in_unit_cube(newdata);
+    check_weights_size(controls.get_weights(), data);
+    Eigen::MatrixXd data_no_nan = data;
+    {
+        auto w = controls.get_weights();
+        tools_eigen::remove_nans(data_no_nan, w);
+        controls.set_weights(w);
+    }
+    tools_eigen::check_if_in_unit_cube(data_no_nan);
 
     bicop_ = AbstractBicop::create();
     rotation_ = 0;
     bicop_->set_loglik(0.0);
-    if (newdata.rows() >= 10) {
-        newdata = cut_and_rotate(newdata);
-        std::vector <Bicop> bicops = create_candidate_bicops(newdata, controls);
+    if (data_no_nan.rows() >= 10) {
+        data_no_nan = cut_and_rotate(data_no_nan);
+        std::vector <Bicop> bicops = create_candidate_bicops(data_no_nan, controls);
 
         // Estimate all models and select the best one using the
         // selection_criterion
@@ -529,20 +549,35 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         std::mutex m;
         auto fit_and_compare = [&](Bicop cop) {
             tools_interface::check_user_interrupt();
-
+            
             // Estimate the model
-            cop.fit(newdata, controls);
+            cop.fit(data_no_nan, controls);
 
             // Compute the selection criterion
             double new_criterion;
+            double ll = cop.get_loglik();
             if (controls.get_selection_criterion() == "loglik") {
-                new_criterion = -cop.get_loglik();
+                new_criterion = -ll;
             } else if (controls.get_selection_criterion() == "aic") {
-                new_criterion = cop.aic(newdata);
-            } else if (controls.get_selection_criterion() == "bic") {
-                new_criterion = cop.bic(newdata);
+                new_criterion = -2 * ll + 2 * cop.calculate_npars();
             } else {
-                new_criterion = cop.mbic(newdata, controls.get_psi0());
+                double n_eff = static_cast<double>(data_no_nan.rows());
+                if (controls.get_weights().size() > 0) {
+                    n_eff = std::pow(controls.get_weights().sum(), 2);
+                    n_eff /= controls.get_weights().array().pow(2).sum();
+                }
+                double npars = cop.calculate_npars();
+                
+                new_criterion = -2 * ll + log(n_eff) * npars;  // BIC
+                if (controls.get_selection_criterion() == "mbic") {
+                    // correction for mBIC
+                    bool is_indep = (this->get_family() == BicopFamily::indep);
+                    double psi0 = controls.get_psi0();
+                    double log_prior = 
+                        static_cast<double>(!is_indep) * log(psi0) +
+                        static_cast<double>(is_indep) * log(1.0 - psi0);
+                    new_criterion -= 2 * log_prior;
+                }
             }
 
             // the following block modifies thread-external variables
@@ -616,6 +651,14 @@ inline void Bicop::check_rotation(int rotation) const
             throw std::runtime_error("rotation must be 0 for the " +
                                      bicop_->get_family_name() + " copula");
         }
+    }
+}
+
+inline void Bicop::check_weights_size(const Eigen::VectorXd& weights,
+                                      const Eigen::MatrixXd& data) const
+{
+    if ((weights.size() > 0) & (weights.size() != data.rows())) {
+        throw std::runtime_error("sizes of weights and data don't match.");
     }
 }
 }

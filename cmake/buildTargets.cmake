@@ -26,7 +26,8 @@ if(BUILD_TESTING)
             test_tools_bobyqa
             test_tools_stats
             test_vinecop_class
-            test_vinecop_sanity_checks)
+            test_vinecop_sanity_checks
+            test_weights)
 
     add_subdirectory(test)
     file(GLOB_RECURSE r_scripts cmake/templates/*R)
@@ -92,6 +93,7 @@ endif()
 #   * include/vinecopulib/bicop/*.hpp -> <prefix>/include/vinecopulib/bicop/*.hpp
 #   * include/vinecopulib/vinecop/*.hpp -> <prefix>/include/vinecopulib/vinecop/*.hpp
 #   * include/vinecopulib/misc/*.hpp -> <prefix>/include/vinecopulib/misc/*.hpp
+#   * wdm/include/*.hpp -> <prefix>/include/vinecopulib/wdm/*.hpp
 install(
         FILES ${main_hpp}
         DESTINATION "${include_install_dir}"
@@ -111,6 +113,14 @@ install(
 install(
         FILES ${misc_hpp}
         DESTINATION "${include_install_dir}/vinecopulib/misc"
+)
+install(
+        FILES ${wdm_main}
+        DESTINATION "${include_install_dir}/vinecopulib/wdm"
+)
+install(
+        FILES ${wdm_hpp}
+        DESTINATION "${include_install_dir}/vinecopulib/wdm/wdm"
 )
 if (NOT VINECOPULIB_SHARED_LIB)
     install(

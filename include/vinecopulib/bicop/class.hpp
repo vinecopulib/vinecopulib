@@ -73,7 +73,8 @@ public:
     hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
 
     Eigen::Matrix<double, Eigen::Dynamic, 2>
-    simulate(const size_t &n, const bool qrng = false,
+    simulate(const size_t &n, 
+             const bool qrng = false,
              const std::vector<int>& seeds =  {1, 2, 3, 4, 5, 6}) const;
 
 
@@ -82,7 +83,7 @@ public:
              const FitControlsBicop &controls = FitControlsBicop());
 
     void select(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-                const FitControlsBicop &controls = FitControlsBicop());
+                FitControlsBicop controls = FitControlsBicop());
 
     // Fit statistics
     double loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
@@ -114,6 +115,9 @@ private:
         const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
 
     void check_rotation(int rotation) const;
+    
+    void check_weights_size(const Eigen::VectorXd& weights, 
+                            const Eigen::MatrixXd& data) const;
 
     BicopPtr get_bicop() const;
 

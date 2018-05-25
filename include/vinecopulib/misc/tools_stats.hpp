@@ -99,11 +99,10 @@ Eigen::VectorXd to_pseudo_obs_1d(Eigen::VectorXd x,
 Eigen::MatrixXd to_pseudo_obs(Eigen::MatrixXd x,
                               std::string ties_method = "average");
 
-double pairwise_tau(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
+double pairwise_mcor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
+                     const Eigen::VectorXd &weights = Eigen::VectorXd());
 
-double pairwise_cor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
-
-double pairwise_mcor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
+Eigen::MatrixXd ghalton(const size_t n, const size_t d);
 
 double pairwise_rho(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
 
