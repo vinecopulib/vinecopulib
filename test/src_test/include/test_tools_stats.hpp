@@ -74,8 +74,23 @@ TEST(test_tools_stats, qrng_are_correct) {
 
 }
 
-TEST(test_tools_stats, seed_works) {
+TEST(test_tools_stats, mcor_works) {
+    Eigen::MatrixXd Z = tools_stats::simulate_uniform(1000, 2);
+    Z = tools_stats::qnorm(Z);
+    Z.block(0, 1, 500, 1) =
+        Z.block(0, 1, 500, 1) + Z.block(0, 0, 500, 1).cwiseAbs2();
+    auto a1 = tools_stats::pairwise_mcor(Z);
+    Eigen::VectorXd weights = Eigen::VectorXd::Ones(1000);
+    auto a2 = tools_stats::pairwise_mcor(Z, weights);
+    ASSERT_TRUE(std::fabs(a1 - a2) < 1e-4);
 
+    a1 = tools_stats::pairwise_mcor(Z.block(0, 0, 500, 2));
+    weights.block(500, 0, 500, 1) = Eigen::VectorXd::Zero(500);
+    a2 = tools_stats::pairwise_mcor(Z, weights);
+    ASSERT_TRUE(std::fabs(a1 - a2) < 0.05);   
+}
+
+TEST(test_tools_stats, seed_works) {
     size_t d = 2;
     size_t n = 10;
     std::vector<int> v = {1, 2, 3};
@@ -86,7 +101,6 @@ TEST(test_tools_stats, seed_works) {
 
     ASSERT_TRUE(U1.cwiseEqual(U2).all());
     ASSERT_TRUE(U1.cwiseNotEqual(U3).all());
-
 
 }
 
