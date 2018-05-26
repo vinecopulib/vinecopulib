@@ -3,6 +3,9 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <chrono>
+#include <vinecopulib/misc/tools_stl.hpp>
+
+namespace vinecopulib {
 
 template<class T>
 class RVineMatrix2 {
@@ -90,10 +93,19 @@ protected:
     
     RVineMatrix2<size_t> create_struct_mat(const Eigen::MatrixXi& mat) const
     {
+        // compute inverse permutation of the order; will be used to fill
+        // matrix in natural order
+        auto order = get_order(mat);;
+        auto rev_order = tools_stl::seq_int(1, mat.cols());
+        std::sort(rev_order.begin(), 
+                  rev_order.end(), 
+                  [&](size_t i, size_t j) { return order[i] < order[j]; });
+        
+        // copy upper triangle but relabeled to natural order                 
         RVineMatrix2<size_t> str_mat(d_);
         for (size_t i = 0; i < d_ - 1; i++) {
             for (size_t j = 0; j < d_ - 1 - i; j++)
-                str_mat(i, j) = mat(i, j);
+                str_mat(i, j) = rev_order[mat(i, j) - 1];
         }
         
         return str_mat;
@@ -135,12 +147,12 @@ protected:
         size_t d = mat.dim();
         RVineMatrix2<size_t> needed_hfunc2(d);
  
-        for (size_t j = 0; j < d - 2; j++) {
-            for (size_t i = 0; i < d - 2 - j; i++) {
+        for (size_t i = 0; i < d - 2; i++) {
+            for (size_t j = 0; j < d - 2 - i; j++) {
                 needed_hfunc2(i, j) = 1;
+                if (mat(i + 1, j) == max_mat(i + 1, j))
+                    needed_hfunc2(i, d - max_mat(i + 1, j)) = 1;
             }
-            if (mat(d - 2 - j, j) == max_mat(d - 2 - j, j))
-                needed_hfunc2(d - 2 - j, j) = 1;
         }
                 
         return needed_hfunc2;
@@ -156,6 +168,8 @@ private:
     RVineMatrix2<size_t> needed_hfunc1_;
     RVineMatrix2<size_t> needed_hfunc2_;
 };
+
+}
 
 class Timer {
 public:
