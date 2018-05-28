@@ -10,6 +10,7 @@
 #include <Eigen/Dense>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <vinecopulib/vinecop/rvine_matrix2.hpp>
 
 namespace vinecopulib {
 
@@ -39,6 +40,25 @@ inline boost::property_tree::ptree matrix_to_ptree(
 
     return output;
 }
+
+template<class T>
+inline boost::property_tree::ptree matrix_to_ptree(
+    const RVineMatrix2<T>& matrix)
+{
+    boost::property_tree::ptree output;
+    for (size_t i = 0; i < matrix.dim(); i++) {
+        boost::property_tree::ptree col;
+        for (size_t j = 0; j < matrix.dim() - i; j++) {
+            boost::property_tree::ptree cell;
+            cell.put_value(matrix(j, i));
+            col.push_back(std::make_pair("", cell));
+        }
+        output.push_back(std::make_pair("", col));
+    }
+
+    return output;
+}
+
 
 //! conversion from boost::property_tree::ptree to Eigen::Matrix
 //!

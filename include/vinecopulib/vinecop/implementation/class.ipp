@@ -27,7 +27,7 @@ inline Vinecop::Vinecop(size_t d)
     auto mat = RVineMatrix::construct_d_vine_matrix(order);
 
     // don't check for validity of R-vine matrix
-    vine_matrix_ = RVineMatrix(mat, false);
+    vine_struct_ = RVineStructure(mat);
 
     // pair_copulas_ empty = everything independence 
     threshold_ = 0.0;
@@ -44,7 +44,7 @@ inline Vinecop::Vinecop(
     bool check_matrix)
 {
     d_ = matrix.rows();
-    vine_matrix_ = RVineMatrix(matrix, check_matrix);
+    vine_struct_ = RVineStructure(matrix);
     // pair_copulas_ empty = everything independence
     threshold_ = 0.0;
     loglik_ = NAN;
@@ -81,7 +81,7 @@ inline Vinecop::Vinecop(const std::vector <std::vector<Bicop>> &pair_copulas,
         }
     }
 
-    vine_matrix_ = RVineMatrix(matrix, check_matrix);
+    vine_struct_ = RVineStructure(matrix);
     pair_copulas_ = pair_copulas;
     threshold_ = 0.0;
     loglik_ = NAN;
@@ -96,7 +96,7 @@ inline Vinecop::Vinecop(boost::property_tree::ptree input, bool check_matrix)
 {
     auto matrix =
         tools_serialization::ptree_to_matrix<size_t>(input.get_child("matrix"));
-    vine_matrix_ = RVineMatrix(matrix, check_matrix);
+    vine_struct_ = RVineStructure(matrix);
     d_ = static_cast<size_t>(matrix.rows());
 
     boost::property_tree::ptree pcs_node = input.get_child("pair copulas");
@@ -151,7 +151,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
     if (data.rows() == 1) {
         throw std::runtime_error("data must have more than one row");
     }
-    vine_matrix_ = RVineMatrix(matrix, check_matrix);
+    vine_struct_ = RVineStructure(matrix);
     select_families(data, controls);
 }
 
@@ -245,7 +245,7 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
     }
     threshold_ = selector.get_threshold();
     loglik_ = selector.get_loglik();
-    vine_matrix_ = selector.get_rvine_matrix();
+    vine_struct_ = selector.get_rvine_matrix();
     pair_copulas_ = selector.get_pair_copulas();
 }
 
@@ -259,7 +259,7 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
     tools_eigen::check_if_in_unit_cube(data);
     check_data_dim(data);
     
-    tools_select::FamilySelector selector(data, vine_matrix_, controls);
+    tools_select::FamilySelector selector(data, vine_struct_, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
     } else {
@@ -420,10 +420,10 @@ inline std::vector <std::vector<double>> Vinecop::get_all_taus() const
 }
 
 //! extracts the structure matrix of the vine copula model.
-inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
+inline RVineMatrix2<size_t>
 Vinecop::get_matrix() const
 {
-    return vine_matrix_.get_matrix();
+    return vine_struct_.matrix();
 }
 
 //! extracts the log-likelihood (zero when model not fitted to data).
@@ -456,11 +456,12 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
     size_t n = u.rows();
     
     // info about the vine structure (reverse rows (!) for more natural indexing)
-    Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
-    auto no_matrix = vine_matrix_.get_natural_order();
-    auto max_matrix = vine_matrix_.get_max_matrix();
-    MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
-    MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
+    auto revorder = vine_struct_.order();
+    std::reverse(revorder.begin(), revorder.end());
+    auto no_matrix = vine_struct_.matrix();
+    auto max_matrix = vine_struct_.max_matrix();
+    auto needed_hfunc1 = vine_struct_.needed_hfunc1();
+    auto needed_hfunc2 = vine_struct_.needed_hfunc2();
 
     // initial value must be 1.0 for multiplication
     Eigen::VectorXd vine_density = Eigen::VectorXd::Constant(u.rows(), 1.0);
@@ -473,7 +474,7 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
     // fill first row of hfunc2 matrix with evaluation points;
     // points have to be reordered to correspond to natural order
     for (size_t j = 0; j < d; ++j)
-        hfunc2.col(j) = u.col(revorder(j) - 1);
+        hfunc2.col(j) = u.col(revorder[j] - 1);
         
     size_t trunc_lvl = pair_copulas_.size();
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
@@ -494,10 +495,10 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
             vine_density = vine_density.cwiseProduct(edge_copula.pdf(u_e));
 
             // h-functions are only evaluated if needed in next step
-            if (needed_hfunc1(tree + 1, edge)) {
+            if (needed_hfunc1(tree, edge)) {
                 hfunc1.col(edge) = edge_copula.hfunc1(u_e);
             }
-            if (needed_hfunc2(tree + 1, edge)) {
+            if (needed_hfunc2(tree, edge)) {
                 hfunc2.col(edge) = edge_copula.hfunc2(u_e);
             }
         }
@@ -703,21 +704,20 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
 
     if (d > 2) {
         // info about the vine structure (in upper triangular matrix notation)
-        Eigen::Matrix<size_t, Eigen::Dynamic, 1> revorder = vine_matrix_.get_order().reverse();
-        auto no_matrix = vine_matrix_.get_natural_order();
-        auto max_matrix = vine_matrix_.get_max_matrix();
-        MatrixXb needed_hfunc1 = vine_matrix_.get_needed_hfunc1();
-        MatrixXb needed_hfunc2 = vine_matrix_.get_needed_hfunc2();
+        auto revorder = vine_struct_.order();
+        std::reverse(revorder.begin(), revorder.end());
+        auto no_matrix = vine_struct_.matrix();
+        auto max_matrix = vine_struct_.max_matrix();
+        auto needed_hfunc1 = vine_struct_.needed_hfunc1();
+        auto needed_hfunc2 = vine_struct_.needed_hfunc2();
 
         // temporary storage objects for (inverse) h-functions
-        Eigen::Matrix <Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> hinv2(d,
-                                                                              d);
-        Eigen::Matrix <Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> hfunc1(d,
-                                                                               d);
+        Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> hinv2(d,d);
+        Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> hfunc1(d,d);
 
         // initialize with independent uniforms (corresponding to natural order)
         for (size_t j = 0; j < d; ++j)
-            hinv2(d - j - 1, j) = u.col(revorder(j) - 1);
+            hinv2(d - j - 1, j) = u.col(revorder[j] - 1);
         hfunc1(0, d - 1) = hinv2(0, d - 1);
 
         // loop through variables (0 is just the inital uniform)
@@ -746,7 +746,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
 
                 // if required at later stage, also calculate hfunc2
                 if (var < static_cast<ptrdiff_t>(d_) - 1) {
-                    if (needed_hfunc1(tree + 1, var)) {
+                    if (needed_hfunc1(tree, var)) {
                         U_e.col(0) = hinv2(tree, var);
                         hfunc1(tree + 1, var) = edge_copula.hfunc1(U_e);
                     }
@@ -755,9 +755,9 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
         }
 
         // go back to original order
-        auto inverse_order = inverse_permutation(revorder);
+        auto inverse_order = tools_stl::invert_permutation(revorder);
         for (size_t j = 0; j < d; ++j)
-            U_vine.col(j) = hinv2(0, inverse_order(j));
+            U_vine.col(j) = hinv2(0, inverse_order[j]);
     } else {
         U_vine.col(0) = get_pair_copula(0, 0).hinv2(u);
     }

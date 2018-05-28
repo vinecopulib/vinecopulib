@@ -54,6 +54,8 @@ private:
 
 class RVineStructure {
 public:
+    RVineStructure() {}
+    
     RVineStructure(
         const Eigen::MatrixXs& mat)
     {
@@ -66,6 +68,7 @@ public:
         needed_hfunc2_ = compute_needed_hfunc2(mat_, max_mat_);
     }
 
+    std::vector<size_t> order() const {return order_;}
     RVineMatrix2<size_t> matrix() const {return mat_;}
     RVineMatrix2<size_t> max_matrix() const {return max_mat_;}
     RVineMatrix2<size_t> needed_hfunc1() const {return needed_hfunc1_;}

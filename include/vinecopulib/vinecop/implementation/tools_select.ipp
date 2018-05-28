@@ -77,9 +77,9 @@ VinecopSelector::get_pair_copulas() const
     return pair_copulas_;
 }
 
-inline RVineMatrix VinecopSelector::get_rvine_matrix() const
+inline RVineStructure VinecopSelector::get_rvine_matrix() const
 {
-    return vine_matrix_;
+    return vine_struct_;
 }
 
 //! Initialize object for storing pair copulas
@@ -286,14 +286,14 @@ inline double VinecopSelector::get_next_threshold(
 
 
 inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
-                                      const RVineMatrix &vine_matrix,
+                                      const RVineStructure &vine_struct,
                                       const FitControlsVinecop &controls)
 {
     n_ = data.rows();
     d_ = data.cols();
     trees_.resize(1);
     controls_ = controls;
-    vine_matrix_ = vine_matrix;
+    vine_struct_ = vine_struct;
     threshold_ = controls.get_threshold();
     psi0_ = controls.get_psi0();
 }
@@ -439,12 +439,9 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
             mat(i, j) += 1;
         }
     }
-    
-    // fill missing entries in case vine was truncated
-    RVineMatrix::complete_matrix(mat, trunc_lvl, controls_.get_num_threads());
 
-    // return as RVineMatrix
-    vine_matrix_ = RVineMatrix(mat, false);
+    // return as RVineStructure
+    vine_struct_ = RVineStructure(mat);
 }
 
 inline bool FamilySelector::belongs_to_structure(size_t v0, size_t v1,
@@ -475,7 +472,7 @@ inline bool FamilySelector::belongs_to_structure(size_t v0, size_t v1,
         add_one(conditioning);
 
         // check whether the edge belongs to the structure
-        return vine_matrix_.belongs_to_structure(conditioned, conditioning);
+        return vine_struct_.belongs_to_structure(conditioned, conditioning);
     }
 
     // there was no common neighbor
@@ -495,7 +492,7 @@ inline void FamilySelector::add_allowed_edges(VineTree &vine_tree)
             if (v0 == v1)
                 continue;
             // check whether edege (v0, v1) belongs to the structure
-            // given in rvine_matrix_
+            // given in rvine_struct_
             if (belongs_to_structure(v0, v1, vine_tree)) {
                 Eigen::MatrixXd pc_data;
                 EdgeIterator e;
@@ -527,7 +524,7 @@ inline size_t FamilySelector::find_column_in_matrix(
     const std::vector<size_t>& conditioned)
 {
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> inds =
-        vine_matrix_.get_order().reverse();
+        vine_struct_.get_order().reverse();
     std::vector<size_t> vinds(inds.data(), inds.data() + inds.rows());
     return tools_stl::find_position(conditioned[0] + 1, vinds);
 }

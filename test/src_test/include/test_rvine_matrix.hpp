@@ -135,7 +135,7 @@ TEST(rvine_matrix, test) {
 //     EXPECT_EQ(rvine_matrix.get_needed_hfunc2(), true_hfunc2);
 // }
 // 
-// TEST(rvine_matrix, construct_d_vine_matrix_is_correct) {
+// TEST(rvine_matrix, construct_d_vine_struct_is_correct) {
 //     Eigen::Matrix<size_t, Eigen::Dynamic, 1> order(7);
 //     order << 7, 2, 3, 5, 1, 4, 6;
 //     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> true_d_vine_matrix(7,
@@ -218,7 +218,7 @@ TEST(rvine_matrix, test) {
 // 
 // }
 // 
-// TEST(rvine_matrix, rvine_matrix_sanity_checks_work) {
+// TEST(rvine_matrix, rvine_struct_sanity_checks_work) {
 //     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
 //     mat << 5, 2, 6, 6, 6, 6, 6,
 //         6, 6, 1, 2, 5, 5, 0,

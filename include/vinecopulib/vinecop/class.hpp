@@ -8,6 +8,7 @@
 
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/vinecop/rvine_matrix.hpp>
+#include <vinecopulib/vinecop/rvine_matrix2.hpp>
 #include <vinecopulib/vinecop/tools_select.hpp>
 
 namespace vinecopulib {
@@ -67,7 +68,7 @@ public:
     
     double get_tau(size_t tree, size_t edge) const;
 
-    Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
+    RVineMatrix2<size_t> get_matrix() const;
 
     // Getters for all pair copulas
     std::vector <std::vector<Bicop>> get_all_pair_copulas() const;
@@ -112,7 +113,7 @@ public:
 
 private:
     size_t d_;
-    RVineMatrix vine_matrix_;
+    RVineStructure vine_struct_;
     std::vector <std::vector<Bicop>> pair_copulas_;
     double threshold_;
     double loglik_;

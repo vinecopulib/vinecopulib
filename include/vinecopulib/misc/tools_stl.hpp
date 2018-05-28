@@ -147,6 +147,16 @@ inline vector <size_t> seq_int(size_t from, size_t length)
     iota(seq.begin(), seq.end(), from);
     return seq;
 }
+
+inline vector<size_t> invert_permutation(const vector<size_t>& perm)
+{
+    auto inv_perm = seq_int(0, perm.size());
+    std::sort(inv_perm.begin(), 
+              inv_perm.end(), 
+              [&](size_t i, size_t j) { return perm[i] < perm[j]; });
+    return inv_perm;
+}
+
 }
 
 }
