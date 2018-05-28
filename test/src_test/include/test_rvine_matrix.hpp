@@ -16,8 +16,7 @@ using namespace vinecopulib;
 
 
 TEST(rvine_matrix, test) {
-    Eigen::MatrixXi mat(7, 7);
-    Eigen::Matrix<size_t, 7, 7> mat2;
+    Eigen::Matrix<size_t, 7, 7> mat;
     mat << 4, 5, 4, 2, 2, 1, 1,
            2, 4, 2, 1, 1, 2, 0,
            5, 2, 1, 3, 3, 0, 0,
@@ -25,13 +24,6 @@ TEST(rvine_matrix, test) {
            1, 3, 5, 0, 0, 0, 0,
            3, 6, 0, 0, 0, 0, 0,
            7, 0, 0, 0, 0, 0, 0;
-    mat2 << 4, 5, 4, 2, 2, 1, 1,
-          2, 4, 2, 1, 1, 2, 0,
-          5, 2, 1, 3, 3, 0, 0,
-          6, 1, 3, 4, 0, 0, 0,
-          1, 3, 5, 0, 0, 0, 0,
-          3, 6, 0, 0, 0, 0, 0,
-          7, 0, 0, 0, 0, 0, 0;   
     
     Timer timer;
     timer.start();
@@ -39,7 +31,7 @@ TEST(rvine_matrix, test) {
     timer.end();
 
     timer.start();
-    RVineMatrix rvm(mat2, false);
+    RVineMatrix rvm(mat, false);
     timer.end();
     
     std::cout << "matrix ------" << std::endl;

@@ -5,6 +5,11 @@
 #include <chrono>
 #include <vinecopulib/misc/tools_stl.hpp>
 
+namespace Eigen {
+    typedef Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> MatrixXs;
+}
+
+
 namespace vinecopulib {
 
 template<class T>
@@ -49,7 +54,8 @@ private:
 
 class RVineStructure {
 public:
-    RVineStructure(const Eigen::MatrixXi& mat)
+    RVineStructure(
+        const Eigen::MatrixXs& mat)
     {
         d_ = mat.cols();
         trunc_lvl_ = find_trunc_lvl(mat);
@@ -67,7 +73,7 @@ public:
 
 protected:
 
-    size_t find_trunc_lvl(const Eigen::MatrixXi& mat)
+    size_t find_trunc_lvl(const Eigen::MatrixXs& mat)
     {
         size_t trunc_lvl; ;
         for (trunc_lvl = mat.cols() - 1; trunc_lvl > 0; trunc_lvl--) {
@@ -78,7 +84,7 @@ protected:
         return trunc_lvl;
     }
 
-    std::vector<size_t> get_order(const Eigen::MatrixXi& mat) const
+    std::vector<size_t> get_order(const Eigen::MatrixXs& mat) const
     {
         size_t d = mat.cols();
         std::vector<size_t> order(d);
@@ -91,7 +97,7 @@ protected:
         return order;
     }
     
-    RVineMatrix2<size_t> create_struct_mat(const Eigen::MatrixXi& mat) const
+    RVineMatrix2<size_t> create_struct_mat(const Eigen::MatrixXs& mat) const
     {
         // compute inverse permutation of the order; will be used to fill
         // matrix in natural order
