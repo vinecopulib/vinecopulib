@@ -5,7 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/misc/tools_stl.hpp>
-#include <vinecopulib/misc/tools_thread.hpp>
+#include <vinecopulib/misc/tools_interface.hpp>
 
 namespace vinecopulib {
 //! instantiates an RVineMatrix object.
