@@ -33,6 +33,7 @@ inline std::vector<Batch> create_batches(size_t num_tasks, size_t num_threads)
     return batches;
 }
 
+#ifndef INTERFACED_FROM_R
 //! Implementation of the thread pool pattern based on `std::thread`.
 class ThreadPool {
 public:
@@ -176,5 +177,7 @@ private:
     std::atomic_uint num_busy_;
     bool stopped_;
 };
+
+#endif
 
 }
