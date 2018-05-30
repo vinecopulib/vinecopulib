@@ -22,12 +22,11 @@
 #endif
 
 // parallel backend
+#include <vinecopulib/misc/tools_thread.hpp>
 #ifdef INTERFACED_FROM_R
     namespace tools_thread { 
         typedef RcppThread::ThreadPool ThreadPool; 
     }
-#else
-    #include <vinecopulib/misc/tools_thread.hpp>
 #endif
 
 namespace vinecopulib {
