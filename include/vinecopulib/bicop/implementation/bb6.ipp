@@ -52,7 +52,7 @@ inline double Bb6Bicop::generator_derivative2(const double &u)
            std::pow(tmp - 1, 2);
 }
 
-inline Eigen::VectorXd Bb6Bicop::pdf(
+inline Eigen::VectorXd Bb6Bicop::pdf_raw(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {

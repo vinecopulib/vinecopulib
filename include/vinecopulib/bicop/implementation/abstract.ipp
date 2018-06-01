@@ -119,6 +119,13 @@ inline void AbstractBicop::set_loglik(const double loglik)
 //! @}
 
 
+//! evaluates the pdf, but truncates it's value by DBL_MIN and DBL_MAX.
+//! @param u matrix of evaluation points.
+inline Eigen::VectorXd AbstractBicop::pdf(
+    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+{
+    return pdf_raw(u).array().min(DBL_MAX).max(DBL_MIN);
+}
 
 //! Numerical inversion of h-functions
 //!
