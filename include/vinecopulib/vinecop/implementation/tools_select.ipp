@@ -107,9 +107,12 @@ inline std::vector <std::vector<Bicop>> VinecopSelector::make_pair_copula_store(
 
 inline void VinecopSelector::select_all_trees(const Eigen::MatrixXd &data)
 {
+    std::cout << "bla" << std::endl;
     initialize_new_fit(data);
+    std::cout << "bla2" << std::endl;
     double loglik = 0.0;
     for (size_t t = 0; t < d_ - 1; ++t) {
+        std::cout << "bla3 " << t << std::endl;
         select_tree(t);  // select pair copulas (+ structure) of tree t
         loglik += get_loglik_of_tree(t);
 
@@ -124,6 +127,7 @@ inline void VinecopSelector::select_all_trees(const Eigen::MatrixXd &data)
             break;
         }
     }
+    std::cout << "bla4" << std::endl;
     loglik_ = loglik;
     finalize(controls_.get_truncation_level());
 }

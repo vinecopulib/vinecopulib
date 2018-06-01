@@ -17,13 +17,13 @@ using namespace vinecopulib;
 
 TEST(rvine_matrix, test) {
     Eigen::Matrix<size_t, 7, 7> mat;
-    mat << 4, 5, 4, 2, 2, 1, 1,
-           2, 4, 2, 1, 1, 2, 0,
-           5, 2, 1, 3, 3, 0, 0,
-           6, 1, 3, 4, 0, 0, 0,
-           1, 3, 5, 0, 0, 0, 0,
-           3, 6, 0, 0, 0, 0, 0,
-           7, 0, 0, 0, 0, 0, 0;
+    mat << 5, 2, 6, 6, 6, 6, 6,
+        6, 6, 1, 2, 5, 5, 0,
+        2, 5, 2, 5, 2, 0, 0,
+        1, 1, 5, 1, 0, 0, 0,
+        3, 7, 7, 0, 0, 0, 0,
+        7, 3, 0, 0, 0, 0, 0,
+        4, 0, 0, 0, 0, 0, 0;
     
     Timer timer;
     timer.start();
@@ -37,6 +37,10 @@ TEST(rvine_matrix, test) {
     std::cout << "matrix ------" << std::endl;
     std::cout << mat << std::endl  << std::endl;
     std::cout << strct.get_matrix() << std::endl;
+
+    std::cout << "no_matrix ------" << std::endl;
+    std::cout << rvm.get_natural_order() << std::endl  << std::endl;
+    std::cout << strct.get_struct_matrix().str() << std::endl;
     
     std::cout << "max_matrix ------" << std::endl;
     std::cout << rvm.get_max_matrix() << std::endl  << std::endl;

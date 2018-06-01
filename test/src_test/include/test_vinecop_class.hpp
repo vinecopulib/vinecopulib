@@ -63,7 +63,7 @@ TEST_F(VinecopTest, getters_are_correct) {
             EXPECT_EQ(rot, 90);
         }
     }
-    
+
     for (auto &tree : vinecop.get_all_taus()) {
         for (auto &tau : tree) {
             ASSERT_TRUE(fabs(tau) < 1e-4);
@@ -120,9 +120,9 @@ TEST_F(VinecopTest, simulate_is_correct) {
     Vinecop vinecop(pair_copulas, model_matrix);
 
     // only check if it works
-    vinecop.simulate(10);  
+    vinecop.simulate(10);
     // check the underlying transformation from independent samples
-    ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));    
+    ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
 }
 
 TEST_F(VinecopTest, aic_bic_are_correct) {

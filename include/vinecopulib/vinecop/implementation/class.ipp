@@ -491,18 +491,6 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
     // points have to be reordered to correspond to natural order
     for (size_t j = 0; j < d; ++j)
         hfunc2.col(j) = u.col(revorder[j] - 1);
-
-    std::cout << "matrix ------" << std::endl;
-    std::cout << get_matrix() << std::endl;
-
-    std::cout << "max_matrix ------" << std::endl;
-    std::cout << vine_struct_.get_max_matrix().str() << std::endl;
-
-    std::cout << "needed_hfunc1 ------" << std::endl;
-    std::cout << vine_struct_.get_needed_hfunc1().str() << std::endl;
-
-    std::cout << "needed_hfunc2 ------" << std::endl;
-    std::cout << vine_struct_.get_needed_hfunc2().str() << std::endl;
         
     size_t trunc_lvl = pair_copulas_.size();
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
