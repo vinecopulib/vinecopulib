@@ -36,19 +36,19 @@ TEST(rvine_matrix, test) {
     
     std::cout << "matrix ------" << std::endl;
     std::cout << mat << std::endl  << std::endl;
-    std::cout << strct.matrix().str() << std::endl;
+    std::cout << strct.get_matrix() << std::endl;
     
     std::cout << "max_matrix ------" << std::endl;
     std::cout << rvm.get_max_matrix() << std::endl  << std::endl;
-    std::cout << strct.max_matrix().str() << std::endl;
+    std::cout << strct.get_max_matrix().str() << std::endl;
     
     std::cout << "needed_hfunc1 ------" << std::endl;
     std::cout << rvm.get_needed_hfunc1() << std::endl  << std::endl;
-    std::cout << strct.needed_hfunc1().str() << std::endl;
+    std::cout << strct.get_needed_hfunc1().str() << std::endl;
     
     std::cout << "needed_hfunc2 ------" << std::endl;
     std::cout << rvm.get_needed_hfunc2() << std::endl  << std::endl;
-    std::cout << strct.needed_hfunc2().str() << std::endl;
+    std::cout << strct.get_needed_hfunc2().str() << std::endl;
 }
 
 // TEST(rvine_matrix, can_convert_to_natural_order) {

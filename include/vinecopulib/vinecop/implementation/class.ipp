@@ -192,8 +192,10 @@ inline boost::property_tree::ptree Vinecop::to_ptree()
 
     boost::property_tree::ptree output;
     output.add_child("pair copulas", pair_copulas);
-    auto matrix_node = tools_serialization::matrix_to_ptree(get_matrix());
+    auto matrix_node = tools_serialization::matrix_to_ptree(get_struct_matrix());
     output.add_child("matrix", matrix_node);
+    auto order_node = tools_serialization::vector_to_ptree(get_order());
+    output.add_child("order", order_node);
 
     return output;
 }
@@ -419,11 +421,25 @@ inline std::vector <std::vector<double>> Vinecop::get_all_taus() const
     return taus;
 }
 
+//! extracts the order vector of the vine copula model.
+inline std::vector<size_t>
+Vinecop::get_order() const
+{
+    return vine_struct_.get_order();
+}
+
 //! extracts the structure matrix of the vine copula model.
-inline RVineMatrix2<size_t>
+inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>
 Vinecop::get_matrix() const
 {
-    return vine_struct_.matrix();
+    return vine_struct_.get_matrix();
+}
+
+//! extracts the above diagonal coefficients of the vine copula model.
+inline RVineMatrix2<size_t>
+Vinecop::get_struct_matrix() const
+{
+    return vine_struct_.get_struct_matrix();
 }
 
 //! extracts the log-likelihood (zero when model not fitted to data).
@@ -456,12 +472,12 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
     size_t n = u.rows();
     
     // info about the vine structure (reverse rows (!) for more natural indexing)
-    auto revorder = vine_struct_.order();
-    std::reverse(revorder.begin(), revorder.end());
-    auto no_matrix = vine_struct_.matrix();
-    auto max_matrix = vine_struct_.max_matrix();
-    auto needed_hfunc1 = vine_struct_.needed_hfunc1();
-    auto needed_hfunc2 = vine_struct_.needed_hfunc2();
+    auto revorder = vine_struct_.get_order();
+    tools_stl::reverse(revorder);
+    auto no_matrix = vine_struct_.get_struct_matrix();
+    auto max_matrix = vine_struct_.get_max_matrix();
+    auto needed_hfunc1 = vine_struct_.get_needed_hfunc1();
+    auto needed_hfunc2 = vine_struct_.get_needed_hfunc2();
 
     // initial value must be 1.0 for multiplication
     Eigen::VectorXd vine_density = Eigen::VectorXd::Constant(u.rows(), 1.0);
@@ -475,6 +491,18 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u) const
     // points have to be reordered to correspond to natural order
     for (size_t j = 0; j < d; ++j)
         hfunc2.col(j) = u.col(revorder[j] - 1);
+
+    std::cout << "matrix ------" << std::endl;
+    std::cout << get_matrix() << std::endl;
+
+    std::cout << "max_matrix ------" << std::endl;
+    std::cout << vine_struct_.get_max_matrix().str() << std::endl;
+
+    std::cout << "needed_hfunc1 ------" << std::endl;
+    std::cout << vine_struct_.get_needed_hfunc1().str() << std::endl;
+
+    std::cout << "needed_hfunc2 ------" << std::endl;
+    std::cout << vine_struct_.get_needed_hfunc2().str() << std::endl;
         
     size_t trunc_lvl = pair_copulas_.size();
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
@@ -704,12 +732,12 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
 
     if (d > 2) {
         // info about the vine structure (in upper triangular matrix notation)
-        auto revorder = vine_struct_.order();
-        std::reverse(revorder.begin(), revorder.end());
-        auto no_matrix = vine_struct_.matrix();
-        auto max_matrix = vine_struct_.max_matrix();
-        auto needed_hfunc1 = vine_struct_.needed_hfunc1();
-        auto needed_hfunc2 = vine_struct_.needed_hfunc2();
+        auto revorder = vine_struct_.get_order();
+        tools_stl::reverse(revorder);
+        auto no_matrix = vine_struct_.get_struct_matrix();
+        auto max_matrix = vine_struct_.get_max_matrix();
+        auto needed_hfunc1 = vine_struct_.get_needed_hfunc1();
+        auto needed_hfunc2 = vine_struct_.get_needed_hfunc2();
 
         // temporary storage objects for (inverse) h-functions
         Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic> hinv2(d,d);

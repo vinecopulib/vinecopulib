@@ -43,7 +43,7 @@ inline boost::property_tree::ptree matrix_to_ptree(
 
 template<class T>
 inline boost::property_tree::ptree matrix_to_ptree(
-    const RVineMatrix2<T>& matrix)
+    RVineMatrix2<T> matrix)
 {
     boost::property_tree::ptree output;
     for (size_t i = 0; i < matrix.dim(); i++) {
@@ -54,6 +54,20 @@ inline boost::property_tree::ptree matrix_to_ptree(
             col.push_back(std::make_pair("", cell));
         }
         output.push_back(std::make_pair("", col));
+    }
+
+    return output;
+}
+
+template<class T>
+inline boost::property_tree::ptree vector_to_ptree(
+    std::vector<T> vec)
+{
+    boost::property_tree::ptree output;
+    for (size_t i = 0; i < vec.size(); i++) {
+        boost::property_tree::ptree cell;
+        cell.put_value(vec[i]);
+        output.push_back(std::make_pair("", cell));
     }
 
     return output;

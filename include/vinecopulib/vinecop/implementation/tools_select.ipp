@@ -523,9 +523,8 @@ inline void FamilySelector::finalize(size_t trunc_lvl)
 inline size_t FamilySelector::find_column_in_matrix(
     const std::vector<size_t>& conditioned)
 {
-    Eigen::Matrix<size_t, Eigen::Dynamic, 1> inds =
-        vine_struct_.get_order().reverse();
-    std::vector<size_t> vinds(inds.data(), inds.data() + inds.rows());
+    auto vinds = vine_struct_.get_order();
+    tools_stl::reverse(vinds);
     return tools_stl::find_position(conditioned[0] + 1, vinds);
 }
 

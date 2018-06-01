@@ -68,8 +68,6 @@ public:
     
     double get_tau(size_t tree, size_t edge) const;
 
-    RVineMatrix2<size_t> get_matrix() const;
-
     // Getters for all pair copulas
     std::vector <std::vector<Bicop>> get_all_pair_copulas() const;
 
@@ -80,6 +78,13 @@ public:
     std::vector <std::vector<Eigen::MatrixXd>> get_all_parameters() const;
     
     std::vector <std::vector<double>> get_all_taus() const;
+
+    // Getters for the structure
+    std::vector<size_t> get_order() const;
+
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
+
+    RVineMatrix2<size_t> get_struct_matrix() const;
     
     // getter for the threshold
     double get_threshold() const;

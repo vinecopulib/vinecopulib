@@ -5,11 +5,6 @@
 #include <chrono>
 #include <vinecopulib/misc/tools_stl.hpp>
 
-namespace Eigen {
-    typedef Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> MatrixXs;
-}
-
-
 namespace vinecopulib {
 
 template<class T>
@@ -18,15 +13,13 @@ public:
     RVineMatrix2() {}
     RVineMatrix2(size_t d) : d_(d)
     {
-        mat_ = std::vector< std::vector<T> >(d - 1);
+        mat_ = std::vector<std::vector<T>>(d - 1);
         for (size_t i = 0; i < mat_.size(); i++)
             mat_[i] = std::vector<T>(mat_.size() - i, 0);
     }
     
-    T& operator()(size_t tree, size_t edge)
-    {
-        return mat_[edge][tree];
-    }
+    T& operator()(size_t tree, size_t edge) {return mat_[edge][tree];}
+    T operator()(size_t tree, size_t edge) const {return mat_[edge][tree];}
 
     std::string str()
     {
@@ -40,10 +33,7 @@ public:
         return str.str();
     }
     
-    size_t dim() const 
-    {
-        return d_;
-    }
+    size_t dim() const {return d_;}
 
 private:
     size_t d_;
@@ -51,32 +41,76 @@ private:
 };
 
 
-
 class RVineStructure {
 public:
     RVineStructure() {}
     
     RVineStructure(
-        const Eigen::MatrixXs& mat)
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat)
     {
+        std::cout << mat << std::endl;
         d_ = mat.cols();
         trunc_lvl_ = find_trunc_lvl(mat);
-        order_ = get_order(mat);
-        mat_ = create_struct_mat(mat);
-        max_mat_ = compute_max_mat(mat_);
-        needed_hfunc1_ = compute_needed_hfunc1(mat_, max_mat_);
-        needed_hfunc2_ = compute_needed_hfunc2(mat_, max_mat_);
+        order_ = compute_order(mat);
+        mat_ = compute_struct_mat(mat);
+        max_mat_ = compute_max_mat();
+        needed_hfunc1_ = compute_needed_hfunc1();
+        needed_hfunc2_ = compute_needed_hfunc2();
     }
 
-    std::vector<size_t> order() const {return order_;}
-    RVineMatrix2<size_t> matrix() const {return mat_;}
-    RVineMatrix2<size_t> max_matrix() const {return max_mat_;}
-    RVineMatrix2<size_t> needed_hfunc1() const {return needed_hfunc1_;}
-    RVineMatrix2<size_t> needed_hfunc2() const {return needed_hfunc2_;}
+    std::vector<size_t> get_order() const {return order_;}
+    RVineMatrix2<size_t> get_struct_matrix() const {return mat_;}
+    RVineMatrix2<size_t> get_max_matrix() const {return max_mat_;}
+    RVineMatrix2<size_t> get_needed_hfunc1() const {return needed_hfunc1_;}
+    RVineMatrix2<size_t> get_needed_hfunc2() const {return needed_hfunc2_;}
+
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const {
+        Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> matrix(d_, d_);
+        matrix.fill(0);
+        for (size_t i = 0; i < d_; ++i) {
+            for (size_t j = 0; j < d_ - i - 1; ++j) {
+                matrix(i, j) = order_[mat_(i, j) - 1];
+            }
+            matrix(d_ - i - 1, i) = order_[d_ - i - 1];
+        }
+        return matrix;
+    }
+
+    bool belongs_to_structure(const std::vector <size_t> conditioned,
+                              const std::vector <size_t> conditioning)
+    {
+        if (conditioned.size() != 2) {
+            throw std::runtime_error("conditioned should have size 2 ");
+        }
+
+        size_t tree = conditioning.size();
+        std::vector <size_t> conditioning_mat(tree);
+        std::vector <size_t> conditioned_mat(2);
+        if (tree + 2 <= d_) {
+            for (size_t i = 0; i < d_ - tree - 1; ++i) {
+                conditioned_mat = {mat_(d_ - 1 - i, i), mat_(tree, i)};
+                if (conditioned == conditioned_mat) {
+                    // conditioned sets equal, need to check conditioning set
+                    if (tree == 0) {
+                        return true;  // conditioning set is empty for tree == 0
+                    }
+                    for (size_t j = 0; j < tree; ++j)
+                        conditioning_mat[j] = mat_(j, i);
+                    if (tools_stl::is_same_set(conditioning, conditioning_mat)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // edge is not contained in the structure implied by the matrix
+        return false;
+    }
 
 protected:
 
-    size_t find_trunc_lvl(const Eigen::MatrixXs& mat)
+    size_t find_trunc_lvl(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat)
     {
         size_t trunc_lvl; ;
         for (trunc_lvl = mat.cols() - 1; trunc_lvl > 0; trunc_lvl--) {
@@ -87,86 +121,78 @@ protected:
         return trunc_lvl;
     }
 
-    std::vector<size_t> get_order(const Eigen::MatrixXs& mat) const
+    std::vector<size_t> compute_order(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
     {
         size_t d = mat.cols();
         std::vector<size_t> order(d);
-        for (size_t i = 0; i < d; i++) {
+        for (size_t i = 0; i < d; i++)
             order[i] = mat(i, d - i - 1);
-            if (order[i] != i + 1)
-                throw std::runtime_error("mat must be in natural order");
-        }
         
         return order;
     }
     
-    RVineMatrix2<size_t> create_struct_mat(const Eigen::MatrixXs& mat) const
+    RVineMatrix2<size_t> compute_struct_mat(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
     {
         // compute inverse permutation of the order; will be used to fill
         // matrix in natural order
-        auto order = get_order(mat);;
         auto rev_order = tools_stl::seq_int(1, mat.cols());
         std::sort(rev_order.begin(), 
                   rev_order.end(), 
-                  [&](size_t i, size_t j) { return order[i] < order[j]; });
+                  [&](size_t i, size_t j) { return order_[i] < order_[j]; });
         
         // copy upper triangle but relabeled to natural order                 
-        RVineMatrix2<size_t> str_mat(d_);
+        RVineMatrix2<size_t> struct_mat(d_);
         for (size_t i = 0; i < d_ - 1; i++) {
             for (size_t j = 0; j < d_ - 1 - i; j++)
-                str_mat(i, j) = rev_order[mat(i, j) - 1];
+                struct_mat(i, j) = rev_order[mat(i, j) - 1];
         }
         
-        return str_mat;
+        return struct_mat;
     }
     
-    RVineMatrix2<size_t> compute_max_mat(RVineMatrix2<size_t>& mat) const
+    RVineMatrix2<size_t> compute_max_mat() const
     {
-        RVineMatrix2<size_t> max_mat = mat;
+        RVineMatrix2<size_t> max_mat = mat_;
         for (size_t j = 0; j < d_ - 1; j++) {
             for (size_t i = 1; i < d_ - 1 - j; i++) {
-                    max_mat(i, j) = std::max(mat(i, j), max_mat(i - 1, j));
+                    max_mat(i, j) = std::max(mat_(i, j), max_mat(i - 1, j));
             }
         }
     
         return max_mat;
     }
     
-    RVineMatrix2<size_t> compute_needed_hfunc1(RVineMatrix2<size_t>& mat,
-                                               RVineMatrix2<size_t>& max_mat)
-                                               const
+    RVineMatrix2<size_t> compute_needed_hfunc1() const
     {
-        size_t d = mat.dim();
-        RVineMatrix2<size_t> needed_hfunc1(d);
+        RVineMatrix2<size_t> needed_hfunc1(d_);
  
-        for (size_t i = 0; i < d - 2; i++) {
-            for (size_t j = 0; j < d - 2 - i; j++) {
-                if (mat(i + 1, j) != max_mat(i + 1, j))
-                    needed_hfunc1(i, d - max_mat(i + 1, j)) = 1;
+        for (size_t i = 0; i < d_ - 2; i++) {
+            for (size_t j = 0; j < d_ - 2 - i; j++) {
+                if (mat_(i + 1, j) != max_mat_(i + 1, j))
+                    needed_hfunc1(i, d_ - max_mat_(i + 1, j)) = 1;
             }
         }
         
         return needed_hfunc1;
     }
     
-    RVineMatrix2<size_t> compute_needed_hfunc2(RVineMatrix2<size_t>& mat,
-                                               RVineMatrix2<size_t>& max_mat)
-                                               const
+    RVineMatrix2<size_t> compute_needed_hfunc2() const
     {
-        size_t d = mat.dim();
-        RVineMatrix2<size_t> needed_hfunc2(d);
+        RVineMatrix2<size_t> needed_hfunc2(d_);
  
-        for (size_t i = 0; i < d - 2; i++) {
-            for (size_t j = 0; j < d - 2 - i; j++) {
+        for (size_t i = 0; i < d_ - 2; i++) {
+            for (size_t j = 0; j < d_ - 2 - i; j++) {
                 needed_hfunc2(i, j) = 1;
-                if (mat(i + 1, j) == max_mat(i + 1, j))
-                    needed_hfunc2(i, d - max_mat(i + 1, j)) = 1;
+                if (mat_(i + 1, j) == max_mat_(i + 1, j))
+                    needed_hfunc2(i, d_ - max_mat_(i + 1, j)) = 1;
             }
         }
                 
         return needed_hfunc2;
     }
-    
+
 
 private:
     std::vector<size_t> order_;
