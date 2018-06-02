@@ -18,6 +18,9 @@ public:
     RVineStructure(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat);
     RVineStructure(const std::vector<size_t>& order);
+    RVineStructure(const std::vector<size_t>& order,
+                   const RVineMatrix<size_t>& struct_mat,
+                   bool is_natural_order = false);
 
     std::vector<size_t> get_order() const;
     RVineMatrix<size_t> get_struct_matrix() const;
@@ -35,6 +38,7 @@ protected:
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
     std::vector<size_t> compute_order(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+    RVineMatrix<size_t> compute_natural_order(const RVineMatrix<size_t>& mat) const;
     RVineMatrix<size_t> compute_struct_matrix(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
     RVineMatrix<size_t> compute_dvine_struct_matrix() const;
@@ -44,6 +48,7 @@ protected:
 
 
 private:
+
     std::vector<size_t> order_;
     size_t d_;
     size_t trunc_lvl_;

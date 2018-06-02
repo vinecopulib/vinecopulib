@@ -349,8 +349,8 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
 {
     using namespace tools_stl;
     pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
-    Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d_, d_);
-    mat.fill(0);
+    RVineMatrix<size_t> mat(d_);
+    std::vector<size_t> order(d_);
     std::vector <size_t> ning_set;
     // fill matrix column by column
     for (size_t col = 0; col < d_ - 1; ++col) {
@@ -374,7 +374,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
                 trees_[t][e].pair_copula.flip();
             }
             // fill diagonal entry with leaf index
-            mat(d_ - 1 - col, col) = trees_[t][e].conditioned[pos];
+            order[col] = trees_[t][e].conditioned[pos];
             // entry in row t-1 is other index of the edge
             mat(t - 1, col) = trees_[t][e].conditioned[std::abs(1 - pos)];
 
@@ -430,18 +430,19 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     // The last column contains a single element which must be different
     // from all other diagonal elements. Based on the properties of an
     // R-vine matrix, this must be the element next to it.
-    mat(0, d_ - 1) = mat(0, d_ - 2);
+    order[d_ - 1] = mat(0, d_ - 2);
 
     // change to user-facing format
     // (variable index starting at 1 instead of 0)
     for (size_t i = 0; i < d_; ++i) {
+        order[i] += 1;
         for (size_t j = 0; j < d_ - i; ++j) {
             mat(i, j) += 1;
         }
     }
 
     // return as RVineStructure
-    vine_struct_ = RVineStructure(mat);
+    vine_struct_ = RVineStructure(order, mat);
 }
 
 //! Add edges allowed by vine matrix structure

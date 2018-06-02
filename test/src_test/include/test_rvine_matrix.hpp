@@ -60,6 +60,10 @@ TEST(rvine_matrix, test) {
     std::cout << "dvine matrix ------" << std::endl;
     std::cout << test.get_matrix() << std::endl;
 
+    std::cout << "test new contructor ------" << std::endl;
+    auto test2 = RVineStructure(order, test.get_struct_matrix());
+    std::cout << test2.get_matrix() << std::endl;
+
     std::cout << "benchmark (new vs old) ------" << std::endl;
     Timer timer;
     timer.start();

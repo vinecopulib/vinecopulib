@@ -21,8 +21,7 @@ inline Vinecop::Vinecop(size_t d)
     d_ = d;
 
     // D-vine with variable order (1, ..., d)
-    std::vector<size_t> order = tools_stl::seq_int(1, d);
-    vine_struct_ = RVineStructure(order);
+    vine_struct_ = RVineStructure(tools_stl::seq_int(1, d));
 
     // pair_copulas_ empty = everything independence 
     threshold_ = 0.0;

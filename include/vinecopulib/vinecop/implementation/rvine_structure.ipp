@@ -13,6 +13,7 @@ inline RVineStructure::RVineStructure(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat)
 {
     d_ = mat.cols();
+
     trunc_lvl_ = find_trunc_lvl(mat);
     order_ = compute_order(mat);
     struct_mat_ = compute_struct_matrix(mat);
@@ -21,7 +22,8 @@ inline RVineStructure::RVineStructure(
     needed_hfunc2_ = compute_needed_hfunc2();
 }
 
-inline RVineStructure::RVineStructure(const std::vector<size_t>& order) {
+inline RVineStructure::RVineStructure(const std::vector<size_t>& order)
+{
 
     d_ = order.size();
     order_ = order;
@@ -31,6 +33,24 @@ inline RVineStructure::RVineStructure(const std::vector<size_t>& order) {
     needed_hfunc1_ = compute_needed_hfunc1();
     needed_hfunc2_ = compute_needed_hfunc2();
 
+}
+
+inline RVineStructure::RVineStructure(
+    const std::vector<size_t>& order,
+    const RVineMatrix<size_t>& struct_mat,
+    bool is_natural_order)
+{
+    d_ = order.size();
+    order_ = order;
+    trunc_lvl_ = d_;
+    if (is_natural_order) {
+        struct_mat_ = struct_mat;
+    } else {
+        struct_mat_ = compute_natural_order(struct_mat);
+    }
+    max_mat_ = compute_max_matrix();
+    needed_hfunc1_ = compute_needed_hfunc1();
+    needed_hfunc2_ = compute_needed_hfunc2();
 }
 
 inline std::vector<size_t> RVineStructure::get_order() const 
@@ -97,6 +117,23 @@ inline std::vector<size_t> RVineStructure::compute_order(
         order[i] = mat(i, d_ - i - 1);
 
     return order;
+}
+
+inline RVineMatrix<size_t> RVineStructure::compute_natural_order(
+    const RVineMatrix<size_t>& mat) const
+{
+    // create vector of new variable labels
+    auto order = tools_stl::get_order(get_order());
+
+    // copy upper triangle and relabel to natural order
+    RVineMatrix<size_t> struct_mat(d_);
+    for (size_t i = 0; i < d_ - 1; i++) {
+        for (size_t j = 0; j < d_ - 1 - i; j++) {
+            struct_mat(i, j) = order[mat(i, j) - 1] + 1;
+        }
+    }
+
+    return struct_mat;
 }
 
 inline RVineMatrix<size_t> RVineStructure::compute_struct_matrix(
