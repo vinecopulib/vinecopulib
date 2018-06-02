@@ -107,12 +107,9 @@ inline std::vector <std::vector<Bicop>> VinecopSelector::make_pair_copula_store(
 
 inline void VinecopSelector::select_all_trees(const Eigen::MatrixXd &data)
 {
-    std::cout << "bla" << std::endl;
     initialize_new_fit(data);
-    std::cout << "bla2" << std::endl;
     double loglik = 0.0;
     for (size_t t = 0; t < d_ - 1; ++t) {
-        std::cout << "bla3 " << t << std::endl;
         select_tree(t);  // select pair copulas (+ structure) of tree t
         loglik += get_loglik_of_tree(t);
 
@@ -127,7 +124,6 @@ inline void VinecopSelector::select_all_trees(const Eigen::MatrixXd &data)
             break;
         }
     }
-    std::cout << "bla4" << std::endl;
     loglik_ = loglik;
     finalize(controls_.get_truncation_level());
 }
@@ -448,41 +444,6 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     vine_struct_ = RVineStructure(mat);
 }
 
-inline bool FamilySelector::belongs_to_structure(size_t v0, size_t v1,
-                                                 const VineTree &vine_tree)
-{
-    // -1 means no common neighbor in previous tree
-    if (find_common_neighbor(v0, v1, vine_tree) > -1) {
-        std::vector <size_t> conditioning;
-        std::vector <size_t> conditioned(2);
-        if (vine_tree[v0].conditioned.size() == 1) {
-            // first tree
-            conditioned = cat(vine_tree[v0].conditioned,
-                              vine_tree[v1].conditioned);
-            conditioning = std::vector<size_t>(0);
-        } else {
-            // compute new conditioned/conditioning sets
-            conditioned = set_sym_diff(vine_tree[v0].all_indices,
-                                       vine_tree[v1].all_indices);
-            conditioning = intersect(vine_tree[v0].all_indices,
-                                     vine_tree[v1].all_indices);
-        }
-
-        // to convert from vinecop to rvine_matrix indices
-        auto add_one = [](std::vector <size_t> &v) {
-            std::for_each(v.begin(), v.end(), [](size_t &d) { d += 1; });
-        };
-        add_one(conditioned);
-        add_one(conditioning);
-
-        // check whether the edge belongs to the structure
-        return vine_struct_.belongs_to_structure(conditioned, conditioning);
-    }
-
-    // there was no common neighbor
-    return false;
-}
-
 //! Add edges allowed by vine matrix structure
 //!
 //! @param vine_tree tree of a vine.
@@ -490,23 +451,19 @@ inline void FamilySelector::add_allowed_edges(VineTree &vine_tree)
 {
     double w = 1.0;
     std::string tree_criterion = controls_.get_tree_criterion();
-    for (auto v0 : boost::vertices(vine_tree)) {
-        tools_interface::check_user_interrupt(v0 % 10000 == 0);
-        for (auto v1 : boost::vertices(vine_tree)) {
-            if (v0 == v1)
-                continue;
-            // check whether edege (v0, v1) belongs to the structure
-            // given in rvine_struct_
-            if (belongs_to_structure(v0, v1, vine_tree)) {
-                Eigen::MatrixXd pc_data;
-                EdgeIterator e;
-                pc_data = get_pc_data(v0, v1, vine_tree);
-                e = boost::add_edge(v0, v1, w, vine_tree).first;
-                double crit = calculate_criterion(pc_data, tree_criterion);
-                vine_tree[e].weight = w;
-                vine_tree[e].crit = crit;
-            }
-        }
+    size_t tree = d_ - boost::num_vertices(vine_tree);
+    size_t edges = boost::num_vertices(vine_tree) - 1;
+    size_t v0;
+    size_t v1;
+    auto max_mat = vine_struct_.get_max_matrix();
+    for (size_t edge = 0; edge < edges; ++edge) {
+        v0 = edge;
+        v1 = d_ - vine_struct_.max_matrix(tree, edge);
+        Eigen::MatrixXd pc_data = get_pc_data(v0, v1, vine_tree);
+        EdgeIterator e = boost::add_edge(v0, v1, w, vine_tree).first;
+        double crit = calculate_criterion(pc_data, tree_criterion);
+        vine_tree[e].weight = w;
+        vine_tree[e].crit = crit;
     }
 }
 
@@ -514,22 +471,13 @@ inline void FamilySelector::finalize(size_t trunc_lvl)
 {
     pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
     for (size_t tree = 0; tree < pair_copulas_.size(); tree++) {
+        size_t edge = 0;
         for (auto e : boost::edges(trees_[tree + 1])) {
-            // check in which column of the matrix the pair-copula e is
-            size_t edge = find_column_in_matrix(trees_[tree + 1][e].conditioned);
             // trees_[0] is base tree, vine copula starts at trees_[1]
             pair_copulas_[tree][edge] = trees_[tree + 1][e].pair_copula;
             edge++;
         }
     }
-}
-
-inline size_t FamilySelector::find_column_in_matrix(
-    const std::vector<size_t>& conditioned)
-{
-    auto vinds = vine_struct_.get_order();
-    tools_stl::reverse(vinds);
-    return tools_stl::find_position(conditioned[0] + 1, vinds);
 }
 
 

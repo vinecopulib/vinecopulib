@@ -68,8 +68,7 @@ boost::vecS,
 boost::vecS,
 boost::undirectedS,
 VertexProperties,
-boost::property<boost::edge_weight_t, double, EdgeProperties>
-> VineTree;
+boost::property<boost::edge_weight_t, double, EdgeProperties>> VineTree;
 
 typedef boost::graph_traits<VineTree>::edge_descriptor EdgeIterator;
 typedef std::pair<EdgeIterator, bool> FoundEdge;
@@ -198,12 +197,7 @@ private:
 
     void add_allowed_edges(VineTree &tree);
 
-    bool belongs_to_structure(size_t v0, size_t v1,
-                              const VineTree &vine_tree);
-
     void finalize(size_t trunc_lvl);
-    
-    size_t find_column_in_matrix(const std::vector<size_t>& conditioned);
 
 };
 

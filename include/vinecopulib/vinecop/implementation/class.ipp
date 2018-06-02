@@ -260,12 +260,18 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
 {
     tools_eigen::check_if_in_unit_cube(data);
     check_data_dim(data);
-    
-    tools_select::FamilySelector selector(data, vine_struct_, controls);
+
+    auto revorder = vine_struct_.get_order();
+    tools_stl::reverse(revorder);
+    auto newdata = data;
+    for (size_t j = 0; j < d_; ++j)
+        newdata.col(j) = data.col(revorder[j] - 1);
+
+    tools_select::FamilySelector selector(newdata, vine_struct_, controls);
     if (controls.needs_sparse_select()) {
-        selector.sparse_select_all_trees(data);
+        selector.sparse_select_all_trees(newdata);
     } else {
-        selector.select_all_trees(data);
+        selector.select_all_trees(newdata);
     }
     threshold_ = selector.get_threshold();
     loglik_ = selector.get_loglik();

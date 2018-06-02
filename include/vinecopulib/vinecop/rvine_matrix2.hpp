@@ -54,6 +54,14 @@ public:
     RVineMatrix2<size_t> get_needed_hfunc1() const {return needed_hfunc1_;}
     RVineMatrix2<size_t> get_needed_hfunc2() const {return needed_hfunc2_;}
 
+    size_t struct_matrix(size_t tree, size_t edge) const {
+        return mat_(tree, edge);
+    }
+
+    size_t max_matrix(size_t tree, size_t edge) const {
+        return max_mat_(tree, edge);
+    }
+
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const {
         Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> matrix(d_, d_);
         matrix.fill(0);
@@ -64,37 +72,6 @@ public:
             matrix(d_ - i - 1, i) = order_[d_ - i - 1];
         }
         return matrix;
-    }
-
-    bool belongs_to_structure(const std::vector <size_t> conditioned,
-                              const std::vector <size_t> conditioning)
-    {
-        if (conditioned.size() != 2) {
-            throw std::runtime_error("conditioned should have size 2 ");
-        }
-
-        size_t tree = conditioning.size();
-        std::vector <size_t> conditioning_mat(tree);
-        std::vector <size_t> conditioned_mat(2);
-        if (tree + 2 <= d_) {
-            for (size_t i = 0; i < d_ - tree - 1; ++i) {
-                conditioned_mat = {mat_(d_ - 1 - i, i), mat_(tree, i)};
-                if (conditioned == conditioned_mat) {
-                    // conditioned sets equal, need to check conditioning set
-                    if (tree == 0) {
-                        return true;  // conditioning set is empty for tree == 0
-                    }
-                    for (size_t j = 0; j < tree; ++j)
-                        conditioning_mat[j] = mat_(j, i);
-                    if (tools_stl::is_same_set(conditioning, conditioning_mat)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        // edge is not contained in the structure implied by the matrix
-        return false;
     }
 
 protected:
