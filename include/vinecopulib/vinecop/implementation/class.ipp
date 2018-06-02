@@ -19,15 +19,10 @@ namespace vinecopulib {
 inline Vinecop::Vinecop(size_t d)
 {
     d_ = d;
-    // D-vine with variable order (1, ..., d)
-    Eigen::Matrix<size_t, Eigen::Dynamic, 1> order(d);
-    for (size_t i = 0; i < d; ++i) {
-        order(i) = i + 1;
-    }
-    auto mat = RVineMatrix::construct_d_vine_matrix(order);
 
-    // don't check for validity of R-vine matrix
-    vine_struct_ = RVineStructure(mat);
+    // D-vine with variable order (1, ..., d)
+    std::vector<size_t> order = tools_stl::seq_int(1, d);
+    vine_struct_ = RVineStructure(order);
 
     // pair_copulas_ empty = everything independence 
     threshold_ = 0.0;
@@ -442,7 +437,7 @@ Vinecop::get_matrix() const
 }
 
 //! extracts the above diagonal coefficients of the vine copula model.
-inline RVineMatrix2<size_t>
+inline RVineMatrix<size_t>
 Vinecop::get_struct_matrix() const
 {
     return vine_struct_.get_struct_matrix();

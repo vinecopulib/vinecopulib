@@ -8,10 +8,10 @@
 #include <vinecopulib/misc/tools_parallel.hpp>
 
 namespace vinecopulib {
-//! instantiates an RVineMatrix object.
+//! instantiates an RVineMatrix2 object.
 //! @param matrix a valid R-vine matrix.
 //! @param check whether the matrix shall be checked for validity.
-inline RVineMatrix::RVineMatrix(
+inline RVineMatrix2::RVineMatrix2(
     const Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
     bool check
 )
@@ -37,7 +37,7 @@ inline RVineMatrix::RVineMatrix(
 //! \param row
 //! \param col
 //! \return matrix(row, col)
-inline size_t RVineMatrix::get_element(size_t row, size_t col) const
+inline size_t RVineMatrix2::get_element(size_t row, size_t col) const
 {
     if (row >= d_ || col >= d_) {
         throw std::runtime_error("row and col should be < d");
@@ -48,14 +48,14 @@ inline size_t RVineMatrix::get_element(size_t row, size_t col) const
 //! extract the matrix.
 //!
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
-RVineMatrix::get_matrix() const
+RVineMatrix2::get_matrix() const
 {
     return matrix_;
 }
 
 //! extracts the variable order in the R-vine.
 //!
-inline Eigen::Matrix<size_t, Eigen::Dynamic, 1> RVineMatrix::get_order() const
+inline Eigen::Matrix<size_t, Eigen::Dynamic, 1> RVineMatrix2::get_order() const
 {
     return matrix_.colwise().reverse().diagonal().reverse();
 }
@@ -64,7 +64,7 @@ inline Eigen::Matrix<size_t, Eigen::Dynamic, 1> RVineMatrix::get_order() const
 //!
 //! @param order order of the variables.
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
-RVineMatrix::construct_d_vine_matrix(
+RVineMatrix2::construct_d_vine_matrix(
     const Eigen::Matrix<size_t, Eigen::Dynamic, 1> &order)
 {
     size_t d = order.size();
@@ -89,7 +89,7 @@ RVineMatrix::construct_d_vine_matrix(
 //! @param conditioned the conditioned set.
 //! @param conditioning the conditioning set.
 inline bool
-RVineMatrix::belongs_to_structure(const std::vector <size_t> conditioned,
+RVineMatrix2::belongs_to_structure(const std::vector <size_t> conditioned,
                                   const std::vector <size_t> conditioning)
 {
     if (conditioned.size() != 2) {
@@ -127,7 +127,7 @@ RVineMatrix::belongs_to_structure(const std::vector <size_t> conditioned,
 //! convert to natural order by relabeling the variables. Most algorithms for
 //! estimation and evaluation assume that the R-vine matrix is in natural order.
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
-RVineMatrix::get_natural_order() const
+RVineMatrix2::get_natural_order() const
 {
     return no_matrix_;
 }
@@ -135,7 +135,7 @@ RVineMatrix::get_natural_order() const
 
 //! computes the R-vine matrix in natural order.
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
-RVineMatrix::compute_natural_order() const
+RVineMatrix2::compute_natural_order() const
 {
     // create vector of new variable labels: d, ..., 1
     std::vector <size_t> ivec = tools_stl::seq_int(1, d_);
@@ -152,7 +152,7 @@ RVineMatrix::compute_natural_order() const
 //! bottom). It is used in estimation and evaluation algorithms to find the right
 //! pseudo observations for an edge.
 inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic>
-RVineMatrix::get_max_matrix() const
+RVineMatrix2::get_max_matrix() const
 {
     auto max_matrix = no_matrix_;
     for (size_t i = 0; i < d_ - 1; ++i) {
@@ -166,13 +166,13 @@ RVineMatrix::get_max_matrix() const
 //! extracts a matrix indicating which of the first h-functions are needed
 //! (it is usually not necessary to apply both h-functions for each
 //! pair-copula).
-inline MatrixXb RVineMatrix::get_needed_hfunc1() const
+inline MatrixXb RVineMatrix2::get_needed_hfunc1() const
 {
     return needed_hfunc1_;
 }
 
 // computes the needed first h-functions.
-inline MatrixXb RVineMatrix::compute_needed_hfunc1() const
+inline MatrixXb RVineMatrix2::compute_needed_hfunc1() const
 {
     MatrixXb needed_hfunc1 = MatrixXb::Constant(d_, d_, false);
     auto max_matrix = this->get_max_matrix();
@@ -190,12 +190,12 @@ inline MatrixXb RVineMatrix::compute_needed_hfunc1() const
 //! extracts a matrix indicating which of the second h-functions are needed
 //! (it is usually not necessary to apply both h-functions for each
 //! pair-copula).
-inline MatrixXb RVineMatrix::get_needed_hfunc2() const
+inline MatrixXb RVineMatrix2::get_needed_hfunc2() const
 {
     return needed_hfunc2_;
 }
 
-inline MatrixXb RVineMatrix::compute_needed_hfunc2() const
+inline MatrixXb RVineMatrix2::compute_needed_hfunc2() const
 {
     MatrixXb needed_hfunc1 = MatrixXb::Constant(d_, d_, false);
     MatrixXb needed_hfunc2 = MatrixXb::Constant(d_, d_, false);
@@ -217,7 +217,7 @@ inline MatrixXb RVineMatrix::compute_needed_hfunc2() const
 //! @}
 
 
-inline void RVineMatrix::check_if_quadratic() const
+inline void RVineMatrix2::check_if_quadratic() const
 {
     std::string problem = "must be quadratic.";
     if (matrix_.rows() != matrix_.cols()) {
@@ -225,7 +225,7 @@ inline void RVineMatrix::check_if_quadratic() const
     }
 }
 
-inline void RVineMatrix::check_lower_tri() const
+inline void RVineMatrix2::check_lower_tri() const
 {
     std::string problem = "the lower right triangle must only contain zeros";
     size_t sum_lwr = 0;
@@ -237,7 +237,7 @@ inline void RVineMatrix::check_lower_tri() const
     }
 }
 
-inline void RVineMatrix::check_upper_tri() const
+inline void RVineMatrix2::check_upper_tri() const
 {
     std::string problem;
     problem += "the upper left triangle can only contain numbers ";
@@ -253,7 +253,7 @@ inline void RVineMatrix::check_upper_tri() const
     }
 }
 
-inline void RVineMatrix::check_antidiagonal() const
+inline void RVineMatrix2::check_antidiagonal() const
 {
     std::string problem;
     problem += "the antidiagonal must contain the numbers ";
@@ -266,7 +266,7 @@ inline void RVineMatrix::check_antidiagonal() const
     }
 }
 
-inline void RVineMatrix::check_columns() const
+inline void RVineMatrix2::check_columns() const
 {
     using namespace tools_stl;
     std::string problem;
@@ -288,7 +288,7 @@ inline void RVineMatrix::check_columns() const
     }
 }
 
-inline void RVineMatrix::check_proximity_condition() const
+inline void RVineMatrix2::check_proximity_condition() const
 {
     using namespace tools_stl;
     for (size_t t = 1; t < d_ - 1; ++t) {
@@ -397,8 +397,8 @@ inline Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> relabel_elements(
 //! @param t_start the tree level from where the matrix needs to be filled.
 //! @param num_threads number of parallel threads to use.
 //! @return a valid R-vine structure matrix (= passing all 
-//!     checks in `RVineMatrix()`).
-inline void RVineMatrix::complete_matrix(
+//!     checks in `RVineMatrix2()`).
+inline void RVineMatrix2::complete_matrix(
     Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &mat,
     size_t t_start,
     size_t num_threads)

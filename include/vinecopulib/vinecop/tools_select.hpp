@@ -10,8 +10,8 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/vinecop/fit_controls.hpp>
-#include <vinecopulib/vinecop/rvine_matrix.hpp>
-#include <vinecopulib/vinecop/rvine_matrix2.hpp>
+#include <vinecopulib/vinecop/rvine_structure.hpp>
+#include <vinecopulib/vinecop/rvine_structure.hpp>
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std {

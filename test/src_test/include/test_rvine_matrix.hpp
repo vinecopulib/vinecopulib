@@ -7,9 +7,31 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include <vinecopulib/vinecop/rvine_matrix.hpp>
+#include <vinecopulib/vinecop/rvine_structure.hpp>
 #include <vinecopulib/vinecop/rvine_matrix2.hpp>
 #include <iostream>
+#include <chrono>
+
+class Timer {
+public:
+    void start()
+    {
+        start_ = std::chrono::steady_clock::now();
+    }
+
+    void end()
+    {
+        end_ = std::chrono::steady_clock::now();
+        auto diff = end_ - start_;
+        std::cout << diff.count() << std::endl;
+    }
+
+
+private:
+    std::chrono::time_point<std::chrono::steady_clock> start_;
+    std::chrono::time_point<std::chrono::steady_clock> end_;
+};
+
 
 namespace test_rvine_matrix {
 using namespace vinecopulib;
@@ -32,14 +54,20 @@ TEST(rvine_matrix, test) {
         1, 3, 5, 0, 0, 0, 0,
         3, 6, 0, 0, 0, 0, 0,
         7, 0, 0, 0, 0, 0, 0;
-    
+
+    std::vector<size_t> order = {2, 4, 3, 1};
+    auto test = RVineStructure(order);
+    std::cout << "dvine matrix ------" << std::endl;
+    std::cout << test.get_matrix() << std::endl;
+
+    std::cout << "benchmark (new vs old) ------" << std::endl;
     Timer timer;
     timer.start();
     RVineStructure strct(mat);
     timer.end();
 
     timer.start();
-    RVineMatrix rvm(mat, false);
+    RVineMatrix2 rvm(mat, false);
     timer.end();
     
     std::cout << "matrix ------" << std::endl;

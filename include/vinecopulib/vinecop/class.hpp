@@ -7,8 +7,8 @@
 #pragma once
 
 #include <vinecopulib/bicop/class.hpp>
-#include <vinecopulib/vinecop/rvine_matrix.hpp>
-#include <vinecopulib/vinecop/rvine_matrix2.hpp>
+#include <vinecopulib/vinecop/rvine_structure.hpp>
+#include <vinecopulib/vinecop/rvine_structure.hpp>
 #include <vinecopulib/vinecop/tools_select.hpp>
 
 namespace vinecopulib {
@@ -84,7 +84,7 @@ public:
 
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
-    RVineMatrix2<size_t> get_struct_matrix() const;
+    RVineMatrix<size_t> get_struct_matrix() const;
     
     // getter for the threshold
     double get_threshold() const;
