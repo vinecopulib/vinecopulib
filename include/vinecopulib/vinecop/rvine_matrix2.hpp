@@ -124,24 +124,18 @@ protected:
     RVineMatrix2<size_t> compute_struct_mat(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
     {
-        // compute inverse permutation of the order; will be used to fill
-        // matrix in natural order
-        auto order = get_order();
-        auto revorder = tools_stl::seq_int(1, d_);
-        std::sort(revorder.begin(),
-                  revorder.end(),
-                  [&](size_t i, size_t j) { return order[i] < order[j]; });
 
-        //for (size_t i = 0; i < d_; ++i)
-        //    std::cout << order[i] << " " << revorder[i] << std::endl;
-        
-        // copy upper triangle but relabeled to natural order                 
+        // create vector of new variable labels
+        auto order = tools_stl::get_order(get_order());
+
+        // copy upper triangle and relabel to natural order
         RVineMatrix2<size_t> struct_mat(d_);
         for (size_t i = 0; i < d_ - 1; i++) {
-            for (size_t j = 0; j < d_ - 1 - i; j++)
-                struct_mat(i, j) = revorder[mat(i, j) - 1];
+            for (size_t j = 0; j < d_ - 1 - i; j++) {
+                struct_mat(i, j) = order[mat(i, j) - 1] + 1;
+            }
         }
-        
+
         return struct_mat;
     }
     
@@ -204,7 +198,6 @@ inline RVineStructure::RVineStructure(
     trunc_lvl_ = find_trunc_lvl(mat);
     order_ = compute_order(mat);
     mat_ = compute_struct_mat(mat);
-    std::cout << mat_.str() << std::endl;
     max_mat_ = compute_max_mat();
     needed_hfunc1_ = compute_needed_hfunc1();
     needed_hfunc2_ = compute_needed_hfunc2();
