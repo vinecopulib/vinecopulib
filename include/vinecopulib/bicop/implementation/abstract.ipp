@@ -124,7 +124,10 @@ inline void AbstractBicop::set_loglik(const double loglik)
 inline Eigen::VectorXd AbstractBicop::pdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
 {
-    return pdf_raw(u).array().min(DBL_MAX).max(DBL_MIN);
+    auto trim = [] (const double &x) {
+        return std::min(DBL_MAX, std::max(x, DBL_MIN));
+    };
+    return tools_eigen::unaryExpr_or_nan(pdf_raw(u), trim);
 }
 
 //! Numerical inversion of h-functions
