@@ -19,8 +19,10 @@ public:
     {
         if (d < 2)
             throw std::runtime_error("d should be greater than 1");
-        if ((trunc_lvl < 1) | (trunc_lvl > d - 1))
-            throw std::runtime_error("trunc_lvl should be in {1, ..., d-1}.");
+        if (trunc_lvl < 1)
+            throw std::runtime_error("trunc_lvl should be greater than 0.");
+        if (trunc_lvl > d - 1)
+            trunc_lvl_ = d - 1;
 
         mat_ = std::vector<std::vector<T>>(d - 1);
         for (size_t i = 0; i < d - 1; i++)

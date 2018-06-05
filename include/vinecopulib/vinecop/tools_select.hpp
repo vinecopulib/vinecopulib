@@ -11,7 +11,7 @@
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/vinecop/fit_controls.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
-#include <vinecopulib/vinecop/rvine_structure.hpp>
+#include <vinecopulib/misc/tools_interface.hpp>
 
 // to allow for (auto e : boost::edges(g)) notation
 namespace std {
@@ -32,10 +32,12 @@ namespace vinecopulib {
 namespace tools_select {
 
 double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
-                           std::string tree_criterion);
+                           std::string tree_criterion,
+                           Eigen::VectorXd weights);
 
 Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
-                                           std::string tree_criterion);
+                                           std::string tree_criterion,
+                                           const Eigen::VectorXd& weights);
 
 
 // boost::graph represenation of a vine tree
@@ -113,7 +115,7 @@ protected:
     
     void initialize_new_fit(const Eigen::MatrixXd &data);
 
-    void set_current_fit_as_opt();
+    void set_current_fit_as_opt(const double& loglik);
 
     
     virtual void add_allowed_edges(VineTree &tree) = 0;
@@ -135,6 +137,7 @@ protected:
     double loglik_;
     double threshold_;
     double psi0_; // initial prior probability for mbicv
+    std::unique_ptr<tools_thread::ThreadPool> pool_;
 
 private:
     double get_next_threshold(std::vector<double> &thresholded_crits);

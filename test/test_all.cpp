@@ -13,6 +13,7 @@
 #include "src_test/include/test_tools_stats.hpp"
 #include "src_test/include/test_vinecop_class.hpp"
 #include "src_test/include/test_vinecop_sanity_checks.hpp"
+#include "src_test/include/test_weights.hpp"
 
 using namespace test_bicop_sanity_checks;
 using namespace test_bicop_parametric;
@@ -23,6 +24,7 @@ using namespace test_tools_bobyqa;
 using namespace test_tools_stats;
 using namespace test_vinecop_class;
 using namespace test_vinecop_sanity_checks;
+using namespace test_weights;
 
 
 int main(int argc, char **argv) {

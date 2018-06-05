@@ -153,7 +153,7 @@ inline vector<size_t> invert_permutation(const vector<size_t>& perm)
     auto inv_perm = seq_int(0, perm.size());
     std::sort(inv_perm.begin(), 
               inv_perm.end(), 
-              [&](size_t i, size_t j) { return perm[i] < perm[j]; });
+              [&](size_t i, size_t j) { return perm[i] < perm[j];});
     return inv_perm;
 }
 

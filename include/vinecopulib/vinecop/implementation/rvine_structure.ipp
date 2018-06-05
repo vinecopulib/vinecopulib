@@ -5,7 +5,6 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/misc/tools_stl.hpp>
-#include <vinecopulib/misc/tools_parallel.hpp>
 
 namespace vinecopulib {
 
