@@ -256,21 +256,23 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
     tools_eigen::check_if_in_unit_cube(data);
     check_data_dim(data);
 
-    auto revorder = vine_struct_.get_order();
-    tools_stl::reverse(revorder);
-    auto newdata = data;
-    for (size_t j = 0; j < d_; ++j)
-        newdata.col(j) = data.col(revorder[j] - 1);
+    if (vine_struct_.get_trunc_lvl() > 0) {
+        auto revorder = vine_struct_.get_order();
+        tools_stl::reverse(revorder);
+        auto newdata = data;
+        for (size_t j = 0; j < d_; ++j)
+            newdata.col(j) = data.col(revorder[j] - 1);
 
-    tools_select::FamilySelector selector(newdata, vine_struct_, controls);
-    if (controls.needs_sparse_select()) {
-        selector.sparse_select_all_trees(newdata);
-    } else {
-        selector.select_all_trees(newdata);
+        tools_select::FamilySelector selector(newdata, vine_struct_, controls);
+        if (controls.needs_sparse_select()) {
+            selector.sparse_select_all_trees(newdata);
+        } else {
+            selector.select_all_trees(newdata);
+        }
+        threshold_ = selector.get_threshold();
+        loglik_ = selector.get_loglik();
+        pair_copulas_ = selector.get_pair_copulas();
     }
-    threshold_ = selector.get_threshold();
-    loglik_ = selector.get_loglik();
-    pair_copulas_ = selector.get_pair_copulas();
 }
 
 //! @name Getters

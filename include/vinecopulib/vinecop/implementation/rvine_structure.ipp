@@ -51,14 +51,16 @@ inline RVineStructure::RVineStructure(
                                      "incompatible dimensions");
     order_ = order;
     trunc_lvl_ = struct_mat.get_trunc_lvl();
-    if (is_natural_order) {
-        struct_mat_ = struct_mat;
-    } else {
-        struct_mat_ = to_natural_order(struct_mat);
+    if (trunc_lvl_ > 0) {
+        if (is_natural_order) {
+            struct_mat_ = struct_mat;
+        } else {
+            struct_mat_ = to_natural_order(struct_mat);
+        }
+        max_mat_ = compute_max_matrix();
+        needed_hfunc1_ = compute_needed_hfunc1();
+        needed_hfunc2_ = compute_needed_hfunc2();
     }
-    max_mat_ = compute_max_matrix();
-    needed_hfunc1_ = compute_needed_hfunc1();
-    needed_hfunc2_ = compute_needed_hfunc2();
 }
 
 inline size_t RVineStructure::get_dim() const

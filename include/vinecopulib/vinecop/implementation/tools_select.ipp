@@ -201,7 +201,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
                 // print fitted pair-copulas for this tree
                 print_pair_copulas_of_tree(t);
             }
-            
+
             // mbicv comparison
             if (controls_.get_select_truncation_level() & (mbicv_trunc >= mbicv)) {
                 // mbicv did not improve, truncate
@@ -359,13 +359,14 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
 inline void StructureSelector::finalize(size_t trunc_lvl)
 {
     using namespace tools_stl;
-    std::cout << trunc_lvl << std::endl;
     pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
     RVineMatrix<size_t> mat(d_, trunc_lvl);
     std::vector<size_t> order(d_);
-    std::vector <size_t> ning_set;
 
     if (trunc_lvl > 0) {
+
+        std::vector <size_t> ning_set;
+
         // fill matrix column by column
         for (size_t col = 0; col < d_ - 1; ++col) {
             tools_interface::check_user_interrupt();
@@ -391,6 +392,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
 
                 // fill diagonal entry with leaf index
                 order[d_ - 1 - col] = trees_[t][e].conditioned[pos];
+
                 // entry in row t-1 is other index of the edge
                 mat(t - 1, col) = trees_[t][e].conditioned[std::abs(1 - pos)];
 
@@ -452,15 +454,12 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
         // change to user-facing format
         // (variable index starting at 1 instead of 0)
         for (size_t i = 0; i < std::min(d_ - 1, trunc_lvl); ++i) {
-            order[i] += 1;
             for (size_t j = 0; j < d_ - i - 1; ++j) {
                 mat(i, j) += 1;
             }
         }
-        if (trunc_lvl < d_ - 1) {
-            for (size_t i = trunc_lvl; i < d_ - 1; i++)
-                order[i] += 1;
-        }
+        for (size_t i = 0; i < d_; i++)
+            order[i] += 1;
     } else {
         // order doesn't matter for truncated
         order = tools_stl::seq_int(1, d_);
@@ -482,17 +481,20 @@ inline void FamilySelector::add_allowed_edges(VineTree &vine_tree)
     size_t v0;
     size_t v1;
     auto max_mat = vine_struct_.get_max_matrix();
-    for (size_t edge = 0; edge < edges; ++edge) {
-        tools_interface::check_user_interrupt(edge % 10000 == 0);
-        v0 = edge;
-        v1 = d_ - vine_struct_.max_matrix(tree, edge);
-        Eigen::MatrixXd pc_data = get_pc_data(v0, v1, vine_tree);
-        EdgeIterator e = boost::add_edge(v0, v1, w, vine_tree).first;
-        double crit = calculate_criterion(pc_data,
-                                          tree_criterion,
-                                          controls_.get_weights());
-        vine_tree[e].weight = w;
-        vine_tree[e].crit = crit;
+    auto trunc_lvl = vine_struct_.get_trunc_lvl();
+    if (tree < trunc_lvl) {
+        for (size_t edge = 0; edge < edges; ++edge) {
+            tools_interface::check_user_interrupt(edge % 10000 == 0);
+            v0 = edge;
+            v1 = d_ - vine_struct_.max_matrix(tree, edge);
+            Eigen::MatrixXd pc_data = get_pc_data(v0, v1, vine_tree);
+            EdgeIterator e = boost::add_edge(v0, v1, w, vine_tree).first;
+            double crit = calculate_criterion(pc_data,
+                                              tree_criterion,
+                                              controls_.get_weights());
+            vine_tree[e].weight = w;
+            vine_tree[e].crit = crit;
+        }
     }
 }
 
@@ -561,16 +563,18 @@ inline void VinecopSelector::select_tree(size_t t)
         // has no effect in FamilySelector
         min_spanning_tree(new_tree);
     }
-    add_edge_info(new_tree);       // for pc estimation and next tree
-    remove_vertex_data(new_tree);  // no longer needed
-    if (controls_.get_selection_criterion() == "mbicv") {
-        // adjust prior probability to tree level
-        controls_.set_psi0(std::pow(psi0_, t + 1));
-    }
-    if (trees_opt_.size() > t + 1) {
-        select_pair_copulas(new_tree, trees_opt_[t + 1]);
-    } else {
-        select_pair_copulas(new_tree);
+    if (boost::num_vertices(new_tree) > 0) {
+        add_edge_info(new_tree);       // for pc estimation and next tree
+        remove_vertex_data(new_tree);  // no longer needed
+        if (controls_.get_selection_criterion() == "mbicv") {
+            // adjust prior probability to tree level
+            controls_.set_psi0(std::pow(psi0_, t + 1));
+        }
+        if (trees_opt_.size() > t + 1) {
+            select_pair_copulas(new_tree, trees_opt_[t + 1]);
+        } else {
+            select_pair_copulas(new_tree);
+        }
     }
     // make sure there is space for new tree
     trees_.resize(t + 2);
