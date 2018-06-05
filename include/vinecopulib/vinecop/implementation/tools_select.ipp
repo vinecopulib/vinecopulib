@@ -352,6 +352,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     RVineMatrix<size_t> mat(d_);
     std::vector<size_t> order(d_);
     std::vector <size_t> ning_set;
+
     // fill matrix column by column
     for (size_t col = 0; col < d_ - 1; ++col) {
         tools_interface::check_user_interrupt();
@@ -360,6 +361,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
             std::max(std::min(trunc_lvl, d_ - 1 - col), static_cast<size_t>(1));
         // start with highest tree in this column
         for (auto e : boost::edges(trees_[t])) {
+
             // find an edge that contains a leaf
             size_t v0 = boost::source(e, trees_[t]);
             size_t v1 = boost::target(e, trees_[t]);
@@ -373,8 +375,9 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
             if (pos == 1) {
                 trees_[t][e].pair_copula.flip();
             }
+
             // fill diagonal entry with leaf index
-            order[col] = trees_[t][e].conditioned[pos];
+            order[d_ - 1 - col] = trees_[t][e].conditioned[pos];
             // entry in row t-1 is other index of the edge
             mat(t - 1, col) = trees_[t][e].conditioned[std::abs(1 - pos)];
 
@@ -394,7 +397,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
 
         // fill column bottom to top
         for (size_t k = 1; k < t; ++k) {
-            auto check_set = cat(mat(d_ - 1 - col, col), ning_set);
+            auto check_set = cat(order[d_ - 1 - col], ning_set);
             for (auto e : boost::edges(trees_[t - k])) {
                 // search for an edge in lower tree that shares all
                 // indices in the conditioning set + diagonal entry
@@ -405,7 +408,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
                 // next matrix entry is conditioned variable of new edge
                 // that's not equal to the diagonal entry of this column
                 auto e_new = trees_[t - k][e];
-                ptrdiff_t pos = (mat(d_ - 1 - col, col) == e_new.conditioned[1]);
+                ptrdiff_t pos = (order[d_ - 1 - col] == e_new.conditioned[1]);
                 if (pos == 1) {
                     e_new.pair_copula.flip();
                 }
@@ -430,15 +433,16 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     // The last column contains a single element which must be different
     // from all other diagonal elements. Based on the properties of an
     // R-vine matrix, this must be the element next to it.
-    order[d_ - 1] = mat(0, d_ - 2);
+    order[0] = mat(0, d_ - 2);
 
     // change to user-facing format
     // (variable index starting at 1 instead of 0)
     for (size_t i = 0; i < d_; ++i) {
         order[i] += 1;
-        for (size_t j = 0; j < d_ - i; ++j) {
+        for (size_t j = 0; j < d_ - i - 1; ++j) {
             mat(i, j) += 1;
         }
+        std::cout << std::endl;
     }
 
     // return as RVineStructure
