@@ -35,14 +35,14 @@ TEST(serialization, vinecop_serialization) {
     // create vine with 5 variables, 2-truncated
     size_t d = 5;
     Vinecop vc(d);
-    auto pc_store = Vinecop::make_pair_copula_store(d, 2);
+    auto pc_store = Vinecop::make_pair_copula_store(d, 5);
     for (auto& tree : pc_store) {
         for (auto& pc : tree) {
             pc = Bicop(BicopFamily::bb1, 90);
         }
     }
     vc = Vinecop(pc_store, vc.get_matrix());
-    
+
     // serialize
     vc.to_json("temp");
     

@@ -442,7 +442,6 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
         for (size_t j = 0; j < d_ - i - 1; ++j) {
             mat(i, j) += 1;
         }
-        std::cout << std::endl;
     }
 
     // return as RVineStructure

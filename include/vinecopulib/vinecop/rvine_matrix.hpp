@@ -23,6 +23,8 @@ public:
     
     T& operator()(size_t tree, size_t edge) {return mat_[edge][tree];}
     T operator()(size_t tree, size_t edge) const {return mat_[edge][tree];}
+    //T& operator[](size_t column) {return mat_[column];}
+    //T operator[](size_t column) const {return mat_[column];}
 
     std::string str()
     {

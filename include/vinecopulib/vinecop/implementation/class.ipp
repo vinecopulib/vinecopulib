@@ -88,10 +88,12 @@ inline Vinecop::Vinecop(const std::vector <std::vector<Bicop>> &pair_copulas,
 //!      a valid R-vine matrix.
 inline Vinecop::Vinecop(boost::property_tree::ptree input, bool check_matrix)
 {
+    auto order =
+        tools_serialization::ptree_to_vector<size_t>(input.get_child("order"));
     auto matrix =
-        tools_serialization::ptree_to_matrix<size_t>(input.get_child("matrix"));
-    vine_struct_ = RVineStructure(matrix);
-    d_ = static_cast<size_t>(matrix.rows());
+        tools_serialization::ptree_to_rvinematrix<size_t>(input.get_child("matrix"));
+    vine_struct_ = RVineStructure(order, matrix);
+    d_ = static_cast<size_t>(vine_struct_.dim());
 
     boost::property_tree::ptree pcs_node = input.get_child("pair copulas");
     for (size_t tree = 0; tree < d_ - 1; ++tree) {
@@ -186,7 +188,7 @@ inline boost::property_tree::ptree Vinecop::to_ptree()
 
     boost::property_tree::ptree output;
     output.add_child("pair copulas", pair_copulas);
-    auto matrix_node = tools_serialization::matrix_to_ptree(get_struct_matrix());
+    auto matrix_node = tools_serialization::rvinematrix_to_ptree(get_struct_matrix());
     output.add_child("matrix", matrix_node);
     auto order_node = tools_serialization::vector_to_ptree(get_order());
     output.add_child("order", order_node);

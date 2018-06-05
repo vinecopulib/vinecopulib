@@ -22,6 +22,7 @@ public:
                    const RVineMatrix<size_t>& struct_mat,
                    bool is_natural_order = false);
 
+    size_t dim() const;
     std::vector<size_t> get_order() const;
     RVineMatrix<size_t> get_struct_matrix() const;
     RVineMatrix<size_t> get_max_matrix() const;
@@ -36,11 +37,11 @@ protected:
 
     size_t find_trunc_lvl(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
-    std::vector<size_t> compute_order(
+    //size_t find_trunc_lvl(const RVineMatrix<size_t>& mat) const;
+    std::vector<size_t> get_order(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
-    RVineMatrix<size_t> compute_natural_order(const RVineMatrix<size_t>& mat) const;
-    RVineMatrix<size_t> compute_struct_matrix(
-        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+
+    template<class T> RVineMatrix<size_t> to_natural_order(const T& mat) const;
     RVineMatrix<size_t> compute_dvine_struct_matrix() const;
     RVineMatrix<size_t> compute_max_matrix() const;
     RVineMatrix<size_t> compute_needed_hfunc1() const;
@@ -57,6 +58,22 @@ private:
     RVineMatrix<size_t> needed_hfunc1_;
     RVineMatrix<size_t> needed_hfunc2_;
 };
+
+template<class T> RVineMatrix<size_t> RVineStructure::to_natural_order(const T& mat) const
+{
+    // create vector of new variable labels
+    auto order = tools_stl::get_order(get_order());
+
+    // copy upper triangle and relabel to natural order
+    RVineMatrix<size_t> struct_mat(d_);
+    for (size_t i = 0; i < d_ - 1; i++) {
+        for (size_t j = 0; j < d_ - 1 - i; j++) {
+            struct_mat(i, j) = order[mat(i, j) - 1] + 1;
+        }
+    }
+
+    return struct_mat;
+}
 
 #include <vinecopulib/vinecop/implementation/rvine_structure.ipp>
 

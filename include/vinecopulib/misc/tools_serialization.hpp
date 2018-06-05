@@ -41,14 +41,18 @@ inline boost::property_tree::ptree matrix_to_ptree(
     return output;
 }
 
+//! conversion from vinecopulib::RVineMatrix to boost::property_tree::ptree
+//!
+//! @param matrix the vinecopulib::RVineMatrix to convert.
+//! @return the corresponding boost::property_tree::ptree.
 template<class T>
-inline boost::property_tree::ptree matrix_to_ptree(
+inline boost::property_tree::ptree rvinematrix_to_ptree(
     RVineMatrix<T> matrix)
 {
     boost::property_tree::ptree output;
-    for (size_t i = 0; i < matrix.dim(); i++) {
+    for (size_t i = 0; i < matrix.dim() - 1; i++) {
         boost::property_tree::ptree col;
-        for (size_t j = 0; j < matrix.dim() - i; j++) {
+        for (size_t j = 0; j < matrix.dim() - i - 1; j++) {
             boost::property_tree::ptree cell;
             cell.put_value(matrix(j, i));
             col.push_back(std::make_pair("", cell));
@@ -59,6 +63,10 @@ inline boost::property_tree::ptree matrix_to_ptree(
     return output;
 }
 
+//! conversion from std::vector to boost::property_tree::ptree
+//!
+//! @param matrix the std::vector to convert.
+//! @return the corresponding boost::property_tree::ptree.
 template<class T>
 inline boost::property_tree::ptree vector_to_ptree(
     std::vector<T> vec)
@@ -72,7 +80,6 @@ inline boost::property_tree::ptree vector_to_ptree(
 
     return output;
 }
-
 
 //! conversion from boost::property_tree::ptree to Eigen::Matrix
 //!
@@ -112,6 +119,58 @@ inline Eigen::Matrix <T, Eigen::Dynamic, Eigen::Dynamic> ptree_to_matrix(
     }
 
     return matrix.cast<T>();
+}
+
+
+//! conversion from boost::property_tree::ptree to vinecopulib::RVineMatrix
+//!
+//! @param iroot the boost::property_tree::ptree to convert.
+//! @return the corresponding vinecopulib::RVineMatrix
+template<typename T>
+inline RVineMatrix<T> ptree_to_rvinematrix(
+    const boost::property_tree::ptree input)
+{
+
+    std::vector<T> vec;
+    size_t rows = 0;
+    size_t cols = 0;
+    for (boost::property_tree::ptree::value_type col : input) {
+        size_t rows_temp = 0;
+        for (boost::property_tree::ptree::value_type cell : col.second) {
+            rows_temp++;
+            vec.push_back(cell.second.get_value<T>());
+        }
+        if (cols == 0) {
+            rows = rows_temp;
+        }
+        cols++;
+    }
+
+    RVineMatrix<T> matrix(cols + 1);
+    size_t count = 0;
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols - i; j++) {
+            matrix(i, j) = vec[count];
+            count++;
+        }
+    }
+    return matrix;
+}
+
+//! conversion from boost::property_tree::ptree to std::vector
+//!
+//! @param iroot the boost::property_tree::ptree to convert.
+//! @return the corresponding std::vector.
+template<typename T>
+inline std::vector<T> ptree_to_vector(
+    const boost::property_tree::ptree input)
+{
+
+    std::vector<T> res;
+    for (boost::property_tree::ptree::value_type cell : input) {
+        res.push_back(cell.second.get_value<T>());
+    }
+    return res;
 }
 
 inline boost::property_tree::ptree json_to_ptree(const char *filename)
