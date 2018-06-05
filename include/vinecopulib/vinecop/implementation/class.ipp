@@ -737,7 +737,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u) const
             hinv2(d - j - 1, j) = u.col(revorder[j] - 1);
         hfunc1(0, d - 1) = hinv2(0, d - 1);
 
-        // loop through variables (0 is just the inital uniform)
+        // loop through variables (0 is just the initial uniform)
         size_t trunc_lvl = pair_copulas_.size();
         for (ptrdiff_t var = d - 2; var >= 0; --var) {
             tools_interface::check_user_interrupt(n * d > 1e5);
