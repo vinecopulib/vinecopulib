@@ -800,7 +800,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
                     Bicop edge_copula = get_pair_copula(tree, var);
 
                     // extract data for conditional pair
-                    Eigen::MatrixXd U_e(n, 2);
+                    Eigen::MatrixXd U_e(b.size, 2);
                     size_t m = max_matrix(tree, var);
                     U_e.col(0) = hinv2(tree + 1, var);
                     if (m == no_matrix(tree, var)) {
