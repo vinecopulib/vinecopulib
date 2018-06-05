@@ -284,7 +284,9 @@ TEST_F(VinecopTest, sparse_truncation_selection) {
     // controls.set_show_trace(true);
     u = tools_stats::simulate_uniform(100, 7);
     Vinecop fit(7);
+    std::cout << "here" << std::endl;
     fit.select_all(u, controls);
+    std::cout << "here2" << std::endl;
     fit.select_families(u, controls);
     EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }

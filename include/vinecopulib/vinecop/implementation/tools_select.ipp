@@ -359,101 +359,111 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
 inline void StructureSelector::finalize(size_t trunc_lvl)
 {
     using namespace tools_stl;
+    std::cout << trunc_lvl << std::endl;
     pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
     RVineMatrix<size_t> mat(d_, trunc_lvl);
     std::vector<size_t> order(d_);
     std::vector <size_t> ning_set;
 
-    // fill matrix column by column
-    for (size_t col = 0; col < d_ - 1; ++col) {
-        tools_interface::check_user_interrupt();
-        // matrix above trunc_lvl will be filled more efficiently later
-        size_t t = 
-            std::max(std::min(trunc_lvl, d_ - 1 - col), static_cast<size_t>(1));
-        // start with highest tree in this column
-        for (auto e : boost::edges(trees_[t])) {
+    if (trunc_lvl > 0) {
+        // fill matrix column by column
+        for (size_t col = 0; col < d_ - 1; ++col) {
+            tools_interface::check_user_interrupt();
+            // matrix above trunc_lvl will be filled more efficiently later
+            size_t t =
+                std::max(std::min(trunc_lvl, d_ - 1 - col), static_cast<size_t>(1));
+            // start with highest tree in this column
+            for (auto e : boost::edges(trees_[t])) {
 
-            // find an edge that contains a leaf
-            size_t v0 = boost::source(e, trees_[t]);
-            size_t v1 = boost::target(e, trees_[t]);
-            size_t min_deg = std::min(boost::out_degree(v0, trees_[t]),
-                                      boost::out_degree(v1, trees_[t]));
-            if (min_deg > 1) {
-                continue;  // not a leaf
-            }
-            // find position of leaf in the edge
-            ptrdiff_t pos = (boost::out_degree(v1, trees_[t]) == 1);
-            if (pos == 1) {
-                trees_[t][e].pair_copula.flip();
-            }
-
-            // fill diagonal entry with leaf index
-            order[d_ - 1 - col] = trees_[t][e].conditioned[pos];
-            // entry in row t-1 is other index of the edge
-            mat(t - 1, col) = trees_[t][e].conditioned[std::abs(1 - pos)];
-
-            // assign fitted pair copula to appropriate entry, see
-            // `Vinecop::get_pair_copula()`.
-            if (trunc_lvl > 0) {
-                pair_copulas_[t - 1][col] = trees_[t][e].pair_copula;
-            }
-
-            // initialize running set with full conditioning set of this edge
-            ning_set = trees_[t][e].conditioning;
-
-            // remove edge (must not be reused in another column!)
-            boost::remove_edge(v0, v1, trees_[t]);
-            break;
-        }
-
-        // fill column bottom to top
-        for (size_t k = 1; k < t; ++k) {
-            auto check_set = cat(order[d_ - 1 - col], ning_set);
-            for (auto e : boost::edges(trees_[t - k])) {
-                // search for an edge in lower tree that shares all
-                // indices in the conditioning set + diagonal entry
-                if (!is_same_set(trees_[t - k][e].all_indices, check_set)) {
-                    continue;
+                // find an edge that contains a leaf
+                size_t v0 = boost::source(e, trees_[t]);
+                size_t v1 = boost::target(e, trees_[t]);
+                size_t min_deg = std::min(boost::out_degree(v0, trees_[t]),
+                                          boost::out_degree(v1, trees_[t]));
+                if (min_deg > 1) {
+                    continue;  // not a leaf
                 }
-                // found suitable edge ->
-                // next matrix entry is conditioned variable of new edge
-                // that's not equal to the diagonal entry of this column
-                auto e_new = trees_[t - k][e];
-                ptrdiff_t pos = (order[d_ - 1 - col] == e_new.conditioned[1]);
+                // find position of leaf in the edge
+                ptrdiff_t pos = (boost::out_degree(v1, trees_[t]) == 1);
                 if (pos == 1) {
-                    e_new.pair_copula.flip();
+                    trees_[t][e].pair_copula.flip();
                 }
-                mat(t - k - 1, col) = e_new.conditioned[std::abs(1 - pos)];
+
+                // fill diagonal entry with leaf index
+                order[d_ - 1 - col] = trees_[t][e].conditioned[pos];
+                // entry in row t-1 is other index of the edge
+                mat(t - 1, col) = trees_[t][e].conditioned[std::abs(1 - pos)];
 
                 // assign fitted pair copula to appropriate entry, see
-                // Vinecop::get_pair_copula().
-                pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
+                // `Vinecop::get_pair_copula()`.
+                if (trunc_lvl > 0) {
+                    pair_copulas_[t - 1][col] = trees_[t][e].pair_copula;
+                }
 
-                // start over with conditioned set of next edge
-                ning_set = e_new.conditioning;
+                // initialize running set with full conditioning set of this edge
+                ning_set = trees_[t][e].conditioning;
 
                 // remove edge (must not be reused in another column!)
-                size_t v0 = boost::source(e, trees_[t - k]);
-                size_t v1 = boost::target(e, trees_[t - k]);
-                boost::remove_edge(v0, v1, trees_[t - k]);
+                boost::remove_edge(v0, v1, trees_[t]);
                 break;
             }
+
+            // fill column bottom to top
+            for (size_t k = 1; k < t; ++k) {
+                auto check_set = cat(order[d_ - 1 - col], ning_set);
+                for (auto e : boost::edges(trees_[t - k])) {
+                    // search for an edge in lower tree that shares all
+                    // indices in the conditioning set + diagonal entry
+                    if (!is_same_set(trees_[t - k][e].all_indices, check_set)) {
+                        continue;
+                    }
+                    // found suitable edge ->
+                    // next matrix entry is conditioned variable of new edge
+                    // that's not equal to the diagonal entry of this column
+                    auto e_new = trees_[t - k][e];
+                    ptrdiff_t pos = (order[d_ - 1 - col] == e_new.conditioned[1]);
+                    if (pos == 1) {
+                        e_new.pair_copula.flip();
+                    }
+                    mat(t - k - 1, col) = e_new.conditioned[std::abs(1 - pos)];
+
+                    // assign fitted pair copula to appropriate entry, see
+                    // Vinecop::get_pair_copula().
+                    pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
+
+                    // start over with conditioned set of next edge
+                    ning_set = e_new.conditioning;
+
+                    // remove edge (must not be reused in another column!)
+                    size_t v0 = boost::source(e, trees_[t - k]);
+                    size_t v1 = boost::target(e, trees_[t - k]);
+                    boost::remove_edge(v0, v1, trees_[t - k]);
+                    break;
+                }
+            }
+
         }
 
-    }
+        // The last column contains a single element which must be different
+        // from all other diagonal elements. Based on the properties of an
+        // R-vine matrix, this must be the element next to it.
+        order[0] = mat(0, d_ - 2);
 
-    // The last column contains a single element which must be different
-    // from all other diagonal elements. Based on the properties of an
-    // R-vine matrix, this must be the element next to it.
-    order[0] = mat(0, d_ - 2);
-
-    // change to user-facing format
-    // (variable index starting at 1 instead of 0)
-    for (size_t i = 0; i < d_; ++i) {
-        order[i] += 1;
-        for (size_t j = 0; j < d_ - i - 1; ++j) {
-            mat(i, j) += 1;
+        // change to user-facing format
+        // (variable index starting at 1 instead of 0)
+        for (size_t i = 0; i < std::min(d_ - 1, trunc_lvl); ++i) {
+            order[i] += 1;
+            for (size_t j = 0; j < d_ - i - 1; ++j) {
+                mat(i, j) += 1;
+            }
         }
+        if (trunc_lvl < d_ - 1) {
+            for (size_t i = trunc_lvl; i < d_ - 1; i++)
+                order[i] += 1;
+        }
+    } else {
+        // order doesn't matter for truncated
+        order = tools_stl::seq_int(1, d_);
     }
 
     // return as RVineStructure

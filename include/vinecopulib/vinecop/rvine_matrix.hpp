@@ -19,8 +19,8 @@ public:
     {
         if (d < 2)
             throw std::runtime_error("d should be greater than 1");
-        if (trunc_lvl < 1)
-            throw std::runtime_error("trunc_lvl should be greater than 0.");
+        //if (trunc_lvl < 1)
+        //    throw std::runtime_error("trunc_lvl should be greater than 0.");
         if (trunc_lvl > d - 1)
             trunc_lvl_ = d - 1;
 
