@@ -7,6 +7,7 @@
 #pragma once
 
 #include <vinecopulib/misc/tools_stl.hpp>
+#include <iostream>
 
 namespace vinecopulib {
 
@@ -14,13 +15,20 @@ template<class T>
 class RVineMatrix {
 public:
     RVineMatrix() {}
-    RVineMatrix(size_t d) : d_(d)
+    RVineMatrix(size_t d, size_t trunc_lvl) : d_(d), trunc_lvl_(trunc_lvl)
     {
+        if (d < 2)
+            throw std::runtime_error("d should be greater than 1");
+        if ((trunc_lvl < 1) | (trunc_lvl > d - 1))
+            throw std::runtime_error("trunc_lvl should be in {1, ..., d-1}.");
+
         mat_ = std::vector<std::vector<T>>(d - 1);
-        for (size_t i = 0; i < mat_.size(); i++)
-            mat_[i] = std::vector<T>(mat_.size() - i, 0);
+        for (size_t i = 0; i < d - 1; i++)
+            mat_[i] = std::vector<T>(std::min(d - i - 1, trunc_lvl), 0);
     }
-    
+
+    RVineMatrix(size_t d) : RVineMatrix(d, d - 1) {}
+
     T& operator()(size_t tree, size_t edge) {return mat_[edge][tree];}
     T operator()(size_t tree, size_t edge) const {return mat_[edge][tree];}
     //T& operator[](size_t column) {return mat_[column];}
@@ -29,20 +37,22 @@ public:
     std::string str()
     {
         std::stringstream str;
-        for (size_t i = 0; i < mat_.size(); i++) {
-            for (size_t j = 0; j < mat_.size() - i; j++) {
+        for (size_t i = 0; i < d_ - 1; i++) {
+            for (size_t j = 0; j < std::min(d_ - i - 1, trunc_lvl_); j++) {
                 str << (*this)(i, j) << " ";
             }
             str << std::endl;
         }
         return str.str();
     }
-    
-    size_t dim() const {return d_;}
+
+    size_t get_trunc_lvl() const {return trunc_lvl_;}
+    size_t get_dim() const {return d_;}
 
 private:
     size_t d_;
-    std::vector< std::vector<T> > mat_;
+    size_t trunc_lvl_;
+    std::vector<std::vector<T>> mat_;
 };
 
 }

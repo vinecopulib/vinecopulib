@@ -93,7 +93,7 @@ inline Vinecop::Vinecop(boost::property_tree::ptree input, bool check_matrix)
     auto matrix =
         tools_serialization::ptree_to_rvinematrix<size_t>(input.get_child("matrix"));
     vine_struct_ = RVineStructure(order, matrix);
-    d_ = static_cast<size_t>(vine_struct_.dim());
+    d_ = static_cast<size_t>(vine_struct_.get_dim());
 
     boost::property_tree::ptree pcs_node = input.get_child("pair copulas");
     for (size_t tree = 0; tree < d_ - 1; ++tree) {

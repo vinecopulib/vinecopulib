@@ -18,11 +18,13 @@ public:
     RVineStructure(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat);
     RVineStructure(const std::vector<size_t>& order);
+    RVineStructure(const std::vector<size_t>& order, const size_t& trunc_lvl);
     RVineStructure(const std::vector<size_t>& order,
                    const RVineMatrix<size_t>& struct_mat,
                    bool is_natural_order = false);
 
-    size_t dim() const;
+    size_t get_dim() const;
+    size_t get_trunc_lvl() const;
     std::vector<size_t> get_order() const;
     RVineMatrix<size_t> get_struct_matrix() const;
     RVineMatrix<size_t> get_max_matrix() const;
@@ -37,7 +39,6 @@ protected:
 
     size_t find_trunc_lvl(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
-    //size_t find_trunc_lvl(const RVineMatrix<size_t>& mat) const;
     std::vector<size_t> get_order(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
 

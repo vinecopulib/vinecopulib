@@ -50,9 +50,9 @@ inline boost::property_tree::ptree rvinematrix_to_ptree(
     RVineMatrix<T> matrix)
 {
     boost::property_tree::ptree output;
-    for (size_t i = 0; i < matrix.dim() - 1; i++) {
+    for (size_t i = 0; i < matrix.get_dim() - 1; i++) {
         boost::property_tree::ptree col;
-        for (size_t j = 0; j < matrix.dim() - i - 1; j++) {
+        for (size_t j = 0; j < matrix.get_dim() - i - 1; j++) {
             boost::property_tree::ptree cell;
             cell.put_value(matrix(j, i));
             col.push_back(std::make_pair("", cell));
@@ -132,24 +132,22 @@ inline RVineMatrix<T> ptree_to_rvinematrix(
 {
 
     std::vector<T> vec;
-    size_t rows = 0;
-    size_t cols = 0;
+    size_t trunc_lvl = 0;
+    size_t d = 1;
     for (boost::property_tree::ptree::value_type col : input) {
-        size_t rows_temp = 0;
         for (boost::property_tree::ptree::value_type cell : col.second) {
-            rows_temp++;
+            if (d == 1) {
+                trunc_lvl++;
+            }
             vec.push_back(cell.second.get_value<T>());
         }
-        if (cols == 0) {
-            rows = rows_temp;
-        }
-        cols++;
+        d++;
     }
 
-    RVineMatrix<T> matrix(cols + 1);
+    RVineMatrix<T> matrix(d, trunc_lvl);
     size_t count = 0;
-    for (size_t i = 0; i < rows; i++) {
-        for (size_t j = 0; j < cols - i; j++) {
+    for (size_t i = 0; i < trunc_lvl; i++) {
+        for (size_t j = 0; j < d - i - 1; j++) {
             matrix(i, j) = vec[count];
             count++;
         }

@@ -22,12 +22,19 @@ inline RVineStructure::RVineStructure(
     needed_hfunc2_ = compute_needed_hfunc2();
 }
 
-inline RVineStructure::RVineStructure(const std::vector<size_t>& order)
+inline RVineStructure::RVineStructure(const std::vector<size_t>& order) :
+    RVineStructure(order, order.size() - 1) {}
+
+inline RVineStructure::RVineStructure(
+    const std::vector<size_t>& order, const size_t& trunc_lvl)
 {
 
     d_ = order.size();
+    if ((trunc_lvl < 1) | (trunc_lvl > d_ - 1))
+        throw std::runtime_error("order and trunc_lvl are incompatible.");
+
     order_ = order;
-    trunc_lvl_ = d_ - 1;
+    trunc_lvl_ = trunc_lvl;
     struct_mat_ = compute_dvine_struct_matrix();
     max_mat_ = compute_max_matrix();
     needed_hfunc1_ = compute_needed_hfunc1();
@@ -41,11 +48,11 @@ inline RVineStructure::RVineStructure(
     bool is_natural_order)
 {
     d_ = order.size();
-    if (struct_mat.dim() != d_)
+    if (struct_mat.get_dim() != d_)
         throw std::runtime_error("order and struct_mat have "
                                      "incompatible dimensions");
     order_ = order;
-    trunc_lvl_ = d_;
+    trunc_lvl_ = struct_mat.get_trunc_lvl();
     if (is_natural_order) {
         struct_mat_ = struct_mat;
     } else {
@@ -56,9 +63,14 @@ inline RVineStructure::RVineStructure(
     needed_hfunc2_ = compute_needed_hfunc2();
 }
 
-inline size_t RVineStructure::dim() const
+inline size_t RVineStructure::get_dim() const
 {
     return d_;
+}
+
+inline size_t RVineStructure::get_trunc_lvl() const
+{
+    return trunc_lvl_;
 }
 
 inline std::vector<size_t> RVineStructure::get_order() const 
@@ -81,7 +93,10 @@ inline RVineMatrix<size_t> RVineStructure::get_needed_hfunc1() const
     return needed_hfunc1_;
 }
 
-inline RVineMatrix<size_t> RVineStructure::get_needed_hfunc2() const {return needed_hfunc2_;}
+inline RVineMatrix<size_t> RVineStructure::get_needed_hfunc2() const
+{
+    return needed_hfunc2_;
+}
 
 inline size_t RVineStructure::struct_matrix(size_t tree, size_t edge) const 
 {
@@ -135,9 +150,10 @@ inline std::vector<size_t> RVineStructure::get_order(
 
 inline RVineMatrix<size_t> RVineStructure::compute_dvine_struct_matrix() const
 {
-    RVineMatrix<size_t> struct_mat(d_);
-    for (size_t i = 0; i < d_ - 1; i++) {
-        for (size_t j = 0; j < d_ - 1 - i; j++) {
+    RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
+    std::cout << struct_mat.str() << std::endl;
+    for (size_t j = 0; j < d_ - 1; j++) {
+        for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
             struct_mat(i, j) = d_ - i - j - 1;
         }
     }
