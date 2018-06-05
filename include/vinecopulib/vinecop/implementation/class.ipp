@@ -772,33 +772,30 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
     auto max_matrix = vine_struct_.get_max_matrix();
     auto needed_hfunc1 = vine_struct_.get_needed_hfunc1();
     auto needed_hfunc2 = vine_struct_.get_needed_hfunc2();
+    size_t trunc_lvl = pair_copulas_.size();
 
     auto do_batch = [&](const tools_thread::Batch& b) {
         if (d > 2) {
             // temporary storage objects for (inverse) h-functions
-            Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic>
-                hinv2(d, d);
-            Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, Eigen::Dynamic>
-                hfunc1(d, d);
-
+            RVineMatrix<Eigen::VectorXd> hinv2(d + 1);
+            RVineMatrix<Eigen::VectorXd> hfunc1(d + 1);
+        
             // initialize with independent uniforms (corresponding to natural
             // order)
             for (size_t j = 0; j < d; ++j) {
-                hinv2(d - j - 1, j) = u.block(b.begin, revorder[j] - 1, b.size, 1);
+                hinv2(std::min(trunc_lvl, d - j - 1), j) = 
+                    u.block(b.begin, revorder[j] - 1, b.size, 1);
             }
             hfunc1(0, d - 1) = hinv2(0, d - 1);
-
+        
             // loop through variables (0 is just the initial uniform)
-            size_t trunc_lvl = pair_copulas_.size();
             for (ptrdiff_t var = d - 2; var >= 0; --var) {
-                tools_interface::check_user_interrupt(n * d > 1e5);
-                if (trunc_lvl < d_ - 1) {
-                    hinv2(trunc_lvl, var) = hinv2(d - var - 1, var);
-                }
+            
+                tools_interface::check_user_interrupt(n * d > 1e5);            
                 size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
                 for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
                     Bicop edge_copula = get_pair_copula(tree, var);
-
+                
                     // extract data for conditional pair
                     Eigen::MatrixXd U_e(b.size, 2);
                     size_t m = max_matrix(tree, var);
@@ -808,10 +805,10 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
                     } else {
                         U_e.col(1) = hfunc1(tree, d - m);
                     }
-
+                
                     // inverse Rosenblatt transform simulates data for conditional pair
                     hinv2(tree, var) = edge_copula.hinv2(U_e);
-
+                
                     // if required at later stage, also calculate hfunc2
                     if (var < static_cast<ptrdiff_t>(d_) - 1) {
                         if (needed_hfunc1(tree, var)) {
@@ -821,7 +818,6 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
                     }
                 }
             }
-
             // go back to original order
             for (size_t j = 0; j < d; j++) {
                 U_vine.block(b.begin, j, b.size, 1) = hinv2(0, inverse_order[j]);
@@ -833,6 +829,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
 
     tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
     pool.map(do_batch, tools_thread::create_batches(n, num_threads));
+
     pool.join();
 
     return U_vine;

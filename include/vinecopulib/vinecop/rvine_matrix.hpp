@@ -26,7 +26,7 @@ public:
 
         mat_ = std::vector<std::vector<T>>(d - 1);
         for (size_t i = 0; i < d - 1; i++)
-            mat_[i] = std::vector<T>(std::min(d - i - 1, trunc_lvl), 0);
+            mat_[i] = std::vector<T>(std::min(d - i - 1, trunc_lvl));
     }
 
     RVineMatrix(size_t d) : RVineMatrix(d, d - 1) {}
