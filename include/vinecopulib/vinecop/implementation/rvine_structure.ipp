@@ -13,7 +13,6 @@ inline RVineStructure::RVineStructure(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat)
 {
     d_ = mat.cols();
-
     trunc_lvl_ = find_trunc_lvl(mat);
     order_ = get_order(mat);
     struct_mat_ = to_natural_order(mat);
@@ -111,12 +110,13 @@ inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> RVineStructure::get
 {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> matrix(d_, d_);
     matrix.fill(0);
-    for (size_t i = 0; i < d_; ++i) {
+    for (size_t i = 0; i < trunc_lvl_; ++i) {
         for (size_t j = 0; j < d_ - i - 1; ++j) {
             matrix(i, j) = order_[struct_mat_(i, j) - 1];
         }
         matrix(d_ - i - 1, i) = order_[d_ - i - 1];
     }
+    matrix(0, d_ - 1) = order_[0];
     return matrix;
 }
 
@@ -151,7 +151,6 @@ inline std::vector<size_t> RVineStructure::get_order(
 inline RVineMatrix<size_t> RVineStructure::compute_dvine_struct_matrix() const
 {
     RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
-    std::cout << struct_mat.str() << std::endl;
     for (size_t j = 0; j < d_ - 1; j++) {
         for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
             struct_mat(i, j) = d_ - i - j - 1;
@@ -165,7 +164,7 @@ inline RVineMatrix<size_t> RVineStructure::compute_max_matrix() const
 {
     RVineMatrix<size_t> max_mat = struct_mat_;
     for (size_t j = 0; j < d_ - 1; j++) {
-        for (size_t i = 1; i < d_ - 1 - j; i++) {
+        for (size_t i = 1; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
             max_mat(i, j) = std::max(struct_mat_(i, j), max_mat(i - 1, j));
         }
     }
@@ -175,9 +174,9 @@ inline RVineMatrix<size_t> RVineStructure::compute_max_matrix() const
 
 inline RVineMatrix<size_t> RVineStructure::compute_needed_hfunc1() const
 {
-    RVineMatrix<size_t> needed_hfunc1(d_);
+    RVineMatrix<size_t> needed_hfunc1(d_, trunc_lvl_);
 
-    for (size_t i = 0; i < d_ - 2; i++) {
+    for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
         for (size_t j = 0; j < d_ - 2 - i; j++) {
             if (struct_mat_(i + 1, j) != max_mat_(i + 1, j))
                 needed_hfunc1(i, d_ - max_mat_(i + 1, j)) = 1;
@@ -189,9 +188,9 @@ inline RVineMatrix<size_t> RVineStructure::compute_needed_hfunc1() const
 
 inline RVineMatrix<size_t> RVineStructure::compute_needed_hfunc2() const
 {
-    RVineMatrix<size_t> needed_hfunc2(d_);
+    RVineMatrix<size_t> needed_hfunc2(d_, trunc_lvl_);
 
-    for (size_t i = 0; i < d_ - 2; i++) {
+    for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
         for (size_t j = 0; j < d_ - 2 - i; j++) {
             needed_hfunc2(i, j) = 1;
             if (struct_mat_(i + 1, j) == max_mat_(i + 1, j))

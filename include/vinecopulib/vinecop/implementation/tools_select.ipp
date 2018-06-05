@@ -428,6 +428,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
                 break;
             }
         }
+
     }
 
     // The last column contains a single element which must be different

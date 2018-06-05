@@ -66,9 +66,9 @@ template<class T> RVineMatrix<size_t> RVineStructure::to_natural_order(const T& 
     auto order = tools_stl::get_order(get_order());
 
     // copy upper triangle and relabel to natural order
-    RVineMatrix<size_t> struct_mat(d_);
-    for (size_t i = 0; i < d_ - 1; i++) {
-        for (size_t j = 0; j < d_ - 1 - i; j++) {
+    RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
+    for (size_t j = 0; j < d_ - 1; j++) {
+        for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
             struct_mat(i, j) = order[mat(i, j) - 1] + 1;
         }
     }

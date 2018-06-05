@@ -9,7 +9,6 @@
 #include <vinecopulib/misc/tools_parallel.hpp>
 
 #include <stdexcept>
-#include <vector>
 
 namespace vinecopulib {
 

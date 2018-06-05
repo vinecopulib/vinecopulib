@@ -55,14 +55,24 @@ TEST(rvine_matrix, test) {
         3, 6, 0, 0, 0, 0, 0,
         7, 0, 0, 0, 0, 0, 0;
 
-    std::vector<size_t> order = {2, 4, 3, 1};
-    auto test = RVineStructure(order);
-    std::cout << "dvine matrix ------" << std::endl;
-    std::cout << test.get_matrix() << std::endl;
+    Eigen::Matrix<size_t, 7, 7> mat2;
 
-    std::cout << "test new contructor ------" << std::endl;
-    auto test2 = RVineStructure(order, test.get_struct_matrix());
-    std::cout << test2.get_matrix() << std::endl;
+    mat2 << 4, 5, 4, 2, 2, 1, 1,
+        2, 4, 2, 1, 1, 2, 0,
+        5, 2, 1, 3, 3, 0, 0,
+        6, 1, 3, 4, 0, 0, 0,
+        0, 0, 5, 0, 0, 0, 0,
+        0, 6, 0, 0, 0, 0, 0,
+        7, 0, 0, 0, 0, 0, 0;
+
+//    std::vector<size_t> order = {1, 2, 3, 4};
+//    auto test = RVineStructure(order);
+//    std::cout << "dvine matrix ------" << std::endl;
+//    std::cout << test.get_matrix() << std::endl;
+//
+//    std::cout << "test new contructor ------" << std::endl;
+//    auto test2 = RVineStructure(order, test.get_struct_matrix());
+//    std::cout << test2.get_matrix() << std::endl;
 
     std::cout << "benchmark (new vs old) ------" << std::endl;
     Timer timer;
@@ -71,28 +81,37 @@ TEST(rvine_matrix, test) {
     timer.end();
 
     timer.start();
+    RVineStructure strct2(mat2);
+    timer.end();
+
+    timer.start();
     RVineMatrix2 rvm(mat, false);
     timer.end();
     
     std::cout << "matrix ------" << std::endl;
     std::cout << mat << std::endl  << std::endl;
-    std::cout << strct.get_matrix() << std::endl;
+    std::cout << strct.get_matrix() << std::endl  << std::endl;
+    std::cout << strct2.get_matrix() << std::endl;
 
     std::cout << "no_matrix ------" << std::endl;
     std::cout << rvm.get_natural_order() << std::endl  << std::endl;
     std::cout << strct.get_struct_matrix().str() << std::endl;
+    std::cout << strct2.get_struct_matrix().str() << std::endl;
     
     std::cout << "max_matrix ------" << std::endl;
     std::cout << rvm.get_max_matrix() << std::endl  << std::endl;
     std::cout << strct.get_max_matrix().str() << std::endl;
+    std::cout << strct2.get_max_matrix().str() << std::endl;
     
     std::cout << "needed_hfunc1 ------" << std::endl;
     std::cout << rvm.get_needed_hfunc1() << std::endl  << std::endl;
     std::cout << strct.get_needed_hfunc1().str() << std::endl;
+    std::cout << strct2.get_needed_hfunc1().str() << std::endl;
     
     std::cout << "needed_hfunc2 ------" << std::endl;
     std::cout << rvm.get_needed_hfunc2() << std::endl  << std::endl;
     std::cout << strct.get_needed_hfunc2().str() << std::endl;
+    std::cout << strct2.get_needed_hfunc2().str() << std::endl;
 }
 
 // TEST(rvine_matrix, can_convert_to_natural_order) {

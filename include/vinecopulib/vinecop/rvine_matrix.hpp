@@ -37,8 +37,8 @@ public:
     std::string str()
     {
         std::stringstream str;
-        for (size_t i = 0; i < d_ - 1; i++) {
-            for (size_t j = 0; j < std::min(d_ - i - 1, trunc_lvl_); j++) {
+        for (size_t i = 0; i < std::min(d_ - 1, trunc_lvl_); i++) {
+            for (size_t j = 0; j < d_ - i - 1; j++) {
                 str << (*this)(i, j) << " ";
             }
             str << std::endl;
