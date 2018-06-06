@@ -209,7 +209,7 @@ inline void RVineStructure::check_proximity_condition() const
     using namespace tools_stl;
     for (size_t t = 1; t < trunc_lvl_; ++t) {
         for (size_t e = 0; e < d_ - t - 1; ++e) {
-            std::vector<size_t> target_set(t + 1), test_set(t + 1);
+            std::vector <size_t> target_set(t + 1), test_set(t + 1);
             // conditioning set
             for (size_t i = 0; i < t; i++) {
                 target_set[i] = struct_mat_(i, e);
@@ -223,16 +223,91 @@ inline void RVineStructure::check_proximity_condition() const
             if (!is_same_set(target_set, test_set)) {
                 std::stringstream problem;
                 problem << "not a valid R-vine matrix: " <<
-                           "proximity condition violated; " <<
-                           "cannot extract conditional distribution (" <<
-                           target_set[t] << " | ";
+                        "proximity condition violated; " <<
+                        "cannot extract conditional distribution (" <<
+                        target_set[t] << " | ";
                 for (size_t i = 0; i < t - 1; ++i) {
                     problem << order_[target_set[i] - 1] << ", ";
                 }
-                problem << order_[target_set[t - 1] - 1] << ") from pair-copulas.";
-                throw std::runtime_error(problem.str().c_str());                
+                problem << order_[target_set[t - 1] - 1]
+                        << ") from pair-copulas.";
+                throw std::runtime_error(problem.str().c_str());
             }
         }
+    }
+}
+
+inline void RVineStructure::check_if_quadratic(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+{
+    std::string problem = "must be quadratic.";
+    if (mat.rows() != mat.cols()) {
+        throw std::runtime_error("not a valid R-vine matrix: " + problem);
+    }
+}
+
+inline void RVineStructure::check_lower_tri(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+{
+    std::string problem = "the lower right triangle must only contain zeros";
+    size_t sum_lwr = 0;
+    for (size_t j = 1; j < d_; ++j) {
+        sum_lwr += mat.block(d_ - j, j, j, 1).array().sum();
+        if (sum_lwr != 0) {
+            throw std::runtime_error("not a valid R-vine matrix: " + problem);
+        }
+    }
+}
+
+inline void RVineStructure::check_upper_tri(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+{
+    std::string problem;
+    problem += "the upper left triangle can only contain numbers ";
+    problem += "between 0 and d (number of variables).";
+    size_t min_upr = d_;
+    size_t max_upr = 0;
+    for (size_t j = 0; j < d_; ++j) {
+        min_upr = std::min(min_upr, mat.col(j).head(d_ - j).minCoeff());
+        max_upr = std::max(max_upr, mat.col(j).head(d_ - j).maxCoeff());
+        if ((max_upr > d_) | (min_upr < 0)) {
+            throw std::runtime_error("not a valid R-vine matrix: " + problem);
+        }
+    }
+}
+
+//inline void RVineStructure::check_columns() const
+//{
+//    using namespace tools_stl;
+//    std::string problem;
+//    problem += "the antidiagonal entry of a column must not be ";
+//    problem += "contained in any column further to the right; ";
+//    problem += "the entries of a column must be contained ";
+//    problem += "in all columns to the left.";
+//
+//    // In natural order: column j only contains indices 1:(d - j).
+//    bool ok = true;
+//    for (size_t j = 0; j < d_; ++j) {
+//        std::vector <size_t> col_vec(d_ - j);
+//        for (size_t i = 0; i < d_ - j; i ++) {
+//            col_vec
+//        }
+//        Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&col_vec[0], d_ - j) =
+//            no_matrix_.col(j).head(d_ - j);
+//        ok = ok & is_same_set(col_vec, seq_int(1, d_ - j));
+//        if (!ok) {
+//            throw std::runtime_error("not a valid R-vine matrix: " + problem);
+//        }
+//    }
+//}
+
+inline void RVineStructure::check_antidiagonal() const
+{
+    std::string problem;
+    problem += "the order/antidiagonal must contain the numbers ";
+    problem += "1, ..., d (the number of variables)";
+    if (!tools_stl::is_same_set(order_, tools_stl::seq_int(1, d_))) {
+        throw std::runtime_error("not a valid R-vine matrix: " + problem);
     }
 }
 

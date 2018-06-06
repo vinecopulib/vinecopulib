@@ -35,7 +35,7 @@ public:
     size_t struct_matrix(size_t tree, size_t edge) const;
     size_t max_matrix(size_t tree, size_t edge) const;
 
-protected:
+private:
 
     size_t find_trunc_lvl(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
@@ -47,10 +47,15 @@ protected:
     RVineMatrix<size_t> compute_max_matrix() const;
     RVineMatrix<size_t> compute_needed_hfunc1() const;
     RVineMatrix<size_t> compute_needed_hfunc2() const;
-    
-    void check_proximity_condition() const;
 
-private:
+    void check_if_quadratic(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+    void check_lower_tri(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+    void check_upper_tri(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+    void check_antidiagonal() const;
+    void check_proximity_condition() const;
 
     std::vector<size_t> order_;
     size_t d_;
