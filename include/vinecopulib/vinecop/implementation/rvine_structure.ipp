@@ -116,9 +116,10 @@ inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> RVineStructure::get
         for (size_t j = 0; j < d_ - i - 1; ++j) {
             matrix(i, j) = order_[struct_mat_(i, j) - 1];
         }
+    }
+    for (size_t i = 0; i < d_; ++i) {
         matrix(d_ - i - 1, i) = order_[d_ - i - 1];
     }
-    matrix(0, d_ - 1) = order_[0];
     return matrix;
 }
 
@@ -222,13 +223,13 @@ inline void RVineStructure::check_proximity_condition() const
             if (!is_same_set(target_set, test_set)) {
                 std::stringstream problem;
                 problem << "not a valid R-vine matrix: " <<
-                           "proximity contition violated; " <<
+                           "proximity condition violated; " <<
                            "cannot extract conditional distribution (" <<
                            target_set[t] << " | ";
                 for (size_t i = 0; i < t - 1; ++i) {
-                    problem << target_set[i] << ", ";
+                    problem << order_[target_set[i] - 1] << ", ";
                 }
-                problem << target_set[t - 1] << ") from pair-copulas.";
+                problem << order_[target_set[t - 1] - 1] << ") from pair-copulas.";
                 throw std::runtime_error(problem.str().c_str());                
             }
         }
