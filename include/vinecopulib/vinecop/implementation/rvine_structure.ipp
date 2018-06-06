@@ -61,7 +61,6 @@ inline RVineStructure::RVineStructure(
             trunc_lvl_ = trunc_lvl;
         }
 
-        std::cout << trunc_lvl_ << std::endl;
         struct_mat_ = compute_dvine_struct_matrix();
         max_mat_ = compute_max_matrix();
         needed_hfunc1_ = compute_needed_hfunc1();

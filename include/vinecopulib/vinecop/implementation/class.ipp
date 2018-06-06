@@ -54,28 +54,30 @@ inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>> &pair_copulas,
                         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
                         const bool check_matrix)
 {
+
     d_ = matrix.rows();
-    if (pair_copulas.size() > d_ - 1) {
+    vine_struct_ = RVineStructure(matrix, check_matrix);
+
+    size_t trunc_lvl = vine_struct_.get_trunc_lvl();
+    if (pair_copulas.size() > std::min(d_ - 1, trunc_lvl)) {
         std::stringstream message;
-        message <<
-                "pair_copulas is too large; " <<
-                "expected size: < " << d_ - 1 << ", " <<
-                "actual size: " << pair_copulas.size() << std::endl;
+        message << "pair_copulas is too large; "
+                << "expected size: < " << std::min(d_ - 1, trunc_lvl) << ", "
+                << "actual size: " << pair_copulas.size() << std::endl;
         throw std::runtime_error(message.str().c_str());
     }
     for (size_t t = 0; t < pair_copulas.size(); ++t) {
-        if (pair_copulas[t].size() != d_ - 1 - t) {
+        if (pair_copulas[t].size() != std::min(d_ - 1 - t, trunc_lvl)) {
             std::stringstream message;
-            message <<
-                    "size of pair_copulas[" << t << "] " <<
-                    "does not match dimension of matrix (" << d_ << "); " <<
-                    "expected size: " << d_ - 1 - t << ", " <<
-                    "actual size: " << pair_copulas[t].size() << std::endl;
+            message << "size of pair_copulas[" << t << "] "
+                    << "does not match dimension of matrix ("
+                    << d_ << "); " << "expected size: "
+                    << std::min(d_ - 1 - t, trunc_lvl) << ", "
+                    << "actual size: " << pair_copulas[t].size() << std::endl;
             throw std::runtime_error(message.str().c_str());
         }
     }
 
-    vine_struct_ = RVineStructure(matrix, check_matrix);
     pair_copulas_ = pair_copulas;
     threshold_ = 0.0;
     loglik_ = NAN;
@@ -93,6 +95,7 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
         tools_serialization::ptree_to_vector<size_t>(input.get_child("order"));
     auto matrix =
         tools_serialization::ptree_to_rvinematrix<size_t>(input.get_child("matrix"));
+
     vine_struct_ = RVineStructure(order, matrix, check_matrix);
     d_ = static_cast<size_t>(vine_struct_.get_dim());
 

@@ -32,20 +32,30 @@ TEST(serialization, bicop_serialization) {
 }
 
 TEST(serialization, vinecop_serialization) {
-    // create vine with 5 variables, 2-truncated
-    size_t d = 5;
-    Vinecop vc(d);
+
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
+    mat << 5, 2, 6, 6, 6, 6, 6,
+        6, 6, 1, 2, 5, 5, 0,
+        2, 5, 2, 5, 2, 0, 0,
+        1, 1, 5, 1, 0, 0, 0,
+        3, 7, 7, 0, 0, 0, 0,
+        7, 3, 0, 0, 0, 0, 0,
+        4, 0, 0, 0, 0, 0, 0;
+
+    // create vine with 7 variables, 2-truncated
+    size_t d = 7;
     auto pc_store = Vinecop::make_pair_copula_store(d, 5);
     for (auto& tree : pc_store) {
         for (auto& pc : tree) {
             pc = Bicop(BicopFamily::bb1, 90);
         }
     }
-    vc = Vinecop(pc_store, vc.get_matrix());
+
+    auto vc = Vinecop(pc_store, mat);
 
     // serialize
     vc.to_json("temp");
-    
+
     // unserialize
     auto vc2 = Vinecop("temp");
 

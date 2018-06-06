@@ -19,6 +19,7 @@ public:
     {
         if (d < 2)
             throw std::runtime_error("d should be greater than 1");
+
         //if (trunc_lvl < 1)
         //    throw std::runtime_error("trunc_lvl should be greater than 0.");
         if (trunc_lvl > d - 1)
@@ -35,6 +36,17 @@ public:
     T operator()(size_t tree, size_t edge) const {return mat_[edge][tree];}
     std::vector<T>& operator[](size_t column) {return mat_[column];}
     std::vector<T> operator[](size_t column) const {return mat_[column];}
+
+    bool operator==(const RVineMatrix<T>& rhs) const {
+        if ((d_ != rhs.get_dim()) | (trunc_lvl_ != rhs.get_trunc_lvl()))
+            return false;
+
+        for (size_t i = 0; i < d_ - 1; i++) {
+            if (!((*this)[i] == rhs[i]))
+                return false;
+        }
+        return true;
+    }
 
     std::string str() const
     {
