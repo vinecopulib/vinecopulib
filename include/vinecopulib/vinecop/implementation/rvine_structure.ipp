@@ -202,4 +202,57 @@ inline RVineMatrix<size_t> RVineStructure::compute_needed_hfunc2() const
     return needed_hfunc2;
 }
 
+inline void RVineStructure::check_if_quadratic(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+{
+    std::string problem = "must be quadratic.";
+    if (mat.rows() != mat.cols()) {
+        throw std::runtime_error("not a valid R-vine matrix: " + problem);
+    }
+}
+
+inline void RVineStructure::check_lower_tri(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+{
+    std::string problem = "the lower right triangle must only contain zeros";
+    size_t sum_lwr = 0;
+    for (size_t j = 1; j < d_; ++j) {
+        sum_lwr += mat.block(d_ - j, j, j, 1).array().sum();
+        if (sum_lwr != 0) {
+            throw std::runtime_error("not a valid R-vine matrix: " + problem);
+        }
+    }
+}
+
+inline void RVineStructure::check_upper_tri(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+{
+    std::string problem;
+    problem += "the upper left triangle can only contain numbers ";
+    problem += "between 0 and d (number of variables).";
+    size_t min_upr = d_;
+    size_t max_upr = 0;
+    for (size_t j = 0; j < d_; ++j) {
+        min_upr = std::min(min_upr, mat.col(j).head(d_ - j).minCoeff());
+        max_upr = std::max(max_upr, mat.col(j).head(d_ - j).maxCoeff());
+        if ((max_upr > d_) | (min_upr < 1)) {
+            throw std::runtime_error("not a valid R-vine matrix: " + problem);
+        }
+    }
+}
+
+inline void RVineStructure::check_antidiagonal(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+{
+    std::string problem;
+    problem += "the antidiagonal must contain the numbers ";
+    problem += "0, ..., d (the number of variables)";
+    auto diag = mat.colwise().reverse().diagonal();
+    std::vector <size_t> diag_vec(d_);
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&diag_vec[0], d_) = diag;
+    if (!tools_stl::is_same_set(diag_vec, tools_stl::seq_int(1, d_))) {
+        throw std::runtime_error("not a valid R-vine matrix: " + problem);
+    }
+}
+
 }
