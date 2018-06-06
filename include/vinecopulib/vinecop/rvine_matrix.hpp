@@ -36,7 +36,7 @@ public:
     //T& operator[](size_t column) {return mat_[column];}
     //T operator[](size_t column) const {return mat_[column];}
 
-    std::string str()
+    std::string str() const
     {
         std::stringstream str;
         for (size_t i = 0; i < std::min(d_ - 1, trunc_lvl_); i++) {

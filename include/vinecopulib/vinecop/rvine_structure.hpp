@@ -47,7 +47,8 @@ protected:
     RVineMatrix<size_t> compute_max_matrix() const;
     RVineMatrix<size_t> compute_needed_hfunc1() const;
     RVineMatrix<size_t> compute_needed_hfunc2() const;
-
+    
+    void check_proximity_condition() const;
 
 private:
 

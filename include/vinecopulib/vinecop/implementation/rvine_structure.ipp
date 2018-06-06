@@ -16,6 +16,7 @@ inline RVineStructure::RVineStructure(
     order_ = get_order(mat);
     struct_mat_ = to_natural_order(mat);
     max_mat_ = compute_max_matrix();
+    check_proximity_condition();
     needed_hfunc1_ = compute_needed_hfunc1();
     needed_hfunc2_ = compute_needed_hfunc2();
 }
@@ -200,6 +201,38 @@ inline RVineMatrix<size_t> RVineStructure::compute_needed_hfunc2() const
     }
 
     return needed_hfunc2;
+}
+
+inline void RVineStructure::check_proximity_condition() const
+{
+    using namespace tools_stl;
+    for (size_t t = 1; t < trunc_lvl_; ++t) {
+        for (size_t e = 0; e < d_ - t - 1; ++e) {
+            std::vector<size_t> target_set(t + 1), test_set(t + 1);
+            // conditioning set
+            for (size_t i = 0; i < t; i++) {
+                target_set[i] = struct_mat_(i, e);
+                test_set[i] = struct_mat_(i, d_ - max_mat_(t, e));
+            }
+            // non-diagonal conditioned variable
+            target_set[t] = struct_mat_(t, e);
+            // diagonal conditioned variable in other column
+            test_set[t] = max_mat_(t, e);
+
+            if (!is_same_set(target_set, test_set)) {
+                std::stringstream problem;
+                problem << "not a valid R-vine matrix: " <<
+                           "proximity contition violated; " <<
+                           "cannot extract conditional distribution (" <<
+                           target_set[t] << " | ";
+                for (size_t i = 0; i < t - 1; ++i) {
+                    problem << target_set[i] << ", ";
+                }
+                problem << target_set[t - 1] << ") from pair-copulas.";
+                throw std::runtime_error(problem.str().c_str());                
+            }
+        }
+    }
 }
 
 }

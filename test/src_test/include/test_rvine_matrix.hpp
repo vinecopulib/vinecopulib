@@ -281,53 +281,53 @@ TEST(rvine_matrix, test) {
 // 
 // }
 // 
-// TEST(rvine_matrix, rvine_struct_sanity_checks_work) {
-//     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
-//     mat << 5, 2, 6, 6, 6, 6, 6,
-//         6, 6, 1, 2, 5, 5, 0,
-//         2, 5, 2, 5, 2, 0, 0,
-//         1, 1, 5, 1, 0, 0, 0,
-//         3, 7, 7, 0, 0, 0, 0,
-//         7, 3, 0, 0, 0, 0, 0,
-//         4, 0, 0, 0, 0, 0, 0;
-//     // should pass without errors
-//     auto rvm = RVineMatrix(mat);
-// 
-//     // must be quadratic
-//     auto wrong_mat = mat;
-//     wrong_mat = mat.block(0, 0, 4, 5);
-//     EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
-// 
-//     // lower right triangle must contain zeros
-//     wrong_mat = mat;
-//     wrong_mat(6, 6) = 1;
-//     EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
-// 
-//     // upper left triangle must only contain 1, ..., d
-//     wrong_mat = mat;
-//     wrong_mat(0, 0) = 9;
-//     EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
-//     wrong_mat(0, 0) = 0;
-//     EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
-// 
-//     // diagonal elements cannot appear further to the right
-//     wrong_mat = mat;
-//     wrong_mat(0, 1) = 4;
-//     EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
-// 
-//     // all numbers in a column most appear in each column to the left
-//     wrong_mat = mat;
-//     wrong_mat(0, 0) = 4;
-//     EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
-// 
-//     // proximity condition
-//     wrong_mat = mat;
-//     wrong_mat(3, 1) = 7;
-//     wrong_mat(4, 1) = 1;
-//     EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
-// 
-//     // row and col should be smaller than d_
-//     EXPECT_ANY_THROW(rvm.get_element(8, 0));
-//     EXPECT_ANY_THROW(rvm.get_element(0, 8));
-// }
+TEST(rvine_matrix, rvine_struct_sanity_checks_work) {
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
+    mat << 5, 2, 6, 6, 6, 6, 6,
+        6, 6, 1, 2, 5, 5, 0,
+        2, 5, 2, 5, 2, 0, 0,
+        1, 1, 5, 1, 0, 0, 0,
+        3, 7, 7, 0, 0, 0, 0,
+        7, 3, 0, 0, 0, 0, 0,
+        4, 0, 0, 0, 0, 0, 0;
+    // should pass without errors
+    auto rvm = RVineStructure(mat);
+    auto wrong_mat = mat;
+
+    // // must be quadratic
+    // wrong_mat = mat.block(0, 0, 4, 5);
+    // EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+    // 
+    // // lower right triangle must contain zeros
+    // wrong_mat = mat;
+    // wrong_mat(6, 6) = 1;
+    // EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+    // 
+    // // upper left triangle must only contain 1, ..., d
+    // wrong_mat = mat;
+    // wrong_mat(0, 0) = 9;
+    // EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+    // wrong_mat(0, 0) = 0;
+    // EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+    // 
+    // // diagonal elements cannot appear further to the right
+    // wrong_mat = mat;
+    // wrong_mat(0, 1) = 4;
+    // EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+    // 
+    // // all numbers in a column most appear in each column to the left
+    // wrong_mat = mat;
+    // wrong_mat(0, 0) = 4;
+    // EXPECT_ANY_THROW(rvm = RVineMatrix(wrong_mat));
+
+    // proximity condition
+    wrong_mat = mat;
+    wrong_mat(3, 1) = 7;
+    wrong_mat(4, 1) = 1;
+    EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
+
+    // // row and col should be smaller than d_
+    // EXPECT_ANY_THROW(rvm.get_element(8, 0));
+    // EXPECT_ANY_THROW(rvm.get_element(0, 8));
+}
 }
