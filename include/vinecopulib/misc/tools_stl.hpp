@@ -140,6 +140,13 @@ bool is_same_set(vector <T> x, vector <T> y)
     return ((z.size() == x.size()) & (z.size() == y.size()));
 }
 
+template<class T>
+bool is_member(vector <T> x, vector <T> y)
+{
+    auto z = intersect(x, y);
+    return z.size() == x.size();
+}
+
 //! Integer sequence starting at 1
 inline vector <size_t> seq_int(size_t from, size_t length)
 {

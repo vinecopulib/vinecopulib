@@ -19,8 +19,9 @@ inline Vinecop::Vinecop(const size_t d)
 {
     d_ = d;
 
-    // D-vine with variable order (1, ..., d)
-    vine_struct_ = RVineStructure(tools_stl::seq_int(1, d));
+    // 0-truncated D-vine with variable order (1, ..., d)
+    vine_struct_ = RVineStructure(tools_stl::seq_int(1, d),
+                                  static_cast<size_t>(0));
 
     // pair_copulas_ empty = everything independence 
     threshold_ = 0.0;
@@ -37,7 +38,7 @@ inline Vinecop::Vinecop(
     const bool check_matrix)
 {
     d_ = matrix.rows();
-    vine_struct_ = RVineStructure(matrix);
+    vine_struct_ = RVineStructure(matrix, check_matrix);
     // pair_copulas_ empty = everything independence
     threshold_ = 0.0;
     loglik_ = NAN;
@@ -74,7 +75,7 @@ inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>> &pair_copulas,
         }
     }
 
-    vine_struct_ = RVineStructure(matrix);
+    vine_struct_ = RVineStructure(matrix, check_matrix);
     pair_copulas_ = pair_copulas;
     threshold_ = 0.0;
     loglik_ = NAN;
@@ -92,7 +93,7 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
         tools_serialization::ptree_to_vector<size_t>(input.get_child("order"));
     auto matrix =
         tools_serialization::ptree_to_rvinematrix<size_t>(input.get_child("matrix"));
-    vine_struct_ = RVineStructure(order, matrix);
+    vine_struct_ = RVineStructure(order, matrix, check_matrix);
     d_ = static_cast<size_t>(vine_struct_.get_dim());
 
     boost::property_tree::ptree pcs_node = input.get_child("pair copulas");
@@ -146,7 +147,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
     if (data.rows() == 1) {
         throw std::runtime_error("data must have more than one row");
     }
-    vine_struct_ = RVineStructure(matrix);
+    vine_struct_ = RVineStructure(matrix, check_matrix);
     select_families(data, controls);
 }
 
@@ -233,7 +234,7 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
 {
     tools_eigen::check_if_in_unit_cube(data);
     check_data_dim(data);
-    
+
     tools_select::StructureSelector selector(data, controls);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);

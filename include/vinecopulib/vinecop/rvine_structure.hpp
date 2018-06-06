@@ -16,12 +16,17 @@ public:
     RVineStructure() {}
     
     RVineStructure(
-        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat);
-    RVineStructure(const std::vector<size_t>& order);
-    RVineStructure(const std::vector<size_t>& order, const size_t& trunc_lvl);
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat,
+        bool check = true);
+    RVineStructure(const std::vector<size_t>& order,
+                   bool check = true);
+    RVineStructure(const std::vector<size_t>& order,
+                   const size_t& trunc_lvl,
+                   bool check = true);
     RVineStructure(const std::vector<size_t>& order,
                    const RVineMatrix<size_t>& struct_mat,
-                   bool is_natural_order = false);
+                   bool is_natural_order = false,
+                   bool check = true);
 
     size_t get_dim() const;
     size_t get_trunc_lvl() const;
@@ -52,8 +57,8 @@ private:
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
     void check_lower_tri(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
-    void check_upper_tri(
-        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+    void check_upper_tri() const;
+    void check_columns() const;
     void check_antidiagonal() const;
     void check_proximity_condition() const;
 
