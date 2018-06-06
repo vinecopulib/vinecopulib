@@ -76,7 +76,6 @@ template<class T> RVineMatrix<size_t> RVineStructure::to_natural_order(const T& 
     return struct_mat;
 }
 
-#include <vinecopulib/vinecop/implementation/rvine_structure.ipp>
-
 }
 
+#include <vinecopulib/vinecop/implementation/rvine_structure.ipp>

@@ -455,7 +455,6 @@ inline Eigen::MatrixXd sobol(const size_t n, const size_t d)
             m(tools_sobol::minit_sobol[j], s);
 
         // Compute direction numbers scaled by pow(2,32)
-        Eigen::Matrix<size_t, Eigen::Dynamic, 1> V(L);
         for (size_t i = 0; i < std::min(L, s); i++) V(i) = m(i) << (32 - (i + 1));
 
         if (L > s) {
