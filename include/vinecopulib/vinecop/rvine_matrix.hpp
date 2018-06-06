@@ -14,42 +14,19 @@ namespace vinecopulib {
 template<class T>
 class RVineMatrix {
 public:
-    RVineMatrix() {}
-    RVineMatrix(size_t d, size_t trunc_lvl) : d_(d), trunc_lvl_(trunc_lvl)
-    {
-        if (d < 2)
-            throw std::runtime_error("d should be greater than 1");
-        //if (trunc_lvl < 1)
-        //    throw std::runtime_error("trunc_lvl should be greater than 0.");
-        if (trunc_lvl > d - 1)
-            trunc_lvl_ = d - 1;
+    RVineMatrix() = default;
+    RVineMatrix(size_t d);
+    RVineMatrix(size_t d, size_t trunc_lvl);
 
-        mat_ = std::vector<std::vector<T>>(d - 1);
-        for (size_t i = 0; i < d - 1; i++)
-            mat_[i] = std::vector<T>(std::min(d - i - 1, trunc_lvl));
-    }
+    T& operator()(size_t tree, size_t edge);
+    T operator()(size_t tree, size_t edge) const;
+    std::vector<T>& operator[](size_t column);
+    std::vector<T> operator[](size_t column) const;
 
-    RVineMatrix(size_t d) : RVineMatrix(d, d - 1) {}
-
-    T& operator()(size_t tree, size_t edge) {return mat_[edge][tree];}
-    T operator()(size_t tree, size_t edge) const {return mat_[edge][tree];}
-    std::vector<T>& operator[](size_t column) {return mat_[column];}
-    std::vector<T> operator[](size_t column) const {return mat_[column];}
-
-    std::string str() const
-    {
-        std::stringstream str;
-        for (size_t i = 0; i < std::min(d_ - 1, trunc_lvl_); i++) {
-            for (size_t j = 0; j < d_ - i - 1; j++) {
-                str << (*this)(i, j) << " ";
-            }
-            str << std::endl;
-        }
-        return str.str();
-    }
-
-    size_t get_trunc_lvl() const {return trunc_lvl_;}
-    size_t get_dim() const {return d_;}
+    size_t get_trunc_lvl() const;
+    size_t get_dim() const;
+    
+    std::string str() const;
 
 private:
     size_t d_;
@@ -57,4 +34,83 @@ private:
     std::vector<std::vector<T>> mat_;
 };
 
+
+template<class T>
+RVineMatrix<T>::RVineMatrix(size_t d) : RVineMatrix(d, d - 1) {}
+
+template<class T>
+RVineMatrix<T>::RVineMatrix(size_t d, size_t trunc_lvl) : 
+    d_(d), 
+    trunc_lvl_(std::min(d - 1, trunc_lvl))
+{
+    if (d < 2)
+        throw std::runtime_error("d should be greater than 1");
+
+    mat_ = std::vector<std::vector<T>>(d - 1);
+    for (size_t i = 0; i < d - 1; i++)
+        mat_[i] = std::vector<T>(std::min(d - i - 1, trunc_lvl));
 }
+
+template<class T>
+T& RVineMatrix<T>::operator()(size_t tree, size_t edge)
+{
+    assert(tree < trunc_lvl_);
+    assert(edge < d_ - 1 - tree);
+    return mat_[edge][tree];
+}
+
+template<class T>
+T RVineMatrix<T>::operator()(size_t tree, size_t edge) const 
+{
+    assert(tree < trunc_lvl_);
+    assert(edge < d_ - 1 - tree);
+    return mat_[edge][tree];
+}
+
+template<class T>
+std::vector<T>& RVineMatrix<T>::operator[](size_t column) 
+{
+    assert(column < d_ - 1);
+    return mat_[column];
+}
+
+template<class T>
+std::vector<T> RVineMatrix<T>::operator[](size_t column) const 
+{
+    assert(column < d_ - 1);
+    return mat_[column];
+}
+
+template<class T>
+size_t RVineMatrix<T>::get_trunc_lvl() const 
+{
+    return trunc_lvl_;
+}
+
+template<class T>
+size_t RVineMatrix<T>::get_dim() const
+{
+    return d_;
+}
+
+template<class T>
+std::string RVineMatrix<T>::str() const
+{
+    std::stringstream str;
+    for (size_t i = 0; i < std::min(d_ - 1, trunc_lvl_); i++) {
+        for (size_t j = 0; j < d_ - i - 1; j++) {
+            str << (*this)(i, j) << " ";
+        }
+        str << std::endl;
+    }
+    return str.str();
+}
+
+}
+
+template<class T>
+std::ostream& operator<<(std::ostream& os, const vinecopulib::RVineMatrix<T>& rvm) 
+{  
+    os << rvm.str();
+    return os;  
+}  
