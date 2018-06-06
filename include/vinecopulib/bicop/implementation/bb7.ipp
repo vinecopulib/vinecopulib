@@ -52,7 +52,7 @@ inline double Bb7Bicop::generator_derivative2(const double &u)
 }
 
 
-inline Eigen::VectorXd Bb7Bicop::pdf(
+inline Eigen::VectorXd Bb7Bicop::pdf_raw(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {

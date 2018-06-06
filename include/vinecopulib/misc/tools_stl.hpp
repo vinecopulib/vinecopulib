@@ -155,6 +155,15 @@ inline vector<size_t> invert_permutation(const vector<size_t>& perm)
               inv_perm.end(), 
               [&](size_t i, size_t j) { return perm[i] < perm[j];});
     return inv_perm;
+
+// safer version of log1p that avoids rounding errors if x ~ -1
+inline double log1p(const double& x)
+{
+    if (x < -0.5) {
+        return std::log(1.0 + x);
+    } else {
+        return std::log1p(x);
+    }
 }
 
 }
