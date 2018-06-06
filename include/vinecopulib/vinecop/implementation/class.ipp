@@ -777,8 +777,8 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
     auto do_batch = [&](const tools_thread::Batch& b) {
         if (d > 2) {
             // temporary storage objects for (inverse) h-functions
-            RVineMatrix<Eigen::VectorXd> hinv2(d + 1, trunc_lvl);
-            RVineMatrix<Eigen::VectorXd> hfunc1(d + 1, trunc_lvl);
+            RVineMatrix<Eigen::VectorXd> hinv2(d + 1, trunc_lvl + 1);
+            RVineMatrix<Eigen::VectorXd> hfunc1(d + 1, trunc_lvl + 1);
         
             // initialize with independent uniforms (corresponding to natural
             // order)
