@@ -42,7 +42,7 @@ inline double ClaytonBicop::generator_derivative2(const double &u)
     return (1 + theta) * std::pow(u, -2 - theta);
 }
 
-inline Eigen::VectorXd ClaytonBicop::pdf(
+inline Eigen::VectorXd ClaytonBicop::pdf_raw(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {

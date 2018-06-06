@@ -103,10 +103,7 @@ Bicop::pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
 const
 {
     tools_eigen::check_if_in_unit_cube(u);
-    Eigen::VectorXd f = bicop_->pdf(cut_and_rotate(u));
-    return tools_eigen::unaryExpr_or_nan(f, [](const double& x) { 
-        return std::max(DBL_MIN, std::min(x, DBL_MAX));
-    });
+    return bicop_->pdf(cut_and_rotate(u));
 }
 
 //! evaluates the copula distribution.

@@ -45,7 +45,7 @@ inline double Bb1Bicop::generator_derivative2(const double &u)
     return res * (1 + delta * theta - (1 + theta) * std::pow(u, theta));
 }
 
-inline Eigen::VectorXd Bb1Bicop::pdf(
+inline Eigen::VectorXd Bb1Bicop::pdf_raw(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {

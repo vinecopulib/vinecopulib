@@ -45,7 +45,7 @@ inline double FrankBicop::generator_derivative2(const double &u)
            std::pow(boost::math::expm1(theta * u) * std::exp(-theta * u / 2), 2);
 }
 
-inline Eigen::VectorXd FrankBicop::pdf(
+inline Eigen::VectorXd FrankBicop::pdf_raw(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {

@@ -46,7 +46,7 @@ inline double JoeBicop::generator_derivative2(const double &u)
            std::pow(-1 + std::pow(1 - u, theta), 2);
 }
 
-inline Eigen::VectorXd JoeBicop::pdf(
+inline Eigen::VectorXd JoeBicop::pdf_raw(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {

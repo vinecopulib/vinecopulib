@@ -44,7 +44,7 @@ inline double GumbelBicop::generator_derivative2(const double &u)
            (theta / std::pow(u, 2));
 }
 
-inline Eigen::VectorXd GumbelBicop::pdf(
+inline Eigen::VectorXd GumbelBicop::pdf_raw(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {
