@@ -11,7 +11,35 @@
 
 namespace vinecopulib {
 
-template<class T>
+//! @brief Right trapezoidal matrices.
+//!
+//! A right trapezoid is a trapezoid having two right angles. The data structure
+//! `RightTrapezoid` behaves like a matrix with the structure 
+//! ```
+//! x x x x x
+//! x x x x
+//! x x x
+//! x x
+//! x
+//! ```
+//! and all other elements omitted. Such structures appear naturally in the
+//! representation of a vine copula model and related algorithms. Each row 
+//! corresponds to one tree in the vine, starting from the top. In each row 
+//! (= tree), each column represents an edge in this tree.
+//! 
+//! In truncated vine models the last few rows are omitted. For example, a 
+//! 3-truncated vine requires only the elements
+//! ```
+//! x x x x x
+//! x x x x
+//! x x x
+//! ```
+//! 
+//! Only the elements indicated by `x`s are stored and can be accessed.
+//! 
+//! The data structure is templated and any type or class can be used to fill
+//! the entries (`x`s) of the right trapezoid.
+template<typename T>
 class RVineMatrix {
 public:
     RVineMatrix() = default;
@@ -35,10 +63,17 @@ private:
 };
 
 
-template<class T>
+//! construct an right trapezoid of dimension `d` (the matrix has `d-1` columns 
+//! and `d-1` rows).
+//! @param d the dimension of the underlying vine.
+template<typename T>
 RVineMatrix<T>::RVineMatrix(size_t d) : RVineMatrix(d, d - 1) {}
 
-template<class T>
+//! construct a truncated right trapezoid (the matrix has `d-1` columns and
+//! `min(trunv_lvl, d-1)` rows).
+//! @param d the dimension of the vine.
+//! @param trunc_lvl the truncation level.
+template<typename T>
 RVineMatrix<T>::RVineMatrix(size_t d, size_t trunc_lvl) : 
     d_(d), 
     trunc_lvl_(std::min(d - 1, trunc_lvl))
@@ -51,7 +86,10 @@ RVineMatrix<T>::RVineMatrix(size_t d, size_t trunc_lvl) :
         mat_[i] = std::vector<T>(std::min(d - i - 1, trunc_lvl));
 }
 
-template<class T>
+//! access one element of the trapezoid (writable).
+//! @param tree the tree level.
+//! @param edge the edge in this tree.
+template<typename T>
 T& RVineMatrix<T>::operator()(size_t tree, size_t edge)
 {
     assert(tree < trunc_lvl_);
@@ -59,7 +97,10 @@ T& RVineMatrix<T>::operator()(size_t tree, size_t edge)
     return mat_[edge][tree];
 }
 
-template<class T>
+//! access one element of the trapezoid (non-writable).
+//! @param tree the tree level.
+//! @param edge the edge in this tree.
+template<typename T>
 T RVineMatrix<T>::operator()(size_t tree, size_t edge) const 
 {
     assert(tree < trunc_lvl_);
@@ -67,33 +108,41 @@ T RVineMatrix<T>::operator()(size_t tree, size_t edge) const
     return mat_[edge][tree];
 }
 
-template<class T>
+//! access one column of the trapezoid (writable).
+//! @param column which column to extract.
+template<typename T>
 std::vector<T>& RVineMatrix<T>::operator[](size_t column) 
 {
     assert(column < d_ - 1);
     return mat_[column];
 }
 
-template<class T>
+//! access one column of the trapezoid (non-writable).
+//! @param column which column to extract.
+template<typename T>
 std::vector<T> RVineMatrix<T>::operator[](size_t column) const 
 {
     assert(column < d_ - 1);
     return mat_[column];
 }
 
-template<class T>
+//! get the truncation level of the underlying vine.
+template<typename T>
 size_t RVineMatrix<T>::get_trunc_lvl() const 
 {
     return trunc_lvl_;
 }
 
-template<class T>
+//! get the dimension of the underlying vine (the matrix has `d-1` columns and
+//! `min(trunv_lvl, d-1)` rows).
+template<typename T>
 size_t RVineMatrix<T>::get_dim() const
 {
     return d_;
 }
 
-template<class T>
+//! represent RightTrapezoid as a string.
+template<typename T>
 std::string RVineMatrix<T>::str() const
 {
     std::stringstream str;
@@ -106,9 +155,12 @@ std::string RVineMatrix<T>::str() const
     return str.str();
 }
 
-}
+} // end of namespace vinecopulib!
 
-template<class T>
+//! ostream method for RightTrapezoid, to be used with `std::cout`
+//! @param os an output stream.
+//! @param rvm an right trapezoid.
+template<typename T>
 std::ostream& operator<<(std::ostream& os, const vinecopulib::RVineMatrix<T>& rvm) 
 {  
     os << rvm.str();
