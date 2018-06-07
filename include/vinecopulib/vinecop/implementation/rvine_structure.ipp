@@ -13,27 +13,25 @@ inline RVineStructure::RVineStructure(
     bool check)
 {
     d_ = mat.cols();
-
     if (check) {
         check_if_quadratic(mat);
         check_lower_tri(mat);
     }
 
     order_ = get_order(mat);
-
     if (check)
         check_antidiagonal();
 
     trunc_lvl_ = find_trunc_lvl(mat);
-    struct_mat_ = to_natural_order(mat);
-
-    if (check) {
+    struct_mat_ = to_rvine_matrix(mat);
+    if (check)
         check_upper_tri();
+
+    struct_mat_ = to_natural_order();
+    if (check)
         check_columns();
-    }
 
     max_mat_ = compute_max_matrix();
-
     if (check)
         check_proximity_condition();
 
@@ -87,15 +85,15 @@ inline RVineStructure::RVineStructure(
 
     trunc_lvl_ = struct_mat.get_trunc_lvl();
     if (trunc_lvl_ > 0) {
-        if (is_natural_order) {
-            struct_mat_ = struct_mat;
-        } else {
-            struct_mat_ = to_natural_order(struct_mat);
-        }
-        if (check) {
+
+        struct_mat_ = struct_mat;
+        if (check)
             check_upper_tri();
+
+        if (!is_natural_order)
+            struct_mat_ = to_natural_order();
+        if (check)
             check_columns();
-        }
 
         max_mat_ = compute_max_matrix();
         if (check)
@@ -197,6 +195,36 @@ inline std::vector<size_t> RVineStructure::get_order(
         order[i] = mat(i, d_ - i - 1);
 
     return order;
+}
+
+inline RVineMatrix<size_t> RVineStructure::to_rvine_matrix(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+{
+    // copy upper triangle
+    RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
+    for (size_t j = 0; j < d_ - 1; j++) {
+        for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
+            struct_mat(i, j) = mat(i, j);
+        }
+    }
+
+    return struct_mat;
+}
+
+inline RVineMatrix<size_t> RVineStructure::to_natural_order() const
+{
+    // create vector of new variable labels
+    auto order = tools_stl::get_order(get_order());
+
+    // relabel to natural order
+    RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
+    for (size_t j = 0; j < d_ - 1; j++) {
+        for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
+            struct_mat(i, j) = order[struct_mat_(i, j) - 1] + 1;
+        }
+    }
+
+    return struct_mat;
 }
 
 inline RVineMatrix<size_t> RVineStructure::compute_dvine_struct_matrix() const
