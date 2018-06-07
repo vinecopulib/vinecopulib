@@ -432,7 +432,7 @@ inline Eigen::MatrixXd sobol(const size_t n, const size_t d)
     // Compute direction numbers scaled by pow(2,32)
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> V(L);
     for (size_t i = 0; i < L; i++) {
-        V(i) = std::pow(2, 32 - (i + 1)); // all m's = 1
+        V(i) = static_cast<size_t>(std::pow(2, 32 - (i + 1))); // all m's = 1
     }
 
     //

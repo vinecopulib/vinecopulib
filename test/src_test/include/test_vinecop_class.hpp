@@ -215,7 +215,7 @@ TEST_F(VinecopTest, works_multi_threaded) {
     EXPECT_EQ(fit2.inverse_rosenblatt(u, 2), fit2.inverse_rosenblatt(u));
 
     //just check that it works
-    fit2.simulate(2, 3);
+    fit2.simulate(2, false, 3);
     fit2.cdf(u, 100, 2);
 }
 

@@ -94,7 +94,8 @@ public:
     double get_loglik() const;
 
     // Stats methods
-    Eigen::VectorXd pdf(const Eigen::MatrixXd &u, const size_t num_threads = 1) const;
+    Eigen::VectorXd pdf(const Eigen::MatrixXd &u,
+                        const size_t num_threads = 1) const;
 
     Eigen::VectorXd cdf(const Eigen::MatrixXd &u, 
                         const size_t N = 1e4,
