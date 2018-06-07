@@ -46,8 +46,10 @@ private:
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
     std::vector<size_t> get_order(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+    RVineMatrix<size_t> to_rvine_matrix(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
 
-    template<class T> RVineMatrix<size_t> to_natural_order(const T& mat) const;
+    RVineMatrix<size_t> to_natural_order() const;
     RVineMatrix<size_t> compute_dvine_struct_matrix() const;
     RVineMatrix<size_t> compute_max_matrix() const;
     RVineMatrix<size_t> compute_needed_hfunc1() const;
@@ -56,8 +58,6 @@ private:
     void check_if_quadratic(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
     void check_lower_tri(
-        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
-    void check_max_coeff(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
     void check_upper_tri() const;
     void check_columns() const;
@@ -72,22 +72,6 @@ private:
     RVineMatrix<size_t> needed_hfunc1_;
     RVineMatrix<size_t> needed_hfunc2_;
 };
-
-template<class T> RVineMatrix<size_t> RVineStructure::to_natural_order(const T& mat) const
-{
-    // create vector of new variable labels
-    auto order = tools_stl::get_order(get_order());
-
-    // copy upper triangle and relabel to natural order
-    RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
-    for (size_t j = 0; j < d_ - 1; j++) {
-        for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
-            struct_mat(i, j) = order[mat(i, j) - 1] + 1;
-        }
-    }
-
-    return struct_mat;
-}
 
 }
 

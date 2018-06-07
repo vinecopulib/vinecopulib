@@ -19,8 +19,6 @@ inline RVineStructure::RVineStructure(
         std::cout << "bla2" << std::endl;
         check_lower_tri(mat);
         std::cout << "bla3" << std::endl;
-        check_max_coeff(mat);
-        std::cout << "bla3b" << std::endl;
     }
 
     order_ = get_order(mat);
@@ -30,13 +28,15 @@ inline RVineStructure::RVineStructure(
     std::cout << "bla4" << std::endl;
     trunc_lvl_ = find_trunc_lvl(mat);
     std::cout << "bla4b" << std::endl;
-    struct_mat_ = to_natural_order(mat);
-    std::cout << "bla5" << std::endl;
-    if (check) {
+    struct_mat_ = to_rvine_matrix(mat);
+    std::cout << "bla4c" << std::endl;
+    if (check)
         check_upper_tri();
-        std::cout << "bla6" << std::endl;
+    std::cout << "bla47" << std::endl;
+    struct_mat_ = to_natural_order();
+    std::cout << "bla6" << std::endl;
+    if (check)
         check_columns();
-    }
     std::cout << "bla7" << std::endl;
     max_mat_ = compute_max_matrix();
     std::cout << "bla8" << std::endl;
@@ -93,15 +93,15 @@ inline RVineStructure::RVineStructure(
 
     trunc_lvl_ = struct_mat.get_trunc_lvl();
     if (trunc_lvl_ > 0) {
-        if (is_natural_order) {
-            struct_mat_ = struct_mat;
-        } else {
-            struct_mat_ = to_natural_order(struct_mat);
-        }
-        if (check) {
+
+        struct_mat_ = struct_mat;
+        if (check)
             check_upper_tri();
+
+        if (!is_natural_order)
+            struct_mat_ = to_natural_order();
+        if (check)
             check_columns();
-        }
 
         max_mat_ = compute_max_matrix();
         if (check)
@@ -205,6 +205,36 @@ inline std::vector<size_t> RVineStructure::get_order(
     return order;
 }
 
+inline RVineMatrix<size_t> RVineStructure::to_rvine_matrix(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+{
+    // copy upper triangle
+    RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
+    for (size_t j = 0; j < d_ - 1; j++) {
+        for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
+            struct_mat(i, j) = mat(i, j);
+        }
+    }
+
+    return struct_mat;
+}
+
+inline RVineMatrix<size_t> RVineStructure::to_natural_order() const
+{
+    // create vector of new variable labels
+    auto order = tools_stl::get_order(get_order());
+
+    // relabel to natural order
+    RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
+    for (size_t j = 0; j < d_ - 1; j++) {
+        for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
+            struct_mat(i, j) = order[struct_mat_(i, j) - 1] + 1;
+        }
+    }
+
+    return struct_mat;
+}
+
 inline RVineMatrix<size_t> RVineStructure::compute_dvine_struct_matrix() const
 {
     RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
@@ -278,15 +308,6 @@ inline void RVineStructure::check_lower_tri(
             throw std::runtime_error("not a valid R-vine matrix: " + problem);
         }
     }
-}
-
-inline void RVineStructure::check_max_coeff(
-    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
-{
-    std::string problem = "there are elements larger than the dimension ";
-    problem += "in the upper left triangle.";
-    if (mat.maxCoeff() > d_)
-        throw std::runtime_error("not a valid R-vine matrix: " + problem);
 }
 
 inline void RVineStructure::check_upper_tri() const
