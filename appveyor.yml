@@ -10,19 +10,19 @@ init:
           $env:CMAKE_GEN_PLAT="x64"
         }
   - cmd: C:/"Program Files (x86)"/"Microsoft Visual Studio 12.0"/VC/vcvarsall.bat
-  #- ps: |
-  #      $ErrorActionPreference = "Stop"
-  #      Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
-  #      Import-Module '..\appveyor-tool.ps1'
+  - ps: |
+        $ErrorActionPreference = "Stop"
+        Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
+        Import-Module '..\appveyor-tool.ps1'
   - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
 
 install:
   - choco upgrade cmake # so Boost 1.63 is supported
   - set path=C:\Program Files\CMake\bin;%path%
 
-  #- ps: Bootstrap #R
-  #- ps: $env:R_LIBS_USER = 'c:\R\library'
-  #- travis-tool.sh r_install VineCopula
+  - ps: Bootstrap #R
+  - ps: $env:R_LIBS_USER = 'c:\R\library'
+  - travis-tool.sh r_install VineCopula
 
   - ps: wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
   - 7z x eigen.zip -o"C:\projects" -y > nul
