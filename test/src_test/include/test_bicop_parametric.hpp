@@ -12,7 +12,7 @@
 namespace test_bicop_parametric {
 using namespace vinecopulib;
 using namespace tools_stl;
-std::vector<int> rotations = {0, 90};
+std::vector<int> rotations = {0, 90, 180, 270};
 
 // Test if the C++ implementation of the basic methods is correct
 TEST_P(ParBicopTest, parametric_bicop_is_correct) {
@@ -101,7 +101,10 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct) {
         EXPECT_TRUE(bicop_.hinv2(u.block(0, 0, 1, 2)).array().isNaN()(0))
                         << bicop_.str();
         EXPECT_NO_THROW(bicop_.loglik(u.block(0, 0, 10, 2))) << bicop_.str();
-        EXPECT_ANY_THROW(bicop_.get_loglik());
+        EXPECT_ANY_THROW(bicop_.loglik());
+        EXPECT_ANY_THROW(bicop_.aic());
+        EXPECT_ANY_THROW(bicop_.bic());
+        EXPECT_ANY_THROW(bicop_.mbic());
         EXPECT_NO_THROW(bicop_.simulate(10, true));
     }
 }
@@ -122,6 +125,11 @@ TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct) {
         auto data = bicop_.simulate(get_n());
         auto bicop = Bicop(data, controls);
         EXPECT_EQ(bicop.loglik(data), bicop.get_loglik());
+
+        EXPECT_NO_THROW(bicop_.loglik());
+        EXPECT_NO_THROW(bicop_.aic());
+        EXPECT_NO_THROW(bicop_.bic());
+        EXPECT_NO_THROW(bicop_.mbic());
 
         //std::cout << bicop_.str() << std::endl;
         //std::cout << bicop.str() << std::endl;
