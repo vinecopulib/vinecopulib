@@ -19,6 +19,8 @@ inline RVineStructure::RVineStructure(
         std::cout << "bla2" << std::endl;
         check_lower_tri(mat);
         std::cout << "bla3" << std::endl;
+        check_max_coeff(mat);
+        std::cout << "bla3b" << std::endl;
     }
 
     order_ = get_order(mat);
@@ -276,6 +278,15 @@ inline void RVineStructure::check_lower_tri(
             throw std::runtime_error("not a valid R-vine matrix: " + problem);
         }
     }
+}
+
+inline void RVineStructure::check_max_coeff(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+{
+    std::string problem = "there are elements larger than the dimension ";
+    problem += "in the upper left triangle.";
+    if (mat.maxCoeff() > d_)
+        throw std::runtime_error("not a valid R-vine matrix: " + problem);
 }
 
 inline void RVineStructure::check_upper_tri() const

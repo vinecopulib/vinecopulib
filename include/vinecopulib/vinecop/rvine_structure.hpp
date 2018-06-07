@@ -57,6 +57,8 @@ private:
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
     void check_lower_tri(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+    void check_max_coeff(
+        const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
     void check_upper_tri() const;
     void check_columns() const;
     void check_antidiagonal() const;
