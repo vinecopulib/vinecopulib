@@ -13,30 +13,33 @@ inline RVineStructure::RVineStructure(
     bool check)
 {
     d_ = mat.cols();
-
+    std::cout << "bla" << std::endl;
     if (check) {
         check_if_quadratic(mat);
+        std::cout << "bla2" << std::endl;
         check_lower_tri(mat);
+        std::cout << "bla3" << std::endl;
     }
 
     order_ = get_order(mat);
 
     if (check)
         check_antidiagonal();
-
+    std::cout << "bla4" << std::endl;
     trunc_lvl_ = find_trunc_lvl(mat);
     struct_mat_ = to_natural_order(mat);
-
+    std::cout << "bla5" << std::endl;
     if (check) {
         check_upper_tri();
+        std::cout << "bla6" << std::endl;
         check_columns();
     }
-
+    std::cout << "bla7" << std::endl;
     max_mat_ = compute_max_matrix();
-
+    std::cout << "bla8" << std::endl;
     if (check)
         check_proximity_condition();
-
+    std::cout << "bla9" << std::endl;
     needed_hfunc1_ = compute_needed_hfunc1();
     needed_hfunc2_ = compute_needed_hfunc2();
 }

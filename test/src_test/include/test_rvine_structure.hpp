@@ -210,39 +210,40 @@ TEST(rvine_structure, rvine_struct_sanity_checks_work) {
     // should pass without errors
     auto rvm = RVineStructure(mat);
     auto wrong_mat = mat;
-
+    std::cout << "here" << std::endl;
      // must be quadratic
      wrong_mat = mat.block(0, 0, 4, 5);
      EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
-
+    std::cout << "here2" << std::endl;
      // lower right triangle must contain zeros
      wrong_mat = mat;
      wrong_mat(6, 6) = 1;
      EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
-
+    std::cout << "here3" << std::endl;
      // upper left triangle must only contain 1, ..., d
      wrong_mat = mat;
      wrong_mat(0, 0) = 9;
      EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
+    std::cout << "here4" << std::endl;
      wrong_mat(0, 0) = 0;
      EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
-
+    std::cout << "here5" << std::endl;
      // diagonal elements cannot appear further to the right
      wrong_mat = mat;
      wrong_mat(0, 1) = 4;
      EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
-
+    std::cout << "here6" << std::endl;
      // all numbers in a column most appear in each column to the left
      wrong_mat = mat;
      wrong_mat(0, 0) = 4;
      EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
-
+    std::cout << "here7" << std::endl;
     // proximity condition
     wrong_mat = mat;
     wrong_mat(3, 1) = 7;
     wrong_mat(4, 1) = 1;
     EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
-
+    std::cout << "here8" << std::endl;
     // // row and col should be smaller than d_
     // EXPECT_ANY_THROW(rvm.get_element(8, 0));
     // EXPECT_ANY_THROW(rvm.get_element(0, 8));
