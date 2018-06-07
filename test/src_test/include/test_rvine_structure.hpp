@@ -14,93 +14,32 @@ namespace test_rvine_structure {
 
 using namespace vinecopulib;
 
+TEST(rvine_structure, rvine_matrix_works) {
 
-//TEST(rvine_structure, test) {
-//    Eigen::Matrix<size_t, 7, 7> mat;
-////    mat << 5, 2, 6, 6, 6, 6, 6,
-////        6, 6, 1, 2, 5, 5, 0,
-////        2, 5, 2, 5, 2, 0, 0,
-////        1, 1, 5, 1, 0, 0, 0,
-////        3, 7, 7, 0, 0, 0, 0,
-////        7, 3, 0, 0, 0, 0, 0,
-////        4, 0, 0, 0, 0, 0, 0;
-//
-//    mat << 4, 5, 4, 2, 2, 1, 1,
-//        2, 4, 2, 1, 1, 2, 0,
-//        5, 2, 1, 3, 3, 0, 0,
-//        6, 1, 3, 4, 0, 0, 0,
-//        1, 3, 5, 0, 0, 0, 0,
-//        3, 6, 0, 0, 0, 0, 0,
-//        7, 0, 0, 0, 0, 0, 0;
-//
-//    Eigen::Matrix<size_t, 7, 7> mat2;
-//
-//    mat2 << 4, 5, 4, 2, 2, 1, 1,
-//        2, 4, 2, 1, 1, 2, 0,
-//        5, 2, 1, 3, 3, 0, 0,
-//        6, 1, 3, 4, 0, 0, 0,
-//        0, 0, 5, 0, 0, 0, 0,
-//        0, 6, 0, 0, 0, 0, 0,
-//        7, 0, 0, 0, 0, 0, 0;
-//
-////    std::vector<size_t> order = {1, 2, 3, 4};
-////    auto test = RVineStructure(order);
-////    std::cout << "dvine matrix ------" << std::endl;
-////    std::cout << test.get_matrix() << std::endl;
-////
-////    std::cout << "test new contructor ------" << std::endl;
-////    auto test2 = RVineStructure(order, test.get_struct_matrix());
-////    std::cout << test2.get_matrix() << std::endl;
-//
-//    std::cout << "benchmark (new vs old) ------" << std::endl;
-//    Timer timer;
-//    timer.start();
-//    RVineStructure strct(mat);
-//    timer.end();
-//
-//    timer.start();
-//    RVineStructure strct2(mat2);
-//    timer.end();
-//
-//    timer.start();
-//    RVineMatrix2 rvm(mat, false);
-//    timer.end();
-//
-//    std::cout << "matrix ------" << std::endl;
-//    std::cout << mat << std::endl  << std::endl;
-//    std::cout << strct.get_matrix() << std::endl  << std::endl;
-//    std::cout << strct2.get_matrix() << std::endl;
-//
-//    std::cout << "no_matrix ------" << std::endl;
-//    std::cout << rvm.get_natural_order() << std::endl  << std::endl;
-//    std::cout << strct.get_struct_matrix().str() << std::endl;
-//    std::cout << strct2.get_struct_matrix().str() << std::endl;
-//
-//    std::cout << "max_matrix ------" << std::endl;
-//    std::cout << rvm.get_max_matrix() << std::endl  << std::endl;
-//    std::cout << strct.get_max_matrix().str() << std::endl;
-//    std::cout << strct2.get_max_matrix().str() << std::endl;
-//
-//    std::cout << "needed_hfunc1 ------" << std::endl;
-//    std::cout << rvm.get_needed_hfunc1() << std::endl  << std::endl;
-//    std::cout << strct.get_needed_hfunc1().str() << std::endl;
-//    std::cout << strct2.get_needed_hfunc1().str() << std::endl;
-//
-//    std::cout << "needed_hfunc2 ------" << std::endl;
-//    std::cout << rvm.get_needed_hfunc2() << std::endl  << std::endl;
-//    std::cout << strct.get_needed_hfunc2().str() << std::endl;
-//    std::cout << strct2.get_needed_hfunc2().str() << std::endl;
-//}
+    RVineMatrix<size_t> my_rvm(7);
+    my_rvm[0] = {2, 1, 3, 4, 6, 5};
+    my_rvm[1] = {3, 1, 2, 4, 5};
+    my_rvm[2] = {1, 4, 3, 2};
+    my_rvm[3] = {1, 3, 2};
+    my_rvm[4] = {1, 2};
+    my_rvm[5] = {1};
 
- TEST(rvine_structure, can_convert_to_natural_order) {
-     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
-     mat << 5, 2, 6, 6, 6, 6, 6,
-         6, 6, 1, 2, 5, 5, 0,
-         2, 5, 2, 5, 2, 0, 0,
-         1, 1, 5, 1, 0, 0, 0,
-         3, 7, 7, 0, 0, 0, 0,
-         7, 3, 0, 0, 0, 0, 0,
-         4, 0, 0, 0, 0, 0, 0;
+    EXPECT_NO_THROW(my_rvm.str());
+
+    std::ostringstream oss;
+    oss << my_rvm;
+    EXPECT_EQ(oss.str(), my_rvm.str());
+}
+
+TEST(rvine_structure, can_convert_to_natural_order) {
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
+    mat << 5, 2, 6, 6, 6, 6, 6,
+        6, 6, 1, 2, 5, 5, 0,
+        2, 5, 2, 5, 2, 0, 0,
+        1, 1, 5, 1, 0, 0, 0,
+        3, 7, 7, 0, 0, 0, 0,
+        7, 3, 0, 0, 0, 0, 0,
+        4, 0, 0, 0, 0, 0, 0;
 
     RVineMatrix<size_t> true_no_matrix(7);
     true_no_matrix[0] = {2, 1, 3, 4, 6, 5};
@@ -110,9 +49,9 @@ using namespace vinecopulib;
     true_no_matrix[4] = {1, 2};
     true_no_matrix[5] = {1};
 
-     RVineStructure rvine_structure(mat);
-     EXPECT_EQ(rvine_structure.get_struct_matrix(), true_no_matrix);
- }
+    RVineStructure rvine_structure(mat);
+    EXPECT_EQ(rvine_structure.get_struct_matrix(), true_no_matrix);
+}
 
 TEST(rvine_structure, max_mat_is_correct) {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
