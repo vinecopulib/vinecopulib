@@ -198,6 +198,17 @@ TEST_F(VinecopTest, family_select_returns_pcs_in_right_order) {
     EXPECT_EQ(fit_struct.get_all_parameters(), fit_fam.get_all_parameters());
 }
 
+TEST_F(VinecopTest, trace_works) {
+    FitControlsVinecop controls(bicop_families::itau, "itau");
+    controls.set_show_trace(true);
+    controls.set_select_threshold(true);
+    controls.set_truncation_level(3);
+    testing::internal::CaptureStdout();
+    Vinecop fit(u, controls);
+    std::string output = testing::internal::GetCapturedStdout();
+    EXPECT_NO_THROW(!output.empty());
+}
+
 TEST_F(VinecopTest, works_multi_threaded) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_truncation_level(true);
