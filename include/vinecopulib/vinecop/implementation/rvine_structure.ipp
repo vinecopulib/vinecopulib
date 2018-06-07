@@ -27,6 +27,7 @@ inline RVineStructure::RVineStructure(
         check_antidiagonal();
     std::cout << "bla4" << std::endl;
     trunc_lvl_ = find_trunc_lvl(mat);
+    std::cout << "bla4b" << std::endl;
     struct_mat_ = to_natural_order(mat);
     std::cout << "bla5" << std::endl;
     if (check) {
