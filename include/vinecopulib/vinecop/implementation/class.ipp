@@ -483,12 +483,17 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
     size_t n = u.rows();
 
     // info about the vine structure (reverse rows (!) for more natural indexing)
-    auto revorder = vine_struct_.get_order();
-    tools_stl::reverse(revorder);
-    auto no_matrix = vine_struct_.get_struct_matrix();
-    auto max_matrix = vine_struct_.get_max_matrix();
-    auto needed_hfunc1 = vine_struct_.get_needed_hfunc1();
-    auto needed_hfunc2 = vine_struct_.get_needed_hfunc2();
+    size_t trunc_lvl = pair_copulas_.size();
+    std::vector<size_t> revorder;
+    RVineMatrix<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
+    if (trunc_lvl > 0) {
+        revorder = vine_struct_.get_order();
+        tools_stl::reverse(revorder);
+        no_matrix = vine_struct_.get_struct_matrix();
+        max_matrix = vine_struct_.get_max_matrix();
+        needed_hfunc1 = vine_struct_.get_needed_hfunc1();
+        needed_hfunc2 = vine_struct_.get_needed_hfunc2();
+    }
 
     // initial value must be 1.0 for multiplication
     Eigen::VectorXd vine_density = Eigen::VectorXd::Constant(u.rows(), 1.0);
@@ -505,7 +510,6 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
         for (size_t j = 0; j < d; ++j)
             hfunc2.col(j) = u.block(b.begin, revorder[j] - 1, b.size, 1);
 
-        size_t trunc_lvl = pair_copulas_.size();
         for (size_t tree = 0; tree < trunc_lvl; ++tree) {
             tools_interface::check_user_interrupt(n * d > 1e5);
             for (size_t edge = 0; edge < d - tree - 1; ++edge) {
@@ -535,9 +539,11 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
         }
     };
 
-    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
-    pool.map(do_batch, tools_thread::create_batches(n, num_threads));
-    pool.join();
+    if (trunc_lvl > 0) {
+        tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
+        pool.map(do_batch, tools_thread::create_batches(n, num_threads));
+        pool.join();
+    }
 
     return vine_density;
 }
@@ -563,38 +569,28 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N, const size_t num_threads)
     tools_eigen::check_if_in_unit_cube(u);
     check_data_dim(u);
 
-    size_t d = u.cols();
-    size_t n = u.rows();
-    if (d != d_) {
-        std::stringstream message;
-        message << "u has wrong number of columns. " <<
-                "expected: " << d_ <<
-                ", actual: " << d << std::endl;
-        throw std::runtime_error(message.str().c_str());
-    }
-
     // Simulate N quasi-random numbers from the vine model
-    Eigen::MatrixXd U(N, d);
-    if (d > 300) {
-        U = tools_stats::sobol(N, d);
+    Eigen::MatrixXd U(N, d_);
+    if (d_ > 300) {
+        U = tools_stats::sobol(N, d_);
     } else {
-        U = tools_stats::ghalton(N, d);
+        U = tools_stats::ghalton(N, d_);
     }
     U = inverse_rosenblatt(U, num_threads);
 
     // Alternative: simulate N pseudo-random numbers from the vine model
     //auto U = simulate(N);
 
+    size_t n = u.rows();
     Eigen::VectorXd vine_distribution(n);
     Eigen::ArrayXXd x(N, 1);
-    Eigen::RowVectorXd temp(d);
+    Eigen::RowVectorXd temp(d_);
     for (size_t i = 0; i < n; i++) {
         tools_interface::check_user_interrupt(i % 1000 == 0);
-        temp = u.block(i, 0, 1, d);
+        temp = u.block(i, 0, 1, d_);
         x = (U.rowwise() - temp).rowwise().maxCoeff().array();
         vine_distribution(i) = (x <= 0.0).count();
     }
-
     return vine_distribution / static_cast<double>(N);
 }
 
@@ -769,14 +765,18 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
     }
 
     // info about the vine structure (in upper triangular matrix notation)
-    auto revorder = vine_struct_.get_order();
-    tools_stl::reverse(revorder);
-    auto inverse_order = tools_stl::invert_permutation(revorder);
-    auto no_matrix = vine_struct_.get_struct_matrix();
-    auto max_matrix = vine_struct_.get_max_matrix();
-    auto needed_hfunc1 = vine_struct_.get_needed_hfunc1();
-    auto needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     size_t trunc_lvl = pair_copulas_.size();
+    std::vector<size_t> revorder, inverse_order;
+    RVineMatrix<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
+    if (trunc_lvl > 0) {
+        revorder = vine_struct_.get_order();
+        tools_stl::reverse(revorder);
+        inverse_order = tools_stl::invert_permutation(revorder);
+        no_matrix = vine_struct_.get_struct_matrix();
+        max_matrix = vine_struct_.get_max_matrix();
+        needed_hfunc1 = vine_struct_.get_needed_hfunc1();
+        needed_hfunc2 = vine_struct_.get_needed_hfunc2();
+    }
 
     auto do_batch = [&](const tools_thread::Batch& b) {
         if (d > 2) {
@@ -831,10 +831,11 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
         }
     };
 
-    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
-    pool.map(do_batch, tools_thread::create_batches(n, num_threads));
-
-    pool.join();
+    if (trunc_lvl > 0) {
+        tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
+        pool.map(do_batch, tools_thread::create_batches(n, num_threads));
+        pool.join();
+    }
 
     return U_vine;
 }

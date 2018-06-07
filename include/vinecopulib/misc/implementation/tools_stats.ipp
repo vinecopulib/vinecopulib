@@ -435,8 +435,7 @@ inline Eigen::MatrixXd sobol(const size_t n, const size_t d)
         V(i) = static_cast<size_t>(std::pow(2, 32 - (i + 1))); // all m's = 1
     }
 
-    //
-    // // Evalulate X scaled by pow(2,32)
+    // Evalulate X scaled by pow(2,32)
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> X(n);
     X(0) = 0;
     for (size_t i = 1; i < n; i++) {
