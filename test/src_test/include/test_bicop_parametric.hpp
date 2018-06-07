@@ -106,6 +106,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct) {
         EXPECT_ANY_THROW(bicop_.bic());
         EXPECT_ANY_THROW(bicop_.mbic());
         EXPECT_NO_THROW(bicop_.simulate(10, true));
+        EXPECT_NO_THROW(bicop_.str());
     }
 }
 
