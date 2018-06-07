@@ -34,6 +34,8 @@ TEST(bicop_select, allows_all_selcrits) {
     cop.select(u, controls);
     controls.set_selection_criterion("bic");
     cop.select(u, controls);
+    controls.set_selection_criterion("mbic");
+    cop.select(u, controls);
 }
 
 }
