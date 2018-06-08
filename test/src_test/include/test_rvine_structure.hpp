@@ -14,7 +14,7 @@ namespace test_rvine_structure {
 
 using namespace vinecopulib;
 
-TEST(rvine_structure, rvine_matrix_works) {
+TEST(rvine_structure, triangular_array_works) {
 
     TriangularArray<size_t> my_rvm(7);
     my_rvm[0] = {2, 1, 3, 4, 6, 5};
