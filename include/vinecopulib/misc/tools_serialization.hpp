@@ -46,7 +46,7 @@ inline boost::property_tree::ptree matrix_to_ptree(
 //! @param matrix the vinecopulib::TriangularArray to convert.
 //! @return the corresponding boost::property_tree::ptree.
 template<class T>
-inline boost::property_tree::ptree TriangularArray_to_ptree(
+inline boost::property_tree::ptree triangular_arrray_to_ptree(
     TriangularArray<T> matrix)
 {
     boost::property_tree::ptree output;
@@ -129,7 +129,7 @@ inline Eigen::Matrix <T, Eigen::Dynamic, Eigen::Dynamic> ptree_to_matrix(
 //! @param iroot the boost::property_tree::ptree to convert.
 //! @return the corresponding vinecopulib::TriangularArray
 template<typename T>
-inline TriangularArray<T> ptree_to_TriangularArray(
+inline TriangularArray<T> ptree_to_triangular_arrray(
     const boost::property_tree::ptree input)
 {
 
