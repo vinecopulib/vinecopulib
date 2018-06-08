@@ -41,13 +41,13 @@ inline boost::property_tree::ptree matrix_to_ptree(
     return output;
 }
 
-//! conversion from vinecopulib::RVineMatrix to boost::property_tree::ptree
+//! conversion from vinecopulib::TriangularArray to boost::property_tree::ptree
 //!
-//! @param matrix the vinecopulib::RVineMatrix to convert.
+//! @param matrix the vinecopulib::TriangularArray to convert.
 //! @return the corresponding boost::property_tree::ptree.
 template<class T>
-inline boost::property_tree::ptree rvinematrix_to_ptree(
-    RVineMatrix<T> matrix)
+inline boost::property_tree::ptree TriangularArray_to_ptree(
+    TriangularArray<T> matrix)
 {
     boost::property_tree::ptree output;
     size_t d = matrix.get_dim();
@@ -124,12 +124,12 @@ inline Eigen::Matrix <T, Eigen::Dynamic, Eigen::Dynamic> ptree_to_matrix(
 }
 
 
-//! conversion from boost::property_tree::ptree to vinecopulib::RVineMatrix
+//! conversion from boost::property_tree::ptree to vinecopulib::TriangularArray
 //!
 //! @param iroot the boost::property_tree::ptree to convert.
-//! @return the corresponding vinecopulib::RVineMatrix
+//! @return the corresponding vinecopulib::TriangularArray
 template<typename T>
-inline RVineMatrix<T> ptree_to_rvinematrix(
+inline TriangularArray<T> ptree_to_TriangularArray(
     const boost::property_tree::ptree input)
 {
 
@@ -150,7 +150,7 @@ inline RVineMatrix<T> ptree_to_rvinematrix(
         d++;
     }
 
-    RVineMatrix<T> matrix(d + 1, trunc_lvl);
+    TriangularArray<T> matrix(d + 1, trunc_lvl);
     for (size_t i = 0; i < d; i++)
         matrix[i] = vec[i];
 

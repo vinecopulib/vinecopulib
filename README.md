@@ -540,7 +540,7 @@ Denoting by `M[i, j]` the matrix entry in row `i` and column `j`, the pair-copul
 3. Gather all entries further up in column `e` (conditioning set).
 
 A valid R-vine matrix must satisfy several conditions which are checked
-when `RVineMatrix()` is called:
+when `RVineStructure()` is called:
 1. The lower right triangle must only contain zeros.
 2. The upper left triangle can only contain numbers between 1 and d.
 3. The antidiagonal must contain the numbers 1, ..., d.

@@ -94,7 +94,7 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
     auto order =
         tools_serialization::ptree_to_vector<size_t>(input.get_child("order"));
     auto matrix =
-        tools_serialization::ptree_to_rvinematrix<size_t>(input.get_child("matrix"));
+        tools_serialization::ptree_to_TriangularArray<size_t>(input.get_child("matrix"));
 
     vine_struct_ = RVineStructure(order, matrix, check_matrix);
     d_ = static_cast<size_t>(vine_struct_.get_dim());
@@ -191,7 +191,7 @@ inline boost::property_tree::ptree Vinecop::to_ptree() const
 
     boost::property_tree::ptree output;
     output.add_child("pair copulas", pair_copulas);
-    auto matrix_node = tools_serialization::rvinematrix_to_ptree(get_struct_matrix());
+    auto matrix_node = tools_serialization::TriangularArray_to_ptree(get_struct_matrix());
     output.add_child("matrix", matrix_node);
     auto order_node = tools_serialization::vector_to_ptree(get_order());
     output.add_child("order", order_node);
@@ -443,7 +443,7 @@ Vinecop::get_matrix() const
 }
 
 //! extracts the above diagonal coefficients of the vine copula model.
-inline RVineMatrix<size_t>
+inline TriangularArray<size_t>
 Vinecop::get_struct_matrix() const
 {
     return vine_struct_.get_struct_matrix();
@@ -781,8 +781,8 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
     auto do_batch = [&](const tools_thread::Batch& b) {
         if (d > 2) {
             // temporary storage objects for (inverse) h-functions
-            RVineMatrix<Eigen::VectorXd> hinv2(d + 1, trunc_lvl + 1);
-            RVineMatrix<Eigen::VectorXd> hfunc1(d + 1, trunc_lvl + 1);
+            TriangularArray<Eigen::VectorXd> hinv2(d + 1, trunc_lvl + 1);
+            TriangularArray<Eigen::VectorXd> hfunc1(d + 1, trunc_lvl + 1);
         
             // initialize with independent uniforms (corresponding to natural
             // order)

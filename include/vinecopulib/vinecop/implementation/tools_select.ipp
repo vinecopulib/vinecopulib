@@ -360,7 +360,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
 {
     using namespace tools_stl;
     pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
-    RVineMatrix<size_t> mat(d_, trunc_lvl);
+    TriangularArray<size_t> mat(d_, trunc_lvl);
     std::vector<size_t> order(d_);
 
     if (trunc_lvl > 0) {

@@ -68,7 +68,7 @@ inline RVineStructure::RVineStructure(
 
 inline RVineStructure::RVineStructure(
     const std::vector<size_t>& order,
-    const RVineMatrix<size_t>& struct_mat,
+    const TriangularArray<size_t>& struct_mat,
     bool is_natural_order,
     bool check)
 {
@@ -119,22 +119,22 @@ inline std::vector<size_t> RVineStructure::get_order() const
     return order_;
 }
 
-inline RVineMatrix<size_t> RVineStructure::get_struct_matrix() const 
+inline TriangularArray<size_t> RVineStructure::get_struct_matrix() const 
 {
     return struct_mat_;
 }
 
-inline RVineMatrix<size_t> RVineStructure::get_max_matrix() const 
+inline TriangularArray<size_t> RVineStructure::get_max_matrix() const 
 {
     return max_mat_;
 }
 
-inline RVineMatrix<size_t> RVineStructure::get_needed_hfunc1() const 
+inline TriangularArray<size_t> RVineStructure::get_needed_hfunc1() const 
 {
     return needed_hfunc1_;
 }
 
-inline RVineMatrix<size_t> RVineStructure::get_needed_hfunc2() const
+inline TriangularArray<size_t> RVineStructure::get_needed_hfunc2() const
 {
     return needed_hfunc2_;
 }
@@ -197,11 +197,11 @@ inline std::vector<size_t> RVineStructure::get_order(
     return order;
 }
 
-inline RVineMatrix<size_t> RVineStructure::to_rvine_matrix(
+inline TriangularArray<size_t> RVineStructure::to_rvine_matrix(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
 {
     // copy upper triangle
-    RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
+    TriangularArray<size_t> struct_mat(d_, trunc_lvl_);
     for (size_t j = 0; j < d_ - 1; j++) {
         for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
             struct_mat(i, j) = mat(i, j);
@@ -211,13 +211,13 @@ inline RVineMatrix<size_t> RVineStructure::to_rvine_matrix(
     return struct_mat;
 }
 
-inline RVineMatrix<size_t> RVineStructure::to_natural_order() const
+inline TriangularArray<size_t> RVineStructure::to_natural_order() const
 {
     // create vector of new variable labels
     auto order = tools_stl::get_order(get_order());
 
     // relabel to natural order
-    RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
+    TriangularArray<size_t> struct_mat(d_, trunc_lvl_);
     for (size_t j = 0; j < d_ - 1; j++) {
         for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
             struct_mat(i, j) = order[struct_mat_(i, j) - 1] + 1;
@@ -227,9 +227,9 @@ inline RVineMatrix<size_t> RVineStructure::to_natural_order() const
     return struct_mat;
 }
 
-inline RVineMatrix<size_t> RVineStructure::compute_dvine_struct_matrix() const
+inline TriangularArray<size_t> RVineStructure::compute_dvine_struct_matrix() const
 {
-    RVineMatrix<size_t> struct_mat(d_, trunc_lvl_);
+    TriangularArray<size_t> struct_mat(d_, trunc_lvl_);
     for (size_t j = 0; j < d_ - 1; j++) {
         for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
             struct_mat(i, j) = d_ - i - j - 1;
@@ -239,9 +239,9 @@ inline RVineMatrix<size_t> RVineStructure::compute_dvine_struct_matrix() const
     return struct_mat;
 }
 
-inline RVineMatrix<size_t> RVineStructure::compute_max_matrix() const
+inline TriangularArray<size_t> RVineStructure::compute_max_matrix() const
 {
-    RVineMatrix<size_t> max_mat = struct_mat_;
+    TriangularArray<size_t> max_mat = struct_mat_;
     for (size_t j = 0; j < d_ - 1; j++) {
         for (size_t i = 1; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
             max_mat(i, j) = std::max(struct_mat_(i, j), max_mat(i - 1, j));
@@ -251,9 +251,9 @@ inline RVineMatrix<size_t> RVineStructure::compute_max_matrix() const
     return max_mat;
 }
 
-inline RVineMatrix<size_t> RVineStructure::compute_needed_hfunc1() const
+inline TriangularArray<size_t> RVineStructure::compute_needed_hfunc1() const
 {
-    RVineMatrix<size_t> needed_hfunc1(d_, trunc_lvl_);
+    TriangularArray<size_t> needed_hfunc1(d_, trunc_lvl_);
 
     for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
         for (size_t j = 0; j < d_ - 2 - i; j++) {
@@ -265,9 +265,9 @@ inline RVineMatrix<size_t> RVineStructure::compute_needed_hfunc1() const
     return needed_hfunc1;
 }
 
-inline RVineMatrix<size_t> RVineStructure::compute_needed_hfunc2() const
+inline TriangularArray<size_t> RVineStructure::compute_needed_hfunc2() const
 {
-    RVineMatrix<size_t> needed_hfunc2(d_, trunc_lvl_);
+    TriangularArray<size_t> needed_hfunc2(d_, trunc_lvl_);
 
     for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
         for (size_t j = 0; j < d_ - 2 - i; j++) {
