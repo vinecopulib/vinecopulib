@@ -84,8 +84,8 @@ public:
 
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
-    TriangularArray<size_t> get_struct_matrix() const;
-    
+    TriangularArray<size_t> get_struct_array() const;
+        
     // getter for the threshold
     double get_threshold() const;
 

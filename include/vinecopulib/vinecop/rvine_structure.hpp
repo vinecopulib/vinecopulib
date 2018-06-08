@@ -15,7 +15,7 @@ namespace vinecopulib {
 //! 
 //! RVineStructure objects encode the tree structure of the vine, i.e. the
 //! conditioned/conditioning variables of edge edge. It is represented by a 
-//! triangular array. An examplary array is
+//! triangular array. An exemplary array is
 //! ```
 //! 1 1 1 1
 //! 2 2 2 
@@ -56,7 +56,7 @@ namespace vinecopulib {
 //!    `(M[t-1, j], {M[d-j-1, j], M[0, j], ..., M[t-2, j]})`.
 //!
 //! An R-vine array is said to be in natural order when the diagonal entries are
-//! \f$ d, \dots, 1 \f$ (from left to right). The examplary arrray above is 
+//! \f$ d, \dots, 1 \f$ (from left to right). The exemplary arrray above is 
 //! in natural order. Any R-vine array can be characterized by the diagonal 
 //! entries (called order) and the entries below the diagonal of the corresponding
 //! R-vine array in natural order. Since most algorithms work with the structure
@@ -74,21 +74,21 @@ public:
                    const size_t& trunc_lvl,
                    bool check = true);
     RVineStructure(const std::vector<size_t>& order,
-                   const TriangularArray<size_t>& struct_mat,
+                   const TriangularArray<size_t>& struct_array,
                    bool is_natural_order = false,
                    bool check = true);
 
     size_t get_dim() const;
     size_t get_trunc_lvl() const;
     std::vector<size_t> get_order() const;
-    TriangularArray<size_t> get_struct_matrix() const;
-    TriangularArray<size_t> get_max_matrix() const;
+    TriangularArray<size_t> get_struct_array() const;
+    TriangularArray<size_t> get_max_array() const;
     TriangularArray<size_t> get_needed_hfunc1() const;
     TriangularArray<size_t> get_needed_hfunc2() const;
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
-    size_t struct_matrix(size_t tree, size_t edge) const;
-    size_t max_matrix(size_t tree, size_t edge) const;
+    size_t struct_array(size_t tree, size_t edge) const;
+    size_t max_array(size_t tree, size_t edge) const;
 
 private:
 
@@ -96,12 +96,12 @@ private:
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
     std::vector<size_t> get_order(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
-    TriangularArray<size_t> to_rvine_matrix(
+    TriangularArray<size_t> to_rvine_array(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
 
     TriangularArray<size_t> to_natural_order() const;
-    TriangularArray<size_t> compute_dvine_struct_matrix() const;
-    TriangularArray<size_t> compute_max_matrix() const;
+    TriangularArray<size_t> compute_dvine_struct_array() const;
+    TriangularArray<size_t> compute_max_array() const;
     TriangularArray<size_t> compute_needed_hfunc1() const;
     TriangularArray<size_t> compute_needed_hfunc2() const;
 
@@ -117,8 +117,8 @@ private:
     std::vector<size_t> order_;
     size_t d_;
     size_t trunc_lvl_;
-    TriangularArray<size_t> struct_mat_;
-    TriangularArray<size_t> max_mat_;
+    TriangularArray<size_t> struct_array_;
+    TriangularArray<size_t> max_array_;
     TriangularArray<size_t> needed_hfunc1_;
     TriangularArray<size_t> needed_hfunc2_;
 };

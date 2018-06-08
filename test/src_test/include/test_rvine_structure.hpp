@@ -41,16 +41,16 @@ TEST(rvine_structure, can_convert_to_natural_order) {
         7, 3, 0, 0, 0, 0, 0,
         4, 0, 0, 0, 0, 0, 0;
 
-    TriangularArray<size_t> true_no_matrix(7);
-    true_no_matrix[0] = {2, 1, 3, 4, 6, 5};
-    true_no_matrix[1] = {3, 1, 2, 4, 5};
-    true_no_matrix[2] = {1, 4, 3, 2};
-    true_no_matrix[3] = {1, 3, 2};
-    true_no_matrix[4] = {1, 2};
-    true_no_matrix[5] = {1};
+    TriangularArray<size_t> true_no_array(7);
+    true_no_array[0] = {2, 1, 3, 4, 6, 5};
+    true_no_array[1] = {3, 1, 2, 4, 5};
+    true_no_array[2] = {1, 4, 3, 2};
+    true_no_array[3] = {1, 3, 2};
+    true_no_array[4] = {1, 2};
+    true_no_array[5] = {1};
 
     RVineStructure rvine_structure(mat);
-    EXPECT_EQ(rvine_structure.get_struct_matrix(), true_no_matrix);
+    EXPECT_EQ(rvine_structure.get_struct_array(), true_no_array);
 }
 
 TEST(rvine_structure, max_mat_is_correct) {
@@ -63,16 +63,16 @@ TEST(rvine_structure, max_mat_is_correct) {
         7, 3, 0, 0, 0, 0, 0,
         4, 0, 0, 0, 0, 0, 0;
 
-    TriangularArray<size_t> true_max_matrix(7);
-    true_max_matrix[0] = {2, 2, 3, 4, 6, 6};
-    true_max_matrix[1] = {3, 3, 3, 4, 5};
-    true_max_matrix[2] = {1, 4, 4, 4};
-    true_max_matrix[3] = {1, 3, 3};
-    true_max_matrix[4] = {1, 2};
-    true_max_matrix[5] = {1};
+    TriangularArray<size_t> true_max_array(7);
+    true_max_array[0] = {2, 2, 3, 4, 6, 6};
+    true_max_array[1] = {3, 3, 3, 4, 5};
+    true_max_array[2] = {1, 4, 4, 4};
+    true_max_array[3] = {1, 3, 3};
+    true_max_array[4] = {1, 2};
+    true_max_array[5] = {1};
 
     RVineStructure rvine_structure(mat);
-    EXPECT_EQ(rvine_structure.get_max_matrix(), true_max_matrix);
+    EXPECT_EQ(rvine_structure.get_max_array(), true_max_array);
 }
 
 TEST(rvine_structure, needed_hfunc1_is_correct) {

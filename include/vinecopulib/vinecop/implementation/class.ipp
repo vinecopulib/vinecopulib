@@ -94,7 +94,7 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
     auto order =
         tools_serialization::ptree_to_vector<size_t>(input.get_child("order"));
     auto matrix =
-        tools_serialization::ptree_to_TriangularArray<size_t>(input.get_child("matrix"));
+        tools_serialization::ptree_to_triangular_array<size_t>(input.get_child("matrix"));
 
     vine_struct_ = RVineStructure(order, matrix, check_matrix);
     d_ = static_cast<size_t>(vine_struct_.get_dim());
@@ -191,7 +191,7 @@ inline boost::property_tree::ptree Vinecop::to_ptree() const
 
     boost::property_tree::ptree output;
     output.add_child("pair copulas", pair_copulas);
-    auto matrix_node = tools_serialization::TriangularArray_to_ptree(get_struct_matrix());
+    auto matrix_node = tools_serialization::triangular_array_to_ptree(get_struct_array());
     output.add_child("matrix", matrix_node);
     auto order_node = tools_serialization::vector_to_ptree(get_order());
     output.add_child("order", order_node);
@@ -444,9 +444,9 @@ Vinecop::get_matrix() const
 
 //! extracts the above diagonal coefficients of the vine copula model.
 inline TriangularArray<size_t>
-Vinecop::get_struct_matrix() const
+Vinecop::get_struct_array() const
 {
-    return vine_struct_.get_struct_matrix();
+    return vine_struct_.get_struct_array();
 }
 
 //! extracts the log-likelihood (zero when model not fitted to data).
@@ -489,8 +489,8 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
     if (trunc_lvl > 0) {
         revorder = vine_struct_.get_order();
         tools_stl::reverse(revorder);
-        no_matrix = vine_struct_.get_struct_matrix();
-        max_matrix = vine_struct_.get_max_matrix();
+        no_matrix = vine_struct_.get_struct_array();
+        max_matrix = vine_struct_.get_max_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     }
@@ -772,8 +772,8 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
         revorder = vine_struct_.get_order();
         tools_stl::reverse(revorder);
         inverse_order = tools_stl::invert_permutation(revorder);
-        no_matrix = vine_struct_.get_struct_matrix();
-        max_matrix = vine_struct_.get_max_matrix();
+        no_matrix = vine_struct_.get_struct_array();
+        max_matrix = vine_struct_.get_max_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     }
