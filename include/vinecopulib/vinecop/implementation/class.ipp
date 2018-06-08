@@ -485,7 +485,7 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
     // info about the vine structure (reverse rows (!) for more natural indexing)
     size_t trunc_lvl = pair_copulas_.size();
     std::vector<size_t> revorder;
-    RVineMatrix<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         revorder = vine_struct_.get_order();
         tools_stl::reverse(revorder);
@@ -767,7 +767,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
     // info about the vine structure (in upper triangular matrix notation)
     size_t trunc_lvl = pair_copulas_.size();
     std::vector<size_t> revorder, inverse_order;
-    RVineMatrix<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         revorder = vine_struct_.get_order();
         tools_stl::reverse(revorder);

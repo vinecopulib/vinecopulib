@@ -8,7 +8,6 @@
 
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
-#include <vinecopulib/vinecop/rvine_structure.hpp>
 #include <vinecopulib/vinecop/tools_select.hpp>
 
 namespace vinecopulib {
