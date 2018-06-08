@@ -553,9 +553,6 @@ when `RVineStructure()` is called:
    `(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})` or
    `(M[t-1, j], {M[d-j-1, j], M[0, j], ..., M[t-2, j]})`.
 
-Condition 6 already implies conditions 2-5, but is more difficult to
-check by hand.
-
 ### Fit and select a vine copula model
 
 The method `select_all()` performs parameter estimation and automatic

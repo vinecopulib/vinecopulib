@@ -11,6 +11,56 @@
 
 namespace vinecopulib {
 
+//! R-vine structures
+//! 
+//! RVineStructure objects encode the tree structure of the vine, i.e. the
+//! conditioned/conditioning variables of edge edge. It is represented by a 
+//! triangular array. An examplary array is
+//! ```
+//! 1 1 1 1
+//! 2 2 2 
+//! 3 3 
+//! 4 
+//! ```
+//! which encodes the following pair-copulas:
+//! ```
+//! | tree | edge | pair-copulas   |
+//! |------|------|----------------|
+//! | 0    | 0    | `(4, 1)`       |
+//! |      | 1    | `(3, 1)`       |
+//! |      | 2    | `(2, 1)`       |
+//! | 1    | 0    | `(4, 2; 1)`    |
+//! |      | 1    | `(3, 2; 1)`    |
+//! | 2    | 0    | `(4, 3; 2, 1)` |
+//! ```
+//! Denoting by `M[i, j]` the array entry in row `i` and column `j`,
+//! the pair-copula index for edge `e` in tree `t` of a `d` dimensional vine
+//! is `(M[d - 1 - t, e], M[t, e]; M[t - 1, e], ..., M[0, e])`. Less
+//! formally,
+//! 1. Start with the counter-diagonal element of column `e` (first conditioned
+//!    variable).
+//! 2. Jump up to the element in row `t` (second conditioned variable).
+//! 3. Gather all entries further up in column `e` (conditioning set).
+//!
+//! A valid R-vine array must satisfy several conditions which are checked
+//! when `RVineStructure()` is called:
+//! 1. It only contains numbers between 1 and d.
+//! 2. The diagonal must contain the numbers 1, ..., d.
+//! 3. The diagonal entry of a column must not be contained in any
+//!    column further to the right.
+//! 4. The entries of a column must be contained in all columns to the left.
+//! 5. The proximity condition must hold: For all t = 1, ..., d - 2 and
+//!    e = 0, ..., d - t - 1 there must exist an index j > d, such that
+//!    `(M[t, e], {M[0, e], ..., M[t-1, e]})` equals either
+//!    `(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})` or
+//!    `(M[t-1, j], {M[d-j-1, j], M[0, j], ..., M[t-2, j]})`.
+//!
+//! An R-vine array is said to be in natural order when the diagonal entries are
+//! \f$ d, \dots, 1 \f$ (from left to right). The examplary arrray above is 
+//! in natural order. Any R-vine array can be characterized by the diagonal 
+//! entries (called order) and the entries below the diagonal of the corresponding
+//! R-vine array in natural order. Since most algorithms work with the structure
+//! in natural order, this is how RVineStructure stores the structure internally.
 class RVineStructure {
 public:
     RVineStructure() {}

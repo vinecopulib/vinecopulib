@@ -8,6 +8,19 @@
 
 namespace vinecopulib {
 
+//! instantiates an RVineStructure object from a matrix representing an
+//! R-vine array. The matrix must contain zeros in the lower right triangle and
+//! the upper left triangle must be a valid R-vine array. Truncated vines can 
+//! be encoded by putting zeros above the digonal in all rows below the 
+//! truncation level. Example of a 1-truncated matrix:
+//! ```
+//! 1 1 1 1
+//! 0 0 2 0
+//! 0 3 0 0
+//! 4 0 0 0
+//! ```
+//! @param matrix a valid R-vine matrix.
+//! @param check whether the matrix shall be checked for validity.
 inline RVineStructure::RVineStructure(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat,
     bool check)
@@ -39,6 +52,11 @@ inline RVineStructure::RVineStructure(
     needed_hfunc2_ = compute_needed_hfunc2();
 }
 
+//! instantiates an RVineStructure object to a D-vine with given ordering of 
+//! variables.
+//! @param order the order of variables in the D-vine (diagonal entries in the 
+//!    R-vine array); must be a permutation of 1, ..., d.
+//! @param check whether the order shall be checked for validity.
 inline RVineStructure::RVineStructure(
     const std::vector<size_t>& order,
     bool check) : RVineStructure(order, order.size() - 1, check) {}
@@ -66,6 +84,16 @@ inline RVineStructure::RVineStructure(
     }
 }
 
+//! instantiates an RVineStructure object from the variable order (diagonal 
+//! elements of the R-vine array) and a triangular structure array (all elements
+//! above the diagonal).
+//! @param order the order of variables (diagonal entries in the 
+//!    R-vine array); must be a permutation of 1, ..., d.
+//! @param struct_mat the structure array  (all elements
+//!    above the diagonal in the R-vine array). For truncated vines, all rows
+//!    below the truncation level are omitted.  
+//! @param is_natural_order whether `struct_mat` is already in natural order.
+//! @param check whether the order shall be checked for validity.
 inline RVineStructure::RVineStructure(
     const std::vector<size_t>& order,
     const TriangularArray<size_t>& struct_mat,
@@ -104,51 +132,72 @@ inline RVineStructure::RVineStructure(
     }
 }
 
+//! extract the dimension of the vine.
 inline size_t RVineStructure::get_dim() const
 {
     return d_;
 }
 
+//! extract the truncation level of the vine.
 inline size_t RVineStructure::get_trunc_lvl() const
 {
     return trunc_lvl_;
 }
 
+//! extract the order of variables in the vine (diagonal entries in the R-vine 
+//! array).
 inline std::vector<size_t> RVineStructure::get_order() const 
 {
     return order_;
 }
 
+//! extract structure array (all elements above the diagonal in the R-vine 
+//! array).
 inline TriangularArray<size_t> RVineStructure::get_struct_matrix() const 
 {
     return struct_mat_;
 }
 
+//! extracts the maximum matrix, which is derived from an R-vine array by
+//! iteratively computing
+//! the (elementwise) maximum of two subsequent rows (starting from the
+//! top). It is used in estimation and evaluation algorithms to find the 
+//! two edges in the previous tree that are joined by the current edge.
 inline TriangularArray<size_t> RVineStructure::get_max_matrix() const 
 {
     return max_mat_;
 }
 
+//! extracts an array indicating which of the first h-functions are needed 
+//! (it is usually not necessary to compute both h-functions for each
+//! pair-copula).
 inline TriangularArray<size_t> RVineStructure::get_needed_hfunc1() const 
 {
     return needed_hfunc1_;
 }
 
+//! extracts an array indicating which of the second h-functions are needed 
+//! (it is usually not necessary to compute both h-functions for each
+//! pair-copula).
 inline TriangularArray<size_t> RVineStructure::get_needed_hfunc2() const
 {
     return needed_hfunc2_;
 }
 
+//! access elements of the structure array.
 inline size_t RVineStructure::struct_matrix(size_t tree, size_t edge) const 
 {
     return struct_mat_(tree, edge);
 }
 
+//! access elements of the maximum matrix.
 inline size_t RVineStructure::max_matrix(size_t tree, size_t edge) const {
     return max_mat_(tree, edge);
 }
 
-inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> RVineStructure::get_matrix() const 
+//! extract the R-vine array.
+inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> 
+RVineStructure::get_matrix() const 
 {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> matrix(d_, d_);
     matrix.fill(0);
@@ -163,6 +212,10 @@ inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> RVineStructure::get
     return matrix;
 }
 
+//! find the truncation level in an R-vine matrix. The truncation level is
+//! determined by the first row (starting from the bottom) that contains only 
+//! zeros above the diagonal.
+//! @param mat a matrix representing the R-vine array.
 inline size_t RVineStructure::find_trunc_lvl(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
 {
@@ -187,6 +240,10 @@ inline size_t RVineStructure::find_trunc_lvl(
     return trunc_lvl;
 }
 
+//! find the order of an R-vine matrix. The truncation level is
+//! determined by the first row (starting from the bottom) that contains only 
+//! zeros above the diagonal.
+//! @param mat a matrix representing the R-vine array.
 inline std::vector<size_t> RVineStructure::get_order(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
 {
@@ -197,6 +254,8 @@ inline std::vector<size_t> RVineStructure::get_order(
     return order;
 }
 
+//! extracts the structure array (entries above the diagonal in R-vine array).
+//! @param mat a matrix representing the R-vine array.
 inline TriangularArray<size_t> RVineStructure::to_rvine_matrix(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
 {
@@ -211,6 +270,7 @@ inline TriangularArray<size_t> RVineStructure::to_rvine_matrix(
     return struct_mat;
 }
 
+//! converts `struct_mat_` to natural order.
 inline TriangularArray<size_t> RVineStructure::to_natural_order() const
 {
     // create vector of new variable labels
@@ -227,6 +287,7 @@ inline TriangularArray<size_t> RVineStructure::to_natural_order() const
     return struct_mat;
 }
 
+//! creates a structure array corresponding to a D-vine (in natural order).
 inline TriangularArray<size_t> RVineStructure::compute_dvine_struct_matrix() const
 {
     TriangularArray<size_t> struct_mat(d_, trunc_lvl_);
@@ -348,7 +409,6 @@ inline void RVineStructure::check_antidiagonal() const
         throw std::runtime_error("not a valid R-vine matrix: " + problem);
     }
 }
-
 
 inline void RVineStructure::check_proximity_condition() const
 {
