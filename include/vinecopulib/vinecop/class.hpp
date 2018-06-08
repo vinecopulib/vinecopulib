@@ -15,7 +15,7 @@ namespace vinecopulib {
 //! @brief A class for vine copula models
 //!
 //! A vine copula model is characterized by the structure matrix (see
-//! RVineMatrix) and the pair-copulas.
+//! TriangularArray) and the pair-copulas.
 class Vinecop
 {
 public:
@@ -85,7 +85,7 @@ public:
 
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
-    RVineMatrix<size_t> get_struct_matrix() const;
+    TriangularArray<size_t> get_struct_matrix() const;
     
     // getter for the threshold
     double get_threshold() const;

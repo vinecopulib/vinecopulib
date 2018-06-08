@@ -41,7 +41,7 @@ TEST(rvine_structure, can_convert_to_natural_order) {
         7, 3, 0, 0, 0, 0, 0,
         4, 0, 0, 0, 0, 0, 0;
 
-    RVineMatrix<size_t> true_no_matrix(7);
+    TriangularArray<size_t> true_no_matrix(7);
     true_no_matrix[0] = {2, 1, 3, 4, 6, 5};
     true_no_matrix[1] = {3, 1, 2, 4, 5};
     true_no_matrix[2] = {1, 4, 3, 2};
@@ -63,7 +63,7 @@ TEST(rvine_structure, max_mat_is_correct) {
         7, 3, 0, 0, 0, 0, 0,
         4, 0, 0, 0, 0, 0, 0;
 
-    RVineMatrix<size_t> true_max_matrix(7);
+    TriangularArray<size_t> true_max_matrix(7);
     true_max_matrix[0] = {2, 2, 3, 4, 6, 6};
     true_max_matrix[1] = {3, 3, 3, 4, 5};
     true_max_matrix[2] = {1, 4, 4, 4};
@@ -85,7 +85,7 @@ TEST(rvine_structure, needed_hfunc1_is_correct) {
         7, 3, 0, 0, 0, 0, 0,
         4, 0, 0, 0, 0, 0, 0;
 
-    RVineMatrix<size_t> true_hfunc1(7);
+    TriangularArray<size_t> true_hfunc1(7);
     true_hfunc1[0] = {0, 0, 0, 0, 0, 0};
     true_hfunc1[1] = {0, 0, 0, 0, 1};
     true_hfunc1[2] = {0, 0, 0, 0};
@@ -107,7 +107,7 @@ TEST(rvine_structure, needed_hfunc2_is_correct) {
         7, 3, 0, 0, 0, 0, 0,
         4, 0, 0, 0, 0, 0, 0;
 
-    RVineMatrix<size_t> true_hfunc2(7);
+    TriangularArray<size_t> true_hfunc2(7);
     true_hfunc2[0] = {1, 1, 1, 1, 1, 0};
     true_hfunc2[1] = {1, 1, 1, 1, 0};
     true_hfunc2[2] = {1, 1, 1, 1};
