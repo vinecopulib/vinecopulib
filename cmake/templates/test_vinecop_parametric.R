@@ -26,7 +26,7 @@ fam <- par <- matrix(0, 7, 7)
 fam[lower.tri(fam)] <- 23
 fam[1:4, ] <- 0  # 3-truncated
 par[lower.tri(par)] <- -3
-model <- VineCopula::TriangularArray(mat, fam, par)
+model <- VineCopula::RVineMatrix(mat, fam, par)
 u <- VineCopula::RVineSim(1000, model)
 fit <- VineCopula::RVineStructureSelect(u, familyset = 0)
 
