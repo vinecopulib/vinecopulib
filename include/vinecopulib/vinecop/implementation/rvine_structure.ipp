@@ -20,7 +20,7 @@ namespace vinecopulib {
 //! 4 0 0 0
 //! ```
 //! @param mat a matrix representing a valid R-vine array.
-//! @param check whether the array shall be checked for validity.
+//! @param check whether `mat` shall be checked for validity.
 inline RVineStructure::RVineStructure(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat,
     bool check)
@@ -56,7 +56,7 @@ inline RVineStructure::RVineStructure(
 //! variables.
 //! @param order the order of variables in the D-vine (diagonal entries in the 
 //!    R-vine array); must be a permutation of 1, ..., d.
-//! @param check whether the order shall be checked for validity.
+//! @param check whether `order shall be checked for validity.
 inline RVineStructure::RVineStructure(
     const std::vector<size_t>& order,
     bool check) : RVineStructure(order, order.size() - 1, check) {}
@@ -93,7 +93,7 @@ inline RVineStructure::RVineStructure(
 //!    above the diagonal in the R-vine array). For truncated vines, all rows
 //!    below the truncation level are omitted.  
 //! @param is_natural_order whether `struct_array` is already in natural order.
-//! @param check whether the order shall be checked for validity.
+//! @param check whether `order` and `struct_array` shall be checked for validity.
 inline RVineStructure::RVineStructure(
     const std::vector<size_t>& order,
     const TriangularArray<size_t>& struct_array,
@@ -215,7 +215,7 @@ RVineStructure::get_matrix() const
 //! find the truncation level in an R-vine array. The truncation level is
 //! determined by the first row (starting from the bottom) that contains only 
 //! zeros above the diagonal.
-//! @param mat a array representing the R-vine array.
+//! @param mat an array representing the R-vine array.
 inline size_t RVineStructure::find_trunc_lvl(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
 {
