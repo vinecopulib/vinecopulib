@@ -63,7 +63,7 @@ TEST_F(VinecopTest, getters_are_correct) {
             EXPECT_EQ(rot, 90);
         }
     }
-    
+
     for (auto &tree : vinecop.get_all_taus()) {
         for (auto &tau : tree) {
             ASSERT_TRUE(fabs(tau) < 1e-4);
@@ -198,24 +198,35 @@ TEST_F(VinecopTest, family_select_returns_pcs_in_right_order) {
     EXPECT_EQ(fit_struct.get_all_parameters(), fit_fam.get_all_parameters());
 }
 
+TEST_F(VinecopTest, trace_works) {
+    FitControlsVinecop controls(bicop_families::itau, "itau");
+    controls.set_show_trace(true);
+    controls.set_select_threshold(true);
+    controls.set_truncation_level(3);
+    testing::internal::CaptureStdout();
+    Vinecop fit(u, controls);
+    std::string output = testing::internal::GetCapturedStdout();
+    EXPECT_NO_THROW(!output.empty());
+}
+
 TEST_F(VinecopTest, works_multi_threaded) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_truncation_level(true);
-    
+
     Vinecop fit1(u, controls);
     controls.set_num_threads(2);
     Vinecop fit2(u, controls);
-    
+
     // check for equality in likelihood, since the pair copulas may be stored
     // in a different order when running in parallel
     EXPECT_NEAR(fit1.loglik(u), fit2.loglik(u), 1e-2);
-    
+
     // check if parallel evaluators have same output as single threaded ones
     EXPECT_EQ(fit2.pdf(u, 2), fit2.pdf(u));
     EXPECT_EQ(fit2.inverse_rosenblatt(u, 2), fit2.inverse_rosenblatt(u));
 
-    //just check that it works 
-    fit2.simulate(2, 3);
+    //just check that it works
+    fit2.simulate(2, false, 3);
     fit2.cdf(u, 100, 2);
 }
 
