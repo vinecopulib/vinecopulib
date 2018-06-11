@@ -13,27 +13,10 @@
 #include <condition_variable>
 #include <memory>
 
+namespace vinecopulib {
+
 namespace tools_thread {
 
-struct Batch {
-    size_t begin;
-    size_t size;
-};
-
-inline std::vector<Batch> create_batches(size_t num_tasks, size_t num_threads)
-{
-    std::vector<Batch> batches(std::min(num_tasks, num_threads));
-    size_t min_size = num_tasks / num_threads;
-    ptrdiff_t rem_size = num_tasks % num_threads;
-    for (size_t i = 0, k = 0; i < num_tasks; k++) {
-        batches[k] = Batch{i, min_size + (rem_size-- > 0)};
-        i += batches[k].size;
-    }
-    
-    return batches;
-}
-
-#ifndef INTERFACED_FROM_R
 //! Implementation of the thread pool pattern based on `std::thread`.
 class ThreadPool {
 public:
@@ -49,37 +32,37 @@ public:
     {
         for (size_t t = 0; t < nThreads; t++) {
             pool_.emplace_back([this] {
-                // observe thread pool as long there are jobs or pool has been
-                // stopped
-                while (!stopped_ | !jobs_.empty()) {
-                    // thread must hold the lock while modifying shared
-                    // variables
-                    std::unique_lock<std::mutex> lk(m_);
+                                   // observe thread pool as long there are jobs or pool has been
+                                   // stopped
+                                   while (!stopped_ | !jobs_.empty()) {
+                                       // thread must hold the lock while modifying shared
+                                       // variables
+                                       std::unique_lock<std::mutex> lk(m_);
 
-                    // wait for new job or stop signal
-                    cv_tasks_.wait(lk, [this] {
-                        return stopped_ || !jobs_.empty();
-                    });
+                                       // wait for new job or stop signal
+                                       cv_tasks_.wait(lk, [this] {
+                                           return stopped_ || !jobs_.empty();
+                                       });
 
-                    // check if there are any jobs left in the queue
-                    if (jobs_.empty())
-                        continue;
+                                       // check if there are any jobs left in the queue
+                                       if (jobs_.empty())
+                                           continue;
 
-                    // take job from the queue and signal that worker is busy
-                    std::function<void()> job = std::move(jobs_.front());
-                    jobs_.pop();
-                    num_busy_++;
-                    lk.unlock();
+                                       // take job from the queue and signal that worker is busy
+                                       std::function<void()> job = std::move(jobs_.front());
+                                       jobs_.pop();
+                                       num_busy_++;
+                                       lk.unlock();
 
-                    // execute job
-                    job();
+                                       // execute job
+                                       job();
 
-                    // signal that job is done
-                    lk.lock();
-                    num_busy_--;
-                    cv_busy_.notify_one();
-                }
-            }
+                                       // signal that job is done
+                                       lk.lock();
+                                       num_busy_--;
+                                       cv_busy_.notify_one();
+                                   }
+                               }
             );
         }
     }
@@ -106,13 +89,13 @@ public:
         auto job = std::make_shared<std::packaged_task<decltype(f(args...))()>>(
             [&f, args...] { return f(args...); }
         );
-        
+
         // if there are no workers, just do the job in the main thread
         if (pool_.size() == 0) {
             (*job)();
             return job->get_future();
         }
-        
+
         // add job to the queue
         {
             std::unique_lock<std::mutex> lk(m_);
@@ -178,6 +161,6 @@ private:
     bool stopped_;
 };
 
-#endif
+}
 
 }
