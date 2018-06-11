@@ -32,38 +32,37 @@ public:
     {
         for (size_t t = 0; t < nThreads; t++) {
             pool_.emplace_back([this] {
-                                   // observe thread pool as long there are jobs or pool has been
-                                   // stopped
-                                   while (!stopped_ | !jobs_.empty()) {
-                                       // thread must hold the lock while modifying shared
-                                       // variables
-                                       std::unique_lock<std::mutex> lk(m_);
+                // observe thread pool as long there are jobs or pool has been
+                // stopped
+                while (!stopped_ | !jobs_.empty()) {
+                    // thread must hold the lock while modifying shared
+                    // variables
+                    std::unique_lock<std::mutex> lk(m_);
 
-                                       // wait for new job or stop signal
-                                       cv_tasks_.wait(lk, [this] {
-                                           return stopped_ || !jobs_.empty();
-                                       });
+                    // wait for new job or stop signal
+                    cv_tasks_.wait(lk, [this] {
+                        return stopped_ || !jobs_.empty();
+                    });
 
-                                       // check if there are any jobs left in the queue
-                                       if (jobs_.empty())
-                                           continue;
+                    // check if there are any jobs left in the queue
+                    if (jobs_.empty())
+                        continue;
 
-                                       // take job from the queue and signal that worker is busy
-                                       std::function<void()> job = std::move(jobs_.front());
-                                       jobs_.pop();
-                                       num_busy_++;
-                                       lk.unlock();
+                    // take job from the queue and signal that worker is busy
+                    std::function<void()> job = std::move(jobs_.front());
+                    jobs_.pop();
+                    num_busy_++;
+                    lk.unlock();
 
-                                       // execute job
-                                       job();
+                    // execute job
+                    job();
 
-                                       // signal that job is done
-                                       lk.lock();
-                                       num_busy_--;
-                                       cv_busy_.notify_one();
-                                   }
-                               }
-            );
+                    // signal that job is done
+                    lk.lock();
+                    num_busy_--;
+                    cv_busy_.notify_one();
+                }
+            });
         }
     }
 
