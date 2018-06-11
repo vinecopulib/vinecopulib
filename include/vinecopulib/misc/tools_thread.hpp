@@ -13,25 +13,9 @@
 #include <condition_variable>
 #include <memory>
 
+namespace vinecopulib {
+
 namespace tools_thread {
-
-struct Batch {
-    size_t begin;
-    size_t size;
-};
-
-inline std::vector<Batch> create_batches(size_t num_tasks, size_t num_threads)
-{
-    std::vector<Batch> batches(std::min(num_tasks, num_threads));
-    size_t min_size = num_tasks / num_threads;
-    ptrdiff_t rem_size = num_tasks % num_threads;
-    for (size_t i = 0, k = 0; i < num_tasks; k++) {
-        batches[k] = Batch{i, min_size + (rem_size-- > 0)};
-        i += batches[k].size;
-    }
-    
-    return batches;
-}
 
 //! Implementation of the thread pool pattern based on `std::thread`.
 class ThreadPool {
@@ -105,13 +89,13 @@ public:
         auto job = std::make_shared<std::packaged_task<decltype(f(args...))()>>(
             [&f, args...] { return f(args...); }
         );
-        
+
         // if there are no workers, just do the job in the main thread
         if (pool_.size() == 0) {
             (*job)();
             return job->get_future();
         }
-        
+
         // add job to the queue
         {
             std::unique_lock<std::mutex> lk(m_);
@@ -176,5 +160,7 @@ private:
     std::atomic_uint num_busy_;
     bool stopped_;
 };
+
+}
 
 }
