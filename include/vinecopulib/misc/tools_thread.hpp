@@ -62,7 +62,8 @@ public:
                     num_busy_--;
                     cv_busy_.notify_one();
                 }
-            });
+            }
+            );
         }
     }
 
