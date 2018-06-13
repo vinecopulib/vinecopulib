@@ -11,6 +11,8 @@ NEW FEATURES
 
 BUG FIXES
 
+   * fix cdf of StudentBicop (#353)
+
    * improve numerical stability (#345, #350)
 
    * fix gcc-8 warning (#340)
