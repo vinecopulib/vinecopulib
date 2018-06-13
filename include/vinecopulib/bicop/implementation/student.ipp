@@ -49,10 +49,11 @@ inline Eigen::VectorXd StudentBicop::cdf(
 
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));
-    double rnu = round(nu);
-    int inu = static_cast<int>(nu);
 
-    if (nu == rnu) {
+    // for integer nu, just use pbvt
+    // otherwise, interpolate linearly between floor(nu) and ceil(nu)
+    if (nu == round(nu)) {
+        int inu = static_cast<int>(nu);
         return pbvt(qt(u, inu), inu, rho);
     } else {
         int nu1 = static_cast<int>(std::floor(nu));
