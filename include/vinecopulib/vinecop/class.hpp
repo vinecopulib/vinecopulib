@@ -18,28 +18,56 @@ namespace vinecopulib {
 class Vinecop
 {
 public:
-    // Constructors
-    Vinecop()
-    {
-    }
+
+    // default constructors
+    Vinecop() {}
 
     Vinecop(size_t d);
 
+    // Constructors with structure only
+    Vinecop(const RVineStructure &vine_struct);
+
     Vinecop(const Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
             const bool check_matrix = true);
+
+    Vinecop(const std::vector<size_t> &order,
+            const TriangularArray<size_t> &struct_array,
+            const bool check_array = true);
+
+    // Constructors with pair_copulas + structure
+    Vinecop(const std::vector<std::vector<Bicop>> &pair_copulas,
+            const RVineStructure &vine_struct);
 
     Vinecop(const std::vector <std::vector<Bicop>> &pair_copulas,
             const Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
             const bool check_matrix = true);
 
+    Vinecop(const std::vector<std::vector<Bicop>> &pair_copulas,
+            const std::vector<size_t> &order,
+            const TriangularArray<size_t> &struct_array,
+            const bool check_array = true);
+
+    // Constructors from data
     Vinecop(const Eigen::MatrixXd &data,
             const FitControlsVinecop &controls = FitControlsVinecop());
+
+    Vinecop(const Eigen::MatrixXd &data,
+            const RVineStructure &vine_struct,
+            FitControlsVinecop controls = FitControlsVinecop());
 
     Vinecop(const Eigen::MatrixXd &data,
             const Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
             FitControlsVinecop controls = FitControlsVinecop(),
             const bool check_matrix = true);
 
+    Vinecop(const Eigen::MatrixXd &data,
+            const std::vector<size_t> &order,
+            const TriangularArray<size_t> &struct_array,
+            FitControlsVinecop controls = FitControlsVinecop(),
+            const bool check_array = true);
+
+
+    // Constructors from files/serialized objects
     Vinecop(const char *filename, const bool check_matrix = true);
 
     Vinecop(const boost::property_tree::ptree input,
@@ -132,6 +160,8 @@ private:
     double loglik_;
 
     void check_data_dim(const Eigen::MatrixXd &data) const;
+    void check_pair_copulas_rvine_structure(
+        const std::vector<std::vector<Bicop>> &pair_copulas) const;
 };
 
 }
