@@ -114,6 +114,81 @@ inline Eigen::Matrix<ptrdiff_t, 1, 2> InterpolationGrid::get_ij(
     return out;
 }
 
+//inline Eigen::VectorXd
+//bilinear_interpolation(const Eigen::VectorXd& q11,
+//                       const Eigen::VectorXd& q12,
+//                       const Eigen::VectorXd& q21,
+//                       const Eigen::VectorXd& q22,
+//                       const Eigen::VectorXd& x1,
+//                       const Eigen::VectorXd& x2,
+//                       const Eigen::VectorXd& y1,
+//                       const Eigen::VectorXd& y2,
+//                       const Eigen::VectorXd& x,
+//                       const Eigen::VectorXd& y)
+//{
+//    size_t n = q11.size();
+//    Eigen::VectorXd x2x1(n), y2y1(n), x2x(n), y2y, yy1(n), xx1(n);
+//    x2x1 = x2 - x1;
+//    y2y1 = y2 - y1;
+//    x2x = x2 - x;
+//    y2y = y2 - y;
+//    yy1 = y - y1;
+//    xx1 = x - x1;
+//    return (q11.cwiseProduct(x2x).cwiseProduct(y2y) +
+//        q21.cwiseProduct(xx1).cwiseProduct(y2y) +
+//        q12.cwiseProduct(x2x).cwiseProduct(yy1) +
+//        q22.cwiseProduct(xx1).cwiseProduct(yy1)).cwiseQuotient(x2x1.cwiseProduct(y2y1));
+//}
+
+//inline double
+//bilinear_interpolation(double z11,
+//                       double z12,
+//                       double z21,
+//                       double z22,
+//                       double x1,
+//                       double x2,
+//                       double y1,
+//                       double y2,
+//                       double x,
+//                       double y)
+//{
+//    double x2x1, y2y1, x2x, y2y, yy1, xx1;
+//    x2x1 = x2 - x1;
+//    y2y1 = y2 - y1;
+//    x2x = x2 - x;
+//    y2y = y2 - y;
+//    yy1 = y - y1;
+//    xx1 = x - x1;
+//    return (z11 * x2x * y2y +
+//            z21 * xx1 * y2y +
+//            z12 * x2x * yy1 +
+//            z22 * xx1 * yy1) / (x2x1 * y2y1);
+//}
+//
+//inline Eigen::VectorXd
+//InterpolationGrid::interpolate(const Eigen::MatrixXd &x)
+//{
+//
+//    ptrdiff_t m = grid_points_.size();
+//    auto f = [&m, this](double x0, double x1) {
+//
+//        Eigen::Matrix<ptrdiff_t, 1, 2> ij = this->get_ij(x0, x1, m);
+//        return fmax(bilinear_interpolation(
+//            this->values_(ij(0), ij(1)),
+//            this->values_(ij(0), ij(1) + 1),
+//            this->values_(ij(0) + 1, ij(1)),
+//            this->values_(ij(0) + 1, ij(1) + 1),
+//            this->grid_points_(ij(0)),
+//            this->grid_points_(ij(0) + 1),
+//            this->grid_points_(ij(1)),
+//            this->grid_points_(ij(1) + 1),
+//            x0,
+//            x1), 1e-15);
+//    };
+//
+//    return tools_eigen::binaryExpr_or_nan(x, f);
+//}
+
 //! Interpolation in two dimensions
 //!
 //! @param x mx2 matrix of evaluation points.
@@ -122,10 +197,10 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd &x)
 {
     Eigen::VectorXd y(4), tmpgrid(4), tmpvals(4);
     ptrdiff_t m = grid_points_.size();
+
     auto f = [&m, this, &y, &tmpgrid, &tmpvals](double x0, double x1) {
         ptrdiff_t i0, i3;
 
-        Eigen::Matrix<ptrdiff_t, 1, 2> ij = this->get_ij(x0, x1, m);
         // construct grid for first direction
         i0 = std::max(ij(0) - 1, static_cast<ptrdiff_t>(0));
         i3 = std::min(ij(0) + 2, m - 1);
@@ -171,7 +246,7 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd &x)
 //! @param cond_var either 1 or 2; the axis considered fixed.
 //!
 inline Eigen::VectorXd
-InterpolationGrid::intergrate_1d(const Eigen::MatrixXd &u,
+InterpolationGrid::integrate_1d(const Eigen::MatrixXd &u,
                                  size_t cond_var)
 {
     ptrdiff_t m = grid_points_.size();
@@ -205,7 +280,7 @@ InterpolationGrid::intergrate_1d(const Eigen::MatrixXd &u,
 //! @param u mx2 matrix of evaluation points
 //!
 inline Eigen::VectorXd
-InterpolationGrid::intergrate_2d(const Eigen::MatrixXd &u)
+InterpolationGrid::integrate_2d(const Eigen::MatrixXd &u)
 {
     ptrdiff_t m = grid_points_.size();
     Eigen::VectorXd tmpvals(m), tmpvals2(m);
@@ -342,8 +417,6 @@ inline double InterpolationGrid::int_on_grid(const double &upr,
                                              const Eigen::VectorXd &grid)
 {
     ptrdiff_t m = grid.size();
-    Eigen::VectorXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
-    double uprnew, newint;
 
     double tmpint = 0.0;
 
@@ -354,28 +427,56 @@ inline double InterpolationGrid::int_on_grid(const double &upr,
             if (upr < grid(k))
                 break;
 
-            // select length 4 subvectors and calculate spline coefficients
-            tmpvals(0) = vals(std::max(k - 1, static_cast<ptrdiff_t>(0)));
-            tmpvals(1) = vals(k);
-            tmpvals(2) = vals(k + 1);
-            tmpvals(3) = vals(std::min(k + 2, m - 1));
-
-            tmpgrid(0) = grid(std::max(k - 1, static_cast<ptrdiff_t>(0)));
-            tmpgrid(1) = grid(k);
-            tmpgrid(2) = grid(k + 1);
-            tmpgrid(3) = grid(std::min(k + 2, m - 1));
-
-            tmpa = find_coefs(tmpvals, tmpgrid);
-
             // don't integrate over full cell if upr is in interior
-            uprnew = (upr - grid(k)) / (grid(k + 1) - grid(k));
-            newint = cubic_integral(0.0, fmin(1.0, uprnew), tmpa);
-            tmpint += newint * (grid(k + 1) - grid(k));
+            if (upr > grid(k)) {
+                tmpint += vals(k) * (upr - grid(k));
+            } else {
+                tmpint += (vals(k + 1) + vals(k)) * (grid(k + 1) - grid(k)) / 2.0;
+            }
         }
     }
 
     return tmpint;
 }
+//inline double InterpolationGrid::int_on_grid(const double &upr,
+//                                             const Eigen::VectorXd &vals,
+//                                             const Eigen::VectorXd &grid)
+//{
+//    ptrdiff_t m = grid.size();
+//    Eigen::VectorXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
+//    double uprnew, newint;
+//
+//    double tmpint = 0.0;
+//
+//    if (upr > grid(0)) {
+//        // go up the grid and integrate
+//        for (ptrdiff_t k = 0; k < m - 1; ++k) {
+//            // stop loop if fully integrated
+//            if (upr < grid(k))
+//                break;
+//
+//            // select length 4 subvectors and calculate spline coefficients
+//            tmpvals(0) = vals(std::max(k - 1, static_cast<ptrdiff_t>(0)));
+//            tmpvals(1) = vals(k);
+//            tmpvals(2) = vals(k + 1);
+//            tmpvals(3) = vals(std::min(k + 2, m - 1));
+//
+//            tmpgrid(0) = grid(std::max(k - 1, static_cast<ptrdiff_t>(0)));
+//            tmpgrid(1) = grid(k);
+//            tmpgrid(2) = grid(k + 1);
+//            tmpgrid(3) = grid(std::min(k + 2, m - 1));
+//
+//            tmpa = find_coefs(tmpvals, tmpgrid);
+//
+//            // don't integrate over full cell if upr is in interior
+//            uprnew = (upr - grid(k)) / (grid(k + 1) - grid(k));
+//            newint = cubic_integral(0.0, fmin(1.0, uprnew), tmpa);
+//            tmpint += newint * (grid(k + 1) - grid(k));*/
+//        }
+//    }
+//
+//    return tmpint;
+//}
 }
 
 }

@@ -12,5 +12,5 @@ TrafokernelTest::TrafokernelTest() {
     controls = FitControlsBicop({vinecopulib::BicopFamily::tll},
                                 "mle",
                                 GetParam());
-    u = tools_stats::simulate_uniform(100, 2);
+    u = tools_stats::simulate_uniform(2000, 2);
 }
