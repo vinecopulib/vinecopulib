@@ -96,11 +96,11 @@ TEST(test_tools_stats, seed_works) {
     std::vector<int> v = {1, 2, 3};
 
     auto U1 = tools_stats::simulate_uniform(n, d);
-    auto U2 = tools_stats::simulate_uniform(n, d);
+    auto U2 = tools_stats::simulate_uniform(n, d, v);
     auto U3 = tools_stats::simulate_uniform(n, d, v);
 
-    ASSERT_TRUE(U1.cwiseEqual(U2).all());
-    ASSERT_TRUE(U1.cwiseNotEqual(U3).all());
+    ASSERT_TRUE(U1.cwiseNotEqual(U2).all());
+    ASSERT_TRUE(U2.cwiseEqual(U3).all());
 
 }
 

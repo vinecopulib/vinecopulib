@@ -103,7 +103,7 @@ public:
     Eigen::MatrixXd simulate(const size_t n, 
                              const bool qrng = false, 
                              const size_t num_threads = 1,
-                             const std::vector<int>& seeds =  {1, 2, 3, 4}) const;
+                             const std::vector<int>& seeds = std::vector<int>()) const;
 
     Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd &u,
                                        const size_t num_threads = 1) const;
