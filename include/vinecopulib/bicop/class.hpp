@@ -75,7 +75,7 @@ public:
     Eigen::Matrix<double, Eigen::Dynamic, 2>
     simulate(const size_t &n, 
              const bool qrng = false,
-             const std::vector<int>& seeds =  {1, 2, 3, 4, 5, 6}) const;
+             const std::vector<int>& seeds = std::vector<int>()) const;
 
 
     // Methods modifying the family/rotation/parameters
