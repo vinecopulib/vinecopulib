@@ -332,36 +332,25 @@ inline double InterpolationGrid::int_on_grid(const double &upr,
                                              const Eigen::VectorXd &vals,
                                              const Eigen::VectorXd &grid)
 {
-    ptrdiff_t m = grid.size();
-    Eigen::VectorXd tmpvals(4), tmpgrid(4), tmpa(4), a(4);
-    double uprnew, newint;
-
     double tmpint = 0.0;
 
     if (upr > grid(0)) {
         // go up the grid and integrate
-        for (ptrdiff_t k = 0; k < m - 1; ++k) {
+        for (ptrdiff_t k = 0; k <  (grid.size() - 1); ++k) {
             // stop loop if fully integrated
             if (upr < grid(k))
                 break;
 
-            // select length 4 subvectors and calculate spline coefficients
-            tmpvals(0) = vals(std::max(k - 1, static_cast<ptrdiff_t>(0)));
-            tmpvals(1) = vals(k);
-            tmpvals(2) = vals(k + 1);
-            tmpvals(3) = vals(std::min(k + 2, m - 1));
-
-            tmpgrid(0) = grid(std::max(k - 1, static_cast<ptrdiff_t>(0)));
-            tmpgrid(1) = grid(k);
-            tmpgrid(2) = grid(k + 1);
-            tmpgrid(3) = grid(std::min(k + 2, m - 1));
-
-            tmpa = find_coefs(tmpvals, tmpgrid);
-
             // don't integrate over full cell if upr is in interior
-            uprnew = (upr - grid(k)) / (grid(k + 1) - grid(k));
-            newint = cubic_integral(0.0, fmin(1.0, uprnew), tmpa);
-            tmpint += newint * (grid(k + 1) - grid(k));
+            if (upr < grid(k + 1)) {
+                tmpint += (2 * vals(k) +
+                    (vals(k + 1) - vals(k)) *
+                        (upr - grid(k)) / (grid(k + 1) - grid(k))) *
+                    (upr - grid(k)) / 2.0;
+            } else {
+                tmpint += (vals(k + 1) + vals(k)) *
+                    (grid(k + 1) - grid(k)) / 2.0;
+            }
         }
     }
 
