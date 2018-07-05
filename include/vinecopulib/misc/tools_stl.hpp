@@ -147,6 +147,30 @@ bool is_member(vector <T> x, vector <T> y)
     return z.size() == x.size();
 }
 
+//template<class T>
+//size_t interpolation_search(vector <T> x, T key)
+//{
+//    size_t low = 0;
+//    size_t high = x.size() - 1;
+//    size_t mid;
+//
+//    while ((x(high) != x(low)) && (key >= x(low)) && (key <= x(high))) {
+//        mid = low + ((key - x(low)) * (high - low) / (x(high) - x(low)));
+//
+//        if (x(mid) < key)
+//            low = mid + 1;
+//        else if (key < x(mid))
+//            high = mid - 1;
+//        else
+//            return mid;
+//    }
+//
+//    if (key == x(low))
+//        return low ;
+//    else
+//        return -1;
+//}
+
 //! Integer sequence starting at 1
 inline vector <size_t> seq_int(size_t from, size_t length)
 {

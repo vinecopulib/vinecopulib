@@ -55,7 +55,7 @@ private:
     double interp_on_grid(const double &x, const Eigen::VectorXd &vals,
                           const Eigen::VectorXd &grid);
 
-    Eigen::Matrix<ptrdiff_t, 1, 2> get_ij(double x0, double x1, ptrdiff_t m);
+    Eigen::Matrix<ptrdiff_t, 1, 2> get_indices(double x0, double x1);
 
     // Utility functions for integration
     double int_on_grid(const double &upr, const Eigen::VectorXd &vals,

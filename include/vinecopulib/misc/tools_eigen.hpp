@@ -9,6 +9,7 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vector>
 #include <Eigen/Dense>
+#include <iostream>
 
 namespace vinecopulib {
 
@@ -20,7 +21,7 @@ typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
 template<typename T>
 Eigen::MatrixXd unaryExpr_or_nan(const Eigen::MatrixXd &x, const T &func)
 {
-    return x.unaryExpr([&func](const double& y) {
+    return x.unaryExpr([&func](const double &y) {
         return tools_stl::unaryFunc_or_nan(func, y);
     });
 }
@@ -37,6 +38,7 @@ Eigen::VectorXd binaryExpr_or_nan(
 }
 
 void remove_nans(Eigen::MatrixXd &x);
+
 void remove_nans(Eigen::MatrixXd &x, Eigen::VectorXd &weights);
 
 bool check_if_in_unit_cube(const Eigen::MatrixXd &u);
@@ -46,10 +48,12 @@ Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
 
 Eigen::VectorXd invert_f(
     const Eigen::VectorXd &x,
-    std::function<Eigen::VectorXd(const Eigen::VectorXd &)> f,
-    const double lb = 1e-20,
-    const double ub = 1 - 1e-20,
-    int n_iter = 35
+    std::function< Eigen::VectorXd(const Eigen::VectorXd &)
+
+> f,
+const double lb = 1e-20,
+const double ub = 1 - 1e-20,
+int n_iter = 35
 );
 
 Eigen::Matrix<double, Eigen::Dynamic, 2> expand_grid(
@@ -61,6 +65,37 @@ Eigen::MatrixXd read_matxd(const char *filename,
 
 Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
     const char *filename, int max_buffer_size = static_cast<int>(1e6));
+
+//template<class T>
+//size_t interpolation_search(Eigen::Matrix<T, Eigen::Dynamic, 1> x, T key)
+//{
+//    size_t low = 0, mid = 0, high = x.size() - 2;
+//
+//    if (key <= x(low))
+//        return low;
+//    if (key >= x(high))
+//        return high;
+//
+//    while ((low < high) && (key >= x(low)) && (key <= x(high))) {
+//        mid = low + static_cast<size_t>((key - x(low)) *
+//                                        static_cast<T>(high - low) /
+//                                        (x(high) - x(low)));
+//
+//        if (x(mid) < key)
+//            low = mid + 1;
+//        else if (key < x(mid))
+//            high = mid - 1;
+//        else
+//            break;
+//    }
+//
+//    if (x(mid) <= key)
+//        return mid;
+//    else
+//        return mid - 1;
+//
+//}
+
 }
 
 }
