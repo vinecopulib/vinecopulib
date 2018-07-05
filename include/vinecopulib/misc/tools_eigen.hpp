@@ -66,36 +66,6 @@ Eigen::MatrixXd read_matxd(const char *filename,
 Eigen::Matrix <size_t, Eigen::Dynamic, Eigen::Dynamic> read_matxs(
     const char *filename, int max_buffer_size = static_cast<int>(1e6));
 
-//template<class T>
-//size_t interpolation_search(Eigen::Matrix<T, Eigen::Dynamic, 1> x, T key)
-//{
-//    size_t low = 0, mid = 0, high = x.size() - 2;
-//
-//    if (key <= x(low))
-//        return low;
-//    if (key >= x(high))
-//        return high;
-//
-//    while ((low < high) && (key >= x(low)) && (key <= x(high))) {
-//        mid = low + static_cast<size_t>((key - x(low)) *
-//                                        static_cast<T>(high - low) /
-//                                        (x(high) - x(low)));
-//
-//        if (x(mid) < key)
-//            low = mid + 1;
-//        else if (key < x(mid))
-//            high = mid - 1;
-//        else
-//            break;
-//    }
-//
-//    if (x(mid) <= key)
-//        return mid;
-//    else
-//        return mid - 1;
-//
-//}
-
 }
 
 }
