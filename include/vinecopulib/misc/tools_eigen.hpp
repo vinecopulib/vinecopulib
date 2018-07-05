@@ -9,7 +9,6 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vector>
 #include <Eigen/Dense>
-#include <iostream>
 
 namespace vinecopulib {
 
@@ -48,17 +47,13 @@ Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
 
 Eigen::VectorXd invert_f(
     const Eigen::VectorXd &x,
-    std::function< Eigen::VectorXd(const Eigen::VectorXd &)
-
-> f,
-const double lb = 1e-20,
-const double ub = 1 - 1e-20,
-int n_iter = 35
-);
+    std::function<Eigen::VectorXd(const Eigen::VectorXd &)> f,
+    const double lb = 1e-20,
+    const double ub = 1 - 1e-20,
+    int n_iter = 35);
 
 Eigen::Matrix<double, Eigen::Dynamic, 2> expand_grid(
-    const Eigen::VectorXd &grid_points
-);
+    const Eigen::VectorXd &grid_points);
 
 Eigen::MatrixXd read_matxd(const char *filename,
                            int max_buffer_size = static_cast<int>(1e6));
