@@ -231,7 +231,8 @@ const
 //!
 //! @param n number of observations.
 //! @param qrng set to true for quasi-random numbers.
-//! @param seed seed of the random number generator.
+//! @param seeds seeds of the random number generator; if empty (default),
+//!   the random number generator is seeded randomly.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2>
 Bicop::simulate(const size_t& n, 

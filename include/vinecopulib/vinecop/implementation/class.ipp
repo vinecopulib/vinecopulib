@@ -664,7 +664,8 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N, const size_t num_threads)
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will generate `n` samples concurrently in 
 //!   `num_threads` batches.
-//! @param seed seed of the random number generator.
+//! @param seeds seeds of the random number generator; if empty (default),
+//!   the random number generator is seeded randomly.
 //! @return An \f$ n \times d \f$ matrix of samples from the copula model.
 inline Eigen::MatrixXd Vinecop::simulate(const size_t n, 
                                          const bool qrng,
