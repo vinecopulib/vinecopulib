@@ -139,13 +139,13 @@ public:
     // Fit statistics
     double calculate_npars() const;
 
-    double loglik(const Eigen::MatrixXd &u) const;
+    double loglik(const Eigen::MatrixXd &u, const size_t num_threads = 1) const;
 
-    double aic(const Eigen::MatrixXd &u) const;
+    double aic(const Eigen::MatrixXd &u, const size_t num_threads = 1) const;
 
-    double bic(const Eigen::MatrixXd &u) const;
+    double bic(const Eigen::MatrixXd &u, const size_t num_threads = 1) const;
     
-    double mbicv(const Eigen::MatrixXd &u, const double pi) const;
+    double mbicv(const Eigen::MatrixXd &u, const double pi, const size_t num_threads = 1) const;
 
     // Misc methods
     static std::vector <std::vector<Bicop>>

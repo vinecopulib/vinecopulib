@@ -691,9 +691,13 @@ inline Eigen::MatrixXd Vinecop::simulate(const size_t n,
 //! where \f$ c \f$ is the copula density pdf().
 //!
 //! @param u \f$n \times d\f$ matrix of observations.
-inline double Vinecop::loglik(const Eigen::MatrixXd &u) const
+//! @param num_threads the number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
+inline double Vinecop::loglik(const Eigen::MatrixXd &u, 
+                              const size_t num_threads) const
 {
-    return pdf(u).array().log().sum();
+    return pdf(u, num_threads).array().log().sum();
 }
 
 //! calculates the Akaike information criterion (AIC), whic is defined as
@@ -704,9 +708,13 @@ inline double Vinecop::loglik(const Eigen::MatrixXd &u) const
 //! for nonparametric models.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
-inline double Vinecop::aic(const Eigen::MatrixXd &u) const
+//! @param num_threads the number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
+inline double Vinecop::aic(const Eigen::MatrixXd &u, 
+                           const size_t num_threads) const
 {
-    return -2 * loglik(u) + 2 * calculate_npars();
+    return -2 * loglik(u, num_threads) + 2 * calculate_npars();
 }
 
 //! calculates the Bayesian information criterion (BIC), which is defined as
@@ -717,9 +725,14 @@ inline double Vinecop::aic(const Eigen::MatrixXd &u) const
 //! for nonparametric models.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
-inline double Vinecop::bic(const Eigen::MatrixXd &u) const
+//! @param num_threads the number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
+inline double Vinecop::bic(const Eigen::MatrixXd &u, 
+                           const size_t num_threads) const
 {
-    return -2 * loglik(u) + calculate_npars() * log(static_cast<double>(u.rows()));
+    return -2 * loglik(u, num_threads) + 
+        calculate_npars() * log(static_cast<double>(u.rows()));
 }
 
 //! calculates the modified Bayesian information criterion for vines (mBICV), 
@@ -735,7 +748,12 @@ inline double Vinecop::bic(const Eigen::MatrixXd &u) const
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 //! @param pi baseline prior probability of a non-independence copula.
-inline double Vinecop::mbicv(const Eigen::MatrixXd &u, const double pi) const
+//! @param num_threads the number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
+inline double Vinecop::mbicv(const Eigen::MatrixXd &u, 
+                             const double pi, 
+                             const size_t num_threads) const
 {
     if (!(pi > 0.0) | !(pi < 1.0)) {
         throw std::runtime_error("pi must be in the interval (0, 1)");
@@ -762,7 +780,7 @@ inline double Vinecop::mbicv(const Eigen::MatrixXd &u, const double pi) const
     }
     double npars = this->calculate_npars();
     double n = static_cast<double>(u.rows());
-    double ll = this->loglik(u);
+    double ll = this->loglik(u, num_threads);
     double log_prior = (
         non_indeps.cast<double>().array() * pis.array().log() +
         (d_ - non_indeps.array() - sq.array()).cast<double>() * 
