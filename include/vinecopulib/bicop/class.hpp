@@ -136,6 +136,7 @@ private:
 
     BicopPtr bicop_;
     int rotation_;
+    size_t nobs_;
 };
 }
 

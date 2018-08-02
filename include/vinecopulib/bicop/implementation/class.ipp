@@ -396,7 +396,7 @@ inline size_t Bicop::get_nobs() const
         throw std::runtime_error("copula has not been fitted from data or its "
                                      "parameters have been modified manually");
     }
-    return bicop_->get_nobs();
+    return nobs_;
 }
 
 inline double Bicop::get_aic() const
@@ -417,9 +417,8 @@ inline double Bicop::get_bic() const
         throw std::runtime_error("copula has not been fitted from data or its "
                                      "parameters have been modified manually");
     }
-    size_t nobs = bicop_->get_nobs();
     double npars = bicop_->calculate_npars();
-    return -2 * loglik + std::log(nobs) * npars;
+    return -2 * loglik + std::log(nobs_) * npars;
 }
 
 inline double Bicop::get_mbic(const double psi0) const
@@ -429,8 +428,7 @@ inline double Bicop::get_mbic(const double psi0) const
         throw std::runtime_error("copula has not been fitted from data or its "
                                      "parameters have been modified manually");
     }
-    size_t nobs = bicop_->get_nobs();
-    return -2 * loglik + compute_mbic_penalty(nobs, psi0);
+    return -2 * loglik + compute_mbic_penalty(nobs_, psi0);
 }
 
 inline double Bicop::compute_mbic_penalty(const size_t nobs, const double psi0) const
@@ -539,6 +537,7 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 method,
                 controls.get_nonparametric_mult(),
                 w);
+    nobs_ = data.rows();
 }
 
 //! selects the best fitting model, by calling fit() for all families in
