@@ -537,7 +537,7 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 method,
                 controls.get_nonparametric_mult(),
                 w);
-    nobs_ = data.rows();
+    nobs_ = data_no_nan.rows();
 }
 
 //! selects the best fitting model, by calling fit() for all families in
@@ -559,6 +559,7 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         controls.set_weights(w);
     }
     tools_eigen::check_if_in_unit_cube(data_no_nan);
+    nobs_ = data_no_nan.rows();
 
     bicop_ = AbstractBicop::create();
     rotation_ = 0;
