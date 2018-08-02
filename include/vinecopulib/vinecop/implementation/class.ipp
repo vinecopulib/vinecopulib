@@ -563,11 +563,11 @@ inline double Vinecop::get_mbicv(const double psi0) const
     if (std::isnan(loglik_)) {
         throw std::runtime_error("copula has not been fitted from data ");
     }
-    return -2 * loglik_ + this->compute_mbicv_penalty(nobs_, psi0);
+    return -2 * loglik_ + this->calculate_mbicv_penalty(nobs_, psi0);
 }
 
 //! computes the penalty term for mBICV
-inline double Vinecop::compute_mbicv_penalty(const size_t nobs, 
+inline double Vinecop::calculate_mbicv_penalty(const size_t nobs, 
                                              const double psi0) const
 {
     if (!(psi0 > 0.0) | !(psi0 < 1.0)) {
@@ -840,7 +840,7 @@ inline double Vinecop::mbicv(const Eigen::MatrixXd &u,
     
     double n = static_cast<double>(u.rows());
     double ll = this->loglik(u, num_threads);
-    return -2 * ll + this->compute_mbicv_penalty(n, psi0);;       
+    return -2 * ll + this->calculate_mbicv_penalty(n, psi0);;       
 }
 
 //! returns sum of the number of parameters for all pair copulas (see
