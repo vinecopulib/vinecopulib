@@ -701,8 +701,11 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will generate `n` samples concurrently in 
 //!   `num_threads` batches.
+//! @param seeds seeds to scramble the quasi-random numbers; if empty (default),
+//!   the random number quasi-generator is seeded randomly.
 inline Eigen::VectorXd
-Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N, const size_t num_threads) const
+Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N,
+             const size_t num_threads, std::vector<int> seeds) const
 {
     if (d_ > 21201) {
         std::stringstream message;
@@ -717,9 +720,9 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N, const size_t num_threads)
     // Simulate N quasi-random numbers from the vine model
     Eigen::MatrixXd U(N, d_);
     if (d_ > 300) {
-        U = tools_stats::sobol(N, d_);
+        U = tools_stats::sobol(N, d_, seeds);
     } else {
-        U = tools_stats::ghalton(N, d_);
+        U = tools_stats::ghalton(N, d_, seeds);
     }
     U = inverse_rosenblatt(U, num_threads);
 
@@ -757,9 +760,9 @@ inline Eigen::MatrixXd Vinecop::simulate(const size_t n,
     Eigen::MatrixXd U(n, d_);
     if (qrng) {
         if (d_ > 300) {
-            U = tools_stats::sobol(n, d_);
+            U = tools_stats::sobol(n, d_, seeds);
         } else {
-            U = tools_stats::ghalton(n, d_);
+            U = tools_stats::ghalton(n, d_, seeds);
         }
     } else {
         U = tools_stats::simulate_uniform(n, d_, seeds);
