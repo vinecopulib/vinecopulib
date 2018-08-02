@@ -38,4 +38,16 @@ TEST(bicop_select, allows_all_selcrits) {
     cop.select(u, controls);
 }
 
+TEST(bicop_select, fit_stats_are_correct) {
+    Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
+    auto u = cop.simulate(15);
+    cop.select(u);
+    EXPECT_EQ(cop.get_nobs(), 15);
+    EXPECT_NEAR(cop.get_loglik(),  cop.loglik(u), 1e-10);
+    EXPECT_NEAR(cop.get_aic(),     cop.aic(u), 1e-10);
+    EXPECT_NEAR(cop.get_bic(),     cop.bic(u), 1e-10);
+    EXPECT_NEAR(cop.get_mbic(0.6), cop.mbic(u, 0.6), 1e-10);
+}
+
+
 }
