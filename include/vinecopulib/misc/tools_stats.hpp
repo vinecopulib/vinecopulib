@@ -109,9 +109,11 @@ double pairwise_hoeffd(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
 Eigen::MatrixXd dependence_matrix(const Eigen::MatrixXd &x,
                                   const std::string &measure);
 
-Eigen::MatrixXd ghalton(const size_t n, const size_t d);
+Eigen::MatrixXd ghalton(const size_t& n, const size_t& d,
+                        std::vector<int> seeds = std::vector<int>());
 
-Eigen::MatrixXd sobol(const size_t n, const size_t d);
+Eigen::MatrixXd sobol(const size_t& n, const size_t& d,
+                      std::vector<int> seeds = std::vector<int>());
 
 Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
                      int nu, double rho);

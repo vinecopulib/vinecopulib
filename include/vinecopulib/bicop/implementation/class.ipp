@@ -231,8 +231,8 @@ const
 //!
 //! @param n number of observations.
 //! @param qrng set to true for quasi-random numbers.
-//! @param seeds seeds of the random number generator; if empty (default),
-//!   the random number generator is seeded randomly.
+//! @param seeds seeds of the (quasi-)random number generator; if empty (default),
+//!   the (quasi-)random number generator is seeded randomly.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2>
 Bicop::simulate(const size_t& n, 
@@ -241,7 +241,7 @@ Bicop::simulate(const size_t& n,
 {
     Eigen::Matrix<double, Eigen::Dynamic, 2> U;
     if (qrng) {
-        U = tools_stats::ghalton(n, 2);
+        U = tools_stats::ghalton(n, 2, seeds);
     } else {
         U = tools_stats::simulate_uniform(n, 2, seeds);
     }
@@ -343,7 +343,7 @@ inline Eigen::MatrixXd Bicop::tau_to_parameters(const double &tau) const
 }
 
 //! converts the parameters to the Kendall's \f$ tau \f$ for the current
-//! family (works for all families but `BicopFamily::tll`).
+//! family.
 //!
 //! @param parameters the parameters (must be a valid parametrization of
 //!     the current family).
