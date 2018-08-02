@@ -113,12 +113,15 @@ public:
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
     TriangularArray<size_t> get_struct_array() const;
-        
-    // getter for the threshold
+    
+    // getters for fit statistics
     double get_threshold() const;
-
-    // getter for the loglik
     double get_loglik() const;
+    size_t get_nobs() const;
+    double get_aic() const;
+    double get_bic() const;
+    double get_mbicv(const double pi) const;
+
 
     // Stats methods
     Eigen::VectorXd pdf(const Eigen::MatrixXd &u,
@@ -158,10 +161,12 @@ private:
     std::vector <std::vector<Bicop>> pair_copulas_;
     double threshold_;
     double loglik_;
+    size_t nobs_;
 
     void check_data_dim(const Eigen::MatrixXd &data) const;
     void check_pair_copulas_rvine_structure(
         const std::vector<std::vector<Bicop>> &pair_copulas) const;
+    double compute_mbicv_penalty(const size_t nobs, const double pi) const;
 };
 
 }
