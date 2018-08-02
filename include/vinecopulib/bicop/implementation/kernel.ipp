@@ -32,21 +32,21 @@ inline Eigen::VectorXd KernelBicop::cdf(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {
-    return interp_grid_.intergrate_2d(u);
+    return interp_grid_.integrate_2d(u);
 }
 
 inline Eigen::VectorXd KernelBicop::hfunc1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {
-    return interp_grid_.intergrate_1d(u, 1);
+    return interp_grid_.integrate_1d(u, 1);
 }
 
 inline Eigen::VectorXd KernelBicop::hfunc2(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {
-    return interp_grid_.intergrate_1d(u, 2);
+    return interp_grid_.integrate_1d(u, 2);
 }
 
 inline Eigen::VectorXd KernelBicop::hinv1(

@@ -1,3 +1,22 @@
+# vinecopulib 0.3.0 (June 11, 2018)
+
+NEW FEATURES
+
+   * refactor vine structures and related algorithms with triangular arrays (#347)
+
+   * improve random number generation: allow for seeds and quasi-random 
+     numbers (#342)
+
+   * improve parallelization (#338, #339, #344)
+
+BUG FIXES
+
+   * fix cdf of StudentBicop (#353)
+
+   * improve numerical stability (#345, #350)
+
+   * fix gcc-8 warning (#340)
+
 # vinecopulib 0.2.8 (May 4, 2018)
 
 NEW FEATURES
