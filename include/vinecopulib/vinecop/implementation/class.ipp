@@ -558,20 +558,20 @@ inline double Vinecop::get_bic() const
 
 //! extracts the log-likelihood (throws an error if model has not been 
 //! fitted to data).
-inline double Vinecop::get_mbicv(const double pi) const
+inline double Vinecop::get_mbicv(const double psi0) const
 {
     if (std::isnan(loglik_)) {
         throw std::runtime_error("copula has not been fitted from data ");
     }
-    return -2 * loglik_ + this->compute_mbicv_penalty(nobs_, pi);
+    return -2 * loglik_ + this->compute_mbicv_penalty(nobs_, psi0);
 }
 
 //! computes the penalty term for mBICV
 inline double Vinecop::compute_mbicv_penalty(const size_t nobs, 
-                                             const double pi) const
+                                             const double psi0) const
 {
-    if (!(pi > 0.0) | !(pi < 1.0)) {
-        throw std::runtime_error("pi must be in the interval (0, 1)");
+    if (!(psi0 > 0.0) | !(psi0 < 1.0)) {
+        throw std::runtime_error("psi0 must be in the interval (0, 1)");
     }    
     auto all_fams = get_all_families();
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps(d_ - 1);
@@ -588,16 +588,16 @@ inline double Vinecop::compute_mbicv_penalty(const size_t nobs,
     }
     auto sq0 = tools_stl::seq_int(1, d_ - 1);
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> sq(d_ - 1);
-    auto pis = Eigen::VectorXd(d_ - 1);
+    auto psis = Eigen::VectorXd(d_ - 1);
     for (size_t i = 0; i < d_ - 1; i++) {
         sq(i) = sq0[i];
-        pis(i) = std::pow(pi, sq0[i]);
+        psis(i) = std::pow(psi0, sq0[i]);
     }
     double npars = this->calculate_npars();
     double log_prior = (
-        non_indeps.cast<double>().array() * pis.array().log() +
+        non_indeps.cast<double>().array() * psis.array().log() +
         (d_ - non_indeps.array() - sq.array()).cast<double>() * 
-        (1 - pis.array()).log()
+        (1 - psis.array()).log()
     ).sum();
     
     return std::log(nobs) * npars - 2 * log_prior;
@@ -829,18 +829,18 @@ inline double Vinecop::bic(const Eigen::MatrixXd &u,
 //! parametric sparse vine copula models when \f$ d = o(\sqrt{n \ln n})\f$.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
-//! @param pi baseline prior probability of a non-independence copula.
+//! @param psi0 baseline prior probability of a non-independence copula.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
 inline double Vinecop::mbicv(const Eigen::MatrixXd &u, 
-                             const double pi, 
+                             const double psi0, 
                              const size_t num_threads) const
 {
     
     double n = static_cast<double>(u.rows());
     double ll = this->loglik(u, num_threads);
-    return -2 * ll + this->compute_mbicv_penalty(n, pi);;       
+    return -2 * ll + this->compute_mbicv_penalty(n, psi0);;       
 }
 
 //! returns sum of the number of parameters for all pair copulas (see

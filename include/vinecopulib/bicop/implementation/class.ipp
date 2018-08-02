@@ -390,6 +390,59 @@ inline double Bicop::get_loglik() const
     return loglik;
 }
 
+inline size_t Bicop::get_nobs() const
+{
+    if ((boost::math::isnan)(bicop_->get_loglik())) {
+        throw std::runtime_error("copula has not been fitted from data or its "
+                                     "parameters have been modified manually");
+    }
+    return bicop_->get_nobs();
+}
+
+inline double Bicop::get_aic() const
+{
+    double loglik = bicop_->get_loglik();
+    if ((boost::math::isnan)(loglik)) {
+        throw std::runtime_error("copula has not been fitted from data or its "
+                                     "parameters have been modified manually");
+    }
+    double npars = bicop_->calculate_npars();
+    return -2 * loglik + 2 * npars;
+}
+
+inline double Bicop::get_bic() const
+{
+    double loglik = bicop_->get_loglik();
+    if ((boost::math::isnan)(loglik)) {
+        throw std::runtime_error("copula has not been fitted from data or its "
+                                     "parameters have been modified manually");
+    }
+    size_t nobs = bicop_->get_nobs();
+    double npars = bicop_->calculate_npars();
+    return -2 * loglik + std::log(nobs) * npars;
+}
+
+inline double Bicop::get_mbic(const double psi0) const
+{
+    double loglik = bicop_->get_loglik();
+    if ((boost::math::isnan)(loglik)) {
+        throw std::runtime_error("copula has not been fitted from data or its "
+                                     "parameters have been modified manually");
+    }
+    size_t nobs = bicop_->get_nobs();
+    return -2 * loglik + compute_mbic_penalty(nobs, psi0);
+}
+
+inline double Bicop::compute_mbic_penalty(const size_t nobs, const double psi0) const
+{
+    double npars = bicop_->calculate_npars();
+    bool is_indep = (this->get_family() == BicopFamily::indep);
+    double log_prior = 
+        static_cast<double>(!is_indep) * std::log(psi0) +
+        static_cast<double>(is_indep) * std::log(1.0 - psi0);
+    return std::log(nobs) * npars  - 2 * log_prior;
+}
+
 inline double Bicop::get_tau() const
 {
     return parameters_to_tau(bicop_->get_parameters());

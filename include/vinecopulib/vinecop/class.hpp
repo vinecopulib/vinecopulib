@@ -120,7 +120,7 @@ public:
     size_t get_nobs() const;
     double get_aic() const;
     double get_bic() const;
-    double get_mbicv(const double pi) const;
+    double get_mbicv(const double psi0) const;
 
 
     // Stats methods
@@ -148,7 +148,7 @@ public:
 
     double bic(const Eigen::MatrixXd &u, const size_t num_threads = 1) const;
     
-    double mbicv(const Eigen::MatrixXd &u, const double pi, const size_t num_threads = 1) const;
+    double mbicv(const Eigen::MatrixXd &u, const double psi0, const size_t num_threads = 1) const;
 
     // Misc methods
     static std::vector <std::vector<Bicop>>
@@ -166,7 +166,7 @@ private:
     void check_data_dim(const Eigen::MatrixXd &data) const;
     void check_pair_copulas_rvine_structure(
         const std::vector<std::vector<Bicop>> &pair_copulas) const;
-    double compute_mbicv_penalty(const size_t nobs, const double pi) const;
+    double compute_mbicv_penalty(const size_t nobs, const double psi0) const;
 };
 
 }
