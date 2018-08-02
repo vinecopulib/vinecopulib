@@ -71,6 +71,21 @@ TEST_F(VinecopTest, getters_are_correct) {
     }
 
     EXPECT_ANY_THROW(vinecop.get_loglik());
+    EXPECT_ANY_THROW(vinecop.get_nobs());
+    EXPECT_ANY_THROW(vinecop.get_aic());
+    EXPECT_ANY_THROW(vinecop.get_bic());
+    EXPECT_ANY_THROW(vinecop.get_mbicv(0.6));
+}
+
+TEST_F(VinecopTest, fit_statistics_getters_are_correct) {
+    auto data = tools_stats::simulate_uniform(100, 3);
+    auto vc = Vinecop(data, FitControlsVinecop({BicopFamily::clayton}));
+
+    EXPECT_NEAR(vc.get_loglik(),   vc.loglik(data), 1e-10);
+    EXPECT_NEAR(vc.get_nobs(),     100, 1e-10);
+    EXPECT_NEAR(vc.get_aic(),      vc.aic(data), 1e-10);
+    EXPECT_NEAR(vc.get_bic(),      vc.bic(data), 1e-10);
+    EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
 }
 
 TEST_F(VinecopTest, pdf_is_correct) {
