@@ -108,8 +108,11 @@ public:
     std::vector <std::vector<double>> get_all_taus() const;
 
     // Getters for the structure
+    size_t get_dim() const;
+
     std::vector<size_t> get_order() const;
-    RVineStructure get_vine_struct() const;
+
+    RVineStructure get_rvine_structure() const;
 
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
