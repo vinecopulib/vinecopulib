@@ -503,6 +503,13 @@ Vinecop::get_order() const
 }
 
 //! extracts the structure matrix of the vine copula model.
+inline RVineStructure
+Vinecop::get_vine_struct() const
+{
+    return vine_struct_;
+}
+
+//! extracts the structure matrix of the vine copula model.
 inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>
 Vinecop::get_matrix() const
 {

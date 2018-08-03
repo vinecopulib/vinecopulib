@@ -109,6 +109,7 @@ public:
 
     // Getters for the structure
     std::vector<size_t> get_order() const;
+    RVineStructure get_vine_struct() const;
 
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 

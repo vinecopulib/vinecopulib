@@ -70,6 +70,7 @@ TEST_F(VinecopTest, getters_are_correct) {
         }
     }
 
+    EXPECT_NO_THROW(vinecop.get_vine_struct());
     EXPECT_ANY_THROW(vinecop.get_loglik());
     EXPECT_ANY_THROW(vinecop.get_nobs());
     EXPECT_ANY_THROW(vinecop.get_aic());
