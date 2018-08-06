@@ -29,6 +29,11 @@ TEST(rvine_structure, triangular_array_works) {
     std::ostringstream oss;
     oss << my_rvm;
     EXPECT_EQ(oss.str(), my_rvm.str());
+
+    std::vector<size_t> myvec = {1, 2};
+    EXPECT_NO_THROW(my_rvm.set_column(4, myvec));
+    EXPECT_ANY_THROW(my_rvm.set_column(6, myvec));
+    EXPECT_ANY_THROW(my_rvm.set_column(3, myvec));
 }
 
 TEST(rvine_structure, can_convert_to_natural_order) {
