@@ -173,7 +173,7 @@ TEST_F(VinecopTest, rosenblatt_is_correct) {
     }
     vinecop = Vinecop(pair_copulas, model_matrix);
     ASSERT_TRUE(vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
-    
+
     // bivariate case
     pair_copulas = Vinecop::make_pair_copula_store(2);
     for (auto &tree : pair_copulas) {
@@ -278,6 +278,7 @@ TEST_F(VinecopTest, works_multi_threaded) {
     // check if parallel evaluators have same output as single threaded ones
     EXPECT_EQ(fit2.pdf(u, 2), fit2.pdf(u));
     EXPECT_EQ(fit2.inverse_rosenblatt(u, 2), fit2.inverse_rosenblatt(u));
+    EXPECT_EQ(fit2.rosenblatt(u, 2), fit2.rosenblatt(u));
 
     //just check that it works
     fit2.simulate(2, false, 3);
