@@ -75,17 +75,18 @@ TEST(test_tools_stats, qrng_are_correct) {
 }
 
 TEST(test_tools_stats, mcor_works) {
-    Eigen::MatrixXd Z = tools_stats::simulate_uniform(1000, 2);
+    std::vector<int> seeds = {1, 2, 3, 4, 5};
+    Eigen::MatrixXd Z = tools_stats::simulate_uniform(10000, 2, seeds);
     Z = tools_stats::qnorm(Z);
-    Z.block(0, 1, 500, 1) =
-        Z.block(0, 1, 500, 1) + Z.block(0, 0, 500, 1).cwiseAbs2();
+    Z.block(0, 1, 5000, 1) =
+        Z.block(0, 1, 5000, 1) + Z.block(0, 0, 5000, 1).cwiseAbs2();
     auto a1 = tools_stats::pairwise_mcor(Z);
-    Eigen::VectorXd weights = Eigen::VectorXd::Ones(1000);
+    Eigen::VectorXd weights = Eigen::VectorXd::Ones(10000);
     auto a2 = tools_stats::pairwise_mcor(Z, weights);
     ASSERT_TRUE(std::fabs(a1 - a2) < 1e-4);
 
-    a1 = tools_stats::pairwise_mcor(Z.block(0, 0, 500, 2));
-    weights.block(500, 0, 500, 1) = Eigen::VectorXd::Zero(500);
+    a1 = tools_stats::pairwise_mcor(Z.block(0, 0, 5000, 2));
+    weights.block(5000, 0, 5000, 1) = Eigen::VectorXd::Zero(5000);
     a2 = tools_stats::pairwise_mcor(Z, weights);
     ASSERT_TRUE(std::fabs(a1 - a2) < 0.05);   
 }
