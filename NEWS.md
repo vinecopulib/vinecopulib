@@ -1,7 +1,10 @@
-# vinecopulib 0.3.0 (August 6, 2018)
+# vinecopulib 0.3.0 (August 7, 2018)
 
 NEW FEATURES
 
+   * new function `Vinecop::rosenblatt()` for computing the Rosenblatt 
+     transformation (#367).
+  
    * faster algorithms for nonparametric copulas based on bilinear interpolation
      (#357).
 
