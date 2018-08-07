@@ -151,6 +151,43 @@ TEST_F(VinecopTest, simulate_is_correct) {
     vinecop.simulate(10, true);
 }
 
+TEST_F(VinecopTest, rosenblatt_is_correct) {
+    // multivariate
+    auto pair_copulas = Vinecop::make_pair_copula_store(7);
+    auto par = Eigen::VectorXd::Constant(1, 3.0);
+    for (auto &tree : pair_copulas) {
+        for (auto &pc : tree) {
+            pc = Bicop(BicopFamily::clayton, 270, par);
+        }
+    }
+    Vinecop vinecop(pair_copulas, model_matrix);
+    auto u = vinecop.simulate(5);
+    ASSERT_TRUE(vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+
+    // truncated multivariate
+    pair_copulas = Vinecop::make_pair_copula_store(7, 2);
+    for (auto &tree : pair_copulas) {
+        for (auto &pc : tree) {
+            pc = Bicop(BicopFamily::clayton, 270, par);
+        }
+    }
+    vinecop = Vinecop(pair_copulas, model_matrix);
+    ASSERT_TRUE(vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+    
+    // bivariate case
+    pair_copulas = Vinecop::make_pair_copula_store(2);
+    for (auto &tree : pair_copulas) {
+        for (auto &pc : tree) {
+            pc = Bicop(BicopFamily::clayton, 270, par);
+        }
+    }
+    Eigen::Matrix<size_t, 2, 2> mat;
+    mat << 1, 1, 2, 0;
+    vinecop = Vinecop(pair_copulas, mat);
+    u = vinecop.simulate(5);
+    ASSERT_TRUE(vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+}
+
 TEST_F(VinecopTest, aic_bic_are_correct) {
 
     int d = 7;
