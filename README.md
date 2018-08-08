@@ -28,7 +28,7 @@ Advantages over VineCopula are
 #### Status
 
 Version [0.3.0](https://github.com/vinecopulib/vinecopulib/releases) was
-released on June 11, 2018. While we did our best to
+released on August 7, 2018. While we did our best to
 design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for
 [R](https://github.com/vinecopulib/rvinecopulib) and
@@ -350,7 +350,7 @@ std::cout <<
 ```
 As it's arguably the most important function of the `Bicop` class, it's worth
 understanding the second argument of `select()`, namely an object of the class
-`FitControlsBicop`, which contain seven data members:
+`FitControlsBicop`, which contain several data members:
 * `std::vector<BicopFamily> family_set` describes the set of family to select
 from. It can take a user specified vector of
 families or any of those mentioned above (default is `bicop_families::all`).
@@ -366,6 +366,7 @@ degree zero, one and two.
 are multiplied.
 * `std::string selection_criterion` describes the criterion to compare the
 families. It can take either `"loglik"`, `"aic"`, or `"bic"`(default).
+* `Eigen::VectorXd weights` an optional vector of weights for the observations.
 * `bool preselect_families` describes a heuristic preselection method (default
 is `true`) based on symmetry properties of the data (e.g., the unrotated
 Clayton won't be preselected if the data displays upper-tail dependence).

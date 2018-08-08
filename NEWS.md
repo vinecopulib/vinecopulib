@@ -1,21 +1,34 @@
-# vinecopulib 0.3.0 (June 11, 2018)
+# vinecopulib 0.3.0 (August 7, 2018)
 
 NEW FEATURES
 
-   * refactor vine structures and related algorithms with triangular arrays (#347)
+   * new function `Vinecop::rosenblatt()` for computing the Rosenblatt 
+     transformation (#367).
+  
+   * faster algorithms for nonparametric copulas based on bilinear interpolation
+     (#357).
+
+   * refactor vine structures and related algorithms with triangular arrays 
+     to improve efficience of truncated models (#347, #354, #365). 
 
    * improve random number generation: allow for seeds and quasi-random 
-     numbers (#342)
+     numbers (#342, #356).
 
-   * improve parallelization (#338, #339, #344)
+   * improved parallelization for fitting vine copula models (#338, #344).
+
+   * parallelized versions of many algorithms including pdf, cdf and simulation 
+     (#339, #363).
+     
+   * allow weights for observations (#336).
 
 BUG FIXES
 
-   * fix cdf of StudentBicop (#353)
+   * fix cdf of StudentBicop (#353).
 
-   * improve numerical stability (#345, #350)
+   * improve numerical stability (#345, #350).
 
-   * fix gcc-8 warning (#340)
+   * fix gcc-8 warning (#340).
+
 
 # vinecopulib 0.2.8 (May 4, 2018)
 
