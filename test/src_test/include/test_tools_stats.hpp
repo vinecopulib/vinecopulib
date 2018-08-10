@@ -39,50 +39,7 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct) {
     EXPECT_ANY_THROW(tools_stats::to_pseudo_obs(X2, "something"));
 }
 
-TEST(test_tools_stats, pairwise_dep_measures_are_correct) {
-    // Independence
-    Eigen::Matrix<double, Eigen::Dynamic, 2> X(10, 2);
-    X << 4, 6,
-        7, 3,
-        1, 8,
-        9, 10,
-        10, 5,
-        6, 7,
-        5, 9,
-        8, 1,
-        3, 2,
-        2, 4;
-    X = X.array() / 10.0;
-    EXPECT_NEAR(tools_stats::pairwise_tau(X), 0.0, 5e-1);
-    EXPECT_NEAR(tools_stats::pairwise_cor(X), 0.0, 5e-1);
-    EXPECT_NEAR(tools_stats::pairwise_rho(X), 0.0, 5e-1);
-    EXPECT_NEAR(tools_stats::pairwise_hoeffd(X), 0.0, 5e-1);
-
-    // Perfect (negative) dependence
-    X.col(1) = 1.0 - X.col(0).array();
-    EXPECT_NEAR(tools_stats::pairwise_tau(X), -1.0, 1e-3);
-    EXPECT_NEAR(tools_stats::pairwise_cor(X), -1.0, 1e-3);
-    EXPECT_NEAR(tools_stats::pairwise_rho(X), -1.0, 1e-3);
-    EXPECT_NEAR(tools_stats::pairwise_hoeffd(X), 1.0, 1e-3);
-
-
-}
-
-TEST(test_tools_stats, dependence_matrix_works) {
-    auto u = tools_stats::simulate_uniform(10, 4);
-    auto mat = tools_stats::dependence_matrix(u, "tau");
-    EXPECT_TRUE((mat.diagonal().array() == 1.0).all());
-    EXPECT_TRUE(mat(0, 1) == mat(1, 0));
-
-    // only check if it works from here one
-    tools_stats::dependence_matrix(u, "cor");
-    tools_stats::dependence_matrix(u, "mcor");
-    tools_stats::dependence_matrix(u, "rho");
-    tools_stats::dependence_matrix(u, "hoeffd");
-    EXPECT_ANY_THROW(tools_stats::dependence_matrix(u, "other"));
-}
-
-TEST(test_tools_stats, ghalton_is_correct) {
+TEST(test_tools_stats, qrng_are_correct) {
 
     size_t d = 2;
     size_t n = 10;
@@ -91,9 +48,10 @@ TEST(test_tools_stats, ghalton_is_correct) {
     auto cop = Bicop(BicopFamily::gaussian);
     auto u = cop.simulate(n);
     auto U = tools_stats::ghalton(N, d);
+    auto U1 = tools_stats::sobol(N, d);
     auto U2 = tools_stats::simulate_uniform(N, d);
 
-    Eigen::VectorXd x(N), p(n), x2(N), p2(n);
+    Eigen::VectorXd x(N), p(n), p1(N), x2(N), p2(n);
     p2 = Eigen::VectorXd::Zero(n);
     for (size_t i = 0; i < n; i++) {
         auto f = [i, u](const double &u1, const double &u2) {
@@ -101,14 +59,49 @@ TEST(test_tools_stats, ghalton_is_correct) {
         };
         x = U.col(0).binaryExpr(cop.hinv1(U), f);
         p(i) = x.sum() / N;
+        x = U1.col(0).binaryExpr(cop.hinv1(U1), f);
+        p1(i) = x.sum() / N;
         x2 = U2.col(0).binaryExpr(cop.hinv1(U2), f);
         p2(i) = x2.sum() / N;
     }
 
-    if (p2.isApprox(cop.cdf(u), 1e-2)) {
-        ASSERT_TRUE(p.isApprox(cop.cdf(u), 1e-2));
+    x = cop.cdf(u);
+    if (p2.isApprox(x, 1e-2)) {
+        ASSERT_TRUE(p.isApprox(x, 1e-2));
+        ASSERT_TRUE(p1.isApprox(x, 1e-2));
     }
 
+
+}
+
+TEST(test_tools_stats, mcor_works) {
+    std::vector<int> seeds = {1, 2, 3, 4, 5};
+    Eigen::MatrixXd Z = tools_stats::simulate_uniform(10000, 2, seeds);
+    Z = tools_stats::qnorm(Z);
+    Z.block(0, 1, 5000, 1) =
+        Z.block(0, 1, 5000, 1) + Z.block(0, 0, 5000, 1).cwiseAbs2();
+    auto a1 = tools_stats::pairwise_mcor(Z);
+    Eigen::VectorXd weights = Eigen::VectorXd::Ones(10000);
+    auto a2 = tools_stats::pairwise_mcor(Z, weights);
+    ASSERT_TRUE(std::fabs(a1 - a2) < 1e-4);
+
+    a1 = tools_stats::pairwise_mcor(Z.block(0, 0, 5000, 2));
+    weights.block(5000, 0, 5000, 1) = Eigen::VectorXd::Zero(5000);
+    a2 = tools_stats::pairwise_mcor(Z, weights);
+    ASSERT_TRUE(std::fabs(a1 - a2) < 0.05);   
+}
+
+TEST(test_tools_stats, seed_works) {
+    size_t d = 2;
+    size_t n = 10;
+    std::vector<int> v = {1, 2, 3};
+
+    auto U1 = tools_stats::simulate_uniform(n, d);
+    auto U2 = tools_stats::simulate_uniform(n, d, v);
+    auto U3 = tools_stats::simulate_uniform(n, d, v);
+
+    ASSERT_TRUE(U1.cwiseNotEqual(U2).all());
+    ASSERT_TRUE(U2.cwiseEqual(U3).all());
 
 }
 

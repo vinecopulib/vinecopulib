@@ -63,14 +63,31 @@ TEST_F(VinecopTest, getters_are_correct) {
             EXPECT_EQ(rot, 90);
         }
     }
-    
+
     for (auto &tree : vinecop.get_all_taus()) {
         for (auto &tau : tree) {
             ASSERT_TRUE(fabs(tau) < 1e-4);
         }
     }
 
+    EXPECT_NO_THROW(vinecop.get_dim());
+    EXPECT_NO_THROW(vinecop.get_rvine_structure());
     EXPECT_ANY_THROW(vinecop.get_loglik());
+    EXPECT_ANY_THROW(vinecop.get_nobs());
+    EXPECT_ANY_THROW(vinecop.get_aic());
+    EXPECT_ANY_THROW(vinecop.get_bic());
+    EXPECT_ANY_THROW(vinecop.get_mbicv(0.6));
+}
+
+TEST_F(VinecopTest, fit_statistics_getters_are_correct) {
+    auto data = tools_stats::simulate_uniform(100, 3);
+    auto vc = Vinecop(data, FitControlsVinecop({BicopFamily::clayton}));
+
+    EXPECT_NEAR(vc.get_loglik(),   vc.loglik(data), 1e-10);
+    EXPECT_NEAR(vc.get_nobs(),     100, 1e-10);
+    EXPECT_NEAR(vc.get_aic(),      vc.aic(data), 1e-10);
+    EXPECT_NEAR(vc.get_bic(),      vc.bic(data), 1e-10);
+    EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
 }
 
 TEST_F(VinecopTest, pdf_is_correct) {
@@ -106,6 +123,10 @@ TEST_F(VinecopTest, cdf_is_correct) {
     // Test whether the analytic and simulated versions are "close" enough
     auto U = vinecop.simulate(10);
     ASSERT_TRUE(vinecop.cdf(U, 10000).isApprox(bicop.cdf(U), 1e-2));
+
+    // verify that qrng stuff works
+    Vinecop vinecop2(301);
+    vinecop.simulate(10, true);
 }
 
 TEST_F(VinecopTest, simulate_is_correct) {
@@ -120,9 +141,51 @@ TEST_F(VinecopTest, simulate_is_correct) {
     Vinecop vinecop(pair_copulas, model_matrix);
 
     // only check if it works
-    vinecop.simulate(10);  
+    vinecop.simulate(10);
     // check the underlying transformation from independent samples
-    ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));    
+    ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
+
+    // verify that qrng stuff works
+    vinecop.simulate(10, true);
+    Vinecop vinecop2(301);
+    vinecop.simulate(10, true);
+}
+
+TEST_F(VinecopTest, rosenblatt_is_correct) {
+    // multivariate
+    auto pair_copulas = Vinecop::make_pair_copula_store(7);
+    auto par = Eigen::VectorXd::Constant(1, 3.0);
+    for (auto &tree : pair_copulas) {
+        for (auto &pc : tree) {
+            pc = Bicop(BicopFamily::clayton, 270, par);
+        }
+    }
+    Vinecop vinecop(pair_copulas, model_matrix);
+    auto u = vinecop.simulate(5);
+    ASSERT_TRUE(vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+
+    // truncated multivariate
+    pair_copulas = Vinecop::make_pair_copula_store(7, 2);
+    for (auto &tree : pair_copulas) {
+        for (auto &pc : tree) {
+            pc = Bicop(BicopFamily::clayton, 270, par);
+        }
+    }
+    vinecop = Vinecop(pair_copulas, model_matrix);
+    ASSERT_TRUE(vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+
+    // bivariate case
+    pair_copulas = Vinecop::make_pair_copula_store(2);
+    for (auto &tree : pair_copulas) {
+        for (auto &pc : tree) {
+            pc = Bicop(BicopFamily::clayton, 270, par);
+        }
+    }
+    Eigen::Matrix<size_t, 2, 2> mat;
+    mat << 1, 1, 2, 0;
+    vinecop = Vinecop(pair_copulas, mat);
+    u = vinecop.simulate(5);
+    ASSERT_TRUE(vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
 }
 
 TEST_F(VinecopTest, aic_bic_are_correct) {
@@ -179,7 +242,7 @@ TEST_F(VinecopTest, family_select_returns_pcs_in_right_order) {
         }
     }
     Vinecop vinecop(pair_copulas, model_matrix);
-    auto data = vinecop.simulate(10000);
+    auto data = vinecop.simulate(1000);
 
     auto controls = FitControlsVinecop(bicop_families::itau, "itau");
     // controls.set_show_trace(true);
@@ -189,17 +252,37 @@ TEST_F(VinecopTest, family_select_returns_pcs_in_right_order) {
     EXPECT_EQ(fit_struct.get_all_parameters(), fit_fam.get_all_parameters());
 }
 
+TEST_F(VinecopTest, trace_works) {
+    FitControlsVinecop controls(bicop_families::itau, "itau");
+    controls.set_show_trace(true);
+    controls.set_select_threshold(true);
+    controls.set_truncation_level(3);
+    testing::internal::CaptureStdout();
+    Vinecop fit(u, controls);
+    std::string output = testing::internal::GetCapturedStdout();
+    EXPECT_NO_THROW(!output.empty());
+}
+
 TEST_F(VinecopTest, works_multi_threaded) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_truncation_level(true);
-    // controls.set_show_trace(true);
-    Vinecop fit1(7), fit2(7);
-    fit1.select_all(u, controls);
+
+    Vinecop fit1(u, controls);
     controls.set_num_threads(2);
-    fit2.select_all(u, controls);
+    Vinecop fit2(u, controls);
+
     // check for equality in likelihood, since the pair copulas may be stored
     // in a different order when running in parallel
     EXPECT_NEAR(fit1.loglik(u), fit2.loglik(u), 1e-2);
+
+    // check if parallel evaluators have same output as single threaded ones
+    EXPECT_EQ(fit2.pdf(u, 2), fit2.pdf(u));
+    EXPECT_EQ(fit2.inverse_rosenblatt(u, 2), fit2.inverse_rosenblatt(u));
+    EXPECT_EQ(fit2.rosenblatt(u, 2), fit2.rosenblatt(u));
+
+    //just check that it works
+    fit2.simulate(2, false, 3);
+    fit2.cdf(u, 100, 2);
 }
 
 TEST_F(VinecopTest, select_finds_right_structure) {
@@ -265,7 +348,7 @@ TEST_F(VinecopTest, sparse_truncation_selection) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_select_truncation_level(true);
     // controls.set_show_trace(true);
-    u = tools_stats::simulate_uniform(1e2, 7);
+    u = tools_stats::simulate_uniform(100, 7);
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);

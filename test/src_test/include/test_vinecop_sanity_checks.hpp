@@ -33,14 +33,21 @@ TEST(vinecop_sanity_checks, catches_wrong_size) {
     Eigen::MatrixXd U = Eigen::MatrixXd::Constant(4, 4, 0.5);
     EXPECT_ANY_THROW(vinecop.pdf(U));
     EXPECT_ANY_THROW(vinecop.cdf(U));
-    Vinecop vinecop2(361);
-    auto U2 = tools_stats::simulate_uniform(1, 361);
-    EXPECT_ANY_THROW(vinecop2.cdf(U2));
     EXPECT_ANY_THROW(vinecop.inverse_rosenblatt(U));
     EXPECT_ANY_THROW(vinecop.select_all(U));
     EXPECT_ANY_THROW(vinecop.select_families(U));
 
+    vinecop = Vinecop(301);
+    U = tools_stats::simulate_uniform(1, 301);
+    EXPECT_NO_THROW(vinecop.cdf(U));
+    vinecop = Vinecop(21202);
+    U = tools_stats::simulate_uniform(1, 21202);
+    EXPECT_ANY_THROW(vinecop.cdf(U));
+
     pair_copulas.resize(4);  // too many
+    EXPECT_ANY_THROW(Vinecop(pair_copulas, mat));
+    pair_copulas = Vinecop::make_pair_copula_store(3);
+    pair_copulas[0].pop_back(); // to few
     EXPECT_ANY_THROW(Vinecop(pair_copulas, mat));
 }
 }

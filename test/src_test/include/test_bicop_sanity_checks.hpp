@@ -36,6 +36,15 @@ TEST(bicop_sanity_checks, catches_wrong_rotation) {
     EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 10));
 }
 
+TEST(bicop_sanity_checks, catches_not_fitted_to_data) {
+    auto bc = Bicop(BicopFamily::gaussian, 0.5);
+    EXPECT_ANY_THROW(bc.get_loglik());
+    EXPECT_ANY_THROW(bc.get_nobs());
+    EXPECT_ANY_THROW(bc.get_aic());
+    EXPECT_ANY_THROW(bc.get_bic());
+    EXPECT_ANY_THROW(bc.get_mbic(0.6));
+}
+
 TEST(bicop_sanity_checks, select_can_handle_zeros_and_ones) {
     Bicop bicop;
     auto u = bicop.simulate(10);
