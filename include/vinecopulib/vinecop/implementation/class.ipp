@@ -338,6 +338,7 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
         tools_select::FamilySelector selector(newdata, vine_struct_, controls);
         if (controls.needs_sparse_select()) {
             selector.sparse_select_all_trees(newdata);
+            vine_struct_ = selector.get_rvine_structure(); // can be truncated
         } else {
             selector.select_all_trees(newdata);
         }

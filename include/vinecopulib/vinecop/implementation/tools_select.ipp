@@ -508,6 +508,8 @@ inline void FamilySelector::finalize(size_t trunc_lvl)
             edge++;
         }
     }
+    
+    vine_struct_.truncate(trunc_lvl);
 }
 
 
