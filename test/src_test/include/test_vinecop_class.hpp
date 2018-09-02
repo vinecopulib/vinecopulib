@@ -90,6 +90,24 @@ TEST_F(VinecopTest, fit_statistics_getters_are_correct) {
     EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
 }
 
+TEST_F(VinecopTest, truncate_methods_works) {
+    auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+    auto par = Eigen::VectorXd::Constant(1, 3.0);
+    for (auto &tree : pair_copulas) {
+        for (auto &pc : tree) {
+            pc = Bicop(BicopFamily::clayton, 270, par);
+        }
+    }
+    Vinecop vinecop(pair_copulas, model_matrix);
+    vinecop.truncate(2);
+    EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 2);
+    EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 2);
+    vinecop.truncate(0);
+    EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 0);
+    EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 0);
+}
+
+
 TEST_F(VinecopTest, pdf_is_correct) {
 
     auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);

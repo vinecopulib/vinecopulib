@@ -78,6 +78,7 @@ inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>> &pair_copulas,
     check_pair_copulas_rvine_structure(pair_copulas);
 
     pair_copulas_ = pair_copulas;
+    vine_struct_.truncate(pair_copulas.size());
     threshold_ = 0.0;
     loglik_ = NAN;
 }
@@ -1104,5 +1105,14 @@ inline  void Vinecop::check_pair_copulas_rvine_structure(
         }
     }
 }
+
+// truncate the vine copula model.
+// @param truncation_level the truncation level.
+inline void Vinecop::truncate(size_t truncation_level)
+{
+    vine_struct_.truncate(truncation_level);
+    pair_copulas_.resize(truncation_level);
+}
+
 
 }

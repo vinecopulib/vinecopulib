@@ -161,6 +161,7 @@ public:
     static std::vector <std::vector<Bicop>>
     make_pair_copula_store(const size_t d,
                            const size_t truncation_level = std::numeric_limits<size_t>::max());
+    void truncate(size_t truncation_level);
 
 private:
     size_t d_;
