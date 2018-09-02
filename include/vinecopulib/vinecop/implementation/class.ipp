@@ -314,7 +314,7 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
     threshold_ = selector.get_threshold();
     loglik_ = selector.get_loglik();
     nobs_ = data.rows();
-    vine_struct_ = selector.get_rvine_matrix();
+    vine_struct_ = selector.get_rvine_structure();
     pair_copulas_ = selector.get_pair_copulas();
 }
 

@@ -78,7 +78,7 @@ VinecopSelector::get_pair_copulas() const
     return pair_copulas_;
 }
 
-inline RVineStructure VinecopSelector::get_rvine_matrix() const
+inline RVineStructure VinecopSelector::get_rvine_structure() const
 {
     return vine_struct_;
 }
