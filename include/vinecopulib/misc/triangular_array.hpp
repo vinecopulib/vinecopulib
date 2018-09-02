@@ -156,9 +156,6 @@ void TriangularArray<T>::set_column(size_t column,
 template<typename T>
 void TriangularArray<T>::truncate(size_t trunc_lvl)
 {
-    if (trunc_lvl == 0) {
-        throw std::runtime_error("truncation level cannot be zero.");
-    }
     if (trunc_lvl < this->get_trunc_lvl()) {
         trunc_lvl_ = trunc_lvl;
         for (size_t column = 0; column < d_ - 1 - trunc_lvl; column++) {

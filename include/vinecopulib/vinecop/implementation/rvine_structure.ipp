@@ -50,6 +50,7 @@ inline RVineStructure::RVineStructure(
     needed_hfunc2_ = compute_needed_hfunc2();
 }
 
+
 //! instantiates an RVineStructure object to a D-vine with given ordering of 
 //! variables.
 //! @param order the order of variables in the D-vine (diagonal entries in the 
@@ -75,10 +76,15 @@ inline RVineStructure::RVineStructure(
             trunc_lvl_ = trunc_lvl;
         }
 
-        struct_array_ = compute_dvine_struct_array();
-        max_array_ = compute_max_array();
+        struct_array_  = compute_dvine_struct_array();
+        max_array_     = compute_max_array();
         needed_hfunc1_ = compute_needed_hfunc1();
         needed_hfunc2_ = compute_needed_hfunc2();
+    } else {
+        struct_array_  = TriangularArray<size_t>(d_, trunc_lvl);
+        max_array_     = TriangularArray<size_t>(d_, trunc_lvl);
+        needed_hfunc1_ = TriangularArray<size_t>(d_, trunc_lvl);
+        needed_hfunc2_ = TriangularArray<size_t>(d_, trunc_lvl);
     }
 }
 
@@ -111,7 +117,6 @@ inline RVineStructure::RVineStructure(
 
     trunc_lvl_ = struct_array.get_trunc_lvl();
     if (trunc_lvl_ > 0) {
-
         struct_array_ = struct_array;
         if (check)
             check_upper_tri();
@@ -127,6 +132,11 @@ inline RVineStructure::RVineStructure(
 
         needed_hfunc1_ = compute_needed_hfunc1();
         needed_hfunc2_ = compute_needed_hfunc2();
+    } else {
+        struct_array_  = TriangularArray<size_t>(d_, trunc_lvl_);
+        max_array_     = TriangularArray<size_t>(d_, trunc_lvl_);
+        needed_hfunc1_ = TriangularArray<size_t>(d_, trunc_lvl_);
+        needed_hfunc2_ = TriangularArray<size_t>(d_, trunc_lvl_);
     }
 }
 
@@ -191,6 +201,17 @@ inline size_t RVineStructure::struct_array(size_t tree, size_t edge) const
 //! access elements of the maximum array.
 inline size_t RVineStructure::max_array(size_t tree, size_t edge) const {
     return max_array_(tree, edge);
+}
+
+//! truncates the R-vine structure.
+//! @param trunc_lvl the truncation level.
+inline void RVineStructure::truncate(size_t trunc_lvl)
+{
+    struct_array_.truncate(trunc_lvl);
+    max_array_.truncate(trunc_lvl);
+    needed_hfunc1_.truncate(trunc_lvl);
+    needed_hfunc2_.truncate(trunc_lvl);
+    trunc_lvl_ = struct_array_.get_trunc_lvl();
 }
 
 //! extract the R-vine matrix representation.
