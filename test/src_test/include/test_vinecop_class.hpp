@@ -370,6 +370,7 @@ TEST_F(VinecopTest, sparse_truncation_selection) {
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);
+    EXPECT_LE(fit.get_rvine_structure().get_trunc_lvl(), 6);
     EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 
