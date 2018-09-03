@@ -95,19 +95,35 @@ class TVineSelector : public FamilySelector {
 public:
     TVineSelector(const Eigen::MatrixXd &data,
                   const RVineStructure &vine_struct,
-                  const FitControlsVinecop &controls) : 
+                  const FitControlsVinecop &controls) 
+                  : 
                   FamilySelector(data, vine_struct, controls),
                   order_(vine_struct.get_dim() / d_),
                   lag_(0),
                   cs_struct_(vine_struct),
                   cs_dim_(vine_struct.get_dim())
-    {}              
+    {}
+    
+    TVineSelector(const Eigen::MatrixXd &data,
+                  const VinecopSelector &selector,
+                  const FitControlsVinecop &controls) 
+                  : 
+                  cs_struct_(selector.get_rvine_structure()),
+                  FamilySelector(data, selector.get_rvine_structure(), controls),
+                  order_(selector.get_rvine_structure().get_dim() / d_),
+                  lag_(0),
+                  cs_dim_(selector.get_rvine_structure().get_dim())
+    {
+        pair_copulas_ = selector.get_pair_copulas();
+        trees_ = selector.get_trees_opt();      
+    }            
     
     ~TVineSelector() {}
     
     void select_tree(size_t t) override
     {
         auto new_tree = edges_as_vertices(trees_[t]);
+        remove_edge_data(trees_[t]);
         add_allowed_edges(new_tree);
         if (boost::num_vertices(new_tree) > 0) {
             add_edge_info(new_tree);       // for pc estimation and next tree
@@ -209,6 +225,9 @@ public:
         pair_copulas_ = make_pair_copula_store(d_);
     }
     
+    TVine(size_t d, size_t order = 1) : 
+        TVine(RVineStructure(tools_stl::seq_int(1, d)), order) {}
+    
     void select_families(const Eigen::MatrixXd &data,
                          const FitControlsVinecop &controls = FitControlsVinecop())
     {
@@ -239,7 +258,29 @@ public:
         }
     }
     
-    Eigen::MatrixXd simulate(
+    void select_all(const Eigen::MatrixXd &data,
+                    const FitControlsVinecop &controls)
+    {
+        tools_eigen::check_if_in_unit_cube(data);
+        check_data_dim(data);
+        
+        tools_select::StructureSelector selector(data, controls);
+        selector.select_all_trees(data);
+
+        auto newdata = data;
+        tools_select::TVineSelector tv_selector(data, selector, controls);
+        for (size_t lag = 1; lag < order_; lag++) {
+            tv_selector.add_lag();
+            newdata = tv_selector.add_lag(newdata);
+            tv_selector.select_all_trees(newdata);
+        }
+        
+        vine_struct_ = tv_selector.get_rvine_structure();
+        threshold_ = tv_selector.get_threshold();
+        loglik_ = tv_selector.get_loglik();
+        nobs_ = data.rows();
+        pair_copulas_ = tv_selector.get_pair_copulas();
+    }
     
 private:
     void check_data_dim(const Eigen::MatrixXd &data) 

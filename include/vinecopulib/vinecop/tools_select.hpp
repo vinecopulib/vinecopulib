@@ -95,6 +95,9 @@ public:
     double get_loglik() const;
 
     double get_threshold() const;
+    
+    std::vector<VineTree> get_trees() const {return trees_;};
+    std::vector<VineTree> get_trees_opt() const {return trees_opt_;};
 
 protected:
     virtual void select_tree(size_t t);
