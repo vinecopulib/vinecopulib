@@ -200,7 +200,8 @@ public:
           order_(order),
           in_(in),
           out_(out),
-          cs_struct_(cs_struct)
+          cs_struct_(cs_struct),
+          Vinecop(cs_struct)
     {
 		d_ = cs_struct.get_dim() * order;
         vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 
@@ -229,7 +230,8 @@ public:
                 newdata = selector.add_lag(newdata);
                 selector.select_all_trees(newdata);
             }
-
+            
+            vine_struct_ = selector.get_rvine_structure();
             threshold_ = selector.get_threshold();
             loglik_ = selector.get_loglik();
             nobs_ = data.rows();
@@ -237,8 +239,7 @@ public:
         }
     }
     
-
-    
+    Eigen::MatrixXd simulate(
     
 private:
     void check_data_dim(const Eigen::MatrixXd &data) 
@@ -253,7 +254,6 @@ private:
     size_t in_;
     size_t out_;
     RVineStructure cs_struct_;
-    RVineStructure vine_struct_;
 };
 
 

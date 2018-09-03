@@ -25,8 +25,8 @@ TEST(test_tvine, playground)
     
     Vinecop vc(u, controls);
     
-    u = tools_stats::simulate_uniform(2000, 3);
-
+    u = tools_stats::simulate_uniform(1000, 3);
+    
     TVine tv(vc.get_rvine_structure(), 3);    
     // controls.set_show_trace(true);
     tv.select_families(u, controls);
