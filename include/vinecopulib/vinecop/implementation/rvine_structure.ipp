@@ -199,7 +199,8 @@ inline size_t RVineStructure::struct_array(size_t tree, size_t edge) const
 }
 
 //! access elements of the maximum array.
-inline size_t RVineStructure::max_array(size_t tree, size_t edge) const {
+inline size_t RVineStructure::max_array(size_t tree, size_t edge) const 
+{
     return max_array_(tree, edge);
 }
 

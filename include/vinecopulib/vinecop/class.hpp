@@ -163,7 +163,7 @@ public:
                            const size_t truncation_level = std::numeric_limits<size_t>::max());
     void truncate(size_t truncation_level);
 
-private:
+protected:
     size_t d_;
     RVineStructure vine_struct_;
     std::vector <std::vector<Bicop>> pair_copulas_;
