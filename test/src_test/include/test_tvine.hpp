@@ -18,11 +18,18 @@ using namespace vinecopulib;
 
 TEST(test_tvine, playground)
 {
-    auto u = tools_stats::simulate_uniform(10, 3);
-    Vinecop vc(u);
-    TVine tv(vc.get_rvine_structure(), 3);
-    u = tools_stats::simulate_uniform(10, 9);
-    tv.select_families(u);
+    FitControlsVinecop controls({BicopFamily::gaussian});
+    controls.set_selection_criterion("loglik");
+
+    auto u = tools_stats::simulate_uniform(20, 3);
+    
+    Vinecop vc(u, controls);
+    
+    u = tools_stats::simulate_uniform(2000, 3);
+
+    TVine tv(vc.get_rvine_structure(), 3);    
+    // controls.set_show_trace(true);
+    tv.select_families(u, controls);
 }
 
 } // namespace test_tvine

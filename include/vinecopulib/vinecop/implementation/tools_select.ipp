@@ -725,7 +725,7 @@ inline VineTree VinecopSelector::make_base_tree(const Eigen::MatrixXd &data)
         base_tree[e].conditioning.reserve(d - 2);
         base_tree[e].all_indices = base_tree[e].conditioned;
     }
-
+    
     return base_tree;
 }
 
@@ -780,6 +780,23 @@ inline ptrdiff_t VinecopSelector::find_common_neighbor(size_t v0, size_t v1,
         return ei_common[0];
     }
 }
+
+// compute a fit id; can be used to re-use already fitted pair-copulas.
+//
+// @param edge.
+double VinecopSelector::compute_fit_id(const EdgeProperties& e)
+{
+    double id = 0.0;
+    if (controls_.needs_sparse_select()) {
+        // the formula is quite arbitrary, but sufficient for
+        // identifying situations where fits can be re-used
+        id = (e.pc_data.col(0) - 2 * e.pc_data.col(1)).sum();
+        id += 5.0 * static_cast<double>(e.crit < controls_.get_threshold());
+    }
+    
+    return id;
+}
+
 
 //! Collapse a graph to the minimum spanning tree
 //!
@@ -839,34 +856,38 @@ inline void VinecopSelector::remove_vertex_data(VineTree &tree)
     }
 }
 
+
+//! Fit and select a pair copula for each edges
+//! @param tree a vine tree preprocessed with add_edge_info().
+inline void VinecopSelector::select_pair_copulas(VineTree &tree)
+{
+    VineTree tree_opt;
+    select_pair_copulas(tree, tree_opt);
+}
+
 //! Fit and select a pair copula for each edges
 //! @param tree a vine tree preprocessed with add_edge_info().
 //! @param tree_opt the current optimal tree (used only for sparse
 //!     selection).
 inline void VinecopSelector::select_pair_copulas(VineTree &tree,
-                                                 const VineTree &tree_opt)
+                                                 VineTree &tree_opt)
 {
     auto select_pc = [&](EdgeIterator e) -> void {
         tools_interface::check_user_interrupt();
         bool is_thresholded = (tree[e].crit < controls_.get_threshold());
         bool used_old_fit = false;
 
-        if (controls_.needs_sparse_select()) {
-            // the formula is quite arbitrary, but sufficient for
-            // identifying situations where fits can be re-used
-            tree[e].fit_id =
-                (tree[e].pc_data.col(0) - 2 * tree[e].pc_data.col(1)).sum();
-            tree[e].fit_id += 5.0 * static_cast<double>(is_thresholded);
-            if (boost::num_edges(tree_opt) > 0) {
-                auto old_fit = find_old_fit(tree[e].fit_id, tree_opt);
-                if (old_fit.second) {  // indicates if match was found
-                    // data and thresholding status haven't changed,
-                    // we can use old fit
-                    used_old_fit = true;
-                    tree[e].pair_copula = tree_opt[old_fit.first].pair_copula;
-                }
+        double id = compute_fit_id(tree[e]);
+        if (boost::num_edges(tree_opt) > 0) {
+            auto old_fit = find_old_fit(id, tree_opt);
+            if (old_fit.second) {  // indicates if match was found
+                // data and thresholding status haven't changed,
+                // we can use old fit
+                used_old_fit = true;
+                tree[e].pair_copula = tree_opt[old_fit.first].pair_copula;
             }
         }
+        tree[e].fit_id = id;
 
         if (!used_old_fit) {
             if (is_thresholded) {
@@ -928,6 +949,8 @@ inline std::string VinecopSelector::get_pc_index(const EdgeIterator &e,
 
     return index.str().c_str();
 }
+
+
 
 }
 
