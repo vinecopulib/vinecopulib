@@ -100,53 +100,61 @@ public:
         lag_++;
         d_ += d0_;
 
-        auto shift = [this] (std::vector<size_t> index) {
-            for (auto &i : index)
-                i = i + d0_ * lag_;
-            return index;
-        };
-
+        // add vertices and edges for lagged variable
         for (size_t t = 1; t < trees_.size(); t++) {
             auto old_tree = trees_[t];
-            // add vertices for lagged variable
-            for (auto v : boost::vertices(old_tree)) {
-                auto v_new = boost::add_vertex(trees_[t]);
-                
-                // copy structure information
-                trees_[t][v_new].conditioned = shift(trees_[t][v].conditioned);
-                trees_[t][v_new].conditioning = shift(trees_[t][v].conditioning);
-                trees_[t][v_new].all_indices = shift(trees_[t][v].all_indices);
-                trees_[t][v_new].prev_edge_indices = shift(trees_[t][v].prev_edge_indices);
-                
-                // copy data and remove rows
-                size_t n = trees_[t][v].hfunc1.rows() - 1;
-                trees_[t][v_new].hfunc1 = trees_[t][v].hfunc1.bottomRows(n);
-                trees_[t][v].hfunc1.conservativeResize(n);
-                if (trees_[t][v].hfunc2.size() > 1) {
-                    trees_[t][v_new].hfunc2 = trees_[t][v].hfunc2.bottomRows(n);
-                    trees_[t][v].hfunc2.conservativeResize(n);
-                }
-            }
-            
-            // copy edges for lagged vine
-            for (auto e : boost::edges(old_tree)) {
-                size_t v1 = boost::source(e, old_tree);
-                size_t v2 = boost::target(e, old_tree);
-                auto e_new = boost::add_edge(v1 + d0_ * lag_, v2 + d0_ * lag_, trees_[t]).first;
-                trees_[t][e_new].pair_copula = trees_[t][e].pair_copula;
-                trees_[t][e_new].fit_id = trees_[t][e].fit_id;
-            }
+            for (auto v : boost::vertices(old_tree)) 
+                duplicate_vertex(v, trees_[t]);
+            for (auto e : boost::edges(old_tree)) 
+                duplicate_edge(e, trees_[t]);
         }
+        
+        // update trees and structure
         trees_opt_ = trees_;
         trees_ = std::vector<VineTree>(1);
         vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_),
                                       build_t_vine_array(struct0_, lag_));
         
+        // update data
         size_t n = data_.rows() - 1;
         Eigen::MatrixXd newdata(n, d_);
         newdata << data_.topRows(n), data_.rightCols(d0_).bottomRows(n);
         data_ = newdata;
     }
+    
+    void duplicate_vertex(size_t v, VineTree& tree)
+    {
+        auto v_new = boost::add_vertex(tree);
+        auto shift = [this] (std::vector<size_t> index) {
+            for (auto &i : index)
+                i = i + d0_ * lag_;
+            return index;
+        };
+        
+        // copy structure information
+        tree[v_new].conditioned = shift(tree[v].conditioned);
+        tree[v_new].conditioning = shift(tree[v].conditioning);
+        tree[v_new].all_indices = shift(tree[v].all_indices);
+        tree[v_new].prev_edge_indices = shift(tree[v].prev_edge_indices);
+        
+        // copy data and remove rows
+        size_t n = tree[v].hfunc1.rows() - 1;
+        tree[v_new].hfunc1 = tree[v].hfunc1.bottomRows(n);
+        tree[v].hfunc1.conservativeResize(n);
+        if (tree[v].hfunc2.size() > 1) {
+            tree[v_new].hfunc2 = tree[v].hfunc2.bottomRows(n);
+            tree[v].hfunc2.conservativeResize(n);
+        }
+    }
+    
+    void duplicate_edge(EdgeIterator e, VineTree& tree)
+    {
+        size_t v1 = boost::source(e, tree);
+        size_t v2 = boost::target(e, tree);
+        auto e_new = boost::add_edge(v1 + d0_ * lag_, v2 + d0_ * lag_, tree);
+        tree[e_new.first].pair_copula = tree[e].pair_copula;
+        tree[e_new.first].fit_id = tree[e].fit_id;
+    } 
     
     Eigen::MatrixXd data()
     {
