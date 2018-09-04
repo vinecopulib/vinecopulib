@@ -159,6 +159,15 @@ inline std::vector<size_t> RVineStructure::get_order() const
     return order_;
 }
 
+//! extract the reverse order
+inline std::vector<size_t> RVineStructure::get_rev_order() const
+{
+    auto rev_order = order_;
+    tools_stl::reverse(rev_order);
+    return rev_order;
+}
+
+
 //! extract structure array (all elements above the diagonal in the R-vine 
 //! array).
 inline TriangularArray<size_t> RVineStructure::get_struct_array() const 

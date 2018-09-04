@@ -211,11 +211,11 @@ public:
 
         if (vine_struct_.get_trunc_lvl() > 0) {
             auto newdata = data;
-            auto revorder = vine_struct_.get_order();
-            revorder.resize(d0_);
-            tools_stl::reverse(revorder);
+            auto rev_order = vine_struct_.get_order();
+            rev_order.resize(d0_);
+            tools_stl::reverse(rev_order);
             for (size_t j = 0; j < d0_; ++j)
-                newdata.col(j) = data.col(revorder[j] - 1);
+                newdata.col(j) = data.col(rev_order[j] - 1);
             tools_select::TVineSelector selector(newdata, struct0_, controls);
             
             selector.select_all_trees(newdata);
@@ -247,6 +247,7 @@ public:
         finalize_fit(tv_selector);
     }
     
+    
 private:
     void check_data_dim(const Eigen::MatrixXd &data) 
     { 
@@ -260,7 +261,5 @@ private:
     size_t out_;
     RVineStructure struct0_;
 };
-
-
 
 }

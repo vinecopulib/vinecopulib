@@ -23,12 +23,20 @@ TEST(test_tvine, playground)
 
     auto u = tools_stats::simulate_uniform(20, 3);
     
-    u = tools_stats::simulate_uniform(1000, 3);
+    u = tools_stats::simulate_uniform(30, 3);
     
     TVine tv(3, 2);    
-    controls.set_show_trace(true);
+    // controls.set_show_trace(true);
     tv.select_families(u, controls);
     // tv.select_all(u, controls);
+}
+
+TEST(conditional, playground)
+{
+    auto str = RVineStructure(tools_stl::seq_int(1, 3));
+    for (auto o : str.get_order())
+        std::cout << o << " ";
+    std::cout << std::endl << str.get_struct_array() << std::endl;
 }
 
 } // namespace test_tvine

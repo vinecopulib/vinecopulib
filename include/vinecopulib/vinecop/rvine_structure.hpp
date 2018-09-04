@@ -81,6 +81,7 @@ public:
     size_t get_dim() const;
     size_t get_trunc_lvl() const;
     std::vector<size_t> get_order() const;
+    std::vector<size_t> get_rev_order() const;
     TriangularArray<size_t> get_struct_array() const;
     TriangularArray<size_t> get_max_array() const;
     TriangularArray<size_t> get_needed_hfunc1() const;
