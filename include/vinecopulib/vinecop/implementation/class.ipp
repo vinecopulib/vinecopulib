@@ -639,7 +639,7 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
     size_t n = u.rows();
 
     // info about the vine structure (reverse rows (!) for more natural indexing)
-    size_t trunc_lvl = pair_copulas_.size();
+    size_t trunc_lvl = vine_struct_.get_trunc_lvl();
     std::vector<size_t> rev_order;
     TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
@@ -885,7 +885,7 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
     size_t n = u.rows();
 
     // info about the vine structure (reverse rows (!) for more natural indexing)
-    size_t trunc_lvl = pair_copulas_.size();
+    size_t trunc_lvl = vine_struct_.get_trunc_lvl();
     std::vector<size_t> rev_order, inverse_order;
     TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
@@ -896,7 +896,7 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     }
-    
+
     // fill first row of hfunc2 matrix with evaluation points;
     // points have to be reordered to correspond to natural order
     Eigen::MatrixXd hfunc1(n, d);
@@ -935,7 +935,7 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
         pool.map(do_batch, tools_batch::create_batches(n, num_threads));
         pool.join();
     }
-    
+
     // go back to original order
     auto U_vine = u;
     for (size_t j = 0; j < d; j++) {
@@ -990,7 +990,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
     }
 
     // info about the vine structure (in upper triangular matrix notation)
-    size_t trunc_lvl = pair_copulas_.size();
+    size_t trunc_lvl = vine_struct_.get_trunc_lvl();
     std::vector<size_t> rev_order, inverse_order;
     TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
