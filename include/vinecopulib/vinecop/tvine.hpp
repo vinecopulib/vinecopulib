@@ -6,7 +6,7 @@ namespace vinecopulib {
     
 // ------------------------- T-VINE STRUCTURE ---------------
 
-TriangularArray<size_t> build_t_vine_array(RVineStructure struct0, size_t p)
+inline TriangularArray<size_t> build_t_vine_array(RVineStructure struct0, size_t p)
 {
     size_t d0 = struct0.get_dim();
     size_t d = d0 * (p + 1);
@@ -39,7 +39,20 @@ TriangularArray<size_t> build_t_vine_array(RVineStructure struct0, size_t p)
 
     return strct;
 }
-    
+
+inline Eigen::MatrixXd spread_lag(const Eigen::MatrixXd& data, size_t d0)
+{
+    if (data.rows() < 2) {
+        throw std::runtime_error("insufficient number of observations");
+    }
+    if (data.cols() % d0 != 0) {
+        throw std::runtime_error("number of columns is not a multiple of d0");
+    }
+    size_t n = data.rows() - 1;
+    Eigen::MatrixXd newdata(n, data.cols() + d0);
+    newdata << data.topRows(n), data.rightCols(d0).bottomRows(n);
+    return newdata;
+}
 
 // ------------------------- SELECTOR ------------------------
 namespace tools_select {
@@ -60,12 +73,7 @@ public:
     TVineSelector(const Eigen::MatrixXd &data,
                   const VinecopSelector &selector,
                   const FitControlsVinecop &controls) : 
-        FamilySelector(data, selector.get_rvine_structure(), controls), 
-        data_(data),
-        d0_(vine_struct_.get_dim()),
-        p_(d0_ / d_ - 1),
-        lag_(0),
-        struct0_(vine_struct_)
+        TVineSelector(data, selector.get_rvine_structure(), controls)
     {
         pair_copulas_ = selector.get_pair_copulas();
         trees_ = selector.get_trees_opt();      
@@ -114,12 +122,7 @@ public:
         trees_ = std::vector<VineTree>(1);
         vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_),
                                       build_t_vine_array(struct0_, lag_));
-        
-        // update data
-        size_t n = data_.rows() - 1;
-        Eigen::MatrixXd newdata(n, d_);
-        newdata << data_.topRows(n), data_.rightCols(d0_).bottomRows(n);
-        data_ = newdata;
+        data_ = spread_lag(data_, d0_);
     }
     
     void duplicate_vertex(size_t v, VineTree& tree)
@@ -154,8 +157,8 @@ public:
         auto e_new = boost::add_edge(v1 + d0_ * lag_, v2 + d0_ * lag_, tree);
         tree[e_new.first].pair_copula = tree[e].pair_copula;
         tree[e_new.first].fit_id = tree[e].fit_id;
-    } 
-    
+    }
+        
     Eigen::MatrixXd data()
     {
         return data_;
@@ -196,10 +199,11 @@ public:
         struct0_(struct0)
     {
 		d_ = struct0.get_dim() * (p + 1);
-        vine_struct_ = RVineStructure(
-            tools_stl::seq_int(1, d_),
-            build_t_vine_array(struct0, p)
-        );
+        std::vector<size_t> order(d_);
+        for (size_t i = 0; i < d_; i++) {
+            order[i] = struct0_.get_order()[i % d0_] + (i / d0_) * d0_;
+        }
+        vine_struct_ = RVineStructure(order, build_t_vine_array(struct0, p));
         pair_copulas_ = make_pair_copula_store(d_);
     }
     
@@ -251,8 +255,13 @@ public:
 private:
     void check_data_dim(const Eigen::MatrixXd &data) 
     { 
-        if (d0_ != static_cast<size_t>(data.cols()))
-            throw std::runtime_error("wrong number of columns");
+        if (d0_ != static_cast<size_t>(data.cols())) {
+            std::stringstream msg;
+            msg << "cond_vals has wrong number of columns." << std::endl <<
+                "expected: " << d0_ << std::endl <<
+                "provided: " << data.cols() << std::endl;
+            throw std::runtime_error(msg.str());
+        }
     }
     
     size_t d0_;
