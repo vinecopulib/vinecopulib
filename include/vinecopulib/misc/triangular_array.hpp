@@ -53,6 +53,7 @@ public:
 
     void set_column(size_t column, const std::vector<size_t>& new_col);
     void truncate(size_t trunc_lvl);
+    void reduce(size_t d);
 
     size_t get_trunc_lvl() const;
     size_t get_dim() const;
@@ -160,6 +161,34 @@ void TriangularArray<T>::truncate(size_t trunc_lvl)
         trunc_lvl_ = trunc_lvl;
         for (size_t column = 0; column < d_ - 1 - trunc_lvl; column++) {
             mat_[column].resize(trunc_lvl);
+        }
+    }
+}
+
+//! resizes the trapezoid such that only the right `d-1` columns are kept.
+//! @param d the new dimension.
+template<typename T>
+void TriangularArray<T>::reduce(size_t d)
+{
+    if (d < 2) {
+        throw std::runtime_error("dimension must be at least 2.");
+    }
+    if (d > d_) {
+        throw std::runtime_error("new dimension canot be larger than current one.");
+    }
+    
+    // remove columns
+    while (mat_.size() >= d) {
+        mat_.erase(mat_.begin());
+    }
+    d_ = d;
+    trunc_lvl_ = std::min(trunc_lvl_, d_ - 1);
+    truncate(trunc_lvl_);
+    
+    // resize columns
+    for (size_t column = 0; column < d_ - 1; column++) {
+        if (mat_[column].size() < trunc_lvl_) {
+            mat_[column].resize(d_ - 1 - column);
         }
     }
 }

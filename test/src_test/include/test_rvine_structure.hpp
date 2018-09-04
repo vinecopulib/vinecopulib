@@ -34,10 +34,20 @@ TEST(rvine_structure, triangular_array_works) {
     EXPECT_NO_THROW(my_rvm.set_column(4, myvec));
     EXPECT_ANY_THROW(my_rvm.set_column(6, myvec));
     EXPECT_ANY_THROW(my_rvm.set_column(3, myvec));
+        
+    my_rvm.truncate(5);
+    EXPECT_EQ(my_rvm.get_trunc_lvl(), 5);
+    EXPECT_EQ(my_rvm[0].size(), 5);
     
-    my_rvm.truncate(2);
-    EXPECT_EQ(my_rvm.get_trunc_lvl(), 2);
-    EXPECT_EQ(my_rvm[0].size(), 2);
+    my_rvm.reduce(4);
+    EXPECT_EQ(my_rvm.get_trunc_lvl(), 3);
+    EXPECT_EQ(my_rvm[0].size(), 3);
+    
+    my_rvm.truncate(1);
+    my_rvm.reduce(3);
+    EXPECT_EQ(my_rvm.get_trunc_lvl(), 1);
+    EXPECT_EQ(my_rvm[0].size(), 1);
+    EXPECT_EQ(my_rvm[1].size(), 1);
 }
 
 TEST(rvine_structure, can_convert_to_natural_order) {
