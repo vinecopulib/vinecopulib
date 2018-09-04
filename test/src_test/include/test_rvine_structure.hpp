@@ -72,6 +72,34 @@ TEST(rvine_structure, can_convert_to_natural_order) {
     EXPECT_EQ(rvine_structure.get_struct_array(), true_no_array);
 }
 
+TEST(rvine_structure, reduce_and_truncate_work) {
+    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
+    mat << 5, 2, 6, 6, 6, 6, 6,
+        6, 6, 1, 2, 5, 5, 0,
+        2, 5, 2, 5, 2, 0, 0,
+        1, 1, 5, 1, 0, 0, 0,
+        3, 7, 7, 0, 0, 0, 0,
+        7, 3, 0, 0, 0, 0, 0,
+        4, 0, 0, 0, 0, 0, 0;
+
+    RVineStructure rvine_structure(mat);
+        
+    rvine_structure.truncate(5);
+    EXPECT_EQ(rvine_structure.get_trunc_lvl(), 5);
+    EXPECT_EQ(rvine_structure.get_struct_array()[0].size(), 5);
+    EXPECT_EQ(rvine_structure.get_max_array()[0].size(), 5);
+    EXPECT_EQ(rvine_structure.get_needed_hfunc1()[0].size(), 5);
+    EXPECT_EQ(rvine_structure.get_needed_hfunc2()[0].size(), 5);
+
+    rvine_structure.reduce(4);
+    EXPECT_EQ(rvine_structure.get_trunc_lvl(), 3);
+    EXPECT_EQ(rvine_structure.get_struct_array()[0].size(), 3);
+    EXPECT_EQ(rvine_structure.get_max_array()[0].size(), 3);
+    EXPECT_EQ(rvine_structure.get_needed_hfunc1()[0].size(), 3);
+    EXPECT_EQ(rvine_structure.get_needed_hfunc2()[0].size(), 3);
+}
+
+
 TEST(rvine_structure, max_array_is_correct) {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
     mat << 5, 2, 6, 6, 6, 6, 6,
@@ -92,10 +120,6 @@ TEST(rvine_structure, max_array_is_correct) {
 
     RVineStructure rvine_structure(mat);
     EXPECT_EQ(rvine_structure.get_max_array(), true_max_array);
-    
-    rvine_structure.truncate(2);
-    EXPECT_EQ(rvine_structure.get_trunc_lvl(), 2);
-    EXPECT_EQ(rvine_structure.get_max_array()[0].size(), 2);
 }
 
 TEST(rvine_structure, needed_hfunc1_is_correct) {
@@ -118,9 +142,6 @@ TEST(rvine_structure, needed_hfunc1_is_correct) {
 
     RVineStructure rvine_structure(mat);
     EXPECT_EQ(rvine_structure.get_needed_hfunc1(), true_hfunc1);
-    
-    rvine_structure.truncate(2);
-    EXPECT_EQ(rvine_structure.get_needed_hfunc1()[0].size(), 2);
 }
 
 TEST(rvine_structure, needed_hfunc2_is_correct) {
@@ -143,9 +164,6 @@ TEST(rvine_structure, needed_hfunc2_is_correct) {
 
     RVineStructure rvine_structure(mat);
     EXPECT_EQ(rvine_structure.get_needed_hfunc2(), true_hfunc2);
-    
-    rvine_structure.truncate(2);
-    EXPECT_EQ(rvine_structure.get_needed_hfunc2()[0].size(), 2);
 }
 
 TEST(rvine_structure, construct_d_vine_struct_is_correct) {

@@ -92,6 +92,7 @@ public:
     size_t max_array(size_t tree, size_t edge) const;
 
     void truncate(size_t trunc_lvl);
+    void reduce(size_t d);
 
 private:
 
