@@ -25,7 +25,7 @@ TEST(test_tvine, playground)
     
     u = tools_stats::simulate_uniform(1000, 3);
     
-    TVine tv(3, 3);    
+    TVine tv(3, 2);    
     // controls.set_show_trace(true);
     tv.select_families(u, controls);
     tv.select_all(u, controls);

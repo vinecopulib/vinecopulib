@@ -4,82 +4,35 @@
 
 namespace vinecopulib {
     
-// ------------------------- SHIFT OPERATOR ---------------------------
-class LagShift {
-public:
-    LagShift(size_t d, size_t lag) : d(d), lag(lag) {}
-    
-    friend size_t operator+(const size_t& index, const LagShift& shift); 
-    friend size_t operator-(const size_t& index, const LagShift& shift); 
-    friend std::vector<size_t>  operator+(const std::vector<size_t>& index, 
-                                          const LagShift& shift); 
-    friend std::vector<size_t>  operator-(const std::vector<size_t>& index, 
-                                          const LagShift& shift); 
-
-    size_t d;
-    size_t lag;
-};
-
-size_t operator+(const size_t& index, const LagShift& shift)
-{
-    return index + shift.d * shift.lag;
-}
-size_t operator-(const size_t& index, const LagShift& shift)
-{
-    assert(index >= shift.d * shift.lag);
-    return index - shift.d * shift.lag;
-}
-
-std::vector<size_t> operator+(const std::vector<size_t>& index, const LagShift& shift)
-{
-    auto new_index = index;
-    for (auto& i : new_index)
-        i = i + shift;
-    return new_index;
-}
-
-std::vector<size_t> operator-(const std::vector<size_t>& index, const LagShift& shift)
-{
-    auto new_index = index;
-    for (auto& i : new_index)
-        i = i - shift;
-    return new_index;
-}
-
-
 // ------------------------- T-VINE STRUCTURE ---------------
 
-TriangularArray<size_t> build_t_vine_array(RVineStructure cs_struct_, size_t order_)
+TriangularArray<size_t> build_t_vine_array(RVineStructure struct0, size_t p)
 {
-    size_t cs_dim_ = cs_struct_.get_dim();
-    size_t d_ = cs_dim_ * order_;
-    TriangularArray<size_t> strct(d_);
-    LagShift val_shift(cs_dim_, order_ - 1);
+    size_t d0 = struct0.get_dim();
+    size_t d = d0 * (p + 1);
+    TriangularArray<size_t> strct(d);
 
     // copy cross-sectional structure
-    for (size_t i = 0; i < cs_dim_ - 1; i++) {
-        for (size_t j = 0; j < cs_dim_ - 1 - i; j++) {
-            strct(i, j) = cs_struct_.struct_array(i, j) + val_shift;
+    for (size_t i = 0; i < d0 - 1; i++) {
+        for (size_t j = 0; j < d0 - 1 - i; j++) {
+            strct(i, j) = struct0.struct_array(i, j) + d0 * p;
         }
     }
 
     // fill parallelograms
-    for (size_t lag = 1; lag < order_; lag++) {
-        val_shift = LagShift(cs_dim_, order_ - lag - 1);
-        LagShift shift(cs_dim_, lag);
-        for (size_t i = 0; i < cs_dim_; i++) {
-            for (size_t j = 0; j < cs_dim_; j++) {
-                strct((i + shift) - j - 1, j) = (i + 1) + val_shift;
+    for (size_t lag = 1; lag <= p; lag++) {
+        for (size_t i = 0; i < d0; i++) {
+            for (size_t j = 0; j < d0; j++) {
+                strct(i + d0 * lag - j - 1, j) = i + 1 + d0 * (p - lag);
             }
         }
     }
 
     // copy to other lags
-    for (size_t lag = 1; lag < order_; lag++) {
-        LagShift shift(cs_dim_, lag);
-        for (size_t j = 0; j < cs_dim_; j++) {
-            for (size_t i = 0; i < d_ - 1 - (j + shift); i++) {
-                strct(i, j + shift) = strct(i, j) - shift;
+    for (size_t lag = 1; lag <= p; lag++) {
+        for (size_t j = 0; j < d0; j++) {
+            for (size_t i = 0; i < d - 1 - (j + d0 * lag); i++) {
+                strct(i, j + d0 * lag) = strct(i, j) - d0 * lag;
             }
         }
     }
@@ -95,24 +48,24 @@ class TVineSelector : public FamilySelector {
 public:
     TVineSelector(const Eigen::MatrixXd &data,
                   const RVineStructure &vine_struct,
-                  const FitControlsVinecop &controls) 
-                  : 
-                  FamilySelector(data, vine_struct, controls),
-                  order_(vine_struct.get_dim() / d_),
-                  lag_(0),
-                  cs_struct_(vine_struct),
-                  cs_dim_(vine_struct.get_dim())
+                  const FitControlsVinecop &controls)  : 
+        FamilySelector(data, vine_struct, controls), 
+        data_(data),
+        d0_(vine_struct.get_dim()), 
+        p_(d0_ / d_ - 1), 
+        lag_(0), 
+        struct0_(vine_struct)
     {}
     
     TVineSelector(const Eigen::MatrixXd &data,
                   const VinecopSelector &selector,
-                  const FitControlsVinecop &controls) 
-                  : 
-                  cs_struct_(selector.get_rvine_structure()),
-                  FamilySelector(data, selector.get_rvine_structure(), controls),
-                  order_(selector.get_rvine_structure().get_dim() / d_),
-                  lag_(0),
-                  cs_dim_(selector.get_rvine_structure().get_dim())
+                  const FitControlsVinecop &controls) : 
+        FamilySelector(data, selector.get_rvine_structure(), controls), 
+        data_(data),
+        d0_(vine_struct_.get_dim()),
+        p_(d0_ / d_ - 1),
+        lag_(0),
+        struct0_(vine_struct_)
     {
         pair_copulas_ = selector.get_pair_copulas();
         trees_ = selector.get_trees_opt();      
@@ -144,7 +97,15 @@ public:
 
     void add_lag()
     {
-        LagShift lag(d_, ++lag_);
+        lag_++;
+        d_ += d0_;
+
+        auto shift = [this] (std::vector<size_t> index) {
+            for (auto &i : index)
+                i = i + d0_ * lag_;
+            return index;
+        };
+
         for (size_t t = 1; t < trees_.size(); t++) {
             auto old_tree = trees_[t];
             // add vertices for lagged variable
@@ -152,10 +113,10 @@ public:
                 auto v_new = boost::add_vertex(trees_[t]);
                 
                 // copy structure information
-                trees_[t][v_new].conditioned = trees_[t][v].conditioned + lag;
-                trees_[t][v_new].conditioning = trees_[t][v].conditioning + lag;
-                trees_[t][v_new].all_indices = trees_[t][v].all_indices + lag;
-                trees_[t][v_new].prev_edge_indices = trees_[t][v].prev_edge_indices + lag;
+                trees_[t][v_new].conditioned = shift(trees_[t][v].conditioned);
+                trees_[t][v_new].conditioning = shift(trees_[t][v].conditioning);
+                trees_[t][v_new].all_indices = shift(trees_[t][v].all_indices);
+                trees_[t][v_new].prev_edge_indices = shift(trees_[t][v].prev_edge_indices);
                 
                 // copy data and remove rows
                 size_t n = trees_[t][v].hfunc1.rows() - 1;
@@ -171,62 +132,68 @@ public:
             for (auto e : boost::edges(old_tree)) {
                 size_t v1 = boost::source(e, old_tree);
                 size_t v2 = boost::target(e, old_tree);
-                auto e_new = boost::add_edge(v1 + lag, v2 + lag, trees_[t]).first;
+                auto e_new = boost::add_edge(v1 + d0_ * lag_, v2 + d0_ * lag_, trees_[t]).first;
                 trees_[t][e_new].pair_copula = trees_[t][e].pair_copula;
                 trees_[t][e_new].fit_id = trees_[t][e].fit_id;
             }
         }
         trees_opt_ = trees_;
         trees_ = std::vector<VineTree>(1);
-        d_ += cs_dim_; 
         vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_),
-                                      build_t_vine_array(cs_struct_, (lag_ + 1)));
+                                      build_t_vine_array(struct0_, lag_));
+        
+        size_t n = data_.rows() - 1;
+        Eigen::MatrixXd newdata(n, d_);
+        newdata << data_.topRows(n), data_.rightCols(d0_).bottomRows(n);
+        data_ = newdata;
     }
     
-    Eigen::MatrixXd add_lag(const Eigen::MatrixXd& data)
+    Eigen::MatrixXd data()
     {
-        size_t n = data.rows() - 1;
-        Eigen::MatrixXd newdata(n, d_);
-        newdata << data.topRows(n), data.rightCols(cs_dim_).bottomRows(n);
-        return newdata;
+        return data_;
     }
     
 protected:
     double compute_fit_id(const EdgeProperties& e) override
     {
-        return (e.conditioned[0] % cs_dim_) * cs_dim_ * 10 + (e.conditioned[1] % cs_dim_);
+        return (e.conditioned[0] % d0_) * d0_ * 10 + (e.conditioned[1] % d0_);
     }
     
-    size_t order_;
+    Eigen::MatrixXd data_;
+    size_t d0_;
+    size_t p_;
     size_t lag_;
-    RVineStructure cs_struct_;
-    size_t cs_dim_;
+    RVineStructure struct0_;
 };
 
 } // end tools_select
+
+
+// --------------------- T-VINE ----------------------------------
     
 class TVine : public Vinecop {
 public:
-    TVine(RVineStructure cs_struct, 
-          size_t order = 1, 
+    TVine(size_t d0, size_t p = 0) : 
+        TVine(RVineStructure(tools_stl::seq_int(1, d0)), p) {}
+
+    TVine(RVineStructure struct0, 
+          size_t p = 0, 
           size_t in = 1, 
-          size_t out = 1) 
-          : 
-          cs_dim_(cs_struct.get_dim()),
-          order_(order),
-          in_(in),
-          out_(out),
-          cs_struct_(cs_struct),
-          Vinecop(cs_struct)
+          size_t out = 1) : 
+        Vinecop(struct0), 
+        d0_(struct0.get_dim()),
+        p_(p), 
+        in_(in), 
+        out_(out), 
+        struct0_(struct0)
     {
-		d_ = cs_struct.get_dim() * order;
-        vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 
-                                      build_t_vine_array(cs_struct, order));
+		d_ = struct0.get_dim() * (p + 1);
+        vine_struct_ = RVineStructure(
+            tools_stl::seq_int(1, d_),
+            build_t_vine_array(struct0, p)
+        );
         pair_copulas_ = make_pair_copula_store(d_);
     }
-    
-    TVine(size_t d, size_t order = 1) : 
-        TVine(RVineStructure(tools_stl::seq_int(1, d)), order) {}
     
     void select_families(const Eigen::MatrixXd &data,
                          const FitControlsVinecop &controls = FitControlsVinecop())
@@ -237,17 +204,16 @@ public:
         if (vine_struct_.get_trunc_lvl() > 0) {
             auto newdata = data;
             auto revorder = vine_struct_.get_order();
-            revorder.resize(cs_dim_);
+            revorder.resize(d0_);
             tools_stl::reverse(revorder);
-            for (size_t j = 0; j < cs_dim_; ++j)
+            for (size_t j = 0; j < d0_; ++j)
                 newdata.col(j) = data.col(revorder[j] - 1);
-            tools_select::TVineSelector selector(newdata, cs_struct_, controls);
+            tools_select::TVineSelector selector(newdata, struct0_, controls);
             
             selector.select_all_trees(newdata);
-            for (size_t lag = 1; lag < order_; lag++) {
+            for (size_t lag = 1; lag <= p_; lag++) {
                 selector.add_lag();
-                newdata = selector.add_lag(newdata);
-                selector.select_all_trees(newdata);
+                selector.select_all_trees(selector.data());
             }
             
             vine_struct_ = selector.get_rvine_structure();
@@ -269,10 +235,9 @@ public:
 
         auto newdata = data;
         tools_select::TVineSelector tv_selector(data, selector, controls);
-        for (size_t lag = 1; lag < order_; lag++) {
+        for (size_t lag = 1; lag <= p_; lag++) {
             tv_selector.add_lag();
-            newdata = tv_selector.add_lag(newdata);
-            tv_selector.select_all_trees(newdata);
+            tv_selector.select_all_trees(tv_selector.data());
         }
         
         vine_struct_ = tv_selector.get_rvine_structure();
@@ -285,16 +250,15 @@ public:
 private:
     void check_data_dim(const Eigen::MatrixXd &data) 
     { 
-        if (cs_dim_ != data.cols())
+        if (d0_ != static_cast<size_t>(data.cols()))
             throw std::runtime_error("wrong number of columns");
     }
-        
-
-    size_t cs_dim_;
-    size_t order_;
+    
+    size_t d0_;
+    size_t p_;
     size_t in_;
     size_t out_;
-    RVineStructure cs_struct_;
+    RVineStructure struct0_;
 };
 
 
