@@ -292,6 +292,11 @@ inline double VinecopSelector::get_threshold() const
     return threshold_;
 }
 
+// extracts the number of observations 
+inline size_t VinecopSelector::get_nobs() const
+{
+    return n_;
+}
 
 //! chooses threshold for next iteration such that at a proportion of at
 //! least 2.5% of the previously thresholded pairs become non-thresholded.

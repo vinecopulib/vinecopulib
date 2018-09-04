@@ -224,11 +224,7 @@ public:
                 selector.select_all_trees(selector.data());
             }
             
-            vine_struct_ = selector.get_rvine_structure();
-            threshold_ = selector.get_threshold();
-            loglik_ = selector.get_loglik();
-            nobs_ = data.rows();
-            pair_copulas_ = selector.get_pair_copulas();
+            finalize_fit(selector);
         }
     }
     
@@ -248,11 +244,7 @@ public:
             tv_selector.select_all_trees(tv_selector.data());
         }
         
-        vine_struct_ = tv_selector.get_rvine_structure();
-        threshold_ = tv_selector.get_threshold();
-        loglik_ = tv_selector.get_loglik();
-        nobs_ = data.rows();
-        pair_copulas_ = tv_selector.get_pair_copulas();
+        finalize_fit(tv_selector);
     }
     
 private:

@@ -175,6 +175,7 @@ protected:
     void check_pair_copulas_rvine_structure(
         const std::vector<std::vector<Bicop>> &pair_copulas) const;
     double calculate_mbicv_penalty(const size_t nobs, const double psi0) const;
+    void finalize_fit(const tools_select::VinecopSelector& selector);
 };
 
 }

@@ -311,11 +311,8 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
     } else {
         selector.select_all_trees(data);
     }
-    threshold_ = selector.get_threshold();
-    loglik_ = selector.get_loglik();
-    nobs_ = data.rows();
-    vine_struct_ = selector.get_rvine_structure();
-    pair_copulas_ = selector.get_pair_copulas();
+    
+    finalize_fit(selector);
 }
 
 //! automatically selects all pair-copula families and fits all parameters.
@@ -342,10 +339,8 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
         } else {
             selector.select_all_trees(newdata);
         }
-        threshold_ = selector.get_threshold();
-        loglik_ = selector.get_loglik();
-        nobs_ = data.rows();
-        pair_copulas_ = selector.get_pair_copulas();
+        
+        finalize_fit(selector);
     }
 }
 
@@ -1114,6 +1109,16 @@ inline void Vinecop::truncate(size_t truncation_level)
     vine_struct_.truncate(truncation_level);
     pair_copulas_.resize(truncation_level);
 }
+
+inline void Vinecop::finalize_fit(const tools_select::VinecopSelector& selector)
+{
+    vine_struct_ = selector.get_rvine_structure();
+    threshold_ = selector.get_threshold();
+    loglik_ = selector.get_loglik();
+    nobs_ = selector.get_nobs();
+    pair_copulas_ = selector.get_pair_copulas();
+}
+
 
 
 }
