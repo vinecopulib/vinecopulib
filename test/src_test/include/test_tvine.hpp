@@ -29,14 +29,10 @@ TEST(test_tvine, playground)
     // controls.set_show_trace(true);
     tv.select_families(u, controls);
     // tv.select_all(u, controls);
-}
+    
+    TVine(tv.get_all_pair_copulas(), tv.get_rvine_structure(), 2);
+    std::cout << tv.simulate(10) << std::endl;
 
-TEST(conditional, playground)
-{
-    auto str = RVineStructure(tools_stl::seq_int(1, 3));
-    for (auto o : str.get_order())
-        std::cout << o << " ";
-    std::cout << std::endl << str.get_struct_array() << std::endl;
 }
 
 } // namespace test_tvine

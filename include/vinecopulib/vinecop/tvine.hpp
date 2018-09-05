@@ -1,6 +1,7 @@
 
 #include <vinecopulib/vinecop/class.hpp>
 #include <vinecopulib/vinecop/tools_select.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
 
 namespace vinecopulib {
     
@@ -187,7 +188,7 @@ public:
     TVine(size_t d0, size_t p = 0) : 
         TVine(RVineStructure(tools_stl::seq_int(1, d0)), p) {}
 
-    TVine(RVineStructure struct0, 
+    TVine(const RVineStructure &struct0, 
           size_t p = 0, 
           size_t in = 1, 
           size_t out = 1) : 
@@ -205,6 +206,26 @@ public:
         }
         vine_struct_ = RVineStructure(order, build_t_vine_array(struct0, p));
         pair_copulas_ = make_pair_copula_store(d_);
+    }
+    
+    TVine(const std::vector<std::vector<Bicop>> &pair_copulas,
+          const RVineStructure &vine_struct, 
+          size_t p) : 
+         Vinecop(vine_struct), 
+         d0_(vine_struct.get_dim() / (p + 1)),
+         p_(p), 
+         in_(1), 
+         out_(1)
+    {
+          struct0_ = vine_struct;
+          struct0_.reduce(d0_);
+          check_pair_copulas_rvine_structure(pair_copulas);
+          pair_copulas_ = pair_copulas;
+    }
+    
+    RVineStructure get_struct0() const
+    {
+        return struct0_;
     }
     
     void select_families(const Eigen::MatrixXd &data,
@@ -249,6 +270,72 @@ public:
         }
         
         finalize_fit(tv_selector);
+    }
+    
+    Eigen::MatrixXd cond_simulate(size_t n, const Eigen::MatrixXd& data)
+    {
+        check_data_dim(data);
+        
+        Eigen::MatrixXd cond_pit;
+        Eigen::MatrixXd combined_vals(n, d_);
+        if (p_ > 0) {
+            // only most recent observations are used
+            Eigen::MatrixXd cond_vals = data.bottomRows(p_);
+            
+            // spread data into columns
+            for (size_t lag = 1; lag < p_; lag++) {
+                cond_vals = spread_lag(cond_vals, d0_);
+            }
+            
+            d_ -= d0_;
+            vine_struct_.reduce(cond_vals.cols());
+            combined_vals << 
+                rosenblatt(cond_vals).replicate(n, 1), 
+                tools_stats::simulate_uniform(n, d0_);
+            
+            d_ += d0_;
+            vine_struct_ = TVine(struct0_, p_, in_, out_).get_rvine_structure();
+        } else {
+            combined_vals << tools_stats::simulate_uniform(n, d0_);    
+        }
+        
+        return inverse_rosenblatt(combined_vals).rightCols(d0_);
+    }
+    
+    Eigen::MatrixXd simulate(const size_t n, 
+                             const bool qrng = false, 
+                             const size_t num_threads = 1,
+                             const std::vector<int>& seeds = std::vector<int>()) const
+    {
+        auto uniform_rng = [seeds, qrng] (size_t n, size_t d) {
+            if (qrng) {
+                if (d > 300) {
+                    return tools_stats::sobol(n, d, seeds);
+                } else {
+                    return tools_stats::ghalton(n, d, seeds);
+                }
+            } else {
+                return tools_stats::simulate_uniform(n, d, seeds);
+            }
+        };
+        
+        // initialize
+        Eigen::MatrixXd sim(n, d0_);
+        Eigen::MatrixXd Ui = uniform_rng(1, d_);
+        Eigen::MatrixXd V = inverse_rosenblatt(Ui, num_threads);
+        for (size_t i = 0; i <= p_; i++) {
+            sim.row(i) = V.block(0, i * d0_, 1, d0_);
+        }
+        
+        // simulate conditional on previous observations
+        Eigen::MatrixXd U = uniform_rng(n, d0_);
+        for (size_t i = p_ + 1; i < n; i++) {
+            Ui.leftCols(d_ - d0_).swap(Ui.rightCols(d_ - d0_));
+            Ui.rightCols(d0_) = U.row(i);
+            sim.row(i) = inverse_rosenblatt(Ui, num_threads).rightCols(d0_);
+        }
+        
+        return sim;    
     }
     
     
