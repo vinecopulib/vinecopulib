@@ -242,6 +242,26 @@ inline void RVineStructure::reduce(size_t d)
     }
 }
 
+inline std::string RVineStructure::str() const
+{
+    auto rev_order = this->get_rev_order();
+    std::stringstream str;
+    for (size_t i = 0; i < d_ - 1; i++) {
+        for (size_t j = 0; j < d_ - i - 1; j++) {
+            if (i < trunc_lvl_) {
+                str << struct_array_(i, j) << " ";
+            } else  {
+                str << "  ";
+            }
+        }
+        str << rev_order[d_ - 1 - i] << std::endl;
+    }
+    str << rev_order[0] << std::endl;
+    
+    return str.str();
+}
+
+
 //! extract the R-vine matrix representation.
 inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> 
 RVineStructure::get_matrix() const 
@@ -490,3 +510,12 @@ inline void RVineStructure::check_proximity_condition() const
 }
 
 }
+
+//! ostream method for RightTrapezoid, to be used with `std::cout`
+//! @param os an output stream.
+//! @param rvm n triangular array.
+std::ostream& operator<<(std::ostream& os, const vinecopulib::RVineStructure& rvs) 
+{  
+    os << rvs.str();
+    return os;  
+}  

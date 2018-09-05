@@ -94,6 +94,8 @@ public:
     void truncate(size_t trunc_lvl);
     void reduce(size_t d);
 
+    std::string str() const;
+    
 private:
 
     size_t find_trunc_lvl(
@@ -128,5 +130,8 @@ private:
 };
 
 }
+
+std::ostream& operator<<(std::ostream& os, const vinecopulib::RVineStructure& rvs);
+
 
 #include <vinecopulib/vinecop/implementation/rvine_structure.ipp>
