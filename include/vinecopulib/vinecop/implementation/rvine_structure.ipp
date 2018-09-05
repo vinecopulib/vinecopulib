@@ -244,19 +244,19 @@ inline void RVineStructure::reduce(size_t d)
 
 inline std::string RVineStructure::str() const
 {
-    auto rev_order = this->get_rev_order();
+    auto inv_perm = tools_stl::invert_permutation(this->get_order());
     std::stringstream str;
     for (size_t i = 0; i < d_ - 1; i++) {
         for (size_t j = 0; j < d_ - i - 1; j++) {
             if (i < trunc_lvl_) {
-                str << struct_array_(i, j) << " ";
+                str << inv_perm[struct_array_(i, j) - 1] + 1 << " ";
             } else  {
                 str << "  ";
             }
         }
-        str << rev_order[d_ - 1 - i] << std::endl;
+        str << order_[i] << std::endl;
     }
-    str << rev_order[0] << std::endl;
+    str << order_[d_ - 1] << std::endl;
     
     return str.str();
 }
