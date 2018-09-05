@@ -398,7 +398,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
         // fill matrix column by column
         for (size_t col = 0; col < d_ - 1; ++col) {
             tools_interface::check_user_interrupt();
-            // matrix above trunc_lvl will be filled more efficiently later
+            // matrix above trunc_lvl is left empty
             size_t t =
                 std::max(std::min(trunc_lvl, d_ - 1 - col), static_cast<size_t>(1));
             // start with highest tree in this column
@@ -426,9 +426,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
 
                 // assign fitted pair copula to appropriate entry, see
                 // `Vinecop::get_pair_copula()`.
-                if (trunc_lvl > 0) {
-                    pair_copulas_[t - 1][col] = trees_[t][e].pair_copula;
-                }
+                pair_copulas_[t - 1][col] = trees_[t][e].pair_copula;
 
                 // initialize running set with full conditioning set of this edge
                 ning_set = trees_[t][e].conditioning;
