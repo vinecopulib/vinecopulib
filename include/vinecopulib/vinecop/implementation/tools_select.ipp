@@ -864,18 +864,10 @@ inline void VinecopSelector::remove_vertex_data(VineTree &tree)
 
 //! Fit and select a pair copula for each edges
 //! @param tree a vine tree preprocessed with add_edge_info().
-inline void VinecopSelector::select_pair_copulas(VineTree &tree)
-{
-    VineTree tree_opt;
-    select_pair_copulas(tree, tree_opt);
-}
-
-//! Fit and select a pair copula for each edges
-//! @param tree a vine tree preprocessed with add_edge_info().
 //! @param tree_opt the current optimal tree (used only for sparse
 //!     selection).
 inline void VinecopSelector::select_pair_copulas(VineTree &tree,
-                                                 VineTree &tree_opt)
+                                                 const VineTree &tree_opt)
 {
     auto select_pc = [&](EdgeIterator e) -> void {
         tools_interface::check_user_interrupt();
@@ -912,7 +904,7 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
     
     // make sure that Bicop.select() doesn't spawn new threads
     size_t num_threads = controls_.get_num_threads();
-    controls_.set_num_threads(1);
+    controls_.set_num_threads(0);
     pool_->map(select_pc, boost::edges(tree));
     pool_->wait();
     controls_.set_num_threads(num_threads);
