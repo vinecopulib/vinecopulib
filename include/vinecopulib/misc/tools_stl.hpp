@@ -120,6 +120,14 @@ vector <T> cat(T x, const vector <T> &y)
 }
 
 template<class T>
+vector <T> span(vector <T> x, size_t start, size_t len)
+{
+    x.erase(x.begin(), x.begin() + std::min(x.size(), start));
+    x.resize(std::min(x.size(), len));
+    return x;
+}
+
+template<class T>
 vector <T> set_sym_diff(vector <T> x, vector <T> y)
 {
     vector <T> dxy = set_diff(x, y);
