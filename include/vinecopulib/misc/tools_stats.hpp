@@ -102,10 +102,6 @@ Eigen::MatrixXd to_pseudo_obs(Eigen::MatrixXd x,
 double pairwise_mcor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
                      const Eigen::VectorXd &weights = Eigen::VectorXd());
 
-double pairwise_rho(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
-
-double pairwise_hoeffd(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x);
-
 Eigen::MatrixXd dependence_matrix(const Eigen::MatrixXd &x,
                                   const std::string &measure);
 

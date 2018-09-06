@@ -2,6 +2,7 @@
 #include <vinecopulib/vinecop/class.hpp>
 #include <vinecopulib/vinecop/tools_select.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
+#include <wdm/eigen.hpp>
 
 namespace vinecopulib {
     
@@ -259,6 +260,7 @@ public:
                   const FitControlsVinecop &controls) : 
         TVineSelector(data, selector.get_rvine_structure(), controls)
     {
+        select_connecting_vertices();
         pair_copulas_ = selector.get_pair_copulas();
         trees_ = selector.get_trees_opt();      
     }            
@@ -286,7 +288,7 @@ public:
         trees_.resize(t + 2);
         trees_[t + 1] = new_tree;
     }
-
+    
     void add_lag()
     {
         lag_++;
@@ -306,6 +308,36 @@ public:
         trees_ = std::vector<VineTree>(1);
         vine_struct_ = TVineStructure(cs_struct_, lag_);
         data_ = spread_lag(data_, d_cs_);
+    }
+    
+    Eigen::MatrixXd data()
+    {
+        return data_;
+    }
+    
+protected:
+    double compute_fit_id(const EdgeProperties& e) override
+    {
+        return (e.conditioned[0] % d_cs_) * d_cs_ * 10 + (e.conditioned[1] % d_cs_);
+    }
+    
+private:
+    void select_connecting_vertices()
+    {
+        double crit = 0.0, new_crit = 0.0;
+        size_t d = data_.cols();
+        size_t n = data_.rows() - 1;
+        Eigen::MatrixXd pair_data(n, 2);
+        for (size_t i = 0; i < d; i++) {
+            for (size_t j = i; j < d; j++) {
+                new_crit = wdm::wdm(data_.col(i).tail(n), data_.col(j).head(n), "hoeffd");
+                if (std::abs(new_crit) > crit) {
+                    crit = std::abs(new_crit);
+                    in_vertex_ = i;
+                    out_vertex_ = j;
+                }
+            }
+        }
     }
     
     void duplicate_vertex(size_t v, VineTree& tree)
@@ -341,17 +373,7 @@ public:
         tree[e_new.first].pair_copula = tree[e].pair_copula;
         tree[e_new.first].fit_id = tree[e].fit_id;
     }
-        
-    Eigen::MatrixXd data()
-    {
-        return data_;
-    }
-    
-protected:
-    double compute_fit_id(const EdgeProperties& e) override
-    {
-        return (e.conditioned[0] % d_cs_) * d_cs_ * 10 + (e.conditioned[1] % d_cs_);
-    }
+
     
     Eigen::MatrixXd data_;
     size_t d_cs_;

@@ -19,19 +19,22 @@ using namespace vinecopulib;
 TEST(test_tvine, playground)
 {
     FitControlsVinecop controls({BicopFamily::gaussian});
-    controls.set_selection_criterion("loglik");
 
-    auto u = tools_stats::simulate_uniform(20, 3);
+    auto u = tools_stats::simulate_uniform(30, 4);
+        
+    TVine tv(4, 0);
     
-    u = tools_stats::simulate_uniform(30, 3);
+    auto cs_struct = tv.get_cs_structure();
+    // // cs_struct.truncate(2);
+
+    TVine tv2(cs_struct, 1, 2, 4);
     
-    TVine tv(3, 2);    
-    // controls.set_show_trace(true);
-    tv.select_families(u, controls);
-    // tv.select_all(u, controls);
-    
-    TVine(tv.get_all_pair_copulas(), tv.get_rvine_structure(), 2);
-    std::cout << tv.simulate(10) << std::endl;
+    controls.set_show_trace(true);
+    // tv2.select_families(u, controls);
+    tv.select_all(u, controls);
+    // 
+    // TVine(tv.get_all_pair_copulas(), tv.get_rvine_structure(), 2);
+    // std::cout << tv.simulate(10) << std::endl;
 
 }
 
