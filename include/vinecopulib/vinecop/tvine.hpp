@@ -11,6 +11,8 @@ namespace vinecopulib {
 // - structure selection with fixed in or out node
 // - loglikelihood calculation (current numbers are incorrect)
 // - margins
+// - truncated models
+// - avoid unneccessary reordering
 // 
 // TO DISCUSS:
 // - fit routine
@@ -35,13 +37,14 @@ public:
         cs_struct_(reorder_structure(cs_struct, in_vertex))
     {
         order_ = expand_order(cs_struct_.get_order(), p);
-        d_ = order_.size();
         struct_array_ = build_t_vine_array(cs_struct_, p, in_vertex, out_vertex);
-        to_natural_order();
-        trunc_lvl_ = struct_array_.get_trunc_lvl();
-        max_array_     = compute_max_array();
-        needed_hfunc1_ = compute_needed_hfunc1();
-        needed_hfunc2_ = compute_needed_hfunc2();
+        RVineStructure new_struct(order_, struct_array_);
+        struct_array_  = new_struct.get_struct_array();
+        max_array_     = new_struct.get_max_array();
+        needed_hfunc1_ = new_struct.get_needed_hfunc1();
+        needed_hfunc2_ = new_struct.get_needed_hfunc2();
+        d_             = new_struct.get_dim();
+        trunc_lvl_     = new_struct.get_trunc_lvl();
     }
     
     size_t get_p() const
@@ -323,7 +326,7 @@ public:
         // update trees and structure
         trees_opt_ = trees_;
         trees_ = std::vector<VineTree>(1);
-        vine_struct_ = TVineStructure(cs_struct_, lag_);
+        vine_struct_ = TVineStructure(cs_struct_, lag_, in_vertex_, out_vertex_);
         data_ = spread_lag(data_, d_cs_);
     }
     
@@ -583,7 +586,7 @@ public:
     
     
 private:
-
+    
     void check_data_dim(const Eigen::MatrixXd &data) const
     { 
         if (d_cs_ != static_cast<size_t>(data.cols())) {
