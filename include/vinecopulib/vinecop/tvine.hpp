@@ -6,10 +6,21 @@
 
 namespace vinecopulib {
     
+// TODO: 
+// - order selection
+// - structure selection with fixed in or out node
+// - loglikelihood calculation (current numbers are incorrect)
+// - margins
+// 
+// TO DISCUSS:
+// - fit routine
+// - reorder function
 // ------------------------- T-VINE STRUCTURE ---------------
 
 class TVineStructure : public RVineStructure {
 public:
+    TVineStructure() {}
+    
     TVineStructure(size_t d_cs, size_t p = 0) : 
         TVineStructure(RVineStructure(tools_stl::seq_int(1, d_cs)), p) 
     {}
@@ -33,11 +44,11 @@ public:
         needed_hfunc2_ = compute_needed_hfunc2();
     }
     
-    RVineStructure get_cs_structure() const 
+    size_t get_p() const
     {
-        return cs_struct_;
+        return p_;
     }
-    
+        
     size_t get_in_vertex() const
     {
         return in_vertex_;
@@ -47,6 +58,12 @@ public:
     {
         return out_vertex_;
     }
+    
+    RVineStructure get_cs_structure() const 
+    {
+        return cs_struct_;
+    }
+    
     
 private:
     std::vector<size_t> expand_order(const std::vector<size_t> &order, size_t p) const
@@ -263,7 +280,7 @@ public:
         select_connecting_vertices();
         pair_copulas_ = selector.get_pair_copulas();
         trees_ = selector.get_trees_opt();      
-    }            
+    }
     
     ~TVineSelector() {}
     
@@ -398,13 +415,13 @@ public:
           size_t p = 0, 
           size_t in_vertex = 1, 
           size_t out_vertex = 1) : 
-        Vinecop(cs_struct), 
         d_cs_(cs_struct.get_dim()),
         p_(p), 
         in_vertex_(in_vertex), 
-        out_vertex_(out_vertex),
-        cs_struct_(cs_struct)
+        out_vertex_(out_vertex)
     {
+        threshold_ = 0.0;
+        loglik_ = NAN;
 	    d_ = d_cs_ * (p + 1);
         vine_struct_ = TVineStructure(cs_struct, p, in_vertex, out_vertex);
         pair_copulas_ = make_pair_copula_store(d_);
@@ -413,22 +430,42 @@ public:
     TVine(const std::vector<std::vector<Bicop>> &pair_copulas,
           const TVineStructure &tvine_struct, 
           size_t p) : 
-         Vinecop(tvine_struct), 
          d_cs_(tvine_struct.get_dim() / (p + 1)),
          p_(p), 
          in_vertex_(1), 
-         out_vertex_(1),
-         cs_struct_(tvine_struct.get_cs_structure())
+         out_vertex_(1)
     {
+        d_ = tvine_struct.get_dim();
+        threshold_ = 0.0;
+        loglik_ = NAN;
         check_pair_copulas_rvine_structure(pair_copulas);
         pair_copulas_ = pair_copulas;
     }
     
-    RVineStructure get_cs_structure() const 
+    size_t get_p() const
     {
-        return cs_struct_;
+        return p_;
+    }
+        
+    size_t get_in_vertex() const
+    {
+        return in_vertex_;
     }
     
+    size_t get_out_vertex() const
+    {
+        return out_vertex_;
+    }
+    
+    RVineStructure get_cs_structure() const 
+    {
+        return vine_struct_.get_cs_structure();
+    }
+    
+    TVineStructure get_rvine_structure() const
+    {
+        return vine_struct_;
+    }
     void select_families(const Eigen::MatrixXd &data,
                          const FitControlsVinecop &controls = FitControlsVinecop())
     {
@@ -442,8 +479,11 @@ public:
             tools_stl::reverse(rev_order);
             for (size_t j = 0; j < d_cs_; ++j)
                 newdata.col(j) = data.col(rev_order[j] - 1);
-            tools_select::TVineSelector selector(newdata, cs_struct_, controls,
-                                                 in_vertex_, out_vertex_);
+            tools_select::TVineSelector selector(newdata, 
+                                                 vine_struct_.get_cs_structure(), 
+                                                 controls,
+                                                 in_vertex_, 
+                                                 out_vertex_);
             
             selector.select_all_trees(newdata);
             for (size_t lag = 1; lag <= p_; lag++) {
@@ -543,6 +583,7 @@ public:
     
     
 private:
+
     void check_data_dim(const Eigen::MatrixXd &data) const
     { 
         if (d_cs_ != static_cast<size_t>(data.cols())) {
@@ -558,7 +599,7 @@ private:
     size_t p_;
     size_t in_vertex_;
     size_t out_vertex_;
-    RVineStructure cs_struct_;
+    TVineStructure vine_struct_;
 };
 
 }
