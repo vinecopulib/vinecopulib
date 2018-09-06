@@ -15,43 +15,56 @@ public:
 
     TVineStructure(const RVineStructure &cs_struct, 
                    size_t p = 0, 
-                   size_t in = 1, 
-                   size_t out = 1) : 
+                   size_t in_vertex = 1, 
+                   size_t out_vertex = 1) : 
         p_(p), 
-        in_(in), 
-        out_(out),
-        cs_struct_(reorder_structure(cs_struct, in))
+        in_vertex_(in_vertex), 
+        out_vertex_(out_vertex),
+        cs_struct_(reorder_structure(cs_struct, in_vertex))
     {
-        order_ = expand_order(cs_struct_, p);
-        struct_array_ = build_t_vine_array(cs_struct, p, in, out);
-        RVineStructure rv(order_, struct_array_); // fails checks
-        d_ = struct_array_.get_dim();
+        order_ = expand_order(cs_struct_.get_order(), p);
+        d_ = order_.size();
+        struct_array_ = build_t_vine_array(cs_struct_, p, in_vertex, out_vertex);
+        to_natural_order();
         trunc_lvl_ = struct_array_.get_trunc_lvl();
         max_array_     = compute_max_array();
         needed_hfunc1_ = compute_needed_hfunc1();
         needed_hfunc2_ = compute_needed_hfunc2();
     }
     
-    RVineStructure get_cs_structure() const {return cs_struct_;}
-    
-protected:
-
-    std::vector<size_t> expand_order(const RVineStructure &cs_struct, size_t p)
+    RVineStructure get_cs_structure() const 
     {
-        size_t d_cs = cs_struct.get_dim();
-        size_t d = d_cs * (p + 1);
-        std::vector<size_t> order(d);
-        for (size_t i = 0; i < d; i++) {
-            order[i] = cs_struct_.get_order()[i % d_cs] + (i / d_cs) * d_cs;
-        }
-        return order;
+        return cs_struct_;
     }
     
-    // output in natural order
-    std::vector<size_t> pivot_diag(RVineStructure structure, size_t index)
+    size_t get_in_vertex() const
     {
-        size_t d = structure.get_dim();
-        auto diag = structure.get_rev_order();
+        return in_vertex_;
+    }
+    
+    size_t get_out_vertex() const
+    {
+        return out_vertex_;
+    }
+    
+private:
+    std::vector<size_t> expand_order(const std::vector<size_t> &order, size_t p) const
+    {
+        size_t d_cs = order.size();
+        size_t d = d_cs * (p + 1);
+        std::vector<size_t> new_order(d);
+        for (size_t i = 0; i < d; i++) {
+            new_order[i] = order[i % d_cs] + (i / d_cs) * d_cs;
+        }
+        
+        return new_order;
+    }
+    
+    std::vector<size_t> pivot_diag(const std::vector<size_t>& diag, 
+                                   const TriangularArray<size_t>& struct_array, 
+                                   size_t index)  const
+    {
+        size_t d = diag.size();
         std::vector<size_t> x(d);
         
         size_t i = 0;
@@ -62,125 +75,146 @@ protected:
         
         size_t pivot_col = i;
         while (i < d - 1) {
-            x[i] = structure.struct_array(d - 2 - i, pivot_col);
+            x[i] = struct_array(d - 2 - i, pivot_col);
             i++;
         }
         x[d - 1] = index;
         
-        
         return x;
     }
     
-    RVineStructure reorder_structure(RVineStructure structure, size_t in_node)
+    TriangularArray<size_t> get_actual_struct_array(const RVineStructure& structure) const
     {
-       using namespace tools_stl;
-       
-       // prepare objects
-       size_t d = structure.get_dim();
-       auto old_struct = structure.get_struct_array();
-       auto new_struct = old_struct;
-       // working w/ rev_order is easier algorithmically; will be reversed again
-       // when final object ist created.
-       auto old_order = structure.get_rev_order();
-       auto new_order = pivot_diag(structure, in_node);
-       
-       // loop through all columns
-       for (size_t i = 0; i < d - 1; i++) {
-           // extract elements of pivotal order that are required for the default
-           // off-diagonal elements
-           auto new_column = pivot_diag(structure, new_order[i]);
-           new_column.erase(new_column.end() - 1);
-           new_column.erase(new_column.begin(), new_column.begin() + i);
-           tools_stl::reverse(new_column);
-           
-           auto diag_until = span(new_order, 0, i);
-           auto diag_after = span(new_order, i, d - i);
-           for (size_t t = 0; t < new_column.size(); t++) {
-               // Check whether an element in this column is already contained in
-               // the diagonal to the left. If so, we need to find another node 
-               // that is connected to the diagonal entry of column i. We search 
-               // for such an edge in the old structure, but only to the right of 
-               // the in_node and to the the left of the current column (included).
-               if (is_member(new_column[t], diag_until)) {
-                   bool found_node = false;
-                   for (size_t j = find_position(in_node, old_order); j <= i; j++) {
-                       if (new_order[i] == old_struct(t, j)) {
-                           if (is_member(old_order[j], diag_after)) {
-                               new_column[t] = old_order[j];
-                               found_node = true;
-                           }
-                       } else if (new_order[i] == old_order[j]) {
-                           if (is_member(old_struct(t, j), diag_after)) {
-                               new_column[t] = old_struct(t, j);
-                           }
-                       }
-                       if (found_node) {
-                           // The new entry may already be contained in this
-                           // column. We need to check the next rows for that 
-                           // as well.
-                           diag_until = cat(new_column[t], diag_until);
-                           break;
-                       }
-                   }
-               }
-           }
-           new_struct[i] = new_column;
-       }
-       
-       // this must always hold beacuse in_node comes last on the diagonal:
-       new_struct(0, d - 2) = in_node;
-       
-       // we were working with a reversed order -> revert back to actual order
-       reverse(new_order);
-       return RVineStructure(new_order, new_struct);
-   }
+        // structure array is in natural order, must convert to actual order
+        auto no_array = structure.get_struct_array();
+        auto order = structure.get_order();
+        for (size_t i = 0; i < structure.get_dim() - 1; i++) {
+            for (auto &s : no_array[i]) {
+                s = order[s - 1];
+            }
+        }
+        
+        return no_array;
+    }
+        
+    RVineStructure reorder_structure(const RVineStructure& structure, size_t in_vertex) const
+    {
+        using namespace tools_stl;
+        size_t d = structure.get_dim();
+ 
+        // structure array is in natural order, must convert to actual order
+        auto old_struct = get_actual_struct_array(structure);
+        auto new_struct = old_struct;
+
+        // prepare objects
+        // working w/ rev_order is easier algorithmically; will be reversed again
+        // when final object ist created.
+        auto old_order = structure.get_rev_order();
+        auto new_order = pivot_diag(old_order, old_struct, in_vertex);
+
+        // loop through all columns
+        for (size_t i = 0; i < d - 1; i++) {
+            // extract elements of pivotal order that are required for the default
+            // off-diagonal elements
+            auto new_column = pivot_diag(old_order, old_struct, new_order[i]);
+            new_column.erase(new_column.end() - 1);
+            new_column.erase(new_column.begin(), new_column.begin() + i);
+            tools_stl::reverse(new_column);
+            
+            auto diag_until = span(new_order, 0, i);
+            auto diag_after = span(new_order, i, d - i);
+            for (size_t t = 0; t < new_column.size(); t++) {
+                // Check whether an element in this column is already contained in
+                // the diagonal to the left. If so, we need to find another node 
+                // that is connected to the diagonal entry of column i. We search 
+                // for such an edge in the old structure, but only to the right of 
+                // the in_vertex and to the the left of the current column (included).
+                if (is_member(new_column[t], diag_until)) {
+                    bool found_node = false;
+                    for (size_t j = find_position(in_vertex, old_order); j <= i; j++) {
+                        if (new_order[i] == old_struct(t, j)) {
+                            if (is_member(old_order[j], diag_after)) {
+                                new_column[t] = old_order[j];
+                                found_node = true;
+                            }
+                        } else if (new_order[i] == old_order[j]) {
+                            if (is_member(old_struct(t, j), diag_after)) {
+                                new_column[t] = old_struct(t, j);
+                            }
+                        }
+                        if (found_node) {
+                            // The new entry may already be contained in this
+                            // column. We need to check the next rows for that 
+                            // as well.
+                            diag_until = cat(new_column[t], diag_until);
+                            break;
+                        }
+                    }
+                }
+            }
+            new_struct[i] = new_column;
+        }
+        
+        // this must always hold beacuse in_vertex comes last on the diagonal:
+        new_struct(0, d - 2) = in_vertex;
+        
+        reverse(new_order);
+        return RVineStructure(new_order, new_struct);
+    }
    
-   inline TriangularArray<size_t> build_t_vine_array(RVineStructure cs_struct, 
-                                                     size_t p,
-                                                     size_t in = 1,
-                                                     size_t out = 1)
-   {
-       size_t d_cs = cs_struct.get_dim();
-       size_t d = d_cs * (p + 1);
-       auto diag = cs_struct.get_rev_order();
+    inline TriangularArray<size_t> build_t_vine_array(
+        const RVineStructure& cs_struct, 
+        size_t p,
+        size_t in_vertex = 1,
+        size_t out_vertex = 1) 
+        const
+    {
+        size_t d_cs = cs_struct.get_dim();
+        size_t d = d_cs * (p + 1);
+        auto diag = cs_struct.get_rev_order();
+        
+        RVineStructure new_struct = cs_struct;
+        if (diag[d_cs - 1] != in_vertex) {
+            new_struct = reorder_structure(new_struct, in_vertex);
+        }
+        
+        auto struct_array = get_actual_struct_array(cs_struct);
+ 
+        TriangularArray<size_t> strct(d);
+        // copy cross-sectional structure
+        for (size_t i = 0; i < d_cs - 1; i++) {
+            for (size_t j = 0; j < d_cs - 1 - i; j++) {
+                strct(i, j) = struct_array(i, j) + d_cs * p;
+            }
+        }
+        
+        // fill parallelograms
+        std::vector<size_t> par = pivot_diag(diag, struct_array, out_vertex);
+        tools_stl::reverse(par);
+        for (size_t lag = 1; lag <= p; lag++) {
+            for (size_t i = 0; i < d_cs; i++) {
+                for (size_t j = 0; j < d_cs; j++) {
+                    strct(i + d_cs * lag - j - 1, j) = par[i] + d_cs * (p - lag);
+                }
+            }
+        }
 
-       TriangularArray<size_t> strct(d);
-       // fill parallelograms
-       std::vector<size_t> par_order = pivot_diag(cs_struct, out);
-       tools_stl::reverse(par_order);
-       for (size_t lag = 1; lag <= p; lag++) {
-           for (size_t i = 0; i < d_cs; i++) {
-               for (size_t j = 0; j < d_cs; j++) {
-                   strct(i + d_cs * lag - j - 1, j) = par_order[i] + d_cs * (p - lag);
-               }
-           }
-       }
-       
-       // copy cross-sectional structure
-       cs_struct = reorder_structure(cs_struct, in);
-       for (size_t i = 0; i < d_cs - 1; i++) {
-           for (size_t j = 0; j < d_cs - 1 - i; j++) {
-               strct(i, j) = cs_struct.struct_array(i, j) + d_cs * p;
-           }
-       }
-
-
-       // copy to other lags
-       for (size_t lag = 1; lag <= p; lag++) {
-           for (size_t j = 0; j < d_cs; j++) {
-               for (size_t i = 0; i < d - 1 - (j + d_cs * lag); i++) {
-                   strct(i, j + d_cs * lag) = strct(i, j) - d_cs * lag;
-               }
-           }
-       }
-       
-       return strct;
-   }
+        // copy to other lags
+        for (size_t lag = 1; lag <= p; lag++) {
+            for (size_t j = 0; j < d_cs; j++) {
+                for (size_t i = 0; i < d - 1 - (j + d_cs * lag); i++) {
+                    strct(i, j + d_cs * lag) = strct(i, j) - d_cs * lag;
+                }
+            }
+        }
+        
+        return strct;
+    }
     
 private:
     size_t p_;
-    size_t in_;
-    size_t out_;
+    size_t in_vertex_;
+    size_t out_vertex_;
     RVineStructure cs_struct_;
 };
 
@@ -206,14 +240,18 @@ namespace tools_select {
 class TVineSelector : public FamilySelector {
 public:
     TVineSelector(const Eigen::MatrixXd &data,
-                  const RVineStructure &vine_struct,
-                  const FitControlsVinecop &controls)  : 
-        FamilySelector(data, vine_struct, controls), 
+                  const RVineStructure &cs_struct,
+                  const FitControlsVinecop &controls,
+                  size_t in_vertex = 1,
+                  size_t out_vertex = 1)  : 
+        FamilySelector(data, cs_struct, controls), 
         data_(data),
-        d_cs_(vine_struct.get_dim()), 
-        p_(d_cs_ / d_ - 1), 
+        d_cs_(cs_struct.get_dim()), 
+        p_(d_cs_ / d_ - 1),
+        in_vertex_(in_vertex),
+        out_vertex_(out_vertex),
         lag_(0),
-        cs_struct_(vine_struct)
+        cs_struct_(cs_struct)
     {}
     
     TVineSelector(const Eigen::MatrixXd &data,
@@ -318,6 +356,8 @@ protected:
     Eigen::MatrixXd data_;
     size_t d_cs_;
     size_t p_;
+    size_t in_vertex_;
+    size_t out_vertex_;
     size_t lag_;
     RVineStructure cs_struct_;
 };
@@ -334,17 +374,17 @@ public:
 
     TVine(const RVineStructure &cs_struct, 
           size_t p = 0, 
-          size_t in = 1, 
-          size_t out = 1) : 
+          size_t in_vertex = 1, 
+          size_t out_vertex = 1) : 
         Vinecop(cs_struct), 
         d_cs_(cs_struct.get_dim()),
         p_(p), 
-        in_(in), 
-        out_(out),
+        in_vertex_(in_vertex), 
+        out_vertex_(out_vertex),
         cs_struct_(cs_struct)
     {
-	    d_ = cs_struct.get_dim() * (p + 1);
-        vine_struct_ = TVineStructure(cs_struct, p, in, out);
+	    d_ = d_cs_ * (p + 1);
+        vine_struct_ = TVineStructure(cs_struct, p, in_vertex, out_vertex);
         pair_copulas_ = make_pair_copula_store(d_);
     }
     
@@ -354,8 +394,8 @@ public:
          Vinecop(tvine_struct), 
          d_cs_(tvine_struct.get_dim() / (p + 1)),
          p_(p), 
-         in_(1), 
-         out_(1),
+         in_vertex_(1), 
+         out_vertex_(1),
          cs_struct_(tvine_struct.get_cs_structure())
     {
         check_pair_copulas_rvine_structure(pair_copulas);
@@ -367,11 +407,6 @@ public:
         return cs_struct_;
     }
     
-    TVineStructure get_rvine_structure() const 
-    {
-        return vine_struct_;
-    }
-        
     void select_families(const Eigen::MatrixXd &data,
                          const FitControlsVinecop &controls = FitControlsVinecop())
     {
@@ -385,7 +420,8 @@ public:
             tools_stl::reverse(rev_order);
             for (size_t j = 0; j < d_cs_; ++j)
                 newdata.col(j) = data.col(rev_order[j] - 1);
-            tools_select::TVineSelector selector(newdata, cs_struct_, controls);
+            tools_select::TVineSelector selector(newdata, cs_struct_, controls,
+                                                 in_vertex_, out_vertex_);
             
             selector.select_all_trees(newdata);
             for (size_t lag = 1; lag <= p_; lag++) {
@@ -484,7 +520,7 @@ public:
     
     
 private:
-    void check_data_dim(const Eigen::MatrixXd &data) 
+    void check_data_dim(const Eigen::MatrixXd &data) const
     { 
         if (d_cs_ != static_cast<size_t>(data.cols())) {
             std::stringstream msg;
@@ -497,8 +533,8 @@ private:
     
     size_t d_cs_;
     size_t p_;
-    size_t in_;
-    size_t out_;
+    size_t in_vertex_;
+    size_t out_vertex_;
     RVineStructure cs_struct_;
 };
 
