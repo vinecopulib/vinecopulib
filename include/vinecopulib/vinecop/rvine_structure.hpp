@@ -92,12 +92,9 @@ public:
     size_t max_array(size_t tree, size_t edge) const;
 
     void truncate(size_t trunc_lvl);
-    void reduce(size_t d);
-
     std::string str() const;
     
-private:
-
+protected:
     size_t find_trunc_lvl(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
     std::vector<size_t> get_order(

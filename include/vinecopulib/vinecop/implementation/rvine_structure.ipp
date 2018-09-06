@@ -224,24 +224,7 @@ inline void RVineStructure::truncate(size_t trunc_lvl)
     trunc_lvl_ = struct_array_.get_trunc_lvl();
 }
 
-//! resizes the structure by removing the `d` last variables in the order.
-inline void RVineStructure::reduce(size_t d)
-{
-    struct_array_.reduce(d);
-    order_.resize(d);
-    d_ = d;
-    trunc_lvl_ = std::min(trunc_lvl_, d_ - 1);
-    if (trunc_lvl_ > 0) {
-        max_array_ = compute_max_array();
-        needed_hfunc1_ = compute_needed_hfunc1();
-        needed_hfunc2_ = compute_needed_hfunc2();
-    } else {
-        max_array_     = TriangularArray<size_t>(d_, trunc_lvl_);
-        needed_hfunc1_ = TriangularArray<size_t>(d_, trunc_lvl_);
-        needed_hfunc2_ = TriangularArray<size_t>(d_, trunc_lvl_);
-    }
-}
-
+//! converts the structure to a string representation (most useful for printing).
 inline std::string RVineStructure::str() const
 {
     auto inv_perm = tools_stl::invert_permutation(this->get_order());

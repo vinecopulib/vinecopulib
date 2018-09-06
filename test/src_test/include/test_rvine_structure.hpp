@@ -38,16 +38,6 @@ TEST(rvine_structure, triangular_array_works) {
     my_rvm.truncate(5);
     EXPECT_EQ(my_rvm.get_trunc_lvl(), 5);
     EXPECT_EQ(my_rvm[0].size(), 5);
-    
-    my_rvm.reduce(4);
-    EXPECT_EQ(my_rvm.get_trunc_lvl(), 3);
-    EXPECT_EQ(my_rvm[0].size(), 3);
-    
-    my_rvm.truncate(1);
-    my_rvm.reduce(3);
-    EXPECT_EQ(my_rvm.get_trunc_lvl(), 1);
-    EXPECT_EQ(my_rvm[0].size(), 1);
-    EXPECT_EQ(my_rvm[1].size(), 1);
 }
 
 TEST(rvine_structure, can_convert_to_natural_order) {
@@ -90,13 +80,6 @@ TEST(rvine_structure, reduce_and_truncate_work) {
     EXPECT_EQ(rvine_structure.get_max_array()[0].size(), 5);
     EXPECT_EQ(rvine_structure.get_needed_hfunc1()[0].size(), 5);
     EXPECT_EQ(rvine_structure.get_needed_hfunc2()[0].size(), 5);
-
-    rvine_structure.reduce(4);
-    EXPECT_EQ(rvine_structure.get_trunc_lvl(), 3);
-    EXPECT_EQ(rvine_structure.get_struct_array()[0].size(), 3);
-    EXPECT_EQ(rvine_structure.get_max_array()[0].size(), 3);
-    EXPECT_EQ(rvine_structure.get_needed_hfunc1()[0].size(), 3);
-    EXPECT_EQ(rvine_structure.get_needed_hfunc2()[0].size(), 3);
 }
 
 
