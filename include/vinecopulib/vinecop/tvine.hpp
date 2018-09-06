@@ -509,28 +509,29 @@ public:
                              const size_t num_threads = 1,
                              const std::vector<int>& seeds = std::vector<int>()) const
     {
-        auto uniform_rng = [seeds, qrng] (size_t n, size_t d) {
-            if (qrng) {
-                if (d > 300) {
-                    return tools_stats::sobol(n, d, seeds);
-                } else {
-                    return tools_stats::ghalton(n, d, seeds);
-                }
+        Eigen::MatrixXd U;
+        if (qrng) {
+            if (d_cs_ > 300) {
+                U = tools_stats::sobol(n, d_cs_, seeds);
             } else {
-                return tools_stats::simulate_uniform(n, d, seeds);
+                U = tools_stats::ghalton(n, d_cs_, seeds);
             }
-        };
+        } else {
+            U = tools_stats::simulate_uniform(n, d_cs_, seeds);
+        }
         
-        // initialize
+        // initialize first p + 1 lags
         Eigen::MatrixXd sim(n, d_cs_);
-        Eigen::MatrixXd Ui = uniform_rng(1, d_);
+        Eigen::MatrixXd Ui(1, d_);
+        for (size_t i = 0; i <= p_; i++) {
+            Ui << U.row(i);       
+        }
         Eigen::MatrixXd V = inverse_rosenblatt(Ui, num_threads);
         for (size_t i = 0; i <= p_; i++) {
             sim.row(i) = V.block(0, i * d_cs_, 1, d_cs_);
         }
         
         // simulate conditional on previous observations
-        Eigen::MatrixXd U = uniform_rng(n, d_cs_);
         for (size_t i = p_ + 1; i < n; i++) {
             Ui.leftCols(d_ - d_cs_).swap(Ui.rightCols(d_ - d_cs_));
             Ui.rightCols(d_cs_) = U.row(i);
