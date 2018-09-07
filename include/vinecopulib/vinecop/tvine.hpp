@@ -265,37 +265,18 @@ inline Eigen::MatrixXd spread_lag(const Eigen::MatrixXd& data, size_t cs_dim)
 }
 
 namespace tools_select {
-
-class TVineSelector : public FamilySelector {
+    
+class TVineSelector {
 public:
-    TVineSelector(const Eigen::MatrixXd &data,
-                  const RVineStructure &cs_struct,
-                  const FitControlsVinecop &controls,
-                  size_t in_vertex = 1,
-                  size_t out_vertex = 1)  : 
-        FamilySelector(data, cs_struct, controls), 
-        data_(data),
-        cs_dim_(cs_struct.get_dim()), 
-        p_(cs_dim_ / d_ - 1),
+    TVineSelector(const Eigen::MatrixXd &data, 
+                  size_t in_vertex = 1, 
+                  size_t out_vertex = 1) : 
+        cs_dim_(data.cols()),
         in_vertex_(in_vertex),
         out_vertex_(out_vertex),
-        lag_(0),
-        cs_struct_(cs_struct)
+        data_(data)        
     {}
-    
-    TVineSelector(const Eigen::MatrixXd &data,
-                  const VinecopSelector &selector,
-                  const FitControlsVinecop &controls) : 
-        TVineSelector(data, selector.get_rvine_structure(), controls)
-    {
-        select_connecting_vertices();
-        pair_copulas_ = selector.get_pair_copulas();
-        trees_ = selector.get_trees();
-    }
-    
-    ~TVineSelector() {}
-    
-    
+
     size_t get_in_vertex() const
     {
         return in_vertex_;
@@ -305,6 +286,111 @@ public:
     {
         return out_vertex_;
     }
+    
+protected:
+    size_t cs_dim_;
+    size_t in_vertex_;
+    size_t out_vertex_;
+    Eigen::MatrixXd data_;
+};
+    
+    
+class TVineStructureSelector : public StructureSelector, public TVineSelector {
+public:
+    TVineStructureSelector(const Eigen::MatrixXd &data,
+                           const FitControlsVinecop &controls) : 
+        StructureSelector(data, controls), 
+        TVineSelector(data)
+    {}
+        
+    ~TVineStructureSelector() {}
+        
+    void select_tree(size_t t) override
+    {
+        auto new_tree = edges_as_vertices(trees_[t]);
+        remove_edge_data(trees_[t]);
+        add_allowed_edges(new_tree);
+        if (boost::num_vertices(new_tree) > 2) {
+            // has no effect in FamilySelector
+            min_spanning_tree(new_tree);
+        }
+        if (boost::num_vertices(new_tree) > 0) {
+                add_edge_info(new_tree);     // for pc estimation and next tree
+                if (controls_.get_selection_criterion() == "mbicv") {
+                    // adjust prior probability to tree level
+                controls_.set_psi0(std::pow(psi0_, t + 1));
+            }
+            if (trees_opt_.size() > t + 1) {
+                select_pair_copulas(new_tree, trees_opt_[t + 1]);
+            } else {
+                select_pair_copulas(new_tree);
+            }
+        }
+        // make sure there is space for new tree
+        trees_.resize(t + 2);
+        trees_[t + 1] = new_tree;
+    }
+    
+    void select_connecting_vertices()
+    {
+        double crit = 0.0, new_crit = 0.0;
+        size_t d = data_.cols();
+        size_t n = data_.rows() - 1;
+        Eigen::MatrixXd pair_data(n, 2);
+        for (size_t i = 0; i < d; i++) {
+            for (size_t j = i; j < d; j++) {
+                new_crit = wdm::wdm(data_.col(i).tail(n), 
+                                    data_.col(j).head(n), 
+                                    "hoeffd");
+                if (std::abs(new_crit) > crit) {
+                    crit = std::abs(new_crit);
+                    in_vertex_ = i + 1;
+                    out_vertex_ = j + 1;
+                }
+            }
+        }
+    }
+    
+protected:
+    double compute_fit_id(const EdgeProperties& e) override
+    {
+        size_t min_c = std::min(e.conditioned[0], e.conditioned[1]);
+        size_t max_c = std::max(e.conditioned[0], e.conditioned[1]);
+        return (min_c % cs_dim_) * cs_dim_ * 10 + (max_c % cs_dim_);
+    }
+    
+    void finalize(size_t trunc_lvl)
+    {
+        trees_opt_ = trees_;
+        StructureSelector::finalize(trunc_lvl);
+        trees_ = trees_opt_;
+    }
+};
+
+class TVineFamilySelector : public FamilySelector, public TVineSelector {
+public:
+    TVineFamilySelector(const Eigen::MatrixXd &data,
+                        const RVineStructure &cs_struct,
+                        const FitControlsVinecop &controls,
+                        size_t in_vertex = 1,
+                        size_t out_vertex = 1)  : 
+        FamilySelector(data, cs_struct, controls), 
+        TVineSelector(data, in_vertex, out_vertex),
+        lag_(0),
+        cs_struct_(cs_struct)
+    {}
+    
+    TVineFamilySelector(const Eigen::MatrixXd &data,
+                        const TVineStructureSelector &selector,
+                        const FitControlsVinecop &controls) : 
+        TVineFamilySelector(data, selector.get_rvine_structure(), controls,
+                            selector.get_in_vertex(), selector.get_out_vertex())
+    {
+        trees_ = selector.get_trees();
+        pair_copulas_ = selector.get_pair_copulas();
+    }
+    
+    ~TVineFamilySelector() {}
 
     RVineStructure get_cs_structure() const
     {
@@ -367,26 +453,6 @@ protected:
         return (min_c % cs_dim_) * cs_dim_ * 10 + (max_c % cs_dim_);
     }
     
-    void select_connecting_vertices()
-    {
-        double crit = 0.0, new_crit = 0.0;
-        size_t d = data_.cols();
-        size_t n = data_.rows() - 1;
-        Eigen::MatrixXd pair_data(n, 2);
-        for (size_t i = 0; i < d; i++) {
-            for (size_t j = i; j < d; j++) {
-                new_crit = wdm::wdm(data_.col(i).tail(n), 
-                                    data_.col(j).head(n), 
-                                    "hoeffd");
-                if (std::abs(new_crit) > crit) {
-                    crit = std::abs(new_crit);
-                    in_vertex_ = i + 1;
-                    out_vertex_ = j + 1;
-                }
-            }
-        }
-    }
-    
     void duplicate_vertex(size_t v, VineTree& tree)
     {
         auto v_new = boost::add_vertex(tree);
@@ -420,15 +486,9 @@ protected:
         tree[e_new.first].pair_copula = tree[e].pair_copula;
         tree[e_new.first].fit_id = tree[e].fit_id;
     }
-
     
-    Eigen::MatrixXd data_;
-    size_t cs_dim_;
-    size_t p_;
-    size_t in_vertex_;
-    size_t out_vertex_;
-    size_t lag_;
     RVineStructure cs_struct_;
+    size_t lag_;
 };
 
 } // end tools_select
@@ -506,11 +566,12 @@ public:
         check_data_dim(data);
 
         if (vine_struct_.get_trunc_lvl() > 0) {
-            tools_select::TVineSelector selector(data, 
-                                                 tvine_struct_.get_cs_structure(), 
-                                                 controls,
-                                                 in_vertex_, 
-                                                 out_vertex_);
+            tools_select::TVineFamilySelector selector(
+                data, 
+                tvine_struct_.get_cs_structure(), 
+                controls,
+                in_vertex_,
+                out_vertex_);
             
             selector.select_all_trees(data);
             for (size_t lag = 1; lag <= p_; lag++) {
@@ -528,12 +589,11 @@ public:
         tools_eigen::check_if_in_unit_cube(data);
         check_data_dim(data);
         
-        tools_select::StructureSelector selector(data, controls);
+        tools_select::TVineStructureSelector selector(data, controls);
         selector.select_all_trees(data);
+        selector.select_connecting_vertices();
 
-        auto newdata = data;
-        auto rev_order = selector.get_rvine_structure().get_rev_order();
-        tools_select::TVineSelector tv_selector(newdata, selector, controls);
+        tools_select::TVineFamilySelector tv_selector(data, selector, controls);
         
         for (size_t lag = 1; lag <= p_; lag++) {
             tv_selector.add_lag();
@@ -613,7 +673,7 @@ public:
     
 protected:
     
-    void finalize_fit(const tools_select::TVineSelector &selector)
+    void finalize_tvine(const tools_select::TVineFamilySelector &selector)
     {
         in_vertex_ = selector.get_in_vertex();
         out_vertex_ = selector.get_out_vertex();
