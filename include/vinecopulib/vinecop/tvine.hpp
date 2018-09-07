@@ -19,6 +19,20 @@ namespace vinecopulib {
 // - reorder function
 // ------------------------- T-VINE STRUCTURE ---------------
 
+TriangularArray<size_t> get_actual_struct_array(const RVineStructure& structure)
+{
+    // structure array is in natural order, must convert to actual order
+    auto no_array = structure.get_struct_array();
+    auto order = structure.get_order();
+    for (size_t i = 0; i < structure.get_dim() - 1; i++) {
+        for (auto &s : no_array[i]) {
+            s = order[s - 1];
+        }
+    }
+    
+    return no_array;
+}
+
 class TVineStructure : public RVineStructure {
 public:    
     TVineStructure() {}
@@ -108,21 +122,7 @@ private:
         
         return x;
     }
-    
-    TriangularArray<size_t> get_actual_struct_array(const RVineStructure& structure) const
-    {
-        // structure array is in natural order, must convert to actual order
-        auto no_array = structure.get_struct_array();
-        auto order = structure.get_order();
-        for (size_t i = 0; i < structure.get_dim() - 1; i++) {
-            for (auto &s : no_array[i]) {
-                s = order[s - 1];
-            }
-        }
-        
-        return no_array;
-    }
-        
+            
     RVineStructure reorder_structure(const RVineStructure& structure, size_t in_vertex) const
     {
         using namespace tools_stl;
@@ -376,9 +376,10 @@ public:
                         size_t out_vertex = 1)  : 
         FamilySelector(data, cs_struct, controls), 
         TVineSelector(data, in_vertex, out_vertex),
-        lag_(0),
-        cs_struct_(cs_struct)
-    {}
+        lag_(0)
+    {
+        cs_struct_ = TVineStructure(cs_struct, 0, in_vertex, out_vertex);
+    }
     
     TVineFamilySelector(const Eigen::MatrixXd &data,
                         const TVineStructureSelector &selector,
@@ -387,7 +388,7 @@ public:
                             selector.get_in_vertex(), selector.get_out_vertex())
     {
         trees_ = selector.get_trees();
-        pair_copulas_ = selector.get_pair_copulas();
+        flip_pcs(trees_);
     }
     
     ~TVineFamilySelector() {}
@@ -451,6 +452,28 @@ protected:
         size_t min_c = std::min(e.conditioned[0], e.conditioned[1]);
         size_t max_c = std::max(e.conditioned[0], e.conditioned[1]);
         return (min_c % cs_dim_) * cs_dim_ * 10 + (max_c % cs_dim_);
+    }
+    
+    void flip_pcs(std::vector<VineTree>& trees)
+    {
+        std::vector<size_t> rev_order = cs_struct_.get_rev_order();
+        size_t d = rev_order.size();
+        auto struct_array = get_actual_struct_array(cs_struct_);
+        for (size_t t = 1; t < trees.size(); t++) {
+            for (auto e : boost::edges(trees[t])) {
+                std::vector<size_t> check_set(2);
+                for (size_t k = 0; k < d; k++) {
+                    // conditioned starts at 0 -> substract -1
+                    check_set = {rev_order[k] - 1, struct_array(t - 1, k) - 1};
+                    if (tools_stl::is_same_set(trees_[t][e].conditioned, check_set)) {
+                        break;
+                    }
+                }
+                if (trees[t][e].conditioned[0] != check_set[0]) {
+                    trees[t][e].pair_copula.flip();
+                }
+            }
+        }
     }
     
     void duplicate_vertex(size_t v, VineTree& tree)

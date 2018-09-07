@@ -388,6 +388,7 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
 inline void StructureSelector::finalize(size_t trunc_lvl)
 {
     using namespace tools_stl;
+    trees_opt_ = trees_;
     pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
     TriangularArray<size_t> mat(d_, trunc_lvl);
     std::vector<size_t> order(d_);
@@ -882,7 +883,6 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
                 // data and thresholding status haven't changed,
                 // we can use old fit
                 used_old_fit = true;
-                std::cout << "Used old" << std::endl;
                 tree[e].pair_copula = tree_opt[old_fit.first].pair_copula;
             }
         }
