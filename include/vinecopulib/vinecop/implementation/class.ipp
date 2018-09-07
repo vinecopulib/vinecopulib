@@ -326,17 +326,12 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
     check_data_dim(data);
 
     if (vine_struct_.get_trunc_lvl() > 0) {
-        auto rev_order = vine_struct_.get_rev_order();
-        auto newdata = data;
-        for (size_t j = 0; j < d_; ++j)
-            newdata.col(j) = data.col(rev_order[j] - 1);
-
-        tools_select::FamilySelector selector(newdata, vine_struct_, controls);
+        tools_select::FamilySelector selector(data, vine_struct_, controls);
         if (controls.needs_sparse_select()) {
-            selector.sparse_select_all_trees(newdata);
+            selector.sparse_select_all_trees(data);
             vine_struct_ = selector.get_rvine_structure(); // can be truncated
         } else {
-            selector.select_all_trees(newdata);
+            selector.select_all_trees(data);
         }
         
         finalize_fit(selector);

@@ -338,6 +338,7 @@ inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
 {
     n_ = data.rows();
     d_ = data.cols();
+    vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
     trees_.resize(1);
     controls_ = controls;
     threshold_ = controls.get_threshold();
@@ -392,7 +393,6 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
     std::vector<size_t> order(d_);
 
     if (trunc_lvl > 0) {
-
         std::vector <size_t> ning_set;
 
         // fill matrix column by column
@@ -714,6 +714,7 @@ inline VineTree VinecopSelector::make_base_tree(const Eigen::MatrixXd &data)
 {
     size_t d = data.cols();
     VineTree base_tree(d);
+    auto rev_order = vine_struct_.get_rev_order();
     // a star connects the root node (d) with all other nodes
     for (size_t target = 0; target < d; ++target) {
         tools_interface::check_user_interrupt(target % 10000 == 0);
@@ -721,10 +722,12 @@ inline VineTree VinecopSelector::make_base_tree(const Eigen::MatrixXd &data)
         auto e = add_edge(d, target, base_tree).first;
 
         // inititialize hfunc1 with actual data for variable "target"
-        base_tree[e].hfunc1 = data.col(boost::target(e, base_tree));
+        // data need are reordered to correspond to natural order (neccessary
+        // when structure is fixed)
+        base_tree[e].hfunc1 = data.col(rev_order[target] - 1);
         // identify edge with variable "target" and initialize sets
         base_tree[e].conditioned.reserve(2);
-        base_tree[e].conditioned.push_back(boost::target(e, base_tree));
+        base_tree[e].conditioned.push_back(rev_order[target] - 1);
         base_tree[e].conditioning.reserve(d - 2);
         base_tree[e].all_indices = base_tree[e].conditioned;
     }
@@ -879,6 +882,7 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
                 // data and thresholding status haven't changed,
                 // we can use old fit
                 used_old_fit = true;
+                std::cout << "Used old" << std::endl;
                 tree[e].pair_copula = tree_opt[old_fit.first].pair_copula;
             }
         }
