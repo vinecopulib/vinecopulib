@@ -227,12 +227,11 @@ inline void RVineStructure::truncate(size_t trunc_lvl)
 //! converts the structure to a string representation (most useful for printing).
 inline std::string RVineStructure::str() const
 {
-    auto inv_perm = tools_stl::invert_permutation(this->get_order());
     std::stringstream str;
     for (size_t i = 0; i < d_ - 1; i++) {
         for (size_t j = 0; j < d_ - i - 1; j++) {
             if (i < trunc_lvl_) {
-                str << inv_perm[struct_array_(i, j) - 1] + 1 << " ";
+                str << order_[struct_array_(i, j) - 1] << " ";
             } else  {
                 str << "  ";
             }
@@ -492,7 +491,6 @@ inline void RVineStructure::check_proximity_condition() const
     }
 }
 
-}
 
 //! ostream method for RightTrapezoid, to be used with `std::cout`
 //! @param os an output stream.
@@ -501,4 +499,6 @@ std::ostream& operator<<(std::ostream& os, const vinecopulib::RVineStructure& rv
 {  
     os << rvs.str();
     return os;  
-}  
+}
+
+}
