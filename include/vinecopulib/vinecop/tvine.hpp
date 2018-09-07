@@ -20,17 +20,17 @@ namespace vinecopulib {
 // ------------------------- T-VINE STRUCTURE ---------------
 
 class TVineStructure : public RVineStructure {
-public:
+public:    
     TVineStructure() {}
     
-    TVineStructure(size_t d_cs, size_t p = 0) : 
-        TVineStructure(RVineStructure(tools_stl::seq_int(1, d_cs)), p) 
+    TVineStructure(size_t cs_dim, size_t p = 0) : 
+        TVineStructure(RVineStructure(tools_stl::seq_int(1, cs_dim)), p) 
     {}
 
     TVineStructure(const RVineStructure &cs_struct, 
                    size_t p = 0, 
                    size_t in_vertex = 1, 
-                   size_t out_vertex = 1) : 
+                   size_t out_vertex = 1) :
         p_(p), 
         in_vertex_(in_vertex), 
         out_vertex_(out_vertex),
@@ -39,17 +39,22 @@ public:
         order_ = expand_order(cs_struct_.get_order(), p);
         struct_array_ = build_t_vine_array(cs_struct_, p, in_vertex, out_vertex);
         RVineStructure new_struct(order_, struct_array_);
+        d_             = new_struct.get_dim();
+        trunc_lvl_     = new_struct.get_trunc_lvl();
         struct_array_  = new_struct.get_struct_array();
         max_array_     = new_struct.get_max_array();
         needed_hfunc1_ = new_struct.get_needed_hfunc1();
-        needed_hfunc2_ = new_struct.get_needed_hfunc2();
-        d_             = new_struct.get_dim();
-        trunc_lvl_     = new_struct.get_trunc_lvl();
+        needed_hfunc2_ = new_struct.get_needed_hfunc2();    
     }
     
     size_t get_p() const
     {
         return p_;
+    }
+    
+    size_t get_cs_dim() const
+    {
+        return cs_struct_.get_dim();
     }
         
     size_t get_in_vertex() const
@@ -71,11 +76,11 @@ public:
 private:
     std::vector<size_t> expand_order(const std::vector<size_t> &order, size_t p) const
     {
-        size_t d_cs = order.size();
-        size_t d = d_cs * (p + 1);
+        size_t cs_dim = order.size();
+        size_t d = cs_dim * (p + 1);
         std::vector<size_t> new_order(d);
         for (size_t i = 0; i < d; i++) {
-            new_order[i] = order[i % d_cs] + (i / d_cs) * d_cs;
+            new_order[i] = order[i % cs_dim] + (i / cs_dim) * cs_dim;
         }
         
         return new_order;
@@ -145,6 +150,7 @@ private:
             auto diag_until = span(new_order, 0, i);
             auto diag_after = span(new_order, i, d - i);
             for (size_t t = 0; t < new_column.size(); t++) {
+                // TODO: start from top
                 // Check whether an element in this column is already contained in
                 // the diagonal to the left. If so, we need to find another node 
                 // that is connected to the diagonal entry of column i. We search 
@@ -152,6 +158,7 @@ private:
                 // the in_vertex and to the the left of the current column (included).
                 if (is_member(new_column[t], diag_until)) {
                     bool found_node = false;
+                    // TODO: check <=
                     for (size_t j = find_position(in_vertex, old_order); j <= i; j++) {
                         if (new_order[i] == old_struct(t, j)) {
                             if (is_member(old_order[j], diag_after)) {
@@ -161,6 +168,7 @@ private:
                         } else if (new_order[i] == old_order[j]) {
                             if (is_member(old_struct(t, j), diag_after)) {
                                 new_column[t] = old_struct(t, j);
+                                found_node = true;
                             }
                         }
                         if (found_node) {
@@ -190,12 +198,12 @@ private:
         size_t out_vertex = 1) 
         const
     {
-        size_t d_cs = cs_struct.get_dim();
-        size_t d = d_cs * (p + 1);
+        size_t cs_dim = cs_struct.get_dim();
+        size_t d = cs_dim * (p + 1);
         auto diag = cs_struct.get_rev_order();
         
         RVineStructure new_struct = cs_struct;
-        if (diag[d_cs - 1] != in_vertex) {
+        if (diag[cs_dim - 1] != in_vertex) {
             new_struct = reorder_structure(new_struct, in_vertex);
         }
         
@@ -203,9 +211,9 @@ private:
  
         TriangularArray<size_t> strct(d);
         // copy cross-sectional structure
-        for (size_t i = 0; i < d_cs - 1; i++) {
-            for (size_t j = 0; j < d_cs - 1 - i; j++) {
-                strct(i, j) = struct_array(i, j) + d_cs * p;
+        for (size_t i = 0; i < cs_dim - 1; i++) {
+            for (size_t j = 0; j < cs_dim - 1 - i; j++) {
+                strct(i, j) = struct_array(i, j) + cs_dim * p;
             }
         }
         
@@ -213,18 +221,18 @@ private:
         std::vector<size_t> par = pivot_diag(diag, struct_array, out_vertex);
         tools_stl::reverse(par);
         for (size_t lag = 1; lag <= p; lag++) {
-            for (size_t i = 0; i < d_cs; i++) {
-                for (size_t j = 0; j < d_cs; j++) {
-                    strct(i + d_cs * lag - j - 1, j) = par[i] + d_cs * (p - lag);
+            for (size_t i = 0; i < cs_dim; i++) {
+                for (size_t j = 0; j < cs_dim; j++) {
+                    strct(i + cs_dim * lag - j - 1, j) = par[i] + cs_dim * (p - lag);
                 }
             }
         }
 
         // copy to other lags
         for (size_t lag = 1; lag <= p; lag++) {
-            for (size_t j = 0; j < d_cs; j++) {
-                for (size_t i = 0; i < d - 1 - (j + d_cs * lag); i++) {
-                    strct(i, j + d_cs * lag) = strct(i, j) - d_cs * lag;
+            for (size_t j = 0; j < cs_dim; j++) {
+                for (size_t i = 0; i < d - 1 - (j + cs_dim * lag); i++) {
+                    strct(i, j + cs_dim * lag) = strct(i, j) - cs_dim * lag;
                 }
             }
         }
@@ -242,17 +250,17 @@ private:
 
 // ------------------------- SELECTOR ------------------------
 
-inline Eigen::MatrixXd spread_lag(const Eigen::MatrixXd& data, size_t d_cs)
+inline Eigen::MatrixXd spread_lag(const Eigen::MatrixXd& data, size_t cs_dim)
 {
     if (data.rows() < 2) {
         throw std::runtime_error("insufficient number of observations");
     }
-    if (data.cols() % d_cs != 0) {
-        throw std::runtime_error("number of columns is not a multiple of d_cs");
+    if (data.cols() % cs_dim != 0) {
+        throw std::runtime_error("number of columns is not a multiple of cs_dim");
     }
     size_t n = data.rows() - 1;
-    Eigen::MatrixXd newdata(n, data.cols() + d_cs);
-    newdata << data.topRows(n), data.rightCols(d_cs).bottomRows(n);
+    Eigen::MatrixXd newdata(n, data.cols() + cs_dim);
+    newdata << data.topRows(n), data.rightCols(cs_dim).bottomRows(n);
     return newdata;
 }
 
@@ -267,8 +275,8 @@ public:
                   size_t out_vertex = 1)  : 
         FamilySelector(data, cs_struct, controls), 
         data_(data),
-        d_cs_(cs_struct.get_dim()), 
-        p_(d_cs_ / d_ - 1),
+        cs_dim_(cs_struct.get_dim()), 
+        p_(cs_dim_ / d_ - 1),
         in_vertex_(in_vertex),
         out_vertex_(out_vertex),
         lag_(0),
@@ -282,10 +290,26 @@ public:
     {
         select_connecting_vertices();
         pair_copulas_ = selector.get_pair_copulas();
-        trees_ = selector.get_trees_opt();      
+        trees_ = selector.get_trees();
     }
     
     ~TVineSelector() {}
+    
+    
+    size_t get_in_vertex() const
+    {
+        return in_vertex_;
+    }
+    
+    size_t get_out_vertex() const
+    {
+        return out_vertex_;
+    }
+
+    RVineStructure get_cs_structure() const
+    {
+        return cs_struct_;
+    }
     
     void select_tree(size_t t) override
     {
@@ -312,7 +336,7 @@ public:
     void add_lag()
     {
         lag_++;
-        d_ += d_cs_;
+        d_ += cs_dim_;
 
         // add vertices and edges for lagged variable
         for (size_t t = 1; t < trees_.size(); t++) {
@@ -322,12 +346,12 @@ public:
             for (auto e : boost::edges(old_tree)) 
                 duplicate_edge(e, trees_[t]);
         }
-        
+
         // update trees and structure
         trees_opt_ = trees_;
         trees_ = std::vector<VineTree>(1);
         vine_struct_ = TVineStructure(cs_struct_, lag_, in_vertex_, out_vertex_);
-        data_ = spread_lag(data_, d_cs_);
+        data_ = spread_lag(data_, cs_dim_);
     }
     
     Eigen::MatrixXd data()
@@ -338,10 +362,11 @@ public:
 protected:
     double compute_fit_id(const EdgeProperties& e) override
     {
-        return (e.conditioned[0] % d_cs_) * d_cs_ * 10 + (e.conditioned[1] % d_cs_);
+        size_t min_c = std::min(e.conditioned[0], e.conditioned[1]);
+        size_t max_c = std::max(e.conditioned[0], e.conditioned[1]);
+        return (min_c % cs_dim_) * cs_dim_ * 10 + (max_c % cs_dim_);
     }
     
-private:
     void select_connecting_vertices()
     {
         double crit = 0.0, new_crit = 0.0;
@@ -350,11 +375,13 @@ private:
         Eigen::MatrixXd pair_data(n, 2);
         for (size_t i = 0; i < d; i++) {
             for (size_t j = i; j < d; j++) {
-                new_crit = wdm::wdm(data_.col(i).tail(n), data_.col(j).head(n), "hoeffd");
+                new_crit = wdm::wdm(data_.col(i).tail(n), 
+                                    data_.col(j).head(n), 
+                                    "hoeffd");
                 if (std::abs(new_crit) > crit) {
                     crit = std::abs(new_crit);
-                    in_vertex_ = i;
-                    out_vertex_ = j;
+                    in_vertex_ = i + 1;
+                    out_vertex_ = j + 1;
                 }
             }
         }
@@ -365,10 +392,10 @@ private:
         auto v_new = boost::add_vertex(tree);
         auto shift = [this] (std::vector<size_t> index) {
             for (auto &i : index)
-                i = i + d_cs_ * lag_;
+                i = i + cs_dim_ * lag_;
             return index;
         };
-        
+
         // copy structure information
         tree[v_new].conditioned = shift(tree[v].conditioned);
         tree[v_new].conditioning = shift(tree[v].conditioning);
@@ -389,14 +416,14 @@ private:
     {
         size_t v1 = boost::source(e, tree);
         size_t v2 = boost::target(e, tree);
-        auto e_new = boost::add_edge(v1 + d_cs_ * lag_, v2 + d_cs_ * lag_, tree);
+        auto e_new = boost::add_edge(v1 + cs_dim_ * lag_, v2 + cs_dim_ * lag_, tree);
         tree[e_new.first].pair_copula = tree[e].pair_copula;
         tree[e_new.first].fit_id = tree[e].fit_id;
     }
 
     
     Eigen::MatrixXd data_;
-    size_t d_cs_;
+    size_t cs_dim_;
     size_t p_;
     size_t in_vertex_;
     size_t out_vertex_;
@@ -411,43 +438,45 @@ private:
     
 class TVine : public Vinecop {
 public:
-    TVine(size_t d_cs, size_t p = 0) : 
-        TVine(RVineStructure(tools_stl::seq_int(1, d_cs)), p) {}
+    TVine(size_t cs_dim, size_t p) : 
+        TVine(RVineStructure(tools_stl::seq_int(1, cs_dim)), p) 
+    {}
 
     TVine(const RVineStructure &cs_struct, 
-          size_t p = 0, 
+          size_t p, 
           size_t in_vertex = 1, 
           size_t out_vertex = 1) : 
-        d_cs_(cs_struct.get_dim()),
+        cs_dim_(cs_struct.get_dim()),
         p_(p), 
         in_vertex_(in_vertex), 
-        out_vertex_(out_vertex)
+        out_vertex_(out_vertex),
+        tvine_struct_(TVineStructure(cs_struct, p, in_vertex, out_vertex))
     {
         threshold_ = 0.0;
         loglik_ = NAN;
-	    d_ = d_cs_ * (p + 1);
-        vine_struct_ = TVineStructure(cs_struct, p, in_vertex, out_vertex);
+	    d_ = tvine_struct_.get_dim();
+        vine_struct_ = tvine_struct_;
         pair_copulas_ = make_pair_copula_store(d_);
     }
     
     TVine(const std::vector<std::vector<Bicop>> &pair_copulas,
-          const TVineStructure &tvine_struct, 
-          size_t p) : 
-         d_cs_(tvine_struct.get_dim() / (p + 1)),
-         p_(p), 
-         in_vertex_(1), 
-         out_vertex_(1)
+          const TVineStructure &cs_struct,
+          size_t p = 0,
+          size_t in_vertex = 1,
+          size_t out_vertex = 1) :
+         TVine(cs_struct, p, in_vertex, out_vertex)
     {
-        d_ = tvine_struct.get_dim();
-        threshold_ = 0.0;
-        loglik_ = NAN;
-        check_pair_copulas_rvine_structure(pair_copulas);
         pair_copulas_ = pair_copulas;
     }
     
     size_t get_p() const
     {
         return p_;
+    }
+    
+    size_t get_cs_dim() const
+    {
+        return cs_dim_;
     }
         
     size_t get_in_vertex() const
@@ -462,13 +491,14 @@ public:
     
     RVineStructure get_cs_structure() const 
     {
-        return vine_struct_.get_cs_structure();
+        return tvine_struct_.get_cs_structure();
     }
     
-    TVineStructure get_rvine_structure() const
+    TVineStructure get_tvine_structure() const
     {
-        return vine_struct_;
+        return tvine_struct_;
     }
+    
     void select_families(const Eigen::MatrixXd &data,
                          const FitControlsVinecop &controls = FitControlsVinecop())
     {
@@ -476,19 +506,13 @@ public:
         check_data_dim(data);
 
         if (vine_struct_.get_trunc_lvl() > 0) {
-            auto newdata = data;
-            auto rev_order = vine_struct_.get_order();
-            rev_order.resize(d_cs_);
-            tools_stl::reverse(rev_order);
-            for (size_t j = 0; j < d_cs_; ++j)
-                newdata.col(j) = data.col(rev_order[j] - 1);
-            tools_select::TVineSelector selector(newdata, 
-                                                 vine_struct_.get_cs_structure(), 
+            tools_select::TVineSelector selector(data, 
+                                                 tvine_struct_.get_cs_structure(), 
                                                  controls,
                                                  in_vertex_, 
                                                  out_vertex_);
             
-            selector.select_all_trees(newdata);
+            selector.select_all_trees(data);
             for (size_t lag = 1; lag <= p_; lag++) {
                 selector.add_lag();
                 selector.select_all_trees(selector.data());
@@ -508,7 +532,9 @@ public:
         selector.select_all_trees(data);
 
         auto newdata = data;
-        tools_select::TVineSelector tv_selector(data, selector, controls);
+        auto rev_order = selector.get_rvine_structure().get_rev_order();
+        tools_select::TVineSelector tv_selector(newdata, selector, controls);
+        
         for (size_t lag = 1; lag <= p_; lag++) {
             tv_selector.add_lag();
             tv_selector.select_all_trees(tv_selector.data());
@@ -529,22 +555,22 @@ public:
     // 
     //         // spread data into columns
     //         for (size_t lag = 1; lag < p_; lag++) {
-    //             cond_vals = spread_lag(cond_vals, d_cs_);
+    //             cond_vals = spread_lag(cond_vals, cs_dim_);
     //         }
     // 
-    //         d_ -= d_cs_;
+    //         d_ -= cs_dim_;
     //         vine_struct_.reduce(cond_vals.cols());
     //         combined_vals << 
     //             rosenblatt(cond_vals).replicate(n, 1), 
-    //             tools_stats::simulate_uniform(n, d_cs_);
+    //             tools_stats::simulate_uniform(n, cs_dim_);
     // 
-    //         d_ += d_cs_;
+    //         d_ += cs_dim_;
     //         vine_struct_ = TVine(cs_struct_, p_, in_, out_).get_rvine_structure();
     //     } else {
-    //         combined_vals << tools_stats::simulate_uniform(n, d_cs_);    
+    //         combined_vals << tools_stats::simulate_uniform(n, cs_dim_);    
     //     }
     // 
-    //     return inverse_rosenblatt(combined_vals).rightCols(d_cs_);
+    //     return inverse_rosenblatt(combined_vals).rightCols(cs_dim_);
     // }
     
     Eigen::MatrixXd simulate(const size_t n, 
@@ -554,55 +580,64 @@ public:
     {
         Eigen::MatrixXd U;
         if (qrng) {
-            if (d_cs_ > 300) {
-                U = tools_stats::sobol(n, d_cs_, seeds);
+            if (cs_dim_ > 300) {
+                U = tools_stats::sobol(n, cs_dim_, seeds);
             } else {
-                U = tools_stats::ghalton(n, d_cs_, seeds);
+                U = tools_stats::ghalton(n, cs_dim_, seeds);
             }
         } else {
-            U = tools_stats::simulate_uniform(n, d_cs_, seeds);
+            U = tools_stats::simulate_uniform(n, cs_dim_, seeds);
         }
-        
+                
         // initialize first p + 1 lags
-        Eigen::MatrixXd sim(n, d_cs_);
+        Eigen::MatrixXd sim(n, cs_dim_);
         Eigen::MatrixXd Ui(1, d_);
         for (size_t i = 0; i <= p_; i++) {
-            Ui << U.row(i);       
+            Ui.row(0).segment(i * cs_dim_, cs_dim_) = U.row(i);       
         }
         Eigen::MatrixXd V = inverse_rosenblatt(Ui, num_threads);
         for (size_t i = 0; i <= p_; i++) {
-            sim.row(i) = V.block(0, i * d_cs_, 1, d_cs_);
+            sim.row(i) = V.block(0, i * cs_dim_, 1, cs_dim_);
         }
         
         // simulate conditional on previous observations
         for (size_t i = p_ + 1; i < n; i++) {
-            Ui.leftCols(d_ - d_cs_).swap(Ui.rightCols(d_ - d_cs_));
-            Ui.rightCols(d_cs_) = U.row(i);
-            sim.row(i) = inverse_rosenblatt(Ui, num_threads).rightCols(d_cs_);
+            Ui.leftCols(d_ - cs_dim_).swap(Ui.rightCols(d_ - cs_dim_));
+            Ui.rightCols(cs_dim_) = U.row(i);
+            sim.row(i) = inverse_rosenblatt(Ui, num_threads).rightCols(cs_dim_);
         }
         
         return sim;    
     }
     
     
-private:
+protected:
+    
+    void finalize_fit(const tools_select::TVineSelector &selector)
+    {
+        in_vertex_ = selector.get_in_vertex();
+        out_vertex_ = selector.get_out_vertex();
+        tvine_struct_ = TVineStructure(selector.get_cs_structure(), 
+                                       p_, in_vertex_, out_vertex_);
+        Vinecop::finalize_fit(selector);
+    }
     
     void check_data_dim(const Eigen::MatrixXd &data) const
     { 
-        if (d_cs_ != static_cast<size_t>(data.cols())) {
+        if (cs_dim_ != static_cast<size_t>(data.cols())) {
             std::stringstream msg;
             msg << "wrong number of columns." << std::endl <<
-                "expected: " << d_cs_ << std::endl <<
+                "expected: " << cs_dim_ << std::endl <<
                 "provided: " << data.cols() << std::endl;
             throw std::runtime_error(msg.str());
         }
     }
     
-    size_t d_cs_;
+    size_t cs_dim_;
     size_t p_;
     size_t in_vertex_;
     size_t out_vertex_;
-    TVineStructure vine_struct_;
+    TVineStructure tvine_struct_;
 };
 
 }
