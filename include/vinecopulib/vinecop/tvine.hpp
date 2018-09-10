@@ -35,14 +35,14 @@ TriangularArray<size_t> get_actual_struct_array(const RVineStructure& structure)
 
 class TVineStructure : public RVineStructure {
 public:    
-    TVineStructure() {}
+    TVineStructure() : RVineStructure() {}
     
-    TVineStructure(size_t cs_dim, size_t p = 0) : 
+    TVineStructure(size_t cs_dim, size_t p) : 
         TVineStructure(RVineStructure(tools_stl::seq_int(1, cs_dim)), p) 
     {}
 
     TVineStructure(const RVineStructure &cs_struct, 
-                   size_t p = 0, 
+                   size_t p, 
                    size_t in_vertex = 1, 
                    size_t out_vertex = 1) :
         p_(p), 
@@ -52,7 +52,6 @@ public:
     {
         order_ = expand_order(cs_struct_.get_order(), p);
         struct_array_ = build_t_vine_array(cs_struct_, p, in_vertex, out_vertex);
-        // std::cout << struct_array_ << std::endl;
         RVineStructure new_struct(order_, struct_array_);
         d_             = new_struct.get_dim();
         trunc_lvl_     = new_struct.get_trunc_lvl();
@@ -86,7 +85,6 @@ public:
     {
         return cs_struct_;
     }
-    
     
 private:
     std::vector<size_t> expand_order(const std::vector<size_t> &order, size_t p) const
@@ -128,7 +126,10 @@ private:
     {
         using namespace tools_stl;
         size_t d = structure.get_dim();
- 
+        if (structure.get_trunc_lvl() < d - 1) {
+            throw std::runtime_error("T-vines cannot be truncated.");
+        }
+        
         // structure array is in natural order, must convert to actual order
         auto old_struct = get_actual_struct_array(structure);
         auto new_struct = old_struct;
@@ -138,16 +139,17 @@ private:
         // when final object ist created.
         auto old_order = structure.get_rev_order();
         auto new_order = pivot_diag(old_order, old_struct, in_vertex);
-        
+
         // loop through all columns
         for (size_t i = 0; i < d - 1; i++) {
             // extract elements of pivotal order that are required for the default
             // off-diagonal elements
             auto new_column = pivot_diag(old_order, old_struct, new_order[i]);
+            // remove diagonal elements
             new_column.erase(new_column.end() - 1);
             new_column.erase(new_column.begin(), new_column.begin() + i);
             tools_stl::reverse(new_column);
-            
+
             auto diag_until = span(new_order, 0, i);
             auto diag_after = span(new_order, i, d - i);    
             auto start_pos = find_position(in_vertex, old_order);    
@@ -288,6 +290,16 @@ public:
     }
     
 protected:
+    void check_controls(const FitControlsVinecop &controls)
+    {
+        if (controls.get_select_truncation_level()) {
+            throw std::runtime_error("Cannot select truncation level for T-vines.");
+        }
+        if (controls.get_truncation_level() < std::numeric_limits<size_t>::max()) {
+            throw std::runtime_error("T-vines cannot be truncated.");
+        }
+    }
+    
     size_t cs_dim_;
     size_t in_vertex_;
     size_t out_vertex_;
@@ -301,7 +313,9 @@ public:
                            const FitControlsVinecop &controls) : 
         StructureSelector(data, controls), 
         TVineSelector(data)
-    {}
+    {
+        check_controls(controls);
+    }
         
     ~TVineStructureSelector() {}
         
@@ -378,6 +392,7 @@ public:
         TVineSelector(data, in_vertex, out_vertex),
         lag_(0)
     {
+        check_controls(controls);
         cs_struct_ = TVineStructure(cs_struct, 0, in_vertex, out_vertex);
     }
     
@@ -543,8 +558,8 @@ public:
     }
     
     TVine(const std::vector<std::vector<Bicop>> &pair_copulas,
-          const TVineStructure &cs_struct,
-          size_t p = 0,
+          const RVineStructure &cs_struct,
+          size_t p,
           size_t in_vertex = 1,
           size_t out_vertex = 1) :
          TVine(cs_struct, p, in_vertex, out_vertex)
@@ -607,7 +622,7 @@ public:
     }
     
     void select_all(const Eigen::MatrixXd &data,
-                    const FitControlsVinecop &controls)
+                    const FitControlsVinecop &controls = FitControlsVinecop())
     {
         tools_eigen::check_if_in_unit_cube(data);
         check_data_dim(data);
@@ -625,52 +640,13 @@ public:
         
         finalize_fit(tv_selector);
     }
-    
-    // Eigen::MatrixXd cond_simulate(size_t n, const Eigen::MatrixXd& data)
-    // {
-    //     check_data_dim(data);
-    // 
-    //     Eigen::MatrixXd cond_pit;
-    //     Eigen::MatrixXd combined_vals(n, d_);
-    //     if (p_ > 0) {
-    //         // only most recent observations are used
-    //         Eigen::MatrixXd cond_vals = data.bottomRows(p_);
-    // 
-    //         // spread data into columns
-    //         for (size_t lag = 1; lag < p_; lag++) {
-    //             cond_vals = spread_lag(cond_vals, cs_dim_);
-    //         }
-    // 
-    //         d_ -= cs_dim_;
-    //         vine_struct_.reduce(cond_vals.cols());
-    //         combined_vals << 
-    //             rosenblatt(cond_vals).replicate(n, 1), 
-    //             tools_stats::simulate_uniform(n, cs_dim_);
-    // 
-    //         d_ += cs_dim_;
-    //         vine_struct_ = TVine(cs_struct_, p_, in_, out_).get_rvine_structure();
-    //     } else {
-    //         combined_vals << tools_stats::simulate_uniform(n, cs_dim_);    
-    //     }
-    // 
-    //     return inverse_rosenblatt(combined_vals).rightCols(cs_dim_);
-    // }
-    
+        
     Eigen::MatrixXd simulate(const size_t n, 
                              const bool qrng = false, 
                              const size_t num_threads = 1,
                              const std::vector<int>& seeds = std::vector<int>()) const
     {
-        Eigen::MatrixXd U;
-        if (qrng) {
-            if (cs_dim_ > 300) {
-                U = tools_stats::sobol(n, cs_dim_, seeds);
-            } else {
-                U = tools_stats::ghalton(n, cs_dim_, seeds);
-            }
-        } else {
-            U = tools_stats::simulate_uniform(n, cs_dim_, seeds);
-        }
+        Eigen::MatrixXd U = my_simulate_uniform(n, cs_dim_, qrng, seeds);
                 
         // initialize first p + 1 lags
         Eigen::MatrixXd sim(n, cs_dim_);
@@ -690,11 +666,110 @@ public:
             sim.row(i) = inverse_rosenblatt(Ui, num_threads).rightCols(cs_dim_);
         }
         
-        return sim;    
+        return sim;
+    }
+    
+    Eigen::MatrixXd simulate_conditional(size_t n, 
+        const Eigen::MatrixXd& data, 
+        const bool qrng = false, 
+        const size_t num_threads = 1,
+        const std::vector<int>& seeds = std::vector<int>())
+    {
+        check_cond_data(data);
+        
+        Eigen::MatrixXd combined_vals(n, d_);
+        if (p_ > 0) {
+            // only most recent observations are used
+            Eigen::MatrixXd cond_vals = data.bottomRows(p_);
+    
+            // spread past observations into one row with d_ - cs_dim_ columns
+            for (size_t lag = 1; lag < p_; lag++) {
+                cond_vals = spread_lag(cond_vals, cs_dim_);
+            }
+            
+            d_ -= cs_dim_;
+            vine_struct_ = TVineStructure(tvine_struct_.get_cs_structure(), 
+                                          p_ - 1, in_vertex_, out_vertex_);
+            combined_vals << rosenblatt(cond_vals, num_threads).replicate(n, 1), 
+                             my_simulate_uniform(n, cs_dim_, qrng, seeds);
+            vine_struct_ = tvine_struct_;
+            d_ += cs_dim_;
+        } else {
+            combined_vals = my_simulate_uniform(n, cs_dim_, qrng, seeds);    
+        }
+
+        return inverse_rosenblatt(combined_vals, num_threads).rightCols(cs_dim_);
+    }
+    
+    Eigen::MatrixXd simulate_ahead(size_t n_ahead, 
+                                   const Eigen::MatrixXd& data, 
+                                   const bool qrng = false, 
+                                   const size_t num_threads = 1,
+                                   const std::vector<int>& seeds = std::vector<int>())
+    {
+        check_cond_data(data);
+        
+        Eigen::MatrixXd U(n_ahead + p_, cs_dim_); 
+        U.bottomRows(n_ahead) = my_simulate_uniform(n_ahead, cs_dim_, qrng, seeds);
+        Eigen::MatrixXd Ui(1, d_);
+
+        // initialize first p lags
+        if (p_ > 0) {
+            // only most recent observations are used
+            Eigen::MatrixXd cond_vals = data.bottomRows(p_);
+    
+            // spread past observations into one row with d_ - cs_dim_ columns
+            for (size_t lag = 1; lag < p_; lag++) {
+                cond_vals = spread_lag(cond_vals, cs_dim_);
+            }
+
+            // construct sub-model for last p_ lags
+            d_ -= cs_dim_;
+            vine_struct_ = TVineStructure(tvine_struct_.get_cs_structure(), 
+                                          p_ - 1, in_vertex_, out_vertex_);
+            
+            // initialize Ui with rosenblatt of past observations
+            auto cpit = rosenblatt(cond_vals, num_threads);
+            Ui.rightCols(cpit.cols()) = cpit;
+    
+            // restore original model
+            vine_struct_ = tvine_struct_;
+            d_ += cs_dim_;
+        } else {
+            Ui = U.topRows(cs_dim_).array();    
+        }
+                        
+        // simulate conditional on previous observations
+        Eigen::MatrixXd sim(n_ahead, cs_dim_);
+        for (size_t i = 0; i < n_ahead; i++) {
+            Ui.leftCols(d_ - cs_dim_).swap(Ui.rightCols(d_ - cs_dim_));
+            Ui.rightCols(cs_dim_) = U.row(i + p_);
+            sim.row(i) = inverse_rosenblatt(Ui, num_threads).rightCols(cs_dim_);
+        }
+        
+        return sim;
     }
     
     
 protected:
+    Eigen::MatrixXd my_simulate_uniform(
+        size_t n, size_t d,
+        const bool qrng = false, 
+        const std::vector<int>& seeds = std::vector<int>()) const
+    {
+        Eigen::MatrixXd U;
+        if (qrng) {
+            if (cs_dim_ > 300) {
+                U = tools_stats::sobol(n, d, seeds);
+            } else {
+                U = tools_stats::ghalton(n, d, seeds);
+            }
+        } else {
+            U = tools_stats::simulate_uniform(n, d, seeds);
+        }
+        
+        return U;
+    }
     
     void finalize_tvine(const tools_select::TVineFamilySelector &selector)
     {
@@ -712,6 +787,19 @@ protected:
             msg << "wrong number of columns." << std::endl <<
                 "expected: " << cs_dim_ << std::endl <<
                 "provided: " << data.cols() << std::endl;
+            throw std::runtime_error(msg.str());
+        }
+    }
+    
+    void check_cond_data(const Eigen::MatrixXd &data) const 
+    {
+        check_data_dim(data);
+        if (static_cast<size_t>(data.rows()) < p_) {
+            std::stringstream msg;
+            msg << 
+                "need at least p observations to condition on;" << std::endl <<
+                "expected: >= " << p_ << std::endl <<
+                "actual: " << data.rows() << std::endl; 
             throw std::runtime_error(msg.str());
         }
     }

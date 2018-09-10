@@ -19,33 +19,23 @@ TEST(test_tvine, playground)
 {
     FitControlsVinecop controls({BicopFamily::clayton});
     
-    auto u = tools_stats::simulate_uniform(30, 4);
+    auto u = tools_stats::simulate_uniform(30, 5);
         
-    TVine tv(4, 0);
+    TVine tv(5, 0);
     
     RVineStructure cs_struct = tv.get_cs_structure();
     // cs_struct.truncate(2);
 
     
-    TVine tv2(cs_struct, 1, 1, 3);
-    std::cout << cs_struct << std::endl;
-    std::cout << tv2.get_rvine_structure() << std::endl;
-    // 
-    controls.set_show_trace(true);
-    tv2.select_all(u, controls);
-    std::cout << tv2.get_tvine_structure() << std::endl;
+    TVine tv2(cs_struct, 1, 5, 1);
 
     // std::cout << tv2.simulate(10) << std::endl;
-    // 
-    // // tv2.select_all(u, controls);
-    // // std::cout << tv2.get_rvine_structure() << std::endl;
+    // std::cout << tv2.simulate_conditional(10, u) << std::endl;
+    std::cout << tv2.simulate_ahead(10, u) << std::endl;
 
-    TVine tv3(tv2.get_all_pair_copulas(), 
-              tv2.get_cs_structure(),
-              tv2.get_p(),
-              tv2.get_in_vertex(),
-              tv2.get_out_vertex());
-    std::cout << tv3.simulate(10) << std::endl;
+    // tv2.select_all(u, controls);
+    // std::cout << tv2.get_rvine_structure() << std::endl;
+
 }
 
 } // namespace test_tvine
