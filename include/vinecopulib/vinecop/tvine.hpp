@@ -52,6 +52,7 @@ public:
     {
         order_ = expand_order(cs_struct_.get_order(), p);
         struct_array_ = build_t_vine_array(cs_struct_, p, in_vertex, out_vertex);
+        // std::cout << struct_array_ << std::endl;
         RVineStructure new_struct(order_, struct_array_);
         d_             = new_struct.get_dim();
         trunc_lvl_     = new_struct.get_trunc_lvl();
@@ -137,7 +138,7 @@ private:
         // when final object ist created.
         auto old_order = structure.get_rev_order();
         auto new_order = pivot_diag(old_order, old_struct, in_vertex);
-
+        
         // loop through all columns
         for (size_t i = 0; i < d - 1; i++) {
             // extract elements of pivotal order that are required for the default
@@ -148,9 +149,9 @@ private:
             tools_stl::reverse(new_column);
             
             auto diag_until = span(new_order, 0, i);
-            auto diag_after = span(new_order, i, d - i);
+            auto diag_after = span(new_order, i, d - i);    
+            auto start_pos = find_position(in_vertex, old_order);    
             for (size_t t = 0; t < new_column.size(); t++) {
-                // TODO: start from top
                 // Check whether an element in this column is already contained in
                 // the diagonal to the left. If so, we need to find another node 
                 // that is connected to the diagonal entry of column i. We search 
@@ -158,8 +159,7 @@ private:
                 // the in_vertex and to the the left of the current column (included).
                 if (is_member(new_column[t], diag_until)) {
                     bool found_node = false;
-                    // TODO: check <=
-                    for (size_t j = find_position(in_vertex, old_order); j <= i; j++) {
+                    for (size_t j = start_pos; j < d - 1; j++) {
                         if (new_order[i] == old_struct(t, j)) {
                             if (is_member(old_order[j], diag_after)) {
                                 new_column[t] = old_order[j];
