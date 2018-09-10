@@ -187,9 +187,11 @@ inline FitControlsBicop FitControlsVinecop::get_fit_controls_bicop() const
 
 inline void FitControlsVinecop::set_truncation_level(size_t truncation_level)
 {
-    if (std::isnan(truncation_level))
+    if (std::isnan(static_cast<double>(truncation_level))) {
         truncation_level_ = std::numeric_limits<size_t>::max();
-    truncation_level_ = truncation_level;
+    } else {
+        truncation_level_ = truncation_level;
+    }
 }
 
 inline void FitControlsVinecop::set_tree_criterion(std::string tree_criterion)
