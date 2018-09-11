@@ -295,7 +295,7 @@ protected:
         if (controls.get_select_truncation_level()) {
             throw std::runtime_error("Cannot select truncation level for T-vines.");
         }
-        if (controls.get_truncation_level() < std::numeric_limits<size_t>::max()) {
+        if (controls.get_truncation_level() < std::numeric_limits<int>::max()) {
             throw std::runtime_error("T-vines cannot be truncated.");
         }
     }
@@ -677,34 +677,18 @@ public:
     {
         check_cond_data(data);
         
-        Eigen::MatrixXd combined_vals(n, d_);
+        Eigen::MatrixXd U(n, d_);
         if (p_ > 0) {
-            // only most recent observations are used
-            Eigen::MatrixXd cond_vals = data.bottomRows(p_);
-    
-            // spread past observations into one row with d_ - cs_dim_ columns
-            for (size_t lag = 1; lag < p_; lag++) {
-                cond_vals = spread_lag(cond_vals, cs_dim_);
-            }
-            
-            d_ -= cs_dim_;
-            vine_struct_ = TVineStructure(tvine_struct_.get_cs_structure(), 
-                                          p_ - 1, in_vertex_, out_vertex_);
-            combined_vals << rosenblatt(cond_vals, num_threads).replicate(n, 1), 
-                             my_simulate_uniform(n, cs_dim_, qrng, seeds);
-            vine_struct_ = tvine_struct_;
-            d_ += cs_dim_;
-        } else {
-            combined_vals = my_simulate_uniform(n, cs_dim_, qrng, seeds);    
+            U.leftCols(d_ - cs_dim_) = get_last_cpits(data).replicate(n, 1);
         }
+        U.rightCols(cs_dim_) = my_simulate_uniform(n, cs_dim_, qrng, seeds);
 
-        return inverse_rosenblatt(combined_vals, num_threads).rightCols(cs_dim_);
+        return inverse_rosenblatt(U, num_threads).rightCols(cs_dim_);
     }
     
     Eigen::MatrixXd simulate_ahead(size_t n_ahead, 
                                    const Eigen::MatrixXd& data, 
                                    const bool qrng = false, 
-                                   const size_t num_threads = 1,
                                    const std::vector<int>& seeds = std::vector<int>())
     {
         check_cond_data(data);
@@ -715,9 +699,30 @@ public:
 
         // initialize first p lags
         if (p_ > 0) {
+            Ui.rightCols(d_ - cs_dim_) = get_last_cpits(data);
+        }
+        
+        // simulate conditional on previous observations
+        Eigen::MatrixXd sim(n_ahead, cs_dim_);
+        for (size_t i = 0; i < n_ahead; i++) {
+            Ui.leftCols(d_ - cs_dim_).swap(Ui.rightCols(d_ - cs_dim_));
+            Ui.rightCols(cs_dim_) = U.row(i + p_);
+            sim.row(i) = inverse_rosenblatt(Ui).rightCols(cs_dim_);
+        }
+        
+        return sim;
+    }
+    
+    
+protected:
+    Eigen::MatrixXd get_last_cpits(const Eigen::MatrixXd& data)
+    {
+        auto cpits = Eigen::MatrixXd();
+        
+        if (p_ > 0) {
             // only most recent observations are used
             Eigen::MatrixXd cond_vals = data.bottomRows(p_);
-    
+
             // spread past observations into one row with d_ - cs_dim_ columns
             for (size_t lag = 1; lag < p_; lag++) {
                 cond_vals = spread_lag(cond_vals, cs_dim_);
@@ -729,29 +734,16 @@ public:
                                           p_ - 1, in_vertex_, out_vertex_);
             
             // initialize Ui with rosenblatt of past observations
-            auto cpit = rosenblatt(cond_vals, num_threads);
-            Ui.rightCols(cpit.cols()) = cpit;
-    
+            cpits = rosenblatt(cond_vals);
+
             // restore original model
             vine_struct_ = tvine_struct_;
             d_ += cs_dim_;
-        } else {
-            Ui = U.topRows(cs_dim_).array();    
-        }
-                        
-        // simulate conditional on previous observations
-        Eigen::MatrixXd sim(n_ahead, cs_dim_);
-        for (size_t i = 0; i < n_ahead; i++) {
-            Ui.leftCols(d_ - cs_dim_).swap(Ui.rightCols(d_ - cs_dim_));
-            Ui.rightCols(cs_dim_) = U.row(i + p_);
-            sim.row(i) = inverse_rosenblatt(Ui, num_threads).rightCols(cs_dim_);
         }
         
-        return sim;
+        return cpits;
     }
     
-    
-protected:
     Eigen::MatrixXd my_simulate_uniform(
         size_t n, size_t d,
         const bool qrng = false, 

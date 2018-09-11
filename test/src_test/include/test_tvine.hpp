@@ -27,10 +27,10 @@ TEST(test_tvine, playground)
     // cs_struct.truncate(2);
 
     
-    TVine tv2(cs_struct, 1, 5, 1);
+    TVine tv2(cs_struct, 2, 5, 1);
 
-    // std::cout << tv2.simulate(10) << std::endl;
-    // std::cout << tv2.simulate_conditional(10, u) << std::endl;
+    std::cout << tv2.simulate(10) << std::endl;
+    std::cout << tv2.simulate_conditional(10, u) << std::endl;
     std::cout << tv2.simulate_ahead(10, u) << std::endl;
 
     // tv2.select_all(u, controls);
