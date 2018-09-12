@@ -47,9 +47,10 @@ public:
                    size_t out_vertex = 1) :
         p_(p), 
         in_vertex_(in_vertex), 
-        out_vertex_(out_vertex),
-        cs_struct_(reorder_structure(cs_struct, in_vertex))
+        out_vertex_(out_vertex)
     {
+        check_in_out_vertices(cs_struct, in_vertex, out_vertex);
+        cs_struct_ = reorder_structure(cs_struct, in_vertex);
         order_ = expand_order(cs_struct_.get_order(), p);
         struct_array_ = build_t_vine_array(cs_struct_, p, in_vertex, out_vertex);
         RVineStructure new_struct(order_, struct_array_);
@@ -87,6 +88,22 @@ public:
     }
     
 private:
+    
+    void check_in_out_vertices(const RVineStructure &cs_struct,
+                               size_t in_vertex, size_t out_vertex) const
+    {
+        if (in_vertex > cs_struct.get_dim())
+            throw std::runtime_error(
+                "in_vertex must not be larger than the number of variables.");
+        if (out_vertex > cs_struct.get_dim())
+            throw std::runtime_error(
+                "out_vertex must not be larger than the number of variables.");
+        if (in_vertex == 0)
+            throw std::runtime_error("in_vertex must be at least 1.");
+        if (out_vertex == 0)
+            throw std::runtime_error("out_vertex must be at least 1.");
+    }
+    
     std::vector<size_t> expand_order(const std::vector<size_t> &order, size_t p) const
     {
         size_t cs_dim = order.size();
@@ -277,7 +294,9 @@ public:
         in_vertex_(in_vertex),
         out_vertex_(out_vertex),
         data_(data)        
-    {}
+    {
+        check_in_out_vertices();
+    }
 
     size_t get_in_vertex() const
     {
@@ -290,6 +309,16 @@ public:
     }
     
 protected:
+    void check_in_out_vertices() const
+    {
+        if (in_vertex_ > cs_dim_)
+            throw std::runtime_error(
+                "in_vertex must not be larger than the number of variables.");
+        if (out_vertex_ > cs_dim_)
+            throw std::runtime_error(
+                "out_vertex must not be larger than the number of variables.");
+    }    
+    
     void check_controls(const FitControlsVinecop &controls)
     {
         if (controls.get_select_truncation_level()) {
@@ -310,14 +339,16 @@ protected:
 class TVineStructureSelector : public StructureSelector, public TVineSelector {
 public:
     TVineStructureSelector(const Eigen::MatrixXd &data,
-                           const FitControlsVinecop &controls) : 
+                           const FitControlsVinecop &controls,
+                           size_t in_vertex,
+                           size_t out_vertex) : 
         StructureSelector(data, controls), 
-        TVineSelector(data)
+        TVineSelector(data, in_vertex, out_vertex)
     {
         check_controls(controls);
     }
         
-    ~TVineStructureSelector() {}
+    ~TVineStructureSelector() = default;
         
     void select_tree(size_t t) override
     {
@@ -347,19 +378,31 @@ public:
     
     void select_connecting_vertices()
     {
-        double crit = 0.0, new_crit = 0.0;
         size_t d = data_.cols();
         size_t n = data_.rows() - 1;
+
+        size_t in_start = 1, out_start = 1;
+        size_t in_end = d, out_end = d;
+        if (in_vertex_ != 0) {
+            in_start = in_vertex_;
+            in_end   = in_vertex_;
+        }
+        if (out_vertex_ != 0) {
+            out_start = out_vertex_;
+            out_end   = out_vertex_;
+        }
+        
+        double crit = 0.0, new_crit = 0.0;
         Eigen::MatrixXd pair_data(n, 2);
-        for (size_t i = 0; i < d; i++) {
-            for (size_t j = i; j < d; j++) {
-                new_crit = wdm::wdm(data_.col(i).tail(n), 
-                                    data_.col(j).head(n), 
+        for (size_t i = in_start; i <= in_end; i++) {
+            for (size_t o = out_start; o <= out_end; o++) {
+                new_crit = wdm::wdm(data_.col(i - 1).tail(n), 
+                                    data_.col(o - 1).head(n), 
                                     "hoeffd");
                 if (std::abs(new_crit) > crit) {
                     crit = std::abs(new_crit);
-                    in_vertex_ = i + 1;
-                    out_vertex_ = j + 1;
+                    in_vertex_ = i;
+                    out_vertex_ = o;
                 }
             }
         }
@@ -622,22 +665,26 @@ public:
     }
     
     void select_all(const Eigen::MatrixXd &data,
-                    const FitControlsVinecop &controls = FitControlsVinecop())
+                    const FitControlsVinecop &controls = FitControlsVinecop(),
+                    size_t in_vertex  = 0,
+                    size_t out_vertex = 0)
     {
         tools_eigen::check_if_in_unit_cube(data);
         check_data_dim(data);
         
-        tools_select::TVineStructureSelector selector(data, controls);
+        tools_select::TVineStructureSelector selector(data, controls, 
+                                                      in_vertex, out_vertex);
+
         selector.select_all_trees(data);
         selector.select_connecting_vertices();
 
         tools_select::TVineFamilySelector tv_selector(data, selector, controls);
-        
+
         for (size_t lag = 1; lag <= p_; lag++) {
             tv_selector.add_lag();
             tv_selector.select_all_trees(tv_selector.data());
         }
-        
+
         finalize_fit(tv_selector);
     }
         
@@ -763,12 +810,13 @@ protected:
         return U;
     }
     
-    void finalize_tvine(const tools_select::TVineFamilySelector &selector)
+    void finalize_fit(const tools_select::TVineFamilySelector &selector)
     {
         in_vertex_ = selector.get_in_vertex();
         out_vertex_ = selector.get_out_vertex();
         tvine_struct_ = TVineStructure(selector.get_cs_structure(), 
                                        p_, in_vertex_, out_vertex_);
+
         Vinecop::finalize_fit(selector);
     }
     
