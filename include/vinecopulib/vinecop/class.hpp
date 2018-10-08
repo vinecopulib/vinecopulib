@@ -96,7 +96,7 @@ public:
     
     double get_tau(size_t tree, size_t edge) const;
     
-    size_t get_truncation_level() const;
+    size_t get_trunc_lvl() const;
 
     // Getters for all pair copulas
     std::vector <std::vector<Bicop>> get_all_pair_copulas() const;
@@ -162,8 +162,8 @@ public:
     // Misc methods
     static std::vector <std::vector<Bicop>>
     make_pair_copula_store(const size_t d,
-                           const size_t truncation_level = std::numeric_limits<size_t>::max());
-    void truncate(size_t truncation_level);
+                           const size_t trunc_lvl = std::numeric_limits<size_t>::max());
+    void truncate(size_t trunc_lvl);
 
 private:
     size_t d_;

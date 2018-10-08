@@ -206,7 +206,7 @@ inline size_t RVineStructure::max_array(size_t tree, size_t edge) const {
 //! truncates the R-vine structure.
 //! @param trunc_lvl the truncation level.
 //! If the structure is already truncated at a level 
-//! less than `truncation_level`, the function does nothing.
+//! less than `trunc_lvl`, the function does nothing.
 inline void RVineStructure::truncate(size_t trunc_lvl)
 {
     if (trunc_lvl < trunc_lvl_) {
