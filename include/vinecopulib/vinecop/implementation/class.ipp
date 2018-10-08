@@ -1106,12 +1106,16 @@ inline  void Vinecop::check_pair_copulas_rvine_structure(
     }
 }
 
-// truncate the vine copula model.
-// @param truncation_level the truncation level.
+//! truncate the vine copula model.
+//! @param truncation_level the truncation level.
+//! If the model is already truncated at a level less than `truncation_level`, 
+//! the function does nothing.
 inline void Vinecop::truncate(size_t truncation_level)
 {
-    vine_struct_.truncate(truncation_level);
-    pair_copulas_.resize(truncation_level);
+    if (truncation_level < vine_struct_.get_trunc_lvl()) {
+        vine_struct_.truncate(truncation_level);
+        pair_copulas_.resize(truncation_level);
+    }
 }
 
 

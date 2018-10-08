@@ -151,8 +151,10 @@ void TriangularArray<T>::set_column(size_t column,
     mat_[column] = new_col;
 }
 
-//! truncates the trapezoid.
+//! truncates the trapezoid. 
 //! @param trunc_lvl the truncation level.
+//! If the trapezoid is already truncated at a level 
+//! less than `trunc_lvl`, the function does nothing.
 template<typename T>
 void TriangularArray<T>::truncate(size_t trunc_lvl)
 {
