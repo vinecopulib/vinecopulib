@@ -816,7 +816,7 @@ protected:
         out_vertex_ = selector.get_out_vertex();
         tvine_struct_ = TVineStructure(selector.get_cs_structure(), 
                                        p_, in_vertex_, out_vertex_);
-
+        tvine_struct_ = tvine_struct_;
         Vinecop::finalize_fit(selector);
     }
     

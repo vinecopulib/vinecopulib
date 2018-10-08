@@ -28,8 +28,8 @@ TEST(test_tvine, playground)
     
     TVine tv2(cs_struct, 1, 4, 2);
 
-    tv2.select_all(u, controls, 2, 2);
-    std::cout << tv2.get_tvine_structure() << std::endl;
+    tv2.select_families(u, controls);
+    std::cout << tv2.get_rvine_structure() << std::endl;
     
     // std::cout << tv2.simulate(10) << std::endl;
     // std::cout << tv2.simulate_conditional(10, u) << std::endl;
