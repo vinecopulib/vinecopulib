@@ -460,6 +460,12 @@ inline double Vinecop::get_tau(const size_t tree, const size_t edge) const
     return get_pair_copula(tree, edge).get_tau();
 }
 
+inline size_t Vinecop::get_truncation_level() const
+{
+    return vine_struct_.get_trunc_lvl();
+}
+
+
 
 //! extracts the parameters of all pair copulas.
 //!
@@ -1112,7 +1118,7 @@ inline  void Vinecop::check_pair_copulas_rvine_structure(
 //! the function does nothing.
 inline void Vinecop::truncate(size_t truncation_level)
 {
-    if (truncation_level < vine_struct_.get_trunc_lvl()) {
+    if (truncation_level < this->get_truncation_level()) {
         vine_struct_.truncate(truncation_level);
         pair_copulas_.resize(truncation_level);
     }

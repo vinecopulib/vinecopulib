@@ -95,6 +95,8 @@ public:
     Eigen::MatrixXd get_parameters(size_t tree, size_t edge) const;
     
     double get_tau(size_t tree, size_t edge) const;
+    
+    size_t get_truncation_level() const;
 
     // Getters for all pair copulas
     std::vector <std::vector<Bicop>> get_all_pair_copulas() const;
