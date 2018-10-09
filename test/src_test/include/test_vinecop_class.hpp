@@ -90,6 +90,24 @@ TEST_F(VinecopTest, fit_statistics_getters_are_correct) {
     EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
 }
 
+TEST_F(VinecopTest, truncate_methods_works) {
+    auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+    auto par = Eigen::VectorXd::Constant(1, 3.0);
+    for (auto &tree : pair_copulas) {
+        for (auto &pc : tree) {
+            pc = Bicop(BicopFamily::clayton, 270, par);
+        }
+    }
+    Vinecop vinecop(pair_copulas, model_matrix);
+    vinecop.truncate(2);
+    EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 2);
+    EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 2);
+    vinecop.truncate(0);
+    EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 0);
+    EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 0);
+}
+
+
 TEST_F(VinecopTest, pdf_is_correct) {
 
     auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
@@ -256,7 +274,7 @@ TEST_F(VinecopTest, trace_works) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_show_trace(true);
     controls.set_select_threshold(true);
-    controls.set_truncation_level(3);
+    controls.set_trunc_lvl(3);
     testing::internal::CaptureStdout();
     Vinecop fit(u, controls);
     std::string output = testing::internal::GetCapturedStdout();
@@ -265,7 +283,7 @@ TEST_F(VinecopTest, trace_works) {
 
 TEST_F(VinecopTest, works_multi_threaded) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
-    controls.set_select_truncation_level(true);
+    controls.set_select_trunc_lvl(true);
 
     Vinecop fit1(u, controls);
     controls.set_num_threads(2);
@@ -326,7 +344,7 @@ TEST_F(VinecopTest, select_finds_right_structure) {
 // in what follows, we only check if funs run without error ----------
 TEST_F(VinecopTest, fixed_truncation) {
     FitControlsVinecop controls({BicopFamily::indep});
-    controls.set_truncation_level(2);
+    controls.set_trunc_lvl(2);
     // controls.set_show_trace(true);
     Vinecop fit(7);
     fit.select_all(u, controls);
@@ -346,7 +364,7 @@ TEST_F(VinecopTest, sparse_threshold_selection) {
 
 TEST_F(VinecopTest, sparse_truncation_selection) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
-    controls.set_select_truncation_level(true);
+    controls.set_select_trunc_lvl(true);
     // controls.set_show_trace(true);
     u = tools_stats::simulate_uniform(100, 7);
     Vinecop fit(7);
@@ -357,7 +375,7 @@ TEST_F(VinecopTest, sparse_truncation_selection) {
 
 TEST_F(VinecopTest, sparse_both_selection) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
-    controls.set_select_truncation_level(true);
+    controls.set_select_trunc_lvl(true);
     controls.set_select_threshold(true);
     // controls.set_show_trace(true);
     Vinecop fit(7);
