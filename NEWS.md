@@ -1,3 +1,11 @@
+# vinecopulib 0.3.1
+
+DEPRECATED FUNCTIONS
+
+    * `FitControlsVinecop` methods like `get_truncation_level()` are now 
+      deprecated in favor of the shorter `get_trunc_lvl()` versions.
+
+
 # vinecopulib 0.3.0 (August 9, 2018)
 
 NEW FEATURES

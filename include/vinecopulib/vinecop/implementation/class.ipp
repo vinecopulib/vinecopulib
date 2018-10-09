@@ -278,15 +278,15 @@ inline void Vinecop::to_json(const char *filename) const
 //! Initialize object for storing pair copulas
 //!
 //! @param d dimension of the vine copula.
-//! @param truncation_level a truncation level (optional).
+//! @param trunc_lvl a truncation level (optional).
 //! @return A nested vector such that `pc_store[t][e]` contains a Bicop.
 //!     object for the pair copula corresponding to tree `t` and edge `e`.
 inline std::vector<std::vector<Bicop>> Vinecop::make_pair_copula_store(
     const size_t d,
-    const size_t truncation_level)
+    const size_t trunc_lvl)
 {
     return tools_select::VinecopSelector::make_pair_copula_store(
-        d, truncation_level);
+        d, trunc_lvl);
 }
 
 
@@ -460,6 +460,12 @@ inline double Vinecop::get_tau(const size_t tree, const size_t edge) const
 {
     return get_pair_copula(tree, edge).get_tau();
 }
+
+inline size_t Vinecop::get_trunc_lvl() const
+{
+    return vine_struct_.get_trunc_lvl();
+}
+
 
 
 //! extracts the parameters of all pair copulas.
@@ -1107,12 +1113,16 @@ inline  void Vinecop::check_pair_copulas_rvine_structure(
     }
 }
 
-// truncate the vine copula model.
-// @param truncation_level the truncation level.
-inline void Vinecop::truncate(size_t truncation_level)
+//! truncate the vine copula model.
+//! @param trunc_lvl the truncation level.
+//! If the model is already truncated at a level less than `trunc_lvl`, 
+//! the function does nothing.
+inline void Vinecop::truncate(size_t trunc_lvl)
 {
-    vine_struct_.truncate(truncation_level);
-    pair_copulas_.resize(truncation_level);
+    if (trunc_lvl < this->get_trunc_lvl()) {
+        vine_struct_.truncate(trunc_lvl);
+        pair_copulas_.resize(trunc_lvl);
+    }
 }
 
 

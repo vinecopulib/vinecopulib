@@ -86,7 +86,7 @@ public:
 
     static std::vector<std::vector<Bicop>> make_pair_copula_store(
         size_t d,
-        size_t truncation_level);
+        size_t trunc_lvl);
 
     void select_all_trees(const Eigen::MatrixXd &data);
 

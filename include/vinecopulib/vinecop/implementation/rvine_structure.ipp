@@ -205,13 +205,17 @@ inline size_t RVineStructure::max_array(size_t tree, size_t edge) const {
 
 //! truncates the R-vine structure.
 //! @param trunc_lvl the truncation level.
+//! If the structure is already truncated at a level 
+//! less than `trunc_lvl`, the function does nothing.
 inline void RVineStructure::truncate(size_t trunc_lvl)
 {
-    struct_array_.truncate(trunc_lvl);
-    max_array_.truncate(trunc_lvl);
-    needed_hfunc1_.truncate(trunc_lvl);
-    needed_hfunc2_.truncate(trunc_lvl);
-    trunc_lvl_ = struct_array_.get_trunc_lvl();
+    if (trunc_lvl < trunc_lvl_) {
+        struct_array_.truncate(trunc_lvl);
+        max_array_.truncate(trunc_lvl);
+        needed_hfunc1_.truncate(trunc_lvl);
+        needed_hfunc2_.truncate(trunc_lvl);
+        trunc_lvl_ = struct_array_.get_trunc_lvl();
+    }
 }
 
 //! extract the R-vine matrix representation.

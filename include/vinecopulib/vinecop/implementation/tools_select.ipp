@@ -86,18 +86,18 @@ inline RVineStructure VinecopSelector::get_rvine_structure() const
 //! Initialize object for storing pair copulas
 //!
 //! @param d dimension of the vine copula.
-//! @param truncation_level a truncation level (optional).
+//! @param trunc_lvl a truncation level (optional).
 //! @return A nested vector such that `pc_store[t][e]` contains a Bicop.
 //!     object for the pair copula corresponding to tree `t` and edge `e`.
 inline std::vector <std::vector<Bicop>> VinecopSelector::make_pair_copula_store(
     size_t d,
-    size_t truncation_level)
+    size_t trunc_lvl)
 {
     if (d < 2) {
         throw std::runtime_error("the dimension should be larger than 1");
     }
 
-    size_t n_trees = std::min(d - 1, truncation_level);
+    size_t n_trees = std::min(d - 1, trunc_lvl);
     std::vector <std::vector<Bicop>> pc_store(n_trees);
     for (size_t t = 0; t < n_trees; ++t) {
         pc_store[t].resize(d - 1 - t);
@@ -120,13 +120,13 @@ inline void VinecopSelector::select_all_trees(const Eigen::MatrixXd &data)
             print_pair_copulas_of_tree(t);
         }
 
-        if (controls_.get_truncation_level() == t + 1) {
+        if (controls_.get_trunc_lvl() == t + 1) {
             // don't need to fit the remaining trees
             break;
         }
     }
     loglik_ = loglik;
-    finalize(controls_.get_truncation_level());
+    finalize(controls_.get_trunc_lvl());
 }
 
 inline void
@@ -159,7 +159,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         // restore family set in case previous threshold iteration also
         // truncated the model
         controls_.set_family_set(family_set);
-        controls_.set_truncation_level(std::numeric_limits<size_t>::max());
+        controls_.set_trunc_lvl(std::numeric_limits<size_t>::max());
         initialize_new_fit(data);
 
         // decrease the threshold
@@ -178,13 +178,13 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         double mbicv_tree = 0.0;
         double mbicv_trunc = 0.0;
         double loglik = 0.0;
-        bool select_trunc_lvl = controls_.get_select_truncation_level();
+        bool select_trunc_lvl = controls_.get_select_trunc_lvl();
         bool select_threshold = controls_.get_select_threshold();
         double num_changed = 0.0;
         double num_total = d_ * (d_ - 1) / 2.0;
 
         for (size_t t = 0; t < d_ - 1; ++t) {
-            if (controls_.get_truncation_level() < t) {
+            if (controls_.get_trunc_lvl() < t) {
                 break;  // don't need to fit the remaining trees
             }
 
@@ -229,7 +229,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
                         t--;
                     }
                     set_current_fit_as_opt(loglik);
-                    controls_.set_truncation_level(t);
+                    controls_.set_trunc_lvl(t);
                     if (!select_threshold) {
                         // fixed threshold, no need to continue
                         needs_break = true;  
@@ -269,7 +269,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         }
     }
     trees_ = trees_opt_;
-    finalize(controls_.get_truncation_level());
+    finalize(controls_.get_trunc_lvl());
 }
 
 inline void VinecopSelector::set_tree_to_indep(size_t t)

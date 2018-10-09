@@ -274,7 +274,7 @@ TEST_F(VinecopTest, trace_works) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
     controls.set_show_trace(true);
     controls.set_select_threshold(true);
-    controls.set_truncation_level(3);
+    controls.set_trunc_lvl(3);
     testing::internal::CaptureStdout();
     Vinecop fit(u, controls);
     std::string output = testing::internal::GetCapturedStdout();
@@ -283,7 +283,7 @@ TEST_F(VinecopTest, trace_works) {
 
 TEST_F(VinecopTest, works_multi_threaded) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
-    controls.set_select_truncation_level(true);
+    controls.set_select_trunc_lvl(true);
 
     Vinecop fit1(u, controls);
     controls.set_num_threads(2);
@@ -344,7 +344,7 @@ TEST_F(VinecopTest, select_finds_right_structure) {
 // in what follows, we only check if funs run without error ----------
 TEST_F(VinecopTest, fixed_truncation) {
     FitControlsVinecop controls({BicopFamily::indep});
-    controls.set_truncation_level(2);
+    controls.set_trunc_lvl(2);
     // controls.set_show_trace(true);
     Vinecop fit(7);
     fit.select_all(u, controls);
@@ -364,7 +364,7 @@ TEST_F(VinecopTest, sparse_threshold_selection) {
 
 TEST_F(VinecopTest, sparse_truncation_selection) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
-    controls.set_select_truncation_level(true);
+    controls.set_select_trunc_lvl(true);
     // controls.set_show_trace(true);
     u = tools_stats::simulate_uniform(100, 7);
     Vinecop fit(7);
@@ -376,7 +376,7 @@ TEST_F(VinecopTest, sparse_truncation_selection) {
 
 TEST_F(VinecopTest, sparse_both_selection) {
     FitControlsVinecop controls(bicop_families::itau, "itau");
-    controls.set_select_truncation_level(true);
+    controls.set_select_trunc_lvl(true);
     controls.set_select_threshold(true);
     // controls.set_show_trace(true);
     Vinecop fit(7);
