@@ -23,7 +23,7 @@ inline Vinecop::Vinecop(const size_t d)
     vine_struct_ = RVineStructure(tools_stl::seq_int(1, d),
                                   static_cast<size_t>(0));
 
-    // pair_copulas_ empty = everything independence 
+    // pair_copulas_ empty = everything independence
     threshold_ = 0.0;
     loglik_ = NAN;
 }
@@ -172,13 +172,12 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
 {
     d_ = data.cols();
     nobs_ = data.rows();
-    if (data.rows() == 1) {
-        throw std::runtime_error("data must have more than one row");
-    }
+    check_enough_data(data);
     if (d_ != vine_struct.get_dim()) {
         throw std::runtime_error("data and structure have "
                                      "incompatible dimensions.");
     }
+    check_weights_size(controls.get_weights(), data);
     vine_struct_ = vine_struct;
     select_families(data, controls);
 }
@@ -230,9 +229,8 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
 {
     d_ = data.cols();
     nobs_ = data.rows();
-    if (data.rows() == 1) {
-        throw std::runtime_error("data must have more than one row");
-    }
+    check_enough_data(data);
+    check_weights_size(controls.get_weights(), data);
     select_all(data, controls);
 }
 
@@ -539,7 +537,7 @@ Vinecop::get_struct_array() const
     return vine_struct_.get_struct_array();
 }
 
-//! extracts the log-likelihood (throws an error if model has not been 
+//! extracts the log-likelihood (throws an error if model has not been
 //! fitted to data).
 inline double Vinecop::get_loglik() const
 {
@@ -549,7 +547,7 @@ inline double Vinecop::get_loglik() const
     return loglik_;
 }
 
-//! extracts the number of observations used for the fit (throws an error if 
+//! extracts the number of observations used for the fit (throws an error if
 //! model has not been fitted to data).
 inline size_t Vinecop::get_nobs() const
 {
@@ -559,7 +557,7 @@ inline size_t Vinecop::get_nobs() const
     return nobs_;
 }
 
-//! extracts the AIC (throws an error if model has not been 
+//! extracts the AIC (throws an error if model has not been
 //! fitted to data).
 inline double Vinecop::get_aic() const
 {
@@ -569,7 +567,7 @@ inline double Vinecop::get_aic() const
     return -2 * loglik_ + 2 * calculate_npars();
 }
 
-//! extracts the BIC (throws an error if model has not been 
+//! extracts the BIC (throws an error if model has not been
 //! fitted to data).
 inline double Vinecop::get_bic() const
 {
@@ -579,7 +577,7 @@ inline double Vinecop::get_bic() const
     return -2 * loglik_ + calculate_npars() * std::log(nobs_);;
 }
 
-//! extracts the log-likelihood (throws an error if model has not been 
+//! extracts the log-likelihood (throws an error if model has not been
 //! fitted to data).
 inline double Vinecop::get_mbicv(const double psi0) const
 {
@@ -590,12 +588,12 @@ inline double Vinecop::get_mbicv(const double psi0) const
 }
 
 //! computes the penalty term for mBICV
-inline double Vinecop::calculate_mbicv_penalty(const size_t nobs, 
+inline double Vinecop::calculate_mbicv_penalty(const size_t nobs,
                                              const double psi0) const
 {
     if (!(psi0 > 0.0) | !(psi0 < 1.0)) {
         throw std::runtime_error("psi0 must be in the interval (0, 1)");
-    }    
+    }
     auto all_fams = get_all_families();
     Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps(d_ - 1);
     non_indeps.setZero();
@@ -619,10 +617,10 @@ inline double Vinecop::calculate_mbicv_penalty(const size_t nobs,
     double npars = this->calculate_npars();
     double log_prior = (
         non_indeps.cast<double>().array() * psis.array().log() +
-        (d_ - non_indeps.array() - sq.array()).cast<double>() * 
+        (d_ - non_indeps.array() - sq.array()).cast<double>() *
         (1 - psis.array()).log()
     ).sum();
-    
+
     return std::log(nobs) * npars - 2 * log_prior;
 }
 
@@ -642,7 +640,7 @@ inline double Vinecop::get_threshold() const
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u, 
+inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
                                     const size_t num_threads) const
 {
     tools_eigen::check_if_in_unit_cube(u);
@@ -722,7 +720,7 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
 //! @param N integer for the number of quasi-random numbers to draw
 //! to evaluate the distribution (default: 1e4).
 //! @param num_threads the number of threads to use for computations; if greater
-//!   than 1, the function will generate `n` samples concurrently in 
+//!   than 1, the function will generate `n` samples concurrently in
 //!   `num_threads` batches.
 //! @param seeds seeds to scramble the quasi-random numbers; if empty (default),
 //!   the random number quasi-generator is seeded randomly.
@@ -770,12 +768,12 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N,
 //! @param n number of observations.
 //! @param qrng set to true for quasi-random numbers.
 //! @param num_threads the number of threads to use for computations; if greater
-//!   than 1, the function will generate `n` samples concurrently in 
+//!   than 1, the function will generate `n` samples concurrently in
 //!   `num_threads` batches.
 //! @param seeds seeds of the random number generator; if empty (default),
 //!   the random number generator is seeded randomly.
 //! @return An \f$ n \times d \f$ matrix of samples from the copula model.
-inline Eigen::MatrixXd Vinecop::simulate(const size_t n, 
+inline Eigen::MatrixXd Vinecop::simulate(const size_t n,
                                          const bool qrng,
                                          const size_t num_threads,
                                          const std::vector<int>& seeds) const
@@ -802,7 +800,7 @@ inline Eigen::MatrixXd Vinecop::simulate(const size_t n,
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-inline double Vinecop::loglik(const Eigen::MatrixXd &u, 
+inline double Vinecop::loglik(const Eigen::MatrixXd &u,
                               const size_t num_threads) const
 {
     return pdf(u, num_threads).array().log().sum();
@@ -819,7 +817,7 @@ inline double Vinecop::loglik(const Eigen::MatrixXd &u,
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-inline double Vinecop::aic(const Eigen::MatrixXd &u, 
+inline double Vinecop::aic(const Eigen::MatrixXd &u,
                            const size_t num_threads) const
 {
     return -2 * loglik(u, num_threads) + 2 * calculate_npars();
@@ -836,22 +834,22 @@ inline double Vinecop::aic(const Eigen::MatrixXd &u,
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-inline double Vinecop::bic(const Eigen::MatrixXd &u, 
+inline double Vinecop::bic(const Eigen::MatrixXd &u,
                            const size_t num_threads) const
 {
-    return -2 * loglik(u, num_threads) + 
+    return -2 * loglik(u, num_threads) +
         calculate_npars() * log(static_cast<double>(u.rows()));
 }
 
-//! calculates the modified Bayesian information criterion for vines (mBICV), 
+//! calculates the modified Bayesian information criterion for vines (mBICV),
 //! which is defined as
-//! \f[ \mathrm{mBICV} = -2\, \mathrm{loglik} +  \ln(n) \nu, - 2 * 
+//! \f[ \mathrm{mBICV} = -2\, \mathrm{loglik} +  \ln(n) \nu, - 2 *
 //! \sum_{t=1}^(d - 1) \{q_t log(\psi_0^t) - (d - t - q_t) log(1 -\psi_0^t)\}\f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood, \f$ \nu \f$ is the
-//! (effective) number of parameters of the model, \f$ t \f$ is the tree level 
-//! \f$ \psi_0 \f$ is the prior probability of having a non-independence copula 
+//! (effective) number of parameters of the model, \f$ t \f$ is the tree level
+//! \f$ \psi_0 \f$ is the prior probability of having a non-independence copula
 //! in the first tree, and \f$ q_t \f$ is the number of non-independence copulas
-//! in tree \f$ t \f$; The vBIC is a consistent model selection criterion for 
+//! in tree \f$ t \f$; The vBIC is a consistent model selection criterion for
 //! parametric sparse vine copula models when \f$ d = o(\sqrt{n \ln n})\f$.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
@@ -859,14 +857,14 @@ inline double Vinecop::bic(const Eigen::MatrixXd &u,
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-inline double Vinecop::mbicv(const Eigen::MatrixXd &u, 
-                             const double psi0, 
+inline double Vinecop::mbicv(const Eigen::MatrixXd &u,
+                             const double psi0,
                              const size_t num_threads) const
 {
-    
+
     double n = static_cast<double>(u.rows());
     double ll = this->loglik(u, num_threads);
-    return -2 * ll + this->calculate_mbicv_penalty(n, psi0);;       
+    return -2 * ll + this->calculate_mbicv_penalty(n, psi0);;
 }
 
 //! returns sum of the number of parameters for all pair copulas (see
@@ -889,7 +887,7 @@ inline double Vinecop::calculate_npars() const
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u, 
+inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
                                            const size_t num_threads) const
 {
     tools_eigen::check_if_in_unit_cube(u);
@@ -910,7 +908,7 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     }
-    
+
     // fill first row of hfunc2 matrix with evaluation points;
     // points have to be reordered to correspond to natural order
     Eigen::MatrixXd hfunc1(n, d);
@@ -949,7 +947,7 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
         pool.map(do_batch, tools_batch::create_batches(n, num_threads));
         pool.join();
     }
-    
+
     // go back to original order
     auto U_vine = u;
     for (size_t j = 0; j < d; j++) {
@@ -1021,23 +1019,23 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
         // temporary storage objects for (inverse) h-functions
         TriangularArray<Eigen::VectorXd> hinv2(d + 1, trunc_lvl + 1);
         TriangularArray<Eigen::VectorXd> hfunc1(d + 1, trunc_lvl + 1);
-    
+
         // initialize with independent uniforms (corresponding to natural
         // order)
         for (size_t j = 0; j < d; ++j) {
-            hinv2(std::min(trunc_lvl, d - j - 1), j) = 
+            hinv2(std::min(trunc_lvl, d - j - 1), j) =
                 u.block(b.begin, revorder[j] - 1, b.size, 1);
         }
         hfunc1(0, d - 1) = hinv2(0, d - 1);
-    
+
         // loop through variables (0 is just the initial uniform)
         for (ptrdiff_t var = d - 2; var >= 0; --var) {
-        
-            tools_interface::check_user_interrupt(n * d > 1e5);            
+
+            tools_interface::check_user_interrupt(n * d > 1e5);
             size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
             for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
                 Bicop edge_copula = get_pair_copula(tree, var);
-            
+
                 // extract data for conditional pair
                 Eigen::MatrixXd U_e(b.size, 2);
                 size_t m = max_matrix(tree, var);
@@ -1047,10 +1045,10 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
                 } else {
                     U_e.col(1) = hfunc1(tree, d - m);
                 }
-            
+
                 // inverse Rosenblatt transform simulates data for conditional pair
                 hinv2(tree, var) = edge_copula.hinv2(U_e);
-            
+
                 // if required at later stage, also calculate hfunc2
                 if (var < static_cast<ptrdiff_t>(d_) - 1) {
                     if (needed_hfunc1(tree, var)) {
@@ -1113,6 +1111,23 @@ inline  void Vinecop::check_pair_copulas_rvine_structure(
     }
 }
 
+//! checks if weights are compatible with the data
+inline void Vinecop::check_weights_size(const Eigen::VectorXd& weights,
+                                      const Eigen::MatrixXd& data) const
+{
+    if ((weights.size() > 0) & (weights.size() != data.rows())) {
+        throw std::runtime_error("sizes of weights and data don't match.");
+    }
+}
+
+//! checks if data size is large enough
+inline void Vinecop::check_enough_data(const Eigen::MatrixXd& data) const
+{
+  if (data.rows() == 1) {
+      throw std::runtime_error("data must have more than one row");
+  }
+}
+
 //! truncate the vine copula model.
 //! @param trunc_lvl the truncation level.
 //! If the model is already truncated at a level less than `trunc_lvl`, 
@@ -1124,6 +1139,5 @@ inline void Vinecop::truncate(size_t trunc_lvl)
         pair_copulas_.resize(trunc_lvl);
     }
 }
-
 
 }
