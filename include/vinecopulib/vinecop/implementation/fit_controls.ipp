@@ -195,14 +195,13 @@ inline FitControlsBicop FitControlsVinecop::get_fit_controls_bicop() const
     return controls_bicop;
 }
 
-inline void FitControlsVinecop::set_truncation_level(size_t truncation_level)
-{
-    trunc_lvl_ = truncation_level;
-}
-
 inline void FitControlsVinecop::set_trunc_lvl(size_t trunc_lvl)
 {
-    trunc_lvl_ = trunc_lvl;
+    if (trunc_lvl == 0) { // select level (likely passed from R)
+        trunc_lvl_ = std::numeric_limits<size_t>::max();
+    } else {
+        trunc_lvl_ = trunc_lvl;
+    }
 }
 
 inline void FitControlsVinecop::set_tree_criterion(std::string tree_criterion)

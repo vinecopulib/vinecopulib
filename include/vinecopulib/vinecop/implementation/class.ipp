@@ -314,7 +314,7 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
     threshold_ = selector.get_threshold();
     loglik_ = selector.get_loglik();
     nobs_ = data.rows();
-    vine_struct_ = selector.get_rvine_matrix();
+    vine_struct_ = selector.get_rvine_structure();
     pair_copulas_ = selector.get_pair_copulas();
 }
 
@@ -338,6 +338,7 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
         tools_select::FamilySelector selector(newdata, vine_struct_, controls);
         if (controls.needs_sparse_select()) {
             selector.sparse_select_all_trees(newdata);
+            vine_struct_ = selector.get_rvine_structure(); // can be truncated
         } else {
             selector.select_all_trees(newdata);
         }
