@@ -89,6 +89,8 @@ public:
 
     size_t struct_array(size_t tree, size_t edge) const;
     size_t max_array(size_t tree, size_t edge) const;
+    
+    void truncate(size_t trunc_lvl);
 
 private:
 

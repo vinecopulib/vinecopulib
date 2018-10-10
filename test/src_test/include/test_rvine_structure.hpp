@@ -29,11 +29,15 @@ TEST(rvine_structure, triangular_array_works) {
     std::ostringstream oss;
     oss << my_rvm;
     EXPECT_EQ(oss.str(), my_rvm.str());
-
+    
     std::vector<size_t> myvec = {1, 2};
     EXPECT_NO_THROW(my_rvm.set_column(4, myvec));
     EXPECT_ANY_THROW(my_rvm.set_column(6, myvec));
     EXPECT_ANY_THROW(my_rvm.set_column(3, myvec));
+    
+    my_rvm.truncate(2);
+    EXPECT_EQ(my_rvm.get_trunc_lvl(), 2);
+    EXPECT_EQ(my_rvm[0].size(), 2);
 }
 
 TEST(rvine_structure, can_convert_to_natural_order) {
@@ -58,7 +62,7 @@ TEST(rvine_structure, can_convert_to_natural_order) {
     EXPECT_EQ(rvine_structure.get_struct_array(), true_no_array);
 }
 
-TEST(rvine_structure, max_mat_is_correct) {
+TEST(rvine_structure, max_array_is_correct) {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
     mat << 5, 2, 6, 6, 6, 6, 6,
         6, 6, 1, 2, 5, 5, 0,
@@ -78,6 +82,10 @@ TEST(rvine_structure, max_mat_is_correct) {
 
     RVineStructure rvine_structure(mat);
     EXPECT_EQ(rvine_structure.get_max_array(), true_max_array);
+    
+    rvine_structure.truncate(2);
+    EXPECT_EQ(rvine_structure.get_trunc_lvl(), 2);
+    EXPECT_EQ(rvine_structure.get_max_array()[0].size(), 2);
 }
 
 TEST(rvine_structure, needed_hfunc1_is_correct) {
@@ -100,6 +108,9 @@ TEST(rvine_structure, needed_hfunc1_is_correct) {
 
     RVineStructure rvine_structure(mat);
     EXPECT_EQ(rvine_structure.get_needed_hfunc1(), true_hfunc1);
+    
+    rvine_structure.truncate(2);
+    EXPECT_EQ(rvine_structure.get_needed_hfunc1()[0].size(), 2);
 }
 
 TEST(rvine_structure, needed_hfunc2_is_correct) {
@@ -122,6 +133,9 @@ TEST(rvine_structure, needed_hfunc2_is_correct) {
 
     RVineStructure rvine_structure(mat);
     EXPECT_EQ(rvine_structure.get_needed_hfunc2(), true_hfunc2);
+    
+    rvine_structure.truncate(2);
+    EXPECT_EQ(rvine_structure.get_needed_hfunc2()[0].size(), 2);
 }
 
 TEST(rvine_structure, construct_d_vine_struct_is_correct) {
@@ -186,8 +200,5 @@ TEST(rvine_structure, rvine_struct_sanity_checks_work) {
     wrong_mat(3, 1) = 7;
     wrong_mat(4, 1) = 1;
     EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
-    // // row and col should be smaller than d_
-    // EXPECT_ANY_THROW(rvm.get_element(8, 0));
-    // EXPECT_ANY_THROW(rvm.get_element(0, 8));
 }
 }

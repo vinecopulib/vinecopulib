@@ -82,11 +82,11 @@ public:
 
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
-    RVineStructure get_rvine_matrix() const;
+    RVineStructure get_rvine_structure() const;
 
     static std::vector<std::vector<Bicop>> make_pair_copula_store(
         size_t d,
-        size_t truncation_level);
+        size_t trunc_lvl);
 
     void select_all_trees(const Eigen::MatrixXd &data);
 

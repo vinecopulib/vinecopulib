@@ -586,9 +586,9 @@ Note that the second argument to `select_all()` and `select_families()` is
 similar to the one of `select()` for `Bicop` objects. Objects of the class
 `FitControlsVinecop` inherit from `FitControlsBicop` and extend them with 
 additional data members to control the structure selection:
-* `int truncation_level` describes the tree after which `family_set` is set to
+* `size_t trunc_lvl` describes the tree after which `family_set` is set to
 `{BicopFamily::indep}`. In other words, all pair copulas in trees lower than
-`truncation_level` (default to none) are "selected" as independence copulas.
+`trunc_lvl` (default to none) are "selected" as independence copulas.
 * `std::string tree_criterion` describes the criterion used to construct the
 minimum spanning tree (see
 [Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf)).
@@ -596,7 +596,7 @@ It can take `"tau"` (default) for Kendall's tau, `"rho"` for Spearman's rho,
 or `"hoeffd"` for Hoeffding's D (suited for non-monotonic relationships).
 * `double threshold` describes a value (default is 0) of `tree_criterion` under
 which the corresponding pair-copula is set to independence.
-* `bool select_truncation_level` can be set to true to select the truncation
+* `bool select_trunc_lvl` can be set to true to select the truncation
 level automatically (default is `false`).
 * `bool select_threshold` can be set to true to select the threshold parameter
 automatically (default is `false`).
@@ -629,7 +629,7 @@ M << 1, 1, 1, 1,
 // Kendall's tau inversion for parameters
 // estimation and a truncation after the second tree
 FitControlsVinecop controls(bicop_families::itau, "itau");
-controls.set_truncation_level(2);
+controls.set_trunc_lvl(2);
 controls.set_num_threads(4);  // parallelize with 4 threads
 Vinecop custom_vine(data, M, controls);
 ```

@@ -52,6 +52,7 @@ public:
     bool operator==(const TriangularArray<T>& rhs) const;
 
     void set_column(size_t column, const std::vector<size_t>& new_col);
+    void truncate(size_t trunc_lvl);
 
     size_t get_trunc_lvl() const;
     size_t get_dim() const;
@@ -148,6 +149,21 @@ void TriangularArray<T>::set_column(size_t column,
     }
 
     mat_[column] = new_col;
+}
+
+//! truncates the trapezoid. 
+//! @param trunc_lvl the truncation level.
+//! If the trapezoid is already truncated at a level 
+//! less than `trunc_lvl`, the function does nothing.
+template<typename T>
+void TriangularArray<T>::truncate(size_t trunc_lvl)
+{
+    if (trunc_lvl < this->get_trunc_lvl()) {
+        trunc_lvl_ = trunc_lvl;
+        for (size_t column = 0; column < d_ - 1 - trunc_lvl; column++) {
+            mat_[column].resize(trunc_lvl);
+        }
+    }
 }
 
 //! equality operator to compare two TriangularArray objects.
