@@ -320,6 +320,9 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
     d_ = data.cols();
     trees_.resize(1);
     controls_ = controls;
+    if (vine_struct.get_trunc_lvl() < controls.get_trunc_lvl()) {
+        controls_.set_trunc_lvl(vine_struct.get_trunc_lvl());
+    }
     vine_struct_ = vine_struct;
     threshold_ = controls.get_threshold();
     psi0_ = controls.get_psi0();
