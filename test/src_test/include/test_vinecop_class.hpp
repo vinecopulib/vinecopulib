@@ -341,7 +341,6 @@ TEST_F(VinecopTest, select_finds_right_structure) {
     EXPECT_EQ(pairs_unequal, 0);
 }
 
-// in what follows, we only check if funs run without error ----------
 TEST_F(VinecopTest, fixed_truncation) {
     FitControlsVinecop controls({BicopFamily::indep});
     controls.set_trunc_lvl(2);
@@ -349,6 +348,18 @@ TEST_F(VinecopTest, fixed_truncation) {
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);
+    
+    TriangularArray<size_t> my_rvm(7);
+    my_rvm[0] = {2, 1, 3, 4, 6, 5};
+    my_rvm[1] = {3, 1, 2, 4, 5};
+    my_rvm[2] = {1, 4, 3, 2};
+    my_rvm[3] = {1, 3, 2};
+    my_rvm[4] = {1, 2};
+    my_rvm[5] = {1};
+    RVineStructure my_struct({1, 2, 3, 4, 5, 6, 7}, my_rvm);
+    my_struct.truncate(2);
+    Vinecop fit2(u, my_struct);
+    EXPECT_EQ(fit2.get_all_pair_copulas().size(), 2);
 }
 
 TEST_F(VinecopTest, sparse_threshold_selection) {
