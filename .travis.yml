@@ -42,7 +42,6 @@ install:
 
   ### OSX
   - if [ $TRAVIS_OS_NAME == osx ]; then /usr/bin/yes | pip2 uninstall numpy; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then rm /usr/local/include/c++; fi # https://github.com/Homebrew/brew/issues/1742#issuecomment-277308817
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install gcc lcov eigen gsl r doxygen graphviz; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then mkdir ~/.R; fi
