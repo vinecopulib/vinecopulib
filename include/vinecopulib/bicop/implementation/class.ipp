@@ -570,7 +570,7 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 
         // Estimate all models and select the best one using the
         // selection_criterion
-        double fitted_criterion = 1e6;
+        double fitted_criterion = std::numeric_limits<double>::max();
         std::mutex m;
         auto fit_and_compare = [&](Bicop cop) {
             tools_interface::check_user_interrupt();
