@@ -67,10 +67,18 @@ inline Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
     return mat;
 }
 
-// needs to be defined
-inline VinecopSelector::~VinecopSelector()
+inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data, 
+                                        const FitControlsVinecop& controls) : 
+    n_(data.rows()), 
+    d_(data.cols()),
+    controls_(controls),
+    pool_(controls_.get_num_threads()),
+    trees_(std::vector<VineTree>(1))
 {
+    threshold_ = controls.get_threshold();
+    psi0_ = controls.get_psi0();
 }
+
 
 inline std::vector <std::vector<Bicop>>
 VinecopSelector::get_pair_copulas() const
@@ -315,34 +323,18 @@ inline double VinecopSelector::get_next_threshold(
 inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
                                       const RVineStructure &vine_struct,
                                       const FitControlsVinecop &controls)
+    : VinecopSelector(data, controls)    
 {
-    n_ = data.rows();
-    d_ = data.cols();
-    trees_.resize(1);
-    controls_ = controls;
+    vine_struct_ = vine_struct;
     if (vine_struct.get_trunc_lvl() < controls.get_trunc_lvl()) {
         controls_.set_trunc_lvl(vine_struct.get_trunc_lvl());
     }
-    vine_struct_ = vine_struct;
-    threshold_ = controls.get_threshold();
-    psi0_ = controls.get_psi0();
-    pool_ = std::unique_ptr<tools_thread::ThreadPool>(
-        new tools_thread::ThreadPool(controls.get_num_threads())
-    );
 }
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
-                                            const FitControlsVinecop &controls)
+                                            const FitControlsVinecop &controls) 
+    : VinecopSelector(data, controls)
 {
-    n_ = data.rows();
-    d_ = data.cols();
-    trees_.resize(1);
-    controls_ = controls;
-    threshold_ = controls.get_threshold();
-    psi0_ = controls.get_psi0();
-    pool_ = std::unique_ptr<tools_thread::ThreadPool>(
-        new tools_thread::ThreadPool(controls.get_num_threads())
-    );
 }
 
 //! Add edges allowed by the proximity condition
@@ -378,8 +370,8 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
         }
     };
 
-    pool_->map(add_edge, boost::vertices(vine_tree));
-    pool_->wait();
+    pool_.map(add_edge, boost::vertices(vine_tree));
+    pool_.wait();
 }
 
 inline void StructureSelector::finalize(size_t trunc_lvl)
@@ -890,8 +882,8 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
     // make sure that Bicop.select() doesn't spawn new threads
     size_t num_threads = controls_.get_num_threads();
     controls_.set_num_threads(1);
-    pool_->map(select_pc, boost::edges(tree));
-    pool_->wait();
+    pool_.map(select_pc, boost::edges(tree));
+    pool_.wait();
     controls_.set_num_threads(num_threads);
 }
 
