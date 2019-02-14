@@ -52,7 +52,8 @@ build_script:
   - if [%configuration%] == [Release] (
     cd build_header_only &&
     cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install &&
-    set path_orig=%path% &&
+    set path_orig=%path%)
+   - if [%configuration%] == [Release] ( 
     cmake --build . --config %configuration% &&
     set path=%path_orig%;C:\projects\vinecopulib\build_header_only\%configuration% &&
     bin\%configuration%\test_all.exe &&
