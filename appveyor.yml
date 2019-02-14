@@ -49,7 +49,7 @@ build_script:
   - md build_header_only
   - md build_shared_libs
 
-  - if [%configuration%] = [Release] (
+  - if [%configuration%] == [Release] (
     cd build_header_only &&
     cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install &&
     set path_orig=%path% &&
@@ -82,5 +82,5 @@ build_script:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_success:
-  - if [%configuration%] = [Release] 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build_shared_libs\%configuration%\vinecopulib.*
-  - if [%configuration%] = [Release] appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
+  - if [%configuration%] == [Release] 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build_shared_libs\%configuration%\vinecopulib.*
+  - if [%configuration%] == [Release] appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
