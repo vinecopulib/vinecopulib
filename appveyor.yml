@@ -57,11 +57,10 @@ build_script:
      cd build_header_only &&
      cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install)
   - if [%configuration%] == [Release] set path_orig=%path%
-  - if [%configuration%] == [Release] ( 
-     cmake --build . --config %configuration% &&
-     set path=%path_orig%;C:\projects\vinecopulib\build_header_only\%configuration% &&
-     bin\%configuration%\test_all.exe &&
-     cd ..) 
+  - if [%configuration%] == [Release] cmake --build . --config %configuration%
+  - if [%configuration%] == [Release] set path=%path_orig%;C:\projects\vinecopulib\build_header_only\%configuration%
+  - if [%configuration%] == [Release] bin\%configuration%\test_all.exe
+  - if [%configuration%] == [Release] cd .. 
   
   - cd build_shared_libs
   - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install
