@@ -2,6 +2,13 @@ platform:
   - x86
   - x64
 
+configuration:
+  - Debug
+  - Release
+
+#environment:
+  #APPVEYOR_RDP_PASSWORD: WelCome123456
+
 init:
   - ps: |
         If ($env:platform -Match "x86") {
@@ -45,37 +52,39 @@ build_script:
   - md build_header_only
   - md build_shared_libs
 
-  - cd build_header_only
-  - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install
-  - set path_orig=%path%
-  - cmake --build . --config Debug
-  - set path=%path_orig%;C:\projects\vinecopulib\build_header_only\Debug
-  - bin\Debug\test_all.exe
-
-  - cd ..
+  #- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - if [%configuration%] == [Release] (
+     cd build_header_only &&
+     cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install)
+  - if [%configuration%] == [Release] set path_orig=%path%
+  - if [%configuration%] == [Release] cmake --build . --config %configuration%
+  - if [%configuration%] == [Release] set path=%path_orig%;C:\projects\vinecopulib\build_header_only\%configuration%
+  - if [%configuration%] == [Release] bin\%configuration%\test_all.exe
+  - if [%configuration%] == [Release] cd .. 
+  
   - cd build_shared_libs
   - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install
   - set path_orig=%path%
 
-  - cmake --build . --config Release
-  - set path=%path_orig%;C:\projects\vinecopulib\build_shared_libs\Release
-  - bin\Release\test_all.exe
+  - cmake --build . --config %configuration%
+  - set path=%path_orig%;C:\projects\vinecopulib\build_shared_libs\%configuration%
+  - bin\%configuration%\test_all.exe
 
-  - cmake --build . --config Release --target install
+  - cmake --build . --config %configuration% --target install
 
   - cd ..
   - cd examples/bicop
   - md build
   - cd build
   - cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_PREFIX_PATH="C:\projects\vinecopulib-install;C:/projects/wdm-install/lib/cmake"
-  - cmake --build . --config Release
-  - cd ..\bin\Release
+  - cmake --build . --config %configuration%
+  - cd ..\bin\%configuration%
   - main.exe
   - cd ..\..\..\..
   
 #on_finish:
-#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_success:
-  - 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build_shared_libs\Release\vinecopulib.*
-  - appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
+  - if [%configuration%] == [Release] 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build_shared_libs\%configuration%\vinecopulib.*
+  - if [%configuration%] == [Release] appveyor PushArtifact vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip
