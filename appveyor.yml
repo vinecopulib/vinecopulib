@@ -6,6 +6,9 @@ configuration:
   - Debug
   - Release
 
+environment:
+  APPVEYOR_RDP_PASSWORD: WelCome123456
+
 init:
   - ps: |
         If ($env:platform -Match "x86") {
@@ -49,6 +52,7 @@ build_script:
   - md build_header_only
   - md build_shared_libs
 
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - if [%configuration%] == [Release] (
     cd build_header_only &&
     cmake .. %CMAKE_ARGS% -DCMAKE_GENERATOR_PLATFORM="%CMAKE_GEN_PLAT%" -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-install &&
@@ -79,8 +83,8 @@ build_script:
   - main.exe
   - cd ..\..\..\..
   
-#on_finish:
-#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 on_success:
   - if [%configuration%] == [Release] 7z a vinecopulib-%APPVEYOR_REPO_COMMIT%-%platform%.zip build_shared_libs\%configuration%\vinecopulib.*
