@@ -130,7 +130,8 @@ make doc && sudo make install && bin/test_all`
 
 To install the library without unit tests, the `MakeFile` can be created via
  `cmake .. -DBUILD_TESTING=OFF`. Additionally, a `Debug` mode is available via 
- `cmake .. -DCMAKE_BUILD_TYPE=Debug`.
+ `cmake .. -DCMAKE_BUILD_TYPE=Debug`; to enable strict compiler warnings, use 
+ `-DSTRICT_COMPILER=ON`.
 
 On Windows, CMake will generate Visual Studio files instead of Makefiles,
 the following sequence of commands can be used to perform compilation using the command prompt:
