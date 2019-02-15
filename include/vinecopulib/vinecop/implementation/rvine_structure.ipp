@@ -29,30 +29,21 @@ inline RVineStructure::RVineStructure(
         check_lower_tri(mat);
     }
 
-    order_ = get_order(mat);
-    
-    for (auto o : order_)
-    std::cout << o << std::endl;
-    
+    order_ = get_order(mat);    
     if (check)
         check_antidiagonal();
 
     trunc_lvl_ = find_trunc_lvl(mat);
     struct_array_ = to_rvine_array(mat);
-    std::cout << struct_array_ << std::endl;
     
     if (check)
         check_upper_tri();
 
     struct_array_ = to_natural_order();
-    std::cout << struct_array_ << std::endl;
-
     if (check)
         check_columns();
 
     min_array_ = compute_min_array();
-    std::cout << min_array_ << std::endl;
-
     if (check)
         check_proximity_condition();
 
@@ -428,10 +419,6 @@ inline void RVineStructure::check_columns() const
                                - col_vec.begin();
         if ((!tools_stl::is_member(col_vec, tools_stl::seq_int(1 + j, d_))) |
             (unique_in_col != col_vec.size())) {
-                std::cout << "col_vec " << j << ":" << std::endl;
-                for (auto c : col_vec)
-                std::cout << c << std::endl;
-                std::cout << "unique_in_col: " << unique_in_col << std::endl;
             throw std::runtime_error("not a valid R-vine array: " + problem);
         }
     }
