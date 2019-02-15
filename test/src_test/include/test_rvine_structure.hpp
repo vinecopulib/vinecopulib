@@ -51,12 +51,12 @@ TEST(rvine_structure, can_convert_to_natural_order) {
            4, 0, 0, 0, 0, 0, 0;
 
     TriangularArray<size_t> true_no_array(7);
-    true_no_array[0] = {2, 1, 3, 4, 6, 5};
-    true_no_array[1] = {3, 1, 2, 4, 5};
-    true_no_array[2] = {1, 4, 3, 2};
-    true_no_array[3] = {1, 3, 2};
-    true_no_array[4] = {1, 2};
-    true_no_array[5] = {1};
+    true_no_array[0] = {6, 7, 5, 4, 2, 3};
+    true_no_array[1] = {5, 7, 6, 4, 3};
+    true_no_array[2] = {7, 4, 5, 6};
+    true_no_array[3] = {7, 5, 6};
+    true_no_array[4] = {7, 6};
+    true_no_array[5] = {7};
 
     RVineStructure rvine_structure(mat);
     EXPECT_EQ(rvine_structure.get_struct_array(), true_no_array);
@@ -65,20 +65,20 @@ TEST(rvine_structure, can_convert_to_natural_order) {
 TEST(rvine_structure, min_array_is_correct) {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
     mat << 5, 2, 6, 6, 6, 6, 6,
-        6, 6, 1, 2, 5, 5, 0,
-        2, 5, 2, 5, 2, 0, 0,
-        1, 1, 5, 1, 0, 0, 0,
-        3, 7, 7, 0, 0, 0, 0,
-        7, 3, 0, 0, 0, 0, 0,
-        4, 0, 0, 0, 0, 0, 0;
+           6, 6, 1, 2, 5, 5, 0,
+           2, 5, 2, 5, 2, 0, 0,
+           1, 1, 5, 1, 0, 0, 0,
+           3, 7, 7, 0, 0, 0, 0,
+           7, 3, 0, 0, 0, 0, 0,
+           4, 0, 0, 0, 0, 0, 0;
 
     TriangularArray<size_t> true_min_array(7);
-    true_min_array[0] = {2, 2, 3, 4, 6, 6};
-    true_min_array[1] = {3, 3, 3, 4, 5};
-    true_min_array[2] = {1, 4, 4, 4};
-    true_min_array[3] = {1, 3, 3};
-    true_min_array[4] = {1, 2};
-    true_min_array[5] = {1};
+    true_min_array[0] = {6, 6, 5, 4, 2, 2};
+    true_min_array[1] = {5, 5, 5, 4, 3};
+    true_min_array[2] = {7, 4, 4, 4};
+    true_min_array[3] = {7, 5, 5};
+    true_min_array[4] = {7, 6};
+    true_min_array[5] = {7};
 
     RVineStructure rvine_structure(mat);
     EXPECT_EQ(rvine_structure.get_min_array(), true_min_array);
@@ -91,12 +91,12 @@ TEST(rvine_structure, min_array_is_correct) {
 TEST(rvine_structure, needed_hfunc1_is_correct) {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
     mat << 5, 2, 6, 6, 6, 6, 6,
-        6, 6, 1, 2, 5, 5, 0,
-        2, 5, 2, 5, 2, 0, 0,
-        1, 1, 5, 1, 0, 0, 0,
-        3, 7, 7, 0, 0, 0, 0,
-        7, 3, 0, 0, 0, 0, 0,
-        4, 0, 0, 0, 0, 0, 0;
+           6, 6, 1, 2, 5, 5, 0,
+           2, 5, 2, 5, 2, 0, 0,
+           1, 1, 5, 1, 0, 0, 0,
+           3, 7, 7, 0, 0, 0, 0,
+           7, 3, 0, 0, 0, 0, 0,
+           4, 0, 0, 0, 0, 0, 0;
 
     TriangularArray<size_t> true_hfunc1(7);
     true_hfunc1[0] = {0, 0, 0, 0, 0, 0};
@@ -116,12 +116,12 @@ TEST(rvine_structure, needed_hfunc1_is_correct) {
 TEST(rvine_structure, needed_hfunc2_is_correct) {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
     mat << 5, 2, 6, 6, 6, 6, 6,
-        6, 6, 1, 2, 5, 5, 0,
-        2, 5, 2, 5, 2, 0, 0,
-        1, 1, 5, 1, 0, 0, 0,
-        3, 7, 7, 0, 0, 0, 0,
-        7, 3, 0, 0, 0, 0, 0,
-        4, 0, 0, 0, 0, 0, 0;
+           6, 6, 1, 2, 5, 5, 0,
+           2, 5, 2, 5, 2, 0, 0,
+           1, 1, 5, 1, 0, 0, 0,
+           3, 7, 7, 0, 0, 0, 0,
+           7, 3, 0, 0, 0, 0, 0,
+           4, 0, 0, 0, 0, 0, 0;
 
     TriangularArray<size_t> true_hfunc2(7);
     true_hfunc2[0] = {1, 1, 1, 1, 1, 0};
@@ -143,14 +143,14 @@ TEST(rvine_structure, construct_d_vine_struct_is_correct) {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>
         true_d_vine_matrix(7, 7);
     true_d_vine_matrix << 4, 1, 5, 3, 2, 7, 7,
-        1, 5, 3, 2, 7, 2, 0,
-        5, 3, 2, 7, 3, 0, 0,
-        3, 2, 7, 5, 0, 0, 0,
-        2, 7, 1, 0, 0, 0, 0,
-        7, 4, 0, 0, 0, 0, 0,
-        6, 0, 0, 0, 0, 0, 0;
+                          1, 5, 3, 2, 7, 2, 0,
+                          5, 3, 2, 7, 3, 0, 0,
+                          3, 2, 7, 5, 0, 0, 0,
+                          2, 7, 1, 0, 0, 0, 0,
+                          7, 4, 0, 0, 0, 0, 0,
+                          6, 0, 0, 0, 0, 0, 0;
 
-    std::vector<size_t> order = {7, 2, 3, 5, 1, 4, 6};
+    std::vector<size_t> order = {6, 4, 1, 5, 3, 2, 7};
     RVineStructure rvine_structure(order);
     EXPECT_EQ(rvine_structure.get_matrix(), true_d_vine_matrix);
 }
@@ -158,12 +158,12 @@ TEST(rvine_structure, construct_d_vine_struct_is_correct) {
 TEST(rvine_structure, rvine_struct_sanity_checks_work) {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
     mat << 5, 2, 6, 6, 6, 6, 6,
-        6, 6, 1, 2, 5, 5, 0,
-        2, 5, 2, 5, 2, 0, 0,
-        1, 1, 5, 1, 0, 0, 0,
-        3, 7, 7, 0, 0, 0, 0,
-        7, 3, 0, 0, 0, 0, 0,
-        4, 0, 0, 0, 0, 0, 0;
+           6, 6, 1, 2, 5, 5, 0,
+           2, 5, 2, 5, 2, 0, 0,
+           1, 1, 5, 1, 0, 0, 0,
+           3, 7, 7, 0, 0, 0, 0,
+           7, 3, 0, 0, 0, 0, 0,
+           4, 0, 0, 0, 0, 0, 0;
 
     // should pass without errors
     auto rvm = RVineStructure(mat);
