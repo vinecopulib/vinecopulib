@@ -30,19 +30,29 @@ inline RVineStructure::RVineStructure(
     }
 
     order_ = get_order(mat);
+    
+    for (auto o : order_)
+    std::cout << o << std::endl;
+    
     if (check)
         check_antidiagonal();
 
     trunc_lvl_ = find_trunc_lvl(mat);
     struct_array_ = to_rvine_array(mat);
+    std::cout << struct_array_ << std::endl;
+    
     if (check)
         check_upper_tri();
 
     struct_array_ = to_natural_order();
+    std::cout << struct_array_ << std::endl;
+
     if (check)
         check_columns();
 
     min_array_ = compute_min_array();
+    std::cout << min_array_ << std::endl;
+
     if (check)
         check_proximity_condition();
 
@@ -230,7 +240,7 @@ RVineStructure::get_matrix() const
         }
     }
     for (size_t i = 0; i < d_; ++i) {
-        array(d_ - i - 1, i) = order_[d_ - i - 1];
+        array(d_ - i - 1, i) = order_[i];
     }
     return array;
 }
@@ -272,7 +282,7 @@ inline std::vector<size_t> RVineStructure::get_order(
 {
     std::vector<size_t> order(d_);
     for (size_t i = 0; i < d_; i++)
-        order[i] = mat(i, d_ - i - 1);
+        order[i] = mat(d_ - i - 1, i);
 
     return order;
 }
@@ -316,7 +326,7 @@ inline TriangularArray<size_t> RVineStructure::compute_dvine_struct_array() cons
     TriangularArray<size_t> struct_array(d_, trunc_lvl_);
     for (size_t j = 0; j < d_ - 1; j++) {
         for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
-            struct_array(i, j) = d_ - i - j - 1;
+            struct_array(i, j) = i + j + 2;
         }
     }
 
@@ -328,7 +338,7 @@ inline TriangularArray<size_t> RVineStructure::compute_min_array() const
     TriangularArray<size_t> min_array = struct_array_;
     for (size_t j = 0; j < d_ - 1; j++) {
         for (size_t i = 1; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
-            min_array(i, j) = std::max(struct_array_(i, j), min_array(i - 1, j));
+            min_array(i, j) = std::min(struct_array_(i, j), min_array(i - 1, j));
         }
     }
 
@@ -342,7 +352,7 @@ inline TriangularArray<size_t> RVineStructure::compute_needed_hfunc1() const
     for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
         for (size_t j = 0; j < d_ - 2 - i; j++) {
             if (struct_array_(i + 1, j) != min_array_(i + 1, j))
-                needed_hfunc1(i, d_ - min_array_(i + 1, j)) = 1;
+                needed_hfunc1(i, min_array_(i + 1, j) - 1) = 1;
         }
     }
 
@@ -357,7 +367,7 @@ inline TriangularArray<size_t> RVineStructure::compute_needed_hfunc2() const
         for (size_t j = 0; j < d_ - 2 - i; j++) {
             needed_hfunc2(i, j) = 1;
             if (struct_array_(i + 1, j) == min_array_(i + 1, j))
-                needed_hfunc2(i, d_ - min_array_(i + 1, j)) = 1;
+                needed_hfunc2(i, min_array_(i + 1, j) - 1) = 1;
         }
     }
 
@@ -416,8 +426,12 @@ inline void RVineStructure::check_columns() const
         std::sort(col_vec.begin(), col_vec.end());
         size_t unique_in_col = std::unique(col_vec.begin(), col_vec.end())
                                - col_vec.begin();
-        if ((!tools_stl::is_member(col_vec, tools_stl::seq_int(1, d_ - j))) |
+        if ((!tools_stl::is_member(col_vec, tools_stl::seq_int(1 + j, d_))) |
             (unique_in_col != col_vec.size())) {
+                std::cout << "col_vec " << j << ":" << std::endl;
+                for (auto c : col_vec)
+                std::cout << c << std::endl;
+                std::cout << "unique_in_col: " << unique_in_col << std::endl;
             throw std::runtime_error("not a valid R-vine array: " + problem);
         }
     }
@@ -441,8 +455,9 @@ inline void RVineStructure::check_proximity_condition() const
             // conditioning set
             for (size_t i = 0; i < t; i++) {
                 target_set[i] = struct_array_(i, e);
-                test_set[i] = struct_array_(i, d_ - min_array_(t, e));
+                test_set[i] = struct_array_(i, min_array_(t, e) - 1);
             }
+            
             // non-diagonal conditioned variable
             target_set[t] = struct_array_(t, e);
             // diagonal conditioned variable in other column

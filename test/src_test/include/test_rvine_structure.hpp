@@ -43,12 +43,12 @@ TEST(rvine_structure, triangular_array_works) {
 TEST(rvine_structure, can_convert_to_natural_order) {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
     mat << 5, 2, 6, 6, 6, 6, 6,
-        6, 6, 1, 2, 5, 5, 0,
-        2, 5, 2, 5, 2, 0, 0,
-        1, 1, 5, 1, 0, 0, 0,
-        3, 7, 7, 0, 0, 0, 0,
-        7, 3, 0, 0, 0, 0, 0,
-        4, 0, 0, 0, 0, 0, 0;
+           6, 6, 1, 2, 5, 5, 0,
+           2, 5, 2, 5, 2, 0, 0,
+           1, 1, 5, 1, 0, 0, 0,
+           3, 7, 7, 0, 0, 0, 0,
+           7, 3, 0, 0, 0, 0, 0,
+           4, 0, 0, 0, 0, 0, 0;
 
     TriangularArray<size_t> true_no_array(7);
     true_no_array[0] = {2, 1, 3, 4, 6, 5};
