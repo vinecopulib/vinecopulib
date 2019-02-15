@@ -409,7 +409,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
                 }
 
                 // fill diagonal entry with leaf index
-                order[d_ - 1 - col] = trees_[t][e].conditioned[pos];
+                order[col] = trees_[t][e].conditioned[pos];
 
                 // entry in row t-1 is other index of the edge
                 mat(t - 1, col) = trees_[t][e].conditioned[std::abs(1 - pos)];
@@ -430,7 +430,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
 
             // fill column bottom to top
             for (size_t k = 1; k < t; ++k) {
-                auto check_set = cat(order[d_ - 1 - col], ning_set);
+                auto check_set = cat(order[col], ning_set);
                 for (auto e : boost::edges(trees_[t - k])) {
                     // search for an edge in lower tree that shares all
                     // indices in the conditioning set + diagonal entry
@@ -441,7 +441,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
                     // next matrix entry is conditioned variable of new edge
                     // that's not equal to the diagonal entry of this column
                     auto e_new = trees_[t - k][e];
-                    ptrdiff_t pos = (order[d_ - 1 - col] == e_new.conditioned[1]);
+                    ptrdiff_t pos = (order[col] == e_new.conditioned[1]);
                     if (pos == 1) {
                         e_new.pair_copula.flip();
                     }
@@ -467,7 +467,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
         // The last column contains a single element which must be different
         // from all other diagonal elements. Based on the properties of an
         // R-vine matrix, this must be the element next to it.
-        order[0] = mat(0, d_ - 2);
+        order[d_ - 1] = mat(0, d_ - 2);
 
         // change to user-facing format
         // (variable index starting at 1 instead of 0)
@@ -503,7 +503,7 @@ inline void FamilySelector::add_allowed_edges(VineTree &vine_tree)
         for (size_t edge = 0; edge < edges; ++edge) {
             tools_interface::check_user_interrupt(edge % 10000 == 0);
             v0 = edge;
-            v1 = d_ - vine_struct_.min_array(tree, edge);
+            v1 = vine_struct_.min_array(tree, edge) - 1;
             Eigen::MatrixXd pc_data = get_pc_data(v0, v1, vine_tree);
             EdgeIterator e = boost::add_edge(v0, v1, w, vine_tree).first;
             double crit = calculate_criterion(pc_data,

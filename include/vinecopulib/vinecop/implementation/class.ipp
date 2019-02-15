@@ -327,11 +327,10 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
     check_data_dim(data);
 
     if (vine_struct_.get_trunc_lvl() > 0) {
-        auto revorder = vine_struct_.get_order();
-        tools_stl::reverse(revorder);
+        auto order = vine_struct_.get_order();
         auto newdata = data;
         for (size_t j = 0; j < d_; ++j)
-            newdata.col(j) = data.col(revorder[j] - 1);
+            newdata.col(j) = data.col(order[j] - 1);
 
         tools_select::FamilySelector selector(newdata, vine_struct_, controls);
         if (controls.needs_sparse_select()) {
@@ -650,13 +649,12 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
 
     // info about the vine structure (reverse rows (!) for more natural indexing)
     size_t trunc_lvl = pair_copulas_.size();
-    std::vector<size_t> revorder;
-    TriangularArray<size_t> no_matrix, min_arrayrix, needed_hfunc1, needed_hfunc2;
+    std::vector<size_t> order;
+    TriangularArray<size_t> no_matrix, min_array, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
-        revorder = vine_struct_.get_order();
-        tools_stl::reverse(revorder);
+        order = vine_struct_.get_order();
         no_matrix = vine_struct_.get_struct_array();
-        min_arrayrix = vine_struct_.get_min_array();
+        min_array = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     }
@@ -674,7 +672,7 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
         // fill first row of hfunc2 matrix with evaluation points;
         // points have to be reordered to correspond to natural order
         for (size_t j = 0; j < d; ++j)
-            hfunc2.col(j) = u.block(b.begin, revorder[j] - 1, b.size, 1);
+            hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
 
         for (size_t tree = 0; tree < trunc_lvl; ++tree) {
             tools_interface::check_user_interrupt(n * d > 1e5);
@@ -682,12 +680,12 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
                 tools_interface::check_user_interrupt(edge % 100 == 0);
                 // extract evaluation point from hfunction matrices (have been
                 // computed in previous tree level)
-                size_t m = min_arrayrix(tree, edge);
+                size_t m = min_array(tree, edge);
                 u_e.col(0) = hfunc2.col(edge);
                 if (m == no_matrix(tree, edge)) {
-                    u_e.col(1) = hfunc2.col(d - m);
+                    u_e.col(1) = hfunc2.col(m - 1);
                 } else {
-                    u_e.col(1) = hfunc1.col(d - m);
+                    u_e.col(1) = hfunc1.col(m - 1);
                 }
 
                 Bicop edge_copula = get_pair_copula(tree, edge);
@@ -897,14 +895,13 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
 
     // info about the vine structure (reverse rows (!) for more natural indexing)
     size_t trunc_lvl = pair_copulas_.size();
-    std::vector<size_t> revorder, inverse_order;
-    TriangularArray<size_t> no_matrix, min_arrayrix, needed_hfunc1, needed_hfunc2;
+    std::vector<size_t> order, inverse_order;
+    TriangularArray<size_t> no_matrix, min_array, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
-        revorder = vine_struct_.get_order();
-        tools_stl::reverse(revorder);
-        inverse_order = tools_stl::invert_permutation(revorder);
+        order = vine_struct_.get_order();
+        inverse_order = tools_stl::invert_permutation(order);
         no_matrix = vine_struct_.get_struct_array();
-        min_arrayrix = vine_struct_.get_min_array();
+        min_array = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     }
@@ -914,7 +911,7 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
     Eigen::MatrixXd hfunc1(n, d);
     Eigen::MatrixXd hfunc2(n, d);
     for (size_t j = 0; j < d; ++j)
-        hfunc2.col(j) = u.col(revorder[j] - 1);
+        hfunc2.col(j) = u.col(order[j] - 1);
 
     auto do_batch = [&](const tools_batch::Batch& b) {
         Eigen::MatrixXd u_e(b.size, 2);
@@ -924,12 +921,12 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
                 tools_interface::check_user_interrupt(edge % 100 == 0);
                 // extract evaluation point from hfunction matrices (have been
                 // computed in previous tree level)
-                size_t m = min_arrayrix(tree, edge);
+                size_t m = min_array(tree, edge);
                 u_e.col(0) = hfunc2.block(b.begin, edge, b.size, 1);
                 if (m == no_matrix(tree, edge)) {
-                    u_e.col(1) = hfunc2.block(b.begin, d - m, b.size, 1);
+                    u_e.col(1) = hfunc2.block(b.begin, m - 1, b.size, 1);
                 } else {
-                    u_e.col(1) = hfunc1.block(b.begin, d - m, b.size, 1);
+                    u_e.col(1) = hfunc1.block(b.begin, m - 1, b.size, 1);
                 }
 
                 // h-functions are only evaluated if needed in next step
@@ -1003,14 +1000,13 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
 
     // info about the vine structure (in upper triangular matrix notation)
     size_t trunc_lvl = pair_copulas_.size();
-    std::vector<size_t> revorder, inverse_order;
-    TriangularArray<size_t> no_matrix, min_arrayrix, needed_hfunc1, needed_hfunc2;
+    std::vector<size_t> order, inverse_order;
+    TriangularArray<size_t> no_matrix, min_array, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
-        revorder = vine_struct_.get_order();
-        tools_stl::reverse(revorder);
-        inverse_order = tools_stl::invert_permutation(revorder);
+        order = vine_struct_.get_order();
+        inverse_order = tools_stl::invert_permutation(order);
         no_matrix = vine_struct_.get_struct_array();
-        min_arrayrix = vine_struct_.get_min_array();
+        min_array = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     }
@@ -1024,7 +1020,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
         // order)
         for (size_t j = 0; j < d; ++j) {
             hinv2(std::min(trunc_lvl, d - j - 1), j) =
-                u.block(b.begin, revorder[j] - 1, b.size, 1);
+                u.block(b.begin, order[j] - 1, b.size, 1);
         }
         hfunc1(0, d - 1) = hinv2(0, d - 1);
 
@@ -1038,12 +1034,12 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
 
                 // extract data for conditional pair
                 Eigen::MatrixXd U_e(b.size, 2);
-                size_t m = min_arrayrix(tree, var);
+                size_t m = min_array(tree, var);
                 U_e.col(0) = hinv2(tree + 1, var);
                 if (m == no_matrix(tree, var)) {
-                    U_e.col(1) = hinv2(tree, d - m);
+                    U_e.col(1) = hinv2(tree, m - 1);
                 } else {
-                    U_e.col(1) = hfunc1(tree, d - m);
+                    U_e.col(1) = hfunc1(tree, m - 1);
                 }
 
                 // inverse Rosenblatt transform simulates data for conditional pair
