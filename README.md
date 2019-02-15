@@ -516,24 +516,24 @@ described [below](#fit-and-select-a-vine-copula-model).
 ### How to read the R-vine matrix
 
 The R-vine matrix notation in vinecopulib is different from the one in VineCopula.
-An example matrix is
+An exemplary array is
 ```
-1 1 1 1
-2 2 2 0
-3 3 0 0
-4 0 0 0
+4 4 4 4
+3 3 3 
+2 2 
+1 
 ```
 which encodes the following pair-copulas:
-
+```
 | tree | edge | pair-copulas   |
 |------|------|----------------|
-| 0    | 0    | `(4, 1)`       |
-|      | 1    | `(3, 1)`       |
-|      | 2    | `(2, 1)`       |
-| 1    | 0    | `(4, 2; 1)`    |
-|      | 1    | `(3, 2; 1)`    |
-| 2    | 0    | `(4, 3; 2, 1)` |
-
+| 0    | 0    | `(1, 4)`       |
+|      | 1    | `(2, 4)`       |
+|      | 2    | `(3, 4)`       |
+| 1    | 0    | `(1, 3; 4)`    |
+|      | 1    | `(2, 3; 4)`    |
+| 2    | 0    | `(1, 2; 3, 4)` |
+```
 Denoting by `M[i, j]` the matrix entry in row `i` and column `j`, the pair-copula index for edge `e` in tree `t` of a `d` dimensional vine is
 `(M[d - 1 - t, e], M[t, e]; M[t - 1, e], ..., M[0, e])`. Less formally,
 1. Start with the counter-diagonal element of column `e` (first conditioned

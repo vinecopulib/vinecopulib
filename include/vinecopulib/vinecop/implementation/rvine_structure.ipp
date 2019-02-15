@@ -12,10 +12,10 @@ namespace vinecopulib {
 //! be encoded by putting zeros above the digonal in all rows below the 
 //! truncation level. Example of a 1-truncated matrix:
 //! ```
-//! 1 1 1 1
-//! 0 0 2 0
-//! 0 3 0 0
-//! 4 0 0 0
+//! 4 4 4 4
+//! 0 0 3 0
+//! 0 2 0 0
+//! 1 0 0 0
 //! ```
 //! @param mat a matrix representing a valid R-vine array.
 //! @param check whether `mat` shall be checked for validity.
@@ -167,9 +167,9 @@ inline TriangularArray<size_t> RVineStructure::get_struct_array() const
     return struct_array_;
 }
 
-//! extracts the maximum array, which is derived from an R-vine array by
+//! extracts the minimum array, which is derived from an R-vine array by
 //! iteratively computing
-//! the (elementwise) maximum of two subsequent rows (starting from the
+//! the (elementwise) minimum of two subsequent rows (starting from the
 //! top). It is used in estimation and evaluation algorithms to find the 
 //! two edges in the previous tree that are joined by the current edge.
 inline TriangularArray<size_t> RVineStructure::get_min_array() const 
