@@ -78,7 +78,8 @@ typedef std::pair<EdgeIterator, bool> FoundEdge;
 class VinecopSelector
 {
 public:
-    virtual ~VinecopSelector() = 0;
+    VinecopSelector(const Eigen::MatrixXd& data, 
+                    const FitControlsVinecop& controls);
 
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
@@ -129,15 +130,15 @@ protected:
     size_t n_;
     size_t d_;
     FitControlsVinecop controls_;
+    tools_thread::ThreadPool pool_;
+    std::vector<VineTree> trees_;
     RVineStructure vine_struct_;
     std::vector<std::vector<Bicop>> pair_copulas_;
-    std::vector<VineTree> trees_;
     // for sparse selction
     std::vector<VineTree> trees_opt_;
     double loglik_;
     double threshold_;
     double psi0_; // initial prior probability for mbicv
-    std::unique_ptr<tools_thread::ThreadPool> pool_;
 
 private:
     double get_next_threshold(std::vector<double> &thresholded_crits);
