@@ -62,7 +62,7 @@ TEST(rvine_structure, can_convert_to_natural_order) {
     EXPECT_EQ(rvine_structure.get_struct_array(), true_no_array);
 }
 
-TEST(rvine_structure, max_array_is_correct) {
+TEST(rvine_structure, min_array_is_correct) {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
     mat << 5, 2, 6, 6, 6, 6, 6,
         6, 6, 1, 2, 5, 5, 0,
@@ -72,20 +72,20 @@ TEST(rvine_structure, max_array_is_correct) {
         7, 3, 0, 0, 0, 0, 0,
         4, 0, 0, 0, 0, 0, 0;
 
-    TriangularArray<size_t> true_max_array(7);
-    true_max_array[0] = {2, 2, 3, 4, 6, 6};
-    true_max_array[1] = {3, 3, 3, 4, 5};
-    true_max_array[2] = {1, 4, 4, 4};
-    true_max_array[3] = {1, 3, 3};
-    true_max_array[4] = {1, 2};
-    true_max_array[5] = {1};
+    TriangularArray<size_t> true_min_array(7);
+    true_min_array[0] = {2, 2, 3, 4, 6, 6};
+    true_min_array[1] = {3, 3, 3, 4, 5};
+    true_min_array[2] = {1, 4, 4, 4};
+    true_min_array[3] = {1, 3, 3};
+    true_min_array[4] = {1, 2};
+    true_min_array[5] = {1};
 
     RVineStructure rvine_structure(mat);
-    EXPECT_EQ(rvine_structure.get_max_array(), true_max_array);
+    EXPECT_EQ(rvine_structure.get_min_array(), true_min_array);
     
     rvine_structure.truncate(2);
     EXPECT_EQ(rvine_structure.get_trunc_lvl(), 2);
-    EXPECT_EQ(rvine_structure.get_max_array()[0].size(), 2);
+    EXPECT_EQ(rvine_structure.get_min_array()[0].size(), 2);
 }
 
 TEST(rvine_structure, needed_hfunc1_is_correct) {

@@ -503,7 +503,7 @@ inline void FamilySelector::add_allowed_edges(VineTree &vine_tree)
         for (size_t edge = 0; edge < edges; ++edge) {
             tools_interface::check_user_interrupt(edge % 10000 == 0);
             v0 = edge;
-            v1 = d_ - vine_struct_.max_array(tree, edge);
+            v1 = d_ - vine_struct_.min_array(tree, edge);
             Eigen::MatrixXd pc_data = get_pc_data(v0, v1, vine_tree);
             EdgeIterator e = boost::add_edge(v0, v1, w, vine_tree).first;
             double crit = calculate_criterion(pc_data,

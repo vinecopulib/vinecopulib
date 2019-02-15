@@ -651,12 +651,12 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
     // info about the vine structure (reverse rows (!) for more natural indexing)
     size_t trunc_lvl = pair_copulas_.size();
     std::vector<size_t> revorder;
-    TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_matrix, min_arrayrix, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         revorder = vine_struct_.get_order();
         tools_stl::reverse(revorder);
         no_matrix = vine_struct_.get_struct_array();
-        max_matrix = vine_struct_.get_max_array();
+        min_arrayrix = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     }
@@ -682,7 +682,7 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
                 tools_interface::check_user_interrupt(edge % 100 == 0);
                 // extract evaluation point from hfunction matrices (have been
                 // computed in previous tree level)
-                size_t m = max_matrix(tree, edge);
+                size_t m = min_arrayrix(tree, edge);
                 u_e.col(0) = hfunc2.col(edge);
                 if (m == no_matrix(tree, edge)) {
                     u_e.col(1) = hfunc2.col(d - m);
@@ -898,13 +898,13 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
     // info about the vine structure (reverse rows (!) for more natural indexing)
     size_t trunc_lvl = pair_copulas_.size();
     std::vector<size_t> revorder, inverse_order;
-    TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_matrix, min_arrayrix, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         revorder = vine_struct_.get_order();
         tools_stl::reverse(revorder);
         inverse_order = tools_stl::invert_permutation(revorder);
         no_matrix = vine_struct_.get_struct_array();
-        max_matrix = vine_struct_.get_max_array();
+        min_arrayrix = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     }
@@ -924,7 +924,7 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
                 tools_interface::check_user_interrupt(edge % 100 == 0);
                 // extract evaluation point from hfunction matrices (have been
                 // computed in previous tree level)
-                size_t m = max_matrix(tree, edge);
+                size_t m = min_arrayrix(tree, edge);
                 u_e.col(0) = hfunc2.block(b.begin, edge, b.size, 1);
                 if (m == no_matrix(tree, edge)) {
                     u_e.col(1) = hfunc2.block(b.begin, d - m, b.size, 1);
@@ -1004,13 +1004,13 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
     // info about the vine structure (in upper triangular matrix notation)
     size_t trunc_lvl = pair_copulas_.size();
     std::vector<size_t> revorder, inverse_order;
-    TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_matrix, min_arrayrix, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         revorder = vine_struct_.get_order();
         tools_stl::reverse(revorder);
         inverse_order = tools_stl::invert_permutation(revorder);
         no_matrix = vine_struct_.get_struct_array();
-        max_matrix = vine_struct_.get_max_array();
+        min_arrayrix = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
     }
@@ -1038,7 +1038,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
 
                 // extract data for conditional pair
                 Eigen::MatrixXd U_e(b.size, 2);
-                size_t m = max_matrix(tree, var);
+                size_t m = min_arrayrix(tree, var);
                 U_e.col(0) = hinv2(tree + 1, var);
                 if (m == no_matrix(tree, var)) {
                     U_e.col(1) = hinv2(tree, d - m);

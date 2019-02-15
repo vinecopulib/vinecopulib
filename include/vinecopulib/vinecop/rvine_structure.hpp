@@ -82,13 +82,13 @@ public:
     size_t get_trunc_lvl() const;
     std::vector<size_t> get_order() const;
     TriangularArray<size_t> get_struct_array() const;
-    TriangularArray<size_t> get_max_array() const;
+    TriangularArray<size_t> get_min_array() const;
     TriangularArray<size_t> get_needed_hfunc1() const;
     TriangularArray<size_t> get_needed_hfunc2() const;
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
     size_t struct_array(size_t tree, size_t edge) const;
-    size_t max_array(size_t tree, size_t edge) const;
+    size_t min_array(size_t tree, size_t edge) const;
     
     void truncate(size_t trunc_lvl);
 
@@ -103,7 +103,7 @@ private:
 
     TriangularArray<size_t> to_natural_order() const;
     TriangularArray<size_t> compute_dvine_struct_array() const;
-    TriangularArray<size_t> compute_max_array() const;
+    TriangularArray<size_t> compute_min_array() const;
     TriangularArray<size_t> compute_needed_hfunc1() const;
     TriangularArray<size_t> compute_needed_hfunc2() const;
 
@@ -120,7 +120,7 @@ private:
     size_t d_;
     size_t trunc_lvl_;
     TriangularArray<size_t> struct_array_;
-    TriangularArray<size_t> max_array_;
+    TriangularArray<size_t> min_array_;
     TriangularArray<size_t> needed_hfunc1_;
     TriangularArray<size_t> needed_hfunc2_;
 };
