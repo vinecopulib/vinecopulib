@@ -25,7 +25,7 @@ TEST_F(VinecopTest, constructors_without_error) {
             pc = Bicop(BicopFamily::clayton, 90);
         }
     }
-
+    
     Vinecop vinecop_parametrized(pair_copulas, model_matrix);
 }
 
@@ -107,9 +107,7 @@ TEST_F(VinecopTest, truncate_methods_works) {
     EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 0);
 }
 
-
 TEST_F(VinecopTest, pdf_is_correct) {
-
     auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
     auto par = Eigen::VectorXd::Constant(1, 3.0);
     for (auto &tree : pair_copulas) {
@@ -240,7 +238,7 @@ TEST_F(VinecopTest, family_select_finds_true_rotations) {
     auto controls = FitControlsVinecop({BicopFamily::clayton}, "itau");
     // controls.set_show_trace(true);
     Vinecop fit(data, model_matrix, controls);
-
+    
     // don't check last two trees to avoid random failures because of
     // estimation uncertainty
     auto true_rots = vinecop.get_all_rotations();
@@ -356,7 +354,7 @@ TEST_F(VinecopTest, fixed_truncation) {
     my_rvm[3] = {1, 3, 2};
     my_rvm[4] = {1, 2};
     my_rvm[5] = {1};
-    RVineStructure my_struct({1, 2, 3, 4, 5, 6, 7}, my_rvm);
+    RVineStructure my_struct({7, 6, 5, 4, 3, 2, 1}, my_rvm);
     my_struct.truncate(2);
     Vinecop fit2(u, my_struct);
     EXPECT_EQ(fit2.get_all_pair_copulas().size(), 2);
