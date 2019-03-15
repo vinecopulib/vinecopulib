@@ -79,7 +79,7 @@ TEST_P(TrafokernelTest, trafo_kernel_tau) {
 }
 
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     TrafokernelTest,
     TrafokernelTest,
     ::testing::Values("constant", "linear", "quadratic")
