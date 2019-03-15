@@ -276,7 +276,7 @@ TEST_F(VinecopTest, trace_works) {
     testing::internal::CaptureStdout();
     Vinecop fit(u, controls);
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NO_THROW(!output.empty());
+    EXPECT_TRUE(!output.empty());
 }
 
 TEST_F(VinecopTest, works_multi_threaded) {
