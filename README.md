@@ -41,6 +41,7 @@ If you have any questions regarding the library, feel free to
 send a mail to <info@vinecopulib.org>.
 
 
+
 # Documentation
 
 Below, we give a brief overview of the most important functionality. The full
@@ -78,7 +79,7 @@ To build the library, you'll need at minimum:
    * [Eigen 3.3 (or later)](http://eigen.tuxfamily.org/index.php?title=Main_Page)
 
 Optionally, you'll need:
-   * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
+   * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) and [graphviz](https://www.graphviz.org/) (to build the documentations)
    * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
 
 Note that:
@@ -129,9 +130,12 @@ make doc && sudo make install && bin/test_all`
 | Run unit tests (optional)  |  `bin/[test_executable]` |
 
 To install the library without unit tests, the `MakeFile` can be created via
- `cmake .. -DBUILD_TESTING=OFF`. Additionally, a `Debug` mode is available via 
+ `cmake .. -DBUILD_TESTING=OFF`. 
+ Additionally, a `Debug` mode is available via 
  `cmake .. -DCMAKE_BUILD_TYPE=Debug`; to enable strict compiler warnings, use 
  `-DSTRICT_COMPILER=ON`.
+ Finally, note that using `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` is useful if 
+ one is interested in using autocomplete or linting when working with the library.
 
 On Windows, CMake will generate Visual Studio files instead of Makefiles,
 the following sequence of commands can be used to perform compilation using the command prompt:
