@@ -41,6 +41,7 @@ If you have any questions regarding the library, feel free to
 send a mail to <info@vinecopulib.org>.
 
 
+
 # Documentation
 
 Below, we give a brief overview of the most important functionality. The full
@@ -78,7 +79,7 @@ To build the library, you'll need at minimum:
    * [Eigen 3.3 (or later)](http://eigen.tuxfamily.org/index.php?title=Main_Page)
 
 Optionally, you'll need:
-   * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
+   * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) and [graphviz](https://www.graphviz.org/) (to build the documentations)
    * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
 
 Note that:
