@@ -6,7 +6,8 @@ configuration:
   - Debug
   - Release
 
-#environment:
+environment:
+  PKGTYPE: win.binary
   #APPVEYOR_RDP_PASSWORD: WelCome123456
 
 init:
