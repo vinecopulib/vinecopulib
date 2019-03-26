@@ -190,7 +190,7 @@ TEST_P(ParBicopTest, bicop_select_itau_bic_is_correct) {
     }
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     ParBicopTest,
     ParBicopTest,
     testing::Combine(

@@ -37,7 +37,7 @@ TEST(bicop_sanity_checks, catches_wrong_rotation) {
 }
 
 TEST(bicop_sanity_checks, catches_not_fitted_to_data) {
-    auto bc = Bicop(BicopFamily::gaussian, 0.5);
+    auto bc = Bicop(BicopFamily::gaussian);
     EXPECT_ANY_THROW(bc.get_loglik());
     EXPECT_ANY_THROW(bc.get_nobs());
     EXPECT_ANY_THROW(bc.get_aic());
