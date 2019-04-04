@@ -47,6 +47,12 @@ inline Eigen::VectorXd ClaytonBicop::pdf_raw(
 )
 {
     double theta = static_cast<double>(parameters_(0));
+    // avoid numerical issues when copula is too close to independence
+    if (theta < 1e-10) {
+        auto f = [theta](const double &, const double &) { return 1.0; };
+        return tools_eigen::binaryExpr_or_nan(u, f);
+    }
+
     auto f = [theta](const double &u1, const double &u2) {
         double temp = boost::math::log1p(theta)-(1.0+theta)*std::log(u1*u2);
         temp = temp - (2.0+1.0/(theta))*std::log(std::pow(u1,-theta) +
