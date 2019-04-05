@@ -8,8 +8,8 @@ namespace vinecopulib {
 
 //! instantiates an RVineStructure object from a matrix representing an
 //! R-vine array. The matrix must contain zeros in the lower right triangle and
-//! the upper left triangle must be a valid R-vine array. Truncated vines can 
-//! be encoded by putting zeros above the digonal in all rows below the 
+//! the upper left triangle must be a valid R-vine array. Truncated vines can
+//! be encoded by putting zeros above the digonal in all rows below the
 //! truncation level. Example of a 1-truncated matrix:
 //! ```
 //! 4 4 4 4
@@ -29,13 +29,13 @@ inline RVineStructure::RVineStructure(
         check_lower_tri(mat);
     }
 
-    order_ = get_order(mat);    
+    order_ = get_order(mat);
     if (check)
         check_antidiagonal();
 
     trunc_lvl_ = find_trunc_lvl(mat);
     struct_array_ = to_rvine_array(mat);
-    
+
     if (check)
         check_upper_tri();
 
@@ -52,9 +52,9 @@ inline RVineStructure::RVineStructure(
 }
 
 
-//! instantiates an RVineStructure object to a D-vine with given ordering of 
+//! instantiates an RVineStructure object to a D-vine with given ordering of
 //! variables.
-//! @param order the order of variables in the D-vine (diagonal entries in the 
+//! @param order the order of variables in the D-vine (diagonal entries in the
 //!    R-vine array); must be a permutation of 1, ..., d.
 //! @param check whether `order shall be checked for validity.
 inline RVineStructure::RVineStructure(
@@ -62,21 +62,13 @@ inline RVineStructure::RVineStructure(
     bool check) : RVineStructure(order, order.size() - 1, check) {}
 
 inline RVineStructure::RVineStructure(
-    const std::vector<size_t>& order, const size_t& trunc_lvl, bool check)
+    const std::vector<size_t>& order, const size_t& trunc_lvl, bool check) :
+    order_(order), d_(order.size()),  trunc_lvl_(std::min(trunc_lvl, d_ - 1))
 {
-    d_ = order.size();
-    order_ = order;
-
     if (check)
         check_antidiagonal();
 
     if (trunc_lvl > 0) {
-        if (trunc_lvl > d_ - 1) {
-            trunc_lvl_ = d_ - 1;
-        } else {
-            trunc_lvl_ = trunc_lvl;
-        }
-
         struct_array_  = compute_dvine_struct_array();
         min_array_     = compute_min_array();
         needed_hfunc1_ = compute_needed_hfunc1();
@@ -89,14 +81,14 @@ inline RVineStructure::RVineStructure(
     }
 }
 
-//! instantiates an RVineStructure object from the variable order (diagonal 
+//! instantiates an RVineStructure object from the variable order (diagonal
 //! elements of the R-vine array) and a triangular structure array (all elements
 //! above the diagonal).
-//! @param order the order of variables (diagonal entries in the 
+//! @param order the order of variables (diagonal entries in the
 //!    R-vine array); must be a permutation of 1, ..., d.
 //! @param struct_array the structure array  (all elements
 //!    above the diagonal in the R-vine array). For truncated vines, all rows
-//!    below the truncation level are omitted.  
+//!    below the truncation level are omitted.
 //! @param is_natural_order whether `struct_array` is already in natural order.
 //! @param check whether `order` and `struct_array` shall be checked for validity.
 inline RVineStructure::RVineStructure(
@@ -153,16 +145,16 @@ inline size_t RVineStructure::get_trunc_lvl() const
     return trunc_lvl_;
 }
 
-//! extract the order of variables in the vine (diagonal entries in the R-vine 
+//! extract the order of variables in the vine (diagonal entries in the R-vine
 //! array).
-inline std::vector<size_t> RVineStructure::get_order() const 
+inline std::vector<size_t> RVineStructure::get_order() const
 {
     return order_;
 }
 
-//! extract structure array (all elements above the diagonal in the R-vine 
+//! extract structure array (all elements above the diagonal in the R-vine
 //! array).
-inline TriangularArray<size_t> RVineStructure::get_struct_array() const 
+inline TriangularArray<size_t> RVineStructure::get_struct_array() const
 {
     return struct_array_;
 }
@@ -170,22 +162,22 @@ inline TriangularArray<size_t> RVineStructure::get_struct_array() const
 //! extracts the minimum array, which is derived from an R-vine array by
 //! iteratively computing
 //! the (elementwise) minimum of two subsequent rows (starting from the
-//! top). It is used in estimation and evaluation algorithms to find the 
+//! top). It is used in estimation and evaluation algorithms to find the
 //! two edges in the previous tree that are joined by the current edge.
-inline TriangularArray<size_t> RVineStructure::get_min_array() const 
+inline TriangularArray<size_t> RVineStructure::get_min_array() const
 {
     return min_array_;
 }
 
-//! extracts an array indicating which of the first h-functions are needed 
+//! extracts an array indicating which of the first h-functions are needed
 //! (it is usually not necessary to compute both h-functions for each
 //! pair-copula).
-inline TriangularArray<size_t> RVineStructure::get_needed_hfunc1() const 
+inline TriangularArray<size_t> RVineStructure::get_needed_hfunc1() const
 {
     return needed_hfunc1_;
 }
 
-//! extracts an array indicating which of the second h-functions are needed 
+//! extracts an array indicating which of the second h-functions are needed
 //! (it is usually not necessary to compute both h-functions for each
 //! pair-copula).
 inline TriangularArray<size_t> RVineStructure::get_needed_hfunc2() const
@@ -194,7 +186,7 @@ inline TriangularArray<size_t> RVineStructure::get_needed_hfunc2() const
 }
 
 //! access elements of the structure array.
-inline size_t RVineStructure::struct_array(size_t tree, size_t edge) const 
+inline size_t RVineStructure::struct_array(size_t tree, size_t edge) const
 {
     return struct_array_(tree, edge);
 }
@@ -206,7 +198,7 @@ inline size_t RVineStructure::min_array(size_t tree, size_t edge) const {
 
 //! truncates the R-vine structure.
 //! @param trunc_lvl the truncation level.
-//! If the structure is already truncated at a level 
+//! If the structure is already truncated at a level
 //! less than `trunc_lvl`, the function does nothing.
 inline void RVineStructure::truncate(size_t trunc_lvl)
 {
@@ -220,8 +212,8 @@ inline void RVineStructure::truncate(size_t trunc_lvl)
 }
 
 //! extract the R-vine matrix representation.
-inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> 
-RVineStructure::get_matrix() const 
+inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>
+RVineStructure::get_matrix() const
 {
     Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> array(d_, d_);
     array.fill(0);
@@ -237,7 +229,7 @@ RVineStructure::get_matrix() const
 }
 
 //! find the truncation level in an R-vine array. The truncation level is
-//! determined by the first row (starting from the bottom) that contains only 
+//! determined by the first row (starting from the bottom) that contains only
 //! zeros above the diagonal.
 //! @param mat an array representing the R-vine array.
 inline size_t RVineStructure::find_trunc_lvl(
@@ -265,7 +257,7 @@ inline size_t RVineStructure::find_trunc_lvl(
 }
 
 //! find the order of an R-vine array. The truncation level is
-//! determined by the first row (starting from the bottom) that contains only 
+//! determined by the first row (starting from the bottom) that contains only
 //! zeros above the diagonal.
 //! @param mat a array representing the R-vine array.
 inline std::vector<size_t> RVineStructure::get_order(
@@ -444,7 +436,7 @@ inline void RVineStructure::check_proximity_condition() const
                 target_set[i] = struct_array_(i, e);
                 test_set[i] = struct_array_(i, min_array_(t, e) - 1);
             }
-            
+
             // non-diagonal conditioned variable
             target_set[t] = struct_array_(t, e);
             // diagonal conditioned variable in other column
