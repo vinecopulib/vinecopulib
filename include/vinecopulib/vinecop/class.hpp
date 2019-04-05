@@ -95,7 +95,7 @@ public:
     Eigen::MatrixXd get_parameters(size_t tree, size_t edge) const;
 
     double get_tau(size_t tree, size_t edge) const;
-    
+
     size_t get_trunc_lvl() const;
 
     // Getters for all pair copulas
@@ -165,7 +165,7 @@ public:
                            const size_t trunc_lvl = std::numeric_limits<size_t>::max());
     void truncate(size_t trunc_lvl);
 
-private:
+protected:
     size_t d_;
     RVineStructure vine_struct_;
     std::vector <std::vector<Bicop>> pair_copulas_;
@@ -177,6 +177,7 @@ private:
     void check_pair_copulas_rvine_structure(
         const std::vector<std::vector<Bicop>> &pair_copulas) const;
     double calculate_mbicv_penalty(const size_t nobs, const double psi0) const;
+    void finalize_fit(const tools_select::VinecopSelector& selector);
     void check_weights_size(const Eigen::VectorXd& weights,
                             const Eigen::MatrixXd& data) const;
     void check_enough_data(const Eigen::MatrixXd& data) const;
