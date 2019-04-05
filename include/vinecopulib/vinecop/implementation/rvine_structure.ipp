@@ -219,6 +219,25 @@ inline void RVineStructure::truncate(size_t trunc_lvl)
     }
 }
 
+//! converts the structure to a string representation (most useful for printing).
+inline std::string RVineStructure::str() const
+{
+    std::stringstream str;
+    for (size_t i = 0; i < d_ - 1; i++) {
+        for (size_t j = 0; j < d_ - i - 1; j++) {
+            if (i < trunc_lvl_) {
+                str << order_[struct_array_(i, j) - 1] << " ";
+            } else  {
+                str << "  ";
+            }
+        }
+        str << order_[d_ - 1 - i] << std::endl;
+    }
+    str << order_[0] << std::endl;
+
+    return str.str();
+}
+
 //! extract the R-vine matrix representation.
 inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> 
 RVineStructure::get_matrix() const 
@@ -465,6 +484,15 @@ inline void RVineStructure::check_proximity_condition() const
             }
         }
     }
+}
+
+//! ostream method for RVineStructure, to be used with `std::cout`
+//! @param os output stream.
+//! @param rvs r-vine structure array.
+std::ostream& operator<<(std::ostream& os, const RVineStructure& rvs)
+{
+    os << rvs.str();
+    return os;
 }
 
 }
