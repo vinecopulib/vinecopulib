@@ -232,9 +232,9 @@ inline std::string RVineStructure::str() const
                 str << "  ";
             }
         }
-        str << order_[i] << std::endl;
+        str << order_[d_ - 1 - i] << std::endl;
     }
-    str << order_[d_ - 1] << std::endl;
+    str << order_[0] << std::endl;
 
     return str.str();
 }
