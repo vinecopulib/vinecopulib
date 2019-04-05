@@ -879,9 +879,9 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
         bool is_thresholded = (tree[e].crit < controls_.get_threshold());
         bool used_old_fit = false;
 
-        double id = compute_fit_id(tree[e]);
+        tree[e].fit_id = compute_fit_id(tree[e]);
         if (boost::num_edges(tree_opt) > 0) {
-            auto old_fit = find_old_fit(id, tree_opt);
+            auto old_fit = find_old_fit(tree[e].fit_id, tree_opt);
             if (old_fit.second) {  // indicates if match was found
                 // data and thresholding status haven't changed,
                 // we can use old fit
@@ -889,7 +889,6 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
                 tree[e].pair_copula = tree_opt[old_fit.first].pair_copula;
             }
         }
-        tree[e].fit_id = id;
 
         if (!used_old_fit) {
             if (is_thresholded) {
