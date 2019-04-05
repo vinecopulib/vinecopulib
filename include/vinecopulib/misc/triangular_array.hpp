@@ -207,7 +207,7 @@ std::string TriangularArray<T>::str() const
         }
         str << std::endl;
     }
-    return str.str().c_str();
+    return str.str();
 }
 
 //! ostream method for RightTrapezoid, to be used with `std::cout`
