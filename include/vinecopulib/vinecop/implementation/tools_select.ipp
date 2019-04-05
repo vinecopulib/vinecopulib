@@ -67,9 +67,9 @@ inline Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
     return mat;
 }
 
-inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data, 
-                                        const FitControlsVinecop& controls) : 
-    n_(data.rows()), 
+inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
+                                        const FitControlsVinecop& controls) :
+    n_(data.rows()),
     d_(data.cols()),
     controls_(controls),
     pool_(controls_.get_num_threads()),
@@ -148,8 +148,8 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
         // initialize threshold with maximum pairwise |tau| (all pairs get
         // thresholded)
         auto tree_crit = controls_.get_tree_criterion();
-        auto crits = calculate_criterion_matrix(data, 
-                                                tree_crit, 
+        auto crits = calculate_criterion_matrix(data,
+                                                tree_crit,
                                                 controls_.get_weights());
         for (size_t i = 1; i < d_; ++i) {
             for (size_t j = 0; j < i; ++j) {
@@ -205,7 +205,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
             loglik += loglik_tree;
             mbicv_tree = get_mbicv_of_tree(t, loglik_tree);
             mbicv_trunc += mbicv_tree;
-            
+
             // print trace for this tree level
             if (controls_.get_show_trace()) {
                 std::cout << "** Tree: " << t;
@@ -218,7 +218,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
                 print_pair_copulas_of_tree(t);
             }
 
-            // mbicv comparison for truncation level (check only after 10% of 
+            // mbicv comparison for truncation level (check only after 10% of
             // copulas change to avoid getting stuck in local minimum)
             if (num_changed / num_total > 0.1) {
                 num_changed = 0.0;
@@ -240,7 +240,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd &data)
                     controls_.set_trunc_lvl(t);
                     if (!select_threshold) {
                         // fixed threshold, no need to continue
-                        needs_break = true;  
+                        needs_break = true;
                     }
                 } else {
                     mbicv = mbicv_trunc;
@@ -300,6 +300,11 @@ inline double VinecopSelector::get_threshold() const
     return threshold_;
 }
 
+// extracts the number of observations
+inline size_t VinecopSelector::get_nobs() const
+{
+    return n_;
+}
 
 //! chooses threshold for next iteration such that at a proportion of at
 //! least 2.5% of the previously thresholded pairs become non-thresholded.
@@ -323,7 +328,7 @@ inline double VinecopSelector::get_next_threshold(
 inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
                                       const RVineStructure &vine_struct,
                                       const FitControlsVinecop &controls)
-    : VinecopSelector(data, controls)    
+    : VinecopSelector(data, controls)
 {
     vine_struct_ = vine_struct;
     if (vine_struct.get_trunc_lvl() < controls.get_trunc_lvl()) {
@@ -332,9 +337,16 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
 }
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
-                                            const FitControlsVinecop &controls) 
+                                            const FitControlsVinecop &controls)
     : VinecopSelector(data, controls)
 {
+    n_ = data.rows();
+    d_ = data.cols();
+    vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
+    trees_.resize(1);
+    controls_ = controls;
+    threshold_ = controls.get_threshold();
+    psi0_ = controls.get_psi0();
 }
 
 //! Add edges allowed by the proximity condition
@@ -356,7 +368,7 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
             // (-1 means 'no common neighbor')
             if (find_common_neighbor(v0, v1, vine_tree) > -1) {
                 auto pc_data = get_pc_data(v0, v1, vine_tree);
-                double crit = calculate_criterion(pc_data, 
+                double crit = calculate_criterion(pc_data,
                                                   tree_criterion,
                                                   controls_.get_weights());
                 double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
@@ -377,18 +389,18 @@ inline void StructureSelector::add_allowed_edges(VineTree &vine_tree)
 inline void StructureSelector::finalize(size_t trunc_lvl)
 {
     using namespace tools_stl;
+    trees_opt_ = trees_;
     pair_copulas_ = make_pair_copula_store(d_, trunc_lvl);
     TriangularArray<size_t> mat(d_, trunc_lvl);
     std::vector<size_t> order(d_);
 
     if (trunc_lvl > 0) {
-
         std::vector <size_t> ning_set;
 
         // fill matrix column by column
         for (size_t col = 0; col < d_ - 1; ++col) {
             tools_interface::check_user_interrupt();
-            // matrix above trunc_lvl will be filled more efficiently later
+            // matrix above trunc_lvl is left empty
             size_t t =
                 std::max(std::min(trunc_lvl, d_ - 1 - col), static_cast<size_t>(1));
             // start with highest tree in this column
@@ -416,7 +428,7 @@ inline void StructureSelector::finalize(size_t trunc_lvl)
 
                 // assign fitted pair copula to appropriate entry, see
                 // `Vinecop::get_pair_copula()`.
-                if (trunc_lvl > 0) {
+                if (trunc_lvl > 0 ) {
                     pair_copulas_[t - 1][col] = trees_[t][e].pair_copula;
                 }
 
@@ -526,7 +538,7 @@ inline void FamilySelector::finalize(size_t trunc_lvl)
             edge++;
         }
     }
-    
+
     vine_struct_.truncate(trunc_lvl);
 }
 
@@ -606,7 +618,7 @@ inline double VinecopSelector::get_mbicv_of_tree(size_t t, double loglik)
     size_t non_indeps = get_num_non_indeps_of_tree(t);
     size_t indeps = d_ - t - 1 - non_indeps;
     double psi0 = std::pow(psi0_, t + 1);
-    double log_prior = 
+    double log_prior =
         static_cast<double>(non_indeps) * std::log(psi0) +
         static_cast<double>(indeps) * std::log(1.0 - psi0);
         double n_eff = static_cast<double>(n_);
@@ -614,7 +626,7 @@ inline double VinecopSelector::get_mbicv_of_tree(size_t t, double loglik)
             n_eff = std::pow(controls_.get_weights().sum(), 2);
             n_eff /= controls_.get_weights().array().pow(2).sum();
         }
-    return -2 * loglik + std::log(n_eff) * npars - 2 * log_prior;    
+    return -2 * loglik + std::log(n_eff) * npars - 2 * log_prior;
 }
 
 
@@ -658,7 +670,7 @@ inline void VinecopSelector::print_pair_copulas_of_tree(size_t t)
 {
     // trees_[0] is the base tree, see make_base_tree()
     for (auto e : boost::edges(trees_[t + 1])) {
-        std::cout << 
+        std::cout <<
             get_pc_index(e, trees_[t + 1]) << " <-> " <<
             trees_[t + 1][e].pair_copula.str() << std::endl;
     }
@@ -706,6 +718,7 @@ inline VineTree VinecopSelector::make_base_tree(const Eigen::MatrixXd &data)
 {
     size_t d = data.cols();
     VineTree base_tree(d);
+    auto order = vine_struct_.get_order();
     // a star connects the root node (d) with all other nodes
     for (size_t target = 0; target < d; ++target) {
         tools_interface::check_user_interrupt(target % 10000 == 0);
@@ -713,10 +726,12 @@ inline VineTree VinecopSelector::make_base_tree(const Eigen::MatrixXd &data)
         auto e = add_edge(d, target, base_tree).first;
 
         // inititialize hfunc1 with actual data for variable "target"
-        base_tree[e].hfunc1 = data.col(boost::target(e, base_tree));
+        // data need are reordered to correspond to natural order (neccessary
+        // when structure is fixed)
+        base_tree[e].hfunc1 = data.col(order[target] - 1);
         // identify edge with variable "target" and initialize sets
         base_tree[e].conditioned.reserve(2);
-        base_tree[e].conditioned.push_back(boost::target(e, base_tree));
+        base_tree[e].conditioned.push_back(order[target] - 1);
         base_tree[e].conditioning.reserve(d - 2);
         base_tree[e].all_indices = base_tree[e].conditioned;
     }
@@ -776,6 +791,23 @@ inline ptrdiff_t VinecopSelector::find_common_neighbor(size_t v0, size_t v1,
     }
 }
 
+// compute a fit id; can be used to re-use already fitted pair-copulas.
+//
+// @param edge.
+double VinecopSelector::compute_fit_id(const EdgeProperties& e)
+{
+    double id = 0.0;
+    if (controls_.needs_sparse_select()) {
+        // the formula is quite arbitrary, but sufficient for
+        // identifying situations where fits can be re-used
+        id = (e.pc_data.col(0) - 2 * e.pc_data.col(1)).sum();
+        id += 5.0 * static_cast<double>(e.crit < controls_.get_threshold());
+    }
+
+    return id;
+}
+
+
 //! Collapse a graph to the minimum spanning tree
 //!
 //! @param graph the input graph.
@@ -834,6 +866,7 @@ inline void VinecopSelector::remove_vertex_data(VineTree &tree)
     }
 }
 
+
 //! Fit and select a pair copula for each edges
 //! @param tree a vine tree preprocessed with add_edge_info().
 //! @param tree_opt the current optimal tree (used only for sparse
@@ -846,22 +879,17 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
         bool is_thresholded = (tree[e].crit < controls_.get_threshold());
         bool used_old_fit = false;
 
-        if (controls_.needs_sparse_select()) {
-            // the formula is quite arbitrary, but sufficient for
-            // identifying situations where fits can be re-used
-            tree[e].fit_id =
-                (tree[e].pc_data.col(0) - 2 * tree[e].pc_data.col(1)).sum();
-            tree[e].fit_id += 5.0 * static_cast<double>(is_thresholded);
-            if (boost::num_edges(tree_opt) > 0) {
-                auto old_fit = find_old_fit(tree[e].fit_id, tree_opt);
-                if (old_fit.second) {  // indicates if match was found
-                    // data and thresholding status haven't changed,
-                    // we can use old fit
-                    used_old_fit = true;
-                    tree[e].pair_copula = tree_opt[old_fit.first].pair_copula;
-                }
+        double id = compute_fit_id(tree[e]);
+        if (boost::num_edges(tree_opt) > 0) {
+            auto old_fit = find_old_fit(id, tree_opt);
+            if (old_fit.second) {  // indicates if match was found
+                // data and thresholding status haven't changed,
+                // we can use old fit
+                used_old_fit = true;
+                tree[e].pair_copula = tree_opt[old_fit.first].pair_copula;
             }
         }
+        tree[e].fit_id = id;
 
         if (!used_old_fit) {
             if (is_thresholded) {
@@ -878,10 +906,11 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
             tree[e].npars = tree[e].pair_copula.calculate_npars();
         }
     };
-    
+
     // make sure that Bicop.select() doesn't spawn new threads
     size_t num_threads = controls_.get_num_threads();
-    controls_.set_num_threads(1);
+    controls_.set_num_threads(0);
+
     pool_.map(select_pc, boost::edges(tree));
     pool_.wait();
     controls_.set_num_threads(num_threads);
@@ -923,6 +952,8 @@ inline std::string VinecopSelector::get_pc_index(const EdgeIterator &e,
 
     return index.str().c_str();
 }
+
+
 
 }
 
