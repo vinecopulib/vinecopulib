@@ -25,7 +25,7 @@ TEST_F(VinecopTest, constructors_without_error) {
             pc = Bicop(BicopFamily::clayton, 90);
         }
     }
-    
+
     Vinecop vinecop_parametrized(pair_copulas, model_matrix);
 }
 
@@ -238,7 +238,7 @@ TEST_F(VinecopTest, family_select_finds_true_rotations) {
     auto controls = FitControlsVinecop({BicopFamily::clayton}, "itau");
     // controls.set_show_trace(true);
     Vinecop fit(data, model_matrix, controls);
-    
+
     // don't check last two trees to avoid random failures because of
     // estimation uncertainty
     auto true_rots = vinecop.get_all_rotations();
@@ -346,7 +346,7 @@ TEST_F(VinecopTest, fixed_truncation) {
     Vinecop fit(7);
     fit.select_all(u, controls);
     fit.select_families(u, controls);
-    
+
     TriangularArray<size_t> my_rvm(7);
     my_rvm[0] = {2, 1, 3, 4, 6, 5};
     my_rvm[1] = {3, 1, 2, 4, 5};
