@@ -126,6 +126,8 @@ private:
     TriangularArray<size_t> needed_hfunc2_;
 };
 
+std::ostream& operator<<(std::ostream& os, const RVineStructure& rvs);
+
 }
 
 #include <vinecopulib/vinecop/implementation/rvine_structure.ipp>
