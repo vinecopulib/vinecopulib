@@ -6,17 +6,18 @@
 
 namespace vinecopulib {
 
-// TODO:
-// - order selection
-// - structure selection with fixed in or out node
-// - loglikelihood calculation (current numbers are incorrect)
-// - margins
-// - truncated models
-// - avoid unneccessary reordering
-//
-// TO DISCUSS:
-// - fit routine
-// - reorder function
+namespace tools_stl {
+
+template<class T>
+std::vector<T> span(std::vector <T> x, size_t start, size_t len)
+{
+    x.erase(x.begin(), x.begin() + std::min(x.size(), start));
+    x.resize(std::min(x.size(), len));
+    return x;
+}
+
+}
+
 // ------------------------- T-VINE STRUCTURE ---------------
 
 TriangularArray<size_t> get_actual_struct_array(const RVineStructure& structure)
@@ -53,6 +54,7 @@ public:
         cs_struct_ = reorder_structure(cs_struct, in_vertex);
         order_ = expand_order(cs_struct_.get_order(), p);
         struct_array_ = build_t_vine_array(cs_struct_, p, in_vertex, out_vertex);
+
         RVineStructure new_struct(order_, struct_array_);
         d_             = new_struct.get_dim();
         trunc_lvl_     = new_struct.get_trunc_lvl();
@@ -110,7 +112,7 @@ private:
         size_t d = cs_dim * (p + 1);
         std::vector<size_t> new_order(d);
         for (size_t i = 0; i < d; i++) {
-            new_order[i] = order[i % cs_dim] + (i / cs_dim) * cs_dim;
+            new_order[i] = order[i % cs_dim] + ((d - 1 - i) / cs_dim) * cs_dim;
         }
 
         return new_order;
@@ -152,9 +154,7 @@ private:
         auto new_struct = old_struct;
 
         // prepare objects
-        // working w/ rev_order is easier algorithmically; will be reversed again
-        // when final object ist created.
-        auto old_order = structure.get_rev_order();
+        auto old_order = structure.get_order();
         auto new_order = pivot_diag(old_order, old_struct, in_vertex);
 
         // loop through all columns
@@ -205,8 +205,6 @@ private:
 
         // this must always hold beacuse in_vertex comes last on the diagonal:
         new_struct(0, d - 2) = in_vertex;
-
-        reverse(new_order);
         return RVineStructure(new_order, new_struct);
     }
 
@@ -219,7 +217,7 @@ private:
     {
         size_t cs_dim = cs_struct.get_dim();
         size_t d = cs_dim * (p + 1);
-        auto diag = cs_struct.get_rev_order();
+        auto diag = cs_struct.get_order();
 
         RVineStructure new_struct = cs_struct;
         if (diag[cs_dim - 1] != in_vertex) {
@@ -514,15 +512,15 @@ protected:
 
     void flip_pcs(std::vector<VineTree>& trees)
     {
-        std::vector<size_t> rev_order = cs_struct_.get_rev_order();
-        size_t d = rev_order.size();
+        std::vector<size_t> order = cs_struct_.get_order();
+        size_t d = order.size();
         auto struct_array = get_actual_struct_array(cs_struct_);
         for (size_t t = 1; t < trees.size(); t++) {
             for (auto e : boost::edges(trees[t])) {
                 std::vector<size_t> check_set(2);
                 for (size_t k = 0; k < d; k++) {
                     // conditioned starts at 0 -> substract -1
-                    check_set = {rev_order[k] - 1, struct_array(t - 1, k) - 1};
+                    check_set = {order[k] - 1, struct_array(t - 1, k) - 1};
                     if (tools_stl::is_same_set(trees_[t][e].conditioned, check_set)) {
                         break;
                     }
