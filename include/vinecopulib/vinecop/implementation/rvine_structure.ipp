@@ -1,4 +1,4 @@
-// Copyright © 2018 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2019 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -12,10 +12,10 @@ namespace vinecopulib {
 //! be encoded by putting zeros above the digonal in all rows below the 
 //! truncation level. Example of a 1-truncated matrix:
 //! ```
-//! 1 1 1 1
-//! 0 0 2 0
-//! 0 3 0 0
-//! 4 0 0 0
+//! 4 4 4 4
+//! 0 0 3 0
+//! 0 2 0 0
+//! 1 0 0 0
 //! ```
 //! @param mat a matrix representing a valid R-vine array.
 //! @param check whether `mat` shall be checked for validity.
@@ -29,12 +29,13 @@ inline RVineStructure::RVineStructure(
         check_lower_tri(mat);
     }
 
-    order_ = get_order(mat);
+    order_ = get_order(mat);    
     if (check)
         check_antidiagonal();
 
     trunc_lvl_ = find_trunc_lvl(mat);
     struct_array_ = to_rvine_array(mat);
+    
     if (check)
         check_upper_tri();
 
@@ -42,7 +43,7 @@ inline RVineStructure::RVineStructure(
     if (check)
         check_columns();
 
-    max_array_ = compute_max_array();
+    min_array_ = compute_min_array();
     if (check)
         check_proximity_condition();
 
@@ -77,12 +78,12 @@ inline RVineStructure::RVineStructure(
         }
 
         struct_array_  = compute_dvine_struct_array();
-        max_array_     = compute_max_array();
+        min_array_     = compute_min_array();
         needed_hfunc1_ = compute_needed_hfunc1();
         needed_hfunc2_ = compute_needed_hfunc2();
     } else {
         struct_array_  = TriangularArray<size_t>(d_, trunc_lvl);
-        max_array_     = TriangularArray<size_t>(d_, trunc_lvl);
+        min_array_     = TriangularArray<size_t>(d_, trunc_lvl);
         needed_hfunc1_ = TriangularArray<size_t>(d_, trunc_lvl);
         needed_hfunc2_ = TriangularArray<size_t>(d_, trunc_lvl);
     }
@@ -126,7 +127,7 @@ inline RVineStructure::RVineStructure(
         if (check)
             check_columns();
 
-        max_array_ = compute_max_array();
+        min_array_ = compute_min_array();
         if (check)
             check_proximity_condition();
 
@@ -134,7 +135,7 @@ inline RVineStructure::RVineStructure(
         needed_hfunc2_ = compute_needed_hfunc2();
     } else {
         struct_array_  = TriangularArray<size_t>(d_, trunc_lvl_);
-        max_array_     = TriangularArray<size_t>(d_, trunc_lvl_);
+        min_array_     = TriangularArray<size_t>(d_, trunc_lvl_);
         needed_hfunc1_ = TriangularArray<size_t>(d_, trunc_lvl_);
         needed_hfunc2_ = TriangularArray<size_t>(d_, trunc_lvl_);
     }
@@ -175,14 +176,14 @@ inline TriangularArray<size_t> RVineStructure::get_struct_array() const
     return struct_array_;
 }
 
-//! extracts the maximum array, which is derived from an R-vine array by
+//! extracts the minimum array, which is derived from an R-vine array by
 //! iteratively computing
-//! the (elementwise) maximum of two subsequent rows (starting from the
+//! the (elementwise) minimum of two subsequent rows (starting from the
 //! top). It is used in estimation and evaluation algorithms to find the 
 //! two edges in the previous tree that are joined by the current edge.
-inline TriangularArray<size_t> RVineStructure::get_max_array() const 
+inline TriangularArray<size_t> RVineStructure::get_min_array() const 
 {
-    return max_array_;
+    return min_array_;
 }
 
 //! extracts an array indicating which of the first h-functions are needed 
@@ -208,20 +209,23 @@ inline size_t RVineStructure::struct_array(size_t tree, size_t edge) const
 }
 
 //! access elements of the maximum array.
-inline size_t RVineStructure::max_array(size_t tree, size_t edge) const 
-{
-    return max_array_(tree, edge);
+inline size_t RVineStructure::min_array(size_t tree, size_t edge) const {
+    return min_array_(tree, edge);
 }
 
 //! truncates the R-vine structure.
 //! @param trunc_lvl the truncation level.
+//! If the structure is already truncated at a level 
+//! less than `trunc_lvl`, the function does nothing.
 inline void RVineStructure::truncate(size_t trunc_lvl)
 {
-    struct_array_.truncate(trunc_lvl);
-    max_array_.truncate(trunc_lvl);
-    needed_hfunc1_.truncate(trunc_lvl);
-    needed_hfunc2_.truncate(trunc_lvl);
-    trunc_lvl_ = struct_array_.get_trunc_lvl();
+    if (trunc_lvl < trunc_lvl_) {
+        struct_array_.truncate(trunc_lvl);
+        min_array_.truncate(trunc_lvl);
+        needed_hfunc1_.truncate(trunc_lvl);
+        needed_hfunc2_.truncate(trunc_lvl);
+        trunc_lvl_ = struct_array_.get_trunc_lvl();
+    }
 }
 
 //! converts the structure to a string representation (most useful for printing).
@@ -256,7 +260,7 @@ RVineStructure::get_matrix() const
         }
     }
     for (size_t i = 0; i < d_; ++i) {
-        array(d_ - i - 1, i) = order_[d_ - i - 1];
+        array(d_ - i - 1, i) = order_[i];
     }
     return array;
 }
@@ -298,7 +302,7 @@ inline std::vector<size_t> RVineStructure::get_order(
 {
     std::vector<size_t> order(d_);
     for (size_t i = 0; i < d_; i++)
-        order[i] = mat(i, d_ - i - 1);
+        order[i] = mat(d_ - i - 1, i);
 
     return order;
 }
@@ -342,23 +346,23 @@ inline TriangularArray<size_t> RVineStructure::compute_dvine_struct_array() cons
     TriangularArray<size_t> struct_array(d_, trunc_lvl_);
     for (size_t j = 0; j < d_ - 1; j++) {
         for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
-            struct_array(i, j) = d_ - i - j - 1;
+            struct_array(i, j) = i + j + 2;
         }
     }
 
     return struct_array;
 }
 
-inline TriangularArray<size_t> RVineStructure::compute_max_array() const
+inline TriangularArray<size_t> RVineStructure::compute_min_array() const
 {
-    TriangularArray<size_t> max_array = struct_array_;
+    TriangularArray<size_t> min_array = struct_array_;
     for (size_t j = 0; j < d_ - 1; j++) {
         for (size_t i = 1; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
-            max_array(i, j) = std::max(struct_array_(i, j), max_array(i - 1, j));
+            min_array(i, j) = std::min(struct_array_(i, j), min_array(i - 1, j));
         }
     }
 
-    return max_array;
+    return min_array;
 }
 
 inline TriangularArray<size_t> RVineStructure::compute_needed_hfunc1() const
@@ -367,8 +371,8 @@ inline TriangularArray<size_t> RVineStructure::compute_needed_hfunc1() const
 
     for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
         for (size_t j = 0; j < d_ - 2 - i; j++) {
-            if (struct_array_(i + 1, j) != max_array_(i + 1, j))
-                needed_hfunc1(i, d_ - max_array_(i + 1, j)) = 1;
+            if (struct_array_(i + 1, j) != min_array_(i + 1, j))
+                needed_hfunc1(i, min_array_(i + 1, j) - 1) = 1;
         }
     }
 
@@ -382,8 +386,8 @@ inline TriangularArray<size_t> RVineStructure::compute_needed_hfunc2() const
     for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
         for (size_t j = 0; j < d_ - 2 - i; j++) {
             needed_hfunc2(i, j) = 1;
-            if (struct_array_(i + 1, j) == max_array_(i + 1, j))
-                needed_hfunc2(i, d_ - max_array_(i + 1, j)) = 1;
+            if (struct_array_(i + 1, j) == min_array_(i + 1, j))
+                needed_hfunc2(i, min_array_(i + 1, j) - 1) = 1;
         }
     }
 
@@ -442,7 +446,7 @@ inline void RVineStructure::check_columns() const
         std::sort(col_vec.begin(), col_vec.end());
         size_t unique_in_col = std::unique(col_vec.begin(), col_vec.end())
                                - col_vec.begin();
-        if ((!tools_stl::is_member(col_vec, tools_stl::seq_int(1, d_ - j))) |
+        if ((!tools_stl::is_member(col_vec, tools_stl::seq_int(1 + j, d_))) |
             (unique_in_col != col_vec.size())) {
             throw std::runtime_error("not a valid R-vine array: " + problem);
         }
@@ -467,12 +471,13 @@ inline void RVineStructure::check_proximity_condition() const
             // conditioning set
             for (size_t i = 0; i < t; i++) {
                 target_set[i] = struct_array_(i, e);
-                test_set[i] = struct_array_(i, d_ - max_array_(t, e));
+                test_set[i] = struct_array_(i, min_array_(t, e) - 1);
             }
+            
             // non-diagonal conditioned variable
             target_set[t] = struct_array_(t, e);
             // diagonal conditioned variable in other column
-            test_set[t] = max_array_(t, e);
+            test_set[t] = min_array_(t, e);
 
             if (!tools_stl::is_same_set(target_set, test_set)) {
                 std::stringstream problem;

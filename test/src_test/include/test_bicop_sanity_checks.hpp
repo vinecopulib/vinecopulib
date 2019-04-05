@@ -1,4 +1,4 @@
-// Copyright © 2018 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2019 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -37,7 +37,7 @@ TEST(bicop_sanity_checks, catches_wrong_rotation) {
 }
 
 TEST(bicop_sanity_checks, catches_not_fitted_to_data) {
-    auto bc = Bicop(BicopFamily::gaussian, 0.5);
+    auto bc = Bicop(BicopFamily::gaussian);
     EXPECT_ANY_THROW(bc.get_loglik());
     EXPECT_ANY_THROW(bc.get_nobs());
     EXPECT_ANY_THROW(bc.get_aic());

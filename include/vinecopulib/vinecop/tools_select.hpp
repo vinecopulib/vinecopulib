@@ -1,4 +1,4 @@
-// Copyright © 2018 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2019 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -78,7 +78,8 @@ typedef std::pair<EdgeIterator, bool> FoundEdge;
 class VinecopSelector
 {
 public:
-    virtual ~VinecopSelector() = 0;
+    VinecopSelector(const Eigen::MatrixXd& data, 
+                    const FitControlsVinecop& controls);
 
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
@@ -86,7 +87,7 @@ public:
 
     static std::vector<std::vector<Bicop>> make_pair_copula_store(
         size_t d,
-        size_t truncation_level);
+        size_t trunc_lvl);
 
     void select_all_trees(const Eigen::MatrixXd &data);
 
@@ -135,15 +136,15 @@ protected:
     size_t n_;
     size_t d_;
     FitControlsVinecop controls_;
+    tools_thread::ThreadPool pool_;
+    std::vector<VineTree> trees_;
     RVineStructure vine_struct_;
     std::vector<std::vector<Bicop>> pair_copulas_;
-    std::vector<VineTree> trees_;
     // for sparse selction
     std::vector<VineTree> trees_opt_;
     double loglik_;
     double threshold_;
     double psi0_; // initial prior probability for mbicv
-    std::unique_ptr<tools_thread::ThreadPool> pool_;
 
     double get_next_threshold(std::vector<double> &thresholded_crits);
 
