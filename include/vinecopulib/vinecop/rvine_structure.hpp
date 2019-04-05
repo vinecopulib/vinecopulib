@@ -12,15 +12,15 @@
 namespace vinecopulib {
 
 //! R-vine structures
-//! 
+//!
 //! RVineStructure objects encode the tree structure of the vine, i.e. the
 //! conditioned/conditioning variables of each edge. It is represented by a
 //! triangular array. An exemplary array is
 //! ```
 //! 4 4 4 4
-//! 3 3 3 
-//! 2 2 
-//! 1 
+//! 3 3 3
+//! 2 2
+//! 1
 //! ```
 //! which encodes the following pair-copulas:
 //! ```
@@ -65,7 +65,7 @@ namespace vinecopulib {
 class RVineStructure {
 public:
     RVineStructure() {}
-    
+
     RVineStructure(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat,
         bool check = true);
@@ -91,12 +91,10 @@ public:
 
     size_t struct_array(size_t tree, size_t edge) const;
     size_t min_array(size_t tree, size_t edge) const;
-    
-    void truncate(size_t trunc_lvl);
 
     void truncate(size_t trunc_lvl);
     std::string str() const;
-    
+
 protected:
     size_t find_trunc_lvl(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;

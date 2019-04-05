@@ -331,7 +331,7 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
         } else {
             selector.select_all_trees(data);
         }
-        
+
         finalize_fit(selector);
     }
 }
@@ -640,10 +640,10 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
     // info about the vine structure (reverse rows (!) for more natural indexing)
     size_t trunc_lvl = vine_struct_.get_trunc_lvl();
     std::vector<size_t> rev_order;
-    TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_array, min_array, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         rev_order = vine_struct_.get_rev_order();
-        no_matrix = vine_struct_.get_struct_array();
+        no_array = vine_struct_.get_struct_array();
         min_array = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -672,7 +672,7 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
                 // computed in previous tree level)
                 size_t m = min_array(tree, edge);
                 u_e.col(0) = hfunc2.col(edge);
-                if (m == no_matrix(tree, edge)) {
+                if (m == no_array(tree, edge)) {
                     u_e.col(1) = hfunc2.col(m - 1);
                 } else {
                     u_e.col(1) = hfunc1.col(m - 1);
@@ -886,11 +886,11 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
     // info about the vine structure (reverse rows (!) for more natural indexing)
     size_t trunc_lvl = vine_struct_.get_trunc_lvl();
     std::vector<size_t> rev_order, inverse_order;
-    TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_array, min_array, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         rev_order = vine_struct_.get_rev_order();
         inverse_order = tools_stl::invert_permutation(rev_order);
-        no_matrix = vine_struct_.get_struct_array();
+        no_array = vine_struct_.get_struct_array();
         min_array = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -913,7 +913,7 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
                 // computed in previous tree level)
                 size_t m = min_array(tree, edge);
                 u_e.col(0) = hfunc2.block(b.begin, edge, b.size, 1);
-                if (m == no_matrix(tree, edge)) {
+                if (m == no_array(tree, edge)) {
                     u_e.col(1) = hfunc2.block(b.begin, m - 1, b.size, 1);
                 } else {
                     u_e.col(1) = hfunc1.block(b.begin, m - 1, b.size, 1);
@@ -991,11 +991,11 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
     // info about the vine structure (in upper triangular matrix notation)
     size_t trunc_lvl = vine_struct_.get_trunc_lvl();
     std::vector<size_t> rev_order, inverse_order;
-    TriangularArray<size_t> no_matrix, max_matrix, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_array, min_array, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         rev_order = vine_struct_.get_rev_order();
         inverse_order = tools_stl::invert_permutation(rev_order);
-        no_matrix = vine_struct_.get_struct_array();
+        no_array = vine_struct_.get_struct_array();
         min_array = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -1009,7 +1009,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
         // initialize with independent uniforms (corresponding to natural
         // order)
         for (size_t j = 0; j < d; ++j) {
-            hinv2(std::min(trunc_lvl, d - j - 1), j) = 
+            hinv2(std::min(trunc_lvl, d - j - 1), j) =
                 u.block(b.begin, rev_order[j] - 1, b.size, 1);
         }
         hfunc1(0, d - 1) = hinv2(0, d - 1);
@@ -1026,7 +1026,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
                 Eigen::MatrixXd U_e(b.size, 2);
                 size_t m = min_array(tree, var);
                 U_e.col(0) = hinv2(tree + 1, var);
-                if (m == no_matrix(tree, var)) {
+                if (m == no_array(tree, var)) {
                     U_e.col(1) = hinv2(tree, m - 1);
                 } else {
                     U_e.col(1) = hfunc1(tree, m - 1);
@@ -1125,7 +1125,7 @@ inline void Vinecop::check_enough_data(const Eigen::MatrixXd& data) const
 
 //! truncate the vine copula model.
 //! @param trunc_lvl the truncation level.
-//! If the model is already truncated at a level less than `trunc_lvl`, 
+//! If the model is already truncated at a level less than `trunc_lvl`,
 //! the function does nothing.
 inline void Vinecop::truncate(size_t trunc_lvl)
 {
