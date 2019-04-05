@@ -1,4 +1,4 @@
-// Copyright © 2018 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2019 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -309,11 +309,8 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
     } else {
         selector.select_all_trees(data);
     }
-    threshold_ = selector.get_threshold();
-    loglik_ = selector.get_loglik();
-    nobs_ = data.rows();
-    vine_struct_ = selector.get_rvine_structure();
-    pair_copulas_ = selector.get_pair_copulas();
+
+    finalize_fit(selector);
 }
 
 //! automatically selects all pair-copula families and fits all parameters.
@@ -327,22 +324,15 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
     check_data_dim(data);
 
     if (vine_struct_.get_trunc_lvl() > 0) {
-        auto order = vine_struct_.get_order();
-        auto newdata = data;
-        for (size_t j = 0; j < d_; ++j)
-            newdata.col(j) = data.col(order[j] - 1);
-
-        tools_select::FamilySelector selector(newdata, vine_struct_, controls);
+        tools_select::FamilySelector selector(data, vine_struct_, controls);
         if (controls.needs_sparse_select()) {
-            selector.sparse_select_all_trees(newdata);
+            selector.sparse_select_all_trees(data);
             vine_struct_ = selector.get_rvine_structure(); // can be truncated
         } else {
-            selector.select_all_trees(newdata);
+            selector.select_all_trees(data);
         }
-        threshold_ = selector.get_threshold();
-        loglik_ = selector.get_loglik();
-        nobs_ = data.rows();
-        pair_copulas_ = selector.get_pair_copulas();
+
+        finalize_fit(selector);
     }
 }
 
@@ -648,12 +638,12 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
     size_t n = u.rows();
 
     // info about the vine structure (reverse rows (!) for more natural indexing)
-    size_t trunc_lvl = pair_copulas_.size();
+    size_t trunc_lvl = vine_struct_.get_trunc_lvl();
     std::vector<size_t> order;
-    TriangularArray<size_t> no_matrix, min_array, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_array, min_array, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         order = vine_struct_.get_order();
-        no_matrix = vine_struct_.get_struct_array();
+        no_array = vine_struct_.get_struct_array();
         min_array = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -682,7 +672,7 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
                 // computed in previous tree level)
                 size_t m = min_array(tree, edge);
                 u_e.col(0) = hfunc2.col(edge);
-                if (m == no_matrix(tree, edge)) {
+                if (m == no_array(tree, edge)) {
                     u_e.col(1) = hfunc2.col(m - 1);
                 } else {
                     u_e.col(1) = hfunc1.col(m - 1);
@@ -894,13 +884,13 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
     size_t n = u.rows();
 
     // info about the vine structure (reverse rows (!) for more natural indexing)
-    size_t trunc_lvl = pair_copulas_.size();
+    size_t trunc_lvl = vine_struct_.get_trunc_lvl();
     std::vector<size_t> order, inverse_order;
-    TriangularArray<size_t> no_matrix, min_array, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_array, min_array, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         order = vine_struct_.get_order();
         inverse_order = tools_stl::invert_permutation(order);
-        no_matrix = vine_struct_.get_struct_array();
+        no_array = vine_struct_.get_struct_array();
         min_array = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -923,7 +913,7 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
                 // computed in previous tree level)
                 size_t m = min_array(tree, edge);
                 u_e.col(0) = hfunc2.block(b.begin, edge, b.size, 1);
-                if (m == no_matrix(tree, edge)) {
+                if (m == no_array(tree, edge)) {
                     u_e.col(1) = hfunc2.block(b.begin, m - 1, b.size, 1);
                 } else {
                     u_e.col(1) = hfunc1.block(b.begin, m - 1, b.size, 1);
@@ -999,13 +989,13 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
     }
 
     // info about the vine structure (in upper triangular matrix notation)
-    size_t trunc_lvl = pair_copulas_.size();
+    size_t trunc_lvl = vine_struct_.get_trunc_lvl();
     std::vector<size_t> order, inverse_order;
-    TriangularArray<size_t> no_matrix, min_array, needed_hfunc1, needed_hfunc2;
+    TriangularArray<size_t> no_array, min_array, needed_hfunc1, needed_hfunc2;
     if (trunc_lvl > 0) {
         order = vine_struct_.get_order();
         inverse_order = tools_stl::invert_permutation(order);
-        no_matrix = vine_struct_.get_struct_array();
+        no_array = vine_struct_.get_struct_array();
         min_array = vine_struct_.get_min_array();
         needed_hfunc1 = vine_struct_.get_needed_hfunc1();
         needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -1036,7 +1026,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
                 Eigen::MatrixXd U_e(b.size, 2);
                 size_t m = min_array(tree, var);
                 U_e.col(0) = hinv2(tree + 1, var);
-                if (m == no_matrix(tree, var)) {
+                if (m == no_array(tree, var)) {
                     U_e.col(1) = hinv2(tree, m - 1);
                 } else {
                     U_e.col(1) = hfunc1(tree, m - 1);
@@ -1107,6 +1097,15 @@ inline  void Vinecop::check_pair_copulas_rvine_structure(
     }
 }
 
+inline void Vinecop::finalize_fit(const tools_select::VinecopSelector& selector)
+{
+    vine_struct_ = selector.get_rvine_structure();
+    threshold_ = selector.get_threshold();
+    loglik_ = selector.get_loglik();
+    nobs_ = selector.get_nobs();
+    pair_copulas_ = selector.get_pair_copulas();
+}
+
 //! checks if weights are compatible with the data
 inline void Vinecop::check_weights_size(const Eigen::VectorXd& weights,
                                       const Eigen::MatrixXd& data) const
@@ -1126,7 +1125,7 @@ inline void Vinecop::check_enough_data(const Eigen::MatrixXd& data) const
 
 //! truncate the vine copula model.
 //! @param trunc_lvl the truncation level.
-//! If the model is already truncated at a level less than `trunc_lvl`, 
+//! If the model is already truncated at a level less than `trunc_lvl`,
 //! the function does nothing.
 inline void Vinecop::truncate(size_t trunc_lvl)
 {
