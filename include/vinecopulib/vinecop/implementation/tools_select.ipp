@@ -340,13 +340,7 @@ inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
                                             const FitControlsVinecop &controls)
     : VinecopSelector(data, controls)
 {
-    n_ = data.rows();
-    d_ = data.cols();
     vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
-    trees_.resize(1);
-    controls_ = controls;
-    threshold_ = controls.get_threshold();
-    psi0_ = controls.get_psi0();
 }
 
 //! Add edges allowed by the proximity condition
