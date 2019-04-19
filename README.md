@@ -27,8 +27,8 @@ Advantages over VineCopula are
 
 #### Status
 
-Version [0.3.0](https://github.com/vinecopulib/vinecopulib/releases) was
-released on August 9, 2018. While we did our best to
+Version [0.3.1](https://github.com/vinecopulib/vinecopulib/releases) was
+released on April 5, 2019. While we did our best to
 design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for
 [R](https://github.com/vinecopulib/rvinecopulib) and
@@ -39,6 +39,7 @@ changes are to be expected. We are also working on interfaces for
 If you have any questions regarding the library, feel free to
 [open an issue](https://github.com/vinecopulib/vinecopulib/issues/new) or
 send a mail to <info@vinecopulib.org>.
+
 
 
 # Documentation
@@ -78,7 +79,7 @@ To build the library, you'll need at minimum:
    * [Eigen 3.3 (or later)](http://eigen.tuxfamily.org/index.php?title=Main_Page)
 
 Optionally, you'll need:
-   * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (to build the documentations)
+   * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) and [graphviz](https://www.graphviz.org/) (to build the documentations)
    * [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
 
 Note that:
@@ -129,8 +130,12 @@ make doc && sudo make install && bin/test_all`
 | Run unit tests (optional)  |  `bin/[test_executable]` |
 
 To install the library without unit tests, the `MakeFile` can be created via
- `cmake .. -DBUILD_TESTING=OFF`. Additionally, a `Debug` mode is available via 
- `cmake .. -DCMAKE_BUILD_TYPE=Debug`.
+ `cmake .. -DBUILD_TESTING=OFF`. 
+ Additionally, a `Debug` mode is available via 
+ `cmake .. -DCMAKE_BUILD_TYPE=Debug`; to enable strict compiler warnings, use 
+ `-DSTRICT_COMPILER=ON`.
+ Finally, note that using `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` is useful if 
+ one is interested in using autocomplete or linting when working with the library.
 
 On Windows, CMake will generate Visual Studio files instead of Makefiles,
 the following sequence of commands can be used to perform compilation using the command prompt:
@@ -515,24 +520,24 @@ described [below](#fit-and-select-a-vine-copula-model).
 ### How to read the R-vine matrix
 
 The R-vine matrix notation in vinecopulib is different from the one in VineCopula.
-An example matrix is
+An exemplary array is
 ```
-1 1 1 1
-2 2 2 0
-3 3 0 0
-4 0 0 0
+4 4 4 4
+3 3 3 
+2 2 
+1 
 ```
 which encodes the following pair-copulas:
-
+```
 | tree | edge | pair-copulas   |
 |------|------|----------------|
-| 0    | 0    | `(4, 1)`       |
-|      | 1    | `(3, 1)`       |
-|      | 2    | `(2, 1)`       |
-| 1    | 0    | `(4, 2; 1)`    |
-|      | 1    | `(3, 2; 1)`    |
-| 2    | 0    | `(4, 3; 2, 1)` |
-
+| 0    | 0    | `(1, 4)`       |
+|      | 1    | `(2, 4)`       |
+|      | 2    | `(3, 4)`       |
+| 1    | 0    | `(1, 3; 4)`    |
+|      | 1    | `(2, 3; 4)`    |
+| 2    | 0    | `(1, 2; 3, 4)` |
+```
 Denoting by `M[i, j]` the matrix entry in row `i` and column `j`, the pair-copula index for edge `e` in tree `t` of a `d` dimensional vine is
 `(M[d - 1 - t, e], M[t, e]; M[t - 1, e], ..., M[0, e])`. Less formally,
 1. Start with the counter-diagonal element of column `e` (first conditioned
@@ -586,9 +591,9 @@ Note that the second argument to `select_all()` and `select_families()` is
 similar to the one of `select()` for `Bicop` objects. Objects of the class
 `FitControlsVinecop` inherit from `FitControlsBicop` and extend them with 
 additional data members to control the structure selection:
-* `int truncation_level` describes the tree after which `family_set` is set to
+* `size_t trunc_lvl` describes the tree after which `family_set` is set to
 `{BicopFamily::indep}`. In other words, all pair copulas in trees lower than
-`truncation_level` (default to none) are "selected" as independence copulas.
+`trunc_lvl` (default to none) are "selected" as independence copulas.
 * `std::string tree_criterion` describes the criterion used to construct the
 minimum spanning tree (see
 [Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf)).
@@ -596,7 +601,7 @@ It can take `"tau"` (default) for Kendall's tau, `"rho"` for Spearman's rho,
 or `"hoeffd"` for Hoeffding's D (suited for non-monotonic relationships).
 * `double threshold` describes a value (default is 0) of `tree_criterion` under
 which the corresponding pair-copula is set to independence.
-* `bool select_truncation_level` can be set to true to select the truncation
+* `bool select_trunc_lvl` can be set to true to select the truncation
 level automatically (default is `false`).
 * `bool select_threshold` can be set to true to select the threshold parameter
 automatically (default is `false`).
@@ -629,7 +634,7 @@ M << 1, 1, 1, 1,
 // Kendall's tau inversion for parameters
 // estimation and a truncation after the second tree
 FitControlsVinecop controls(bicop_families::itau, "itau");
-controls.set_truncation_level(2);
+controls.set_trunc_lvl(2);
 controls.set_num_threads(4);  // parallelize with 4 threads
 Vinecop custom_vine(data, M, controls);
 ```

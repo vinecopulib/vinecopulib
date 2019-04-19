@@ -1,10 +1,55 @@
+# vinecopulib 0.3.1 (April 5, 2019)
+
+NEW FEATURES
+
+    * refactoring for enhanced extensibility of the class `Vinecop` (#407)
+
+    * add an `str` method to `RVineStructure` (#406) 
+
+    * simplify algorithms by reversing definition of natural order (#387)
+
+    * improve selection of truncation level (#373)
+
+    * add truncate methods for `TriangularArray`, `RVineStructure` and `Vinecop` (#372)
+
+DEPRECATED FUNCTIONS
+
+    * `FitControlsVinecop` methods like `get_truncation_level()` are now 
+      deprecated in favor of the shorter `get_trunc_lvl()` versions.
+
+BUG FIXES
+
+    * fix triangular array print method (#405)
+
+    * fix potential nan when using Kendall's tau inversion to fit (#403)
+
+    * stabilize clayton pdf close to independence (#402)
+
+    * fix warning-generating typos in the tests (#391)
+
+    * fix deprecated warnings from gtest (#390)
+
+    * initializer list constructor for `VinecopSelector` (#384)
+
+    * fix baseline criterion in `Bicop::select()` (#382)
+
+    * use the `trunc_lvl` of `vine_struct` in `select_families` (#380)
+
+    * fix incompatible size (#378)
+
+    * remove definitions of `pairwise_rho` and `pairwise_hoeffd` (#375)
+
+    * fix windows warnings (#371)
+
+    * use `std::log()` (#370)
+
 # vinecopulib 0.3.0 (August 9, 2018)
 
 NEW FEATURES
 
    * new function `Vinecop::rosenblatt()` for computing the Rosenblatt 
      transformation (#367).
-  
+
    * faster algorithms for nonparametric copulas based on bilinear interpolation
      (#357).
 
