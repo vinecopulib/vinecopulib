@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_856640eeb2fa8464ec5cdb8b89c9010f" kind="dir">
+    <compoundname>dev/cpp/vinecopulib</compoundname>
+    <innerdir refid="dir_0b482f4f14857740cbd592d70e7606ba">dev/cpp/vinecopulib/include</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="dev/cpp/vinecopulib/"/>
+  </compounddef>
+</doxygen>

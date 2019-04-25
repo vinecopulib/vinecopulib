@@ -1,5 +1,4 @@
 /** @file mainpage.h
-* @brief api_docs
 *
 */
 /** @mainpage vinecopulib: a C++ library for vine copula modeling

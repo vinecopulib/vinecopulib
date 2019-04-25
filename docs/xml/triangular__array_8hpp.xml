@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="triangular__array_8hpp" kind="file" language="C++">
+    <compoundname>triangular_array.hpp</compoundname>
+    <includes local="no">vinecopulib/misc/tools_stl.hpp</includes>
+    <includes local="no">iostream</includes>
+    <includes local="no">stdexcept</includes>
+    <includedby refid="rvine__structure_8hpp" local="no">include/vinecopulib/vinecop/rvine_structure.hpp</includedby>
+    <incdepgraph>
+      <node id="260">
+        <label>include/vinecopulib/misc/triangular_array.hpp</label>
+        <link refid="triangular__array_8hpp"/>
+        <childnode refid="261" relation="include">
+        </childnode>
+        <childnode refid="262" relation="include">
+        </childnode>
+        <childnode refid="263" relation="include">
+        </childnode>
+      </node>
+      <node id="263">
+        <label>stdexcept</label>
+      </node>
+      <node id="262">
+        <label>iostream</label>
+      </node>
+      <node id="261">
+        <label>vinecopulib/misc/tools_stl.hpp</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="264">
+        <label>include/vinecopulib/misc/triangular_array.hpp</label>
+        <link refid="triangular__array_8hpp"/>
+        <childnode refid="265" relation="include">
+        </childnode>
+      </node>
+      <node id="267">
+        <label>include/vinecopulib.hpp</label>
+        <link refid="vinecopulib_8hpp_source"/>
+      </node>
+      <node id="266">
+        <label>include/vinecopulib/vinecop/class.hpp</label>
+        <link refid="vinecop_2class_8hpp_source"/>
+        <childnode refid="267" relation="include">
+        </childnode>
+      </node>
+      <node id="265">
+        <label>include/vinecopulib/vinecop/rvine_structure.hpp</label>
+        <link refid="rvine__structure_8hpp_source"/>
+        <childnode refid="266" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classvinecopulib_1_1_triangular_array" prot="public">vinecopulib::TriangularArray</innerclass>
+    <innernamespace refid="namespacevinecopulib">vinecopulib</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/vinecopulib/misc/triangular_array.hpp"/>
+  </compounddef>
+</doxygen>

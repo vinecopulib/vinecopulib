@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_0938a55f3633eaaa9a374f4c2d52bb71" kind="dir">
+    <compoundname>vinecopulib/include/vinecopulib/vinecop/implementation</compoundname>
+    <innerfile refid="vinecop_2implementation_2class_8ipp">class.ipp</innerfile>
+    <innerfile refid="vinecop_2implementation_2fit__controls_8ipp">fit_controls.ipp</innerfile>
+    <innerfile refid="rvine__structure_8ipp">rvine_structure.ipp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="vinecopulib/include/vinecopulib/vinecop/implementation/"/>
+  </compounddef>
+</doxygen>

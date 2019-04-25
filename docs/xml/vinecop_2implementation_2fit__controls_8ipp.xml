@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="vinecop_2implementation_2fit__controls_8ipp" kind="file" language="C++">
+    <compoundname>fit_controls.ipp</compoundname>
+    <includes local="no">vinecopulib/misc/tools_stl.hpp</includes>
+    <includes local="no">stdexcept</includes>
+    <includedby refid="vinecop_2fit__controls_8hpp" local="no">include/vinecopulib/vinecop/fit_controls.hpp</includedby>
+    <incdepgraph>
+      <node id="210">
+        <label>stdexcept</label>
+      </node>
+      <node id="208">
+        <label>include/vinecopulib/vinecop/implementation/fit_controls.ipp</label>
+        <link refid="vinecop_2implementation_2fit__controls_8ipp"/>
+        <childnode refid="209" relation="include">
+        </childnode>
+        <childnode refid="210" relation="include">
+        </childnode>
+      </node>
+      <node id="209">
+        <label>vinecopulib/misc/tools_stl.hpp</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="211">
+        <label>include/vinecopulib/vinecop/implementation/fit_controls.ipp</label>
+        <link refid="vinecop_2implementation_2fit__controls_8ipp"/>
+        <childnode refid="212" relation="include">
+        </childnode>
+      </node>
+      <node id="212">
+        <label>include/vinecopulib/vinecop/fit_controls.hpp</label>
+        <link refid="vinecop_2fit__controls_8hpp_source"/>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespacevinecopulib">vinecopulib</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/vinecopulib/vinecop/implementation/fit_controls.ipp"/>
+  </compounddef>
+</doxygen>

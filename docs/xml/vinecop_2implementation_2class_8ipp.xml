@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="vinecop_2implementation_2class_8ipp" kind="file" language="C++">
+    <compoundname>class.ipp</compoundname>
+    <includes local="no">vinecopulib/misc/tools_stl.hpp</includes>
+    <includes refid="tools__stats_8hpp" local="no">vinecopulib/misc/tools_stats.hpp</includes>
+    <includes local="no">vinecopulib/misc/tools_interface.hpp</includes>
+    <includes local="no">stdexcept</includes>
+    <includedby refid="vinecop_2class_8hpp" local="no">include/vinecopulib/vinecop/class.hpp</includedby>
+    <incdepgraph>
+      <node id="182">
+        <label>vinecopulib/misc/tools_interface.hpp</label>
+      </node>
+      <node id="180">
+        <label>unsupported/Eigen/FFT</label>
+      </node>
+      <node id="176">
+        <label>vinecopulib/misc/tools_eigen.hpp</label>
+      </node>
+      <node id="183">
+        <label>stdexcept</label>
+      </node>
+      <node id="173">
+        <label>vinecopulib/misc/tools_stats.hpp</label>
+        <link refid="tools__stats_8hpp_source"/>
+        <childnode refid="174" relation="include">
+        </childnode>
+        <childnode refid="175" relation="include">
+        </childnode>
+        <childnode refid="176" relation="include">
+        </childnode>
+        <childnode refid="177" relation="include">
+        </childnode>
+      </node>
+      <node id="181">
+        <label>wdm/eigen.hpp</label>
+      </node>
+      <node id="175">
+        <label>random</label>
+      </node>
+      <node id="174">
+        <label>boost/math/distributions.hpp</label>
+      </node>
+      <node id="177">
+        <label>vinecopulib/misc/implementation/tools_stats.ipp</label>
+        <link refid="tools__stats_8ipp_source"/>
+        <childnode refid="178" relation="include">
+        </childnode>
+        <childnode refid="179" relation="include">
+        </childnode>
+        <childnode refid="172" relation="include">
+        </childnode>
+        <childnode refid="180" relation="include">
+        </childnode>
+        <childnode refid="181" relation="include">
+        </childnode>
+      </node>
+      <node id="179">
+        <label>vinecopulib/misc/tools_stats_sobol.hpp</label>
+        <link refid="tools__stats__sobol_8hpp_source"/>
+      </node>
+      <node id="178">
+        <label>vinecopulib/misc/tools_stats_ghalton.hpp</label>
+        <link refid="tools__stats__ghalton_8hpp_source"/>
+      </node>
+      <node id="172">
+        <label>vinecopulib/misc/tools_stl.hpp</label>
+      </node>
+      <node id="171">
+        <label>include/vinecopulib/vinecop/implementation/class.ipp</label>
+        <link refid="vinecop_2implementation_2class_8ipp"/>
+        <childnode refid="172" relation="include">
+        </childnode>
+        <childnode refid="173" relation="include">
+        </childnode>
+        <childnode refid="182" relation="include">
+        </childnode>
+        <childnode refid="183" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="186">
+        <label>include/vinecopulib.hpp</label>
+        <link refid="vinecopulib_8hpp_source"/>
+      </node>
+      <node id="185">
+        <label>include/vinecopulib/vinecop/class.hpp</label>
+        <link refid="vinecop_2class_8hpp_source"/>
+        <childnode refid="186" relation="include">
+        </childnode>
+      </node>
+      <node id="184">
+        <label>include/vinecopulib/vinecop/implementation/class.ipp</label>
+        <link refid="vinecop_2implementation_2class_8ipp"/>
+        <childnode refid="185" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespacevinecopulib">vinecopulib</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/vinecopulib/vinecop/implementation/class.ipp"/>
+  </compounddef>
+</doxygen>

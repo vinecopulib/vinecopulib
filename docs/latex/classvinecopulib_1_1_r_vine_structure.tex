@@ -1,0 +1,282 @@
+\hypertarget{classvinecopulib_1_1_r_vine_structure}{}\section{vinecopulib\+:\+:R\+Vine\+Structure Class Reference}
+\label{classvinecopulib_1_1_r_vine_structure}\index{vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}}
+
+
+R-\/vine structures.  
+
+
+
+
+{\ttfamily \#include $<$rvine\+\_\+structure.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classvinecopulib_1_1_r_vine_structure_a271688bc56e2950d5a27213f4b5f9fda}{R\+Vine\+Structure} (const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&mat, bool check=true)
+\begin{DoxyCompactList}\small\item\em instantiates an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object from a matrix representing an R-\/vine array. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_r_vine_structure_aa7e6b14379d8eed772e63c6944e3f610}{R\+Vine\+Structure} (const std\+::vector$<$ size\+\_\+t $>$ \&order, bool check=true)
+\begin{DoxyCompactList}\small\item\em instantiates an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object to a D-\/vine with given ordering of variables. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_r_vine_structure_a0fb1958f6971b01776133af60ee20ee7}{R\+Vine\+Structure} (const std\+::vector$<$ size\+\_\+t $>$ \&order, const \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \&\hyperlink{classvinecopulib_1_1_r_vine_structure_a00835cb9e06ca80bfff9c89100a1bb56}{struct\+\_\+array}, bool is\+\_\+natural\+\_\+order=false, bool check=true)
+\begin{DoxyCompactList}\small\item\em instantiates an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object from the variable order (diagonal elements of the R-\/vine array) and a triangular structure array (all elements above the diagonal). \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_ac2cd2c83b9ffafb9c6563f1923aa1835}\label{classvinecopulib_1_1_r_vine_structure_ac2cd2c83b9ffafb9c6563f1923aa1835}} 
+size\+\_\+t \hyperlink{classvinecopulib_1_1_r_vine_structure_ac2cd2c83b9ffafb9c6563f1923aa1835}{get\+\_\+dim} () const
+\begin{DoxyCompactList}\small\item\em extract the dimension of the vine. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_a6c691b843017f85b7067fcbe0fae55d0}\label{classvinecopulib_1_1_r_vine_structure_a6c691b843017f85b7067fcbe0fae55d0}} 
+size\+\_\+t \hyperlink{classvinecopulib_1_1_r_vine_structure_a6c691b843017f85b7067fcbe0fae55d0}{get\+\_\+trunc\+\_\+lvl} () const
+\begin{DoxyCompactList}\small\item\em extract the truncation level of the vine. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_aed7d73a5bf50b95a6166f42e0f8df9a9}\label{classvinecopulib_1_1_r_vine_structure_aed7d73a5bf50b95a6166f42e0f8df9a9}} 
+std\+::vector$<$ size\+\_\+t $>$ \hyperlink{classvinecopulib_1_1_r_vine_structure_aed7d73a5bf50b95a6166f42e0f8df9a9}{get\+\_\+order} () const
+\begin{DoxyCompactList}\small\item\em extract the order of variables in the vine (diagonal entries in the R-\/vine array). \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_a1f04ff64c8cf56fa32173ed0fccbbe46}\label{classvinecopulib_1_1_r_vine_structure_a1f04ff64c8cf56fa32173ed0fccbbe46}} 
+\hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \hyperlink{classvinecopulib_1_1_r_vine_structure_a1f04ff64c8cf56fa32173ed0fccbbe46}{get\+\_\+struct\+\_\+array} () const
+\begin{DoxyCompactList}\small\item\em extract structure array (all elements above the diagonal in the R-\/vine array). \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \hyperlink{classvinecopulib_1_1_r_vine_structure_aaebebea9982629eb81223d18b0b9d905}{get\+\_\+min\+\_\+array} () const
+\begin{DoxyCompactList}\small\item\em extracts the minimum array. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \hyperlink{classvinecopulib_1_1_r_vine_structure_a71e339dae0c4ea4338c731a0dfa70780}{get\+\_\+needed\+\_\+hfunc1} () const
+\begin{DoxyCompactList}\small\item\em extracts an array indicating which of the first h-\/functions are needed. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \hyperlink{classvinecopulib_1_1_r_vine_structure_aa935d78845713014d7aaf6a6aa1a9a8f}{get\+\_\+needed\+\_\+hfunc2} () const
+\begin{DoxyCompactList}\small\item\em extracts an array indicating which of the second h-\/functions are needed. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_a37325d7485875cf823c288400c351699}\label{classvinecopulib_1_1_r_vine_structure_a37325d7485875cf823c288400c351699}} 
+Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{classvinecopulib_1_1_r_vine_structure_a37325d7485875cf823c288400c351699}{get\+\_\+matrix} () const
+\begin{DoxyCompactList}\small\item\em extract the R-\/vine matrix representation. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{classvinecopulib_1_1_r_vine_structure_a00835cb9e06ca80bfff9c89100a1bb56}{struct\+\_\+array} (size\+\_\+t tree, size\+\_\+t edge) const
+\begin{DoxyCompactList}\small\item\em access elements of the structure array. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{classvinecopulib_1_1_r_vine_structure_a4c67417a03be525c7c64ebcc884b87fc}{min\+\_\+array} (size\+\_\+t tree, size\+\_\+t edge) const
+\begin{DoxyCompactList}\small\item\em access elements of the minimum array. \end{DoxyCompactList}\item 
+void \hyperlink{classvinecopulib_1_1_r_vine_structure_a7580c0663ac702f718944de2a0fcd1d3}{truncate} (size\+\_\+t trunc\+\_\+lvl)
+\begin{DoxyCompactList}\small\item\em truncates the R-\/vine structure. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_a488bcaf1868f79f733e812f80445199e}\label{classvinecopulib_1_1_r_vine_structure_a488bcaf1868f79f733e812f80445199e}} 
+std\+::string \hyperlink{classvinecopulib_1_1_r_vine_structure_a488bcaf1868f79f733e812f80445199e}{str} () const
+\begin{DoxyCompactList}\small\item\em converts the structure to a string representation (most useful for printing). \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+R-\/vine structures. 
+
+\hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} objects encode the tree structure of the vine, i.\+e. the conditioned/conditioning variables of each edge. It is represented by a triangular array. An exemplary array is 
+\begin{DoxyCode}
+4 4 4 4
+3 3 3
+2 2
+1
+\end{DoxyCode}
+ which encodes the following pair-\/copulas\+: 
+\begin{DoxyCode}
+| tree | edge | pair-copulas   |
+|------|------|----------------|
+| 0    | 0    | `(1, 4)`       |
+|      | 1    | `(2, 4)`       |
+|      | 2    | `(3, 4)`       |
+| 1    | 0    | `(1, 3; 4)`    |
+|      | 1    | `(2, 3; 4)`    |
+| 2    | 0    | `(1, 2; 3, 4)` |
+\end{DoxyCode}
+ Denoting by {\ttfamily M\mbox{[}i, j\mbox{]}} the array entry in row {\ttfamily i} and column {\ttfamily j}, the pair-\/copula index for edge {\ttfamily e} in tree {\ttfamily t} of a {\ttfamily d} dimensional vine is {\ttfamily (M\mbox{[}d -\/ 1 -\/ t, e\mbox{]}, M\mbox{[}t, e\mbox{]}; M\mbox{[}t -\/ 1, e\mbox{]}, ..., M\mbox{[}0, e\mbox{]})}. Less formally,
+\begin{DoxyEnumerate}
+\item Start with the counter-\/diagonal element of column {\ttfamily e} (first conditioned variable).
+\item Jump up to the element in row {\ttfamily t} (second conditioned variable).
+\item Gather all entries further up in column {\ttfamily e} (conditioning set).
+\end{DoxyEnumerate}
+
+A valid R-\/vine array must satisfy several conditions which are checked when {\ttfamily R\+Vine\+Structure()} is called\+:
+\begin{DoxyEnumerate}
+\item It only contains numbers between 1 and d.
+\item The diagonal must contain the numbers 1, ..., d.
+\item The diagonal entry of a column must not be contained in any column further to the right.
+\item The entries of a column must be contained in all columns to the left.
+\item The proximity condition must hold\+: For all t = 1, ..., d -\/ 2 and e = 0, ..., d -\/ t -\/ 1 there must exist an index j $>$ d, such that {\ttfamily (M\mbox{[}t, e\mbox{]}, \{M\mbox{[}0, e\mbox{]}, ..., M\mbox{[}t-\/1, e\mbox{]}\})} equals either {\ttfamily (M\mbox{[}d-\/j-\/1, j\mbox{]}, \{M\mbox{[}0, j\mbox{]}, ..., M\mbox{[}t-\/1, j\mbox{]}\})} or {\ttfamily (M\mbox{[}t-\/1, j\mbox{]}, \{M\mbox{[}d-\/j-\/1, j\mbox{]}, M\mbox{[}0, j\mbox{]}, ..., M\mbox{[}t-\/2, j\mbox{]}\})}.
+\end{DoxyEnumerate}
+
+An R-\/vine array is said to be in natural order when the anti-\/diagonal entries are $ 1, \dots, d $ (from left to right). The exemplary arrray above is in natural order. Any R-\/vine array can be characterized by the diagonal entries (called order) and the entries below the diagonal of the corresponding R-\/vine array in natural order. Since most algorithms work with the structure in natural order, this is how \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} stores the structure internally. 
+
+Definition at line 65 of file rvine\+\_\+structure.\+hpp.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_a271688bc56e2950d5a27213f4b5f9fda}\label{classvinecopulib_1_1_r_vine_structure_a271688bc56e2950d5a27213f4b5f9fda}} 
+\index{vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}!R\+Vine\+Structure@{R\+Vine\+Structure}}
+\index{R\+Vine\+Structure@{R\+Vine\+Structure}!vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}}
+\subsubsection{\texorpdfstring{R\+Vine\+Structure()}{RVineStructure()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily vinecopulib\+::\+R\+Vine\+Structure\+::\+R\+Vine\+Structure (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{mat,  }\item[{bool}]{check = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+instantiates an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object from a matrix representing an R-\/vine array. 
+
+The matrix must contain zeros in the lower right triangle and the upper left triangle must be a valid R-\/vine array. Truncated vines can be encoded by putting zeros above the digonal in all rows below the truncation level. Example of a 1-\/truncated matrix\+: 
+\begin{DoxyCode}
+4 4 4 4
+0 0 3 0
+0 2 0 0
+1 0 0 0
+\end{DoxyCode}
+ 
+\begin{DoxyParams}{Parameters}
+{\em mat} & a matrix representing a valid R-\/vine array. \\
+\hline
+{\em check} & whether {\ttfamily mat} shall be checked for validity. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 24 of file rvine\+\_\+structure.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_aa7e6b14379d8eed772e63c6944e3f610}\label{classvinecopulib_1_1_r_vine_structure_aa7e6b14379d8eed772e63c6944e3f610}} 
+\index{vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}!R\+Vine\+Structure@{R\+Vine\+Structure}}
+\index{R\+Vine\+Structure@{R\+Vine\+Structure}!vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}}
+\subsubsection{\texorpdfstring{R\+Vine\+Structure()}{RVineStructure()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily vinecopulib\+::\+R\+Vine\+Structure\+::\+R\+Vine\+Structure (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ size\+\_\+t $>$ \&}]{order,  }\item[{bool}]{check = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+instantiates an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object to a D-\/vine with given ordering of variables. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em order} & the order of variables in the D-\/vine (diagonal entries in the R-\/vine array); must be a permutation of 1, ..., d. \\
+\hline
+{\em check} & whether `order shall be checked for validity. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 62 of file rvine\+\_\+structure.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_a0fb1958f6971b01776133af60ee20ee7}\label{classvinecopulib_1_1_r_vine_structure_a0fb1958f6971b01776133af60ee20ee7}} 
+\index{vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}!R\+Vine\+Structure@{R\+Vine\+Structure}}
+\index{R\+Vine\+Structure@{R\+Vine\+Structure}!vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}}
+\subsubsection{\texorpdfstring{R\+Vine\+Structure()}{RVineStructure()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily vinecopulib\+::\+R\+Vine\+Structure\+::\+R\+Vine\+Structure (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ size\+\_\+t $>$ \&}]{order,  }\item[{const \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \&}]{struct\+\_\+array,  }\item[{bool}]{is\+\_\+natural\+\_\+order = {\ttfamily false},  }\item[{bool}]{check = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+instantiates an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object from the variable order (diagonal elements of the R-\/vine array) and a triangular structure array (all elements above the diagonal). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em order} & the order of variables (diagonal entries in the R-\/vine array); must be a permutation of 1, ..., d. \\
+\hline
+{\em struct\+\_\+array} & the structure array (all elements above the diagonal in the R-\/vine array). For truncated vines, all rows below the truncation level are omitted. \\
+\hline
+{\em is\+\_\+natural\+\_\+order} & whether {\ttfamily struct\+\_\+array} is already in natural order. \\
+\hline
+{\em check} & whether {\ttfamily order} and {\ttfamily struct\+\_\+array} shall be checked for validity. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 97 of file rvine\+\_\+structure.\+ipp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_aaebebea9982629eb81223d18b0b9d905}\label{classvinecopulib_1_1_r_vine_structure_aaebebea9982629eb81223d18b0b9d905}} 
+\index{vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}!get\+\_\+min\+\_\+array@{get\+\_\+min\+\_\+array}}
+\index{get\+\_\+min\+\_\+array@{get\+\_\+min\+\_\+array}!vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}}
+\subsubsection{\texorpdfstring{get\+\_\+min\+\_\+array()}{get\_min\_array()}}
+{\footnotesize\ttfamily \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ vinecopulib\+::\+R\+Vine\+Structure\+::get\+\_\+min\+\_\+array (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the minimum array. 
+
+The minimum array is derived from an R-\/vine array by iteratively computing the (elementwise) minimum of two subsequent rows (starting from the top). It is used in estimation and evaluation algorithms to find the two edges in the previous tree that are joined by the current edge. 
+
+Definition at line 172 of file rvine\+\_\+structure.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_a71e339dae0c4ea4338c731a0dfa70780}\label{classvinecopulib_1_1_r_vine_structure_a71e339dae0c4ea4338c731a0dfa70780}} 
+\index{vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}!get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}}
+\index{get\+\_\+needed\+\_\+hfunc1@{get\+\_\+needed\+\_\+hfunc1}!vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}}
+\subsubsection{\texorpdfstring{get\+\_\+needed\+\_\+hfunc1()}{get\_needed\_hfunc1()}}
+{\footnotesize\ttfamily \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ vinecopulib\+::\+R\+Vine\+Structure\+::get\+\_\+needed\+\_\+hfunc1 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts an array indicating which of the first h-\/functions are needed. 
+
+(it is usually not necessary to compute both h-\/functions for each pair-\/copula). 
+
+Definition at line 181 of file rvine\+\_\+structure.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_aa935d78845713014d7aaf6a6aa1a9a8f}\label{classvinecopulib_1_1_r_vine_structure_aa935d78845713014d7aaf6a6aa1a9a8f}} 
+\index{vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}!get\+\_\+needed\+\_\+hfunc2@{get\+\_\+needed\+\_\+hfunc2}}
+\index{get\+\_\+needed\+\_\+hfunc2@{get\+\_\+needed\+\_\+hfunc2}!vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}}
+\subsubsection{\texorpdfstring{get\+\_\+needed\+\_\+hfunc2()}{get\_needed\_hfunc2()}}
+{\footnotesize\ttfamily \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ vinecopulib\+::\+R\+Vine\+Structure\+::get\+\_\+needed\+\_\+hfunc2 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts an array indicating which of the second h-\/functions are needed. 
+
+(it is usually not necessary to compute both h-\/functions for each pair-\/copula). 
+
+Definition at line 190 of file rvine\+\_\+structure.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_a4c67417a03be525c7c64ebcc884b87fc}\label{classvinecopulib_1_1_r_vine_structure_a4c67417a03be525c7c64ebcc884b87fc}} 
+\index{vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}!min\+\_\+array@{min\+\_\+array}}
+\index{min\+\_\+array@{min\+\_\+array}!vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}}
+\subsubsection{\texorpdfstring{min\+\_\+array()}{min\_array()}}
+{\footnotesize\ttfamily size\+\_\+t vinecopulib\+::\+R\+Vine\+Structure\+::min\+\_\+array (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{tree,  }\item[{size\+\_\+t}]{edge }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+access elements of the minimum array. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index. \\
+\hline
+{\em edge} & edge index. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 206 of file rvine\+\_\+structure.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_a00835cb9e06ca80bfff9c89100a1bb56}\label{classvinecopulib_1_1_r_vine_structure_a00835cb9e06ca80bfff9c89100a1bb56}} 
+\index{vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}!struct\+\_\+array@{struct\+\_\+array}}
+\index{struct\+\_\+array@{struct\+\_\+array}!vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}}
+\subsubsection{\texorpdfstring{struct\+\_\+array()}{struct\_array()}}
+{\footnotesize\ttfamily size\+\_\+t vinecopulib\+::\+R\+Vine\+Structure\+::struct\+\_\+array (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{tree,  }\item[{size\+\_\+t}]{edge }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+access elements of the structure array. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index. \\
+\hline
+{\em edge} & edge index. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 198 of file rvine\+\_\+structure.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_r_vine_structure_a7580c0663ac702f718944de2a0fcd1d3}\label{classvinecopulib_1_1_r_vine_structure_a7580c0663ac702f718944de2a0fcd1d3}} 
+\index{vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}!truncate@{truncate}}
+\index{truncate@{truncate}!vinecopulib\+::\+R\+Vine\+Structure@{vinecopulib\+::\+R\+Vine\+Structure}}
+\subsubsection{\texorpdfstring{truncate()}{truncate()}}
+{\footnotesize\ttfamily void vinecopulib\+::\+R\+Vine\+Structure\+::truncate (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{trunc\+\_\+lvl }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+truncates the R-\/vine structure. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em trunc\+\_\+lvl} & the truncation level.\\
+\hline
+\end{DoxyParams}
+If the structure is already truncated at a level less than {\ttfamily trunc\+\_\+lvl}, the function does nothing. 
+
+Definition at line 215 of file rvine\+\_\+structure.\+ipp.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/vinecopulib/vinecop/rvine\+\_\+structure.\+hpp\item 
+include/vinecopulib/vinecop/implementation/rvine\+\_\+structure.\+ipp\end{DoxyCompactItemize}

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_f24cbef8a3ae9558b8b3469ecfc5f1f4" kind="dir">
+    <compoundname>vinecopulib/include/vinecopulib</compoundname>
+    <innerdir refid="dir_7fb6bc5aac5ae74429ca3e2a5ec6363d">vinecopulib/include/vinecopulib/bicop</innerdir>
+    <innerdir refid="dir_5d8e286f27bc9d3912c4d20bf0eaf6c1">vinecopulib/include/vinecopulib/misc</innerdir>
+    <innerdir refid="dir_7a28269d1cbf4935028feefbbe536353">vinecopulib/include/vinecopulib/vinecop</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="vinecopulib/include/vinecopulib/"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,764 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classvinecopulib_1_1_fit_controls_vinecop" kind="class" language="C++" prot="public">
+    <compoundname>vinecopulib::FitControlsVinecop</compoundname>
+    <basecompoundref refid="classvinecopulib_1_1_fit_controls_bicop" prot="public" virt="non-virtual">vinecopulib::FitControlsBicop</basecompoundref>
+    <includes refid="vinecop_2fit__controls_8hpp" local="no">fit_controls.hpp</includes>
+      <sectiondef kind="user-defined">
+      <header>Sanity checks</header>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1a07c65b2d38d5c5b717cae502a77dfeb6" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::FitControlsVinecop::check_tree_criterion</definition>
+        <argsstring>(std::string tree_criterion)</argsstring>
+        <name>check_tree_criterion</name>
+        <param>
+          <type>std::string</type>
+          <declname>tree_criterion</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="100" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="125" bodyend="132"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1aefa0ba3708b58e6408a25ae9fbef3984" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::FitControlsVinecop::check_threshold</definition>
+        <argsstring>(double threshold)</argsstring>
+        <name>check_threshold</name>
+        <param>
+          <type>double</type>
+          <declname>threshold</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="102" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="134" bodyend="139"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="user-defined">
+      <header>Getters and setters.</header>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1ace8965fe7c115ac40611f0e46f441a96" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t vinecopulib::FitControlsVinecop::get_trunc_lvl</definition>
+        <argsstring>() const</argsstring>
+        <name>get_trunc_lvl</name>
+        <briefdescription>
+<para>returns the truncation level. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="58" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="146" bodyend="149"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1aaf3f0b43e26f0877e5030afd90e35d1e" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string vinecopulib::FitControlsVinecop::get_tree_criterion</definition>
+        <argsstring>() const</argsstring>
+        <name>get_tree_criterion</name>
+        <briefdescription>
+<para>returns the criterion for tree selection. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="60" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="175" bodyend="178"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1a6c428e61c86c371cee6f98367ff35796" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>double</type>
+        <definition>double vinecopulib::FitControlsVinecop::get_threshold</definition>
+        <argsstring>() const</argsstring>
+        <name>get_threshold</name>
+        <briefdescription>
+<para>returns the threshold parameter. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="62" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="188" bodyend="191"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1a18c66b8801249218f07c3897064f0b5d" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool vinecopulib::FitControlsVinecop::get_select_trunc_lvl</definition>
+        <argsstring>() const</argsstring>
+        <name>get_select_trunc_lvl</name>
+        <briefdescription>
+<para>returns whether to select the truncation level automatically. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="67" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="162" bodyend="165"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1ac2c2854d43466a4d3733c24f282a2e79" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool vinecopulib::FitControlsVinecop::get_select_threshold</definition>
+        <argsstring>() const</argsstring>
+        <name>get_select_threshold</name>
+        <briefdescription>
+<para>returns whether to select the threshold automatically. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="69" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="213" bodyend="216"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1a9757ee81656627a0eb0486c8ff994b7d" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool vinecopulib::FitControlsVinecop::needs_sparse_select</definition>
+        <argsstring>() const</argsstring>
+        <name>needs_sparse_select</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="71" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="224" bodyend="227"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1acb9f0b704c00f79dade119426916abf1" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_fit_controls_bicop" kindref="compound">FitControlsBicop</ref></type>
+        <definition>FitControlsBicop vinecopulib::FitControlsVinecop::get_fit_controls_bicop</definition>
+        <argsstring>() const</argsstring>
+        <name>get_fit_controls_bicop</name>
+        <briefdescription>
+<para>returns the fit controls for bivariate fitting. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="73" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="230" bodyend="240"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1acbeb159acb79f24c71071781000e935f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::FitControlsVinecop::set_trunc_lvl</definition>
+        <argsstring>(size_t trunc_lvl)</argsstring>
+        <name>set_trunc_lvl</name>
+        <param>
+          <type>size_t</type>
+          <declname>trunc_lvl</declname>
+        </param>
+        <briefdescription>
+<para>sets the truncation level. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="77" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="152" bodyend="159"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1ac51c634095193c976135f57822a53069" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::FitControlsVinecop::set_tree_criterion</definition>
+        <argsstring>(std::string tree_criterion)</argsstring>
+        <name>set_tree_criterion</name>
+        <param>
+          <type>std::string</type>
+          <declname>tree_criterion</declname>
+        </param>
+        <briefdescription>
+<para>sets the criterion for tree selection. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="79" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="181" bodyend="185"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1a774ebb065432b9e5f5add91ad3a6b137" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::FitControlsVinecop::set_threshold</definition>
+        <argsstring>(double threshold)</argsstring>
+        <name>set_threshold</name>
+        <param>
+          <type>double</type>
+          <declname>threshold</declname>
+        </param>
+        <briefdescription>
+<para>sets the threshold parameter </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="81" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="194" bodyend="198"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1ac6012b793cf0bc620bd1db57c562baf7" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::FitControlsVinecop::set_select_trunc_lvl</definition>
+        <argsstring>(bool select_trunc_lvl)</argsstring>
+        <name>set_select_trunc_lvl</name>
+        <param>
+          <type>bool</type>
+          <declname>select_trunc_lvl</declname>
+        </param>
+        <briefdescription>
+<para>sets whether to select the truncation level automatically. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="86" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="169" bodyend="172"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1ae07f4c5e566c041d6b2475555313d35f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::FitControlsVinecop::set_select_threshold</definition>
+        <argsstring>(bool select_threshold)</argsstring>
+        <name>set_select_threshold</name>
+        <param>
+          <type>bool</type>
+          <declname>select_threshold</declname>
+        </param>
+        <briefdescription>
+<para>sets whether to select the threshold automatically. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="88" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="219" bodyend="222"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1a6ed63d403dc902119ebe0252ada0be47" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::FitControlsVinecop::set_fit_controls_bicop</definition>
+        <argsstring>(FitControlsBicop controls)</argsstring>
+        <name>set_fit_controls_bicop</name>
+        <param>
+          <type><ref refid="classvinecopulib_1_1_fit_controls_bicop" kindref="compound">FitControlsBicop</ref></type>
+          <declname>controls</declname>
+        </param>
+        <briefdescription>
+<para>sets the fit controls for bivariate fitting. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="90" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="244" bodyend="250"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classvinecopulib_1_1_fit_controls_vinecop_1a92d169955bc5a73df704febdaa083db9" prot="private" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t vinecopulib::FitControlsVinecop::trunc_lvl_</definition>
+        <argsstring></argsstring>
+        <name>trunc_lvl_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="93" column="1" bodyfile="include/vinecopulib/vinecop/fit_controls.hpp" bodystart="93" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classvinecopulib_1_1_fit_controls_vinecop_1a5de4e4bff7e6a57d805848ba949af9ca" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string vinecopulib::FitControlsVinecop::tree_criterion_</definition>
+        <argsstring></argsstring>
+        <name>tree_criterion_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="94" column="1" bodyfile="include/vinecopulib/vinecop/fit_controls.hpp" bodystart="94" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classvinecopulib_1_1_fit_controls_vinecop_1a3a6220c447aaf733c953e39e76bfc826" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double vinecopulib::FitControlsVinecop::threshold_</definition>
+        <argsstring></argsstring>
+        <name>threshold_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="95" column="1" bodyfile="include/vinecopulib/vinecop/fit_controls.hpp" bodystart="95" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classvinecopulib_1_1_fit_controls_vinecop_1ac708bc482cf8d64c4f76762bf6312f52" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool vinecopulib::FitControlsVinecop::select_trunc_lvl_</definition>
+        <argsstring></argsstring>
+        <name>select_trunc_lvl_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="97" column="1" bodyfile="include/vinecopulib/vinecop/fit_controls.hpp" bodystart="97" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classvinecopulib_1_1_fit_controls_vinecop_1ac2627ab2826f5f1c535b776adb5dc8d6" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool vinecopulib::FitControlsVinecop::select_threshold_</definition>
+        <argsstring></argsstring>
+        <name>select_threshold_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="98" column="1" bodyfile="include/vinecopulib/vinecop/fit_controls.hpp" bodystart="98" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1ad101d135c8d8fe66046d931947f45bef" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>vinecopulib::FitControlsVinecop::FitControlsVinecop</definition>
+        <argsstring>()</argsstring>
+        <name>FitControlsVinecop</name>
+        <briefdescription>
+<para>creates default controls for fitting vine copula models. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="29" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="16" bodyend="24"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1a94112587de376b493be4445aab15b7ce" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>vinecopulib::FitControlsVinecop::FitControlsVinecop</definition>
+        <argsstring>(std::vector&lt; BicopFamily &gt; family_set, std::string parametric_method=&quot;mle&quot;, std::string nonparametric_method=&quot;quadratic&quot;, double nonparametric_mult=1.0, size_t trunc_lvl=std::numeric_limits&lt; size_t &gt;::max(), std::string tree_criterion=&quot;tau&quot;, double threshold=0.0, std::string selection_criterion=&quot;bic&quot;, const Eigen::VectorXd &amp;weights=Eigen::VectorXd(), double psi0=0.9, bool preselect_families=true, bool select_trunc_lvl=false, bool select_threshold=false, bool show_trace=false, size_t num_threads=1)</argsstring>
+        <name>FitControlsVinecop</name>
+        <param>
+          <type>std::vector&lt; <ref refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3" kindref="member">BicopFamily</ref> &gt;</type>
+          <declname>family_set</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>parametric_method</declname>
+          <defval>&quot;mle&quot;</defval>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>nonparametric_method</declname>
+          <defval>&quot;quadratic&quot;</defval>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>nonparametric_mult</declname>
+          <defval>1.0</defval>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>trunc_lvl</declname>
+          <defval>std::numeric_limits&lt; size_t &gt;::max()</defval>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>tree_criterion</declname>
+          <defval>&quot;tau&quot;</defval>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>threshold</declname>
+          <defval>0.0</defval>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>selection_criterion</declname>
+          <defval>&quot;bic&quot;</defval>
+        </param>
+        <param>
+          <type>const Eigen::VectorXd &amp;</type>
+          <declname>weights</declname>
+          <defval>Eigen::VectorXd()</defval>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>psi0</declname>
+          <defval>0.9</defval>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>preselect_families</declname>
+          <defval>true</defval>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>select_trunc_lvl</declname>
+          <defval>false</defval>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>select_threshold</declname>
+          <defval>false</defval>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>show_trace</declname>
+          <defval>false</defval>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>num_threads</declname>
+          <defval>1</defval>
+        </param>
+        <briefdescription>
+<para>creates custom controls for fitting vine copula models. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>family_set</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the set of copula families to consider (if empty, then all families are included). </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>parametric_method</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the fit method for parametric families; possible choices: <computeroutput>&quot;mle&quot;</computeroutput>, <computeroutput>&quot;itau&quot;</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>nonparametric_method</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the fit method for the local-likelihood nonparametric family (TLLs); possible choices: <computeroutput>&quot;constant&quot;</computeroutput>, <computeroutput>&quot;linear&quot;</computeroutput>, <computeroutput>&quot;quadratic&quot;</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>nonparametric_mult</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a factor with which the smoothing parameters are multiplied. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>trunc_lvl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>truncation level for truncated vines. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>tree_criterion</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the criterion for selecting the maximum spanning tree (&quot;tau&quot;, &quot;hoeffd&quot;, &quot;rho&quot;, and &quot;mcor&quot; implemented so far). </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>threshold</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>for thresholded vines (0 = no threshold). </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>selection_criterion</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the selection criterion (<computeroutput>&quot;loglik&quot;</computeroutput>, <computeroutput>&quot;aic&quot;</computeroutput> or <computeroutput>&quot;bic&quot;</computeroutput>). </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>weights</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a vector of weights for the observations. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>psi0</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>only for `selection_criterion = &quot;mbic&quot;): prior probability of non-independence. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>preselect_families</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether to exclude families before fitting based on symmetry properties of the data. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>select_trunc_lvl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether the truncation shall be selected automatically. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>select_threshold</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether the threshold parameter shall be selected automatically. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>show_trace</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether to show a trace of the building progress. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>num_threads</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>number of concurrent threads to use while fitting pair copulas within a tree; never uses more than the number returned by <computeroutput>std::thread::hardware_concurrency()</computeroutput>. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="31" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="55" bodyend="87"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1a22cb78b491409cb9ce6e8a17dc21e7b8" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>vinecopulib::FitControlsVinecop::FitControlsVinecop</definition>
+        <argsstring>(const FitControlsBicop &amp;controls, size_t trunc_lvl=std::numeric_limits&lt; size_t &gt;::max(), std::string tree_criterion=&quot;tau&quot;, double threshold=0.0, bool select_trunc_lvl=false, bool select_threshold=false, bool show_trace=false, size_t num_threads=1)</argsstring>
+        <name>FitControlsVinecop</name>
+        <param>
+          <type>const <ref refid="classvinecopulib_1_1_fit_controls_bicop" kindref="compound">FitControlsBicop</ref> &amp;</type>
+          <declname>controls</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>trunc_lvl</declname>
+          <defval>std::numeric_limits&lt; size_t &gt;::max()</defval>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>tree_criterion</declname>
+          <defval>&quot;tau&quot;</defval>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>threshold</declname>
+          <defval>0.0</defval>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>select_trunc_lvl</declname>
+          <defval>false</defval>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>select_threshold</declname>
+          <defval>false</defval>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>show_trace</declname>
+          <defval>false</defval>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>num_threads</declname>
+          <defval>1</defval>
+        </param>
+        <briefdescription>
+<para>creates custom controls for fitting vine copula models. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>trunc_lvl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>truncation level for truncated vines. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>tree_criterion</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the criterion for selecting the maximum spanning tree (&quot;tau&quot;, &quot;hoeffd&quot; and &quot;rho&quot; implemented so far). </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>threshold</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>for thresholded vines (0 = no threshold). </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>show_trace</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether to show a trace of the building progress. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>select_trunc_lvl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether the truncation shall be selected automatically. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>select_threshold</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether the threshold parameter shall be selected automatically. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>controls</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>see <ref refid="classvinecopulib_1_1_fit_controls_bicop" kindref="compound">FitControlsBicop</ref>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>num_threads</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>number of concurrent threads to use while fitting pair copulas within a tree; never uses more than the number returned by <computeroutput>std::thread::hardware_concurrency()</computeroutput>`. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="47" column="1" bodyfile="include/vinecopulib/vinecop/implementation/fit_controls.ipp" bodystart="103" bodyend="120"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1a2d068c9b98774abc720ca90c939ed89c" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>DEPRECATED size_t</type>
+        <definition>DEPRECATED size_t vinecopulib::FitControlsVinecop::get_truncation_level</definition>
+        <argsstring>() const</argsstring>
+        <name>get_truncation_level</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="57" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1a6559330912082c057099138f6ab97991" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>DEPRECATED bool</type>
+        <definition>DEPRECATED bool vinecopulib::FitControlsVinecop::get_select_truncation_level</definition>
+        <argsstring>() const</argsstring>
+        <name>get_select_truncation_level</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="66" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1aaba682be018c86e3d1cf9ebd0f80716d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>DEPRECATED void</type>
+        <definition>DEPRECATED void vinecopulib::FitControlsVinecop::set_truncation_level</definition>
+        <argsstring>(size_t trunc_lvl)</argsstring>
+        <name>set_truncation_level</name>
+        <param>
+          <type>size_t</type>
+          <declname>trunc_lvl</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="76" column="1"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_fit_controls_vinecop_1af359b0ba1ed1e2e2611d1fcffa43eef9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>DEPRECATED void</type>
+        <definition>DEPRECATED void vinecopulib::FitControlsVinecop::set_select_truncation_level</definition>
+        <argsstring>(bool select_trunc_lvl)</argsstring>
+        <name>set_select_truncation_level</name>
+        <param>
+          <type>bool</type>
+          <declname>select_trunc_lvl</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="85" column="1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>A class for controlling fit of bivariate copula models. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="5">
+        <label>vinecopulib::FitControlsVinecop</label>
+        <link refid="classvinecopulib_1_1_fit_controls_vinecop"/>
+        <childnode refid="6" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>vinecopulib::FitControlsBicop</label>
+        <link refid="classvinecopulib_1_1_fit_controls_bicop"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="7">
+        <label>vinecopulib::FitControlsVinecop</label>
+        <link refid="classvinecopulib_1_1_fit_controls_vinecop"/>
+        <childnode refid="8" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>vinecopulib::FitControlsBicop</label>
+        <link refid="classvinecopulib_1_1_fit_controls_bicop"/>
+      </node>
+    </collaborationgraph>
+    <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="26" column="1" bodyfile="include/vinecopulib/vinecop/fit_controls.hpp" bodystart="25" bodyend="103"/>
+    <listofallmembers>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1aefa0ba3708b58e6408a25ae9fbef3984" prot="private" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>check_threshold</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a07c65b2d38d5c5b717cae502a77dfeb6" prot="private" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>check_tree_criterion</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a20f51de5d89278679c2c9aa2bac2a36e" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>FitControlsBicop</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a6a2fc00794c9dd9d598ac9948e7b98e4" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>FitControlsBicop</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1ae87a80323e8f5d3702ab0db42bf8bcb5" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>FitControlsBicop</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ad101d135c8d8fe66046d931947f45bef" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>FitControlsVinecop</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a94112587de376b493be4445aab15b7ce" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>FitControlsVinecop</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a22cb78b491409cb9ce6e8a17dc21e7b8" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>FitControlsVinecop</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1aa3958aa4fe5d2900a14db83224d256b2" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_family_set</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1acb9f0b704c00f79dade119426916abf1" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_fit_controls_bicop</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1af1ff49b3f08edd0ae2986b10956d2067" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_nonparametric_method</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1adb5099d2fad28099872abf75b4f6c7a1" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_nonparametric_mult</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a530b8a58404b7fba0a02e29030c32bee" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_num_threads</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a5b10436f0fb84d8a3276a514c05c8442" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_parametric_method</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1acf45a95368ae735ab70a522b53c0133d" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_preselect_families</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a2c994c101ca1cb8225acd1de233b8f80" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_psi0</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ac2c2854d43466a4d3733c24f282a2e79" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_select_threshold</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a18c66b8801249218f07c3897064f0b5d" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_select_trunc_lvl</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a6559330912082c057099138f6ab97991" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_select_truncation_level</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a03924f690903038302b9f0d73a44210c" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_selection_criterion</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a6c428e61c86c371cee6f98367ff35796" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_threshold</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1aaf3f0b43e26f0877e5030afd90e35d1e" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_tree_criterion</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ace8965fe7c115ac40611f0e46f441a96" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_trunc_lvl</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a2d068c9b98774abc720ca90c939ed89c" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_truncation_level</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a6874e7226c05af5b3a87d8bd49073ba0" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>get_weights</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a9757ee81656627a0eb0486c8ff994b7d" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>needs_sparse_select</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ac2627ab2826f5f1c535b776adb5dc8d6" prot="private" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>select_threshold_</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ac708bc482cf8d64c4f76762bf6312f52" prot="private" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>select_trunc_lvl_</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a39d4e24261da184abf3fa3dd11d1f23b" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_family_set</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a6ed63d403dc902119ebe0252ada0be47" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_fit_controls_bicop</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a5b785f0e3384d224025e754d2f212881" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_nonparametric_method</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a69fa1ff241282cc5a968ff64f0029ae0" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_nonparametric_mult</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1adc395c1123ad4d9ad9cc795d9c34c9a8" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_num_threads</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a722bef09427577ba2f04c91d7e4dba90" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_parametric_method</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a7850b5ba8acaf78109d00789d93cc876" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_preselect_families</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a3421f63a8ec0eed23c7392d16770658e" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_psi0</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ae07f4c5e566c041d6b2475555313d35f" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_select_threshold</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ac6012b793cf0bc620bd1db57c562baf7" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_select_trunc_lvl</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1af359b0ba1ed1e2e2611d1fcffa43eef9" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_select_truncation_level</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1a52c187e5fcf047825ced777d73483df1" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_selection_criterion</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a774ebb065432b9e5f5add91ad3a6b137" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_threshold</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ac51c634095193c976135f57822a53069" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_tree_criterion</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1acbeb159acb79f24c71071781000e935f" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_trunc_lvl</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1aaba682be018c86e3d1cf9ebd0f80716d" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_truncation_level</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_bicop_1abe41e1cf7edfbd0a4dd9031c7a75ea14" prot="public" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>set_weights</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a3a6220c447aaf733c953e39e76bfc826" prot="private" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>threshold_</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a5de4e4bff7e6a57d805848ba949af9ca" prot="private" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>tree_criterion_</name></member>
+      <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a92d169955bc5a73df704febdaa083db9" prot="private" virt="non-virtual"><scope>vinecopulib::FitControlsVinecop</scope><name>trunc_lvl_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

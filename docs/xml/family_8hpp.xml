@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="family_8hpp" kind="file" language="C++">
+    <compoundname>family.hpp</compoundname>
+    <includes local="no">vector</includes>
+    <includes local="no">string</includes>
+    <includes refid="family_8ipp" local="no">vinecopulib/bicop/implementation/family.ipp</includes>
+    <includedby refid="bicop_2fit__controls_8hpp" local="no">include/vinecopulib/bicop/fit_controls.hpp</includedby>
+    <incdepgraph>
+      <node id="112">
+        <label>boost/bimap.hpp</label>
+      </node>
+      <node id="111">
+        <label>stdexcept</label>
+      </node>
+      <node id="110">
+        <label>vinecopulib/bicop/implementation/family.ipp</label>
+        <link refid="family_8ipp_source"/>
+        <childnode refid="111" relation="include">
+        </childnode>
+        <childnode refid="112" relation="include">
+        </childnode>
+        <childnode refid="113" relation="include">
+        </childnode>
+      </node>
+      <node id="109">
+        <label>string</label>
+      </node>
+      <node id="113">
+        <label>boost/assign.hpp</label>
+      </node>
+      <node id="108">
+        <label>vector</label>
+      </node>
+      <node id="107">
+        <label>include/vinecopulib/bicop/family.hpp</label>
+        <link refid="family_8hpp"/>
+        <childnode refid="108" relation="include">
+        </childnode>
+        <childnode refid="109" relation="include">
+        </childnode>
+        <childnode refid="110" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="116">
+        <label>include/vinecopulib/bicop/class.hpp</label>
+        <link refid="bicop_2class_8hpp_source"/>
+        <childnode refid="117" relation="include">
+        </childnode>
+        <childnode refid="118" relation="include">
+        </childnode>
+      </node>
+      <node id="115">
+        <label>include/vinecopulib/bicop/fit_controls.hpp</label>
+        <link refid="bicop_2fit__controls_8hpp_source"/>
+        <childnode refid="116" relation="include">
+        </childnode>
+        <childnode refid="119" relation="include">
+        </childnode>
+      </node>
+      <node id="114">
+        <label>include/vinecopulib/bicop/family.hpp</label>
+        <link refid="family_8hpp"/>
+        <childnode refid="115" relation="include">
+        </childnode>
+      </node>
+      <node id="118">
+        <label>include/vinecopulib.hpp</label>
+        <link refid="vinecopulib_8hpp_source"/>
+      </node>
+      <node id="119">
+        <label>include/vinecopulib/vinecop/fit_controls.hpp</label>
+        <link refid="vinecop_2fit__controls_8hpp_source"/>
+      </node>
+      <node id="117">
+        <label>include/vinecopulib/vinecop/class.hpp</label>
+        <link refid="vinecop_2class_8hpp_source"/>
+        <childnode refid="118" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespacevinecopulib">vinecopulib</innernamespace>
+    <innernamespace refid="namespacevinecopulib_1_1bicop__families">vinecopulib::bicop_families</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/vinecopulib/bicop/family.hpp"/>
+  </compounddef>
+</doxygen>

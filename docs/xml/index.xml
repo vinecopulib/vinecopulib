@@ -1,0 +1,354 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.13">
+  <compound refid="classvinecopulib_1_1_bicop" kind="class"><name>vinecopulib::Bicop</name>
+    <member refid="classvinecopulib_1_1_bicop_1a31b9242bfcff783cff12d1eb89ab82a7" kind="function"><name>get_family</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1afee990e7396b869a168e8508c56cb7f7" kind="function"><name>get_family_name</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1acefff1101f5f2c11731fd887c875e105" kind="function"><name>get_rotation</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a3243687fb4b9b7c02dfbc53b22e24203" kind="function"><name>get_parameters</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a1ac4b29df47b0a09bb8afa230b0eca88" kind="function"><name>get_tau</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a9707a32d415b6df6f4b70550ce5279b1" kind="function"><name>get_loglik</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a8bd6cde26ce8c9ac335b7bb181033d90" kind="function"><name>get_nobs</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a1f76279f4bf59b754c51444cab71bf22" kind="function"><name>get_aic</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a956526f702664b6c821fa6fd7d900ae5" kind="function"><name>get_bic</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a4fd7c3b3ef2960d24b87da8c838df055" kind="function"><name>get_mbic</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a53be89bcc576f0192fe2690af3f6d93c" kind="function"><name>set_rotation</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1ac8d1d4266b0fd7e2f971d0149f881ef9" kind="function"><name>set_parameters</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a0ed8eae71586aefd61b0289be4749322" kind="function"><name>compute_mbic_penalty</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a8d0b6ed59b962d1349c1c2d49b17ccab" kind="function"><name>str</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a59b7087b3857350df25ff684ab96f377" kind="function"><name>flip</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1adeb7facfc26e94b0ad2013e144f0ec0c" kind="variable"><name>bicop_</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a8730514d4d92ef8ec400a3336d5f1f4d" kind="variable"><name>rotation_</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1ac2b04fc8aae2b9c9adb86152c5dc5e6a" kind="variable"><name>nobs_</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1ad9b900b5d0ad9ba3d4a95a114b322291" kind="function"><name>Bicop</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1ac439ded27a50239db5f94b4d8b1d7641" kind="function"><name>Bicop</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1aebe3a41e3f23817f0234fa789c443a98" kind="function"><name>Bicop</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a48720b451adb23ede4147d4d355f4eaa" kind="function"><name>Bicop</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a74397cf5f843f5aebb436a49322dd2f9" kind="function"><name>to_ptree</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a67cec4b86ecdae9ab4bd299fcd53ab60" kind="function"><name>to_json</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a6c5a0051c17e74760d4eab394245b3f1" kind="function"><name>pdf</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a3b0ee4b197e971f83e1d0c357c5ccdd3" kind="function"><name>cdf</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1ae6d42fab3bc19b807f41ccecfc80de46" kind="function"><name>hfunc1</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a9bbf2e9ab9a04a45e8d98206a46b7596" kind="function"><name>hfunc2</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1aa4c7814cd1728ecf4c965aed5499968f" kind="function"><name>hinv1</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a571c4e213695f805f8e0e7843f9b245b" kind="function"><name>hinv2</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a31dc185fdd1be89370088eea3fad23e6" kind="function"><name>simulate</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1ac95738f7f2ec4e008404f5621030efc1" kind="function"><name>fit</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a40e37a67480de2990821580eb09ba354" kind="function"><name>select</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a81979ae3578ec9af1f5f956751faa63d" kind="function"><name>loglik</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a6d5907e8fcc38c3be57712a26b562a39" kind="function"><name>aic</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a5ad96c73be4b32846792203a9dee1c53" kind="function"><name>bic</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a12e146f82646dbebcd12cccd82d91c00" kind="function"><name>mbic</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a8e6b3e3dd484d07cafeb24ca3393f5f0" kind="function"><name>calculate_npars</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1ac3d54d13bccaab2ab249599ee133c3c5" kind="function"><name>parameters_to_tau</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a2664461e9ef54c1596a2db7d1592af20" kind="function"><name>tau_to_parameters</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1aa777c88702169cb1419bad3ad3729f17" kind="function"><name>get_parameters_lower_bounds</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a7602f071c93374e6d2167da4c8c344fc" kind="function"><name>get_parameters_upper_bounds</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a714f13019476d521051ad2369d447f40" kind="function"><name>cut_and_rotate</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a68a906a148af0ed054603c6cb32731d0" kind="function"><name>check_rotation</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1ac18fa7c94d98c8237b8fc3a555fbaa46" kind="function"><name>check_weights_size</name></member>
+    <member refid="classvinecopulib_1_1_bicop_1a20b5f18685dd889d9c2017635a910375" kind="function"><name>get_bicop</name></member>
+  </compound>
+  <compound refid="classvinecopulib_1_1_fit_controls_bicop" kind="class"><name>vinecopulib::FitControlsBicop</name>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a657a94df6f1dc680e45af3123c0fda43" kind="function"><name>check_parametric_method</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a6fee692f4e1d84fe70fb4d5f9b8ee078" kind="function"><name>check_nonparametric_method</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1aaa5af8160ff120a6c16be951358821f6" kind="function"><name>check_nonparametric_mult</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1ad59d0494cec09f9ab96a8664fc3734d2" kind="function"><name>check_selection_criterion</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a27b84617980fd3b4ca196e87a6d279c9" kind="function"><name>check_psi0</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1aa3958aa4fe5d2900a14db83224d256b2" kind="function"><name>get_family_set</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a5b10436f0fb84d8a3276a514c05c8442" kind="function"><name>get_parametric_method</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1af1ff49b3f08edd0ae2986b10956d2067" kind="function"><name>get_nonparametric_method</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1adb5099d2fad28099872abf75b4f6c7a1" kind="function"><name>get_nonparametric_mult</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a03924f690903038302b9f0d73a44210c" kind="function"><name>get_selection_criterion</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a6874e7226c05af5b3a87d8bd49073ba0" kind="function"><name>get_weights</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1acf45a95368ae735ab70a522b53c0133d" kind="function"><name>get_preselect_families</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a2c994c101ca1cb8225acd1de233b8f80" kind="function"><name>get_psi0</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a530b8a58404b7fba0a02e29030c32bee" kind="function"><name>get_num_threads</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a39d4e24261da184abf3fa3dd11d1f23b" kind="function"><name>set_family_set</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a722bef09427577ba2f04c91d7e4dba90" kind="function"><name>set_parametric_method</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a5b785f0e3384d224025e754d2f212881" kind="function"><name>set_nonparametric_method</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a69fa1ff241282cc5a968ff64f0029ae0" kind="function"><name>set_nonparametric_mult</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a52c187e5fcf047825ced777d73483df1" kind="function"><name>set_selection_criterion</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1abe41e1cf7edfbd0a4dd9031c7a75ea14" kind="function"><name>set_weights</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a7850b5ba8acaf78109d00789d93cc876" kind="function"><name>set_preselect_families</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a3421f63a8ec0eed23c7392d16770658e" kind="function"><name>set_psi0</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1adc395c1123ad4d9ad9cc795d9c34c9a8" kind="function"><name>set_num_threads</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a58195140d42fceba9310bad956df6879" kind="function"><name>process_num_threads</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a5d3bb91e05952fd0af172a0520d34c8c" kind="variable"><name>family_set_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1ae16820f63a8cc99b2435db7fdb06e94b" kind="variable"><name>parametric_method_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1ab5859d14e78b91caaf67aa766c035ed0" kind="variable"><name>nonparametric_method_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1ae28eed8b43903f9df6b8ba6087a8bec2" kind="variable"><name>nonparametric_mult_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a75e322db29f4ce4da2d19b0ace875619" kind="variable"><name>selection_criterion_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a70d9ebf6c2ba69a3ae0df2c221e8cf15" kind="variable"><name>weights_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a5229f18f6e0bd91b75ecc532d63d2915" kind="variable"><name>preselect_families_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a44864b707c7214b35a5651510b7b1bee" kind="variable"><name>psi0_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1afa2d5ee9ffa38ca11e4bdca9f93b9172" kind="variable"><name>num_threads_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a20f51de5d89278679c2c9aa2bac2a36e" kind="function"><name>FitControlsBicop</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1a6a2fc00794c9dd9d598ac9948e7b98e4" kind="function"><name>FitControlsBicop</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_bicop_1ae87a80323e8f5d3702ab0db42bf8bcb5" kind="function"><name>FitControlsBicop</name></member>
+  </compound>
+  <compound refid="classvinecopulib_1_1_fit_controls_vinecop" kind="class"><name>vinecopulib::FitControlsVinecop</name>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a07c65b2d38d5c5b717cae502a77dfeb6" kind="function"><name>check_tree_criterion</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1aefa0ba3708b58e6408a25ae9fbef3984" kind="function"><name>check_threshold</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ace8965fe7c115ac40611f0e46f441a96" kind="function"><name>get_trunc_lvl</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1aaf3f0b43e26f0877e5030afd90e35d1e" kind="function"><name>get_tree_criterion</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a6c428e61c86c371cee6f98367ff35796" kind="function"><name>get_threshold</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a18c66b8801249218f07c3897064f0b5d" kind="function"><name>get_select_trunc_lvl</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ac2c2854d43466a4d3733c24f282a2e79" kind="function"><name>get_select_threshold</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a9757ee81656627a0eb0486c8ff994b7d" kind="function"><name>needs_sparse_select</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1acb9f0b704c00f79dade119426916abf1" kind="function"><name>get_fit_controls_bicop</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1acbeb159acb79f24c71071781000e935f" kind="function"><name>set_trunc_lvl</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ac51c634095193c976135f57822a53069" kind="function"><name>set_tree_criterion</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a774ebb065432b9e5f5add91ad3a6b137" kind="function"><name>set_threshold</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ac6012b793cf0bc620bd1db57c562baf7" kind="function"><name>set_select_trunc_lvl</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ae07f4c5e566c041d6b2475555313d35f" kind="function"><name>set_select_threshold</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a6ed63d403dc902119ebe0252ada0be47" kind="function"><name>set_fit_controls_bicop</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a92d169955bc5a73df704febdaa083db9" kind="variable"><name>trunc_lvl_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a5de4e4bff7e6a57d805848ba949af9ca" kind="variable"><name>tree_criterion_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a3a6220c447aaf733c953e39e76bfc826" kind="variable"><name>threshold_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ac708bc482cf8d64c4f76762bf6312f52" kind="variable"><name>select_trunc_lvl_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ac2627ab2826f5f1c535b776adb5dc8d6" kind="variable"><name>select_threshold_</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1ad101d135c8d8fe66046d931947f45bef" kind="function"><name>FitControlsVinecop</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a94112587de376b493be4445aab15b7ce" kind="function"><name>FitControlsVinecop</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a22cb78b491409cb9ce6e8a17dc21e7b8" kind="function"><name>FitControlsVinecop</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a2d068c9b98774abc720ca90c939ed89c" kind="function"><name>get_truncation_level</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1a6559330912082c057099138f6ab97991" kind="function"><name>get_select_truncation_level</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1aaba682be018c86e3d1cf9ebd0f80716d" kind="function"><name>set_truncation_level</name></member>
+    <member refid="classvinecopulib_1_1_fit_controls_vinecop_1af359b0ba1ed1e2e2611d1fcffa43eef9" kind="function"><name>set_select_truncation_level</name></member>
+  </compound>
+  <compound refid="classvinecopulib_1_1_r_vine_structure" kind="class"><name>vinecopulib::RVineStructure</name>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1afe9ed9e81a35e1816e0d66d0223fbffc" kind="variable"><name>order_</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1ad2b50a1841a8fdbf172bdd41ce2f94ab" kind="variable"><name>d_</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1aeaf238cc116e7a198a1f43cef4360462" kind="variable"><name>trunc_lvl_</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a7c4209ec3bef2ded97361ff97a297483" kind="variable"><name>struct_array_</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a503fcb4e9036db49bd4840ae80cc6128" kind="variable"><name>min_array_</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a7403cad6cfbeff9fc190a58049ce2eab" kind="variable"><name>needed_hfunc1_</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1ac0eb2517f8924d7b2efb54e00658b5f5" kind="variable"><name>needed_hfunc2_</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a4408fcee797cfd3bf7913b92986d6b08" kind="function"><name>RVineStructure</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a271688bc56e2950d5a27213f4b5f9fda" kind="function"><name>RVineStructure</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1aa7e6b14379d8eed772e63c6944e3f610" kind="function"><name>RVineStructure</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a2d1ec630fcd5b7d820413dedca26cdad" kind="function"><name>RVineStructure</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a0fb1958f6971b01776133af60ee20ee7" kind="function"><name>RVineStructure</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1ac2cd2c83b9ffafb9c6563f1923aa1835" kind="function"><name>get_dim</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a6c691b843017f85b7067fcbe0fae55d0" kind="function"><name>get_trunc_lvl</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1aed7d73a5bf50b95a6166f42e0f8df9a9" kind="function"><name>get_order</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a1f04ff64c8cf56fa32173ed0fccbbe46" kind="function"><name>get_struct_array</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1aaebebea9982629eb81223d18b0b9d905" kind="function"><name>get_min_array</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a71e339dae0c4ea4338c731a0dfa70780" kind="function"><name>get_needed_hfunc1</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1aa935d78845713014d7aaf6a6aa1a9a8f" kind="function"><name>get_needed_hfunc2</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a37325d7485875cf823c288400c351699" kind="function"><name>get_matrix</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a00835cb9e06ca80bfff9c89100a1bb56" kind="function"><name>struct_array</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a4c67417a03be525c7c64ebcc884b87fc" kind="function"><name>min_array</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a7580c0663ac702f718944de2a0fcd1d3" kind="function"><name>truncate</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a488bcaf1868f79f733e812f80445199e" kind="function"><name>str</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a53839dd700b689c87346bdc44a97ebda" kind="function"><name>find_trunc_lvl</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1aba56d8f32760cef0a66200faf6868778" kind="function"><name>get_order</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1adf765bda069f23409d0289d4c087e8d2" kind="function"><name>to_rvine_array</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a96b50b9a5fc53f53d867c3610d6a99bd" kind="function"><name>to_natural_order</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a4d5a13be2f839cdd3e194ccd0da7b7e0" kind="function"><name>compute_dvine_struct_array</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a989a81821a22281a23a315d9c1cebd28" kind="function"><name>compute_min_array</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a75909b9e1e7a292b53d709778eefb8be" kind="function"><name>compute_needed_hfunc1</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1ad5d206da33caad5a93a8c4bcf5914abc" kind="function"><name>compute_needed_hfunc2</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1ac17fb4459ad72692a9420eae2ed7cb11" kind="function"><name>check_if_quadratic</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a5a1524d7491dd1a8a5bbc271917d2a89" kind="function"><name>check_lower_tri</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a76ace3100cc84ca1c023ff843325309b" kind="function"><name>check_upper_tri</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1aa5ccca935dab19d703be329ecb13a156" kind="function"><name>check_columns</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a1bb9100bce29c43f8a7734c49909f817" kind="function"><name>check_antidiagonal</name></member>
+    <member refid="classvinecopulib_1_1_r_vine_structure_1a2167e19801604650c086a6987e665e71" kind="function"><name>check_proximity_condition</name></member>
+  </compound>
+  <compound refid="classvinecopulib_1_1_triangular_array" kind="class"><name>vinecopulib::TriangularArray</name>
+    <member refid="classvinecopulib_1_1_triangular_array_1a9516f42110e2f9b0836ea488b338b639" kind="variable"><name>d_</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1a9c949e8357f0330141db4a402a175816" kind="variable"><name>trunc_lvl_</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1a9a550868789b35b266e69cdd57729fff" kind="variable"><name>mat_</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1a4d1d1a1f64ab2c918e169dcb1d04f07f" kind="function"><name>TriangularArray</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1ab291264bdad179aed275517243cdad68" kind="function"><name>TriangularArray</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1a6c4a21f452a2c8094d452996f1f58401" kind="function"><name>TriangularArray</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1aeaee00fbe12f2bce4bf7f2a4479417f3" kind="function"><name>operator()</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1a9909caab2252198416abcb3294181dee" kind="function"><name>operator()</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1a30cdac9d2e0e13bce3c6c054283b6fb7" kind="function"><name>operator[]</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1a3e6654bb40de5c4b615ea37a8ffecac1" kind="function"><name>operator[]</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1a2bb6d8ef421bbcef635970000b072727" kind="function"><name>operator==</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1ae9d39595702831aca33b981ef7687a1d" kind="function"><name>set_column</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1ab6d8130336a957271b1db9018781e69a" kind="function"><name>truncate</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1ae557ebefe25bfc18818e254ada5c91cb" kind="function"><name>get_trunc_lvl</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1adb36a7916d7281707dcf50e40839bfb9" kind="function"><name>get_dim</name></member>
+    <member refid="classvinecopulib_1_1_triangular_array_1a2cd9d9617c7c3fc422ed67a6054b2d3a" kind="function"><name>str</name></member>
+  </compound>
+  <compound refid="classvinecopulib_1_1_vinecop" kind="class"><name>vinecopulib::Vinecop</name>
+    <member refid="classvinecopulib_1_1_vinecop_1a5a75b825ad6091d734dc163c3277b36b" kind="function"><name>get_pair_copula</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a5c909eae77a38558d46d6d4b98564e57" kind="function"><name>get_family</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a889a0c1c5c143e32cf34aa9bd15e33b6" kind="function"><name>get_rotation</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a16872eaecac2cf3f90c7f282c453fe58" kind="function"><name>get_parameters</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a3f4cc62395a9ae4ce2b7714ceae6bde3" kind="function"><name>get_tau</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a508971cf99ce5a94712168d10b736812" kind="function"><name>get_trunc_lvl</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a5f1c76c0fd97ea586b182f7996034e86" kind="function"><name>get_all_pair_copulas</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ab8a6a5d111b80788955438e1630f04c9" kind="function"><name>get_all_families</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a45dd56984cf7395494ed3fab75c62a1e" kind="function"><name>get_all_rotations</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1adbd6c2e57666bcec101bc2cc8846c78b" kind="function"><name>get_all_parameters</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ac271e64e1b2dd16f8b5ccaecf3f03e96" kind="function"><name>get_all_taus</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a27e9d72fa28b4d167dde9ae9205ec995" kind="function"><name>get_dim</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a4aff71e7b65688ff04205ec66b34473e" kind="function"><name>get_order</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1aeaaad4d204e86a0df21becfa26032e47" kind="function"><name>get_rvine_structure</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1aab1af57bb6b7e02029dcc3dc2a285314" kind="function"><name>get_matrix</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a4d0f5a7e4b60e6d58aef3020577aeb5a" kind="function"><name>get_struct_array</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a1b8f3b15053e1d84b13b262e9833552d" kind="function"><name>get_threshold</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a1525e0fbb288182518230ede06db1801" kind="function"><name>get_loglik</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a2260191b027249666f637dae58795a47" kind="function"><name>get_nobs</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a08fcd0fce480d68c47932fd4d68e5478" kind="function"><name>get_aic</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a29d0beb8d6c20c246c7b86f38d90e48d" kind="function"><name>get_bic</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ad694a38fd514fe339e00a00093b5aa33" kind="function"><name>get_mbicv</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a08e91a1c33e21b07d708d89adac01078" kind="function"><name>calculate_mbicv_penalty</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1aea1f8be4ac7bf48af1f186fbaf96530b" kind="variable"><name>d_</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a1bd2b00a31f3d14d1ad51d493286f0d2" kind="variable"><name>vine_struct_</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1af206b4d5e82d91f0d78b176870e422d5" kind="variable"><name>pair_copulas_</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a3ed8d7fe44fef03e738cd2561df8d58c" kind="variable"><name>threshold_</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a671f2c116ae39979f1c3a79489d247ab" kind="variable"><name>loglik_</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ae4402f2d6c3cb7001207ede73743024d" kind="variable"><name>nobs_</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a16aff724dab68fe606e372208abe6e0f" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a391541e2795d06a848d5a17fe3496a63" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1abebc47fd9c68aeff199a3eba370a5f6a" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a2cb5079a1a3cfe0403969aba92092ac3" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1af54ae0403aaa188052c63e959e70f90f" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a6f41f3f14cd479a62bef7448c00376d0" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1abc94737980ef5dbdc16b7d0aa66e683d" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ae15da62d7cd3829bbd2980fe4ac190b0" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a8b389e32ae8d1a2c26046a6be19040f0" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ac8e2119b7cd9d2f67a8a62e7b4fbd61f" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a228e7c92a06fbf7020870eec625a0e80" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ae91e02b92cd4af43596131cce9b085d9" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ac77c6f78b0e2c7860d7406c9ea7fe251" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a83e7fdc7c3aef45d8431005b5d1abb83" kind="function"><name>Vinecop</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1aaee91f92acc8402eb7358b65c8fe63f8" kind="function"><name>to_ptree</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1acab8a34d8f89da6be0ab6ae77427c09f" kind="function"><name>to_json</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a0d2fae568f3d893c1c144a8034fbaf90" kind="function"><name>select_all</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a5e6cacd0883811fcd80c772ace747c43" kind="function"><name>select_families</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ad4ba574fee5f39170e1a38b921a4c02f" kind="function"><name>pdf</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a7db9bc6b406d03e51f2e6e66af0f5ed1" kind="function"><name>cdf</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a1221d844d9850435708f21494b80d39f" kind="function"><name>simulate</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a9df88fb9bcdcc420b0771a96943c7d45" kind="function"><name>rosenblatt</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a73da79be3f0f3cb892afbd8f41dcad6b" kind="function"><name>inverse_rosenblatt</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a2b4b1151c5b0a817811628aa59de7eea" kind="function"><name>calculate_npars</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a07e9c59b42d0668df5fc5e69b281272e" kind="function"><name>loglik</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a082d0c740fcb5610c8d7687cf12a95e4" kind="function"><name>aic</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a61745ef0b908f6580a5af8fb40221869" kind="function"><name>bic</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1abb2e75c3531d813125dda78017f0b219" kind="function"><name>mbicv</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ac77812a69ccd568b7eb0c21658001640" kind="function"><name>truncate</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ac99ec5154d923ee5eb73fdad071bca46" kind="function"><name>make_pair_copula_store</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ac92fe4b93780b56e0cce7c4f6c267bcc" kind="function"><name>check_data_dim</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1afe39a71a2d1e994ce37a62f32af23245" kind="function"><name>check_pair_copulas_rvine_structure</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1ac7004a3ed7005b039a07b08964f21c1e" kind="function"><name>finalize_fit</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a8f7f8ed74b29c8463e4c00c0a80b563d" kind="function"><name>check_weights_size</name></member>
+    <member refid="classvinecopulib_1_1_vinecop_1a80b44198828ac97bc82e11965c8597a7" kind="function"><name>check_enough_data</name></member>
+  </compound>
+  <compound refid="namespacevinecopulib" kind="namespace"><name>vinecopulib</name>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3" kind="enum"><name>BicopFamily</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65" kind="enumvalue"><name>indep</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a304e2a3b544f6b9f267a151e1bcee487" kind="enumvalue"><name>gaussian</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3acd73502828457d15655bbd7a63fb0bc8" kind="enumvalue"><name>student</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3ad0b8c94bb241f6f7a4b96cd6d3e26c36" kind="enumvalue"><name>clayton</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a7bfb9d9ee5abbfa800e56bbe62db9bbe" kind="enumvalue"><name>gumbel</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a26253c50741faa9c2e2b836773c69fe6" kind="enumvalue"><name>frank</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a8ff32489f92f33416694be8fdc2d4c22" kind="enumvalue"><name>joe</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a8a2e0a5eece6b7020e5308bcd0df4aa3" kind="enumvalue"><name>bb1</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3aa2d33c13012f342a80bdc94b60538c68" kind="enumvalue"><name>bb6</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3ac9e791d6604a5fcc1f4e6ad574f43328" kind="enumvalue"><name>bb7</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3adf8b15ba30764e3b9ce084c11336603a" kind="enumvalue"><name>bb8</name></member>
+    <member refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a9b0d6b8b82f0af7ca85d5a216f97f5b8" kind="enumvalue"><name>tll</name></member>
+    <member refid="namespacevinecopulib_1a4201d6dd2999386c080b4b982fa1af4e" kind="typedef"><name>family_bimap</name></member>
+    <member refid="namespacevinecopulib_1a7fdf9f81ce49a26346013e77901a0458" kind="variable"><name>family_names</name></member>
+    <member refid="namespacevinecopulib_1ac46553ae5f99072f65e9d3254d2c526d" kind="function"><name>get_family_name</name></member>
+    <member refid="namespacevinecopulib_1a8d5285a58e0d250a5226715754e12568" kind="function"><name>get_family_enum</name></member>
+    <member refid="namespacevinecopulib_1a84bb80714f45441e76d85c7dd049db02" kind="function"><name>operator&lt;&lt;</name></member>
+    <member refid="namespacevinecopulib_1a903371123a404c8736f5418da502b81c" kind="function"><name>operator&lt;&lt;</name></member>
+  </compound>
+  <compound refid="namespacevinecopulib_1_1bicop__families" kind="namespace"><name>vinecopulib::bicop_families</name>
+    <member refid="namespacevinecopulib_1_1bicop__families_1a5214a513f41ec23b74782aab96ea6774" kind="variable"><name>all</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1a76d66bb6cb03ae4de1cef3d1ed70ac16" kind="variable"><name>parametric</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1a01c7c990cc34b1b74d115858a52fcdc5" kind="variable"><name>nonparametric</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1aba503484b0a13cfb0e67c026e2f295d4" kind="variable"><name>one_par</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1ad5871c39b4ee62bd44fa851d7d70c7ca" kind="variable"><name>two_par</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1a24b790671c9f4b25e57ecbc3505232fb" kind="variable"><name>elliptical</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1a714863b69ae59ac48c7fb2be45cd2619" kind="variable"><name>archimedean</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1a1cb66138467920882f9c37611553aa34" kind="variable"><name>bb</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1ac221bc84c32d2836692ed40d89439928" kind="variable"><name>rotationless</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1a5a5f349f07638768ff8b1bb2ae90d102" kind="variable"><name>lt</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1af754a2d2697709c204dda0473215f9cd" kind="variable"><name>ut</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1af92a2e71f03e2280276533def655760d" kind="variable"><name>itau</name></member>
+    <member refid="namespacevinecopulib_1_1bicop__families_1ae1ae1673e3d4a9c57bd9df074e17a3b9" kind="variable"><name>flip_by_rotation</name></member>
+  </compound>
+  <compound refid="namespacevinecopulib_1_1tools__stats" kind="namespace"><name>vinecopulib::tools_stats</name>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a4f9a1f8fdbe23db916b013f7f6e500ca" kind="function"><name>simulate_uniform</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1afda41507cee7cba84602e28e56cfcd99" kind="function"><name>to_pseudo_obs</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a9e4849a2a908703a68e92e0c0633237f" kind="function"><name>to_pseudo_obs_1d</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a95f6f6f63139c26b7114c4eb9cc22c48" kind="function"><name>pairwise_mcor</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a96499e20cf7b24c504b8d160fe753e05" kind="function"><name>ghalton</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a9a8c8331b2eb372a4ad8a3808b4847ab" kind="function"><name>sobol</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a1e81bac0b4e1e9e0158b800a7db0d1af" kind="function"><name>pbvt</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a6867eea2d193c7e5d78b30b9991397ad" kind="function"><name>pbvnorm</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a249880b93e82211207869f94821de440" kind="function"><name>dnorm</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1aa380a12540c4749e14049cdd0b163352" kind="function"><name>pnorm</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a4772a68417aa49b50e69c957db8533f7" kind="function"><name>qnorm</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1abc09bc02add2d7b7781aa42a406be7d9" kind="function"><name>dt</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a1f65dc25a8284fe4629f092969e2861a" kind="function"><name>pt</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1a17eb427c3a562c72d2e87438da1cd279" kind="function"><name>qt</name></member>
+    <member refid="namespacevinecopulib_1_1tools__stats_1ae2eca8e0fc4ac2d7eeb0226845214847" kind="function"><name>dependence_matrix</name></member>
+  </compound>
+  <compound refid="mainpage_8h" kind="file"><name>mainpage.h</name>
+  </compound>
+  <compound refid="vinecopulib_8hpp" kind="file"><name>vinecopulib.hpp</name>
+  </compound>
+  <compound refid="bicop_2class_8hpp" kind="file"><name>class.hpp</name>
+  </compound>
+  <compound refid="vinecop_2class_8hpp" kind="file"><name>class.hpp</name>
+  </compound>
+  <compound refid="family_8hpp" kind="file"><name>family.hpp</name>
+  </compound>
+  <compound refid="bicop_2fit__controls_8hpp" kind="file"><name>fit_controls.hpp</name>
+  </compound>
+  <compound refid="vinecop_2fit__controls_8hpp" kind="file"><name>fit_controls.hpp</name>
+    <member refid="vinecop_2fit__controls_8hpp_1ac1e8a42306d8e67cb94ca31c3956ee78" kind="define"><name>DEPRECATED</name></member>
+  </compound>
+  <compound refid="bicop_2implementation_2class_8ipp" kind="file"><name>class.ipp</name>
+  </compound>
+  <compound refid="vinecop_2implementation_2class_8ipp" kind="file"><name>class.ipp</name>
+  </compound>
+  <compound refid="family_8ipp" kind="file"><name>family.ipp</name>
+  </compound>
+  <compound refid="bicop_2implementation_2fit__controls_8ipp" kind="file"><name>fit_controls.ipp</name>
+  </compound>
+  <compound refid="vinecop_2implementation_2fit__controls_8ipp" kind="file"><name>fit_controls.ipp</name>
+  </compound>
+  <compound refid="tools__stats_8ipp" kind="file"><name>tools_stats.ipp</name>
+  </compound>
+  <compound refid="tools__stats_8hpp" kind="file"><name>tools_stats.hpp</name>
+  </compound>
+  <compound refid="tools__stats__ghalton_8hpp" kind="file"><name>tools_stats_ghalton.hpp</name>
+    <member refid="tools__stats__ghalton_8hpp_1a311ce58bd6b4dd3b194e1e113917dab1" kind="define"><name>ghalton_max_dim</name></member>
+  </compound>
+  <compound refid="tools__stats__sobol_8hpp" kind="file"><name>tools_stats_sobol.hpp</name>
+    <member refid="tools__stats__sobol_8hpp_1a2a9ccb56944afbb0a7b449fdfe21b25d" kind="define"><name>sobol_max_dim</name></member>
+  </compound>
+  <compound refid="triangular__array_8hpp" kind="file"><name>triangular_array.hpp</name>
+  </compound>
+  <compound refid="rvine__structure_8ipp" kind="file"><name>rvine_structure.ipp</name>
+  </compound>
+  <compound refid="rvine__structure_8hpp" kind="file"><name>rvine_structure.hpp</name>
+  </compound>
+  <compound refid="dir_d9cc11671bbc13b7de7f52ca5cea150c" kind="dir"><name>include/vinecopulib/bicop</name>
+  </compound>
+  <compound refid="dir_f1b8f37f4d59719a37b7e2340084c1f5" kind="dir"><name>include/vinecopulib/bicop/implementation</name>
+  </compound>
+  <compound refid="dir_d34bd80d8445a15edb3cdd97cd723029" kind="dir"><name>include/vinecopulib/misc/implementation</name>
+  </compound>
+  <compound refid="dir_a4ae23f9de19e4501b2d569aa9df2ed2" kind="dir"><name>include/vinecopulib/vinecop/implementation</name>
+  </compound>
+  <compound refid="dir_d44c64559bbebec7f509842c48db8b23" kind="dir"><name>include</name>
+  </compound>
+  <compound refid="dir_46be4491dfb25c1a5af669466d62a71a" kind="dir"><name>include/vinecopulib/misc</name>
+  </compound>
+  <compound refid="dir_70a4b5fec8b8dc9e5cdeb752867f2c13" kind="dir"><name>include/vinecopulib/vinecop</name>
+  </compound>
+  <compound refid="dir_2db46f93ad752b059ac9748989c23361" kind="dir"><name>include/vinecopulib</name>
+  </compound>
+  <compound refid="indexpage" kind="page"><name>index</name>
+  </compound>
+</doxygenindex>

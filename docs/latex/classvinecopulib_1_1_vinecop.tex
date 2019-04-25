@@ -1,0 +1,1028 @@
+\hypertarget{classvinecopulib_1_1_vinecop}{}\section{vinecopulib\+:\+:Vinecop Class Reference}
+\label{classvinecopulib_1_1_vinecop}\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+
+
+A class for vine copula models.  
+
+
+
+
+{\ttfamily \#include $<$class.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classvinecopulib_1_1_vinecop_a391541e2795d06a848d5a17fe3496a63}{Vinecop} (size\+\_\+t d)
+\begin{DoxyCompactList}\small\item\em creates a D-\/vine on {\ttfamily d} variables with all pair-\/copulas set to independence. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_abebc47fd9c68aeff199a3eba370a5f6a}{Vinecop} (const \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} \&vine\+\_\+struct)
+\begin{DoxyCompactList}\small\item\em creates a vine copula with structure specified by an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object; all pair-\/copulas are set to independence. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_a2cb5079a1a3cfe0403969aba92092ac3}{Vinecop} (const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, const bool check\+\_\+matrix=true)
+\begin{DoxyCompactList}\small\item\em creates a vine copula with structure specified by an R-\/vine matrix; all pair-\/copulas are set to independence. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_af54ae0403aaa188052c63e959e70f90f}{Vinecop} (const std\+::vector$<$ size\+\_\+t $>$ \&order, const \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \&struct\+\_\+array, const bool check\+\_\+array=true)
+\begin{DoxyCompactList}\small\item\em creates a vine copula with structure specified by an R-\/vine matrix; all pair-\/copulas are set to independence. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_a6f41f3f14cd479a62bef7448c00376d0}{Vinecop} (const std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$$>$ \&pair\+\_\+copulas, const \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} \&vine\+\_\+struct)
+\begin{DoxyCompactList}\small\item\em creates an arbitrary vine copula model. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_abc94737980ef5dbdc16b7d0aa66e683d}{Vinecop} (const std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$$>$ \&pair\+\_\+copulas, const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, const bool check\+\_\+matrix=true)
+\begin{DoxyCompactList}\small\item\em creates an arbitrary vine copula model. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_ae15da62d7cd3829bbd2980fe4ac190b0}{Vinecop} (const std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$$>$ \&pair\+\_\+copulas, const std\+::vector$<$ size\+\_\+t $>$ \&order, const \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \&struct\+\_\+array, const bool check\+\_\+array=true)
+\begin{DoxyCompactList}\small\item\em creates an arbitrary vine copula model. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_a8b389e32ae8d1a2c26046a6be19040f0}{Vinecop} (const Eigen\+::\+Matrix\+Xd \&data, const \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} \&controls=\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}())
+\begin{DoxyCompactList}\small\item\em constructs a vine copula model from data by creating a model and calling \hyperlink{classvinecopulib_1_1_vinecop_a0d2fae568f3d893c1c144a8034fbaf90}{select\+\_\+all()}. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_ac8e2119b7cd9d2f67a8a62e7b4fbd61f}{Vinecop} (const Eigen\+::\+Matrix\+Xd \&data, const \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} \&vine\+\_\+struct, \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} controls=\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}())
+\begin{DoxyCompactList}\small\item\em constructs a vine copula model from data by creating a model and calling select\+\_\+family(). \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_a228e7c92a06fbf7020870eec625a0e80}{Vinecop} (const Eigen\+::\+Matrix\+Xd \&data, const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&matrix, \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} controls=\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}(), const bool check\+\_\+matrix=true)
+\begin{DoxyCompactList}\small\item\em constructs a vine copula model from data by creating a model and calling select\+\_\+family(). \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_ae91e02b92cd4af43596131cce9b085d9}{Vinecop} (const Eigen\+::\+Matrix\+Xd \&data, const std\+::vector$<$ size\+\_\+t $>$ \&order, const \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \&struct\+\_\+array, \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} controls=\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}(), const bool check\+\_\+array=true)
+\begin{DoxyCompactList}\small\item\em constructs a vine copula model from data by creating a model and calling select\+\_\+family(). \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_ac77c6f78b0e2c7860d7406c9ea7fe251}{Vinecop} (const char $\ast$filename, const bool check\+\_\+matrix=true)
+\begin{DoxyCompactList}\small\item\em creates from a J\+S\+ON file. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_vinecop_a83e7fdc7c3aef45d8431005b5d1abb83}{Vinecop} (const boost\+::property\+\_\+tree\+::ptree input, const bool check\+\_\+matrix=true)
+\begin{DoxyCompactList}\small\item\em creates from a boost\+::property\+\_\+tree\+::ptree object \end{DoxyCompactList}\item 
+boost\+::property\+\_\+tree\+::ptree \hyperlink{classvinecopulib_1_1_vinecop_aaee91f92acc8402eb7358b65c8fe63f8}{to\+\_\+ptree} () const
+\begin{DoxyCompactList}\small\item\em converts the copula into a boost\+::property\+\_\+tree\+::ptree object. \end{DoxyCompactList}\item 
+void \hyperlink{classvinecopulib_1_1_vinecop_acab8a34d8f89da6be0ab6ae77427c09f}{to\+\_\+json} (const char $\ast$filename) const
+\begin{DoxyCompactList}\small\item\em write the copula object into a J\+S\+ON file. \end{DoxyCompactList}\item 
+void \hyperlink{classvinecopulib_1_1_vinecop_a0d2fae568f3d893c1c144a8034fbaf90}{select\+\_\+all} (const Eigen\+::\+Matrix\+Xd \&data, const \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} \&controls=\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}())
+\begin{DoxyCompactList}\small\item\em automatically fits and selects a vine copula model. \end{DoxyCompactList}\item 
+void \hyperlink{classvinecopulib_1_1_vinecop_a5e6cacd0883811fcd80c772ace747c43}{select\+\_\+families} (const Eigen\+::\+Matrix\+Xd \&data, const \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} \&controls=\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}())
+\begin{DoxyCompactList}\small\item\em automatically selects all pair-\/copula families and fits all parameters. \end{DoxyCompactList}\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_vinecop_ad4ba574fee5f39170e1a38b921a4c02f}{pdf} (const Eigen\+::\+Matrix\+Xd \&u, const size\+\_\+t num\+\_\+threads=1) const
+\begin{DoxyCompactList}\small\item\em calculates the density function of the vine copula model. \end{DoxyCompactList}\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_vinecop_a7db9bc6b406d03e51f2e6e66af0f5ed1}{cdf} (const Eigen\+::\+Matrix\+Xd \&u, const size\+\_\+t N=1e4, const size\+\_\+t num\+\_\+threads=1, std\+::vector$<$ int $>$ seeds=std\+::vector$<$ int $>$()) const
+\begin{DoxyCompactList}\small\item\em calculates the cumulative distribution of the vine copula model. \end{DoxyCompactList}\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{classvinecopulib_1_1_vinecop_a1221d844d9850435708f21494b80d39f}{simulate} (const size\+\_\+t n, const bool qrng=false, const size\+\_\+t num\+\_\+threads=1, const std\+::vector$<$ int $>$ \&seeds=std\+::vector$<$ int $>$()) const
+\begin{DoxyCompactList}\small\item\em simulates from a vine copula model, see \hyperlink{classvinecopulib_1_1_vinecop_a73da79be3f0f3cb892afbd8f41dcad6b}{inverse\+\_\+rosenblatt()}. \end{DoxyCompactList}\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{classvinecopulib_1_1_vinecop_a9df88fb9bcdcc420b0771a96943c7d45}{rosenblatt} (const Eigen\+::\+Matrix\+Xd \&u, const size\+\_\+t num\+\_\+threads=1) const
+\begin{DoxyCompactList}\small\item\em calculates the Rosenblatt transform for a vine copula model. \end{DoxyCompactList}\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{classvinecopulib_1_1_vinecop_a73da79be3f0f3cb892afbd8f41dcad6b}{inverse\+\_\+rosenblatt} (const Eigen\+::\+Matrix\+Xd \&u, const size\+\_\+t num\+\_\+threads=1) const
+\begin{DoxyCompactList}\small\item\em calculates the inverse Rosenblatt transform for a vine copula model. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a2b4b1151c5b0a817811628aa59de7eea}\label{classvinecopulib_1_1_vinecop_a2b4b1151c5b0a817811628aa59de7eea}} 
+double \hyperlink{classvinecopulib_1_1_vinecop_a2b4b1151c5b0a817811628aa59de7eea}{calculate\+\_\+npars} () const
+\begin{DoxyCompactList}\small\item\em returns sum of the number of parameters for all pair copulas (see \hyperlink{classvinecopulib_1_1_bicop_a8e6b3e3dd484d07cafeb24ca3393f5f0}{Bicop\+::calculate\+\_\+npars()}). \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_vinecop_a07e9c59b42d0668df5fc5e69b281272e}{loglik} (const Eigen\+::\+Matrix\+Xd \&u, const size\+\_\+t num\+\_\+threads=1) const
+\begin{DoxyCompactList}\small\item\em calculates the log-\/likelihood. \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_vinecop_a082d0c740fcb5610c8d7687cf12a95e4}{aic} (const Eigen\+::\+Matrix\+Xd \&u, const size\+\_\+t num\+\_\+threads=1) const
+\begin{DoxyCompactList}\small\item\em calculates the Akaike information criterion (A\+IC). \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_vinecop_a61745ef0b908f6580a5af8fb40221869}{bic} (const Eigen\+::\+Matrix\+Xd \&u, const size\+\_\+t num\+\_\+threads=1) const
+\begin{DoxyCompactList}\small\item\em calculates the Bayesian information criterion (B\+IC). \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_vinecop_abb2e75c3531d813125dda78017f0b219}{mbicv} (const Eigen\+::\+Matrix\+Xd \&u, const double psi0, const size\+\_\+t num\+\_\+threads=1) const
+\begin{DoxyCompactList}\small\item\em calculates the modified Bayesian information criterion for vines (m\+B\+I\+CV). \end{DoxyCompactList}\item 
+void \hyperlink{classvinecopulib_1_1_vinecop_ac77812a69ccd568b7eb0c21658001640}{truncate} (size\+\_\+t trunc\+\_\+lvl)
+\begin{DoxyCompactList}\small\item\em truncate the vine copula model. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_ac99ec5154d923ee5eb73fdad071bca46}{make\+\_\+pair\+\_\+copula\+\_\+store} (const size\+\_\+t d, const size\+\_\+t trunc\+\_\+lvl=std\+::numeric\+\_\+limits$<$ size\+\_\+t $>$\+::max())
+\begin{DoxyCompactList}\small\item\em initializes object for storing pair copulas. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Getters}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classvinecopulib_1_1_bicop}{Bicop} \hyperlink{classvinecopulib_1_1_vinecop_a5a75b825ad6091d734dc163c3277b36b}{get\+\_\+pair\+\_\+copula} (size\+\_\+t tree, size\+\_\+t edge) const
+\begin{DoxyCompactList}\small\item\em extracts a pair copula. \end{DoxyCompactList}\item 
+\hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} \hyperlink{classvinecopulib_1_1_vinecop_a5c909eae77a38558d46d6d4b98564e57}{get\+\_\+family} (size\+\_\+t tree, size\+\_\+t edge) const
+\begin{DoxyCompactList}\small\item\em extracts the family of a pair copula. \end{DoxyCompactList}\item 
+int \hyperlink{classvinecopulib_1_1_vinecop_a889a0c1c5c143e32cf34aa9bd15e33b6}{get\+\_\+rotation} (size\+\_\+t tree, size\+\_\+t edge) const
+\begin{DoxyCompactList}\small\item\em extracts the rotation of a pair copula. \end{DoxyCompactList}\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{classvinecopulib_1_1_vinecop_a16872eaecac2cf3f90c7f282c453fe58}{get\+\_\+parameters} (size\+\_\+t tree, size\+\_\+t edge) const
+\begin{DoxyCompactList}\small\item\em extracts the parameters of a pair copula. \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_vinecop_a3f4cc62395a9ae4ce2b7714ceae6bde3}{get\+\_\+tau} (size\+\_\+t tree, size\+\_\+t edge) const
+\begin{DoxyCompactList}\small\item\em extracts the Kendall\textquotesingle{}s $ tau $ of a pair copula. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a508971cf99ce5a94712168d10b736812}\label{classvinecopulib_1_1_vinecop_a508971cf99ce5a94712168d10b736812}} 
+size\+\_\+t {\bfseries get\+\_\+trunc\+\_\+lvl} () const
+\item 
+std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_a5f1c76c0fd97ea586b182f7996034e86}{get\+\_\+all\+\_\+pair\+\_\+copulas} () const
+\begin{DoxyCompactList}\small\item\em extracts all pair copulas. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_ab8a6a5d111b80788955438e1630f04c9}{get\+\_\+all\+\_\+families} () const
+\begin{DoxyCompactList}\small\item\em extracts the families of all pair copulas. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ int $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_a45dd56984cf7395494ed3fab75c62a1e}{get\+\_\+all\+\_\+rotations} () const
+\begin{DoxyCompactList}\small\item\em extracts the rotations of all pair copulas. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ Eigen\+::\+Matrix\+Xd $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_adbd6c2e57666bcec101bc2cc8846c78b}{get\+\_\+all\+\_\+parameters} () const
+\begin{DoxyCompactList}\small\item\em extracts the parameters of all pair copulas. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ double $>$ $>$ \hyperlink{classvinecopulib_1_1_vinecop_ac271e64e1b2dd16f8b5ccaecf3f03e96}{get\+\_\+all\+\_\+taus} () const
+\begin{DoxyCompactList}\small\item\em extracts the Kendall\textquotesingle{}s $ tau $s of all pair copulas. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a27e9d72fa28b4d167dde9ae9205ec995}\label{classvinecopulib_1_1_vinecop_a27e9d72fa28b4d167dde9ae9205ec995}} 
+size\+\_\+t \hyperlink{classvinecopulib_1_1_vinecop_a27e9d72fa28b4d167dde9ae9205ec995}{get\+\_\+dim} () const
+\begin{DoxyCompactList}\small\item\em extracts the dimension of the vine copula model. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a4aff71e7b65688ff04205ec66b34473e}\label{classvinecopulib_1_1_vinecop_a4aff71e7b65688ff04205ec66b34473e}} 
+std\+::vector$<$ size\+\_\+t $>$ \hyperlink{classvinecopulib_1_1_vinecop_a4aff71e7b65688ff04205ec66b34473e}{get\+\_\+order} () const
+\begin{DoxyCompactList}\small\item\em extracts the order vector of the vine copula model. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_aeaaad4d204e86a0df21becfa26032e47}\label{classvinecopulib_1_1_vinecop_aeaaad4d204e86a0df21becfa26032e47}} 
+\hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} \hyperlink{classvinecopulib_1_1_vinecop_aeaaad4d204e86a0df21becfa26032e47}{get\+\_\+rvine\+\_\+structure} () const
+\begin{DoxyCompactList}\small\item\em extracts the structure matrix of the vine copula model. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_aab1af57bb6b7e02029dcc3dc2a285314}\label{classvinecopulib_1_1_vinecop_aab1af57bb6b7e02029dcc3dc2a285314}} 
+Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \hyperlink{classvinecopulib_1_1_vinecop_aab1af57bb6b7e02029dcc3dc2a285314}{get\+\_\+matrix} () const
+\begin{DoxyCompactList}\small\item\em extracts the structure matrix of the vine copula model. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a4d0f5a7e4b60e6d58aef3020577aeb5a}\label{classvinecopulib_1_1_vinecop_a4d0f5a7e4b60e6d58aef3020577aeb5a}} 
+\hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \hyperlink{classvinecopulib_1_1_vinecop_a4d0f5a7e4b60e6d58aef3020577aeb5a}{get\+\_\+struct\+\_\+array} () const
+\begin{DoxyCompactList}\small\item\em extracts the above diagonal coefficients of the vine copula model. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a1b8f3b15053e1d84b13b262e9833552d}\label{classvinecopulib_1_1_vinecop_a1b8f3b15053e1d84b13b262e9833552d}} 
+double \hyperlink{classvinecopulib_1_1_vinecop_a1b8f3b15053e1d84b13b262e9833552d}{get\+\_\+threshold} () const
+\begin{DoxyCompactList}\small\item\em extracts the threshold (usually zero except {\ttfamily select\+\_\+threshold == T\+R\+UE} in {\ttfamily Fit\+Controls\+Vinecop()}). \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a1525e0fbb288182518230ede06db1801}\label{classvinecopulib_1_1_vinecop_a1525e0fbb288182518230ede06db1801}} 
+double \hyperlink{classvinecopulib_1_1_vinecop_a1525e0fbb288182518230ede06db1801}{get\+\_\+loglik} () const
+\begin{DoxyCompactList}\small\item\em extracts the log-\/likelihood (throws an error if model has not been fitted to data). \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{classvinecopulib_1_1_vinecop_a2260191b027249666f637dae58795a47}{get\+\_\+nobs} () const
+\begin{DoxyCompactList}\small\item\em extracts the number of observations used for the fit. \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_vinecop_a08fcd0fce480d68c47932fd4d68e5478}{get\+\_\+aic} () const
+\begin{DoxyCompactList}\small\item\em extracts the A\+IC. \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_vinecop_a29d0beb8d6c20c246c7b86f38d90e48d}{get\+\_\+bic} () const
+\begin{DoxyCompactList}\small\item\em extracts the B\+IC. \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_vinecop_ad694a38fd514fe339e00a00093b5aa33}{get\+\_\+mbicv} (const double psi0) const
+\begin{DoxyCompactList}\small\item\em extracts the log-\/likelihood. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A class for vine copula models. 
+
+A vine copula model is characterized by the structure matrix (see \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}) and the pair-\/copulas. 
+
+Definition at line 18 of file class.\+hpp.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a391541e2795d06a848d5a17fe3496a63}\label{classvinecopulib_1_1_vinecop_a391541e2795d06a848d5a17fe3496a63}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{d }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates a D-\/vine on {\ttfamily d} variables with all pair-\/copulas set to independence. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em d} & the dimension (= number of variables) of the model. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 18 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_abebc47fd9c68aeff199a3eba370a5f6a}\label{classvinecopulib_1_1_vinecop_abebc47fd9c68aeff199a3eba370a5f6a}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} \&}]{vine\+\_\+struct }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates a vine copula with structure specified by an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object; all pair-\/copulas are set to independence. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vine\+\_\+struct} & an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object representing the structure of the vine. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 35 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a2cb5079a1a3cfe0403969aba92092ac3}\label{classvinecopulib_1_1_vinecop_a2cb5079a1a3cfe0403969aba92092ac3}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [3/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{matrix,  }\item[{const bool}]{check\+\_\+matrix = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates a vine copula with structure specified by an R-\/vine matrix; all pair-\/copulas are set to independence. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em matrix} & an R-\/vine matrix. \\
+\hline
+{\em check\+\_\+matrix} & whether to check if {\ttfamily matrix} is a valid R-\/vine matrix. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 49 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_af54ae0403aaa188052c63e959e70f90f}\label{classvinecopulib_1_1_vinecop_af54ae0403aaa188052c63e959e70f90f}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [4/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ size\+\_\+t $>$ \&}]{order,  }\item[{const \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \&}]{struct\+\_\+array,  }\item[{const bool}]{check\+\_\+array = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates a vine copula with structure specified by an R-\/vine matrix; all pair-\/copulas are set to independence. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em order} & the order of the variables in the vine structure, see \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure}\textquotesingle{}s corresponding constructor. \\
+\hline
+{\em struct\+\_\+array} & a triangular array object specifying the vine structure, see \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure}\textquotesingle{}s corresponding constructor. \\
+\hline
+{\em check\+\_\+array} & whether {\ttfamily order} and {\ttfamily struct\+\_\+array} shall be checked for validity. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 62 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a6f41f3f14cd479a62bef7448c00376d0}\label{classvinecopulib_1_1_vinecop_a6f41f3f14cd479a62bef7448c00376d0}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [5/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$$>$ \&}]{pair\+\_\+copulas,  }\item[{const \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} \&}]{vine\+\_\+struct }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates an arbitrary vine copula model. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pair\+\_\+copulas} & \hyperlink{classvinecopulib_1_1_bicop}{Bicop} objects specifying the pair-\/copulas, see \hyperlink{classvinecopulib_1_1_vinecop_ac99ec5154d923ee5eb73fdad071bca46}{make\+\_\+pair\+\_\+copula\+\_\+store()}. \\
+\hline
+{\em vine\+\_\+struct} & an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object specifying the vine structure. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 71 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_abc94737980ef5dbdc16b7d0aa66e683d}\label{classvinecopulib_1_1_vinecop_abc94737980ef5dbdc16b7d0aa66e683d}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [6/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$$>$ \&}]{pair\+\_\+copulas,  }\item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{matrix,  }\item[{const bool}]{check\+\_\+matrix = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates an arbitrary vine copula model. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pair\+\_\+copulas} & \hyperlink{classvinecopulib_1_1_bicop}{Bicop} objects specifying the pair-\/copulas, see \hyperlink{classvinecopulib_1_1_vinecop_ac99ec5154d923ee5eb73fdad071bca46}{make\+\_\+pair\+\_\+copula\+\_\+store()}. \\
+\hline
+{\em matrix} & an R-\/vine matrix specifying the vine structure. \\
+\hline
+{\em check\+\_\+matrix} & whether to check if {\ttfamily matrix} is a valid R-\/vine matrix. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 92 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_ae15da62d7cd3829bbd2980fe4ac190b0}\label{classvinecopulib_1_1_vinecop_ae15da62d7cd3829bbd2980fe4ac190b0}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [7/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$$>$ \&}]{pair\+\_\+copulas,  }\item[{const std\+::vector$<$ size\+\_\+t $>$ \&}]{order,  }\item[{const \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \&}]{struct\+\_\+array,  }\item[{const bool}]{check\+\_\+array = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates an arbitrary vine copula model. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pair\+\_\+copulas} & \hyperlink{classvinecopulib_1_1_bicop}{Bicop} objects specifying the pair-\/copulas, see \hyperlink{classvinecopulib_1_1_vinecop_ac99ec5154d923ee5eb73fdad071bca46}{make\+\_\+pair\+\_\+copula\+\_\+store()}. \\
+\hline
+{\em order} & the order of the variables in the vine structure, see \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure}\textquotesingle{}s corresponding constructor. \\
+\hline
+{\em struct\+\_\+array} & a triangular array object specifying the vine structure, see the corresponding constructor of \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure}. \\
+\hline
+{\em check\+\_\+array} & whether {\ttfamily order} and {\ttfamily struct\+\_\+array} shall be checked for validity. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 107 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a8b389e32ae8d1a2c26046a6be19040f0}\label{classvinecopulib_1_1_vinecop_a8b389e32ae8d1a2c26046a6be19040f0}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [8/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{data,  }\item[{const \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} \&}]{controls = {\ttfamily \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+constructs a vine copula model from data by creating a model and calling \hyperlink{classvinecopulib_1_1_vinecop_a0d2fae568f3d893c1c144a8034fbaf90}{select\+\_\+all()}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & an $ n \times d $ matrix of observations. \\
+\hline
+{\em controls} & see \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 227 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_ac8e2119b7cd9d2f67a8a62e7b4fbd61f}\label{classvinecopulib_1_1_vinecop_ac8e2119b7cd9d2f67a8a62e7b4fbd61f}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [9/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{data,  }\item[{const \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} \&}]{vine\+\_\+struct,  }\item[{\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}}]{controls = {\ttfamily \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+constructs a vine copula model from data by creating a model and calling select\+\_\+family(). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & an $ n \times d $ matrix of observations. \\
+\hline
+{\em vine\+\_\+struct} & an \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure} object specifying the vine structure. \\
+\hline
+{\em controls} & see \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 169 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a228e7c92a06fbf7020870eec625a0e80}\label{classvinecopulib_1_1_vinecop_a228e7c92a06fbf7020870eec625a0e80}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [10/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{data,  }\item[{const Eigen\+::\+Matrix$<$ size\+\_\+t, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic $>$ \&}]{matrix,  }\item[{\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}}]{controls = {\ttfamily \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}()},  }\item[{const bool}]{check\+\_\+matrix = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+constructs a vine copula model from data by creating a model and calling select\+\_\+family(). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & an $ n \times d $ matrix of observations. \\
+\hline
+{\em matrix} & either an empty matrix (default) or an R-\/vine structure matrix, see \hyperlink{classvinecopulib_1_1_vinecop_a5e6cacd0883811fcd80c772ace747c43}{select\+\_\+families()}. \\
+\hline
+{\em controls} & see \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}. \\
+\hline
+{\em check\+\_\+matrix} & whether to check if {\ttfamily matrix} is a valid R-\/vine matrix. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 194 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_ae91e02b92cd4af43596131cce9b085d9}\label{classvinecopulib_1_1_vinecop_ae91e02b92cd4af43596131cce9b085d9}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [11/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{data,  }\item[{const std\+::vector$<$ size\+\_\+t $>$ \&}]{order,  }\item[{const \hyperlink{classvinecopulib_1_1_triangular_array}{Triangular\+Array}$<$ size\+\_\+t $>$ \&}]{struct\+\_\+array,  }\item[{\hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}}]{controls = {\ttfamily \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}()},  }\item[{const bool}]{check\+\_\+array = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+constructs a vine copula model from data by creating a model and calling select\+\_\+family(). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & an $ n \times d $ matrix of observations. \\
+\hline
+{\em order} & the order of the variables in the vine structure, see the corresponding constructor of \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure}. \\
+\hline
+{\em struct\+\_\+array} & a triangular array object specifying the vine structure, see the corresponding constructor of \hyperlink{classvinecopulib_1_1_r_vine_structure}{R\+Vine\+Structure}. \\
+\hline
+{\em controls} & see \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}. \\
+\hline
+{\em check\+\_\+array} & whether {\ttfamily order} and {\ttfamily struct\+\_\+array} shall be checked for validity. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 213 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_ac77c6f78b0e2c7860d7406c9ea7fe251}\label{classvinecopulib_1_1_vinecop_ac77c6f78b0e2c7860d7406c9ea7fe251}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [12/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const char $\ast$}]{filename,  }\item[{const bool}]{check\+\_\+matrix = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates from a J\+S\+ON file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & the name of the J\+S\+ON file to read (see \hyperlink{classvinecopulib_1_1_vinecop_aaee91f92acc8402eb7358b65c8fe63f8}{to\+\_\+ptree()} for the structure of the file). \\
+\hline
+{\em check\+\_\+matrix} & whether to check if the {\ttfamily \char`\"{}matrix\char`\"{}} node represents a valid R-\/vine matrix. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 158 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a83e7fdc7c3aef45d8431005b5d1abb83}\label{classvinecopulib_1_1_vinecop_a83e7fdc7c3aef45d8431005b5d1abb83}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!Vinecop@{Vinecop}}
+\index{Vinecop@{Vinecop}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{Vinecop()}{Vinecop()}\hspace{0.1cm}{\footnotesize\ttfamily [13/13]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Vinecop\+::\+Vinecop (\begin{DoxyParamCaption}\item[{const boost\+::property\+\_\+tree\+::ptree}]{input,  }\item[{const bool}]{check\+\_\+matrix = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates from a boost\+::property\+\_\+tree\+::ptree object 
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & the boost\+::property\+\_\+tree\+::ptree object to convert from (see \hyperlink{classvinecopulib_1_1_vinecop_aaee91f92acc8402eb7358b65c8fe63f8}{to\+\_\+ptree()} for the structure of the input). \\
+\hline
+{\em check\+\_\+matrix} & whether to check if the {\ttfamily \char`\"{}matrix\char`\"{}} node represents a valid R-\/vine matrix. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 119 of file class.\+ipp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a082d0c740fcb5610c8d7687cf12a95e4}\label{classvinecopulib_1_1_vinecop_a082d0c740fcb5610c8d7687cf12a95e4}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!aic@{aic}}
+\index{aic@{aic}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{aic()}{aic()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Vinecop\+::aic (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{u,  }\item[{const size\+\_\+t}]{num\+\_\+threads = {\ttfamily 1} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the Akaike information criterion (A\+IC). 
+
+The A\+IC is defined as \[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ p $ is the (effective) number of parameters of the model, see \hyperlink{classvinecopulib_1_1_vinecop_a07e9c59b42d0668df5fc5e69b281272e}{loglik()} and \hyperlink{classvinecopulib_1_1_vinecop_a2b4b1151c5b0a817811628aa59de7eea}{calculate\+\_\+npars()}. The A\+IC is a consistent model selection criterion for nonparametric models.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of observations. \\
+\hline
+{\em num\+\_\+threads} & the number of threads to use for computations; if greater than 1, the function will be applied concurrently to {\ttfamily num\+\_\+threads} batches of {\ttfamily u}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 818 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a61745ef0b908f6580a5af8fb40221869}\label{classvinecopulib_1_1_vinecop_a61745ef0b908f6580a5af8fb40221869}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!bic@{bic}}
+\index{bic@{bic}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{bic()}{bic()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Vinecop\+::bic (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{u,  }\item[{const size\+\_\+t}]{num\+\_\+threads = {\ttfamily 1} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the Bayesian information criterion (B\+IC). 
+
+The B\+IC is defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ p $ is the (effective) number of parameters of the model, see \hyperlink{classvinecopulib_1_1_vinecop_a07e9c59b42d0668df5fc5e69b281272e}{loglik()} and \hyperlink{classvinecopulib_1_1_vinecop_a2b4b1151c5b0a817811628aa59de7eea}{calculate\+\_\+npars()}. The B\+IC is a consistent model selection criterion for nonparametric models.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of observations. \\
+\hline
+{\em num\+\_\+threads} & the number of threads to use for computations; if greater than 1, the function will be applied concurrently to {\ttfamily num\+\_\+threads} batches of {\ttfamily u}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 837 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a7db9bc6b406d03e51f2e6e66af0f5ed1}\label{classvinecopulib_1_1_vinecop_a7db9bc6b406d03e51f2e6e66af0f5ed1}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!cdf@{cdf}}
+\index{cdf@{cdf}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{cdf()}{cdf()}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd vinecopulib\+::\+Vinecop\+::cdf (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{u,  }\item[{const size\+\_\+t}]{N = {\ttfamily 1e4},  }\item[{const size\+\_\+t}]{num\+\_\+threads = {\ttfamily 1},  }\item[{std\+::vector$<$ int $>$}]{seeds = {\ttfamily std\+:\+:vector$<$int$>$()} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the cumulative distribution of the vine copula model. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $ n \times d $ matrix of evaluation points. \\
+\hline
+{\em N} & integer for the number of quasi-\/random numbers to draw to evaluate the distribution (default\+: 1e4). \\
+\hline
+{\em num\+\_\+threads} & the number of threads to use for computations; if greater than 1, the function will generate {\ttfamily n} samples concurrently in {\ttfamily num\+\_\+threads} batches. \\
+\hline
+{\em seeds} & seeds to scramble the quasi-\/random numbers; if empty (default), the random number quasi-\/generator is seeded randomly. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 722 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a08fcd0fce480d68c47932fd4d68e5478}\label{classvinecopulib_1_1_vinecop_a08fcd0fce480d68c47932fd4d68e5478}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+aic@{get\+\_\+aic}}
+\index{get\+\_\+aic@{get\+\_\+aic}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+aic()}{get\_aic()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Vinecop\+::get\+\_\+aic (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the A\+IC. 
+
+The function throws an error if model has not been fitted to data. 
+
+Definition at line 555 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_ab8a6a5d111b80788955438e1630f04c9}\label{classvinecopulib_1_1_vinecop_ab8a6a5d111b80788955438e1630f04c9}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+families@{get\+\_\+all\+\_\+families}}
+\index{get\+\_\+all\+\_\+families@{get\+\_\+all\+\_\+families}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+all\+\_\+families()}{get\_all\_families()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::vector$<$ \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} $>$ $>$ vinecopulib\+::\+Vinecop\+::get\+\_\+all\+\_\+families (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the families of all pair copulas. 
+
+\begin{DoxyReturn}{Returns}
+a nested std\+::vector with entry {\ttfamily \mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} corresponding to edge {\ttfamily e} in tree {\ttfamily t}. 
+\end{DoxyReturn}
+
+
+Definition at line 396 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a5f1c76c0fd97ea586b182f7996034e86}\label{classvinecopulib_1_1_vinecop_a5f1c76c0fd97ea586b182f7996034e86}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+pair\+\_\+copulas@{get\+\_\+all\+\_\+pair\+\_\+copulas}}
+\index{get\+\_\+all\+\_\+pair\+\_\+copulas@{get\+\_\+all\+\_\+pair\+\_\+copulas}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+all\+\_\+pair\+\_\+copulas()}{get\_all\_pair\_copulas()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ $>$ vinecopulib\+::\+Vinecop\+::get\+\_\+all\+\_\+pair\+\_\+copulas (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts all pair copulas. 
+
+\begin{DoxyReturn}{Returns}
+a nested std\+::vector with entry {\ttfamily \mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} corresponding to edge {\ttfamily e} in tree {\ttfamily t}. 
+\end{DoxyReturn}
+
+
+Definition at line 378 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_adbd6c2e57666bcec101bc2cc8846c78b}\label{classvinecopulib_1_1_vinecop_adbd6c2e57666bcec101bc2cc8846c78b}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+parameters@{get\+\_\+all\+\_\+parameters}}
+\index{get\+\_\+all\+\_\+parameters@{get\+\_\+all\+\_\+parameters}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+all\+\_\+parameters()}{get\_all\_parameters()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::vector$<$ Eigen\+::\+Matrix\+Xd $>$ $>$ vinecopulib\+::\+Vinecop\+::get\+\_\+all\+\_\+parameters (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the parameters of all pair copulas. 
+
+\begin{DoxyReturn}{Returns}
+a nested std\+::vector with entry {\ttfamily \mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} corresponding to edge {\ttfamily e} in tree {\ttfamily t}. 
+\end{DoxyReturn}
+
+
+Definition at line 465 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a45dd56984cf7395494ed3fab75c62a1e}\label{classvinecopulib_1_1_vinecop_a45dd56984cf7395494ed3fab75c62a1e}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+rotations@{get\+\_\+all\+\_\+rotations}}
+\index{get\+\_\+all\+\_\+rotations@{get\+\_\+all\+\_\+rotations}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+all\+\_\+rotations()}{get\_all\_rotations()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::vector$<$ int $>$ $>$ vinecopulib\+::\+Vinecop\+::get\+\_\+all\+\_\+rotations (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the rotations of all pair copulas. 
+
+\begin{DoxyReturn}{Returns}
+a nested std\+::vector with entry {\ttfamily \mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} corresponding to edge {\ttfamily e} in tree {\ttfamily t}. 
+\end{DoxyReturn}
+
+
+Definition at line 422 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_ac271e64e1b2dd16f8b5ccaecf3f03e96}\label{classvinecopulib_1_1_vinecop_ac271e64e1b2dd16f8b5ccaecf3f03e96}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+all\+\_\+taus@{get\+\_\+all\+\_\+taus}}
+\index{get\+\_\+all\+\_\+taus@{get\+\_\+all\+\_\+taus}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+all\+\_\+taus()}{get\_all\_taus()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::vector$<$ double $>$ $>$ vinecopulib\+::\+Vinecop\+::get\+\_\+all\+\_\+taus (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the Kendall\textquotesingle{}s $ tau $s of all pair copulas. 
+
+\begin{DoxyReturn}{Returns}
+a nested std\+::vector with entry {\ttfamily \mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} corresponding to edge {\ttfamily e} in tree {\ttfamily t}. 
+\end{DoxyReturn}
+
+
+Definition at line 483 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a29d0beb8d6c20c246c7b86f38d90e48d}\label{classvinecopulib_1_1_vinecop_a29d0beb8d6c20c246c7b86f38d90e48d}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+bic@{get\+\_\+bic}}
+\index{get\+\_\+bic@{get\+\_\+bic}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+bic()}{get\_bic()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Vinecop\+::get\+\_\+bic (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the B\+IC. 
+
+The function throws an error if model has not been fitted to data. 
+
+Definition at line 566 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a5c909eae77a38558d46d6d4b98564e57}\label{classvinecopulib_1_1_vinecop_a5c909eae77a38558d46d6d4b98564e57}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+family@{get\+\_\+family}}
+\index{get\+\_\+family@{get\+\_\+family}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+family()}{get\_family()}}
+{\footnotesize\ttfamily \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} vinecopulib\+::\+Vinecop\+::get\+\_\+family (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{tree,  }\item[{size\+\_\+t}]{edge }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the family of a pair copula. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index (starting with 0). \\
+\hline
+{\em edge} & edge index (starting with 0). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 387 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_ad694a38fd514fe339e00a00093b5aa33}\label{classvinecopulib_1_1_vinecop_ad694a38fd514fe339e00a00093b5aa33}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+mbicv@{get\+\_\+mbicv}}
+\index{get\+\_\+mbicv@{get\+\_\+mbicv}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+mbicv()}{get\_mbicv()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Vinecop\+::get\+\_\+mbicv (\begin{DoxyParamCaption}\item[{const double}]{psi0 }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the log-\/likelihood. 
+
+The function throws an error if model has not been fitted to data. 
+
+Definition at line 577 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a2260191b027249666f637dae58795a47}\label{classvinecopulib_1_1_vinecop_a2260191b027249666f637dae58795a47}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+nobs@{get\+\_\+nobs}}
+\index{get\+\_\+nobs@{get\+\_\+nobs}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+nobs()}{get\_nobs()}}
+{\footnotesize\ttfamily size\+\_\+t vinecopulib\+::\+Vinecop\+::get\+\_\+nobs (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the number of observations used for the fit. 
+
+The function throws an error if model has not been fitted to data. 
+
+Definition at line 544 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a5a75b825ad6091d734dc163c3277b36b}\label{classvinecopulib_1_1_vinecop_a5a75b825ad6091d734dc163c3277b36b}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+pair\+\_\+copula@{get\+\_\+pair\+\_\+copula}}
+\index{get\+\_\+pair\+\_\+copula@{get\+\_\+pair\+\_\+copula}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+pair\+\_\+copula()}{get\_pair\_copula()}}
+{\footnotesize\ttfamily \hyperlink{classvinecopulib_1_1_bicop}{Bicop} vinecopulib\+::\+Vinecop\+::get\+\_\+pair\+\_\+copula (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{tree,  }\item[{size\+\_\+t}]{edge }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts a pair copula. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index (starting with 0). \\
+\hline
+{\em edge} & edge index (starting with 0). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 348 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a16872eaecac2cf3f90c7f282c453fe58}\label{classvinecopulib_1_1_vinecop_a16872eaecac2cf3f90c7f282c453fe58}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+parameters@{get\+\_\+parameters}}
+\index{get\+\_\+parameters@{get\+\_\+parameters}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+parameters()}{get\_parameters()}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix\+Xd vinecopulib\+::\+Vinecop\+::get\+\_\+parameters (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{tree,  }\item[{size\+\_\+t}]{edge }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the parameters of a pair copula. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index (starting with 0). \\
+\hline
+{\em edge} & edge index (starting with 0). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 439 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a889a0c1c5c143e32cf34aa9bd15e33b6}\label{classvinecopulib_1_1_vinecop_a889a0c1c5c143e32cf34aa9bd15e33b6}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+rotation@{get\+\_\+rotation}}
+\index{get\+\_\+rotation@{get\+\_\+rotation}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+rotation()}{get\_rotation()}}
+{\footnotesize\ttfamily int vinecopulib\+::\+Vinecop\+::get\+\_\+rotation (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{tree,  }\item[{size\+\_\+t}]{edge }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the rotation of a pair copula. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index (starting with 0). \\
+\hline
+{\em edge} & edge index (starting with 0). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 413 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a3f4cc62395a9ae4ce2b7714ceae6bde3}\label{classvinecopulib_1_1_vinecop_a3f4cc62395a9ae4ce2b7714ceae6bde3}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!get\+\_\+tau@{get\+\_\+tau}}
+\index{get\+\_\+tau@{get\+\_\+tau}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{get\+\_\+tau()}{get\_tau()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Vinecop\+::get\+\_\+tau (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{tree,  }\item[{size\+\_\+t}]{edge }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+extracts the Kendall\textquotesingle{}s $ tau $ of a pair copula. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tree} & tree index (starting with 0). \\
+\hline
+{\em edge} & edge index (starting with 0). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 448 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a73da79be3f0f3cb892afbd8f41dcad6b}\label{classvinecopulib_1_1_vinecop_a73da79be3f0f3cb892afbd8f41dcad6b}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!inverse\+\_\+rosenblatt@{inverse\+\_\+rosenblatt}}
+\index{inverse\+\_\+rosenblatt@{inverse\+\_\+rosenblatt}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{inverse\+\_\+rosenblatt()}{inverse\_rosenblatt()}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix\+Xd vinecopulib\+::\+Vinecop\+::inverse\+\_\+rosenblatt (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{u,  }\item[{const size\+\_\+t}]{num\+\_\+threads = {\ttfamily 1} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the inverse Rosenblatt transform for a vine copula model. 
+
+The inverse Rosenblatt transform can be used for simulation\+: the function applied to independent uniform variates resembles simulated data from the vine copula model.
+
+If the problem is too large, it is split recursively into halves (w.\+r.\+t. n, the number of observations). \char`\"{}\+Too large\char`\"{} means that the required memory will exceed 1 GB. An examplary configuration requiring less than 1 GB is $ n = 1000 $, $d = 200$.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $ n \times d $ matrix of evaluation points. \\
+\hline
+{\em num\+\_\+threads} & the number of threads to use for computations; if greater than 1, the function will be applied concurrently to {\ttfamily num\+\_\+threads} batches of {\ttfamily u}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 980 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a07e9c59b42d0668df5fc5e69b281272e}\label{classvinecopulib_1_1_vinecop_a07e9c59b42d0668df5fc5e69b281272e}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!loglik@{loglik}}
+\index{loglik@{loglik}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{loglik()}{loglik()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Vinecop\+::loglik (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{u,  }\item[{const size\+\_\+t}]{num\+\_\+threads = {\ttfamily 1} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the log-\/likelihood. 
+
+The log-\/likelihood is defined as \[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \] where $ c $ is the copula density \hyperlink{classvinecopulib_1_1_vinecop_ad4ba574fee5f39170e1a38b921a4c02f}{pdf()}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times d$ matrix of observations. \\
+\hline
+{\em num\+\_\+threads} & the number of threads to use for computations; if greater than 1, the function will be applied concurrently to {\ttfamily num\+\_\+threads} batches of {\ttfamily u}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 799 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_ac99ec5154d923ee5eb73fdad071bca46}\label{classvinecopulib_1_1_vinecop_ac99ec5154d923ee5eb73fdad071bca46}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!make\+\_\+pair\+\_\+copula\+\_\+store@{make\+\_\+pair\+\_\+copula\+\_\+store}}
+\index{make\+\_\+pair\+\_\+copula\+\_\+store@{make\+\_\+pair\+\_\+copula\+\_\+store}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{make\+\_\+pair\+\_\+copula\+\_\+store()}{make\_pair\_copula\_store()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::vector$<$ \hyperlink{classvinecopulib_1_1_bicop}{Bicop} $>$ $>$ vinecopulib\+::\+Vinecop\+::make\+\_\+pair\+\_\+copula\+\_\+store (\begin{DoxyParamCaption}\item[{const size\+\_\+t}]{d,  }\item[{const size\+\_\+t}]{trunc\+\_\+lvl = {\ttfamily std\+:\+:numeric\+\_\+limits$<$size\+\_\+t$>$\+:\+:max()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+initializes object for storing pair copulas. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em d} & dimension of the vine copula. \\
+\hline
+{\em trunc\+\_\+lvl} & a truncation level (optional). \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A nested vector such that {\ttfamily pc\+\_\+store\mbox{[}t\mbox{]}\mbox{[}e\mbox{]}} contains a \hyperlink{classvinecopulib_1_1_bicop}{Bicop}. object for the pair copula corresponding to tree {\ttfamily t} and edge {\ttfamily e}. 
+\end{DoxyReturn}
+
+
+Definition at line 283 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_abb2e75c3531d813125dda78017f0b219}\label{classvinecopulib_1_1_vinecop_abb2e75c3531d813125dda78017f0b219}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!mbicv@{mbicv}}
+\index{mbicv@{mbicv}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{mbicv()}{mbicv()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Vinecop\+::mbicv (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{u,  }\item[{const double}]{psi0,  }\item[{const size\+\_\+t}]{num\+\_\+threads = {\ttfamily 1} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the modified Bayesian information criterion for vines (m\+B\+I\+CV). 
+
+The m\+B\+I\+CV is defined as \[ \mathrm{mBICV} = -2\, \mathrm{loglik} + \ln(n) \nu, - 2 * //! \sum_{t=1}^(d - 1) \{q_t log(\psi_0^t) - (d - t - q_t) log(1 -\psi_0^t)\}\] where $ \mathrm{loglik} $ is the log-\/liklihood, $ \nu $ is the (effective) number of parameters of the model, $ t $ is the tree level $ \psi_0 $ is the prior probability of having a non-\/independence copula in the first tree, and $ q_t $ is the number of non-\/independence copulas in tree $ t $; The v\+B\+IC is a consistent model selection criterion for parametric sparse vine copula models when $ d = o(\sqrt{n \ln n})$.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of observations. \\
+\hline
+{\em psi0} & baseline prior probability of a non-\/independence copula. \\
+\hline
+{\em num\+\_\+threads} & the number of threads to use for computations; if greater than 1, the function will be applied concurrently to {\ttfamily num\+\_\+threads} batches of {\ttfamily u}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 861 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_ad4ba574fee5f39170e1a38b921a4c02f}\label{classvinecopulib_1_1_vinecop_ad4ba574fee5f39170e1a38b921a4c02f}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!pdf@{pdf}}
+\index{pdf@{pdf}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{pdf()}{pdf()}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd vinecopulib\+::\+Vinecop\+::pdf (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{u,  }\item[{const size\+\_\+t}]{num\+\_\+threads = {\ttfamily 1} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the density function of the vine copula model. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $ n \times d $ matrix of evaluation points. \\
+\hline
+{\em num\+\_\+threads} & the number of threads to use for computations; if greater than 1, the function will be applied concurrently to {\ttfamily num\+\_\+threads} batches of {\ttfamily u}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 638 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a9df88fb9bcdcc420b0771a96943c7d45}\label{classvinecopulib_1_1_vinecop_a9df88fb9bcdcc420b0771a96943c7d45}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!rosenblatt@{rosenblatt}}
+\index{rosenblatt@{rosenblatt}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{rosenblatt()}{rosenblatt()}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix\+Xd vinecopulib\+::\+Vinecop\+::rosenblatt (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{u,  }\item[{const size\+\_\+t}]{num\+\_\+threads = {\ttfamily 1} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the Rosenblatt transform for a vine copula model. 
+
+The Rosenblatt transform converts data from this model into independent uniform variates.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $ n \times d $ matrix of evaluation points. \\
+\hline
+{\em num\+\_\+threads} & the number of threads to use for computations; if greater than 1, the function will be applied concurrently to {\ttfamily num\+\_\+threads} batches of {\ttfamily u}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 893 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a0d2fae568f3d893c1c144a8034fbaf90}\label{classvinecopulib_1_1_vinecop_a0d2fae568f3d893c1c144a8034fbaf90}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!select\+\_\+all@{select\+\_\+all}}
+\index{select\+\_\+all@{select\+\_\+all}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{select\+\_\+all()}{select\_all()}}
+{\footnotesize\ttfamily void vinecopulib\+::\+Vinecop\+::select\+\_\+all (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{data,  }\item[{const \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} \&}]{controls = {\ttfamily \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+automatically fits and selects a vine copula model. 
+
+Selection of the structure is performed using the algorithm of Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013). {\itshape Selecting and estimating regular vine copulae and application to financial returns.} Computational Statistics \& Data Analysis, 59 (1), 52-\/69.
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & nxd matrix of copula data. \\
+\hline
+{\em controls} & the controls to the algorithm (see \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 302 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a5e6cacd0883811fcd80c772ace747c43}\label{classvinecopulib_1_1_vinecop_a5e6cacd0883811fcd80c772ace747c43}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!select\+\_\+families@{select\+\_\+families}}
+\index{select\+\_\+families@{select\+\_\+families}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{select\+\_\+families()}{select\_families()}}
+{\footnotesize\ttfamily void vinecopulib\+::\+Vinecop\+::select\+\_\+families (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{data,  }\item[{const \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop} \&}]{controls = {\ttfamily \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+automatically selects all pair-\/copula families and fits all parameters. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & nxd matrix of copula data. \\
+\hline
+{\em controls} & the controls to the algorithm (see \hyperlink{classvinecopulib_1_1_fit_controls_vinecop}{Fit\+Controls\+Vinecop}). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 322 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_a1221d844d9850435708f21494b80d39f}\label{classvinecopulib_1_1_vinecop_a1221d844d9850435708f21494b80d39f}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!simulate@{simulate}}
+\index{simulate@{simulate}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{simulate()}{simulate()}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix\+Xd vinecopulib\+::\+Vinecop\+::simulate (\begin{DoxyParamCaption}\item[{const size\+\_\+t}]{n,  }\item[{const bool}]{qrng = {\ttfamily false},  }\item[{const size\+\_\+t}]{num\+\_\+threads = {\ttfamily 1},  }\item[{const std\+::vector$<$ int $>$ \&}]{seeds = {\ttfamily std\+:\+:vector$<$int$>$()} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+simulates from a vine copula model, see \hyperlink{classvinecopulib_1_1_vinecop_a73da79be3f0f3cb892afbd8f41dcad6b}{inverse\+\_\+rosenblatt()}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & number of observations. \\
+\hline
+{\em qrng} & set to true for quasi-\/random numbers. \\
+\hline
+{\em num\+\_\+threads} & the number of threads to use for computations; if greater than 1, the function will generate {\ttfamily n} samples concurrently in {\ttfamily num\+\_\+threads} batches. \\
+\hline
+{\em seeds} & seeds of the random number generator; if empty (default), the random number generator is seeded randomly. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An $ n \times d $ matrix of samples from the copula model. 
+\end{DoxyReturn}
+
+
+Definition at line 770 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_acab8a34d8f89da6be0ab6ae77427c09f}\label{classvinecopulib_1_1_vinecop_acab8a34d8f89da6be0ab6ae77427c09f}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!to\+\_\+json@{to\+\_\+json}}
+\index{to\+\_\+json@{to\+\_\+json}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{to\+\_\+json()}{to\_json()}}
+{\footnotesize\ttfamily void vinecopulib\+::\+Vinecop\+::to\+\_\+json (\begin{DoxyParamCaption}\item[{const char $\ast$}]{filename }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+write the copula object into a J\+S\+ON file. 
+
+See \hyperlink{classvinecopulib_1_1_vinecop_aaee91f92acc8402eb7358b65c8fe63f8}{to\+\_\+ptree()} for the structure of the file. 
+\begin{DoxyParams}{Parameters}
+{\em filename} & the name of the file to write. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 272 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_aaee91f92acc8402eb7358b65c8fe63f8}\label{classvinecopulib_1_1_vinecop_aaee91f92acc8402eb7358b65c8fe63f8}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!to\+\_\+ptree@{to\+\_\+ptree}}
+\index{to\+\_\+ptree@{to\+\_\+ptree}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{to\+\_\+ptree()}{to\_ptree()}}
+{\footnotesize\ttfamily boost\+::property\+\_\+tree\+::ptree vinecopulib\+::\+Vinecop\+::to\+\_\+ptree (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+converts the copula into a boost\+::property\+\_\+tree\+::ptree object. 
+
+The {\ttfamily ptree} object contains two nodes \+: {\ttfamily \char`\"{}matrix\char`\"{}} and {\ttfamily \char`\"{}pair copulas\char`\"{}}. The former is encodes the R-\/\+Vine structure and the latter is a list of child nodes for the trees ({\ttfamily \char`\"{}tree1\char`\"{}}, {\ttfamily \char`\"{}tree2\char`\"{}}, etc), each containing a list of child nodes for the edges ({\ttfamily \char`\"{}pc1\char`\"{}}, {\ttfamily \char`\"{}pc2\char`\"{}}, etc). See \hyperlink{classvinecopulib_1_1_bicop_a74397cf5f843f5aebb436a49322dd2f9}{Bicop\+::to\+\_\+ptree()} for the encoding of pair-\/copulas.
+
+\begin{DoxyReturn}{Returns}
+the boost\+::property\+\_\+tree\+::ptree object containing the copula. 
+\end{DoxyReturn}
+
+
+Definition at line 246 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_vinecop_ac77812a69ccd568b7eb0c21658001640}\label{classvinecopulib_1_1_vinecop_ac77812a69ccd568b7eb0c21658001640}} 
+\index{vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}!truncate@{truncate}}
+\index{truncate@{truncate}!vinecopulib\+::\+Vinecop@{vinecopulib\+::\+Vinecop}}
+\subsubsection{\texorpdfstring{truncate()}{truncate()}}
+{\footnotesize\ttfamily void vinecopulib\+::\+Vinecop\+::truncate (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{trunc\+\_\+lvl }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+truncate the vine copula model. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em trunc\+\_\+lvl} & the truncation level. If the model is already truncated at a level less than {\ttfamily trunc\+\_\+lvl}, the function does nothing. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1146 of file class.\+ipp.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/vinecopulib/vinecop/class.\+hpp\item 
+include/vinecopulib/vinecop/implementation/class.\+ipp\end{DoxyCompactItemize}

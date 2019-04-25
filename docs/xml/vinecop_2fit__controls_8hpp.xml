@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="vinecop_2fit__controls_8hpp" kind="file" language="C++">
+    <compoundname>fit_controls.hpp</compoundname>
+    <includes local="no">limits</includes>
+    <includes refid="bicop_2fit__controls_8hpp" local="no">vinecopulib/bicop/fit_controls.hpp</includes>
+    <includes refid="vinecop_2implementation_2fit__controls_8ipp" local="no">vinecopulib/vinecop/implementation/fit_controls.ipp</includes>
+    <incdepgraph>
+      <node id="148">
+        <label>vinecopulib/bicop/implementation/fit_controls.ipp</label>
+        <link refid="bicop_2implementation_2fit__controls_8ipp"/>
+        <childnode refid="149" relation="include">
+        </childnode>
+        <childnode refid="144" relation="include">
+        </childnode>
+        <childnode refid="150" relation="include">
+        </childnode>
+      </node>
+      <node id="138">
+        <label>limits</label>
+      </node>
+      <node id="145">
+        <label>boost/bimap.hpp</label>
+      </node>
+      <node id="144">
+        <label>stdexcept</label>
+      </node>
+      <node id="143">
+        <label>vinecopulib/bicop/implementation/family.ipp</label>
+        <link refid="family_8ipp_source"/>
+        <childnode refid="144" relation="include">
+        </childnode>
+        <childnode refid="145" relation="include">
+        </childnode>
+        <childnode refid="146" relation="include">
+        </childnode>
+      </node>
+      <node id="142">
+        <label>string</label>
+      </node>
+      <node id="146">
+        <label>boost/assign.hpp</label>
+      </node>
+      <node id="147">
+        <label>Eigen/Dense</label>
+      </node>
+      <node id="139">
+        <label>vinecopulib/bicop/fit_controls.hpp</label>
+        <link refid="bicop_2fit__controls_8hpp_source"/>
+        <childnode refid="140" relation="include">
+        </childnode>
+        <childnode refid="141" relation="include">
+        </childnode>
+        <childnode refid="147" relation="include">
+        </childnode>
+        <childnode refid="148" relation="include">
+        </childnode>
+      </node>
+      <node id="151">
+        <label>vinecopulib/vinecop/implementation/fit_controls.ipp</label>
+        <link refid="vinecop_2implementation_2fit__controls_8ipp_source"/>
+        <childnode refid="149" relation="include">
+        </childnode>
+        <childnode refid="144" relation="include">
+        </childnode>
+      </node>
+      <node id="140">
+        <label>vector</label>
+      </node>
+      <node id="141">
+        <label>vinecopulib/bicop/family.hpp</label>
+        <link refid="family_8hpp_source"/>
+        <childnode refid="140" relation="include">
+        </childnode>
+        <childnode refid="142" relation="include">
+        </childnode>
+        <childnode refid="143" relation="include">
+        </childnode>
+      </node>
+      <node id="137">
+        <label>include/vinecopulib/vinecop/fit_controls.hpp</label>
+        <link refid="vinecop_2fit__controls_8hpp"/>
+        <childnode refid="138" relation="include">
+        </childnode>
+        <childnode refid="139" relation="include">
+        </childnode>
+        <childnode refid="151" relation="include">
+        </childnode>
+      </node>
+      <node id="150">
+        <label>thread</label>
+      </node>
+      <node id="149">
+        <label>vinecopulib/misc/tools_stl.hpp</label>
+      </node>
+    </incdepgraph>
+    <innerclass refid="classvinecopulib_1_1_fit_controls_vinecop" prot="public">vinecopulib::FitControlsVinecop</innerclass>
+    <innernamespace refid="namespacevinecopulib">vinecopulib</innernamespace>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="vinecop_2fit__controls_8hpp_1ac1e8a42306d8e67cb94ca31c3956ee78" prot="public" static="no">
+        <name>DEPRECATED</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/fit_controls.hpp" line="18" column="11" bodyfile="include/vinecopulib/vinecop/fit_controls.hpp" bodystart="18" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/vinecopulib/vinecop/fit_controls.hpp"/>
+  </compounddef>
+</doxygen>

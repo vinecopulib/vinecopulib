@@ -1,0 +1,580 @@
+\hypertarget{classvinecopulib_1_1_bicop}{}\section{vinecopulib\+:\+:Bicop Class Reference}
+\label{classvinecopulib_1_1_bicop}\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+
+
+A class for bivariate copula models.  
+
+
+
+
+{\ttfamily \#include $<$class.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classvinecopulib_1_1_bicop_ad9b900b5d0ad9ba3d4a95a114b322291}{Bicop} (const \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} family=\hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65}{Bicop\+Family\+::indep}, const int rotation=0, const Eigen\+::\+Matrix\+Xd \&parameters=Eigen\+::\+Matrix\+Xd())
+\begin{DoxyCompactList}\small\item\em creates a specific bivariate copula model. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_bicop_ac439ded27a50239db5f94b4d8b1d7641}{Bicop} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&data, const \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop} \&controls=\hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}())
+\begin{DoxyCompactList}\small\item\em create a copula model from the data, equivalent to {\ttfamily \hyperlink{classvinecopulib_1_1_bicop}{Bicop} cop; cop.\+select(data, controls)}. \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_bicop_aebe3a41e3f23817f0234fa789c443a98}{Bicop} (const char $\ast$filename)
+\begin{DoxyCompactList}\small\item\em creates from a J\+S\+ON file \end{DoxyCompactList}\item 
+\hyperlink{classvinecopulib_1_1_bicop_a48720b451adb23ede4147d4d355f4eaa}{Bicop} (const boost\+::property\+\_\+tree\+::ptree input)
+\begin{DoxyCompactList}\small\item\em creates from a boost\+::property\+\_\+tree\+::ptree object \end{DoxyCompactList}\item 
+boost\+::property\+\_\+tree\+::ptree \hyperlink{classvinecopulib_1_1_bicop_a74397cf5f843f5aebb436a49322dd2f9}{to\+\_\+ptree} () const
+\begin{DoxyCompactList}\small\item\em Convert the copula into a boost\+::property\+\_\+tree\+::ptree object. \end{DoxyCompactList}\item 
+void \hyperlink{classvinecopulib_1_1_bicop_a67cec4b86ecdae9ab4bd299fcd53ab60}{to\+\_\+json} (const char $\ast$filename) const
+\begin{DoxyCompactList}\small\item\em Write the copula object into a J\+S\+ON file. \end{DoxyCompactList}\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a6c5a0051c17e74760d4eab394245b3f1}{pdf} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u) const
+\begin{DoxyCompactList}\small\item\em evaluates the copula density. \end{DoxyCompactList}\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a3b0ee4b197e971f83e1d0c357c5ccdd3}{cdf} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u) const
+\begin{DoxyCompactList}\small\item\em evaluates the copula distribution. \end{DoxyCompactList}\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_ae6d42fab3bc19b807f41ccecfc80de46}{hfunc1} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u) const
+\begin{DoxyCompactList}\small\item\em calculates the first h-\/function. \end{DoxyCompactList}\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a9bbf2e9ab9a04a45e8d98206a46b7596}{hfunc2} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u) const
+\begin{DoxyCompactList}\small\item\em calculates the second h-\/function. \end{DoxyCompactList}\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_aa4c7814cd1728ecf4c965aed5499968f}{hinv1} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u) const
+\begin{DoxyCompactList}\small\item\em calculates the inverse of $ h_1 $ (see \hyperlink{classvinecopulib_1_1_bicop_ae6d42fab3bc19b807f41ccecfc80de46}{hfunc1()}) w.\+r.\+t. the second argument. \end{DoxyCompactList}\item 
+Eigen\+::\+Vector\+Xd \hyperlink{classvinecopulib_1_1_bicop_a571c4e213695f805f8e0e7843f9b245b}{hinv2} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u) const
+\begin{DoxyCompactList}\small\item\em calculates the inverse of $ h_2 $ (see \hyperlink{classvinecopulib_1_1_bicop_a9bbf2e9ab9a04a45e8d98206a46b7596}{hfunc2()}) w.\+r.\+t. the first argument. \end{DoxyCompactList}\item 
+Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \hyperlink{classvinecopulib_1_1_bicop_a31dc185fdd1be89370088eea3fad23e6}{simulate} (const size\+\_\+t \&n, const bool qrng=false, const std\+::vector$<$ int $>$ \&seeds=std\+::vector$<$ int $>$()) const
+\begin{DoxyCompactList}\small\item\em simulates from a bivariate copula. \end{DoxyCompactList}\item 
+void \hyperlink{classvinecopulib_1_1_bicop_ac95738f7f2ec4e008404f5621030efc1}{fit} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&data, const \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop} \&controls=\hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}())
+\begin{DoxyCompactList}\small\item\em fits a bivariate copula (with fixed family) to data. \end{DoxyCompactList}\item 
+void \hyperlink{classvinecopulib_1_1_bicop_a40e37a67480de2990821580eb09ba354}{select} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&data, \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop} controls=\hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}())
+\begin{DoxyCompactList}\small\item\em selects the best fitting model. \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_bicop_a81979ae3578ec9af1f5f956751faa63d}{loglik} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u=Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$()) const
+\begin{DoxyCompactList}\small\item\em calculates the log-\/likelihood. \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_bicop_a6d5907e8fcc38c3be57712a26b562a39}{aic} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u=Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$()) const
+\begin{DoxyCompactList}\small\item\em calculates the Akaike information criterion (A\+IC). \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_bicop_a5ad96c73be4b32846792203a9dee1c53}{bic} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u=Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$()) const
+\begin{DoxyCompactList}\small\item\em calculates the Bayesian information criterion (B\+IC). \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_bicop_a12e146f82646dbebcd12cccd82d91c00}{mbic} (const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&u=Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$(), const double psi0=0.\+9) const
+\begin{DoxyCompactList}\small\item\em calculates the modified Bayesian information criterion (m\+B\+IC). \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_bicop_a8e6b3e3dd484d07cafeb24ca3393f5f0}{calculate\+\_\+npars} () const
+\begin{DoxyCompactList}\small\item\em returns the actual number of parameters for parameteric families. \end{DoxyCompactList}\item 
+double \hyperlink{classvinecopulib_1_1_bicop_ac3d54d13bccaab2ab249599ee133c3c5}{parameters\+\_\+to\+\_\+tau} (const Eigen\+::\+Matrix\+Xd \&parameters) const
+\begin{DoxyCompactList}\small\item\em converts the parameters to the Kendall\textquotesingle{}s $ tau $ for the current family. \end{DoxyCompactList}\item 
+Eigen\+::\+Matrix\+Xd \hyperlink{classvinecopulib_1_1_bicop_a2664461e9ef54c1596a2db7d1592af20}{tau\+\_\+to\+\_\+parameters} (const double \&tau) const
+\begin{DoxyCompactList}\small\item\em converts a Kendall\textquotesingle{}s $ \tau $ to the copula parameters of the current family \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{Indent}\textbf{ Utilities}\par
+{\em useful functions for bivariate copulas }\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a8d0b6ed59b962d1349c1c2d49b17ccab}\label{classvinecopulib_1_1_bicop_a8d0b6ed59b962d1349c1c2d49b17ccab}} 
+std\+::string \hyperlink{classvinecopulib_1_1_bicop_a8d0b6ed59b962d1349c1c2d49b17ccab}{str} () const
+\begin{DoxyCompactList}\small\item\em summarizes the model into a string (can be used for printing). \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a59b7087b3857350df25ff684ab96f377}\label{classvinecopulib_1_1_bicop_a59b7087b3857350df25ff684ab96f377}} 
+void \hyperlink{classvinecopulib_1_1_bicop_a59b7087b3857350df25ff684ab96f377}{flip} ()
+\begin{DoxyCompactList}\small\item\em adjust\textquotesingle{}s the copula model to a change in the variable order. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\subsection*{Getters and setters}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a31b9242bfcff783cff12d1eb89ab82a7}\label{classvinecopulib_1_1_bicop_a31b9242bfcff783cff12d1eb89ab82a7}} 
+\hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family} {\bfseries get\+\_\+family} () const
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_afee990e7396b869a168e8508c56cb7f7}\label{classvinecopulib_1_1_bicop_afee990e7396b869a168e8508c56cb7f7}} 
+std\+::string {\bfseries get\+\_\+family\+\_\+name} () const
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_acefff1101f5f2c11731fd887c875e105}\label{classvinecopulib_1_1_bicop_acefff1101f5f2c11731fd887c875e105}} 
+int {\bfseries get\+\_\+rotation} () const
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a3243687fb4b9b7c02dfbc53b22e24203}\label{classvinecopulib_1_1_bicop_a3243687fb4b9b7c02dfbc53b22e24203}} 
+Eigen\+::\+Matrix\+Xd {\bfseries get\+\_\+parameters} () const
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a1ac4b29df47b0a09bb8afa230b0eca88}\label{classvinecopulib_1_1_bicop_a1ac4b29df47b0a09bb8afa230b0eca88}} 
+double {\bfseries get\+\_\+tau} () const
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a9707a32d415b6df6f4b70550ce5279b1}\label{classvinecopulib_1_1_bicop_a9707a32d415b6df6f4b70550ce5279b1}} 
+double {\bfseries get\+\_\+loglik} () const
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a8bd6cde26ce8c9ac335b7bb181033d90}\label{classvinecopulib_1_1_bicop_a8bd6cde26ce8c9ac335b7bb181033d90}} 
+size\+\_\+t {\bfseries get\+\_\+nobs} () const
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a1f76279f4bf59b754c51444cab71bf22}\label{classvinecopulib_1_1_bicop_a1f76279f4bf59b754c51444cab71bf22}} 
+double {\bfseries get\+\_\+aic} () const
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a956526f702664b6c821fa6fd7d900ae5}\label{classvinecopulib_1_1_bicop_a956526f702664b6c821fa6fd7d900ae5}} 
+double {\bfseries get\+\_\+bic} () const
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a4fd7c3b3ef2960d24b87da8c838df055}\label{classvinecopulib_1_1_bicop_a4fd7c3b3ef2960d24b87da8c838df055}} 
+double {\bfseries get\+\_\+mbic} (const double psi0) const
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a53be89bcc576f0192fe2690af3f6d93c}\label{classvinecopulib_1_1_bicop_a53be89bcc576f0192fe2690af3f6d93c}} 
+void {\bfseries set\+\_\+rotation} (const int rotation)
+\item 
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_ac8d1d4266b0fd7e2f971d0149f881ef9}\label{classvinecopulib_1_1_bicop_ac8d1d4266b0fd7e2f971d0149f881ef9}} 
+void {\bfseries set\+\_\+parameters} (const Eigen\+::\+Matrix\+Xd \&parameters)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A class for bivariate copula models. 
+
+The copula model is fully characterized by the family, rotation, and parameters. 
+
+Definition at line 19 of file class.\+hpp.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_ad9b900b5d0ad9ba3d4a95a114b322291}\label{classvinecopulib_1_1_bicop_ad9b900b5d0ad9ba3d4a95a114b322291}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!Bicop@{Bicop}}
+\index{Bicop@{Bicop}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{Bicop()}{Bicop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Bicop\+::\+Bicop (\begin{DoxyParamCaption}\item[{const \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3}{Bicop\+Family}}]{family = {\ttfamily \hyperlink{namespacevinecopulib_a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65}{Bicop\+Family\+::indep}},  }\item[{const int}]{rotation = {\ttfamily 0},  }\item[{const Eigen\+::\+Matrix\+Xd \&}]{parameters = {\ttfamily Eigen\+:\+:MatrixXd()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates a specific bivariate copula model. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em family} & the copula family. \\
+\hline
+{\em rotation} & the rotation of the copula; one of 0, 90, 180, or 270 (for Independence, Gaussian, Student, Frank, and nonparametric families, only 0 is allowed). \\
+\hline
+{\em parameters} & the copula parameters. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 22 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_ac439ded27a50239db5f94b4d8b1d7641}\label{classvinecopulib_1_1_bicop_ac439ded27a50239db5f94b4d8b1d7641}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!Bicop@{Bicop}}
+\index{Bicop@{Bicop}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{Bicop()}{Bicop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Bicop\+::\+Bicop (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{data,  }\item[{const \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop} \&}]{controls = {\ttfamily \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+create a copula model from the data, equivalent to {\ttfamily \hyperlink{classvinecopulib_1_1_bicop}{Bicop} cop; cop.\+select(data, controls)}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & see \hyperlink{classvinecopulib_1_1_bicop_a40e37a67480de2990821580eb09ba354}{select()}. \\
+\hline
+{\em controls} & see \hyperlink{classvinecopulib_1_1_bicop_a40e37a67480de2990821580eb09ba354}{select()}. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 40 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_aebe3a41e3f23817f0234fa789c443a98}\label{classvinecopulib_1_1_bicop_aebe3a41e3f23817f0234fa789c443a98}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!Bicop@{Bicop}}
+\index{Bicop@{Bicop}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{Bicop()}{Bicop()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Bicop\+::\+Bicop (\begin{DoxyParamCaption}\item[{const char $\ast$}]{filename }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates from a J\+S\+ON file 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & the name of the J\+S\+ON file to read (see \hyperlink{classvinecopulib_1_1_bicop_a74397cf5f843f5aebb436a49322dd2f9}{to\+\_\+ptree()} for the structure of the file). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 62 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a48720b451adb23ede4147d4d355f4eaa}\label{classvinecopulib_1_1_bicop_a48720b451adb23ede4147d4d355f4eaa}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!Bicop@{Bicop}}
+\index{Bicop@{Bicop}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{Bicop()}{Bicop()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily vinecopulib\+::\+Bicop\+::\+Bicop (\begin{DoxyParamCaption}\item[{const boost\+::property\+\_\+tree\+::ptree}]{input }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+creates from a boost\+::property\+\_\+tree\+::ptree object 
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & the boost\+::property\+\_\+tree\+::ptree object to convert from (see \hyperlink{classvinecopulib_1_1_bicop_a74397cf5f843f5aebb436a49322dd2f9}{to\+\_\+ptree()} for the structure of the input). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 49 of file class.\+ipp.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a6d5907e8fcc38c3be57712a26b562a39}\label{classvinecopulib_1_1_bicop_a6d5907e8fcc38c3be57712a26b562a39}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!aic@{aic}}
+\index{aic@{aic}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{aic()}{aic()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Bicop\+::aic (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u = {\ttfamily Eigen\+:\+:Matrix$<$double,~Eigen\+:\+:Dynamic,~2$>$()} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the Akaike information criterion (A\+IC). 
+
+The A\+IC is defined as \[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ p $ is the (effective) number of parameters of the model, see \hyperlink{classvinecopulib_1_1_bicop_a81979ae3578ec9af1f5f956751faa63d}{loglik()} and \hyperlink{classvinecopulib_1_1_bicop_a8e6b3e3dd484d07cafeb24ca3393f5f0}{calculate\+\_\+npars()}. The A\+IC is a consistent model selection criterion for nonparametric models.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of observations. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 289 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a5ad96c73be4b32846792203a9dee1c53}\label{classvinecopulib_1_1_bicop_a5ad96c73be4b32846792203a9dee1c53}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!bic@{bic}}
+\index{bic@{bic}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{bic()}{bic()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Bicop\+::bic (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u = {\ttfamily Eigen\+:\+:Matrix$<$double,~Eigen\+:\+:Dynamic,~2$>$()} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the Bayesian information criterion (B\+IC). 
+
+The B\+IC is defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \ln(n) p, \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ p $ is the (effective) number of parameters of the model, see \hyperlink{classvinecopulib_1_1_bicop_a81979ae3578ec9af1f5f956751faa63d}{loglik()} and \hyperlink{classvinecopulib_1_1_bicop_a8e6b3e3dd484d07cafeb24ca3393f5f0}{calculate\+\_\+npars()}. The B\+IC is a consistent model selection criterion for parametric models.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of observations. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 305 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a8e6b3e3dd484d07cafeb24ca3393f5f0}\label{classvinecopulib_1_1_bicop_a8e6b3e3dd484d07cafeb24ca3393f5f0}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!calculate\+\_\+npars@{calculate\+\_\+npars}}
+\index{calculate\+\_\+npars@{calculate\+\_\+npars}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{calculate\+\_\+npars()}{calculate\_npars()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Bicop\+::calculate\+\_\+npars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+returns the actual number of parameters for parameteric families. 
+
+For nonparametric families, there is a conceptually similar definition in the sense that it can be used in the calculation of fit statistics. 
+
+Definition at line 344 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a3b0ee4b197e971f83e1d0c357c5ccdd3}\label{classvinecopulib_1_1_bicop_a3b0ee4b197e971f83e1d0c357c5ccdd3}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!cdf@{cdf}}
+\index{cdf@{cdf}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{cdf()}{cdf()}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd vinecopulib\+::\+Bicop\+::cdf (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+evaluates the copula distribution. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The copula distribution evaluated at {\ttfamily u}. 
+\end{DoxyReturn}
+
+
+Definition at line 114 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_ac95738f7f2ec4e008404f5621030efc1}\label{classvinecopulib_1_1_bicop_ac95738f7f2ec4e008404f5621030efc1}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!fit@{fit}}
+\index{fit@{fit}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{fit()}{fit()}}
+{\footnotesize\ttfamily void vinecopulib\+::\+Bicop\+::fit (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{data,  }\item[{const \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop} \&}]{controls = {\ttfamily \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+fits a bivariate copula (with fixed family) to data. 
+
+For parametric models, two different methods are available. {\ttfamily \char`\"{}mle\char`\"{}} fits the parameters by maximum-\/likelihood. {\ttfamily \char`\"{}itau\char`\"{}} uses inversion of Kendall\textquotesingle{}s $ \tau $, but is only available for one-\/parameter families and the Student t copula. For the latter, there is a one-\/to-\/one transformation for the first parameter, the second is found by profile likelihood optimization (with accuracy of at least 0.\+5). Nonparametric families have specialized methods, no specification is required.
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & an $ n \times 2 $ matrix of observations contained in $(0, 1)^2 $. \\
+\hline
+{\em controls} & the controls (see \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 533 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_ae6d42fab3bc19b807f41ccecfc80de46}\label{classvinecopulib_1_1_bicop_ae6d42fab3bc19b807f41ccecfc80de46}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!hfunc1@{hfunc1}}
+\index{hfunc1@{hfunc1}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{hfunc1()}{hfunc1()}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd vinecopulib\+::\+Bicop\+::hfunc1 (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the first h-\/function. 
+
+The first h-\/function is $ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) $. 
+\begin{DoxyParams}{Parameters}
+{\em u} & $m \times 2$ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 143 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a9bbf2e9ab9a04a45e8d98206a46b7596}\label{classvinecopulib_1_1_bicop_a9bbf2e9ab9a04a45e8d98206a46b7596}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!hfunc2@{hfunc2}}
+\index{hfunc2@{hfunc2}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{hfunc2()}{hfunc2()}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd vinecopulib\+::\+Bicop\+::hfunc2 (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the second h-\/function. 
+
+The second h-\/function is $ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) $. 
+\begin{DoxyParams}{Parameters}
+{\em u} & $m \times 2$ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 168 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_aa4c7814cd1728ecf4c965aed5499968f}\label{classvinecopulib_1_1_bicop_aa4c7814cd1728ecf4c965aed5499968f}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!hinv1@{hinv1}}
+\index{hinv1@{hinv1}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{hinv1()}{hinv1()}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd vinecopulib\+::\+Bicop\+::hinv1 (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the inverse of $ h_1 $ (see \hyperlink{classvinecopulib_1_1_bicop_ae6d42fab3bc19b807f41ccecfc80de46}{hfunc1()}) w.\+r.\+t. the second argument. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $m \times 2$ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 191 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a571c4e213695f805f8e0e7843f9b245b}\label{classvinecopulib_1_1_bicop_a571c4e213695f805f8e0e7843f9b245b}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!hinv2@{hinv2}}
+\index{hinv2@{hinv2}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{hinv2()}{hinv2()}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd vinecopulib\+::\+Bicop\+::hinv2 (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the inverse of $ h_2 $ (see \hyperlink{classvinecopulib_1_1_bicop_a9bbf2e9ab9a04a45e8d98206a46b7596}{hfunc2()}) w.\+r.\+t. the first argument. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $m \times 2$ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 214 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a81979ae3578ec9af1f5f956751faa63d}\label{classvinecopulib_1_1_bicop_a81979ae3578ec9af1f5f956751faa63d}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!loglik@{loglik}}
+\index{loglik@{loglik}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{loglik()}{loglik()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Bicop\+::loglik (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u = {\ttfamily Eigen\+:\+:Matrix$<$double,~Eigen\+:\+:Dynamic,~2$>$()} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the log-\/likelihood. 
+
+The log-\/likelihood is defined as \[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \] where $ c $ is the copula density \hyperlink{classvinecopulib_1_1_bicop_a6c5a0051c17e74760d4eab394245b3f1}{pdf()}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of observations. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 266 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a12e146f82646dbebcd12cccd82d91c00}\label{classvinecopulib_1_1_bicop_a12e146f82646dbebcd12cccd82d91c00}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!mbic@{mbic}}
+\index{mbic@{mbic}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{mbic()}{mbic()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Bicop\+::mbic (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u = {\ttfamily Eigen\+:\+:Matrix$<$double,~Eigen\+:\+:Dynamic,~2$>$()},  }\item[{const double}]{psi0 = {\ttfamily 0.9} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+calculates the modified Bayesian information criterion (m\+B\+IC). 
+
+The m\+B\+IC is defined as \[ \mathrm{BIC} = -2\, \mathrm{loglik} + \nu \ln(n) //! - 2 (I log(\psi_0) + (1 - I) log(1 - \psi_0) \] where $ \mathrm{loglik} $ is the log-\/liklihood and $ \nu $ is the (effective) number of parameters of the model, $ \psi_0 $ is the prior probability of having a non-\/independence copula and $ I $ is an indicator for the family being non-\/independence; see \hyperlink{classvinecopulib_1_1_bicop_a81979ae3578ec9af1f5f956751faa63d}{loglik()} and \hyperlink{classvinecopulib_1_1_bicop_a8e6b3e3dd484d07cafeb24ca3393f5f0}{calculate\+\_\+npars()}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of observations. \\
+\hline
+{\em psi0} & prior probability of a non-\/independence copula. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 327 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_ac3d54d13bccaab2ab249599ee133c3c5}\label{classvinecopulib_1_1_bicop_ac3d54d13bccaab2ab249599ee133c3c5}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!parameters\+\_\+to\+\_\+tau@{parameters\+\_\+to\+\_\+tau}}
+\index{parameters\+\_\+to\+\_\+tau@{parameters\+\_\+to\+\_\+tau}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{parameters\+\_\+to\+\_\+tau()}{parameters\_to\_tau()}}
+{\footnotesize\ttfamily double vinecopulib\+::\+Bicop\+::parameters\+\_\+to\+\_\+tau (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix\+Xd \&}]{parameters }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+converts the parameters to the Kendall\textquotesingle{}s $ tau $ for the current family. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em parameters} & the parameters (must be a valid parametrization of the current family). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 365 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a6c5a0051c17e74760d4eab394245b3f1}\label{classvinecopulib_1_1_bicop_a6c5a0051c17e74760d4eab394245b3f1}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!pdf@{pdf}}
+\index{pdf@{pdf}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{pdf()}{pdf()}}
+{\footnotesize\ttfamily Eigen\+::\+Vector\+Xd vinecopulib\+::\+Bicop\+::pdf (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{u }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+evaluates the copula density. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em u} & $n \times 2$ matrix of evaluation points. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The copula density evaluated at {\ttfamily u}. 
+\end{DoxyReturn}
+
+
+Definition at line 102 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a40e37a67480de2990821580eb09ba354}\label{classvinecopulib_1_1_bicop_a40e37a67480de2990821580eb09ba354}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!select@{select}}
+\index{select@{select}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{select()}{select()}}
+{\footnotesize\ttfamily void vinecopulib\+::\+Bicop\+::select (\begin{DoxyParamCaption}\item[{const Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ \&}]{data,  }\item[{\hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}}]{controls = {\ttfamily \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+selects the best fitting model. 
+
+The function calls \hyperlink{classvinecopulib_1_1_bicop_ac95738f7f2ec4e008404f5621030efc1}{fit()} for all families in {\ttfamily family\+\_\+set} and selecting the best fitting model by either B\+IC or A\+IC, see \hyperlink{classvinecopulib_1_1_bicop_a5ad96c73be4b32846792203a9dee1c53}{bic()} and \hyperlink{classvinecopulib_1_1_bicop_a6d5907e8fcc38c3be57712a26b562a39}{aic()}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & an $ n \times 2 $ matrix of observations contained in $(0, 1)^2 $. \\
+\hline
+{\em controls} & the controls (see \hyperlink{classvinecopulib_1_1_fit_controls_bicop}{Fit\+Controls\+Bicop}). \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 566 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a31dc185fdd1be89370088eea3fad23e6}\label{classvinecopulib_1_1_bicop_a31dc185fdd1be89370088eea3fad23e6}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!simulate@{simulate}}
+\index{simulate@{simulate}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{simulate()}{simulate()}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix$<$ double, Eigen\+::\+Dynamic, 2 $>$ vinecopulib\+::\+Bicop\+::simulate (\begin{DoxyParamCaption}\item[{const size\+\_\+t \&}]{n,  }\item[{const bool}]{qrng = {\ttfamily false},  }\item[{const std\+::vector$<$ int $>$ \&}]{seeds = {\ttfamily std\+:\+:vector$<$int$>$()} }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+simulates from a bivariate copula. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & number of observations. \\
+\hline
+{\em qrng} & set to true for quasi-\/random numbers. \\
+\hline
+{\em seeds} & seeds of the (quasi-\/)random number generator; if empty (default), the (quasi-\/)random number generator is seeded randomly. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An $ n \times 2 $ matrix of samples from the copula model. 
+\end{DoxyReturn}
+
+
+Definition at line 243 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a2664461e9ef54c1596a2db7d1592af20}\label{classvinecopulib_1_1_bicop_a2664461e9ef54c1596a2db7d1592af20}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!tau\+\_\+to\+\_\+parameters@{tau\+\_\+to\+\_\+parameters}}
+\index{tau\+\_\+to\+\_\+parameters@{tau\+\_\+to\+\_\+parameters}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{tau\+\_\+to\+\_\+parameters()}{tau\_to\_parameters()}}
+{\footnotesize\ttfamily Eigen\+::\+Matrix\+Xd vinecopulib\+::\+Bicop\+::tau\+\_\+to\+\_\+parameters (\begin{DoxyParamCaption}\item[{const double \&}]{tau }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+converts a Kendall\textquotesingle{}s $ \tau $ to the copula parameters of the current family 
+
+(only works for one-\/parameter families) 
+\begin{DoxyParams}{Parameters}
+{\em tau} & a value in $ (-1, 1) $. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 354 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a67cec4b86ecdae9ab4bd299fcd53ab60}\label{classvinecopulib_1_1_bicop_a67cec4b86ecdae9ab4bd299fcd53ab60}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!to\+\_\+json@{to\+\_\+json}}
+\index{to\+\_\+json@{to\+\_\+json}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{to\+\_\+json()}{to\_json()}}
+{\footnotesize\ttfamily void vinecopulib\+::\+Bicop\+::to\+\_\+json (\begin{DoxyParamCaption}\item[{const char $\ast$}]{filename }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Write the copula object into a J\+S\+ON file. 
+
+See \hyperlink{classvinecopulib_1_1_bicop_a74397cf5f843f5aebb436a49322dd2f9}{to\+\_\+ptree()} for the structure of the file.
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & the name of the file to write. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 92 of file class.\+ipp.
+
+\mbox{\Hypertarget{classvinecopulib_1_1_bicop_a74397cf5f843f5aebb436a49322dd2f9}\label{classvinecopulib_1_1_bicop_a74397cf5f843f5aebb436a49322dd2f9}} 
+\index{vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}!to\+\_\+ptree@{to\+\_\+ptree}}
+\index{to\+\_\+ptree@{to\+\_\+ptree}!vinecopulib\+::\+Bicop@{vinecopulib\+::\+Bicop}}
+\subsubsection{\texorpdfstring{to\+\_\+ptree()}{to\_ptree()}}
+{\footnotesize\ttfamily boost\+::property\+\_\+tree\+::ptree vinecopulib\+::\+Bicop\+::to\+\_\+ptree (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Convert the copula into a boost\+::property\+\_\+tree\+::ptree object. 
+
+The boost\+::property\+\_\+tree\+::ptree is contains of three values named {\ttfamily \char`\"{}family\char`\"{}}, {\ttfamily \char`\"{}rotation\char`\"{}}, {\ttfamily \char`\"{}parameters\char`\"{}}, respectively a string for the family name, an integer for the rotation, and an Eigen\+::\+Matrix\+Xd for the parameters.
+
+\begin{DoxyReturn}{Returns}
+the boost\+::property\+\_\+tree\+::ptree object containing the copula. 
+\end{DoxyReturn}
+
+
+Definition at line 75 of file class.\+ipp.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/vinecopulib/bicop/class.\+hpp\item 
+include/vinecopulib/bicop/implementation/class.\+ipp\end{DoxyCompactItemize}

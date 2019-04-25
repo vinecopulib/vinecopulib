@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_bdff260fc04acee89d9ee8246c58b15c" kind="dir">
+    <compoundname>cpp/vinecopulib/include/vinecopulib/bicop</compoundname>
+    <innerdir refid="dir_191c3c3c2637b07916fcc36ed830d9d6">cpp/vinecopulib/include/vinecopulib/bicop/implementation</innerdir>
+    <innerfile refid="bicop_2class_8hpp">class.hpp</innerfile>
+    <innerfile refid="family_8hpp">family.hpp</innerfile>
+    <innerfile refid="bicop_2fit__controls_8hpp">fit_controls.hpp</innerfile>
+    <briefdescription>
+<para>Implementation of Bicop class. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="cpp/vinecopulib/include/vinecopulib/bicop/"/>
+  </compounddef>
+</doxygen>

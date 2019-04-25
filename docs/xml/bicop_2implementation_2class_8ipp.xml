@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="bicop_2implementation_2class_8ipp" kind="file" language="C++">
+    <compoundname>class.ipp</compoundname>
+    <includes local="no">vinecopulib/bicop/tools_select.hpp</includes>
+    <includes refid="tools__stats_8hpp" local="no">vinecopulib/misc/tools_stats.hpp</includes>
+    <includes local="no">vinecopulib/misc/tools_stl.hpp</includes>
+    <includes local="no">vinecopulib/misc/tools_interface.hpp</includes>
+    <includes local="no">mutex</includes>
+    <includedby refid="bicop_2class_8hpp" local="no">include/vinecopulib/bicop/class.hpp</includedby>
+    <incdepgraph>
+      <node id="165">
+        <label>vinecopulib/misc/tools_interface.hpp</label>
+      </node>
+      <node id="163">
+        <label>unsupported/Eigen/FFT</label>
+      </node>
+      <node id="158">
+        <label>vinecopulib/misc/tools_eigen.hpp</label>
+      </node>
+      <node id="155">
+        <label>vinecopulib/misc/tools_stats.hpp</label>
+        <link refid="tools__stats_8hpp_source"/>
+        <childnode refid="156" relation="include">
+        </childnode>
+        <childnode refid="157" relation="include">
+        </childnode>
+        <childnode refid="158" relation="include">
+        </childnode>
+        <childnode refid="159" relation="include">
+        </childnode>
+      </node>
+      <node id="164">
+        <label>wdm/eigen.hpp</label>
+      </node>
+      <node id="157">
+        <label>random</label>
+      </node>
+      <node id="156">
+        <label>boost/math/distributions.hpp</label>
+      </node>
+      <node id="153">
+        <label>include/vinecopulib/bicop/implementation/class.ipp</label>
+        <link refid="bicop_2implementation_2class_8ipp"/>
+        <childnode refid="154" relation="include">
+        </childnode>
+        <childnode refid="155" relation="include">
+        </childnode>
+        <childnode refid="162" relation="include">
+        </childnode>
+        <childnode refid="165" relation="include">
+        </childnode>
+        <childnode refid="166" relation="include">
+        </childnode>
+      </node>
+      <node id="159">
+        <label>vinecopulib/misc/implementation/tools_stats.ipp</label>
+        <link refid="tools__stats_8ipp_source"/>
+        <childnode refid="160" relation="include">
+        </childnode>
+        <childnode refid="161" relation="include">
+        </childnode>
+        <childnode refid="162" relation="include">
+        </childnode>
+        <childnode refid="163" relation="include">
+        </childnode>
+        <childnode refid="164" relation="include">
+        </childnode>
+      </node>
+      <node id="161">
+        <label>vinecopulib/misc/tools_stats_sobol.hpp</label>
+        <link refid="tools__stats__sobol_8hpp_source"/>
+      </node>
+      <node id="166">
+        <label>mutex</label>
+      </node>
+      <node id="160">
+        <label>vinecopulib/misc/tools_stats_ghalton.hpp</label>
+        <link refid="tools__stats__ghalton_8hpp_source"/>
+      </node>
+      <node id="162">
+        <label>vinecopulib/misc/tools_stl.hpp</label>
+      </node>
+      <node id="154">
+        <label>vinecopulib/bicop/tools_select.hpp</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="168">
+        <label>include/vinecopulib/bicop/class.hpp</label>
+        <link refid="bicop_2class_8hpp_source"/>
+        <childnode refid="169" relation="include">
+        </childnode>
+        <childnode refid="170" relation="include">
+        </childnode>
+      </node>
+      <node id="167">
+        <label>include/vinecopulib/bicop/implementation/class.ipp</label>
+        <link refid="bicop_2implementation_2class_8ipp"/>
+        <childnode refid="168" relation="include">
+        </childnode>
+      </node>
+      <node id="170">
+        <label>include/vinecopulib.hpp</label>
+        <link refid="vinecopulib_8hpp_source"/>
+      </node>
+      <node id="169">
+        <label>include/vinecopulib/vinecop/class.hpp</label>
+        <link refid="vinecop_2class_8hpp_source"/>
+        <childnode refid="170" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespacevinecopulib">vinecopulib</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/vinecopulib/bicop/implementation/class.ipp"/>
+  </compounddef>
+</doxygen>

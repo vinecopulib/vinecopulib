@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_a53ef55c755698c9939367e6b4ea5341" kind="dir">
+    <compoundname>vinecopulib/include/vinecopulib/misc/implementation</compoundname>
+    <innerfile refid="tools__stats_8ipp">tools_stats.ipp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="vinecopulib/include/vinecopulib/misc/implementation/"/>
+  </compounddef>
+</doxygen>

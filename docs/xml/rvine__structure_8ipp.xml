@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="rvine__structure_8ipp" kind="file" language="C++">
+    <compoundname>rvine_structure.ipp</compoundname>
+    <includedby refid="rvine__structure_8hpp" local="no">include/vinecopulib/vinecop/rvine_structure.hpp</includedby>
+    <invincdepgraph>
+      <node id="269">
+        <label>include/vinecopulib/vinecop/implementation/rvine_structure.ipp</label>
+        <link refid="rvine__structure_8ipp"/>
+        <childnode refid="270" relation="include">
+        </childnode>
+      </node>
+      <node id="272">
+        <label>include/vinecopulib.hpp</label>
+        <link refid="vinecopulib_8hpp_source"/>
+      </node>
+      <node id="271">
+        <label>include/vinecopulib/vinecop/class.hpp</label>
+        <link refid="vinecop_2class_8hpp_source"/>
+        <childnode refid="272" relation="include">
+        </childnode>
+      </node>
+      <node id="270">
+        <label>include/vinecopulib/vinecop/rvine_structure.hpp</label>
+        <link refid="rvine__structure_8hpp_source"/>
+        <childnode refid="271" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespacevinecopulib">vinecopulib</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/vinecopulib/vinecop/implementation/rvine_structure.ipp"/>
+  </compounddef>
+</doxygen>

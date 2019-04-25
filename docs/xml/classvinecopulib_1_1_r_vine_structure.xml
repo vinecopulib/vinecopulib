@@ -1,0 +1,782 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="classvinecopulib_1_1_r_vine_structure" kind="class" language="C++" prot="public">
+    <compoundname>vinecopulib::RVineStructure</compoundname>
+    <includes refid="rvine__structure_8hpp" local="no">rvine_structure.hpp</includes>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classvinecopulib_1_1_r_vine_structure_1afe9ed9e81a35e1816e0d66d0223fbffc" prot="private" static="no" mutable="no">
+        <type>std::vector&lt; size_t &gt;</type>
+        <definition>std::vector&lt;size_t&gt; vinecopulib::RVineStructure::order_</definition>
+        <argsstring></argsstring>
+        <name>order_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="120" column="1" bodyfile="include/vinecopulib/vinecop/rvine_structure.hpp" bodystart="120" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classvinecopulib_1_1_r_vine_structure_1ad2b50a1841a8fdbf172bdd41ce2f94ab" prot="private" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t vinecopulib::RVineStructure::d_</definition>
+        <argsstring></argsstring>
+        <name>d_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="121" column="1" bodyfile="include/vinecopulib/vinecop/rvine_structure.hpp" bodystart="121" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classvinecopulib_1_1_r_vine_structure_1aeaf238cc116e7a198a1f43cef4360462" prot="private" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t vinecopulib::RVineStructure::trunc_lvl_</definition>
+        <argsstring></argsstring>
+        <name>trunc_lvl_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="122" column="1" bodyfile="include/vinecopulib/vinecop/rvine_structure.hpp" bodystart="122" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classvinecopulib_1_1_r_vine_structure_1a7c4209ec3bef2ded97361ff97a297483" prot="private" static="no" mutable="no">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt;size_t&gt; vinecopulib::RVineStructure::struct_array_</definition>
+        <argsstring></argsstring>
+        <name>struct_array_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="123" column="1" bodyfile="include/vinecopulib/vinecop/rvine_structure.hpp" bodystart="123" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classvinecopulib_1_1_r_vine_structure_1a503fcb4e9036db49bd4840ae80cc6128" prot="private" static="no" mutable="no">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt;size_t&gt; vinecopulib::RVineStructure::min_array_</definition>
+        <argsstring></argsstring>
+        <name>min_array_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="124" column="1" bodyfile="include/vinecopulib/vinecop/rvine_structure.hpp" bodystart="124" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classvinecopulib_1_1_r_vine_structure_1a7403cad6cfbeff9fc190a58049ce2eab" prot="private" static="no" mutable="no">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt;size_t&gt; vinecopulib::RVineStructure::needed_hfunc1_</definition>
+        <argsstring></argsstring>
+        <name>needed_hfunc1_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="125" column="1" bodyfile="include/vinecopulib/vinecop/rvine_structure.hpp" bodystart="125" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classvinecopulib_1_1_r_vine_structure_1ac0eb2517f8924d7b2efb54e00658b5f5" prot="private" static="no" mutable="no">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt;size_t&gt; vinecopulib::RVineStructure::needed_hfunc2_</definition>
+        <argsstring></argsstring>
+        <name>needed_hfunc2_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="126" column="1" bodyfile="include/vinecopulib/vinecop/rvine_structure.hpp" bodystart="126" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a4408fcee797cfd3bf7913b92986d6b08" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>vinecopulib::RVineStructure::RVineStructure</definition>
+        <argsstring>()</argsstring>
+        <name>RVineStructure</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="67" column="1" bodyfile="include/vinecopulib/vinecop/rvine_structure.hpp" bodystart="67" bodyend="67"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a271688bc56e2950d5a27213f4b5f9fda" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>vinecopulib::RVineStructure::RVineStructure</definition>
+        <argsstring>(const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;mat, bool check=true)</argsstring>
+        <name>RVineStructure</name>
+        <param>
+          <type>const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;</type>
+          <declname>mat</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>check</declname>
+          <defval>true</defval>
+        </param>
+        <briefdescription>
+<para>instantiates an <ref refid="classvinecopulib_1_1_r_vine_structure" kindref="compound">RVineStructure</ref> object from a matrix representing an R-vine array. </para>        </briefdescription>
+        <detaileddescription>
+<para>The matrix must contain zeros in the lower right triangle and the upper left triangle must be a valid R-vine array. Truncated vines can be encoded by putting zeros above the digonal in all rows below the truncation level. Example of a 1-truncated matrix: <programlisting><codeline><highlight class="normal">4<sp/>4<sp/>4<sp/>4</highlight></codeline>
+<codeline><highlight class="normal">0<sp/>0<sp/>3<sp/>0</highlight></codeline>
+<codeline><highlight class="normal">0<sp/>2<sp/>0<sp/>0</highlight></codeline>
+<codeline><highlight class="normal">1<sp/>0<sp/>0<sp/>0</highlight></codeline>
+</programlisting> <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>mat</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a matrix representing a valid R-vine array. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>check</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether <computeroutput>mat</computeroutput> shall be checked for validity. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="69" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="24" bodyend="54"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1aa7e6b14379d8eed772e63c6944e3f610" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>vinecopulib::RVineStructure::RVineStructure</definition>
+        <argsstring>(const std::vector&lt; size_t &gt; &amp;order, bool check=true)</argsstring>
+        <name>RVineStructure</name>
+        <param>
+          <type>const std::vector&lt; size_t &gt; &amp;</type>
+          <declname>order</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>check</declname>
+          <defval>true</defval>
+        </param>
+        <briefdescription>
+<para>instantiates an <ref refid="classvinecopulib_1_1_r_vine_structure" kindref="compound">RVineStructure</ref> object to a D-vine with given ordering of variables. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>order</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the order of variables in the D-vine (diagonal entries in the R-vine array); must be a permutation of 1, ..., d. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>check</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether `order shall be checked for validity. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="72" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="62" bodyend="64"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a2d1ec630fcd5b7d820413dedca26cdad" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>vinecopulib::RVineStructure::RVineStructure</definition>
+        <argsstring>(const std::vector&lt; size_t &gt; &amp;order, const size_t &amp;trunc_lvl, bool check=true)</argsstring>
+        <name>RVineStructure</name>
+        <param>
+          <type>const std::vector&lt; size_t &gt; &amp;</type>
+          <declname>order</declname>
+        </param>
+        <param>
+          <type>const size_t &amp;</type>
+          <declname>trunc_lvl</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>check</declname>
+          <defval>true</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="74" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="66" bodyend="84"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a0fb1958f6971b01776133af60ee20ee7" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>vinecopulib::RVineStructure::RVineStructure</definition>
+        <argsstring>(const std::vector&lt; size_t &gt; &amp;order, const TriangularArray&lt; size_t &gt; &amp;struct_array, bool is_natural_order=false, bool check=true)</argsstring>
+        <name>RVineStructure</name>
+        <param>
+          <type>const std::vector&lt; size_t &gt; &amp;</type>
+          <declname>order</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt; &amp;</type>
+          <declname>struct_array</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>is_natural_order</declname>
+          <defval>false</defval>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>check</declname>
+          <defval>true</defval>
+        </param>
+        <briefdescription>
+<para>instantiates an <ref refid="classvinecopulib_1_1_r_vine_structure" kindref="compound">RVineStructure</ref> object from the variable order (diagonal elements of the R-vine array) and a triangular structure array (all elements above the diagonal). </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>order</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the order of variables (diagonal entries in the R-vine array); must be a permutation of 1, ..., d. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>struct_array</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the structure array (all elements above the diagonal in the R-vine array). For truncated vines, all rows below the truncation level are omitted. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>is_natural_order</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether <computeroutput>struct_array</computeroutput> is already in natural order. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>check</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>whether <computeroutput>order</computeroutput> and <computeroutput>struct_array</computeroutput> shall be checked for validity. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="77" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="97" bodyend="137"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1ac2cd2c83b9ffafb9c6563f1923aa1835" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t vinecopulib::RVineStructure::get_dim</definition>
+        <argsstring>() const</argsstring>
+        <name>get_dim</name>
+        <briefdescription>
+<para>extract the dimension of the vine. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="82" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="140" bodyend="143"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a6c691b843017f85b7067fcbe0fae55d0" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t vinecopulib::RVineStructure::get_trunc_lvl</definition>
+        <argsstring>() const</argsstring>
+        <name>get_trunc_lvl</name>
+        <briefdescription>
+<para>extract the truncation level of the vine. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="83" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="146" bodyend="149"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1aed7d73a5bf50b95a6166f42e0f8df9a9" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::vector&lt; size_t &gt;</type>
+        <definition>std::vector&lt; size_t &gt; vinecopulib::RVineStructure::get_order</definition>
+        <argsstring>() const</argsstring>
+        <name>get_order</name>
+        <briefdescription>
+<para>extract the order of variables in the vine (diagonal entries in the R-vine array). </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="84" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="153" bodyend="156"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a1f04ff64c8cf56fa32173ed0fccbbe46" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt; size_t &gt; vinecopulib::RVineStructure::get_struct_array</definition>
+        <argsstring>() const</argsstring>
+        <name>get_struct_array</name>
+        <briefdescription>
+<para>extract structure array (all elements above the diagonal in the R-vine array). </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="85" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="160" bodyend="163"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1aaebebea9982629eb81223d18b0b9d905" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt; size_t &gt; vinecopulib::RVineStructure::get_min_array</definition>
+        <argsstring>() const</argsstring>
+        <name>get_min_array</name>
+        <briefdescription>
+<para>extracts the minimum array. </para>        </briefdescription>
+        <detaileddescription>
+<para>The minimum array is derived from an R-vine array by iteratively computing the (elementwise) minimum of two subsequent rows (starting from the top). It is used in estimation and evaluation algorithms to find the two edges in the previous tree that are joined by the current edge. </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="86" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="172" bodyend="175"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a71e339dae0c4ea4338c731a0dfa70780" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt; size_t &gt; vinecopulib::RVineStructure::get_needed_hfunc1</definition>
+        <argsstring>() const</argsstring>
+        <name>get_needed_hfunc1</name>
+        <briefdescription>
+<para>extracts an array indicating which of the first h-functions are needed. </para>        </briefdescription>
+        <detaileddescription>
+<para>(it is usually not necessary to compute both h-functions for each pair-copula). </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="87" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="181" bodyend="184"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1aa935d78845713014d7aaf6a6aa1a9a8f" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt; size_t &gt; vinecopulib::RVineStructure::get_needed_hfunc2</definition>
+        <argsstring>() const</argsstring>
+        <name>get_needed_hfunc2</name>
+        <briefdescription>
+<para>extracts an array indicating which of the second h-functions are needed. </para>        </briefdescription>
+        <detaileddescription>
+<para>(it is usually not necessary to compute both h-functions for each pair-copula). </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="88" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="190" bodyend="193"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a37325d7485875cf823c288400c351699" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt;</type>
+        <definition>Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; vinecopulib::RVineStructure::get_matrix</definition>
+        <argsstring>() const</argsstring>
+        <name>get_matrix</name>
+        <briefdescription>
+<para>extract the R-vine matrix representation. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="89" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="247" bodyend="260"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a00835cb9e06ca80bfff9c89100a1bb56" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t vinecopulib::RVineStructure::struct_array</definition>
+        <argsstring>(size_t tree, size_t edge) const</argsstring>
+        <name>struct_array</name>
+        <param>
+          <type>size_t</type>
+          <declname>tree</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>edge</declname>
+        </param>
+        <briefdescription>
+<para>access elements of the structure array. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>tree</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>tree index. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>edge</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>edge index. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="91" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="198" bodyend="201"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a4c67417a03be525c7c64ebcc884b87fc" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t vinecopulib::RVineStructure::min_array</definition>
+        <argsstring>(size_t tree, size_t edge) const</argsstring>
+        <name>min_array</name>
+        <param>
+          <type>size_t</type>
+          <declname>tree</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>edge</declname>
+        </param>
+        <briefdescription>
+<para>access elements of the minimum array. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>tree</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>tree index. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>edge</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>edge index. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="92" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="206" bodyend="208"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a7580c0663ac702f718944de2a0fcd1d3" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::RVineStructure::truncate</definition>
+        <argsstring>(size_t trunc_lvl)</argsstring>
+        <name>truncate</name>
+        <param>
+          <type>size_t</type>
+          <declname>trunc_lvl</declname>
+        </param>
+        <briefdescription>
+<para>truncates the R-vine structure. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>trunc_lvl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the truncation level.</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+If the structure is already truncated at a level less than <computeroutput>trunc_lvl</computeroutput>, the function does nothing. </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="94" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="215" bodyend="224"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a488bcaf1868f79f733e812f80445199e" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string vinecopulib::RVineStructure::str</definition>
+        <argsstring>() const</argsstring>
+        <name>str</name>
+        <briefdescription>
+<para>converts the structure to a string representation (most useful for printing). </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="95" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="227" bodyend="243"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a53839dd700b689c87346bdc44a97ebda" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t vinecopulib::RVineStructure::find_trunc_lvl</definition>
+        <argsstring>(const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;mat) const</argsstring>
+        <name>find_trunc_lvl</name>
+        <param>
+          <type>const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;</type>
+          <declname>mat</declname>
+        </param>
+        <briefdescription>
+<para>find the truncation level in an R-vine array. </para>        </briefdescription>
+        <detaileddescription>
+<para>The truncation level is determined by the first row (starting from the bottom) that contains only zeros above the diagonal.</para><para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>mat</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>an array representing the R-vine array. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="98" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="269" bodyend="291"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1aba56d8f32760cef0a66200faf6868778" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::vector&lt; size_t &gt;</type>
+        <definition>std::vector&lt; size_t &gt; vinecopulib::RVineStructure::get_order</definition>
+        <argsstring>(const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;mat) const</argsstring>
+        <name>get_order</name>
+        <param>
+          <type>const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;</type>
+          <declname>mat</declname>
+        </param>
+        <briefdescription>
+<para>find the order of an R-vine array. </para>        </briefdescription>
+        <detaileddescription>
+<para>The order is contained in the counter-diagonal of the R-vine array. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>mat</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a matrix representing the R-vine array. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="100" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="297" bodyend="305"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1adf765bda069f23409d0289d4c087e8d2" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt; size_t &gt; vinecopulib::RVineStructure::to_rvine_array</definition>
+        <argsstring>(const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;mat) const</argsstring>
+        <name>to_rvine_array</name>
+        <param>
+          <type>const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;</type>
+          <declname>mat</declname>
+        </param>
+        <briefdescription>
+<para>extracts the structure array (entries above the diagonal in R-vine array). </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>mat</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a array representing the R-vine array. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="102" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="309" bodyend="321"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a96b50b9a5fc53f53d867c3610d6a99bd" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt; size_t &gt; vinecopulib::RVineStructure::to_natural_order</definition>
+        <argsstring>() const</argsstring>
+        <name>to_natural_order</name>
+        <briefdescription>
+<para>converts <computeroutput>struct_array_</computeroutput> to natural order. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="105" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="324" bodyend="338"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a4d5a13be2f839cdd3e194ccd0da7b7e0" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt; size_t &gt; vinecopulib::RVineStructure::compute_dvine_struct_array</definition>
+        <argsstring>() const</argsstring>
+        <name>compute_dvine_struct_array</name>
+        <briefdescription>
+<para>creates a structure array corresponding to a D-vine (in natural order). </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="106" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="341" bodyend="351"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a989a81821a22281a23a315d9c1cebd28" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt; size_t &gt; vinecopulib::RVineStructure::compute_min_array</definition>
+        <argsstring>() const</argsstring>
+        <name>compute_min_array</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="107" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="353" bodyend="363"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a75909b9e1e7a292b53d709778eefb8be" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt; size_t &gt; vinecopulib::RVineStructure::compute_needed_hfunc1</definition>
+        <argsstring>() const</argsstring>
+        <name>compute_needed_hfunc1</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="108" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="365" bodyend="377"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1ad5d206da33caad5a93a8c4bcf5914abc" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; size_t &gt;</type>
+        <definition>TriangularArray&lt; size_t &gt; vinecopulib::RVineStructure::compute_needed_hfunc2</definition>
+        <argsstring>() const</argsstring>
+        <name>compute_needed_hfunc2</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="109" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="379" bodyend="392"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1ac17fb4459ad72692a9420eae2ed7cb11" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::RVineStructure::check_if_quadratic</definition>
+        <argsstring>(const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;mat) const</argsstring>
+        <name>check_if_quadratic</name>
+        <param>
+          <type>const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;</type>
+          <declname>mat</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="111" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="394" bodyend="401"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a5a1524d7491dd1a8a5bbc271917d2a89" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::RVineStructure::check_lower_tri</definition>
+        <argsstring>(const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;mat) const</argsstring>
+        <name>check_lower_tri</name>
+        <param>
+          <type>const Eigen::Matrix&lt; size_t, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;</type>
+          <declname>mat</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="113" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="403" bodyend="414"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a76ace3100cc84ca1c023ff843325309b" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::RVineStructure::check_upper_tri</definition>
+        <argsstring>() const</argsstring>
+        <name>check_upper_tri</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="115" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="416" bodyend="430"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1aa5ccca935dab19d703be329ecb13a156" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::RVineStructure::check_columns</definition>
+        <argsstring>() const</argsstring>
+        <name>check_columns</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="116" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="432" bodyend="451"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a1bb9100bce29c43f8a7734c49909f817" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::RVineStructure::check_antidiagonal</definition>
+        <argsstring>() const</argsstring>
+        <name>check_antidiagonal</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="117" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="453" bodyend="461"/>
+      </memberdef>
+      <memberdef kind="function" id="classvinecopulib_1_1_r_vine_structure_1a2167e19801604650c086a6987e665e71" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void vinecopulib::RVineStructure::check_proximity_condition</definition>
+        <argsstring>() const</argsstring>
+        <name>check_proximity_condition</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="118" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="463" bodyend="494"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>R-vine structures. </para>    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classvinecopulib_1_1_r_vine_structure" kindref="compound">RVineStructure</ref> objects encode the tree structure of the vine, i.e. the conditioned/conditioning variables of each edge. It is represented by a triangular array. An exemplary array is <programlisting><codeline><highlight class="normal">4<sp/>4<sp/>4<sp/>4</highlight></codeline>
+<codeline><highlight class="normal">3<sp/>3<sp/>3</highlight></codeline>
+<codeline><highlight class="normal">2<sp/>2</highlight></codeline>
+<codeline><highlight class="normal">1</highlight></codeline>
+</programlisting> which encodes the following pair-copulas: <programlisting><codeline><highlight class="normal">|<sp/>tree<sp/>|<sp/>edge<sp/>|<sp/>pair-copulas<sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|------|------|----------------|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>0<sp/><sp/><sp/><sp/>|<sp/>0<sp/><sp/><sp/><sp/>|<sp/>`(1,<sp/>4)`<sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>1<sp/><sp/><sp/><sp/>|<sp/>`(2,<sp/>4)`<sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>2<sp/><sp/><sp/><sp/>|<sp/>`(3,<sp/>4)`<sp/><sp/><sp/><sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>1<sp/><sp/><sp/><sp/>|<sp/>0<sp/><sp/><sp/><sp/>|<sp/>`(1,<sp/>3;<sp/>4)`<sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>1<sp/><sp/><sp/><sp/>|<sp/>`(2,<sp/>3;<sp/>4)`<sp/><sp/><sp/><sp/>|</highlight></codeline>
+<codeline><highlight class="normal">|<sp/>2<sp/><sp/><sp/><sp/>|<sp/>0<sp/><sp/><sp/><sp/>|<sp/>`(1,<sp/>2;<sp/>3,<sp/>4)`<sp/>|</highlight></codeline>
+</programlisting> Denoting by <computeroutput>M[i, j]</computeroutput> the array entry in row <computeroutput>i</computeroutput> and column <computeroutput>j</computeroutput>, the pair-copula index for edge <computeroutput>e</computeroutput> in tree <computeroutput>t</computeroutput> of a <computeroutput>d</computeroutput> dimensional vine is <computeroutput>(M[d - 1 - t, e], M[t, e]; M[t - 1, e], ..., M[0, e])</computeroutput>. Less formally,<orderedlist>
+<listitem><para>Start with the counter-diagonal element of column <computeroutput>e</computeroutput> (first conditioned variable).</para></listitem><listitem><para>Jump up to the element in row <computeroutput>t</computeroutput> (second conditioned variable).</para></listitem><listitem><para>Gather all entries further up in column <computeroutput>e</computeroutput> (conditioning set).</para></listitem></orderedlist>
+</para><para>A valid R-vine array must satisfy several conditions which are checked when <computeroutput>RVineStructure()</computeroutput> is called:<orderedlist>
+<listitem><para>It only contains numbers between 1 and d.</para></listitem><listitem><para>The diagonal must contain the numbers 1, ..., d.</para></listitem><listitem><para>The diagonal entry of a column must not be contained in any column further to the right.</para></listitem><listitem><para>The entries of a column must be contained in all columns to the left.</para></listitem><listitem><para>The proximity condition must hold: For all t = 1, ..., d - 2 and e = 0, ..., d - t - 1 there must exist an index j &gt; d, such that <computeroutput>(M[t, e], {M[0, e], ..., M[t-1, e]})</computeroutput> equals either <computeroutput>(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})</computeroutput> or <computeroutput>(M[t-1, j], {M[d-j-1, j], M[0, j], ..., M[t-2, j]})</computeroutput>.</para></listitem></orderedlist>
+</para><para>An R-vine array is said to be in natural order when the anti-diagonal entries are <formula id="32">$ 1, \dots, d $</formula> (from left to right). The exemplary arrray above is in natural order. Any R-vine array can be characterized by the diagonal entries (called order) and the entries below the diagonal of the corresponding R-vine array in natural order. Since most algorithms work with the structure in natural order, this is how <ref refid="classvinecopulib_1_1_r_vine_structure" kindref="compound">RVineStructure</ref> stores the structure internally. </para>    </detaileddescription>
+    <location file="include/vinecopulib/vinecop/rvine_structure.hpp" line="65" column="1" bodyfile="include/vinecopulib/vinecop/rvine_structure.hpp" bodystart="65" bodyend="127"/>
+    <listofallmembers>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a1bb9100bce29c43f8a7734c49909f817" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>check_antidiagonal</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1aa5ccca935dab19d703be329ecb13a156" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>check_columns</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1ac17fb4459ad72692a9420eae2ed7cb11" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>check_if_quadratic</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a5a1524d7491dd1a8a5bbc271917d2a89" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>check_lower_tri</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a2167e19801604650c086a6987e665e71" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>check_proximity_condition</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a76ace3100cc84ca1c023ff843325309b" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>check_upper_tri</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a4d5a13be2f839cdd3e194ccd0da7b7e0" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>compute_dvine_struct_array</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a989a81821a22281a23a315d9c1cebd28" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>compute_min_array</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a75909b9e1e7a292b53d709778eefb8be" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>compute_needed_hfunc1</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1ad5d206da33caad5a93a8c4bcf5914abc" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>compute_needed_hfunc2</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1ad2b50a1841a8fdbf172bdd41ce2f94ab" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>d_</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a53839dd700b689c87346bdc44a97ebda" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>find_trunc_lvl</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1ac2cd2c83b9ffafb9c6563f1923aa1835" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>get_dim</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a37325d7485875cf823c288400c351699" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>get_matrix</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1aaebebea9982629eb81223d18b0b9d905" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>get_min_array</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a71e339dae0c4ea4338c731a0dfa70780" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>get_needed_hfunc1</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1aa935d78845713014d7aaf6a6aa1a9a8f" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>get_needed_hfunc2</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1aed7d73a5bf50b95a6166f42e0f8df9a9" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>get_order</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1aba56d8f32760cef0a66200faf6868778" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>get_order</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a1f04ff64c8cf56fa32173ed0fccbbe46" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>get_struct_array</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a6c691b843017f85b7067fcbe0fae55d0" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>get_trunc_lvl</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a4c67417a03be525c7c64ebcc884b87fc" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>min_array</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a503fcb4e9036db49bd4840ae80cc6128" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>min_array_</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a7403cad6cfbeff9fc190a58049ce2eab" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>needed_hfunc1_</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1ac0eb2517f8924d7b2efb54e00658b5f5" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>needed_hfunc2_</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1afe9ed9e81a35e1816e0d66d0223fbffc" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>order_</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a4408fcee797cfd3bf7913b92986d6b08" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>RVineStructure</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a271688bc56e2950d5a27213f4b5f9fda" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>RVineStructure</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1aa7e6b14379d8eed772e63c6944e3f610" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>RVineStructure</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a2d1ec630fcd5b7d820413dedca26cdad" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>RVineStructure</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a0fb1958f6971b01776133af60ee20ee7" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>RVineStructure</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a488bcaf1868f79f733e812f80445199e" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>str</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a00835cb9e06ca80bfff9c89100a1bb56" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>struct_array</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a7c4209ec3bef2ded97361ff97a297483" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>struct_array_</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a96b50b9a5fc53f53d867c3610d6a99bd" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>to_natural_order</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1adf765bda069f23409d0289d4c087e8d2" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>to_rvine_array</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1aeaf238cc116e7a198a1f43cef4360462" prot="private" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>trunc_lvl_</name></member>
+      <member refid="classvinecopulib_1_1_r_vine_structure_1a7580c0663ac702f718944de2a0fcd1d3" prot="public" virt="non-virtual"><scope>vinecopulib::RVineStructure</scope><name>truncate</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

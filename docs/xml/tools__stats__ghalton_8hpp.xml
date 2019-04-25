@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="tools__stats__ghalton_8hpp" kind="file" language="C++">
+    <compoundname>tools_stats_ghalton.hpp</compoundname>
+    <includedby refid="tools__stats_8ipp" local="no">include/vinecopulib/misc/implementation/tools_stats.ipp</includedby>
+    <invincdepgraph>
+      <node id="247">
+        <label>include/vinecopulib/bicop/class.hpp</label>
+        <link refid="bicop_2class_8hpp_source"/>
+        <childnode refid="248" relation="include">
+        </childnode>
+        <childnode refid="249" relation="include">
+        </childnode>
+      </node>
+      <node id="245">
+        <label>include/vinecopulib/misc/tools_stats.hpp</label>
+        <link refid="tools__stats_8hpp_source"/>
+        <childnode refid="246" relation="include">
+        </childnode>
+        <childnode refid="250" relation="include">
+        </childnode>
+      </node>
+      <node id="246">
+        <label>include/vinecopulib/bicop/implementation/class.ipp</label>
+        <link refid="bicop_2implementation_2class_8ipp_source"/>
+        <childnode refid="247" relation="include">
+        </childnode>
+      </node>
+      <node id="244">
+        <label>include/vinecopulib/misc/implementation/tools_stats.ipp</label>
+        <link refid="tools__stats_8ipp_source"/>
+        <childnode refid="245" relation="include">
+        </childnode>
+      </node>
+      <node id="249">
+        <label>include/vinecopulib.hpp</label>
+        <link refid="vinecopulib_8hpp_source"/>
+      </node>
+      <node id="248">
+        <label>include/vinecopulib/vinecop/class.hpp</label>
+        <link refid="vinecop_2class_8hpp_source"/>
+        <childnode refid="249" relation="include">
+        </childnode>
+      </node>
+      <node id="243">
+        <label>include/vinecopulib/misc/tools_stats_ghalton.hpp</label>
+        <link refid="tools__stats__ghalton_8hpp"/>
+        <childnode refid="244" relation="include">
+        </childnode>
+      </node>
+      <node id="250">
+        <label>include/vinecopulib/vinecop/implementation/class.ipp</label>
+        <link refid="vinecop_2implementation_2class_8ipp_source"/>
+        <childnode refid="248" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespacevinecopulib">vinecopulib</innernamespace>
+    <innernamespace refid="namespacevinecopulib_1_1tools__stats">vinecopulib::tools_stats</innernamespace>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="tools__stats__ghalton_8hpp_1a311ce58bd6b4dd3b194e1e113917dab1" prot="public" static="no">
+        <name>ghalton_max_dim</name>
+        <initializer>360</initializer>
+        <briefdescription>
+<para>Maximal dimension allowed for generalized Halton quasi Monte Carlo. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/misc/tools_stats_ghalton.hpp" line="14" column="9" bodyfile="include/vinecopulib/misc/tools_stats_ghalton.hpp" bodystart="14" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/vinecopulib/misc/tools_stats_ghalton.hpp"/>
+  </compounddef>
+</doxygen>

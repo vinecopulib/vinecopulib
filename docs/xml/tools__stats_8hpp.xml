@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="tools__stats_8hpp" kind="file" language="C++">
+    <compoundname>tools_stats.hpp</compoundname>
+    <includes local="no">boost/math/distributions.hpp</includes>
+    <includes local="no">random</includes>
+    <includes local="no">vinecopulib/misc/tools_eigen.hpp</includes>
+    <includes refid="tools__stats_8ipp" local="no">vinecopulib/misc/implementation/tools_stats.ipp</includes>
+    <includedby refid="bicop_2implementation_2class_8ipp" local="no">include/vinecopulib/bicop/implementation/class.ipp</includedby>
+    <includedby refid="vinecop_2implementation_2class_8ipp" local="no">include/vinecopulib/vinecop/implementation/class.ipp</includedby>
+    <incdepgraph>
+      <node id="234">
+        <label>unsupported/Eigen/FFT</label>
+      </node>
+      <node id="229">
+        <label>vinecopulib/misc/tools_eigen.hpp</label>
+      </node>
+      <node id="226">
+        <label>include/vinecopulib/misc/tools_stats.hpp</label>
+        <link refid="tools__stats_8hpp"/>
+        <childnode refid="227" relation="include">
+        </childnode>
+        <childnode refid="228" relation="include">
+        </childnode>
+        <childnode refid="229" relation="include">
+        </childnode>
+        <childnode refid="230" relation="include">
+        </childnode>
+      </node>
+      <node id="235">
+        <label>wdm/eigen.hpp</label>
+      </node>
+      <node id="228">
+        <label>random</label>
+      </node>
+      <node id="227">
+        <label>boost/math/distributions.hpp</label>
+      </node>
+      <node id="230">
+        <label>vinecopulib/misc/implementation/tools_stats.ipp</label>
+        <link refid="tools__stats_8ipp_source"/>
+        <childnode refid="231" relation="include">
+        </childnode>
+        <childnode refid="232" relation="include">
+        </childnode>
+        <childnode refid="233" relation="include">
+        </childnode>
+        <childnode refid="234" relation="include">
+        </childnode>
+        <childnode refid="235" relation="include">
+        </childnode>
+      </node>
+      <node id="232">
+        <label>vinecopulib/misc/tools_stats_sobol.hpp</label>
+        <link refid="tools__stats__sobol_8hpp_source"/>
+      </node>
+      <node id="231">
+        <label>vinecopulib/misc/tools_stats_ghalton.hpp</label>
+        <link refid="tools__stats__ghalton_8hpp_source"/>
+      </node>
+      <node id="233">
+        <label>vinecopulib/misc/tools_stl.hpp</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="238">
+        <label>include/vinecopulib/bicop/class.hpp</label>
+        <link refid="bicop_2class_8hpp_source"/>
+        <childnode refid="239" relation="include">
+        </childnode>
+        <childnode refid="240" relation="include">
+        </childnode>
+      </node>
+      <node id="236">
+        <label>include/vinecopulib/misc/tools_stats.hpp</label>
+        <link refid="tools__stats_8hpp"/>
+        <childnode refid="237" relation="include">
+        </childnode>
+        <childnode refid="241" relation="include">
+        </childnode>
+      </node>
+      <node id="237">
+        <label>include/vinecopulib/bicop/implementation/class.ipp</label>
+        <link refid="bicop_2implementation_2class_8ipp_source"/>
+        <childnode refid="238" relation="include">
+        </childnode>
+      </node>
+      <node id="240">
+        <label>include/vinecopulib.hpp</label>
+        <link refid="vinecopulib_8hpp_source"/>
+      </node>
+      <node id="239">
+        <label>include/vinecopulib/vinecop/class.hpp</label>
+        <link refid="vinecop_2class_8hpp_source"/>
+        <childnode refid="240" relation="include">
+        </childnode>
+      </node>
+      <node id="241">
+        <label>include/vinecopulib/vinecop/implementation/class.ipp</label>
+        <link refid="vinecop_2implementation_2class_8ipp_source"/>
+        <childnode refid="239" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespacevinecopulib">vinecopulib</innernamespace>
+    <innernamespace refid="namespacevinecopulib_1_1tools__stats">vinecopulib::tools_stats</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/vinecopulib/misc/tools_stats.hpp"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="namespacevinecopulib" kind="namespace" language="C++">
+    <compoundname>vinecopulib</compoundname>
+    <innerclass refid="classvinecopulib_1_1_bicop" prot="public">vinecopulib::Bicop</innerclass>
+    <innerclass refid="classvinecopulib_1_1_fit_controls_bicop" prot="public">vinecopulib::FitControlsBicop</innerclass>
+    <innerclass refid="classvinecopulib_1_1_fit_controls_vinecop" prot="public">vinecopulib::FitControlsVinecop</innerclass>
+    <innerclass refid="classvinecopulib_1_1_r_vine_structure" prot="public">vinecopulib::RVineStructure</innerclass>
+    <innerclass refid="classvinecopulib_1_1_triangular_array" prot="public">vinecopulib::TriangularArray</innerclass>
+    <innerclass refid="classvinecopulib_1_1_vinecop" prot="public">vinecopulib::Vinecop</innerclass>
+    <innernamespace refid="namespacevinecopulib_1_1bicop__families">vinecopulib::bicop_families</innernamespace>
+    <innernamespace refid="namespacevinecopulib_1_1tools__stats">vinecopulib::tools_stats</innernamespace>
+      <sectiondef kind="enum">
+      <memberdef kind="enum" id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3" prot="public" static="no">
+        <name>BicopFamily</name>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65" prot="public">
+          <name>indep</name>
+          <briefdescription>
+<para>Independence copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a304e2a3b544f6b9f267a151e1bcee487" prot="public">
+          <name>gaussian</name>
+          <briefdescription>
+<para>Gaussian copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3acd73502828457d15655bbd7a63fb0bc8" prot="public">
+          <name>student</name>
+          <briefdescription>
+<para>Student t copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3ad0b8c94bb241f6f7a4b96cd6d3e26c36" prot="public">
+          <name>clayton</name>
+          <briefdescription>
+<para>Clayton copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a7bfb9d9ee5abbfa800e56bbe62db9bbe" prot="public">
+          <name>gumbel</name>
+          <briefdescription>
+<para>Gumbel copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a26253c50741faa9c2e2b836773c69fe6" prot="public">
+          <name>frank</name>
+          <briefdescription>
+<para>Frank copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a8ff32489f92f33416694be8fdc2d4c22" prot="public">
+          <name>joe</name>
+          <briefdescription>
+<para>Joe copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a8a2e0a5eece6b7020e5308bcd0df4aa3" prot="public">
+          <name>bb1</name>
+          <briefdescription>
+<para>BB1 copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3aa2d33c13012f342a80bdc94b60538c68" prot="public">
+          <name>bb6</name>
+          <briefdescription>
+<para>BB6 copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3ac9e791d6604a5fcc1f4e6ad574f43328" prot="public">
+          <name>bb7</name>
+          <briefdescription>
+<para>BB7 copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3adf8b15ba30764e3b9ce084c11336603a" prot="public">
+          <name>bb8</name>
+          <briefdescription>
+<para>BB8 copula. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3a9b0d6b8b82f0af7ca85d5a216f97f5b8" prot="public">
+          <name>tll</name>
+          <briefdescription>
+<para>Transformation local likelihood kernel estimator. </para>          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+<para>A bivariate copula family identifier. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/bicop/family.hpp" line="16" column="1" bodyfile="include/vinecopulib/bicop/family.hpp" bodystart="15" bodyend="29"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="namespacevinecopulib_1a4201d6dd2999386c080b4b982fa1af4e" prot="public" static="no">
+        <type>boost::bimap&lt; <ref refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3" kindref="member">BicopFamily</ref>, std::string &gt;</type>
+        <definition>typedef boost::bimap&lt;BicopFamily, std::string&gt; vinecopulib::family_bimap</definition>
+        <argsstring></argsstring>
+        <name>family_bimap</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/bicop/implementation/family.ipp" line="13" column="1" bodyfile="include/vinecopulib/bicop/implementation/family.ipp" bodystart="13" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="var">
+      <memberdef kind="variable" id="namespacevinecopulib_1a7fdf9f81ce49a26346013e77901a0458" prot="public" static="no" mutable="no">
+        <type>const family_bimap</type>
+        <definition>const family_bimap vinecopulib::family_names</definition>
+        <argsstring></argsstring>
+        <name>family_names</name>
+        <initializer>=
+    boost::assign::list_of&lt;family_bimap::relation&gt;
+        (<ref refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65" kindref="member">BicopFamily::indep</ref>, &quot;Independence&quot;)
+        (BicopFamily::gaussian, &quot;Gaussian&quot;)
+        (BicopFamily::student, &quot;Student&quot;)
+        (BicopFamily::clayton, &quot;Clayton&quot;)
+        (BicopFamily::gumbel, &quot;Gumbel&quot;)
+        (BicopFamily::frank, &quot;Frank&quot;)
+        (BicopFamily::joe, &quot;Joe&quot;)
+        (BicopFamily::bb1, &quot;BB1&quot;)
+        (BicopFamily::bb6, &quot;BB6&quot;)
+        (BicopFamily::bb7, &quot;BB7&quot;)
+        (BicopFamily::bb8, &quot;BB8&quot;)
+        (BicopFamily::tll, &quot;TLL&quot;)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/bicop/implementation/family.ipp" line="14" column="1" bodyfile="include/vinecopulib/bicop/implementation/family.ipp" bodystart="14" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="namespacevinecopulib_1ac46553ae5f99072f65e9d3254d2c526d" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string vinecopulib::get_family_name</definition>
+        <argsstring>(BicopFamily family)</argsstring>
+        <name>get_family_name</name>
+        <param>
+          <type><ref refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3" kindref="member">BicopFamily</ref></type>
+          <declname>family</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>converts a BicopFamily into a string with its name. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>family</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the family. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/bicop/family.hpp" line="31" column="1" bodyfile="include/vinecopulib/bicop/implementation/family.ipp" bodystart="31" bodyend="34"/>
+      </memberdef>
+      <memberdef kind="function" id="namespacevinecopulib_1a8d5285a58e0d250a5226715754e12568" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="namespacevinecopulib_1a42e95cc06d33896199caab0c11ad44f3" kindref="member">BicopFamily</ref></type>
+        <definition>BicopFamily vinecopulib::get_family_enum</definition>
+        <argsstring>(std::string family)</argsstring>
+        <name>get_family_enum</name>
+        <param>
+          <type>std::string</type>
+          <declname>family</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>converts a string name into a BicopFamily. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>family</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the family name. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/bicop/family.hpp" line="33" column="1" bodyfile="include/vinecopulib/bicop/implementation/family.ipp" bodystart="38" bodyend="41"/>
+      </memberdef>
+      <memberdef kind="function" id="namespacevinecopulib_1a84bb80714f45441e76d85c7dd049db02" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>typename T</type>
+          </param>
+        </templateparamlist>
+        <type>std::ostream &amp;</type>
+        <definition>std::ostream&amp; vinecopulib::operator&lt;&lt;</definition>
+        <argsstring>(std::ostream &amp;os, const TriangularArray&lt; T &gt; &amp;tri_array)</argsstring>
+        <name>operator&lt;&lt;</name>
+        <param>
+          <type>std::ostream &amp;</type>
+          <declname>os</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classvinecopulib_1_1_triangular_array" kindref="compound">TriangularArray</ref>&lt; T &gt; &amp;</type>
+          <declname>tri_array</declname>
+        </param>
+        <briefdescription>
+<para>ostream method for RightTrapezoid, to be used with <computeroutput>std::cout</computeroutput> </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>os</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>an output stream. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>tri_array</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>n triangular array. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/misc/triangular_array.hpp" line="219" column="1" bodyfile="include/vinecopulib/misc/triangular_array.hpp" bodystart="219" bodyend="223"/>
+      </memberdef>
+      <memberdef kind="function" id="namespacevinecopulib_1a903371123a404c8736f5418da502b81c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::ostream &amp;</type>
+        <definition>std::ostream &amp; vinecopulib::operator&lt;&lt;</definition>
+        <argsstring>(std::ostream &amp;os, const RVineStructure &amp;rvs)</argsstring>
+        <name>operator&lt;&lt;</name>
+        <param>
+          <type>std::ostream &amp;</type>
+          <declname>os</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classvinecopulib_1_1_r_vine_structure" kindref="compound">RVineStructure</ref> &amp;</type>
+          <declname>rvs</declname>
+        </param>
+        <briefdescription>
+<para>ostream method for <ref refid="classvinecopulib_1_1_r_vine_structure" kindref="compound">RVineStructure</ref>, to be used with <computeroutput>std::cout</computeroutput>. </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>os</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>output stream. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>rvs</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>r-vine structure array. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" line="499" column="1" bodyfile="include/vinecopulib/vinecop/implementation/rvine_structure.ipp" bodystart="499" bodyend="503"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Tools for bivariate and vine copula modeling. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="include/vinecopulib/bicop/class.hpp" line="14" column="1"/>
+  </compounddef>
+</doxygen>
