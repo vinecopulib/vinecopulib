@@ -7,47 +7,47 @@
     <includes local="no">stdexcept</includes>
     <includedby refid="rvine__structure_8hpp" local="no">include/vinecopulib/vinecop/rvine_structure.hpp</includedby>
     <incdepgraph>
-      <node id="260">
+      <node id="290">
         <label>include/vinecopulib/misc/triangular_array.hpp</label>
         <link refid="triangular__array_8hpp"/>
-        <childnode refid="261" relation="include">
+        <childnode refid="291" relation="include">
         </childnode>
-        <childnode refid="262" relation="include">
+        <childnode refid="292" relation="include">
         </childnode>
-        <childnode refid="263" relation="include">
+        <childnode refid="293" relation="include">
         </childnode>
       </node>
-      <node id="263">
+      <node id="293">
         <label>stdexcept</label>
       </node>
-      <node id="262">
+      <node id="292">
         <label>iostream</label>
       </node>
-      <node id="261">
+      <node id="291">
         <label>vinecopulib/misc/tools_stl.hpp</label>
       </node>
     </incdepgraph>
     <invincdepgraph>
-      <node id="264">
+      <node id="294">
         <label>include/vinecopulib/misc/triangular_array.hpp</label>
         <link refid="triangular__array_8hpp"/>
-        <childnode refid="265" relation="include">
+        <childnode refid="295" relation="include">
         </childnode>
       </node>
-      <node id="267">
+      <node id="297">
         <label>include/vinecopulib.hpp</label>
         <link refid="vinecopulib_8hpp_source"/>
       </node>
-      <node id="266">
+      <node id="296">
         <label>include/vinecopulib/vinecop/class.hpp</label>
         <link refid="vinecop_2class_8hpp_source"/>
-        <childnode refid="267" relation="include">
+        <childnode refid="297" relation="include">
         </childnode>
       </node>
-      <node id="265">
+      <node id="295">
         <label>include/vinecopulib/vinecop/rvine_structure.hpp</label>
         <link refid="rvine__structure_8hpp_source"/>
-        <childnode refid="266" relation="include">
+        <childnode refid="296" relation="include">
         </childnode>
       </node>
     </invincdepgraph>

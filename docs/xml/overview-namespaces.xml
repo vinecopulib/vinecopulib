@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="overview-namespaces" kind="page">
+    <compoundname>overview-namespaces</compoundname>
+    <title>Namespaces</title>
+    <detaileddescription>
+<para>In all examples, it is assumed that <computeroutput>using namespace vinecopulib;</computeroutput> is used. While the namespace <computeroutput>vinecopulib</computeroutput> contains the most important functionalities described below, there are a two others that are available to the user:<itemizedlist>
+<listitem><para><computeroutput>bicop_families</computeroutput>: convenience definitions of sets of bivariate copula families</para></listitem><listitem><para><computeroutput>tools_stats</computeroutput>: utilities for statistical analysis </para></listitem></itemizedlist>
+</para>    </detaileddescription>
+  </compounddef>
+</doxygen>

@@ -4,54 +4,54 @@
     <compoundname>tools_stats_ghalton.hpp</compoundname>
     <includedby refid="tools__stats_8ipp" local="no">include/vinecopulib/misc/implementation/tools_stats.ipp</includedby>
     <invincdepgraph>
-      <node id="247">
+      <node id="277">
         <label>include/vinecopulib/bicop/class.hpp</label>
         <link refid="bicop_2class_8hpp_source"/>
-        <childnode refid="248" relation="include">
+        <childnode refid="278" relation="include">
         </childnode>
-        <childnode refid="249" relation="include">
+        <childnode refid="279" relation="include">
         </childnode>
       </node>
-      <node id="245">
+      <node id="275">
         <label>include/vinecopulib/misc/tools_stats.hpp</label>
         <link refid="tools__stats_8hpp_source"/>
-        <childnode refid="246" relation="include">
+        <childnode refid="276" relation="include">
         </childnode>
-        <childnode refid="250" relation="include">
+        <childnode refid="280" relation="include">
         </childnode>
       </node>
-      <node id="246">
+      <node id="276">
         <label>include/vinecopulib/bicop/implementation/class.ipp</label>
         <link refid="bicop_2implementation_2class_8ipp_source"/>
-        <childnode refid="247" relation="include">
+        <childnode refid="277" relation="include">
         </childnode>
       </node>
-      <node id="244">
+      <node id="274">
         <label>include/vinecopulib/misc/implementation/tools_stats.ipp</label>
         <link refid="tools__stats_8ipp_source"/>
-        <childnode refid="245" relation="include">
+        <childnode refid="275" relation="include">
         </childnode>
       </node>
-      <node id="249">
+      <node id="279">
         <label>include/vinecopulib.hpp</label>
         <link refid="vinecopulib_8hpp_source"/>
       </node>
-      <node id="248">
+      <node id="278">
         <label>include/vinecopulib/vinecop/class.hpp</label>
         <link refid="vinecop_2class_8hpp_source"/>
-        <childnode refid="249" relation="include">
+        <childnode refid="279" relation="include">
         </childnode>
       </node>
-      <node id="243">
+      <node id="273">
         <label>include/vinecopulib/misc/tools_stats_ghalton.hpp</label>
         <link refid="tools__stats__ghalton_8hpp"/>
-        <childnode refid="244" relation="include">
+        <childnode refid="274" relation="include">
         </childnode>
       </node>
-      <node id="250">
+      <node id="280">
         <label>include/vinecopulib/vinecop/implementation/class.ipp</label>
         <link refid="vinecop_2implementation_2class_8ipp_source"/>
-        <childnode refid="248" relation="include">
+        <childnode refid="278" relation="include">
         </childnode>
       </node>
     </invincdepgraph>

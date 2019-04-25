@@ -1,0 +1,210 @@
+/** @page overview-bicop Bivariate copula models
+
+Bivariate copula models are implemented as the `Bicop` class, and `BicopFamily`
+is a closely related enum class describing the type or "family" of copula.
+To use bivariate copula models in your code, include the header
+`vinecopulib/bicop/class.hpp` (or simply `vinecopulib.hpp`) at the top of
+your source file.
+
+@section Implemented bivariate copula families
+
+| type          | name                  | BicopFamily |
+|---------------|-----------------------|-------|
+| -             | Independence          | indep     |
+| Elliptical    | Gaussian              | gaussian     |
+|               | Student t             | student     |
+| Archimedean   | Clayton               | clayton     |
+|               | Gumbel                | gumbel     |
+|               | Frank                 | frank     |
+|               | Joe                   | joe     |
+|               | BB1                   | bb1     |
+|               | BB6                   | bb6     |
+|               | BB7                   | bb7     |
+|               | BB8                   | bb8    |
+| Nonparametric | Transformation kernel | tll  |
+
+Note that several convenience vectors of families are included in the
+sub-namespace `bicop_families`:
+- `all` contains all the families
+- `parametric` contains the parametric families (all except `tll`)
+- `nonparametric` contains the nonparametric families (`indep` and `tll`)
+- `one_par` contains the parametric families with a single parameter
+(`gaussian`, `clayton`, `gumbel`, `frank`, and `joe`)
+- `two_par` contains the parametric families with two parameters
+(`student`, `bb1`, `bb6`, `bb7`, and `bb8`)
+- `elliptical` contains the elliptical families
+- `archimedean` contains the archimedean families
+- `bb` contains the BB families
+- `itau` families for which estimation by Kendall's tau inversion is available
+(`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
+
+```
+// print all available families
+std::cout << "Available families : ";
+for (auto family : vinecopulib::bicop_families::all) {
+		std::cout << get_family_name(family) << " ";
+}
+```
+
+
+@section bicop-custom Set up a custom bivariate copula model
+
+There are essentially two ways of setting-up bivariate copulas:
+- with known parameters,
+- from data (i.e., with estimated parameters).
+
+The constructor with known parameters takes 3 arguments:
+- The copula family (default to `indep`)
+- The rotation (default to `0`)
+- The parameters (default to parameters corresponding to an independence copula)
+
+```
+// 90 degree rotated Clayton with default parameter (corresponds to independence)
+Bicop clayton(BicopFamily::clayton, 90);
+
+// Gauss copula with parameter 0.5
+Bicop gauss(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
+```
+The constructor from data takes the same arguments as the select method and is
+described in the next section.
+
+
+@section bicop-fit Fit and select a bivariate copula
+
+You can either fit the parameters of a given `Bicop` object with `fit()` or
+select the best fitting model from a set of families with `select()`.
+
+``` cpp
+// create a Gauss copula with parameter 0.5 and simulate 1e3 observations
+Bicop model(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
+auto data = model.simulate(1e3);
+
+// instantiate a gaussian copula with default parameters and fit to data
+Bicop fitted(BicopFamily::gaussian);
+fitted.fit(data);
+std::cout <<
+       "estimated parameter: " <<
+       fitted.get_parameters() <<
+       std::endl;
+
+// assign another family to the same variable and fit to data
+fitted = Bicop(BicopFamily::student);
+fitted.fit(data);
+std::cout <<
+       "estimated parameter: " <<
+       fitted.get_parameters() <<
+       std::endl;
+
+// alternatively, assign to a family and fit automatically
+fitted.select(data);
+std::cout <<
+       "family: " << fitted.get_family_name() <<
+       "rotation: " <<  fitted.get_rotation() <<
+       std::endl;
+```
+
+As it's arguably the most important function of the `Bicop` class, it's worth
+understanding the second argument of `select()`, namely an object of the class
+`FitControlsBicop`, which contain several data members:
+- `std::vector<BicopFamily> family_set` describes the set of family to select
+from. It can take a user specified vector of
+families or any of those mentioned above (default is `bicop_families::all`).
+- `std::string parametric_method` describes the estimation method. It can take
+     `"mle"` (default, for maximum-likelihood estimation) and
+`"itau"` (for Kendall's tau inversion, although only available for families
+included in `bicop_families::itau`).
+- `std::string nonparametric_method` describes the degree of the density
+approximation for the transformation kernel estimator. It can take
+`constant`, `linear` and `quadratic` (default) for approximations of
+degree zero, one and two.
+- `double nonparametric_mult` a factor with which the smoothing parameters
+are multiplied.
+- `std::string selection_criterion` describes the criterion to compare the
+families. It can take either `"loglik"`, `"aic"`, or `"bic"`(default).
+- `Eigen::VectorXd weights` an optional vector of weights for the observations.
+- `bool preselect_families` describes a heuristic preselection method (default
+is `true`) based on symmetry properties of the data (e.g., the unrotated
+Clayton won't be preselected if the data displays upper-tail dependence).
+- `size_t num_threads` number of threads to run in parallel when fitting
+several families.
+
+As mentioned [above](#bicop-custom), the arguments
+of `select()` can be used as arguments to a
+    constructor allowing to instantiate a new object directly:
+
+``` cpp
+// instantiate an archimedean copula by selecting the "best" family according to
+// the BIC and parameters corresponding to the MLE
+Bicop best_archimedean(data, FitControlsBicop(bicop_families::archimedean));
+std::cout <<
+       "family: " << best_archimedean.get_family_name() <<
+       "rotation: " <<  best_archimedean.get_rotation() <<
+       best_archimedean.get_parameters() <<
+       std::endl
+
+// instantiate a bivariate copula by selecting the "best" family according to
+// the AIC and parameters corresponding to Kendall's tau inversion
+FitControlsBicop controls(bicop_families::itau, "itau");
+controls.set_selection_criterion("aic");
+Bicop best_itau(data, controls));
+std::cout <<
+       "family: " << best_itau.get_family_name() <<
+       "rotation: " <<  best_itau.get_rotation() <<
+       best_itau.get_parameters() <<
+       std::endl
+```
+
+@section bicop-model Work with a bivariate copula model
+
+You can simulate from a model and evaluate the pdf, h-functions, inverse
+h-functions, log-likelihood, AIC, and BIC.
+
+```
+// Gauss copula with parameter 0.5
+Bicop bicop(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
+
+// Simulate 100 observations
+auto sim_data = bicop.simulate(100);
+
+// Evaluate the pdf
+auto pdf  = bicop.pdf(sim_data);
+
+// Evaluate the two h-functions
+auto h1   = bicop.hfunc1(sim_data);
+auto h2   = bicop.hfunc2(sim_data);
+
+// Evalute the two inverse h-functions
+auto hi1  = bicop.hinv1(sim_data);
+auto hi2  = bicop.hinv2(sim_data);
+
+// Evaluate the log-likelihood, AIC, and BIC
+auto ll   = bicop.loglik(sim_data);
+auto aic  = bicop.aic(sim_data);
+auto bic  = bicop.bic(sim_data);
+```
+
+
+Bivariate copula models can also be written to and constructed from JSON files
+and `boost::property_tree::ptree` objects:
+
+```
+// Gauss copula with parameter 0.5
+Bicop bicop(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
+
+// Save as a ptree object
+boost::property_tree::ptree bicop_node = bicop.to_ptree();
+
+// Write into a JSON file
+boost::property_tree::write_json("myfile.JSON", bicop_node);
+
+// Equivalently
+bicop.to_json("myfile.JSON");
+
+// Then a new Bicop can be constructed from the ptree object
+Bicop bicop2(bicop_node);
+
+// Or from the JSON file
+Bicop bicop3("myfile.JSON");
+```
+
+*/

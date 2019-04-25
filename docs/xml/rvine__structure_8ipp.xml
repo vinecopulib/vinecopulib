@@ -4,26 +4,26 @@
     <compoundname>rvine_structure.ipp</compoundname>
     <includedby refid="rvine__structure_8hpp" local="no">include/vinecopulib/vinecop/rvine_structure.hpp</includedby>
     <invincdepgraph>
-      <node id="269">
+      <node id="299">
         <label>include/vinecopulib/vinecop/implementation/rvine_structure.ipp</label>
         <link refid="rvine__structure_8ipp"/>
-        <childnode refid="270" relation="include">
+        <childnode refid="300" relation="include">
         </childnode>
       </node>
-      <node id="272">
+      <node id="302">
         <label>include/vinecopulib.hpp</label>
         <link refid="vinecopulib_8hpp_source"/>
       </node>
-      <node id="271">
+      <node id="301">
         <label>include/vinecopulib/vinecop/class.hpp</label>
         <link refid="vinecop_2class_8hpp_source"/>
-        <childnode refid="272" relation="include">
+        <childnode refid="302" relation="include">
         </childnode>
       </node>
-      <node id="270">
+      <node id="300">
         <label>include/vinecopulib/vinecop/rvine_structure.hpp</label>
         <link refid="rvine__structure_8hpp_source"/>
-        <childnode refid="271" relation="include">
+        <childnode refid="301" relation="include">
         </childnode>
       </node>
     </invincdepgraph>

@@ -4,54 +4,54 @@
     <compoundname>tools_stats_sobol.hpp</compoundname>
     <includedby refid="tools__stats_8ipp" local="no">include/vinecopulib/misc/implementation/tools_stats.ipp</includedby>
     <invincdepgraph>
-      <node id="256">
+      <node id="286">
         <label>include/vinecopulib/bicop/class.hpp</label>
         <link refid="bicop_2class_8hpp_source"/>
-        <childnode refid="257" relation="include">
+        <childnode refid="287" relation="include">
         </childnode>
-        <childnode refid="258" relation="include">
+        <childnode refid="288" relation="include">
         </childnode>
       </node>
-      <node id="254">
+      <node id="284">
         <label>include/vinecopulib/misc/tools_stats.hpp</label>
         <link refid="tools__stats_8hpp_source"/>
-        <childnode refid="255" relation="include">
+        <childnode refid="285" relation="include">
         </childnode>
-        <childnode refid="259" relation="include">
+        <childnode refid="289" relation="include">
         </childnode>
       </node>
-      <node id="255">
+      <node id="285">
         <label>include/vinecopulib/bicop/implementation/class.ipp</label>
         <link refid="bicop_2implementation_2class_8ipp_source"/>
-        <childnode refid="256" relation="include">
+        <childnode refid="286" relation="include">
         </childnode>
       </node>
-      <node id="253">
+      <node id="283">
         <label>include/vinecopulib/misc/implementation/tools_stats.ipp</label>
         <link refid="tools__stats_8ipp_source"/>
-        <childnode refid="254" relation="include">
+        <childnode refid="284" relation="include">
         </childnode>
       </node>
-      <node id="258">
+      <node id="288">
         <label>include/vinecopulib.hpp</label>
         <link refid="vinecopulib_8hpp_source"/>
       </node>
-      <node id="257">
+      <node id="287">
         <label>include/vinecopulib/vinecop/class.hpp</label>
         <link refid="vinecop_2class_8hpp_source"/>
-        <childnode refid="258" relation="include">
+        <childnode refid="288" relation="include">
         </childnode>
       </node>
-      <node id="252">
+      <node id="282">
         <label>include/vinecopulib/misc/tools_stats_sobol.hpp</label>
         <link refid="tools__stats__sobol_8hpp"/>
-        <childnode refid="253" relation="include">
+        <childnode refid="283" relation="include">
         </childnode>
       </node>
-      <node id="259">
+      <node id="289">
         <label>include/vinecopulib/vinecop/implementation/class.ipp</label>
         <link refid="vinecop_2implementation_2class_8ipp_source"/>
-        <childnode refid="257" relation="include">
+        <childnode refid="287" relation="include">
         </childnode>
       </node>
     </invincdepgraph>

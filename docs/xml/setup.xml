@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="setup" kind="page">
+    <compoundname>setup</compoundname>
+    <title>Setup</title>
+    <detaileddescription>
+<sect1 id="setup_1Requirements">
+<title>Requirements</title>
+<para>To build the library, you&apos;ll need at minimum:</para><para><itemizedlist>
+<listitem><para><ulink url="https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers">a C++11-compatible compiler</ulink> (tested with GCC 6.3.0 and Clang 3.5.0 on Linux and AppleClang 8.0.0 on OSX)</para></listitem><listitem><para><ulink url="https://cmake.org/">CMake 3.2 (or later)</ulink></para></listitem><listitem><para><ulink url="http://www.boost.org/">Boost 1.56 (or later)</ulink></para></listitem><listitem><para><ulink url="http://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen 3.3 (or later)</ulink></para></listitem></itemizedlist>
+</para><para>Optionally, you&apos;ll need:<itemizedlist>
+<listitem><para><ulink url="http://www.stack.nl/~dimitri/doxygen/">Doxygen</ulink> and <ulink url="https://www.graphviz.org/">graphviz</ulink> (to build the documentations)</para></listitem><listitem><para><ulink url="https://www.r-project.org/about.html">R</ulink> and <ulink url="https://github.com/tnagler/VineCopula">VineCopula</ulink> (to run the unit tests)</para></listitem></itemizedlist>
+</para><para>Note that:</para><para><itemizedlist>
+<listitem><para>The <ulink url="http://en.cppreference.com/w/cpp/thread">C++11 thread support library</ulink>, available along with any C++11 compiler on OSX/Windows/most-linux-distributions, is used for multithreading.</para></listitem><listitem><para>A <computeroutput>findR.cmake</computeroutput> looks for R and VineCopula in the default locations for linux and osx, but problems might occur with versions installed from R/RStudio. Therefore, prior to building the library, it is recommended to use: <programlisting><codeline><highlight class="normal">sudo<sp/>Rscript<sp/>-e<sp/>&apos;install.packages(c(&quot;VineCopula&quot;),<sp/>lib=&quot;/usr/lib/R/library&quot;,</highlight></codeline>
+<codeline><highlight class="normal">repos=&quot;http://cran.rstudio.com/&quot;)&apos;</highlight></codeline>
+</programlisting></para></listitem></itemizedlist>
+</para></sect1>
+<sect1 id="setup_1build-lib">
+<title>How to build the library</title>
+<para>By default, vinecopulib is header-only. It means that we use the CMake build system, but only to build the documentation and unit-tests, and to automate installation (i.e., place headers in the usual location). If you just want to use vinecopulib, you can use the header files (located in the<computeroutput>includes</computeroutput>folder) right away.</para><para>The unix one liner (from the root folder):</para><para><programlisting><codeline><highlight class="normal">mkdir<sp/>build<sp/>&amp;&amp;<sp/>cd<sp/>build<sp/>&amp;&amp;<sp/>cmake<sp/>..<sp/>&amp;&amp;<sp/>make<sp/>&amp;&amp;<sp/>make<sp/>doc<sp/>&amp;&amp;</highlight></codeline>
+<codeline><highlight class="normal">sudo<sp/>make<sp/>install<sp/>&amp;&amp;<sp/>bin/test_all</highlight></codeline>
+</programlisting></para><para>Alternatively, we provide an option to precompile compiled the library in order to save building time (and memory) via the CMake option <computeroutput>VINECOPULIB_SHARED_LIB</computeroutput>. In this case, source files are generated from header files and the CMake build system additionally allows to install the .dylib/.so/.dll object.</para><para>The unix one liner (from the root folder):</para><para><programlisting><codeline><highlight class="normal">mkdir<sp/>build<sp/>&amp;&amp;<sp/>cd<sp/>build<sp/>&amp;&amp;<sp/>cmake<sp/>..<sp/>-DVINECOPULIB_SHARED_LIB=ON<sp/>&amp;&amp;<sp/>make<sp/>&amp;&amp;</highlight></codeline>
+<codeline><highlight class="normal">make<sp/>doc<sp/>&amp;&amp;<sp/>sudo<sp/>make<sp/>install<sp/>&amp;&amp;<sp/>bin/test_all</highlight></codeline>
+</programlisting></para><para><table rows="8" cols="2"><row>
+<entry thead="yes"><para>Step </para></entry><entry thead="yes"><para>Shell command  </para></entry></row>
+<row>
+<entry thead="no"><para>Create a build folder </para></entry><entry thead="no"><para><computeroutput>mkdir build</computeroutput> </para></entry></row>
+<row>
+<entry thead="no"><para>Move to the created folder </para></entry><entry thead="no"><para><computeroutput>cd build</computeroutput> </para></entry></row>
+<row>
+<entry thead="no"><para>Create the <computeroutput>MakeFile</computeroutput> via cmake </para></entry><entry thead="no"><para><computeroutput>cmake ..</computeroutput> (or <computeroutput>cmake .. -DVINECOPULIB_SHARED_LIB=ON</computeroutput> for the compiled version) </para></entry></row>
+<row>
+<entry thead="no"><para>Compile the library </para></entry><entry thead="no"><para><computeroutput>make</computeroutput> or <computeroutput>make -j n</computeroutput> where <computeroutput>n</computeroutput> is the number of cores </para></entry></row>
+<row>
+<entry thead="no"><para>Build the documentation (optional) </para></entry><entry thead="no"><para><computeroutput>make doc</computeroutput> </para></entry></row>
+<row>
+<entry thead="no"><para>Install the library on linux/OSX (optional) </para></entry><entry thead="no"><para><computeroutput>sudo make install</computeroutput> </para></entry></row>
+<row>
+<entry thead="no"><para>Run unit tests (optional) </para></entry><entry thead="no"><para><computeroutput>bin/[test_executable]</computeroutput> </para></entry></row>
+</table>
+</para></sect1>
+<sect1 id="setup_1install-lib">
+<title>How to install the library</title>
+<para>To install the library without unit tests, the <computeroutput>MakeFile</computeroutput> can be created via <computeroutput>cmake .. -DBUILD_TESTING=OFF</computeroutput>. Additionally, a <computeroutput>Debug</computeroutput> mode is available via <computeroutput>cmake .. -DCMAKE_BUILD_TYPE=Debug</computeroutput>; to enable strict compiler warnings, use <computeroutput>-DSTRICT_COMPILER=ON</computeroutput>. Finally, note that using <computeroutput>-DCMAKE_EXPORT_COMPILE_COMMANDS=ON</computeroutput> is useful if one is interested in using autocomplete or linting when working with the library.</para><para>On Windows, CMake will generate Visual Studio files instead of Makefiles, the following sequence of commands can be used to perform compilation using the command prompt: <programlisting><codeline><highlight class="normal">md<sp/>build</highlight></codeline>
+<codeline><highlight class="normal">cd<sp/>build</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>..</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>.<sp/>--config<sp/>Debug</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>.<sp/>--config<sp/>Release</highlight></codeline>
+<codeline><highlight class="normal">cmake<sp/>--build<sp/>.<sp/>--config<sp/>Release<sp/>--target<sp/>install</highlight></codeline>
+</programlisting> Instead of the <computeroutput>cmake --build</computeroutput> commands, the generated <computeroutput>vinecopulib.sln</computeroutput> file can be open in the Visual Studio GUI. Furthermore, as for linux systems, the third line can be replaced by <computeroutput>cmake .. -DVINECOPULIB_SHARED_LIB=ON</computeroutput> to generate the source files in order to compile vinecopulib in non-header-only mode.</para><para>The following CMake flags (given with example values) will likely come handy: <programlisting><codeline><highlight class="normal">-DBOOST_ROOT=c:\local\boost_1_63_0</highlight></codeline>
+<codeline><highlight class="normal">-DEIGEN3_INCLUDE_DIR=c:\local\eigen-eigen-da9b4e14c255</highlight></codeline>
+<codeline><highlight class="normal">-DCMAKE_INSTALL_PREFIX=c:\local\vinecopulib-install</highlight></codeline>
+<codeline><highlight class="normal">-DCMAKE_GENERATOR_PLATFORM=x64</highlight></codeline>
+<codeline><highlight class="normal">-DBOOST_DEBUG=1</highlight></codeline>
+</programlisting></para></sect1>
+<sect1 id="setup_1include-lib">
+<title>How to include the library in other projects</title>
+<sect2 id="setup_1include-headers">
+<title>As a header only library</title>
+<para>The library can be included header only by simply copying the files in your project.</para></sect2>
+<sect2 id="setup_1include-install">
+<title>Using a system install</title>
+<para>Using <computeroutput>make install</computeroutput>, vinecopulib is installed in the usual location of the system, namely</para><para><itemizedlist>
+<listitem><para><computeroutput>&lt;prefix&gt;/include/</computeroutput> (for the headers),</para></listitem><listitem><para><computeroutput>&lt;prefix&gt;/lib/</computeroutput> (for the shared library when <computeroutput>VINECOPULIB_SHARED_LIB=ON</computeroutput> is used),</para></listitem><listitem><para><computeroutput>&lt;prefix&gt;/lib/cmake/vinecopulib</computeroutput> (to allow cmake to find the library with <computeroutput>find_package</computeroutput>),</para></listitem></itemizedlist>
+</para><para>where <computeroutput>&lt;prefix&gt;</computeroutput> is e.g. <computeroutput>/usr/</computeroutput> or <computeroutput>/usr/local</computeroutput>. Note that <computeroutput>make install</computeroutput> only copies <computeroutput><ref refid="vinecopulib_8hpp_source" kindref="compound">vinecopulib.hpp</ref></computeroutput> in <computeroutput>&lt;prefix&gt;/include/</computeroutput> and puts the other headers in a subfolder <computeroutput>&lt;prefix&gt;/include/vinecopulib</computeroutput>, but using <computeroutput>#include &lt;<ref refid="vinecopulib_8hpp_source" kindref="compound">vinecopulib.hpp</ref>&gt;</computeroutput> is enough to load both bivariate and vine functions.</para></sect2>
+<sect2 id="setup_1include-cmake">
+<title>In a CMake project</title>
+<para>The easiest way to include vinecopulib in another project (and to avoid writing makefiles) is to use CMake. For instance, an example projet where the source code to be linked could contain<itemizedlist>
+<listitem><para>a <computeroutput>CMakeLists.txt</computeroutput> file for the project&apos;s setup,</para></listitem><listitem><para>a subfolder <computeroutput>src</computeroutput> for the source code, containing<itemizedlist>
+<listitem><para>the source code,</para></listitem><listitem><para>another <computeroutput>CMakeLists.txt</computeroutput> file for the project libraries and executables.</para></listitem></itemizedlist>
+</para></listitem></itemizedlist>
+</para><para>The top-level <computeroutput>CMakeLists.txt</computeroutput> could be:</para><para><programlisting><codeline><highlight class="normal">cmake_minimum_required(VERSION<sp/>3.2)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">set(CMAKE_CXX_STANDARD<sp/>11)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">project<sp/>(Example)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Setting<sp/>default<sp/>folders</highlight></codeline>
+<codeline><highlight class="normal">set(CMAKE_RUNTIME_OUTPUT_DIRECTORY<sp/>${CMAKE_SOURCE_DIR}/bin)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>C++<sp/>compile<sp/>flags</highlight></codeline>
+<codeline><highlight class="normal">if<sp/>(NOT<sp/>WIN32)</highlight></codeline>
+<codeline><highlight class="normal"><sp/>set(CMAKE_CXX_FLAGS<sp/>&quot;-std=gnu++11<sp/>-Wextra<sp/>-Wall<sp/>-Wno-delete-non-virtual-dtor<sp/>-Werror=return-type<sp/>-O2<sp/>-DNDEBUG&quot;)</highlight></codeline>
+<codeline><highlight class="normal">endif()</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Find<sp/>vinecopulib<sp/>package<sp/>and<sp/>dependencies</highlight></codeline>
+<codeline><highlight class="normal">find_package(vinecopulib<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>REQUIRED)</highlight></codeline>
+<codeline><highlight class="normal">find_package(Boost<sp/>1.56<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>REQUIRED)</highlight></codeline>
+<codeline><highlight class="normal">include(cmake/findEigen3.cmake<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>REQUIRED)</highlight></codeline>
+<codeline><highlight class="normal">find_package(Threads<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>REQUIRED)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Set<sp/>required<sp/>variables<sp/>for<sp/>includes<sp/>and<sp/>libraries</highlight></codeline>
+<codeline><highlight class="normal">#<sp/>In<sp/>the<sp/>second<sp/>line</highlight></codeline>
+<codeline><highlight class="normal">#<sp/><sp/><sp/>*<sp/>VINECOPULIB_LIBRARIES<sp/>is<sp/>needed<sp/>if<sp/>vinecopulib<sp/>has<sp/>been<sp/>built<sp/>as<sp/>a</highlight></codeline>
+<codeline><highlight class="normal">#<sp/><sp/><sp/><sp/><sp/>shared<sp/>lib<sp/>(does<sp/>nothing<sp/>otherwise).</highlight></codeline>
+<codeline><highlight class="normal">#<sp/><sp/><sp/>*<sp/>CMAKE_THREAD_LIBS_INIT<sp/>is<sp/>needed<sp/>for<sp/>some<sp/>linux<sp/>systems</highlight></codeline>
+<codeline><highlight class="normal">#<sp/><sp/><sp/><sp/><sp/>(but<sp/>does<sp/>nothing<sp/>on<sp/>OSX/Windows).</highlight></codeline>
+<codeline><highlight class="normal">set(external_includes<sp/>${VINECOPULIB_INCLUDE_DIR}<sp/>${EIGEN3_INCLUDE_DIR}<sp/>${Boost_INCLUDE_DIRS})</highlight></codeline>
+<codeline><highlight class="normal">set(external_libs<sp/>${VINECOPULIB_LIBRARIES}<sp/>${CMAKE_THREAD_LIBS_INIT})</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Include<sp/>subdirectory<sp/>with<sp/>project<sp/>sources</highlight></codeline>
+<codeline><highlight class="normal">add_subdirectory(src)</highlight></codeline>
+</programlisting></para><para>Assuming a single <computeroutput>main.cpp</computeroutput> source file (with <computeroutput>#include &lt;<ref refid="vinecopulib_8hpp_source" kindref="compound">vinecopulib.hpp</ref>&gt;</computeroutput> at the top), the <computeroutput>CMakeLists.txt</computeroutput> file in <computeroutput>/src/</computeroutput> could then be:</para><para><programlisting><codeline><highlight class="normal">#<sp/>Include<sp/>header<sp/>files</highlight></codeline>
+<codeline><highlight class="normal">include_directories(${external_includes})</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Add<sp/>main<sp/>executable</highlight></codeline>
+<codeline><highlight class="normal">add_executable(main<sp/>main.cpp)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Link<sp/>to<sp/>vinecopulib<sp/>if<sp/>vinecopulib<sp/>has<sp/>been<sp/>built<sp/>as<sp/>a<sp/>shared<sp/>lib</highlight></codeline>
+<codeline><highlight class="normal">#<sp/>and<sp/>to<sp/>pthreads<sp/>on<sp/>some<sp/>linux<sp/>systems<sp/>(does<sp/>nothing<sp/>otherwise)</highlight></codeline>
+<codeline><highlight class="normal">target_link_libraries(main<sp/>${VINECOPULIB_LIBRARIES}<sp/>${CMAKE_THREAD_LIBS_INIT})</highlight></codeline>
+</programlisting> </para></sect2>
+</sect1>
+    </detaileddescription>
+  </compounddef>
+</doxygen>

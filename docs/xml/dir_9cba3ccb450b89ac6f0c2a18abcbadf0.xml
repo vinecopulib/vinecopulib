@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="dir_9cba3ccb450b89ac6f0c2a18abcbadf0" kind="dir">
+    <compoundname>docs/html</compoundname>
+    <innerfile refid="classvinecopulib__1__1__bicop_8html">classvinecopulib_1_1_bicop.html</innerfile>
+    <innerfile refid="classvinecopulib__1__1__fit__controls__bicop_8html">classvinecopulib_1_1_fit_controls_bicop.html</innerfile>
+    <innerfile refid="classvinecopulib__1__1__fit__controls__vinecop_8html">classvinecopulib_1_1_fit_controls_vinecop.html</innerfile>
+    <innerfile refid="classvinecopulib__1__1__r__vine__structure_8html">classvinecopulib_1_1_r_vine_structure.html</innerfile>
+    <innerfile refid="classvinecopulib__1__1__triangular__array_8html">classvinecopulib_1_1_triangular_array.html</innerfile>
+    <innerfile refid="classvinecopulib__1__1__vinecop_8html">classvinecopulib_1_1_vinecop.html</innerfile>
+    <innerfile refid="overview-bicop_8html">overview-bicop.html</innerfile>
+    <innerfile refid="overview-namespaces_8html">overview-namespaces.html</innerfile>
+    <innerfile refid="overview-vinecop_8html">overview-vinecop.html</innerfile>
+    <innerfile refid="overview_8html">overview.html</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="docs/html/"/>
+  </compounddef>
+</doxygen>

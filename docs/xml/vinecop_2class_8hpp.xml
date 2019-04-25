@@ -8,228 +8,228 @@
     <includes refid="vinecop_2implementation_2class_8ipp" local="no">vinecopulib/vinecop/implementation/class.ipp</includes>
     <includedby refid="vinecopulib_8hpp" local="no">include/vinecopulib.hpp</includedby>
     <incdepgraph>
-      <node id="82">
+      <node id="112">
         <label>vinecopulib/bicop/implementation/fit_controls.ipp</label>
         <link refid="bicop_2implementation_2fit__controls_8ipp"/>
-        <childnode refid="83" relation="include">
+        <childnode refid="113" relation="include">
         </childnode>
-        <childnode refid="78" relation="include">
+        <childnode refid="108" relation="include">
         </childnode>
-        <childnode refid="84" relation="include">
+        <childnode refid="114" relation="include">
         </childnode>
       </node>
-      <node id="100">
+      <node id="130">
         <label>vinecopulib/misc/triangular_array.hpp</label>
         <link refid="triangular__array_8hpp_source"/>
-        <childnode refid="83" relation="include">
+        <childnode refid="113" relation="include">
         </childnode>
-        <childnode refid="101" relation="include">
+        <childnode refid="131" relation="include">
         </childnode>
-        <childnode refid="78" relation="include">
+        <childnode refid="108" relation="include">
         </childnode>
       </node>
-      <node id="79">
+      <node id="109">
         <label>boost/bimap.hpp</label>
       </node>
-      <node id="96">
+      <node id="126">
         <label>unsupported/Eigen/FFT</label>
       </node>
-      <node id="85">
+      <node id="115">
         <label>vinecopulib/misc/tools_interface.hpp</label>
       </node>
-      <node id="71">
+      <node id="101">
         <label>vinecopulib/bicop/class.hpp</label>
         <link refid="bicop_2class_8hpp_source"/>
-        <childnode refid="72" relation="include">
-        </childnode>
-        <childnode refid="73" relation="include">
-        </childnode>
-        <childnode refid="85" relation="include">
-        </childnode>
-        <childnode refid="86" relation="include">
-        </childnode>
-        <childnode refid="87" relation="include">
-        </childnode>
-      </node>
-      <node id="92">
-        <label>vinecopulib/misc/tools_eigen.hpp</label>
-      </node>
-      <node id="78">
-        <label>stdexcept</label>
-      </node>
-      <node id="77">
-        <label>vinecopulib/bicop/implementation/family.ipp</label>
-        <link refid="family_8ipp_source"/>
-        <childnode refid="78" relation="include">
-        </childnode>
-        <childnode refid="79" relation="include">
-        </childnode>
-        <childnode refid="80" relation="include">
-        </childnode>
-      </node>
-      <node id="76">
-        <label>string</label>
-      </node>
-      <node id="80">
-        <label>boost/assign.hpp</label>
-      </node>
-      <node id="89">
-        <label>vinecopulib/misc/tools_stats.hpp</label>
-        <link refid="tools__stats_8hpp_source"/>
-        <childnode refid="90" relation="include">
-        </childnode>
-        <childnode refid="91" relation="include">
-        </childnode>
-        <childnode refid="92" relation="include">
-        </childnode>
-        <childnode refid="93" relation="include">
-        </childnode>
-      </node>
-      <node id="102">
-        <label>vinecopulib/vinecop/implementation/rvine_structure.ipp</label>
-        <link refid="rvine__structure_8ipp_source"/>
-      </node>
-      <node id="97">
-        <label>wdm/eigen.hpp</label>
-      </node>
-      <node id="91">
-        <label>random</label>
-      </node>
-      <node id="81">
-        <label>Eigen/Dense</label>
-      </node>
-      <node id="73">
-        <label>vinecopulib/bicop/fit_controls.hpp</label>
-        <link refid="bicop_2fit__controls_8hpp_source"/>
-        <childnode refid="74" relation="include">
-        </childnode>
-        <childnode refid="75" relation="include">
-        </childnode>
-        <childnode refid="81" relation="include">
-        </childnode>
-        <childnode refid="82" relation="include">
-        </childnode>
-      </node>
-      <node id="72">
-        <label>vinecopulib/bicop/abstract.hpp</label>
-      </node>
-      <node id="90">
-        <label>boost/math/distributions.hpp</label>
-      </node>
-      <node id="74">
-        <label>vector</label>
-      </node>
-      <node id="86">
-        <label>vinecopulib/misc/tools_serialization.hpp</label>
-      </node>
-      <node id="87">
-        <label>vinecopulib/bicop/implementation/class.ipp</label>
-        <link refid="bicop_2implementation_2class_8ipp_source"/>
-        <childnode refid="88" relation="include">
-        </childnode>
-        <childnode refid="89" relation="include">
-        </childnode>
-        <childnode refid="83" relation="include">
-        </childnode>
-        <childnode refid="85" relation="include">
-        </childnode>
-        <childnode refid="98" relation="include">
-        </childnode>
-      </node>
-      <node id="93">
-        <label>vinecopulib/misc/implementation/tools_stats.ipp</label>
-        <link refid="tools__stats_8ipp_source"/>
-        <childnode refid="94" relation="include">
-        </childnode>
-        <childnode refid="95" relation="include">
-        </childnode>
-        <childnode refid="83" relation="include">
-        </childnode>
-        <childnode refid="96" relation="include">
-        </childnode>
-        <childnode refid="97" relation="include">
-        </childnode>
-      </node>
-      <node id="75">
-        <label>vinecopulib/bicop/family.hpp</label>
-        <link refid="family_8hpp_source"/>
-        <childnode refid="74" relation="include">
-        </childnode>
-        <childnode refid="76" relation="include">
-        </childnode>
-        <childnode refid="77" relation="include">
-        </childnode>
-      </node>
-      <node id="70">
-        <label>include/vinecopulib/vinecop/class.hpp</label>
-        <link refid="vinecop_2class_8hpp"/>
-        <childnode refid="71" relation="include">
-        </childnode>
-        <childnode refid="99" relation="include">
+        <childnode refid="102" relation="include">
         </childnode>
         <childnode refid="103" relation="include">
         </childnode>
-        <childnode refid="104" relation="include">
+        <childnode refid="115" relation="include">
+        </childnode>
+        <childnode refid="116" relation="include">
+        </childnode>
+        <childnode refid="117" relation="include">
         </childnode>
       </node>
+      <node id="122">
+        <label>vinecopulib/misc/tools_eigen.hpp</label>
+      </node>
+      <node id="108">
+        <label>stdexcept</label>
+      </node>
+      <node id="107">
+        <label>vinecopulib/bicop/implementation/family.ipp</label>
+        <link refid="family_8ipp_source"/>
+        <childnode refid="108" relation="include">
+        </childnode>
+        <childnode refid="109" relation="include">
+        </childnode>
+        <childnode refid="110" relation="include">
+        </childnode>
+      </node>
+      <node id="106">
+        <label>string</label>
+      </node>
+      <node id="110">
+        <label>boost/assign.hpp</label>
+      </node>
+      <node id="119">
+        <label>vinecopulib/misc/tools_stats.hpp</label>
+        <link refid="tools__stats_8hpp_source"/>
+        <childnode refid="120" relation="include">
+        </childnode>
+        <childnode refid="121" relation="include">
+        </childnode>
+        <childnode refid="122" relation="include">
+        </childnode>
+        <childnode refid="123" relation="include">
+        </childnode>
+      </node>
+      <node id="132">
+        <label>vinecopulib/vinecop/implementation/rvine_structure.ipp</label>
+        <link refid="rvine__structure_8ipp_source"/>
+      </node>
+      <node id="127">
+        <label>wdm/eigen.hpp</label>
+      </node>
+      <node id="121">
+        <label>random</label>
+      </node>
+      <node id="111">
+        <label>Eigen/Dense</label>
+      </node>
       <node id="103">
+        <label>vinecopulib/bicop/fit_controls.hpp</label>
+        <link refid="bicop_2fit__controls_8hpp_source"/>
+        <childnode refid="104" relation="include">
+        </childnode>
+        <childnode refid="105" relation="include">
+        </childnode>
+        <childnode refid="111" relation="include">
+        </childnode>
+        <childnode refid="112" relation="include">
+        </childnode>
+      </node>
+      <node id="102">
+        <label>vinecopulib/bicop/abstract.hpp</label>
+      </node>
+      <node id="120">
+        <label>boost/math/distributions.hpp</label>
+      </node>
+      <node id="104">
+        <label>vector</label>
+      </node>
+      <node id="116">
+        <label>vinecopulib/misc/tools_serialization.hpp</label>
+      </node>
+      <node id="117">
+        <label>vinecopulib/bicop/implementation/class.ipp</label>
+        <link refid="bicop_2implementation_2class_8ipp_source"/>
+        <childnode refid="118" relation="include">
+        </childnode>
+        <childnode refid="119" relation="include">
+        </childnode>
+        <childnode refid="113" relation="include">
+        </childnode>
+        <childnode refid="115" relation="include">
+        </childnode>
+        <childnode refid="128" relation="include">
+        </childnode>
+      </node>
+      <node id="123">
+        <label>vinecopulib/misc/implementation/tools_stats.ipp</label>
+        <link refid="tools__stats_8ipp_source"/>
+        <childnode refid="124" relation="include">
+        </childnode>
+        <childnode refid="125" relation="include">
+        </childnode>
+        <childnode refid="113" relation="include">
+        </childnode>
+        <childnode refid="126" relation="include">
+        </childnode>
+        <childnode refid="127" relation="include">
+        </childnode>
+      </node>
+      <node id="105">
+        <label>vinecopulib/bicop/family.hpp</label>
+        <link refid="family_8hpp_source"/>
+        <childnode refid="104" relation="include">
+        </childnode>
+        <childnode refid="106" relation="include">
+        </childnode>
+        <childnode refid="107" relation="include">
+        </childnode>
+      </node>
+      <node id="100">
+        <label>include/vinecopulib/vinecop/class.hpp</label>
+        <link refid="vinecop_2class_8hpp"/>
+        <childnode refid="101" relation="include">
+        </childnode>
+        <childnode refid="129" relation="include">
+        </childnode>
+        <childnode refid="133" relation="include">
+        </childnode>
+        <childnode refid="134" relation="include">
+        </childnode>
+      </node>
+      <node id="133">
         <label>vinecopulib/vinecop/tools_select.hpp</label>
       </node>
-      <node id="101">
+      <node id="131">
         <label>iostream</label>
       </node>
-      <node id="95">
+      <node id="125">
         <label>vinecopulib/misc/tools_stats_sobol.hpp</label>
         <link refid="tools__stats__sobol_8hpp_source"/>
       </node>
-      <node id="98">
+      <node id="128">
         <label>mutex</label>
       </node>
-      <node id="94">
+      <node id="124">
         <label>vinecopulib/misc/tools_stats_ghalton.hpp</label>
         <link refid="tools__stats__ghalton_8hpp_source"/>
       </node>
-      <node id="84">
+      <node id="114">
         <label>thread</label>
       </node>
-      <node id="83">
+      <node id="113">
         <label>vinecopulib/misc/tools_stl.hpp</label>
       </node>
-      <node id="104">
+      <node id="134">
         <label>vinecopulib/vinecop/implementation/class.ipp</label>
         <link refid="vinecop_2implementation_2class_8ipp_source"/>
-        <childnode refid="83" relation="include">
+        <childnode refid="113" relation="include">
         </childnode>
-        <childnode refid="89" relation="include">
+        <childnode refid="119" relation="include">
         </childnode>
-        <childnode refid="85" relation="include">
+        <childnode refid="115" relation="include">
         </childnode>
-        <childnode refid="78" relation="include">
+        <childnode refid="108" relation="include">
         </childnode>
       </node>
-      <node id="99">
+      <node id="129">
         <label>vinecopulib/vinecop/rvine_structure.hpp</label>
         <link refid="rvine__structure_8hpp_source"/>
-        <childnode refid="81" relation="include">
+        <childnode refid="111" relation="include">
         </childnode>
-        <childnode refid="100" relation="include">
+        <childnode refid="130" relation="include">
         </childnode>
-        <childnode refid="102" relation="include">
+        <childnode refid="132" relation="include">
         </childnode>
       </node>
-      <node id="88">
+      <node id="118">
         <label>vinecopulib/bicop/tools_select.hpp</label>
       </node>
     </incdepgraph>
     <invincdepgraph>
-      <node id="106">
+      <node id="136">
         <label>include/vinecopulib.hpp</label>
         <link refid="vinecopulib_8hpp_source"/>
       </node>
-      <node id="105">
+      <node id="135">
         <label>include/vinecopulib/vinecop/class.hpp</label>
         <link refid="vinecop_2class_8hpp"/>
-        <childnode refid="106" relation="include">
+        <childnode refid="136" relation="include">
         </childnode>
       </node>
     </invincdepgraph>

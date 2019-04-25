@@ -1,0 +1,184 @@
+Vine copula models are implemented in the class {\ttfamily Vinecop}. To use this class in your code, include the header include the header {\ttfamily \hyperlink{vinecop_2class_8hpp_source}{vinecopulib/vinecop/class.\+hpp}} (or simply {\ttfamily \hyperlink{vinecopulib_8hpp_source}{vinecopulib.\+hpp}}) at the top of your source file. This automatically enables all features for bivariate copula models.\hypertarget{overview-vinecop_vinecop-custom}{}\section{Set up a custom vine copula model}\label{overview-vinecop_vinecop-custom}
+Custom models can be created through the constructor of {\ttfamily Vinecop}. A model is represented by a {\ttfamily std\+::vector$<$std\+::vector$<$Bicop$>$$>$} containing all pair-\/copulas and an \href{#how-to-read-an-r-vine-matrix}{\tt R-\/vine matrix}.
+
+Similarly to bivariate copulas, there are essentially two ways of setting-\/up vine copulas\+:
+\begin{DoxyItemize}
+\item with known parameters,
+\item from data (i.\+e., with estimated parameters).
+\end{DoxyItemize}
+
+The constructor with known parameters has two versions\+:
+\begin{DoxyItemize}
+\item one for which the only argument is the dimension, allowing to set-\/up a D-\/vine with only independence copulas,
+\item and one for which the two arguments are a matrix of integers (i.\+e., and \href{#how-to-read-an-r-vine-matrix}{\tt R-\/vine matrix}) and a {\ttfamily std\+::vector$<$std\+::vector$<$Bicop$>$$>$} containing all pair-\/copulas.
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}
+\textcolor{comment}{// specify the dimension of the model}
+\textcolor{keywordtype}{int} d = 3;
+
+\textcolor{comment}{// instantiate a three dimensional D-vine with independence copulas}
+Vinecop default\_model(d);
+
+\textcolor{comment}{// alternatively, instantiate a std::vector<std::vector<Bicop>> object}
+\textcolor{keyword}{auto} pair\_copulas = Vinecop::make\_pair\_copula\_store(d);
+
+\textcolor{comment}{// specify the pair copulas}
+\textcolor{keyword}{auto} par = Eigen::VectorXd::Constant(1, 3.0);
+\textcolor{keywordflow}{for} (\textcolor{keyword}{auto}& tree : pair\_copulas) \{
+       \textcolor{keywordflow}{for} (\textcolor{keyword}{auto}& pc : tree) \{
+           pc = Bicop(BicopFamily::clayton, 270, par);
+       \}
+\}
+
+\textcolor{comment}{// specify a structure matrix}
+Eigen::Matrix<size\_t, Eigen::Dynamic, Eigen::Dynamic> mat(3, 3);
+mat << 1, 1, 1,
+          2, 2, 0,
+          3, 0, 0;
+
+\textcolor{comment}{// instantiate the custom model}
+Vinecop custom\_model(pair\_copulas, mat);
+\end{DoxyCode}
+ The constructors from data take the same arguments as the two select methods described \href{#vinecop-fit}{\tt below}.\hypertarget{overview-vinecop_vinecop-matrix}{}\section{How to read the R-\/vine matrix}\label{overview-vinecop_vinecop-matrix}
+The R-\/vine matrix notation in vinecopulib is different from the one in Vine\+Copula. An exemplary array is 
+\begin{DoxyCode}
+4 4 4 4
+3 3 3
+2 2
+1
+\end{DoxyCode}
+ which encodes the following pair-\/copulas\+: 
+\begin{DoxyCode}
+| tree | edge | pair-copulas   |
+|------|------|----------------|
+| 0    | 0    | `(1, 4)`       |
+|      | 1    | `(2, 4)`       |
+|      | 2    | `(3, 4)`       |
+| 1    | 0    | `(1, 3; 4)`    |
+|      | 1    | `(2, 3; 4)`    |
+| 2    | 0    | `(1, 2; 3, 4)` |
+\end{DoxyCode}
+ Denoting by {\ttfamily M\mbox{[}i, j\mbox{]}} the matrix entry in row {\ttfamily i} and column {\ttfamily j}, the pair-\/copula index for edge {\ttfamily e} in tree {\ttfamily t} of a {\ttfamily d} dimensional vine is {\ttfamily (M\mbox{[}d -\/ 1 -\/ t, e\mbox{]}, M\mbox{[}t, e\mbox{]}; M\mbox{[}t -\/ 1, e\mbox{]}, ..., M\mbox{[}0, e\mbox{]})}. Less formally,
+\begin{DoxyEnumerate}
+\item Start with the counter-\/diagonal element of column {\ttfamily e} (first conditioned variable).
+\item Jump up to the element in row {\ttfamily t} (second conditioned variable).
+\item Gather all entries further up in column {\ttfamily e} (conditioning set).
+\end{DoxyEnumerate}
+
+A valid R-\/vine matrix must satisfy several conditions which are checked when {\ttfamily R\+Vine\+Structure()} is called\+:
+\begin{DoxyEnumerate}
+\item The lower right triangle must only contain zeros.
+\item The upper left triangle can only contain numbers between 1 and d.
+\item The antidiagonal must contain the numbers 1, ..., d.
+\item The antidiagonal entry of a column must not be contained in any column further to the right.
+\item The entries of a column must be contained in all columns to the left.
+\item The proximity condition must hold\+: For all t = 1, ..., d -\/ 2 and e = 0, ..., d -\/ t -\/ 1 there must exist an index j $>$ d, such that {\ttfamily (M\mbox{[}t, e\mbox{]}, \{M\mbox{[}0, e\mbox{]}, ..., M\mbox{[}t-\/1, e\mbox{]}\})} equals either {\ttfamily (M\mbox{[}d-\/j-\/1, j\mbox{]}, \{M\mbox{[}0, j\mbox{]}, ..., M\mbox{[}t-\/1, j\mbox{]}\})} or {\ttfamily (M\mbox{[}t-\/1, j\mbox{]}, \{M\mbox{[}d-\/j-\/1, j\mbox{]}, M\mbox{[}0, j\mbox{]}, ..., M\mbox{[}t-\/2, j\mbox{]}\})}.
+\end{DoxyEnumerate}\hypertarget{overview-vinecop_vinecop-fit}{}\section{Fit and select a vine copula model}\label{overview-vinecop_vinecop-fit}
+The method {\ttfamily select\+\_\+all()} performs parameter estimation and automatic model selection when the vine structure is unknown (i.\+e., it modifies the structure of the object), using the sequential procedure proposed by \href{https://mediatum.ub.tum.de/doc/1079277/1079277.pdf}{\tt Dissman et al. (2013)}. Alternatively, {\ttfamily select\+\_\+families()} performs parameter estimation and automatic model selection for a known structure (i.\+e., using the structure of the object). In both cases, the only mandatory argument is the data (stored in a {\ttfamily Eigen\+::\+Matrix\+Xd}), while controls argument allow for customization of the fit. 
+\begin{DoxyCode}
+\textcolor{comment}{// specify the dimension of the model}
+\textcolor{keywordtype}{int} d = 5;
+
+\textcolor{comment}{// simulate dummy data}
+Eigen::MatrixXd data = tools\_stats::simulate\_uniform(100, d);
+
+\textcolor{comment}{// instantiate a D-vine and select the families}
+Vinecop model(d);
+model.select\_families(data);
+
+\textcolor{comment}{// alternatively, select the structure along with the families}
+model.select\_all(data);
+\end{DoxyCode}
+
+
+Note that the second argument to {\ttfamily select\+\_\+all()} and {\ttfamily select\+\_\+families()} is similar to the one of {\ttfamily select()} for {\ttfamily Bicop} objects. Objects of the class {\ttfamily Fit\+Controls\+Vinecop} inherit from {\ttfamily Fit\+Controls\+Bicop} and extend them with additional data members to control the structure selection\+:
+\begin{DoxyItemize}
+\item {\ttfamily size\+\_\+t trunc\+\_\+lvl} describes the tree after which {\ttfamily family\+\_\+set} is set to {\ttfamily \{Bicop\+Family\+::indep\}}. In other words, all pair copulas in trees lower than {\ttfamily trunc\+\_\+lvl} (default to none) are \char`\"{}selected\char`\"{} as independence copulas.
+\item {\ttfamily std\+::string tree\+\_\+criterion} describes the criterion used to construct the minimum spanning tree (see \href{https://mediatum.ub.tum.de/doc/1079277/1079277.pdf}{\tt Dissman et al. (2013)}). It can take {\ttfamily \char`\"{}tau\char`\"{}} (default) for Kendall\textquotesingle{}s tau, {\ttfamily \char`\"{}rho\char`\"{}} for Spearman\textquotesingle{}s rho, or {\ttfamily \char`\"{}hoeffd\char`\"{}} for Hoeffding\textquotesingle{}s D (suited for non-\/monotonic relationships).
+\item {\ttfamily double threshold} describes a value (default is 0) of {\ttfamily tree\+\_\+criterion} under which the corresponding pair-\/copula is set to independence.
+\item {\ttfamily bool select\+\_\+trunc\+\_\+lvl} can be set to true to select the truncation level automatically (default is {\ttfamily false}).
+\item {\ttfamily bool select\+\_\+threshold} can be set to true to select the threshold parameter automatically (default is {\ttfamily false}).
+\item {\ttfamily size\+\_\+t num\+\_\+threads} number of threads to run in parallel when fitting pair copulas within one tree.
+\end{DoxyItemize}
+
+As mentioned \href{#set-up-a-custom-vine-copula-model}{\tt above}, the arguments of {\ttfamily select\+\_\+all()} and {\ttfamily select\+\_\+families()} can be used as arguments to a constructor allowing to instantiate a new object directly\+:
+
+
+\begin{DoxyCode}
+\textcolor{comment}{// specify the dimension of the model}
+\textcolor{keywordtype}{int} d = 4;
+
+\textcolor{comment}{// simulate dummy data}
+Eigen::MatrixXd data = \hyperlink{namespacevinecopulib_1_1tools__stats_a4f9a1f8fdbe23db916b013f7f6e500ca}{simulate\_uniform}(100, d);
+
+\textcolor{comment}{// instantiate a vine from data using the default arguments}
+Vinecop best\_vine(data);
+
+\textcolor{comment}{// alternatively, instantiate a structure matrix...}
+Eigen::Matrix<size\_t, Eigen::Dynamic, Eigen::Dynamic> M;
+M << 1, 1, 1, 1,
+        2, 2, 2, 0,
+        3, 3, 0, 0
+        4, 0, 0, 0;
+
+\textcolor{comment}{// ... and instantiate a vine copula from data using the custom structure,}
+\textcolor{comment}{// Kendall's tau inversion for parameters}
+\textcolor{comment}{// estimation and a truncation after the second tree}
+FitControlsVinecop controls(bicop\_families::itau, \textcolor{stringliteral}{"itau"});
+controls.set\_trunc\_lvl(2);
+controls.set\_num\_threads(4);  \textcolor{comment}{// parallelize with 4 threads}
+Vinecop custom\_vine(data, M, controls);
+\end{DoxyCode}
+\hypertarget{overview-vinecop_vinecop-work}{}\section{Work with a vine copula model}\label{overview-vinecop_vinecop-work}
+You can simulate from a vine copula model, evaluate its density, distribution, log-\/likelihood, A\+IC and B\+IC.
+
+
+\begin{DoxyCode}
+\textcolor{comment}{// 5-dimensional independence vine}
+Vinecop model(5);
+
+\textcolor{comment}{// simulate 100 observations}
+\textcolor{keyword}{auto} data = model.simulate(100)
+
+\textcolor{comment}{// evaluate the density}
+\textcolor{keyword}{auto} pdf = model.pdf(data)
+
+\textcolor{comment}{// evaluate the distribution}
+\textcolor{keyword}{auto} cdf = model.cdf(data)
+
+\textcolor{comment}{// evaluate the log-likelihood}
+\textcolor{keyword}{auto} ll = model.loglik(data)
+
+\textcolor{comment}{// evaluate the AIC}
+\textcolor{keyword}{auto} aic = model.aic(data)
+
+\textcolor{comment}{// evaluate the BIC}
+\textcolor{keyword}{auto} bic = model.bic(data)
+\end{DoxyCode}
+
+
+Vine copula models can also be written to and constructed from J\+S\+ON files and {\ttfamily boost\+::property\+\_\+tree\+::ptree} objects\+:
+
+
+\begin{DoxyCode}
+\textcolor{comment}{// 5-dimensional vine copula}
+Vinecop vinecop(5);
+
+\textcolor{comment}{// Save as a ptree object}
+boost::property\_tree::ptree vinecop\_node = vinecop.to\_ptree();
+
+\textcolor{comment}{// Write into a JSON file}
+boost::property\_tree::write\_json(\textcolor{stringliteral}{"myfile.JSON"}, vinecop\_node);
+
+\textcolor{comment}{// Equivalently}
+vinecop.to\_json(\textcolor{stringliteral}{"myfile.JSON"});
+
+\textcolor{comment}{// Then a new Bicop can be constructed from the ptree object}
+Vinecop vinecop2(vinecop\_node);
+
+\textcolor{comment}{// Or from the JSON file}
+Vinecop vinecop2(\textcolor{stringliteral}{"myfile.JSON"});
+\end{DoxyCode}
+ 

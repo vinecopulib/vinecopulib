@@ -292,6 +292,36 @@
     <member refid="namespacevinecopulib_1_1tools__stats_1a17eb427c3a562c72d2e87438da1cd279" kind="function"><name>qt</name></member>
     <member refid="namespacevinecopulib_1_1tools__stats_1ae2eca8e0fc4ac2d7eeb0226845214847" kind="function"><name>dependence_matrix</name></member>
   </compound>
+  <compound refid="classvinecopulib__1__1__bicop_8html" kind="file"><name>classvinecopulib_1_1_bicop.html</name>
+  </compound>
+  <compound refid="classvinecopulib__1__1__fit__controls__bicop_8html" kind="file"><name>classvinecopulib_1_1_fit_controls_bicop.html</name>
+  </compound>
+  <compound refid="classvinecopulib__1__1__fit__controls__vinecop_8html" kind="file"><name>classvinecopulib_1_1_fit_controls_vinecop.html</name>
+  </compound>
+  <compound refid="classvinecopulib__1__1__r__vine__structure_8html" kind="file"><name>classvinecopulib_1_1_r_vine_structure.html</name>
+  </compound>
+  <compound refid="classvinecopulib__1__1__triangular__array_8html" kind="file"><name>classvinecopulib_1_1_triangular_array.html</name>
+  </compound>
+  <compound refid="classvinecopulib__1__1__vinecop_8html" kind="file"><name>classvinecopulib_1_1_vinecop.html</name>
+  </compound>
+  <compound refid="overview-bicop_8html" kind="file"><name>overview-bicop.html</name>
+  </compound>
+  <compound refid="overview-namespaces_8html" kind="file"><name>overview-namespaces.html</name>
+  </compound>
+  <compound refid="overview-vinecop_8html" kind="file"><name>overview-vinecop.html</name>
+  </compound>
+  <compound refid="overview_8html" kind="file"><name>overview.html</name>
+  </compound>
+  <compound refid="license_8dox" kind="file"><name>license.dox</name>
+  </compound>
+  <compound refid="overview-bicop_8dox" kind="file"><name>overview-bicop.dox</name>
+  </compound>
+  <compound refid="overview-vinecop_8dox" kind="file"><name>overview-vinecop.dox</name>
+  </compound>
+  <compound refid="overview_8dox" kind="file"><name>overview.dox</name>
+  </compound>
+  <compound refid="setup_8dox" kind="file"><name>setup.dox</name>
+  </compound>
   <compound refid="mainpage_8h" kind="file"><name>mainpage.h</name>
   </compound>
   <compound refid="vinecopulib_8hpp" kind="file"><name>vinecopulib.hpp</name>
@@ -333,13 +363,27 @@
   </compound>
   <compound refid="rvine__structure_8hpp" kind="file"><name>rvine_structure.hpp</name>
   </compound>
+  <compound refid="license" kind="page"><name>license</name>
+  </compound>
+  <compound refid="overview-bicop" kind="page"><name>overview-bicop</name>
+  </compound>
+  <compound refid="overview-vinecop" kind="page"><name>overview-vinecop</name>
+  </compound>
+  <compound refid="overview" kind="page"><name>overview</name>
+  </compound>
+  <compound refid="setup" kind="page"><name>setup</name>
+  </compound>
   <compound refid="dir_d9cc11671bbc13b7de7f52ca5cea150c" kind="dir"><name>include/vinecopulib/bicop</name>
   </compound>
-  <compound refid="dir_f1b8f37f4d59719a37b7e2340084c1f5" kind="dir"><name>include/vinecopulib/bicop/implementation</name>
+  <compound refid="dir_49e56c817e5e54854c35e136979f97ca" kind="dir"><name>docs</name>
+  </compound>
+  <compound refid="dir_9cba3ccb450b89ac6f0c2a18abcbadf0" kind="dir"><name>docs/html</name>
+  </compound>
+  <compound refid="dir_a4ae23f9de19e4501b2d569aa9df2ed2" kind="dir"><name>include/vinecopulib/vinecop/implementation</name>
   </compound>
   <compound refid="dir_d34bd80d8445a15edb3cdd97cd723029" kind="dir"><name>include/vinecopulib/misc/implementation</name>
   </compound>
-  <compound refid="dir_a4ae23f9de19e4501b2d569aa9df2ed2" kind="dir"><name>include/vinecopulib/vinecop/implementation</name>
+  <compound refid="dir_f1b8f37f4d59719a37b7e2340084c1f5" kind="dir"><name>include/vinecopulib/bicop/implementation</name>
   </compound>
   <compound refid="dir_d44c64559bbebec7f509842c48db8b23" kind="dir"><name>include</name>
   </compound>

@@ -1,13 +1,14 @@
 \begin{DoxyAuthor}{Authors}
 Thomas Nagler and Thibault Vatter
 \end{DoxyAuthor}
-This is the A\+PI documentation for the vinecopulib C++ library. It provides functionality for statistical dependence modeling with bivariate and vine copulas. For a more high-\/level overview see \href{https://github.com/tvatter/vinecopulib/blob/master/README.md}{\tt R\+E\+A\+D\+ME}.\hypertarget{index_license}{}\section{License}\label{index_license}
-The M\+IT License (M\+IT)
-
-Copyright © 2016-\/2019 Thomas Nagler and Thibault Vatter
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “\+Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions\+:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-T\+HE S\+O\+F\+T\+W\+A\+RE IS P\+R\+O\+V\+I\+D\+ED “\+AS I\+S”, W\+I\+T\+H\+O\+UT W\+A\+R\+R\+A\+N\+TY OF A\+NY K\+I\+ND, E\+X\+P\+R\+E\+SS OR I\+M\+P\+L\+I\+ED, I\+N\+C\+L\+U\+D\+I\+NG B\+UT N\+OT L\+I\+M\+I\+T\+ED TO T\+HE W\+A\+R\+R\+A\+N\+T\+I\+ES OF M\+E\+R\+C\+H\+A\+N\+T\+A\+B\+I\+L\+I\+TY, F\+I\+T\+N\+E\+SS F\+OR A P\+A\+R\+T\+I\+C\+U\+L\+AR P\+U\+R\+P\+O\+SE A\+ND N\+O\+N\+I\+N\+F\+R\+I\+N\+G\+E\+M\+E\+NT. IN NO E\+V\+E\+NT S\+H\+A\+LL T\+HE A\+U\+T\+H\+O\+RS OR C\+O\+P\+Y\+R\+I\+G\+HT H\+O\+L\+D\+E\+RS BE L\+I\+A\+B\+LE F\+OR A\+NY C\+L\+A\+IM, D\+A\+M\+A\+G\+ES OR O\+T\+H\+ER L\+I\+A\+B\+I\+L\+I\+TY, W\+H\+E\+T\+H\+ER IN AN A\+C\+T\+I\+ON OF C\+O\+N\+T\+R\+A\+CT, T\+O\+RT OR O\+T\+H\+E\+R\+W\+I\+SE, A\+R\+I\+S\+I\+NG F\+R\+OM, O\+UT OF OR IN C\+O\+N\+N\+E\+C\+T\+I\+ON W\+I\+TH T\+HE S\+O\+F\+T\+W\+A\+RE OR T\+HE U\+SE OR O\+T\+H\+ER D\+E\+A\+L\+I\+N\+GS IN T\+HE S\+O\+F\+T\+W\+A\+RE. 
+\hypertarget{index_what-vc}{}\section{What are vine copulas?}\label{index_what-vc}
+Vine copulas are a flexible class of dependence models consisting of bivariate building blocks (see e.\+g., \href{https://mediatum.ub.tum.de/doc/1083600/1083600.pdf}{\tt Aas et al., 2009}). You can find a comprehensive list of publications and other materials on \href{http://www.statistics.ma.tum.de/en/research/vine-copula-models/}{\tt vine-\/copula.\+org}.\hypertarget{index_what-vcl}{}\section{What is vinecopulib?}\label{index_what-vcl}
+vinecopulib is a header-\/only C++ library for vine copula models based on \href{http://eigen.tuxfamily.org/index.php?title=Main_Page}{\tt Eigen}. It provides high-\/performance implementations of the core features of the popular \href{https://github.com/tnagler/VineCopula}{\tt Vine\+Copula R library}, in particular inference algorithms for both vine copula and bivariate copula models. Advantages over Vine\+Copula are
+\begin{DoxyItemize}
+\item a stand-\/alone C++ library with interfaces to both R and Python,
+\item a sleaker and more modern A\+PI,
+\item shorter runtimes and lower memory consumption, especially in high dimensions,
+\item nonparametric and multi-\/parameter families.
+\end{DoxyItemize}\hypertarget{index_Status}{}\section{Status}\label{index_Status}
+Version \href{https://github.com/vinecopulib/vinecopulib/releases}{\tt 0.\+3.\+1} was released on April 5, 2019. While we did our best to design a user-\/friendly A\+PI, the library is still under active development and changes are to be expected. We are also working on interfaces for \href{https://github.com/vinecopulib/rvinecopulib}{\tt R} and \href{https://github.com/vinecopulib/pyvinecopulib}{\tt Python}.\hypertarget{index_Contact}{}\section{Contact}\label{index_Contact}
+If you have any questions regarding the library, feel free to \href{https://github.com/vinecopulib/vinecopulib/issues/new}{\tt open an issue} or send a mail to \href{mailto:info@vinecopulib.org}{\tt info@vinecopulib.\+org}. 
