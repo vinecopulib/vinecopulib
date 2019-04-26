@@ -2,6 +2,17 @@
 
 @tableofcontents
 
+[Requirements](#requirements)
+
+[How to build the library](#build-lib)
+
+[How to install the library](#install-lib)
+
+[How to include the library in other projects](#include-lib)
+- [As a header only library](#include-headers)
+- [Using a system install](#include-install)
+- [In a CMake project](#include-cmake)
+
 @section Requirements
 
 To build the library, you'll need at minimum:

@@ -1,8 +1,7 @@
 /** @page overview Overview
 
-- [Namespaces](#namespaces)
-- [Bivariate copulas models](#bicop)
-- [Vine copula models](#vinecop)
+- [Bivariate copulas models](overview-bicop.html)
+- [Vine copula models](overview-vinecop.html)
 
 In all examples, it is assumed that
 `using namespace vinecopulib;` is used. While the namespace `vinecopulib`
