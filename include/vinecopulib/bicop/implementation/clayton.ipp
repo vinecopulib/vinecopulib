@@ -49,7 +49,7 @@ inline Eigen::VectorXd ClaytonBicop::pdf_raw(
     double theta = static_cast<double>(parameters_(0));
     // avoid numerical issues when copula is too close to independence
     if (theta < 1e-10) {
-        auto f = [theta](const double &, const double &) { return 1.0; };
+        auto f = [](const double &, const double &) { return 1.0; };
         return tools_eigen::binaryExpr_or_nan(u, f);
     }
 

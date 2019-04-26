@@ -16,8 +16,8 @@ namespace vinecopulib {
 
 namespace tools_bobyqa {
 
-constexpr double sqrt_2 = std::sqrt(2.0);
-constexpr double sqrt_0_5 = std::sqrt(0.5);
+constexpr double sqrt_2 = 1.41421356237309504880168872420969807;
+constexpr double sqrt_0_5 = 1.0 / sqrt_2;
 constexpr double one_plus_sqrt_2 = 1.0 + sqrt_2;
 
 inline constexpr double square(const double x)

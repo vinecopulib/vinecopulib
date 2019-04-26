@@ -379,53 +379,33 @@ inline Eigen::MatrixXd Bicop::get_parameters() const
 
 inline double Bicop::get_loglik() const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
-    return loglik;
+    check_fitted();
+    return bicop_->get_loglik();
 }
 
 inline size_t Bicop::get_nobs() const
 {
-    if ((boost::math::isnan)(bicop_->get_loglik())) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
+    check_fitted();
     return nobs_;
 }
 
 inline double Bicop::get_aic() const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
-    double npars = bicop_->calculate_npars();
-    return -2 * loglik + 2 * npars;
+    check_fitted();
+    return -2 * bicop_->get_loglik() + 2 * bicop_->calculate_npars();
 }
 
 inline double Bicop::get_bic() const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
+    check_fitted();
     double npars = bicop_->calculate_npars();
-    return -2 * loglik + std::log(nobs_) * npars;
+    return -2 * bicop_->get_loglik() + std::log(nobs_) * npars;
 }
 
 inline double Bicop::get_mbic(const double psi0) const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
-    return -2 * loglik + compute_mbic_penalty(nobs_, psi0);
+    check_fitted();
+    return -2 * bicop_->get_loglik() + compute_mbic_penalty(nobs_, psi0);
 }
 
 inline double Bicop::compute_mbic_penalty(const size_t nobs, const double psi0) const
@@ -681,6 +661,14 @@ inline void Bicop::check_weights_size(const Eigen::VectorXd& weights,
 {
     if ((weights.size() > 0) & (weights.size() != data.rows())) {
         throw std::runtime_error("sizes of weights and data don't match.");
+    }
+}
+
+inline void Bicop::check_fitted() const
+{
+    if ((boost::math::isnan)(bicop_->get_loglik())) {
+        throw std::runtime_error("copula has not been fitted from data or its "
+                                     "parameters have been modified manually");
     }
 }
 }

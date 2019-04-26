@@ -134,6 +134,9 @@ private:
 
     void check_weights_size(const Eigen::VectorXd& weights,
                             const Eigen::MatrixXd& data) const;
+
+    void check_fitted() const;
+
     double compute_mbic_penalty(const size_t nobs, const double psi0) const;
 
     BicopPtr get_bicop() const;

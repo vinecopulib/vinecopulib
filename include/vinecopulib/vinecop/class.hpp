@@ -189,6 +189,7 @@ protected:
     void check_weights_size(const Eigen::VectorXd& weights,
                             const Eigen::MatrixXd& data) const;
     void check_enough_data(const Eigen::MatrixXd& data) const;
+    void check_fitted() const;
 };
 
 }
