@@ -7,6 +7,7 @@
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
+
 inline IndepBicop::IndepBicop()
 {
     family_ = BicopFamily::indep;
@@ -17,9 +18,7 @@ inline Eigen::VectorXd IndepBicop::pdf_raw(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {
-    auto f = [](double u1, double u2) {
-        tools_stl::unused(u1);
-        tools_stl::unused(u2);
+    auto f = [](double, double) {
         return 1.0;
     };
     return tools_eigen::binaryExpr_or_nan(u, f);
@@ -36,8 +35,7 @@ inline Eigen::VectorXd IndepBicop::hfunc1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {
-    auto f = [](double u1, double u2) {
-        tools_stl::unused(u1);
+    auto f = [](double, double u2) {
         return u2;
     };
     return tools_eigen::binaryExpr_or_nan(u, f);
@@ -47,8 +45,7 @@ inline Eigen::VectorXd IndepBicop::hfunc2(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {
-    auto f = [](double u1, double u2) {
-        tools_stl::unused(u2);
+    auto f = [](double u1, double) {
         return u1;
     };
     return tools_eigen::binaryExpr_or_nan(u, f);
@@ -58,8 +55,7 @@ inline Eigen::VectorXd IndepBicop::hinv1(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {
-    auto f = [](double u1, double u2) {
-        tools_stl::unused(u1);
+    auto f = [](double, double u2) {
         return u2;
     };
     return tools_eigen::binaryExpr_or_nan(u, f);
@@ -69,8 +65,7 @@ inline Eigen::VectorXd IndepBicop::hinv2(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
 {
-    auto f = [](double u1, double u2) {
-        tools_stl::unused(u2);
+    auto f = [](double u1, double) {
         return u1;
     };
     return tools_eigen::binaryExpr_or_nan(u, f);
