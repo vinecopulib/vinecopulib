@@ -767,18 +767,8 @@ inline Eigen::MatrixXd Vinecop::simulate(const size_t n,
                                          const size_t num_threads,
                                          const std::vector<int>& seeds) const
 {
-    Eigen::MatrixXd U(n, d_);
-    if (qrng) {
-        if (d_ > 300) {
-            U = tools_stats::sobol(n, d_, seeds);
-        } else {
-            U = tools_stats::ghalton(n, d_, seeds);
-        }
-    } else {
-        U = tools_stats::simulate_uniform(n, d_, seeds);
-    }
-
-    return inverse_rosenblatt(U, num_threads);
+    auto u = tools_stats::simulate_uniform(n, d_, qrng, seeds);
+    return inverse_rosenblatt(u, num_threads);
 }
 
 //! calculates the log-likelihood, which is defined as

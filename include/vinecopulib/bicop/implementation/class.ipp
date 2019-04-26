@@ -241,16 +241,11 @@ Bicop::simulate(const size_t& n,
                 const bool qrng,
                 const std::vector<int>& seeds) const
 {
-    Eigen::Matrix<double, Eigen::Dynamic, 2> U;
-    if (qrng) {
-        U = tools_stats::ghalton(n, 2, seeds);
-    } else {
-        U = tools_stats::simulate_uniform(n, 2, seeds);
-    }
+    auto u = tools_stats::simulate_uniform(n, 2, qrng, seeds);
 
     // use inverse Rosenblatt transform to generate a sample from the copula
-    U.col(1) = hinv1(U);
-    return U;
+    u.col(1) = hinv1(u);
+    return u;
 }
 
 //! calculates the log-likelihood, defined as
