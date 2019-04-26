@@ -43,7 +43,7 @@ std::vector<T> intersect(std::vector<T> x, std::vector<T> y)
     std::set_intersection(
         x.begin(), x.end(),
         y.begin(), y.end(),
-        back_inserter(common)
+        std::back_inserter(common)
     );
 
     return common;
