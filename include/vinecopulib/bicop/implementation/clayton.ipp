@@ -6,6 +6,7 @@
 
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <boost/math/special_functions/log1p.hpp>
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
 inline ClaytonBicop::ClaytonBicop()

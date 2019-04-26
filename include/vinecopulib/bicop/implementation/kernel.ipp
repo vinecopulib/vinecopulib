@@ -107,6 +107,6 @@ inline void KernelBicop::flip()
 
 inline Eigen::MatrixXd KernelBicop::tau_to_parameters(const double &tau)
 {
-    return vinecopulib::no_tau_to_parameters(tau);
+    return no_tau_to_parameters(tau);
 }
 }

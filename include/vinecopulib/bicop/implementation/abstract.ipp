@@ -5,10 +5,8 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <stdexcept>
-#include <cmath>
 
-#include <vinecopulib/misc/tools_stl.hpp>
-
+#include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/bicop/bb1.hpp>
 #include <vinecopulib/bicop/bb6.hpp>
 #include <vinecopulib/bicop/bb7.hpp>
@@ -23,6 +21,7 @@
 #include <vinecopulib/bicop/tll.hpp>
 
 namespace vinecopulib {
+
 //! virtual destructor
 inline AbstractBicop::~AbstractBicop()
 {
@@ -90,7 +89,7 @@ inline BicopPtr AbstractBicop::create(BicopFamily family,
 
 //!@}
 
-inline Eigen::VectorXd no_tau_to_parameters(const double &)
+inline Eigen::MatrixXd AbstractBicop::no_tau_to_parameters(const double &)
 {
     throw std::runtime_error("Method not implemented for this family");
 }

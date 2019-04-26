@@ -5,6 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <cmath>
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 #ifndef M_PI
 #define M_PI       3.14159265358979323846

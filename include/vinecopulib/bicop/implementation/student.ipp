@@ -112,6 +112,6 @@ inline Eigen::VectorXd StudentBicop::get_start_parameters(const double tau)
 
 inline Eigen::MatrixXd StudentBicop::tau_to_parameters(const double &tau)
 {
-    return vinecopulib::no_tau_to_parameters(tau);
+    return no_tau_to_parameters(tau);
 }
 }
