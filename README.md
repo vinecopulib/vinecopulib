@@ -42,6 +42,7 @@ send a mail to <info@vinecopulib.org>.
 
 #### Documentation
 
-For an introduction to the library's functionality, its API documentation, and
-instructions how to use it, see our
-[website](https://vinecopulib.github.io/vinecopulib/).
+For documentation of the library's functionality and
+instructions how to use it, check out our
+[website](https://vinecopulib.github.io/vinecopulib/) or the `docs/` folder
+in this repository.
