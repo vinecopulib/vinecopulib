@@ -104,7 +104,7 @@ inline Eigen::VectorXd StudentBicop::hinv1(
 inline Eigen::VectorXd StudentBicop::get_start_parameters(const double tau)
 {
     Eigen::VectorXd parameters = get_parameters();
-    parameters(0) = sin(tau * constant::pi / 2);;
+    parameters(0) = std::sin(tau * constant::pi / 2);;
     parameters(1) = 5;
     return parameters;
 }
