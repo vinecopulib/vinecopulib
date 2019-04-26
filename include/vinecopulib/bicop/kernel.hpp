@@ -33,27 +33,27 @@ public:
 
 protected:
     Eigen::VectorXd pdf_raw(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+        const Eigen::MatrixXd &u
     );
 
     Eigen::VectorXd cdf(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+        const Eigen::MatrixXd &u
     );
 
     Eigen::VectorXd hfunc1(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+        const Eigen::MatrixXd &u
     );
 
     Eigen::VectorXd hfunc2(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+        const Eigen::MatrixXd &u
     );
 
     Eigen::VectorXd hinv1(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+        const Eigen::MatrixXd &u
     );
 
     Eigen::VectorXd hinv2(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+        const Eigen::MatrixXd &u
     );
 
     double parameters_to_tau(const Eigen::MatrixXd &parameters);

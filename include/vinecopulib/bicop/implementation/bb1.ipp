@@ -46,7 +46,7 @@ inline double Bb1Bicop::generator_derivative(const double &u)
 //}
 
 inline Eigen::VectorXd Bb1Bicop::pdf_raw(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     double theta = static_cast<double>(parameters_(0));

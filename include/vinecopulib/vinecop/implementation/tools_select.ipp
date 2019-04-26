@@ -22,7 +22,7 @@ using namespace tools_stl;
 //! @param data observations.
 //! @param tree_criterion the criterion.
 //! @param weights vector of weights for each observation (can be empty).
-inline double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+inline double calculate_criterion(const Eigen::MatrixXd& data,
                                   std::string tree_criterion,
                                   Eigen::VectorXd weights)
 {
@@ -53,7 +53,7 @@ inline Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
     size_t d = data.cols();
     Eigen::MatrixXd mat(d, d);
     mat.diagonal() = Eigen::VectorXd::Constant(d, 1.0);
-    Eigen::Matrix<double, Eigen::Dynamic, 2> pair_data(n, 2);
+    Eigen::MatrixXd pair_data(n, 2);
     for (size_t i = 1; i < d; ++i) {
         for (size_t j = 0; j < i; ++j) {
             pair_data.col(0) = data.col(i);
@@ -845,7 +845,7 @@ inline void VinecopSelector::remove_edge_data(VineTree &tree)
     for (auto e : boost::edges(tree)) {
         tree[e].hfunc1 = Eigen::VectorXd();
         tree[e].hfunc2 = Eigen::VectorXd();
-        tree[e].pc_data = Eigen::Matrix<double, Eigen::Dynamic, 2>(0, 2);
+        tree[e].pc_data = Eigen::MatrixXd(0, 2);
     }
 }
 

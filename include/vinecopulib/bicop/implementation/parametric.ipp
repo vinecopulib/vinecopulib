@@ -51,7 +51,7 @@ inline double ParBicop::calculate_npars()
 }
 
 // fit
-inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+inline void ParBicop::fit(const Eigen::MatrixXd &data,
                           std::string method,
                           double,
                           const Eigen::VectorXd& weights)

@@ -40,6 +40,14 @@ protected:
 
     void set_loglik(const double loglik = NAN);
 
+    void set_discrete_vars(const std::vector<size_t> discrete_vars)
+    {
+        if (discrete_vars.size() > 2) {
+            throw std::runtime_error("too many discrete variables; only two allowed.");
+        }
+        discrete_vars_ = discrete_vars;
+    }
+
     virtual Eigen::MatrixXd get_parameters() const = 0;
 
     virtual void set_parameters(const Eigen::MatrixXd &parameters) = 0;
@@ -47,7 +55,7 @@ protected:
     virtual void flip() = 0;
 
     // Virtual methods
-    virtual void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+    virtual void fit(const Eigen::MatrixXd &data,
                      std::string method,
                      double mult,
                      const Eigen::VectorXd& weights) = 0;
@@ -56,39 +64,40 @@ protected:
 
     virtual double parameters_to_tau(const Eigen::MatrixXd &parameters) = 0;
 
-    Eigen::VectorXd pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u);
+    Eigen::VectorXd pdf(const Eigen::MatrixXd &u);
 
     virtual Eigen::VectorXd pdf_raw(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) = 0;
+        const Eigen::MatrixXd &u) = 0;
 
     virtual Eigen::VectorXd cdf(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) = 0;
+        const Eigen::MatrixXd &u) = 0;
 
     virtual Eigen::VectorXd hfunc1(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) = 0;
+        const Eigen::MatrixXd &u) = 0;
 
     virtual Eigen::VectorXd hfunc2(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) = 0;
+        const Eigen::MatrixXd &u) = 0;
 
     virtual Eigen::VectorXd hinv1(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) = 0;
+        const Eigen::MatrixXd &u) = 0;
 
     virtual Eigen::VectorXd hinv2(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) = 0;
+        const Eigen::MatrixXd &u) = 0;
 
     virtual Eigen::MatrixXd tau_to_parameters(const double &tau) = 0;
     Eigen::MatrixXd no_tau_to_parameters(const double &);
 
     // Misc methods
     Eigen::VectorXd hinv1_num(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u);
+        const Eigen::MatrixXd &u);
 
     Eigen::VectorXd hinv2_num(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u);
+        const Eigen::MatrixXd &u);
 
     // Data members
     BicopFamily family_;
     double loglik_;
+    std::vector<size_t> discrete_vars_{};
 };
 
 //! A shared pointer to an object of class AbstracBicop.

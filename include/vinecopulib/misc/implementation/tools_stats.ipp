@@ -198,8 +198,8 @@ inline Eigen::VectorXd cef(const Eigen::VectorXd &x,
 }
 
 //! alternating conditional expectation algorithm
-inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, // data
+inline Eigen::MatrixXd ace(
+        const Eigen::MatrixXd& data, // data
         const Eigen::VectorXd& weights = Eigen::VectorXd(), // weights
         size_t wl = 0, // window length for the smoother
         size_t outer_iter_max = 100, // max number of outer iterations
@@ -242,7 +242,7 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
     }
 
     // initialize output
-    Eigen::Matrix<double, Eigen::Dynamic, 2> phi = ranks.cast<double>();
+    Eigen::MatrixXd phi = ranks.cast<double>();
     phi.array() -= (n_dbl - 1.0)/2.0 - 1.0;
     phi /= std::sqrt(n_dbl * (n_dbl - 1.0) / 12.0);
     if (nw > 0) {
@@ -307,10 +307,10 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> ace(
 
 //! calculates the pairwise maximum correlation coefficient.
 inline double pairwise_mcor(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
+    const Eigen::MatrixXd &x,
     const Eigen::VectorXd &weights)
 {
-    Eigen::Matrix<double, Eigen::Dynamic, 2> phi = ace(x, weights);
+    Eigen::MatrixXd phi = ace(x, weights);
     return wdm::wdm(phi, "cor", weights)(0, 1);
 }
 //! @}
@@ -481,7 +481,7 @@ inline Eigen::MatrixXd sobol(const size_t& n, const size_t& d,
 //! @param rho correlation.
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
-inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
+inline Eigen::VectorXd pbvt(const Eigen::MatrixXd &z,
                             int nu, double rho)
 {
     double snu = sqrt(static_cast<double>(nu));
@@ -615,7 +615,7 @@ inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
 inline Eigen::VectorXd
-pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
+pbvnorm(const Eigen::MatrixXd &z,
         double rho)
 {
 

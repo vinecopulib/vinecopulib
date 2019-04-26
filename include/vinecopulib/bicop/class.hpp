@@ -28,7 +28,7 @@ public:
           const int rotation = 0,
           const Eigen::MatrixXd &parameters = Eigen::MatrixXd());
 
-    Bicop(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+    Bicop(const Eigen::MatrixXd& data,
           const FitControlsBicop &controls = FitControlsBicop());
 
     Bicop(const char *filename);
@@ -61,54 +61,56 @@ public:
 
     void set_parameters(const Eigen::MatrixXd &parameters);
 
+    void set_discrete_vars(const std::vector<size_t> discrete_vars);
+
     // Stats methods
     Eigen::VectorXd
-    pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
+    pdf(const Eigen::MatrixXd &u) const;
 
     Eigen::VectorXd
-    cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
+    cdf(const Eigen::MatrixXd &u) const;
 
     Eigen::VectorXd
-    hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
+    hfunc1(const Eigen::MatrixXd &u) const;
 
     Eigen::VectorXd
-    hfunc2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
+    hfunc2(const Eigen::MatrixXd &u) const;
 
     Eigen::VectorXd
-    hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
+    hinv1(const Eigen::MatrixXd &u) const;
 
     Eigen::VectorXd
-    hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
+    hinv2(const Eigen::MatrixXd &u) const;
 
-    Eigen::Matrix<double, Eigen::Dynamic, 2>
+    Eigen::MatrixXd
     simulate(const size_t &n,
              const bool qrng = false,
              const std::vector<int>& seeds = std::vector<int>()) const;
 
 
     // Methods modifying the family/rotation/parameters
-    void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+    void fit(const Eigen::MatrixXd &data,
              const FitControlsBicop &controls = FitControlsBicop());
 
-    void select(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+    void select(const Eigen::MatrixXd& data,
                 FitControlsBicop controls = FitControlsBicop());
 
     // Fit statistics
     double loglik(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u =
-            Eigen::Matrix<double, Eigen::Dynamic, 2>()) const;
+        const Eigen::MatrixXd &u =
+            Eigen::MatrixXd()) const;
 
     double aic(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u =
-            Eigen::Matrix<double, Eigen::Dynamic, 2>()) const;
+        const Eigen::MatrixXd &u =
+            Eigen::MatrixXd()) const;
 
     double bic(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u =
-            Eigen::Matrix<double, Eigen::Dynamic, 2>()) const;
+        const Eigen::MatrixXd &u =
+            Eigen::MatrixXd()) const;
 
     double mbic(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u =
-            Eigen::Matrix<double, Eigen::Dynamic, 2>(),
+        const Eigen::MatrixXd &u =
+            Eigen::MatrixXd(),
         const double psi0 = 0.9) const;
 
     // Misc
@@ -127,8 +129,8 @@ private:
 
     Eigen::MatrixXd get_parameters_upper_bounds() const;
 
-    Eigen::Matrix<double, Eigen::Dynamic, 2> cut_and_rotate(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;
+    Eigen::MatrixXd cut_and_rotate(
+        const Eigen::MatrixXd &u) const;
 
     void check_rotation(int rotation) const;
 

@@ -73,8 +73,8 @@ inline bool check_if_in_unit_cube(const Eigen::MatrixXd &u)
 //! swap the columns of a two-column matrix
 //! @param u the matrix.
 //! @return a new matrix v with `v.col(0) = u.col(1)`, `v.col(1) = u.col(0)`.
-inline Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
-    Eigen::Matrix<double, Eigen::Dynamic, 2> u)
+inline Eigen::MatrixXd swap_cols(
+    Eigen::MatrixXd u)
 {
     u.col(0).swap(u.col(1));
     return u;
@@ -124,11 +124,11 @@ inline Eigen::VectorXd invert_f(
 //! contains one combination of the vector elements
 //!
 //! @param grid_points the vector to expand.
-inline Eigen::Matrix<double, Eigen::Dynamic, 2> expand_grid(
+inline Eigen::MatrixXd expand_grid(
     const Eigen::VectorXd &grid_points)
 {
     ptrdiff_t m = grid_points.size();
-    Eigen::Matrix<double, Eigen::Dynamic, 2> grid_2d(m * m, 2);
+    Eigen::MatrixXd grid_2d(m * m, 2);
     ptrdiff_t k = 0;
     for (ptrdiff_t i = 0; i < m; ++i) {
         for (ptrdiff_t j = 0; j < m; ++j) {

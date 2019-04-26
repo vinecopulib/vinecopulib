@@ -20,13 +20,13 @@ inline StudentBicop::StudentBicop()
 }
 
 inline Eigen::VectorXd StudentBicop::pdf_raw(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));
     Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
-    Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qt(u, nu);
+    Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
 
     f = tmp.col(0).cwiseAbs2() + tmp.col(1).cwiseAbs2() -
         (2 * rho) * tmp.rowwise().prod();
@@ -41,7 +41,7 @@ inline Eigen::VectorXd StudentBicop::pdf_raw(
 }
 
 inline Eigen::VectorXd StudentBicop::cdf(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     using namespace tools_stats;
@@ -65,13 +65,13 @@ inline Eigen::VectorXd StudentBicop::cdf(
 }
 
 inline Eigen::VectorXd StudentBicop::hfunc1(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));
     Eigen::VectorXd h = Eigen::VectorXd::Ones(u.rows());
-    Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qt(u, nu);
+    Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
     h = nu * h + tmp.col(0).cwiseAbs2();
     h *= (1.0 - pow(rho, 2)) / (nu + 1.0);
     h = h.cwiseSqrt().cwiseInverse().cwiseProduct(
@@ -82,7 +82,7 @@ inline Eigen::VectorXd StudentBicop::hfunc1(
 }
 
 inline Eigen::VectorXd StudentBicop::hinv1(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     double rho = double(this->parameters_(0));

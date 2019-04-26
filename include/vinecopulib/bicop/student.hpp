@@ -26,22 +26,22 @@ public:
 private:
     // PDF
     Eigen::VectorXd pdf_raw(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+        const Eigen::MatrixXd &u
     );
 
     // CDF
     Eigen::VectorXd cdf(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+        const Eigen::MatrixXd &u
     );
 
     // hfunction
     Eigen::VectorXd hfunc1(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+        const Eigen::MatrixXd &u
     );
 
     // inverse hfunction
     Eigen::VectorXd hinv1(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+        const Eigen::MatrixXd &u
     );
 
     Eigen::MatrixXd tau_to_parameters(const double &tau);

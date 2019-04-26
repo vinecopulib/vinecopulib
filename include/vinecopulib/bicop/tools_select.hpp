@@ -14,7 +14,7 @@ namespace vinecopulib {
 namespace tools_select {
 
 std::vector <Bicop> create_candidate_bicops(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+    const Eigen::MatrixXd &data,
     const FitControlsBicop &controls);
 
 std::vector <BicopFamily> get_candidate_families(
@@ -22,12 +22,12 @@ std::vector <BicopFamily> get_candidate_families(
 
 void preselect_candidates(
     std::vector <Bicop> &bicops,
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+    const Eigen::MatrixXd &data,
     double tau,
     const Eigen::VectorXd& weights);
 
 std::vector<double> get_c1c2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+    const Eigen::MatrixXd &data,
     double tau,
     const Eigen::VectorXd& weights);
 

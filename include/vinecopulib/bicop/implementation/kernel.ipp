@@ -23,42 +23,42 @@ inline KernelBicop::KernelBicop()
 }
 
 inline Eigen::VectorXd KernelBicop::pdf_raw(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     return interp_grid_->interpolate(u);
 }
 
 inline Eigen::VectorXd KernelBicop::cdf(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     return interp_grid_->integrate_2d(u);
 }
 
 inline Eigen::VectorXd KernelBicop::hfunc1(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     return interp_grid_->integrate_1d(u, 1);
 }
 
 inline Eigen::VectorXd KernelBicop::hfunc2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     return interp_grid_->integrate_1d(u, 2);
 }
 
 inline Eigen::VectorXd KernelBicop::hinv1(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     return hinv1_num(u);
 }
 
 inline Eigen::VectorXd KernelBicop::hinv2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     return hinv2_num(u);

@@ -15,7 +15,7 @@ inline IndepBicop::IndepBicop()
 }
 
 inline Eigen::VectorXd IndepBicop::pdf_raw(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     auto f = [](double, double) {
@@ -25,14 +25,14 @@ inline Eigen::VectorXd IndepBicop::pdf_raw(
 }
 
 inline Eigen::VectorXd IndepBicop::cdf(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     return u.rowwise().prod();
 }
 
 inline Eigen::VectorXd IndepBicop::hfunc1(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     auto f = [](double, double u2) {
@@ -42,7 +42,7 @@ inline Eigen::VectorXd IndepBicop::hfunc1(
 }
 
 inline Eigen::VectorXd IndepBicop::hfunc2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     auto f = [](double u1, double) {
@@ -52,7 +52,7 @@ inline Eigen::VectorXd IndepBicop::hfunc2(
 }
 
 inline Eigen::VectorXd IndepBicop::hinv1(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     auto f = [](double, double u2) {
@@ -62,7 +62,7 @@ inline Eigen::VectorXd IndepBicop::hinv1(
 }
 
 inline Eigen::VectorXd IndepBicop::hinv2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     auto f = [](double u1, double) {

@@ -120,13 +120,29 @@ inline void AbstractBicop::set_loglik(const double loglik)
 
 //! evaluates the pdf, but truncates it's value by DBL_MIN and DBL_MAX.
 //! @param u matrix of evaluation points.
-inline Eigen::VectorXd AbstractBicop::pdf(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+inline Eigen::VectorXd AbstractBicop::pdf(const Eigen::MatrixXd &u)
 {
     auto trim = [] (const double &x) {
         return std::min(DBL_MAX, std::max(x, DBL_MIN));
     };
-    return tools_eigen::unaryExpr_or_nan(pdf_raw(u), trim);
+    if (discrete_vars_.size() == 0) {
+        return tools_eigen::unaryExpr_or_nan(pdf_raw(u), trim);
+    }
+
+    Eigen::MatrixXd umax = u.leftCols(2);
+    Eigen::MatrixXd umin = u.rightCols(2);
+    if (discrete_vars_.size() == 1) {
+        if (discrete_vars_[0] == 0) {
+            return hfunc2(umax) - hfunc2(umin);
+        } else {
+            return hfunc2(umax) - hfunc2(umin);
+        }
+    }
+
+    Eigen::VectorXd pdf = cdf(umax) + cdf(umin);
+    umax.col(0).swap(umax.col(0));
+    pdf -= cdf(umax) + cdf(umin);
+    return pdf;
 }
 
 //! Numerical inversion of h-functions
@@ -138,9 +154,9 @@ inline Eigen::VectorXd AbstractBicop::pdf(
 //! @return The numerical inverse of h-functions.
 //! @{
 inline Eigen::VectorXd
-AbstractBicop::hinv1_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+AbstractBicop::hinv1_num(const Eigen::MatrixXd &u)
 {
-    Eigen::Matrix<double, Eigen::Dynamic, 2> u_new = u;
+    Eigen::MatrixXd u_new = u;
     auto h1 = [&](const Eigen::VectorXd &v) {
         u_new.col(1) = v;
         return hfunc1(u_new);
@@ -150,9 +166,9 @@ AbstractBicop::hinv1_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv2_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+AbstractBicop::hinv2_num(const Eigen::MatrixXd &u)
 {
-    Eigen::Matrix<double, Eigen::Dynamic, 2> u_new = u;
+    Eigen::MatrixXd u_new = u;
     auto h1 = [&](const Eigen::VectorXd &x) {
         u_new.col(0) = x;
         return hfunc2(u_new);

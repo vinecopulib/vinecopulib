@@ -15,7 +15,7 @@ namespace tools_select {
 //! @param data captured by reference to avoid data copies;
 //!     should NOT be modified though.
 inline std::vector <Bicop> create_candidate_bicops(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+    const Eigen::MatrixXd &data,
     const FitControlsBicop &controls)
 {
     std::vector <BicopFamily> families = get_candidate_families(controls);
@@ -75,7 +75,7 @@ get_candidate_families(const FitControlsBicop &controls)
 //! removes candidates whose symmetry properties does not correspond to those
 //! of the data.
 inline void preselect_candidates(std::vector <Bicop> &bicops,
-                                 const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+                                 const Eigen::MatrixXd &data,
                                  double tau,
                                  const Eigen::VectorXd& weights)
 {
@@ -91,7 +91,7 @@ inline void preselect_candidates(std::vector <Bicop> &bicops,
 }
 
 inline std::vector<double> get_c1c2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+    const Eigen::MatrixXd &data,
     double tau,
     const Eigen::VectorXd& weights)
 {

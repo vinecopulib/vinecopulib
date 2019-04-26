@@ -30,7 +30,7 @@ namespace vinecopulib {
 
 namespace tools_select {
 
-double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+double calculate_criterion(const Eigen::MatrixXd& data,
                            std::string tree_criterion,
                            Eigen::VectorXd weights);
 
@@ -54,7 +54,7 @@ struct EdgeProperties
     std::vector<size_t> conditioning;
     std::vector<size_t> conditioned;
     std::vector<size_t> all_indices;
-    Eigen::Matrix<double, Eigen::Dynamic, 2> pc_data;
+    Eigen::MatrixXd pc_data;
     Eigen::VectorXd hfunc1;
     Eigen::VectorXd hfunc2;
     double weight;

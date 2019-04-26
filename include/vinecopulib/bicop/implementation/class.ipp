@@ -38,7 +38,7 @@ inline Bicop::Bicop(const BicopFamily family, const int rotation,
 //! equivalent to `Bicop cop; cop.select(data, controls)`.
 //! @param data see select().
 //! @param controls see select().
-inline Bicop::Bicop(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+inline Bicop::Bicop(const Eigen::MatrixXd& data,
                     const FitControlsBicop &controls)
 {
     select(data, controls);
@@ -100,7 +100,7 @@ inline void Bicop::to_json(const char *filename) const
 //! @param u \f$n \times 2\f$ matrix of evaluation points.
 //! @return The copula density evaluated at \c u.
 inline Eigen::VectorXd
-Bicop::pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+Bicop::pdf(const Eigen::MatrixXd &u)
 const
 {
     tools_eigen::check_if_in_unit_cube(u);
@@ -112,7 +112,7 @@ const
 //! @param u \f$n \times 2\f$ matrix of evaluation points.
 //! @return The copula distribution evaluated at \c u.
 inline Eigen::VectorXd
-Bicop::cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+Bicop::cdf(const Eigen::MatrixXd &u)
 const
 {
     tools_eigen::check_if_in_unit_cube(u);
@@ -139,7 +139,7 @@ const
 //! \f$ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) \f$.
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 inline Eigen::VectorXd
-Bicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+Bicop::hfunc1(const Eigen::MatrixXd &u)
 const
 {
     tools_eigen::check_if_in_unit_cube(u);
@@ -162,7 +162,7 @@ const
 //! \f$ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) \f$.
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 inline Eigen::VectorXd
-Bicop::hfunc2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+Bicop::hfunc2(const Eigen::MatrixXd &u)
 const
 {
     tools_eigen::check_if_in_unit_cube(u);
@@ -185,7 +185,7 @@ const
 //! argument.
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 inline Eigen::VectorXd
-Bicop::hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+Bicop::hinv1(const Eigen::MatrixXd &u)
 const
 {
     tools_eigen::check_if_in_unit_cube(u);
@@ -208,7 +208,7 @@ const
 //! argument.
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 inline Eigen::VectorXd
-Bicop::hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
+Bicop::hinv2(const Eigen::MatrixXd &u)
 const
 {
     tools_eigen::check_if_in_unit_cube(u);
@@ -236,7 +236,7 @@ const
 //! @param seeds seeds of the (quasi-)random number generator; if empty (default),
 //!   the (quasi-)random number generator is seeded randomly.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
-inline Eigen::Matrix<double, Eigen::Dynamic, 2>
+inline Eigen::MatrixXd
 Bicop::simulate(const size_t& n,
                 const bool qrng,
                 const std::vector<int>& seeds) const
@@ -254,7 +254,7 @@ Bicop::simulate(const size_t& n,
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 inline double Bicop::loglik(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
+    const Eigen::MatrixXd &u) const
 {
     if (u.rows() < 1) {
         return get_loglik();
@@ -274,7 +274,7 @@ inline double Bicop::loglik(
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 inline double
-Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
+Bicop::aic(const Eigen::MatrixXd &u) const
 {
     return -2 * loglik(u) + 2 * calculate_npars();
 }
@@ -288,7 +288,7 @@ Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 inline double
-Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
+Bicop::bic(const Eigen::MatrixXd &u) const
 {
     Eigen::MatrixXd u_no_nan = u;
     tools_eigen::remove_nans(u_no_nan);
@@ -309,7 +309,7 @@ Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 //! @param u \f$n \times 2\f$ matrix of observations.
 //! @param psi0 prior probability of a non-independence copula.
 inline double
-Bicop::mbic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u, const double psi0)
+Bicop::mbic(const Eigen::MatrixXd &u, const double psi0)
 const
 {
     bool is_indep = (this->get_family() == BicopFamily::indep);
@@ -435,6 +435,11 @@ inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters)
     bicop_->set_parameters(parameters);
     bicop_->set_loglik();
 }
+
+inline void Bicop::set_discrete_vars(const std::vector<size_t> discrete_vars)
+{
+    bicop_->set_discrete_vars(discrete_vars);
+}
 //! @}
 
 
@@ -493,7 +498,7 @@ inline BicopPtr Bicop::get_bicop() const
 //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
-inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+inline void Bicop::fit(const Eigen::MatrixXd &data,
                        const FitControlsBicop &controls)
 {
     std::string method;
@@ -524,7 +529,7 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
 //!     \f$(0, 1)^2 \f$.
 //! @param controls the controls (see FitControlsBicop).
-inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+inline void Bicop::select(const Eigen::MatrixXd &data,
                           FitControlsBicop controls)
 {
     using namespace tools_select;
@@ -605,10 +610,10 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 //!
 //! @param u \f$m \times 2\f$ matrix of data.
 //! @return The manipulated data.
-inline Eigen::Matrix<double, Eigen::Dynamic, 2> Bicop::cut_and_rotate(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
+inline Eigen::MatrixXd Bicop::cut_and_rotate(
+    const Eigen::MatrixXd &u) const
 {
-    Eigen::Matrix<double, Eigen::Dynamic, 2> u_new(u.rows(), 2);
+    Eigen::MatrixXd u_new(u.rows(), 2);
 
     // counter-clockwise rotations
     switch (rotation_) {
@@ -633,8 +638,8 @@ inline Eigen::Matrix<double, Eigen::Dynamic, 2> Bicop::cut_and_rotate(
     }
 
     // truncate to interval [eps, 1 - eps]
-    Eigen::Matrix<double, Eigen::Dynamic, 2> eps =
-        Eigen::Matrix<double, Eigen::Dynamic, 2>::Constant(u.rows(), 2, 1e-10);
+    Eigen::MatrixXd eps =
+        Eigen::MatrixXd::Constant(u.rows(), 2, 1e-10);
     u_new = (1.0 - eps.array()).min(u_new.array());
     u_new = eps.array().max(u_new.array());
 

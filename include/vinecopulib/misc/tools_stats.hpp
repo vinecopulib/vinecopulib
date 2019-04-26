@@ -101,7 +101,7 @@ Eigen::VectorXd to_pseudo_obs_1d(Eigen::VectorXd x,
 Eigen::MatrixXd to_pseudo_obs(Eigen::MatrixXd x,
                               std::string ties_method = "average");
 
-double pairwise_mcor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
+double pairwise_mcor(const Eigen::MatrixXd& x,
                      const Eigen::VectorXd &weights = Eigen::VectorXd());
 
 Eigen::MatrixXd dependence_matrix(const Eigen::MatrixXd &x,
@@ -113,10 +113,10 @@ Eigen::MatrixXd ghalton(const size_t& n, const size_t& d,
 Eigen::MatrixXd sobol(const size_t& n, const size_t& d,
                       std::vector<int> seeds = std::vector<int>());
 
-Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
+Eigen::VectorXd pbvt(const Eigen::MatrixXd &z,
                      int nu, double rho);
 
-Eigen::VectorXd pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
+Eigen::VectorXd pbvnorm(const Eigen::MatrixXd &z,
                         double rho);
 }
 

@@ -17,7 +17,7 @@ inline TllBicop::TllBicop()
 }
 
 inline Eigen::VectorXd TllBicop::gaussian_kernel_2d(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &x
+    const Eigen::MatrixXd &x
 )
 {
     return tools_stats::dnorm(x).rowwise().prod();
@@ -26,7 +26,7 @@ inline Eigen::VectorXd TllBicop::gaussian_kernel_2d(
 //! selects the bandwidth matrix for local líkelihood estimator (covariance
 //! times appropriate factor).
 inline Eigen::Matrix2d TllBicop::select_bandwidth(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
+    const Eigen::MatrixXd &x,
     std::string method,
     const Eigen::VectorXd& weights
 )
@@ -80,8 +80,8 @@ inline Eigen::Matrix2d chol22(const Eigen::Matrix2d &B)
 //! @return a two-column matrix; first column is estimated density, second
 //!    column is influence of evaluation point.
 inline Eigen::MatrixXd TllBicop::fit_local_likelihood(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &x_data,
+    const Eigen::MatrixXd &x,
+    const Eigen::MatrixXd &x_data,
     const Eigen::Matrix2d &B,
     std::string method,
     const Eigen::VectorXd& weights)
@@ -212,7 +212,7 @@ inline double TllBicop::calculate_infl(const size_t &n,
 }
 
 
-inline void TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
+inline void TllBicop::fit(const Eigen::MatrixXd &data,
                           std::string method,
                           double mult,
                           const Eigen::VectorXd& weights)
@@ -231,8 +231,8 @@ inline void TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     auto grid_2d = tools_eigen::expand_grid(grid_points);
 
     // transform evaluation grid and data by inverse Gaussian cdf
-    Eigen::Matrix<double, Eigen::Dynamic, 2> z = tools_stats::qnorm(grid_2d);
-    Eigen::Matrix<double, Eigen::Dynamic, 2> z_data = tools_stats::qnorm(data);
+    Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
+    Eigen::MatrixXd z_data = tools_stats::qnorm(data);
 
     // find bandwidth matrix
     Eigen::Matrix2d B = select_bandwidth(z_data, method, weights);

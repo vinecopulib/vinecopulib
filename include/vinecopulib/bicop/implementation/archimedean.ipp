@@ -8,7 +8,7 @@
 
 namespace vinecopulib {
 //inline Eigen::VectorXd ArchimedeanBicop::pdf(
-//    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+//    const Eigen::MatrixXd &u
 //)
 //{
 //    auto f = [this](const double &u1, const double &u2) {
@@ -23,7 +23,7 @@ namespace vinecopulib {
 //}
 
 inline Eigen::VectorXd ArchimedeanBicop::cdf(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     auto f = [this](const double &u1, const double &u2) {
@@ -33,7 +33,7 @@ inline Eigen::VectorXd ArchimedeanBicop::cdf(
 }
 
 inline Eigen::VectorXd ArchimedeanBicop::hfunc1(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     auto f = [this](const double &u1, const double &u2) {
@@ -45,14 +45,14 @@ inline Eigen::VectorXd ArchimedeanBicop::hfunc1(
 }
 
 inline Eigen::VectorXd ArchimedeanBicop::hfunc2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     return hfunc1(tools_eigen::swap_cols(u));
 }
 
 inline Eigen::VectorXd ArchimedeanBicop::hinv1(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     Eigen::VectorXd hinv = hinv1_num(u);
@@ -60,7 +60,7 @@ inline Eigen::VectorXd ArchimedeanBicop::hinv1(
 }
 
 inline Eigen::VectorXd ArchimedeanBicop::hinv2(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
+    const Eigen::MatrixXd &u
 )
 {
     return hinv1(tools_eigen::swap_cols(u));

@@ -31,7 +31,7 @@ Eigen::MatrixXd unaryExpr_or_nan(const Eigen::MatrixXd &x, const T &func)
 
 template<typename T>
 Eigen::VectorXd binaryExpr_or_nan(
-    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u,
+    const Eigen::MatrixXd &u,
     const T &func)
 {
     auto func_or_nan = [&func](const double &u1, const double &u2) {
@@ -50,8 +50,8 @@ void remove_nans(Eigen::MatrixXd &x, Eigen::VectorXd &weights);
 
 bool check_if_in_unit_cube(const Eigen::MatrixXd &u);
 
-Eigen::Matrix<double, Eigen::Dynamic, 2> swap_cols(
-    Eigen::Matrix<double, Eigen::Dynamic, 2> u);
+Eigen::MatrixXd swap_cols(
+    Eigen::MatrixXd u);
 
 Eigen::VectorXd invert_f(
     const Eigen::VectorXd &x,
@@ -60,7 +60,7 @@ Eigen::VectorXd invert_f(
     const double ub = 1 - 1e-20,
     int n_iter = 35);
 
-Eigen::Matrix<double, Eigen::Dynamic, 2> expand_grid(
+Eigen::MatrixXd expand_grid(
     const Eigen::VectorXd &grid_points);
 
 Eigen::MatrixXd read_matxd(const char *filename,
