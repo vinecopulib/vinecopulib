@@ -6,11 +6,12 @@
 
 #pragma once
 
-#include <vinecopulib/misc/tools_bobyqa.hpp>
-#include <vinecopulib/misc/tools_eigen.hpp>
-#include <vinecopulib/bicop/parametric.hpp>
+#include <Eigen/Dense>
 
 namespace vinecopulib {
+
+// forward declaration of parametric subclass
+class ParBicop;
 
 namespace tools_optimization {
 
@@ -18,11 +19,11 @@ namespace tools_optimization {
 typedef struct
 {
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &U; //!< the data.
-    vinecopulib::ParBicop *bicop; //!< a pointer to the bivariate copula to optimize.
+    ParBicop *bicop; //!< a pointer to the bivariate copula to optimize.
     double par0;  //!< main dependence parameter.
     size_t objective_calls; //!< number of evaluations of the objective.
     Eigen::VectorXd weights; //!< weights for the observations.
-    double objective_min;  //!< final value of the objective function 
+    double objective_min;  //!< final value of the objective function
 } ParBicopOptData;
 
 //! @brief A class for the controls to Bobyqa
