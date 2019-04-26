@@ -2,13 +2,10 @@
 
 @tableofcontents
 
-[Set up a custom vine copula model](#vinecop-custom)
-
-[How to read the R-vine matrix](#vinecop-matrix)
-
-[Fit and select a vine copula model](#vinecop-fit)
-
-[Work with a vine copula model](#vinecop-work)
+- [Set up a custom vine copula model](#vinecop-custom)
+- [How to read the R-vine matrix](#vinecop-matrix)
+- [Fit and select a vine copula model](#vinecop-fit)
+- [Work with a vine copula model](#vinecop-work)
 
 Vine copula models are implemented in the class `Vinecop`. To use this class in
 your code, include the header include the header `vinecopulib/vinecop/class.hpp`

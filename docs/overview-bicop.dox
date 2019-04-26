@@ -2,13 +2,10 @@
 
 @tableofcontents
 
-[Implemented bivariate copula families](#bicop-families)
-
-[Set up a custom bivariate copula model](#bicop-custom)
-
-[Fit and select a bivariate copula](#bicop-fit)
-
-[Work with a bivariate copula model](#bicop-model)
+- [Implemented bivariate copula families](#bicop-families)
+- [Set up a custom bivariate copula model](#bicop-custom)
+- [Fit and select a bivariate copula](#bicop-fit)
+- [Work with a bivariate copula model](#bicop-model)
 
 
 Bivariate copula models are implemented as the `Bicop` class, and `BicopFamily`
