@@ -9,10 +9,6 @@
 
 namespace vinecopulib {
 
-namespace constant {
-constexpr double pi = 3.14159265358979323846;
-}
-
 inline Eigen::VectorXd EllipticalBicop::hfunc2(
     const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
 )
