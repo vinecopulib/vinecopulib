@@ -7,6 +7,7 @@
 #include <vinecopulib/misc/tools_stats_ghalton.hpp>
 #include <vinecopulib/misc/tools_stats_sobol.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
+#include <random>
 #include <unsupported/Eigen/FFT>
 #include <wdm/eigen.hpp>
 

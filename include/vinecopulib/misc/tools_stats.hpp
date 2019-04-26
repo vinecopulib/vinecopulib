@@ -7,7 +7,6 @@
 #pragma once
 
 #include <boost/math/distributions.hpp>
-#include <random>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
