@@ -145,14 +145,8 @@ AbstractBicop::hinv1_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
         u_new.col(1) = v;
         return hfunc1(u_new);
     };
-    auto res = tools_eigen::invert_f(u.col(1), h1);
-    size_t n = u.rows();
-    for (size_t j = 0; j < n; j++) {
-        if ((boost::math::isnan)(u(j, 0)) | (boost::math::isnan)(u(j, 1))) {
-            res(j) = std::numeric_limits<double>::quiet_NaN();
-        }
-    }
-    return res;
+
+    return tools_eigen::invert_f(u.col(1), h1);
 }
 
 inline Eigen::VectorXd
@@ -164,14 +158,7 @@ AbstractBicop::hinv2_num(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u)
         return hfunc2(u_new);
     };
 
-    auto res = tools_eigen::invert_f(u.col(0), h1);
-    size_t n = u.rows();
-    for (size_t j = 0; j < n; j++) {
-        if ((boost::math::isnan)(u(j, 0)) | (boost::math::isnan)(u(j, 1))) {
-            res(j) = std::numeric_limits<double>::quiet_NaN();
-        }
-    }
-    return res;
+    return tools_eigen::invert_f(u.col(0), h1);
 }
 //! @}
 }
