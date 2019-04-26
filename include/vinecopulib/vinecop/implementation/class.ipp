@@ -720,8 +720,8 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N,
     check_data_dim(u);
 
     // Simulate N quasi-random numbers from the vine model
-    auto U = tools_stats::simulate_uniform(N, d_, true, seeds);
-    U = inverse_rosenblatt(U, num_threads);
+    auto u_sim = tools_stats::simulate_uniform(N, d_, true, seeds);
+    u_sim = inverse_rosenblatt(u_sim, num_threads);
 
     size_t n = u.rows();
     Eigen::VectorXd vine_distribution(n);
@@ -730,7 +730,7 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N,
     for (size_t i = 0; i < n; i++) {
         tools_interface::check_user_interrupt(i % 1000 == 0);
         temp = u.block(i, 0, 1, d_);
-        x = (U.rowwise() - temp).rowwise().maxCoeff().array();
+        x = (u_sim.rowwise() - temp).rowwise().maxCoeff().array();
         vine_distribution(i) = (x <= 0.0).count();
     }
     return vine_distribution / static_cast<double>(N);

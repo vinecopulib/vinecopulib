@@ -73,12 +73,9 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
                               184618802,
                               399707801,
                               290266245};
-    Eigen::Matrix<double, Eigen::Dynamic, 2> U =
-        tools_stats::ghalton(static_cast<size_t>(1e3),
-                             static_cast<size_t>(2),
-                             seeds);
-    U.col(1) = hinv1(U);
-    return wdm::wdm(U, "tau")(0, 1);
+    auto u = tools_stats::ghalton(1000, 2, seeds);
+    u.col(1) = hinv1(u);
+    return wdm::wdm(u, "tau")(0, 1);
 }
 
 inline double KernelBicop::calculate_npars()
