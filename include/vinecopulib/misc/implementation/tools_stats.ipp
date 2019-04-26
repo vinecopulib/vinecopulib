@@ -62,8 +62,8 @@ inline Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
 //!
 //! @return An \f$ n \times d \f$ matrix of independent
 //! \f$ \mathrm{U}[0, 1] \f$ random variables.
-Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
-                                 bool qrng, std::vector<int> seeds)
+inline Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
+                                        bool qrng, std::vector<int> seeds)
 {
     Eigen::MatrixXd u(n, d);
     if (qrng) {
