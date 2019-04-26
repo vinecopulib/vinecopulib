@@ -260,7 +260,7 @@ inline void TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     Eigen::MatrixXd infl(m, m);
     infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), m, m).transpose();
     // don't normalize margins of the EDF! (norm_times = 0)
-    auto infl_grid = InterpolationGrid(grid_points, values, 0);
+    auto infl_grid = InterpolationGrid(grid_points, infl, 0);
     npars_ = infl_grid.interpolate(data).sum();
     set_loglik(pdf(data).array().log().sum());
 }
