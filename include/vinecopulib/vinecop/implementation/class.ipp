@@ -8,6 +8,8 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
 #include <vinecopulib/misc/tools_serialization.hpp>
+#include <vinecopulib/vinecop/tools_select.hpp>
+#include <vinecopulib/bicop/class.hpp>
 
 #include <stdexcept>
 
@@ -728,16 +730,8 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N,
     check_data_dim(u);
 
     // Simulate N quasi-random numbers from the vine model
-    Eigen::MatrixXd U(N, d_);
-    if (d_ > 300) {
-        U = tools_stats::sobol(N, d_, seeds);
-    } else {
-        U = tools_stats::ghalton(N, d_, seeds);
-    }
+    auto U = tools_stats::simulate_uniform(N, d_, true, seeds);
     U = inverse_rosenblatt(U, num_threads);
-
-    // Alternative: simulate N pseudo-random numbers from the vine model
-    //auto U = simulate(N);
 
     size_t n = u.rows();
     Eigen::VectorXd vine_distribution(n);
