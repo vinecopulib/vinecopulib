@@ -4,9 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include <iostream>
 #include <fstream>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 
 namespace vinecopulib {
 
