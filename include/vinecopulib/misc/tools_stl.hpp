@@ -10,6 +10,7 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <iterator>
 
 namespace vinecopulib {
 
@@ -64,7 +65,7 @@ std::vector<T> set_diff(std::vector<T> x, std::vector<T> y)
     set_difference(
         x.begin(), x.end(),
         y.begin(), y.end(),
-        back_inserter(different)
+        std::back_inserter(different)
     );
 
     return different;
