@@ -7,6 +7,7 @@
 #include <fstream>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
+#include <iostream>
 
 namespace vinecopulib {
 
@@ -105,7 +106,7 @@ inline Eigen::VectorXd invert_f(
         x_tmp = (xh + xl) / 2.0;
         fm = f(x_tmp) - x;
         xl = (fm.array() < 0).select(x_tmp, xl);
-        xh = (fm.array() > 0).select(x_tmp, xh);
+        xh = (fm.array() < 0).select(xh, x_tmp);
     }
     if (fm.array().isNaN().any()) {
         size_t n = x.size();
