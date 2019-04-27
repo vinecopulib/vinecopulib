@@ -550,16 +550,21 @@ inline Eigen::MatrixXd VinecopSelector::get_pc_data(size_t v0, size_t v1,
                                                     const VineTree &tree)
 {
     Eigen::MatrixXd pc_data(tree[v0].hfunc1.size(), 2);
+    Eigen::MatrixXd pc_data_min(tree[v0].hfunc1_min.size(), 2);
     size_t ei_common = find_common_neighbor(v0, v1, tree);
     if (find_position(ei_common, tree[v0].prev_edge_indices) == 0) {
         pc_data.col(0) = tree[v0].hfunc1;
+        pc_data_min.col(0) = tree[v0].hfunc1_min;
     } else {
         pc_data.col(0) = tree[v0].hfunc2;
+        pc_data_min.col(0) = tree[v0].hfunc2_min;
     }
     if (find_position(ei_common, tree[v1].prev_edge_indices) == 0) {
         pc_data.col(1) = tree[v1].hfunc1;
+        pc_data_min.col(1) = tree[v0].hfunc1_min;
     } else {
         pc_data.col(1) = tree[v1].hfunc2;
+        pc_data_min.col(1) = tree[v0].hfunc2_min;
     }
 
     return pc_data;
@@ -727,7 +732,7 @@ inline VineTree VinecopSelector::make_base_tree(const Eigen::MatrixXd &data)
         // when structure is fixed)
         base_tree[e].hfunc1.col(0) = data.col(order[target] - 1);
         if (tools_stl::is_member(order[target] - 1, discrete_vars_)) {
-            base_tree[e].hfunc1.col(1) = data.col(d_ + order[target] - 1);
+            base_tree[e].hfunc1_min = data.col(d_ + order[target] - 1);
         }
         // identify edge with variable "target" and initialize sets
         base_tree[e].conditioned.reserve(2);
@@ -850,8 +855,8 @@ inline void VinecopSelector::add_edge_info(VineTree &tree)
 inline void VinecopSelector::remove_edge_data(VineTree &tree)
 {
     for (auto e : boost::edges(tree)) {
-        tree[e].hfunc1 = Eigen::VectorXd();
-        tree[e].hfunc2 = Eigen::VectorXd();
+        tree[e].hfunc1 = Eigen::MatrixXd();
+        tree[e].hfunc2 = Eigen::MatrixXd();
         tree[e].pc_data = Eigen::MatrixXd(0, 2);
     }
 }
@@ -861,8 +866,8 @@ inline void VinecopSelector::remove_edge_data(VineTree &tree)
 inline void VinecopSelector::remove_vertex_data(VineTree &tree)
 {
     for (auto v : boost::vertices(tree)) {
-        tree[v].hfunc1 = Eigen::VectorXd();
-        tree[v].hfunc2 = Eigen::VectorXd();
+        tree[v].hfunc1 = Eigen::MatrixXd();
+        tree[v].hfunc2 = Eigen::MatrixXd();
     }
 }
 

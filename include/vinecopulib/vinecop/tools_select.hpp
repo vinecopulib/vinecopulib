@@ -46,8 +46,10 @@ struct VertexProperties
     std::vector<size_t> conditioned;
     std::vector<size_t> all_indices;
     std::vector<size_t> prev_edge_indices;
-    Eigen::MatrixXd hfunc1;
-    Eigen::MatrixXd hfunc2;
+    Eigen::VectorXd hfunc1;
+    Eigen::VectorXd hfunc2;
+    Eigen::VectorXd hfunc1_min;
+    Eigen::VectorXd hfunc2_min;
 };
 struct EdgeProperties
 {
@@ -55,8 +57,11 @@ struct EdgeProperties
     std::vector<size_t> conditioned;
     std::vector<size_t> all_indices;
     Eigen::MatrixXd pc_data;
-    Eigen::MatrixXd hfunc1;
-    Eigen::MatrixXd hfunc2;
+    Eigen::MatrixXd pc_data_min;
+    Eigen::VectorXd hfunc1;
+    Eigen::VectorXd hfunc2;
+    Eigen::VectorXd hfunc1_min;
+    Eigen::VectorXd hfunc2_min;
     double weight;
     double crit;
     vinecopulib::Bicop pair_copula;
