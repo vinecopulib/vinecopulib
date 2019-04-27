@@ -613,6 +613,26 @@ inline double Vinecop::get_threshold() const
     return threshold_;
 }
 
+inline void Vinecop::set_discrete_vars(std::vector<size_t> discrete_vars)
+{
+    std::stringstream msg;
+    if (discrete_vars.size() > d_) {
+        msg <<
+            d_ << "-dimensional Vinecop model cannot have more than " <<
+            d_ << " discrete variables." <<
+            std::endl;
+    }
+    auto allowed_vars = tools_stl::seq_int(0, d_ - 1);
+    if (!tools_stl::set_diff(discrete_vars, allowed_vars).empty()) {
+        msg << "Discrete variables must be a subset of {0, .., d - 1}." <<
+            std::endl;
+    }
+    if (!msg.str().empty()) {
+        throw std::runtime_error(msg.str());
+    }
+    discrete_vars_ = discrete_vars;
+}
+
 
 //! @}
 
@@ -1038,12 +1058,19 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
 inline void Vinecop::check_data_dim(const Eigen::MatrixXd &data) const
 {
     size_t d_data = data.cols();
-    if (d_data != d_) {
-        std::stringstream message;
-        message << "data has wrong number of columns; " <<
-                "expected: " << d_ <<
-                ", actual: " << d_data << std::endl;
-        throw std::runtime_error(message.str().c_str());
+    bool is_discrete = discrete_vars_.size() > 0;
+    size_t d_exp = is_discrete > 0 ? d_ : 2 * d_;
+    if (d_data != d_exp) {
+        std::stringstream msg;
+        msg << "data has wrong number of columns; " <<
+            "expected: " << d_exp <<
+            ", actual: " << d_data <<
+            "(model contains ";
+        if (is_discrete) {
+            msg << "no ";
+        }
+        msg << "discrete variables)." <<std::endl;
+        throw std::runtime_error(msg.str());
     }
 }
 

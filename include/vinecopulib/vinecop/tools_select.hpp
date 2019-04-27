@@ -46,8 +46,8 @@ struct VertexProperties
     std::vector<size_t> conditioned;
     std::vector<size_t> all_indices;
     std::vector<size_t> prev_edge_indices;
-    Eigen::VectorXd hfunc1;
-    Eigen::VectorXd hfunc2;
+    Eigen::MatrixXd hfunc1;
+    Eigen::MatrixXd hfunc2;
 };
 struct EdgeProperties
 {
@@ -55,8 +55,8 @@ struct EdgeProperties
     std::vector<size_t> conditioned;
     std::vector<size_t> all_indices;
     Eigen::MatrixXd pc_data;
-    Eigen::VectorXd hfunc1;
-    Eigen::VectorXd hfunc2;
+    Eigen::MatrixXd hfunc1;
+    Eigen::MatrixXd hfunc2;
     double weight;
     double crit;
     vinecopulib::Bicop pair_copula;
@@ -78,7 +78,8 @@ class VinecopSelector
 {
 public:
     VinecopSelector(const Eigen::MatrixXd& data,
-                    const FitControlsVinecop& controls);
+                    const FitControlsVinecop& controls,
+                    std::vector<size_t> discrete_vars = std::vector<size_t>());
 
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
@@ -134,6 +135,7 @@ protected:
 
     size_t n_;
     size_t d_;
+    std::vector<size_t> discrete_vars_;
     FitControlsVinecop controls_;
     tools_thread::ThreadPool pool_;
     std::vector<VineTree> trees_;
@@ -178,7 +180,8 @@ class StructureSelector : public VinecopSelector
 {
 public:
     StructureSelector(const Eigen::MatrixXd &data,
-                      const FitControlsVinecop &controls);
+                      const FitControlsVinecop &controls,
+                      std::vector<size_t> discrete_vars = std::vector<size_t>());
 
     ~StructureSelector()
     {
@@ -195,7 +198,8 @@ class FamilySelector : public VinecopSelector
 public:
     FamilySelector(const Eigen::MatrixXd &data,
                    const RVineStructure &vine_struct,
-                   const FitControlsVinecop &controls);
+                   const FitControlsVinecop &controls,
+                   std::vector<size_t> discrete_vars = std::vector<size_t>());
 
     ~FamilySelector()
     {

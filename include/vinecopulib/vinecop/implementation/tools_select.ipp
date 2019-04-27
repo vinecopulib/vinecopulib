@@ -67,9 +67,11 @@ inline Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
 }
 
 inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
-                                        const FitControlsVinecop& controls) :
+                                        const FitControlsVinecop& controls,
+                                        std::vector<size_t> discrete_vars) :
     n_(data.rows()),
     d_(data.cols()),
+    discrete_vars_(discrete_vars),
     controls_(controls),
     pool_(controls_.get_num_threads()),
     trees_(std::vector<VineTree>(1))
@@ -326,8 +328,9 @@ inline double VinecopSelector::get_next_threshold(
 
 inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
                                       const RVineStructure &vine_struct,
-                                      const FitControlsVinecop &controls)
-    : VinecopSelector(data, controls)
+                                      const FitControlsVinecop &controls,
+                                      std::vector<size_t> discrete_vars)
+    : VinecopSelector(data, controls, discrete_vars)
 {
     vine_struct_ = vine_struct;
     if (vine_struct.get_trunc_lvl() < controls.get_trunc_lvl()) {
@@ -336,8 +339,9 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
 }
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
-                                            const FitControlsVinecop &controls)
-    : VinecopSelector(data, controls)
+                                            const FitControlsVinecop &controls,
+                                            std::vector<size_t> discrete_vars)
+    : VinecopSelector(data, controls, discrete_vars)
 {
     vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
 }
@@ -721,7 +725,10 @@ inline VineTree VinecopSelector::make_base_tree(const Eigen::MatrixXd &data)
         // inititialize hfunc1 with actual data for variable "target"
         // data need are reordered to correspond to natural order (neccessary
         // when structure is fixed)
-        base_tree[e].hfunc1 = data.col(order[target] - 1);
+        base_tree[e].hfunc1.col(0) = data.col(order[target] - 1);
+        if (tools_stl::is_member(order[target] - 1, discrete_vars_)) {
+            base_tree[e].hfunc1.col(1) = data.col(d_ + order[target] - 1);
+        }
         // identify edge with variable "target" and initialize sets
         base_tree[e].conditioned.reserve(2);
         base_tree[e].conditioned.push_back(order[target] - 1);
