@@ -144,9 +144,9 @@ inline Eigen::VectorXd AbstractBicop::pdf_mixed(const Eigen::MatrixXd &u)
     auto umax = u.leftCols(2);
     auto umin = u.rightCols(2);
     if (discrete_vars_[0] == 0) {
-        return hfunc2(umax) - hfunc2(umin);
+        return hfunc2_raw(umax) - hfunc2_raw(umin);
     } else {
-        return hfunc1(umax) - hfunc1(umin);
+        return hfunc1_raw(umax) - hfunc1_raw(umin);
     }
 }
 
