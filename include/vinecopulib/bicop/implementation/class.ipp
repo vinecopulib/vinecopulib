@@ -461,6 +461,14 @@ inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters)
 
 inline void Bicop::set_discrete_vars(const std::vector<size_t> discrete_vars)
 {
+    if (discrete_vars.size() > 2) {
+        throw std::runtime_error(
+            "A Bicop model cannot have more than two discrete variables.");
+    }
+    if (!tools_stl::set_diff(discrete_vars, {0, 1}).empty()) {
+        throw std::runtime_error(
+            "Discrete variables must be a subset of {0, 1}.");
+    }
     discrete_vars_ = discrete_vars;
     bicop_->set_discrete_vars(discrete_vars);
     if (tools_stl::is_member(static_cast<size_t>(rotation_), {90, 270})) {
