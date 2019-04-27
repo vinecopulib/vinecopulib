@@ -62,7 +62,7 @@ TEST(bicop_discrete, playground) {
         u_new.col(2) = (u.col(0).array() * 2).floor() / 2;
         u_new.col(1) = (u.col(1).array() * 2).ceil() / 2;
         u_new.col(3) = (u.col(1).array() * 2).floor() / 2;
-        bc.set_discrete_vars({1, 2});
+        bc.set_discrete_vars({0, 1});
         bc.fit(u_new);
     }
 }

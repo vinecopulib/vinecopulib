@@ -25,31 +25,19 @@ public:
 
 private:
     // PDF
-    Eigen::VectorXd pdf_raw(
-        const Eigen::MatrixXd &u
-    );
+    Eigen::VectorXd pdf_raw(const Eigen::MatrixXd &u);
 
     // PDF
-    Eigen::VectorXd cdf(
-        const Eigen::MatrixXd &u
-    );
+    Eigen::VectorXd cdf(const Eigen::MatrixXd &u);
 
     // hfunctions and their inverses
-    Eigen::VectorXd hfunc1_raw(
-        const Eigen::MatrixXd &u
-    );
+    Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd hfunc2_raw(
-        const Eigen::MatrixXd &u
-    );
+    Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd hinv1(
-        const Eigen::MatrixXd &u
-    );
+    Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd hinv2(
-        const Eigen::MatrixXd &u
-    );
+    Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd &u);
 
     Eigen::MatrixXd tau_to_parameters(const double &);
 

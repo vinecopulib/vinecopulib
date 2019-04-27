@@ -16,11 +16,9 @@ inline Eigen::VectorXd EllipticalBicop::hfunc2_raw(
     return hfunc1_raw(tools_eigen::swap_cols(u));
 }
 
-inline Eigen::VectorXd EllipticalBicop::hinv2(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd EllipticalBicop::hinv2_raw(const Eigen::MatrixXd &u)
 {
-    return hinv1(tools_eigen::swap_cols(u));
+    return hinv1_raw(tools_eigen::swap_cols(u));
 }
 
 inline double

@@ -14,9 +14,7 @@ inline IndepBicop::IndepBicop()
     parameters_ = Eigen::MatrixXd();
 }
 
-inline Eigen::VectorXd IndepBicop::pdf_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd IndepBicop::pdf_raw(const Eigen::MatrixXd &u)
 {
     auto f = [](double, double) {
         return 1.0;
@@ -24,51 +22,29 @@ inline Eigen::VectorXd IndepBicop::pdf_raw(
     return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd IndepBicop::cdf(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd IndepBicop::cdf(const Eigen::MatrixXd &u)
 {
     return u.rowwise().prod();
 }
 
-inline Eigen::VectorXd IndepBicop::hfunc1_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd IndepBicop::hfunc1_raw(const Eigen::MatrixXd &u)
 {
-    auto f = [](double, double u2) {
-        return u2;
-    };
-    return tools_eigen::binaryExpr_or_nan(u, f);
+    return u.col(1);
 }
 
-inline Eigen::VectorXd IndepBicop::hfunc2_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd IndepBicop::hfunc2_raw(const Eigen::MatrixXd &u)
 {
-    auto f = [](double u1, double) {
-        return u1;
-    };
-    return tools_eigen::binaryExpr_or_nan(u, f);
+    return u.col(0);
 }
 
-inline Eigen::VectorXd IndepBicop::hinv1(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd IndepBicop::hinv1_raw(const Eigen::MatrixXd &u)
 {
-    auto f = [](double, double u2) {
-        return u2;
-    };
-    return tools_eigen::binaryExpr_or_nan(u, f);
+    return u.col(1);
 }
 
-inline Eigen::VectorXd IndepBicop::hinv2(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd IndepBicop::hinv2_raw(const Eigen::MatrixXd &u)
 {
-    auto f = [](double u1, double) {
-        return u1;
-    };
-    return tools_eigen::binaryExpr_or_nan(u, f);
+    return u.col(0);
 }
 
 inline Eigen::MatrixXd IndepBicop::tau_to_parameters(const double &)

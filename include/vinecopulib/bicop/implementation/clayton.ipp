@@ -42,9 +42,7 @@ inline double ClaytonBicop::generator_derivative(const double &u)
 //    return (1 + theta) * std::pow(u, -2 - theta);
 //}
 
-inline Eigen::VectorXd ClaytonBicop::pdf_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd ClaytonBicop::pdf_raw(const Eigen::MatrixXd &u)
 {
     double theta = static_cast<double>(parameters_(0));
     // avoid numerical issues when copula is too close to independence
@@ -62,9 +60,7 @@ inline Eigen::VectorXd ClaytonBicop::pdf_raw(
     return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd ClaytonBicop::hinv1(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd ClaytonBicop::hinv1_raw(const Eigen::MatrixXd &u)
 {
     double theta = double(this->parameters_(0));
     Eigen::VectorXd hinv = u.col(0).array().pow(theta + 1.0);

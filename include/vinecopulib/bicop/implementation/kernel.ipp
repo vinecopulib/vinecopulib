@@ -22,44 +22,32 @@ inline KernelBicop::KernelBicop()
     );
 }
 
-inline Eigen::VectorXd KernelBicop::pdf_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd KernelBicop::pdf_raw(const Eigen::MatrixXd &u)
 {
     return interp_grid_->interpolate(u);
 }
 
-inline Eigen::VectorXd KernelBicop::cdf(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd KernelBicop::cdf(const Eigen::MatrixXd &u)
 {
     return interp_grid_->integrate_2d(u);
 }
 
-inline Eigen::VectorXd KernelBicop::hfunc1_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd KernelBicop::hfunc1_raw(const Eigen::MatrixXd &u)
 {
     return interp_grid_->integrate_1d(u, 1);
 }
 
-inline Eigen::VectorXd KernelBicop::hfunc2_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd KernelBicop::hfunc2_raw(const Eigen::MatrixXd &u)
 {
     return interp_grid_->integrate_1d(u, 2);
 }
 
-inline Eigen::VectorXd KernelBicop::hinv1(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd KernelBicop::hinv1_raw(const Eigen::MatrixXd &u)
 {
     return hinv1_num(u);
 }
 
-inline Eigen::VectorXd KernelBicop::hinv2(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd KernelBicop::hinv2_raw(const Eigen::MatrixXd &u)
 {
     return hinv2_num(u);
 }
@@ -74,7 +62,7 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd &parameters)
                               399707801,
                               290266245};
     auto u = tools_stats::ghalton(1000, 2, seeds);
-    u.col(1) = hinv1(u);
+    u.col(1) = hinv1_raw(u);
     return wdm::wdm(u, "tau")(0, 1);
 }
 

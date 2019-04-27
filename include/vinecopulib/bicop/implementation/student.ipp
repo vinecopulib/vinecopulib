@@ -19,9 +19,7 @@ inline StudentBicop::StudentBicop()
     parameters_upper_bounds_ << 1, 50;
 }
 
-inline Eigen::VectorXd StudentBicop::pdf_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd StudentBicop::pdf_raw(const Eigen::MatrixXd &u)
 {
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));
@@ -40,9 +38,7 @@ inline Eigen::VectorXd StudentBicop::pdf_raw(
     return f;
 }
 
-inline Eigen::VectorXd StudentBicop::cdf(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd StudentBicop::cdf(const Eigen::MatrixXd &u)
 {
     using namespace tools_stats;
 
@@ -64,9 +60,7 @@ inline Eigen::VectorXd StudentBicop::cdf(
     }
 }
 
-inline Eigen::VectorXd StudentBicop::hfunc1_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd StudentBicop::hfunc1_raw(const Eigen::MatrixXd &u)
 {
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));
@@ -81,9 +75,7 @@ inline Eigen::VectorXd StudentBicop::hfunc1_raw(
     return h;
 }
 
-inline Eigen::VectorXd StudentBicop::hinv1(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd StudentBicop::hinv1_raw(const Eigen::MatrixXd &u)
 {
     double rho = double(this->parameters_(0));
     double nu = double(this->parameters_(1));

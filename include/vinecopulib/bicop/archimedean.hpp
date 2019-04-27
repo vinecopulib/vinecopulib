@@ -29,9 +29,9 @@ private:
 
     Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd hinv1(const Eigen::MatrixXd &u);
+    Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd hinv2(const Eigen::MatrixXd &u);
+    Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd &u);
 
     // generator, its inverse and derivative
     virtual double generator(const double &u) = 0;

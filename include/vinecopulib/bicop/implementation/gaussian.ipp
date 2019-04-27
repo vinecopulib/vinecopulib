@@ -18,9 +18,7 @@ inline GaussianBicop::GaussianBicop()
     parameters_upper_bounds_ << 1;
 }
 
-inline Eigen::VectorXd GaussianBicop::pdf_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd GaussianBicop::pdf_raw(const Eigen::MatrixXd &u)
 {
     // Inverse Cholesky of the correlation matrix
     double rho = double(this->parameters_(0));
@@ -39,17 +37,13 @@ inline Eigen::VectorXd GaussianBicop::pdf_raw(
     return f / sqrt(1.0 - pow(rho, 2.0));
 }
 
-inline Eigen::VectorXd GaussianBicop::cdf(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd GaussianBicop::cdf(const Eigen::MatrixXd &u)
 {
     return tools_stats::pbvnorm(tools_stats::qnorm(u),
                                 double(this->parameters_(0)));
 }
 
-inline Eigen::VectorXd GaussianBicop::hfunc1_raw(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd GaussianBicop::hfunc1_raw(const Eigen::MatrixXd &u)
 {
     double rho = double(this->parameters_(0));
     Eigen::VectorXd h = Eigen::VectorXd::Zero(u.rows());
@@ -58,9 +52,7 @@ inline Eigen::VectorXd GaussianBicop::hfunc1_raw(
     return tools_stats::pnorm(h);
 }
 
-inline Eigen::VectorXd GaussianBicop::hinv1(
-    const Eigen::MatrixXd &u
-)
+inline Eigen::VectorXd GaussianBicop::hinv1_raw(const Eigen::MatrixXd &u)
 {
     double rho = double(this->parameters_(0));
     Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());

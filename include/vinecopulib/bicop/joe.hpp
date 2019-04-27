@@ -37,9 +37,7 @@ private:
     Eigen::VectorXd pdf_raw(const Eigen::MatrixXd &u);
 
     // inverse hfunction
-    Eigen::VectorXd hinv1(
-        const Eigen::MatrixXd &u
-    );
+    Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd &u);
 
     // link between Kendall's tau and the par_bicop parameter
     Eigen::MatrixXd tau_to_parameters(const double &tau);

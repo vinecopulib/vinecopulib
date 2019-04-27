@@ -180,6 +180,24 @@ Eigen::VectorXd AbstractBicop::hfunc2(const Eigen::MatrixXd &u)
     }
 }
 
+Eigen::VectorXd AbstractBicop::hinv1(const Eigen::MatrixXd &u)
+{
+    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 0))) {
+        return hinv1_num(u);
+    } else {
+        return hinv1_raw(u);
+    }
+}
+
+Eigen::VectorXd AbstractBicop::hinv2(const Eigen::MatrixXd &u)
+{
+    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 1))) {
+        return hinv2_num(u);
+    } else {
+        return hinv2_raw(u);
+    }
+}
+
 //! Numerical inversion of h-functions
 //!
 //! These are generic functions to invert the hfunctions numerically.

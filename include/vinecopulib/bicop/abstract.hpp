@@ -66,37 +66,33 @@ protected:
 
     Eigen::VectorXd pdf(const Eigen::MatrixXd &u);
 
-    virtual Eigen::VectorXd pdf_raw(
-        const Eigen::MatrixXd &u) = 0;
-
-    virtual Eigen::VectorXd cdf(
-        const Eigen::MatrixXd &u) = 0;
+    virtual Eigen::VectorXd cdf(const Eigen::MatrixXd &u) = 0;
 
     Eigen::VectorXd hfunc1(const Eigen::MatrixXd &u);
 
     Eigen::VectorXd hfunc2(const Eigen::MatrixXd &u);
 
-    virtual Eigen::VectorXd hfunc1_raw(
-        const Eigen::MatrixXd &u) = 0;
+    Eigen::VectorXd hinv1(const Eigen::MatrixXd &u);
 
-    virtual Eigen::VectorXd hfunc2_raw(
-        const Eigen::MatrixXd &u) = 0;
+    Eigen::VectorXd hinv2(const Eigen::MatrixXd &u);
 
-    virtual Eigen::VectorXd hinv1(
-        const Eigen::MatrixXd &u) = 0;
+    virtual Eigen::VectorXd pdf_raw(const Eigen::MatrixXd &u) = 0;
 
-    virtual Eigen::VectorXd hinv2(
-        const Eigen::MatrixXd &u) = 0;
+    virtual Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd &u) = 0;
+
+    virtual Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd &u) = 0;
+
+    virtual Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd &u) = 0;
+
+    virtual Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd &u) = 0;
 
     virtual Eigen::MatrixXd tau_to_parameters(const double &tau) = 0;
     Eigen::MatrixXd no_tau_to_parameters(const double &);
 
     // Misc methods
-    Eigen::VectorXd hinv1_num(
-        const Eigen::MatrixXd &u);
+    Eigen::VectorXd hinv1_num(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd hinv2_num(
-        const Eigen::MatrixXd &u);
+    Eigen::VectorXd hinv2_num(const Eigen::MatrixXd &u);
 
     Eigen::VectorXd pdf_mixed(const Eigen::MatrixXd &u);
 
