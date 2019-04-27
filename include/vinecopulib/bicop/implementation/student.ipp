@@ -64,7 +64,7 @@ inline Eigen::VectorXd StudentBicop::cdf(
     }
 }
 
-inline Eigen::VectorXd StudentBicop::hfunc1(
+inline Eigen::VectorXd StudentBicop::hfunc1_raw(
     const Eigen::MatrixXd &u
 )
 {

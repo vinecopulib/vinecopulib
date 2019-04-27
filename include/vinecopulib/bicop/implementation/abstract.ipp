@@ -125,12 +125,12 @@ inline Eigen::VectorXd AbstractBicop::pdf(const Eigen::MatrixXd &u)
 {
 
     Eigen::VectorXd pdf(u.rows());
-    if (discrete_vars_.size() == 0) {
+    if (is_continuous()) {
         pdf = pdf_raw(u);
-    } else if (discrete_vars_.size() == 1) {
-        pdf = pdf_cont_disc(u);
-    } else {
-        pdf = pdf_disc(u);
+    } else if (is_mixed()) {
+        pdf = pdf_mixed(u);
+    } else if (is_discrete()) {
+        pdf = pdf_discrete(u);
     }
 
     auto trim = [] (const double &x) {
@@ -139,7 +139,7 @@ inline Eigen::VectorXd AbstractBicop::pdf(const Eigen::MatrixXd &u)
     return tools_eigen::unaryExpr_or_nan(pdf, trim);
 }
 
-inline Eigen::VectorXd AbstractBicop::pdf_cont_disc(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd AbstractBicop::pdf_mixed(const Eigen::MatrixXd &u)
 {
     auto umax = u.leftCols(2);
     auto umin = u.rightCols(2);
@@ -150,7 +150,7 @@ inline Eigen::VectorXd AbstractBicop::pdf_cont_disc(const Eigen::MatrixXd &u)
     }
 }
 
-inline Eigen::VectorXd AbstractBicop::pdf_disc(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd AbstractBicop::pdf_discrete(const Eigen::MatrixXd &u)
 {
     Eigen::MatrixXd umax = u.leftCols(2);
     Eigen::MatrixXd umin = u.rightCols(2);
@@ -158,6 +158,26 @@ inline Eigen::VectorXd AbstractBicop::pdf_disc(const Eigen::MatrixXd &u)
     umax.col(0).swap(umin.col(0));
     pdf -= cdf(umax) + cdf(umin);
     return pdf;
+}
+
+Eigen::VectorXd AbstractBicop::hfunc1(const Eigen::MatrixXd &u)
+{
+    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 0))) {
+        return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
+                    (u.col(0) - u.col(2)).array();
+    } else {
+        return hfunc1_raw(u);
+    }
+}
+
+Eigen::VectorXd AbstractBicop::hfunc2(const Eigen::MatrixXd &u)
+{
+    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 1))) {
+        return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
+                    (u.col(1) - u.col(3)).array();
+    } else {
+        return hfunc2_raw(u);
+    }
 }
 
 //! Numerical inversion of h-functions

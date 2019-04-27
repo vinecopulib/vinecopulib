@@ -40,11 +40,11 @@ protected:
         const Eigen::MatrixXd &u
     );
 
-    Eigen::VectorXd hfunc1(
+    Eigen::VectorXd hfunc1_raw(
         const Eigen::MatrixXd &u
     );
 
-    Eigen::VectorXd hfunc2(
+    Eigen::VectorXd hfunc2_raw(
         const Eigen::MatrixXd &u
     );
 

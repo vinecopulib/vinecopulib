@@ -47,7 +47,7 @@ inline Eigen::VectorXd GaussianBicop::cdf(
                                 double(this->parameters_(0)));
 }
 
-inline Eigen::VectorXd GaussianBicop::hfunc1(
+inline Eigen::VectorXd GaussianBicop::hfunc1_raw(
     const Eigen::MatrixXd &u
 )
 {

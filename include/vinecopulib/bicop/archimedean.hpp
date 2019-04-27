@@ -25,9 +25,9 @@ private:
 
     Eigen::VectorXd cdf(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd hfunc1(const Eigen::MatrixXd &u);
+    Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd hfunc2(const Eigen::MatrixXd &u);
+    Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd &u);
 
     Eigen::VectorXd hinv1(const Eigen::MatrixXd &u);
 

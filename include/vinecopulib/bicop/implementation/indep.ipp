@@ -31,7 +31,7 @@ inline Eigen::VectorXd IndepBicop::cdf(
     return u.rowwise().prod();
 }
 
-inline Eigen::VectorXd IndepBicop::hfunc1(
+inline Eigen::VectorXd IndepBicop::hfunc1_raw(
     const Eigen::MatrixXd &u
 )
 {
@@ -41,7 +41,7 @@ inline Eigen::VectorXd IndepBicop::hfunc1(
     return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd IndepBicop::hfunc2(
+inline Eigen::VectorXd IndepBicop::hfunc2_raw(
     const Eigen::MatrixXd &u
 )
 {

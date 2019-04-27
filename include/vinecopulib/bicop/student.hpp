@@ -35,7 +35,7 @@ private:
     );
 
     // hfunction
-    Eigen::VectorXd hfunc1(
+    Eigen::VectorXd hfunc1_raw(
         const Eigen::MatrixXd &u
     );
 

@@ -72,10 +72,14 @@ protected:
     virtual Eigen::VectorXd cdf(
         const Eigen::MatrixXd &u) = 0;
 
-    virtual Eigen::VectorXd hfunc1(
+    Eigen::VectorXd hfunc1(const Eigen::MatrixXd &u);
+
+    Eigen::VectorXd hfunc2(const Eigen::MatrixXd &u);
+
+    virtual Eigen::VectorXd hfunc1_raw(
         const Eigen::MatrixXd &u) = 0;
 
-    virtual Eigen::VectorXd hfunc2(
+    virtual Eigen::VectorXd hfunc2_raw(
         const Eigen::MatrixXd &u) = 0;
 
     virtual Eigen::VectorXd hinv1(
@@ -94,10 +98,24 @@ protected:
     Eigen::VectorXd hinv2_num(
         const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd pdf_cont_disc(const Eigen::MatrixXd &u);
+    Eigen::VectorXd pdf_mixed(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd pdf_disc(const Eigen::MatrixXd &u);
+    Eigen::VectorXd pdf_discrete(const Eigen::MatrixXd &u);
 
+    bool is_continuous() const
+    {
+        return (discrete_vars_.size() == 0);
+    }
+
+    bool is_mixed() const
+    {
+        return (discrete_vars_.size() == 1);
+    }
+
+    bool is_discrete() const
+    {
+        return (discrete_vars_.size() == 2);
+    }
 
     // Data members
     BicopFamily family_;

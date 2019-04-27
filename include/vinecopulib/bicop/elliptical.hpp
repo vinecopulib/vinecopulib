@@ -26,7 +26,7 @@ class EllipticalBicop : public ParBicop
 {
 private:
     // hfunction and its inverse
-    Eigen::VectorXd hfunc2(
+    Eigen::VectorXd hfunc2_raw(
         const Eigen::MatrixXd &u
     );
 

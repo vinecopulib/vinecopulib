@@ -36,14 +36,14 @@ inline Eigen::VectorXd KernelBicop::cdf(
     return interp_grid_->integrate_2d(u);
 }
 
-inline Eigen::VectorXd KernelBicop::hfunc1(
+inline Eigen::VectorXd KernelBicop::hfunc1_raw(
     const Eigen::MatrixXd &u
 )
 {
     return interp_grid_->integrate_1d(u, 1);
 }
 
-inline Eigen::VectorXd KernelBicop::hfunc2(
+inline Eigen::VectorXd KernelBicop::hfunc2_raw(
     const Eigen::MatrixXd &u
 )
 {

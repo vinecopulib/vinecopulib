@@ -32,7 +32,7 @@ inline Eigen::VectorXd ArchimedeanBicop::cdf(
     return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd ArchimedeanBicop::hfunc1(
+inline Eigen::VectorXd ArchimedeanBicop::hfunc1_raw(
     const Eigen::MatrixXd &u
 )
 {
@@ -44,11 +44,11 @@ inline Eigen::VectorXd ArchimedeanBicop::hfunc1(
     return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd ArchimedeanBicop::hfunc2(
+inline Eigen::VectorXd ArchimedeanBicop::hfunc2_raw(
     const Eigen::MatrixXd &u
 )
 {
-    return hfunc1(tools_eigen::swap_cols(u));
+    return hfunc1_raw(tools_eigen::swap_cols(u));
 }
 
 inline Eigen::VectorXd ArchimedeanBicop::hinv1(
