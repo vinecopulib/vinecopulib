@@ -143,7 +143,7 @@ void TriangularArray<T>::set_column(size_t column,
         problem << "column should be smaller than " << d_ - 1 << ".";
         throw std::runtime_error(problem.str());
     }
-    if (new_col.size() != mat_[column].size()) {
+    if (new_column.size() != mat_[column].size()) {
         std::stringstream problem;
         problem << "column " << column << " should have size "
                 << mat_[column].size() << ".";
