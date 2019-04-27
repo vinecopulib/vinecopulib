@@ -160,7 +160,7 @@ inline Eigen::VectorXd AbstractBicop::pdf_discrete(const Eigen::MatrixXd &u)
     return pdf;
 }
 
-Eigen::VectorXd AbstractBicop::hfunc1(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd AbstractBicop::hfunc1(const Eigen::MatrixXd &u)
 {
     if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 0))) {
         return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
@@ -170,7 +170,7 @@ Eigen::VectorXd AbstractBicop::hfunc1(const Eigen::MatrixXd &u)
     }
 }
 
-Eigen::VectorXd AbstractBicop::hfunc2(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd AbstractBicop::hfunc2(const Eigen::MatrixXd &u)
 {
     if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 1))) {
         return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
@@ -180,7 +180,7 @@ Eigen::VectorXd AbstractBicop::hfunc2(const Eigen::MatrixXd &u)
     }
 }
 
-Eigen::VectorXd AbstractBicop::hinv1(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd AbstractBicop::hinv1(const Eigen::MatrixXd &u)
 {
     if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 0))) {
         return hinv1_num(u);
@@ -189,7 +189,7 @@ Eigen::VectorXd AbstractBicop::hinv1(const Eigen::MatrixXd &u)
     }
 }
 
-Eigen::VectorXd AbstractBicop::hinv2(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd AbstractBicop::hinv2(const Eigen::MatrixXd &u)
 {
     if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 1))) {
         return hinv2_num(u);
@@ -206,8 +206,7 @@ Eigen::VectorXd AbstractBicop::hinv2(const Eigen::MatrixXd &u)
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 //! @return The numerical inverse of h-functions.
 //! @{
-inline Eigen::VectorXd
-AbstractBicop::hinv1_num(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd AbstractBicop::hinv1_num(const Eigen::MatrixXd &u)
 {
     Eigen::MatrixXd u_new = u;
     auto h1 = [&](const Eigen::VectorXd &v) {
@@ -218,8 +217,7 @@ AbstractBicop::hinv1_num(const Eigen::MatrixXd &u)
     return tools_eigen::invert_f(u.col(1), h1);
 }
 
-inline Eigen::VectorXd
-AbstractBicop::hinv2_num(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd AbstractBicop::hinv2_num(const Eigen::MatrixXd &u)
 {
     Eigen::MatrixXd u_new = u;
     auto h1 = [&](const Eigen::VectorXd &x) {
