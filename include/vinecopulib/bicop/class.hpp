@@ -64,23 +64,17 @@ public:
     void set_discrete_vars(const std::vector<size_t> discrete_vars);
 
     // Stats methods
-    Eigen::VectorXd
-    pdf(const Eigen::MatrixXd &u) const;
+    Eigen::VectorXd pdf(const Eigen::MatrixXd &u) const;
 
-    Eigen::VectorXd
-    cdf(const Eigen::MatrixXd &u) const;
+    Eigen::VectorXd cdf(const Eigen::MatrixXd &u) const;
 
-    Eigen::VectorXd
-    hfunc1(const Eigen::MatrixXd &u) const;
+    Eigen::VectorXd hfunc1(const Eigen::MatrixXd &u) const;
 
-    Eigen::VectorXd
-    hfunc2(const Eigen::MatrixXd &u) const;
+    Eigen::VectorXd hfunc2(const Eigen::MatrixXd &u) const;
 
-    Eigen::VectorXd
-    hinv1(const Eigen::MatrixXd &u) const;
+    Eigen::VectorXd hinv1(const Eigen::MatrixXd &u) const;
 
-    Eigen::VectorXd
-    hinv2(const Eigen::MatrixXd &u) const;
+    Eigen::VectorXd hinv2(const Eigen::MatrixXd &u) const;
 
     Eigen::MatrixXd
     simulate(const size_t &n,
@@ -96,22 +90,14 @@ public:
                 FitControlsBicop controls = FitControlsBicop());
 
     // Fit statistics
-    double loglik(
-        const Eigen::MatrixXd &u =
-            Eigen::MatrixXd()) const;
+    double loglik(const Eigen::MatrixXd &u = Eigen::MatrixXd()) const;
 
-    double aic(
-        const Eigen::MatrixXd &u =
-            Eigen::MatrixXd()) const;
+    double aic(const Eigen::MatrixXd &u = Eigen::MatrixXd()) const;
 
-    double bic(
-        const Eigen::MatrixXd &u =
-            Eigen::MatrixXd()) const;
+    double bic(const Eigen::MatrixXd &u = Eigen::MatrixXd()) const;
 
-    double mbic(
-        const Eigen::MatrixXd &u =
-            Eigen::MatrixXd(),
-        const double psi0 = 0.9) const;
+    double mbic(const Eigen::MatrixXd &u = Eigen::MatrixXd(),
+                const double psi0 = 0.9) const;
 
     // Misc
     std::string str() const;
@@ -133,6 +119,10 @@ private:
         const Eigen::MatrixXd &u) const;
 
     void check_rotation(int rotation) const;
+
+    void check_data(const Eigen::MatrixXd &u) const;
+
+    void check_data_dim(const Eigen::MatrixXd &u) const;
 
     void flip_discrete_vars();
 

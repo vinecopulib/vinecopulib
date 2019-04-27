@@ -99,11 +99,9 @@ inline void Bicop::to_json(const char *filename) const
 //!
 //! @param u \f$n \times 2\f$ matrix of evaluation points.
 //! @return The copula density evaluated at \c u.
-inline Eigen::VectorXd
-Bicop::pdf(const Eigen::MatrixXd &u)
-const
+inline Eigen::VectorXd Bicop::pdf(const Eigen::MatrixXd &u) const
 {
-    tools_eigen::check_if_in_unit_cube(u);
+    check_data(u);
     return bicop_->pdf(cut_and_rotate(u));
 }
 
@@ -111,11 +109,9 @@ const
 //!
 //! @param u \f$n \times 2\f$ matrix of evaluation points.
 //! @return The copula distribution evaluated at \c u.
-inline Eigen::VectorXd
-Bicop::cdf(const Eigen::MatrixXd &u)
-const
+inline Eigen::VectorXd Bicop::cdf(const Eigen::MatrixXd &u) const
 {
-    tools_eigen::check_if_in_unit_cube(u);
+    check_data(u);
     Eigen::VectorXd p = bicop_->cdf(cut_and_rotate(u));
     switch (rotation_) {
         default:
@@ -138,11 +134,9 @@ const
 //! calculates the first h-function, i.e.,
 //! \f$ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) \f$.
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
-inline Eigen::VectorXd
-Bicop::hfunc1(const Eigen::MatrixXd &u)
-const
+inline Eigen::VectorXd Bicop::hfunc1(const Eigen::MatrixXd &u) const
 {
-    tools_eigen::check_if_in_unit_cube(u);
+    check_data(u);
     switch (rotation_) {
         default:
             return bicop_->hfunc1(cut_and_rotate(u));
@@ -161,11 +155,9 @@ const
 //! calculates the second h-function, i.e.,
 //! \f$ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) \f$.
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
-inline Eigen::VectorXd
-Bicop::hfunc2(const Eigen::MatrixXd &u)
-const
+inline Eigen::VectorXd Bicop::hfunc2(const Eigen::MatrixXd &u) const
 {
-    tools_eigen::check_if_in_unit_cube(u);
+    check_data(u);
     switch (rotation_) {
         default:
             return bicop_->hfunc2(cut_and_rotate(u));
@@ -184,11 +176,9 @@ const
 //! calculates the inverse of \f$ h_1 f\f$ (see hfunc1()) w.r.t. the second
 //! argument.
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
-inline Eigen::VectorXd
-Bicop::hinv1(const Eigen::MatrixXd &u)
-const
+inline Eigen::VectorXd Bicop::hinv1(const Eigen::MatrixXd &u) const
 {
-    tools_eigen::check_if_in_unit_cube(u);
+    check_data(u);
     switch (rotation_) {
         default:
             return bicop_->hinv1(cut_and_rotate(u));
@@ -207,11 +197,9 @@ const
 //! calculates the inverse of \f$ h_2 f\f$ (see hfunc2()) w.r.t. the first
 //! argument.
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
-inline Eigen::VectorXd
-Bicop::hinv2(const Eigen::MatrixXd &u)
-const
+inline Eigen::VectorXd Bicop::hinv2(const Eigen::MatrixXd &u) const
 {
-    tools_eigen::check_if_in_unit_cube(u);
+    check_data(u);
     switch (rotation_) {
         default:
             return bicop_->hinv2(cut_and_rotate(u));
@@ -433,6 +421,31 @@ inline void Bicop::set_rotation(const int rotation)
     bicop_->set_loglik();
 }
 
+inline void Bicop::check_data(const Eigen::MatrixXd &u) const
+{
+    check_data_dim(u);
+    tools_eigen::check_if_in_unit_cube(u);
+}
+
+
+inline void Bicop::check_data_dim(const Eigen::MatrixXd &u) const
+{
+    size_t d_u = u.cols();
+    size_t d_exp = bicop_->is_continuous() ? 2 : 4;
+    if (d_u != d_exp) {
+        std::stringstream msg;
+        msg << "data has wrong number of columns; " <<
+            "expected: " << d_exp <<
+            ", actual: " << d_u <<
+            "(model contains ";
+        if (bicop_->is_continuous()) {
+            msg << "no ";
+        }
+        msg << "discrete variables)." <<std::endl;
+        throw std::runtime_error(msg.str());
+    }
+}
+
 inline void Bicop::flip_discrete_vars()
 {
     for (auto &var : bicop_->discrete_vars_) {
@@ -522,7 +535,7 @@ inline void Bicop::fit(const Eigen::MatrixXd &data,
     } else {
         method = controls.get_nonparametric_method();
     }
-    tools_eigen::check_if_in_unit_cube(data);
+    check_data(data);
 
     auto w = controls.get_weights();
     Eigen::MatrixXd data_no_nan = data;
@@ -554,7 +567,7 @@ inline void Bicop::select(const Eigen::MatrixXd &data,
         tools_eigen::remove_nans(data_no_nan, w);
         controls.set_weights(w);
     }
-    tools_eigen::check_if_in_unit_cube(data_no_nan);
+    check_data(data_no_nan);
     nobs_ = data_no_nan.rows();
 
     bicop_ = AbstractBicop::create();
