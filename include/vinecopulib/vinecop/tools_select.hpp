@@ -133,6 +133,8 @@ protected:
 
     Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree &tree);
 
+    Eigen::MatrixXd get_pc_data_min(size_t v0, size_t v1, const VineTree &tree);
+    
     ptrdiff_t find_common_neighbor(size_t v0, size_t v1,
                                    const VineTree &tree);
 
