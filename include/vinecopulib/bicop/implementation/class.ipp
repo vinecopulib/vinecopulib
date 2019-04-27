@@ -613,7 +613,28 @@ inline void Bicop::select(const Eigen::MatrixXd &data,
 inline Eigen::MatrixXd Bicop::cut_and_rotate(
     const Eigen::MatrixXd &u) const
 {
+    using namespace tools_stl;
     Eigen::MatrixXd u_new(u.rows(), u.cols());
+
+    if (u.cols() == 4) {
+        u_new.leftCols(2) = cut_and_rotate(u.leftCols(2));
+        u_new.rightCols(2) = cut_and_rotate(u.rightCols(2));
+        if (rotation_ == 180) {
+            u_new.leftCols(2).swap(u_new.rightCols(2));
+        } else if (is_member(rotation_, {90, 270})) {
+            for (auto &var : bicop_->discrete_vars_) {
+                var = 1 - var;
+                if (var == 1 && rotation_ == 90) {
+                    u_new.col(1).swap(u_new.col(3));
+                }
+                if (var == 0 && rotation_ == 270) {
+                    u_new.col(0).swap(u_new.col(2));
+                }
+            }
+        }
+
+        return u_new;
+    }
 
     // counter-clockwise rotations
     switch (rotation_) {
@@ -638,8 +659,7 @@ inline Eigen::MatrixXd Bicop::cut_and_rotate(
     }
 
     // truncate to interval [eps, 1 - eps]
-    Eigen::MatrixXd eps =
-        Eigen::MatrixXd::Constant(u.rows(), 4, 1e-10);
+    Eigen::MatrixXd eps = Eigen::MatrixXd::Constant(u.rows(), 4, 1e-10);
     u_new = (1.0 - eps.array()).min(u_new.array());
     u_new = eps.array().max(u_new.array());
 

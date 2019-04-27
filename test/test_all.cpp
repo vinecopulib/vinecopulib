@@ -27,20 +27,6 @@ using namespace test_vinecop_sanity_checks;
 using namespace test_weights;
 
 int main(int argc, char **argv) {
-    // ::testing::InitGoogleTest(&argc, argv);
-    // return RUN_ALL_TESTS();
-
-    auto bc = Bicop(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 3));
-    auto u = bc.simulate(1000);
-
-    Eigen::MatrixXd unew(1000, 4);
-    unew.block(0, 0, 1000, 2) = u;
-    unew.block(0, 2, 1000, 2) = u;
-    unew.col(2) = (unew.col(2).array() * 2).floor() / 2;
-    // unew.col(3) = (unew.col(3).array() * 2).floor() / 2.0;
-    bc.set_discrete_vars({0});
-    bc.fit(unew);
-    std::cout << bc.str() << std::endl;
-
-    return 0;
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

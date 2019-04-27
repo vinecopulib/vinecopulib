@@ -5,6 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <stdexcept>
+#include <iostream>
 
 #include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/bicop/bb1.hpp>
@@ -133,6 +134,9 @@ inline Eigen::VectorXd AbstractBicop::pdf(const Eigen::MatrixXd &u)
     Eigen::MatrixXd umin = u.rightCols(2);
     if (discrete_vars_.size() == 1) {
         if (discrete_vars_[0] == 0) {
+            // std::cout << "umax: \n" << umax << std::endl <<
+            //              "umin: \n" << umin << "end" << std::endl;
+            // std::cout << hfunc2(umax) - hfunc2(umin) << std::endl;
             return hfunc2(umax) - hfunc2(umin);
         } else {
             return hfunc1(umax) - hfunc1(umin);
