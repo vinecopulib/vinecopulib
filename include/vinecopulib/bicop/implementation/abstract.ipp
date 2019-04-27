@@ -123,28 +123,39 @@ inline void AbstractBicop::set_loglik(const double loglik)
 //! @param u matrix of evaluation points.
 inline Eigen::VectorXd AbstractBicop::pdf(const Eigen::MatrixXd &u)
 {
+
+    Eigen::VectorXd pdf(u.rows());
+    if (discrete_vars_.size() == 0) {
+        pdf = pdf_raw(u);
+    } else if (discrete_vars_.size() == 1) {
+        pdf = pdf_cont_disc(u);
+    } else {
+        pdf = pdf_disc(u);
+    }
+
     auto trim = [] (const double &x) {
         return std::min(DBL_MAX, std::max(x, DBL_MIN));
     };
-    if (discrete_vars_.size() == 0) {
-        return tools_eigen::unaryExpr_or_nan(pdf_raw(u), trim);
-    }
+    return tools_eigen::unaryExpr_or_nan(pdf, trim);
+}
 
+inline Eigen::VectorXd AbstractBicop::pdf_cont_disc(const Eigen::MatrixXd &u)
+{
+    auto umax = u.leftCols(2);
+    auto umin = u.rightCols(2);
+    if (discrete_vars_[0] == 0) {
+        return hfunc2(umax) - hfunc2(umin);
+    } else {
+        return hfunc1(umax) - hfunc1(umin);
+    }
+}
+
+inline Eigen::VectorXd AbstractBicop::pdf_disc(const Eigen::MatrixXd &u)
+{
     Eigen::MatrixXd umax = u.leftCols(2);
     Eigen::MatrixXd umin = u.rightCols(2);
-    if (discrete_vars_.size() == 1) {
-        if (discrete_vars_[0] == 0) {
-            // std::cout << "umax: \n" << umax << std::endl <<
-            //              "umin: \n" << umin << "end" << std::endl;
-            // std::cout << hfunc2(umax) - hfunc2(umin) << std::endl;
-            return hfunc2(umax) - hfunc2(umin);
-        } else {
-            return hfunc1(umax) - hfunc1(umin);
-        }
-    }
-
     Eigen::VectorXd pdf = cdf(umax) + cdf(umin);
-    umax.col(0).swap(umax.col(0));
+    umax.col(0).swap(umin.col(0));
     pdf -= cdf(umax) + cdf(umin);
     return pdf;
 }

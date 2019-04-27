@@ -94,6 +94,11 @@ protected:
     Eigen::VectorXd hinv2_num(
         const Eigen::MatrixXd &u);
 
+    Eigen::VectorXd pdf_cont_disc(const Eigen::MatrixXd &u);
+
+    Eigen::VectorXd pdf_disc(const Eigen::MatrixXd &u);
+
+
     // Data members
     BicopFamily family_;
     double loglik_;

@@ -134,6 +134,8 @@ private:
 
     void check_rotation(int rotation) const;
 
+    void flip_discrete_vars();
+
     void check_weights_size(const Eigen::VectorXd& weights,
                             const Eigen::MatrixXd& data) const;
 
@@ -146,6 +148,7 @@ private:
     BicopPtr bicop_;
     int rotation_;
     size_t nobs_;
+    std::vector<size_t> discrete_vars_{};
 };
 }
 

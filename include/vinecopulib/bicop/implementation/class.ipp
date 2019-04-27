@@ -426,8 +426,18 @@ inline double Bicop::get_tau() const
 inline void Bicop::set_rotation(const int rotation)
 {
     check_rotation(rotation);
+    if ((rotation_ - rotation % 180) != 0) {
+        flip_discrete_vars();
+    }
     rotation_ = rotation;
     bicop_->set_loglik();
+}
+
+inline void Bicop::flip_discrete_vars()
+{
+    for (auto &var : bicop_->discrete_vars_) {
+        var = 1 - var;
+    }
 }
 
 inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters)
@@ -438,7 +448,11 @@ inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters)
 
 inline void Bicop::set_discrete_vars(const std::vector<size_t> discrete_vars)
 {
+    discrete_vars_ = discrete_vars;
     bicop_->set_discrete_vars(discrete_vars);
+    if (tools_stl::is_member(static_cast<size_t>(rotation_), {90, 270})) {
+        flip_discrete_vars();
+    }
 }
 //! @}
 
@@ -622,17 +636,15 @@ inline Eigen::MatrixXd Bicop::cut_and_rotate(
         if (rotation_ == 180) {
             u_new.leftCols(2).swap(u_new.rightCols(2));
         } else if (is_member(rotation_, {90, 270})) {
-            for (auto &var : bicop_->discrete_vars_) {
-                var = 1 - var;
-                if (var == 1 && rotation_ == 90) {
+            for (auto var : discrete_vars_) {
+                if (var == 0 && rotation_ == 90) {
                     u_new.col(1).swap(u_new.col(3));
                 }
-                if (var == 0 && rotation_ == 270) {
+                if (var == 1 && rotation_ == 270) {
                     u_new.col(0).swap(u_new.col(2));
                 }
             }
         }
-
         return u_new;
     }
 
