@@ -135,7 +135,7 @@ inline Eigen::VectorXd AbstractBicop::pdf(const Eigen::MatrixXd &u)
         if (discrete_vars_[0] == 0) {
             return hfunc2(umax) - hfunc2(umin);
         } else {
-            return hfunc2(umax) - hfunc2(umin);
+            return hfunc1(umax) - hfunc1(umin);
         }
     }
 

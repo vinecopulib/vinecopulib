@@ -613,7 +613,7 @@ inline void Bicop::select(const Eigen::MatrixXd &data,
 inline Eigen::MatrixXd Bicop::cut_and_rotate(
     const Eigen::MatrixXd &u) const
 {
-    Eigen::MatrixXd u_new(u.rows(), 2);
+    Eigen::MatrixXd u_new(u.rows(), u.cols());
 
     // counter-clockwise rotations
     switch (rotation_) {
@@ -639,7 +639,7 @@ inline Eigen::MatrixXd Bicop::cut_and_rotate(
 
     // truncate to interval [eps, 1 - eps]
     Eigen::MatrixXd eps =
-        Eigen::MatrixXd::Constant(u.rows(), 2, 1e-10);
+        Eigen::MatrixXd::Constant(u.rows(), 4, 1e-10);
     u_new = (1.0 - eps.array()).min(u_new.array());
     u_new = eps.array().max(u_new.array());
 

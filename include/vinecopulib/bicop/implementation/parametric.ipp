@@ -144,7 +144,7 @@ inline void ParBicop::fit(const Eigen::MatrixXd &data,
         // check if fit is reasonable, otherwise increase search interval
         // and refit
         if (tools_stl::is_member(family_, bicop_families::one_par)) {
-            if (my_data.objective_min > 0.1) {
+            if ((my_data.objective_min > 0.1) && (discrete_vars_.size() == 0)) {
                 // -loglik should always be negative!
                 lb = get_parameters_lower_bounds();
                 ub = get_parameters_upper_bounds();
