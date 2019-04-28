@@ -502,6 +502,7 @@ inline void Bicop::flip()
     } else {
         bicop_->flip();
     }
+    flip_discrete_vars();
 }
 
 //! summarizes the model into a string (can be used for printing).

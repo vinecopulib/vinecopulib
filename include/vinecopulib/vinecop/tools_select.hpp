@@ -48,8 +48,8 @@ struct VertexProperties
     std::vector<size_t> prev_edge_indices;
     Eigen::VectorXd hfunc1;
     Eigen::VectorXd hfunc2;
-    Eigen::VectorXd hfunc1_min;
-    Eigen::VectorXd hfunc2_min;
+    Eigen::VectorXd hfunc1_sub;
+    Eigen::VectorXd hfunc2_sub;
 };
 struct EdgeProperties
 {
@@ -57,11 +57,11 @@ struct EdgeProperties
     std::vector<size_t> conditioned;
     std::vector<size_t> all_indices;
     Eigen::MatrixXd pc_data;
-    Eigen::MatrixXd pc_data_min;
+    Eigen::MatrixXd pc_data_sub;
     Eigen::VectorXd hfunc1;
     Eigen::VectorXd hfunc2;
-    Eigen::VectorXd hfunc1_min;
-    Eigen::VectorXd hfunc2_min;
+    Eigen::VectorXd hfunc1_sub;
+    Eigen::VectorXd hfunc2_sub;
     double weight;
     double crit;
     vinecopulib::Bicop pair_copula;
@@ -133,8 +133,8 @@ protected:
 
     Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree &tree);
 
-    Eigen::MatrixXd get_pc_data_min(size_t v0, size_t v1, const VineTree &tree);
-    
+    Eigen::MatrixXd get_pc_data_sub(size_t v0, size_t v1, const VineTree &tree);
+
     ptrdiff_t find_common_neighbor(size_t v0, size_t v1,
                                    const VineTree &tree);
 
