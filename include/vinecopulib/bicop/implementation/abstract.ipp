@@ -249,27 +249,55 @@ inline Eigen::VectorXd AbstractBicop::pdf_dc_dc(const Eigen::MatrixXd &u)
 
 inline Eigen::VectorXd AbstractBicop::hfunc1(const Eigen::MatrixXd &u)
 {
-    if (var_types_[0] != "c") {
+    if (var_types_[0] == "c") {
+        return hfunc1_raw(u);
+    } else if (var_types_[0] == "d") {
         return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
                     (u.col(0) - u.col(2)).array();
     } else {
-        return hfunc1_raw(u);
+        var_types_[0] = "d";
+        Eigen::VectorXd h(u.rows());
+        Eigen::Matrix<double, 1, 4> tmp;
+        for (size_t i = 0; i < u.rows(); ++i) {
+            tmp.row(0) = u.row(i);
+            if (u(i, 0) == u(i, 2)) {
+                h(i) = hfunc1_raw(tmp.leftCols(2))(0);
+            } else {
+                h(i) = hfunc1(tmp)(0);
+            }
+        }
+        var_types_[0] = "dc";
+        return h;
     }
 }
 
 inline Eigen::VectorXd AbstractBicop::hfunc2(const Eigen::MatrixXd &u)
 {
-    if (var_types_[1] != "c") {
+    if (var_types_[1] == "c") {
+        return hfunc2_raw(u);
+    } else if (var_types_[1] == "d") {
         return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
                     (u.col(1) - u.col(3)).array();
     } else {
-        return hfunc2_raw(u);
+        var_types_[0] = "d";
+        Eigen::VectorXd h(u.rows());
+        Eigen::Matrix<double, 1, 4> tmp;
+        for (size_t i = 0; i < u.rows(); ++i) {
+            tmp.row(0) = u.row(i);
+            if (u(i, 1) == u(i, 3)) {
+                h(i) = hfunc2_raw(tmp.leftCols(2))(0);
+            } else {
+                h(i) = hfunc2(tmp)(0);
+            }
+        }
+        var_types_[0] = "dc";
+        return h;
     }
 }
 
 inline Eigen::VectorXd AbstractBicop::hinv1(const Eigen::MatrixXd &u)
 {
-    if (var_types_[0] != "d") {
+    if (var_types_[0] != "c") {
         return hinv1_num(u);
     } else {
         return hinv1_raw(u);
@@ -278,7 +306,7 @@ inline Eigen::VectorXd AbstractBicop::hinv1(const Eigen::MatrixXd &u)
 
 inline Eigen::VectorXd AbstractBicop::hinv2(const Eigen::MatrixXd &u)
 {
-    if (var_types_[0] != "d") {
+    if (var_types_[0] != "c") {
         return hinv2_num(u);
     } else {
         return hinv2_raw(u);
