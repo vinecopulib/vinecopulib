@@ -68,7 +68,7 @@ inline Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
 
 inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
                                         const FitControlsVinecop& controls,
-                                        std::vector<size_t> var_types) :
+                                        std::vector<std::string> var_types) :
     n_(data.rows()),
     d_(data.cols()),
     var_types_(var_types),
@@ -329,7 +329,7 @@ inline double VinecopSelector::get_next_threshold(
 inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
                                       const RVineStructure &vine_struct,
                                       const FitControlsVinecop &controls,
-                                      std::vector<size_t> var_types)
+                                      std::vector<std::string> var_types)
     : VinecopSelector(data, controls, var_types)
 {
     vine_struct_ = vine_struct;
@@ -340,7 +340,7 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
                                             const FitControlsVinecop &controls,
-                                            std::vector<size_t> var_types)
+                                            std::vector<std::string> var_types)
     : VinecopSelector(data, controls, var_types)
 {
     vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
@@ -546,6 +546,51 @@ inline void FamilySelector::finalize(size_t trunc_lvl)
 //! @param tree a vine tree.
 //! @return The pseudo-observations for the pair coula, extracted from
 //!     the h-functions calculated in the previous tree.
+inline void VinecopSelector::add_pc_info(const EdgeIterator &e, VineTree &tree)
+{
+    auto v0 = boost::source(e, tree);
+    auto v1 = boost::target(e, tree);
+    size_t n = tree[v0].hfunc1.size();
+    tree[e].pc_data = Eigen::MatrixXd(n, 4);
+
+    size_t ei_common = find_common_neighbor(v0, v1, tree);
+    if (find_position(ei_common, tree[v0].prev_edge_indices) == 0) {
+        tree[e].pc_data.col(0) = tree[v0].hfunc1;
+        if (tree[v0].var_types[0] != "c") {
+            tree[e].pc_data.col(2) = tree[v0].hfunc1_sub;
+        }
+        tree[e].var_types[0] = tree[v0].var_types[0];
+    } else {
+        tree[e].pc_data.col(0) = tree[v0].hfunc2;
+        if (tree[v0].var_types[1] != "c") {
+            tree[e].pc_data.col(2) = tree[v0].hfunc2_sub;
+        }
+        tree[e].var_types[0] = tree[v0].var_types[1];
+    }
+    if (find_position(ei_common, tree[v1].prev_edge_indices) == 0) {
+        tree[e].pc_data.col(1) = tree[v1].hfunc1;
+        if (tree[v0].var_types[0] != "c") {
+            tree[e].pc_data.col(3) = tree[v0].hfunc1_sub;
+        }
+        tree[e].var_types[1] = tree[v1].var_types[0];
+    } else {
+        tree[e].pc_data.col(1) = tree[v1].hfunc2;
+        if (tree[v0].var_types[1] != "c") {
+            tree[e].pc_data.col(3) = tree[v0].hfunc2_sub;
+        }
+        tree[e].var_types[1] = tree[v1].var_types[1];
+    }
+    if (tools_stl::set_diff(tree[e].var_types, {"c"}).empty()) {
+        tree[e].pc_data.conservativeResize(n, 2);
+    }
+
+    tree[e].conditioned = set_sym_diff(tree[v0].all_indices,
+                                       tree[v1].all_indices);
+    tree[e].conditioning = intersect(tree[v0].all_indices,
+                                     tree[v1].all_indices);
+    tree[e].all_indices = cat(tree[e].conditioned, tree[e].conditioning);
+}
+
 inline Eigen::MatrixXd VinecopSelector::get_pc_data(size_t v0, size_t v1,
                                                     const VineTree &tree)
 {
@@ -557,37 +602,12 @@ inline Eigen::MatrixXd VinecopSelector::get_pc_data(size_t v0, size_t v1,
         pc_data.col(0) = tree[v0].hfunc2;
     }
     if (find_position(ei_common, tree[v1].prev_edge_indices) == 0) {
-        pc_data.col(1) = tree[v1].hfunc1;
+        pc_data.col(1) = tree[v0].hfunc1;
     } else {
-        pc_data.col(1) = tree[v1].hfunc2;
+        pc_data.col(1) = tree[v0].hfunc2;
     }
 
     return pc_data;
-}
-
-//! Extract pair copula pseudo-observations from h-functions
-//!
-//! @param v0,v1 vertex indices.
-//! @param tree a vine tree.
-//! @return The pseudo-observations for the pair coula, extracted from
-//!     the h-functions calculated in the previous tree.
-inline Eigen::MatrixXd VinecopSelector::get_pc_data_sub(size_t v0, size_t v1,
-                                                        const VineTree &tree)
-{
-    Eigen::MatrixXd pc_data_sub(tree[v0].hfunc1_sub.size(), 2);
-    size_t ei_common = find_common_neighbor(v0, v1, tree);
-    if (find_position(ei_common, tree[v0].prev_edge_indices) == 0) {
-        pc_data_sub.col(0) = tree[v0].hfunc1_sub;
-    } else {
-        pc_data_sub.col(0) = tree[v0].hfunc2_sub;
-    }
-    if (find_position(ei_common, tree[v1].prev_edge_indices) == 0) {
-        pc_data_sub.col(1) = tree[v0].hfunc1_sub;
-    } else {
-        pc_data_sub.col(1) = tree[v0].hfunc2_sub;
-    }
-
-    return pc_data_sub;
 }
 
 
@@ -752,8 +772,9 @@ inline VineTree VinecopSelector::make_base_tree(const Eigen::MatrixXd &data)
         // data need are reordered to correspond to natural order (neccessary
         // when structure is fixed)
         base_tree[e].hfunc1.col(0) = data.col(order[target] - 1);
-        if (tools_stl::is_member(order[target] - 1, var_types_)) {
-            base_tree[e].hfunc1_sub = data.col(d_ + order[target] - 1);
+        if (var_types_[order[target] - 1] != "c") {
+            base_tree[e].hfunc1 = data.col(d_ + order[target] - 1);
+            base_tree[e].var_types[0] = var_types_[order[target] - 1];
         }
         // identify edge with variable "target" and initialize sets
         base_tree[e].conditioned.reserve(2);
@@ -791,6 +812,7 @@ inline VineTree VinecopSelector::edges_as_vertices(const VineTree &prev_tree)
         new_tree[i].prev_edge_indices.reserve(2);
         new_tree[i].prev_edge_indices.push_back(boost::source(e, prev_tree));
         new_tree[i].prev_edge_indices.push_back(boost::target(e, prev_tree));
+        new_tree[i].var_types = prev_tree[e].var_types;
         ++i;
     }
 
@@ -860,15 +882,7 @@ inline void VinecopSelector::min_spanning_tree(VineTree &graph)
 inline void VinecopSelector::add_edge_info(VineTree &tree)
 {
     for (auto e : boost::edges(tree)) {
-        auto v0 = boost::source(e, tree);
-        auto v1 = boost::target(e, tree);
-        tree[e].pc_data = get_pc_data(v0, v1, tree);
-        tree[e].pc_data_sub = get_pc_data_sub(v0, v1, tree);
-        tree[e].conditioned = set_sym_diff(tree[v0].all_indices,
-                                           tree[v1].all_indices);
-        tree[e].conditioning = intersect(tree[v0].all_indices,
-                                         tree[v1].all_indices);
-        tree[e].all_indices = cat(tree[e].conditioned, tree[e].conditioning);
+        add_pc_info(e, tree);
     }
 }
 
@@ -880,9 +894,9 @@ inline void VinecopSelector::remove_edge_data(VineTree &tree)
         tree[e].hfunc1 = Eigen::VectorXd();
         tree[e].hfunc2 = Eigen::VectorXd();
         tree[e].pc_data = Eigen::MatrixXd(0, 2);
-        tree[e].hfunc1_sub = Eigen::VectorXd();
-        tree[e].hfunc2_sub = Eigen::VectorXd();
-        tree[e].pc_data_sub = Eigen::MatrixXd(0, 2);
+        tree[e].hfunc1 = Eigen::VectorXd();
+        tree[e].hfunc2 = Eigen::VectorXd();
+        tree[e].pc_data = Eigen::MatrixXd(0, 2);
     }
 }
 
@@ -893,22 +907,9 @@ inline void VinecopSelector::remove_vertex_data(VineTree &tree)
     for (auto v : boost::vertices(tree)) {
         tree[v].hfunc1 = Eigen::VectorXd();
         tree[v].hfunc2 = Eigen::VectorXd();
-        tree[v].hfunc1_sub = Eigen::VectorXd();
-        tree[v].hfunc2_sub = Eigen::VectorXd();
+        tree[v].hfunc1 = Eigen::VectorXd();
+        tree[v].hfunc2 = Eigen::VectorXd();
     }
-}
-
-inline std::vector<size_t> get_var_types(const Eigen::MatrixXd &u,
-                                             const Eigen::MatrixXd &u_sub)
-{
-    std::vector<size_t> var_types{};
-    if (u(0, 0) != u_sub(0, 0)) {
-        var_types.push_back(1);
-    }
-    if (u(0, 1) != u_sub(0, 1)) {
-        var_types.push_back(2);
-    }
-    return var_types;
 }
 
 //! Fit and select a pair copula for each edges
@@ -938,29 +939,22 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
             if (is_thresholded) {
                 tree[e].pair_copula = vinecopulib::Bicop();
             } else {
-                auto dv = get_var_types(tree[e].pc_data, tree[e].pc_data_sub);
-                if (dv.size() > 0) {
-                    tree[e].pair_copula.set_var_types(dv);
-                    tree[e].pc_data.conservativeResize(tree[e].pc_data.rows(), 4);
-                    tree[e].pc_data.rightCols(2) = tree[e].pc_data_sub;
-                }
                 tree[e].pair_copula.select(tree[e].pc_data, controls_);
             }
         }
+        tree[e].pair_copula.set_var_types(tree[e].var_types);
 
         tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
         tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
-        if (tools_stl::is_member(static_cast<size_t>(2),
-                                 tree[e].pair_copula.get_var_types())) {
-            tree[e].hfunc1_sub = tree[e].pair_copula.hfunc1(tree[e].pc_data_sub);
+        if (true) {
+            tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
         } else {
-            tree[e].hfunc1_sub = tree[e].hfunc1;
+            tree[e].hfunc1 = tree[e].hfunc1;
         }
-        if (tools_stl::is_member(static_cast<size_t>(1),
-                                 tree[e].pair_copula.get_var_types())) {
-            tree[e].hfunc2_sub = tree[e].pair_copula.hfunc2(tree[e].pc_data_sub);
+        if (true) {
+            tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
         } else {
-            tree[e].hfunc2_sub = tree[e].hfunc2;
+            tree[e].hfunc2 = tree[e].hfunc2;
         }
         tree[e].loglik = tree[e].pair_copula.get_loglik();
         if (controls_.needs_sparse_select()) {

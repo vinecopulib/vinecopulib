@@ -50,6 +50,7 @@ struct VertexProperties
     Eigen::VectorXd hfunc2;
     Eigen::VectorXd hfunc1_sub;
     Eigen::VectorXd hfunc2_sub;
+    std::vector<std::string> var_types{"c"};
 };
 struct EdgeProperties
 {
@@ -57,11 +58,11 @@ struct EdgeProperties
     std::vector<size_t> conditioned;
     std::vector<size_t> all_indices;
     Eigen::MatrixXd pc_data;
-    Eigen::MatrixXd pc_data_sub;
     Eigen::VectorXd hfunc1;
     Eigen::VectorXd hfunc2;
     Eigen::VectorXd hfunc1_sub;
     Eigen::VectorXd hfunc2_sub;
+    std::vector<std::string> var_types{"c", "c"};
     double weight;
     double crit;
     vinecopulib::Bicop pair_copula;
@@ -84,7 +85,7 @@ class VinecopSelector
 public:
     VinecopSelector(const Eigen::MatrixXd& data,
                     const FitControlsVinecop& controls,
-                    std::vector<size_t> var_types = std::vector<size_t>());
+                    std::vector<std::string> var_types = std::vector<std::string>());
 
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
@@ -131,9 +132,9 @@ protected:
 
     virtual void add_allowed_edges(VineTree &tree) = 0;
 
-    Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree &tree);
+    void add_pc_info(const EdgeIterator &e, VineTree &tree);
 
-    Eigen::MatrixXd get_pc_data_sub(size_t v0, size_t v1, const VineTree &tree);
+    Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree &tree);
 
     ptrdiff_t find_common_neighbor(size_t v0, size_t v1,
                                    const VineTree &tree);
@@ -142,7 +143,7 @@ protected:
 
     size_t n_;
     size_t d_;
-    std::vector<size_t> var_types_;
+    std::vector<std::string> var_types_;
     FitControlsVinecop controls_;
     tools_thread::ThreadPool pool_;
     std::vector<VineTree> trees_;
@@ -188,7 +189,7 @@ class StructureSelector : public VinecopSelector
 public:
     StructureSelector(const Eigen::MatrixXd &data,
                       const FitControlsVinecop &controls,
-                      std::vector<size_t> var_types = std::vector<size_t>());
+                      std::vector<std::string> var_types = std::vector<std::string>());
 
     ~StructureSelector()
     {
@@ -206,7 +207,7 @@ public:
     FamilySelector(const Eigen::MatrixXd &data,
                    const RVineStructure &vine_struct,
                    const FitControlsVinecop &controls,
-                   std::vector<size_t> var_types = std::vector<size_t>());
+                   std::vector<std::string> var_types = std::vector<std::string>());
 
     ~FamilySelector()
     {

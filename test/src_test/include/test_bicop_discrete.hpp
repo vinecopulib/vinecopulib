@@ -25,7 +25,7 @@ TEST(bicop_discrete, rotations_are_correct) {
 
         u_new.col(0) = (u.col(0).array() * 2).ceil() / 2;
         u_new.col(2) = (u.col(0).array() * 2).floor() / 2;
-        bc.set_var_types({1});
+        bc.set_var_types({"d", "c"});
         EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
         bc.fit(u_new);
         EXPECT_NEAR(bc.get_parameters()(0), 3, 0.3);
@@ -34,14 +34,14 @@ TEST(bicop_discrete, rotations_are_correct) {
         u_new.block(0, 2, u.rows(), 2) = u;
         u_new.col(1) = (u.col(1).array() * 2).ceil() / 2;
         u_new.col(3) = (u.col(1).array() * 2).floor() / 2;
-        bc.set_var_types({2});
+        bc.set_var_types({"c", "d"});
         EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
         bc.fit(u_new);
         EXPECT_NEAR(bc.get_parameters()(0), 3, 0.3);
 
         u_new.col(0) = (u_new.col(0).array() * 2).ceil() / 2.0;
         u_new.col(2) = (u_new.col(2).array() * 2).floor() / 2.0;
-        bc.set_var_types({1, 2});
+        bc.set_var_types({"d", "d"});
         EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
         bc.fit(u_new);
         EXPECT_NEAR(bc.get_parameters()(0), 3, 0.3);
@@ -49,22 +49,22 @@ TEST(bicop_discrete, rotations_are_correct) {
 }
 
 TEST(bicop_discrete, playground) {
-    for (auto rot : {0}) {
-        auto bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
-        auto u = bc.simulate(20, true, {1});
-        // std::cout << u << std::endl<< std::endl;
-
-        Eigen::MatrixXd u_new(u.rows(), 4);
-        u_new.block(0, 0, u.rows(), 2) = u;
-        u_new.block(0, 2, u.rows(), 2) = u;
-
-        u_new.col(0) = (u.col(0).array() * 2).ceil() / 2;
-        u_new.col(2) = (u.col(0).array() * 2).floor() / 2;
-        u_new.col(1) = (u.col(1).array() * 2).ceil() / 2;
-        u_new.col(3) = (u.col(1).array() * 2).floor() / 2;
-        bc.set_var_types({1, 2});
-        bc.fit(u_new);
-    }
+    // for (auto rot : {0}) {
+    //     auto bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
+    //     auto u = bc.simulate(20, true, {1});
+    //     // std::cout << u << std::endl<< std::endl;
+    //
+    //     Eigen::MatrixXd u_new(u.rows(), 4);
+    //     u_new.block(0, 0, u.rows(), 2) = u;
+    //     u_new.block(0, 2, u.rows(), 2) = u;
+    //
+    //     u_new.col(0) = (u.col(0).array() * 2).ceil() / 2;
+    //     u_new.col(2) = (u.col(0).array() * 2).floor() / 2;
+    //     u_new.col(1) = (u.col(1).array() * 2).ceil() / 2;
+    //     u_new.col(3) = (u.col(1).array() * 2).floor() / 2;
+    //     bc.set_var_types({"d", "d"});
+    //     bc.fit(u_new);
+    // }
 }
 
 }
