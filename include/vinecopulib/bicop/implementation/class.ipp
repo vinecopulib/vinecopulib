@@ -449,7 +449,7 @@ inline void Bicop::check_data_dim(const Eigen::MatrixXd &u) const
 
 inline void Bicop::flip_var_types()
 {
-    std::swap(var_types_[0], var_types_[1]);
+    std::swap(bicop_->var_types_[0], bicop_->var_types_[1]);
 }
 
 inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters)
@@ -463,9 +463,11 @@ inline void Bicop::set_var_types(const std::vector<std::string> &var_types)
     if (var_types.size() != 2) {
         throw std::runtime_error("var_types must have size two.");
     }
-    if (!tools_stl::set_diff(var_types, {"c", "dc", "d"}).empty()) {
-        throw std::runtime_error(
-            "Discrete variables must be a subset of {'c', 'd', 'dc'}.");
+    for (auto t : var_types) {
+        if (!tools_stl::is_member(t, {"c", "d", "dc"})) {
+            throw std::runtime_error(
+                "each var type must be one of {'c', 'd', 'dc'}.");
+        }
     }
     var_types_ = var_types;
     bicop_->set_var_types(var_types);
