@@ -68,10 +68,10 @@ inline Eigen::MatrixXd calculate_criterion_matrix(const Eigen::MatrixXd &data,
 
 inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
                                         const FitControlsVinecop& controls,
-                                        std::vector<size_t> discrete_vars) :
+                                        std::vector<size_t> var_types) :
     n_(data.rows()),
     d_(data.cols()),
-    discrete_vars_(discrete_vars),
+    var_types_(var_types),
     controls_(controls),
     pool_(controls_.get_num_threads()),
     trees_(std::vector<VineTree>(1))
@@ -329,8 +329,8 @@ inline double VinecopSelector::get_next_threshold(
 inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
                                       const RVineStructure &vine_struct,
                                       const FitControlsVinecop &controls,
-                                      std::vector<size_t> discrete_vars)
-    : VinecopSelector(data, controls, discrete_vars)
+                                      std::vector<size_t> var_types)
+    : VinecopSelector(data, controls, var_types)
 {
     vine_struct_ = vine_struct;
     if (vine_struct.get_trunc_lvl() < controls.get_trunc_lvl()) {
@@ -340,8 +340,8 @@ inline FamilySelector::FamilySelector(const Eigen::MatrixXd &data,
 
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd &data,
                                             const FitControlsVinecop &controls,
-                                            std::vector<size_t> discrete_vars)
-    : VinecopSelector(data, controls, discrete_vars)
+                                            std::vector<size_t> var_types)
+    : VinecopSelector(data, controls, var_types)
 {
     vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
 }
@@ -752,7 +752,7 @@ inline VineTree VinecopSelector::make_base_tree(const Eigen::MatrixXd &data)
         // data need are reordered to correspond to natural order (neccessary
         // when structure is fixed)
         base_tree[e].hfunc1.col(0) = data.col(order[target] - 1);
-        if (tools_stl::is_member(order[target] - 1, discrete_vars_)) {
+        if (tools_stl::is_member(order[target] - 1, var_types_)) {
             base_tree[e].hfunc1_sub = data.col(d_ + order[target] - 1);
         }
         // identify edge with variable "target" and initialize sets
@@ -898,17 +898,17 @@ inline void VinecopSelector::remove_vertex_data(VineTree &tree)
     }
 }
 
-inline std::vector<size_t> get_discrete_vars(const Eigen::MatrixXd &u,
+inline std::vector<size_t> get_var_types(const Eigen::MatrixXd &u,
                                              const Eigen::MatrixXd &u_sub)
 {
-    std::vector<size_t> discrete_vars{};
+    std::vector<size_t> var_types{};
     if (u(0, 0) != u_sub(0, 0)) {
-        discrete_vars.push_back(1);
+        var_types.push_back(1);
     }
     if (u(0, 1) != u_sub(0, 1)) {
-        discrete_vars.push_back(2);
+        var_types.push_back(2);
     }
-    return discrete_vars;
+    return var_types;
 }
 
 //! Fit and select a pair copula for each edges
@@ -938,9 +938,9 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
             if (is_thresholded) {
                 tree[e].pair_copula = vinecopulib::Bicop();
             } else {
-                auto dv = get_discrete_vars(tree[e].pc_data, tree[e].pc_data_sub);
+                auto dv = get_var_types(tree[e].pc_data, tree[e].pc_data_sub);
                 if (dv.size() > 0) {
-                    tree[e].pair_copula.set_discrete_vars(dv);
+                    tree[e].pair_copula.set_var_types(dv);
                     tree[e].pc_data.conservativeResize(tree[e].pc_data.rows(), 4);
                     tree[e].pc_data.rightCols(2) = tree[e].pc_data_sub;
                 }
@@ -951,13 +951,13 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
         tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
         tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
         if (tools_stl::is_member(static_cast<size_t>(2),
-                                 tree[e].pair_copula.get_discrete_vars())) {
+                                 tree[e].pair_copula.get_var_types())) {
             tree[e].hfunc1_sub = tree[e].pair_copula.hfunc1(tree[e].pc_data_sub);
         } else {
             tree[e].hfunc1_sub = tree[e].hfunc1;
         }
         if (tools_stl::is_member(static_cast<size_t>(1),
-                                 tree[e].pair_copula.get_discrete_vars())) {
+                                 tree[e].pair_copula.get_var_types())) {
             tree[e].hfunc2_sub = tree[e].pair_copula.hfunc2(tree[e].pc_data_sub);
         } else {
             tree[e].hfunc2_sub = tree[e].hfunc2;

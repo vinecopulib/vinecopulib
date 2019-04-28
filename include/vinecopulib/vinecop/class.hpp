@@ -137,7 +137,7 @@ public:
     double get_mbicv(const double psi0) const;
 
 
-    void set_discrete_vars(std::vector<size_t> discrete_vars);
+    void set_var_types(std::vector<size_t> var_types);
 
     // Stats methods
     Eigen::VectorXd pdf(const Eigen::MatrixXd &u,
@@ -182,7 +182,7 @@ protected:
     double threshold_;
     double loglik_;
     size_t nobs_;
-    std::vector<size_t> discrete_vars_{};
+    std::vector<size_t> var_types_{};
 
     void check_data_dim(const Eigen::MatrixXd &data) const;
     void check_pair_copulas_rvine_structure(

@@ -40,12 +40,12 @@ protected:
 
     void set_loglik(const double loglik = NAN);
 
-    void set_discrete_vars(const std::vector<size_t> discrete_vars)
+    void set_var_types(const std::vector<std::string>& var_types)
     {
-        if (discrete_vars.size() > 2) {
-            throw std::runtime_error("too many discrete variables; only two allowed.");
+        if (var_types.size() != 2) {
+            throw std::runtime_error("var_types must have size two.");
         }
-        discrete_vars_ = discrete_vars;
+        var_types_ = var_types;
     }
 
     virtual Eigen::MatrixXd get_parameters() const = 0;
@@ -94,29 +94,26 @@ protected:
 
     Eigen::VectorXd hinv2_num(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd pdf_mixed(const Eigen::MatrixXd &u);
+    Eigen::VectorXd pdf_c_d(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd pdf_discrete(const Eigen::MatrixXd &u);
+    Eigen::VectorXd pdf_c_dc(const Eigen::MatrixXd &u);
 
-    bool is_continuous() const
-    {
-        return (discrete_vars_.size() == 0);
-    }
+    Eigen::VectorXd pdf_d_d(const Eigen::MatrixXd &u);
 
-    bool is_mixed() const
-    {
-        return (discrete_vars_.size() == 1);
-    }
+    Eigen::VectorXd pdf_dc_d(const Eigen::MatrixXd &u);
 
-    bool is_discrete() const
-    {
-        return (discrete_vars_.size() == 2);
+    Eigen::VectorXd pdf_dc_dc(const Eigen::MatrixXd &u);
+
+    std::string get_vars_type() const {
+        auto types = var_types_;
+        std::sort(types.begin(), types.end());
+        return types[0] + "_" + types[1];
     }
 
     // Data members
     BicopFamily family_;
     double loglik_;
-    std::vector<size_t> discrete_vars_{};
+    std::vector<std::string> var_types_{"c", "c"};
 };
 
 //! A shared pointer to an object of class AbstracBicop.

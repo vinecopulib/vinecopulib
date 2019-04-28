@@ -415,7 +415,7 @@ inline void Bicop::set_rotation(const int rotation)
 {
     check_rotation(rotation);
     if ((rotation_ - rotation % 180) != 0) {
-        flip_discrete_vars();
+        flip_var_types();
     }
     rotation_ = rotation;
     bicop_->set_loglik();
@@ -431,14 +431,15 @@ inline void Bicop::check_data(const Eigen::MatrixXd &u) const
 inline void Bicop::check_data_dim(const Eigen::MatrixXd &u) const
 {
     size_t d_u = u.cols();
-    size_t d_exp = bicop_->is_continuous() ? 2 : 4;
+    bool is_continuous = (var_types_[0] == "c") && (var_types_[1] == "c");
+    size_t d_exp = is_continuous ? 2 : 4;
     if (d_u != d_exp) {
         std::stringstream msg;
         msg << "data has wrong number of columns; " <<
             "expected: " << d_exp <<
             ", actual: " << d_u <<
             "(model contains ";
-        if (bicop_->is_continuous()) {
+        if (is_continuous) {
             msg << "no ";
         }
         msg << "discrete variables)." <<std::endl;
@@ -446,11 +447,9 @@ inline void Bicop::check_data_dim(const Eigen::MatrixXd &u) const
     }
 }
 
-inline void Bicop::flip_discrete_vars()
+inline void Bicop::flip_var_types()
 {
-    for (auto &var : bicop_->discrete_vars_) {
-        var = 3 - var;
-    }
+    std::swap(var_types_[0], var_types_[1]);
 }
 
 inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters)
@@ -459,26 +458,25 @@ inline void Bicop::set_parameters(const Eigen::MatrixXd &parameters)
     bicop_->set_loglik();
 }
 
-inline void Bicop::set_discrete_vars(const std::vector<size_t> discrete_vars)
+inline void Bicop::set_var_types(const std::vector<std::string> &var_types)
 {
-    if (discrete_vars.size() > 2) {
-        throw std::runtime_error(
-            "A Bicop model cannot have more than two discrete variables.");
+    if (var_types.size() != 2) {
+        throw std::runtime_error("var_types must have size two.");
     }
-    if (!tools_stl::set_diff(discrete_vars, {1, 2}).empty()) {
+    if (!tools_stl::set_diff(var_types, {"c", "dc", "d"}).empty()) {
         throw std::runtime_error(
-            "Discrete variables must be a subset of {1, 2}.");
+            "Discrete variables must be a subset of {'c', 'd', 'dc'}.");
     }
-    discrete_vars_ = discrete_vars;
-    bicop_->set_discrete_vars(discrete_vars);
+    var_types_ = var_types;
+    bicop_->set_var_types(var_types);
     if (tools_stl::is_member(static_cast<size_t>(rotation_), {90, 270})) {
-        flip_discrete_vars();
+        flip_var_types();
     }
 }
 
-inline std::vector<size_t> Bicop::get_discrete_vars() const
+inline std::vector<std::string> Bicop::get_var_types() const
 {
-    return discrete_vars_;
+    return var_types_;
 }
 //! @}
 
@@ -502,7 +500,7 @@ inline void Bicop::flip()
     } else {
         bicop_->flip();
     }
-    flip_discrete_vars();
+    flip_var_types();
 }
 
 //! summarizes the model into a string (can be used for printing).
@@ -663,13 +661,11 @@ inline Eigen::MatrixXd Bicop::cut_and_rotate(
         if (rotation_ == 180) {
             u_new.leftCols(2).swap(u_new.rightCols(2));
         } else if (is_member(rotation_, {90, 270})) {
-            for (auto var : discrete_vars_) {
-                if (var == 1 && rotation_ == 90) {
-                    u_new.col(1).swap(u_new.col(3));
-                }
-                if (var == 2 && rotation_ == 270) {
-                    u_new.col(0).swap(u_new.col(2));
-                }
+            if (var_types_[0] != "c" && rotation_ == 90) {
+                u_new.col(1).swap(u_new.col(3));
+            }
+            if (var_types_[1] != "c" && rotation_ == 270) {
+                u_new.col(0).swap(u_new.col(2));
             }
         }
         return u_new;

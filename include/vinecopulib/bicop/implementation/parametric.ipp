@@ -144,7 +144,8 @@ inline void ParBicop::fit(const Eigen::MatrixXd &data,
         // check if fit is reasonable, otherwise increase search interval
         // and refit
         if (tools_stl::is_member(family_, bicop_families::one_par)) {
-            if ((my_data.objective_min > 0.1) && is_continuous()) {
+            bool is_continuous = (var_types_[0] == "c") && (var_types_[1] == "c");
+            if ((my_data.objective_min > 0.1) && is_continuous) {
                 // -loglik should always be negative!
                 lb = get_parameters_lower_bounds();
                 ub = get_parameters_upper_bounds();

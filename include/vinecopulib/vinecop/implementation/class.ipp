@@ -613,24 +613,24 @@ inline double Vinecop::get_threshold() const
     return threshold_;
 }
 
-inline void Vinecop::set_discrete_vars(std::vector<size_t> discrete_vars)
+inline void Vinecop::set_var_types(std::vector<size_t> var_types)
 {
     std::stringstream msg;
-    if (discrete_vars.size() > d_) {
+    if (var_types.size() > d_) {
         msg <<
             d_ << "-dimensional Vinecop model cannot have more than " <<
             d_ << " discrete variables." <<
             std::endl;
     }
     auto allowed_vars = tools_stl::seq_int(0, d_ - 1);
-    if (!tools_stl::set_diff(discrete_vars, allowed_vars).empty()) {
+    if (!tools_stl::set_diff(var_types, allowed_vars).empty()) {
         msg << "Discrete variables must be a subset of {0, .., d - 1}." <<
             std::endl;
     }
     if (!msg.str().empty()) {
         throw std::runtime_error(msg.str());
     }
-    discrete_vars_ = discrete_vars;
+    var_types_ = var_types;
 }
 
 
@@ -1058,7 +1058,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
 inline void Vinecop::check_data_dim(const Eigen::MatrixXd &data) const
 {
     size_t d_data = data.cols();
-    bool is_discrete = discrete_vars_.size() > 0;
+    bool is_discrete = var_types_.size() > 0;
     size_t d_exp = is_discrete > 0 ? d_ : 2 * d_;
     if (d_data != d_exp) {
         std::stringstream msg;

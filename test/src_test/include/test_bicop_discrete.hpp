@@ -25,7 +25,7 @@ TEST(bicop_discrete, rotations_are_correct) {
 
         u_new.col(0) = (u.col(0).array() * 2).ceil() / 2;
         u_new.col(2) = (u.col(0).array() * 2).floor() / 2;
-        bc.set_discrete_vars({1});
+        bc.set_var_types({1});
         EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
         bc.fit(u_new);
         EXPECT_NEAR(bc.get_parameters()(0), 3, 0.3);
@@ -34,14 +34,14 @@ TEST(bicop_discrete, rotations_are_correct) {
         u_new.block(0, 2, u.rows(), 2) = u;
         u_new.col(1) = (u.col(1).array() * 2).ceil() / 2;
         u_new.col(3) = (u.col(1).array() * 2).floor() / 2;
-        bc.set_discrete_vars({2});
+        bc.set_var_types({2});
         EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
         bc.fit(u_new);
         EXPECT_NEAR(bc.get_parameters()(0), 3, 0.3);
 
         u_new.col(0) = (u_new.col(0).array() * 2).ceil() / 2.0;
         u_new.col(2) = (u_new.col(2).array() * 2).floor() / 2.0;
-        bc.set_discrete_vars({1, 2});
+        bc.set_var_types({1, 2});
         EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
         bc.fit(u_new);
         EXPECT_NEAR(bc.get_parameters()(0), 3, 0.3);
@@ -62,7 +62,7 @@ TEST(bicop_discrete, playground) {
         u_new.col(2) = (u.col(0).array() * 2).floor() / 2;
         u_new.col(1) = (u.col(1).array() * 2).ceil() / 2;
         u_new.col(3) = (u.col(1).array() * 2).floor() / 2;
-        bc.set_discrete_vars({1, 2});
+        bc.set_var_types({1, 2});
         bc.fit(u_new);
     }
 }

@@ -61,8 +61,8 @@ public:
 
     void set_parameters(const Eigen::MatrixXd &parameters);
 
-    void set_discrete_vars(const std::vector<size_t> discrete_vars);
-    std::vector<size_t> get_discrete_vars() const;
+    void set_var_types(const std::vector<std::string> &var_types);
+    std::vector<std::string> get_var_types() const;
 
     // Stats methods
     Eigen::VectorXd pdf(const Eigen::MatrixXd &u) const;
@@ -125,7 +125,7 @@ private:
 
     void check_data_dim(const Eigen::MatrixXd &u) const;
 
-    void flip_discrete_vars();
+    void flip_var_types();
 
     void check_weights_size(const Eigen::VectorXd& weights,
                             const Eigen::MatrixXd& data) const;
@@ -139,7 +139,7 @@ private:
     BicopPtr bicop_;
     int rotation_;
     size_t nobs_;
-    std::vector<size_t> discrete_vars_{};
+    std::vector<std::string> var_types_{"c", "c"};
 };
 }
 
