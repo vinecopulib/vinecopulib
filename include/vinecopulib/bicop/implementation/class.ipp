@@ -449,7 +449,7 @@ inline void Bicop::check_data_dim(const Eigen::MatrixXd &u) const
 inline void Bicop::flip_discrete_vars()
 {
     for (auto &var : bicop_->discrete_vars_) {
-        var = 1 - var;
+        var = 3 - var;
     }
 }
 
@@ -465,15 +465,20 @@ inline void Bicop::set_discrete_vars(const std::vector<size_t> discrete_vars)
         throw std::runtime_error(
             "A Bicop model cannot have more than two discrete variables.");
     }
-    if (!tools_stl::set_diff(discrete_vars, {0, 1}).empty()) {
+    if (!tools_stl::set_diff(discrete_vars, {1, 2}).empty()) {
         throw std::runtime_error(
-            "Discrete variables must be a subset of {0, 1}.");
+            "Discrete variables must be a subset of {1, 2}.");
     }
     discrete_vars_ = discrete_vars;
     bicop_->set_discrete_vars(discrete_vars);
     if (tools_stl::is_member(static_cast<size_t>(rotation_), {90, 270})) {
         flip_discrete_vars();
     }
+}
+
+inline std::vector<size_t> Bicop::get_discrete_vars() const
+{
+    return discrete_vars_;
 }
 //! @}
 
@@ -658,10 +663,10 @@ inline Eigen::MatrixXd Bicop::cut_and_rotate(
             u_new.leftCols(2).swap(u_new.rightCols(2));
         } else if (is_member(rotation_, {90, 270})) {
             for (auto var : discrete_vars_) {
-                if (var == 0 && rotation_ == 90) {
+                if (var == 1 && rotation_ == 90) {
                     u_new.col(1).swap(u_new.col(3));
                 }
-                if (var == 1 && rotation_ == 270) {
+                if (var == 2 && rotation_ == 270) {
                     u_new.col(0).swap(u_new.col(2));
                 }
             }

@@ -62,6 +62,7 @@ public:
     void set_parameters(const Eigen::MatrixXd &parameters);
 
     void set_discrete_vars(const std::vector<size_t> discrete_vars);
+    std::vector<size_t> get_discrete_vars() const;
 
     // Stats methods
     Eigen::VectorXd pdf(const Eigen::MatrixXd &u) const;

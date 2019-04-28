@@ -921,12 +921,24 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
             if (is_thresholded) {
                 tree[e].pair_copula = vinecopulib::Bicop();
             } else {
+                if (tree[e].pc_data_min.rows() > 0) {
+                    tree[e].pc_data.conservativeResize(tree[e].pc_data.rows(), 4);
+                    tree[e].pc_data.rightCols(2) = tree[e].pc_data_min;
+                }
                 tree[e].pair_copula.select(tree[e].pc_data, controls_);
             }
         }
 
         tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
         tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
+        if (tools_stl::is_member(static_cast<size_t>(2),
+                                 tree[e].pair_copula.get_discrete_vars())) {
+            tree[e].hfunc1_min = tree[e].pair_copula.hfunc1(tree[e].pc_data_min);
+        }
+        if (tools_stl::is_member(static_cast<size_t>(1),
+                                 tree[e].pair_copula.get_discrete_vars())) {
+            tree[e].hfunc1_min = tree[e].pair_copula.hfunc1(tree[e].pc_data_min);
+        }
         tree[e].loglik = tree[e].pair_copula.get_loglik();
         if (controls_.needs_sparse_select()) {
             tree[e].npars = tree[e].pair_copula.calculate_npars();

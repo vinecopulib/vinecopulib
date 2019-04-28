@@ -143,7 +143,7 @@ inline Eigen::VectorXd AbstractBicop::pdf_mixed(const Eigen::MatrixXd &u)
 {
     auto umax = u.leftCols(2);
     auto umin = u.rightCols(2);
-    if (discrete_vars_[0] == 0) {
+    if (discrete_vars_[0] == 1) {
         return hfunc2_raw(umax) - hfunc2_raw(umin);
     } else {
         return hfunc1_raw(umax) - hfunc1_raw(umin);
@@ -162,7 +162,7 @@ inline Eigen::VectorXd AbstractBicop::pdf_discrete(const Eigen::MatrixXd &u)
 
 inline Eigen::VectorXd AbstractBicop::hfunc1(const Eigen::MatrixXd &u)
 {
-    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 0))) {
+    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 1))) {
         return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
                     (u.col(0) - u.col(2)).array();
     } else {
@@ -172,7 +172,7 @@ inline Eigen::VectorXd AbstractBicop::hfunc1(const Eigen::MatrixXd &u)
 
 inline Eigen::VectorXd AbstractBicop::hfunc2(const Eigen::MatrixXd &u)
 {
-    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 1))) {
+    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 2))) {
         return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
                     (u.col(1) - u.col(3)).array();
     } else {
@@ -182,7 +182,7 @@ inline Eigen::VectorXd AbstractBicop::hfunc2(const Eigen::MatrixXd &u)
 
 inline Eigen::VectorXd AbstractBicop::hinv1(const Eigen::MatrixXd &u)
 {
-    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 0))) {
+    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 1))) {
         return hinv1_num(u);
     } else {
         return hinv1_raw(u);
@@ -191,7 +191,7 @@ inline Eigen::VectorXd AbstractBicop::hinv1(const Eigen::MatrixXd &u)
 
 inline Eigen::VectorXd AbstractBicop::hinv2(const Eigen::MatrixXd &u)
 {
-    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 1))) {
+    if (is_discrete() || (is_mixed() && (discrete_vars_[0] == 2))) {
         return hinv2_num(u);
     } else {
         return hinv2_raw(u);
