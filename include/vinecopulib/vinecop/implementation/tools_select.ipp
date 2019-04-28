@@ -877,9 +877,12 @@ inline void VinecopSelector::add_edge_info(VineTree &tree)
 inline void VinecopSelector::remove_edge_data(VineTree &tree)
 {
     for (auto e : boost::edges(tree)) {
-        tree[e].hfunc1 = Eigen::MatrixXd();
-        tree[e].hfunc2 = Eigen::MatrixXd();
+        tree[e].hfunc1 = Eigen::VectorXd();
+        tree[e].hfunc2 = Eigen::VectorXd();
         tree[e].pc_data = Eigen::MatrixXd(0, 2);
+        tree[e].hfunc1_min = Eigen::VectorXd();
+        tree[e].hfunc2_min = Eigen::VectorXd();
+        tree[e].pc_data_min = Eigen::MatrixXd(0, 2);
     }
 }
 
@@ -888,8 +891,10 @@ inline void VinecopSelector::remove_edge_data(VineTree &tree)
 inline void VinecopSelector::remove_vertex_data(VineTree &tree)
 {
     for (auto v : boost::vertices(tree)) {
-        tree[v].hfunc1 = Eigen::MatrixXd();
-        tree[v].hfunc2 = Eigen::MatrixXd();
+        tree[v].hfunc1 = Eigen::VectorXd();
+        tree[v].hfunc2 = Eigen::VectorXd();
+        tree[v].hfunc1_min = Eigen::VectorXd();
+        tree[v].hfunc2_min = Eigen::VectorXd();
     }
 }
 
@@ -934,10 +939,14 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
         if (tools_stl::is_member(static_cast<size_t>(2),
                                  tree[e].pair_copula.get_discrete_vars())) {
             tree[e].hfunc1_min = tree[e].pair_copula.hfunc1(tree[e].pc_data_min);
+        } else {
+            tree[e].hfunc1_min = tree[e].hfunc1;
         }
         if (tools_stl::is_member(static_cast<size_t>(1),
                                  tree[e].pair_copula.get_discrete_vars())) {
-            tree[e].hfunc1_min = tree[e].pair_copula.hfunc1(tree[e].pc_data_min);
+            tree[e].hfunc2_min = tree[e].pair_copula.hfunc2(tree[e].pc_data_min);
+        } else {
+            tree[e].hfunc2_min = tree[e].hfunc2;
         }
         tree[e].loglik = tree[e].pair_copula.get_loglik();
         if (controls_.needs_sparse_select()) {
