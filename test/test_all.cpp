@@ -26,7 +26,6 @@ using namespace test_vinecop_class;
 using namespace test_vinecop_sanity_checks;
 using namespace test_weights;
 
-
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

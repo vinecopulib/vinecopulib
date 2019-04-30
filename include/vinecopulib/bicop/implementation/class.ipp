@@ -4,10 +4,12 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <vinecopulib/bicop/abstract.hpp>
 #include <vinecopulib/bicop/tools_select.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
+#include <vinecopulib/misc/tools_serialization.hpp>
 #include <mutex>
 
 //! Tools for bivariate and vine copula modeling
@@ -235,20 +237,15 @@ const
 //!   the (quasi-)random number generator is seeded randomly.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2>
-Bicop::simulate(const size_t& n, 
+Bicop::simulate(const size_t& n,
                 const bool qrng,
                 const std::vector<int>& seeds) const
 {
-    Eigen::Matrix<double, Eigen::Dynamic, 2> U;
-    if (qrng) {
-        U = tools_stats::ghalton(n, 2, seeds);
-    } else {
-        U = tools_stats::simulate_uniform(n, 2, seeds);
-    }
+    auto u = tools_stats::simulate_uniform(n, 2, qrng, seeds);
 
     // use inverse Rosenblatt transform to generate a sample from the copula
-    U.col(1) = hinv1(U);
-    return U;
+    u.col(1) = hinv1(u);
+    return u;
 }
 
 //! calculates the log-likelihood, defined as
@@ -312,14 +309,14 @@ Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const
 //! @param u \f$n \times 2\f$ matrix of observations.
 //! @param psi0 prior probability of a non-independence copula.
 inline double
-Bicop::mbic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u, const double psi0) 
+Bicop::mbic(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u, const double psi0)
 const
 {
     bool is_indep = (this->get_family() == BicopFamily::indep);
     double npars = this->calculate_npars();
     double n = static_cast<double>(u.rows());
     double ll = this->loglik(u);
-    double log_prior = 
+    double log_prior =
         static_cast<double>(!is_indep) * std::log(psi0) +
         static_cast<double>(is_indep) * std::log(1.0 - psi0);
     return -2 * ll + std::log(n) * npars - 2 * log_prior;
@@ -382,60 +379,40 @@ inline Eigen::MatrixXd Bicop::get_parameters() const
 
 inline double Bicop::get_loglik() const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
-    return loglik;
+    check_fitted();
+    return bicop_->get_loglik();
 }
 
 inline size_t Bicop::get_nobs() const
 {
-    if ((boost::math::isnan)(bicop_->get_loglik())) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
+    check_fitted();
     return nobs_;
 }
 
 inline double Bicop::get_aic() const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
-    double npars = bicop_->calculate_npars();
-    return -2 * loglik + 2 * npars;
+    check_fitted();
+    return -2 * bicop_->get_loglik() + 2 * bicop_->calculate_npars();
 }
 
 inline double Bicop::get_bic() const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
+    check_fitted();
     double npars = bicop_->calculate_npars();
-    return -2 * loglik + std::log(nobs_) * npars;
+    return -2 * bicop_->get_loglik() + std::log(nobs_) * npars;
 }
 
 inline double Bicop::get_mbic(const double psi0) const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
-    return -2 * loglik + compute_mbic_penalty(nobs_, psi0);
+    check_fitted();
+    return -2 * bicop_->get_loglik() + compute_mbic_penalty(nobs_, psi0);
 }
 
 inline double Bicop::compute_mbic_penalty(const size_t nobs, const double psi0) const
 {
     double npars = bicop_->calculate_npars();
     bool is_indep = (this->get_family() == BicopFamily::indep);
-    double log_prior = 
+    double log_prior =
         static_cast<double>(!is_indep) * std::log(psi0) +
         static_cast<double>(is_indep) * std::log(1.0 - psi0);
     return std::log(nobs) * npars  - 2 * log_prior;
@@ -527,13 +504,13 @@ inline void Bicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         method = controls.get_nonparametric_method();
     }
     tools_eigen::check_if_in_unit_cube(data);
-    
+
     auto w = controls.get_weights();
     Eigen::MatrixXd data_no_nan = data;
     check_weights_size(w, data);
     tools_eigen::remove_nans(data_no_nan, w);
 
-    bicop_->fit(cut_and_rotate(data_no_nan), 
+    bicop_->fit(cut_and_rotate(data_no_nan),
                 method,
                 controls.get_nonparametric_mult(),
                 w);
@@ -574,7 +551,7 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         std::mutex m;
         auto fit_and_compare = [&](Bicop cop) {
             tools_interface::check_user_interrupt();
-            
+
             // Estimate the model
             cop.fit(data_no_nan, controls);
 
@@ -592,13 +569,13 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                     n_eff /= controls.get_weights().array().pow(2).sum();
                 }
                 double npars = cop.calculate_npars();
-                
+
                 new_criterion = -2 * ll + log(n_eff) * npars;  // BIC
                 if (controls.get_selection_criterion() == "mbic") {
                     // correction for mBIC
                     bool is_indep = (this->get_family() == BicopFamily::indep);
                     double psi0 = controls.get_psi0();
-                    double log_prior = 
+                    double log_prior =
                         static_cast<double>(!is_indep) * log(psi0) +
                         static_cast<double>(is_indep) * log(1.0 - psi0);
                     new_criterion -= 2 * log_prior;
@@ -684,6 +661,14 @@ inline void Bicop::check_weights_size(const Eigen::VectorXd& weights,
 {
     if ((weights.size() > 0) & (weights.size() != data.rows())) {
         throw std::runtime_error("sizes of weights and data don't match.");
+    }
+}
+
+inline void Bicop::check_fitted() const
+{
+    if ((boost::math::isnan)(bicop_->get_loglik())) {
+        throw std::runtime_error("copula has not been fitted from data or its "
+                                     "parameters have been modified manually");
     }
 }
 }

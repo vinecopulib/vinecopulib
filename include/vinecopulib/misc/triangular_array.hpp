@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <vinecopulib/misc/tools_stl.hpp>
 #include <iostream>
+#include <vector>
 #include <stdexcept>
 
 namespace vinecopulib {

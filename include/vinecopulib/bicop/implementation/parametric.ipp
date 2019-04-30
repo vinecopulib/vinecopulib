@@ -7,7 +7,6 @@
 #include <vinecopulib/misc/tools_optimization.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <iostream>
 #include <vinecopulib/misc/tools_bobyqa.hpp>
 #include <wdm/eigen.hpp>
 
@@ -53,8 +52,8 @@ inline double ParBicop::calculate_npars()
 
 // fit
 inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                          std::string method, 
-                          double, 
+                          std::string method,
+                          double,
                           const Eigen::VectorXd& weights)
 {
     if (family_ == BicopFamily::indep) {
@@ -62,7 +61,7 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         set_loglik(0.0);
         return;
     }
-    
+
     using namespace tools_optimization;
     std::vector <std::string> methods = {"itau", "mle"};
     if (!tools_stl::is_member(method, methods)) {
@@ -80,7 +79,7 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 
     double tau = wdm::wdm(data, "tau", weights)(0, 1);
     auto newpar = get_start_parameters(tau);
-    
+
     if (npars > 0) {
         // Set bounds and starting values
         auto lb = get_parameters_lower_bounds();
@@ -99,9 +98,9 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         ParBicopOptData my_data = {
             data,
             this,
-            initial_parameters(0), 
-            0, 
-            weights, 
+            initial_parameters(0),
+            0,
+            weights,
         0};
         std::function<double(void *, long, const double *)> objective =
             mle_objective;
@@ -117,8 +116,8 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
             }
             objective = pmle_objective;
         }
-            
-        // refine search interval for Brent algorithm        
+
+        // refine search interval for Brent algorithm
         if (tools_stl::is_member(family_, bicop_families::one_par)) {
             auto lb2 = lb;
             auto ub2 = ub;
@@ -127,22 +126,22 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 ub = tau_to_parameters(std::min(std::fabs(tau) + 0.1, 0.95));
             } else {
                 lb = tau_to_parameters(std::max(tau - 0.1, -0.99));
-                ub = tau_to_parameters(std::min(tau + 0.1, 0.99));                    
+                ub = tau_to_parameters(std::min(tau + 0.1, 0.99));
             }
             // make sure that parameter bounds are respected
             lb = lb2.cwiseMax(lb);
             ub = ub2.cwiseMin(ub);
         }
-            
+
         // create optimizer
         Optimizer optimizer(npars, lb, ub);
 
         // optimize and store result
         auto optimized_parameters = optimizer.optimize(initial_parameters,
-                                                       objective, 
+                                                       objective,
                                                        &my_data);
-                                                       
-        // check if fit is reasonable, otherwise increase search interval 
+
+        // check if fit is reasonable, otherwise increase search interval
         // and refit
         if (tools_stl::is_member(family_, bicop_families::one_par)) {
             if (my_data.objective_min > 0.1) {
@@ -151,7 +150,7 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
                 ub = get_parameters_upper_bounds();
                 optimizer = Optimizer(npars, lb, ub);
                 optimized_parameters = optimizer.optimize(initial_parameters,
-                                                          objective, 
+                                                          objective,
                                                           &my_data);
             }
         }
@@ -164,14 +163,14 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
         set_loglik(-my_data.objective_min);
     }
     set_parameters(newpar);
-    
+
     // loglik has not been computed
     if (npars == 0) {
         Eigen::MatrixXd log_pdf = pdf(data);
         log_pdf = log_pdf.array().log();
         if (weights.size() > 0) {
             log_pdf = log_pdf.cwiseProduct(weights);
-        }  
+        }
         tools_eigen::remove_nans(log_pdf);
         set_loglik(log_pdf.sum());
     }

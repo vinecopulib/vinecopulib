@@ -7,7 +7,6 @@
 #pragma once
 
 #include <boost/math/distributions.hpp>
-#include <random>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
@@ -92,6 +91,9 @@ inline Eigen::MatrixXd qt(const Eigen::MatrixXd &x, double nu)
 
 Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
                                  std::vector<int> seeds = std::vector<int>());
+
+Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d, bool qrng,
+                                  std::vector<int> seeds = std::vector<int>());
 
 Eigen::VectorXd to_pseudo_obs_1d(Eigen::VectorXd x,
                                  std::string ties_method = "average");

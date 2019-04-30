@@ -7,10 +7,10 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
-#include <vinecopulib/misc/tools_eigen.hpp>
+#include <Eigen/Dense>
 #include <vinecopulib/bicop/family.hpp>
+
 
 namespace vinecopulib {
 //! @brief An abstract class for bivariate copula families
@@ -48,8 +48,8 @@ protected:
 
     // Virtual methods
     virtual void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-                     std::string method, 
-                     double mult, 
+                     std::string method,
+                     double mult,
                      const Eigen::VectorXd& weights) = 0;
 
     virtual double calculate_npars() = 0;
@@ -77,6 +77,7 @@ protected:
         const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) = 0;
 
     virtual Eigen::MatrixXd tau_to_parameters(const double &tau) = 0;
+    Eigen::MatrixXd no_tau_to_parameters(const double &);
 
     // Misc methods
     Eigen::VectorXd hinv1_num(
@@ -93,7 +94,6 @@ protected:
 //! A shared pointer to an object of class AbstracBicop.
 typedef std::shared_ptr <AbstractBicop> BicopPtr;
 
-Eigen::VectorXd no_tau_to_parameters(const double &);
 }
 
 #include <vinecopulib/bicop/implementation/abstract.ipp>

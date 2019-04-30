@@ -6,11 +6,14 @@
 
 #pragma once
 
-#include <cstddef>
-#include <vinecopulib/misc/tools_interpolation.hpp>
 #include <vinecopulib/bicop/abstract.hpp>
 
 namespace vinecopulib {
+
+namespace tools_interpolation {
+    class InterpolationGrid;
+}
+
 //! @brief An abstract class for kernel copulas
 //!
 //! Evaluation functions of kernel estimators are implemented efficiently
@@ -65,7 +68,7 @@ protected:
 
     void flip();
 
-    tools_interpolation::InterpolationGrid interp_grid_;
+    std::shared_ptr<tools_interpolation::InterpolationGrid> interp_grid_;
     double npars_;
 };
 }
