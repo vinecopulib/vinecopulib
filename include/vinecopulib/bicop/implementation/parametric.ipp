@@ -88,10 +88,13 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
           };
       } else {
           // profile likelihood
+          set_parameters(initial_parameters);
+          initial_parameters(0) = initial_parameters(1);
+          initial_parameters.conservativeResize(1);
           objective = [&data, &weights, this] (const Eigen::VectorXd& pars) {
               Eigen::VectorXd newpars(2);
-              newpars[0] = this->get_parameters()(0, 0);
-              newpars[1] = pars(0, 1);
+              newpars(0) = this->get_parameters()(0);
+              newpars(1) = pars(0);
               this->set_parameters(newpars);
               return this->loglik(data, weights);
           };
@@ -114,7 +117,7 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
           // only the second parameter has been optimized
           newpars.conservativeResize(2);
           std::swap(newpars(0), newpars(1));
-          newpars(0) = initial_parameters(0);
+          newpars(0) = get_parameters()(0);
       }
 
       set_parameters(newpars);
@@ -147,8 +150,8 @@ void ParBicop::adjust_parameters_bounds(Eigen::MatrixXd &lb,
         // for pseudo mle, we can ignore the first parameter
         lb(0) = lb(1);
         ub(0) = ub(1);
-        lb.resize(1, 1);
-        ub.resize(1, 1);
+        lb.conservativeResize(1, 1);
+        ub.conservativeResize(1, 1);
         if (family_ == BicopFamily::student) {
             // the df parameter doesn't need to be estimated as accurately
             ub(0) = 15;
