@@ -10,6 +10,7 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/bicop/class.hpp>
 #include <boost/math/constants/constants.hpp>
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 using namespace vinecopulib;
 

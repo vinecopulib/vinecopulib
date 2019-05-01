@@ -4,6 +4,8 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <vinecopulib/misc/tools_stl.hpp>
+
 namespace vinecopulib {
 
 //! @brief instantiates an RVineStructure object from a matrix representing an

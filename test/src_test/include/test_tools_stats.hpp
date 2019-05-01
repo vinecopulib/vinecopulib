@@ -88,7 +88,7 @@ TEST(test_tools_stats, mcor_works) {
     a1 = tools_stats::pairwise_mcor(Z.block(0, 0, 5000, 2));
     weights.block(5000, 0, 5000, 1) = Eigen::VectorXd::Zero(5000);
     a2 = tools_stats::pairwise_mcor(Z, weights);
-    ASSERT_TRUE(std::fabs(a1 - a2) < 0.05);   
+    ASSERT_TRUE(std::fabs(a1 - a2) < 0.05);
 }
 
 TEST(test_tools_stats, seed_works) {

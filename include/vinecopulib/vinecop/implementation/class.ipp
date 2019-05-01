@@ -7,6 +7,9 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
+#include <vinecopulib/misc/tools_serialization.hpp>
+#include <vinecopulib/vinecop/tools_select.hpp>
+#include <vinecopulib/bicop/class.hpp>
 
 #include <stdexcept>
 
@@ -532,9 +535,7 @@ Vinecop::get_struct_array() const
 //! fitted to data).
 inline double Vinecop::get_loglik() const
 {
-    if (std::isnan(loglik_)) {
-        throw std::runtime_error("copula has not been fitted from data ");
-    }
+    check_fitted();
     return loglik_;
 }
 
@@ -543,9 +544,7 @@ inline double Vinecop::get_loglik() const
 //! The function throws an error if model has not been fitted to data.
 inline size_t Vinecop::get_nobs() const
 {
-    if (std::isnan(loglik_)) {
-        throw std::runtime_error("copula has not been fitted from data ");
-    }
+    check_fitted();
     return nobs_;
 }
 
@@ -554,9 +553,7 @@ inline size_t Vinecop::get_nobs() const
 //! The function throws an error if model has not been fitted to data.
 inline double Vinecop::get_aic() const
 {
-    if (std::isnan(loglik_)) {
-        throw std::runtime_error("copula has not been fitted from data ");
-    }
+    check_fitted();
     return -2 * loglik_ + 2 * calculate_npars();
 }
 
@@ -565,9 +562,7 @@ inline double Vinecop::get_aic() const
 //! The function throws an error if model has not been fitted to data.
 inline double Vinecop::get_bic() const
 {
-    if (std::isnan(loglik_)) {
-        throw std::runtime_error("copula has not been fitted from data ");
-    }
+    check_fitted();
     return -2 * loglik_ + calculate_npars() * std::log(nobs_);;
 }
 
@@ -576,9 +571,7 @@ inline double Vinecop::get_bic() const
 //! The function throws an error if model has not been fitted to data.
 inline double Vinecop::get_mbicv(const double psi0) const
 {
-    if (std::isnan(loglik_)) {
-        throw std::runtime_error("copula has not been fitted from data ");
-    }
+    check_fitted();
     return -2 * loglik_ + this->calculate_mbicv_penalty(nobs_, psi0);
 }
 
@@ -733,16 +726,8 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N,
     check_data_dim(u);
 
     // Simulate N quasi-random numbers from the vine model
-    Eigen::MatrixXd U(N, d_);
-    if (d_ > 300) {
-        U = tools_stats::sobol(N, d_, seeds);
-    } else {
-        U = tools_stats::ghalton(N, d_, seeds);
-    }
-    U = inverse_rosenblatt(U, num_threads);
-
-    // Alternative: simulate N pseudo-random numbers from the vine model
-    //auto U = simulate(N);
+    auto u_sim = tools_stats::simulate_uniform(N, d_, true, seeds);
+    u_sim = inverse_rosenblatt(u_sim, num_threads);
 
     size_t n = u.rows();
     Eigen::VectorXd vine_distribution(n);
@@ -751,7 +736,7 @@ Vinecop::cdf(const Eigen::MatrixXd &u, const size_t N,
     for (size_t i = 0; i < n; i++) {
         tools_interface::check_user_interrupt(i % 1000 == 0);
         temp = u.block(i, 0, 1, d_);
-        x = (U.rowwise() - temp).rowwise().maxCoeff().array();
+        x = (u_sim.rowwise() - temp).rowwise().maxCoeff().array();
         vine_distribution(i) = (x <= 0.0).count();
     }
     return vine_distribution / static_cast<double>(N);
@@ -772,18 +757,8 @@ inline Eigen::MatrixXd Vinecop::simulate(const size_t n,
                                          const size_t num_threads,
                                          const std::vector<int>& seeds) const
 {
-    Eigen::MatrixXd U(n, d_);
-    if (qrng) {
-        if (d_ > 300) {
-            U = tools_stats::sobol(n, d_, seeds);
-        } else {
-            U = tools_stats::ghalton(n, d_, seeds);
-        }
-    } else {
-        U = tools_stats::simulate_uniform(n, d_, seeds);
-    }
-
-    return inverse_rosenblatt(U, num_threads);
+    auto u = tools_stats::simulate_uniform(n, d_, qrng, seeds);
+    return inverse_rosenblatt(u, num_threads);
 }
 
 //! @brief calculates the log-likelihood.
@@ -1137,6 +1112,13 @@ inline void Vinecop::check_enough_data(const Eigen::MatrixXd& data) const
   if (data.rows() == 1) {
       throw std::runtime_error("data must have more than one row");
   }
+}
+
+inline void Vinecop::check_fitted() const
+{
+    if (std::isnan(loglik_)) {
+        throw std::runtime_error("copula has not been fitted from data ");
+    }
 }
 
 //! @brief truncate the vine copula model.

@@ -7,6 +7,7 @@
 #include <vinecopulib/misc/tools_stats_ghalton.hpp>
 #include <vinecopulib/misc/tools_stats_sobol.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
+#include <random>
 #include <unsupported/Eigen/FFT>
 #include <wdm/eigen.hpp>
 
@@ -46,6 +47,35 @@ inline Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
 
     Eigen::MatrixXd U(n, d);
     return U.unaryExpr([&](double) { return distribution(generator); });
+}
+
+//! simulates from the multivariate uniform distribution
+//!
+//! @param n number of observations.
+//! @param d dimension.
+//! @param qrng if true, quasi-numbers are generated.
+//! @param seeds seeds of the random number generator; if empty (default),
+//!   the random number generator is seeded randomly.
+//!
+//! If `qrng = TRUE`, generalized Halton sequences (see `ghalton()`) are used
+//! for `d <= 300` and Sobol sequences otherwise (see `sobol()`).
+//!
+//! @return An \f$ n \times d \f$ matrix of independent
+//! \f$ \mathrm{U}[0, 1] \f$ random variables.
+inline Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
+                                        bool qrng, std::vector<int> seeds)
+{
+    Eigen::MatrixXd u(n, d);
+    if (qrng) {
+        if (d > 300) {
+            u = tools_stats::sobol(n, d, seeds);
+        } else {
+            u = tools_stats::ghalton(n, d, seeds);
+        }
+    } else {
+        u = tools_stats::simulate_uniform(n, d, seeds);
+    }
+    return u;
 }
 
 //! @brief applies the empirical probability integral transform to a data matrix.

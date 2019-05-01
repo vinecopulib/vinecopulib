@@ -6,7 +6,6 @@
 
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <vinecopulib/misc/tools_interface.hpp>
 
 #include <cmath>
 #include <iostream>

@@ -4,10 +4,12 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <vinecopulib/bicop/abstract.hpp>
 #include <vinecopulib/bicop/tools_select.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
+#include <vinecopulib/misc/tools_serialization.hpp>
 #include <mutex>
 
 //! Tools for bivariate and vine copula modeling
@@ -244,16 +246,11 @@ Bicop::simulate(const size_t& n,
                 const bool qrng,
                 const std::vector<int>& seeds) const
 {
-    Eigen::Matrix<double, Eigen::Dynamic, 2> U;
-    if (qrng) {
-        U = tools_stats::ghalton(n, 2, seeds);
-    } else {
-        U = tools_stats::simulate_uniform(n, 2, seeds);
-    }
+    auto u = tools_stats::simulate_uniform(n, 2, qrng, seeds);
 
     // use inverse Rosenblatt transform to generate a sample from the copula
-    U.col(1) = hinv1(U);
-    return U;
+    u.col(1) = hinv1(u);
+    return u;
 }
 
 //! @brief calculates the log-likelihood.
@@ -396,53 +393,33 @@ inline Eigen::MatrixXd Bicop::get_parameters() const
 
 inline double Bicop::get_loglik() const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
-    return loglik;
+    check_fitted();
+    return bicop_->get_loglik();
 }
 
 inline size_t Bicop::get_nobs() const
 {
-    if ((boost::math::isnan)(bicop_->get_loglik())) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
+    check_fitted();
     return nobs_;
 }
 
 inline double Bicop::get_aic() const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
-    double npars = bicop_->calculate_npars();
-    return -2 * loglik + 2 * npars;
+    check_fitted();
+    return -2 * bicop_->get_loglik() + 2 * bicop_->calculate_npars();
 }
 
 inline double Bicop::get_bic() const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
+    check_fitted();
     double npars = bicop_->calculate_npars();
-    return -2 * loglik + std::log(nobs_) * npars;
+    return -2 * bicop_->get_loglik() + std::log(nobs_) * npars;
 }
 
 inline double Bicop::get_mbic(const double psi0) const
 {
-    double loglik = bicop_->get_loglik();
-    if ((boost::math::isnan)(loglik)) {
-        throw std::runtime_error("copula has not been fitted from data or its "
-                                     "parameters have been modified manually");
-    }
-    return -2 * loglik + compute_mbic_penalty(nobs_, psi0);
+    check_fitted();
+    return -2 * bicop_->get_loglik() + compute_mbic_penalty(nobs_, psi0);
 }
 
 inline double Bicop::compute_mbic_penalty(const size_t nobs, const double psi0) const
@@ -700,6 +677,14 @@ inline void Bicop::check_weights_size(const Eigen::VectorXd& weights,
 {
     if ((weights.size() > 0) & (weights.size() != data.rows())) {
         throw std::runtime_error("sizes of weights and data don't match.");
+    }
+}
+
+inline void Bicop::check_fitted() const
+{
+    if ((boost::math::isnan)(bicop_->get_loglik())) {
+        throw std::runtime_error("copula has not been fitted from data or its "
+                                     "parameters have been modified manually");
     }
 }
 }

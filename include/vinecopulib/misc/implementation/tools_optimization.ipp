@@ -4,9 +4,10 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib/bicop/parametric.hpp>
+#include <vinecopulib/misc/tools_bobyqa.hpp>
 #include <boost/math/tools/minima.hpp>
-#include <iostream>
+
 namespace vinecopulib {
 
 //! Utilities for numerical optimization (based on Bobyqa)
@@ -130,7 +131,7 @@ inline double mle_objective(void *f_data, long n, const double *x)
     Eigen::Map<const Eigen::VectorXd> par(&x[0], n);
     newdata->bicop->set_parameters(par);
     if (newdata->weights.size() > 0) {
-        return -(newdata->bicop->pdf(newdata->U).array().log() * 
+        return -(newdata->bicop->pdf(newdata->U).array().log() *
                     newdata->weights.array()).sum();
     } else {
         return -newdata->bicop->pdf(newdata->U).array().log().sum();
@@ -150,7 +151,7 @@ inline double pmle_objective(void *f_data, long n, const double *x)
     }
     newdata->bicop->set_parameters(par);
     if (newdata->weights.size() > 0) {
-        return -(newdata->bicop->pdf(newdata->U).array().log() * 
+        return -(newdata->bicop->pdf(newdata->U).array().log() *
                     newdata->weights.array()).sum();
     } else {
         return -newdata->bicop->pdf(newdata->U).array().log().sum();
