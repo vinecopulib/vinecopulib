@@ -58,6 +58,9 @@ protected:
 
     Eigen::VectorXd pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u);
 
+    double loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2> &u,
+              const Eigen::VectorXd weights = Eigen::VectorXd());
+
     virtual Eigen::VectorXd pdf_raw(
         const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) = 0;
 

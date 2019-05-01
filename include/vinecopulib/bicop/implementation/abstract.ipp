@@ -129,6 +129,21 @@ inline Eigen::VectorXd AbstractBicop::pdf(
     return tools_eigen::unaryExpr_or_nan(pdf_raw(u), trim);
 }
 
+//! evaluates the log-likelihood.
+//! @param u data matrix.
+//! @param weights optional weights for each observation.
+inline double AbstractBicop::loglik(
+    const Eigen::Matrix<double, Eigen::Dynamic, 2> &u,
+    const Eigen::VectorXd weights)
+{
+    Eigen::MatrixXd log_pdf = this->pdf(u).array().log();
+    if (weights.size() > 0) {
+        log_pdf = log_pdf.cwiseProduct(weights);
+    }
+    tools_eigen::remove_nans(log_pdf);
+    return log_pdf.sum();
+}
+
 //! Numerical inversion of h-functions
 //!
 //! These are generic functions to invert the hfunctions numerically.
