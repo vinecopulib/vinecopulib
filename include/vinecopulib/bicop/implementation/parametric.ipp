@@ -141,10 +141,10 @@ inline double ParBicop::winsorize_tau(double tau) const
 }
 
 //! adjusts parameter bounds for better search intervals.
-void ParBicop::adjust_parameters_bounds(Eigen::MatrixXd &lb,
-                                        Eigen::MatrixXd &ub,
-                                        const double &tau,
-                                        const std::string method)
+inline void ParBicop::adjust_parameters_bounds(Eigen::MatrixXd &lb,
+                                               Eigen::MatrixXd &ub,
+                                               const double &tau,
+                                               const std::string method)
 {
     if (method == "itau") {
         // for pseudo mle, we can ignore the first parameter

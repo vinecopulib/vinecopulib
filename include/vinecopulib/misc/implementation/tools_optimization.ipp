@@ -93,21 +93,22 @@ inline Eigen::VectorXd Optimizer::optimize(
 }
 
 //! @brief returns how often the objective function was called.
-size_t Optimizer::get_objective_calls() const
+inline size_t Optimizer::get_objective_calls() const
 {
     return objective_calls_;
 }
 
 //! @brief returns the objective value at the maximum.
-double Optimizer::get_objective_max() const
+inline double Optimizer::get_objective_max() const
 {
     return objective_max_;
 }
 
 //! checks whether sizes of parameters and bounds match.
-void Optimizer::check_parameters_size(const Eigen::VectorXd &initial_parameters,
-                                      const Eigen::VectorXd &lower_bounds,
-                                      const Eigen::VectorXd &upper_bounds) const
+inline void Optimizer::check_parameters_size(
+    const Eigen::VectorXd &initial_parameters,
+    const Eigen::VectorXd &lower_bounds,
+    const Eigen::VectorXd &upper_bounds) const
 {
     if (initial_parameters.size() != upper_bounds.size()) {
         throw std::runtime_error(
@@ -171,15 +172,13 @@ inline void BobyqaControls::check_parameters(double initial_trust_region,
 //! @{
 
 //! @return the initial trust region.
-inline double
-BobyqaControls::get_initial_trust_region()
+inline double BobyqaControls::get_initial_trust_region()
 {
     return initial_trust_region_;
 }
 
 //! @return the final trust region.
-inline double
-BobyqaControls::get_final_trust_region()
+inline double BobyqaControls::get_final_trust_region()
 {
     return final_trust_region_;
 }
