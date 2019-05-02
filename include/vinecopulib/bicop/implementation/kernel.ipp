@@ -88,6 +88,16 @@ inline Eigen::MatrixXd KernelBicop::get_parameters() const
     return interp_grid_->get_values();
 }
 
+inline Eigen::MatrixXd KernelBicop::get_parameters_lower_bounds() const
+{
+    return Eigen::MatrixXd::Constant(30, 30, 0.0);
+}
+
+inline Eigen::MatrixXd KernelBicop::get_parameters_upper_bounds() const
+{
+    return Eigen::MatrixXd::Constant(30, 30, 1e4);
+}
+
 inline void KernelBicop::set_parameters(const Eigen::MatrixXd &parameters)
 {
     if (parameters.minCoeff() < 0) {

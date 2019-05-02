@@ -601,6 +601,20 @@ inline void Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
     }
 }
 
+
+//! extract lower bounds for copula parameters.
+inline Eigen::MatrixXd Bicop::get_parameters_lower_bounds() const
+{
+    return bicop_->get_parameters_lower_bounds();
+}
+
+//! extract upper bounds for copula parameters.
+inline Eigen::MatrixXd Bicop::get_parameters_upper_bounds() const
+{
+    return bicop_->get_parameters_upper_bounds();
+}
+
+
 //! Data manipulations for rotated families
 //!
 //! @param u \f$m \times 2\f$ matrix of data.
