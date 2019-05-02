@@ -173,7 +173,7 @@ public:
                            const size_t trunc_lvl = std::numeric_limits<size_t>::max());
     void truncate(size_t trunc_lvl);
 
-    std::string Vinecop::str() const
+    std::string Vinecop::str() const;
 
 protected:
     size_t d_;
