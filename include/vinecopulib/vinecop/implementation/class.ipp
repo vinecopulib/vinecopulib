@@ -1117,4 +1117,28 @@ inline void Vinecop::truncate(size_t trunc_lvl)
     }
 }
 
+//! summarizes the model into a string (can be used for printing).
+inline std::string Vinecop::str() const
+{
+    std::stringstream str;
+    auto arr = vine_struct_.get_struct_array();
+    auto order = vine_struct_.get_order();
+    for (size_t t = 0; t < vine_struct_.get_trunc_lvl(); ++t) {
+        str << "** Tree: " << t << std::endl;
+        for (size_t e = 0; e < d_ - 1 - t; ++e) {
+            str << order[e] << "," << order[arr(t, e) - 1];
+            if (t > 0) {
+                str << " | ";
+                for (size_t cv = t - 1; cv > 1; --cv) {
+                    str << order[arr(cv, e) - 1] << ",";
+                }
+                str << order[arr(0, e) - 1];
+            }
+            str <<
+                " <-> " << pair_copulas_[t][e].str() << std::endl;
+        }
+    }
+    return str.str();
+}
+
 }
