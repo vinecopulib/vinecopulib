@@ -467,10 +467,11 @@ inline std::string Bicop::str() const
     if (get_rotation() != 0) {
         bicop_str << " " << get_rotation() << "°";
     }
-    if (get_family() != BicopFamily::indep) {
+    if (get_family() == BicopFamily::tll) {
+        bicop_str << ", parameters = [30x30 grid]";
+    } else if (get_family() != BicopFamily::indep) {
         bicop_str << ", parameters = " << get_parameters();
     }
-
     return bicop_str.str().c_str();
 }
 //! @}
