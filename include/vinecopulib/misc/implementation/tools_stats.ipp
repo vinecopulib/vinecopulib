@@ -16,7 +16,7 @@ namespace vinecopulib {
 //! Utilities for statistical analysis
 namespace tools_stats {
 
-//! simulates from the multivariate uniform distribution
+//! @brief simulates from the multivariate uniform distribution.
 //!
 //! @param n number of observations.
 //! @param d dimension.
@@ -78,7 +78,7 @@ inline Eigen::MatrixXd simulate_uniform(const size_t& n, const size_t& d,
     return u;
 }
 
-//! applies the empirical probability integral transform to a data matrix.
+//! @brief applies the empirical probability integral transform to a data matrix.
 //!
 //! Gives pseudo-observations from the copula by applying the empirical
 //! distribution function (scaled by n + 1) to each margin/column.
@@ -97,7 +97,7 @@ to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method)
     return x;
 }
 
-//! applies the empirical probability integral transform to a data vector.
+//! @brief applies the empirical probability integral transform to a data vector.
 //!
 //! Gives pseudo-observations from the copula by applying the empirical
 //! distribution function (scaled by n + 1) to each margin/column.
@@ -315,7 +315,7 @@ inline double pairwise_mcor(
 }
 //! @}
 
-//! simulates from the multivariate Generalized Halton Sequence
+//! @brief simulates from the multivariate Generalized Halton Sequence.
 //!
 //! For more information on Generalized Halton Sequence, see
 //! Faure, H., Lemieux, C. (2009). Generalized Halton Sequences in 2008:
@@ -378,7 +378,7 @@ inline Eigen::MatrixXd ghalton(const size_t& n, const size_t& d,
     return res.transpose();
 }
 
-//! simulates from the multivariate Sobol sequence
+//! @brief simulates from the multivariate Sobol sequence.
 //!
 //! For more information on the Sobol sequence, see S. Joe and F. Y. Kuo
 //! (2008), Constructing Sobol  sequences with better two-dimensional
@@ -467,7 +467,7 @@ inline Eigen::MatrixXd sobol(const size_t& n, const size_t& d,
     return output;
 }
 
-//! Compute bivariate t probabilities
+//! @brief computes bivariate t probabilities.
 //!
 //! Based on the method described by
 //! Dunnett, C.W. and M. Sobel, (1954),
@@ -600,7 +600,7 @@ inline Eigen::VectorXd pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2> &z,
     return tools_eigen::binaryExpr_or_nan(z, f);
 }
 
-//! Compute bivariate normal probabilities
+//! @brief compute bivariate normal probabilities.
 //!
 //! A function for computing bivariate normal probabilities;
 //! developed using Drezner, Z. and Wesolowsky, G. O. (1989),

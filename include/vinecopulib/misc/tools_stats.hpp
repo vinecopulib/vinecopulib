@@ -14,7 +14,7 @@ namespace vinecopulib {
 namespace tools_stats {
 
 
-//! Density function of the Standard normal distribution
+//! @brief Density function of the Standard normal distribution.
 //!
 //! @param x evaluation points.
 //!
@@ -26,7 +26,7 @@ inline Eigen::MatrixXd dnorm(const Eigen::MatrixXd &x)
     return tools_eigen::unaryExpr_or_nan(x, f);
 }
 
-//! Distribution function of the Standard normal distribution
+//! @brief Distribution function of the Standard normal distribution.
 //!
 //! @param x evaluation points.
 //!
@@ -38,7 +38,7 @@ inline Eigen::MatrixXd pnorm(const Eigen::MatrixXd &x)
     return tools_eigen::unaryExpr_or_nan(x, f);
 }
 
-//! Quantile function of the Standard normal distribution
+//! @brief Quantile function of the Standard normal distribution.
 //!
 //! @param x evaluation points.
 //!
@@ -50,7 +50,7 @@ inline Eigen::MatrixXd qnorm(const Eigen::MatrixXd &x)
     return tools_eigen::unaryExpr_or_nan(x, f);
 }
 
-//! Density function of the Student t distribution
+//! @brief Density function of the Student t distribution.
 //!
 //! @param x evaluation points.
 //! @param nu degrees of freedom parameter.
@@ -63,7 +63,7 @@ inline Eigen::MatrixXd dt(const Eigen::MatrixXd &x, double nu)
     return tools_eigen::unaryExpr_or_nan(x, f);
 }
 
-//! Distribution function of the Student t distribution
+//! @brief Distribution function of the Student t distribution.
 //!
 //! @param x evaluation points.
 //! @param nu degrees of freedom parameter.
@@ -76,7 +76,7 @@ inline Eigen::MatrixXd pt(const Eigen::MatrixXd &x, double nu)
     return tools_eigen::unaryExpr_or_nan(x, f);
 }
 
-//! Quantile function of the Student t distribution
+//! @brief Quantile function of the Student t distribution.
 //!
 //! @param x evaluation points.
 //! @param nu degrees of freedom parameter.
