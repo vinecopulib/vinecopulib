@@ -105,7 +105,8 @@ inline void ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
 
       // check if fit is reasonable, otherwise increase search interval
       // and refit
-      if (optimizer.get_objective_max() < -0.1) {
+      if (tools_stl::is_member(family_, bicop_families::one_par) &&
+          (optimizer.get_objective_max() < -0.1)) {
           newpars = optimizer.optimize(initial_parameters,
                                        get_parameters_lower_bounds(),
                                        get_parameters_upper_bounds(),
