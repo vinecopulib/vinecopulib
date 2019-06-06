@@ -11,7 +11,7 @@
 
 namespace vinecopulib {
 
-//! R-vine structures
+//! @brief R-vine structures
 //!
 //! RVineStructure objects encode the tree structure of the vine, i.e. the
 //! conditioned/conditioning variables of each edge. It is represented by a
