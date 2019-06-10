@@ -498,7 +498,7 @@ inline void RVineStructure::check_proximity_condition() const
 //! @brief ostream method for RVineStructure, to be used with `std::cout`.
 //! @param os output stream.
 //! @param rvs r-vine structure array.
-std::ostream& operator<<(std::ostream& os, const RVineStructure& rvs)
+inline std::ostream& operator<<(std::ostream& os, const RVineStructure& rvs)
 {
     os << rvs.str();
     return os;
