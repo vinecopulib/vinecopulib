@@ -122,10 +122,11 @@ public:
 
     void flip();
 
-private:
     Eigen::MatrixXd get_parameters_lower_bounds() const;
 
     Eigen::MatrixXd get_parameters_upper_bounds() const;
+
+private:
 
     Eigen::Matrix<double, Eigen::Dynamic, 2> cut_and_rotate(
         const Eigen::Matrix<double, Eigen::Dynamic, 2> &u) const;

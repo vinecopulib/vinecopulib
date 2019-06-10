@@ -173,6 +173,8 @@ public:
                            const size_t trunc_lvl = std::numeric_limits<size_t>::max());
     void truncate(size_t trunc_lvl);
 
+    std::string str() const;
+
 protected:
     size_t d_;
     RVineStructure vine_struct_;

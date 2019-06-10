@@ -45,11 +45,11 @@ install:
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install gcc lcov eigen gsl r doxygen graphviz; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then mkdir ~/.R; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then touch ~/.R/Makevars; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then echo "CC=/usr/local/bin/gcc-8" >> ~/.R/Makevars; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then echo "CXX=/usr/local/bin/g++-8" >> ~/.R/Makevars; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then echo "CXX11=/usr/local/bin/g++-8" >> ~/.R/Makevars; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then echo "FC=/usr/local/bin/gfortran-8" >> ~/.R/Makevars; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then echo "F77=/usr/local/bin/gfortran-8" >> ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then echo "CC=/usr/local/bin/gcc-9" >> ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then echo "CXX=/usr/local/bin/g++-9" >> ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then echo "CXX11=/usr/local/bin/g++-9" >> ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then echo "FC=/usr/local/bin/gfortran-9" >> ~/.R/Makevars; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then echo "F77=/usr/local/bin/gfortran-9" >> ~/.R/Makevars; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then cat ~/.R/Makevars; fi
 
   ### Common

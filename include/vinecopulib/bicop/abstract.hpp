@@ -42,6 +42,10 @@ protected:
 
     virtual Eigen::MatrixXd get_parameters() const = 0;
 
+    virtual Eigen::MatrixXd get_parameters_lower_bounds() const = 0;
+
+    virtual Eigen::MatrixXd get_parameters_upper_bounds() const = 0;
+
     virtual void set_parameters(const Eigen::MatrixXd &parameters) = 0;
 
     virtual void flip() = 0;

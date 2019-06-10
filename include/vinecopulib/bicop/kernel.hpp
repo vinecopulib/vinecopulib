@@ -64,6 +64,10 @@ protected:
 
     Eigen::MatrixXd get_parameters() const;
 
+    Eigen::MatrixXd get_parameters_lower_bounds() const;
+
+    Eigen::MatrixXd get_parameters_upper_bounds() const;
+
     void set_parameters(const Eigen::MatrixXd &parameters);
 
     void flip();
