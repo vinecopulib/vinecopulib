@@ -266,9 +266,8 @@ inline double Bicop::loglik(
     if (u.rows() < 1) {
         return get_loglik();
     } else {
-        Eigen::MatrixXd u_no_nan = u;
-        tools_eigen::remove_nans(u_no_nan);
-        return pdf(u_no_nan).array().log().sum();
+        tools_eigen::check_if_in_unit_cube(u);
+        return bicop_->loglik(cut_and_rotate(u));
     }
 }
 
