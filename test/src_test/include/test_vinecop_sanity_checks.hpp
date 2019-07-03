@@ -7,8 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include <vinecopulib/vinecop/class.hpp>
-#include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib.hpp>
 
 namespace test_vinecop_sanity_checks {
 using namespace vinecopulib;

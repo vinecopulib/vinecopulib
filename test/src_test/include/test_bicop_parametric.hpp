@@ -129,15 +129,12 @@ TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct) {
     if (needs_check_) {
         auto data = bicop_.simulate(get_n());
         auto bicop = Bicop(data, controls);
-        EXPECT_EQ(bicop.loglik(data), bicop.get_loglik());
+        EXPECT_EQ(bicop.loglik(data), bicop.get_loglik()) << bicop_.str();
 
         EXPECT_NO_THROW(bicop.loglik());
         EXPECT_NO_THROW(bicop.aic());
         EXPECT_NO_THROW(bicop.bic());
         EXPECT_NO_THROW(bicop.mbic());
-
-        //std::cout << bicop_.str() << std::endl;
-        //std::cout << bicop.str() << std::endl;
 
         auto selected_family = bicop.get_family_name();
         EXPECT_EQ(selected_family, true_family) <<
