@@ -1,3 +1,23 @@
+# vinecopulib 0.3.2 (July 3, 2019)
+
+NEW FEATURES
+
+    * new `Vinecop::str()` method (#420)
+
+    * enhanced extensibility of `RVineStructure`, `Vinecop`, and 
+      `VinecopSelector` classes and  (#419) 
+
+BUG FIXES
+
+    * fix interval adjustment for Brent parameter optimization (#414)
+
+    * clean up includes to improve build times (#412)
+
+    * better printing for tll family (#415)
+
+    * fix batches when `num_threads = 0` (#418)
+
+
 # vinecopulib 0.3.1 (April 5, 2019)
 
 NEW FEATURES
