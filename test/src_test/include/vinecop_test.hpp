@@ -6,17 +6,18 @@
 
 #pragma once
 
+#include "rscript.hpp"
 #include "gtest/gtest.h"
 #include <vinecopulib/misc/tools_eigen.hpp>
-#include "rscript.hpp"
 
-class VinecopTest : public ::testing::Test {
+class VinecopTest : public ::testing::Test
+{
 public:
-    VinecopTest();
+  VinecopTest();
 
-    Eigen::MatrixXd u;
-    Eigen::VectorXd f;
-    Eigen::MatrixXd sim;
-    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> model_matrix;
-    Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> vc_matrix;
+  Eigen::MatrixXd u;
+  Eigen::VectorXd f;
+  Eigen::MatrixXd sim;
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> model_matrix;
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> vc_matrix;
 };
