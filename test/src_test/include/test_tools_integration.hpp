@@ -7,13 +7,15 @@
 #pragma once
 
 #include "gtest/gtest.h"
+#include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/misc/tools_integration.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
 
 namespace test_tools_integration {
 
 using namespace vinecopulib;
 
-TEST(test_tools_integration, integrate_is_correct)
+TEST(test_tools_integration, integrate_uniform)
 {
   auto myfun = [](double x, double i = 1) { return std::pow(x, i); };
   auto moments_uniform = [](double a = 0, double b = 1, double i = 1) {
@@ -31,9 +33,28 @@ TEST(test_tools_integration, integrate_is_correct)
     auto f = [i_dbl, myfun](double x) { return myfun(x, i_dbl); };
     EXPECT_NEAR(
       tools_integration::integrate(f), moments_uniform(0, 1, i_dbl), 1e-8);
-    EXPECT_NEAR(tools_integration::integrate(f, 3, 5),
+    EXPECT_NEAR(tools_integration::integrate(f, 3, 5) / 2,
                 moments_uniform(3, 5, i_dbl),
                 1e-8);
+  }
+}
+
+TEST(test_tools_integration, integrate_hfunc)
+{
+  auto cop = Bicop(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 10));
+  auto myfun = [cop](const double u1, const double u2) {
+    Eigen::MatrixXd input(1, 2);
+    input << u1, u2;
+    auto output = cop.pdf(input);
+    return output(0);
+  };
+  auto u = tools_stats::simulate_uniform(20, 2, { 1 });
+  for (size_t i = 0; i < 20; i++) {
+    auto f = [i, u, myfun](double x) { return myfun(x, u(i, 1)); };
+    auto truth = cop.hfunc2(u.row(i));
+    EXPECT_NEAR(tools_integration::integrate(f, 0, 1, 50), 1.0, 1e-5);
+    EXPECT_NEAR(
+      tools_integration::integrate(f, 0, u(i, 0), 50), truth(0, 0), 1e-5);
   }
 }
 }

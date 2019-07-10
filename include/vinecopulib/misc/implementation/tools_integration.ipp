@@ -61,7 +61,7 @@ integrate(std::function<double(double)> f,
   auto nodes_weights = quadrature_rule(n);
   nodes_weights.col(0) = a + (b - a) * nodes_weights.col(0).array();
   auto f_vals = tools_eigen::unaryExpr_or_nan(nodes_weights.col(0), f);
-  return nodes_weights.col(1).cwiseProduct(f_vals).sum();
+  return (b - a) * nodes_weights.col(1).cwiseProduct(f_vals).sum();
 }
 }
 }
