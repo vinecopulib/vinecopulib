@@ -124,7 +124,7 @@ Bb6Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
     return 1 / (delta * theta) * tools_stl::log1p(-std::pow(1 - v, theta)) *
            res;
   };
-  return 1 + tools_integration::integrate_zero_to_one(f);
+  return 1 + tools_integration::integrate(f);
 }
 
 inline Eigen::MatrixXd

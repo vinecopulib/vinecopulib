@@ -6,30 +6,22 @@
 
 #pragma once
 
-#include <boost/numeric/odeint.hpp>
 #include <functional>
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
 
 namespace tools_integration {
 
-inline double
-integrate_zero_to_one(std::function<double(double)> f)
-{
-  boost::numeric::odeint::runge_kutta_dopri5<double> stepper;
-  double lb = 1e-12;
-  double ub = 1.0 - lb;
-  double x = 0.0;
-  auto ifunc = [f](const double /* x */, double& dxdt, const double t) {
-    dxdt = f(t);
-  };
-  integrate_adaptive(boost::numeric::odeint::make_controlled(lb, lb, stepper),
-                     ifunc,
-                     x,
-                     lb,
-                     ub,
-                     lb);
-  return x;
+Eigen::Matrix<double, Eigen::Dynamic, 2>
+quadrature_rule(const size_t n = 20);
+
+double
+integrate(std::function<double(double)> f,
+          const double a = 0,
+          const double b = 1,
+          const size_t n = 20);
 }
 }
-}
+
+#include <vinecopulib/misc/implementation/tools_integration.ipp>

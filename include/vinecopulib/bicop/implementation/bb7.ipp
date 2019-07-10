@@ -107,7 +107,7 @@ Bb7Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
     double res = -4 * (std::pow(1 - tmp, -delta) - 1) / (theta * delta);
     return res / (std::pow(1 - v, theta - 1) * std::pow(1 - tmp, -delta - 1));
   };
-  return 1 + tools_integration::integrate_zero_to_one(f);
+  return 1 + tools_integration::integrate(f);
 }
 
 inline Eigen::MatrixXd

@@ -10,6 +10,7 @@
 #include "src_test/include/test_rvine_structure.hpp"
 #include "src_test/include/test_serialization.hpp"
 #include "src_test/include/test_tools_bobyqa.hpp"
+#include "src_test/include/test_tools_integration.hpp"
 #include "src_test/include/test_tools_stats.hpp"
 #include "src_test/include/test_vinecop_class.hpp"
 #include "src_test/include/test_vinecop_sanity_checks.hpp"
@@ -21,6 +22,7 @@ using namespace test_bicop_kernel;
 using namespace test_rvine_structure;
 using namespace test_serialization;
 using namespace test_tools_bobyqa;
+using namespace test_tools_integration;
 using namespace test_tools_stats;
 using namespace test_vinecop_class;
 using namespace test_vinecop_sanity_checks;
