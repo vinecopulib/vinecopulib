@@ -14,6 +14,10 @@ namespace test_rvine_structure {
 
 using namespace vinecopulib;
 
+TEST(rvine_structure, bla) {
+    RVineStructure::sample(7);
+}
+
 TEST(rvine_structure, triangular_array_works) {
 
     TriangularArray<size_t> my_rvm(7);

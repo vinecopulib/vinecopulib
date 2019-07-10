@@ -94,6 +94,8 @@ public:
     void truncate(size_t trunc_lvl);
     std::string str() const;
 
+    static RVineStructure sample(size_t d, bool natural_order = false);
+
 protected:
     size_t find_trunc_lvl(
         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
