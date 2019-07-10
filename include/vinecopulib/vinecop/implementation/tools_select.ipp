@@ -33,6 +33,10 @@ inline double calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>
     if (data_no_nan.rows() > 10) {
         if (tree_criterion == "mcor") {
             w = tools_stats::pairwise_mcor(data_no_nan, weights);
+        } else if (tree_criterion == "joe") {
+            // mutual information for Gaussian copula
+            w = wdm::wdm(tools_stats::qnorm(data_no_nan), "pearson", weights)(0, 1);
+            w = - 0.5 * std::log(1 - w * w); 
         } else {
             w = wdm::wdm(data_no_nan, tree_criterion, weights)(0, 1);
         }
