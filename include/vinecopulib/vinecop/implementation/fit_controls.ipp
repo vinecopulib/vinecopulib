@@ -124,13 +124,13 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop &controls,
 inline void
 FitControlsVinecop::check_tree_criterion(std::string tree_criterion)
 {
-    if (!tools_stl::is_member(tree_criterion, {"tau", "rho",
+    if (!tools_stl::is_member(tree_criterion, {"tau", "rho", "joe",
                                                "hoeffd", "mcor"})) {
-        throw std::runtime_error("tree_criterion should be tau, "
-                                     "rho, hoeffd or mcor");
+        throw std::runtime_error(
+            "tree_criterion must be one of " 
+            "'tau', 'rho', 'hoeffd', 'mcor', or 'joe'");
     }
 }
-
 inline void FitControlsVinecop::check_threshold(double threshold)
 {
     if (threshold < 0 || threshold > 1) {
