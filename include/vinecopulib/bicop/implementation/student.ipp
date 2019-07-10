@@ -5,7 +5,6 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <boost/math/constants/constants.hpp>
 
 namespace vinecopulib {
 inline StudentBicop::StudentBicop()
