@@ -42,9 +42,7 @@ calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
       w = wdm::wdm(data_no_nan, tree_criterion, weights)(0, 1);
     }
   }
-}
-
-return std::fabs(w) * std::sqrt(freq);
+  return std::fabs(w) * std::sqrt(freq);
 }
 
 //! Calculates maximal criterion for tree selection.
