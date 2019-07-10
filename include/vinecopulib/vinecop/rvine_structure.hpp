@@ -94,7 +94,9 @@ public:
     void truncate(size_t trunc_lvl);
     std::string str() const;
 
-    static RVineStructure sample(size_t d, bool natural_order = false);
+    static RVineStructure sample(size_t d, 
+                                 bool natural_order = false,
+                                 std::vector<int> seeds = std::vector<int>());
 
 protected:
     size_t find_trunc_lvl(

@@ -264,21 +264,22 @@ RVineStructure::str() const
   return str.str();
 }
 
-
-
 //! @brief randomly sample from a regular vine structure. 
 //! @param d the dimension.
 //! @note Implementation of Algorithm 13 in Harry Joe's 2014 book (p. 288),
 //! but there's a typo: the end of line 6 in the book should be 
 //! 'column j' instead of 'column k'.
-inline RVineStructure RVineStructure::sample(size_t d, bool natural_order)
+inline RVineStructure RVineStructure::sample(size_t d, 
+                                             bool natural_order,
+                                             std::vector<int> seeds)
 {
-  using MatrixXs = Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>;
+  auto U = tools_stats::simulate_uniform(d, d, false, seeds);
+
   // A is the R-vine matrix we want to create (upper right-triag format).
   // B is a random binary representation that we need to convert.
-  MatrixXs A(d, d), B(d, d);
-  A = MatrixXs::Constant(d, d, 0);
-  B = (tools_stats::simulate_uniform(d, d).array() > 0.5).cast<size_t>();
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> A(d, d), B(d, d);
+  A.setZero();
+  B = (U.leftCols(d).array() > 0.5).cast<size_t>();
 
   for (size_t i = 0; i < d; i++) {
     A(i, i) = i + 1;
@@ -313,6 +314,21 @@ inline RVineStructure RVineStructure::sample(size_t d, bool natural_order)
 
   // need to convert to upper left triangular form (our notation)
   auto rvm = RVineStructure(A.rowwise().reverse());
+
+  // sampling the variable order randomly
+  // the first column of U has not been used to construct B,
+  // hence it is stochastically independent of B. Calling 
+  // pseudo_obs and rescaling gives us a permutation of (1, ..., d)
+  // that is independent of B.
+  if (!natural_order) {
+    std::vector<size_t> order(d);
+    U.col(0) = tools_stats::to_pseudo_obs_1d(U.col(0)) * (d + 1);
+    for (size_t k = 0; k < d; k++) {
+      order[k] = static_cast<size_t>(U(k, 0));
+    }
+    rvm = RVineStructure(order, rvm.get_struct_array(), true, false);
+  }
+
   return rvm;
 }
 
