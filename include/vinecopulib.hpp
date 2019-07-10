@@ -5,6 +5,6 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/bicop/class.hpp>
-#include <vinecopulib/vinecop/class.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib/vinecop/class.hpp>
 #include <wdm/eigen.hpp>
