@@ -7,7 +7,7 @@
 #pragma once
 
 #include <vinecopulib/bicop/parametric.hpp>
-#include <vinecopulib/misc/constants.hpp>
+#include <vinecopulib/misc/tools_constants.hpp>
 
 
 namespace vinecopulib {
