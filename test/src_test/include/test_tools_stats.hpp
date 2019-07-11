@@ -77,7 +77,7 @@ TEST(test_tools_stats, qrng_are_correct)
 TEST(test_tools_stats, mcor_works)
 {
   std::vector<int> seeds = { 1, 2, 3, 4, 5 };
-  Eigen::MatrixXd Z = tools_stats::simulate_uniform(10000, 2, seeds);
+  Eigen::MatrixXd Z = tools_stats::simulate_uniform(10000, 2, true, seeds);
   Z = tools_stats::qnorm(Z);
   Z.block(0, 1, 5000, 1) =
     Z.block(0, 1, 5000, 1) + Z.block(0, 0, 5000, 1).cwiseAbs2();
@@ -99,8 +99,8 @@ TEST(test_tools_stats, seed_works)
   std::vector<int> v = { 1, 2, 3 };
 
   auto U1 = tools_stats::simulate_uniform(n, d);
-  auto U2 = tools_stats::simulate_uniform(n, d, v);
-  auto U3 = tools_stats::simulate_uniform(n, d, v);
+  auto U2 = tools_stats::simulate_uniform(n, d, false, v);
+  auto U3 = tools_stats::simulate_uniform(n, d, false, v);
 
   ASSERT_TRUE(U1.cwiseNotEqual(U2).all());
   ASSERT_TRUE(U2.cwiseEqual(U3).all());
