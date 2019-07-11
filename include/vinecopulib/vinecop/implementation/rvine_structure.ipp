@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
 namespace vinecopulib {
@@ -261,6 +262,76 @@ RVineStructure::str() const
   str << order_[0] << " " << std::endl;
 
   return str.str();
+}
+
+//! @brief randomly sample a regular vine structure.
+//! @param d the dimension.
+//! @param natural_order should the sampled structure be in natural order?
+//! @param seeds seeds of the random number generator; if empty (default),
+//!   the random number generator is seeded randomly.
+//! @note Implementation of Algorithm 13 in Harry Joe's 2014 book (p. 288),
+//! but there's a typo: the end of line 6 in the book should be
+//! 'column j' instead of 'column k'.
+inline RVineStructure
+RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
+{
+  auto U = tools_stats::simulate_uniform(d, d, false, seeds);
+
+  // A is the R-vine matrix we want to create (upper right-triag format).
+  // B is a random binary representation that we need to convert.
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> A(d, d), B(d, d);
+  A.setZero();
+  B = (U.leftCols(d).array() > 0.5).cast<size_t>();
+
+  for (size_t i = 0; i < d; i++) {
+    A(i, i) = i + 1;
+    B(i, i) = 1;
+    if (i > 0) {
+      A(i - 1, i) = i;
+      B(0, i) = 1;
+      B(i - 1, i) = 1;
+    }
+  }
+  if (d > 2) {
+    A(0, 2) = 1;
+  }
+
+  for (size_t j = 3; j < d; j++) {
+    int ac = j - 2;
+    auto to_assign = tools_stl::seq_int(1, j - 1);
+    for (ptrdiff_t k = j - 2; k >= 0; k--) {
+      if (B(k, j) == 1) {
+        A(k, j) = ac + 1;
+        to_assign = tools_stl::set_diff(to_assign, { A(k, j) });
+        if (k > 0) {
+          // to_assign is always ordered ascendingly -> we pick largest
+          ac = to_assign[to_assign.size() - 1] - 1;
+        }
+      } else {
+        A(k, j) = A(k - 1, ac);
+        to_assign = tools_stl::set_diff(to_assign, { A(k, j) });
+      }
+    }
+  }
+
+  // need to convert to upper left triangular form (our notation)
+  auto rvm = RVineStructure(A.rowwise().reverse());
+
+  // sampling the variable order randomly
+  // the first column of U has not been used to construct B,
+  // hence it is stochastically independent of B. Calling
+  // pseudo_obs and rescaling gives us a permutation of (1, ..., d)
+  // that is independent of B.
+  if (!natural_order) {
+    std::vector<size_t> order(d);
+    U.col(0) = tools_stats::to_pseudo_obs_1d(U.col(0)) * (d + 1);
+    for (size_t k = 0; k < d; k++) {
+      order[k] = static_cast<size_t>(U(k, 0));
+    }
+    rvm = RVineStructure(order, rvm.get_struct_array(), true, false);
+  }
+
+  return rvm;
 }
 
 //! extract the R-vine matrix representation.
