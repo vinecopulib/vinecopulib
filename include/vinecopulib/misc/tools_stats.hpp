@@ -97,12 +97,7 @@ qt(const Eigen::MatrixXd& x, double nu)
 Eigen::MatrixXd
 simulate_uniform(const size_t& n,
                  const size_t& d,
-                 std::vector<int> seeds = std::vector<int>());
-
-Eigen::MatrixXd
-simulate_uniform(const size_t& n,
-                 const size_t& d,
-                 bool qrng,
+                 bool qrng = false,
                  std::vector<int> seeds = std::vector<int>());
 
 Eigen::VectorXd

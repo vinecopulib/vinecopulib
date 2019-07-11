@@ -16,39 +16,6 @@ namespace vinecopulib {
 //! Utilities for statistical analysis
 namespace tools_stats {
 
-//! @brief simulates from the multivariate uniform distribution.
-//!
-//! @param n number of observations.
-//! @param d dimension.
-//! @param seeds seeds of the random number generator; if empty (default),
-//!   the random number generator is seeded randomly.
-//!
-//! @return An \f$ n \times d \f$ matrix of independent
-//! \f$ \mathrm{U}[0, 1] \f$ random variables.
-inline Eigen::MatrixXd
-simulate_uniform(const size_t& n, const size_t& d, std::vector<int> seeds)
-{
-  if ((n < 1) | (d < 1)) {
-    throw std::runtime_error("both n and d must be at least 1.");
-  }
-
-  if (seeds.size() == 0) {
-    // no seeds provided, seed randomly
-    std::random_device rd{};
-    seeds = std::vector<int>(5);
-    for (auto& s : seeds)
-      s = static_cast<int>(rd());
-  }
-
-  // initialize random engine and uniform distribution
-  std::seed_seq seq(seeds.begin(), seeds.end());
-  std::mt19937 generator(seq);
-  std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
-  Eigen::MatrixXd U(n, d);
-  return U.unaryExpr([&](double) { return distribution(generator); });
-}
-
 //! simulates from the multivariate uniform distribution
 //!
 //! @param n number of observations.
@@ -68,17 +35,31 @@ simulate_uniform(const size_t& n,
                  bool qrng,
                  std::vector<int> seeds)
 {
-  Eigen::MatrixXd u(n, d);
   if (qrng) {
     if (d > 300) {
-      u = tools_stats::sobol(n, d, seeds);
+      return tools_stats::sobol(n, d, seeds);
     } else {
-      u = tools_stats::ghalton(n, d, seeds);
+      return tools_stats::ghalton(n, d, seeds);
     }
-  } else {
-    u = tools_stats::simulate_uniform(n, d, seeds);
+  } 
+  if ((n < 1) | (d < 1)) {
+    throw std::runtime_error("n and d must be at least 1.");
   }
-  return u;
+  if (seeds.size() == 0) {
+    // no seeds provided, seed randomly
+    std::random_device rd{};
+    seeds = std::vector<int>(5);
+    for (auto& s : seeds)
+      s = static_cast<int>(rd());
+  }
+
+  // initialize random engine and uniform distribution
+  std::seed_seq seq(seeds.begin(), seeds.end());
+  std::mt19937 generator(seq);
+  std::uniform_real_distribution<double> distribution(0.0, 1.0);
+
+  Eigen::MatrixXd u(n, d);
+  return u.unaryExpr([&](double) { return distribution(generator); });
 }
 
 //! @brief applies the empirical probability integral transform to a data
@@ -344,7 +325,7 @@ ghalton(const size_t& n, const size_t& d, std::vector<int> seeds)
   Eigen::MatrixXi shcoeff(d, 32);
   Eigen::VectorXi base = tools_ghalton::primes.block(0, 0, d, 1);
   Eigen::MatrixXd u = Eigen::VectorXd::Zero(d, 1);
-  auto U = simulate_uniform(d, 32, seeds);
+  auto U = simulate_uniform(d, 32, false, seeds);
   for (int k = 31; k >= 0; k--) {
     shcoeff.col(k) =
       (base.cast<double>()).cwiseProduct(U.block(0, k, d, 1)).cast<int>();
@@ -408,7 +389,7 @@ sobol(const size_t& n, const size_t& d, std::vector<int> seeds)
     static_cast<size_t>(std::ceil(log(static_cast<double>(n)) / log(2.0)));
 
   // Vector of scrambling factors
-  Eigen::MatrixXd scrambling = simulate_uniform(d, 1, seeds);
+  Eigen::MatrixXd scrambling = simulate_uniform(d, 1, false, seeds);
 
   // C(i) = index from the right of the first zero bit of i + 1
   Eigen::Matrix<size_t, Eigen::Dynamic, 1> C(n);
