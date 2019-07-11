@@ -41,20 +41,20 @@ TEST(test_tools_integration, integrate_uniform)
 
 TEST(test_tools_integration, integrate_hfunc)
 {
-  auto cop = Bicop(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 10));
+  auto cop = Bicop(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 3));
   auto myfun = [cop](const double u1, const double u2) {
     Eigen::MatrixXd input(1, 2);
     input << u1, u2;
     auto output = cop.pdf(input);
     return output(0);
   };
-  auto u = tools_stats::simulate_uniform(20, 2, { 1 });
+  auto u = tools_stats::simulate_uniform(20, 2, false, { 1 });
   for (size_t i = 0; i < 20; i++) {
     auto f = [i, u, myfun](double x) { return myfun(x, u(i, 1)); };
     auto truth = cop.hfunc2(u.row(i));
-    EXPECT_NEAR(tools_integration::integrate(f, 0, 1, 50), 1.0, 1e-5);
+    EXPECT_NEAR(tools_integration::integrate(f, 0, 1, 50), 1.0, 1e-3);
     EXPECT_NEAR(
-      tools_integration::integrate(f, 0, u(i, 0), 50), truth(0, 0), 1e-5);
+      tools_integration::integrate(f, 0, u(i, 0), 50), truth(0, 0), 1e-3);
   }
 }
 }
