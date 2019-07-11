@@ -202,10 +202,10 @@ TEST(rvine_structure, rvine_struct_sanity_checks_work)
   EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
 }
 
-TEST(rvine_structure, random_sampling) {
-    for (size_t i = 0; i < 20; i++) {
-        RVineStructure test = RVineStructure::sample(10);
-    }
+TEST(rvine_structure, random_sampling)
+{
+  for (size_t i = 0; i < 20; i++) {
+    RVineStructure test = RVineStructure::simulate(10);
+  }
 }
-
 }

@@ -4,8 +4,8 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 
 namespace vinecopulib {
 
@@ -264,14 +264,16 @@ RVineStructure::str() const
   return str.str();
 }
 
-//! @brief randomly sample from a regular vine structure. 
+//! @brief randomly sample a regular vine structure.
 //! @param d the dimension.
+//! @param natural_order should the sampled structure be in natural order?
+//! @param seeds seeds of the random number generator; if empty (default),
+//!   the random number generator is seeded randomly.
 //! @note Implementation of Algorithm 13 in Harry Joe's 2014 book (p. 288),
-//! but there's a typo: the end of line 6 in the book should be 
+//! but there's a typo: the end of line 6 in the book should be
 //! 'column j' instead of 'column k'.
-inline RVineStructure RVineStructure::sample(size_t d, 
-                                             bool natural_order,
-                                             std::vector<int> seeds)
+inline RVineStructure
+RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
 {
   auto U = tools_stats::simulate_uniform(d, d, false, seeds);
 
@@ -285,7 +287,7 @@ inline RVineStructure RVineStructure::sample(size_t d,
     A(i, i) = i + 1;
     B(i, i) = 1;
     if (i > 0) {
-      A(i - 1, i) = i; 
+      A(i - 1, i) = i;
       B(0, i) = 1;
       B(i - 1, i) = 1;
     }
@@ -300,14 +302,14 @@ inline RVineStructure RVineStructure::sample(size_t d,
     for (ptrdiff_t k = j - 2; k >= 0; k--) {
       if (B(k, j) == 1) {
         A(k, j) = ac + 1;
-        to_assign = tools_stl::set_diff(to_assign, {A(k, j)});
+        to_assign = tools_stl::set_diff(to_assign, { A(k, j) });
         if (k > 0) {
           // to_assign is always ordered ascendingly -> we pick largest
-          ac = to_assign[to_assign.size() - 1] - 1; 
+          ac = to_assign[to_assign.size() - 1] - 1;
         }
       } else {
         A(k, j) = A(k - 1, ac);
-        to_assign = tools_stl::set_diff(to_assign, {A(k, j)});
+        to_assign = tools_stl::set_diff(to_assign, { A(k, j) });
       }
     }
   }
@@ -317,7 +319,7 @@ inline RVineStructure RVineStructure::sample(size_t d,
 
   // sampling the variable order randomly
   // the first column of U has not been used to construct B,
-  // hence it is stochastically independent of B. Calling 
+  // hence it is stochastically independent of B. Calling
   // pseudo_obs and rescaling gives us a permutation of (1, ..., d)
   // that is independent of B.
   if (!natural_order) {
