@@ -16,7 +16,7 @@ namespace vinecopulib {
 //! Utilities for statistical analysis
 namespace tools_stats {
 
-//! simulates from the multivariate uniform distribution
+//! @brief simulates from the multivariate uniform distribution
 //!
 //! @param n number of observations.
 //! @param d dimension.
