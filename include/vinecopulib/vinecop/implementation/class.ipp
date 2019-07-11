@@ -5,6 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_integration.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
 #include <vinecopulib/misc/tools_serialization.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
@@ -1071,6 +1072,72 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   }
 
   return U_vine;
+}
+
+inline Eigen::VectorXd
+Vinecop::cond_cdf(const Eigen::MatrixXd& u,
+                  const std::vector<size_t> conditioned_set,
+                  const size_t n_nodes,
+                  const size_t num_threads) const
+{
+  tools_eigen::check_if_in_unit_cube(u);
+  check_data_dim(u);
+  size_t d = u.cols();
+  size_t n = u.rows();
+  if (!tools_stl::is_member(conditioned_set, tools_stl::seq_int(1, d)))
+    throw std::runtime_error("Members of the conditioned set should be in {1, "
+                             "..., d}");
+  if (conditioned_set.size() != 1)
+    throw std::runtime_error(
+      "Conditioned sets of size larger than 1 are not (yet) supported.");
+
+  // load quadrature nodes and weights
+  auto nodes_weights = tools_integration::quadrature_rule(n_nodes);
+
+  // initialize output
+  Eigen::VectorXd output = u.col(conditioned_set[0] - 1);
+
+  auto do_batch = [&](const tools_batch::Batch& b) {
+    // temporary storage objects
+    Eigen::VectorXd output_batch(b.size);
+    Eigen::MatrixXd u_row(n_nodes, d);
+    double u_conditioned_set;
+    double int_num1;
+    double int_num2;
+    double int_denom;
+
+    for (size_t i = 0; i < b.size; i++) {
+      u_conditioned_set = u(b.begin + i, conditioned_set[0] - 1);
+      // replicate row for vectorized integrals
+      u_row = u.row(b.begin + i).replicate(n_nodes, 1);
+      // set conditioned set as the quadrature nodes and compute denominator
+      u_row.col(conditioned_set[0] - 1) = nodes_weights.col(0);
+      int_denom = pdf(u_row).cwiseProduct(nodes_weights.col(1)).sum();
+      // update quadrature nodes and compute numerator (0 to u)
+      u_row.col(conditioned_set[0] - 1) *= u_conditioned_set;
+      int_num1 =
+        u_conditioned_set * pdf(u_row).cwiseProduct(nodes_weights.col(1)).sum();
+      // update quadrature nodes and compute numerator (u to 1)
+      u_row.col(conditioned_set[0] - 1) *=
+        (1 - u_conditioned_set) / u_conditioned_set;
+      u_row.col(conditioned_set[0] - 1).array() += u_conditioned_set;
+      int_num2 =
+        int_denom - (1 - u_conditioned_set) *
+                      pdf(u_row).cwiseProduct(nodes_weights.col(1)).sum();
+      // return output
+      output_batch(i) = (int_num1 + int_num2) / 2 / int_denom;
+    }
+    output.segment(b.begin, b.size) = output_batch;
+  };
+
+  size_t trunc_lvl = vine_struct_.get_trunc_lvl();
+  if (trunc_lvl > 0) {
+    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
+    pool.map(do_batch, tools_batch::create_batches(n, num_threads));
+    pool.join();
+  }
+
+  return output;
 }
 
 //! checks if dimension d of the data matches the dimension of the vine.

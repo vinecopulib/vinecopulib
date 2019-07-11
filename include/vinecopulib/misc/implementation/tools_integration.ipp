@@ -19,10 +19,10 @@ namespace tools_integration {
 //! @return An \f$ n \times 2 \f$ with the nodes in the first colum and the
 //! weights in the second.
 inline Eigen::Matrix<double, Eigen::Dynamic, 2>
-quadrature_rule(const size_t n)
+quadrature_rule(const size_t n_nodes)
 {
   Eigen::Matrix<double, Eigen::Dynamic, 2> output;
-  switch (n) {
+  switch (n_nodes) {
     case 10:
       output = tools_legendre::nodes_weights_10;
       break;
@@ -47,21 +47,21 @@ quadrature_rule(const size_t n)
 //! @brief integrate a function.
 //!
 //! @param f the function to be integrated
-//! @param a lower integration bound
-//! @param b upper integration bound
-//! @param n number of quadrature nodes and weights (10, 20, 30, 40 or 50)
+//! @param lower lower integration bound
+//! @param upper upper integration bound
+//! @param n_nodes number of quadrature nodes and weights (10, 20, 30, 40 or 50)
 //!
 //! @return the value of the integral
 inline double
 integrate(std::function<double(double)> f,
-          const double a,
-          const double b,
-          const size_t n)
+          const double lower,
+          const double upper,
+          const size_t n_nodes)
 {
-  auto nodes_weights = quadrature_rule(n);
-  nodes_weights.col(0) = a + (b - a) * nodes_weights.col(0).array();
+  auto nodes_weights = quadrature_rule(n_nodes);
+  nodes_weights.col(0) = lower + (upper - lower) * nodes_weights.col(0).array();
   auto f_vals = tools_eigen::unaryExpr_or_nan(nodes_weights.col(0), f);
-  return (b - a) * nodes_weights.col(1).cwiseProduct(f_vals).sum();
+  return (lower - upper) * nodes_weights.col(1).cwiseProduct(f_vals).sum();
 }
 }
 }

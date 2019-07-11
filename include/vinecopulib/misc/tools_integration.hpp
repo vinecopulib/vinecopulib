@@ -14,13 +14,13 @@ namespace vinecopulib {
 namespace tools_integration {
 
 Eigen::Matrix<double, Eigen::Dynamic, 2>
-quadrature_rule(const size_t n = 20);
+quadrature_rule(const size_t n_nodes = 20);
 
 double
 integrate(std::function<double(double)> f,
-          const double a = 0,
-          const double b = 1,
-          const size_t n = 20);
+          const double lower = 0,
+          const double upper = 1,
+          const size_t n_nodes = 20);
 }
 }
 

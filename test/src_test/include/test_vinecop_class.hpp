@@ -15,85 +15,206 @@
 namespace test_vinecop_class {
 using namespace vinecopulib;
 
-TEST_F(VinecopTest, constructors_without_error)
-{
-  Vinecop vinecop(5);
-  Vinecop vinecop_indep(model_matrix);
-
-  auto pair_copulas = Vinecop::make_pair_copula_store(7);
-  for (auto& tree : pair_copulas) {
-    for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 90);
-    }
-  }
-
-  Vinecop vinecop_parametrized(pair_copulas, model_matrix);
-}
-
-TEST_F(VinecopTest, getters_are_correct)
-{
-  auto pair_copulas = Vinecop::make_pair_copula_store(7);
-  for (auto& tree : pair_copulas) {
-    for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 90);
-    }
-  }
-  Vinecop vinecop(pair_copulas, model_matrix);
-
-  for (auto& tree : vinecop.get_all_families()) {
-    for (auto& fam : tree) {
-      EXPECT_EQ(fam, BicopFamily::clayton);
-    }
-  }
-
-  for (auto& tree : vinecop.get_all_pair_copulas()) {
-    for (auto& pc : tree) {
-      EXPECT_EQ(pc.get_family(), BicopFamily::clayton);
-      EXPECT_EQ(pc.get_rotation(), 90);
-    }
-  }
-
-  for (auto& tree : vinecop.get_all_parameters()) {
-    for (auto& par : tree) {
-      EXPECT_EQ(par.size(), 1);
-      EXPECT_EQ(par(0), 0);
-    }
-  }
-
-  for (auto& tree : vinecop.get_all_rotations()) {
-    for (auto& rot : tree) {
-      EXPECT_EQ(rot, 90);
-    }
-  }
-
-  for (auto& tree : vinecop.get_all_taus()) {
-    for (auto& tau : tree) {
-      ASSERT_TRUE(fabs(tau) < 1e-4);
-    }
-  }
-
-  EXPECT_NO_THROW(vinecop.get_dim());
-  EXPECT_NO_THROW(vinecop.get_rvine_structure());
-  EXPECT_ANY_THROW(vinecop.get_loglik());
-  EXPECT_ANY_THROW(vinecop.get_nobs());
-  EXPECT_ANY_THROW(vinecop.get_aic());
-  EXPECT_ANY_THROW(vinecop.get_bic());
-  EXPECT_ANY_THROW(vinecop.get_mbicv(0.6));
-}
-
-TEST_F(VinecopTest, fit_statistics_getters_are_correct)
-{
-  auto data = tools_stats::simulate_uniform(100, 3);
-  auto vc = Vinecop(data, FitControlsVinecop({ BicopFamily::clayton }));
-
-  EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
-  EXPECT_NEAR(vc.get_nobs(), 100, 1e-10);
-  EXPECT_NEAR(vc.get_aic(), vc.aic(data), 1e-10);
-  EXPECT_NEAR(vc.get_bic(), vc.bic(data), 1e-10);
-  EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
-}
-
-TEST_F(VinecopTest, truncate_methods_works)
+/* TEST_F(VinecopTest, constructors_without_error) */
+// {
+//   Vinecop vinecop(5);
+//   Vinecop vinecop_indep(model_matrix);
+//
+//   auto pair_copulas = Vinecop::make_pair_copula_store(7);
+//   for (auto& tree : pair_copulas) {
+//     for (auto& pc : tree) {
+//       pc = Bicop(BicopFamily::clayton, 90);
+//     }
+//   }
+//
+//   Vinecop vinecop_parametrized(pair_copulas, model_matrix);
+// }
+//
+// TEST_F(VinecopTest, getters_are_correct)
+// {
+//   auto pair_copulas = Vinecop::make_pair_copula_store(7);
+//   for (auto& tree : pair_copulas) {
+//     for (auto& pc : tree) {
+//       pc = Bicop(BicopFamily::clayton, 90);
+//     }
+//   }
+//   Vinecop vinecop(pair_copulas, model_matrix);
+//
+//   for (auto& tree : vinecop.get_all_families()) {
+//     for (auto& fam : tree) {
+//       EXPECT_EQ(fam, BicopFamily::clayton);
+//     }
+//   }
+//
+//   for (auto& tree : vinecop.get_all_pair_copulas()) {
+//     for (auto& pc : tree) {
+//       EXPECT_EQ(pc.get_family(), BicopFamily::clayton);
+//       EXPECT_EQ(pc.get_rotation(), 90);
+//     }
+//   }
+//
+//   for (auto& tree : vinecop.get_all_parameters()) {
+//     for (auto& par : tree) {
+//       EXPECT_EQ(par.size(), 1);
+//       EXPECT_EQ(par(0), 0);
+//     }
+//   }
+//
+//   for (auto& tree : vinecop.get_all_rotations()) {
+//     for (auto& rot : tree) {
+//       EXPECT_EQ(rot, 90);
+//     }
+//   }
+//
+//   for (auto& tree : vinecop.get_all_taus()) {
+//     for (auto& tau : tree) {
+//       ASSERT_TRUE(fabs(tau) < 1e-4);
+//     }
+//   }
+//
+//   EXPECT_NO_THROW(vinecop.get_dim());
+//   EXPECT_NO_THROW(vinecop.get_rvine_structure());
+//   EXPECT_ANY_THROW(vinecop.get_loglik());
+//   EXPECT_ANY_THROW(vinecop.get_nobs());
+//   EXPECT_ANY_THROW(vinecop.get_aic());
+//   EXPECT_ANY_THROW(vinecop.get_bic());
+//   EXPECT_ANY_THROW(vinecop.get_mbicv(0.6));
+// }
+//
+// TEST_F(VinecopTest, fit_statistics_getters_are_correct)
+// {
+//   auto data = tools_stats::simulate_uniform(100, 3);
+//   auto vc = Vinecop(data, FitControlsVinecop({ BicopFamily::clayton }));
+//
+//   EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
+//   EXPECT_NEAR(vc.get_nobs(), 100, 1e-10);
+//   EXPECT_NEAR(vc.get_aic(), vc.aic(data), 1e-10);
+//   EXPECT_NEAR(vc.get_bic(), vc.bic(data), 1e-10);
+//   EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
+// }
+//
+// TEST_F(VinecopTest, truncate_methods_works)
+// {
+//   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+//   auto par = Eigen::VectorXd::Constant(1, 3.0);
+//   for (auto& tree : pair_copulas) {
+//     for (auto& pc : tree) {
+//       pc = Bicop(BicopFamily::clayton, 270, par);
+//     }
+//   }
+//   Vinecop vinecop(pair_copulas, model_matrix);
+//   vinecop.truncate(2);
+//   EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 2);
+//   EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 2);
+//   vinecop.truncate(0);
+//   EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 0);
+//   EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 0);
+// }
+//
+// TEST_F(VinecopTest, pdf_is_correct)
+// {
+//   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+//   auto par = Eigen::VectorXd::Constant(1, 3.0);
+//   for (auto& tree : pair_copulas) {
+//     for (auto& pc : tree) {
+//       pc = Bicop(BicopFamily::clayton, 270, par);
+//     }
+//   }
+//   Vinecop vinecop(pair_copulas, model_matrix);
+//
+//   ASSERT_TRUE(vinecop.pdf(u).isApprox(f, 1e-4));
+// }
+//
+// TEST_F(VinecopTest, cdf_is_correct)
+// {
+//
+//   // Create a bivariate copula and a corresponding vine with two variables
+//   auto pair_copulas = Vinecop::make_pair_copula_store(2);
+//   auto par = Eigen::VectorXd::Constant(1, 0.5);
+//   auto bicop = Bicop(BicopFamily::gaussian, 0, par);
+//   for (auto& tree : pair_copulas) {
+//     for (auto& pc : tree) {
+//       pc = Bicop(BicopFamily::gaussian, 0, par);
+//     }
+//   }
+//   Eigen::Matrix<size_t, 2, 2> matrix;
+//   matrix << 1, 1, 2, 0;
+//   Vinecop vinecop(pair_copulas, matrix);
+//
+//   // Test whether the analytic and simulated versions are "close" enough
+//   auto u = vinecop.simulate(10);
+//   ASSERT_TRUE(vinecop.cdf(u, 10000).isApprox(bicop.cdf(u), 1e-2));
+//
+//   // verify that qrng stuff works
+//   Vinecop vinecop2(301);
+//   vinecop.simulate(10, true);
+// }
+//
+// TEST_F(VinecopTest, simulate_is_correct)
+// {
+//
+//   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+//   auto par = Eigen::VectorXd::Constant(1, 3.0);
+//   for (auto& tree : pair_copulas) {
+//     for (auto& pc : tree) {
+//       pc = Bicop(BicopFamily::clayton, 270, par);
+//     }
+//   }
+//   Vinecop vinecop(pair_copulas, model_matrix);
+//
+//   // only check if it works
+//   vinecop.simulate(10);
+//   // check the underlying transformation from independent samples
+//   ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
+//
+//   // verify that qrng stuff works
+//   vinecop.simulate(10, true);
+//   Vinecop vinecop2(301);
+//   vinecop.simulate(10, true);
+// }
+//
+// TEST_F(VinecopTest, rosenblatt_is_correct)
+// {
+//   // multivariate
+//   auto pair_copulas = Vinecop::make_pair_copula_store(7);
+//   auto par = Eigen::VectorXd::Constant(1, 3.0);
+//   for (auto& tree : pair_copulas) {
+//     for (auto& pc : tree) {
+//       pc = Bicop(BicopFamily::clayton, 270, par);
+//     }
+//   }
+//   Vinecop vinecop(pair_copulas, model_matrix);
+//   auto u = vinecop.simulate(5);
+//   ASSERT_TRUE(
+//     vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+//
+//   // truncated multivariate
+//   pair_copulas = Vinecop::make_pair_copula_store(7, 2);
+//   for (auto& tree : pair_copulas) {
+//     for (auto& pc : tree) {
+//       pc = Bicop(BicopFamily::clayton, 270, par);
+//     }
+//   }
+//   vinecop = Vinecop(pair_copulas, model_matrix);
+//   ASSERT_TRUE(
+//     vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+//
+//   // bivariate case
+//   pair_copulas = Vinecop::make_pair_copula_store(2);
+//   for (auto& tree : pair_copulas) {
+//     for (auto& pc : tree) {
+//       pc = Bicop(BicopFamily::clayton, 270, par);
+//     }
+//   }
+//   Eigen::Matrix<size_t, 2, 2> mat;
+//   mat << 1, 1, 2, 0;
+//   vinecop = Vinecop(pair_copulas, mat);
+//   u = vinecop.simulate(5);
+//   ASSERT_TRUE(
+//     vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+// }
+/*  */
+TEST_F(VinecopTest, cond_cdf_is_correct)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
   auto par = Eigen::VectorXd::Constant(1, 3.0);
@@ -103,115 +224,16 @@ TEST_F(VinecopTest, truncate_methods_works)
     }
   }
   Vinecop vinecop(pair_copulas, model_matrix);
-  vinecop.truncate(2);
-  EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 2);
-  EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 2);
-  vinecop.truncate(0);
-  EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 0);
-  EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 0);
-}
 
-TEST_F(VinecopTest, pdf_is_correct)
-{
-  auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
-  for (auto& tree : pair_copulas) {
-    for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 270, par);
-    }
-  }
-  Vinecop vinecop(pair_copulas, model_matrix);
+  auto order = vinecop.get_order();
+  Eigen::VectorXd truth = vinecop.rosenblatt(u).col(order[0] - 1);
+  Eigen::VectorXd computed = vinecop.cond_cdf(u, { order[0] });
 
-  ASSERT_TRUE(vinecop.pdf(u).isApprox(f, 1e-4));
-}
-
-TEST_F(VinecopTest, cdf_is_correct)
-{
-
-  // Create a bivariate copula and a corresponding vine with two variables
-  auto pair_copulas = Vinecop::make_pair_copula_store(2);
-  auto par = Eigen::VectorXd::Constant(1, 0.5);
-  auto bicop = Bicop(BicopFamily::gaussian, 0, par);
-  for (auto& tree : pair_copulas) {
-    for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::gaussian, 0, par);
-    }
-  }
-  Eigen::Matrix<size_t, 2, 2> matrix;
-  matrix << 1, 1, 2, 0;
-  Vinecop vinecop(pair_copulas, matrix);
-
-  // Test whether the analytic and simulated versions are "close" enough
-  auto u = vinecop.simulate(10);
-  ASSERT_TRUE(vinecop.cdf(u, 10000).isApprox(bicop.cdf(u), 1e-2));
-
-  // verify that qrng stuff works
-  Vinecop vinecop2(301);
-  vinecop.simulate(10, true);
-}
-
-TEST_F(VinecopTest, simulate_is_correct)
-{
-
-  auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
-  for (auto& tree : pair_copulas) {
-    for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 270, par);
-    }
-  }
-  Vinecop vinecop(pair_copulas, model_matrix);
-
-  // only check if it works
-  vinecop.simulate(10);
-  // check the underlying transformation from independent samples
-  ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
-
-  // verify that qrng stuff works
-  vinecop.simulate(10, true);
-  Vinecop vinecop2(301);
-  vinecop.simulate(10, true);
-}
-
-TEST_F(VinecopTest, rosenblatt_is_correct)
-{
-  // multivariate
-  auto pair_copulas = Vinecop::make_pair_copula_store(7);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
-  for (auto& tree : pair_copulas) {
-    for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 270, par);
-    }
-  }
-  Vinecop vinecop(pair_copulas, model_matrix);
-  auto u = vinecop.simulate(5);
-  ASSERT_TRUE(
-    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
-
-  // truncated multivariate
-  pair_copulas = Vinecop::make_pair_copula_store(7, 2);
-  for (auto& tree : pair_copulas) {
-    for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 270, par);
-    }
-  }
-  vinecop = Vinecop(pair_copulas, model_matrix);
-  ASSERT_TRUE(
-    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
-
-  // bivariate case
-  pair_copulas = Vinecop::make_pair_copula_store(2);
-  for (auto& tree : pair_copulas) {
-    for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 270, par);
-    }
-  }
-  Eigen::Matrix<size_t, 2, 2> mat;
-  mat << 1, 1, 2, 0;
-  vinecop = Vinecop(pair_copulas, mat);
-  u = vinecop.simulate(5);
-  ASSERT_TRUE(
-    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+  std::cout << truth(0) << " " << computed(0) << std::endl;
+  std::cout << truth(1) << " " << computed(1) << std::endl;
+  std::cout << truth(2) << " " << computed(2) << std::endl;
+  std::cout << truth(3) << " " << computed(3) << std::endl;
+  ASSERT_TRUE(computed.isApprox(truth, 1e-1));
 }
 
 TEST_F(VinecopTest, aic_bic_are_correct)

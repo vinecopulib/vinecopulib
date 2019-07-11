@@ -154,6 +154,10 @@ public:
                              const size_t num_threads = 1) const;
   Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& u,
                                      const size_t num_threads = 1) const;
+  Eigen::VectorXd cond_cdf(const Eigen::MatrixXd& u,
+                           const std::vector<size_t> conditioned_set,
+                           const size_t n_nodes = 50,
+                           const size_t num_threads = 1) const;
 
   // Fit statistics
   double calculate_npars() const;
