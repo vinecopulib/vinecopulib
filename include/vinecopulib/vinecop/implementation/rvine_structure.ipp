@@ -522,11 +522,11 @@ RVineStructure::check_upper_tri() const
   problem += "the upper left triangle can only contain numbers ";
   problem += "between 1 and d (number of variables).";
 
-  for (size_t j = 0; j < d_ - 1; ++j) {
-    auto col_vec = struct_array_[j];
-    auto minmax_in_col = std::minmax_element(col_vec.begin(), col_vec.end());
-    if ((*(minmax_in_col.first) < 1) | (*(minmax_in_col.second) > d_)) {
-      throw std::runtime_error("not a valid R-vine array: " + problem);
+  for (size_t i = 0; i < trunc_lvl_; ++i) {
+    for (size_t j = 0; j < d_ - 1 - i; ++j) {
+      if ((struct_array_(i, j) < 1) | (struct_array_(i, j) > d_)) {
+        throw std::runtime_error("not a valid R-vine array: " + problem);
+      }
     }
   }
 }
@@ -534,21 +534,26 @@ RVineStructure::check_upper_tri() const
 inline void
 RVineStructure::check_columns() const
 {
-  std::string problem;
-  problem += "the antidiagonal entry of a column must not be ";
-  problem += "contained in any column further to the right; ";
-  problem += "the entries of a column must be contained ";
-  problem += "in all columns to the left.";
+  std::string problem = "";
+  for (size_t j = 0; j < d_ - 1; j++) {
+    // read column into vector so we can use stl methods
+    std::vector<size_t> col(std::min(trunc_lvl_, d_ - 1 - j));
+    for (size_t i = 0; i < col.size(); i++) {
+      col[i] = struct_array_(i, j);
+    }
+    
+    std::sort(col.begin(), col.end());
+    if (col[0] <= 1 + j) {
+        problem += "the antidiagonal entry of a column must not be ";
+        problem += "contained in any column further to the right.";
+    }
 
-  // check that column j only contains unique indices in 1:(d - j).
-  for (size_t j = 0; j < d_ - 1; ++j) {
-    auto col_vec = struct_array_[j];
-    std::sort(col_vec.begin(), col_vec.end());
-    size_t unique_in_col =
-      std::unique(col_vec.begin(), col_vec.end()) - col_vec.begin();
-    if ((!tools_stl::is_member(col_vec, tools_stl::seq_int(1 + j, d_))) |
-        (unique_in_col != col_vec.size())) {
-      throw std::runtime_error("not a valid R-vine array: " + problem);
+    size_t unique_in_col = std::unique(col.begin(), col.end()) - col.begin();
+    if (unique_in_col != col.size()) {
+      problem = "columns must not contain duplicate entries.";
+    }
+    if (problem != "") {
+        throw std::runtime_error("not a valid R-vine array: " + problem);
     }
   }
 }

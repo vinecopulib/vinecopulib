@@ -148,12 +148,7 @@ ptree_to_triangular_array(const boost::property_tree::ptree input)
     vec[d] = col_vec;
     d++;
   }
-
-  TriangularArray<T> matrix(d + 1, trunc_lvl);
-  for (size_t i = 0; i < d; i++)
-    matrix[i] = vec[i];
-
-  return matrix;
+  return TriangularArray<T>(vec);
 }
 
 //! conversion from boost::property_tree::ptree to std::vector

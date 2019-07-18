@@ -45,14 +45,11 @@ public:
   TriangularArray() = default;
   TriangularArray(size_t d);
   TriangularArray(size_t d, size_t trunc_lvl);
+  TriangularArray(const std::vector<std::vector<T>>& rows);
 
   T& operator()(size_t row, size_t column);
   T operator()(size_t row, size_t column) const;
-  std::vector<T>& operator[](size_t row);
-  std::vector<T> operator[](size_t row) const;
   bool operator==(const TriangularArray<T>& rhs) const;
-
-  void set_column(size_t column, const std::vector<size_t>& new_column);
   void truncate(size_t trunc_lvl);
 
   size_t get_trunc_lvl() const;
@@ -93,6 +90,23 @@ TriangularArray<T>::TriangularArray(size_t d, size_t trunc_lvl)
     arr_[i] = std::vector<T>(d_ - i);
 }
 
+//! @brief construct a truncated triangular array from nested vector.
+//!
+//! @param d the dimension of the vine.
+//! @param rows a vector of rows; the length of the first row defines
+//! the dimension of the triangular array. The number of rows defines
+//! the truncation level.
+template<typename T>
+TriangularArray<T>::TriangularArray(const std::vector<std::vector<T>>& rows)
+  : d_(rows[0].size())
+  , trunc_lvl_(rows.size())
+{
+  if (trunc_lvl_ > d_)
+    throw std::runtime_error(
+      "Input does not define a triangular array: more rows than columns.");
+  arr_ = rows;
+}
+
 //! @brief access one element of the trapezoid (writable).
 //! @param row the row level.
 //! @param column the column in this row.
@@ -115,24 +129,6 @@ TriangularArray<T>::operator()(size_t row, size_t column) const
   assert(row < trunc_lvl_);
   assert(column < d_ - 1 - row);
   return arr_[row][column];
-}
-
-//! @brief access one row of the trapezoid (writable).
-//! @param row which row to extract.
-template<typename T>
-std::vector<T>& TriangularArray<T>::operator[](size_t row)
-{
-  assert(row < trunc_lvl_);
-  return arr_[row];
-}
-
-//! @brief access one row of the trapezoid (non-writable).
-//! @param row which row to extract.
-template<typename T>
-std::vector<T> TriangularArray<T>::operator[](size_t row) const
-{
-  assert(row < trunc_lvl_);
-  return arr_[row];
 }
 
 //! @brief truncates the trapezoid.
