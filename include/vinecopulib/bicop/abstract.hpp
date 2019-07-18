@@ -55,7 +55,7 @@ protected:
                    double mult,
                    const Eigen::VectorXd& weights) = 0;
 
-  virtual double calculate_npars() = 0;
+  virtual double get_npars() = 0;
 
   virtual double parameters_to_tau(const Eigen::MatrixXd& parameters) = 0;
 

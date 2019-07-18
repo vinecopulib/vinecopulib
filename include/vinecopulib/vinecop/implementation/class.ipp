@@ -569,7 +569,7 @@ inline double
 Vinecop::get_aic() const
 {
   check_fitted();
-  return -2 * loglik_ + 2 * calculate_npars();
+  return -2 * loglik_ + 2 * get_npars();
 }
 
 //! @brief extracts the BIC.
@@ -579,7 +579,7 @@ inline double
 Vinecop::get_bic() const
 {
   check_fitted();
-  return -2 * loglik_ + calculate_npars() * std::log(nobs_);
+  return -2 * loglik_ + get_npars() * std::log(nobs_);
   ;
 }
 
@@ -620,7 +620,7 @@ Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
     sq(i) = sq0[i];
     psis(i) = std::pow(psi0, sq0[i]);
   }
-  double npars = this->calculate_npars();
+  double npars = this->get_npars();
   double log_prior = (non_indeps.cast<double>().array() * psis.array().log() +
                       (d_ - non_indeps.array() - sq.array()).cast<double>() *
                         (1 - psis.array()).log())
@@ -803,7 +803,7 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
 //! (effective) number of parameters of the model, see loglik() and
-//! calculate_npars(). The AIC is a consistent model selection criterion
+//! get_npars(). The AIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
@@ -813,7 +813,7 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 inline double
 Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
-  return -2 * loglik(u, num_threads) + 2 * calculate_npars();
+  return -2 * loglik(u, num_threads) + 2 * get_npars();
 }
 
 //! @brief calculates the Bayesian information criterion (BIC).
@@ -822,7 +822,7 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
 //! (effective) number of parameters of the model, see loglik() and
-//! calculate_npars(). The BIC is a consistent model selection criterion
+//! get_npars(). The BIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
@@ -833,7 +833,7 @@ inline double
 Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
   return -2 * loglik(u, num_threads) +
-         calculate_npars() * log(static_cast<double>(u.rows()));
+         get_npars() * log(static_cast<double>(u.rows()));
 }
 
 //! @brief calculates the modified Bayesian information criterion for vines
@@ -867,14 +867,14 @@ Vinecop::mbicv(const Eigen::MatrixXd& u,
 }
 
 //! @brief returns sum of the number of parameters for all pair copulas (see
-//! Bicop::calculate_npars()).
+//! Bicop::get_npars()).
 inline double
-Vinecop::calculate_npars() const
+Vinecop::get_npars() const
 {
   double npars = 0.0;
   for (auto& tree : pair_copulas_) {
     for (auto& pc : tree) {
-      npars += pc.calculate_npars();
+      npars += pc.get_npars();
     }
   }
   return npars;

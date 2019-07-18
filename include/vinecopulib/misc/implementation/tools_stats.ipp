@@ -41,7 +41,7 @@ simulate_uniform(const size_t& n,
     } else {
       return tools_stats::ghalton(n, d, seeds);
     }
-  } 
+  }
   if ((n < 1) | (d < 1)) {
     throw std::runtime_error("n and d must be at least 1.");
   }

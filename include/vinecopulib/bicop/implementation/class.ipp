@@ -270,14 +270,14 @@ Bicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u) const
 //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
 //! (effective) number of parameters of the model, see loglik() and
-//! calculate_npars(). The AIC is a consistent model selection criterion
+//! get_npars(). The AIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 inline double
 Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u) const
 {
-  return -2 * loglik(u) + 2 * calculate_npars();
+  return -2 * loglik(u) + 2 * get_npars();
 }
 
 //! @brief calculates the Bayesian information criterion (BIC).
@@ -286,7 +286,7 @@ Bicop::aic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u) const
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
 //! (effective) number of parameters of the model, see loglik() and
-//! calculate_npars(). The BIC is a consistent model selection criterion
+//! get_npars(). The BIC is a consistent model selection criterion
 //! for parametric models.
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
@@ -296,7 +296,7 @@ Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u) const
   Eigen::MatrixXd u_no_nan = u;
   tools_eigen::remove_nans(u_no_nan);
   double n = static_cast<double>(u_no_nan.rows());
-  return -2 * loglik(u_no_nan) + calculate_npars() * log(n);
+  return -2 * loglik(u_no_nan) + get_npars() * log(n);
 }
 
 //! @brief calculates the modified Bayesian information criterion (mBIC).
@@ -308,7 +308,7 @@ Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u) const
 //! (effective) number of parameters of the model, \f$ \psi_0 \f$ is the prior
 //! probability of having a non-independence copula and \f$ I \f$ is an
 //! indicator for the family being non-independence; see loglik() and
-//! calculate_npars().
+//! get_npars().
 //!
 //! @param u \f$n \times 2\f$ matrix of observations.
 //! @param psi0 prior probability of a non-independence copula.
@@ -317,7 +317,7 @@ Bicop::mbic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u,
             const double psi0) const
 {
   bool is_indep = (this->get_family() == BicopFamily::indep);
-  double npars = this->calculate_npars();
+  double npars = this->get_npars();
   double n = static_cast<double>(u.rows());
   double ll = this->loglik(u);
   double log_prior = static_cast<double>(!is_indep) * std::log(psi0) +
@@ -330,9 +330,9 @@ Bicop::mbic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u,
 //! For nonparametric families, there is a conceptually similar definition in
 //! the sense that it can be used in the calculation of fit statistics.
 inline double
-Bicop::calculate_npars() const
+Bicop::get_npars() const
 {
-  return bicop_->calculate_npars();
+  return bicop_->get_npars();
 }
 
 //! @brief converts a Kendall's \f$ \tau \f$ to the copula parameters of the
@@ -406,14 +406,14 @@ inline double
 Bicop::get_aic() const
 {
   check_fitted();
-  return -2 * bicop_->get_loglik() + 2 * bicop_->calculate_npars();
+  return -2 * bicop_->get_loglik() + 2 * bicop_->get_npars();
 }
 
 inline double
 Bicop::get_bic() const
 {
   check_fitted();
-  double npars = bicop_->calculate_npars();
+  double npars = bicop_->get_npars();
   return -2 * bicop_->get_loglik() + std::log(nobs_) * npars;
 }
 
@@ -427,7 +427,7 @@ Bicop::get_mbic(const double psi0) const
 inline double
 Bicop::compute_mbic_penalty(const size_t nobs, const double psi0) const
 {
-  double npars = bicop_->calculate_npars();
+  double npars = bicop_->get_npars();
   bool is_indep = (this->get_family() == BicopFamily::indep);
   double log_prior = static_cast<double>(!is_indep) * std::log(psi0) +
                      static_cast<double>(is_indep) * std::log(1.0 - psi0);
@@ -584,14 +584,14 @@ Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
       if (controls.get_selection_criterion() == "loglik") {
         new_criterion = -ll;
       } else if (controls.get_selection_criterion() == "aic") {
-        new_criterion = -2 * ll + 2 * cop.calculate_npars();
+        new_criterion = -2 * ll + 2 * cop.get_npars();
       } else {
         double n_eff = static_cast<double>(data_no_nan.rows());
         if (controls.get_weights().size() > 0) {
           n_eff = std::pow(controls.get_weights().sum(), 2);
           n_eff /= controls.get_weights().array().pow(2).sum();
         }
-        double npars = cop.calculate_npars();
+        double npars = cop.get_npars();
 
         new_criterion = -2 * ll + log(n_eff) * npars; // BIC
         if (controls.get_selection_criterion() == "mbic") {

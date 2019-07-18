@@ -39,8 +39,8 @@ TEST_P(TrafokernelTest, trafo_kernel_eval_funcs)
   EXPECT_LE(bicop_.hfunc2(u).maxCoeff(), 1.0);
   EXPECT_LE(bicop_.hinv1(u).maxCoeff(), 1.0);
   EXPECT_LE(bicop_.hinv2(u).maxCoeff(), 1.0);
-  EXPECT_GE(bicop_.calculate_npars(), 0.0);
-  EXPECT_LE(bicop_.calculate_npars(), 100.0);
+  EXPECT_GE(bicop_.get_npars(), 0.0);
+  EXPECT_LE(bicop_.get_npars(), 100.0);
   EXPECT_EQ(bicop_.get_loglik(), bicop_.loglik(u));
 
   u(0, 0) = std::numeric_limits<double>::quiet_NaN();

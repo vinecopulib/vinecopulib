@@ -911,7 +911,7 @@ VinecopSelector::select_pair_copulas(VineTree& tree, const VineTree& tree_opt)
     tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
     tree[e].loglik = tree[e].pair_copula.get_loglik();
     if (controls_.needs_sparse_select()) {
-      tree[e].npars = tree[e].pair_copula.calculate_npars();
+      tree[e].npars = tree[e].pair_copula.get_npars();
     }
   };
 
