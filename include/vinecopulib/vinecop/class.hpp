@@ -156,7 +156,7 @@ public:
                                      const size_t num_threads = 1) const;
 
   // Fit statistics
-  double calculate_npars() const;
+  double get_npars() const;
 
   double loglik(const Eigen::MatrixXd& u, const size_t num_threads = 1) const;
 

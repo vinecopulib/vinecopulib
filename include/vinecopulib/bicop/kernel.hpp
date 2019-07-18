@@ -48,7 +48,7 @@ protected:
 
   Eigen::MatrixXd tau_to_parameters(const double& tau);
 
-  double calculate_npars();
+  double get_npars();
 
   Eigen::MatrixXd get_parameters() const;
 

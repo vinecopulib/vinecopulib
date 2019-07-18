@@ -51,6 +51,8 @@ public:
 
   double get_tau() const;
 
+  double get_npars() const;
+
   double get_loglik() const;
   size_t get_nobs() const;
   double get_aic() const;
@@ -106,8 +108,6 @@ public:
 
   // Misc
   std::string str() const;
-
-  double calculate_npars() const;
 
   double parameters_to_tau(const Eigen::MatrixXd& parameters) const;
 

@@ -46,7 +46,7 @@ ParBicop::flip()
 
 // calculate number of parameters
 inline double
-ParBicop::calculate_npars()
+ParBicop::get_npars()
 {
   // indepence copula has no parameters
   if (family_ == BicopFamily::indep) {
@@ -73,7 +73,7 @@ ParBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
   double tau = wdm::wdm(data, "tau", weights)(0, 1);
 
   // for method itau and one-parameter families we don't need to optimize
-  int npars = static_cast<int>(calculate_npars()) - (method == "itau");
+  int npars = static_cast<int>(get_npars()) - (method == "itau");
   if (npars == 0) {
     set_parameters(tau_to_parameters(tau));
     set_loglik(loglik(data, weights));
