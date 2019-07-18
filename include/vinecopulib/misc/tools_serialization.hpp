@@ -52,14 +52,14 @@ triangular_array_to_ptree(TriangularArray<T> matrix)
   boost::property_tree::ptree output;
   size_t d = matrix.get_dim();
   size_t trunc_lvl = matrix.get_trunc_lvl();
-  for (size_t i = 0; i < d - 1; i++) {
-    boost::property_tree::ptree col;
-    for (size_t j = 0; j < std::min(d - i - 1, trunc_lvl); j++) {
+  for (size_t i = 0; i < std::min(d - -1, trunc_lvl); i++) {
+    boost::property_tree::ptree row;
+    for (size_t j = 0; j < d - 1 - i; j++) {
       boost::property_tree::ptree cell;
-      cell.put_value(matrix(j, i));
-      col.push_back(std::make_pair("", cell));
+      cell.put_value(matrix(i, j));
+      row.push_back(std::make_pair("", cell));
     }
-    output.push_back(std::make_pair("", col));
+    output.push_back(std::make_pair("", row));
   }
 
   return output;
@@ -134,19 +134,13 @@ ptree_to_triangular_array(const boost::property_tree::ptree input)
 
   std::vector<std::vector<T>> vec(input.size());
   size_t trunc_lvl = 0;
-  size_t d = 0;
-  for (boost::property_tree::ptree::value_type col : input) {
-    std::vector<T> col_vec(col.second.size());
+  for (boost::property_tree::ptree::value_type row : input) {
+    std::vector<T> row_vec(row.second.size());
     size_t count = 0;
-    for (boost::property_tree::ptree::value_type cell : col.second) {
-      col_vec[count] = cell.second.get_value<T>();
-      if (d == 0) {
-        trunc_lvl++;
-      }
-      count++;
+    for (boost::property_tree::ptree::value_type cell : row.second) {
+      row_vec[count++] = cell.second.get_value<T>();
     }
-    vec[d] = col_vec;
-    d++;
+    vec[trunc_lvl++] = row_vec;
   }
   return TriangularArray<T>(vec);
 }
