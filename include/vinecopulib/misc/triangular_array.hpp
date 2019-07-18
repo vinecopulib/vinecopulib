@@ -92,18 +92,26 @@ TriangularArray<T>::TriangularArray(size_t d, size_t trunc_lvl)
 
 //! @brief construct a truncated triangular array from nested vector.
 //!
-//! @param d the dimension of the vine.
+//! An arrax of dimension `d` has `d-1` columns and `min(trunc_lvl, d-1)` 
+//! rows.
 //! @param rows a vector of rows; the length of the first row defines
 //! the dimension of the triangular array. The number of rows defines
 //! the truncation level.
 template<typename T>
 TriangularArray<T>::TriangularArray(const std::vector<std::vector<T>>& rows)
-  : d_(rows[0].size())
+  : d_(rows[0].size() + 1)
   , trunc_lvl_(rows.size())
 {
-  if (trunc_lvl_ > d_)
-    throw std::runtime_error(
-      "Input does not define a triangular array: more rows than columns.");
+  std::string problem = "Not a triangular array: ";
+  if (trunc_lvl_ > d_) {
+    throw std::runtime_error(problem + "more rows than columns.");
+  }
+  for (size_t i = 0; i < trunc_lvl_; i++) {
+    if (rows[i].size() != d_ - 1 - i) {
+        throw std::runtime_error(problem + "row i must have d - 1 - i entries.");
+    }
+  }
+  
   arr_ = rows;
 }
 
@@ -155,8 +163,10 @@ TriangularArray<T>::operator==(const TriangularArray<T>& rhs) const
     return false;
 
   for (size_t i = 0; i < trunc_lvl_; i++) {
-    if (arr_[i] != rhs[i])
-      return false;
+    for (size_t j = 0; j < d_ - 1 - i; j++) {
+      if ((*this)(i, j) != rhs(i, j))
+        return false;
+    }
   }
   return true;
 }
@@ -185,7 +195,7 @@ TriangularArray<T>::str() const
 {
   std::stringstream str;
   for (size_t i = 0; i < trunc_lvl_; i++) {
-    for (size_t j = 0; j < d_ - i - 1; j++) {
+    for (size_t j = 0; j < d_ - 1 - i; j++) {
       str << arr_[i][j] << " ";
     }
     str << std::endl;
