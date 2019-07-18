@@ -550,7 +550,7 @@ RVineStructure::check_columns() const
 
     size_t unique_in_col = std::unique(col.begin(), col.end()) - col.begin();
     if (unique_in_col != col.size()) {
-      problem = "columns must not contain duplicate entries.";
+      problem = "a column must not contain duplicate entries.";
     }
     if (problem != "") {
         throw std::runtime_error("not a valid R-vine array: " + problem);

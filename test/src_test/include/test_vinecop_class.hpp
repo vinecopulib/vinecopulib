@@ -363,14 +363,12 @@ TEST_F(VinecopTest, fixed_truncation)
   Vinecop fit(7);
   fit.select_all(u, controls);
   fit.select_families(u, controls);
-
-  TriangularArray<size_t> my_rvm(7);
-  my_rvm[0] = { 2, 1, 3, 4, 6, 5 };
-  my_rvm[1] = { 3, 1, 2, 4, 5 };
-  my_rvm[2] = { 1, 4, 3, 2 };
-  my_rvm[3] = { 1, 3, 2 };
-  my_rvm[4] = { 1, 2 };
-  my_rvm[5] = { 1 };
+  TriangularArray<size_t> my_rvm({ { 2, 3, 1, 1, 1, 1 },
+                                   { 1, 1, 4, 3, 2 },
+                                   { 3, 2, 3, 2 },
+                                   { 4, 4, 2 },
+                                   { 6, 5 },
+                                   { 5 } });
   RVineStructure my_struct({ 7, 6, 5, 4, 3, 2, 1 }, my_rvm);
   my_struct.truncate(2);
   Vinecop fit2(u, my_struct);
