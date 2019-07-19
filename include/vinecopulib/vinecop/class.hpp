@@ -121,7 +121,7 @@ public:
 
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
 
-  TriangularArray<size_t> get_struct_array() const;
+  TriangularArray<size_t> get_struct_array(bool natural_order = false) const;
 
   // getters for fit statistics
   double get_threshold() const;

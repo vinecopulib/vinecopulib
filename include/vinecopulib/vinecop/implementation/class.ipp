@@ -529,10 +529,11 @@ Vinecop::get_matrix() const
 }
 
 //! @brief extracts the above diagonal coefficients of the vine copula model.
+//! @param natural_order whether indices correspond to natural order.
 inline TriangularArray<size_t>
-Vinecop::get_struct_array() const
+Vinecop::get_struct_array(bool natural_order) const
 {
-  return vine_struct_.get_struct_array();
+  return vine_struct_.get_struct_array(natural_order);
 }
 
 //! @brief extracts the log-likelihood (throws an error if model has not been
@@ -651,7 +652,7 @@ Vinecop::pdf(const Eigen::MatrixXd& u, const size_t num_threads) const
   TriangularArray<size_t> no_array, min_array, needed_hfunc1, needed_hfunc2;
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
-    no_array = vine_struct_.get_struct_array();
+    no_array = vine_struct_.get_struct_array(true);
     min_array = vine_struct_.get_min_array();
     needed_hfunc1 = vine_struct_.get_needed_hfunc1();
     needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -896,7 +897,7 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
     inverse_order = tools_stl::invert_permutation(order);
-    no_array = vine_struct_.get_struct_array();
+    no_array = vine_struct_.get_struct_array(true);
     min_array = vine_struct_.get_min_array();
     needed_hfunc1 = vine_struct_.get_needed_hfunc1();
     needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -1001,7 +1002,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
     inverse_order = tools_stl::invert_permutation(order);
-    no_array = vine_struct_.get_struct_array();
+    no_array = vine_struct_.get_struct_array(true);
     min_array = vine_struct_.get_min_array();
     needed_hfunc1 = vine_struct_.get_needed_hfunc1();
     needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -1163,13 +1164,13 @@ Vinecop::str() const
   for (size_t t = 0; t < vine_struct_.get_trunc_lvl(); ++t) {
     str << "** Tree: " << t << std::endl;
     for (size_t e = 0; e < d_ - 1 - t; ++e) {
-      str << order[e] << "," << order[arr(t, e) - 1];
+      str << order[e] << "," << arr(t, e);
       if (t > 0) {
         str << " | ";
         for (size_t cv = t - 1; cv > 1; --cv) {
-          str << order[arr(cv, e) - 1] << ",";
+          str << arr(cv, e) - 1 << ",";
         }
-        str << order[arr(0, e) - 1];
+        str << arr(0, e);
       }
       str << " <-> " << pair_copulas_[t][e].str() << std::endl;
     }
