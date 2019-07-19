@@ -31,7 +31,7 @@ public:
   Vinecop(size_t d);
 
   // Constructors with structure only
-  Vinecop(const RVineStructure& vine_struct);
+  Vinecop(const RVineStructure& structure);
 
   Vinecop(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
           const bool check = true);
@@ -42,7 +42,7 @@ public:
 
   // Constructors with pair_copulas + structure
   Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
-          const RVineStructure& vine_struct);
+          const RVineStructure& structure);
 
   Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
           const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
@@ -58,7 +58,7 @@ public:
           const FitControlsVinecop& controls = FitControlsVinecop());
 
   Vinecop(const Eigen::MatrixXd& data,
-          const RVineStructure& vine_struct,
+          const RVineStructure& structure,
           FitControlsVinecop controls = FitControlsVinecop());
 
   Vinecop(const Eigen::MatrixXd& data,
