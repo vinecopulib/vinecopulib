@@ -47,12 +47,12 @@ inline Vinecop::Vinecop(const RVineStructure& vine_struct)
 //! @brief creates a vine copula with structure specified by an R-vine matrix;
 //! all pair-copulas are set to independence.
 //! @param matrix an R-vine matrix.
-//! @param check_matrix whether to check if `matrix` is a valid R-vine
+//! @param check whether to check if `matrix` is a valid R-vine
 //!     matrix.
 inline Vinecop::Vinecop(
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
-  const bool check_matrix)
-  : Vinecop(RVineStructure(matrix, check_matrix))
+  const bool check)
+  : Vinecop(RVineStructure(matrix, check))
 {}
 
 //! @brief creates a vine copula with structure specified by an R-vine matrix;
@@ -61,12 +61,12 @@ inline Vinecop::Vinecop(
 //! RVineStructure's corresponding constructor.
 //! @param struct_array a triangular array object specifying the vine structure,
 //! see RVineStructure's corresponding constructor.
-//! @param check_array whether `order` and `struct_array` shall be checked
+//! @param check whether `order` and `struct_array` shall be checked
 //! for validity.
 inline Vinecop::Vinecop(const std::vector<size_t>& order,
                         const TriangularArray<size_t>& struct_array,
-                        const bool check_array)
-  : Vinecop(RVineStructure(order, struct_array, false, check_array))
+                        const bool check)
+  : Vinecop(RVineStructure(order, struct_array, false, check))
 {}
 
 //! @brief creates an arbitrary vine copula model.
@@ -92,13 +92,13 @@ inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
 //! @param pair_copulas Bicop objects specifying the pair-copulas, see
 //!     make_pair_copula_store().
 //! @param matrix an R-vine matrix specifying the vine structure.
-//! @param check_matrix whether to check if `matrix` is a valid R-vine
+//! @param check whether to check if `matrix` is a valid R-vine
 //!     matrix.
 inline Vinecop::Vinecop(
   const std::vector<std::vector<Bicop>>& pair_copulas,
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
-  const bool check_matrix)
-  : Vinecop(pair_copulas, RVineStructure(matrix, check_matrix))
+  const bool check)
+  : Vinecop(pair_copulas, RVineStructure(matrix, check))
 {}
 
 //! @brief creates an arbitrary vine copula model.
@@ -108,30 +108,24 @@ inline Vinecop::Vinecop(
 //! RVineStructure's corresponding constructor.
 //! @param struct_array a triangular array object specifying the vine structure,
 //! see the corresponding constructor of RVineStructure.
-//! @param check_array whether `order` and `struct_array` shall be checked
+//! @param check whether `order` and `struct_array` shall be checked
 //! for validity.
 inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
                         const std::vector<size_t>& order,
                         const TriangularArray<size_t>& struct_array,
-                        const bool check_array)
-  : Vinecop(pair_copulas,
-            RVineStructure(order, struct_array, false, check_array))
+                        const bool check)
+  : Vinecop(pair_copulas, RVineStructure(order, struct_array, false, check))
 {}
 
 //! @brief creates from a boost::property_tree::ptree object
 //! @param input the boost::property_tree::ptree object to convert from
 //! (see to_ptree() for the structure of the input).
-//! @param check_matrix whether to check if the `"matrix"` node represents
-//!      a valid R-vine matrix.
+//! @param check whether to check if the `"structure"` node represents
+//!      a valid R-vine structure.
 inline Vinecop::Vinecop(const boost::property_tree::ptree input,
-                        const bool check_matrix)
+                        const bool check)
 {
-  auto order =
-    tools_serialization::ptree_to_vector<size_t>(input.get_child("order"));
-  auto matrix = tools_serialization::ptree_to_triangular_array<size_t>(
-    input.get_child("matrix"));
-
-  vine_struct_ = RVineStructure(order, matrix, check_matrix);
+  vine_struct_ = RVineStructure(input.get_child("structure"), check);
   d_ = static_cast<size_t>(vine_struct_.get_dim());
 
   boost::property_tree::ptree pcs_node = input.get_child("pair copulas");
@@ -160,10 +154,11 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
 //! @brief creates from a JSON file.
 //! @param filename the name of the JSON file to read (see to_ptree() for the
 //! structure of the file).
-//! @param check_matrix whether to check if the `"matrix"` node represents
-//!      a valid R-vine matrix.
-inline Vinecop::Vinecop(const char* filename, const bool check_matrix)
-  : Vinecop(tools_serialization::json_to_ptree(filename), check_matrix)
+//! @param check whether to check if the `"structure"` node of the input
+//! represents
+//!      a valid R-vine structure.
+inline Vinecop::Vinecop(const char* filename, const bool check)
+  : Vinecop(tools_serialization::json_to_ptree(filename), check)
 {}
 
 //! @brief constructs a vine copula model from data by creating a model and
@@ -195,14 +190,14 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 //! @param matrix either an empty matrix (default) or an R-vine structure
 //!     matrix, see select_families().
 //! @param controls see FitControlsVinecop.
-//! @param check_matrix whether to check if `matrix` is a valid R-vine
+//! @param check whether to check if `matrix` is a valid R-vine
 //!     matrix.
 inline Vinecop::Vinecop(
   const Eigen::MatrixXd& data,
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
   FitControlsVinecop controls,
-  const bool check_matrix)
-  : Vinecop(data, RVineStructure(matrix, check_matrix), controls)
+  const bool check)
+  : Vinecop(data, RVineStructure(matrix, check), controls)
 {}
 
 //! @brief constructs a vine copula model from data by creating a model and
@@ -214,16 +209,14 @@ inline Vinecop::Vinecop(
 //! @param struct_array a triangular array object specifying the vine structure,
 //! see the corresponding constructor of RVineStructure.
 //! @param controls see FitControlsVinecop.
-//! @param check_array whether `order` and `struct_array` shall be checked
+//! @param check whether `order` and `struct_array` shall be checked
 //! for validity.
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                         const std::vector<size_t>& order,
                         const TriangularArray<size_t>& struct_array,
                         FitControlsVinecop controls,
-                        const bool check_array)
-  : Vinecop(data,
-            RVineStructure(order, struct_array, false, check_array),
-            controls)
+                        const bool check)
+  : Vinecop(data, RVineStructure(order, struct_array, false, check), controls)
 {}
 
 //! @brief constructs a vine copula model from data by creating a model and
@@ -243,8 +236,10 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 
 //! @brief converts the copula into a boost::property_tree::ptree object.
 //!
-//! The `ptree` object contains two nodes : `"matrix"` and `"pair copulas"`.
-//! The former is encodes the R-Vine structure and the latter is a list of
+//! The `ptree` object contains two nodes : `"structure"` for the vine
+//! structure, which itself contains nodes `"array"` for the structure
+//! triangular array and `"order"` for the order vector, and `"pair copulas"`.
+//! The former two encode the R-Vine structure and the latter is a list of
 //! child nodes for the trees (`"tree1"`, `"tree2"`, etc), each containing
 //! a list of child nodes for the edges (`"pc1"`, `"pc2"`, etc).
 //! See Bicop::to_ptree() for the encoding of pair-copulas.
@@ -265,11 +260,8 @@ Vinecop::to_ptree() const
 
   boost::property_tree::ptree output;
   output.add_child("pair copulas", pair_copulas);
-  auto matrix_node =
-    tools_serialization::triangular_array_to_ptree(get_struct_array());
-  output.add_child("matrix", matrix_node);
-  auto order_node = tools_serialization::vector_to_ptree(get_order());
-  output.add_child("order", order_node);
+  auto structure_node = vine_struct_.to_ptree();
+  output.add_child("structure", structure_node);
 
   return output;
 }
