@@ -130,7 +130,6 @@ TEST_F(VinecopTest, pdf_is_correct)
 
 TEST_F(VinecopTest, cdf_is_correct)
 {
-
   // Create a bivariate copula and a corresponding vine with two variables
   auto pair_copulas = Vinecop::make_pair_copula_store(2);
   auto par = Eigen::VectorXd::Constant(1, 0.5);
@@ -155,7 +154,6 @@ TEST_F(VinecopTest, cdf_is_correct)
 
 TEST_F(VinecopTest, simulate_is_correct)
 {
-
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
   auto par = Eigen::VectorXd::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
@@ -178,7 +176,6 @@ TEST_F(VinecopTest, simulate_is_correct)
 
 TEST_F(VinecopTest, rosenblatt_is_correct)
 {
-  // multivariate
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
   auto par = Eigen::VectorXd::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
@@ -219,16 +216,14 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
 
 TEST_F(VinecopTest, aic_bic_are_correct)
 {
-
   int d = 7;
-  auto data = tools_stats::simulate_uniform(1000, 7);
+  auto data = tools_stats::simulate_uniform(100, 7);
   Vinecop true_model(d);
 
   auto pair_copulas = Vinecop::make_pair_copula_store(d);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
     for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 0, par);
+      pc = Bicop(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 3.0));
     }
   }
   Vinecop complex_model(pair_copulas, model_matrix);
@@ -239,7 +234,6 @@ TEST_F(VinecopTest, aic_bic_are_correct)
 
 TEST_F(VinecopTest, family_select_finds_true_rotations)
 {
-
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
   auto par = Eigen::VectorXd::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
@@ -248,7 +242,7 @@ TEST_F(VinecopTest, family_select_finds_true_rotations)
     }
   }
   Vinecop vinecop(pair_copulas, model_matrix);
-  auto data = vinecop.simulate(10000);
+  auto data = vinecop.simulate(1000);
 
   auto controls = FitControlsVinecop({ BicopFamily::clayton }, "itau");
   // controls.set_show_trace(true);
@@ -265,7 +259,7 @@ TEST_F(VinecopTest, family_select_finds_true_rotations)
 
 TEST_F(VinecopTest, family_select_returns_pcs_in_right_order)
 {
-
+   u.conservativeResize(50, 7);
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
   auto par = Eigen::VectorXd::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
@@ -274,18 +268,18 @@ TEST_F(VinecopTest, family_select_returns_pcs_in_right_order)
     }
   }
   Vinecop vinecop(pair_copulas, model_matrix);
-  auto data = vinecop.simulate(1000);
 
   auto controls = FitControlsVinecop(bicop_families::itau, "itau");
   // controls.set_show_trace(true);
-  Vinecop fit_struct(data, controls);
-  Vinecop fit_fam(data, fit_struct.get_matrix(), controls);
+  Vinecop fit_struct(u, controls);
+  Vinecop fit_fam(u, fit_struct.get_matrix(), controls);
 
   EXPECT_EQ(fit_struct.get_all_parameters(), fit_fam.get_all_parameters());
 }
 
 TEST_F(VinecopTest, trace_works)
 {
+  u.conservativeResize(10, 7);
   FitControlsVinecop controls(bicop_families::itau, "itau");
   controls.set_show_trace(true);
   controls.set_select_threshold(true);
@@ -298,6 +292,7 @@ TEST_F(VinecopTest, trace_works)
 
 TEST_F(VinecopTest, works_multi_threaded)
 {
+  u.conservativeResize(100, 7);
   FitControlsVinecop controls(bicop_families::itau, "itau");
   controls.set_select_trunc_lvl(true);
 
@@ -360,38 +355,38 @@ TEST_F(VinecopTest, select_finds_right_structure)
 
 TEST_F(VinecopTest, fixed_truncation)
 {
+  u.conservativeResize(10, 7);
   FitControlsVinecop controls({ BicopFamily::indep });
   controls.set_trunc_lvl(2);
   // controls.set_show_trace(true);
   Vinecop fit(7);
   fit.select_all(u, controls);
+  EXPECT_EQ(fit.get_all_pair_copulas().size(), 2);
+
   fit.select_families(u, controls);
-  TriangularArray<size_t> my_rvm({ { 2, 3, 1, 1, 1, 1 },
-                                   { 1, 1, 4, 3, 2 },
-                                   { 3, 2, 3, 2 },
-                                   { 4, 4, 2 },
-                                   { 6, 5 },
-                                   { 5 } });
-  RVineStructure my_struct({ 7, 6, 5, 4, 3, 2, 1 }, my_rvm);
-  my_struct.truncate(2);
-  Vinecop fit2(u, my_struct);
+  EXPECT_EQ(fit.get_all_pair_copulas().size(), 2);
+
+  Vinecop fit2(u, fit.get_rvine_structure());
   EXPECT_EQ(fit2.get_all_pair_copulas().size(), 2);
 }
 
 TEST_F(VinecopTest, sparse_threshold_selection)
 {
+  u.conservativeResize(20, 7);
   FitControlsVinecop controls(bicop_families::itau, "itau");
   controls.set_select_threshold(true);
   // controls.set_show_trace(true);
   controls.set_selection_criterion("mbicv");
   Vinecop fit(7);
   fit.select_all(u, controls);
+  EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
   fit.select_families(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 
 TEST_F(VinecopTest, sparse_truncation_selection)
 {
+  u.conservativeResize(50, 7);
   FitControlsVinecop controls(bicop_families::itau, "itau");
   controls.set_select_trunc_lvl(true);
   // controls.set_show_trace(true);
@@ -405,12 +400,14 @@ TEST_F(VinecopTest, sparse_truncation_selection)
 
 TEST_F(VinecopTest, sparse_both_selection)
 {
+  u.conservativeResize(20, 7);
   FitControlsVinecop controls(bicop_families::itau, "itau");
   controls.set_select_trunc_lvl(true);
   controls.set_select_threshold(true);
   // controls.set_show_trace(true);
   Vinecop fit(7);
   fit.select_all(u, controls);
+  EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
   fit.select_families(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
