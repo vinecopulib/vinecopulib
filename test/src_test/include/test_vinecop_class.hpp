@@ -78,7 +78,10 @@ TEST_F(VinecopTest, getters_are_correct)
   EXPECT_ANY_THROW(vinecop.get_nobs());
   EXPECT_ANY_THROW(vinecop.get_aic());
   EXPECT_ANY_THROW(vinecop.get_bic());
-  EXPECT_ANY_THROW(vinecop.get_mbicv(0.6));
+  EXPECT_ANY_THROW(vinecop.get_mbicv());
+  EXPECT_ANY_THROW(vinecop.aic());
+  EXPECT_ANY_THROW(vinecop.bic());
+  EXPECT_ANY_THROW(vinecop.mbicv());
 }
 
 TEST_F(VinecopTest, fit_statistics_getters_are_correct)

@@ -129,7 +129,7 @@ public:
   size_t get_nobs() const;
   double get_aic() const;
   double get_bic() const;
-  double get_mbicv(const double psi0) const;
+  double get_mbicv(const double psi0 = 0.9) const;
 
   // Stats methods
   Eigen::VectorXd pdf(const Eigen::MatrixXd& u,
@@ -154,14 +154,17 @@ public:
   // Fit statistics
   double get_npars() const;
 
-  double loglik(const Eigen::MatrixXd& u, const size_t num_threads = 1) const;
+  double loglik(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
+                const size_t num_threads = 1) const;
 
-  double aic(const Eigen::MatrixXd& u, const size_t num_threads = 1) const;
+  double aic(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
+             const size_t num_threads = 1) const;
 
-  double bic(const Eigen::MatrixXd& u, const size_t num_threads = 1) const;
+  double bic(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
+             const size_t num_threads = 1) const;
 
-  double mbicv(const Eigen::MatrixXd& u,
-               const double psi0,
+  double mbicv(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
+               const double psi0 = 0.9,
                const size_t num_threads = 1) const;
 
   // Misc methods
