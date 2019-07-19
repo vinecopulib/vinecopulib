@@ -35,6 +35,13 @@ TEST(rvine_structure, triangular_array_works)
                                                     { 4, 4, 2 },
                                                     { 6, 5 },
                                                     { 5, 2 /* TOO MANY*/ } }));
+  EXPECT_ANY_THROW(TriangularArray<size_t> my_rvm({ { 2, 3, 1, 1, 1, 1 },
+                                                    { 1, 1, 4, 3, 2 },
+                                                    { 3, 2, 3, 2 },
+                                                    { 4, 4, 2 },
+                                                    { 6, 5 },
+                                                    { 5 },
+                                                    { 5 }  /* TOO MANY*/ }));
   EXPECT_NO_THROW(TriangularArray<size_t> my_rvm(
                     { { 2, 3, 1, 1, 1, 1 }, { 1, 1, 4, 3, 2 } }));
   my_rvm.truncate(2);

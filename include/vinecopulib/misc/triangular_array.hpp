@@ -23,9 +23,9 @@ namespace vinecopulib {
 //! x
 //! ```
 //! and all other elements omitted. This structure appears naturally in the
-//! representation of a vine copula model and related algorithms. Each tree
-//! corresponds to one row in the vine, starting from the top. In each tree
-//! (= row), each column represents an edge.
+//! representation of a vine copula model and related algorithms. Each row
+//! corresponds to one tree in the vine, starting from the top. In each tree
+//! (=row), each column represents an edge.
 //!
 //! For truncated vine models the last few trees are omitted. For example, a
 //! 3-truncated version of the above array contains the elements
