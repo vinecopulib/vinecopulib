@@ -31,14 +31,14 @@ public:
   Bicop(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
         const FitControlsBicop& controls = FitControlsBicop());
 
-  Bicop(const char* filename);
+  Bicop(const std::string filename);
 
   Bicop(const boost::property_tree::ptree input);
 
   // Serialize
   boost::property_tree::ptree to_ptree() const;
 
-  void to_json(const char* filename) const;
+  void to_json(const std::string filename) const;
 
   // Getters and setters
   BicopFamily get_family() const;

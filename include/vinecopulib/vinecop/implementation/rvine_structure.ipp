@@ -164,8 +164,9 @@ inline RVineStructure::RVineStructure(const boost::property_tree::ptree input,
 //! structure of the file).
 //! @param check whether to check if the input represents
 //!      a valid R-vine matrix.
-inline RVineStructure::RVineStructure(const char* filename, const bool check)
-  : RVineStructure(tools_serialization::json_to_ptree(filename), check)
+inline RVineStructure::RVineStructure(const std::string filename,
+                                      const bool check)
+  : RVineStructure(tools_serialization::json_to_ptree(filename.c_str()), check)
 {}
 
 //! @brief converts the structure into a boost::property_tree::ptree object.
@@ -192,9 +193,9 @@ RVineStructure::to_ptree() const
 //! See to_ptree() for the structure of the file.
 //! @param filename the name of the file to write.
 inline void
-RVineStructure::to_json(const char* filename) const
+RVineStructure::to_json(const std::string filename) const
 {
-  boost::property_tree::write_json(filename, to_ptree());
+  boost::property_tree::write_json(filename.c_str(), to_ptree());
 }
 
 //! extract the dimension of the vine.
@@ -595,11 +596,11 @@ RVineStructure::check_columns() const
     for (size_t i = 0; i < col.size(); i++) {
       col[i] = struct_array_(i, j);
     }
-    
+
     std::sort(col.begin(), col.end());
     if (col[0] <= 1 + j) {
-        problem += "the antidiagonal entry of a column must not be ";
-        problem += "contained in any column further to the right.";
+      problem += "the antidiagonal entry of a column must not be ";
+      problem += "contained in any column further to the right.";
     }
 
     size_t unique_in_col = std::unique(col.begin(), col.end()) - col.begin();
@@ -607,7 +608,7 @@ RVineStructure::check_columns() const
       problem = "a column must not contain duplicate entries.";
     }
     if (problem != "") {
-        throw std::runtime_error("not a valid R-vine array: " + problem);
+      throw std::runtime_error("not a valid R-vine array: " + problem);
     }
   }
 }

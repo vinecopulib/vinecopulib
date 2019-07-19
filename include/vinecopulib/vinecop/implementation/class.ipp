@@ -157,8 +157,8 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
 //! @param check whether to check if the `"structure"` node of the input
 //! represents
 //!      a valid R-vine structure.
-inline Vinecop::Vinecop(const char* filename, const bool check)
-  : Vinecop(tools_serialization::json_to_ptree(filename), check)
+inline Vinecop::Vinecop(const std::string filename, const bool check)
+  : Vinecop(tools_serialization::json_to_ptree(filename.c_str()), check)
 {}
 
 //! @brief constructs a vine copula model from data by creating a model and
@@ -271,9 +271,9 @@ Vinecop::to_ptree() const
 //! See to_ptree() for the structure of the file.
 //! @param filename the name of the file to write.
 inline void
-Vinecop::to_json(const char* filename) const
+Vinecop::to_json(const std::string filename) const
 {
-  boost::property_tree::write_json(filename, to_ptree());
+  boost::property_tree::write_json(filename.c_str(), to_ptree());
 }
 
 //! @brief initializes object for storing pair copulas.

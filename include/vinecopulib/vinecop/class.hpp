@@ -73,12 +73,12 @@ public:
           const bool check = true);
 
   // Constructors from files/serialized objects
-  Vinecop(const char* filename, const bool check = true);
+  Vinecop(const std::string filename, const bool check = true);
   Vinecop(const boost::property_tree::ptree input, const bool check = true);
 
   // Serialize
   boost::property_tree::ptree to_ptree() const;
-  void to_json(const char* filename) const;
+  void to_json(const std::string filename) const;
 
   // Methods modifying structure and/or families and parameters
   void select_all(const Eigen::MatrixXd& data,
