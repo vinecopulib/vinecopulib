@@ -10,7 +10,7 @@
 #include "gtest/gtest.h"
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/vinecop/class.hpp>
-#include <vinecopulib/vinecop/rvinestructure.hpp>
+#include <vinecopulib/vinecop/rvine_structure.hpp>
 
 namespace test_serialization {
 using namespace vinecopulib;

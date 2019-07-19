@@ -221,10 +221,23 @@ RVineStructure::get_order() const
 
 //! @brief extract structure array (all elements above the diagonal in the
 //! R-vine array).
+//! @param in_natural_order whether indices correspond to natural order 
+//! (default).
 inline TriangularArray<size_t>
-RVineStructure::get_struct_array() const
+RVineStructure::get_struct_array(bool in_natural_order) const
 {
-  return struct_array_;
+  if (in_natural_order) {
+    return struct_array_;
+  }
+
+  auto new_array = struct_array_;
+  // convert all labels to original order
+  for (size_t tree = 0; tree < trunc_lvl_; tree++) {
+    for (size_t edge = 0; edge < d_ - 1 - tree; edge++) {
+        new_array(tree, edge) = this->struct_array(tree, edge, false);
+    }
+  }
+  return new_array;
 }
 
 //! @brief extracts the minimum array.
@@ -265,10 +278,18 @@ RVineStructure::get_needed_hfunc2() const
 //! @brief access elements of the structure array.
 //! @param tree tree index.
 //! @param edge edge index.
+//! @param in_natural_order whether indices correspond to natural order 
+//! (default).
 inline size_t
-RVineStructure::struct_array(size_t tree, size_t edge) const
+RVineStructure::struct_array(size_t tree,
+                             size_t edge,
+                             bool in_natural_order) const
 {
-  return struct_array_(tree, edge);
+  if (in_natural_order) {
+    return struct_array_(tree, edge);
+  }
+  // convert label back to original order
+  return order_[struct_array_(tree, edge) - 1];
 }
 
 //! @brief access elements of the minimum array.
@@ -306,7 +327,7 @@ RVineStructure::str() const
   for (size_t i = 0; i < d_ - 1; i++) {
     for (size_t j = 0; j < d_ - i - 1; j++) {
       if (i < trunc_lvl_) {
-        str << order_[struct_array_(i, j) - 1] << " ";
+        str << this->struct_array(i, j, false) << " ";
       } else {
         str << "  ";
       }
@@ -595,11 +616,11 @@ RVineStructure::check_columns() const
     for (size_t i = 0; i < col.size(); i++) {
       col[i] = struct_array_(i, j);
     }
-    
+
     std::sort(col.begin(), col.end());
     if (col[0] <= 1 + j) {
-        problem += "the antidiagonal entry of a column must not be ";
-        problem += "contained in any column further to the right.";
+      problem += "the antidiagonal entry of a column must not be ";
+      problem += "contained in any column further to the right.";
     }
 
     size_t unique_in_col = std::unique(col.begin(), col.end()) - col.begin();
@@ -607,7 +628,7 @@ RVineStructure::check_columns() const
       problem = "a column must not contain duplicate entries.";
     }
     if (problem != "") {
-        throw std::runtime_error("not a valid R-vine array: " + problem);
+      throw std::runtime_error("not a valid R-vine array: " + problem);
     }
   }
 }
