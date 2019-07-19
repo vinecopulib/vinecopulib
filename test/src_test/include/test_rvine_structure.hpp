@@ -93,7 +93,7 @@ TEST(rvine_structure, can_convert_to_natural_order)
                                           { 3 } });
 
   RVineStructure rvine_structure(mat);
-  EXPECT_EQ(rvine_structure.get_struct_array(), true_no_array);
+  EXPECT_EQ(rvine_structure.get_struct_array(true), true_no_array);
 }
 
 TEST(rvine_structure, min_array_is_correct)

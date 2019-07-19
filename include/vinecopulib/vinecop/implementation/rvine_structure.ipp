@@ -416,7 +416,7 @@ RVineStructure::get_matrix() const
   mat.fill(0);
   for (size_t i = 0; i < trunc_lvl_; ++i) {
     for (size_t j = 0; j < d_ - i - 1; ++j) {
-      mat(i, j) = struct_array_(i, j, false);
+      mat(i, j) = this->struct_array(i, j, false);
     }
   }
   for (size_t i = 0; i < d_; ++i) {
