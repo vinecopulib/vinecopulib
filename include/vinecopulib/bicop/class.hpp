@@ -57,7 +57,7 @@ public:
   size_t get_nobs() const;
   double get_aic() const;
   double get_bic() const;
-  double get_mbic(const double psi0) const;
+  double get_mbic(const double psi0 = 0.9) const;
 
   void set_rotation(const int rotation);
 
