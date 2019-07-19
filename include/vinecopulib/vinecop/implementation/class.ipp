@@ -33,12 +33,12 @@ inline Vinecop::Vinecop(const size_t d)
 
 //! @brief creates a vine copula with structure specified by an RVineStructure
 //! object; all pair-copulas are set to independence.
-//! @param vine_struct an RVineStructure object representing the structure of
+//! @param structure an RVineStructure object representing the structure of
 //! the vine.
-inline Vinecop::Vinecop(const RVineStructure& vine_struct)
+inline Vinecop::Vinecop(const RVineStructure& structure)
 {
-  d_ = vine_struct.get_dim();
-  vine_struct_ = vine_struct;
+  d_ = structure.get_dim();
+  vine_struct_ = structure;
   // pair_copulas_ empty = everything independence
   threshold_ = 0.0;
   loglik_ = NAN;
@@ -72,13 +72,13 @@ inline Vinecop::Vinecop(const std::vector<size_t>& order,
 //! @brief creates an arbitrary vine copula model.
 //! @param pair_copulas Bicop objects specifying the pair-copulas, see
 //!     make_pair_copula_store().
-//! @param vine_struct an RVineStructure object specifying the vine structure.
+//! @param structure an RVineStructure object specifying the vine structure.
 inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
-                        const RVineStructure& vine_struct)
+                        const RVineStructure& structure)
 {
 
-  d_ = vine_struct.get_dim();
-  vine_struct_ = vine_struct;
+  d_ = structure.get_dim();
+  vine_struct_ = structure;
 
   check_pair_copulas_rvine_structure(pair_copulas);
 
@@ -165,21 +165,21 @@ inline Vinecop::Vinecop(const std::string filename, const bool check)
 //! calling select_family().
 //!
 //! @param data an \f$ n \times d \f$ matrix of observations.
-//! @param vine_struct an RVineStructure object specifying the vine structure.
+//! @param structure an RVineStructure object specifying the vine structure.
 //! @param controls see FitControlsVinecop.
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
-                        const RVineStructure& vine_struct,
+                        const RVineStructure& structure,
                         FitControlsVinecop controls)
 {
   d_ = data.cols();
   nobs_ = data.rows();
   check_enough_data(data);
-  if (d_ != vine_struct.get_dim()) {
+  if (d_ != structure.get_dim()) {
     throw std::runtime_error("data and structure have "
                              "incompatible dimensions.");
   }
   check_weights_size(controls.get_weights(), data);
-  vine_struct_ = vine_struct;
+  vine_struct_ = structure;
   select_families(data, controls);
 }
 
