@@ -99,13 +99,13 @@ inline RVineStructure::RVineStructure(const std::vector<size_t>& order,
 //! @param struct_array the structure array  (all elements
 //!    above the diagonal in the R-vine array). For truncated vines, all rows
 //!    below the truncation level are omitted.
-//! @param is_natural_order whether `struct_array` is already in natural order.
+//! @param natural_order whether `struct_array` is already in natural order.
 //! @param check whether `order` and `struct_array` shall be checked for
 //! validity.
 inline RVineStructure::RVineStructure(
   const std::vector<size_t>& order,
   const TriangularArray<size_t>& struct_array,
-  bool is_natural_order,
+  bool natural_order,
   bool check)
 {
   d_ = order.size();
@@ -125,7 +125,7 @@ inline RVineStructure::RVineStructure(
     if (check)
       check_upper_tri();
 
-    if (!is_natural_order)
+    if (!natural_order)
       struct_array_ = to_natural_order();
     if (check)
       check_columns();
@@ -222,17 +222,16 @@ RVineStructure::get_order() const
 
 //! @brief extract structure array (all elements above the diagonal in the
 //! R-vine array).
-//! @param in_natural_order whether indices correspond to natural order 
-//! (default).
+//! @param natural_order whether indices correspond to natural order.
 inline TriangularArray<size_t>
-RVineStructure::get_struct_array(bool in_natural_order) const
+RVineStructure::get_struct_array(bool natural_order) const
 {
-  if (in_natural_order) {
+  if (natural_order) {
     return struct_array_;
   }
 
-  auto new_array = struct_array_;
   // convert all labels to original order
+  auto new_array = struct_array_;
   for (size_t tree = 0; tree < trunc_lvl_; tree++) {
     for (size_t edge = 0; edge < d_ - 1 - tree; edge++) {
         new_array(tree, edge) = this->struct_array(tree, edge, false);
@@ -279,14 +278,13 @@ RVineStructure::get_needed_hfunc2() const
 //! @brief access elements of the structure array.
 //! @param tree tree index.
 //! @param edge edge index.
-//! @param in_natural_order whether indices correspond to natural order 
-//! (default).
+//! @param natural_order whether indices correspond to natural order.
 inline size_t
 RVineStructure::struct_array(size_t tree,
                              size_t edge,
-                             bool in_natural_order) const
+                             bool natural_order) const
 {
-  if (in_natural_order) {
+  if (natural_order) {
     return struct_array_(tree, edge);
   }
   // convert label back to original order
@@ -414,17 +412,17 @@ RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
 inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>
 RVineStructure::get_matrix() const
 {
-  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> array(d_, d_);
-  array.fill(0);
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d_, d_);
+  mat.fill(0);
   for (size_t i = 0; i < trunc_lvl_; ++i) {
     for (size_t j = 0; j < d_ - i - 1; ++j) {
-      array(i, j) = order_[struct_array_(i, j) - 1];
+      mat(i, j) = struct_array_(i, j, false);
     }
   }
   for (size_t i = 0; i < d_; ++i) {
-    array(d_ - i - 1, i) = order_[i];
+    mat(d_ - i - 1, i) = order_[i];
   }
-  return array;
+  return mat;
 }
 
 //! @brief find the truncation level in an R-vine array.

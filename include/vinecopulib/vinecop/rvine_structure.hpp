@@ -77,7 +77,7 @@ public:
                  bool check = true);
   RVineStructure(const std::vector<size_t>& order,
                  const TriangularArray<size_t>& struct_array,
-                 bool is_natural_order = false,
+                 bool natural_order = false,
                  bool check = true);
   RVineStructure(const std::string filename, const bool check = true);
   RVineStructure(const boost::property_tree::ptree input,
@@ -89,7 +89,7 @@ public:
   size_t get_dim() const;
   size_t get_trunc_lvl() const;
   std::vector<size_t> get_order() const;
-  TriangularArray<size_t> get_struct_array(bool in_natural_order = true) const;
+  TriangularArray<size_t> get_struct_array(bool natural_order = false) const;
   TriangularArray<size_t> get_min_array() const;
   TriangularArray<size_t> get_needed_hfunc1() const;
   TriangularArray<size_t> get_needed_hfunc2() const;
@@ -97,7 +97,7 @@ public:
 
   size_t struct_array(size_t tree,
                       size_t edge,
-                      bool in_natural_order = true) const;
+                      bool natural_order = false) const;
   size_t min_array(size_t tree, size_t edge) const;
 
   void truncate(size_t trunc_lvl);
