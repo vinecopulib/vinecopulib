@@ -61,12 +61,12 @@ inline Vinecop::Vinecop(
 //! RVineStructure's corresponding constructor.
 //! @param struct_array a triangular array object specifying the vine structure,
 //! see RVineStructure's corresponding constructor.
-//! @param check_array whether `order` and `struct_array` shall be checked
+//! @param check whether `order` and `struct_array` shall be checked
 //! for validity.
 inline Vinecop::Vinecop(const std::vector<size_t>& order,
                         const TriangularArray<size_t>& struct_array,
-                        const bool check_array)
-  : Vinecop(RVineStructure(order, struct_array, false, check_array))
+                        const bool check)
+  : Vinecop(RVineStructure(order, struct_array, false, check))
 {}
 
 //! @brief creates an arbitrary vine copula model.
@@ -108,14 +108,13 @@ inline Vinecop::Vinecop(
 //! RVineStructure's corresponding constructor.
 //! @param struct_array a triangular array object specifying the vine structure,
 //! see the corresponding constructor of RVineStructure.
-//! @param check_array whether `order` and `struct_array` shall be checked
+//! @param check whether `order` and `struct_array` shall be checked
 //! for validity.
 inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
                         const std::vector<size_t>& order,
                         const TriangularArray<size_t>& struct_array,
-                        const bool check_array)
-  : Vinecop(pair_copulas,
-            RVineStructure(order, struct_array, false, check_array))
+                        const bool check)
+  : Vinecop(pair_copulas, RVineStructure(order, struct_array, false, check))
 {}
 
 //! @brief creates from a boost::property_tree::ptree object
@@ -210,16 +209,14 @@ inline Vinecop::Vinecop(
 //! @param struct_array a triangular array object specifying the vine structure,
 //! see the corresponding constructor of RVineStructure.
 //! @param controls see FitControlsVinecop.
-//! @param check_array whether `order` and `struct_array` shall be checked
+//! @param check whether `order` and `struct_array` shall be checked
 //! for validity.
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                         const std::vector<size_t>& order,
                         const TriangularArray<size_t>& struct_array,
                         FitControlsVinecop controls,
-                        const bool check_array)
-  : Vinecop(data,
-            RVineStructure(order, struct_array, false, check_array),
-            controls)
+                        const bool check)
+  : Vinecop(data, RVineStructure(order, struct_array, false, check), controls)
 {}
 
 //! @brief constructs a vine copula model from data by creating a model and

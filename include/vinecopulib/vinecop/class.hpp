@@ -38,7 +38,7 @@ public:
 
   Vinecop(const std::vector<size_t>& order,
           const TriangularArray<size_t>& struct_array,
-          const bool check_array = true);
+          const bool check = true);
 
   // Constructors with pair_copulas + structure
   Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
@@ -51,7 +51,7 @@ public:
   Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
           const std::vector<size_t>& order,
           const TriangularArray<size_t>& struct_array,
-          const bool check_array = true);
+          const bool check = true);
 
   // Constructors from data
   Vinecop(const Eigen::MatrixXd& data,
@@ -70,7 +70,7 @@ public:
           const std::vector<size_t>& order,
           const TriangularArray<size_t>& struct_array,
           FitControlsVinecop controls = FitControlsVinecop(),
-          const bool check_array = true);
+          const bool check = true);
 
   // Constructors from files/serialized objects
   Vinecop(const char* filename, const bool check = true);
