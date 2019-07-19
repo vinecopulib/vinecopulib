@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <vinecopulib/misc/tools_serialization.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
@@ -141,6 +142,59 @@ inline RVineStructure::RVineStructure(
     needed_hfunc1_ = TriangularArray<size_t>(d_, trunc_lvl_);
     needed_hfunc2_ = TriangularArray<size_t>(d_, trunc_lvl_);
   }
+}
+
+//! @brief creates from a boost::property_tree::ptree object
+//! @param input the boost::property_tree::ptree object to convert from
+//! (see to_ptree() for the structure of the input).
+//! @param check whether to check if the input represents
+//!      a valid R-vine structure.
+inline RVineStructure::RVineStructure(const boost::property_tree::ptree input,
+                                      const bool check)
+  : RVineStructure(
+      tools_serialization::ptree_to_vector<size_t>(input.get_child("order")),
+      tools_serialization::ptree_to_triangular_array<size_t>(
+        input.get_child("array")),
+      true,
+      check)
+{}
+
+//! @brief creates from a JSON file.
+//! @param filename the name of the JSON file to read (see to_ptree() for the
+//! structure of the file).
+//! @param check whether to check if the input represents
+//!      a valid R-vine matrix.
+inline RVineStructure::RVineStructure(const char* filename, const bool check)
+  : RVineStructure(tools_serialization::json_to_ptree(filename), check)
+{}
+
+//! @brief converts the structure into a boost::property_tree::ptree object.
+//!
+//! The `ptree` object contains two nodes: `"array"` for the structure
+//! triangular array and `"order"` for the order vector.
+//!
+//! @return the boost::property_tree::ptree object containing the structure.
+inline boost::property_tree::ptree
+RVineStructure::to_ptree() const
+{
+  boost::property_tree::ptree output;
+  auto array_node =
+    tools_serialization::triangular_array_to_ptree(get_struct_array());
+  output.add_child("array", array_node);
+  auto order_node = tools_serialization::vector_to_ptree(get_order());
+  output.add_child("order", order_node);
+
+  return output;
+}
+
+//! @brief write the structure into a JSON file.
+//!
+//! See to_ptree() for the structure of the file.
+//! @param filename the name of the file to write.
+inline void
+RVineStructure::to_json(const char* filename) const
+{
+  boost::property_tree::write_json(filename, to_ptree());
 }
 
 //! extract the dimension of the vine.

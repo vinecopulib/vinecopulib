@@ -7,7 +7,6 @@
 #pragma once
 
 #include <Eigen/Dense>
-#include <boost/property_tree/ptree.hpp>
 #include <vinecopulib/vinecop/fit_controls.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
 
@@ -35,7 +34,7 @@ public:
   Vinecop(const RVineStructure& vine_struct);
 
   Vinecop(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
-          const bool check_matrix = true);
+          const bool check = true);
 
   Vinecop(const std::vector<size_t>& order,
           const TriangularArray<size_t>& struct_array,
@@ -47,7 +46,7 @@ public:
 
   Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
           const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
-          const bool check_matrix = true);
+          const bool check = true);
 
   Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
           const std::vector<size_t>& order,
@@ -65,7 +64,7 @@ public:
   Vinecop(const Eigen::MatrixXd& data,
           const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
           FitControlsVinecop controls = FitControlsVinecop(),
-          const bool check_matrix = true);
+          const bool check = true);
 
   Vinecop(const Eigen::MatrixXd& data,
           const std::vector<size_t>& order,
@@ -74,14 +73,11 @@ public:
           const bool check_array = true);
 
   // Constructors from files/serialized objects
-  Vinecop(const char* filename, const bool check_matrix = true);
-
-  Vinecop(const boost::property_tree::ptree input,
-          const bool check_matrix = true);
+  Vinecop(const char* filename, const bool check = true);
+  Vinecop(const boost::property_tree::ptree input, const bool check = true);
 
   // Serialize
   boost::property_tree::ptree to_ptree() const;
-
   void to_json(const char* filename) const;
 
   // Methods modifying structure and/or families and parameters
