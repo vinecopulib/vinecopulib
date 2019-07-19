@@ -364,30 +364,36 @@ Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters) const
 //! @name Getters and setters
 //!
 //! @{
+
+//! get the copula family
 inline BicopFamily
 Bicop::get_family() const
 {
   return bicop_->get_family();
 }
 
+//! get the copula family as a string
 inline std::string
 Bicop::get_family_name() const
 {
   return bicop_->get_family_name();
 }
 
+//! get the rotation
 inline int
 Bicop::get_rotation() const
 {
   return rotation_;
 }
 
+//! get the parameters
 inline Eigen::MatrixXd
 Bicop::get_parameters() const
 {
   return bicop_->get_parameters();
 }
 
+//! get the log-likelihood (only for fitted objects)
 inline double
 Bicop::get_loglik() const
 {
@@ -395,6 +401,7 @@ Bicop::get_loglik() const
   return bicop_->get_loglik();
 }
 
+//! get the number of observations (only for fitted objects)
 inline size_t
 Bicop::get_nobs() const
 {
@@ -402,6 +409,7 @@ Bicop::get_nobs() const
   return nobs_;
 }
 
+//! get the aic (only for fitted objects)
 inline double
 Bicop::get_aic() const
 {
@@ -409,6 +417,7 @@ Bicop::get_aic() const
   return -2 * bicop_->get_loglik() + 2 * bicop_->get_npars();
 }
 
+//! get the bic (only for fitted objects)
 inline double
 Bicop::get_bic() const
 {
@@ -417,6 +426,7 @@ Bicop::get_bic() const
   return -2 * bicop_->get_loglik() + std::log(nobs_) * npars;
 }
 
+//! get the modified bic (only for fitted objects)
 inline double
 Bicop::get_mbic(const double psi0) const
 {
@@ -434,12 +444,14 @@ Bicop::compute_mbic_penalty(const size_t nobs, const double psi0) const
   return std::log(nobs) * npars - 2 * log_prior;
 }
 
+//! get the Kendall's tau
 inline double
 Bicop::get_tau() const
 {
   return parameters_to_tau(bicop_->get_parameters());
 }
 
+//! set the rotation
 inline void
 Bicop::set_rotation(const int rotation)
 {
@@ -448,6 +460,7 @@ Bicop::set_rotation(const int rotation)
   bicop_->set_loglik();
 }
 
+//! set the parameters
 inline void
 Bicop::set_parameters(const Eigen::MatrixXd& parameters)
 {
@@ -494,6 +507,21 @@ Bicop::str() const
   }
   return bicop_str.str().c_str();
 }
+
+//! extract lower bounds for copula parameters.
+inline Eigen::MatrixXd
+Bicop::get_parameters_lower_bounds() const
+{
+  return bicop_->get_parameters_lower_bounds();
+}
+
+//! extract upper bounds for copula parameters.
+inline Eigen::MatrixXd
+Bicop::get_parameters_upper_bounds() const
+{
+  return bicop_->get_parameters_upper_bounds();
+}
+
 //! @}
 
 inline BicopPtr
@@ -621,20 +649,6 @@ Bicop::select(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
     tools_thread::ThreadPool pool(controls.get_num_threads());
     pool.map(fit_and_compare, bicops);
   }
-}
-
-//! extract lower bounds for copula parameters.
-inline Eigen::MatrixXd
-Bicop::get_parameters_lower_bounds() const
-{
-  return bicop_->get_parameters_lower_bounds();
-}
-
-//! extract upper bounds for copula parameters.
-inline Eigen::MatrixXd
-Bicop::get_parameters_upper_bounds() const
-{
-  return bicop_->get_parameters_upper_bounds();
 }
 
 //! @brief Data manipulations for rotated families
