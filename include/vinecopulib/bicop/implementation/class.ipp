@@ -294,8 +294,11 @@ inline double
 Bicop::bic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u) const
 {
   Eigen::MatrixXd u_no_nan = u;
-  tools_eigen::remove_nans(u_no_nan);
-  double n = static_cast<double>(u_no_nan.rows());
+  double n = nobs_;
+  if (u.rows() > 0) {
+    tools_eigen::remove_nans(u_no_nan);
+    n = static_cast<double>(u_no_nan.rows());
+  }
   return -2 * loglik(u_no_nan) + get_npars() * log(n);
 }
 
@@ -316,13 +319,16 @@ inline double
 Bicop::mbic(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u,
             const double psi0) const
 {
+  Eigen::MatrixXd u_no_nan = u;
   bool is_indep = (this->get_family() == BicopFamily::indep);
   double npars = this->get_npars();
-  double n = static_cast<double>(u.rows());
-  double ll = this->loglik(u);
   double log_prior = static_cast<double>(!is_indep) * std::log(psi0) +
                      static_cast<double>(is_indep) * std::log(1.0 - psi0);
-  return -2 * ll + std::log(n) * npars - 2 * log_prior;
+  double n = nobs_;
+  if (u.rows() > 0) {
+    n = static_cast<double>(u_no_nan.rows());
+  }
+  return -2 * this->loglik(u_no_nan) + std::log(n) * npars - 2 * log_prior;
 }
 
 //! @brief returns the actual number of parameters for parameteric families.

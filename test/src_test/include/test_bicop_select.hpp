@@ -47,8 +47,12 @@ TEST(bicop_select, fit_stats_are_correct)
   cop.select(u);
   EXPECT_EQ(cop.get_nobs(), 15);
   EXPECT_NEAR(cop.get_loglik(), cop.loglik(u), 1e-10);
+  EXPECT_NEAR(cop.get_loglik(), cop.loglik(), 1e-10);
   EXPECT_NEAR(cop.get_aic(), cop.aic(u), 1e-10);
+  EXPECT_NEAR(cop.get_aic(), cop.aic(), 1e-10);
   EXPECT_NEAR(cop.get_bic(), cop.bic(u), 1e-10);
-  EXPECT_NEAR(cop.get_mbic(0.6), cop.mbic(u, 0.6), 1e-10);
+  EXPECT_NEAR(cop.get_bic(), cop.bic(), 1e-10);
+  EXPECT_NEAR(cop.get_mbic(), cop.mbic(u), 1e-10);
+  EXPECT_NEAR(cop.get_mbic(), cop.mbic(), 1e-10);
 }
 }
