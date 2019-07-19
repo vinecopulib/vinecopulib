@@ -787,7 +787,11 @@ Vinecop::simulate(const size_t n,
 inline double
 Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
-  return pdf(u, num_threads).array().log().sum();
+  if (u.rows() < 1) {
+    return this->get_loglik();
+  } else {
+    return pdf(u, num_threads).array().log().sum();
+  }
 }
 
 //! @brief calculates the Akaike information criterion (AIC).
@@ -806,7 +810,7 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 inline double
 Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
-  return -2 * loglik(u, num_threads) + 2 * get_npars();
+  return -2 * this->loglik(u, num_threads) + 2 * get_npars();
 }
 
 //! @brief calculates the Bayesian information criterion (BIC).
@@ -825,7 +829,7 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 inline double
 Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
-  return -2 * loglik(u, num_threads) +
+  return -2 * this->loglik(u, num_threads) +
          get_npars() * log(static_cast<double>(u.rows()));
 }
 
@@ -856,7 +860,6 @@ Vinecop::mbicv(const Eigen::MatrixXd& u,
   double n = static_cast<double>(u.rows());
   double ll = this->loglik(u, num_threads);
   return -2 * ll + this->calculate_mbicv_penalty(n, psi0);
-  ;
 }
 
 //! @brief returns sum of the number of parameters for all pair copulas (see
