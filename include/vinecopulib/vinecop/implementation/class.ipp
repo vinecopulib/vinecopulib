@@ -273,7 +273,7 @@ Vinecop::to_ptree() const
 inline void
 Vinecop::to_json(const std::string filename) const
 {
-  boost::property_tree::write_json(filename.c_str(), to_ptree());
+  boost::property_tree::write_json(filename.c_str(), this->to_ptree());
 }
 
 //! @brief initializes object for storing pair copulas.

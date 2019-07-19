@@ -43,20 +43,20 @@ matrix_to_ptree(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix)
 
 //! conversion from vinecopulib::TriangularArray to boost::property_tree::ptree
 //!
-//! @param matrix the vinecopulib::TriangularArray to convert.
+//! @param array the vinecopulib::TriangularArray to convert.
 //! @return the corresponding boost::property_tree::ptree.
 template<class T>
 inline boost::property_tree::ptree
-triangular_array_to_ptree(TriangularArray<T> matrix)
+triangular_array_to_ptree(TriangularArray<T> array)
 {
   boost::property_tree::ptree output;
-  size_t d = matrix.get_dim();
-  size_t trunc_lvl = matrix.get_trunc_lvl();
+  size_t d = array.get_dim();
+  size_t trunc_lvl = array.get_trunc_lvl();
   for (size_t i = 0; i < std::min(d - -1, trunc_lvl); i++) {
     boost::property_tree::ptree row;
     for (size_t j = 0; j < d - 1 - i; j++) {
       boost::property_tree::ptree cell;
-      cell.put_value(matrix(i, j));
+      cell.put_value(array(i, j));
       row.push_back(std::make_pair("", cell));
     }
     output.push_back(std::make_pair("", row));
