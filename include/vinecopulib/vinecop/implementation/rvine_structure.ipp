@@ -180,9 +180,9 @@ RVineStructure::to_ptree() const
 {
   boost::property_tree::ptree output;
   auto array_node =
-    tools_serialization::triangular_array_to_ptree(get_struct_array());
+    tools_serialization::triangular_array_to_ptree(struct_array_);
   output.add_child("array", array_node);
-  auto order_node = tools_serialization::vector_to_ptree(get_order());
+  auto order_node = tools_serialization::vector_to_ptree(order_);
   output.add_child("order", order_node);
 
   return output;
@@ -195,7 +195,7 @@ RVineStructure::to_ptree() const
 inline void
 RVineStructure::to_json(const std::string filename) const
 {
-  boost::property_tree::write_json(filename.c_str(), to_ptree());
+  boost::property_tree::write_json(filename.c_str(), this->to_ptree());
 }
 
 //! extract the dimension of the vine.
