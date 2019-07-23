@@ -83,6 +83,16 @@ TEST_P(TrafokernelTest, tau)
   EXPECT_LE(tau, 1.0);
 }
 
+TEST_P(TrafokernelTest, reset)
+{
+  // this is essentially what we do when converting between C++ and R objects
+  auto cop = Bicop(u, controls);
+  auto cop_new = Bicop(BicopFamily::tll, 0, cop.get_parameters());
+  EXPECT_EQ(cop.get_parameters(), cop_new.get_parameters());
+  EXPECT_EQ(cop.get_family(), cop_new.get_family());
+  EXPECT_EQ(cop.get_rotation(), cop_new.get_rotation());
+  EXPECT_EQ(cop.loglik(u), cop_new.loglik(u));
+}
 
 INSTANTIATE_TEST_SUITE_P(TrafokernelTest,
                          TrafokernelTest,
