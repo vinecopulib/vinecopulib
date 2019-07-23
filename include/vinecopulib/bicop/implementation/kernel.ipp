@@ -67,12 +67,14 @@ KernelBicop::hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
 inline double
 KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
 {
-  set_parameters(parameters);
+  auto oldpars = this->get_parameters();
+  this->set_parameters(parameters);
   std::vector<int> seeds = {
     204967043, 733593603, 184618802, 399707801, 290266245
   };
   auto u = tools_stats::ghalton(1000, 2, seeds);
   u.col(1) = hinv1(u);
+  this->set_parameters(oldpars);
   return wdm::wdm(u, "tau")(0, 1);
 }
 
@@ -108,7 +110,8 @@ KernelBicop::set_parameters(const Eigen::MatrixXd& parameters)
     message << "density should be larger than 0. ";
     throw std::runtime_error(message.str().c_str());
   }
-  interp_grid_->set_values(parameters);
+  // don't normalize again!
+  interp_grid_->set_values(parameters, 0);
 }
 
 inline void
