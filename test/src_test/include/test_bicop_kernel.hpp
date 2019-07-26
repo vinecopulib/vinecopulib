@@ -11,7 +11,7 @@
 namespace test_bicop_kernel {
 using namespace vinecopulib;
 
-TEST_P(TrafokernelTest, trafo_kernel_sanity_checks)
+TEST_P(TrafokernelTest, sanity_checks)
 {
   auto values = bicop_.get_parameters();
   EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0, 0, 30, 1)));
@@ -19,12 +19,12 @@ TEST_P(TrafokernelTest, trafo_kernel_sanity_checks)
   EXPECT_ANY_THROW(bicop_.set_parameters(-1 * values));
 }
 
-TEST_P(TrafokernelTest, trafo_kernel_fit)
+TEST_P(TrafokernelTest, fit)
 {
   bicop_.fit(u, controls);
 }
 
-TEST_P(TrafokernelTest, trafo_kernel_eval_funcs)
+TEST_P(TrafokernelTest, eval_funcs)
 {
   bicop_.fit(u, controls);
 
@@ -60,14 +60,14 @@ TEST_P(TrafokernelTest, trafo_kernel_eval_funcs)
   EXPECT_NO_THROW(bicop_.loglik(u.block(0, 0, 10, 2)));
 }
 
-TEST_P(TrafokernelTest, trafo_kernel_select)
+TEST_P(TrafokernelTest, select)
 {
   auto newcop = Bicop(u, controls);
   EXPECT_EQ(newcop.loglik(u), newcop.get_loglik());
   EXPECT_EQ(newcop.get_family(), BicopFamily::tll);
 }
 
-TEST_P(TrafokernelTest, trafo_kernel_flip)
+TEST_P(TrafokernelTest, flip)
 {
   auto pdf = bicop_.pdf(u);
   u.col(0).swap(u.col(1));
@@ -76,11 +76,22 @@ TEST_P(TrafokernelTest, trafo_kernel_flip)
   EXPECT_TRUE(pdf.isApprox(pdf_flipped, 1e-10));
 }
 
-TEST_P(TrafokernelTest, trafo_kernel_tau)
+TEST_P(TrafokernelTest, tau)
 {
   double tau = bicop_.parameters_to_tau(bicop_.get_parameters());
   EXPECT_GE(tau, -1.0);
   EXPECT_LE(tau, 1.0);
+}
+
+TEST_P(TrafokernelTest, reset)
+{
+  // this is essentially what we do when converting between C++ and R objects
+  auto cop = Bicop(u, controls);
+  auto cop_new = Bicop(BicopFamily::tll, 0, cop.get_parameters());
+  EXPECT_EQ(cop.get_parameters(), cop_new.get_parameters());
+  EXPECT_EQ(cop.get_family(), cop_new.get_family());
+  EXPECT_EQ(cop.get_rotation(), cop_new.get_rotation());
+  EXPECT_EQ(cop.loglik(u), cop_new.loglik(u));
 }
 
 INSTANTIATE_TEST_SUITE_P(TrafokernelTest,
