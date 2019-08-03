@@ -36,7 +36,7 @@ namespace vinecopulib {
 //! ```
 //! Denoting by `M[i, j]` the array entry in row `i` and column `j`,
 //! the pair-copula index for edge `e` in tree `t` of a `d` dimensional vine
-//! is `(M[d - 1 - t, e], M[t, e]; M[t - 1, e], ..., M[0, e])`. Less
+//! is `(M[d - 1 - e, e], M[t, e]; M[t - 1, e], ..., M[0, e])`. Less
 //! formally,
 //! 1. Start with the counter-diagonal element of column `e` (first conditioned
 //!    variable).
