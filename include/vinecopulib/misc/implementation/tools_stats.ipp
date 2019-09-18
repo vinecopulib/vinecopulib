@@ -115,10 +115,6 @@ to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
     // set up random number generator
     std::random_device rd;
     std::default_random_engine gen(rd());
-    auto sim = [&](int m) {
-      std::uniform_int_distribution<> distr(0, m - 1);
-      return distr(gen);
-    };
     for (size_t i = 0, reps; i < n; i += reps) {
       // find replications
       reps = 1;
@@ -127,7 +123,7 @@ to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
       // assign random rank between ties
       std::vector<size_t> rvals(reps);
       std::iota(rvals.begin(), rvals.end(), 0); // 0, 1, 2, ...
-      std::random_shuffle(rvals.begin(), rvals.end(), sim);
+      std::shuffle(rvals.begin(), rvals.end(), gen);
       for (size_t k = 0; k < reps; ++k)
         x[order[i + k]] = static_cast<double>(i + 1 + rvals[k]);
     }
