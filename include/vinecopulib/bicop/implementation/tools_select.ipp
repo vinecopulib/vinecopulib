@@ -21,7 +21,7 @@ inline std::vector <Bicop> create_candidate_bicops(
     std::vector <BicopFamily> families = get_candidate_families(controls);
 
     // check whether dependence is negative or positive
-    double tau = wdm::wdm(data, "tau", controls.get_weights())(0, 1);
+    double tau = wdm::wdm(data.leftCols(2), "tau", controls.get_weights())(0, 1);
     std::vector<int> which_rotations;
     if (tau > 0) {
         which_rotations = {0, 180};
@@ -42,7 +42,8 @@ inline std::vector <Bicop> create_candidate_bicops(
 
     // remove combinations based on symmetry characteristics
     if (controls.get_preselect_families()) {
-        preselect_candidates(new_bicops, data, tau, controls.get_weights());
+        preselect_candidates(new_bicops, data.leftCols(2), 
+                             tau, controls.get_weights());
     }
 
     return new_bicops;

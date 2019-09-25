@@ -599,11 +599,15 @@ inline void Bicop::select(const Eigen::MatrixXd &data,
     nobs_ = data_no_nan.rows();
 
     bicop_ = AbstractBicop::create();
+    bicop_->set_var_types(var_types_);
     rotation_ = 0;
     bicop_->set_loglik(0.0);
     if (data_no_nan.rows() >= 10) {
         data_no_nan = cut_and_rotate(data_no_nan);
         std::vector <Bicop> bicops = create_candidate_bicops(data_no_nan, controls);
+        for (auto& bc : bicops) {
+            bc.set_var_types(var_types_);
+        }
 
         // Estimate all models and select the best one using the
         // selection_criterion
@@ -611,7 +615,6 @@ inline void Bicop::select(const Eigen::MatrixXd &data,
         std::mutex m;
         auto fit_and_compare = [&](Bicop cop) {
             tools_interface::check_user_interrupt();
-
             // Estimate the model
             cop.fit(data_no_nan, controls);
 
