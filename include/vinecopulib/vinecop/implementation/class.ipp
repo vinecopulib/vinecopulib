@@ -595,7 +595,7 @@ inline double Vinecop::get_threshold() const
     return threshold_;
 }
 
-inline void Vinecop::set_var_types(std::vector<std::string> var_types)
+inline void Vinecop::set_var_types(const std::vector<std::string>& var_types)
 {
     std::stringstream msg;
     if (var_types.size() > d_) {
@@ -611,6 +611,35 @@ inline void Vinecop::set_var_types(std::vector<std::string> var_types)
         throw std::runtime_error(msg.str());
     }
     var_types_ = var_types;
+    if (pair_copulas_.size() == 0) {
+        return;
+    }
+
+    // set new var_types for all pair-copulas
+    std::vector<std::string> no_types(d_), pair_types(2);
+    for (size_t j = 0; j < d_; ++j) {
+        no_types[j] = var_types[vine_struct_.get_order()[j] - 1];
+    }
+    // we set the first tree explicitly and deduce later trees
+    for (size_t e = 0; e < d_ - 1; ++e) {
+        pair_types[0] = no_types[e];
+        pair_types[1] = no_types[vine_struct_.struct_array(0, e) - 1];
+        pair_copulas_[0][e].set_var_types(pair_types);
+    }
+
+    for (size_t t = 1; t < pair_copulas_.size(); ++t) {
+        for (size_t e = 0; e < d_ - t - 1; ++e) {
+            size_t m = vine_struct_.min_array(t, e);
+            pair_types[0] = pair_copulas_[t][e].get_var_types()[0];
+            // TODO: check if this remains in NO with new lib version
+            if (m == vine_struct_.struct_array(t, e)) {
+                pair_types[1] = pair_copulas_[t][m - 1].get_var_types()[0];
+            } else {
+                pair_types[1] = pair_copulas_[t][m - 1].get_var_types()[1];
+            }
+            pair_copulas_[t][e].set_var_types(pair_types);
+        }
+    }
 }
 
 

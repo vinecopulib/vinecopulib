@@ -137,7 +137,7 @@ public:
     double get_mbicv(const double psi0) const;
 
 
-    void set_var_types(std::vector<std::string> var_types);
+    void set_var_types(const std::vector<std::string>& var_types);
 
     // Stats methods
     Eigen::VectorXd pdf(const Eigen::MatrixXd &u,
