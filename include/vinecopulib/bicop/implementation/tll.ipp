@@ -232,7 +232,10 @@ inline void TllBicop::fit(const Eigen::MatrixXd &data,
 
     // transform evaluation grid and data by inverse Gaussian cdf
     Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
-    Eigen::MatrixXd z_data = tools_stats::qnorm(data);
+
+    // use jittering in case observations are discrete
+    auto psobs = tools_stats::to_pseudo_obs(data.leftCols(2), "random");
+    Eigen::MatrixXd z_data = tools_stats::qnorm(psobs);
 
     // find bandwidth matrix
     Eigen::Matrix2d B = select_bandwidth(z_data, method, weights);
@@ -261,7 +264,10 @@ inline void TllBicop::fit(const Eigen::MatrixXd &data,
     infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), m, m).transpose();
     // don't normalize margins of the EDF! (norm_times = 0)
     auto infl_grid = InterpolationGrid(grid_points, infl, 0);
-    npars_ = infl_grid.interpolate(data).sum();
-    set_loglik(pdf(data).array().log().sum());
+    // use mid ranks to compute EDF and log-likelihood 
+    // (this is closer to "observations" than jittered data)
+    psobs = tools_stats::to_pseudo_obs(data, "average");
+    npars_ = std::fmax(infl_grid.interpolate(psobs).sum(), 1.0);
+    set_loglik(pdf(psobs).array().log().sum());
 }
 }

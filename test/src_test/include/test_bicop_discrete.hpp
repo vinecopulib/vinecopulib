@@ -52,6 +52,9 @@ TEST(bicop_discrete, rotations_are_correct) {
         EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
         bc.fit(u_new);
         EXPECT_NEAR(bc.get_parameters()(0), 3, 0.3);
+        bc = Bicop(BicopFamily::tll);
+        bc.set_var_types({"d", "d"});
+        bc.fit(u_new.topRows(100));
     }
 }
 
