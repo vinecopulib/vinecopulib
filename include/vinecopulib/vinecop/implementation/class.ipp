@@ -18,30 +18,20 @@ namespace vinecopulib {
 //! creates a D-vine on `d` variables with all pair-copulas set to
 //! independence.
 //! @param d the dimension (= number of variables) of the model.
-inline Vinecop::Vinecop(const size_t d)
-{
-    d_ = d;
-
-    // 0-truncated D-vine with variable order (1, ..., d)
-    vine_struct_ = RVineStructure(tools_stl::seq_int(1, d),
-                                  static_cast<size_t>(0));
-
-    // pair_copulas_ empty = everything independence
-    threshold_ = 0.0;
-    loglik_ = NAN;
-}
+inline Vinecop::Vinecop(const size_t d) : 
+    Vinecop(RVineStructure(tools_stl::seq_int(1, d), static_cast<size_t>(0))) {}
 
 //! creates a vine copula with structure specified by an RVineStructure object;
 //! all pair-copulas are set to independence.
 //! @param vine_struct an RVineStructure object representing the structure of
 //! the vine.
-inline Vinecop::Vinecop(const RVineStructure &vine_struct)
+inline Vinecop::Vinecop(const RVineStructure &vine_struct) :
+    d_(vine_struct.get_dim()),
+    vine_struct_(vine_struct),
+    threshold_(0.0),
+    loglik_(NAN)
 {
-    d_ = vine_struct.get_dim();
-    vine_struct_ = vine_struct;
-    // pair_copulas_ empty = everything independence
-    threshold_ = 0.0;
-    loglik_ = NAN;
+    set_continuous_var_types();
 }
 
 //! creates a vine copula with structure specified by an R-vine matrix; all
@@ -72,18 +62,12 @@ inline Vinecop::Vinecop(const std::vector<size_t> &order,
 //!     make_pair_copula_store().
 //! @param vine_struct an RVineStructure object specifying the vine structure.
 inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>> &pair_copulas,
-                        const RVineStructure &vine_struct)
+                        const RVineStructure &vine_struct) :
+    Vinecop(vine_struct)
 {
-
-    d_ = vine_struct.get_dim();
-    vine_struct_ = vine_struct;
-
     check_pair_copulas_rvine_structure(pair_copulas);
-
     pair_copulas_ = pair_copulas;
     vine_struct_.truncate(pair_copulas.size());
-    threshold_ = 0.0;
-    loglik_ = NAN;
 }
 
 //! creates an arbitrary vine copula model.
@@ -95,8 +79,7 @@ inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>> &pair_copulas,
 inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>> &pair_copulas,
                         const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> &matrix,
                         const bool check_matrix) :
-    Vinecop(pair_copulas,
-            RVineStructure(matrix, check_matrix)) {}
+    Vinecop(pair_copulas, RVineStructure(matrix, check_matrix)) {}
 
 //! creates an arbitrary vine copula model.
 //! @param pair_copulas Bicop objects specifying the pair-copulas, see
@@ -122,6 +105,7 @@ inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>> &pair_copulas,
 inline Vinecop::Vinecop(const boost::property_tree::ptree input,
                         const bool check_matrix)
 {
+    // TODO: var_types
     auto order =
         tools_serialization::ptree_to_vector<size_t>(input.get_child("order"));
     auto matrix =
@@ -149,6 +133,7 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
         }
     }
 
+    // TODO: is this right?
     threshold_ = 0;
     loglik_ = NAN;
 }
@@ -159,9 +144,7 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
 //! @param check_matrix whether to check if the `"matrix"` node represents
 //!      a valid R-vine matrix.
 inline Vinecop::Vinecop(const char *filename, const bool check_matrix) :
-    Vinecop(tools_serialization::json_to_ptree(filename), check_matrix)
-{
-}
+    Vinecop(tools_serialization::json_to_ptree(filename), check_matrix) {}
 
 //! constructs a vine copula model from data by creating a model and calling
 //! select_family().
@@ -171,17 +154,16 @@ inline Vinecop::Vinecop(const char *filename, const bool check_matrix) :
 //! @param controls see FitControlsVinecop.
 inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
         const RVineStructure &vine_struct,
-        FitControlsVinecop controls)
+        FitControlsVinecop controls) :
+    Vinecop(vine_struct)
 {
-    d_ = data.cols();
     nobs_ = data.rows();
     check_enough_data(data);
-    if (d_ != vine_struct.get_dim()) {
+    if (static_cast<size_t>(data.cols()) != vine_struct_.get_dim()) {
         throw std::runtime_error("data and structure have "
                                      "incompatible dimensions.");
     }
     check_weights_size(controls.get_weights(), data);
-    vine_struct_ = vine_struct;
     select_families(data, controls);
 }
 
@@ -228,9 +210,9 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
 //! @param data an \f$ n \times d \f$ matrix of observations.
 //! @param controls see FitControlsVinecop.
 inline Vinecop::Vinecop(const Eigen::MatrixXd &data,
-                        const FitControlsVinecop &controls)
+                        const FitControlsVinecop &controls) :
+    Vinecop(data.cols())
 {
-    d_ = data.cols();
     nobs_ = data.rows();
     check_enough_data(data);
     check_weights_size(controls.get_weights(), data);
@@ -613,19 +595,17 @@ inline double Vinecop::get_threshold() const
     return threshold_;
 }
 
-inline void Vinecop::set_var_types(std::vector<size_t> var_types)
+inline void Vinecop::set_var_types(std::vector<std::string> var_types)
 {
     std::stringstream msg;
     if (var_types.size() > d_) {
-        msg <<
-            d_ << "-dimensional Vinecop model cannot have more than " <<
-            d_ << " discrete variables." <<
-            std::endl;
+        msg << "more var_types (" << var_types.size() << ")" <<
+            "than variables (" << d_ << ")-" << std::endl;
     }
-    auto allowed_vars = tools_stl::seq_int(0, d_ - 1);
-    if (!tools_stl::set_diff(var_types, allowed_vars).empty()) {
-        msg << "Discrete variables must be a subset of {0, .., d - 1}." <<
-            std::endl;
+    for (auto t : var_types) {
+        if (!tools_stl::is_member(t, {"c", "d"})) {
+            msg << "variable type must be 'c' or 'd'." << std::endl;
+        }
     }
     if (!msg.str().empty()) {
         throw std::runtime_error(msg.str());
@@ -1142,6 +1122,14 @@ inline void Vinecop::truncate(size_t trunc_lvl)
         vine_struct_.truncate(trunc_lvl);
         pair_copulas_.resize(trunc_lvl);
     }
+}
+
+
+//! set all variable types to continuous.
+inline void Vinecop::set_continuous_var_types()
+{
+    var_types_ = std::vector<std::string>(d_);
+    for (auto& t : var_types_) t = "c";
 }
 
 }
