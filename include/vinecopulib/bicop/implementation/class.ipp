@@ -530,6 +530,16 @@ inline BicopPtr Bicop::get_bicop() const
     return bicop_;
 }
 
+inline Bicop Bicop::as_continuous() const
+{
+    std::vector<std::string> cc = {"c", "c"};
+     if (var_types_ == cc)
+        return *this;
+    auto bc_new = *this;
+    bc_new.set_var_types(cc);
+    return bc_new;
+}
+
 //! fits a bivariate copula (with fixed family) to data.
 //!
 //! For parametric models, two different methods are available. `"mle"` fits

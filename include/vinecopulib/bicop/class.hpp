@@ -111,6 +111,8 @@ public:
 
     void flip();
 
+    Bicop as_continuous() const;
+
 private:
     Eigen::MatrixXd get_parameters_lower_bounds() const;
 

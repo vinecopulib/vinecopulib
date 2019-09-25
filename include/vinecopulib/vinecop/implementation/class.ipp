@@ -895,7 +895,7 @@ inline Eigen::MatrixXd Vinecop::rosenblatt(const Eigen::MatrixXd &u,
                 }
 
                 // h-functions are only evaluated if needed in next step
-                Bicop edge_copula = get_pair_copula(tree, edge);
+                Bicop edge_copula = get_pair_copula(tree, edge).as_continuous();
                 if (needed_hfunc1(tree, edge)) {
                     hfunc1.block(b.begin, edge, b.size, 1) = edge_copula.hfunc1(u_e);
                 }
@@ -995,7 +995,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
             tools_interface::check_user_interrupt(n * d > 1e5);
             size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
             for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
-                Bicop edge_copula = get_pair_copula(tree, var);
+                Bicop edge_copula = get_pair_copula(tree, var).as_continuous();
 
                 // extract data for conditional pair
                 Eigen::MatrixXd U_e(b.size, 2);
