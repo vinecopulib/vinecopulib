@@ -158,6 +158,8 @@ inline Eigen::VectorXd AbstractBicop::pdf_d_d(const Eigen::MatrixXd &u)
     Eigen::VectorXd pdf = cdf(umax) + cdf(umin);
     umax.col(0).swap(umin.col(0));
     pdf -= cdf(umax) + cdf(umin);
+    pdf = pdf.array() / (u.col(0) - u.col(2)).array();
+    pdf = pdf.array() / (u.col(1) - u.col(3)).array();
     return pdf;
 }
 

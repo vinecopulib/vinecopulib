@@ -646,7 +646,6 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
     Eigen::VectorXd vine_density = Eigen::VectorXd::Constant(u.rows(), 1.0);
 
     auto do_batch = [&](const tools_batch::Batch& b) {
-
         // temporary storage objects for h-functions
         Eigen::MatrixXd hfunc1(b.size, d);
         Eigen::MatrixXd hfunc2(b.size, d);
@@ -672,8 +671,9 @@ inline Eigen::VectorXd Vinecop::pdf(const Eigen::MatrixXd &u,
                 }
 
                 Bicop edge_copula = get_pair_copula(tree, edge);
-                vine_density.segment(b.begin, b.size) =
-                    vine_density.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e));
+                vine_density.segment(b.begin, b.size) = vine_density.
+                        segment(b.begin, b.size).
+                        cwiseProduct(edge_copula.pdf(u_e));
 
                 // h-functions are only evaluated if needed in next step
                 if (needed_hfunc1(tree, edge)) {
