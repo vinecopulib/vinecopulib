@@ -30,6 +30,9 @@
 # Emacs file
 *~
 
+# VS Code
+.vscode/
+
 *.user
 
 #build, bin and Lion related dirs

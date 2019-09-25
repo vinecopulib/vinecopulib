@@ -130,14 +130,8 @@ inline Eigen::VectorXd AbstractBicop::pdf(const Eigen::MatrixXd &u)
         pdf = pdf_raw(u);
     } else if (vars_type == "c_d")  {
         pdf = pdf_c_d(u);
-    } else if (vars_type == "c_dc") {
-        pdf = pdf_c_dc(u);
     } else if (vars_type == "d_d") {
         pdf = pdf_d_d(u);
-    } else if (vars_type == "dc_d") {
-        pdf = pdf_dc_d(u);
-    } else if (vars_type == "dc_dc") {
-        pdf = pdf_dc_dc(u);
     }
 
     auto trim = [] (const double &x) {
@@ -157,30 +151,6 @@ inline Eigen::VectorXd AbstractBicop::pdf_c_d(const Eigen::MatrixXd &u)
     }
 }
 
-inline Eigen::VectorXd AbstractBicop::pdf_c_dc(const Eigen::MatrixXd &u)
-{
-    auto umax = u.leftCols(2);
-    auto umin = u.rightCols(2);
-    Eigen::VectorXd pdf(u.rows());
-
-    for (size_t i = 0; i < pdf.rows(); ++i) {
-        if (var_types_[0] == "dc") {
-            if (umax(i, 0) == umin(i, 0)) {
-                pdf(i) = pdf_raw(umax.row(i))(0);
-            } else {
-                pdf(i) = pdf_c_d(u.row(i))(0);
-            }
-        } else {
-            if (umax(i, 1) == umin(i, 1)) {
-                pdf(i) = pdf_raw(umax.row(i))(0);
-            } else {
-                pdf(i) = pdf_c_d(u.row(i))(0);
-            }
-        }
-    }
-    return pdf;
-}
-
 inline Eigen::VectorXd AbstractBicop::pdf_d_d(const Eigen::MatrixXd &u)
 {
     Eigen::MatrixXd umax = u.leftCols(2);
@@ -191,83 +161,14 @@ inline Eigen::VectorXd AbstractBicop::pdf_d_d(const Eigen::MatrixXd &u)
     return pdf;
 }
 
-inline Eigen::VectorXd AbstractBicop::pdf_dc_d(const Eigen::MatrixXd &u)
-{
-    Eigen::MatrixXd umax = u.leftCols(2);
-    Eigen::MatrixXd umin = u.rightCols(2);
-    Eigen::VectorXd pdf(u.rows());
-
-    if (var_types_[0] == "dc") {
-        var_types_[0] = "c";
-        for (size_t i = 0; i < pdf.rows(); ++i) {
-            if (umax(i, 0) == umin(i, 0)) {
-                pdf(i) = pdf_c_d(u.row(i))(0);
-            } else {
-                pdf(i) = pdf_d_d(u.row(i))(0);
-            }
-        }
-        var_types_[0] = "dc";
-    } else {
-        var_types_[1] = "c";
-        for (size_t i = 0; i < pdf.rows(); ++i) {
-            if (umax(i, 0) == umin(i, 0)) {
-                pdf(i) = pdf_c_d(u.row(i))(0);
-            } else {
-                pdf(i) = pdf_d_d(u.row(i))(0);
-            }
-        }
-        var_types_[1] = "dc";
-    }
-    return pdf;
-}
-
-inline Eigen::VectorXd AbstractBicop::pdf_dc_dc(const Eigen::MatrixXd &u)
-{
-    Eigen::MatrixXd umax = u.leftCols(2);
-    Eigen::MatrixXd umin = u.rightCols(2);
-    Eigen::VectorXd pdf(u.rows());
-
-    for (size_t i = 0; i < pdf.rows(); ++i) {
-        if (umax.row(i) == umin.row(i)) {
-            var_types_ = {"c", "c"};
-            pdf(i) = pdf_raw(umax.row(i))(0);
-        } else if (umax(i, 0) == umin(i, 0)) {
-            var_types_ = {"c", "d"};
-            pdf(i) = pdf_c_d(u.row(i))(0);
-        } else if (umax(i, 1) == umin(i, 1)) {
-            var_types_ = {"d", "c"};
-            pdf(i) = pdf_c_d(u.row(i))(0);
-        } else {
-            pdf(i) = cdf(u.row(i))(0);
-        }
-    }
-    var_types_ = {"dc", "dc"};
-
-    return pdf;
-}
-
-
 inline Eigen::VectorXd AbstractBicop::hfunc1(const Eigen::MatrixXd &u)
 {
     if (var_types_[0] == "c") {
         return hfunc1_raw(u);
-    } else if (var_types_[0] == "d") {
-        return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
-                    (u.col(0) - u.col(2)).array();
     } else {
-        var_types_[0] = "d";
-        Eigen::VectorXd h(u.rows());
-        Eigen::Matrix<double, 1, 4> tmp;
-        for (size_t i = 0; i < u.rows(); ++i) {
-            tmp.row(0) = u.row(i);
-            if (u(i, 0) == u(i, 2)) {
-                h(i) = hfunc1_raw(tmp.leftCols(2))(0);
-            } else {
-                h(i) = hfunc1(tmp)(0);
-            }
-        }
-        var_types_[0] = "dc";
-        return h;
+        // (var_types_[0] == "d")
+        return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
+                 (u.col(0) - u.col(2)).array();
     }
 }
 
@@ -275,41 +176,28 @@ inline Eigen::VectorXd AbstractBicop::hfunc2(const Eigen::MatrixXd &u)
 {
     if (var_types_[1] == "c") {
         return hfunc2_raw(u);
-    } else if (var_types_[1] == "d") {
-        return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
-                    (u.col(1) - u.col(3)).array();
     } else {
-        var_types_[0] = "d";
-        Eigen::VectorXd h(u.rows());
-        Eigen::Matrix<double, 1, 4> tmp;
-        for (size_t i = 0; i < u.rows(); ++i) {
-            tmp.row(0) = u.row(i);
-            if (u(i, 1) == u(i, 3)) {
-                h(i) = hfunc2_raw(tmp.leftCols(2))(0);
-            } else {
-                h(i) = hfunc2(tmp)(0);
-            }
-        }
-        var_types_[0] = "dc";
-        return h;
+        // (var_types_[1] == "d")
+        return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
+                (u.col(1) - u.col(3)).array();
     }
 }
 
 inline Eigen::VectorXd AbstractBicop::hinv1(const Eigen::MatrixXd &u)
 {
-    if (var_types_[0] != "c") {
-        return hinv1_num(u);
-    } else {
+    if (var_types_[0] == "c") {
         return hinv1_raw(u);
+    } else {
+        return hinv1_num(u);
     }
 }
 
 inline Eigen::VectorXd AbstractBicop::hinv2(const Eigen::MatrixXd &u)
 {
-    if (var_types_[0] != "c") {
-        return hinv2_num(u);
-    } else {
+    if (var_types_[1] == "c") {
         return hinv2_raw(u);
+    } else {
+        return hinv2_num(u);
     }
 }
 

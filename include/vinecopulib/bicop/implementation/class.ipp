@@ -178,7 +178,9 @@ inline Eigen::VectorXd Bicop::hfunc2(const Eigen::MatrixXd &u) const
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 inline Eigen::VectorXd Bicop::hinv1(const Eigen::MatrixXd &u) const
 {
+
     check_data(u);
+
     switch (rotation_) {
         default:
             return bicop_->hinv1(cut_and_rotate(u));
@@ -232,7 +234,10 @@ Bicop::simulate(const size_t& n,
     auto u = tools_stats::simulate_uniform(n, 2, qrng, seeds);
 
     // use inverse Rosenblatt transform to generate a sample from the copula
+    auto var_types = var_types_; 
+    var_types = {"c", "c"};  // always simulate continuous data
     u.col(1) = hinv1(u);
+    var_types_ = var_types;
     return u;
 }
 
@@ -464,9 +469,8 @@ inline void Bicop::set_var_types(const std::vector<std::string> &var_types)
         throw std::runtime_error("var_types must have size two.");
     }
     for (auto t : var_types) {
-        if (!tools_stl::is_member(t, {"c", "d", "dc"})) {
-            throw std::runtime_error(
-                "each var type must be one of {'c', 'd', 'dc'}.");
+        if (!tools_stl::is_member(t, {"c", "d"})) {
+            throw std::runtime_error("var type must be either 'c' or 'd'.");
         }
     }
     var_types_ = var_types;
@@ -696,7 +700,7 @@ inline Eigen::MatrixXd Bicop::cut_and_rotate(
     }
 
     // truncate to interval [eps, 1 - eps]
-    Eigen::MatrixXd eps = Eigen::MatrixXd::Constant(u.rows(), 4, 1e-10);
+    Eigen::MatrixXd eps = Eigen::MatrixXd::Constant(u.rows(), 2, 1e-10);
     u_new = (1.0 - eps.array()).min(u_new.array());
     u_new = eps.array().max(u_new.array());
 

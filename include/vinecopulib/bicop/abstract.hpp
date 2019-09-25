@@ -96,13 +96,7 @@ protected:
 
     Eigen::VectorXd pdf_c_d(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd pdf_c_dc(const Eigen::MatrixXd &u);
-
     Eigen::VectorXd pdf_d_d(const Eigen::MatrixXd &u);
-
-    Eigen::VectorXd pdf_dc_d(const Eigen::MatrixXd &u);
-
-    Eigen::VectorXd pdf_dc_dc(const Eigen::MatrixXd &u);
 
     std::string get_vars_type() const {
         auto types = var_types_;

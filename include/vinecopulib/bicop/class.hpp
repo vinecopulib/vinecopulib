@@ -139,7 +139,7 @@ private:
     BicopPtr bicop_;
     int rotation_;
     size_t nobs_;
-    std::vector<std::string> var_types_{"c", "c"};
+    mutable std::vector<std::string> var_types_{"c", "c"};
 };
 }
 
