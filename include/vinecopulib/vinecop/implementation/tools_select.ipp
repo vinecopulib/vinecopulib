@@ -70,7 +70,7 @@ inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
                                         const FitControlsVinecop& controls,
                                         std::vector<std::string> var_types) :
     n_(data.rows()),
-    d_(data.cols()),
+    d_(var_types.size()),
     var_types_(var_types),
     controls_(controls),
     pool_(controls_.get_num_threads()),
@@ -118,6 +118,7 @@ inline std::vector <std::vector<Bicop>> VinecopSelector::make_pair_copula_store(
 inline void VinecopSelector::select_all_trees(const Eigen::MatrixXd &data)
 {
     initialize_new_fit(data);
+
     double loglik = 0.0;
     for (size_t t = 0; t < d_ - 1; ++t) {
         select_tree(t);  // select pair copulas (+ structure) of tree t
@@ -515,7 +516,7 @@ inline void FamilySelector::add_allowed_edges(VineTree &vine_tree)
             v1 = vine_struct_.min_array(tree, edge) - 1;
             Eigen::MatrixXd pc_data = get_pc_data(v0, v1, vine_tree);
             EdgeIterator e = boost::add_edge(v0, v1, w, vine_tree).first;
-            double crit = calculate_criterion(pc_data,
+            double crit = calculate_criterion(pc_data.leftCols(2),
                                               tree_criterion,
                                               controls_.get_weights());
             vine_tree[e].weight = w;
@@ -553,32 +554,43 @@ inline void VinecopSelector::add_pc_info(const EdgeIterator &e, VineTree &tree)
     size_t n = tree[v0].hfunc1.size();
     tree[e].pc_data = Eigen::MatrixXd(n, 4);
 
+
     size_t ei_common = find_common_neighbor(v0, v1, tree);
+
     if (find_position(ei_common, tree[v0].prev_edge_indices) == 0) {
         tree[e].pc_data.col(0) = tree[v0].hfunc1;
-        if (tree[v0].var_types[0] != "c") {
+        if (tree[v0].hfunc1_sub.size()) {
             tree[e].pc_data.col(2) = tree[v0].hfunc1_sub;
-        }
-        tree[e].var_types[0] = tree[v0].var_types[0];
-    } else {
-        tree[e].pc_data.col(0) = tree[v0].hfunc2;
-        if (tree[v0].var_types[1] != "c") {
-            tree[e].pc_data.col(2) = tree[v0].hfunc2_sub;
+            tree[e].var_types[0] = "d";
+        } else {
+            tree[e].pc_data.col(2) = tree[v0].hfunc1;
         }
         tree[e].var_types[0] = tree[v0].var_types[1];
+    } else {
+        tree[e].pc_data.col(0) = tree[v0].hfunc2;
+        if (tree[v0].hfunc2_sub.size()) {
+            tree[e].pc_data.col(2) = tree[v0].hfunc2_sub;
+            tree[e].var_types[0] = "d";
+        } else {
+            tree[e].pc_data.col(2) = tree[v0].hfunc2;
+        }
     }
     if (find_position(ei_common, tree[v1].prev_edge_indices) == 0) {
         tree[e].pc_data.col(1) = tree[v1].hfunc1;
-        if (tree[v0].var_types[0] != "c") {
-            tree[e].pc_data.col(3) = tree[v0].hfunc1_sub;
+        if (tree[v1].hfunc1_sub.size()) {
+            tree[e].pc_data.col(3) = tree[v1].hfunc1_sub;
+            tree[e].var_types[1] = "d";
+        } else {
+            tree[e].pc_data.col(3) = tree[v1].hfunc1;
         }
-        tree[e].var_types[1] = tree[v1].var_types[0];
     } else {
         tree[e].pc_data.col(1) = tree[v1].hfunc2;
-        if (tree[v0].var_types[1] != "c") {
-            tree[e].pc_data.col(3) = tree[v0].hfunc2_sub;
+        if (tree[v1].hfunc2_sub.size()) {
+            tree[e].pc_data.col(3) = tree[v1].hfunc2_sub;
+            tree[e].var_types[1] = "d";
+        } else {
+            tree[e].pc_data.col(3) = tree[v1].hfunc2;
         }
-        tree[e].var_types[1] = tree[v1].var_types[1];
     }
     if (tools_stl::set_diff(tree[e].var_types, {"c"}).empty()) {
         tree[e].pc_data.conservativeResize(n, 2);
@@ -592,7 +604,7 @@ inline void VinecopSelector::add_pc_info(const EdgeIterator &e, VineTree &tree)
 }
 
 inline Eigen::MatrixXd VinecopSelector::get_pc_data(size_t v0, size_t v1,
-                                                    const VineTree &tree)
+    const VineTree &tree)
 {
     Eigen::MatrixXd pc_data(tree[v0].hfunc1.size(), 2);
     size_t ei_common = find_common_neighbor(v0, v1, tree);
@@ -649,6 +661,7 @@ inline void VinecopSelector::select_tree(size_t t)
         } else {
             select_pair_copulas(new_tree);
         }
+
     }
     // make sure there is space for new tree
     trees_.resize(t + 2);
@@ -759,27 +772,26 @@ inline void VinecopSelector::set_current_fit_as_opt(const double& loglik)
 //!  @return A VineTree object containing the base graph.
 inline VineTree VinecopSelector::make_base_tree(const Eigen::MatrixXd &data)
 {
-    size_t d = data.cols();
-    VineTree base_tree(d);
+    VineTree base_tree(d_);
     auto order = vine_struct_.get_order();
     // a star connects the root node (d) with all other nodes
-    for (size_t target = 0; target < d; ++target) {
+    for (size_t target = 0; target < d_; ++target) {
         tools_interface::check_user_interrupt(target % 10000 == 0);
         // add edge and extract edge iterator
-        auto e = add_edge(d, target, base_tree).first;
-
+        auto e = add_edge(d_, target, base_tree).first;
         // inititialize hfunc1 with actual data for variable "target"
         // data need are reordered to correspond to natural order (neccessary
         // when structure is fixed)
-        base_tree[e].hfunc1.col(0) = data.col(order[target] - 1);
-        if (var_types_[order[target] - 1] != "c") {
-            base_tree[e].hfunc1 = data.col(d_ + order[target] - 1);
-            base_tree[e].var_types[0] = var_types_[order[target] - 1];
+        base_tree[e].hfunc1 = data.col(order[target] - 1);
+        if (var_types_[order[target] - 1] == "d") {
+            base_tree[e].hfunc1_sub = data.col(d_ + order[target] - 1);
+            base_tree[e].var_types = {"d", "d"} ;
         }
+
         // identify edge with variable "target" and initialize sets
         base_tree[e].conditioned.reserve(2);
         base_tree[e].conditioned.push_back(order[target] - 1);
-        base_tree[e].conditioning.reserve(d - 2);
+        base_tree[e].conditioning.reserve(d_ - 2);
         base_tree[e].all_indices = base_tree[e].conditioned;
     }
 
@@ -806,6 +818,8 @@ inline VineTree VinecopSelector::edges_as_vertices(const VineTree &prev_tree)
     for (auto e : boost::edges(prev_tree)) {
         new_tree[i].hfunc1 = prev_tree[e].hfunc1;
         new_tree[i].hfunc2 = prev_tree[e].hfunc2;
+        new_tree[i].hfunc1_sub = prev_tree[e].hfunc1_sub;
+        new_tree[i].hfunc2_sub = prev_tree[e].hfunc2_sub;
         new_tree[i].conditioned = prev_tree[e].conditioned;
         new_tree[i].conditioning = prev_tree[e].conditioning;
         new_tree[i].all_indices = prev_tree[e].all_indices;
@@ -893,9 +907,8 @@ inline void VinecopSelector::remove_edge_data(VineTree &tree)
     for (auto e : boost::edges(tree)) {
         tree[e].hfunc1 = Eigen::VectorXd();
         tree[e].hfunc2 = Eigen::VectorXd();
-        tree[e].pc_data = Eigen::MatrixXd(0, 2);
-        tree[e].hfunc1 = Eigen::VectorXd();
-        tree[e].hfunc2 = Eigen::VectorXd();
+        tree[e].hfunc1_sub = Eigen::VectorXd();
+        tree[e].hfunc2_sub = Eigen::VectorXd();
         tree[e].pc_data = Eigen::MatrixXd(0, 2);
     }
 }
@@ -907,8 +920,8 @@ inline void VinecopSelector::remove_vertex_data(VineTree &tree)
     for (auto v : boost::vertices(tree)) {
         tree[v].hfunc1 = Eigen::VectorXd();
         tree[v].hfunc2 = Eigen::VectorXd();
-        tree[v].hfunc1 = Eigen::VectorXd();
-        tree[v].hfunc2 = Eigen::VectorXd();
+        tree[v].hfunc1_sub = Eigen::VectorXd();
+        tree[v].hfunc2_sub = Eigen::VectorXd();
     }
 }
 
@@ -936,13 +949,17 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
         }
 
         if (!used_old_fit) {
-            if (is_thresholded) {
-                tree[e].pair_copula = vinecopulib::Bicop();
-            } else {
+            tree[e].pair_copula = vinecopulib::Bicop();
+            if (!is_thresholded) {
+                std::cout << "test" << std::endl;
+                tree[e].pair_copula.set_var_types(tree[e].var_types);
+                std::cout << tree[e].var_types[0] << tree[e].var_types[1] << std::endl;
+
+                                std::cout << tree[e].pc_data << std::endl;
                 tree[e].pair_copula.select(tree[e].pc_data, controls_);
+                std::cout << "test2" << std::endl;
             }
         }
-        tree[e].pair_copula.set_var_types(tree[e].var_types);
 
         tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
         tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);

@@ -50,7 +50,7 @@ struct VertexProperties
     Eigen::VectorXd hfunc2;
     Eigen::VectorXd hfunc1_sub;
     Eigen::VectorXd hfunc2_sub;
-    std::vector<std::string> var_types{"c"};
+    std::vector<std::string> var_types{"c", "c"};
 };
 struct EdgeProperties
 {
@@ -85,7 +85,7 @@ class VinecopSelector
 public:
     VinecopSelector(const Eigen::MatrixXd& data,
                     const FitControlsVinecop& controls,
-                    std::vector<std::string> var_types = std::vector<std::string>());
+                    std::vector<std::string> var_types);
 
     std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
@@ -189,7 +189,7 @@ class StructureSelector : public VinecopSelector
 public:
     StructureSelector(const Eigen::MatrixXd &data,
                       const FitControlsVinecop &controls,
-                      std::vector<std::string> var_types = std::vector<std::string>());
+                      std::vector<std::string> var_types);
 
     ~StructureSelector()
     {
@@ -207,7 +207,7 @@ public:
     FamilySelector(const Eigen::MatrixXd &data,
                    const RVineStructure &vine_struct,
                    const FitControlsVinecop &controls,
-                   std::vector<std::string> var_types = std::vector<std::string>());
+                   std::vector<std::string> var_types);
 
     ~FamilySelector()
     {

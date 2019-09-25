@@ -288,7 +288,7 @@ inline void Vinecop::select_all(const Eigen::MatrixXd &data,
     tools_eigen::check_if_in_unit_cube(data);
     check_data_dim(data);
 
-    tools_select::StructureSelector selector(data, controls);
+    tools_select::StructureSelector selector(data, controls, var_types_);
     if (controls.needs_sparse_select()) {
         selector.sparse_select_all_trees(data);
     } else {
@@ -309,7 +309,8 @@ inline void Vinecop::select_families(const Eigen::MatrixXd &data,
     check_data_dim(data);
 
     if (vine_struct_.get_trunc_lvl() > 0) {
-        tools_select::FamilySelector selector(data, vine_struct_, controls);
+        tools_select::FamilySelector selector(data, vine_struct_, 
+                                              controls, var_types_);
         if (controls.needs_sparse_select()) {
             selector.sparse_select_all_trees(data);
             vine_struct_ = selector.get_rvine_structure(); // can be truncated
@@ -1067,8 +1068,9 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd &u,
 inline void Vinecop::check_data_dim(const Eigen::MatrixXd &data) const
 {
     size_t d_data = data.cols();
-    bool is_discrete = var_types_.size() > 0;
-    size_t d_exp = is_discrete > 0 ? d_ : 2 * d_;
+    bool is_discrete = tools_stl::is_member(static_cast<std::string>("d"), 
+                                            var_types_);
+    size_t d_exp = is_discrete ? 2 * d_ : d_;
     if (d_data != d_exp) {
         std::stringstream msg;
         msg << "data has wrong number of columns; " <<

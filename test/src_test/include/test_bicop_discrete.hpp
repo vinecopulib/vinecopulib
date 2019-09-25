@@ -42,7 +42,7 @@ TEST(bicop_discrete, rotations_are_correct) {
         u_new.col(3) = (u.col(1).array() * 2).floor() / 2;
         bc.set_var_types({"c", "d"});
         EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
-        bc.fit(u_new);
+        bc.select(u_new);
         EXPECT_NEAR(bc.get_parameters()(0), 3, 0.3);
 
         // d_d
