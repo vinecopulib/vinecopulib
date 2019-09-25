@@ -24,7 +24,7 @@ inline KernelBicop::KernelBicop()
 
 inline Eigen::VectorXd KernelBicop::pdf_raw(const Eigen::MatrixXd &u)
 {
-    return interp_grid_->interpolate(u);
+    return interp_grid_->interpolate(u).cwiseMax(1e-20);
 }
 
 inline Eigen::VectorXd KernelBicop::cdf(const Eigen::MatrixXd &u)

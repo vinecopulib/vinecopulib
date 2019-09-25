@@ -152,7 +152,7 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd &x)
     auto f = [this](double x0, double x1) {
 
         auto indices = this->get_indices(x0, x1);
-        return fmax(bilinear_interpolation(
+        return bilinear_interpolation(
             this->values_(indices(0), indices(1)),
             this->values_(indices(0), indices(1) + 1),
             this->values_(indices(0) + 1, indices(1)),
@@ -161,7 +161,7 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd &x)
             this->grid_points_(indices(0) + 1),
             this->grid_points_(indices(1)),
             this->grid_points_(indices(1) + 1),
-            x0, x1), 1e-15);
+            x0, x1);
     };
 
     return tools_eigen::binaryExpr_or_nan(x, f);
