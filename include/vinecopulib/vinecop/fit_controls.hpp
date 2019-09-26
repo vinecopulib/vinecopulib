@@ -32,6 +32,7 @@ public:
                      std::string nonparametric_method = "quadratic",
                      double nonparametric_mult = 1.0,
                      size_t trunc_lvl = std::numeric_limits<size_t>::max(),
+                     bool select_partial = false,
                      std::string tree_criterion = "tau",
                      double threshold = 0.0,
                      std::string selection_criterion = "bic",
@@ -45,6 +46,7 @@ public:
 
   FitControlsVinecop(const FitControlsBicop& controls,
                      size_t trunc_lvl = std::numeric_limits<size_t>::max(),
+                     bool select_partial = false,
                      std::string tree_criterion = "tau",
                      double threshold = 0.0,
                      bool select_trunc_lvl = false,
@@ -75,6 +77,8 @@ public:
   DEPRECATED void set_truncation_level(size_t trunc_lvl);
   void set_trunc_lvl(size_t trunc_lvl);
 
+  void set_select_partial(bool select_partial);
+
   void set_tree_criterion(std::string tree_criterion);
 
   void set_threshold(double threshold);
@@ -90,6 +94,7 @@ public:
 
 private:
   size_t trunc_lvl_;
+  bool select_partial_;
   std::string tree_criterion_;
   double threshold_;
   bool show_trace_;

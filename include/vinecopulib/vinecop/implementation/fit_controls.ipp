@@ -18,6 +18,7 @@ inline FitControlsVinecop::FitControlsVinecop()
 {
   trunc_lvl_ = std::numeric_limits<int>::max();
   threshold_ = 0.0;
+  select_partial_ = false;
   tree_criterion_ = "tau";
   select_trunc_lvl_ = false;
   select_threshold_ = false;
@@ -35,6 +36,8 @@ inline FitControlsVinecop::FitControlsVinecop()
 //! @param nonparametric_mult a factor with which the smoothing parameters
 //!     are multiplied.
 //! @param trunc_lvl truncation level for truncated vines.
+//! @param select_partial whether to select the lower trees of a partially
+//      specified structure.
 //! @param tree_criterion the criterion for selecting the maximum spanning
 //!     tree ("tau", "hoeffd", "rho", and "mcor" implemented so far).
 //! @param threshold for thresholded vines (0 = no threshold).
@@ -59,6 +62,7 @@ inline FitControlsVinecop::FitControlsVinecop(
   std::string nonparametric_method,
   double nonparametric_mult,
   size_t trunc_lvl,
+  bool select_partial,
   std::string tree_criterion,
   double threshold,
   std::string selection_criterion,
@@ -79,6 +83,7 @@ inline FitControlsVinecop::FitControlsVinecop(
                      preselect_families)
 {
   set_trunc_lvl(trunc_lvl);
+  set_select_partial(select_partial);
   set_tree_criterion(tree_criterion);
   set_threshold(threshold);
   set_select_trunc_lvl(select_trunc_lvl);
@@ -89,6 +94,8 @@ inline FitControlsVinecop::FitControlsVinecop(
 
 //! @brief creates custom controls for fitting vine copula models.
 //! @param trunc_lvl truncation level for truncated vines.
+//! @param select_partial whether to select the lower trees of a partially
+//      specified structure.
 //! @param tree_criterion the criterion for selecting the maximum spanning
 //!     tree ("tau", "hoeffd" and "rho" implemented so far).
 //! @param threshold for thresholded vines (0 = no threshold).
@@ -103,6 +110,7 @@ inline FitControlsVinecop::FitControlsVinecop(
 //!     by `std::thread::hardware_concurrency()``.
 inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
                                               size_t trunc_lvl,
+                                              bool select_partial,
                                               std::string tree_criterion,
                                               double threshold,
                                               bool select_trunc_lvl,
@@ -112,6 +120,7 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
   : FitControlsBicop(controls)
 {
   set_trunc_lvl(trunc_lvl);
+  set_select_partial(select_partial);
   set_tree_criterion(tree_criterion);
   set_threshold(threshold);
   set_select_trunc_lvl(select_trunc_lvl);
@@ -160,6 +169,13 @@ FitControlsVinecop::set_trunc_lvl(size_t trunc_lvl)
   } else {
     trunc_lvl_ = trunc_lvl;
   }
+}
+
+//! sets whether to select the lower trees of a partially specified structure.
+inline void
+FitControlsVinecop::set_select_partial(bool select_partial)
+{
+  select_partial_ = select_partial;
 }
 
 //! returns whether to select the truncation level automatically.
