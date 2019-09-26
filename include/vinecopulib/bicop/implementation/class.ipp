@@ -110,7 +110,8 @@ Bicop::to_json(const std::string filename) const
 
 //! @brief evaluates the copula density.
 //!
-//! @param u \f$n \times 2\f$ matrix of evaluation points.
+//! @param u \f$ n \times 2 \f$ matrix of evaluation points for continuous
+//!    models; \f$ n \times 4 \f$ for discrete models.
 //! @return The copula density evaluated at \c u.
 inline Eigen::VectorXd
 Bicop::pdf(const Eigen::MatrixXd& u) const
@@ -121,7 +122,8 @@ Bicop::pdf(const Eigen::MatrixXd& u) const
 
 //! @brief evaluates the copula distribution.
 //!
-//! @param u \f$n \times 2\f$ matrix of evaluation points.
+//! @param u \f$ n \times 2 \f$ matrix of evaluation points for continuous
+//!    models; \f$ n \times 4 \f$ for discrete models.
 //! @return The copula distribution evaluated at \c u.
 inline Eigen::VectorXd
 Bicop::cdf(const Eigen::MatrixXd& u) const
@@ -150,7 +152,8 @@ Bicop::cdf(const Eigen::MatrixXd& u) const
 //!
 //! The first h-function is
 //! \f$ h_1(u_1, u_2) = \int_0^{u_2} c(u_1, s) \f$.
-//! @param u \f$m \times 2\f$ matrix of evaluation points.
+//! @param u \f$ n \times 2 \f$ matrix of evaluation points for continuous
+//!    models; \f$ n \times 4 \f$ for discrete models.
 inline Eigen::VectorXd
 Bicop::hfunc1(const Eigen::MatrixXd& u) const
 {
@@ -174,7 +177,8 @@ Bicop::hfunc1(const Eigen::MatrixXd& u) const
 //!
 //! The second h-function is
 //! \f$ h_2(u_1, u_2) = \int_0^{u_1} c(s, u_2) \f$.
-//! @param u \f$m \times 2\f$ matrix of evaluation points.
+//! @param u \f$ n \times 2 \f$ matrix of evaluation points for continuous
+//!    models; \f$ n \times 4 \f$ for discrete models.
 inline Eigen::VectorXd
 Bicop::hfunc2(const Eigen::MatrixXd& u) const
 {
@@ -196,7 +200,8 @@ Bicop::hfunc2(const Eigen::MatrixXd& u) const
 
 //! @brief calculates the inverse of \f$ h_1 \f$ (see hfunc1()) w.r.t. the
 //! second argument.
-//! @param u \f$m \times 2\f$ matrix of evaluation points.
+//! @param u \f$ n \times 2 \f$ matrix of evaluation points for continuous
+//!    models; \f$ n \times 4 \f$ for discrete models.
 inline Eigen::VectorXd
 Bicop::hinv1(const Eigen::MatrixXd& u) const
 {
@@ -218,7 +223,8 @@ Bicop::hinv1(const Eigen::MatrixXd& u) const
 
 //! @brief calculates the inverse of \f$ h_2 \f$ (see hfunc2()) w.r.t. the first
 //! argument.
-//! @param u \f$m \times 2\f$ matrix of evaluation points.
+//! @param u \f$ n \times 2 \f$ matrix of evaluation points for continuous
+//!    models; \f$ n \times 4 \f$ for discrete models.
 inline Eigen::VectorXd
 Bicop::hinv2(const Eigen::MatrixXd& u) const
 {
@@ -265,7 +271,8 @@ Bicop::simulate(const size_t& n,
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \f]
 //! where \f$ c \f$ is the copula density pdf().
 //!
-//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param u \f$ n \times 2 \f$ matrix of observations for continuous
+//!    models; \f$ n \times 4 \f$ for discrete models.
 inline double
 Bicop::loglik(const Eigen::MatrixXd& u) const
 {
@@ -286,9 +293,10 @@ Bicop::loglik(const Eigen::MatrixXd& u) const
 //! get_npars(). The AIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
-//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param u \f$ n \times 2 \f$ matrix of observations for continuous
+//!    models; \f$ n \times 4 \f$ for discrete models.
 inline double
-Bicop::aic(const Eigen::MatrixXd &u) const
+Bicop::aic(const Eigen::MatrixXd& u) const
 {
   return -2 * loglik(u) + 2 * get_npars();
 }
@@ -302,9 +310,10 @@ Bicop::aic(const Eigen::MatrixXd &u) const
 //! get_npars(). The BIC is a consistent model selection criterion
 //! for parametric models.
 //!
-//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param u \f$ n \times 2 \f$ matrix of observations for continuous
+//!    models; \f$ n \times 4 \f$ for discrete models.
 inline double
-Bicop::bic(const Eigen::MatrixXd &u) const
+Bicop::bic(const Eigen::MatrixXd& u) const
 {
   Eigen::MatrixXd u_no_nan = u;
   double n = nobs_;
@@ -326,7 +335,8 @@ Bicop::bic(const Eigen::MatrixXd &u) const
 //! indicator for the family being non-independence; see loglik() and
 //! get_npars().
 //!
-//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param u \f$ n \times 2 \f$ matrix of observations for continuous
+//!    models; \f$ n \times 4 \f$ for discrete models.
 //! @param psi0 prior probability of a non-independence copula.
 inline double
 Bicop::mbic(const Eigen::MatrixXd& u, const double psi0) const
@@ -519,6 +529,9 @@ Bicop::set_parameters(const Eigen::MatrixXd& parameters)
   bicop_->set_loglik();
 }
 
+//! @brief sets variable types.
+//! @param var_types a vector of size two specifying the types of the variables,
+//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
 inline void
 Bicop::set_var_types(const std::vector<std::string>& var_types)
 {
@@ -537,6 +550,7 @@ Bicop::set_var_types(const std::vector<std::string>& var_types)
   }
 }
 
+//! @brief extracts variable types.
 inline std::vector<std::string>
 Bicop::get_var_types() const
 {
@@ -627,8 +641,17 @@ Bicop::as_continuous() const
 //! likelihood optimization (with accuracy of at least 0.5). Nonparametric
 //! families have specialized methods, no specification is required.
 //!
+//! @details When at least one variable is discrete, two types of "observations"
+//! are required: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times 2 \f$ block contains
+//! realizations of \f$ F_Y(Y^-), F_X(X^-) \f$. The minus indicates a left-sided
+//! limit of the cdf. For continuous variables the left limit and the cdf itself
+//! coincide. For, e.g., an integer-valued variable, it holds \f$ F_Y(Y^-) =
+//! F_Y(Y - 1) \f$.
+//!
 //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
-//!     \f$(0, 1)^2 \f$.
+//!   \f$(0, 1)^2 \f$ for continuous models; \f$ n \times 4 \f$ for discrete
+//!   models.
 //! @param controls the controls (see FitControlsBicop).
 inline void
 Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
@@ -651,14 +674,25 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
   nobs_ = data_no_nan.rows();
 }
 
+// 
+
 //! @brief selects the best fitting model.
 //!
 //! The function calls fit() for all families in
 //! `family_set` and selecting the best fitting model by either BIC or AIC,
 //! see bic() and aic().
+//! 
+//! @details When at least one variable is discrete, two types of "observations"
+//! are required: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times 2 \f$ block contains
+//! realizations of \f$ F_Y(Y^-), F_X(X^-) \f$. The minus indicates a left-sided
+//! limit of the cdf. For continuous variables the left limit and the cdf itself
+//! coincide. For, e.g., an integer-valued variable, it holds \f$ F_Y(Y^-) =
+//! F_Y(Y - 1) \f$.
 //!
 //! @param data an \f$ n \times 2 \f$ matrix of observations contained in
-//!     \f$(0, 1)^2 \f$.
+//!   \f$(0, 1)^2 \f$ for continuous models; \f$ n \times 4 \f$ for discrete
+//!   models.
 //! @param controls the controls (see FitControlsBicop).
 inline void
 Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
@@ -741,7 +775,8 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
 
 //! @brief Data manipulations for rotated families
 //!
-//! @param u \f$m \times 2\f$ matrix of data.
+//! @param u \f$ n \times 2 \f$ matrix of observations for continuous models; 
+//!   \f$ n \times 4 \f$ for discrete models.
 //! @return The manipulated data.
 inline Eigen::MatrixXd
 Bicop::cut_and_rotate(const Eigen::MatrixXd& u) const

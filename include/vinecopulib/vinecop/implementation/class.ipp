@@ -292,7 +292,16 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! financial returns.* Computational Statistics & Data Analysis, 59 (1),
 //! 52-69.
 //!
-//! @param data nxd matrix of copula data.
+//! @details When at least one variable is discrete, two types of "observations"
+//! are required: the first \f$ n \times d \f$ block contains realizations of
+//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
+//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
+//! left-sided limit of the cdf. For continuous variables the left limit and the
+//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
+//! F_Y(Y^-) = F_Y(Y - 1) \f$.
+//!
+//! @param data \f$ n \times d \f$ matrix of observations for continuous
+//!    models; \f$ n \times 2d \f$ for discrete models.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void
 Vinecop::select_all(const Eigen::MatrixXd& data,
@@ -313,7 +322,17 @@ Vinecop::select_all(const Eigen::MatrixXd& data,
 //! @brief automatically selects all pair-copula families and fits all
 //! parameters.
 //!
-//! @param data nxd matrix of copula data.
+//!
+//! @details When at least one variable is discrete, two types of "observations"
+//! are required: the first \f$ n \times d \f$ block contains realizations of
+//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
+//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
+//! left-sided limit of the cdf. For continuous variables the left limit and the
+//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
+//! F_Y(Y^-) = F_Y(Y - 1) \f$.
+//!
+//! @param data \f$ n \times d \f$ matrix of observations for continuous
+//!    models; \f$ n \times 2d \f$ for discrete models.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void
 Vinecop::select_families(const Eigen::MatrixXd& data,
@@ -624,6 +643,9 @@ Vinecop::get_threshold() const
   return threshold_;
 }
 
+//! @brief sets variable types.
+//! @param var_types a vector of size two specifying the types of the variables,
+//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
 inline void
 Vinecop::set_var_types(const std::vector<std::string>& var_types)
 {
@@ -671,6 +693,7 @@ Vinecop::set_var_types(const std::vector<std::string>& var_types)
   }
 }
 
+//! @brief extracts the variable types.
 std::vector<std::string>
 Vinecop::get_var_types() const
 {
@@ -681,7 +704,8 @@ Vinecop::get_var_types() const
 
 //! @brief calculates the density function of the vine copula model.
 //!
-//! @param u \f$ n \times d \f$ matrix of evaluation points.
+//! @param u \f$ n \times d \f$ matrix of evaluation points for continuous
+//!    models; \f$ n \times 2d \f$ for discrete models.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -760,7 +784,8 @@ return vine_density;
 
 //! @brief calculates the cumulative distribution of the vine copula model.
 //!
-//! @param u \f$ n \times d \f$ matrix of evaluation points.
+//! @param u \f$ n \times d \f$ matrix of evaluation points for continuous
+//!    models; \f$ n \times 2d \f$ for discrete models.
 //! @param N integer for the number of quasi-random numbers to draw
 //! to evaluate the distribution (default: 1e4).
 //! @param num_threads the number of threads to use for computations; if greater
@@ -827,7 +852,8 @@ Vinecop::simulate(const size_t n,
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \f]
 //! where \f$ c \f$ is the copula density pdf().
 //!
-//! @param u \f$n \times d\f$ matrix of observations.
+//! @param u \f$ n \times d \f$ matrix of observations for continuous
+//!    models; \f$ n \times 2d \f$ for discrete models.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -850,7 +876,8 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! get_npars(). The AIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
-//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param u \f$ n \times d \f$ matrix of observations for continuous
+//!    models; \f$ n \times 2d \f$ for discrete models.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -869,7 +896,8 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! get_npars(). The BIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
-//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param u \f$ n \times d \f$ matrix of observations for continuous
+//!    models; \f$ n \times 2d \f$ for discrete models.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -893,7 +921,8 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! in tree \f$ t \f$; The vBIC is a consistent model selection criterion for
 //! parametric sparse vine copula models when \f$ d = o(\sqrt{n \ln n})\f$.
 //!
-//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param u \f$ n \times d \f$ matrix of observations for continuous
+//!    models; \f$ n \times 2d \f$ for discrete models.
 //! @param psi0 baseline prior probability of a non-independence copula.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
@@ -928,7 +957,8 @@ Vinecop::get_npars() const
 //! The Rosenblatt transform converts data from this model into independent
 //! uniform variates.
 //!
-//! @param u \f$ n \times d \f$ matrix of evaluation points.
+//! @param u \f$ n \times d \f$ matrix of evaluation points for continuous
+//!    models; \f$ n \times 2d \f$ for discrete models.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -1013,7 +1043,8 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! examplary configuration requiring less than 1 GB is \f$ n = 1000 \f$,
 //! \f$d = 200\f$.
 //!
-//! @param u \f$ n \times d \f$ matrix of evaluation points.
+//! @param u \f$ n \times d \f$ matrix of evaluation points for continuous
+//!    models; \f$ n \times 2d \f$ for discrete models.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
