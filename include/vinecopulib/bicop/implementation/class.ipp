@@ -178,9 +178,7 @@ inline Eigen::VectorXd Bicop::hfunc2(const Eigen::MatrixXd &u) const
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 inline Eigen::VectorXd Bicop::hinv1(const Eigen::MatrixXd &u) const
 {
-
     check_data(u);
-
     switch (rotation_) {
         default:
             return bicop_->hinv1(cut_and_rotate(u));
@@ -677,16 +675,6 @@ inline Eigen::MatrixXd Bicop::cut_and_rotate(
     if (u.cols() == 4) {
         u_new.leftCols(2) = cut_and_rotate(u.leftCols(2));
         u_new.rightCols(2) = cut_and_rotate(u.rightCols(2));
-        if (rotation_ == 180) {
-            u_new.leftCols(2).swap(u_new.rightCols(2));
-        } else if (is_member(rotation_, {90, 270})) {
-            if (var_types_[0] != "c" && rotation_ == 90) {
-                u_new.col(1).swap(u_new.col(3));
-            }
-            if (var_types_[1] != "c" && rotation_ == 270) {
-                u_new.col(0).swap(u_new.col(2));
-            }
-        }
         return u_new;
     }
 

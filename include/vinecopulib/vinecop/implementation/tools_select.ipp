@@ -951,28 +951,22 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
         if (!used_old_fit) {
             tree[e].pair_copula = vinecopulib::Bicop();
             if (!is_thresholded) {
-                std::cout << tree[e].pc_data.topRows(5) << std::endl << std::endl;
                 tree[e].pair_copula.set_var_types(tree[e].var_types);
                 tree[e].pair_copula.select(tree[e].pc_data, controls_);
             }
         }
 
-        // TODO: get hfuncs right
         tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
         tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
         if (tree[e].var_types[1] == "d") {
             auto sub_data = tree[e].pc_data;
             sub_data.col(1) = sub_data.col(3);
             tree[e].hfunc1_sub = tree[e].pair_copula.hfunc1(sub_data);
-        } else {
-            tree[e].hfunc1_sub = tree[e].hfunc1;
         }
         if (tree[e].var_types[0] == "d") {
             auto sub_data = tree[e].pc_data;
             sub_data.col(0) = sub_data.col(2);
             tree[e].hfunc2_sub = tree[e].pair_copula.hfunc2(sub_data);
-        } else {
-            tree[e].hfunc2_sub = tree[e].hfunc2;
         }
         tree[e].pair_copula.set_var_types(tree[e].var_types);
         tree[e].loglik = tree[e].pair_copula.get_loglik();

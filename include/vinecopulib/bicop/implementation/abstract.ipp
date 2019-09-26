@@ -125,14 +125,13 @@ inline Eigen::VectorXd AbstractBicop::pdf(const Eigen::MatrixXd &u)
 {
 
     Eigen::VectorXd pdf(u.rows());
-    auto vars_type = get_vars_type();
-    if (vars_type == "c_c") {
+    if (var_types_ == std::vector<std::string>{"c", "c"}) {
         pdf = pdf_raw(u);
-    } else if (vars_type == "c_d")  {
-        pdf = pdf_c_d(u);
-    } else if (vars_type == "d_d") {
+    } else if (var_types_ == std::vector<std::string>{"d", "d"}) {
         pdf = pdf_d_d(u);
-    }
+    } else {
+        pdf = pdf_c_d(u);
+    } 
 
     auto trim = [] (const double &x) {
         return std::min(DBL_MAX, std::max(x, DBL_MIN));
@@ -145,9 +144,9 @@ inline Eigen::VectorXd AbstractBicop::pdf_c_d(const Eigen::MatrixXd &u)
     auto umax = u.leftCols(2);
     auto umin = u.rightCols(2);
     if (var_types_[0] != "c") {
-        return hfunc2_raw(umax) - hfunc2_raw(umin);
+        return (hfunc2_raw(umax) - hfunc2_raw(umin)).array().abs();
     } else {
-        return hfunc1_raw(umax) - hfunc1_raw(umin);
+        return (hfunc1_raw(umax) - hfunc1_raw(umin)).array().abs();
     }
 }
 
@@ -165,23 +164,26 @@ inline Eigen::VectorXd AbstractBicop::pdf_d_d(const Eigen::MatrixXd &u)
 
 inline Eigen::VectorXd AbstractBicop::hfunc1(const Eigen::MatrixXd &u)
 {
-    if (var_types_[0] == "c") {
-        return hfunc1_raw(u);
+    if (var_types_[0] == "d") {
+        auto uu = u;
+        uu.col(3) = uu.col(1);
+        return ((cdf(uu.leftCols(2)) - cdf(uu.rightCols(2))).array() /
+                    (uu.col(0) - uu.col(2)).array()).abs();
     } else {
-        // (var_types_[0] == "d")
-        return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
-                 (u.col(0) - u.col(2)).array();
+        return hfunc1_raw(u);
+
     }
 }
 
 inline Eigen::VectorXd AbstractBicop::hfunc2(const Eigen::MatrixXd &u)
 {
-    if (var_types_[1] == "c") {
-        return hfunc2_raw(u);
+    if (var_types_[1] == "d") {
+        auto uu = u;
+        uu.col(2) = uu.col(0);
+        return ((cdf(uu.leftCols(2)) - cdf(uu.rightCols(2))).array() /
+                    (uu.col(1) - uu.col(3)).array()).abs();
     } else {
-        // (var_types_[1] == "d")
-        return (cdf(u.leftCols(2)) - cdf(u.rightCols(2))).array() /
-                (u.col(1) - u.col(3)).array();
+        return hfunc2_raw(u);
     }
 }
 

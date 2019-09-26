@@ -98,12 +98,6 @@ protected:
 
     Eigen::VectorXd pdf_d_d(const Eigen::MatrixXd &u);
 
-    std::string get_vars_type() const {
-        auto types = var_types_;
-        std::sort(types.begin(), types.end());
-        return types[0] + "_" + types[1];
-    }
-
     // Data members
     BicopFamily family_;
     double loglik_;
