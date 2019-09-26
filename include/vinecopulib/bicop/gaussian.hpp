@@ -20,25 +20,25 @@ namespace vinecopulib {
 class GaussianBicop : public EllipticalBicop
 {
 public:
-    // constructor
-    GaussianBicop();
+  // constructor
+  GaussianBicop();
 
 private:
-    // PDF
-    Eigen::VectorXd pdf_raw(const Eigen::MatrixXd &u);
+  // PDF
+  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
 
-    // CDF
-    Eigen::VectorXd cdf(const Eigen::MatrixXd &u);
+  // CDF
+  Eigen::VectorXd cdf(const Eigen::MatrixXd& u);
 
-    // hfunction
-    Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd &u);
+  // hfunction
+  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
 
-    // inverse hfunction
-    Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd &u);
+  // inverse hfunction
+  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
 
-    Eigen::MatrixXd tau_to_parameters(const double &tau);
+  Eigen::MatrixXd tau_to_parameters(const double& tau);
 
-    Eigen::VectorXd get_start_parameters(const double tau);
+  Eigen::VectorXd get_start_parameters(const double tau);
 };
 }
 

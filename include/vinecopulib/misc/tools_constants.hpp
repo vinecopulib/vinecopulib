@@ -4,13 +4,13 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include "src_test/include/test_serialization.hpp"
+#pragma once
 
-using namespace test_serialization;
+#include <boost/math/constants/constants.hpp>
 
-int
-main(int argc, char** argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+namespace vinecopulib {
+
+namespace constant {
+constexpr double pi = 3.141592653589793238462643383279502884;
+}
 }

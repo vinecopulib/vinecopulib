@@ -45,6 +45,7 @@ cmake-build/
 examples/*/build/
 examples/*/bin/
 compile_commands.json
+.vscode/
 
 # Ctags
 src/tags

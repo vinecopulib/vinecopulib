@@ -20,29 +20,29 @@ namespace vinecopulib {
 class ArchimedeanBicop : public ParBicop
 {
 private:
-    // cdf, hfunctions and inverses
-    //Eigen::VectorXd pdf(const Eigen::MatrixXd &u);
+  // cdf, hfunctions and inverses
+  // Eigen::VectorXd pdf(const Eigen::MatrixXd &u);
 
-    Eigen::VectorXd cdf(const Eigen::MatrixXd &u);
+  Eigen::VectorXd cdf(const Eigen::MatrixXd& u);
 
-    Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd &u);
+  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
 
-    Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd &u);
+  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u);
 
-    Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd &u);
+  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
 
-    Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd &u);
+  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
 
-    // generator, its inverse and derivative
-    virtual double generator(const double &u) = 0;
+  // generator, its inverse and derivative
+  virtual double generator(const double& u) = 0;
 
-    virtual double generator_inv(const double &u) = 0;
+  virtual double generator_inv(const double& u) = 0;
 
-    virtual double generator_derivative(const double &u) = 0;
+  virtual double generator_derivative(const double& u) = 0;
 
-    //virtual double generator_derivative2(const double &u) = 0;
+  // virtual double generator_derivative2(const double &u) = 0;
 
-    Eigen::VectorXd get_start_parameters(const double tau);
+  Eigen::VectorXd get_start_parameters(const double tau);
 };
 }
 

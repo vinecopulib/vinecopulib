@@ -1,38 +1,45 @@
 /** @file mainpage.h
-* @brief api_docs
 *
 */
+
 /** @mainpage vinecopulib: a C++ library for vine copula modeling
-*
-* @authors Thomas Nagler and Thibault Vatter
-*
-* This is the API documentation for the vinecopulib C++ library. It provides
-* functionality for statistical dependence modeling with bivariate and vine
-* copulas. For a more high-level overview see
-* <a href="https://github.com/tvatter/vinecopulib/blob/master/README.md">README</a>.
-*
-* @section license License
-*
-* The MIT License (MIT)
-*
-* Copyright © 2016-2019 Thomas Nagler and Thibault Vatter
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of
-* this software and associated documentation files (the “Software”), to deal in
-* the Software without restriction, including without limitation the rights to
-* use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-* the Software, and to permit persons to whom the Software is furnished to do so,
-* subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-* FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-* COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-* IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-* CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*
-*
+
+@authors Thomas Nagler and Thibault Vatter
+
+@section what-vc What are vine copulas?
+
+Vine copulas are a flexible class of dependence models consisting of bivariate
+building blocks (see e.g.,
+[Aas et al., 2009](https://mediatum.ub.tum.de/doc/1083600/1083600.pdf)).
+You can find a comprehensive list of publications and other materials on
+[vine-copula.org](http://www.statistics.ma.tum.de/en/research/vine-copula-models/).
+
+
+@section what-vcl What is vinecopulib?
+
+vinecopulib is a header-only C++ library for vine copula models based on
+[Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). It provides
+high-performance implementations of the core features of the popular
+[VineCopula R library](https://github.com/tnagler/VineCopula), in particular
+inference algorithms for both vine copula and bivariate copula models.
+Advantages over VineCopula are
+- a stand-alone C++ library with interfaces to both R and Python,
+- a sleaker and more modern API,
+- shorter runtimes and lower memory consumption, especially in high dimensions,
+- nonparametric and multi-parameter families.
+
+@section Status
+
+Version [0.3.2](https://github.com/vinecopulib/vinecopulib/releases) was
+released on July 3, 2019. While we did our best to
+design a user-friendly API, the library is still under active development and
+changes are to be expected. We are also working on interfaces for
+[R](https://github.com/vinecopulib/rvinecopulib) and
+[Python](https://github.com/vinecopulib/pyvinecopulib).
+
+@section Contact
+If you have any questions regarding the library, feel free to
+[open an issue](https://github.com/vinecopulib/vinecopulib/issues/new) or
+send a mail to <info@vinecopulib.org>.
+
 */

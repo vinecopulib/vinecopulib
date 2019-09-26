@@ -20,32 +20,32 @@ namespace vinecopulib {
 class IndepBicop : public ParBicop
 {
 public:
-    // constructor
-    IndepBicop();
+  // constructor
+  IndepBicop();
 
 private:
-    // PDF
-    Eigen::VectorXd pdf_raw(const Eigen::MatrixXd &u);
+  // PDF
+  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
 
-    // PDF
-    Eigen::VectorXd cdf(const Eigen::MatrixXd &u);
+  // PDF
+  Eigen::VectorXd cdf(const Eigen::MatrixXd& u);
 
-    // hfunctions and their inverses
-    Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd &u);
+  // hfunctions and their inverses
+  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
 
-    Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd &u);
+  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u);
 
-    Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd &u);
+  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
 
-    Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd &u);
+  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
 
-    Eigen::MatrixXd tau_to_parameters(const double &);
+  Eigen::MatrixXd tau_to_parameters(const double&);
 
-    double parameters_to_tau(const Eigen::MatrixXd &);
+  double parameters_to_tau(const Eigen::MatrixXd&);
 
-    void flip();
+  void flip();
 
-    Eigen::VectorXd get_start_parameters(const double tau);
+  Eigen::VectorXd get_start_parameters(const double tau);
 };
 }
 

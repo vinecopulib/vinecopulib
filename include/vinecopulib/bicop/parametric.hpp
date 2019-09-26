@@ -9,14 +9,6 @@
 #include <vinecopulib/bicop/abstract.hpp>
 
 namespace vinecopulib {
-// Pre-declaration to allow ParBicop to befriend the two functions
-namespace tools_optimization {
-// the objective function for maximum likelihood estimation
-double mle_objective(void *f_data, long n, const double *x);
-
-// the objective function for profile maximum likelihood estimation
-double pmle_objective(void *f_data, long n, const double *x);
-}
 
 //! @brief An abstract class for parametric copula families
 //!
@@ -25,46 +17,49 @@ double pmle_objective(void *f_data, long n, const double *x);
 //! always work with the Bicop interface.
 class ParBicop : public AbstractBicop
 {
-    friend double tools_optimization::mle_objective(void *f_data, long n,
-                                                    const double *x);
-
-    friend double tools_optimization::pmle_objective(void *f_data, long n,
-                                                     const double *x);
-
 protected:
-    // Getters and setters
-    Eigen::MatrixXd get_parameters() const;
+  // Getters and setters
+  Eigen::MatrixXd get_parameters() const;
 
-    Eigen::MatrixXd get_parameters_lower_bounds() const;
+  Eigen::MatrixXd get_parameters_lower_bounds() const;
 
-    Eigen::MatrixXd get_parameters_upper_bounds() const;
+  Eigen::MatrixXd get_parameters_upper_bounds() const;
 
-    void set_parameters(const Eigen::MatrixXd &parameters);
+  void set_parameters(const Eigen::MatrixXd& parameters);
 
-    void flip();
+  void flip();
 
-    // Data members
-    Eigen::MatrixXd parameters_;
-    Eigen::MatrixXd parameters_lower_bounds_;
-    Eigen::MatrixXd parameters_upper_bounds_;
+  // Data members
+  Eigen::MatrixXd parameters_;
+  Eigen::MatrixXd parameters_lower_bounds_;
+  Eigen::MatrixXd parameters_upper_bounds_;
+
+  void fit(const Eigen::MatrixXd& data,
+           std::string method,
+           double,
+           const Eigen::VectorXd& weights);
+
+  double get_npars();
+
+  virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
 
 private:
-    void fit(const Eigen::MatrixXd &data,
-             std::string method, 
-             double, 
-             const Eigen::VectorXd& weights);
+  double winsorize_tau(double tau) const;
 
-    double calculate_npars();
+  void adjust_parameters_bounds(Eigen::MatrixXd& lb,
+                                Eigen::MatrixXd& ub,
+                                const double& tau,
+                                const std::string method);
 
-    virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
+  void check_parameters(const Eigen::MatrixXd& parameters);
 
-    void check_parameters(const Eigen::MatrixXd &parameters);
+  void check_parameters_size(const Eigen::MatrixXd& parameters);
 
-    void check_parameters_size(const Eigen::MatrixXd &parameters);
+  void check_parameters_upper(const Eigen::MatrixXd& parameters);
 
-    void check_parameters_upper(const Eigen::MatrixXd &parameters);
+  void check_parameters_lower(const Eigen::MatrixXd& parameters);
 
-    void check_parameters_lower(const Eigen::MatrixXd &parameters);
+  void check_fit_method(const std::string& method);
 };
 }
 
