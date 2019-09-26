@@ -54,7 +54,15 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
           input.get<int>("rotation"),
           tools_serialization::ptree_to_matrix<double>(
             input.get_child("parameters")))
-{}
+{
+  var_types_ = tools_serialization::ptree_to_vector<std::string>(
+    input.get_child("var_types"));
+  // try block for backwards compatibility
+  try {
+    nobs_ = input.get<size_t>("nobs_");
+    bicop_->set_loglik(input.get<double>("loglik"));
+  } catch (...) {}
+}
 
 //! @brief creates from a JSON file
 //! @param filename the name of the JSON file to read (see to_ptree() for the
@@ -80,6 +88,11 @@ Bicop::to_ptree() const
   output.put("rotation", rotation_);
   auto mat_node = tools_serialization::matrix_to_ptree(get_parameters());
   output.add_child("parameters", mat_node);
+  output.add_child("var_types",
+                   tools_serialization::vector_to_ptree(var_types_));
+
+  output.put("nobs_", nobs_);
+  output.put("loglik", bicop_->get_loglik());
 
   return output;
 }

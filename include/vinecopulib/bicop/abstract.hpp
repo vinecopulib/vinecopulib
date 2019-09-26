@@ -100,7 +100,7 @@ protected:
 
   // Data members
   BicopFamily family_;
-  double loglik_;
+  double loglik_{NAN};
   std::vector<std::string> var_types_{ "c", "c" };
 };
 

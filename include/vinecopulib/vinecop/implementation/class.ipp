@@ -111,7 +111,6 @@ inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
 inline Vinecop::Vinecop(const boost::property_tree::ptree input,
                         const bool check)
 {
-  // TODO: var_types
   vine_struct_ = RVineStructure(input.get_child("structure"), check);
   d_ = static_cast<size_t>(vine_struct_.get_dim());
 
@@ -133,10 +132,15 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
       pair_copulas_[tree][edge] = Bicop(pc_node);
     }
   }
+  var_types_ = tools_serialization::ptree_to_vector<std::string>(
+    input.get_child("var_types"));
 
-  // TODO: We should rather store these in ptree and set to appropriate values
-  threshold_ = 0;
-  loglik_ = NAN;
+  // try block for backwards compatibility
+  try {
+    nobs_ = input.get<size_t>("nobs_");
+    threshold_ = input.get<double>("threshold");
+    loglik_ = input.get<double>("loglik");
+  } catch (...) {}
 }
 
 //! @brief creates from a JSON file.
@@ -249,6 +253,11 @@ Vinecop::to_ptree() const
   output.add_child("pair copulas", pair_copulas);
   auto structure_node = vine_struct_.to_ptree();
   output.add_child("structure", structure_node);
+  output.add_child("var_types",
+                   tools_serialization::vector_to_ptree(var_types_));
+  output.put("nobs_", nobs_);
+  output.put("threshold", threshold_);
+  output.put("loglik", loglik_);
 
   return output;
 }
@@ -662,6 +671,11 @@ Vinecop::set_var_types(const std::vector<std::string>& var_types)
   }
 }
 
+std::vector<std::string>
+Vinecop::get_var_types() const
+{
+  return var_types_;
+}
 
 //! @}
 

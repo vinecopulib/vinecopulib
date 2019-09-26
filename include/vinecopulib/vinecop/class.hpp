@@ -153,6 +153,8 @@ public:
 
   void set_var_types(const std::vector<std::string>& var_types);
 
+  std::vector<std::string> get_var_types() const;
+
   // Fit statistics
   double get_npars() const;
 
@@ -181,9 +183,9 @@ protected:
   size_t d_;
   RVineStructure vine_struct_;
   std::vector<std::vector<Bicop>> pair_copulas_;
-  double threshold_;
-  double loglik_;
-  size_t nobs_;
+  double threshold_{0.0};
+  double loglik_{NAN};
+  size_t nobs_{0};
   mutable std::vector<std::string> var_types_;
 
   void check_data_dim(const Eigen::MatrixXd& data) const;
