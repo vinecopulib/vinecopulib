@@ -592,7 +592,7 @@ inline void VinecopSelector::add_pc_info(const EdgeIterator &e, VineTree &tree)
             tree[e].pc_data.col(3) = tree[v1].hfunc2;
         }
     }
-    if (tools_stl::set_diff(tree[e].var_types, {"c"}).empty()) {
+    if (tree[e].var_types == std::vector<std::string>{"c", "c"}) {
         tree[e].pc_data.conservativeResize(n, 2);
     }
 
@@ -951,28 +951,30 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
         if (!used_old_fit) {
             tree[e].pair_copula = vinecopulib::Bicop();
             if (!is_thresholded) {
-                std::cout << "test" << std::endl;
+                std::cout << tree[e].pc_data.topRows(5) << std::endl << std::endl;
                 tree[e].pair_copula.set_var_types(tree[e].var_types);
-                std::cout << tree[e].var_types[0] << tree[e].var_types[1] << std::endl;
-
-                                std::cout << tree[e].pc_data << std::endl;
                 tree[e].pair_copula.select(tree[e].pc_data, controls_);
-                std::cout << "test2" << std::endl;
             }
         }
 
+        // TODO: get hfuncs right
         tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
         tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
-        if (true) {
-            tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
+        if (tree[e].var_types[1] == "d") {
+            auto sub_data = tree[e].pc_data;
+            sub_data.col(1) = sub_data.col(3);
+            tree[e].hfunc1_sub = tree[e].pair_copula.hfunc1(sub_data);
         } else {
-            tree[e].hfunc1 = tree[e].hfunc1;
+            tree[e].hfunc1_sub = tree[e].hfunc1;
         }
-        if (true) {
-            tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
+        if (tree[e].var_types[0] == "d") {
+            auto sub_data = tree[e].pc_data;
+            sub_data.col(0) = sub_data.col(2);
+            tree[e].hfunc2_sub = tree[e].pair_copula.hfunc2(sub_data);
         } else {
-            tree[e].hfunc2 = tree[e].hfunc2;
+            tree[e].hfunc2_sub = tree[e].hfunc2;
         }
+        tree[e].pair_copula.set_var_types(tree[e].var_types);
         tree[e].loglik = tree[e].pair_copula.get_loglik();
         if (controls_.needs_sparse_select()) {
             tree[e].npars = tree[e].pair_copula.calculate_npars();
@@ -982,7 +984,6 @@ inline void VinecopSelector::select_pair_copulas(VineTree &tree,
     // make sure that Bicop.select() doesn't spawn new threads
     size_t num_threads = controls_.get_num_threads();
     controls_.set_num_threads(0);
-
     pool_.map(select_pc, boost::edges(tree));
     pool_.wait();
     controls_.set_num_threads(num_threads);

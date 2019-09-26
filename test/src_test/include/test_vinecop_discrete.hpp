@@ -17,16 +17,17 @@ using namespace vinecopulib;
 
 TEST(vinecop_discrete, ) {
     // simulate data and make first var discrete
-    auto utmp = tools_stats::simulate_uniform(100, 6, true, {1});
+    auto utmp = tools_stats::simulate_uniform(100, 10, true, {1});
     auto u = utmp;
-    u.leftCols(3) = u.rightCols(3);
+    u.leftCols(5) = u.rightCols(5);
     u.col(0) = (utmp.col(0).array() * 2).ceil() / 2;
-    u.col(3) = (utmp.col(0).array() * 2).floor() / 2;
-    std::cout << u.topRows(20) << std::endl;
+    u.col(5) = (utmp.col(0).array() * 2).floor() / 2;
+    u.col(2) = (utmp.col(2).array() * 2).ceil() / 2;
+    u.col(7) = (utmp.col(2).array() * 2).floor() / 2;
 
     // fit vine
-    Vinecop vc(3);
-    vc.set_var_types({"d", "c", "c"});
+    Vinecop vc(5);
+    vc.set_var_types({"d", "c", "d", "c", "c"});
     FitControlsVinecop controls({BicopFamily::clayton});
     controls.set_show_trace(true);
     vc.select_all(u, controls);
