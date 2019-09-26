@@ -32,7 +32,9 @@ inline Vinecop::Vinecop(const RVineStructure& structure)
   // pair_copulas_ empty = everything independence
   , threshold_(0.0)
   , loglik_(NAN)
-{}
+{
+  set_continuous_var_types();
+}
 
 //! @brief creates a vine copula with structure specified by an R-vine matrix;
 //! all pair-copulas are set to independence.
