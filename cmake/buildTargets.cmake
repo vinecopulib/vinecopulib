@@ -28,8 +28,7 @@ if(BUILD_TESTING)
             test_vinecop_class
             test_vinecop_sanity_checks
             test_weights
-            test_bicop_discrete
-            test_vinecop_discrete)
+            test_discrete)
 
     add_subdirectory(test)
     file(GLOB_RECURSE r_scripts cmake/templates/*R)

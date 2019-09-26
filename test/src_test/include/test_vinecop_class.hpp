@@ -56,7 +56,7 @@ TEST_F(VinecopTest, getters_are_correct)
   for (auto& tree : vinecop.get_all_parameters()) {
     for (auto& par : tree) {
       EXPECT_EQ(par.size(), 1);
-      EXPECT_EQ(par(0), 0);
+      EXPECT_EQ(par(0), 1e-10);
     }
   }
 
