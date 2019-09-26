@@ -129,7 +129,7 @@ inline Eigen::VectorXd
 Bicop::cdf(const Eigen::MatrixXd& u) const
 {
   check_data(u);
-  Eigen::VectorXd p = bicop_->cdf(cut_and_rotate(u));
+  Eigen::VectorXd p = bicop_->cdf(cut_and_rotate(u.leftCols(2)));
   switch (rotation_) {
     default:
       return p;
