@@ -682,11 +682,11 @@ Vinecop::set_var_types(const std::vector<std::string>& var_types)
   for (size_t t = 1; t < pair_copulas_.size(); ++t) {
     for (size_t e = 0; e < d_ - t - 1; ++e) {
       size_t m = vine_struct_.min_array(t, e);
-      pair_types[0] = pair_copulas_[t][e].get_var_types()[0];
+      pair_types[0] = pair_copulas_[t - 1][e].get_var_types()[0];
       if (m == vine_struct_.struct_array(t, e, true)) {
-        pair_types[1] = pair_copulas_[t][m - 1].get_var_types()[0];
+        pair_types[1] = pair_copulas_[t - 1][m - 1].get_var_types()[0];
       } else {
-        pair_types[1] = pair_copulas_[t][m - 1].get_var_types()[1];
+        pair_types[1] = pair_copulas_[t - 1][m - 1].get_var_types()[1];
       }
       pair_copulas_[t][e].set_var_types(pair_types);
     }
