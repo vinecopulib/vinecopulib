@@ -1007,7 +1007,7 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
         }
 
         // h-functions are only evaluated if needed in next step
-        Bicop edge_copula = get_pair_copula(tree, edge);
+        Bicop edge_copula = get_pair_copula(tree, edge).as_continuous();
         if (needed_hfunc1(tree, edge)) {
           hfunc1.block(b.begin, edge, b.size, 1) = edge_copula.hfunc1(u_e);
         }
@@ -1058,10 +1058,9 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   if (n < 1) {
     throw std::runtime_error("n must be at least one");
   }
-  size_t d = u.cols();
+  size_t d = d_;
 
-  Eigen::MatrixXd U_vine = u; // output matrix
-
+  Eigen::MatrixXd U_vine = u.leftCols(d); // output matrix
   //                   (direct + indirect)    (U_vine)       (info matrices)
   size_t bytes_required = (8 * 2 * n * d * d) + (8 * n * d) + (4 * 4 * d * d);
   // if the problem is too large (requires more than 1 GB memory), split
@@ -1104,11 +1103,10 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
     // loop through variables (0 is just the initial uniform)
     for (ptrdiff_t var = d - 2; var >= 0; --var) {
-
       tools_interface::check_user_interrupt(n * d > 1e5);
       size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
       for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
-        Bicop edge_copula = get_pair_copula(tree, var);
+        Bicop edge_copula = get_pair_copula(tree, var).as_continuous();
 
         // extract data for conditional pair
         Eigen::MatrixXd U_e(b.size, 2);
