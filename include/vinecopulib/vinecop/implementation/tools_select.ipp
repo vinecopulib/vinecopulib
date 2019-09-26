@@ -616,9 +616,9 @@ inline Eigen::MatrixXd VinecopSelector::get_pc_data(size_t v0, size_t v1,
         pc_data.col(0) = tree[v0].hfunc2;
     }
     if (find_position(ei_common, tree[v1].prev_edge_indices) == 0) {
-        pc_data.col(1) = tree[v0].hfunc1;
+        pc_data.col(1) = tree[v1].hfunc1;
     } else {
-        pc_data.col(1) = tree[v0].hfunc2;
+        pc_data.col(1) = tree[v1].hfunc2;
     }
 
   return pc_data;

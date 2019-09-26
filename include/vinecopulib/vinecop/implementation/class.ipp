@@ -298,7 +298,6 @@ Vinecop::select_all(const Eigen::MatrixXd& data,
   } else {
     selector.select_all_trees(data);
   }
-
   finalize_fit(selector);
 }
 
