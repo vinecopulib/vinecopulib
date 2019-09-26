@@ -139,7 +139,7 @@ Bicop::cdf(const Eigen::MatrixXd& u) const
 
     case 180: {
       Eigen::VectorXd f = Eigen::VectorXd::Ones(p.rows());
-      f = f - u.rowwise().sum();
+      f = f - u.leftCols(2).rowwise().sum();
       return p - f;
     }
 
