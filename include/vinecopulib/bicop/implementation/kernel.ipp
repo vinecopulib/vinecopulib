@@ -26,7 +26,11 @@ inline KernelBicop::KernelBicop()
 inline Eigen::VectorXd
 KernelBicop::pdf_raw(const Eigen::MatrixXd& u)
 {
-  return interp_grid_->interpolate(u).cwiseMax(1e-20);
+  auto pdf = interp_grid_->interpolate(u);
+  auto trunc = [] (const double& p) {
+      return std::fmax(p, 1e-20);
+  };
+  return tools_eigen::unaryExpr_or_nan(pdf, trunc);
 }
 
 inline Eigen::VectorXd
