@@ -18,13 +18,13 @@ TEST(discrete, bicop)
 {
   for (auto rot : { 0, 90, 180, 270 }) {
     auto bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
-    auto u = bc.simulate(5000, true, { 1 });
+    auto u = bc.simulate(1000, true, { 1 });
     Eigen::MatrixXd u_new(u.rows(), 4);
     u_new.block(0, 0, u.rows(), 2) = u;
     u_new.block(0, 2, u.rows(), 2) = u;
 
     // c_c
-    EXPECT_GE(bc.pdf(u).minCoeff(), 0);
+    EXPECT_GE(bc.pdf(u.topRows(20)).minCoeff(), 0);
     bc.fit(u);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
 
@@ -32,12 +32,11 @@ TEST(discrete, bicop)
     u_new.col(0) = (u.col(0).array() * 2).ceil() / 2;
     u_new.col(2) = (u.col(0).array() * 2).floor() / 2;
     bc.set_var_types({ "d", "c" });
-    EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
-    EXPECT_GE(bc.hfunc1(u_new).minCoeff(), 0);
-    EXPECT_GE(bc.hfunc2(u_new).minCoeff(), 0);
+    EXPECT_GE(bc.pdf(u_new.topRows(20)).minCoeff(), 0);
     bc.fit(u_new);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
-    EXPECT_EQ(bc.cdf(u_new), bc.as_continuous().cdf(u_new.leftCols(2)));
+    EXPECT_EQ(bc.cdf(u_new.topRows(20)),
+              bc.as_continuous().cdf(u_new.leftCols(2).topRows(20)));
 
     // c_d
     u_new.block(0, 0, u.rows(), 2) = u;
@@ -45,23 +44,21 @@ TEST(discrete, bicop)
     u_new.col(1) = (u.col(1).array() * 2).ceil() / 2;
     u_new.col(3) = (u.col(1).array() * 2).floor() / 2;
     bc.set_var_types({ "c", "d" });
-    EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
-    EXPECT_GE(bc.hfunc1(u_new).minCoeff(), 0);
-    EXPECT_GE(bc.hfunc2(u_new).minCoeff(), 0);
+    EXPECT_GE(bc.pdf(u_new.topRows(20)).minCoeff(), 0);
     bc.fit(u_new);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
-    EXPECT_EQ(bc.cdf(u_new), bc.as_continuous().cdf(u_new.leftCols(2)));
+    EXPECT_EQ(bc.cdf(u_new.topRows(20)),
+              bc.as_continuous().cdf(u_new.leftCols(2).topRows(20)));
 
     // d_d
     u_new.col(0) = (u_new.col(0).array() * 2).ceil() / 2.0;
     u_new.col(2) = (u_new.col(2).array() * 2).floor() / 2.0;
     bc.set_var_types({ "d", "d" });
-    EXPECT_GE(bc.pdf(u_new).minCoeff(), 0);
-    EXPECT_GE(bc.hfunc1(u_new).minCoeff(), 0);
-    EXPECT_GE(bc.hfunc2(u_new).minCoeff(), 0);
+    EXPECT_GE(bc.pdf(u_new.topRows(20)).minCoeff(), 0);
     bc.fit(u_new);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
-    EXPECT_EQ(bc.cdf(u_new), bc.as_continuous().cdf(u_new.leftCols(2)));
+    EXPECT_EQ(bc.cdf(u_new.topRows(20)),
+              bc.as_continuous().cdf(u_new.leftCols(2).topRows(20)));
     bc.select(u_new.topRows(20)); // all families
   }
 }
@@ -69,24 +66,25 @@ TEST(discrete, bicop)
 TEST(discrete, vinecop)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(5);
-  for (auto& tree : pair_copulas) {
-    for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 90, Eigen::VectorXd::Constant(1, 3));
+  for (size_t t = 0; t < 4; t++) {
+    for (auto& pc : pair_copulas[t]) {
+      auto par = Eigen::VectorXd::Constant(1, 2.0 / (t + 1));
+      pc = Bicop(BicopFamily::clayton, 90, par);
     }
   }
   RVineStructure str(std::vector<size_t>{ 1, 2, 3, 4, 5 });
   Vinecop vc(pair_copulas, str);
 
-  auto utmp = vc.simulate(5000, true, 1, {1});
+  auto utmp = vc.simulate(1000, true);
   Eigen::MatrixXd u(utmp.rows(), 2 * utmp.cols());
   u.leftCols(5) = utmp;
   u.rightCols(5) = utmp;
-  u.col(0) = (utmp.col(0).array() * 1000).ceil() / 1000;
-  u.col(0 + utmp.cols()) = (utmp.col(0).array() * 1000).floor() / 1000;
-  u.col(2) = (utmp.col(2).array() * 1000).ceil() / 1000;
-  u.col(2 + utmp.cols()) = (utmp.col(2).array() * 1000).floor() / 1000;
-  u.col(3) = (utmp.col(3).array() * 1000).ceil() / 1000;
-  u.col(3 + utmp.cols()) = (utmp.col(3).array() * 1000).floor() / 1000;
+  u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
+  u.col(0 + utmp.cols()) = (utmp.col(0).array() * 10).floor() / 10;
+  u.col(2) = (utmp.col(2).array() * 10).ceil() / 10;
+  u.col(2 + utmp.cols()) = (utmp.col(2).array() * 10).floor() / 10;
+  u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
+  u.col(3 + utmp.cols()) = (utmp.col(3).array() * 10).floor() / 10;
 
   // fit vine
   vc.set_var_types({ "d", "c", "d", "d", "c" });
@@ -96,10 +94,10 @@ TEST(discrete, vinecop)
 
   // check output
   auto pcs = vc.get_all_pair_copulas();
-  for (auto tree : pcs) {
-    for (auto pc : tree) {
+  for (size_t t = 0; t < 4; t++) {
+    for (auto pc : pcs[t]) {
       EXPECT_EQ(pc.get_rotation(), 90);
-      EXPECT_NEAR(pc.get_parameters()(0), 3, 1);
+      EXPECT_NEAR(pc.get_parameters()(0), 2.0 / (t + 1), 1);
     }
   }
 }
