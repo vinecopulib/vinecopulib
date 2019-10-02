@@ -189,6 +189,7 @@ protected:
   mutable std::vector<std::string> var_types_;
 
   void check_data_dim(const Eigen::MatrixXd& data) const;
+  void check_data(const Eigen::MatrixXd& data) const;
   void check_pair_copulas_rvine_structure(
     const std::vector<std::vector<Bicop>>& pair_copulas) const;
   double calculate_mbicv_penalty(const size_t nobs, const double psi0) const;

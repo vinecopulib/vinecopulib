@@ -308,8 +308,7 @@ inline void
 Vinecop::select_all(Eigen::MatrixXd data,
                     const FitControlsVinecop& controls)
 {
-  tools_eigen::check_if_in_unit_cube(data);
-  check_data_dim(data);
+  check_data(data);
   data = collapse_data(data);
 
   tools_select::StructureSelector selector(data, controls, var_types_);
@@ -341,8 +340,7 @@ inline void
 Vinecop::select_families(Eigen::MatrixXd data,
                          const FitControlsVinecop& controls)
 {
-  tools_eigen::check_if_in_unit_cube(data);
-  check_data_dim(data);
+  check_data(data);
   data = collapse_data(data);
 
   if (vine_struct_.get_trunc_lvl() > 0) {
@@ -717,8 +715,7 @@ Vinecop::get_var_types() const
 inline Eigen::VectorXd
 Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 {
-  tools_eigen::check_if_in_unit_cube(u);
-  check_data_dim(u);
+  check_data(u);
   u = collapse_data(u);
 
   size_t d = d_;
@@ -741,11 +738,12 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
   Eigen::VectorXd pdf = Eigen::VectorXd::Constant(u.rows(), 1.0);
 
   auto do_batch = [&](const tools_batch::Batch& b) {
-    // temporary storage objects for h-functions
+    // temporary storage objects (all data must be in (0, 1))
     Eigen::MatrixXd hfunc1(b.size, d);
-    Eigen::MatrixXd hfunc2(b.size, d);
-    Eigen::MatrixXd hfunc1_sub(b.size, d);
-    Eigen::MatrixXd hfunc2_sub(b.size, d);
+    hfunc1.setZero();
+    Eigen::MatrixXd hfunc2 = hfunc1;
+    Eigen::MatrixXd hfunc1_sub = hfunc1;
+    Eigen::MatrixXd hfunc2_sub = hfunc1;
     Eigen::MatrixXd u_e(b.size, 4);
     Eigen::MatrixXd u_sub(b.size, 4);
 
@@ -757,6 +755,8 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
       if (var_types_[order[j] - 1] == "d") {
         hfunc2_sub.col(j) =
           u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
+      } else {
+        hfunc2_sub.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
       }
     }
 
@@ -779,7 +779,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
         Bicop edge_copula = get_pair_copula(tree, edge);
         pdf.segment(b.begin, b.size) =
-          pdf.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e.leftCols(2)));
+          pdf.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e));
 
         // h-functions are only evaluated if needed in next step
         auto var_types = edge_copula.get_var_types();
@@ -837,8 +837,7 @@ Vinecop::cdf(const Eigen::MatrixXd& u,
             << std::endl;
     throw std::runtime_error(message.str().c_str());
   }
-  tools_eigen::check_if_in_unit_cube(u);
-  check_data_dim(u);
+  check_data(u);
 
   // Simulate N quasi-random numbers from the vine model
   auto u_sim = simulate(N, true, num_threads, seeds);
@@ -1009,8 +1008,7 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
   if (get_n_discrete() > 0) {
     throw std::runtime_error("rosenblatt() only works for continuous models.");
   }
-  tools_eigen::check_if_in_unit_cube(u);
-  check_data_dim(u);
+  check_data(u);
   size_t d = u.cols();
   size_t n = u.rows();
 
@@ -1101,8 +1099,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
     throw std::runtime_error(
       "inverse_rosenblatt() only works for continuous models.");
   }
-  tools_eigen::check_if_in_unit_cube(u);
-  check_data_dim(u);
+  check_data(u);
   size_t n = u.rows();
   if (n < 1) {
     throw std::runtime_error("n must be at least one");
@@ -1213,6 +1210,14 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
     msg << "discrete variables)." << std::endl;
     throw std::runtime_error(msg.str());
   }
+}
+
+//! checks if dimension d of the data matches the dimension of the vine.
+inline void
+Vinecop::check_data(const Eigen::MatrixXd& data) const
+{
+  check_data_dim(data);
+  tools_eigen::check_if_in_unit_cube(data);
 }
 
 //! checks if pair copulas are compatible with the R-vine structure.

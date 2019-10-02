@@ -774,12 +774,16 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
   }
 }
 
-//! adds an additional column if there's only one discrete variable. 
+//! adds an additional column if there's only one discrete variable;
+//! removes superfluous columns for continuous variables. 
 //! (continuous models only require two columns, discrete models always four)
 inline Eigen::MatrixXd
-Bicop::extend_data(const Eigen::MatrixXd& u) const
+Bicop::format_data(const Eigen::MatrixXd& u) const
 {
-  if ((get_n_discrete() != 1) | (u.cols() == 4)) {
+  int n_disc = get_n_discrete();
+  if (n_disc == 0) {
+    return u.leftCols(2);
+  } else if ((get_n_discrete() != 1) | (u.cols() == 4)) {
     return u;
   }
   Eigen::MatrixXd u_new(u.rows(), 4);
@@ -837,10 +841,10 @@ Bicop::rotate_data(const Eigen::MatrixXd& u) const
 inline Eigen::MatrixXd
 Bicop::prep_for_abstract(const Eigen::MatrixXd& u) const
 {
-  auto u_new = extend_data(u);
+  auto u_new = format_data(u);
   u_new = clip_data(u_new);
   u_new.leftCols(2) = rotate_data(u_new.leftCols(2));
-  if (u_new.cols() > 2) {
+  if (u_new.cols() == 4) {
     u_new.rightCols(2) = rotate_data(u_new.rightCols(2));
   }
   return u_new;

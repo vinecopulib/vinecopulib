@@ -118,7 +118,7 @@ public:
   Bicop as_continuous() const;
 
 private:
-  Eigen::MatrixXd extend_data(const Eigen::MatrixXd& u) const;
+  Eigen::MatrixXd format_data(const Eigen::MatrixXd& u) const;
 
   Eigen::MatrixXd clip_data(const Eigen::MatrixXd& u) const;
 
