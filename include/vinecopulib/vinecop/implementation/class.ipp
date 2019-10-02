@@ -714,7 +714,7 @@ Vinecop::pdf(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
   tools_eigen::check_if_in_unit_cube(u);
   check_data_dim(u);
-  size_t d = u.cols();
+  size_t d = d_;
   size_t n = u.rows();
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
@@ -736,7 +736,8 @@ Vinecop::pdf(const Eigen::MatrixXd& u, const size_t num_threads) const
     // temporary storage objects for h-functions
     Eigen::MatrixXd hfunc1(b.size, d);
     Eigen::MatrixXd hfunc2(b.size, d);
-    Eigen::MatrixXd u_e(b.size, 2);
+    Eigen::MatrixXd hfunc1_sub(b.size, d);
+    Eigen::MatrixXd hfunc2_sub(b.size, d);
 
     // fill first row of hfunc2 matrix with evaluation points;
     // points have to be reordered to correspond to natural order
@@ -747,28 +748,48 @@ Vinecop::pdf(const Eigen::MatrixXd& u, const size_t num_threads) const
       tools_interface::check_user_interrupt(n * d > 1e5);
       for (size_t edge = 0; edge < d - tree - 1; ++edge) {
         tools_interface::check_user_interrupt(edge % 100 == 0);
-        // extract evaluation point from hfunction matrices (have been
-        // computed in previous tree level)
-        size_t m = min_array(tree, edge);
-        u_e.col(0) = hfunc2.col(edge);
-        if (m == no_array(tree, edge)) {
-          u_e.col(1) = hfunc2.col(m - 1);
-        } else {
-          u_e.col(1) = hfunc1.col(m - 1);
-        }
-
-        // TODO: discre variables
 
         Bicop edge_copula = get_pair_copula(tree, edge);
+        auto var_types = edge_copula.get_var_types();
+        int n_disc = (var_types[0] == "d") + (var_types[1] == "d");
+
+        // extract evaluation point from hfunction matrices (have been
+        // computed in previous tree level)
+        Eigen::MatrixXd u_e(b.size, 4);
+        u_e.col(0) = hfunc2.col(edge);
+        u_e.col(2) = hfunc2_sub.col(edge);
+        size_t m = min_array(tree, edge);
+        if (m == no_array(tree, edge)) {
+          u_e.col(1) = hfunc2.col(m - 1);
+          u_e.col(3) = hfunc2_sub.col(m - 1);
+        } else {
+          u_e.col(1) = hfunc1.col(m - 1);
+          u_e.col(3) = hfunc1_sub.col(m - 1);
+        }
+        if ((n_disc == 1) & (var_types[0] == "c")) {
+          u_e.col(2).swap(u_e.col(3));
+        }
+        u_e.conservativeResize(b.size, 2 + n_disc);
+
         pdf.segment(b.begin, b.size) =
           pdf.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e));
 
         // h-functions are only evaluated if needed in next step
         if (needed_hfunc1(tree, edge)) {
           hfunc1.col(edge) = edge_copula.hfunc1(u_e);
+          if (var_types[1] == "d") {
+            auto u_sub = u_e;
+            u_sub.col(1) = u_sub.col(1 + n_disc);
+            hfunc1_sub.col(edge) = edge_copula.hfunc1(u_sub);
+          }
         }
         if (needed_hfunc2(tree, edge)) {
           hfunc2.col(edge) = edge_copula.hfunc2(u_e);
+          if (var_types[0] == "d") {
+            auto u_sub = u_e;
+            u_sub.col(0) = u_sub.col(2);
+            hfunc2_sub.col(edge) = edge_copula.hfunc2(u_sub);
+          }
         }
       }
     }

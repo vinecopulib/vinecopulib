@@ -97,6 +97,7 @@ TEST(discrete, vinecop)
   auto controls = FitControlsVinecop({ BicopFamily::clayton });
   // controls.set_show_trace(true);
   vc.select_families(u, controls);
+  vc.pdf(u);
 
   // check output
   auto pcs = vc.get_all_pair_copulas();
