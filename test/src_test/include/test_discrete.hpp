@@ -82,7 +82,7 @@ TEST(discrete, vinecop)
   vc.set_var_types({ "d", "c", "d", "d", "c" });
 
   // simulate data with continuous and discrete variables
-  auto utmp = vc.simulate(1000, true, { 1 });
+  auto utmp = vc.simulate(5000, true, 1, { 1 });
   Eigen::MatrixXd u(utmp.rows(), 5 + 3); // 3 discrete vars
   u.leftCols(5) = utmp;
 
@@ -103,12 +103,12 @@ TEST(discrete, vinecop)
 
   // check output
   auto pcs = vc.get_all_pair_copulas();
-  // for (size_t t = 0; t < 4; t++) {
-  //   for (auto pc : pcs[t]) {
-  //     EXPECT_EQ(pc.get_rotation(), 90);
-  //     EXPECT_NEAR(pc.get_parameters()(0), 2.0 / (t + 1), 1);
-  //   }
-  // }
+  for (size_t t = 0; t < 4; t++) {
+    for (auto pc : pcs[t]) {
+      EXPECT_EQ(pc.get_rotation(), 90);
+      EXPECT_NEAR(pc.get_parameters()(0), 2.0 / (t + 1), 0.5);
+    }
+  }
 
   // test other input format
   u = Eigen::MatrixXd(utmp.rows(), 10);
@@ -125,7 +125,7 @@ TEST(discrete, vinecop)
   for (size_t t = 0; t < 4; t++) {
     for (auto pc : pcs[t]) {
       EXPECT_EQ(pc.get_rotation(), 90);
-      EXPECT_NEAR(pc.get_parameters()(0), 2.0 / (t + 1), 1);
+      EXPECT_NEAR(pc.get_parameters()(0), 2.0 / (t + 1), 0.5);
     }
   }
 }
