@@ -103,6 +103,25 @@ TEST(discrete, vinecop)
 
   // check output
   auto pcs = vc.get_all_pair_copulas();
+  // for (size_t t = 0; t < 4; t++) {
+  //   for (auto pc : pcs[t]) {
+  //     EXPECT_EQ(pc.get_rotation(), 90);
+  //     EXPECT_NEAR(pc.get_parameters()(0), 2.0 / (t + 1), 1);
+  //   }
+  // }
+
+  // test other input format
+  u = Eigen::MatrixXd(utmp.rows(), 10);
+  u.leftCols(5) = utmp;
+  u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
+  u.col(5) = (utmp.col(0).array() * 10).floor() / 10;
+  u.col(2) = (utmp.col(2).array() * 10).ceil() / 10;
+  u.col(7) = (utmp.col(2).array() * 10).floor() / 10;
+  u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
+  u.col(8) = (utmp.col(3).array() * 10).floor() / 10;
+  vc.select_families(u, controls);
+  vc.pdf(u);
+  pcs = vc.get_all_pair_copulas();
   for (size_t t = 0; t < 4; t++) {
     for (auto pc : pcs[t]) {
       EXPECT_EQ(pc.get_rotation(), 90);

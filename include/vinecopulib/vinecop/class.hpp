@@ -81,11 +81,11 @@ public:
   void to_json(const std::string filename) const;
 
   // Methods modifying structure and/or families and parameters
-  void select_all(const Eigen::MatrixXd& data,
+  void select_all(Eigen::MatrixXd data,
                   const FitControlsVinecop& controls = FitControlsVinecop());
 
   void select_families(
-    const Eigen::MatrixXd& data,
+    Eigen::MatrixXd data,
     const FitControlsVinecop& controls = FitControlsVinecop());
 
   // Getters for a single pair copula

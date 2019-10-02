@@ -171,7 +171,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                              "incompatible dimensions.");
   }
   check_weights_size(controls.get_weights(), data);
-  select_families(collapse_data(data), controls);
+  select_families(data, controls);
 }
 
 //! @brief constructs a vine copula model from data by creating a model and
@@ -222,7 +222,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   nobs_ = data.rows();
   check_enough_data(data);
   check_weights_size(controls.get_weights(), data);
-  select_all(collapse_data(data), controls);
+  select_all(data, controls);
 }
 
 //! @brief converts the copula into a boost::property_tree::ptree object.
@@ -305,11 +305,12 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select_all(const Eigen::MatrixXd& data,
+Vinecop::select_all(Eigen::MatrixXd data,
                     const FitControlsVinecop& controls)
 {
   tools_eigen::check_if_in_unit_cube(data);
   check_data_dim(data);
+  data = collapse_data(data);
 
   tools_select::StructureSelector selector(data, controls, var_types_);
   if (controls.needs_sparse_select()) {
@@ -337,11 +338,12 @@ Vinecop::select_all(const Eigen::MatrixXd& data,
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select_families(const Eigen::MatrixXd& data,
+Vinecop::select_families(Eigen::MatrixXd data,
                          const FitControlsVinecop& controls)
 {
   tools_eigen::check_if_in_unit_cube(data);
   check_data_dim(data);
+  data = collapse_data(data);
 
   if (vine_struct_.get_trunc_lvl() > 0) {
     tools_select::FamilySelector selector(
@@ -1084,7 +1086,7 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! 
 //! Only works for continous models.
 //!
-//! @param u \f$ n \times d \f$ matrix of evaluation points..
+//! @param u \f$ n \times d \f$ matrix of evaluation points.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -1310,12 +1312,15 @@ Vinecop::get_n_discrete() const
 inline Eigen::MatrixXd
 Vinecop::collapse_data(const Eigen::MatrixXd& u) const
 {
+  if (static_cast<size_t>(u.cols()) == d_ + get_n_discrete()) {
+    return u;
+  }
   Eigen::MatrixXd u_new(u.rows(), d_ + get_n_discrete());
   u_new.leftCols(d_) = u.leftCols(d_);
   size_t disc_count = 0;
   for (size_t i = 0; i < d_; ++i) {
     if (var_types_[i] == "d") {
-      u_new.col(d_ + disc_count) = u.col(i);
+      u_new.col(d_ + disc_count++) = u.col(d_ + i);
     }
   }
   return u_new;
