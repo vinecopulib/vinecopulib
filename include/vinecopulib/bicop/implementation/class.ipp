@@ -117,7 +117,7 @@ inline Eigen::VectorXd
 Bicop::pdf(const Eigen::MatrixXd& u) const
 {
   check_data(u);
-  return bicop_->pdf(cut_and_rotate(u));
+  return bicop_->pdf(prep_for_abstract(u));
 }
 
 //! @brief evaluates the copula distribution.
@@ -129,7 +129,7 @@ inline Eigen::VectorXd
 Bicop::cdf(const Eigen::MatrixXd& u) const
 {
   check_data(u);
-  Eigen::VectorXd p = bicop_->cdf(cut_and_rotate(u.leftCols(2)));
+  Eigen::VectorXd p = bicop_->cdf(prep_for_abstract(u.leftCols(2)));
   switch (rotation_) {
     default:
       return p;
@@ -157,16 +157,16 @@ Bicop::hfunc1(const Eigen::MatrixXd& u) const
   check_data(u);
   switch (rotation_) {
     default:
-      return bicop_->hfunc1(cut_and_rotate(u));
+      return bicop_->hfunc1(prep_for_abstract(u));
 
     case 90:
-      return bicop_->hfunc2(cut_and_rotate(u));
+      return bicop_->hfunc2(prep_for_abstract(u));
 
     case 180:
-      return 1.0 - bicop_->hfunc1(cut_and_rotate(u)).array();
+      return 1.0 - bicop_->hfunc1(prep_for_abstract(u)).array();
 
     case 270:
-      return 1.0 - bicop_->hfunc2(cut_and_rotate(u)).array();
+      return 1.0 - bicop_->hfunc2(prep_for_abstract(u)).array();
   }
 }
 
@@ -182,16 +182,16 @@ Bicop::hfunc2(const Eigen::MatrixXd& u) const
   check_data(u);
   switch (rotation_) {
     default:
-      return bicop_->hfunc2(cut_and_rotate(u));
+      return bicop_->hfunc2(prep_for_abstract(u));
 
     case 90:
-      return 1.0 - bicop_->hfunc1(cut_and_rotate(u)).array();
+      return 1.0 - bicop_->hfunc1(prep_for_abstract(u)).array();
 
     case 180:
-      return 1.0 - bicop_->hfunc2(cut_and_rotate(u)).array();
+      return 1.0 - bicop_->hfunc2(prep_for_abstract(u)).array();
 
     case 270:
-      return bicop_->hfunc1(cut_and_rotate(u));
+      return bicop_->hfunc1(prep_for_abstract(u));
   }
 }
 
@@ -205,16 +205,16 @@ Bicop::hinv1(const Eigen::MatrixXd& u) const
   check_data(u);
   switch (rotation_) {
     default:
-      return bicop_->hinv1(cut_and_rotate(u));
+      return bicop_->hinv1(prep_for_abstract(u));
 
     case 90:
-      return bicop_->hinv2(cut_and_rotate(u));
+      return bicop_->hinv2(prep_for_abstract(u));
 
     case 180:
-      return 1.0 - bicop_->hinv1(cut_and_rotate(u)).array();
+      return 1.0 - bicop_->hinv1(prep_for_abstract(u)).array();
 
     case 270:
-      return 1.0 - bicop_->hinv2(cut_and_rotate(u)).array();
+      return 1.0 - bicop_->hinv2(prep_for_abstract(u)).array();
   }
 }
 
@@ -228,16 +228,16 @@ Bicop::hinv2(const Eigen::MatrixXd& u) const
   check_data(u);
   switch (rotation_) {
     default:
-      return bicop_->hinv2(cut_and_rotate(u));
+      return bicop_->hinv2(prep_for_abstract(u));
 
     case 90:
-      return 1.0 - bicop_->hinv1(cut_and_rotate(u)).array();
+      return 1.0 - bicop_->hinv1(prep_for_abstract(u)).array();
 
     case 180:
-      return 1.0 - bicop_->hinv2(cut_and_rotate(u)).array();
+      return 1.0 - bicop_->hinv2(prep_for_abstract(u)).array();
 
     case 270:
-      return bicop_->hinv1(cut_and_rotate(u));
+      return bicop_->hinv1(prep_for_abstract(u));
   }
 }
 //! @}
@@ -277,7 +277,7 @@ Bicop::loglik(const Eigen::MatrixXd& u) const
     return get_loglik();
   } else {
     tools_eigen::check_if_in_unit_cube(u);
-    return bicop_->loglik(cut_and_rotate(u));
+    return bicop_->loglik(prep_for_abstract(u));
   }
 }
 
@@ -498,15 +498,17 @@ Bicop::check_data(const Eigen::MatrixXd& u) const
 inline void
 Bicop::check_data_dim(const Eigen::MatrixXd& u) const
 {
-  size_t d_u = u.cols();
-  bool is_continuous = (var_types_[0] == "c") && (var_types_[1] == "c");
-  size_t d_exp = is_continuous ? 2 : 4;
-  if (d_u != d_exp) {
+  size_t n_cols = u.cols();
+  size_t n_cols_exp = 2 + get_n_discrete();
+  if (n_cols != n_cols_exp) {
     std::stringstream msg;
     msg << "data has wrong number of columns; "
-        << "expected: " << d_exp << ", actual: " << d_u << "(model contains ";
-    if (is_continuous) {
+        << "expected: " << n_cols_exp << ", actual: " << n_cols 
+        << "; (model contains ";
+    if (n_cols_exp == 2) {
       msg << "no ";
+    } else {
+      msg << get_n_discrete() << " ";
     }
     msg << "discrete variables)." << std::endl;
     throw std::runtime_error(msg.str());
@@ -667,7 +669,7 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
   tools_eigen::remove_nans(data_no_nan, w);
 
   bicop_->fit(
-    cut_and_rotate(data_no_nan), method, controls.get_nonparametric_mult(), w);
+    prep_for_abstract(data_no_nan), method, controls.get_nonparametric_mult(), w);
   nobs_ = data_no_nan.rows();
 }
 
@@ -710,7 +712,7 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
   rotation_ = 0;
   bicop_->set_loglik(0.0);
   if (data_no_nan.rows() >= 10) {
-    data_no_nan = cut_and_rotate(data_no_nan);
+    data_no_nan = clip_data(data_no_nan);
     std::vector<Bicop> bicops = create_candidate_bicops(data_no_nan, controls);
     for (auto& bc : bicops) {
       bc.set_var_types(var_types_);
@@ -770,25 +772,37 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
   }
 }
 
-//! @brief Data manipulations for rotated families
-//!
-//! @param u \f$ n \times 2 \f$ matrix of observations for continuous models; 
-//!   \f$ n \times 4 \f$ for discrete models.
-//! @return The manipulated data.
-inline Eigen::MatrixXd
-Bicop::cut_and_rotate(const Eigen::MatrixXd& u) const
-{
-  Eigen::MatrixXd u_new(u.rows(), u.cols());
-  if (u.cols() == 4) {
-    u_new.leftCols(2) = cut_and_rotate(u.leftCols(2));
-    u_new.rightCols(2) = cut_and_rotate(u.rightCols(2));
-    return u_new;
-  }
 
+inline Eigen::MatrixXd
+Bicop::extend_data(const Eigen::MatrixXd& u) const
+{
+  if (get_n_discrete() != 1) {
+    return u;
+  }
+  // only one discrete variable, need to duplicate the continuous variable for
+  // u_min
+  Eigen::MatrixXd u_new(u.cols(), 4);
+  u_new.leftCols(2) = u;
+  int disc_col = (var_types_[1] == "d");
+  int cont_col = 1 - disc_col;
+  u_new.col(2 + disc_col) = u.col(2);
+  u_new.col(2 + cont_col) = u.col(cont_col);
+  return u_new;
+}
+
+inline Eigen::MatrixXd
+Bicop::clip_data(const Eigen::MatrixXd& u) const
+{
+  return u.cwiseMax(1e-10).cwiseMin(1 - 1e-10);
+}
+
+inline Eigen::MatrixXd
+Bicop::rotate_data(const Eigen::MatrixXd& u) const
+{
+  auto u_new = u;
   // counter-clockwise rotations
   switch (rotation_) {
     case 0:
-      u_new = u;
       break;
 
     case 90:
@@ -806,12 +820,16 @@ Bicop::cut_and_rotate(const Eigen::MatrixXd& u) const
       u_new.col(1) = u.col(0);
       break;
   }
+  return u_new;
+}
 
-  // truncate to interval [eps, 1 - eps]
-  Eigen::MatrixXd eps = Eigen::MatrixXd::Constant(u.rows(), 2, 1e-10);
-  u_new = (1.0 - eps.array()).min(u_new.array());
-  u_new = eps.array().max(u_new.array());
-
+inline Eigen::MatrixXd
+Bicop::prep_for_abstract(const Eigen::MatrixXd& u) const
+{
+  auto u_new = extend_data(u);
+  u_new = clip_data(u_new);
+  u_new.leftCols(2) = rotate_data(u_new.leftCols(2));
+  u_new.rightCols(2) = rotate_data(u_new.rightCols(2));
   return u_new;
 }
 
@@ -847,6 +865,16 @@ Bicop::check_fitted() const
     throw std::runtime_error("copula has not been fitted from data or its "
                              "parameters have been modified manually");
   }
+}
+
+inline int
+Bicop::get_n_discrete() const
+{
+  int n_discrete = 0;
+  for (auto t : var_types_) {
+    n_discrete += (t == "d");
+  }
+  return n_discrete;
 }
 
 }
