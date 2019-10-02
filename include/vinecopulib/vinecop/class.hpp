@@ -132,7 +132,7 @@ public:
   double get_mbicv(const double psi0 = 0.9) const;
 
   // Stats methods
-  Eigen::VectorXd pdf(const Eigen::MatrixXd& u,
+  Eigen::VectorXd pdf(Eigen::MatrixXd u,
                       const size_t num_threads = 1) const;
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
@@ -188,7 +188,7 @@ protected:
   size_t nobs_{0};
   mutable std::vector<std::string> var_types_;
 
-  void check_data_dim(const Eigen::MatrixXd& data, bool discrete = true) const;
+  void check_data_dim(const Eigen::MatrixXd& data) const;
   void check_pair_copulas_rvine_structure(
     const std::vector<std::vector<Bicop>>& pair_copulas) const;
   double calculate_mbicv_penalty(const size_t nobs, const double psi0) const;
@@ -197,9 +197,11 @@ protected:
                           const Eigen::MatrixXd& data) const;
   void check_enough_data(const Eigen::MatrixXd& data) const;
   void check_fitted() const;
-  void set_continuous_var_types();
+  void set_continuous_var_types() const;
   int get_n_discrete() const;
+  Eigen::MatrixXd collapse_data(const Eigen::MatrixXd& u) const;
 };
+
 }
 
 #include <vinecopulib/vinecop/implementation/class.ipp>
