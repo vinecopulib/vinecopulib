@@ -772,15 +772,14 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
   }
 }
 
-
+//! adds an additional column if there's only one discrete variable. 
+//! (continuous models only require two columns, discrete models always four)
 inline Eigen::MatrixXd
 Bicop::extend_data(const Eigen::MatrixXd& u) const
 {
   if (get_n_discrete() != 1) {
     return u;
   }
-  // only one discrete variable, need to duplicate the continuous variable for
-  // u_min
   Eigen::MatrixXd u_new(u.cols(), 4);
   u_new.leftCols(2) = u;
   int disc_col = (var_types_[1] == "d");
@@ -790,12 +789,14 @@ Bicop::extend_data(const Eigen::MatrixXd& u) const
   return u_new;
 }
 
+//! clisp the data to the interval [1e-10, 1 - 1e-10] for numerical stability.
 inline Eigen::MatrixXd
 Bicop::clip_data(const Eigen::MatrixXd& u) const
 {
   return u.cwiseMax(1e-10).cwiseMin(1 - 1e-10);
 }
 
+//! rotates the data corresponding to the models rotation.
 inline Eigen::MatrixXd
 Bicop::rotate_data(const Eigen::MatrixXd& u) const
 {
@@ -823,6 +824,10 @@ Bicop::rotate_data(const Eigen::MatrixXd& u) const
   return u_new;
 }
 
+//! prepares data for use with the `AbstractBicop` class:
+//! - add an additional column if there's only one discrete variable.
+//! - clip the data to the interval [1e-10, 1 - 1e-10] for numerical stability.
+//! - rotate the data appropriately (`AbstractBicop` is always 0deg-rotation).
 inline Eigen::MatrixXd
 Bicop::prep_for_abstract(const Eigen::MatrixXd& u) const
 {
@@ -833,6 +838,7 @@ Bicop::prep_for_abstract(const Eigen::MatrixXd& u) const
   return u_new;
 }
 
+//! checks whether the supplied rotation is valid (only 0, 90, 180, 270 allowd).
 inline void
 Bicop::check_rotation(int rotation) const
 {
@@ -849,6 +855,7 @@ Bicop::check_rotation(int rotation) const
   }
 }
 
+//! checks whether weights and data have matching sizes.
 inline void
 Bicop::check_weights_size(const Eigen::VectorXd& weights,
                           const Eigen::MatrixXd& data) const
@@ -858,6 +865,7 @@ Bicop::check_weights_size(const Eigen::VectorXd& weights,
   }
 }
 
+//! checks whether the Bicop object was fitted to data.
 inline void
 Bicop::check_fitted() const
 {
@@ -867,6 +875,7 @@ Bicop::check_fitted() const
   }
 }
 
+//! returns the number of discrete variables.
 inline int
 Bicop::get_n_discrete() const
 {
