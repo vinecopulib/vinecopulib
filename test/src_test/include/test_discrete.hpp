@@ -44,9 +44,11 @@ TEST(discrete, bicop)
               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
 
     // c_d
+    uu = Eigen::MatrixXd(u.rows(), 4);
     uu.col(0) = u.col(0);
+    uu.col(2) = u.col(0);
     uu.col(1) = u_disc.col(1);
-    uu.col(2) = u_disc.col(3);
+    uu.col(3) = u_disc.col(3);
     bc.set_var_types({ "c", "d" });
     EXPECT_GE(bc.pdf(uu.topRows(20)).minCoeff(), 0);
     bc.fit(uu);

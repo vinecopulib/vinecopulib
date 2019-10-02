@@ -741,8 +741,10 @@ Vinecop::pdf(const Eigen::MatrixXd& u, const size_t num_threads) const
 
     // fill first row of hfunc2 matrix with evaluation points;
     // points have to be reordered to correspond to natural order
-    for (size_t j = 0; j < d; ++j)
+    for (size_t j = 0; j < d; ++j) {
       hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
+      hfunc2_sub.col(j) = u.block(b.begin, d_ + order[j] - 1, b.size, 1);
+    }
 
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
       tools_interface::check_user_interrupt(n * d > 1e5);

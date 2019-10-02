@@ -500,10 +500,10 @@ Bicop::check_data_dim(const Eigen::MatrixXd& u) const
 {
   size_t n_cols = u.cols();
   size_t n_cols_exp = 2 + get_n_discrete();
-  if (n_cols != n_cols_exp) {
+  if ((n_cols != n_cols_exp) & (n_cols != 4)) {
     std::stringstream msg;
     msg << "data has wrong number of columns; "
-        << "expected: " << n_cols_exp << ", actual: " << n_cols 
+        << "expected: " << n_cols_exp << " or 4, actual: " << n_cols 
         << " (model contains ";
     if (n_cols_exp == 2) {
       msg << "no ";
@@ -668,8 +668,10 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
   check_weights_size(w, data);
   tools_eigen::remove_nans(data_no_nan, w);
 
-  bicop_->fit(
-    prep_for_abstract(data_no_nan), method, controls.get_nonparametric_mult(), w);
+  bicop_->fit(prep_for_abstract(data_no_nan),
+              method,
+              controls.get_nonparametric_mult(),
+              w);
   nobs_ = data_no_nan.rows();
 }
 
@@ -777,7 +779,7 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
 inline Eigen::MatrixXd
 Bicop::extend_data(const Eigen::MatrixXd& u) const
 {
-  if (get_n_discrete() != 1) {
+  if ((get_n_discrete() != 1) | (u.cols() == 4)) {
     return u;
   }
   Eigen::MatrixXd u_new(u.rows(), 4);
