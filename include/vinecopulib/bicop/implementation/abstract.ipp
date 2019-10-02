@@ -148,7 +148,7 @@ AbstractBicop::pdf(const Eigen::MatrixXd& u)
 
   Eigen::VectorXd pdf(u.rows());
   if (var_types_ == std::vector<std::string>{ "c", "c" }) {
-    pdf = pdf_raw(u);
+    pdf = pdf_raw(u.leftCols(2));
   } else if (var_types_ == std::vector<std::string>{ "d", "d" }) {
     pdf = pdf_d_d(u);
   } else {

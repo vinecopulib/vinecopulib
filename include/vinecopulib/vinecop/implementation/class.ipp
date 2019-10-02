@@ -754,8 +754,10 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
     for (size_t j = 0; j < d; ++j) {
       hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
-      hfunc2_sub.col(j) =
-        u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
+      if (var_types_[order[j] - 1] == "d") {
+        hfunc2_sub.col(j) =
+          u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
+      }
     }
 
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
@@ -777,14 +779,14 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
         Bicop edge_copula = get_pair_copula(tree, edge);
         pdf.segment(b.begin, b.size) =
-          pdf.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e));
+          pdf.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e.leftCols(2)));
 
         // h-functions are only evaluated if needed in next step
         auto var_types = edge_copula.get_var_types();
-        u_sub = u_e;
         if (needed_hfunc1(tree, edge)) {
           hfunc1.col(edge) = edge_copula.hfunc1(u_e);
           if (var_types[1] == "d") {
+            u_sub = u_e;
             u_sub.col(1) = u_sub.col(3);
             hfunc1_sub.col(edge) = edge_copula.hfunc1(u_sub);
           }
@@ -792,6 +794,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
         if (needed_hfunc2(tree, edge)) {
           hfunc2.col(edge) = edge_copula.hfunc2(u_e);
           if (var_types[0] == "d") {
+            u_sub = u_e;
             u_sub.col(0) = u_sub.col(2);
             hfunc2_sub.col(edge) = edge_copula.hfunc2(u_sub);
           }

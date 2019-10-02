@@ -988,10 +988,9 @@ VinecopSelector::select_pair_copulas(VineTree& tree, const VineTree& tree_opt)
 
     tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
     tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
-    int n_disc = (tree[e].var_types[0] == "d") + (tree[e].var_types[1] == "d");
     if (tree[e].var_types[1] == "d") {
       auto sub_data = tree[e].pc_data;
-      sub_data.col(1) = sub_data.col(1 + n_disc);
+      sub_data.col(1) = sub_data.col(3);
       tree[e].hfunc1_sub = tree[e].pair_copula.hfunc1(sub_data);
     }
     if (tree[e].var_types[0] == "d") {

@@ -795,7 +795,10 @@ Bicop::extend_data(const Eigen::MatrixXd& u) const
 inline Eigen::MatrixXd
 Bicop::clip_data(const Eigen::MatrixXd& u) const
 {
-  return u.cwiseMax(1e-10).cwiseMin(1 - 1e-10);
+  auto clip = [] (const double& x) {
+    return std::min(std::max(x, 1e-10), 1 - 1e-10);
+  };
+  return tools_eigen::unaryExpr_or_nan(u, clip);
 }
 
 //! rotates the data corresponding to the models rotation.

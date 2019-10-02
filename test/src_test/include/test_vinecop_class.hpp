@@ -259,7 +259,7 @@ TEST_F(VinecopTest, family_select_finds_true_rotations)
 
 TEST_F(VinecopTest, family_select_returns_pcs_in_right_order)
 {
-   u.conservativeResize(50, 7);
+  u.conservativeResize(50, 7);
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
   auto par = Eigen::VectorXd::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
