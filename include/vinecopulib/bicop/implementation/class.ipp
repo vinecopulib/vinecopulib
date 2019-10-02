@@ -129,7 +129,7 @@ inline Eigen::VectorXd
 Bicop::cdf(const Eigen::MatrixXd& u) const
 {
   check_data(u);
-  Eigen::VectorXd p = bicop_->cdf(prep_for_abstract(u.leftCols(2)));
+  Eigen::VectorXd p = bicop_->cdf(prep_for_abstract(u).leftCols(2));
   switch (rotation_) {
     default:
       return p;
@@ -712,7 +712,7 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
   rotation_ = 0;
   bicop_->set_loglik(0.0);
   if (data_no_nan.rows() >= 10) {
-    data_no_nan = clip_data(data_no_nan);
+    data_no_nan = prep_for_abstract(data_no_nan);
     std::vector<Bicop> bicops = create_candidate_bicops(data_no_nan, controls);
     for (auto& bc : bicops) {
       bc.set_var_types(var_types_);
@@ -780,8 +780,8 @@ Bicop::extend_data(const Eigen::MatrixXd& u) const
   if (get_n_discrete() != 1) {
     return u;
   }
-  Eigen::MatrixXd u_new(u.cols(), 4);
-  u_new.leftCols(2) = u;
+  Eigen::MatrixXd u_new(u.rows(), 4);
+  u_new.leftCols(2) = u.leftCols(2);
   int disc_col = (var_types_[1] == "d");
   int cont_col = 1 - disc_col;
   u_new.col(2 + disc_col) = u.col(2);
@@ -835,7 +835,9 @@ Bicop::prep_for_abstract(const Eigen::MatrixXd& u) const
   auto u_new = extend_data(u);
   u_new = clip_data(u_new);
   u_new.leftCols(2) = rotate_data(u_new.leftCols(2));
-  u_new.rightCols(2) = rotate_data(u_new.rightCols(2));
+  if (u_new.cols() > 2) {
+    u_new.rightCols(2) = rotate_data(u_new.rightCols(2));
+  }
   return u_new;
 }
 
