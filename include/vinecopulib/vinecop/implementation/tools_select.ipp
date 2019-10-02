@@ -595,9 +595,13 @@ VinecopSelector::add_pc_info(const EdgeIterator& e, VineTree& tree)
       tree[e].pc_data.col(3) = tree[v1].hfunc2;
     }
   }
-  if (tree[e].var_types == std::vector<std::string>{ "c", "c" }) {
-    tree[e].pc_data.conservativeResize(n, 2);
+
+  // remove unused columns
+  int n_disc = (tree[e].var_types[0] == "d") + (tree[e].var_types[1] == "d");
+  if ((n_disc == 1) & (tree[e].var_types[0] == "c")) {
+    tree[e].pc_data.col(2).swap(tree[e].pc_data.col(3));
   }
+  tree[e].pc_data.conservativeResize(n, 2 + n_disc);
 
   tree[e].conditioned =
     set_sym_diff(tree[v0].all_indices, tree[v1].all_indices);
@@ -781,6 +785,17 @@ VinecopSelector::make_base_tree(const Eigen::MatrixXd& data)
 {
   VineTree base_tree(d_);
   auto order = vine_struct_.get_order();
+  // get indices of discrete variables
+  auto disc_order = order;
+  size_t disc_count = 0;
+  for (size_t i = 0; i < d_; ++i) {
+    if (var_types_[i] == "d") {
+      disc_order[i] = disc_count++;
+    } else {
+      disc_order[i] = d_;
+    }
+  }
+
   // a star connects the root node (d) with all other nodes
   for (size_t target = 0; target < d_; ++target) {
     tools_interface::check_user_interrupt(target % 10000 == 0);
@@ -791,7 +806,7 @@ VinecopSelector::make_base_tree(const Eigen::MatrixXd& data)
     // when structure is fixed)
     base_tree[e].hfunc1 = data.col(order[target] - 1);
     if (var_types_[order[target] - 1] == "d") {
-      base_tree[e].hfunc1_sub = data.col(d_ + order[target] - 1);
+      base_tree[e].hfunc1_sub = data.col(d_ + disc_order[order[target] - 1]);
       base_tree[e].var_types = { "d", "d" };
     }
 
@@ -972,9 +987,10 @@ VinecopSelector::select_pair_copulas(VineTree& tree, const VineTree& tree_opt)
 
     tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
     tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
+    int n_disc = (tree[e].var_types[0] == "d") + (tree[e].var_types[1] == "d");
     if (tree[e].var_types[1] == "d") {
       auto sub_data = tree[e].pc_data;
-      sub_data.col(1) = sub_data.col(3);
+      sub_data.col(1) = sub_data.col(1 + n_disc);
       tree[e].hfunc1_sub = tree[e].pair_copula.hfunc1(sub_data);
     }
     if (tree[e].var_types[0] == "d") {
@@ -982,7 +998,6 @@ VinecopSelector::select_pair_copulas(VineTree& tree, const VineTree& tree_opt)
       sub_data.col(0) = sub_data.col(2);
       tree[e].hfunc2_sub = tree[e].pair_copula.hfunc2(sub_data);
     }
-    tree[e].pair_copula.set_var_types(tree[e].var_types);
     tree[e].loglik = tree[e].pair_copula.get_loglik();
     if (controls_.needs_sparse_select()) {
       tree[e].npars = tree[e].pair_copula.get_npars();

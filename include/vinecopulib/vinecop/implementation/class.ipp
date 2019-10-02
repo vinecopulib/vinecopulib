@@ -730,7 +730,7 @@ Vinecop::pdf(const Eigen::MatrixXd& u, const size_t num_threads) const
   }
 
   // initial value must be 1.0 for multiplication
-  Eigen::VectorXd vine_density = Eigen::VectorXd::Constant(u.rows(), 1.0);
+  Eigen::VectorXd pdf = Eigen::VectorXd::Constant(u.rows(), 1.0);
 
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects for h-functions
@@ -755,31 +755,32 @@ Vinecop::pdf(const Eigen::MatrixXd& u, const size_t num_threads) const
           u_e.col(1) = hfunc2.col(m - 1);
         } else {
           u_e.col(1) = hfunc1.col(m - 1);
-      }
+        }
 
-      Bicop edge_copula = get_pair_copula(tree, edge);
-      vine_density.segment(b.begin, b.size) =
-        vine_density.segment(b.begin, b.size)
-          .cwiseProduct(edge_copula.pdf(u_e));
+        // TODO: discre variables
 
-      // h-functions are only evaluated if needed in next step
-      if (needed_hfunc1(tree, edge)) {
-        hfunc1.col(edge) = edge_copula.hfunc1(u_e);
-      }
-      if (needed_hfunc2(tree, edge)) {
-        hfunc2.col(edge) = edge_copula.hfunc2(u_e);
+        Bicop edge_copula = get_pair_copula(tree, edge);
+        pdf.segment(b.begin, b.size) =
+          pdf.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e));
+
+        // h-functions are only evaluated if needed in next step
+        if (needed_hfunc1(tree, edge)) {
+          hfunc1.col(edge) = edge_copula.hfunc1(u_e);
+        }
+        if (needed_hfunc2(tree, edge)) {
+          hfunc2.col(edge) = edge_copula.hfunc2(u_e);
+        }
       }
     }
+  };
+
+  if (trunc_lvl > 0) {
+    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
+    pool.map(do_batch, tools_batch::create_batches(n, num_threads));
+    pool.join();
   }
-};
 
-if (trunc_lvl > 0) {
-  tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
-  pool.map(do_batch, tools_batch::create_batches(n, num_threads));
-  pool.join();
-}
-
-return vine_density;
+  return pdf;
 }
 
 //! @brief calculates the cumulative distribution of the vine copula model.
@@ -966,7 +967,7 @@ inline Eigen::MatrixXd
 Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
   tools_eigen::check_if_in_unit_cube(u);
-  check_data_dim(u);
+  check_data_dim(u, false);
   size_t d = u.cols();
   size_t n = u.rows();
 
@@ -1053,7 +1054,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const size_t num_threads) const
 {
   tools_eigen::check_if_in_unit_cube(u);
-  check_data_dim(u);
+  check_data_dim(u, false);
   size_t n = u.rows();
   if (n < 1) {
     throw std::runtime_error("n must be at least one");
@@ -1147,19 +1148,19 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
 //! checks if dimension d of the data matches the dimension of the vine.
 inline void
-Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
+Vinecop::check_data_dim(const Eigen::MatrixXd& data, bool discrete) const
 {
   size_t d_data = data.cols();
-  bool is_discrete =
-    tools_stl::is_member(static_cast<std::string>("d"), var_types_);
-  size_t d_exp = is_discrete ? 2 * d_ : d_;
+  size_t d_exp = d_ + discrete * get_n_discrete();
   if (d_data != d_exp) {
     std::stringstream msg;
     msg << "data has wrong number of columns; "
         << "expected: " << d_exp << ", actual: " << d_data
-        << "(model contains ";
-    if (is_discrete) {
+        << " (model contains ";
+    if (d_exp == d_) {
       msg << "no ";
+    } else {
+      msg << get_n_discrete() << " ";
     }
     msg << "discrete variables)." << std::endl;
     throw std::runtime_error(msg.str());
@@ -1248,6 +1249,17 @@ Vinecop::set_continuous_var_types()
   var_types_ = std::vector<std::string>(d_);
   for (auto& t : var_types_)
     t = "c";
+}
+
+//! returns the number of discrete variables.
+inline int
+Vinecop::get_n_discrete() const
+{
+  int n_discrete = 0;
+  for (auto t : var_types_) {
+    n_discrete += (t == "d");
+  }
+  return n_discrete;
 }
 
 //! summarizes the model into a string (can be used for printing).

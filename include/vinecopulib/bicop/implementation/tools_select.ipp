@@ -43,7 +43,7 @@ create_candidate_bicops(const Eigen::MatrixXd& data,
   // remove combinations based on symmetry characteristics
   if (controls.get_preselect_families()) {
     preselect_candidates(new_bicops,
-                         (data.leftCols(2) + data.rightCols(2)).array() / 2,
+                         data.leftCols(2),
                          tau,
                          controls.get_weights());
   }

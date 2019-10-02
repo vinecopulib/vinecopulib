@@ -504,7 +504,7 @@ Bicop::check_data_dim(const Eigen::MatrixXd& u) const
     std::stringstream msg;
     msg << "data has wrong number of columns; "
         << "expected: " << n_cols_exp << ", actual: " << n_cols 
-        << "; (model contains ";
+        << " (model contains ";
     if (n_cols_exp == 2) {
       msg << "no ";
     } else {
@@ -712,7 +712,7 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
   rotation_ = 0;
   bicop_->set_loglik(0.0);
   if (data_no_nan.rows() >= 10) {
-    data_no_nan = prep_for_abstract(data_no_nan);
+    data_no_nan = clip_data(data_no_nan);
     std::vector<Bicop> bicops = create_candidate_bicops(data_no_nan, controls);
     for (auto& bc : bicops) {
       bc.set_var_types(var_types_);
