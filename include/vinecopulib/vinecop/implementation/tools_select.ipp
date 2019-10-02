@@ -71,6 +71,23 @@ calculate_criterion_matrix(const Eigen::MatrixXd& data,
   return mat;
 }
 
+//! computes
+inline std::vector<size_t>
+get_disc_cols(std::vector<std::string> var_types)
+{
+  size_t d = var_types.size();
+  std::vector<size_t> disc_cols(d);
+  size_t disc_count = 0;
+  for (size_t i = 0; i < d; ++i) {
+    if (var_types[i] == "d") {
+      disc_cols[i] = disc_count++;
+    } else {
+      disc_cols[i] = 0;
+    }
+  }
+  return disc_cols;
+}
+
 inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
                                         const FitControlsVinecop& controls,
                                         std::vector<std::string> var_types)
@@ -595,9 +612,6 @@ VinecopSelector::add_pc_info(const EdgeIterator& e, VineTree& tree)
       tree[e].pc_data.col(3) = tree[v1].hfunc2;
     }
   }
-  if (tree[e].var_types == std::vector<std::string>{ "c", "c" }) {
-    tree[e].pc_data.conservativeResize(n, 2);
-  }
 
   tree[e].conditioned =
     set_sym_diff(tree[v0].all_indices, tree[v1].all_indices);
@@ -781,6 +795,8 @@ VinecopSelector::make_base_tree(const Eigen::MatrixXd& data)
 {
   VineTree base_tree(d_);
   auto order = vine_struct_.get_order();
+  auto disc_cols = get_disc_cols(var_types_);
+
   // a star connects the root node (d) with all other nodes
   for (size_t target = 0; target < d_; ++target) {
     tools_interface::check_user_interrupt(target % 10000 == 0);
@@ -791,7 +807,7 @@ VinecopSelector::make_base_tree(const Eigen::MatrixXd& data)
     // when structure is fixed)
     base_tree[e].hfunc1 = data.col(order[target] - 1);
     if (var_types_[order[target] - 1] == "d") {
-      base_tree[e].hfunc1_sub = data.col(d_ + order[target] - 1);
+      base_tree[e].hfunc1_sub = data.col(d_ + disc_cols[order[target] - 1]);
       base_tree[e].var_types = { "d", "d" };
     }
 
@@ -982,7 +998,6 @@ VinecopSelector::select_pair_copulas(VineTree& tree, const VineTree& tree_opt)
       sub_data.col(0) = sub_data.col(2);
       tree[e].hfunc2_sub = tree[e].pair_copula.hfunc2(sub_data);
     }
-    tree[e].pair_copula.set_var_types(tree[e].var_types);
     tree[e].loglik = tree[e].pair_copula.get_loglik();
     if (controls_.needs_sparse_select()) {
       tree[e].npars = tree[e].pair_copula.get_npars();

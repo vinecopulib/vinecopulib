@@ -42,6 +42,9 @@ calculate_criterion_matrix(const Eigen::MatrixXd& data,
                            std::string tree_criterion,
                            const Eigen::VectorXd& weights);
 
+std::vector<size_t>
+get_disc_cols(std::vector<std::string> var_types);
+
 // boost::graph represenation of a vine tree
 struct VertexProperties
 {

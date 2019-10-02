@@ -148,7 +148,7 @@ AbstractBicop::pdf(const Eigen::MatrixXd& u)
 
   Eigen::VectorXd pdf(u.rows());
   if (var_types_ == std::vector<std::string>{ "c", "c" }) {
-    pdf = pdf_raw(u);
+    pdf = pdf_raw(u.leftCols(2));
   } else if (var_types_ == std::vector<std::string>{ "d", "d" }) {
     pdf = pdf_d_d(u);
   } else {
@@ -196,7 +196,7 @@ AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
             (uu.col(0) - uu.col(2)).array())
       .abs();
   } else {
-    return hfunc1_raw(u);
+    return hfunc1_raw(u.leftCols(2));
   }
 }
 
@@ -210,7 +210,7 @@ AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
             (uu.col(1) - uu.col(3)).array())
       .abs();
   } else {
-    return hfunc2_raw(u);
+    return hfunc2_raw(u.leftCols(2));
   }
 }
 
@@ -218,7 +218,7 @@ inline Eigen::VectorXd
 AbstractBicop::hinv1(const Eigen::MatrixXd& u)
 {
   if (var_types_[0] == "c") {
-    return hinv1_raw(u);
+    return hinv1_raw(u.leftCols(2));
   } else {
     return hinv1_num(u);
   }
@@ -228,7 +228,7 @@ inline Eigen::VectorXd
 AbstractBicop::hinv2(const Eigen::MatrixXd& u)
 {
   if (var_types_[1] == "c") {
-    return hinv2_raw(u);
+    return hinv2_raw(u.leftCols(2));
   } else {
     return hinv2_num(u);
   }

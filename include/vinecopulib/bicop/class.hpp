@@ -118,7 +118,13 @@ public:
   Bicop as_continuous() const;
 
 private:
-  Eigen::MatrixXd cut_and_rotate(const Eigen::MatrixXd& u) const;
+  Eigen::MatrixXd format_data(const Eigen::MatrixXd& u) const;
+
+  Eigen::MatrixXd clip_data(const Eigen::MatrixXd& u) const;
+
+  Eigen::MatrixXd rotate_data(const Eigen::MatrixXd& u) const;
+
+  Eigen::MatrixXd prep_for_abstract(const Eigen::MatrixXd& u) const;
 
   void check_rotation(int rotation) const;
 
@@ -132,6 +138,8 @@ private:
                           const Eigen::MatrixXd& data) const;
 
   void check_fitted() const;
+
+  int get_n_discrete() const;
 
   double compute_mbic_penalty(const size_t nobs, const double psi0) const;
 
