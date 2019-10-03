@@ -113,6 +113,7 @@ TEST(discrete, vinecop)
   // test other input format
   u = Eigen::MatrixXd(utmp.rows(), 10);
   u.leftCols(5) = utmp;
+  u.rightCols(5) = utmp;
   u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
   u.col(5) = (utmp.col(0).array() * 10).floor() / 10;
   u.col(2) = (utmp.col(2).array() * 10).ceil() / 10;
