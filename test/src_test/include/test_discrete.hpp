@@ -97,7 +97,7 @@ TEST(discrete, vinecop)
 
   // fit vine
   auto controls = FitControlsVinecop({ BicopFamily::clayton });
-  controls.set_show_trace(true);
+  // controls.set_show_trace(true);
   vc.select_families(u, controls);
   vc.pdf(u);
 

@@ -253,9 +253,8 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   interp_grid_ = std::make_shared<InterpolationGrid>(grid_points, values);
 
   // compute effective degrees of freedom via interpolation ---------
-  Eigen::VectorXd infl_vec = ll_fit.col(1);
   // stabilize interpolation by restricting to plausible range
-  infl_vec = infl_vec.array().min(1.0).max(-1.0);
+  Eigen::VectorXd infl_vec = ll_fit.col(1).cwiseMin(1.3).cwiseMax(-0.2);
   Eigen::MatrixXd infl(m, m);
   infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), m, m).transpose();
   // don't normalize margins of the EDF! (norm_times = 0)
@@ -264,10 +263,12 @@ TllBicop::fit(const Eigen::MatrixXd& data,
       // for discrete, use mid ranks to compute EDF and log-likelihood
       // (this is closer to "observations" than jittered or "upper" pseudo data)
       psobs = tools_stats::to_pseudo_obs(data, "average");
+      npars_ =
+        tools_eigen::unique(infl_grid.interpolate(psobs.leftCols(2))).sum();
+      npars_ = std::fmax(npars_, 1.0);
   } else {
-    psobs = data;
+    npars_ = std::fmax(infl_grid.interpolate(data).sum(), 1.0);
   }
-  npars_ = std::fmax(infl_grid.interpolate(psobs).sum(), 1.0);
-  set_loglik(pdf(psobs).array().log().sum());
+  set_loglik(pdf(data).array().log().sum());
 }
 }
