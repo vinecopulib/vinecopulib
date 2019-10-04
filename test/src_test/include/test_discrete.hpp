@@ -65,6 +65,10 @@ TEST(discrete, bicop)
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
     bc.select(uu.topRows(20)); // all families
+
+    // tll
+    bc.select(uu.topRows(20), FitControlsBicop({BicopFamily::tll})); 
+    bc.parameters_to_tau(bc.get_parameters());
   }
 }
 

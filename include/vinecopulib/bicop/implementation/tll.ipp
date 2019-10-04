@@ -262,9 +262,8 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   if ((var_types_[0] == "d") | (var_types_[1] == "d")) {
       // for discrete, use mid ranks to compute EDF and log-likelihood
       // (this is closer to "observations" than jittered or "upper" pseudo data)
-      psobs = tools_stats::to_pseudo_obs(data, "average");
-      npars_ =
-        tools_eigen::unique(infl_grid.interpolate(psobs.leftCols(2))).sum();
+      psobs = tools_stats::to_pseudo_obs(data.leftCols(2), "average");
+      npars_ = tools_eigen::unique(infl_grid.interpolate(psobs)).sum();
       npars_ = std::fmax(npars_, 1.0);
   } else {
     npars_ = std::fmax(infl_grid.interpolate(data).sum(), 1.0);
