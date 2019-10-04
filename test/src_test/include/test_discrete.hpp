@@ -82,7 +82,7 @@ TEST(discrete, vinecop)
   vc.set_var_types({ "d", "c", "d", "d", "c" });
 
   // simulate data with continuous and discrete variables
-  auto utmp = vc.simulate(5000, true, 1, { 1 });
+  auto utmp = vc.simulate(500, true, 1, { 1 });
   Eigen::MatrixXd u(utmp.rows(), 5 + 3); // 3 discrete vars
   u.leftCols(5) = utmp;
 
@@ -97,7 +97,7 @@ TEST(discrete, vinecop)
 
   // fit vine
   auto controls = FitControlsVinecop({ BicopFamily::clayton });
-  // controls.set_show_trace(true);
+  controls.set_show_trace(true);
   vc.select_families(u, controls);
   vc.pdf(u);
 
