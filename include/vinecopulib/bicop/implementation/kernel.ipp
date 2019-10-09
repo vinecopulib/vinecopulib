@@ -34,6 +34,16 @@ KernelBicop::pdf_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
+KernelBicop::pdf(const Eigen::MatrixXd& u)
+{
+  if (u.cols() == 4) {
+    // evaluate jittered density at mid rank for stability
+    return pdf_raw((u.leftCols(2) + u.rightCols(2)).array() / 2.0);
+  }
+  return pdf_raw(u);
+}
+
+inline Eigen::VectorXd
 KernelBicop::cdf(const Eigen::MatrixXd& u)
 {
   return interp_grid_->integrate_2d(u);
@@ -49,6 +59,28 @@ inline Eigen::VectorXd
 KernelBicop::hfunc2_raw(const Eigen::MatrixXd& u)
 {
   return interp_grid_->integrate_1d(u, 2);
+}
+
+inline Eigen::VectorXd
+KernelBicop::hfunc1(const Eigen::MatrixXd& u)
+{
+  if (u.cols() == 4) {
+    auto u_avg = u;
+    u_avg.col(0) = (u.col(0) + u.col(2)).array() / 2.0;
+    return hfunc1_raw(u_avg.leftCols(2));
+  }
+  return hfunc1_raw(u);
+}
+
+inline Eigen::VectorXd
+KernelBicop::hfunc2(const Eigen::MatrixXd& u)
+{
+  if (u.cols() == 4) {
+    auto u_avg = u;
+    u_avg.col(1) = (u.col(1) + u.col(3)).array() / 2.0;
+    return hfunc1_raw(u_avg.leftCols(2));
+  }
+  return hfunc1_raw(u);
 }
 
 inline Eigen::VectorXd
