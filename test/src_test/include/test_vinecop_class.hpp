@@ -242,7 +242,7 @@ TEST_F(VinecopTest, family_select_finds_true_rotations)
     }
   }
   Vinecop vinecop(pair_copulas, model_matrix);
-  auto data = vinecop.simulate(1000);
+  auto data = vinecop.simulate(2000);
 
   auto controls = FitControlsVinecop({ BicopFamily::clayton }, "itau");
   // controls.set_show_trace(true);
