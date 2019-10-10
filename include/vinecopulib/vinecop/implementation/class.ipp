@@ -655,14 +655,14 @@ Vinecop::set_var_types(const std::vector<std::string>& var_types)
   if (var_types.size() > d_) {
     msg << "more var_types (" << var_types.size() << ")"
         << "than variables (" << d_ << ")-" << std::endl;
+    throw std::runtime_error(msg.str());
   }
   for (auto t : var_types) {
     if (!tools_stl::is_member(t, { "c", "d" })) {
-      msg << "variable type must be 'c' or 'd'." << std::endl;
+      msg << "variable type must be 'c' or 'd' (not '" << t << "')."
+          << std::endl;
+      throw std::runtime_error(msg.str());
     }
-  }
-  if (!msg.str().empty()) {
-    throw std::runtime_error(msg.str());
   }
   var_types_ = var_types;
   if (pair_copulas_.size() == 0) {
