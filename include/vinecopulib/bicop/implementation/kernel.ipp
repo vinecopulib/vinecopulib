@@ -16,10 +16,17 @@ inline KernelBicop::KernelBicop()
   Eigen::VectorXd grid_points(m);
   for (size_t i = 0; i < m; ++i)
     grid_points(i) = -3.25 + i * (6.5 / static_cast<double>(m - 1));
-  interp_grid_ = std::make_shared<tools_interpolation::InterpolationGrid>(
-    tools_stats::pnorm(grid_points),
-    Eigen::MatrixXd::Constant(m, m, 1.0) // independence
-  );
+  grid_points = tools_stats::pnorm(grid_points);
+  
+  // move boundary points to 0/1, so we don't have to extrapolate
+  grid_points(0) = 0.0;
+  grid_points(m - 1) = 1.0;
+
+  interp_grid_ =
+    std::make_shared<tools_interpolation::InterpolationGrid>(
+      tools_stats::pnorm(grid_points),
+      Eigen::MatrixXd::Constant(m, m, 1.0) // independence
+    );
 }
 
 inline Eigen::VectorXd
