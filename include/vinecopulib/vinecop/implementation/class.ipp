@@ -166,7 +166,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 {
   nobs_ = data.rows();
   check_enough_data(data);
-  if (static_cast<size_t>(data.cols()) != vine_struct_.get_dim()) {
+  if (static_cast<size_t>(data.cols()) != d_) {
     throw std::runtime_error("data and structure have "
                              "incompatible dimensions.");
   }
