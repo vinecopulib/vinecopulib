@@ -646,10 +646,17 @@ Vinecop::get_threshold() const
 }
 
 //! @brief sets variable types.
-//! @param var_types a vector of size two specifying the types of the variables,
+//! @param var_types a vector specifying the types of the variables,
 //!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
 inline void
 Vinecop::set_var_types(const std::vector<std::string>& var_types)
+{
+  check_var_types(var_types);
+  set_var_types_internal(var_types);
+}
+
+inline void
+Vinecop::check_var_types(const std::vector<std::string>& var_types) const
 {
   std::stringstream msg;
   if (var_types.size() > d_) {
@@ -664,6 +671,14 @@ Vinecop::set_var_types(const std::vector<std::string>& var_types)
       throw std::runtime_error(msg.str());
     }
   }
+}
+
+//! @brief sets variable types.
+//! @param var_types a vector specifying the types of the variables,
+//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
+inline void
+Vinecop::set_var_types_internal(const std::vector<std::string>& var_types) const
+{
   var_types_ = var_types;
   if (pair_copulas_.size() == 0) {
     return;
@@ -879,7 +894,7 @@ Vinecop::simulate(const size_t n,
   auto actual_types = var_types_;
   set_continuous_var_types();
   u = inverse_rosenblatt(u, num_threads); 
-  var_types_ = actual_types;
+  set_var_types_internal(actual_types);
   return u;
 }
 
@@ -1306,6 +1321,7 @@ Vinecop::set_continuous_var_types() const
   var_types_ = std::vector<std::string>(d_);
   for (auto& t : var_types_)
     t = "c";
+  set_var_types_internal(var_types_);
 }
 
 //! returns the number of discrete variables.
