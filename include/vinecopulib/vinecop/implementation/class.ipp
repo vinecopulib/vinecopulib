@@ -64,10 +64,10 @@ inline Vinecop::Vinecop(const std::vector<size_t>& order,
 //! @brief creates an arbitrary vine copula model.
 //! @param pair_copulas Bicop objects specifying the pair-copulas, see
 //!     make_pair_copula_store().
-//! @param vine_struct an RVineStructure object specifying the vine structure.
+//! @param structure an RVineStructure object specifying the vine structure.
 inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
-                        const RVineStructure& vine_struct)
-  : Vinecop(vine_struct)
+                        const RVineStructure& structure)
+  : Vinecop(structure)
 {
   check_pair_copulas_rvine_structure(pair_copulas);
   pair_copulas_ = pair_copulas;
@@ -160,9 +160,9 @@ inline Vinecop::Vinecop(const std::string filename, const bool check)
 //! @param structure an RVineStructure object specifying the vine structure.
 //! @param controls see FitControlsVinecop.
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
-                        const RVineStructure& vine_struct,
+                        const RVineStructure& structure,
                         FitControlsVinecop controls)
-  : Vinecop(vine_struct)
+  : Vinecop(structure)
 {
   nobs_ = data.rows();
   check_enough_data(data);
