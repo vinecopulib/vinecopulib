@@ -154,11 +154,7 @@ AbstractBicop::pdf(const Eigen::MatrixXd& u)
   } else {
     pdf = pdf_c_d(u);
   }
-
-  auto trim = [](const double& x) {
-    return std::min(DBL_MAX, std::max(x, DBL_MIN));
-  };
-  return tools_eigen::unaryExpr_or_nan(pdf, trim);
+  return tools_eigen::trim(pdf, DBL_MIN, DBL_MAX);
 }
 
 inline Eigen::VectorXd

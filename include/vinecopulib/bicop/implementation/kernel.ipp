@@ -6,7 +6,6 @@
 
 #include <vinecopulib/misc/tools_interpolation.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <vinecopulib/misc/tools_interpolation.hpp>
 #include <wdm/eigen.hpp>
 
 namespace vinecopulib {
@@ -27,10 +26,7 @@ inline Eigen::VectorXd
 KernelBicop::pdf_raw(const Eigen::MatrixXd& u)
 {
   auto pdf = interp_grid_->interpolate(u);
-  auto trunc = [] (const double& p) {
-      return std::fmax(p, 1e-20);
-  };
-  return tools_eigen::unaryExpr_or_nan(pdf, trunc);
+  return tools_eigen::trim(pdf, 1e-20, DBL_MAX);
 }
 
 inline Eigen::VectorXd
