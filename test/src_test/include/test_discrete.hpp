@@ -133,5 +133,6 @@ TEST(discrete, vinecop)
       EXPECT_NEAR(pc.get_parameters()(0), 2.0 / (t + 1), 0.5);
     }
   }
+
 }
 }

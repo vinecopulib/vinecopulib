@@ -24,7 +24,7 @@ inline KernelBicop::KernelBicop()
 
   interp_grid_ =
     std::make_shared<tools_interpolation::InterpolationGrid>(
-      tools_stats::pnorm(grid_points),
+      grid_points,
       Eigen::MatrixXd::Constant(m, m, 1.0) // independence
     );
 }
@@ -81,15 +81,15 @@ KernelBicop::hfunc2(const Eigen::MatrixXd& u)
   if (u.cols() == 4) {
     auto u_avg = u;
     u_avg.col(1) = (u.col(1) + u.col(3)).array() / 2.0;
-    return hfunc1_raw(u_avg.leftCols(2));
+    return hfunc2_raw(u_avg.leftCols(2));
   }
-  return hfunc1_raw(u);
+  return hfunc2_raw(u);
 }
 
 inline Eigen::VectorXd
 KernelBicop::hinv1_raw(const Eigen::MatrixXd& u)
 {
-  return hinv2_num(u);
+  return hinv1_num(u);
 }
 
 inline Eigen::VectorXd
