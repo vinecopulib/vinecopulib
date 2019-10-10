@@ -139,7 +139,7 @@ private:
 
   void check_fitted() const;
 
-  int get_n_discrete() const;
+  unsigned short get_n_discrete() const;
 
   double compute_mbic_penalty(const size_t nobs, const double psi0) const;
 

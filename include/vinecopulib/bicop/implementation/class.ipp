@@ -529,7 +529,7 @@ inline void
 Bicop::check_data_dim(const Eigen::MatrixXd& u) const
 {
   size_t n_cols = u.cols();
-  size_t n_cols_exp = 2 + get_n_discrete();
+  auto n_cols_exp = 2 + get_n_discrete();
   if ((n_cols != n_cols_exp) & (n_cols != 4)) {
     std::stringstream msg;
     msg << "data has wrong number of columns; "
@@ -810,10 +810,10 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
 inline Eigen::MatrixXd
 Bicop::format_data(const Eigen::MatrixXd& u) const
 {
-  int n_disc = get_n_discrete();
+  auto n_disc = get_n_discrete();
   if (n_disc == 0) {
     return u.leftCols(2);
-  } else if ((get_n_discrete() != 1) | (u.cols() == 4)) {
+  } else if ((n_disc != 1) | (u.cols() == 4)) {
     return u;
   }
   Eigen::MatrixXd u_new(u.rows(), 4);
@@ -918,7 +918,7 @@ Bicop::check_fitted() const
 }
 
 //! returns the number of discrete variables.
-inline int
+inline unsigned short
 Bicop::get_n_discrete() const
 {
   int n_discrete = 0;
