@@ -132,11 +132,11 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
       pair_copulas_[tree][edge] = Bicop(pc_node);
     }
   }
-  var_types_ = tools_serialization::ptree_to_vector<std::string>(
-    input.get_child("var_types"));
 
   // try block for backwards compatibility
   try {
+    var_types_ = tools_serialization::ptree_to_vector<std::string>(
+      input.get_child("var_types"));
     nobs_ = input.get<size_t>("nobs_");
     threshold_ = input.get<double>("threshold");
     loglik_ = input.get<double>("loglik");

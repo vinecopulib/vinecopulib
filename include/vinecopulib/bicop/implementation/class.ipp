@@ -55,10 +55,10 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
           tools_serialization::ptree_to_matrix<double>(
             input.get_child("parameters")))
 {
-  var_types_ = tools_serialization::ptree_to_vector<std::string>(
-    input.get_child("var_types"));
   // try block for backwards compatibility
   try {
+    var_types_ = tools_serialization::ptree_to_vector<std::string>(
+      input.get_child("var_types"));
     nobs_ = input.get<size_t>("nobs_");
     bicop_->set_loglik(input.get<double>("loglik"));
   } catch (...) {}
