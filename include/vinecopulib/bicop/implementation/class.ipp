@@ -523,18 +523,20 @@ inline void
 Bicop::check_data_dim(const Eigen::MatrixXd& u) const
 {
   size_t n_cols = u.cols();
-  unsigned short n_cols_exp = 2 + get_n_discrete();
+  auto n_disc = get_n_discrete();
+  unsigned short n_cols_exp = 2 + n_disc;
   if ((n_cols != n_cols_exp) & (n_cols != 4)) {
     std::stringstream msg;
     msg << "data has wrong number of columns; "
         << "expected: " << n_cols_exp << " or 4, actual: " << n_cols 
         << " (model contains ";
-    if (n_cols_exp == 2) {
-      msg << "no ";
+    if (n_disc == 0) {
+      msg << "no discrete variables)." << std::endl;
+    } else if (n_disc == 1) {
+      msg << "1 discrete variable)." << std::endl;
     } else {
-      msg << get_n_discrete() << " ";
+      msg << get_n_discrete() << "discrete variables)." << std::endl;
     }
-    msg << "discrete variables)." << std::endl;
     throw std::runtime_error(msg.str());
   }
 }

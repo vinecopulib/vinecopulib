@@ -1197,18 +1197,20 @@ inline void
 Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
 {
   size_t d_data = data.cols();
-  size_t d_exp = d_ + get_n_discrete();
+  auto n_disc = get_n_discrete();
+  size_t d_exp = d_ + n_disc;
   if ((d_data != d_exp) & (d_data != 2 * d_)) {
     std::stringstream msg;
     msg << "data has wrong number of columns; "
         << "expected: " << d_exp << " or " << 2 * d_ << ", actual: " << d_data
         << " (model contains ";
-    if (d_exp == d_) {
-      msg << "no ";
+    if (n_disc == 0) {
+      msg << "no discrete variables)." << std::endl;
+    } else if (n_disc == 1) {
+      msg << "1 discrete variable)." << std::endl;
     } else {
-      msg << get_n_discrete() << " ";
+      msg << get_n_discrete() << "discrete variables)." << std::endl;
     }
-    msg << "discrete variables)." << std::endl;
     throw std::runtime_error(msg.str());
   }
 }
