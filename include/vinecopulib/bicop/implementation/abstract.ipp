@@ -21,16 +21,6 @@
 #include <vinecopulib/bicop/tll.hpp>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
-
-
-
-
-#include <iostream>
-
-
-
-
-
 namespace vinecopulib {
 
 //! virtual destructor
