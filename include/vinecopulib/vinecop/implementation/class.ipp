@@ -311,7 +311,7 @@ Vinecop::select(Eigen::MatrixXd data, const FitControlsVinecop& controls)
   check_data(data);
   data = collapse_data(data);
 
-  tools_select::StructureSelector selector(data, controls, var_types_);
+  tools_select::VinecopSelector selector(data, controls, var_types_);
   if (controls.needs_sparse_select()) {
     selector.sparse_select_all_trees(data);
   } else {
@@ -346,7 +346,7 @@ Vinecop::select_all(Eigen::MatrixXd data, const FitControlsVinecop& controls)
   check_data(data);
   data = collapse_data(data);
 
-  tools_select::StructureSelector selector(data, controls, var_types_);
+  tools_select::VinecopSelector selector(data, controls, var_types_);
   if (controls.needs_sparse_select()) {
     selector.sparse_select_all_trees(data);
   } else {
@@ -379,7 +379,7 @@ Vinecop::select_families(Eigen::MatrixXd data,
   data = collapse_data(data);
 
   if (vine_struct_.get_trunc_lvl() > 0) {
-    tools_select::FamilySelector selector(
+    tools_select::VinecopSelector selector(
       data, vine_struct_, controls, var_types_);
     if (controls.needs_sparse_select()) {
       selector.sparse_select_all_trees(data);
