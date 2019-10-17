@@ -143,6 +143,8 @@ protected:
 
   void add_allowed_edges(VineTree& vine_tree);
 
+  void select_edges(VineTree& tree);
+
   Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
 
   Eigen::VectorXd get_hfunc(const VertexProperties& vertex_data,

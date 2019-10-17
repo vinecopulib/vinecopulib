@@ -417,6 +417,18 @@ VinecopSelector::add_allowed_edges(VineTree& vine_tree)
   }
 }
 
+//! Select the edges using the minimum spanning tree
+//!
+//! See, e.g., Czado (2010), "Pair-copula constructions of multivariate
+//! copulas", url: https://mediatum.ub.tum.de/doc/1079253/file.pdf
+//! @param vine_tree tree of a vine.
+inline void
+VinecopSelector::select_edges(VineTree& vine_tree)
+{
+  // has no effect if the input is already a tree
+  min_spanning_tree(vine_tree);
+}
+
 inline void
 VinecopSelector::finalize(size_t trunc_lvl)
 {
@@ -776,8 +788,7 @@ VinecopSelector::select_tree(size_t t)
   remove_edge_data(trees_[t]); // no longer needed
   add_allowed_edges(new_tree);
   if (boost::num_vertices(new_tree) > 2) {
-    // has no effect in FamilySelector
-    min_spanning_tree(new_tree);
+    select_edges(new_tree);
   }
   if (boost::num_vertices(new_tree) > 0) {
     add_edge_info(new_tree);      // for pc estimation and next tree
