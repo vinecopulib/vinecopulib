@@ -155,7 +155,7 @@ inline Vinecop::Vinecop(const std::string filename, const bool check)
 {}
 
 //! @brief constructs a vine copula model from data by creating a model and
-//! calling select_family().
+//! calling select().
 //!
 //! @param data an \f$ n \times d \f$ matrix of observations.
 //! @param structure an RVineStructure object specifying the vine structure.
@@ -172,15 +172,15 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                              "incompatible dimensions.");
   }
   check_weights_size(controls.get_weights(), data);
-  select_families(data, controls);
+  select(data, controls);
 }
 
 //! @brief constructs a vine copula model from data by creating a model and
-//! calling select_family().
+//! calling select().
 //!
 //! @param data an \f$ n \times d \f$ matrix of observations.
 //! @param matrix either an empty matrix (default) or an R-vine structure
-//!     matrix, see select_families().
+//!     matrix, see select().
 //! @param controls see FitControlsVinecop.
 //! @param check whether to check if `matrix` is a valid R-vine
 //!     matrix.
@@ -193,7 +193,7 @@ inline Vinecop::Vinecop(
 {}
 
 //! @brief constructs a vine copula model from data by creating a model and
-//! calling select_family().
+//! calling select().
 //!
 //! @param data an \f$ n \times d \f$ matrix of observations.
 //! @param order the order of the variables in the vine structure, see
@@ -212,7 +212,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 {}
 
 //! @brief constructs a vine copula model from data by creating a model and
-//! calling select_all().
+//! calling select().
 //!
 //! @param data an \f$ n \times d \f$ matrix of observations.
 //! @param controls see FitControlsVinecop.
@@ -223,7 +223,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   nobs_ = data.rows();
   check_enough_data(data);
   check_weights_size(controls.get_weights(), data);
-  select_all(data, controls);
+  select(data, controls);
 }
 
 //! @brief converts the copula into a boost::property_tree::ptree object.
@@ -311,7 +311,8 @@ Vinecop::select(Eigen::MatrixXd data, const FitControlsVinecop& controls)
   check_data(data);
   data = collapse_data(data);
 
-  tools_select::VinecopSelector selector(data, controls, var_types_);
+  tools_select::VinecopSelector selector(
+    data, vine_struct_, controls, var_types_);
   if (controls.needs_sparse_select()) {
     selector.sparse_select_all_trees(data);
   } else {
@@ -343,16 +344,7 @@ Vinecop::select(Eigen::MatrixXd data, const FitControlsVinecop& controls)
 inline void
 Vinecop::select_all(Eigen::MatrixXd data, const FitControlsVinecop& controls)
 {
-  check_data(data);
-  data = collapse_data(data);
-
-  tools_select::VinecopSelector selector(data, controls, var_types_);
-  if (controls.needs_sparse_select()) {
-    selector.sparse_select_all_trees(data);
-  } else {
-    selector.select_all_trees(data);
-  }
-  finalize_fit(selector);
+  select(data, controls);
 }
 
 //! @brief automatically selects all pair-copula families and fits all
@@ -375,20 +367,7 @@ inline void
 Vinecop::select_families(Eigen::MatrixXd data,
                          const FitControlsVinecop& controls)
 {
-  check_data(data);
-  data = collapse_data(data);
-
-  if (vine_struct_.get_trunc_lvl() > 0) {
-    tools_select::VinecopSelector selector(
-      data, vine_struct_, controls, var_types_);
-    if (controls.needs_sparse_select()) {
-      selector.sparse_select_all_trees(data);
-      vine_struct_ = selector.get_rvine_structure(); // can be truncated
-    } else {
-      selector.select_all_trees(data);
-    }
-    finalize_fit(selector);
-  }
+  select(data, controls);
 }
 
 //! @name Getters
@@ -758,7 +737,7 @@ Vinecop::get_var_types() const
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `Vinecop::select_all()`).
+//!   (see `Vinecop::select()`).
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -867,7 +846,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `Vinecop::select_all()`).
+//!   (see `Vinecop::select()`).
 //! @param N integer for the number of quasi-random numbers to draw
 //! to evaluate the distribution (default: 1e4).
 //! @param num_threads the number of threads to use for computations; if greater
@@ -941,7 +920,7 @@ Vinecop::simulate(const size_t n,
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `Vinecop::select_all()`).
+//!   (see `Vinecop::select()`).
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -966,7 +945,7 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `Vinecop::select_all()`).
+//!   (see `Vinecop::select()`).
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -987,7 +966,7 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `Vinecop::select_all()`).
+//!   (see `Vinecop::select()`).
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -1013,7 +992,7 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `Vinecop::select_all()`).
+//!   (see `Vinecop::select()`).
 //! @param psi0 baseline prior probability of a non-independence copula.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches

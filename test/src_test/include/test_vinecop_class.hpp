@@ -321,7 +321,7 @@ TEST_F(VinecopTest, select_finds_right_structure)
 
   // select structure and get matrix
   Vinecop fit(7);
-  fit.select_all(u, FitControlsVinecop({ BicopFamily::indep }));
+  fit.select(u, FitControlsVinecop({ BicopFamily::indep }));
   auto vcl_matrix = fit.get_matrix();
 
   // check if the same conditioned sets appear for each tree
@@ -360,10 +360,10 @@ TEST_F(VinecopTest, fixed_truncation)
   controls.set_trunc_lvl(2);
   // controls.set_show_trace(true);
   Vinecop fit(7);
-  fit.select_all(u, controls);
+  fit.select(u, controls);
   EXPECT_EQ(fit.get_all_pair_copulas().size(), 2);
 
-  fit.select_families(u, controls);
+  fit.select(u, controls);
   EXPECT_EQ(fit.get_all_pair_copulas().size(), 2);
 
   Vinecop fit2(u, fit.get_rvine_structure(), controls);
@@ -381,9 +381,9 @@ TEST_F(VinecopTest, sparse_threshold_selection)
   // controls.set_show_trace(true);
   controls.set_selection_criterion("mbicv");
   Vinecop fit(7);
-  fit.select_all(u, controls);
+  fit.select(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
-  fit.select_families(u, controls);
+  fit.select(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 
@@ -395,8 +395,10 @@ TEST_F(VinecopTest, sparse_truncation_selection)
   // controls.set_show_trace(true);
   u = tools_stats::simulate_uniform(100, 7);
   Vinecop fit(7);
-  fit.select_all(u, controls);
-  fit.select_families(u, controls);
+  fit.select(u, controls);
+  EXPECT_LE(fit.get_rvine_structure().get_trunc_lvl(), 6);
+  EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
+  fit.select(u, controls);
   EXPECT_LE(fit.get_rvine_structure().get_trunc_lvl(), 6);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
@@ -409,9 +411,9 @@ TEST_F(VinecopTest, sparse_both_selection)
   controls.set_select_threshold(true);
   // controls.set_show_trace(true);
   Vinecop fit(7);
-  fit.select_all(u, controls);
+  fit.select(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
-  fit.select_families(u, controls);
+  fit.select(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 }

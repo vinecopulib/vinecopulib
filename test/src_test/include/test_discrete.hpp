@@ -67,7 +67,7 @@ TEST(discrete, bicop)
     bc.select(uu.topRows(20)); // all families
 
     // tll
-    bc.select(uu.topRows(20), FitControlsBicop({BicopFamily::tll})); 
+    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
     bc.parameters_to_tau(bc.get_parameters());
   }
 }
@@ -102,7 +102,7 @@ TEST(discrete, vinecop)
   // fit vine
   auto controls = FitControlsVinecop({ BicopFamily::clayton });
   // controls.set_show_trace(true);
-  vc.select_families(u, controls);
+  vc.select(u, controls);
   vc.pdf(u);
 
   // check output
@@ -124,7 +124,7 @@ TEST(discrete, vinecop)
   u.col(7) = (utmp.col(2).array() * 10).floor() / 10;
   u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
   u.col(8) = (utmp.col(3).array() * 10).floor() / 10;
-  vc.select_families(u, controls);
+  vc.select(u, controls);
   vc.pdf(u);
   pcs = vc.get_all_pair_copulas();
   for (size_t t = 0; t < 4; t++) {
@@ -133,6 +133,5 @@ TEST(discrete, vinecop)
       EXPECT_NEAR(pc.get_parameters()(0), 2.0 / (t + 1), 0.5);
     }
   }
-
 }
 }
