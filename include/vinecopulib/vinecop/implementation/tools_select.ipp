@@ -97,10 +97,9 @@ inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
   , controls_(controls)
   , pool_(controls_.get_num_threads())
   , trees_(std::vector<VineTree>(1))
-{
-  threshold_ = controls.get_threshold();
-  psi0_ = controls.get_psi0();
-}
+  , threshold_(controls.get_threshold())
+  , psi0_(controls.get_psi0())
+{}
 
 inline std::vector<std::vector<Bicop>>
 VinecopSelector::get_pair_copulas() const
@@ -347,18 +346,6 @@ VinecopSelector::get_next_threshold(std::vector<double>& thresholded_crits)
   return thresholded_crits[static_cast<size_t>(new_index)];
 }
 
-inline FamilySelector::FamilySelector(const Eigen::MatrixXd& data,
-                                      const RVineStructure& vine_struct,
-                                      const FitControlsVinecop& controls,
-                                      std::vector<std::string> var_types)
-  : VinecopSelector(data, controls, var_types)
-{
-  vine_struct_ = vine_struct;
-  if (vine_struct.get_trunc_lvl() < controls.get_trunc_lvl()) {
-    controls_.set_trunc_lvl(vine_struct.get_trunc_lvl());
-  }
-}
-
 inline StructureSelector::StructureSelector(const Eigen::MatrixXd& data,
                                             const FitControlsVinecop& controls,
                                             std::vector<std::string> var_types)
@@ -367,41 +354,73 @@ inline StructureSelector::StructureSelector(const Eigen::MatrixXd& data,
   vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
 }
 
-//! Add edges allowed by the proximity condition
+inline FamilySelector::FamilySelector(const Eigen::MatrixXd& data,
+                                      const RVineStructure& vine_struct,
+                                      const FitControlsVinecop& controls,
+                                      std::vector<std::string> var_types)
+  : StructureSelector(data, controls, var_types)
+{
+  vine_struct_ = vine_struct;
+  proximity_ = false;
+  if (vine_struct.get_trunc_lvl() < controls.get_trunc_lvl()) {
+    controls_.set_trunc_lvl(vine_struct.get_trunc_lvl());
+  }
+}
+
+//! Add edges allowed by either the proximity condition or the vine structure
 //!
-//! Also calculates the edge weight (e.g., 1-|tau| for tree_criterion =
-//! "itau").
+//! If all the edges allowed by the proximity condition are included, then
+//! the function also calculates the edge weight
+//! (e.g., 1-|tau| for tree_criterion = "itau").
 //!
 //! @param vine_tree tree of a vine.
+//! @param proximity whether edges are added based on the proximity condition.
 inline void
 StructureSelector::add_allowed_edges(VineTree& vine_tree)
 {
   std::string tree_criterion = controls_.get_tree_criterion();
-  double threshold = controls_.get_threshold();
-
-  std::mutex m;
-  auto add_edge = [&](size_t v0) {
-    tools_interface::check_user_interrupt(v0 % 50 == 0);
-    for (size_t v1 = 0; v1 < v0; ++v1) {
-      // check proximity condition: common neighbor in previous tree
-      // (-1 means 'no common neighbor')
-      if (find_common_neighbor(v0, v1, vine_tree) > -1) {
-        auto pc_data = get_pc_data(v0, v1, vine_tree);
-        double crit =
-          calculate_criterion(pc_data, tree_criterion, controls_.get_weights());
-        double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
-        {
-          std::lock_guard<std::mutex> lk(m);
-          auto e = boost::add_edge(v0, v1, w, vine_tree).first;
-          vine_tree[e].weight = w;
-          vine_tree[e].crit = crit;
+  if (proximity_) {
+    double threshold = controls_.get_threshold();
+    std::mutex m;
+    auto add_edge = [&](size_t v0) {
+      tools_interface::check_user_interrupt(v0 % 50 == 0);
+      for (size_t v1 = 0; v1 < v0; ++v1) {
+        // check proximity condition: common neighbor in previous tree
+        // (-1 means 'no common neighbor')
+        if (find_common_neighbor(v0, v1, vine_tree) > -1) {
+          auto pc_data = get_pc_data(v0, v1, vine_tree);
+          double crit = calculate_criterion(
+            pc_data, tree_criterion, controls_.get_weights());
+          double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
+          {
+            std::lock_guard<std::mutex> lk(m);
+            auto e = boost::add_edge(v0, v1, w, vine_tree).first;
+            vine_tree[e].weight = w;
+            vine_tree[e].crit = crit;
+          }
         }
       }
-    }
-  };
+    };
 
-  pool_.map(add_edge, boost::vertices(vine_tree));
-  pool_.wait();
+    pool_.map(add_edge, boost::vertices(vine_tree));
+    pool_.wait();
+  } else {
+    size_t tree = d_ - boost::num_vertices(vine_tree);
+    size_t edges = boost::num_vertices(vine_tree) - 1;
+    size_t trunc_lvl = vine_struct_.get_trunc_lvl();
+    if (tree < trunc_lvl) {
+      for (size_t v0 = 0; v0 < edges; ++v0) {
+        tools_interface::check_user_interrupt(v0 % 10000 == 0);
+        size_t v1 = vine_struct_.min_array(tree, v0) - 1;
+        Eigen::MatrixXd pc_data = get_pc_data(v0, v1, vine_tree);
+        EdgeIterator e = boost::add_edge(v0, v1, 1.0, vine_tree).first;
+        double crit = calculate_criterion(
+          pc_data.leftCols(2), tree_criterion, controls_.get_weights());
+        vine_tree[e].weight = 1.0;
+        vine_tree[e].crit = crit;
+      }
+    }
+  }
 }
 
 inline void
@@ -517,34 +536,6 @@ StructureSelector::finalize(size_t trunc_lvl)
   vine_struct_ = RVineStructure(order, mat);
 }
 
-//! Add edges allowed by vine matrix structure
-//!
-//! @param vine_tree tree of a vine.
-inline void
-FamilySelector::add_allowed_edges(VineTree& vine_tree)
-{
-  double w = 1.0;
-  std::string tree_criterion = controls_.get_tree_criterion();
-  size_t tree = d_ - boost::num_vertices(vine_tree);
-  size_t edges = boost::num_vertices(vine_tree) - 1;
-  size_t v0;
-  size_t v1;
-  auto trunc_lvl = vine_struct_.get_trunc_lvl();
-  if (tree < trunc_lvl) {
-    for (size_t edge = 0; edge < edges; ++edge) {
-      tools_interface::check_user_interrupt(edge % 10000 == 0);
-      v0 = edge;
-      v1 = vine_struct_.min_array(tree, edge) - 1;
-      Eigen::MatrixXd pc_data = get_pc_data(v0, v1, vine_tree);
-      EdgeIterator e = boost::add_edge(v0, v1, w, vine_tree).first;
-      double crit = calculate_criterion(
-        pc_data.leftCols(2), tree_criterion, controls_.get_weights());
-      vine_tree[e].weight = w;
-      vine_tree[e].crit = crit;
-    }
-  }
-}
-
 inline void
 FamilySelector::finalize(size_t trunc_lvl)
 {
@@ -637,7 +628,6 @@ VinecopSelector::get_pc_data(size_t v0, size_t v1, const VineTree& tree)
   pc_data.col(1) = get_hfunc(tree[v1], pos1);
   return pc_data;
 }
-
 
 //! Select and fit next tree of the vine
 //!

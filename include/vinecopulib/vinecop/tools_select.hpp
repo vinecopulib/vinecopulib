@@ -136,7 +136,7 @@ protected:
 
   void set_current_fit_as_opt(const double& loglik);
 
-  virtual void add_allowed_edges(VineTree& tree) = 0;
+  virtual void add_allowed_edges(VineTree& vine_tree) = 0;
 
   Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
 
@@ -205,12 +205,13 @@ public:
   ~StructureSelector() {}
 
 protected:
-  void add_allowed_edges(VineTree& tree);
+  bool proximity_{ true };
+  void add_allowed_edges(VineTree& vine_tree);
 
   void finalize(size_t trunc_lvl);
 };
 
-class FamilySelector : public VinecopSelector
+class FamilySelector : public StructureSelector
 {
 public:
   FamilySelector(const Eigen::MatrixXd& data,
@@ -221,8 +222,6 @@ public:
   ~FamilySelector() {}
 
 protected:
-  void add_allowed_edges(VineTree& tree);
-
   void finalize(size_t trunc_lvl);
 };
 }

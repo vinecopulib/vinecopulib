@@ -140,7 +140,8 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
     nobs_ = input.get<size_t>("nobs_");
     threshold_ = input.get<double>("threshold");
     loglik_ = input.get<double>("loglik");
-  } catch (...) {}
+  } catch (...) {
+  }
 }
 
 //! @brief creates from a JSON file.
@@ -305,8 +306,42 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select_all(Eigen::MatrixXd data,
-                    const FitControlsVinecop& controls)
+Vinecop::select(Eigen::MatrixXd data, const FitControlsVinecop& controls)
+{
+  check_data(data);
+  data = collapse_data(data);
+
+  tools_select::StructureSelector selector(data, controls, var_types_);
+  if (controls.needs_sparse_select()) {
+    selector.sparse_select_all_trees(data);
+  } else {
+    selector.select_all_trees(data);
+  }
+  finalize_fit(selector);
+}
+
+//! @brief automatically fits and selects a vine copula model.
+//!
+//! Selection of the structure is performed using the algorithm of
+//! Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013).
+//! *Selecting and estimating regular vine copulae and application to
+//! financial returns.* Computational Statistics & Data Analysis, 59 (1),
+//! 52-69.
+//!
+//! @details When at least one variable is discrete, two types of "observations"
+//! are required: the first \f$ n \times d \f$ block contains realizations of
+//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
+//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
+//! left-sided limit of the cdf. For continuous variables the left limit and the
+//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
+//! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
+//! be omitted.
+//!
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   observations, where \f$ k \f$ is the number of discrete variables.
+//! @param controls the controls to the algorithm (see FitControlsVinecop).
+inline void
+Vinecop::select_all(Eigen::MatrixXd data, const FitControlsVinecop& controls)
 {
   check_data(data);
   data = collapse_data(data);
@@ -893,7 +928,7 @@ Vinecop::simulate(const size_t n,
   // inverse_rosenblatt() only works for continous models
   auto actual_types = var_types_;
   set_continuous_var_types();
-  u = inverse_rosenblatt(u, num_threads); 
+  u = inverse_rosenblatt(u, num_threads);
   set_var_types_internal(actual_types);
   return u;
 }
@@ -1031,7 +1066,8 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
   std::vector<size_t> order, inverse_order;
-  TriangularArray<size_t> natural_array, min_array, needed_hfunc1, needed_hfunc2;
+  TriangularArray<size_t> natural_array, min_array, needed_hfunc1,
+    needed_hfunc2;
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
     inverse_order = tools_stl::invert_permutation(order);
@@ -1100,7 +1136,7 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! "Too large" means that the required memory will exceed 1 GB. An
 //! examplary configuration requiring less than 1 GB is \f$ n = 1000 \f$,
 //! \f$d = 200\f$.
-//! 
+//!
 //! Only works for continous models.
 //!
 //! @param u \f$ n \times d \f$ matrix of evaluation points.
@@ -1140,7 +1176,8 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   // info about the vine structure (in upper triangular matrix notation)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
   std::vector<size_t> order, inverse_order;
-  TriangularArray<size_t> natural_array, min_array, needed_hfunc1, needed_hfunc2;
+  TriangularArray<size_t> natural_array, min_array, needed_hfunc1,
+    needed_hfunc2;
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
     inverse_order = tools_stl::invert_permutation(order);
