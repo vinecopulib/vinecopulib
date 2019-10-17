@@ -111,9 +111,6 @@ inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
 {
   vine_struct_ = vine_struct;
   proximity_ = false;
-  if (vine_struct.get_trunc_lvl() < controls.get_trunc_lvl()) {
-    controls_.set_trunc_lvl(vine_struct.get_trunc_lvl());
-  }
 }
 
 inline std::vector<std::vector<Bicop>>
@@ -368,7 +365,6 @@ VinecopSelector::get_next_threshold(std::vector<double>& thresholded_crits)
 //! (e.g., 1-|tau| for tree_criterion = "itau").
 //!
 //! @param vine_tree tree of a vine.
-//! @param proximity whether edges are added based on the proximity condition.
 inline void
 VinecopSelector::add_allowed_edges(VineTree& vine_tree)
 {
@@ -786,6 +782,11 @@ VinecopSelector::select_tree(size_t t)
 {
   auto new_tree = edges_as_vertices(trees_[t]);
   remove_edge_data(trees_[t]); // no longer needed
+
+  if (t >= vine_struct_.get_trunc_lvl()) {
+    // only important if proximity_ was previously false (partial selection)
+    proximity_ = true;
+  }
   add_allowed_edges(new_tree);
   if (boost::num_vertices(new_tree) > 2) {
     select_edges(new_tree);
