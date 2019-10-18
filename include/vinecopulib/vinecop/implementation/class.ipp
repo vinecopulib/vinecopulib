@@ -383,6 +383,7 @@ inline void
 Vinecop::select_families(Eigen::MatrixXd data,
                          const FitControlsVinecop& controls)
 {
+  controls.set_trunc_lvl(vine_struct_.get_trunc_lvl());
   select(data, controls);
 }
 
