@@ -159,7 +159,7 @@ protected:
 
   size_t n_;
   size_t d_;
-  bool proximity_{ true };
+  bool structure_known_{ true };
   std::vector<std::string> var_types_;
   FitControlsVinecop controls_;
   tools_thread::ThreadPool pool_;
