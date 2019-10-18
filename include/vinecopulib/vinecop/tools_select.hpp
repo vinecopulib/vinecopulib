@@ -202,33 +202,6 @@ protected:
 
   std::string get_pc_index(const EdgeIterator& e, const VineTree& tree);
 };
-
-class StructureSelector : public VinecopSelector
-{
-public:
-  StructureSelector(const Eigen::MatrixXd& data,
-                    const FitControlsVinecop& controls,
-                    std::vector<std::string> var_types);
-
-  ~StructureSelector() {}
-
-protected:
-  void finalize(size_t trunc_lvl);
-};
-
-class FamilySelector : public StructureSelector
-{
-public:
-  FamilySelector(const Eigen::MatrixXd& data,
-                 const RVineStructure& vine_struct,
-                 const FitControlsVinecop& controls,
-                 std::vector<std::string> var_types);
-
-  ~FamilySelector() {}
-
-protected:
-  void finalize(size_t trunc_lvl);
-};
 }
 }
 
