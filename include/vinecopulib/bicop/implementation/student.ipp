@@ -19,12 +19,12 @@ inline StudentBicop::StudentBicop()
 }
 
 inline Eigen::VectorXd
-StudentBicop::pdf_raw(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+StudentBicop::pdf_raw(const Eigen::MatrixXd& u)
 {
   double rho = double(this->parameters_(0));
   double nu = double(this->parameters_(1));
   Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
-  Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qt(u, nu);
+  Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
 
   f = tmp.col(0).cwiseAbs2() + tmp.col(1).cwiseAbs2() -
       (2 * rho) * tmp.rowwise().prod();
@@ -38,8 +38,7 @@ StudentBicop::pdf_raw(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
   return f;
 }
 
-inline Eigen::VectorXd
-StudentBicop::cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+inline Eigen::VectorXd StudentBicop::cdf(const Eigen::MatrixXd &u)
 {
   using namespace tools_stats;
 
@@ -62,12 +61,12 @@ StudentBicop::cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
 }
 
 inline Eigen::VectorXd
-StudentBicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u)
 {
   double rho = double(this->parameters_(0));
   double nu = double(this->parameters_(1));
   Eigen::VectorXd h = Eigen::VectorXd::Ones(u.rows());
-  Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qt(u, nu);
+  Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
   h = nu * h + tmp.col(0).cwiseAbs2();
   h *= (1.0 - pow(rho, 2)) / (nu + 1.0);
   h = h.cwiseSqrt().cwiseInverse().cwiseProduct(tmp.col(1) - rho * tmp.col(0));
@@ -76,8 +75,7 @@ StudentBicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
   return h;
 }
 
-inline Eigen::VectorXd
-StudentBicop::hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+inline Eigen::VectorXd StudentBicop::hinv1_raw(const Eigen::MatrixXd &u)
 {
   double rho = double(this->parameters_(0));
   double nu = double(this->parameters_(1));
@@ -100,7 +98,6 @@ StudentBicop::get_start_parameters(const double tau)
 {
   Eigen::VectorXd parameters = get_parameters();
   parameters(0) = std::sin(tau * constant::pi / 2);
-  ;
   parameters(1) = 5;
   return parameters;
 }

@@ -6,6 +6,7 @@
 
 #include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/misc/tools_integration.hpp>
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
 inline Bb7Bicop::Bb7Bicop()
@@ -55,7 +56,7 @@ Bb7Bicop::generator_derivative(const double& u)
 //}
 
 inline Eigen::VectorXd
-Bb7Bicop::pdf_raw(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+Bb7Bicop::pdf_raw(const Eigen::MatrixXd& u)
 {
   double theta = static_cast<double>(parameters_(0));
   double delta = static_cast<double>(parameters_(1));

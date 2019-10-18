@@ -41,7 +41,7 @@ TEST_P(TrafokernelTest, eval_funcs)
   EXPECT_LE(bicop_.hinv2(u).maxCoeff(), 1.0);
   EXPECT_GE(bicop_.get_npars(), 0.0);
   EXPECT_LE(bicop_.get_npars(), 100.0);
-  EXPECT_EQ(bicop_.get_loglik(), bicop_.loglik(u));
+  EXPECT_NEAR(bicop_.get_loglik(), bicop_.loglik(u), 1e-5);
 
   u(0, 0) = std::numeric_limits<double>::quiet_NaN();
   u(1, 1) = std::numeric_limits<double>::quiet_NaN();
@@ -63,7 +63,7 @@ TEST_P(TrafokernelTest, eval_funcs)
 TEST_P(TrafokernelTest, select)
 {
   auto newcop = Bicop(u, controls);
-  EXPECT_EQ(newcop.loglik(u), newcop.get_loglik());
+  EXPECT_NEAR(newcop.loglik(u), newcop.get_loglik(), 1e-5);
   EXPECT_EQ(newcop.get_family(), BicopFamily::tll);
 }
 

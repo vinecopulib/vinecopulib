@@ -29,6 +29,7 @@ TEST(serialization, bicop_serialization)
 
   EXPECT_EQ(pc.get_rotation(), pc2.get_rotation());
   EXPECT_EQ(pc.get_family_name(), pc2.get_family_name());
+  EXPECT_EQ(pc.get_var_types(), pc2.get_var_types());
   ASSERT_TRUE(pc.get_parameters().isApprox(pc2.get_parameters(), 1e-4));
 }
 
@@ -65,5 +66,6 @@ TEST(serialization, vinecop_serialization)
 
   EXPECT_EQ(vc.get_all_rotations(), vc2.get_all_rotations());
   EXPECT_EQ(vc.get_all_families(), vc2.get_all_families());
+  EXPECT_EQ(vc.get_var_types(), vc2.get_var_types());
 }
 }

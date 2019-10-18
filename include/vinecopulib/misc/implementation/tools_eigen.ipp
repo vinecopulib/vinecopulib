@@ -59,6 +59,19 @@ remove_nans(Eigen::MatrixXd& x, Eigen::VectorXd& weights)
     weights.conservativeResize(last + 1);
 }
 
+//! trims all elements in the matrix to the interval `[lower, upper]`.
+//! @param x data matrix.
+//! @param lower lower bound of the interval.
+//! @param upper upper bound of the interval.
+inline Eigen::MatrixXd
+trim(const Eigen::MatrixXd& x, const double& lower, const double& upper)
+{
+  auto trim_one = [&lower, &upper](const double& x) {
+    return std::min(std::max(x, lower), upper);
+  };
+  return tools_eigen::unaryExpr_or_nan(x, trim_one);
+}
+
 //! check if all elements are contained in the unit cube.
 //! @param u copula data.
 //! @return `true` if all data lie in the unit cube; throws an error otherwise.
@@ -75,11 +88,21 @@ check_if_in_unit_cube(const Eigen::MatrixXd& u)
 //! swap the columns of a two-column matrix
 //! @param u the matrix.
 //! @return a new matrix v with `v.col(0) = u.col(1)`, `v.col(1) = u.col(0)`.
-inline Eigen::Matrix<double, Eigen::Dynamic, 2>
-swap_cols(Eigen::Matrix<double, Eigen::Dynamic, 2> u)
+inline Eigen::MatrixXd
+swap_cols(Eigen::MatrixXd u)
 {
   u.col(0).swap(u.col(1));
   return u;
+}
+
+inline Eigen::VectorXd
+unique(const Eigen::VectorXd& x)
+{
+  std::vector<double> v(x.data(), x.data() + x.size());
+  std::sort(v.begin(), v.end()); // 1 1 2 2 3 3 3 4 4 5 5 6 7
+  auto last = std::unique(v.begin(), v.end());
+  v.erase(last, v.end());
+  return Eigen::Map<Eigen::VectorXd>(&v[0], v.size());
 }
 
 //! computes the inverse \f$ f^{-1} \f$ of a function \f$ f \f$ by the
@@ -126,11 +149,11 @@ invert_f(const Eigen::VectorXd& x,
 //! contains one combination of the vector elements
 //!
 //! @param grid_points the vector to expand.
-inline Eigen::Matrix<double, Eigen::Dynamic, 2>
+inline Eigen::MatrixXd
 expand_grid(const Eigen::VectorXd& grid_points)
 {
   ptrdiff_t m = grid_points.size();
-  Eigen::Matrix<double, Eigen::Dynamic, 2> grid_2d(m * m, 2);
+  Eigen::MatrixXd grid_2d(m * m, 2);
   ptrdiff_t k = 0;
   for (ptrdiff_t i = 0; i < m; ++i) {
     for (ptrdiff_t j = 0; j < m; ++j) {

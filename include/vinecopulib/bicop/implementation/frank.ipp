@@ -51,7 +51,7 @@ FrankBicop::generator_derivative(const double& u)
 //}
 
 inline Eigen::VectorXd
-FrankBicop::pdf_raw(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+FrankBicop::pdf_raw(const Eigen::MatrixXd& u)
 {
   double theta = static_cast<double>(parameters_(0));
   auto f = [theta](const double& u1, const double& u2) {

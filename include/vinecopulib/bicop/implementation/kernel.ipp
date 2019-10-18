@@ -21,45 +21,79 @@ inline KernelBicop::KernelBicop()
   // move boundary points to 0/1, so we don't have to extrapolate
   grid_points(0) = 0.0;
   grid_points(m - 1) = 1.0;
-  
-  interp_grid_ = std::make_shared<tools_interpolation::InterpolationGrid>(
-    grid_points,
-    Eigen::MatrixXd::Constant(m, m, 1.0) // independence
-  );
+
+  interp_grid_ =
+    std::make_shared<tools_interpolation::InterpolationGrid>(
+      grid_points,
+      Eigen::MatrixXd::Constant(m, m, 1.0) // independence
+    );
 }
 
 inline Eigen::VectorXd
-KernelBicop::pdf_raw(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+KernelBicop::pdf_raw(const Eigen::MatrixXd& u)
 {
-  return interp_grid_->interpolate(u);
+  auto pdf = interp_grid_->interpolate(u);
+  return tools_eigen::trim(pdf, 1e-20, DBL_MAX);
 }
 
 inline Eigen::VectorXd
-KernelBicop::cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+KernelBicop::pdf(const Eigen::MatrixXd& u)
+{
+  if (u.cols() == 4) {
+    // evaluate jittered density at mid rank for stability
+    return pdf_raw((u.leftCols(2) + u.rightCols(2)).array() / 2.0);
+  }
+  return pdf_raw(u);
+}
+
+inline Eigen::VectorXd
+KernelBicop::cdf(const Eigen::MatrixXd& u)
 {
   return interp_grid_->integrate_2d(u);
 }
 
 inline Eigen::VectorXd
-KernelBicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+KernelBicop::hfunc1_raw(const Eigen::MatrixXd& u)
 {
   return interp_grid_->integrate_1d(u, 1);
 }
 
 inline Eigen::VectorXd
-KernelBicop::hfunc2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+KernelBicop::hfunc2_raw(const Eigen::MatrixXd& u)
 {
   return interp_grid_->integrate_1d(u, 2);
 }
 
 inline Eigen::VectorXd
-KernelBicop::hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+KernelBicop::hfunc1(const Eigen::MatrixXd& u)
+{
+  if (u.cols() == 4) {
+    auto u_avg = u;
+    u_avg.col(0) = (u.col(0) + u.col(2)).array() / 2.0;
+    return hfunc1_raw(u_avg.leftCols(2));
+  }
+  return hfunc1_raw(u);
+}
+
+inline Eigen::VectorXd
+KernelBicop::hfunc2(const Eigen::MatrixXd& u)
+{
+  if (u.cols() == 4) {
+    auto u_avg = u;
+    u_avg.col(1) = (u.col(1) + u.col(3)).array() / 2.0;
+    return hfunc2_raw(u_avg.leftCols(2));
+  }
+  return hfunc2_raw(u);
+}
+
+inline Eigen::VectorXd
+KernelBicop::hinv1_raw(const Eigen::MatrixXd& u)
 {
   return hinv1_num(u);
 }
 
 inline Eigen::VectorXd
-KernelBicop::hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+KernelBicop::hinv2_raw(const Eigen::MatrixXd& u)
 {
   return hinv2_num(u);
 }
@@ -68,13 +102,18 @@ inline double
 KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
 {
   auto oldpars = this->get_parameters();
+  auto old_types = var_types_;
   this->set_parameters(parameters);
+  var_types_ = { "c", "c" };
+
   std::vector<int> seeds = {
     204967043, 733593603, 184618802, 399707801, 290266245
   };
   auto u = tools_stats::ghalton(1000, 2, seeds);
-  u.col(1) = hinv1(u);
+  u.col(1) = hinv1_raw(u);
+
   this->set_parameters(oldpars);
+  var_types_ = old_types;
   return wdm::wdm(u, "tau")(0, 1);
 }
 

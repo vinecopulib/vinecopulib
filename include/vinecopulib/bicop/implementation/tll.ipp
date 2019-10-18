@@ -17,7 +17,7 @@ inline TllBicop::TllBicop()
 }
 
 inline Eigen::VectorXd
-TllBicop::gaussian_kernel_2d(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
+TllBicop::gaussian_kernel_2d(const Eigen::MatrixXd& x)
 {
   return tools_stats::dnorm(x).rowwise().prod();
 }
@@ -25,7 +25,7 @@ TllBicop::gaussian_kernel_2d(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x)
 //! selects the bandwidth matrix for local líkelihood estimator (covariance
 //! times appropriate factor).
 inline Eigen::Matrix2d
-TllBicop::select_bandwidth(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
+TllBicop::select_bandwidth(const Eigen::MatrixXd& x,
                            std::string method,
                            const Eigen::VectorXd& weights)
 {
@@ -79,12 +79,11 @@ chol22(const Eigen::Matrix2d& B)
 //! @return a two-column matrix; first column is estimated density, second
 //!    column is influence of evaluation point.
 inline Eigen::MatrixXd
-TllBicop::fit_local_likelihood(
-  const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
-  const Eigen::Matrix<double, Eigen::Dynamic, 2>& x_data,
-  const Eigen::Matrix2d& B,
-  std::string method,
-  const Eigen::VectorXd& weights)
+TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
+                               const Eigen::MatrixXd& x_data,
+                               const Eigen::Matrix2d& B,
+                               std::string method,
+                               const Eigen::VectorXd& weights)
 {
   size_t m = x.rows();      // number of evaluation points
   size_t n = x_data.rows(); // number of observations
@@ -209,7 +208,7 @@ TllBicop::calculate_infl(const size_t& n,
 }
 
 inline void
-TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+TllBicop::fit(const Eigen::MatrixXd& data,
               std::string method,
               double mult,
               const Eigen::VectorXd& weights)
@@ -228,8 +227,11 @@ TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
   auto grid_2d = tools_eigen::expand_grid(grid_points);
 
   // transform evaluation grid and data by inverse Gaussian cdf
-  Eigen::Matrix<double, Eigen::Dynamic, 2> z = tools_stats::qnorm(grid_2d);
-  Eigen::Matrix<double, Eigen::Dynamic, 2> z_data = tools_stats::qnorm(data);
+  Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
+
+  // use jittering in case observations are discrete
+  auto psobs = tools_stats::to_pseudo_obs(data.leftCols(2), "random");
+  Eigen::MatrixXd z_data = tools_stats::qnorm(psobs);
 
   // find bandwidth matrix
   Eigen::Matrix2d B = select_bandwidth(z_data, method, weights);
@@ -251,14 +253,21 @@ TllBicop::fit(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
   interp_grid_ = std::make_shared<InterpolationGrid>(grid_points, values);
 
   // compute effective degrees of freedom via interpolation ---------
-  Eigen::VectorXd infl_vec = ll_fit.col(1);
   // stabilize interpolation by restricting to plausible range
-  infl_vec = infl_vec.array().min(1.0).max(-1.0);
+  Eigen::VectorXd infl_vec = ll_fit.col(1).cwiseMin(1.3).cwiseMax(-0.2);
   Eigen::MatrixXd infl(m, m);
   infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), m, m).transpose();
   // don't normalize margins of the EDF! (norm_times = 0)
   auto infl_grid = InterpolationGrid(grid_points, infl, 0);
-  npars_ = infl_grid.interpolate(data).sum();
-  set_loglik(loglik(data, weights));
+  if ((var_types_[0] == "d") | (var_types_[1] == "d")) {
+      // for discrete, use mid ranks to compute EDF and log-likelihood
+      // (this is closer to "observations" than jittered or "upper" pseudo data)
+      psobs = 0.5 * (data.leftCols(2) + data.rightCols(2)).array();
+      npars_ = tools_eigen::unique(infl_grid.interpolate(psobs)).sum();
+      npars_ = std::max(npars_, 1.0);
+  } else {
+    npars_ = std::max(infl_grid.interpolate(data).sum(), 1.0);
+  }
+  set_loglik(pdf(data).array().log().sum());
 }
 }

@@ -15,13 +15,13 @@ namespace tools_select {
 //! @param data captured by reference to avoid data copies;
 //!     should NOT be modified though.
 inline std::vector<Bicop>
-create_candidate_bicops(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+create_candidate_bicops(const Eigen::MatrixXd& data,
                         const FitControlsBicop& controls)
 {
   std::vector<BicopFamily> families = get_candidate_families(controls);
 
   // check whether dependence is negative or positive
-  double tau = wdm::wdm(data, "tau", controls.get_weights())(0, 1);
+  double tau = wdm::wdm(data.leftCols(2), "tau", controls.get_weights())(0, 1);
   std::vector<int> which_rotations;
   if (tau > 0) {
     which_rotations = { 0, 180 };
@@ -42,7 +42,10 @@ create_candidate_bicops(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
 
   // remove combinations based on symmetry characteristics
   if (controls.get_preselect_families()) {
-    preselect_candidates(new_bicops, data, tau, controls.get_weights());
+    preselect_candidates(new_bicops,
+                         data.leftCols(2),
+                         tau,
+                         controls.get_weights());
   }
 
   return new_bicops;
@@ -76,7 +79,7 @@ get_candidate_families(const FitControlsBicop& controls)
 //! of the data.
 inline void
 preselect_candidates(std::vector<Bicop>& bicops,
-                     const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+                     const Eigen::MatrixXd& data,
                      double tau,
                      const Eigen::VectorXd& weights)
 {
@@ -90,7 +93,7 @@ preselect_candidates(std::vector<Bicop>& bicops,
 }
 
 inline std::vector<double>
-get_c1c2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+get_c1c2(const Eigen::MatrixXd& data,
          double tau,
          const Eigen::VectorXd& weights)
 {

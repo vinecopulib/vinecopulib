@@ -183,8 +183,8 @@ cef(const Eigen::VectorXd& x,
 }
 
 //! alternating conditional expectation algorithm
-inline Eigen::Matrix<double, Eigen::Dynamic, 2>
-ace(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, // data
+inline Eigen::MatrixXd
+ace(const Eigen::MatrixXd& data, // data
     const Eigen::VectorXd& weights = Eigen::VectorXd(),   // weights
     size_t wl = 0,                // window length for the smoother
     size_t outer_iter_max = 100,  // max number of outer iterations
@@ -227,7 +227,7 @@ ace(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, // data
   }
 
   // initialize output
-  Eigen::Matrix<double, Eigen::Dynamic, 2> phi = ranks.cast<double>();
+  Eigen::MatrixXd phi = ranks.cast<double>();
   phi.array() -= (n_dbl - 1.0) / 2.0 - 1.0;
   phi /= std::sqrt(n_dbl * (n_dbl - 1.0) / 12.0);
   if (nw > 0) {
@@ -290,10 +290,10 @@ ace(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data, // data
 
 //! calculates the pairwise maximum correlation coefficient.
 inline double
-pairwise_mcor(const Eigen::Matrix<double, Eigen::Dynamic, 2>& x,
+pairwise_mcor(const Eigen::MatrixXd& x,
               const Eigen::VectorXd& weights)
 {
-  Eigen::Matrix<double, Eigen::Dynamic, 2> phi = ace(x, weights);
+  Eigen::MatrixXd phi = ace(x, weights);
   return wdm::wdm(phi, "cor", weights)(0, 1);
 }
 //! @}
@@ -465,7 +465,7 @@ sobol(const size_t& n, const size_t& d, std::vector<int> seeds)
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
 inline Eigen::VectorXd
-pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z, int nu, double rho)
+pbvt(const Eigen::MatrixXd& z, int nu, double rho)
 {
   double snu = sqrt(static_cast<double>(nu));
   double ors = 1 - pow(rho, 2.0);
@@ -589,7 +589,7 @@ pbvt(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z, int nu, double rho)
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
 inline Eigen::VectorXd
-pbvnorm(const Eigen::Matrix<double, Eigen::Dynamic, 2>& z, double rho)
+pbvnorm(const Eigen::MatrixXd& z, double rho)
 {
 
   static struct

@@ -33,7 +33,7 @@ namespace vinecopulib {
 namespace tools_select {
 
 double
-calculate_criterion(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+calculate_criterion(const Eigen::MatrixXd& data,
                     std::string tree_criterion,
                     Eigen::VectorXd weights);
 
@@ -41,6 +41,9 @@ Eigen::MatrixXd
 calculate_criterion_matrix(const Eigen::MatrixXd& data,
                            std::string tree_criterion,
                            const Eigen::VectorXd& weights);
+
+std::vector<size_t>
+get_disc_cols(std::vector<std::string> var_types);
 
 // boost::graph represenation of a vine tree
 struct VertexProperties
@@ -51,15 +54,21 @@ struct VertexProperties
   std::vector<size_t> prev_edge_indices;
   Eigen::VectorXd hfunc1;
   Eigen::VectorXd hfunc2;
+  Eigen::VectorXd hfunc1_sub;
+  Eigen::VectorXd hfunc2_sub;
+  std::vector<std::string> var_types{ "c", "c" };
 };
 struct EdgeProperties
 {
   std::vector<size_t> conditioning;
   std::vector<size_t> conditioned;
   std::vector<size_t> all_indices;
-  Eigen::Matrix<double, Eigen::Dynamic, 2> pc_data;
+  Eigen::MatrixXd pc_data;
   Eigen::VectorXd hfunc1;
   Eigen::VectorXd hfunc2;
+  Eigen::VectorXd hfunc1_sub;
+  Eigen::VectorXd hfunc2_sub;
+  std::vector<std::string> var_types{ "c", "c" };
   double weight;
   double crit;
   vinecopulib::Bicop pair_copula;
@@ -82,7 +91,8 @@ class VinecopSelector
 {
 public:
   VinecopSelector(const Eigen::MatrixXd& data,
-                  const FitControlsVinecop& controls);
+                  const FitControlsVinecop& controls,
+                  std::vector<std::string> var_types);
 
   std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
@@ -130,12 +140,19 @@ protected:
 
   Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
 
+  Eigen::VectorXd get_hfunc(const VertexProperties& vertex_data,
+                            unsigned short pos);
+
+  Eigen::VectorXd get_hfunc_sub(const VertexProperties& vertex_data,
+                                unsigned short pos);
+
   ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
 
   virtual double compute_fit_id(const EdgeProperties& e);
 
   size_t n_;
   size_t d_;
+  std::vector<std::string> var_types_;
   FitControlsVinecop controls_;
   tools_thread::ThreadPool pool_;
   std::vector<VineTree> trees_;
@@ -157,6 +174,8 @@ protected:
   void min_spanning_tree(VineTree& tree);
 
   void add_edge_info(VineTree& tree);
+
+  void add_pc_info(const EdgeIterator& e, VineTree& tree);
 
   void remove_edge_data(VineTree& tree);
 
@@ -180,7 +199,8 @@ class StructureSelector : public VinecopSelector
 {
 public:
   StructureSelector(const Eigen::MatrixXd& data,
-                    const FitControlsVinecop& controls);
+                    const FitControlsVinecop& controls,
+                    std::vector<std::string> var_types);
 
   ~StructureSelector() {}
 
@@ -195,7 +215,8 @@ class FamilySelector : public VinecopSelector
 public:
   FamilySelector(const Eigen::MatrixXd& data,
                  const RVineStructure& vine_struct,
-                 const FitControlsVinecop& controls);
+                 const FitControlsVinecop& controls,
+                 std::vector<std::string> var_types);
 
   ~FamilySelector() {}
 

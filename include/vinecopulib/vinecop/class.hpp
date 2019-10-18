@@ -81,11 +81,11 @@ public:
   void to_json(const std::string filename) const;
 
   // Methods modifying structure and/or families and parameters
-  void select_all(const Eigen::MatrixXd& data,
+  void select_all(Eigen::MatrixXd data,
                   const FitControlsVinecop& controls = FitControlsVinecop());
 
   void select_families(
-    const Eigen::MatrixXd& data,
+    Eigen::MatrixXd data,
     const FitControlsVinecop& controls = FitControlsVinecop());
 
   // Getters for a single pair copula
@@ -132,7 +132,7 @@ public:
   double get_mbicv(const double psi0 = 0.9) const;
 
   // Stats methods
-  Eigen::VectorXd pdf(const Eigen::MatrixXd& u,
+  Eigen::VectorXd pdf(Eigen::MatrixXd u,
                       const size_t num_threads = 1) const;
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
@@ -150,6 +150,10 @@ public:
                              const size_t num_threads = 1) const;
   Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& u,
                                      const size_t num_threads = 1) const;
+
+  void set_var_types(const std::vector<std::string>& var_types);
+
+  std::vector<std::string> get_var_types() const;
 
   // Fit statistics
   double get_npars() const;
@@ -178,12 +182,14 @@ public:
 protected:
   size_t d_;
   RVineStructure vine_struct_;
-  std::vector<std::vector<Bicop>> pair_copulas_;
-  double threshold_;
-  double loglik_;
-  size_t nobs_;
+  mutable std::vector<std::vector<Bicop>> pair_copulas_;
+  double threshold_{0.0};
+  double loglik_{NAN};
+  size_t nobs_{0};
+  mutable std::vector<std::string> var_types_;
 
   void check_data_dim(const Eigen::MatrixXd& data) const;
+  void check_data(const Eigen::MatrixXd& data) const;
   void check_pair_copulas_rvine_structure(
     const std::vector<std::vector<Bicop>>& pair_copulas) const;
   double calculate_mbicv_penalty(const size_t nobs, const double psi0) const;
@@ -192,7 +198,13 @@ protected:
                           const Eigen::MatrixXd& data) const;
   void check_enough_data(const Eigen::MatrixXd& data) const;
   void check_fitted() const;
+  void check_var_types(const std::vector<std::string>& var_types) const;
+  void set_continuous_var_types() const;
+  void set_var_types_internal(const std::vector<std::string>& var_types) const;
+  int get_n_discrete() const;
+  Eigen::MatrixXd collapse_data(const Eigen::MatrixXd& u) const;
 };
+
 }
 
 #include <vinecopulib/vinecop/implementation/class.ipp>

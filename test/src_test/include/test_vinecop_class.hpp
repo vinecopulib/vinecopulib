@@ -56,7 +56,7 @@ TEST_F(VinecopTest, getters_are_correct)
   for (auto& tree : vinecop.get_all_parameters()) {
     for (auto& par : tree) {
       EXPECT_EQ(par.size(), 1);
-      EXPECT_EQ(par(0), 0);
+      EXPECT_EQ(par(0), 1e-10);
     }
   }
 
@@ -242,7 +242,7 @@ TEST_F(VinecopTest, family_select_finds_true_rotations)
     }
   }
   Vinecop vinecop(pair_copulas, model_matrix);
-  auto data = vinecop.simulate(1000);
+  auto data = vinecop.simulate(2000);
 
   auto controls = FitControlsVinecop({ BicopFamily::clayton }, "itau");
   // controls.set_show_trace(true);
@@ -259,7 +259,7 @@ TEST_F(VinecopTest, family_select_finds_true_rotations)
 
 TEST_F(VinecopTest, family_select_returns_pcs_in_right_order)
 {
-   u.conservativeResize(50, 7);
+  u.conservativeResize(50, 7);
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
   auto par = Eigen::VectorXd::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {

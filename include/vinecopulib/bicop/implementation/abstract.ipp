@@ -6,6 +6,7 @@
 
 #include <stdexcept>
 
+#include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/bicop/bb1.hpp>
 #include <vinecopulib/bicop/bb6.hpp>
 #include <vinecopulib/bicop/bb7.hpp>
@@ -118,25 +119,112 @@ AbstractBicop::set_loglik(const double loglik)
 {
   loglik_ = loglik;
 }
+
+inline void
+AbstractBicop::set_var_types(const std::vector<std::string>& var_types)
+{
+  if (var_types.size() != 2) {
+    throw std::runtime_error("var_types must have size two.");
+  }
+  var_types_ = var_types;
+}
 //! @}
 
 //! evaluates the pdf, but truncates it's value by DBL_MIN and DBL_MAX.
 //! @param u matrix of evaluation points.
 inline Eigen::VectorXd
-AbstractBicop::pdf(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+AbstractBicop::pdf(const Eigen::MatrixXd& u)
 {
-  auto trim = [](const double& x) {
-    return std::min(DBL_MAX, std::max(x, DBL_MIN));
-  };
-  return tools_eigen::unaryExpr_or_nan(pdf_raw(u), trim);
+
+  Eigen::VectorXd pdf(u.rows());
+  if (var_types_ == std::vector<std::string>{ "c", "c" }) {
+    pdf = pdf_raw(u.leftCols(2));
+  } else if (var_types_ == std::vector<std::string>{ "d", "d" }) {
+    pdf = pdf_d_d(u);
+  } else {
+    pdf = pdf_c_d(u);
+  }
+  return tools_eigen::trim(pdf, DBL_MIN, DBL_MAX);
+}
+
+inline Eigen::VectorXd
+AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u)
+{
+  auto umax = u.leftCols(2);
+  auto umin = u.rightCols(2);
+  if (var_types_[0] != "c") {
+    return (hfunc2_raw(umax) - hfunc2_raw(umin)).array().abs();
+  } else {
+    return (hfunc1_raw(umax) - hfunc1_raw(umin)).array().abs();
+  }
+}
+
+inline Eigen::VectorXd
+AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u)
+{
+  Eigen::MatrixXd umax = u.leftCols(2);
+  Eigen::MatrixXd umin = u.rightCols(2);
+  Eigen::VectorXd pdf = cdf(umax) + cdf(umin);
+  umax.col(0).swap(umin.col(0));
+  pdf -= cdf(umax) + cdf(umin);
+  pdf = pdf.array() / (u.col(0) - u.col(2)).array();
+  pdf = pdf.array() / (u.col(1) - u.col(3)).array();
+  return pdf;
+}
+
+inline Eigen::VectorXd
+AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
+{
+  if (var_types_[0] == "d") {
+    auto uu = u;
+    uu.col(3) = uu.col(1);
+    return ((cdf(uu.leftCols(2)) - cdf(uu.rightCols(2))).array() /
+            (uu.col(0) - uu.col(2)).array())
+      .abs();
+  } else {
+    return hfunc1_raw(u.leftCols(2));
+  }
+}
+
+inline Eigen::VectorXd
+AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
+{
+  if (var_types_[1] == "d") {
+    auto uu = u;
+    uu.col(2) = uu.col(0);
+    return ((cdf(uu.leftCols(2)) - cdf(uu.rightCols(2))).array() /
+            (uu.col(1) - uu.col(3)).array())
+      .abs();
+  } else {
+    return hfunc2_raw(u.leftCols(2));
+  }
+}
+
+inline Eigen::VectorXd
+AbstractBicop::hinv1(const Eigen::MatrixXd& u)
+{
+  if (var_types_[0] == "c") {
+    return hinv1_raw(u.leftCols(2));
+  } else {
+    return hinv1_num(u);
+  }
+}
+
+inline Eigen::VectorXd
+AbstractBicop::hinv2(const Eigen::MatrixXd& u)
+{
+  if (var_types_[1] == "c") {
+    return hinv2_raw(u.leftCols(2));
+  } else {
+    return hinv2_num(u);
+  }
 }
 
 //! evaluates the log-likelihood.
 //! @param u data matrix.
 //! @param weights optional weights for each observation.
 inline double
-AbstractBicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u,
-                      const Eigen::VectorXd weights)
+AbstractBicop::loglik(const Eigen::MatrixXd& u, const Eigen::VectorXd weights)
 {
   Eigen::MatrixXd log_pdf = this->pdf(u).array().log();
   if (weights.size() > 0) {
@@ -155,9 +243,9 @@ AbstractBicop::loglik(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u,
 //! @return The numerical inverse of h-functions.
 //! @{
 inline Eigen::VectorXd
-AbstractBicop::hinv1_num(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+AbstractBicop::hinv1_num(const Eigen::MatrixXd& u)
 {
-  Eigen::Matrix<double, Eigen::Dynamic, 2> u_new = u;
+  Eigen::MatrixXd u_new = u;
   auto h1 = [&](const Eigen::VectorXd& v) {
     u_new.col(1) = v;
     return hfunc1(u_new);
@@ -167,9 +255,9 @@ AbstractBicop::hinv1_num(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv2_num(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+AbstractBicop::hinv2_num(const Eigen::MatrixXd& u)
 {
-  Eigen::Matrix<double, Eigen::Dynamic, 2> u_new = u;
+  Eigen::MatrixXd u_new = u;
   auto h1 = [&](const Eigen::VectorXd& x) {
     u_new.col(0) = x;
     return hfunc2(u_new);
@@ -178,4 +266,5 @@ AbstractBicop::hinv2_num(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
   return tools_eigen::invert_f(u.col(0), h1);
 }
 //! @}
+
 }

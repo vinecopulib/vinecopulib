@@ -32,21 +32,23 @@ public:
   KernelBicop();
 
 protected:
-  Eigen::VectorXd pdf_raw(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
 
-  Eigen::VectorXd cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+  Eigen::VectorXd pdf(const Eigen::MatrixXd& u) override;
 
-  Eigen::VectorXd hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+  Eigen::VectorXd cdf(const Eigen::MatrixXd& u);
 
-  Eigen::VectorXd hfunc2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
 
-  Eigen::VectorXd hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u);
 
-  Eigen::VectorXd hinv2(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u);
+  Eigen::VectorXd hfunc1(const Eigen::MatrixXd& u) override;
 
-  double parameters_to_tau(const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hfunc2(const Eigen::MatrixXd& u) override;
 
-  Eigen::MatrixXd tau_to_parameters(const double& tau);
+  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
+
+  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
 
   double get_npars();
 
@@ -58,7 +60,11 @@ protected:
 
   void set_parameters(const Eigen::MatrixXd& parameters);
 
+  double parameters_to_tau(const Eigen::MatrixXd& parameters);
+
   void flip();
+
+  Eigen::MatrixXd tau_to_parameters(const double& tau);
 
   std::shared_ptr<tools_interpolation::InterpolationGrid> interp_grid_;
   double npars_;

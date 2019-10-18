@@ -34,7 +34,7 @@ protected:
   Eigen::MatrixXd parameters_lower_bounds_;
   Eigen::MatrixXd parameters_upper_bounds_;
 
-  void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2>& data,
+  void fit(const Eigen::MatrixXd& data,
            std::string method,
            double,
            const Eigen::VectorXd& weights);

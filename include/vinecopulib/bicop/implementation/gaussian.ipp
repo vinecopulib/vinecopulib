@@ -18,8 +18,7 @@ inline GaussianBicop::GaussianBicop()
   parameters_upper_bounds_ << 1;
 }
 
-inline Eigen::VectorXd
-GaussianBicop::pdf_raw(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+inline Eigen::VectorXd GaussianBicop::pdf_raw(const Eigen::MatrixXd &u)
 {
   // Inverse Cholesky of the correlation matrix
   double rho = double(this->parameters_(0));
@@ -31,7 +30,7 @@ GaussianBicop::pdf_raw(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
 
   // Compute copula density
   Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
-  Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qnorm(u);
+  Eigen::MatrixXd tmp = tools_stats::qnorm(u);
   f = f.cwiseQuotient(tools_stats::dnorm(tmp).rowwise().prod());
   tmp = tmp * L;
   f = f.cwiseProduct(tools_stats::dnorm(tmp).rowwise().prod());
@@ -39,28 +38,28 @@ GaussianBicop::pdf_raw(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
 }
 
 inline Eigen::VectorXd
-GaussianBicop::cdf(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+GaussianBicop::cdf(const Eigen::MatrixXd& u)
 {
   return tools_stats::pbvnorm(tools_stats::qnorm(u),
                               double(this->parameters_(0)));
 }
 
 inline Eigen::VectorXd
-GaussianBicop::hfunc1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+GaussianBicop::hfunc1_raw(const Eigen::MatrixXd& u)
 {
   double rho = double(this->parameters_(0));
   Eigen::VectorXd h = Eigen::VectorXd::Zero(u.rows());
-  Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qnorm(u);
+  Eigen::MatrixXd tmp = tools_stats::qnorm(u);
   h = (tmp.col(1) - rho * tmp.col(0)) / sqrt(1.0 - pow(rho, 2.0));
   return tools_stats::pnorm(h);
 }
 
 inline Eigen::VectorXd
-GaussianBicop::hinv1(const Eigen::Matrix<double, Eigen::Dynamic, 2>& u)
+GaussianBicop::hinv1_raw(const Eigen::MatrixXd& u)
 {
   double rho = double(this->parameters_(0));
   Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
-  Eigen::Matrix<double, Eigen::Dynamic, 2> tmp = tools_stats::qnorm(u);
+  Eigen::MatrixXd tmp = tools_stats::qnorm(u);
   hinv = tmp.col(1) * sqrt(1.0 - pow(rho, 2.0)) + rho * tmp.col(0);
   return tools_stats::pnorm(hinv);
 }

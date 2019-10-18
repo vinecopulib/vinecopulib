@@ -19,29 +19,21 @@ namespace vinecopulib {
 //! independence.
 //! @param d the dimension (= number of variables) of the model.
 inline Vinecop::Vinecop(const size_t d)
-{
-  d_ = d;
-
-  // 0-truncated D-vine with variable order (1, ..., d)
-  vine_struct_ =
-    RVineStructure(tools_stl::seq_int(1, d), static_cast<size_t>(0));
-
-  // pair_copulas_ empty = everything independence
-  threshold_ = 0.0;
-  loglik_ = NAN;
-}
+  : Vinecop(RVineStructure(tools_stl::seq_int(1, d), static_cast<size_t>(0)))
+{}
 
 //! @brief creates a vine copula with structure specified by an RVineStructure
 //! object; all pair-copulas are set to independence.
 //! @param structure an RVineStructure object representing the structure of
 //! the vine.
 inline Vinecop::Vinecop(const RVineStructure& structure)
-{
-  d_ = structure.get_dim();
-  vine_struct_ = structure;
+  : d_(structure.get_dim())
+  , vine_struct_(structure)
   // pair_copulas_ empty = everything independence
-  threshold_ = 0.0;
-  loglik_ = NAN;
+  , threshold_(0.0)
+  , loglik_(NAN)
+{
+  set_continuous_var_types();
 }
 
 //! @brief creates a vine copula with structure specified by an R-vine matrix;
@@ -75,17 +67,11 @@ inline Vinecop::Vinecop(const std::vector<size_t>& order,
 //! @param structure an RVineStructure object specifying the vine structure.
 inline Vinecop::Vinecop(const std::vector<std::vector<Bicop>>& pair_copulas,
                         const RVineStructure& structure)
+  : Vinecop(structure)
 {
-
-  d_ = structure.get_dim();
-  vine_struct_ = structure;
-
   check_pair_copulas_rvine_structure(pair_copulas);
-
   pair_copulas_ = pair_copulas;
   vine_struct_.truncate(pair_copulas.size());
-  threshold_ = 0.0;
-  loglik_ = NAN;
 }
 
 //! @brief creates an arbitrary vine copula model.
@@ -147,8 +133,14 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
     }
   }
 
-  threshold_ = 0;
-  loglik_ = NAN;
+  // try block for backwards compatibility
+  try {
+    var_types_ = tools_serialization::ptree_to_vector<std::string>(
+      input.get_child("var_types"));
+    nobs_ = input.get<size_t>("nobs_");
+    threshold_ = input.get<double>("threshold");
+    loglik_ = input.get<double>("loglik");
+  } catch (...) {}
 }
 
 //! @brief creates from a JSON file.
@@ -170,16 +162,15 @@ inline Vinecop::Vinecop(const std::string filename, const bool check)
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                         const RVineStructure& structure,
                         FitControlsVinecop controls)
+  : Vinecop(structure)
 {
-  d_ = data.cols();
   nobs_ = data.rows();
   check_enough_data(data);
-  if (d_ != structure.get_dim()) {
+  if (static_cast<size_t>(data.cols()) != d_) {
     throw std::runtime_error("data and structure have "
                              "incompatible dimensions.");
   }
   check_weights_size(controls.get_weights(), data);
-  vine_struct_ = structure;
   select_families(data, controls);
 }
 
@@ -226,8 +217,8 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 //! @param controls see FitControlsVinecop.
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                         const FitControlsVinecop& controls)
+  : Vinecop(data.cols())
 {
-  d_ = data.cols();
   nobs_ = data.rows();
   check_enough_data(data);
   check_weights_size(controls.get_weights(), data);
@@ -262,6 +253,11 @@ Vinecop::to_ptree() const
   output.add_child("pair copulas", pair_copulas);
   auto structure_node = vine_struct_.to_ptree();
   output.add_child("structure", structure_node);
+  output.add_child("var_types",
+                   tools_serialization::vector_to_ptree(var_types_));
+  output.put("nobs_", nobs_);
+  output.put("threshold", threshold_);
+  output.put("loglik", loglik_);
 
   return output;
 }
@@ -296,46 +292,66 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! financial returns.* Computational Statistics & Data Analysis, 59 (1),
 //! 52-69.
 //!
-//! @param data nxd matrix of copula data.
+//! @details When at least one variable is discrete, two types of "observations"
+//! are required: the first \f$ n \times d \f$ block contains realizations of
+//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
+//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
+//! left-sided limit of the cdf. For continuous variables the left limit and the
+//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
+//! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
+//! be omitted.
+//!
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select_all(const Eigen::MatrixXd& data,
+Vinecop::select_all(Eigen::MatrixXd data,
                     const FitControlsVinecop& controls)
 {
-  tools_eigen::check_if_in_unit_cube(data);
-  check_data_dim(data);
+  check_data(data);
+  data = collapse_data(data);
 
-  tools_select::StructureSelector selector(data, controls);
+  tools_select::StructureSelector selector(data, controls, var_types_);
   if (controls.needs_sparse_select()) {
     selector.sparse_select_all_trees(data);
   } else {
     selector.select_all_trees(data);
   }
-
   finalize_fit(selector);
 }
 
 //! @brief automatically selects all pair-copula families and fits all
 //! parameters.
 //!
-//! @param data nxd matrix of copula data.
+//!
+//! @details When at least one variable is discrete, two types of "observations"
+//! are required: the first \f$ n \times d \f$ block contains realizations of
+//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
+//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
+//! left-sided limit of the cdf. For continuous variables the left limit and the
+//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
+//! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
+//! be omitted.
+//!
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select_families(const Eigen::MatrixXd& data,
+Vinecop::select_families(Eigen::MatrixXd data,
                          const FitControlsVinecop& controls)
 {
-  tools_eigen::check_if_in_unit_cube(data);
-  check_data_dim(data);
+  check_data(data);
+  data = collapse_data(data);
 
   if (vine_struct_.get_trunc_lvl() > 0) {
-    tools_select::FamilySelector selector(data, vine_struct_, controls);
+    tools_select::FamilySelector selector(
+      data, vine_struct_, controls, var_types_);
     if (controls.needs_sparse_select()) {
       selector.sparse_select_all_trees(data);
       vine_struct_ = selector.get_rvine_structure(); // can be truncated
     } else {
       selector.select_all_trees(data);
     }
-
     finalize_fit(selector);
   }
 }
@@ -573,7 +589,6 @@ Vinecop::get_bic() const
 {
   check_fitted();
   return -2 * loglik_ + get_npars() * std::log(nobs_);
-  ;
 }
 
 //! @brief extracts the log-likelihood.
@@ -630,47 +645,136 @@ Vinecop::get_threshold() const
   return threshold_;
 }
 
+//! @brief sets variable types.
+//! @param var_types a vector specifying the types of the variables,
+//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
+inline void
+Vinecop::set_var_types(const std::vector<std::string>& var_types)
+{
+  check_var_types(var_types);
+  set_var_types_internal(var_types);
+}
+
+inline void
+Vinecop::check_var_types(const std::vector<std::string>& var_types) const
+{
+  std::stringstream msg;
+  if (var_types.size() > d_) {
+    msg << "more var_types (" << var_types.size() << ")"
+        << "than variables (" << d_ << ")-" << std::endl;
+    throw std::runtime_error(msg.str());
+  }
+  for (auto t : var_types) {
+    if (!tools_stl::is_member(t, { "c", "d" })) {
+      msg << "variable type must be 'c' or 'd' (not '" << t << "')."
+          << std::endl;
+      throw std::runtime_error(msg.str());
+    }
+  }
+}
+
+//! @brief sets variable types.
+//! @param var_types a vector specifying the types of the variables,
+//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
+inline void
+Vinecop::set_var_types_internal(const std::vector<std::string>& var_types) const
+{
+  var_types_ = var_types;
+  if (pair_copulas_.size() == 0) {
+    return;
+  }
+
+  // set new var_types for all pair-copulas
+  std::vector<std::string> natural_types(d_), pair_types(2);
+  for (size_t j = 0; j < d_; ++j) {
+    natural_types[j] = var_types[vine_struct_.get_order()[j] - 1];
+  }
+  // we set the first tree explicitly and deduce later trees
+  for (size_t e = 0; e < d_ - 1; ++e) {
+    pair_types[0] = natural_types[e];
+    pair_types[1] = natural_types[vine_struct_.struct_array(0, e, true) - 1];
+    pair_copulas_[0][e].set_var_types(pair_types);
+  }
+
+  for (size_t t = 1; t < pair_copulas_.size(); ++t) {
+    for (size_t e = 0; e < d_ - t - 1; ++e) {
+      size_t m = vine_struct_.min_array(t, e);
+      pair_types[0] = pair_copulas_[t - 1][e].get_var_types()[0];
+      if (m == vine_struct_.struct_array(t, e, true)) {
+        pair_types[1] = pair_copulas_[t - 1][m - 1].get_var_types()[0];
+      } else {
+        pair_types[1] = pair_copulas_[t - 1][m - 1].get_var_types()[1];
+      }
+      pair_copulas_[t][e].set_var_types(pair_types);
+    }
+  }
+}
+
+//! @brief extracts the variable types.
+std::vector<std::string>
+Vinecop::get_var_types() const
+{
+  return var_types_;
+}
+
 //! @}
 
 //! @brief calculates the density function of the vine copula model.
 //!
-//! @param u \f$ n \times d \f$ matrix of evaluation points.
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `Vinecop::select_all()`).
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
 inline Eigen::VectorXd
-Vinecop::pdf(const Eigen::MatrixXd& u, const size_t num_threads) const
+Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 {
-  tools_eigen::check_if_in_unit_cube(u);
-  check_data_dim(u);
-  size_t d = u.cols();
+  check_data(u);
+  u = collapse_data(u);
+
+  size_t d = d_;
   size_t n = u.rows();
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
   std::vector<size_t> order;
-  TriangularArray<size_t> no_array, min_array, needed_hfunc1, needed_hfunc2;
+  TriangularArray<size_t> natural_array, min_array, needed_hfunc1,
+    needed_hfunc2;
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
-    no_array = vine_struct_.get_struct_array(true);
+    natural_array = vine_struct_.get_struct_array(true);
     min_array = vine_struct_.get_min_array();
     needed_hfunc1 = vine_struct_.get_needed_hfunc1();
     needed_hfunc2 = vine_struct_.get_needed_hfunc2();
   }
+  auto disc_cols = tools_select::get_disc_cols(var_types_);
 
   // initial value must be 1.0 for multiplication
-  Eigen::VectorXd vine_density = Eigen::VectorXd::Constant(u.rows(), 1.0);
+  Eigen::VectorXd pdf = Eigen::VectorXd::Constant(u.rows(), 1.0);
 
   auto do_batch = [&](const tools_batch::Batch& b) {
-    // temporary storage objects for h-functions
+    // temporary storage objects (all data must be in (0, 1))
     Eigen::MatrixXd hfunc1(b.size, d);
-    Eigen::MatrixXd hfunc2(b.size, d);
-    Eigen::MatrixXd u_e(b.size, 2);
+    hfunc1.setZero();
+    Eigen::MatrixXd hfunc2 = hfunc1;
+    Eigen::MatrixXd hfunc1_sub = hfunc1;
+    Eigen::MatrixXd hfunc2_sub = hfunc1;
+    Eigen::MatrixXd u_e(b.size, 4);
+    Eigen::MatrixXd u_sub(b.size, 4);
 
     // fill first row of hfunc2 matrix with evaluation points;
     // points have to be reordered to correspond to natural order
-    for (size_t j = 0; j < d; ++j)
+
+    for (size_t j = 0; j < d; ++j) {
       hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
+      if (var_types_[order[j] - 1] == "d") {
+        hfunc2_sub.col(j) =
+          u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
+      } else {
+        hfunc2_sub.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
+      }
+    }
 
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
       tools_interface::check_user_interrupt(n * d > 1e5);
@@ -678,25 +782,38 @@ Vinecop::pdf(const Eigen::MatrixXd& u, const size_t num_threads) const
         tools_interface::check_user_interrupt(edge % 100 == 0);
         // extract evaluation point from hfunction matrices (have been
         // computed in previous tree level)
-        size_t m = min_array(tree, edge);
         u_e.col(0) = hfunc2.col(edge);
-        if (m == no_array(tree, edge)) {
+        u_e.col(2) = hfunc2_sub.col(edge);
+        size_t m = min_array(tree, edge);
+        if (m == natural_array(tree, edge)) {
           u_e.col(1) = hfunc2.col(m - 1);
+          u_e.col(3) = hfunc2_sub.col(m - 1);
         } else {
           u_e.col(1) = hfunc1.col(m - 1);
+          u_e.col(3) = hfunc1_sub.col(m - 1);
         }
 
         Bicop edge_copula = get_pair_copula(tree, edge);
-        vine_density.segment(b.begin, b.size) =
-          vine_density.segment(b.begin, b.size)
-            .cwiseProduct(edge_copula.pdf(u_e));
+        pdf.segment(b.begin, b.size) =
+          pdf.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e));
 
         // h-functions are only evaluated if needed in next step
+        auto var_types = edge_copula.get_var_types();
         if (needed_hfunc1(tree, edge)) {
           hfunc1.col(edge) = edge_copula.hfunc1(u_e);
+          if (var_types[1] == "d") {
+            u_sub = u_e;
+            u_sub.col(1) = u_sub.col(3);
+            hfunc1_sub.col(edge) = edge_copula.hfunc1(u_sub);
+          }
         }
         if (needed_hfunc2(tree, edge)) {
           hfunc2.col(edge) = edge_copula.hfunc2(u_e);
+          if (var_types[0] == "d") {
+            u_sub = u_e;
+            u_sub.col(0) = u_sub.col(2);
+            hfunc2_sub.col(edge) = edge_copula.hfunc2(u_sub);
+          }
         }
       }
     }
@@ -708,12 +825,14 @@ Vinecop::pdf(const Eigen::MatrixXd& u, const size_t num_threads) const
     pool.join();
   }
 
-  return vine_density;
+  return pdf;
 }
 
 //! @brief calculates the cumulative distribution of the vine copula model.
 //!
-//! @param u \f$ n \times d \f$ matrix of evaluation points.
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `Vinecop::select_all()`).
 //! @param N integer for the number of quasi-random numbers to draw
 //! to evaluate the distribution (default: 1e4).
 //! @param num_threads the number of threads to use for computations; if greater
@@ -734,12 +853,10 @@ Vinecop::cdf(const Eigen::MatrixXd& u,
             << std::endl;
     throw std::runtime_error(message.str().c_str());
   }
-  tools_eigen::check_if_in_unit_cube(u);
-  check_data_dim(u);
+  check_data(u);
 
   // Simulate N quasi-random numbers from the vine model
-  auto u_sim = tools_stats::simulate_uniform(N, d_, true, seeds);
-  u_sim = inverse_rosenblatt(u_sim, num_threads);
+  auto u_sim = simulate(N, true, num_threads, seeds);
 
   size_t n = u.rows();
   Eigen::VectorXd vine_distribution(n);
@@ -756,6 +873,8 @@ Vinecop::cdf(const Eigen::MatrixXd& u,
 
 //! @brief simulates from a vine copula model, see inverse_rosenblatt().
 //!
+//! @details Simulated data is always a continous \f$ n \times d \f$ matrix.
+//!
 //! @param n number of observations.
 //! @param qrng set to true for quasi-random numbers.
 //! @param num_threads the number of threads to use for computations; if greater
@@ -771,7 +890,12 @@ Vinecop::simulate(const size_t n,
                   const std::vector<int>& seeds) const
 {
   auto u = tools_stats::simulate_uniform(n, d_, qrng, seeds);
-  return inverse_rosenblatt(u, num_threads);
+  // inverse_rosenblatt() only works for continous models
+  auto actual_types = var_types_;
+  set_continuous_var_types();
+  u = inverse_rosenblatt(u, num_threads); 
+  set_var_types_internal(actual_types);
+  return u;
 }
 
 //! @brief calculates the log-likelihood.
@@ -780,7 +904,9 @@ Vinecop::simulate(const size_t n,
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \f]
 //! where \f$ c \f$ is the copula density pdf().
 //!
-//! @param u \f$n \times d\f$ matrix of observations.
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `Vinecop::select_all()`).
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -803,7 +929,9 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! get_npars(). The AIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
-//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `Vinecop::select_all()`).
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -822,7 +950,9 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! get_npars(). The BIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
-//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `Vinecop::select_all()`).
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -846,7 +976,9 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! in tree \f$ t \f$; The vBIC is a consistent model selection criterion for
 //! parametric sparse vine copula models when \f$ d = o(\sqrt{n \ln n})\f$.
 //!
-//! @param u \f$n \times 2\f$ matrix of observations.
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `Vinecop::select_all()`).
 //! @param psi0 baseline prior probability of a non-independence copula.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
@@ -879,28 +1011,31 @@ Vinecop::get_npars() const
 //! @brief calculates the Rosenblatt transform for a vine copula model.
 //!
 //! The Rosenblatt transform converts data from this model into independent
-//! uniform variates.
+//! uniform variates. Only works for continuous data.
 //!
-//! @param u \f$ n \times d \f$ matrix of evaluation points.
+//! @param data \f$ n \times d \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
 inline Eigen::MatrixXd
 Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
-  tools_eigen::check_if_in_unit_cube(u);
-  check_data_dim(u);
+  if (get_n_discrete() > 0) {
+    throw std::runtime_error("rosenblatt() only works for continuous models.");
+  }
+  check_data(u);
   size_t d = u.cols();
   size_t n = u.rows();
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
   std::vector<size_t> order, inverse_order;
-  TriangularArray<size_t> no_array, min_array, needed_hfunc1, needed_hfunc2;
+  TriangularArray<size_t> natural_array, min_array, needed_hfunc1, needed_hfunc2;
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
     inverse_order = tools_stl::invert_permutation(order);
-    no_array = vine_struct_.get_struct_array(true);
+    natural_array = vine_struct_.get_struct_array(true);
     min_array = vine_struct_.get_min_array();
     needed_hfunc1 = vine_struct_.get_needed_hfunc1();
     needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -923,14 +1058,14 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
         // computed in previous tree level)
         size_t m = min_array(tree, edge);
         u_e.col(0) = hfunc2.block(b.begin, edge, b.size, 1);
-        if (m == no_array(tree, edge)) {
+        if (m == natural_array(tree, edge)) {
           u_e.col(1) = hfunc2.block(b.begin, m - 1, b.size, 1);
         } else {
           u_e.col(1) = hfunc1.block(b.begin, m - 1, b.size, 1);
         }
 
         // h-functions are only evaluated if needed in next step
-        Bicop edge_copula = get_pair_copula(tree, edge);
+        Bicop edge_copula = get_pair_copula(tree, edge).as_continuous();
         if (needed_hfunc1(tree, edge)) {
           hfunc1.block(b.begin, edge, b.size, 1) = edge_copula.hfunc1(u_e);
         }
@@ -965,6 +1100,8 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! "Too large" means that the required memory will exceed 1 GB. An
 //! examplary configuration requiring less than 1 GB is \f$ n = 1000 \f$,
 //! \f$d = 200\f$.
+//! 
+//! Only works for continous models.
 //!
 //! @param u \f$ n \times d \f$ matrix of evaluation points.
 //! @param num_threads the number of threads to use for computations; if greater
@@ -974,16 +1111,18 @@ inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const size_t num_threads) const
 {
-  tools_eigen::check_if_in_unit_cube(u);
-  check_data_dim(u);
+  if (get_n_discrete() > 0) {
+    throw std::runtime_error(
+      "inverse_rosenblatt() only works for continuous models.");
+  }
+  check_data(u);
   size_t n = u.rows();
   if (n < 1) {
     throw std::runtime_error("n must be at least one");
   }
-  size_t d = u.cols();
+  size_t d = d_;
 
-  Eigen::MatrixXd U_vine = u; // output matrix
-
+  Eigen::MatrixXd U_vine = u.leftCols(d); // output matrix
   //                   (direct + indirect)    (U_vine)       (info matrices)
   size_t bytes_required = (8 * 2 * n * d * d) + (8 * n * d) + (4 * 4 * d * d);
   // if the problem is too large (requires more than 1 GB memory), split
@@ -1001,11 +1140,11 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   // info about the vine structure (in upper triangular matrix notation)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
   std::vector<size_t> order, inverse_order;
-  TriangularArray<size_t> no_array, min_array, needed_hfunc1, needed_hfunc2;
+  TriangularArray<size_t> natural_array, min_array, needed_hfunc1, needed_hfunc2;
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
     inverse_order = tools_stl::invert_permutation(order);
-    no_array = vine_struct_.get_struct_array(true);
+    natural_array = vine_struct_.get_struct_array(true);
     min_array = vine_struct_.get_min_array();
     needed_hfunc1 = vine_struct_.get_needed_hfunc1();
     needed_hfunc2 = vine_struct_.get_needed_hfunc2();
@@ -1026,17 +1165,16 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
     // loop through variables (0 is just the initial uniform)
     for (ptrdiff_t var = d - 2; var >= 0; --var) {
-
       tools_interface::check_user_interrupt(n * d > 1e5);
       size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
       for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
-        Bicop edge_copula = get_pair_copula(tree, var);
+        Bicop edge_copula = get_pair_copula(tree, var).as_continuous();
 
         // extract data for conditional pair
         Eigen::MatrixXd U_e(b.size, 2);
         size_t m = min_array(tree, var);
         U_e.col(0) = hinv2(tree + 1, var);
-        if (m == no_array(tree, var)) {
+        if (m == natural_array(tree, var)) {
           U_e.col(1) = hinv2(tree, m - 1);
         } else {
           U_e.col(1) = hfunc1(tree, m - 1);
@@ -1074,12 +1212,30 @@ inline void
 Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
 {
   size_t d_data = data.cols();
-  if (d_data != d_) {
-    std::stringstream message;
-    message << "data has wrong number of columns; "
-            << "expected: " << d_ << ", actual: " << d_data << std::endl;
-    throw std::runtime_error(message.str().c_str());
+  auto n_disc = get_n_discrete();
+  size_t d_exp = d_ + n_disc;
+  if ((d_data != d_exp) & (d_data != 2 * d_)) {
+    std::stringstream msg;
+    msg << "data has wrong number of columns; "
+        << "expected: " << d_exp << " or " << 2 * d_ << ", actual: " << d_data
+        << " (model contains ";
+    if (n_disc == 0) {
+      msg << "no discrete variables)." << std::endl;
+    } else if (n_disc == 1) {
+      msg << "1 discrete variable)." << std::endl;
+    } else {
+      msg << get_n_discrete() << "discrete variables)." << std::endl;
+    }
+    throw std::runtime_error(msg.str());
   }
+}
+
+//! checks if dimension d of the data matches the dimension of the vine.
+inline void
+Vinecop::check_data(const Eigen::MatrixXd& data) const
+{
+  check_data_dim(data);
+  tools_eigen::check_if_in_unit_cube(data);
 }
 
 //! checks if pair copulas are compatible with the R-vine structure.
@@ -1155,6 +1311,46 @@ Vinecop::truncate(size_t trunc_lvl)
     vine_struct_.truncate(trunc_lvl);
     pair_copulas_.resize(trunc_lvl);
   }
+}
+
+//! set all variable types to continuous.
+//! the function can be const, because var_types_ is mutable.
+inline void
+Vinecop::set_continuous_var_types() const
+{
+  var_types_ = std::vector<std::string>(d_);
+  for (auto& t : var_types_)
+    t = "c";
+  set_var_types_internal(var_types_);
+}
+
+//! returns the number of discrete variables.
+inline int
+Vinecop::get_n_discrete() const
+{
+  int n_discrete = 0;
+  for (auto t : var_types_) {
+    n_discrete += (t == "d");
+  }
+  return n_discrete;
+}
+
+//! removes superfluous columns for continuous data.
+inline Eigen::MatrixXd
+Vinecop::collapse_data(const Eigen::MatrixXd& u) const
+{
+  if (static_cast<size_t>(u.cols()) == d_ + get_n_discrete()) {
+    return u;
+  }
+  Eigen::MatrixXd u_new(u.rows(), d_ + get_n_discrete());
+  u_new.leftCols(d_) = u.leftCols(d_);
+  size_t disc_count = 0;
+  for (size_t i = 0; i < d_; ++i) {
+    if (var_types_[i] == "d") {
+      u_new.col(d_ + disc_count++) = u.col(d_ + i);
+    }
+  }
+  return u_new;
 }
 
 //! summarizes the model into a string (can be used for printing).
