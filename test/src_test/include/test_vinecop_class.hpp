@@ -314,29 +314,26 @@ TEST_F(VinecopTest, works_multi_threaded)
   fit2.cdf(u, 100, 2);
 }
 
-TEST_F(VinecopTest, select_finds_right_structure)
+// check if the same conditioned sets appear for each tree
+inline size_t
+get_pairs_unequal(
+  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix1,
+  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix2,
+  size_t trunc_lvl)
 {
-  // check whether the same structure appears if we only allow for
-  // independence (pair-copula estimates differ otherwise)
-
-  // select structure and get matrix
-  Vinecop fit(7);
-  fit.select(u, FitControlsVinecop({ BicopFamily::indep }));
-  auto vcl_matrix = fit.get_matrix();
-
-  // check if the same conditioned sets appear for each tree
-  std::vector<std::vector<std::vector<size_t>>> vc_sets(6), vcl_sets(6);
-  int pairs_unequal = 0;
-  for (int tree = 0; tree < 6; ++tree) {
-    vc_sets[tree].resize(6 - tree);
-    vcl_sets[tree].resize(6 - tree);
-    for (int edge = 0; edge < 6 - tree; ++edge) {
+  std::vector<std::vector<std::vector<size_t>>> vc_sets(trunc_lvl),
+    vcl_sets(trunc_lvl);
+  size_t pairs_unequal = 0;
+  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+    vc_sets[tree].resize(trunc_lvl - tree);
+    vcl_sets[tree].resize(trunc_lvl - tree);
+    for (size_t edge = 0; edge < trunc_lvl - tree; ++edge) {
       vc_sets[tree][edge].resize(2);
-      vc_sets[tree][edge][0] = vc_matrix(tree, edge);
-      vc_sets[tree][edge][1] = vc_matrix(6 - edge, edge);
+      vc_sets[tree][edge][0] = matrix1(tree, edge);
+      vc_sets[tree][edge][1] = matrix1(trunc_lvl - edge, edge);
       vcl_sets[tree][edge].resize(2);
-      vcl_sets[tree][edge][0] = vcl_matrix(tree, edge);
-      vcl_sets[tree][edge][1] = vcl_matrix(6 - edge, edge);
+      vcl_sets[tree][edge][0] = matrix2(tree, edge);
+      vcl_sets[tree][edge][1] = matrix2(trunc_lvl - edge, edge);
     }
     for (auto s1 : vc_sets[tree]) {
       bool is_in_both = false;
@@ -350,6 +347,21 @@ TEST_F(VinecopTest, select_finds_right_structure)
       }
     }
   }
+  return pairs_unequal;
+}
+
+TEST_F(VinecopTest, select_finds_right_structure)
+{
+  // check whether the same structure appears if we only allow for
+  // independence (pair-copula estimates differ otherwise)
+
+  // select structure and get matrix
+  Vinecop fit(7);
+  fit.select(u, FitControlsVinecop({ BicopFamily::indep }));
+  auto vcl_matrix = fit.get_matrix();
+
+  // check if the same conditioned sets appear for each tree
+  size_t pairs_unequal = get_pairs_unequal(vc_matrix, vcl_matrix, 6);
   EXPECT_EQ(pairs_unequal, 0);
 }
 
@@ -371,6 +383,11 @@ TEST_F(VinecopTest, fixed_truncation)
 
   Vinecop fit3(u, fit.get_rvine_structure());
   EXPECT_EQ(fit3.get_all_pair_copulas().size(), 6);
+
+  fit3.truncate(2);
+  size_t pairs_unequal =
+    get_pairs_unequal(fit3.get_matrix(), fit.get_matrix(), 2);
+  EXPECT_EQ(pairs_unequal, 0);
 }
 
 TEST_F(VinecopTest, sparse_threshold_selection)
