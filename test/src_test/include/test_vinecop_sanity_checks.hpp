@@ -36,8 +36,7 @@ TEST(vinecop_sanity_checks, catches_wrong_size)
   EXPECT_ANY_THROW(vinecop.pdf(U));
   EXPECT_ANY_THROW(vinecop.cdf(U));
   EXPECT_ANY_THROW(vinecop.inverse_rosenblatt(U));
-  EXPECT_ANY_THROW(vinecop.select_all(U));
-  EXPECT_ANY_THROW(vinecop.select_families(U));
+  EXPECT_ANY_THROW(vinecop.select(U));
 
   vinecop = Vinecop(301);
   U = tools_stats::simulate_uniform(1, 301);
