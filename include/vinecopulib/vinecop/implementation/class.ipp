@@ -287,13 +287,27 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 
 //! @brief automatically fits and selects a vine copula model.
 //!
+//! @details `select()` behaves differently depending on its current truncation
+//! level and the truncation level specified in the controls, respectively
+//! called `trunc_lvl` and `controls.trunc_lvl` in what follows.
+//! Essentially, `controls.trunc_lvl` defines the object's truncation level
+//! after calling `select()`:
+//!   - If `controls.trunc_lvl <= trunc_lvl`, the families and parameters for
+//!     all pairs in trees smaller or equal to `controls.trunc_lvl`
+//!     are selected, using the current structure.
+//!   - If `controls.trunc_lvl > trunc_lvl`, `select()` behaves as above for
+//!     all trees that are smaller or equal to `trunc_lvl`, and then it selects
+//!     the structure for higher trees along with the families and parameters.
+//!     This includes the case where `trunc_lvl = 0`, namely where the
+//!     structure is fully unspecified.
+//!
 //! Selection of the structure is performed using the algorithm of
 //! Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013).
 //! *Selecting and estimating regular vine copulae and application to
 //! financial returns.* Computational Statistics & Data Analysis, 59 (1),
 //! 52-69.
 //!
-//! @details When at least one variable is discrete, two types of "observations"
+//! When at least one variable is discrete, two types of "observations"
 //! are required: the first \f$ n \times d \f$ block contains realizations of
 //! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
 //! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
