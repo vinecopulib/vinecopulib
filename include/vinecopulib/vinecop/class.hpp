@@ -84,13 +84,13 @@ public:
   void select(Eigen::MatrixXd data,
               const FitControlsVinecop& controls = FitControlsVinecop());
 
-  void DEPRECATED
-  select_all(Eigen::MatrixXd data,
-             const FitControlsVinecop& controls = FitControlsVinecop());
+  DEPRECATED void select_all(
+    Eigen::MatrixXd data,
+    const FitControlsVinecop& controls = FitControlsVinecop());
 
-  void DEPRECATED
-  select_families(Eigen::MatrixXd data,
-                  const FitControlsVinecop& controls = FitControlsVinecop());
+  DEPRECATED void select_families(
+    Eigen::MatrixXd data,
+    const FitControlsVinecop& controls = FitControlsVinecop());
 
   // Getters for a single pair copula
   Bicop get_pair_copula(size_t tree, size_t edge) const;
