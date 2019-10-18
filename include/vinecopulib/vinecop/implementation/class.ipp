@@ -358,6 +358,8 @@ Vinecop::select(Eigen::MatrixXd data, const FitControlsVinecop& controls)
 inline void
 Vinecop::select_all(Eigen::MatrixXd data, const FitControlsVinecop& controls)
 {
+  vine_struct_ =
+    RVineStructure(tools_stl::seq_int(1, d_), static_cast<size_t>(0));
   select(data, controls);
 }
 
