@@ -828,31 +828,36 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
 
 //! rotates the data corresponding to the models rotation.
 //! @param u an `n x 2` matrix.
-inline Eigen::MatrixXd
-Bicop::rotate_data(const Eigen::MatrixXd& u) const
+inline void
+Bicop::rotate_data(Eigen::MatrixXd& u) const
 {
-  auto u_new = u;
   // counter-clockwise rotations
   switch (rotation_) {
     case 0:
       break;
 
     case 90:
-      u_new.col(0) = u.col(1);
-      u_new.col(1) = 1.0 - u.col(0).array();
+      u.col(0).swap(u.col(1));
+      u.col(1) = 1 - u.col(1).array();
+      if (u.cols() == 4) {
+        u.col(2).swap(u.col(3));
+        u.col(3) = 1 - u.col(3).array();
+      }
       break;
 
     case 180:
-      u_new.col(0) = 1.0 - u.col(0).array();
-      u_new.col(1) = 1.0 - u.col(1).array();
+      u = 1 - u.array();
       break;
 
     case 270:
-      u_new.col(0) = 1.0 - u.col(1).array();
-      u_new.col(1) = u.col(0);
+      u.col(0).swap(u.col(1));
+      u.col(0) = 1 - u.col(0).array();
+      if (u.cols() == 4) {
+        u.col(2).swap(u.col(3));
+        u.col(2) = 1 - u.col(2).array();
+      }
       break;
   }
-  return u_new;
 }
 
 //! prepares data for use with the `AbstractBicop` class:
@@ -864,10 +869,7 @@ Bicop::prep_for_abstract(const Eigen::MatrixXd& u) const
 {
   auto u_new = format_data(u);
   tools_eigen::trim(u_new);
-  u_new.leftCols(2) = rotate_data(u_new.leftCols(2));
-  if (u_new.cols() == 4) {
-    u_new.rightCols(2) = rotate_data(u_new.rightCols(2));
-  }
+  rotate_data(u_new);
   return u_new;
 }
 
