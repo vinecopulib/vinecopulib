@@ -85,8 +85,8 @@ inline RVineStructure::RVineStructure(const std::vector<size_t>& order,
   } else {
     struct_array_ = TriangularArray<size_t>(d_, trunc_lvl);
     min_array_ = TriangularArray<size_t>(d_, trunc_lvl);
-    needed_hfunc1_ = TriangularArray<size_t>(d_, trunc_lvl);
-    needed_hfunc2_ = TriangularArray<size_t>(d_, trunc_lvl);
+    needed_hfunc1_ = TriangularArray<short unsigned>(d_, trunc_lvl);
+    needed_hfunc2_ = TriangularArray<short unsigned>(d_, trunc_lvl);
   }
 }
 
@@ -139,8 +139,8 @@ inline RVineStructure::RVineStructure(
   } else {
     struct_array_ = TriangularArray<size_t>(d_, trunc_lvl_);
     min_array_ = TriangularArray<size_t>(d_, trunc_lvl_);
-    needed_hfunc1_ = TriangularArray<size_t>(d_, trunc_lvl_);
-    needed_hfunc2_ = TriangularArray<size_t>(d_, trunc_lvl_);
+    needed_hfunc1_ = TriangularArray<short unsigned>(d_, trunc_lvl_);
+    needed_hfunc2_ = TriangularArray<short unsigned>(d_, trunc_lvl_);
   }
 }
 
@@ -258,7 +258,7 @@ RVineStructure::get_min_array() const
 //!
 //! (it is usually not necessary to compute both h-functions for each
 //! pair-copula).
-inline TriangularArray<size_t>
+inline TriangularArray<short unsigned>
 RVineStructure::get_needed_hfunc1() const
 {
   return needed_hfunc1_;
@@ -269,7 +269,7 @@ RVineStructure::get_needed_hfunc1() const
 //!
 //! (it is usually not necessary to compute both h-functions for each
 //! pair-copula).
-inline TriangularArray<size_t>
+inline TriangularArray<short unsigned>
 RVineStructure::get_needed_hfunc2() const
 {
   return needed_hfunc2_;
@@ -303,14 +303,14 @@ RVineStructure::min_array(size_t tree, size_t edge) const
 //! @brief access elements of the needed_hfunc1 array.
 //! @param tree tree index.
 //! @param edge edge index.
-size_t
+bool
 RVineStructure::needed_hfunc1(size_t tree, size_t edge) const
 {
   return needed_hfunc1_(tree, edge);
 }
 
 //! @brief access elements of the needed_hfunc2 array.
-size_t
+bool
 RVineStructure::needed_hfunc2(size_t tree, size_t edge) const
 {
   return needed_hfunc2_(tree, edge);
@@ -550,10 +550,10 @@ RVineStructure::compute_min_array() const
   return min_array;
 }
 
-inline TriangularArray<size_t>
+inline TriangularArray<short unsigned>
 RVineStructure::compute_needed_hfunc1() const
 {
-  TriangularArray<size_t> needed_hfunc1(d_, trunc_lvl_);
+  TriangularArray<short unsigned> needed_hfunc1(d_, trunc_lvl_);
 
   for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
     for (size_t j = 0; j < d_ - 2 - i; j++) {
@@ -565,10 +565,10 @@ RVineStructure::compute_needed_hfunc1() const
   return needed_hfunc1;
 }
 
-inline TriangularArray<size_t>
+inline TriangularArray<short unsigned>
 RVineStructure::compute_needed_hfunc2() const
 {
-  TriangularArray<size_t> needed_hfunc2(d_, trunc_lvl_);
+  TriangularArray<short unsigned> needed_hfunc2(d_, trunc_lvl_);
 
   for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
     for (size_t j = 0; j < d_ - 2 - i; j++) {

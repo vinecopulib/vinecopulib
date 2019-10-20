@@ -771,8 +771,8 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
   std::vector<size_t> order;
-  TriangularArray<size_t> natural_array, min_array, needed_hfunc1,
-    needed_hfunc2;
+  TriangularArray<size_t> natural_array, min_array;
+  TriangularArray<short unsigned> needed_hfunc1, needed_hfunc2;
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
     natural_array = vine_struct_.get_struct_array(true);
@@ -1063,8 +1063,8 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
   std::vector<size_t> order, inverse_order;
-  TriangularArray<size_t> natural_array, min_array, needed_hfunc1,
-    needed_hfunc2;
+  TriangularArray<size_t> natural_array, min_array;
+  TriangularArray<short unsigned> needed_hfunc1, needed_hfunc2;
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
     inverse_order = tools_stl::invert_permutation(order);
@@ -1173,8 +1173,8 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   // info about the vine structure (in upper triangular matrix notation)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
   std::vector<size_t> order, inverse_order;
-  TriangularArray<size_t> natural_array, min_array, needed_hfunc1,
-    needed_hfunc2;
+  TriangularArray<size_t> natural_array, min_array;
+  TriangularArray<short unsigned> needed_hfunc1, needed_hfunc2;
   if (trunc_lvl > 0) {
     order = vine_struct_.get_order();
     inverse_order = tools_stl::invert_permutation(order);
