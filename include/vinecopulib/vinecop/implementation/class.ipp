@@ -770,16 +770,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
-  std::vector<size_t> order;
-  TriangularArray<size_t> natural_array, min_array;
-  TriangularArray<short unsigned> needed_hfunc1, needed_hfunc2;
-  if (trunc_lvl > 0) {
-    order = vine_struct_.get_order();
-    natural_array = vine_struct_.get_struct_array(true);
-    min_array = vine_struct_.get_min_array();
-    needed_hfunc1 = vine_struct_.get_needed_hfunc1();
-    needed_hfunc2 = vine_struct_.get_needed_hfunc2();
-  }
+  auto order = vine_struct_.get_order();
   auto disc_cols = tools_select::get_disc_cols(var_types_);
 
   // initial value must be 1.0 for multiplication
@@ -816,8 +807,8 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
         // computed in previous tree level)
         u_e.col(0) = hfunc2.col(edge);
         u_e.col(2) = hfunc2_sub.col(edge);
-        size_t m = min_array(tree, edge);
-        if (m == natural_array(tree, edge)) {
+        size_t m = vine_struct_.min_array(tree, edge);
+        if (m == vine_struct_.struct_array(tree, edge, true)) {
           u_e.col(1) = hfunc2.col(m - 1);
           u_e.col(3) = hfunc2_sub.col(m - 1);
         } else {
@@ -831,7 +822,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
         // h-functions are only evaluated if needed in next step
         auto var_types = edge_copula.get_var_types();
-        if (needed_hfunc1(tree, edge)) {
+        if (vine_struct_.needed_hfunc1(tree, edge)) {
           hfunc1.col(edge) = edge_copula.hfunc1(u_e);
           if (var_types[1] == "d") {
             u_sub = u_e;
@@ -839,7 +830,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
             hfunc1_sub.col(edge) = edge_copula.hfunc1(u_sub);
           }
         }
-        if (needed_hfunc2(tree, edge)) {
+        if (vine_struct_.needed_hfunc2(tree, edge)) {
           hfunc2.col(edge) = edge_copula.hfunc2(u_e);
           if (var_types[0] == "d") {
             u_sub = u_e;
@@ -1060,19 +1051,10 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
   size_t d = u.cols();
   size_t n = u.rows();
 
-  // info about the vine structure (reverse rows (!) for more natural indexing)
+  // info about the vine structure
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
-  std::vector<size_t> order, inverse_order;
-  TriangularArray<size_t> natural_array, min_array;
-  TriangularArray<short unsigned> needed_hfunc1, needed_hfunc2;
-  if (trunc_lvl > 0) {
-    order = vine_struct_.get_order();
-    inverse_order = tools_stl::invert_permutation(order);
-    natural_array = vine_struct_.get_struct_array(true);
-    min_array = vine_struct_.get_min_array();
-    needed_hfunc1 = vine_struct_.get_needed_hfunc1();
-    needed_hfunc2 = vine_struct_.get_needed_hfunc2();
-  }
+  auto order = vine_struct_.get_order();
+  auto inverse_order = tools_stl::invert_permutation(order);
 
   // fill first row of hfunc2 matrix with evaluation points;
   // points have to be reordered to correspond to natural order
@@ -1089,9 +1071,9 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
         tools_interface::check_user_interrupt(edge % 100 == 0);
         // extract evaluation point from hfunction matrices (have been
         // computed in previous tree level)
-        size_t m = min_array(tree, edge);
+        size_t m = vine_struct_.min_array(tree, edge);
         u_e.col(0) = hfunc2.block(b.begin, edge, b.size, 1);
-        if (m == natural_array(tree, edge)) {
+        if (m == vine_struct_.struct_array(tree, edge, true)) {
           u_e.col(1) = hfunc2.block(b.begin, m - 1, b.size, 1);
         } else {
           u_e.col(1) = hfunc1.block(b.begin, m - 1, b.size, 1);
@@ -1099,7 +1081,7 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 
         // h-functions are only evaluated if needed in next step
         Bicop edge_copula = get_pair_copula(tree, edge).as_continuous();
-        if (needed_hfunc1(tree, edge)) {
+        if (vine_struct_.needed_hfunc1(tree, edge)) {
           hfunc1.block(b.begin, edge, b.size, 1) = edge_copula.hfunc1(u_e);
         }
         hfunc2.block(b.begin, edge, b.size, 1) = edge_copula.hfunc2(u_e);
@@ -1172,17 +1154,8 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
   // info about the vine structure (in upper triangular matrix notation)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
-  std::vector<size_t> order, inverse_order;
-  TriangularArray<size_t> natural_array, min_array;
-  TriangularArray<short unsigned> needed_hfunc1, needed_hfunc2;
-  if (trunc_lvl > 0) {
-    order = vine_struct_.get_order();
-    inverse_order = tools_stl::invert_permutation(order);
-    natural_array = vine_struct_.get_struct_array(true);
-    min_array = vine_struct_.get_min_array();
-    needed_hfunc1 = vine_struct_.get_needed_hfunc1();
-    needed_hfunc2 = vine_struct_.get_needed_hfunc2();
-  }
+  auto order = vine_struct_.get_order();
+  auto inverse_order = tools_stl::invert_permutation(order);
 
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects for (inverse) h-functions
@@ -1206,9 +1179,9 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
         // extract data for conditional pair
         Eigen::MatrixXd U_e(b.size, 2);
-        size_t m = min_array(tree, var);
+        size_t m = vine_struct_.min_array(tree, var);
         U_e.col(0) = hinv2(tree + 1, var);
-        if (m == natural_array(tree, var)) {
+        if (m == vine_struct_.struct_array(tree, var, true)) {
           U_e.col(1) = hinv2(tree, m - 1);
         } else {
           U_e.col(1) = hfunc1(tree, m - 1);
@@ -1219,7 +1192,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
         // if required at later stage, also calculate hfunc2
         if (var < static_cast<ptrdiff_t>(d_) - 1) {
-          if (needed_hfunc1(tree, var)) {
+          if (vine_struct_.needed_hfunc1(tree, var)) {
             U_e.col(0) = hinv2(tree, var);
             hfunc1(tree + 1, var) = edge_copula.hfunc1(U_e);
           }
