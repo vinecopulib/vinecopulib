@@ -99,6 +99,8 @@ public:
                       size_t edge,
                       bool natural_order = false) const;
   size_t min_array(size_t tree, size_t edge) const;
+  size_t needed_hfunc1(size_t tree, size_t edge) const;
+  size_t needed_hfunc2(size_t tree, size_t edge) const;
 
   void truncate(size_t trunc_lvl);
   std::string str() const;
