@@ -144,7 +144,8 @@ AbstractBicop::pdf(const Eigen::MatrixXd& u)
   } else {
     pdf = pdf_c_d(u);
   }
-  return tools_eigen::trim(pdf, DBL_MIN, DBL_MAX);
+  tools_eigen::trim(pdf, DBL_MIN, DBL_MAX);
+  return pdf;
 }
 
 inline Eigen::VectorXd
