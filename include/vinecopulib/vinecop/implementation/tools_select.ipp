@@ -566,21 +566,24 @@ VinecopSelector::add_pc_info(const EdgeIterator& e, VineTree& tree)
   auto v0 = boost::source(e, tree);
   auto v1 = boost::target(e, tree);
   size_t n = tree[v0].hfunc1.size();
-  tree[e].pc_data = Eigen::MatrixXd(n, 4);
+  tree[e].pc_data = Eigen::MatrixXd(n, 2);
 
   // find positions of common vertex in pair indices
   size_t ei_common = find_common_neighbor(v0, v1, tree);
   ptrdiff_t pos0 = find_position(ei_common, tree[v0].prev_edge_indices);
   ptrdiff_t pos1 = find_position(ei_common, tree[v1].prev_edge_indices);
 
+  tree[e].var_types[0] = tree[v0].var_types[std::abs(1 - pos0)];
+  tree[e].var_types[1] = tree[v1].var_types[std::abs(1 - pos1)];
+
   // collect pseudo observations for next tree
   tree[e].pc_data.col(0) = get_hfunc(tree[v0], pos0);
   tree[e].pc_data.col(1) = get_hfunc(tree[v1], pos1);
-  tree[e].pc_data.col(2) = get_hfunc_sub(tree[v0], pos0);
-  tree[e].pc_data.col(3) = get_hfunc_sub(tree[v1], pos1);
-
-  tree[e].var_types[0] = tree[v0].var_types[std::abs(1 - pos0)];
-  tree[e].var_types[1] = tree[v1].var_types[std::abs(1 - pos1)];
+  if ((tree[e].var_types[0] == "d") | (tree[e].var_types[1] == "d")) {
+    tree[e].pc_data.conservativeResize(n, 4); 
+    tree[e].pc_data.col(2) = get_hfunc_sub(tree[v0], pos0);
+    tree[e].pc_data.col(3) = get_hfunc_sub(tree[v1], pos1);
+  }
 
   tree[e].conditioned =
     set_sym_diff(tree[v0].all_indices, tree[v1].all_indices);
@@ -833,7 +836,7 @@ VinecopSelector::edges_as_vertices(const VineTree& prev_tree)
   size_t d = num_edges(prev_tree);
   VineTree new_tree(d);
 
-  // cut & paste information from previous tree
+  // copy & paste information from previous tree
   int i = 0;
   for (auto e : boost::edges(prev_tree)) {
     new_tree[i].hfunc1 = prev_tree[e].hfunc1;
