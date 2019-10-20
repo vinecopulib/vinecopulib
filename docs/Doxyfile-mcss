@@ -8,7 +8,9 @@ M_LINKS_NAVBAR1 = setup \
     "overview overview-bicop overview-vinecop" \
     "annotated classvinecopulib_1_1_bicop classvinecopulib_1_1_fit_controls_bicop classvinecopulib_1_1_vinecop classvinecopulib_1_1_fit_controls_vinecop classvinecopulib_1_1_r_vine_structure classvinecopulib_1_1_triangular_array"
 
-M_LINKS_NAVBAR2 = license \
+M_LINKS_NAVBAR2 = \
+    "namespaces namespacevinecopulib namespacevinecopulib_1_1bicop__families namespacevinecopulib_1_1tools__stats" \ 
+    license \
     "<a href=\"https://github.com/vinecopulib/vinecopulib\">GitHub</a>"
 
 
