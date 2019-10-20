@@ -765,9 +765,6 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
   check_data(u);
   u = collapse_data(u);
 
-  size_t d = d_;
-  size_t n = u.rows();
-
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = vine_struct_.get_trunc_lvl();
   auto order = vine_struct_.get_order();
@@ -778,64 +775,71 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects (all data must be in (0, 1))
-    Eigen::MatrixXd hfunc1(b.size, d);
-    hfunc1.setZero();
-    Eigen::MatrixXd hfunc2 = hfunc1;
-    Eigen::MatrixXd hfunc1_sub = hfunc1;
-    Eigen::MatrixXd hfunc2_sub = hfunc1;
-    Eigen::MatrixXd u_e(b.size, 4);
-    Eigen::MatrixXd u_sub(b.size, 4);
+    Eigen::MatrixXd hfunc1, hfunc2, u_e,
+                    hfunc1_sub, hfunc2_sub, u_e_sub;
+    hfunc1 = Eigen::MatrixXd::Zero(b.size, d_);
+    hfunc2 = Eigen::MatrixXd::Zero(b.size, d_);
+    if (get_n_discrete() > 0) {
+      hfunc1_sub = hfunc1;
+      hfunc2_sub = hfunc2;
+    }
 
     // fill first row of hfunc2 matrix with evaluation points;
     // points have to be reordered to correspond to natural order
-
-    for (size_t j = 0; j < d; ++j) {
+    for (size_t j = 0; j < d_; ++j) {
       hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
       if (var_types_[order[j] - 1] == "d") {
         hfunc2_sub.col(j) =
           u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
-      } else {
-        hfunc2_sub.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
       }
     }
 
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-      tools_interface::check_user_interrupt(n * d > 1e5);
-      for (size_t edge = 0; edge < d - tree - 1; ++edge) {
+      tools_interface::check_user_interrupt(u.rows() * d_ > 1e5);
+      for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
         tools_interface::check_user_interrupt(edge % 100 == 0);
         // extract evaluation point from hfunction matrices (have been
         // computed in previous tree level)
-        u_e.col(0) = hfunc2.col(edge);
-        u_e.col(2) = hfunc2_sub.col(edge);
+        Bicop edge_copula = get_pair_copula(tree, edge);
+        auto var_types = edge_copula.get_var_types();
         size_t m = vine_struct_.min_array(tree, edge);
+
+        u_e = Eigen::MatrixXd(b.size, 2);
+        u_e.col(0) = hfunc2.col(edge);
         if (m == vine_struct_.struct_array(tree, edge, true)) {
           u_e.col(1) = hfunc2.col(m - 1);
-          u_e.col(3) = hfunc2_sub.col(m - 1);
         } else {
           u_e.col(1) = hfunc1.col(m - 1);
-          u_e.col(3) = hfunc1_sub.col(m - 1);
         }
 
-        Bicop edge_copula = get_pair_copula(tree, edge);
+        if ((var_types[0] == "d") | (var_types[1] == "d")) {
+          u_e.conservativeResize(b.size, 4);
+          u_e.col(2) = hfunc2_sub.col(edge);
+          if (m == vine_struct_.struct_array(tree, edge, true)) {
+            u_e.col(3) = hfunc2_sub.col(m - 1);
+          } else {
+            u_e.col(3) = hfunc1_sub.col(m - 1);
+          }
+        }
+
         pdf.segment(b.begin, b.size) =
           pdf.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e));
 
         // h-functions are only evaluated if needed in next step
-        auto var_types = edge_copula.get_var_types();
         if (vine_struct_.needed_hfunc1(tree, edge)) {
           hfunc1.col(edge) = edge_copula.hfunc1(u_e);
           if (var_types[1] == "d") {
-            u_sub = u_e;
-            u_sub.col(1) = u_sub.col(3);
-            hfunc1_sub.col(edge) = edge_copula.hfunc1(u_sub);
+            u_e_sub = u_e;
+            u_e_sub.col(1) = u_e.col(3);
+            hfunc1_sub.col(edge) = edge_copula.hfunc1(u_e_sub);
           }
         }
         if (vine_struct_.needed_hfunc2(tree, edge)) {
           hfunc2.col(edge) = edge_copula.hfunc2(u_e);
           if (var_types[0] == "d") {
-            u_sub = u_e;
-            u_sub.col(0) = u_sub.col(2);
-            hfunc2_sub.col(edge) = edge_copula.hfunc2(u_sub);
+            u_e_sub = u_e;
+            u_e_sub.col(0) = u_e.col(2);
+            hfunc2_sub.col(edge) = edge_copula.hfunc2(u_e_sub);
           }
         }
       }
@@ -844,7 +848,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
   if (trunc_lvl > 0) {
     tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
-    pool.map(do_batch, tools_batch::create_batches(n, num_threads));
+    pool.map(do_batch, tools_batch::create_batches(u.rows(), num_threads));
     pool.join();
   }
 
