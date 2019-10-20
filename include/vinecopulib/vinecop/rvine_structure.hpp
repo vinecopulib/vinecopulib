@@ -118,7 +118,8 @@ protected:
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
 
   TriangularArray<size_t> to_natural_order() const;
-  TriangularArray<size_t> compute_dvine_struct_array() const;
+  static TriangularArray<size_t> make_dvine_struct_array(size_t d,
+                                                         size_t trunc_lvl);
   TriangularArray<size_t> compute_min_array() const;
   TriangularArray<short unsigned> compute_needed_hfunc1() const;
   TriangularArray<short unsigned> compute_needed_hfunc2() const;

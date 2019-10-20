@@ -70,24 +70,13 @@ inline RVineStructure::RVineStructure(const std::vector<size_t>& order,
 inline RVineStructure::RVineStructure(const std::vector<size_t>& order,
                                       const size_t& trunc_lvl,
                                       bool check)
-  : order_(order)
-  , d_(order.size())
-  , trunc_lvl_(std::min(trunc_lvl, d_ - 1))
+  : RVineStructure(order,
+                   make_dvine_struct_array(order.size(), trunc_lvl),
+                   true,
+                   false)
 {
   if (check)
     check_antidiagonal();
-
-  if (trunc_lvl > 0) {
-    struct_array_ = compute_dvine_struct_array();
-    min_array_ = compute_min_array();
-    needed_hfunc1_ = compute_needed_hfunc1();
-    needed_hfunc2_ = compute_needed_hfunc2();
-  } else {
-    struct_array_ = TriangularArray<size_t>(d_, trunc_lvl);
-    min_array_ = TriangularArray<size_t>(d_, trunc_lvl);
-    needed_hfunc1_ = TriangularArray<short unsigned>(d_, trunc_lvl);
-    needed_hfunc2_ = TriangularArray<short unsigned>(d_, trunc_lvl);
-  }
 }
 
 //! @brief instantiates an RVineStructure object from the variable order
@@ -525,11 +514,11 @@ RVineStructure::to_natural_order() const
 
 //! creates a structure array corresponding to a D-vine (in natural order).
 inline TriangularArray<size_t>
-RVineStructure::compute_dvine_struct_array() const
+RVineStructure::make_dvine_struct_array(size_t d, size_t trunc_lvl)
 {
-  TriangularArray<size_t> struct_array(d_, trunc_lvl_);
-  for (size_t j = 0; j < d_ - 1; j++) {
-    for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
+  TriangularArray<size_t> struct_array(d, trunc_lvl);
+  for (size_t j = 0; j < d - 1; j++) {
+    for (size_t i = 0; i < std::min(d - 1 - j, trunc_lvl); i++) {
       struct_array(i, j) = i + j + 2;
     }
   }
