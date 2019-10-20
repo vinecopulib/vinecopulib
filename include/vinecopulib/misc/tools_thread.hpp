@@ -17,7 +17,7 @@ namespace vinecopulib {
 
 namespace tools_thread {
 
-//! Implemenation of the thread pool pattern based on `Thread`.
+//! Implemenation of the thread pool pattern based on `std::sthread`.
 class ThreadPool
 {
 public:
@@ -42,26 +42,26 @@ public:
   void clear();
 
 private:
-  void startWorker();
-  void doJob(std::function<void()>&& job);
-  void announceBusy();
-  void announceIdle();
-  void announceStop();
-  void joinWorkers();
+  void start_worker();
+  void do_job(std::function<void()>&& job);
+  void announce_busy();
+  void announce_idle();
+  void announce_stop();
+  void join_workers();
 
-  bool hasErrored();
-  bool allJobsDone();
-  bool waitForWakeUpEvent();
-  void rethrowExceptions();
+  bool has_errored();
+  bool all_jobs_done();
+  bool wait_for_wake_up_event();
+  void rethrow_exceptions();
 
   std::vector<std::thread> workers_;       // worker threads in the pool
   std::queue<std::function<void()>> jobs_; // the task que
 
   // variables for synchronization between workers
-  std::mutex mTasks_;
-  std::condition_variable cvTasks_;
-  std::condition_variable cvBusy_;
-  size_t numBusy_{ 0 };
+  std::mutex m_tasks_;
+  std::condition_variable cv_tasks_;
+  std::condition_variable cv_busy_;
+  size_t num_busy_{ 0 };
   bool stopped_{ false };
   std::exception_ptr error_ptr_;
 };
@@ -77,7 +77,7 @@ inline ThreadPool::ThreadPool()
 inline ThreadPool::ThreadPool(size_t nWorkers)
 {
   for (size_t w = 0; w < nWorkers; ++w)
-    this->startWorker();
+    this->start_worker();
 }
 
 //! destructor joins all threads if possible.
@@ -85,8 +85,8 @@ inline ThreadPool::~ThreadPool() noexcept
 {
   // destructors should never throw
   try {
-    this->announceStop();
-    this->joinWorkers();
+    this->announce_stop();
+    this->join_workers();
   } catch (...) {
   }
 }
@@ -106,13 +106,13 @@ ThreadPool::push(F&& f, Args&&... args)
     return;
   } else {
     // must hold lock while modifying the shared queue
-    std::lock_guard<std::mutex> lk(mTasks_);
+    std::lock_guard<std::mutex> lk(m_tasks_);
     if (stopped_)
       throw std::runtime_error("cannot push to joined thread pool");
     jobs_.emplace([f, args...] { f(args...); });
   }
   // signal a waiting worker that there's a new job
-  cvTasks_.notify_one();
+  cv_tasks_.notify_one();
 }
 
 //! maps a function on a list of items, possibly running tasks in parallel.
@@ -133,18 +133,18 @@ inline void
 ThreadPool::wait()
 {
   while (true) {
-    if (waitForWakeUpEvent()) {
-      if (!this->allJobsDone()) {
+    if (wait_for_wake_up_event()) {
+      if (!this->all_jobs_done()) {
         this->clear(); // cancel all remaining jobs
         continue;      // wait for currently running jobs
       }
-      if (this->hasErrored() | this->allJobsDone())
+      if (this->has_errored() | this->all_jobs_done())
         break;
     }
     std::this_thread::yield();
   }
 
-  this->rethrowExceptions();
+  this->rethrow_exceptions();
 }
 
 //! waits for all jobs to finish and joins all threads.
@@ -152,8 +152,8 @@ inline void
 ThreadPool::join()
 {
   this->wait();
-  this->announceStop();
-  this->joinWorkers();
+  this->announce_stop();
+  this->join_workers();
 }
 
 //! clears the pool from all open jobs.
@@ -161,24 +161,24 @@ inline void
 ThreadPool::clear()
 {
   // must hold lock while modifying job queue
-  std::lock_guard<std::mutex> lk(mTasks_);
+  std::lock_guard<std::mutex> lk(m_tasks_);
   std::queue<std::function<void()>>().swap(jobs_);
-  cvTasks_.notify_all();
+  cv_tasks_.notify_all();
 }
 
 //! spawns a worker thread waiting for jobs to arrive.
 inline void
-ThreadPool::startWorker()
+ThreadPool::start_worker()
 {
   workers_.emplace_back([this] {
     std::function<void()> job;
     // observe thread pool; only stop after all jobs are done
     while (!stopped_ | !jobs_.empty()) {
       // must hold a lock while modifying shared variables
-      std::unique_lock<std::mutex> lk(mTasks_);
+      std::unique_lock<std::mutex> lk(m_tasks_);
 
       // thread should wait when there is no job
-      cvTasks_.wait(lk, [this] { return stopped_ || !jobs_.empty(); });
+      cv_tasks_.wait(lk, [this] { return stopped_ || !jobs_.empty(); });
 
       // queue can be empty if thread pool is stopped
       if (jobs_.empty())
@@ -190,11 +190,11 @@ ThreadPool::startWorker()
 
       // lock can be released before starting work, but must signal
       // that thread will be busy before (!) to avoid premature breaks
-      this->announceBusy();
+      this->announce_busy();
       lk.unlock();
 
-      this->doJob(std::move(job));
-      this->announceIdle();
+      this->do_job(std::move(job));
+      this->announce_idle();
       std::this_thread::yield();
     }
   });
@@ -203,49 +203,49 @@ ThreadPool::startWorker()
 //! executes a job safely and let's pool know when it's busy.
 //! @param job job to be exectued.
 inline void
-ThreadPool::doJob(std::function<void()>&& job)
+ThreadPool::do_job(std::function<void()>&& job)
 {
   try {
     job();
   } catch (...) {
-    std::lock_guard<std::mutex> lk(mTasks_);
+    std::lock_guard<std::mutex> lk(m_tasks_);
     error_ptr_ = std::current_exception();
   }
 }
 
-//! signals that a worker is busy (must be called why locking mTasks).
+//! signals that a worker is busy (must be called why locking m_tasks_).
 inline void
-ThreadPool::announceBusy()
+ThreadPool::announce_busy()
 {
-  ++numBusy_;
-  cvBusy_.notify_one();
+  ++num_busy_;
+  cv_busy_.notify_one();
 }
 
 //! signals that a worker is idle.
 inline void
-ThreadPool::announceIdle()
+ThreadPool::announce_idle()
 {
   {
-    std::lock_guard<std::mutex> lk(mTasks_);
-    --numBusy_;
+    std::lock_guard<std::mutex> lk(m_tasks_);
+    --num_busy_;
   }
-  cvBusy_.notify_one();
+  cv_busy_.notify_one();
 }
 
 //! signals threads that no more new work is coming.
 inline void
-ThreadPool::announceStop()
+ThreadPool::announce_stop()
 {
   {
-    std::unique_lock<std::mutex> lk(mTasks_);
+    std::unique_lock<std::mutex> lk(m_tasks_);
     stopped_ = true;
   }
-  cvTasks_.notify_all();
+  cv_tasks_.notify_all();
 }
 
 //! joins worker threads if possible.
 inline void
-ThreadPool::joinWorkers()
+ThreadPool::join_workers()
 {
   if (workers_.size() > 0) {
     for (auto& worker : workers_) {
@@ -257,37 +257,37 @@ ThreadPool::joinWorkers()
 
 //! checks if an error occured.
 inline bool
-ThreadPool::hasErrored()
+ThreadPool::has_errored()
 {
   return static_cast<bool>(error_ptr_);
 }
 
 //! check whether all jobs are done
 inline bool
-ThreadPool::allJobsDone()
+ThreadPool::all_jobs_done()
 {
-  return (numBusy_ == 0) && jobs_.empty();
+  return (num_busy_ == 0) && jobs_.empty();
 }
 
 //! checks whether wait() needs to wake up
 inline bool
-ThreadPool::waitForWakeUpEvent()
+ThreadPool::wait_for_wake_up_event()
 {
   static auto timeout = std::chrono::milliseconds(250);
-  auto isWakeUpEvent = [this] {
-    return this->allJobsDone() | this->hasErrored();
+  auto wake_up_event_occured = [this] {
+    return this->all_jobs_done() | this->has_errored();
   };
-  std::unique_lock<std::mutex> lk(mTasks_);
-  cvBusy_.wait_for(lk, timeout, isWakeUpEvent);
-  return isWakeUpEvent();
+  std::unique_lock<std::mutex> lk(m_tasks_);
+  cv_busy_.wait_for(lk, timeout, wake_up_event_occured);
+  return wake_up_event_occured();
 }
 
 //! rethrows exceptions (exceptions from workers are caught and stored; the
 //! wait loop only checks, but does not throw exceptions)
 inline void
-ThreadPool::rethrowExceptions()
+ThreadPool::rethrow_exceptions()
 {
-  if (this->hasErrored())
+  if (this->has_errored())
     std::rethrow_exception(error_ptr_);
 }
 
