@@ -5,7 +5,6 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <vinecopulib/misc/tools_stl.hpp>
