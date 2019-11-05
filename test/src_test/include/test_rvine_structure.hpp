@@ -132,12 +132,12 @@ TEST(rvine_structure, needed_hfunc1_is_correct)
          7, 3, 0, 0, 0, 0, 0,
          4, 0, 0, 0, 0, 0, 0;
 
-  TriangularArray<size_t> true_hfunc1({ { 0, 0, 0, 0, 1, 1 },
-                                        { 0, 0, 0, 1, 1 },
-                                        { 0, 0, 0, 1 },
-                                        { 0, 0, 0 },
-                                        { 0, 1 },
-                                        { 0 } });
+  TriangularArray<short unsigned> true_hfunc1({ { 0, 0, 0, 0, 1, 1 },
+                                                { 0, 0, 0, 1, 1 },
+                                                { 0, 0, 0, 1 },
+                                                { 0, 0, 0 },
+                                                { 0, 1 },
+                                                { 0 } });
 
   RVineStructure rvine_structure(mat);
   EXPECT_EQ(rvine_structure.get_needed_hfunc1(), true_hfunc1);
@@ -157,12 +157,12 @@ TEST(rvine_structure, needed_hfunc2_is_correct)
          7, 3, 0, 0, 0, 0, 0,
          4, 0, 0, 0, 0, 0, 0;
 
-  TriangularArray<size_t> true_hfunc2({ { 1, 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1, 1 },
-                                        { 1, 1, 1, 1 },
-                                        { 1, 1, 1 },
-                                        { 1, 0 },
-                                        { 0 } });
+  TriangularArray<short unsigned> true_hfunc2({ { 1, 1, 1, 1, 1, 1 },
+                                                { 1, 1, 1, 1, 1 },
+                                                { 1, 1, 1, 1 },
+                                                { 1, 1, 1 },
+                                                { 1, 0 },
+                                                { 0 } });
 
   RVineStructure rvine_structure(mat);
   EXPECT_EQ(rvine_structure.get_needed_hfunc2(), true_hfunc2);
