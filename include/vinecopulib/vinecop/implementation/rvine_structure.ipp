@@ -96,24 +96,22 @@ inline RVineStructure::RVineStructure(
   const TriangularArray<size_t>& struct_array,
   bool natural_order,
   bool check)
+  : order_(order)
+  , d_(order.size())
+  , trunc_lvl_(struct_array.get_trunc_lvl())
+  , struct_array_(struct_array)
 {
-  d_ = order.size();
-  if (check & (struct_array.get_dim() != d_)) {
-    throw std::runtime_error("order and struct_array have "
-                             "incompatible dimensions");
+  if (check) {
+    if ((trunc_lvl_ > 0) & (struct_array.get_dim() != d_)) {
+      throw std::runtime_error("order and struct_array have "
+                               "incompatible dimensions");
+    }
+    check_antidiagonal();
   }
 
-  order_ = order;
-
-  if (check)
-    check_antidiagonal();
-
-  trunc_lvl_ = struct_array.get_trunc_lvl();
   if (trunc_lvl_ > 0) {
-    struct_array_ = struct_array;
     if (check)
       check_upper_tri();
-
     if (!natural_order)
       struct_array_ = to_natural_order();
     if (check)
@@ -223,7 +221,7 @@ RVineStructure::get_struct_array(bool natural_order) const
   auto new_array = struct_array_;
   for (size_t tree = 0; tree < trunc_lvl_; tree++) {
     for (size_t edge = 0; edge < d_ - 1 - tree; edge++) {
-        new_array(tree, edge) = this->struct_array(tree, edge, false);
+      new_array(tree, edge) = this->struct_array(tree, edge, false);
     }
   }
   return new_array;
@@ -233,9 +231,9 @@ RVineStructure::get_struct_array(bool natural_order) const
 //!
 //! The minimum array is derived from an R-vine array by
 //! iteratively computing the (elementwise) minimum of two subsequent rows
-//! (starting from the top). It is used in estimation and evaluation algorithms
-//! to find the two edges in the previous tree that are joined by the current
-//! edge.
+//! (starting from the top). It is used in estimation and evaluation
+//! algorithms to find the two edges in the previous tree that are joined by
+//! the current edge.
 inline TriangularArray<size_t>
 RVineStructure::get_min_array() const
 {
@@ -269,9 +267,7 @@ RVineStructure::get_needed_hfunc2() const
 //! @param edge edge index.
 //! @param natural_order whether indices correspond to natural order.
 inline size_t
-RVineStructure::struct_array(size_t tree,
-                             size_t edge,
-                             bool natural_order) const
+RVineStructure::struct_array(size_t tree, size_t edge, bool natural_order) const
 {
   if (natural_order) {
     return struct_array_(tree, edge);
