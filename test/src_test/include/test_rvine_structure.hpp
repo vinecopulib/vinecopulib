@@ -7,6 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
+#include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
 
 namespace test_rvine_structure {
@@ -41,9 +42,9 @@ TEST(rvine_structure, triangular_array_works)
                                                     { 4, 4, 2 },
                                                     { 6, 5 },
                                                     { 5 },
-                                                    { 5 }  /* TOO MANY*/ }));
+                                                    { 5 } /* TOO MANY*/ }));
   EXPECT_NO_THROW(TriangularArray<size_t> my_rvm(
-                    { { 2, 3, 1, 1, 1, 1 }, { 1, 1, 4, 3, 2 } }));
+    { { 2, 3, 1, 1, 1, 1 }, { 1, 1, 4, 3, 2 } }));
   my_rvm.truncate(2);
   EXPECT_EQ(my_rvm.get_trunc_lvl(), 2);
 }
@@ -51,13 +52,8 @@ TEST(rvine_structure, triangular_array_works)
 TEST(rvine_structure, rvine_structure_print)
 {
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
-  mat << 5, 2, 6, 6, 6, 6, 6,
-         6, 6, 1, 2, 5, 5, 0,
-         2, 5, 2, 5, 2, 0, 0,
-         1, 1, 5, 1, 0, 0, 0,
-         3, 7, 7, 0, 0, 0, 0,
-         7, 3, 0, 0, 0, 0, 0,
-         4, 0, 0, 0, 0, 0, 0;
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
   RVineStructure rvine_structure(mat);
   EXPECT_NO_THROW(rvine_structure.str());
 
@@ -77,13 +73,8 @@ TEST(rvine_structure, rvine_structure_print)
 TEST(rvine_structure, can_convert_to_natural_order)
 {
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
-  mat << 5, 2, 6, 6, 6, 6, 6,
-         6, 6, 1, 2, 5, 5, 0,
-         2, 5, 2, 5, 2, 0, 0,
-         1, 1, 5, 1, 0, 0, 0,
-         3, 7, 7, 0, 0, 0, 0,
-         7, 3, 0, 0, 0, 0, 0,
-         4, 0, 0, 0, 0, 0, 0;
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
 
   TriangularArray<size_t> true_no_array({ { 6, 5, 7, 7, 7, 7 },
                                           { 7, 7, 4, 5, 6 },
@@ -99,13 +90,8 @@ TEST(rvine_structure, can_convert_to_natural_order)
 TEST(rvine_structure, min_array_is_correct)
 {
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
-  mat << 5, 2, 6, 6, 6, 6, 6,
-         6, 6, 1, 2, 5, 5, 0,
-         2, 5, 2, 5, 2, 0, 0,
-         1, 1, 5, 1, 0, 0, 0,
-         3, 7, 7, 0, 0, 0, 0,
-         7, 3, 0, 0, 0, 0, 0,
-         4, 0, 0, 0, 0, 0, 0;
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
 
   TriangularArray<size_t> true_min_array({ { 6, 5, 7, 7, 7, 7 },
                                            { 6, 5, 4, 5, 6 },
@@ -124,13 +110,8 @@ TEST(rvine_structure, min_array_is_correct)
 TEST(rvine_structure, needed_hfunc1_is_correct)
 {
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
-  mat << 5, 2, 6, 6, 6, 6, 6,
-         6, 6, 1, 2, 5, 5, 0,
-         2, 5, 2, 5, 2, 0, 0,
-         1, 1, 5, 1, 0, 0, 0,
-         3, 7, 7, 0, 0, 0, 0,
-         7, 3, 0, 0, 0, 0, 0,
-         4, 0, 0, 0, 0, 0, 0;
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
 
   TriangularArray<short unsigned> true_hfunc1({ { 0, 0, 0, 0, 1, 1 },
                                                 { 0, 0, 0, 1, 1 },
@@ -149,13 +130,8 @@ TEST(rvine_structure, needed_hfunc1_is_correct)
 TEST(rvine_structure, needed_hfunc2_is_correct)
 {
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
-  mat << 5, 2, 6, 6, 6, 6, 6,
-         6, 6, 1, 2, 5, 5, 0,
-         2, 5, 2, 5, 2, 0, 0,
-         1, 1, 5, 1, 0, 0, 0,
-         3, 7, 7, 0, 0, 0, 0,
-         7, 3, 0, 0, 0, 0, 0,
-         4, 0, 0, 0, 0, 0, 0;
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
 
   TriangularArray<short unsigned> true_hfunc2({ { 1, 1, 1, 1, 1, 1 },
                                                 { 1, 1, 1, 1, 1 },
@@ -175,13 +151,9 @@ TEST(rvine_structure, construct_d_vine_struct_is_correct)
 {
 
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> d_vine_mat(7, 7);
-  d_vine_mat << 4, 1, 5, 3, 2, 7, 7,
-                1, 5, 3, 2, 7, 2, 0,
-                5, 3, 2, 7, 3, 0, 0,
-                3, 2, 7, 5, 0, 0, 0,
-                2, 7, 1, 0, 0, 0, 0,
-                7, 4, 0, 0, 0, 0, 0,
-                6, 0, 0, 0, 0, 0, 0;
+  d_vine_mat << 4, 1, 5, 3, 2, 7, 7, 1, 5, 3, 2, 7, 2, 0, 5, 3, 2, 7, 3, 0, 0,
+    3, 2, 7, 5, 0, 0, 0, 2, 7, 1, 0, 0, 0, 0, 7, 4, 0, 0, 0, 0, 0, 6, 0, 0, 0,
+    0, 0, 0;
 
   std::vector<size_t> order = { 6, 4, 1, 5, 3, 2, 7 };
   RVineStructure rvine_structure(order);
@@ -191,13 +163,8 @@ TEST(rvine_structure, construct_d_vine_struct_is_correct)
 TEST(rvine_structure, rvine_struct_sanity_checks_work)
 {
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
-  mat << 5, 2, 6, 6, 6, 6, 6,
-         6, 6, 1, 2, 5, 5, 0,
-         2, 5, 2, 5, 2, 0, 0,
-         1, 1, 5, 1, 0, 0, 0,
-         3, 7, 7, 0, 0, 0, 0,
-         7, 3, 0, 0, 0, 0, 0,
-         4, 0, 0, 0, 0, 0, 0;
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
 
   // should pass without errors
   auto rvm = RVineStructure(mat);
@@ -241,5 +208,21 @@ TEST(rvine_structure, random_sampling)
   for (size_t i = 0; i < 20; i++) {
     RVineStructure test = RVineStructure::simulate(10);
   }
+}
+
+TEST(rvine_structure, dvine_structure)
+{
+  DVineStructure test(tools_stl::seq_int(1, 5));
+  DVineStructure test_tr(tools_stl::seq_int(1, 5), 2);
+  EXPECT_EQ(test.get_trunc_lvl(), 4);
+  EXPECT_EQ(test_tr.get_trunc_lvl(), 2);
+}
+
+TEST(rvine_structure, cvine_structure)
+{
+  CVineStructure test(tools_stl::seq_int(1, 5));
+  CVineStructure test_tr(tools_stl::seq_int(1, 5), 2);
+  EXPECT_EQ(test.get_trunc_lvl(), 4);
+  EXPECT_EQ(test_tr.get_trunc_lvl(), 2);
 }
 }
