@@ -8,6 +8,7 @@
 
 #include <Eigen/Dense>
 #include <boost/property_tree/ptree.hpp>
+#include <limits>
 #include <vinecopulib/misc/triangular_array.hpp>
 
 namespace vinecopulib {
@@ -66,14 +67,13 @@ namespace vinecopulib {
 class RVineStructure
 {
 public:
-  RVineStructure() {}
-
+  RVineStructure(const size_t& d = static_cast<size_t>(1),
+                 const size_t& trunc_lvl = std::numeric_limits<size_t>::max());
   RVineStructure(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat,
     bool check = true);
-  RVineStructure(const std::vector<size_t>& order, bool check = true);
   RVineStructure(const std::vector<size_t>& order,
-                 const size_t& trunc_lvl,
+                 const size_t& trunc_lvl = std::numeric_limits<size_t>::max(),
                  bool check = true);
   RVineStructure(const std::vector<size_t>& order,
                  const TriangularArray<size_t>& struct_array,

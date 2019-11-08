@@ -36,8 +36,7 @@ inline Bicop::Bicop(const BicopFamily family,
   } else {
     bicop_->set_loglik(0.0);
   }
-  check_var_types(var_types);
-  var_types_ = var_types;
+  set_var_types(var_types);
 }
 
 //! @brief create a copula model from the data,
@@ -46,13 +45,12 @@ inline Bicop::Bicop(const BicopFamily family,
 //! @param data see select().
 //! @param controls see select().
 //! @param var_types a vector of size two specifying the types of the variables,
-//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
+//!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
 inline Bicop::Bicop(const Eigen::MatrixXd& data,
                     const FitControlsBicop& controls,
                     const std::vector<std::string>& var_types)
 {
-  check_var_types(var_types);
-  var_types_ = var_types;
+  set_var_types(var_types);
   select(data, controls);
 }
 
@@ -571,7 +569,7 @@ Bicop::set_parameters(const Eigen::MatrixXd& parameters)
 
 //! @brief sets variable types.
 //! @param var_types a vector of size two specifying the types of the variables,
-//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
+//!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
 inline void
 Bicop::set_var_types(const std::vector<std::string>& var_types)
 {

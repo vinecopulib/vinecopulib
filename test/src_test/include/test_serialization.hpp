@@ -49,7 +49,7 @@ TEST(serialization, vinecop_serialization)
     }
   }
 
-  auto vc = Vinecop(pc_store, mat);
+  auto vc = Vinecop(mat, pc_store);
 
   // serialize
   vc.to_json("temp");

@@ -82,8 +82,7 @@ TEST(discrete, vinecop)
     }
   }
   RVineStructure str(std::vector<size_t>{ 1, 2, 3, 4, 5 });
-  Vinecop vc(pair_copulas, str);
-  vc.set_var_types({ "d", "c", "d", "d", "c" });
+  Vinecop vc(str, pair_copulas, { "d", "c", "d", "d", "c" });
 
   // simulate data with continuous and discrete variables
   auto utmp = vc.simulate(500, true, 1, { 1 });
