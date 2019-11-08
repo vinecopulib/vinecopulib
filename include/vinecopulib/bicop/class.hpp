@@ -26,10 +26,12 @@ public:
   // Constructors
   Bicop(const BicopFamily family = BicopFamily::indep,
         const int rotation = 0,
-        const Eigen::MatrixXd& parameters = Eigen::MatrixXd());
+        const Eigen::MatrixXd& parameters = Eigen::MatrixXd(),
+        const std::vector<std::string>& var_types = { "c", "c" });
 
   Bicop(const Eigen::MatrixXd& data,
-        const FitControlsBicop& controls = FitControlsBicop());
+        const FitControlsBicop& controls = FitControlsBicop(),
+        const std::vector<std::string>& var_types = { "c", "c" });
 
   Bicop(const std::string filename);
 
@@ -63,8 +65,8 @@ public:
 
   void set_parameters(const Eigen::MatrixXd& parameters);
 
-  void set_var_types(const std::vector<std::string>& var_types);
-  
+  void set_var_types(const std::vector<std::string>& var_types = { "c", "c" });
+
   std::vector<std::string> get_var_types() const;
 
   // Stats methods
@@ -130,6 +132,8 @@ private:
 
   void check_data_dim(const Eigen::MatrixXd& u) const;
 
+  void check_var_types(const Eigen::MatrixXd& u) const;
+
   void flip_var_types();
 
   void check_weights_size(const Eigen::VectorXd& weights,
@@ -145,8 +149,8 @@ private:
 
   BicopPtr bicop_;
   int rotation_;
-  size_t nobs_{0};
-  mutable std::vector<std::string> var_types_{ "c", "c" };
+  size_t nobs_{ 0 };
+  mutable std::vector<std::string> var_types_;
 };
 }
 
