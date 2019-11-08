@@ -6,7 +6,6 @@
 
 #include <stdexcept>
 
-#include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/bicop/bb1.hpp>
 #include <vinecopulib/bicop/bb6.hpp>
 #include <vinecopulib/bicop/bb7.hpp>
@@ -152,9 +151,13 @@ inline Eigen::VectorXd
 AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u)
 {
   if (var_types_[0] != "c") {
-    return (hfunc2_raw(u.leftCols(2)) - hfunc2_raw(u.rightCols(2))).cwiseAbs();
+    return (hfunc2_raw(u.leftCols(2)) - hfunc2_raw(u.rightCols(2)))
+      .cwiseQuotient(u.col(0) - u.col(2))
+      .cwiseAbs();
   } else {
-    return (hfunc1_raw(u.leftCols(2)) - hfunc1_raw(u.rightCols(2))).cwiseAbs();
+    return (hfunc1_raw(u.leftCols(2)) - hfunc1_raw(u.rightCols(2)))
+      .cwiseQuotient(u.col(1) - u.col(3))
+      .cwiseAbs();
   }
 }
 
@@ -265,5 +268,4 @@ AbstractBicop::hinv2_num(const Eigen::MatrixXd& u)
   return tools_eigen::invert_f(u.col(0), h1);
 }
 //! @}
-
 }
