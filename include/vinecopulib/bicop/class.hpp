@@ -132,7 +132,7 @@ private:
 
   void check_data_dim(const Eigen::MatrixXd& u) const;
 
-  void check_var_types(const Eigen::MatrixXd& u) const;
+  void check_var_types(const std::vector<std::string>& var_types) const;
 
   void flip_var_types();
 
