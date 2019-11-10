@@ -92,7 +92,6 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   } else {
     set_var_types(var_types);
   }
-  std::cout << rvine_structure_.str() << std::endl;
   check_weights_size(controls.get_weights(), data);
   select(data, controls);
 }

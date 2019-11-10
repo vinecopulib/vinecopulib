@@ -148,7 +148,7 @@ private:
   BicopPtr get_bicop() const;
 
   BicopPtr bicop_;
-  int rotation_;
+  int rotation_{ 0 };
   size_t nobs_{ 0 };
   mutable std::vector<std::string> var_types_;
 };
