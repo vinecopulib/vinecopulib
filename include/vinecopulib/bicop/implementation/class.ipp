@@ -21,9 +21,12 @@ namespace vinecopulib {
 //!     (for Independence, Gaussian, Student, Frank, and nonparametric
 //!     families, only 0 is allowed).
 //! @param parameters the copula parameters.
+//! @param var_types a vector of size two specifying the types of the variables,
+//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
 inline Bicop::Bicop(const BicopFamily family,
                     const int rotation,
-                    const Eigen::MatrixXd& parameters)
+                    const Eigen::MatrixXd& parameters,
+                    const std::vector<std::string>& var_types)
 {
   bicop_ = AbstractBicop::create(family, parameters);
   // family must be set before checking the rotation
@@ -33,6 +36,7 @@ inline Bicop::Bicop(const BicopFamily family,
   } else {
     bicop_->set_loglik(0.0);
   }
+  set_var_types(var_types);
 }
 
 //! @brief create a copula model from the data,
@@ -40,9 +44,13 @@ inline Bicop::Bicop(const BicopFamily family,
 //!
 //! @param data see select().
 //! @param controls see select().
+//! @param var_types a vector of size two specifying the types of the variables,
+//!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
 inline Bicop::Bicop(const Eigen::MatrixXd& data,
-                    const FitControlsBicop& controls)
+                    const FitControlsBicop& controls,
+                    const std::vector<std::string>& var_types)
 {
+  set_var_types(var_types);
   select(data, controls);
 }
 
@@ -61,7 +69,8 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
       input.get_child("var_types"));
     nobs_ = input.get<size_t>("nobs_");
     bicop_->set_loglik(input.get<double>("loglik"));
-  } catch (...) {}
+  } catch (...) {
+  }
 }
 
 //! @brief creates from a JSON file
@@ -532,7 +541,7 @@ Bicop::check_data_dim(const Eigen::MatrixXd& u) const
   if ((n_cols != n_cols_exp) & (n_cols != 4)) {
     std::stringstream msg;
     msg << "data has wrong number of columns; "
-        << "expected: " << n_cols_exp << " or 4, actual: " << n_cols 
+        << "expected: " << n_cols_exp << " or 4, actual: " << n_cols
         << " (model contains ";
     if (n_disc == 0) {
       msg << "no discrete variables)." << std::endl;
@@ -560,22 +569,17 @@ Bicop::set_parameters(const Eigen::MatrixXd& parameters)
 
 //! @brief sets variable types.
 //! @param var_types a vector of size two specifying the types of the variables,
-//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
+//!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
 inline void
 Bicop::set_var_types(const std::vector<std::string>& var_types)
 {
-  if (var_types.size() != 2) {
-    throw std::runtime_error("var_types must have size two.");
-  }
-  for (auto t : var_types) {
-    if (!tools_stl::is_member(t, { "c", "d" })) {
-      throw std::runtime_error("var type must be either 'c' or 'd'.");
-    }
-  }
+  check_var_types(var_types);
   var_types_ = var_types;
-  bicop_->set_var_types(var_types);
-  if (tools_stl::is_member(static_cast<size_t>(rotation_), { 90, 270 })) {
-    flip_var_types();
+  if (bicop_) {
+    bicop_->set_var_types(var_types);
+    if (tools_stl::is_member(static_cast<size_t>(rotation_), { 90, 270 })) {
+      flip_var_types();
+    }
   }
 }
 
@@ -805,7 +809,7 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
 }
 
 //! adds an additional column if there's only one discrete variable;
-//! removes superfluous columns for continuous variables. 
+//! removes superfluous columns for continuous variables.
 //! (continuous models only require two columns, discrete models always four)
 inline Eigen::MatrixXd
 Bicop::format_data(const Eigen::MatrixXd& u) const
@@ -824,7 +828,6 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
   u_new.col(2 + cont_col) = u.col(cont_col);
   return u_new;
 }
-
 
 //! rotates the data corresponding to the models rotation.
 //! @param u an `n x 2` matrix.
@@ -910,6 +913,20 @@ Bicop::check_fitted() const
   }
 }
 
+//! checks whether var_types have the correct length and are either "c" or "d".
+inline void
+Bicop::check_var_types(const std::vector<std::string>& var_types) const
+{
+  if (var_types.size() != 2) {
+    throw std::runtime_error("var_types must have size two.");
+  }
+  for (auto t : var_types) {
+    if (!tools_stl::is_member(t, { "c", "d" })) {
+      throw std::runtime_error("var type must be either 'c' or 'd'.");
+    }
+  }
+}
+
 //! returns the number of discrete variables.
 inline unsigned short
 Bicop::get_n_discrete() const
@@ -920,5 +937,4 @@ Bicop::get_n_discrete() const
   }
   return n_discrete;
 }
-
 }

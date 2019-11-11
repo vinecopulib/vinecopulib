@@ -39,6 +39,13 @@ TEST(bicop_sanity_checks, catches_wrong_rotation)
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 10));
 }
 
+TEST(bicop_sanity_checks, catches_var_types)
+{
+  auto rho = Eigen::VectorXd::Constant(1, 0.5);
+  EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, rho, { "c" }));
+  EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, rho, { "c", "u" }));
+}
+
 TEST(bicop_sanity_checks, catches_not_fitted_to_data)
 {
   auto bc = Bicop(BicopFamily::gaussian);
