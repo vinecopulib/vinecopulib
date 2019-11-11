@@ -31,7 +31,7 @@ inline Vinecop::Vinecop(const size_t d)
 //!   If empty, then all variables are set as continuous.
 inline Vinecop::Vinecop(const RVineStructure& structure,
                         const std::vector<std::vector<Bicop>>& pair_copulas,
-                        const std::vector<std::string> var_types)
+                        const std::vector<std::string>& var_types)
   : d_(structure.get_dim())
   , rvine_structure_(structure)
 {
@@ -56,7 +56,7 @@ inline Vinecop::Vinecop(const RVineStructure& structure,
 inline Vinecop::Vinecop(
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
   const std::vector<std::vector<Bicop>>& pair_copulas,
-  const std::vector<std::string> var_types)
+  const std::vector<std::string>& var_types)
   : Vinecop(RVineStructure(matrix), pair_copulas, var_types)
 {}
 
@@ -72,8 +72,8 @@ inline Vinecop::Vinecop(
 //! @param controls see FitControlsVinecop.
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                         const RVineStructure& structure,
-                        const std::vector<std::string> var_types,
-                        FitControlsVinecop controls)
+                        const std::vector<std::string>& var_types,
+                        const FitControlsVinecop& controls)
 {
   check_enough_data(data);
   if (structure.get_dim() > 1) {
@@ -109,8 +109,8 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 inline Vinecop::Vinecop(
   const Eigen::MatrixXd& data,
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
-  const std::vector<std::string> var_types,
-  FitControlsVinecop controls)
+  const std::vector<std::string>& var_types,
+  const FitControlsVinecop& controls)
   : Vinecop(data, RVineStructure(matrix), var_types, controls)
 {}
 
@@ -259,17 +259,17 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select(Eigen::MatrixXd data, const FitControlsVinecop& controls)
+Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 {
   check_data(data);
-  data = collapse_data(data);
+  Eigen::MatrixXd u = collapse_data(data);
 
   tools_select::VinecopSelector selector(
-    data, rvine_structure_, controls, var_types_);
+    u, rvine_structure_, controls, var_types_);
   if (controls.needs_sparse_select()) {
-    selector.sparse_select_all_trees(data);
+    selector.sparse_select_all_trees(u);
   } else {
-    selector.select_all_trees(data);
+    selector.select_all_trees(u);
   }
   finalize_fit(selector);
 }
@@ -295,10 +295,10 @@ Vinecop::select(Eigen::MatrixXd data, const FitControlsVinecop& controls)
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select_all(Eigen::MatrixXd data, const FitControlsVinecop& controls)
+Vinecop::select_all(const Eigen::MatrixXd& data,
+                    const FitControlsVinecop& controls)
 {
-  rvine_structure_ =
-    RVineStructure(tools_stl::seq_int(1, d_), static_cast<size_t>(0));
+  rvine_structure_ = RVineStructure(d_, static_cast<size_t>(0));
   select(data, controls);
 }
 
@@ -319,7 +319,7 @@ Vinecop::select_all(Eigen::MatrixXd data, const FitControlsVinecop& controls)
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls the controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select_families(Eigen::MatrixXd data,
+Vinecop::select_families(const Eigen::MatrixXd& data,
                          const FitControlsVinecop& controls)
 {
   auto controls_trunc_lvl = controls;

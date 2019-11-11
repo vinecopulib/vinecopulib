@@ -33,23 +33,23 @@ public:
   // Constructors without data
   Vinecop(const RVineStructure& structure,
           const std::vector<std::vector<Bicop>>& pair_copulas = {},
-          const std::vector<std::string> var_types = {});
+          const std::vector<std::string>& var_types = {});
 
   Vinecop(const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
           const std::vector<std::vector<Bicop>>& pair_copulas = {},
-          const std::vector<std::string> var_types = {});
+          const std::vector<std::string>& var_types = {});
 
   // Constructors from data
   Vinecop(const Eigen::MatrixXd& data,
           const RVineStructure& structure = RVineStructure(),
-          const std::vector<std::string> var_types = {},
-          FitControlsVinecop controls = FitControlsVinecop());
+          const std::vector<std::string>& var_types = {},
+          const FitControlsVinecop& controls = FitControlsVinecop());
 
   Vinecop(const Eigen::MatrixXd& data,
           const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix =
             Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>(),
-          const std::vector<std::string> var_types = {},
-          FitControlsVinecop controls = FitControlsVinecop());
+          const std::vector<std::string>& var_types = {},
+          const FitControlsVinecop& controls = FitControlsVinecop());
 
   // Constructors from files/serialized objects
   Vinecop(const std::string filename, const bool check = true);
@@ -60,15 +60,15 @@ public:
   void to_json(const std::string filename) const;
 
   // Methods modifying structure and/or families and parameters
-  void select(Eigen::MatrixXd data,
+  void select(const Eigen::MatrixXd& data,
               const FitControlsVinecop& controls = FitControlsVinecop());
 
   DEPRECATED void select_all(
-    Eigen::MatrixXd data,
+    const Eigen::MatrixXd& data,
     const FitControlsVinecop& controls = FitControlsVinecop());
 
   DEPRECATED void select_families(
-    Eigen::MatrixXd data,
+    const Eigen::MatrixXd& data,
     const FitControlsVinecop& controls = FitControlsVinecop());
 
   // Getters for a single pair copula
