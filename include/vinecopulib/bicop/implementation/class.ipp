@@ -577,9 +577,9 @@ Bicop::set_var_types(const std::vector<std::string>& var_types)
   var_types_ = var_types;
   if (bicop_) {
     bicop_->set_var_types(var_types);
-  }
-  if (tools_stl::is_member(static_cast<size_t>(rotation_), { 90, 270 })) {
-    flip_var_types();
+    if (tools_stl::is_member(static_cast<size_t>(rotation_), { 90, 270 })) {
+      flip_var_types();
+    }
   }
 }
 
