@@ -34,8 +34,6 @@ jobs:
         shell: bash
       - name: Setup-R
         uses: r-lib/actions/setup-r@master
-      - name: Install VineCopula
-        run: 
       - name: Install other dependencies
         run:   |
           if [ "${{ matrix.cfg.os }}" == "ubuntu-latest" ]; then
