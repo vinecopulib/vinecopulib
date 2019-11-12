@@ -62,8 +62,8 @@ jobs:
             wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip
             7z x 3.3.2.zip -o"C:\projects" -y > nul
             choco install r.project
-            set PATH="${PATH};C:\\Program Files\\R\\R-3.6.1\\bin"
-            echo "::add-path::C:\\Program Files\\R\\R-3.6.1\\bin"
+            set PATH="${PATH}:/c/Program Files/R/R-3.6.1/bin"
+            echo "::add-path::/c/Program Files/R/R-3.6.1/bin"
             echo "${PATH}"
             Rscript.exe -e 'install.packages("VineCopula")'
           fi
