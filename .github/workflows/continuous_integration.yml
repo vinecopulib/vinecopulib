@@ -37,36 +37,22 @@ jobs:
       - name: Install other dependencies
         run:   |
           if [ "${{ matrix.cfg.os }}" == "ubuntu-latest" ]; then
-            # sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
             sudo apt-get update
             sudo apt-get install --no-install-recommends -y lcov libgsl0-dev libeigen3-dev libboost-all-dev
             sudo apt-get install --no-install-recommends -y --allow-unauthenticated g++ clang
-            # sudo apt-get install --no-install-recommends -y --allow-unauthenticated r-base-dev r-cran-vinecopula
             sudo apt-get autoremove
           elif [ "${{ matrix.cfg.os }}" == "macos-latest" ]; then
             brew update
             brew install gcc lcov eigen gsl doxygen graphviz boost
-            # mkdir ~/.R
-            # touch ~/.R/Makevars
-            # echo "CC=/usr/local/bin/gcc-9" >> ~/.R/Makevars
-            # echo "CXX=/usr/local/bin/g++-9" >> ~/.R/Makevars
-            # echo "CXX11=/usr/local/bin/g++-9" >> ~/.R/Makevars
-            # echo "FC=/usr/local/bin/gfortran-9" >> ~/.R/Makevars
-            # echo "F77=/usr/local/bin/gfortran-9" >> ~/.R/Makevars
-            # cat ~/.R/Makevars
-            # sudo Rscript -e 'install.packages("VineCopula", repos=c("http://cran.rstudio.com/", "http://macos.rbind.io"))'
+            brew link --overwrite gcc
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
             choco install wget
             wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip
             7z x 3.3.2.zip -o"C:\projects" -y > nul
-            # choco install r.project
-            # set PATH="${PATH}:/c/Program Files/R/R-3.6.1/bin"
-            # echo "::add-path::/c/Program Files/R/R-3.6.1/bin"
-            # "/c/Program Files/R/R-3.6.1/bin/Rscript.exe" -e 'install.packages("VineCopula", repos="http://cran.rstudio.com/")'
           fi
-          Rscript -e "install.packages('VineCopula')"
+          Rscript -e "install.packages('VineCopula', repos='http://cran.rstudio.com/')"
           # Install wdm
           git clone https://github.com/tnagler/wdm.git
           cd wdm && mkdir build && cd build
