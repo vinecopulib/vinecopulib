@@ -64,7 +64,7 @@ protected:
 
   void flip() override;
 
-  Eigen::MatrixXd tau_to_parameters(const double& tau);
+  Eigen::MatrixXd tau_to_parameters(const double& tau) override;
 
   std::shared_ptr<tools_interpolation::InterpolationGrid> interp_grid_;
   double npars_;
