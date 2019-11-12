@@ -115,6 +115,6 @@ jobs:
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             cd examples/bicop
             mkdir build && cd build && cmake .. && make
-            bin/main
+            ../bin/main
           fi
         shell: bash
