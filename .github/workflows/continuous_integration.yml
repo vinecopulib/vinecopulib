@@ -56,8 +56,6 @@ jobs:
             # echo "options(repos = c(CRAN = 'https://cran.rstudio.com', CRANextra = 'https://macos.rbind.io'))" >> ~/.Rprofile
             # echo "options(repos = c(CRAN = 'http://cran.rstudio.com', CRANextra = 'http://macos.rbind.io'))" >> ~/.Rprofile
             # cat ~/.Rprofile
-            # set PATH="${PATH};C:\path\to\directory\"
-            # echo "::add-path::C:\\path\\to\\directory\\"
             sudo Rscript -e 'install.packages("VineCopula", type = "mac.binary", repos=c("http://cran.rstudio.com/", "http://macos.rbind.io"))'
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
@@ -66,7 +64,9 @@ jobs:
             wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip
             7z x 3.3.2.zip -o"C:\projects" -y > nul
             choco install r.project
-            Rscript -e 'install.packages("VineCopula", type = "binary")'
+            set PATH="${PATH};C:\\Program Files\\R\\R-3.6.1\\bin"
+            echo "::add-path::C:\\Program Files\\R\\R-3.6.1\\bin"
+            Rscript.exe -e 'install.packages("VineCopula", type = "binary")'
           fi
           
           # Install wdm
