@@ -9,12 +9,12 @@ jobs:
       max-parallel: 8 
       matrix:
         cfg:
-          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, cmake-prefix: "/usr" }
-          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, cmake-prefix: "/usr" }
-          - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64, cmake-prefix: "/usr/local" }
-          - { os: macos-latest,    name: Clang,  cc: clang, cxx: clang++, platform: x64, cmake-prefix: "/usr/local" }
-          - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32, cmake-prefix: "C:\projects" }
-          - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64, cmake-prefix: "C:\projects" }
+          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
+          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64}
+          - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
+          - { os: macos-latest,    name: Clang,  cc: clang, cxx: clang++, platform: x64}
+          - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32}
+          - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64}
 
     runs-on: ${{ matrix.cfg.os }}
     name:    ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
