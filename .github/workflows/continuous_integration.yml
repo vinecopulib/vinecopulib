@@ -100,7 +100,7 @@ jobs:
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
         with:
           token: ${{secrets.CODECOV_TOKEN}}
-          file: vinecopulib/debug/coverage.info 
+          file: debug/coverage.info 
       - name: Compile and test the release version
         run:   |
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
