@@ -60,6 +60,7 @@ jobs:
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
+            choco install wget
             wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
             7z x eigen.zip -o"C:\projects" -y > nul
             choco install r.project
