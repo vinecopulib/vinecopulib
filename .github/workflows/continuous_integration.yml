@@ -61,8 +61,8 @@ jobs:
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
             choco install wget
-            wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip eigen.zip
-            7z x eigen.zip -o"C:\projects" -y > nul
+            wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip
+            7z x 3.3.2.zip -o"C:\projects" -y > nul
             choco install r.project
             Rscript -e 'install.packages("VineCopula", type = "binary")'
           fi
@@ -73,7 +73,7 @@ jobs:
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             cmake .. && sudo make install
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX=C:\wdm-install
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX=C:\projects\wdm-install
             echo '::set-env name=PATH_ORIG::${PATH}'
             cmake --build . --config Release --target install
           fi
