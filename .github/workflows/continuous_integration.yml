@@ -1,0 +1,113 @@
+name: Continuous integration 
+
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      max-parallel: 8 
+      matrix:
+        cfg:
+          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, cmake-prefix: "/usr" }
+          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, cmake-prefix: "/usr" }
+          - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64, cmake-prefix: "/usr/local" }
+          - { os: macos-latest,    name: Clang,  cc: clang, cxx: clang++, platform: x64, cmake-prefix: "/usr/local" }
+          # - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32, cmake-prefix: "C:\projects" }
+          # - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64, cmake-prefix: "C:\projects" }
+
+    runs-on: ${{ matrix.cfg.os }}
+    name:    ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
+    steps:
+      - name: Set environment variables
+        run:   |
+          echo '::set-env name=CC::${{ matrix.cfg.cc }}'
+          echo '::set-env name=CXX::${{ matrix.cfg.cxx }}'
+      - name: Set-up R
+        uses: r-lib/actions/setup-r@v1
+        with: 
+          r-version: '3.5.3' # The R version (if necessary).
+      - name: Install required dependencies
+        run:   |
+          if [ "${{ matrix.cfg.os }}" == "ubuntu-latest" ]; then
+            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+            # sudo add-apt-repository -y ppa:marutter/rrutter3.5 
+            sudo add-apt-repository -y ppa:marutter/c2d4u3.5
+            sudo apt-get update
+            sudo apt-get install --no-install-recommends -y lcov libgsl0-dev libeigen3-dev libboost-all-dev
+            sudo apt-get install --no-install-recommends -y --allow-unauthenticated g++ clang
+            # sudo apt-get install --no-install-recommends -y --allow-unauthenticated r-base-dev r-cran-vinecopula
+            sudo apt-get install --no-install-recommends -y --allow-unauthenticated r-cran-vinecopula
+            sudo apt-get autoremove
+          elif [ "${{ matrix.cfg.os }}" == "macos-latest" ]; then
+            brew update
+            # brew install gcc lcov eigen gsl r doxygen graphviz boost
+            brew install gcc lcov eigen gsl doxygen graphviz boost
+            mkdir ~/.R
+            touch ~/.R/Makevars
+            echo "CC=/usr/local/bin/gcc-9" >> ~/.R/Makevars
+            echo "CXX=/usr/local/bin/g++-9" >> ~/.R/Makevars
+            echo "CXX11=/usr/local/bin/g++-9" >> ~/.R/Makevars
+            echo "FC=/usr/local/bin/gfortran-9" >> ~/.R/Makevars
+            echo "F77=/usr/local/bin/gfortran-9" >> ~/.R/Makevars
+            cat ~/.R/Makevars
+            echo "options(repos = c(CRAN = 'https://cran.rstudio.com', CRANextra = 'https://macos.rbind.io'))" >> ~/.Rprofile
+            cat ~/.Rprofile
+            sudo Rscript -e 'install.packages("VineCopula", type = "mac.binary")'
+          elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
+            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.platform-vcvars }}
+            choco upgrade cmake
+            # choco install r.project
+            sudo Rscript -e 'install.packages("VineCopula", type = "binary")'
+            # INSTALL VINECOPULA
+            wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip -OutFile eigen.zip
+
+          fi
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            # Install wdm
+            git clone https://github.com/tnagler/wdm.git
+            cd wdm && mkdir build && cd build
+            cmake .. && sudo make install && cd ../..
+          fi
+        shell: bash
+      - name: Checkout project 
+        uses: actions/checkout@v1
+        with:
+          submodules: recursive
+      - name: Compile the debug version
+        run:   |
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            mkdir debug && cd debug
+            if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
+              cmake .. -DCODE_COVERAGE=ON -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+              make vinecopulib_coverage
+            else
+              cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+              make
+            fi
+            cd ..
+          fi
+        shell: bash
+      - name: Code coverage
+        uses: codecov/codecov-action@v1.0.3
+        if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          file: vinecopulib/debug/coverage.info 
+      - name: Compile and test the release version
+        run:   |
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            mkdir release && cd release
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make
+            bin/test_all
+          fi
+        shell: bash        
+      - name: Install the release version and test the install
+        run:   |
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            sudo make install
+            cd ../examples/bicop
+            mkdir build && cd build && cmake .. && make
+            bin/main
+          fi
+        shell: bash
