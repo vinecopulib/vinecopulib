@@ -106,15 +106,14 @@ jobs:
         run:   |
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             mkdir release && cd release
-            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make && sudo make install
             bin/test_all
           fi
         shell: bash        
       - name: Install the release version and test the install
         run:   |
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            sudo make install
-            cd ../examples/bicop
+            cd examples/bicop
             mkdir build && cd build && cmake .. && make
             bin/main
           fi
