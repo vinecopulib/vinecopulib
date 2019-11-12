@@ -53,7 +53,8 @@ jobs:
             echo "FC=/usr/local/bin/gfortran-9" >> ~/.R/Makevars
             echo "F77=/usr/local/bin/gfortran-9" >> ~/.R/Makevars
             cat ~/.R/Makevars
-            echo "options(repos = c(CRAN = 'https://cran.rstudio.com', CRANextra = 'https://macos.rbind.io'))" >> ~/.Rprofile
+            # echo "options(repos = c(CRAN = 'https://cran.rstudio.com', CRANextra = 'https://macos.rbind.io'))" >> ~/.Rprofile
+            echo "options(repos = c(CRAN = 'http://cran.rstudio.com', CRANextra = 'http://macos.rbind.io'))" >> ~/.Rprofile
             cat ~/.Rprofile
             sudo Rscript -e 'install.packages("VineCopula", type = "mac.binary")'
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
