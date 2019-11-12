@@ -54,7 +54,7 @@ jobs:
             echo "FC=/usr/local/bin/gfortran-9" >> ~/.R/Makevars
             echo "F77=/usr/local/bin/gfortran-9" >> ~/.R/Makevars
             cat ~/.R/Makevars
-            sudo Rscript -e 'install.packages("VineCopula", type = "mac.binary", repos=c("http://cran.rstudio.com/", "http://macos.rbind.io"))'
+            sudo Rscript -e 'install.packages("VineCopula", type = "binary", repos=c("http://cran.rstudio.com/", "http://macos.rbind.io"))'
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
