@@ -24,6 +24,7 @@ jobs:
           echo '::set-env name=CC::${{ matrix.cfg.cc }}'
           echo '::set-env name=CXX::${{ matrix.cfg.cxx }}'
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
+            echo '::set-env name=CMAKE_GEN_PLAT::x64'
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
               echo '::set-env name=CMAKE_GEN_PLAT::x64'
             else
@@ -53,9 +54,6 @@ jobs:
             echo "FC=/usr/local/bin/gfortran-9" >> ~/.R/Makevars
             echo "F77=/usr/local/bin/gfortran-9" >> ~/.R/Makevars
             cat ~/.R/Makevars
-            # echo "options(repos = c(CRAN = 'https://cran.rstudio.com', CRANextra = 'https://macos.rbind.io'))" >> ~/.Rprofile
-            # echo "options(repos = c(CRAN = 'http://cran.rstudio.com', CRANextra = 'http://macos.rbind.io'))" >> ~/.Rprofile
-            # cat ~/.Rprofile
             sudo Rscript -e 'install.packages("VineCopula", type = "mac.binary", repos=c("http://cran.rstudio.com/", "http://macos.rbind.io"))'
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
@@ -66,6 +64,7 @@ jobs:
             choco install r.project
             set PATH="${PATH};C:\\Program Files\\R\\R-3.6.1\\bin"
             echo "::add-path::C:\\Program Files\\R\\R-3.6.1\\bin"
+            echo "${PATH}"
             Rscript.exe -e 'install.packages("VineCopula")'
           fi
           
