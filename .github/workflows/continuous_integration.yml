@@ -57,7 +57,7 @@ jobs:
             sudo Rscript -e 'install.packages("VineCopula", type = "mac.binary")'
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
-            choco upgrade cmake
+            # choco upgrade cmake
             7z x eigen.zip -o"C:\projects" -y > nul
             choco install r.project
             sudo Rscript -e 'install.packages("VineCopula", type = "binary")'
