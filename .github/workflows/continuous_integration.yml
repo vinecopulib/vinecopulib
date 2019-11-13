@@ -52,6 +52,8 @@ jobs:
             brew update
             brew install gcc lcov eigen gsl doxygen graphviz boost
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
+            echo "${WDM_CMAR_DIR}"
+            echo "${EIGEN3_INCLUDE_DIR}"
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
             choco install wget
