@@ -34,6 +34,8 @@ jobs:
             else
               echo '::set-env name=CMAKE_GEN_PLAT::Win32'
             fi
+            echo '::set-env name=WDM_CMAKE_DIR::"C:\\projects\\wdm-install\\lib\\cmake"'
+            echo '::set-env name=EIGEN3_INCLUDE_DIR="C:\\projects\\eigen-eigen-da9b4e14c255"'
           fi
         shell: bash
       - name: Setup-R
@@ -81,7 +83,7 @@ jobs:
               make
             fi
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug"
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
             echo '::set-env name=PATH_ORIG::${PATH}'
             cmake --build . --config Debug
           fi
@@ -99,7 +101,7 @@ jobs:
             cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make && sudo make install
             bin/test_all
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release"
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
             cmake --build . --config Release
             bin\Release\test_all.exe
             cmake --build . --config Release --target install
@@ -113,7 +115,7 @@ jobs:
             cmake .. && make
             ../bin/main
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_PREFIX_PATH="C:\\projects\\vinecopulib-release;C:\\projects\\wdm-install\\lib\\cmake" 
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_PREFIX_PATH="C:\\projects\\vinecopulib-release;${WDM_CMAKE_DIR}" 
             cmake --build . --config Release
             ../bin/Release/main.exe
           fi
