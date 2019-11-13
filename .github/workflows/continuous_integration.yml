@@ -101,7 +101,7 @@ jobs:
             cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make && sudo make install
             bin/test_all
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
+            cmake .. -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
             cmake --build . --config Release
             "bin/Release/test_all.exe"
             cmake --build . --config Release --target install
