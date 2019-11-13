@@ -9,10 +9,10 @@ jobs:
       max-parallel: 6 
       matrix:
         cfg:
-          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
-          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64}
-          - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
-          - { os: macos-latest,    name: Clang,  cc: clang, cxx: clang++, platform: x64}
+          # - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
+          # - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64}
+          # - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
+          # - { os: macos-latest,    name: Clang,  cc: clang, cxx: clang++, platform: x64}
           - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32}
           - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64}
 
@@ -30,6 +30,7 @@ jobs:
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             echo '::set-env name=CMAKE_GEN_PLAT::x64'
             echo '::set-env name=WDM_CMAKE_DIR::C:\projects\wdm-install\lib\cmake'
+            echo '::set-env name=EIGEN3_ROOT=C:\projects\eigen-eigen-da9b4e14c255'
             echo '::set-env name=EIGEN3_INCLUDE_DIR=C:\projects\eigen-eigen-da9b4e14c255'
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
               echo '::set-env name=CMAKE_GEN_PLAT::x64'
