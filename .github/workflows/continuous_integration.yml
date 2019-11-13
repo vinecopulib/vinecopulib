@@ -19,10 +19,6 @@ jobs:
     runs-on: ${{ matrix.cfg.os }}
     name:    ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
     steps:
-      - name: Checkout project 
-        uses: actions/checkout@v1
-        with:
-          submodules: recursive
       - name: Set environment variables
         run:   |
           echo '::set-env name=CC::${{ matrix.cfg.cc }}'
@@ -46,9 +42,9 @@ jobs:
             sudo apt-get install --no-install-recommends -y --allow-unauthenticated g++ clang
             sudo apt-get autoremove
           elif [ "${{ matrix.cfg.os }}" == "macos-latest" ]; then
-            rm '/usr/local/bin/gfortran'
             brew update
             brew install gcc lcov eigen gsl doxygen graphviz boost
+            brew link --overwrite gcc
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
@@ -63,16 +59,20 @@ jobs:
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             cmake .. && sudo make install
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\wdm-install"
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX=C:\projects\wdm-install
             echo '::set-env name=PATH_ORIG::${PATH}'
             cmake --build . --config Release --target install
           fi
           cd ../..
         shell: bash
+      - name: Checkout project 
+        uses: actions/checkout@v1
+        with:
+          submodules: recursive
       - name: Compile the debug version
         run:   |
+          mkdir debug && cd debug
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            mkdir debug && cd debug
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
               cmake .. -DCODE_COVERAGE=ON -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
               make vinecopulib_coverage
@@ -80,6 +80,10 @@ jobs:
               cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
               make
             fi
+          else
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-debug
+            echo '::set-env name=PATH_ORIG::${PATH}'
+            cmake --build . --config Debug
           fi
         shell: bash
       - name: Code coverage
@@ -90,17 +94,27 @@ jobs:
           file: debug/coverage.info 
       - name: Compile and test the release version
         run:   |
+          mkdir release && cd release
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            mkdir release && cd release
             cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make && sudo make install
             bin/test_all
+          else
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX=C:\projects\vinecopulib-release
+            cmake --build . --config Release
+            bin\Release\test_all.exe
+            cmake --build . --config Release --target install
           fi
         shell: bash        
       - name: Install the release version and test the install
         run:   |
+          cd examples/bicop
+          mkdir build && cd build
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            cd examples/bicop
-            mkdir build && cd build && cmake .. && make
+            cmake .. && make
             ../bin/main
+          else
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_PREFIX_PATH="C:\projects\vinecopulib-release;C:/projects/wdm-install/lib/cmake" 
+            cmake --build . --config Release
+            ../bin/Release/main.exe
           fi
         shell: bash
