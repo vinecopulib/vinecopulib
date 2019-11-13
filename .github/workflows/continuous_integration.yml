@@ -30,7 +30,6 @@ jobs:
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             echo '::set-env name=CMAKE_GEN_PLAT::x64'
             echo '::set-env name=WDM_CMAKE_DIR::C:\projects\wdm-install\lib\cmake'
-            echo '::set-env name=EIGEN3_ROOT::C:\projects\eigen-eigen-da9b4e14c255'
             echo '::set-env name=EIGEN3_INCLUDE_DIR::C:\projects\eigen-eigen-da9b4e14c255'
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
               echo '::set-env name=CMAKE_GEN_PLAT::x64'
@@ -53,8 +52,6 @@ jobs:
             brew update
             brew install gcc lcov eigen gsl doxygen graphviz boost
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
-            echo "${WDM_CMAR_DIR}"
-            echo "${EIGEN3_INCLUDE_DIR}"
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
             choco install wget
@@ -106,7 +103,7 @@ jobs:
           else
             cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
             cmake --build . --config Release
-            bin\Release\test_all.exe
+            "bin/Release/test_all.exe"
             cmake --build . --config Release --target install
           fi
         shell: bash        
@@ -120,6 +117,6 @@ jobs:
           else
             cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="C:\\projects\\vinecopulib-release;${WDM_CMAKE_DIR}" 
             cmake --build . --config Release
-            ../bin/Release/main.exe
+            "../bin/Release/main.exe"
           fi
         shell: bash
