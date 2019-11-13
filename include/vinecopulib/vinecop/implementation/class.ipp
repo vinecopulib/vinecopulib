@@ -1186,7 +1186,7 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
     } else if (n_disc == 1) {
       msg << "1 discrete variable)." << std::endl;
     } else {
-      msg << get_n_discrete() << "discrete variables)." << std::endl;
+      msg << get_n_discrete() << " discrete variables)." << std::endl;
     }
     throw std::runtime_error(msg.str());
   }
