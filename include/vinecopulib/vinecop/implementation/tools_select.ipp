@@ -580,7 +580,7 @@ VinecopSelector::add_pc_info(const EdgeIterator& e, VineTree& tree)
   tree[e].pc_data.col(0) = get_hfunc(tree[v0], pos0);
   tree[e].pc_data.col(1) = get_hfunc(tree[v1], pos1);
   if ((tree[e].var_types[0] == "d") | (tree[e].var_types[1] == "d")) {
-    tree[e].pc_data.conservativeResize(n, 4); 
+    tree[e].pc_data.conservativeResize(n, 4);
     tree[e].pc_data.col(2) = get_hfunc_sub(tree[v0], pos0);
     tree[e].pc_data.col(3) = get_hfunc_sub(tree[v1], pos1);
   }

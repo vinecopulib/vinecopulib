@@ -184,8 +184,8 @@ cef(const Eigen::VectorXd& x,
 
 //! alternating conditional expectation algorithm
 inline Eigen::MatrixXd
-ace(const Eigen::MatrixXd& data, // data
-    const Eigen::VectorXd& weights = Eigen::VectorXd(),   // weights
+ace(const Eigen::MatrixXd& data,                        // data
+    const Eigen::VectorXd& weights = Eigen::VectorXd(), // weights
     size_t wl = 0,                // window length for the smoother
     size_t outer_iter_max = 100,  // max number of outer iterations
     size_t inner_iter_max = 10,   // max number of inner iterations
@@ -290,8 +290,7 @@ ace(const Eigen::MatrixXd& data, // data
 
 //! calculates the pairwise maximum correlation coefficient.
 inline double
-pairwise_mcor(const Eigen::MatrixXd& x,
-              const Eigen::VectorXd& weights)
+pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 {
   Eigen::MatrixXd phi = ace(x, weights);
   return wdm::wdm(phi, "cor", weights)(0, 1);
@@ -409,7 +408,7 @@ sobol(const size_t& n, const size_t& d, std::vector<int> seeds)
 
   // Evalulate X scaled by pow(2,32)
   Eigen::Matrix<size_t, Eigen::Dynamic, 1> X(n);
-  X(0) = scrambling(0) * std::pow(2.0, 32);
+  X(0) = static_cast<size_t>(scrambling(0) * std::pow(2.0, 32));
   for (size_t i = 1; i < n; i++) {
     X(i) = X(i - 1) ^ V(C(i - 1) - 1);
   }
@@ -438,7 +437,7 @@ sobol(const size_t& n, const size_t& d, std::vector<int> seeds)
     }
 
     // Evalulate X
-    X(0) = scrambling(j + 1) * std::pow(2.0, 32);
+    X(0) = static_cast<size_t>(scrambling(j + 1) * std::pow(2.0, 32));
     for (size_t i = 1; i < n; i++)
       X(i) = X(i - 1) ^ V(C(i - 1) - 1);
     output.block(0, j + 1, n, 1) = X.cast<double>();

@@ -605,7 +605,7 @@ Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
                         (1 - psis.array()).log())
                        .sum();
 
-  return std::log(nobs) * npars - 2 * log_prior;
+  return std::log(nobs) * npars - 2.0 * log_prior;
 }
 
 //! @brief extracts the threshold (usually zero except `select_threshold ==
@@ -969,7 +969,7 @@ Vinecop::mbicv(const Eigen::MatrixXd& u,
 
   double n = static_cast<double>(u.rows());
   double ll = this->loglik(u, num_threads);
-  return -2 * ll + this->calculate_mbicv_penalty(n, psi0);
+  return -2.0 * ll + this->calculate_mbicv_penalty(n, psi0);
 }
 
 //! @brief returns sum of the number of parameters for all pair copulas (see
