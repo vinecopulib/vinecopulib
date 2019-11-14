@@ -48,10 +48,16 @@ jobs:
         shell: bash
       # - name: Setup-R
         # uses: r-lib/actions/setup-r@master
-      - name: Install other dependencies
+      - name: Check path
+        run:   |
+          $env:path 
+        shell: ps
+      - name: Check path
         run:   |
           echo "${PATH}"
-          echo "${PATH}"
+        shell: bash
+      - name: Install other dependencies
+        run:   |
           if [ "${{ matrix.cfg.os }}" == "ubuntu-latest" ]; then
             sudo apt-get update
             sudo apt-get install --no-install-recommends -y lcov libgsl0-dev libeigen3-dev libboost-all-dev
