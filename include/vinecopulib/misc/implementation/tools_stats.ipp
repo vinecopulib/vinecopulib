@@ -109,7 +109,8 @@ to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
         ++reps;
       // assign average rank of the tied values
       for (size_t k = 0; k < reps; ++k)
-        x[order[i + k]] = i + 1 + (reps - 1) / 2.0;
+        x[order[i + k]] = static_cast<double>(i) + 1.0 +
+                          (static_cast<double>(reps) - 1.0) / 2.0;
     }
   } else if (ties_method == "random") {
     // set up random number generator
@@ -133,7 +134,7 @@ to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
     throw std::runtime_error(msg.str().c_str());
   }
 
-  return x / (x.size() + 1.0);
+  return x / (static_cast<double>(x.size()) + 1.0);
 }
 
 //! window smoother
@@ -408,7 +409,7 @@ sobol(const size_t& n, const size_t& d, std::vector<int> seeds)
 
   // Evalulate X scaled by pow(2,32)
   Eigen::Matrix<size_t, Eigen::Dynamic, 1> X(n);
-  X(0) = scrambling(0) * std::pow(2.0, 32);
+  X(0) = static_cast<size_t>(scrambling(0) * std::pow(2.0, 32));
   for (size_t i = 1; i < n; i++) {
     X(i) = X(i - 1) ^ V(C(i - 1) - 1);
   }
@@ -437,7 +438,7 @@ sobol(const size_t& n, const size_t& d, std::vector<int> seeds)
     }
 
     // Evalulate X
-    X(0) = scrambling(j + 1) * std::pow(2.0, 32);
+    X(0) = static_cast<size_t>(scrambling(j + 1) * std::pow(2.0, 32));
     for (size_t i = 1; i < n; i++)
       X(i) = X(i - 1) ^ V(C(i - 1) - 1);
     output.block(0, j + 1, n, 1) = X.cast<double>();
@@ -513,18 +514,19 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
       btpdhk = sqrt(xnhk * (1 - xnhk)) * 2 / 3.14159265358979323844;
       size_t i1 = static_cast<size_t>(nu / 2);
       for (size_t j = 1; j <= i1; ++j) {
+        double jj = static_cast<double>(j << 1);
         bvt += gmph * (ks * btnckh + 1);
         bvt += gmpk * (hs * btnchk + 1);
         btnckh += btpdkh;
-        btpdkh = (j << 1) * btpdkh * (1 - xnkh) / ((j << 1) + 1);
+        btpdkh = jj * btpdkh * (1 - xnkh) / (jj + 1);
         btnchk += btpdhk;
-        btpdhk = (j << 1) * btpdhk * (1 - xnhk) / ((j << 1) + 1);
+        btpdhk = jj * btpdhk * (1 - xnhk) / (jj + 1);
         /* Computing 2nd power */
         d1 = h;
-        gmph = gmph * ((j << 1) - 1) / ((j << 1) * (d1 * d1 / nu + 1));
+        gmph = gmph * (jj - 1) / (jj * (d1 * d1 / nu + 1));
         /* Computing 2nd power */
         d1 = k;
-        gmpk = gmpk * ((j << 1) - 1) / ((j << 1) * (d1 * d1 / nu + 1));
+        gmpk = gmpk * (jj - 1) / (jj * (d1 * d1 / nu + 1));
       }
     } else {
       /* Computing 2nd power */
@@ -553,18 +555,19 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
       btpdhk = btnchk;
       size_t i1 = static_cast<size_t>((nu - 1) / 2);
       for (size_t j = 1; j <= i1; ++j) {
+        double jj = static_cast<double>(j << 1);
         bvt += gmph * (ks * btnckh + 1);
         bvt += gmpk * (hs * btnchk + 1);
-        btpdkh = ((j << 1) - 1) * btpdkh * (1 - xnkh) / (j << 1);
+        btpdkh = (jj - 1) * btpdkh * (1 - xnkh) / jj;
         btnckh += btpdkh;
-        btpdhk = ((j << 1) - 1) * btpdhk * (1 - xnhk) / (j << 1);
+        btpdhk = (jj - 1) * btpdhk * (1 - xnhk) / jj;
         btnchk += btpdhk;
         /* Computing 2nd power */
         d1 = h;
-        gmph = (j << 1) * gmph / (((j << 1) + 1) * (d1 * d1 / nu + 1));
+        gmph = jj * gmph / ((jj + 1) * (d1 * d1 / nu + 1));
         /* Computing 2nd power */
         d1 = k;
-        gmpk = (j << 1) * gmpk / (((j << 1) + 1) * (d1 * d1 / nu + 1));
+        gmpk = jj * gmpk / ((jj + 1) * (d1 * d1 / nu + 1));
       }
     }
     return bvt;
