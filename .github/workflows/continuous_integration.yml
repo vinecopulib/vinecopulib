@@ -31,14 +31,8 @@ jobs:
             echo '::set-env name=CMAKE_GEN_PLAT::x64'
             echo '::set-env name=WDM_CMAKE_DIR::C:\projects\wdm-install\lib\cmake'
             echo '::set-env name=EIGEN3_INCLUDE_DIR::C:\projects\eigen-eigen-da9b4e14c255'
-            echo '::add-path::D:/a/vinecopulib/vinecopulib/release'
-            echo '::add-path::/d/a/vinecopulib/vinecopulib/release'
-            echo '::add-path::D:/a/vinecopulib/vinecopulib/release/Release'
-            echo '::add-path::/d/a/vinecopulib/vinecopulib/release/Release'
             echo '::add-path::D:\a\vinecopulib\vinecopulib\release'
             echo '::add-path::D:\a\vinecopulib\vinecopulib\release\Release'
-            echo '::add-path::D:\\a\\vinecopulib\\vinecopulib\\release'
-            echo '::add-path::D:\\a\\vinecopulib\\vinecopulib\\release\\Release'
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
               echo '::set-env name=CMAKE_GEN_PLAT::x64'
             else
@@ -48,14 +42,6 @@ jobs:
         shell: bash
       # - name: Setup-R
         # uses: r-lib/actions/setup-r@master
-      - name: Check path
-        run:   |
-          $env:path 
-        shell: powershell
-      - name: Check path
-        run:   |
-          echo "${PATH}"
-        shell: bash
       - name: Install other dependencies
         run:   |
           if [ "${{ matrix.cfg.os }}" == "ubuntu-latest" ]; then
@@ -116,10 +102,13 @@ jobs:
             cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make && sudo make install
             bin/test_all
           else
+            echo "${PATH}"
             cmake .. -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
-            set PATH_ORIG="${PATH}"
+            # set PATH_ORIG="${PATH}"
+            echo "${PATH}"
             cmake --build . --config Release
-                        "bin/Release/test_all.exe"
+            echo "${PATH}"
+            "bin/Release/test_all.exe"
             cmake --build . --config Release --target install
           fi
         shell: bash        
