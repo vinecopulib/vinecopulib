@@ -1,5 +1,5 @@
 # vinecopulib
-[![Build Status](https://github.com/vinecopulib/vinecopulib/workflows/.github/workflows/continuous_integration.yml/badge.svg)](https://github.com/vinecopulib/vinecopulib/actions)
+[![](https://github.com/vinecopulib/vinecopulib/workflows/Build%20Status/badge.svg)](https://github.com/vinecopulib/vinecopulib/actions)
 [![Coverage Status](https://img.shields.io/codecov/c/github/vinecopulib/vinecopulib/master.svg)](https://codecov.io/github/vinecopulib/vinecopulib?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
