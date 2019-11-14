@@ -1,7 +1,7 @@
 if(NOT WIN32)
 
     if(STRICT_COMPILER AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        set(CMAKE_CXX_FLAGS                "-std=gnu++11 -Wno-delete-non-virtual-dtor -Wall -Wextra")
+        set(CMAKE_CXX_FLAGS                "-std=gnu++11 -Wno-delete-non-virtual-dtor -Wall -Wextra -Wconversion")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wstrict-aliasing -pedantic -fmax-errors=5 -Werror=return-type")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wunreachable-code -Wcast-align -Wcast-qual")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op")
