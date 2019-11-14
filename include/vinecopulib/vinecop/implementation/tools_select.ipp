@@ -594,9 +594,9 @@ VinecopSelector::add_pc_info(const EdgeIterator& e, VineTree& tree)
 }
 
 inline Eigen::VectorXd
-VinecopSelector::get_hfunc(const VertexProperties& vertex_data, bool pos)
+VinecopSelector::get_hfunc(const VertexProperties& vertex_data, bool is_first)
 {
-  if (pos) {
+  if (is_first) {
     return vertex_data.hfunc1;
   } else {
     return vertex_data.hfunc2;
@@ -604,7 +604,8 @@ VinecopSelector::get_hfunc(const VertexProperties& vertex_data, bool pos)
 }
 
 inline Eigen::VectorXd
-VinecopSelector::get_hfunc_sub(const VertexProperties& vertex_data, bool pos)
+VinecopSelector::get_hfunc_sub(const VertexProperties& vertex_data,
+                               bool is_first)
 {
   if (pos) {
     if (vertex_data.hfunc1_sub.size()) {
