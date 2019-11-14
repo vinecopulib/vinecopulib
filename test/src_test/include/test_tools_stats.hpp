@@ -46,6 +46,7 @@ TEST(test_tools_stats, qrng_are_correct)
   size_t d = 2;
   size_t n = 10;
   size_t N = 1000;
+  double Nd = static_cast<double>(N);
 
   auto cop = Bicop(BicopFamily::gaussian);
   auto u = cop.simulate(n);
@@ -60,11 +61,11 @@ TEST(test_tools_stats, qrng_are_correct)
       return (u1 <= u(i, 0) && u2 <= u(i, 1)) ? 1.0 : 0.0;
     };
     x = U.col(0).binaryExpr(cop.hinv1(U), f);
-    p(i) = x.sum() / N;
+    p(i) = x.sum() / Nd;
     x = U1.col(0).binaryExpr(cop.hinv1(U1), f);
-    p1(i) = x.sum() / N;
+    p1(i) = x.sum() / Nd;
     x2 = U2.col(0).binaryExpr(cop.hinv1(U2), f);
-    p2(i) = x2.sum() / N;
+    p2(i) = x2.sum() / Nd;
   }
 
   x = cop.cdf(u);
