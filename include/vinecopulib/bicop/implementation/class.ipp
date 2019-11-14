@@ -350,7 +350,7 @@ inline double
 Bicop::bic(const Eigen::MatrixXd& u) const
 {
   Eigen::MatrixXd u_no_nan = u;
-  double n = nobs_;
+  double n = static_cast<double>(nobs_);
   if (u.rows() > 0) {
     tools_eigen::remove_nans(u_no_nan);
     n = static_cast<double>(u_no_nan.rows());
@@ -380,7 +380,7 @@ Bicop::mbic(const Eigen::MatrixXd& u, const double psi0) const
   double npars = this->get_npars();
   double log_prior = static_cast<double>(!is_indep) * std::log(psi0) +
                      static_cast<double>(is_indep) * std::log(1.0 - psi0);
-  double n = nobs_;
+  double n = static_cast<double>(nobs_);
   if (u.rows() > 0) {
     n = static_cast<double>(u_no_nan.rows());
   }
@@ -536,8 +536,8 @@ inline void
 Bicop::check_data_dim(const Eigen::MatrixXd& u) const
 {
   size_t n_cols = u.cols();
-  auto n_disc = get_n_discrete();
-  unsigned short n_cols_exp = 2 + n_disc;
+  int n_disc = get_n_discrete();
+  unsigned short n_cols_exp = static_cast<unsigned short>(2 + n_disc);
   if ((n_cols != n_cols_exp) & (n_cols != 4)) {
     std::stringstream msg;
     msg << "data has wrong number of columns; "
@@ -935,6 +935,6 @@ Bicop::get_n_discrete() const
   for (auto t : var_types_) {
     n_discrete += (t == "d");
   }
-  return n_discrete;
+  return static_cast<unsigned short>(n_discrete);
 }
 }

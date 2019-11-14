@@ -147,11 +147,9 @@ protected:
 
   Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
 
-  Eigen::VectorXd get_hfunc(const VertexProperties& vertex_data,
-                            unsigned short pos);
+  Eigen::VectorXd get_hfunc(const VertexProperties& vertex_data, bool pos);
 
-  Eigen::VectorXd get_hfunc_sub(const VertexProperties& vertex_data,
-                                unsigned short pos);
+  Eigen::VectorXd get_hfunc_sub(const VertexProperties& vertex_data, bool pos);
 
   ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
 
