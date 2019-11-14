@@ -605,7 +605,7 @@ Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
                         (1 - psis.array()).log())
                        .sum();
 
-  return std::log(nobs) * npars - 2 * log_prior;
+  return std::log(nobs) * npars - 2.0 * log_prior;
 }
 
 //! @brief extracts the threshold (usually zero except `select_threshold ==
@@ -746,7 +746,8 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
     }
 
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-      tools_interface::check_user_interrupt(u.rows() * d_ > 1e5);
+      tools_interface::check_user_interrupt(
+        static_cast<double>(u.rows()) * static_cast<double>(d_) > 1e5);
       for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
         tools_interface::check_user_interrupt(edge % 100 == 0);
         // extract evaluation point from hfunction matrices (have been
@@ -844,7 +845,7 @@ Vinecop::cdf(const Eigen::MatrixXd& u,
     tools_interface::check_user_interrupt(i % 1000 == 0);
     temp = u.block(i, 0, 1, d_);
     x = (u_sim.rowwise() - temp).rowwise().maxCoeff().array();
-    vine_distribution(i) = (x <= 0.0).count();
+    vine_distribution(i) = static_cast<double>((x <= 0.0).count());
   }
   return vine_distribution / static_cast<double>(N);
 }
@@ -967,9 +968,9 @@ Vinecop::mbicv(const Eigen::MatrixXd& u,
                const size_t num_threads) const
 {
 
-  double n = static_cast<double>(u.rows());
+  size_t n = u.rows();
   double ll = this->loglik(u, num_threads);
-  return -2 * ll + this->calculate_mbicv_penalty(n, psi0);
+  return -2.0 * ll + this->calculate_mbicv_penalty(n, psi0);
 }
 
 //! @brief returns sum of the number of parameters for all pair copulas (see
@@ -1021,7 +1022,8 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
   auto do_batch = [&](const tools_batch::Batch& b) {
     Eigen::MatrixXd u_e(b.size, 2);
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-      tools_interface::check_user_interrupt(n * d > 1e5);
+      tools_interface::check_user_interrupt(
+        static_cast<double>(n) * static_cast<double>(d) > 1e5);
       for (size_t edge = 0; edge < d - tree - 1; ++edge) {
         tools_interface::check_user_interrupt(edge % 100 == 0);
         // extract evaluation point from hfunction matrices (have been
@@ -1097,7 +1099,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   size_t bytes_required = (8 * 2 * n * d * d) + (8 * n * d) + (4 * 4 * d * d);
   // if the problem is too large (requires more than 1 GB memory), split
   // the data into two halves and call simulate on the reduced data.
-  if ((n > 1) & (bytes_required > 1e9)) {
+  if ((n > 1) & (bytes_required > static_cast<size_t>(1e9))) {
     size_t n_half = n / 2;
     size_t n_left = n - n_half;
     U_vine.block(0, 0, n_half, d) =
@@ -1127,7 +1129,8 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
     // loop through variables (0 is just the initial uniform)
     for (ptrdiff_t var = d - 2; var >= 0; --var) {
-      tools_interface::check_user_interrupt(n * d > 1e5);
+      tools_interface::check_user_interrupt(
+        static_cast<double>(n) * static_cast<double>(d) > 1e5);
       size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
       for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
         Bicop edge_copula = get_pair_copula(tree, var).as_continuous();

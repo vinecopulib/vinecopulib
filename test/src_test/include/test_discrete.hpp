@@ -77,7 +77,8 @@ TEST(discrete, vinecop)
   auto pair_copulas = Vinecop::make_pair_copula_store(5);
   for (size_t t = 0; t < 4; t++) {
     for (auto& pc : pair_copulas[t]) {
-      auto par = Eigen::VectorXd::Constant(1, 2.0 / (t + 1));
+      auto par =
+        Eigen::VectorXd::Constant(1, 2.0 / (static_cast<double>(t) + 1.0));
       pc = Bicop(BicopFamily::clayton, 90, par);
     }
   }
@@ -109,7 +110,8 @@ TEST(discrete, vinecop)
   for (size_t t = 0; t < 4; t++) {
     for (auto pc : pcs[t]) {
       EXPECT_EQ(pc.get_rotation(), 90);
-      EXPECT_NEAR(pc.get_parameters()(0), 2.0 / (t + 1), 0.5);
+      EXPECT_NEAR(
+        pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
     }
   }
 
@@ -129,7 +131,8 @@ TEST(discrete, vinecop)
   for (size_t t = 0; t < 4; t++) {
     for (auto pc : pcs[t]) {
       EXPECT_EQ(pc.get_rotation(), 90);
-      EXPECT_NEAR(pc.get_parameters()(0), 2.0 / (t + 1), 0.5);
+      EXPECT_NEAR(
+        pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
     }
   }
 }

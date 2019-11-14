@@ -30,20 +30,20 @@ TEST(rvine_structure, triangular_array_works)
   EXPECT_EQ(oss.str(), my_rvm.str());
 
   std::vector<size_t> myvec = { 1, 2 };
-  EXPECT_ANY_THROW(TriangularArray<size_t> my_rvm({ { 2, 3, 1, 1, 1, 1 },
-                                                    { 1, 1, 4, 3, 2 },
-                                                    { 3, 2, 3, 2 },
-                                                    { 4, 4, 2 },
-                                                    { 6, 5 },
-                                                    { 5, 2 /* TOO MANY*/ } }));
-  EXPECT_ANY_THROW(TriangularArray<size_t> my_rvm({ { 2, 3, 1, 1, 1, 1 },
-                                                    { 1, 1, 4, 3, 2 },
-                                                    { 3, 2, 3, 2 },
-                                                    { 4, 4, 2 },
-                                                    { 6, 5 },
-                                                    { 5 },
-                                                    { 5 } /* TOO MANY*/ }));
-  EXPECT_NO_THROW(TriangularArray<size_t> my_rvm(
+  EXPECT_ANY_THROW(TriangularArray<size_t> my_rvm2({ { 2, 3, 1, 1, 1, 1 },
+                                                     { 1, 1, 4, 3, 2 },
+                                                     { 3, 2, 3, 2 },
+                                                     { 4, 4, 2 },
+                                                     { 6, 5 },
+                                                     { 5, 2 /* TOO MANY*/ } }));
+  EXPECT_ANY_THROW(TriangularArray<size_t> my_rvm3({ { 2, 3, 1, 1, 1, 1 },
+                                                     { 1, 1, 4, 3, 2 },
+                                                     { 3, 2, 3, 2 },
+                                                     { 4, 4, 2 },
+                                                     { 6, 5 },
+                                                     { 5 },
+                                                     { 5 } /* TOO MANY*/ }));
+  EXPECT_NO_THROW(TriangularArray<size_t> my_rvm4(
     { { 2, 3, 1, 1, 1, 1 }, { 1, 1, 4, 3, 2 } }));
   my_rvm.truncate(2);
   EXPECT_EQ(my_rvm.get_trunc_lvl(), 2);

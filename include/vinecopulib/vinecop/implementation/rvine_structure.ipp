@@ -378,7 +378,7 @@ RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
   }
 
   for (size_t j = 3; j < d; j++) {
-    int ac = j - 2;
+    size_t ac = j - 2;
     auto to_assign = tools_stl::seq_int(1, j - 1);
     for (ptrdiff_t k = j - 2; k >= 0; k--) {
       if (B(k, j) == 1) {

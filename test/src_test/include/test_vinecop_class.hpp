@@ -91,7 +91,7 @@ TEST_F(VinecopTest, fit_statistics_getters_are_correct)
     data, RVineStructure(), {}, FitControlsVinecop({ BicopFamily::clayton }));
 
   EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
-  EXPECT_NEAR(vc.get_nobs(), 100, 1e-10);
+  EXPECT_NEAR(static_cast<double>(vc.get_nobs()), 100, 1e-10);
   EXPECT_NEAR(vc.get_aic(), vc.aic(data), 1e-10);
   EXPECT_NEAR(vc.get_bic(), vc.bic(data), 1e-10);
   EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
@@ -145,8 +145,8 @@ TEST_F(VinecopTest, cdf_is_correct)
   Vinecop vinecop(matrix, pair_copulas);
 
   // Test whether the analytic and simulated versions are "close" enough
-  auto u = vinecop.simulate(10);
-  ASSERT_TRUE(vinecop.cdf(u, 10000).isApprox(bicop.cdf(u), 1e-2));
+  auto u2 = vinecop.simulate(10);
+  ASSERT_TRUE(vinecop.cdf(u2, 10000).isApprox(bicop.cdf(u2), 1e-2));
 
   // verify that qrng stuff works
   Vinecop vinecop2(301);
@@ -185,9 +185,9 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
     }
   }
   Vinecop vinecop(model_matrix, pair_copulas);
-  auto u = vinecop.simulate(5);
+  auto u2 = vinecop.simulate(5);
   ASSERT_TRUE(
-    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u2)).isApprox(u2, 1e-6));
 
   // truncated multivariate
   pair_copulas = Vinecop::make_pair_copula_store(7, 2);
