@@ -51,7 +51,7 @@ jobs:
       - name: Check path
         run:   |
           $env:path 
-        shell: ps
+        shell: powershell
       - name: Check path
         run:   |
           echo "${PATH}"
