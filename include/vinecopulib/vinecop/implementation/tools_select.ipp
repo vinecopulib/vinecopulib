@@ -607,7 +607,7 @@ inline Eigen::VectorXd
 VinecopSelector::get_hfunc_sub(const VertexProperties& vertex_data,
                                bool is_first)
 {
-  if (pos) {
+  if (is_first) {
     if (vertex_data.hfunc1_sub.size()) {
       return vertex_data.hfunc1_sub;
     } else {
