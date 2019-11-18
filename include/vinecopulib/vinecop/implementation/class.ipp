@@ -627,7 +627,7 @@ Vinecop::set_var_types(const std::vector<std::string>& var_types)
 }
 
 //! @brief sets all pair-copulas.
-//! @param pair_copuals a vector of pair-copulas that has to be consistent with
+//! @param pair_copulas a vector of pair-copulas that has to be consistent with
 //!     the current structure (see Vinecop()).
 inline void
 Vinecop::set_all_pair_copulas(
@@ -705,7 +705,7 @@ Vinecop::get_var_types() const
 
 //! @brief calculates the density function of the vine copula model.
 //!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()`).
 //! @param num_threads the number of threads to use for computations; if greater
@@ -809,7 +809,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
 //! @brief calculates the cumulative distribution of the vine copula model.
 //!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()`).
 //! @param N integer for the number of quasi-random numbers to draw
@@ -883,7 +883,7 @@ Vinecop::simulate(const size_t n,
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \f]
 //! where \f$ c \f$ is the copula density pdf().
 //!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()`).
 //! @param num_threads the number of threads to use for computations; if greater
@@ -908,7 +908,7 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! get_npars(). The AIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()`).
 //! @param num_threads the number of threads to use for computations; if greater
@@ -929,7 +929,7 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! get_npars(). The BIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()`).
 //! @param num_threads the number of threads to use for computations; if greater
@@ -955,7 +955,7 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! in tree \f$ t \f$; The vBIC is a consistent model selection criterion for
 //! parametric sparse vine copula models when \f$ d = o(\sqrt{n \ln n})\f$.
 //!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()`).
 //! @param psi0 baseline prior probability of a non-independence copula.
@@ -992,7 +992,7 @@ Vinecop::get_npars() const
 //! The Rosenblatt transform converts data from this model into independent
 //! uniform variates. Only works for continuous data.
 //!
-//! @param data \f$ n \times d \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u \f$ n \times d \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points.
 //! @param num_threads the number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
