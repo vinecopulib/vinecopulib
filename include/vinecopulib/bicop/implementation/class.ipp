@@ -119,7 +119,7 @@ Bicop::to_json(const std::string filename) const
 
 //! @brief evaluates the copula density.
 //!
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
 //! @return The copula density evaluated at \c u.
 inline Eigen::VectorXd
@@ -131,7 +131,7 @@ Bicop::pdf(const Eigen::MatrixXd& u) const
 
 //! @brief evaluates the copula distribution.
 //!
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
 //! @return The copula distribution evaluated at \c u.
 inline Eigen::VectorXd
@@ -158,7 +158,7 @@ Bicop::cdf(const Eigen::MatrixXd& u) const
 //!
 //! The first h-function is
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hfunc1(const Eigen::MatrixXd& u) const
@@ -190,7 +190,7 @@ Bicop::hfunc1(const Eigen::MatrixXd& u) const
 //!
 //! The second h-function is
 //! \f$ h_2(u_1, u_2) = P(U_1 \le u_1 | U_2 = u_2)  \f$.
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hfunc2(const Eigen::MatrixXd& u) const
@@ -220,7 +220,7 @@ Bicop::hfunc2(const Eigen::MatrixXd& u) const
 
 //! @brief calculates the inverse of \f$ h_1 \f$ (see hfunc1()) w.r.t. the
 //! second argument.
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hinv1(const Eigen::MatrixXd& u) const
@@ -250,7 +250,7 @@ Bicop::hinv1(const Eigen::MatrixXd& u) const
 
 //! @brief calculates the inverse of \f$ h_2 \f$ (see hfunc2()) w.r.t. the first
 //! argument.
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hinv2(const Eigen::MatrixXd& u) const
@@ -305,7 +305,7 @@ Bicop::simulate(const size_t& n,
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \f]
 //! where \f$ c \f$ is the copula density pdf().
 //!
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
 Bicop::loglik(const Eigen::MatrixXd& u) const
@@ -327,7 +327,7 @@ Bicop::loglik(const Eigen::MatrixXd& u) const
 //! get_npars(). The AIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
 Bicop::aic(const Eigen::MatrixXd& u) const
@@ -344,7 +344,7 @@ Bicop::aic(const Eigen::MatrixXd& u) const
 //! get_npars(). The BIC is a consistent model selection criterion
 //! for parametric models.
 //!
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
 Bicop::bic(const Eigen::MatrixXd& u) const
@@ -369,7 +369,7 @@ Bicop::bic(const Eigen::MatrixXd& u) const
 //! indicator for the family being non-independence; see loglik() and
 //! get_npars().
 //!
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
 //! @param psi0 prior probability of a non-independence copula.
 inline double
