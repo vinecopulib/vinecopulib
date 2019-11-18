@@ -1,3 +1,61 @@
+
+# vinecopulib 0.4.0 (July 3, 2019)
+
+NEW FEATURES
+
+    * modelling discrete variables with bivariate or vine copulas. (#454)
+
+    * selection of partially specified R-vine structures. (#457)
+
+    * convenience classes `DVineStructure()`/`CVineStructure()` for D- and 
+      C-vine structures. (#464)
+
+    * new criterion for tree selection: `"joe"` corresponds to -log(1-r^2), 
+      where r is the pairwise partial correlation. (#426)
+
+    * random sampling of R-vine structures. (#429)
+
+    * (de)serialization methods `to/from_ptree/json()` for `RVineStructure` 
+      objects. (#435)
+
+    * some improvements in memory efficiency. (#460)
+
+BREAKING API CHANGES
+
+    * `Vinecop` ctors: interchanged order of `structure` and `pair_copulas`,
+      removed unpopular versions, new argument `var_types`. (#465) 
+
+    * removed `tools_stats::simulate_uniform(n, d, seeds)` to avoid implicit 
+      conversion. (#430)
+
+    * `calculate_npars()` becomes `get_npars()`. (#431)
+
+    * by default, `RVineStructure::get_struct_array()` and 
+     `RVineStructure::struct_array()` objects return the structure array in 
+      the original order (as opposed to natural order). An additional argument
+      is available to ask for the old behavior. (#437, #439)
+
+    * removed `TriangularArray<T>::operator[]` to access columns. 
+      `TriangularArray`s are now stored row-major and provide a new constructor
+      `TriangularArray<T>(std::vector<std::vector<T>> rows)`. (#433)
+
+BUG FIXES AND OTHER IMPROVEMENTS
+
+     * better support for 0-truncated structures. (#462)
+
+     * prevent 0/0 in normalization of `BicopFamily::tll` fits. (#463)
+
+     * use `std::shufle()` instead of `std::random_shuffle()` to remain 
+       C++17-compliant. (#451)
+
+     * ensure consistency in manually created `Bicop(BicopFamily::tll, ...)`, 
+       with fitted versions. (#446)
+
+     * fixed order of ranks in `to_pseudo_obs(.., "first")`. (#469)
+
+     * safer computation of multivariate normal cdf. (#475) 
+
+
 # vinecopulib 0.3.2 (July 3, 2019)
 
 NEW FEATURES
