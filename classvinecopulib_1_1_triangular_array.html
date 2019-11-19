@@ -45,6 +45,14 @@
             </li>
           </ol>
           <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li>
+              <a href="namespaces.html">Namespaces</a>
+              <ol>
+                <li><a href="namespacevinecopulib.html">vinecopulib</a></li>
+                <li><a href="namespacevinecopulib_1_1bicop__families.html">vinecopulib::bicop_families</a></li>
+                <li><a href="namespacevinecopulib_1_1tools__stats.html">vinecopulib::tools_stats</a></li>
+              </ol>
+            </li>
             <li><a href="license.html">License</a></li>
             <li><a href="https://github.com/vinecopulib/vinecopulib">GitHub</a></li>
             <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
@@ -81,7 +89,7 @@
 <span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
 <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
 <span class="n">x</span> <span class="n">x</span>
-<span class="n">x</span></pre><p>and all other elements omitted. This structure appears naturally in the representation of a vine copula model and related algorithms. Each row corresponds to one tree in the vine, starting from the top. In each row (= tree), each column represents an edge in this tree.</p><p>For truncated vine models the last few rows are omitted. For example, a 3-truncated version of the above array contains the elements</p><pre class="m-code"><span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
+<span class="n">x</span></pre><p>and all other elements omitted. This structure appears naturally in the representation of a vine copula model and related algorithms. Each row corresponds to one tree in the vine, starting from the top. In each tree (=row), each column represents an edge.</p><p>For truncated vine models the last few trees are omitted. For example, a 3-truncated version of the above array contains the elements</p><pre class="m-code"><span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
 <span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
 <span class="n">x</span> <span class="n">x</span> <span class="n">x</span></pre><p>Only the elements indicated by <code>x</code>s are stored and can be accessed.</p><p>The data structure is templated and any type or class can be used to fill the entries (<code>x</code>s) of the triangular array.</p>
         <section id="typeless-methods">
@@ -96,38 +104,29 @@
               size_t trunc_lvl)</span>
             </dt>
             <dd>construct a truncated triangular array</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper"><a href="#a5c0d9bb174c208146446467f38d9591b" class="m-doc">TriangularArray</a>(</span><span class="m-doc-wrap">const std::vector&lt;std::vector&lt;T&gt;&gt;&amp; rows)</span>
+            </dt>
+            <dd>construct a truncated triangular array from nested vector.</dd>
           </dl>
         </section>
         <section id="pub-methods">
           <h2><a href="#pub-methods">Public functions</a></h2>
           <dl class="m-doc">
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#aeaee00fbe12f2bce4bf7f2a4479417f3" class="m-doc">operator()</a>(</span><span class="m-doc-wrap">size_t tree,
-              size_t edge) -&gt; T&amp;</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#aed0ecf76f8dd6d4863fa338b50adcd47" class="m-doc">operator()</a>(</span><span class="m-doc-wrap">size_t row,
+              size_t column) -&gt; T&amp;</span>
             </dt>
             <dd>access one element of the trapezoid (writable).</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a9909caab2252198416abcb3294181dee" class="m-doc">operator()</a>(</span><span class="m-doc-wrap">size_t tree,
-              size_t edge) const -&gt; T</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a8a99e40cf6e6facc1cd0ceb14545d5df" class="m-doc">operator()</a>(</span><span class="m-doc-wrap">size_t row,
+              size_t column) const -&gt; T</span>
             </dt>
             <dd>access one element of the trapezoid (non-writable).</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a30cdac9d2e0e13bce3c6c054283b6fb7" class="m-doc">operator[]</a>(</span><span class="m-doc-wrap">size_t column) -&gt; std::vector&lt;T&gt;&amp;</span>
-            </dt>
-            <dd>access one column of the trapezoid (writable).</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a3e6654bb40de5c4b615ea37a8ffecac1" class="m-doc">operator[]</a>(</span><span class="m-doc-wrap">size_t column) const -&gt; std::vector&lt;T&gt;</span>
-            </dt>
-            <dd>access one column of the trapezoid (non-writable).</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#a2bb6d8ef421bbcef635970000b072727" class="m-doc">operator==</a>(</span><span class="m-doc-wrap">const <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;T&gt;&amp; rhs) const -&gt; bool</span>
             </dt>
             <dd>equality operator to compare two <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a> objects.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">void <a href="#ae9d39595702831aca33b981ef7687a1d" class="m-doc">set_column</a>(</span><span class="m-doc-wrap">size_t column,
-              const std::vector&lt;size_t&gt;&amp; new_column)</span>
-            </dt>
-            <dd>set one column of the trapezoid.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#ab6d8130336a957271b1db9018781e69a" class="m-doc">truncate</a>(</span><span class="m-doc-wrap">size_t trunc_lvl)</span>
             </dt>
@@ -143,7 +142,7 @@
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#a2cd9d9617c7c3fc422ed67a6054b2d3a" class="m-doc-self" name="a2cd9d9617c7c3fc422ed67a6054b2d3a">str</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
             </dt>
-            <dd>represent RightTrapezoid as a string.</dd>
+            <dd>represent triangular array as a string.</dd>
           </dl>
         </section>
         <section>
@@ -193,15 +192,36 @@
                 </tr>
               </tbody>
             </table>
-<p>The array has <code>d-1</code> columns and <code>min(trunv_lvl, d-1)</code> rows.</p>
+<p>The array has <code>d-1</code> columns and <code>min(trunc_lvl, d-1)</code> rows.</p>
           </div></section>
-          <section class="m-doc-details" id="aeaee00fbe12f2bce4bf7f2a4479417f3"><div>
+          <section class="m-doc-details" id="a5c0d9bb174c208146446467f38d9591b"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;typename T&gt;
               </div>
-              <span class="m-doc-wrap-bumper">T&amp; vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aeaee00fbe12f2bce4bf7f2a4479417f3" class="m-doc-self">operator()</a>(</span><span class="m-doc-wrap">size_t tree,
-              size_t edge)</span></span>
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a5c0d9bb174c208146446467f38d9591b" class="m-doc-self">TriangularArray</a>(</span><span class="m-doc-wrap">const std::vector&lt;std::vector&lt;T&gt;&gt;&amp; rows)</span></span>
+            </h3>
+            <p>construct a truncated triangular array from nested vector.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">rows</td>
+                  <td>a vector of rows; the length of the first row defines the dimension of the triangular array. The number of rows defines the truncation level.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>An arrax of dimension <code>d</code> has <code>d-1</code> columns and <code>min(trunc_lvl, d-1)</code> rows.</p>
+          </div></section>
+          <section class="m-doc-details" id="aed0ecf76f8dd6d4863fa338b50adcd47"><div>
+            <h3>
+              <div class="m-doc-template">
+                template&lt;typename T&gt;
+              </div>
+              <span class="m-doc-wrap-bumper">T&amp; vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aed0ecf76f8dd6d4863fa338b50adcd47" class="m-doc-self">operator()</a>(</span><span class="m-doc-wrap">size_t row,
+              size_t column)</span></span>
             </h3>
             <p>access one element of the trapezoid (writable).</p>
             <table class="m-table m-fullwidth m-flat">
@@ -210,23 +230,23 @@
               </thead>
               <tbody>
                 <tr>
-                  <td style="width: 1%">tree</td>
-                  <td>the tree level.</td>
+                  <td style="width: 1%">row</td>
+                  <td>the row level.</td>
                 </tr>
                 <tr>
-                  <td>edge</td>
-                  <td>the edge in this tree.</td>
+                  <td>column</td>
+                  <td>the column in this row.</td>
                 </tr>
               </tbody>
             </table>
           </div></section>
-          <section class="m-doc-details" id="a9909caab2252198416abcb3294181dee"><div>
+          <section class="m-doc-details" id="a8a99e40cf6e6facc1cd0ceb14545d5df"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;typename T&gt;
               </div>
-              <span class="m-doc-wrap-bumper">T vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a9909caab2252198416abcb3294181dee" class="m-doc-self">operator()</a>(</span><span class="m-doc-wrap">size_t tree,
-              size_t edge) const</span></span>
+              <span class="m-doc-wrap-bumper">T vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a8a99e40cf6e6facc1cd0ceb14545d5df" class="m-doc-self">operator()</a>(</span><span class="m-doc-wrap">size_t row,
+              size_t column) const</span></span>
             </h3>
             <p>access one element of the trapezoid (non-writable).</p>
             <table class="m-table m-fullwidth m-flat">
@@ -235,52 +255,12 @@
               </thead>
               <tbody>
                 <tr>
-                  <td style="width: 1%">tree</td>
-                  <td>the tree level.</td>
+                  <td style="width: 1%">row</td>
+                  <td>the row level.</td>
                 </tr>
                 <tr>
-                  <td>edge</td>
-                  <td>the edge in this tree.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div></section>
-          <section class="m-doc-details" id="a30cdac9d2e0e13bce3c6c054283b6fb7"><div>
-            <h3>
-              <div class="m-doc-template">
-                template&lt;typename T&gt;
-              </div>
-              <span class="m-doc-wrap-bumper">std::vector&lt;T&gt;&amp; vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a30cdac9d2e0e13bce3c6c054283b6fb7" class="m-doc-self">operator[]</a>(</span><span class="m-doc-wrap">size_t column)</span></span>
-            </h3>
-            <p>access one column of the trapezoid (writable).</p>
-            <table class="m-table m-fullwidth m-flat">
-              <thead>
-                <tr><th colspan="2">Parameters</th></tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="width: 1%">column</td>
-                  <td>which column to extract.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div></section>
-          <section class="m-doc-details" id="a3e6654bb40de5c4b615ea37a8ffecac1"><div>
-            <h3>
-              <div class="m-doc-template">
-                template&lt;typename T&gt;
-              </div>
-              <span class="m-doc-wrap-bumper">std::vector&lt;T&gt; vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a3e6654bb40de5c4b615ea37a8ffecac1" class="m-doc-self">operator[]</a>(</span><span class="m-doc-wrap">size_t column) const</span></span>
-            </h3>
-            <p>access one column of the trapezoid (non-writable).</p>
-            <table class="m-table m-fullwidth m-flat">
-              <thead>
-                <tr><th colspan="2">Parameters</th></tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="width: 1%">column</td>
-                  <td>which column to extract.</td>
+                  <td>column</td>
+                  <td>the column in this row.</td>
                 </tr>
               </tbody>
             </table>
@@ -301,31 +281,6 @@
                 <tr>
                   <td style="width: 1%">rhs</td>
                   <td>right-hand-side of the equality operator.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div></section>
-          <section class="m-doc-details" id="ae9d39595702831aca33b981ef7687a1d"><div>
-            <h3>
-              <div class="m-doc-template">
-                template&lt;typename T&gt;
-              </div>
-              <span class="m-doc-wrap-bumper">void vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ae9d39595702831aca33b981ef7687a1d" class="m-doc-self">set_column</a>(</span><span class="m-doc-wrap">size_t column,
-              const std::vector&lt;size_t&gt;&amp; new_column)</span></span>
-            </h3>
-            <p>set one column of the trapezoid.</p>
-            <table class="m-table m-fullwidth m-flat">
-              <thead>
-                <tr><th colspan="2">Parameters</th></tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="width: 1%">column</td>
-                  <td>which column to set.</td>
-                </tr>
-                <tr>
-                  <td>new_column</td>
-                  <td>the column column to set.</td>
                 </tr>
               </tbody>
             </table>

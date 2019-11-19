@@ -45,6 +45,14 @@
             </li>
           </ol>
           <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li>
+              <a href="namespaces.html">Namespaces</a>
+              <ol>
+                <li><a href="namespacevinecopulib.html">vinecopulib</a></li>
+                <li><a href="namespacevinecopulib_1_1bicop__families.html">vinecopulib::bicop_families</a></li>
+                <li><a href="namespacevinecopulib_1_1tools__stats.html">vinecopulib::tools_stats</a></li>
+              </ol>
+            </li>
             <li><a href="license.html">License</a></li>
             <li><a href="https://github.com/vinecopulib/vinecopulib">GitHub</a></li>
             <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
@@ -70,6 +78,8 @@
             <li>
               Reference
               <ul>
+                <li><a href="#derived-classes">Derived classes</a></li>
+                <li><a href="#pub-static-methods">Public static functions</a></li>
                 <li><a href="#typeless-methods">Constructors, destructors, conversion operators</a></li>
                 <li><a href="#pub-methods">Public functions</a></li>
               </ul>
@@ -86,7 +96,7 @@
 <span class="o">|</span>      <span class="o">|</span> <span class="mi">2</span>    <span class="o">|</span> <span class="err">`</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="err">`</span>       <span class="o">|</span>
 <span class="o">|</span> <span class="mi">1</span>    <span class="o">|</span> <span class="mi">0</span>    <span class="o">|</span> <span class="err">`</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">;</span> <span class="mi">4</span><span class="p">)</span><span class="err">`</span>    <span class="o">|</span>
 <span class="o">|</span>      <span class="o">|</span> <span class="mi">1</span>    <span class="o">|</span> <span class="err">`</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">;</span> <span class="mi">4</span><span class="p">)</span><span class="err">`</span>    <span class="o">|</span>
-<span class="o">|</span> <span class="mi">2</span>    <span class="o">|</span> <span class="mi">0</span>    <span class="o">|</span> <span class="err">`</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">;</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="err">`</span> <span class="o">|</span></pre><p>Denoting by <code>M[i, j]</code> the array entry in row <code>i</code> and column <code>j</code>, the pair-copula index for edge <code>e</code> in tree <code>t</code> of a <code>d</code> dimensional vine is <code>(M[d - 1 - t, e], M[t, e]; M[t - 1, e], ..., M[0, e])</code>. Less formally,</p><ol><li>Start with the counter-diagonal element of column <code>e</code> (first conditioned variable).</li><li>Jump up to the element in row <code>t</code> (second conditioned variable).</li><li>Gather all entries further up in column <code>e</code> (conditioning set).</li></ol><p>A valid R-vine array must satisfy several conditions which are checked when <code>RVineStructure()</code> is called:</p><ol><li>It only contains numbers between 1 and d.</li><li>The diagonal must contain the numbers 1, ..., d.</li><li>The diagonal entry of a column must not be contained in any column further to the right.</li><li>The entries of a column must be contained in all columns to the left.</li><li>The proximity condition must hold: For all t = 1, ..., d - 2 and e = 0, ..., d - t - 1 there must exist an index j &gt; d, such that <code>(M[t, e], {M[0, e], ..., M[t-1, e]})</code> equals either <code>(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})</code> or <code>(M[t-1, j], {M[d-j-1, j], M[0, j], ..., M[t-2, j]})</code>.</li></ol><p>An R-vine array is said to be in natural order when the anti-diagonal entries are <svg class="m-math" style="width: 3.975em; height: 1.107em; vertical-align: -0.243em;" viewBox="0 -8.30219 38.1565 10.6268">
+<span class="o">|</span> <span class="mi">2</span>    <span class="o">|</span> <span class="mi">0</span>    <span class="o">|</span> <span class="err">`</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">;</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="err">`</span> <span class="o">|</span></pre><p>Denoting by <code>M[i, j]</code> the array entry in row <code>i</code> and column <code>j</code>, the pair-copula index for edge <code>e</code> in tree <code>t</code> of a <code>d</code> dimensional vine is <code>(M[d - 1 - e, e], M[t, e]; M[t - 1, e], ..., M[0, e])</code>. Less formally,</p><ol><li>Start with the counter-diagonal element of column <code>e</code> (first conditioned variable).</li><li>Jump up to the element in row <code>t</code> (second conditioned variable).</li><li>Gather all entries further up in column <code>e</code> (conditioning set).</li></ol><p>A valid R-vine array must satisfy several conditions which are checked when <code><a href="classvinecopulib_1_1_r_vine_structure.html#a00a8ce5a6d6a18a2dc0b38afe4749691" class="m-doc">RVineStructure()</a></code> is called:</p><ol><li>It only contains numbers between 1 and d.</li><li>The diagonal must contain the numbers 1, ..., d.</li><li>The diagonal entry of a column must not be contained in any column further to the right.</li><li>The entries of a column must be contained in all columns to the left.</li><li>The proximity condition must hold: For all t = 1, ..., d - 2 and e = 0, ..., d - t - 1 there must exist an index j &gt; d, such that <code>(M[t, e], {M[0, e], ..., M[t-1, e]})</code> equals either <code>(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})</code> or <code>(M[t-1, j], {M[d-j-1, j], M[0, j], ..., M[t-2, j]})</code>.</li></ol><p>An R-vine array is said to be in natural order when the anti-diagonal entries are <svg class="m-math" style="width: 3.975em; height: 1.107em; vertical-align: -0.243em;" viewBox="0 -8.30219 38.1565 10.6268">
 <title>
 $ 1, \dots, d $
 </title>
@@ -106,31 +116,79 @@ $ 1, \dots, d $
 <use x='32.0738' xlink:href='#eq1-g0-100' y='0'/>
 </g>
 </svg> (from left to right). The exemplary arrray above is in natural order. Any R-vine array can be characterized by the diagonal entries (called order) and the entries below the diagonal of the corresponding R-vine array in natural order. Since most algorithms work with the structure in natural order, this is how <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a> stores the structure internally.</p>
+        <section id="derived-classes">
+          <h2><a href="#derived-classes">Derived classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              class <a href="classvinecopulib_1_1_c_vine_structure.html" class="m-doc">CVineStructure</a>
+            </dt>
+            <dd>C-vine structures.</dd>
+            <dt>
+              class <a href="classvinecopulib_1_1_d_vine_structure.html" class="m-doc">DVineStructure</a>
+            </dt>
+            <dd>D-vine structures.</dd>
+          </dl>
+        </section>
+        <section id="pub-static-methods">
+          <h2><a href="#pub-static-methods">Public static functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">static auto <a href="#aff880d51e866ec2082c3330cb1e91fd6" class="m-doc">simulate</a>(</span><span class="m-doc-wrap">size_t d,
+              bool natural_order = false,
+              std::vector&lt;int&gt; seeds = std::vector&lt;int&gt;()) -&gt; <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a></span>
+            </dt>
+            <dd>randomly sample a regular vine structure.</dd>
+          </dl>
+        </section>
         <section id="typeless-methods">
           <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
           <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper"><a href="#a00a8ce5a6d6a18a2dc0b38afe4749691" class="m-doc">RVineStructure</a>(</span><span class="m-doc-wrap">const size_t&amp; d = static_cast&lt;size_t&gt;(1),
+              const size_t&amp; trunc_lvl = std::numeric_limits&lt;size_t&gt;::max())</span>
+            </dt>
+            <dd>instantiates an <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a> object to a D-vine for a given dimension</dd>
             <dt>
               <span class="m-doc-wrap-bumper"><a href="#a271688bc56e2950d5a27213f4b5f9fda" class="m-doc">RVineStructure</a>(</span><span class="m-doc-wrap">const Eigen::Matrix&lt;size_t, Eigen::Dynamic, Eigen::Dynamic&gt;&amp; mat,
               bool check = true)</span>
             </dt>
             <dd>instantiates an <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a> object from a matrix representing an R-vine array.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper"><a href="#aa7e6b14379d8eed772e63c6944e3f610" class="m-doc">RVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order,
+              <span class="m-doc-wrap-bumper"><a href="#a43bf1388524c52fbd9c3598e674b8c3b" class="m-doc">RVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order,
+              const size_t&amp; trunc_lvl = std::numeric_limits&lt;size_t&gt;::max(),
               bool check = true)</span>
             </dt>
             <dd>instantiates an <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a> object to a D-vine with given ordering of variables.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper"><a href="#a0fb1958f6971b01776133af60ee20ee7" class="m-doc">RVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order,
+              <span class="m-doc-wrap-bumper"><a href="#af60265a40de9e6ec264cfdb35d182070" class="m-doc">RVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order,
               const <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;size_t&gt;&amp; struct_array,
-              bool is_natural_order = false,
+              bool natural_order = false,
               bool check = true)</span>
             </dt>
             <dd>instantiates an <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a> object from the variable order (diagonal elements of the R-vine array) and a triangular structure array (all elements above the diagonal).</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper"><a href="#ae8e17cf0bac13c715f4dae988d801c96" class="m-doc">RVineStructure</a>(</span><span class="m-doc-wrap">const std::string filename,
+              const bool check = true)</span>
+            </dt>
+            <dd>creates from a JSON file.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper"><a href="#a40373ed0f1e4875050c6d0928baa0c74" class="m-doc">RVineStructure</a>(</span><span class="m-doc-wrap">const boost::property_tree::ptree input,
+              const bool check = true)</span>
+            </dt>
+            <dd>creates from a boost::property_tree::ptree object</dd>
           </dl>
         </section>
         <section id="pub-methods">
           <h2><a href="#pub-methods">Public functions</a></h2>
           <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a174c4933d350dfe1764f3bfc2b9d2a77" class="m-doc">to_ptree</a>(</span><span class="m-doc-wrap">) const -&gt; boost::property_tree::ptree</span>
+            </dt>
+            <dd>converts the structure into a boost::property_tree::ptree object.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">void <a href="#ac0251e5a81e2eb3d31a24a7698c82cfd" class="m-doc">to_json</a>(</span><span class="m-doc-wrap">const std::string filename) const</span>
+            </dt>
+            <dd>write the structure into a JSON file.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#ac2cd2c83b9ffafb9c6563f1923aa1835" class="m-doc-self" name="ac2cd2c83b9ffafb9c6563f1923aa1835">get_dim</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
             </dt>
@@ -144,7 +202,7 @@ $ 1, \dots, d $
             </dt>
             <dd>extract the order of variables in the vine (diagonal entries in the R-vine array).</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a1f04ff64c8cf56fa32173ed0fccbbe46" class="m-doc-self" name="a1f04ff64c8cf56fa32173ed0fccbbe46">get_struct_array</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;size_t&gt;</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a20a4e552f52dd0a35efa4b30abbcc14d" class="m-doc">get_struct_array</a>(</span><span class="m-doc-wrap">bool natural_order = false) const -&gt; <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;size_t&gt;</span>
             </dt>
             <dd>extract structure array (all elements above the diagonal in the R-vine array).</dd>
             <dt>
@@ -152,11 +210,11 @@ $ 1, \dots, d $
             </dt>
             <dd>extracts the minimum array.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a71e339dae0c4ea4338c731a0dfa70780" class="m-doc">get_needed_hfunc1</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;size_t&gt;</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#ab811fb2ec4f895a9afead688da0e25c3" class="m-doc">get_needed_hfunc1</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;short unsigned&gt;</span>
             </dt>
             <dd>extracts an array indicating which of the first h-functions are needed.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#aa935d78845713014d7aaf6a6aa1a9a8f" class="m-doc">get_needed_hfunc2</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;size_t&gt;</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#ac23409bcd9d4b49d706d83fc54f0ec46" class="m-doc">get_needed_hfunc2</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;short unsigned&gt;</span>
             </dt>
             <dd>extracts an array indicating which of the second h-functions are needed.</dd>
             <dt>
@@ -164,8 +222,9 @@ $ 1, \dots, d $
             </dt>
             <dd>extract the R-vine matrix representation.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a00835cb9e06ca80bfff9c89100a1bb56" class="m-doc">struct_array</a>(</span><span class="m-doc-wrap">size_t tree,
-              size_t edge) const -&gt; size_t</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a83ec35fc7093f6d1095f763662ece56a" class="m-doc">struct_array</a>(</span><span class="m-doc-wrap">size_t tree,
+              size_t edge,
+              bool natural_order = false) const -&gt; size_t</span>
             </dt>
             <dd>access elements of the structure array.</dd>
             <dt>
@@ -174,17 +233,77 @@ $ 1, \dots, d $
             </dt>
             <dd>access elements of the minimum array.</dd>
             <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#a3ded308116afcef4c31bdc8150496d60" class="m-doc">needed_hfunc1</a>(</span><span class="m-doc-wrap">size_t tree,
+              size_t edge) const -&gt; bool</span>
+            </dt>
+            <dd>access elements of the needed_hfunc1 array.</dd>
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#aa56a6f1c3fb5255a0b41247ef37377ed" class="m-doc-self" name="aa56a6f1c3fb5255a0b41247ef37377ed">needed_hfunc2</a>(</span><span class="m-doc-wrap">size_t tree,
+              size_t edge) const -&gt; bool</span>
+            </dt>
+            <dd>access elements of the needed_hfunc2 array.</dd>
+            <dt>
               <span class="m-doc-wrap-bumper">void <a href="#a7580c0663ac702f718944de2a0fcd1d3" class="m-doc">truncate</a>(</span><span class="m-doc-wrap">size_t trunc_lvl)</span>
             </dt>
             <dd>truncates the R-vine structure.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a488bcaf1868f79f733e812f80445199e" class="m-doc-self" name="a488bcaf1868f79f733e812f80445199e">str</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a488bcaf1868f79f733e812f80445199e" class="m-doc">str</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
             </dt>
-            <dd>converts the structure to a string representation (most useful for printing).</dd>
+            <dd></dd>
           </dl>
         </section>
         <section>
           <h2>Function documentation</h2>
+          <section class="m-doc-details" id="aff880d51e866ec2082c3330cb1e91fd6"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">static <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a> vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aff880d51e866ec2082c3330cb1e91fd6" class="m-doc-self">simulate</a>(</span><span class="m-doc-wrap">size_t d,
+              bool natural_order = false,
+              std::vector&lt;int&gt; seeds = std::vector&lt;int&gt;())</span></span>
+            </h3>
+            <p>randomly sample a regular vine structure.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">d</td>
+                  <td>the dimension.</td>
+                </tr>
+                <tr>
+                  <td>natural_order</td>
+                  <td>should the sampled structure be in natural order?</td>
+                </tr>
+                <tr>
+                  <td>seeds</td>
+                  <td>seeds of the random number generator; if empty (default), the random number generator is seeded randomly.</td>
+                </tr>
+              </tbody>
+            </table>
+<aside class="m-note m-info"><h4>Note</h4><p>Implementation of Algorithm 13 in Harry Joe&#x27;s 2014 book (p. 288), but there&#x27;s a typo: the end of line 6 in the book should be &#x27;column j&#x27; instead of &#x27;column k&#x27;.</p></aside>
+          </div></section>
+          <section class="m-doc-details" id="a00a8ce5a6d6a18a2dc0b38afe4749691"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a00a8ce5a6d6a18a2dc0b38afe4749691" class="m-doc-self">RVineStructure</a>(</span><span class="m-doc-wrap">const size_t&amp; d = static_cast&lt;size_t&gt;(1),
+              const size_t&amp; trunc_lvl = std::numeric_limits&lt;size_t&gt;::max())</span></span>
+            </h3>
+            <p>instantiates an <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a> object to a D-vine for a given dimension</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">d</td>
+                  <td>the dimension.</td>
+                </tr>
+                <tr>
+                  <td>trunc_lvl</td>
+                  <td>the truncation level. By default, it is dim - 1.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
           <section class="m-doc-details" id="a271688bc56e2950d5a27213f4b5f9fda"><div>
             <h3>
               <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a271688bc56e2950d5a27213f4b5f9fda" class="m-doc-self">RVineStructure</a>(</span><span class="m-doc-wrap">const Eigen::Matrix&lt;size_t, Eigen::Dynamic, Eigen::Dynamic&gt;&amp; mat,
@@ -211,9 +330,10 @@ $ 1, \dots, d $
 <span class="mi">0</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span>
 <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span></pre>
           </div></section>
-          <section class="m-doc-details" id="aa7e6b14379d8eed772e63c6944e3f610"><div>
+          <section class="m-doc-details" id="a43bf1388524c52fbd9c3598e674b8c3b"><div>
             <h3>
-              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aa7e6b14379d8eed772e63c6944e3f610" class="m-doc-self">RVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order,
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a43bf1388524c52fbd9c3598e674b8c3b" class="m-doc-self">RVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order,
+              const size_t&amp; trunc_lvl = std::numeric_limits&lt;size_t&gt;::max(),
               bool check = true)</span></span>
             </h3>
             <p>instantiates an <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a> object to a D-vine with given ordering of variables.</p>
@@ -227,17 +347,21 @@ $ 1, \dots, d $
                   <td>the order of variables in the D-vine (diagonal entries in the R-vine array); must be a permutation of 1, ..., d.</td>
                 </tr>
                 <tr>
+                  <td>trunc_lvl</td>
+                  <td>the truncation level. By default, it is d - 1.</td>
+                </tr>
+                <tr>
                   <td>check</td>
                   <td>whether `order shall be checked for validity.</td>
                 </tr>
               </tbody>
             </table>
           </div></section>
-          <section class="m-doc-details" id="a0fb1958f6971b01776133af60ee20ee7"><div>
+          <section class="m-doc-details" id="af60265a40de9e6ec264cfdb35d182070"><div>
             <h3>
-              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a0fb1958f6971b01776133af60ee20ee7" class="m-doc-self">RVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order,
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#af60265a40de9e6ec264cfdb35d182070" class="m-doc-self">RVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order,
               const <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;size_t&gt;&amp; struct_array,
-              bool is_natural_order = false,
+              bool natural_order = false,
               bool check = true)</span></span>
             </h3>
             <p>instantiates an <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a> object from the variable order (diagonal elements of the R-vine array) and a triangular structure array (all elements above the diagonal).</p>
@@ -255,12 +379,106 @@ $ 1, \dots, d $
                   <td>the structure array (all elements above the diagonal in the R-vine array). For truncated vines, all rows below the truncation level are omitted.</td>
                 </tr>
                 <tr>
-                  <td>is_natural_order</td>
+                  <td>natural_order</td>
                   <td>whether <code>struct_array</code> is already in natural order.</td>
                 </tr>
                 <tr>
                   <td>check</td>
                   <td>whether <code>order</code> and <code>struct_array</code> shall be checked for validity.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="ae8e17cf0bac13c715f4dae988d801c96"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ae8e17cf0bac13c715f4dae988d801c96" class="m-doc-self">RVineStructure</a>(</span><span class="m-doc-wrap">const std::string filename,
+              const bool check = true)</span></span>
+            </h3>
+            <p>creates from a JSON file.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">filename</td>
+                  <td>the name of the JSON file to read (see <a href="classvinecopulib_1_1_r_vine_structure.html#a174c4933d350dfe1764f3bfc2b9d2a77" class="m-doc">to_<wbr />ptree()</a> for the structure of the file).</td>
+                </tr>
+                <tr>
+                  <td>check</td>
+                  <td>whether to check if the input represents a valid R-vine matrix.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a40373ed0f1e4875050c6d0928baa0c74"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a40373ed0f1e4875050c6d0928baa0c74" class="m-doc-self">RVineStructure</a>(</span><span class="m-doc-wrap">const boost::property_tree::ptree input,
+              const bool check = true)</span></span>
+            </h3>
+            <p>creates from a boost::property_tree::ptree object</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">input</td>
+                  <td>the boost::property_tree::ptree object to convert from (see <a href="classvinecopulib_1_1_r_vine_structure.html#a174c4933d350dfe1764f3bfc2b9d2a77" class="m-doc">to_<wbr />ptree()</a> for the structure of the input).</td>
+                </tr>
+                <tr>
+                  <td>check</td>
+                  <td>whether to check if the input represents a valid R-vine structure.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a174c4933d350dfe1764f3bfc2b9d2a77"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">boost::property_tree::ptree vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a174c4933d350dfe1764f3bfc2b9d2a77" class="m-doc-self">to_ptree</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+            <p>converts the structure into a boost::property_tree::ptree object.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <tfoot>
+                <tr>
+                  <th style="width: 1%">Returns</th>
+                  <td>the boost::property_tree::ptree object containing the structure.</td>
+                </tr>
+              </tfoot>
+            </table>
+<p>The <code>ptree</code> object contains two nodes: <code>&quot;array&quot;</code> for the structure triangular array and <code>&quot;order&quot;</code> for the order vector.</p>
+          </div></section>
+          <section class="m-doc-details" id="ac0251e5a81e2eb3d31a24a7698c82cfd"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">void vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ac0251e5a81e2eb3d31a24a7698c82cfd" class="m-doc-self">to_json</a>(</span><span class="m-doc-wrap">const std::string filename) const</span></span>
+            </h3>
+            <p>write the structure into a JSON file.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">filename</td>
+                  <td>the name of the file to write.</td>
+                </tr>
+              </tbody>
+            </table>
+<p>See <a href="classvinecopulib_1_1_r_vine_structure.html#a174c4933d350dfe1764f3bfc2b9d2a77" class="m-doc">to_<wbr />ptree()</a> for the structure of the file.</p>
+          </div></section>
+          <section class="m-doc-details" id="a20a4e552f52dd0a35efa4b30abbcc14d"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;size_t&gt; vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a20a4e552f52dd0a35efa4b30abbcc14d" class="m-doc-self">get_struct_array</a>(</span><span class="m-doc-wrap">bool natural_order = false) const</span></span>
+            </h3>
+            <p>extract structure array (all elements above the diagonal in the R-vine array).</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">natural_order</td>
+                  <td>whether indices correspond to natural order.</td>
                 </tr>
               </tbody>
             </table>
@@ -272,26 +490,53 @@ $ 1, \dots, d $
             <p>extracts the minimum array.</p>
 <p>The minimum array is derived from an R-vine array by iteratively computing the (elementwise) minimum of two subsequent rows (starting from the top). It is used in estimation and evaluation algorithms to find the two edges in the previous tree that are joined by the current edge.</p>
           </div></section>
-          <section class="m-doc-details" id="a71e339dae0c4ea4338c731a0dfa70780"><div>
+          <section class="m-doc-details" id="ab811fb2ec4f895a9afead688da0e25c3"><div>
             <h3>
-              <span class="m-doc-wrap-bumper"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;size_t&gt; vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a71e339dae0c4ea4338c731a0dfa70780" class="m-doc-self">get_needed_hfunc1</a>(</span><span class="m-doc-wrap">) const</span></span>
+              <span class="m-doc-wrap-bumper"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;short unsigned&gt; vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ab811fb2ec4f895a9afead688da0e25c3" class="m-doc-self">get_needed_hfunc1</a>(</span><span class="m-doc-wrap">) const</span></span>
             </h3>
             <p>extracts an array indicating which of the first h-functions are needed.</p>
 <p>(it is usually not necessary to compute both h-functions for each pair-copula).</p>
           </div></section>
-          <section class="m-doc-details" id="aa935d78845713014d7aaf6a6aa1a9a8f"><div>
+          <section class="m-doc-details" id="ac23409bcd9d4b49d706d83fc54f0ec46"><div>
             <h3>
-              <span class="m-doc-wrap-bumper"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;size_t&gt; vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aa935d78845713014d7aaf6a6aa1a9a8f" class="m-doc-self">get_needed_hfunc2</a>(</span><span class="m-doc-wrap">) const</span></span>
+              <span class="m-doc-wrap-bumper"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;short unsigned&gt; vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ac23409bcd9d4b49d706d83fc54f0ec46" class="m-doc-self">get_needed_hfunc2</a>(</span><span class="m-doc-wrap">) const</span></span>
             </h3>
             <p>extracts an array indicating which of the second h-functions are needed.</p>
 <p>(it is usually not necessary to compute both h-functions for each pair-copula).</p>
           </div></section>
-          <section class="m-doc-details" id="a00835cb9e06ca80bfff9c89100a1bb56"><div>
+          <section class="m-doc-details" id="a83ec35fc7093f6d1095f763662ece56a"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">size_t vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a00835cb9e06ca80bfff9c89100a1bb56" class="m-doc-self">struct_array</a>(</span><span class="m-doc-wrap">size_t tree,
-              size_t edge) const</span></span>
+              <span class="m-doc-wrap-bumper">size_t vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a83ec35fc7093f6d1095f763662ece56a" class="m-doc-self">struct_array</a>(</span><span class="m-doc-wrap">size_t tree,
+              size_t edge,
+              bool natural_order = false) const</span></span>
             </h3>
             <p>access elements of the structure array.</p>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">tree</td>
+                  <td>tree index.</td>
+                </tr>
+                <tr>
+                  <td>edge</td>
+                  <td>edge index.</td>
+                </tr>
+                <tr>
+                  <td>natural_order</td>
+                  <td>whether indices correspond to natural order.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a4c67417a03be525c7c64ebcc884b87fc"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">size_t vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a4c67417a03be525c7c64ebcc884b87fc" class="m-doc-self">min_array</a>(</span><span class="m-doc-wrap">size_t tree,
+              size_t edge) const</span></span>
+            </h3>
+            <p>access elements of the minimum array.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -308,12 +553,12 @@ $ 1, \dots, d $
               </tbody>
             </table>
           </div></section>
-          <section class="m-doc-details" id="a4c67417a03be525c7c64ebcc884b87fc"><div>
+          <section class="m-doc-details" id="a3ded308116afcef4c31bdc8150496d60"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">size_t vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a4c67417a03be525c7c64ebcc884b87fc" class="m-doc-self">min_array</a>(</span><span class="m-doc-wrap">size_t tree,
+              <span class="m-doc-wrap-bumper">bool vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a3ded308116afcef4c31bdc8150496d60" class="m-doc-self">needed_hfunc1</a>(</span><span class="m-doc-wrap">size_t tree,
               size_t edge) const</span></span>
             </h3>
-            <p>access elements of the minimum array.</p>
+            <p>access elements of the needed_hfunc1 array.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -347,6 +592,12 @@ $ 1, \dots, d $
               </tbody>
             </table>
 <p>If the structure is already truncated at a level less than <code>trunc_lvl</code>, the function does nothing.</p>
+          </div></section>
+          <section class="m-doc-details" id="a488bcaf1868f79f733e812f80445199e"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper">std::string vinecopulib::<wbr />RVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a488bcaf1868f79f733e812f80445199e" class="m-doc-self">str</a>(</span><span class="m-doc-wrap">) const</span></span>
+            </h3>
+<p>converts the structure to a string representation (most useful for printing).</p>
           </div></section>
         </section>
       </div>

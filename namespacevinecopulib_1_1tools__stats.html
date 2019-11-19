@@ -45,6 +45,14 @@
             </li>
           </ol>
           <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li>
+              <a href="namespaces.html">Namespaces</a>
+              <ol>
+                <li><a href="namespacevinecopulib.html">vinecopulib</a></li>
+                <li><a href="namespacevinecopulib_1_1bicop__families.html">vinecopulib::bicop_families</a></li>
+                <li><a href="namespacevinecopulib_1_1tools__stats.html" id="m-navbar-current">vinecopulib::tools_stats</a></li>
+              </ol>
+            </li>
             <li><a href="license.html">License</a></li>
             <li><a href="https://github.com/vinecopulib/vinecopulib">GitHub</a></li>
             <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
@@ -79,11 +87,12 @@
           <h2><a href="#func-members">Functions</a></h2>
           <dl class="m-doc">
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a4f9a1f8fdbe23db916b013f7f6e500ca" class="m-doc">simulate_uniform</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
+              <span class="m-doc-wrap-bumper">auto <a href="#a18b1782149896e177d8954e7903a737d" class="m-doc">simulate_uniform</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
               const size_t&amp; d,
+              bool qrng,
               std::vector&lt;int&gt; seeds) -&gt; Eigen::MatrixXd</span>
             </dt>
-            <dd>simulates from the multivariate uniform distribution.</dd>
+            <dd>simulates from the multivariate uniform distribution</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#afda41507cee7cba84602e28e56cfcd99" class="m-doc">to_pseudo_obs</a>(</span><span class="m-doc-wrap">Eigen::MatrixXd x,
               std::string ties_method) -&gt; Eigen::MatrixXd</span>
@@ -95,7 +104,7 @@
             </dt>
             <dd>applies the empirical probability integral transform to a data vector.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a95f6f6f63139c26b7114c4eb9cc22c48" class="m-doc-self" name="a95f6f6f63139c26b7114c4eb9cc22c48">pairwise_mcor</a>(</span><span class="m-doc-wrap">const Eigen::Matrix&lt;double, Eigen::Dynamic, 2&gt;&amp; x,
+              <span class="m-doc-wrap-bumper">auto <a href="#a0f2e1fc8de5b7855d986e389c2974307" class="m-doc-self" name="a0f2e1fc8de5b7855d986e389c2974307">pairwise_mcor</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x,
               const Eigen::VectorXd&amp; weights) -&gt; double</span>
             </dt>
             <dd>calculates the pairwise maximum correlation coefficient.</dd>
@@ -112,13 +121,13 @@
             </dt>
             <dd>simulates from the multivariate Sobol sequence.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a1e81bac0b4e1e9e0158b800a7db0d1af" class="m-doc">pbvt</a>(</span><span class="m-doc-wrap">const Eigen::Matrix&lt;double, Eigen::Dynamic, 2&gt;&amp; z,
+              <span class="m-doc-wrap-bumper">auto <a href="#aee3ed415fa5264e359d20d6144919c5a" class="m-doc">pbvt</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; z,
               int nu,
               double rho) -&gt; Eigen::VectorXd</span>
             </dt>
             <dd>computes bivariate t probabilities.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a6867eea2d193c7e5d78b30b9991397ad" class="m-doc">pbvnorm</a>(</span><span class="m-doc-wrap">const Eigen::Matrix&lt;double, Eigen::Dynamic, 2&gt;&amp; z,
+              <span class="m-doc-wrap-bumper">auto <a href="#a4ce72fad3658994025804af4d16c7748" class="m-doc">pbvnorm</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; z,
               double rho) -&gt; Eigen::VectorXd</span>
             </dt>
             <dd>compute bivariate normal probabilities.</dd>
@@ -153,13 +162,14 @@
         </section>
         <section>
           <h2>Function documentation</h2>
-          <section class="m-doc-details" id="a4f9a1f8fdbe23db916b013f7f6e500ca"><div>
+          <section class="m-doc-details" id="a18b1782149896e177d8954e7903a737d"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a4f9a1f8fdbe23db916b013f7f6e500ca" class="m-doc-self">simulate_uniform</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a18b1782149896e177d8954e7903a737d" class="m-doc-self">simulate_uniform</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
               const size_t&amp; d,
+              bool qrng,
               std::vector&lt;int&gt; seeds)</span></span>
             </h3>
-            <p>simulates from the multivariate uniform distribution.</p>
+            <p>simulates from the multivariate uniform distribution</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -172,6 +182,10 @@
                 <tr>
                   <td>d</td>
                   <td>dimension.</td>
+                </tr>
+                <tr>
+                  <td>qrng</td>
+                  <td>if true, quasi-numbers are generated.</td>
                 </tr>
                 <tr>
                   <td>seeds</td>
@@ -219,6 +233,7 @@ $ \mathrm{U}[0, 1] $
                 </tr>
               </tfoot>
             </table>
+<p>If <code>qrng = TRUE</code>, generalized Halton sequences (see <code><a href="namespacevinecopulib_1_1tools__stats.html#a96499e20cf7b24c504b8d160fe753e05" class="m-doc">ghalton()</a></code>) are used for <code>d &lt;= 300</code> and Sobol sequences otherwise (see <code><a href="namespacevinecopulib_1_1tools__stats.html#a9a8c8331b2eb372a4ad8a3808b4847ab" class="m-doc">sobol()</a></code>).</p>
           </div></section>
           <section class="m-doc-details" id="afda41507cee7cba84602e28e56cfcd99"><div>
             <h3>
@@ -414,9 +429,9 @@ $ \mathrm{U}[0, 1] $
             </table>
 <p>For more information on the Sobol sequence, see S. Joe and F. Y. Kuo (2008), Constructing Sobol sequences with better two-dimensional projections, SIAM J. Sci. Comput. 30, 2635–2654.</p>
           </div></section>
-          <section class="m-doc-details" id="a1e81bac0b4e1e9e0158b800a7db0d1af"><div>
+          <section class="m-doc-details" id="aee3ed415fa5264e359d20d6144919c5a"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::VectorXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a1e81bac0b4e1e9e0158b800a7db0d1af" class="m-doc-self">pbvt</a>(</span><span class="m-doc-wrap">const Eigen::Matrix&lt;double, Eigen::Dynamic, 2&gt;&amp; z,
+              <span class="m-doc-wrap-bumper">Eigen::VectorXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aee3ed415fa5264e359d20d6144919c5a" class="m-doc-self">pbvt</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; z,
               int nu,
               double rho)</span></span>
             </h3>
@@ -476,9 +491,9 @@ $ n \times 1 $
             </table>
 <p>Based on the method described by Dunnett, C.W. and M. Sobel, (1954), A bivariate generalization of Student&#x27;s t-distribution with tables for certain special cases, Biometrika 41, pp. 153-169. Translated from the Fortran routines of Alan Genz (www.math.wsu.edu/faculty/genz/software/fort77/mvtdstpack.f).</p>
           </div></section>
-          <section class="m-doc-details" id="a6867eea2d193c7e5d78b30b9991397ad"><div>
+          <section class="m-doc-details" id="a4ce72fad3658994025804af4d16c7748"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::VectorXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a6867eea2d193c7e5d78b30b9991397ad" class="m-doc-self">pbvnorm</a>(</span><span class="m-doc-wrap">const Eigen::Matrix&lt;double, Eigen::Dynamic, 2&gt;&amp; z,
+              <span class="m-doc-wrap-bumper">Eigen::VectorXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a4ce72fad3658994025804af4d16c7748" class="m-doc-self">pbvnorm</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; z,
               double rho)</span></span>
             </h3>
             <p>compute bivariate normal probabilities.</p>

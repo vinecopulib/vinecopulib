@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>vinecopulib A C++ library for vine copulas</title>
+  <title>vinecopulib::DVineStructure class | vinecopulib A C++ library for vine copulas</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
   <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
   <link rel="icon" href="favicon-dark.png" type="image/png" />
@@ -46,7 +46,7 @@
           </ol>
           <ol class="m-col-t-6 m-col-m-none" start="4">
             <li>
-              <a href="namespaces.html" id="m-navbar-current">Namespaces</a>
+              <a href="namespaces.html">Namespaces</a>
               <ol>
                 <li><a href="namespacevinecopulib.html">vinecopulib</a></li>
                 <li><a href="namespacevinecopulib_1_1bicop__families.html">vinecopulib::bicop_families</a></li>
@@ -68,33 +68,86 @@
   <div class="m-container m-container-inflatable">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <h1>Namespaces</h2>
-        <ul class="m-doc">
-          <li class="m-doc-collapsible">
-            <a href="#" onclick="return toggle(this)">namespace</a> <a href="namespacevinecopulib.html" class="m-doc">vinecopulib</a> <span class="m-doc">Tools for bivariate and vine copula modeling.</span>
-            <ul class="m-doc">
-              <li>namespace <a href="namespacevinecopulib_1_1bicop__families.html" class="m-doc">bicop_families</a> <span class="m-doc">Convenience definitions of sets of bivariate copula families.</span></li>
-              <li>namespace <a href="namespacevinecopulib_1_1tools__stats.html" class="m-doc">tools_stats</a> <span class="m-doc">Utilities for statistical analysis.</span></li>
-
-            </ul>
-          </li>
-        </ul>
-        <script>
-        function toggle(e) {
-            e.parentElement.className = e.parentElement.className == 'm-doc-collapsible' ?
-                'm-doc-expansible' : 'm-doc-collapsible';
-            return false;
-        }
-        /* Collapse all nodes marked as such. Doing it via JS instead of
-           directly in markup so disabling it doesn't harm usability. The list
-           is somehow regenerated on every iteration and shrinks as I change
-           the classes. It's not documented anywhere and I'm not sure if this
-           is the same across browsers, so I am going backwards in that list to
-           be sure. */
-        var collapsed = document.getElementsByClassName("collapsed");
-        for(var i = collapsed.length - 1; i >= 0; --i)
-            collapsed[i].className = 'm-doc-expansible';
-        </script>
+        <h1>
+          <span class="m-breadcrumb"><a href="namespacevinecopulib.html">vinecopulib</a>::<wbr/></span>DVineStructure <span class="m-thin">class</span>
+        </h1>
+        <p>D-vine structures.</p>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li>
+              Reference
+              <ul>
+                <li><a href="#base-classes">Base classes</a></li>
+                <li><a href="#typeless-methods">Constructors, destructors, conversion operators</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+<p>D-vines are a special class of R-vines where each tree is a path. A D-vine structure is determined entirely by the order of variables. For example, if the order is <code>{1, 2, 3, 4}</code>, the first tree in the vine is 1-2-3-4 and all further trees are unique due to the proximity condition.</p>
+        <section id="base-classes">
+          <h2><a href="#base-classes">Base classes</a></h2>
+          <dl class="m-doc">
+            <dt>
+              class <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>
+            </dt>
+            <dd>R-vine structures.</dd>
+          </dl>
+        </section>
+        <section id="typeless-methods">
+          <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper"><a href="#a4ed2682583ec557f902b20c7399b6405" class="m-doc">DVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order)</span>
+            </dt>
+            <dd></dd>
+            <dt>
+              <span class="m-doc-wrap-bumper"><a href="#a16c7b985adbc9ec119143b254a1470bd" class="m-doc">DVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order,
+              size_t trunc_lvl)</span>
+            </dt>
+            <dd></dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Function documentation</h2>
+          <section class="m-doc-details" id="a4ed2682583ec557f902b20c7399b6405"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />DVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a4ed2682583ec557f902b20c7399b6405" class="m-doc-self">DVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">order</td>
+                  <td>the order of variables in the D-vine (diagonal entries in the R-vine array); must be a permutation of 1, ..., d.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+          <section class="m-doc-details" id="a16c7b985adbc9ec119143b254a1470bd"><div>
+            <h3>
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />DVineStructure::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a16c7b985adbc9ec119143b254a1470bd" class="m-doc-self">DVineStructure</a>(</span><span class="m-doc-wrap">const std::vector&lt;size_t&gt;&amp; order,
+              size_t trunc_lvl)</span></span>
+            </h3>
+            <table class="m-table m-fullwidth m-flat">
+              <thead>
+                <tr><th colspan="2">Parameters</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="width: 1%">order</td>
+                  <td>the order of variables in the D-vine (diagonal entries in the R-vine array); must be a permutation of 1, ..., d.</td>
+                </tr>
+                <tr>
+                  <td>trunc_lvl</td>
+                  <td>the truncation level.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div></section>
+        </section>
       </div>
     </div>
   </div>
