@@ -1,0 +1,123 @@
+name: Build Status 
+
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      max-parallel: 6 
+      matrix:
+        cfg:
+          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
+          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64}
+          - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
+          - { os: macos-latest,    name: Clang,  cc: clang, cxx: clang++, platform: x64}
+          - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32}
+          - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64}
+
+    runs-on: ${{ matrix.cfg.os }}
+    name:    ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
+    steps:
+      - name: Checkout project 
+        uses: actions/checkout@v1
+        with:
+          submodules: recursive
+      - name: Set environment variables and path
+        run:   |
+          echo '::set-env name=CC::${{ matrix.cfg.cc }}'
+          echo '::set-env name=CXX::${{ matrix.cfg.cxx }}'
+          if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
+            echo '::set-env name=CMAKE_GEN_PLAT::x64'
+            echo '::set-env name=WDM_CMAKE_DIR::C:\projects\wdm-install\lib\cmake'
+            echo '::set-env name=EIGEN3_INCLUDE_DIR::C:\projects\eigen-eigen-da9b4e14c255'
+            echo '::add-path::D:\a\vinecopulib\vinecopulib\release'
+            echo '::add-path::D:\a\vinecopulib\vinecopulib\release\Release'
+            if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
+              echo '::set-env name=CMAKE_GEN_PLAT::x64'
+            else
+              echo '::set-env name=CMAKE_GEN_PLAT::Win32'
+            fi
+          fi
+        shell: bash
+      - name: Setup-R
+        uses: r-lib/actions/setup-r@master
+      - name: Install other dependencies
+        run:   |
+          if [ "${{ matrix.cfg.os }}" == "ubuntu-latest" ]; then
+            sudo apt-get update
+            sudo apt-get install --no-install-recommends -y lcov libgsl0-dev libeigen3-dev libboost-all-dev
+            sudo apt-get install --no-install-recommends -y --allow-unauthenticated g++ clang
+            sudo apt-get autoremove
+          elif [ "${{ matrix.cfg.os }}" == "macos-latest" ]; then
+            rm '/usr/local/bin/gfortran'
+            brew update
+            brew install gcc lcov eigen gsl doxygen graphviz boost
+          elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
+            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
+            # choco upgrade cmake
+            choco install wget
+            wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip
+            7z x 3.3.2.zip -o"C:\projects" -y > nul
+          fi
+          Rscript -e "install.packages('VineCopula', repos='http://cran.rstudio.com/')"
+          # Install wdm
+          git clone https://github.com/tnagler/wdm.git
+          cd wdm && mkdir build && cd build
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            cmake .. && sudo make install
+          elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\wdm-install"
+            echo '::set-env name=PATH_ORIG::${PATH}'
+            cmake --build . --config Release --target install
+          fi
+          cd ../..
+        shell: bash
+      - name: Compile the debug version
+        run:   |
+          mkdir debug && cd debug
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
+              cmake .. -DSTRICT_COMPILER=ON -DCODE_COVERAGE=ON -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+              make vinecopulib_coverage
+            else
+              cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+              make
+            fi
+          else
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
+            cmake --build . --config Debug
+          fi
+        shell: bash
+      - name: Code coverage
+        uses: codecov/codecov-action@v1.0.3
+        if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          file: debug/coverage.info 
+      - name: Compile and test the release version
+        run:   |
+          mkdir release && cd release
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make && sudo make install
+            bin/test_all
+          else
+            cmake .. -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
+            cmake --build . --config Release
+            "bin/Release/test_all.exe"
+            cmake --build . --config Release --target install
+          fi
+        shell: bash        
+      - name: Install the release version and test the install
+        run:   |
+          cd examples/bicop
+          mkdir build && cd build
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            cmake .. && make
+            ../bin/main
+          else
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="C:\\projects\\vinecopulib-release;${WDM_CMAKE_DIR}" 
+            cmake --build . --config Release
+            "../bin/Release/main.exe"
+          fi
+        shell: bash
