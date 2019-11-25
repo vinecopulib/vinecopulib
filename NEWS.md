@@ -1,3 +1,11 @@
+# vinecopulib 0.5.1 (November 25, 2019)
+
+BUG FIXES
+
+  * fix out of range bug for weighted TLL influence when sample size is small 
+    (#479).
+
+
 # vinecopulib 0.5.0 (November 25, 2019)
 
 NEW FEATURES
