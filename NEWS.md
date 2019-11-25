@@ -1,4 +1,4 @@
-# vinecopulib 0.5.0 (November 19, 2019)
+# vinecopulib 0.5.0 (November 25, 2019)
 
 NEW FEATURES
 
