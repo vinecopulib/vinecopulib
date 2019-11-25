@@ -22,6 +22,8 @@ TEST_P(TrafokernelTest, sanity_checks)
 TEST_P(TrafokernelTest, fit)
 {
   bicop_.fit(u, controls);
+  controls.set_weights(Eigen::VectorXd::Constant(20, 1.0));
+  bicop_.fit(u.topRows(20), controls); // catches bugs when n < (grid size)^2
 }
 
 TEST_P(TrafokernelTest, eval_funcs)
