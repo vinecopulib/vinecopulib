@@ -133,7 +133,7 @@ Bicop::to_json(const std::string filename) const
 //! @brief Evaluates the copula density.
 //!
 //! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @return The copula density evaluated at \c u.
 inline Eigen::VectorXd
 Bicop::pdf(const Eigen::MatrixXd& u) const
@@ -145,7 +145,7 @@ Bicop::pdf(const Eigen::MatrixXd& u) const
 //! @brief Evaluates the copula distribution.
 //!
 //! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @return The copula distribution evaluated at \c u.
 inline Eigen::VectorXd
 Bicop::cdf(const Eigen::MatrixXd& u) const
@@ -172,7 +172,7 @@ Bicop::cdf(const Eigen::MatrixXd& u) const
 //! The first h-function is
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
 //! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hfunc1(const Eigen::MatrixXd& u) const
 {
@@ -204,7 +204,7 @@ Bicop::hfunc1(const Eigen::MatrixXd& u) const
 //! The second h-function is
 //! \f$ h_2(u_1, u_2) = P(U_1 \le u_1 | U_2 = u_2)  \f$.
 //! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hfunc2(const Eigen::MatrixXd& u) const
 {
@@ -237,7 +237,7 @@ Bicop::hfunc2(const Eigen::MatrixXd& u) const
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
 //! The inverse is calulated w.r.t. the second argument.
 //! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hinv1(const Eigen::MatrixXd& u) const
 {
@@ -270,7 +270,7 @@ Bicop::hinv1(const Eigen::MatrixXd& u) const
 //! \f$ h_2(u_1, u_2) = P(U_1 \le u_1 | U_2 = u_2)  \f$.
 //! The inverse is calculated w.r.t. the first argument.
 //! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hinv2(const Eigen::MatrixXd& u) const
 {
@@ -329,7 +329,7 @@ Bicop::simulate(const size_t& n,
 //! where \f$ c \f$ is the copula density pdf().
 //!
 //! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
 Bicop::loglik(const Eigen::MatrixXd& u) const
 {
@@ -351,7 +351,7 @@ Bicop::loglik(const Eigen::MatrixXd& u) const
 //! for nonparametric models.
 //!
 //! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
 Bicop::aic(const Eigen::MatrixXd& u) const
 {
@@ -368,7 +368,7 @@ Bicop::aic(const Eigen::MatrixXd& u) const
 //! for parametric models.
 //!
 //! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
 Bicop::bic(const Eigen::MatrixXd& u) const
 {
@@ -393,7 +393,7 @@ Bicop::bic(const Eigen::MatrixXd& u) const
 //! indicator for the family being non-independence.
 //!
 //! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @param psi0 prior probability of a non-independence copula.
 inline double
 Bicop::mbic(const Eigen::MatrixXd& u, const double psi0) const
@@ -685,7 +685,7 @@ Bicop::as_continuous() const
   return bc_new;
 }
 
-//! fits a bivariate copula (with fixed family) to data.
+//! Fits a bivariate copula (with fixed family) to data.
 //!
 //! For parametric models, two different methods are available. `"mle"` fits
 //! the parameters by maximum-likelihood. `"itau"` uses inversion of
@@ -705,7 +705,7 @@ Bicop::as_continuous() const
 //! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
 //!
 //! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @param controls the controls (see FitControlsBicop).
 inline void
 Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
@@ -732,7 +732,7 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 
 //
 
-//! @brief selects the best fitting model.
+//! @brief Selects the best fitting model.
 //!
 //! The function calls fit() for all families in
 //! `family_set` and selecting the best fitting model by either BIC or AIC,
@@ -748,7 +748,7 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 //! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
 //!
 //! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
-//!   \f$(0, 1)^2 \f$, where \f$ k \f$ is the number of discrete variables.
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @param controls the controls (see FitControlsBicop).
 inline void
 Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
