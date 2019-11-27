@@ -21,8 +21,8 @@ namespace vinecopulib {
 //!     (for Independence, Gaussian, Student, Frank, and nonparametric
 //!     families, only 0 is allowed).
 //! @param parameters the copula parameters.
-//! @param var_types a vector of size two specifying the types of the variables,
-//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
+//! @param var_types two strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
 inline Bicop::Bicop(const BicopFamily family,
                     const int rotation,
                     const Eigen::MatrixXd& parameters,
