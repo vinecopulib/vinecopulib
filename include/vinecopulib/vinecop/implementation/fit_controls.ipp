@@ -24,7 +24,7 @@ inline FitControlsVinecop::FitControlsVinecop()
   show_trace_ = false;
 }
 
-//! @brief creates custom controls for fitting vine copula models.
+//! @brief Creates custom controls for fitting vine copula models.
 //! @param family_set the set of copula families to consider (if empty, then
 //!     all families are included).
 //! @param parametric_method the fit method for parametric families;
@@ -41,7 +41,7 @@ inline FitControlsVinecop::FitControlsVinecop()
 //! @param selection_criterion the selection criterion (`"loglik"`, `"aic"`
 //!     or `"bic"`).
 //! @param weights a vector of weights for the observations.
-//! @param psi0 only for `selection_criterion = "mbic"): prior probability of
+//! @param psi0 only for `selection_criterion = "mbic", prior probability of
 //!     non-independence.
 //! @param preselect_families whether to exclude families before fitting
 //!     based on symmetry properties of the data.
@@ -51,8 +51,8 @@ inline FitControlsVinecop::FitControlsVinecop()
 //!     selected automatically.
 //! @param show_trace whether to show a trace of the building progress.
 //! @param num_threads number of concurrent threads to use while fitting
-//!     pair copulas within a tree; never uses more than the number returned
-//!     by `std::thread::hardware_concurrency()`.
+//!     pair copulas within a tree; never uses more than the number
+//!     of concurrent threads supported by the implementation.
 inline FitControlsVinecop::FitControlsVinecop(
   std::vector<BicopFamily> family_set,
   std::string parametric_method,
