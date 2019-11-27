@@ -40,7 +40,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     }
 
     auto absdiff = fabs(bicop_.get_tau() - results(0, 0));
-    ASSERT_TRUE(absdiff < 1e-4) << bicop_.str();
+    ASSERT_TRUE(absdiff < 1e-2) << bicop_.str();
 
     // Get u-data
     Eigen::MatrixXd u = results.block(0, 1, n, 2);

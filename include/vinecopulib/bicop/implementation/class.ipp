@@ -635,7 +635,7 @@ Bicop::flip()
   }
 }
 
-//! summarizes the model into a string (can be used for printing).
+//! Summarizes the model into a string (can be used for printing).
 inline std::string
 Bicop::str() const
 {

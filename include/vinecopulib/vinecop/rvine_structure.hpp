@@ -152,8 +152,11 @@ operator<<(std::ostream& os, const RVineStructure& rvs);
 //!
 //! D-vines are a special class of R-vines where each tree is a path. A D-vine
 //! structure is determined entirely by the order of variables. For example, if
-//! the order is `{1, 2, 3, 4}`, the first tree in the vine is 1-2-3-4 and all
+//! the order is `(1, 2, 3, 4)`, the first tree in the vine is 1-2-3-4 and all
 //! further trees are unique due to the proximity condition.
+//!
+//! Note that `DVineStructure` objects inherit the methods and attributes of
+//! `RVineStructure` objects.
 class DVineStructure : public RVineStructure
 {
 public:
@@ -168,6 +171,9 @@ public:
 //! the order is `{1, 2, 3, 4}`, the first tree in the vine connects variable
 //! 4 with all others, the second tree connects variable 3 with all others,
 //! etc.
+//!
+//! Note that `DVineStructure` objects inherit the methods and attributes of
+//! `RVineStructure` objects.
 class CVineStructure : public RVineStructure
 {
 public:

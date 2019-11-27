@@ -10,7 +10,7 @@
 
 namespace vinecopulib {
 
-//! @brief instantiates an RVineStructure object from a matrix representing an
+//! @brief Instantiates an RVineStructure object from a matrix representing an
 //! R-vine array.
 //!
 //! The matrix must contain zeros in the lower right triangle and
@@ -57,15 +57,15 @@ inline RVineStructure::RVineStructure(
   needed_hfunc2_ = compute_needed_hfunc2();
 }
 
-//! @brief instantiates an RVineStructure object to a D-vine for a given
-//! dimension
+//! @brief Instantiates an RVineStructure object to a D-vine for a given
+//! dimension.
 //! @param d the dimension.
 //! @param trunc_lvl the truncation level. By default, it is dim - 1.
 inline RVineStructure::RVineStructure(const size_t& d, const size_t& trunc_lvl)
   : RVineStructure(tools_stl::seq_int(1, d), std::min(d - 1, trunc_lvl), false)
 {}
 
-//! @brief instantiates an RVineStructure object to a D-vine with given ordering
+//! @brief Instantiates an RVineStructure object to a D-vine with given ordering
 //! of variables.
 //! @param order the order of variables in the D-vine (diagonal entries in the
 //!    R-vine array); must be a permutation of 1, ..., d.
@@ -152,9 +152,12 @@ inline RVineStructure::RVineStructure(const boost::property_tree::ptree input,
       check)
 {}
 
-//! @brief creates from a JSON file.
-//! @param filename the name of the JSON file to read (see to_ptree() for the
-//! structure of the file).
+//! @brief Instantiates an RVineStructure from a JSON file.
+//!
+//! The file needs to contain two values: `"array"` for the structure
+//! triangular array and `"order"` for the order vector.
+//!
+//! @param filename the name of the JSON file to read.
 //! @param check whether to check if the input represents
 //!      a valid R-vine matrix.
 inline RVineStructure::RVineStructure(const std::string filename,
@@ -181,9 +184,11 @@ RVineStructure::to_ptree() const
   return output;
 }
 
-//! @brief write the structure into a JSON file.
+//! @brief Write the structure into a JSON file.
 //!
-//! See to_ptree() for the structure of the file.
+//! The written file contains two values: `"array"` for the structure
+//! triangular array and `"order"` for the order vector.
+//!
 //! @param filename the name of the file to write.
 inline void
 RVineStructure::to_json(const std::string filename) const
@@ -268,7 +273,7 @@ RVineStructure::get_needed_hfunc2() const
   return needed_hfunc2_;
 }
 
-//! @brief access elements of the structure array.
+//! @brief Accesses elements of the structure array.
 //! @param tree tree index.
 //! @param edge edge index.
 //! @param natural_order whether indices correspond to natural order.
@@ -307,7 +312,7 @@ RVineStructure::needed_hfunc2(size_t tree, size_t edge) const
   return needed_hfunc2_(tree, edge);
 }
 
-//! @brief truncates the R-vine structure.
+//! @brief Truncates the R-vine structure.
 //! @param trunc_lvl the truncation level.
 //!
 //! If the structure is already truncated at a level
@@ -324,7 +329,7 @@ RVineStructure::truncate(size_t trunc_lvl)
   }
 }
 
-//! converts the structure to a string representation (most useful for
+//! Converts the structure to a string representation (most useful for
 //! printing).
 inline std::string
 RVineStructure::str() const
@@ -345,7 +350,7 @@ RVineStructure::str() const
   return str.str();
 }
 
-//! @brief randomly sample a regular vine structure.
+//! @brief Randomly sample a regular vine structure.
 //! @param d the dimension.
 //! @param natural_order should the sampled structure be in natural order?
 //! @param seeds seeds of the random number generator; if empty (default),
