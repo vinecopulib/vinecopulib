@@ -10,7 +10,7 @@
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib {
-//! @brief creates the controls for fitting bivariate copula models.
+//! @brief Creates the controls for fitting bivariate copula models.
 //!
 //! @param family_set the set of copula families to consider (if empty, then
 //!     all families are included).
@@ -24,13 +24,13 @@ namespace vinecopulib {
 //! @param selection_criterion the selection criterion (`"loglik"`, `"aic"`
 //!     or `"bic"`).
 //! @param weights a vector of weights for the observations.
-//! @param psi0 only for `selection_criterion = "mbic"): prior probability of
+//! @param psi0 only for `selection_criterion = "mbic", the prior probability of
 //!     non-independence.
 //! @param preselect_families whether to exclude families before fitting
 //!     based on symmetry properties of the data.
 //! @param num_threads number of concurrent threads to use while fitting
 //!     copulas for different families; never uses more than the number
-//!     returned by `std::thread::hardware_concurrency()`.
+//!     of concurrent threads supported by the implementation.
 inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
                                           std::string parametric_method,
                                           std::string nonparametric_method,
