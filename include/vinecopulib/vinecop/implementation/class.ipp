@@ -15,19 +15,20 @@
 
 namespace vinecopulib {
 
-//! @brief creates a D-vine on `d` variables with all pair-copulas set to
+//! @brief Instantiates a D-vine on `d` variables with all pair-copulas set to
 //! independence.
 //! @param d the dimension (= number of variables) of the model.
 inline Vinecop::Vinecop(const size_t d)
   : Vinecop(RVineStructure(d, static_cast<size_t>(0)))
 {}
 
-//! @brief creates an arbitrary vine copula model.
+//! @brief Instantiates an arbitrary vine copula model.
 //! @param structure an RVineStructure object specifying the vine structure.
-//! @param pair_copulas Bicop objects specifying the pair-copulas, see
-//!     make_pair_copula_store().
-//! @param var_types a vector specifying the types of the variables,
-//!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
+//! @param pair_copulas Bicop objects specifying the pair-copulas, namely
+//!     a nested list such that `pc_store[t][e]` contains a `Bicop`.
+//!     object for the pair copula corresponding to tree `t` and edge `e`.
+//! @param var_types strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
 inline Vinecop::Vinecop(const RVineStructure& structure,
                         const std::vector<std::vector<Bicop>>& pair_copulas,
@@ -46,12 +47,13 @@ inline Vinecop::Vinecop(const RVineStructure& structure,
   }
 }
 
-//! @brief creates an arbitrary vine copula model.
+//! @brief Instantiates an arbitrary vine copula model.
 //! @param matrix an R-vine matrix specifying the vine structure.
-//! @param pair_copulas Bicop objects specifying the pair-copulas, see
-//!     make_pair_copula_store().
-//! @param var_types a vector specifying the types of the variables,
-//!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
+//! @param pair_copulas Bicop objects specifying the pair-copulas, namely
+//!     a nested list such that `pc_store[t][e]` contains a `Bicop`.
+//!     object for the pair copula corresponding to tree `t` and edge `e`.
+//! @param var_types strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
 inline Vinecop::Vinecop(
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
@@ -60,16 +62,15 @@ inline Vinecop::Vinecop(
   : Vinecop(RVineStructure(matrix), pair_copulas, var_types)
 {}
 
-//! @brief constructs a vine copula model from data by creating a model and
-//! calling select().
+//! @brief Instantiates from data by creating a model and calling select().
 //!
 //! @param data an \f$ n \times d \f$ matrix of observations.
 //! @param structure an RVineStructure object specifying the vine structure.
 //!    If empty, then it is selected as part of the fit.
-//! @param var_types a vector specifying the types of the variables,
-//!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
+//! @param var_types strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
-//! @param controls see FitControlsVinecop.
+//! @param controls see `FitControlsVinecop()`.
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                         const RVineStructure& structure,
                         const std::vector<std::string>& var_types,
@@ -96,16 +97,15 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   select(data, controls);
 }
 
-//! @brief constructs a vine copula model from data by creating a model and
-//! calling select().
+//! @brief Instantiates from data by creating a model and calling select().
 //!
 //! @param data an \f$ n \times d \f$ matrix of observations.
 //! @param matrix either an empty matrix (default) or an R-vine structure
 //!     matrix, see select(). If empty, then it is selected as part of the fit.
-//! @param var_types a vector specifying the types of the variables,
-//!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
+//! @param var_types strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
-//! @param controls see FitControlsVinecop.
+//! @param controls see `FitControlsVinecop()`.
 inline Vinecop::Vinecop(
   const Eigen::MatrixXd& data,
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
@@ -216,7 +216,7 @@ Vinecop::to_json(const std::string filename) const
 //!
 //! @param d dimension of the vine copula.
 //! @param trunc_lvl a truncation level (optional).
-//! @return A nested vector such that `pc_store[t][e]` contains a Bicop.
+//! @return A nested list such that `pc_store[t][e]` contains a Bicop.
 //!     object for the pair copula corresponding to tree `t` and edge `e`.
 inline std::vector<std::vector<Bicop>>
 Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
