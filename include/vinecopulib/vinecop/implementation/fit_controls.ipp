@@ -25,32 +25,32 @@ inline FitControlsVinecop::FitControlsVinecop()
 }
 
 //! @brief Creates custom controls for fitting vine copula models.
-//! @param family_set the set of copula families to consider (if empty, then
+//! @param family_set The set of copula families to consider (if empty, then
 //!     all families are included).
-//! @param parametric_method the fit method for parametric families;
+//! @param parametric_method The fit method for parametric families;
 //!     possible choices: `"mle"`, `"itau"`.
-//! @param nonparametric_method the fit method for the local-likelihood
+//! @param nonparametric_method The fit method for the local-likelihood
 //!     nonparametric family (TLLs); possible choices: `"constant"`,
 //!     `"linear"`, `"quadratic"`.
-//! @param nonparametric_mult a factor with which the smoothing parameters
+//! @param nonparametric_mult A factor with which the smoothing parameters
 //!     are multiplied.
-//! @param trunc_lvl truncation level for truncated vines.
-//! @param tree_criterion the criterion for selecting the maximum spanning
+//! @param trunc_lvl Truncation level for truncated vines.
+//! @param tree_criterion The criterion for selecting the maximum spanning
 //!     tree ("tau", "hoeffd", "rho", and "mcor" implemented so far).
-//! @param threshold for thresholded vines (0 = no threshold).
-//! @param selection_criterion the selection criterion (`"loglik"`, `"aic"`
+//! @param threshold For thresholded vines (0 = no threshold).
+//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
 //!     or `"bic"`).
-//! @param weights a vector of weights for the observations.
-//! @param psi0 only for `selection_criterion = "mbic", prior probability of
+//! @param weights A vector of weights for the observations.
+//! @param psi0 Only for `selection_criterion = "mbic", prior probability of
 //!     non-independence.
-//! @param preselect_families whether to exclude families before fitting
+//! @param preselect_families Whether to exclude families before fitting
 //!     based on symmetry properties of the data.
-//! @param select_trunc_lvl whether the truncation shall be selected
+//! @param select_trunc_lvl Whether the truncation shall be selected
 //!     automatically.
-//! @param select_threshold whether the threshold parameter shall be
+//! @param select_threshold Whether the threshold parameter shall be
 //!     selected automatically.
-//! @param show_trace whether to show a trace of the building progress.
-//! @param num_threads number of concurrent threads to use while fitting
+//! @param show_trace Whether to show a trace of the building progress.
+//! @param num_threads Number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number
 //!     of concurrent threads supported by the implementation.
 inline FitControlsVinecop::FitControlsVinecop(
@@ -88,17 +88,17 @@ inline FitControlsVinecop::FitControlsVinecop(
 }
 
 //! @brief Creates custom controls for fitting vine copula models.
-//! @param trunc_lvl truncation level for truncated vines.
-//! @param tree_criterion the criterion for selecting the maximum spanning
+//! @param trunc_lvl Truncation level for truncated vines.
+//! @param tree_criterion The criterion for selecting the maximum spanning
 //!     tree ("tau", "hoeffd" and "rho" implemented so far).
-//! @param threshold for thresholded vines (0 = no threshold).
-//! @param show_trace whether to show a trace of the building progress.
-//! @param select_trunc_lvl whether the truncation shall be selected
+//! @param threshold For thresholded vines (0 = no threshold).
+//! @param show_trace Whether to show a trace of the building progress.
+//! @param select_trunc_lvl Whether the truncation shall be selected
 //!     automatically.
-//! @param select_threshold whether the threshold parameter shall be
+//! @param select_threshold Whether the threshold parameter shall be
 //!     selected automatically.
-//! @param controls see FitControlsBicop.
-//! @param num_threads number of concurrent threads to use while fitting
+//! @param controls See FitControlsBicop.
+//! @param num_threads Number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number returned
 //!     by `std::thread::hardware_concurrency()``.
 inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,

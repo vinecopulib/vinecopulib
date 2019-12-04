@@ -26,7 +26,7 @@ const family_bimap family_names =
     (BicopFamily::tll, "TLL");
 
 //! converts a BicopFamily into a string with its name.
-//! @param family the family.
+//! @param family The family.
 inline std::string
 get_family_name(BicopFamily family)
 {
@@ -34,7 +34,7 @@ get_family_name(BicopFamily family)
 }
 
 //! converts a string name into a BicopFamily.
-//! @param family the family name.
+//! @param family The family name.
 inline BicopFamily
 get_family_enum(std::string family)
 {

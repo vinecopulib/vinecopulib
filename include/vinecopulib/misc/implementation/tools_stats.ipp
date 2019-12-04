@@ -18,10 +18,10 @@ namespace tools_stats {
 
 //! @brief Simulates from the multivariate uniform distribution.
 //!
-//! @param n number of observations.
-//! @param d dimension.
-//! @param qrng if true, quasi-numbers are generated.
-//! @param seeds seeds of the random number generator; if empty (default),
+//! @param n Number of observations.
+//! @param d Dimension.
+//! @param qrng If true, quasi-numbers are generated.
+//! @param seeds Seeds of the random number generator; if empty (default),
 //!   the random number generator is seeded randomly.
 //!
 //! If `qrng = TRUE`, generalized Halton sequences (see `ghalton()`) are used
@@ -68,8 +68,8 @@ simulate_uniform(const size_t& n,
 //! Gives pseudo-observations from the copula by applying the empirical
 //! distribution function (scaled by n + 1) to each margin/column.
 //!
-//! @param x a matrix of real numbers.
-//! @param ties_method indicates how to treat ties; same as in R, see
+//! @param x A matrix of real numbers.
+//! @param ties_method Indicates how to treat ties; same as in R, see
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
 //! @return Psuedo-observations of the copula, i.e. F_X(X) (column-wise)
 inline Eigen::MatrixXd
@@ -88,8 +88,8 @@ to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method)
 //! Gives pseudo-observations from the copula by applying the empirical
 //! distribution function (scaled by n + 1) to each margin/column.
 //!
-//! @param x a vector of real numbers.
-//! @param ties_method indicates how to treat ties; same as in R, see
+//! @param x A vector of real numbers.
+//! @param ties_method Indicates how to treat ties; same as in R, see
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
 //! @return Psuedo-observations of the copula, i.e. F_X(X) (column-wise)
 inline Eigen::VectorXd
@@ -304,9 +304,9 @@ pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 //! Faure, H., Lemieux, C. (2009). Generalized Halton Sequences in 2008:
 //! A Comparative Study. ACM-TOMACS 19(4), Article 15.
 //!
-//! @param n number of observations.
-//! @param d dimension.
-//! @param seeds seeds to scramble the quasi-random numbers; if empty (default),
+//! @param n Number of observations.
+//! @param d Dimension.
+//! @param seeds Seeds to scramble the quasi-random numbers; if empty (default),
 //!   the quasi-random number generator is seeded randomly.
 //!
 //! @return An \f$ n \times d \f$ matrix of quasi-random
@@ -366,9 +366,9 @@ ghalton(const size_t& n, const size_t& d, std::vector<int> seeds)
 //! (2008), Constructing Sobol  sequences with better two-dimensional
 //! projections, SIAM J. Sci. Comput. 30, 2635–2654.
 //!
-//! @param n number of observations.
-//! @param d dimension.
-//! @param seeds seeds to scramble the quasi-random numbers; if empty (default),
+//! @param n Number of observations.
+//! @param d Dimension.
+//! @param seeds Seeds to scramble the quasi-random numbers; if empty (default),
 //!   the quasi-random number generator is seeded randomly.
 //!
 //! @return An \f$ n \times d \f$ matrix of quasi-random
@@ -459,9 +459,9 @@ sobol(const size_t& n, const size_t& d, std::vector<int> seeds)
 //! Biometrika 41, pp. 153-169. Translated from the Fortran routines of
 //! Alan Genz (www.math.wsu.edu/faculty/genz/software/fort77/mvtdstpack.f).
 //!
-//! @param z an \f$ n \times 2 \f$ matrix of evaluation points.
-//! @param nu number of degrees of freedom.
-//! @param rho correlation.
+//! @param z An \f$ n \times 2 \f$ matrix of evaluation points.
+//! @param nu Number of degrees of freedom.
+//! @param rho Correlation.
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
 inline Eigen::VectorXd
@@ -586,8 +586,8 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
 //! Alan Genz and Yihong Ge. Translated from the Fortran routines of
 //! Alan Genz (www.math.wsu.edu/faculty/genz/software/fort77/mvtdstpack.f).
 //!
-//! @param z an \f$ n \times 2 \f$ matrix of evaluation points.
-//! @param rho correlation.
+//! @param z An \f$ n \times 2 \f$ matrix of evaluation points.
+//! @param rho Correlation.
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
 inline Eigen::VectorXd

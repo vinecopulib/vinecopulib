@@ -12,23 +12,23 @@
 namespace vinecopulib {
 //! @brief Creates the controls for fitting bivariate copula models.
 //!
-//! @param family_set the set of copula families to consider (if empty, then
+//! @param family_set The set of copula families to consider (if empty, then
 //!     all families are included).
-//! @param parametric_method the fit method for parametric families;
+//! @param parametric_method The fit method for parametric families;
 //!     possible choices: `"mle"`, `"itau"`.
-//! @param nonparametric_method the fit method for the local-likelihood
+//! @param nonparametric_method The fit method for the local-likelihood
 //!     nonparametric family (TLLs); possible choices: `"constant"`,
 //!     `"linear"`, `"quadratic"`.
-//! @param nonparametric_mult a factor with which the smoothing parameters
+//! @param nonparametric_mult A factor with which the smoothing parameters
 //!     are multiplied.
-//! @param selection_criterion the selection criterion (`"loglik"`, `"aic"`
+//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
 //!     or `"bic"`).
-//! @param weights a vector of weights for the observations.
-//! @param psi0 only for `selection_criterion = "mbic", the prior probability of
+//! @param weights A vector of weights for the observations.
+//! @param psi0 Only for `selection_criterion = "mbic", the prior probability of
 //!     non-independence.
-//! @param preselect_families whether to exclude families before fitting
+//! @param preselect_families Whether to exclude families before fitting
 //!     based on symmetry properties of the data.
-//! @param num_threads number of concurrent threads to use while fitting
+//! @param num_threads Number of concurrent threads to use while fitting
 //!     copulas for different families; never uses more than the number
 //!     of concurrent threads supported by the implementation.
 inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
@@ -53,7 +53,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
 }
 
 //! @brief Creates default controls except for the parameteric method.
-//! @param parametric_method the fit method for parametric families;
+//! @param parametric_method The fit method for parametric families;
 //!     possible choices: `"mle"`, `"itau"`.
 inline FitControlsBicop::FitControlsBicop(std::string parametric_method)
   : FitControlsBicop()
@@ -62,10 +62,10 @@ inline FitControlsBicop::FitControlsBicop(std::string parametric_method)
 }
 
 //! @brief Creates default controls except for the nonparametric method.
-//! @param nonparametric_method the fit method for the local-likelihood
+//! @param nonparametric_method The fit method for the local-likelihood
 //!     nonparametric family (TLLs); possible choices: `"constant"`,
 //!     `"linear"`, `"quadratic"`.
-//! @param nonparametric_mult a factor with which the smoothing parameters
+//! @param nonparametric_mult A factor with which the smoothing parameters
 //!     are multiplied.
 inline FitControlsBicop::FitControlsBicop(std::string nonparametric_method,
                                           double nonparametric_mult)

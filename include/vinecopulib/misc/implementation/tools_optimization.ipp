@@ -24,9 +24,9 @@ inline Optimizer::Optimizer()
 
 //! set the optimizer's controls.
 //!
-//! @param initial_trust_region initial trust region.
-//! @param final_trust_region final trust region.
-//! @param maxeval maximal number of evaluations of the objective.
+//! @param initial_trust_region Initial trust region.
+//! @param final_trust_region Final trust region.
+//! @param maxeval Maximal number of evaluations of the objective.
 inline void
 Optimizer::set_controls(double initial_trust_region,
                         double final_trust_region,
@@ -37,11 +37,11 @@ Optimizer::set_controls(double initial_trust_region,
 
 //! @brief Solve the maximization problem.
 //!
-//! @param initial_parameters of starting values for the optimization
+//! @param initial_parameters Of starting values for the optimization
 //!     algorithm.
-//! @param lower_bounds lower bounds for the parameters.
-//! @param upper_bounds upper bounds for the parameters.
-//! @param the objective function to maximize.
+//! @param lower_bounds Lower bounds for the parameters.
+//! @param upper_bounds Upper bounds for the parameters.
+//! @param the Objective function to maximize.
 //! @return the optimal parameters.
 inline Eigen::VectorXd
 Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
@@ -141,9 +141,9 @@ inline BobyqaControls::BobyqaControls()
 
 //! Create controls by passing the arguments
 //!
-//! @param initial_trust_region initial trust region.
-//! @param final_trust_region final trust region.
-//! @param maxeval maximal number of evaluations of the objective.
+//! @param initial_trust_region Initial trust region.
+//! @param final_trust_region Final trust region.
+//! @param maxeval Maximal number of evaluations of the objective.
 inline BobyqaControls::BobyqaControls(double initial_trust_region,
                                       double final_trust_region,
                                       int maxeval)

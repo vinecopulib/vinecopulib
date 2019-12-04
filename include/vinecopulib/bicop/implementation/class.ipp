@@ -16,12 +16,12 @@
 namespace vinecopulib {
 
 //! @brief Creates a specific bivariate copula model.
-//! @param family the copula family.
-//! @param rotation the rotation of the copula; one of 0, 90, 180, or 270
+//! @param family The copula family.
+//! @param rotation The rotation of the copula; one of 0, 90, 180, or 270
 //!     (for Independence, Gaussian, Student, Frank, and nonparametric
 //!     families, only 0 is allowed).
-//! @param parameters the copula parameters.
-//! @param var_types two strings specifying the types of the variables,
+//! @param parameters The copula parameters.
+//! @param var_types Two strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 inline Bicop::Bicop(const BicopFamily family,
                     const int rotation,
@@ -44,9 +44,9 @@ inline Bicop::Bicop(const BicopFamily family,
 //! Equivalent to creating a default `cop = Bicop()` and then selecting using
 //! `cop.select(data, controls)`.
 //!
-//! @param data see select().
-//! @param controls see select().
-//! @param var_types two strings specifying the types of the variables,
+//! @param data See select().
+//! @param controls See select().
+//! @param var_types Two strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 inline Bicop::Bicop(const Eigen::MatrixXd& data,
                     const FitControlsBicop& controls,
@@ -57,7 +57,7 @@ inline Bicop::Bicop(const Eigen::MatrixXd& data,
 }
 
 //! @brief Creates from a boost::property_tree::ptree object.
-//! @param input the boost::property_tree::ptree object to convert from
+//! @param input The boost::property_tree::ptree object to convert from
 //! (see to_ptree() for the structure of the input).
 inline Bicop::Bicop(const boost::property_tree::ptree input)
   : Bicop(get_family_enum(input.get<std::string>("family")),
@@ -83,7 +83,7 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
 //! matrix for the parameters, and a list of two strings for the variable
 //! types.
 //!
-//! @param filename the name of the JSON file to read.
+//! @param filename The name of the JSON file to read.
 inline Bicop::Bicop(const std::string filename)
   : Bicop(tools_serialization::json_to_ptree(filename.c_str()))
 {}
@@ -123,7 +123,7 @@ Bicop::to_ptree() const
 //! matrix for the parameters, and a list of two strings for the variable
 //! types.
 //!
-//! @param filename the name of the file to write.
+//! @param filename The name of the file to write.
 inline void
 Bicop::to_json(const std::string filename) const
 {
@@ -132,7 +132,7 @@ Bicop::to_json(const std::string filename) const
 
 //! @brief Evaluates the copula density.
 //!
-//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @return The copula density evaluated at \c u.
 inline Eigen::VectorXd
@@ -144,7 +144,7 @@ Bicop::pdf(const Eigen::MatrixXd& u) const
 
 //! @brief Evaluates the copula distribution.
 //!
-//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @return The copula distribution evaluated at \c u.
 inline Eigen::VectorXd
@@ -171,7 +171,7 @@ Bicop::cdf(const Eigen::MatrixXd& u) const
 //!
 //! The first h-function is
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
-//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hfunc1(const Eigen::MatrixXd& u) const
@@ -203,7 +203,7 @@ Bicop::hfunc1(const Eigen::MatrixXd& u) const
 //!
 //! The second h-function is
 //! \f$ h_2(u_1, u_2) = P(U_1 \le u_1 | U_2 = u_2)  \f$.
-//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hfunc2(const Eigen::MatrixXd& u) const
@@ -236,7 +236,7 @@ Bicop::hfunc2(const Eigen::MatrixXd& u) const
 //! The first h-function is
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
 //! The inverse is calulated w.r.t. the second argument.
-//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hinv1(const Eigen::MatrixXd& u) const
@@ -269,7 +269,7 @@ Bicop::hinv1(const Eigen::MatrixXd& u) const
 //! The second h-function is
 //! \f$ h_2(u_1, u_2) = P(U_1 \le u_1 | U_2 = u_2)  \f$.
 //! The inverse is calculated w.r.t. the first argument.
-//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
 Bicop::hinv2(const Eigen::MatrixXd& u) const
@@ -305,9 +305,9 @@ Bicop::hinv2(const Eigen::MatrixXd& u) const
 //! Faure, H., Lemieux, C. (2009). Generalized Halton Sequences in 2008:
 //! A Comparative Study. ACM-TOMACS 19(4), Article 15.
 //!
-//! @param n number of observations.
-//! @param qrng set to true for quasi-random numbers.
-//! @param seeds seeds of the (quasi-)random number generator; if empty
+//! @param n Number of observations.
+//! @param qrng Set to true for quasi-random numbers.
+//! @param seeds Seeds of the (quasi-)random number generator; if empty
 //! (default), the (quasi-)random number generator is seeded randomly.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
 inline Eigen::MatrixXd
@@ -328,7 +328,7 @@ Bicop::simulate(const size_t& n,
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \f]
 //! where \f$ c \f$ is the copula density pdf().
 //!
-//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
 Bicop::loglik(const Eigen::MatrixXd& u) const
@@ -350,7 +350,7 @@ Bicop::loglik(const Eigen::MatrixXd& u) const
 //! The AIC is a consistent model selection criterion even
 //! for nonparametric models.
 //!
-//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
 Bicop::aic(const Eigen::MatrixXd& u) const
@@ -367,7 +367,7 @@ Bicop::aic(const Eigen::MatrixXd& u) const
 //! The BIC is a consistent model selection criterion
 //! for parametric models.
 //!
-//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
 Bicop::bic(const Eigen::MatrixXd& u) const
@@ -392,9 +392,9 @@ Bicop::bic(const Eigen::MatrixXd& u) const
 //! probability of having a non-independence copula and \f$ I \f$ is an
 //! indicator for the family being non-independence.
 //!
-//! @param u an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
-//! @param psi0 prior probability of a non-independence copula.
+//! @param psi0 Prior probability of a non-independence copula.
 inline double
 Bicop::mbic(const Eigen::MatrixXd& u, const double psi0) const
 {
@@ -423,7 +423,7 @@ Bicop::get_npars() const
 //! @brief Converts a Kendall's \f$ \tau \f$ into copula parameters.
 //!
 //! It only works for one-parameter families.
-//! @param tau a value in \f$ (-1, 1) \f$.
+//! @param tau A value in \f$ (-1, 1) \f$.
 inline Eigen::MatrixXd
 Bicop::tau_to_parameters(const double& tau) const
 {
@@ -432,7 +432,7 @@ Bicop::tau_to_parameters(const double& tau) const
 
 //! @brief Converts the copula parameters to Kendall's \f$ tau \f$.
 //!
-//! @param parameters the parameters (must be a valid parametrization of
+//! @param parameters The parameters (must be a valid parametrization of
 //!     the current family).
 inline double
 Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters) const
@@ -589,7 +589,7 @@ Bicop::set_parameters(const Eigen::MatrixXd& parameters)
 }
 
 //! @brief Sets variable types.
-//! @param var_types a vector of size two specifying the types of the variables,
+//! @param var_types A vector of size two specifying the types of the variables,
 //!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
 inline void
 Bicop::set_var_types(const std::vector<std::string>& var_types)
@@ -704,9 +704,9 @@ Bicop::as_continuous() const
 //! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
 //! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
 //!
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
-//! @param controls the controls (see FitControlsBicop).
+//! @param controls The controls (see FitControlsBicop).
 inline void
 Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 {
@@ -747,9 +747,9 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 //! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
 //! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
 //!
-//! @param data an \f$ n \times (2 + k) \f$ matrix of observations contained in
+//! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
-//! @param controls the controls (see FitControlsBicop).
+//! @param controls The controls (see FitControlsBicop).
 inline void
 Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
 {
@@ -851,7 +851,7 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
 }
 
 //! rotates the data corresponding to the models rotation.
-//! @param u an `n x 2` matrix.
+//! @param u An `n x 2` matrix.
 inline void
 Bicop::rotate_data(Eigen::MatrixXd& u) const
 {

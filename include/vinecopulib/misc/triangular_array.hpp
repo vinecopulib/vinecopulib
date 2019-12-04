@@ -66,7 +66,7 @@ private:
 //! @brief Construct a triangular array of dimension `d`.
 //!
 //! The array has `d-1` columns and `d-1` rows.
-//! @param d the dimension of the underlying vine.
+//! @param d The dimension of the underlying vine.
 template<typename T>
 TriangularArray<T>::TriangularArray(size_t d)
   : TriangularArray(d, d - 1)
@@ -75,8 +75,8 @@ TriangularArray<T>::TriangularArray(size_t d)
 //! @brief Construct a truncated triangular array.
 //!
 //! The array has `d-1` columns and `min(trunc_lvl, d-1)` rows.
-//! @param d the dimension of the vine.
-//! @param trunc_lvl the truncation level.
+//! @param d The dimension of the vine.
+//! @param trunc_lvl The truncation level.
 template<typename T>
 TriangularArray<T>::TriangularArray(size_t d, size_t trunc_lvl)
   : d_(d)
@@ -94,7 +94,7 @@ TriangularArray<T>::TriangularArray(size_t d, size_t trunc_lvl)
 //!
 //! An arrax of dimension `d` has `d-1` columns and `min(trunc_lvl, d-1)`
 //! rows.
-//! @param rows a vector of rows; the length of the first row defines
+//! @param rows A vector of rows; the length of the first row defines
 //! the dimension of the triangular array. The number of rows defines
 //! the truncation level.
 template<typename T>
@@ -120,8 +120,8 @@ TriangularArray<T>::TriangularArray(const std::vector<std::vector<T>>& rows)
 }
 
 //! @brief Access one element of the trapezoid (writable).
-//! @param row the row level.
-//! @param column the column in this row.
+//! @param row The row level.
+//! @param column The column in this row.
 template<typename T>
 T&
 TriangularArray<T>::operator()(size_t row, size_t column)
@@ -132,8 +132,8 @@ TriangularArray<T>::operator()(size_t row, size_t column)
 }
 
 //! @brief Access one element of the trapezoid (non-writable).
-//! @param row the row level.
-//! @param column the column in this row.
+//! @param row The row level.
+//! @param column The column in this row.
 template<typename T>
 T
 TriangularArray<T>::operator()(size_t row, size_t column) const
@@ -146,7 +146,7 @@ TriangularArray<T>::operator()(size_t row, size_t column) const
 //! @brief Truncates the trapezoid.
 //! If the trapezoid is already truncated at a level
 //! less than `trunc_lvl`, the function does nothing.
-//! @param trunc_lvl the truncation level.
+//! @param trunc_lvl The truncation level.
 template<typename T>
 void
 TriangularArray<T>::truncate(size_t trunc_lvl)
@@ -158,7 +158,7 @@ TriangularArray<T>::truncate(size_t trunc_lvl)
 }
 
 //! @brief Equality operator to compare two TriangularArray objects.
-//! @param rhs right-hand-side of the equality operator.
+//! @param rhs Right-hand-side of the equality operator.
 template<typename T>
 bool
 TriangularArray<T>::operator==(const TriangularArray<T>& rhs) const
@@ -208,8 +208,8 @@ TriangularArray<T>::str() const
 }
 
 //! @brief Ostream method for TriangularArray, to be used with `std::cout`.
-//! @param os an output stream.
-//! @param tri_array n triangular array.
+//! @param os An output stream.
+//! @param tri_array N triangular array.
 template<typename T>
 std::ostream&
 operator<<(std::ostream& os, const TriangularArray<T>& tri_array)

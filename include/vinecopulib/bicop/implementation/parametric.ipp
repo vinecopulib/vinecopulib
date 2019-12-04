@@ -133,7 +133,7 @@ ParBicop::fit(const Eigen::MatrixXd& data,
 }
 
 //! ensures that starting values are sufficiently separated from bounds
-//! @param tau kendall's tau
+//! @param tau Kendall's tau
 inline double
 ParBicop::winsorize_tau(double tau) const
 {

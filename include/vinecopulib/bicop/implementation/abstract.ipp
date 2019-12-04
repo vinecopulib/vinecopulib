@@ -27,8 +27,8 @@ inline AbstractBicop::~AbstractBicop() {}
 
 //! Create a bivariate copula using the default contructor
 //!
-//! @param family the copula family.
-//! @param parameters the copula parameters (optional, must be compatible
+//! @param family The copula family.
+//! @param parameters The copula parameters (optional, must be compatible
 //!     with family).
 //! @return A pointer to an object that inherits from AbstractBicop.
 //! @{
@@ -130,7 +130,7 @@ AbstractBicop::set_var_types(const std::vector<std::string>& var_types)
 //! @}
 
 //! evaluates the pdf, but truncates it's value by DBL_MIN and DBL_MAX.
-//! @param u matrix of evaluation points.
+//! @param u Matrix of evaluation points.
 inline Eigen::VectorXd
 AbstractBicop::pdf(const Eigen::MatrixXd& u)
 {
@@ -223,8 +223,8 @@ AbstractBicop::hinv2(const Eigen::MatrixXd& u)
 }
 
 //! evaluates the log-likelihood.
-//! @param u data matrix.
-//! @param weights optional weights for each observation.
+//! @param u Data matrix.
+//! @param weights Optional weights for each observation.
 inline double
 AbstractBicop::loglik(const Eigen::MatrixXd& u, const Eigen::VectorXd weights)
 {

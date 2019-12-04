@@ -70,12 +70,12 @@ chol22(const Eigen::Matrix2d& B)
 
 //! evaluates local likleihood density estimate.
 //!
-//! @param x evaluation points.
-//! @param x_data observations.
-//! @param B bandwidth matrix.
-//! @param method order of local polynomial approximation; either `"constant"`,
+//! @param x Evaluation points.
+//! @param x_data Observations.
+//! @param B Bandwidth matrix.
+//! @param method Order of local polynomial approximation; either `"constant"`,
 //!   `"linear"`, or `"quadratic"`.
-//! @param weights vector of weights for the observations
+//! @param weights Vector of weights for the observations
 //! @return a two-column matrix; first column is estimated density, second
 //!    column is influence of evaluation point.
 inline Eigen::MatrixXd
