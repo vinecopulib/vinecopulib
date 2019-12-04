@@ -11,7 +11,7 @@
 
 namespace vinecopulib {
 
-//! @brief An abstract class for elliptical copula families
+//! @brief An abstract class for elliptical copula families.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but

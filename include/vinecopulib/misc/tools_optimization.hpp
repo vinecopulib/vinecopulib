@@ -12,7 +12,7 @@ namespace vinecopulib {
 
 namespace tools_optimization {
 
-//! @brief A class for the controls to Bobyqa
+//! @brief A class for the controls to Bobyqa.
 class BobyqaControls
 {
 public:

@@ -35,7 +35,7 @@ Optimizer::set_controls(double initial_trust_region,
   controls_ = BobyqaControls(initial_trust_region, final_trust_region, maxeval);
 }
 
-//! @brief solve the maximization problem.
+//! @brief Solve the maximization problem.
 //!
 //! @param initial_parameters of starting values for the optimization
 //!     algorithm.
@@ -92,14 +92,14 @@ Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
   return optimal_parameters;
 }
 
-//! @brief returns how often the objective function was called.
+//! @brief Returns how often the objective function was called.
 inline size_t
 Optimizer::get_objective_calls() const
 {
   return objective_calls_;
 }
 
-//! @brief returns the objective value at the maximum.
+//! @brief Returns the objective value at the maximum.
 inline double
 Optimizer::get_objective_max() const
 {

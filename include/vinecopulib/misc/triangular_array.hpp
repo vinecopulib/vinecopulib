@@ -63,7 +63,7 @@ private:
   std::vector<std::vector<T>> arr_;
 };
 
-//! @brief construct a triangular array of dimension `d`.
+//! @brief Construct a triangular array of dimension `d`.
 //!
 //! The array has `d-1` columns and `d-1` rows.
 //! @param d the dimension of the underlying vine.
@@ -72,7 +72,7 @@ TriangularArray<T>::TriangularArray(size_t d)
   : TriangularArray(d, d - 1)
 {}
 
-//! @brief construct a truncated triangular array
+//! @brief Construct a truncated triangular array.
 //!
 //! The array has `d-1` columns and `min(trunc_lvl, d-1)` rows.
 //! @param d the dimension of the vine.
@@ -90,7 +90,7 @@ TriangularArray<T>::TriangularArray(size_t d, size_t trunc_lvl)
     arr_[i] = std::vector<T>(d_ - i);
 }
 
-//! @brief construct a truncated triangular array from nested vector.
+//! @brief Construct a truncated triangular array from nested vector.
 //!
 //! An arrax of dimension `d` has `d-1` columns and `min(trunc_lvl, d-1)`
 //! rows.
@@ -119,7 +119,7 @@ TriangularArray<T>::TriangularArray(const std::vector<std::vector<T>>& rows)
   arr_ = rows;
 }
 
-//! @brief access one element of the trapezoid (writable).
+//! @brief Access one element of the trapezoid (writable).
 //! @param row the row level.
 //! @param column the column in this row.
 template<typename T>
@@ -131,7 +131,7 @@ TriangularArray<T>::operator()(size_t row, size_t column)
   return arr_[row][column];
 }
 
-//! @brief access one element of the trapezoid (non-writable).
+//! @brief Access one element of the trapezoid (non-writable).
 //! @param row the row level.
 //! @param column the column in this row.
 template<typename T>
@@ -143,7 +143,7 @@ TriangularArray<T>::operator()(size_t row, size_t column) const
   return arr_[row][column];
 }
 
-//! @brief truncates the trapezoid.
+//! @brief Truncates the trapezoid.
 //! If the trapezoid is already truncated at a level
 //! less than `trunc_lvl`, the function does nothing.
 //! @param trunc_lvl the truncation level.
@@ -157,7 +157,7 @@ TriangularArray<T>::truncate(size_t trunc_lvl)
   }
 }
 
-//! @brief equality operator to compare two TriangularArray objects.
+//! @brief Equality operator to compare two TriangularArray objects.
 //! @param rhs right-hand-side of the equality operator.
 template<typename T>
 bool
@@ -207,7 +207,7 @@ TriangularArray<T>::str() const
   return str.str();
 }
 
-//! @brief ostream method for TriangularArray, to be used with `std::cout`
+//! @brief Ostream method for TriangularArray, to be used with `std::cout`.
 //! @param os an output stream.
 //! @param tri_array n triangular array.
 template<typename T>

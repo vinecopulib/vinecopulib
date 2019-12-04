@@ -88,7 +88,7 @@ inline Bicop::Bicop(const std::string filename)
   : Bicop(tools_serialization::json_to_ptree(filename.c_str()))
 {}
 
-//! @brief Convert the copula into a boost::property_tree::ptree object
+//! @brief Convert the copula into a boost::property_tree::ptree object.
 //!
 //! The boost::property_tree::ptree is contains of three values named
 //! `"family"`, `"rotation"`, `"parameters"`, `"var_types"`,
@@ -231,7 +231,7 @@ Bicop::hfunc2(const Eigen::MatrixXd& u) const
   return h;
 }
 
-//! @brief Calculates the inverse of the first h-function
+//! @brief Calculates the inverse of the first h-function.
 //
 //! The first h-function is
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
@@ -264,7 +264,7 @@ Bicop::hinv1(const Eigen::MatrixXd& u) const
   return hi;
 }
 
-//! @brief Calculates the inverse of the second h-function
+//! @brief Calculates the inverse of the second h-function.
 //!
 //! The second h-function is
 //! \f$ h_2(u_1, u_2) = P(U_1 \le u_1 | U_2 = u_2)  \f$.
@@ -588,7 +588,7 @@ Bicop::set_parameters(const Eigen::MatrixXd& parameters)
   bicop_->set_loglik();
 }
 
-//! @brief sets variable types.
+//! @brief Sets variable types.
 //! @param var_types a vector of size two specifying the types of the variables,
 //!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
 inline void
@@ -604,7 +604,7 @@ Bicop::set_var_types(const std::vector<std::string>& var_types)
   }
 }
 
-//! @brief extracts variable types.
+//! @brief Extracts variable types.
 inline std::vector<std::string>
 Bicop::get_var_types() const
 {

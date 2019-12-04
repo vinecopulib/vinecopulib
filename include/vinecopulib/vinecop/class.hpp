@@ -18,7 +18,7 @@ namespace tools_select {
 class VinecopSelector;
 }
 
-//! @brief A class for vine copula models
+//! @brief A class for vine copula models.
 //!
 //! A vine copula model is characterized by the structure matrix (see
 //! TriangularArray) and the pair-copulas.

@@ -52,7 +52,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
   set_num_threads(num_threads);
 }
 
-//! @brief creates default controls except for the parameteric method.
+//! @brief Creates default controls except for the parameteric method.
 //! @param parametric_method the fit method for parametric families;
 //!     possible choices: `"mle"`, `"itau"`.
 inline FitControlsBicop::FitControlsBicop(std::string parametric_method)
@@ -61,7 +61,7 @@ inline FitControlsBicop::FitControlsBicop(std::string parametric_method)
   set_parametric_method(parametric_method);
 }
 
-//! @brief creates default controls except for the nonparametric method.
+//! @brief Creates default controls except for the nonparametric method.
 //! @param nonparametric_method the fit method for the local-likelihood
 //!     nonparametric family (TLLs); possible choices: `"constant"`,
 //!     `"linear"`, `"quadratic"`.

@@ -10,7 +10,7 @@
 
 namespace vinecopulib {
 
-//! @brief Instantiates an RVineStructure object from a matrix representing an
+//! @brief Instantiates an RVineStructure object from a matrix representing an.
 //! R-vine array.
 //!
 //! The matrix must contain zeros in the lower right triangle and
@@ -57,7 +57,7 @@ inline RVineStructure::RVineStructure(
   needed_hfunc2_ = compute_needed_hfunc2();
 }
 
-//! @brief Instantiates an RVineStructure object to a D-vine for a given
+//! @brief Instantiates an RVineStructure object to a D-vine for a given.
 //! dimension.
 //! @param d the dimension.
 //! @param trunc_lvl the truncation level. By default, it is dim - 1.
@@ -65,7 +65,7 @@ inline RVineStructure::RVineStructure(const size_t& d, const size_t& trunc_lvl)
   : RVineStructure(tools_stl::seq_int(1, d), std::min(d - 1, trunc_lvl), false)
 {}
 
-//! @brief Instantiates an RVineStructure object to a D-vine with given ordering
+//! @brief Instantiates an RVineStructure object to a D-vine with given ordering.
 //! of variables.
 //! @param order the order of variables in the D-vine (diagonal entries in the
 //!    R-vine array); must be a permutation of 1, ..., d.
@@ -85,7 +85,7 @@ inline RVineStructure::RVineStructure(const std::vector<size_t>& order,
     check_antidiagonal();
 }
 
-//! @brief instantiates an RVineStructure object from the variable order
+//! @brief Instantiates an RVineStructure object from the variable order.
 //! (diagonal elements of the R-vine array) and a triangular structure array
 //! (all elements above the diagonal).
 //!
@@ -137,7 +137,7 @@ inline RVineStructure::RVineStructure(
   }
 }
 
-//! @brief creates from a boost::property_tree::ptree object
+//! @brief Creates from a boost::property_tree::ptree object.
 //! @param input the boost::property_tree::ptree object to convert from
 //! (see to_ptree() for the structure of the input).
 //! @param check whether to check if the input represents
@@ -165,7 +165,7 @@ inline RVineStructure::RVineStructure(const std::string filename,
   : RVineStructure(tools_serialization::json_to_ptree(filename.c_str()), check)
 {}
 
-//! @brief converts the structure into a boost::property_tree::ptree object.
+//! @brief Converts the structure into a boost::property_tree::ptree object.
 //!
 //! The `ptree` object contains two nodes: `"array"` for the structure
 //! triangular array and `"order"` for the order vector.
@@ -210,7 +210,7 @@ RVineStructure::get_trunc_lvl() const
   return trunc_lvl_;
 }
 
-//! @brief extract the order of variables in the vine (diagonal entries in the
+//! @brief Extract the order of variables in the vine (diagonal entries in the.
 //! R-vine array).
 inline std::vector<size_t>
 RVineStructure::get_order() const
@@ -218,7 +218,7 @@ RVineStructure::get_order() const
   return order_;
 }
 
-//! @brief extract structure array (all elements above the diagonal in the
+//! @brief Extract structure array (all elements above the diagonal in the.
 //! R-vine array).
 //! @param natural_order whether indices correspond to natural order.
 inline TriangularArray<size_t>
@@ -238,7 +238,7 @@ RVineStructure::get_struct_array(bool natural_order) const
   return new_array;
 }
 
-//! @brief extracts the minimum array.
+//! @brief Extracts the minimum array.
 //!
 //! The minimum array is derived from an R-vine array by
 //! iteratively computing the (elementwise) minimum of two subsequent rows
@@ -251,7 +251,7 @@ RVineStructure::get_min_array() const
   return min_array_;
 }
 
-//! @brief extracts an array indicating which of the first h-functions are
+//! @brief Extracts an array indicating which of the first h-functions are.
 //! needed.
 //!
 //! (it is usually not necessary to compute both h-functions for each
@@ -262,7 +262,7 @@ RVineStructure::get_needed_hfunc1() const
   return needed_hfunc1_;
 }
 
-//! @brief extracts an array indicating which of the second h-functions are
+//! @brief Extracts an array indicating which of the second h-functions are.
 //! needed.
 //!
 //! (it is usually not necessary to compute both h-functions for each
@@ -287,7 +287,7 @@ RVineStructure::struct_array(size_t tree, size_t edge, bool natural_order) const
   return order_[struct_array_(tree, edge) - 1];
 }
 
-//! @brief access elements of the minimum array.
+//! @brief Access elements of the minimum array.
 //! @param tree tree index.
 //! @param edge edge index.
 inline size_t
@@ -296,7 +296,7 @@ RVineStructure::min_array(size_t tree, size_t edge) const
   return min_array_(tree, edge);
 }
 
-//! @brief access elements of the needed_hfunc1 array.
+//! @brief Access elements of the needed_hfunc1 array.
 //! @param tree tree index.
 //! @param edge edge index.
 inline bool
@@ -305,7 +305,7 @@ RVineStructure::needed_hfunc1(size_t tree, size_t edge) const
   return needed_hfunc1_(tree, edge);
 }
 
-//! @brief access elements of the needed_hfunc2 array.
+//! @brief Access elements of the needed_hfunc2 array.
 inline bool
 RVineStructure::needed_hfunc2(size_t tree, size_t edge) const
 {
@@ -440,7 +440,7 @@ RVineStructure::get_matrix() const
   return mat;
 }
 
-//! @brief find the truncation level in an R-vine array.
+//! @brief Find the truncation level in an R-vine array.
 //!
 //! The truncation level is
 //! determined by the first row (starting from the bottom) that contains only
@@ -471,7 +471,7 @@ RVineStructure::find_trunc_lvl(
   return trunc_lvl;
 }
 
-//! @brief find the order of an R-vine array.
+//! @brief Find the order of an R-vine array.
 //!
 //! The order is contained in the counter-diagonal of the R-vine array.
 //! @param mat a matrix representing the R-vine array.
@@ -486,7 +486,7 @@ RVineStructure::get_order(
   return order;
 }
 
-//! @brief extracts the structure array (entries above the diagonal in R-vine
+//! @brief Extracts the structure array (entries above the diagonal in R-vine.
 //! array).
 //! @param mat a array representing the R-vine array.
 inline TriangularArray<size_t>
@@ -705,7 +705,7 @@ RVineStructure::check_proximity_condition() const
   }
 }
 
-//! @brief ostream method for RVineStructure, to be used with `std::cout`.
+//! @brief Ostream method for RVineStructure, to be used with `std::cout`.
 //! @param os output stream.
 //! @param rvs r-vine structure array.
 inline std::ostream&

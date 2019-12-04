@@ -13,7 +13,7 @@
 
 namespace vinecopulib {
 
-//! @brief R-vine structures
+//! @brief R-vine structures.
 //!
 //! RVineStructure objects encode the tree structure of the vine, i.e. the
 //! conditioned/conditioning variables of each edge. It is represented by a
@@ -148,7 +148,7 @@ protected:
 std::ostream&
 operator<<(std::ostream& os, const RVineStructure& rvs);
 
-//! @brief D-vine structures
+//! @brief D-vine structures.
 //!
 //! D-vines are a special class of R-vines where each tree is a path. A D-vine
 //! structure is determined entirely by the order of variables. For example, if
@@ -164,7 +164,7 @@ public:
   DVineStructure(const std::vector<size_t>& order, size_t trunc_lvl);
 };
 
-//! @brief C-vine structures
+//! @brief C-vine structures.
 //!
 //! C-vines are a special class of R-vines where each tree is a star. A C-vine
 //! structure is determined entirely by the order of variables. For example, if

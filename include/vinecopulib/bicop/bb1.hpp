@@ -10,7 +10,7 @@
 
 namespace vinecopulib {
 
-//! @brief The BB1 copula
+//! @brief The BB1 copula.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but

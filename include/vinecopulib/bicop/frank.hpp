@@ -9,7 +9,7 @@
 #include <vinecopulib/bicop/archimedean.hpp>
 
 namespace vinecopulib {
-//! @brief The Frank copula
+//! @brief The Frank copula.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but

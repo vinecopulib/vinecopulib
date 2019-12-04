@@ -8,7 +8,7 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 
 //! @file bicop/implementation/fit_controls.ipp
-//! @brief Fit controls for Bicop class (Implementation)
+//! @brief Fit controls for Bicop class (Implementation).
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib {
@@ -87,7 +87,7 @@ inline FitControlsVinecop::FitControlsVinecop(
   set_num_threads(num_threads);
 }
 
-//! @brief creates custom controls for fitting vine copula models.
+//! @brief Creates custom controls for fitting vine copula models.
 //! @param trunc_lvl truncation level for truncated vines.
 //! @param tree_criterion the criterion for selecting the maximum spanning
 //!     tree ("tau", "hoeffd" and "rho" implemented so far).

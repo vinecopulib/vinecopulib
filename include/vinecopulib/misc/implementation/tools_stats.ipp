@@ -16,7 +16,7 @@ namespace vinecopulib {
 //! Utilities for statistical analysis
 namespace tools_stats {
 
-//! @brief simulates from the multivariate uniform distribution
+//! @brief Simulates from the multivariate uniform distribution.
 //!
 //! @param n number of observations.
 //! @param d dimension.
@@ -62,7 +62,7 @@ simulate_uniform(const size_t& n,
   return u.unaryExpr([&](double) { return distribution(generator); });
 }
 
-//! @brief applies the empirical probability integral transform to a data
+//! @brief Applies the empirical probability integral transform to a data.
 //! matrix.
 //!
 //! Gives pseudo-observations from the copula by applying the empirical
@@ -82,7 +82,7 @@ to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method)
   return x;
 }
 
-//! @brief applies the empirical probability integral transform to a data
+//! @brief Applies the empirical probability integral transform to a data.
 //! vector.
 //!
 //! Gives pseudo-observations from the copula by applying the empirical
@@ -298,7 +298,7 @@ pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 }
 //! @}
 
-//! @brief simulates from the multivariate Generalized Halton Sequence.
+//! @brief Simulates from the multivariate Generalized Halton Sequence.
 //!
 //! For more information on Generalized Halton Sequence, see
 //! Faure, H., Lemieux, C. (2009). Generalized Halton Sequences in 2008:
@@ -360,7 +360,7 @@ ghalton(const size_t& n, const size_t& d, std::vector<int> seeds)
   return res.transpose();
 }
 
-//! @brief simulates from the multivariate Sobol sequence.
+//! @brief Simulates from the multivariate Sobol sequence.
 //!
 //! For more information on the Sobol sequence, see S. Joe and F. Y. Kuo
 //! (2008), Constructing Sobol  sequences with better two-dimensional
@@ -450,7 +450,7 @@ sobol(const size_t& n, const size_t& d, std::vector<int> seeds)
   return output;
 }
 
-//! @brief computes bivariate t probabilities.
+//! @brief Computes bivariate t probabilities.
 //!
 //! Based on the method described by
 //! Dunnett, C.W. and M. Sobel, (1954),
@@ -576,7 +576,7 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
   return tools_eigen::binaryExpr_or_nan(z, f);
 }
 
-//! @brief compute bivariate normal probabilities.
+//! @brief Compute bivariate normal probabilities.
 //!
 //! A function for computing bivariate normal probabilities;
 //! developed using Drezner, Z. and Wesolowsky, G. O. (1989),
