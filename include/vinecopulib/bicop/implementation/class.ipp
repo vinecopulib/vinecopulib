@@ -232,7 +232,7 @@ Bicop::hfunc2(const Eigen::MatrixXd& u) const
 }
 
 //! @brief Evaluates the inverse of the first h-function.
-//
+//!
 //! The first h-function is
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
 //! The inverse is calulated w.r.t. the second argument.
