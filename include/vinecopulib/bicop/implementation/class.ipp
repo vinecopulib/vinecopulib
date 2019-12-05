@@ -130,7 +130,7 @@ Bicop::to_json(const std::string filename) const
   boost::property_tree::write_json(filename.c_str(), to_ptree());
 }
 
-//! @brief Evaluates the copula density.
+//! @brief Calculates the copula density.
 //!
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
@@ -142,7 +142,7 @@ Bicop::pdf(const Eigen::MatrixXd& u) const
   return bicop_->pdf(prep_for_abstract(u));
 }
 
-//! @brief Evaluates the copula distribution.
+//! @brief Calculates the copula distribution.
 //!
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
@@ -615,7 +615,7 @@ Bicop::get_var_types() const
 //! @{
 //! useful functions for bivariate copulas
 
-//! adjust's the copula model to a change in the variable order.
+//! Adjust's the copula model to a change in the variable order.
 inline void
 Bicop::flip()
 {

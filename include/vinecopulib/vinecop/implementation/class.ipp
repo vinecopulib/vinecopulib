@@ -726,7 +726,7 @@ Vinecop::get_var_types() const
 
 //! @}
 
-//! @brief Evaluates the copula density.
+//! @brief Calculates the copula density.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
@@ -830,7 +830,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
   return pdf;
 }
 
-//! @brief Evaluates the copula distribution.
+//! @brief Calculates the copula distribution.
 //!
 //! Because no closed-form expression is available, the distribution is 
 //! estimated numerically using Monte Carlo integration.
@@ -1198,7 +1198,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   return U_vine;
 }
 
-//! checks if dimension d of the data matches the dimension of the vine.
+//! Checks if dimension d of the data matches the dimension of the vine.
 inline void
 Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
 {
@@ -1221,7 +1221,7 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
   }
 }
 
-//! checks if dimension d of the data matches the dimension of the vine.
+//! Checks if dimension d of the data matches the dimension of the vine.
 inline void
 Vinecop::check_data(const Eigen::MatrixXd& data) const
 {
@@ -1229,7 +1229,7 @@ Vinecop::check_data(const Eigen::MatrixXd& data) const
   tools_eigen::check_if_in_unit_cube(data);
 }
 
-//! checks if pair copulas are compatible with the R-vine structure.
+//! Checks if pair copulas are compatible with the R-vine structure.
 inline void
 Vinecop::check_pair_copulas_rvine_structure(
   const std::vector<std::vector<Bicop>>& pair_copulas) const
@@ -1264,7 +1264,7 @@ Vinecop::finalize_fit(const tools_select::VinecopSelector& selector)
   pair_copulas_ = selector.get_pair_copulas();
 }
 
-//! checks if weights are compatible with the data.
+//! Checks if weights are compatible with the data.
 inline void
 Vinecop::check_weights_size(const Eigen::VectorXd& weights,
                             const Eigen::MatrixXd& data) const
@@ -1274,7 +1274,7 @@ Vinecop::check_weights_size(const Eigen::VectorXd& weights,
   }
 }
 
-//! checks if data size is large enough
+//! Checks if data size is large enough.
 inline void
 Vinecop::check_enough_data(const Eigen::MatrixXd& data) const
 {
@@ -1291,10 +1291,12 @@ Vinecop::check_fitted() const
   }
 }
 
-//! @brief Truncate the vine copula model.
-//! @param trunc_lvl The truncation level.
+//! @brief Truncates the vine copula model.
+//!
 //! If the model is already truncated at a level less than `trunc_lvl`,
 //! the function does nothing.
+//! 
+//! @param trunc_lvl The truncation level.
 inline void
 Vinecop::truncate(size_t trunc_lvl)
 {
@@ -1304,7 +1306,7 @@ Vinecop::truncate(size_t trunc_lvl)
   }
 }
 
-//! Sets all variable types to continuous..
+//! Sets all variable types to continuous.
 //! the function can be const, because var_types_ is mutable.
 inline void
 Vinecop::set_continuous_var_types() const
@@ -1315,7 +1317,7 @@ Vinecop::set_continuous_var_types() const
   set_var_types_internal(var_types_);
 }
 
-//! returns the number of discrete variables.
+//! Returns the number of discrete variables.
 inline int
 Vinecop::get_n_discrete() const
 {
@@ -1326,7 +1328,7 @@ Vinecop::get_n_discrete() const
   return n_discrete;
 }
 
-//! removes superfluous columns for continuous data.
+//! Removes superfluous columns for continuous data.
 inline Eigen::MatrixXd
 Vinecop::collapse_data(const Eigen::MatrixXd& u) const
 {
@@ -1344,7 +1346,7 @@ Vinecop::collapse_data(const Eigen::MatrixXd& u) const
   return u_new;
 }
 
-//! summarizes the model into a string (can be used for printing).
+//! Summarizes the model into a string (can be used for printing).
 inline std::string
 Vinecop::str() const
 {
