@@ -556,7 +556,7 @@ VinecopSelector::finalize(size_t trunc_lvl)
   }
 }
 
-//! Extract pair copula pseudo-observations from h-functions
+//! Get pair copula pseudo-observations from h-functions
 //!
 //! @param v0,v1 vertex indices.
 //! @param tree A vine tree.
