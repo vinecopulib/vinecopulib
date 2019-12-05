@@ -227,8 +227,7 @@ Vinecop::to_ptree() const
 //! See the corresponding method of `Bicop` objects for the encoding of
 //! pair-copulas.
 //!
-//! @param filename The name of the JSON file to read.
-//! @param filename The name of the file to write.
+//! @param filename The name of the JSON file to write.
 inline void
 Vinecop::to_json(const std::string filename) const
 {
