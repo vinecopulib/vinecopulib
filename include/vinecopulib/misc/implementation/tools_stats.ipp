@@ -25,7 +25,7 @@ namespace tools_stats {
 //!   the random number generator is seeded randomly.
 //!
 //! If `qrng = TRUE`, generalized Halton sequences (see `ghalton()`) are used
-//! for `d <= 300` and Sobol sequences otherwise (see `sobol()`).
+//! for \f$ d \leq 300 \f$ and Sobol sequences otherwise (see `sobol()`).
 //!
 //! @return An \f$ n \times d \f$ matrix of independent
 //! \f$ \mathrm{U}[0, 1] \f$ random variables.
@@ -62,16 +62,17 @@ simulate_uniform(const size_t& n,
   return u.unaryExpr([&](double) { return distribution(generator); });
 }
 
-//! @brief Applies the empirical probability integral transform to a data.
+//! @brief Applies the empirical probability integral transform to a data
 //! matrix.
 //!
 //! Gives pseudo-observations from the copula by applying the empirical
-//! distribution function (scaled by n + 1) to each margin/column.
+//! distribution function (scaled by \f$ n + 1 \f$) to each margin/column.
 //!
 //! @param x A matrix of real numbers.
 //! @param ties_method Indicates how to treat ties; same as in R, see
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
-//! @return Psuedo-observations of the copula, i.e. F_X(X) (column-wise)
+//! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$
+//! (column-wise).
 inline Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method)
 {
@@ -82,16 +83,16 @@ to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method)
   return x;
 }
 
-//! @brief Applies the empirical probability integral transform to a data.
+//! @brief Applies the empirical probability integral transform to a data
 //! vector.
 //!
 //! Gives pseudo-observations from the copula by applying the empirical
-//! distribution function (scaled by n + 1) to each margin/column.
+//! distribution function (scaled by \f$ n + 1 \f$) to each margin/column.
 //!
 //! @param x A vector of real numbers.
 //! @param ties_method Indicates how to treat ties; same as in R, see
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
-//! @return Psuedo-observations of the copula, i.e. F_X(X) (column-wise)
+//! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$.
 inline Eigen::VectorXd
 to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method)
 {
