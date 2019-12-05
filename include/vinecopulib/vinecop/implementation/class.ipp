@@ -61,7 +61,10 @@ inline Vinecop::Vinecop(
   : Vinecop(RVineStructure(matrix), pair_copulas, var_types)
 {}
 
-//! @brief Instantiates from data by creating a model and calling `select()`.
+//! @brief Instantiates from data.
+//!
+//! Equivalent to creating a default `Vinecop()` and then selecting the model
+//! using `select()`.
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
 //! @param structure An RVineStructure object specifying the vine structure.
@@ -96,11 +99,15 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   select(data, controls);
 }
 
-//! @brief Instantiates from data by creating a model and calling `select()`.
+//! @brief Instantiates from data.
+//!
+//! Equivalent to creating a default `Vinecop()` and then selecting the model
+//! using `select()`.
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
 //! @param matrix Either an empty matrix (default) or an R-vine structure
-//!     matrix, see `select()`. If empty, then it is selected as part of the fit.
+//!     matrix, see `select()`. If empty, then it is selected as part of the
+//!     fit.
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
@@ -155,11 +162,19 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
 }
 
 //! @brief Instantiates from a JSON file.
-//! @param filename The name of the JSON file to read (see `to_ptree()` for the
-//! structure of the file).
+//!
+//! The input file contains 2 attributes : `"structure"` for the vine
+//! structure, which itself contains attributes `"array"` for the structure
+//! triangular array and `"order"` for the order vector, and `"pair copulas"`.
+//! `"pair copulas"` contains a list of attributes for the trees
+//! (`"tree1"`, `"tree2"`, etc), each containing
+//! a list of attributes for the edges (`"pc1"`, `"pc2"`, etc).
+//! See the corresponding method of `Bicop` objects for the encoding of
+//! pair-copulas.
+//!
+//! @param filename The name of the JSON file to read.
 //! @param check Whether to check if the `"structure"` node of the input
-//! represents
-//!      a valid R-vine structure.
+//! represents a valid R-vine structure.
 inline Vinecop::Vinecop(const std::string filename, const bool check)
   : Vinecop(tools_serialization::json_to_ptree(filename.c_str()), check)
 {}
@@ -203,7 +218,16 @@ Vinecop::to_ptree() const
 
 //! @brief Write the copula object into a JSON file.
 //!
-//! See `to_ptree()` for the structure of the file.
+//! The output file contains 2 attributes : `"structure"` for the vine
+//! structure, which itself contains attributes `"array"` for the structure
+//! triangular array and `"order"` for the order vector, and `"pair copulas"`.
+//! `"pair copulas"` contains a list of attributes for the trees
+//! (`"tree1"`, `"tree2"`, etc), each containing
+//! a list of attributes for the edges (`"pc1"`, `"pc2"`, etc).
+//! See the corresponding method of `Bicop` objects for the encoding of
+//! pair-copulas.
+//!
+//! @param filename The name of the JSON file to read.
 //! @param filename The name of the file to write.
 inline void
 Vinecop::to_json(const std::string filename) const
@@ -880,7 +904,7 @@ Vinecop::simulate(const size_t n,
 //! @brief Calculates the log-likelihood.
 //!
 //! The log-likelihood is defined as
-//! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \f]
+//! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, ..., U_{d, i}), \f]
 //! where \f$ c \f$ is the copula density `pdf()`.
 //!
 //! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
@@ -903,9 +927,9 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 //!
 //! The AIC is defined as
 //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
-//! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
-//! (effective) number of parameters of the model, see `loglik()` and
-//! `get_npars()`. The AIC is a consistent model selection criterion
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `loglik()`)
+//! and \f$ p \f$ is the (effective) number of parameters of the model.
+//! The AIC is a consistent model selection criterion even
 //! for nonparametric models.
 //!
 //! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
@@ -923,10 +947,10 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! @brief Calculates the Bayesian information criterion (BIC).
 //!
 //! The BIC is defined as
-//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
-//! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
-//! (effective) number of parameters of the model, see `loglik()` and
-//! `get_npars()`. The BIC is a consistent model selection criterion
+//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \log(n) p, \f]
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `loglik()`)
+//! and \f$ p \f$ is the (effective) number of parameters of the model.
+//! The BIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
 //! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
@@ -942,22 +966,22 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
          get_npars() * log(static_cast<double>(u.rows()));
 }
 
-//! @brief Calculates the modified Bayesian information criterion for vines.
+//! @brief Calculates the modified Bayesian information criterion for vines
 //! (mBICV).
 //!
 //! The mBICV is defined as
-//! \f[ \mathrm{mBICV} = -2\, \mathrm{loglik} +  \ln(n) \nu, - 2 *
-//! \sum_{t=1}^(d - 1) \{q_t log(\psi_0^t) - (d - t - q_t) log(1 -\psi_0^t)\}\f]
-//! where \f$ \mathrm{loglik} \f$ is the log-liklihood, \f$ \nu \f$ is the
-//! (effective) number of parameters of the model, \f$ t \f$ is the tree level
-//! \f$ \psi_0 \f$ is the prior probability of having a non-independence copula
-//! in the first tree, and \f$ q_t \f$ is the number of non-independence copulas
-//! in tree \f$ t \f$; The vBIC is a consistent model selection criterion for
-//! parametric sparse vine copula models when \f$ d = o(\sqrt{n \ln n})\f$.
+//! \f[ \mathrm{mBICV} = -2\, \mathrm{loglik} +  \log(n) p, - 2 * \sum_{t=1}^(d - 1) \{q_t \log(\psi_0^t) - (d - t - q_t) \log(1 -\psi_0^t)\},\f]
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood, 
+//! \f$ p \f$ is the (effective) number of parameters of the model, \f$ t \f$ 
+//! is the tree level, \f$ \psi_0 \f$ is the prior probability of having a
+//! non-independence copula in the first tree, and \f$ q_t \f$ is the number of
+//! non-independence copulas in tree \f$ t \f$; The vBIC is a consistent model
+//! selection criterion for parametric sparse vine copula models when
+//! \f$ d = o(\sqrt{n \log n})\f$.
 //!
 //! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `Vinecop::select()`).
+//!   (see `select()`).
 //! @param psi0 Baseline prior probability of a non-independence copula.
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches

@@ -77,7 +77,7 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
 
 //! @brief Instantiates from a JSON file.
 //!
-//! The input file contains four values named
+//! The input file contains four attributes:
 //! `"family"`, `"rotation"`, `"parameters"`, `"var_types"` respectively a
 //! string for the family name, an integer for the rotation, and a numeric
 //! matrix for the parameters, and a list of two strings for the variable
@@ -117,7 +117,7 @@ Bicop::to_ptree() const
 
 //! @brief Write the copula object into a JSON file.
 //!
-//! The written file contains four values named
+//! The written file contains four attributes:
 //! `"family"`, `"rotation"`, `"parameters"`, `"var_types"` respectively a
 //! string for the family name, an integer for the rotation, and a numeric
 //! matrix for the parameters, and a list of two strings for the variable
@@ -325,7 +325,7 @@ Bicop::simulate(const size_t& n,
 //! @brief Calculates the log-likelihood.
 //!
 //! The log-likelihood is defined as
-//! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \f]
+//! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, U_{2, i}), \f]
 //! where \f$ c \f$ is the copula density `pdf()`.
 //!
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
@@ -361,7 +361,7 @@ Bicop::aic(const Eigen::MatrixXd& u) const
 //! @brief Calculates the Bayesian information criterion (BIC).
 //!
 //! The BIC is defined as
-//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
+//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \log(n) p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `loglik()`)
 //! and \f$ p \f$ is the (effective) number of parameters of the model.
 //! The BIC is a consistent model selection criterion
@@ -384,13 +384,12 @@ Bicop::bic(const Eigen::MatrixXd& u) const
 //! @brief Calculates the modified Bayesian information criterion (mBIC).
 //!
 //! The mBIC is defined as
-//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  p \ln(n)
-//!  - 2 (I log(\psi_0) + (1 - I) log(1 - \psi_0) \f]
-//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `loglik()`),
-//! \f$ p \f$ is the (effective) number of parameters of the model,
-//! and \f$ \psi_0 \f$ is the prior
-//! probability of having a non-independence copula and \f$ I \f$ is an
-//! indicator for the family being non-independence.
+//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  p \log(n) - 2 (I \log(\psi_0) + (1 - I) \log(1 - \psi_0), \f] 
+//! where \f$ \mathrm{loglik} \f$ is the \log-liklihood
+//! (see `loglik()`), \f$ p \f$ is the (effective) number of parameters of the
+//! model, and \f$ \psi_0 \f$ is the prior probability of having a
+//! non-independence copula and \f$ I \f$ is an indicator for the family being
+//! non-independence.
 //!
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
