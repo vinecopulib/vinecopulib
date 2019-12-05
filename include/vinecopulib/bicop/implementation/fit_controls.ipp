@@ -189,14 +189,14 @@ FitControlsBicop::get_psi0() const
   return psi0_;
 }
 
-//! Setss the family set..
+//! Sets the family set..
 inline void
 FitControlsBicop::set_family_set(std::vector<BicopFamily> family_set)
 {
   family_set_ = family_set;
 }
 
-//! Setss the parametric method..
+//! Sets the parametric method..
 inline void
 FitControlsBicop::set_parametric_method(std::string parametric_method)
 {
@@ -204,7 +204,7 @@ FitControlsBicop::set_parametric_method(std::string parametric_method)
   parametric_method_ = parametric_method;
 }
 
-//! Setss the nonparmetric method..
+//! Sets the nonparmetric method..
 inline void
 FitControlsBicop::set_nonparametric_method(std::string nonparametric_method)
 {
@@ -212,7 +212,7 @@ FitControlsBicop::set_nonparametric_method(std::string nonparametric_method)
   nonparametric_method_ = nonparametric_method;
 }
 
-//! Setss the nonparametric multiplier..
+//! Sets the nonparametric multiplier..
 inline void
 FitControlsBicop::set_nonparametric_mult(double nonparametric_mult)
 {
@@ -220,7 +220,7 @@ FitControlsBicop::set_nonparametric_mult(double nonparametric_mult)
   nonparametric_mult_ = nonparametric_mult;
 }
 
-//! Setss the selection criterion.
+//! Sets the selection criterion.
 inline void
 FitControlsBicop::set_selection_criterion(std::string selection_criterion)
 {
@@ -228,7 +228,7 @@ FitControlsBicop::set_selection_criterion(std::string selection_criterion)
   selection_criterion_ = selection_criterion;
 }
 
-//! Setss the observation weights..
+//! Sets the observation weights..
 inline void
 FitControlsBicop::set_weights(const Eigen::VectorXd& weights)
 {
@@ -236,14 +236,14 @@ FitControlsBicop::set_weights(const Eigen::VectorXd& weights)
   weights_ = weights / weights.sum() * weights.size();
 }
 
-//! Setss whether to preselect the families..
+//! Sets whether to preselect the families..
 inline void
 FitControlsBicop::set_preselect_families(bool preselect_families)
 {
   preselect_families_ = preselect_families;
 }
 
-//! Setss the prior probability for mBIC..
+//! Sets the prior probability for mBIC..
 inline void
 FitControlsBicop::set_psi0(double psi0)
 {
@@ -251,7 +251,7 @@ FitControlsBicop::set_psi0(double psi0)
   psi0_ = psi0;
 }
 
-//! Setss the number of threads..
+//! Sets the number of threads..
 inline void
 FitControlsBicop::set_num_threads(size_t num_threads)
 {
