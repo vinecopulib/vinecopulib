@@ -749,7 +749,7 @@ VinecopSelector::print_pair_copulas_of_tree(size_t t)
   }
 }
 
-//! Getss all criterion values that got thresholded to zero.
+//! Gets all criterion values that got thresholded to zero.
 inline std::vector<double>
 VinecopSelector::get_thresholded_crits()
 {
