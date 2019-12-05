@@ -615,7 +615,7 @@ Bicop::get_var_types() const
 //! @{
 //! useful functions for bivariate copulas
 
-//! Adjust's the copula model to a change in the variable order.
+//! Adjusts the copula model to a change in the variable order.
 inline void
 Bicop::flip()
 {
