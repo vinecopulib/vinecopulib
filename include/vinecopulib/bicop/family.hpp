@@ -14,17 +14,17 @@ namespace vinecopulib {
 //! @brief A bivariate copula family identifier.
 enum class BicopFamily
 {
-  indep,    /// Independence copula
-  gaussian, /// Gaussian copula
-  student,  /// Student t copula
-  clayton,  /// Clayton copula
-  gumbel,   /// Gumbel copula
-  frank,    /// Frank copula
-  joe,      /// Joe copula
   bb1,      /// BB1 copula
   bb6,      /// BB6 copula
   bb7,      /// BB7 copula
   bb8,      /// BB8 copula
+  clayton,  /// Clayton copula
+  frank,    /// Frank copula
+  gaussian, /// Gaussian copula
+  gumbel,   /// Gumbel copula
+  indep,    /// Independence copula
+  joe,      /// Joe copula
+  student,  /// Student t copula
   tll       /// Transformation local likelihood kernel estimator
 };
 
