@@ -448,35 +448,35 @@ Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters) const
 //!
 //! @{
 
-//! get the copula family
+//! Get the copula family.
 inline BicopFamily
 Bicop::get_family() const
 {
   return bicop_->get_family();
 }
 
-//! get the copula family as a string
+//! Get the copula family as a string.
 inline std::string
 Bicop::get_family_name() const
 {
   return bicop_->get_family_name();
 }
 
-//! get the rotation
+//! Get the rotation.
 inline int
 Bicop::get_rotation() const
 {
   return rotation_;
 }
 
-//! get the parameters
+//! Get the parameters.
 inline Eigen::MatrixXd
 Bicop::get_parameters() const
 {
   return bicop_->get_parameters();
 }
 
-//! get the log-likelihood (only for fitted objects)
+//! Get the log-likelihood (only for fitted objects).
 inline double
 Bicop::get_loglik() const
 {
@@ -484,7 +484,7 @@ Bicop::get_loglik() const
   return bicop_->get_loglik();
 }
 
-//! get the number of observations (only for fitted objects)
+//! Get the number of observations (only for fitted objects).
 inline size_t
 Bicop::get_nobs() const
 {
@@ -492,7 +492,7 @@ Bicop::get_nobs() const
   return nobs_;
 }
 
-//! get the aic (only for fitted objects)
+//! Get the aic (only for fitted objects).
 inline double
 Bicop::get_aic() const
 {
@@ -500,7 +500,7 @@ Bicop::get_aic() const
   return -2 * bicop_->get_loglik() + 2 * bicop_->get_npars();
 }
 
-//! get the bic (only for fitted objects)
+//! Get the bic (only for fitted objects).
 inline double
 Bicop::get_bic() const
 {
@@ -509,7 +509,7 @@ Bicop::get_bic() const
   return -2 * bicop_->get_loglik() + std::log(nobs_) * npars;
 }
 
-//! get the modified bic (only for fitted objects)
+//! Get the modified bic (only for fitted objects).
 inline double
 Bicop::get_mbic(const double psi0) const
 {
@@ -527,7 +527,7 @@ Bicop::compute_mbic_penalty(const size_t nobs, const double psi0) const
   return std::log(nobs) * npars - 2 * log_prior;
 }
 
-//! get the Kendall's tau
+//! Get the Kendall's tau.
 inline double
 Bicop::get_tau() const
 {

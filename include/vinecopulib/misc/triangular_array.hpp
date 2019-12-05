@@ -175,7 +175,7 @@ TriangularArray<T>::operator==(const TriangularArray<T>& rhs) const
   return true;
 }
 
-//! get the truncation level of the underlying vine.
+//! Get the truncation level of the underlying vine..
 template<typename T>
 size_t
 TriangularArray<T>::get_trunc_lvl() const
@@ -183,7 +183,7 @@ TriangularArray<T>::get_trunc_lvl() const
   return trunc_lvl_;
 }
 
-//! get the dimension of the underlying vine (the matrix has `d-1` columns and
+//! Get the dimension of the underlying vine (the matrix has `d-1` columns and.
 //! `min(trunv_lvl, d-1)` rows).
 template<typename T>
 size_t
