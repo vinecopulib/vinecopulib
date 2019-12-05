@@ -172,7 +172,7 @@ public:
 //! 4 with all others, the second tree connects variable 3 with all others,
 //! etc.
 //!
-//! Note that `DVineStructure` objects inherit the methods and attributes of
+//! Note that `CVineStructure` objects inherit the methods and attributes of
 //! `RVineStructure` objects.
 class CVineStructure : public RVineStructure
 {

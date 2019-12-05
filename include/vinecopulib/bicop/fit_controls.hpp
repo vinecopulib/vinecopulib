@@ -11,7 +11,7 @@
 #include <vinecopulib/bicop/family.hpp>
 
 namespace vinecopulib {
-//! @brief A class for controlling fit of bivariate copula models.
+//! @brief A class for controlling fits of bivariate copula models.
 //!
 class FitControlsBicop
 {

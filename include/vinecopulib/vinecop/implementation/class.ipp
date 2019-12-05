@@ -329,7 +329,7 @@ Vinecop::select_families(const Eigen::MatrixXd& data,
 //! @name Getters
 //! @{
 
-//! @brief Extracts a pair copula.
+//! @brief Gets a pair copula.
 //!
 //! @param tree Tree index (starting with 0).
 //! @param edge Edge index (starting with 0).
@@ -358,7 +358,7 @@ Vinecop::get_pair_copula(const size_t tree, const size_t edge) const
   return pair_copulas_[tree][edge];
 }
 
-//! @brief Extracts all pair copulas.
+//! @brief Gets all pair copulas.
 //!
 //! @return a nested std::vector with entry `[t][e]` corresponding to
 //! edge `e` in tree `t`.
@@ -368,7 +368,7 @@ Vinecop::get_all_pair_copulas() const
   return pair_copulas_;
 }
 
-//! @brief Extracts the family of a pair copula.
+//! @brief Gets the family of a pair copula.
 //!
 //! @param tree Tree index (starting with 0).
 //! @param edge Edge index (starting with 0).
@@ -378,7 +378,7 @@ Vinecop::get_family(const size_t tree, const size_t edge) const
   return get_pair_copula(tree, edge).get_family();
 }
 
-//! @brief Extracts the families of all pair copulas.
+//! @brief Gets the families of all pair copulas.
 //!
 //! @return a nested std::vector with entry `[t][e]` corresponding to
 //! edge `e` in tree `t`.
@@ -396,7 +396,7 @@ Vinecop::get_all_families() const
   return families;
 }
 
-//! @brief Extracts the rotation of a pair copula.
+//! @brief Gets the rotation of a pair copula.
 //!
 //! @param tree Tree index (starting with 0).
 //! @param edge Edge index (starting with 0).
@@ -406,7 +406,7 @@ Vinecop::get_rotation(const size_t tree, const size_t edge) const
   return get_pair_copula(tree, edge).get_rotation();
 }
 
-//! @brief Extracts the rotations of all pair copulas.
+//! @brief Gets the rotations of all pair copulas.
 //!
 //! @return a nested std::vector with entry `[t][e]` corresponding to
 //! edge `e` in tree `t`.
@@ -424,7 +424,7 @@ Vinecop::get_all_rotations() const
   return rotations;
 }
 
-//! @brief Extracts the parameters of a pair copula.
+//! @brief Gets the parameters of a pair copula.
 //!
 //! @param tree Tree index (starting with 0).
 //! @param edge Edge index (starting with 0).
@@ -434,7 +434,7 @@ Vinecop::get_parameters(const size_t tree, const size_t edge) const
   return get_pair_copula(tree, edge).get_parameters();
 }
 
-//! @brief Extracts the Kendall's \f$ tau \f$ of a pair copula.
+//! @brief Gets the Kendall's \f$ tau \f$ of a pair copula.
 //!
 //! @param tree Tree index (starting with 0).
 //! @param edge Edge index (starting with 0).
@@ -450,7 +450,7 @@ Vinecop::get_trunc_lvl() const
   return rvine_structure_.get_trunc_lvl();
 }
 
-//! @brief Extracts the parameters of all pair copulas.
+//! @brief Gets the parameters of all pair copulas.
 //!
 //! @return a nested std::vector with entry `[t][e]` corresponding to
 //! edge `e` in tree `t`.
@@ -468,7 +468,7 @@ Vinecop::get_all_parameters() const
   return parameters;
 }
 
-//! @brief Extracts the Kendall's \f$ tau \f$s of all pair copulas.
+//! @brief Gets the Kendall's \f$ tau \f$s of all pair copulas.
 //!
 //! @return a nested std::vector with entry `[t][e]` corresponding to
 //! edge `e` in tree `t`.
@@ -486,35 +486,35 @@ Vinecop::get_all_taus() const
   return taus;
 }
 
-//! @brief Extracts the dimension of the vine copula model.
+//! @brief Gets the dimension of the vine copula model.
 inline size_t
 Vinecop::get_dim() const
 {
   return d_;
 }
 
-//! @brief Extracts the order vector of the vine copula model.
+//! @brief Gets the order vector of the vine copula model.
 inline std::vector<size_t>
 Vinecop::get_order() const
 {
   return rvine_structure_.get_order();
 }
 
-//! @brief Extracts the structure matrix of the vine copula model.
+//! @brief Gets the structure matrix of the vine copula model.
 inline RVineStructure
 Vinecop::get_rvine_structure() const
 {
   return rvine_structure_;
 }
 
-//! @brief Extracts the structure matrix of the vine copula model.
+//! @brief Gets the structure matrix of the vine copula model.
 inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>
 Vinecop::get_matrix() const
 {
   return rvine_structure_.get_matrix();
 }
 
-//! @brief Extracts the above diagonal coefficients of the vine copula model.
+//! @brief Gets the above diagonal coefficients of the vine copula model.
 //! @param natural_order Whether indices correspond to natural order.
 inline TriangularArray<size_t>
 Vinecop::get_struct_array(bool natural_order) const
@@ -522,7 +522,7 @@ Vinecop::get_struct_array(bool natural_order) const
   return rvine_structure_.get_struct_array(natural_order);
 }
 
-//! @brief Extracts the log-likelihood (throws an error if model has not been.
+//! @brief Gets the log-likelihood (throws an error if model has not been.
 //! fitted to data).
 inline double
 Vinecop::get_loglik() const
@@ -531,7 +531,7 @@ Vinecop::get_loglik() const
   return loglik_;
 }
 
-//! @brief Extracts the number of observations used for the fit.
+//! @brief Gets the number of observations used for the fit.
 //!
 //! The function throws an error if model has not been fitted to data.
 inline size_t
@@ -541,7 +541,7 @@ Vinecop::get_nobs() const
   return nobs_;
 }
 
-//! @brief Extracts the AIC.
+//! @brief Gets the AIC.
 //!
 //! The function throws an error if model has not been fitted to data.
 inline double
@@ -551,7 +551,7 @@ Vinecop::get_aic() const
   return -2 * loglik_ + 2 * get_npars();
 }
 
-//! @brief Extracts the BIC.
+//! @brief Gets the BIC.
 //!
 //! The function throws an error if model has not been fitted to data.
 inline double
@@ -561,7 +561,7 @@ Vinecop::get_bic() const
   return -2 * loglik_ + get_npars() * std::log(nobs_);
 }
 
-//! @brief Extracts the log-likelihood.
+//! @brief Gets the log-likelihood.
 //!
 //! The function throws an error if model has not been fitted to data.
 inline double
@@ -607,7 +607,7 @@ Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
   return std::log(nobs) * npars - 2.0 * log_prior;
 }
 
-//! @brief Extracts the threshold
+//! @brief Gets the threshold
 //!
 //! Usually zero except `select_threshold == TRUE` in `FitControlsVinecop()`).
 inline double
@@ -694,7 +694,7 @@ Vinecop::set_var_types_internal(const std::vector<std::string>& var_types) const
   }
 }
 
-//! @brief Extracts the variable types.
+//! @brief Gets the variable types.
 inline std::vector<std::string>
 Vinecop::get_var_types() const
 {

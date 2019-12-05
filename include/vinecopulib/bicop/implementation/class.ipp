@@ -604,7 +604,7 @@ Bicop::set_var_types(const std::vector<std::string>& var_types)
   }
 }
 
-//! @brief Extracts variable types.
+//! @brief Gets variable types.
 inline std::vector<std::string>
 Bicop::get_var_types() const
 {

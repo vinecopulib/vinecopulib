@@ -238,7 +238,7 @@ RVineStructure::get_struct_array(bool natural_order) const
   return new_array;
 }
 
-//! @brief Extracts the minimum array.
+//! @brief Gets the minimum array.
 //!
 //! The minimum array is derived from an R-vine array by
 //! iteratively computing the (elementwise) minimum of two subsequent rows
@@ -251,7 +251,7 @@ RVineStructure::get_min_array() const
   return min_array_;
 }
 
-//! @brief Extracts an array indicating which of the first h-functions are.
+//! @brief Gets an array indicating which of the first h-functions are.
 //! needed.
 //!
 //! (it is usually not necessary to compute both h-functions for each
@@ -262,7 +262,7 @@ RVineStructure::get_needed_hfunc1() const
   return needed_hfunc1_;
 }
 
-//! @brief Extracts an array indicating which of the second h-functions are.
+//! @brief Gets an array indicating which of the second h-functions are.
 //! needed.
 //!
 //! (it is usually not necessary to compute both h-functions for each
@@ -486,7 +486,7 @@ RVineStructure::get_order(
   return order;
 }
 
-//! @brief Extracts the structure array (entries above the diagonal in R-vine.
+//! @brief Gets the structure array (entries above the diagonal in R-vine.
 //! array).
 //! @param mat A array representing the R-vine array.
 inline TriangularArray<size_t>

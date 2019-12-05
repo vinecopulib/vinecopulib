@@ -7,12 +7,12 @@
 #include <stdexcept>
 #include <vinecopulib/misc/tools_stl.hpp>
 
-//! @file bicop/implementation/fit_controls.ipp
-//! @brief Fit controls for Bicop class (Implementation).
+//! @file vinecop/implementation/fit_controls.ipp
+//! @brief Fit controls for Vinecop class (Implementation).
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib {
-//! creates default controls for fitting vine copula models.
+//! Instantiates default controls for fitting vine copula models.
 inline FitControlsVinecop::FitControlsVinecop()
   : FitControlsBicop()
 {
