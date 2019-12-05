@@ -37,7 +37,7 @@ Optimizer::set_controls(double initial_trust_region,
 
 //! @brief Solve the maximization problem.
 //!
-//! @param initial_parameters Of starting values for the optimization
+//! @param initial_parameters Starting values for the optimization
 //!     algorithm.
 //! @param lower_bounds Lower bounds for the parameters.
 //! @param upper_bounds Upper bounds for the parameters.
