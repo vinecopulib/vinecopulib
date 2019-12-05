@@ -1278,7 +1278,7 @@ Vinecop::truncate(size_t trunc_lvl)
   }
 }
 
-//! set all variable types to continuous.
+//! Sets all variable types to continuous..
 //! the function can be const, because var_types_ is mutable.
 inline void
 Vinecop::set_continuous_var_types() const

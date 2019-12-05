@@ -534,7 +534,7 @@ Bicop::get_tau() const
   return parameters_to_tau(bicop_->get_parameters());
 }
 
-//! set the rotation
+//! Sets the rotation.
 inline void
 Bicop::set_rotation(const int rotation)
 {
@@ -652,14 +652,14 @@ Bicop::str() const
   return bicop_str.str().c_str();
 }
 
-//! extract lower bounds for copula parameters.
+//! Gets lower bounds for copula parameters.
 inline Eigen::MatrixXd
 Bicop::get_parameters_lower_bounds() const
 {
   return bicop_->get_parameters_lower_bounds();
 }
 
-//! extract upper bounds for copula parameters.
+//! Gets upper bounds for copula parameters.
 inline Eigen::MatrixXd
 Bicop::get_parameters_upper_bounds() const
 {

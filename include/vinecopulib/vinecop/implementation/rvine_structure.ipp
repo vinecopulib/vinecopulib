@@ -196,14 +196,14 @@ RVineStructure::to_json(const std::string filename) const
   boost::property_tree::write_json(filename.c_str(), this->to_ptree());
 }
 
-//! extract the dimension of the vine.
+//! Gets the dimension of the vine.
 inline size_t
 RVineStructure::get_dim() const
 {
   return d_;
 }
 
-//! extract the truncation level of the vine.
+//! Gets the truncation level of the vine.
 inline size_t
 RVineStructure::get_trunc_lvl() const
 {
@@ -423,7 +423,7 @@ RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
   return RVineStructure(order, rvm.get_struct_array(true), true, false);
 }
 
-//! extract the R-vine matrix representation.
+//! Gets the R-vine matrix representation.
 inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>
 RVineStructure::get_matrix() const
 {

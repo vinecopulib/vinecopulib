@@ -151,7 +151,7 @@ FitControlsVinecop::get_trunc_lvl() const
   return trunc_lvl_;
 }
 
-//! sets the truncation level.
+//! Setss the truncation level..
 inline void
 FitControlsVinecop::set_trunc_lvl(size_t trunc_lvl)
 {
@@ -169,7 +169,7 @@ FitControlsVinecop::get_select_trunc_lvl() const
   return select_trunc_lvl_;
 }
 
-//! sets whether to select the truncation level automatically.
+//! Setss whether to select the truncation level automatically..
 inline void
 FitControlsVinecop::set_select_trunc_lvl(bool select_trunc_lvl)
 {
@@ -183,7 +183,7 @@ FitControlsVinecop::get_tree_criterion() const
   return tree_criterion_;
 }
 
-//! sets the criterion for tree selection.
+//! Setss the criterion for tree selection..
 inline void
 FitControlsVinecop::set_tree_criterion(std::string tree_criterion)
 {
@@ -198,7 +198,7 @@ FitControlsVinecop::get_threshold() const
   return threshold_;
 }
 
-//! sets the threshold parameter
+//! Setss the threshold parameter.
 inline void
 FitControlsVinecop::set_threshold(double threshold)
 {
@@ -227,7 +227,7 @@ FitControlsVinecop::get_select_threshold() const
   return select_threshold_;
 }
 
-//! sets whether to select the threshold automatically.
+//! Setss whether to select the threshold automatically..
 inline void
 FitControlsVinecop::set_select_threshold(bool select_threshold)
 {
@@ -254,7 +254,7 @@ FitControlsVinecop::get_fit_controls_bicop() const
   return controls_bicop;
 }
 
-//! sets the fit controls for bivariate fitting.
+//! Setss the fit controls for bivariate fitting..
 inline void
 FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)
 {

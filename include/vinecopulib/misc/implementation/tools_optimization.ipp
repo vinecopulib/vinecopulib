@@ -22,7 +22,7 @@ inline Optimizer::Optimizer()
   : controls_(BobyqaControls())
 {}
 
-//! set the optimizer's controls.
+//! Sets the optimizer's controls..
 //!
 //! @param initial_trust_region Initial trust region.
 //! @param final_trust_region Final trust region.
