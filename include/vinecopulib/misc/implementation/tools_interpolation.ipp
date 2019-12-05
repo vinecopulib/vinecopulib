@@ -10,7 +10,7 @@
 namespace vinecopulib {
 
 namespace tools_interpolation {
-//! Instantiatesor
+//! Constructor
 //!
 //! @param grid_points An ascending sequence of grid_points; used in both
 //! dimensions.
