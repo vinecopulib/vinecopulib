@@ -139,7 +139,7 @@ inline RVineStructure::RVineStructure(
 
 //! @brief Instantiates from a boost::property_tree::ptree object.
 //! @param input The boost::property_tree::ptree object to convert from
-//! (see to_ptree() for the structure of the input).
+//! (see `to_ptree()` for the structure of the input).
 //! @param check Whether to check if the input represents
 //!      a valid R-vine structure.
 inline RVineStructure::RVineStructure(const boost::property_tree::ptree input,

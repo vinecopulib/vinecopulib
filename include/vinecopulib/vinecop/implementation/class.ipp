@@ -24,7 +24,7 @@ inline Vinecop::Vinecop(const size_t d)
 //! @brief Instantiates an arbitrary vine copula model.
 //! @param structure An RVineStructure object specifying the vine structure.
 //! @param pair_copulas Bicop objects specifying the pair-copulas, namely
-//!     a nested list such that `pc_store[t][e]` contains a `Bicop`.
+//!     a nested list such that `pc_store[t][e]` contains a `Bicop`
 //!     object for the pair copula corresponding to tree `t` and edge `e`.
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
@@ -49,7 +49,7 @@ inline Vinecop::Vinecop(const RVineStructure& structure,
 //! @brief Instantiates an arbitrary vine copula model.
 //! @param matrix An R-vine matrix specifying the vine structure.
 //! @param pair_copulas Bicop objects specifying the pair-copulas, namely
-//!     a nested list such that `pc_store[t][e]` contains a `Bicop`.
+//!     a nested list such that `pc_store[t][e]` contains a `Bicop`
 //!     object for the pair copula corresponding to tree `t` and edge `e`.
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
@@ -61,7 +61,7 @@ inline Vinecop::Vinecop(
   : Vinecop(RVineStructure(matrix), pair_copulas, var_types)
 {}
 
-//! @brief Instantiates from data by creating a model and calling select().
+//! @brief Instantiates from data by creating a model and calling `select()`.
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
 //! @param structure An RVineStructure object specifying the vine structure.
@@ -96,11 +96,11 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   select(data, controls);
 }
 
-//! @brief Instantiates from data by creating a model and calling select().
+//! @brief Instantiates from data by creating a model and calling `select()`.
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
 //! @param matrix Either an empty matrix (default) or an R-vine structure
-//!     matrix, see select(). If empty, then it is selected as part of the fit.
+//!     matrix, see `select()`. If empty, then it is selected as part of the fit.
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
@@ -115,7 +115,7 @@ inline Vinecop::Vinecop(
 
 //! @brief Instantiates from a boost::property_tree::ptree object.
 //! @param input The boost::property_tree::ptree object to convert from
-//! (see to_ptree() for the structure of the input).
+//! (see `to_ptree()` for the structure of the input).
 //! @param check Whether to check if the `"structure"` node represents
 //!      a valid R-vine structure.
 inline Vinecop::Vinecop(const boost::property_tree::ptree input,
@@ -155,7 +155,7 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
 }
 
 //! @brief Instantiates from a JSON file.
-//! @param filename The name of the JSON file to read (see to_ptree() for the
+//! @param filename The name of the JSON file to read (see `to_ptree()` for the
 //! structure of the file).
 //! @param check Whether to check if the `"structure"` node of the input
 //! represents
@@ -203,7 +203,7 @@ Vinecop::to_ptree() const
 
 //! @brief Write the copula object into a JSON file.
 //!
-//! See to_ptree() for the structure of the file.
+//! See `to_ptree()` for the structure of the file.
 //! @param filename The name of the file to write.
 inline void
 Vinecop::to_json(const std::string filename) const
@@ -628,7 +628,7 @@ Vinecop::set_var_types(const std::vector<std::string>& var_types)
 
 //! @brief Sets all pair-copulas.
 //! @param pair_copulas A vector of pair-copulas that has to be consistent with
-//!     the current structure (see Vinecop()).
+//!     the current structure (see `Vinecop()`).
 inline void
 Vinecop::set_all_pair_copulas(
   const std::vector<std::vector<Bicop>>& pair_copulas)
@@ -850,7 +850,7 @@ Vinecop::cdf(const Eigen::MatrixXd& u,
   return vine_distribution / static_cast<double>(N);
 }
 
-//! @brief Simulates from a vine copula model, see inverse_rosenblatt().
+//! @brief Simulates from a vine copula model, see `inverse_rosenblatt()`.
 //!
 //! @details Simulated data is always a continous \f$ n \times d \f$ matrix.
 //!
@@ -881,7 +881,7 @@ Vinecop::simulate(const size_t n,
 //!
 //! The log-likelihood is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, ..., U_{d, i}), \f]
-//! where \f$ c \f$ is the copula density pdf().
+//! where \f$ c \f$ is the copula density `pdf()`.
 //!
 //! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
@@ -904,8 +904,8 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! The AIC is defined as
 //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
-//! (effective) number of parameters of the model, see loglik() and
-//! get_npars(). The AIC is a consistent model selection criterion
+//! (effective) number of parameters of the model, see `loglik()` and
+//! `get_npars()`. The AIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
 //! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
@@ -925,8 +925,8 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! The BIC is defined as
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood and \f$ p \f$ is the
-//! (effective) number of parameters of the model, see loglik() and
-//! get_npars(). The BIC is a consistent model selection criterion
+//! (effective) number of parameters of the model, see `loglik()` and
+//! `get_npars()`. The BIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
 //! @param u \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of

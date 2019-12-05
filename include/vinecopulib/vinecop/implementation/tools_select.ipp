@@ -956,7 +956,7 @@ VinecopSelector::remove_vertex_data(VineTree& tree)
 }
 
 //! Fit and select a pair copula for each edges
-//! @param tree A vine tree preprocessed with add_edge_info().
+//! @param tree A vine tree preprocessed with `add_edge_info()`.
 //! @param tree_opt The current optimal tree (used only for sparse
 //!     selection).
 inline void

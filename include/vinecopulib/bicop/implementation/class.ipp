@@ -39,13 +39,13 @@ inline Bicop::Bicop(const BicopFamily family,
   set_var_types(var_types);
 }
 
-//! @brief Instantiates a copula model from the data.
+//! @brief Instantiates from data.
 //!
-//! Equivalent to creating a default `cop = Bicop()` and then selecting using
-//! `cop.select(data, controls)`.
+//! Equivalent to creating a default `Bicop()` and then selecting the model
+//! using `select()`.
 //!
-//! @param data See select().
-//! @param controls See select().
+//! @param data See `select()`.
+//! @param controls See `select()`.
 //! @param var_types Two strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 inline Bicop::Bicop(const Eigen::MatrixXd& data,
@@ -58,7 +58,7 @@ inline Bicop::Bicop(const Eigen::MatrixXd& data,
 
 //! @brief Instantiates from a boost::property_tree::ptree object.
 //! @param input The boost::property_tree::ptree object to convert from
-//! (see to_ptree() for the structure of the input).
+//! (see `to_ptree()` for the structure of the input).
 inline Bicop::Bicop(const boost::property_tree::ptree input)
   : Bicop(get_family_enum(input.get<std::string>("family")),
           input.get<int>("rotation"),
@@ -326,7 +326,7 @@ Bicop::simulate(const size_t& n,
 //!
 //! The log-likelihood is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \ln c(U_{1, i}, U_{2, i}), \f]
-//! where \f$ c \f$ is the copula density pdf().
+//! where \f$ c \f$ is the copula density `pdf()`.
 //!
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
@@ -345,7 +345,7 @@ Bicop::loglik(const Eigen::MatrixXd& u) const
 //!
 //! The AIC is defined as
 //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
-//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see loglik())
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `loglik()`)
 //! and \f$ p \f$ is the (effective) number of parameters of the model.
 //! The AIC is a consistent model selection criterion even
 //! for nonparametric models.
@@ -362,7 +362,7 @@ Bicop::aic(const Eigen::MatrixXd& u) const
 //!
 //! The BIC is defined as
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \ln(n) p, \f]
-//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see loglik())
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `loglik()`)
 //! and \f$ p \f$ is the (effective) number of parameters of the model.
 //! The BIC is a consistent model selection criterion
 //! for parametric models.
@@ -386,7 +386,7 @@ Bicop::bic(const Eigen::MatrixXd& u) const
 //! The mBIC is defined as
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  p \ln(n)
 //!  - 2 (I log(\psi_0) + (1 - I) log(1 - \psi_0) \f]
-//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see loglik()),
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `loglik()`),
 //! \f$ p \f$ is the (effective) number of parameters of the model,
 //! and \f$ \psi_0 \f$ is the prior
 //! probability of having a non-independence copula and \f$ I \f$ is an
@@ -734,9 +734,9 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 
 //! @brief Selects the best fitting model.
 //!
-//! The function calls fit() for all families in
+//! The function calls `fit()` for all families in
 //! `family_set` and selecting the best fitting model by either BIC or AIC,
-//! see bic() and aic().
+//! see `bic()` and `aic()`.
 //!
 //! @details When at least one variable is discrete, two types of "observations"
 //! are required: the first \f$ n \times 2 \f$ block contains realizations of

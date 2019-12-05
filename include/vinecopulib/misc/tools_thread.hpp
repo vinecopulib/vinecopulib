@@ -269,7 +269,7 @@ ThreadPool::all_jobs_done()
   return (num_busy_ == 0) && jobs_.empty();
 }
 
-//! checks whether wait() needs to wake up
+//! checks whether `wait()` needs to wake up
 inline bool
 ThreadPool::wait_for_wake_up_event()
 {
