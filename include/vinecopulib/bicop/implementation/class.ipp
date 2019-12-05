@@ -130,7 +130,7 @@ Bicop::to_json(const std::string filename) const
   boost::property_tree::write_json(filename.c_str(), to_ptree());
 }
 
-//! @brief Calculates the copula density.
+//! @brief Evaluates the copula density.
 //!
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
@@ -142,7 +142,7 @@ Bicop::pdf(const Eigen::MatrixXd& u) const
   return bicop_->pdf(prep_for_abstract(u));
 }
 
-//! @brief Calculates the copula distribution.
+//! @brief Evaluates the copula distribution.
 //!
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
@@ -167,7 +167,7 @@ Bicop::cdf(const Eigen::MatrixXd& u) const
   }
 }
 
-//! @brief Calculates the first h-function.
+//! @brief Evaluates the first h-function.
 //!
 //! The first h-function is
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
@@ -199,7 +199,7 @@ Bicop::hfunc1(const Eigen::MatrixXd& u) const
   return h;
 }
 
-//! @brief Calculates the second h-function.
+//! @brief Evaluates the second h-function.
 //!
 //! The second h-function is
 //! \f$ h_2(u_1, u_2) = P(U_1 \le u_1 | U_2 = u_2)  \f$.
@@ -231,7 +231,7 @@ Bicop::hfunc2(const Eigen::MatrixXd& u) const
   return h;
 }
 
-//! @brief Calculates the inverse of the first h-function.
+//! @brief Evaluates the inverse of the first h-function.
 //
 //! The first h-function is
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
@@ -264,7 +264,7 @@ Bicop::hinv1(const Eigen::MatrixXd& u) const
   return hi;
 }
 
-//! @brief Calculates the inverse of the second h-function.
+//! @brief Evaluates the inverse of the second h-function.
 //!
 //! The second h-function is
 //! \f$ h_2(u_1, u_2) = P(U_1 \le u_1 | U_2 = u_2)  \f$.
@@ -322,7 +322,7 @@ Bicop::simulate(const size_t& n,
   return u;
 }
 
-//! @brief Calculates the log-likelihood.
+//! @brief Evaluates the log-likelihood.
 //!
 //! The log-likelihood is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, U_{2, i}), \f]
@@ -341,7 +341,7 @@ Bicop::loglik(const Eigen::MatrixXd& u) const
   }
 }
 
-//! @brief Calculates the Akaike information criterion (AIC).
+//! @brief Evaluates the Akaike information criterion (AIC).
 //!
 //! The AIC is defined as
 //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
@@ -358,7 +358,7 @@ Bicop::aic(const Eigen::MatrixXd& u) const
   return -2 * loglik(u) + 2 * get_npars();
 }
 
-//! @brief Calculates the Bayesian information criterion (BIC).
+//! @brief Evaluates the Bayesian information criterion (BIC).
 //!
 //! The BIC is defined as
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \log(n) p, \f]
@@ -381,7 +381,7 @@ Bicop::bic(const Eigen::MatrixXd& u) const
   return -2 * loglik(u_no_nan) + get_npars() * log(n);
 }
 
-//! @brief Calculates the modified Bayesian information criterion (mBIC).
+//! @brief Evaluates the modified Bayesian information criterion (mBIC).
 //!
 //! The mBIC is defined as
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  p \log(n) - 2 (I \log(\psi_0) + (1 - I) \log(1 - \psi_0), \f] 

@@ -726,7 +726,7 @@ Vinecop::get_var_types() const
 
 //! @}
 
-//! @brief Calculates the copula density.
+//! @brief Evaluates the copula density.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
@@ -830,7 +830,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
   return pdf;
 }
 
-//! @brief Calculates the copula distribution.
+//! @brief Evaluates the copula distribution.
 //!
 //! Because no closed-form expression is available, the distribution is 
 //! estimated numerically using Monte Carlo integration.
@@ -903,7 +903,7 @@ Vinecop::simulate(const size_t n,
   return u;
 }
 
-//! @brief Calculates the log-likelihood.
+//! @brief Evaluates the log-likelihood.
 //!
 //! The log-likelihood is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, ..., U_{d, i}), \f]
@@ -925,7 +925,7 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
   }
 }
 
-//! @brief Calculates the Akaike information criterion (AIC).
+//! @brief Evaluates the Akaike information criterion (AIC).
 //!
 //! The AIC is defined as
 //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
@@ -946,7 +946,7 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
   return -2 * this->loglik(u, num_threads) + 2 * get_npars();
 }
 
-//! @brief Calculates the Bayesian information criterion (BIC).
+//! @brief Evaluates the Bayesian information criterion (BIC).
 //!
 //! The BIC is defined as
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \log(n) p, \f]
@@ -968,7 +968,7 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
          get_npars() * log(static_cast<double>(u.rows()));
 }
 
-//! @brief Calculates the modified Bayesian information criterion for vines
+//! @brief Evaluates the modified Bayesian information criterion for vines
 //! (mBICV).
 //!
 //! The mBICV is defined as
@@ -1013,7 +1013,7 @@ Vinecop::get_npars() const
   return npars;
 }
 
-//! @brief Calculates the Rosenblatt transform for a vine copula model.
+//! @brief Evaluates the Rosenblatt transform for a vine copula model.
 //!
 //! The Rosenblatt transform converts data from this model into independent
 //! uniform variates. Only works for continuous data.
@@ -1087,7 +1087,7 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
   return U_vine.array().min(1 - 1e-10).max(1e-10);
 }
 
-//! @brief Calculates the inverse Rosenblatt transform.
+//! @brief Evaluates the inverse Rosenblatt transform.
 //!
 //! The inverse Rosenblatt transform can be used for simulation: the
 //! function applied to independent uniform variates resembles simulated

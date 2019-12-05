@@ -46,7 +46,7 @@ calculate_criterion(const Eigen::MatrixXd& data,
   return std::fabs(w) * std::sqrt(freq);
 }
 
-//! Calculates maximal criterion for tree selection.
+//! Evaluates maximal criterion for tree selection.
 //! @param data Observations.
 //! @param tree_criterion The criterion.
 //! @param weights Vector of weights for each observation (can be empty).
