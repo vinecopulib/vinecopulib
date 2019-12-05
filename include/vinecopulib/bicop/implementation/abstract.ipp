@@ -25,7 +25,7 @@ namespace vinecopulib {
 //! virtual destructor
 inline AbstractBicop::~AbstractBicop() {}
 
-//! Create a bivariate copula using the default contructor
+//! Instantiates a bivariate copula using the default contructor
 //!
 //! @param family The copula family.
 //! @param parameters The copula parameters (optional, must be compatible

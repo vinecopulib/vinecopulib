@@ -124,7 +124,7 @@ Optimizer::check_parameters_size(const Eigen::VectorXd& initial_parameters,
   }
 }
 
-//! Create controls using the default contructor
+//! Instantiates controls using the default contructor
 //!
 //! The defaults are
 //! ```
@@ -139,7 +139,7 @@ inline BobyqaControls::BobyqaControls()
   maxeval_ = 1000;
 }
 
-//! Create controls by passing the arguments
+//! Instantiates controls by passing the arguments
 //!
 //! @param initial_trust_region Initial trust region.
 //! @param final_trust_region Final trust region.

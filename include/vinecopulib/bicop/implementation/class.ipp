@@ -15,7 +15,7 @@
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib {
 
-//! @brief Creates a specific bivariate copula model.
+//! @brief Instantiates a specific bivariate copula model.
 //! @param family The copula family.
 //! @param rotation The rotation of the copula; one of 0, 90, 180, or 270
 //!     (for Independence, Gaussian, Student, Frank, and nonparametric
@@ -39,7 +39,7 @@ inline Bicop::Bicop(const BicopFamily family,
   set_var_types(var_types);
 }
 
-//! @brief Create a copula model from the data.
+//! @brief Instantiates a copula model from the data.
 //!
 //! Equivalent to creating a default `cop = Bicop()` and then selecting using
 //! `cop.select(data, controls)`.
@@ -56,7 +56,7 @@ inline Bicop::Bicop(const Eigen::MatrixXd& data,
   select(data, controls);
 }
 
-//! @brief Creates from a boost::property_tree::ptree object.
+//! @brief Instantiates from a boost::property_tree::ptree object.
 //! @param input The boost::property_tree::ptree object to convert from
 //! (see to_ptree() for the structure of the input).
 inline Bicop::Bicop(const boost::property_tree::ptree input)
@@ -75,7 +75,7 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
   }
 }
 
-//! @brief Creates from a JSON file.
+//! @brief Instantiates from a JSON file.
 //!
 //! The input file contains four values named
 //! `"family"`, `"rotation"`, `"parameters"`, `"var_types"` respectively a

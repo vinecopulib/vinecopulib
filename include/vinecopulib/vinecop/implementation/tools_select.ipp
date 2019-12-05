@@ -779,7 +779,7 @@ VinecopSelector::set_current_fit_as_opt(const double& loglik)
   loglik_ = loglik;
 }
 
-//! Create base tree of the vine
+//! Instantiates base tree of the vine
 //!
 //!  The base tree is a star on d + 1 variables, where the conditioned
 //!  set of each edge consists of a single number. When building the next

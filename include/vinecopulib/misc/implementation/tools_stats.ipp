@@ -363,7 +363,7 @@ ghalton(const size_t& n, const size_t& d, std::vector<int> seeds)
 //! @brief Simulates from the multivariate Sobol sequence.
 //!
 //! For more information on the Sobol sequence, see S. Joe and F. Y. Kuo
-//! (2008), Constructing Sobol  sequences with better two-dimensional
+//! (2008), Instantiatesing Sobol  sequences with better two-dimensional
 //! projections, SIAM J. Sci. Comput. 30, 2635–2654.
 //!
 //! @param n Number of observations.

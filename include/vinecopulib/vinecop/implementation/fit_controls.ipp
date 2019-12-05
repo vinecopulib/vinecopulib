@@ -24,7 +24,7 @@ inline FitControlsVinecop::FitControlsVinecop()
   show_trace_ = false;
 }
 
-//! @brief Creates custom controls for fitting vine copula models.
+//! @brief Instantiates custom controls for fitting vine copula models.
 //! @param family_set The set of copula families to consider (if empty, then
 //!     all families are included).
 //! @param parametric_method The fit method for parametric families;
@@ -87,7 +87,7 @@ inline FitControlsVinecop::FitControlsVinecop(
   set_num_threads(num_threads);
 }
 
-//! @brief Creates custom controls for fitting vine copula models.
+//! @brief Instantiates custom controls for fitting vine copula models.
 //! @param trunc_lvl Truncation level for truncated vines.
 //! @param tree_criterion The criterion for selecting the maximum spanning
 //!     tree ("tau", "hoeffd" and "rho" implemented so far).

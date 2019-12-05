@@ -137,7 +137,7 @@ inline RVineStructure::RVineStructure(
   }
 }
 
-//! @brief Creates from a boost::property_tree::ptree object.
+//! @brief Instantiates from a boost::property_tree::ptree object.
 //! @param input The boost::property_tree::ptree object to convert from
 //! (see to_ptree() for the structure of the input).
 //! @param check Whether to check if the input represents

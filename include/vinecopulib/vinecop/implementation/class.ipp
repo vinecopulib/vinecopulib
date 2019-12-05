@@ -113,7 +113,7 @@ inline Vinecop::Vinecop(
   : Vinecop(data, RVineStructure(matrix), var_types, controls)
 {}
 
-//! @brief Creates from a boost::property_tree::ptree object.
+//! @brief Instantiates from a boost::property_tree::ptree object.
 //! @param input The boost::property_tree::ptree object to convert from
 //! (see to_ptree() for the structure of the input).
 //! @param check Whether to check if the `"structure"` node represents
@@ -154,7 +154,7 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
   }
 }
 
-//! @brief Creates from a JSON file.
+//! @brief Instantiates from a JSON file.
 //! @param filename The name of the JSON file to read (see to_ptree() for the
 //! structure of the file).
 //! @param check Whether to check if the `"structure"` node of the input
