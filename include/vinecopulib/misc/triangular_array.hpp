@@ -209,7 +209,7 @@ TriangularArray<T>::str() const
 
 //! @brief Ostream method for TriangularArray, to be used with `std::cout`.
 //! @param os An output stream.
-//! @param tri_array N triangular array.
+//! @param tri_array A triangular array.
 template<typename T>
 std::ostream&
 operator<<(std::ostream& os, const TriangularArray<T>& tri_array)
