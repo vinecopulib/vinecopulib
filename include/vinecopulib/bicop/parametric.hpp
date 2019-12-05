@@ -10,7 +10,7 @@
 
 namespace vinecopulib {
 
-//! @brief An abstract class for parametric copula families
+//! @brief An abstract class for parametric copula families.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but

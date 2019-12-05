@@ -9,7 +9,7 @@
 #include <vinecopulib/bicop/elliptical.hpp>
 
 namespace vinecopulib {
-//! @brief The Gaussian copula
+//! @brief The Gaussian copula.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but

@@ -19,7 +19,7 @@
 #endif
 
 namespace vinecopulib {
-//! @brief A class for controlling fit of bivariate copula models.
+//! @brief A class for controlling fits of vine copula models.
 //!
 class FitControlsVinecop : public FitControlsBicop
 {

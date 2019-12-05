@@ -12,7 +12,7 @@ namespace vinecopulib {
 namespace tools_select {
 //! returns only those rotations that yield the appropriate
 //! association direction.
-//! @param data captured by reference to avoid data copies;
+//! @param data Captured by reference to avoid data copies;
 //!     should NOT be modified though.
 inline std::vector<Bicop>
 create_candidate_bicops(const Eigen::MatrixXd& data,

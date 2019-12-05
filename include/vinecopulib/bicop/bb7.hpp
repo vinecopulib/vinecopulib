@@ -9,7 +9,7 @@
 #include <vinecopulib/bicop/archimedean.hpp>
 
 namespace vinecopulib {
-//! @brief The BB7 copula
+//! @brief The BB7 copula.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but

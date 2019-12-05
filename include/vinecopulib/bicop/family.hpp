@@ -87,7 +87,7 @@ const std::vector<BicopFamily> bb = { BicopFamily::bb1,
                                       BicopFamily::bb7,
                                       BicopFamily::bb8 };
 
-//! @brief All copulas that don't have a rotation
+//! @brief All copulas that don't have a rotation.
 //!
 //! (because they already cover positive and negative dependence)
 const std::vector<BicopFamily> rotationless = { BicopFamily::indep,

@@ -9,7 +9,7 @@
 #include <vinecopulib/bicop/elliptical.hpp>
 
 namespace vinecopulib {
-//! @brief The Student t copula
+//! @brief The Student t copula.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but

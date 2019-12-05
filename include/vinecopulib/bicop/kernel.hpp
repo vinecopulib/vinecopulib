@@ -14,7 +14,7 @@ namespace tools_interpolation {
 class InterpolationGrid;
 }
 
-//! @brief An abstract class for kernel copulas
+//! @brief An abstract class for kernel copulas.
 //!
 //! Evaluation functions of kernel estimators are implemented efficiently
 //! using spline interpolation, see Nagler (2016).

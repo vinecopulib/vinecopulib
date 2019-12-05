@@ -9,7 +9,7 @@
 #include <vinecopulib/bicop/kernel.hpp>
 
 namespace vinecopulib {
-//! @brief The transformation local-constant likelihood estimator
+//! @brief The transformation local-constant likelihood estimator.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but

@@ -9,7 +9,7 @@
 #include <vinecopulib/bicop/parametric.hpp>
 
 namespace vinecopulib {
-//! @brief The independence copula
+//! @brief The independence copula.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but
