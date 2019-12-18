@@ -1359,7 +1359,7 @@ Vinecop::str() const
       str << order[e] << "," << arr(t, e);
       if (t > 0) {
         str << " | ";
-        for (size_t cv = t - 1; cv > 1; --cv) {
+        for (size_t cv = t - 1; cv > 0; --cv) {
           str << arr(cv, e) - 1 << ",";
         }
         str << arr(0, e);
