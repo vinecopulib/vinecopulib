@@ -29,13 +29,13 @@ public:
         const Eigen::MatrixXd& parameters = Eigen::MatrixXd(),
         const std::vector<std::string>& var_types = { "c", "c" });
 
-  Bicop(const Eigen::MatrixXd& data,
-        const FitControlsBicop& controls = FitControlsBicop(),
-        const std::vector<std::string>& var_types = { "c", "c" });
+  explicit Bicop(const Eigen::MatrixXd& data,
+                 const FitControlsBicop& controls = FitControlsBicop(),
+                 const std::vector<std::string>& var_types = { "c", "c" });
 
-  Bicop(const std::string& filename);
+  explicit Bicop(const std::string& filename);
 
-  Bicop(const boost::property_tree::ptree input);
+  explicit Bicop(const boost::property_tree::ptree input);
 
   // Serialize
   boost::property_tree::ptree to_ptree() const;

@@ -43,9 +43,9 @@ class TriangularArray
 {
 public:
   TriangularArray() = default;
-  TriangularArray(size_t d);
+  explicit TriangularArray(size_t d);
   TriangularArray(size_t d, size_t trunc_lvl);
-  TriangularArray(const std::vector<std::vector<T>>& rows);
+  explicit TriangularArray(const std::vector<std::vector<T>>& rows);
 
   T& operator()(size_t row, size_t column);
   T operator()(size_t row, size_t column) const;

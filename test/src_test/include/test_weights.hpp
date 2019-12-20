@@ -21,7 +21,8 @@ TEST(test_weights, catches_incompatible_sizes)
   controls.set_weights(w);
   EXPECT_ANY_THROW(Bicop(u, controls));
   u = tools_stats::simulate_uniform(20, 4);
-  EXPECT_ANY_THROW(Vinecop(u, RVineStructure(), {}, controls));
+  EXPECT_ANY_THROW(
+    Vinecop(u, RVineStructure(), {}, (FitControlsVinecop)controls));
 }
 
 TEST(test_weights, allows_nans)
@@ -57,9 +58,10 @@ TEST(test_weights, works_in_vinecop_select)
   w.head(100) = Eigen::VectorXd::Ones(100);
 
   FitControlsBicop controls(bicop_families::parametric);
-  auto cop_uw = Vinecop(u.block(0, 0, 100, 7), RVineStructure(), {}, controls);
+  auto cop_uw = Vinecop(
+    u.block(0, 0, 100, 7), RVineStructure(), {}, (FitControlsVinecop)controls);
   controls.set_weights(w);
-  auto cop_w = Vinecop(u, RVineStructure(), {}, controls);
+  auto cop_w = Vinecop(u, RVineStructure(), {}, (FitControlsVinecop)controls);
   EXPECT_EQ(cop_uw.get_all_families(), cop_w.get_all_families());
   EXPECT_EQ(cop_uw.get_all_parameters(), cop_w.get_all_parameters());
 }
