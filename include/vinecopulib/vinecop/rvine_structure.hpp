@@ -79,12 +79,12 @@ public:
                  const TriangularArray<size_t>& struct_array,
                  bool natural_order = false,
                  bool check = true);
-  RVineStructure(const std::string filename, const bool check = true);
+  RVineStructure(const std::string& filename, const bool check = true);
   RVineStructure(const boost::property_tree::ptree input,
                  const bool check = true);
 
   boost::property_tree::ptree to_ptree() const;
-  void to_json(const std::string filename) const;
+  void to_json(const std::string& filename) const;
 
   size_t get_dim() const;
   size_t get_trunc_lvl() const;

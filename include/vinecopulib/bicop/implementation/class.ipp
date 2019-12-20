@@ -84,7 +84,7 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
 //! types.
 //!
 //! @param filename The name of the JSON file to read.
-inline Bicop::Bicop(const std::string filename)
+inline Bicop::Bicop(const std::string& filename)
   : Bicop(tools_serialization::json_to_ptree(filename.c_str()))
 {}
 
@@ -125,7 +125,7 @@ Bicop::to_ptree() const
 //!
 //! @param filename The name of the file to write.
 inline void
-Bicop::to_json(const std::string filename) const
+Bicop::to_json(const std::string& filename) const
 {
   boost::property_tree::write_json(filename.c_str(), to_ptree());
 }
@@ -384,12 +384,12 @@ Bicop::bic(const Eigen::MatrixXd& u) const
 //! @brief Evaluates the modified Bayesian information criterion (mBIC).
 //!
 //! The mBIC is defined as
-//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  p \log(n) - 2 (I \log(\psi_0) + (1 - I) \log(1 - \psi_0), \f] 
-//! where \f$ \mathrm{loglik} \f$ is the \log-liklihood
-//! (see `loglik()`), \f$ p \f$ is the (effective) number of parameters of the
-//! model, and \f$ \psi_0 \f$ is the prior probability of having a
-//! non-independence copula and \f$ I \f$ is an indicator for the family being
-//! non-independence.
+//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  p \log(n) - 2 (I \log(\psi_0) +
+//! (1 - I) \log(1 - \psi_0), \f] where \f$ \mathrm{loglik} \f$ is the
+//! \log-liklihood (see `loglik()`), \f$ p \f$ is the (effective) number of
+//! parameters of the model, and \f$ \psi_0 \f$ is the prior probability of
+//! having a non-independence copula and \f$ I \f$ is an indicator for the
+//! family being non-independence.
 //!
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.

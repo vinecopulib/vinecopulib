@@ -65,8 +65,8 @@ inline RVineStructure::RVineStructure(const size_t& d, const size_t& trunc_lvl)
   : RVineStructure(tools_stl::seq_int(1, d), std::min(d - 1, trunc_lvl), false)
 {}
 
-//! @brief Instantiates an RVineStructure object to a D-vine with given ordering.
-//! of variables.
+//! @brief Instantiates an RVineStructure object to a D-vine with given
+//! ordering. of variables.
 //! @param order The order of variables in the D-vine (diagonal entries in the
 //!    R-vine array); must be a permutation of 1, ..., d.
 //! @param trunc_lvl The truncation level. By default, it is d - 1.
@@ -160,7 +160,7 @@ inline RVineStructure::RVineStructure(const boost::property_tree::ptree input,
 //! @param filename The name of the JSON file to read.
 //! @param check Whether to check if the input represents
 //!      a valid R-vine matrix.
-inline RVineStructure::RVineStructure(const std::string filename,
+inline RVineStructure::RVineStructure(const std::string& filename,
                                       const bool check)
   : RVineStructure(tools_serialization::json_to_ptree(filename.c_str()), check)
 {}
@@ -191,7 +191,7 @@ RVineStructure::to_ptree() const
 //!
 //! @param filename The name of the file to write.
 inline void
-RVineStructure::to_json(const std::string filename) const
+RVineStructure::to_json(const std::string& filename) const
 {
   boost::property_tree::write_json(filename.c_str(), this->to_ptree());
 }

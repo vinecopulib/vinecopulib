@@ -49,7 +49,7 @@ private:
   void adjust_parameters_bounds(Eigen::MatrixXd& lb,
                                 Eigen::MatrixXd& ub,
                                 const double& tau,
-                                const std::string method);
+                                const std::string& method);
 
   void check_parameters(const Eigen::MatrixXd& parameters);
 

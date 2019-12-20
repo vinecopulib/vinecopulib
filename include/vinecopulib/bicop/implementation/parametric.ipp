@@ -154,7 +154,7 @@ inline void
 ParBicop::adjust_parameters_bounds(Eigen::MatrixXd& lb,
                                    Eigen::MatrixXd& ub,
                                    const double& tau,
-                                   const std::string method)
+                                   const std::string& method)
 {
   if (method == "itau") {
     // for pseudo mle, we can ignore the first parameter
@@ -178,10 +178,10 @@ ParBicop::adjust_parameters_bounds(Eigen::MatrixXd& lb,
     } else {
       lb = tau_to_parameters(std::max(std::fabs(tau) - 0.1, 1e-10));
       ub = tau_to_parameters(std::min(std::fabs(tau) + 0.1, 0.95));
-  }
-  // make sure that parameter bounds are respected
-  lb = lb2.cwiseMax(lb);
-  ub = ub2.cwiseMin(ub);
+    }
+    // make sure that parameter bounds are respected
+    lb = lb2.cwiseMax(lb);
+    ub = ub2.cwiseMin(ub);
   }
 }
 

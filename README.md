@@ -22,7 +22,7 @@ Advantages over VineCopula are
 * a stand-alone C++ library with interfaces to both R and Python,
 * a sleaker and more modern API,
 * shorter runtimes and lower memory consumption, especially in high dimensions,
-* nonparametric and multi-parameter families.
+* nonparametric and multiparameter families.
 
 #### Status
 
