@@ -66,7 +66,7 @@ inline RVineStructure::RVineStructure(const size_t& d, const size_t& trunc_lvl)
 {}
 
 //! @brief Instantiates an RVineStructure object to a D-vine with given
-//! ordering. of variables.
+//! ordering of variables.
 //! @param order The order of variables in the D-vine (diagonal entries in the
 //!    R-vine array); must be a permutation of 1, ..., d.
 //! @param trunc_lvl The truncation level. By default, it is d - 1.
