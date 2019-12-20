@@ -1,7 +1,3 @@
 ---
-engines:
- cppcheck:
-   enabled: true
-   language: c++
 exclude_paths:
   - '**.md'
