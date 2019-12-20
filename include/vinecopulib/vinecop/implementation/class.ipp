@@ -968,6 +968,7 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
          get_npars() * log(static_cast<double>(u.rows()));
 }
 
+// clang-format off
 //! @brief Evaluates the modified Bayesian information criterion for vines
 //! (mBICV).
 //!
@@ -988,6 +989,7 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+// clang-format on
 inline double
 Vinecop::mbicv(const Eigen::MatrixXd& u,
                const double psi0,
