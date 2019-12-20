@@ -2,6 +2,7 @@
 [![Build Status](https://github.com/vinecopulib/vinecopulib/workflows/Build%20Status/badge.svg)](https://github.com/vinecopulib/vinecopulib/actions)
 [![Coverage Status](https://img.shields.io/codecov/c/github/vinecopulib/vinecopulib/master.svg)](https://codecov.io/github/vinecopulib/vinecopulib?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a81e08da0aa344418114298d3ba04931)](https://www.codacy.com/gh/vinecopulib/vinecopulib?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vinecopulib/vinecopulib&amp;utm_campaign=Badge_Grade)
 
 #### What are vine copulas?
 
@@ -22,7 +23,7 @@ Advantages over VineCopula are
 * a stand-alone C++ library with interfaces to both R and Python,
 * a sleaker and more modern API,
 * shorter runtimes and lower memory consumption, especially in high dimensions,
-* nonparametric and multi-parameter families.
+* nonparametric and multiparameter families.
 
 #### Status
 

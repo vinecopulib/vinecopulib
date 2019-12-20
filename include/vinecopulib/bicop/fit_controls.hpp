@@ -27,10 +27,10 @@ public:
                    bool preselect_families = true,
                    size_t num_threads = 1);
 
-  FitControlsBicop(std::string parametric_method);
+  explicit FitControlsBicop(std::string parametric_method);
 
-  FitControlsBicop(std::string nonparametric_method,
-                   double nonparametric_mult = 1.0);
+  explicit FitControlsBicop(std::string nonparametric_method,
+                            double nonparametric_mult = 1.0);
 
   // Getters
   std::vector<BicopFamily> get_family_set() const;

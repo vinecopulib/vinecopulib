@@ -173,7 +173,7 @@ ThreadPool::start_worker()
   workers_.emplace_back([this] {
     std::function<void()> job;
     // observe thread pool; only stop after all jobs are done
-    while (!stopped_ | !jobs_.empty()) {
+    while ((!stopped_) | (!jobs_.empty())) {
       // must hold a lock while modifying shared variables
       std::unique_lock<std::mutex> lk(m_tasks_);
 

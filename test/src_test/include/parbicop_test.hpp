@@ -70,7 +70,8 @@ protected:
         auto tau_v = Eigen::VectorXd::Constant(1, std::fabs(tau));
         auto f = [this, delta](const Eigen::VectorXd& v) {
           Eigen::VectorXd par(2);
-          par << v(0), delta;
+          par(0) = v(0);
+          par(1) = delta;
           auto tt = bicop_.parameters_to_tau(par);
           return Eigen::VectorXd::Constant(1, std::fabs(tt));
         };

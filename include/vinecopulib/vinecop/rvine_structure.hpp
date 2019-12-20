@@ -67,24 +67,26 @@ namespace vinecopulib {
 class RVineStructure
 {
 public:
-  RVineStructure(const size_t& d = static_cast<size_t>(1),
-                 const size_t& trunc_lvl = std::numeric_limits<size_t>::max());
-  RVineStructure(
+  explicit RVineStructure(
+    const size_t& d = static_cast<size_t>(1),
+    const size_t& trunc_lvl = std::numeric_limits<size_t>::max());
+  explicit RVineStructure(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat,
     bool check = true);
-  RVineStructure(const std::vector<size_t>& order,
-                 const size_t& trunc_lvl = std::numeric_limits<size_t>::max(),
-                 bool check = true);
+  explicit RVineStructure(
+    const std::vector<size_t>& order,
+    const size_t& trunc_lvl = std::numeric_limits<size_t>::max(),
+    bool check = true);
   RVineStructure(const std::vector<size_t>& order,
                  const TriangularArray<size_t>& struct_array,
                  bool natural_order = false,
                  bool check = true);
-  RVineStructure(const std::string filename, const bool check = true);
-  RVineStructure(const boost::property_tree::ptree input,
-                 const bool check = true);
+  explicit RVineStructure(const std::string& filename, const bool check = true);
+  explicit RVineStructure(const boost::property_tree::ptree input,
+                          const bool check = true);
 
   boost::property_tree::ptree to_ptree() const;
-  void to_json(const std::string filename) const;
+  void to_json(const std::string& filename) const;
 
   size_t get_dim() const;
   size_t get_trunc_lvl() const;
@@ -160,7 +162,7 @@ operator<<(std::ostream& os, const RVineStructure& rvs);
 class DVineStructure : public RVineStructure
 {
 public:
-  DVineStructure(const std::vector<size_t>& order);
+  explicit DVineStructure(const std::vector<size_t>& order);
   DVineStructure(const std::vector<size_t>& order, size_t trunc_lvl);
 };
 
@@ -177,7 +179,7 @@ public:
 class CVineStructure : public RVineStructure
 {
 public:
-  CVineStructure(const std::vector<size_t>& order);
+  explicit CVineStructure(const std::vector<size_t>& order);
   CVineStructure(const std::vector<size_t>& order, size_t trunc_lvl);
 };
 }
