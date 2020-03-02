@@ -42,6 +42,10 @@ calculate_criterion(const Eigen::MatrixXd& data,
     } else {
       w = wdm::wdm(data_no_nan, tree_criterion, weights)(0, 1);
     }
+
+    if (std::isnan(w)) {
+      w = 0.0;
+    }
   }
   return std::fabs(w) * std::sqrt(freq);
 }
