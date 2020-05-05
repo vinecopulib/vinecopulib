@@ -384,8 +384,8 @@ Bicop::bic(const Eigen::MatrixXd& u) const
 //! @brief Evaluates the modified Bayesian information criterion (mBIC).
 //!
 //! The mBIC is defined as
-//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  p \log(n) - 2 (I \log(\psi_0) +
-//! (1 - I) \log(1 - \psi_0), \f] where \f$ \mathrm{loglik} \f$ is the
+//! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  p \log(n) - 2 (I \log(\psi_0) + (1 - I) \log(1 - \psi_0), \f]
+//! where \f$ \mathrm{loglik} \f$ is the
 //! \log-liklihood (see `loglik()`), \f$ p \f$ is the (effective) number of
 //! parameters of the model, and \f$ \psi_0 \f$ is the prior probability of
 //! having a non-independence copula and \f$ I \f$ is an indicator for the

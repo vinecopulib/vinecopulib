@@ -594,7 +594,7 @@ Vinecop::get_mbicv(const double psi0) const
   return -2 * loglik_ + this->calculate_mbicv_penalty(nobs_, psi0);
 }
 
-//! computes the penalty term for mBICV
+//! @brief Computes the penalty term for mBICV.
 inline double
 Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
 {
@@ -972,9 +972,8 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! (mBICV).
 //!
 //! The mBICV is defined as
-//! \f[ \mathrm{mBICV} = -2\, \mathrm{loglik} +  \log(n) p, - 2 * \sum_{t=1}^(d
-//! - 1) \{q_t \log(\psi_0^t) - (d - t - q_t) \log(1 -\psi_0^t)\},\f] where \f$
-//! \mathrm{loglik} \f$ is the log-liklihood, \f$ p \f$ is the (effective)
+//! \f[ \mathrm{mBICV} = -2\, \mathrm{loglik} +  \log(n) p, - 2 * \sum_{t=1}^(d - 1) \{q_t \log(\psi_0^t) - (d - t - q_t) \log(1 -\psi_0^t)\},\f]
+//! where \f$\mathrm{loglik} \f$ is the log-liklihood, \f$ p \f$ is the (effective)
 //! number of parameters of the model, \f$ t \f$ is the tree level, \f$ \psi_0
 //! \f$ is the prior probability of having a non-independence copula in the
 //! first tree, and \f$ q_t \f$ is the number of non-independence copulas in
