@@ -275,7 +275,13 @@ FitControlsBicop::process_num_threads(size_t num_threads)
 
 //! @brief Summarizes the controls into a string (can be used for printing).
 inline std::string
-FitControlsBicop::str(bool print_threads) const
+FitControlsBicop::str() const
+{
+  return str_internal();
+}
+
+inline std::string
+FitControlsBicop::str_internal(bool print_threads) const
 {
   std::stringstream controls_str;
 

@@ -272,7 +272,7 @@ FitControlsVinecop::str() const
 {
   std::stringstream controls_str;
 
-  controls_str << get_fit_controls_bicop().str(false);
+  controls_str << str_internal(false);
   controls_str << "Truncation level: "
                << (get_trunc_lvl() == std::numeric_limits<size_t>::max()
                      ? "none (default)"
