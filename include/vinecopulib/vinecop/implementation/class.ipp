@@ -594,7 +594,7 @@ Vinecop::get_mbicv(const double psi0) const
   return -2 * loglik_ + this->calculate_mbicv_penalty(nobs_, psi0);
 }
 
-//! @brief Computes the penalty term for mBICV
+//! @brief Computes the penalty term for mBICV.
 inline double
 Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
 {
