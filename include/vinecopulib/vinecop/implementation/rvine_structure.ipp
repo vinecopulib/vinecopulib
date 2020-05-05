@@ -403,16 +403,15 @@ RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
   // need to convert to upper left triangular form (our notation)
   auto rvm = RVineStructure(A.rowwise().reverse());
 
-  // sampling the variable order randomly
-  // the first column of U has not been used to construct B,
-  // hence it is stochastically independent of B. Calling
-  // pseudo_obs and rescaling gives us a permutation of (1, ..., d)
-  // that is independent of B.
+  // sampling the variable order randomly the first column of U has not been
+  // used to construct B, hence it is stochastically independent of B. Calling
+  // get_order gives us a permutation of (1, ..., d) that is independent of B.
   std::vector<size_t> order(d);
   if (!natural_order) {
-    U.col(0) = tools_stats::to_pseudo_obs_1d(U.col(0)) * (d + 1);
+    std::vector<double> u(U.data(), U.data() + d); // first column of U
+    auto osim = tools_stl::get_order(u);
     for (size_t k = 0; k < d; k++) {
-      order[k] = static_cast<size_t>(U(k, 0));
+      order[k] = osim[k] + 1;
     }
   } else {
     for (size_t i = 0; i < d; ++i) {
