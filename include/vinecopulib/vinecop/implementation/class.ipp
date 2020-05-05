@@ -216,7 +216,7 @@ Vinecop::to_ptree() const
   return output;
 }
 
-//! @brief Write the copula object into a JSON file.
+//! @brief Writes the copula object into a JSON file.
 //!
 //! The output file contains 2 attributes : `"structure"` for the vine
 //! structure, which itself contains attributes `"array"` for the structure
@@ -349,7 +349,7 @@ Vinecop::select_families(const Eigen::MatrixXd& data,
   select(data, controls);
 }
 
-//! @name Getters
+//! @name Getters and setters
 //! @{
 
 //! @brief Gets a pair copula.
@@ -630,7 +630,7 @@ Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
   return std::log(nobs) * npars - 2.0 * log_prior;
 }
 
-//! @brief Gets the threshold
+//! @brief Gets the threshold.
 //!
 //! Usually zero except `select_threshold == TRUE` in `FitControlsVinecop()`).
 inline double
@@ -1308,8 +1308,8 @@ Vinecop::truncate(size_t trunc_lvl)
   }
 }
 
-//! Sets all variable types to continuous.
-//! the function can be const, because var_types_ is mutable.
+//! @brief Sets all variable types to continuous.
+//! The function can be const, because var_types_ is mutable.
 inline void
 Vinecop::set_continuous_var_types() const
 {
@@ -1319,7 +1319,7 @@ Vinecop::set_continuous_var_types() const
   set_var_types_internal(var_types_);
 }
 
-//! Returns the number of discrete variables.
+//! @brief Returns the number of discrete variables.
 inline int
 Vinecop::get_n_discrete() const
 {
@@ -1330,7 +1330,7 @@ Vinecop::get_n_discrete() const
   return n_discrete;
 }
 
-//! Removes superfluous columns for continuous data.
+//! @brief Removes superfluous columns for continuous data.
 inline Eigen::MatrixXd
 Vinecop::collapse_data(const Eigen::MatrixXd& u) const
 {
@@ -1348,7 +1348,7 @@ Vinecop::collapse_data(const Eigen::MatrixXd& u) const
   return u_new;
 }
 
-//! Summarizes the model into a string (can be used for printing).
+//! @brief Summarizes the model into a string (can be used for printing).
 inline std::string
 Vinecop::str() const
 {

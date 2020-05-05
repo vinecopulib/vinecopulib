@@ -58,7 +58,6 @@ jobs:
             # choco upgrade cmake
             choco install boost-msvc-14.1
             choco install wget
-            choco install boost-msvc-14.1
             wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip
             7z x 3.3.2.zip -o"C:\projects" -y > nul
           fi

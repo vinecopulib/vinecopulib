@@ -70,6 +70,12 @@ public:
 
   void set_num_threads(size_t num_threads);
 
+  // Misc
+  std::string str() const;
+
+protected:
+  std::string str_internal(bool print_threads = true) const;
+
 private:
   std::vector<BicopFamily> family_set_;
   std::string parametric_method_;

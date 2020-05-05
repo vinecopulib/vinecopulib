@@ -90,6 +90,9 @@ public:
 
   void set_fit_controls_bicop(FitControlsBicop controls);
 
+  // Misc
+  std::string str() const;
+
 private:
   size_t trunc_lvl_;
   std::string tree_criterion_;
