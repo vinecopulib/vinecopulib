@@ -18,7 +18,7 @@ namespace tools_select {
 
 using namespace tools_stl;
 
-//! Calculate criterion for tree selection
+//! @brief Calculates criterion for tree selection.
 //! @param data Observations.
 //! @param tree_criterion The criterion.
 //! @param weights Vector of weights for each observation (can be empty).
@@ -50,7 +50,7 @@ calculate_criterion(const Eigen::MatrixXd& data,
   return std::fabs(w) * std::sqrt(freq);
 }
 
-//! Evaluates maximal criterion for tree selection.
+//! @brief Evaluates maximal criterion for tree selection.
 //! @param data Observations.
 //! @param tree_criterion The criterion.
 //! @param weights Vector of weights for each observation (can be empty).
@@ -130,8 +130,7 @@ VinecopSelector::get_rvine_structure() const
   return vine_struct_;
 }
 
-//! Initialize object for storing pair copulas
-//!
+//! @brief Instantiates the object for storing pair copulas.
 //! @param d Dimension of the vine copula.
 //! @param trunc_lvl A truncation level (optional).
 //! @return A nested vector such that `pc_store[t][e]` contains a Bicop.
@@ -364,7 +363,8 @@ VinecopSelector::get_next_threshold(std::vector<double>& thresholded_crits)
   return thresholded_crits[static_cast<size_t>(new_index)];
 }
 
-//! Add edges allowed by either the proximity condition or the vine structure
+//! @brief Adds edges allowed by either the proximity condition or the vine
+//  structure.
 //!
 //! If all the edges allowed by the proximity condition are included, then
 //! the function also calculates the edge weight
@@ -419,7 +419,7 @@ VinecopSelector::add_allowed_edges(VineTree& vine_tree)
   }
 }
 
-//! Select the edges using the minimum spanning tree
+//! @brief Selects the edges using the minimum spanning tree.
 //!
 //! See, e.g., Czado (2010), "Pair-copula constructions of multivariate
 //! copulas", url: https://mediatum.ub.tum.de/doc/1079253/file.pdf
@@ -560,8 +560,7 @@ VinecopSelector::finalize(size_t trunc_lvl)
   }
 }
 
-//! Get pair copula pseudo-observations from h-functions
-//!
+//! @brief Gets pair copula pseudo-observations from h-functions.
 //! @param v0,v1 vertex indices.
 //! @param tree A vine tree.
 //! @return The pseudo-observations for the pair coula, extracted from
@@ -639,7 +638,7 @@ VinecopSelector::get_pc_data(size_t v0, size_t v1, const VineTree& tree)
   return pc_data;
 }
 
-//! Select and fit next tree of the vine
+//! @brief Selects and fits next tree of the vine.
 //!
 //! The next tree is found the following way:
 //!     1. Edges of the previous tree become edges in the new tree.
@@ -705,7 +704,7 @@ VinecopSelector::get_mbicv_of_tree(size_t t, double loglik)
   return -2 * loglik + std::log(n_eff) * npars - 2 * log_prior;
 }
 
-//! calculates the log-likelihood of a tree.
+//! @brief Calculates the log-likelihood of a tree.
 inline double
 VinecopSelector::get_loglik_of_tree(size_t t)
 {
@@ -717,7 +716,7 @@ VinecopSelector::get_loglik_of_tree(size_t t)
   return ll;
 }
 
-//! calculates the numbers of parameters of a tree.
+//! @brief Calculates the numbers of parameters of a tree.
 inline double
 VinecopSelector::get_npars_of_tree(size_t t)
 {
@@ -729,7 +728,7 @@ VinecopSelector::get_npars_of_tree(size_t t)
   return npars;
 }
 
-//! calculates the numbers of independence copulas in a tree.
+//! @brief Calculates the numbers of independence copulas in a tree.
 inline size_t
 VinecopSelector::get_num_non_indeps_of_tree(size_t t)
 {
@@ -741,7 +740,7 @@ VinecopSelector::get_num_non_indeps_of_tree(size_t t)
   return num_non_indeps;
 }
 
-//! Print indices, family, and parameters for each pair-copula
+//! @brief Prints indices, family, and parameters for each pair-copula
 //! @param tree A vine tree.
 inline void
 VinecopSelector::print_pair_copulas_of_tree(size_t t)
@@ -753,7 +752,7 @@ VinecopSelector::print_pair_copulas_of_tree(size_t t)
   }
 }
 
-//! Gets all criterion values that got thresholded to zero.
+//! @brief Gets all criterion values that got thresholded to zero.
 inline std::vector<double>
 VinecopSelector::get_thresholded_crits()
 {
@@ -783,17 +782,17 @@ VinecopSelector::set_current_fit_as_opt(const double& loglik)
   loglik_ = loglik;
 }
 
-//! Instantiates base tree of the vine
+//! @brief Instantiates base tree of the vine.
 //!
-//!  The base tree is a star on d + 1 variables, where the conditioned
-//!  set of each edge consists of a single number. When building the next
-//!  tree, the edges become vertices. Because the base graph was a star
-//!  all edges are allowed by the proximity condition, and the edges will
-//!  have a conditioned set consisting of the two vertex indices. This
-//!  will be the first actual tree of the vine.
+//! The base tree is a star on d + 1 variables, where the conditioned
+//! set of each edge consists of a single number. When building the next
+//! tree, the edges become vertices. Because the base graph was a star
+//! all edges are allowed by the proximity condition, and the edges will
+//! have a conditioned set consisting of the two vertex indices. This
+//! will be the first actual tree of the vine.
 //!
-//!  @param data nxd matrix of copula data.
-//!  @return A VineTree object containing the base graph.
+//! @param data nxd matrix of copula data.
+//! @return A VineTree object containing the base graph.
 inline VineTree
 VinecopSelector::make_base_tree(const Eigen::MatrixXd& data)
 {
@@ -825,7 +824,7 @@ VinecopSelector::make_base_tree(const Eigen::MatrixXd& data)
   return base_tree;
 }
 
-//! Convert edge set into vertex set of a new graph
+//! @brief Converts the edge set into vertex set of a new graph.
 //!
 //! Further information about the structure is passed along:
 //!     - conditioned/conditioning set,
@@ -861,12 +860,11 @@ VinecopSelector::edges_as_vertices(const VineTree& prev_tree)
   return new_tree;
 }
 
-// Find common neighbor in previous tree
-//
-// @param v0,v1 vertices in the tree.
-// @param tree the current tree.
-// @return Gives the index of the vertex in the previous tree that was
-//     shared by e0, e1, the edge representations of v0, v1.
+//! @brief Finds common neighbor in previous tree.
+//! @param v0,v1 vertices in the tree.
+//! @param tree the current tree.
+//! @return Gives the index of the vertex in the previous tree that was
+//!     shared by e0, e1, the edge representations of v0, v1.
 inline ptrdiff_t
 VinecopSelector::find_common_neighbor(size_t v0,
                                       size_t v1,
@@ -883,9 +881,8 @@ VinecopSelector::find_common_neighbor(size_t v0,
   }
 }
 
-// compute a fit id; can be used to re-use already fitted pair-copulas.
-//
-// @param edge.
+//! @brief Computes a fit id; can be used to re-use already fitted pair-copulas.
+//! @param edge.
 inline double
 VinecopSelector::compute_fit_id(const EdgeProperties& e)
 {
@@ -900,8 +897,7 @@ VinecopSelector::compute_fit_id(const EdgeProperties& e)
   return id;
 }
 
-//! Collapse a graph to the minimum spanning tree
-//!
+//! @brief Collapses a graph to the minimum spanning tree.
 //! @param graph The input graph.
 //! @return the input graph with all non-MST edges removed.
 inline void
@@ -919,7 +915,7 @@ VinecopSelector::min_spanning_tree(VineTree& graph)
   }
 }
 
-//! Add conditioned info and data for each edge
+//! @brief Adds conditioned info and data for each edge.
 //!
 //! See, e.g., Czado (2010), "Pair-copula constructions of multivariate
 //! copulas", url: https://mediatum.ub.tum.de/doc/1079253/file.pdf
@@ -932,7 +928,7 @@ VinecopSelector::add_edge_info(VineTree& tree)
   }
 }
 
-//! Remove data (hfunc1/hfunc2/pc_data) from all edges of a vine tree
+//! @brief Removes data (hfunc1/hfunc2/pc_data) from all edges of a vine tree.
 //! @param tree A vine tree.
 inline void
 VinecopSelector::remove_edge_data(VineTree& tree)
@@ -946,7 +942,7 @@ VinecopSelector::remove_edge_data(VineTree& tree)
   }
 }
 
-//! Remove data (hfunc1/hfunc2/pc_data) from all vertices of a vine tree
+//! @brief Removes data (hfunc1/hfunc2/pc_data) from all vertices of a vine tree.
 //! @param tree A vine tree.
 inline void
 VinecopSelector::remove_vertex_data(VineTree& tree)
@@ -959,7 +955,7 @@ VinecopSelector::remove_vertex_data(VineTree& tree)
   }
 }
 
-//! Fit and select a pair copula for each edges
+//! @brief Fits and selects a pair copula for each edges.
 //! @param tree A vine tree preprocessed with `add_edge_info()`.
 //! @param tree_opt The current optimal tree (used only for sparse
 //!     selection).
@@ -1016,7 +1012,7 @@ VinecopSelector::select_pair_copulas(VineTree& tree, const VineTree& tree_opt)
   controls_.set_num_threads(num_threads);
 }
 
-//! finds the fitted pair-copula from the previous iteration.
+//! @brief Finds the fitted pair-copula from the previous iteration.
 inline FoundEdge
 VinecopSelector::find_old_fit(double fit_id, const VineTree& old_graph)
 {
@@ -1031,7 +1027,7 @@ VinecopSelector::find_old_fit(double fit_id, const VineTree& old_graph)
   return std::make_pair(edge, fit_with_same_id);
 }
 
-//! Get edge index for the vine (like 1, 2; 3)
+//! @brief Gets edge index for the vine (like 1, 2; 3).
 //! @param e A descriptor for the edge.
 //! @param tree A vine tree.
 inline std::string
