@@ -47,5 +47,9 @@ main()
   // selecting the structure along with the families
   Vinecop fitted2(data);
 
+  // check the default fit controls
+  auto controls = FitControlsVinecop();
+  std::cout << controls.str() << std::endl;
+
   return 0;
 }

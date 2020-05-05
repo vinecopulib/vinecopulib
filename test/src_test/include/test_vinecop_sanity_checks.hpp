@@ -51,4 +51,10 @@ TEST(vinecop_sanity_checks, catches_wrong_size)
   pair_copulas[0].pop_back(); // to few
   EXPECT_ANY_THROW(Vinecop(mat, pair_copulas));
 }
+
+TEST(vinecop_sanity_checks, controls_print)
+{
+  auto controls = FitControlsVinecop();
+  EXPECT_NO_THROW(controls.str());
+}
 }

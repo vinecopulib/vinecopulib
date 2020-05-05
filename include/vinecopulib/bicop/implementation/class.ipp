@@ -449,35 +449,35 @@ Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters) const
 //!
 //! @{
 
-//! Get the copula family.
+//! @brief Gets the copula family.
 inline BicopFamily
 Bicop::get_family() const
 {
   return bicop_->get_family();
 }
 
-//! Get the copula family as a string.
+//! @brief Gets the copula family as a string.
 inline std::string
 Bicop::get_family_name() const
 {
   return bicop_->get_family_name();
 }
 
-//! Get the rotation.
+//! @brief Gets the rotation.
 inline int
 Bicop::get_rotation() const
 {
   return rotation_;
 }
 
-//! Get the parameters.
+//! @brief Gets the parameters.
 inline Eigen::MatrixXd
 Bicop::get_parameters() const
 {
   return bicop_->get_parameters();
 }
 
-//! Get the log-likelihood (only for fitted objects).
+//! @brief Gets the log-likelihood (only for fitted objects).
 inline double
 Bicop::get_loglik() const
 {
@@ -485,7 +485,7 @@ Bicop::get_loglik() const
   return bicop_->get_loglik();
 }
 
-//! Get the number of observations (only for fitted objects).
+//! @brief Gets the number of observations (only for fitted objects).
 inline size_t
 Bicop::get_nobs() const
 {
@@ -493,7 +493,7 @@ Bicop::get_nobs() const
   return nobs_;
 }
 
-//! Get the aic (only for fitted objects).
+//! @brief Gets the aic (only for fitted objects).
 inline double
 Bicop::get_aic() const
 {
@@ -501,7 +501,7 @@ Bicop::get_aic() const
   return -2 * bicop_->get_loglik() + 2 * bicop_->get_npars();
 }
 
-//! Get the bic (only for fitted objects).
+//! @brief Gets the bic (only for fitted objects).
 inline double
 Bicop::get_bic() const
 {
@@ -510,7 +510,7 @@ Bicop::get_bic() const
   return -2 * bicop_->get_loglik() + std::log(nobs_) * npars;
 }
 
-//! Get the modified bic (only for fitted objects).
+//! @brief Gets the modified bic (only for fitted objects).
 inline double
 Bicop::get_mbic(const double psi0) const
 {
@@ -528,14 +528,14 @@ Bicop::compute_mbic_penalty(const size_t nobs, const double psi0) const
   return std::log(nobs) * npars - 2 * log_prior;
 }
 
-//! Get the Kendall's tau.
+//! @brief Gets the Kendall's tau.
 inline double
 Bicop::get_tau() const
 {
   return parameters_to_tau(bicop_->get_parameters());
 }
 
-//! Sets the rotation.
+//! @brief Sets the rotation.
 inline void
 Bicop::set_rotation(const int rotation)
 {
@@ -636,7 +636,7 @@ Bicop::flip()
   }
 }
 
-//! Summarizes the model into a string (can be used for printing).
+//! @brief Summarizes the model into a string (can be used for printing).
 inline std::string
 Bicop::str() const
 {
@@ -653,14 +653,14 @@ Bicop::str() const
   return bicop_str.str().c_str();
 }
 
-//! Gets lower bounds for copula parameters.
+//! @brief Gets lower bounds for copula parameters.
 inline Eigen::MatrixXd
 Bicop::get_parameters_lower_bounds() const
 {
   return bicop_->get_parameters_lower_bounds();
 }
 
-//! Gets upper bounds for copula parameters.
+//! @brief Gets upper bounds for copula parameters.
 inline Eigen::MatrixXd
 Bicop::get_parameters_upper_bounds() const
 {
@@ -830,7 +830,7 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
   }
 }
 
-//! adds an additional column if there's only one discrete variable;
+//! @brief Adds an additional column if there's only one discrete variable;
 //! removes superfluous columns for continuous variables.
 //! (continuous models only require two columns, discrete models always four)
 inline Eigen::MatrixXd
@@ -851,7 +851,7 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
   return u_new;
 }
 
-//! rotates the data corresponding to the models rotation.
+//! @brief Rotates the data corresponding to the models rotation.
 //! @param u An `n x 2` matrix.
 inline void
 Bicop::rotate_data(Eigen::MatrixXd& u) const
@@ -885,7 +885,7 @@ Bicop::rotate_data(Eigen::MatrixXd& u) const
   }
 }
 
-//! prepares data for use with the `AbstractBicop` class:
+//! @brief Prepares data for use with the `AbstractBicop` class:
 //! - add an additional column if there's only one discrete variable.
 //! - trim the data to the interval [1e-10, 1 - 1e-10] for numerical stability.
 //! - rotate the data appropriately (`AbstractBicop` is always 0deg-rotation).
@@ -898,7 +898,8 @@ Bicop::prep_for_abstract(const Eigen::MatrixXd& u) const
   return u_new;
 }
 
-//! checks whether the supplied rotation is valid (only 0, 90, 180, 270 allowd).
+//! @brief Checks whether the supplied rotation is valid (only 0, 90, 180, 270
+//! allowd).
 inline void
 Bicop::check_rotation(int rotation) const
 {
@@ -915,7 +916,7 @@ Bicop::check_rotation(int rotation) const
   }
 }
 
-//! checks whether weights and data have matching sizes.
+//! @brief Checks whether weights and data have matching sizes.
 inline void
 Bicop::check_weights_size(const Eigen::VectorXd& weights,
                           const Eigen::MatrixXd& data) const
@@ -925,7 +926,7 @@ Bicop::check_weights_size(const Eigen::VectorXd& weights,
   }
 }
 
-//! checks whether the Bicop object was fitted to data.
+//! @brief Checks whether the Bicop object was fitted to data.
 inline void
 Bicop::check_fitted() const
 {
@@ -935,7 +936,8 @@ Bicop::check_fitted() const
   }
 }
 
-//! checks whether var_types have the correct length and are either "c" or "d".
+//! @brief Checks whether var_types have the correct length and are either "c"
+//! or "d".
 inline void
 Bicop::check_var_types(const std::vector<std::string>& var_types) const
 {
@@ -949,7 +951,7 @@ Bicop::check_var_types(const std::vector<std::string>& var_types) const
   }
 }
 
-//! returns the number of discrete variables.
+//! @brief Returns the number of discrete variables.
 inline unsigned short
 Bicop::get_n_discrete() const
 {
