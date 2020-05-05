@@ -130,17 +130,17 @@ get_c1c2(const Eigen::MatrixXd& data,
   double c1, c2;
   Eigen::VectorXd w;
 
-  w = (weights.size() > 0) ? weights.head(count1 - 1) : weights;
   if (count1 == 0) {
     c1 = 0.0;
   } else {
+    w = (weights.size() > 0) ? weights.head(count1 - 1) : weights;
     c1 = wdm::wdm(z1.block(0, 0, count1 - 1, 2), "cor", w)(0, 1);
   }
 
-  w = (weights.size() > 0) ? weights.head(count2 - 1) : weights;
   if (count2 == 0) {
     c2 = 0.0;
   } else {
+    w = (weights.size() > 0) ? weights.head(count2 - 1) : weights;
     c2 = wdm::wdm(z2.block(0, 0, count2 - 1, 2), "cor", w)(0, 1);
   }
 

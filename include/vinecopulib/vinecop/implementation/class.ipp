@@ -968,17 +968,19 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
          get_npars() * log(static_cast<double>(u.rows()));
 }
 
+// clang-format off
 //! @brief Evaluates the modified Bayesian information criterion for vines
 //! (mBICV).
 //!
 //! The mBICV is defined as
 //! \f[ \mathrm{mBICV} = -2\, \mathrm{loglik} +  \log(n) p, - 2 * \sum_{t=1}^(d - 1) \{q_t \log(\psi_0^t) - (d - t - q_t) \log(1 -\psi_0^t)\},\f]
-//! where \f$\mathrm{loglik} \f$ is the log-liklihood, \f$ p \f$ is the (effective)
-//! number of parameters of the model, \f$ t \f$ is the tree level, \f$ \psi_0
-//! \f$ is the prior probability of having a non-independence copula in the
-//! first tree, and \f$ q_t \f$ is the number of non-independence copulas in
-//! tree \f$ t \f$; The vBIC is a consistent model selection criterion for
-//! parametric sparse vine copula models when \f$ d = o(\sqrt{n \log n})\f$.
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood,
+//! \f$ p \f$ is the (effective) number of parameters of the model, \f$ t \f$
+//! is the tree level, \f$ \psi_0 \f$ is the prior probability of having a
+//! non-independence copula in the first tree, and \f$ q_t \f$ is the number of
+//! non-independence copulas in tree \f$ t \f$; The vBIC is a consistent model
+//! selection criterion for parametric sparse vine copula models when
+//! \f$ d = o(\sqrt{n \log n})\f$.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
@@ -987,6 +989,7 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+// clang-format on
 inline double
 Vinecop::mbicv(const Eigen::MatrixXd& u,
                const double psi0,

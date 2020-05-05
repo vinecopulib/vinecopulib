@@ -31,6 +31,7 @@ TllBicop::select_bandwidth(const Eigen::MatrixXd& x,
 {
   size_t n = x.rows();
   double cor = wdm::wdm(x, "cor", weights)(0, 1);
+  cor = std::min(std::max(cor, -0.95), 0.95);
   Eigen::Matrix2d cov = Eigen::MatrixXd::Identity(2, 2);
   cov(0, 1) = cor;
   cov(1, 0) = cor;
