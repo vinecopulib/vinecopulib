@@ -471,8 +471,8 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
   double ors = 1 - pow(rho, 2.0);
 
   auto f = [snu, nu, ors, rho](double h, double k) {
-    double d1, d2, d3, hkn, hpk, bvt, gmph, gmpk, hkrn, xnkh, xnhk, btnckh, 
-      btnchk, btpdkh, btpdhk;
+    double d1, d2, d3, hkn, hpk, bvt, gmph, gmpk, xnkh, xnhk, btnckh, btnchk,
+      btpdkh, btpdhk;
     int hs, ks;
 
     double hrk = h - rho * k;
@@ -534,7 +534,7 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
       /* Computing 2nd power */
       d2 = k;
       double qhrk = sqrt(d1 * d1 + d2 * d2 - rho * 2 * h * k + nu * ors);
-      hkrn = h * k + rho * nu;
+      double hkrn = h * k + rho * nu;
       hkn = h * k - nu;
       hpk = h + k;
       bvt =
@@ -629,7 +629,7 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
 
   auto f = [lg, rho, x, w, phi](double h, double k) {
     size_t i1;
-    double a, b, c, d, d1, d2, as, bs, hk, hs, sn, rs, xs, bvn;
+    double a, b, c, d, d1, d2, as, bs, hk, hs, sn, rs, bvn;
     h = -h;
     k = -k;
     hk = h * k;
@@ -673,7 +673,7 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
         for (size_t i = 0; i < i1; ++i) {
           /* Computing 2nd power */
           d1 = a * (x(i) + 1);
-          xs = d1 * d1;
+          double xs = d1 * d1;
           rs = std::sqrt(1 - xs);
           bvn += a * w(i) *
                  (std::exp(-bs / (xs * 2) - hk / (rs + 1)) / rs -

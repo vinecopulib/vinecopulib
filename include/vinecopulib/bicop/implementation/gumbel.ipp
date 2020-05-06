@@ -47,7 +47,8 @@ GumbelBicop::generator_derivative(const double& u)
 //           (theta / std::pow(u, 2));
 //}
 
-inline Eigen::VectorXd GumbelBicop::pdf_raw(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd
+GumbelBicop::pdf_raw(const Eigen::MatrixXd& u)
 {
   double theta = static_cast<double>(parameters_(0));
   double thetha1 = 1.0 / theta;
@@ -62,7 +63,8 @@ inline Eigen::VectorXd GumbelBicop::pdf_raw(const Eigen::MatrixXd &u)
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd GumbelBicop::hinv1_raw(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd
+GumbelBicop::hinv1_raw(const Eigen::MatrixXd& u)
 {
   double theta = double(this->parameters_(0));
   double u1, u2;
@@ -106,7 +108,7 @@ GumbelBicop::get_start_parameters(const double tau)
 inline double
 qcondgum(double* q, double* u, double* de)
 {
-  double a, p, g, z1, z2, con, de1, dif;
+  double a, p, z1, z2, con, de1, dif;
   double mxdif;
   int iter;
 
@@ -119,7 +121,7 @@ qcondgum(double* q, double* u, double* de)
   iter = 0;
   dif = .1; // needed in case first step leads to NaN
   while ((mxdif > 1.e-6) && (iter < 20)) {
-    g = a + de1 * log(a) + con;
+    double g = a + de1 * log(a) + con;
     double gp = 1. + de1 / a;
     if ((boost::math::isnan)(g) || (boost::math::isnan)(gp) ||
         (boost::math::isnan)(g / gp)) {
