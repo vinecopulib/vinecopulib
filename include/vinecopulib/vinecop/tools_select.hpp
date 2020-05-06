@@ -39,7 +39,7 @@ calculate_criterion(const Eigen::MatrixXd& data,
 
 Eigen::MatrixXd
 calculate_criterion_matrix(const Eigen::MatrixXd& data,
-                           std::string tree_criterion,
+                           const std::string& tree_criterion,
                            const Eigen::VectorXd& weights);
 
 std::vector<size_t>
