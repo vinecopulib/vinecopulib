@@ -25,5 +25,9 @@ main()
   std::cout << "Fitted Model (sample size = 2e3) | " << fitted.str()
             << std::endl;
 
+  // check the default fit controls
+  auto controls = FitControlsBicop();
+  std::cout << controls.str() << std::endl;
+
   return 0;
 }

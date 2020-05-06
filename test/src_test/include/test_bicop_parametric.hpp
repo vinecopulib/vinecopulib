@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -40,7 +40,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     }
 
     auto absdiff = fabs(bicop_.get_tau() - results(0, 0));
-    ASSERT_TRUE(absdiff < 1e-4) << bicop_.str();
+    ASSERT_TRUE(absdiff < 1e-2) << bicop_.str();
 
     // Get u-data
     Eigen::MatrixXd u = results.block(0, 1, n, 2);

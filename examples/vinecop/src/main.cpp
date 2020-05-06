@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -46,6 +46,10 @@ main()
   // alternatively, instantiate a new object by
   // selecting the structure along with the families
   Vinecop fitted2(data);
+
+  // check the default fit controls
+  auto controls = FitControlsVinecop();
+  std::cout << controls.str() << std::endl;
 
   return 0;
 }

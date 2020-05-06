@@ -2,6 +2,7 @@
 [![Build Status](https://github.com/vinecopulib/vinecopulib/workflows/Build%20Status/badge.svg)](https://github.com/vinecopulib/vinecopulib/actions)
 [![Coverage Status](https://img.shields.io/codecov/c/github/vinecopulib/vinecopulib/master.svg)](https://codecov.io/github/vinecopulib/vinecopulib?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a81e08da0aa344418114298d3ba04931)](https://www.codacy.com/gh/vinecopulib/vinecopulib?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vinecopulib/vinecopulib&amp;utm_campaign=Badge_Grade)
 
 #### What are vine copulas?
 
@@ -13,21 +14,21 @@ You can find a comprehensive list of publications and other materials on
 
 #### What is vinecopulib?
 
-vinecopulib is a header-only C++ library for vine copula models based on
+[vinecopulib](https://vinecopulib.github.io/vinecopulib/) is a header-only C++ library for vine copula models based on
 [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). It provides
 high-performance implementations of the core features of the popular
 [VineCopula R library](https://github.com/tnagler/VineCopula), in particular
 inference algorithms for both vine copula and bivariate copula models.
 Advantages over VineCopula are  
-* a stand-alone C++ library with interfaces to both R and Python,
-* a sleaker and more modern API,
-* shorter runtimes and lower memory consumption, especially in high dimensions,
-* nonparametric and multi-parameter families.
+  * a stand-alone C++ library with interfaces to both R and Python,
+  * a sleaker and more modern API,
+  * shorter runtimes and lower memory consumption, especially in high dimensions,
+  * nonparametric and multiparameter families.
 
 #### Status
 
-Version [0.5.1](https://github.com/vinecopulib/vinecopulib/releases) was
-released on November 25, 2019. While we did our best to
+Version [0.5.2](https://github.com/vinecopulib/vinecopulib/releases) was
+released on May 7th, 2020. While we did our best to
 design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for
 [R](https://github.com/vinecopulib/rvinecopulib) and

@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -50,5 +50,11 @@ TEST(vinecop_sanity_checks, catches_wrong_size)
   pair_copulas = Vinecop::make_pair_copula_store(3);
   pair_copulas[0].pop_back(); // to few
   EXPECT_ANY_THROW(Vinecop(mat, pair_copulas));
+}
+
+TEST(vinecop_sanity_checks, controls_print)
+{
+  auto controls = FitControlsVinecop();
+  EXPECT_NO_THROW(controls.str());
 }
 }

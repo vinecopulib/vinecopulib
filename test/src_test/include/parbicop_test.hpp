@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -70,7 +70,8 @@ protected:
         auto tau_v = Eigen::VectorXd::Constant(1, std::fabs(tau));
         auto f = [this, delta](const Eigen::VectorXd& v) {
           Eigen::VectorXd par(2);
-          par << v(0), delta;
+          par(0) = v(0);
+          par(1) = delta;
           auto tt = bicop_.parameters_to_tau(par);
           return Eigen::VectorXd::Constant(1, std::fabs(tt));
         };
