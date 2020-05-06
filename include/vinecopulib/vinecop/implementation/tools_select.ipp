@@ -56,7 +56,7 @@ calculate_criterion(const Eigen::MatrixXd& data,
 //! @param weights Vector of weights for each observation (can be empty).
 inline Eigen::MatrixXd
 calculate_criterion_matrix(const Eigen::MatrixXd& data,
-                           std::string tree_criterion,
+                           const std::string& tree_criterion,
                            const Eigen::VectorXd& weights)
 {
   size_t n = data.rows();
@@ -219,7 +219,6 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
 
     // helper variables for checking whether an optimum was found
     double mbicv = 0.0;
-    double mbicv_tree = 0.0;
     double mbicv_trunc = 0.0;
     double loglik = 0.0;
     bool select_trunc_lvl = controls_.get_select_trunc_lvl();
@@ -239,7 +238,7 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
       // update fit statistic
       double loglik_tree = get_loglik_of_tree(t);
       loglik += loglik_tree;
-      mbicv_tree = get_mbicv_of_tree(t, loglik_tree);
+      double mbicv_tree = get_mbicv_of_tree(t, loglik_tree);
       mbicv_trunc += mbicv_tree;
 
       // print trace for this tree level
@@ -304,9 +303,9 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
       set_current_fit_as_opt(loglik);
       mbicv_opt = mbicv;
       // while loop is only for threshold selection
-      needs_break = needs_break | !select_threshold;
+      needs_break = needs_break || !select_threshold;
       // threshold is too close to 0
-      needs_break = needs_break | (controls_.get_threshold() < 0.01);
+      needs_break = needs_break || (controls_.get_threshold() < 0.01);
       // prepare for possible next iteration
       thresholded_crits = get_thresholded_crits();
     }
