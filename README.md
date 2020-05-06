@@ -20,10 +20,10 @@ high-performance implementations of the core features of the popular
 [VineCopula R library](https://github.com/tnagler/VineCopula), in particular
 inference algorithms for both vine copula and bivariate copula models.
 Advantages over VineCopula are  
-* a stand-alone C++ library with interfaces to both R and Python,
-* a sleaker and more modern API,
-* shorter runtimes and lower memory consumption, especially in high dimensions,
-* nonparametric and multiparameter families.
+  * a stand-alone C++ library with interfaces to both R and Python,
+  * a sleaker and more modern API,
+  * shorter runtimes and lower memory consumption, especially in high dimensions,
+  * nonparametric and multiparameter families.
 
 #### Status
 
