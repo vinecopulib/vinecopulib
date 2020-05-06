@@ -1,3 +1,28 @@
+## vinecopulib 0.5.2 (May 7, 2020)
+
+### NEW FEATURES
+
+* `str()` methods for `FitControlsBicop` and 
+  `FitControlsVinecop` (#494) 
+
+### BUG FIXES
+
+* fix documentation (#482, #493)
+
+* fix bug in `RVineStructure::simulate()` (#492)
+
+* fix tll family with comonotonic data (#491)
+
+* fix weights handling in family preselection (#490) 
+
+* fix archimidean h-functions near independence (#488)
+
+* safety net for NA structure weights (#487)
+
+* fix code qix quality issues (#486)
+
+* fix `Vinecop::str()` (#484)
+
 ## vinecopulib 0.5.1 (November 25, 2019)
 
 ### BUG FIXES
