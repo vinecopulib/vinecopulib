@@ -16,6 +16,7 @@
 #include <vinecopulib/bicop/gumbel.hpp>
 #include <vinecopulib/bicop/indep.hpp>
 #include <vinecopulib/bicop/joe.hpp>
+#include <vinecopulib/bicop/rmgumbel.hpp>
 #include <vinecopulib/bicop/student.hpp>
 #include <vinecopulib/bicop/tll.hpp>
 #include <vinecopulib/misc/tools_eigen.hpp>
@@ -73,7 +74,9 @@ AbstractBicop::create(BicopFamily family, const Eigen::MatrixXd& parameters)
     case BicopFamily::tll:
       new_bicop = BicopPtr(new TllBicop());
       break;
-
+    case BicopFamily::rmgumbel:
+      new_bicop = BicopPtr(new RMGumbelBicop());
+      break;
     default:
       throw std::runtime_error(std::string("Family not implemented"));
   }

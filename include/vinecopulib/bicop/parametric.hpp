@@ -17,6 +17,8 @@ namespace vinecopulib {
 //! always work with the Bicop interface.
 class ParBicop : public AbstractBicop
 {
+  friend class RMGumbelBicop;
+
 protected:
   // Getters and setters
   Eigen::MatrixXd get_parameters() const;

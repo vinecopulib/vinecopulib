@@ -14,18 +14,19 @@ namespace vinecopulib {
 //! @brief A bivariate copula family identifier.
 enum class BicopFamily
 {
-  indep,    ///< Independence copula
-  gaussian, ///< Gaussian copula
-  student,  ///< Student t copula
-  clayton,  ///< Clayton copula
-  gumbel,   ///< Gumbel copula
-  frank,    ///< Frank copula
-  joe,      ///< Joe copula
-  bb1,      ///< BB1 copula
-  bb6,      ///< BB6 copula
-  bb7,      ///< BB7 copula
-  bb8,      ///< BB8 copula
-  tll       ///< Transformation local likelihood kernel estimator
+  indep,     ///< Independence copula
+  gaussian,  ///< Gaussian copula
+  student,   ///< Student t copula
+  clayton,   ///< Clayton copula
+  gumbel,    ///< Gumbel copula,
+  frank,     ///< Frank copula
+  joe,       ///< Joe copula
+  bb1,       ///< BB1 copula
+  bb6,       ///< BB6 copula
+  bb7,       ///< BB7 copula
+  bb8,       ///< BB8 copula
+  tll,       ///< Transformation local likelihood kernel estimator
+  rmgumbel   ///< Rotation mixture of Gumbel copulas
 };
 
 std::string
@@ -42,7 +43,8 @@ const std::vector<BicopFamily> all = {
   BicopFamily::indep,   BicopFamily::gaussian, BicopFamily::student,
   BicopFamily::clayton, BicopFamily::gumbel,   BicopFamily::frank,
   BicopFamily::joe,     BicopFamily::bb1,      BicopFamily::bb6,
-  BicopFamily::bb7,     BicopFamily::bb8,      BicopFamily::tll
+  BicopFamily::bb7,     BicopFamily::bb8,      BicopFamily::tll,
+  BicopFamily::rmgumbel
 };
 
 //! All parametric families
@@ -50,7 +52,7 @@ const std::vector<BicopFamily> parametric = {
   BicopFamily::indep,   BicopFamily::gaussian, BicopFamily::student,
   BicopFamily::clayton, BicopFamily::gumbel,   BicopFamily::frank,
   BicopFamily::joe,     BicopFamily::bb1,      BicopFamily::bb6,
-  BicopFamily::bb7,     BicopFamily::bb8
+  BicopFamily::bb7,     BicopFamily::bb8,      BicopFamily::rmgumbel
 };
 
 //! All nonparametric families
@@ -94,7 +96,8 @@ const std::vector<BicopFamily> rotationless = { BicopFamily::indep,
                                                 BicopFamily::gaussian,
                                                 BicopFamily::student,
                                                 BicopFamily::frank,
-                                                BicopFamily::tll };
+                                                BicopFamily::tll,
+                                                BicopFamily::rmgumbel };
 
 //! Families with stronger dependence in the lower tail
 const std::vector<BicopFamily> lt = { BicopFamily::clayton,
