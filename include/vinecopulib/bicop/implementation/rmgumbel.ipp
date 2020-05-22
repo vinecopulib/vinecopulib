@@ -49,11 +49,23 @@ RMGumbelBicop::hfunc1_raw(const Eigen::MatrixXd& u)
   auto uu = u;
   Eigen::VectorXd h1 = Eigen::VectorXd::Zero(u.rows());
   GumbelBicop bc;
-  for (int i = 0; i < 4; i++) {
-    bc.set_parameters(Eigen::VectorXd::Constant(1, parameters_(i)));
-    h1 += bc.hfunc1(uu) / 4;
-    rotate_90(uu);
-  }
+  Eigen::VectorXd ones = Eigen::VectorXd::Ones(u.rows());
+
+  bc.set_parameters(Eigen::VectorXd::Constant(1, parameters_(0)));
+  h1 += 0.25 * bc.hfunc1(uu);
+
+  rotate_90(uu);
+  bc.set_parameters(Eigen::VectorXd::Constant(1, parameters_(1)));
+  h1 += 0.25 * bc.hfunc2(uu);
+
+  rotate_90(uu);
+  bc.set_parameters(Eigen::VectorXd::Constant(1, parameters_(2)));
+  h1 += 0.25 * (ones - bc.hfunc1(uu));
+
+  rotate_90(uu);
+  bc.set_parameters(Eigen::VectorXd::Constant(1, parameters_(3)));
+  h1 += 0.25 * (ones - bc.hfunc2(uu));
+
   return h1;
 }
 
@@ -63,11 +75,23 @@ RMGumbelBicop::hfunc2_raw(const Eigen::MatrixXd& u)
   auto uu = u;
   Eigen::VectorXd h2 = Eigen::VectorXd::Zero(u.rows());
   GumbelBicop bc;
-  for (int i = 0; i < 4; i++) {
-    bc.set_parameters(Eigen::VectorXd::Constant(1, parameters_(i)));
-    h2 += bc.hfunc2(uu) / 4;
-    rotate_90(uu);
-  }
+  Eigen::VectorXd ones = Eigen::VectorXd::Ones(u.rows());
+
+  bc.set_parameters(Eigen::VectorXd::Constant(1, parameters_(0)));
+  h2 += 0.25 * bc.hfunc2(uu);
+
+  rotate_90(uu);
+  bc.set_parameters(Eigen::VectorXd::Constant(1, parameters_(1)));
+  h2 += 0.25 * (ones - bc.hfunc1(uu));
+
+  rotate_90(uu);
+  bc.set_parameters(Eigen::VectorXd::Constant(1, parameters_(2)));
+  h2 += 0.25 * (ones - bc.hfunc2(uu));
+
+  rotate_90(uu);
+  bc.set_parameters(Eigen::VectorXd::Constant(1, parameters_(3)));
+  h2 += 0.25 * bc.hfunc1(uu);
+
   return h2;
 }
 
