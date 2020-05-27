@@ -95,6 +95,7 @@ TEST_F(VinecopTest, 1dim)
   vc.loglik();
   vc.aic();
   vc.simulate(3);
+  Vinecop::make_pair_copula_store(1, 2);
 }
 
 TEST_F(VinecopTest, fit_statistics_getters_are_correct)
