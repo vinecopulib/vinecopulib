@@ -96,6 +96,9 @@ TEST_F(VinecopTest, 1dim)
   vc.aic();
   vc.simulate(3);
   Vinecop::make_pair_copula_store(1, 2);
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(1, 1);
+  mat(0, 0) = 1;
+  RVineStructure rvine_structure(mat);
 }
 
 TEST_F(VinecopTest, fit_statistics_getters_are_correct)
