@@ -92,6 +92,8 @@ TEST_F(VinecopTest, 1dim)
   EXPECT_TRUE((vc.pdf(data).array() == 1).all());
   EXPECT_TRUE((vc.rosenblatt(data).array() == data.array()).all());
   EXPECT_TRUE((vc.inverse_rosenblatt(data).array() == data.array()).all());
+  vc.loglik();
+  vc.aic();
   vc.simulate(3);
 }
 

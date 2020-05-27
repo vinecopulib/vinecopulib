@@ -285,6 +285,8 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 {
   check_data(data);
   if (data.cols() == 1) {
+    loglik_ = 0;
+    nobs_ = data.rows();
     return;
   }
   Eigen::MatrixXd u = collapse_data(data);
