@@ -19,8 +19,6 @@ namespace vinecopulib {
 //! Joe, Harry. Dependence modeling with copulas. CRC Press, 2014.
 class ArchimedeanBicop : public ParBicop
 {
-  friend class RMGumbelBicop;
-
 private:
   // cdf, hfunctions and inverses
   // Eigen::VectorXd pdf(const Eigen::MatrixXd &u);
