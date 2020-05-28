@@ -63,6 +63,8 @@ protected:
         parameters(1) = 1.5;
         parameters(0) = -(2 * (1 - parameters(1) + parameters(1) * tau));
         parameters(0) /= (parameters(1) * (-1 + tau));
+      } else if (tools_stl::is_member(family, bicop_families::rm)) {
+        parameters = Eigen::VectorXd::Ones(4) * 1.7;
       } else {
         double delta = 1.5;
         if (family == BicopFamily::bb8)
@@ -91,7 +93,9 @@ protected:
         parameters *= -1;
     }
 
-    // set the parameters vector for R
-    set_parameters(parameters);
+    if (!tools_stl::is_member(family, bicop_families::rm)) {
+      // set the parameters vector for R
+      set_parameters(parameters);
+    }
   }
 };
