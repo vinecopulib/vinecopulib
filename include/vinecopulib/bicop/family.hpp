@@ -14,19 +14,21 @@ namespace vinecopulib {
 //! @brief A bivariate copula family identifier.
 enum class BicopFamily
 {
-  indep,     ///< Independence copula
-  gaussian,  ///< Gaussian copula
-  student,   ///< Student t copula
-  clayton,   ///< Clayton copula
-  gumbel,    ///< Gumbel copula,
-  frank,     ///< Frank copula
-  joe,       ///< Joe copula
-  bb1,       ///< BB1 copula
-  bb6,       ///< BB6 copula
-  bb7,       ///< BB7 copula
-  bb8,       ///< BB8 copula
-  tll,       ///< Transformation local likelihood kernel estimator
-  rmgumbel   ///< Rotation mixture of Gumbel copulas
+  indep,       ///< Independence copula
+  gaussian,    ///< Gaussian copula
+  student,     ///< Student t copula
+  clayton,     ///< Clayton copula
+  gumbel,      ///< Gumbel copula,
+  frank,       ///< Frank copula
+  joe,         ///< Joe copula
+  bb1,         ///< BB1 copula
+  bb6,         ///< BB6 copula
+  bb7,         ///< BB7 copula
+  bb8,         ///< BB8 copula
+  tll,         ///< Transformation local likelihood kernel estimator
+  rmclayton,   ///< Rotation mixture of Clayton copulas
+  rmgumbel,    ///< Rotation mixture of Gumbel copulas
+  rmjoe        ///< Rotation mixture of Joe copulas
 };
 
 std::string
@@ -40,19 +42,20 @@ namespace bicop_families {
 
 //! All implemented families
 const std::vector<BicopFamily> all = {
-  BicopFamily::indep,   BicopFamily::gaussian, BicopFamily::student,
-  BicopFamily::clayton, BicopFamily::gumbel,   BicopFamily::frank,
-  BicopFamily::joe,     BicopFamily::bb1,      BicopFamily::bb6,
-  BicopFamily::bb7,     BicopFamily::bb8,      BicopFamily::tll,
-  BicopFamily::rmgumbel
+  BicopFamily::indep,     BicopFamily::gaussian, BicopFamily::student,
+  BicopFamily::clayton,   BicopFamily::gumbel,   BicopFamily::frank,
+  BicopFamily::joe,       BicopFamily::bb1,      BicopFamily::bb6,
+  BicopFamily::bb7,       BicopFamily::bb8,      BicopFamily::tll,
+  BicopFamily::rmclayton, BicopFamily::rmgumbel, BicopFamily::rmjoe
 };
 
 //! All parametric families
 const std::vector<BicopFamily> parametric = {
-  BicopFamily::indep,   BicopFamily::gaussian, BicopFamily::student,
-  BicopFamily::clayton, BicopFamily::gumbel,   BicopFamily::frank,
-  BicopFamily::joe,     BicopFamily::bb1,      BicopFamily::bb6,
-  BicopFamily::bb7,     BicopFamily::bb8,      BicopFamily::rmgumbel
+  BicopFamily::indep,    BicopFamily::gaussian, BicopFamily::student,
+  BicopFamily::clayton,  BicopFamily::gumbel,   BicopFamily::frank,
+  BicopFamily::joe,      BicopFamily::bb1,      BicopFamily::bb6,
+  BicopFamily::bb7,      BicopFamily::bb8,      BicopFamily::rmclayton,
+  BicopFamily::rmgumbel, BicopFamily::rmjoe
 };
 
 //! All nonparametric families
@@ -89,15 +92,19 @@ const std::vector<BicopFamily> bb = { BicopFamily::bb1,
                                       BicopFamily::bb7,
                                       BicopFamily::bb8 };
 
+//! All Rotation Mixture copulas
+const std::vector<BicopFamily> rm = { BicopFamily::rmclayton,
+                                      BicopFamily::rmgumbel,
+                                      BicopFamily::rmjoe };
+
 //! @brief All copulas that don't have a rotation.
 //!
 //! (because they already cover positive and negative dependence)
-const std::vector<BicopFamily> rotationless = { BicopFamily::indep,
-                                                BicopFamily::gaussian,
-                                                BicopFamily::student,
-                                                BicopFamily::frank,
-                                                BicopFamily::tll,
-                                                BicopFamily::rmgumbel };
+const std::vector<BicopFamily> rotationless = {
+  BicopFamily::indep,    BicopFamily::gaussian, BicopFamily::student,
+  BicopFamily::frank,    BicopFamily::tll,      BicopFamily::rmclayton,
+  BicopFamily::rmgumbel, BicopFamily::rmjoe
+};
 
 //! Families with stronger dependence in the lower tail
 const std::vector<BicopFamily> lt = { BicopFamily::clayton,

@@ -20,6 +20,7 @@ namespace vinecopulib {
 class AbstractBicop
 {
   friend class Bicop;
+  friend class RotationMixtureBicop;
 
 public:
   virtual ~AbstractBicop() = 0;

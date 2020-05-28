@@ -18,6 +18,7 @@ namespace vinecopulib {
 class ParBicop : public AbstractBicop
 {
   friend class RMGumbelBicop;
+  friend class RotationMixtureBicop;
 
 protected:
   // Getters and setters
