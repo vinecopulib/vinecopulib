@@ -84,6 +84,23 @@ TEST_F(VinecopTest, getters_are_correct)
   EXPECT_ANY_THROW(vinecop.mbicv());
 }
 
+TEST_F(VinecopTest, 1dim)
+{
+  auto data = tools_stats::simulate_uniform(3, 1);
+  auto vc = Vinecop(1);
+  vc.select(data);
+  EXPECT_TRUE((vc.pdf(data).array() == 1).all());
+  EXPECT_TRUE((vc.rosenblatt(data).array() == data.array()).all());
+  EXPECT_TRUE((vc.inverse_rosenblatt(data).array() == data.array()).all());
+  vc.loglik();
+  vc.aic();
+  vc.simulate(3);
+  Vinecop::make_pair_copula_store(1, 2);
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(1, 1);
+  mat(0, 0) = 1;
+  RVineStructure rvine_structure(mat);
+}
+
 TEST_F(VinecopTest, fit_statistics_getters_are_correct)
 {
   auto data = tools_stats::simulate_uniform(100, 3);
