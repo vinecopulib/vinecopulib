@@ -120,6 +120,9 @@ public:
   // Stats methods
   Eigen::VectorXd pdf(Eigen::MatrixXd u, const size_t num_threads = 1) const;
 
+  TriangularArray<Eigen::VectorXd> pdf_sep(Eigen::MatrixXd u,
+                                           const size_t num_threads = 1) const;
+
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
                       const size_t N = 1e4,
                       const size_t num_threads = 1,
@@ -165,9 +168,15 @@ public:
   void truncate(size_t trunc_lvl);
 
   std::string str() const;
+  TriangularArray<Eigen::MatrixXd> hessian(Eigen::MatrixXd u,
+                                           const size_t num_threads = 1);
+  Eigen::MatrixXd scores(Eigen::MatrixXd u, const size_t num_threads = 1) const;
+  Eigen::MatrixXd fisher_information(Eigen::MatrixXd u,
+                                     const size_t num_threads = 1);
+  Eigen::MatrixXd score_cov(Eigen::MatrixXd u, const size_t num_threads = 1);
 
 protected:
-  size_t d_;
+  size_t d_{ 1 };
   RVineStructure rvine_structure_;
   mutable std::vector<std::vector<Bicop>> pair_copulas_;
   double threshold_{ 0.0 };
