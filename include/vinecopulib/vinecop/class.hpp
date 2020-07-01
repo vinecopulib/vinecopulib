@@ -168,12 +168,19 @@ public:
   void truncate(size_t trunc_lvl);
 
   std::string str() const;
-  TriangularArray<Eigen::MatrixXd> hessian(Eigen::MatrixXd u,
-                                           const size_t num_threads = 1);
-  Eigen::MatrixXd scores(Eigen::MatrixXd u, const size_t num_threads = 1) const;
-  Eigen::MatrixXd fisher_information(Eigen::MatrixXd u,
-                                     const size_t num_threads = 1);
-  Eigen::MatrixXd score_cov(Eigen::MatrixXd u, const size_t num_threads = 1);
+  Eigen::MatrixXd scores(Eigen::MatrixXd u,
+                         bool step_wise = true,
+                         const size_t num_threads = 1);
+  TriangularArray<std::vector<Eigen::MatrixXd>> hessian(
+    Eigen::MatrixXd u,
+    bool step_wise = true,
+    const size_t num_threads = 1);
+  Eigen::MatrixXd hessian_exp(Eigen::MatrixXd u,
+                              bool step_wise = true,
+                              const size_t num_threads = 1);
+  Eigen::MatrixXd scores_cov(Eigen::MatrixXd u,
+                             bool step_wise = true,
+                             const size_t num_threads = 1);
 
 protected:
   size_t d_{ 1 };

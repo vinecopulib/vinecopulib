@@ -831,7 +831,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 }
 
 Eigen::MatrixXd
-Vinecop::scores(Eigen::MatrixXd u, const size_t num_threads) const
+Vinecop::scores(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
   check_data(u);
   u = collapse_data(u);
@@ -841,8 +841,35 @@ Vinecop::scores(Eigen::MatrixXd u, const size_t num_threads) const
   auto order = rvine_structure_.get_order();
   auto disc_cols = tools_select::get_disc_cols(var_types_);
 
-  Eigen::MatrixXd scores(u.size(), static_cast<size_t>(this->get_npars()));
+  Eigen::MatrixXd scores(u.rows(), static_cast<size_t>(this->get_npars()));
   scores.setZero();
+
+  if (!step_wise) {
+    size_t ipar = 0;
+    for (size_t t = 0; t < trunc_lvl; t++) {
+      for (size_t e = 0; e < d_ - 1 - t; e++) {
+        auto pars = pair_copulas_[t][e].get_parameters();
+        for (size_t p = 0; p < pars.size(); p++) {
+          auto pars_tmp = pars;
+
+          pars_tmp(p) = pars(p) + 1e-2;
+          pair_copulas_[t][e].set_parameters(pars_tmp);
+          Eigen::VectorXd f1 =
+            this->pdf(u, num_threads).array().max(1e-20).log();
+
+          pars_tmp(p) = pars(p) - 1e-2;
+          pair_copulas_[t][e].set_parameters(pars_tmp);
+          Eigen::VectorXd f2 =
+            this->pdf(u, num_threads).array().max(1e-20).log();
+
+          scores.col(ipar++) = (f1 - f2) / 2e-2;
+          pair_copulas_[t][e].set_parameters(pars);
+        }
+      }
+    }
+
+    return scores;
+  }
 
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects (all data must be in (0, 1))
@@ -897,15 +924,17 @@ Vinecop::scores(Eigen::MatrixXd u, const size_t num_threads) const
         auto pars = edge_copula.get_parameters();
         for (size_t p = 0; p < pars.size(); p++) {
           auto pars_tmp = pars;
-          Bicop pc = edge_copula;
-          pars_tmp(p) = pars(p) + 1e-2;
-          pc.set_parameters(pars_tmp);
-          Eigen::VectorXd f1 = pc.pdf(u_e).array().log();
-          pars_tmp(p) = pars(p) - 1e-2;
-          pc.set_parameters(pars_tmp);
-          Eigen::VectorXd f2 = pc.pdf(u_e).array().log();
-          scores.col(ipar++).segment(b.begin, b.size) = (f1 - f2) / 2e-2;
-          pc.set_parameters(pars);
+
+          pars_tmp(p) = pars(p) + 1e-3;
+          edge_copula.set_parameters(pars_tmp);
+          Eigen::VectorXd f1 = edge_copula.pdf(u_e).array().max(1e-20).log();
+
+          pars_tmp(p) = pars(p) - 1e-3;
+          edge_copula.set_parameters(pars_tmp);
+          Eigen::VectorXd f2 = edge_copula.pdf(u_e).array().max(1e-20).log();
+
+          scores.col(ipar++).segment(b.begin, b.size) = (f1 - f2) / 2e-3;
+          edge_copula.set_parameters(pars);
         }
 
         // h-functions are only evaluated if needed in next step
@@ -938,27 +967,30 @@ Vinecop::scores(Eigen::MatrixXd u, const size_t num_threads) const
   return scores;
 }
 
-TriangularArray<Eigen::MatrixXd>
-Vinecop::hessian(Eigen::MatrixXd u, const size_t num_threads)
+TriangularArray<std::vector<Eigen::MatrixXd>>
+Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
   check_data(u);
   u = collapse_data(u);
 
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
-  TriangularArray<Eigen::MatrixXd> hess(d_);
+  TriangularArray<std::vector<Eigen::MatrixXd>> hess(d_);
   for (size_t t = 0; t < trunc_lvl; t++) {
     for (size_t e = 0; e < d_ - 1 - t; e++) {
       auto pars = pair_copulas_[t][e].get_parameters();
+      hess(t, e).resize(pars.size());
       for (size_t p = 0; p < pars.size(); p++) {
         auto pars_tmp = pars;
+
         pars_tmp(p) = pars(p) + 1e-2;
         pair_copulas_[t][e].set_parameters(pars_tmp);
+        Eigen::MatrixXd f1 = this->scores(u, step_wise, num_threads);
 
-        auto f1 = this->scores(u, num_threads);
         pars_tmp(p) = pars(p) - 1e-2;
         pair_copulas_[t][e].set_parameters(pars_tmp);
-        auto f2 = this->scores(u, num_threads);
-        hess(t, e) = (f1 - f2) / 2e-2;
+        Eigen::MatrixXd f2 = this->scores(u, step_wise, num_threads);
+
+        hess(t, e)[p] = (f1 - f2) / 2e-2;
         pair_copulas_[t][e].set_parameters(pars);
       }
     }
@@ -968,29 +1000,31 @@ Vinecop::hessian(Eigen::MatrixXd u, const size_t num_threads)
 }
 
 Eigen::MatrixXd
-Vinecop::fisher_information(Eigen::MatrixXd u, const size_t num_threads)
+Vinecop::hessian_exp(Eigen::MatrixXd u,
+                     bool step_wise,
+                     const size_t num_threads)
 {
-  auto hess = this->hessian(u, num_threads);
+  auto hess = this->hessian(u, step_wise, num_threads);
   size_t npars = this->get_npars();
-  Eigen::MatrixXd fisher(npars, npars);
+  Eigen::MatrixXd H(npars, npars);
 
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
   size_t ipar = 0;
   for (size_t t = 0; t < trunc_lvl; t++) {
     for (size_t e = 0; e < d_ - 1 - t; e++) {
       for (size_t p = 0; p < pair_copulas_[t][e].get_parameters().size(); p++) {
-        fisher.row(ipar++) = hess(t, e).colwise().mean();
+        H.row(ipar++) = hess(t, e)[p].colwise().mean();
       }
     }
   }
 
-  return fisher;
+  return H;
 }
 
 Eigen::MatrixXd
-Vinecop::score_cov(Eigen::MatrixXd u, const size_t num_threads)
+Vinecop::scores_cov(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
-  auto s = this->scores(u, num_threads);
+  auto s = this->scores(u, step_wise, num_threads);
   auto sc = s.rowwise() - s.colwise().mean();
   return (sc.adjoint() * sc) / static_cast<double>(s.rows());
 }
