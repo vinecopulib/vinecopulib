@@ -835,7 +835,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
   return pdf;
 }
 
-Eigen::MatrixXd
+inline Eigen::MatrixXd
 Vinecop::scores(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
   check_data(u);
@@ -972,7 +972,7 @@ Vinecop::scores(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
   return scores;
 }
 
-TriangularArray<std::vector<Eigen::MatrixXd>>
+inline TriangularArray<std::vector<Eigen::MatrixXd>>
 Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
   check_data(u);
@@ -1004,7 +1004,7 @@ Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
   return hess;
 }
 
-Eigen::MatrixXd
+inline Eigen::MatrixXd
 Vinecop::hessian_exp(Eigen::MatrixXd u,
                      bool step_wise,
                      const size_t num_threads)
@@ -1026,7 +1026,7 @@ Vinecop::hessian_exp(Eigen::MatrixXd u,
   return H;
 }
 
-Eigen::MatrixXd
+inline Eigen::MatrixXd
 Vinecop::scores_cov(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
   auto s = this->scores(u, step_wise, num_threads);
