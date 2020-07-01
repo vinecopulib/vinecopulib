@@ -120,9 +120,6 @@ public:
   // Stats methods
   Eigen::VectorXd pdf(Eigen::MatrixXd u, const size_t num_threads = 1) const;
 
-  TriangularArray<Eigen::VectorXd> pdf_sep(Eigen::MatrixXd u,
-                                           const size_t num_threads = 1) const;
-
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
                       const size_t N = 1e4,
                       const size_t num_threads = 1,

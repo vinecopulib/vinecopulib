@@ -284,6 +284,11 @@ inline void
 Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 {
   check_data(data);
+  if (data.cols() == 1) {
+    loglik_ = 0;
+    nobs_ = data.rows();
+    return;
+  }
   Eigen::MatrixXd u = collapse_data(data);
 
   tools_select::VinecopSelector selector(
@@ -1029,105 +1034,6 @@ Vinecop::scores_cov(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
   return (sc.adjoint() * sc) / static_cast<double>(s.rows());
 }
 
-inline TriangularArray<Eigen::VectorXd>
-Vinecop::pdf_sep(Eigen::MatrixXd u, const size_t num_threads) const
-{
-  check_data(u);
-  u = collapse_data(u);
-
-  // info about the vine structure (reverse rows (!) for more natural indexing)
-  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
-  auto order = rvine_structure_.get_order();
-  auto disc_cols = tools_select::get_disc_cols(var_types_);
-
-  // initial value must be 1.0 for multiplication
-  Eigen::VectorXd pdf = Eigen::VectorXd::Constant(u.rows(), 1.0);
-  TriangularArray<Eigen::VectorXd> pdfs(d_);
-  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-    for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
-      pdfs(tree, edge) = Eigen::VectorXd(u.rows());
-    }
-  }
-  auto do_batch = [&](const tools_batch::Batch& b) {
-    // temporary storage objects (all data must be in (0, 1))
-    Eigen::MatrixXd hfunc1, hfunc2, u_e, hfunc1_sub, hfunc2_sub, u_e_sub;
-    hfunc1 = Eigen::MatrixXd::Zero(b.size, d_);
-    hfunc2 = Eigen::MatrixXd::Zero(b.size, d_);
-    if (get_n_discrete() > 0) {
-      hfunc1_sub = hfunc1;
-      hfunc2_sub = hfunc2;
-    }
-
-    // fill first row of hfunc2 matrix with evaluation points;
-    // points have to be reordered to correspond to natural order
-    for (size_t j = 0; j < d_; ++j) {
-      hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
-      if (var_types_[order[j] - 1] == "d") {
-        hfunc2_sub.col(j) =
-          u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
-      }
-    }
-
-    for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-      tools_interface::check_user_interrupt(
-        static_cast<double>(u.rows()) * static_cast<double>(d_) > 1e3);
-      for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
-        tools_interface::check_user_interrupt(edge % 100 == 0);
-        // extract evaluation point from hfunction matrices (have been
-        // computed in previous tree level)
-        Bicop edge_copula = get_pair_copula(tree, edge);
-        auto var_types = edge_copula.get_var_types();
-        size_t m = rvine_structure_.min_array(tree, edge);
-
-        u_e = Eigen::MatrixXd(b.size, 2);
-        u_e.col(0) = hfunc2.col(edge);
-        if (m == rvine_structure_.struct_array(tree, edge, true)) {
-          u_e.col(1) = hfunc2.col(m - 1);
-        } else {
-          u_e.col(1) = hfunc1.col(m - 1);
-        }
-
-        if ((var_types[0] == "d") | (var_types[1] == "d")) {
-          u_e.conservativeResize(b.size, 4);
-          u_e.col(2) = hfunc2_sub.col(edge);
-          if (m == rvine_structure_.struct_array(tree, edge, true)) {
-            u_e.col(3) = hfunc2_sub.col(m - 1);
-          } else {
-            u_e.col(3) = hfunc1_sub.col(m - 1);
-          }
-        }
-
-        pdfs(tree, edge).segment(b.begin, b.size) = edge_copula.pdf(u_e);
-
-        // h-functions are only evaluated if needed in next step
-        if (rvine_structure_.needed_hfunc1(tree, edge)) {
-          hfunc1.col(edge) = edge_copula.hfunc1(u_e);
-          if (var_types[1] == "d") {
-            u_e_sub = u_e;
-            u_e_sub.col(1) = u_e.col(3);
-            hfunc1_sub.col(edge) = edge_copula.hfunc1(u_e_sub);
-          }
-        }
-        if (rvine_structure_.needed_hfunc2(tree, edge)) {
-          hfunc2.col(edge) = edge_copula.hfunc2(u_e);
-          if (var_types[0] == "d") {
-            u_e_sub = u_e;
-            u_e_sub.col(0) = u_e.col(2);
-            hfunc2_sub.col(edge) = edge_copula.hfunc2(u_e_sub);
-          }
-        }
-      }
-    }
-  };
-
-  if (trunc_lvl > 0) {
-    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
-    pool.map(do_batch, tools_batch::create_batches(u.rows(), num_threads));
-    pool.join();
-  }
-
-  return pdfs;
-}
 
 //! @brief Evaluates the copula distribution.
 //!

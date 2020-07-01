@@ -84,12 +84,28 @@ using namespace vinecopulib;
 //   EXPECT_ANY_THROW(vinecop.mbicv());
 // }
 
+// TEST_F(VinecopTest, 1dim)
+// {
+//   auto data = tools_stats::simulate_uniform(3, 1);
+//   auto vc = Vinecop(1);
+//   vc.select(data);
+//   EXPECT_TRUE((vc.pdf(data).array() == 1).all());
+//   EXPECT_TRUE((vc.rosenblatt(data).array() == data.array()).all());
+//   EXPECT_TRUE((vc.inverse_rosenblatt(data).array() == data.array()).all());
+//   vc.loglik();
+//   vc.aic();
+//   vc.simulate(3);
+//   Vinecop::make_pair_copula_store(1, 2);
+//   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(1, 1);
+//   mat(0, 0) = 1;
+//   RVineStructure rvine_structure(mat);
+// }
+
 // TEST_F(VinecopTest, fit_statistics_getters_are_correct)
 // {
 //   auto data = tools_stats::simulate_uniform(100, 3);
 //   auto vc = Vinecop(
-//     data, RVineStructure(), {}, FitControlsVinecop({ BicopFamily::clayton
-//     }));
+//     data, RVineStructure(), {}, FitControlsVinecop({ BicopFamily::clayton }));
 
 //   EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
 //   EXPECT_NEAR(static_cast<double>(vc.get_nobs()), 100, 1e-10);
@@ -129,30 +145,6 @@ using namespace vinecopulib;
 
 //   ASSERT_TRUE(vinecop.pdf(u).isApprox(f, 1e-4));
 // }
-//
-TEST_F(VinecopTest, pdf_sep_is_correct)
-{
-  auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
-  for (auto& tree : pair_copulas) {
-    for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 270, par);
-    }
-  }
-  Vinecop vinecop(model_matrix, pair_copulas);
-
-  auto pdf_sep = vinecop.pdf_sep(u);
-  ASSERT_EQ(pdf_sep.get_dim(), 7);
-  ASSERT_EQ(pdf_sep(0, 0).size(), 1000);
-
-  Eigen::VectorXd prod = Eigen::VectorXd::Constant(1000, 1.0);
-  for (size_t tree = 0; tree < vinecop.get_trunc_lvl(); tree++) {
-    for (size_t edge = 0; edge < 6 - tree; edge++) {
-      prod = prod.cwiseProduct(pdf_sep(tree, edge));
-    }
-  }
-  ASSERT_TRUE(prod.isApprox(vinecop.pdf(u), 1e-5));
-}
 
 TEST_F(VinecopTest, scores_stepwise)
 {
