@@ -126,13 +126,11 @@ TEST_F(VinecopTest, fit_statistics_getters_are_correct)
   auto data = tools_stats::simulate_uniform(100, 3);
   auto vc = Vinecop(
     data, RVineStructure(), {}, FitControlsVinecop({ BicopFamily::clayton }));
-
-  // std::cout << vc.get_pair_copula(0, 0).get_loglik() << std::endl;
-  // EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
-  // EXPECT_NEAR(static_cast<double>(vc.get_nobs()), 100, 1e-10);
-  // EXPECT_NEAR(vc.get_aic(), vc.aic(data), 1e-10);
-  // EXPECT_NEAR(vc.get_bic(), vc.bic(data), 1e-10);
-  // EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
+  EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
+  EXPECT_NEAR(static_cast<double>(vc.get_nobs()), 100, 1e-10);
+  EXPECT_NEAR(vc.get_aic(), vc.aic(data), 1e-10);
+  EXPECT_NEAR(vc.get_bic(), vc.bic(data), 1e-10);
+  EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
 }
 
 TEST_F(VinecopTest, truncate_methods_works)
