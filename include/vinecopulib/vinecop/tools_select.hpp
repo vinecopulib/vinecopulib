@@ -72,8 +72,6 @@ struct EdgeProperties
   double weight;
   double crit;
   vinecopulib::Bicop pair_copula;
-  double loglik;
-  double npars;
   double fit_id;
 };
 typedef boost::adjacency_list<
