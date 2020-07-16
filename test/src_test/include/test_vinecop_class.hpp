@@ -30,6 +30,26 @@ TEST_F(VinecopTest, constructors_without_error)
   Vinecop vinecop_parametrized(model_matrix, pair_copulas);
 }
 
+TEST_F(VinecopTest, copy)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(7);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 90);
+    }
+  }
+
+  Vinecop vinecop1(model_matrix, pair_copulas);
+  auto pc = vinecop1.get_pair_copula(0, 0);
+  pc.set_parameters(pc.get_parameters().array() + 1);
+  EXPECT_EQ(vinecop1.get_parameters(0, 0), vinecop1.get_parameters(0, 1));
+
+  Vinecop vinecop2 = vinecop1;
+  pair_copulas[0][0].set_parameters(pc.get_parameters().array() + 1);
+  vinecop2.set_all_pair_copulas(pair_copulas);
+  EXPECT_EQ(vinecop1.get_parameters(0, 0), vinecop1.get_parameters(0, 1));
+}
+
 TEST_F(VinecopTest, getters_are_correct)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
@@ -84,12 +104,28 @@ TEST_F(VinecopTest, getters_are_correct)
   EXPECT_ANY_THROW(vinecop.mbicv());
 }
 
+TEST_F(VinecopTest, 1dim)
+{
+  auto data = tools_stats::simulate_uniform(3, 1);
+  auto vc = Vinecop(1);
+  vc.select(data);
+  EXPECT_TRUE((vc.pdf(data).array() == 1).all());
+  EXPECT_TRUE((vc.rosenblatt(data).array() == data.array()).all());
+  EXPECT_TRUE((vc.inverse_rosenblatt(data).array() == data.array()).all());
+  vc.loglik();
+  vc.aic();
+  vc.simulate(3);
+  Vinecop::make_pair_copula_store(1, 2);
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(1, 1);
+  mat(0, 0) = 1;
+  RVineStructure rvine_structure(mat);
+}
+
 TEST_F(VinecopTest, fit_statistics_getters_are_correct)
 {
   auto data = tools_stats::simulate_uniform(100, 3);
   auto vc = Vinecop(
     data, RVineStructure(), {}, FitControlsVinecop({ BicopFamily::clayton }));
-
   EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
   EXPECT_NEAR(static_cast<double>(vc.get_nobs()), 100, 1e-10);
   EXPECT_NEAR(vc.get_aic(), vc.aic(data), 1e-10);
