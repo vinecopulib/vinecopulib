@@ -105,6 +105,8 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     if ((bicop_.get_parameters().size() > 1) &
         (bicop_.get_family() != BicopFamily::student)) {
       EXPECT_ANY_THROW(bicop_.tau_to_parameters(0.5));
+    } else if (bicop_.get_parameters().size() == 1) {
+      EXPECT_NO_THROW(bicop_.tau_to_parameters(1));
     }
   }
 }
