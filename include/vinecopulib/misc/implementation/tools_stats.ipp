@@ -471,8 +471,7 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
   double ors = 1 - pow(rho, 2.0);
 
   auto f = [snu, nu, ors, rho](double h, double k) {
-    double d1, d2, d3, bvt, gmph, gmpk, xnkh, xnhk, btnckh, btnchk, btpdkh,
-      btpdhk;
+    double d1, d2, bvt, gmph, gmpk, xnkh, xnhk, btnckh, btnchk, btpdkh, btpdhk;
     int hs, ks;
 
     double hrk = h - rho * k;
@@ -483,7 +482,7 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
       /* Computing 2nd power */
       d2 = hrk;
       /* Computing 2nd power */
-      d3 = k;
+      double d3 = k;
       xnhk = d1 * d1 / (d2 * d2 + ors * (nu + d3 * d3));
       /* Computing 2nd power */
       d1 = krh;
@@ -629,7 +628,7 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
 
   auto f = [lg, rho, x, w, phi](double h, double k) {
     size_t i1;
-    double d1, d2, hk, sn, bvn;
+    double d1, d2, hk, bvn;
     h = -h;
     k = -k;
     hk = h * k;
@@ -639,7 +638,7 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
       double asr = asin(rho);
       i1 = lg;
       for (size_t i = 0; i < i1; ++i) {
-        sn = std::sin(asr * (x(i) + 1) / 2);
+        double sn = std::sin(asr * (x(i) + 1) / 2);
         bvn += w(i) * std::exp((sn * hk - hs) / (1 - sn * sn));
         sn = std::sin(asr * (-x(i) + 1) / 2);
         bvn += w(i) * std::exp((sn * hk - hs) / (1 - sn * sn));
