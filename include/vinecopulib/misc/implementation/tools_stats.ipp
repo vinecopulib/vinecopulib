@@ -42,15 +42,15 @@ simulate_uniform(const size_t& n,
       return tools_stats::ghalton(n, d, seeds);
     }
   }
-  if ((n < 1) | (d < 1)) {
+  if ((n < 1) || (d < 1)) {
     throw std::runtime_error("n and d must be at least 1.");
   }
   if (seeds.size() == 0) {
     // no seeds provided, seed randomly
     std::random_device rd{};
     seeds = std::vector<int>(5);
-    for (auto& s : seeds)
-      s = static_cast<int>(rd());
+    std::generate(
+      seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
   }
 
   // initialize random engine and uniform distribution
