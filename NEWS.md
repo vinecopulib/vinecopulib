@@ -4,6 +4,8 @@
 
   * allow 1-dimensional models (#499) 
 
+  * make AIC default selection criterion (#502)
+
 ### BUG FIXES
 
   * make Bicop/Vinecop objects indepent of copied-from-objects (#503)
