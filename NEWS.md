@@ -1,3 +1,17 @@
+## vinecopulib 0.5.3 (August 11, 2020)
+
+### NEW FEATURES
+
+  * allow 1-dimensional models (#499) 
+
+  * make AIC default selection criterion (#502)
+
+### BUG FIXES
+
+  * make Bicop/Vinecop objects indepent of copied-from-objects (#503)
+
+  * enforce parameters bounds in tau_to_parameters for Archimedean families (#507)
+
 ## vinecopulib 0.5.2 (May 7, 2020)
 
 ### NEW FEATURES
