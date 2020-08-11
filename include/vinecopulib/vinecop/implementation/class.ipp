@@ -371,7 +371,6 @@ Vinecop::get_pair_copula(const size_t tree, const size_t edge) const
   return pair_copulas_[tree][edge];
 }
 
-
 //! @brief Gets all pair copulas.
 //!
 //! @return a nested std::vector with entry `[t][e]` corresponding to
@@ -605,7 +604,7 @@ Vinecop::get_mbicv(const double psi0) const
 inline double
 Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
 {
-  if (!(psi0 > 0.0) | !(psi0 < 1.0)) {
+  if ((psi0 <= 0.0) || (psi0 >= 1.0)) {
     throw std::runtime_error("psi0 must be in the interval (0, 1)");
   }
   auto all_fams = get_all_families();

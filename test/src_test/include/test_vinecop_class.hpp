@@ -463,11 +463,18 @@ TEST_F(VinecopTest, sparse_both_selection)
   FitControlsVinecop controls(bicop_families::itau, "itau");
   controls.set_select_trunc_lvl(true);
   controls.set_select_threshold(true);
+  controls.set_tree_criterion("joe");
+  controls.set_selection_criterion("mbicv");
   // controls.set_show_trace(true);
   Vinecop fit(7);
   fit.select(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
   fit.select(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
+
+  // 1d models
+  Eigen::MatrixXd uu = u.col(0).matrix();
+  fit = Vinecop(1);
+  fit.select(uu, controls);
 }
 }

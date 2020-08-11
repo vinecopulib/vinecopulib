@@ -110,7 +110,7 @@ GumbelBicop::get_start_parameters(const double tau)
 inline double
 qcondgum(double* q, double* u, double* de)
 {
-  double a, p, g, gp, z1, z2, con, de1, dif;
+  double a, p, z1, z2, con, de1, dif;
   double mxdif;
   int iter;
 
@@ -123,8 +123,8 @@ qcondgum(double* q, double* u, double* de)
   iter = 0;
   dif = .1; // needed in case first step leads to NaN
   while ((mxdif > 1.e-6) && (iter < 20)) {
-    g = a + de1 * log(a) + con;
-    gp = 1. + de1 / a;
+    double g = a + de1 * log(a) + con;
+    double gp = 1. + de1 / a;
     if ((boost::math::isnan)(g) || (boost::math::isnan)(gp) ||
         (boost::math::isnan)(g / gp)) {
       // added for de>50
