@@ -71,6 +71,15 @@
         <h1>
           Vine copula models
         </h1>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li><a href="#vinecop-custom">Set up a custom vine copula model</a></li>
+            <li><a href="#vinecop-matrix">How to read the R-vine matrix</a></li>
+            <li><a href="#vinecop-fit">Fit and select a vine copula model</a></li>
+            <li><a href="#vinecop-work">Work with a vine copula model</a></li>
+          </ul>
+        </div>
 <ul><li><a href="#vinecop-custom">Set up a custom vine copula model</a></li><li><a href="#vinecop-matrix">How to read the R-vine matrix</a></li><li><a href="#vinecop-fit">Fit and select a vine copula model</a></li><li><a href="#vinecop-work">Work with a vine copula model</a></li></ul><p>Vine copula models are implemented in the class <code>Vinecop</code>. To use this class in your code, include the header include the header <code><a href="vinecop_2class_8hpp_source.html" class="m-doc">vinecopulib/<wbr />vinecop/<wbr />class.hpp</a></code> (or simply <code><a href="vinecopulib_8hpp_source.html" class="m-doc">vinecopulib.hpp</a></code>) at the top of your source file. This automatically enables all features for bivariate copula models.</p><section id="vinecop-custom"><h2><a href="#vinecop-custom">Set up a custom vine copula model</a></h2><p>Custom models can be created through the constructor of <code>Vinecop</code>. A model is represented by a <code>std::vector&lt;std::vector&lt;Bicop&gt;&gt;</code> containing all pair-copulas and an <a href="#how-to-read-an-r-vine-matrix">R-vine matrix</a>.</p><p>Similarly to bivariate copulas, there are essentially two ways of setting-up vine copulas:</p><ul><li>with known parameters,</li><li>from data (i.e., with estimated parameters).</li></ul><p>The constructor with known parameters has two versions:</p><ul><li>one for which the only argument is the dimension, allowing to set-up a D-vine with only independence copulas,</li><li>and one for which the two arguments are a matrix of integers (i.e., and <a href="#how-to-read-an-r-vine-matrix">R-vine matrix</a>) and a <code>std::vector&lt;std::vector&lt;Bicop&gt;&gt;</code> containing all pair-copulas.</li></ul><pre class="m-code"><span class="c1">// specify the dimension of the model</span>
 <span class="kt">int</span> <span class="n">d</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
 
@@ -219,7 +228,7 @@
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>vinecopulib A C++ library for vine copulas. Created by <a href="https://doxygen.org/">Doxygen</a> 1.8.13 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>vinecopulib A C++ library for vine copulas. Created by <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>

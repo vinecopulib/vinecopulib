@@ -105,23 +105,23 @@
             <dt>
               class <a href="classvinecopulib_1_1_c_vine_structure.html" class="m-doc">CVineStructure</a>
             </dt>
-            <dd>C-vine structures.</dd>
+            <dd>A class for C-vine structures.</dd>
             <dt>
               class <a href="classvinecopulib_1_1_d_vine_structure.html" class="m-doc">DVineStructure</a>
             </dt>
-            <dd>D-vine structures.</dd>
+            <dd>A class for D-vine structures.</dd>
             <dt>
               class <a href="classvinecopulib_1_1_fit_controls_bicop.html" class="m-doc">FitControlsBicop</a>
             </dt>
-            <dd>A class for controlling fit of bivariate copula models.</dd>
+            <dd>A class for controlling fits of bivariate copula models.</dd>
             <dt>
               class <a href="classvinecopulib_1_1_fit_controls_vinecop.html" class="m-doc">FitControlsVinecop</a>
             </dt>
-            <dd>A class for controlling fit of bivariate copula models.</dd>
+            <dd>A class for controlling fits of vine copula models.</dd>
             <dt>
               class <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>
             </dt>
-            <dd>R-vine structures.</dd>
+            <dd>A class for R-vine structures.</dd>
             <dt>
               <div class="m-doc-template">template&lt;typename T&gt;</div>
               class <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>
@@ -137,7 +137,7 @@
           <h2><a href="#enum-members">Enums</a></h2>
           <dl class="m-doc">
             <dt>
-              <span class="m-doc-wrap-bumper">enum <a href="#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a> { </span><span class="m-doc-wrap"><a href="#a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65" class="m-doc">indep</a>,
+              <span class="m-doc-wrap-bumper">enum class <a href="#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a> { </span><span class="m-doc-wrap"><a href="#a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65" class="m-doc">indep</a>,
               <a href="#a42e95cc06d33896199caab0c11ad44f3a304e2a3b544f6b9f267a151e1bcee487" class="m-doc">gaussian</a>,
               <a href="#a42e95cc06d33896199caab0c11ad44f3acd73502828457d15655bbd7a63fb0bc8" class="m-doc">student</a>,
               <a href="#a42e95cc06d33896199caab0c11ad44f3ad0b8c94bb241f6f7a4b96cd6d3e26c36" class="m-doc">clayton</a>,
@@ -159,29 +159,29 @@
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#ac46553ae5f99072f65e9d3254d2c526d" class="m-doc">get_family_name</a>(</span><span class="m-doc-wrap"><a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a> family) -&gt; std::string</span>
             </dt>
-            <dd></dd>
+            <dd>Converts a BicopFamily into a string with its name.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#a8d5285a58e0d250a5226715754e12568" class="m-doc">get_family_enum</a>(</span><span class="m-doc-wrap">std::string family) -&gt; <a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a></span>
             </dt>
-            <dd></dd>
+            <dd>Converts a string name into a BicopFamily.</dd>
             <dt>
               <div class="m-doc-template">template&lt;typename T&gt;</div>
               <span class="m-doc-wrap-bumper">auto <a href="#a84bb80714f45441e76d85c7dd049db02" class="m-doc">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
               const <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;T&gt;&amp; tri_array) -&gt; std::ostream&amp;</span>
             </dt>
-            <dd>ostream method for <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>, to be used with <code>std::cout</code></dd>
+            <dd>Ostream method for <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>, to be used with <code>std::cout</code>.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#a903371123a404c8736f5418da502b81c" class="m-doc">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
               const <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>&amp; rvs) -&gt; std::ostream&amp;</span>
             </dt>
-            <dd>ostream method for <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>, to be used with <code>std::cout</code>.</dd>
+            <dd>Ostream method for <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>, to be used with <code>std::cout</code>.</dd>
           </dl>
         </section>
         <section>
           <h2>Enum documentation</h2>
           <section class="m-doc-details" id="a42e95cc06d33896199caab0c11ad44f3"><div>
             <h3>
-              enum vinecopulib::<wbr /><a href="#a42e95cc06d33896199caab0c11ad44f3" class="m-doc-self">BicopFamily</a>
+              enum class vinecopulib::<wbr /><a href="#a42e95cc06d33896199caab0c11ad44f3" class="m-doc-self">BicopFamily</a>
             </h3>
             <p>A bivariate copula family identifier.</p>
             <table class="m-table m-fullwidth m-flat m-doc">
@@ -269,6 +269,7 @@
             <h3>
               <span class="m-doc-wrap-bumper">std::string vinecopulib::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ac46553ae5f99072f65e9d3254d2c526d" class="m-doc-self">get_family_name</a>(</span><span class="m-doc-wrap"><a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a> family)</span></span>
             </h3>
+            <p>Converts a BicopFamily into a string with its name.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -276,16 +277,16 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">family</td>
-                  <td>the family.</td>
+                  <td>The family.</td>
                 </tr>
               </tbody>
             </table>
-<p>converts a BicopFamily into a string with its name.</p>
           </div></section>
           <section class="m-doc-details" id="a8d5285a58e0d250a5226715754e12568"><div>
             <h3>
               <span class="m-doc-wrap-bumper"><a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a> vinecopulib::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a8d5285a58e0d250a5226715754e12568" class="m-doc-self">get_family_enum</a>(</span><span class="m-doc-wrap">std::string family)</span></span>
             </h3>
+            <p>Converts a string name into a BicopFamily.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -293,11 +294,10 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">family</td>
-                  <td>the family name.</td>
+                  <td>The family name.</td>
                 </tr>
               </tbody>
             </table>
-<p>converts a string name into a BicopFamily.</p>
           </div></section>
           <section class="m-doc-details" id="a84bb80714f45441e76d85c7dd049db02"><div>
             <h3>
@@ -307,7 +307,7 @@
               <span class="m-doc-wrap-bumper">std::ostream&amp; vinecopulib::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a84bb80714f45441e76d85c7dd049db02" class="m-doc-self">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
               const <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;T&gt;&amp; tri_array)</span></span>
             </h3>
-            <p>ostream method for <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>, to be used with <code>std::cout</code></p>
+            <p>Ostream method for <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>, to be used with <code>std::cout</code>.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -315,11 +315,11 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">os</td>
-                  <td>an output stream.</td>
+                  <td>An output stream.</td>
                 </tr>
                 <tr>
                   <td>tri_array</td>
-                  <td>n triangular array.</td>
+                  <td>A triangular array.</td>
                 </tr>
               </tbody>
             </table>
@@ -329,7 +329,7 @@
               <span class="m-doc-wrap-bumper">std::ostream&amp; vinecopulib::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a903371123a404c8736f5418da502b81c" class="m-doc-self">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
               const <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>&amp; rvs)</span></span>
             </h3>
-            <p>ostream method for <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>, to be used with <code>std::cout</code>.</p>
+            <p>Ostream method for <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>, to be used with <code>std::cout</code>.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -337,11 +337,11 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">os</td>
-                  <td>output stream.</td>
+                  <td>Output stream.</td>
                 </tr>
                 <tr>
                   <td>rvs</td>
-                  <td>r-vine structure array.</td>
+                  <td>R-vine structure array.</td>
                 </tr>
               </tbody>
             </table>
@@ -392,7 +392,7 @@
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>vinecopulib A C++ library for vine copulas. Created by <a href="https://doxygen.org/">Doxygen</a> 1.8.13 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>vinecopulib A C++ library for vine copulas. Created by <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>

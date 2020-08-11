@@ -96,18 +96,18 @@
           <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
           <dl class="m-doc">
             <dt>
-              <span class="m-doc-wrap-bumper"><a href="#ab291264bdad179aed275517243cdad68" class="m-doc">TriangularArray</a>(</span><span class="m-doc-wrap">size_t d)</span>
+              <span class="m-doc-wrap-bumper"><a href="#ab291264bdad179aed275517243cdad68" class="m-doc">TriangularArray</a>(</span><span class="m-doc-wrap">size_t d) <span class="m-label m-flat m-info">explicit</span> </span>
             </dt>
-            <dd>construct a triangular array of dimension <code>d</code>.</dd>
+            <dd>Construct a triangular array of dimension <code>d</code>.</dd>
             <dt>
               <span class="m-doc-wrap-bumper"><a href="#a6c4a21f452a2c8094d452996f1f58401" class="m-doc">TriangularArray</a>(</span><span class="m-doc-wrap">size_t d,
               size_t trunc_lvl)</span>
             </dt>
-            <dd>construct a truncated triangular array</dd>
+            <dd>Construct a truncated triangular array.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper"><a href="#a5c0d9bb174c208146446467f38d9591b" class="m-doc">TriangularArray</a>(</span><span class="m-doc-wrap">const std::vector&lt;std::vector&lt;T&gt;&gt;&amp; rows)</span>
+              <span class="m-doc-wrap-bumper"><a href="#a5c0d9bb174c208146446467f38d9591b" class="m-doc">TriangularArray</a>(</span><span class="m-doc-wrap">const std::vector&lt;std::vector&lt;T&gt;&gt;&amp; rows) <span class="m-label m-flat m-info">explicit</span> </span>
             </dt>
-            <dd>construct a truncated triangular array from nested vector.</dd>
+            <dd>Construct a truncated triangular array from nested vector.</dd>
           </dl>
         </section>
         <section id="pub-methods">
@@ -117,24 +117,24 @@
               <span class="m-doc-wrap-bumper">auto <a href="#aed0ecf76f8dd6d4863fa338b50adcd47" class="m-doc">operator()</a>(</span><span class="m-doc-wrap">size_t row,
               size_t column) -&gt; T&amp;</span>
             </dt>
-            <dd>access one element of the trapezoid (writable).</dd>
+            <dd>Access one element of the trapezoid (writable).</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#a8a99e40cf6e6facc1cd0ceb14545d5df" class="m-doc">operator()</a>(</span><span class="m-doc-wrap">size_t row,
               size_t column) const -&gt; T</span>
             </dt>
-            <dd>access one element of the trapezoid (non-writable).</dd>
+            <dd>Access one element of the trapezoid (non-writable).</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#a2bb6d8ef421bbcef635970000b072727" class="m-doc">operator==</a>(</span><span class="m-doc-wrap">const <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;T&gt;&amp; rhs) const -&gt; bool</span>
             </dt>
-            <dd>equality operator to compare two <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a> objects.</dd>
+            <dd>Equality operator to compare two <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a> objects.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#ab6d8130336a957271b1db9018781e69a" class="m-doc">truncate</a>(</span><span class="m-doc-wrap">size_t trunc_lvl)</span>
             </dt>
-            <dd>truncates the trapezoid. If the trapezoid is already truncated at a level less than <code>trunc_lvl</code>, the function does nothing.</dd>
+            <dd>Truncates the trapezoid. If the trapezoid is already truncated at a level less than <code>trunc_lvl</code>, the function does nothing.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#ae557ebefe25bfc18818e254ada5c91cb" class="m-doc-self" name="ae557ebefe25bfc18818e254ada5c91cb">get_trunc_lvl</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
             </dt>
-            <dd>get the truncation level of the underlying vine.</dd>
+            <dd>Get the truncation level of the underlying vine..</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#adb36a7916d7281707dcf50e40839bfb9" class="m-doc">get_dim</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
             </dt>
@@ -152,9 +152,9 @@
               <div class="m-doc-template">
                 template&lt;typename T&gt;
               </div>
-              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ab291264bdad179aed275517243cdad68" class="m-doc-self">TriangularArray</a>(</span><span class="m-doc-wrap">size_t d)</span></span>
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ab291264bdad179aed275517243cdad68" class="m-doc-self">TriangularArray</a>(</span><span class="m-doc-wrap">size_t d) <span class="m-label m-info">explicit</span> </span></span>
             </h3>
-            <p>construct a triangular array of dimension <code>d</code>.</p>
+            <p>Construct a triangular array of dimension <code>d</code>.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -162,7 +162,7 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">d</td>
-                  <td>the dimension of the underlying vine.</td>
+                  <td>The dimension of the underlying vine.</td>
                 </tr>
               </tbody>
             </table>
@@ -176,7 +176,7 @@
               <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a6c4a21f452a2c8094d452996f1f58401" class="m-doc-self">TriangularArray</a>(</span><span class="m-doc-wrap">size_t d,
               size_t trunc_lvl)</span></span>
             </h3>
-            <p>construct a truncated triangular array</p>
+            <p>Construct a truncated triangular array.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -184,11 +184,11 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">d</td>
-                  <td>the dimension of the vine.</td>
+                  <td>The dimension of the vine.</td>
                 </tr>
                 <tr>
                   <td>trunc_lvl</td>
-                  <td>the truncation level.</td>
+                  <td>The truncation level.</td>
                 </tr>
               </tbody>
             </table>
@@ -199,9 +199,9 @@
               <div class="m-doc-template">
                 template&lt;typename T&gt;
               </div>
-              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a5c0d9bb174c208146446467f38d9591b" class="m-doc-self">TriangularArray</a>(</span><span class="m-doc-wrap">const std::vector&lt;std::vector&lt;T&gt;&gt;&amp; rows)</span></span>
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a5c0d9bb174c208146446467f38d9591b" class="m-doc-self">TriangularArray</a>(</span><span class="m-doc-wrap">const std::vector&lt;std::vector&lt;T&gt;&gt;&amp; rows) <span class="m-label m-info">explicit</span> </span></span>
             </h3>
-            <p>construct a truncated triangular array from nested vector.</p>
+            <p>Construct a truncated triangular array from nested vector.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -209,7 +209,7 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">rows</td>
-                  <td>a vector of rows; the length of the first row defines the dimension of the triangular array. The number of rows defines the truncation level.</td>
+                  <td>A vector of rows; the length of the first row defines the dimension of the triangular array. The number of rows defines the truncation level.</td>
                 </tr>
               </tbody>
             </table>
@@ -223,7 +223,7 @@
               <span class="m-doc-wrap-bumper">T&amp; vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aed0ecf76f8dd6d4863fa338b50adcd47" class="m-doc-self">operator()</a>(</span><span class="m-doc-wrap">size_t row,
               size_t column)</span></span>
             </h3>
-            <p>access one element of the trapezoid (writable).</p>
+            <p>Access one element of the trapezoid (writable).</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -231,11 +231,11 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">row</td>
-                  <td>the row level.</td>
+                  <td>The row level.</td>
                 </tr>
                 <tr>
                   <td>column</td>
-                  <td>the column in this row.</td>
+                  <td>The column in this row.</td>
                 </tr>
               </tbody>
             </table>
@@ -248,7 +248,7 @@
               <span class="m-doc-wrap-bumper">T vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a8a99e40cf6e6facc1cd0ceb14545d5df" class="m-doc-self">operator()</a>(</span><span class="m-doc-wrap">size_t row,
               size_t column) const</span></span>
             </h3>
-            <p>access one element of the trapezoid (non-writable).</p>
+            <p>Access one element of the trapezoid (non-writable).</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -256,11 +256,11 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">row</td>
-                  <td>the row level.</td>
+                  <td>The row level.</td>
                 </tr>
                 <tr>
                   <td>column</td>
-                  <td>the column in this row.</td>
+                  <td>The column in this row.</td>
                 </tr>
               </tbody>
             </table>
@@ -272,7 +272,7 @@
               </div>
               <span class="m-doc-wrap-bumper">bool vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a2bb6d8ef421bbcef635970000b072727" class="m-doc-self">operator==</a>(</span><span class="m-doc-wrap">const <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;T&gt;&amp; rhs) const</span></span>
             </h3>
-            <p>equality operator to compare two <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a> objects.</p>
+            <p>Equality operator to compare two <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a> objects.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -280,7 +280,7 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">rhs</td>
-                  <td>right-hand-side of the equality operator.</td>
+                  <td>Right-hand-side of the equality operator.</td>
                 </tr>
               </tbody>
             </table>
@@ -292,7 +292,7 @@
               </div>
               <span class="m-doc-wrap-bumper">void vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ab6d8130336a957271b1db9018781e69a" class="m-doc-self">truncate</a>(</span><span class="m-doc-wrap">size_t trunc_lvl)</span></span>
             </h3>
-            <p>truncates the trapezoid. If the trapezoid is already truncated at a level less than <code>trunc_lvl</code>, the function does nothing.</p>
+            <p>Truncates the trapezoid. If the trapezoid is already truncated at a level less than <code>trunc_lvl</code>, the function does nothing.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -300,7 +300,7 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">trunc_lvl</td>
-                  <td>the truncation level.</td>
+                  <td>The truncation level.</td>
                 </tr>
               </tbody>
             </table>
@@ -312,7 +312,7 @@
               </div>
               <span class="m-doc-wrap-bumper">size_t vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#adb36a7916d7281707dcf50e40839bfb9" class="m-doc-self">get_dim</a>(</span><span class="m-doc-wrap">) const</span></span>
             </h3>
-<p>get the dimension of the underlying vine (the matrix has <code>d-1</code> columns and <code>min(trunv_lvl, d-1)</code> rows).</p>
+<p>Get the dimension of the underlying vine (the matrix has <code>d-1</code> columns and. <code>min(trunv_lvl, d-1)</code> rows).</p>
           </div></section>
         </section>
       </div>
@@ -360,7 +360,7 @@
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>vinecopulib A C++ library for vine copulas. Created by <a href="https://doxygen.org/">Doxygen</a> 1.8.13 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>vinecopulib A C++ library for vine copulas. Created by <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>

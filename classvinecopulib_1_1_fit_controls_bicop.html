@@ -71,7 +71,7 @@
         <h1>
           <span class="m-breadcrumb"><a href="namespacevinecopulib.html">vinecopulib</a>::<wbr/></span>FitControlsBicop <span class="m-thin">class</span>
         </h1>
-        <p>A class for controlling fit of bivariate copula models.</p>
+        <p>A class for controlling fits of bivariate copula models.</p>
         <div class="m-block m-default">
           <h3>Contents</h3>
           <ul>
@@ -80,6 +80,7 @@
               <ul>
                 <li><a href="#derived-classes">Derived classes</a></li>
                 <li><a href="#typeless-methods">Constructors, destructors, conversion operators</a></li>
+                <li><a href="#pub-methods">Public functions</a></li>
                 <li><a href="#getters-and-setters">Getters and setters.</a></li>
               </ul>
             </li>
@@ -91,33 +92,42 @@
             <dt>
               class <a href="classvinecopulib_1_1_fit_controls_vinecop.html" class="m-doc">FitControlsVinecop</a>
             </dt>
-            <dd>A class for controlling fit of bivariate copula models.</dd>
+            <dd>A class for controlling fits of vine copula models.</dd>
           </dl>
         </section>
         <section id="typeless-methods">
           <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
           <dl class="m-doc">
             <dt>
-              <span class="m-doc-wrap-bumper"><a href="#a20f51de5d89278679c2c9aa2bac2a36e" class="m-doc">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set = <a href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774" class="m-doc">bicop_families::<wbr />all</a>,
+              <span class="m-doc-wrap-bumper"><a href="#a9790eb1ef9f8b26f11d6c4235a809f1c" class="m-doc">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set = <a href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774" class="m-doc">bicop_families::<wbr />all</a>,
               std::string parametric_method = &quot;mle&quot;,
               std::string nonparametric_method = &quot;quadratic&quot;,
               double nonparametric_mult = 1.0,
-              std::string selection_criterion = &quot;bic&quot;,
+              std::string selection_criterion = &quot;aic&quot;,
               const Eigen::VectorXd&amp; weights = Eigen::VectorXd(),
               double psi0 = 0.9,
               bool preselect_families = true,
               size_t num_threads = 1)</span>
             </dt>
-            <dd>creates the controls for fitting bivariate copula models.</dd>
+            <dd>Instantiates the controls for fitting bivariate copula models.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper"><a href="#a6a2fc00794c9dd9d598ac9948e7b98e4" class="m-doc">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::string parametric_method)</span>
+              <span class="m-doc-wrap-bumper"><a href="#a6a2fc00794c9dd9d598ac9948e7b98e4" class="m-doc">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::string parametric_method) <span class="m-label m-flat m-info">explicit</span> </span>
             </dt>
-            <dd>creates default controls except for the parameteric method.</dd>
+            <dd>Instantiates default controls except for the parameteric method.</dd>
             <dt>
               <span class="m-doc-wrap-bumper"><a href="#ae87a80323e8f5d3702ab0db42bf8bcb5" class="m-doc">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::string nonparametric_method,
-              double nonparametric_mult = 1.0)</span>
+              double nonparametric_mult = 1.0) <span class="m-label m-flat m-info">explicit</span> </span>
             </dt>
-            <dd>creates default controls except for the nonparametric method.</dd>
+            <dd>Instantiates default controls except for the nonparametric method.</dd>
+          </dl>
+        </section>
+        <section id="pub-methods">
+          <h2><a href="#pub-methods">Public functions</a></h2>
+          <dl class="m-doc">
+            <dt>
+              <span class="m-doc-wrap-bumper">auto <a href="#acd490d8309d7a507aaec5ee411fbebb2" class="m-doc-self" name="acd490d8309d7a507aaec5ee411fbebb2">str</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
+            </dt>
+            <dd>Summarizes the controls into a string (can be used for printing).</dd>
           </dl>
         </section>
         <section id="getters-and-setters">
@@ -158,56 +168,56 @@
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#a39d4e24261da184abf3fa3dd11d1f23b" class="m-doc-self" name="a39d4e24261da184abf3fa3dd11d1f23b">set_family_set</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set)</span>
             </dt>
-            <dd>sets the family set.</dd>
+            <dd>Sets the family set.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#a722bef09427577ba2f04c91d7e4dba90" class="m-doc-self" name="a722bef09427577ba2f04c91d7e4dba90">set_parametric_method</a>(</span><span class="m-doc-wrap">std::string parametric_method)</span>
             </dt>
-            <dd>sets the parametric method.</dd>
+            <dd>Sets the parametric method.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#a5b785f0e3384d224025e754d2f212881" class="m-doc-self" name="a5b785f0e3384d224025e754d2f212881">set_nonparametric_method</a>(</span><span class="m-doc-wrap">std::string nonparametric_method)</span>
             </dt>
-            <dd>sets the nonparmetric method.</dd>
+            <dd>Sets the nonparmetric method.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#a69fa1ff241282cc5a968ff64f0029ae0" class="m-doc-self" name="a69fa1ff241282cc5a968ff64f0029ae0">set_nonparametric_mult</a>(</span><span class="m-doc-wrap">double nonparametric_mult)</span>
             </dt>
-            <dd>sets the nonparametric multiplier.</dd>
+            <dd>Sets the nonparametric multiplier.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#a52c187e5fcf047825ced777d73483df1" class="m-doc-self" name="a52c187e5fcf047825ced777d73483df1">set_selection_criterion</a>(</span><span class="m-doc-wrap">std::string selection_criterion)</span>
             </dt>
-            <dd>sets the selection criterion</dd>
+            <dd>Sets the selection criterion.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#abe41e1cf7edfbd0a4dd9031c7a75ea14" class="m-doc-self" name="abe41e1cf7edfbd0a4dd9031c7a75ea14">set_weights</a>(</span><span class="m-doc-wrap">const Eigen::VectorXd&amp; weights)</span>
             </dt>
-            <dd>sets the observation weights.</dd>
+            <dd>Sets the observation weights.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#a7850b5ba8acaf78109d00789d93cc876" class="m-doc-self" name="a7850b5ba8acaf78109d00789d93cc876">set_preselect_families</a>(</span><span class="m-doc-wrap">bool preselect_families)</span>
             </dt>
-            <dd>sets whether to preselect the families.</dd>
+            <dd>Sets whether to preselect the families.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#a3421f63a8ec0eed23c7392d16770658e" class="m-doc-self" name="a3421f63a8ec0eed23c7392d16770658e">set_psi0</a>(</span><span class="m-doc-wrap">double psi0)</span>
             </dt>
-            <dd>sets the prior probability for mBIC.</dd>
+            <dd>Sets the prior probability for mBIC.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">void <a href="#adc395c1123ad4d9ad9cc795d9c34c9a8" class="m-doc-self" name="adc395c1123ad4d9ad9cc795d9c34c9a8">set_num_threads</a>(</span><span class="m-doc-wrap">size_t num_threads)</span>
             </dt>
-            <dd>sets the number of threads.</dd>
+            <dd>Sets the number of threads.</dd>
           </dl>
         </section>
         <section>
           <h2>Function documentation</h2>
-          <section class="m-doc-details" id="a20f51de5d89278679c2c9aa2bac2a36e"><div>
+          <section class="m-doc-details" id="a9790eb1ef9f8b26f11d6c4235a809f1c"><div>
             <h3>
-              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsBicop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a20f51de5d89278679c2c9aa2bac2a36e" class="m-doc-self">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set = <a href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774" class="m-doc">bicop_families::<wbr />all</a>,
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsBicop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a9790eb1ef9f8b26f11d6c4235a809f1c" class="m-doc-self">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set = <a href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774" class="m-doc">bicop_families::<wbr />all</a>,
               std::string parametric_method = &quot;mle&quot;,
               std::string nonparametric_method = &quot;quadratic&quot;,
               double nonparametric_mult = 1.0,
-              std::string selection_criterion = &quot;bic&quot;,
+              std::string selection_criterion = &quot;aic&quot;,
               const Eigen::VectorXd&amp; weights = Eigen::VectorXd(),
               double psi0 = 0.9,
               bool preselect_families = true,
               size_t num_threads = 1)</span></span>
             </h3>
-            <p>creates the controls for fitting bivariate copula models.</p>
+            <p>Instantiates the controls for fitting bivariate copula models.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -215,48 +225,48 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">family_set</td>
-                  <td>the set of copula families to consider (if empty, then all families are included).</td>
+                  <td>The set of copula families to consider (if empty, then all families are included).</td>
                 </tr>
                 <tr>
                   <td>parametric_method</td>
-                  <td>the fit method for parametric families; possible choices: <code>&quot;mle&quot;</code>, <code>&quot;itau&quot;</code>.</td>
+                  <td>The fit method for parametric families; possible choices: <code>&quot;mle&quot;</code>, <code>&quot;itau&quot;</code>.</td>
                 </tr>
                 <tr>
                   <td>nonparametric_method</td>
-                  <td>the fit method for the local-likelihood nonparametric family (TLLs); possible choices: <code>&quot;constant&quot;</code>, <code>&quot;linear&quot;</code>, <code>&quot;quadratic&quot;</code>.</td>
+                  <td>The fit method for the local-likelihood nonparametric family (TLLs); possible choices: <code>&quot;constant&quot;</code>, <code>&quot;linear&quot;</code>, <code>&quot;quadratic&quot;</code>.</td>
                 </tr>
                 <tr>
                   <td>nonparametric_mult</td>
-                  <td>a factor with which the smoothing parameters are multiplied.</td>
+                  <td>A factor with which the smoothing parameters are multiplied.</td>
                 </tr>
                 <tr>
                   <td>selection_criterion</td>
-                  <td>the selection criterion (<code>&quot;loglik&quot;</code>, <code>&quot;aic&quot;</code> or <code>&quot;bic&quot;</code>).</td>
+                  <td>The selection criterion (<code>&quot;loglik&quot;</code>, <code>&quot;aic&quot;</code> or <code>&quot;bic&quot;</code>).</td>
                 </tr>
                 <tr>
                   <td>weights</td>
-                  <td>a vector of weights for the observations.</td>
+                  <td>A vector of weights for the observations.</td>
                 </tr>
                 <tr>
                   <td>psi0</td>
-                  <td>only for `selection_criterion = &quot;mbic&quot;): prior probability of non-independence.</td>
+                  <td>Only for `selection_criterion = &quot;mbic&quot;, the prior probability of non-independence.</td>
                 </tr>
                 <tr>
                   <td>preselect_families</td>
-                  <td>whether to exclude families before fitting based on symmetry properties of the data.</td>
+                  <td>Whether to exclude families before fitting based on symmetry properties of the data.</td>
                 </tr>
                 <tr>
                   <td>num_threads</td>
-                  <td>number of concurrent threads to use while fitting copulas for different families; never uses more than the number returned by <code>std::thread::hardware_concurrency()</code>.</td>
+                  <td>Number of concurrent threads to use while fitting copulas for different families; never uses more than the number of concurrent threads supported by the implementation.</td>
                 </tr>
               </tbody>
             </table>
           </div></section>
           <section class="m-doc-details" id="a6a2fc00794c9dd9d598ac9948e7b98e4"><div>
             <h3>
-              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsBicop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a6a2fc00794c9dd9d598ac9948e7b98e4" class="m-doc-self">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::string parametric_method)</span></span>
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsBicop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a6a2fc00794c9dd9d598ac9948e7b98e4" class="m-doc-self">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::string parametric_method) <span class="m-label m-info">explicit</span> </span></span>
             </h3>
-            <p>creates default controls except for the parameteric method.</p>
+            <p>Instantiates default controls except for the parameteric method.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -264,7 +274,7 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">parametric_method</td>
-                  <td>the fit method for parametric families; possible choices: <code>&quot;mle&quot;</code>, <code>&quot;itau&quot;</code>.</td>
+                  <td>The fit method for parametric families; possible choices: <code>&quot;mle&quot;</code>, <code>&quot;itau&quot;</code>.</td>
                 </tr>
               </tbody>
             </table>
@@ -272,9 +282,9 @@
           <section class="m-doc-details" id="ae87a80323e8f5d3702ab0db42bf8bcb5"><div>
             <h3>
               <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsBicop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#ae87a80323e8f5d3702ab0db42bf8bcb5" class="m-doc-self">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::string nonparametric_method,
-              double nonparametric_mult = 1.0)</span></span>
+              double nonparametric_mult = 1.0) <span class="m-label m-info">explicit</span> </span></span>
             </h3>
-            <p>creates default controls except for the nonparametric method.</p>
+            <p>Instantiates default controls except for the nonparametric method.</p>
             <table class="m-table m-fullwidth m-flat">
               <thead>
                 <tr><th colspan="2">Parameters</th></tr>
@@ -282,11 +292,11 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">nonparametric_method</td>
-                  <td>the fit method for the local-likelihood nonparametric family (TLLs); possible choices: <code>&quot;constant&quot;</code>, <code>&quot;linear&quot;</code>, <code>&quot;quadratic&quot;</code>.</td>
+                  <td>The fit method for the local-likelihood nonparametric family (TLLs); possible choices: <code>&quot;constant&quot;</code>, <code>&quot;linear&quot;</code>, <code>&quot;quadratic&quot;</code>.</td>
                 </tr>
                 <tr>
                   <td>nonparametric_mult</td>
-                  <td>a factor with which the smoothing parameters are multiplied.</td>
+                  <td>A factor with which the smoothing parameters are multiplied.</td>
                 </tr>
               </tbody>
             </table>
@@ -337,7 +347,7 @@
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>vinecopulib A C++ library for vine copulas. Created by <a href="https://doxygen.org/">Doxygen</a> 1.8.13 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>vinecopulib A C++ library for vine copulas. Created by <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>
