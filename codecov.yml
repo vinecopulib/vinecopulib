@@ -11,11 +11,11 @@ coverage:
     project:
       default:
         changes: no
-        threshold: 0.1%
+        threshold: 0.5%
     patch:
       default:
         changes: no
-        threshold: 0.1%
+        threshold: 0.5%
 
 parsers:
   gcov:
