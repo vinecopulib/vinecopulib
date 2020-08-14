@@ -81,17 +81,12 @@ FrankBicop::tau_to_parameters(const double& tau)
 inline double
 FrankBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
 {
-  double par = parameters(0);
-  if (std::fabs(par) < 1e-5) {
+  double par = std::fabs(parameters(0));
+  if (par < 1e-5) {
     return 0.0;
   }
-  double tau = 1 - 4 / par;
-  double d = debye1(std::fabs(par)) / std::fabs(par);
-  if (par < 0) {
-    d = d - par / 2;
-  }
-  tau = tau + (4 / par) * d;
-  return tau;
+  double tau = 1 - 4 / par + (4 / par) * debye1(par) / par;
+  return (parameters(0) >= 0) ? tau : -tau;
 }
 
 inline Eigen::VectorXd
