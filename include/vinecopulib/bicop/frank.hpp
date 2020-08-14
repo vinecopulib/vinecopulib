@@ -43,9 +43,9 @@ private:
 
   Eigen::VectorXd get_start_parameters(const double tau);
 };
-}
 
 double
 debye1(const double& x);
+}
 
 #include <vinecopulib/bicop/implementation/frank.ipp>

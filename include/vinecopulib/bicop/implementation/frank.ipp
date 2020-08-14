@@ -97,7 +97,7 @@ FrankBicop::get_start_parameters(const double tau)
   par = par.cwiseMin(parameters_upper_bounds_);
   return par;
 }
-}
+
 
 //! @brief computes the Debye function of order 1.
 //! @param x the argument and upper limit of the integral. x>=0.
@@ -217,3 +217,5 @@ debye1(const double& x)
     return x * (sum + 1. - x / 4.);
   }
 }
+}
+
