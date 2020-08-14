@@ -104,22 +104,6 @@ FrankBicop::get_start_parameters(const double tau)
 }
 }
 
-/* Debye function of order n.
-    int(t=0..x) t^n dt / [exp(t)-1]
- The underivative for n=0 is log[1-exp(-x)], which is infinite at x=0,
- so the corresponding Debye-function is not defined at n=0.
- Literature:
- Ng et al, Math. Comp. 24 (110) (1970) 405
- Guseinov et al, Intl. J. Thermophys. 28 (4) (2007) 1420
- Engeln et al, Colloid & Polymer Sci. 261 (9) (1983) 736
- Maximon , Proc. R. Soc. A 459 (2039) (2003) 2807
- @param[in] x the argument and upper limit of the integral. x>=0.
- @param[in] n the power in the numerator of the integral, 1<=n<=20 .
- @return the Debye function. Zero if x<=0, and -1 if n is outside the
-     parameter range that is implemented.
- @author Richard J. Mathar
- @since 2007-10-31 implemented range n=8..10
-*/
 inline double
 debyen(const double x, const int n)
 {
@@ -285,11 +269,10 @@ debyen(const double x, const int n)
     const double x2pi = x * m_1_2pi;
     for (size_t k = 1; k < sizeof(koeff) / sizeof(double) - 1; k++) {
       const double sumold = sum;
-      const double kk = static_cast<double>(k);
       /* do not precompute x2pi^2 to avoid loss of precision */
-      sum += (2. + koeff[k]) * pow(x2pi, 2. * kk) / (2 * kk + n);
+      sum += (2. + koeff[k]) * pow(x2pi, 2. * k) / static_cast<double>(2 * k + n);
       k++;
-      sum -= (2. + koeff[k]) * pow(x2pi, 2. * kk) / (2 * kk + n);
+      sum -= (2. + koeff[k]) * pow(x2pi, 2. * k) / static_cast<double>(2 * k + n);
       if (sum == sumold)
         break;
     }
