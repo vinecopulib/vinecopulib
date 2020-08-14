@@ -121,7 +121,7 @@ debye1(const double& x)
 
   if (x >= 3.) {
     double sum = 1.64493406684822643647241516665e+00;
-    static constexpr std::array<double, 14> kLim{ 0, 0, 0, 13, 10, 8, 7,
+    static constexpr std::array<short, 14> kLim{ 0, 0, 0, 13, 10, 8, 7,
                                                   6, 5, 5, 4,  4,  4, 3 };
     const short kmax = (x < 14) ? kLim[static_cast<int>(x)] : 3;
     for (short k = 1; k <= kmax; k++) {
