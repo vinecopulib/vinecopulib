@@ -58,7 +58,7 @@ jobs:
             # choco upgrade cmake
             choco install boost-msvc-14.1
             choco install wget
-            wget http://bitbucket.org/eigen/eigen/get/3.3.2.zip
+            wget http://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip
             7z x 3.3.2.zip -o"C:\projects" -y > nul
           fi
           Rscript -e "install.packages('VineCopula', repos='http://cran.rstudio.com/')"
