@@ -30,7 +30,7 @@ jobs:
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             echo '::set-env name=CMAKE_GEN_PLAT::x64'
             echo '::set-env name=WDM_CMAKE_DIR::C:\projects\wdm-install\lib\cmake'
-            echo '::set-env name=EIGEN3_INCLUDE_DIR::C:\projects\eigen-eigen-da9b4e14c255'
+            echo '::set-env name=EIGEN3_INCLUDE_DIR::C:\projects\eigen-3.3.7'
             echo '::add-path::D:\a\vinecopulib\vinecopulib\release'
             echo '::add-path::D:\a\vinecopulib\vinecopulib\release\Release'
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
