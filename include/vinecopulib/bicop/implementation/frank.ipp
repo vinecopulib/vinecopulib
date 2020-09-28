@@ -105,13 +105,6 @@ FrankBicop::get_start_parameters(const double tau)
 //! @details The Debye function is defined as \f$ \int_0^x t  / [exp(t)-1] dt
 //! \f$. Code modified from implementation in
 //! https://github.com/openturns/openturns.
-
-//! @brief computes the Debye function of order 1.
-//! @param x the argument and upper limit of the integral. x>=0.
-//! @return the Debye function. Zero if x<=0.
-//! @details The Debye function is defined as \f$ \int_0^x t  / [exp(t)-1] dt
-//! \f$. Code modified from implementation in
-//! https://github.com/openturns/openturns.
 inline double
 debye1(const double& x)
 {
