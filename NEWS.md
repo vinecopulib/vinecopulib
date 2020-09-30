@@ -1,3 +1,14 @@
+## vinecopulib 0.5.4 (September 30, 2020)
+
+### BUG FIXES
+
+  * fix uninitialized number of parameters for TLL family (#515)
+
+  * fix Kendall's tau of Frank copula for par <= 3 (#513)
+
+  * fix `Vinecop::pdf()` when discrete variables are present (#514)
+
+
 ## vinecopulib 0.5.3 (August 11, 2020)
 
 ### NEW FEATURES
