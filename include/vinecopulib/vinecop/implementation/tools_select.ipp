@@ -191,7 +191,9 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
     controls_.set_trunc_lvl(std::numeric_limits<size_t>::max());
     initialize_new_fit(data);
 
-    // decrease the threshold
+    // decrease the threshold 
+    // (in the first iteration thresholded_crits is empty and the threshold is 
+    // set to 1.0, which fits an independence model)
     if (controls_.get_select_threshold()) {
       controls_.set_threshold(get_next_threshold(thresholded_crits));
       if (controls_.get_show_trace()) {
@@ -231,7 +233,6 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
           std::cout << ", mbicv: " << mbicv_tree << ", loglik: " << loglik_tree;
         }
         std::cout << std::endl;
-        // print fitted pair-copulas for this tree
         print_pair_copulas_of_tree(t);
       }
 
@@ -273,16 +274,17 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
 
     // check whether mbicv-optimal model has been found
     if (mbicv == 0.0) {
+      //// CASE: 0-truncated model is best for this threshold
       set_current_fit_as_opt(loglik);
       if (!select_threshold) {
-        // threshold is fixed, optimal truncation level has been found
+        // threshold is fixed and trunc_lvl has been found -> stop
         needs_break = true;
       }
     } else if (mbicv >= mbicv_opt) {
-      // old model is optimal
+      //// CASE: old model is optimal
       needs_break = true;
     } else {
-      // optimum hasn't been found
+      //// CASE: optimum hasn't been found
       set_current_fit_as_opt(loglik);
       mbicv_opt = mbicv;
       // while loop is only for threshold selection
@@ -293,9 +295,9 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
       thresholded_crits = get_thresholded_crits();
     }
   }
-  if (trees_opt_.size() != 0) {
-    trees_ = trees_opt_;
-  }
+
+  // set final model
+  trees_ = trees_opt_;
   finalize(controls_.get_trunc_lvl());
 }
 
