@@ -69,7 +69,7 @@ jobs:
             cmake .. && sudo make install
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\wdm-install"
-            echo '::set-env name=PATH_ORIG::${PATH}'
+            echo "PATH_ORIG=${PATH}" >> $GITHUB_ENV
             cmake --build . --config Release --target install
           fi
           cd ../..
