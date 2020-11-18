@@ -430,15 +430,21 @@ TEST_F(VinecopTest, fixed_truncation)
 TEST_F(VinecopTest, sparse_threshold_selection)
 {
   u.conservativeResize(20, 7);
+
   FitControlsVinecop controls(bicop_families::itau, "itau");
-  controls.set_select_threshold(true);
+  controls.set_select_threshold(NAN);
+  controls.set_threshold(true);
   // controls.set_show_trace(true);
   controls.set_selection_criterion("mbicv");
+
   Vinecop fit(7);
   fit.select(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
   fit.select(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
+
+  u = tools_stats::simulate_uniform(100, 7);
+  fit.select(u, controls);
 }
 
 TEST_F(VinecopTest, sparse_truncation_selection)
