@@ -1,3 +1,18 @@
+## vinecopulib 0.5.5 (November 23, 2020)
+
+### BUG FIXES
+
+  * fix little bug in copula selection based on mBIC (#527)
+
+  * stabilize BB7 copula pdf (#526)
+
+  * fix threshold selection for (near-)independent data (#523)
+
+  * fix `Vinecop::select()` for 1-dimensional models with discrete variables (#521)
+
+  * fix user-visible variable types messed up in `Bicop::flip()` (#519)
+
+
 ## vinecopulib 0.5.4 (September 30, 2020)
 
 ### BUG FIXES
