@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bivariate copula models | vinecopulib A C++ library for vine copulas</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i%7CSource+Code+Pro:400,400i,600" />
+  <link rel="stylesheet" href="m-dark+documentation.compiled.css" />
+  <link rel="icon" href="favicon-dark.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#22272e" />
+</head>
+<body>
+<header><nav id="navigation">
+  <div class="m-container">
+    <div class="m-row">
+      <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">vinecopulib <span class="m-thin">A C++ library for vine copulas</span></a>
+      <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
+        <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+          <path d="m6 0c-3.3144 0-6 2.6856-6 6 0 3.3144 2.6856 6 6 6 1.4858 0 2.8463-0.54083 3.8945-1.4355-0.0164 0.33797 0.14734 0.75854 0.5 1.1504l3.2227 3.7891c0.55185 0.6139 1.4517 0.66544 2.002 0.11524 0.55022-0.55022 0.49866-1.4501-0.11524-2.002l-3.7891-3.2246c-0.39184-0.35266-0.81242-0.51469-1.1504-0.5 0.89472-1.0482 1.4355-2.4088 1.4355-3.8945 0-3.3128-2.6856-5.998-6-5.998zm0 1.5625a4.4375 4.4375 0 0 1 4.4375 4.4375 4.4375 4.4375 0 0 1-4.4375 4.4375 4.4375 4.4375 0 0 1-4.4375-4.4375 4.4375 4.4375 0 0 1 4.4375-4.4375z"/>
+        </svg></a>
+        <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
+        <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
+      </div>
+      <div id="m-navbar-collapse" class="m-col-t-12 m-show-m m-col-m-none m-right-m">
+        <div class="m-row">
+          <ol class="m-col-t-6 m-col-m-none">
+            <li><a href="setup.html">Setup</a></li>
+            <li>
+              <a href="overview.html">Overview</a>
+              <ol>
+                <li><a href="overview-bicop.html" id="m-navbar-current">Bivariate copula models</a></li>
+                <li><a href="overview-vinecop.html">Vine copula models</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="annotated.html">Classes</a>
+              <ol>
+                <li><a href="classvinecopulib_1_1_bicop.html">vinecopulib::Bicop</a></li>
+                <li><a href="classvinecopulib_1_1_fit_controls_bicop.html">vinecopulib::FitControlsBicop</a></li>
+                <li><a href="classvinecopulib_1_1_vinecop.html">vinecopulib::Vinecop</a></li>
+                <li><a href="classvinecopulib_1_1_fit_controls_vinecop.html">vinecopulib::FitControlsVinecop</a></li>
+                <li><a href="classvinecopulib_1_1_r_vine_structure.html">vinecopulib::RVineStructure</a></li>
+                <li><a href="classvinecopulib_1_1_triangular_array.html">vinecopulib::TriangularArray</a></li>
+              </ol>
+            </li>
+          </ol>
+          <ol class="m-col-t-6 m-col-m-none" start="4">
+            <li>
+              <a href="namespaces.html">Namespaces</a>
+              <ol>
+                <li><a href="namespacevinecopulib.html">vinecopulib</a></li>
+                <li><a href="namespacevinecopulib_1_1bicop__families.html">vinecopulib::bicop_families</a></li>
+                <li><a href="namespacevinecopulib_1_1tools__stats.html">vinecopulib::tools_stats</a></li>
+              </ol>
+            </li>
+            <li><a href="license.html">License</a></li>
+            <li><a href="https://github.com/vinecopulib/vinecopulib">GitHub</a></li>
+            <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
+              <path d="m6 0c-3.3144 0-6 2.6856-6 6 0 3.3144 2.6856 6 6 6 1.4858 0 2.8463-0.54083 3.8945-1.4355-0.0164 0.33797 0.14734 0.75854 0.5 1.1504l3.2227 3.7891c0.55185 0.6139 1.4517 0.66544 2.002 0.11524 0.55022-0.55022 0.49866-1.4501-0.11524-2.002l-3.7891-3.2246c-0.39184-0.35266-0.81242-0.51469-1.1504-0.5 0.89472-1.0482 1.4355-2.4088 1.4355-3.8945 0-3.3128-2.6856-5.998-6-5.998zm0 1.5625a4.4375 4.4375 0 0 1 4.4375 4.4375 4.4375 4.4375 0 0 1-4.4375 4.4375 4.4375 4.4375 0 0 1-4.4375-4.4375 4.4375 4.4375 0 0 1 4.4375-4.4375z"/>
+            </svg></a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav></header>
+<main><article>
+  <div class="m-container m-container-inflatable">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <h1>
+          Bivariate copula models
+        </h1>
+        <div class="m-block m-default">
+          <h3>Contents</h3>
+          <ul>
+            <li><a href="#bicop-families">Implemented bivariate copula families</a></li>
+            <li><a href="#bicop-custom">Set up a custom bivariate copula model</a></li>
+            <li><a href="#bicop-fit">Fit and select a bivariate copula</a></li>
+            <li><a href="#bicop-model">Work with a bivariate copula model</a></li>
+          </ul>
+        </div>
+<ul><li><a href="#bicop-families">Implemented bivariate copula families</a></li><li><a href="#bicop-custom">Set up a custom bivariate copula model</a></li><li><a href="#bicop-fit">Fit and select a bivariate copula</a></li><li><a href="#bicop-model">Work with a bivariate copula model</a></li></ul><p>Bivariate copula models are implemented as the <code>Bicop</code> class, and <code>BicopFamily</code> is a closely related enum class describing the type or &quot;family&quot; of copula. To use bivariate copula models in your code, include the header <code><a href="bicop_2class_8hpp_source.html" class="m-doc">vinecopulib/<wbr />bicop/<wbr />class.hpp</a></code> (or simply <code><a href="vinecopulib_8hpp_source.html" class="m-doc">vinecopulib.hpp</a></code>) at the top of your source file.</p><section id="bicop-families"><h2><a href="#bicop-families">Implemented bivariate copula families</a></h2><table class="m-table"><thead><tr><th>type</th><th>name</th><th>BicopFamily</th></tr></thead><tbody><tr><td>-</td><td>Independence</td><td>indep</td></tr><tr><td>Elliptical</td><td>Gaussian</td><td>gaussian</td></tr><tr><td></td><td>Student t</td><td>student</td></tr><tr><td>Archimedean</td><td>Clayton</td><td>clayton</td></tr><tr><td></td><td>Gumbel</td><td>gumbel</td></tr><tr><td></td><td>Frank</td><td>frank</td></tr><tr><td></td><td>Joe</td><td>joe</td></tr><tr><td></td><td>BB1</td><td>bb1</td></tr><tr><td></td><td>BB6</td><td>bb6</td></tr><tr><td></td><td>BB7</td><td>bb7</td></tr><tr><td></td><td>BB8</td><td>bb8</td></tr><tr><td>Nonparametric</td><td>Transformation kernel</td><td>tll</td></tr></tbody></table><p>Note that several convenience vectors of families are included in the sub-namespace <code>bicop_families</code>:</p><ul><li><code>all</code> contains all the families</li><li><code>parametric</code> contains the parametric families (all except <code>tll</code>)</li><li><code>nonparametric</code> contains the nonparametric families (<code>indep</code> and <code>tll</code>)</li><li><code>one_par</code> contains the parametric families with a single parameter (<code>gaussian</code>, <code>clayton</code>, <code>gumbel</code>, <code>frank</code>, and <code>joe</code>)</li><li><code>two_par</code> contains the parametric families with two parameters (<code>student</code>, <code>bb1</code>, <code>bb6</code>, <code>bb7</code>, and <code>bb8</code>)</li><li><code>elliptical</code> contains the elliptical families</li><li><code>archimedean</code> contains the archimedean families</li><li><code>bb</code> contains the BB families</li><li><code>itau</code> families for which estimation by Kendall&#x27;s tau inversion is available (<code>indep</code>,<code>gaussian</code>, <code>student</code>,<code>clayton</code>, <code>gumbel</code>, <code>frank</code>, <code>joe</code>)</li></ul><pre class="m-code"><span class="c1">// print all available families</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Available families : &quot;</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="nl">family</span> <span class="p">:</span> <span class="n">vinecopulib</span><span class="o">::</span><span class="n">bicop_families</span><span class="o">::</span><span class="n">all</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">get_family_name</span><span class="p">(</span><span class="n">family</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &quot;</span><span class="p">;</span>
+<span class="p">}</span></pre></section><section id="bicop-custom"><h2><a href="#bicop-custom">Set up a custom bivariate copula model</a></h2><p>There are essentially two ways of setting-up bivariate copulas:</p><ul><li>with known parameters,</li><li>from data (i.e., with estimated parameters).</li></ul><p>The constructor with known parameters takes 3 arguments:</p><ul><li>The copula family (default to <code>indep</code>)</li><li>The rotation (default to <code>0</code>)</li><li>The parameters (default to parameters corresponding to an independence copula)</li></ul><pre class="m-code"><span class="c1">// 90 degree rotated Clayton with default parameter (corresponds to independence)</span>
+<span class="n">Bicop</span> <span class="nf">clayton</span><span class="p">(</span><span class="n">BicopFamily</span><span class="o">::</span><span class="n">clayton</span><span class="p">,</span> <span class="mi">90</span><span class="p">);</span>
+
+<span class="c1">// Gauss copula with parameter 0.5</span>
+<span class="n">Bicop</span> <span class="nf">gauss</span><span class="p">(</span><span class="n">BicopFamily</span><span class="o">::</span><span class="n">gaussian</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">));</span></pre><p>The constructor from data takes the same arguments as the select method and is described in the next section.</p></section><section id="bicop-fit"><h2><a href="#bicop-fit">Fit and select a bivariate copula</a></h2><p>You can either fit the parameters of a given <code>Bicop</code> object with <code>fit()</code> or select the best fitting model from a set of families with <code>select()</code>.</p><pre class="m-code"><span class="n">create</span> <span class="n">a</span> <span class="n">Gauss</span> <span class="n">copula</span> <span class="n">with</span> <span class="n">parameter</span> <span class="mf">0.5</span> <span class="n">and</span> <span class="n">simulate</span> <span class="mf">1e3</span> <span class="n">observations</span>
+<span class="n">Bicop</span> <span class="n">model</span><span class="p">(</span><span class="n">BicopFamily</span><span class="o">::</span><span class="n">gaussian</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">));</span>
+<span class="k">auto</span> <span class="n">data</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">simulate</span><span class="p">(</span><span class="mf">1e3</span><span class="p">);</span>
+
+<span class="n">instantiate</span> <span class="n">a</span> <span class="n">gaussian</span> <span class="n">copula</span> <span class="n">with</span> <span class="k">default</span> <span class="n">parameters</span> <span class="n">and</span> <span class="n">fit</span> <span class="n">to</span> <span class="n">data</span>
+<span class="n">Bicop</span> <span class="n">fitted</span><span class="p">(</span><span class="n">BicopFamily</span><span class="o">::</span><span class="n">gaussian</span><span class="p">);</span>
+<span class="n">fitted</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span>
+       <span class="s">&quot;estimated parameter: &quot;</span> <span class="o">&lt;&lt;</span>
+       <span class="n">fitted</span><span class="p">.</span><span class="n">get_parameters</span><span class="p">()</span> <span class="o">&lt;&lt;</span>
+       <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="n">assign</span> <span class="n">another</span> <span class="n">family</span> <span class="n">to</span> <span class="n">the</span> <span class="n">same</span> <span class="n">variable</span> <span class="n">and</span> <span class="n">fit</span> <span class="n">to</span> <span class="n">data</span>
+<span class="n">fitted</span> <span class="o">=</span> <span class="n">Bicop</span><span class="p">(</span><span class="n">BicopFamily</span><span class="o">::</span><span class="n">student</span><span class="p">);</span>
+<span class="n">fitted</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span>
+       <span class="s">&quot;estimated parameter: &quot;</span> <span class="o">&lt;&lt;</span>
+       <span class="n">fitted</span><span class="p">.</span><span class="n">get_parameters</span><span class="p">()</span> <span class="o">&lt;&lt;</span>
+       <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="n">alternatively</span><span class="p">,</span> <span class="n">assign</span> <span class="n">to</span> <span class="n">a</span> <span class="n">family</span> <span class="n">and</span> <span class="n">fit</span> <span class="n">automatically</span>
+<span class="n">fitted</span><span class="p">.</span><span class="n">select</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span>
+       <span class="s">&quot;family: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">fitted</span><span class="p">.</span><span class="n">get_family_name</span><span class="p">()</span> <span class="o">&lt;&lt;</span>
+       <span class="s">&quot;rotation: &quot;</span> <span class="o">&lt;&lt;</span>  <span class="n">fitted</span><span class="p">.</span><span class="n">get_rotation</span><span class="p">()</span> <span class="o">&lt;&lt;</span>
+       <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span></pre><p>As it&#x27;s arguably the most important function of the <code>Bicop</code> class, it&#x27;s worth understanding the second argument of <code>select()</code>, namely an object of the class <code>FitControlsBicop</code>, which contain several data members:</p><ul><li><code>std::vector&lt;BicopFamily&gt; family_set</code> describes the set of family to select from. It can take a user specified vector of families or any of those mentioned above (default is <code>bicop_families::all</code>).</li><li><code>std::string parametric_method</code> describes the estimation method. It can take <code>&quot;mle&quot;</code> (default, for maximum-likelihood estimation) and <code>&quot;itau&quot;</code> (for Kendall&#x27;s tau inversion, although only available for families included in <code>bicop_families::itau</code>).</li><li><code>std::string nonparametric_method</code> describes the degree of the density approximation for the transformation kernel estimator. It can take <code>constant</code>, <code>linear</code> and <code>quadratic</code> (default) for approximations of degree zero, one and two.</li><li><code>double nonparametric_mult</code> a factor with which the smoothing parameters are multiplied.</li><li><code>std::string selection_criterion</code> describes the criterion to compare the families. It can take either <code>&quot;loglik&quot;</code>, <code>&quot;aic&quot;</code>, or <code>&quot;bic&quot;</code>(default).</li><li><code>Eigen::VectorXd weights</code> an optional vector of weights for the observations.</li><li><code>bool preselect_families</code> describes a heuristic preselection method (default is <code>true</code>) based on symmetry properties of the data (e.g., the unrotated Clayton won&#x27;t be preselected if the data displays upper-tail dependence).</li><li><code>size_t num_threads</code> number of threads to run in parallel when fitting several families.</li></ul><p>As mentioned <a href="#bicop-custom">above</a>, the arguments of <code>select()</code> can be used as arguments to a constructor allowing to instantiate a new object directly:</p><pre class="m-code"><span class="c1">// instantiate an archimedean copula by selecting the &quot;best&quot; family according to</span>
+<span class="c1">// the BIC and parameters corresponding to the MLE</span>
+<span class="n">Bicop</span> <span class="nf">best_archimedean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">FitControlsBicop</span><span class="p">(</span><span class="n">bicop_families</span><span class="o">::</span><span class="n">archimedean</span><span class="p">));</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span>
+       <span class="s">&quot;family: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">best_archimedean</span><span class="p">.</span><span class="n">get_family_name</span><span class="p">()</span> <span class="o">&lt;&lt;</span>
+       <span class="s">&quot;rotation: &quot;</span> <span class="o">&lt;&lt;</span>  <span class="n">best_archimedean</span><span class="p">.</span><span class="n">get_rotation</span><span class="p">()</span> <span class="o">&lt;&lt;</span>
+       <span class="n">best_archimedean</span><span class="p">.</span><span class="n">get_parameters</span><span class="p">()</span> <span class="o">&lt;&lt;</span>
+       <span class="n">std</span><span class="o">::</span><span class="n">endl</span>
+
+<span class="c1">// instantiate a bivariate copula by selecting the &quot;best&quot; family according to</span>
+<span class="c1">// the AIC and parameters corresponding to Kendall&#39;s tau inversion</span>
+<span class="n">FitControlsBicop</span> <span class="n">controls</span><span class="p">(</span><span class="n">bicop_families</span><span class="o">::</span><span class="n">itau</span><span class="p">,</span> <span class="s">&quot;itau&quot;</span><span class="p">);</span>
+<span class="n">controls</span><span class="p">.</span><span class="n">set_selection_criterion</span><span class="p">(</span><span class="s">&quot;aic&quot;</span><span class="p">);</span>
+<span class="n">Bicop</span> <span class="nf">best_itau</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">controls</span><span class="p">));</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span>
+       <span class="s">&quot;family: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">best_itau</span><span class="p">.</span><span class="n">get_family_name</span><span class="p">()</span> <span class="o">&lt;&lt;</span>
+       <span class="s">&quot;rotation: &quot;</span> <span class="o">&lt;&lt;</span>  <span class="n">best_itau</span><span class="p">.</span><span class="n">get_rotation</span><span class="p">()</span> <span class="o">&lt;&lt;</span>
+       <span class="n">best_itau</span><span class="p">.</span><span class="n">get_parameters</span><span class="p">()</span> <span class="o">&lt;&lt;</span>
+       <span class="n">std</span><span class="o">::</span><span class="n">endl</span></pre></section><section id="bicop-model"><h2><a href="#bicop-model">Work with a bivariate copula model</a></h2><p>You can simulate from a model and evaluate the pdf, h-functions, inverse h-functions, log-likelihood, AIC, and BIC.</p><pre class="m-code"><span class="c1">// Gauss copula with parameter 0.5</span>
+<span class="n">Bicop</span> <span class="nf">bicop</span><span class="p">(</span><span class="n">BicopFamily</span><span class="o">::</span><span class="n">gaussian</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">));</span>
+
+<span class="c1">// Simulate 100 observations</span>
+<span class="k">auto</span> <span class="n">sim_data</span> <span class="o">=</span> <span class="n">bicop</span><span class="p">.</span><span class="n">simulate</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+
+<span class="c1">// Evaluate the pdf</span>
+<span class="k">auto</span> <span class="n">pdf</span>  <span class="o">=</span> <span class="n">bicop</span><span class="p">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">sim_data</span><span class="p">);</span>
+
+<span class="c1">// Evaluate the two h-functions</span>
+<span class="k">auto</span> <span class="n">h1</span>   <span class="o">=</span> <span class="n">bicop</span><span class="p">.</span><span class="n">hfunc1</span><span class="p">(</span><span class="n">sim_data</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">h2</span>   <span class="o">=</span> <span class="n">bicop</span><span class="p">.</span><span class="n">hfunc2</span><span class="p">(</span><span class="n">sim_data</span><span class="p">);</span>
+
+<span class="c1">// Evalute the two inverse h-functions</span>
+<span class="k">auto</span> <span class="n">hi1</span>  <span class="o">=</span> <span class="n">bicop</span><span class="p">.</span><span class="n">hinv1</span><span class="p">(</span><span class="n">sim_data</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">hi2</span>  <span class="o">=</span> <span class="n">bicop</span><span class="p">.</span><span class="n">hinv2</span><span class="p">(</span><span class="n">sim_data</span><span class="p">);</span>
+
+<span class="c1">// Evaluate the log-likelihood, AIC, and BIC</span>
+<span class="k">auto</span> <span class="n">ll</span>   <span class="o">=</span> <span class="n">bicop</span><span class="p">.</span><span class="n">loglik</span><span class="p">(</span><span class="n">sim_data</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">aic</span>  <span class="o">=</span> <span class="n">bicop</span><span class="p">.</span><span class="n">aic</span><span class="p">(</span><span class="n">sim_data</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">bic</span>  <span class="o">=</span> <span class="n">bicop</span><span class="p">.</span><span class="n">bic</span><span class="p">(</span><span class="n">sim_data</span><span class="p">);</span></pre><p>Bivariate copula models can also be written to and constructed from JSON files and <code>boost::property_tree::ptree</code> objects:</p><pre class="m-code"><span class="c1">// Gauss copula with parameter 0.5</span>
+<span class="n">Bicop</span> <span class="nf">bicop</span><span class="p">(</span><span class="n">BicopFamily</span><span class="o">::</span><span class="n">gaussian</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">));</span>
+
+<span class="c1">// Save as a ptree object</span>
+<span class="n">boost</span><span class="o">::</span><span class="n">property_tree</span><span class="o">::</span><span class="n">ptree</span> <span class="n">bicop_node</span> <span class="o">=</span> <span class="n">bicop</span><span class="p">.</span><span class="n">to_ptree</span><span class="p">();</span>
+
+<span class="c1">// Write into a JSON file</span>
+<span class="n">boost</span><span class="o">::</span><span class="n">property_tree</span><span class="o">::</span><span class="n">write_json</span><span class="p">(</span><span class="s">&quot;myfile.JSON&quot;</span><span class="p">,</span> <span class="n">bicop_node</span><span class="p">);</span>
+
+<span class="c1">// Equivalently</span>
+<span class="n">bicop</span><span class="p">.</span><span class="n">to_json</span><span class="p">(</span><span class="s">&quot;myfile.JSON&quot;</span><span class="p">);</span>
+
+<span class="c1">// Then a new Bicop can be constructed from the ptree object</span>
+<span class="n">Bicop</span> <span class="nf">bicop2</span><span class="p">(</span><span class="n">bicop_node</span><span class="p">);</span>
+
+<span class="c1">// Or from the JSON file</span>
+<span class="n">Bicop</span> <span class="nf">bicop3</span><span class="p">(</span><span class="s">&quot;myfile.JSON&quot;</span><span class="p">);</span></pre></section>
+      </div>
+    </div>
+  </div>
+</article></main>
+<div class="m-doc-search" id="search">
+  <a href="#!" onclick="return hideSearch()"></a>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-m-8 m-push-m-2">
+        <div class="m-doc-search-header m-text m-small">
+          <div><span class="m-label m-default">Tab</span> / <span class="m-label m-default">T</span> to search, <span class="m-label m-default">Esc</span> to close</div>
+          <div id="search-symbolcount">&hellip;</div>
+        </div>
+        <div class="m-doc-search-content">
+          <form>
+            <input type="search" name="q" id="search-input" placeholder="Loading &hellip;" disabled="disabled" autofocus="autofocus" autocomplete="off" spellcheck="false" />
+          </form>
+          <noscript class="m-text m-danger m-text-center">Unlike everything else in the docs, the search functionality <em>requires</em> JavaScript.</noscript>
+          <div id="search-help" class="m-text m-dim m-text-center">
+            <p class="m-noindent">Search for symbols, directories, files, pages or
+            modules. You can omit any prefix from the symbol or file path; adding a
+            <code>:</code> or <code>/</code> suffix lists all members of given symbol or
+            directory.</p>
+            <p class="m-noindent">Use <span class="m-label m-dim">&darr;</span>
+            / <span class="m-label m-dim">&uarr;</span> to navigate through the list,
+            <span class="m-label m-dim">Enter</span> to go.
+            <span class="m-label m-dim">Tab</span> autocompletes common prefix, you can
+            copy a link to the result using <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
+            <span class="m-label m-dim">M</span> produces a Markdown link.</p>
+
+          </div>
+          <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
+          <ul id="search-results"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="search.js"></script>
+<script src="searchdata.js" async="async"></script>
+<footer><nav>
+  <div class="m-container">
+    <div class="m-row">
+      <div class="m-col-l-10 m-push-l-1">
+        <p>vinecopulib A C++ library for vine copulas. Created by <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+      </div>
+    </div>
+  </div>
+</nav></footer>
+</body>
+</html>
