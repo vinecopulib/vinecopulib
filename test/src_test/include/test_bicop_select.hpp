@@ -40,6 +40,15 @@ TEST(bicop_select, allows_all_selcrits)
   cop.select(u, controls);
 }
 
+TEST(bicop_select, allows_weights)
+{
+  Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
+  auto u = cop.simulate(15);
+  FitControlsBicop controls;
+  controls.set_weights(u.col(0)); 
+  cop.select(u, controls);
+}
+
 TEST(bicop_select, fit_stats_are_correct)
 {
   Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));

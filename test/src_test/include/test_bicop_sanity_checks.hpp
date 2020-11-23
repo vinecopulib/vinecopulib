@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_stats.hpp>
 
 namespace test_bicop_sanity_checks {
 using namespace vinecopulib;
@@ -44,6 +45,15 @@ TEST(bicop_sanity_checks, catches_var_types)
   auto rho = Eigen::VectorXd::Constant(1, 0.5);
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, rho, { "c" }));
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, rho, { "c", "u" }));
+}
+
+TEST(bicop_sanity_checks, catches_data_dim)
+{
+  Bicop bicop;
+  auto u = tools_stats::simulate_uniform(10, 3);
+  EXPECT_ANY_THROW(bicop.select(u));
+  bicop.set_var_types({ "d", "d" });
+  EXPECT_ANY_THROW(bicop.select(u));
 }
 
 TEST(bicop_sanity_checks, catches_not_fitted_to_data)
