@@ -50,7 +50,7 @@ protected:
 
   Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u) override;
 
-  double get_npars() override;
+  double get_npars() const override;
 
   void set_npars(const double& npars) override;
 

@@ -55,7 +55,7 @@ protected:
                    double mult,
                    const Eigen::VectorXd& weights) = 0;
 
-  virtual double get_npars() = 0;
+  virtual double get_npars() const = 0;
 
   virtual void set_npars(const double& npars) = 0;
 

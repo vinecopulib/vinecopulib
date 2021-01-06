@@ -115,7 +115,7 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
 }
 
 inline double
-KernelBicop::get_npars()
+KernelBicop::get_npars() const
 {
   return npars_;
 }
