@@ -1,3 +1,4 @@
+find_package(Torch REQUIRED)
 include(cmake/findEigen3.cmake            REQUIRED)
 message(STATUS "Eigen3 version: ${EIGEN3_VERSION}")
 include(cmake/findR.cmake                 REQUIRED)
