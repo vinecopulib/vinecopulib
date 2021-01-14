@@ -99,6 +99,7 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
       input.get_child("var_types"));
     nobs_ = input.get<size_t>("nobs_");
     bicop_->set_loglik(input.get<double>("loglik"));
+    bicop_->set_npars(input.get<double>("npars"));
   } catch (...) {
   }
 }
@@ -139,6 +140,7 @@ Bicop::to_ptree() const
 
   output.put("nobs_", nobs_);
   output.put("loglik", bicop_->get_loglik());
+  output.put("npars", bicop_->get_npars());
 
   return output;
 }
