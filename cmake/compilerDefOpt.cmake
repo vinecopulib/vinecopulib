@@ -1,7 +1,7 @@
 if(NOT WIN32)
 
     if(STRICT_COMPILER AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-      set(CMAKE_CXX_FLAGS                "-std=gnu++11 -Werror -Wno-delete-non-virtual-dtor -Wall -Wextra -Wconversion")
+      set(CMAKE_CXX_FLAGS                "-std=gnu++14 -Werror -Wno-delete-non-virtual-dtor -Wall -Wextra -Wconversion")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wstrict-aliasing -pedantic -fmax-errors=5 -Werror=return-type")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wunreachable-code -Wcast-align -Wcast-qual")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op")
@@ -9,7 +9,7 @@ if(NOT WIN32)
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wno-variadic-macros -Wno-parentheses -fdiagnostics-show-option")
     else()
-        set(CMAKE_CXX_FLAGS                "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type")
+        set(CMAKE_CXX_FLAGS                "-std=gnu++14 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type")
     endif()
 
     set(CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG ")
@@ -42,4 +42,8 @@ endif()
 
 if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+endif()
+
+if (TORCH)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 endif()

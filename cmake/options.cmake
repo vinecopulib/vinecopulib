@@ -6,6 +6,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 option(VINECOPULIB_SHARED_LIB    "Pre-compiled version"              "OFF")
+option(TORCH                     "Use libtorch"                      "OFF")
 option(WARNINGS_AS_ERRORS        "Compiler warnings as errors"       "OFF")
 option(OPT_ASAN                  "Use adress sanitizer (debug)"      "ON")
 option(BUILD_TESTING             "Build tests."                      "ON")

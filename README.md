@@ -46,3 +46,15 @@ For documentation of the library's functionality and
 instructions how to use it, check out our
 [website](https://vinecopulib.github.io/vinecopulib/) or the `docs/` folder
 in this repository.
+
+#### Torch
+
+The following cmake options can be used:
+
+* `TORCH`: allows to turn torch on (default is `OFF`).
+* `TORCH_INSTALL_DIR`: can be used to specify the `/absolute/path/to/libtorch` as the absolute (!) path to the unzipped LibTorch distribution. If PyTorch was installed via conda or pip, this can be queried using something like `python -c 'import torch;print(torch.utils.cmake_prefix_path)'`.
+
+<!-- cmake .. -DVINECOPULIB_ -->
+<!-- SHARED_LIB=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=clang++ -DTORCH=ON -DTORCH_INST -->
+<!-- ALL_DIR=../libtorch  && cp compile_commands.json ../. -->
+<!--  -->

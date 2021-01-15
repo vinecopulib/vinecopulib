@@ -21,3 +21,7 @@ foreach (app ${unit_tests})
     add_executable(${app} ${app}.cpp)
     target_link_libraries(${app} gtest vinecopulib ${CMAKE_THREAD_LIBS_INIT} ${test_libs} src_test)
 endforeach ()
+
+add_executable(test_torch test_torch.cpp)
+target_link_libraries(test_torch ${TORCH_LIBRARIES})
+
