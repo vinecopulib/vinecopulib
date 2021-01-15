@@ -49,7 +49,9 @@ in this repository.
 
 #### Torch
 
-The following cmake options can be used:
+First, follow the [libtorch installation instructions](https://pytorch.org/cppdocs/installing.html). Note that, in the `test/test_torch.cpp`, it is assumed that a GPU-enabled libtorch is installed, but this can be disabled by commenting lines 17-18.
+
+Then, the following cmake options can be used:
 
 * `TORCH`: allows to turn torch on (default is `OFF`).
 * `TORCH_INSTALL_DIR`: can be used to specify the `/absolute/path/to/libtorch` as the absolute (!) path to the unzipped LibTorch distribution. If PyTorch was installed via conda or pip, this can be queried using something like `python -c 'import torch;print(torch.utils.cmake_prefix_path)'`.
