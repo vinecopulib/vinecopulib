@@ -162,7 +162,7 @@ ptree_to_vector(const boost::property_tree::ptree input)
 }
 
 inline boost::property_tree::ptree
-json_to_ptree(const char* filename)
+json_to_ptree(const std::string & filename)
 {
   boost::property_tree::ptree output;
   boost::property_tree::read_json(filename, output);

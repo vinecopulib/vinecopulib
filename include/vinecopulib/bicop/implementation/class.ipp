@@ -112,7 +112,7 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
 //!
 //! @param filename The name of the JSON file to read.
 inline Bicop::Bicop(const std::string& filename)
-  : Bicop(tools_serialization::json_to_ptree(filename.c_str()))
+  : Bicop(tools_serialization::json_to_ptree(filename))
 {}
 
 //! @brief Convert the copula into a boost::property_tree::ptree object.
@@ -154,7 +154,7 @@ Bicop::to_ptree() const
 inline void
 Bicop::to_json(const std::string& filename) const
 {
-  boost::property_tree::write_json(filename.c_str(), to_ptree());
+  boost::property_tree::write_json(filename, to_ptree());
 }
 
 //! @brief Evaluates the copula density.

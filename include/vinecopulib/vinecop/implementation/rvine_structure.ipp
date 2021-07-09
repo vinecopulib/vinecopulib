@@ -162,7 +162,7 @@ inline RVineStructure::RVineStructure(const boost::property_tree::ptree input,
 //!      a valid R-vine matrix.
 inline RVineStructure::RVineStructure(const std::string& filename,
                                       const bool check)
-  : RVineStructure(tools_serialization::json_to_ptree(filename.c_str()), check)
+  : RVineStructure(tools_serialization::json_to_ptree(filename), check)
 {}
 
 //! @brief Converts the structure into a boost::property_tree::ptree object.
@@ -193,7 +193,7 @@ RVineStructure::to_ptree() const
 inline void
 RVineStructure::to_json(const std::string& filename) const
 {
-  boost::property_tree::write_json(filename.c_str(), this->to_ptree());
+  boost::property_tree::write_json(filename, this->to_ptree());
 }
 
 //! Gets the dimension of the vine.
