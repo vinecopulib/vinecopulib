@@ -62,15 +62,16 @@ Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
         this->objective_calls_++;
         return -objective(par);
       };
-    auto result = tools_bobyqa::bobyqa(f,
-                                       n_parameters,
-                                       number_interpolation_conditions,
-                                       initial_parameters,
-                                       lower_bounds,
-                                       upper_bounds,
-                                       controls_.get_initial_trust_region(),
-                                       controls_.get_final_trust_region(),
-                                       controls_.get_maxeval());
+    auto result =
+      tools_bobyqa::bobyqa(f,
+                           n_parameters,
+                           number_interpolation_conditions,
+                           initial_parameters,
+                           lower_bounds,
+                           upper_bounds,
+                           controls_.get_initial_trust_region(),
+                           controls_.get_final_trust_region(),
+                           static_cast<long>(controls_.get_maxeval()));
     optimal_parameters = result.first;
     objective_max_ = -result.second;
   } else {
