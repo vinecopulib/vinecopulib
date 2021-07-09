@@ -9,6 +9,7 @@
 #include <Eigen/Dense>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include <vector>
 #include <vinecopulib/misc/triangular_array.hpp>
 
@@ -33,9 +34,9 @@ matrix_to_ptree(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix)
     for (size_t j = 0; j < rows; j++) {
       boost::property_tree::ptree cell;
       cell.put_value(matrix(j, i));
-      col.push_back(boost::property_tree::ptree::value_type("", cell));
+      col.push_back(boost::property_tree::ptree::value_type("f", cell));
     }
-    output.push_back(std::make_pair("", col));
+    output.push_back(std::make_pair("c", col));
   }
 
   return output;
@@ -57,9 +58,9 @@ triangular_array_to_ptree(TriangularArray<T> array)
     for (size_t j = 0; j < d - 1 - i; j++) {
       boost::property_tree::ptree cell;
       cell.put_value(array(i, j));
-      row.push_back(boost::property_tree::ptree::value_type("", cell));
+      row.push_back(boost::property_tree::ptree::value_type("f", cell));
     }
-    output.push_back(std::make_pair("", row));
+    output.push_back(std::make_pair("r", row));
   }
 
   return output;
@@ -77,7 +78,7 @@ vector_to_ptree(std::vector<T> vec)
   for (size_t i = 0; i < vec.size(); i++) {
     boost::property_tree::ptree cell;
     cell.put_value(vec[i]);
-    output.push_back(boost::property_tree::ptree::value_type("", cell));
+    output.push_back(boost::property_tree::ptree::value_type("f", cell));
   }
 
   return output;
@@ -162,11 +163,19 @@ ptree_to_vector(const boost::property_tree::ptree input)
 }
 
 inline boost::property_tree::ptree
-json_to_ptree(const std::string & filename)
+file_to_ptree(const std::string& filename, const std::string& filetype)
 {
   boost::property_tree::ptree output;
-  boost::property_tree::read_json(filename, output);
+  if (filetype == "xml") {
+    boost::property_tree::read_xml(filename, output);
+  } else if (filetype == "json") {
+    boost::property_tree::read_json(filename, output);
+  } else {
+    throw std::runtime_error(std::string("Filetype not implemented"));
+  }
+
   return output;
 }
+
 }
 }

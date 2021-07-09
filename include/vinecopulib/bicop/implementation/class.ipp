@@ -102,7 +102,7 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
   }
 }
 
-//! @brief Instantiates from a JSON file.
+//! @brief Instantiates from a file.
 //!
 //! The input file contains four attributes:
 //! `"family"`, `"rotation"`, `"parameters"`, `"var_types"` respectively a
@@ -110,9 +110,10 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
 //! matrix for the parameters, and a list of two strings for the variable
 //! types.
 //!
-//! @param filename The name of the JSON file to read.
-inline Bicop::Bicop(const std::string& filename)
-  : Bicop(tools_serialization::json_to_ptree(filename))
+//! @param filename The name of the file to read.
+//! @param filetype The type of the file (either `"json"` or `"xml"`).
+inline Bicop::Bicop(const std::string& filename, const std::string& filetype)
+  : Bicop(tools_serialization::file_to_ptree(filename, filetype))
 {}
 
 //! @brief Convert the copula into a boost::property_tree::ptree object.
@@ -155,6 +156,21 @@ inline void
 Bicop::to_json(const std::string& filename) const
 {
   boost::property_tree::write_json(filename, to_ptree());
+}
+
+//! @brief Write the copula object into an XLM file.
+//!
+//! The written file contains four attributes:
+//! `"family"`, `"rotation"`, `"parameters"`, `"var_types"` respectively a
+//! string for the family name, an integer for the rotation, and a numeric
+//! matrix for the parameters, and a list of two strings for the variable
+//! types.
+//!
+//! @param filename The name of the file to write.
+inline void
+Bicop::to_xml(const std::string& filename) const
+{
+  boost::property_tree::write_xml(filename, to_ptree());
 }
 
 //! @brief Evaluates the copula density.

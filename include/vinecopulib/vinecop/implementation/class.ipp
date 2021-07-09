@@ -131,7 +131,7 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
   rvine_structure_ = RVineStructure(input.get_child("structure"), check);
   d_ = static_cast<size_t>(rvine_structure_.get_dim());
 
-  boost::property_tree::ptree pcs_node = input.get_child("pair copulas");
+  boost::property_tree::ptree pcs_node = input.get_child("pair_copulas");
   for (size_t tree = 0; tree < d_ - 1; ++tree) {
     boost::property_tree::ptree tree_node;
     try {
@@ -161,7 +161,7 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
   }
 }
 
-//! @brief Instantiates from a JSON file.
+//! @brief Instantiates from a file.
 //!
 //! The input file contains 2 attributes : `"structure"` for the vine
 //! structure, which itself contains attributes `"array"` for the structure
@@ -172,11 +172,14 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
 //! See the corresponding method of `Bicop` objects for the encoding of
 //! pair-copulas.
 //!
-//! @param filename The name of the JSON file to read.
+//! @param filename The name of the file to read.
+//! @param filetype The type of the file (either `"json"` or `"xml"`).
 //! @param check Whether to check if the `"structure"` node of the input
 //! represents a valid R-vine structure.
-inline Vinecop::Vinecop(const std::string& filename, const bool check)
-  : Vinecop(tools_serialization::json_to_ptree(filename), check)
+inline Vinecop::Vinecop(const std::string& filename,
+                        const std::string& filetype,
+                        const bool check)
+  : Vinecop(tools_serialization::file_to_ptree(filename, filetype), check)
 {}
 
 //! @brief Converts the copula into a boost::property_tree::ptree object.
@@ -204,7 +207,7 @@ Vinecop::to_ptree() const
   }
 
   boost::property_tree::ptree output;
-  output.add_child("pair copulas", pair_copulas);
+  output.add_child("pair_copulas", pair_copulas);
   auto structure_node = rvine_structure_.to_ptree();
   output.add_child("structure", structure_node);
   output.add_child("var_types",
@@ -232,6 +235,24 @@ inline void
 Vinecop::to_json(const std::string& filename) const
 {
   boost::property_tree::write_json(filename, this->to_ptree());
+}
+
+//! @brief Writes the copula object into an XML file.
+//!
+//! The output file contains 2 attributes : `"structure"` for the vine
+//! structure, which itself contains attributes `"array"` for the structure
+//! triangular array and `"order"` for the order vector, and `"pair copulas"`.
+//! `"pair copulas"` contains a list of attributes for the trees
+//! (`"tree1"`, `"tree2"`, etc), each containing
+//! a list of attributes for the edges (`"pc1"`, `"pc2"`, etc).
+//! See the corresponding method of `Bicop` objects for the encoding of
+//! pair-copulas.
+//!
+//! @param filename The name of the XML file to write.
+inline void
+Vinecop::to_xml(const std::string& filename) const
+{
+  boost::property_tree::write_xml(filename, this->to_ptree());
 }
 
 //! @brief Initializes object for storing pair copulas.
@@ -734,7 +755,7 @@ Vinecop::get_var_types() const
 
 //! @brief Evaluates the copula density.
 //!
-//! The copula density is defined as joint density divided by marginal 
+//! The copula density is defined as joint density divided by marginal
 //! densities, irrespective of variable types.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of

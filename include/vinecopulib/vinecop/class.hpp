@@ -54,13 +54,16 @@ public:
     const FitControlsVinecop& controls = FitControlsVinecop());
 
   // Constructors from files/serialized objects
-  explicit Vinecop(const std::string& filename, const bool check = true);
+  explicit Vinecop(const std::string& filename,
+                   const std::string& filetype = "json",
+                   const bool check = true);
   explicit Vinecop(const boost::property_tree::ptree input,
                    const bool check = true);
 
   // Serialize
   boost::property_tree::ptree to_ptree() const;
   void to_json(const std::string& filename) const;
+  void to_xml(const std::string& filename) const;
 
   // Methods modifying structure and/or families and parameters
   void select(const Eigen::MatrixXd& data,

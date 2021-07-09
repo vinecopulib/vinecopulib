@@ -35,7 +35,8 @@ public:
 
   Bicop(const Bicop& other);
 
-  explicit Bicop(const std::string& filename);
+  explicit Bicop(const std::string& filename,
+                 const std::string& filetype = "json");
 
   explicit Bicop(const boost::property_tree::ptree input);
 
@@ -43,8 +44,8 @@ public:
 
   // Serialize
   boost::property_tree::ptree to_ptree() const;
-
   void to_json(const std::string& filename) const;
+  void to_xml(const std::string& filename) const;
 
   // Getters and setters
   BicopFamily get_family() const;

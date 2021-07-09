@@ -9,19 +9,20 @@
 #include "rscript.hpp"
 #include "gtest/gtest.h"
 #include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_serialization.hpp>
 #include <vinecopulib/vinecop/class.hpp>
 
 namespace test_serialization {
 using namespace vinecopulib;
 
-TEST(serialization, bicop_serialization)
+TEST(serialization, bicop_json_serialization)
 {
   auto pc = Bicop(BicopFamily::bb1);
-  pc.to_json("temp");
-  Bicop pc2("temp");
+  pc.to_json("temp.json");
+  Bicop pc2("temp.json", "json");
 
   // Remove temp file
-  std::string cmd = rm + "temp";
+  std::string cmd = rm + "temp.json";
   int sys_exit_code = system(cmd.c_str());
   if (sys_exit_code != 0) {
     throw std::runtime_error("error in system call");
@@ -33,14 +34,31 @@ TEST(serialization, bicop_serialization)
   ASSERT_TRUE(pc.get_parameters().isApprox(pc2.get_parameters(), 1e-4));
 }
 
-TEST(serialization, vinecop_serialization)
+TEST(serialization, bicop_xml_serialization)
+{
+  auto pc = Bicop(BicopFamily::bb1);
+  pc.to_xml("temp.xml");
+  Bicop pc2("temp.xml", "xml");
+
+  // Remove temp file
+  std::string cmd = rm + "temp.xml";
+  int sys_exit_code = system(cmd.c_str());
+  if (sys_exit_code != 0) {
+    throw std::runtime_error("error in system call");
+  }
+
+  EXPECT_EQ(pc.get_rotation(), pc2.get_rotation());
+  EXPECT_EQ(pc.get_family_name(), pc2.get_family_name());
+  EXPECT_EQ(pc.get_var_types(), pc2.get_var_types());
+  ASSERT_TRUE(pc.get_parameters().isApprox(pc2.get_parameters(), 1e-4));
+}
+
+TEST(serialization, vinecop_json_serialization)
 {
 
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
-  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1,
-  5,
-    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0,
-    0;
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
 
   // create vine with 7 variables, 2-truncated
   size_t d = 7;
@@ -54,13 +72,50 @@ TEST(serialization, vinecop_serialization)
   auto vc = Vinecop(mat, pc_store);
 
   // serialize
-  vc.to_json("temp");
+  vc.to_json("temp.json");
 
   // unserialize
-  auto vc2 = Vinecop("temp");
+  auto vc2 = Vinecop("temp.json", "json");
 
   // Remove temp file
-  std::string cmd = rm + "temp";
+  std::string cmd = rm + "temp.json";
+  int sys_exit_code = system(cmd.c_str());
+  if (sys_exit_code != 0) {
+    throw std::runtime_error("error in system call");
+  }
+
+  EXPECT_EQ(vc.get_all_rotations(), vc2.get_all_rotations());
+  EXPECT_EQ(vc.get_all_families(), vc2.get_all_families());
+  EXPECT_EQ(vc.get_var_types(), vc2.get_var_types());
+  EXPECT_EQ(vc.get_matrix(), vc2.get_matrix());
+}
+
+TEST(serialization, vinecop_xml_serialization)
+{
+
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
+
+  // create vine with 7 variables, 2-truncated
+  size_t d = 7;
+  auto pc_store = Vinecop::make_pair_copula_store(d, 5);
+  for (auto& tree : pc_store) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::bb1, 90);
+    }
+  }
+
+  auto vc = Vinecop(mat, pc_store);
+
+  // serialize
+  vc.to_xml("temp.xml");
+
+  // unserialize
+  auto vc2 = Vinecop("temp.xml", "xml");
+
+  // Remove temp file
+  std::string cmd = rm + "temp.xml";
   int sys_exit_code = system(cmd.c_str());
   if (sys_exit_code != 0) {
     throw std::runtime_error("error in system call");

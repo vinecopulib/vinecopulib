@@ -152,17 +152,20 @@ inline RVineStructure::RVineStructure(const boost::property_tree::ptree input,
       check)
 {}
 
-//! @brief Instantiates an RVineStructure from a JSON file.
+//! @brief Instantiates an RVineStructure from a file.
 //!
 //! The file needs to contain two values: `"array"` for the structure
 //! triangular array and `"order"` for the order vector.
 //!
-//! @param filename The name of the JSON file to read.
+//! @param filename The name of the file to read.
+//! @param filetype The type of the file (either `"json"` or `"xml"`).
 //! @param check Whether to check if the input represents
 //!      a valid R-vine matrix.
 inline RVineStructure::RVineStructure(const std::string& filename,
+                                      const std::string& filetype,
                                       const bool check)
-  : RVineStructure(tools_serialization::json_to_ptree(filename), check)
+  : RVineStructure(tools_serialization::file_to_ptree(filename, filetype),
+                   check)
 {}
 
 //! @brief Converts the structure into a boost::property_tree::ptree object.
@@ -194,6 +197,18 @@ inline void
 RVineStructure::to_json(const std::string& filename) const
 {
   boost::property_tree::write_json(filename, this->to_ptree());
+}
+
+//! @brief Write the structure into a XML file.
+//!
+//! The written file contains two values: `"array"` for the structure
+//! triangular array and `"order"` for the order vector.
+//!
+//! @param filename The name of the file to write.
+inline void
+RVineStructure::to_xml(const std::string& filename) const
+{
+  boost::property_tree::write_xml(filename, this->to_ptree());
 }
 
 //! Gets the dimension of the vine.
