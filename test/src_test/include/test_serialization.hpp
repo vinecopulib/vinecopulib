@@ -37,8 +37,10 @@ TEST(serialization, vinecop_serialization)
 {
 
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
-  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
-    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1,
+  5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0,
+    0;
 
   // create vine with 7 variables, 2-truncated
   size_t d = 7;
@@ -67,5 +69,6 @@ TEST(serialization, vinecop_serialization)
   EXPECT_EQ(vc.get_all_rotations(), vc2.get_all_rotations());
   EXPECT_EQ(vc.get_all_families(), vc2.get_all_families());
   EXPECT_EQ(vc.get_var_types(), vc2.get_var_types());
+  EXPECT_EQ(vc.get_matrix(), vc2.get_matrix());
 }
 }

@@ -33,7 +33,7 @@ matrix_to_ptree(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix)
     for (size_t j = 0; j < rows; j++) {
       boost::property_tree::ptree cell;
       cell.put_value(matrix(j, i));
-      col.push_back(std::make_pair("", cell));
+      col.push_back(boost::property_tree::ptree::value_type("", cell));
     }
     output.push_back(std::make_pair("", col));
   }
@@ -57,7 +57,7 @@ triangular_array_to_ptree(TriangularArray<T> array)
     for (size_t j = 0; j < d - 1 - i; j++) {
       boost::property_tree::ptree cell;
       cell.put_value(array(i, j));
-      row.push_back(std::make_pair("", cell));
+      row.push_back(boost::property_tree::ptree::value_type("", cell));
     }
     output.push_back(std::make_pair("", row));
   }
@@ -77,7 +77,7 @@ vector_to_ptree(std::vector<T> vec)
   for (size_t i = 0; i < vec.size(); i++) {
     boost::property_tree::ptree cell;
     cell.put_value(vec[i]);
-    output.push_back(std::make_pair("", cell));
+    output.push_back(boost::property_tree::ptree::value_type("", cell));
   }
 
   return output;
