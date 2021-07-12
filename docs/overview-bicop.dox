@@ -193,7 +193,7 @@ auto bic  = bicop.bic(sim_data);
 
 
 Bivariate copula models can also be written to and constructed from JSON files
-and `nlohmann::json` objects:
+and [`nlohmann::json` objects](https://github.com/nlohmann/json):
 
 ```
 // Gauss copula with parameter 0.5

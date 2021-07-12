@@ -210,7 +210,7 @@ auto bic = model.bic(data)
 ```
 
 Vine copula models can also be written to and constructed from JSON files
-and `nlohmann::json` objects:
+and [`nlohmann::json` objects](https://github.com/nlohmann/json):
 
 ```
 // 5-dimensional vine copula
