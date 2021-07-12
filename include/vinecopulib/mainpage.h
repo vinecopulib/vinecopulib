@@ -31,7 +31,7 @@ Advantages over VineCopula are
 
 @section Status
 
-Version [0.5.6](https://github.com/vinecopulib/vinecopulib/releases) was
+Version [0.6.0](https://github.com/vinecopulib/vinecopulib/releases) was
 released on July 12, 2021. While we did our best to
 design a user-friendly API, the library is still under active development and
 changes are to be expected. We are also working on interfaces for

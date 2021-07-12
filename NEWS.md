@@ -1,4 +1,4 @@
-## vinecopulib 0.5.6 (July 12, 2021)
+## vinecopulib 0.6.0 (July 12, 2021)
 
 ### BREAKING API CHANGES
 
