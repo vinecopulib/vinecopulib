@@ -17,8 +17,9 @@ using namespace vinecopulib;
 
 TEST(serialization, bicop_serialization)
 {
+  auto pc = Bicop(BicopFamily::bb1);
   auto u = pc.simulate(100);
-  pc = Bicop(u, FitControlsBicop({BicopFamily::tll}));
+  pc = Bicop(u, FitControlsBicop({ BicopFamily::tll }));
   pc.to_file(std::string("temp"));
   Bicop pc2(std::string("temp"));
 
