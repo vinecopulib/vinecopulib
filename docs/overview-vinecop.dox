@@ -220,18 +220,17 @@ Vinecop vinecop(5);
 nlohmann::json vinecop_json = vinecop.to_json();
 
 // Write into a JSON file
-std::string filename = "myfile.json"
-std::ofstream file(filename);
+std::ofstream file(std::string("myfile.json"));
 file << vinecop_json << std::endl;
 
 // Equivalently
 vinecop.to_file(myfile);
 
-// Then a new Bicop can be constructed from the nlohmann::json object
-Vinecop vinecop2(filename);
+// Then a new Vine can be constructed from the nlohmann::json object
+Vinecop vinecop2(vinecop_json);
 
 // Or from the JSON file
-Vinecop vinecop2(filename);
+Vinecop vinecop2(std::string("myfile.json"));
 ```
 
 */

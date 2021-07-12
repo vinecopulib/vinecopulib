@@ -27,8 +27,6 @@ matrix_to_json(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matrix)
 
   nlohmann::json output;
   output["shape"] = { matrix.rows(), matrix.cols() };
-  // std::vector<double> v(matrix.data(), matrix.data() + matrix.size());
-  // json_mat["data"] = v;
   nlohmann::json json_data;
   auto it = matrix.data();
   auto last = matrix.data() + matrix.size();
@@ -134,7 +132,7 @@ file_to_json(const std::string& filename)
 }
 
 inline void
-json_to_file(const std::string& filename, nlohmann::json json)
+json_to_file(const std::string& filename, const nlohmann::json& json)
 {
   std::ofstream file(filename);
   file << json << std::endl;

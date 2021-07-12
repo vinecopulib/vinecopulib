@@ -208,13 +208,13 @@ std::ofstream file(myfile);
 file << bicop_json << std::endl;
 
 // Equivalently
-bicop.to_file(filename);
+bicop.to_file(std::string("myfile.json"));
 
 // Then a new Bicop can be constructed from the nlohmann::json object
 Bicop bicop2(bicop_json);
 
 // Or from the JSON file
-Bicop bicop3(filename);
+Bicop bicop3(std::string("myfile.json"));
 ```
 
 */

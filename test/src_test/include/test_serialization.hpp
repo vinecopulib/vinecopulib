@@ -18,9 +18,8 @@ using namespace vinecopulib;
 TEST(serialization, bicop_serialization)
 {
   auto pc = Bicop(BicopFamily::bb1);
-  std::string temp = "temp";
-  pc.to_file(temp);
-  Bicop pc2(temp);
+  pc.to_file(std::string("temp"));
+  Bicop pc2(std::string("temp"));
 
   // Remove temp file
   std::string cmd = rm + "temp";
@@ -55,11 +54,10 @@ TEST(serialization, vinecop_serialization)
   vc.truncate(3);
 
   // serialize
-  std::string temp = "temp";
-  vc.to_file(temp);
+  vc.to_file(std::string("temp"));
 
   // unserialize
-  auto vc2 = Vinecop(temp);
+  auto vc2 = Vinecop(std::string("temp"));
 
   // Remove temp file
   std::string cmd = rm + "temp";
