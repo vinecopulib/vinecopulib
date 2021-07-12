@@ -1389,7 +1389,7 @@ Vinecop::str() const
       if (t > 0) {
         str << " | ";
         for (size_t cv = t - 1; cv > 0; --cv) {
-          str << arr(cv, e) - 1 << ",";
+          str << arr(cv, e) << ",";
         }
         str << arr(0, e);
       }
