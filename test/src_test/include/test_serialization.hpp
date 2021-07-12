@@ -9,6 +9,7 @@
 #include "rscript.hpp"
 #include "gtest/gtest.h"
 #include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_serialization.hpp>
 #include <vinecopulib/vinecop/class.hpp>
 
 namespace test_serialization {
@@ -17,8 +18,9 @@ using namespace vinecopulib;
 TEST(serialization, bicop_serialization)
 {
   auto pc = Bicop(BicopFamily::bb1);
-  pc.to_json("temp");
-  Bicop pc2("temp");
+  std::string temp = "temp";
+  pc.to_file(temp);
+  Bicop pc2(temp);
 
   // Remove temp file
   std::string cmd = rm + "temp";
@@ -50,12 +52,14 @@ TEST(serialization, vinecop_serialization)
   }
 
   auto vc = Vinecop(mat, pc_store);
+  vc.truncate(3);
 
   // serialize
-  vc.to_json("temp");
+  std::string temp = "temp";
+  vc.to_file(temp);
 
   // unserialize
-  auto vc2 = Vinecop("temp");
+  auto vc2 = Vinecop(temp);
 
   // Remove temp file
   std::string cmd = rm + "temp";
@@ -67,5 +71,6 @@ TEST(serialization, vinecop_serialization)
   EXPECT_EQ(vc.get_all_rotations(), vc2.get_all_rotations());
   EXPECT_EQ(vc.get_all_families(), vc2.get_all_families());
   EXPECT_EQ(vc.get_var_types(), vc2.get_var_types());
+  EXPECT_EQ(vc.get_matrix(), vc2.get_matrix());
 }
 }

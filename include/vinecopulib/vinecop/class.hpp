@@ -55,12 +55,11 @@ public:
 
   // Constructors from files/serialized objects
   explicit Vinecop(const std::string& filename, const bool check = true);
-  explicit Vinecop(const boost::property_tree::ptree input,
-                   const bool check = true);
+  explicit Vinecop(const nlohmann::json& input, const bool check = true);
 
   // Serialize
-  boost::property_tree::ptree to_ptree() const;
-  void to_json(const std::string& filename) const;
+  nlohmann::json to_json() const;
+  void to_file(const std::string& filename) const;
 
   // Methods modifying structure and/or families and parameters
   void select(const Eigen::MatrixXd& data,
