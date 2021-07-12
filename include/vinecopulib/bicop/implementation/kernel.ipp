@@ -115,9 +115,18 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
 }
 
 inline double
-KernelBicop::get_npars()
+KernelBicop::get_npars() const
 {
   return npars_;
+}
+
+inline void
+KernelBicop::set_npars(const double& npars)
+{
+  if (npars < 0) {
+    throw std::runtime_error("npars must be positive.");
+  }
+  npars_ = npars;
 }
 
 inline Eigen::MatrixXd

@@ -46,7 +46,7 @@ ParBicop::flip()
 
 // calculate number of parameters
 inline double
-ParBicop::get_npars()
+ParBicop::get_npars() const
 {
   // indepence copula has no parameters
   if (family_ == BicopFamily::indep) {
@@ -54,6 +54,12 @@ ParBicop::get_npars()
   }
   // otherwise, return length of parameter vector
   return static_cast<double>(parameters_.size());
+}
+
+inline void
+ParBicop::set_npars(const double&)
+{
+  // does nothing
 }
 
 // fit

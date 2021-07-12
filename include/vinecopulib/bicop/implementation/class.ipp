@@ -67,6 +67,7 @@ inline Bicop::Bicop(const Bicop& other)
 {
   nobs_ = other.nobs_;
   bicop_->set_loglik(other.bicop_->get_loglik());
+  bicop_->set_npars(other.bicop_->get_npars());
 }
 
 //! @brief Copy assignment operator (deep copy)
@@ -97,6 +98,7 @@ inline Bicop::Bicop(const nlohmann::json& input)
       tools_serialization::json_to_vector<std::string>(input["var_types"]);
     nobs_ = static_cast<size_t>(input["nobs_"]);
     bicop_->set_loglik(input["loglik"]);
+    bicop_->set_npars(input["npars"]);
   } catch (...) {
   }
 }
@@ -127,13 +129,13 @@ inline nlohmann::json
 Bicop::to_json() const
 {
   nlohmann::json output;
-
   output["family"] = get_family_name();
   output["rotation"] = rotation_;
   output["parameters"] = tools_serialization::matrix_to_json(get_parameters());
   output["var_types"] = tools_serialization::vector_to_json(var_types_);
   output["nobs_"] = nobs_;
   output["loglik"] = bicop_->get_loglik();
+  output["npars"] = bicop_->get_npars();
 
   return output;
 }

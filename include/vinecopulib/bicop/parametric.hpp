@@ -39,7 +39,9 @@ protected:
            double,
            const Eigen::VectorXd& weights);
 
-  double get_npars();
+  double get_npars() const;
+
+  void set_npars(const double& npars);
 
   virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
 

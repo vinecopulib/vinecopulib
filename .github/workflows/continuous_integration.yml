@@ -51,6 +51,7 @@ jobs:
             sudo apt-get autoremove
           elif [ "${{ matrix.cfg.os }}" == "macos-latest" ]; then
             rm '/usr/local/bin/gfortran'
+            rm '/usr/local/bin/2to3'
             brew update
             brew install lcov eigen gsl doxygen graphviz boost
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then

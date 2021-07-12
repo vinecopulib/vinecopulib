@@ -18,6 +18,8 @@ using namespace vinecopulib;
 TEST(serialization, bicop_serialization)
 {
   auto pc = Bicop(BicopFamily::bb1);
+  auto u = pc.simulate(100);
+  pc = Bicop(u, FitControlsBicop({ BicopFamily::tll }));
   pc.to_file(std::string("temp"));
   Bicop pc2(std::string("temp"));
 
@@ -31,6 +33,7 @@ TEST(serialization, bicop_serialization)
   EXPECT_EQ(pc.get_rotation(), pc2.get_rotation());
   EXPECT_EQ(pc.get_family_name(), pc2.get_family_name());
   EXPECT_EQ(pc.get_var_types(), pc2.get_var_types());
+  EXPECT_EQ(pc.get_npars(), pc2.get_npars());
   ASSERT_TRUE(pc.get_parameters().isApprox(pc2.get_parameters(), 1e-4));
 }
 
