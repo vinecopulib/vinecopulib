@@ -266,15 +266,17 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! *Selecting and estimating regular vine copulae and application to
 //! financial returns.* Computational Statistics & Data Analysis, 59 (1),
 //! 52-69.
+//! The dependence measure used to select trees (default: Kendall's tau) is
+//! corrected for ties (see the wdm library).
 //!
-//! When at least one variable is discrete, two types of "observations"
-//! are required: the first \f$ n \times d \f$ block contains realizations of
-//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
-//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
-//! left-sided limit of the cdf. For continuous variables the left limit and the
-//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
-//! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
-//! be omitted.
+//! When at least one variable is discrete, two types of
+//! "observations" are required: the first \f$ n \times d \f$ block contains
+//! realizations of \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block
+//! contains realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus
+//! indicates a left-sided limit of the cdf. For continuous variables the left
+//! limit and the cdf itself coincide. For, e.g., an integer-valued variable, it
+//! holds \f$ F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second
+//! block can be omitted.
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
