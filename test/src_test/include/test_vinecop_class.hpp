@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <string>
 #include "vinecop_test.hpp"
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
@@ -48,6 +49,25 @@ TEST_F(VinecopTest, copy)
   pair_copulas[0][0].set_parameters(pc.get_parameters().array() + 1);
   vinecop2.set_all_pair_copulas(pair_copulas);
   EXPECT_EQ(vinecop1.get_parameters(0, 0), vinecop1.get_parameters(0, 1));
+}
+
+
+TEST_F(VinecopTest, print)
+{
+  auto cvine = CVineStructure(std::vector<size_t>({5, 4, 3, 2, 1}));
+  auto pcs = Vinecop::make_pair_copula_store(5, 4);
+  auto vc = Vinecop(cvine, pcs);
+
+  // check if last line of output is correct
+  std::istringstream input;
+  input.str(vc.str());
+  std::string last_line;
+  for (std::string line; std::getline(input, line);)
+    last_line = line;
+  EXPECT_EQ(last_line, "5,4 | 3,2,1 <-> Independence");
+
+  // just shouldn't segfault
+  Vinecop(cvine).str(); 
 }
 
 TEST_F(VinecopTest, getters_are_correct)

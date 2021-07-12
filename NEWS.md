@@ -18,6 +18,8 @@
 
 - fix number of parameters for TLL (#530)
 
+- fix bugs in `Vinecop` print methods (pyvinecopulib/#78)
+
 ## vinecopulib 0.5.5 (November 23, 2020)
 
 ### BUG FIXES
