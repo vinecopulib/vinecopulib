@@ -1,8 +1,16 @@
 ## vinecopulib 0.5.6 (July 12, 2021)
 
-### BUG FIXES
+### BREAKING API CHANGES
 
-- refactored serialization using `nlohmann::json` instead of `boost::property_tree` (#539)
+- refactored serialization using `nlohmann::json` instead of `boost::property_tree` (#539):
+
+  - `to_json` and `to_ptree` methods of both `Bicop` and `Vinecop` objects 
+    are respectively renamed as `to_file` and `to_json`
+
+  - internal structure of the serialized objects is changed (i.e., not 
+    possible to read the old files with the new functions) 
+
+### BUG FIXES
 
 - use `num_threads` in recursive calls to the inverse Rosenblatt (#535)
 
