@@ -397,7 +397,9 @@ RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
   }
 
   // need to convert to upper left triangular form (our notation)
-  auto rvm = RVineStructure(A.rowwise().reverse());
+  auto rvm =
+    RVineStructure(Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>(
+      A.rowwise().reverse()));
 
   // sampling the variable order randomly the first column of U has not been
   // used to construct B, hence it is stochastically independent of B. Calling
