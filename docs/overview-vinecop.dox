@@ -210,26 +210,27 @@ auto bic = model.bic(data)
 ```
 
 Vine copula models can also be written to and constructed from JSON files
-and `boost::property_tree::ptree` objects:
+and `nlohmann::json` objects:
 
 ```
 // 5-dimensional vine copula
 Vinecop vinecop(5);
 
-// Save as a ptree object
-boost::property_tree::ptree vinecop_node = vinecop.to_ptree();
+// Save as a nlohmann::json object
+nlohmann::json vinecop_json = vinecop.to_json();
 
 // Write into a JSON file
-boost::property_tree::write_json("myfile.JSON", vinecop_node);
+std::ofstream file(std::string("myfile.json"));
+file << vinecop_json << std::endl;
 
 // Equivalently
-vinecop.to_json("myfile.JSON");
+vinecop.to_file(myfile);
 
-// Then a new Bicop can be constructed from the ptree object
-Vinecop vinecop2(vinecop_node);
+// Then a new Vine can be constructed from the nlohmann::json object
+Vinecop vinecop2(vinecop_json);
 
 // Or from the JSON file
-Vinecop vinecop2("myfile.JSON");
+Vinecop vinecop2(std::string("myfile.json"));
 ```
 
 */

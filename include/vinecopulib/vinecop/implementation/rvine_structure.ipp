@@ -137,18 +137,16 @@ inline RVineStructure::RVineStructure(
   }
 }
 
-//! @brief Instantiates from a boost::property_tree::ptree object.
-//! @param input The boost::property_tree::ptree object to convert from
-//! (see `to_ptree()` for the structure of the input).
+//! @brief Instantiates from a nlohmann::json object.
+//! @param input The nlohmann::json object to convert from
+//! (see `to_json()` for the structure of the input).
 //! @param check Whether to check if the input represents
 //!      a valid R-vine structure.
-inline RVineStructure::RVineStructure(const boost::property_tree::ptree input,
+inline RVineStructure::RVineStructure(const nlohmann::json& input,
                                       const bool check)
   : RVineStructure(
-      tools_serialization::ptree_to_vector<size_t>(input.get_child("order")),
-      tools_serialization::ptree_to_triangular_array<size_t>(
-        input.get_child("array")),
-      true,
+      tools_serialization::json_to_vector<size_t>(input["order"]),
+      tools_serialization::json_to_triangular_array<size_t>(input["array"]),
       check)
 {}
 
@@ -162,24 +160,24 @@ inline RVineStructure::RVineStructure(const boost::property_tree::ptree input,
 //!      a valid R-vine matrix.
 inline RVineStructure::RVineStructure(const std::string& filename,
                                       const bool check)
-  : RVineStructure(tools_serialization::json_to_ptree(filename.c_str()), check)
+  : RVineStructure(tools_serialization::file_to_json(filename), check)
 {}
 
-//! @brief Converts the structure into a boost::property_tree::ptree object.
+//! @brief Converts the structure into a nlohmann::json object.
 //!
-//! The `ptree` object contains two nodes: `"array"` for the structure
+//! The `nlohmann::json` object contains two nodes: `"array"` for the structure
 //! triangular array and `"order"` for the order vector.
 //!
-//! @return the boost::property_tree::ptree object containing the structure.
-inline boost::property_tree::ptree
-RVineStructure::to_ptree() const
+//! @return the nlohmann::json object containing the structure.
+inline nlohmann::json
+RVineStructure::to_json() const
 {
-  boost::property_tree::ptree output;
-  auto array_node =
-    tools_serialization::triangular_array_to_ptree(struct_array_);
-  output.add_child("array", array_node);
-  auto order_node = tools_serialization::vector_to_ptree(order_);
-  output.add_child("order", order_node);
+  nlohmann::json output;
+  auto array_json =
+    tools_serialization::triangular_array_to_json(struct_array_);
+  output["array"] = array_json;
+  auto order_json = tools_serialization::vector_to_json(order_);
+  output["order"] = order_json;
 
   return output;
 }
@@ -191,9 +189,9 @@ RVineStructure::to_ptree() const
 //!
 //! @param filename The name of the file to write.
 inline void
-RVineStructure::to_json(const std::string& filename) const
+RVineStructure::to_file(const std::string& filename) const
 {
-  boost::property_tree::write_json(filename.c_str(), this->to_ptree());
+  tools_serialization::json_to_file(filename, this->to_json());
 }
 
 //! Gets the dimension of the vine.
