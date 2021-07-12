@@ -1138,9 +1138,9 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
     size_t n_half = n / 2;
     size_t n_left = n - n_half;
     U_vine.block(0, 0, n_half, d) =
-      inverse_rosenblatt(u.block(0, 0, n_half, d));
+      inverse_rosenblatt(u.block(0, 0, n_half, d), num_threads);
     U_vine.block(n_half, 0, n_left, d) =
-      inverse_rosenblatt(u.block(n_half, 0, n_left, d));
+      inverse_rosenblatt(u.block(n_half, 0, n_left, d), num_threads);
     return U_vine;
   }
 
