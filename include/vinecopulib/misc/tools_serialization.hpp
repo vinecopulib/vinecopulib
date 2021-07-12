@@ -9,7 +9,7 @@
 #include <Eigen/Dense>
 #include <fstream>
 #include <vector>
-#include <vinecopulib/misc/tools_json.hpp>
+#include <vinecopulib/misc/nlohmann_json.hpp>
 #include <vinecopulib/misc/triangular_array.hpp>
 
 namespace vinecopulib {
@@ -22,7 +22,7 @@ namespace tools_serialization {
 //! @return the corresponding nlohmann::json.
 template<class T>
 inline nlohmann::json
-matrix_to_json(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix)
+matrix_to_json(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matrix)
 {
 
   nlohmann::json output;
@@ -46,7 +46,7 @@ matrix_to_json(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix)
 //! @return the corresponding nlohmann::json.
 template<class T>
 inline nlohmann::json
-triangular_array_to_json(TriangularArray<T> array)
+triangular_array_to_json(const TriangularArray<T>& array)
 {
   nlohmann::json output;
   size_t d = array.get_dim();
@@ -73,7 +73,7 @@ triangular_array_to_json(TriangularArray<T> array)
 //! @return the corresponding nlohmann::json.
 template<class T>
 inline nlohmann::json
-vector_to_json(std::vector<T> vec)
+vector_to_json(const std::vector<T>& vec)
 {
   nlohmann::json output = vec;
   return output;

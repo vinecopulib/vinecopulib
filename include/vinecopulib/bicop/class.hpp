@@ -7,7 +7,7 @@
 #pragma once
 
 #include <vinecopulib/bicop/fit_controls.hpp>
-#include <vinecopulib/misc/tools_json.hpp>
+#include <vinecopulib/misc/nlohmann_json.hpp>
 
 namespace vinecopulib {
 
