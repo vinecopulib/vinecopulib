@@ -5,3 +5,4 @@ engines:
    language: c++
 exclude_paths:
   - '**.md'
+  - 'include/vinecopulib/misc/nlohmann_json.hpp'

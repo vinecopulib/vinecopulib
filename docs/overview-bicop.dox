@@ -193,26 +193,28 @@ auto bic  = bicop.bic(sim_data);
 
 
 Bivariate copula models can also be written to and constructed from JSON files
-and `boost::property_tree::ptree` objects:
+and `nlohmann::json` objects:
 
 ```
 // Gauss copula with parameter 0.5
 Bicop bicop(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
 
-// Save as a ptree object
-boost::property_tree::ptree bicop_node = bicop.to_ptree();
+// Save as a nlohmann::json object
+nlohmann::json bicop_json = bicop.to_json();
 
 // Write into a JSON file
-boost::property_tree::write_json("myfile.JSON", bicop_node);
+std::string filename = "myfile.json"
+std::ofstream file(myfile);
+file << bicop_json << std::endl;
 
 // Equivalently
-bicop.to_json("myfile.JSON");
+bicop.to_file(std::string("myfile.json"));
 
-// Then a new Bicop can be constructed from the ptree object
-Bicop bicop2(bicop_node);
+// Then a new Bicop can be constructed from the nlohmann::json object
+Bicop bicop2(bicop_json);
 
 // Or from the JSON file
-Bicop bicop3("myfile.JSON");
+Bicop bicop3(std::string("myfile.json"));
 ```
 
 */
