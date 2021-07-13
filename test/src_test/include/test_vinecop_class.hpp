@@ -55,8 +55,7 @@ TEST_F(VinecopTest, copy)
 TEST_F(VinecopTest, print)
 {
   auto cvine = CVineStructure(std::vector<size_t>({5, 4, 3, 2, 1}));
-  auto pcs = Vinecop::make_pair_copula_store(5, 4);
-  auto vc = Vinecop(cvine, pcs);
+  auto vc = Vinecop(cvine);
 
   // check if last line of output is correct
   std::istringstream input;
@@ -502,5 +501,26 @@ TEST_F(VinecopTest, sparse_both_selection)
   Eigen::MatrixXd uu = u.col(0).matrix();
   fit = Vinecop(1);
   fit.select(uu, controls);
+}
+
+TEST_F(VinecopTest, partial_selection)
+{
+  u.conservativeResize(20, 7);
+  FitControlsVinecop controls(bicop_families::itau, "itau");
+  // controls.set_show_trace(true);
+  auto fixed = CVineStructure(std::vector<size_t>{ 5, 4, 7, 1, 3, 6, 2 });
+  fixed.truncate(1);
+  Vinecop fit(fixed);
+  fit.select(u, controls);
+
+  // a C-vine with root node 2 contains 6 edges with vertex 2.
+  auto rvm = fit.get_rvine_structure().get_matrix();
+  int count2 = 0;
+  for (int i = 0; i < 6; i++) {
+    //  diagonal element        base element
+    if ((rvm(6 - i, i) == 2) | (rvm(0, i) == 2))
+      count2++;
+  }
+  EXPECT_EQ(count2, 6);
 }
 }
