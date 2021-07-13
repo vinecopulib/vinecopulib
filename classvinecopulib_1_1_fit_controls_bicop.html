@@ -16,7 +16,7 @@
       <a href="index.html" id="m-navbar-brand" class="m-col-t-8 m-col-m-none m-left-m">vinecopulib <span class="m-thin">A C++ library for vine copulas</span></a>
       <div class="m-col-t-4 m-hide-m m-text-right m-nopadr">
         <a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
-          <path d="m6 0c-3.3144 0-6 2.6856-6 6 0 3.3144 2.6856 6 6 6 1.4858 0 2.8463-0.54083 3.8945-1.4355-0.0164 0.33797 0.14734 0.75854 0.5 1.1504l3.2227 3.7891c0.55185 0.6139 1.4517 0.66544 2.002 0.11524 0.55022-0.55022 0.49866-1.4501-0.11524-2.002l-3.7891-3.2246c-0.39184-0.35266-0.81242-0.51469-1.1504-0.5 0.89472-1.0482 1.4355-2.4088 1.4355-3.8945 0-3.3128-2.6856-5.998-6-5.998zm0 1.5625a4.4375 4.4375 0 0 1 4.4375 4.4375 4.4375 4.4375 0 0 1-4.4375 4.4375 4.4375 4.4375 0 0 1-4.4375-4.4375 4.4375 4.4375 0 0 1 4.4375-4.4375z"/>
+          <path id="m-doc-search-icon-path" d="m6 0c-3.31 0-6 2.69-6 6 0 3.31 2.69 6 6 6 1.49 0 2.85-0.541 3.89-1.44-0.0164 0.338 0.147 0.759 0.5 1.15l3.22 3.79c0.552 0.614 1.45 0.665 2 0.115 0.55-0.55 0.499-1.45-0.115-2l-3.79-3.22c-0.392-0.353-0.812-0.515-1.15-0.5 0.895-1.05 1.44-2.41 1.44-3.89 0-3.31-2.69-6-6-6zm0 1.56a4.44 4.44 0 0 1 4.44 4.44 4.44 4.44 0 0 1-4.44 4.44 4.44 4.44 0 0 1-4.44-4.44 4.44 4.44 0 0 1 4.44-4.44z"/>
         </svg></a>
         <a id="m-navbar-show" href="#navigation" title="Show navigation"></a>
         <a id="m-navbar-hide" href="#" title="Hide navigation"></a>
@@ -56,7 +56,7 @@
             <li><a href="license.html">License</a></li>
             <li><a href="https://github.com/vinecopulib/vinecopulib">GitHub</a></li>
             <li class="m-show-m"><a href="#search" class="m-doc-search-icon" title="Search" onclick="return showSearch()"><svg style="height: 0.9rem;" viewBox="0 0 16 16">
-              <path d="m6 0c-3.3144 0-6 2.6856-6 6 0 3.3144 2.6856 6 6 6 1.4858 0 2.8463-0.54083 3.8945-1.4355-0.0164 0.33797 0.14734 0.75854 0.5 1.1504l3.2227 3.7891c0.55185 0.6139 1.4517 0.66544 2.002 0.11524 0.55022-0.55022 0.49866-1.4501-0.11524-2.002l-3.7891-3.2246c-0.39184-0.35266-0.81242-0.51469-1.1504-0.5 0.89472-1.0482 1.4355-2.4088 1.4355-3.8945 0-3.3128-2.6856-5.998-6-5.998zm0 1.5625a4.4375 4.4375 0 0 1 4.4375 4.4375 4.4375 4.4375 0 0 1-4.4375 4.4375 4.4375 4.4375 0 0 1-4.4375-4.4375 4.4375 4.4375 0 0 1 4.4375-4.4375z"/>
+              <use href="#m-doc-search-icon-path" />
             </svg></a></li>
           </ol>
         </div>
@@ -124,8 +124,8 @@
         <section id="pub-methods">
           <h2><a href="#pub-methods">Public functions</a></h2>
           <dl class="m-doc">
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#acd490d8309d7a507aaec5ee411fbebb2" class="m-doc-self" name="acd490d8309d7a507aaec5ee411fbebb2">str</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
+            <dt id="acd490d8309d7a507aaec5ee411fbebb2">
+              <span class="m-doc-wrap-bumper">auto <a href="#acd490d8309d7a507aaec5ee411fbebb2" class="m-doc-self">str</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
             </dt>
             <dd>Summarizes the controls into a string (can be used for printing).</dd>
           </dl>
@@ -133,72 +133,72 @@
         <section id="getters-and-setters">
           <h2><a href="#getters-and-setters">Getters and setters.</a></h2>
           <dl class="m-doc">
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#aa3958aa4fe5d2900a14db83224d256b2" class="m-doc-self" name="aa3958aa4fe5d2900a14db83224d256b2">get_family_set</a>(</span><span class="m-doc-wrap">) const -&gt; std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt;</span>
+            <dt id="aa3958aa4fe5d2900a14db83224d256b2">
+              <span class="m-doc-wrap-bumper">auto <a href="#aa3958aa4fe5d2900a14db83224d256b2" class="m-doc-self">get_family_set</a>(</span><span class="m-doc-wrap">) const -&gt; std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt;</span>
             </dt>
             <dd>returns the family set.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a5b10436f0fb84d8a3276a514c05c8442" class="m-doc-self" name="a5b10436f0fb84d8a3276a514c05c8442">get_parametric_method</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
+            <dt id="a5b10436f0fb84d8a3276a514c05c8442">
+              <span class="m-doc-wrap-bumper">auto <a href="#a5b10436f0fb84d8a3276a514c05c8442" class="m-doc-self">get_parametric_method</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
             </dt>
             <dd>returns the parametric method.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#af1ff49b3f08edd0ae2986b10956d2067" class="m-doc-self" name="af1ff49b3f08edd0ae2986b10956d2067">get_nonparametric_method</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
+            <dt id="af1ff49b3f08edd0ae2986b10956d2067">
+              <span class="m-doc-wrap-bumper">auto <a href="#af1ff49b3f08edd0ae2986b10956d2067" class="m-doc-self">get_nonparametric_method</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
             </dt>
             <dd>returns the nonparametric method.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#adb5099d2fad28099872abf75b4f6c7a1" class="m-doc-self" name="adb5099d2fad28099872abf75b4f6c7a1">get_nonparametric_mult</a>(</span><span class="m-doc-wrap">) const -&gt; double</span>
+            <dt id="adb5099d2fad28099872abf75b4f6c7a1">
+              <span class="m-doc-wrap-bumper">auto <a href="#adb5099d2fad28099872abf75b4f6c7a1" class="m-doc-self">get_nonparametric_mult</a>(</span><span class="m-doc-wrap">) const -&gt; double</span>
             </dt>
             <dd>returns the nonparametric bandwidth multiplier.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a6874e7226c05af5b3a87d8bd49073ba0" class="m-doc-self" name="a6874e7226c05af5b3a87d8bd49073ba0">get_weights</a>(</span><span class="m-doc-wrap">) const -&gt; Eigen::VectorXd</span>
+            <dt id="a6874e7226c05af5b3a87d8bd49073ba0">
+              <span class="m-doc-wrap-bumper">auto <a href="#a6874e7226c05af5b3a87d8bd49073ba0" class="m-doc-self">get_weights</a>(</span><span class="m-doc-wrap">) const -&gt; Eigen::VectorXd</span>
             </dt>
             <dd>returns the observation weights.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#acf45a95368ae735ab70a522b53c0133d" class="m-doc-self" name="acf45a95368ae735ab70a522b53c0133d">get_preselect_families</a>(</span><span class="m-doc-wrap">) const -&gt; bool</span>
+            <dt id="acf45a95368ae735ab70a522b53c0133d">
+              <span class="m-doc-wrap-bumper">auto <a href="#acf45a95368ae735ab70a522b53c0133d" class="m-doc-self">get_preselect_families</a>(</span><span class="m-doc-wrap">) const -&gt; bool</span>
             </dt>
             <dd>returns whether to preselect families.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a2c994c101ca1cb8225acd1de233b8f80" class="m-doc-self" name="a2c994c101ca1cb8225acd1de233b8f80">get_psi0</a>(</span><span class="m-doc-wrap">) const -&gt; double</span>
+            <dt id="a2c994c101ca1cb8225acd1de233b8f80">
+              <span class="m-doc-wrap-bumper">auto <a href="#a2c994c101ca1cb8225acd1de233b8f80" class="m-doc-self">get_psi0</a>(</span><span class="m-doc-wrap">) const -&gt; double</span>
             </dt>
             <dd>returns the baseline probability for mBIC selection.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a530b8a58404b7fba0a02e29030c32bee" class="m-doc-self" name="a530b8a58404b7fba0a02e29030c32bee">get_num_threads</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
+            <dt id="a530b8a58404b7fba0a02e29030c32bee">
+              <span class="m-doc-wrap-bumper">auto <a href="#a530b8a58404b7fba0a02e29030c32bee" class="m-doc-self">get_num_threads</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
             </dt>
             <dd>returns the number of threads.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">void <a href="#a39d4e24261da184abf3fa3dd11d1f23b" class="m-doc-self" name="a39d4e24261da184abf3fa3dd11d1f23b">set_family_set</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set)</span>
+            <dt id="a39d4e24261da184abf3fa3dd11d1f23b">
+              <span class="m-doc-wrap-bumper">void <a href="#a39d4e24261da184abf3fa3dd11d1f23b" class="m-doc-self">set_family_set</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set)</span>
             </dt>
             <dd>Sets the family set.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">void <a href="#a722bef09427577ba2f04c91d7e4dba90" class="m-doc-self" name="a722bef09427577ba2f04c91d7e4dba90">set_parametric_method</a>(</span><span class="m-doc-wrap">std::string parametric_method)</span>
+            <dt id="a722bef09427577ba2f04c91d7e4dba90">
+              <span class="m-doc-wrap-bumper">void <a href="#a722bef09427577ba2f04c91d7e4dba90" class="m-doc-self">set_parametric_method</a>(</span><span class="m-doc-wrap">std::string parametric_method)</span>
             </dt>
             <dd>Sets the parametric method.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">void <a href="#a5b785f0e3384d224025e754d2f212881" class="m-doc-self" name="a5b785f0e3384d224025e754d2f212881">set_nonparametric_method</a>(</span><span class="m-doc-wrap">std::string nonparametric_method)</span>
+            <dt id="a5b785f0e3384d224025e754d2f212881">
+              <span class="m-doc-wrap-bumper">void <a href="#a5b785f0e3384d224025e754d2f212881" class="m-doc-self">set_nonparametric_method</a>(</span><span class="m-doc-wrap">std::string nonparametric_method)</span>
             </dt>
             <dd>Sets the nonparmetric method.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">void <a href="#a69fa1ff241282cc5a968ff64f0029ae0" class="m-doc-self" name="a69fa1ff241282cc5a968ff64f0029ae0">set_nonparametric_mult</a>(</span><span class="m-doc-wrap">double nonparametric_mult)</span>
+            <dt id="a69fa1ff241282cc5a968ff64f0029ae0">
+              <span class="m-doc-wrap-bumper">void <a href="#a69fa1ff241282cc5a968ff64f0029ae0" class="m-doc-self">set_nonparametric_mult</a>(</span><span class="m-doc-wrap">double nonparametric_mult)</span>
             </dt>
             <dd>Sets the nonparametric multiplier.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">void <a href="#a52c187e5fcf047825ced777d73483df1" class="m-doc-self" name="a52c187e5fcf047825ced777d73483df1">set_selection_criterion</a>(</span><span class="m-doc-wrap">std::string selection_criterion)</span>
+            <dt id="a52c187e5fcf047825ced777d73483df1">
+              <span class="m-doc-wrap-bumper">void <a href="#a52c187e5fcf047825ced777d73483df1" class="m-doc-self">set_selection_criterion</a>(</span><span class="m-doc-wrap">std::string selection_criterion)</span>
             </dt>
             <dd>Sets the selection criterion.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">void <a href="#abe41e1cf7edfbd0a4dd9031c7a75ea14" class="m-doc-self" name="abe41e1cf7edfbd0a4dd9031c7a75ea14">set_weights</a>(</span><span class="m-doc-wrap">const Eigen::VectorXd&amp; weights)</span>
+            <dt id="abe41e1cf7edfbd0a4dd9031c7a75ea14">
+              <span class="m-doc-wrap-bumper">void <a href="#abe41e1cf7edfbd0a4dd9031c7a75ea14" class="m-doc-self">set_weights</a>(</span><span class="m-doc-wrap">const Eigen::VectorXd&amp; weights)</span>
             </dt>
             <dd>Sets the observation weights.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">void <a href="#a7850b5ba8acaf78109d00789d93cc876" class="m-doc-self" name="a7850b5ba8acaf78109d00789d93cc876">set_preselect_families</a>(</span><span class="m-doc-wrap">bool preselect_families)</span>
+            <dt id="a7850b5ba8acaf78109d00789d93cc876">
+              <span class="m-doc-wrap-bumper">void <a href="#a7850b5ba8acaf78109d00789d93cc876" class="m-doc-self">set_preselect_families</a>(</span><span class="m-doc-wrap">bool preselect_families)</span>
             </dt>
             <dd>Sets whether to preselect the families.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">void <a href="#a3421f63a8ec0eed23c7392d16770658e" class="m-doc-self" name="a3421f63a8ec0eed23c7392d16770658e">set_psi0</a>(</span><span class="m-doc-wrap">double psi0)</span>
+            <dt id="a3421f63a8ec0eed23c7392d16770658e">
+              <span class="m-doc-wrap-bumper">void <a href="#a3421f63a8ec0eed23c7392d16770658e" class="m-doc-self">set_psi0</a>(</span><span class="m-doc-wrap">double psi0)</span>
             </dt>
             <dd>Sets the prior probability for mBIC.</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">void <a href="#adc395c1123ad4d9ad9cc795d9c34c9a8" class="m-doc-self" name="adc395c1123ad4d9ad9cc795d9c34c9a8">set_num_threads</a>(</span><span class="m-doc-wrap">size_t num_threads)</span>
+            <dt id="adc395c1123ad4d9ad9cc795d9c34c9a8">
+              <span class="m-doc-wrap-bumper">void <a href="#adc395c1123ad4d9ad9cc795d9c34c9a8" class="m-doc-self">set_num_threads</a>(</span><span class="m-doc-wrap">size_t num_threads)</span>
             </dt>
             <dd>Sets the number of threads.</dd>
           </dl>
@@ -332,7 +332,6 @@
             copy a link to the result using <span class="m-label m-dim">⌘</span>
             <span class="m-label m-dim">L</span> while <span class="m-label m-dim">⌘</span>
             <span class="m-label m-dim">M</span> produces a Markdown link.</p>
-
           </div>
           <div id="search-notfound" class="m-text m-warning m-text-center">Sorry, nothing was found.</div>
           <ul id="search-results"></ul>
@@ -341,13 +340,13 @@
     </div>
   </div>
 </div>
-<script src="search.js"></script>
-<script src="searchdata.js" async="async"></script>
+<script src="search-v1.js"></script>
+<script src="searchdata-v1.js" async="async"></script>
 <footer><nav>
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>vinecopulib A C++ library for vine copulas. Created by <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>
