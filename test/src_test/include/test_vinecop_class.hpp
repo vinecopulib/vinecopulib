@@ -55,8 +55,7 @@ TEST_F(VinecopTest, copy)
 TEST_F(VinecopTest, print)
 {
   auto cvine = CVineStructure(std::vector<size_t>({5, 4, 3, 2, 1}));
-  auto pcs = Vinecop::make_pair_copula_store(5, 4);
-  auto vc = Vinecop(cvine, pcs);
+  auto vc = Vinecop(cvine);
 
   // check if last line of output is correct
   std::istringstream input;
