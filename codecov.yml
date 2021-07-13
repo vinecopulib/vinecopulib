@@ -33,3 +33,4 @@ comment:
 
 ignore:
   - "test/"
+  - "include/vinecopulib/misc/nlohmann_json.hpp"

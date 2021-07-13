@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2021 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -9,6 +9,7 @@
 #include "rscript.hpp"
 #include "gtest/gtest.h"
 #include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_serialization.hpp>
 #include <vinecopulib/vinecop/class.hpp>
 
 namespace test_serialization {
@@ -17,8 +18,10 @@ using namespace vinecopulib;
 TEST(serialization, bicop_serialization)
 {
   auto pc = Bicop(BicopFamily::bb1);
-  pc.to_json("temp");
-  Bicop pc2("temp");
+  auto u = pc.simulate(100);
+  pc = Bicop(u, FitControlsBicop({ BicopFamily::tll }));
+  pc.to_file(std::string("temp"));
+  Bicop pc2(std::string("temp"));
 
   // Remove temp file
   std::string cmd = rm + "temp";
@@ -30,6 +33,7 @@ TEST(serialization, bicop_serialization)
   EXPECT_EQ(pc.get_rotation(), pc2.get_rotation());
   EXPECT_EQ(pc.get_family_name(), pc2.get_family_name());
   EXPECT_EQ(pc.get_var_types(), pc2.get_var_types());
+  EXPECT_EQ(pc.get_npars(), pc2.get_npars());
   ASSERT_TRUE(pc.get_parameters().isApprox(pc2.get_parameters(), 1e-4));
 }
 
@@ -50,12 +54,13 @@ TEST(serialization, vinecop_serialization)
   }
 
   auto vc = Vinecop(mat, pc_store);
+  vc.truncate(3);
 
   // serialize
-  vc.to_json("temp");
+  vc.to_file(std::string("temp"));
 
   // unserialize
-  auto vc2 = Vinecop("temp");
+  auto vc2 = Vinecop(std::string("temp"));
 
   // Remove temp file
   std::string cmd = rm + "temp";
@@ -67,5 +72,6 @@ TEST(serialization, vinecop_serialization)
   EXPECT_EQ(vc.get_all_rotations(), vc2.get_all_rotations());
   EXPECT_EQ(vc.get_all_families(), vc2.get_all_families());
   EXPECT_EQ(vc.get_var_types(), vc2.get_var_types());
+  EXPECT_EQ(vc.get_matrix(), vc2.get_matrix());
 }
 }

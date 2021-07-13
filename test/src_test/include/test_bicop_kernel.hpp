@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2021 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -22,8 +22,14 @@ TEST_P(TrafokernelTest, sanity_checks)
 TEST_P(TrafokernelTest, fit)
 {
   bicop_.fit(u, controls);
+
+  // make sure that npars are copied
+  auto bicop_cpy = bicop_;
+  EXPECT_GT(bicop_cpy.get_npars(), 1.0);
+
+  // catches bugs when n < (grid size)^2
   controls.set_weights(Eigen::VectorXd::Constant(20, 1.0));
-  bicop_.fit(u.topRows(20), controls); // catches bugs when n < (grid size)^2
+  bicop_.fit(u.topRows(20), controls);
 }
 
 TEST_P(TrafokernelTest, eval_funcs)

@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2021 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <string>
 #include "vinecop_test.hpp"
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
@@ -48,6 +49,24 @@ TEST_F(VinecopTest, copy)
   pair_copulas[0][0].set_parameters(pc.get_parameters().array() + 1);
   vinecop2.set_all_pair_copulas(pair_copulas);
   EXPECT_EQ(vinecop1.get_parameters(0, 0), vinecop1.get_parameters(0, 1));
+}
+
+
+TEST_F(VinecopTest, print)
+{
+  auto cvine = CVineStructure(std::vector<size_t>({5, 4, 3, 2, 1}));
+  auto vc = Vinecop(cvine);
+
+  // check if last line of output is correct
+  std::istringstream input;
+  input.str(vc.str());
+  std::string last_line;
+  for (std::string line; std::getline(input, line);)
+    last_line = line;
+  EXPECT_EQ(last_line, "5,4 | 3,2,1 <-> Independence");
+
+  // just shouldn't segfault
+  Vinecop(cvine).str(); 
 }
 
 TEST_F(VinecopTest, getters_are_correct)
@@ -482,5 +501,26 @@ TEST_F(VinecopTest, sparse_both_selection)
   Eigen::MatrixXd uu = u.col(0).matrix();
   fit = Vinecop(1);
   fit.select(uu, controls);
+}
+
+TEST_F(VinecopTest, partial_selection)
+{
+  u.conservativeResize(20, 7);
+  FitControlsVinecop controls(bicop_families::itau, "itau");
+  // controls.set_show_trace(true);
+  auto fixed = CVineStructure(std::vector<size_t>{ 5, 4, 7, 1, 3, 6, 2 });
+  fixed.truncate(1);
+  Vinecop fit(fixed);
+  fit.select(u, controls);
+
+  // a C-vine with root node 2 contains 6 edges with vertex 2.
+  auto rvm = fit.get_rvine_structure().get_matrix();
+  int count2 = 0;
+  for (int i = 0; i < 6; i++) {
+    //  diagonal element        base element
+    if ((rvm(6 - i, i) == 2) | (rvm(0, i) == 2))
+      count2++;
+  }
+  EXPECT_EQ(count2, 6);
 }
 }
