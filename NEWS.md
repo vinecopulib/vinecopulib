@@ -1,4 +1,4 @@
-## vinecopulib 0.6.0 (July 12, 2021)
+## vinecopulib 0.6.1 (July 13, 2021)
 
 ### BREAKING API CHANGES
 
@@ -18,7 +18,7 @@
 
 - fix number of parameters for TLL (#530)
 
-- fix bugs in `Vinecop` print methods (pyvinecopulib/#78)
+- fix bugs in `Vinecop` print methods (#544)
 
 ## vinecopulib 0.5.5 (November 23, 2020)
 
