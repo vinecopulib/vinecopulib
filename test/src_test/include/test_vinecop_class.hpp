@@ -502,4 +502,25 @@ TEST_F(VinecopTest, sparse_both_selection)
   fit = Vinecop(1);
   fit.select(uu, controls);
 }
+
+TEST_F(VinecopTest, partial_selection)
+{
+  u.conservativeResize(20, 7);
+  FitControlsVinecop controls(bicop_families::itau, "itau");
+  // controls.set_show_trace(true);
+  auto fixed = CVineStructure(std::vector<size_t>{ 5, 4, 7, 1, 3, 6, 2 });
+  fixed.truncate(1);
+  Vinecop fit(fixed);
+  fit.select(u, controls);
+
+  // a C-vine with root node 2 contains 6 edges with vertex 2.
+  auto rvm = fit.get_rvine_structure().get_matrix();
+  int count2 = 0;
+  for (int i = 0; i < 6; i++) {
+    //  diagonal element        base element
+    if ((rvm(6 - i, i) == 2) | (rvm(0, i) == 2))
+      count2++;
+  }
+  EXPECT_EQ(count2, 6);
+}
 }
