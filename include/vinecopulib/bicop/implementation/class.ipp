@@ -615,7 +615,9 @@ Bicop::flip_abstract_var_types()
 inline void
 Bicop::set_parameters(const Eigen::MatrixXd& parameters)
 {
-  bicop_->set_parameters(parameters);
+  if (bicop_->get_family_name() != "Independence") {
+    bicop_->set_parameters(parameters);
+  }
   bicop_->set_loglik();
 }
 
