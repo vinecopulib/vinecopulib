@@ -7,6 +7,7 @@
 #pragma once
 
 #include "kernel_test.hpp"
+#include "rscript.hpp"
 
 namespace test_bicop_kernel {
 using namespace vinecopulib;
@@ -30,6 +31,25 @@ TEST_P(TrafokernelTest, fit)
   // catches bugs when n < (grid size)^2
   controls.set_weights(Eigen::VectorXd::Constant(20, 1.0));
   bicop_.fit(u.topRows(20), controls);
+}
+
+TEST_P(TrafokernelTest, serialization)
+{
+  bicop_.to_file(std::string("temp"));
+  Bicop pc(std::string("temp"));
+
+  // Remove temp file
+  std::string cmd = rm + "temp";
+  int sys_exit_code = system(cmd.c_str());
+  if (sys_exit_code != 0) {
+    throw std::runtime_error("error in system call");
+  }
+
+  EXPECT_EQ(bicop_.get_rotation(), pc.get_rotation());
+  EXPECT_EQ(bicop_.get_family_name(), pc.get_family_name());
+  EXPECT_EQ(bicop_.get_var_types(), pc.get_var_types());
+  EXPECT_EQ(bicop_.get_npars(), pc.get_npars());
+  ASSERT_TRUE(bicop_.get_parameters().isApprox(pc.get_parameters(), 1e-4));
 }
 
 TEST_P(TrafokernelTest, eval_funcs)

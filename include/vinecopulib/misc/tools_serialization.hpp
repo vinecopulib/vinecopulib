@@ -88,12 +88,16 @@ json_to_matrix(const nlohmann::json& input)
 
   size_t rows = input["shape"][0];
   size_t cols = input["shape"][1];
-  std::vector<double> vec = input["data"];
+  if (rows == 0 && cols == 0) {
+    return Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>();
+  } else {
+    std::vector<double> vec = input["data"];
 
-  Eigen::MatrixXd matrix;
-  matrix = Eigen::MatrixXd::Map(&vec[0], rows, cols);
+    Eigen::MatrixXd matrix;
+    matrix = Eigen::MatrixXd::Map(&vec[0], rows, cols);
 
-  return matrix.cast<T>();
+    return matrix.cast<T>();
+  }
 }
 
 //! conversion from nlohmann::json to vinecopulib::TriangularArray
