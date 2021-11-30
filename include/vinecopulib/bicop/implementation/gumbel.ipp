@@ -13,9 +13,9 @@ namespace vinecopulib {
 inline GumbelBicop::GumbelBicop()
 {
   family_ = BicopFamily::gumbel;
-  parameters_ = Eigen::VectorXd(1);
-  parameters_lower_bounds_ = Eigen::VectorXd(1);
-  parameters_upper_bounds_ = Eigen::VectorXd(1);
+  parameters_ = Vector(1);
+  parameters_lower_bounds_ = Vector(1);
+  parameters_upper_bounds_ = Vector(1);
   parameters_ << 1;
   parameters_lower_bounds_ << 1;
   parameters_upper_bounds_ << 50;
@@ -47,7 +47,7 @@ GumbelBicop::generator_derivative(const double& u)
 //           (theta / std::pow(u, 2));
 //}
 
-inline Eigen::VectorXd
+inline Vector
 GumbelBicop::pdf_raw(const Matrix& u)
 {
   double theta = static_cast<double>(parameters_(0));
@@ -63,12 +63,12 @@ GumbelBicop::pdf_raw(const Matrix& u)
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd
+inline Vector
 GumbelBicop::hinv1_raw(const Matrix& u)
 {
   double theta = double(this->parameters_(0));
   double u1, u2;
-  Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
+  Vector hinv = Vector::Zero(u.rows());
   for (int j = 0; j < u.rows(); ++j) {
     u1 = u(j, 1);
     u2 = u(j, 0);
@@ -85,7 +85,7 @@ GumbelBicop::hinv1_raw(const Matrix& u)
 inline Matrix
 GumbelBicop::tau_to_parameters(const double& tau)
 {
-  auto par = Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
+  auto par = Vector::Constant(1, 1.0 / (1 - std::fabs(tau)));
   return par.cwiseMax(parameters_lower_bounds_)
     .cwiseMin(parameters_upper_bounds_);
 }
@@ -96,10 +96,10 @@ GumbelBicop::parameters_to_tau(const Matrix& parameters)
   return (parameters(0) - 1) / parameters(0);
 }
 
-inline Eigen::VectorXd
+inline Vector
 GumbelBicop::get_start_parameters(const double tau)
 {
-  Eigen::VectorXd par = tau_to_parameters(tau);
+  Vector par = tau_to_parameters(tau);
   par = par.cwiseMax(parameters_lower_bounds_);
   par = par.cwiseMin(parameters_upper_bounds_);
   return par;

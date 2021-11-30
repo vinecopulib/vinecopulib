@@ -13,9 +13,9 @@ namespace vinecopulib {
 inline FrankBicop::FrankBicop()
 {
   family_ = BicopFamily::frank;
-  parameters_ = Eigen::VectorXd(1);
-  parameters_lower_bounds_ = Eigen::VectorXd(1);
-  parameters_upper_bounds_ = Eigen::VectorXd(1);
+  parameters_ = Vector(1);
+  parameters_lower_bounds_ = Vector(1);
+  parameters_upper_bounds_ = Vector(1);
   parameters_ << 0;
   parameters_lower_bounds_ << -35;
   parameters_upper_bounds_ << 35;
@@ -50,7 +50,7 @@ FrankBicop::generator_derivative(const double& u)
 //           2);
 //}
 
-inline Eigen::VectorXd
+inline Vector
 FrankBicop::pdf_raw(const Matrix& u)
 {
   double theta = static_cast<double>(parameters_(0));
@@ -68,9 +68,9 @@ FrankBicop::pdf_raw(const Matrix& u)
 inline Matrix
 FrankBicop::tau_to_parameters(const double& tau)
 {
-  Eigen::VectorXd tau0 = Eigen::VectorXd::Constant(1, tau);
-  auto f = [&](const Eigen::VectorXd& par) {
-    return Eigen::VectorXd::Constant(1, parameters_to_tau(par));
+  Vector tau0 = Vector::Constant(1, tau);
+  auto f = [&](const Vector& par) {
+    return Vector::Constant(1, parameters_to_tau(par));
   };
   return tools_eigen::invert_f(tau0,
                                f,
@@ -89,10 +89,10 @@ FrankBicop::parameters_to_tau(const Matrix& parameters)
   return (parameters(0) >= 0) ? tau : -tau;
 }
 
-inline Eigen::VectorXd
+inline Vector
 FrankBicop::get_start_parameters(const double tau)
 {
-  Eigen::VectorXd par = tau_to_parameters(tau);
+  Vector par = tau_to_parameters(tau);
   par = par.cwiseMax(parameters_lower_bounds_);
   par = par.cwiseMin(parameters_upper_bounds_);
   return par;

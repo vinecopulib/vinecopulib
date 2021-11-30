@@ -21,7 +21,7 @@ class ParBicopTest
 public:
   void set_family(BicopFamily family, int rotation);
 
-  void set_parameters(Eigen::VectorXd parameters);
+  void set_parameters(Vector parameters);
 
   int get_n();
 
@@ -67,13 +67,13 @@ protected:
         double delta = 1.5;
         if (family == BicopFamily::bb8)
           delta = 0.8;
-        auto tau_v = Eigen::VectorXd::Constant(1, std::fabs(tau));
-        auto f = [this, delta](const Eigen::VectorXd& v) {
-          Eigen::VectorXd par(2);
+        auto tau_v = Vector::Constant(1, std::fabs(tau));
+        auto f = [this, delta](const Vector& v) {
+          Vector par(2);
           par(0) = v(0);
           par(1) = delta;
           auto tt = bicop_.parameters_to_tau(par);
-          return Eigen::VectorXd::Constant(1, std::fabs(tt));
+          return Vector::Constant(1, std::fabs(tt));
         };
         parameters(0) = tools_eigen::invert_f(tau_v, f, 1 + 1e-6, 100)(0);
         parameters(1) = delta;

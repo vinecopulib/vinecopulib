@@ -36,7 +36,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
                                           std::string nonparametric_method,
                                           double nonparametric_mult,
                                           std::string selection_criterion,
-                                          const Eigen::VectorXd& weights,
+                                          const Vector& weights,
                                           double psi0,
                                           bool preselect_families,
                                           size_t num_threads)
@@ -169,7 +169,7 @@ FitControlsBicop::get_selection_criterion() const
 }
 
 //! returns the observation weights.
-inline Eigen::VectorXd
+inline Vector
 FitControlsBicop::get_weights() const
 {
   return weights_;
@@ -230,7 +230,7 @@ FitControlsBicop::set_selection_criterion(std::string selection_criterion)
 
 //! Sets the observation weights.
 inline void
-FitControlsBicop::set_weights(const Eigen::VectorXd& weights)
+FitControlsBicop::set_weights(const Vector& weights)
 {
   // store standardized weights (should sum up to number of observations)
   weights_ = weights / weights.sum() * weights.size();

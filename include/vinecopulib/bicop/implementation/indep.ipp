@@ -14,41 +14,41 @@ inline IndepBicop::IndepBicop()
   parameters_ = Matrix();
 }
 
-inline Eigen::VectorXd
+inline Vector
 IndepBicop::pdf_raw(const Matrix& u)
 {
   auto f = [](double, double) { return 1.0; };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd
+inline Vector
 IndepBicop::cdf(const Matrix& u)
 {
   return u.rowwise().prod();
 }
 
-inline Eigen::VectorXd
+inline Vector
 IndepBicop::hfunc1_raw(const Matrix& u)
 {
   auto f = [](double, double u2) { return u2; };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd
+inline Vector
 IndepBicop::hfunc2_raw(const Matrix& u)
 {
   auto f = [](double u1, double) { return u1; };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd
+inline Vector
 IndepBicop::hinv1_raw(const Matrix& u)
 {
   auto f = [](double, double u2) { return u2; };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd
+inline Vector
 IndepBicop::hinv2_raw(const Matrix& u)
 {
   auto f = [](double u1, double) { return u1; };
@@ -58,7 +58,7 @@ IndepBicop::hinv2_raw(const Matrix& u)
 inline Matrix
 IndepBicop::tau_to_parameters(const double&)
 {
-  return Eigen::VectorXd();
+  return Vector();
 }
 
 inline double
@@ -67,7 +67,7 @@ IndepBicop::parameters_to_tau(const Matrix&)
   return 0.0;
 }
 
-inline Eigen::VectorXd
+inline Vector
 IndepBicop::get_start_parameters(const double tau)
 {
   return tau_to_parameters(tau);

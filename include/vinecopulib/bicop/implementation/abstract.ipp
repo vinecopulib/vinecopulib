@@ -131,11 +131,11 @@ AbstractBicop::set_var_types(const std::vector<std::string>& var_types)
 
 //! evaluates the pdf, but truncates it's value by DBL_MIN and DBL_MAX.
 //! @param u Matrix of evaluation points.
-inline Eigen::VectorXd
+inline Vector
 AbstractBicop::pdf(const Matrix& u)
 {
 
-  Eigen::VectorXd pdf(u.rows());
+  Vector pdf(u.rows());
   if (var_types_ == std::vector<std::string>{ "c", "c" }) {
     pdf = pdf_raw(u.leftCols(2));
   } else if (var_types_ == std::vector<std::string>{ "d", "d" }) {
@@ -147,7 +147,7 @@ AbstractBicop::pdf(const Matrix& u)
   return pdf;
 }
 
-inline Eigen::VectorXd
+inline Vector
 AbstractBicop::pdf_c_d(const Matrix& u)
 {
   if (var_types_[0] != "c") {
@@ -161,12 +161,12 @@ AbstractBicop::pdf_c_d(const Matrix& u)
   }
 }
 
-inline Eigen::VectorXd
+inline Vector
 AbstractBicop::pdf_d_d(const Matrix& u)
 {
   Matrix umax = u.leftCols(2);
   Matrix umin = u.rightCols(2);
-  Eigen::VectorXd pdf = cdf(umax) + cdf(umin);
+  Vector pdf = cdf(umax) + cdf(umin);
   umax.col(0).swap(umin.col(0));
   pdf -= cdf(umax) + cdf(umin);
   pdf = pdf.array() / (u.col(0) - u.col(2)).array();
@@ -174,7 +174,7 @@ AbstractBicop::pdf_d_d(const Matrix& u)
   return pdf;
 }
 
-inline Eigen::VectorXd
+inline Vector
 AbstractBicop::hfunc1(const Matrix& u)
 {
   if (var_types_[0] == "d") {
@@ -188,7 +188,7 @@ AbstractBicop::hfunc1(const Matrix& u)
   }
 }
 
-inline Eigen::VectorXd
+inline Vector
 AbstractBicop::hfunc2(const Matrix& u)
 {
   if (var_types_[1] == "d") {
@@ -202,7 +202,7 @@ AbstractBicop::hfunc2(const Matrix& u)
   }
 }
 
-inline Eigen::VectorXd
+inline Vector
 AbstractBicop::hinv1(const Matrix& u)
 {
   if (var_types_[0] == "c") {
@@ -212,7 +212,7 @@ AbstractBicop::hinv1(const Matrix& u)
   }
 }
 
-inline Eigen::VectorXd
+inline Vector
 AbstractBicop::hinv2(const Matrix& u)
 {
   if (var_types_[1] == "c") {
@@ -226,7 +226,7 @@ AbstractBicop::hinv2(const Matrix& u)
 //! @param u Data matrix.
 //! @param weights Optional weights for each observation.
 inline double
-AbstractBicop::loglik(const Matrix& u, const Eigen::VectorXd weights)
+AbstractBicop::loglik(const Matrix& u, const Vector weights)
 {
   Matrix log_pdf = this->pdf(u).array().log();
   if (weights.size() > 0) {
@@ -244,11 +244,11 @@ AbstractBicop::loglik(const Matrix& u, const Eigen::VectorXd weights)
 //! @param u \f$m \times 2\f$ matrix of evaluation points.
 //! @return The numerical inverse of h-functions.
 //! @{
-inline Eigen::VectorXd
+inline Vector
 AbstractBicop::hinv1_num(const Matrix& u)
 {
   Matrix u_new = u;
-  auto h1 = [&](const Eigen::VectorXd& v) {
+  auto h1 = [&](const Vector& v) {
     u_new.col(1) = v;
     return hfunc1(u_new);
   };
@@ -256,11 +256,11 @@ AbstractBicop::hinv1_num(const Matrix& u)
   return tools_eigen::invert_f(u.col(1), h1);
 }
 
-inline Eigen::VectorXd
+inline Vector
 AbstractBicop::hinv2_num(const Matrix& u)
 {
   Matrix u_new = u;
-  auto h1 = [&](const Eigen::VectorXd& x) {
+  auto h1 = [&](const Vector& x) {
     u_new.col(0) = x;
     return hfunc2(u_new);
   };

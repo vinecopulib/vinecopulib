@@ -16,20 +16,20 @@ using namespace vinecopulib;
 TEST(bicop_sanity_checks, catches_wrong_parameter_size)
 {
   for (auto family : bicop_families::nonparametric) {
-    EXPECT_ANY_THROW(Bicop(family, 0, Eigen::VectorXd::Zero(1)));
+    EXPECT_ANY_THROW(Bicop(family, 0, Vector::Zero(1)));
   }
   for (auto family : bicop_families::one_par) {
-    EXPECT_ANY_THROW(Bicop(family, 0, Eigen::VectorXd::Zero(2)));
+    EXPECT_ANY_THROW(Bicop(family, 0, Vector::Zero(2)));
   }
   for (auto family : bicop_families::two_par) {
-    EXPECT_ANY_THROW(Bicop(family, 0, Eigen::VectorXd::Zero(1)));
+    EXPECT_ANY_THROW(Bicop(family, 0, Vector::Zero(1)));
   }
 }
 
 TEST(bicop_sanity_checks, catches_parameters_out_of_bounds)
 {
   auto cop = Bicop(BicopFamily::gaussian);
-  auto wrong_par = Eigen::VectorXd::Constant(1, 1.01);
+  auto wrong_par = Vector::Constant(1, 1.01);
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, wrong_par));
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, -wrong_par));
 }
@@ -42,7 +42,7 @@ TEST(bicop_sanity_checks, catches_wrong_rotation)
 
 TEST(bicop_sanity_checks, catches_var_types)
 {
-  auto rho = Eigen::VectorXd::Constant(1, 0.5);
+  auto rho = Vector::Constant(1, 0.5);
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, rho, { "c" }));
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, rho, { "c", "u" }));
 }
@@ -83,7 +83,7 @@ TEST(bicop_sanity_checks, controls_print)
 
 TEST(bicop_sanity_checks, copy)
 {
-  auto rho = Eigen::VectorXd::Constant(1, 0.5);
+  auto rho = Vector::Constant(1, 0.5);
   Bicop bc1(BicopFamily::gaussian, 0, rho);
   Bicop bc2 = bc1;
   bc2.set_parameters(rho.array() + 0.2);

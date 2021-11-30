@@ -21,17 +21,17 @@ class ArchimedeanBicop : public ParBicop
 {
 private:
   // cdf, hfunctions and inverses
-  // Eigen::VectorXd pdf(const Matrix &u);
+  // Vector pdf(const Matrix &u);
 
-  Eigen::VectorXd cdf(const Matrix& u);
+  Vector cdf(const Matrix& u);
 
-  Eigen::VectorXd hfunc1_raw(const Matrix& u);
+  Vector hfunc1_raw(const Matrix& u);
 
-  Eigen::VectorXd hfunc2_raw(const Matrix& u);
+  Vector hfunc2_raw(const Matrix& u);
 
-  Eigen::VectorXd hinv1_raw(const Matrix& u);
+  Vector hinv1_raw(const Matrix& u);
 
-  Eigen::VectorXd hinv2_raw(const Matrix& u);
+  Vector hinv2_raw(const Matrix& u);
 
   // generator, its inverse and derivative
   virtual double generator(const double& u) = 0;
@@ -42,7 +42,7 @@ private:
 
   // virtual double generator_derivative2(const double &u) = 0;
 
-  Eigen::VectorXd get_start_parameters(const double tau);
+  Vector get_start_parameters(const double tau);
 };
 }
 

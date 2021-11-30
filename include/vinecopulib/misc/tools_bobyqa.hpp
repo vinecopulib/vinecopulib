@@ -2269,13 +2269,13 @@ impl(const Function& function,
 }
 
 template<class Function>
-std::pair<Eigen::VectorXd, double>
+std::pair<Vector, double>
 bobyqa(const Function& function,
        const long n,
        const long npt,
-       Eigen::VectorXd initial_parameters,
-       Eigen::VectorXd lb,
-       Eigen::VectorXd ub,
+       Vector initial_parameters,
+       Vector lb,
+       Vector ub,
        const double rhobeg,
        const double rhoend,
        const long maxfun)
@@ -2294,13 +2294,13 @@ bobyqa(const Function& function,
   double* xl = new double[n];
   double* xu = new double[n];
   double eps = 1e-6;
-  Eigen::VectorXd::Map(xl, n) = lb.array() + eps;
-  Eigen::VectorXd::Map(xu, n) = ub.array() - eps;
+  Vector::Map(xl, n) = lb.array() + eps;
+  Vector::Map(xu, n) = ub.array() - eps;
 
   double* x = new double[n];
-  Eigen::VectorXd::Map(x, n) = initial_parameters;
+  Vector::Map(x, n) = initial_parameters;
 
-  Eigen::VectorXd optimized_parameters = initial_parameters;
+  Vector optimized_parameters = initial_parameters;
   double optimum = 0.0;
   std::string err_msg = "";
   try {
@@ -2330,7 +2330,7 @@ bobyqa(const Function& function,
     throw std::runtime_error(err_msg);
   }
 
-  std::pair<Eigen::VectorXd, double> result(optimized_parameters, optimum);
+  std::pair<Vector, double> result(optimized_parameters, optimum);
   return result;
 }
 }

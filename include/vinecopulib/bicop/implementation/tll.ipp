@@ -16,7 +16,7 @@ inline TllBicop::TllBicop()
   family_ = BicopFamily::tll;
 }
 
-inline Eigen::VectorXd
+inline Vector
 TllBicop::gaussian_kernel_2d(const Matrix& x)
 {
   return tools_stats::dnorm(x).rowwise().prod();
@@ -27,7 +27,7 @@ TllBicop::gaussian_kernel_2d(const Matrix& x)
 inline Eigen::Matrix2d
 TllBicop::select_bandwidth(const Matrix& x,
                            std::string method,
-                           const Eigen::VectorXd& weights)
+                           const Vector& weights)
 {
   size_t n = x.rows();
   double cor = wdm::wdm(x, "cor", weights)(0, 1);
@@ -84,7 +84,7 @@ TllBicop::fit_local_likelihood(const Matrix& x,
                                const Matrix& x_data,
                                const Eigen::Matrix2d& B,
                                std::string method,
-                               const Eigen::VectorXd& weights)
+                               const Vector& weights)
 {
   size_t m = x.rows();      // number of evaluation points
   size_t n = x_data.rows(); // number of observations
@@ -98,8 +98,8 @@ TllBicop::fit_local_likelihood(const Matrix& x,
   Matrix z_data = (irB * x_data.transpose()).transpose();
 
   Matrix res(m, 2);
-  res.col(0) = Eigen::VectorXd::Ones(m); // result will be a product
-  Eigen::VectorXd kernels(n);
+  res.col(0) = Vector::Ones(m); // result will be a product
+  Vector kernels(n);
   Eigen::Vector2d f1;
   Eigen::Vector2d b;
   Eigen::Matrix2d S(B);
@@ -220,7 +220,7 @@ inline void
 TllBicop::fit(const Matrix& data,
               std::string method,
               double mult,
-              const Eigen::VectorXd& weights)
+              const Vector& weights)
 {
   using namespace tools_interpolation;
 
@@ -247,7 +247,7 @@ TllBicop::fit(const Matrix& data,
   Matrix ll_fit = fit_local_likelihood(z, z_data, B, method, weights);
 
   // transform density estimate to copula scale
-  Eigen::VectorXd c =
+  Vector c =
     ll_fit.col(0).cwiseQuotient(tools_stats::dnorm(z).rowwise().prod());
   // store values in mxm grid
   Matrix values(m, m);
@@ -260,7 +260,7 @@ TllBicop::fit(const Matrix& data,
 
   // compute effective degrees of freedom via interpolation ---------
   // stabilize interpolation by restricting to plausible range
-  Eigen::VectorXd infl_vec = ll_fit.col(1).cwiseMin(1.3).cwiseMax(-0.2);
+  Vector infl_vec = ll_fit.col(1).cwiseMin(1.3).cwiseMax(-0.2);
   Matrix infl(m, m);
   infl = Eigen::Map<Matrix>(infl_vec.data(), m, m).transpose();
   // don't normalize margins of the EDF! (norm_times = 0)

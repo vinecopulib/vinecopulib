@@ -28,7 +28,7 @@ TEST_P(TrafokernelTest, fit)
   EXPECT_GT(bicop_cpy.get_npars(), 1.0);
 
   // catches bugs when n < (grid size)^2
-  controls.set_weights(Eigen::VectorXd::Constant(20, 1.0));
+  controls.set_weights(Vector::Constant(20, 1.0));
   bicop_.fit(u.topRows(20), controls);
 }
 

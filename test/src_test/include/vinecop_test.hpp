@@ -16,7 +16,7 @@ public:
   VinecopTest();
 
   Matrix u;
-  Eigen::VectorXd f;
+  Vector f;
   Matrix sim;
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> model_matrix;
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> vc_matrix;

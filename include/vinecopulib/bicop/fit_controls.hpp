@@ -22,7 +22,7 @@ public:
                    std::string nonparametric_method = "quadratic",
                    double nonparametric_mult = 1.0,
                    std::string selection_criterion = "aic",
-                   const Eigen::VectorXd& weights = Eigen::VectorXd(),
+                   const Vector& weights = Vector(),
                    double psi0 = 0.9,
                    bool preselect_families = true,
                    size_t num_threads = 1);
@@ -43,7 +43,7 @@ public:
 
   std::string get_selection_criterion() const;
 
-  Eigen::VectorXd get_weights() const;
+  Vector get_weights() const;
 
   bool get_preselect_families() const;
 
@@ -62,7 +62,7 @@ public:
 
   void set_selection_criterion(std::string selection_criterion);
 
-  void set_weights(const Eigen::VectorXd& weights);
+  void set_weights(const Vector& weights);
 
   void set_preselect_families(bool preselect_families);
 
@@ -82,7 +82,7 @@ private:
   std::string nonparametric_method_;
   double nonparametric_mult_;
   std::string selection_criterion_;
-  Eigen::VectorXd weights_;
+  Vector weights_;
   bool preselect_families_;
   double psi0_;
   size_t num_threads_;

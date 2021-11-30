@@ -51,19 +51,19 @@ public:
                     double final_trust_region,
                     int maxeval);
 
-  Eigen::VectorXd optimize(
-    const Eigen::VectorXd& initial_parameters,
-    const Eigen::VectorXd& lower_bounds,
-    const Eigen::VectorXd& upper_bounds,
-    std::function<double(const Eigen::VectorXd&)> objective);
+  Vector optimize(
+    const Vector& initial_parameters,
+    const Vector& lower_bounds,
+    const Vector& upper_bounds,
+    std::function<double(const Vector&)> objective);
 
   size_t get_objective_calls() const;
   double get_objective_max() const;
 
 private:
-  void check_parameters_size(const Eigen::VectorXd& initial_parameters,
-                             const Eigen::VectorXd& lower_bounds,
-                             const Eigen::VectorXd& upper_bounds) const;
+  void check_parameters_size(const Vector& initial_parameters,
+                             const Vector& lower_bounds,
+                             const Vector& upper_bounds) const;
 
   BobyqaControls controls_;
   size_t objective_calls_{ 0 };

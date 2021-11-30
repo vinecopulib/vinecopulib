@@ -163,7 +163,7 @@ Bicop::to_file(const std::string& filename) const
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @return The copula density evaluated at \c u.
-inline Eigen::VectorXd
+inline Vector
 Bicop::pdf(const Matrix& u) const
 {
   check_data(u);
@@ -175,11 +175,11 @@ Bicop::pdf(const Matrix& u) const
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @return The copula distribution evaluated at \c u.
-inline Eigen::VectorXd
+inline Vector
 Bicop::cdf(const Matrix& u) const
 {
   check_data(u);
-  Eigen::VectorXd p = bicop_->cdf(prep_for_abstract(u).leftCols(2));
+  Vector p = bicop_->cdf(prep_for_abstract(u).leftCols(2));
   switch (rotation_) {
     default:
       return p;
@@ -201,11 +201,11 @@ Bicop::cdf(const Matrix& u) const
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
-inline Eigen::VectorXd
+inline Vector
 Bicop::hfunc1(const Matrix& u) const
 {
   check_data(u);
-  Eigen::VectorXd h(u.rows());
+  Vector h(u.rows());
   switch (rotation_) {
     default:
       h = bicop_->hfunc1(prep_for_abstract(u));
@@ -233,11 +233,11 @@ Bicop::hfunc1(const Matrix& u) const
 //! \f$ h_2(u_1, u_2) = P(U_1 \le u_1 | U_2 = u_2)  \f$.
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
-inline Eigen::VectorXd
+inline Vector
 Bicop::hfunc2(const Matrix& u) const
 {
   check_data(u);
-  Eigen::VectorXd h(u.rows());
+  Vector h(u.rows());
   switch (rotation_) {
     default:
       h = bicop_->hfunc2(prep_for_abstract(u));
@@ -266,11 +266,11 @@ Bicop::hfunc2(const Matrix& u) const
 //! The inverse is calulated w.r.t. the second argument.
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
-inline Eigen::VectorXd
+inline Vector
 Bicop::hinv1(const Matrix& u) const
 {
   check_data(u);
-  Eigen::VectorXd hi(u.rows());
+  Vector hi(u.rows());
   switch (rotation_) {
     default:
       hi = bicop_->hinv1(prep_for_abstract(u));
@@ -299,11 +299,11 @@ Bicop::hinv1(const Matrix& u) const
 //! The inverse is calculated w.r.t. the first argument.
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
-inline Eigen::VectorXd
+inline Vector
 Bicop::hinv2(const Matrix& u) const
 {
   check_data(u);
-  Eigen::VectorXd hi(u.rows());
+  Vector hi(u.rows());
   switch (rotation_) {
     default:
       hi = bicop_->hinv2(prep_for_abstract(u));
@@ -958,7 +958,7 @@ Bicop::check_rotation(int rotation) const
 
 //! @brief Checks whether weights and data have matching sizes.
 inline void
-Bicop::check_weights_size(const Eigen::VectorXd& weights,
+Bicop::check_weights_size(const Vector& weights,
                           const Matrix& data) const
 {
   if ((weights.size() > 0) & (weights.size() != data.rows())) {

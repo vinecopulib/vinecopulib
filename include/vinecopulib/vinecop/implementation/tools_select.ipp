@@ -25,7 +25,7 @@ using namespace tools_stl;
 inline double
 calculate_criterion(const Matrix& data,
                     std::string tree_criterion,
-                    Eigen::VectorXd weights)
+                    Vector weights)
 {
   double w = 0.0;
   Matrix data_no_nan = data;
@@ -57,18 +57,18 @@ calculate_criterion(const Matrix& data,
 inline Matrix
 calculate_criterion_matrix(const Matrix& data,
                            const std::string& tree_criterion,
-                           const Eigen::VectorXd& weights)
+                           const Vector& weights)
 {
   size_t n = data.rows();
   size_t d = data.cols();
   Matrix mat(d, d);
-  mat.diagonal() = Eigen::VectorXd::Constant(d, 1.0);
+  mat.diagonal() = Vector::Constant(d, 1.0);
   Matrix pair_data(n, 2);
   for (size_t i = 1; i < d; ++i) {
     for (size_t j = 0; j < i; ++j) {
       pair_data.col(0) = data.col(i);
       pair_data.col(1) = data.col(j);
-      Eigen::VectorXd pair_w = weights;
+      Vector pair_w = weights;
       mat(i, j) = calculate_criterion(pair_data, tree_criterion, pair_w);
       mat(j, i) = mat(i, j);
     }
@@ -582,7 +582,7 @@ VinecopSelector::add_pc_info(const EdgeIterator& e, VineTree& tree)
   tree[e].all_indices = cat(tree[e].conditioned, tree[e].conditioning);
 }
 
-inline Eigen::VectorXd
+inline Vector
 VinecopSelector::get_hfunc(const VertexProperties& vertex_data, bool is_first)
 {
   if (is_first) {
@@ -592,7 +592,7 @@ VinecopSelector::get_hfunc(const VertexProperties& vertex_data, bool is_first)
   }
 }
 
-inline Eigen::VectorXd
+inline Vector
 VinecopSelector::get_hfunc_sub(const VertexProperties& vertex_data,
                                bool is_first)
 {
@@ -922,10 +922,10 @@ inline void
 VinecopSelector::remove_edge_data(VineTree& tree)
 {
   for (auto e : boost::edges(tree)) {
-    tree[e].hfunc1 = Eigen::VectorXd();
-    tree[e].hfunc2 = Eigen::VectorXd();
-    tree[e].hfunc1_sub = Eigen::VectorXd();
-    tree[e].hfunc2_sub = Eigen::VectorXd();
+    tree[e].hfunc1 = Vector();
+    tree[e].hfunc2 = Vector();
+    tree[e].hfunc1_sub = Vector();
+    tree[e].hfunc2_sub = Vector();
     tree[e].pc_data = Matrix(0, 2);
   }
 }
@@ -937,10 +937,10 @@ inline void
 VinecopSelector::remove_vertex_data(VineTree& tree)
 {
   for (auto v : boost::vertices(tree)) {
-    tree[v].hfunc1 = Eigen::VectorXd();
-    tree[v].hfunc2 = Eigen::VectorXd();
-    tree[v].hfunc1_sub = Eigen::VectorXd();
-    tree[v].hfunc2_sub = Eigen::VectorXd();
+    tree[v].hfunc1 = Vector();
+    tree[v].hfunc2 = Vector();
+    tree[v].hfunc1_sub = Vector();
+    tree[v].hfunc2_sub = Vector();
   }
 }
 

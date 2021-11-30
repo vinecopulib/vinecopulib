@@ -17,7 +17,7 @@ namespace tools_interpolation {
 //! @param values A dxd matrix of copula density values evaluated at
 //! (grid_points_i, grid_points_j).
 //! @param norm_times How many times the normalization routine should run.
-inline InterpolationGrid::InterpolationGrid(const Eigen::VectorXd& grid_points,
+inline InterpolationGrid::InterpolationGrid(const Vector& grid_points,
                                             const Matrix& values,
                                             int norm_times)
 {
@@ -154,7 +154,7 @@ InterpolationGrid::bilinear_interpolation(double z11,
 //!
 //! @param x Mx2 matrix of evaluation points.
 //! @return a vector of resulting interpolated values
-inline Eigen::VectorXd
+inline Vector
 InterpolationGrid::interpolate(const Matrix& x)
 {
 
@@ -180,11 +180,11 @@ InterpolationGrid::interpolate(const Matrix& x)
 //! @param u Mx2 matrix of evaluation points
 //! @param cond_var Either 1 or 2; the axis considered fixed.
 //! @return a vector of resulting integral values
-inline Eigen::VectorXd
+inline Vector
 InterpolationGrid::integrate_1d(const Matrix& u, size_t cond_var)
 {
   ptrdiff_t m = grid_points_.size();
-  Eigen::VectorXd tmpvals(m);
+  Vector tmpvals(m);
   Matrix tmpgrid(m, 2);
 
   auto f = [this, m, cond_var, &tmpvals, &tmpgrid](double u1, double u2) {
@@ -192,12 +192,12 @@ InterpolationGrid::integrate_1d(const Matrix& u, size_t cond_var)
     double tmpint = 0.0, int1;
     if (cond_var == 1) {
       upr = u2;
-      tmpgrid.col(0) = Eigen::VectorXd::Constant(m, u1);
+      tmpgrid.col(0) = Vector::Constant(m, u1);
       tmpgrid.col(1) = grid_points_;
     } else if (cond_var == 2) {
       upr = u1;
       tmpgrid.col(0) = grid_points_;
-      tmpgrid.col(1) = Eigen::VectorXd::Constant(m, u2);
+      tmpgrid.col(1) = Vector::Constant(m, u2);
     }
     tmpvals = interpolate(tmpgrid).array().max(1e-4);
     tmpint = int_on_grid(upr, tmpvals, grid_points_);
@@ -213,11 +213,11 @@ InterpolationGrid::integrate_1d(const Matrix& u, size_t cond_var)
 //!
 //! @param u Mx2 matrix of evaluation points
 //! @return a vector of resulting integral values
-inline Eigen::VectorXd
+inline Vector
 InterpolationGrid::integrate_2d(const Matrix& u)
 {
   ptrdiff_t m = grid_points_.size();
-  Eigen::VectorXd tmpvals(m), tmpvals2(m);
+  Vector tmpvals(m), tmpvals2(m);
   Matrix tmpgrid(m, 2);
   tmpgrid.col(1) = grid_points_;
 
@@ -225,7 +225,7 @@ InterpolationGrid::integrate_2d(const Matrix& u)
     double upr, tmpint, tmpint1;
     upr = u2;
     for (ptrdiff_t k = 0; k < m; ++k) {
-      tmpgrid.col(0) = Eigen::VectorXd::Constant(m, grid_points_(k));
+      tmpgrid.col(0) = Vector::Constant(m, grid_points_(k));
       tmpvals = interpolate(tmpgrid);
       tmpint = int_on_grid(upr, tmpvals, grid_points_);
       tmpvals2(k) = tmpint;
@@ -250,8 +250,8 @@ InterpolationGrid::integrate_2d(const Matrix& u)
 //! @return integral of a piecewise linear function defined by (grid_i, vals_i).
 inline double
 InterpolationGrid::int_on_grid(const double& upr,
-                               const Eigen::VectorXd& vals,
-                               const Eigen::VectorXd& grid)
+                               const Vector& vals,
+                               const Vector& grid)
 {
   double tmpint = 0.0;
 

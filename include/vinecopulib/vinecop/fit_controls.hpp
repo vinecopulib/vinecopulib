@@ -36,7 +36,7 @@ public:
     std::string tree_criterion = "tau",
     double threshold = 0.0,
     std::string selection_criterion = "aic",
-    const Eigen::VectorXd& weights = Eigen::VectorXd(),
+    const Vector& weights = Vector(),
     double psi0 = 0.9,
     bool preselect_families = true,
     bool select_trunc_lvl = false,

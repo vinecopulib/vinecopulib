@@ -621,7 +621,7 @@ Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
   }
   auto sq0 = tools_stl::seq_int(1, d_ - 1);
   Eigen::Matrix<size_t, Eigen::Dynamic, 1> sq(d_ - 1);
-  auto psis = Eigen::VectorXd(d_ - 1);
+  auto psis = Vector(d_ - 1);
   for (size_t i = 0; i < d_ - 1; i++) {
     sq(i) = sq0[i];
     psis(i) = std::pow(psi0, sq0[i]);
@@ -742,7 +742,7 @@ Vinecop::get_var_types() const
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-inline Eigen::VectorXd
+inline Vector
 Vinecop::pdf(Matrix u, const size_t num_threads) const
 {
   check_data(u);
@@ -754,7 +754,7 @@ Vinecop::pdf(Matrix u, const size_t num_threads) const
   auto disc_cols = tools_select::get_disc_cols(var_types_);
 
   // initial value must be 1.0 for multiplication
-  Eigen::VectorXd pdf = Eigen::VectorXd::Constant(u.rows(), 1.0);
+  Vector pdf = Vector::Constant(u.rows(), 1.0);
 
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects (all data must be in (0, 1))
@@ -853,7 +853,7 @@ Vinecop::pdf(Matrix u, const size_t num_threads) const
 //!   `num_threads` batches.
 //! @param seeds Seeds to scramble the quasi-random numbers; if empty (default),
 //!   the random number quasi-generator is seeded randomly.
-inline Eigen::VectorXd
+inline Vector
 Vinecop::cdf(const Matrix& u,
              const size_t N,
              const size_t num_threads,
@@ -872,7 +872,7 @@ Vinecop::cdf(const Matrix& u,
   auto u_sim = simulate(N, true, num_threads, seeds);
 
   size_t n = u.rows();
-  Eigen::VectorXd vine_distribution(n);
+  Vector vine_distribution(n);
   Eigen::ArrayXXd x(N, 1);
   Eigen::RowVectorXd temp(d_);
   for (size_t i = 0; i < n; i++) {
@@ -1151,8 +1151,8 @@ Vinecop::inverse_rosenblatt(const Matrix& u, const size_t num_threads) const
 
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects for (inverse) h-functions
-    TriangularArray<Eigen::VectorXd> hinv2(d + 1, trunc_lvl + 1);
-    TriangularArray<Eigen::VectorXd> hfunc1(d + 1, trunc_lvl + 1);
+    TriangularArray<Vector> hinv2(d + 1, trunc_lvl + 1);
+    TriangularArray<Vector> hfunc1(d + 1, trunc_lvl + 1);
 
     // initialize with independent uniforms (corresponding to natural
     // order)
@@ -1275,7 +1275,7 @@ Vinecop::finalize_fit(const tools_select::VinecopSelector& selector)
 
 //! Checks if weights are compatible with the data.
 inline void
-Vinecop::check_weights_size(const Eigen::VectorXd& weights,
+Vinecop::check_weights_size(const Vector& weights,
                             const Matrix& data) const
 {
   if ((weights.size() > 0) & (weights.size() != data.rows())) {

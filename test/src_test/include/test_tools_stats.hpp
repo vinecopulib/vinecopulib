@@ -24,8 +24,8 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct)
   // X1 = (1,...,n) and X2 = (n, ..., 1)
   // X = (X1, X2)
   Matrix X(n, 2);
-  X.col(0) = Eigen::VectorXd::LinSpaced(n, 1, n);
-  X.col(1) = Eigen::VectorXd::LinSpaced(n, n, 1);
+  X.col(0) = Vector::LinSpaced(n, 1, n);
+  X.col(1) = Vector::LinSpaced(n, n, 1);
 
   // U = pobs(X)
   Matrix U = tools_stats::to_pseudo_obs(X);
@@ -54,8 +54,8 @@ TEST(test_tools_stats, qrng_are_correct)
   auto U1 = tools_stats::sobol(N, d);
   auto U2 = tools_stats::simulate_uniform(N, d);
 
-  Eigen::VectorXd x(N), p(n), p1(N), x2(N), p2(n);
-  p2 = Eigen::VectorXd::Zero(n);
+  Vector x(N), p(n), p1(N), x2(N), p2(n);
+  p2 = Vector::Zero(n);
   for (size_t i = 0; i < n; i++) {
     auto f = [i, u](const double& u1, const double& u2) {
       return (u1 <= u(i, 0) && u2 <= u(i, 1)) ? 1.0 : 0.0;
@@ -83,12 +83,12 @@ TEST(test_tools_stats, mcor_works)
   Z.block(0, 1, 5000, 1) =
     Z.block(0, 1, 5000, 1) + Z.block(0, 0, 5000, 1).cwiseAbs2();
   auto a1 = tools_stats::pairwise_mcor(Z);
-  Eigen::VectorXd weights = Eigen::VectorXd::Ones(10000);
+  Vector weights = Vector::Ones(10000);
   auto a2 = tools_stats::pairwise_mcor(Z, weights);
   ASSERT_TRUE(std::fabs(a1 - a2) < 1e-4);
 
   a1 = tools_stats::pairwise_mcor(Z.block(0, 0, 5000, 2));
-  weights.block(5000, 0, 5000, 1) = Eigen::VectorXd::Zero(5000);
+  weights.block(5000, 0, 5000, 1) = Vector::Zero(5000);
   a2 = tools_stats::pairwise_mcor(Z, weights);
   ASSERT_TRUE(std::fabs(a1 - a2) < 0.05);
 }
@@ -109,7 +109,7 @@ TEST(test_tools_stats, seed_works)
 
 TEST(test_tools_stats, dpqnorm_are_nan_safe)
 {
-  Eigen::VectorXd X = Eigen::VectorXd::Random(10);
+  Vector X = Vector::Random(10);
   X(0) = std::numeric_limits<double>::quiet_NaN();
   EXPECT_NO_THROW(tools_stats::dnorm(X));
   EXPECT_NO_THROW(tools_stats::pnorm(X));
@@ -118,7 +118,7 @@ TEST(test_tools_stats, dpqnorm_are_nan_safe)
 
 TEST(test_tools_stats, dpt_are_nan_safe)
 {
-  Eigen::VectorXd X = Eigen::VectorXd::Random(10);
+  Vector X = Vector::Random(10);
   X(0) = std::numeric_limits<double>::quiet_NaN();
   double nu = 4.0;
   EXPECT_NO_THROW(tools_stats::dt(X, nu));

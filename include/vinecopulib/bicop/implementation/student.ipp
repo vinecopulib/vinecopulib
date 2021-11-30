@@ -10,26 +10,26 @@ namespace vinecopulib {
 inline StudentBicop::StudentBicop()
 {
   family_ = BicopFamily::student;
-  parameters_ = Eigen::VectorXd(2);
-  parameters_lower_bounds_ = Eigen::VectorXd(2);
-  parameters_upper_bounds_ = Eigen::VectorXd(2);
+  parameters_ = Vector(2);
+  parameters_lower_bounds_ = Vector(2);
+  parameters_upper_bounds_ = Vector(2);
   parameters_ << 0, 50;
   parameters_lower_bounds_ << -1, 2;
   parameters_upper_bounds_ << 1, 50;
 }
 
-inline Eigen::VectorXd
+inline Vector
 StudentBicop::pdf_raw(const Matrix& u)
 {
   double rho = double(this->parameters_(0));
   double nu = double(this->parameters_(1));
-  Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
+  Vector f = Vector::Ones(u.rows());
   Matrix tmp = tools_stats::qt(u, nu);
 
   f = tmp.col(0).cwiseAbs2() + tmp.col(1).cwiseAbs2() -
       (2 * rho) * tmp.rowwise().prod();
   f /= nu * (1.0 - pow(rho, 2.0));
-  f = f + Eigen::VectorXd::Ones(u.rows());
+  f = f + Vector::Ones(u.rows());
   f = f.array().pow(-(nu + 2.0) / 2.0);
   f = f.cwiseQuotient(tools_stats::dt(tmp, nu).rowwise().prod());
   f *= boost::math::tgamma_ratio((nu + 2.0) / 2.0, nu / 2.0);
@@ -38,7 +38,7 @@ StudentBicop::pdf_raw(const Matrix& u)
   return f;
 }
 
-inline Eigen::VectorXd
+inline Vector
 StudentBicop::cdf(const Matrix& u)
 {
   using namespace tools_stats;
@@ -61,12 +61,12 @@ StudentBicop::cdf(const Matrix& u)
   }
 }
 
-inline Eigen::VectorXd
+inline Vector
 StudentBicop::hfunc1_raw(const Matrix& u)
 {
   double rho = double(this->parameters_(0));
   double nu = double(this->parameters_(1));
-  Eigen::VectorXd h = Eigen::VectorXd::Ones(u.rows());
+  Vector h = Vector::Ones(u.rows());
   Matrix tmp = tools_stats::qt(u, nu);
   h = nu * h + tmp.col(0).cwiseAbs2();
   h *= (1.0 - pow(rho, 2)) / (nu + 1.0);
@@ -76,14 +76,14 @@ StudentBicop::hfunc1_raw(const Matrix& u)
   return h;
 }
 
-inline Eigen::VectorXd
+inline Vector
 StudentBicop::hinv1_raw(const Matrix& u)
 {
   double rho = double(this->parameters_(0));
   double nu = double(this->parameters_(1));
-  Eigen::VectorXd hinv = Eigen::VectorXd::Ones(u.rows());
-  Eigen::VectorXd tmp = u.col(1);
-  Eigen::VectorXd tmp2 = u.col(0);
+  Vector hinv = Vector::Ones(u.rows());
+  Vector tmp = u.col(1);
+  Vector tmp2 = u.col(0);
   tmp = tools_stats::qt(tmp, nu + 1.0);
   tmp2 = tools_stats::qt(tmp2, nu);
 
@@ -95,10 +95,10 @@ StudentBicop::hinv1_raw(const Matrix& u)
   return hinv;
 }
 
-inline Eigen::VectorXd
+inline Vector
 StudentBicop::get_start_parameters(const double tau)
 {
-  Eigen::VectorXd parameters = get_parameters();
+  Vector parameters = get_parameters();
   parameters(0) = std::sin(tau * constant::pi / 2);
   parameters(1) = 5;
   return parameters;

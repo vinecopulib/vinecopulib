@@ -62,7 +62,7 @@ ParBicopTest::set_family(BicopFamily family, int rotation)
 }
 
 void
-ParBicopTest::set_parameters(Eigen::VectorXd parameters)
+ParBicopTest::set_parameters(Vector parameters)
 {
   if (parameters.size() > 0) {
     par_ = parameters(0);

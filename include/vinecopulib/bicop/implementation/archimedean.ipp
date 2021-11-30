@@ -7,7 +7,7 @@
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
-// inline Eigen::VectorXd ArchimedeanBicop::pdf(
+// inline Vector ArchimedeanBicop::pdf(
 //    const Matrix &u
 //)
 //{
@@ -22,7 +22,7 @@ namespace vinecopulib {
 //    return tools_eigen::binaryExpr_or_nan(u, f);
 //}
 
-inline Eigen::VectorXd
+inline Vector
 ArchimedeanBicop::cdf(const Matrix& u)
 {
   auto f = [this](const double& u1, const double& u2) {
@@ -31,7 +31,7 @@ ArchimedeanBicop::cdf(const Matrix& u)
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd
+inline Vector
 ArchimedeanBicop::hfunc1_raw(const Matrix& u)
 {
   auto f = [this](const double& u1, const double& u2) {
@@ -42,30 +42,30 @@ ArchimedeanBicop::hfunc1_raw(const Matrix& u)
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd
+inline Vector
 ArchimedeanBicop::hfunc2_raw(const Matrix& u)
 {
   return hfunc1_raw(tools_eigen::swap_cols(u));
 }
 
-inline Eigen::VectorXd
+inline Vector
 ArchimedeanBicop::hinv1_raw(const Matrix& u)
 {
-  Eigen::VectorXd hinv = hinv1_num(u);
+  Vector hinv = hinv1_num(u);
   return hinv;
 }
 
-inline Eigen::VectorXd
+inline Vector
 ArchimedeanBicop::hinv2_raw(const Matrix& u)
 {
   return hinv1_raw(tools_eigen::swap_cols(u));
 }
 
-inline Eigen::VectorXd
+inline Vector
 ArchimedeanBicop::get_start_parameters(const double)
 {
   Matrix lb = this->get_parameters_lower_bounds();
-  Eigen::VectorXd parameters = lb + Eigen::VectorXd::Constant(2, 0.1);
+  Vector parameters = lb + Vector::Constant(2, 0.1);
   return parameters;
 }
 }

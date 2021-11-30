@@ -25,20 +25,20 @@ public:
 
 private:
   // PDF
-  Eigen::VectorXd pdf_raw(const Matrix& u);
+  Vector pdf_raw(const Matrix& u);
 
   // CDF
-  Eigen::VectorXd cdf(const Matrix& u);
+  Vector cdf(const Matrix& u);
 
   // hfunction
-  Eigen::VectorXd hfunc1_raw(const Matrix& u);
+  Vector hfunc1_raw(const Matrix& u);
 
   // inverse hfunction
-  Eigen::VectorXd hinv1_raw(const Matrix& u);
+  Vector hinv1_raw(const Matrix& u);
 
   Matrix tau_to_parameters(const double& tau);
 
-  Eigen::VectorXd get_start_parameters(const double tau);
+  Vector get_start_parameters(const double tau);
 };
 }
 

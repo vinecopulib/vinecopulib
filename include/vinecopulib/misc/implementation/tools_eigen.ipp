@@ -33,7 +33,7 @@ remove_nans(Matrix& x)
 //! @param a Vector of weights that is either empty or whose size is equal to
 //!   the number of columns of x.
 inline void
-remove_nans(Matrix& x, Eigen::VectorXd& weights)
+remove_nans(Matrix& x, Vector& weights)
 {
   if ((weights.size() > 0) & (weights.size() != x.rows()))
     throw std::runtime_error("sizes of x and weights don't match.");
@@ -80,7 +80,7 @@ trim(Matrix& x, const double& lower, const double& upper)
 //! @param lower Lower bound of the interval.
 //! @param upper Upper bound of the interval.
 inline void
-trim(Eigen::VectorXd& x, const double& lower, const double& upper)
+trim(Vector& x, const double& lower, const double& upper)
 {
   // code of std::for_each (save some compile time by not including <algorithm>)
   auto it = x.data();
@@ -114,14 +114,14 @@ swap_cols(Matrix u)
   return u;
 }
 
-inline Eigen::VectorXd
-unique(const Eigen::VectorXd& x)
+inline Vector
+unique(const Vector& x)
 {
   std::vector<double> v(x.data(), x.data() + x.size());
   std::sort(v.begin(), v.end()); // 1 1 2 2 3 3 3 4 4 5 5 6 7
   auto last = std::unique(v.begin(), v.end());
   v.erase(last, v.end());
-  return Eigen::Map<Eigen::VectorXd>(&v[0], v.size());
+  return Eigen::Map<Vector>(&v[0], v.size());
 }
 
 //! computes the inverse \f$ f^{-1} \f$ of a function \f$ f \f$ by the
@@ -135,17 +135,17 @@ unique(const Eigen::VectorXd& x)
 //! guaranteeing an accuracy of 0.5^35 ~= 6e-11).
 //!
 //! @return \f$ f^{-1}(x) \f$.
-inline Eigen::VectorXd
-invert_f(const Eigen::VectorXd& x,
-         std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
+inline Vector
+invert_f(const Vector& x,
+         std::function<Vector(const Vector&)> f,
          const double lb,
          const double ub,
          int n_iter)
 {
-  Eigen::VectorXd xl = Eigen::VectorXd::Constant(x.size(), lb);
-  Eigen::VectorXd xh = Eigen::VectorXd::Constant(x.size(), ub);
-  Eigen::VectorXd x_tmp = x;
-  Eigen::VectorXd fm(x.size());
+  Vector xl = Vector::Constant(x.size(), lb);
+  Vector xh = Vector::Constant(x.size(), ub);
+  Vector x_tmp = x;
+  Vector fm(x.size());
   for (int iter = 0; iter < n_iter; ++iter) {
     x_tmp = (xh + xl) / 2.0;
     fm = f(x_tmp) - x;
@@ -169,7 +169,7 @@ invert_f(const Eigen::VectorXd& x,
 //!
 //! @param grid_points The vector to expand.
 inline Matrix
-expand_grid(const Eigen::VectorXd& grid_points)
+expand_grid(const Vector& grid_points)
 {
   ptrdiff_t m = grid_points.size();
   Matrix grid_2d(m * m, 2);

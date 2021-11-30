@@ -15,9 +15,9 @@ namespace vinecopulib {
 inline JoeBicop::JoeBicop()
 {
   family_ = BicopFamily::joe;
-  parameters_ = Eigen::VectorXd(1);
-  parameters_lower_bounds_ = Eigen::VectorXd(1);
-  parameters_upper_bounds_ = Eigen::VectorXd(1);
+  parameters_ = Vector(1);
+  parameters_lower_bounds_ = Vector(1);
+  parameters_upper_bounds_ = Vector(1);
   parameters_ << 1;
   parameters_lower_bounds_ << 1;
   parameters_upper_bounds_ << 30;
@@ -50,7 +50,7 @@ JoeBicop::generator_derivative(const double& u)
 //           std::pow(-1 + std::pow(1 - u, theta), 2);
 //}
 
-inline Eigen::VectorXd
+inline Vector
 JoeBicop::pdf_raw(const Matrix& u)
 {
   double theta = static_cast<double>(parameters_(0));
@@ -65,12 +65,12 @@ JoeBicop::pdf_raw(const Matrix& u)
 }
 
 // inverse h-function
-inline Eigen::VectorXd
+inline Vector
 JoeBicop::hinv1_raw(const Matrix& u)
 {
   double theta = double(parameters_(0));
   double u1, u2;
-  Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
+  Vector hinv = Vector::Zero(u.rows());
   for (int j = 0; j < u.rows(); ++j) {
     u1 = u(j, 1);
     u2 = u(j, 0);
@@ -88,9 +88,9 @@ JoeBicop::hinv1_raw(const Matrix& u)
 inline Matrix
 JoeBicop::tau_to_parameters(const double& tau)
 {
-  Eigen::VectorXd tau0 = Eigen::VectorXd::Constant(1, std::fabs(tau));
-  auto f = [&](const Eigen::VectorXd& v) {
-    return Eigen::VectorXd::Constant(1, std::fabs(parameters_to_tau(v)));
+  Vector tau0 = Vector::Constant(1, std::fabs(tau));
+  auto f = [&](const Vector& v) {
+    return Vector::Constant(1, std::fabs(parameters_to_tau(v)));
   };
   return tools_eigen::invert_f(tau0,
                                f,
@@ -107,10 +107,10 @@ JoeBicop::parameters_to_tau(const Matrix& parameters)
   return 1 + 2 * tau / (2 - par);
 }
 
-inline Eigen::VectorXd
+inline Vector
 JoeBicop::get_start_parameters(const double tau)
 {
-  Eigen::VectorXd par = tau_to_parameters(tau);
+  Vector par = tau_to_parameters(tau);
   par = par.cwiseMax(parameters_lower_bounds_);
   par = par.cwiseMin(parameters_upper_bounds_);
   return par;

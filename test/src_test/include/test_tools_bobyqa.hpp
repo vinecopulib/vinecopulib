@@ -23,9 +23,9 @@ TEST(test_tools_bobyqa, const_function)
   const long variables_count = 2;
   const long number_of_interpolation_conditions = variables_count + 2;
 
-  Eigen::VectorXd lb(2);
-  Eigen::VectorXd ub(2);
-  Eigen::VectorXd x(2);
+  Vector lb(2);
+  Vector ub(2);
+  Vector x(2);
 
   lb << -1.0, -1.0;
   ub << 1.0, 1.0;
@@ -62,9 +62,9 @@ TEST(test_tools_bobyqa, complex_quadratic_function)
   const long number_of_interpolation_conditions =
     (variables_count + 1) * (variables_count + 2) / 2;
 
-  Eigen::VectorXd lb(2);
-  Eigen::VectorXd ub(2);
-  Eigen::VectorXd x(2);
+  Vector lb(2);
+  Vector ub(2);
+  Vector x(2);
 
   lb << -4.0, -3.0;
   ub << 5.0, 5.0;
@@ -101,9 +101,9 @@ TEST(test_tools_bobyqa, quadratic_function_with_jump)
   const long number_of_interpolation_conditions =
     (variables_count + 1) * (variables_count + 2) / 2;
 
-  Eigen::VectorXd lb(2);
-  Eigen::VectorXd ub(2);
-  Eigen::VectorXd x(2);
+  Vector lb(2);
+  Vector ub(2);
+  Vector x(2);
 
   lb << -1.0, -1.0;
   ub << 1.0, 1.0;

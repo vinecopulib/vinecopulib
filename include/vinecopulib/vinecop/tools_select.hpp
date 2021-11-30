@@ -35,12 +35,12 @@ namespace tools_select {
 double
 calculate_criterion(const Matrix& data,
                     std::string tree_criterion,
-                    Eigen::VectorXd weights);
+                    Vector weights);
 
 Matrix
 calculate_criterion_matrix(const Matrix& data,
                            const std::string& tree_criterion,
-                           const Eigen::VectorXd& weights);
+                           const Vector& weights);
 
 std::vector<size_t>
 get_disc_cols(std::vector<std::string> var_types);
@@ -52,10 +52,10 @@ struct VertexProperties
   std::vector<size_t> conditioned;
   std::vector<size_t> all_indices;
   std::vector<size_t> prev_edge_indices;
-  Eigen::VectorXd hfunc1;
-  Eigen::VectorXd hfunc2;
-  Eigen::VectorXd hfunc1_sub;
-  Eigen::VectorXd hfunc2_sub;
+  Vector hfunc1;
+  Vector hfunc2;
+  Vector hfunc1_sub;
+  Vector hfunc2_sub;
   std::vector<std::string> var_types{ "c", "c" };
 };
 struct EdgeProperties
@@ -64,10 +64,10 @@ struct EdgeProperties
   std::vector<size_t> conditioned;
   std::vector<size_t> all_indices;
   Matrix pc_data;
-  Eigen::VectorXd hfunc1;
-  Eigen::VectorXd hfunc2;
-  Eigen::VectorXd hfunc1_sub;
-  Eigen::VectorXd hfunc2_sub;
+  Vector hfunc1;
+  Vector hfunc2;
+  Vector hfunc1_sub;
+  Vector hfunc2_sub;
   std::vector<std::string> var_types{ "c", "c" };
   double weight;
   double crit;
@@ -145,9 +145,9 @@ protected:
 
   Matrix get_pc_data(size_t v0, size_t v1, const VineTree& tree);
 
-  Eigen::VectorXd get_hfunc(const VertexProperties& vertex_data, bool is_first);
+  Vector get_hfunc(const VertexProperties& vertex_data, bool is_first);
 
-  Eigen::VectorXd get_hfunc_sub(const VertexProperties& vertex_data,
+  Vector get_hfunc_sub(const VertexProperties& vertex_data,
                                 bool is_first);
 
   ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);

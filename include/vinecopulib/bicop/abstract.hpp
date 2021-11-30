@@ -53,7 +53,7 @@ protected:
   virtual void fit(const Matrix& data,
                    std::string method,
                    double mult,
-                   const Eigen::VectorXd& weights) = 0;
+                   const Vector& weights) = 0;
 
   virtual double get_npars() const = 0;
 
@@ -64,42 +64,42 @@ protected:
   virtual void flip() = 0;
 
   // following are virtual so they can be overriden by KernelBicop
-  virtual Eigen::VectorXd pdf(const Matrix& u);
+  virtual Vector pdf(const Matrix& u);
 
-  virtual Eigen::VectorXd cdf(const Matrix& u) = 0;
+  virtual Vector cdf(const Matrix& u) = 0;
 
-  virtual Eigen::VectorXd hfunc1(const Matrix& u);
+  virtual Vector hfunc1(const Matrix& u);
 
-  virtual Eigen::VectorXd hfunc2(const Matrix& u);
+  virtual Vector hfunc2(const Matrix& u);
 
-  Eigen::VectorXd hinv1(const Matrix& u);
+  Vector hinv1(const Matrix& u);
 
-  Eigen::VectorXd hinv2(const Matrix& u);
+  Vector hinv2(const Matrix& u);
 
-  virtual Eigen::VectorXd pdf_raw(const Matrix& u) = 0;
+  virtual Vector pdf_raw(const Matrix& u) = 0;
 
-  virtual Eigen::VectorXd hfunc1_raw(const Matrix& u) = 0;
+  virtual Vector hfunc1_raw(const Matrix& u) = 0;
 
-  virtual Eigen::VectorXd hfunc2_raw(const Matrix& u) = 0;
+  virtual Vector hfunc2_raw(const Matrix& u) = 0;
 
-  virtual Eigen::VectorXd hinv1_raw(const Matrix& u) = 0;
+  virtual Vector hinv1_raw(const Matrix& u) = 0;
 
-  virtual Eigen::VectorXd hinv2_raw(const Matrix& u) = 0;
+  virtual Vector hinv2_raw(const Matrix& u) = 0;
 
   virtual Matrix tau_to_parameters(const double& tau) = 0;
   Matrix no_tau_to_parameters(const double&);
 
   // Misc methods
-  Eigen::VectorXd hinv1_num(const Matrix& u);
+  Vector hinv1_num(const Matrix& u);
 
-  Eigen::VectorXd hinv2_num(const Matrix& u);
+  Vector hinv2_num(const Matrix& u);
 
-  Eigen::VectorXd pdf_c_d(const Matrix& u);
+  Vector pdf_c_d(const Matrix& u);
 
-  Eigen::VectorXd pdf_d_d(const Matrix& u);
+  Vector pdf_d_d(const Matrix& u);
 
   double loglik(const Matrix& u,
-                const Eigen::VectorXd weights = Eigen::VectorXd());
+                const Vector weights = Vector());
 
   // Data members
   BicopFamily family_;

@@ -78,7 +78,7 @@ inline void
 preselect_candidates(std::vector<Bicop>& bicops,
                      const Matrix& data,
                      double tau,
-                     const Eigen::VectorXd& weights)
+                     const Vector& weights)
 {
   auto c = get_c1c2(data, tau, weights);
   bicops.erase(std::remove_if(bicops.begin(),
@@ -90,7 +90,7 @@ preselect_candidates(std::vector<Bicop>& bicops,
 }
 
 inline std::vector<double>
-get_c1c2(const Matrix& data, double tau, const Eigen::VectorXd& weights)
+get_c1c2(const Matrix& data, double tau, const Vector& weights)
 {
   size_t n = data.rows();
   Matrix x = Matrix::Zero(n, 2);
@@ -123,7 +123,7 @@ get_c1c2(const Matrix& data, double tau, const Eigen::VectorXd& weights)
 
   // if one of the quadrants is empty, we see it as independent
   double c1, c2;
-  Eigen::VectorXd w;
+  Vector w;
 
   if (count1 == 0) {
     c1 = 0.0;

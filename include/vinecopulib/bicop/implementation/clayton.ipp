@@ -11,9 +11,9 @@ namespace vinecopulib {
 inline ClaytonBicop::ClaytonBicop()
 {
   family_ = BicopFamily::clayton;
-  parameters_ = Eigen::VectorXd(1);
-  parameters_lower_bounds_ = Eigen::VectorXd(1);
-  parameters_upper_bounds_ = Eigen::VectorXd(1);
+  parameters_ = Vector(1);
+  parameters_lower_bounds_ = Vector(1);
+  parameters_upper_bounds_ = Vector(1);
   parameters_ << 1e-10;
   parameters_lower_bounds_ << 1e-10;
   parameters_upper_bounds_ << 28;
@@ -45,7 +45,7 @@ ClaytonBicop::generator_derivative(const double& u)
 //    return (1 + theta) * std::pow(u, -2 - theta);
 //}
 
-inline Eigen::VectorXd
+inline Vector
 ClaytonBicop::pdf_raw(const Matrix& u)
 {
   double theta = static_cast<double>(parameters_(0));
@@ -64,17 +64,17 @@ ClaytonBicop::pdf_raw(const Matrix& u)
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd
+inline Vector
 ClaytonBicop::hinv1_raw(const Matrix& u)
 {
   double theta = double(this->parameters_(0));
-  Eigen::VectorXd hinv = u.col(0).array().pow(theta + 1.0);
+  Vector hinv = u.col(0).array().pow(theta + 1.0);
   if (theta < 75) {
     hinv = u.col(1).cwiseProduct(hinv);
     hinv = hinv.array().pow(-theta / (theta + 1.0));
-    Eigen::VectorXd x = u.col(0);
+    Vector x = u.col(0);
     x = x.array().pow(-theta);
-    hinv = hinv - x + Eigen::VectorXd::Ones(x.size());
+    hinv = hinv - x + Vector::Ones(x.size());
     hinv = hinv.array().pow(-1 / theta);
   } else {
     hinv = hinv1_num(u);
@@ -85,7 +85,7 @@ ClaytonBicop::hinv1_raw(const Matrix& u)
 inline Matrix
 ClaytonBicop::tau_to_parameters(const double& tau)
 {
-  Eigen::VectorXd parameters(1);
+  Vector parameters(1);
   parameters(0) = 2 * std::fabs(tau) / (1 - std::fabs(tau));
   return parameters.cwiseMax(parameters_lower_bounds_)
     .cwiseMin(parameters_upper_bounds_);
@@ -97,10 +97,10 @@ ClaytonBicop::parameters_to_tau(const Matrix& parameters)
   return parameters(0) / (2 + std::fabs(parameters(0)));
 }
 
-inline Eigen::VectorXd
+inline Vector
 ClaytonBicop::get_start_parameters(const double tau)
 {
-  Eigen::VectorXd par = tau_to_parameters(tau);
+  Vector par = tau_to_parameters(tau);
   par = par.cwiseMax(parameters_lower_bounds_);
   par = par.cwiseMin(parameters_upper_bounds_);
   return par;

@@ -71,7 +71,7 @@ The constructor with known parameters takes 3 arguments:
 Bicop clayton(BicopFamily::clayton, 90);
 
 // Gauss copula with parameter 0.5
-Bicop gauss(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
+Bicop gauss(BicopFamily::gaussian, 0,  Vector::Constant(1, 0.5));
 ```
 The constructor from data takes the same arguments as the select method and is
 described in the next section.
@@ -84,7 +84,7 @@ select the best fitting model from a set of families with `select()`.
 
 ``` cpp
 // create a Gauss copula with parameter 0.5 and simulate 1e3 observations
-Bicop model(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
+Bicop model(BicopFamily::gaussian, 0,  Vector::Constant(1, 0.5));
 auto data = model.simulate(1e3);
 
 // instantiate a gaussian copula with default parameters and fit to data
@@ -129,7 +129,7 @@ degree zero, one and two.
 are multiplied.
 - `std::string selection_criterion` describes the criterion to compare the
 families. It can take either `"loglik"`, `"aic"`, or `"bic"`(default).
-- `Eigen::VectorXd weights` an optional vector of weights for the observations.
+- `Vector weights` an optional vector of weights for the observations.
 - `bool preselect_families` describes a heuristic preselection method (default
 is `true`) based on symmetry properties of the data (e.g., the unrotated
 Clayton won't be preselected if the data displays upper-tail dependence).
@@ -169,7 +169,7 @@ h-functions, log-likelihood, AIC, and BIC.
 
 ```
 // Gauss copula with parameter 0.5
-Bicop bicop(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
+Bicop bicop(BicopFamily::gaussian, 0,  Vector::Constant(1, 0.5));
 
 // Simulate 100 observations
 auto sim_data = bicop.simulate(100);
@@ -197,7 +197,7 @@ and [`nlohmann::json` objects](https://github.com/nlohmann/json):
 
 ```
 // Gauss copula with parameter 0.5
-Bicop bicop(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
+Bicop bicop(BicopFamily::gaussian, 0,  Vector::Constant(1, 0.5));
 
 // Save as a nlohmann::json object
 nlohmann::json bicop_json = bicop.to_json();

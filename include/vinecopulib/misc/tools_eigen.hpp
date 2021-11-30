@@ -31,7 +31,7 @@ unaryExpr_or_nan(const Matrix& x, const T& func)
 }
 
 template<typename T>
-Eigen::VectorXd
+Vector
 binaryExpr_or_nan(const Matrix& u, const T& func)
 {
   auto func_or_nan = [&func](const double& u1, const double& u2) {
@@ -48,13 +48,13 @@ void
 remove_nans(Matrix& x);
 
 void
-remove_nans(Matrix& x, Eigen::VectorXd& weights);
+remove_nans(Matrix& x, Vector& weights);
 
 void
 trim(Matrix& x, const double& lower = 1e-10, const double& upper = 1 - 1e-10);
 
 void
-trim(Eigen::VectorXd& x,
+trim(Vector& x,
      const double& lower = 1e-10,
      const double& upper = 1 - 1e-10);
 
@@ -64,18 +64,18 @@ check_if_in_unit_cube(const Matrix& u);
 Matrix
 swap_cols(Matrix u);
 
-Eigen::VectorXd
-unique(const Eigen::VectorXd& x);
+Vector
+unique(const Vector& x);
 
-Eigen::VectorXd
-invert_f(const Eigen::VectorXd& x,
-         std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
+Vector
+invert_f(const Vector& x,
+         std::function<Vector(const Vector&)> f,
          const double lb = 1e-20,
          const double ub = 1 - 1e-20,
          int n_iter = 35);
 
 Matrix
-expand_grid(const Eigen::VectorXd& grid_points);
+expand_grid(const Vector& grid_points);
 
 Matrix
 read_matxd(const char* filename, int max_buffer_size = static_cast<int>(1e6));

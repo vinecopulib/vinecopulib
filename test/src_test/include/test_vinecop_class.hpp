@@ -155,7 +155,7 @@ TEST_F(VinecopTest, fit_statistics_getters_are_correct)
 TEST_F(VinecopTest, truncate_methods_works)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  auto par = Vector::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
     for (auto& pc : tree) {
       pc = Bicop(BicopFamily::clayton, 270, par);
@@ -173,7 +173,7 @@ TEST_F(VinecopTest, truncate_methods_works)
 TEST_F(VinecopTest, pdf_is_correct)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  auto par = Vector::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
     for (auto& pc : tree) {
       pc = Bicop(BicopFamily::clayton, 270, par);
@@ -188,7 +188,7 @@ TEST_F(VinecopTest, cdf_is_correct)
 {
   // Create a bivariate copula and a corresponding vine with two variables
   auto pair_copulas = Vinecop::make_pair_copula_store(2);
-  auto par = Eigen::VectorXd::Constant(1, 0.5);
+  auto par = Vector::Constant(1, 0.5);
   auto bicop = Bicop(BicopFamily::gaussian, 0, par);
   for (auto& tree : pair_copulas) {
     for (auto& pc : tree) {
@@ -211,7 +211,7 @@ TEST_F(VinecopTest, cdf_is_correct)
 TEST_F(VinecopTest, simulate_is_correct)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  auto par = Vector::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
     for (auto& pc : tree) {
       pc = Bicop(BicopFamily::clayton, 270, par);
@@ -233,7 +233,7 @@ TEST_F(VinecopTest, simulate_is_correct)
 TEST_F(VinecopTest, rosenblatt_is_correct)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  auto par = Vector::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
     for (auto& pc : tree) {
       pc = Bicop(BicopFamily::clayton, 270, par);
@@ -279,7 +279,7 @@ TEST_F(VinecopTest, aic_bic_are_correct)
   auto pair_copulas = Vinecop::make_pair_copula_store(d);
   for (auto& tree : pair_copulas) {
     for (auto& pc : tree) {
-      pc = Bicop(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 3.0));
+      pc = Bicop(BicopFamily::clayton, 0, Vector::Constant(1, 3.0));
     }
   }
   Vinecop complex_model(model_matrix, pair_copulas);
@@ -291,7 +291,7 @@ TEST_F(VinecopTest, aic_bic_are_correct)
 TEST_F(VinecopTest, family_select_finds_true_rotations)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  auto par = Vector::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
     for (auto& pc : tree) {
       pc = Bicop(BicopFamily::clayton, 270, par);
@@ -317,7 +317,7 @@ TEST_F(VinecopTest, family_select_returns_pcs_in_right_order)
 {
   u.conservativeResize(50, 7);
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  auto par = Vector::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
     for (auto& pc : tree) {
       pc = Bicop(BicopFamily::clayton, 270, par);

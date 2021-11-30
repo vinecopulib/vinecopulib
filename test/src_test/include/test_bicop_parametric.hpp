@@ -46,7 +46,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     Matrix u = results.block(0, 1, n, 2);
 
     // evaluate pdf in C++
-    Eigen::VectorXd f = bicop_.pdf(u);
+    Vector f = bicop_.pdf(u);
     // assert approximate equality
     ASSERT_TRUE(f.isApprox(results.block(0, 3, n, 1), 1e-4)) << bicop_.str();
 

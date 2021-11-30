@@ -10,15 +10,15 @@ namespace vinecopulib {
 inline GaussianBicop::GaussianBicop()
 {
   family_ = BicopFamily::gaussian;
-  parameters_ = Eigen::VectorXd(1);
-  parameters_lower_bounds_ = Eigen::VectorXd(1);
-  parameters_upper_bounds_ = Eigen::VectorXd(1);
+  parameters_ = Vector(1);
+  parameters_lower_bounds_ = Vector(1);
+  parameters_upper_bounds_ = Vector(1);
   parameters_ << 0;
   parameters_lower_bounds_ << -1;
   parameters_upper_bounds_ << 1;
 }
 
-inline Eigen::VectorXd
+inline Vector
 GaussianBicop::pdf_raw(const Matrix& u)
 {
   // Inverse Cholesky of the correlation matrix
@@ -30,7 +30,7 @@ GaussianBicop::pdf_raw(const Matrix& u)
   L(1, 0) = 0;
 
   // Compute copula density
-  Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
+  Vector f = Vector::Ones(u.rows());
   Matrix tmp = tools_stats::qnorm(u);
   f = f.cwiseQuotient(tools_stats::dnorm(tmp).rowwise().prod());
   tmp = tmp * L;
@@ -38,34 +38,34 @@ GaussianBicop::pdf_raw(const Matrix& u)
   return f / sqrt(1.0 - pow(rho, 2.0));
 }
 
-inline Eigen::VectorXd
+inline Vector
 GaussianBicop::cdf(const Matrix& u)
 {
   return tools_stats::pbvnorm(tools_stats::qnorm(u),
                               double(this->parameters_(0)));
 }
 
-inline Eigen::VectorXd
+inline Vector
 GaussianBicop::hfunc1_raw(const Matrix& u)
 {
   double rho = double(this->parameters_(0));
-  Eigen::VectorXd h = Eigen::VectorXd::Zero(u.rows());
+  Vector h = Vector::Zero(u.rows());
   Matrix tmp = tools_stats::qnorm(u);
   h = (tmp.col(1) - rho * tmp.col(0)) / sqrt(1.0 - pow(rho, 2.0));
   return tools_stats::pnorm(h);
 }
 
-inline Eigen::VectorXd
+inline Vector
 GaussianBicop::hinv1_raw(const Matrix& u)
 {
   double rho = double(this->parameters_(0));
-  Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
+  Vector hinv = Vector::Zero(u.rows());
   Matrix tmp = tools_stats::qnorm(u);
   hinv = tmp.col(1) * sqrt(1.0 - pow(rho, 2.0)) + rho * tmp.col(0);
   return tools_stats::pnorm(hinv);
 }
 
-inline Eigen::VectorXd
+inline Vector
 GaussianBicop::get_start_parameters(const double tau)
 {
   return tau_to_parameters(tau);
@@ -74,7 +74,7 @@ GaussianBicop::get_start_parameters(const double tau)
 inline Matrix
 GaussianBicop::tau_to_parameters(const double& tau)
 {
-  Eigen::VectorXd parameters = this->parameters_;
+  Vector parameters = this->parameters_;
   parameters(0) = std::sin(tau * constant::pi / 2);
   return parameters;
 }

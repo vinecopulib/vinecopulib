@@ -62,7 +62,7 @@ inline FitControlsVinecop::FitControlsVinecop(
   std::string tree_criterion,
   double threshold,
   std::string selection_criterion,
-  const Eigen::VectorXd& weights,
+  const Vector& weights,
   double psi0,
   bool preselect_families,
   bool select_trunc_lvl,

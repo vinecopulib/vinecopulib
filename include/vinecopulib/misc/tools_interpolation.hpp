@@ -20,7 +20,7 @@ class InterpolationGrid
 public:
   InterpolationGrid() {}
 
-  InterpolationGrid(const Eigen::VectorXd& grid_points,
+  InterpolationGrid(const Vector& grid_points,
                     const Matrix& values,
                     int norm_times = 3);
 
@@ -32,11 +32,11 @@ public:
 
   void normalize_margins(int times);
 
-  Eigen::VectorXd interpolate(const Matrix& x);
+  Vector interpolate(const Matrix& x);
 
-  Eigen::VectorXd integrate_1d(const Matrix& u, size_t cond_var);
+  Vector integrate_1d(const Matrix& u, size_t cond_var);
 
-  Eigen::VectorXd integrate_2d(const Matrix& u);
+  Vector integrate_2d(const Matrix& u);
 
 private:
   Eigen::Matrix<ptrdiff_t, 1, 2> get_indices(double x0, double x1);
@@ -51,10 +51,10 @@ private:
                                 double x,
                                 double y);
   double int_on_grid(const double& upr,
-                     const Eigen::VectorXd& vals,
-                     const Eigen::VectorXd& grid);
+                     const Vector& vals,
+                     const Vector& grid);
 
-  Eigen::VectorXd grid_points_;
+  Vector grid_points_;
   Matrix values_;
 };
 }

@@ -23,10 +23,10 @@ void
 preselect_candidates(std::vector<Bicop>& bicops,
                      const Matrix& data,
                      double tau,
-                     const Eigen::VectorXd& weights);
+                     const Vector& weights);
 
 std::vector<double>
-get_c1c2(const Matrix& data, double tau, const Eigen::VectorXd& weights);
+get_c1c2(const Matrix& data, double tau, const Vector& weights);
 
 bool
 preselect_family(std::vector<double> c, double tau, const Bicop& bicop);

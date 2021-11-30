@@ -37,13 +37,13 @@ protected:
   void fit(const Matrix& data,
            std::string method,
            double,
-           const Eigen::VectorXd& weights);
+           const Vector& weights);
 
   double get_npars() const;
 
   void set_npars(const double& npars);
 
-  virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
+  virtual Vector get_start_parameters(const double tau) = 0;
 
 private:
   double winsorize_tau(double tau) const;

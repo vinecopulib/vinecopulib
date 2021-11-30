@@ -24,17 +24,17 @@ public:
   TllBicop();
 
 private:
-  Eigen::VectorXd gaussian_kernel_2d(const Matrix& x);
+  Vector gaussian_kernel_2d(const Matrix& x);
 
   Eigen::Matrix2d select_bandwidth(const Matrix& x,
                                    std::string method,
-                                   const Eigen::VectorXd& weights);
+                                   const Vector& weights);
 
   Matrix fit_local_likelihood(const Matrix& x,
                               const Matrix& x_data,
                               const Eigen::Matrix2d& B,
                               std::string method,
-                              const Eigen::VectorXd& weights);
+                              const Vector& weights);
 
   double calculate_infl(const size_t& n,
                         const double& f0,
@@ -48,7 +48,7 @@ private:
   void fit(const Matrix& data,
            std::string method,
            double mult,
-           const Eigen::VectorXd& weights);
+           const Vector& weights);
 };
 }
 

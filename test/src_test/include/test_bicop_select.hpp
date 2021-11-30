@@ -14,7 +14,7 @@ using namespace vinecopulib;
 
 TEST(bicop_select, works_in_parallel)
 {
-  Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
+  Bicop cop(BicopFamily::gaussian, 0, Vector::Constant(1, -0.5));
   auto u = cop.simulate(15);
   Bicop fit1, fit2;
   fit1.select(u);
@@ -27,7 +27,7 @@ TEST(bicop_select, works_in_parallel)
 
 TEST(bicop_select, allows_all_selcrits)
 {
-  Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
+  Bicop cop(BicopFamily::gaussian, 0, Vector::Constant(1, -0.5));
   auto u = cop.simulate(15);
   FitControlsBicop controls;
   controls.set_selection_criterion("loglik");
@@ -42,7 +42,7 @@ TEST(bicop_select, allows_all_selcrits)
 
 TEST(bicop_select, fit_stats_are_correct)
 {
-  Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
+  Bicop cop(BicopFamily::gaussian, 0, Vector::Constant(1, -0.5));
   auto u = cop.simulate(15);
   cop.select(u);
   EXPECT_EQ(cop.get_nobs(), 15);

@@ -17,7 +17,7 @@ using namespace vinecopulib;
 TEST(discrete, bicop)
 {
   for (auto rot : { 0, 90, 180, 270 }) {
-    auto bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
+    auto bc = Bicop(BicopFamily::clayton, rot, Vector::Constant(1, 3));
     auto u = bc.simulate(1000, true, { 1 });
 
     Matrix u_disc(u.rows(), 4);
@@ -78,7 +78,7 @@ TEST(discrete, vinecop)
   for (size_t t = 0; t < 4; t++) {
     for (auto& pc : pair_copulas[t]) {
       auto par =
-        Eigen::VectorXd::Constant(1, 2.0 / (static_cast<double>(t) + 1.0));
+        Vector::Constant(1, 2.0 / (static_cast<double>(t) + 1.0));
       pc = Bicop(BicopFamily::clayton, 90, par);
     }
   }

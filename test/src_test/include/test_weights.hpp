@@ -39,8 +39,8 @@ TEST(test_weights, works_in_bicop_select)
 {
   // if half of the weights are zero
   auto u = tools_stats::simulate_uniform(200, 2);
-  Eigen::VectorXd w = Eigen::VectorXd::Zero(200);
-  w.head(100) = Eigen::VectorXd::Ones(100);
+  Vector w = Vector::Zero(200);
+  w.head(100) = Vector::Ones(100);
 
   FitControlsBicop controls(bicop_families::parametric);
   auto cop_uw = Bicop(u.block(0, 0, 100, 2), controls);
@@ -54,8 +54,8 @@ TEST(test_weights, works_in_vinecop_select)
 {
   // if half of the weights are zero
   auto u = tools_stats::simulate_uniform(200, 7);
-  Eigen::VectorXd w = Eigen::VectorXd::Zero(200);
-  w.head(100) = Eigen::VectorXd::Ones(100);
+  Vector w = Vector::Zero(200);
+  w.head(100) = Vector::Ones(100);
 
   FitControlsBicop controls(bicop_families::parametric);
   auto cop_uw = Vinecop(

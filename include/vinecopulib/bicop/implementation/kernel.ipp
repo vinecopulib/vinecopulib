@@ -25,7 +25,7 @@ inline KernelBicop::KernelBicop()
   npars_ = 0.0;
 }
 
-inline Eigen::VectorXd
+inline Vector
 KernelBicop::pdf_raw(const Matrix& u)
 {
   auto pdf = interp_grid_->interpolate(u);
@@ -33,7 +33,7 @@ KernelBicop::pdf_raw(const Matrix& u)
   return pdf;
 }
 
-inline Eigen::VectorXd
+inline Vector
 KernelBicop::pdf(const Matrix& u)
 {
   if (u.cols() == 4) {
@@ -43,25 +43,25 @@ KernelBicop::pdf(const Matrix& u)
   return pdf_raw(u);
 }
 
-inline Eigen::VectorXd
+inline Vector
 KernelBicop::cdf(const Matrix& u)
 {
   return interp_grid_->integrate_2d(u);
 }
 
-inline Eigen::VectorXd
+inline Vector
 KernelBicop::hfunc1_raw(const Matrix& u)
 {
   return interp_grid_->integrate_1d(u, 1);
 }
 
-inline Eigen::VectorXd
+inline Vector
 KernelBicop::hfunc2_raw(const Matrix& u)
 {
   return interp_grid_->integrate_1d(u, 2);
 }
 
-inline Eigen::VectorXd
+inline Vector
 KernelBicop::hfunc1(const Matrix& u)
 {
   if (u.cols() == 4) {
@@ -72,7 +72,7 @@ KernelBicop::hfunc1(const Matrix& u)
   return hfunc1_raw(u);
 }
 
-inline Eigen::VectorXd
+inline Vector
 KernelBicop::hfunc2(const Matrix& u)
 {
   if (u.cols() == 4) {
@@ -83,13 +83,13 @@ KernelBicop::hfunc2(const Matrix& u)
   return hfunc2_raw(u);
 }
 
-inline Eigen::VectorXd
+inline Vector
 KernelBicop::hinv1_raw(const Matrix& u)
 {
   return hinv1_num(u);
 }
 
-inline Eigen::VectorXd
+inline Vector
 KernelBicop::hinv2_raw(const Matrix& u)
 {
   return hinv2_num(u);
@@ -172,10 +172,10 @@ KernelBicop::tau_to_parameters(const double& tau)
 }
 
 // construct default grid (equally spaced on Gaussian scale)
-inline Eigen::VectorXd
+inline Vector
 KernelBicop::make_normal_grid(size_t m)
 {
-  Eigen::VectorXd grid_points(m);
+  Vector grid_points(m);
   for (size_t i = 0; i < m; ++i)
     grid_points(i) =
       -3.25 + static_cast<double>(i) * (6.5 / static_cast<double>(m - 1));

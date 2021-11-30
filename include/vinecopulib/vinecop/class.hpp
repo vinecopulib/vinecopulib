@@ -117,9 +117,9 @@ public:
   double get_mbicv(const double psi0 = 0.9) const;
 
   // Stats methods
-  Eigen::VectorXd pdf(Matrix u, const size_t num_threads = 1) const;
+  Vector pdf(Matrix u, const size_t num_threads = 1) const;
 
-  Eigen::VectorXd cdf(const Matrix& u,
+  Vector cdf(const Matrix& u,
                       const size_t N = 1e4,
                       const size_t num_threads = 1,
                       std::vector<int> seeds = std::vector<int>()) const;
@@ -175,7 +175,7 @@ protected:
     const std::vector<std::vector<Bicop>>& pair_copulas) const;
   double calculate_mbicv_penalty(const size_t nobs, const double psi0) const;
   void finalize_fit(const tools_select::VinecopSelector& selector);
-  void check_weights_size(const Eigen::VectorXd& weights,
+  void check_weights_size(const Vector& weights,
                           const Matrix& data) const;
   void check_enough_data(const Matrix& data) const;
   void check_fitted() const;

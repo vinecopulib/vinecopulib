@@ -100,15 +100,15 @@ simulate_uniform(const size_t& n,
                  bool qrng = false,
                  std::vector<int> seeds = std::vector<int>());
 
-Eigen::VectorXd
-to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method = "average");
+Vector
+to_pseudo_obs_1d(Vector x, const std::string& ties_method = "average");
 
 Matrix
 to_pseudo_obs(Matrix x, const std::string& ties_method = "average");
 
 double
 pairwise_mcor(const Matrix& x,
-              const Eigen::VectorXd& weights = Eigen::VectorXd());
+              const Vector& weights = Vector());
 
 Matrix
 dependence_matrix(const Matrix& x, const std::string& measure);
@@ -123,10 +123,10 @@ sobol(const size_t& n,
       const size_t& d,
       const std::vector<int>& seeds = std::vector<int>());
 
-Eigen::VectorXd
+Vector
 pbvt(const Matrix& z, int nu, double rho);
 
-Eigen::VectorXd
+Vector
 pbvnorm(const Matrix& z, double rho);
 }
 }

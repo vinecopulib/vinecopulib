@@ -67,7 +67,7 @@ inline void
 ParBicop::fit(const Matrix& data,
               std::string method,
               double,
-              const Eigen::VectorXd& weights)
+              const Vector& weights)
 {
   // for independence copula we don't have to do anything
   if (family_ == BicopFamily::indep) {
@@ -93,9 +93,9 @@ ParBicop::fit(const Matrix& data,
   auto initial_parameters = get_start_parameters(winsorize_tau(tau));
 
   // find (pseudo-) mle
-  std::function<double(const Eigen::VectorXd&)> objective;
+  std::function<double(const Vector&)> objective;
   if (method == "mle") {
-    objective = [&data, &weights, this](const Eigen::VectorXd& pars) {
+    objective = [&data, &weights, this](const Vector& pars) {
       this->set_parameters(pars);
       return this->loglik(data, weights);
     };
@@ -104,8 +104,8 @@ ParBicop::fit(const Matrix& data,
     set_parameters(initial_parameters);
     initial_parameters(0) = initial_parameters(1);
     initial_parameters.conservativeResize(1);
-    objective = [&data, &weights, this](const Eigen::VectorXd& pars) {
-      Eigen::VectorXd newpars(2);
+    objective = [&data, &weights, this](const Vector& pars) {
+      Vector newpars(2);
       newpars(0) = this->get_parameters()(0);
       newpars(1) = pars(0);
       this->set_parameters(newpars);

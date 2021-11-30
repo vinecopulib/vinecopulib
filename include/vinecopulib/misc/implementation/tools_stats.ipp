@@ -78,7 +78,7 @@ to_pseudo_obs(Matrix x, const std::string& ties_method)
 {
   for (int j = 0; j < x.cols(); ++j)
     x.col(j) =
-      to_pseudo_obs_1d(static_cast<Eigen::VectorXd>(x.col(j)), ties_method);
+      to_pseudo_obs_1d(static_cast<Vector>(x.col(j)), ties_method);
 
   return x;
 }
@@ -93,8 +93,8 @@ to_pseudo_obs(Matrix x, const std::string& ties_method)
 //! @param ties_method Indicates how to treat ties; same as in R, see
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
 //! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$.
-inline Eigen::VectorXd
-to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method)
+inline Vector
+to_pseudo_obs_1d(Vector x, const std::string& ties_method)
 {
   size_t n = x.size();
   std::vector<double> xvec(x.data(), x.data() + n);
@@ -139,14 +139,14 @@ to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method)
 }
 
 //! window smoother
-inline Eigen::VectorXd
-win(const Eigen::VectorXd& x, size_t wl = 5)
+inline Vector
+win(const Vector& x, size_t wl = 5)
 {
   size_t n = x.size();
-  Eigen::VectorXd xx = Eigen::VectorXd::Zero(n + 2 * wl);
-  Eigen::VectorXd yy = Eigen::VectorXd::Zero(n + 2 * wl);
+  Vector xx = Vector::Zero(n + 2 * wl);
+  Vector yy = Vector::Zero(n + 2 * wl);
   xx.block(2 * wl, 0, n, 1) = x;
-  yy.block(0, 0, 2 * wl + 1, 1) = Eigen::VectorXd::Ones(2 * wl + 1);
+  yy.block(0, 0, 2 * wl + 1, 1) = Vector::Ones(2 * wl + 1);
 
   Eigen::FFT<double> fft;
   Eigen::VectorXcd tmp1 = fft.fwd(xx);
@@ -154,30 +154,30 @@ win(const Eigen::VectorXd& x, size_t wl = 5)
   tmp2 = tmp2.conjugate();
   tmp1 = tmp1.cwiseProduct(tmp2);
   tmp2 = fft.inv(tmp1);
-  Eigen::VectorXd result = tmp2.real().block(wl, 0, n, 1);
+  Vector result = tmp2.real().block(wl, 0, n, 1);
   result /= 2.0 * static_cast<double>(wl) + 1.0;
-  result.block(0, 0, wl, 1) = Eigen::VectorXd::Constant(wl, result(wl));
+  result.block(0, 0, wl, 1) = Vector::Constant(wl, result(wl));
   result.block(n - wl, 0, wl, 1) =
-    Eigen::VectorXd::Constant(wl, result(n - wl - 1));
+    Vector::Constant(wl, result(n - wl - 1));
   return result;
 }
 
 //! helper routine for ace (In R, this would be win(x[ind], wl)[ranks])
-inline Eigen::VectorXd
-cef(const Eigen::VectorXd& x,
+inline Vector
+cef(const Vector& x,
     const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& ind,
     const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& ranks,
     size_t wl = 5)
 {
   size_t n_ind = ind.size();
-  Eigen::VectorXd cey(n_ind);
+  Vector cey(n_ind);
   for (size_t i = 0; i < n_ind; i++) {
     cey(i) = x(ind(i));
   }
   cey = win(cey, wl);
 
   size_t n_ranks = ranks.size();
-  Eigen::VectorXd result(n_ranks);
+  Vector result(n_ranks);
   for (size_t i = 0; i < n_ranks; i++) {
     result(i) = cey(ranks(i));
   }
@@ -187,7 +187,7 @@ cef(const Eigen::VectorXd& x,
 //! alternating conditional expectation algorithm
 inline Matrix
 ace(const Matrix& data,                                 // data
-    const Eigen::VectorXd& weights = Eigen::VectorXd(), // weights
+    const Vector& weights = Vector(), // weights
     size_t wl = 0,                // window length for the smoother
     size_t outer_iter_max = 100,  // max number of outer iterations
     size_t inner_iter_max = 10,   // max number of inner iterations
@@ -196,12 +196,12 @@ ace(const Matrix& data,                                 // data
 {
   // sample size and memory allocation for the outer/inner loops
   size_t n = data.rows();
-  Eigen::VectorXd tmp(n);
+  Vector tmp(n);
 
   size_t nw = weights.size();
-  Eigen::VectorXd w(n);
+  Vector w(n);
   if (nw == 0) {
-    w = Eigen::VectorXd::Ones(n);
+    w = Vector::Ones(n);
   } else {
     if (nw != n) {
       throw std::runtime_error("weights should have a length equal to "
@@ -292,7 +292,7 @@ ace(const Matrix& data,                                 // data
 
 //! calculates the pairwise maximum correlation coefficient.
 inline double
-pairwise_mcor(const Matrix& x, const Eigen::VectorXd& weights)
+pairwise_mcor(const Matrix& x, const Vector& weights)
 {
   Matrix phi = ace(x, weights);
   return wdm::wdm(phi, "cor", weights)(0, 1);
@@ -321,7 +321,7 @@ ghalton(const size_t& n, const size_t& d, const std::vector<int>& seeds)
   // Coefficients of the shift
   Eigen::MatrixXi shcoeff(d, 32);
   Eigen::VectorXi base = tools_ghalton::primes.block(0, 0, d, 1);
-  Matrix u = Eigen::VectorXd::Zero(d, 1);
+  Matrix u = Vector::Zero(d, 1);
   auto U = simulate_uniform(d, 32, false, seeds);
   for (int k = 31; k >= 0; k--) {
     shcoeff.col(k) =
@@ -346,7 +346,7 @@ ghalton(const size_t& n, const size_t& d, const std::vector<int>& seeds)
       k++;
     }
 
-    u = Eigen::VectorXd::Zero(d);
+    u = Vector::Zero(d);
     k = 31;
     while (k >= 0) {
       tmp = perm.cwiseProduct(coeff.col(k)) + shcoeff.col(k);
@@ -464,7 +464,7 @@ sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 //! @param rho Correlation.
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
-inline Eigen::VectorXd
+inline Vector
 pbvt(const Matrix& z, int nu, double rho)
 {
   double snu = sqrt(static_cast<double>(nu));
@@ -589,7 +589,7 @@ pbvt(const Matrix& z, int nu, double rho)
 //! @param rho Correlation.
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
-inline Eigen::VectorXd
+inline Vector
 pbvnorm(const Matrix& z, double rho)
 {
 
@@ -606,7 +606,7 @@ pbvnorm(const Matrix& z, double rho)
   } else {
     lg = 10;
   }
-  Eigen::VectorXd w(lg), x(lg);
+  Vector w(lg), x(lg);
   if (std::fabs(rho) < .3f) {
     w << 0.1713244923791705, 0.3607615730481384, 0.4679139345726904;
     x << -.9324695142031522, -.6612093864662647, -.238619186083197;

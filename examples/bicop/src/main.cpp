@@ -16,7 +16,7 @@ main()
   std::cout << std::endl;
 
   // create Gumbel copula and simulate from the model
-  auto model = Bicop(BicopFamily::gumbel, 0, Eigen::VectorXd::Constant(1, 2));
+  auto model = Bicop(BicopFamily::gumbel, 0, Vector::Constant(1, 2));
   auto data = model.simulate(2e3);
   std::cout << "Created Model | " << model.str() << std::endl;
 

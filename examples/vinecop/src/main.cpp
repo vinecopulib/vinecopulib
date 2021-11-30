@@ -22,7 +22,7 @@ main()
   auto pair_copulas = Vinecop::make_pair_copula_store(d);
 
   // specify the pair copulas
-  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  auto par = Vector::Constant(1, 3.0);
   for (auto& tree : pair_copulas) {
     for (auto& pc : tree) {
       pc = Bicop(BicopFamily::clayton, 270, par);

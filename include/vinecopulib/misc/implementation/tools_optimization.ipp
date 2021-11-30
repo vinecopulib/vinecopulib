@@ -43,11 +43,11 @@ Optimizer::set_controls(double initial_trust_region,
 //! @param upper_bounds Upper bounds for the parameters.
 //! @param the Objective function to maximize.
 //! @return the optimal parameters.
-inline Eigen::VectorXd
-Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
-                    const Eigen::VectorXd& lower_bounds,
-                    const Eigen::VectorXd& upper_bounds,
-                    std::function<double(const Eigen::VectorXd&)> objective)
+inline Vector
+Optimizer::optimize(const Vector& initial_parameters,
+                    const Vector& lower_bounds,
+                    const Vector& upper_bounds,
+                    std::function<double(const Vector&)> objective)
 {
   check_parameters_size(initial_parameters, lower_bounds, upper_bounds);
   size_t n_parameters = initial_parameters.size();
@@ -58,7 +58,7 @@ Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
     size_t number_interpolation_conditions = n_parameters + 3;
     std::function<double(size_t, const double*)> f =
       [objective, this](size_t n, const double* x) {
-        Eigen::Map<const Eigen::VectorXd> par(x, n);
+        Eigen::Map<const Vector> par(x, n);
         this->objective_calls_++;
         return -objective(par);
       };
@@ -76,7 +76,7 @@ Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
   } else {
     double eps = 1e-6;
     std::function<double(double)> f = [objective, this](double x) {
-      Eigen::Map<const Eigen::VectorXd> par(&x, 1);
+      Eigen::Map<const Vector> par(&x, 1);
       this->objective_calls_++;
       return -objective(par);
     };
@@ -108,9 +108,9 @@ Optimizer::get_objective_max() const
 
 //! checks whether sizes of parameters and bounds match.
 inline void
-Optimizer::check_parameters_size(const Eigen::VectorXd& initial_parameters,
-                                 const Eigen::VectorXd& lower_bounds,
-                                 const Eigen::VectorXd& upper_bounds) const
+Optimizer::check_parameters_size(const Vector& initial_parameters,
+                                 const Vector& lower_bounds,
+                                 const Vector& upper_bounds) const
 {
   if (initial_parameters.size() != upper_bounds.size()) {
     throw std::runtime_error(

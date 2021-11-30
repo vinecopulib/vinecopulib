@@ -11,9 +11,9 @@ namespace vinecopulib {
 inline Bb8Bicop::Bb8Bicop()
 {
   family_ = BicopFamily::bb8;
-  parameters_ = Eigen::VectorXd(2);
-  parameters_lower_bounds_ = Eigen::VectorXd(2);
-  parameters_upper_bounds_ = Eigen::VectorXd(2);
+  parameters_ = Vector(2);
+  parameters_lower_bounds_ = Vector(2);
+  parameters_upper_bounds_ = Vector(2);
   parameters_ << 1, 1;
   parameters_lower_bounds_ << 1, 1e-4;
   parameters_upper_bounds_ << 8, 1;
@@ -56,7 +56,7 @@ Bb8Bicop::generator_derivative(const double& u)
 //    return res * (theta - 1 + tmp) / std::pow(tmp - 1, 2);
 //}
 
-inline Eigen::VectorXd
+inline Vector
 Bb8Bicop::pdf_raw(const Matrix& u)
 {
   double theta = static_cast<double>(parameters_(0));

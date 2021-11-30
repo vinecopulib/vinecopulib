@@ -23,9 +23,9 @@ class EllipticalBicop : public ParBicop
 {
 private:
   // hfunction and its inverse
-  Eigen::VectorXd hfunc2_raw(const Matrix& u);
+  Vector hfunc2_raw(const Matrix& u);
 
-  Eigen::VectorXd hinv2_raw(const Matrix& u);
+  Vector hinv2_raw(const Matrix& u);
 
   // link between Kendall's tau and the par_bicop parameter
   double parameters_to_tau(const Matrix& parameters);

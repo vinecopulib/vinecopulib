@@ -74,17 +74,17 @@ public:
   std::vector<std::string> get_var_types() const;
 
   // Stats methods
-  Eigen::VectorXd pdf(const Matrix& u) const;
+  Vector pdf(const Matrix& u) const;
 
-  Eigen::VectorXd cdf(const Matrix& u) const;
+  Vector cdf(const Matrix& u) const;
 
-  Eigen::VectorXd hfunc1(const Matrix& u) const;
+  Vector hfunc1(const Matrix& u) const;
 
-  Eigen::VectorXd hfunc2(const Matrix& u) const;
+  Vector hfunc2(const Matrix& u) const;
 
-  Eigen::VectorXd hinv1(const Matrix& u) const;
+  Vector hinv1(const Matrix& u) const;
 
-  Eigen::VectorXd hinv2(const Matrix& u) const;
+  Vector hinv2(const Matrix& u) const;
 
   Matrix simulate(const size_t& n,
                   const bool qrng = false,
@@ -138,7 +138,7 @@ private:
 
   void flip_abstract_var_types();
 
-  void check_weights_size(const Eigen::VectorXd& weights,
+  void check_weights_size(const Vector& weights,
                           const Matrix& data) const;
 
   void check_fitted() const;

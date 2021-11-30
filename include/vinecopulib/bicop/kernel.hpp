@@ -32,23 +32,23 @@ public:
   KernelBicop();
 
 protected:
-  Eigen::VectorXd pdf_raw(const Matrix& u) override;
+  Vector pdf_raw(const Matrix& u) override;
 
-  Eigen::VectorXd pdf(const Matrix& u) override;
+  Vector pdf(const Matrix& u) override;
 
-  Eigen::VectorXd cdf(const Matrix& u) override;
+  Vector cdf(const Matrix& u) override;
 
-  Eigen::VectorXd hfunc1_raw(const Matrix& u) override;
+  Vector hfunc1_raw(const Matrix& u) override;
 
-  Eigen::VectorXd hfunc2_raw(const Matrix& u) override;
+  Vector hfunc2_raw(const Matrix& u) override;
 
-  Eigen::VectorXd hfunc1(const Matrix& u) override;
+  Vector hfunc1(const Matrix& u) override;
 
-  Eigen::VectorXd hfunc2(const Matrix& u) override;
+  Vector hfunc2(const Matrix& u) override;
 
-  Eigen::VectorXd hinv1_raw(const Matrix& u) override;
+  Vector hinv1_raw(const Matrix& u) override;
 
-  Eigen::VectorXd hinv2_raw(const Matrix& u) override;
+  Vector hinv2_raw(const Matrix& u) override;
 
   double get_npars() const override;
 
@@ -68,7 +68,7 @@ protected:
 
   Matrix tau_to_parameters(const double& tau) override;
 
-  Eigen::VectorXd make_normal_grid(size_t m = 30);
+  Vector make_normal_grid(size_t m = 30);
 
   std::shared_ptr<tools_interpolation::InterpolationGrid> interp_grid_;
   double npars_;
