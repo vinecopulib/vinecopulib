@@ -6,20 +6,20 @@
 
 #pragma once
 
-#include <Eigen/Dense>
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 #include <functional>
+#include <vinecopulib/misc/tools_linalg.hpp>
 
 namespace vinecopulib {
 
 //! Tools for working with Eigen types
 namespace tools_eigen {
-//! An `Eigen::Matrix` containing `bool`s (similar to `Eigen::MatrixXd`).
+//! An `Eigen::Matrix` containing `bool`s (similar to `Matrix`).
 typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
 
 template<typename T>
-Eigen::MatrixXd
-unaryExpr_or_nan(const Eigen::MatrixXd& x, const T& func)
+Matrix
+unaryExpr_or_nan(const Matrix& x, const T& func)
 {
   return x.unaryExpr([&func](const double& y) {
     if ((boost::math::isnan)(y)) {
@@ -32,7 +32,7 @@ unaryExpr_or_nan(const Eigen::MatrixXd& x, const T& func)
 
 template<typename T>
 Eigen::VectorXd
-binaryExpr_or_nan(const Eigen::MatrixXd& u, const T& func)
+binaryExpr_or_nan(const Matrix& u, const T& func)
 {
   auto func_or_nan = [&func](const double& u1, const double& u2) {
     if ((boost::math::isnan)(u1) | (boost::math::isnan)(u2)) {
@@ -45,15 +45,13 @@ binaryExpr_or_nan(const Eigen::MatrixXd& u, const T& func)
 }
 
 void
-remove_nans(Eigen::MatrixXd& x);
+remove_nans(Matrix& x);
 
 void
-remove_nans(Eigen::MatrixXd& x, Eigen::VectorXd& weights);
+remove_nans(Matrix& x, Eigen::VectorXd& weights);
 
 void
-trim(Eigen::MatrixXd& x,
-     const double& lower = 1e-10,
-     const double& upper = 1 - 1e-10);
+trim(Matrix& x, const double& lower = 1e-10, const double& upper = 1 - 1e-10);
 
 void
 trim(Eigen::VectorXd& x,
@@ -61,10 +59,10 @@ trim(Eigen::VectorXd& x,
      const double& upper = 1 - 1e-10);
 
 bool
-check_if_in_unit_cube(const Eigen::MatrixXd& u);
+check_if_in_unit_cube(const Matrix& u);
 
-Eigen::MatrixXd
-swap_cols(Eigen::MatrixXd u);
+Matrix
+swap_cols(Matrix u);
 
 Eigen::VectorXd
 unique(const Eigen::VectorXd& x);
@@ -76,10 +74,10 @@ invert_f(const Eigen::VectorXd& x,
          const double ub = 1 - 1e-20,
          int n_iter = 35);
 
-Eigen::MatrixXd
+Matrix
 expand_grid(const Eigen::VectorXd& grid_points);
 
-Eigen::MatrixXd
+Matrix
 read_matxd(const char* filename, int max_buffer_size = static_cast<int>(1e6));
 
 Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>

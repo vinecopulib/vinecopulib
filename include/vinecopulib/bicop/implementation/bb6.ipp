@@ -57,7 +57,7 @@ Bb6Bicop::generator_derivative(const double& u)
 //}
 
 inline Eigen::VectorXd
-Bb6Bicop::pdf_raw(const Eigen::MatrixXd& u)
+Bb6Bicop::pdf_raw(const Matrix& u)
 {
   double theta = static_cast<double>(parameters_(0));
   double delta = static_cast<double>(parameters_(1));
@@ -114,7 +114,7 @@ Bb6Bicop::pdf_raw(const Eigen::MatrixXd& u)
 }
 
 inline double
-Bb6Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
+Bb6Bicop::parameters_to_tau(const Matrix& parameters)
 {
   double theta = parameters(0);
   double delta = parameters(1);
@@ -127,7 +127,7 @@ Bb6Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   return 1 + tools_integration::integrate_zero_to_one(f);
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 Bb6Bicop::tau_to_parameters(const double& tau)
 {
   return no_tau_to_parameters(tau);

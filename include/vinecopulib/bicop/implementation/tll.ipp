@@ -17,7 +17,7 @@ inline TllBicop::TllBicop()
 }
 
 inline Eigen::VectorXd
-TllBicop::gaussian_kernel_2d(const Eigen::MatrixXd& x)
+TllBicop::gaussian_kernel_2d(const Matrix& x)
 {
   return tools_stats::dnorm(x).rowwise().prod();
 }
@@ -25,14 +25,14 @@ TllBicop::gaussian_kernel_2d(const Eigen::MatrixXd& x)
 //! selects the bandwidth matrix for local líkelihood estimator (covariance
 //! times appropriate factor).
 inline Eigen::Matrix2d
-TllBicop::select_bandwidth(const Eigen::MatrixXd& x,
+TllBicop::select_bandwidth(const Matrix& x,
                            std::string method,
                            const Eigen::VectorXd& weights)
 {
   size_t n = x.rows();
   double cor = wdm::wdm(x, "cor", weights)(0, 1);
   cor = std::min(std::max(cor, -0.95), 0.95);
-  Eigen::Matrix2d cov = Eigen::MatrixXd::Identity(2, 2);
+  Eigen::Matrix2d cov = Matrix::Identity(2, 2);
   cov(0, 1) = cor;
   cov(1, 0) = cor;
 
@@ -79,9 +79,9 @@ chol22(const Eigen::Matrix2d& B)
 //! @param weights Vector of weights for the observations
 //! @return a two-column matrix; first column is estimated density, second
 //!    column is influence of evaluation point.
-inline Eigen::MatrixXd
-TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
-                               const Eigen::MatrixXd& x_data,
+inline Matrix
+TllBicop::fit_local_likelihood(const Matrix& x,
+                               const Matrix& x_data,
                                const Eigen::Matrix2d& B,
                                std::string method,
                                const Eigen::VectorXd& weights)
@@ -94,16 +94,16 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
   double det_irB = irB.determinant();
 
   // de-correlate data by applying B^{-1/2}
-  Eigen::MatrixXd z = (irB * x.transpose()).transpose();
-  Eigen::MatrixXd z_data = (irB * x_data.transpose()).transpose();
+  Matrix z = (irB * x.transpose()).transpose();
+  Matrix z_data = (irB * x_data.transpose()).transpose();
 
-  Eigen::MatrixXd res(m, 2);
+  Matrix res(m, 2);
   res.col(0) = Eigen::VectorXd::Ones(m); // result will be a product
   Eigen::VectorXd kernels(n);
   Eigen::Vector2d f1;
   Eigen::Vector2d b;
   Eigen::Matrix2d S(B);
-  Eigen::MatrixXd zz(n, 2), zz2(n, 2);
+  Matrix zz(n, 2), zz2(n, 2);
   for (size_t k = 0; k < m; ++k) {
     zz = z_data - z.row(k).replicate(n, 1);
     kernels = gaussian_kernel_2d(zz) * det_irB;
@@ -160,17 +160,17 @@ TllBicop::calculate_infl(const size_t& n,
                          const std::string& method,
                          const double& weight)
 {
-  Eigen::MatrixXd M;
+  Matrix M;
   if (method == "constant") {
-    M = Eigen::MatrixXd::Constant(1, 1, f0);
+    M = Matrix::Constant(1, 1, f0);
   } else if (method == "linear") {
-    M = Eigen::MatrixXd(3, 3);
+    M = Matrix(3, 3);
     M(0, 0) = f0;
     M.col(0).tail(2) = B * b * f0;
     M.row(0).tail(2) = M.col(0).tail(2);
     M.block(1, 1, 2, 2) = f0 * B + f0 * B * b * b.transpose() * B;
   } else if (method == "quadratic") {
-    M = Eigen::MatrixXd::Zero(6, 6);
+    M = Matrix::Zero(6, 6);
     M(0, 0) = f0;
     M.col(0).segment(1, 2) = f0 * b;
     M.row(0).segment(1, 2) = M.col(0).segment(1, 2);
@@ -179,7 +179,7 @@ TllBicop::calculate_infl(const size_t& n,
     M(4, 0) = 0.5 * M(2, 2);
     M(5, 0) = M(1, 2);
     M.row(0).tail(3) = M.col(0).tail(3);
-    Eigen::MatrixXd Si = S.inverse();
+    Matrix Si = S.inverse();
     M(3, 1) = 0.5 * f0 * (3.0 * Si(0, 0) * b(0) + std::pow(b(0), 3));
     M(4, 2) = 0.5 * f0 * (3.0 * Si(1, 1) * b(1) + std::pow(b(1), 3));
     M(4, 1) = 0.5 * f0;
@@ -211,13 +211,13 @@ TllBicop::calculate_infl(const size_t& n,
     M(4, 5) = M(5, 4);
   }
 
-  double infl = gaussian_kernel_2d(Eigen::MatrixXd::Zero(1, 2))(0) * det_irB;
+  double infl = gaussian_kernel_2d(Matrix::Zero(1, 2))(0) * det_irB;
   infl *= M.inverse()(0, 0) * weight / static_cast<double>(n);
   return infl;
 }
 
 inline void
-TllBicop::fit(const Eigen::MatrixXd& data,
+TllBicop::fit(const Matrix& data,
               std::string method,
               double mult,
               const Eigen::VectorXd& weights)
@@ -233,25 +233,25 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   auto grid_2d = tools_eigen::expand_grid(grid_points);
 
   // transform evaluation grid and data by inverse Gaussian cdf
-  Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
+  Matrix z = tools_stats::qnorm(grid_2d);
 
   // use jittering in case observations are discrete
   auto psobs = tools_stats::to_pseudo_obs(data.leftCols(2), "random");
-  Eigen::MatrixXd z_data = tools_stats::qnorm(psobs);
+  Matrix z_data = tools_stats::qnorm(psobs);
 
   // find bandwidth matrix
   Eigen::Matrix2d B = select_bandwidth(z_data, method, weights);
   B *= mult;
 
   // compute the density estimator (first column estimate, second influence)
-  Eigen::MatrixXd ll_fit = fit_local_likelihood(z, z_data, B, method, weights);
+  Matrix ll_fit = fit_local_likelihood(z, z_data, B, method, weights);
 
   // transform density estimate to copula scale
   Eigen::VectorXd c =
     ll_fit.col(0).cwiseQuotient(tools_stats::dnorm(z).rowwise().prod());
   // store values in mxm grid
-  Eigen::MatrixXd values(m, m);
-  values = Eigen::Map<Eigen::MatrixXd>(c.data(), m, m).transpose();
+  Matrix values(m, m);
+  values = Eigen::Map<Matrix>(c.data(), m, m).transpose();
 
   // for interpolation, we shift the limiting gridpoints to 0 and 1
   grid_points(0) = 0.0;
@@ -261,8 +261,8 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   // compute effective degrees of freedom via interpolation ---------
   // stabilize interpolation by restricting to plausible range
   Eigen::VectorXd infl_vec = ll_fit.col(1).cwiseMin(1.3).cwiseMax(-0.2);
-  Eigen::MatrixXd infl(m, m);
-  infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), m, m).transpose();
+  Matrix infl(m, m);
+  infl = Eigen::Map<Matrix>(infl_vec.data(), m, m).transpose();
   // don't normalize margins of the EDF! (norm_times = 0)
   auto infl_grid = InterpolationGrid(grid_points, infl, 0);
   if ((var_types_[0] == "d") | (var_types_[1] == "d")) {

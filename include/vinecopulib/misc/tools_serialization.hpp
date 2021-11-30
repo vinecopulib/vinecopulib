@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <Eigen/Dense>
 #include <fstream>
 #include <vector>
 #include <vinecopulib/misc/nlohmann_json.hpp>
+#include <vinecopulib/misc/tools_linalg.hpp>
 #include <vinecopulib/misc/triangular_array.hpp>
 
 namespace vinecopulib {
@@ -90,8 +90,8 @@ json_to_matrix(const nlohmann::json& input)
   size_t cols = input["shape"][1];
   std::vector<double> vec = input["data"];
 
-  Eigen::MatrixXd matrix;
-  matrix = Eigen::MatrixXd::Map(&vec[0], rows, cols);
+  Matrix matrix;
+  matrix = Matrix::Map(&vec[0], rows, cols);
 
   return matrix.cast<T>();
 }

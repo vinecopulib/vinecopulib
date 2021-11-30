@@ -6,30 +6,27 @@
 
 #pragma once
 
-#include <Eigen/Dense>
 #include <vector>
 #include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_linalg.hpp>
 
 namespace vinecopulib {
 namespace tools_select {
 
 std::vector<Bicop>
-create_candidate_bicops(const Eigen::MatrixXd& data,
-                        const FitControlsBicop& controls);
+create_candidate_bicops(const Matrix& data, const FitControlsBicop& controls);
 
 std::vector<BicopFamily>
 get_candidate_families(const FitControlsBicop& controls);
 
 void
 preselect_candidates(std::vector<Bicop>& bicops,
-                     const Eigen::MatrixXd& data,
+                     const Matrix& data,
                      double tau,
                      const Eigen::VectorXd& weights);
 
 std::vector<double>
-get_c1c2(const Eigen::MatrixXd& data,
-         double tau,
-         const Eigen::VectorXd& weights);
+get_c1c2(const Matrix& data, double tau, const Eigen::VectorXd& weights);
 
 bool
 preselect_family(std::vector<double> c, double tau, const Bicop& bicop);

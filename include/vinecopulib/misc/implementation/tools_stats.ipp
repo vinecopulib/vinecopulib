@@ -29,7 +29,7 @@ namespace tools_stats {
 //!
 //! @return An \f$ n \times d \f$ matrix of independent
 //! \f$ \mathrm{U}[0, 1] \f$ random variables.
-inline Eigen::MatrixXd
+inline Matrix
 simulate_uniform(const size_t& n,
                  const size_t& d,
                  bool qrng,
@@ -58,7 +58,7 @@ simulate_uniform(const size_t& n,
   std::mt19937 generator(seq);
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
-  Eigen::MatrixXd u(n, d);
+  Matrix u(n, d);
   return u.unaryExpr([&](double) { return distribution(generator); });
 }
 
@@ -73,8 +73,8 @@ simulate_uniform(const size_t& n,
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
 //! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$
 //! (column-wise).
-inline Eigen::MatrixXd
-to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method)
+inline Matrix
+to_pseudo_obs(Matrix x, const std::string& ties_method)
 {
   for (int j = 0; j < x.cols(); ++j)
     x.col(j) =
@@ -185,8 +185,8 @@ cef(const Eigen::VectorXd& x,
 }
 
 //! alternating conditional expectation algorithm
-inline Eigen::MatrixXd
-ace(const Eigen::MatrixXd& data,                        // data
+inline Matrix
+ace(const Matrix& data,                                 // data
     const Eigen::VectorXd& weights = Eigen::VectorXd(), // weights
     size_t wl = 0,                // window length for the smoother
     size_t outer_iter_max = 100,  // max number of outer iterations
@@ -229,7 +229,7 @@ ace(const Eigen::MatrixXd& data,                        // data
   }
 
   // initialize output
-  Eigen::MatrixXd phi = ranks.cast<double>();
+  Matrix phi = ranks.cast<double>();
   phi.array() -= (n_dbl - 1.0) / 2.0 - 1.0;
   phi /= std::sqrt(n_dbl * (n_dbl - 1.0) / 12.0);
   if (nw > 0) {
@@ -292,9 +292,9 @@ ace(const Eigen::MatrixXd& data,                        // data
 
 //! calculates the pairwise maximum correlation coefficient.
 inline double
-pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
+pairwise_mcor(const Matrix& x, const Eigen::VectorXd& weights)
 {
-  Eigen::MatrixXd phi = ace(x, weights);
+  Matrix phi = ace(x, weights);
   return wdm::wdm(phi, "cor", weights)(0, 1);
 }
 //! @}
@@ -312,16 +312,16 @@ pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 //!
 //! @return An \f$ n \times d \f$ matrix of quasi-random
 //! \f$ \mathrm{U}[0, 1] \f$ variables.
-inline Eigen::MatrixXd
+inline Matrix
 ghalton(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 {
 
-  Eigen::MatrixXd res(d, n);
+  Matrix res(d, n);
 
   // Coefficients of the shift
   Eigen::MatrixXi shcoeff(d, 32);
   Eigen::VectorXi base = tools_ghalton::primes.block(0, 0, d, 1);
-  Eigen::MatrixXd u = Eigen::VectorXd::Zero(d, 1);
+  Matrix u = Eigen::VectorXd::Zero(d, 1);
   auto U = simulate_uniform(d, 32, false, seeds);
   for (int k = 31; k >= 0; k--) {
     shcoeff.col(k) =
@@ -373,19 +373,19 @@ ghalton(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 //!
 //! @return An \f$ n \times d \f$ matrix of quasi-random
 //! \f$ \mathrm{U}[0, 1] \f$ variables.
-inline Eigen::MatrixXd
+inline Matrix
 sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 {
 
   // output matrix
-  Eigen::MatrixXd output = Eigen::MatrixXd::Zero(n, d);
+  Matrix output = Matrix::Zero(n, d);
 
   // L = max number of bits needed
   size_t L =
     static_cast<size_t>(std::ceil(log(static_cast<double>(n)) / log(2.0)));
 
   // Vector of scrambling factors
-  Eigen::MatrixXd scrambling = simulate_uniform(d, 1, false, seeds);
+  Matrix scrambling = simulate_uniform(d, 1, false, seeds);
 
   // C(i) = index from the right of the first zero bit of i + 1
   Eigen::Matrix<size_t, Eigen::Dynamic, 1> C(n);
@@ -465,7 +465,7 @@ sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
 inline Eigen::VectorXd
-pbvt(const Eigen::MatrixXd& z, int nu, double rho)
+pbvt(const Matrix& z, int nu, double rho)
 {
   double snu = sqrt(static_cast<double>(nu));
   double ors = 1 - pow(rho, 2.0);
@@ -590,7 +590,7 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
 //!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
 inline Eigen::VectorXd
-pbvnorm(const Eigen::MatrixXd& z, double rho)
+pbvnorm(const Matrix& z, double rho)
 {
 
   // normal cdf

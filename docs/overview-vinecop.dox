@@ -113,14 +113,14 @@ structure of the object), using the sequential procedure proposed by
     Alternatively, `select_families()` performs parameter estimation and automatic
     model selection for a known structure (i.e., using the structure of the
     object). In both cases, the only mandatory argument is the data
-    (stored in a `Eigen::MatrixXd`), while controls argument allow for
+    (stored in a `Matrix`), while controls argument allow for
     customization of the fit.
 ```
 // specify the dimension of the model
 int d = 5;
 
 // simulate dummy data
-Eigen::MatrixXd data = tools_stats::simulate_uniform(100, d);
+Matrix data = tools_stats::simulate_uniform(100, d);
 
 // instantiate a D-vine and select the families
 Vinecop model(d);
@@ -160,7 +160,7 @@ of `select_all()` and `select_families()` can be used as arguments to a
 int d = 4;
 
 // simulate dummy data
-Eigen::MatrixXd data = simulate_uniform(100, d);
+Matrix data = simulate_uniform(100, d);
 
 // instantiate a vine from data using the default arguments
 Vinecop best_vine(data);

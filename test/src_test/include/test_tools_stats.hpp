@@ -23,18 +23,18 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct)
 
   // X1 = (1,...,n) and X2 = (n, ..., 1)
   // X = (X1, X2)
-  Eigen::MatrixXd X(n, 2);
+  Matrix X(n, 2);
   X.col(0) = Eigen::VectorXd::LinSpaced(n, 1, n);
   X.col(1) = Eigen::VectorXd::LinSpaced(n, n, 1);
 
   // U = pobs(X)
-  Eigen::MatrixXd U = tools_stats::to_pseudo_obs(X);
+  Matrix U = tools_stats::to_pseudo_obs(X);
   for (int i = 0; i < 9; i++) {
     EXPECT_NEAR(U(i, 0), (i + 1.0) * 0.1, 1e-2);
     EXPECT_NEAR(U(i, 1), 1.0 - (i + 1.0) * 0.1, 1e-2);
   }
 
-  Eigen::MatrixXd X2 = tools_stats::simulate_uniform(100, 2);
+  Matrix X2 = tools_stats::simulate_uniform(100, 2);
   EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X2, "random"));
   EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X2, "first"));
   EXPECT_ANY_THROW(tools_stats::to_pseudo_obs(X2, "something"));
@@ -78,7 +78,7 @@ TEST(test_tools_stats, qrng_are_correct)
 TEST(test_tools_stats, mcor_works)
 {
   std::vector<int> seeds = { 1, 2, 3, 4, 5 };
-  Eigen::MatrixXd Z = tools_stats::simulate_uniform(10000, 2, true, seeds);
+  Matrix Z = tools_stats::simulate_uniform(10000, 2, true, seeds);
   Z = tools_stats::qnorm(Z);
   Z.block(0, 1, 5000, 1) =
     Z.block(0, 1, 5000, 1) + Z.block(0, 0, 5000, 1).cwiseAbs2();
@@ -128,7 +128,7 @@ TEST(test_tools_stats, dpt_are_nan_safe)
 
 TEST(test_tools_stats, pbvt_and_pbvnorm_are_nan_safe)
 {
-  Eigen::MatrixXd X = Eigen::MatrixXd::Random(10, 2);
+  Matrix X = Matrix::Random(10, 2);
   X(0) = std::numeric_limits<double>::quiet_NaN();
   double rho = -0.95;
   int nu = 5;

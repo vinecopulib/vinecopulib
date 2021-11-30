@@ -19,7 +19,7 @@ VinecopTest::VinecopTest()
   vc_matrix = vinecopulib::tools_eigen::read_matxs("temp3").colwise().reverse();
 
   // u, pdf, sim
-  Eigen::MatrixXd temp = vinecopulib::tools_eigen::read_matxd("temp");
+  Matrix temp = vinecopulib::tools_eigen::read_matxd("temp");
   size_t n = temp.rows();
   size_t m = model_matrix.rows();
   u = temp.block(0, 0, n, m);

@@ -18,5 +18,5 @@ public:
 
   Bicop bicop_;
   FitControlsBicop controls;
-  Eigen::MatrixXd u;
+  Matrix u;
 };

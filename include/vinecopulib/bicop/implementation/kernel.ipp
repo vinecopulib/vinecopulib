@@ -20,13 +20,13 @@ inline KernelBicop::KernelBicop()
   grid_points(m - 1) = 1.0;
 
   interp_grid_ = std::make_shared<tools_interpolation::InterpolationGrid>(
-    grid_points, Eigen::MatrixXd::Constant(m, m, 1.0) // independence
+    grid_points, Matrix::Constant(m, m, 1.0) // independence
   );
   npars_ = 0.0;
 }
 
 inline Eigen::VectorXd
-KernelBicop::pdf_raw(const Eigen::MatrixXd& u)
+KernelBicop::pdf_raw(const Matrix& u)
 {
   auto pdf = interp_grid_->interpolate(u);
   tools_eigen::trim(pdf, 1e-20, DBL_MAX);
@@ -34,7 +34,7 @@ KernelBicop::pdf_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-KernelBicop::pdf(const Eigen::MatrixXd& u)
+KernelBicop::pdf(const Matrix& u)
 {
   if (u.cols() == 4) {
     // evaluate jittered density at mid rank for stability
@@ -44,25 +44,25 @@ KernelBicop::pdf(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-KernelBicop::cdf(const Eigen::MatrixXd& u)
+KernelBicop::cdf(const Matrix& u)
 {
   return interp_grid_->integrate_2d(u);
 }
 
 inline Eigen::VectorXd
-KernelBicop::hfunc1_raw(const Eigen::MatrixXd& u)
+KernelBicop::hfunc1_raw(const Matrix& u)
 {
   return interp_grid_->integrate_1d(u, 1);
 }
 
 inline Eigen::VectorXd
-KernelBicop::hfunc2_raw(const Eigen::MatrixXd& u)
+KernelBicop::hfunc2_raw(const Matrix& u)
 {
   return interp_grid_->integrate_1d(u, 2);
 }
 
 inline Eigen::VectorXd
-KernelBicop::hfunc1(const Eigen::MatrixXd& u)
+KernelBicop::hfunc1(const Matrix& u)
 {
   if (u.cols() == 4) {
     auto u_avg = u;
@@ -73,7 +73,7 @@ KernelBicop::hfunc1(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-KernelBicop::hfunc2(const Eigen::MatrixXd& u)
+KernelBicop::hfunc2(const Matrix& u)
 {
   if (u.cols() == 4) {
     auto u_avg = u;
@@ -84,19 +84,19 @@ KernelBicop::hfunc2(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-KernelBicop::hinv1_raw(const Eigen::MatrixXd& u)
+KernelBicop::hinv1_raw(const Matrix& u)
 {
   return hinv1_num(u);
 }
 
 inline Eigen::VectorXd
-KernelBicop::hinv2_raw(const Eigen::MatrixXd& u)
+KernelBicop::hinv2_raw(const Matrix& u)
 {
   return hinv2_num(u);
 }
 
 inline double
-KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
+KernelBicop::parameters_to_tau(const Matrix& parameters)
 {
   auto oldpars = this->get_parameters();
   auto old_types = var_types_;
@@ -129,26 +129,26 @@ KernelBicop::set_npars(const double& npars)
   npars_ = npars;
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 KernelBicop::get_parameters() const
 {
   return interp_grid_->get_values();
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 KernelBicop::get_parameters_lower_bounds() const
 {
-  return Eigen::MatrixXd::Constant(30, 30, 0.0);
+  return Matrix::Constant(30, 30, 0.0);
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 KernelBicop::get_parameters_upper_bounds() const
 {
-  return Eigen::MatrixXd::Constant(30, 30, 1e4);
+  return Matrix::Constant(30, 30, 1e4);
 }
 
 inline void
-KernelBicop::set_parameters(const Eigen::MatrixXd& parameters)
+KernelBicop::set_parameters(const Matrix& parameters)
 {
   if (parameters.minCoeff() < 0) {
     std::stringstream message;
@@ -165,7 +165,7 @@ KernelBicop::flip()
   interp_grid_->flip();
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 KernelBicop::tau_to_parameters(const double& tau)
 {
   return no_tau_to_parameters(tau);

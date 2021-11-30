@@ -8,7 +8,7 @@
 
 namespace vinecopulib {
 // inline Eigen::VectorXd ArchimedeanBicop::pdf(
-//    const Eigen::MatrixXd &u
+//    const Matrix &u
 //)
 //{
 //    auto f = [this](const double &u1, const double &u2) {
@@ -23,7 +23,7 @@ namespace vinecopulib {
 //}
 
 inline Eigen::VectorXd
-ArchimedeanBicop::cdf(const Eigen::MatrixXd& u)
+ArchimedeanBicop::cdf(const Matrix& u)
 {
   auto f = [this](const double& u1, const double& u2) {
     return generator_inv(generator(u1) + generator(u2));
@@ -32,7 +32,7 @@ ArchimedeanBicop::cdf(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-ArchimedeanBicop::hfunc1_raw(const Eigen::MatrixXd& u)
+ArchimedeanBicop::hfunc1_raw(const Matrix& u)
 {
   auto f = [this](const double& u1, const double& u2) {
     double temp = generator_inv(generator(u1) + generator(u2));
@@ -43,20 +43,20 @@ ArchimedeanBicop::hfunc1_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-ArchimedeanBicop::hfunc2_raw(const Eigen::MatrixXd& u)
+ArchimedeanBicop::hfunc2_raw(const Matrix& u)
 {
   return hfunc1_raw(tools_eigen::swap_cols(u));
 }
 
 inline Eigen::VectorXd
-ArchimedeanBicop::hinv1_raw(const Eigen::MatrixXd& u)
+ArchimedeanBicop::hinv1_raw(const Matrix& u)
 {
   Eigen::VectorXd hinv = hinv1_num(u);
   return hinv;
 }
 
 inline Eigen::VectorXd
-ArchimedeanBicop::hinv2_raw(const Eigen::MatrixXd& u)
+ArchimedeanBicop::hinv2_raw(const Matrix& u)
 {
   return hinv1_raw(tools_eigen::swap_cols(u));
 }
@@ -64,7 +64,7 @@ ArchimedeanBicop::hinv2_raw(const Eigen::MatrixXd& u)
 inline Eigen::VectorXd
 ArchimedeanBicop::get_start_parameters(const double)
 {
-  Eigen::MatrixXd lb = this->get_parameters_lower_bounds();
+  Matrix lb = this->get_parameters_lower_bounds();
   Eigen::VectorXd parameters = lb + Eigen::VectorXd::Constant(2, 0.1);
   return parameters;
 }

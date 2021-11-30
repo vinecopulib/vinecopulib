@@ -33,7 +33,7 @@ inline AbstractBicop::~AbstractBicop() {}
 //! @return A pointer to an object that inherits from AbstractBicop.
 //! @{
 inline BicopPtr
-AbstractBicop::create(BicopFamily family, const Eigen::MatrixXd& parameters)
+AbstractBicop::create(BicopFamily family, const Matrix& parameters)
 {
   BicopPtr new_bicop;
   switch (family) {
@@ -87,7 +87,7 @@ AbstractBicop::create(BicopFamily family, const Eigen::MatrixXd& parameters)
 
 //!@}
 
-inline Eigen::MatrixXd
+inline Matrix
 AbstractBicop::no_tau_to_parameters(const double&)
 {
   throw std::runtime_error("Method not implemented for this family");
@@ -132,7 +132,7 @@ AbstractBicop::set_var_types(const std::vector<std::string>& var_types)
 //! evaluates the pdf, but truncates it's value by DBL_MIN and DBL_MAX.
 //! @param u Matrix of evaluation points.
 inline Eigen::VectorXd
-AbstractBicop::pdf(const Eigen::MatrixXd& u)
+AbstractBicop::pdf(const Matrix& u)
 {
 
   Eigen::VectorXd pdf(u.rows());
@@ -148,7 +148,7 @@ AbstractBicop::pdf(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u)
+AbstractBicop::pdf_c_d(const Matrix& u)
 {
   if (var_types_[0] != "c") {
     return (hfunc2_raw(u.leftCols(2)) - hfunc2_raw(u.rightCols(2)))
@@ -162,10 +162,10 @@ AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u)
+AbstractBicop::pdf_d_d(const Matrix& u)
 {
-  Eigen::MatrixXd umax = u.leftCols(2);
-  Eigen::MatrixXd umin = u.rightCols(2);
+  Matrix umax = u.leftCols(2);
+  Matrix umin = u.rightCols(2);
   Eigen::VectorXd pdf = cdf(umax) + cdf(umin);
   umax.col(0).swap(umin.col(0));
   pdf -= cdf(umax) + cdf(umin);
@@ -175,7 +175,7 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
+AbstractBicop::hfunc1(const Matrix& u)
 {
   if (var_types_[0] == "d") {
     auto uu = u;
@@ -189,7 +189,7 @@ AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
+AbstractBicop::hfunc2(const Matrix& u)
 {
   if (var_types_[1] == "d") {
     auto uu = u;
@@ -203,7 +203,7 @@ AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv1(const Eigen::MatrixXd& u)
+AbstractBicop::hinv1(const Matrix& u)
 {
   if (var_types_[0] == "c") {
     return hinv1_raw(u.leftCols(2));
@@ -213,7 +213,7 @@ AbstractBicop::hinv1(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv2(const Eigen::MatrixXd& u)
+AbstractBicop::hinv2(const Matrix& u)
 {
   if (var_types_[1] == "c") {
     return hinv2_raw(u.leftCols(2));
@@ -226,9 +226,9 @@ AbstractBicop::hinv2(const Eigen::MatrixXd& u)
 //! @param u Data matrix.
 //! @param weights Optional weights for each observation.
 inline double
-AbstractBicop::loglik(const Eigen::MatrixXd& u, const Eigen::VectorXd weights)
+AbstractBicop::loglik(const Matrix& u, const Eigen::VectorXd weights)
 {
-  Eigen::MatrixXd log_pdf = this->pdf(u).array().log();
+  Matrix log_pdf = this->pdf(u).array().log();
   if (weights.size() > 0) {
     log_pdf = log_pdf.cwiseProduct(weights);
   }
@@ -245,9 +245,9 @@ AbstractBicop::loglik(const Eigen::MatrixXd& u, const Eigen::VectorXd weights)
 //! @return The numerical inverse of h-functions.
 //! @{
 inline Eigen::VectorXd
-AbstractBicop::hinv1_num(const Eigen::MatrixXd& u)
+AbstractBicop::hinv1_num(const Matrix& u)
 {
-  Eigen::MatrixXd u_new = u;
+  Matrix u_new = u;
   auto h1 = [&](const Eigen::VectorXd& v) {
     u_new.col(1) = v;
     return hfunc1(u_new);
@@ -257,9 +257,9 @@ AbstractBicop::hinv1_num(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv2_num(const Eigen::MatrixXd& u)
+AbstractBicop::hinv2_num(const Matrix& u)
 {
-  Eigen::MatrixXd u_new = u;
+  Matrix u_new = u;
   auto h1 = [&](const Eigen::VectorXd& x) {
     u_new.col(0) = x;
     return hfunc2(u_new);

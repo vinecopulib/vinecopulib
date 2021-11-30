@@ -74,7 +74,7 @@ inline Vinecop::Vinecop(
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
 //! @param controls See `FitControlsVinecop()`.
-inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
+inline Vinecop::Vinecop(const Matrix& data,
                         const RVineStructure& structure,
                         const std::vector<std::string>& var_types,
                         const FitControlsVinecop& controls)
@@ -114,7 +114,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 //!   If empty, then all variables are set as continuous.
 //! @param controls See `FitControlsVinecop()`.
 inline Vinecop::Vinecop(
-  const Eigen::MatrixXd& data,
+  const Matrix& data,
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
   const std::vector<std::string>& var_types,
   const FitControlsVinecop& controls)
@@ -282,7 +282,7 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
+Vinecop::select(const Matrix& data, const FitControlsVinecop& controls)
 {
   check_data(data);
   if (d_ == 1) {
@@ -290,7 +290,7 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
     nobs_ = data.rows();
     return;
   }
-  Eigen::MatrixXd u = collapse_data(data);
+  Matrix u = collapse_data(data);
 
   tools_select::VinecopSelector selector(
     u, rvine_structure_, controls, var_types_);
@@ -323,8 +323,7 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select_all(const Eigen::MatrixXd& data,
-                    const FitControlsVinecop& controls)
+Vinecop::select_all(const Matrix& data, const FitControlsVinecop& controls)
 {
   rvine_structure_ = RVineStructure(d_, static_cast<size_t>(0));
   select(data, controls);
@@ -347,8 +346,7 @@ Vinecop::select_all(const Eigen::MatrixXd& data,
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls to the algorithm (see FitControlsVinecop).
 inline void
-Vinecop::select_families(const Eigen::MatrixXd& data,
-                         const FitControlsVinecop& controls)
+Vinecop::select_families(const Matrix& data, const FitControlsVinecop& controls)
 {
   auto controls_trunc_lvl = controls;
   controls_trunc_lvl.set_trunc_lvl(rvine_structure_.get_trunc_lvl());
@@ -450,12 +448,12 @@ Vinecop::get_all_rotations() const
 //!
 //! @param tree Tree index (starting with 0).
 //! @param edge Edge index (starting with 0).
-inline Eigen::MatrixXd
+inline Matrix
 Vinecop::get_parameters(const size_t tree, const size_t edge) const
 {
   this->check_indices(tree, edge);
   if (tree >= pair_copulas_.size()) {
-    return Eigen::MatrixXd(); // vine is truncated
+    return Matrix(); // vine is truncated
   }
   return pair_copulas_[tree][edge].get_parameters();
 }
@@ -484,10 +482,10 @@ Vinecop::get_trunc_lvl() const
 //!
 //! @return a nested std::vector with entry `[t][e]` corresponding to
 //! edge `e` in tree `t`.
-inline std::vector<std::vector<Eigen::MatrixXd>>
+inline std::vector<std::vector<Matrix>>
 Vinecop::get_all_parameters() const
 {
-  std::vector<std::vector<Eigen::MatrixXd>> parameters(pair_copulas_.size());
+  std::vector<std::vector<Matrix>> parameters(pair_copulas_.size());
   for (size_t tree = 0; tree < parameters.size(); ++tree) {
     parameters[tree].resize(d_ - 1 - tree);
     for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
@@ -745,7 +743,7 @@ Vinecop::get_var_types() const
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
 inline Eigen::VectorXd
-Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
+Vinecop::pdf(Matrix u, const size_t num_threads) const
 {
   check_data(u);
   u = collapse_data(u);
@@ -760,9 +758,9 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects (all data must be in (0, 1))
-    Eigen::MatrixXd hfunc1, hfunc2, u_e, hfunc1_sub, hfunc2_sub, u_e_sub;
-    hfunc1 = Eigen::MatrixXd::Zero(b.size, d_);
-    hfunc2 = Eigen::MatrixXd::Zero(b.size, d_);
+    Matrix hfunc1, hfunc2, u_e, hfunc1_sub, hfunc2_sub, u_e_sub;
+    hfunc1 = Matrix::Zero(b.size, d_);
+    hfunc2 = Matrix::Zero(b.size, d_);
     if (get_n_discrete() > 0) {
       hfunc1_sub = hfunc1;
       hfunc2_sub = hfunc2;
@@ -789,7 +787,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
         auto var_types = edge_copula->get_var_types();
         size_t m = rvine_structure_.min_array(tree, edge);
 
-        u_e = Eigen::MatrixXd(b.size, 2);
+        u_e = Matrix(b.size, 2);
         u_e.col(0) = hfunc2.col(edge);
         if (m == rvine_structure_.struct_array(tree, edge, true)) {
           u_e.col(1) = hfunc2.col(m - 1);
@@ -856,7 +854,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 //! @param seeds Seeds to scramble the quasi-random numbers; if empty (default),
 //!   the random number quasi-generator is seeded randomly.
 inline Eigen::VectorXd
-Vinecop::cdf(const Eigen::MatrixXd& u,
+Vinecop::cdf(const Matrix& u,
              const size_t N,
              const size_t num_threads,
              std::vector<int> seeds) const
@@ -898,7 +896,7 @@ Vinecop::cdf(const Eigen::MatrixXd& u,
 //! @param seeds Seeds of the random number generator; if empty (default),
 //!   the random number generator is seeded randomly.
 //! @return An \f$ n \times d \f$ matrix of samples from the copula model.
-inline Eigen::MatrixXd
+inline Matrix
 Vinecop::simulate(const size_t n,
                   const bool qrng,
                   const size_t num_threads,
@@ -926,7 +924,7 @@ Vinecop::simulate(const size_t n,
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
 inline double
-Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
+Vinecop::loglik(const Matrix& u, const size_t num_threads) const
 {
   if (u.rows() < 1) {
     return this->get_loglik();
@@ -951,7 +949,7 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
 inline double
-Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
+Vinecop::aic(const Matrix& u, const size_t num_threads) const
 {
   return -2 * this->loglik(u, num_threads) + 2 * get_npars();
 }
@@ -972,7 +970,7 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
 inline double
-Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
+Vinecop::bic(const Matrix& u, const size_t num_threads) const
 {
   return -2 * this->loglik(u, num_threads) +
          get_npars() * log(static_cast<double>(u.rows()));
@@ -1001,7 +999,7 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //!   of `u`.
 // clang-format on
 inline double
-Vinecop::mbicv(const Eigen::MatrixXd& u,
+Vinecop::mbicv(const Matrix& u,
                const double psi0,
                const size_t num_threads) const
 {
@@ -1035,8 +1033,8 @@ Vinecop::get_npars() const
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-inline Eigen::MatrixXd
-Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
+inline Matrix
+Vinecop::rosenblatt(const Matrix& u, const size_t num_threads) const
 {
   if (get_n_discrete() > 0) {
     throw std::runtime_error("rosenblatt() only works for continuous models.");
@@ -1052,13 +1050,13 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 
   // fill first row of hfunc2 matrix with evaluation points;
   // points have to be reordered to correspond to natural order
-  Eigen::MatrixXd hfunc1(n, d);
-  Eigen::MatrixXd hfunc2(n, d);
+  Matrix hfunc1(n, d);
+  Matrix hfunc2(n, d);
   for (size_t j = 0; j < d; ++j)
     hfunc2.col(j) = u.col(order[j] - 1);
 
   auto do_batch = [&](const tools_batch::Batch& b) {
-    Eigen::MatrixXd u_e(b.size, 2);
+    Matrix u_e(b.size, 2);
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
       tools_interface::check_user_interrupt(
         static_cast<double>(n) * static_cast<double>(d) > 1e5);
@@ -1117,9 +1115,8 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-inline Eigen::MatrixXd
-Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
-                            const size_t num_threads) const
+inline Matrix
+Vinecop::inverse_rosenblatt(const Matrix& u, const size_t num_threads) const
 {
   if (get_n_discrete() > 0) {
     throw std::runtime_error(
@@ -1132,7 +1129,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   }
   size_t d = d_;
 
-  Eigen::MatrixXd U_vine = u.leftCols(d); // output matrix
+  Matrix U_vine = u.leftCols(d); // output matrix
   //                   (direct + indirect)    (U_vine)       (info matrices)
   size_t bytes_required = (8 * 2 * n * d * d) + (8 * n * d) + (4 * 4 * d * d);
   // if the problem is too large (requires more than 1 GB memory), split
@@ -1174,7 +1171,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
         Bicop edge_copula = pair_copulas_[tree][var].as_continuous();
 
         // extract data for conditional pair
-        Eigen::MatrixXd U_e(b.size, 2);
+        Matrix U_e(b.size, 2);
         size_t m = rvine_structure_.min_array(tree, var);
         U_e.col(0) = hinv2(tree + 1, var);
         if (m == rvine_structure_.struct_array(tree, var, true)) {
@@ -1212,7 +1209,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
 //! Checks if dimension d of the data matches the dimension of the vine.
 inline void
-Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
+Vinecop::check_data_dim(const Matrix& data) const
 {
   size_t d_data = data.cols();
   auto n_disc = get_n_discrete();
@@ -1235,7 +1232,7 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
 
 //! Checks if dimension d of the data matches the dimension of the vine.
 inline void
-Vinecop::check_data(const Eigen::MatrixXd& data) const
+Vinecop::check_data(const Matrix& data) const
 {
   check_data_dim(data);
   tools_eigen::check_if_in_unit_cube(data);
@@ -1279,7 +1276,7 @@ Vinecop::finalize_fit(const tools_select::VinecopSelector& selector)
 //! Checks if weights are compatible with the data.
 inline void
 Vinecop::check_weights_size(const Eigen::VectorXd& weights,
-                            const Eigen::MatrixXd& data) const
+                            const Matrix& data) const
 {
   if ((weights.size() > 0) & (weights.size() != data.rows())) {
     throw std::runtime_error("sizes of weights and data don't match.");
@@ -1288,7 +1285,7 @@ Vinecop::check_weights_size(const Eigen::VectorXd& weights,
 
 //! Checks if data size is large enough.
 inline void
-Vinecop::check_enough_data(const Eigen::MatrixXd& data) const
+Vinecop::check_enough_data(const Matrix& data) const
 {
   if (data.rows() == 1) {
     throw std::runtime_error("data must have more than one row");
@@ -1361,13 +1358,13 @@ Vinecop::get_n_discrete() const
 }
 
 //! @brief Removes superfluous columns for continuous data.
-inline Eigen::MatrixXd
-Vinecop::collapse_data(const Eigen::MatrixXd& u) const
+inline Matrix
+Vinecop::collapse_data(const Matrix& u) const
 {
   if (static_cast<size_t>(u.cols()) == d_ + get_n_discrete()) {
     return u;
   }
-  Eigen::MatrixXd u_new(u.rows(), d_ + get_n_discrete());
+  Matrix u_new(u.rows(), d_ + get_n_discrete());
   u_new.leftCols(d_) = u.leftCols(d_);
   size_t disc_count = 0;
   for (size_t i = 0; i < d_; ++i) {

@@ -15,8 +15,7 @@ namespace tools_select {
 //! @param data Captured by reference to avoid data copies;
 //!     should NOT be modified though.
 inline std::vector<Bicop>
-create_candidate_bicops(const Eigen::MatrixXd& data,
-                        const FitControlsBicop& controls)
+create_candidate_bicops(const Matrix& data, const FitControlsBicop& controls)
 {
   std::vector<BicopFamily> families = get_candidate_families(controls);
 
@@ -77,7 +76,7 @@ get_candidate_families(const FitControlsBicop& controls)
 //! of the data.
 inline void
 preselect_candidates(std::vector<Bicop>& bicops,
-                     const Eigen::MatrixXd& data,
+                     const Matrix& data,
                      double tau,
                      const Eigen::VectorXd& weights)
 {
@@ -91,14 +90,12 @@ preselect_candidates(std::vector<Bicop>& bicops,
 }
 
 inline std::vector<double>
-get_c1c2(const Eigen::MatrixXd& data,
-         double tau,
-         const Eigen::VectorXd& weights)
+get_c1c2(const Matrix& data, double tau, const Eigen::VectorXd& weights)
 {
   size_t n = data.rows();
-  Eigen::MatrixXd x = Eigen::MatrixXd::Zero(n, 2);
-  Eigen::MatrixXd z1 = x;
-  Eigen::MatrixXd z2 = x;
+  Matrix x = Matrix::Zero(n, 2);
+  Matrix z1 = x;
+  Matrix z2 = x;
   x = tools_stats::qnorm(data);
 
   int count1 = 0, count2 = 0;

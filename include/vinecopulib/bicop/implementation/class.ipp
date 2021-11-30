@@ -25,7 +25,7 @@ namespace vinecopulib {
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 inline Bicop::Bicop(const BicopFamily family,
                     const int rotation,
-                    const Eigen::MatrixXd& parameters,
+                    const Matrix& parameters,
                     const std::vector<std::string>& var_types)
 {
   bicop_ = AbstractBicop::create(family, parameters);
@@ -48,7 +48,7 @@ inline Bicop::Bicop(const BicopFamily family,
 //! @param controls See `select()`.
 //! @param var_types Two strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
-inline Bicop::Bicop(const Eigen::MatrixXd& data,
+inline Bicop::Bicop(const Matrix& data,
                     const FitControlsBicop& controls,
                     const std::vector<std::string>& var_types)
 {
@@ -164,7 +164,7 @@ Bicop::to_file(const std::string& filename) const
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @return The copula density evaluated at \c u.
 inline Eigen::VectorXd
-Bicop::pdf(const Eigen::MatrixXd& u) const
+Bicop::pdf(const Matrix& u) const
 {
   check_data(u);
   return bicop_->pdf(prep_for_abstract(u));
@@ -176,7 +176,7 @@ Bicop::pdf(const Eigen::MatrixXd& u) const
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @return The copula distribution evaluated at \c u.
 inline Eigen::VectorXd
-Bicop::cdf(const Eigen::MatrixXd& u) const
+Bicop::cdf(const Matrix& u) const
 {
   check_data(u);
   Eigen::VectorXd p = bicop_->cdf(prep_for_abstract(u).leftCols(2));
@@ -202,7 +202,7 @@ Bicop::cdf(const Eigen::MatrixXd& u) const
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
-Bicop::hfunc1(const Eigen::MatrixXd& u) const
+Bicop::hfunc1(const Matrix& u) const
 {
   check_data(u);
   Eigen::VectorXd h(u.rows());
@@ -234,7 +234,7 @@ Bicop::hfunc1(const Eigen::MatrixXd& u) const
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
-Bicop::hfunc2(const Eigen::MatrixXd& u) const
+Bicop::hfunc2(const Matrix& u) const
 {
   check_data(u);
   Eigen::VectorXd h(u.rows());
@@ -267,7 +267,7 @@ Bicop::hfunc2(const Eigen::MatrixXd& u) const
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
-Bicop::hinv1(const Eigen::MatrixXd& u) const
+Bicop::hinv1(const Matrix& u) const
 {
   check_data(u);
   Eigen::VectorXd hi(u.rows());
@@ -300,7 +300,7 @@ Bicop::hinv1(const Eigen::MatrixXd& u) const
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline Eigen::VectorXd
-Bicop::hinv2(const Eigen::MatrixXd& u) const
+Bicop::hinv2(const Matrix& u) const
 {
   check_data(u);
   Eigen::VectorXd hi(u.rows());
@@ -338,7 +338,7 @@ Bicop::hinv2(const Eigen::MatrixXd& u) const
 //! @param seeds Seeds of the (quasi-)random number generator; if empty
 //! (default), the (quasi-)random number generator is seeded randomly.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
-inline Eigen::MatrixXd
+inline Matrix
 Bicop::simulate(const size_t& n,
                 const bool qrng,
                 const std::vector<int>& seeds) const
@@ -359,7 +359,7 @@ Bicop::simulate(const size_t& n,
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
-Bicop::loglik(const Eigen::MatrixXd& u) const
+Bicop::loglik(const Matrix& u) const
 {
   if (u.rows() < 1) {
     return get_loglik();
@@ -381,7 +381,7 @@ Bicop::loglik(const Eigen::MatrixXd& u) const
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
-Bicop::aic(const Eigen::MatrixXd& u) const
+Bicop::aic(const Matrix& u) const
 {
   return -2 * loglik(u) + 2 * get_npars();
 }
@@ -398,9 +398,9 @@ Bicop::aic(const Eigen::MatrixXd& u) const
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 inline double
-Bicop::bic(const Eigen::MatrixXd& u) const
+Bicop::bic(const Matrix& u) const
 {
-  Eigen::MatrixXd u_no_nan = u;
+  Matrix u_no_nan = u;
   double n = static_cast<double>(nobs_);
   if (u.rows() > 0) {
     tools_eigen::remove_nans(u_no_nan);
@@ -425,9 +425,9 @@ Bicop::bic(const Eigen::MatrixXd& u) const
 //! @param psi0 Prior probability of a non-independence copula.
 // clang-format on
 inline double
-Bicop::mbic(const Eigen::MatrixXd& u, const double psi0) const
+Bicop::mbic(const Matrix& u, const double psi0) const
 {
-  Eigen::MatrixXd u_no_nan = u;
+  Matrix u_no_nan = u;
   bool is_indep = (this->get_family() == BicopFamily::indep);
   double npars = this->get_npars();
   double log_prior = static_cast<double>(!is_indep) * std::log(psi0) +
@@ -453,7 +453,7 @@ Bicop::get_npars() const
 //!
 //! It only works for one-parameter families.
 //! @param tau A value in \f$ (-1, 1) \f$.
-inline Eigen::MatrixXd
+inline Matrix
 Bicop::tau_to_parameters(const double& tau) const
 {
   return bicop_->tau_to_parameters(tau);
@@ -464,7 +464,7 @@ Bicop::tau_to_parameters(const double& tau) const
 //! @param parameters The parameters (must be a valid parametrization of
 //!     the current family).
 inline double
-Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters) const
+Bicop::parameters_to_tau(const Matrix& parameters) const
 {
   double tau = bicop_->parameters_to_tau(parameters);
   if (tools_stl::is_member(rotation_, { 90, 270 })) {
@@ -499,7 +499,7 @@ Bicop::get_rotation() const
 }
 
 //! @brief Gets the parameters.
-inline Eigen::MatrixXd
+inline Matrix
 Bicop::get_parameters() const
 {
   return bicop_->get_parameters();
@@ -576,14 +576,14 @@ Bicop::set_rotation(const int rotation)
 }
 
 inline void
-Bicop::check_data(const Eigen::MatrixXd& u) const
+Bicop::check_data(const Matrix& u) const
 {
   check_data_dim(u);
   tools_eigen::check_if_in_unit_cube(u);
 }
 
 inline void
-Bicop::check_data_dim(const Eigen::MatrixXd& u) const
+Bicop::check_data_dim(const Matrix& u) const
 {
   size_t n_cols = u.cols();
   int n_disc = get_n_discrete();
@@ -611,7 +611,7 @@ Bicop::flip_abstract_var_types()
 }
 
 inline void
-Bicop::set_parameters(const Eigen::MatrixXd& parameters)
+Bicop::set_parameters(const Matrix& parameters)
 {
   bicop_->set_parameters(parameters);
   bicop_->set_loglik();
@@ -685,14 +685,14 @@ Bicop::str() const
 }
 
 //! @brief Gets lower bounds for copula parameters.
-inline Eigen::MatrixXd
+inline Matrix
 Bicop::get_parameters_lower_bounds() const
 {
   return bicop_->get_parameters_lower_bounds();
 }
 
 //! @brief Gets upper bounds for copula parameters.
-inline Eigen::MatrixXd
+inline Matrix
 Bicop::get_parameters_upper_bounds() const
 {
   return bicop_->get_parameters_upper_bounds();
@@ -740,7 +740,7 @@ Bicop::as_continuous() const
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls (see FitControlsBicop).
 inline void
-Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
+Bicop::fit(const Matrix& data, const FitControlsBicop& controls)
 {
   std::string method;
   if (tools_stl::is_member(bicop_->get_family(), bicop_families::parametric)) {
@@ -751,7 +751,7 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
   tools_eigen::check_if_in_unit_cube(data);
 
   auto w = controls.get_weights();
-  Eigen::MatrixXd data_no_nan = data;
+  Matrix data_no_nan = data;
   check_weights_size(w, data);
   tools_eigen::remove_nans(data_no_nan, w);
 
@@ -783,11 +783,11 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls (see FitControlsBicop).
 inline void
-Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
+Bicop::select(const Matrix& data, FitControlsBicop controls)
 {
   using namespace tools_select;
   check_weights_size(controls.get_weights(), data);
-  Eigen::MatrixXd data_no_nan = data;
+  Matrix data_no_nan = data;
   {
     auto w = controls.get_weights();
     tools_eigen::remove_nans(data_no_nan, w);
@@ -864,8 +864,8 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
 //! @brief Adds an additional column if there's only one discrete variable;
 //! removes superfluous columns for continuous variables.
 //! (continuous models only require two columns, discrete models always four)
-inline Eigen::MatrixXd
-Bicop::format_data(const Eigen::MatrixXd& u) const
+inline Matrix
+Bicop::format_data(const Matrix& u) const
 {
   auto n_disc = get_n_discrete();
   if (n_disc == 0) {
@@ -874,7 +874,7 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
     return u;
   }
   // n_disc = 1:
-  Eigen::MatrixXd u_new(u.rows(), 4);
+  Matrix u_new(u.rows(), 4);
   u_new.leftCols(2) = u.leftCols(2);
   int disc_col = (var_types_[1] == "d");
   int cont_col = 1 - disc_col;
@@ -894,7 +894,7 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
 //! @brief Rotates the data corresponding to the models rotation.
 //! @param u An `n x 2` matrix.
 inline void
-Bicop::rotate_data(Eigen::MatrixXd& u) const
+Bicop::rotate_data(Matrix& u) const
 {
   // counter-clockwise rotations
   switch (rotation_) {
@@ -929,8 +929,8 @@ Bicop::rotate_data(Eigen::MatrixXd& u) const
 //! - add an additional column if there's only one discrete variable.
 //! - trim the data to the interval [1e-10, 1 - 1e-10] for numerical stability.
 //! - rotate the data appropriately (`AbstractBicop` is always 0deg-rotation).
-inline Eigen::MatrixXd
-Bicop::prep_for_abstract(const Eigen::MatrixXd& u) const
+inline Matrix
+Bicop::prep_for_abstract(const Matrix& u) const
 {
   auto u_new = format_data(u);
   tools_eigen::trim(u_new);
@@ -959,7 +959,7 @@ Bicop::check_rotation(int rotation) const
 //! @brief Checks whether weights and data have matching sizes.
 inline void
 Bicop::check_weights_size(const Eigen::VectorXd& weights,
-                          const Eigen::MatrixXd& data) const
+                          const Matrix& data) const
 {
   if ((weights.size() > 0) & (weights.size() != data.rows())) {
     throw std::runtime_error("sizes of weights and data don't match.");

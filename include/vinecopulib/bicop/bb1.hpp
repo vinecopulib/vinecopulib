@@ -35,12 +35,12 @@ private:
   double generator_derivative2(const double& u);
 
   // pdf
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd pdf_raw(const Matrix& u);
 
   // link between Kendall's tau and the par_bicop parameter
-  double parameters_to_tau(const Eigen::MatrixXd& par);
+  double parameters_to_tau(const Matrix& par);
 
-  Eigen::MatrixXd tau_to_parameters(const double& tau);
+  Matrix tau_to_parameters(const double& tau);
 };
 }
 

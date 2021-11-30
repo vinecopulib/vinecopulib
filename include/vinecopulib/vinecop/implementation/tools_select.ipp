@@ -23,12 +23,12 @@ using namespace tools_stl;
 //! @param tree_criterion The criterion.
 //! @param weights Vector of weights for each observation (can be empty).
 inline double
-calculate_criterion(const Eigen::MatrixXd& data,
+calculate_criterion(const Matrix& data,
                     std::string tree_criterion,
                     Eigen::VectorXd weights)
 {
   double w = 0.0;
-  Eigen::MatrixXd data_no_nan = data;
+  Matrix data_no_nan = data;
   tools_eigen::remove_nans(data_no_nan, weights);
   double freq =
     static_cast<double>(data_no_nan.rows()) / static_cast<double>(data.rows());
@@ -54,16 +54,16 @@ calculate_criterion(const Eigen::MatrixXd& data,
 //! @param data Observations.
 //! @param tree_criterion The criterion.
 //! @param weights Vector of weights for each observation (can be empty).
-inline Eigen::MatrixXd
-calculate_criterion_matrix(const Eigen::MatrixXd& data,
+inline Matrix
+calculate_criterion_matrix(const Matrix& data,
                            const std::string& tree_criterion,
                            const Eigen::VectorXd& weights)
 {
   size_t n = data.rows();
   size_t d = data.cols();
-  Eigen::MatrixXd mat(d, d);
+  Matrix mat(d, d);
   mat.diagonal() = Eigen::VectorXd::Constant(d, 1.0);
-  Eigen::MatrixXd pair_data(n, 2);
+  Matrix pair_data(n, 2);
   for (size_t i = 1; i < d; ++i) {
     for (size_t j = 0; j < i; ++j) {
       pair_data.col(0) = data.col(i);
@@ -93,7 +93,7 @@ get_disc_cols(std::vector<std::string> var_types)
   return disc_cols;
 }
 
-inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
+inline VinecopSelector::VinecopSelector(const Matrix& data,
                                         const FitControlsVinecop& controls,
                                         std::vector<std::string> var_types)
   : n_(data.rows())
@@ -108,7 +108,7 @@ inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
   vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
 }
 
-inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
+inline VinecopSelector::VinecopSelector(const Matrix& data,
                                         const RVineStructure& vine_struct,
                                         const FitControlsVinecop& controls,
                                         std::vector<std::string> var_types)
@@ -152,7 +152,7 @@ VinecopSelector::make_pair_copula_store(size_t d, size_t trunc_lvl)
 }
 
 inline void
-VinecopSelector::select_all_trees(const Eigen::MatrixXd& data)
+VinecopSelector::select_all_trees(const Matrix& data)
 {
   loglik_ = 0.0;
   initialize_new_fit(data);
@@ -175,7 +175,7 @@ VinecopSelector::select_all_trees(const Eigen::MatrixXd& data)
 }
 
 inline void
-VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
+VinecopSelector::sparse_select_all_trees(const Matrix& data)
 {
   // family set must be reset after each iteration of the threshold search
   auto family_set = controls_.get_family_set();
@@ -394,7 +394,7 @@ VinecopSelector::add_allowed_edges(VineTree& vine_tree)
       for (size_t v0 = 0; v0 < edges; ++v0) {
         tools_interface::check_user_interrupt(v0 % 10000 == 0);
         size_t v1 = vine_struct_.min_array(tree, v0) - 1;
-        Eigen::MatrixXd pc_data = get_pc_data(v0, v1, vine_tree);
+        Matrix pc_data = get_pc_data(v0, v1, vine_tree);
         EdgeIterator e = boost::add_edge(v0, v1, 1.0, vine_tree).first;
         double crit = calculate_criterion(
           pc_data.leftCols(2), tree_criterion, controls_.get_weights());
@@ -557,7 +557,7 @@ VinecopSelector::add_pc_info(const EdgeIterator& e, VineTree& tree)
   auto v0 = boost::source(e, tree);
   auto v1 = boost::target(e, tree);
   size_t n = tree[v0].hfunc1.size();
-  tree[e].pc_data = Eigen::MatrixXd(n, 2);
+  tree[e].pc_data = Matrix(n, 2);
 
   // find positions of common vertex in pair indices
   size_t ei_common = find_common_neighbor(v0, v1, tree);
@@ -611,14 +611,14 @@ VinecopSelector::get_hfunc_sub(const VertexProperties& vertex_data,
   }
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 VinecopSelector::get_pc_data(size_t v0, size_t v1, const VineTree& tree)
 {
   size_t ei_common = find_common_neighbor(v0, v1, tree);
   auto pos0 = find_position(ei_common, tree[v0].prev_edge_indices);
   auto pos1 = find_position(ei_common, tree[v1].prev_edge_indices);
 
-  Eigen::MatrixXd pc_data(tree[v0].hfunc1.size(), 2);
+  Matrix pc_data(tree[v0].hfunc1.size(), 2);
   pc_data.col(0) = get_hfunc(tree[v0], pos0 == 0);
   pc_data.col(1) = get_hfunc(tree[v1], pos1 == 0);
   return pc_data;
@@ -757,7 +757,7 @@ VinecopSelector::get_thresholded_crits()
 }
 
 inline void
-VinecopSelector::initialize_new_fit(const Eigen::MatrixXd& data)
+VinecopSelector::initialize_new_fit(const Matrix& data)
 {
   trees_[0] = make_base_tree(data);
 }
@@ -782,7 +782,7 @@ VinecopSelector::set_current_fit_as_opt(const double& loglik)
 //! @param data nxd matrix of copula data.
 //! @return A VineTree object containing the base graph.
 inline VineTree
-VinecopSelector::make_base_tree(const Eigen::MatrixXd& data)
+VinecopSelector::make_base_tree(const Matrix& data)
 {
   VineTree base_tree(d_);
   auto order = vine_struct_.get_order();
@@ -926,7 +926,7 @@ VinecopSelector::remove_edge_data(VineTree& tree)
     tree[e].hfunc2 = Eigen::VectorXd();
     tree[e].hfunc1_sub = Eigen::VectorXd();
     tree[e].hfunc2_sub = Eigen::VectorXd();
-    tree[e].pc_data = Eigen::MatrixXd(0, 2);
+    tree[e].pc_data = Matrix(0, 2);
   }
 }
 

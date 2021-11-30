@@ -11,26 +11,26 @@
 #include <wdm/eigen.hpp>
 
 namespace vinecopulib {
-inline Eigen::MatrixXd
+inline Matrix
 ParBicop::get_parameters() const
 {
   return parameters_;
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 ParBicop::get_parameters_lower_bounds() const
 {
   return parameters_lower_bounds_;
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 ParBicop::get_parameters_upper_bounds() const
 {
   return parameters_upper_bounds_;
 }
 
 inline void
-ParBicop::set_parameters(const Eigen::MatrixXd& parameters)
+ParBicop::set_parameters(const Matrix& parameters)
 {
   check_parameters(parameters);
   parameters_ = parameters;
@@ -64,7 +64,7 @@ ParBicop::set_npars(const double&)
 
 // fit
 inline void
-ParBicop::fit(const Eigen::MatrixXd& data,
+ParBicop::fit(const Matrix& data,
               std::string method,
               double,
               const Eigen::VectorXd& weights)
@@ -157,8 +157,8 @@ ParBicop::winsorize_tau(double tau) const
 
 //! adjusts parameter bounds for better search intervals.
 inline void
-ParBicop::adjust_parameters_bounds(Eigen::MatrixXd& lb,
-                                   Eigen::MatrixXd& ub,
+ParBicop::adjust_parameters_bounds(Matrix& lb,
+                                   Matrix& ub,
                                    const double& tau,
                                    const std::string& method)
 {
@@ -194,7 +194,7 @@ ParBicop::adjust_parameters_bounds(Eigen::MatrixXd& lb,
 //! Sanity checks
 //! @{
 inline void
-ParBicop::check_parameters(const Eigen::MatrixXd& parameters)
+ParBicop::check_parameters(const Matrix& parameters)
 {
   check_parameters_size(parameters);
   check_parameters_lower(parameters);
@@ -202,7 +202,7 @@ ParBicop::check_parameters(const Eigen::MatrixXd& parameters)
 }
 
 inline void
-ParBicop::check_parameters_size(const Eigen::MatrixXd& parameters)
+ParBicop::check_parameters_size(const Matrix& parameters)
 {
   if (parameters.size() != parameters_.size()) {
     if (parameters.rows() != parameters_.rows()) {
@@ -225,7 +225,7 @@ ParBicop::check_parameters_size(const Eigen::MatrixXd& parameters)
 }
 
 inline void
-ParBicop::check_parameters_lower(const Eigen::MatrixXd& parameters)
+ParBicop::check_parameters_lower(const Matrix& parameters)
 {
   if (parameters_lower_bounds_.size() > 0) {
     std::stringstream message;
@@ -242,7 +242,7 @@ ParBicop::check_parameters_lower(const Eigen::MatrixXd& parameters)
 }
 
 inline void
-ParBicop::check_parameters_upper(const Eigen::MatrixXd& parameters)
+ParBicop::check_parameters_upper(const Matrix& parameters)
 {
   if (parameters_upper_bounds_.size() > 0) {
     std::stringstream message;

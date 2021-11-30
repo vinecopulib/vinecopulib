@@ -37,7 +37,7 @@ main()
   Vinecop custom_model(pair_copulas, mat);
 
   // simulate data
-  Eigen::MatrixXd data = custom_model.simulate(1e3);
+  Matrix data = custom_model.simulate(1e3);
 
   // instantiate a D-vine and select the families
   Vinecop fitted(d);

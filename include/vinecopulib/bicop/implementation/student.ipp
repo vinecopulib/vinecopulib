@@ -19,12 +19,12 @@ inline StudentBicop::StudentBicop()
 }
 
 inline Eigen::VectorXd
-StudentBicop::pdf_raw(const Eigen::MatrixXd& u)
+StudentBicop::pdf_raw(const Matrix& u)
 {
   double rho = double(this->parameters_(0));
   double nu = double(this->parameters_(1));
   Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
-  Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
+  Matrix tmp = tools_stats::qt(u, nu);
 
   f = tmp.col(0).cwiseAbs2() + tmp.col(1).cwiseAbs2() -
       (2 * rho) * tmp.rowwise().prod();
@@ -39,7 +39,7 @@ StudentBicop::pdf_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-StudentBicop::cdf(const Eigen::MatrixXd& u)
+StudentBicop::cdf(const Matrix& u)
 {
   using namespace tools_stats;
 
@@ -62,12 +62,12 @@ StudentBicop::cdf(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u)
+StudentBicop::hfunc1_raw(const Matrix& u)
 {
   double rho = double(this->parameters_(0));
   double nu = double(this->parameters_(1));
   Eigen::VectorXd h = Eigen::VectorXd::Ones(u.rows());
-  Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
+  Matrix tmp = tools_stats::qt(u, nu);
   h = nu * h + tmp.col(0).cwiseAbs2();
   h *= (1.0 - pow(rho, 2)) / (nu + 1.0);
   h = h.cwiseSqrt().cwiseInverse().cwiseProduct(tmp.col(1) - rho * tmp.col(0));
@@ -77,7 +77,7 @@ StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-StudentBicop::hinv1_raw(const Eigen::MatrixXd& u)
+StudentBicop::hinv1_raw(const Matrix& u)
 {
   double rho = double(this->parameters_(0));
   double nu = double(this->parameters_(1));
@@ -104,7 +104,7 @@ StudentBicop::get_start_parameters(const double tau)
   return parameters;
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 StudentBicop::tau_to_parameters(const double& tau)
 {
   return no_tau_to_parameters(tau);

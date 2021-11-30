@@ -16,7 +16,7 @@ namespace tools_eigen {
 //! remove rows of a matrix which contain nan values
 //! @param x The matrix.
 inline void
-remove_nans(Eigen::MatrixXd& x)
+remove_nans(Matrix& x)
 {
   // if a row has nan, move it to the end
   size_t last = x.rows() - 1;
@@ -33,7 +33,7 @@ remove_nans(Eigen::MatrixXd& x)
 //! @param a Vector of weights that is either empty or whose size is equal to
 //!   the number of columns of x.
 inline void
-remove_nans(Eigen::MatrixXd& x, Eigen::VectorXd& weights)
+remove_nans(Matrix& x, Eigen::VectorXd& weights)
 {
   if ((weights.size() > 0) & (weights.size() != x.rows()))
     throw std::runtime_error("sizes of x and weights don't match.");
@@ -64,7 +64,7 @@ remove_nans(Eigen::MatrixXd& x, Eigen::VectorXd& weights)
 //! @param lower Lower bound of the interval.
 //! @param upper Upper bound of the interval.
 inline void
-trim(Eigen::MatrixXd& x, const double& lower, const double& upper)
+trim(Matrix& x, const double& lower, const double& upper)
 {
   // code of std::for_each (save some compile time by not including <algorithm>)
   auto it = x.data();
@@ -95,7 +95,7 @@ trim(Eigen::VectorXd& x, const double& lower, const double& upper)
 //! @param u Copula data.
 //! @return `true` if all data lie in the unit cube; throws an error otherwise.
 inline bool
-check_if_in_unit_cube(const Eigen::MatrixXd& u)
+check_if_in_unit_cube(const Matrix& u)
 {
   bool any_outside = (u.array() < 0.0).any() | (u.array() > 1.0).any();
   if (any_outside) {
@@ -107,8 +107,8 @@ check_if_in_unit_cube(const Eigen::MatrixXd& u)
 //! swap the columns of a two-column matrix
 //! @param u The matrix.
 //! @return a new matrix v with `v.col(0) = u.col(1)`, `v.col(1) = u.col(0)`.
-inline Eigen::MatrixXd
-swap_cols(Eigen::MatrixXd u)
+inline Matrix
+swap_cols(Matrix u)
 {
   u.col(0).swap(u.col(1));
   return u;
@@ -168,11 +168,11 @@ invert_f(const Eigen::VectorXd& x,
 //! contains one combination of the vector elements
 //!
 //! @param grid_points The vector to expand.
-inline Eigen::MatrixXd
+inline Matrix
 expand_grid(const Eigen::VectorXd& grid_points)
 {
   ptrdiff_t m = grid_points.size();
-  Eigen::MatrixXd grid_2d(m * m, 2);
+  Matrix grid_2d(m * m, 2);
   ptrdiff_t k = 0;
   for (ptrdiff_t i = 0; i < m; ++i) {
     for (ptrdiff_t j = 0; j < m; ++j) {
@@ -194,7 +194,7 @@ expand_grid(const Eigen::VectorXd& grid_points)
 inline Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>
 read_matxs(const char* filename, int max_buffer_size)
 {
-  Eigen::MatrixXd temp = read_matxd(filename, max_buffer_size);
+  Matrix temp = read_matxd(filename, max_buffer_size);
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> output =
     temp.cast<size_t>();
   return output;
@@ -207,7 +207,7 @@ read_matxs(const char* filename, int max_buffer_size)
 //!
 //! @param filename The name of the file to read from.
 //! @param max_buffer_size The maximal buffer size.
-inline Eigen::MatrixXd
+inline Matrix
 read_matxd(const char* filename, int max_buffer_size)
 {
   using namespace std;
@@ -241,7 +241,7 @@ read_matxd(const char* filename, int max_buffer_size)
   rows--;
 
   // Populate matrix with numbers.
-  Eigen::MatrixXd result(rows, cols);
+  Matrix result(rows, cols);
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
       result(i, j) = buff[cols * i + j];

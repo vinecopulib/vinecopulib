@@ -498,7 +498,7 @@ TEST_F(VinecopTest, sparse_both_selection)
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 
   // 1d models
-  Eigen::MatrixXd uu = u.col(0).matrix();
+  Matrix uu = u.col(0).matrix();
   fit = Vinecop(1);
   fit.select(uu, controls);
 }

@@ -30,7 +30,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
 
     int n = get_n();
 
-    Eigen::MatrixXd results = tools_eigen::read_matxd("temp");
+    Matrix results = tools_eigen::read_matxd("temp");
 
     // Remove temp file
     cmd = rm + "temp";
@@ -43,7 +43,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     ASSERT_TRUE(absdiff < 1e-2) << bicop_.str();
 
     // Get u-data
-    Eigen::MatrixXd u = results.block(0, 1, n, 2);
+    Matrix u = results.block(0, 1, n, 2);
 
     // evaluate pdf in C++
     Eigen::VectorXd f = bicop_.pdf(u);

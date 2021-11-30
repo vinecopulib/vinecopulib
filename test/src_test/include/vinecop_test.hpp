@@ -15,9 +15,9 @@ class VinecopTest : public ::testing::Test
 public:
   VinecopTest();
 
-  Eigen::MatrixXd u;
+  Matrix u;
   Eigen::VectorXd f;
-  Eigen::MatrixXd sim;
+  Matrix sim;
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> model_matrix;
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> vc_matrix;
 };

@@ -33,12 +33,12 @@ namespace vinecopulib {
 namespace tools_select {
 
 double
-calculate_criterion(const Eigen::MatrixXd& data,
+calculate_criterion(const Matrix& data,
                     std::string tree_criterion,
                     Eigen::VectorXd weights);
 
-Eigen::MatrixXd
-calculate_criterion_matrix(const Eigen::MatrixXd& data,
+Matrix
+calculate_criterion_matrix(const Matrix& data,
                            const std::string& tree_criterion,
                            const Eigen::VectorXd& weights);
 
@@ -63,7 +63,7 @@ struct EdgeProperties
   std::vector<size_t> conditioning;
   std::vector<size_t> conditioned;
   std::vector<size_t> all_indices;
-  Eigen::MatrixXd pc_data;
+  Matrix pc_data;
   Eigen::VectorXd hfunc1;
   Eigen::VectorXd hfunc2;
   Eigen::VectorXd hfunc1_sub;
@@ -88,11 +88,11 @@ typedef std::pair<EdgeIterator, bool> FoundEdge;
 class VinecopSelector
 {
 public:
-  VinecopSelector(const Eigen::MatrixXd& data,
+  VinecopSelector(const Matrix& data,
                   const FitControlsVinecop& controls,
                   std::vector<std::string> var_types);
 
-  VinecopSelector(const Eigen::MatrixXd& data,
+  VinecopSelector(const Matrix& data,
                   const RVineStructure& vine_struct,
                   const FitControlsVinecop& controls,
                   std::vector<std::string> var_types);
@@ -105,9 +105,9 @@ public:
     size_t d,
     size_t trunc_lvl);
 
-  void select_all_trees(const Eigen::MatrixXd& data);
+  void select_all_trees(const Matrix& data);
 
-  void sparse_select_all_trees(const Eigen::MatrixXd& data);
+  void sparse_select_all_trees(const Matrix& data);
 
   double get_loglik() const;
 
@@ -135,7 +135,7 @@ protected:
 
   std::vector<double> get_thresholded_crits();
 
-  void initialize_new_fit(const Eigen::MatrixXd& data);
+  void initialize_new_fit(const Matrix& data);
 
   void set_current_fit_as_opt(const double& loglik);
 
@@ -143,7 +143,7 @@ protected:
 
   void select_edges(VineTree& vine_tree);
 
-  Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
+  Matrix get_pc_data(size_t v0, size_t v1, const VineTree& tree);
 
   Eigen::VectorXd get_hfunc(const VertexProperties& vertex_data, bool is_first);
 
@@ -172,7 +172,7 @@ protected:
   double get_next_threshold(std::vector<double>& thresholded_crits);
 
   // functions for manipulation of trees ----------------
-  VineTree make_base_tree(const Eigen::MatrixXd& data);
+  VineTree make_base_tree(const Matrix& data);
 
   VineTree edges_as_vertices(const VineTree& prev_tree);
 

@@ -18,7 +18,7 @@ namespace tools_interpolation {
 //! (grid_points_i, grid_points_j).
 //! @param norm_times How many times the normalization routine should run.
 inline InterpolationGrid::InterpolationGrid(const Eigen::VectorXd& grid_points,
-                                            const Eigen::MatrixXd& values,
+                                            const Matrix& values,
                                             int norm_times)
 {
   if (values.cols() != values.rows()) {
@@ -34,14 +34,14 @@ inline InterpolationGrid::InterpolationGrid(const Eigen::VectorXd& grid_points,
   normalize_margins(norm_times);
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 InterpolationGrid::get_values() const
 {
   return values_;
 }
 
 inline void
-InterpolationGrid::set_values(const Eigen::MatrixXd& values, int norm_times)
+InterpolationGrid::set_values(const Matrix& values, int norm_times)
 {
   if (values.size() != values_.size()) {
     if (values.rows() != values_.rows()) {
@@ -155,7 +155,7 @@ InterpolationGrid::bilinear_interpolation(double z11,
 //! @param x Mx2 matrix of evaluation points.
 //! @return a vector of resulting interpolated values
 inline Eigen::VectorXd
-InterpolationGrid::interpolate(const Eigen::MatrixXd& x)
+InterpolationGrid::interpolate(const Matrix& x)
 {
 
   auto f = [this](double x0, double x1) {
@@ -181,11 +181,11 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd& x)
 //! @param cond_var Either 1 or 2; the axis considered fixed.
 //! @return a vector of resulting integral values
 inline Eigen::VectorXd
-InterpolationGrid::integrate_1d(const Eigen::MatrixXd& u, size_t cond_var)
+InterpolationGrid::integrate_1d(const Matrix& u, size_t cond_var)
 {
   ptrdiff_t m = grid_points_.size();
   Eigen::VectorXd tmpvals(m);
-  Eigen::MatrixXd tmpgrid(m, 2);
+  Matrix tmpgrid(m, 2);
 
   auto f = [this, m, cond_var, &tmpvals, &tmpgrid](double u1, double u2) {
     double upr = 0.0;
@@ -214,11 +214,11 @@ InterpolationGrid::integrate_1d(const Eigen::MatrixXd& u, size_t cond_var)
 //! @param u Mx2 matrix of evaluation points
 //! @return a vector of resulting integral values
 inline Eigen::VectorXd
-InterpolationGrid::integrate_2d(const Eigen::MatrixXd& u)
+InterpolationGrid::integrate_2d(const Matrix& u)
 {
   ptrdiff_t m = grid_points_.size();
   Eigen::VectorXd tmpvals(m), tmpvals2(m);
-  Eigen::MatrixXd tmpgrid(m, 2);
+  Matrix tmpgrid(m, 2);
   tmpgrid.col(1) = grid_points_;
 
   auto f = [this, m, &tmpvals, &tmpvals2, &tmpgrid](double u1, double u2) {

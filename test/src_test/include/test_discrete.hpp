@@ -20,7 +20,7 @@ TEST(discrete, bicop)
     auto bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
     auto u = bc.simulate(1000, true, { 1 });
 
-    Eigen::MatrixXd u_disc(u.rows(), 4);
+    Matrix u_disc(u.rows(), 4);
     u_disc.col(0) = (u.col(0).array() * 2).ceil() / 2;
     u_disc.col(2) = (u.col(0).array() * 2).floor() / 2;
     u_disc.col(1) = (u.col(1).array() * 2).ceil() / 2;
@@ -32,7 +32,7 @@ TEST(discrete, bicop)
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
 
     // d_c
-    Eigen::MatrixXd uu(u.rows(), 3);
+    Matrix uu(u.rows(), 3);
     uu.col(0) = u_disc.col(0);
     uu.col(1) = u.col(1);
     uu.col(2) = u_disc.col(2);
@@ -44,7 +44,7 @@ TEST(discrete, bicop)
               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
 
     // c_d
-    uu = Eigen::MatrixXd(u.rows(), 4);
+    uu = Matrix(u.rows(), 4);
     uu.col(0) = u.col(0);
     uu.col(2) = u.col(0);
     uu.col(1) = u_disc.col(1);
@@ -87,7 +87,7 @@ TEST(discrete, vinecop)
 
   // simulate data with continuous and discrete variables
   auto utmp = vc.simulate(500, true, 1, { 1 });
-  Eigen::MatrixXd u(utmp.rows(), 5 + 3); // 3 discrete vars
+  Matrix u(utmp.rows(), 5 + 3); // 3 discrete vars
   u.leftCols(5) = utmp;
 
   u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
@@ -116,7 +116,7 @@ TEST(discrete, vinecop)
   }
 
   // test other input format
-  u = Eigen::MatrixXd(utmp.rows(), 10);
+  u = Matrix(utmp.rows(), 10);
   u.leftCols(5) = utmp;
   u.rightCols(5) = utmp;
   u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;

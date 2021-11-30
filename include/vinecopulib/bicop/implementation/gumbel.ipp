@@ -48,7 +48,7 @@ GumbelBicop::generator_derivative(const double& u)
 //}
 
 inline Eigen::VectorXd
-GumbelBicop::pdf_raw(const Eigen::MatrixXd& u)
+GumbelBicop::pdf_raw(const Matrix& u)
 {
   double theta = static_cast<double>(parameters_(0));
   double thetha1 = 1.0 / theta;
@@ -64,7 +64,7 @@ GumbelBicop::pdf_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-GumbelBicop::hinv1_raw(const Eigen::MatrixXd& u)
+GumbelBicop::hinv1_raw(const Matrix& u)
 {
   double theta = double(this->parameters_(0));
   double u1, u2;
@@ -82,7 +82,7 @@ GumbelBicop::hinv1_raw(const Eigen::MatrixXd& u)
   return hinv;
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 GumbelBicop::tau_to_parameters(const double& tau)
 {
   auto par = Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
@@ -91,7 +91,7 @@ GumbelBicop::tau_to_parameters(const double& tau)
 }
 
 inline double
-GumbelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
+GumbelBicop::parameters_to_tau(const Matrix& parameters)
 {
   return (parameters(0) - 1) / parameters(0);
 }

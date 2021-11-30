@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <Eigen/Dense>
 #include <vector>
 #include <vinecopulib/bicop/family.hpp>
+#include <vinecopulib/misc/tools_linalg.hpp>
 
 namespace vinecopulib {
 //! @brief A class for controlling fits of bivariate copula models.

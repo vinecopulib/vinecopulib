@@ -18,8 +18,8 @@ namespace tools_stats {
 //! @param x Evaluation points.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated densities.
-inline Eigen::MatrixXd
-dnorm(const Eigen::MatrixXd& x)
+inline Matrix
+dnorm(const Matrix& x)
 {
   boost::math::normal dist;
   auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
@@ -31,8 +31,8 @@ dnorm(const Eigen::MatrixXd& x)
 //! @param x Evaluation points.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated probabilities.
-inline Eigen::MatrixXd
-pnorm(const Eigen::MatrixXd& x)
+inline Matrix
+pnorm(const Matrix& x)
 {
   boost::math::normal dist;
   auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
@@ -44,8 +44,8 @@ pnorm(const Eigen::MatrixXd& x)
 //! @param x Evaluation points.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated quantiles.
-inline Eigen::MatrixXd
-qnorm(const Eigen::MatrixXd& x)
+inline Matrix
+qnorm(const Matrix& x)
 {
   boost::math::normal dist;
   auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
@@ -58,8 +58,8 @@ qnorm(const Eigen::MatrixXd& x)
 //! @param nu Degrees of freedom parameter.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated densities.
-inline Eigen::MatrixXd
-dt(const Eigen::MatrixXd& x, double nu)
+inline Matrix
+dt(const Matrix& x, double nu)
 {
   boost::math::students_t dist(nu);
   auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
@@ -72,8 +72,8 @@ dt(const Eigen::MatrixXd& x, double nu)
 //! @param nu Degrees of freedom parameter.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated probabilities.
-inline Eigen::MatrixXd
-pt(const Eigen::MatrixXd& x, double nu)
+inline Matrix
+pt(const Matrix& x, double nu)
 {
   boost::math::students_t dist(nu);
   auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
@@ -86,15 +86,15 @@ pt(const Eigen::MatrixXd& x, double nu)
 //! @param nu Degrees of freedom parameter.
 //!
 //! @return An \f$ n \times d \f$ matrix of evaluated quantiles.
-inline Eigen::MatrixXd
-qt(const Eigen::MatrixXd& x, double nu)
+inline Matrix
+qt(const Matrix& x, double nu)
 {
   boost::math::students_t dist(nu);
   auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
   return tools_eigen::unaryExpr_or_nan(x, f);
 }
 
-Eigen::MatrixXd
+Matrix
 simulate_uniform(const size_t& n,
                  const size_t& d,
                  bool qrng = false,
@@ -103,31 +103,31 @@ simulate_uniform(const size_t& n,
 Eigen::VectorXd
 to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method = "average");
 
-Eigen::MatrixXd
-to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average");
+Matrix
+to_pseudo_obs(Matrix x, const std::string& ties_method = "average");
 
 double
-pairwise_mcor(const Eigen::MatrixXd& x,
+pairwise_mcor(const Matrix& x,
               const Eigen::VectorXd& weights = Eigen::VectorXd());
 
-Eigen::MatrixXd
-dependence_matrix(const Eigen::MatrixXd& x, const std::string& measure);
+Matrix
+dependence_matrix(const Matrix& x, const std::string& measure);
 
-Eigen::MatrixXd
+Matrix
 ghalton(const size_t& n,
         const size_t& d,
         const std::vector<int>& seeds = std::vector<int>());
 
-Eigen::MatrixXd
+Matrix
 sobol(const size_t& n,
       const size_t& d,
       const std::vector<int>& seeds = std::vector<int>());
 
 Eigen::VectorXd
-pbvt(const Eigen::MatrixXd& z, int nu, double rho);
+pbvt(const Matrix& z, int nu, double rho);
 
 Eigen::VectorXd
-pbvnorm(const Eigen::MatrixXd& z, double rho);
+pbvnorm(const Matrix& z, double rho);
 }
 }
 

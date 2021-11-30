@@ -26,10 +26,10 @@ public:
   // Constructors
   Bicop(const BicopFamily family = BicopFamily::indep,
         const int rotation = 0,
-        const Eigen::MatrixXd& parameters = Eigen::MatrixXd(),
+        const Matrix& parameters = Matrix(),
         const std::vector<std::string>& var_types = { "c", "c" });
 
-  explicit Bicop(const Eigen::MatrixXd& data,
+  explicit Bicop(const Matrix& data,
                  const FitControlsBicop& controls = FitControlsBicop(),
                  const std::vector<std::string>& var_types = { "c", "c" });
 
@@ -53,7 +53,7 @@ public:
 
   int get_rotation() const;
 
-  Eigen::MatrixXd get_parameters() const;
+  Matrix get_parameters() const;
 
   double get_tau() const;
 
@@ -67,81 +67,79 @@ public:
 
   void set_rotation(const int rotation);
 
-  void set_parameters(const Eigen::MatrixXd& parameters);
+  void set_parameters(const Matrix& parameters);
 
   void set_var_types(const std::vector<std::string>& var_types = { "c", "c" });
 
   std::vector<std::string> get_var_types() const;
 
   // Stats methods
-  Eigen::VectorXd pdf(const Eigen::MatrixXd& u) const;
+  Eigen::VectorXd pdf(const Matrix& u) const;
 
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u) const;
+  Eigen::VectorXd cdf(const Matrix& u) const;
 
-  Eigen::VectorXd hfunc1(const Eigen::MatrixXd& u) const;
+  Eigen::VectorXd hfunc1(const Matrix& u) const;
 
-  Eigen::VectorXd hfunc2(const Eigen::MatrixXd& u) const;
+  Eigen::VectorXd hfunc2(const Matrix& u) const;
 
-  Eigen::VectorXd hinv1(const Eigen::MatrixXd& u) const;
+  Eigen::VectorXd hinv1(const Matrix& u) const;
 
-  Eigen::VectorXd hinv2(const Eigen::MatrixXd& u) const;
+  Eigen::VectorXd hinv2(const Matrix& u) const;
 
-  Eigen::MatrixXd simulate(
-    const size_t& n,
-    const bool qrng = false,
-    const std::vector<int>& seeds = std::vector<int>()) const;
+  Matrix simulate(const size_t& n,
+                  const bool qrng = false,
+                  const std::vector<int>& seeds = std::vector<int>()) const;
 
   // Methods modifying the family/rotation/parameters
-  void fit(const Eigen::MatrixXd& data,
+  void fit(const Matrix& data,
            const FitControlsBicop& controls = FitControlsBicop());
 
-  void select(const Eigen::MatrixXd& data,
+  void select(const Matrix& data,
               FitControlsBicop controls = FitControlsBicop());
 
   // Fit statistics
-  double loglik(const Eigen::MatrixXd& u = Eigen::MatrixXd()) const;
+  double loglik(const Matrix& u = Matrix()) const;
 
-  double aic(const Eigen::MatrixXd& u = Eigen::MatrixXd()) const;
+  double aic(const Matrix& u = Matrix()) const;
 
-  double bic(const Eigen::MatrixXd& u = Eigen::MatrixXd()) const;
+  double bic(const Matrix& u = Matrix()) const;
 
-  double mbic(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
-              const double psi0 = 0.9) const;
+  double mbic(const Matrix& u = Matrix(), const double psi0 = 0.9) const;
 
   // Misc
   std::string str() const;
 
-  double parameters_to_tau(const Eigen::MatrixXd& parameters) const;
+  double parameters_to_tau(const Matrix& parameters) const;
 
-  Eigen::MatrixXd tau_to_parameters(const double& tau) const;
+  Matrix tau_to_parameters(const double& tau) const;
 
   void flip();
 
-  Eigen::MatrixXd get_parameters_lower_bounds() const;
+  Matrix get_parameters_lower_bounds() const;
 
-  Eigen::MatrixXd get_parameters_upper_bounds() const;
+  Matrix get_parameters_upper_bounds() const;
 
   Bicop as_continuous() const;
 
 private:
-  Eigen::MatrixXd format_data(const Eigen::MatrixXd& u) const;
+  Matrix format_data(const Matrix& u) const;
 
-  void rotate_data(Eigen::MatrixXd& u) const;
+  void rotate_data(Matrix& u) const;
 
-  Eigen::MatrixXd prep_for_abstract(const Eigen::MatrixXd& u) const;
+  Matrix prep_for_abstract(const Matrix& u) const;
 
   void check_rotation(int rotation) const;
 
-  void check_data(const Eigen::MatrixXd& u) const;
+  void check_data(const Matrix& u) const;
 
-  void check_data_dim(const Eigen::MatrixXd& u) const;
+  void check_data_dim(const Matrix& u) const;
 
   void check_var_types(const std::vector<std::string>& var_types) const;
 
   void flip_abstract_var_types();
 
   void check_weights_size(const Eigen::VectorXd& weights,
-                          const Eigen::MatrixXd& data) const;
+                          const Matrix& data) const;
 
   void check_fitted() const;
 

@@ -19,22 +19,22 @@ class ParBicop : public AbstractBicop
 {
 protected:
   // Getters and setters
-  Eigen::MatrixXd get_parameters() const;
+  Matrix get_parameters() const;
 
-  Eigen::MatrixXd get_parameters_lower_bounds() const;
+  Matrix get_parameters_lower_bounds() const;
 
-  Eigen::MatrixXd get_parameters_upper_bounds() const;
+  Matrix get_parameters_upper_bounds() const;
 
-  void set_parameters(const Eigen::MatrixXd& parameters);
+  void set_parameters(const Matrix& parameters);
 
   void flip();
 
   // Data members
-  Eigen::MatrixXd parameters_;
-  Eigen::MatrixXd parameters_lower_bounds_;
-  Eigen::MatrixXd parameters_upper_bounds_;
+  Matrix parameters_;
+  Matrix parameters_lower_bounds_;
+  Matrix parameters_upper_bounds_;
 
-  void fit(const Eigen::MatrixXd& data,
+  void fit(const Matrix& data,
            std::string method,
            double,
            const Eigen::VectorXd& weights);
@@ -48,18 +48,18 @@ protected:
 private:
   double winsorize_tau(double tau) const;
 
-  void adjust_parameters_bounds(Eigen::MatrixXd& lb,
-                                Eigen::MatrixXd& ub,
+  void adjust_parameters_bounds(Matrix& lb,
+                                Matrix& ub,
                                 const double& tau,
                                 const std::string& method);
 
-  void check_parameters(const Eigen::MatrixXd& parameters);
+  void check_parameters(const Matrix& parameters);
 
-  void check_parameters_size(const Eigen::MatrixXd& parameters);
+  void check_parameters_size(const Matrix& parameters);
 
-  void check_parameters_upper(const Eigen::MatrixXd& parameters);
+  void check_parameters_upper(const Matrix& parameters);
 
-  void check_parameters_lower(const Eigen::MatrixXd& parameters);
+  void check_parameters_lower(const Matrix& parameters);
 
   void check_fit_method(const std::string& method);
 };

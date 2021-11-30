@@ -19,7 +19,7 @@ inline GaussianBicop::GaussianBicop()
 }
 
 inline Eigen::VectorXd
-GaussianBicop::pdf_raw(const Eigen::MatrixXd& u)
+GaussianBicop::pdf_raw(const Matrix& u)
 {
   // Inverse Cholesky of the correlation matrix
   double rho = double(this->parameters_(0));
@@ -31,7 +31,7 @@ GaussianBicop::pdf_raw(const Eigen::MatrixXd& u)
 
   // Compute copula density
   Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
-  Eigen::MatrixXd tmp = tools_stats::qnorm(u);
+  Matrix tmp = tools_stats::qnorm(u);
   f = f.cwiseQuotient(tools_stats::dnorm(tmp).rowwise().prod());
   tmp = tmp * L;
   f = f.cwiseProduct(tools_stats::dnorm(tmp).rowwise().prod());
@@ -39,28 +39,28 @@ GaussianBicop::pdf_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-GaussianBicop::cdf(const Eigen::MatrixXd& u)
+GaussianBicop::cdf(const Matrix& u)
 {
   return tools_stats::pbvnorm(tools_stats::qnorm(u),
                               double(this->parameters_(0)));
 }
 
 inline Eigen::VectorXd
-GaussianBicop::hfunc1_raw(const Eigen::MatrixXd& u)
+GaussianBicop::hfunc1_raw(const Matrix& u)
 {
   double rho = double(this->parameters_(0));
   Eigen::VectorXd h = Eigen::VectorXd::Zero(u.rows());
-  Eigen::MatrixXd tmp = tools_stats::qnorm(u);
+  Matrix tmp = tools_stats::qnorm(u);
   h = (tmp.col(1) - rho * tmp.col(0)) / sqrt(1.0 - pow(rho, 2.0));
   return tools_stats::pnorm(h);
 }
 
 inline Eigen::VectorXd
-GaussianBicop::hinv1_raw(const Eigen::MatrixXd& u)
+GaussianBicop::hinv1_raw(const Matrix& u)
 {
   double rho = double(this->parameters_(0));
   Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
-  Eigen::MatrixXd tmp = tools_stats::qnorm(u);
+  Matrix tmp = tools_stats::qnorm(u);
   hinv = tmp.col(1) * sqrt(1.0 - pow(rho, 2.0)) + rho * tmp.col(0);
   return tools_stats::pnorm(hinv);
 }
@@ -71,7 +71,7 @@ GaussianBicop::get_start_parameters(const double tau)
   return tau_to_parameters(tau);
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 GaussianBicop::tau_to_parameters(const double& tau)
 {
   Eigen::VectorXd parameters = this->parameters_;

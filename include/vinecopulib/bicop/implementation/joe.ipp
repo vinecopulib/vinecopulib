@@ -51,7 +51,7 @@ JoeBicop::generator_derivative(const double& u)
 //}
 
 inline Eigen::VectorXd
-JoeBicop::pdf_raw(const Eigen::MatrixXd& u)
+JoeBicop::pdf_raw(const Matrix& u)
 {
   double theta = static_cast<double>(parameters_(0));
   auto f = [theta](const double& u1, const double& u2) {
@@ -66,7 +66,7 @@ JoeBicop::pdf_raw(const Eigen::MatrixXd& u)
 
 // inverse h-function
 inline Eigen::VectorXd
-JoeBicop::hinv1_raw(const Eigen::MatrixXd& u)
+JoeBicop::hinv1_raw(const Matrix& u)
 {
   double theta = double(parameters_(0));
   double u1, u2;
@@ -85,7 +85,7 @@ JoeBicop::hinv1_raw(const Eigen::MatrixXd& u)
 }
 
 // link between Kendall's tau and the par_bicop parameter
-inline Eigen::MatrixXd
+inline Matrix
 JoeBicop::tau_to_parameters(const double& tau)
 {
   Eigen::VectorXd tau0 = Eigen::VectorXd::Constant(1, std::fabs(tau));
@@ -99,7 +99,7 @@ JoeBicop::tau_to_parameters(const double& tau)
 }
 
 inline double
-JoeBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
+JoeBicop::parameters_to_tau(const Matrix& parameters)
 {
   double par = parameters(0);
   double tau = 2 / par + 1;

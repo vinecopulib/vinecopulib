@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <Eigen/Dense>
+#include <vinecopulib/misc/tools_linalg.hpp>
 
 namespace vinecopulib {
 

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <Eigen/Dense>
+#include <vinecopulib/misc/tools_linalg.hpp>
 
 namespace vinecopulib {
 
@@ -21,22 +21,22 @@ public:
   InterpolationGrid() {}
 
   InterpolationGrid(const Eigen::VectorXd& grid_points,
-                    const Eigen::MatrixXd& values,
+                    const Matrix& values,
                     int norm_times = 3);
 
-  Eigen::MatrixXd get_values() const;
+  Matrix get_values() const;
 
-  void set_values(const Eigen::MatrixXd& values, int norm_times = 3);
+  void set_values(const Matrix& values, int norm_times = 3);
 
   void flip();
 
   void normalize_margins(int times);
 
-  Eigen::VectorXd interpolate(const Eigen::MatrixXd& x);
+  Eigen::VectorXd interpolate(const Matrix& x);
 
-  Eigen::VectorXd integrate_1d(const Eigen::MatrixXd& u, size_t cond_var);
+  Eigen::VectorXd integrate_1d(const Matrix& u, size_t cond_var);
 
-  Eigen::VectorXd integrate_2d(const Eigen::MatrixXd& u);
+  Eigen::VectorXd integrate_2d(const Matrix& u);
 
 private:
   Eigen::Matrix<ptrdiff_t, 1, 2> get_indices(double x0, double x1);
@@ -55,7 +55,7 @@ private:
                      const Eigen::VectorXd& grid);
 
   Eigen::VectorXd grid_points_;
-  Eigen::MatrixXd values_;
+  Matrix values_;
 };
 }
 }

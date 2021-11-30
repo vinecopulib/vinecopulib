@@ -11,58 +11,58 @@ namespace vinecopulib {
 inline IndepBicop::IndepBicop()
 {
   family_ = BicopFamily::indep;
-  parameters_ = Eigen::MatrixXd();
+  parameters_ = Matrix();
 }
 
 inline Eigen::VectorXd
-IndepBicop::pdf_raw(const Eigen::MatrixXd& u)
+IndepBicop::pdf_raw(const Matrix& u)
 {
   auto f = [](double, double) { return 1.0; };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
 inline Eigen::VectorXd
-IndepBicop::cdf(const Eigen::MatrixXd& u)
+IndepBicop::cdf(const Matrix& u)
 {
   return u.rowwise().prod();
 }
 
 inline Eigen::VectorXd
-IndepBicop::hfunc1_raw(const Eigen::MatrixXd& u)
+IndepBicop::hfunc1_raw(const Matrix& u)
 {
   auto f = [](double, double u2) { return u2; };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
 inline Eigen::VectorXd
-IndepBicop::hfunc2_raw(const Eigen::MatrixXd& u)
+IndepBicop::hfunc2_raw(const Matrix& u)
 {
   auto f = [](double u1, double) { return u1; };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
 inline Eigen::VectorXd
-IndepBicop::hinv1_raw(const Eigen::MatrixXd& u)
+IndepBicop::hinv1_raw(const Matrix& u)
 {
   auto f = [](double, double u2) { return u2; };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
 inline Eigen::VectorXd
-IndepBicop::hinv2_raw(const Eigen::MatrixXd& u)
+IndepBicop::hinv2_raw(const Matrix& u)
 {
   auto f = [](double u1, double) { return u1; };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::MatrixXd
+inline Matrix
 IndepBicop::tau_to_parameters(const double&)
 {
   return Eigen::VectorXd();
 }
 
 inline double
-IndepBicop::parameters_to_tau(const Eigen::MatrixXd&)
+IndepBicop::parameters_to_tau(const Matrix&)
 {
   return 0.0;
 }

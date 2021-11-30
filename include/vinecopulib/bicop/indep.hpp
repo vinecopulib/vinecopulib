@@ -25,23 +25,23 @@ public:
 
 private:
   // PDF
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd pdf_raw(const Matrix& u);
 
   // PDF
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u);
+  Eigen::VectorXd cdf(const Matrix& u);
 
   // hfunctions and their inverses
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd hfunc1_raw(const Matrix& u);
 
-  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd hfunc2_raw(const Matrix& u);
 
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd hinv1_raw(const Matrix& u);
 
-  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd hinv2_raw(const Matrix& u);
 
-  Eigen::MatrixXd tau_to_parameters(const double&);
+  Matrix tau_to_parameters(const double&);
 
-  double parameters_to_tau(const Eigen::MatrixXd&);
+  double parameters_to_tau(const Matrix&);
 
   void flip();
 

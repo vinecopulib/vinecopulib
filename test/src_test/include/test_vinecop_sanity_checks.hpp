@@ -32,7 +32,7 @@ TEST(vinecop_sanity_checks, catches_wrong_size)
   mat << 2, 2, 2, 1, 1, 0, 3, 0, 0;
   Vinecop vinecop(mat, pair_copulas);
 
-  Eigen::MatrixXd U = Eigen::MatrixXd::Constant(4, 4, 0.5);
+  Matrix U = Matrix::Constant(4, 4, 0.5);
   EXPECT_ANY_THROW(vinecop.pdf(U));
   EXPECT_ANY_THROW(vinecop.cdf(U));
   EXPECT_ANY_THROW(vinecop.inverse_rosenblatt(U));
