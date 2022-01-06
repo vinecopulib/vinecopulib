@@ -8,8 +8,6 @@ include(cmake/options.cmake               REQUIRED)
 
 include(cmake/findDependencies.cmake      REQUIRED)
 
-include(cmake/findDoxygen.cmake           REQUIRED)
-
 include(cmake/findHeaders.cmake           REQUIRED)
 
 include(cmake/compilerDefOpt.cmake        REQUIRED)
