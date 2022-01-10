@@ -30,7 +30,7 @@ if(NOT wdm_FOUND)
   endif()
   set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
 elseif(BUILD_TESTING)
-  FetchContent(googletest)
+  FetchContent_MakeAvailable(googletest)
 endif()
 
 # Set all the external dependencies
