@@ -8,14 +8,15 @@ include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        703bd9caab50b139428cea1aaff9974ebee5742e # release-1.10.0
-  URL https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip
+  GIT_TAG        6b74da4757a549563d7c37c8fae3e704662a043b # release-1.10.0
 )
+
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_Declare(
   wdm
-  URL https://github.com/tnagler/wdm/archive/refs/heads/dev.zip
+  GIT_REPOSITORY https://github.com/tnagler/wdm.git
+  GIT_TAG        bf49a5709b795c4501c25a99ecb18e838cbab631
 )
 
 # Find wdm and download if not found
