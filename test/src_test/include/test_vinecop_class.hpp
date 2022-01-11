@@ -361,9 +361,9 @@ TEST_F(VinecopTest, works_multi_threaded)
   EXPECT_NEAR(fit1.loglik(u), fit2.loglik(u), 1e-2);
 
   // check if parallel evaluators have same output as single threaded ones
-  EXPECT_EQ(fit2.pdf(u, 2), fit2.pdf(u));
-  EXPECT_EQ(fit2.inverse_rosenblatt(u, 2), fit2.inverse_rosenblatt(u));
-  EXPECT_EQ(fit2.rosenblatt(u, 2), fit2.rosenblatt(u));
+  EXPECT_TRUE(fit2.pdf(u, 2).isApprox(fit2.pdf(u), 1e-10));
+  EXPECT_TRUE(fit2.inverse_rosenblatt(u, 2).isApprox(fit2.inverse_rosenblatt(u), 1e-10));
+  EXPECT_TRUE(fit2.rosenblatt(u, 2).isApprox(fit2.rosenblatt(u), 1e-10));
 
   // just check that it works
   fit2.simulate(2, false, 3);
