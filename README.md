@@ -7,14 +7,6 @@
 [![Documentation](https://img.shields.io/website/http/vinecopulib.github.io/vinecopulib.svg)](https://vinecopulib.github.io/vinecopulib/)
 [![DOI](https://zenodo.org/badge/76354683.svg)](https://zenodo.org/badge/latestdoi/76354683)
 
-#### What are vine copulas?
-
-Vine copulas are a flexible class of dependence models consisting of bivariate
-building blocks (see e.g.,
-[Aas et al., 2009](https://mediatum.ub.tum.de/doc/1083600/1083600.pdf)).
-You can find a comprehensive list of publications and other materials on
-[vine-copula.org](http://www.statistics.ma.tum.de/en/research/vine-copula-models/).
-
 #### What is vinecopulib?
 
 [vinecopulib](https://vinecopulib.github.io/vinecopulib/) is a header-only C++ library for vine copula models based on

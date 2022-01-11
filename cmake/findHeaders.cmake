@@ -93,3 +93,4 @@ file(GLOB_RECURSE vinecop_hpp ${vinecopulib_includes}/vinecopulib/vinecop/*.hpp)
 file(GLOB_RECURSE misc_hpp ${vinecopulib_includes}/vinecopulib/misc/*.hpp)
 file(GLOB_RECURSE main_hpp ${vinecopulib_includes}/vinecopulib.hpp)
 file(GLOB_RECURSE version_hpp ${vinecopulib_includes}/vinecopulib/version.hpp)
+

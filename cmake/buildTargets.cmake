@@ -114,14 +114,6 @@ install(
         FILES ${misc_hpp}
         DESTINATION "${include_install_dir}/vinecopulib/misc"
 )
-install(
-        FILES ${wdm_main}
-        DESTINATION "${include_install_dir}/vinecopulib/wdm"
-)
-install(
-        FILES ${wdm_hpp}
-        DESTINATION "${include_install_dir}/vinecopulib/wdm/wdm"
-)
 if (NOT VINECOPULIB_SHARED_LIB)
     install(
             FILES ${vinecopulib_bicop_ipp}

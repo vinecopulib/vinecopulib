@@ -14,8 +14,8 @@ endif()
 
 # Find vinecopulib package and dependencies
 find_package(vinecopulib                  REQUIRED)
+find_package(Eigen3                       REQUIRED)
 find_package(Boost 1.56                   REQUIRED)
-include(cmake/findEigen3.cmake            REQUIRED)
 find_package(Threads                      REQUIRED)
 find_package(wdm                          REQUIRED)
 
