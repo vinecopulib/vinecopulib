@@ -14,6 +14,27 @@ using namespace vinecopulib;
 using namespace tools_stl;
 std::vector<int> rotations = { 0, 90, 180, 270 };
 
+// Test that the serialization works
+TEST_P(ParBicopTest, bicop_serialization_is_correct)
+{
+
+  bicop_.to_file(std::string("temp"));
+  Bicop pc(std::string("temp"));
+
+  // Remove temp file
+  std::string cmd = rm + "temp";
+  int sys_exit_code = system(cmd.c_str());
+  if (sys_exit_code != 0) {
+    throw std::runtime_error("error in system call");
+  }
+
+  EXPECT_EQ(bicop_.get_rotation(), pc.get_rotation());
+  EXPECT_EQ(bicop_.get_family_name(), pc.get_family_name());
+  EXPECT_EQ(bicop_.get_var_types(), pc.get_var_types());
+  EXPECT_EQ(bicop_.get_npars(), pc.get_npars());
+  ASSERT_TRUE(bicop_.get_parameters().isApprox(pc.get_parameters(), 1e-4));
+}
+
 // Test if the C++ implementation of the basic methods is correct
 TEST_P(ParBicopTest, parametric_bicop_is_correct)
 {
