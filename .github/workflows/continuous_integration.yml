@@ -51,10 +51,9 @@ jobs:
             sudo apt-get autoremove
           elif [ "${{ matrix.cfg.os }}" == "macos-latest" ]; then
             rm '/usr/local/bin/gfortran'
-            rm '/usr/local/gfortran/bin/gcc'
             rm '/usr/local/bin/2to3'
             brew update
-            brew install lcov eigen gsl doxygen graphviz boost
+            brew install lcov eigen gsl doxygen graphviz boost gcc
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
