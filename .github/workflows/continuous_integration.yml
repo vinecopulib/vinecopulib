@@ -11,7 +11,7 @@ jobs:
         cfg:
           - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
           - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64}
-          - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
+          # - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
           - { os: macos-latest,    name: Clang,  cc: clang, cxx: clang++, platform: x64}
           - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32}
           - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64}
@@ -50,8 +50,10 @@ jobs:
             sudo apt-get install --no-install-recommends -y --allow-unauthenticated g++ clang
             sudo apt-get autoremove
           elif [ "${{ matrix.cfg.os }}" == "macos-latest" ]; then
+            rm '/usr/local/bin/gfortran'
+            rm '/usr/local/bin/2to3'
             brew update
-            brew install lcov eigen gsl doxygen graphviz boost gcc
+            brew install lcov eigen gsl doxygen graphviz boost
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
