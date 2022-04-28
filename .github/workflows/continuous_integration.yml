@@ -11,7 +11,7 @@ jobs:
         cfg:
           - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
           - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64}
-          - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
+          # - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
           - { os: macos-latest,    name: Clang,  cc: clang, cxx: clang++, platform: x64}
           - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32}
           - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64}
