@@ -739,6 +739,8 @@ Bicop::as_continuous() const
 //! left-sided limit of the cdf. For continuous variables the left limit and the
 //! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
 //! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
+//! 
+//! Incomplete observations (i.e., ones with a NaN value) are discarded.
 //!
 //! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
@@ -782,6 +784,8 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 //! left-sided limit of the cdf. For continuous variables the left limit and the
 //! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
 //! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
+//! 
+//! Incomplete observations (i.e., ones with a NaN value) are discarded.
 //!
 //! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.

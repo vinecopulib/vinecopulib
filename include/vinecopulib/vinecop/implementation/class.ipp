@@ -278,6 +278,11 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! holds \f$ F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second
 //! block can be omitted.
 //!
+//! If there are missing data (i.e., NaN entries), incomplete observations are 
+//! discarded before fitting a pair-copula. This is done on a pair-by-pair basis
+//! so that the maximal available information is used.
+//! 
+//!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls to the algorithm (see FitControlsVinecop).
@@ -342,6 +347,10 @@ Vinecop::select_all(const Eigen::MatrixXd& data,
 //! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
 //! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
 //! be omitted.
+//!
+//! If there are missing data (i.e., NaN entries), incomplete observations are 
+//! discarded before fitting a pair-copula. This is done on a pair-by-pair basis
+//! so that the maximal available information is used.
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
