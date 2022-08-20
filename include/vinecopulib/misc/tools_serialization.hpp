@@ -28,8 +28,8 @@ matrix_to_json(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matrix)
   nlohmann::json output;
   output["shape"] = { matrix.rows(), matrix.cols() };
   nlohmann::json json_data;
-  for (size_t col = 0; col < matrix.cols(); col++) {
-    for (size_t row = 0; row < matrix.rows(); row++) {
+  for (long col = 0; col < matrix.cols(); col++) {
+    for (long row = 0; row < matrix.rows(); row++) {
       json_data.push_back(matrix(row, col));
     }
   }
