@@ -1,3 +1,12 @@
+## vinecopulib 0.6.2 (August 21, 2022)
+
+* updated cmake setup (#549)
+
+* improved documentation (missing data and Rosenblatt transforms)
+
+* better parallelization when there is a small number of edges (#555)
+
+
 ## vinecopulib 0.6.1 (July 13, 2021)
 
 ### BREAKING API CHANGES
