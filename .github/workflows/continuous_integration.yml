@@ -34,6 +34,7 @@ jobs:
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
+            echo "Boost_INCLUDE_DIR=D:\a\vinecopulib\vinecopulib\boost_1_71_0" >> $GITHUB_PATH
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
               echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_PATH
             else
@@ -63,7 +64,6 @@ jobs:
             set current_dir=%CD%
             echo %current_dir%  
             pwd
-            echo "Boost_INCLUDE_DIR=D:\a\vinecopulib\vinecopulib\boost_1_71_0" >> $GITHUB_PATH
             tar xzvf boost_1_71_0.tar.gz
             # choco install boost-msvc-14.3
             choco install eigen
