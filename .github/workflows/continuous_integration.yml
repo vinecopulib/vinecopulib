@@ -60,7 +60,6 @@ jobs:
             # choco upgrade cmake
             choco install wget
             wget https://github.com/vinecopulib/pyvinecopulib/raw/master/lib/boost_1_71_0.tar.gz
-            mkdir "C:\\projects\\boost-install"
             tar xzvf boost_1_71_0.tar.gz --directory "C:\\projects\\boost-install"
             # choco install boost-msvc-14.3
             choco install eigen
