@@ -64,6 +64,7 @@ jobs:
             set current_dir=%CD%
             echo %current_dir%  
             pwd
+            echo "${Boost_INCLUDE_DIR}"
             tar xzvf boost_1_71_0.tar.gz
             # choco install boost-msvc-14.3
             choco install eigen
