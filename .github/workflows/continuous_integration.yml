@@ -33,6 +33,7 @@ jobs:
             echo "EIGEN3_INCLUDE_DIR=C:\projects\eigen-3.3.7" >> $GITHUB_ENV
             echo "Boost_INCLUDE_DIR=c:\programdata\chocolatey" >> $GITHUB_ENV
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
+            echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
               echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_PATH
@@ -60,7 +61,11 @@ jobs:
             # choco upgrade cmake
             choco install wget
             wget https://github.com/vinecopulib/pyvinecopulib/raw/master/lib/boost_1_71_0.tar.gz
-            tar xzvf boost_1_71_0.tar.gz --directory "C:\\projects\\boost-install"
+            set current_dir=%cd%
+            echo %current_dir%  
+            cd
+            echo "Boost_INCLUDE_DIR=%cd%\boost_1_71_0" >> $GITHUB_PATH
+            tar xzvf boost_1_71_0.tar.gz --directory "boost-install"
             # choco install boost-msvc-14.3
             choco install eigen
           fi
