@@ -34,7 +34,7 @@ jobs:
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
-            echo "Boost_INCLUDE_DIR=D:\a\vinecopulib\vinecopulib\boost_1_71_0" >> $GITHUB_PATH
+            echo "Boost_INCLUDE_DIR=D:\a\vinecopulib\vinecopulib" >> $GITHUB_PATH
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
               echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_PATH
             else
@@ -94,7 +94,7 @@ jobs:
               make
             fi
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}" -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}"
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
             cmake --build . --config Debug
           fi
         shell: bash
@@ -125,7 +125,7 @@ jobs:
             cmake .. && make
             ../bin/main
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="C:\\projects\\vinecopulib-release;${WDM_CMAKE_DIR}" 
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}"  -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="C:\\projects\\vinecopulib-release;${WDM_CMAKE_DIR}" 
             cmake --build . --config Release
             "../bin/Release/main.exe"
           fi
