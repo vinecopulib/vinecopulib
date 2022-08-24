@@ -31,10 +31,10 @@ jobs:
             echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_ENV
             echo "WDM_CMAKE_DIR=C:\projects\wdm-install\lib\cmake" >> $GITHUB_ENV
             echo "EIGEN3_INCLUDE_DIR=C:\projects\eigen-3.3.7" >> $GITHUB_ENV
+            echo "Boost_INCLUDE_DIR=D:\a\vinecopulib\vinecopulib" >> $GITHUB_ENV
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
-            echo "Boost_INCLUDE_DIR=D:\a\vinecopulib\vinecopulib" >> $GITHUB_ENV
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
               echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_PATH
             else
