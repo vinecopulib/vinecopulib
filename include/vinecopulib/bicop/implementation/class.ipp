@@ -866,6 +866,7 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
 
     tools_thread::ThreadPool pool(controls.get_num_threads());
     pool.map(fit_and_compare, bicops);
+    pool.wait();
   }
 }
 
