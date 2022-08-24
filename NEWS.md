@@ -1,4 +1,4 @@
-## vinecopulib 0.6.2 (August 21, 2022)
+## vinecopulib 0.6.2 (August 24, 2022)
 
 * updated cmake setup (#549)
 
