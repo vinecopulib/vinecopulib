@@ -32,7 +32,9 @@ jobs:
             echo "WDM_CMAKE_DIR=C:\projects\wdm-install\lib\cmake" >> $GITHUB_ENV
             echo "EIGEN3_INCLUDE_DIR=C:\projects\eigen-3.3.7" >> $GITHUB_ENV
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
+            echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
+            echo "Boost_INCLUDE_DIR=D:\a\vinecopulib\vinecopulib" >> $GITHUB_ENV
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
               echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_PATH
             else
@@ -57,7 +59,14 @@ jobs:
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
-            choco install boost-msvc-14.3
+            choco install wget
+            wget https://github.com/vinecopulib/pyvinecopulib/raw/master/lib/boost_1_71_0.tar.gz
+            set current_dir=%CD%
+            echo %current_dir%  
+            pwd
+            echo "${Boost_INCLUDE_DIR}"
+            tar xzvf boost_1_71_0.tar.gz
+            # choco install boost-msvc-14.3
             choco install eigen
           fi
           Rscript -e "install.packages('VineCopula', repos='http://cran.rstudio.com/')"
@@ -85,7 +94,7 @@ jobs:
               make
             fi
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
             cmake --build . --config Debug
           fi
         shell: bash
@@ -102,7 +111,7 @@ jobs:
             cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make && sudo make install
             bin/test_all
           else
-            cmake .. -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
+            cmake .. -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}" -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}"
             cmake --build . --config Release
             "bin/Release/test_all.exe"
             cmake --build . --config Release --target install
@@ -116,7 +125,7 @@ jobs:
             cmake .. && make
             ../bin/main
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="C:\\projects\\vinecopulib-release;${WDM_CMAKE_DIR}" 
+            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}"  -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="C:\\projects\\vinecopulib-release;${WDM_CMAKE_DIR}" 
             cmake --build . --config Release
             "../bin/Release/main.exe"
           fi
