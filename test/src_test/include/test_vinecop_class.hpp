@@ -1,4 +1,4 @@
-// Copyright © 2016-2021 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2022 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <string>
 #include "vinecop_test.hpp"
+#include <string>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/vinecop/class.hpp>
@@ -51,10 +51,9 @@ TEST_F(VinecopTest, copy)
   EXPECT_EQ(vinecop1.get_parameters(0, 0), vinecop1.get_parameters(0, 1));
 }
 
-
 TEST_F(VinecopTest, print)
 {
-  auto cvine = CVineStructure(std::vector<size_t>({5, 4, 3, 2, 1}));
+  auto cvine = CVineStructure(std::vector<size_t>({ 5, 4, 3, 2, 1 }));
   auto vc = Vinecop(cvine);
 
   // check if last line of output is correct
@@ -66,7 +65,45 @@ TEST_F(VinecopTest, print)
   EXPECT_EQ(last_line, "5,4 | 3,2,1 <-> Independence");
 
   // just shouldn't segfault
-  Vinecop(cvine).str(); 
+  Vinecop(cvine).str();
+}
+
+TEST_F(VinecopTest, serialization)
+{
+
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
+
+  // create vine with 7 variables, 2-truncated
+  size_t d = 7;
+  auto pc_store = Vinecop::make_pair_copula_store(d, 5);
+  for (auto& tree : pc_store) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::bb1, 90);
+    }
+  }
+
+  auto vc = Vinecop(mat, pc_store);
+  vc.truncate(3);
+
+  // serialize
+  vc.to_file(std::string("temp"));
+
+  // unserialize
+  auto vc2 = Vinecop(std::string("temp"));
+
+  // Remove temp file
+  std::string cmd = rm + "temp";
+  int sys_exit_code = system(cmd.c_str());
+  if (sys_exit_code != 0) {
+    throw std::runtime_error("error in system call");
+  }
+
+  EXPECT_EQ(vc.get_all_rotations(), vc2.get_all_rotations());
+  EXPECT_EQ(vc.get_all_families(), vc2.get_all_families());
+  EXPECT_EQ(vc.get_var_types(), vc2.get_var_types());
+  EXPECT_EQ(vc.get_matrix(), vc2.get_matrix());
 }
 
 TEST_F(VinecopTest, getters_are_correct)
@@ -361,9 +398,9 @@ TEST_F(VinecopTest, works_multi_threaded)
   EXPECT_NEAR(fit1.loglik(u), fit2.loglik(u), 1e-2);
 
   // check if parallel evaluators have same output as single threaded ones
-  EXPECT_EQ(fit2.pdf(u, 2), fit2.pdf(u));
-  EXPECT_EQ(fit2.inverse_rosenblatt(u, 2), fit2.inverse_rosenblatt(u));
-  EXPECT_EQ(fit2.rosenblatt(u, 2), fit2.rosenblatt(u));
+  EXPECT_TRUE(fit2.pdf(u, 2).isApprox(fit2.pdf(u), 1e-10));
+  EXPECT_TRUE(fit2.inverse_rosenblatt(u, 2).isApprox(fit2.inverse_rosenblatt(u), 1e-10));
+  EXPECT_TRUE(fit2.rosenblatt(u, 2).isApprox(fit2.rosenblatt(u), 1e-10));
 
   // just check that it works
   fit2.simulate(2, false, 3);

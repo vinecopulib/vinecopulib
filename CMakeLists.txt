@@ -2,13 +2,11 @@ cmake_minimum_required(VERSION 3.2)
 
 set(CMAKE_CXX_STANDARD 11)
 
-project(vinecopulib VERSION 0.6.1)
+project(vinecopulib VERSION 0.6.2)
 
 include(cmake/options.cmake               REQUIRED)
 
 include(cmake/findDependencies.cmake      REQUIRED)
-
-include(cmake/findDoxygen.cmake           REQUIRED)
 
 include(cmake/findHeaders.cmake           REQUIRED)
 
