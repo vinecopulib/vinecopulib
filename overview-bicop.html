@@ -71,7 +71,7 @@
         <h1>
           Bivariate copula models
         </h1>
-        <div class="m-block m-default">
+        <nav class="m-block m-default">
           <h3>Contents</h3>
           <ul>
             <li><a href="#bicop-families">Implemented bivariate copula families</a></li>
@@ -79,7 +79,7 @@
             <li><a href="#bicop-fit">Fit and select a bivariate copula</a></li>
             <li><a href="#bicop-model">Work with a bivariate copula model</a></li>
           </ul>
-        </div>
+        </nav>
 <ul><li><a href="#bicop-families">Implemented bivariate copula families</a></li><li><a href="#bicop-custom">Set up a custom bivariate copula model</a></li><li><a href="#bicop-fit">Fit and select a bivariate copula</a></li><li><a href="#bicop-model">Work with a bivariate copula model</a></li></ul><p>Bivariate copula models are implemented as the <code>Bicop</code> class, and <code>BicopFamily</code> is a closely related enum class describing the type or &quot;family&quot; of copula. To use bivariate copula models in your code, include the header <code><a href="bicop_2class_8hpp_source.html" class="m-doc">vinecopulib/<wbr />bicop/<wbr />class.hpp</a></code> (or simply <code><a href="vinecopulib_8hpp_source.html" class="m-doc">vinecopulib.hpp</a></code>) at the top of your source file.</p><section id="bicop-families"><h2><a href="#bicop-families">Implemented bivariate copula families</a></h2><table class="m-table"><thead><tr><th>type</th><th>name</th><th>BicopFamily</th></tr></thead><tbody><tr><td>-</td><td>Independence</td><td>indep</td></tr><tr><td>Elliptical</td><td>Gaussian</td><td>gaussian</td></tr><tr><td></td><td>Student t</td><td>student</td></tr><tr><td>Archimedean</td><td>Clayton</td><td>clayton</td></tr><tr><td></td><td>Gumbel</td><td>gumbel</td></tr><tr><td></td><td>Frank</td><td>frank</td></tr><tr><td></td><td>Joe</td><td>joe</td></tr><tr><td></td><td>BB1</td><td>bb1</td></tr><tr><td></td><td>BB6</td><td>bb6</td></tr><tr><td></td><td>BB7</td><td>bb7</td></tr><tr><td></td><td>BB8</td><td>bb8</td></tr><tr><td>Nonparametric</td><td>Transformation kernel</td><td>tll</td></tr></tbody></table><p>Note that several convenience vectors of families are included in the sub-namespace <code>bicop_families</code>:</p><ul><li><code>all</code> contains all the families</li><li><code>parametric</code> contains the parametric families (all except <code>tll</code>)</li><li><code>nonparametric</code> contains the nonparametric families (<code>indep</code> and <code>tll</code>)</li><li><code>one_par</code> contains the parametric families with a single parameter (<code>gaussian</code>, <code>clayton</code>, <code>gumbel</code>, <code>frank</code>, and <code>joe</code>)</li><li><code>two_par</code> contains the parametric families with two parameters (<code>student</code>, <code>bb1</code>, <code>bb6</code>, <code>bb7</code>, and <code>bb8</code>)</li><li><code>elliptical</code> contains the elliptical families</li><li><code>archimedean</code> contains the archimedean families</li><li><code>bb</code> contains the BB families</li><li><code>itau</code> families for which estimation by Kendall&#x27;s tau inversion is available (<code>indep</code>,<code>gaussian</code>, <code>student</code>,<code>clayton</code>, <code>gumbel</code>, <code>frank</code>, <code>joe</code>)</li></ul><pre class="m-code"><span class="c1">// print all available families</span>
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Available families : &quot;</span><span class="p">;</span>
 <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="nl">family</span> <span class="p">:</span> <span class="n">vinecopulib</span><span class="o">::</span><span class="n">bicop_families</span><span class="o">::</span><span class="n">all</span><span class="p">)</span> <span class="p">{</span>
@@ -208,8 +208,8 @@
     </div>
   </div>
 </div>
-<script src="search-v1.js"></script>
-<script src="searchdata-v1.js" async="async"></script>
+<script src="search-v2.js"></script>
+<script src="searchdata-v2.js" async="async"></script>
 <footer><nav>
   <div class="m-container">
     <div class="m-row">
