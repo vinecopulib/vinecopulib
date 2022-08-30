@@ -36,7 +36,10 @@ if(NOT WIN32)
 
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-register") # -Qunused-arguments
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-const-variable -Wno-unused-parameter")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics -Wbitwise-instead-of-logical")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 14.0)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wbitwise-instead-of-logical")
+        endif ()
     endif()
 endif()
 
