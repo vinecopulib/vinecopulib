@@ -554,8 +554,8 @@ TEST_F(VinecopTest, partial_selection)
   auto rvm = fit.get_rvine_structure().get_matrix();
   int count2 = 0;
   for (int i = 0; i < 6; i++) {
-    //  diagonal element        base element
-    if ((rvm(6 - i, i) == 2) | (rvm(0, i) == 2))
+    //  diagonal element         base element
+    if ((rvm(6 - i, i) == 2) || (rvm(0, i) == 2))
       count2++;
   }
   EXPECT_EQ(count2, 6);

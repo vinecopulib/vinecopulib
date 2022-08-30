@@ -7,7 +7,7 @@ if(NOT WIN32)
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel")
-        set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wno-variadic-macros -Wno-parentheses -fdiagnostics-show-option")
+        set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wno-variadic-macros -Wno-parentheses  -fdiagnostics-show-option")
     else()
         set(CMAKE_CXX_FLAGS                "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type")
     endif()
@@ -36,7 +36,7 @@ if(NOT WIN32)
 
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-register") # -Qunused-arguments
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-const-variable -Wno-unused-parameter")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics -Wbitwise-instead-of-logical")
     endif()
 endif()
 
