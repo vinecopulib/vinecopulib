@@ -62,10 +62,20 @@ Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
         this->objective_calls_++;
         return -objective(par);
       };
+    auto start_pars =
+      tools_bobyqa::bobyqa(f,
+                           n_parameters,
+                           number_interpolation_conditions,
+                           initial_parameters,
+                           lower_bounds,
+                           upper_bounds,
+                           std::sqrt(controls_.get_initial_trust_region()),
+                           std::sqrt(controls_.get_final_trust_region()),
+                           std::ceil(std::sqrt(controls_.get_maxeval()))).first;
     auto result = tools_bobyqa::bobyqa(f,
                                        n_parameters,
                                        number_interpolation_conditions,
-                                       initial_parameters,
+                                       start_pars,
                                        lower_bounds,
                                        upper_bounds,
                                        controls_.get_initial_trust_region(),
@@ -134,9 +144,9 @@ Optimizer::check_parameters_size(const Eigen::VectorXd& initial_parameters,
 //! ```
 inline BobyqaControls::BobyqaControls()
 {
-  initial_trust_region_ = 1e-4;
-  final_trust_region_ = 1e3;
-  maxeval_ = 1000;
+  initial_trust_region_ = 1e-2;
+  final_trust_region_ = 1e-4;
+  maxeval_ = 500;
 }
 
 //! Instantiates controls by passing the arguments
