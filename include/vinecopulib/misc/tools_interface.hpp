@@ -20,19 +20,6 @@ static RcppThread::RPrinter Rcout = RcppThread::RPrinter();
 #include <iostream>
 #endif
 
-#ifdef INTERFACED_FROM_R
-// replace std::sprintf by void function
-// - this is necessary because `sprintf()` is now flagged as potential se
-//   security  risk by CRAN checks, which issue a WARNING.
-// - in our case, `boost/odeint` makes (safe) use of the function, but we don't 
-//   really need it.
-#define sprintf _sprintf_do_nothing
-namespace std
-{
-  inline int _sprintf_do_nothing(char* s, const char* format, ...) { return 0; }
-}
-#endif
-
 // parallel backend
 #include <vinecopulib/misc/tools_batch.hpp>
 #ifdef INTERFACED_FROM_R
