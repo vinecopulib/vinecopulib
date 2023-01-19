@@ -42,7 +42,7 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct)
   X2.col(0).head(50) = Eigen::VectorXd::Constant(n, NAN);
   auto u = tools_stats::to_pseudo_obs(X2);
   EXPECT_TRUE(std::isnan(u(0, 0)));
-  EXPECT_GE(u.array().maxCoeff(), 0.98);
+  EXPECT_GE(u.col(0).tail(50).maxCoeff(), 0.98);
 }
 
 TEST(test_tools_stats, qrng_are_correct)
