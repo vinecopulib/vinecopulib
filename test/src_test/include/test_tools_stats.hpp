@@ -38,6 +38,11 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct)
   EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X2, "random"));
   EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X2, "first"));
   EXPECT_ANY_THROW(tools_stats::to_pseudo_obs(X2, "something"));
+
+  X2.col(0).head(50) = Eigen::VectorXd::Constant(50, NAN);
+  auto u = tools_stats::to_pseudo_obs(X2);
+  EXPECT_TRUE(std::isnan(u(0, 0)));
+  EXPECT_GE(u.col(0).tail(50).maxCoeff(), 0.98);
 }
 
 TEST(test_tools_stats, qrng_are_correct)

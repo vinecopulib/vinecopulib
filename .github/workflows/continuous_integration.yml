@@ -52,9 +52,12 @@ jobs:
             sudo apt-get install --no-install-recommends -y --allow-unauthenticated g++ clang
             sudo apt-get autoremove
           elif [ "${{ matrix.cfg.os }}" == "macos-latest" ]; then
-            rm '/usr/local/bin/gfortran'
-            rm '/usr/local/bin/2to3'
-            brew update
+            # rm '/usr/local/bin/gfortran'
+            # rm '/usr/local/bin/2to3'
+            # rm '/usr/local/bin/2to3-3.11'
+            # rm '/usr/local/bin/idle3'
+            # rm '/usr/local/bin/R'
+            # brew update
             brew install lcov eigen gsl doxygen graphviz boost
           elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
