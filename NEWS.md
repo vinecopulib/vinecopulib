@@ -1,3 +1,14 @@
+## vinecopulib 0.6.3 (Februrary 20, 2023)
+
+BUG FIXES
+
+* replace bitwise ops on boolean operands (#563) 
+
+* handle `NaN`s in `to_pseudo_obs()` (#566)
+
+* Replace calls to `sprintf` in boost libraries (#565)
+
+
 ## vinecopulib 0.6.2 (August 24, 2022)
 
 * updated cmake setup (#549)
