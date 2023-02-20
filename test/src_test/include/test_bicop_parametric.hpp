@@ -1,4 +1,4 @@
-// Copyright © 2016-2022 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -123,7 +123,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     EXPECT_ANY_THROW(bicop_.mbic());
     EXPECT_NO_THROW(bicop_.simulate(10, true));
     EXPECT_NO_THROW(bicop_.str());
-    if ((bicop_.get_parameters().size() > 1) &
+    if ((bicop_.get_parameters().size() > 1) &&
         (bicop_.get_family() != BicopFamily::student)) {
       EXPECT_ANY_THROW(bicop_.tau_to_parameters(0.5));
     } else if (bicop_.get_parameters().size() == 1) {

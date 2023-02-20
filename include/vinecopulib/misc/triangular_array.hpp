@@ -1,4 +1,4 @@
-// Copyright © 2016-2022 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -163,7 +163,7 @@ template<typename T>
 bool
 TriangularArray<T>::operator==(const TriangularArray<T>& rhs) const
 {
-  if ((d_ != rhs.get_dim()) | (trunc_lvl_ != rhs.get_trunc_lvl()))
+  if ((d_ != rhs.get_dim()) || (trunc_lvl_ != rhs.get_trunc_lvl()))
     return false;
 
   for (size_t i = 0; i < trunc_lvl_; i++) {

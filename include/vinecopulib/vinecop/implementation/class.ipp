@@ -1,4 +1,4 @@
-// Copyright © 2016-2022 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -806,7 +806,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
           u_e.col(1) = hfunc1.col(m - 1);
         }
 
-        if ((var_types[0] == "d") | (var_types[1] == "d")) {
+        if ((var_types[0] == "d") || (var_types[1] == "d")) {
           u_e.conservativeResize(b.size, 4);
           u_e.col(2) = hfunc2_sub.col(edge);
           if (m == rvine_structure_.struct_array(tree, edge, true)) {
@@ -1332,7 +1332,7 @@ inline void
 Vinecop::check_weights_size(const Eigen::VectorXd& weights,
                             const Eigen::MatrixXd& data) const
 {
-  if ((weights.size() > 0) & (weights.size() != data.rows())) {
+  if ((weights.size() > 0) && (weights.size() != data.rows())) {
     throw std::runtime_error("sizes of weights and data don't match.");
   }
 }

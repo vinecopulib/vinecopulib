@@ -1,4 +1,4 @@
-// Copyright © 2016-2022 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -970,7 +970,7 @@ inline void
 Bicop::check_weights_size(const Eigen::VectorXd& weights,
                           const Eigen::MatrixXd& data) const
 {
-  if ((weights.size() > 0) & (weights.size() != data.rows())) {
+  if ((weights.size() > 0) && (weights.size() != data.rows())) {
     throw std::runtime_error("sizes of weights and data don't match.");
   }
 }

@@ -1,4 +1,4 @@
-// Copyright © 2016-2022 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -138,7 +138,7 @@ ThreadPool::wait()
         this->clear(); // cancel all remaining jobs
         continue;      // wait for currently running jobs
       }
-      if (this->has_errored() | this->all_jobs_done())
+      if (this->has_errored() || this->all_jobs_done())
         break;
     }
     std::this_thread::yield();
@@ -275,7 +275,7 @@ ThreadPool::wait_for_wake_up_event()
 {
   static auto timeout = std::chrono::milliseconds(250);
   auto wake_up_event_occured = [this] {
-    return this->all_jobs_done() | this->has_errored();
+    return this->all_jobs_done() || this->has_errored();
   };
   std::unique_lock<std::mutex> lk(m_tasks_);
   cv_busy_.wait_for(lk, timeout, wake_up_event_occured);
