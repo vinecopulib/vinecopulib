@@ -11,6 +11,9 @@
 #include <Eigen/Dense>
 #include <vinecopulib/bicop/family.hpp>
 
+
+#include <iostream>
+
 namespace vinecopulib {
 //! @brief An abstract class for bivariate copula families.
 //!

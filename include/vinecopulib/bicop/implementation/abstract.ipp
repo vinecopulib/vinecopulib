@@ -150,28 +150,61 @@ AbstractBicop::pdf(const Eigen::MatrixXd& u)
 inline Eigen::VectorXd
 AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u)
 {
+  Eigen::VectorXd pdf(u.rows());
+  Eigen::MatrixXd umax = u.leftCols(2);
+  Eigen::MatrixXd umin = u.rightCols(2);
+  Eigen::VectorXd udiff(u.rows());
+
   if (var_types_[0] != "c") {
-    return (hfunc2_raw(u.leftCols(2)) - hfunc2_raw(u.rightCols(2)))
-      .cwiseQuotient(u.col(0) - u.col(2))
-      .cwiseAbs();
+    pdf = (hfunc2_raw(u.leftCols(2)) - hfunc2_raw(u.rightCols(2)))
+            .cwiseQuotient(u.col(0) - u.col(2));
+    udiff = (u.col(0) - u.col(2)).cwiseAbs();
   } else {
-    return (hfunc1_raw(u.leftCols(2)) - hfunc1_raw(u.rightCols(2)))
-      .cwiseQuotient(u.col(1) - u.col(3))
-      .cwiseAbs();
+    pdf = (hfunc1_raw(u.leftCols(2)) - hfunc1_raw(u.rightCols(2)))
+            .cwiseQuotient(u.col(1) - u.col(3));
+    udiff = (u.col(1) - u.col(3)).cwiseAbs();
   }
+
+  if ((udiff.array() < 1e-4).any()) {
+    for (size_t i = 0; i < u.rows(); i++) {
+      if (udiff(i) < 1e-4) {
+        pdf(i) = pdf_raw((umax.row(i) + umin.row(i)) / 2)(0);
+      }
+    }
+  }
+  return pdf.cwiseAbs();
 }
 
 inline Eigen::VectorXd
 AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u)
 {
+  Eigen::VectorXd pdf(u.rows());
   Eigen::MatrixXd umax = u.leftCols(2);
   Eigen::MatrixXd umin = u.rightCols(2);
-  Eigen::VectorXd pdf = cdf(umax) + cdf(umin);
+  Eigen::MatrixXd udiff = (umax - umin).cwiseAbs();
+
+  pdf = cdf(umax) + cdf(umin);
   umax.col(0).swap(umin.col(0));
   pdf -= cdf(umax) + cdf(umin);
-  pdf = pdf.array() / (u.col(0) - u.col(2)).array();
-  pdf = pdf.array() / (u.col(1) - u.col(3)).array();
-  return pdf;
+  pdf = pdf.cwiseQuotient(udiff.col(0) * (udiff.col(1)));
+
+  if (udiff.minCoeff() < 1e-4) {
+    for (size_t i = 0; i < u.rows(); i++) {
+      if (udiff.row(i).maxCoeff() < 1e-4) {
+        pdf(i) = pdf_raw((umax.row(i) + umin.row(i)) / 2)(0);
+      } else if (udiff(i, 0) < 1e-4) {
+        umax(i, 0) = (umax(i, 0) + umin(i, 0)) / 2;
+        umin(i, 0) = (umax(i, 0) + umin(i, 0)) / 2;
+        pdf(i) = hfunc1_raw(umax)(0) - hfunc1_raw(umin)(0) / udiff(i, 1);
+      } else if (udiff(i, 1) < 1e-4) {
+        umax(i, 1) = (umax(i, 1) + umin(i, 0)) / 2;
+        umin(i, 1) = (umax(i, 1) + umin(i, 0)) / 2;
+        pdf(i) = hfunc2_raw(umax)(0) - hfunc2_raw(umin)(0) / udiff(i, 0);
+      }
+    }
+  }
+
+  return pdf.cwiseAbs();
 }
 
 inline Eigen::VectorXd
