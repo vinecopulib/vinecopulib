@@ -75,66 +75,66 @@ TEST(discrete, bicop)
 
 TEST(discrete, vinecop)
 {
-  // auto pair_copulas = Vinecop::make_pair_copula_store(5);
-  // for (size_t t = 0; t < 4; t++) {
-  //   for (auto& pc : pair_copulas[t]) {
-  //     auto par =
-  //       Eigen::VectorXd::Constant(1, 2.0 / (static_cast<double>(t) + 1.0));
-  //     pc = Bicop(BicopFamily::clayton, 90, par);
-  //   }
-  // }
-  // RVineStructure str(std::vector<size_t>{ 1, 2, 3, 4, 5 });
-  // Vinecop vc(str, pair_copulas, { "d", "c", "d", "d", "c" });
+  auto pair_copulas = Vinecop::make_pair_copula_store(5);
+  for (size_t t = 0; t < 4; t++) {
+    for (auto& pc : pair_copulas[t]) {
+      auto par =
+        Eigen::VectorXd::Constant(1, 2.0 / (static_cast<double>(t) + 1.0));
+      pc = Bicop(BicopFamily::clayton, 90, par);
+    }
+  }
+  RVineStructure str(std::vector<size_t>{ 1, 2, 3, 4, 5 });
+  Vinecop vc(str, pair_copulas, { "d", "c", "d", "d", "c" });
 
-  // // simulate data with continuous and discrete variables
-  // auto utmp = vc.simulate(500, true, 1, { 1 });
-  // Eigen::MatrixXd u(utmp.rows(), 5 + 3); // 3 discrete vars
-  // u.leftCols(5) = utmp;
+  // simulate data with continuous and discrete variables
+  auto utmp = vc.simulate(500, true, 1, { 1 });
+  Eigen::MatrixXd u(utmp.rows(), 5 + 3); // 3 discrete vars
+  u.leftCols(5) = utmp;
 
-  // u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
-  // u.col(5 + 0) = (utmp.col(0).array() * 10).floor() / 10;
+  u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
+  u.col(5 + 0) = (utmp.col(0).array() * 10).floor() / 10;
 
-  // u.col(2) = (utmp.col(2).array() * 10).ceil() / 10;
-  // u.col(5 + 1) = (utmp.col(2).array() * 10).floor() / 10;
+  u.col(2) = (utmp.col(2).array() * 10).ceil() / 10;
+  u.col(5 + 1) = (utmp.col(2).array() * 10).floor() / 10;
 
-  // u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
-  // u.col(5 + 2) = (utmp.col(3).array() * 10).floor() / 10;
+  u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
+  u.col(5 + 2) = (utmp.col(3).array() * 10).floor() / 10;
 
-  // // fit vine
-  // auto controls = FitControlsVinecop({ BicopFamily::clayton });
-  // // controls.set_show_trace(true);
-  // vc.select(u, controls);
-  // vc.pdf(u);
+  // fit vine
+  auto controls = FitControlsVinecop({ BicopFamily::clayton });
+  // controls.set_show_trace(true);
+  vc.select(u, controls);
+  vc.pdf(u);
 
-  // // check output
-  // auto pcs = vc.get_all_pair_copulas();
-  // for (size_t t = 0; t < 4; t++) {
-  //   for (auto pc : pcs[t]) {
-  //     EXPECT_EQ(pc.get_rotation(), 90);
-  //     EXPECT_NEAR(
-  //       pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
-  //   }
-  // }
+  // check output
+  auto pcs = vc.get_all_pair_copulas();
+  for (size_t t = 0; t < 4; t++) {
+    for (auto pc : pcs[t]) {
+      EXPECT_EQ(pc.get_rotation(), 90);
+      EXPECT_NEAR(
+        pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
+    }
+  }
 
-  // // test other input format
-  // u = Eigen::MatrixXd(utmp.rows(), 10);
-  // u.leftCols(5) = utmp;
-  // u.rightCols(5) = utmp;
-  // u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
-  // u.col(5) = (utmp.col(0).array() * 10).floor() / 10;
-  // u.col(2) = (utmp.col(2).array() * 10).ceil() / 10;
-  // u.col(7) = (utmp.col(2).array() * 10).floor() / 10;
-  // u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
-  // u.col(8) = (utmp.col(3).array() * 10).floor() / 10;
-  // vc.select(u, controls);
-  // vc.pdf(u);
-  // pcs = vc.get_all_pair_copulas();
-  // for (size_t t = 0; t < 4; t++) {
-  //   for (auto pc : pcs[t]) {
-  //     EXPECT_EQ(pc.get_rotation(), 90);
-  //     EXPECT_NEAR(
-  //       pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
-  //   }
-  // }
+  // test other input format
+  u = Eigen::MatrixXd(utmp.rows(), 10);
+  u.leftCols(5) = utmp;
+  u.rightCols(5) = utmp;
+  u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
+  u.col(5) = (utmp.col(0).array() * 10).floor() / 10;
+  u.col(2) = (utmp.col(2).array() * 10).ceil() / 10;
+  u.col(7) = (utmp.col(2).array() * 10).floor() / 10;
+  u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
+  u.col(8) = (utmp.col(3).array() * 10).floor() / 10;
+  vc.select(u, controls);
+  vc.pdf(u);
+  pcs = vc.get_all_pair_copulas();
+  for (size_t t = 0; t < 4; t++) {
+    for (auto pc : pcs[t]) {
+      EXPECT_EQ(pc.get_rotation(), 90);
+      EXPECT_NEAR(
+        pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
+    }
+  }
 }
 }

@@ -188,6 +188,8 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u)
   pdf -= cdf(umax) + cdf(umin);
   pdf = pdf.cwiseQuotient(udiff.col(0) * (udiff.col(1)));
 
+  // the quotient can be instable, use analytical derivative if denominator
+  // too small
   if (udiff.minCoeff() < 1e-4) {
     for (size_t i = 0; i < u.rows(); i++) {
       if (udiff.row(i).maxCoeff() < 1e-4) {
@@ -213,9 +215,17 @@ AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
   if (var_types_[0] == "d") {
     auto uu = u;
     uu.col(3) = uu.col(1);
-    return ((cdf(uu.leftCols(2)) - cdf(uu.rightCols(2))).array() /
-            (uu.col(0) - uu.col(2)).array())
-      .abs();
+    Eigen::VectorXd h = ((cdf(uu.leftCols(2)) - cdf(uu.rightCols(2))).array() /
+                         (uu.col(0) - uu.col(2)).array());
+    // the quotient can be instable, use analytical derivative if denominator
+    // too small
+    for (size_t i = 0; i < u.rows(); i++) {
+      if (std::abs(uu(i, 0) - uu(i, 2)) < 1e-4) {
+        uu(i, 0) = (uu(i, 0) + uu(i, 2)) / 2;
+        h(i) = hfunc1_raw(uu.row(i).leftCols(2))(0);
+      }
+    }
+    return h.cwiseAbs();
   } else {
     return hfunc1_raw(u.leftCols(2));
   }
@@ -227,9 +237,17 @@ AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
   if (var_types_[1] == "d") {
     auto uu = u;
     uu.col(2) = uu.col(0);
-    return ((cdf(uu.leftCols(2)) - cdf(uu.rightCols(2))).array() /
-            (uu.col(1) - uu.col(3)).array())
-      .abs();
+    Eigen::VectorXd h = ((cdf(uu.leftCols(2)) - cdf(uu.rightCols(2))).array() /
+                         (uu.col(1) - uu.col(3)).array());
+    // the quotient can be instable, use analytical derivative if denominator
+    // too small
+    for (size_t i = 0; i < u.rows(); i++) {
+      if (std::abs(uu(i, 1) - uu(i, 3)) < 1e-4) {
+        uu(i, 1) = (uu(i, 1) + uu(i, 3)) / 2;
+        h(i) = hfunc1_raw(uu.row(i).leftCols(2))(0);
+      }
+    }
+    return h.cwiseAbs();
   } else {
     return hfunc2_raw(u.leftCols(2));
   }
