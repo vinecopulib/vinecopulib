@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -18,7 +18,7 @@ using namespace vinecopulib;
 TEST(test_tools_bobyqa, const_function)
 {
 
-  auto f = [](long /*n*/, const double * /*x*/) -> double { return 0.0; };
+  auto f = [](long /*n*/, const double* /*x*/) -> double { return 0.0; };
 
   const long variables_count = 2;
   const long number_of_interpolation_conditions = variables_count + 2;

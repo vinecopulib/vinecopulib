@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -93,7 +93,7 @@ inline Eigen::Matrix<ptrdiff_t, 1, 2>
 InterpolationGrid::get_indices(double x0, double x1)
 {
   Eigen::Matrix<ptrdiff_t, 1, 2> out;
-  out << 0, 0;
+  out.setZero();
   bool found_i = false;
   bool found_j = false;
   for (ptrdiff_t k = 1; k < (grid_points_.size() - 1); ++k) {

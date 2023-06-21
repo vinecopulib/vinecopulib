@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -55,12 +55,11 @@ public:
 
   // Constructors from files/serialized objects
   explicit Vinecop(const std::string& filename, const bool check = true);
-  explicit Vinecop(const boost::property_tree::ptree input,
-                   const bool check = true);
+  explicit Vinecop(const nlohmann::json& input, const bool check = true);
 
   // Serialize
-  boost::property_tree::ptree to_ptree() const;
-  void to_json(const std::string& filename) const;
+  nlohmann::json to_json() const;
+  void to_file(const std::string& filename) const;
 
   // Methods modifying structure and/or families and parameters
   void select(const Eigen::MatrixXd& data,
@@ -198,6 +197,7 @@ protected:
                           const Eigen::MatrixXd& data) const;
   void check_enough_data(const Eigen::MatrixXd& data) const;
   void check_fitted() const;
+  void check_indices(const size_t tree, const size_t edge) const;
   void check_var_types(const std::vector<std::string>& var_types) const;
   void set_continuous_var_types() const;
   void set_var_types_internal(const std::vector<std::string>& var_types) const;

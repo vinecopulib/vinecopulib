@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -101,10 +101,10 @@ simulate_uniform(const size_t& n,
                  std::vector<int> seeds = std::vector<int>());
 
 Eigen::VectorXd
-to_pseudo_obs_1d(Eigen::VectorXd x, std::string ties_method = "average");
+to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method = "average");
 
 Eigen::MatrixXd
-to_pseudo_obs(Eigen::MatrixXd x, std::string ties_method = "average");
+to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average");
 
 double
 pairwise_mcor(const Eigen::MatrixXd& x,
@@ -116,12 +116,12 @@ dependence_matrix(const Eigen::MatrixXd& x, const std::string& measure);
 Eigen::MatrixXd
 ghalton(const size_t& n,
         const size_t& d,
-        std::vector<int> seeds = std::vector<int>());
+        const std::vector<int>& seeds = std::vector<int>());
 
 Eigen::MatrixXd
 sobol(const size_t& n,
       const size_t& d,
-      std::vector<int> seeds = std::vector<int>());
+      const std::vector<int>& seeds = std::vector<int>());
 
 Eigen::VectorXd
 pbvt(const Eigen::MatrixXd& z, int nu, double rho);

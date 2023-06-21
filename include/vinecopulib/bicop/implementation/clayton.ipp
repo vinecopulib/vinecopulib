@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -87,7 +87,8 @@ ClaytonBicop::tau_to_parameters(const double& tau)
 {
   Eigen::VectorXd parameters(1);
   parameters(0) = 2 * std::fabs(tau) / (1 - std::fabs(tau));
-  return parameters;
+  return parameters.cwiseMax(parameters_lower_bounds_)
+    .cwiseMin(parameters_upper_bounds_);
 }
 
 inline double

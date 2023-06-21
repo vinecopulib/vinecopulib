@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -39,7 +39,7 @@ calculate_criterion(const Eigen::MatrixXd& data,
 
 Eigen::MatrixXd
 calculate_criterion_matrix(const Eigen::MatrixXd& data,
-                           std::string tree_criterion,
+                           const std::string& tree_criterion,
                            const Eigen::VectorXd& weights);
 
 std::vector<size_t>
@@ -72,8 +72,6 @@ struct EdgeProperties
   double weight;
   double crit;
   vinecopulib::Bicop pair_copula;
-  double loglik;
-  double npars;
   double fit_id;
 };
 typedef boost::adjacency_list<
@@ -98,6 +96,8 @@ public:
                   const RVineStructure& vine_struct,
                   const FitControlsVinecop& controls,
                   std::vector<std::string> var_types);
+
+  virtual ~VinecopSelector() = default;
 
   std::vector<std::vector<Bicop>> get_pair_copulas() const;
 

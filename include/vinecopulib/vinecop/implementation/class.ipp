@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -39,6 +39,7 @@ inline Vinecop::Vinecop(const RVineStructure& structure,
   if (pair_copulas.size() > 0) {
     set_all_pair_copulas(pair_copulas);
   }
+
   if (var_types.size() > 0) {
     set_var_types(var_types);
   } else {
@@ -120,22 +121,22 @@ inline Vinecop::Vinecop(
   : Vinecop(data, RVineStructure(matrix), var_types, controls)
 {}
 
-//! @brief Instantiates from a boost::property_tree::ptree object.
-//! @param input The boost::property_tree::ptree object to convert from
-//! (see `to_ptree()` for the structure of the input).
+//! @brief Instantiates from a nlohmann::json object.
+//! @param input The nlohmann::json object to convert from
+//! (see `to_json()` for the structure of the input).
 //! @param check Whether to check if the `"structure"` node represents
 //!      a valid R-vine structure.
-inline Vinecop::Vinecop(const boost::property_tree::ptree input,
-                        const bool check)
+inline Vinecop::Vinecop(const nlohmann::json& input, const bool check)
 {
-  rvine_structure_ = RVineStructure(input.get_child("structure"), check);
+  rvine_structure_ = RVineStructure(input["structure"], check);
   d_ = static_cast<size_t>(rvine_structure_.get_dim());
+  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
 
-  boost::property_tree::ptree pcs_node = input.get_child("pair copulas");
-  for (size_t tree = 0; tree < d_ - 1; ++tree) {
-    boost::property_tree::ptree tree_node;
+  nlohmann::json pcs_json = input["pair copulas"];
+  for (size_t tree = 0; tree < std::min(d_, trunc_lvl); ++tree) {
+    nlohmann::json tree_json;
     try {
-      tree_node = pcs_node.get_child("tree" + std::to_string(tree));
+      tree_json = pcs_json["tree" + std::to_string(tree)];
     } catch (...) {
       break; // vine was truncated, no more trees to parse
     }
@@ -144,19 +145,18 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
     pair_copulas_[tree].resize(d_ - tree - 1);
 
     for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
-      boost::property_tree::ptree pc_node =
-        tree_node.get_child("pc" + std::to_string(edge));
-      pair_copulas_[tree][edge] = Bicop(pc_node);
+      nlohmann::json pc_json = tree_json["pc" + std::to_string(edge)];
+      pair_copulas_[tree][edge] = Bicop(pc_json);
     }
   }
 
   // try block for backwards compatibility
   try {
-    var_types_ = tools_serialization::ptree_to_vector<std::string>(
-      input.get_child("var_types"));
-    nobs_ = input.get<size_t>("nobs_");
-    threshold_ = input.get<double>("threshold");
-    loglik_ = input.get<double>("loglik");
+    var_types_ =
+      tools_serialization::json_to_vector<std::string>(input["var_types"]);
+    nobs_ = static_cast<size_t>(input["nobs_"]);
+    threshold_ = static_cast<double>(input["threshold"]);
+    loglik_ = static_cast<double>(input["loglik"]);
   } catch (...) {
   }
 }
@@ -176,42 +176,41 @@ inline Vinecop::Vinecop(const boost::property_tree::ptree input,
 //! @param check Whether to check if the `"structure"` node of the input
 //! represents a valid R-vine structure.
 inline Vinecop::Vinecop(const std::string& filename, const bool check)
-  : Vinecop(tools_serialization::json_to_ptree(filename.c_str()), check)
+  : Vinecop(tools_serialization::file_to_json(filename), check)
 {}
 
-//! @brief Converts the copula into a boost::property_tree::ptree object.
+//! @brief Converts the copula into a nlohmann::json object.
 //!
-//! The `ptree` object contains two nodes : `"structure"` for the vine
+//! The `nlohmann::json` object contains two nodes : `"structure"` for the vine
 //! structure, which itself contains nodes `"array"` for the structure
 //! triangular array and `"order"` for the order vector, and `"pair copulas"`.
 //! The former two encode the R-Vine structure and the latter is a list of
 //! child nodes for the trees (`"tree1"`, `"tree2"`, etc), each containing
 //! a list of child nodes for the edges (`"pc1"`, `"pc2"`, etc).
-//! See Bicop::to_ptree() for the encoding of pair-copulas.
+//! See Bicop::to_json() for the encoding of pair-copulas.
 //!
-//! @return the boost::property_tree::ptree object containing the copula.
-inline boost::property_tree::ptree
-Vinecop::to_ptree() const
+//! @return the nlohmann::json object containing the copula.
+inline nlohmann::json
+Vinecop::to_json() const
 {
-  boost::property_tree::ptree pair_copulas;
+  nlohmann::json pair_copulas;
   for (size_t tree = 0; tree < pair_copulas_.size(); ++tree) {
-    boost::property_tree::ptree tree_node;
+    nlohmann::json tree_json;
     for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
-      tree_node.add_child("pc" + std::to_string(edge),
-                          pair_copulas_[tree][edge].to_ptree());
+      tree_json["pc" + std::to_string(edge)] =
+        pair_copulas_[tree][edge].to_json();
     }
-    pair_copulas.add_child("tree" + std::to_string(tree), tree_node);
+    pair_copulas["tree" + std::to_string(tree)] = tree_json;
   }
 
-  boost::property_tree::ptree output;
-  output.add_child("pair copulas", pair_copulas);
-  auto structure_node = rvine_structure_.to_ptree();
-  output.add_child("structure", structure_node);
-  output.add_child("var_types",
-                   tools_serialization::vector_to_ptree(var_types_));
-  output.put("nobs_", nobs_);
-  output.put("threshold", threshold_);
-  output.put("loglik", loglik_);
+  nlohmann::json output;
+  output["pair copulas"] = pair_copulas;
+  auto structure_json = rvine_structure_.to_json();
+  output["structure"] = structure_json;
+  output["var_types"] = tools_serialization::vector_to_json(var_types_);
+  output["nobs_"] = nobs_;
+  output["threshold"] = threshold_;
+  output["loglik"] = loglik_;
 
   return output;
 }
@@ -229,9 +228,9 @@ Vinecop::to_ptree() const
 //!
 //! @param filename The name of the JSON file to write.
 inline void
-Vinecop::to_json(const std::string& filename) const
+Vinecop::to_file(const std::string& filename) const
 {
-  boost::property_tree::write_json(filename.c_str(), this->to_ptree());
+  tools_serialization::json_to_file(filename, this->to_json());
 }
 
 //! @brief Initializes object for storing pair copulas.
@@ -267,15 +266,22 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! *Selecting and estimating regular vine copulae and application to
 //! financial returns.* Computational Statistics & Data Analysis, 59 (1),
 //! 52-69.
+//! The dependence measure used to select trees (default: Kendall's tau) is
+//! corrected for ties (see the wdm library).
 //!
-//! When at least one variable is discrete, two types of "observations"
-//! are required: the first \f$ n \times d \f$ block contains realizations of
-//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
-//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
-//! left-sided limit of the cdf. For continuous variables the left limit and the
-//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
-//! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
-//! be omitted.
+//! When at least one variable is discrete, two types of
+//! "observations" are required: the first \f$ n \times d \f$ block contains
+//! realizations of \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block
+//! contains realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus
+//! indicates a left-sided limit of the cdf. For continuous variables the left
+//! limit and the cdf itself coincide. For, e.g., an integer-valued variable, it
+//! holds \f$ F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second
+//! block can be omitted.
+//!
+//! If there are missing data (i.e., NaN entries), incomplete observations are 
+//! discarded before fitting a pair-copula. This is done on a pair-by-pair basis
+//! so that the maximal available information is used.
+//! 
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
@@ -284,7 +290,7 @@ inline void
 Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 {
   check_data(data);
-  if (data.cols() == 1) {
+  if (d_ == 1) {
     loglik_ = 0;
     nobs_ = data.rows();
     return;
@@ -342,6 +348,10 @@ Vinecop::select_all(const Eigen::MatrixXd& data,
 //! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
 //! be omitted.
 //!
+//! If there are missing data (i.e., NaN entries), incomplete observations are 
+//! discarded before fitting a pair-copula. This is done on a pair-by-pair basis
+//! so that the maximal available information is used.
+//!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls to the algorithm (see FitControlsVinecop).
@@ -364,24 +374,9 @@ Vinecop::select_families(const Eigen::MatrixXd& data,
 inline Bicop
 Vinecop::get_pair_copula(const size_t tree, const size_t edge) const
 {
-  if (tree > d_ - 2) {
-    std::stringstream message;
-    message << "tree index out of bounds" << std::endl
-            << "allowed: 0, ..., " << d_ - 2 << std::endl
-            << "actual: " << tree << std::endl;
-    throw std::runtime_error(message.str().c_str());
-  }
-  if (edge > d_ - tree - 2) {
-    std::stringstream message;
-    message << "edge index out of bounds" << std::endl
-            << "allowed: 0, ..., " << d_ - tree - 2 << std::endl
-            << "actual: " << edge << std::endl
-            << "tree level: " << tree << std::endl;
-    throw std::runtime_error(message.str().c_str());
-  }
+  this->check_indices(tree, edge);
   if (tree >= pair_copulas_.size()) {
-    // vine is truncated
-    return Bicop();
+    return Bicop(); // vine is truncated
   }
   return pair_copulas_[tree][edge];
 }
@@ -403,7 +398,11 @@ Vinecop::get_all_pair_copulas() const
 inline BicopFamily
 Vinecop::get_family(const size_t tree, const size_t edge) const
 {
-  return get_pair_copula(tree, edge).get_family();
+  this->check_indices(tree, edge);
+  if (tree >= pair_copulas_.size()) {
+    return BicopFamily::indep; // vine is truncated
+  }
+  return pair_copulas_[tree][edge].get_family();
 }
 
 //! @brief Gets the families of all pair copulas.
@@ -417,7 +416,7 @@ Vinecop::get_all_families() const
   for (size_t tree = 0; tree < pair_copulas_.size(); ++tree) {
     families[tree].resize(d_ - 1 - tree);
     for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
-      families[tree][edge] = get_family(tree, edge);
+      families[tree][edge] = pair_copulas_[tree][edge].get_family();
     }
   }
 
@@ -431,7 +430,11 @@ Vinecop::get_all_families() const
 inline int
 Vinecop::get_rotation(const size_t tree, const size_t edge) const
 {
-  return get_pair_copula(tree, edge).get_rotation();
+  this->check_indices(tree, edge);
+  if (tree >= pair_copulas_.size()) {
+    return 0; // vine is truncated
+  }
+  return pair_copulas_[tree][edge].get_rotation();
 }
 
 //! @brief Gets the rotations of all pair copulas.
@@ -445,7 +448,7 @@ Vinecop::get_all_rotations() const
   for (size_t tree = 0; tree < pair_copulas_.size(); ++tree) {
     rotations[tree].resize(d_ - 1 - tree);
     for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
-      rotations[tree][edge] = get_rotation(tree, edge);
+      rotations[tree][edge] = pair_copulas_[tree][edge].get_rotation();
     }
   }
 
@@ -459,7 +462,11 @@ Vinecop::get_all_rotations() const
 inline Eigen::MatrixXd
 Vinecop::get_parameters(const size_t tree, const size_t edge) const
 {
-  return get_pair_copula(tree, edge).get_parameters();
+  this->check_indices(tree, edge);
+  if (tree >= pair_copulas_.size()) {
+    return Eigen::MatrixXd(); // vine is truncated
+  }
+  return pair_copulas_[tree][edge].get_parameters();
 }
 
 //! @brief Gets the Kendall's \f$ tau \f$ of a pair copula.
@@ -469,7 +476,11 @@ Vinecop::get_parameters(const size_t tree, const size_t edge) const
 inline double
 Vinecop::get_tau(const size_t tree, const size_t edge) const
 {
-  return get_pair_copula(tree, edge).get_tau();
+  this->check_indices(tree, edge);
+  if (tree >= pair_copulas_.size()) {
+    return 0; // vine is truncated
+  }
+  return pair_copulas_[tree][edge].get_tau();
 }
 
 inline size_t
@@ -489,7 +500,7 @@ Vinecop::get_all_parameters() const
   for (size_t tree = 0; tree < parameters.size(); ++tree) {
     parameters[tree].resize(d_ - 1 - tree);
     for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
-      parameters[tree][edge] = get_parameters(tree, edge);
+      parameters[tree][edge] = pair_copulas_[tree][edge].get_parameters();
     }
   }
 
@@ -507,7 +518,7 @@ Vinecop::get_all_taus() const
   for (size_t tree = 0; tree < taus.size(); ++tree) {
     taus[tree].resize(d_ - 1 - tree);
     for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
-      taus[tree][edge] = get_tau(tree, edge);
+      taus[tree][edge] = pair_copulas_[tree][edge].get_tau();
     }
   }
 
@@ -603,7 +614,7 @@ Vinecop::get_mbicv(const double psi0) const
 inline double
 Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
 {
-  if (!(psi0 > 0.0) | !(psi0 < 1.0)) {
+  if ((psi0 <= 0.0) || (psi0 >= 1.0)) {
     throw std::runtime_error("psi0 must be in the interval (0, 1)");
   }
   auto all_fams = get_all_families();
@@ -733,6 +744,9 @@ Vinecop::get_var_types() const
 
 //! @brief Evaluates the copula density.
 //!
+//! The copula density is defined as joint density divided by marginal
+//! densities, irrespective of variable types.
+//!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `select()`).
@@ -780,8 +794,8 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
         tools_interface::check_user_interrupt(edge % 100 == 0);
         // extract evaluation point from hfunction matrices (have been
         // computed in previous tree level)
-        Bicop edge_copula = get_pair_copula(tree, edge);
-        auto var_types = edge_copula.get_var_types();
+        Bicop* edge_copula = &pair_copulas_[tree][edge];
+        auto var_types = edge_copula->get_var_types();
         size_t m = rvine_structure_.min_array(tree, edge);
 
         u_e = Eigen::MatrixXd(b.size, 2);
@@ -792,7 +806,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
           u_e.col(1) = hfunc1.col(m - 1);
         }
 
-        if ((var_types[0] == "d") | (var_types[1] == "d")) {
+        if ((var_types[0] == "d") || (var_types[1] == "d")) {
           u_e.conservativeResize(b.size, 4);
           u_e.col(2) = hfunc2_sub.col(edge);
           if (m == rvine_structure_.struct_array(tree, edge, true)) {
@@ -803,23 +817,23 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
         }
 
         pdf.segment(b.begin, b.size) =
-          pdf.segment(b.begin, b.size).cwiseProduct(edge_copula.pdf(u_e));
+          pdf.segment(b.begin, b.size).cwiseProduct(edge_copula->pdf(u_e));
 
         // h-functions are only evaluated if needed in next step
         if (rvine_structure_.needed_hfunc1(tree, edge)) {
-          hfunc1.col(edge) = edge_copula.hfunc1(u_e);
+          hfunc1.col(edge) = edge_copula->hfunc1(u_e);
           if (var_types[1] == "d") {
             u_e_sub = u_e;
             u_e_sub.col(1) = u_e.col(3);
-            hfunc1_sub.col(edge) = edge_copula.hfunc1(u_e_sub);
+            hfunc1_sub.col(edge) = edge_copula->hfunc1(u_e_sub);
           }
         }
         if (rvine_structure_.needed_hfunc2(tree, edge)) {
-          hfunc2.col(edge) = edge_copula.hfunc2(u_e);
+          hfunc2.col(edge) = edge_copula->hfunc2(u_e);
           if (var_types[0] == "d") {
             u_e_sub = u_e;
             u_e_sub.col(0) = u_e.col(2);
-            hfunc2_sub.col(edge) = edge_copula.hfunc2(u_e_sub);
+            hfunc2_sub.col(edge) = edge_copula->hfunc2(u_e_sub);
           }
         }
       }
@@ -1112,7 +1126,7 @@ Vinecop::simulate(const size_t n,
 //!
 //! The log-likelihood is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, ..., U_{d, i}), \f]
-//! where \f$ c \f$ is the copula density `pdf()`.
+//! where \f$ c \f$ is the copula density, see `Vinecop::pdf()`.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
@@ -1230,6 +1244,27 @@ Vinecop::get_npars() const
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+//! 
+//! @details 
+//! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random 
+//! vector \f$ V = (V_1,\ldots,V_d) ~ F \f$ is defined as
+//! \f[ U_1= F(V_1), U_{2} = F(V_{2}|V_1), \ldots, U_d =F(V_d|V_1,\ldots,V_{d-1}), \f]
+//! where \f$ F(v_k|v_1,\ldots,v_{k-1}) \f$ is the conditional distribution of
+//! \f$ V_k \f$ given  \f$ V_1 \ldots, V_{k-1}, k = 2,\ldots,d \f$. The vector 
+//! \f$ U = (U_1, \dots, U_d) \f$ then contains independent standard uniform 
+//! variables. The inverse operation
+//! \f[V_1 = F^{-1}(U_1), V_{2} = F^{-1}(U_2|U_1), \ldots, V_d =F^{-1}(U_d|U_1,\ldots,U_{d-1}) \f]
+//! can be used to simulate from a distribution. For any copula \f$ F \f$, if
+//! \f$ U\f$ is a vector of independent random variables, \f$ V = T^{-1}(U) \f$ 
+//! has distribution \f$ F \f$.
+//!
+//! The formulas above assume a vine copula model with order \f$ d, \dots, 1 \f$.
+//! More generally, `Vinecop::rosenblatt()` returns the variables
+//! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
+//! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
+//! returns
+//! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
+//!
 inline Eigen::MatrixXd
 Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
@@ -1270,7 +1305,7 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
         }
 
         // h-functions are only evaluated if needed in next step
-        Bicop edge_copula = get_pair_copula(tree, edge).as_continuous();
+        Bicop edge_copula = pair_copulas_[tree][edge].as_continuous();
         if (rvine_structure_.needed_hfunc1(tree, edge)) {
           hfunc1.block(b.begin, edge, b.size, 1) = edge_copula.hfunc1(u_e);
         }
@@ -1312,6 +1347,27 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+//! 
+//! @details 
+//! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random 
+//! vector \f$ V = (V_1,\ldots,V_d) ~ F \f$ is defined as
+//! \f[ U_1= F(V_1), U_{2} = F(V_{2}|V_1), \ldots, U_d =F(V_d|V_1,\ldots,V_{d-1}), \f]
+//! where \f$ F(v_k|v_1,\ldots,v_{k-1}) \f$ is the conditional distribution of
+//! \f$ V_k \f$ given  \f$ V_1 \ldots, V_{k-1}, k = 2,\ldots,d \f$. The vector 
+//! \f$ U = (U_1, \dots, U_d) \f$ then contains independent standard uniform 
+//! variables. The inverse operation
+//! \f[V_1 = F^{-1}(U_1), V_{2} = F^{-1}(U_2|U_1), \ldots, V_d =F^{-1}(U_d|U_1,\ldots,U_{d-1}) \f]
+//! can be used to simulate from a distribution. For any copula \f$ F \f$, if
+//! \f$ U\f$ is a vector of independent random variables, \f$ V = T^{-1}(U) \f$ 
+//! has distribution \f$ F \f$.
+//!
+//! The formulas above assume a vine copula model with order \f$ d, \dots, 1 \f$.
+//! More generally, `Vinecop::rosenblatt()` returns the variables
+//! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
+//! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
+//! returns
+//! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
+//!
 inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const size_t num_threads) const
@@ -1336,9 +1392,9 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
     size_t n_half = n / 2;
     size_t n_left = n - n_half;
     U_vine.block(0, 0, n_half, d) =
-      inverse_rosenblatt(u.block(0, 0, n_half, d));
+      inverse_rosenblatt(u.block(0, 0, n_half, d), num_threads);
     U_vine.block(n_half, 0, n_left, d) =
-      inverse_rosenblatt(u.block(n_half, 0, n_left, d));
+      inverse_rosenblatt(u.block(n_half, 0, n_left, d), num_threads);
     return U_vine;
   }
 
@@ -1366,7 +1422,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
         static_cast<double>(n) * static_cast<double>(d) > 1e5);
       size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
       for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
-        Bicop edge_copula = get_pair_copula(tree, var).as_continuous();
+        Bicop edge_copula = pair_copulas_[tree][var].as_continuous();
 
         // extract data for conditional pair
         Eigen::MatrixXd U_e(b.size, 2);
@@ -1476,7 +1532,7 @@ inline void
 Vinecop::check_weights_size(const Eigen::VectorXd& weights,
                             const Eigen::MatrixXd& data) const
 {
-  if ((weights.size() > 0) & (weights.size() != data.rows())) {
+  if ((weights.size() > 0) && (weights.size() != data.rows())) {
     throw std::runtime_error("sizes of weights and data don't match.");
   }
 }
@@ -1495,6 +1551,26 @@ Vinecop::check_fitted() const
 {
   if (std::isnan(loglik_)) {
     throw std::runtime_error("copula has not been fitted from data ");
+  }
+}
+
+inline void
+Vinecop::check_indices(const size_t tree, const size_t edge) const
+{
+  if (tree > d_ - 2) {
+    std::stringstream message;
+    message << "tree index out of bounds" << std::endl
+            << "allowed: 0, ..., " << d_ - 2 << std::endl
+            << "actual: " << tree << std::endl;
+    throw std::runtime_error(message.str().c_str());
+  }
+  if (edge > d_ - tree - 2) {
+    std::stringstream message;
+    message << "edge index out of bounds" << std::endl
+            << "allowed: 0, ..., " << d_ - tree - 2 << std::endl
+            << "actual: " << edge << std::endl
+            << "tree level: " << tree << std::endl;
+    throw std::runtime_error(message.str().c_str());
   }
 }
 
@@ -1567,11 +1643,16 @@ Vinecop::str() const
       if (t > 0) {
         str << " | ";
         for (size_t cv = t - 1; cv > 0; --cv) {
-          str << arr(cv, e) - 1 << ",";
+          str << arr(cv, e) << ",";
         }
         str << arr(0, e);
       }
-      str << " <-> " << pair_copulas_[t][e].str() << std::endl;
+      str << " <-> ";
+      if (t < pair_copulas_.size()) {
+        str << pair_copulas_[t][e].str() << std::endl;
+      } else {
+        str << "Independence" << std::endl;
+      }
     }
   }
   return str.str();

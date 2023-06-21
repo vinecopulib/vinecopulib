@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -56,21 +56,48 @@ inline Bicop::Bicop(const Eigen::MatrixXd& data,
   select(data, controls);
 }
 
-//! @brief Instantiates from a boost::property_tree::ptree object.
-//! @param input The boost::property_tree::ptree object to convert from
-//! (see `to_ptree()` for the structure of the input).
-inline Bicop::Bicop(const boost::property_tree::ptree input)
-  : Bicop(get_family_enum(input.get<std::string>("family")),
-          input.get<int>("rotation"),
-          tools_serialization::ptree_to_matrix<double>(
-            input.get_child("parameters")))
+//! @brief Copy constructor (deep copy)
+//!
+//! @param other Bicop object to copy.
+inline Bicop::Bicop(const Bicop& other)
+  : Bicop(other.get_family(),
+          other.get_rotation(),
+          other.get_parameters(),
+          other.get_var_types())
+{
+  nobs_ = other.nobs_;
+  bicop_->set_loglik(other.bicop_->get_loglik());
+  bicop_->set_npars(other.bicop_->get_npars());
+}
+
+//! @brief Copy assignment operator (deep copy)
+//!
+//! @param other Bicop object to copy.
+inline Bicop&
+Bicop::operator=(Bicop other)
+{
+  // copy/swap idiom
+  std::swap(bicop_, other.bicop_);
+  std::swap(rotation_, other.rotation_);
+  std::swap(nobs_, other.nobs_);
+  std::swap(var_types_, other.var_types_);
+  return *this;
+}
+
+//! @brief Instantiates from a nlohmann::json object.
+//! @param input The nlohmann::json object to convert from
+//! (see `to_json()` for the structure of the input).
+inline Bicop::Bicop(const nlohmann::json& input)
+  : Bicop(get_family_enum(input["fam"]),
+          static_cast<int>(input["rot"]),
+          tools_serialization::json_to_matrix<double>(input["par"]))
 {
   // try block for backwards compatibility
   try {
-    var_types_ = tools_serialization::ptree_to_vector<std::string>(
-      input.get_child("var_types"));
-    nobs_ = input.get<size_t>("nobs_");
-    bicop_->set_loglik(input.get<double>("loglik"));
+    var_types_ = tools_serialization::json_to_vector<std::string>(input["vt"]);
+    nobs_ = static_cast<size_t>(input["nobs"]);
+    bicop_->set_loglik(input["ll"]);
+    bicop_->set_npars(input["npars"]);
   } catch (...) {
   }
 }
@@ -78,39 +105,36 @@ inline Bicop::Bicop(const boost::property_tree::ptree input)
 //! @brief Instantiates from a JSON file.
 //!
 //! The input file contains four attributes:
-//! `"family"`, `"rotation"`, `"parameters"`, `"var_types"` respectively a
+//! `"fam"`, `"rot"`, `"par"`, `"vt"` respectively a
 //! string for the family name, an integer for the rotation, and a numeric
 //! matrix for the parameters, and a list of two strings for the variable
 //! types.
 //!
 //! @param filename The name of the JSON file to read.
 inline Bicop::Bicop(const std::string& filename)
-  : Bicop(tools_serialization::json_to_ptree(filename.c_str()))
+  : Bicop(tools_serialization::file_to_json(filename))
 {}
 
-//! @brief Convert the copula into a boost::property_tree::ptree object.
+//! @brief Convert the copula into a nlohmann::json object.
 //!
-//! The boost::property_tree::ptree is contains of three values named
-//! `"family"`, `"rotation"`, `"parameters"`, `"var_types"`,
+//! The nlohmann::json is contains of three values named
+//! `"fam"`, `"rot"`, `"par"`, `"vt"`,
 //! respectively a string for the family name, an integer for the rotation,
 //! a numeric matrix for the parameters and a list of two strings for the
 //! variables types.
 //!
-//! @return the boost::property_tree::ptree object containing the copula.
-inline boost::property_tree::ptree
-Bicop::to_ptree() const
+//! @return the nlohmann::json object containing the copula.
+inline nlohmann::json
+Bicop::to_json() const
 {
-  boost::property_tree::ptree output;
-
-  output.put("family", get_family_name());
-  output.put("rotation", rotation_);
-  auto mat_node = tools_serialization::matrix_to_ptree(get_parameters());
-  output.add_child("parameters", mat_node);
-  output.add_child("var_types",
-                   tools_serialization::vector_to_ptree(var_types_));
-
-  output.put("nobs_", nobs_);
-  output.put("loglik", bicop_->get_loglik());
+  nlohmann::json output;
+  output["fam"] = get_family_name();
+  output["rot"] = rotation_;
+  output["par"] = tools_serialization::matrix_to_json(get_parameters());
+  output["vt"] = tools_serialization::vector_to_json(var_types_);
+  output["nobs"] = nobs_;
+  output["ll"] = bicop_->get_loglik();
+  output["npars"] = bicop_->get_npars();
 
   return output;
 }
@@ -118,19 +142,25 @@ Bicop::to_ptree() const
 //! @brief Write the copula object into a JSON file.
 //!
 //! The written file contains four attributes:
-//! `"family"`, `"rotation"`, `"parameters"`, `"var_types"` respectively a
-//! string for the family name, an integer for the rotation, and a numeric
-//! matrix for the parameters, and a list of two strings for the variable
-//! types.
+//! `"fam"`, `"rot"`, `"par"`, `"vt"`, `"nobs"`, `"ll"`, `"npars"`
+//! respectively a string for the family name, an integer for the rotation, and
+//! a numeric matrix for the parameters, a list of two strings for the
+//! variable types, an integer for the number of observations (if fitted),
+//! a double for the log-likelihood (if fitted), and a double
+//! for the number of parameters (can be non-integer in nonparametric
+//! models).
 //!
 //! @param filename The name of the file to write.
 inline void
-Bicop::to_json(const std::string& filename) const
+Bicop::to_file(const std::string& filename) const
 {
-  boost::property_tree::write_json(filename.c_str(), to_ptree());
+  tools_serialization::json_to_file(filename, to_json());
 }
 
 //! @brief Evaluates the copula density.
+//!
+//! The copula density is defined as joint density divided by marginal
+//! densities, irrespective of variable types.
 //!
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
@@ -326,7 +356,7 @@ Bicop::simulate(const size_t& n,
 //!
 //! The log-likelihood is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, U_{2, i}), \f]
-//! where \f$ c \f$ is the copula density `pdf()`.
+//! where \f$ c \f$ is the copula density, see `Bicop::pdf()`.
 //!
 //! @param u An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
@@ -541,7 +571,7 @@ Bicop::set_rotation(const int rotation)
 {
   check_rotation(rotation);
   if ((rotation_ - rotation % 180) != 0) {
-    flip_var_types();
+    flip_abstract_var_types();
   }
   rotation_ = rotation;
   bicop_->set_loglik();
@@ -577,7 +607,7 @@ Bicop::check_data_dim(const Eigen::MatrixXd& u) const
 }
 
 inline void
-Bicop::flip_var_types()
+Bicop::flip_abstract_var_types()
 {
   std::swap(bicop_->var_types_[0], bicop_->var_types_[1]);
 }
@@ -585,7 +615,9 @@ Bicop::flip_var_types()
 inline void
 Bicop::set_parameters(const Eigen::MatrixXd& parameters)
 {
-  bicop_->set_parameters(parameters);
+  if (bicop_->get_family_name() != "Independence") {
+    bicop_->set_parameters(parameters);
+  }
   bicop_->set_loglik();
 }
 
@@ -600,7 +632,7 @@ Bicop::set_var_types(const std::vector<std::string>& var_types)
   if (bicop_) {
     bicop_->set_var_types(var_types);
     if (tools_stl::is_member(static_cast<size_t>(rotation_), { 90, 270 })) {
-      flip_var_types();
+      flip_abstract_var_types();
     }
   }
 }
@@ -622,6 +654,7 @@ inline void
 Bicop::flip()
 {
   BicopFamily family = bicop_->get_family();
+  // change internal representation
   if (tools_stl::is_member(family, bicop_families::flip_by_rotation)) {
     double loglik = bicop_->get_loglik();
     if (rotation_ == 90) {
@@ -631,9 +664,11 @@ Bicop::flip()
     }
     bicop_->set_loglik(loglik);
   } else {
-    flip_var_types();
+    flip_abstract_var_types();
     bicop_->flip();
   }
+  // change Bicop-level var_types
+  std::swap(var_types_[0], var_types_[1]);
 }
 
 //! @brief Summarizes the model into a string (can be used for printing).
@@ -704,6 +739,8 @@ Bicop::as_continuous() const
 //! left-sided limit of the cdf. For continuous variables the left limit and the
 //! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
 //! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
+//! 
+//! Incomplete observations (i.e., ones with a NaN value) are discarded.
 //!
 //! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
@@ -747,6 +784,8 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 //! left-sided limit of the cdf. For continuous variables the left limit and the
 //! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
 //! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
+//! 
+//! Incomplete observations (i.e., ones with a NaN value) are discarded.
 //!
 //! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
@@ -803,7 +842,7 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
         new_criterion = -2 * ll + log(n_eff) * npars; // BIC
         if (controls.get_selection_criterion() == "mbic") {
           // correction for mBIC
-          bool is_indep = (this->get_family() == BicopFamily::indep);
+          bool is_indep = (cop.get_family() == BicopFamily::indep);
           double psi0 = controls.get_psi0();
           double log_prior = static_cast<double>(!is_indep) * log(psi0) +
                              static_cast<double>(is_indep) * log(1.0 - psi0);
@@ -827,6 +866,7 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
 
     tools_thread::ThreadPool pool(controls.get_num_threads());
     pool.map(fit_and_compare, bicops);
+    pool.wait();
   }
 }
 
@@ -839,14 +879,23 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
   auto n_disc = get_n_discrete();
   if (n_disc == 0) {
     return u.leftCols(2);
-  } else if ((n_disc != 1) | (u.cols() == 4)) {
+  } else if (n_disc == 2) {
     return u;
   }
+  // n_disc = 1:
   Eigen::MatrixXd u_new(u.rows(), 4);
   u_new.leftCols(2) = u.leftCols(2);
   int disc_col = (var_types_[1] == "d");
   int cont_col = 1 - disc_col;
-  u_new.col(2 + disc_col) = u.col(2);
+  // We already know that there is one discrete and one continuous variable. Now
+  // there are two cases:
+  // 1. `u.cols() == 3`: then the F(x^-) values for the discrete variable is
+  // always in the last column, i.e. `u.col(2)`.
+  // 2. `u.cols() == 4`: Then the F(x^-) values for the discrete variable is in
+  // the third column if variable 1 is discrete, and in the fourth column if
+  // variable 2 is discrete. Thus, `u.col(2 + disc_col)`.
+  int old_disc_col = 2 + (u.cols() == 4) * disc_col;
+  u_new.col(2 + disc_col) = u.col(old_disc_col);
   u_new.col(2 + cont_col) = u.col(cont_col);
   return u_new;
 }
@@ -921,7 +970,7 @@ inline void
 Bicop::check_weights_size(const Eigen::VectorXd& weights,
                           const Eigen::MatrixXd& data) const
 {
-  if ((weights.size() > 0) & (weights.size() != data.rows())) {
+  if ((weights.size() > 0) && (weights.size() != data.rows())) {
     throw std::runtime_error("sizes of weights and data don't match.");
   }
 }

@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -100,7 +100,6 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
   Eigen::MatrixXd res(m, 2);
   res.col(0) = Eigen::VectorXd::Ones(m); // result will be a product
   Eigen::VectorXd kernels(n);
-  double f0;
   Eigen::Vector2d f1;
   Eigen::Vector2d b;
   Eigen::Matrix2d S(B);
@@ -110,7 +109,7 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
     kernels = gaussian_kernel_2d(zz) * det_irB;
     if (weights.size() > 0)
       kernels = kernels.cwiseProduct(weights);
-    f0 = kernels.mean();
+    double f0 = kernels.mean();
     if (method != "constant") {
       zz = (irB * zz.transpose()).transpose();
       f1 = zz.cwiseProduct(kernels.replicate(1, 2)).colwise().mean();
@@ -123,7 +122,7 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
         res(k) *= std::sqrt(S.determinant()) / det_irB;
       }
       res(k) *= std::exp(-0.5 * double(b.transpose() * S * b));
-      if ((boost::math::isnan)(res(k)) | (boost::math::isinf)(res(k))) {
+      if ((boost::math::isnan)(res(k)) || (boost::math::isinf)(res(k))) {
         // inverse operation might go wrong due to rounding when
         // true value is equal or close to zero
         res(k) = 0.0;
@@ -139,6 +138,11 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
     } else {
       res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, 1.0);
     }
+  }
+
+  if (weights.size() > 0) {
+    // estimate can be negative if negative weights are used
+    res.col(0) = res.col(0).array().max(0.0);
   }
 
   return res;
@@ -261,7 +265,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), m, m).transpose();
   // don't normalize margins of the EDF! (norm_times = 0)
   auto infl_grid = InterpolationGrid(grid_points, infl, 0);
-  if ((var_types_[0] == "d") | (var_types_[1] == "d")) {
+  if ((var_types_[0] == "d") || (var_types_[1] == "d")) {
     // for discrete, use mid ranks to compute EDF and log-likelihood
     // (this is closer to "observations" than jittered or "upper" pseudo data)
     psobs = 0.5 * (data.leftCols(2) + data.rightCols(2)).array();

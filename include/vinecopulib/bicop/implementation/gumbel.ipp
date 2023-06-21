@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -47,7 +47,8 @@ GumbelBicop::generator_derivative(const double& u)
 //           (theta / std::pow(u, 2));
 //}
 
-inline Eigen::VectorXd GumbelBicop::pdf_raw(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd
+GumbelBicop::pdf_raw(const Eigen::MatrixXd& u)
 {
   double theta = static_cast<double>(parameters_(0));
   double thetha1 = 1.0 / theta;
@@ -62,7 +63,8 @@ inline Eigen::VectorXd GumbelBicop::pdf_raw(const Eigen::MatrixXd &u)
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-inline Eigen::VectorXd GumbelBicop::hinv1_raw(const Eigen::MatrixXd &u)
+inline Eigen::VectorXd
+GumbelBicop::hinv1_raw(const Eigen::MatrixXd& u)
 {
   double theta = double(this->parameters_(0));
   double u1, u2;
@@ -70,7 +72,7 @@ inline Eigen::VectorXd GumbelBicop::hinv1_raw(const Eigen::MatrixXd &u)
   for (int j = 0; j < u.rows(); ++j) {
     u1 = u(j, 1);
     u2 = u(j, 0);
-    if ((boost::math::isnan)(u1) | (boost::math::isnan)(u2)) {
+    if ((boost::math::isnan)(u1) || (boost::math::isnan)(u2)) {
       hinv(j) = std::numeric_limits<double>::quiet_NaN();
     } else {
       hinv(j) = qcondgum(&u1, &u2, &theta);
@@ -83,7 +85,9 @@ inline Eigen::VectorXd GumbelBicop::hinv1_raw(const Eigen::MatrixXd &u)
 inline Eigen::MatrixXd
 GumbelBicop::tau_to_parameters(const double& tau)
 {
-  return Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
+  auto par = Eigen::VectorXd::Constant(1, 1.0 / (1 - std::fabs(tau)));
+  return par.cwiseMax(parameters_lower_bounds_)
+    .cwiseMin(parameters_upper_bounds_);
 }
 
 inline double
@@ -106,7 +110,7 @@ GumbelBicop::get_start_parameters(const double tau)
 inline double
 qcondgum(double* q, double* u, double* de)
 {
-  double a, p, g, gp, z1, z2, con, de1, dif;
+  double a, p, z1, z2, con, de1, dif;
   double mxdif;
   int iter;
 
@@ -119,8 +123,8 @@ qcondgum(double* q, double* u, double* de)
   iter = 0;
   dif = .1; // needed in case first step leads to NaN
   while ((mxdif > 1.e-6) && (iter < 20)) {
-    g = a + de1 * log(a) + con;
-    gp = 1. + de1 / a;
+    double g = a + de1 * log(a) + con;
+    double gp = 1. + de1 / a;
     if ((boost::math::isnan)(g) || (boost::math::isnan)(gp) ||
         (boost::math::isnan)(g / gp)) {
       // added for de>50

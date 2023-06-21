@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <boost/property_tree/ptree.hpp>
 #include <vinecopulib/bicop/fit_controls.hpp>
+#include <vinecopulib/misc/nlohmann_json.hpp>
 
 namespace vinecopulib {
 
@@ -33,14 +33,18 @@ public:
                  const FitControlsBicop& controls = FitControlsBicop(),
                  const std::vector<std::string>& var_types = { "c", "c" });
 
+  Bicop(const Bicop& other);
+
   explicit Bicop(const std::string& filename);
 
-  explicit Bicop(const boost::property_tree::ptree input);
+  explicit Bicop(const nlohmann::json& input);
+
+  Bicop& operator=(Bicop other);
 
   // Serialize
-  boost::property_tree::ptree to_ptree() const;
+  nlohmann::json to_json() const;
 
-  void to_json(const std::string& filename) const;
+  void to_file(const std::string& filename) const;
 
   // Getters and setters
   BicopFamily get_family() const;
@@ -134,7 +138,7 @@ private:
 
   void check_var_types(const std::vector<std::string>& var_types) const;
 
-  void flip_var_types();
+  void flip_abstract_var_types();
 
   void check_weights_size(const Eigen::VectorXd& weights,
                           const Eigen::MatrixXd& data) const;

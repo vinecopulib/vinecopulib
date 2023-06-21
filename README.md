@@ -1,16 +1,11 @@
 # vinecopulib
+
 [![Build Status](https://github.com/vinecopulib/vinecopulib/workflows/Build%20Status/badge.svg)](https://github.com/vinecopulib/vinecopulib/actions)
-[![Coverage Status](https://img.shields.io/codecov/c/github/vinecopulib/vinecopulib/master.svg)](https://codecov.io/github/vinecopulib/vinecopulib?branch=master)
+[![Coverage Status](https://img.shields.io/codecov/c/github/vinecopulib/vinecopulib/main.svg)](https://codecov.io/github/vinecopulib/vinecopulib?branch=main)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/2c8d45ebcb954082b409b4a2bd31af2b)](https://www.codacy.com/gh/vinecopulib/vinecopulib/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vinecopulib/vinecopulib&amp;utm_campaign=Badge_Grade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a81e08da0aa344418114298d3ba04931)](https://www.codacy.com/gh/vinecopulib/vinecopulib?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vinecopulib/vinecopulib&amp;utm_campaign=Badge_Grade)
-
-#### What are vine copulas?
-
-Vine copulas are a flexible class of dependence models consisting of bivariate
-building blocks (see e.g.,
-[Aas et al., 2009](https://mediatum.ub.tum.de/doc/1083600/1083600.pdf)).
-You can find a comprehensive list of publications and other materials on
-[vine-copula.org](http://www.statistics.ma.tum.de/en/research/vine-copula-models/).
+[![Documentation](https://img.shields.io/website/http/vinecopulib.github.io/vinecopulib.svg)](https://vinecopulib.github.io/vinecopulib/)
+[![DOI](https://zenodo.org/badge/76354683.svg)](https://zenodo.org/badge/latestdoi/76354683)
 
 #### What is vinecopulib?
 
@@ -20,17 +15,13 @@ high-performance implementations of the core features of the popular
 [VineCopula R library](https://github.com/tnagler/VineCopula), in particular
 inference algorithms for both vine copula and bivariate copula models.
 Advantages over VineCopula are  
-  * a stand-alone C++ library with interfaces to both R and Python,
-  * a sleaker and more modern API,
-  * shorter runtimes and lower memory consumption, especially in high dimensions,
-  * nonparametric and multiparameter families.
 
-#### Status
+- a stand-alone C++ library with interfaces to both R and Python,
+- a sleaker and more modern API,
+- shorter runtimes and lower memory consumption, especially in high dimensions,
+- nonparametric and multiparameter families.
 
-Version [0.5.2](https://github.com/vinecopulib/vinecopulib/releases) was
-released on May 7th, 2020. While we did our best to
-design a user-friendly API, the library is still under active development and
-changes are to be expected. We are also working on interfaces for
+The library also has interfaces for
 [R](https://github.com/vinecopulib/rvinecopulib) and
 [Python](https://github.com/vinecopulib/pyvinecopulib).
 
@@ -38,7 +29,7 @@ changes are to be expected. We are also working on interfaces for
 
 If you have any questions regarding the library, feel free to
 [open an issue](https://github.com/vinecopulib/vinecopulib/issues/new) or
-send a mail to <info@vinecopulib.org>.
+send a mail to [info@vinecopulib.org](mailto:info@vinecopulib.org).
 
 #### Documentation
 

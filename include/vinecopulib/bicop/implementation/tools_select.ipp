@@ -1,4 +1,4 @@
-// Copyright © 2016-2020 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -42,10 +42,8 @@ create_candidate_bicops(const Eigen::MatrixXd& data,
 
   // remove combinations based on symmetry characteristics
   if (controls.get_preselect_families()) {
-    preselect_candidates(new_bicops,
-                         data.leftCols(2),
-                         tau,
-                         controls.get_weights());
+    preselect_candidates(
+      new_bicops, data.leftCols(2), tau, controls.get_weights());
   }
 
   return new_bicops;
@@ -170,17 +168,17 @@ preselect_family(std::vector<double> c, double tau, const Bicop& bicop)
     }
     bool is_90or180 = is_member(rotation, { 90, 180 });
     if (c[0] - c[1] > 0.05) {
-      if (is_member(family, bicop_families::lt) & is_90or180) {
+      if (is_member(family, bicop_families::lt) && is_90or180) {
         preselect = true;
       }
-      if (is_member(family, bicop_families::ut) & !is_90or180) {
+      if (is_member(family, bicop_families::ut) && !is_90or180) {
         preselect = true;
       }
     } else if (c[0] - c[1] < -0.05) {
-      if (is_member(family, bicop_families::lt) & !is_90or180) {
+      if (is_member(family, bicop_families::lt) && !is_90or180) {
         preselect = true;
       }
-      if (is_member(family, bicop_families::ut) & is_90or180) {
+      if (is_member(family, bicop_families::ut) && is_90or180) {
         preselect = true;
       }
     } else {

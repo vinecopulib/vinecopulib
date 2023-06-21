@@ -22,7 +22,6 @@ if(BUILD_TESTING)
             test_bicop_kernel
             test_bicop_select
             test_rvine_structure
-            test_serialization
             test_tools_bobyqa
             test_tools_stats
             test_vinecop_class
@@ -114,14 +113,6 @@ install(
 install(
         FILES ${misc_hpp}
         DESTINATION "${include_install_dir}/vinecopulib/misc"
-)
-install(
-        FILES ${wdm_main}
-        DESTINATION "${include_install_dir}/vinecopulib/wdm"
-)
-install(
-        FILES ${wdm_hpp}
-        DESTINATION "${include_install_dir}/vinecopulib/wdm/wdm"
 )
 if (NOT VINECOPULIB_SHARED_LIB)
     install(

@@ -8,10 +8,16 @@ coverage:
   range: "70...100"
 
   status:
-    project: yes
-    patch: yes
-    changes: no
-
+    project:
+      default:
+        threshold: 0.5%
+        base: auto
+        target: auto
+    patch:
+      default:
+        threshold: 0.5%
+        base: auto
+        target: auto
 parsers:
   gcov:
     branch_detection:
@@ -27,3 +33,4 @@ comment:
 
 ignore:
   - "test/"
+  - "include/vinecopulib/misc/nlohmann_json.hpp"

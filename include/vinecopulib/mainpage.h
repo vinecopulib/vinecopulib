@@ -29,14 +29,6 @@ Advantages over VineCopula are
 - shorter runtimes and lower memory consumption, especially in high dimensions,
 - nonparametric and multi-parameter families.
 
-@section Status
-
-Version [0.5.2](https://github.com/vinecopulib/vinecopulib/releases) was
-released on May 7th, 2020. While we did our best to
-design a user-friendly API, the library is still under active development and
-changes are to be expected. We are also working on interfaces for
-[R](https://github.com/vinecopulib/rvinecopulib) and
-[Python](https://github.com/vinecopulib/pyvinecopulib).
 
 @section Contact
 If you have any questions regarding the library, feel free to
