@@ -171,7 +171,7 @@ public:
     Eigen::MatrixXd u,
     bool step_wise = true,
     const size_t num_threads = 1);
-  Eigen::MatrixXd hessian_exp(Eigen::MatrixXd u,
+  Eigen::MatrixXd hessian_avg(Eigen::MatrixXd u,
                               bool step_wise = true,
                               const size_t num_threads = 1);
   Eigen::MatrixXd scores_cov(Eigen::MatrixXd u,

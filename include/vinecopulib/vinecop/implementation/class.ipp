@@ -849,6 +849,20 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
   return pdf;
 }
 
+
+//! @brief Evaluates the score function.
+//!
+//! The score function is defined as the gradient of the log-likelihood 
+//! with respect to the parameters.
+//!
+//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `select()`).
+//! @param step_wise if `false`, full gradient of the log-likelihood; if `true`, 
+//!   score function of the step-wise MLE (gradients computed per pair-copula).
+//! @param num_threads The number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
 inline Eigen::MatrixXd
 Vinecop::scores(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
@@ -986,6 +1000,18 @@ Vinecop::scores(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
   return scores;
 }
 
+//! @brief Evaluates the hessian per observation.
+//!
+//! Hessian is meant losely as "gradients of each component of the score function".
+//! 
+//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `select()`).
+//! @param step_wise if `false`, full gradient of the log-likelihood; if `true`, 
+//!   score function of the step-wise MLE (gradients computed per pair-copula).
+//! @param num_threads The number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
 inline TriangularArray<std::vector<Eigen::MatrixXd>>
 Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
@@ -1018,8 +1044,21 @@ Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
   return hess;
 }
 
+//! @brief Evaluates the average hessian.
+//!
+//! Hessian is meant losely as "gradients of each component of the score function".
+//! The Hessian is averaged over all samples in `u`.
+//! 
+//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `select()`).
+//! @param step_wise if `false`, full gradient of the log-likelihood; if `true`, 
+//!   score function of the step-wise MLE (gradients computed per pair-copula).
+//! @param num_threads The number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
 inline Eigen::MatrixXd
-Vinecop::hessian_exp(Eigen::MatrixXd u,
+Vinecop::hessian_avg(Eigen::MatrixXd u,
                      bool step_wise,
                      const size_t num_threads)
 {
@@ -1040,6 +1079,17 @@ Vinecop::hessian_exp(Eigen::MatrixXd u,
   return H;
 }
 
+//! @brief Computes the covariance matrix of scores.
+//!
+//! 
+//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `select()`).
+//! @param step_wise if `false`, full gradient of the log-likelihood; if `true`, 
+//!   score function of the step-wise MLE (gradients computed per pair-copula).
+//! @param num_threads The number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
 inline Eigen::MatrixXd
 Vinecop::scores_cov(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
