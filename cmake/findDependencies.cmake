@@ -16,12 +16,12 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_Declare(
   wdm
   GIT_REPOSITORY https://github.com/tnagler/wdm.git
-  GIT_TAG        1b37bb6cf6cdb9e957f202f965a622e4a9ac0dd6
+  GIT_TAG        135f0bfbdc60b0e5994f2d50ed8e1257de83367f
 )
 
 # Find wdm and download if not found
 # Download googlestest
-find_package(wdm QUIET)
+find_package(wdm 0.2.4 QUIET)
 if(NOT wdm_FOUND)
   if(BUILD_TESTING)
     FetchContent_MakeAvailable(wdm googletest)
