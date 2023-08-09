@@ -118,7 +118,7 @@ to_pseudo_obs_1d(Eigen::VectorXd x,
     }
   }
 
-  return (x.array() + 1) / (static_cast<double>(n) + 1.0);
+  return x.array() / (static_cast<double>(n) + 1.0);
 }
 
 //! window smoother

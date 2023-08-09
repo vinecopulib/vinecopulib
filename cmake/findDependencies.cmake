@@ -16,7 +16,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_Declare(
   wdm
   GIT_REPOSITORY https://github.com/tnagler/wdm.git
-  GIT_TAG        135f0bfbdc60b0e5994f2d50ed8e1257de83367f
+  GIT_TAG        6198b75bea7f6a5b0ea5e96659bd82e0537f2edd
 )
 
 # Find wdm and download if not found
