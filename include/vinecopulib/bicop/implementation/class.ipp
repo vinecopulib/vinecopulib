@@ -916,11 +916,15 @@ Bicop::rotate_data(Eigen::MatrixXd& u) const
       if (u.cols() == 4) {
         u.col(2).swap(u.col(3));
         u.col(3) = 1 - u.col(3).array();
+        u.col(1).swap(u.col(3));
       }
       break;
 
     case 180:
       u = 1 - u.array();
+      if (u.cols() == 4) {
+        u.leftCols(2).swap(u.rightCols(2));
+      }
       break;
 
     case 270:
@@ -929,6 +933,7 @@ Bicop::rotate_data(Eigen::MatrixXd& u) const
       if (u.cols() == 4) {
         u.col(2).swap(u.col(3));
         u.col(2) = 1 - u.col(2).array();
+        u.col(0).swap(u.col(2));
       }
       break;
   }
