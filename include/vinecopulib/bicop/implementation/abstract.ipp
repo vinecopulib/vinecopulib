@@ -5,7 +5,6 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <stdexcept>
-#include <iostream>
 
 #include <vinecopulib/bicop/bb1.hpp>
 #include <vinecopulib/bicop/bb6.hpp>
@@ -157,21 +156,20 @@ AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u)
   Eigen::VectorXd udiff(u.rows());
 
   if (var_types_[0] != "c") {
-    udiff = u.col(0) - u.col(2);
+    udiff = (u.col(0) - u.col(2)).cwiseAbs();
+    ;
     pdf = (hfunc2_raw(umax) - hfunc2_raw(umin)).cwiseQuotient(udiff);
   } else {
-    udiff = u.col(1) - u.col(3);
+    udiff = (u.col(1) - u.col(3)).cwiseAbs();
     pdf = (hfunc1_raw(umax) - hfunc1_raw(umin)).cwiseQuotient(udiff);
   }
 
-  if ((udiff.array() < 1e-4).any()) {
-    for (Eigen::Index i = 0; i < u.rows(); i++) {
-      if (udiff(i) < 1e-4) {
-        pdf(i) = pdf_raw((umax.row(i) + umin.row(i)) / 2)(0);
-      }
+  for (Eigen::Index i = 0; i < u.rows(); i++) {
+    if (udiff(i) < 1e-3) {
+      pdf(i) = pdf_raw((umax.row(i) + umin.row(i)) / 2)(0);
     }
   }
-  return pdf;
+  return pdf.cwiseAbs();
 }
 
 inline Eigen::VectorXd
@@ -189,23 +187,21 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u)
 
   // the quotient can be instable, use analytical derivative if denominator
   // too small
-  if (udiff.minCoeff() < 1e-4) {
-    for (Eigen::Index i = 0; i < u.rows(); i++) {
-      if (udiff.row(i).maxCoeff() < 1e-4) {
-        pdf(i) = pdf_raw((umax.row(i) + umin.row(i)) / 2)(0);
-      } else if (udiff(i, 0) < 1e-4) {
-        umax(i, 0) = (umax(i, 0) + umin(i, 0)) / 2;
-        umin(i, 0) = (umax(i, 0) + umin(i, 0)) / 2;
-        pdf(i) = hfunc1_raw(umax)(0) - hfunc1_raw(umin)(0) / udiff(i, 1);
-      } else if (udiff(i, 1) < 1e-4) {
-        umax(i, 1) = (umax(i, 1) + umin(i, 0)) / 2;
-        umin(i, 1) = (umax(i, 1) + umin(i, 0)) / 2;
-        pdf(i) = hfunc2_raw(umax)(0) - hfunc2_raw(umin)(0) / udiff(i, 0);
-      }
+  for (Eigen::Index i = 0; i < u.rows(); i++) {
+    if (udiff.row(i).maxCoeff() < 1e-3) {
+      pdf(i) = pdf_raw((umax.row(i) + umin.row(i)) / 2)(0);
+    } else if (udiff(i, 0) < 1e-3) {
+      umax(i, 0) = (umax(i, 0) + umin(i, 0)) / 2;
+      umin(i, 0) = (umax(i, 0) + umin(i, 0)) / 2;
+      pdf(i) = hfunc1_raw(umax)(0) - hfunc1_raw(umin)(0) / udiff(i, 1);
+    } else if (udiff(i, 1) < 1e-3) {
+      umax(i, 1) = (umax(i, 1) + umin(i, 0)) / 2;
+      umin(i, 1) = (umax(i, 1) + umin(i, 0)) / 2;
+      pdf(i) = hfunc2_raw(umax)(0) - hfunc2_raw(umin)(0) / udiff(i, 0);
     }
   }
 
-  return pdf;
+  return pdf.cwiseAbs();
 }
 
 inline Eigen::VectorXd
@@ -220,7 +216,7 @@ AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
     // the quotient can be instable, use analytical derivative if denominator
     // too small
     for (Eigen::Index i = 0; i < u.rows(); i++) {
-      if (u1diff(i) < 1e-4) {
+      if (std::abs(u1diff(i)) < 1e-3) {
         uu(i, 0) = (uu(i, 0) + uu(i, 2)) / 2;
         h(i) = hfunc1_raw(uu.row(i).leftCols(2))(0);
       }
@@ -243,7 +239,7 @@ AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
     // the quotient can be instable, use analytical derivative if denominator
     // too small
     for (Eigen::Index i = 0; i < u.rows(); i++) {
-      if (u2diff(i) < 1e-4) {
+      if (std::abs(u2diff(i)) < 1e-3) {
         uu(i, 1) = (uu(i, 1) + uu(i, 3)) / 2;
         h(i) = hfunc1_raw(uu.row(i).leftCols(2))(0);
       }
