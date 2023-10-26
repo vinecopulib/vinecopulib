@@ -183,7 +183,7 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u)
   pdf = cdf(umax) + cdf(umin);
   umax.col(0).swap(umin.col(0));
   pdf -= cdf(umax) + cdf(umin);
-  pdf = pdf.cwiseQuotient(udiff.col(0) * (udiff.col(1)));
+  pdf = pdf.cwiseQuotient(udiff.col(0)).cwiseQuotient(udiff.col(1));
 
   // the quotient can be instable, use analytical derivative if denominator
   // too small
@@ -193,11 +193,11 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u)
     } else if (udiff(i, 0) < 1e-3) {
       umax(i, 0) = (umax(i, 0) + umin(i, 0)) / 2;
       umin(i, 0) = (umax(i, 0) + umin(i, 0)) / 2;
-      pdf(i) = hfunc1_raw(umax)(0) - hfunc1_raw(umin)(0) / udiff(i, 1);
+      pdf(i) = (hfunc1_raw(umax)(0) - hfunc1_raw(umin)(0)) / udiff(i, 1);
     } else if (udiff(i, 1) < 1e-3) {
       umax(i, 1) = (umax(i, 1) + umin(i, 0)) / 2;
       umin(i, 1) = (umax(i, 1) + umin(i, 0)) / 2;
-      pdf(i) = hfunc2_raw(umax)(0) - hfunc2_raw(umin)(0) / udiff(i, 0);
+      pdf(i) = (hfunc2_raw(umax)(0) - hfunc2_raw(umin)(0)) / udiff(i, 0);
     }
   }
 
