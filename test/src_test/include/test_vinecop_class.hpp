@@ -241,7 +241,7 @@ TEST_F(VinecopTest, scores_stepwise)
 
   auto u = vinecop.simulate(100, false, 1, { 1 });
 
-  auto J = vinecop.hessian_exp(u, true);
+  auto J = vinecop.hessian_avg(u, true);
   EXPECT_TRUE(J.isUpperTriangular());
   // Eigen::MatrixXd Jinv = J.triangularView<Eigen::Upper>()
   //                          .solve(Eigen::MatrixXd::Identity(J.cols(),
@@ -268,7 +268,7 @@ TEST_F(VinecopTest, scores_joint)
   Vinecop vinecop(model_matrix, pair_copulas);
 
   auto u = vinecop.simulate(100, false, 1, { 1 });
-  auto J = vinecop.hessian_exp(u, false);
+  auto J = vinecop.hessian_avg(u, false);
   auto I = vinecop.scores_cov(u, false);
 
   EXPECT_FALSE(J.isUpperTriangular());
@@ -277,13 +277,13 @@ TEST_F(VinecopTest, scores_joint)
                            .solve(Eigen::MatrixXd::Identity(J.cols(),
                            J.cols())) .triangularView<Eigen::Upper>();
   // std::cout << J << std::endl << std::endl;
-  // std::cout << Jinv << std::endl;
+  // std::cout << Jinv * I << std::endl;
   I = vinecop.scores_cov(u, true);
-  std::cout << (Jinv * I * Jinv.transpose() /
-  u.rows()).diagonal().cwiseSqrt()
-            << std::endl
-            << std::endl;
-  std::cout << vinecop.str() << std::endl;
+  // std::cout << (Jinv * I * Jinv.transpose() /
+  // u.rows()).diagonal().cwiseSqrt()
+  //           << std::endl
+  //           << std::endl;
+  // std::cout << vinecop.str() << std::endl;
 }
 
 TEST_F(VinecopTest, cdf_is_correct)
