@@ -4,7 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include <random>
+#include <boost/random.hpp>
+#include <boost/random/random_device.hpp>
+#include <boost/random/seed_seq.hpp>
 #include <unsupported/Eigen/FFT>
 #include <vinecopulib/misc/tools_stats_ghalton.hpp>
 #include <vinecopulib/misc/tools_stats_sobol.hpp>
@@ -54,9 +56,9 @@ simulate_uniform(const size_t& n,
   }
 
   // initialize random engine and uniform distribution
-  std::seed_seq seq(seeds.begin(), seeds.end());
-  std::mt19937 generator(seq);
-  std::uniform_real_distribution<double> distribution(0.0, 1.0);
+  boost::random::seed_seq seq(seeds.begin(), seeds.end());
+  boost::random::mt19937 generator(seq);
+  boost::random::uniform_real_distribution<double> distribution(0.0, 1.0);
 
   Eigen::MatrixXd u(n, d);
   return u.unaryExpr([&](double) { return distribution(generator); });
