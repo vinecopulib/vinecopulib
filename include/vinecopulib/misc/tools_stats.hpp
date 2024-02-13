@@ -106,6 +106,9 @@ to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method = "average");
 Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average");
 
+Eigen::MatrixXd
+to_pseudo_obs_fixed_jitter(Eigen::MatrixXd x);
+
 double
 pairwise_mcor(const Eigen::MatrixXd& x,
               const Eigen::VectorXd& weights = Eigen::VectorXd());

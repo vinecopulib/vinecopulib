@@ -148,6 +148,49 @@ to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method)
   return x / (static_cast<double>(n) + 1.0);
 }
 
+//! @param ties_method Indicates how to treat ties; same as in R, see
+//! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
+//! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$
+//! (column-wise).
+inline Eigen::MatrixXd
+to_pseudo_obs_fixed_jitter(Eigen::MatrixXd x)
+{
+  size_t n = x.rows();
+  auto gen = std::mt19937{5};
+
+  for (int j = 0; j < x.cols(); ++j) {
+    std::vector<double> xvec(x.col(j).data(), x.col(j).data() + n);
+    auto order = tools_stl::get_order(xvec);
+    // set up random number generator
+    for (size_t i = 0, reps; i < n; i += reps) {
+      // find replications
+      reps = 1;
+      while ((i + reps < n) && (x(order[i], j) == x(order[i + reps], j)))
+        ++reps;
+      // assign random rank between ties
+      std::vector<size_t> rvals(reps);
+      for (size_t k = 0; k < reps; ++k) {
+        rvals[k] = gen();
+      }
+      rvals = tools_stl::get_order(rvals);
+      for (size_t k = 0; k < reps; ++k) {
+         x(order[i + k], j) = static_cast<double>(i + 1 + rvals[k]);
+      }
+       
+    }
+
+    // NaN-handling
+    for (size_t i = 0; i < xvec.size(); i++) {
+      if (std::isnan(xvec[i])) {
+        x(i, j) = NAN;
+        n--;
+      }
+    }
+  }
+
+  return x.array() / (static_cast<double>(n) + 1.0);
+}
+
 //! window smoother
 inline Eigen::VectorXd
 win(const Eigen::VectorXd& x, size_t wl = 5)

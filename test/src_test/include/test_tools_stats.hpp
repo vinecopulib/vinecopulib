@@ -38,6 +38,7 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct)
   EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X2, "random"));
   EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X2, "first"));
   EXPECT_ANY_THROW(tools_stats::to_pseudo_obs(X2, "something"));
+  EXPECT_NO_THROW(tools_stats::to_pseudo_obs_fixed_jitter(X2));
 
   X2.col(0).head(50) = Eigen::VectorXd::Constant(50, NAN);
   auto u = tools_stats::to_pseudo_obs(X2);
