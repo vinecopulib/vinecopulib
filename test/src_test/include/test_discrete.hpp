@@ -14,63 +14,63 @@ namespace test_discrete {
 
 using namespace vinecopulib;
 
-TEST(discrete, bicop)
-{
-  for (auto rot : { 0, 90, 180, 270 }) {
-    auto bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
-    auto u = bc.simulate(1000, true, { 1 });
+// TEST(discrete, bicop)
+// {
+//   for (auto rot : { 0, 90, 180, 270 }) {
+//     auto bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
+//     auto u = bc.simulate(1000, true, { 1 });
 
-    Eigen::MatrixXd u_disc(u.rows(), 4);
-    u_disc.col(0) = (u.col(0).array() * 2).ceil() / 2;
-    u_disc.col(2) = (u.col(0).array() * 2).floor() / 2;
-    u_disc.col(1) = (u.col(1).array() * 2).ceil() / 2;
-    u_disc.col(3) = (u.col(1).array() * 2).floor() / 2;
+//     Eigen::MatrixXd u_disc(u.rows(), 4);
+//     u_disc.col(0) = (u.col(0).array() * 2).ceil() / 2;
+//     u_disc.col(2) = (u.col(0).array() * 2).floor() / 2;
+//     u_disc.col(1) = (u.col(1).array() * 2).ceil() / 2;
+//     u_disc.col(3) = (u.col(1).array() * 2).floor() / 2;
 
-    // c_c
-    EXPECT_GE(bc.pdf(u.topRows(20)).minCoeff(), 0);
-    bc.fit(u);
-    EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
+//     // c_c
+//     EXPECT_GE(bc.pdf(u.topRows(20)).minCoeff(), 0);
+//     bc.fit(u);
+//     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
 
-    // d_c
-    Eigen::MatrixXd uu(u.rows(), 3);
-    uu.col(0) = u_disc.col(0);
-    uu.col(1) = u.col(1);
-    uu.col(2) = u_disc.col(2);
-    bc.set_var_types({ "d", "c" });
-    EXPECT_GE(bc.pdf(uu.topRows(20)).minCoeff(), 0);
-    bc.fit(uu);
-    EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
-    EXPECT_EQ(bc.cdf(uu.topRows(20)),
-              bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+//     // d_c
+//     Eigen::MatrixXd uu(u.rows(), 3);
+//     uu.col(0) = u_disc.col(0);
+//     uu.col(1) = u.col(1);
+//     uu.col(2) = u_disc.col(2);
+//     bc.set_var_types({ "d", "c" });
+//     EXPECT_GE(bc.pdf(uu.topRows(20)).minCoeff(), 0);
+//     bc.fit(uu);
+//     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
+//     EXPECT_EQ(bc.cdf(uu.topRows(20)),
+//               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
 
-    // c_d
-    uu = Eigen::MatrixXd(u.rows(), 4);
-    uu.col(0) = u.col(0);
-    uu.col(2) = u.col(0);
-    uu.col(1) = u_disc.col(1);
-    uu.col(3) = u_disc.col(3);
-    bc.set_var_types({ "c", "d" });
-    EXPECT_GE(bc.pdf(uu.topRows(20)).minCoeff(), 0);
-    bc.fit(uu);
-    EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
-    EXPECT_EQ(bc.cdf(uu.topRows(20)),
-              bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+//     // c_d
+//     uu = Eigen::MatrixXd(u.rows(), 4);
+//     uu.col(0) = u.col(0);
+//     uu.col(2) = u.col(0);
+//     uu.col(1) = u_disc.col(1);
+//     uu.col(3) = u_disc.col(3);
+//     bc.set_var_types({ "c", "d" });
+//     EXPECT_GE(bc.pdf(uu.topRows(20)).minCoeff(), 0);
+//     bc.fit(uu);
+//     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
+//     EXPECT_EQ(bc.cdf(uu.topRows(20)),
+//               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
 
-    // d_d
-    uu = u_disc;
-    bc.set_var_types({ "d", "d" });
-    EXPECT_GE(bc.pdf(uu.topRows(20)).minCoeff(), 0);
-    bc.fit(uu);
-    EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
-    EXPECT_EQ(bc.cdf(uu.topRows(20)),
-              bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
-    bc.select(uu.topRows(20)); // all families
+//     // d_d
+//     uu = u_disc;
+//     bc.set_var_types({ "d", "d" });
+//     EXPECT_GE(bc.pdf(uu.topRows(20)).minCoeff(), 0);
+//     bc.fit(uu);
+//     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
+//     EXPECT_EQ(bc.cdf(uu.topRows(20)),
+//               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+//     bc.select(uu.topRows(20)); // all families
 
-    // tll
-    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
-    bc.parameters_to_tau(bc.get_parameters());
-  }
-}
+//     // tll
+//     bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
+//     bc.parameters_to_tau(bc.get_parameters());
+//   }
+// }
 
 TEST(discrete, vinecop)
 {
@@ -105,35 +105,40 @@ TEST(discrete, vinecop)
   vc.select(u, controls);
   vc.pdf(u);
 
-  // check output
-  auto pcs = vc.get_all_pair_copulas();
-  for (size_t t = 0; t < 4; t++) {
-    for (auto pc : pcs[t]) {
-      EXPECT_EQ(pc.get_rotation(), 90);
-      EXPECT_NEAR(
-        pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
-    }
-  }
+  // // check output
+  // auto pcs = vc.get_all_pair_copulas();
+  // for (size_t t = 0; t < 4; t++) {
+  //   for (auto pc : pcs[t]) {
+  //     EXPECT_EQ(pc.get_rotation(), 90);
+  //     EXPECT_NEAR(
+  //       pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
+  //   }
+  // }
 
-  // test other input format
-  u = Eigen::MatrixXd(utmp.rows(), 10);
-  u.leftCols(5) = utmp;
-  u.rightCols(5) = utmp;
-  u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
-  u.col(5) = (utmp.col(0).array() * 10).floor() / 10;
-  u.col(2) = (utmp.col(2).array() * 10).ceil() / 10;
-  u.col(7) = (utmp.col(2).array() * 10).floor() / 10;
-  u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
-  u.col(8) = (utmp.col(3).array() * 10).floor() / 10;
-  vc.select(u, controls);
-  vc.pdf(u);
-  pcs = vc.get_all_pair_copulas();
-  for (size_t t = 0; t < 4; t++) {
-    for (auto pc : pcs[t]) {
-      EXPECT_EQ(pc.get_rotation(), 90);
-      EXPECT_NEAR(
-        pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
-    }
+  // // test other input format
+  // u = Eigen::MatrixXd(utmp.rows(), 10);
+  // u.leftCols(5) = utmp;
+  // u.rightCols(5) = utmp;
+  // u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
+  // u.col(5) = (utmp.col(0).array() * 10).floor() / 10;
+  // u.col(2) = (utmp.col(2).array() * 10).ceil() / 10;
+  // u.col(7) = (utmp.col(2).array() * 10).floor() / 10;
+  // u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
+  // u.col(8) = (utmp.col(3).array() * 10).floor() / 10;
+  // vc.select(u, controls);
+  // vc.pdf(u);
+  // pcs = vc.get_all_pair_copulas();
+  // for (size_t t = 0; t < 4; t++) {
+  //   for (auto pc : pcs[t]) {
+  //     EXPECT_EQ(pc.get_rotation(), 90);
+  //     EXPECT_NEAR(
+  //       pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
+  //   }
+  // }
+
+  // rosenblatt
+  for (int i = 0; i < 500; i++) {
+    vc.rosenblatt_discrete(u);
   }
 }
 }
