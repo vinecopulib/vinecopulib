@@ -19,7 +19,8 @@ namespace vinecopulib {
 //! @param d The dimension (= number of variables) of the model.
 inline Vinecop::Vinecop(const size_t d)
   : Vinecop(RVineStructure(d, static_cast<size_t>(0)))
-{}
+{
+}
 
 //! @brief Instantiates an arbitrary vine copula model.
 //! @param structure An RVineStructure object specifying the vine structure.
@@ -60,7 +61,8 @@ inline Vinecop::Vinecop(
   const std::vector<std::vector<Bicop>>& pair_copulas,
   const std::vector<std::string>& var_types)
   : Vinecop(RVineStructure(matrix), pair_copulas, var_types)
-{}
+{
+}
 
 //! @brief Instantiates from data.
 //!
@@ -119,7 +121,8 @@ inline Vinecop::Vinecop(
   const std::vector<std::string>& var_types,
   const FitControlsVinecop& controls)
   : Vinecop(data, RVineStructure(matrix), var_types, controls)
-{}
+{
+}
 
 //! @brief Instantiates from a nlohmann::json object.
 //! @param input The nlohmann::json object to convert from
@@ -177,7 +180,8 @@ inline Vinecop::Vinecop(const nlohmann::json& input, const bool check)
 //! represents a valid R-vine structure.
 inline Vinecop::Vinecop(const std::string& filename, const bool check)
   : Vinecop(tools_serialization::file_to_json(filename), check)
-{}
+{
+}
 
 //! @brief Converts the copula into a nlohmann::json object.
 //!
@@ -278,10 +282,10 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! holds \f$ F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second
 //! block can be omitted.
 //!
-//! If there are missing data (i.e., NaN entries), incomplete observations are 
+//! If there are missing data (i.e., NaN entries), incomplete observations are
 //! discarded before fitting a pair-copula. This is done on a pair-by-pair basis
 //! so that the maximal available information is used.
-//! 
+//!
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
@@ -348,7 +352,7 @@ Vinecop::select_all(const Eigen::MatrixXd& data,
 //! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
 //! be omitted.
 //!
-//! If there are missing data (i.e., NaN entries), incomplete observations are 
+//! If there are missing data (i.e., NaN entries), incomplete observations are
 //! discarded before fitting a pair-copula. This is done on a pair-by-pair basis
 //! so that the maximal available information is used.
 //!
@@ -1045,26 +1049,27 @@ Vinecop::get_npars() const
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-//! 
-//! @details 
-//! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random 
-//! vector \f$ V = (V_1,\ldots,V_d) ~ F \f$ is defined as
-//! \f[ U_1= F(V_1), U_{2} = F(V_{2}|V_1), \ldots, U_d =F(V_d|V_1,\ldots,V_{d-1}), \f]
-//! where \f$ F(v_k|v_1,\ldots,v_{k-1}) \f$ is the conditional distribution of
-//! \f$ V_k \f$ given  \f$ V_1 \ldots, V_{k-1}, k = 2,\ldots,d \f$. The vector 
-//! \f$ U = (U_1, \dots, U_d) \f$ then contains independent standard uniform 
-//! variables. The inverse operation
-//! \f[V_1 = F^{-1}(U_1), V_{2} = F^{-1}(U_2|U_1), \ldots, V_d =F^{-1}(U_d|U_1,\ldots,U_{d-1}) \f]
-//! can be used to simulate from a distribution. For any copula \f$ F \f$, if
-//! \f$ U\f$ is a vector of independent random variables, \f$ V = T^{-1}(U) \f$ 
-//! has distribution \f$ F \f$.
 //!
-//! The formulas above assume a vine copula model with order \f$ d, \dots, 1 \f$.
-//! More generally, `Vinecop::rosenblatt()` returns the variables
-//! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
-//! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
-//! returns
-//! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
+//! @details
+//! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random
+//! vector \f$ V = (V_1,\ldots,V_d) ~ F \f$ is defined as
+//! \f[ U_1= F(V_1), U_{2} = F(V_{2}|V_1), \ldots, U_d
+//! =F(V_d|V_1,\ldots,V_{d-1}), \f] where \f$ F(v_k|v_1,\ldots,v_{k-1}) \f$ is
+//! the conditional distribution of \f$ V_k \f$ given  \f$ V_1 \ldots, V_{k-1},
+//! k = 2,\ldots,d \f$. The vector \f$ U = (U_1, \dots, U_d) \f$ then contains
+//! independent standard uniform variables. The inverse operation \f[V_1 =
+//! F^{-1}(U_1), V_{2} = F^{-1}(U_2|U_1), \ldots, V_d
+//! =F^{-1}(U_d|U_1,\ldots,U_{d-1}) \f] can be used to simulate from a
+//! distribution. For any copula \f$ F \f$, if \f$ U\f$ is a vector of
+//! independent random variables, \f$ V = T^{-1}(U) \f$ has distribution \f$ F
+//! \f$.
+//!
+//! The formulas above assume a vine copula model with order \f$ d, \dots, 1
+//! \f$. More generally, `Vinecop::rosenblatt()` returns the variables \f[
+//! U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0,
+//! 0]}), \f] where \f$ M \f$ is the structure matrix. Similarly,
+//! `Vinecop::inverse_rosenblatt()` returns \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d -
+//! j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
 //!
 inline Eigen::MatrixXd
 Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
@@ -1130,6 +1135,112 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
   return U_vine.array().min(1 - 1e-10).max(1e-10);
 }
 
+inline Eigen::MatrixXd
+Vinecop::rosenblatt_discrete(const Eigen::MatrixXd& u,
+                             const size_t num_threads) const
+{
+  check_data(u);
+  auto uu = collapse_data(u);
+
+  size_t d = d_;
+  size_t n = u.rows();
+
+  // info about the vine structure
+  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
+  auto order = rvine_structure_.get_order();
+  auto inverse_order = tools_stl::invert_permutation(order);
+  auto disc_cols = tools_select::get_disc_cols(var_types_);
+
+  Eigen::MatrixXd U_vine(n, 2 * d);
+
+  auto do_batch = [&](const tools_batch::Batch& b) {
+    // temporary storage objects (all data must be in (0, 1))
+    Eigen::MatrixXd hfunc1, hfunc2, u_e, hfunc1_sub, hfunc2_sub, u_e_sub;
+    hfunc1 = Eigen::MatrixXd::Zero(b.size, d_);
+    hfunc2 = Eigen::MatrixXd::Zero(b.size, d_);
+    if (get_n_discrete() > 0) {
+      hfunc1_sub = hfunc1;
+      hfunc2_sub = hfunc2;
+    }
+
+    // fill first row of hfunc2 matrix with evaluation points;
+    // points have to be reordered to correspond to natural order
+    for (size_t j = 0; j < d_; ++j) {
+      hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
+      if (var_types_[order[j] - 1] == "d") {
+        hfunc2_sub.col(j) =
+          u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
+      }
+    }
+    hfunc1_sub = Eigen::MatrixXd::Zero(b.size, d);
+
+    for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+      tools_interface::check_user_interrupt(
+        static_cast<double>(n) * static_cast<double>(d) > 1e5);
+      for (size_t edge = 0; edge < d - tree - 1; ++edge) {
+        tools_interface::check_user_interrupt(edge % 100 == 0);
+        // extract evaluation point from hfunction matrices (have been
+        // computed in previous tree level)
+        Bicop* edge_copula = &pair_copulas_[tree][edge];
+        auto var_types = edge_copula->get_var_types();
+        size_t m = rvine_structure_.min_array(tree, edge);
+
+        u_e = Eigen::MatrixXd(b.size, 2);
+        u_e.col(0) = hfunc2.col(edge);
+        if (m == rvine_structure_.struct_array(tree, edge, true)) {
+          u_e.col(1) = hfunc2.col(m - 1);
+        } else {
+          u_e.col(1) = hfunc1.col(m - 1);
+        }
+
+        if ((var_types[0] == "d") || (var_types[1] == "d")) {
+          u_e.conservativeResize(b.size, 4);
+          u_e.col(2) = hfunc2_sub.col(edge);
+          if (m == rvine_structure_.struct_array(tree, edge, true)) {
+            u_e.col(3) = hfunc2_sub.col(m - 1);
+          } else {
+            u_e.col(3) = hfunc1_sub.col(m - 1);
+          }
+        }
+
+        // h-functions are only evaluated if needed in next step
+        if (rvine_structure_.needed_hfunc1(tree, edge)) {
+          hfunc1.col(edge) = edge_copula->hfunc1(u_e);
+          if (var_types[1] == "d") {
+            u_e_sub = u_e;
+            u_e_sub.col(1) = u_e.col(3);
+            hfunc1_sub.col(edge) = edge_copula->hfunc1(u_e_sub);
+          }
+        }
+        hfunc2.col(edge) = edge_copula->hfunc2(u_e);
+        if (var_types[0] == "d") {
+          u_e_sub = u_e;
+          u_e_sub.col(0) = u_e.col(2);
+          hfunc2_sub.col(edge) = edge_copula->hfunc2(u_e_sub);
+        }
+      }
+    }
+
+    // go back to original order
+    for (size_t j = 0; j < d; j++) {
+      U_vine.col(j).segment(b.begin, b.size) = hfunc2.col(inverse_order[j]);
+    }
+    for (size_t j = 0; j < d; j++) {
+      U_vine.col(d + j).segment(b.begin, b.size) =
+        var_types_[j] == "d" ? hfunc2_sub.col(inverse_order[j])
+                             : hfunc2.col(inverse_order[j]);
+    }
+  };
+
+  if (trunc_lvl > 0) {
+    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
+    pool.map(do_batch, tools_batch::create_batches(n, num_threads));
+    pool.join();
+  }
+
+  return U_vine.array().min(1 - 1e-10).max(1e-10);
+}
+
 //! @brief Evaluates the inverse Rosenblatt transform.
 //!
 //! The inverse Rosenblatt transform can be used for simulation: the
@@ -1145,29 +1256,31 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! Only works for continous models.
 //!
 //! @param u An \f$ n \times d \f$ matrix of evaluation points.
-//! @param num_threads The number of threads to use for computations; if greater
-//!   than 1, the function will be applied concurrently to `num_threads` batches
-//!   of `u`.
-//! 
-//! @details 
-//! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random 
-//! vector \f$ V = (V_1,\ldots,V_d) ~ F \f$ is defined as
-//! \f[ U_1= F(V_1), U_{2} = F(V_{2}|V_1), \ldots, U_d =F(V_d|V_1,\ldots,V_{d-1}), \f]
-//! where \f$ F(v_k|v_1,\ldots,v_{k-1}) \f$ is the conditional distribution of
-//! \f$ V_k \f$ given  \f$ V_1 \ldots, V_{k-1}, k = 2,\ldots,d \f$. The vector 
-//! \f$ U = (U_1, \dots, U_d) \f$ then contains independent standard uniform 
-//! variables. The inverse operation
-//! \f[V_1 = F^{-1}(U_1), V_{2} = F^{-1}(U_2|U_1), \ldots, V_d =F^{-1}(U_d|U_1,\ldots,U_{d-1}) \f]
-//! can be used to simulate from a distribution. For any copula \f$ F \f$, if
-//! \f$ U\f$ is a vector of independent random variables, \f$ V = T^{-1}(U) \f$ 
-//! has distribution \f$ F \f$.
+//! @param num_threads The number of threads to use for computations; if
+//! greater
+//!   than 1, the function will be applied concurrently to `num_threads`
+//!   batches of `u`.
 //!
-//! The formulas above assume a vine copula model with order \f$ d, \dots, 1 \f$.
-//! More generally, `Vinecop::rosenblatt()` returns the variables
-//! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
-//! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
-//! returns
-//! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
+//! @details
+//! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random
+//! vector \f$ V = (V_1,\ldots,V_d) ~ F \f$ is defined as
+//! \f[ U_1= F(V_1), U_{2} = F(V_{2}|V_1), \ldots, U_d
+//! =F(V_d|V_1,\ldots,V_{d-1}), \f] where \f$ F(v_k|v_1,\ldots,v_{k-1}) \f$ is
+//! the conditional distribution of \f$ V_k \f$ given  \f$ V_1 \ldots,
+//! V_{k-1}, k = 2,\ldots,d \f$. The vector \f$ U = (U_1, \dots, U_d) \f$ then
+//! contains independent standard uniform variables. The inverse operation
+//! \f[V_1 = F^{-1}(U_1), V_{2} = F^{-1}(U_2|U_1), \ldots, V_d
+//! =F^{-1}(U_d|U_1,\ldots,U_{d-1}) \f] can be used to simulate from a
+//! distribution. For any copula \f$ F \f$, if \f$ U\f$ is a vector of
+//! independent random variables, \f$ V = T^{-1}(U) \f$ has distribution \f$ F
+//! \f$.
+//!
+//! The formulas above assume a vine copula model with order \f$ d, \dots, 1
+//! \f$. More generally, `Vinecop::rosenblatt()` returns the variables \f[
+//! U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots,
+//! V_{M[0, 0]}), \f] where \f$ M \f$ is the structure matrix. Similarly,
+//! `Vinecop::inverse_rosenblatt()` returns \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d
+//! - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
 //!
 inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
