@@ -34,6 +34,7 @@ jobs:
           eigen_install_dir: ${{ matrix.cfg.root_install_dir }}
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
+          R: true
       # - name: Set environment variables and path
       #   run:   |
       #     echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
