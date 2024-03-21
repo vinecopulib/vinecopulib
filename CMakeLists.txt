@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 project(vinecopulib VERSION 0.6.3)
 
+include(CTest)
+
 include(cmake/options.cmake               REQUIRED)
 
 include(cmake/findDependencies.cmake      REQUIRED)

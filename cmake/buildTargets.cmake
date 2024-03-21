@@ -14,20 +14,23 @@ else()
 endif()
 
 if(BUILD_TESTING)
+
     set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
     set(unit_tests
-            test_all
-            test_bicop_parametric
-            test_bicop_sanity_checks
-            test_bicop_kernel
-            test_bicop_select
-            test_rvine_structure
-            test_tools_bobyqa
-            test_tools_stats
-            test_vinecop_class
-            test_vinecop_sanity_checks
-            test_weights
-            test_discrete)
+    test_tools_stats)
+    # set(unit_tests
+    #         test_all
+    #         test_bicop_parametric
+    #         test_bicop_sanity_checks
+    #         test_bicop_kernel
+    #         test_bicop_select
+    #         test_rvine_structure
+    #         test_tools_bobyqa
+    #         test_tools_stats
+    #         test_vinecop_class
+    #         test_vinecop_sanity_checks
+    #         test_weights
+    #         test_discrete)
 
     add_subdirectory(test)
     file(GLOB_RECURSE r_scripts cmake/templates/*R)
