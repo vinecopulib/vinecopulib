@@ -28,7 +28,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install dependencies
-        uses: ./.github/actions/install-dependencies
+        uses: ./.github/actions/install_dependencies
         with:
           os: ${{ matrix.cfg.os }}
           platform: ${{ matrix.cfg.platform }}
