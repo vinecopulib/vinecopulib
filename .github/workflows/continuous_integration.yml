@@ -26,7 +26,7 @@ jobs:
       - name: Checkout project 
         uses: actions/checkout@v4
       - name: Install dependencies
-        uses: ./.github/actions/install_dependencies.yml
+        uses: ./.github/actions/action.yml
         with:
           os: ${{ matrix.cfg.os }}
           platform: ${{ matrix.cfg.platform }}
