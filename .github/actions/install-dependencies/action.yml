@@ -66,7 +66,7 @@ runs:
     - name: Install Eigen ${{inputs.eigen_version}}
       if: ${{ inputs.eigen == 'true' }}
       run: |
-          git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen ${{inputs.eigen_install_dir}}
+          git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen ${{inputs.eigen_install_dir}}/eigen
       shell: bash
 
 
