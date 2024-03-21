@@ -24,9 +24,7 @@ jobs:
     name:    ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
     steps:
       - name: Checkout project 
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
+        uses: actions/checkout@v4
       - name: Install dependencies
         uses: ./.github/actions/install_dependencies.yml
         with:
