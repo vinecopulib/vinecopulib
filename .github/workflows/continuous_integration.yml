@@ -63,12 +63,12 @@ jobs:
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             # choco upgrade cmake
             choco install wget
-            wget https://github.com/vinecopulib/pyvinecopulib/raw/main/lib/boost_1_71_0.tar.gz
+            wget https://github.com/vinecopulib/pyvinecopulib/raw/main/lib/boost_1_84_0.tar.gz
             set current_dir=%CD%
             echo %current_dir%  
             pwd
             echo "${Boost_INCLUDE_DIR}"
-            tar xzvf boost_1_71_0.tar.gz
+            tar xzvf boost_1_84_0.tar.gz
             # choco install boost-msvc-14.3
             choco install eigen
           fi
