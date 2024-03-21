@@ -76,7 +76,7 @@ runs:
       if: ${{ inputs.lcov == 'true' }} && ${{ inputs.os == 'ubuntu-latest' }}
       run: |
           sudo apt-get install --no-install-recommends -y lcov
-        shell: bash
+      shell: bash
 
     - name: Install R
       if: ${{ inputs.install_R == 'true' }}
@@ -102,3 +102,4 @@ runs:
             choco install eigen
           fi
           Rscript -e "install.packages('VineCopula', repos='http://cran.rstudio.com/')"
+      shell: bash
