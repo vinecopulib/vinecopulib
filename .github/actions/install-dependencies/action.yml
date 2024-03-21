@@ -67,8 +67,8 @@ runs:
       if: ${{ inputs.eigen == 'true' }}
       uses: actions/checkout@v4
       run: |
-          mkdir -p ../eigen
           git clone --depth 1 --branch ${{inputs.eigen_version}} ${{inputs.repository}} ${{inputs.eigen_install_dir}}
+      shell: bash
 
 
     - name: Install lcov
