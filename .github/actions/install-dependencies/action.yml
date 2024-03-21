@@ -66,10 +66,9 @@ runs:
     - name: Install Eigen ${{inputs.eigen_version}}
       if: ${{ inputs.eigen == 'true' }}
       uses: actions/checkout@v4
-      with:
-        repository: 'https://gitlab.com/libeigen/eigen.git'
-        ref: ${{inputs.eigen_version}}
-        path: ../..
+      run: |
+          mkdir -p ../eigen
+          git clone --depth 1 --branch ${{inputs.eigen_version}} ${{inputs.repository}} ${{inputs.eigen_install_dir}}
 
 
     - name: Install lcov
