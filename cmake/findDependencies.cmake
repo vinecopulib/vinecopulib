@@ -1,7 +1,7 @@
 # Find the main dependencies
 message(STATUS ${CMAKE_PREFIX_PATH})
 message(STATUS ${BOOST_ROOT})
-message(STATUS ${Eigen3_ROOT})
+message(STATUS ${Eigen3_DIR})
 message(STATUS 'BLABLABLA')
 find_package(Eigen3                       REQUIRED)
 include(cmake/findR.cmake                 REQUIRED)
