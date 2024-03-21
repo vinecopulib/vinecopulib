@@ -40,6 +40,8 @@ jobs:
         run:   |
           echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
           echo "CCX=${{ matrix.cfg.ccx }}" >> $GITHUB_ENV
+          echo "Boost_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Eigen3_ROOT=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}" >> $GITHUB_ENV
           echo "CMAKE_PREFIX_PATH=${{ matrix.cfg.root_install_dir }}/eigen;${{ matrix.cfg.root_install_dir }}/boost" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_ENV
