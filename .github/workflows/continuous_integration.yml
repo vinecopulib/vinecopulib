@@ -31,6 +31,7 @@ jobs:
           os: ${{ matrix.cfg.os }}
           platform: ${{ matrix.cfg.platform }}
           boost_install_dir: ${{ matrix.cfg.boost_install_dir }}
+          eien_install_dir: ${{ matrix.cfg.boost_install_dir }}
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
       # - name: Set environment variables and path
