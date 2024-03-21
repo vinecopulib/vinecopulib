@@ -62,7 +62,8 @@ jobs:
           mkdir debug && cd debug
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
-              cmake .. -DSTRICT_COMPILER=ON -DCODE_COVERAGE=ON -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}"
+              cmake .. -DSTRICT_COMPILER=ON -DCODE_COVERAGE=ON -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug \
+              -DEIGEN3_DIR="${EIGEN3_DIR}"
               make vinecopulib_coverage
             else
               cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
