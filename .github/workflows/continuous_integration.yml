@@ -86,7 +86,7 @@ jobs:
         run:   |
           mkdir release && cd release
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}"
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}" -DCMAKE_FIND_DEBUG_MODE=ON
             make && sudo make install
             bin/test_all
           else
