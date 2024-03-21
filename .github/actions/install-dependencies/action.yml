@@ -65,7 +65,6 @@ runs:
 
     - name: Install Eigen ${{inputs.eigen_version}}
       if: ${{ inputs.eigen == 'true' }}
-      uses: actions/checkout@v4
       run: |
           git clone --depth 1 --branch ${{inputs.eigen_version}} ${{inputs.repository}} ${{inputs.eigen_install_dir}}
       shell: bash
