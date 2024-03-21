@@ -26,6 +26,7 @@ jobs:
       - name: Checkout project 
         uses: actions/checkout@v4
       - name: Install dependencies
+        id: install-dependencies
         uses: ./.github/actions/install-dependencies
         with:
           os: ${{ matrix.cfg.os }}
@@ -42,8 +43,6 @@ jobs:
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_ENV
             echo "WDM_CMAKE_DIR=C:\projects\wdm-install\lib\cmake" >> $GITHUB_ENV
-            echo "EIGEN3_INCLUDE_DIR=C:\projects\eigen-3.3.7" >> $GITHUB_ENV
-            echo "Boost_INCLUDE_DIR=D:\a\vinecopulib\vinecopulib" >> $GITHUB_ENV
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
@@ -53,6 +52,7 @@ jobs:
               echo "CMAKE_GEN_PLAT=Win32" >> $GITHUB_PATH
             fi
           fi
+
         shell: bash
       - name: Compile the debug version
         run:   |
@@ -70,6 +70,9 @@ jobs:
             cmake --build . --config Debug
           fi
         shell: bash
+        env:
+          BOOST_ROOT: ${{ steps.install-dependencies.outputs.BOOST_ROOT }}
+          EIGEN3_ROOT: ${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}
       - name: Code coverage
         uses: codecov/codecov-action@v3
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
