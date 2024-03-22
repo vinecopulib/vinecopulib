@@ -39,7 +39,7 @@ jobs:
       - name: Set environment variables and path
         run:   |
           echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
-          echo "CCX=${{ matrix.cfg.ccx }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
           echo "Boost_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
           echo "Eigen3_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/cmake" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
@@ -93,7 +93,9 @@ jobs:
             "bin/Release/test_all.exe"
             cmake --build . --config Release --target install
           fi
-        shell: bash        
+        shell: bash
+        env:
+          BOOST_ROOT: ${{ steps.install-dependencies.outputs.BOOST_ROOT }}     
       - name: Install the release version and test the install
         run:   |
           cd examples/bicop
@@ -107,3 +109,5 @@ jobs:
             "../bin/Release/main.exe"
           fi
         shell: bash
+        env:
+          BOOST_ROOT: ${{ steps.install-dependencies.outputs.BOOST_ROOT }}   
