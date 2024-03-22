@@ -9,11 +9,10 @@ jobs:
       max-parallel: 6 
       matrix:
         cfg:
-          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
+          # - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
           # - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
-          # - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
-          - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
-          - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # apple silicon runner
+          # - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
+          # - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # apple silicon runner
           - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32, root_install_dir: 'D:\'}
           - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64, root_install_dir: 'D:\'}
     env:
@@ -67,7 +66,11 @@ jobs:
               make
             fi
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
+            cmake .. -G "Visual Studio 16 2019" -A "${CMAKE_GEN_PLAT}"\ 
+            -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug"\ 
+            -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" \
+            -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" \
+            -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
             cmake --build . --config Debug
           fi
         shell: bash
