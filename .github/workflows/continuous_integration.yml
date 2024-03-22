@@ -73,7 +73,7 @@ jobs:
       #   with:
       #     token: ${{secrets.CODECOV_TOKEN}}
       #     file: debug/coverage.info 
-      - name: Compile and test the release version
+      - name: Compile, test and install the release version
         run:   |
           mkdir release && cd release
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
@@ -82,13 +82,13 @@ jobs:
             bin/test_all
           else
             cmake .. -DVINECOPULIB_SHARED_LIB=ON -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \ 
-            -DCMAKE_INSTALL_PREFIX="${{matrix.cfg.root_install_dir}}\\vinecopulib-release"
+            -DCMAKE_INSTALL_PREFIX="${{matrix.cfg.root_install_dir}}"
             cmake --build . --config Release
             "bin/Release/test_all.exe"
             cmake --build . --config Release --target install
           fi
         shell: bash
-      - name: Install the release version and test the install
+      - name: Test the install
         run:   |
           cd examples/bicop
           mkdir build && cd build
@@ -96,7 +96,7 @@ jobs:
             cmake .. && make
             ../bin/main
           else
-            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \ -DCMAKE_PREFIX_PATH="${{matrix.cfg.root_install_dir}}\\vinecopulib-release" 
+            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \ -DCMAKE_PREFIX_PATH="${{matrix.cfg.root_install_dir}}" 
             cmake --build . --config Release
             "../bin/Release/main.exe"
           fi
