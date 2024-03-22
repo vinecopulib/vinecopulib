@@ -9,7 +9,7 @@ jobs:
       max-parallel: 6 
       matrix:
         cfg:
-          # - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
+          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
           # - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
           # - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
           - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
@@ -39,7 +39,7 @@ jobs:
         run:   |
           echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
           echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
-          echo "Boost_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
           echo "Eigen3_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/cmake" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_ENV
@@ -71,8 +71,8 @@ jobs:
             cmake --build . --config Debug
           fi
         shell: bash
-        env:
-          BOOST_ROOT: ${{ steps.install-dependencies.outputs.BOOST_ROOT }}
+        # env:
+        #   BOOST_ROOT: ${{ steps.install-dependencies.outputs.BOOST_ROOT }}
       - name: Code coverage
         uses: codecov/codecov-action@v3
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
