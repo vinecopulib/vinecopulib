@@ -68,7 +68,6 @@ jobs:
             fi
           else
             cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \ 
-            -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" \ 
             -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" \
             -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" \
             -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
