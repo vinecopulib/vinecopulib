@@ -75,6 +75,8 @@ runs:
       if: ${{ inputs.eigen }}
       run: |
           git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{inputs.eigen_install_dir}}/eigen
+          cmake eigen -B ${{inputs.eigen_install_dir}}/eigen/build
+          make install -C ${{inputs.eigen_install_dir}}/eigen/build
       shell: bash
 
 

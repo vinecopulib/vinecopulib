@@ -42,7 +42,6 @@ jobs:
           echo "CCX=${{ matrix.cfg.ccx }}" >> $GITHUB_ENV
           echo "Boost_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
           echo "Eigen3_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/cmake" >> $GITHUB_ENV
-          echo "CMAKE_PREFIX_PATH=${{ matrix.cfg.root_install_dir }}" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_ENV
             echo "WDM_CMAKE_DIR=C:\projects\wdm-install\lib\cmake" >> $GITHUB_ENV
@@ -87,7 +86,7 @@ jobs:
         run:   |
           mkdir release && cd release
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}" -DCMAKE_FIND_DEBUG_MODE=ON
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON
             make && sudo make install
             bin/test_all
           else
