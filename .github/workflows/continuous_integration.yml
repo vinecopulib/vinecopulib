@@ -29,9 +29,6 @@ jobs:
         with:
           vs-version: 16
           msbuild-architecture: ${{matrix.cfg.platform}}
-      - name: List installed Visual Studio versions
-        run: |
-          "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -all -prerelease
       # - name: Install dependencies
       #   id: install-dependencies
       #   uses: ./.github/actions/install-dependencies
@@ -62,28 +59,28 @@ jobs:
       #     fi
 
       #   shell: bash
-      # - name: Compile the debug version
-      #   run:   |
-      #     mkdir debug && cd debug
-      #     if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-      #       if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
-      #         cmake .. -DSTRICT_COMPILER=ON \
-      #         -DCODE_COVERAGE=ON -DOPT_ASAN=OFF \
-      #         -DCMAKE_BUILD_TYPE=Debug
-      #         make vinecopulib_coverage
-      #       else
-      #         cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
-      #         make
-      #       fi
-      #     else
-      #       cmake .. -G "Visual Studio 16 2019" -A "${CMAKE_GEN_PLAT}" \ 
-      #       -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" \ 
-      #       -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" \
-      #       -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" \
-      #       -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
-      #       cmake --build . --config Debug
-      #     fi
-      #   shell: bash
+      - name: Compile the debug version
+        run:   |
+          mkdir debug && cd debug
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
+              cmake .. -DSTRICT_COMPILER=ON \
+              -DCODE_COVERAGE=ON -DOPT_ASAN=OFF \
+              -DCMAKE_BUILD_TYPE=Debug
+              make vinecopulib_coverage
+            else
+              cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+              make
+            fi
+          else
+            cmake .. -G "Visual Studio 16 2019" -A "${CMAKE_GEN_PLAT}" \ 
+            -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" \ 
+            -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" \
+            -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" \
+            -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
+            cmake --build . --config Debug
+          fi
+        shell: bash
       # - name: Code coverage
       #   uses: codecov/codecov-action@v3
       #   if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
