@@ -41,9 +41,9 @@ jobs:
           echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
+            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_ENV
             echo "WDM_CMAKE_DIR=C:\projects\wdm-install\lib\cmake" >> $GITHUB_ENV
-            echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
             if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
@@ -59,15 +59,17 @@ jobs:
           mkdir debug && cd debug
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
-              cmake .. -DSTRICT_COMPILER=ON -DCODE_COVERAGE=ON -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+              cmake .. -DSTRICT_COMPILER=ON \
+              -DCODE_COVERAGE=ON -DOPT_ASAN=OFF \
+              -DCMAKE_BUILD_TYPE=Debug
               make vinecopulib_coverage
             else
               cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
               make
             fi
           else
-            cmake .. -G "Visual Studio 16 2019" -A "${CMAKE_GEN_PLAT}"\ 
-            -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug"\ 
+            cmake .. -G "Visual Studio 16 2019" -A "${CMAKE_GEN_PLAT}" \ 
+            -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" \ 
             -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" \
             -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" \
             -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
@@ -88,7 +90,12 @@ jobs:
             make && sudo make install
             bin/test_all
           else
-            cmake .. -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}" -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}"
+            cmake .. -DVINECOPULIB_SHARED_LIB=ON -G "Visual Studio 16 2019" -A "${CMAKE_GEN_PLAT}" \ 
+            -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" \ 
+            -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" \
+            -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" \
+            -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
+            cmake --build . --config Debug
             cmake --build . --config Release
             "bin/Release/test_all.exe"
             cmake --build . --config Release --target install
