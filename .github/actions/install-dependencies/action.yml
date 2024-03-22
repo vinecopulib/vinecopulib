@@ -84,9 +84,11 @@ runs:
       shell: bash
 
     - name: Install lcov
-      if: ${{ inputs.lcov }} && contains(inputs.os, 'ubuntu')
+      if: ${{ inputs.lcov }}
       run: |
-          sudo apt-get install --no-install-recommends -y lcov
+          if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
+              sudo apt-get install --no-install-recommends -y lcov
+          fi
       shell: bash
 
     - name: Install R
