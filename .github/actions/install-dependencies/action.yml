@@ -57,7 +57,7 @@ runs:
   steps:
 
     - name: Update compilers on ubuntu
-      if: ${{ inputs.update_compilers_ubuntu }} && ${{ inputs.os }}  == 'ubuntu-latest'
+      if: ${{ inputs.update_compilers_ubuntu }} && contains(inputs.os, 'ubuntu')
       run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y g++ clang
@@ -81,7 +81,7 @@ runs:
       shell: bash
 
     - name: Install lcov
-      if: ${{ inputs.lcov }} && ${{ inputs.os }} == 'ubuntu-latest'
+      if: ${{ inputs.lcov }} && contains(inputs.os, 'ubuntu')
       run: |
           sudo apt-get install --no-install-recommends -y lcov
       shell: bash
