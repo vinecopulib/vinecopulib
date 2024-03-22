@@ -78,9 +78,15 @@ runs:
     - name: Install Eigen ${{inputs.eigen_version}}
       if: ${{ inputs.eigen }}
       run: |
-          git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{runner.temp}}/eigen
-          cmake ${{runner.temp}}/eigen -B ${{runner.temp}}/eigen/build -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
-          make install -C ${{runner.temp}}/eigen/build
+          if [ "${{ inputs.os }}" != "windows-latest" ]; then
+            git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{runner.temp}}/eigen
+            cmake ${{runner.temp}}/eigen -B ${{runner.temp}}/eigen/build -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
+            make install -C ${{runner.temp}}/eigen/build
+          else
+            git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{runner.temp}}\eigen
+            cmake ${{runner.temp}}\eigen -B ${{runner.temp}}\eigen\build -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
+            cmake --build ${{runner.temp}}\eigen\build --config Release --target install
+          fi
       shell: bash
 
     - name: Install lcov
