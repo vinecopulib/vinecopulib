@@ -57,15 +57,15 @@ runs:
   steps:
 
     - name: Print os and update compilers on ubuntu
-      if: ${{ inputs.update_compilers_ubuntu }} && contains(inputs.os, 'ubuntu')
+      if: ${{ inputs.update_compilers_ubuntu }}
       run: |
-          echo "OS: ${{ os }}"
+          if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y g++ clang
           sudo apt-get autoremove
+          fi
       shell: bash
-      env:
-        os: ${{ inputs.os }}
+
 
     - name: Install boost ${{inputs.boost_version}}
       if: ${{ inputs.boost }}
