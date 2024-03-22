@@ -63,7 +63,7 @@ runs:
           cmake ${{temp}}/eigen -B ${{temp}}/eigen/build -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
           make install -C ${{temp}}/eigen/build
       shell: bash
-      with:
+      env:
           temp: ${{ runner.temp }}
 
     - name: Update compilers on ubuntu
