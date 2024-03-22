@@ -5,10 +5,10 @@ inputs:
     description: 'The operating system to install dependencies for'
     required: false
     default: 'ubuntu-latest'
-  platform:
-    description: 'The platform to install dependencies for'
-    required: false
-    default: 'x64'
+  # platform:
+  #   description: 'The platform to install dependencies for'
+  #   required: false
+  #   default: 'x64'
   boost:
     description: 'Whether to install Boost'
     required: false
@@ -56,13 +56,16 @@ runs:
   using: 'composite'
   steps:
 
-    - name: Update compilers on ubuntu
+    - name: Print os and update compilers on ubuntu
       if: ${{ inputs.update_compilers_ubuntu }} && contains(inputs.os, 'ubuntu')
       run: |
+          echo "OS: ${{ os }}"
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y g++ clang
           sudo apt-get autoremove
       shell: bash
+      env:
+        os: ${{ inputs.os }}
 
     - name: Install boost ${{inputs.boost_version}}
       if: ${{ inputs.boost }}
