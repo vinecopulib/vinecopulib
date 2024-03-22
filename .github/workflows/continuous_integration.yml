@@ -10,10 +10,10 @@ jobs:
       matrix:
         cfg:
           - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
-          # - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
+          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
           # # - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
-          # - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
-          # - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # apple silicon runner
+          - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
+          - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # apple silicon runner
           # - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32, root_install_dir: 'D:\'}
           # - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64, root_install_dir: 'D:\'}
     env:
@@ -72,9 +72,9 @@ jobs:
             cmake --build . --config Debug
           fi
         shell: bash
-        env:
-          BOOST_ROOT: ${{ steps.install-dependencies.outputs.BOOST_ROOT }}
-          EIGEN3_ROOT: ${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}
+        # env:
+        #   BOOST_ROOT: ${{ steps.install-dependencies.outputs.BOOST_ROOT }}
+        #   EIGEN3_ROOT: ${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}
       - name: Code coverage
         uses: codecov/codecov-action@v3
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')

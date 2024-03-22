@@ -87,10 +87,10 @@ runs:
       shell: bash
 
     - name: Install R
-      if: ${{ inputs.install_R }}
+      if: ${{ inputs.R }}
       uses: r-lib/actions/setup-r@v2
     - name: Install VineCopula
-      if: ${{ inputs.install_R }}
+      if: ${{ inputs.R }}
       run: |
         if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
             sudo apt-get install --no-install-recommends -y libgsl0-dev
