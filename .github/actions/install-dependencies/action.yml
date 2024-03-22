@@ -59,9 +59,9 @@ runs:
     - name: Install Eigen ${{inputs.eigen_version}}
       if: ${{ inputs.eigen }}
       run: |
-          git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{inputs.eigen_install_dir}}/eigen
-          cmake ${{inputs.eigen_install_dir}}/eigen -B ${{inputs.eigen_install_dir}}/eigen/build
-          make install -C ${{inputs.eigen_install_dir}}/eigen/build
+          git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{RUNNER_TEMP}}/eigen
+          cmake ${{RUNNER_TEMP}}/eigen -B ${{RUNNER_TEMP}}/eigen/build -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
+          make install -C ${{RUNNER_TEMP}}/eigen/build
       shell: bash
 
     - name: Update compilers on ubuntu
