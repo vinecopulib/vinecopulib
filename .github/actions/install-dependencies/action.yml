@@ -55,6 +55,15 @@ outputs:
 runs:
   using: 'composite'
   steps:
+
+    - name: Install Eigen ${{inputs.eigen_version}}
+      if: ${{ inputs.eigen }}
+      run: |
+          git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{inputs.eigen_install_dir}}/eigen
+          cmake ${{inputs.eigen_install_dir}}/eigen -B ${{inputs.eigen_install_dir}}/eigen/build
+          make install -C ${{inputs.eigen_install_dir}}/eigen/build
+      shell: bash
+
     - name: Update compilers on ubuntu
       if: ${{ inputs.update_compilers_ubuntu }} && ${{ inputs.os == 'ubuntu-latest' }}
       run: |
@@ -70,15 +79,6 @@ runs:
       with:
           boost_version: ${{inputs.boost_version}}
           boost_install_dir: ${{ inputs.boost_install_dir }}
-
-    - name: Install Eigen ${{inputs.eigen_version}}
-      if: ${{ inputs.eigen }}
-      run: |
-          git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{inputs.eigen_install_dir}}/eigen
-          cmake eigen -B ${{inputs.eigen_install_dir}}/eigen/build
-          make install -C ${{inputs.eigen_install_dir}}/eigen/build
-      shell: bash
-
 
     - name: Install lcov
       if: ${{ inputs.lcov }} && ${{ inputs.os == 'ubuntu-latest' }}
