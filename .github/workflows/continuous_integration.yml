@@ -40,7 +40,6 @@ jobs:
           echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
           echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Eigen3_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/cmake" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_ENV
             echo "WDM_CMAKE_DIR=C:\projects\wdm-install\lib\cmake" >> $GITHUB_ENV
@@ -71,8 +70,6 @@ jobs:
             cmake --build . --config Debug
           fi
         shell: bash
-        # env:
-        #   BOOST_ROOT: ${{ steps.install-dependencies.outputs.BOOST_ROOT }}
       - name: Code coverage
         uses: codecov/codecov-action@v3
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
@@ -93,8 +90,6 @@ jobs:
             cmake --build . --config Release --target install
           fi
         shell: bash
-        env:
-          BOOST_ROOT: ${{ steps.install-dependencies.outputs.BOOST_ROOT }}     
       - name: Install the release version and test the install
         run:   |
           cd examples/bicop
@@ -108,5 +103,3 @@ jobs:
             "../bin/Release/main.exe"
           fi
         shell: bash
-        env:
-          BOOST_ROOT: ${{ steps.install-dependencies.outputs.BOOST_ROOT }}   
