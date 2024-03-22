@@ -84,8 +84,9 @@ runs:
             make install -C ${{runner.temp}}/eigen/build
           else
             git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ "${{runner.temp}}\\eigen"
-            cmake "${{runner.temp}}\\eigen" -B "${{runner.temp}}\\eigen\\build" -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
-            cmake --build "${{runner.temp}}\\eigen\\build" --config Release --target install
+            cmake "${{runner.temp}}\\eigen" -G "MinGW Makefiles" -B "${{runner.temp}}\\eigen\\build" -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
+            make install -C "${{runner.temp}}\\eigen\\build"
+            # cmake --build "${{runner.temp}}\\eigen\\build" --config Release --target install
           fi
       shell: bash
 
