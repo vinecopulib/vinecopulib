@@ -32,6 +32,7 @@ jobs:
           platform: ${{ matrix.cfg.platform }}
           boost_install_dir: ${{ matrix.cfg.root_install_dir }}
           eigen_install_dir: ${{ matrix.cfg.root_install_dir }}
+          wdm_install_dir: ${{ matrix.cfg.root_install_dir }}
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: true
@@ -40,6 +41,8 @@ jobs:
           echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
           echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Boost_INCLUDE_DIR =${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
+          echo "Eigen3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_ENV
             echo "WDM_CMAKE_DIR=C:\projects\wdm-install\lib\cmake" >> $GITHUB_ENV

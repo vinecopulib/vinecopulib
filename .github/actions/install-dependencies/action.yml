@@ -33,6 +33,14 @@ inputs:
     description: 'The version of Eigen to install'
     required: false
     default: '3.4.0'
+  wdm:
+    description: 'Whether to install WDM'
+    required: false
+    default: true
+  wdm_install_dir:
+    description: 'The directory to install WDM to'
+    required: false
+    default: '/home/runner/work'
   lcov:
     description: 'Whether to install lcov'
     required: false
@@ -65,6 +73,19 @@ runs:
           sudo apt-get autoremove
           fi
       shell: bash
+
+    - name: Install WDM
+      if: ${{ inputs.wdm }}
+      run: |
+          git clone https://github.com/tnagler/wdm.git
+          cd wdm && mkdir build && cd build
+          if [ "${{ inputs.os }}" != "windows-latest" ]; then
+            cmake .. && sudo make install
+          elif [ "${{ inputsos }}" == "windows-latest" ]; then
+            cmake .. -G "Visual Studio 17 2022" -A ${{ inputs.platform }} \
+            -DCMAKE_INSTALL_PREFIX="${{ inputs.wdm_install_dir }}\\wdm"
+            cmake --build . --config Release --target install
+          fi
 
     - name: Install boost ${{inputs.boost_version}}
       if: ${{ inputs.boost }}
