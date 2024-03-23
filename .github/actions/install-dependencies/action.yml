@@ -33,10 +33,10 @@ inputs:
     description: 'Whether to install WDM'
     required: false
     default: true
-  wdm_install_dir:
-    description: 'The directory to install WDM to'
-    required: false
-    default: '/home/runner/work'
+  # wdm_install_dir:
+  #   description: 'The directory to install WDM to'
+  #   required: false
+  #   default: '/home/runner/work'
   lcov:
     description: 'Whether to install lcov'
     required: false
