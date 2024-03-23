@@ -77,23 +77,6 @@ runs:
           fi
       shell: bash
 
-    - name: Install wdm
-      if: inputs.wdm == 'true'
-      run: |
-          git clone https://github.com/tnagler/wdm.git
-          cd wdm && mkdir release && cd release
-          if [ "${{ inputs.os }}" != "windows-latest" ]; then
-            cmake .. -DCMAKE_BUILD_TYPE=Release
-            sudo make install
-          elif [ "${{ inputs.os }}" == "windows-latest" ]; then
-            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ inputs.platform }}
-            cmake .. -G "Visual Studio 17 2022" \
-              -DCMAKE_BUILD_TYPE=Release
-            cmake --build . --target install
-          fi
-          cd ../.. && rm -rf wdm
-      shell: bash
-
     - name: Install boost ${{inputs.boost_version}}
       if: inputs.boost == 'true'
       id: boost
@@ -113,6 +96,23 @@ runs:
             cmd "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ inputs.platform }}
             choco install eigen --version="${{inputs.eigen_version}}"
           fi
+      shell: bash
+
+    - name: Install wdm
+      if: inputs.wdm == 'true'
+      run: |
+          git clone https://github.com/tnagler/wdm.git
+          cd wdm && mkdir release && cd release
+          if [ "${{ inputs.os }}" != "windows-latest" ]; then
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            sudo make install
+          elif [ "${{ inputs.os }}" == "windows-latest" ]; then
+            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ inputs.platform }}
+            cmake .. -G "Visual Studio 17 2022" \
+              -DCMAKE_BUILD_TYPE=Release
+            cmake --build . --target install
+          fi
+          cd ../.. && rm -rf wdm
       shell: bash
 
     - name: Install lcov
