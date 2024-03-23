@@ -5,10 +5,6 @@ inputs:
     description: 'The operating system to install dependencies for'
     required: false
     default: 'ubuntu-latest'
-  platform:
-    description: 'The platform to install dependencies for'
-    required: false
-    default: 'x64'
   boost:
     description: 'Whether to install Boost'
     required: false
@@ -85,7 +81,7 @@ runs:
     #     path: wdm
     #     ref: main
 
-    - name: Install WDM
+    - name: Install wdm
       if: ${{ inputs.wdm }}
       run: |
           git clone https://github.com/tnagler/wdm.git
@@ -94,7 +90,7 @@ runs:
             cmake ..
             make install
           elif [ "${{ inputs.os }}" == "windows-latest" ]; then
-            cmake .. -G "Visual Studio 17 2022" -A ${{ inputs.platform }}
+            cmake .. -G "Visual Studio 17 2022"
             cmake --build . --config Release --target install
           fi
           cd ../.. && rm -rf wdm
