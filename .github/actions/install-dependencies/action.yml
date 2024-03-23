@@ -5,6 +5,10 @@ inputs:
     description: 'The operating system to install dependencies for'
     required: false
     default: 'ubuntu-latest'
+  platform:
+    description: 'The platform to install dependencies for'
+    required: false
+    default: 'x64'
   boost:
     description: 'Whether to install Boost'
     required: false
@@ -91,7 +95,8 @@ runs:
             sudo make install
           elif [ "${{ inputs.os }}" == "windows-latest" ]; then
             cmake .. -G "Visual Studio 17 2022" \
-            -DCMAKE_BUILD_TYPE=Release
+              -A ${{ inputs.platform }} \
+              -DCMAKE_BUILD_TYPE=Release
             cmake --build . --target install
           fi
           cd ../.. && rm -rf wdm

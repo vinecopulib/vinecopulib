@@ -29,6 +29,7 @@ jobs:
         uses: ./.github/actions/install-dependencies
         with:
           os: ${{ matrix.cfg.os }}
+          platform: ${{ matrix.cfg.platform }}
           boost_install_dir: ${{ matrix.cfg.root_install_dir }}
           eigen_install_dir: ${{ matrix.cfg.root_install_dir }}
           # wdm_install_dir: ${{ matrix.cfg.root_install_dir }}
