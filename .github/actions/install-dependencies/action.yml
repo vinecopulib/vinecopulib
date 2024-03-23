@@ -81,6 +81,7 @@ runs:
       if: ${{ inputs.wdm }}
       run: |
           git clone https://github.com/tnagler/wdm.git ${{runner.temp}}
+          ls -la ${{runner.temp}}
           if [ "${{ inputs.os }}" != "windows-latest" ]; then
             cmake ${{runner.temp}}/wdm -B ${{runner.temp}}/wdm/build
             make install -C ${{runner.temp}}/wdm/build
