@@ -83,9 +83,9 @@ jobs:
           else
             cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
             -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON
-            cmake --build .
+            cmake --build . --config Release
             "bin/Release/test_all.exe"
-            cmake --build . --target install
+            cmake --build . --config Release --target install
           fi
         shell: bash
       - name: Test the install
