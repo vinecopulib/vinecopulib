@@ -53,7 +53,7 @@ jobs:
       - name: Compile the debug version
         run:   |
           mkdir debug && cd debug
-          if [ "${{ matrix.cfg.os }}" != "windows-2019" ]; then
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
               cmake .. -DSTRICT_COMPILER=ON \
               -DCODE_COVERAGE=ON -DOPT_ASAN=OFF \
@@ -94,7 +94,7 @@ jobs:
         run:   |
           cd examples/bicop
           mkdir build && cd build
-          if [ "${{ matrix.cfg.os }}" != "windows-2019" ]; then
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             cmake .. && make
             ../bin/main
           else
