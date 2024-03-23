@@ -44,36 +44,37 @@ jobs:
           echo "Boost_INCLUDE_DIR =${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
           echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
+            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
           fi
 
         shell: bash
-      - name: Compile the debug version
-        run:   |
-          mkdir debug && cd debug
-          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
-              cmake .. -DSTRICT_COMPILER=ON \
-              -DCODE_COVERAGE=ON -DOPT_ASAN=OFF \
-              -DCMAKE_BUILD_TYPE=Debug
-              make vinecopulib_coverage
-            else
-              cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
-              make
-            fi
-          else
-            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
-            -DCMAKE_BUILD_TYPE=Debug
-            cmake --build .
-          fi
-        shell: bash
-      - name: Code coverage
-        uses: codecov/codecov-action@v3
-        if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
-        with:
-          token: ${{secrets.CODECOV_TOKEN}}
-          file: debug/coverage.info 
+      # - name: Compile the debug version
+      #   run:   |
+      #     mkdir debug && cd debug
+      #     if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+      #       if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
+      #         cmake .. -DSTRICT_COMPILER=ON \
+      #         -DCODE_COVERAGE=ON -DOPT_ASAN=OFF \
+      #         -DCMAKE_BUILD_TYPE=Debug
+      #         make vinecopulib_coverage
+      #       else
+      #         cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+      #         make
+      #       fi
+      #     else
+      #       cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
+      #       -DCMAKE_BUILD_TYPE=Debug
+      #       cmake --build .
+      #     fi
+      #   shell: bash
+      # - name: Code coverage
+      #   uses: codecov/codecov-action@v3
+      #   if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
+      #   with:
+      #     token: ${{secrets.CODECOV_TOKEN}}
+      #     file: debug/coverage.info 
       - name: Compile, test and install the release version
         run:   |
           mkdir release && cd release
