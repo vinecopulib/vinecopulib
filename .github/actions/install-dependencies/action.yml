@@ -85,7 +85,7 @@ runs:
             cmake ${{runner.temp}}/wdm -B ${{runner.temp}}/wdm/build
             make install -C ${{runner.temp}}/wdm/build
           elif [ "${{ inputs.os }}" == "windows-latest" ]; then
-            cmake "${{runner.temp}}\\wdm" -G "Visual Studio 17 2022" -A ${{ inputs.platform }}
+            cmake "${{runner.temp}}" -G "Visual Studio 17 2022" -A ${{ inputs.platform }}
             cmake --build . --config Release --target install
           fi
       shell: bash
