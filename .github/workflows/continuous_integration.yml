@@ -9,10 +9,10 @@ jobs:
       max-parallel: 6 
       matrix:
         cfg:
-          # - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
-          # - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
-          # - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
-          # - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # apple silicon runner
+          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
+          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
+          - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
+          - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # apple silicon runner
           - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32, root_install_dir: 'D:\'}
           - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64, root_install_dir: 'D:\'}
     env:
@@ -50,31 +50,31 @@ jobs:
           fi
 
         shell: bash
-      # - name: Compile the debug version
-      #   run:   |
-      #     mkdir debug && cd debug
-      #     if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-      #       if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
-      #         cmake .. -DSTRICT_COMPILER=ON \
-      #         -DCODE_COVERAGE=ON -DOPT_ASAN=OFF \
-      #         -DCMAKE_BUILD_TYPE=Debug
-      #         make vinecopulib_coverage
-      #       else
-      #         cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
-      #         make
-      #       fi
-      #     else
-      #       cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
-      #       -DCMAKE_BUILD_TYPE=Debug
-      #       cmake --build .
-      #     fi
-      #   shell: bash
-      # - name: Code coverage
-      #   uses: codecov/codecov-action@v3
-      #   if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
-      #   with:
-      #     token: ${{secrets.CODECOV_TOKEN}}
-      #     file: debug/coverage.info 
+      - name: Compile the debug version
+        run:   |
+          mkdir debug && cd debug
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
+              cmake .. -DSTRICT_COMPILER=ON \
+              -DCODE_COVERAGE=ON -DOPT_ASAN=OFF \
+              -DCMAKE_BUILD_TYPE=Debug
+              make vinecopulib_coverage
+            else
+              cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+              make
+            fi
+          else
+            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
+            -DCMAKE_BUILD_TYPE=Debug
+            cmake --build .
+          fi
+        shell: bash
+      - name: Code coverage
+        uses: codecov/codecov-action@v3
+        if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          file: debug/coverage.info 
       - name: Compile, test and install the release version
         run:   |
           mkdir release && cd release
