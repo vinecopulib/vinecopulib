@@ -87,14 +87,15 @@ runs:
 
     - name: Install WDM
       run: |
+          cd wdm && mkdir release && cd release
           if [ "${{ inputs.os }}" != "windows-latest" ]; then
-            cmake wdm -B wdm/build
-            make install -C wdm/build
+            cmake ..
+            make install
           elif [ "${{ inputs.os }}" == "windows-latest" ]; then
-            cmake wdm -G "Visual Studio 17 2022" -A ${{ inputs.platform }}
-            cmake --build wdm --config Release --target install
+            cmake .. -G "Visual Studio 17 2022" -A ${{ inputs.platform }}
+            cmake --build . --config Release --target install
           fi
-          rm -rf wdm
+          cd ../.. && rm -rf wdm
       shell: bash
 
 
