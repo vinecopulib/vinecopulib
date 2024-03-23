@@ -7,6 +7,8 @@ find_package(Eigen3                       REQUIRED)
 include(cmake/findR.cmake                 REQUIRED)
 find_package(Boost 1.56                   REQUIRED)
 find_package(Threads                      REQUIRED)
+find_package(wdm                          REQUIRED)
+set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
 
 include(FetchContent)
 FetchContent_Declare(
@@ -15,25 +17,8 @@ FetchContent_Declare(
   GIT_TAG        6b74da4757a549563d7c37c8fae3e704662a043b # release-1.10.0
 )
 
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_Declare(
-  wdm
-  GIT_REPOSITORY https://github.com/tnagler/wdm.git
-  GIT_TAG        2243ec8aa81f338b2b9500605377c721dc0f9888
-)
-
-# Find wdm and download if not found
 # Download googlestest
-find_package(wdm QUIET)
-if(NOT wdm_FOUND)
-  if(BUILD_TESTING)
-    FetchContent_MakeAvailable(wdm googletest)
-  else()
-    FetchContent_MakeAvailable(wdm)
-  endif()
-  set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
-elseif(BUILD_TESTING)
+if(BUILD_TESTING)
   FetchContent_MakeAvailable(googletest)
 endif()
 
