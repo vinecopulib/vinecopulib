@@ -1,8 +1,4 @@
 # Find the main dependencies
-message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-message(STATUS "BOOST_ROOT: ${Boost_ROOT}")
-message(STATUS "Eigen3_DIR: ${Eigen3_DIR}")
-message(STATUS 'BLABLABLA')
 find_package(Eigen3                       REQUIRED)
 include(cmake/findR.cmake                 REQUIRED)
 find_package(Boost 1.56                   REQUIRED)
