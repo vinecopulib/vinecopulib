@@ -80,8 +80,8 @@ runs:
     - name: Install WDM
       if: ${{ inputs.wdm }}
       run: |
-          git clone https://github.com/tnagler/wdm.git ${{runner.temp}}
-          ls -la ${{runner.temp}}
+          git clone https://github.com/tnagler/wdm.git ${{RUNNER_TEMP}}
+          ls -la ${{RUNNER_TEMP}}
           if [ "${{ inputs.os }}" != "windows-latest" ]; then
             cmake ${{runner.temp}}/wdm -B ${{runner.temp}}/wdm/build
             make install -C ${{runner.temp}}/wdm/build
