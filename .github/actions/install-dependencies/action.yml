@@ -84,7 +84,7 @@ runs:
           cd ${{runner.temp}}/wdm && mkdir build && cd build
           if [ "${{ inputs.os }}" != "windows-latest" ]; then
             cmake .. && sudo make install
-          elif [ "${{ inputsos }}" == "windows-latest" ]; then
+          elif [ "${{ inputs.os }}" == "windows-latest" ]; then
             cmake .. -G "Visual Studio 17 2022" -A ${{ inputs.platform }}
             cmake --build . --config Release --target install
           fi
