@@ -88,6 +88,7 @@ runs:
             cmake .. -G "Visual Studio 17 2022" -A ${{ inputs.platform }}
             cmake --build . --config Release --target install
           fi
+      shell: bash
 
     - name: Install boost ${{inputs.boost_version}}
       if: ${{ inputs.boost }}
