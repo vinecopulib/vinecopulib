@@ -9,96 +9,64 @@ jobs:
       max-parallel: 6 
       matrix:
         cfg:
-          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
-          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64}
-          # - { os: macos-latest,    name: GNU,    cc: gcc,   cxx: g++,     platform: x64}
-          - { os: macos-latest,    name: Clang,  cc: clang, cxx: clang++, platform: x64}
-          - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x32}
-          - { os: windows-latest,  name: VS2019, cc: cl,    cxx: cl,      platform: x64}
+          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
+          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
+          - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
+          - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # apple silicon runner
+          - { os: windows-latest,  name: x32, cc: cl,    cxx: cl,      platform: x32, root_install_dir: 'D:\'}
+          - { os: windows-latest,  name: x64, cc: cl,    cxx: cl,      platform: x64, root_install_dir: 'D:\'}
+    env:
+      BOOST_VERSION: 1.84.0
+      EIGEN_VERSION: 3.4.0
 
     runs-on: ${{ matrix.cfg.os }}
     name:    ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
     steps:
       - name: Checkout project 
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
         with:
-          submodules: recursive
+          os: ${{ matrix.cfg.os }}
+          platform: ${{ matrix.cfg.platform }}
+          boost_install_dir: ${{ matrix.cfg.root_install_dir }}
+          eigen_install_dir: ${{ matrix.cfg.root_install_dir }}
+          # wdm_install_dir: ${{ matrix.cfg.root_install_dir }}
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          R: true
       - name: Set environment variables and path
         run:   |
           echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
-          echo "CCX=${{ matrix.cfg.ccx }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Boost_INCLUDE_DIR =${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
+          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
-            echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_ENV
-            echo "WDM_CMAKE_DIR=C:\projects\wdm-install\lib\cmake" >> $GITHUB_ENV
-            echo "EIGEN3_INCLUDE_DIR=C:\projects\eigen-3.3.7" >> $GITHUB_ENV
-            echo "Boost_INCLUDE_DIR=D:\a\vinecopulib\vinecopulib" >> $GITHUB_ENV
-            echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
+            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
-            if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
-              echo "CMAKE_GEN_PLAT=x64" >> $GITHUB_PATH
-            else
-              echo "CMAKE_GEN_PLAT=Win32" >> $GITHUB_PATH
-            fi
           fi
-        shell: bash
-      - name: Setup-R
-        uses: r-lib/actions/setup-r@v2
-      - name: Install other dependencies
-        run:   |
-          if [ "${{ matrix.cfg.os }}" == "ubuntu-latest" ]; then
-            sudo apt-get update
-            sudo apt-get install --no-install-recommends -y lcov libgsl0-dev libeigen3-dev libboost-all-dev
-            sudo apt-get install --no-install-recommends -y --allow-unauthenticated g++ clang
-            sudo apt-get autoremove
-          elif [ "${{ matrix.cfg.os }}" == "macos-latest" ]; then
-            # rm '/usr/local/bin/gfortran'
-            # rm '/usr/local/bin/2to3'
-            # rm '/usr/local/bin/2to3-3.11'
-            # rm '/usr/local/bin/idle3'
-            # rm '/usr/local/bin/R'
-            # brew update
-            brew install lcov eigen gsl doxygen graphviz boost
-          elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
-            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
-            # choco upgrade cmake
-            choco install wget
-            wget https://github.com/vinecopulib/pyvinecopulib/raw/main/lib/boost_1_71_0.tar.gz
-            set current_dir=%CD%
-            echo %current_dir%  
-            pwd
-            echo "${Boost_INCLUDE_DIR}"
-            tar xzvf boost_1_71_0.tar.gz
-            # choco install boost-msvc-14.3
-            choco install eigen
-          fi
-          Rscript -e "install.packages('VineCopula', repos='http://cran.rstudio.com/')"
-          # Install wdm
-          git clone https://github.com/tnagler/wdm.git
-          cd wdm && mkdir build && cd build
-          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            cmake .. && sudo make install
-          elif [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\wdm-install"
-            echo "PATH_ORIG=${PATH}" >> $GITHUB_ENV
-            cmake --build . --config Release --target install
-          fi
-          cd ../..
+
         shell: bash
       - name: Compile the debug version
         run:   |
           mkdir debug && cd debug
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
-              cmake .. -DSTRICT_COMPILER=ON -DCODE_COVERAGE=ON -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
+              cmake .. -DSTRICT_COMPILER=ON \
+              -DCODE_COVERAGE=ON -DOPT_ASAN=OFF \
+              -DCMAKE_BUILD_TYPE=Debug
               make vinecopulib_coverage
             else
               cmake .. -DOPT_ASAN=OFF -DCMAKE_BUILD_TYPE=Debug
               make
             fi
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-debug" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}"
-            cmake --build . --config Debug
+            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
+            -DCMAKE_BUILD_TYPE=Debug
+            cmake --build .
           fi
         shell: bash
       - name: Code coverage
@@ -107,20 +75,22 @@ jobs:
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: debug/coverage.info 
-      - name: Compile and test the release version
+      - name: Compile, test and install the release version
         run:   |
           mkdir release && cd release
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON && make && sudo make install
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON
+            make && sudo make install
             bin/test_all
           else
-            cmake .. -DVINECOPULIB_SHARED_LIB=ON -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DCMAKE_INSTALL_PREFIX="C:\\projects\\vinecopulib-release" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="${WDM_CMAKE_DIR}" -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}"
+            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
+            -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON
             cmake --build . --config Release
             "bin/Release/test_all.exe"
             cmake --build . --config Release --target install
           fi
-        shell: bash        
-      - name: Install the release version and test the install
+        shell: bash
+      - name: Test the install
         run:   |
           cd examples/bicop
           mkdir build && cd build
@@ -128,7 +98,7 @@ jobs:
             cmake .. && make
             ../bin/main
           else
-            cmake .. -DCMAKE_GENERATOR_PLATFORM="${CMAKE_GEN_PLAT}" -DEIGEN3_INCLUDE_DIR="${EIGEN3_INCLUDE_DIR}"  -DBoost_INCLUDE_DIR="${Boost_INCLUDE_DIR}" -DCMAKE_PREFIX_PATH="C:\\projects\\vinecopulib-release;${WDM_CMAKE_DIR}" 
+            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}"
             cmake --build . --config Release
             "../bin/Release/main.exe"
           fi

@@ -16,8 +16,25 @@ To build the library, you'll need at minimum:
 
    - [a C++11-compatible compiler](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers) (tested with GCC 6.3.0 and Clang 3.5.0 on Linux and AppleClang 8.0.0 on OSX)
    - [CMake 3.2 (or later)](https://cmake.org/)
-   - [Boost 1.56 (or later)](http://www.boost.org/)
+   - [Boost 1.71 (or later)](http://www.boost.org/)
    - [Eigen 3.3 (or later)](http://eigen.tuxfamily.org/index.php?title=Main_Page)
+   - [wdm](https://github.com/tnagler/wdm)
+
+
+On Linux or OSX, you can install wdm with:
+
+```bash
+git clone https://github.com/tnagler/wdm.git
+cmake wdm -B wdm/build && sudo make install -C wdm/build
+```
+
+On Windows, you can install wdm with:
+
+```bash
+git clone https://github.com/tnagler/wdm.git
+cmake wdm -B wdm\build -G "Visual Studio 17 2022" -A x64
+cmake --build wdm\build --config Release --target install
+```
 
 Optionally, you'll need:
    - [Doxygen](http://www.stack.nl/~dimitri/doxygen/) and [graphviz](https://www.graphviz.org/) (to build the documentations)
@@ -90,10 +107,9 @@ the following sequence of commands can be used to perform compilation using the 
 ```
 md build
 cd build
-cmake ..
-cmake --build . --config Debug
-cmake --build . --config Release
-cmake --build . --config Release --target install
+cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
+cmake --build .
+cmake --build . --target install
 ```
 Instead of the `cmake --build` commands, the generated `vinecopulib.sln` file can be open in the Visual Studio GUI. Furthermore,
 as for linux systems, the third line can be replaced by
@@ -101,12 +117,10 @@ as for linux systems, the third line can be replaced by
 to compile vinecopulib in non-header-only mode.
 
 The following CMake flags (given with example values) will likely come handy:
+
 ```
--DBOOST_ROOT=c:\local\boost_1_63_0
--DEIGEN3_INCLUDE_DIR=c:\local\eigen-eigen-da9b4e14c255
--DCMAKE_INSTALL_PREFIX=c:\local\vinecopulib-install
--DCMAKE_GENERATOR_PLATFORM=x64
--DBOOST_DEBUG=1
+-G "Visual Studio 17 2022"
+-A x64
 ```
 
 @section include-lib How to include the library in other projects
