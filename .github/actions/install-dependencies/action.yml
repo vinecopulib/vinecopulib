@@ -12,7 +12,7 @@ inputs:
   boost:
     description: 'Whether to install Boost'
     required: false
-    default: "true"
+    default: 'true'
   boost_install_dir:
     description: 'The directory to install Boost to'
     required: false
@@ -24,7 +24,7 @@ inputs:
   eigen:
     description: 'Whether to install Eigen'
     required: false
-    default: "true"
+    default: 'true'
   eigen_install_dir:
     description: 'The directory to install Eigen to'
     required: false
@@ -36,7 +36,7 @@ inputs:
   wdm:
     description: 'Whether to install WDM'
     required: false
-    default: "true"
+    default: 'true'
   # wdm_install_dir:
   #   description: 'The directory to install WDM to'
   #   required: false
@@ -44,15 +44,15 @@ inputs:
   lcov:
     description: 'Whether to install lcov'
     required: false
-    default: "true"
+    default: 'true'
   R:
     description: 'Whether to install R'
     required: false
-    default: "false"
+    default: 'false'
   update_compilers_ubuntu:
     description: 'Whether to update the compilers on Ubuntu'
     required: false
-    default: "true"
+    default: 'true'
 outputs:
   BOOST_ROOT:
     description: 'The path to the boost installation, e.g. to be used in CMake'
