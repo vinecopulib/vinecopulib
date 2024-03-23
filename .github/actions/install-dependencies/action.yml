@@ -68,7 +68,7 @@ runs:
   steps:
 
     - name: Update compilers on ubuntu
-      if: inputs.update_compilers_ubuntu == "true"
+      if: inputs.update_compilers_ubuntu == 'true'
       run: |
           if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
           sudo apt-get update
@@ -78,7 +78,7 @@ runs:
       shell: bash
 
     - name: Install wdm
-      if: inputs.wdm == "true"
+      if: inputs.wdm == 'true'
       run: |
           git clone https://github.com/tnagler/wdm.git
           cd wdm && mkdir release && cd release
@@ -95,7 +95,7 @@ runs:
       shell: bash
 
     - name: Install boost ${{inputs.boost_version}}
-      if: inputs.boost == "true"
+      if: inputs.boost == 'true'
       id: boost
       uses: MarkusJx/install-boost@v2.3.1
       with:
@@ -103,7 +103,7 @@ runs:
           boost_install_dir: ${{ inputs.boost_install_dir }}
 
     - name: Install Eigen ${{inputs.eigen_version}}
-      if: inputs.eigen == "true"
+      if: inputs.eigen == 'true'
       run: |
           if [ "${{ inputs.os }}" != "windows-latest" ]; then
             git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{runner.temp}}/eigen
@@ -116,7 +116,7 @@ runs:
       shell: bash
 
     - name: Install lcov
-      if: inputs.lcov == "true"
+      if: inputs.lcov == 'true'
       run: |
           if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
               sudo apt-get install --no-install-recommends -y lcov
@@ -124,11 +124,11 @@ runs:
       shell: bash
 
     - name: Install R
-      if: inputs.R == "true"
+      if: inputs.R == 'true'
       uses: r-lib/actions/setup-r@v2
 
     - name: Install VineCopula
-      if: inputs.R == "true"
+      if: inputs.R == 'true'
       run: |
         if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
             sudo apt-get install --no-install-recommends -y libgsl0-dev
