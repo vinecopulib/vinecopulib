@@ -8,7 +8,9 @@ include(cmake/findR.cmake                 REQUIRED)
 find_package(Boost 1.56                   REQUIRED)
 find_package(Threads                      REQUIRED)
 find_package(wdm                          REQUIRED)
+message(STATUS "wdm_INCLUDE_DIRS: ${wdm_INCLUDE_DIRS}")
 set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
+message(STATUS "wdm_INCLUDE_DIRS: ${wdm_INCLUDE_DIRS}")
 
 include(FetchContent)
 FetchContent_Declare(
