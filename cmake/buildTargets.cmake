@@ -14,6 +14,7 @@ else()
 endif()
 
 if(BUILD_TESTING)
+
     set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
     set(unit_tests
             test_all
