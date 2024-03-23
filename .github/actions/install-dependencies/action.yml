@@ -82,6 +82,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: tnagler/wdm
+        path: wdm
         ref: main
 
     - name: Install WDM
@@ -91,7 +92,7 @@ runs:
             make install -C wdm/build
           elif [ "${{ inputs.os }}" == "windows-latest" ]; then
             cmake wdm -G "Visual Studio 17 2022" -A ${{ inputs.platform }}
-            cmake --build . --config Release --target install
+            cmake --build wdm --config Release --target install
           fi
           rm -rf wdm
       shell: bash
