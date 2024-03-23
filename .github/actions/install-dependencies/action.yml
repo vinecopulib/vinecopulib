@@ -87,11 +87,12 @@ runs:
           git clone https://github.com/tnagler/wdm.git
           cd wdm && mkdir release && cd release
           if [ "${{ inputs.os }}" != "windows-latest" ]; then
-            cmake ..
+            cmake .. -DCMAKE_BUILD_TYPE=Release
             sudo make install
           elif [ "${{ inputs.os }}" == "windows-latest" ]; then
-            cmake .. -G "Visual Studio 17 2022"
-            cmake --build . --config Release --target install
+            cmake .. -G "Visual Studio 17 2022" \
+            -DCMAKE_BUILD_TYPE=Release
+            cmake --build . --target install
           fi
           cd ../.. && rm -rf wdm
       shell: bash

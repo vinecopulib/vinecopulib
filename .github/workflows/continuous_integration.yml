@@ -62,8 +62,9 @@ jobs:
               make
             fi
           else
-            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}"
-            cmake --build . --config Debug
+            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
+            -DCMAKE_BUILD_TYPE=Debug
+            cmake --build .
           fi
         shell: bash
       - name: Code coverage
@@ -80,10 +81,11 @@ jobs:
             make && sudo make install
             bin/test_all
           else
-            cmake .. -DVINECOPULIB_SHARED_LIB=ON -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}"
-            cmake --build . --config Release
+            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
+            -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON
+            cmake --build .
             "bin/Release/test_all.exe"
-            cmake --build . --config Release --target install
+            cmake --build . --target install
           fi
         shell: bash
       - name: Test the install
