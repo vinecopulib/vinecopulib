@@ -895,6 +895,7 @@ Vinecop::cdf(const Eigen::MatrixXd& u,
   return vine_distribution / static_cast<double>(N);
 }
 
+
 //! @brief Simulates from a vine copula model, see `inverse_rosenblatt()`.
 //!
 //! @details Simulated data is always a continous \f$ n \times d \f$ matrix.
@@ -1072,7 +1073,7 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
     throw std::runtime_error("rosenblatt() only works for continuous models.");
   }
   check_data(u);
-  size_t d = u.cols();
+  size_t d = d_;
   size_t n = u.rows();
 
   // info about the vine structure
