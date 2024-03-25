@@ -12,7 +12,7 @@ inputs:
   boost:
     description: 'Whether to install Boost'
     required: false
-    default: true
+    default: 'true'
   boost_install_dir:
     description: 'The directory to install Boost to'
     required: false
@@ -24,7 +24,7 @@ inputs:
   eigen:
     description: 'Whether to install Eigen'
     required: false
-    default: true
+    default: 'true'
   eigen_install_dir:
     description: 'The directory to install Eigen to'
     required: false
@@ -36,7 +36,7 @@ inputs:
   wdm:
     description: 'Whether to install WDM'
     required: false
-    default: true
+    default: 'true'
   # wdm_install_dir:
   #   description: 'The directory to install WDM to'
   #   required: false
@@ -44,15 +44,15 @@ inputs:
   lcov:
     description: 'Whether to install lcov'
     required: false
-    default: true
+    default: 'true'
   R:
     description: 'Whether to install R'
     required: false
-    default: false
+    default: 'false'
   update_compilers_ubuntu:
     description: 'Whether to update the compilers on Ubuntu'
     required: false
-    default: true
+    default: 'true'
 outputs:
   BOOST_ROOT:
     description: 'The path to the boost installation, e.g. to be used in CMake'
@@ -68,7 +68,7 @@ runs:
   steps:
 
     - name: Update compilers on ubuntu
-      if: ${{ inputs.update_compilers_ubuntu }}
+      if: inputs.update_compilers_ubuntu == 'true'
       run: |
           if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
           sudo apt-get update
@@ -77,16 +77,29 @@ runs:
           fi
       shell: bash
 
-    # - name: Checkout WDM
-    #   if: ${{ inputs.wdm }}
-    #   uses: actions/checkout@v4
-    #   with:
-    #     repository: tnagler/wdm
-    #     path: wdm
-    #     ref: main
+    - name: Install boost ${{inputs.boost_version}}
+      if: inputs.boost == 'true'
+      id: boost
+      uses: MarkusJx/install-boost@v2.3.1
+      with:
+          boost_version: ${{inputs.boost_version}}
+          boost_install_dir: ${{ inputs.boost_install_dir }}
+
+    - name: Install Eigen ${{inputs.eigen_version}}
+      if: inputs.eigen == 'true'
+      run: |
+          if [ "${{ inputs.os }}" != "windows-latest" ]; then
+            git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{runner.temp}}/eigen
+            cmake ${{runner.temp}}/eigen -B ${{runner.temp}}/eigen/build -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
+            make install -C ${{runner.temp}}/eigen/build
+          else
+            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ inputs.platform }}
+            choco install eigen --version="${{inputs.eigen_version}}"
+          fi
+      shell: bash
 
     - name: Install wdm
-      if: ${{ inputs.wdm }}
+      if: inputs.wdm == 'true'
       run: |
           git clone https://github.com/tnagler/wdm.git
           cd wdm && mkdir release && cd release
@@ -102,29 +115,8 @@ runs:
           cd ../.. && rm -rf wdm
       shell: bash
 
-    - name: Install boost ${{inputs.boost_version}}
-      if: ${{ inputs.boost }}
-      id: boost
-      uses: MarkusJx/install-boost@v2.3.1
-      with:
-          boost_version: ${{inputs.boost_version}}
-          boost_install_dir: ${{ inputs.boost_install_dir }}
-
-    - name: Install Eigen ${{inputs.eigen_version}}
-      if: ${{ inputs.eigen }}
-      run: |
-          if [ "${{ inputs.os }}" != "windows-latest" ]; then
-            git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{runner.temp}}/eigen
-            cmake ${{runner.temp}}/eigen -B ${{runner.temp}}/eigen/build -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
-            make install -C ${{runner.temp}}/eigen/build
-          else
-            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ inputs.platform }}
-            choco install eigen --version="${{inputs.eigen_version}}"
-          fi
-      shell: bash
-
     - name: Install lcov
-      if: ${{ inputs.lcov }}
+      if: inputs.lcov == 'true'
       run: |
           if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
               sudo apt-get install --no-install-recommends -y lcov
@@ -132,10 +124,11 @@ runs:
       shell: bash
 
     - name: Install R
-      if: ${{ inputs.R }}
+      if: inputs.R == 'true'
       uses: r-lib/actions/setup-r@v2
+
     - name: Install VineCopula
-      if: ${{ inputs.R }}
+      if: inputs.R == 'true'
       run: |
         if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
             sudo apt-get install --no-install-recommends -y libgsl0-dev
