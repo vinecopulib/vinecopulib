@@ -897,13 +897,13 @@ VinecopSelector::min_spanning_tree(VineTree& graph)
     size_t d = num_vertices(graph);
     std::vector<size_t> targets(d);
     prim_minimum_spanning_tree(graph, targets.data());
-    for (size_t v1 = 0; v1 < d; ++v1) {
-      for (size_t v2 = 0; v2 < v1; ++v2) {
-        if ((v2 != targets[v1]) && (v1 != targets[v2])) {
-          boost::remove_edge(v1, v2, graph);
-        }
-      }
-    }
+    remove_edge_if(
+      [&](const EdgeIterator& e) {
+        auto source = boost::source(e, graph);
+        auto target = boost::target(e, graph);
+        return targets[source] != target && targets[target] != source;
+      },
+      graph);
   } else {
     std::vector<EdgeIterator> spanning_tree;
     kruskal_minimum_spanning_tree(graph, std::back_inserter(spanning_tree));
