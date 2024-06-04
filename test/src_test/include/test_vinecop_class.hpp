@@ -463,6 +463,7 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
   // check whether the same structure appears if we only allow for
   // independence (pair-copula estimates differ otherwise)
   FitControlsVinecop controls({ BicopFamily::indep });
+  EXPECT_ANY_THROW(controls.set_mst_algorithm("foobar"));
   controls.set_mst_algorithm("kruskal");
 
   // select structure and get matrix
