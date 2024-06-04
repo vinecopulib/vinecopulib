@@ -170,7 +170,6 @@ protected:
   double loglik_;
   double threshold_;
   double psi0_; // initial prior probability for mbicv
-  std::string mst_algorithm_;
 
   double get_next_threshold(std::vector<double>& thresholded_crits);
 

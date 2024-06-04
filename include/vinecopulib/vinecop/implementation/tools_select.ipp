@@ -105,7 +105,6 @@ inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
   , trees_(std::vector<VineTree>(1))
   , threshold_(controls.get_threshold())
   , psi0_(controls.get_psi0())
-  , mst_algorithm_(controls.get_mst_algorithm())
 {
   vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
 }
@@ -893,7 +892,7 @@ VinecopSelector::compute_fit_id(const EdgeProperties& e)
 inline void
 VinecopSelector::min_spanning_tree(VineTree& graph)
 {
-  if (mst_algorithm_ == "prim") {
+  if (controls_.get_mst_algorithm() == "prim") {
     size_t d = num_vertices(graph);
     std::vector<size_t> targets(d);
     prim_minimum_spanning_tree(graph, targets.data());
