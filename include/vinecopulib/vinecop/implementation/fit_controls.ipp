@@ -315,6 +315,7 @@ FitControlsVinecop::str() const
                << std::endl;
   controls_str << "Number of threads: "
                << (get_num_threads() == 0 ? 1 : get_num_threads()) << std::endl;
+  controls_str << "MST algorithm: " << get_mst_algorithm() << std::endl;
   return controls_str.str().c_str();
 }
 
