@@ -7,6 +7,7 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <cmath>
 #include <iostream>
@@ -104,6 +105,7 @@ inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
   , trees_(std::vector<VineTree>(1))
   , threshold_(controls.get_threshold())
   , psi0_(controls.get_psi0())
+  , mst_algorithm_(controls.get_mst_algorithm())
 {
   vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
 }
@@ -891,15 +893,34 @@ VinecopSelector::compute_fit_id(const EdgeProperties& e)
 inline void
 VinecopSelector::min_spanning_tree(VineTree& graph)
 {
-  size_t d = num_vertices(graph);
-  std::vector<size_t> targets(d);
-  prim_minimum_spanning_tree(graph, targets.data());
-  for (size_t v1 = 0; v1 < d; ++v1) {
-    for (size_t v2 = 0; v2 < v1; ++v2) {
-      if ((v2 != targets[v1]) && (v1 != targets[v2])) {
-        boost::remove_edge(v1, v2, graph);
+  if (mst_algorithm_ == "prim") {
+    size_t d = num_vertices(graph);
+    std::vector<size_t> targets(d);
+    prim_minimum_spanning_tree(graph, targets.data());
+    for (size_t v1 = 0; v1 < d; ++v1) {
+      for (size_t v2 = 0; v2 < v1; ++v2) {
+        if ((v2 != targets[v1]) && (v1 != targets[v2])) {
+          boost::remove_edge(v1, v2, graph);
+        }
       }
     }
+  } else {
+    std::vector<EdgeIterator> spanning_tree;
+    kruskal_minimum_spanning_tree(graph, std::back_inserter(spanning_tree));
+    // Using a hashmap to make the lookup faster
+    // boost::unordered set is used instead of std::set
+    // because std::pair doesn't have a default hash function
+    boost::unordered_set<std::pair<size_t, size_t>> edges_set;
+    for (auto e : spanning_tree) {
+      edges_set.insert({ boost::source(e, graph), boost::target(e, graph) });
+    }
+    remove_edge_if(
+      [&](const EdgeIterator& e) {
+        auto source = boost::source(e, graph);
+        auto target = boost::target(e, graph);
+        return edges_set.find({ source, target }) == edges_set.end();
+      },
+      graph);
   }
 }
 

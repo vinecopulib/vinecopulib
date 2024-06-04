@@ -443,7 +443,7 @@ get_pairs_unequal(
   return pairs_unequal;
 }
 
-TEST_F(VinecopTest, select_finds_right_structure)
+TEST_F(VinecopTest, select_finds_right_structure_prim)
 {
   // check whether the same structure appears if we only allow for
   // independence (pair-copula estimates differ otherwise)
@@ -451,6 +451,23 @@ TEST_F(VinecopTest, select_finds_right_structure)
   // select structure and get matrix
   Vinecop fit(7);
   fit.select(u, FitControlsVinecop({ BicopFamily::indep }));
+  auto vcl_matrix = fit.get_matrix();
+
+  // check if the same conditioned sets appear for each tree
+  size_t pairs_unequal = get_pairs_unequal(vc_matrix, vcl_matrix, 6);
+  EXPECT_EQ(pairs_unequal, 0);
+}
+
+TEST_F(VinecopTest, select_finds_right_structure_kruskal)
+{
+  // check whether the same structure appears if we only allow for
+  // independence (pair-copula estimates differ otherwise)
+  FitControlsVinecop controls({ BicopFamily::indep });
+  controls.set_mst_algorithm("kruskal");
+
+  // select structure and get matrix
+  Vinecop fit(7);
+  fit.select(u, controls);
   auto vcl_matrix = fit.get_matrix();
 
   // check if the same conditioned sets appear for each tree

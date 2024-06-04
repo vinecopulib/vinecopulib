@@ -42,7 +42,8 @@ public:
     bool select_trunc_lvl = false,
     bool select_threshold = false,
     bool show_trace = false,
-    size_t num_threads = 1);
+    size_t num_threads = 1,
+    std::string mst_algorithm = "prim");
 
   explicit FitControlsVinecop(
     const FitControlsBicop& controls,
@@ -52,7 +53,8 @@ public:
     bool select_trunc_lvl = false,
     bool select_threshold = false,
     bool show_trace = false,
-    size_t num_threads = 1);
+    size_t num_threads = 1,
+    std::string mst_algorithm = "prim");
 
   // Getters
   DEPRECATED size_t get_truncation_level() const;
@@ -73,6 +75,8 @@ public:
 
   FitControlsBicop get_fit_controls_bicop() const;
 
+  std::string get_mst_algorithm() const;
+
   // Setters
   DEPRECATED void set_truncation_level(size_t trunc_lvl);
   void set_trunc_lvl(size_t trunc_lvl);
@@ -90,6 +94,8 @@ public:
 
   void set_fit_controls_bicop(FitControlsBicop controls);
 
+  void set_mst_algorithm(std::string mst_algorithm);
+
   // Misc
   std::string str() const;
 
@@ -100,6 +106,7 @@ private:
   bool show_trace_;
   bool select_trunc_lvl_;
   bool select_threshold_;
+  std::string mst_algorithm_;
 
   void check_tree_criterion(std::string tree_criterion);
 
