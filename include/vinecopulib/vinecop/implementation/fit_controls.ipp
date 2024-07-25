@@ -53,6 +53,8 @@ inline FitControlsVinecop::FitControlsVinecop()
 //! @param num_threads Number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number
 //!     of concurrent threads supported by the implementation.
+//! @param mst_algorithm The algorithm for building the maximum spanning
+//!     tree ("prim" or "kruskal") during the tree-wise structure selection.
 inline FitControlsVinecop::FitControlsVinecop(
   std::vector<BicopFamily> family_set,
   std::string parametric_method,
@@ -68,7 +70,8 @@ inline FitControlsVinecop::FitControlsVinecop(
   bool select_trunc_lvl,
   bool select_threshold,
   bool show_trace,
-  size_t num_threads)
+  size_t num_threads,
+  std::string mst_algorithm)
   : FitControlsBicop(family_set,
                      parametric_method,
                      nonparametric_method,
@@ -85,6 +88,7 @@ inline FitControlsVinecop::FitControlsVinecop(
   set_select_threshold(select_threshold);
   set_show_trace(show_trace);
   set_num_threads(num_threads);
+  set_mst_algorithm(mst_algorithm);
 }
 
 //! @brief Instantiates custom controls for fitting vine copula models.
@@ -101,6 +105,8 @@ inline FitControlsVinecop::FitControlsVinecop(
 //! @param num_threads Number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number returned
 //!     by `std::thread::hardware_concurrency()``.
+//! @param mst_algorithm The algorithm for building the maximum spanning
+//!     tree ("prim" or "kruskal") during the tree-wise structure selection.
 inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
                                               size_t trunc_lvl,
                                               std::string tree_criterion,
@@ -108,7 +114,8 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
                                               bool select_trunc_lvl,
                                               bool select_threshold,
                                               bool show_trace,
-                                              size_t num_threads)
+                                              size_t num_threads,
+                                              std::string mst_algorithm)
   : FitControlsBicop(controls)
 {
   set_trunc_lvl(trunc_lvl);
@@ -118,6 +125,7 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
   set_select_threshold(select_threshold);
   set_show_trace(show_trace);
   set_num_threads(num_threads);
+  set_mst_algorithm(mst_algorithm);
 }
 
 //! @name Sanity checks
@@ -223,6 +231,13 @@ FitControlsVinecop::get_select_threshold() const
   return select_threshold_;
 }
 
+//! returns the maximum spanning tree algorithm.
+inline std::string
+FitControlsVinecop::get_mst_algorithm() const
+{
+  return mst_algorithm_;
+}
+
 //! Sets whether to select the threshold automatically.
 inline void
 FitControlsVinecop::set_select_threshold(bool select_threshold)
@@ -260,6 +275,17 @@ FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)
   set_selection_criterion(get_selection_criterion());
   set_preselect_families(controls.get_preselect_families());
 }
+
+//! Sets the maximum spanning tree algorithm.
+inline void
+FitControlsVinecop::set_mst_algorithm(std::string mst_algorithm)
+{
+  if (!tools_stl::is_member(mst_algorithm, { "prim", "kruskal" })) {
+    throw std::runtime_error("mst_algorithm must be one of 'prim' or 'kruskal'");
+  }
+  mst_algorithm_ = mst_algorithm;
+}
+
 //! @}
 
 //! @brief Summarizes the controls into a string (can be used for printing).
@@ -289,6 +315,7 @@ FitControlsVinecop::str() const
                << std::endl;
   controls_str << "Number of threads: "
                << (get_num_threads() == 0 ? 1 : get_num_threads()) << std::endl;
+  controls_str << "MST algorithm: " << get_mst_algorithm() << std::endl;
   return controls_str.str().c_str();
 }
 
