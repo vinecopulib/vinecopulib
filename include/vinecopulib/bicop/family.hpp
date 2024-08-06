@@ -89,7 +89,7 @@ const std::vector<BicopFamily> archimedean = {
 };
 
 //! All Extreme-value copulas
-const std::vector<BicopFamily> ev = {
+const std::vector<BicopFamily> extreme_value = {
   BicopFamily::tawn, BicopFamily::gumbel
 };
 

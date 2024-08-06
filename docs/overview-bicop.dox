@@ -29,6 +29,7 @@ your source file.
 |               | BB6                   | bb6     |
 |               | BB7                   | bb7     |
 |               | BB8                   | bb8    |
+| Extreme-Value | Tawn                  | tawn     |
 | Nonparametric | Transformation kernel | tll  |
 
 Note that several convenience vectors of families are included in the
@@ -40,8 +41,12 @@ sub-namespace `bicop_families`:
 (`gaussian`, `clayton`, `gumbel`, `frank`, and `joe`)
 - `two_par` contains the parametric families with two parameters
 (`student`, `bb1`, `bb6`, `bb7`, and `bb8`)
+(`gaussian`, `clayton`, `gumbel`, `frank`, and `joe`)
+- `three_par` contains the parametric families with three parameters
+(`tawn`)
 - `elliptical` contains the elliptical families
 - `archimedean` contains the archimedean families
+- `extreme_value` contains the extreme-value families (`gumbel`, `tawn`)
 - `bb` contains the BB families
 - `itau` families for which estimation by Kendall's tau inversion is available
 (`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
