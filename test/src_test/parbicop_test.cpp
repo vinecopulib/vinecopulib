@@ -43,6 +43,9 @@ ParBicopTest::set_family(BicopFamily family, int rotation)
     case BicopFamily::bb8:
       family_ = 10;
       break;
+    case BicopFamily::tawn:
+      family_ = 104;
+      break;
     default:;
   }
 
@@ -64,6 +67,11 @@ ParBicopTest::set_family(BicopFamily family, int rotation)
 void
 ParBicopTest::set_parameters(Eigen::VectorXd parameters)
 {
+  if (bicop_.get_family() == BicopFamily::tawn) {
+      par_ = parameters(2);
+      par2_ = parameters(0);
+      return;
+  }
   if (parameters.size() > 0) {
     par_ = parameters(0);
   } else {

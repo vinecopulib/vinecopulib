@@ -15,8 +15,8 @@ inline TawnBicop::TawnBicop()
   parameters_lower_bounds_ = Eigen::VectorXd(3);
   parameters_upper_bounds_ = Eigen::VectorXd(3);
   parameters_ << 0.5, 0.5, 6;
-  parameters_lower_bounds_ << 1e-10, 1e-10, 1 + 1e-10;
-  parameters_upper_bounds_ << 1 - 1e-10, 1 - 1e-10, 60;
+  parameters_lower_bounds_ << 0, 0, 1;
+  parameters_upper_bounds_ << 1, 1, 60;
 }
 
 inline double
