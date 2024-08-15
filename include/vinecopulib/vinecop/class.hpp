@@ -20,8 +20,8 @@ class VinecopSelector;
 
 //! @brief A class for vine copula models.
 //!
-//! A vine copula model is characterized by its structure (see
-//! `RVineStructure` objects) and the pair-copulas.
+//! @details A vine copula model is characterized by its structure (see
+//! `RVineStructure` objects) and the pair-copulas (see `Bicop` objects).
 class Vinecop
 {
 public:
