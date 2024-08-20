@@ -14,7 +14,7 @@ inline TawnBicop::TawnBicop()
   parameters_ = Eigen::VectorXd(3);
   parameters_lower_bounds_ = Eigen::VectorXd(3);
   parameters_upper_bounds_ = Eigen::VectorXd(3);
-  parameters_ << 0.5, 0.5, 6;
+  parameters_ << 1, 1, 1; // independence copula, gumbel for parameters_(2) != 1
   parameters_lower_bounds_ << 0, 0, 1;
   parameters_upper_bounds_ << 1, 1, 60;
 }
