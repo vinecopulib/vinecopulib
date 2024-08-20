@@ -153,8 +153,9 @@ TEST(discrete, vinecop)
   Vinecop vc(str, pair_copulas, { "d", "c", "d", "d", "c" });
 
   // simulate data with continuous and discrete variables
-  auto utmp = vc.simulate(500, true, 1, { 1 });
-  Eigen::MatrixXd u(utmp.rows(), 5 + 3); // 3 discrete vars
+  size_t n = 500;
+  auto utmp = vc.simulate(n, true, 1, { 1 });
+  Eigen::MatrixXd u(n, 5 + 3); // 3 discrete vars
   u.leftCols(5) = utmp;
 
   u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
@@ -184,7 +185,7 @@ TEST(discrete, vinecop)
   }
 
   // test other input format
-  u = Eigen::MatrixXd(utmp.rows(), 10);
+  u = Eigen::MatrixXd(n, 10);
   u.leftCols(5) = utmp;
   u.rightCols(5) = utmp;
   u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
@@ -209,7 +210,7 @@ TEST(discrete, vinecop)
   for (int i = 0; i < 5; i++) {
     auto w = tools_stats::to_pseudo_obs(u.col(i));
     // close to KS test with FWER ~ 0.001
-    EXPECT_LE(std::sqrt(u.rows()) * (u.col(i) - w).cwiseAbs().maxCoeff(), 3.5);
+    EXPECT_LE(std::sqrt(n) * (u.col(i) - w).cwiseAbs().maxCoeff(), 3.5);
     // Kendall's tau test with FWER ~ 0.001
     for (int j = i + 1; j < 5; j++) {
       EXPECT_GE(
@@ -219,6 +220,9 @@ TEST(discrete, vinecop)
         0.0001);
     }
   }
+  
+  // only check that it works
+  vc.inverse_rosenblatt(u.topRows(10));
 }
 
 TEST(zero_inflated, vinecop)

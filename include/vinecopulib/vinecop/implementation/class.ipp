@@ -942,12 +942,7 @@ Vinecop::simulate(const size_t n,
                   const std::vector<int>& seeds) const
 {
   auto u = tools_stats::simulate_uniform(n, d_, qrng, seeds);
-  // inverse_rosenblatt() only works for continous models
-  auto actual_types = var_types_;
-  set_continuous_var_types();
-  u = inverse_rosenblatt(u, num_threads);
-  set_var_types_internal(actual_types);
-  return u;
+  return inverse_rosenblatt(u, num_threads);;
 }
 
 //! @brief Evaluates the log-likelihood.
@@ -1259,11 +1254,11 @@ inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const size_t num_threads) const
 {
+  auto var_types = get_var_types();
+  set_continuous_var_types();
   check_data(u);
+
   size_t n = u.rows();
-  if (n < 1) {
-    throw std::runtime_error("n must be at least one");
-  }
   size_t d = d_;
 
   Eigen::MatrixXd U_vine = u.leftCols(d); // output matrix
@@ -1341,6 +1336,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
     pool.join();
   }
 
+  set_var_types_internal(var_types);
   return U_vine;
 }
 
@@ -1364,6 +1360,10 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
       msg << get_n_discrete() << " discrete variables)." << std::endl;
     }
     throw std::runtime_error(msg.str());
+  }
+
+  if (data.rows() < 1) {
+    throw std::runtime_error("data must have at least one row"); 
   }
 }
 
