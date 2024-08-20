@@ -1069,7 +1069,7 @@ Vinecop::get_npars() const
 //! @brief Evaluates the Rosenblatt transform for a vine copula model.
 //!
 //! @details The Rosenblatt transform converts data from this model 
-//! into independent uniform variates. Only works for continuous data.
+//! into independent uniform variates.
 //!
 //! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random 
 //! vector \f$ V = (V_1,\ldots,V_d) ~ F \f$ is defined as
@@ -1087,6 +1087,14 @@ Vinecop::get_npars() const
 //! More generally, `Vinecop::rosenblatt()` returns the variables
 //! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
 //! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
+//!
+//! If some variables have atoms, Brockwell (10.1016/j.spl.2007.02.008) proposed a
+//! simple randomization scheme to ensure that output is still independent uniform
+//! if the model is correct. This is used by default. If you are interested in the conditional 
+//! probabilities
+//! \f[F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
+//! set `randomize_discrete = FALSE`.
+//!
 //! @brief Gets
 //! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
 //!
@@ -1094,6 +1102,12 @@ Vinecop::get_npars() const
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+//! @param randomize_discrete Whether to randomize the transform for discrete 
+//!   variables; see Details.
+//! @param seeds Seeds to scramble the quasi-random numbers; if empty (default),
+//!   the random number quasi-generator is seeded randomly. Only relevant if
+//!   there are discrete variables and `randomize_discrete = TRUE`.
+//! @param 
 //! @return An \f$ n \times d \f$ matrix of independent uniform variates.
 inline Eigen::MatrixXd
 Vinecop::rosenblatt(Eigen::MatrixXd u, const size_t num_threads,

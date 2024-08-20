@@ -132,7 +132,7 @@ public:
 
   Eigen::MatrixXd rosenblatt(Eigen::MatrixXd u,
                              const size_t num_threads = 1,
-                             bool randomize_discrete = false,
+                             bool randomize_discrete = true,
                              std::vector<int> seeds = {}) const;
   Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& u,
                                      const size_t num_threads = 1) const;
