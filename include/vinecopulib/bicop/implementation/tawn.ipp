@@ -63,6 +63,15 @@ TawnBicop::pickands_derivative2(const double& t)
           std::pow(temp, 1 / theta - 1) * (theta - 1) * temp3;
 }
 
+inline Eigen::VectorXd
+TawnBicop::get_start_parameters(const double)
+{
+  Eigen::MatrixXd lb = this->get_parameters_lower_bounds();
+  Eigen::VectorXd parameters = lb + Eigen::VectorXd::Constant(3, 0.5);
+  return parameters;
+}
+
+
 inline Eigen::MatrixXd
 TawnBicop::tau_to_parameters(const double& tau)
 {

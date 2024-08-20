@@ -86,14 +86,6 @@ ExtremeValueBicop::hinv2_raw(const Eigen::MatrixXd& u)
   return hinv;
 }
 
-inline Eigen::VectorXd
-ExtremeValueBicop::get_start_parameters(const double)
-{
-  Eigen::MatrixXd lb = this->get_parameters_lower_bounds();
-  Eigen::VectorXd parameters = lb + Eigen::VectorXd::Constant(3, 0.5);
-  return parameters;
-}
-
 inline double
 ExtremeValueBicop::parameters_to_tau(const Eigen::MatrixXd& par)
 {
