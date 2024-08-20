@@ -41,7 +41,6 @@ sub-namespace `bicop_families`:
 (`gaussian`, `clayton`, `gumbel`, `frank`, and `joe`)
 - `two_par` contains the parametric families with two parameters
 (`student`, `bb1`, `bb6`, `bb7`, and `bb8`)
-(`gaussian`, `clayton`, `gumbel`, `frank`, and `joe`)
 - `three_par` contains the parametric families with three parameters
 (`tawn`)
 - `elliptical` contains the elliptical families
