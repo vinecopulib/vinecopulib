@@ -22,8 +22,8 @@ inline Vinecop::Vinecop(const size_t d)
 {}
 
 //! @brief Instantiates an arbitrary vine copula model.
-//! @param structure An RVineStructure object specifying the vine structure.
-//! @param pair_copulas Bicop objects specifying the pair-copulas, namely
+//! @param structure An `RVineStructure` object specifying the vine structure.
+//! @param pair_copulas `Bicop` objects specifying the pair-copulas, namely
 //!     a nested list such that `pc_store[t][e]` contains a `Bicop`
 //!     object for the pair copula corresponding to tree `t` and edge `e`.
 //! @param var_types Strings specifying the types of the variables,
@@ -49,7 +49,7 @@ inline Vinecop::Vinecop(const RVineStructure& structure,
 
 //! @brief Instantiates an arbitrary vine copula model.
 //! @param matrix An R-vine matrix specifying the vine structure.
-//! @param pair_copulas Bicop objects specifying the pair-copulas, namely
+//! @param pair_copulas `Bicop` objects specifying the pair-copulas, namely
 //!     a nested list such that `pc_store[t][e]` contains a `Bicop`
 //!     object for the pair copula corresponding to tree `t` and edge `e`.
 //! @param var_types Strings specifying the types of the variables,
@@ -64,8 +64,8 @@ inline Vinecop::Vinecop(
 
 //! @brief Instantiates from data.
 //!
-//! Equivalent to creating a default `Vinecop()` and then selecting the model
-//! using `select()`.
+//! @details Equivalent to creating a default `Vinecop()` and then
+//! selecting the model using `select()`.
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
 //! @param structure An RVineStructure object specifying the vine structure.
@@ -102,8 +102,8 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 
 //! @brief Instantiates from data.
 //!
-//! Equivalent to creating a default `Vinecop()` and then selecting the model
-//! using `select()`.
+//! @details Equivalent to creating a default `Vinecop()` and 
+//! then selecting the model using `select()`.
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
 //! @param matrix Either an empty matrix (default) or an R-vine structure
@@ -163,7 +163,7 @@ inline Vinecop::Vinecop(const nlohmann::json& input, const bool check)
 
 //! @brief Instantiates from a JSON file.
 //!
-//! The input file contains 2 attributes : `"structure"` for the vine
+//! @details The input file contains 2 attributes : `"structure"` for the vine
 //! structure, which itself contains attributes `"array"` for the structure
 //! triangular array and `"order"` for the order vector, and `"pair copulas"`.
 //! `"pair copulas"` contains a list of attributes for the trees
@@ -181,7 +181,8 @@ inline Vinecop::Vinecop(const std::string& filename, const bool check)
 
 //! @brief Converts the copula into a nlohmann::json object.
 //!
-//! The `nlohmann::json` object contains two nodes : `"structure"` for the vine
+//! @details The `nlohmann::json` object contains two nodes : `"structure"` 
+//! for the vine
 //! structure, which itself contains nodes `"array"` for the structure
 //! triangular array and `"order"` for the order vector, and `"pair copulas"`.
 //! The former two encode the R-Vine structure and the latter is a list of
@@ -217,13 +218,13 @@ Vinecop::to_json() const
 
 //! @brief Writes the copula object into a JSON file.
 //!
-//! The output file contains 2 attributes : `"structure"` for the vine
+//! @details The output file contains 2 attributes : `"structure"` for the vine
 //! structure, which itself contains attributes `"array"` for the structure
 //! triangular array and `"order"` for the order vector, and `"pair copulas"`.
 //! `"pair copulas"` contains a list of attributes for the trees
 //! (`"tree1"`, `"tree2"`, etc), each containing
 //! a list of attributes for the edges (`"pc1"`, `"pc2"`, etc).
-//! See the corresponding method of `Bicop` objects for the encoding of
+//! See `Bicop::to_file()` objects for the encoding of
 //! pair-copulas.
 //!
 //! @param filename The name of the JSON file to write.
@@ -285,7 +286,7 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls to the algorithm (see FitControlsVinecop).
+//! @param controls The controls to the algorithm (see `FitControlsVinecop()`).
 inline void
 Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 {
@@ -326,7 +327,7 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls to the algorithm (see FitControlsVinecop).
+//! @param controls The controls to the algorithm (see `FitControlsVinecop()`).
 inline void
 Vinecop::select_all(const Eigen::MatrixXd& data,
                     const FitControlsVinecop& controls)
@@ -354,7 +355,7 @@ Vinecop::select_all(const Eigen::MatrixXd& data,
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls to the algorithm (see FitControlsVinecop).
+//! @param controls The controls to the algorithm (see `FitControlsVinecop()`).
 inline void
 Vinecop::select_families(const Eigen::MatrixXd& data,
                          const FitControlsVinecop& controls)
@@ -744,15 +745,26 @@ Vinecop::get_var_types() const
 
 //! @brief Evaluates the copula density.
 //!
-//! The copula density is defined as joint density divided by marginal
+//! @details The copula density is defined as joint density divided by marginal
 //! densities, irrespective of variable types.
+//!
+//! When at least one variable is discrete, two types of
+//! "observations" are required in `u`: the first \f$ n \; x \; d \f$ block
+//! contains realizations of \f$ F_{X_j}(X_j) \f$. 
+//! The second \f$ n \; x \; d \f$
+//! block contains realizations of \f$ F_{X_j}(X_j^-) \f$. The minus indicates a
+//! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
+//! \f$ F_{X_j}(X_j^-) = F_{X_j}(X_j - 1) \f$. For continuous variables the left
+//! limit and the cdf itself coincide. Respective columns can be omitted in the
+//! second block.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `select()`).
+//!   (see `Vinecop::select()`).
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+//! @return A vector of length `n` containing the copula density values.
 inline Eigen::VectorXd
 Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 {
@@ -851,12 +863,23 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
 //! @brief Evaluates the copula distribution.
 //!
-//! Because no closed-form expression is available, the distribution is
-//! estimated numerically using Monte Carlo integration.
+//! @details Because no closed-form expression is available, the distribution is
+//! estimated numerically using Monte Carlo integration. The function uses
+//! quasi-random numbers from the vine model to do so.
+//!
+//! When at least one variable is discrete, two types of
+//! "observations" are required in `u`: the first \f$ n \; x \; d \f$ block
+//! contains realizations of \f$ F_{X_j}(X_j) \f$. 
+//! The second \f$ n \; x \; d \f$
+//! block contains realizations of \f$ F_{X_j}(X_j^-) \f$. The minus indicates a
+//! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
+//! \f$ F_{X_j}(X_j^-) = F_{X_j}(X_j - 1) \f$. For continuous variables the left
+//! limit and the cdf itself coincide. Respective columns can be omitted in the
+//! second block.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `select()`).
+//!   (see `Vinecop::select()`).
 //! @param N Integer for the number of quasi-random numbers to draw
 //! to evaluate the distribution (default: 1e4).
 //! @param num_threads The number of threads to use for computations; if greater
@@ -864,6 +887,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 //!   `num_threads` batches.
 //! @param seeds Seeds to scramble the quasi-random numbers; if empty (default),
 //!   the random number quasi-generator is seeded randomly.
+//! @return A vector of length `n` containing the copula distribution values.
 inline Eigen::VectorXd
 Vinecop::cdf(const Eigen::MatrixXd& u,
              const size_t N,
@@ -899,6 +923,9 @@ Vinecop::cdf(const Eigen::MatrixXd& u,
 //! @brief Simulates from a vine copula model, see `inverse_rosenblatt()`.
 //!
 //! @details Simulated data is always a continous \f$ n \times d \f$ matrix.
+//! Sampling from a vine copula model is done by first generating 
+//! \f$ n \times d \f$ uniform random numbers and then applying the inverse
+//! Rosenblatt transformation.
 //!
 //! @param n Number of observations.
 //! @param qrng Set to true for quasi-random numbers.
@@ -925,16 +952,17 @@ Vinecop::simulate(const size_t n,
 
 //! @brief Evaluates the log-likelihood.
 //!
-//! The log-likelihood is defined as
+//! @details The log-likelihood is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, ..., U_{d, i}), \f]
 //! where \f$ c \f$ is the copula density, see `Vinecop::pdf()`.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `select()`).
+//!   (see `select()` or `Vinecop::pdf()`).
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+//! @return The log-likelihood as a double.
 inline double
 Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
@@ -947,19 +975,20 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 
 //! @brief Evaluates the Akaike information criterion (AIC).
 //!
-//! The AIC is defined as
+//! @details The AIC is defined as
 //! \f[ \mathrm{AIC} = -2\, \mathrm{loglik} + 2 p, \f]
-//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `loglik()`)
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `Vinecop::loglik()`)
 //! and \f$ p \f$ is the (effective) number of parameters of the model.
 //! The AIC is a consistent model selection criterion even
 //! for nonparametric models.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `select()`).
+//!   (see `select()` or `Vinecop::pdf()`).
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+//! @return The AIC as a double.
 inline double
 Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
@@ -968,19 +997,20 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 
 //! @brief Evaluates the Bayesian information criterion (BIC).
 //!
-//! The BIC is defined as
+//! @details The BIC is defined as
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  \log(n) p, \f]
-//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `loglik()`)
+//! where \f$ \mathrm{loglik} \f$ is the log-liklihood (see `Vinecop::loglik()`)
 //! and \f$ p \f$ is the (effective) number of parameters of the model.
 //! The BIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `select()`).
+//!   (see `Vinecop::select()` or `Vinecop::pdf()`).
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+//! @return The BIC as a double.
 inline double
 Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
@@ -992,7 +1022,7 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! @brief Evaluates the modified Bayesian information criterion for vines
 //! (mBICV).
 //!
-//! The mBICV is defined as
+//! @details The mBICV is defined as
 //! \f[ \mathrm{mBICV} = -2\, \mathrm{loglik} +  \log(n) p, - 2 * \sum_{t=1}^(d - 1) \{q_t \log(\psi_0^t) - (d - t - q_t) \log(1 -\psi_0^t)\},\f]
 //! where \f$ \mathrm{loglik} \f$ is the log-liklihood,
 //! \f$ p \f$ is the (effective) number of parameters of the model, \f$ t \f$
@@ -1004,11 +1034,12 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
-//!   (see `select()`).
+//!   (see `Vinecop::select()` or `Vinecop::pdf()`).
 //! @param psi0 Baseline prior probability of a non-independence copula.
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+//! @return The mBICV as a double.
 // clang-format on
 inline double
 Vinecop::mbicv(const Eigen::MatrixXd& u,
@@ -1037,16 +1068,9 @@ Vinecop::get_npars() const
 
 //! @brief Evaluates the Rosenblatt transform for a vine copula model.
 //!
-//! The Rosenblatt transform converts data from this model into independent
-//! uniform variates. Only works for continuous data.
+//! @details The Rosenblatt transform converts data from this model 
+//! into independent uniform variates. Only works for continuous data.
 //!
-//! @param u An \f$ n \times d \f$ or \f$ n \times 2d \f$ matrix of
-//!   evaluation points.
-//! @param num_threads The number of threads to use for computations; if greater
-//!   than 1, the function will be applied concurrently to `num_threads` batches
-//!   of `u`.
-//! 
-//! @details 
 //! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random 
 //! vector \f$ V = (V_1,\ldots,V_d) ~ F \f$ is defined as
 //! \f[ U_1= F(V_1), U_{2} = F(V_{2}|V_1), \ldots, U_d =F(V_d|V_1,\ldots,V_{d-1}), \f]
@@ -1054,7 +1078,7 @@ Vinecop::get_npars() const
 //! \f$ V_k \f$ given  \f$ V_1 \ldots, V_{k-1}, k = 2,\ldots,d \f$. The vector 
 //! \f$ U = (U_1, \dots, U_d) \f$ then contains independent standard uniform 
 //! variables. The inverse operation
-//! \f[V_1 = F^{-1}(U_1), V_{2} = F^{-1}(U_2|U_1), \ldots, V_d =F^{-1}(U_d|U_1,\ldots,U_{d-1}) \f]
+//! \f[ V_1 = F^{-1}(U_1), V_{2} = F^{-1}(U_2|U_1), \ldots, V_d =F^{-1}(U_d|U_1,\ldots,U_{d-1}) \f]
 //! can be used to simulate from a distribution. For any copula \f$ F \f$, if
 //! \f$ U\f$ is a vector of independent random variables, \f$ V = T^{-1}(U) \f$ 
 //! has distribution \f$ F \f$.
@@ -1063,9 +1087,14 @@ Vinecop::get_npars() const
 //! More generally, `Vinecop::rosenblatt()` returns the variables
 //! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
 //! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
-//! returns
+//! @brief Gets
 //! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
 //!
+//! @param u An \f$ n \times d \f$ matrix of evaluation points.
+//! @param num_threads The number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
+//! @return An \f$ n \times d \f$ matrix of independent uniform variates.
 inline Eigen::MatrixXd
 Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
@@ -1132,9 +1161,9 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 
 //! @brief Evaluates the inverse Rosenblatt transform.
 //!
-//! The inverse Rosenblatt transform can be used for simulation: the
+//! @details The inverse Rosenblatt transform can be used for simulation: the
 //! function applied to independent uniform variates resembles simulated
-//! data from the vine copula model.
+//! data from the vine copula model. Only works for continous models.
 //!
 //! If the problem is too large, it is split recursively into halves (w.r.t.
 //! \f$ n \f$, the number of observations).
@@ -1142,14 +1171,6 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! examplary configuration requiring less than 1 GB is \f$ n = 1000 \f$,
 //! \f$d = 200\f$.
 //!
-//! Only works for continous models.
-//!
-//! @param u An \f$ n \times d \f$ matrix of evaluation points.
-//! @param num_threads The number of threads to use for computations; if greater
-//!   than 1, the function will be applied concurrently to `num_threads` batches
-//!   of `u`.
-//! 
-//! @details 
 //! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random 
 //! vector \f$ V = (V_1,\ldots,V_d) ~ F \f$ is defined as
 //! \f[ U_1= F(V_1), U_{2} = F(V_{2}|V_1), \ldots, U_d =F(V_d|V_1,\ldots,V_{d-1}), \f]
@@ -1166,9 +1187,14 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! More generally, `Vinecop::rosenblatt()` returns the variables
 //! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
 //! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
-//! returns
+//! @brief Gets
 //! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
 //!
+//! @param u An \f$ n \times d \f$ matrix of evaluation points.
+//! @param num_threads The number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
+//! @return An \f$ n \times d \f$ matrix of evaluations.
 inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const size_t num_threads) const
@@ -1377,9 +1403,12 @@ Vinecop::check_indices(const size_t tree, const size_t edge) const
 
 //! @brief Truncates the vine copula model.
 //!
+//! @details While model for a `d` dimensional random vector contains at most 
+//! `d-1` nested trees, this function extracts a sub-model based 
+//! on a given truncation level.
+//!
 //! If the model is already truncated at a level less than `trunc_lvl`,
 //! the function does nothing.
-//!
 //! @param trunc_lvl The truncation level.
 inline void
 Vinecop::truncate(size_t trunc_lvl)
@@ -1391,7 +1420,8 @@ Vinecop::truncate(size_t trunc_lvl)
 }
 
 //! @brief Sets all variable types to continuous.
-//! The function can be const, because var_types_ is mutable.
+//! 
+//! @details The function can be const, because var_types_ is mutable.
 inline void
 Vinecop::set_continuous_var_types() const
 {
