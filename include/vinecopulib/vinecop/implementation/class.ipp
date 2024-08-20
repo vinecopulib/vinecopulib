@@ -1223,7 +1223,7 @@ Vinecop::rosenblatt(Eigen::MatrixXd u, const size_t num_threads,
 //!
 //! @details The inverse Rosenblatt transform can be used for simulation: the
 //! function applied to independent uniform variates resembles simulated
-//! data from the vine copula model. Only works for continous models.
+//! data from the vine copula model. 
 //!
 //! If the problem is too large, it is split recursively into halves (w.r.t.
 //! \f$ n \f$, the number of observations).
@@ -1259,10 +1259,6 @@ inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const size_t num_threads) const
 {
-  if (is_discrete()) {
-    throw std::runtime_error(
-      "inverse_rosenblatt() only works for continuous models.");
-  }
   check_data(u);
   size_t n = u.rows();
   if (n < 1) {
