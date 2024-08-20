@@ -130,8 +130,10 @@ public:
     const size_t num_threads = 1,
     const std::vector<int>& seeds = std::vector<int>()) const;
 
-  Eigen::MatrixXd rosenblatt(const Eigen::MatrixXd& u,
-                             const size_t num_threads = 1) const;
+  Eigen::MatrixXd rosenblatt(Eigen::MatrixXd u,
+                             const size_t num_threads = 1,
+                             bool randomize_discrete = false,
+                             std::vector<int> seeds = {}) const;
   Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& u,
                                      const size_t num_threads = 1) const;
 
@@ -189,6 +191,7 @@ protected:
   void set_continuous_var_types() const;
   void set_var_types_internal(const std::vector<std::string>& var_types) const;
   int get_n_discrete() const;
+  bool is_discrete() const;
   Eigen::MatrixXd collapse_data(const Eigen::MatrixXd& u) const;
 };
 }
