@@ -37,6 +37,7 @@ using BicopPtr = std::shared_ptr<AbstractBicop>;
 //! | "             | Joe-Gumbel (BB6)      | "bb6"                 |
 //! | "             | Joe-Clayton (BB7)     | "bb7"                 |
 //! | "             | Joe-Frank (BB8)       | "bb8"                 |
+//! | Extreme-Value | Tawn                  | "tawn"                |
 //! | Nonparametric | Transformation kernel | "tll"                 |
 //! 
 class Bicop
