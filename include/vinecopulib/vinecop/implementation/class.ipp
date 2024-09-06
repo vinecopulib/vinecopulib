@@ -1081,17 +1081,19 @@ Vinecop::get_npars() const
 //! The formulas above assume a vine copula model with order \f$ d, \dots, 1 \f$.
 //! More generally, `Vinecop::rosenblatt()` returns the variables
 //! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
-//! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
+//! where \f$ M \f$ is the structure matrix.  Similarly, `Vinecop::inverse_rosenblatt()` computes
+//! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
 //!
 //! If some variables have atoms, Brockwell (10.1016/j.spl.2007.02.008) proposed a
 //! simple randomization scheme to ensure that output is still independent uniform
-//! if the model is correct. This is used by default. If you are interested in the conditional 
+//! if the model is correct. The transformation reads
+//! \f[ U_{M[d - j, j]}= W_{d - j} F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}) + (1 - W_{d - j}) F^-(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
+//! where \f$ F^- \f$ is the left limit of the conditional cdf and \f$W_1, \dots, W_d \f$ 
+//! are are independent standard uniform random variables.
+//! This is used by default. If you are interested in the conditional 
 //! probabilities
 //! \f[F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
 //! set `randomize_discrete = FALSE`.
-//!
-//! @brief Gets
-//! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
 //!
 //! @param u An \f$ n \times d \f$ matrix of evaluation points.
 //! @param num_threads The number of threads to use for computations; if greater
@@ -1102,7 +1104,7 @@ Vinecop::get_npars() const
 //! @param seeds Seeds to scramble the quasi-random numbers; if empty (default),
 //!   the random number quasi-generator is seeded randomly. Only relevant if
 //!   there are discrete variables and `randomize_discrete = TRUE`.
-//! @param 
+//!
 //! @return An \f$ n \times d \f$ matrix of independent uniform variates.
 inline Eigen::MatrixXd
 Vinecop::rosenblatt(Eigen::MatrixXd u, const size_t num_threads,
@@ -1203,10 +1205,13 @@ Vinecop::rosenblatt(Eigen::MatrixXd u, const size_t num_threads,
   }
 
   if (randomize_discrete && is_discrete()) {
+    // fill second half of U with left-sided limits of the conditional CDF
+    // (equal to conditional CDF for continuous variables)
     for (size_t j = 0; j < d; j++) {
       U.col(d + j) = var_types_[j] == "d" ? hfunc2_sub.col(inverse_order[j]) 
                                           : hfunc2.col(inverse_order[j]);
     }
+    // randomize by weighting left and right limits with independent uniforms
     auto R = tools_stats::simulate_uniform(u.rows(), d, true, seeds);
     U.leftCols(d) = U.leftCols(d).array() * R.array() +
       U.rightCols(d).array() * (1 - R.array());
@@ -1241,8 +1246,7 @@ Vinecop::rosenblatt(Eigen::MatrixXd u, const size_t num_threads,
 //! The formulas above assume a vine copula model with order \f$ d, \dots, 1 \f$.
 //! More generally, `Vinecop::rosenblatt()` returns the variables
 //! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
-//! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
-//! @brief Gets
+//! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()` computes
 //! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
 //!
 //! @param u An \f$ n \times d \f$ matrix of evaluation points.
