@@ -784,7 +784,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
     Eigen::MatrixXd hfunc1, hfunc2, u_e, hfunc1_sub, hfunc2_sub, u_e_sub;
     hfunc1 = Eigen::MatrixXd::Zero(b.size, d_);
     hfunc2 = Eigen::MatrixXd::Zero(b.size, d_);
-    if (get_n_discrete() > 0) {
+    if (is_discrete()) {
       hfunc1_sub = hfunc1;
       hfunc2_sub = hfunc2;
     }
@@ -942,12 +942,7 @@ Vinecop::simulate(const size_t n,
                   const std::vector<int>& seeds) const
 {
   auto u = tools_stats::simulate_uniform(n, d_, qrng, seeds);
-  // inverse_rosenblatt() only works for continous models
-  auto actual_types = var_types_;
-  set_continuous_var_types();
-  u = inverse_rosenblatt(u, num_threads);
-  set_var_types_internal(actual_types);
-  return u;
+  return inverse_rosenblatt(u, num_threads);;
 }
 
 //! @brief Evaluates the log-likelihood.
@@ -1069,7 +1064,7 @@ Vinecop::get_npars() const
 //! @brief Evaluates the Rosenblatt transform for a vine copula model.
 //!
 //! @details The Rosenblatt transform converts data from this model 
-//! into independent uniform variates. Only works for continuous data.
+//! into independent uniform variates.
 //!
 //! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random 
 //! vector \f$ V = (V_1,\ldots,V_d) ~ F \f$ is defined as
@@ -1086,22 +1081,38 @@ Vinecop::get_npars() const
 //! The formulas above assume a vine copula model with order \f$ d, \dots, 1 \f$.
 //! More generally, `Vinecop::rosenblatt()` returns the variables
 //! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
-//! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
-//! @brief Gets
+//! where \f$ M \f$ is the structure matrix.  Similarly, `Vinecop::inverse_rosenblatt()` computes
 //! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
+//!
+//! If some variables have atoms, Brockwell (10.1016/j.spl.2007.02.008) proposed a
+//! simple randomization scheme to ensure that output is still independent uniform
+//! if the model is correct. The transformation reads
+//! \f[ U_{M[d - j, j]}= W_{d - j} F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}) + (1 - W_{d - j}) F^-(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
+//! where \f$ F^- \f$ is the left limit of the conditional cdf and \f$W_1, \dots, W_d \f$ 
+//! are are independent standard uniform random variables.
+//! This is used by default. If you are interested in the conditional 
+//! probabilities
+//! \f[F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
+//! set `randomize_discrete = FALSE`.
 //!
 //! @param u An \f$ n \times d \f$ matrix of evaluation points.
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+//! @param randomize_discrete Whether to randomize the transform for discrete 
+//!   variables; see Details.
+//! @param seeds Seeds to scramble the quasi-random numbers; if empty (default),
+//!   the random number quasi-generator is seeded randomly. Only relevant if
+//!   there are discrete variables and `randomize_discrete = TRUE`.
+//!
 //! @return An \f$ n \times d \f$ matrix of independent uniform variates.
 inline Eigen::MatrixXd
-Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
+Vinecop::rosenblatt(Eigen::MatrixXd u, const size_t num_threads,
+                    bool randomize_discrete, std::vector<int> seeds) const
 {
-  if (get_n_discrete() > 0) {
-    throw std::runtime_error("rosenblatt() only works for continuous models.");
-  }
   check_data(u);
+  u = collapse_data(u);
+
   size_t d = d_;
   size_t n = u.rows();
 
@@ -1109,16 +1120,30 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
   auto order = rvine_structure_.get_order();
   auto inverse_order = tools_stl::invert_permutation(order);
+  auto disc_cols = tools_select::get_disc_cols(var_types_);
 
   // fill first row of hfunc2 matrix with evaluation points;
   // points have to be reordered to correspond to natural order
-  Eigen::MatrixXd hfunc1(n, d);
-  Eigen::MatrixXd hfunc2(n, d);
-  for (size_t j = 0; j < d; ++j)
+  Eigen::MatrixXd hfunc1(n, d), hfunc2(n, d), hfunc1_sub(n, d), hfunc2_sub(n, d);
+  for (size_t j = 0; j < d; ++j) {
     hfunc2.col(j) = u.col(order[j] - 1);
+  }
+  if (is_discrete()) {
+    hfunc1_sub = hfunc1;
+    hfunc2_sub = hfunc2;  
+  }
+
+  // fill first row of hfunc2 matrix with evaluation points;
+  // points have to be reordered to correspond to natural order
+  for (size_t j = 0; j < d_; ++j) {
+    hfunc2.col(j) = u.col(order[j] - 1);
+    if (var_types_[order[j] - 1] == "d") {
+      hfunc2_sub.col(j) = u.col(d_ + disc_cols[order[j] - 1]);
+    }
+  }
 
   auto do_batch = [&](const tools_batch::Batch& b) {
-    Eigen::MatrixXd u_e(b.size, 2);
+    Eigen::MatrixXd u_e, u_e_sub;
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
       tools_interface::check_user_interrupt(
         static_cast<double>(n) * static_cast<double>(d) > 1e5);
@@ -1126,7 +1151,11 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
         tools_interface::check_user_interrupt(edge % 100 == 0);
         // extract evaluation point from hfunction matrices (have been
         // computed in previous tree level)
+        Bicop* edge_copula = &pair_copulas_[tree][edge];
+        auto var_types = edge_copula->get_var_types();
         size_t m = rvine_structure_.min_array(tree, edge);
+
+        u_e = Eigen::MatrixXd(b.size, 2);
         u_e.col(0) = hfunc2.block(b.begin, edge, b.size, 1);
         if (m == rvine_structure_.struct_array(tree, edge, true)) {
           u_e.col(1) = hfunc2.block(b.begin, m - 1, b.size, 1);
@@ -1134,12 +1163,31 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
           u_e.col(1) = hfunc1.block(b.begin, m - 1, b.size, 1);
         }
 
-        // h-functions are only evaluated if needed in next step
-        Bicop edge_copula = pair_copulas_[tree][edge].as_continuous();
-        if (rvine_structure_.needed_hfunc1(tree, edge)) {
-          hfunc1.block(b.begin, edge, b.size, 1) = edge_copula.hfunc1(u_e);
+        if ((var_types[0] == "d") || (var_types[1] == "d")) {
+          u_e.conservativeResize(b.size, 4);
+          u_e.col(2) = hfunc2_sub.block(b.begin, edge, b.size, 1);
+          if (m == rvine_structure_.struct_array(tree, edge, true)) {
+            u_e.col(3) = hfunc2_sub.block(b.begin, m - 1, b.size, 1);
+          } else {
+            u_e.col(3) = hfunc1_sub.block(b.begin, m - 1, b.size, 1);
+          }
         }
-        hfunc2.block(b.begin, edge, b.size, 1) = edge_copula.hfunc2(u_e);
+
+        // h-functions are only evaluated if needed in next step
+        if (rvine_structure_.needed_hfunc1(tree, edge)) {
+          hfunc1.block(b.begin, edge, b.size, 1) = edge_copula->hfunc1(u_e);
+          if (var_types[1] == "d") {
+            u_e_sub = u_e;
+            u_e_sub.col(1) = u_e.col(3);
+            hfunc1_sub.block(b.begin, edge, b.size, 1) = edge_copula->hfunc1(u_e_sub);
+          }
+        }
+        hfunc2.block(b.begin, edge, b.size, 1) = edge_copula->hfunc2(u_e);
+        if (var_types[0] == "d") {
+          u_e_sub = u_e;
+          u_e_sub.col(0) = u_e.col(2);
+          hfunc2_sub.block(b.begin, edge, b.size, 1) = edge_copula->hfunc2(u_e_sub);
+        }
       }
     }
   };
@@ -1151,19 +1199,31 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
   }
 
   // go back to original order
-  auto U_vine = u;
+  Eigen::MatrixXd U(n, 2 * d);
   for (size_t j = 0; j < d; j++) {
-    U_vine.col(j) = hfunc2.col(inverse_order[j]);
+    U.col(j) = hfunc2.col(inverse_order[j]);
   }
 
-  return U_vine.array().min(1 - 1e-10).max(1e-10);
+  if (randomize_discrete && is_discrete()) {
+    // fill second half of U with left-sided limits of the conditional CDF
+    // (equal to conditional CDF for continuous variables)
+    for (size_t j = 0; j < d; j++) {
+      U.col(d + j) = var_types_[j] == "d" ? hfunc2_sub.col(inverse_order[j]) 
+                                          : hfunc2.col(inverse_order[j]);
+    }
+    // randomize by weighting left and right limits with independent uniforms
+    auto R = tools_stats::simulate_uniform(u.rows(), d, true, seeds);
+    U.leftCols(d) = U.leftCols(d).array() * R.array() +
+      U.rightCols(d).array() * (1 - R.array());
+  } 
+  return U.leftCols(d).array().min(1 - 1e-10).max(1e-10);
 }
 
 //! @brief Evaluates the inverse Rosenblatt transform.
 //!
 //! @details The inverse Rosenblatt transform can be used for simulation: the
 //! function applied to independent uniform variates resembles simulated
-//! data from the vine copula model. Only works for continous models.
+//! data from the vine copula model. 
 //!
 //! If the problem is too large, it is split recursively into halves (w.r.t.
 //! \f$ n \f$, the number of observations).
@@ -1186,8 +1246,7 @@ Vinecop::rosenblatt(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! The formulas above assume a vine copula model with order \f$ d, \dots, 1 \f$.
 //! More generally, `Vinecop::rosenblatt()` returns the variables
 //! \f[ U_{M[d - j, j]}= F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
-//! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()`
-//! @brief Gets
+//! where \f$ M \f$ is the structure matrix. Similarly, `Vinecop::inverse_rosenblatt()` computes
 //! \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
 //!
 //! @param u An \f$ n \times d \f$ matrix of evaluation points.
@@ -1199,15 +1258,11 @@ inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const size_t num_threads) const
 {
-  if (get_n_discrete() > 0) {
-    throw std::runtime_error(
-      "inverse_rosenblatt() only works for continuous models.");
-  }
+  auto var_types = get_var_types();
+  set_continuous_var_types();
   check_data(u);
+
   size_t n = u.rows();
-  if (n < 1) {
-    throw std::runtime_error("n must be at least one");
-  }
   size_t d = d_;
 
   Eigen::MatrixXd U_vine = u.leftCols(d); // output matrix
@@ -1285,6 +1340,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
     pool.join();
   }
 
+  set_var_types_internal(var_types);
   return U_vine;
 }
 
@@ -1308,6 +1364,10 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
       msg << get_n_discrete() << " discrete variables)." << std::endl;
     }
     throw std::runtime_error(msg.str());
+  }
+
+  if (data.rows() < 1) {
+    throw std::runtime_error("data must have at least one row"); 
   }
 }
 
@@ -1440,6 +1500,11 @@ Vinecop::get_n_discrete() const
     n_discrete += (t == "d");
   }
   return n_discrete;
+}
+
+inline bool Vinecop::is_discrete() const 
+{
+  return get_n_discrete() > 0;
 }
 
 //! @brief Removes superfluous columns for continuous data.
