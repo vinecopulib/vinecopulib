@@ -41,7 +41,7 @@ public:
     bool preselect_families = true,
     bool select_trunc_lvl = false,
     bool select_threshold = false,
-    bool select_families = false,
+    bool select_families = true,
     bool show_trace = false,
     size_t num_threads = 1,
     std::string mst_algorithm = "prim");
@@ -53,7 +53,7 @@ public:
     double threshold = 0.0,
     bool select_trunc_lvl = false,
     bool select_threshold = false,
-    bool select_families = false,
+    bool select_families = true,
     bool show_trace = false,
     size_t num_threads = 1,
     std::string mst_algorithm = "prim");

@@ -65,6 +65,10 @@ public:
   void select(const Eigen::MatrixXd& data,
               const FitControlsVinecop& controls = FitControlsVinecop());
 
+  void fit(const Eigen::MatrixXd& data,
+           const FitControlsBicop& controls = FitControlsBicop(),
+           const size_t num_threads = 1);
+
   DEPRECATED void select_all(
     const Eigen::MatrixXd& data,
     const FitControlsVinecop& controls = FitControlsVinecop());
