@@ -16,13 +16,13 @@ if(NOT WIN32)
     set(CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG ")
     set(CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
 
-
     if(WARNINGS_AS_ERRORS)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werr")
     endif()
 
     if(OPT_ASAN)
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
+        # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=thread -fno-omit-frame-pointer")
     endif()
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND BUILD_TESTING AND NOT WIN32 AND CODE_COVERAGE)

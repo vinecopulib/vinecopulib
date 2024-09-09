@@ -8,11 +8,11 @@ include(CTest)
 
 include(cmake/options.cmake               REQUIRED)
 
+include(cmake/compilerDefOpt.cmake        REQUIRED)
+
 include(cmake/findDependencies.cmake      REQUIRED)
 
 include(cmake/findHeaders.cmake           REQUIRED)
-
-include(cmake/compilerDefOpt.cmake        REQUIRED)
 
 include(cmake/buildTargets.cmake          REQUIRED)
 
