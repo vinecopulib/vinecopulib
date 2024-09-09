@@ -150,7 +150,8 @@ TEST(discrete, vinecop)
     }
   }
   RVineStructure str(std::vector<size_t>{ 1, 2, 3, 4, 5 });
-  Vinecop vc(str, pair_copulas, { "d", "c", "d", "d", "c" });
+  auto var_types = std::vector<std::string>{ "d", "c", "d", "d", "c" };
+  Vinecop vc(str, pair_copulas, var_types);
 
   // simulate data with continuous and discrete variables
   size_t n = 500;
@@ -183,6 +184,13 @@ TEST(discrete, vinecop)
         pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
     }
   }
+
+  for (auto& pc : pcs[0])
+    pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
+  Vinecop vc3(vc2.get_rvine_structure(), pcs, var_types);
+  vc3.fit(u, controls);
+
+  ASSERT_TRUE(vc2.str() == vc3.str());
 
   // test other input format
   u = Eigen::MatrixXd(n, 10);
