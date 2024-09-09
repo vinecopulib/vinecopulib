@@ -325,6 +325,29 @@ TEST_F(VinecopTest, aic_bic_are_correct)
   ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
 }
 
+TEST_F(VinecopTest, fit_parameters_is_correct)
+{
+  u.conservativeResize(50, 7);
+  auto controls = FitControlsVinecop({ BicopFamily::clayton }, "itau");
+  Vinecop vc(7);
+  vc.select(u, controls);
+  auto rvine_structure = vc.get_rvine_structure();
+
+  auto pcs = vc.get_all_pair_copulas();
+  for (auto& pc : pcs[0])
+    pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
+  Vinecop vc2(rvine_structure, pcs);
+  vc2.fit(u, controls);
+
+  ASSERT_TRUE(vc.str() == vc2.str());
+
+  Vinecop vc3(rvine_structure, pcs);
+  controls.set_select_families(false);
+  vc3.select(u, controls);
+  ASSERT_TRUE(vc.str() == vc3.str());
+
+}
+
 TEST_F(VinecopTest, family_select_finds_true_rotations)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
@@ -393,13 +416,21 @@ TEST_F(VinecopTest, works_multi_threaded)
   controls.set_num_threads(2);
   Vinecop fit2(u, RVineStructure(), {}, controls);
 
+  auto pcs = fit1.get_all_pair_copulas();
+  for (auto& pc : pcs[0])
+    pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
+  Vinecop fit3(fit1.get_rvine_structure(), pcs);
+  fit3.fit(u, controls, 2);
+
   // check for equality in likelihood, since the pair copulas may be stored
   // in a different order when running in parallel
   EXPECT_NEAR(fit1.loglik(u), fit2.loglik(u), 1e-2);
+  EXPECT_NEAR(fit1.loglik(u), fit3.loglik(u), 1e-2);
 
   // check if parallel evaluators have same output as single threaded ones
   EXPECT_TRUE(fit2.pdf(u, 2).isApprox(fit2.pdf(u), 1e-10));
-  EXPECT_TRUE(fit2.inverse_rosenblatt(u, 2).isApprox(fit2.inverse_rosenblatt(u), 1e-10));
+  EXPECT_TRUE(
+    fit2.inverse_rosenblatt(u, 2).isApprox(fit2.inverse_rosenblatt(u), 1e-10));
   EXPECT_TRUE(fit2.rosenblatt(u, 2).isApprox(fit2.rosenblatt(u), 1e-10));
 
   // just check that it works

@@ -21,6 +21,7 @@ inline FitControlsVinecop::FitControlsVinecop()
   tree_criterion_ = "tau";
   select_trunc_lvl_ = false;
   select_threshold_ = false;
+  select_families_ = true;
   show_trace_ = false;
 }
 
@@ -49,6 +50,9 @@ inline FitControlsVinecop::FitControlsVinecop()
 //!     automatically.
 //! @param select_threshold Whether the threshold parameter shall be
 //!     selected automatically.
+//! @param select_families Whether the families shall be selected
+//! automatically, or should the method simply update the parameters for 
+//! the pair copulas already present in the model.
 //! @param show_trace Whether to show a trace of the building progress.
 //! @param num_threads Number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number
@@ -69,6 +73,7 @@ inline FitControlsVinecop::FitControlsVinecop(
   bool preselect_families,
   bool select_trunc_lvl,
   bool select_threshold,
+  bool select_families,
   bool show_trace,
   size_t num_threads,
   std::string mst_algorithm)
@@ -86,12 +91,15 @@ inline FitControlsVinecop::FitControlsVinecop(
   set_threshold(threshold);
   set_select_trunc_lvl(select_trunc_lvl);
   set_select_threshold(select_threshold);
+  set_select_families(select_families);
   set_show_trace(show_trace);
   set_num_threads(num_threads);
   set_mst_algorithm(mst_algorithm);
 }
 
 //! @brief Instantiates custom controls for fitting vine copula models.
+//!
+//! @param controls See `FitControlsBicop()`.
 //! @param trunc_lvl Truncation level for truncated vines.
 //! @param tree_criterion The criterion for selecting the maximum spanning
 //!     tree (`"tau"`, `"hoeffd"` and `"rho"` implemented so far).
@@ -101,7 +109,9 @@ inline FitControlsVinecop::FitControlsVinecop(
 //!     automatically.
 //! @param select_threshold Whether the threshold parameter shall be
 //!     selected automatically.
-//! @param controls See `FitControlsBicop()`.
+//! @param select_families Whether the families shall be selected
+//! automatically, or should the method simply update the parameters for 
+//! the pair copulas already present in the model.
 //! @param num_threads Number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number returned
 //!     by `std::thread::hardware_concurrency()``.
@@ -113,6 +123,7 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
                                               double threshold,
                                               bool select_trunc_lvl,
                                               bool select_threshold,
+                                              bool select_families,
                                               bool show_trace,
                                               size_t num_threads,
                                               std::string mst_algorithm)
@@ -123,6 +134,7 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
   set_threshold(threshold);
   set_select_trunc_lvl(select_trunc_lvl);
   set_select_threshold(select_threshold);
+  set_select_families(select_families);
   set_show_trace(show_trace);
   set_num_threads(num_threads);
   set_mst_algorithm(mst_algorithm);
@@ -178,6 +190,20 @@ inline void
 FitControlsVinecop::set_select_trunc_lvl(bool select_trunc_lvl)
 {
   select_trunc_lvl_ = select_trunc_lvl;
+}
+
+//! @brief Gets whether to select the families automatically.
+inline bool
+FitControlsVinecop::get_select_families() const
+{
+  return select_families_;
+}
+
+//! @brief Sets whether to select the families automatically.
+inline void
+FitControlsVinecop::set_select_families(bool select_families)
+{
+  select_families_ = select_families;
 }
 
 //! @brief Gets the criterion for tree selection.
@@ -310,6 +336,10 @@ FitControlsVinecop::str() const
                << static_cast<std::string>(get_select_trunc_lvl() ? "yes"
                                                                   : "no")
                << std::endl;
+  controls_str << "Select families: "
+                << static_cast<std::string>(get_select_families() ? "yes"
+                                                                  : "no")
+                << std::endl;
   controls_str << "Show trace: "
                << static_cast<std::string>(get_show_trace() ? "yes" : "no")
                << std::endl;
