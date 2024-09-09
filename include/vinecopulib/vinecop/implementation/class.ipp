@@ -398,7 +398,7 @@ Vinecop::fit(const Eigen::MatrixXd& data,
         u_e.col(1) = hfunc1.col(m - 1);
       }
 
-      if ((var_types[0] == "d") | (var_types[1] == "d")) {
+      if ((var_types[0] == "d") || (var_types[1] == "d")) {
         u_e.conservativeResize(n, 4);
         u_e.col(2) = hfunc2_sub.col(edge);
         if (m == rvine_structure_.struct_array(tree, edge, true)) {
