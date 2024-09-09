@@ -248,11 +248,17 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 
 //! @brief Automatically fits and selects a vine copula model.
 //!
-//! @details `select()` behaves differently depending on its current truncation
-//! level and the truncation level specified in the controls, respectively
-//! called `trunc_lvl` and `controls.trunc_lvl` in what follows.
+//! @details This method can be used to select either the pair-copulas only,
+//! or the pair-copulas and the structure. The latter is done by specifying
+//! a truncation level in the controls. The method then selects the structure
+//! and fits the pair-copulas for all trees up to the truncation level.
+
+//! In other words, `select()` behaves differently depending on its current 
+//! truncation level and the truncation level specified in the controls, 
+//! respectively called `trunc_lvl` and `controls.trunc_lvl` in what follows.
 //! Essentially, `controls.trunc_lvl` defines the object's truncation level
 //! after calling `select()`:
+//! 
 //!   - If `controls.trunc_lvl <= trunc_lvl`, the families and parameters for
 //!     all pairs in trees smaller or equal to `controls.trunc_lvl`
 //!     are selected, using the current structure.

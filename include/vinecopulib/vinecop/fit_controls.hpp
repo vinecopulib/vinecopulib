@@ -41,6 +41,7 @@ public:
     bool preselect_families = true,
     bool select_trunc_lvl = false,
     bool select_threshold = false,
+    bool select_families = false,
     bool show_trace = false,
     size_t num_threads = 1,
     std::string mst_algorithm = "prim");
@@ -52,6 +53,7 @@ public:
     double threshold = 0.0,
     bool select_trunc_lvl = false,
     bool select_threshold = false,
+    bool select_families = false,
     bool show_trace = false,
     size_t num_threads = 1,
     std::string mst_algorithm = "prim");
@@ -70,6 +72,8 @@ public:
   bool get_select_trunc_lvl() const;
 
   bool get_select_threshold() const;
+
+  bool get_select_families() const;
 
   bool needs_sparse_select() const;
 
@@ -92,6 +96,8 @@ public:
 
   void set_select_threshold(bool select_threshold);
 
+  void set_select_families(bool select_families);
+
   void set_fit_controls_bicop(FitControlsBicop controls);
 
   void set_mst_algorithm(std::string mst_algorithm);
@@ -106,6 +112,7 @@ private:
   bool show_trace_;
   bool select_trunc_lvl_;
   bool select_threshold_;
+  bool select_families_;
   std::string mst_algorithm_;
 
   void check_tree_criterion(std::string tree_criterion);
