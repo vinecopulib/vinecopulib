@@ -163,11 +163,11 @@ Bicop::to_file(const std::string& filename) const
 //! densities, irrespective of variable types.
 //! 
 //! When at least one variable is discrete, more than two columns are required
-//! for `u`: the first \eqn{n \times 2} block contains realizations of
-//! \eqn{F_{X_1}(x_1), F_{X_2}(x_2)}. The second \eqn{n \times 2} block contains
-//! realizations of \eqn{F_{X_1}(x_1^-), F_{X_1}(x_1^-)}. The minus indicates a
+//! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ (F_{X_1}(x_1), F_{X_2}(x_2)) \f$. The second \f$ n \times 2 \f$ block contains
+//! realizations of \f$ (F_{X_1}(x_1^-), F_{X_1}(x_1^-)) \f$. The minus indicates a
 //! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
-//! \eqn{F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1)}. For continuous variables the left
+//! \f$ F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1) \f$. For continuous variables the left
 //! limit and the cdf itself coincide. Respective columns can be omitted in the
 //! second block.
 //!
@@ -185,11 +185,11 @@ Bicop::pdf(const Eigen::MatrixXd& u) const
 //! 
 //! @details When at least one variable is discrete, more than two 
 //! columns are required
-//! for `u`: the first \eqn{n \times 2} block contains realizations of
-//! \eqn{F_{X_1}(x_1), F_{X_2}(x_2)}. The second \eqn{n \times 2} block contains
-//! realizations of \eqn{F_{X_1}(x_1^-), F_{X_1}(x_1^-)}. The minus indicates a
+//! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ (F_{X_1}(x_1), F_{X_2}(x_2)) \f$. The second \f$ n \times 2 \f$ block contains
+//! realizations of \f$ (F_{X_1}(x_1^-), F_{X_1}(x_1^-)) \f$. The minus indicates a
 //! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
-//! \eqn{F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1)}. For continuous variables the left
+//! \f$ F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1) \f$. For continuous variables the left
 //! limit and the cdf itself coincide. Respective columns can be omitted in the
 //! second block.
 //!
@@ -222,11 +222,11 @@ Bicop::cdf(const Eigen::MatrixXd& u) const
 //! \f$ h_1(u_1, u_2) = P(U_2 \le u_2 | U_1 = u_1) \f$.
 //! 
 //! When at least one variable is discrete, more than two columns are required
-//! for `u`: the first \eqn{n \times 2} block contains realizations of
-//! \eqn{F_{X_1}(x_1), F_{X_2}(x_2)}. The second \eqn{n \times 2} block contains
-//! realizations of \eqn{F_{X_1}(x_1^-), F_{X_1}(x_1^-)}. The minus indicates a
+//! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ (F_{X_1}(x_1), F_{X_2}(x_2)) \f$. The second \f$ n \times 2 \f$ block contains
+//! realizations of \f$ (F_{X_1}(x_1^-), F_{X_1}(x_1^-)) \f$. The minus indicates a
 //! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
-//! \eqn{F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1)}. For continuous variables the left
+//! \f$ F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1) \f$. For continuous variables the left
 //! limit and the cdf itself coincide. Respective columns can be omitted in the
 //! second block.
 //!
@@ -265,11 +265,11 @@ Bicop::hfunc1(const Eigen::MatrixXd& u) const
 //! \f$ h_2(u_1, u_2) = P(U_1 \le u_1 | U_2 = u_2)  \f$.
 //! 
 //! When at least one variable is discrete, more than two columns are required
-//! for `u`: the first \eqn{n \times 2} block contains realizations of
-//! \eqn{F_{X_1}(x_1), F_{X_2}(x_2)}. The second \eqn{n \times 2} block contains
-//! realizations of \eqn{F_{X_1}(x_1^-), F_{X_1}(x_1^-)}. The minus indicates a
+//! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ (F_{X_1}(x_1), F_{X_2}(x_2)) \f$. The second \f$ n \times 2 \f$ block contains
+//! realizations of \f$ (F_{X_1}(x_1^-), F_{X_1}(x_1^-)) \f$. The minus indicates a
 //! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
-//! \eqn{F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1)}. For continuous variables the left
+//! \f$ F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1) \f$. For continuous variables the left
 //! limit and the cdf itself coincide. Respective columns can be omitted in the
 //! second block.
 //!
@@ -309,11 +309,11 @@ Bicop::hfunc2(const Eigen::MatrixXd& u) const
 //! The inverse is calulated w.r.t. the second argument.
 //! 
 //! When at least one variable is discrete, more than two columns are required
-//! for `u`: the first \eqn{n \times 2} block contains realizations of
-//! \eqn{F_{X_1}(x_1), F_{X_2}(x_2)}. The second \eqn{n \times 2} block contains
-//! realizations of \eqn{F_{X_1}(x_1^-), F_{X_1}(x_1^-)}. The minus indicates a
+//! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ (F_{X_1}(x_1), F_{X_2}(x_2)) \f$. The second \f$ n \times 2 \f$ block contains
+//! realizations of \f$ (F_{X_1}(x_1^-), F_{X_1}(x_1^-)) \f$. The minus indicates a
 //! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
-//! \eqn{F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1)}. For continuous variables the left
+//! \f$ F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1) \f$. For continuous variables the left
 //! limit and the cdf itself coincide. Respective columns can be omitted in the
 //! second block.
 //!
@@ -354,11 +354,11 @@ Bicop::hinv1(const Eigen::MatrixXd& u) const
 //! The inverse is calculated w.r.t. the first argument.
 //! 
 //! When at least one variable is discrete, more than two columns are required
-//! for `u`: the first \eqn{n \times 2} block contains realizations of
-//! \eqn{F_{X_1}(x_1), F_{X_2}(x_2)}. The second \eqn{n \times 2} block contains
-//! realizations of \eqn{F_{X_1}(x_1^-), F_{X_1}(x_1^-)}. The minus indicates a
+//! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ (F_{X_1}(x_1), F_{X_2}(x_2)) \f$. The second \f$ n \times 2 \f$ block contains
+//! realizations of \f$ (F_{X_1}(x_1^-), F_{X_1}(x_1^-)) \f$. The minus indicates a
 //! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
-//! \eqn{F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1)}. For continuous variables the left
+//! \f$ F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1) \f$. For continuous variables the left
 //! limit and the cdf itself coincide. Respective columns can be omitted in the
 //! second block.
 //!
@@ -424,11 +424,11 @@ Bicop::simulate(const size_t& n,
 //! where \f$ c \f$ is the copula density, see `Bicop::pdf()`.
 //! 
 //! When at least one variable is discrete, more than two columns are required
-//! for `u`: the first \eqn{n \times 2} block contains realizations of
-//! \eqn{F_{X_1}(x_1), F_{X_2}(x_2)}. The second \eqn{n \times 2} block contains
-//! realizations of \eqn{F_{X_1}(x_1^-), F_{X_1}(x_1^-)}. The minus indicates a
+//! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ (F_{X_1}(x_1), F_{X_2}(x_2)) \f$. The second \f$ n \times 2 \f$ block contains
+//! realizations of \f$ (F_{X_1}(x_1^-), F_{X_1}(x_1^-)) \f$. The minus indicates a
 //! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
-//! \eqn{F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1)}. For continuous variables the left
+//! \f$ F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1) \f$. For continuous variables the left
 //! limit and the cdf itself coincide. Respective columns can be omitted in the
 //! second block.
 //!
