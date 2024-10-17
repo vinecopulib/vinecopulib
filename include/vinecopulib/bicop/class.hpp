@@ -24,22 +24,24 @@ using BicopPtr = std::shared_ptr<AbstractBicop>;
 //! 
 //! Implemented families (see `BicopFamily`):
 //!
+//! ```
 //! | type          | full name             | string identifier     |
 //! |---------------|-----------------------|-----------------------|
 //! | -             | Independence          | "indep"               |
 //! | Elliptical    | Gaussian              | "gaussian"            |
-//! | "             | Student t             | "student"             |
+//! |               | Student t             | "student"             |
 //! | Archimedean   | Clayton               | "clayton"             |
-//! | "             | Gumbel                | "gumbel"              |
-//! | "             | Frank                 | "frank"               |
-//! | "             | Joe                   | "joe"                 |
-//! | "             | Clayton-Gumbel (BB1)  | "bb1"                 |
-//! | "             | Joe-Gumbel (BB6)      | "bb6"                 |
-//! | "             | Joe-Clayton (BB7)     | "bb7"                 |
-//! | "             | Joe-Frank (BB8)       | "bb8"                 |
+//! |               | Gumbel                | "gumbel"              |
+//! |               | Frank                 | "frank"               |
+//! |               | Joe                   | "joe"                 |
+//! |               | Clayton-Gumbel (BB1)  | "bb1"                 |
+//! |               | Joe-Gumbel (BB6)      | "bb6"                 |
+//! |               | Joe-Clayton (BB7)     | "bb7"                 |
+//! |               | Joe-Frank (BB8)       | "bb8"                 |
 //! | Extreme-Value | Tawn                  | "tawn"                |
 //! | Nonparametric | Transformation kernel | "tll"                 |
-//! 
+//! ```
+//!
 class Bicop
 {
 
