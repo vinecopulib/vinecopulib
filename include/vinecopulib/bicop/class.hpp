@@ -24,6 +24,7 @@ using BicopPtr = std::shared_ptr<AbstractBicop>;
 //! 
 //! Implemented families (see `BicopFamily`):
 //!
+//! ```
 //! | type          | full name             | string identifier     |
 //! |---------------|-----------------------|-----------------------|
 //! | -             | Independence          | "indep"               |
@@ -39,7 +40,8 @@ using BicopPtr = std::shared_ptr<AbstractBicop>;
 //! | "             | Joe-Frank (BB8)       | "bb8"                 |
 //! | Extreme-Value | Tawn                  | "tawn"                |
 //! | Nonparametric | Transformation kernel | "tll"                 |
-//! 
+//! ```
+//!
 class Bicop
 {
 
