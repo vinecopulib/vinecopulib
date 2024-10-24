@@ -758,7 +758,7 @@ Bicop::str() const
   bicop_str << "Bivariate copula: \n";
   bicop_str << "  family = " << get_family_name() << "\n";
   bicop_str << "  rotation = " << get_rotation() << "\n";
-  bicop_str << "  var_types = " << var_types_[0] << ", " << var_types_[1] << "\n";
+  bicop_str << "  var_types = " << var_types_[0] << "," << var_types_[1] << "\n";
   if (get_family() == BicopFamily::tll) {
     bicop_str << "  parameters = [30x30 grid] with " << get_npars() << " d.f.\n";
   } else if (get_family() != BicopFamily::indep) {
