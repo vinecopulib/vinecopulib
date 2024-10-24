@@ -1,5 +1,5 @@
 if (VINECOPULIB_SHARED_LIB)
-    add_library(vinecopulib SHARED ${vinecopulib_sources})
+    add_library(vinecopulib ${vinecopulib_sources})
     target_include_directories(vinecopulib PRIVATE ${vinecopulib_includes})
     set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
     set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
