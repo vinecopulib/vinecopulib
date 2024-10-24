@@ -754,14 +754,15 @@ inline std::string
 Bicop::str() const
 {
   std::stringstream bicop_str;
-  bicop_str << get_family_name();
-  if (get_rotation() != 0) {
-    bicop_str << " " << get_rotation() << "°";
-  }
+  bicop_str << "Bivariate copula: \n";
+  bicop_str << "  family = " << get_family_name() << "\n";
+  bicop_str << "  rotation = " << get_rotation() << "\n";
+  bicop_str << "  var_types = " << var_types_[0] << ", " << var_types_[1] << "\n";
   if (get_family() == BicopFamily::tll) {
-    bicop_str << ", parameters = [30x30 grid]";
+    double npars = get_npars()
+    bicop_str << "  parameters = [30x30 grid] with " << get_npars() << setprecision(2) << " d.f.\n";
   } else if (get_family() != BicopFamily::indep) {
-    bicop_str << ", parameters = " << get_parameters();
+    bicop_str << "  parameters = " << get_parameters() << "\n";
   }
   return bicop_str.str().c_str();
 }
