@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.5)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 project (Example)
 
@@ -9,24 +9,21 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # C++ compile flags
 if (NOT WIN32)
-    set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O2 -DNDEBUG")
+    set(CMAKE_CXX_FLAGS "-Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O2 -DNDEBUG")
 endif()
 
-# Find vinecopulib package and dependencies
-find_package(vinecopulib                  REQUIRED)
-find_package(Eigen3                       REQUIRED)
-find_package(Boost 1.56                   REQUIRED)
-find_package(Threads                      REQUIRED)
-find_package(wdm                          REQUIRED)
+if (POLICY CMP0074)
+  # find_package() uses <PackageName>_ROOT variables
+  cmake_policy(SET CMP0074 NEW)
+endif ()
 
-# Set required variables for includes and libraries
-# In the second line
-#   * VINECOPULIB_LIBRARIES is needed if vinecopulib has been built as a
-#     shared lib (does nothing otherwise).
-#   * CMAKE_THREAD_LIBS_INIT is needed for some linux systems
-#     (but does nothing on OSX/Windows).
-set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${wdm_INCLUDE_DIRS})
-set(external_libs ${VINECOPULIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+if (POLICY CMP0144)
+  # find_package() uses upper-case <PACKAGENAME>_ROOT variables.
+  cmake_policy(SET CMP0144 NEW)
+endif ()
+
+# Find vinecopulib package and dependencies
+find_package(vinecopulib REQUIRED)
 
 # Include subdirectory with project sources
 add_subdirectory(src)

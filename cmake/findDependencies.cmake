@@ -1,7 +1,25 @@
+if (POLICY CMP0074)
+  # find_package() uses <PackageName>_ROOT variables
+  cmake_policy(SET CMP0074 NEW)
+endif ()
+
+if (POLICY CMP0144)
+  # find_package() uses upper-case <PACKAGENAME>_ROOT variables.
+  cmake_policy(SET CMP0144 NEW)
+endif ()
+
 # Find the main dependencies
 find_package(Eigen3                       REQUIRED)
 include(cmake/findR.cmake                 REQUIRED)
-find_package(Boost 1.56                   REQUIRED)
+
+find_package(Boost 1.56 CONFIG)
+if (Boost_FOUND)
+  message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")  
+else ()
+  # fallback to MODULE mode
+  find_package(Boost 1.56 MODULE REQUIRED)
+endif ()
+
 find_package(Threads                      REQUIRED)
 find_package(wdm                          REQUIRED)
 
