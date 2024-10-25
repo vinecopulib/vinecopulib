@@ -54,18 +54,54 @@ TEST_F(VinecopTest, copy)
 TEST_F(VinecopTest, print)
 {
   auto cvine = CVineStructure(std::vector<size_t>({ 5, 4, 3, 2, 1 }));
-  auto vc = Vinecop(cvine);
+  auto vc1 = Vinecop(cvine);
 
-  // check if last line of output is correct
+  // check if first, second and last line are correct
+  std::string expected_first_line = "Vinecop model with 5 variables";
+  std::string expected_second_line = "tree edge conditioned variables conditioning variables var_types       family rotation parameters df tau ";
+  std::string expected_last_line = "   4    1                  5, 4                3, 2, 1      c, c Independence                        0.0 ";
+
   std::istringstream input;
-  input.str(vc.str());
-  std::string last_line;
-  for (std::string line; std::getline(input, line);)
-    last_line = line;
-  EXPECT_EQ(last_line, "5,4 | 3,2,1 <-> Independence");
+  input.str(vc1.str());
 
-  // just shouldn't segfault
-  Vinecop(cvine).str();
+  std::string line;
+  // get first, second and last line
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_first_line);
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_second_line);
+  std::string last_line;
+  while (std::getline(input, line)) {
+    last_line = line;
+  }
+  EXPECT_EQ(last_line, expected_last_line);
+
+  // create vine with 7 variables
+  auto pair_copulas = Vinecop::make_pair_copula_store(7);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::tawn, 270);
+    }
+  }
+
+  Vinecop vc2(model_matrix, pair_copulas);
+
+  // check if first, second and last line are correct
+  expected_first_line = "Vinecop model with 7 variables";
+  expected_second_line = "tree edge conditioned variables conditioning variables var_types       family rotation parameters df tau ";
+  expected_last_line = "   4    1                  5, 4                3, 2, 1      c, c Independence                        0.0 ";
+
+  input.str(vc2.str());
+
+  // get first, second and last line
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_first_line) << vc2.str();
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_second_line) << vc2.str();
+  while (std::getline(input, line)) {
+    last_line = line;
+  }
+  EXPECT_EQ(last_line, expected_last_line);
 }
 
 TEST_F(VinecopTest, serialization)
