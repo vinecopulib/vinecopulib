@@ -1667,7 +1667,7 @@ Vinecop::collapse_data(const Eigen::MatrixXd& u) const
 //! @brief Summarizes the model into a string (can be used for printing).
 //! @param trees A vector of tree indices to summarize; if empty, all trees.
 inline std::string
-Vinecop::str(const std::vector<size_t> trees) const
+Vinecop::str(const std::vector<size_t>& trees) const
 {
   std::vector<size_t> trees_to_summarize;
   std::vector<size_t> all_trees(rvine_structure_.get_trunc_lvl());
