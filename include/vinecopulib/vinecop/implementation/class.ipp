@@ -280,7 +280,7 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! The dependence measure used to select trees (default: Kendall's tau) is
 //! corrected for ties (see the [wdm](https://github.com/tnagler/wdm) library).
 //!
-//! If the `controls` object has been instantiated with 
+//! If the `controls` object has been instantiated with
 //! `select_families = false`, then the method simply updates the parameters of
 //! the pair-copulas without selecting the families or the structure.
 //! In this case, this is equivalent to calling `fit()` for each pair-copula,
@@ -333,13 +333,13 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 //! @details This method fits the pair-copulas of a vine copula model. It is
 //! assumed that the structure  and pair-copula families are already set.
 //! The method is equivalent to calling `fit()` for each pair-copula in the
-//! model. The same can be achieved by calling `select()` with the same data 
-//! and a `FitControlsVinecop` object instantiated 
+//! model. The same can be achieved by calling `select()` with the same data
+//! and a `FitControlsVinecop` object instantiated
 //! with `select_families = false`.
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls for each bivariate fit (see 
+//! @param controls The controls for each bivariate fit (see
 //! `FitControlsBicop()`).
 //! @param num_threads The number of threads to use for parallel computation.
 inline void
@@ -1665,31 +1665,130 @@ Vinecop::collapse_data(const Eigen::MatrixXd& u) const
 }
 
 //! @brief Summarizes the model into a string (can be used for printing).
+//! @param trees A vector of tree indices to summarize; if empty, all trees.
 inline std::string
-Vinecop::str() const
+Vinecop::str(const std::vector<size_t>& trees) const
 {
-  std::stringstream str;
+  std::vector<size_t> trees_to_summarize;
+  std::vector<size_t> all_trees(rvine_structure_.get_trunc_lvl());
+  std::iota(all_trees.begin(), all_trees.end(), 0);
+  if (trees.size() == 0) {
+    trees_to_summarize = all_trees;
+  } else {
+    trees_to_summarize = tools_stl::intersect(all_trees, trees);
+  }
+
+  std::stringstream vinecop_str;
+  vinecop_str << std::setprecision(2);
+  vinecop_str << "Vinecop model with " << d_ << " variables" << std::endl;
   auto arr = rvine_structure_.get_struct_array();
   auto order = rvine_structure_.get_order();
-  for (size_t t = 0; t < rvine_structure_.get_trunc_lvl(); ++t) {
-    str << "** Tree: " << t << std::endl;
+
+  std::vector<std::string> trees_s;
+  std::vector<std::string> edges;
+  std::vector<std::string> conditioned_variables;
+  std::vector<std::string> conditioning_variables;
+  std::vector<std::string> var_types;
+  std::vector<std::string> families;
+  std::vector<std::string> rotations;
+  std::vector<std::string> parameters;
+  std::vector<std::string> dfs;
+  std::vector<std::string> taus;
+  trees_s.push_back("tree");
+  edges.push_back("edge");
+  conditioned_variables.push_back("conditioned variables");
+  conditioning_variables.push_back("conditioning variables");
+  var_types.push_back("var_types");
+  families.push_back("family");
+  rotations.push_back("rotation");
+  parameters.push_back("parameters");
+  dfs.push_back("df");
+  taus.push_back("tau");
+
+  std::stringstream params_ss;   // 2 decimal places
+  std::stringstream dfs_ss;      // 1 decimal place
+  std::stringstream taus_ss;     // 2 decimal places
+  std::stringstream rotation_ss; // 0 decimal places
+  params_ss << std::fixed << std::setprecision(2);
+  dfs_ss << std::fixed << std::setprecision(1);
+  taus_ss << std::fixed << std::setprecision(2);
+  rotation_ss << std::fixed << std::setprecision(0);
+  for (size_t t : trees_to_summarize) {
     for (size_t e = 0; e < d_ - 1 - t; ++e) {
-      str << order[e] << "," << arr(t, e);
+      trees_s.push_back(std::to_string(t + 1));
+      edges.push_back(std::to_string(e + 1));
+      conditioned_variables.push_back(std::to_string(order[e]) + ", " +
+                                      std::to_string(arr(t, e)));
       if (t > 0) {
-        str << " | ";
-        for (size_t cv = t - 1; cv > 0; --cv) {
-          str << arr(cv, e) << ",";
+        std::string cv = "";
+        for (size_t cv_ = t - 1; cv_ > 0; --cv_) {
+          cv += std::to_string(arr(cv_, e)) + ", ";
         }
-        str << arr(0, e);
-      }
-      str << " <-> ";
-      if (t < pair_copulas_.size()) {
-        str << pair_copulas_[t][e].str() << std::endl;
+        cv += std::to_string(arr(0, e));
+        conditioning_variables.push_back(cv);
       } else {
-        str << "Independence" << std::endl;
+        conditioning_variables.push_back("");
+      }
+      var_types.push_back(var_types_[order[e] - 1] + ", " +
+                          var_types_[arr(t, e) - 1]);
+
+      if (t < pair_copulas_.size()) {
+        params_ss.str("");
+        dfs_ss.str("");
+        taus_ss.str("");
+        rotation_ss.str("");
+        auto bicop = pair_copulas_[t][e];
+        families.push_back(bicop.get_family_name());
+        if (bicop.get_family() == BicopFamily::tll) {
+          params_ss << "[30x30 grid]";
+          dfs_ss << bicop.get_npars();
+        } else if (bicop.get_family() != BicopFamily::indep) {
+          // They are concatenated on a single row with ", " as a separator
+          auto bicop_params = bicop.get_parameters();
+          for (long int row = 0; row < bicop_params.rows(); ++row) {
+            for (long int col = 0; col < bicop_params.cols(); ++col) {
+              params_ss << bicop_params(row, col);
+              // Add separator if not last element
+              if (col < bicop_params.cols() - 1 ||
+                  row < bicop_params.rows() - 1) {
+                params_ss << ", ";
+              }
+            }
+          }
+          rotation_ss << bicop.get_rotation();
+          dfs_ss << bicop.get_npars();
+        }
+
+        taus_ss << bicop.get_tau();
+        parameters.push_back(params_ss.str());
+        dfs.push_back(dfs_ss.str());
+        taus.push_back(taus_ss.str());
+        rotations.push_back(rotation_ss.str());
+
+      } else {
+        families.push_back(get_family_name(BicopFamily::indep));
+        rotations.push_back("");
+        parameters.push_back("");
+        taus.push_back("0.0");
+        dfs.push_back("");
       }
     }
   }
-  return str.str();
+
+  std::vector<std::vector<std::string>> vinecop_str_vec = {
+    trees_s,
+    edges,
+    conditioned_variables,
+    conditioning_variables,
+    var_types,
+    families,
+    rotations,
+    parameters,
+    dfs,
+    taus
+  };
+
+  vinecop_str << tools_stl::dataframe_to_string(vinecop_str_vec).str();
+  return vinecop_str.str();
 }
 }
