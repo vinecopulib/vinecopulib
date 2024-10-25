@@ -58,8 +58,12 @@ TEST_F(VinecopTest, print)
 
   // check if first, second and last line are correct
   std::string expected_first_line = "Vinecop model with 5 variables";
-  std::string expected_second_line = "tree edge conditioned variables conditioning variables var_types       family rotation parameters df tau ";
-  std::string expected_last_line = "   4    1                  5, 4                3, 2, 1      c, c Independence                        0.0 ";
+  std::string expected_second_line =
+    "tree edge conditioned variables conditioning variables var_types       "
+    "family rotation parameters df tau ";
+  std::string expected_last_line =
+    "   4    1                  5, 4                3, 2, 1      c, c "
+    "Independence                        0.0 ";
 
   std::istringstream input;
   input.str(vc1.str());
@@ -88,20 +92,44 @@ TEST_F(VinecopTest, print)
 
   // check if first, second and last line are correct
   expected_first_line = "Vinecop model with 7 variables";
-  expected_second_line = "tree edge conditioned variables conditioning variables var_types       family rotation parameters df tau ";
-  expected_last_line = "   4    1                  5, 4                3, 2, 1      c, c Independence                        0.0 ";
+  expected_second_line =
+    "tree edge conditioned variables conditioning variables var_types family "
+    "rotation       parameters  df   tau ";
+  expected_last_line = "   6    1                  4, 7          3, 1, 2, 6, 5 "
+                       "     c, c   Tawn      270 1.00, 1.00, 1.00 3.0 -0.00 ";
 
+  input.clear();
   input.str(vc2.str());
 
   // get first, second and last line
   std::getline(input, line);
-  EXPECT_EQ(line, expected_first_line) << vc2.str();
+  EXPECT_EQ(line, expected_first_line);
   std::getline(input, line);
-  EXPECT_EQ(line, expected_second_line) << vc2.str();
+  EXPECT_EQ(line, expected_second_line);
   while (std::getline(input, line)) {
     last_line = line;
   }
   EXPECT_EQ(last_line, expected_last_line);
+
+  auto data = tools_stats::simulate_uniform(100, 5);
+  auto controls = FitControlsVinecop({ BicopFamily::tll });
+  vc1.select(data, controls);
+
+  // check if first and second are correct
+  // we don't check the last line as it is random
+  // but at least we see it doesn't crash
+  expected_first_line = "Vinecop model with 5 variables";
+  expected_second_line =
+    "tree edge conditioned variables conditioning variables var_types family rotation   parameters   df   tau ";
+
+  input.clear();
+  input.str(vc1.str());
+
+  // get first, second and last line
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_first_line) << vc1.str();
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_second_line) << vc1.str();
 }
 
 TEST_F(VinecopTest, serialization)
@@ -381,7 +409,6 @@ TEST_F(VinecopTest, fit_parameters_is_correct)
   controls.set_select_families(false);
   vc3.select(u, controls);
   ASSERT_TRUE(vc.str() == vc3.str());
-
 }
 
 TEST_F(VinecopTest, family_select_finds_true_rotations)

@@ -1705,9 +1705,16 @@ Vinecop::str(const std::vector<size_t> trees) const
   dfs.push_back("df");
   taus.push_back("tau");
 
+  std::stringstream params_ss;   // 2 decimal places
+  std::stringstream dfs_ss;      // 1 decimal place
+  std::stringstream taus_ss;     // 2 decimal places
+  std::stringstream rotation_ss; // 0 decimal places
+  params_ss << std::fixed << std::setprecision(2);
+  dfs_ss << std::fixed << std::setprecision(1);
+  taus_ss << std::fixed << std::setprecision(2);
+  rotation_ss << std::fixed << std::setprecision(0);
   for (size_t t : trees_to_summarize) {
     for (size_t e = 0; e < d_ - 1 - t; ++e) {
-      std::cout << "tree: " << t << ", edge: " << e << std::endl;
       trees_s.push_back(std::to_string(t + 1));
       edges.push_back(std::to_string(e + 1));
       conditioned_variables.push_back(std::to_string(order[e]) + ", " +
@@ -1726,27 +1733,38 @@ Vinecop::str(const std::vector<size_t> trees) const
                           var_types_[arr(t, e) - 1]);
 
       if (t < pair_copulas_.size()) {
+        params_ss.str("");
+        dfs_ss.str("");
+        taus_ss.str("");
+        rotation_ss.str("");
         auto bicop = pair_copulas_[t][e];
         families.push_back(bicop.get_family_name());
         if (bicop.get_family() == BicopFamily::tll) {
-          parameters.push_back("[30x30 grid]");
-          rotations.push_back("");
-          // dfs are rounded after 1 decimal places
-          dfs.push_back(std::to_string(std::round(bicop.get_npars() * 10) / 10));
+          params_ss << "[30x30 grid]";
+          dfs_ss << bicop.get_npars();
         } else if (bicop.get_family() != BicopFamily::indep) {
-          std::stringstream ss;
-          ss << bicop.get_parameters();
-          parameters.push_back(ss.str());
-          rotations.push_back(std::to_string(bicop.get_rotation()));
-          // no need to round dfs
-          dfs.push_back(std::to_string(bicop.get_npars()));
-        } else {
-          parameters.push_back("");
-          rotations.push_back("");
-          dfs.push_back("");
+          // They are concatenated on a single row with ", " as a separator
+          auto bicop_params = bicop.get_parameters();
+          for (long int row = 0; row < bicop_params.rows(); ++row) {
+            for (long int col = 0; col < bicop_params.cols(); ++col) {
+              params_ss << bicop_params(row, col);
+              // Add separator if not last element
+              if (col < bicop_params.cols() - 1 ||
+                  row < bicop_params.rows() - 1) {
+                params_ss << ", ";
+              }
+            }
+          }
+          rotation_ss << bicop.get_rotation();
+          dfs_ss << bicop.get_npars();
         }
-        // taus are rounded after 2 decimal places
-        taus.push_back(std::to_string(std::round(bicop.get_tau() * 100) / 100));
+
+        taus_ss << bicop.get_tau();
+        parameters.push_back(params_ss.str());
+        dfs.push_back(dfs_ss.str());
+        taus.push_back(taus_ss.str());
+        rotations.push_back(rotation_ss.str());
+
       } else {
         families.push_back(get_family_name(BicopFamily::indep));
         rotations.push_back("");
@@ -1755,11 +1773,20 @@ Vinecop::str(const std::vector<size_t> trees) const
         dfs.push_back("");
       }
     }
-
   }
 
   std::vector<std::vector<std::string>> vinecop_str_vec = {
-    trees_s, edges, conditioned_variables, conditioning_variables, var_types, families, rotations, parameters, dfs, taus};
+    trees_s,
+    edges,
+    conditioned_variables,
+    conditioning_variables,
+    var_types,
+    families,
+    rotations,
+    parameters,
+    dfs,
+    taus
+  };
 
   vinecop_str << tools_stl::dataframe_to_string(vinecop_str_vec).str();
   return vinecop_str.str();
