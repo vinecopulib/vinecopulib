@@ -109,4 +109,19 @@ StudentBicop::tau_to_parameters(const double& tau)
 {
   return no_tau_to_parameters(tau);
 }
+
+inline double
+StudentBicop::parameters_to_tail_dependence(const Eigen::MatrixXd& parameters,
+                                            const bool)
+{
+  // 2 * pt(-sqrt(nu + 1)*sqrt((1 - theta)/(1 + theta)), nu + 1)
+  double nu = parameters(1);
+  double rho = parameters(0);
+  boost::math::students_t dist(nu + 1.0);
+  auto dt = [&dist](double y) { return boost::math::pdf(dist, y); };
+  auto tail =
+    2.0 * dt(-std::sqrt(nu + 1.0) * std::sqrt((1.0 - rho) / (1.0 + rho)));
+  return tail;
+}
+
 }

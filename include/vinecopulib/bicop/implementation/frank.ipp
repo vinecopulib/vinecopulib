@@ -89,6 +89,13 @@ FrankBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   return (parameters(0) >= 0) ? tau : -tau;
 }
 
+inline double
+FrankBicop::parameters_to_tail_dependence(const Eigen::MatrixXd&, const bool)
+{
+  return 0.0;
+}
+
+
 inline Eigen::VectorXd
 FrankBicop::get_start_parameters(const double tau)
 {

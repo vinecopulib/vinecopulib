@@ -79,6 +79,7 @@ public:
   Eigen::MatrixXd get_parameters() const;
 
   double get_tau() const;
+  double get_tail_dependence(const bool upper = true) const;
 
   double get_npars() const;
 
@@ -135,6 +136,8 @@ public:
   std::string str() const;
 
   double parameters_to_tau(const Eigen::MatrixXd& parameters) const;
+  double parameters_to_tail_dependence(const Eigen::MatrixXd& parameters,
+                                       const bool upper = true) const;
 
   Eigen::MatrixXd tau_to_parameters(const double& tau) const;
 

@@ -107,6 +107,12 @@ JoeBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   return 1 + 2 * tau / (2 - par);
 }
 
+inline double
+JoeBicop::parameters_to_tail_dependence(const Eigen::MatrixXd&, const bool)
+{
+  return 0.0;
+}
+
 inline Eigen::VectorXd
 JoeBicop::get_start_parameters(const double tau)
 {

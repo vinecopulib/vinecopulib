@@ -96,6 +96,19 @@ Bb1Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   return 1 - 2 / (parameters(1) * (parameters(0) + 2));
 }
 
+inline double
+Bb1Bicop::parameters_to_tail_dependence(const Eigen::MatrixXd& parameters,
+                                        const bool upper)
+{
+  double theta = parameters(0);
+  double delta = parameters(1);
+  if (upper) {
+    return 2.0 - std::pow(2.0, 1 / delta);
+  } else {
+    return std::pow(2.0, -1.0 / (delta * theta));
+  }
+}
+
 inline Eigen::MatrixXd
 Bb1Bicop::tau_to_parameters(const double& tau)
 {

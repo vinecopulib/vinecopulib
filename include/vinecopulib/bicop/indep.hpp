@@ -43,6 +43,8 @@ private:
 
   double parameters_to_tau(const Eigen::MatrixXd&);
 
+  double parameters_to_tail_dependence(const Eigen::MatrixXd&, const bool);
+
   void flip();
 
   Eigen::VectorXd get_start_parameters(const double tau);

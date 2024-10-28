@@ -96,6 +96,13 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     // assert approximate equality
     ASSERT_TRUE(f.isApprox(results.block(0, 8, n, 1), 1e-4)) << bicop_.str();
 
+    // evaluate tail dependence in C++
+    absdiff = fabs(bicop_.get_tail_dependence(true) - results(0, 9));
+    ASSERT_TRUE(absdiff < 1e-2) << bicop_.str();
+    absdiff = fabs(bicop_.get_tail_dependence(false) - results(0, 10));
+    ASSERT_TRUE(absdiff < 1e-2) << bicop_.str();
+
+
     u(0, 0) = std::numeric_limits<double>::quiet_NaN();
     u(1, 1) = std::numeric_limits<double>::quiet_NaN();
     EXPECT_NO_THROW(bicop_.pdf(u.block(0, 0, 10, 2))) << bicop_.str();

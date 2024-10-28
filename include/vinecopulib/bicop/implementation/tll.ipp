@@ -276,4 +276,12 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   }
   set_loglik(pdf(data).array().log().sum());
 }
+
+inline double
+TllBicop::parameters_to_tail_dependence(const Eigen::MatrixXd&,
+                                        const bool)
+{
+  return 0.0;
+}
+
 }

@@ -78,4 +78,10 @@ GaussianBicop::tau_to_parameters(const double& tau)
   parameters(0) = std::sin(tau * constant::pi / 2);
   return parameters;
 }
+
+inline double
+GaussianBicop::parameters_to_tail_dependence(const Eigen::MatrixXd&, const bool)
+{
+  return 0.0;
+}
 }

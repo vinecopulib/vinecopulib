@@ -96,6 +96,18 @@ GumbelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   return (parameters(0) - 1) / parameters(0);
 }
 
+inline double
+GumbelBicop::parameters_to_tail_dependence(const Eigen::MatrixXd& parameters,
+                                           const bool upper)
+{
+  double theta = parameters(0);
+  if (upper) {
+    return 2.0 - std::pow(2, 1 / theta);
+  } else {
+    return 0.0;
+  }
+}
+
 inline Eigen::VectorXd
 GumbelBicop::get_start_parameters(const double tau)
 {

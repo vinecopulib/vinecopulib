@@ -61,6 +61,9 @@ protected:
   virtual void set_npars(const double& npars) = 0;
 
   virtual double parameters_to_tau(const Eigen::MatrixXd& parameters) = 0;
+  
+  virtual double parameters_to_tail_dependence(const Eigen::MatrixXd& parameters,
+                                               const bool upper) = 0;
 
   virtual void flip() = 0;
 

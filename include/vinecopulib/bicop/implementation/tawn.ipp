@@ -77,4 +77,16 @@ TawnBicop::tau_to_parameters(const double& tau)
 {
   return no_tau_to_parameters(tau);
 }
+
+inline double
+TawnBicop::parameters_to_tail_dependence(const Eigen::MatrixXd& par, const bool upper)
+{
+  double psi1 = par(0, 0);
+  double psi2 = par(0, 1);
+
+  if (upper) {
+    return 1 - psi2;
+  } else {
+    return 1 - psi1;
+  }
 }

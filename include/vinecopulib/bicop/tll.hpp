@@ -49,6 +49,9 @@ private:
            std::string method,
            double mult,
            const Eigen::VectorXd& weights);
+
+  double parameters_to_tail_dependence(const Eigen::MatrixXd&,
+                                            const bool);
 };
 }
 

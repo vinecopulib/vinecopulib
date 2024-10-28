@@ -553,6 +553,19 @@ Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters) const
   return tau;
 }
 
+//! @brief Converts the copula parameters to tail dependence coefficients.
+//!
+//! @param parameters The parameters (must be a valid parametrization of
+//!     the current family).
+//! @param upper If `true` (default), the upper tail dependence coefficient is
+//!     returned, otherwise the lower tail dependence coefficient.
+inline double
+Bicop::parameters_to_tail_dependence(const Eigen::MatrixXd& parameters,
+                                      const bool upper) const
+{
+  return bicop_->parameters_to_tail_dependence(parameters, upper);
+}
+
 //! @name Getters and setters
 //!
 //! @{
@@ -641,6 +654,15 @@ inline double
 Bicop::get_tau() const
 {
   return parameters_to_tau(bicop_->get_parameters());
+}
+
+//! @brief Gets the tail dependence coefficient.
+//! @param upper If `true` (default), the upper tail dependence 
+//!   coefficient is returned, otherwise the lower tail dependence coefficient.
+inline double
+Bicop::get_tail_dependence(const bool upper) const
+{
+  return parameters_to_tail_dependence(bicop_->get_parameters(), upper);
 }
 
 //! @brief Sets the rotation.
