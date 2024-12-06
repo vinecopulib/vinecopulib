@@ -1,7 +1,11 @@
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_MACOSX_RPATH 1)
 
-set(CMAKE_BUILD_TYPE                                           "Release")
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build (Debug, Release, RelWithDebInfo, MinSizeRel)" FORCE)
+endif()
+
 option(VINECOPULIB_SHARED_LIB    "Pre-compiled version"              OFF)
 option(BUILD_SHARED_LIBS         "shared/static lib"                 ON)
 option(WARNINGS_AS_ERRORS        "Compiler warnings as errors"       OFF)
