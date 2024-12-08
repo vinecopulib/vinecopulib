@@ -62,6 +62,38 @@ simulate_uniform(const size_t& n,
   return u.unaryExpr([&](double) { return distribution(generator); });
 }
 
+//! @brief Simulates from independendent normals.
+//!
+//! @param n Number of observations.
+//! @param d Dimension.
+//! @param seeds Seeds of the random number generator; if empty (default),
+//!   the random number generator is seeded randomly.
+//!//!
+//! @return An \f$ n \times d \f$ matrix of independent
+//! \f$ \mathrm{N}(0, 1) \f$ random variables.
+inline Eigen::MatrixXd
+simulate_normal(const size_t& n, const size_t& d, std::vector<int> seeds)
+{
+  if ((n < 1) || (d < 1)) {
+    throw std::runtime_error("n and d must be at least 1.");
+  }
+  if (seeds.size() == 0) {
+    // no seeds provided, seed randomly
+    std::random_device rd{};
+    seeds = std::vector<int>(5);
+    std::generate(
+      seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
+  }
+
+  // initialize random engine and uniform distribution
+  std::seed_seq seq(seeds.begin(), seeds.end());
+  std::mt19937 generator(seq);
+  std::normal_distribution<double> distribution(0, 1);
+
+  Eigen::MatrixXd x(n, d);
+  return x.unaryExpr([&](double) { return distribution(generator); });
+}
+
 //! @brief Applies the empirical probability integral transform to a data
 //! matrix.
 //!
@@ -144,6 +176,47 @@ to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method)
   }
 
   return x / (static_cast<double>(n) + 1.0);
+}
+
+//
+inline Eigen::MatrixXd
+find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
+{
+  using namespace tools_stats;
+  size_t n = u.rows();
+
+  auto w = simulate_uniform(n, 2);
+  Eigen::MatrixXd uu = w.array() * u.leftCols(2).array() +
+                       (1 - w.array()) * u.rightCols(2).array();
+
+  auto covering = BoxCovering(uu);
+  std::vector<size_t> indices;
+
+  Eigen::MatrixXd lb = safe_qnorm(u.rightCols(2));
+  Eigen::MatrixXd ub = safe_qnorm(u.leftCols(2));
+  lb = safe_pnorm(lb.array() - b);
+  ub = safe_pnorm(ub.array() + b);
+
+  Eigen::MatrixXd x(n, 2), norm_sim(n, 2);
+
+  for (size_t it = 0; it < niter; it++) {
+    uu = to_pseudo_obs(uu);
+    x = qnorm(uu);
+    norm_sim = simulate_normal(n, 2).array() * b;
+    w = simulate_uniform(n, 1);
+
+    for (size_t i = 0; i < n; i++) {
+      indices = covering.get_box_indices(lb.row(i), ub.row(i));
+      if (indices.size() > 0) {
+        int j = indices.at(static_cast<size_t>(w(i) * indices.size()));
+        x.row(i) = x.row(j) + norm_sim.row(i);
+        uu.row(i) = pnorm(x.row(i));
+        covering.swap_sample(i, uu.row(i));
+      }
+    }
+  }
+
+  return to_pseudo_obs(x);
 }
 
 //! window smoother

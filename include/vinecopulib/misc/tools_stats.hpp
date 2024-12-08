@@ -7,6 +7,7 @@
 #pragma once
 
 #include <boost/math/distributions.hpp>
+#include <set>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
@@ -49,6 +50,52 @@ qnorm(const Eigen::MatrixXd& x)
 {
   boost::math::normal dist;
   auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
+  return tools_eigen::unaryExpr_or_nan(x, f);
+}
+
+//! @brief Quantile function of the Standard normal distribution with additional
+//! bound checks for numerical stability.
+//!
+//! @param x Evaluation points.
+//!
+//! @return An \f$ n \times d \f$ matrix of evaluated quantiles.
+inline Eigen::MatrixXd
+safe_qnorm(const Eigen::MatrixXd& x)
+{
+  boost::math::normal dist;
+  auto f = [&dist](double y) {
+    if (y <= 0) {
+      return -std::numeric_limits<double>::infinity();
+    } else if (y >= 1) {
+      return std::numeric_limits<double>::infinity();
+    } else {
+      return boost::math::quantile(dist, y);
+    }
+  };
+
+  return tools_eigen::unaryExpr_or_nan(x, f);
+}
+
+//! @brief Distribution function of the Standard normal distribution with
+//! additional bound checks for numerical stability.
+//!
+//! @param x Evaluation points.
+//!
+//! @return An \f$ n \times d \f$ matrix of evaluated quantiles.
+inline Eigen::MatrixXd
+safe_pnorm(const Eigen::MatrixXd& x)
+{
+  boost::math::normal dist;
+  auto f = [&dist](double y) {
+    if (y >= std::numeric_limits<double>::max()) {
+      return 1.0;
+    } else if (y <= -std::numeric_limits<double>::max()) {
+      return 0.0;
+    } else {
+      return boost::math::cdf(dist, y);
+    }
+  };
+
   return tools_eigen::unaryExpr_or_nan(x, f);
 }
 
@@ -100,11 +147,109 @@ simulate_uniform(const size_t& n,
                  bool qrng = false,
                  std::vector<int> seeds = std::vector<int>());
 
+Eigen::MatrixXd
+simulate_normal(const size_t& n,
+                const size_t& d,
+                std::vector<int> seeds = std::vector<int>());
+
 Eigen::VectorXd
 to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method = "average");
 
 Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average");
+
+class BoxCovering
+{
+public:
+  BoxCovering(const Eigen::MatrixXd& u, size_t K = 40)
+    : u_(u)
+    , K_(K)
+  {
+    boxes_.resize(K);
+    for (size_t k = 0; k < K; k++) {
+      boxes_[k].resize(K);
+      for (size_t j = 0; j < K; j++) {
+        boxes_[k][j] = std::make_unique<Box>(
+          std::vector<double>{ static_cast<double>(k) / K,
+                               static_cast<double>(j) / K },
+          std::vector<double>{ static_cast<double>(k + 1) / K,
+                               static_cast<double>(j + 1) / K });
+      }
+    }
+
+    size_t k, j;
+    n_ = u.rows();
+    for (size_t i = 0; i < n_; i++) {
+      k = std::floor(u(i, 0) * K);
+      j = std::floor(u(i, 1) * K);
+      boxes_[k][j]->indices_.insert(i);
+    }
+  }
+
+  std::vector<size_t> get_box_indices(const Eigen::VectorXd& lower,
+                                      const Eigen::VectorXd& upper)
+  {
+    std::vector<size_t> indices;
+    indices.reserve(n_);
+    auto l0 = std::floor(lower(0) * K_);
+    auto l1 = std::floor(lower(1) * K_);
+    auto u0 = std::ceil(upper(0) * K_);
+    auto u1 = std::ceil(upper(1) * K_);
+
+    for (size_t k = l0; k < u0; k++) {
+      for (size_t j = l1; j < u1; j++) {
+        for (auto& i : boxes_[k][j]->indices_) {
+          if ((k == l0) || (k == u0 - 1)) {
+            if ((u_(i, 0) < lower(0)) || (u_(i, 0) > upper(0)))
+              continue;
+          }
+          if ((j == l1) || (j == u1 - 1)) {
+            if ((u_(i, 1) < lower(1)) || (u_(i, 1) > upper(1)))
+              continue;
+          }
+          indices.push_back(i);
+        }
+      }
+    }
+
+    return indices;
+  }
+
+  void swap_sample(size_t i, const Eigen::VectorXd& new_sample)
+  {
+    auto k = std::floor(u_(i, 0) * K_);
+    auto j = std::floor(u_(i, 1) * K_);
+    boxes_[k][j]->indices_.erase(i);
+
+    u_.row(i) = new_sample;
+    k = std::floor(new_sample(0) * K_);
+    j = std::floor(new_sample(1) * K_);
+    boxes_[k][j]->indices_.insert(i);
+  }
+
+private:
+  struct Box
+  {
+  public:
+    Box(std::vector<double> lower, std::vector<double> upper)
+      : lower_(lower)
+      , upper_(upper)
+    {
+    }
+
+    std::vector<double> lower_;
+    std::vector<double> upper_;
+    std::set<size_t> indices_;
+  };
+
+  Eigen::MatrixXd u_;
+  size_t n_;
+  size_t K_;
+  std::vector<std::vector<std::unique_ptr<Box>>> boxes_;
+};
+
+Eigen::MatrixXd
+find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter = 3);
 
 double
 pairwise_mcor(const Eigen::MatrixXd& x,
