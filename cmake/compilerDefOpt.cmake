@@ -9,17 +9,13 @@ if(NOT WIN32)
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wno-variadic-macros -Wno-parentheses  -fdiagnostics-show-option")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wbool-operation")
-        set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wmacro-redefined -Wundef -Wshadow -Wredundant-decls -Winit-self -Wcast-qual -Wfloat-equal")
+        set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wbuiltin-macro-redefined -Wundef")
     else()
         set(CMAKE_CXX_FLAGS                "-Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type")
     endif()
 
     set(CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG ")
     set(CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
-
-    if(WARNINGS_AS_ERRORS)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werr")
-    endif()
 
     if(OPT_ASAN)
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
@@ -49,3 +45,9 @@ endif()
 if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()
+
+add_compile_definitions(
+  BOOST_NO_AUTO_PTR
+  BOOST_ALLOW_DEPRECATED_HEADERS
+  BOOST_MATH_PROMOTE_DOUBLE_POLICY=false
+)

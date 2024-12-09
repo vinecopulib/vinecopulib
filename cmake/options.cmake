@@ -8,7 +8,6 @@ endif()
 
 option(VINECOPULIB_SHARED_LIB    "Pre-compiled version"              OFF)
 option(BUILD_SHARED_LIBS         "shared/static lib"                 ON)
-option(WARNINGS_AS_ERRORS        "Compiler warnings as errors"       OFF)
 option(OPT_ASAN                  "Use adress sanitizer (debug)"      ON)
 option(BUILD_TESTING             "Build tests."                      ON)
 option(CODE_COVERAGE             "Code coverage."                    OFF)
