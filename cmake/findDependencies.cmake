@@ -13,8 +13,7 @@ endif ()
 # Check if EIGEN3_INCLUDE_DIR is defined and if not, try to find it
 if(NOT DEFINED EIGEN3_INCLUDE_DIR)
   find_package(Eigen3 REQUIRED)
-
-include(cmake/findR.cmake                 REQUIRED)
+endif()
 
 # Check if Boost_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED Boost_INCLUDE_DIRS)
@@ -26,15 +25,18 @@ if(NOT DEFINED Boost_INCLUDE_DIRS)
     # fallback to MODULE mode
     find_package(Boost 1.56 MODULE REQUIRED)
   endif ()
+endif()
 
 find_package(Threads                      REQUIRED)
 
 # Check if wdm_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED wdm_INCLUDE_DIRS)
   find_package(wdm REQUIRED)
+endif()
 
-# Download googlestest
+# Ensure R is available and download googlestest
 if(BUILD_TESTING)
+  include(cmake/findR.cmake                 REQUIRED)
 
   # Prevent overriding the parent project's compiler/linker settings
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
