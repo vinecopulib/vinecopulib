@@ -11,6 +11,16 @@ endif ()
 # Find the main dependencies
 
 # Check if EIGEN3_INCLUDE_DIR is defined and if not, try to find it
+message(STATUS)
+message(STATUS)
+message(STATUS)
+message(STATUS)
+message(STATUS "EIGEN3_INCLUDE_DIR: ${EIGEN3_INCLUDE_DIR}")
+message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+message(STATUS)
+message(STATUS)
+message(STATUS)
+message(STATUS)
 if(NOT DEFINED EIGEN3_INCLUDE_DIR)
   find_package(Eigen3 REQUIRED)
 endif()
