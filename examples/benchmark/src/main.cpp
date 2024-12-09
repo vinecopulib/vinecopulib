@@ -18,8 +18,9 @@ generate_data(int n, int d)
 
   MatrixXd data(n, d);
   for (int i = 0; i < n; ++i) {
+    double x = dist(gen);
     for (int j = 0; j < d; ++j) {
-      data(i, j) = dist(gen) * 1.0 + 0.5 * dist(gen);
+      data(i, j) = x * 1.0 + 0.5 * dist(gen);
     }
   }
   return data;
@@ -54,8 +55,6 @@ main()
   FitControlsVinecop controls_itau_par_method(bicop_families::itau, "itau");
   FitControlsVinecop controls_tll({ BicopFamily::tll });
 
-
-
   // Benchmark different configurations
   double time_itau = benchmark([&](const Eigen::MatrixXd& u) {
     Vinecop vc(u, RVineStructure(), {}, controls_itau);
@@ -66,6 +65,7 @@ main()
   double time_tll = benchmark([&](const Eigen::MatrixXd& u) {
     Vinecop vc(u, RVineStructure(), {}, controls_tll);
   });
+
 
   // Output results
   cout << "Benchmark Results (ms):" << endl;
