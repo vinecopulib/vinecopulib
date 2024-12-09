@@ -9,19 +9,29 @@ if (POLICY CMP0144)
 endif ()
 
 # Find the main dependencies
-find_package(Eigen3                       REQUIRED)
+
+# Check if EIGEN3_INCLUDE_DIR is defined and if not, try to find it
+if(NOT DEFINED EIGEN3_INCLUDE_DIR)
+  find_package(Eigen3 REQUIRED)
+
 include(cmake/findR.cmake                 REQUIRED)
 
-find_package(Boost 1.56 CONFIG)
-if (Boost_FOUND)
-  message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")  
-else ()
-  # fallback to MODULE mode
-  find_package(Boost 1.56 MODULE REQUIRED)
-endif ()
+# Check if Boost_INCLUDE_DIRS is defined and if not, try to find it
+if(NOT DEFINED Boost_INCLUDE_DIRS)
+  # try to find Boost in CONFIG mode first
+  find_package(Boost 1.56 CONFIG)
+  if (Boost_FOUND)
+    message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")  
+  else ()
+    # fallback to MODULE mode
+    find_package(Boost 1.56 MODULE REQUIRED)
+  endif ()
 
 find_package(Threads                      REQUIRED)
-find_package(wdm                          REQUIRED)
+
+# Check if wdm_INCLUDE_DIRS is defined and if not, try to find it
+if(NOT DEFINED wdm_INCLUDE_DIRS)
+  find_package(wdm REQUIRED)
 
 # Download googlestest
 if(BUILD_TESTING)
