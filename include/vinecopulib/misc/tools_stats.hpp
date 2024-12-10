@@ -161,7 +161,7 @@ to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average");
 class BoxCovering
 {
 public:
-  BoxCovering(const Eigen::MatrixXd& u, size_t K = 40)
+  BoxCovering(const Eigen::MatrixXd& u, uint16_t K = 40)
     : u_(u)
     , K_(K)
   {
@@ -180,8 +180,8 @@ public:
     size_t k, j;
     n_ = u.rows();
     for (size_t i = 0; i < n_; i++) {
-      k = std::floor(u(i, 0) * K);
-      j = std::floor(u(i, 1) * K);
+      k = static_cast<size_t>(std::floor(u(i, 0) * K));
+      j = static_cast<size_t>(std::floor(u(i, 1) * K));
       boxes_[k][j]->indices_.insert(i);
     }
   }
@@ -191,10 +191,10 @@ public:
   {
     std::vector<size_t> indices;
     indices.reserve(n_);
-    auto l0 = std::floor(lower(0) * K_);
-    auto l1 = std::floor(lower(1) * K_);
-    auto u0 = std::ceil(upper(0) * K_);
-    auto u1 = std::ceil(upper(1) * K_);
+    auto l0 = static_cast<size_t>(std::floor(lower(0) * K_));
+    auto l1 = static_cast<size_t>(std::floor(lower(1) * K_));
+    auto u0 = static_cast<size_t>(std::ceil(upper(0) * K_));
+    auto u1 = static_cast<size_t>(std::ceil(upper(1) * K_));
 
     for (size_t k = l0; k < u0; k++) {
       for (size_t j = l1; j < u1; j++) {
@@ -217,13 +217,13 @@ public:
 
   void swap_sample(size_t i, const Eigen::VectorXd& new_sample)
   {
-    auto k = std::floor(u_(i, 0) * K_);
-    auto j = std::floor(u_(i, 1) * K_);
+    auto k = static_cast<size_t>(std::floor(u_(i, 0) * K_));
+    auto j = static_cast<size_t>(std::floor(u_(i, 1) * K_));
     boxes_[k][j]->indices_.erase(i);
 
     u_.row(i) = new_sample;
-    k = std::floor(new_sample(0) * K_);
-    j = std::floor(new_sample(1) * K_);
+    k = static_cast<size_t>(std::floor(new_sample(0) * K_));
+    j = static_cast<size_t>(std::floor(new_sample(1) * K_));
     boxes_[k][j]->indices_.insert(i);
   }
 
@@ -244,7 +244,7 @@ private:
 
   Eigen::MatrixXd u_;
   size_t n_;
-  size_t K_;
+  uint16_t K_;
   std::vector<std::vector<std::unique_ptr<Box>>> boxes_;
 };
 
