@@ -8,10 +8,8 @@
 
 #include "vinecop_test.hpp"
 #include <string>
-#include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
-#include <vinecopulib/vinecop/class.hpp>
-#include <vinecopulib/vinecop/tools_select.hpp>
 
 namespace test_vinecop_class {
 using namespace vinecopulib;
