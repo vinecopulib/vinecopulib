@@ -8,9 +8,7 @@
 
 #include "test_vinecop_sanity_checks.hpp"
 #include "gtest/gtest.h"
-#include <vinecopulib/bicop/class.hpp>
-#include <vinecopulib/misc/tools_stats.hpp>
-#include <vinecopulib/misc/tools_stl.hpp>
+#include <vinecopulib.hpp>
 
 namespace test_tools_stats {
 

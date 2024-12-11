@@ -21,6 +21,7 @@ inline FitControlsVinecop::FitControlsVinecop()
   tree_criterion_ = "tau";
   select_trunc_lvl_ = false;
   select_threshold_ = false;
+  select_families_ = true;
   show_trace_ = false;
 }
 
@@ -36,12 +37,12 @@ inline FitControlsVinecop::FitControlsVinecop()
 //!     are multiplied.
 //! @param trunc_lvl Truncation level for truncated vines.
 //! @param tree_criterion The criterion for selecting the maximum spanning
-//!     tree ("tau", "hoeffd", "rho", and "mcor" implemented so far).
+//!     tree (`"tau"`, `"hoeffd"`, `"rho"`, and `"mcor"` implemented so far).
 //! @param threshold For thresholded vines (0 = no threshold).
 //! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
 //!     or `"bic"`).
 //! @param weights A vector of weights for the observations.
-//! @param psi0 Only for `selection_criterion = "mbic", prior probability of
+//! @param psi0 Only for `selection_criterion = "mbic"`, prior probability of
 //!     non-independence.
 //! @param preselect_families Whether to exclude families before fitting
 //!     based on symmetry properties of the data.
@@ -49,12 +50,15 @@ inline FitControlsVinecop::FitControlsVinecop()
 //!     automatically.
 //! @param select_threshold Whether the threshold parameter shall be
 //!     selected automatically.
+//! @param select_families Whether the families shall be selected
+//! automatically, or should the method simply update the parameters for 
+//! the pair copulas already present in the model.
 //! @param show_trace Whether to show a trace of the building progress.
 //! @param num_threads Number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number
 //!     of concurrent threads supported by the implementation.
 //! @param mst_algorithm The algorithm for building the maximum spanning
-//!     tree ("prim" or "kruskal") during the tree-wise structure selection.
+//!     tree (`"prim"` or `"kruskal"`) during the tree-wise structure selection.
 inline FitControlsVinecop::FitControlsVinecop(
   std::vector<BicopFamily> family_set,
   std::string parametric_method,
@@ -69,6 +73,7 @@ inline FitControlsVinecop::FitControlsVinecop(
   bool preselect_families,
   bool select_trunc_lvl,
   bool select_threshold,
+  bool select_families,
   bool show_trace,
   size_t num_threads,
   std::string mst_algorithm)
@@ -86,33 +91,39 @@ inline FitControlsVinecop::FitControlsVinecop(
   set_threshold(threshold);
   set_select_trunc_lvl(select_trunc_lvl);
   set_select_threshold(select_threshold);
+  set_select_families(select_families);
   set_show_trace(show_trace);
   set_num_threads(num_threads);
   set_mst_algorithm(mst_algorithm);
 }
 
 //! @brief Instantiates custom controls for fitting vine copula models.
+//!
+//! @param controls See `FitControlsBicop()`.
 //! @param trunc_lvl Truncation level for truncated vines.
 //! @param tree_criterion The criterion for selecting the maximum spanning
-//!     tree ("tau", "hoeffd" and "rho" implemented so far).
-//! @param threshold For thresholded vines (0 = no threshold).
+//!     tree (`"tau"`, `"hoeffd"` and `"rho"` implemented so far).
+//! @param threshold For thresholded vines (`0` = no threshold).
 //! @param show_trace Whether to show a trace of the building progress.
 //! @param select_trunc_lvl Whether the truncation shall be selected
 //!     automatically.
 //! @param select_threshold Whether the threshold parameter shall be
 //!     selected automatically.
-//! @param controls See FitControlsBicop.
+//! @param select_families Whether the families shall be selected
+//! automatically, or should the method simply update the parameters for 
+//! the pair copulas already present in the model.
 //! @param num_threads Number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number returned
 //!     by `std::thread::hardware_concurrency()``.
 //! @param mst_algorithm The algorithm for building the maximum spanning
-//!     tree ("prim" or "kruskal") during the tree-wise structure selection.
+//!     tree (`"prim"` or `"kruskal"`) during the tree-wise structure selection.
 inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
                                               size_t trunc_lvl,
                                               std::string tree_criterion,
                                               double threshold,
                                               bool select_trunc_lvl,
                                               bool select_threshold,
+                                              bool select_families,
                                               bool show_trace,
                                               size_t num_threads,
                                               std::string mst_algorithm)
@@ -123,6 +134,7 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
   set_threshold(threshold);
   set_select_trunc_lvl(select_trunc_lvl);
   set_select_threshold(select_threshold);
+  set_select_families(select_families);
   set_show_trace(show_trace);
   set_num_threads(num_threads);
   set_mst_algorithm(mst_algorithm);
@@ -152,42 +164,56 @@ FitControlsVinecop::check_threshold(double threshold)
 //! @name Getters and setters.
 //! @{
 
-//! returns the truncation level.
+//! @brief Gets the truncation level.
 inline size_t
 FitControlsVinecop::get_trunc_lvl() const
 {
   return trunc_lvl_;
 }
 
-//! Sets the truncation level.
+//! @brief Sets the truncation level.
 inline void
 FitControlsVinecop::set_trunc_lvl(size_t trunc_lvl)
 {
   trunc_lvl_ = trunc_lvl;
 }
 
-//! returns whether to select the truncation level automatically.
+//! @brief Gets whether to select the truncation level automatically.
 inline bool
 FitControlsVinecop::get_select_trunc_lvl() const
 {
   return select_trunc_lvl_;
 }
 
-//! Sets whether to select the truncation level automatically.
+//! @brief Sets whether to select the truncation level automatically.
 inline void
 FitControlsVinecop::set_select_trunc_lvl(bool select_trunc_lvl)
 {
   select_trunc_lvl_ = select_trunc_lvl;
 }
 
-//! returns the criterion for tree selection.
+//! @brief Gets whether to select the families automatically.
+inline bool
+FitControlsVinecop::get_select_families() const
+{
+  return select_families_;
+}
+
+//! @brief Sets whether to select the families automatically.
+inline void
+FitControlsVinecop::set_select_families(bool select_families)
+{
+  select_families_ = select_families;
+}
+
+//! @brief Gets the criterion for tree selection.
 inline std::string
 FitControlsVinecop::get_tree_criterion() const
 {
   return tree_criterion_;
 }
 
-//! Sets the criterion for tree selection.
+//! @brief Sets the criterion for tree selection.
 inline void
 FitControlsVinecop::set_tree_criterion(std::string tree_criterion)
 {
@@ -195,14 +221,14 @@ FitControlsVinecop::set_tree_criterion(std::string tree_criterion)
   tree_criterion_ = tree_criterion;
 }
 
-//! returns the threshold parameter.
+//! @brief Gets the threshold parameter.
 inline double
 FitControlsVinecop::get_threshold() const
 {
   return threshold_;
 }
 
-//! Sets the threshold parameter.
+//! @brief Sets the threshold parameter.
 inline void
 FitControlsVinecop::set_threshold(double threshold)
 {
@@ -210,35 +236,35 @@ FitControlsVinecop::set_threshold(double threshold)
   threshold_ = threshold;
 }
 
-//! returns whether to show a trace is during fitting.
+//! @brief Gets whether to show a trace is during fitting.
 inline bool
 FitControlsVinecop::get_show_trace() const
 {
   return show_trace_;
 }
 
-//! returns whether to show a trace is during fitting.
+//! @brief Gets whether to show a trace is during fitting.
 inline void
 FitControlsVinecop::set_show_trace(bool show_trace)
 {
   show_trace_ = show_trace;
 }
 
-//! returns whether to select the threshold automatically.
+//! @brief Gets whether to select the threshold automatically.
 inline bool
 FitControlsVinecop::get_select_threshold() const
 {
   return select_threshold_;
 }
 
-//! returns the maximum spanning tree algorithm.
+//! @brief Gets the maximum spanning tree algorithm.
 inline std::string
 FitControlsVinecop::get_mst_algorithm() const
 {
   return mst_algorithm_;
 }
 
-//! Sets whether to select the threshold automatically.
+//! @brief Sets whether to select the threshold automatically.
 inline void
 FitControlsVinecop::set_select_threshold(bool select_threshold)
 {
@@ -251,7 +277,7 @@ FitControlsVinecop::needs_sparse_select() const
   return (select_trunc_lvl_ | select_threshold_);
 }
 
-//! Returns the fit controls for bivariate fitting.
+//! @brief Gets the fit controls for bivariate fitting.
 inline FitControlsBicop
 FitControlsVinecop::get_fit_controls_bicop() const
 {
@@ -266,7 +292,7 @@ FitControlsVinecop::get_fit_controls_bicop() const
   return controls_bicop;
 }
 
-//! Sets the fit controls for bivariate fitting.
+//! @brief Sets the fit controls for bivariate fitting.
 inline void
 FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)
 {
@@ -276,7 +302,7 @@ FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)
   set_preselect_families(controls.get_preselect_families());
 }
 
-//! Sets the maximum spanning tree algorithm.
+//! @brief Sets the maximum spanning tree algorithm.
 inline void
 FitControlsVinecop::set_mst_algorithm(std::string mst_algorithm)
 {
@@ -310,6 +336,10 @@ FitControlsVinecop::str() const
                << static_cast<std::string>(get_select_trunc_lvl() ? "yes"
                                                                   : "no")
                << std::endl;
+  controls_str << "Select families: "
+                << static_cast<std::string>(get_select_families() ? "yes"
+                                                                  : "no")
+                << std::endl;
   controls_str << "Show trace: "
                << static_cast<std::string>(get_show_trace() ? "yes" : "no")
                << std::endl;

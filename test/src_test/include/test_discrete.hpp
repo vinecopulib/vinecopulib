@@ -7,8 +7,8 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include <vinecopulib/bicop/class.hpp>
-#include <vinecopulib/vinecop/class.hpp>
+#include <vinecopulib.hpp>
+#include <wdm/eigen.hpp>
 
 namespace test_discrete {
 
@@ -148,11 +148,13 @@ TEST(discrete, vinecop)
     }
   }
   RVineStructure str(std::vector<size_t>{ 1, 2, 3, 4, 5 });
-  Vinecop vc(str, pair_copulas, { "d", "c", "d", "d", "c" });
+  auto var_types = std::vector<std::string>{ "d", "c", "d", "d", "c" };
+  Vinecop vc(str, pair_copulas, var_types);
 
   // simulate data with continuous and discrete variables
-  auto utmp = vc.simulate(500, true, 1, { 1 });
-  Eigen::MatrixXd u(utmp.rows(), 5 + 3); // 3 discrete vars
+  size_t n = 500;
+  auto utmp = vc.simulate(n, true, 1, { 1 });
+  Eigen::MatrixXd u(n, 5 + 3); // 3 discrete vars
   u.leftCols(5) = utmp;
 
   u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
@@ -166,12 +168,13 @@ TEST(discrete, vinecop)
 
   // fit vine
   auto controls = FitControlsVinecop({ BicopFamily::clayton });
+  auto vc2 = vc;
   // controls.set_show_trace(true);
-  vc.select(u, controls);
-  vc.pdf(u);
+  vc2.select(u, controls);
+  vc2.pdf(u);
 
   // check output
-  auto pcs = vc.get_all_pair_copulas();
+  auto pcs = vc2.get_all_pair_copulas();
   for (size_t t = 0; t < 4; t++) {
     for (auto pc : pcs[t]) {
       EXPECT_EQ(pc.get_rotation(), 90);
@@ -180,8 +183,15 @@ TEST(discrete, vinecop)
     }
   }
 
+  for (auto& pc : pcs[0])
+    pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
+  Vinecop vc3(vc2.get_rvine_structure(), pcs, var_types);
+  vc3.fit(u, controls);
+
+  ASSERT_TRUE(vc2.str() == vc3.str());
+
   // test other input format
-  u = Eigen::MatrixXd(utmp.rows(), 10);
+  u = Eigen::MatrixXd(n, 10);
   u.leftCols(5) = utmp;
   u.rightCols(5) = utmp;
   u.col(0) = (utmp.col(0).array() * 10).ceil() / 10;
@@ -190,9 +200,9 @@ TEST(discrete, vinecop)
   u.col(7) = (utmp.col(2).array() * 10).floor() / 10;
   u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
   u.col(8) = (utmp.col(3).array() * 10).floor() / 10;
-  vc.select(u, controls);
-  vc.pdf(u);
-  pcs = vc.get_all_pair_copulas();
+  vc2.select(u, controls);
+  vc2.pdf(u);
+  pcs = vc2.get_all_pair_copulas();
   for (size_t t = 0; t < 4; t++) {
     for (auto pc : pcs[t]) {
       EXPECT_EQ(pc.get_rotation(), 90);
@@ -200,6 +210,25 @@ TEST(discrete, vinecop)
         pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
     }
   }
+
+  // test for approximate uniformity of rosenblatt transformation
+  u = vc.rosenblatt(u, 1, true);
+  for (int i = 0; i < 5; i++) {
+    auto w = tools_stats::to_pseudo_obs(u.col(i));
+    // close to KS test with FWER ~ 0.001
+    EXPECT_LE(std::sqrt(n) * (u.col(i) - w).cwiseAbs().maxCoeff(), 3.5);
+    // Kendall's tau test with FWER ~ 0.001
+    for (int j = i + 1; j < 5; j++) {
+      EXPECT_GE(
+        wdm::Indep_test(wdm::utils::convert_vec(u.col(i)), 
+                        wdm::utils::convert_vec(u.col(j)),
+                        "kendall").p_value(),
+        0.0001);
+    }
+  }
+  
+  // only check that it works
+  vc.inverse_rosenblatt(u.topRows(10));
 }
 
 TEST(zero_inflated, vinecop)

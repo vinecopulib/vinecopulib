@@ -8,10 +8,8 @@
 
 #include "vinecop_test.hpp"
 #include <string>
-#include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
-#include <vinecopulib/vinecop/class.hpp>
-#include <vinecopulib/vinecop/tools_select.hpp>
 
 namespace test_vinecop_class {
 using namespace vinecopulib;
@@ -54,18 +52,82 @@ TEST_F(VinecopTest, copy)
 TEST_F(VinecopTest, print)
 {
   auto cvine = CVineStructure(std::vector<size_t>({ 5, 4, 3, 2, 1 }));
-  auto vc = Vinecop(cvine);
+  auto vc1 = Vinecop(cvine);
 
-  // check if last line of output is correct
+  // check if first, second and last line are correct
+  std::string expected_first_line = "Vinecop model with 5 variables";
+  std::string expected_second_line =
+    "tree edge conditioned variables conditioning variables var_types       "
+    "family rotation parameters df tau ";
+  std::string expected_last_line =
+    "   4    1                  5, 4                3, 2, 1      c, c "
+    "Independence                        0.0 ";
+
   std::istringstream input;
-  input.str(vc.str());
-  std::string last_line;
-  for (std::string line; std::getline(input, line);)
-    last_line = line;
-  EXPECT_EQ(last_line, "5,4 | 3,2,1 <-> Independence");
+  input.str(vc1.str());
 
-  // just shouldn't segfault
-  Vinecop(cvine).str();
+  std::string line;
+  // get first, second and last line
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_first_line);
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_second_line);
+  std::string last_line;
+  while (std::getline(input, line)) {
+    last_line = line;
+  }
+  EXPECT_EQ(last_line, expected_last_line);
+
+  // create vine with 7 variables
+  auto pair_copulas = Vinecop::make_pair_copula_store(7);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::tawn, 270);
+    }
+  }
+
+  Vinecop vc2(model_matrix, pair_copulas);
+
+  // check if first, second and last line are correct
+  expected_first_line = "Vinecop model with 7 variables";
+  expected_second_line =
+    "tree edge conditioned variables conditioning variables var_types family "
+    "rotation       parameters  df   tau ";
+  expected_last_line = "   6    1                  4, 7          3, 1, 2, 6, 5 "
+                       "     c, c   Tawn      270 1.00, 1.00, 1.00 3.0 -0.00 ";
+
+  input.clear();
+  input.str(vc2.str());
+
+  // get first, second and last line
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_first_line);
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_second_line);
+  while (std::getline(input, line)) {
+    last_line = line;
+  }
+  EXPECT_EQ(last_line, expected_last_line);
+
+  auto data = tools_stats::simulate_uniform(100, 5);
+  auto controls = FitControlsVinecop({ BicopFamily::tll });
+  vc1.select(data, controls);
+
+  // check if first and second are correct
+  // we don't check the last line as it is random
+  // but at least we see it doesn't crash
+  expected_first_line = "Vinecop model with 5 variables";
+  expected_second_line =
+    "tree edge conditioned variables conditioning variables var_types family rotation   parameters   df   tau ";
+
+  input.clear();
+  input.str(vc1.str());
+
+  // get first, second and last line
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_first_line) << vc1.str();
+  std::getline(input, line);
+  EXPECT_EQ(line, expected_second_line) << vc1.str();
 }
 
 TEST_F(VinecopTest, serialization)
@@ -325,6 +387,28 @@ TEST_F(VinecopTest, aic_bic_are_correct)
   ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
 }
 
+TEST_F(VinecopTest, fit_parameters_is_correct)
+{
+  u.conservativeResize(50, 7);
+  auto controls = FitControlsVinecop({ BicopFamily::clayton }, "itau");
+  Vinecop vc(7);
+  vc.select(u, controls);
+  auto rvine_structure = vc.get_rvine_structure();
+
+  auto pcs = vc.get_all_pair_copulas();
+  for (auto& pc : pcs[0])
+    pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
+  Vinecop vc2(rvine_structure, pcs);
+  vc2.fit(u, controls);
+
+  ASSERT_TRUE(vc.str() == vc2.str());
+
+  Vinecop vc3(rvine_structure, pcs);
+  controls.set_select_families(false);
+  vc3.select(u, controls);
+  ASSERT_TRUE(vc.str() == vc3.str());
+}
+
 TEST_F(VinecopTest, family_select_finds_true_rotations)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
@@ -393,13 +477,21 @@ TEST_F(VinecopTest, works_multi_threaded)
   controls.set_num_threads(2);
   Vinecop fit2(u, RVineStructure(), {}, controls);
 
+  auto pcs = fit1.get_all_pair_copulas();
+  for (auto& pc : pcs[0])
+    pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
+  Vinecop fit3(fit1.get_rvine_structure(), pcs);
+  fit3.fit(u, controls, 2);
+
   // check for equality in likelihood, since the pair copulas may be stored
   // in a different order when running in parallel
   EXPECT_NEAR(fit1.loglik(u), fit2.loglik(u), 1e-2);
+  EXPECT_NEAR(fit1.loglik(u), fit3.loglik(u), 1e-2);
 
   // check if parallel evaluators have same output as single threaded ones
   EXPECT_TRUE(fit2.pdf(u, 2).isApprox(fit2.pdf(u), 1e-10));
-  EXPECT_TRUE(fit2.inverse_rosenblatt(u, 2).isApprox(fit2.inverse_rosenblatt(u), 1e-10));
+  EXPECT_TRUE(
+    fit2.inverse_rosenblatt(u, 2).isApprox(fit2.inverse_rosenblatt(u), 1e-10));
   EXPECT_TRUE(fit2.rosenblatt(u, 2).isApprox(fit2.rosenblatt(u), 1e-10));
 
   // just check that it works

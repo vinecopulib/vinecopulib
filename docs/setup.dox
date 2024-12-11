@@ -156,9 +156,9 @@ is to use CMake. For instance, an example projet where the source code to be lin
 The top-level `CMakeLists.txt` could be:
 
 ```cmake
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.5)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 project (Example)
 
@@ -167,23 +167,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # C++ compile flags
 if (NOT WIN32)
- set(CMAKE_CXX_FLAGS "-std=gnu++11 -Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O2 -DNDEBUG")
+ set(CMAKE_CXX_FLAGS "-Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O2 -DNDEBUG")
 endif()
 
 # Find vinecopulib package and dependencies
-find_package(vinecopulib                  REQUIRED)
-find_package(Boost 1.56                   REQUIRED)
-include(cmake/findEigen3.cmake            REQUIRED)
-find_package(Threads                      REQUIRED)
-
-# Set required variables for includes and libraries
-# In the second line
-#   * VINECOPULIB_LIBRARIES is needed if vinecopulib has been built as a
-#     shared lib (does nothing otherwise).
-#   * CMAKE_THREAD_LIBS_INIT is needed for some linux systems
-#     (but does nothing on OSX/Windows).
-set(external_includes ${VINECOPULIB_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
-set(external_libs ${VINECOPULIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+find_package(vinecopulib REQUIRED)
 
 # Include subdirectory with project sources
 add_subdirectory(src)
@@ -194,15 +182,12 @@ the top), the `CMakeLists.txt` file in `/src/`
 could then be:
 
 ```cmake
-# Include header files
-include_directories(${external_includes})
 
 # Add main executable
 add_executable(main main.cpp)
 
-# Link to vinecopulib if vinecopulib has been built as a shared lib
-# and to pthreads on some linux systems (does nothing otherwise)
-target_link_libraries(main ${VINECOPULIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+# Link to vinecopulib
+target_link_libraries(main ${VINECOPULIB_LIBRARIES})
 ```
 
 **/
