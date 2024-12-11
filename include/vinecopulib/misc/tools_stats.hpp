@@ -6,9 +6,9 @@
 
 #pragma once
 
+#include <boost/math/distributions.hpp>
 #include <memory>
 #include <set>
-#include <boost/math/distributions.hpp>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
@@ -162,7 +162,7 @@ to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average");
 class BoxCovering
 {
 public:
-  BoxCovering(const Eigen::MatrixXd& u, uint16_t K = 40)
+  explicit BoxCovering(const Eigen::MatrixXd& u, uint16_t K = 40)
     : u_(u)
     , K_(K)
   {
@@ -178,11 +178,10 @@ public:
       }
     }
 
-    size_t k, j;
     n_ = u.rows();
     for (size_t i = 0; i < n_; i++) {
-      k = static_cast<size_t>(std::floor(u(i, 0) * K));
-      j = static_cast<size_t>(std::floor(u(i, 1) * K));
+      size_t k = static_cast<size_t>(std::floor(u(i, 0) * K));
+      size_t j = static_cast<size_t>(std::floor(u(i, 1) * K));
       boxes_[k][j]->indices_.insert(i);
     }
   }
@@ -232,7 +231,7 @@ private:
   struct Box
   {
   public:
-    Box(std::vector<double> lower, std::vector<double> upper)
+    Box(const std::vector<double>& lower, const std::vector<double>& upper)
       : lower_(lower)
       , upper_(upper)
     {
