@@ -9,6 +9,8 @@
 #include <boost/math/distributions.hpp>
 #include <vinecopulib/misc/tools_eigen.hpp>
 #include <unsupported/Eigen/SpecialFunctions>
+
+
 namespace vinecopulib {
 
 namespace tools_stats {
@@ -21,7 +23,8 @@ namespace tools_stats {
 inline Eigen::MatrixXd
 dnorm(const Eigen::MatrixXd& x)
 {
-  const double sqrt_2pi = std::sqrt(2.0 * M_PI);
+  static const double pi = 3.14159265358979323846;
+  static const double sqrt_2pi = std::sqrt(2.0 * pi);
   return (1.0 / sqrt_2pi) * (-0.5 * x.array().square()).exp();
 }
 
@@ -33,7 +36,7 @@ dnorm(const Eigen::MatrixXd& x)
 inline Eigen::MatrixXd
 pnorm(const Eigen::MatrixXd& x)
 {
-  const double sqrt2 = std::sqrt(2.0);
+  static const double sqrt2 = std::sqrt(2.0);
   return 0.5 * (1.0 + (x.array() / sqrt2).erf());
 }
 
