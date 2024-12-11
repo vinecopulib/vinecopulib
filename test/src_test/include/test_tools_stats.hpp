@@ -110,6 +110,45 @@ TEST(test_tools_stats, seed_works)
   ASSERT_TRUE(U2.cwiseEqual(U3).all());
 }
 
+TEST(test_tools_stats, dpqnorm_work)
+{
+  auto dnorm_boost = [](Eigen::MatrixXd x) {
+    boost::math::normal dist;
+    auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
+    return tools_eigen::unaryExpr_or_nan(x, f);
+  };
+
+  auto pnorm_boost = [](Eigen::MatrixXd x) {
+    boost::math::normal dist;
+    auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
+    return tools_eigen::unaryExpr_or_nan(x, f);
+  };
+
+  auto qnorm_boost = [](Eigen::MatrixXd x) {
+    boost::math::normal dist;
+    auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
+    return tools_eigen::unaryExpr_or_nan(x, f);
+  };
+
+  // linspace from -5 to 5 (1000 points)
+  Eigen::VectorXd X = Eigen::VectorXd::LinSpaced(1000, -5, 5);
+
+  // tools_stats::dnorm is the same as dnorm_boost
+  auto d1 = tools_stats::dnorm(X);
+  auto d2 = dnorm_boost(X);
+  ASSERT_TRUE(d1.isApprox(d2, 1e-6));
+
+  // tools_stats::pnorm is the same as pnorm_boost
+  auto p1 = tools_stats::pnorm(X);
+  auto p2 = pnorm_boost(X);
+  ASSERT_TRUE(p1.isApprox(p2, 1e-6));
+
+  // tools_stats::qnorm is the same as qnorm_boost
+  auto q1 = tools_stats::qnorm(p1);
+  auto q2 = qnorm_boost(p1);
+  ASSERT_TRUE(q1.isApprox(q2, 1e-6));
+}
+
 TEST(test_tools_stats, dpqnorm_are_nan_safe)
 {
   Eigen::VectorXd X = Eigen::VectorXd::Random(10);
