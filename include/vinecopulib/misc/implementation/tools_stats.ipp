@@ -241,7 +241,8 @@ BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
 }
 
 //! Create a single box.
-BoxCovering::Box::Box(const std::vector<double>& lower, const std::vector<double>& upper)
+inline BoxCovering::Box::Box(const std::vector<double>& lower,
+                             const std::vector<double>& upper)
   : lower_(lower)
   , upper_(upper)
 {
