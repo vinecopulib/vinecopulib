@@ -10,7 +10,9 @@
 * Allow for the discrete Rosenblatt transform (#581)
 * Add `Vinecop::fit()` (#584)
 * Improve `Bicop::str()` (#588) and `Vinecop::str()` (#589)
-* Improve performance by aligning with R defaults and add benchmarking example (#592)
+* Improve performance by
+    * aligning with R defaults and add benchmarking example (#592),
+    * using `Eigen` element-wise operations instead of `boost` in `tools::stats` (#598).
 
 ### BUG FIXES
 
