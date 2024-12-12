@@ -8,6 +8,8 @@
 
 #include <boost/math/distributions.hpp>
 #include <vinecopulib/misc/tools_eigen.hpp>
+#include <unsupported/Eigen/SpecialFunctions>
+
 
 namespace vinecopulib {
 
@@ -21,9 +23,9 @@ namespace tools_stats {
 inline Eigen::MatrixXd
 dnorm(const Eigen::MatrixXd& x)
 {
-  boost::math::normal dist;
-  auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
-  return tools_eigen::unaryExpr_or_nan(x, f);
+  static const double pi = 3.14159265358979323846;
+  static const double sqrt_2pi = std::sqrt(2.0 * pi);
+  return (1.0 / sqrt_2pi) * (-0.5 * x.array().square()).exp();
 }
 
 //! @brief Distribution function of the Standard normal distribution.
@@ -34,9 +36,8 @@ dnorm(const Eigen::MatrixXd& x)
 inline Eigen::MatrixXd
 pnorm(const Eigen::MatrixXd& x)
 {
-  boost::math::normal dist;
-  auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
-  return tools_eigen::unaryExpr_or_nan(x, f);
+  static const double sqrt2 = std::sqrt(2.0);
+  return 0.5 * (1.0 + (x.array() / sqrt2).erf());
 }
 
 //! @brief Quantile function of the Standard normal distribution.
@@ -47,9 +48,7 @@ pnorm(const Eigen::MatrixXd& x)
 inline Eigen::MatrixXd
 qnorm(const Eigen::MatrixXd& x)
 {
-  boost::math::normal dist;
-  auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
-  return tools_eigen::unaryExpr_or_nan(x, f);
+  return x.array().ndtri();
 }
 
 //! @brief Density function of the Student t distribution.
