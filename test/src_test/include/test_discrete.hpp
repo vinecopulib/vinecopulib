@@ -7,9 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include <vinecopulib/bicop/class.hpp>
-#include <vinecopulib/misc/tools_stats.hpp>
-#include <vinecopulib/vinecop/class.hpp>
+#include <vinecopulib.hpp>
 #include <wdm/eigen.hpp>
 
 namespace test_discrete {
