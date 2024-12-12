@@ -112,84 +112,22 @@ to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method = "average");
 Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average");
 
+
+// Covers the unit hypercube with boxes and assigns each sample to a box.
+// Used internally for recovering the latent sample of a discrete copula.
 class BoxCovering
 {
-public:
-  explicit BoxCovering(const Eigen::MatrixXd& u, uint16_t K = 40)
-    : u_(u)
-    , K_(K)
-  {
-    boxes_.resize(K);
-    for (size_t k = 0; k < K; k++) {
-      boxes_[k].resize(K);
-      for (size_t j = 0; j < K; j++) {
-        boxes_[k][j] = std::make_unique<Box>(
-          std::vector<double>{ static_cast<double>(k) / K,
-                               static_cast<double>(j) / K },
-          std::vector<double>{ static_cast<double>(k + 1) / K,
-                               static_cast<double>(j + 1) / K });
-      }
-    }
-
-    n_ = u.rows();
-    for (size_t i = 0; i < n_; i++) {
-      size_t k = static_cast<size_t>(std::floor(u(i, 0) * K));
-      size_t j = static_cast<size_t>(std::floor(u(i, 1) * K));
-      boxes_[k][j]->indices_.insert(i);
-    }
-  }
-
+public:  
+  explicit BoxCovering(const Eigen::MatrixXd& u, uint16_t K = 40);
   std::vector<size_t> get_box_indices(const Eigen::VectorXd& lower,
-                                      const Eigen::VectorXd& upper)
-  {
-    std::vector<size_t> indices;
-    indices.reserve(n_);
-    auto l0 = static_cast<size_t>(std::floor(lower(0) * K_));
-    auto l1 = static_cast<size_t>(std::floor(lower(1) * K_));
-    auto u0 = static_cast<size_t>(std::ceil(upper(0) * K_));
-    auto u1 = static_cast<size_t>(std::ceil(upper(1) * K_));
-
-    for (size_t k = l0; k < u0; k++) {
-      for (size_t j = l1; j < u1; j++) {
-        for (auto& i : boxes_[k][j]->indices_) {
-          if ((k == l0) || (k == u0 - 1)) {
-            if ((u_(i, 0) < lower(0)) || (u_(i, 0) > upper(0)))
-              continue;
-          }
-          if ((j == l1) || (j == u1 - 1)) {
-            if ((u_(i, 1) < lower(1)) || (u_(i, 1) > upper(1)))
-              continue;
-          }
-          indices.push_back(i);
-        }
-      }
-    }
-
-    return indices;
-  }
-
-  void swap_sample(size_t i, const Eigen::VectorXd& new_sample)
-  {
-    auto k = static_cast<size_t>(std::floor(u_(i, 0) * K_));
-    auto j = static_cast<size_t>(std::floor(u_(i, 1) * K_));
-    boxes_[k][j]->indices_.erase(i);
-
-    u_.row(i) = new_sample;
-    k = static_cast<size_t>(std::floor(new_sample(0) * K_));
-    j = static_cast<size_t>(std::floor(new_sample(1) * K_));
-    boxes_[k][j]->indices_.insert(i);
-  }
+                                      const Eigen::VectorXd& upper) const;
+  void swap_sample(size_t i, const Eigen::VectorXd& new_sample);
 
 private:
   struct Box
   {
   public:
-    Box(const std::vector<double>& lower, const std::vector<double>& upper)
-      : lower_(lower)
-      , upper_(upper)
-    {
-    }
-
+    Box(const std::vector<double>& lower, const std::vector<double>& upper);
     std::vector<double> lower_;
     std::vector<double> upper_;
     std::set<size_t> indices_;

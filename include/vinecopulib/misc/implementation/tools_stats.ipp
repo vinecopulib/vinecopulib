@@ -165,7 +165,93 @@ to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method)
   return x / (static_cast<double>(n) + 1.0);
 }
 
-//
+// Construct a box covering from a matrix of samples.
+// @param u A matrix of samples.
+// @param K The number of boxes in each dimension.
+inline BoxCovering::BoxCovering(const Eigen::MatrixXd& u, uint16_t K)
+  : u_(u)
+  , K_(K)
+{
+  boxes_.resize(K);
+  for (size_t k = 0; k < K; k++) {
+    boxes_[k].resize(K);
+    for (size_t j = 0; j < K; j++) {
+      boxes_[k][j] = std::make_unique<Box>(
+        std::vector<double>{ static_cast<double>(k) / K,
+                             static_cast<double>(j) / K },
+        std::vector<double>{ static_cast<double>(k + 1) / K,
+                             static_cast<double>(j + 1) / K });
+    }
+  }
+
+  n_ = u.rows();
+  for (size_t i = 0; i < n_; i++) {
+    size_t k = static_cast<size_t>(std::floor(u(i, 0) * K));
+    size_t j = static_cast<size_t>(std::floor(u(i, 1) * K));
+    boxes_[k][j]->indices_.insert(i);
+  }
+}
+
+// Get the indices of the samples in a box defined by lower and upper bounds.
+// @param lower Lower bounds of the box.
+// @param upper Upper bounds of the box.
+inline std::vector<size_t>
+BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
+                             const Eigen::VectorXd& upper) const
+{
+  std::vector<size_t> indices;
+  indices.reserve(n_);
+  auto l0 = static_cast<size_t>(std::floor(lower(0) * K_));
+  auto l1 = static_cast<size_t>(std::floor(lower(1) * K_));
+  auto u0 = static_cast<size_t>(std::ceil(upper(0) * K_));
+  auto u1 = static_cast<size_t>(std::ceil(upper(1) * K_));
+
+  for (size_t k = l0; k < u0; k++) {
+    for (size_t j = l1; j < u1; j++) {
+      for (auto& i : boxes_[k][j]->indices_) {
+        if ((k == l0) || (k == u0 - 1)) {
+          if ((u_(i, 0) < lower(0)) || (u_(i, 0) > upper(0)))
+            continue;
+        }
+        if ((j == l1) || (j == u1 - 1)) {
+          if ((u_(i, 1) < lower(1)) || (u_(i, 1) > upper(1)))
+            continue;
+        }
+        indices.push_back(i);
+      }
+    }
+  }
+
+  return indices;
+}
+
+// Swap a sample in the box covering.
+// @param i Index of the sample to swap.
+inline void
+BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
+{
+  auto k = static_cast<size_t>(std::floor(u_(i, 0) * K_));
+  auto j = static_cast<size_t>(std::floor(u_(i, 1) * K_));
+  boxes_[k][j]->indices_.erase(i);
+
+  u_.row(i) = new_sample;
+  k = static_cast<size_t>(std::floor(new_sample(0) * K_));
+  j = static_cast<size_t>(std::floor(new_sample(1) * K_));
+  boxes_[k][j]->indices_.insert(i);
+}
+
+//! Create a single box.
+BoxCovering::Box::Box(const std::vector<double>& lower, const std::vector<double>& upper)
+  : lower_(lower)
+  , upper_(upper)
+{
+}
+
+// Recovers a (continuous) latent sample from a sample of a discrete copula by
+// treating it as an interval-censored density estimation problem.
+// @param u A matrix of samples.
+// @param b The bandwidth of the kernel density estimator.
+// @param niter The number of iterations.
 inline Eigen::MatrixXd
 find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
 {
