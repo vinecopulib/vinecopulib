@@ -9,9 +9,8 @@
 #include <boost/math/distributions.hpp>
 #include <memory>
 #include <set>
-#include <vinecopulib/misc/tools_eigen.hpp>
 #include <unsupported/Eigen/SpecialFunctions>
-
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
 
@@ -51,52 +50,6 @@ inline Eigen::MatrixXd
 qnorm(const Eigen::MatrixXd& x)
 {
   return x.array().ndtri();
-}
-
-//! @brief Quantile function of the Standard normal distribution with additional
-//! bound checks for numerical stability.
-//!
-//! @param x Evaluation points.
-//!
-//! @return An \f$ n \times d \f$ matrix of evaluated quantiles.
-inline Eigen::MatrixXd
-safe_qnorm(const Eigen::MatrixXd& x)
-{
-  boost::math::normal dist;
-  auto f = [&dist](double y) {
-    if (y <= 0) {
-      return -std::numeric_limits<double>::infinity();
-    } else if (y >= 1) {
-      return std::numeric_limits<double>::infinity();
-    } else {
-      return boost::math::quantile(dist, y);
-    }
-  };
-
-  return tools_eigen::unaryExpr_or_nan(x, f);
-}
-
-//! @brief Distribution function of the Standard normal distribution with
-//! additional bound checks for numerical stability.
-//!
-//! @param x Evaluation points.
-//!
-//! @return An \f$ n \times d \f$ matrix of evaluated quantiles.
-inline Eigen::MatrixXd
-safe_pnorm(const Eigen::MatrixXd& x)
-{
-  boost::math::normal dist;
-  auto f = [&dist](double y) {
-    if (y >= std::numeric_limits<double>::max()) {
-      return 1.0;
-    } else if (y <= -std::numeric_limits<double>::max()) {
-      return 0.0;
-    } else {
-      return boost::math::cdf(dist, y);
-    }
-  };
-
-  return tools_eigen::unaryExpr_or_nan(x, f);
 }
 
 //! @brief Density function of the Student t distribution.
@@ -150,6 +103,7 @@ simulate_uniform(const size_t& n,
 Eigen::MatrixXd
 simulate_normal(const size_t& n,
                 const size_t& d,
+                bool qrng = false,
                 std::vector<int> seeds = std::vector<int>());
 
 Eigen::VectorXd

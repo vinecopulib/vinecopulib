@@ -78,7 +78,7 @@ simulate_normal(const size_t& n,
                 bool qrng,
                 std::vector<int> seeds)
 {
-  qnorm(tools_stats::simulate_uniform(n, d, qrng, seeds));
+  return qnorm(tools_stats::simulate_uniform(n, d, qrng, seeds));
 }
 
 //! @brief Applies the empirical probability integral transform to a data
@@ -179,10 +179,10 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   auto covering = BoxCovering(uu);
   std::vector<size_t> indices;
 
-  Eigen::MatrixXd lb = safe_qnorm(u.rightCols(2));
-  Eigen::MatrixXd ub = safe_qnorm(u.leftCols(2));
-  lb = safe_pnorm(lb.array() - b);
-  ub = safe_pnorm(ub.array() + b);
+  Eigen::MatrixXd lb = qnorm(u.rightCols(2));
+  Eigen::MatrixXd ub = qnorm(u.leftCols(2));
+  lb = pnorm(lb.array() - b);
+  ub = pnorm(ub.array() + b);
 
   Eigen::MatrixXd x(n, 2), norm_sim(n, 2);
 
