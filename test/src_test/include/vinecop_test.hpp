@@ -8,7 +8,7 @@
 
 #include "rscript.hpp"
 #include "gtest/gtest.h"
-#include <vinecopulib/misc/tools_eigen.hpp>
+#include <vinecopulib.hpp>
 
 class VinecopTest : public ::testing::Test
 {

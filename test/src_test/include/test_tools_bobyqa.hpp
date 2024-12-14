@@ -8,8 +8,8 @@
 
 #include "gtest/gtest.h"
 #include <cmath>
+#include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_bobyqa.hpp>
-#include <vinecopulib/misc/tools_stats.hpp>
 
 namespace test_tools_bobyqa {
 
