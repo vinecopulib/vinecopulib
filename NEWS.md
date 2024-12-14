@@ -13,6 +13,7 @@
 * Improve performance by
     * aligning with R defaults and add benchmarking example (#592),
     * using `Eigen` element-wise operations instead of `boost` in `tools::stats` (#598).
+* Properly handle discrete variables for the TLL family (#597)
 
 ### BUG FIXES
 
