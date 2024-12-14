@@ -8,9 +8,7 @@
 
 #include "test_vinecop_sanity_checks.hpp"
 #include "gtest/gtest.h"
-#include <vinecopulib/bicop/class.hpp>
-#include <vinecopulib/misc/tools_stats.hpp>
-#include <vinecopulib/misc/tools_stl.hpp>
+#include <vinecopulib.hpp>
 
 namespace test_tools_stats {
 
@@ -113,6 +111,45 @@ TEST(test_tools_stats, seed_works)
   ASSERT_TRUE(U2.cwiseEqual(U3).all());
 }
 
+TEST(test_tools_stats, dpqnorm_work)
+{
+  auto dnorm_boost = [](Eigen::MatrixXd x) {
+    boost::math::normal dist;
+    auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
+    return tools_eigen::unaryExpr_or_nan(x, f);
+  };
+
+  auto pnorm_boost = [](Eigen::MatrixXd x) {
+    boost::math::normal dist;
+    auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
+    return tools_eigen::unaryExpr_or_nan(x, f);
+  };
+
+  auto qnorm_boost = [](Eigen::MatrixXd x) {
+    boost::math::normal dist;
+    auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
+    return tools_eigen::unaryExpr_or_nan(x, f);
+  };
+
+  // linspace from -5 to 5 (1000 points)
+  Eigen::VectorXd X = Eigen::VectorXd::LinSpaced(1000, -5, 5);
+
+  // tools_stats::dnorm is the same as dnorm_boost
+  auto d1 = tools_stats::dnorm(X);
+  auto d2 = dnorm_boost(X);
+  ASSERT_TRUE(d1.isApprox(d2, 1e-6));
+
+  // tools_stats::pnorm is the same as pnorm_boost
+  auto p1 = tools_stats::pnorm(X);
+  auto p2 = pnorm_boost(X);
+  ASSERT_TRUE(p1.isApprox(p2, 1e-6));
+
+  // tools_stats::qnorm is the same as qnorm_boost
+  auto q1 = tools_stats::qnorm(p1);
+  auto q2 = qnorm_boost(p1);
+  ASSERT_TRUE(q1.isApprox(q2, 1e-6));
+}
+
 TEST(test_tools_stats, dpqnorm_are_nan_safe)
 {
   Eigen::VectorXd X = Eigen::VectorXd::Random(10);
@@ -140,5 +177,25 @@ TEST(test_tools_stats, pbvt_and_pbvnorm_are_nan_safe)
   int nu = 5;
   EXPECT_NO_THROW(tools_stats::pbvt(X, nu, rho));
   EXPECT_NO_THROW(tools_stats::pbvnorm(X, rho));
+}
+
+TEST(test_tools_stats, find_latent_sample)
+{
+  Eigen::MatrixXd u(4, 4);
+  u << 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2, 0.3, 0.4, 0.5,
+    0.6, 0.7;
+
+  double bandwidth = 0.1;
+  size_t niter = 10;
+
+  Eigen::MatrixXd latent_sample =
+    tools_stats::find_latent_sample(u, bandwidth, niter);
+
+  EXPECT_EQ(latent_sample.rows(), u.rows());
+  EXPECT_EQ(latent_sample.cols(), 2);
+
+  u.resize(2, 8);
+  EXPECT_THROW(tools_stats::find_latent_sample(u, bandwidth, niter),
+               std::runtime_error);
 }
 }
