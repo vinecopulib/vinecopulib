@@ -177,4 +177,24 @@ TEST(test_tools_stats, pbvt_and_pbvnorm_are_nan_safe)
   EXPECT_NO_THROW(tools_stats::pbvt(X, nu, rho));
   EXPECT_NO_THROW(tools_stats::pbvnorm(X, rho));
 }
+
+TEST(test_tools_stats, find_latent_sample)
+{
+  Eigen::MatrixXd u(4, 4);
+  u << 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.1, 0.2, 0.3, 0.4, 0.5,
+    0.6, 0.7;
+
+  double bandwidth = 0.1;
+  size_t niter = 10;
+
+  Eigen::MatrixXd latent_sample =
+    tools_stats::find_latent_sample(u, bandwidth, niter);
+
+  EXPECT_EQ(latent_sample.rows(), u.rows());
+  EXPECT_EQ(latent_sample.cols(), 2);
+
+  u.resize(2, 8);
+  EXPECT_THROW(tools_stats::find_latent_sample(u, bandwidth, niter),
+               std::runtime_error);
+}
 }

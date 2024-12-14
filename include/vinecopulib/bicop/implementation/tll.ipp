@@ -243,6 +243,12 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   Eigen::Matrix2d B = select_bandwidth(z_data, method, weights);
   B *= mult;
 
+  // find latent sample in case observations are discrete
+  if (var_types_[0] == "d" || var_types_[1] == "d") {
+    psobs =
+      tools_stats::find_latent_sample(data, std::pow(B(0, 0) * B(1, 1), 0.25));
+  }
+
   // compute the density estimator (first column estimate, second influence)
   Eigen::MatrixXd ll_fit = fit_local_likelihood(z, z_data, B, method, weights);
 

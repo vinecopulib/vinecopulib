@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <memory>
 #include <random>
 #include <unsupported/Eigen/FFT>
 #include <vinecopulib/misc/tools_stats_ghalton.hpp>
@@ -59,6 +60,25 @@ simulate_uniform(const size_t& n,
 
   Eigen::MatrixXd u(n, d);
   return u.unaryExpr([&](double) { return distribution(generator); });
+}
+
+//! @brief Simulates from independendent normals.
+//!
+//! @param n Number of observations.
+//! @param d Dimension.
+//! @param qrng If true, quasi-numbers are generated.
+//! @param seeds Seeds of the random number generator; if empty (default),
+//!   the random number generator is seeded randomly.
+//!//!
+//! @return An \f$ n \times d \f$ matrix of independent
+//! \f$ \mathrm{N}(0, 1) \f$ random variables.
+inline Eigen::MatrixXd
+simulate_normal(const size_t& n,
+                const size_t& d,
+                bool qrng,
+                std::vector<int> seeds)
+{
+  return qnorm(tools_stats::simulate_uniform(n, d, qrng, seeds));
 }
 
 //! @brief Applies the empirical probability integral transform to a data
@@ -143,6 +163,138 @@ to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method)
   }
 
   return x / (static_cast<double>(n) + 1.0);
+}
+
+// Construct a box covering from a matrix of samples.
+// @param u A matrix of samples.
+// @param K The number of boxes in each dimension.
+inline BoxCovering::BoxCovering(const Eigen::MatrixXd& u, uint16_t K)
+  : u_(u)
+  , K_(K)
+{
+  boxes_.resize(K);
+  for (size_t k = 0; k < K; k++) {
+    boxes_[k].resize(K);
+    for (size_t j = 0; j < K; j++) {
+      boxes_[k][j] = std::make_unique<Box>(
+        std::vector<double>{ static_cast<double>(k) / K,
+                             static_cast<double>(j) / K },
+        std::vector<double>{ static_cast<double>(k + 1) / K,
+                             static_cast<double>(j + 1) / K });
+    }
+  }
+
+  n_ = u.rows();
+  for (size_t i = 0; i < n_; i++) {
+    size_t k = static_cast<size_t>(std::floor(u(i, 0) * K));
+    size_t j = static_cast<size_t>(std::floor(u(i, 1) * K));
+    boxes_[k][j]->indices_.insert(i);
+  }
+}
+
+// Get the indices of the samples in a box defined by lower and upper bounds.
+// @param lower Lower bounds of the box.
+// @param upper Upper bounds of the box.
+inline std::vector<size_t>
+BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
+                             const Eigen::VectorXd& upper) const
+{
+  std::vector<size_t> indices;
+  indices.reserve(n_);
+  auto l0 = static_cast<size_t>(std::floor(lower(0) * K_));
+  auto l1 = static_cast<size_t>(std::floor(lower(1) * K_));
+  auto u0 = static_cast<size_t>(std::ceil(upper(0) * K_));
+  auto u1 = static_cast<size_t>(std::ceil(upper(1) * K_));
+
+  for (size_t k = l0; k < u0; k++) {
+    for (size_t j = l1; j < u1; j++) {
+      for (auto& i : boxes_[k][j]->indices_) {
+        if ((k == l0) || (k == u0 - 1)) {
+          if ((u_(i, 0) < lower(0)) || (u_(i, 0) > upper(0)))
+            continue;
+        }
+        if ((j == l1) || (j == u1 - 1)) {
+          if ((u_(i, 1) < lower(1)) || (u_(i, 1) > upper(1)))
+            continue;
+        }
+        indices.push_back(i);
+      }
+    }
+  }
+
+  return indices;
+}
+
+// Swap a sample in the box covering.
+// @param i Index of the sample to swap.
+inline void
+BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
+{
+  auto k = static_cast<size_t>(std::floor(u_(i, 0) * K_));
+  auto j = static_cast<size_t>(std::floor(u_(i, 1) * K_));
+  boxes_[k][j]->indices_.erase(i);
+
+  u_.row(i) = new_sample;
+  k = static_cast<size_t>(std::floor(new_sample(0) * K_));
+  j = static_cast<size_t>(std::floor(new_sample(1) * K_));
+  boxes_[k][j]->indices_.insert(i);
+}
+
+//! Create a single box.
+inline BoxCovering::Box::Box(const std::vector<double>& lower,
+                             const std::vector<double>& upper)
+  : lower_(lower)
+  , upper_(upper)
+{
+}
+
+// Recovers a (continuous) latent sample from a sample of a discrete copula by
+// treating it as an interval-censored density estimation problem.
+// @param u A matrix of samples.
+// @param b The bandwidth of the kernel density estimator.
+// @param niter The number of iterations.
+inline Eigen::MatrixXd
+find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
+{
+  using namespace tools_stats;
+  size_t n = u.rows();
+  if (u.cols() != 4) {
+    throw std::runtime_error("u must have four columns.");
+  }
+
+  auto w = simulate_uniform(n, 2);
+  Eigen::MatrixXd uu = w.array() * u.leftCols(2).array() +
+                       (1 - w.array()) * u.rightCols(2).array();
+
+  auto covering = BoxCovering(uu);
+  std::vector<size_t> indices;
+
+  Eigen::MatrixXd lb = qnorm(u.rightCols(2));
+  Eigen::MatrixXd ub = qnorm(u.leftCols(2));
+  lb = pnorm(lb.array() - b);
+  ub = pnorm(ub.array() + b);
+
+  Eigen::MatrixXd x(n, 2), norm_sim(n, 2);
+
+  for (size_t it = 0; it < niter; it++) {
+    uu = to_pseudo_obs(uu);
+    x = qnorm(uu);
+    norm_sim = simulate_normal(n, 2).array() * b;
+    w = simulate_uniform(n, 1);
+
+    for (size_t i = 0; i < n; i++) {
+      indices = covering.get_box_indices(lb.row(i), ub.row(i));
+      double n_idx = static_cast<double>(indices.size());
+      if (n_idx > 0) {
+        size_t j = indices.at(static_cast<size_t>(w(i) * n_idx));
+        x.row(i) = x.row(j) + norm_sim.row(i);
+        uu.row(i) = pnorm(x.row(i));
+        covering.swap_sample(i, uu.row(i));
+      }
+    }
+  }
+
+  return to_pseudo_obs(x);
 }
 
 //! window smoother

@@ -78,6 +78,7 @@ TEST(zero_inflated, bicop)
 
   for (auto rot : { 0, 90, 180, 270 }) {
     auto bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
+    auto tau = bc.parameters_to_tau(Eigen::VectorXd::Constant(1, 3));
     auto u = bc.simulate(1000, true, { 1 });
     
     auto thresh = Eigen::VectorXd::Constant(u.rows(), 0.1);
@@ -99,12 +100,16 @@ TEST(zero_inflated, bicop)
     uu.col(0) = u_disc.col(0);
     uu.col(1) = u.col(1);
     uu.col(2) = u_disc.col(2);
+    bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
     bc.set_var_types({ "d", "c" });
     EXPECT_GE(bc.pdf(uu.topRows(20)).minCoeff(), 0);
     bc.fit(uu);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+    // tll
+    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
+    EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
 
     // c_d
     uu = Eigen::MatrixXd(u.rows(), 4);
@@ -112,15 +117,21 @@ TEST(zero_inflated, bicop)
     uu.col(2) = u.col(0);
     uu.col(1) = u_disc.col(1);
     uu.col(3) = u_disc.col(3);
+    bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
     bc.set_var_types({ "c", "d" });
     EXPECT_GE(bc.pdf(uu.topRows(20)).minCoeff(), 0);
     bc.fit(uu);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+    // tll
+    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
+    EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
+
 
     // d_d
     uu = u_disc;
+    bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
     bc.set_var_types({ "d", "d" });
     EXPECT_GE(bc.pdf(uu.topRows(20)).minCoeff(), 0);
     bc.fit(uu);
@@ -131,10 +142,9 @@ TEST(zero_inflated, bicop)
 
     // tll
     bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
-    bc.parameters_to_tau(bc.get_parameters());
+    EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
   }
 }
-
 
 
 TEST(discrete, vinecop)
