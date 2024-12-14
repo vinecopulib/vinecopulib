@@ -258,6 +258,9 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
 {
   using namespace tools_stats;
   size_t n = u.rows();
+  if (u.cols() != 4) {
+    throw std::runtime_error("u must have four columns.");
+  }
 
   auto w = simulate_uniform(n, 2);
   Eigen::MatrixXd uu = w.array() * u.leftCols(2).array() +
