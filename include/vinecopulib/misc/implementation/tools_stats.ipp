@@ -4,14 +4,10 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-<<<<<<< HEAD
 #include <boost/random.hpp>
 #include <boost/random/random_device.hpp>
 #include <boost/random/seed_seq.hpp>
-=======
 #include <memory>
-#include <random>
->>>>>>> dev
 #include <unsupported/Eigen/FFT>
 #include <vinecopulib/misc/tools_stats_ghalton.hpp>
 #include <vinecopulib/misc/tools_stats_sobol.hpp>
