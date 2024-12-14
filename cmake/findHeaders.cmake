@@ -4,7 +4,7 @@ if(VINECOPULIB_SHARED_LIB)
     set(vinecopulib_generated_sources ${CMAKE_BINARY_DIR}/generated/src)
     set(vinecopulib_generated_includes ${CMAKE_BINARY_DIR}/generated/include)
 
-    string(CONCAT license "// Copyright © 2018 Thomas Nagler and Thibault Vatter \n"
+    string(CONCAT license "// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter \n"
             "// \n"
             "// This file is part of the vinecopulib library and licensed under the terms of \n"
             "// the MIT license. For a copy, see the LICENSE file in the root directory of \n"
@@ -27,7 +27,7 @@ if(VINECOPULIB_SHARED_LIB)
         # Scrap file content, remove inline & add include
         file(READ ${file} file_content)
         string(REGEX REPLACE "inline " "" file_content "${file_content}")
-        string(SUBSTRING "${file_content}" 277 -1 file_content)
+        string(SUBSTRING "${file_content}" 282 -1 file_content)
         string(CONCAT file_content "${license}"
                 "\n#include <${header_file}>" "${file_content}")
 
@@ -92,4 +92,5 @@ file(GLOB_RECURSE bicop_hpp ${vinecopulib_includes}/vinecopulib/bicop/*.hpp)
 file(GLOB_RECURSE vinecop_hpp ${vinecopulib_includes}/vinecopulib/vinecop/*.hpp)
 file(GLOB_RECURSE misc_hpp ${vinecopulib_includes}/vinecopulib/misc/*.hpp)
 file(GLOB_RECURSE main_hpp ${vinecopulib_includes}/vinecopulib.hpp)
-file(GLOB_RECURSE version_hpp ${vinecopulib_includes}/version.hpp)
+file(GLOB_RECURSE version_hpp ${vinecopulib_includes}/vinecopulib/version.hpp)
+

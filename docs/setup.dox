@@ -1,0 +1,193 @@
+/** @page setup Setup
+
+@tableofcontents
+
+- [Requirements](#requirements)
+- [How to build the library](#build-lib)
+- [How to install the library](#install-lib)
+- [How to include the library in other projects](#include-lib)
+    - [As a header only library](#include-headers)
+    - [Using a system install](#include-install)
+    - [In a CMake project](#include-cmake)
+
+@section Requirements
+
+To build the library, you'll need at minimum:
+
+   - [a C++11-compatible compiler](https://en.wikipedia.org/wiki/List_of_compilers#C.2B.2B_compilers) (tested with GCC 6.3.0 and Clang 3.5.0 on Linux and AppleClang 8.0.0 on OSX)
+   - [CMake 3.2 (or later)](https://cmake.org/)
+   - [Boost 1.71 (or later)](http://www.boost.org/)
+   - [Eigen 3.3 (or later)](http://eigen.tuxfamily.org/index.php?title=Main_Page)
+   - [wdm](https://github.com/tnagler/wdm)
+
+
+On Linux or OSX, you can install wdm with:
+
+```bash
+git clone https://github.com/tnagler/wdm.git
+cmake wdm -B wdm/build && sudo make install -C wdm/build
+```
+
+On Windows, you can install wdm with:
+
+```bash
+git clone https://github.com/tnagler/wdm.git
+cmake wdm -B wdm\build -G "Visual Studio 17 2022" -A x64
+cmake --build wdm\build --config Release --target install
+```
+
+Optionally, you'll need:
+   - [Doxygen](http://www.stack.nl/~dimitri/doxygen/) and [graphviz](https://www.graphviz.org/) (to build the documentations)
+   - [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
+
+Note that:
+
+   - The [C++11 thread support library](http://en.cppreference.com/w/cpp/thread),
+   available along with any C++11 compiler on
+   OSX/Windows/most-linux-distributions, is used for multithreading.
+   - A `findR.cmake` looks for R and VineCopula in the default locations for
+   linux and osx, but problems might occur with versions installed from
+   R/RStudio. Therefore, prior to building the library, it is recommended to
+   use:
+   ```
+   sudo Rscript -e 'install.packages(c("VineCopula"), lib="/usr/lib/R/library",
+   repos="http://cran.rstudio.com/")'
+   ```
+
+@section build-lib How to build the library
+
+By default, vinecopulib is header-only. It means that we use the CMake build
+system, but only to build the documentation and unit-tests, and to automate
+installation (i.e., place headers in the usual location).
+If you just want to use vinecopulib, you can use the header files
+(located in the`includes`folder) right away.
+
+The unix one liner (from the root folder):
+
+```
+mkdir build && cd build && cmake .. && make && make doc &&
+sudo make install && bin/test_all
+```
+
+Alternatively, we provide an option to precompile compiled the library in
+order to save building time (and memory) via the CMake option
+`VINECOPULIB_SHARED_LIB`. In this case, source files are generated from header
+files and the CMake build system additionally allows to install the
+.dylib/.so/.dll object.
+
+The unix one liner (from the root folder):
+
+```
+mkdir build && cd build && cmake .. -DVINECOPULIB_SHARED_LIB=ON && make &&
+make doc && sudo make install && bin/test_all
+```
+
+| Step | Shell command  |
+|-----------------------|------------------------------------|
+| Create a build folder  | `mkdir build` |
+| Move to the created folder  | `cd build` |
+| Create the `MakeFile` via cmake  |  `cmake .. ` (or `cmake .. -DVINECOPULIB_SHARED_LIB=ON` for the compiled version)  |
+| Compile the library | `make` or `make -j n` where `n` is the number of cores |
+| Build the documentation (optional)  | `make doc` |
+| Install the library on linux/OSX (optional)  | `sudo make install` |
+| Run unit tests (optional)  |  `bin/[test_executable]` |
+
+@section install-lib How to install the library
+
+To install the library without unit tests, the `MakeFile` can be created via
+`cmake .. -DBUILD_TESTING=OFF`.
+Additionally, a `Debug` mode is available via
+`cmake .. -DCMAKE_BUILD_TYPE=Debug`; to enable strict compiler warnings, use
+`-DSTRICT_COMPILER=ON`.
+Finally, note that using `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` is useful if
+one is interested in using autocomplete or linting when working with the library.
+
+On Windows, CMake will generate Visual Studio files instead of Makefiles,
+the following sequence of commands can be used to perform compilation using the command prompt:
+```
+md build
+cd build
+cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
+cmake --build .
+cmake --build . --target install
+```
+Instead of the `cmake --build` commands, the generated `vinecopulib.sln` file can be open in the Visual Studio GUI. Furthermore,
+as for linux systems, the third line can be replaced by
+`cmake .. -DVINECOPULIB_SHARED_LIB=ON` to generate the source files in order
+to compile vinecopulib in non-header-only mode.
+
+The following CMake flags (given with example values) will likely come handy:
+
+```
+-G "Visual Studio 17 2022"
+-A x64
+```
+
+@section include-lib How to include the library in other projects
+
+@subsection include-headers As a header only library
+
+The library can be included header only by simply copying the files in your
+project.
+
+@subsection include-install Using a system install
+Using `make install`, vinecopulib is installed in the usual location of the
+system, namely
+
+- `<prefix>/include/` (for the headers),
+- `<prefix>/lib/` (for the shared library when `VINECOPULIB_SHARED_LIB=ON` is used),
+- `<prefix>/lib/cmake/vinecopulib` (to allow cmake to find the library
+with `find_package`),
+
+where `<prefix>` is e.g. `/usr/` or `/usr/local`. Note that
+`make install` only copies `vinecopulib.hpp` in `<prefix>/include/` and
+puts the other headers in a subfolder `<prefix>/include/vinecopulib`, but using
+`#include <vinecopulib.hpp>` is enough to load both bivariate and vine functions.
+
+@subsection include-cmake In a CMake project
+
+The easiest way to include vinecopulib in another project (and to avoid writing makefiles)
+is to use CMake. For instance, an example projet where the source code to be linked could contain
+- a `CMakeLists.txt` file for the project's setup,
+- a subfolder `src` for the source code, containing
+   - the source code,
+   - another `CMakeLists.txt` file for the project libraries and executables.
+
+The top-level `CMakeLists.txt` could be:
+
+```cmake
+cmake_minimum_required(VERSION 3.5)
+
+set(CMAKE_CXX_STANDARD 14)
+
+project (Example)
+
+# Setting default folders
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+# C++ compile flags
+if (NOT WIN32)
+ set(CMAKE_CXX_FLAGS "-Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O2 -DNDEBUG")
+endif()
+
+# Find vinecopulib package and dependencies
+find_package(vinecopulib REQUIRED)
+
+# Include subdirectory with project sources
+add_subdirectory(src)
+```
+
+Assuming a single `main.cpp` source file (with `#include <vinecopulib.hpp>` at
+the top), the `CMakeLists.txt` file in `/src/`
+could then be:
+
+```cmake
+
+# Add main executable
+add_executable(main main.cpp)
+
+# Link to vinecopulib
+target_link_libraries(main ${VINECOPULIB_LIBRARIES})
+```
+
+**/

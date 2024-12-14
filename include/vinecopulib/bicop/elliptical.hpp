@@ -1,4 +1,4 @@
-// Copyright © 2018 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -7,9 +7,11 @@
 #pragma once
 
 #include <vinecopulib/bicop/parametric.hpp>
+#include <vinecopulib/misc/tools_constants.hpp>
 
 namespace vinecopulib {
-//! @brief An abstract class for elliptical copula families
+
+//! @brief An abstract class for elliptical copula families.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but
@@ -20,17 +22,13 @@ namespace vinecopulib {
 class EllipticalBicop : public ParBicop
 {
 private:
-    // hfunction and its inverse
-    Eigen::VectorXd hfunc2(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-    );
+  // hfunction and its inverse
+  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u);
 
-    Eigen::VectorXd hinv2(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-    );
+  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
 
-    // link between Kendall's tau and the par_bicop parameter
-    double parameters_to_tau(const Eigen::MatrixXd &parameters);
+  // link between Kendall's tau and the par_bicop parameter
+  double parameters_to_tau(const Eigen::MatrixXd& parameters);
 };
 }
 

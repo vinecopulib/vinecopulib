@@ -1,4 +1,4 @@
-// Copyright © 2018 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -9,7 +9,7 @@
 #include <vinecopulib/bicop/kernel.hpp>
 
 namespace vinecopulib {
-//! @brief The transformation local-constant likelihood estimator
+//! @brief The transformation local-constant likelihood estimator.
 //!
 //! This class is used in the implementation underlying the Bicop class.
 //! Users should not use AbstractBicop or derived classes directly, but
@@ -21,37 +21,34 @@ namespace vinecopulib {
 class TllBicop : public KernelBicop
 {
 public:
-    TllBicop();
+  TllBicop();
 
 private:
-    Eigen::VectorXd gaussian_kernel_2d(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &x);
+  Eigen::VectorXd gaussian_kernel_2d(const Eigen::MatrixXd& x);
 
-    Eigen::Matrix2d select_bandwidth(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
-        std::string method,
-        const Eigen::VectorXd& weights);
+  Eigen::Matrix2d select_bandwidth(const Eigen::MatrixXd& x,
+                                   std::string method,
+                                   const Eigen::VectorXd& weights);
 
-    Eigen::MatrixXd fit_local_likelihood(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &x,
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &x_data,
-        const Eigen::Matrix2d &B,
-        std::string method,
-        const Eigen::VectorXd& weights);
+  Eigen::MatrixXd fit_local_likelihood(const Eigen::MatrixXd& x,
+                                       const Eigen::MatrixXd& x_data,
+                                       const Eigen::Matrix2d& B,
+                                       std::string method,
+                                       const Eigen::VectorXd& weights);
 
-    double calculate_infl(const size_t &n,
-                          const double &f0,
-                          const Eigen::Vector2d &b,
-                          const Eigen::Matrix2d &B,
-                          const double &det_irB,
-                          const Eigen::Matrix2d &S,
-                          const std::string &method,
-                          const double& weight);
+  double calculate_infl(const size_t& n,
+                        const double& f0,
+                        const Eigen::Vector2d& b,
+                        const Eigen::Matrix2d& B,
+                        const double& det_irB,
+                        const Eigen::Matrix2d& S,
+                        const std::string& method,
+                        const double& weight);
 
-    void fit(const Eigen::Matrix<double, Eigen::Dynamic, 2> &data,
-             std::string method, 
-             double mult, 
-             const Eigen::VectorXd& weights);
+  void fit(const Eigen::MatrixXd& data,
+           std::string method,
+           double mult,
+           const Eigen::VectorXd& weights);
 };
 }
 

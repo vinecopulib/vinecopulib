@@ -1,4 +1,4 @@
-// Copyright © 2018 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -6,9 +6,7 @@
 
 #pragma once
 
-#include <vinecopulib/misc/tools_bobyqa.hpp>
-#include <vinecopulib/misc/tools_eigen.hpp>
-#include <vinecopulib/bicop/parametric.hpp>
+#include <Eigen/Dense>
 
 namespace vinecopulib {
 
@@ -29,30 +27,29 @@ typedef struct
 class BobyqaControls
 {
 public:
+  BobyqaControls();
 
-    BobyqaControls();
+  BobyqaControls(double initial_trust_region,
+                 double final_trust_region,
+                 int maxeval);
 
-    BobyqaControls(double initial_trust_region,
-                   double final_trust_region,
-                   int maxeval);
+  double get_initial_trust_region();
 
-    double get_initial_trust_region();
+  double get_final_trust_region();
 
-    double get_final_trust_region();
-
-    int get_maxeval();
+  int get_maxeval();
 
 private:
-    double initial_trust_region_; //! Initial trust region
-    double final_trust_region_; //! Final trust region
-    int maxeval_; //! Maximal number of evaluations of the objective
+  double initial_trust_region_; //! Initial trust region
+  double final_trust_region_;   //! Final trust region
+  int maxeval_; //! Maximal number of evaluations of the objective
 
-    //! Sanity checks
-    //! @{
-    void check_parameters(double initial_trust_region,
-                          double final_trust_region,
-                          int maxeval);
-    //! @}
+  //! Sanity checks
+  //! @{
+  void check_parameters(double initial_trust_region,
+                        double final_trust_region,
+                        int maxeval);
+  //! @}
 };
 
 //! @brief A class for optimization (wrapping Bobyqa).
@@ -63,23 +60,31 @@ public:
               const Eigen::MatrixXd &lower_bounds,
               const Eigen::MatrixXd &upper_bounds);
 
-    void set_controls(double initial_trust_region,
-                      double final_trust_region,
-                      int maxeval);
+  void set_controls(double initial_trust_region,
+                    double final_trust_region,
+                    int maxeval);
 
-    Eigen::VectorXd optimize(Eigen::VectorXd initial_parameters,
-                             std::function<double(void *, long,
-                                                  const double *)> objective,
-                             void *f_data);
+  Eigen::VectorXd optimize(
+    const Eigen::VectorXd& initial_parameters,
+    const Eigen::VectorXd& lower_bounds,
+    const Eigen::VectorXd& upper_bounds,
+    std::function<double(const Eigen::VectorXd&)> objective);
+
+  size_t get_objective_calls() const;
+  double get_objective_max() const;
 
 private:
     size_t n_parameters_;
     BobyqaControls controls_;
     Eigen::MatrixXd lb_;
     Eigen::MatrixXd ub_;
+    size_t objective_calls_{ 0 };
+    double objective_max_{ 0 };
+    void check_parameters_size(const Eigen::VectorXd& initial_parameters,
+                             const Eigen::VectorXd& lower_bounds,
+                             const Eigen::VectorXd& upper_bounds) const;
 };
 }
-
 }
 
 #include <vinecopulib/misc/implementation/tools_optimization.ipp>

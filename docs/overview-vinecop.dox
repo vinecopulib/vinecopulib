@@ -1,0 +1,236 @@
+/** @page overview-vinecop Vine copula models
+
+@tableofcontents
+
+- [Set up a custom vine copula model](#vinecop-custom)
+- [How to read the R-vine matrix](#vinecop-matrix)
+- [Fit and select a vine copula model](#vinecop-fit)
+- [Work with a vine copula model](#vinecop-work)
+
+Vine copula models are implemented in the class `Vinecop`. To use this class in
+your code, include the header include the header `vinecopulib/vinecop/class.hpp`
+(or simply `vinecopulib.hpp`) at the top of your source file. This automatically
+enables all features for bivariate copula models.
+
+@section vinecop-custom Set up a custom vine copula model
+
+Custom models can be created through the constructor of `Vinecop`. A model is
+represented by a `std::vector<std::vector<Bicop>>` containing all
+pair-copulas and an [R-vine matrix](#how-to-read-an-r-vine-matrix).
+
+Similarly to bivariate copulas, there are essentially two ways of setting-up
+vine copulas:
+- with known parameters,
+- from data (i.e., with estimated parameters).
+
+The constructor with known parameters has two versions:
+- one for which the only argument is the dimension, allowing to set-up a D-vine
+with only independence copulas,
+- and one for which the two arguments are a matrix of integers (i.e., and
+[R-vine matrix](#how-to-read-an-r-vine-matrix)) and a
+`std::vector<std::vector<Bicop>>` containing all pair-copulas.
+
+```
+// specify the dimension of the model
+int d = 3;
+
+// instantiate a three dimensional D-vine with independence copulas
+Vinecop default_model(d);
+
+// alternatively, instantiate a std::vector<std::vector<Bicop>> object
+auto pair_copulas = Vinecop::make_pair_copula_store(d);
+
+// specify the pair copulas
+auto par = Eigen::VectorXd::Constant(1, 3.0);
+for (auto& tree : pair_copulas) {
+       for (auto& pc : tree) {
+           pc = Bicop(BicopFamily::clayton, 270, par);
+       }
+}
+
+// specify a structure matrix
+Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(3, 3);
+mat << 1, 1, 1,
+          2, 2, 0,
+          3, 0, 0;
+
+// instantiate the custom model
+Vinecop custom_model(pair_copulas, mat);
+```
+The constructors from data take the same arguments as the two select methods
+described [below](#vinecop-fit).
+
+
+@section vinecop-matrix How to read the R-vine matrix
+
+The R-vine matrix notation in vinecopulib is different from the one in VineCopula.
+An exemplary array is
+```
+4 4 4 4
+3 3 3
+2 2
+1
+```
+which encodes the following pair-copulas:
+```
+| tree | edge | pair-copulas   |
+|------|------|----------------|
+| 0    | 0    | `(1, 4)`       |
+|      | 1    | `(2, 4)`       |
+|      | 2    | `(3, 4)`       |
+| 1    | 0    | `(1, 3; 4)`    |
+|      | 1    | `(2, 3; 4)`    |
+| 2    | 0    | `(1, 2; 3, 4)` |
+```
+Denoting by `M[i, j]` the matrix entry in row `i` and column `j`, the pair-copula index for edge `e` in tree `t` of a `d` dimensional vine is
+`(M[d - 1 - e, e], M[t, e]; M[t - 1, e], ..., M[0, e])`. Less formally,
+1. Start with the counter-diagonal element of column `e` (first conditioned
+      variable).
+2. Jump up to the element in row `t` (second conditioned variable).
+3. Gather all entries further up in column `e` (conditioning set).
+
+A valid R-vine matrix must satisfy several conditions which are checked
+when `RVineStructure()` is called:
+1. The lower right triangle must only contain zeros.
+2. The upper left triangle can only contain numbers between 1 and d.
+3. The antidiagonal must contain the numbers 1, ..., d.
+4. The antidiagonal entry of a column must not be contained in any
+      column further to the right.
+5. The entries of a column must be contained in all columns to the left.
+6. The proximity condition must hold: For all t = 1, ..., d - 2 and
+      e = 0, ..., d - t - 1 there must exist an index j > d, such that
+      `(M[t, e], {M[0, e], ..., M[t-1, e]})` equals either
+      `(M[d-j-1, j], {M[0, j], ..., M[t-1, j]})` or
+      `(M[t-1, j], {M[d-j-1, j], M[0, j], ..., M[t-2, j]})`.
+
+
+@section vinecop-fit Fit and select a vine copula model
+
+The method `select_all()` performs parameter estimation and automatic
+model selection when the vine structure is unknown (i.e., it modifies the
+structure of the object), using the sequential procedure proposed by
+    [Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf).
+    Alternatively, `select_families()` performs parameter estimation and automatic
+    model selection for a known structure (i.e., using the structure of the
+    object). In both cases, the only mandatory argument is the data
+    (stored in a `Eigen::MatrixXd`), while controls argument allow for
+    customization of the fit.
+```
+// specify the dimension of the model
+int d = 5;
+
+// simulate dummy data
+Eigen::MatrixXd data = tools_stats::simulate_uniform(100, d);
+
+// instantiate a D-vine and select the families
+Vinecop model(d);
+model.select_families(data);
+
+// alternatively, select the structure along with the families
+model.select_all(data);
+```
+
+Note that the second argument to `select_all()` and `select_families()` is
+similar to the one of `select()` for `Bicop` objects. Objects of the class
+`FitControlsVinecop` inherit from `FitControlsBicop` and extend them with
+additional data members to control the structure selection:
+- `size_t trunc_lvl` describes the tree after which `family_set` is set to
+`{BicopFamily::indep}`. In other words, all pair copulas in trees lower than
+`trunc_lvl` (default to none) are "selected" as independence copulas.
+- `std::string tree_criterion` describes the criterion used to construct the
+minimum spanning tree (see
+[Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf)).
+It can take `"tau"` (default) for Kendall's tau, `"rho"` for Spearman's rho,
+or `"hoeffd"` for Hoeffding's D (suited for non-monotonic relationships).
+- `double threshold` describes a value (default is 0) of `tree_criterion` under
+which the corresponding pair-copula is set to independence.
+- `bool select_trunc_lvl` can be set to true to select the truncation
+level automatically (default is `false`).
+- `bool select_threshold` can be set to true to select the threshold parameter
+automatically (default is `false`).
+- `size_t num_threads` number of threads to run in parallel when fitting pair
+copulas within one tree.
+
+As mentioned [above](#set-up-a-custom-vine-copula-model), the arguments
+of `select_all()` and `select_families()` can be used as arguments to a
+    constructor allowing to instantiate a new object directly:
+
+```
+// specify the dimension of the model
+int d = 4;
+
+// simulate dummy data
+Eigen::MatrixXd data = simulate_uniform(100, d);
+
+// instantiate a vine from data using the default arguments
+Vinecop best_vine(data);
+
+// alternatively, instantiate a structure matrix...
+Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> M;
+M << 1, 1, 1, 1,
+        2, 2, 2, 0,
+        3, 3, 0, 0
+        4, 0, 0, 0;
+
+// ... and instantiate a vine copula from data using the custom structure,
+// Kendall's tau inversion for parameters
+// estimation and a truncation after the second tree
+FitControlsVinecop controls(bicop_families::itau, "itau");
+controls.set_trunc_lvl(2);
+controls.set_num_threads(4);  // parallelize with 4 threads
+Vinecop custom_vine(data, M, controls);
+```
+
+@section vinecop-work Work with a vine copula model
+
+You can simulate from a vine copula model, evaluate its density, distribution,
+log-likelihood, AIC and BIC.
+
+```
+// 5-dimensional independence vine
+Vinecop model(5);
+
+// simulate 100 observations
+auto data = model.simulate(100)
+
+// evaluate the density
+auto pdf = model.pdf(data)
+
+// evaluate the distribution
+auto cdf = model.cdf(data)
+
+// evaluate the log-likelihood
+auto ll = model.loglik(data)
+
+// evaluate the AIC
+auto aic = model.aic(data)
+
+// evaluate the BIC
+auto bic = model.bic(data)
+```
+
+Vine copula models can also be written to and constructed from JSON files
+and [`nlohmann::json` objects](https://github.com/nlohmann/json):
+
+```
+// 5-dimensional vine copula
+Vinecop vinecop(5);
+
+// Save as a nlohmann::json object
+nlohmann::json vinecop_json = vinecop.to_json();
+
+// Write into a JSON file
+std::ofstream file(std::string("myfile.json"));
+file << vinecop_json << std::endl;
+
+// Equivalently
+vinecop.to_file(myfile);
+
+// Then a new Vine can be constructed from the nlohmann::json object
+Vinecop vinecop2(vinecop_json);
+
+// Or from the JSON file
+Vinecop vinecop2(std::string("myfile.json"));
+```
+
+*/

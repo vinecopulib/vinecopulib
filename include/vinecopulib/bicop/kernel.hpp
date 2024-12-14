@@ -1,4 +1,4 @@
-// Copyright © 2018 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -6,12 +6,15 @@
 
 #pragma once
 
-#include <cstddef>
-#include <vinecopulib/misc/tools_interpolation.hpp>
 #include <vinecopulib/bicop/abstract.hpp>
 
 namespace vinecopulib {
-//! @brief An abstract class for kernel copulas
+
+namespace tools_interpolation {
+class InterpolationGrid;
+}
+
+//! @brief An abstract class for kernel copulas.
 //!
 //! Evaluation functions of kernel estimators are implemented efficiently
 //! using spline interpolation, see Nagler (2016).
@@ -26,47 +29,49 @@ namespace vinecopulib {
 class KernelBicop : public AbstractBicop
 {
 public:
-    KernelBicop();
+  KernelBicop();
 
 protected:
-    Eigen::VectorXd pdf_raw(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-    );
+  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u) override;
 
-    Eigen::VectorXd cdf(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-    );
+  Eigen::VectorXd pdf(const Eigen::MatrixXd& u) override;
 
-    Eigen::VectorXd hfunc1(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-    );
+  Eigen::VectorXd cdf(const Eigen::MatrixXd& u) override;
 
-    Eigen::VectorXd hfunc2(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-    );
+  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u) override;
 
-    Eigen::VectorXd hinv1(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-    );
+  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u) override;
 
-    Eigen::VectorXd hinv2(
-        const Eigen::Matrix<double, Eigen::Dynamic, 2> &u
-    );
+  Eigen::VectorXd hfunc1(const Eigen::MatrixXd& u) override;
 
-    double parameters_to_tau(const Eigen::MatrixXd &parameters);
+  Eigen::VectorXd hfunc2(const Eigen::MatrixXd& u) override;
 
-    Eigen::MatrixXd tau_to_parameters(const double &tau);
+  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u) override;
 
-    double calculate_npars();
+  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u) override;
 
-    Eigen::MatrixXd get_parameters() const;
+  double get_npars() const override;
 
-    void set_parameters(const Eigen::MatrixXd &parameters);
+  void set_npars(const double& npars) override;
 
-    void flip();
+  Eigen::MatrixXd get_parameters() const override;
 
-    tools_interpolation::InterpolationGrid interp_grid_;
-    double npars_;
+  Eigen::MatrixXd get_parameters_lower_bounds() const override;
+
+  Eigen::MatrixXd get_parameters_upper_bounds() const override;
+
+  void set_parameters(const Eigen::MatrixXd& parameters) override;
+
+  double parameters_to_tau(const Eigen::MatrixXd& parameters) override;
+
+  void flip() override;
+
+  Eigen::MatrixXd tau_to_parameters(const double& tau) override;
+
+  Eigen::VectorXd make_normal_grid(size_t m = 30);
+
+  std::shared_ptr<tools_interpolation::InterpolationGrid> interp_grid_;
+  double npars_;
 };
 }
 
