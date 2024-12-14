@@ -1,0 +1,139 @@
+name: 'Install Dependencies'
+description: 'Install Eigen, Boost and other dependencies required by vinecopulib'
+inputs:
+  os:
+    description: 'The operating system to install dependencies for'
+    required: false
+    default: 'ubuntu-latest'
+  platform:
+    description: 'The platform to install dependencies for'
+    required: false
+    default: 'x64'
+  boost:
+    description: 'Whether to install Boost'
+    required: false
+    default: 'true'
+  boost_install_dir:
+    description: 'The directory to install Boost to'
+    required: false
+    default: '/home/runner/work'
+  boost_version:
+    description: 'The version of Boost to install'
+    required: false
+    default: '1.84.0'
+  eigen:
+    description: 'Whether to install Eigen'
+    required: false
+    default: 'true'
+  eigen_install_dir:
+    description: 'The directory to install Eigen to'
+    required: false
+    default: '/home/runner/work'
+  eigen_version:
+    description: 'The version of Eigen to install'
+    required: false
+    default: '3.4.0'
+  wdm:
+    description: 'Whether to install WDM'
+    required: false
+    default: 'true'
+  # wdm_install_dir:
+  #   description: 'The directory to install WDM to'
+  #   required: false
+  #   default: '/home/runner/work'
+  lcov:
+    description: 'Whether to install lcov'
+    required: false
+    default: 'true'
+  R:
+    description: 'Whether to install R'
+    required: false
+    default: 'false'
+  update_compilers_ubuntu:
+    description: 'Whether to update the compilers on Ubuntu'
+    required: false
+    default: 'true'
+outputs:
+  BOOST_ROOT:
+    description: 'The path to the boost installation, e.g. to be used in CMake'
+    value: ${{ steps.boost.outputs.BOOST_ROOT }}
+  EIGEN3_ROOT:
+    description: 'The path to the eigen installation, e.g. to be used in CMake'
+    value: ${{ inputs.eigen_install_dir }}/eigen
+  WDM_ROOT:
+    description: 'The path to the wdm installation, e.g. to be used in CMake'
+    value: ${{ inputs.wdm_install_dir }}/wdm
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Update compilers on ubuntu
+      if: inputs.update_compilers_ubuntu == 'true'
+      run: |
+          if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y g++ clang
+          sudo apt-get autoremove
+          fi
+      shell: bash
+
+    - name: Install boost ${{inputs.boost_version}}
+      if: inputs.boost == 'true'
+      id: boost
+      uses: MarkusJx/install-boost@v2.3.1
+      with:
+          boost_version: ${{inputs.boost_version}}
+          boost_install_dir: ${{ inputs.boost_install_dir }}
+
+    - name: Install Eigen ${{inputs.eigen_version}}
+      if: inputs.eigen == 'true'
+      run: |
+          if [ "${{ inputs.os }}" != "windows-latest" ]; then
+            git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{runner.temp}}/eigen
+            cmake ${{runner.temp}}/eigen -B ${{runner.temp}}/eigen/build -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
+            make install -C ${{runner.temp}}/eigen/build
+          else
+            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ inputs.platform }}
+            choco install eigen --version="${{inputs.eigen_version}}"
+          fi
+      shell: bash
+
+    - name: Install wdm
+      if: inputs.wdm == 'true'
+      run: |
+          git clone https://github.com/tnagler/wdm.git
+          cd wdm && mkdir release && cd release
+          if [ "${{ inputs.os }}" != "windows-latest" ]; then
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            sudo make install
+          elif [ "${{ inputs.os }}" == "windows-latest" ]; then
+            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ inputs.platform }}
+            cmake .. -G "Visual Studio 17 2022" \
+              -DCMAKE_BUILD_TYPE=Release
+            cmake --build . --target install
+          fi
+          cd ../.. && rm -rf wdm
+      shell: bash
+
+    - name: Install lcov
+      if: inputs.lcov == 'true'
+      run: |
+          if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
+              sudo apt-get install --no-install-recommends -y lcov
+          fi
+      shell: bash
+
+    - name: Install R
+      if: inputs.R == 'true'
+      uses: r-lib/actions/setup-r@v2
+
+    - name: Install VineCopula
+      if: inputs.R == 'true'
+      run: |
+        if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
+            sudo apt-get install --no-install-recommends -y libgsl0-dev
+        elif [ "${{ inputs.os }}" == "macos-latest" ]; then
+            brew install gsl
+        fi
+        Rscript -e "install.packages('VineCopula', repos='http://cran.rstudio.com/')"
+      shell: bash
