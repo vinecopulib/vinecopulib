@@ -7,9 +7,10 @@
 #pragma once
 
 #include <boost/math/distributions.hpp>
-#include <vinecopulib/misc/tools_eigen.hpp>
+#include <memory>
+#include <set>
 #include <unsupported/Eigen/SpecialFunctions>
-
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
 
@@ -99,11 +100,47 @@ simulate_uniform(const size_t& n,
                  bool qrng = false,
                  std::vector<int> seeds = std::vector<int>());
 
+Eigen::MatrixXd
+simulate_normal(const size_t& n,
+                const size_t& d,
+                bool qrng = false,
+                std::vector<int> seeds = std::vector<int>());
+
 Eigen::VectorXd
 to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method = "average");
 
 Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average");
+
+
+// Covers the unit hypercube with boxes and assigns each sample to a box.
+// Used internally for recovering the latent sample of a discrete copula.
+class BoxCovering
+{
+public:  
+  explicit BoxCovering(const Eigen::MatrixXd& u, uint16_t K = 40);
+  std::vector<size_t> get_box_indices(const Eigen::VectorXd& lower,
+                                      const Eigen::VectorXd& upper) const;
+  void swap_sample(size_t i, const Eigen::VectorXd& new_sample);
+
+private:
+  struct Box
+  {
+  public:
+    Box(const std::vector<double>& lower, const std::vector<double>& upper);
+    std::vector<double> lower_;
+    std::vector<double> upper_;
+    std::set<size_t> indices_;
+  };
+
+  Eigen::MatrixXd u_;
+  size_t n_;
+  uint16_t K_;
+  std::vector<std::vector<std::unique_ptr<Box>>> boxes_;
+};
+
+Eigen::MatrixXd
+find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter = 3);
 
 double
 pairwise_mcor(const Eigen::MatrixXd& x,

@@ -13,6 +13,11 @@ endif ()
 # Check if EIGEN3_INCLUDE_DIR is defined and if not, try to find it
 if(NOT DEFINED EIGEN3_INCLUDE_DIR)
   find_package(Eigen3 REQUIRED)
+  if (EIGEN3_FOUND)
+    message(STATUS "Found Eigen3: ${EIGEN3_INCLUDE_DIR} (found suitable version \"${Eigen3_VERSION}\")")
+  else()
+    message(FATAL_ERROR "Could not find Eigen3")
+  endif()
 endif()
 
 # Check if Boost_INCLUDE_DIRS is defined and if not, try to find it
