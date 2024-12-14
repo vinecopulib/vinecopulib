@@ -1348,7 +1348,7 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
                                           : hfunc2.col(inverse_order[j]);
     }
     // randomize by weighting left and right limits with independent uniforms
-    auto R = tools_stats::simulate_uniform(u.rows(), d, true, seeds);
+    auto R = tools_stats::simulate_uniform(u.rows(), d, false, seeds);
     U.leftCols(d) = U.leftCols(d).array() * R.array() +
                     U.rightCols(d).array() * (1 - R.array());
   }
