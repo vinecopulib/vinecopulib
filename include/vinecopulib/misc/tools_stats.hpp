@@ -107,10 +107,12 @@ simulate_normal(const size_t& n,
                 std::vector<int> seeds = std::vector<int>());
 
 Eigen::VectorXd
-to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method = "average");
+to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method = "average",
+              const Eigen::VectorXd& weights = Eigen::VectorXd());
 
 Eigen::MatrixXd
-to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average");
+to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average",
+              const Eigen::VectorXd& weights = Eigen::VectorXd());
 
 
 // Covers the unit hypercube with boxes and assigns each sample to a box.
