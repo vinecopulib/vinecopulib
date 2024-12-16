@@ -1262,6 +1262,7 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
   for (size_t j = 0; j < d; ++j) {
     hfunc2.col(j) = u.col(order[j] - 1);
   }
+  hfunc1 = hfunc2; // just ensure data is in [0, 1]^d
   if (is_discrete()) {
     hfunc1_sub = hfunc1;
     hfunc2_sub = hfunc2;
