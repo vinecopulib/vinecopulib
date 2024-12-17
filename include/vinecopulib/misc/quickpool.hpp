@@ -188,11 +188,11 @@ class allocator : public std::allocator<T>
     template<class U, class... Args>
     void construct(U* ptr, Args&&... args)
     {
-        ::new ((void*)ptr) U(std::forward<Args>(args)...);
+        ::new (static_cast<void*>(ptr)) U(std::forward<Args>(args)...);
     }
 
     template<class U>
-    void destroy(U* ptr)
+    void destroy(U* ptr) noexcept
     {
         (void)ptr;
         ptr->~U();
