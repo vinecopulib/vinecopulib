@@ -39,6 +39,7 @@ if(NOT DEFINED wdm_INCLUDE_DIRS)
   # Download if not found
   find_package(wdm 0.2.4 QUIET)
   if(NOT wdm_FOUND)
+    include(FetchContent)
     FetchContent_Declare(
       wdm
       GIT_REPOSITORY https://github.com/tnagler/wdm.git
