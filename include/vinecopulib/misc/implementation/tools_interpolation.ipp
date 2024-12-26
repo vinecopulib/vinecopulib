@@ -109,10 +109,12 @@ InterpolationGrid::binary_search(double x)
 }
 
 inline Eigen::Matrix<ptrdiff_t, 1, 2>
-InterpolationGrid::get_indices(double x0, double x1, bool binary_search)
+InterpolationGrid::get_indices(double x0, double x1)
 {
   Eigen::Matrix<ptrdiff_t, 1, 2> out;
-  if (binary_search) {
+  // bool binary_search_ = true;
+  bool binary_search_ = false;
+  if (binary_search_) {
     out(0) = this->binary_search(x0);
     out(1) = this->binary_search(x1);
   } else {
