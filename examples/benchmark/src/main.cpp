@@ -52,8 +52,11 @@ main()
 {
   // Define different FitControls configurations
   FitControlsVinecop controls_itau(bicop_families::itau);
+  controls_itau.set_num_threads(8);
   FitControlsVinecop controls_itau_par_method(bicop_families::itau, "itau");
+  controls_itau_par_method.set_num_threads(8);
   FitControlsVinecop controls_tll({ BicopFamily::tll });
+  controls_tll.set_num_threads(8);
 
   // Benchmark different configurations
   double time_itau = benchmark([&](const Eigen::MatrixXd& u) {
