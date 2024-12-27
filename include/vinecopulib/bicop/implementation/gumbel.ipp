@@ -69,7 +69,7 @@ GumbelBicop::hinv1_raw(const Eigen::MatrixXd& u)
 
   // Define the lambda function for qcondgum
   auto qcondgum_func = [&theta](const double& u1, const double& u2) -> double {
-    return qcondgum(u1, u2, theta);
+    return qcondgum(u2, u1, theta);
   };
 
   // Use binaryExpr_or_nan to compute hinv

@@ -71,7 +71,7 @@ JoeBicop::hinv1_raw(const Eigen::MatrixXd& u)
 
   // Define the lambda function for qcondjoe
   auto qcondjoe_func = [&theta](const double& u1, const double& u2) -> double {
-    return qcondjoe(u1, u2, theta);
+    return qcondjoe(u2, u1, theta);
   };
 
   // Use binaryExpr_or_nan to compute hinv
