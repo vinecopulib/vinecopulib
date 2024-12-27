@@ -33,17 +33,14 @@ template<typename T>
 Eigen::VectorXd
 binaryExpr_or_nan(const Eigen::MatrixXd& u, const T& func)
 {
-  const Eigen::ArrayXd u1 = u.col(0).array();
-  const Eigen::ArrayXd u2 = u.col(1).array();
-
-  // Mask for NaN values
-  Eigen::Array<bool, Eigen::Dynamic, 1> nan_mask = u1.isNaN() || u2.isNaN();
-
-  // Apply the function where not NaN
-  Eigen::ArrayXd result = nan_mask.select(
-    std::numeric_limits<double>::quiet_NaN(), u1.binaryExpr(u2, func));
-
-  return result.matrix();
+  auto func_or_nan = [&func](const double& u1, const double& u2) {
+    if ((std::isnan)(u1) || (std::isnan)(u2)) {
+      return std::numeric_limits<double>::quiet_NaN();
+    } else {
+      return func(u1, u2);
+    }
+  };
+  return u.col(0).binaryExpr(u.col(1), func_or_nan);
 }
 
 void
