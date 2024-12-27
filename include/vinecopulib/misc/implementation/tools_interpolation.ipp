@@ -175,12 +175,7 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd& x)
                                   x1);
   };
 
-  Eigen::VectorXd res = tools_eigen::binaryExpr_or_nan(x, f);
-
-  std::cout << "get_indices: " << times[0] << " ms" << std::endl;
-  std::cout << "bilinear_interpolation: " << times[1] << " ms" << std::endl;
-
-  return res;
+  return tools_eigen::binaryExpr_or_nan(x, f);
 }
 
 //! Integrate the grid along one axis
