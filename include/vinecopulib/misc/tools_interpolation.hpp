@@ -39,7 +39,7 @@ public:
   Eigen::VectorXd integrate_2d(const Eigen::MatrixXd& u);
 
 private:
-  Eigen::Matrix<ptrdiff_t, 1, 2> get_indices(double x0, double x1, bool binary_search = false);
+  Eigen::Matrix<ptrdiff_t, 1, 2> get_indices(double x0, double x1);
   ptrdiff_t binary_search(double x);
   double bilinear_interpolation(double z11,
                                 double z12,
