@@ -4,7 +4,6 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include <boost/math/special_functions/log1p.hpp>
 #include <cmath>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
@@ -56,7 +55,7 @@ GumbelBicop::pdf_raw(const Eigen::MatrixXd& u)
     double temp = -std::pow(t1, thetha1) + (2 * thetha1 - 2.0) * std::log(t1) +
                   (theta - 1.0) * std::log(std::log(u1) * std::log(u2)) -
                   std::log(u1 * u2) +
-                  boost::math::log1p((theta - 1.0) * std::pow(t1, -thetha1));
+                  std::log1p((theta - 1.0) * std::pow(t1, -thetha1));
     return std::exp(temp);
   };
   return tools_eigen::binaryExpr_or_nan(u, f);

@@ -5,8 +5,6 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <boost/math/special_functions/digamma.hpp>
-#include <boost/math/special_functions/expm1.hpp>
-#include <boost/math/special_functions/log1p.hpp>
 #include <cmath>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
@@ -25,13 +23,13 @@ inline JoeBicop::JoeBicop()
 inline double
 JoeBicop::generator(const double& u)
 {
-  return (-1) * boost::math::log1p(-std::pow(1 - u, parameters_(0)));
+  return (-1) * std::log1p(-std::pow(1 - u, parameters_(0)));
 }
 
 inline double
 JoeBicop::generator_inv(const double& u)
 {
-  return 1 - std::pow(-boost::math::expm1(-u), 1 / parameters_(0));
+  return 1 - std::pow(-std::expm1(-u), 1 / parameters_(0));
 }
 
 inline double
