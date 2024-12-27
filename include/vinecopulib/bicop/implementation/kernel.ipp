@@ -13,15 +13,8 @@ inline KernelBicop::KernelBicop()
 {
   // construct default grid (equally spaced on Gaussian scale)
   size_t m = 30;
-  auto grid_points = this->make_normal_grid(m);
-
-  // move boundary points to 0/1, so we don't have to extrapolate
-  grid_points(0) = 0.0;
-  grid_points(m - 1) = 1.0;
-
-  interp_grid_ = std::make_shared<tools_interpolation::InterpolationGrid>(
-    grid_points, Eigen::MatrixXd::Constant(m, m, 1.0) // independence
-  );
+  bool normal = true;
+  make_grid(m, normal);
   npars_ = 0.0;
 }
 
@@ -171,16 +164,26 @@ KernelBicop::tau_to_parameters(const double& tau)
   return no_tau_to_parameters(tau);
 }
 
-// construct default grid (equally spaced on Gaussian scale)
-inline Eigen::VectorXd
-KernelBicop::make_normal_grid(size_t m)
+// construct default grid (equally spaced on Gaussian scale if normal is true)
+inline void
+KernelBicop::make_grid(size_t m, bool normal)
 {
   Eigen::VectorXd grid_points(m);
-  for (size_t i = 0; i < m; ++i)
-    grid_points(i) =
-      -3.25 + static_cast<double>(i) * (6.5 / static_cast<double>(m - 1));
-  grid_points = tools_stats::pnorm(grid_points);
+  if (normal) {
+    for (size_t i = 0; i < m; ++i)
+      grid_points(i) =
+        -3.25 + static_cast<double>(i) * (6.5 / static_cast<double>(m - 1));
+    grid_points = tools_stats::pnorm(grid_points);
+  } else {
+    grid_points.setLinSpaced(m, 1 / (2 * m), 1.0 - 1 / (2 * m));
+  }
 
-  return grid_points;
+  // // move boundary points to 0/1, so we don't have to extrapolate
+  // grid_points(0) = 0.0;
+  // grid_points(m - 1) = 1.0;
+
+  interp_grid_ = std::make_shared<tools_interpolation::InterpolationGrid>(
+    grid_points, Eigen::MatrixXd::Constant(m, m, 1.0) // independence
+  );
 }
 }

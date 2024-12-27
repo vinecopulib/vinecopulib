@@ -26,6 +26,8 @@ public:
 
   Eigen::MatrixXd get_values() const;
 
+  Eigen::VectorXd get_grid_points() const;
+
   void set_values(const Eigen::MatrixXd& values, int norm_times = 3);
 
   void flip();

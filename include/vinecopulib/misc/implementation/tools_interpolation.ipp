@@ -40,6 +40,12 @@ InterpolationGrid::get_values() const
   return values_;
 }
 
+inline Eigen::VectorXd
+InterpolationGrid::get_grid_points() const
+{
+  return grid_points_;
+}
+
 inline void
 InterpolationGrid::set_values(const Eigen::MatrixXd& values, int norm_times)
 {

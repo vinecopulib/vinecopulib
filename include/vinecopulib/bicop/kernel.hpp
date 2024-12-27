@@ -68,7 +68,7 @@ protected:
 
   Eigen::MatrixXd tau_to_parameters(const double& tau) override;
 
-  Eigen::VectorXd make_normal_grid(size_t m = 30);
+  void make_grid(size_t m = 30, bool normal = true);
 
   std::shared_ptr<tools_interpolation::InterpolationGrid> interp_grid_;
   double npars_;

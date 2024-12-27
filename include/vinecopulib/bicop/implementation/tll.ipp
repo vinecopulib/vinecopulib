@@ -223,9 +223,8 @@ TllBicop::fit(const Eigen::MatrixXd& data,
 {
   using namespace tools_interpolation;
 
-  // construct default grid (equally spaced on Gaussian scale)
-  size_t m = 30;
-  auto grid_points = this->make_normal_grid(m);
+  auto grid_points = interp_grid_->get_grid_points();
+  auto m = grid_points.size();
 
   // expand the interpolation grid; a matrix with two columns where each row
   // contains one combination of the grid points
@@ -258,10 +257,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   Eigen::MatrixXd values(m, m);
   values = Eigen::Map<Eigen::MatrixXd>(c.data(), m, m).transpose();
 
-  // for interpolation, we shift the limiting gridpoints to 0 and 1
-  grid_points(0) = 0.0;
-  grid_points(m - 1) = 1.0;
-  interp_grid_ = std::make_shared<InterpolationGrid>(grid_points, values);
+  interp_grid_->set_values(values);
 
   // compute effective degrees of freedom via interpolation ---------
   // stabilize interpolation by restricting to plausible range
