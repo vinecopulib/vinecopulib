@@ -15,7 +15,7 @@ if(NOT WIN32)
     endif()
 
     set(CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG ")
-    set(CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELEASE        "-O3 -march=native -DNDEBUG")
 
     if(OPT_ASAN)
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
