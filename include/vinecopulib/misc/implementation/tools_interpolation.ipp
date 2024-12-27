@@ -112,31 +112,8 @@ inline Eigen::Matrix<ptrdiff_t, 1, 2>
 InterpolationGrid::get_indices(double x0, double x1)
 {
   Eigen::Matrix<ptrdiff_t, 1, 2> out;
-  // bool binary_search_ = true;
-  bool binary_search_ = false;
-  if (binary_search_) {
-    out(0) = this->binary_search(x0);
-    out(1) = this->binary_search(x1);
-  } else {
-    out.setZero();
-    bool found_i = false;
-    bool found_j = false;
-    for (ptrdiff_t k = 1; k < (grid_points_.size() - 1); ++k) {
-      if ((x0 >= grid_points_(k))) {
-        out(0) = k;
-      } else {
-        found_i = true;
-      }
-      if ((x1 >= grid_points_(k))) {
-        out(1) = k;
-      } else {
-        found_j = true;
-      }
-      if (found_i & found_j) {
-        break;
-      }
-    }
-  }
+  out(0) = this->binary_search(x0);
+  out(1) = this->binary_search(x1);
   return out;
 }
 
@@ -198,7 +175,12 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd& x)
                                   x1);
   };
 
-  return tools_eigen::binaryExpr_or_nan(x, f);
+  Eigen::VectorXd res = tools_eigen::binaryExpr_or_nan(x, f);
+
+  std::cout << "get_indices: " << times[0] << " ms" << std::endl;
+  std::cout << "bilinear_interpolation: " << times[1] << " ms" << std::endl;
+
+  return res;
 }
 
 //! Integrate the grid along one axis
