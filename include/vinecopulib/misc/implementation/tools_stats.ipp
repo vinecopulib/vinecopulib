@@ -150,7 +150,7 @@ inline Eigen::MatrixXd
 to_pseudo_obs_fixed_jitter(Eigen::MatrixXd x)
 {
   size_t n = x.rows();
-  auto gen = std::mt19937{5};
+  auto gen = boost::random::mt19937{5};
 
   for (int j = 0; j < x.cols(); ++j) {
     std::vector<double> xvec(x.col(j).data(), x.col(j).data() + n);
