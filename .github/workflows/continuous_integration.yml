@@ -70,7 +70,7 @@ jobs:
           fi
         shell: bash
       - name: Code coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
         with:
           token: ${{secrets.CODECOV_TOKEN}}
