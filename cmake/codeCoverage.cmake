@@ -141,13 +141,13 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
             ${LCOV_PATH} --directory . --zerocounters
             
             # Run initial/baseline lcov
-            COMMAND ${LCOV_PATH} --directory . --capture --initial --output-file ${coverage_info}
+            COMMAND ${LCOV_PATH} --directory . --capture --initial --output-file ${coverage_info} --ignore-errors mismatch,gccov,negative
             
             # Run tests
             COMMAND ${test_command} ${ARGV3}
 
             # Capturing lcov counters and generating report
-            COMMAND ${LCOV_PATH} --directory . --capture --output-file ${coverage_info}
+            COMMAND ${LCOV_PATH} --directory . --capture --output-file ${coverage_info} --ignore-errors mismatch,cov,negative
             COMMAND ${LCOV_PATH} --remove ${coverage_info} '*test*' '/usr/*' --output-file ${coverage_info}
 
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
