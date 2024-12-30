@@ -282,7 +282,7 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     throw std::runtime_error("u must have four columns.");
   }
 
-  auto w = simulate_uniform(n, 2);
+  auto w = simulate_uniform(n, 2, true, {5});
   Eigen::MatrixXd uu = w.array() * u.leftCols(2).array() +
                        (1 - w.array()) * u.rightCols(2).array();
 
@@ -296,11 +296,11 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
 
   Eigen::MatrixXd x(n, 2), norm_sim(n, 2);
 
-  for (size_t it = 0; it < niter; it++) {
+  for (uint16_t it = 0; it < niter; it++) {
     uu = to_pseudo_obs(uu);
     x = qnorm(uu);
-    norm_sim = simulate_normal(n, 2).array() * b;
-    w = simulate_uniform(n, 1);
+    norm_sim = simulate_normal(n, 2, true, {it, 5}).array() * b;
+    w = simulate_uniform(n, 1, true, {it, 55});
 
     for (size_t i = 0; i < n; i++) {
       indices = covering.get_box_indices(lb.row(i), ub.row(i));

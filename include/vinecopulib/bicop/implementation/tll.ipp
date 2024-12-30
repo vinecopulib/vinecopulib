@@ -236,7 +236,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
 
   // use jittering in case observations are discrete
-  auto psobs = tools_stats::to_pseudo_obs(data.leftCols(2), "random");
+  auto psobs = tools_stats::to_pseudo_obs_fixed_jitter(data.leftCols(2));
   Eigen::MatrixXd z_data = tools_stats::qnorm(psobs);
 
   // find bandwidth matrix
