@@ -37,13 +37,13 @@ find_package(Threads                      REQUIRED)
 # Check if wdm_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED wdm_INCLUDE_DIRS)
   # Download if not found
-  find_package(wdm 0.2.5 QUIET)
+  find_package(wdm 0.2.6 QUIET)
   if(NOT wdm_FOUND)
     include(FetchContent)
     FetchContent_Declare(
       wdm
       GIT_REPOSITORY https://github.com/tnagler/wdm.git
-      GIT_TAG        1ae9dc5 
+      GIT_TAG        c837460 
     )
     FetchContent_MakeAvailable(wdm)
     set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
