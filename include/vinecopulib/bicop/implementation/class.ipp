@@ -1058,7 +1058,7 @@ Bicop::check_weights_size(const Eigen::VectorXd& weights,
 inline void
 Bicop::check_fitted() const
 {
-  if ((boost::math::isnan)(bicop_->get_loglik())) {
+  if ((std::isnan)(bicop_->get_loglik())) {
     throw std::runtime_error("copula has not been fitted from data or its "
                              "parameters have been modified manually");
   }
