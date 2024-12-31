@@ -1,3 +1,4 @@
+#include "benchmark.hpp"
 #include <iostream>
 #include <map>
 #include <random>
@@ -78,6 +79,7 @@ benchmark_bicop_tll(int n = 1000, unsigned int repeats = 10)
       Bicop bc(u, controls_tll);
     },
     seeds);
+
 
   // Benchmark data generation
   Eigen::VectorXd times_generate_data = benchmark_func(
