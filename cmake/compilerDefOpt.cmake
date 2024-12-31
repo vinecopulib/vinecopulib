@@ -15,7 +15,14 @@ if(NOT WIN32)
     endif()
 
     set(CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG ")
-    set(CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
+    
+    # Detect Apple M1 and apply specific flags
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64" AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        message(STATUS "Configuring for Apple M1")
+        set(CMAKE_CXX_FLAGS_RELEASE "-O3 -arch arm64 -mcpu=apple-m1 -DNDEBUG")
+    else()
+        set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
+    endif()
 
     if(OPT_ASAN)
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
