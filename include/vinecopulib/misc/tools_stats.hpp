@@ -107,21 +107,22 @@ simulate_normal(const size_t& n,
                 std::vector<int> seeds = std::vector<int>());
 
 Eigen::VectorXd
-to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method = "average",
-              const Eigen::VectorXd& weights = Eigen::VectorXd());
+to_pseudo_obs_1d(Eigen::VectorXd x,
+                 const std::string& ties_method = "average",
+                 const Eigen::VectorXd& weights = Eigen::VectorXd(),
+                 std::vector<int> seeds = std::vector<int>());
 
 Eigen::MatrixXd
-to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method = "average",
-              const Eigen::VectorXd& weights = Eigen::VectorXd());
-
-Eigen::MatrixXd
-to_pseudo_obs_fixed_jitter(Eigen::MatrixXd x);
+to_pseudo_obs(Eigen::MatrixXd x,
+              const std::string& ties_method = "average",
+              const Eigen::VectorXd& weights = Eigen::VectorXd(),
+              std::vector<int> seeds = std::vector<int>());
 
 // Covers the unit hypercube with boxes and assigns each sample to a box.
 // Used internally for recovering the latent sample of a discrete copula.
 class BoxCovering
 {
-public:  
+public:
   explicit BoxCovering(const Eigen::MatrixXd& u, uint16_t K = 40);
   std::vector<size_t> get_box_indices(const Eigen::VectorXd& lower,
                                       const Eigen::VectorXd& upper) const;

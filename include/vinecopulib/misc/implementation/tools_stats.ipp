@@ -99,11 +99,12 @@ simulate_normal(const size_t& n,
 inline Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x,
               const std::string& ties_method,
-              const Eigen::VectorXd& weights)
+              const Eigen::VectorXd& weights,
+              std::vector<int> seeds)
 {
   for (int j = 0; j < x.cols(); ++j)
     x.col(j) = to_pseudo_obs_1d(
-      static_cast<Eigen::VectorXd>(x.col(j)), ties_method, weights);
+      static_cast<Eigen::VectorXd>(x.col(j)), ties_method, weights, seeds);
 
   return x;
 }
@@ -122,61 +123,19 @@ to_pseudo_obs(Eigen::MatrixXd x,
 inline Eigen::VectorXd
 to_pseudo_obs_1d(Eigen::VectorXd x,
                  const std::string& ties_method,
-                 const Eigen::VectorXd& weights)
+                 const Eigen::VectorXd& weights,
+                 std::vector<int> seeds)
 {
   size_t n = x.size();
   auto xvec = wdm::utils::convert_vec(x);
   auto res =
-    wdm::impl::rank(xvec, wdm::utils::convert_vec(weights), ties_method);
+    wdm::impl::rank(xvec, wdm::utils::convert_vec(weights), ties_method, seeds);
   x = Eigen::Map<Eigen::VectorXd>(res.data(), res.size());
 
   // correction for NaNs
   if (wdm::utils::any_nan(xvec)) {
     for (size_t i = 0; i < xvec.size(); i++) {
       if (std::isnan(xvec[i])) {
-        n--;
-      }
-    }
-  }
-
-  return x.array() / (static_cast<double>(n) + 1.0);
-}
-
-//! @param ties_method Indicates how to treat ties; same as in R, see
-//! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
-//! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$
-//! (column-wise).
-inline Eigen::MatrixXd
-to_pseudo_obs_fixed_jitter(Eigen::MatrixXd x)
-{
-  size_t n = x.rows();
-  auto gen = boost::random::mt19937{5};
-
-  for (int j = 0; j < x.cols(); ++j) {
-    std::vector<double> xvec(x.col(j).data(), x.col(j).data() + n);
-    auto order = tools_stl::get_order(xvec);
-    // set up random number generator
-    for (size_t i = 0, reps; i < n; i += reps) {
-      // find replications
-      reps = 1;
-      while ((i + reps < n) && (x(order[i], j) == x(order[i + reps], j)))
-        ++reps;
-      // assign random rank between ties
-      std::vector<size_t> rvals(reps);
-      for (size_t k = 0; k < reps; ++k) {
-        rvals[k] = gen();
-      }
-      rvals = tools_stl::get_order(rvals);
-      for (size_t k = 0; k < reps; ++k) {
-         x(order[i + k], j) = static_cast<double>(i + 1 + rvals[k]);
-      }
-       
-    }
-
-    // NaN-handling
-    for (size_t i = 0; i < xvec.size(); i++) {
-      if (std::isnan(xvec[i])) {
-        x(i, j) = NAN;
         n--;
       }
     }
@@ -282,7 +241,7 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     throw std::runtime_error("u must have four columns.");
   }
 
-  auto w = simulate_uniform(n, 2, true, {5});
+  auto w = simulate_uniform(n, 2, true, { 5 });
   Eigen::MatrixXd uu = w.array() * u.leftCols(2).array() +
                        (1 - w.array()) * u.rightCols(2).array();
 
@@ -299,8 +258,8 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   for (uint16_t it = 0; it < niter; it++) {
     uu = to_pseudo_obs(uu);
     x = qnorm(uu);
-    norm_sim = simulate_normal(n, 2, true, {it, 5}).array() * b;
-    w = simulate_uniform(n, 1, true, {it, 55});
+    norm_sim = simulate_normal(n, 2, true, { it, 5 }).array() * b;
+    w = simulate_uniform(n, 1, true, { it, 55 });
 
     for (size_t i = 0; i < n; i++) {
       indices = covering.get_box_indices(lb.row(i), ub.row(i));
@@ -316,7 +275,6 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
 
   return to_pseudo_obs(x);
 }
-
 
 //! window smoother
 inline Eigen::VectorXd
