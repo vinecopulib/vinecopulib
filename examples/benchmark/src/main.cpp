@@ -1,7 +1,8 @@
-#include <Eigen/Dense>
-#include <chrono>
+#include "benchmark.hpp"
 #include <iostream>
+#include <map>
 #include <random>
+#include <string>
 #include <vinecopulib.hpp>
 
 using namespace std;
@@ -9,11 +10,11 @@ using namespace vinecopulib;
 using Eigen::MatrixXd;
 
 // Utility function to generate random data using Eigen
-MatrixXd
-generate_data(int n, int d)
+Eigen::MatrixXd
+generate_data(int n, int d, unsigned seed)
 {
-  std::random_device rd;
-  std::mt19937 gen(rd());
+
+  std::mt19937 gen(seed);
   std::normal_distribution<> dist(0.0, 1.0);
 
   MatrixXd data(n, d);
@@ -23,55 +24,111 @@ generate_data(int n, int d)
       data(i, j) = x * 1.0 + 0.5 * dist(gen);
     }
   }
-  return data;
+  return tools_stats::to_pseudo_obs(data);
 }
 
-// Benchmarking function
-template<typename Function>
-double
-benchmark(Function func, int repeats = 10, int n = 1000, int d = 5)
+void
+benchmark_vinecop_fitting(int n = 1000, int d = 5, unsigned int repeats = 10)
 {
-  double total_time = 0.0;
-  for (int i = 0; i < repeats; ++i) {
-    // Generate and preprocess data
-    MatrixXd x = generate_data(n, d);
 
-    // Convert to pseudo-observations
-    auto u = tools_stats::to_pseudo_obs(x);
+  // Seeds for benchmarking
+  Eigen::VectorXi seeds = Eigen::VectorXi::LinSpaced(repeats, 1, repeats);
 
-    auto start = chrono::high_resolution_clock::now();
-    func(u);
-    auto end = chrono::high_resolution_clock::now();
-    total_time += chrono::duration<double, std::milli>(end - start).count();
+  // Benchmark data generation
+  Eigen::VectorXd times_generate_data = benchmark_func(
+    [&](unsigned seed) { auto u = generate_data(n, d, seed); }, seeds);
+
+  // Define different FitControls configurations
+  std::map<std::string, FitControlsVinecop> controls_configs = {
+    { "itau", FitControlsVinecop(bicop_families::itau) },
+    { "itau_par_method", FitControlsVinecop(bicop_families::itau, "itau") },
+    { "tll", FitControlsVinecop({ BicopFamily::tll }) }
+  };
+
+  // Wrapper function to generate data and fit a Vinecop
+  auto generate_and_fit = [&](unsigned seed,
+                              const FitControlsVinecop& controls) {
+    auto u = generate_data(n, d, seed);
+    Vinecop vc(u, RVineStructure(), {}, controls);
+  };
+
+  // Benchmark different configurations
+  cout << "Benchmark Results for Vinecop Fitting (ms):" << endl;
+  for (const auto& config : controls_configs) {
+    Eigen::VectorXd time_fit = benchmark_func(
+      [&](unsigned seed) { generate_and_fit(seed, config.second); }, seeds);
+    cout << config.first << ": "
+         << benchmark_stats(time_fit - times_generate_data).transpose() << endl;
   }
-  return total_time / repeats;
+}
+
+void
+benchmark_bicop_tll(int n = 1000, unsigned int repeats = 10)
+{
+  FitControlsBicop controls_tll({ BicopFamily::tll }); // Define FitControls
+
+  // Seeds for benchmarking
+  Eigen::VectorXi seeds = Eigen::VectorXi::LinSpaced(repeats, 1, repeats);
+
+  // // Warmup
+  // auto warmup = benchmark_func(
+  //   [&](unsigned seed) {
+  //     auto u = generate_data(n, 2, seed);
+  //     Bicop bc(u, controls_tll);
+  //   },
+  //   seeds);
+
+  // Benchmark data generation
+  Eigen::VectorXd times_generate_data = benchmark_func(
+    [&](unsigned seed) { auto u = generate_data(n, 2, seed); }, seeds);
+
+  // Benchmark fitting
+  Eigen::VectorXd time_fit_tll = benchmark_func(
+    [&](unsigned seed) {
+      auto u = generate_data(n, 2, seed);
+      Bicop bc(u, controls_tll);
+    },
+    seeds);
+
+  cout << "Benchmark Results for Bicop tll (ms):" << endl;
+  cout << "fit: "
+       << benchmark_stats(time_fit_tll - times_generate_data).transpose()
+       << endl;
+
+  // Benchmark different methods
+  std::vector<std::string> methods = { "pdf",    "cdf",   "hfunc1",
+                                       "hfunc2", "hinv1", "hinv2" };
+  for (const auto& method : methods) {
+    Eigen::VectorXd time_method = benchmark_func(
+      [&](unsigned seed) {
+        auto u = generate_data(n, 2, seed);
+        Bicop bc(u, controls_tll);
+        if (method == "pdf") {
+          auto d = bc.pdf(u);
+        } else if (method == "cdf") {
+          auto p = bc.cdf(u);
+        } else if (method == "hfunc1") {
+          auto h1 = bc.hfunc1(u);
+        } else if (method == "hfunc2") {
+          auto h2 = bc.hfunc2(u);
+        } else if (method == "hinv1") {
+          auto u1 = bc.hinv1(u);
+        } else if (method == "hinv2") {
+          auto u2 = bc.hinv2(u);
+        }
+      },
+      seeds);
+    cout << method << ": "
+         << benchmark_stats(time_method - time_fit_tll).transpose() << endl;
+  }
 }
 
 int
 main()
 {
-  // Define different FitControls configurations
-  FitControlsVinecop controls_itau(bicop_families::itau);
-  FitControlsVinecop controls_itau_par_method(bicop_families::itau, "itau");
-  FitControlsVinecop controls_tll({ BicopFamily::tll });
 
-  // Benchmark different configurations
-  double time_itau = benchmark([&](const Eigen::MatrixXd& u) {
-    Vinecop vc(u, RVineStructure(), {}, controls_itau);
-  });
-  double time_itau_par_method = benchmark([&](const Eigen::MatrixXd& u) {
-    Vinecop vc(u, RVineStructure(), {}, controls_itau_par_method);
-  });
-  double time_tll = benchmark([&](const Eigen::MatrixXd& u) {
-    Vinecop vc(u, RVineStructure(), {}, controls_tll);
-  });
-
-
-  // Output results
-  cout << "Benchmark Results (ms):" << endl;
-  cout << "itau: " << time_itau << " ms" << endl;
-  cout << "itau_par_method: " << time_itau_par_method << " ms" << endl;
-  cout << "tll: " << time_tll << " ms" << endl;
+  benchmark_vinecop_fitting();
+  benchmark_bicop_tll();
 
   return 0;
 }
