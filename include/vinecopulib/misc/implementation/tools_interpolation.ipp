@@ -98,8 +98,19 @@ InterpolationGrid::normalize_margins(int times)
 inline ptrdiff_t
 InterpolationGrid::binary_search(double x)
 {
+  if (x <= grid_points_(0)) {
+    // Extrapolation: Return the first interval for extrapolation
+    return 0;
+  }
+
+  if (x >= grid_points_(grid_points_.size() - 1)) {
+    // Extrapolation: Return the last interval for extrapolation
+    return grid_points_.size() - 2;
+  }
+
+  // Regular binary search for interior points
   ptrdiff_t low = 0;
-  ptrdiff_t high = grid_points_.size() - 2; // there's one cell less than points
+  ptrdiff_t high = grid_points_.size() - 1; 
   ptrdiff_t mid;
 
   while (low < high) {
