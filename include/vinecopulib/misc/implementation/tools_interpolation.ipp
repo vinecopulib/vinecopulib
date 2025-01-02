@@ -99,7 +99,7 @@ inline ptrdiff_t
 InterpolationGrid::binary_search(double x)
 {
   ptrdiff_t low = 0;
-  ptrdiff_t high = grid_points_.size() - 1;
+  ptrdiff_t high = grid_points_.size() - 2; // there's one cell less than points
   ptrdiff_t mid;
 
   while (low < high) {

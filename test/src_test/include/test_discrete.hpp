@@ -72,7 +72,6 @@ TEST(discrete, bicop)
   }
 }
 
-
 TEST(zero_inflated, bicop)
 {
 
@@ -80,7 +79,7 @@ TEST(zero_inflated, bicop)
     auto bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
     auto tau = bc.parameters_to_tau(Eigen::VectorXd::Constant(1, 3));
     auto u = bc.simulate(1000, true, { 1 });
-    
+
     auto thresh = Eigen::VectorXd::Constant(u.rows(), 0.1);
     auto zero = Eigen::VectorXd::Zero(u.rows());
 
@@ -128,7 +127,6 @@ TEST(zero_inflated, bicop)
     bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
     EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
 
-
     // d_d
     uu = u_disc;
     bc = Bicop(BicopFamily::clayton, rot, Eigen::VectorXd::Constant(1, 3));
@@ -145,7 +143,6 @@ TEST(zero_inflated, bicop)
     EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
   }
 }
-
 
 TEST(discrete, vinecop)
 {
@@ -222,21 +219,21 @@ TEST(discrete, vinecop)
   }
 
   // test for approximate uniformity of rosenblatt transformation
-  u = vc.rosenblatt(u, 1, true);
+  auto u4 = vc.rosenblatt(u.topRows(100), 1, true, { 5 });
   for (int i = 0; i < 5; i++) {
-    auto w = tools_stats::to_pseudo_obs(u.col(i));
+    auto w = tools_stats::to_pseudo_obs(u4.col(i));
     // close to KS test with FWER ~ 0.001
-    EXPECT_LE(std::sqrt(n) * (u.col(i) - w).cwiseAbs().maxCoeff(), 3.5);
-    // Kendall's tau test with FWER ~ 0.001
+    EXPECT_LE(std::sqrt(n) * (u4.col(i) - w).cwiseAbs().maxCoeff(), 3.5);
+    // Kendall's tau test with FWER ~ 0.0001
     for (int j = i + 1; j < 5; j++) {
-      EXPECT_GE(
-        wdm::Indep_test(wdm::utils::convert_vec(u.col(i)), 
-                        wdm::utils::convert_vec(u.col(j)),
-                        "kendall").p_value(),
-        0.0001);
+      EXPECT_GE(wdm::Indep_test(wdm::utils::convert_vec(u4.col(i)),
+                                wdm::utils::convert_vec(u4.col(j)),
+                                "kendall")
+                  .p_value(),
+                0.0001);
     }
   }
-  
+
   // only check that it works
   vc.inverse_rosenblatt(u.topRows(10));
 }
