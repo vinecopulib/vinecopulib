@@ -12,24 +12,24 @@ namespace vinecopulib {
 namespace tools_interpolation {
 //! Constructor
 //!
-//! @param grid_points An ascending sequence of grid_points; used in both
+//! @param points An ascending sequence of points; used in both
 //! dimensions.
 //! @param values A dxd matrix of copula density values evaluated at
-//! (grid_points_i, grid_points_j).
+//! (points_i, points_j).
 //! @param norm_times How many times the normalization routine should run.
-inline InterpolationGrid::InterpolationGrid(const Eigen::VectorXd& grid_points,
+inline InterpolationGrid::InterpolationGrid(const Eigen::VectorXd& points,
                                             const Eigen::MatrixXd& values,
                                             int norm_times)
 {
   if (values.cols() != values.rows()) {
     throw std::runtime_error("values must be a quadratic matrix");
   }
-  if (grid_points.size() != values.rows()) {
+  if (points.size() != values.rows()) {
     throw std::runtime_error(
-      "number of grid_points must equal dimension of values");
+      "number of points must equal dimension of values");
   }
 
-  grid_points_ = grid_points;
+  points_ = points;
   values_ = values;
   normalize_margins(norm_times);
 }
@@ -41,9 +41,15 @@ InterpolationGrid::get_values() const
 }
 
 inline Eigen::VectorXd
-InterpolationGrid::get_grid_points() const
+InterpolationGrid::get_points() const
 {
-  return grid_points_;
+  return points_;
+}
+
+inline size_t
+InterpolationGrid::get_size() const
+{
+  return points_.size();
 }
 
 inline void
@@ -82,15 +88,15 @@ InterpolationGrid::flip()
 inline void
 InterpolationGrid::normalize_margins(int times)
 {
-  size_t m = grid_points_.size();
+  size_t m = points_.size();
   for (int k = 0; k < times; ++k) {
     for (size_t i = 0; i < m; ++i) {
       values_.row(i) /= // prevent 0/0
-        std::max(int_on_grid(1.0, values_.row(i), grid_points_), 1e-20);
+        std::max(int_on_grid(1.0, values_.row(i), points_), 1e-20);
     }
     for (size_t j = 0; j < m; ++j) {
       values_.col(j) /= // prevent 0/0
-        std::max(int_on_grid(1.0, values_.col(j), grid_points_), 1e-20);
+        std::max(int_on_grid(1.0, values_.col(j), points_), 1e-20);
     }
   }
 }
@@ -98,24 +104,24 @@ InterpolationGrid::normalize_margins(int times)
 inline ptrdiff_t
 InterpolationGrid::binary_search(double x)
 {
-  if (x <= grid_points_(0)) {
+  if (x <= points_(0)) {
     // Extrapolation: Return the first interval for extrapolation
     return 0;
   }
 
-  if (x >= grid_points_(grid_points_.size() - 1)) {
+  if (x >= points_(points_.size() - 1)) {
     // Extrapolation: Return the last interval for extrapolation
-    return grid_points_.size() - 2;
+    return points_.size() - 2;
   }
 
   // Regular binary search for interior points
   ptrdiff_t low = 0;
-  ptrdiff_t high = grid_points_.size() - 1; 
+  ptrdiff_t high = points_.size() - 1; 
   ptrdiff_t mid;
 
   while (low < high) {
     mid = (low + high + 1) / 2; // Use upper midpoint
-    if (grid_points_(mid) <= x) {
+    if (points_(mid) <= x) {
       low = mid; // Move lower bound up
     } else {
       high = mid - 1; // Move upper bound down
@@ -180,16 +186,18 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd& x)
 
   auto f = [this](double x0, double x1) {
     auto indices = this->get_indices(x0, x1);
-    return bilinear_interpolation(this->values_(indices(0), indices(1)),
+    double res = bilinear_interpolation(this->values_(indices(0), indices(1)),
                                   this->values_(indices(0), indices(1) + 1),
                                   this->values_(indices(0) + 1, indices(1)),
                                   this->values_(indices(0) + 1, indices(1) + 1),
-                                  this->grid_points_(indices(0)),
-                                  this->grid_points_(indices(0) + 1),
-                                  this->grid_points_(indices(1)),
-                                  this->grid_points_(indices(1) + 1),
+                                  this->points_(indices(0)),
+                                  this->points_(indices(0) + 1),
+                                  this->points_(indices(1)),
+                                  this->points_(indices(1) + 1),
                                   x0,
                                   x1);
+    // clip to [0.0, 1e4] to avoid numerical issues
+    return std::min(std::max(res, 0.0), 1e4);
   };
 
   return tools_eigen::binaryExpr_or_nan(x, f);
@@ -203,7 +211,7 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd& x)
 inline Eigen::VectorXd
 InterpolationGrid::integrate_1d(const Eigen::MatrixXd& u, size_t cond_var)
 {
-  ptrdiff_t m = grid_points_.size();
+  ptrdiff_t m = points_.size();
   Eigen::VectorXd tmpvals(m);
   Eigen::MatrixXd tmpgrid(m, 2);
 
@@ -213,15 +221,15 @@ InterpolationGrid::integrate_1d(const Eigen::MatrixXd& u, size_t cond_var)
     if (cond_var == 1) {
       upr = u2;
       tmpgrid.col(0) = Eigen::VectorXd::Constant(m, u1);
-      tmpgrid.col(1) = grid_points_;
+      tmpgrid.col(1) = points_;
     } else if (cond_var == 2) {
       upr = u1;
-      tmpgrid.col(0) = grid_points_;
+      tmpgrid.col(0) = points_;
       tmpgrid.col(1) = Eigen::VectorXd::Constant(m, u2);
     }
     tmpvals = interpolate(tmpgrid).array().max(1e-4);
-    tmpint = int_on_grid(upr, tmpvals, grid_points_);
-    int1 = int_on_grid(1.0, tmpvals, grid_points_);
+    tmpint = int_on_grid(upr, tmpvals, points_);
+    int1 = int_on_grid(1.0, tmpvals, points_);
 
     return std::min(std::max(tmpint / int1, 1e-10), 1 - 1e-10);
   };
@@ -236,23 +244,23 @@ InterpolationGrid::integrate_1d(const Eigen::MatrixXd& u, size_t cond_var)
 inline Eigen::VectorXd
 InterpolationGrid::integrate_2d(const Eigen::MatrixXd& u)
 {
-  ptrdiff_t m = grid_points_.size();
+  ptrdiff_t m = points_.size();
   Eigen::VectorXd tmpvals(m), tmpvals2(m);
   Eigen::MatrixXd tmpgrid(m, 2);
-  tmpgrid.col(1) = grid_points_;
+  tmpgrid.col(1) = points_;
 
   auto f = [this, m, &tmpvals, &tmpvals2, &tmpgrid](double u1, double u2) {
     double upr, tmpint, tmpint1;
     upr = u2;
     for (ptrdiff_t k = 0; k < m; ++k) {
-      tmpgrid.col(0) = Eigen::VectorXd::Constant(m, grid_points_(k));
+      tmpgrid.col(0) = Eigen::VectorXd::Constant(m, points_(k));
       tmpvals = interpolate(tmpgrid);
-      tmpint = int_on_grid(upr, tmpvals, grid_points_);
+      tmpint = int_on_grid(upr, tmpvals, points_);
       tmpvals2(k) = tmpint;
     }
     upr = u1;
-    tmpint = int_on_grid(upr, tmpvals2, grid_points_);
-    tmpint1 = int_on_grid(1.0, tmpvals2, grid_points_);
+    tmpint = int_on_grid(upr, tmpvals2, points_);
+    tmpint1 = int_on_grid(1.0, tmpvals2, points_);
     return std::min(std::max(tmpint / tmpint1, 1e-10), 1 - 1e-10);
   };
 

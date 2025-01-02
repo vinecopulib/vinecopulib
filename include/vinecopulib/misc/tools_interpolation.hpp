@@ -20,13 +20,15 @@ class InterpolationGrid
 public:
   InterpolationGrid() {}
 
-  InterpolationGrid(const Eigen::VectorXd& grid_points,
+  InterpolationGrid(const Eigen::VectorXd& points,
                     const Eigen::MatrixXd& values,
                     int norm_times = 3);
 
   Eigen::MatrixXd get_values() const;
 
-  Eigen::VectorXd get_grid_points() const;
+  Eigen::VectorXd get_points() const;
+
+  size_t get_size() const;
 
   void set_values(const Eigen::MatrixXd& values, int norm_times = 3);
 
@@ -57,7 +59,7 @@ private:
                      const Eigen::VectorXd& vals,
                      const Eigen::VectorXd& grid);
 
-  Eigen::VectorXd grid_points_;
+  Eigen::VectorXd points_;
   Eigen::MatrixXd values_;
 };
 }

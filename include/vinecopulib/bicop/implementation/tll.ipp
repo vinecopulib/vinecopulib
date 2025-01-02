@@ -223,8 +223,8 @@ TllBicop::fit(const Eigen::MatrixXd& data,
 {
   using namespace tools_interpolation;
 
-  auto grid_points = interp_grid_->get_grid_points();
-  auto m = grid_points.size();
+  auto grid_points = interp_grid_->get_points();
+  auto grid_size = interp_grid_->get_size();
 
   // expand the interpolation grid; a matrix with two columns where each row
   // contains one combination of the grid points
@@ -255,16 +255,18 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   Eigen::VectorXd c =
     ll_fit.col(0).cwiseQuotient(tools_stats::dnorm(z).rowwise().prod());
   // store values in mxm grid
-  Eigen::MatrixXd values(m, m);
-  values = Eigen::Map<Eigen::MatrixXd>(c.data(), m, m).transpose();
+  Eigen::MatrixXd values(grid_size, grid_size);
+  values =
+    Eigen::Map<Eigen::MatrixXd>(c.data(), grid_size, grid_size).transpose();
 
   interp_grid_->set_values(values);
 
   // compute effective degrees of freedom via interpolation ---------
   // stabilize interpolation by restricting to plausible range
   Eigen::VectorXd infl_vec = ll_fit.col(1).cwiseMin(1.3).cwiseMax(-0.2);
-  Eigen::MatrixXd infl(m, m);
-  infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), m, m).transpose();
+  Eigen::MatrixXd infl(grid_size, grid_size);
+  infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), grid_size, grid_size)
+           .transpose();
   // don't normalize margins of the EDF! (norm_times = 0)
   auto infl_grid = InterpolationGrid(grid_points, infl, 0);
   if ((var_types_[0] == "d") || (var_types_[1] == "d")) {

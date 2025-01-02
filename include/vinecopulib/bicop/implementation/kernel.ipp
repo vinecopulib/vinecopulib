@@ -131,13 +131,15 @@ KernelBicop::get_parameters() const
 inline Eigen::MatrixXd
 KernelBicop::get_parameters_lower_bounds() const
 {
-  return Eigen::MatrixXd::Constant(30, 30, 0.0);
+  auto grid_size = interp_grid_->get_size();
+  return Eigen::MatrixXd::Constant(grid_size, grid_size, 0.0);
 }
 
 inline Eigen::MatrixXd
 KernelBicop::get_parameters_upper_bounds() const
 {
-  return Eigen::MatrixXd::Constant(30, 30, 1e4);
+  auto grid_size = interp_grid_->get_size();
+  return Eigen::MatrixXd::Constant(grid_size, grid_size, 1e4);
 }
 
 inline void
