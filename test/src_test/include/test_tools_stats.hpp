@@ -47,6 +47,7 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct)
   r2 = tools_stats::to_pseudo_obs(X2, "first", weights);
   EXPECT_TRUE(r1 == r2);
 
+
   X2.col(0).head(50) = Eigen::VectorXd::Constant(50, NAN);
   auto u = tools_stats::to_pseudo_obs(X2);
   EXPECT_TRUE(std::isnan(u(0, 0)));
