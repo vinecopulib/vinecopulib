@@ -36,7 +36,20 @@ find_package(Threads                      REQUIRED)
 
 # Check if wdm_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED wdm_INCLUDE_DIRS)
-  find_package(wdm REQUIRED)
+  # Download if not found
+  find_package(wdm 0.2.6 QUIET)
+  if(NOT wdm_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+      wdm
+      GIT_REPOSITORY https://github.com/tnagler/wdm.git
+      GIT_TAG        c837460 
+    )
+    FetchContent_MakeAvailable(wdm)
+    set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
+  else()
+    message(STATUS "Found wdm: ${wdm_INCLUDE_DIRS} (found suitable version \"${wdm_VERSION}\")")
+  endif()
 endif()
 
 # Ensure R is available and download googlestest
