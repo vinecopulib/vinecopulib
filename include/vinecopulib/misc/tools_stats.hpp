@@ -24,9 +24,8 @@ namespace tools_stats {
 inline Eigen::MatrixXd
 dnorm(const Eigen::MatrixXd& x)
 {
-  static const double pi = 3.14159265358979323846;
-  static const double sqrt_2pi = std::sqrt(2.0 * pi);
-  return (1.0 / sqrt_2pi) * (-0.5 * x.array().square()).exp();
+  static constexpr double inv_sqrt_2pi = 0.39894228040143270286;
+  return inv_sqrt_2pi * (-0.5 * x.array().square()).exp();
 }
 
 //! @brief Distribution function of the Standard normal distribution.

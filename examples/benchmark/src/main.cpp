@@ -5,6 +5,8 @@
 #include <string>
 #include <vinecopulib.hpp>
 
+#include "benchmark.hpp"
+
 using namespace std;
 using namespace vinecopulib;
 using Eigen::MatrixXd;
@@ -70,13 +72,14 @@ benchmark_bicop_tll(int n = 1000, unsigned int repeats = 10)
   // Seeds for benchmarking
   Eigen::VectorXi seeds = Eigen::VectorXi::LinSpaced(repeats, 1, repeats);
 
-  // // Warmup
-  // auto warmup = benchmark_func(
-  //   [&](unsigned seed) {
-  //     auto u = generate_data(n, 2, seed);
-  //     Bicop bc(u, controls_tll);
-  //   },
-  //   seeds);
+  // Warmup
+  auto warmup = benchmark_func(
+    [&](unsigned seed) {
+      auto u = generate_data(n, 2, seed);
+      Bicop bc(u, controls_tll);
+    },
+    seeds);
+
 
   // Benchmark data generation
   Eigen::VectorXd times_generate_data = benchmark_func(
