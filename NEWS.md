@@ -1,4 +1,4 @@
-## vinecopulib 0.7.0 (December 9, 2024)
+## vinecopulib 0.7.0 (January 2, 2025)
 
 ### NEW FEATURES
 
@@ -6,21 +6,24 @@
 * Allow for alternative for `"prim"` vs `"kruskal"` in MST-based model selection (#577)
 * Improve the dependencies install script to use it in other projects (#576)
 * Add tawn copula (#579)
-* Improve doc (#580, #585)
+* Improve doc (#580, #585, #607)
 * Allow for the discrete Rosenblatt transform (#581)
 * Add `Vinecop::fit()` (#584)
 * Improve `Bicop::str()` (#588) and `Vinecop::str()` (#589)
-* Improve performance by
-    * aligning with R defaults and add benchmarking example (#592),
-    * using `Eigen` element-wise operations instead of `boost` in `tools::stats` (#598).
 * Properly handle discrete variables for the TLL family (#597)
+* Weighted pseudo-observations (#602)
+* Cross-platform random numbers and add seeds options to `to_pseudo_obs` (#603)
+* Improve performance by
+    * aligning with the `R` defaults (e.g., `BOOST_NO_AUTO_PTR`, `BOOST_ALLOW_DEPRECATED_HEADERS`, `BOOST_MATH_PROMOTE_DOUBLE_POLICY=false`, `std::string nonparametric_method = "constant"` for the TLL instead of `"quadratic"`, `-O3 -march=native` compiler flags) and add benchmarking example (#592, #611, #613),
+    * using `Eigen` element-wise operations instead of `boost` whenever possible (#598, #612),
+    * using binary search in the TLL for `get_indices` (#613).
 
 ### BUG FIXES
 
 * Improve stability in BB7 PDF (#573)
 * Revamped CI/CD pipeline, tests discoverable by CTest, boost version on windows (66cf8b0)
 * Fix ASAN issues (#583)
-* Fix interface includes and other CMake issue (#586, by @jschueller)
+* Fix interface includes and other CMake issue (#586, #599, #601, #608, by @jschueller)
 
 ## vinecopulib 0.6.3 (Februrary 20, 2023)
 
