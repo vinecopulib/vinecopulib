@@ -6,8 +6,8 @@ check_required_components("@PROJECT_NAME@")
 
 # needed to find depedent interface targets
 include(CMakeFindDependencyMacro)
-find_dependency(Eigen3)
-find_dependency(wdm)
+find_dependency(Eigen3 REQUIRED)
+find_dependency(wdm REQUIRED)
 
 find_package(Boost CONFIG)
 if (NOT Boost_FOUND)
