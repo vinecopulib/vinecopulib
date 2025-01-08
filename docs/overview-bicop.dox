@@ -127,7 +127,7 @@ families or any of those mentioned above (default is `bicop_families::all`).
 included in `bicop_families::itau`).
 - `std::string nonparametric_method` describes the degree of the density
 approximation for the transformation kernel estimator. It can take
-`constant`, `linear` and `quadratic` (default) for approximations of
+`constant` (default), `linear` and `quadratic` for approximations of
 degree zero, one and two.
 - `double nonparametric_mult` a factor with which the smoothing parameters
 are multiplied.
