@@ -134,6 +134,14 @@ const std::vector<BicopFamily> flip_by_rotation = {
   BicopFamily::bb7,     BicopFamily::bb8,    BicopFamily::tawn
 };
 
+//! Families used as the default in Bicop::select() and Vinecop::select().
+const std::vector<BicopFamily> default_set = {
+  BicopFamily::indep,   BicopFamily::gaussian, BicopFamily::student,
+  BicopFamily::clayton, BicopFamily::gumbel,   BicopFamily::frank,
+  BicopFamily::joe,     BicopFamily::bb1,      BicopFamily::bb6,
+  BicopFamily::bb7,     BicopFamily::bb8,      BicopFamily::tll
+};
+
 } // end of namespace BicopFamilies
 } // end of namespace vinecopulib
 

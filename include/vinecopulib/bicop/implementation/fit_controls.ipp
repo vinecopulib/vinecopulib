@@ -13,7 +13,8 @@ namespace vinecopulib {
 //! @brief Instantiates the controls for fitting bivariate copula models.
 //!
 //! @param family_set The set of copula families to consider (if empty, then
-//!     all families are included).
+//!   the following families are included: indep, gaussian, student, clayton, 
+//!   gumbel, frank, joe, bb1, bb6, bb7, bb8, tll).
 //! @param parametric_method The fit method for parametric families;
 //!     possible choices: `"mle"`, `"itau"`.
 //! @param nonparametric_method The fit method for the local-likelihood

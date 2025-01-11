@@ -17,15 +17,16 @@ class FitControlsBicop
 {
 public:
   // Constructor
-  FitControlsBicop(std::vector<BicopFamily> family_set = bicop_families::all,
-                   std::string parametric_method = "mle",
-                   std::string nonparametric_method = "constant",
-                   double nonparametric_mult = 1.0,
-                   std::string selection_criterion = "aic",
-                   const Eigen::VectorXd& weights = Eigen::VectorXd(),
-                   double psi0 = 0.9,
-                   bool preselect_families = true,
-                   size_t num_threads = 1);
+  FitControlsBicop(
+    std::vector<BicopFamily> family_set = bicop_families::default_set,
+    std::string parametric_method = "mle",
+    std::string nonparametric_method = "constant",
+    double nonparametric_mult = 1.0,
+    std::string selection_criterion = "aic",
+    const Eigen::VectorXd& weights = Eigen::VectorXd(),
+    double psi0 = 0.9,
+    bool preselect_families = true,
+    size_t num_threads = 1);
 
   explicit FitControlsBicop(std::string parametric_method);
 
