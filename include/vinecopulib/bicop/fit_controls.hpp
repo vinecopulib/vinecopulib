@@ -1,4 +1,4 @@
-// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -19,7 +19,7 @@ public:
   // Constructor
   FitControlsBicop(std::vector<BicopFamily> family_set = bicop_families::all,
                    std::string parametric_method = "mle",
-                   std::string nonparametric_method = "quadratic",
+                   std::string nonparametric_method = "constant",
                    double nonparametric_mult = 1.0,
                    std::string selection_criterion = "aic",
                    const Eigen::VectorXd& weights = Eigen::VectorXd(),

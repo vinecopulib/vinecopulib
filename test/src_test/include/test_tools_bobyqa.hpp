@@ -1,4 +1,4 @@
-// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -8,8 +8,8 @@
 
 #include "gtest/gtest.h"
 #include <cmath>
+#include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_bobyqa.hpp>
-#include <vinecopulib/misc/tools_stats.hpp>
 
 namespace test_tools_bobyqa {
 

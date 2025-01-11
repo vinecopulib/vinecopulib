@@ -29,6 +29,7 @@ your source file.
 |               | BB6                   | bb6     |
 |               | BB7                   | bb7     |
 |               | BB8                   | bb8    |
+| Extreme-Value | Tawn                  | tawn     |
 | Nonparametric | Transformation kernel | tll  |
 
 Note that several convenience vectors of families are included in the
@@ -40,8 +41,11 @@ sub-namespace `bicop_families`:
 (`gaussian`, `clayton`, `gumbel`, `frank`, and `joe`)
 - `two_par` contains the parametric families with two parameters
 (`student`, `bb1`, `bb6`, `bb7`, and `bb8`)
+- `three_par` contains the parametric families with three parameters
+(`tawn`)
 - `elliptical` contains the elliptical families
 - `archimedean` contains the archimedean families
+- `extreme_value` contains the extreme-value families (`gumbel`, `tawn`)
 - `bb` contains the BB families
 - `itau` families for which estimation by Kendall's tau inversion is available
 (`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
@@ -123,7 +127,7 @@ families or any of those mentioned above (default is `bicop_families::all`).
 included in `bicop_families::itau`).
 - `std::string nonparametric_method` describes the degree of the density
 approximation for the transformation kernel estimator. It can take
-`constant`, `linear` and `quadratic` (default) for approximations of
+`constant` (default), `linear` and `quadratic` for approximations of
 degree zero, one and two.
 - `double nonparametric_mult` a factor with which the smoothing parameters
 are multiplied.

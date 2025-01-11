@@ -1,4 +1,4 @@
-// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -10,7 +10,7 @@
 
 namespace vinecopulib {
 namespace tools_select {
-//! returns only those rotations that yield the appropriate
+//! @brief Gets only those rotations that yield the appropriate
 //! association direction.
 //! @param data Captured by reference to avoid data copies;
 //!     should NOT be modified though.

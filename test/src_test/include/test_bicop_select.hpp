@@ -1,4 +1,4 @@
-// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -7,7 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib.hpp>
 
 namespace test_bicop_select {
 using namespace vinecopulib;
