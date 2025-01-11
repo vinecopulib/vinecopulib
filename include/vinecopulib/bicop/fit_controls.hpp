@@ -18,7 +18,7 @@ class FitControlsBicop
 public:
   // Constructor
   FitControlsBicop(
-    std::vector<BicopFamily> family_set = bicop_families::default_set,
+    std::vector<BicopFamily> family_set = bicop_families::default,
     std::string parametric_method = "mle",
     std::string nonparametric_method = "constant",
     double nonparametric_mult = 1.0,

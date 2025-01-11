@@ -49,6 +49,9 @@ sub-namespace `bicop_families`:
 - `bb` contains the BB families
 - `itau` families for which estimation by Kendall's tau inversion is available
 (`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
+- `default` contains the default families for the `select()` methods
+(`indep`, `gaussian`, `student`, `clayton`, `gumbel`, `frank`, `joe`, `bb1`, 
+`bb6`, `bb7`, `bb8`, `tll`).
 
 ```
 // print all available families
