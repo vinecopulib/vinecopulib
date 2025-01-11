@@ -77,4 +77,11 @@ TawnBicop::tau_to_parameters(const double& tau)
 {
   return no_tau_to_parameters(tau);
 }
+
+inline void
+TawnBicop::flip()
+{
+  std::swap(parameters_(0), parameters_(1));
+}
+
 }
