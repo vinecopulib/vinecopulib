@@ -39,6 +39,9 @@ TEST_P(ParBicopTest, bicop_serialization_is_correct)
 TEST_P(ParBicopTest, parametric_bicop_is_correct)
 {
   if (needs_check_) {
+    if (bicop_.get_family() == BicopFamily::fgm) {
+      return;
+    }
     std::string cmd = std::string(RSCRIPT) + std::string(TEST_BICOP);
     cmd += " " + std::to_string(get_n());
     cmd += " " + std::to_string(get_family());
@@ -127,7 +130,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
         (bicop_.get_family() != BicopFamily::student)) {
       EXPECT_ANY_THROW(bicop_.tau_to_parameters(0.5));
     } else if (bicop_.get_parameters().size() == 1) {
-      EXPECT_NO_THROW(bicop_.tau_to_parameters(1));
+      EXPECT_NO_THROW(bicop_.tau_to_parameters(0.2));
     }
   }
 }

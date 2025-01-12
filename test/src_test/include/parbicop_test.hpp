@@ -7,10 +7,10 @@
 #pragma once
 
 #include "gtest/gtest.h"
+#include <boost/math/constants/constants.hpp>
 #include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
-#include <boost/math/constants/constants.hpp>
 
 using namespace vinecopulib;
 
@@ -52,9 +52,13 @@ protected:
 
     set_family(family, rotation);
     double tau = 0.5; // should be positive
+    if (family == BicopFamily::fgm) {
+      tau /= 3;
+    }
     auto parameters = bicop_.get_parameters();
     if (parameters.size() < 2) {
       parameters = bicop_.tau_to_parameters(tau);
+
     } else if (parameters.size() == 2) {
       if (family == BicopFamily::student) {
         parameters(0) = sin(tau * boost::math::constants::pi<double>() / 2);

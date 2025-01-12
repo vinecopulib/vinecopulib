@@ -105,6 +105,7 @@ const std::vector<BicopFamily> rotationless = { BicopFamily::indep,
                                                 BicopFamily::gaussian,
                                                 BicopFamily::student,
                                                 BicopFamily::frank,
+                                                BicopFamily::fgm,
                                                 BicopFamily::tll };
 
 //! Families with stronger dependence in the lower tail
