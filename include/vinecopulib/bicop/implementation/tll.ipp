@@ -97,45 +97,89 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
   Eigen::MatrixXd z_data = (irB * x_data.transpose()).transpose();
 
   Eigen::MatrixXd res(m, 2);
-  res.col(0) = Eigen::VectorXd::Ones(m); // result will be a product
-  Eigen::VectorXd kernels(n);
-  Eigen::Vector2d f1;
-  Eigen::Vector2d b;
-  Eigen::Matrix2d S(B);
-  Eigen::MatrixXd zz(n, 2), zz2(n, 2);
-  for (size_t k = 0; k < m; ++k) {
-    zz = z_data - z.row(k).replicate(n, 1);
-    kernels = gaussian_kernel_2d(zz) * det_irB;
-    if (weights.size() > 0)
-      kernels = kernels.cwiseProduct(weights);
-    double f0 = kernels.mean();
-    if (method != "constant") {
-      zz = (irB * zz.transpose()).transpose();
-      f1 = zz.cwiseProduct(kernels.replicate(1, 2)).colwise().mean();
-      b = f1 / f0;
-      if (method == "quadratic") {
-        zz2 = zz.cwiseProduct(kernels.replicate(1, 2)) /
-              (f0 * static_cast<double>(n));
-        b = B * b;
-        S = (B * (zz.transpose() * zz2) * B - b * b.transpose()).inverse();
-        res(k) *= std::sqrt(S.determinant()) / det_irB;
-      }
-      res(k) *= std::exp(-0.5 * double(b.transpose() * S * b));
-      if ((std::isnan)(res(k)) || (std::isinf)(res(k))) {
-        // inverse operation might go wrong due to rounding when
-        // true value is equal or close to zero
-        res(k) = 0.0;
-      }
-    }
-    res(k, 0) *= f0;
+
+  // diff + unweighted sum + weighted sum + w
+  size_t bytes_required = m * n * 2 * 8 + m * 8 * 3;
+  if (method == "constant" && bytes_required < static_cast<size_t>(1e9)) {
+    // Compute pairwise differences (broadcast z_data to all evaluation points)
+    Eigen::MatrixXd kernel_values = (z_data.transpose().rowwise().replicate(m) -
+                                     z.transpose().rowwise().replicate(n))
+                                      .transpose();
+
+    // Compute Gaussian kernels for all differences
+    kernel_values = gaussian_kernel_2d(kernel_values).reshaped(n, m) * det_irB;
+
+    Eigen::VectorXd unweighted_sums(m);
     if (weights.size() > 0) {
-      // average weight in neighborhood of evaluation point (essentially a
-      // kernel regression estimate);
-      // kernels have already been multiplied with weights above
-      double w = kernels.sum() / kernels.cwiseQuotient(weights).sum();
-      res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, w);
+      // For the influence calculation
+      unweighted_sums = kernel_values.colwise().sum();
+      // Apply weights
+      kernel_values = kernel_values.array().colwise() * weights.array();
+    }
+
+    res.col(0) = kernel_values.colwise().mean();
+    if (weights.size() > 0) {
+      // Compute weighted sums for w calculation
+      Eigen::VectorXd kernel_sums = kernel_values.colwise().sum();
+
+      // Compute `w` values for each evaluation point
+      Eigen::VectorXd w = kernel_sums.array() / unweighted_sums.array();
+
+      // Compute inflation for weighted case
+      res.col(1) = gaussian_kernel_2d(Eigen::MatrixXd::Zero(1, 2))(0) *
+                   det_irB / res.col(0).array() // 1 / f0
+                   * w.array() / static_cast<double>(n);
+
     } else {
-      res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, 1.0);
+
+      // Compute inflation for unweighted case (w = 1)
+      res.col(1) = gaussian_kernel_2d(Eigen::MatrixXd::Zero(1, 2))(0) *
+                   det_irB / res.col(0).array() // 1 / f0
+                   / static_cast<double>(n);
+    }
+  } else {
+
+    res.col(0) = Eigen::VectorXd::Ones(m); // result will be a product
+    Eigen::VectorXd kernels(n);
+    Eigen::Vector2d f1;
+    Eigen::Vector2d b;
+    Eigen::Matrix2d S(B);
+    Eigen::MatrixXd zz(n, 2), zz2(n, 2);
+
+    for (size_t k = 0; k < m; ++k) {
+      zz = z_data.rowwise() - z.row(k);
+      kernels = gaussian_kernel_2d(zz) * det_irB;
+      if (weights.size() > 0)
+        kernels = kernels.cwiseProduct(weights);
+      double f0 = kernels.mean();
+      if (method != "constant") {
+        zz = (irB * zz.transpose()).transpose();
+        f1 = zz.cwiseProduct(kernels.replicate(1, 2)).colwise().mean();
+        b = f1 / f0;
+        if (method == "quadratic") {
+          zz2 = zz.cwiseProduct(kernels.replicate(1, 2)) /
+                (f0 * static_cast<double>(n));
+          b = B * b;
+          S = (B * (zz.transpose() * zz2) * B - b * b.transpose()).inverse();
+          res(k) *= std::sqrt(S.determinant()) / det_irB;
+        }
+        res(k) *= std::exp(-0.5 * double(b.transpose() * S * b));
+        if ((std::isnan)(res(k)) || (std::isinf)(res(k))) {
+          // inverse operation might go wrong due to rounding when
+          // true value is equal or close to zero
+          res(k) = 0.0;
+        }
+      }
+      res(k, 0) *= f0;
+      if (weights.size() > 0) {
+        // average weight in neighborhood of evaluation point (essentially a
+        // kernel regression estimate);
+        // kernels have already been multiplied with weights above
+        double w = kernels.sum() / kernels.cwiseQuotient(weights).sum();
+        res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, w);
+      } else {
+        res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, 1.0);
+      }
     }
   }
 
