@@ -733,15 +733,28 @@ inline void
 Bicop::flip()
 {
   // change var_types
+  // ----------------
   std::swap(var_types_[0], var_types_[1]);
   flip_abstract_var_types();
 
   // change internal representation
+  // ------------------------------
+  // For families that are exchangeable (most in our library), flipping 0° or
+  // 180° rotated versions does not alter the shape of the copula.
+  //
+  // For 90° and 270° rotations, their definition itself involves exchanging
+  // arguments plus a reflection in one of the arguments (e.g.,
+  // c(u, v) -> c(1 - v, u)). To indicate that the the argument which needs to
+  // be reflected changes, we always switch 90° <-> 270° . For families that are
+  // exchangeable in their 0° variant, this will be the only change this is
+  // needed.
   if (rotation_ == 90) {
     rotation_ = 270;
   } else if (rotation_ == 270) {
     rotation_ = 90;
   }
+  // The following implements any changes to the shape beyond the change in 
+  // rotation. Formost of our families, it does nothing.
   bicop_->flip();
 }
 
@@ -757,7 +770,8 @@ Bicop::str() const
   bicop_str << "  var_types = " << var_types_[0] << "," << var_types_[1]
             << "\n";
   if (get_family() == BicopFamily::tll) {
-    bicop_str << "  parameters = [30x30 grid] with " << get_npars() << " d.f.\n";
+    bicop_str << "  parameters = [30x30 grid] with " << get_npars()
+              << " d.f.\n";
   } else if (get_family() != BicopFamily::indep) {
     bicop_str << "  parameters = " << get_parameters() << "\n";
   }
