@@ -1,3 +1,15 @@
+## vinecopulib 0.7.1 (January 15, 2025)
+
+### BUG FIXES
+
+* restrict parameter range for fitting Tawn copulas; fix handling of their 
+  shape/argument order (#620).
+
+* compute and save loglik/nobs in `Vinecop::fit()` (#623)
+
+* disable unwanted compiler output related to BOOST_CONCEPT checks (#624)
+
+
 ## vinecopulib 0.7.0 (January 2, 2025)
 
 ### NEW FEATURES
