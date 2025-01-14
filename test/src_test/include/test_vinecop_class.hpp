@@ -385,7 +385,13 @@ TEST_F(VinecopTest, aic_bic_are_correct)
 
   ASSERT_TRUE(true_model.aic(data) < complex_model.aic(data));
   ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
-}
+  true_model.select(data);
+
+  FitControlsVinecop controls({ BicopFamily::gaussian, BicopFamily::tll });
+  complex_model.select(data);
+  ASSERT_NEAR(complex_model.get_aic(), complex_model.aic(data), 1e-2);
+  ASSERT_NEAR(complex_model.get_bic(), complex_model.bic(data), 1e-2);
+} 
 
 TEST_F(VinecopTest, fit_parameters_is_correct)
 {
@@ -401,6 +407,9 @@ TEST_F(VinecopTest, fit_parameters_is_correct)
   Vinecop vc2(rvine_structure, pcs);
   vc2.fit(u, controls);
 
+  ASSERT_TRUE(vc2.get_loglik() == vc2.loglik(u));
+  ASSERT_TRUE(vc2.get_aic() == vc2.aic(u));
+  ASSERT_TRUE(vc2.get_bic() == vc2.bic(u));
   ASSERT_TRUE(vc.str() == vc2.str());
 
   Vinecop vc3(rvine_structure, pcs);
