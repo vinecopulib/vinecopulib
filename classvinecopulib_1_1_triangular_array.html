@@ -85,13 +85,13 @@
             </li>
           </ul>
         </nav>
-<p>A triangular array behaves like a matrix with the structure</p><pre class="m-code"><span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
-<span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
-<span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
-<span class="n">x</span> <span class="n">x</span>
-<span class="n">x</span></pre><p>and all other elements omitted. This structure appears naturally in the representation of a vine copula model and related algorithms. Each row corresponds to one tree in the vine, starting from the top. In each tree (=row), each column represents an edge.</p><p>For truncated vine models the last few trees are omitted. For example, a 3-truncated version of the above array contains the elements</p><pre class="m-code"><span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
-<span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
-<span class="n">x</span> <span class="n">x</span> <span class="n">x</span></pre><p>Only the elements indicated by <code>x</code>s are stored and can be accessed.</p><p>The data structure is templated and any type or class can be used to fill the entries (<code>x</code>s) of the triangular array.</p>
+<p>A triangular array behaves like a matrix with the structure</p><pre class="m-code"><span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span>
+<span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span>
+<span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span>
+<span class="n">x</span><span class="w"> </span><span class="n">x</span>
+<span class="n">x</span></pre><p>and all other elements omitted. This structure appears naturally in the representation of a vine copula model and related algorithms. Each row corresponds to one tree in the vine, starting from the top. In each tree (=row), each column represents an edge.</p><p>For truncated vine models the last few trees are omitted. For example, a 3-truncated version of the above array contains the elements</p><pre class="m-code"><span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span>
+<span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span>
+<span class="n">x</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">x</span></pre><p>Only the elements indicated by <code>x</code>s are stored and can be accessed.</p><p>The data structure is templated and any type or class can be used to fill the entries (<code>x</code>s) of the triangular array.</p>
         <section id="typeless-methods">
           <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
           <dl class="m-doc">
@@ -134,11 +134,11 @@
             <dt id="ae557ebefe25bfc18818e254ada5c91cb">
               <span class="m-doc-wrap-bumper">auto <a href="#ae557ebefe25bfc18818e254ada5c91cb" class="m-doc-self">get_trunc_lvl</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
             </dt>
-            <dd>Get the truncation level of the underlying vine..</dd>
-            <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#adb36a7916d7281707dcf50e40839bfb9" class="m-doc">get_dim</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
+            <dd>Gets the truncation level of the underlying vine..</dd>
+            <dt id="adb36a7916d7281707dcf50e40839bfb9">
+              <span class="m-doc-wrap-bumper">auto <a href="#adb36a7916d7281707dcf50e40839bfb9" class="m-doc-self">get_dim</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
             </dt>
-            <dd></dd>
+            <dd>Gets the dimension of the underlying vine (the matrix has <code>d-1</code> columns and. <code>min(trunv_lvl, d-1)</code> rows).</dd>
             <dt id="a2cd9d9617c7c3fc422ed67a6054b2d3a">
               <span class="m-doc-wrap-bumper">auto <a href="#a2cd9d9617c7c3fc422ed67a6054b2d3a" class="m-doc-self">str</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
             </dt>
@@ -305,15 +305,6 @@
               </tbody>
             </table>
           </div></section>
-          <section class="m-doc-details" id="adb36a7916d7281707dcf50e40839bfb9"><div>
-            <h3>
-              <div class="m-doc-template">
-                template&lt;typename T&gt;
-              </div>
-              <span class="m-doc-wrap-bumper">size_t vinecopulib::<wbr />TriangularArray&lt;T&gt;::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#adb36a7916d7281707dcf50e40839bfb9" class="m-doc-self">get_dim</a>(</span><span class="m-doc-wrap">) const</span></span>
-            </h3>
-<p>Get the dimension of the underlying vine (the matrix has <code>d-1</code> columns and. <code>min(trunv_lvl, d-1)</code> rows).</p>
-          </div></section>
         </section>
       </div>
     </div>
@@ -359,7 +350,7 @@
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.9.1 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>

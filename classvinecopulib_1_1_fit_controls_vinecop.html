@@ -103,9 +103,9 @@
             </dt>
             <dd>Instantiates default controls for fitting vine copula models.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper"><a href="#a7f6fd15aebce75800cab978596ee7cb5" class="m-doc">FitControlsVinecop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set,
+              <span class="m-doc-wrap-bumper"><a href="#af620f0d3efbfb560ff05755f8c5c8472" class="m-doc">FitControlsVinecop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set,
               std::string parametric_method = &quot;mle&quot;,
-              std::string nonparametric_method = &quot;quadratic&quot;,
+              std::string nonparametric_method = &quot;constant&quot;,
               double nonparametric_mult = 1.0,
               size_t trunc_lvl = std::numeric_limits&lt;size_t&gt;::max(),
               std::string tree_criterion = &quot;tau&quot;,
@@ -116,19 +116,23 @@
               bool preselect_families = true,
               bool select_trunc_lvl = false,
               bool select_threshold = false,
+              bool select_families = true,
               bool show_trace = false,
-              size_t num_threads = 1) <span class="m-label m-flat m-info">explicit</span> </span>
+              size_t num_threads = 1,
+              std::string mst_algorithm = &quot;prim&quot;) <span class="m-label m-flat m-info">explicit</span> </span>
             </dt>
             <dd>Instantiates custom controls for fitting vine copula models.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper"><a href="#a22cb78b491409cb9ce6e8a17dc21e7b8" class="m-doc">FitControlsVinecop</a>(</span><span class="m-doc-wrap">const <a href="classvinecopulib_1_1_fit_controls_bicop.html" class="m-doc">FitControlsBicop</a>&amp; controls,
+              <span class="m-doc-wrap-bumper"><a href="#a2d5d4b56b8d8c1da6fe8509c8313906f" class="m-doc">FitControlsVinecop</a>(</span><span class="m-doc-wrap">const <a href="classvinecopulib_1_1_fit_controls_bicop.html" class="m-doc">FitControlsBicop</a>&amp; controls,
               size_t trunc_lvl = std::numeric_limits&lt;size_t&gt;::max(),
               std::string tree_criterion = &quot;tau&quot;,
               double threshold = 0.0,
               bool select_trunc_lvl = false,
               bool select_threshold = false,
+              bool select_families = true,
               bool show_trace = false,
-              size_t num_threads = 1) <span class="m-label m-flat m-info">explicit</span> </span>
+              size_t num_threads = 1,
+              std::string mst_algorithm = &quot;prim&quot;) <span class="m-label m-flat m-info">explicit</span> </span>
             </dt>
             <dd>Instantiates custom controls for fitting vine copula models.</dd>
           </dl>
@@ -148,27 +152,35 @@
             <dt id="ace8965fe7c115ac40611f0e46f441a96">
               <span class="m-doc-wrap-bumper">auto <a href="#ace8965fe7c115ac40611f0e46f441a96" class="m-doc-self">get_trunc_lvl</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
             </dt>
-            <dd>returns the truncation level.</dd>
+            <dd>Gets the truncation level.</dd>
             <dt id="aaf3f0b43e26f0877e5030afd90e35d1e">
               <span class="m-doc-wrap-bumper">auto <a href="#aaf3f0b43e26f0877e5030afd90e35d1e" class="m-doc-self">get_tree_criterion</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
             </dt>
-            <dd>returns the criterion for tree selection.</dd>
+            <dd>Gets the criterion for tree selection.</dd>
             <dt id="a6c428e61c86c371cee6f98367ff35796">
               <span class="m-doc-wrap-bumper">auto <a href="#a6c428e61c86c371cee6f98367ff35796" class="m-doc-self">get_threshold</a>(</span><span class="m-doc-wrap">) const -&gt; double</span>
             </dt>
-            <dd>returns the threshold parameter.</dd>
+            <dd>Gets the threshold parameter.</dd>
             <dt id="a18c66b8801249218f07c3897064f0b5d">
               <span class="m-doc-wrap-bumper">auto <a href="#a18c66b8801249218f07c3897064f0b5d" class="m-doc-self">get_select_trunc_lvl</a>(</span><span class="m-doc-wrap">) const -&gt; bool</span>
             </dt>
-            <dd>returns whether to select the truncation level automatically.</dd>
+            <dd>Gets whether to select the truncation level automatically.</dd>
             <dt id="ac2c2854d43466a4d3733c24f282a2e79">
               <span class="m-doc-wrap-bumper">auto <a href="#ac2c2854d43466a4d3733c24f282a2e79" class="m-doc-self">get_select_threshold</a>(</span><span class="m-doc-wrap">) const -&gt; bool</span>
             </dt>
-            <dd>returns whether to select the threshold automatically.</dd>
+            <dd>Gets whether to select the threshold automatically.</dd>
+            <dt id="aeb934cf5d36bafbac12e5a29a078eece">
+              <span class="m-doc-wrap-bumper">auto <a href="#aeb934cf5d36bafbac12e5a29a078eece" class="m-doc-self">get_select_families</a>(</span><span class="m-doc-wrap">) const -&gt; bool</span>
+            </dt>
+            <dd>Gets whether to select the families automatically.</dd>
             <dt id="acb9f0b704c00f79dade119426916abf1">
               <span class="m-doc-wrap-bumper">auto <a href="#acb9f0b704c00f79dade119426916abf1" class="m-doc-self">get_fit_controls_bicop</a>(</span><span class="m-doc-wrap">) const -&gt; <a href="classvinecopulib_1_1_fit_controls_bicop.html" class="m-doc">FitControlsBicop</a></span>
             </dt>
-            <dd>Returns the fit controls for bivariate fitting.</dd>
+            <dd>Gets the fit controls for bivariate fitting.</dd>
+            <dt id="a33d9fa651c48c35701247ad8a2850ae4">
+              <span class="m-doc-wrap-bumper">auto <a href="#a33d9fa651c48c35701247ad8a2850ae4" class="m-doc-self">get_mst_algorithm</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
+            </dt>
+            <dd>Gets the maximum spanning tree algorithm.</dd>
             <dt id="acbeb159acb79f24c71071781000e935f">
               <span class="m-doc-wrap-bumper">void <a href="#acbeb159acb79f24c71071781000e935f" class="m-doc-self">set_trunc_lvl</a>(</span><span class="m-doc-wrap">size_t trunc_lvl)</span>
             </dt>
@@ -189,19 +201,27 @@
               <span class="m-doc-wrap-bumper">void <a href="#ae07f4c5e566c041d6b2475555313d35f" class="m-doc-self">set_select_threshold</a>(</span><span class="m-doc-wrap">bool select_threshold)</span>
             </dt>
             <dd>Sets whether to select the threshold automatically.</dd>
+            <dt id="aa17432d6002457f45cfdcd7282e6156c">
+              <span class="m-doc-wrap-bumper">void <a href="#aa17432d6002457f45cfdcd7282e6156c" class="m-doc-self">set_select_families</a>(</span><span class="m-doc-wrap">bool select_families)</span>
+            </dt>
+            <dd>Sets whether to select the families automatically.</dd>
             <dt id="a6ed63d403dc902119ebe0252ada0be47">
               <span class="m-doc-wrap-bumper">void <a href="#a6ed63d403dc902119ebe0252ada0be47" class="m-doc-self">set_fit_controls_bicop</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_fit_controls_bicop.html" class="m-doc">FitControlsBicop</a> controls)</span>
             </dt>
             <dd>Sets the fit controls for bivariate fitting.</dd>
+            <dt id="a740877ac6f6d28b72e0918961f509803">
+              <span class="m-doc-wrap-bumper">void <a href="#a740877ac6f6d28b72e0918961f509803" class="m-doc-self">set_mst_algorithm</a>(</span><span class="m-doc-wrap">std::string mst_algorithm)</span>
+            </dt>
+            <dd>Sets the maximum spanning tree algorithm.</dd>
           </dl>
         </section>
         <section>
           <h2>Function documentation</h2>
-          <section class="m-doc-details" id="a7f6fd15aebce75800cab978596ee7cb5"><div>
+          <section class="m-doc-details" id="af620f0d3efbfb560ff05755f8c5c8472"><div>
             <h3>
-              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsVinecop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a7f6fd15aebce75800cab978596ee7cb5" class="m-doc-self">FitControlsVinecop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set,
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsVinecop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#af620f0d3efbfb560ff05755f8c5c8472" class="m-doc-self">FitControlsVinecop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set,
               std::string parametric_method = &quot;mle&quot;,
-              std::string nonparametric_method = &quot;quadratic&quot;,
+              std::string nonparametric_method = &quot;constant&quot;,
               double nonparametric_mult = 1.0,
               size_t trunc_lvl = std::numeric_limits&lt;size_t&gt;::max(),
               std::string tree_criterion = &quot;tau&quot;,
@@ -212,8 +232,10 @@
               bool preselect_families = true,
               bool select_trunc_lvl = false,
               bool select_threshold = false,
+              bool select_families = true,
               bool show_trace = false,
-              size_t num_threads = 1) <span class="m-label m-info">explicit</span> </span></span>
+              size_t num_threads = 1,
+              std::string mst_algorithm = &quot;prim&quot;) <span class="m-label m-info">explicit</span> </span></span>
             </h3>
             <p>Instantiates custom controls for fitting vine copula models.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -243,7 +265,7 @@
                 </tr>
                 <tr>
                   <td>tree_criterion</td>
-                  <td>The criterion for selecting the maximum spanning tree (&quot;tau&quot;, &quot;hoeffd&quot;, &quot;rho&quot;, and &quot;mcor&quot; implemented so far).</td>
+                  <td>The criterion for selecting the maximum spanning tree (<code>&quot;tau&quot;</code>, <code>&quot;hoeffd&quot;</code>, <code>&quot;rho&quot;</code>, and <code>&quot;mcor&quot;</code> implemented so far).</td>
                 </tr>
                 <tr>
                   <td>threshold</td>
@@ -259,7 +281,7 @@
                 </tr>
                 <tr>
                   <td>psi0</td>
-                  <td>Only for `selection_criterion = &quot;mbic&quot;, prior probability of non-independence.</td>
+                  <td>Only for <code>selection_criterion = &quot;mbic&quot;</code>, prior probability of non-independence.</td>
                 </tr>
                 <tr>
                   <td>preselect_families</td>
@@ -274,6 +296,10 @@
                   <td>Whether the threshold parameter shall be selected automatically.</td>
                 </tr>
                 <tr>
+                  <td>select_families</td>
+                  <td>Whether the families shall be selected automatically, or should the method simply update the parameters for the pair copulas already present in the model.</td>
+                </tr>
+                <tr>
                   <td>show_trace</td>
                   <td>Whether to show a trace of the building progress.</td>
                 </tr>
@@ -281,19 +307,25 @@
                   <td>num_threads</td>
                   <td>Number of concurrent threads to use while fitting pair copulas within a tree; never uses more than the number of concurrent threads supported by the implementation.</td>
                 </tr>
+                <tr>
+                  <td>mst_algorithm</td>
+                  <td>The algorithm for building the maximum spanning tree (<code>&quot;prim&quot;</code> or <code>&quot;kruskal&quot;</code>) during the tree-wise structure selection.</td>
+                </tr>
               </tbody>
             </table>
           </div></section>
-          <section class="m-doc-details" id="a22cb78b491409cb9ce6e8a17dc21e7b8"><div>
+          <section class="m-doc-details" id="a2d5d4b56b8d8c1da6fe8509c8313906f"><div>
             <h3>
-              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsVinecop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a22cb78b491409cb9ce6e8a17dc21e7b8" class="m-doc-self">FitControlsVinecop</a>(</span><span class="m-doc-wrap">const <a href="classvinecopulib_1_1_fit_controls_bicop.html" class="m-doc">FitControlsBicop</a>&amp; controls,
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsVinecop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a2d5d4b56b8d8c1da6fe8509c8313906f" class="m-doc-self">FitControlsVinecop</a>(</span><span class="m-doc-wrap">const <a href="classvinecopulib_1_1_fit_controls_bicop.html" class="m-doc">FitControlsBicop</a>&amp; controls,
               size_t trunc_lvl = std::numeric_limits&lt;size_t&gt;::max(),
               std::string tree_criterion = &quot;tau&quot;,
               double threshold = 0.0,
               bool select_trunc_lvl = false,
               bool select_threshold = false,
+              bool select_families = true,
               bool show_trace = false,
-              size_t num_threads = 1) <span class="m-label m-info">explicit</span> </span></span>
+              size_t num_threads = 1,
+              std::string mst_algorithm = &quot;prim&quot;) <span class="m-label m-info">explicit</span> </span></span>
             </h3>
             <p>Instantiates custom controls for fitting vine copula models.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -303,7 +335,7 @@
               <tbody>
                 <tr>
                   <td style="width: 1%">controls</td>
-                  <td>See <a href="classvinecopulib_1_1_fit_controls_bicop.html" class="m-doc">FitControlsBicop</a>.</td>
+                  <td>See <code><a href="classvinecopulib_1_1_fit_controls_bicop.html#a680cc88905cd3beb2c39799979661718" class="m-doc">FitControlsBicop()</a></code>.</td>
                 </tr>
                 <tr>
                   <td>trunc_lvl</td>
@@ -311,11 +343,11 @@
                 </tr>
                 <tr>
                   <td>tree_criterion</td>
-                  <td>The criterion for selecting the maximum spanning tree (&quot;tau&quot;, &quot;hoeffd&quot; and &quot;rho&quot; implemented so far).</td>
+                  <td>The criterion for selecting the maximum spanning tree (<code>&quot;tau&quot;</code>, <code>&quot;hoeffd&quot;</code> and <code>&quot;rho&quot;</code> implemented so far).</td>
                 </tr>
                 <tr>
                   <td>threshold</td>
-                  <td>For thresholded vines (0 = no threshold).</td>
+                  <td>For thresholded vines (<code>0</code> = no threshold).</td>
                 </tr>
                 <tr>
                   <td>select_trunc_lvl</td>
@@ -326,12 +358,20 @@
                   <td>Whether the threshold parameter shall be selected automatically.</td>
                 </tr>
                 <tr>
+                  <td>select_families</td>
+                  <td>Whether the families shall be selected automatically, or should the method simply update the parameters for the pair copulas already present in the model.</td>
+                </tr>
+                <tr>
                   <td>show_trace</td>
                   <td>Whether to show a trace of the building progress.</td>
                 </tr>
                 <tr>
                   <td>num_threads</td>
                   <td>Number of concurrent threads to use while fitting pair copulas within a tree; never uses more than the number returned by <code>std::thread::hardware_concurrency()</code>`.</td>
+                </tr>
+                <tr>
+                  <td>mst_algorithm</td>
+                  <td>The algorithm for building the maximum spanning tree (<code>&quot;prim&quot;</code> or <code>&quot;kruskal&quot;</code>) during the tree-wise structure selection.</td>
                 </tr>
               </tbody>
             </table>
@@ -381,7 +421,7 @@
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.9.1 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>

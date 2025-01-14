@@ -99,9 +99,9 @@
           <h2><a href="#typeless-methods">Constructors, destructors, conversion operators</a></h2>
           <dl class="m-doc">
             <dt>
-              <span class="m-doc-wrap-bumper"><a href="#a9790eb1ef9f8b26f11d6c4235a809f1c" class="m-doc">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set = <a href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774" class="m-doc">bicop_families::<wbr />all</a>,
+              <span class="m-doc-wrap-bumper"><a href="#a680cc88905cd3beb2c39799979661718" class="m-doc">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set = <a href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774" class="m-doc">bicop_families::<wbr />all</a>,
               std::string parametric_method = &quot;mle&quot;,
-              std::string nonparametric_method = &quot;quadratic&quot;,
+              std::string nonparametric_method = &quot;constant&quot;,
               double nonparametric_mult = 1.0,
               std::string selection_criterion = &quot;aic&quot;,
               const Eigen::VectorXd&amp; weights = Eigen::VectorXd(),
@@ -136,35 +136,35 @@
             <dt id="aa3958aa4fe5d2900a14db83224d256b2">
               <span class="m-doc-wrap-bumper">auto <a href="#aa3958aa4fe5d2900a14db83224d256b2" class="m-doc-self">get_family_set</a>(</span><span class="m-doc-wrap">) const -&gt; std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt;</span>
             </dt>
-            <dd>returns the family set.</dd>
+            <dd>Gets the family set.</dd>
             <dt id="a5b10436f0fb84d8a3276a514c05c8442">
               <span class="m-doc-wrap-bumper">auto <a href="#a5b10436f0fb84d8a3276a514c05c8442" class="m-doc-self">get_parametric_method</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
             </dt>
-            <dd>returns the parametric method.</dd>
+            <dd>Gets the parametric method.</dd>
             <dt id="af1ff49b3f08edd0ae2986b10956d2067">
               <span class="m-doc-wrap-bumper">auto <a href="#af1ff49b3f08edd0ae2986b10956d2067" class="m-doc-self">get_nonparametric_method</a>(</span><span class="m-doc-wrap">) const -&gt; std::string</span>
             </dt>
-            <dd>returns the nonparametric method.</dd>
+            <dd>Gets the nonparametric method.</dd>
             <dt id="adb5099d2fad28099872abf75b4f6c7a1">
               <span class="m-doc-wrap-bumper">auto <a href="#adb5099d2fad28099872abf75b4f6c7a1" class="m-doc-self">get_nonparametric_mult</a>(</span><span class="m-doc-wrap">) const -&gt; double</span>
             </dt>
-            <dd>returns the nonparametric bandwidth multiplier.</dd>
+            <dd>Gets the nonparametric bandwidth multiplier.</dd>
             <dt id="a6874e7226c05af5b3a87d8bd49073ba0">
               <span class="m-doc-wrap-bumper">auto <a href="#a6874e7226c05af5b3a87d8bd49073ba0" class="m-doc-self">get_weights</a>(</span><span class="m-doc-wrap">) const -&gt; Eigen::VectorXd</span>
             </dt>
-            <dd>returns the observation weights.</dd>
+            <dd>Gets the observation weights.</dd>
             <dt id="acf45a95368ae735ab70a522b53c0133d">
               <span class="m-doc-wrap-bumper">auto <a href="#acf45a95368ae735ab70a522b53c0133d" class="m-doc-self">get_preselect_families</a>(</span><span class="m-doc-wrap">) const -&gt; bool</span>
             </dt>
-            <dd>returns whether to preselect families.</dd>
+            <dd>Gets whether to preselect families.</dd>
             <dt id="a2c994c101ca1cb8225acd1de233b8f80">
               <span class="m-doc-wrap-bumper">auto <a href="#a2c994c101ca1cb8225acd1de233b8f80" class="m-doc-self">get_psi0</a>(</span><span class="m-doc-wrap">) const -&gt; double</span>
             </dt>
-            <dd>returns the baseline probability for mBIC selection.</dd>
+            <dd>Gets the baseline probability for mBIC selection.</dd>
             <dt id="a530b8a58404b7fba0a02e29030c32bee">
               <span class="m-doc-wrap-bumper">auto <a href="#a530b8a58404b7fba0a02e29030c32bee" class="m-doc-self">get_num_threads</a>(</span><span class="m-doc-wrap">) const -&gt; size_t</span>
             </dt>
-            <dd>returns the number of threads.</dd>
+            <dd>Gets the number of threads.</dd>
             <dt id="a39d4e24261da184abf3fa3dd11d1f23b">
               <span class="m-doc-wrap-bumper">void <a href="#a39d4e24261da184abf3fa3dd11d1f23b" class="m-doc-self">set_family_set</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set)</span>
             </dt>
@@ -205,11 +205,11 @@
         </section>
         <section>
           <h2>Function documentation</h2>
-          <section class="m-doc-details" id="a9790eb1ef9f8b26f11d6c4235a809f1c"><div>
+          <section class="m-doc-details" id="a680cc88905cd3beb2c39799979661718"><div>
             <h3>
-              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsBicop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a9790eb1ef9f8b26f11d6c4235a809f1c" class="m-doc-self">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set = <a href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774" class="m-doc">bicop_families::<wbr />all</a>,
+              <span class="m-doc-wrap-bumper"> vinecopulib::<wbr />FitControlsBicop::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a680cc88905cd3beb2c39799979661718" class="m-doc-self">FitControlsBicop</a>(</span><span class="m-doc-wrap">std::vector&lt;<a href="namespacevinecopulib.html#a42e95cc06d33896199caab0c11ad44f3" class="m-doc">BicopFamily</a>&gt; family_set = <a href="namespacevinecopulib_1_1bicop__families.html#a5214a513f41ec23b74782aab96ea6774" class="m-doc">bicop_families::<wbr />all</a>,
               std::string parametric_method = &quot;mle&quot;,
-              std::string nonparametric_method = &quot;quadratic&quot;,
+              std::string nonparametric_method = &quot;constant&quot;,
               double nonparametric_mult = 1.0,
               std::string selection_criterion = &quot;aic&quot;,
               const Eigen::VectorXd&amp; weights = Eigen::VectorXd(),
@@ -249,7 +249,7 @@
                 </tr>
                 <tr>
                   <td>psi0</td>
-                  <td>Only for `selection_criterion = &quot;mbic&quot;, the prior probability of non-independence.</td>
+                  <td>Only for <code>selection_criterion = &quot;mbic&quot;</code>, the prior probability of non-independence.</td>
                 </tr>
                 <tr>
                   <td>preselect_families</td>
@@ -346,7 +346,7 @@
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.8.17 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.9.1 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>
