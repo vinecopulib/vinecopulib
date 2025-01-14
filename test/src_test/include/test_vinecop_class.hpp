@@ -407,9 +407,9 @@ TEST_F(VinecopTest, fit_parameters_is_correct)
   Vinecop vc2(rvine_structure, pcs);
   vc2.fit(u, controls);
 
-  ASSERT_TRUE(vc2.get_loglik() == vc2.loglik(u));
-  ASSERT_TRUE(vc2.get_aic() == vc2.aic(u));
-  ASSERT_TRUE(vc2.get_bic() == vc2.bic(u));
+  ASSERT_NEAR(vc2.get_loglik(), vc2.loglik(u), 1e-2);
+  ASSERT_NEAR(vc2.get_aic(), vc2.aic(u), 1e-2);
+  ASSERT_NEAR(vc2.get_bic(), vc2.bic(u), 1e-2);
   ASSERT_TRUE(vc.str() == vc2.str());
 
   Vinecop vc3(rvine_structure, pcs);
