@@ -14,8 +14,6 @@
 #define BOOST_ALLOW_DEPRECATED_HEADERS
 #endif
 
-// silences all the BOOST_CONCEPT warnings bullshit
-// https://stackoverflow.com/questions/13930894/how-to-disable-boost-concept-check
 #ifndef BOOST_MATH_PROMOTE_DOUBLE_POLICY
 #define BOOST_MATH_PROMOTE_DOUBLE_POLICY false
 #else
@@ -23,6 +21,8 @@
 #define BOOST_MATH_PROMOTE_DOUBLE_POLICY false
 #endif
 
+// silences all the BOOST_CONCEPT warnings bullshit
+// https://stackoverflow.com/questions/13930894/how-to-disable-boost-concept-check
 #include <boost/concept/assert.hpp>
 #undef BOOST_CONCEPT_ASSERT
 #define BOOST_CONCEPT_ASSERT(Model)
