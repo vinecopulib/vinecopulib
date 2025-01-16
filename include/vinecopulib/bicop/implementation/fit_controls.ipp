@@ -75,11 +75,12 @@ inline FitControlsBicop::FitControlsBicop(std::string nonparametric_method,
                                           double nonparametric_mult)
   : FitControlsBicop()
 {
-  set_nonparametric_method(nonparamet//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
-//!     or `"bic"`).
-//! @param weights A vector of weights for the observations.
-//! @param psi0 Only for `selection_criterion = "mbic"`, the prior probability of
-//!     non-independence.
+  set_nonparametric_method(nonparametric_method);
+  set_nonparametric_mult(nonparametric_mult);
+}
+
+//! @name Sanity checks
+//! @{
 inline void
 FitControlsBicop::check_parametric_method(std::string parametric_method)
 {
