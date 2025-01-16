@@ -56,7 +56,6 @@ public:
     bool select_threshold = false,
     bool select_families = true,
     bool show_trace = false,
-    size_t num_threads = 1,
     std::string mst_algorithm = "prim");
 
   explicit FitControlsVinecop(const FitControlsConfig& config);
