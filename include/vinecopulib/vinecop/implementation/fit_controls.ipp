@@ -23,6 +23,7 @@ inline FitControlsVinecop::FitControlsVinecop()
   select_threshold_ = false;
   select_families_ = true;
   show_trace_ = false;
+  mst_algorithm_ = "prim";
 }
 
 //! @brief Instantiates custom controls for fitting vine copula models.
@@ -51,7 +52,7 @@ inline FitControlsVinecop::FitControlsVinecop()
 //! @param select_threshold Whether the threshold parameter shall be
 //!     selected automatically.
 //! @param select_families Whether the families shall be selected
-//! automatically, or should the method simply update the parameters for 
+//! automatically, or should the method simply update the parameters for
 //! the pair copulas already present in the model.
 //! @param show_trace Whether to show a trace of the building progress.
 //! @param num_threads Number of concurrent threads to use while fitting
@@ -88,7 +89,8 @@ inline FitControlsVinecop::FitControlsVinecop(
                      weights,
                      psi0,
                      preselect_families,
-                     allow_rotations)
+                     allow_rotations,
+                     num_threads)
 {
   set_trunc_lvl(trunc_lvl);
   set_tree_criterion(tree_criterion);
@@ -97,7 +99,6 @@ inline FitControlsVinecop::FitControlsVinecop(
   set_select_threshold(select_threshold);
   set_select_families(select_families);
   set_show_trace(show_trace);
-  set_num_threads(num_threads);
   set_mst_algorithm(mst_algorithm);
 }
 
@@ -114,11 +115,8 @@ inline FitControlsVinecop::FitControlsVinecop(
 //! @param select_threshold Whether the threshold parameter shall be
 //!     selected automatically.
 //! @param select_families Whether the families shall be selected
-//! automatically, or should the method simply update the parameters for 
+//! automatically, or should the method simply update the parameters for
 //! the pair copulas already present in the model.
-//! @param num_threads Number of concurrent threads to use while fitting
-//!     pair copulas within a tree; never uses more than the number returned
-//!     by `std::thread::hardware_concurrency()``.
 //! @param mst_algorithm The algorithm for building the maximum spanning
 //!     tree (`"prim"` or `"kruskal"`) during the tree-wise structure selection.
 inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
@@ -129,7 +127,6 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
                                               bool select_threshold,
                                               bool select_families,
                                               bool show_trace,
-                                              size_t num_threads,
                                               std::string mst_algorithm)
   : FitControlsBicop(controls)
 {
@@ -140,69 +137,38 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
   set_select_threshold(select_threshold);
   set_select_families(select_families);
   set_show_trace(show_trace);
-  set_num_threads(num_threads);
   set_mst_algorithm(mst_algorithm);
 }
 
 //! @brief Instantiates the controls from a configuration object.
 //! @param config The configuration object.
 inline FitControlsVinecop::FitControlsVinecop(const FitControlsConfig& config)
-    : FitControlsVinecop() // Call default constructor
+  : FitControlsBicop(config)
 {
-    if (optional::has_value(config.family_set)) {
-        set_family_set(optional::value(config.family_set));
-    }
-    if (optional::has_value(config.parametric_method)) {
-        set_parametric_method(optional::value(config.parametric_method));
-    }
-    if (optional::has_value(config.nonparametric_method)) {
-        set_nonparametric_method(optional::value(config.nonparametric_method));
-    }
-    if (optional::has_value(config.nonparametric_mult)) {
-        set_nonparametric_mult(optional::value(config.nonparametric_mult));
-    }
-    if (optional::has_value(config.trunc_lvl)) {
-        set_trunc_lvl(optional::value(config.trunc_lvl));
-    }
-    if (optional::has_value(config.tree_criterion)) {
-        set_tree_criterion(optional::value(config.tree_criterion));
-    }
-    if (optional::has_value(config.threshold)) {
-        set_threshold(optional::value(config.threshold));
-    }
-    if (optional::has_value(config.selection_criterion)) {
-        set_selection_criterion(optional::value(config.selection_criterion));
-    }
-    if (optional::has_value(config.weights)) {
-        set_weights(optional::value(config.weights));
-    }
-    if (optional::has_value(config.psi0)) {
-        set_psi0(optional::value(config.psi0));
-    }
-    if (optional::has_value(config.preselect_families)) {
-        set_preselect_families(optional::value(config.preselect_families));
-    }
-    if (optional::has_value(config.select_trunc_lvl)) {
-        set_select_trunc_lvl(optional::value(config.select_trunc_lvl));
-    }
-    if (optional::has_value(config.select_threshold)) {
-        set_select_threshold(optional::value(config.select_threshold));
-    }
-    if (optional::has_value(config.select_families)) {
-        set_select_families(optional::value(config.select_families));
-    }
-    if (optional::has_value(config.show_trace)) {
-        set_show_trace(optional::value(config.show_trace));
-    }
-    if (optional::has_value(config.num_threads)) {
-        set_num_threads(optional::value(config.num_threads));
-    }
-    if (optional::has_value(config.mst_algorithm)) {
-        set_mst_algorithm(optional::value(config.mst_algorithm));
-    }
-    if (optional::has_value(config.rotations)) {
-        set_rotations(optional::value(config.rotations));
-    }
+  if (optional::has_value(config.trunc_lvl)) {
+    set_trunc_lvl(optional::value(config.trunc_lvl));
+  }
+  if (optional::has_value(config.tree_criterion)) {
+    set_tree_criterion(optional::value(config.tree_criterion));
+  }
+  if (optional::has_value(config.threshold)) {
+    set_threshold(optional::value(config.threshold));
+  }
+  if (optional::has_value(config.select_trunc_lvl)) {
+    set_select_trunc_lvl(optional::value(config.select_trunc_lvl));
+  }
+  if (optional::has_value(config.select_threshold)) {
+    set_select_threshold(optional::value(config.select_threshold));
+  }
+  if (optional::has_value(config.select_families)) {
+    set_select_families(optional::value(config.select_families));
+  }
+  if (optional::has_value(config.show_trace)) {
+    set_show_trace(optional::value(config.show_trace));
+  }
+  if (optional::has_value(config.mst_algorithm)) {
+    set_mst_algorithm(optional::value(config.mst_algorithm));
+  }
 }
 
 //! @name Sanity checks
@@ -367,12 +333,8 @@ FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)
   set_preselect_families(controls.get_preselect_families());
 }
 
-//! @brief Sets the maximum spanning tree algorithm.
-inline void
-FitControlsVinecop::set_mst_algorithm(std::string mst_algorithm)
-{
-  if (!tools_stl::is_member(mst_algorithm, { "prim", "kruskal" })) {
-    throw std::runtime_error("mst_algorithm must be one of 'prim' or 'kruskal'");
+//! @brief Sets the maximum spanning tree algorithm.s
+      "mst_algorithm must be one of 'prim' or 'kruskal'");
   }
   mst_algorithm_ = mst_algorithm;
 }
@@ -402,9 +364,8 @@ FitControlsVinecop::str() const
                                                                   : "no")
                << std::endl;
   controls_str << "Select families: "
-                << static_cast<std::string>(get_select_families() ? "yes"
-                                                                  : "no")
-                << std::endl;
+               << static_cast<std::string>(get_select_families() ? "yes" : "no")
+               << std::endl;
   controls_str << "Show trace: "
                << static_cast<std::string>(get_show_trace() ? "yes" : "no")
                << std::endl;

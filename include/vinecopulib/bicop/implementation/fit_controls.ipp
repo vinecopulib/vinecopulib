@@ -111,8 +111,8 @@ inline FitControlsBicop::FitControlsBicop(const FitControlsConfig& config)
     if (optional::has_value(config.num_threads)) {
         set_num_threads(optional::value(config.num_threads));
     }
-    if (optional::has_value(config.rotations)) {
-        set_rotations(optional::value(config.rotations));
+    if (optional::has_value(config.allow_rotations)) {
+        set_allow_rotations(optional::value(config.allow_rotations));
     }
 }
 

@@ -43,8 +43,8 @@ struct FitControlsConfig {
     //! Whether to preselect families based on preliminary criteria. Default: true.
     optional::optional<bool> preselect_families;
 
-    //! Allowed rotations for the copula families (degrees). Default: {0, 90, 180, 270}.
-    optional::optional<std::vector<int>> rotations;
+    //! Whether to allow rotations for the families. Default: true.
+    optional::optional<bool> allow_rotations;
 
     //! Number of threads to use during fitting. Default: 1.
     optional::optional<size_t> num_threads;
