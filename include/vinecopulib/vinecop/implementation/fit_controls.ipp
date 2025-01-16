@@ -76,7 +76,8 @@ inline FitControlsVinecop::FitControlsVinecop(
   bool select_families,
   bool show_trace,
   size_t num_threads,
-  std::string mst_algorithm)
+  std::string mst_algorithm,
+  std::vector<int> rotations)
   : FitControlsBicop(family_set,
                      parametric_method,
                      nonparametric_method,
@@ -84,7 +85,8 @@ inline FitControlsVinecop::FitControlsVinecop(
                      selection_criterion,
                      weights,
                      psi0,
-                     preselect_families)
+                     preselect_families,
+                     rotations)
 {
   set_trunc_lvl(trunc_lvl);
   set_tree_criterion(tree_criterion);

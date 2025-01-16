@@ -80,6 +80,20 @@ TEST(bicop_sanity_checks, controls_print)
   EXPECT_NO_THROW(controls.str());
 }
 
+TEST(bicop_sanity_checks, controls_checks)
+{
+  auto controls = FitControlsBicop();
+  EXPECT_ANY_THROW(controls.set_num_threads(0));
+  EXPECT_ANY_THROW(controls.set_selection_criterion("foo"));
+  EXPECT_ANY_THROW(controls.set_nonparametric_method("foo"));
+  EXPECT_ANY_THROW(controls.set_parametric_method("foo"));
+  EXPECT_ANY_THROW(controls.set_nonparametric_mult(0.0));
+  EXPECT_ANY_THROW(controls.set_psi0(0.0));
+  EXPECT_ANY_THROW(controls.set_psi0(1.0));
+  EXPECT_ANY_THROW(controls.set_rotations({ 0, 90, 180, 270, 360 }));
+  EXPECT_ANY_THROW(controls.set_rotations({ 0, 90, 180, 270, 270 }));
+}
+
 TEST(bicop_sanity_checks, copy)
 {
   auto rho = Eigen::VectorXd::Constant(1, 0.5);
