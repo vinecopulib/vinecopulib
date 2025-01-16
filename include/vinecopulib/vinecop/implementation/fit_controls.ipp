@@ -339,6 +339,7 @@ FitControlsVinecop::set_mst_algorithm(std::string mst_algorithm)
 {
   if (!tools_stl::is_member(mst_algorithm, { "prim", "kruskal" })) {
     throw std::runtime_error("mst_algorithm must be one of 'prim' or 'kruskal'");
+  }
   mst_algorithm_ = mst_algorithm;
 }
 
