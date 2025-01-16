@@ -21,15 +21,11 @@ namespace vinecopulib {
 //!     `"linear"`, `"quadratic"`.
 //! @param nonparametric_mult A factor with which the smoothing parameters
 //!     are multiplied.
-//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
-//!     or `"bic"`).
-//! @param weights A vector of weights for the observations.
-//! @param psi0 Only for `selection_criterion = "mbic"`, the prior probability of
-//!     non-independence.
+//! @param selection_criterionrotations
 //! @param preselect_families Whether to exclude families before fitting
 //!     based on symmetry properties of the data.
-//! @param rotations Allowed rotations for the families when doing
-//!     model selection (default: all rotations).
+//! @param allow_rotations Allow rotations for the families when doing
+//!     model selection (default: true).
 //! @param num_threads Number of concurrent threads to use while fitting
 //!     copulas for different families; never uses more than the number
 //!     of concurrent threads supported by the implementation.
@@ -41,7 +37,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
                                           const Eigen::VectorXd& weights,
                                           double psi0,
                                           bool preselect_families,
-                                          std::vector<int> rotations,
+                                          bool allow_rotations,
                                           size_t num_threads)
 {
   set_family_set(family_set);
@@ -51,7 +47,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
   set_selection_criterion(selection_criterion);
   set_weights(weights);
   set_preselect_families(preselect_families);
-  set_rotations(rotations);
+  set_allow_rotations(allow_rotations);
   set_psi0(psi0);
   set_num_threads(num_threads);
 }
@@ -126,22 +122,6 @@ FitControlsBicop::check_psi0(double psi0)
     throw std::runtime_error("psi0 must be in the interval (0, 1)");
   }
 }
-
-inline void
-FitControlsBicop::check_rotations(const std::vector<int>& rotations)
-{
-  // check for valid rotations
-  for (auto rotation : rotations) {
-    if (!tools_stl::is_member(rotation, { 0, 90, 180, 270 })) {
-      throw std::runtime_error("rotations must be a subset of {0, 90, 180, 270}");
-    }
-  }
-  // check for duplicates
-  if (rotations.size() != std::set<int>(rotations.begin(),
-                                                rotations.end()).size()) {
-    throw std::runtime_error("rotations must not contain duplicates");
-  }
-}
 //! @}
 
 //! @name Getters and setters.
@@ -209,11 +189,11 @@ FitControlsBicop::get_psi0() const
   return psi0_;
 }
 
-//! @brief Gets the allowed rotations.
-inline std::vector<int>
-FitControlsBicop::get_rotations() const
+//! @brief Gets whether to allow rotations.
+inline bool
+FitControlsBicop::get_allow_rotations() const
 {
-  return rotations_;
+  return allow_rotations_;
 }
 
 //! @brief Sets the family set.
@@ -285,12 +265,11 @@ FitControlsBicop::set_num_threads(size_t num_threads)
   num_threads_ = process_num_threads(num_threads);
 }
 
-//! @brief Sets the allowed rotations.
+//! @brief Sets whether to allow rotations.
 inline void
-FitControlsBicop::set_rotations(std::vector<int> rotations)
+FitControlsBicop::set_allow_rotations(bool allow_rotations)
 {
-  check_rotations(rotations);
-  rotations_ = rotations;
+  allow_rotations_ = allow_rotations;
 }
 
 inline size_t

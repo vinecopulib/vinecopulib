@@ -40,6 +40,19 @@ TEST(bicop_select, allows_all_selcrits)
   cop.select(u, controls);
 }
 
+TEST(bicop_select, allow_rotations_works)
+{
+  Bicop cop(BicopFamily::clayton, 180, Eigen::VectorXd::Constant(1, 5));
+  auto u = cop.simulate(5e3);
+  FitControlsBicop controls;
+  controls.set_family_set({ BicopFamily::clayton });
+  cop.select(u, controls);
+  EXPECT_EQ(cop.get_rotation(), 180);
+  controls.set_allow_rotations(false);
+  cop.select(u, controls);
+  EXPECT_EQ(cop.get_rotation(), 0);
+}
+
 TEST(bicop_select, fit_stats_are_correct)
 {
   Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));

@@ -25,7 +25,7 @@ public:
                    const Eigen::VectorXd& weights = Eigen::VectorXd(),
                    double psi0 = 0.9,
                    bool preselect_families = true,
-                   std::vector<int> rotations = { 0, 90, 180, 270 },
+                   bool allow_rotations = true,
                    size_t num_threads = 1);
 
   explicit FitControlsBicop(std::string parametric_method);
@@ -52,7 +52,7 @@ public:
 
   size_t get_num_threads() const;
 
-  std::vector<int> get_rotations() const;
+  bool get_allow_rotations() const;
 
   // Setters
   void set_family_set(std::vector<BicopFamily> family_set);
@@ -73,7 +73,7 @@ public:
 
   void set_num_threads(size_t num_threads);
 
-  void set_rotations(std::vector<int> rotations);
+  void set_allow_rotations(bool allow_rotations);
 
   // Misc
   std::string str() const;
@@ -91,7 +91,7 @@ private:
   bool preselect_families_;
   double psi0_;
   size_t num_threads_;
-  std::vector<int> rotations_;
+  bool allow_rotations_;
 
   void check_parametric_method(std::string parametric_method);
 
@@ -102,8 +102,6 @@ private:
   void check_selection_criterion(std::string selection_criterion);
 
   void check_psi0(double psi0);
-
-  void check_rotations(const std::vector<int>& rotations);
 
   size_t process_num_threads(size_t num_threads);
 };
