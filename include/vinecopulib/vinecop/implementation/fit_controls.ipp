@@ -142,6 +142,67 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
   set_mst_algorithm(mst_algorithm);
 }
 
+//! @brief Instantiates the controls from a configuration object.
+//! @param config The configuration object.
+inline FitControlsVinecop::FitControlsVinecop(const FitControlsConfig& config)
+    : FitControlsVinecop() // Call default constructor
+{
+    if (optional::has_value(config.family_set)) {
+        set_family_set(optional::value(config.family_set));
+    }
+    if (optional::has_value(config.parametric_method)) {
+        set_parametric_method(optional::value(config.parametric_method));
+    }
+    if (optional::has_value(config.nonparametric_method)) {
+        set_nonparametric_method(optional::value(config.nonparametric_method));
+    }
+    if (optional::has_value(config.nonparametric_mult)) {
+        set_nonparametric_mult(optional::value(config.nonparametric_mult));
+    }
+    if (optional::has_value(config.trunc_lvl)) {
+        set_trunc_lvl(optional::value(config.trunc_lvl));
+    }
+    if (optional::has_value(config.tree_criterion)) {
+        set_tree_criterion(optional::value(config.tree_criterion));
+    }
+    if (optional::has_value(config.threshold)) {
+        set_threshold(optional::value(config.threshold));
+    }
+    if (optional::has_value(config.selection_criterion)) {
+        set_selection_criterion(optional::value(config.selection_criterion));
+    }
+    if (optional::has_value(config.weights)) {
+        set_weights(optional::value(config.weights));
+    }
+    if (optional::has_value(config.psi0)) {
+        set_psi0(optional::value(config.psi0));
+    }
+    if (optional::has_value(config.preselect_families)) {
+        set_preselect_families(optional::value(config.preselect_families));
+    }
+    if (optional::has_value(config.select_trunc_lvl)) {
+        set_select_trunc_lvl(optional::value(config.select_trunc_lvl));
+    }
+    if (optional::has_value(config.select_threshold)) {
+        set_select_threshold(optional::value(config.select_threshold));
+    }
+    if (optional::has_value(config.select_families)) {
+        set_select_families(optional::value(config.select_families));
+    }
+    if (optional::has_value(config.show_trace)) {
+        set_show_trace(optional::value(config.show_trace));
+    }
+    if (optional::has_value(config.num_threads)) {
+        set_num_threads(optional::value(config.num_threads));
+    }
+    if (optional::has_value(config.mst_algorithm)) {
+        set_mst_algorithm(optional::value(config.mst_algorithm));
+    }
+    if (optional::has_value(config.rotations)) {
+        set_rotations(optional::value(config.rotations));
+    }
+}
+
 //! @name Sanity checks
 //! @{
 inline void

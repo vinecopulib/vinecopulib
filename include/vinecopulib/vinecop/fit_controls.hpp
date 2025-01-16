@@ -59,6 +59,8 @@ public:
     size_t num_threads = 1,
     std::string mst_algorithm = "prim");
 
+  explicit FitControlsVinecop(const FitControlsConfig& config);
+
   // Getters
   DEPRECATED size_t get_truncation_level() const;
   size_t get_trunc_lvl() const;
