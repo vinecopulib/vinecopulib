@@ -89,20 +89,20 @@ inline Eigen::MatrixXd
 FGMBicop::tau_to_parameters(const double& tau)
 {
   // FGM's Kendall's tau = 2 * theta / 9
-  return Eigen::VectorXd::Constant(1, 9 * tau / 2);
+  return Eigen::VectorXd::Constant(1, 4.5 * tau);
 }
 
 inline double
 FGMBicop::parameters_to_tau(const Eigen::MatrixXd& params)
 {
-  return 2 * params(0, 0) / 9;
+  return params(0, 0) / 4.5;
 }
 
 // starting parameters
 inline Eigen::VectorXd
 FGMBicop::get_start_parameters(const double tau)
 {
-  if (std::abs(tau) <= 2.0 / 9.0) {
+  if (std::abs(tau) <= 1.0 / 4.5) {
     return tau_to_parameters(tau);
   } else {
     auto theta = std::pow(-1.0, static_cast<double>(tau < 0));
