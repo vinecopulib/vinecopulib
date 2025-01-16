@@ -190,7 +190,6 @@ ParBicop::adjust_parameters_bounds(Eigen::MatrixXd& lb,
       }
     } catch (std::runtime_error&) {
       // can't refine the search interval, not a big deal
-      return;
     }
     // make sure that parameter bounds are respected
     lb = lb2.cwiseMax(lb);
