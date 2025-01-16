@@ -105,7 +105,7 @@ FGMBicop::get_start_parameters(const double tau)
   if (std::abs(tau) <= 1.0 / 4.5) {
     return tau_to_parameters(tau);
   } else {
-    auto theta = std::pow(-1.0, static_cast<double>(tau < 0));
+    auto theta = std::pow(-1.0, static_cast<double>(tau < 0)) * 0.9;
     return Eigen::VectorXd::Constant(1, theta);
   }
 }
