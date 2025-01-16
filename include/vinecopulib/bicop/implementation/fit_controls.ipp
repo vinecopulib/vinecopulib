@@ -21,7 +21,11 @@ namespace vinecopulib {
 //!     `"linear"`, `"quadratic"`.
 //! @param nonparametric_mult A factor with which the smoothing parameters
 //!     are multiplied.
-//! @param selection_criterionrotations
+//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
+//!     or `"bic"`).
+//! @param weights A vector of weights for the observations.
+//! @param psi0 Only for `selection_criterion = "mbic"`, the prior probability 
+//!     of non-independence.
 //! @param preselect_families Whether to exclude families before fitting
 //!     based on symmetry properties of the data.
 //! @param allow_rotations Allow rotations for the families when doing
@@ -71,12 +75,11 @@ inline FitControlsBicop::FitControlsBicop(std::string nonparametric_method,
                                           double nonparametric_mult)
   : FitControlsBicop()
 {
-  set_nonparametric_method(nonparametric_method);
-  set_nonparametric_mult(nonparametric_mult);
-}
-
-//! @name Sanity checks
-//! @{
+  set_nonparametric_method(nonparamet//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
+//!     or `"bic"`).
+//! @param weights A vector of weights for the observations.
+//! @param psi0 Only for `selection_criterion = "mbic"`, the prior probability of
+//!     non-independence.
 inline void
 FitControlsBicop::check_parametric_method(std::string parametric_method)
 {
@@ -244,19 +247,11 @@ FitControlsBicop::set_weights(const Eigen::VectorXd& weights)
 }
 
 //! @brief Sets whether to preselect the families.
-inline void
-FitControlsBicop::set_preselect_families(bool preselect_families)
-{
-  preselect_families_ = preselect_families;
-}
-
-//! @brief Sets the prior probability for mBIC.
-inline void
-FitControlsBicop::set_psi0(double psi0)
-{
-  check_psi0(psi0);
-  psi0_ = psi0;
-}
+inline void//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
+//!     or `"bic"`).
+//! @param weights A vector of weights for the observations.
+//! @param psi0 Only for `selection_criterion = "mbic"`, the prior probability of
+//!     non-independence.
 
 //! @brief Sets the number of threads.
 inline void
