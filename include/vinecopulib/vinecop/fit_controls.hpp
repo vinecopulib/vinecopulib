@@ -45,7 +45,7 @@ public:
     bool show_trace = false,
     size_t num_threads = 1,
     std::string mst_algorithm = "prim",
-    std::vector<int> rotations = { 0, 90, 180, 270 });
+    bool allow_rotations = true);
 
   explicit FitControlsVinecop(
     const FitControlsBicop& controls,
