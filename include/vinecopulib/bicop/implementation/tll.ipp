@@ -101,13 +101,16 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
   // diff + unweighted sum + weighted sum + w
   size_t bytes_required = m * n * 2 * 8 + m * 8 * 3;
   if (method == "constant" && bytes_required < static_cast<size_t>(1e9)) {
-    // Compute pairwise differences (broadcast z_data to all evaluation points)
-    Eigen::MatrixXd kernel_values = (z_data.transpose().rowwise().replicate(m) -
-                                     z.transpose().rowwise().replicate(n))
-                                      .transpose();
+    Eigen::VectorXd kernel_values(m * n); // Preallocate for efficiency
+    size_t offset = 0; // Tracks row position in the output matrix
 
-    // Compute Gaussian kernels for all differences
-    kernel_values = gaussian_kernel_2d(kernel_values).reshaped(n, m) * det_irB;
+    for (size_t i = 0; i < m; ++i) {
+      // Compute Gaussian kernels differences for the i-th row of z with all
+      // rows of z_data
+      kernel_values.segment(offset, n) =
+        gaussian_kernel_2d(z_data.rowwise() - z.row(i)) * det_irB;
+      offset += n; // Move the offset for the next block
+    }
 
     Eigen::VectorXd unweighted_sums(m);
     if (weights.size() > 0) {

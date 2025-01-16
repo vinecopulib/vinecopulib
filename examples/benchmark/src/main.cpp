@@ -5,7 +5,6 @@
 #include <string>
 #include <vinecopulib.hpp>
 
-#include "benchmark.hpp"
 
 using namespace std;
 using namespace vinecopulib;
@@ -65,7 +64,7 @@ benchmark_vinecop_fitting(int n = 1000, int d = 5, unsigned int repeats = 10)
 }
 
 void
-benchmark_bicop_tll(int n = 1000, unsigned int repeats = 10)
+benchmark_bicop_tll(int n = 10000, unsigned int repeats = 10)
 {
   FitControlsBicop controls_tll({ BicopFamily::tll }); // Define FitControls
 
@@ -130,7 +129,7 @@ int
 main()
 {
 
-  benchmark_vinecop_fitting();
+  //benchmark_vinecop_fitting();
   benchmark_bicop_tll();
 
   return 0;
