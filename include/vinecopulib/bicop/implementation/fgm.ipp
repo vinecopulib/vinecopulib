@@ -89,6 +89,9 @@ inline Eigen::MatrixXd
 FGMBicop::tau_to_parameters(const double& tau)
 {
   // FGM's Kendall's tau = 2 * theta / 9
+  if (std::abs(tau) > 1.0 / 4.5) {
+    throw std::runtime_error("|tau| too large for FGM copula.");
+  }
   return Eigen::VectorXd::Constant(1, 4.5 * tau);
 }
 
