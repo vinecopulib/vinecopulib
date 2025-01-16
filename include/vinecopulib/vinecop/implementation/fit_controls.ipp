@@ -59,6 +59,8 @@ inline FitControlsVinecop::FitControlsVinecop()
 //!     of concurrent threads supported by the implementation.
 //! @param mst_algorithm The algorithm for building the maximum spanning
 //!     tree (`"prim"` or `"kruskal"`) during the tree-wise structure selection.
+//! @param allow_rotations Allow rotations for the families when doing
+//!     model selection (default: true).
 inline FitControlsVinecop::FitControlsVinecop(
   std::vector<BicopFamily> family_set,
   std::string parametric_method,
@@ -76,7 +78,8 @@ inline FitControlsVinecop::FitControlsVinecop(
   bool select_families,
   bool show_trace,
   size_t num_threads,
-  std::string mst_algorithm)
+  std::string mst_algorithm,
+  bool allow_rotations)
   : FitControlsBicop(family_set,
                      parametric_method,
                      nonparametric_method,
@@ -84,7 +87,8 @@ inline FitControlsVinecop::FitControlsVinecop(
                      selection_criterion,
                      weights,
                      psi0,
-                     preselect_families)
+                     preselect_families,
+                     allow_rotations)
 {
   set_trunc_lvl(trunc_lvl);
   set_tree_criterion(tree_criterion);

@@ -1,5 +1,10 @@
 ## vinecopulib 0.7.1 (January 15, 2025)
 
+### NEW FEATURES
+
+* add `allow_rotation` option to `FitControlsBicop` and `FitControlsVinecop`
+  to allow for the rotation of the pair copulas (#628).
+
 ### BUG FIXES
 
 * restrict parameter range for fitting Tawn copulas; fix handling of their 
