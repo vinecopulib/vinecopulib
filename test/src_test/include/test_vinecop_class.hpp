@@ -118,7 +118,8 @@ TEST_F(VinecopTest, print)
   // but at least we see it doesn't crash
   expected_first_line = "Vinecop model with 5 variables";
   expected_second_line =
-    "tree edge conditioned variables conditioning variables var_types family rotation   parameters   df   tau ";
+    "tree edge conditioned variables conditioning variables var_types family "
+    "rotation   parameters   df   tau ";
 
   input.clear();
   input.str(vc1.str());
@@ -385,7 +386,13 @@ TEST_F(VinecopTest, aic_bic_are_correct)
 
   ASSERT_TRUE(true_model.aic(data) < complex_model.aic(data));
   ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
-}
+  true_model.select(data);
+
+  FitControlsVinecop controls({ BicopFamily::gaussian, BicopFamily::tll });
+  complex_model.select(data);
+  ASSERT_NEAR(complex_model.get_aic(), complex_model.aic(data), 1e-2);
+  ASSERT_NEAR(complex_model.get_bic(), complex_model.bic(data), 1e-2);
+} 
 
 TEST_F(VinecopTest, fit_parameters_is_correct)
 {
@@ -401,6 +408,9 @@ TEST_F(VinecopTest, fit_parameters_is_correct)
   Vinecop vc2(rvine_structure, pcs);
   vc2.fit(u, controls);
 
+  ASSERT_NEAR(vc2.get_loglik(), vc2.loglik(u), 1e-2);
+  ASSERT_NEAR(vc2.get_aic(), vc2.aic(u), 1e-2);
+  ASSERT_NEAR(vc2.get_bic(), vc2.bic(u), 1e-2);
   ASSERT_TRUE(vc.str() == vc2.str());
 
   Vinecop vc3(rvine_structure, pcs);
@@ -670,4 +680,24 @@ TEST_F(VinecopTest, partial_selection)
   }
   EXPECT_EQ(count2, 6);
 }
+
+TEST_F(VinecopTest, tawn_flipping)
+{
+  FitControlsVinecop controls({ BicopFamily::tawn });
+  Vinecop fit1(7);
+  fit1.select(u, controls);
+  Vinecop fit2(fit1.get_rvine_structure());
+  fit2.select(u, controls);
+
+  for (size_t tree = 0; tree < fit1.get_trunc_lvl(); ++tree) {
+    for (size_t edge = 0; edge < 6 - tree; ++edge) {
+      auto pc1 = fit1.get_pair_copula(tree, edge);
+      auto pc2 = fit2.get_pair_copula(tree, edge);
+      ASSERT_EQ(pc1.get_family(), pc2.get_family());
+      ASSERT_EQ(pc1.get_rotation(), pc2.get_rotation());
+      ASSERT_TRUE(pc1.get_parameters().isApprox(pc2.get_parameters(), 0.01));
+    }
+  }
+}
+
 }

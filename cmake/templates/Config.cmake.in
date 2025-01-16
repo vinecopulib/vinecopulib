@@ -1,19 +1,14 @@
 @PACKAGE_INIT@
 
-set_and_check(VINECOPULIB_INCLUDE_DIR "@PACKAGE_include_install_dir@")
-include("${CMAKE_CURRENT_LIST_DIR}/@targets_export_name@.cmake")
-check_required_components("@PROJECT_NAME@")
-
-# needed to find depedent interface targets
+# needed to find dependent interface targets
 include(CMakeFindDependencyMacro)
 find_dependency(Eigen3)
 find_dependency(wdm)
+find_dependency(Boost)
 
-find_package(Boost CONFIG)
-if (NOT Boost_FOUND)
-  # fallback to MODULE mode
-  find_package(Boost MODULE REQUIRED)
-endif ()
+set_and_check(VINECOPULIB_INCLUDE_DIR "@PACKAGE_include_install_dir@")
+include("${CMAKE_CURRENT_LIST_DIR}/@targets_export_name@.cmake")
+check_required_components("@PROJECT_NAME@")
 
 set(VINECOPULIB_LIBRARIES vinecopulib)
 message(STATUS "vinecopulib version: @PROJECT_VERSION@")
