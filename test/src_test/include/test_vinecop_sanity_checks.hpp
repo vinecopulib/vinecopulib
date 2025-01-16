@@ -28,7 +28,7 @@ TEST(vinecop_sanity_checks, catches_wrong_edge)
 TEST(vinecop_sanity_checks, catches_wrong_size)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(3);
-  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(3, 3);<<<<<<< fit_controls_config
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(3, 3);
   mat << 2, 2, 2, 1, 1, 0, 3, 0, 0;
   Vinecop vinecop(mat, pair_copulas);
 

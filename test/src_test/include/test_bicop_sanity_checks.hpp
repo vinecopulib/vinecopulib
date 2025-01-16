@@ -28,7 +28,7 @@ TEST(bicop_sanity_checks, catches_wrong_parameter_size)
 TEST(bicop_sanity_checks, catches_parameters_out_of_bounds)
 {
   auto cop = Bicop(BicopFamily::gaussian);
-  auto wrong_par = Eigen::VectorXd::Constant(1, 1.01);<<<<<<< fit_controls_config
+  auto wrong_par = Eigen::VectorXd::Constant(1, 1.01);
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, wrong_par));
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, -wrong_par));
 }
