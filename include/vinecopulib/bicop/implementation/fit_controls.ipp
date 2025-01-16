@@ -248,11 +248,19 @@ FitControlsBicop::set_weights(const Eigen::VectorXd& weights)
 }
 
 //! @brief Sets whether to preselect the families.
-inline void//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
-//!     or `"bic"`).
-//! @param weights A vector of weights for the observations.
-//! @param psi0 Only for `selection_criterion = "mbic"`, the prior probability of
-//!     non-independence.
+inline void
+FitControlsBicop::set_preselect_families(bool preselect_families)
+{
+  preselect_families_ = preselect_families;
+}
+
+//! @brief Sets the prior probability for mBIC.
+inline void
+FitControlsBicop::set_psi0(double psi0)
+{
+  check_psi0(psi0);
+  psi0_ = psi0;
+}
 
 //! @brief Sets the number of threads.
 inline void
