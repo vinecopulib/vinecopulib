@@ -29,7 +29,7 @@ FGMBicop::pdf_raw(const Eigen::MatrixXd& u)
 }
 
 // CDF
-inline inline Eigen::VectorXd
+inline Eigen::VectorXd
 FGMBicop::cdf(const Eigen::MatrixXd& u)
 {
   const Eigen::VectorXd& u1 = u.col(0);
