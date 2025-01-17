@@ -5,6 +5,9 @@
 * add `allow_rotation` option to `FitControlsBicop` and `FitControlsVinecop`
   to allow for the rotation of the pair copulas (#628).
 
+* add a `FitControlsConfig` struct to create flexible and yet safe constructors
+  for `FitControlsBicop` and `FitControlsVinecop` (#629).
+
 ### BUG FIXES
 
 * restrict parameter range for fitting Tawn copulas; fix handling of their 

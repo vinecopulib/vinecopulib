@@ -9,6 +9,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <vinecopulib/bicop/family.hpp>
+#include <vinecopulib/misc/fit_controls.hpp>
 
 namespace vinecopulib {
 //! @brief A class for controlling fits of bivariate copula models.
@@ -32,6 +33,8 @@ public:
 
   explicit FitControlsBicop(std::string nonparametric_method,
                             double nonparametric_mult = 1.0);
+
+  explicit FitControlsBicop(const FitControlsConfig& config);
 
   // Getters
   std::vector<BicopFamily> get_family_set() const;

@@ -58,6 +58,45 @@ TEST(vinecop_sanity_checks, controls_print)
   EXPECT_NO_THROW(controls.str());
 }
 
+TEST(vinecop_sanity_checks, fit_controls_config_works)
+{
+  // Some controls for testing
+  // Only the non FitControlsBicop fields are tested here
+  FitControlsVinecop controls;
+  controls.set_trunc_lvl(3);
+  controls.set_tree_criterion("rho");
+  controls.set_threshold(0.5);
+  controls.set_select_threshold(true);
+  controls.set_select_trunc_lvl(true);
+  controls.set_select_families(false);
+  controls.set_show_trace(true);
+  controls.set_mst_algorithm("kruskal");
+
+  // Create a config object from the controls
+  FitControlsConfig config;
+  config.trunc_lvl = controls.get_trunc_lvl();
+  config.tree_criterion = controls.get_tree_criterion();
+  config.threshold = controls.get_threshold();
+  config.select_threshold = controls.get_select_threshold();
+  config.select_trunc_lvl = controls.get_select_trunc_lvl();
+  config.select_families = controls.get_select_families();
+  config.show_trace = controls.get_show_trace();
+  config.num_threads = controls.get_num_threads();
+  config.mst_algorithm = controls.get_mst_algorithm();
+
+  // Create and test new controls from the config object
+  FitControlsVinecop controls2(config);
+  EXPECT_EQ(controls.get_trunc_lvl(), controls2.get_trunc_lvl());
+  EXPECT_EQ(controls.get_tree_criterion(), controls2.get_tree_criterion());
+  EXPECT_EQ(controls.get_threshold(), controls2.get_threshold());
+  EXPECT_EQ(controls.get_select_threshold(), controls2.get_select_threshold());
+  EXPECT_EQ(controls.get_select_trunc_lvl(), controls2.get_select_trunc_lvl());
+  EXPECT_EQ(controls.get_select_families(), controls2.get_select_families());
+  EXPECT_EQ(controls.get_show_trace(), controls2.get_show_trace());
+  EXPECT_EQ(controls.get_num_threads(), controls2.get_num_threads());
+  EXPECT_EQ(controls.get_mst_algorithm(), controls2.get_mst_algorithm());
+}
+
 TEST(vinecop_sanity_checks, controls_check)
 {
   auto controls = FitControlsVinecop();
