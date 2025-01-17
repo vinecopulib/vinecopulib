@@ -93,8 +93,8 @@ TEST(bicop_sanity_checks, controls_checks)
 
 TEST(bicop_sanity_checks, fit_controls_config_works)
 {
+  // Some non-default controls for testing
   FitControlsBicop controls;
-  FitControlsConfig config;
   controls.set_family_set({ BicopFamily::itau });
   controls.set_parametric_method("itau");
   controls.set_nonparametric_method("quadratic");
@@ -106,6 +106,8 @@ TEST(bicop_sanity_checks, fit_controls_config_works)
   controls.set_allow_rotations(false);
   // can't use non-default num_threads in CI
 
+  // Create a config object from the controls
+  FitControlsConfig config;
   config.family_set = controls.get_family_set();
   config.parametric_method = controls.get_parametric_method();
   config.nonparametric_method = controls.get_nonparametric_method();
@@ -116,6 +118,8 @@ TEST(bicop_sanity_checks, fit_controls_config_works)
   config.preselect_families = controls.get_preselect_families();
   config.allow_rotations = controls.get_allow_rotations();
   config.num_threads = controls.get_num_threads();
+
+  // Create and test new controls from the config object
   FitControlsBicop controls2(config);
   EXPECT_EQ(controls.get_family_set(), controls2.get_family_set());
   EXPECT_EQ(controls.get_parametric_method(), controls2.get_parametric_method());
