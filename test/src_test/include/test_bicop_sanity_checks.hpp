@@ -95,7 +95,7 @@ TEST(bicop_sanity_checks, fit_controls_config_works)
 {
   // Some non-default controls for testing
   FitControlsBicop controls;
-  controls.set_family_set({ BicopFamily::itau });
+  controls.set_family_set(bicop_families::itau);
   controls.set_parametric_method("itau");
   controls.set_nonparametric_method("quadratic");
   controls.set_nonparametric_mult(2.0);
