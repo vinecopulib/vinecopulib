@@ -62,6 +62,15 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
 {
   FitControlsVinecop controls;
   FitControlsConfig config;
+  controls.set_trunc_lvl(3);
+  controls.set_tree_criterion("rho");
+  controls.set_threshold(0.5);
+  controls.set_select_threshold(true);
+  controls.set_select_trunc_lvl(true);
+  controls.set_select_families(false);
+  controls.set_show_trace(true);
+  controls.set_mst_algorithm("kruskal");
+
   // Only the non FitControlsBicop fields are tested here
   config.trunc_lvl = controls.get_trunc_lvl();
   config.tree_criterion = controls.get_tree_criterion();
@@ -72,7 +81,6 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
   config.show_trace = controls.get_show_trace();
   config.num_threads = controls.get_num_threads();
   config.mst_algorithm = controls.get_mst_algorithm();
-  EXPECT_EQ(controls.get_mst_algorithm(), "prim");
   FitControlsVinecop controls2(config);
   EXPECT_EQ(controls.get_trunc_lvl(), controls2.get_trunc_lvl());
   EXPECT_EQ(controls.get_tree_criterion(), controls2.get_tree_criterion());

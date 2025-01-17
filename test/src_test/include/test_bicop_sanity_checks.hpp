@@ -95,6 +95,17 @@ TEST(bicop_sanity_checks, fit_controls_config_works)
 {
   FitControlsBicop controls;
   FitControlsConfig config;
+  controls.set_family_set({ BicopFamily::itau });
+  controls.set_parametric_method("itau");
+  controls.set_nonparametric_method("quadratic");
+  controls.set_nonparametric_mult(2.0);
+  controls.set_selection_criterion("bic");
+  controls.set_weights(Eigen::VectorXd::Ones(10));
+  controls.set_psi0(0.6);
+  controls.set_preselect_families(false);
+  controls.set_allow_rotations(false);
+  // can't use non-default num_threads in CI
+
   config.family_set = controls.get_family_set();
   config.parametric_method = controls.get_parametric_method();
   config.nonparametric_method = controls.get_nonparametric_method();
