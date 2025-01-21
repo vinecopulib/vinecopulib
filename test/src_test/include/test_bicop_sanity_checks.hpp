@@ -80,6 +80,59 @@ TEST(bicop_sanity_checks, controls_print)
   EXPECT_NO_THROW(controls.str());
 }
 
+TEST(bicop_sanity_checks, controls_checks)
+{
+  auto controls = FitControlsBicop();
+  EXPECT_ANY_THROW(controls.set_selection_criterion("foo"));
+  EXPECT_ANY_THROW(controls.set_nonparametric_method("foo"));
+  EXPECT_ANY_THROW(controls.set_parametric_method("foo"));
+  EXPECT_ANY_THROW(controls.set_nonparametric_mult(0.0));
+  EXPECT_ANY_THROW(controls.set_psi0(0.0));
+  EXPECT_ANY_THROW(controls.set_psi0(1.0));
+}
+
+TEST(bicop_sanity_checks, fit_controls_config_works)
+{
+  // Some non-default controls for testing
+  FitControlsBicop controls;
+  controls.set_family_set(bicop_families::itau);
+  controls.set_parametric_method("itau");
+  controls.set_nonparametric_method("quadratic");
+  controls.set_nonparametric_mult(2.0);
+  controls.set_selection_criterion("bic");
+  controls.set_weights(Eigen::VectorXd::Ones(10));
+  controls.set_psi0(0.6);
+  controls.set_preselect_families(false);
+  controls.set_allow_rotations(false);
+  // can't use non-default num_threads in CI
+
+  // Create a config object from the controls
+  FitControlsConfig config;
+  config.family_set = controls.get_family_set();
+  config.parametric_method = controls.get_parametric_method();
+  config.nonparametric_method = controls.get_nonparametric_method();
+  config.nonparametric_mult = controls.get_nonparametric_mult();
+  config.selection_criterion = controls.get_selection_criterion();
+  config.weights = controls.get_weights();
+  config.psi0 = controls.get_psi0();
+  config.preselect_families = controls.get_preselect_families();
+  config.allow_rotations = controls.get_allow_rotations();
+  config.num_threads = controls.get_num_threads();
+
+  // Create and test new controls from the config object
+  FitControlsBicop controls2(config);
+  EXPECT_EQ(controls.get_family_set(), controls2.get_family_set());
+  EXPECT_EQ(controls.get_parametric_method(), controls2.get_parametric_method());
+  EXPECT_EQ(controls.get_nonparametric_method(), controls2.get_nonparametric_method());
+  EXPECT_EQ(controls.get_nonparametric_mult(), controls2.get_nonparametric_mult());
+  EXPECT_EQ(controls.get_selection_criterion(), controls2.get_selection_criterion());
+  EXPECT_EQ(controls.get_weights(), controls2.get_weights());
+  EXPECT_EQ(controls.get_psi0(), controls2.get_psi0());
+  EXPECT_EQ(controls.get_preselect_families(), controls2.get_preselect_families());
+  EXPECT_EQ(controls.get_allow_rotations(), controls2.get_allow_rotations());
+  EXPECT_EQ(controls.get_num_threads(), controls2.get_num_threads());
+}
+
 TEST(bicop_sanity_checks, copy)
 {
   auto rho = Eigen::VectorXd::Constant(1, 0.5);
