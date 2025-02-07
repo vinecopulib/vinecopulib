@@ -203,6 +203,13 @@ TEST(rvine_structure, rvine_struct_sanity_checks_work)
   EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
 }
 
+TEST(rvine_structure, partially_specified_trees_work)
+{
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(6, 6);
+  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
+    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
+}
+
 TEST(rvine_structure, random_sampling)
 {
   for (size_t i = 0; i < 20; i++) {
