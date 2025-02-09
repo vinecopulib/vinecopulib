@@ -205,9 +205,20 @@ TEST(rvine_structure, rvine_struct_sanity_checks_work)
 
 TEST(rvine_structure, partially_specified_trees_work)
 {
+
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(6, 6);
-  mat << 5, 2, 6, 6, 6, 6, 6, 6, 6, 1, 2, 5, 5, 0, 2, 5, 2, 5, 2, 0, 0, 1, 1, 5,
-    1, 0, 0, 0, 3, 7, 7, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0;
+  mat << 3, 3, 6, 6, 6, 6, 2, 6, 5, 5, 5, 0, 0, 0, 0, 4, 0, 0,
+    0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0;
+  
+  // should pass without errors
+  auto rvm = RVineStructure(mat);
+
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat2(6, 6);
+  mat2 << 3, 3, 0, 6, 6, 6, 2, 0, 0, 5, 5, 0, 0, 0, 0, 4, 0, 0,
+    0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0;
+
+  // should pass without errors
+  auto rvm2 = RVineStructure(mat2);
 }
 
 TEST(rvine_structure, random_sampling)

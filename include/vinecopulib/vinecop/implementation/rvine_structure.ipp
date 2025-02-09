@@ -64,7 +64,8 @@ inline RVineStructure::RVineStructure(
 //! @param trunc_lvl The truncation level. By default, it is dim - 1.
 inline RVineStructure::RVineStructure(const size_t& d, const size_t& trunc_lvl)
   : RVineStructure(tools_stl::seq_int(1, d), std::min(d - 1, trunc_lvl), false)
-{}
+{
+}
 
 //! @brief Instantiates as a D-vine with a given ordering of the variables.
 //! @param order The order of variables in the D-vine (diagonal entries in the
@@ -148,11 +149,12 @@ inline RVineStructure::RVineStructure(const nlohmann::json& input,
       tools_serialization::json_to_vector<size_t>(input["order"]),
       tools_serialization::json_to_triangular_array<size_t>(input["array"]),
       check)
-{}
+{
+}
 
 //! @brief Instantiates an RVineStructure from a JSON file.
 //!
-//! @details The file needs to contain two values: `"array"` for the 
+//! @details The file needs to contain two values: `"array"` for the
 //! structure triangular array and `"order"` for the order vector.
 //!
 //! @param filename The name of the JSON file to read.
@@ -161,7 +163,8 @@ inline RVineStructure::RVineStructure(const nlohmann::json& input,
 inline RVineStructure::RVineStructure(const std::string& filename,
                                       const bool check)
   : RVineStructure(tools_serialization::file_to_json(filename), check)
-{}
+{
+}
 
 //! @brief Converts the structure into a `nlohmann::json` object.
 //!
@@ -310,7 +313,7 @@ RVineStructure::needed_hfunc2(size_t tree, size_t edge) const
 
 //! @brief Truncates the R-vine structure.
 //! @details While a structure of dimension `d`  contains at most `d-1`
-//! nested levels, this function extracts a sub-structure based 
+//! nested levels, this function extracts a sub-structure based
 //! on a given truncation level.
 //!
 //! If the structure is already truncated at a level
@@ -352,7 +355,7 @@ RVineStructure::str() const
 //! @brief Randomly sample a regular vine structure.
 //! @details Simulates from a uniform distribution over all R-vine
 //! structures on d variables
-//! 
+//!
 //! Implementation of Algorithm 13 in Harry Joe's 2014 book (p. 288),
 //! but there's a typo: the end of line 6 in the book should be
 //! 'column j' instead of 'column k'.
@@ -457,17 +460,12 @@ RVineStructure::find_trunc_lvl(
   size_t trunc_lvl;
   size_t d = mat.cols();
 
-  std::stringstream problem;
-  problem << "not a valid R-vine array: "
-          << "a row with a 0 above the diagonal contains one or more "
-          << "non-zero values.";
-
   for (trunc_lvl = d - 1; trunc_lvl > 0; trunc_lvl--) {
     std::vector<size_t> row_vec(d - trunc_lvl);
     Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&row_vec[0], d - trunc_lvl) =
       mat.row(trunc_lvl - 1).head(d - trunc_lvl);
 
-    if (*(std::min_element(row_vec.begin(), row_vec.end())) != 0)
+    if (*(std::max_element(row_vec.begin(), row_vec.end())) > 0)
       break;
   }
 
@@ -518,7 +516,8 @@ RVineStructure::to_natural_order() const
   TriangularArray<size_t> struct_array(d_, trunc_lvl_);
   for (size_t j = 0; j < d_ - 1; j++) {
     for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
-      struct_array(i, j) = order[struct_array_(i, j) - 1] + 1;
+      struct_array(i, j) =
+        (struct_array_(i, j) == 0) ? 0 : order[struct_array_(i, j) - 1] + 1;
     }
   }
 
@@ -576,8 +575,10 @@ RVineStructure::compute_needed_hfunc1() const
 
   for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
     for (size_t j = 0; j < d_ - 2 - i; j++) {
-      if (struct_array_(i + 1, j) != min_array_(i + 1, j))
+      if (struct_array_(i + 1, j) != min_array_(i + 1, j) &&
+          min_array_(i + 1, j) != 0) {
         needed_hfunc1(i, min_array_(i + 1, j) - 1) = 1;
+      }
     }
   }
 
@@ -595,8 +596,10 @@ RVineStructure::compute_needed_hfunc2() const
   for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
     for (size_t j = 0; j < d_ - 2 - i; j++) {
       needed_hfunc2(i, j) = 1;
-      if (struct_array_(i + 1, j) == min_array_(i + 1, j))
+      if (struct_array_(i + 1, j) == min_array_(i + 1, j) &&
+          min_array_(i + 1, j) != 0) {
         needed_hfunc2(i, min_array_(i + 1, j) - 1) = 1;
+      }
     }
   }
 
@@ -632,11 +635,11 @@ RVineStructure::check_upper_tri() const
 {
   std::string problem;
   problem += "the upper left triangle can only contain numbers ";
-  problem += "between 1 and d (number of variables).";
+  problem += "between 0 and d (number of variables).";
 
   for (size_t i = 0; i < trunc_lvl_; ++i) {
     for (size_t j = 0; j < d_ - 1 - i; ++j) {
-      if ((struct_array_(i, j) < 1) || (struct_array_(i, j) > d_)) {
+      if (struct_array_(i, j) > d_) {
         throw std::runtime_error("not a valid R-vine array: " + problem);
       }
     }
@@ -646,7 +649,7 @@ RVineStructure::check_upper_tri() const
 inline void
 RVineStructure::check_columns() const
 {
-  std::string problem = "";
+  std::string problem = "not a valid R-vine array: ";
   for (size_t j = 0; j < d_ - 1; j++) {
     // read column into vector so we can use stl methods
     std::vector<size_t> col(std::min(trunc_lvl_, d_ - 1 - j));
@@ -654,18 +657,42 @@ RVineStructure::check_columns() const
       col[i] = struct_array_(i, j);
     }
 
-    std::sort(col.begin(), col.end());
-    if (col[0] <= 1 + j) {
-      problem += "the antidiagonal entry of a column must not be ";
-      problem += "contained in any column further to the right.";
+    // if a column has a zero, then the entries below must be zeroes
+    bool has_zero = col[0] == 0;
+    for (size_t i = 1; i < col.size(); i++) {
+      if (has_zero && col[i] != 0) {
+        problem += "if a column contains a zero, all entries below ";
+        problem += "must be zeroes as well.";
+        throw std::runtime_error(problem);
+      }
+      has_zero = col[i] == 0;
     }
 
-    size_t unique_in_col = std::unique(col.begin(), col.end()) - col.begin();
-    if (unique_in_col != col.size()) {
-      problem = "a column must not contain duplicate entries.";
+    std::sort(col.begin(), col.end());
+
+    // find first non-zero entry (if any)
+    auto it =
+      (col.empty() || col[0] != 0)
+        ? col.begin()
+        : std::find_if(col.begin(), col.end(), [](size_t i) { return i != 0; });
+
+    // if a column contains only zeros, go to next column
+    if (it == col.end()) {
+      continue;
     }
-    if (problem != "") {
-      throw std::runtime_error("not a valid R-vine array: " + problem);
+
+    if (*it <= 1 + j) {
+      problem += "the antidiagonal entry of a column must not be ";
+      problem += "contained in any column further to the right.";
+      throw std::runtime_error(problem);
+    }
+
+    // check if there are any duplicates (except for zeros)
+    bool all_unique =
+      (it == col.end()) || (std::adjacent_find(it, col.end()) == col.end());
+    if (!all_unique) {
+      problem = "a column must not contain duplicate entries.";
+      throw std::runtime_error(problem);
     }
   }
 }
@@ -686,6 +713,9 @@ RVineStructure::check_proximity_condition() const
 {
   for (size_t t = 1; t < trunc_lvl_; ++t) {
     for (size_t e = 0; e < d_ - t - 1; ++e) {
+      if (min_array_(t, e) == 0) {
+        continue;
+      }
       std::vector<size_t> target_set(t + 1), test_set(t + 1);
       // conditioning set
       for (size_t i = 0; i < t; i++) {
@@ -731,7 +761,8 @@ inline DVineStructure::DVineStructure(const std::vector<size_t>& order)
                    make_dvine_struct_array(order.size(), order.size() - 1),
                    true,
                    false)
-{}
+{
+}
 
 //! @param order The order of variables in the D-vine (diagonal entries in the
 //!    R-vine array); must be a permutation of 1, ..., d.
@@ -742,7 +773,8 @@ inline DVineStructure::DVineStructure(const std::vector<size_t>& order,
                    make_dvine_struct_array(order.size(), trunc_lvl),
                    true,
                    false)
-{}
+{
+}
 
 //! @param order The order of variables in the C-vine (diagonal entries in the
 //!    R-vine array); must be a permutation of 1, ..., d.
@@ -751,7 +783,8 @@ inline CVineStructure::CVineStructure(const std::vector<size_t>& order)
                    make_cvine_struct_array(order.size(), order.size() - 1),
                    true,
                    false)
-{}
+{
+}
 
 //! @param order The order of variables in the C-vine (diagonal entries in the
 //!    R-vine array); must be a permutation of 1, ..., d.
@@ -762,5 +795,6 @@ inline CVineStructure::CVineStructure(const std::vector<size_t>& order,
                    make_cvine_struct_array(order.size(), trunc_lvl),
                    true,
                    false)
-{}
+{
+}
 }
