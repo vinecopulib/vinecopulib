@@ -276,15 +276,24 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   return to_pseudo_obs(x);
 }
 
+// Utility function to compute the next power of 2.
+inline size_t next_power_of_two(size_t n) {
+  size_t power = 1;
+  while (power < n) { power *= 2; }
+  return power;
+}
+
 //! window smoother
 inline Eigen::VectorXd
 win(const Eigen::VectorXd& x, size_t wl = 5)
 {
   size_t n = x.size();
-  Eigen::VectorXd xx = Eigen::VectorXd::Zero(n + 2 * wl);
-  Eigen::VectorXd yy = Eigen::VectorXd::Zero(n + 2 * wl);
-  xx.block(2 * wl, 0, n, 1) = x;
-  yy.block(0, 0, 2 * wl + 1, 1) = Eigen::VectorXd::Ones(2 * wl + 1);
+  size_t fftSize = next_power_of_two(n + 2 * wl);
+
+  Eigen::VectorXd xx = Eigen::VectorXd::Zero(fftSize);
+  Eigen::VectorXd yy = Eigen::VectorXd::Zero(fftSize);
+  xx.segment(2 * wl, n) = x;
+  yy.head(2 * wl + 1) = Eigen::VectorXd::Ones(2 * wl + 1);
 
   Eigen::FFT<double> fft;
   Eigen::VectorXcd tmp1 = fft.fwd(xx);
@@ -292,11 +301,12 @@ win(const Eigen::VectorXd& x, size_t wl = 5)
   tmp2 = tmp2.conjugate();
   tmp1 = tmp1.cwiseProduct(tmp2);
   tmp2 = fft.inv(tmp1);
-  Eigen::VectorXd result = tmp2.real().block(wl, 0, n, 1);
+
+  Eigen::VectorXd result = tmp2.real().segment(wl, n);
   result /= 2.0 * static_cast<double>(wl) + 1.0;
-  result.block(0, 0, wl, 1) = Eigen::VectorXd::Constant(wl, result(wl));
-  result.block(n - wl, 0, wl, 1) =
-    Eigen::VectorXd::Constant(wl, result(n - wl - 1));
+  result.head(wl).setConstant(result(wl));
+  result.tail(wl).setConstant(result(n - wl - 1));
+
   return result;
 }
 
