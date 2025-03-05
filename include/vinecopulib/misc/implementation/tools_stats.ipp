@@ -288,6 +288,7 @@ inline Eigen::VectorXd
 win(const Eigen::VectorXd& x, size_t wl = 5)
 {
   size_t n = x.size();
+  // pad length to powers of 2 to force FFT to use its fastest algorithm
   size_t fftSize = next_power_of_two(n + 2 * wl);
 
   Eigen::VectorXd xx = Eigen::VectorXd::Zero(fftSize);
@@ -317,19 +318,9 @@ cef(const Eigen::VectorXd& x,
     const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& ranks,
     size_t wl = 5)
 {
-  size_t n_ind = ind.size();
-  Eigen::VectorXd cey(n_ind);
-  for (size_t i = 0; i < n_ind; i++) {
-    cey(i) = x(ind(i));
-  }
+  Eigen::VectorXd cey = x(ind);
   cey = win(cey, wl);
-
-  size_t n_ranks = ranks.size();
-  Eigen::VectorXd result(n_ranks);
-  for (size_t i = 0; i < n_ranks; i++) {
-    result(i) = cey(ranks(i));
-  }
-  return result;
+  return cey(ranks);
 }
 
 //! alternating conditional expectation algorithm
