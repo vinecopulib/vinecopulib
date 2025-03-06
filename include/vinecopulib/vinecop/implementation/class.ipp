@@ -1226,7 +1226,8 @@ Vinecop::get_npars() const
 //! \f[ 
 //! \begin{aligned}
 //! U_{M[d - j, j]} &= W_{d - j} F(V_{M[d - j, j]} 
-//! | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}) \\
+//! | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}) 
+//! \\
 //! &\quad + (1 - W_{d - j}) F^-(V_{M[d - j, j]} 
 //! | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]})
 //! \end{aligned}
