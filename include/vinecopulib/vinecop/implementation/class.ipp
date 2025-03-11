@@ -1222,18 +1222,11 @@ Vinecop::get_npars() const
 //!
 //! If some variables have atoms, Brockwell (10.1016/j.spl.2007.02.008) proposed
 //! a simple randomization scheme to ensure that output is still independent
-//! uniform if the model is correct. The transformation reads 
-//! \f[ 
-//! \begin{aligned}
-//! U_{M[d - j, j]} &= W_{d - j} F(V_{M[d - j, j]} 
-//! | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}) 
-//! \\
-//! &\quad + (1 - W_{d - j}) F^-(V_{M[d - j, j]} 
-//! | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]})
-//! \end{aligned}
-//! \f] 
-//! where \f$ F^- \f$ is the left limit of the conditional cdf
-//! and \f$ W_1, \dots, W_d \f$ are are independent standard uniform random
+//! uniform if the model is correct. The transformation reads \f[ U_{M[d - j,
+//! j]}= W_{d - j} F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0,
+//! 0]}) + (1 - W_{d - j}) F^-(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots,
+//! V_{M[0, 0]}), \f] where \f$ F^- \f$ is the left limit of the conditional cdf
+//! and \f$W_1, \dots, W_d \f$ are are independent standard uniform random
 //! variables. This is used by default. If you are interested in the conditional
 //! probabilities
 //! \f[ F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
