@@ -1,3 +1,13 @@
+## vinecopulib 0.7.2 (March 7, 2025)
+
+### BUG FIXES
+
+* more build system updates by @jschueller (#633)
+
+* fix deprecation warning in json header (#634)
+
+* fix TLL speed issues related to FFT (#635)
+
 ## vinecopulib 0.7.1 (January 15, 2025)
 
 ### NEW FEATURES
