@@ -20,26 +20,16 @@ if(NOT DEFINED EIGEN3_INCLUDE_DIR)
   endif()
 endif()
 
-# Boost components needed by vinecopulib
-set(VINECOPULIB_BOOST_COMPONENT_NAMES
-  random  # compiled component
-)
-
-# Corresponding imported targets (used in target_link_libraries)
-set(VINECOPULIB_BOOST_COMPONENTS
-  Boost::boost      # header-only base
-  Boost::random     # compiled component
-)
-
 # Check if Boost_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED Boost_INCLUDE_DIRS)
-  find_package(Boost 1.56 CONFIG COMPONENTS ${VINECOPULIB_BOOST_COMPONENT_NAMES})
-  if(Boost_FOUND)
-    message(STATUS "Found Boost via CONFIG: ${Boost_DIR} (version ${Boost_VERSION})")
-  else()
-    find_package(Boost 1.56 MODULE REQUIRED COMPONENTS ${VINECOPULIB_BOOST_COMPONENT_NAMES})
-    message(STATUS "Found Boost via MODULE: ${Boost_INCLUDE_DIRS} (version ${Boost_VERSION})")
-  endif()
+  # try to find Boost in CONFIG mode first
+  find_package(Boost 1.56 CONFIG)
+  if (Boost_FOUND)
+    message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")  
+  else ()
+    # fallback to MODULE mode
+    find_package(Boost 1.56 MODULE REQUIRED)
+  endif ()
 endif()
 
 find_package(Threads                      REQUIRED)
