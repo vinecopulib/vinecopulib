@@ -586,7 +586,7 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
   controls_weighted.set_tree_algorithm("random_weighted");
 
   FitControlsVinecop controls_unweighted({ BicopFamily::indep });
-  controls_unweighted.set_tree_algorithm("random_weighted");
+  controls_unweighted.set_tree_algorithm("random_unweighted");
 
   // For reseeding the random number generator
   std::random_device rd;
