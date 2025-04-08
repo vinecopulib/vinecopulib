@@ -590,10 +590,11 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
 
   // For reseeding the random number generator
   std::random_device rd;
-  std::vector<int> seeds(5);
+  std::vector<int> seeds(20);
 
   // To store the unique structures
-  std::set<TriangularArray<size_t>> unique_structures;
+  std::set<TriangularArray<size_t>> unique_structures_weighted;
+  std::set<TriangularArray<size_t>> unique_structures_unweighted;
 
   // To store the first RNG value after each reseeding
   std::set<uint32_t> first_rng_outputs;
@@ -617,17 +618,18 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
     // Select a random structure for the weighted method
     Vinecop fit_weighted(u, RVineStructure(), {}, controls_weighted);
     auto struct_array_weighted = fit_weighted.get_struct_array();
-    unique_structures.insert(struct_array_weighted);
+    unique_structures_weighted.insert(struct_array_weighted);
 
     // Select a random structure for the unweighted method
     Vinecop fit_unweighted(u, RVineStructure(), {}, controls_unweighted);
     auto struct_array_unweighted = fit_unweighted.get_struct_array();
-    unique_structures.insert(struct_array_unweighted);
+    unique_structures_unweighted.insert(struct_array_unweighted);
   }
 
   // The probability that any 2 samples are the same by chance is very low
   EXPECT_EQ(first_rng_outputs.size(), num_trials);
-  EXPECT_EQ(unique_structures.size(), 2 * num_trials);
+  EXPECT_EQ(unique_structures_weighted.size(), num_trials);
+  EXPECT_EQ(unique_structures_unweighted.size(), num_trials);
 }
 
 TEST_F(VinecopTest, fixed_truncation)
