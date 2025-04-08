@@ -10,6 +10,8 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
 
+// I just wanna trigger CI
+
 namespace test_rvine_structure {
 
 using namespace vinecopulib;
