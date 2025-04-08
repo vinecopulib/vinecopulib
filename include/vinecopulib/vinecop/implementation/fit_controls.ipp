@@ -59,7 +59,8 @@ inline FitControlsVinecop::FitControlsVinecop()
 //!     pair copulas within a tree; never uses more than the number
 //!     of concurrent threads supported by the implementation.
 //! @param mst_algorithm The algorithm for building the maximum spanning
-//!     tree (`"prim"` or `"kruskal"`) during the tree-wise structure selection.
+//!     tree (`"prim"`, `"kruskal"`, `"random"`) during the tree-wise 
+//!     structure selection.
 //! @param allow_rotations Allow rotations for the families when doing
 //!     model selection (default: true).
 inline FitControlsVinecop::FitControlsVinecop(
@@ -118,7 +119,8 @@ inline FitControlsVinecop::FitControlsVinecop(
 //! automatically, or should the method simply update the parameters for
 //! the pair copulas already present in the model.
 //! @param mst_algorithm The algorithm for building the maximum spanning
-//!     tree (`"prim"` or `"kruskal"`) during the tree-wise structure selection.
+//!     tree (`"prim"`, `"kruskal"`, or `"random"`) during the 
+//!     tree-wise structure selection.
 inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
                                               size_t trunc_lvl,
                                               std::string tree_criterion,
@@ -337,8 +339,8 @@ FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)
 inline void
 FitControlsVinecop::set_mst_algorithm(std::string mst_algorithm)
 {
-  if (!tools_stl::is_member(mst_algorithm, { "prim", "kruskal" })) {
-    throw std::runtime_error("mst_algorithm must be one of 'prim' or 'kruskal'");
+  if (!tools_stl::is_member(mst_algorithm, { "prim", "kruskal", "random" })) {
+    throw std::runtime_error("mst_algorithm must be one of 'prim', 'kruskal', or 'random'");
   }
   mst_algorithm_ = mst_algorithm;
 }
