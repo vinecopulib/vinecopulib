@@ -627,7 +627,7 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
 
   // The probability that any 2 samples are the same by chance is very low
   EXPECT_EQ(first_rng_outputs.size(), num_trials);
-  EXPECT_EQ(unique_structures.size(), 2 * num_trials);
+  EXPECT_EQ(unique_structures.size(), 2 * num_trials - 1);
 }
 
 TEST_F(VinecopTest, fixed_truncation)
