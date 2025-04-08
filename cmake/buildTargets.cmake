@@ -1,3 +1,17 @@
+# Manual override of Boost::random: define a dummy interface target
+# to avoid linking against libboost_random on Windows when only
+# header-only features are used.
+# NOTE: Boost::random is not used as a compiled component.
+# This override prevents unnecessary linking against libboost_random on MSVC.
+# If you ever use boost::random_device or other compiled parts, remove this.
+
+if(NOT TARGET Boost::random)
+  add_library(dummy_boost_random INTERFACE)
+  target_link_libraries(dummy_boost_random INTERFACE Boost::boost)
+  add_library(Boost::random ALIAS dummy_boost_random)
+endif()
+
+
 if (VINECOPULIB_SHARED_LIB)
     add_library(vinecopulib ${vinecopulib_sources})
     target_include_directories(vinecopulib PRIVATE ${vinecopulib_includes})
