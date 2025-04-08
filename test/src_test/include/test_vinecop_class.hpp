@@ -91,14 +91,12 @@ TEST_F(VinecopTest, print)
   // check if first, second and last line are correct
   expected_first_line = "Vinecop model with 7 variables";
   expected_second_line =
-    "tree edge conditioned variables conditioning variables var_types family
-    " " rotation parameters df tau ";
-    expected_last_line = "   6    1                  4, 7          3, 1, 2, 6,
-                         5 "
-                           "     c, c   Tawn      270 1.00, 1.00, 1.00 3.0 -0.00
-                           ";
+    "tree edge conditioned variables conditioning variables var_types family "
+    "rotation       parameters  df   tau ";
+  expected_last_line = "   6    1                  4, 7          3, 1, 2, 6, 5 "
+                       "     c, c   Tawn      270 1.00, 1.00, 1.00 3.0 -0.00 ";
 
-                         input.clear();
+  input.clear();
   input.str(vc2.str());
 
   // get first, second and last line
@@ -120,10 +118,10 @@ TEST_F(VinecopTest, print)
   // but at least we see it doesn't crash
   expected_first_line = "Vinecop model with 5 variables";
   expected_second_line =
-    "tree edge conditioned variables conditioning variables var_types family
-    " " rotation parameters df tau ";
+    "tree edge conditioned variables conditioning variables var_types family "
+    "rotation   parameters   df   tau ";
 
-    input.clear();
+  input.clear();
   input.str(vc1.str());
 
   // get first, second and last line
