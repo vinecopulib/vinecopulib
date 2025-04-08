@@ -24,6 +24,7 @@ inline FitControlsVinecop::FitControlsVinecop()
   select_families_ = true;
   show_trace_ = false;
   mst_algorithm_ = "prim";
+  set_seeds(std::vector<int>());
 }
 
 //! @brief Instantiates custom controls for fitting vine copula models.
@@ -63,6 +64,9 @@ inline FitControlsVinecop::FitControlsVinecop()
 //!     structure selection.
 //! @param allow_rotations Allow rotations for the families when doing
 //!     model selection (default: true).
+//! @param seeds A vector of random seeds for the random number generator
+//!     for parts of the algorithm that are randomized (e.g., 
+//!     random tree selection).
 inline FitControlsVinecop::FitControlsVinecop(
   std::vector<BicopFamily> family_set,
   std::string parametric_method,
@@ -81,7 +85,8 @@ inline FitControlsVinecop::FitControlsVinecop(
   bool show_trace,
   size_t num_threads,
   std::string mst_algorithm,
-  bool allow_rotations)
+  bool allow_rotations,
+  std::vector<int> seeds)
   : FitControlsBicop(family_set,
                      parametric_method,
                      nonparametric_method,
@@ -101,6 +106,7 @@ inline FitControlsVinecop::FitControlsVinecop(
   set_select_families(select_families);
   set_show_trace(show_trace);
   set_mst_algorithm(mst_algorithm);
+  set_seeds(seeds);
 }
 
 //! @brief Instantiates custom controls for fitting vine copula models.
@@ -121,6 +127,9 @@ inline FitControlsVinecop::FitControlsVinecop(
 //! @param mst_algorithm The algorithm for building the maximum spanning
 //!     tree (`"prim"`, `"kruskal"`, or `"random"`) during the 
 //!     tree-wise structure selection.
+//! @param seeds A vector of random seeds for the random number generator
+//!     for parts of the algorithm that are randomized (e.g.,
+//!     random tree selection).
 inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
                                               size_t trunc_lvl,
                                               std::string tree_criterion,
@@ -129,7 +138,8 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
                                               bool select_threshold,
                                               bool select_families,
                                               bool show_trace,
-                                              std::string mst_algorithm)
+                                              std::string mst_algorithm,
+                                              std::vector<int> seeds)
   : FitControlsBicop(controls)
 {
   set_trunc_lvl(trunc_lvl);
@@ -140,6 +150,7 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
   set_select_families(select_families);
   set_show_trace(show_trace);
   set_mst_algorithm(mst_algorithm);
+  set_seeds(seeds);
 }
 
 //! @brief Instantiates the controls from a configuration object.
@@ -170,6 +181,9 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsConfig& config)
   }
   if (optional::has_value(config.mst_algorithm)) {
     set_mst_algorithm(optional::value(config.mst_algorithm));
+  }
+  if (optional::has_value(config.seeds)) {
+    set_seeds(optional::value(config.seeds));
   }
 }
 
@@ -297,6 +311,20 @@ FitControlsVinecop::get_mst_algorithm() const
   return mst_algorithm_;
 }
 
+//! @brief Gets the random seeds for the random number generator.
+inline std::vector<int>
+FitControlsVinecop::get_seeds() const
+{
+  return seeds_;
+}
+
+//! @brief Gets the random number generator.
+inline boost::random::mt19937
+FitControlsVinecop::get_rng() const
+{
+  return rng_;
+}
+
 //! @brief Sets whether to select the threshold automatically.
 inline void
 FitControlsVinecop::set_select_threshold(bool select_threshold)
@@ -343,6 +371,22 @@ FitControlsVinecop::set_mst_algorithm(std::string mst_algorithm)
     throw std::runtime_error("mst_algorithm must be one of 'prim', 'kruskal', or 'random'");
   }
   mst_algorithm_ = mst_algorithm;
+}
+
+//! @brief Sets the random seeds for the random number generator.
+inline void
+FitControlsVinecop::set_seeds(std::vector<int> seeds)
+{
+  if (seeds.size() == 0) {
+    // no seeds provided, seed randomly
+    std::random_device rd{};
+    seeds = std::vector<int>(5);
+    std::generate(
+      seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
+  }
+  seeds_ = seeds;
+  boost::random::seed_seq seq(seeds.begin(), seeds.end());
+  rng_.seed(seq);
 }
 
 //! @}

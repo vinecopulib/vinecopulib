@@ -924,7 +924,7 @@ VinecopSelector::min_spanning_tree(VineTree& graph)
   } else {
     size_t d = num_vertices(graph);
     std::vector<size_t> predecessors(d);
-    boost::mt19937 gen;
+    boost::mt19937 gen = controls_.get_rng();
 
     // Here we inverse the weights to get a spanning tree
     // with probability proportional to the product of the weights
