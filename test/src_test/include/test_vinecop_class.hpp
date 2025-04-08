@@ -565,9 +565,9 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
   // check whether the same structure appears if we only allow for
   // independence (pair-copula estimates differ otherwise)
   FitControlsVinecop controls({ BicopFamily::indep });
-  EXPECT_EQ(controls.get_mst_algorithm(), "prim");
-  EXPECT_ANY_THROW(controls.set_mst_algorithm("foobar"));
-  controls.set_mst_algorithm("kruskal");
+  EXPECT_EQ(controls.get_tree_algorithm(), "mst_prim");
+  EXPECT_ANY_THROW(controls.set_tree_algorithm("foobar"));
+  controls.set_tree_algorithm("mst_kruskal");
 
   // select structure and get matrix
   Vinecop fit(7);
@@ -582,8 +582,11 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
 TEST_F(VinecopTest, select_finds_different_structures_random)
 {
   // Initialize the controls
-  FitControlsVinecop controls({ BicopFamily::indep });
-  controls.set_mst_algorithm("random");
+  FitControlsVinecop controls_weighted({ BicopFamily::indep });
+  controls_weighted.set_tree_algorithm("random_weighted");
+
+  FitControlsVinecop controls_unweighted({ BicopFamily::indep });
+  controls_unweighted.set_tree_algorithm("random_weighted");
 
   // For reseeding the random number generator
   std::random_device rd;
@@ -601,21 +604,30 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
     // Seed controls randomly for each test run
     std::generate(
       seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
-    controls.set_seeds(seeds);
+    controls_weighted.set_seeds(seeds);
+    controls_unweighted.set_seeds(seeds);
 
     // Check RNG output changes
-    auto rng_sample = controls.get_rng()(); // Get first sample
-    first_rng_outputs.insert(rng_sample);
+    auto rng_sample_weighted = controls_weighted.get_rng()(); // Get first sample
+    first_rng_outputs.insert(rng_sample_weighted);
 
-    // Select a random structure
-    Vinecop fit(u, RVineStructure(), {}, controls);
-    auto struct_array = fit.get_struct_array();
-    unique_structures.insert(struct_array);
+    auto rng_sample_unweighted = controls_unweighted.get_rng()(); // Get first sample
+    first_rng_outputs.insert(rng_sample_unweighted);
+
+    // Select a random structure for the weighted method
+    Vinecop fit_weighted(u, RVineStructure(), {}, controls_weighted);
+    auto struct_array_weighted = fit_weighted.get_struct_array();
+    unique_structures.insert(struct_array_weighted);
+
+    // Select a random structure for the unweighted method
+    Vinecop fit_unweighted(u, RVineStructure(), {}, controls_unweighted);
+    auto struct_array_unweighted = fit_unweighted.get_struct_array();
+    unique_structures.insert(struct_array_unweighted);
   }
 
   // The probability that any 2 samples are the same by chance is very low
   EXPECT_EQ(first_rng_outputs.size(), num_trials);
-  EXPECT_EQ(unique_structures.size(), num_trials);
+  EXPECT_EQ(unique_structures.size(), 2 * num_trials);
 }
 
 TEST_F(VinecopTest, fixed_truncation)
