@@ -582,10 +582,10 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
 TEST_F(VinecopTest, select_finds_different_structures_random)
 {
   // Initialize the controls
-  FitControlsVinecop controls_weighted({ BicopFamily::indep });
+  FitControlsVinecop controls_weighted({ BicopFamily::tll });
   controls_weighted.set_tree_algorithm("random_weighted");
 
-  FitControlsVinecop controls_unweighted({ BicopFamily::indep });
+  FitControlsVinecop controls_unweighted({ BicopFamily::tll });
   controls_unweighted.set_tree_algorithm("random_unweighted");
 
   // For reseeding the random number generator
@@ -627,7 +627,7 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
 
   // The probability that any 2 samples are the same by chance is very low
   EXPECT_EQ(first_rng_outputs.size(), num_trials);
-  EXPECT_EQ(unique_structures.size(), 2 * num_trials - 1);
+  EXPECT_EQ(unique_structures.size(), 2 * num_trials);
 }
 
 TEST_F(VinecopTest, fixed_truncation)
