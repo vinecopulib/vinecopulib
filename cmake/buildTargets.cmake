@@ -3,14 +3,26 @@ if (VINECOPULIB_SHARED_LIB)
     target_include_directories(vinecopulib PRIVATE ${vinecopulib_includes})
     set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
     set_target_properties(vinecopulib PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
-    target_link_libraries(vinecopulib PUBLIC Eigen3::Eigen wdm Boost::boost ${CMAKE_THREAD_LIBS_INIT})
-    # non windows
+    target_link_libraries(vinecopulib
+        PUBLIC
+            Eigen3::Eigen
+            wdm
+            ${VINECOPULIB_BOOST_COMPONENTS}
+            ${CMAKE_THREAD_LIBS_INIT}
+    )
+
     if (NOT WIN32)
-        target_compile_options(vinecopulib PRIVATE -Wno-maybe-uninitialized) # Boost triggers this warning in strict mode
+        target_compile_options(vinecopulib PRIVATE -Wno-maybe-uninitialized)
     endif()
 else()
     add_library(vinecopulib INTERFACE)
-    target_link_libraries(vinecopulib INTERFACE Eigen3::Eigen wdm Boost::boost ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(vinecopulib
+        INTERFACE
+            Eigen3::Eigen
+            wdm
+            ${VINECOPULIB_BOOST_COMPONENTS}
+            ${CMAKE_THREAD_LIBS_INIT}
+    )
 endif()
 
 target_include_directories(vinecopulib INTERFACE $<BUILD_INTERFACE:${vinecopulib_includes}>)
