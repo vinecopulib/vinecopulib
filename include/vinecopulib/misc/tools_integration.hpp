@@ -9,10 +9,12 @@
 // interface specfifc #defines can be set here
 // (R package does: #define INTERFACED_FROM_R)
 
+#ifndef INTERFACED_FROM_R
 // Suppress compiler warnings caused by boost/odeint internals
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #endif
 
 // replace std::sprintf by void function
@@ -32,8 +34,10 @@ _sprintf_do_nothing(char*, const char*, ...)
 #include <boost/numeric/odeint.hpp>
 #undef sprintf
 
+#ifndef INTERFACED_FROM_R
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic pop
+#endif
 #endif
 
 #include <functional>
