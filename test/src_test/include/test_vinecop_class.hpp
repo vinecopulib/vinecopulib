@@ -392,7 +392,7 @@ TEST_F(VinecopTest, aic_bic_are_correct)
   complex_model.select(data);
   ASSERT_NEAR(complex_model.get_aic(), complex_model.aic(data), 1e-2);
   ASSERT_NEAR(complex_model.get_bic(), complex_model.bic(data), 1e-2);
-} 
+}
 
 TEST_F(VinecopTest, fit_parameters_is_correct)
 {
@@ -565,9 +565,9 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
   // check whether the same structure appears if we only allow for
   // independence (pair-copula estimates differ otherwise)
   FitControlsVinecop controls({ BicopFamily::indep });
-  EXPECT_EQ(controls.get_mst_algorithm(), "prim");
-  EXPECT_ANY_THROW(controls.set_mst_algorithm("foobar"));
-  controls.set_mst_algorithm("kruskal");
+  EXPECT_EQ(controls.get_tree_algorithm(), "mst_prim");
+  EXPECT_ANY_THROW(controls.set_tree_algorithm("foobar"));
+  controls.set_tree_algorithm("mst_kruskal");
 
   // select structure and get matrix
   Vinecop fit(7);
@@ -577,6 +577,59 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
   // check if the same conditioned sets appear for each tree
   size_t pairs_unequal = get_pairs_unequal(vc_matrix, vcl_matrix, 6);
   EXPECT_EQ(pairs_unequal, 0);
+}
+
+TEST_F(VinecopTest, select_finds_different_structures_random)
+{
+  // Initialize the controls
+  FitControlsVinecop controls_weighted({ BicopFamily::tll });
+  controls_weighted.set_tree_algorithm("random_weighted");
+
+  FitControlsVinecop controls_unweighted({ BicopFamily::tll });
+  controls_unweighted.set_tree_algorithm("random_unweighted");
+
+  // For reseeding the random number generator
+  std::random_device rd;
+  std::vector<int> seeds(20);
+
+  // To store the unique structures
+  std::set<TriangularArray<size_t>> unique_structures_weighted;
+  std::set<TriangularArray<size_t>> unique_structures_unweighted;
+
+  // To store the first RNG value after each reseeding
+  std::set<uint32_t> first_rng_outputs;
+
+  const size_t num_trials = 10;
+
+  for (size_t i = 0; i < num_trials; ++i) {
+    // Seed controls randomly for each test run
+    std::generate(
+      seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
+    controls_weighted.set_seeds(seeds);
+    controls_unweighted.set_seeds(seeds);
+
+    // Check RNG output changes
+    auto rng_sample_weighted = controls_weighted.get_rng()(); // Get first sample
+    first_rng_outputs.insert(rng_sample_weighted);
+
+    auto rng_sample_unweighted = controls_unweighted.get_rng()(); // Get first sample
+    first_rng_outputs.insert(rng_sample_unweighted);
+
+    // Select a random structure for the weighted method
+    Vinecop fit_weighted(u, RVineStructure(), {}, controls_weighted);
+    auto struct_array_weighted = fit_weighted.get_struct_array();
+    unique_structures_weighted.insert(struct_array_weighted);
+
+    // Select a random structure for the unweighted method
+    Vinecop fit_unweighted(u, RVineStructure(), {}, controls_unweighted);
+    auto struct_array_unweighted = fit_unweighted.get_struct_array();
+    unique_structures_unweighted.insert(struct_array_unweighted);
+  }
+
+  // The probability that any 2 samples are the same by chance is very low
+  EXPECT_EQ(first_rng_outputs.size(), num_trials);
+  EXPECT_EQ(unique_structures_weighted.size(), num_trials);
+  EXPECT_EQ(unique_structures_unweighted.size(), num_trials);
 }
 
 TEST_F(VinecopTest, fixed_truncation)

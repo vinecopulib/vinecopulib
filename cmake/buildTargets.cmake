@@ -13,6 +13,7 @@ else()
     target_link_libraries(vinecopulib INTERFACE Eigen3::Eigen wdm Boost::boost ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
+target_compile_definitions(vinecopulib INTERFACE ${VINECOPULIB_DEFINITIONS}) 
 target_include_directories(vinecopulib INTERFACE $<BUILD_INTERFACE:${vinecopulib_includes}>)
 target_include_directories (vinecopulib INTERFACE $<INSTALL_INTERFACE:include>)
 
