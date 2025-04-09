@@ -363,37 +363,35 @@ VinecopSelector::add_allowed_edges(VineTree& vine_tree)
 {
   std::string tree_criterion = controls_.get_tree_criterion();
   if (structure_unknown_) {
-    std::vector<std::tuple<size_t, size_t, EdgeIterator>> edge_list;
-
+    std::vector<std::pair<size_t, size_t>> edge_list;
     for (size_t v0 = 0; v0 < num_vertices(vine_tree); ++v0) {
       tools_interface::check_user_interrupt(v0 % 50 == 0);
       for (size_t v1 = 0; v1 < v0; ++v1) {
         if (find_common_neighbor(v0, v1, vine_tree) > -1) {
-          auto e = boost::add_edge(v0, v1, vine_tree).first;
-          edge_list.emplace_back(v0, v1, e);
+          boost::add_edge(v0, v1, vine_tree);
+          edge_list.emplace_back(v0, v1); // ordering preserved
         }
       }
     }
 
     std::mutex m;
     double threshold = controls_.get_threshold();
-    auto process_edge =
-      [&](const std::tuple<size_t, size_t, EdgeIterator>& entry) {
-        size_t v0, v1;
-        EdgeIterator e;
-        std::tie(v0, v1, e) = entry;
+    auto process_edge = [&](const std::pair<size_t, size_t>& entry) {
+      size_t v0 = entry.first;
+      size_t v1 = entry.second;
 
-        auto pc_data = get_pc_data(v0, v1, vine_tree);
-        double crit =
-          calculate_criterion(pc_data, tree_criterion, controls_.get_weights());
-        double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
+      auto pc_data = get_pc_data(v0, v1, vine_tree);
+      double crit =
+        calculate_criterion(pc_data, tree_criterion, controls_.get_weights());
+      double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
 
-        {
-          std::lock_guard<std::mutex> lk(m);
-          vine_tree[e].weight = w;
-          vine_tree[e].crit = crit;
-        }
-      };
+      {
+        std::lock_guard<std::mutex> lk(m);
+        auto e = boost::edge(v0, v1, vine_tree).first;
+        vine_tree[e].weight = w;
+        vine_tree[e].crit = crit;
+      }
+    };
 
     pool_.map(process_edge, edge_list);
     pool_.wait();
