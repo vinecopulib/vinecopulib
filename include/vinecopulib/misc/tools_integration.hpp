@@ -6,6 +6,9 @@
 
 #pragma once
 
+// interface specfifc #defines can be set here
+// (R package does: #define INTERFACED_FROM_R)
+
 // Suppress compiler warnings caused by boost/odeint internals
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
