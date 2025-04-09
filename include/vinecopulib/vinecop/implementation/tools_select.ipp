@@ -388,6 +388,7 @@ VinecopSelector::add_allowed_edges(VineTree& vine_tree)
       {
         std::lock_guard<std::mutex> lk(m);
         auto e = boost::edge(v0, v1, vine_tree).first;
+        put(boost::edge_weight, vine_tree, e, w);
         vine_tree[e].weight = w;
         vine_tree[e].crit = crit;
       }
