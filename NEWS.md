@@ -13,6 +13,11 @@
   `tree_algorithm` in `FitControlsVinecop` with `"random_weighted"` or `"random_unweighted"`
   (#637).
 
+### BUG FIXES
+
+* Decouple edge insertion from criterion computation in `VinecopSelector` to fix randomness
+  issues in structure selection when using multiple threads (#640)
+
 ## vinecopulib 0.7.2 (March 7, 2025)
 
 ### BUG FIXES
