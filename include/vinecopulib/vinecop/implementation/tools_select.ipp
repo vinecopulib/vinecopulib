@@ -363,29 +363,39 @@ VinecopSelector::add_allowed_edges(VineTree& vine_tree)
 {
   std::string tree_criterion = controls_.get_tree_criterion();
   if (structure_unknown_) {
-    double threshold = controls_.get_threshold();
-    std::mutex m;
-    auto add_edge = [&](size_t v0) {
+    std::vector<std::tuple<size_t, size_t, EdgeIterator>> edge_list;
+
+    for (size_t v0 = 0; v0 < num_vertices(vine_tree); ++v0) {
       tools_interface::check_user_interrupt(v0 % 50 == 0);
       for (size_t v1 = 0; v1 < v0; ++v1) {
-        // check proximity condition: common neighbor in previous tree
-        // (-1 means 'no common neighbor')
         if (find_common_neighbor(v0, v1, vine_tree) > -1) {
-          auto pc_data = get_pc_data(v0, v1, vine_tree);
-          double crit = calculate_criterion(
-            pc_data, tree_criterion, controls_.get_weights());
-          double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
-          {
-            std::lock_guard<std::mutex> lk(m);
-            auto e = boost::add_edge(v0, v1, w, vine_tree).first;
-            vine_tree[e].weight = w;
-            vine_tree[e].crit = crit;
-          }
+          auto e = boost::add_edge(v0, v1, vine_tree).first;
+          edge_list.emplace_back(v0, v1, e);
         }
       }
-    };
+    }
 
-    pool_.map(add_edge, boost::vertices(vine_tree));
+    std::mutex m;
+    double threshold = controls_.get_threshold();
+    auto process_edge =
+      [&](const std::tuple<size_t, size_t, EdgeIterator>& entry) {
+        size_t v0, v1;
+        EdgeIterator e;
+        std::tie(v0, v1, e) = entry;
+
+        auto pc_data = get_pc_data(v0, v1, vine_tree);
+        double crit =
+          calculate_criterion(pc_data, tree_criterion, controls_.get_weights());
+        double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
+
+        {
+          std::lock_guard<std::mutex> lk(m);
+          vine_tree[e].weight = w;
+          vine_tree[e].crit = crit;
+        }
+      };
+
+    pool_.map(process_edge, edge_list);
     pool_.wait();
   } else {
     size_t tree = d_ - boost::num_vertices(vine_tree);
