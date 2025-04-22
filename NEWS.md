@@ -1,4 +1,4 @@
-## vinecopulib 0.7.3 (XXX YYY, 2025)
+## vinecopulib 0.7.3 (April 22, 2025)
 
 ### BREAKING API CHANGES
 
