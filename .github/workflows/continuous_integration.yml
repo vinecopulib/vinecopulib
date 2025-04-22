@@ -79,12 +79,12 @@ jobs:
         run:   |
           mkdir release && cd release
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
             make && sudo make install
             bin/test_all
           else
             cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
-            -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON
+            -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
             cmake --build . --config Release
             "bin/Release/test_all.exe"
             cmake --build . --config Release --target install
