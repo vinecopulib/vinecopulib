@@ -6,6 +6,8 @@
   allow for alternative spanning tree algorithms (#637).
 * `tree_algorithm`'s default value is now `"mst_prim"` instead of `"prim"`, and `"mst_kruskal"`
   replaces `"kruskal"` (#637).
+* The CMake option `VINECOPULIB_BUILD_SHARED_LIBS` has been changed to `VINECOPULIB_PRECOMPILED`
+  to better reflect its purpose (#641).
 
 ### NEW FEATURES
 
