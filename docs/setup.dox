@@ -71,14 +71,14 @@ sudo make install && bin/test_all
 
 Alternatively, we provide an option to precompile compiled the library in
 order to save building time (and memory) via the CMake option
-`VINECOPULIB_SHARED_LIB`. In this case, source files are generated from header
+`VINECOPULIB_PRECOMPILED`. In this case, source files are generated from header
 files and the CMake build system additionally allows to install the
 .dylib/.so/.dll object.
 
 The unix one liner (from the root folder):
 
 ```
-mkdir build && cd build && cmake .. -DVINECOPULIB_SHARED_LIB=ON && make &&
+mkdir build && cd build && cmake .. -DVINECOPULIB_PRECOMPILED=ON && make &&
 make doc && sudo make install && bin/test_all
 ```
 
@@ -86,7 +86,7 @@ make doc && sudo make install && bin/test_all
 |-----------------------|------------------------------------|
 | Create a build folder  | `mkdir build` |
 | Move to the created folder  | `cd build` |
-| Create the `MakeFile` via cmake  |  `cmake .. ` (or `cmake .. -DVINECOPULIB_SHARED_LIB=ON` for the compiled version)  |
+| Create the `MakeFile` via cmake  |  `cmake .. ` (or `cmake .. -DVINECOPULIB_PRECOMPILED=ON` for the compiled version)  |
 | Compile the library | `make` or `make -j n` where `n` is the number of cores |
 | Build the documentation (optional)  | `make doc` |
 | Install the library on linux/OSX (optional)  | `sudo make install` |
@@ -113,7 +113,7 @@ cmake --build . --target install
 ```
 Instead of the `cmake --build` commands, the generated `vinecopulib.sln` file can be open in the Visual Studio GUI. Furthermore,
 as for linux systems, the third line can be replaced by
-`cmake .. -DVINECOPULIB_SHARED_LIB=ON` to generate the source files in order
+`cmake .. -DVINECOPULIB_PRECOMPILED=ON` to generate the source files in order
 to compile vinecopulib in non-header-only mode.
 
 The following CMake flags (given with example values) will likely come handy:
@@ -135,7 +135,7 @@ Using `make install`, vinecopulib is installed in the usual location of the
 system, namely
 
 - `<prefix>/include/` (for the headers),
-- `<prefix>/lib/` (for the shared library when `VINECOPULIB_SHARED_LIB=ON` is used),
+- `<prefix>/lib/` (for the shared library when `VINECOPULIB_PRECOMPILED=ON` is used),
 - `<prefix>/lib/cmake/vinecopulib` (to allow cmake to find the library
 with `find_package`),
 
