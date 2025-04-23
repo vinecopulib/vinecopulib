@@ -1,4 +1,4 @@
-if (VINECOPULIB_SHARED_LIB)
+if (VINECOPULIB_PRECOMPILED)
     add_library(vinecopulib ${vinecopulib_sources})
     target_include_directories(vinecopulib PRIVATE ${vinecopulib_includes})
     set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -13,6 +13,7 @@ else()
     target_link_libraries(vinecopulib INTERFACE Eigen3::Eigen wdm Boost::boost ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
+target_compile_definitions(vinecopulib INTERFACE ${VINECOPULIB_DEFINITIONS}) 
 target_include_directories(vinecopulib INTERFACE $<BUILD_INTERFACE:${vinecopulib_includes}>)
 target_include_directories (vinecopulib INTERFACE $<INSTALL_INTERFACE:include>)
 
@@ -79,7 +80,7 @@ configure_package_config_file(
 
 # Targets:
 #   * <prefix>/lib/libvinecopulib.dylib
-if (VINECOPULIB_SHARED_LIB)
+if (VINECOPULIB_PRECOMPILED)
     install(TARGETS vinecopulib
             EXPORT "${targets_export_name}"
             LIBRARY DESTINATION "lib"
@@ -118,7 +119,7 @@ install(
         FILES ${misc_hpp}
         DESTINATION "${include_install_dir}/vinecopulib/misc"
 )
-if (NOT VINECOPULIB_SHARED_LIB)
+if (NOT VINECOPULIB_PRECOMPILED)
     install(
             FILES ${vinecopulib_bicop_ipp}
             DESTINATION "${include_install_dir}/vinecopulib/bicop/implementation"

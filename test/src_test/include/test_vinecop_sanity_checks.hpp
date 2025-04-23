@@ -70,7 +70,9 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
   controls.set_select_trunc_lvl(true);
   controls.set_select_families(false);
   controls.set_show_trace(true);
-  controls.set_mst_algorithm("kruskal");
+  controls.set_tree_algorithm("mst_kruskal");
+  std::vector<int> seeds = { 1, 2, 3, 4, 5 };
+  controls.set_seeds(seeds);
 
   // Create a config object from the controls
   FitControlsConfig config;
@@ -82,7 +84,8 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
   config.select_families = controls.get_select_families();
   config.show_trace = controls.get_show_trace();
   config.num_threads = controls.get_num_threads();
-  config.mst_algorithm = controls.get_mst_algorithm();
+  config.tree_algorithm = controls.get_tree_algorithm();
+  config.seeds = controls.get_seeds();
 
   // Create and test new controls from the config object
   FitControlsVinecop controls2(config);
@@ -94,7 +97,8 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
   EXPECT_EQ(controls.get_select_families(), controls2.get_select_families());
   EXPECT_EQ(controls.get_show_trace(), controls2.get_show_trace());
   EXPECT_EQ(controls.get_num_threads(), controls2.get_num_threads());
-  EXPECT_EQ(controls.get_mst_algorithm(), controls2.get_mst_algorithm());
+  EXPECT_EQ(controls.get_tree_algorithm(), controls2.get_tree_algorithm());
+  EXPECT_EQ(controls.get_seeds(), controls2.get_seeds());
 }
 
 TEST(vinecop_sanity_checks, controls_check)
