@@ -72,6 +72,115 @@ TEST(rvine_structure, triangular_array_works)
   EXPECT_FALSE(ta4 < ta3);
 }
 
+TEST(rvine_structure, rvine_trees_works)
+{
+  TriangularArray<size_t> struct_array({ { 5, 2, 6, 6, 6, 6 },
+                                         { 6, 6, 1, 2, 5 },
+                                         { 2, 5, 2, 5 },
+                                         { 1, 1, 5 },
+                                         { 3, 7 },
+                                         { 7 } });
+
+  std::vector<size_t> order = { 4, 3, 7, 1, 2, 5, 6 };
+  EXPECT_NO_THROW(RVineTrees(order, struct_array));
+
+  RVineTrees rvt(order, struct_array);
+  EXPECT_NO_THROW(rvt.to_struct_array());
+
+  auto my_rvt = rvt.to_struct_array();
+  EXPECT_EQ(order, std::get<0>(my_rvt));
+  EXPECT_EQ(struct_array, std::get<1>(my_rvt));
+
+  RVineStructure rvs(order, struct_array);
+  EXPECT_NO_THROW(RVineStructure rvs2(rvt));
+  EXPECT_EQ(rvs, RVineStructure(rvt));
+  EXPECT_NO_THROW(RVineStructure rvs3(rvt, false));
+
+  // Truncated vine test (truncate at level 3)
+  size_t trunc_lvl = 3;
+  TriangularArray<size_t> truncated_array(struct_array);
+  truncated_array.truncate(trunc_lvl);
+  RVineStructure rvs_trunc(order, truncated_array);
+
+  EXPECT_NO_THROW(RVineTrees(order, truncated_array));
+  RVineTrees rvt_trunc(order, truncated_array);
+  auto my_rvt_trunc = rvt_trunc.to_struct_array();
+  EXPECT_EQ(order, std::get<0>(my_rvt_trunc));
+  EXPECT_EQ(truncated_array, std::get<1>(my_rvt_trunc));
+  EXPECT_NO_THROW(RVineStructure rvs_trunc(rvt_trunc));
+  EXPECT_EQ(rvs_trunc, RVineStructure(rvt_trunc));
+}
+
+TEST(rvine_structure, rvine_trees_sanity_checks)
+{
+  // throws_on_dimension_mismatch)
+  std::vector<size_t> order = { 1, 2, 3, 4 };
+  TriangularArray<size_t> struct_array1({ { 2, 3 }, { 1 } });
+
+  EXPECT_THROW(RVineTrees rvt1(order, struct_array1), std::runtime_error);
+
+  // throws_on_missing_vars_in_first_tree
+  TriangularArray<size_t> struct_array2(
+    { { 2, 3, 3 }, // edge (1,2), (2,3), (3,3) -- missing variable 4 if d=4
+      { 4, 1 },
+      { 2 } });
+
+  RVineTrees rvt2(order, struct_array2);
+  EXPECT_THROW(rvt2.to_struct_array(), std::runtime_error);
+
+
+  // throws_on_proximity_condition)
+  TriangularArray<size_t> struct_array3({ { 2, 3, 4 }, { 5, 1 }, { 6 } });
+
+  RVineTrees rvt3(order, struct_array3);
+  EXPECT_THROW(rvt3.to_struct_array(), std::runtime_error);
+}
+
+TEST(rvine_structure, rvine_trees_merge_constructor_works)
+{
+  // Define two simple vines on variables {1, 2, 3, 4} and {5, 6, 7, 8}
+  TriangularArray<size_t> arr1({ {2, 3, 4}, {3, 4}, {4} });
+  std::vector<size_t> order1 = {1, 2, 3, 4};
+
+  TriangularArray<size_t> arr2({ {6, 7, 8}, {7, 8}, {8} });
+  std::vector<size_t> order2 = {5, 6, 7, 8};
+
+  RVineTrees vine1(order1, arr1);
+  RVineTrees vine2(order2, arr2);
+
+  std::vector<RVineTrees> vines = {vine1, vine2};
+
+  // Should not throw
+  EXPECT_NO_THROW(RVineTrees merged(vines));
+
+  RVineTrees merged(vines);
+
+  // The merged structure has twice as many edges per tree (2x each tree)
+  auto merged_trees = merged.get_trees();
+  for (size_t t = 0; t < merged_trees.size(); ++t) {
+    EXPECT_EQ(merged_trees[t].size(), 2 * vine1.get_trees()[t].size());
+  }
+  EXPECT_THROW(
+    merged.to_struct_array(), std::runtime_error); // not a valid structure
+
+  EXPECT_NO_THROW(
+    merged.to_struct_array(true)); // valid structure with fill_missing = true
+
+  auto merged_struct = merged.to_struct_array(true);
+  auto merged_order = std::get<0>(merged_struct);
+  auto merged_struct_array = std::get<1>(merged_struct);
+  EXPECT_NO_THROW(
+    RVineStructure merged_rvine(merged_order, merged_struct_array));
+
+  std::vector<RVineTrees> empty_list;
+  EXPECT_THROW(RVineTrees merged(empty_list), std::runtime_error);
+
+  RVineTrees empty_vine;
+  vines.push_back(empty_vine);
+  EXPECT_THROW(RVineTrees merged(vines), std::runtime_error);
+}
+
+
 TEST(rvine_structure, rvine_structure_print)
 {
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);

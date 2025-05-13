@@ -10,6 +10,7 @@
 #include <limits>
 #include <vinecopulib/misc/nlohmann_json.hpp>
 #include <vinecopulib/misc/triangular_array.hpp>
+#include <vinecopulib/vinecop/rvine_trees.hpp>
 
 namespace vinecopulib {
 
@@ -100,6 +101,9 @@ public:
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat,
     bool check = true);
   explicit RVineStructure(
+    const RVineTrees& trees,
+    bool check = true);
+  explicit RVineStructure(
     const std::vector<size_t>& order,
     const size_t& trunc_lvl = std::numeric_limits<size_t>::max(),
     bool check = true);
@@ -110,6 +114,8 @@ public:
   explicit RVineStructure(const std::string& filename, const bool check = true);
   explicit RVineStructure(const nlohmann::json& input, const bool check = true);
 
+
+  bool operator==(const RVineStructure& rhs) const;
   nlohmann::json to_json() const;
   void to_file(const std::string& filename) const;
 
@@ -121,6 +127,7 @@ public:
   TriangularArray<short unsigned> get_needed_hfunc1() const;
   TriangularArray<short unsigned> get_needed_hfunc2() const;
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> get_matrix() const;
+  RVineTrees get_trees() const;
 
   size_t struct_array(size_t tree,
                       size_t edge,
@@ -135,6 +142,7 @@ public:
   static RVineStructure simulate(size_t d,
                                  bool natural_order = false,
                                  std::vector<int> seeds = std::vector<int>());
+  
 
 protected:
   size_t find_trunc_lvl(
