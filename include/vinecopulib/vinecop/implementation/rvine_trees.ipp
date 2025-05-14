@@ -66,22 +66,22 @@ RVineTrees::to_struct_array(bool fill_missing) const
     AugmentedTree& tree = augmented[t - 1];
 
     Edge edge;
-    size_t a, b;
-    std::set<size_t> check_set;
+    size_t a, b, diag, offdiag, node1, node2;
+    std::set<size_t> check_set, C, all_indices;
     for (typename std::vector<std::tuple<size_t, size_t, Edge>>::iterator it =
            tree.edges.begin();
          it != tree.edges.end();
          ++it) {
-      size_t node1 = std::get<0>(*it);
-      size_t node2 = std::get<1>(*it);
+      node1 = std::get<0>(*it);
+      node2 = std::get<1>(*it);
 
       if (tree.degrees[node1] == 1 || tree.degrees[node2] == 1) {
         edge = std::get<2>(*it);
         a = std::get<0>(edge);
         b = std::get<1>(edge);
         check_set = std::get<2>(edge);
-        size_t diag = (tree.degrees[node1] == 1) ? a : b;
-        size_t offdiag = (diag == a) ? b : a;
+        diag = (tree.degrees[node1] == 1) ? a : b;
+        offdiag = (diag == a) ? b : a;
         struct_array(t - 1, col) = offdiag;
         order[col] = diag;
         tree.degrees[node1]--;
@@ -100,14 +100,14 @@ RVineTrees::to_struct_array(bool fill_missing) const
              ltree.edges.begin();
            it != ltree.edges.end();
            ++it) {
-        size_t node1 = std::get<0>(*it);
-        size_t node2 = std::get<1>(*it);
-        Edge edge = std::get<2>(*it);
-        size_t a = std::get<0>(edge);
-        size_t b = std::get<1>(edge);
-        std::set<size_t> C = std::get<2>(edge);
+        node1 = std::get<0>(*it);
+        node2 = std::get<1>(*it);
+        edge = std::get<2>(*it);
+        a = std::get<0>(edge);
+        b = std::get<1>(edge);
+        C = std::get<2>(edge);
 
-        std::set<size_t> all_indices = C;
+        all_indices = C;
         all_indices.insert(a);
         all_indices.insert(b);
 

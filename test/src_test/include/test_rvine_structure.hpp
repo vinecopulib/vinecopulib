@@ -107,7 +107,7 @@ TEST(rvine_structure, rvine_trees_works)
   auto my_rvt_trunc = rvt_trunc.to_struct_array();
   EXPECT_EQ(order, std::get<0>(my_rvt_trunc));
   EXPECT_EQ(truncated_array, std::get<1>(my_rvt_trunc));
-  EXPECT_NO_THROW(RVineStructure rvs_trunc(rvt_trunc));
+  EXPECT_NO_THROW(RVineStructure rvs_trunc2(rvt_trunc));
   EXPECT_EQ(rvs_trunc, RVineStructure(rvt_trunc));
 }
 
@@ -117,7 +117,7 @@ TEST(rvine_structure, rvine_trees_sanity_checks)
   std::vector<size_t> order = { 1, 2, 3, 4 };
   TriangularArray<size_t> struct_array1({ { 2, 3 }, { 1 } });
 
-  EXPECT_THROW(RVineTrees rvt1(order, struct_array1), std::runtime_error);
+  EXPECT_THROW(RVineTrees(order, struct_array1), std::runtime_error);
 
   // throws_on_missing_vars_in_first_tree
   TriangularArray<size_t> struct_array2(
@@ -127,7 +127,6 @@ TEST(rvine_structure, rvine_trees_sanity_checks)
 
   RVineTrees rvt2(order, struct_array2);
   EXPECT_THROW(rvt2.to_struct_array(), std::runtime_error);
-
 
   // throws_on_proximity_condition)
   TriangularArray<size_t> struct_array3({ { 2, 3, 4 }, { 5, 1 }, { 6 } });
@@ -139,19 +138,19 @@ TEST(rvine_structure, rvine_trees_sanity_checks)
 TEST(rvine_structure, rvine_trees_merge_constructor_works)
 {
   // Define two simple vines on variables {1, 2, 3, 4} and {5, 6, 7, 8}
-  TriangularArray<size_t> arr1({ {2, 3, 4}, {3, 4}, {4} });
-  std::vector<size_t> order1 = {1, 2, 3, 4};
+  TriangularArray<size_t> arr1({ { 2, 3, 4 }, { 3, 4 }, { 4 } });
+  std::vector<size_t> order1 = { 1, 2, 3, 4 };
 
-  TriangularArray<size_t> arr2({ {6, 7, 8}, {7, 8}, {8} });
-  std::vector<size_t> order2 = {5, 6, 7, 8};
+  TriangularArray<size_t> arr2({ { 6, 7, 8 }, { 7, 8 }, { 8 } });
+  std::vector<size_t> order2 = { 5, 6, 7, 8 };
 
   RVineTrees vine1(order1, arr1);
   RVineTrees vine2(order2, arr2);
 
-  std::vector<RVineTrees> vines = {vine1, vine2};
+  std::vector<RVineTrees> vines = { vine1, vine2 };
 
   // Should not throw
-  EXPECT_NO_THROW(RVineTrees merged(vines));
+  EXPECT_NO_THROW(RVineTrees merged_tmp(vines));
 
   RVineTrees merged(vines);
 
@@ -160,8 +159,8 @@ TEST(rvine_structure, rvine_trees_merge_constructor_works)
   for (size_t t = 0; t < merged_trees.size(); ++t) {
     EXPECT_EQ(merged_trees[t].size(), 2 * vine1.get_trees()[t].size());
   }
-  EXPECT_THROW(
-    merged.to_struct_array(), std::runtime_error); // not a valid structure
+  EXPECT_THROW(merged.to_struct_array(),
+               std::runtime_error); // not a valid structure
 
   EXPECT_NO_THROW(
     merged.to_struct_array(true)); // valid structure with fill_missing = true
@@ -169,17 +168,15 @@ TEST(rvine_structure, rvine_trees_merge_constructor_works)
   auto merged_struct = merged.to_struct_array(true);
   auto merged_order = std::get<0>(merged_struct);
   auto merged_struct_array = std::get<1>(merged_struct);
-  EXPECT_NO_THROW(
-    RVineStructure merged_rvine(merged_order, merged_struct_array));
+  EXPECT_NO_THROW(RVineStructure(merged_order, merged_struct_array));
 
   std::vector<RVineTrees> empty_list;
-  EXPECT_THROW(RVineTrees merged(empty_list), std::runtime_error);
+  EXPECT_THROW(RVineTrees empty_tmp(empty_list), std::runtime_error);
 
   RVineTrees empty_vine;
   vines.push_back(empty_vine);
-  EXPECT_THROW(RVineTrees merged(vines), std::runtime_error);
+  EXPECT_THROW(RVineTrees empty_tmp2(vines), std::runtime_error);
 }
-
 
 TEST(rvine_structure, rvine_structure_print)
 {
