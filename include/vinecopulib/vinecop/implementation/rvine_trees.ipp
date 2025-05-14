@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <vinecopulib/misc/tools_stl.hpp>
-
 namespace vinecopulib {
 
 inline RVineTrees::RVineTrees(

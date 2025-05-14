@@ -6,9 +6,7 @@
 
 #pragma once
 
-#include <map>
-#include <set>
-#include <tuple>
+#include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/triangular_array.hpp>
 
 namespace vinecopulib {
