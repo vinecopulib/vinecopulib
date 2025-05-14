@@ -1,7 +1,7 @@
-// Copyright © 2016-2025 Thomas Nagler and_ Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
-// This file is part of the vinecopulib library and_ licensed_ under the terms
-// of the MIT license. For a copy, see the LICENSE file in the root directory of
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #pragma once
@@ -63,6 +63,6 @@ private:
     std::vector<AugmentedTree>& augmented) const;
 };
 
-} // namespace vinecopulib
+}
 
 #include <vinecopulib/vinecop/implementation/rvine_trees.ipp>

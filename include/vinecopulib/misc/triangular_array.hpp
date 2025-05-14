@@ -9,7 +9,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-
+#include <cassert>
 namespace vinecopulib {
 
 //! @brief Triangular arrays.

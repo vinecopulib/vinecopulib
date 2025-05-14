@@ -1,10 +1,8 @@
-// Copyright © 2016-2025 Thomas Nagler and_ Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
-// This file is part of the vinecopulib library and_ licensed_ under the terms
-// of the MIT license. For a copy, see the LICENSE file in the root directory of
+// This file is part of the vinecopulib library and licensed under the terms of
+// the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
-
-#pragma once
 
 namespace vinecopulib {
 
@@ -25,7 +23,7 @@ inline RVineTrees::RVineTrees(
     Tree tree;
     for (size_t e = 0; e < d_ - 1 - t; ++e) {
       size_t a = order[e];
-      size_t b = struct_array(t, e);
+      size_t b = static_cast<size_t>(struct_array(t, e));
       std::set<size_t> C;
       for (size_t k = 0; k < t; ++k) {
         C.insert(struct_array(k, e));
