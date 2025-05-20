@@ -9,7 +9,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # C++ compile flags
 if (NOT WIN32)
-    set(CMAKE_CXX_FLAGS "-Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O2 -DNDEBUG")
+    set(CMAKE_CXX_FLAGS "-Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O3 -march=native -DNDEBUG")
 endif()
 
 if (POLICY CMP0074)

@@ -1,4 +1,4 @@
-// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -30,7 +30,7 @@ inline Optimizer::Optimizer()
 inline void
 Optimizer::set_controls(double initial_trust_region,
                         double final_trust_region,
-                        int maxeval)
+                        size_t maxeval)
 {
   controls_ = BobyqaControls(initial_trust_region, final_trust_region, maxeval);
 }
@@ -76,7 +76,7 @@ Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
   } else {
     double eps = 1e-6;
     std::function<double(double)> f = [objective, this](double x) {
-      Eigen::Map<const Eigen::VectorXd> par(&x, 1);
+      Eigen::VectorXd par = Eigen::VectorXd::Constant(1, x);
       this->objective_calls_++;
       return -objective(par);
     };
@@ -146,7 +146,7 @@ inline BobyqaControls::BobyqaControls()
 //! @param maxeval Maximal number of evaluations of the objective.
 inline BobyqaControls::BobyqaControls(double initial_trust_region,
                                       double final_trust_region,
-                                      int maxeval)
+                                      size_t maxeval)
 {
   check_parameters(initial_trust_region, final_trust_region, maxeval);
   initial_trust_region_ = initial_trust_region;
@@ -157,7 +157,7 @@ inline BobyqaControls::BobyqaControls(double initial_trust_region,
 inline void
 BobyqaControls::check_parameters(double initial_trust_region,
                                  double final_trust_region,
-                                 int maxeval)
+                                 size_t maxeval)
 {
   if (initial_trust_region <= 0) {
     throw std::runtime_error("initial_trust_region should be larger than 0");
@@ -188,7 +188,7 @@ BobyqaControls::get_final_trust_region()
 }
 
 //! @return the maximal number of evaluations of the objective.
-inline int
+inline size_t
 BobyqaControls::get_maxeval()
 {
   return maxeval_;

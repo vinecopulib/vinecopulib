@@ -1,10 +1,16 @@
-// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #pragma once
+
+// Suppress compiler warnings caused by boost/odeint internals
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 
 // replace std::sprintf by void function
 // - this is necessary because `sprintf()` is now flagged as potential security
@@ -13,12 +19,19 @@
 //   really need it.
 // - we can remove this hack if and when updates odeint (PR open).
 #define sprintf _sprintf_do_nothing
-namespace std
+namespace std {
+constexpr int
+_sprintf_do_nothing(char*, const char*, ...)
 {
-constexpr int _sprintf_do_nothing(char*, const char*, ...) { return 0; }
+  return 0;
+}
 }
 #include <boost/numeric/odeint.hpp>
 #undef sprintf
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 #include <functional>
 

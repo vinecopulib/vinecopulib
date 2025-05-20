@@ -1,4 +1,4 @@
-// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -38,6 +38,19 @@ TEST(bicop_select, allows_all_selcrits)
   cop.select(u, controls);
   controls.set_selection_criterion("mbic");
   cop.select(u, controls);
+}
+
+TEST(bicop_select, allow_rotations_works)
+{
+  Bicop cop(BicopFamily::clayton, 180, Eigen::VectorXd::Constant(1, 5));
+  auto u = cop.simulate(5e3);
+  FitControlsBicop controls;
+  controls.set_family_set({ BicopFamily::clayton });
+  cop.select(u, controls);
+  EXPECT_EQ(cop.get_rotation(), 180);
+  controls.set_allow_rotations(false);
+  cop.select(u, controls);
+  EXPECT_EQ(cop.get_rotation(), 0);
 }
 
 TEST(bicop_select, fit_stats_are_correct)

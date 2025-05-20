@@ -1,16 +1,19 @@
-// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/seed_seq.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 #include <memory>
-#include <random>
 #include <unsupported/Eigen/FFT>
 #include <vinecopulib/misc/tools_stats_ghalton.hpp>
 #include <vinecopulib/misc/tools_stats_sobol.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <wdm/eigen.hpp>
+#include <wdm/ranks.hpp>
 
 namespace vinecopulib {
 
@@ -48,15 +51,15 @@ simulate_uniform(const size_t& n,
   if (seeds.size() == 0) {
     // no seeds provided, seed randomly
     std::random_device rd{};
-    seeds = std::vector<int>(5);
+    seeds = std::vector<int>(20);
     std::generate(
       seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
   }
 
   // initialize random engine and uniform distribution
-  std::seed_seq seq(seeds.begin(), seeds.end());
-  std::mt19937 generator(seq);
-  std::uniform_real_distribution<double> distribution(0.0, 1.0);
+  boost::random::seed_seq seq(seeds.begin(), seeds.end());
+  boost::random::mt19937 generator(seq);
+  boost::random::uniform_real_distribution<double> distribution(0.0, 1.0);
 
   Eigen::MatrixXd u(n, d);
   return u.unaryExpr([&](double) { return distribution(generator); });
@@ -90,14 +93,18 @@ simulate_normal(const size_t& n,
 //! @param x A matrix of real numbers.
 //! @param ties_method Indicates how to treat ties; same as in R, see
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
+//! @param weights Vector of weights for the observations.
 //! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$
 //! (column-wise).
 inline Eigen::MatrixXd
-to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method)
+to_pseudo_obs(Eigen::MatrixXd x,
+              const std::string& ties_method,
+              const Eigen::VectorXd& weights,
+              std::vector<int> seeds)
 {
   for (int j = 0; j < x.cols(); ++j)
-    x.col(j) =
-      to_pseudo_obs_1d(static_cast<Eigen::VectorXd>(x.col(j)), ties_method);
+    x.col(j) = to_pseudo_obs_1d(
+      static_cast<Eigen::VectorXd>(x.col(j)), ties_method, weights, seeds);
 
   return x;
 }
@@ -111,58 +118,173 @@ to_pseudo_obs(Eigen::MatrixXd x, const std::string& ties_method)
 //! @param x A vector of real numbers.
 //! @param ties_method Indicates how to treat ties; same as in R, see
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
+//! @param weights Vector of weights for the observations.
 //! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$.
 inline Eigen::VectorXd
-to_pseudo_obs_1d(Eigen::VectorXd x, const std::string& ties_method)
+to_pseudo_obs_1d(Eigen::VectorXd x,
+                 const std::string& ties_method,
+                 const Eigen::VectorXd& weights,
+                 std::vector<int> seeds)
 {
   size_t n = x.size();
-  std::vector<double> xvec(x.data(), x.data() + n);
-  auto order = tools_stl::get_order(xvec);
-  if (ties_method == "first") {
-    for (auto i : order)
-      x[order[i]] = static_cast<double>(i + 1);
-  } else if (ties_method == "average") {
-    for (size_t i = 0, reps; i < n; i += reps) {
-      // find replications
-      reps = 1;
-      while ((i + reps < n) && (x[order[i]] == x[order[i + reps]]))
-        ++reps;
-      // assign average rank of the tied values
-      for (size_t k = 0; k < reps; ++k)
-        x[order[i + k]] = static_cast<double>(i) + 1.0 +
-                          (static_cast<double>(reps) - 1.0) / 2.0;
-    }
-  } else if (ties_method == "random") {
-    // set up random number generator
-    std::random_device rd;
-    std::default_random_engine gen(rd());
-    for (size_t i = 0, reps; i < n; i += reps) {
-      // find replications
-      reps = 1;
-      while ((i + reps < n) && (x[order[i]] == x[order[i + reps]]))
-        ++reps;
-      // assign random rank between ties
-      std::vector<size_t> rvals(reps);
-      std::iota(rvals.begin(), rvals.end(), 0); // 0, 1, 2, ...
-      std::shuffle(rvals.begin(), rvals.end(), gen);
-      for (size_t k = 0; k < reps; ++k)
-        x[order[i + k]] = static_cast<double>(i + 1 + rvals[k]);
-    }
-  } else {
-    std::stringstream msg;
-    msg << "unknown ties method (" << ties_method << ")";
-    throw std::runtime_error(msg.str().c_str());
-  }
+  auto xvec = wdm::utils::convert_vec(x);
+  auto res =
+    wdm::impl::rank(xvec, wdm::utils::convert_vec(weights), ties_method, seeds);
+  x = Eigen::Map<Eigen::VectorXd>(res.data(), res.size());
 
-  // NaN-handling
-  for (size_t i = 0; i < xvec.size(); i++) {
-    if (std::isnan(xvec[i])) {
-      x[i] = NAN;
-      n--;
+  // correction for NaNs
+  if (wdm::utils::any_nan(xvec)) {
+    for (size_t i = 0; i < xvec.size(); i++) {
+      if (std::isnan(xvec[i])) {
+        n--;
+      }
     }
   }
 
-  return x / (static_cast<double>(n) + 1.0);
+  return x.array() / (static_cast<double>(n) + 1.0);
+}
+
+// Construct a box covering from a matrix of samples.
+// @param u A matrix of samples.
+// @param K The number of boxes in each dimension.
+inline BoxCovering::BoxCovering(const Eigen::MatrixXd& u, uint16_t K)
+  : u_(u)
+  , K_(K)
+{
+  boxes_.resize(K);
+  for (size_t k = 0; k < K; k++) {
+    boxes_[k].resize(K);
+    for (size_t j = 0; j < K; j++) {
+      boxes_[k][j] = std::make_unique<Box>(
+        std::vector<double>{ static_cast<double>(k) / K,
+                             static_cast<double>(j) / K },
+        std::vector<double>{ static_cast<double>(k + 1) / K,
+                             static_cast<double>(j + 1) / K });
+    }
+  }
+
+  n_ = u.rows();
+  for (size_t i = 0; i < n_; i++) {
+    size_t k = static_cast<size_t>(std::floor(u(i, 0) * K));
+    size_t j = static_cast<size_t>(std::floor(u(i, 1) * K));
+    boxes_[k][j]->indices_.insert(i);
+  }
+}
+
+// Get the indices of the samples in a box defined by lower and upper bounds.
+// @param lower Lower bounds of the box.
+// @param upper Upper bounds of the box.
+inline std::vector<size_t>
+BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
+                             const Eigen::VectorXd& upper) const
+{
+  std::vector<size_t> indices;
+  indices.reserve(n_);
+  auto l0 = static_cast<size_t>(std::floor(lower(0) * K_));
+  auto l1 = static_cast<size_t>(std::floor(lower(1) * K_));
+  auto u0 = static_cast<size_t>(std::ceil(upper(0) * K_));
+  auto u1 = static_cast<size_t>(std::ceil(upper(1) * K_));
+
+  for (size_t k = l0; k < u0; k++) {
+    for (size_t j = l1; j < u1; j++) {
+      for (auto& i : boxes_[k][j]->indices_) {
+        if ((k == l0) || (k == u0 - 1)) {
+          if ((u_(i, 0) < lower(0)) || (u_(i, 0) > upper(0)))
+            continue;
+        }
+        if ((j == l1) || (j == u1 - 1)) {
+          if ((u_(i, 1) < lower(1)) || (u_(i, 1) > upper(1)))
+            continue;
+        }
+        indices.push_back(i);
+      }
+    }
+  }
+
+  return indices;
+}
+
+// Swap a sample in the box covering.
+// @param i Index of the sample to swap.
+inline void
+BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
+{
+  auto k = static_cast<size_t>(std::floor(u_(i, 0) * K_));
+  auto j = static_cast<size_t>(std::floor(u_(i, 1) * K_));
+  boxes_[k][j]->indices_.erase(i);
+
+  u_.row(i) = new_sample;
+  k = static_cast<size_t>(std::floor(new_sample(0) * K_));
+  j = static_cast<size_t>(std::floor(new_sample(1) * K_));
+  boxes_[k][j]->indices_.insert(i);
+}
+
+//! Create a single box.
+inline BoxCovering::Box::Box(const std::vector<double>& lower,
+                             const std::vector<double>& upper)
+  : lower_(lower)
+  , upper_(upper)
+{
+}
+
+// Recovers a (continuous) latent sample from a sample of a discrete copula by
+// treating it as an interval-censored density estimation problem.
+// @param u A matrix of samples.
+// @param b The bandwidth of the kernel density estimator.
+// @param niter The number of iterations.
+inline Eigen::MatrixXd
+find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
+{
+  using namespace tools_stats;
+  size_t n = u.rows();
+  if (u.cols() != 4) {
+    throw std::runtime_error("u must have four columns.");
+  }
+
+  auto w = simulate_uniform(n, 2, true, { 5 });
+  Eigen::MatrixXd uu = w.array() * u.leftCols(2).array() +
+                       (1 - w.array()) * u.rightCols(2).array();
+
+  auto covering = BoxCovering(uu);
+  std::vector<size_t> indices;
+
+  Eigen::MatrixXd lb = qnorm(u.rightCols(2));
+  Eigen::MatrixXd ub = qnorm(u.leftCols(2));
+  lb = pnorm(lb.array() - b);
+  ub = pnorm(ub.array() + b);
+
+  Eigen::MatrixXd x(n, 2), norm_sim(n, 2);
+
+  for (uint16_t it = 0; it < niter; it++) {
+    uu = to_pseudo_obs(uu);
+    x = qnorm(uu);
+    norm_sim = simulate_normal(n, 2, true, { it, 5 }).array() * b;
+    w = simulate_uniform(n, 1, true, { it, 55 });
+
+    for (size_t i = 0; i < n; i++) {
+      indices = covering.get_box_indices(lb.row(i), ub.row(i));
+      double n_idx = static_cast<double>(indices.size());
+      if (n_idx > 0) {
+        size_t j = indices.at(static_cast<size_t>(w(i) * n_idx));
+        x.row(i) = x.row(j) + norm_sim.row(i);
+        uu.row(i) = pnorm(x.row(i));
+        covering.swap_sample(i, uu.row(i));
+      }
+    }
+  }
+
+  return to_pseudo_obs(x);
+}
+
+// Utility function to compute the next power of 2.
+inline size_t
+next_power_of_two(size_t n)
+{
+  size_t power = 1;
+  while (power < n) {
+    power *= 2;
+  }
+  return power;
 }
 
 // Construct a box covering from a matrix of samples.
@@ -302,10 +424,13 @@ inline Eigen::VectorXd
 win(const Eigen::VectorXd& x, size_t wl = 5)
 {
   size_t n = x.size();
-  Eigen::VectorXd xx = Eigen::VectorXd::Zero(n + 2 * wl);
-  Eigen::VectorXd yy = Eigen::VectorXd::Zero(n + 2 * wl);
-  xx.block(2 * wl, 0, n, 1) = x;
-  yy.block(0, 0, 2 * wl + 1, 1) = Eigen::VectorXd::Ones(2 * wl + 1);
+  // pad length to powers of 2 to force FFT to use its fastest algorithm
+  size_t fftSize = next_power_of_two(n + 2 * wl);
+
+  Eigen::VectorXd xx = Eigen::VectorXd::Zero(fftSize);
+  Eigen::VectorXd yy = Eigen::VectorXd::Zero(fftSize);
+  xx.segment(2 * wl, n) = x;
+  yy.head(2 * wl + 1) = Eigen::VectorXd::Ones(2 * wl + 1);
 
   Eigen::FFT<double> fft;
   Eigen::VectorXcd tmp1 = fft.fwd(xx);
@@ -313,11 +438,12 @@ win(const Eigen::VectorXd& x, size_t wl = 5)
   tmp2 = tmp2.conjugate();
   tmp1 = tmp1.cwiseProduct(tmp2);
   tmp2 = fft.inv(tmp1);
-  Eigen::VectorXd result = tmp2.real().block(wl, 0, n, 1);
+
+  Eigen::VectorXd result = tmp2.real().segment(wl, n);
   result /= 2.0 * static_cast<double>(wl) + 1.0;
-  result.block(0, 0, wl, 1) = Eigen::VectorXd::Constant(wl, result(wl));
-  result.block(n - wl, 0, wl, 1) =
-    Eigen::VectorXd::Constant(wl, result(n - wl - 1));
+  result.head(wl).setConstant(result(wl));
+  result.tail(wl).setConstant(result(n - wl - 1));
+
   return result;
 }
 
@@ -328,19 +454,9 @@ cef(const Eigen::VectorXd& x,
     const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& ranks,
     size_t wl = 5)
 {
-  size_t n_ind = ind.size();
-  Eigen::VectorXd cey(n_ind);
-  for (size_t i = 0; i < n_ind; i++) {
-    cey(i) = x(ind(i));
-  }
+  Eigen::VectorXd cey = x(ind);
   cey = win(cey, wl);
-
-  size_t n_ranks = ranks.size();
-  Eigen::VectorXd result(n_ranks);
-  for (size_t i = 0; i < n_ranks; i++) {
-    result(i) = cey(ranks(i));
-  }
-  return result;
+  return cey(ranks);
 }
 
 //! alternating conditional expectation algorithm

@@ -1,7 +1,7 @@
 if(NOT WIN32)
 
     if(STRICT_COMPILER AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-      set(CMAKE_CXX_FLAGS                "-Werror -Wno-delete-non-virtual-dtor -Wall -Wextra -Wconversion")
+      set(CMAKE_CXX_FLAGS                "-Werror -Wno-delete-non-virtual-dtor -Wall -Wextra -Wpedantic -Wconversion")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wstrict-aliasing -pedantic -fmax-errors=5 -Werror=return-type")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wunreachable-code -Wcast-align -Wcast-qual")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op")
@@ -15,7 +15,14 @@ if(NOT WIN32)
     endif()
 
     set(CMAKE_CXX_FLAGS_DEBUG          "-g -O0 -DDEBUG ")
-    set(CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
+    
+    # Detect Apple M1 and apply specific flags
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64" AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        message(STATUS "Configuring for Apple M1")
+        set(CMAKE_CXX_FLAGS_RELEASE "-O3 -arch arm64 -mcpu=apple-m1 -DNDEBUG")
+    else()
+        set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
+    endif()
 
     if(OPT_ASAN)
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
@@ -46,8 +53,12 @@ if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()
 
-add_compile_definitions(
+set(VINECOPULIB_DEFINITIONS
   BOOST_NO_AUTO_PTR
   BOOST_ALLOW_DEPRECATED_HEADERS
   BOOST_MATH_PROMOTE_DOUBLE_POLICY=false
+  BOOST_ALL_NO_LIB
+  USE_BOOST
 )
+
+add_compile_definitions(${VINECOPULIB_DEFINITIONS})

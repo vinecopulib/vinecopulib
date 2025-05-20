@@ -1,4 +1,4 @@
-// Copyright © 2016-2023 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -36,6 +36,17 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct)
   EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X2, "random"));
   EXPECT_NO_THROW(tools_stats::to_pseudo_obs(X2, "first"));
   EXPECT_ANY_THROW(tools_stats::to_pseudo_obs(X2, "something"));
+
+
+  auto weights = Eigen::VectorXd::Constant(100, 1.0);
+  auto r1 = tools_stats::to_pseudo_obs(X2, "average");
+  auto r2 = tools_stats::to_pseudo_obs(X2, "average", weights);
+  EXPECT_TRUE(r1 == r2);
+
+  r1 = tools_stats::to_pseudo_obs(X2, "first");
+  r2 = tools_stats::to_pseudo_obs(X2, "first", weights);
+  EXPECT_TRUE(r1 == r2);
+
 
   X2.col(0).head(50) = Eigen::VectorXd::Constant(50, NAN);
   auto u = tools_stats::to_pseudo_obs(X2);
