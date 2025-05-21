@@ -162,15 +162,6 @@ Bicop::to_file(const std::string& filename) const
 //!
 //! @details The copula density is defined as joint density divided by marginal
 //! densities, irrespective of variable types.
-//! 
-//! When at least one variable is discrete, more than two columns are required
-//! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
-//! \f$ (F_{X_1}(x_1), F_{X_2}(x_2)) \f$. The second \f$ n \times 2 \f$ block contains
-//! realizations of \f$ (F_{X_1}(x_1^-), F_{X_1}(x_1^-)) \f$. The minus indicates a
-//! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
-//! \f$ F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1) \f$. For continuous variables the left
-//! limit and the cdf itself coincide. Respective columns can be omitted in the
-//! second block.
 //!
 //! When at least one variable is discrete, more than two columns are required
 //! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
@@ -192,16 +183,6 @@ Bicop::pdf(const Eigen::MatrixXd& u) const
 }
 
 //! @brief Evaluates the copula distribution.
-//! 
-//! @details When at least one variable is discrete, more than two 
-//! columns are required
-//! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
-//! \f$ (F_{X_1}(x_1), F_{X_2}(x_2)) \f$. The second \f$ n \times 2 \f$ block contains
-//! realizations of \f$ (F_{X_1}(x_1^-), F_{X_1}(x_1^-)) \f$. The minus indicates a
-//! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
-//! \f$ F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1) \f$. For continuous variables the left
-//! limit and the cdf itself coincide. Respective columns can be omitted in the
-//! second block.
 //!
 //! @details When at least one variable is discrete, more than two
 //! columns are required
@@ -442,15 +423,6 @@ Bicop::simulate(const size_t& n,
 //! @details The log-likelihood is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, U_{2, i}), \f]
 //! where \f$ c \f$ is the copula density, see `Bicop::pdf()`.
-//! 
-//! When at least one variable is discrete, more than two columns are required
-//! for `u`: the first \f$ n \times 2 \f$ block contains realizations of
-//! \f$ (F_{X_1}(x_1), F_{X_2}(x_2)) \f$. The second \f$ n \times 2 \f$ block contains
-//! realizations of \f$ (F_{X_1}(x_1^-), F_{X_1}(x_1^-)) \f$. The minus indicates a
-//! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
-//! \f$ F_{X_1}(x_1^-) = F_{X_1}(x_1 - 1) \f$. For continuous variables the left
-//! limit and the cdf itself coincide. Respective columns can be omitted in the
-//! second block.
 //!
 //! When at least one variable is discrete, more than two columns are required
 //! for `u`: the first \f$ n \times 2 \f$ block contains realizations of

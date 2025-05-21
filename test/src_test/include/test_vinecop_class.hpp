@@ -368,6 +368,59 @@ TEST_F(VinecopTest, cdf_is_correct)
   auto u2 = vinecop.simulate(10);
   ASSERT_TRUE(vinecop.cdf(u2, 10000).isApprox(bicop.cdf(u2), 1e-2));
 
+
+  // verify that qrng stuff works
+  Vinecop vinecop2(301);
+  vinecop.simulate(10, true);
+}
+
+TEST_F(VinecopTest, simulate_is_correct)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 270, par);
+    }
+  }
+  Vinecop vinecop(model_matrix, pair_copulas);
+
+  // only check if it works
+  vinecop.simulate(10);
+  // check the underlying transformation from independent samples
+  ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
+
+  // verify that qrng stuff works
+  vinecop.simulate(10, true);
+  Vinecop vinecop2(301);
+  vinecop.simulate(10, true);
+}
+
+TEST_F(VinecopTest, rosenblatt_is_correct)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(7);
+  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 270, par);
+    }
+  }
+  Vinecop vinecop(model_matrix, pair_copulas);
+  auto u2 = vinecop.simulate(5);
+  ASSERT_TRUE(
+    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u2)).isApprox(u2, 1e-6));
+
+  // truncated multivariate
+  pair_copulas = Vinecop::make_pair_copula_store(7, 2);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 270, par);
+    }
+  }
+  vinecop = Vinecop(model_matrix, pair_copulas);
+  ASSERT_TRUE(
+    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+
   // bivariate case
   pair_copulas = Vinecop::make_pair_copula_store(2);
   for (auto& tree : pair_copulas) {

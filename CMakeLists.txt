@@ -6,8 +6,6 @@ project(vinecopulib VERSION 0.7.3)
 
 include(CTest)
 
-include(CTest)
-
 include(cmake/options.cmake               REQUIRED)
 
 include(cmake/compilerDefOpt.cmake        REQUIRED)
