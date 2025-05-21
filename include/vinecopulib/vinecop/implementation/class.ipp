@@ -1043,7 +1043,7 @@ Vinecop::scores(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
         auto pars = pair_copulas_[t][e].get_parameters();
         auto ub = pair_copulas_[t][e].get_parameters_upper_bounds();
         auto lb = pair_copulas_[t][e].get_parameters_lower_bounds();
-        for (size_t p = 0; p < pars.size(); p++) {
+        for (size_t p = 0; p < static_cast<size_t>(pars.size()); p++) {
           auto pars_tmp = pars;
           double eps = 0;
 
@@ -1121,7 +1121,7 @@ Vinecop::scores(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
         auto pars = edge_copula.get_parameters();
         auto ub = edge_copula.get_parameters_upper_bounds();
         auto lb = edge_copula.get_parameters_lower_bounds();
-        for (size_t p = 0; p < pars.size(); p++) {
+        for (size_t p = 0; p < static_cast<size_t>(pars.size()); p++) {
           auto pars_tmp = pars;
           double eps = 0;
 
@@ -1196,7 +1196,7 @@ Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
       auto ub = pair_copulas_[t][e].get_parameters_upper_bounds();
       auto lb = pair_copulas_[t][e].get_parameters_lower_bounds();
       hess(t, e).resize(pars.size());
-      for (size_t p = 0; p < pars.size(); p++) {
+      for (size_t p = 0; p < static_cast<size_t>(pars.size()); p++) {
         auto pars_tmp = pars;
         double eps = 0;
 
@@ -1238,14 +1238,16 @@ Vinecop::hessian_avg(Eigen::MatrixXd u,
                      const size_t num_threads)
 {
   auto hess = this->hessian(u, step_wise, num_threads);
-  size_t npars = this->get_npars();
+  size_t npars = static_cast<size_t>(this->get_npars());
   Eigen::MatrixXd H(npars, npars);
 
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
   size_t ipar = 0;
   for (size_t t = 0; t < trunc_lvl; t++) {
     for (size_t e = 0; e < d_ - 1 - t; e++) {
-      for (size_t p = 0; p < pair_copulas_[t][e].get_parameters().size(); p++) {
+      for (size_t p = 0;
+           p < static_cast<size_t>(pair_copulas_[t][e].get_parameters().size());
+           p++) {
         H.row(ipar++) = hess(t, e)[p].colwise().mean();
       }
     }

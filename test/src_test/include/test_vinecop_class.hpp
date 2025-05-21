@@ -252,46 +252,7 @@ TEST_F(VinecopTest, fit_statistics_getters_are_correct)
   EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
 }
 
-//   EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
-//   EXPECT_NEAR(static_cast<double>(vc.get_nobs()), 100, 1e-10);
-//   EXPECT_NEAR(vc.get_aic(), vc.aic(data), 1e-10);
-//   EXPECT_NEAR(vc.get_bic(), vc.bic(data), 1e-10);
-//   EXPECT_NEAR(vc.get_mbicv(0.6), vc.mbicv(data, 0.6), 1e-10);
-// }
-
-// TEST_F(VinecopTest, truncate_methods_works)
-// {
-//   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
-//   auto par = Eigen::VectorXd::Constant(1, 3.0);
-//   for (auto& tree : pair_copulas) {
-//     for (auto& pc : tree) {
-//       pc = Bicop(BicopFamily::clayton, 270, par);
-//     }
-//   }
-//   Vinecop vinecop(model_matrix, pair_copulas);
-//   vinecop.truncate(2);
-//   EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 2);
-//   EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 2);
-//   vinecop.truncate(0);
-//   EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 0);
-//   EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 0);
-// }
-
-// TEST_F(VinecopTest, pdf_is_correct)
-// {
-//   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
-//   auto par = Eigen::VectorXd::Constant(1, 3.0);
-//   for (auto& tree : pair_copulas) {
-//     for (auto& pc : tree) {
-//       pc = Bicop(BicopFamily::clayton, 270, par);
-//     }
-//   }
-//   Vinecop vinecop(model_matrix, pair_copulas);
-
-//   ASSERT_TRUE(vinecop.pdf(u).isApprox(f, 1e-4));
-// }
-
-TEST_F(VinecopTest, scores_stepwise)
+TEST_F(VinecopTest, truncate_methods_works)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
   auto par = Eigen::VectorXd::Constant(1, 3.0);
@@ -301,25 +262,15 @@ TEST_F(VinecopTest, scores_stepwise)
     }
   }
   Vinecop vinecop(model_matrix, pair_copulas);
-
-  auto u = vinecop.simulate(100, false, 1, { 1 });
-
-  auto J = vinecop.hessian_avg(u, true);
-  EXPECT_TRUE(J.isUpperTriangular());
-  // Eigen::MatrixXd Jinv = J.triangularView<Eigen::Upper>()
-  //                          .solve(Eigen::MatrixXd::Identity(J.cols(),
-  //                          J.cols())) .triangularView<Eigen::Upper>();
-  // // std::cout << J << std::endl << std::endl;
-  // // std::cout << Jinv << std::endl;
-  // auto I = vinecop.scores_cov(u, true);
-  // std::cout << (Jinv * I * Jinv.transpose() /
-  // u.rows()).diagonal().cwiseSqrt()
-  //           << std::endl
-  //           << std::endl;
-  // std::cout << vinecop.str() << std::endl;
+  vinecop.truncate(2);
+  EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 2);
+  EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 2);
+  vinecop.truncate(0);
+  EXPECT_EQ(vinecop.get_all_pair_copulas().size(), 0);
+  EXPECT_EQ(vinecop.get_rvine_structure().get_trunc_lvl(), 0);
 }
 
-TEST_F(VinecopTest, scores_joint)
+TEST_F(VinecopTest, pdf_is_correct)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
   auto par = Eigen::VectorXd::Constant(1, 3.0);
@@ -330,23 +281,7 @@ TEST_F(VinecopTest, scores_joint)
   }
   Vinecop vinecop(model_matrix, pair_copulas);
 
-  auto u = vinecop.simulate(100, false, 1, { 1 });
-  auto J = vinecop.hessian_avg(u, false);
-  auto I = vinecop.scores_cov(u, false);
-
-  EXPECT_FALSE(J.isUpperTriangular());
-
-  Eigen::MatrixXd Jinv = J.triangularView<Eigen::Upper>()
-                           .solve(Eigen::MatrixXd::Identity(J.cols(),
-                           J.cols())) .triangularView<Eigen::Upper>();
-  // std::cout << J << std::endl << std::endl;
-  // std::cout << Jinv * I << std::endl;
-  I = vinecop.scores_cov(u, true);
-  // std::cout << (Jinv * I * Jinv.transpose() /
-  // u.rows()).diagonal().cwiseSqrt()
-  //           << std::endl
-  //           << std::endl;
-  // std::cout << vinecop.str() << std::endl;
+  ASSERT_TRUE(vinecop.pdf(u).isApprox(f, 1e-4));
 }
 
 TEST_F(VinecopTest, cdf_is_correct)
@@ -436,6 +371,65 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
     vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
 }
 
+
+TEST_F(VinecopTest, scores_stepwise)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 270, par);
+    }
+  }
+  Vinecop vinecop(model_matrix, pair_copulas);
+
+  auto uu = vinecop.simulate(100, false, 1, { 1 });
+
+  auto J = vinecop.hessian_avg(uu, true);
+  EXPECT_TRUE(J.isUpperTriangular());
+  // Eigen::MatrixXd Jinv = J.triangularView<Eigen::Upper>()
+  //                          .solve(Eigen::MatrixXd::Identity(J.cols(),
+  //                          J.cols())) .triangularView<Eigen::Upper>();
+  // // std::cout << J << std::endl << std::endl;
+  // // std::cout << Jinv << std::endl;
+  // auto I = vinecop.scores_cov(uu, true);
+  // std::cout << (Jinv * I * Jinv.transpose() /
+  // u.rows()).diagonal().cwiseSqrt()
+  //           << std::endl
+  //           << std::endl;
+  // std::cout << vinecop.str() << std::endl;
+}
+
+TEST_F(VinecopTest, scores_joint)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 270, par);
+    }
+  }
+  Vinecop vinecop(model_matrix, pair_copulas);
+
+  auto uu = vinecop.simulate(100, false, 1, { 1 });
+  auto J = vinecop.hessian_avg(uu, false);
+  auto I = vinecop.scores_cov(uu, false);
+
+  EXPECT_FALSE(J.isUpperTriangular());
+
+  Eigen::MatrixXd Jinv = J.triangularView<Eigen::Upper>()
+                           .solve(Eigen::MatrixXd::Identity(J.cols(),
+                           J.cols())) .triangularView<Eigen::Upper>();
+  // std::cout << J << std::endl << std::endl;
+  // std::cout << Jinv * I << std::endl;
+  I = vinecop.scores_cov(uu, true);
+  // std::cout << (Jinv * I * Jinv.transpose() /
+  // u.rows()).diagonal().cwiseSqrt()
+  //           << std::endl
+  //           << std::endl;
+  // std::cout << vinecop.str() << std::endl;
+}
+
 TEST_F(VinecopTest, aic_bic_are_correct)
 {
   int d = 7;
@@ -477,28 +471,6 @@ TEST_F(VinecopTest, fit_parameters_is_correct)
   ASSERT_NEAR(vc2.get_loglik(), vc2.loglik(u), 1e-2);
   ASSERT_NEAR(vc2.get_aic(), vc2.aic(u), 1e-2);
   ASSERT_NEAR(vc2.get_bic(), vc2.bic(u), 1e-2);
-  ASSERT_TRUE(vc.str() == vc2.str());
-
-  Vinecop vc3(rvine_structure, pcs);
-  controls.set_select_families(false);
-  vc3.select(u, controls);
-  ASSERT_TRUE(vc.str() == vc3.str());
-}
-
-TEST_F(VinecopTest, fit_parameters_is_correct)
-{
-  u.conservativeResize(50, 7);
-  auto controls = FitControlsVinecop({ BicopFamily::clayton }, "itau");
-  Vinecop vc(7);
-  vc.select(u, controls);
-  auto rvine_structure = vc.get_rvine_structure();
-
-  auto pcs = vc.get_all_pair_copulas();
-  for (auto& pc : pcs[0])
-    pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
-  Vinecop vc2(rvine_structure, pcs);
-  vc2.fit(u, controls);
-
   ASSERT_TRUE(vc.str() == vc2.str());
 
   Vinecop vc3(rvine_structure, pcs);
