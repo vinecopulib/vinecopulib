@@ -66,14 +66,21 @@ XtdGumbelBicop::hfunc2_raw(const Eigen::MatrixXd& u)
 inline Eigen::VectorXd
 XtdGumbelBicop::hinv1_raw(const Eigen::MatrixXd& u)
 {
-  Eigen::VectorXd hinv = hinv1_num(u);
-  return hinv;
+  if (parameters_(0) >= 0) {
+    return gumbel_bicop_->hinv1_raw(u);
+  } else {
+    return gumbel_bicop_->hinv1_raw(tools_eigen::swap_cols(tools_stats::rotate_data(u, 90)));
+  }
 }
 
 inline Eigen::VectorXd
 XtdGumbelBicop::hinv2_raw(const Eigen::MatrixXd& u)
 {
-  return hinv1_raw(tools_eigen::swap_cols(u));
+  if (parameters_(0) >= 0) {
+    return gumbel_bicop_->hinv1_raw(tools_eigen::swap_cols(u));
+  } else {
+    return 1 - gumbel_bicop_->hinv1_raw(tools_stats::rotate_data(u, 90)).array();
+  }
 }
 
 
