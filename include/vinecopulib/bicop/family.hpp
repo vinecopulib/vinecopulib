@@ -26,7 +26,8 @@ enum class BicopFamily
   bb7,      ///< BB7 copula
   bb8,      ///< BB8 copula
   tawn,     ///< Tawn copula
-  tll       ///< Transformation local likelihood kernel estimator
+  tll,      ///< Transformation local likelihood kernel estimator
+  xtd_gumbel ///< Extended Gumbel copula
 };
 
 std::string

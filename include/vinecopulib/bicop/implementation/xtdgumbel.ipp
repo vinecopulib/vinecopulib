@@ -16,20 +16,16 @@ inline XtdGumbelBicop::XtdGumbelBicop()
   parameters_ << 0;
   parameters_lower_bounds_ << -20;
   parameters_upper_bounds_ << 20;
-  gumbel_bicop_ = std::make_shared<Bicop>(BicopFamily::gumbel);
+  gumbel_bicop_ = std::make_shared<GumbelBicop>();
 }
 
-inline XtdGumbelBicop::set_parameters(const Eigen::VectorXd& par)
+inline void XtdGumbelBicop::set_parameters(const Eigen::MatrixXd& par) 
 {
-  check_parameters(parameters);
   parameters_ = par;
-
   if (par(0) >= 0) {
-    gumbel_bicop_->set_rotation(0);
-    gumbel_bicop_->set_parameters(par(0) + 1.0);
+    gumbel_bicop_->set_parameters(par.array() + 1.0);
   } else {
-    gumbel_bicop_->set_rotation(90);
-    gumbel_bicop_->set_parameters(par(0) - 1.0);
+    gumbel_bicop_->set_parameters(par.array() - 1.0);
   }
 }
 
@@ -37,25 +33,38 @@ inline XtdGumbelBicop::set_parameters(const Eigen::VectorXd& par)
 inline Eigen::VectorXd
 XtdGumbelBicop::pdf_raw(const Eigen::MatrixXd& u)
 {
-  return gumbel_bicop_->pdf(u);
+  if (parameters_(0) >= 0) {
+      return gumbel_bicop_->pdf_raw(u);
+  } else {
+      return gumbel_bicop_->pdf_raw(tools_stats::rotate_data(u, 90));
+  }
 }
 
 inline Eigen::VectorXd
 XtdGumbelBicop::cdf(const Eigen::MatrixXd& u)
 {
-  return gumbel_bicop_->cdf(u);
+  throw std::runtime_error(
+    "XtdGumbelBicop does not support the cdf function.");
 }
 
 inline Eigen::VectorXd
 XtdGumbelBicop::hfunc1_raw(const Eigen::MatrixXd& u)
 {
-  return gumbel_bicop_->hfunc1(u);
+  if (parameters_(0) >= 0) {
+      return gumbel_bicop_->hfunc1_raw(u);
+  } else {
+    return gumbel_bicop_->hfunc1_raw(tools_eigen::swap_cols(tools_stats::rotate_data(u, 90)));
+  }
 }
 
 inline Eigen::VectorXd
-XtdGumbelBicop::hinv1_raw(const Eigen::MatrixXd& u)
+XtdGumbelBicop::hfunc2_raw(const Eigen::MatrixXd& u)
 {
-  return gumbel_bicop_->hfunc2(u);
+  if (parameters_(0) >= 0) {
+      return gumbel_bicop_->hfunc1_raw(tools_eigen::swap_cols(u));
+  } else {
+    return gumbel_bicop_->hfunc1_raw(tools_stats::rotate_data(u, 90));
+  }
 }
 
 inline Eigen::VectorXd

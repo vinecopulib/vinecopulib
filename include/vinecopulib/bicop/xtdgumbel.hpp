@@ -26,7 +26,7 @@ public:
   // constructor
   XtdGumbelBicop();
 
-  set_parameters(const Eigen::VectorXd& par) override;
+  void set_parameters(const Eigen::MatrixXd& parameters) override;
 
 private:
   // PDF
@@ -37,15 +37,13 @@ private:
 
   // hfunction
   Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
-
-  // inverse hfunction
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u);
 
   Eigen::MatrixXd tau_to_parameters(const double& tau);
 
   Eigen::VectorXd get_start_parameters(const double tau);
 
-  std::shared_ptr<Bicop> gumbel_bicop_;
+  std::shared_ptr<GumbelBicop> gumbel_bicop_;
 };
 }
 
