@@ -22,13 +22,8 @@ inline XtdGumbelBicop::XtdGumbelBicop()
 inline void XtdGumbelBicop::set_parameters(const Eigen::MatrixXd& par) 
 {
   parameters_ = par;
-  if (par(0) >= 0) {
-    gumbel_bicop_->set_parameters(par.array() + 1.0);
-  } else {
-    gumbel_bicop_->set_parameters(par.array() - 1.0);
-  }
+  gumbel_bicop_->set_parameters(par.array().abs() + 1.0);
 }
-
 
 inline Eigen::VectorXd
 XtdGumbelBicop::pdf_raw(const Eigen::MatrixXd& u)
