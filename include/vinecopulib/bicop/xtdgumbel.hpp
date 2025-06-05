@@ -9,8 +9,6 @@
 #include <vinecopulib/bicop/parametric.hpp>
 #include <vinecopulib/bicop/gumbel.hpp>
 
-class Bicop;
-
 namespace vinecopulib {
 //! @brief The Gaussian copula.
 //!
@@ -38,8 +36,11 @@ private:
   // hfunction
   Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
   Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
 
   Eigen::MatrixXd tau_to_parameters(const double& tau);
+  double parameters_to_tau(const Eigen::MatrixXd& par);
 
   Eigen::VectorXd get_start_parameters(const double tau);
 

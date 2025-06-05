@@ -51,21 +51,36 @@ inline Eigen::VectorXd
 XtdGumbelBicop::hfunc1_raw(const Eigen::MatrixXd& u)
 {
   if (parameters_(0) >= 0) {
-      return gumbel_bicop_->hfunc1_raw(u);
+    return gumbel_bicop_->hfunc1_raw(u);
   } else {
     return gumbel_bicop_->hfunc1_raw(tools_eigen::swap_cols(tools_stats::rotate_data(u, 90)));
   }
 }
 
+
 inline Eigen::VectorXd
 XtdGumbelBicop::hfunc2_raw(const Eigen::MatrixXd& u)
 {
   if (parameters_(0) >= 0) {
-      return gumbel_bicop_->hfunc1_raw(tools_eigen::swap_cols(u));
+    return gumbel_bicop_->hfunc1_raw(tools_eigen::swap_cols(u));
   } else {
     return gumbel_bicop_->hfunc1_raw(tools_stats::rotate_data(u, 90));
   }
 }
+
+inline Eigen::VectorXd
+XtdGumbelBicop::hinv1_raw(const Eigen::MatrixXd& u)
+{
+  Eigen::VectorXd hinv = hinv1_num(u);
+  return hinv;
+}
+
+inline Eigen::VectorXd
+XtdGumbelBicop::hinv2_raw(const Eigen::MatrixXd& u)
+{
+  return hinv1_raw(tools_eigen::swap_cols(u));
+}
+
 
 inline Eigen::VectorXd
 XtdGumbelBicop::get_start_parameters(const double tau)
@@ -77,11 +92,22 @@ inline Eigen::MatrixXd
 XtdGumbelBicop::tau_to_parameters(const double& tau)
 {
   auto par = gumbel_bicop_->tau_to_parameters(std::abs(tau));
-    if (tau >= 0) {
+  if (tau >= 0) {
     par(0) =  par(0) - 1.0;
   } else {
     par(0) = -par(0) + 1.0;
   }
   return par;
 }
+
+inline double
+XtdGumbelBicop::parameters_to_tau(const Eigen::MatrixXd& par)
+{
+  if (par(0) >= 0) {
+    return gumbel_bicop_->parameters_to_tau(par.array() + 1.0);
+  } else {
+    return -gumbel_bicop_->parameters_to_tau(-par.array() + 1.0);
+  }
+}
+
 }
