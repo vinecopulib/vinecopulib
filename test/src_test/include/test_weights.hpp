@@ -8,7 +8,6 @@
 
 #include "gtest/gtest.h"
 #include <vinecopulib.hpp>
-#include <vinecopulib.hpp>
 
 namespace test_weights {
 using namespace vinecopulib;

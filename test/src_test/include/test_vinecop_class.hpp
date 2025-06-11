@@ -609,10 +609,12 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
     controls_unweighted.set_seeds(seeds);
 
     // Check RNG output changes
-    auto rng_sample_weighted = controls_weighted.get_rng()(); // Get first sample
+    auto rng_sample_weighted =
+      controls_weighted.get_rng()(); // Get first sample
     first_rng_outputs.insert(rng_sample_weighted);
 
-    auto rng_sample_unweighted = controls_unweighted.get_rng()(); // Get first sample
+    auto rng_sample_unweighted =
+      controls_unweighted.get_rng()(); // Get first sample
     first_rng_outputs.insert(rng_sample_unweighted);
 
     // Select a random structure for the weighted method
