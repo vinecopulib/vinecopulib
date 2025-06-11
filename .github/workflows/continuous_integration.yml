@@ -20,7 +20,6 @@ jobs:
           FILES=$(git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$')
           clang-format-14 --dry-run --Werror $FILES
   build:
-    needs: [style] 
     strategy:
       fail-fast: false
       max-parallel: 6 
