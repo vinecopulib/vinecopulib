@@ -20,7 +20,8 @@ namespace tools_optimization {
 //! @param objective The optimizer's objective function
 inline Optimizer::Optimizer()
   : controls_(BobyqaControls())
-{}
+{
+}
 
 //! @brief Sets the optimizer's controls..
 //!

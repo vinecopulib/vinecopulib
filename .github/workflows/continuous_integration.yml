@@ -17,7 +17,7 @@ jobs:
 
       - name: Check formatting
         run: |
-          FILES="$(git ls-files '*.hpp' '*.h' '*.cpp' '*.cc')"
+          FILES=$(git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$')
           clang-format-14 --dry-run --Werror $FILES
   build:
     needs: [style] 
