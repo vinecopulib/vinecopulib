@@ -73,11 +73,11 @@ jobs:
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
               cmake .. -DSTRICT_COMPILER=ON \
               -DCODE_COVERAGE=ON \
-              -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+              -DCMAKE_BUILD_TYPE=Debug
               make vinecopulib_coverage
             else
-              cmake .. -DCMAKE_BUILD_TYPE=Debug
+              cmake .. -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
               make
             fi
           else
@@ -87,17 +87,13 @@ jobs:
           fi
         shell: bash
       - name: Run clang-tidy static analysis
-        if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.name == 'GNU'
+        if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.name == 'Clang'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-tidy-14 jq
+          sudo apt-get install -y clang-tidy-14 jq libc++-dev libc++abi-dev
           cp debug/compile_commands.json debug/compile_commands_bak.json
           jq '[.[] | select(.file | test("_deps/") | not)]' debug/compile_commands_bak.json > debug/compile_commands.json
-          FILES=$(git ls-files | grep -E '^(include|test|examples)/.*\.(cpp|cc|cxx|h|hpp|ipp)$')
-          for file in $FILES; do
-            echo "Running clang-tidy on $file"
-            run-clang-tidy-14 -p debug -quiet -- "$file"
-          done
+          run-clang-tidy-14 -p debug -quiet test/test_all.cpp
           mv debug/compile_commands_bak.json debug/compile_commands.json
       - name: Code coverage
         uses: codecov/codecov-action@v5
@@ -133,3 +129,21 @@ jobs:
             cmd.exe /c ..\\bin\\Release\\main.exe
           fi
         shell: bash
+
+  rm -rf debug && mkdir debug && cd debug && cmake .. -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+              -DCMAKE_CXX_COMPILER=clang++ \
+              -DCMAKE_C_COMPILER=clang \
+  && cd .. && cp debug/compile_commands.json debug/compile_commands_bak.json && jq '[.[] | select(.file | test("_deps/") | not)]' debug/compile_commands_bak.json > debug/compile_commands.json && clang-tidy-14 -p debug \
+  -extra-arg-before=-std=c++14 \
+  -extra-arg=-v \
+  test/test_all.cpp
+
+  rm -rf debug && mkdir debug && cd debug && cmake .. -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+              -DCMAKE_CXX_COMPILER=clang++ \
+              -DCMAKE_C_COMPILER=clang \
+  && cd .. && clang-tidy-14 -p debug \
+  -extra-arg-before=-std=c++14 \
+  -extra-arg=-v \
+  test/test_all.cpp
