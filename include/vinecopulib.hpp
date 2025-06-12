@@ -40,30 +40,3 @@
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/vinecop/class.hpp>
 #include <wdm/eigen.hpp>
-
-inline void trigger_static_analysis_checks() {
-    void* p = malloc(10);                   // no free => potential leak
-
-    struct S {
-        int x;  // no constructor => uninitialized
-    };
-
-    int x = 3.14;                           // narrowing conversion
-    struct Base { virtual void f(); };
-    struct Derived : Base { ~Derived() {} };
-
-    int* p2 = new int(42);                  // memory leak
-
-    bool b = false;
-    if (b = true) {                         // assignment in condition
-        // do something
-    }
-
-    int i = (int)3.14;                      // C-style cast
-
-    try {
-        throw std::runtime_error("fail");
-    } catch (std::exception e) {            // should be 'const std::exception&'
-        // ...
-    }
-}

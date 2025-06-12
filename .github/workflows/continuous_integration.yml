@@ -90,11 +90,8 @@ jobs:
         if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.name == 'Clang'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-tidy-14 jq libc++-dev libc++abi-dev
-          cp debug/compile_commands.json debug/compile_commands_bak.json
-          jq '[.[] | select(.file | test("_deps/") | not)]' debug/compile_commands_bak.json > debug/compile_commands.json
-          run-clang-tidy-14 -p debug -quiet test/test_all.cpp
-          mv debug/compile_commands_bak.json debug/compile_commands.json
+          sudo apt-get install -y clang-tidy-14
+          clang-tidy-14 -p debug -quiet test/test_all.cpp
       - name: Code coverage
         uses: codecov/codecov-action@v5
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
@@ -129,21 +126,3 @@ jobs:
             cmd.exe /c ..\\bin\\Release\\main.exe
           fi
         shell: bash
-
-  rm -rf debug && mkdir debug && cd debug && cmake .. -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-              -DCMAKE_CXX_COMPILER=clang++ \
-              -DCMAKE_C_COMPILER=clang \
-  && cd .. && cp debug/compile_commands.json debug/compile_commands_bak.json && jq '[.[] | select(.file | test("_deps/") | not)]' debug/compile_commands_bak.json > debug/compile_commands.json && clang-tidy-14 -p debug \
-  -extra-arg-before=-std=c++14 \
-  -extra-arg=-v \
-  test/test_all.cpp
-
-  rm -rf debug && mkdir debug && cd debug && cmake .. -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-              -DCMAKE_CXX_COMPILER=clang++ \
-              -DCMAKE_C_COMPILER=clang \
-  && cd .. && clang-tidy-14 -p debug \
-  -extra-arg-before=-std=c++14 \
-  -extra-arg=-v \
-  test/test_all.cpp
