@@ -1,0 +1,16 @@
+Checks: >
+  -*,
+  bugprone-*,
+  performance-*,
+  readability-*,
+  modernize-*,
+  cppcoreguidelines-*,
+  portability-*,
+  clang-analyzer-*,
+  misc-*,
+  hicpp-*
+
+WarningsAsErrors: ''
+
+HeaderFilterRegex: '^(/)?(include|test|examples)/'
+FormatStyle: file

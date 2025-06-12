@@ -122,13 +122,18 @@ TEST(bicop_sanity_checks, fit_controls_config_works)
   // Create and test new controls from the config object
   FitControlsBicop controls2(config);
   EXPECT_EQ(controls.get_family_set(), controls2.get_family_set());
-  EXPECT_EQ(controls.get_parametric_method(), controls2.get_parametric_method());
-  EXPECT_EQ(controls.get_nonparametric_method(), controls2.get_nonparametric_method());
-  EXPECT_EQ(controls.get_nonparametric_mult(), controls2.get_nonparametric_mult());
-  EXPECT_EQ(controls.get_selection_criterion(), controls2.get_selection_criterion());
+  EXPECT_EQ(controls.get_parametric_method(),
+            controls2.get_parametric_method());
+  EXPECT_EQ(controls.get_nonparametric_method(),
+            controls2.get_nonparametric_method());
+  EXPECT_EQ(controls.get_nonparametric_mult(),
+            controls2.get_nonparametric_mult());
+  EXPECT_EQ(controls.get_selection_criterion(),
+            controls2.get_selection_criterion());
   EXPECT_EQ(controls.get_weights(), controls2.get_weights());
   EXPECT_EQ(controls.get_psi0(), controls2.get_psi0());
-  EXPECT_EQ(controls.get_preselect_families(), controls2.get_preselect_families());
+  EXPECT_EQ(controls.get_preselect_families(),
+            controls2.get_preselect_families());
   EXPECT_EQ(controls.get_allow_rotations(), controls2.get_allow_rotations());
   EXPECT_EQ(controls.get_num_threads(), controls2.get_num_threads());
 }
