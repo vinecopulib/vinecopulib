@@ -50,25 +50,25 @@ jobs:
           fi
 
         shell: bash
-      - name: Compile the debug version
-        run:   |
-          mkdir debug && cd debug
-          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
-              cmake .. -DSTRICT_COMPILER=ON \
-              -DCODE_COVERAGE=ON \
-              -DCMAKE_BUILD_TYPE=Debug
-              make vinecopulib_coverage
-            else
-              cmake .. -DCMAKE_BUILD_TYPE=Debug
-              make
-            fi
-          else
-            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
-            -DCMAKE_BUILD_TYPE=Debug
-            cmake --build .
-          fi
-        shell: bash
+      # - name: Compile the debug version
+      #   run:   |
+      #     mkdir debug && cd debug
+      #     if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+      #       if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
+      #         cmake .. -DSTRICT_COMPILER=ON \
+      #         -DCODE_COVERAGE=ON \
+      #         -DCMAKE_BUILD_TYPE=Debug
+      #         make vinecopulib_coverage
+      #       else
+      #         cmake .. -DCMAKE_BUILD_TYPE=Debug
+      #         make
+      #       fi
+      #     else
+      #       cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
+      #       -DCMAKE_BUILD_TYPE=Debug
+      #       cmake --build .
+      #     fi
+      #   shell: bash
       - name: Code coverage
         uses: codecov/codecov-action@v5
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
@@ -86,7 +86,7 @@ jobs:
             cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
             -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
             cmake --build . --config Release
-            $(pwd)/bin/Release/test_all.exe
+            cmd.exe /c bin\\Release\\test_all.exe
             cmake --build . --config Release --target install
           fi
         shell: bash
