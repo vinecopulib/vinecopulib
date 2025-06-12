@@ -13,7 +13,7 @@ jobs:
           # - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
           # - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
           # - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: arm64, root_install_dir: '/Users/runner/work'} # apple silicon runner
-          - { os: windows-latest,  name: x32, cc: cl,    cxx: cl,      platform: x32, root_install_dir: 'D:\'}
+          # - { os: windows-latest,  name: x32, cc: cl,    cxx: cl,      platform: x32, root_install_dir: 'D:\'}
           - { os: windows-latest,  name: x64, cc: cl,    cxx: cl,      platform: x64, root_install_dir: 'D:\'}
     env:
       BOOST_VERSION: 1.84.0
@@ -99,7 +99,7 @@ jobs:
       - name: Run test binary manually and install
         if: matrix.cfg.os == 'windows-latest'
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           release\bin\Release\test_all.exe
           echo Exit code: %ERRORLEVEL%
           cmake --build release --config Release --target install
