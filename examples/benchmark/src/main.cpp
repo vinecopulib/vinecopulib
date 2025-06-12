@@ -80,7 +80,6 @@ benchmark_bicop_tll(int n = 1000, unsigned int repeats = 10)
     },
     seeds);
 
-
   // Benchmark data generation
   Eigen::VectorXd times_generate_data = benchmark_func(
     [&](unsigned seed) { auto u = generate_data(n, 2, seed); }, seeds);

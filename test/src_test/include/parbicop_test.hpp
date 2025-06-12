@@ -7,10 +7,10 @@
 #pragma once
 
 #include "gtest/gtest.h"
+#include <boost/math/constants/constants.hpp>
 #include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
-#include <boost/math/constants/constants.hpp>
 
 using namespace vinecopulib;
 
