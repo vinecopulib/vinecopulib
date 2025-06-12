@@ -9,11 +9,11 @@ jobs:
       max-parallel: 6 
       matrix:
         cfg:
-          # - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
-          # - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
-          # - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
-          # - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: arm64, root_install_dir: '/Users/runner/work'} # apple silicon runner
-          # - { os: windows-latest,  name: x32, cc: cl,    cxx: cl,      platform: x32, root_install_dir: 'D:\'}
+          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
+          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
+          - { os: macos-13,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
+          - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: arm64, root_install_dir: '/Users/runner/work'} # apple silicon runner
+          - { os: windows-latest,  name: x32, cc: cl,    cxx: cl,      platform: x32, root_install_dir: 'D:\'}
           - { os: windows-latest,  name: x64, cc: cl,    cxx: cl,      platform: x64, root_install_dir: 'D:\'}
     env:
       BOOST_VERSION: 1.84.0
@@ -77,33 +77,19 @@ jobs:
           file: debug/coverage.info 
       - name: Compile, test and install the release version
         run:   |
-            mkdir release && cd release
-            if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-              cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
-              make && sudo make install
-              bin/test_all
-            else
-              cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
-              -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
-              cmake --build . --config Release
-              # "bin/Release/test_all.exe"
-              # cmake --build . --config Release --target install
-            fi
+          mkdir release && cd release
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
+            make && sudo make install
+            bin/test_all
+          else
+            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
+            -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
+            cmake --build . --config Release
+            "bin/Release/test_all.exe"
+            cmake --build . --config Release --target install
+          fi
         shell: bash
-      - name: Inspect binary dependencies (dumpbin)
-        if: matrix.cfg.os == 'windows-latest'
-        run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
-          dumpbin /DEPENDENTS release\bin\Release\test_all.exe || echo "dumpbin failed"
-        shell: cmd
-      - name: Run test binary manually and install
-        if: matrix.cfg.os == 'windows-latest'
-        run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
-          release\bin\Release\test_all.exe
-          echo Exit code: %ERRORLEVEL%
-          cmake --build release --config Release --target install
-        shell: cmd
       - name: Test the install
         run:   |
           cd examples/bicop
