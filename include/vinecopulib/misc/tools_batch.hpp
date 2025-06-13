@@ -19,17 +19,9 @@ struct Batch
   size_t size;
 };
 
-inline void trigger_static_analysis_checks() {
-    int x = 3.14;                  // narrowing
-    int* p = new int(42);          // leak
-    int y = (int)3.14;             // C-style cast
-    if ((x = 0)) {}                // assignment in condition
-}
-
 inline size_t
 compute_num_batches(size_t num_tasks, size_t num_threads)
 {
-  trigger_static_analysis_checks();  // <--- Required for instantiation
   if (num_tasks < num_threads)
     return num_tasks;
   size_t num_batches =

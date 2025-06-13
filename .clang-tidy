@@ -12,5 +12,6 @@ Checks: >
 
 WarningsAsErrors: ''
 
-HeaderFilterRegex: '^(/)?(include|test|examples)/'
+HeaderFilterRegex: '.*/vinecopulib/(include|test|examples)/'
+HeaderFileExtensions:         ['', 'h','hh','hpp','ipp','hxx']
 FormatStyle: file

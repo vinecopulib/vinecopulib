@@ -9,16 +9,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Install the version specified in your .clang-format (here LLVM 14).
       - name: Install clang-format
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-format-14
+          sudo apt-get install -y clang-format-18
 
       - name: Check formatting
         run: |
           FILES=$(git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$')
-          clang-format-14 --dry-run --Werror $FILES
+          clang-format-18 --dry-run --Werror $FILES
   build:
     strategy:
       fail-fast: false
@@ -90,8 +89,8 @@ jobs:
         if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.name == 'Clang'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-tidy-14
-          clang-tidy-14 -p debug -quiet test/test_all.cpp
+          sudo apt-get install -y clang-tidy-18
+          clang-tidy-18 -p debug -quiet test/test_all.cpp
       - name: Code coverage
         uses: codecov/codecov-action@v5
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
