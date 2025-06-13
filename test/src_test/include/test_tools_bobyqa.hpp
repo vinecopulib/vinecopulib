@@ -6,7 +6,9 @@
 
 #pragma once
 
+// NOLINTBEGIN
 #include "gtest/gtest.h"
+// NOLINTEND
 #include <cmath>
 #include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_bobyqa.hpp>

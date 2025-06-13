@@ -7,7 +7,9 @@
 #pragma once
 
 #include "test_vinecop_sanity_checks.hpp"
+// NOLINTBEGIN
 #include "gtest/gtest.h"
+// NOLINTEND
 #include <vinecopulib.hpp>
 
 namespace test_tools_stats {
