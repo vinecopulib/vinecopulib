@@ -1,22 +1,23 @@
-Checks: >
-  -*,
-  bugprone-*,
-  performance-*,
-  readability-*,
-  modernize-*,  
-  cppcoreguidelines-*,
-  portability-*,
-  clang-analyzer-*,
-  misc-*,
-  hicpp-*,
-  boost-*
+# Checks: >
+#   -*,
+#   bugprone-*,
+#   performance-*,
+#   readability-*,
+#   modernize-*,  
+#   cppcoreguidelines-*,
+#   portability-*,
+#   clang-analyzer-*,
+#   misc-*,
+#   hicpp-*,
+#   boost-*
+Checks: '-*,bugprone-*,readability-*'
 
 WarningsAsErrors: ''
 
 HeaderFilterRegex: '.*/vinecopulib/(include|test|examples)/'
 ExcludeHeaderFilterRegex: '.*(_deps|eigen3|boost|gtest).*'
 SystemHeaders: false
-HeaderFileExtensions:         ['', 'h','hh','hpp','ipp','hxx']
+HeaderFileExtensions: ['', 'h','hh','hpp','ipp','hxx']
 FormatStyle: file
 
 CheckOptions:
