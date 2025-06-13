@@ -14,5 +14,6 @@ Checks: >
 WarningsAsErrors: ''
 
 HeaderFilterRegex: '.*/vinecopulib/(include|test|examples)/'
+ExcludeHeaderFilterRegex: '.*(_deps|eigen3|boost|gtest).*'
 HeaderFileExtensions:         ['', 'h','hh','hpp','ipp','hxx']
 FormatStyle: file

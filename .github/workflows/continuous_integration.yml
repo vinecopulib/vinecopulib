@@ -13,11 +13,11 @@ jobs:
       - name: Install clang-format
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-format-18
+          sudo apt-get install -y clang-format-19
       - name: Check formatting
         run: |
           FILES=$(git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$')
-          clang-format-18 --dry-run --Werror $FILES
+          clang-format-19 --dry-run --Werror $FILES
   clang-tidy:
     name: Clang-Tidy Static Code Analysis
     runs-on: ubuntu-latest
@@ -54,8 +54,8 @@ jobs:
       - name: Install and run clang-tidy
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-tidy-18
-          clang-tidy-18 -p debug -quiet test/test_all.cpp
+          sudo apt-get install -y clang-tidy-19
+          clang-tidy-19 -p debug -quiet test/test_all.cpp
   build:
     strategy:
       fail-fast: false
