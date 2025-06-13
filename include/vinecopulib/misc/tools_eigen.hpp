@@ -25,7 +25,6 @@ unaryExpr_or_nan(const Eigen::MatrixXd& x, const T& func)
       return std::numeric_limits<double>::quiet_NaN();
     }
     return func(y);
-   
   });
 }
 
@@ -38,7 +37,6 @@ binaryExpr_or_nan(const Eigen::MatrixXd& u, const T& func)
       return std::numeric_limits<double>::quiet_NaN();
     }
     return func(u1, u2);
-   
   };
   return u.col(0).binaryExpr(u.col(1), func_or_nan);
 }

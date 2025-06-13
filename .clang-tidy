@@ -15,7 +15,7 @@ Checks: '-*,bugprone-*,readability-*,-readability-identifier-length'
 WarningsAsErrors: ''
 
 HeaderFilterRegex: '.*/vinecopulib/(include|test|examples)/'
-ExcludeHeaderFilterRegex: '.*(_deps|eigen3|boost|gtest).*'
+ExcludeHeaderFilterRegex: '.*(_deps|eigen3|boost|gtest|nlohmann_json).*'
 SystemHeaders: false
 HeaderFileExtensions: ['', 'h','hh','hpp','ipp','hxx']
 FormatStyle: file

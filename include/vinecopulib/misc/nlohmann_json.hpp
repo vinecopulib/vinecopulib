@@ -48,22 +48,31 @@
 
 // #include <nlohmann/adl_serializer.hpp>
 
+#include <utility>
+
 // #include <nlohmann/detail/conversions/from_json.hpp>
 
+#include <algorithm>    // transform
 #include <array>        // array
 #include <forward_list> // forward_list
+#include <iterator>     // inserter, front_inserter, end
 #include <map>          // map
+#include <string>       // string
 #include <tuple>        // tuple, make_tuple
 #include <type_traits> // is_arithmetic, is_same, is_enum, underlying_type, is_convertible
 #include <unordered_map> // unordered_map
+#include <utility>       // pair, declval
 #include <valarray>      // valarray
 
 // #include <nlohmann/detail/exceptions.hpp>
 
 #include <exception> // exception
 #include <stdexcept> // runtime_error
+#include <string>    // to_string
 
 // #include <nlohmann/detail/input/position_t.hpp>
+
+#include <cstddef> // size_t
 
 namespace nlohmann {
 namespace detail {
@@ -86,6 +95,7 @@ struct position_t
 
 // #include <nlohmann/detail/macro_scope.hpp>
 
+#include <utility> // pair
 // #include <nlohmann/thirdparty/hedley/hedley.hpp>
 /* Hedley - https://nemequ.github.io/hedley
  * Created by Evan Nemerson <evan@nemerson.com>
@@ -6911,7 +6921,7 @@ struct merge_and_renumber<index_sequence<I1...>, index_sequence<I2...>>
 template<std::size_t N>
 struct make_index_sequence
   : merge_and_renumber<typename make_index_sequence<N / 2>::type,
-                       typename make_index_sequence<N - (N / 2)>::type>
+                       typename make_index_sequence<N - N / 2>::type>
 {
 };
 
@@ -6951,7 +6961,8 @@ constexpr T static_const<T>::value;
 
 // #include <nlohmann/detail/meta/type_traits.hpp>
 
-#include <limits>  // numeric_limits
+#include <limits> // numeric_limits
+#include <type_traits> // false_type, is_constructible, is_integral, is_same, true_type
 #include <utility> // declval
 
 // #include <nlohmann/detail/iterators/iterator_traits.hpp>
@@ -7027,6 +7038,8 @@ struct iterator_traits<T*, enable_if_t<std::is_object<T>::value>>
 // #include <nlohmann/detail/meta/cpp_future.hpp>
 
 // #include <nlohmann/detail/meta/detected.hpp>
+
+#include <type_traits>
 
 // #include <nlohmann/detail/meta/void_t.hpp>
 
@@ -7634,6 +7647,8 @@ struct is_constructible_tuple<T1, std::tuple<Args...>>
 
 #include <array>   // array
 #include <cstddef> // size_t
+#include <cstdint> // uint8_t
+#include <string>  // string
 
 namespace nlohmann {
 namespace detail {
@@ -8169,12 +8184,19 @@ constexpr const auto& from_json =
 
 #include <algorithm> // copy
 #include <iterator>  // begin, end
+#include <string>    // string
 #include <tuple>     // tuple, get
 #include <type_traits> // is_same, is_constructible, is_floating_point, is_enum, underlying_type
 #include <utility>  // move, forward, declval, pair
 #include <valarray> // valarray
+#include <vector>   // vector
 
 // #include <nlohmann/detail/iterators/iteration_proxy.hpp>
+
+#include <cstddef>  // size_t
+#include <iterator> // input_iterator_tag
+#include <string>   // string, to_string
+#include <tuple>    // tuple_size, get, tuple_element
 
 // #include <nlohmann/detail/meta/type_traits.hpp>
 
@@ -8212,7 +8234,7 @@ private:
   /// a string representation of the array index
   mutable string_type array_index_str = "0";
   /// an empty string (to return a reference for primitive values)
-  const string_type empty_str;
+  const string_type empty_str = "";
 
 public:
   explicit iteration_proxy_value(IteratorType it) noexcept
@@ -8837,6 +8859,10 @@ struct adl_serializer
 
 // #include <nlohmann/byte_container_with_subtype.hpp>
 
+#include <cstdint> // uint8_t
+#include <tuple>   // tie
+#include <utility> // move
+
 namespace nlohmann {
 
 /*!
@@ -9013,6 +9039,7 @@ private:
 
 // #include <nlohmann/detail/hash.hpp>
 
+#include <cstddef>    // size_t, uint8_t
 #include <functional> // hash
 
 namespace nlohmann {
@@ -9121,17 +9148,33 @@ hash(const BasicJsonType& j)
 
 // #include <nlohmann/detail/input/binary_reader.hpp>
 
+#include <algorithm> // generate_n
+#include <array>     // array
 #include <cmath>     // ldexp
+#include <cstddef>   // size_t
+#include <cstdint>   // uint8_t, uint16_t, uint32_t, uint64_t
 #include <cstdio>    // snprintf
 #include <cstring>   // memcpy
+#include <iterator>  // back_inserter
 #include <limits>    // numeric_limits
+#include <string>    // char_traits, string
+#include <utility>   // make_pair, move
 
 // #include <nlohmann/detail/exceptions.hpp>
 
 // #include <nlohmann/detail/input/input_adapters.hpp>
 
+#include <array>   // array
+#include <cstddef> // size_t
+#include <cstdio>  //FILE *
+#include <cstring> // strlen
 #include <istream> // istream
+#include <iterator> // begin, end, iterator_traits, random_access_iterator_tag, distance, next
+#include <memory>  // shared_ptr, make_shared, addressof
 #include <numeric> // accumulate
+#include <string>  // string, char_traits
+#include <type_traits> // enable_if, is_base_of, is_pointer, is_integral, remove_pointer
+#include <utility> // pair, declval
 
 // #include <nlohmann/detail/iterators/iterator_traits.hpp>
 
@@ -9265,8 +9308,9 @@ public:
       auto result = std::char_traits<char_type>::to_int_type(*current);
       std::advance(current, 1);
       return result;
+    } else {
+      return std::char_traits<char_type>::eof();
     }
-    return std::char_traits<char_type>::eof();
   }
 
 private:
@@ -9307,27 +9351,27 @@ struct wide_string_input_helper<BaseInputAdapter, 4>
         utf8_bytes_filled = 1;
       } else if (wc <= 0x7FF) {
         utf8_bytes[0] = static_cast<std::char_traits<char>::int_type>(
-          0xC0U | ((static_cast<unsigned int>(wc) >> 6U) & 0x1FU));
+          0xC0u | ((static_cast<unsigned int>(wc) >> 6u) & 0x1Fu));
         utf8_bytes[1] = static_cast<std::char_traits<char>::int_type>(
-          0x80U | (static_cast<unsigned int>(wc) & 0x3FU));
+          0x80u | (static_cast<unsigned int>(wc) & 0x3Fu));
         utf8_bytes_filled = 2;
       } else if (wc <= 0xFFFF) {
         utf8_bytes[0] = static_cast<std::char_traits<char>::int_type>(
-          0xE0U | ((static_cast<unsigned int>(wc) >> 12U) & 0x0FU));
+          0xE0u | ((static_cast<unsigned int>(wc) >> 12u) & 0x0Fu));
         utf8_bytes[1] = static_cast<std::char_traits<char>::int_type>(
-          0x80U | ((static_cast<unsigned int>(wc) >> 6U) & 0x3FU));
+          0x80u | ((static_cast<unsigned int>(wc) >> 6u) & 0x3Fu));
         utf8_bytes[2] = static_cast<std::char_traits<char>::int_type>(
-          0x80U | (static_cast<unsigned int>(wc) & 0x3FU));
+          0x80u | (static_cast<unsigned int>(wc) & 0x3Fu));
         utf8_bytes_filled = 3;
       } else if (wc <= 0x10FFFF) {
         utf8_bytes[0] = static_cast<std::char_traits<char>::int_type>(
-          0xF0U | ((static_cast<unsigned int>(wc) >> 18U) & 0x07U));
+          0xF0u | ((static_cast<unsigned int>(wc) >> 18u) & 0x07u));
         utf8_bytes[1] = static_cast<std::char_traits<char>::int_type>(
-          0x80U | ((static_cast<unsigned int>(wc) >> 12U) & 0x3FU));
+          0x80u | ((static_cast<unsigned int>(wc) >> 12u) & 0x3Fu));
         utf8_bytes[2] = static_cast<std::char_traits<char>::int_type>(
-          0x80U | ((static_cast<unsigned int>(wc) >> 6U) & 0x3FU));
+          0x80u | ((static_cast<unsigned int>(wc) >> 6u) & 0x3Fu));
         utf8_bytes[3] = static_cast<std::char_traits<char>::int_type>(
-          0x80U | (static_cast<unsigned int>(wc) & 0x3FU));
+          0x80u | (static_cast<unsigned int>(wc) & 0x3Fu));
         utf8_bytes_filled = 4;
       } else {
         // unknown character
@@ -9363,32 +9407,32 @@ struct wide_string_input_helper<BaseInputAdapter, 2>
         utf8_bytes_filled = 1;
       } else if (wc <= 0x7FF) {
         utf8_bytes[0] = static_cast<std::char_traits<char>::int_type>(
-          0xC0U | ((static_cast<unsigned int>(wc) >> 6U)));
+          0xC0u | ((static_cast<unsigned int>(wc) >> 6u)));
         utf8_bytes[1] = static_cast<std::char_traits<char>::int_type>(
-          0x80U | (static_cast<unsigned int>(wc) & 0x3FU));
+          0x80u | (static_cast<unsigned int>(wc) & 0x3Fu));
         utf8_bytes_filled = 2;
       } else if (0xD800 > wc || wc >= 0xE000) {
         utf8_bytes[0] = static_cast<std::char_traits<char>::int_type>(
-          0xE0U | ((static_cast<unsigned int>(wc) >> 12U)));
+          0xE0u | ((static_cast<unsigned int>(wc) >> 12u)));
         utf8_bytes[1] = static_cast<std::char_traits<char>::int_type>(
-          0x80U | ((static_cast<unsigned int>(wc) >> 6U) & 0x3FU));
+          0x80u | ((static_cast<unsigned int>(wc) >> 6u) & 0x3Fu));
         utf8_bytes[2] = static_cast<std::char_traits<char>::int_type>(
-          0x80U | (static_cast<unsigned int>(wc) & 0x3FU));
+          0x80u | (static_cast<unsigned int>(wc) & 0x3Fu));
         utf8_bytes_filled = 3;
       } else {
         if (JSON_HEDLEY_UNLIKELY(!input.empty())) {
           const auto wc2 = static_cast<unsigned int>(input.get_character());
           const auto charcode =
-            0x10000U + (((static_cast<unsigned int>(wc) & 0x3FFU) << 10U) |
-                        (wc2 & 0x3FFU));
+            0x10000u + (((static_cast<unsigned int>(wc) & 0x3FFu) << 10u) |
+                        (wc2 & 0x3FFu));
           utf8_bytes[0] = static_cast<std::char_traits<char>::int_type>(
-            0xF0U | (charcode >> 18U));
+            0xF0u | (charcode >> 18u));
           utf8_bytes[1] = static_cast<std::char_traits<char>::int_type>(
-            0x80U | ((charcode >> 12U) & 0x3FU));
+            0x80u | ((charcode >> 12u) & 0x3Fu));
           utf8_bytes[2] = static_cast<std::char_traits<char>::int_type>(
-            0x80U | ((charcode >> 6U) & 0x3FU));
+            0x80u | ((charcode >> 6u) & 0x3Fu));
           utf8_bytes[3] = static_cast<std::char_traits<char>::int_type>(
-            0x80U | (charcode & 0x3FU));
+            0x80u | (charcode & 0x3Fu));
           utf8_bytes_filled = 4;
         } else {
           utf8_bytes[0] = static_cast<std::char_traits<char>::int_type>(wc);
@@ -9594,6 +9638,11 @@ private:
 } // namespace nlohmann
 
 // #include <nlohmann/detail/input/json_sax.hpp>
+
+#include <cstddef>
+#include <string>  // string
+#include <utility> // move
+#include <vector>  // vector
 
 // #include <nlohmann/detail/exceptions.hpp>
 
@@ -10191,9 +10240,9 @@ private:
   /// stack to model hierarchy of values
   std::vector<BasicJsonType*> ref_stack{};
   /// stack to manage which values to keep
-  std::vector<bool> keep_stack;
+  std::vector<bool> keep_stack{};
   /// stack to manage which object keys to keep
-  std::vector<bool> key_keep_stack;
+  std::vector<bool> key_keep_stack{};
   /// helper to hold the reference for the next object element
   BasicJsonType* object_element = nullptr;
   /// whether a syntax error occurred
@@ -10256,9 +10305,15 @@ public:
 
 // #include <nlohmann/detail/input/lexer.hpp>
 
+#include <array>            // array
 #include <clocale>          // localeconv
+#include <cstddef>          // size_t
+#include <cstdio>           // snprintf
 #include <cstdlib>          // strtof, strtod, strtold, strtoll, strtoull
 #include <initializer_list> // initializer_list
+#include <string>           // char_traits, string
+#include <utility>          // move
+#include <vector>           // vector
 
 // #include <nlohmann/detail/input/input_adapters.hpp>
 
@@ -10418,19 +10473,19 @@ private:
     JSON_ASSERT(current == 'u');
     int codepoint = 0;
 
-    const auto factors = { 12U, 8U, 4U, 0U };
+    const auto factors = { 12u, 8u, 4u, 0u };
     for (const auto factor : factors) {
       get();
 
       if (current >= '0' && current <= '9') {
         codepoint += static_cast<int>(
-          (static_cast<unsigned int>(current) - 0x30U) << factor);
+          (static_cast<unsigned int>(current) - 0x30u) << factor);
       } else if (current >= 'A' && current <= 'F') {
         codepoint += static_cast<int>(
-          (static_cast<unsigned int>(current) - 0x37U) << factor);
+          (static_cast<unsigned int>(current) - 0x37u) << factor);
       } else if (current >= 'a' && current <= 'f') {
         codepoint += static_cast<int>(
-          (static_cast<unsigned int>(current) - 0x57U) << factor);
+          (static_cast<unsigned int>(current) - 0x57u) << factor);
       } else {
         return -1;
       }
@@ -10575,13 +10630,13 @@ private:
                     // overwrite codepoint
                     codepoint = static_cast<int>(
                       // high surrogate occupies the most significant 22 bits
-                      (static_cast<unsigned int>(codepoint1) << 10U)
+                      (static_cast<unsigned int>(codepoint1) << 10u)
                       // low surrogate occupies the least significant 15 bits
                       + static_cast<unsigned int>(codepoint2)
                       // there is still the 0xD800, 0xDC00 and 0x10000 noise
                       // in the result so we have to subtract with:
                       // (0xD800 << 10) + DC00 - 0x10000 = 0x35FDC00
-                      - 0x35FDC00U);
+                      - 0x35FDC00u);
                   } else {
                     error_message = "invalid string: surrogate U+D800..U+DBFF "
                                     "must be followed by U+DC00..U+DFFF";
@@ -10611,30 +10666,30 @@ private:
               } else if (codepoint <= 0x7FF) {
                 // 2-byte characters: 110xxxxx 10xxxxxx
                 add(static_cast<char_int_type>(
-                  0xC0U | (static_cast<unsigned int>(codepoint) >> 6U)));
+                  0xC0u | (static_cast<unsigned int>(codepoint) >> 6u)));
                 add(static_cast<char_int_type>(
-                  0x80U | (static_cast<unsigned int>(codepoint) & 0x3FU)));
+                  0x80u | (static_cast<unsigned int>(codepoint) & 0x3Fu)));
               } else if (codepoint <= 0xFFFF) {
                 // 3-byte characters: 1110xxxx 10xxxxxx 10xxxxxx
                 add(static_cast<char_int_type>(
-                  0xE0U | (static_cast<unsigned int>(codepoint) >> 12U)));
+                  0xE0u | (static_cast<unsigned int>(codepoint) >> 12u)));
                 add(static_cast<char_int_type>(
-                  0x80U |
-                  ((static_cast<unsigned int>(codepoint) >> 6U) & 0x3FU)));
+                  0x80u |
+                  ((static_cast<unsigned int>(codepoint) >> 6u) & 0x3Fu)));
                 add(static_cast<char_int_type>(
-                  0x80U | (static_cast<unsigned int>(codepoint) & 0x3FU)));
+                  0x80u | (static_cast<unsigned int>(codepoint) & 0x3Fu)));
               } else {
                 // 4-byte characters: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
                 add(static_cast<char_int_type>(
-                  0xF0U | (static_cast<unsigned int>(codepoint) >> 18U)));
+                  0xF0u | (static_cast<unsigned int>(codepoint) >> 18u)));
                 add(static_cast<char_int_type>(
-                  0x80U |
-                  ((static_cast<unsigned int>(codepoint) >> 12U) & 0x3FU)));
+                  0x80u |
+                  ((static_cast<unsigned int>(codepoint) >> 12u) & 0x3Fu)));
                 add(static_cast<char_int_type>(
-                  0x80U |
-                  ((static_cast<unsigned int>(codepoint) >> 6U) & 0x3FU)));
+                  0x80u |
+                  ((static_cast<unsigned int>(codepoint) >> 6u) & 0x3Fu)));
                 add(static_cast<char_int_type>(
-                  0x80U | (static_cast<unsigned int>(codepoint) & 0x3FU)));
+                  0x80u | (static_cast<unsigned int>(codepoint) & 0x3Fu)));
               }
 
               break;
@@ -11789,6 +11844,10 @@ private:
 
 // #include <nlohmann/detail/meta/is_sax.hpp>
 
+#include <cstdint> // size_t
+#include <string>  // string
+#include <utility> // declval
+
 // #include <nlohmann/detail/meta/detected.hpp>
 
 // #include <nlohmann/detail/meta/type_traits.hpp>
@@ -12574,7 +12633,7 @@ private:
       case 0x96:
       case 0x97:
         return get_cbor_array(
-          static_cast<std::size_t>(static_cast<unsigned int>(current) & 0x1FU),
+          static_cast<std::size_t>(static_cast<unsigned int>(current) & 0x1Fu),
           tag_handler);
 
       case 0x98: // array (one-byte uint8_t for n follows)
@@ -12634,7 +12693,7 @@ private:
       case 0xB6:
       case 0xB7:
         return get_cbor_object(
-          static_cast<std::size_t>(static_cast<unsigned int>(current) & 0x1FU),
+          static_cast<std::size_t>(static_cast<unsigned int>(current) & 0x1Fu),
           tag_handler);
 
       case 0xB8: // map (one-byte uint8_t for n follows)
@@ -12768,10 +12827,10 @@ private:
         // without such support. An example of a small decoder for
         // half-precision floating-point numbers in the C language
         // is shown in Fig. 3.
-        const auto half = static_cast<unsigned int>((byte1 << 8U) + byte2);
+        const auto half = static_cast<unsigned int>((byte1 << 8u) + byte2);
         const double val = [&half] {
-          const int exp = (half >> 10U) & 0x1FU;
-          const unsigned int mant = half & 0x3FFU;
+          const int exp = (half >> 10u) & 0x1Fu;
+          const unsigned int mant = half & 0x3FFu;
           JSON_ASSERT(0 <= exp && exp <= 32);
           JSON_ASSERT(mant <= 1024);
           switch (exp) {
@@ -12784,7 +12843,7 @@ private:
               return std::ldexp(mant + 1024, exp - 25);
           }
         }();
-        return sax->number_float((half & 0x8000U) != 0
+        return sax->number_float((half & 0x8000u) != 0
                                    ? static_cast<number_float_t>(-val)
                                    : static_cast<number_float_t>(val),
                                  "");
@@ -12863,7 +12922,7 @@ private:
       case 0x76:
       case 0x77: {
         return get_string(input_format_t::cbor,
-                          static_cast<unsigned int>(current) & 0x1FU,
+                          static_cast<unsigned int>(current) & 0x1Fu,
                           result);
       }
 
@@ -12968,7 +13027,7 @@ private:
       case 0x56:
       case 0x57: {
         return get_binary(input_format_t::cbor,
-                          static_cast<unsigned int>(current) & 0x1FU,
+                          static_cast<unsigned int>(current) & 0x1Fu,
                           result);
       }
 
@@ -13265,7 +13324,7 @@ private:
       case 0x8E:
       case 0x8F:
         return get_msgpack_object(
-          static_cast<std::size_t>(static_cast<unsigned int>(current) & 0x0FU));
+          static_cast<std::size_t>(static_cast<unsigned int>(current) & 0x0Fu));
 
         // fixarray
       case 0x90:
@@ -13285,7 +13344,7 @@ private:
       case 0x9E:
       case 0x9F:
         return get_msgpack_array(
-          static_cast<std::size_t>(static_cast<unsigned int>(current) & 0x0FU));
+          static_cast<std::size_t>(static_cast<unsigned int>(current) & 0x0Fu));
 
         // fixstr
       case 0xA0:
@@ -13553,7 +13612,7 @@ private:
       case 0xBE:
       case 0xBF: {
         return get_string(input_format_t::msgpack,
-                          static_cast<unsigned int>(current) & 0x1FU,
+                          static_cast<unsigned int>(current) & 0x1Fu,
                           result);
       }
 
@@ -14448,6 +14507,7 @@ private:
     return error_msg + " " + context + ": " + detail;
   }
 
+private:
   /// input adapter
   InputAdapterType ia;
 
@@ -14471,6 +14531,13 @@ private:
 // #include <nlohmann/detail/input/lexer.hpp>
 
 // #include <nlohmann/detail/input/parser.hpp>
+
+#include <cmath>      // isfinite
+#include <cstdint>    // uint8_t
+#include <functional> // function
+#include <string>     // string
+#include <utility>    // move
+#include <vector>     // vector
 
 // #include <nlohmann/detail/exceptions.hpp>
 
@@ -14849,63 +14916,65 @@ private:
             101,
             m_lexer.get_position(),
             exception_message(token_type::end_array, "array")));
-      } // object
+      } else // object
+      {
         // comma -> next value
-      if (get_token() == token_type::value_separator) {
-        // parse key
-        if (JSON_HEDLEY_UNLIKELY(get_token() != token_type::value_string)) {
-          return sax->parse_error(
-            m_lexer.get_position(),
-            m_lexer.get_token_string(),
-            parse_error::create(
-              101,
+        if (get_token() == token_type::value_separator) {
+          // parse key
+          if (JSON_HEDLEY_UNLIKELY(get_token() != token_type::value_string)) {
+            return sax->parse_error(
               m_lexer.get_position(),
-              exception_message(token_type::value_string, "object key")));
+              m_lexer.get_token_string(),
+              parse_error::create(
+                101,
+                m_lexer.get_position(),
+                exception_message(token_type::value_string, "object key")));
+          }
+
+          if (JSON_HEDLEY_UNLIKELY(!sax->key(m_lexer.get_string()))) {
+            return false;
+          }
+
+          // parse separator (:)
+          if (JSON_HEDLEY_UNLIKELY(get_token() != token_type::name_separator)) {
+            return sax->parse_error(
+              m_lexer.get_position(),
+              m_lexer.get_token_string(),
+              parse_error::create(101,
+                                  m_lexer.get_position(),
+                                  exception_message(token_type::name_separator,
+                                                    "object separator")));
+          }
+
+          // parse values
+          get_token();
+          continue;
         }
 
-        if (JSON_HEDLEY_UNLIKELY(!sax->key(m_lexer.get_string()))) {
-          return false;
+        // closing }
+        if (JSON_HEDLEY_LIKELY(last_token == token_type::end_object)) {
+          if (JSON_HEDLEY_UNLIKELY(!sax->end_object())) {
+            return false;
+          }
+
+          // We are done with this object. Before we can parse a
+          // new value, we need to evaluate the new state first.
+          // By setting skip_to_state_evaluation to false, we
+          // are effectively jumping to the beginning of this if.
+          JSON_ASSERT(!states.empty());
+          states.pop_back();
+          skip_to_state_evaluation = true;
+          continue;
         }
 
-        // parse separator (:)
-        if (JSON_HEDLEY_UNLIKELY(get_token() != token_type::name_separator)) {
-          return sax->parse_error(
-            m_lexer.get_position(),
-            m_lexer.get_token_string(),
-            parse_error::create(101,
-                                m_lexer.get_position(),
-                                exception_message(token_type::name_separator,
-                                                  "object separator")));
-        }
-
-        // parse values
-        get_token();
-        continue;
-      }
-
-      // closing }
-      if (JSON_HEDLEY_LIKELY(last_token == token_type::end_object)) {
-        if (JSON_HEDLEY_UNLIKELY(!sax->end_object())) {
-          return false;
-        }
-
-        // We are done with this object. Before we can parse a
-        // new value, we need to evaluate the new state first.
-        // By setting skip_to_state_evaluation to false, we
-        // are effectively jumping to the beginning of this if.
-        JSON_ASSERT(!states.empty());
-        states.pop_back();
-        skip_to_state_evaluation = true;
-        continue;
-      }
-
-      return sax->parse_error(
-        m_lexer.get_position(),
-        m_lexer.get_token_string(),
-        parse_error::create(
-          101,
+        return sax->parse_error(
           m_lexer.get_position(),
-          exception_message(token_type::end_object, "object")));
+          m_lexer.get_token_string(),
+          parse_error::create(
+            101,
+            m_lexer.get_position(),
+            exception_message(token_type::end_object, "object")));
+      }
     }
   }
 
@@ -14939,6 +15008,7 @@ private:
     return error_msg;
   }
 
+private:
   /// callback function
   const parser_callback_t<BasicJsonType> callback = nullptr;
   /// the type of the last read token
@@ -14954,6 +15024,9 @@ private:
 // #include <nlohmann/detail/iterators/internal_iterator.hpp>
 
 // #include <nlohmann/detail/iterators/primitive_iterator.hpp>
+
+#include <cstddef> // ptrdiff_t
+#include <limits>  // numeric_limits
 
 namespace nlohmann {
 namespace detail {
@@ -15022,7 +15095,7 @@ public:
     return *this;
   }
 
-  primitive_iterator_t operator++(int) noexcept
+  primitive_iterator_t const operator++(int) noexcept
   {
     auto result = *this;
     ++m_it;
@@ -15035,7 +15108,7 @@ public:
     return *this;
   }
 
-  primitive_iterator_t operator--(int) noexcept
+  primitive_iterator_t const operator--(int) noexcept
   {
     auto result = *this;
     --m_it;
@@ -15080,6 +15153,9 @@ struct internal_iterator
 } // namespace nlohmann
 
 // #include <nlohmann/detail/iterators/iter_impl.hpp>
+
+#include <iterator> // iterator, random_access_iterator_tag, bidirectional_iterator_tag, advance, next
+#include <type_traits> // conditional, is_const, remove_const
 
 // #include <nlohmann/detail/exceptions.hpp>
 
@@ -15382,7 +15458,7 @@ public:
    @brief post-increment (it++)
    @pre The iterator is initialized; i.e. `m_object != nullptr`.
    */
-  iter_impl operator++(int)
+  iter_impl const operator++(int)
   {
     auto result = *this;
     ++(*this);
@@ -15421,7 +15497,7 @@ public:
    @brief post-decrement (it--)
    @pre The iterator is initialized; i.e. `m_object != nullptr`.
    */
-  iter_impl operator--(int)
+  iter_impl const operator--(int)
   {
     auto result = *this;
     --(*this);
@@ -15687,6 +15763,10 @@ private:
 
 // #include <nlohmann/detail/iterators/json_reverse_iterator.hpp>
 
+#include <cstddef>  // ptrdiff_t
+#include <iterator> // reverse_iterator
+#include <utility>  // declval
+
 namespace nlohmann {
 namespace detail {
 //////////////////////
@@ -15735,7 +15815,7 @@ public:
   }
 
   /// post-increment (it++)
-  json_reverse_iterator operator++(int)
+  json_reverse_iterator const operator++(int)
   {
     return static_cast<json_reverse_iterator>(base_iterator::operator++(1));
   }
@@ -15747,7 +15827,7 @@ public:
   }
 
   /// post-decrement (it--)
-  json_reverse_iterator operator--(int)
+  json_reverse_iterator const operator--(int)
   {
     return static_cast<json_reverse_iterator>(base_iterator::operator--(1));
   }
@@ -15809,7 +15889,13 @@ public:
 
 // #include <nlohmann/detail/json_pointer.hpp>
 
-#include <cctype> // isdigit
+#include <algorithm> // all_of
+#include <cctype>    // isdigit
+#include <limits>    // max
+#include <numeric>   // accumulate
+#include <string>    // string
+#include <utility>   // move
+#include <vector>    // vector
 
 // #include <nlohmann/detail/exceptions.hpp>
 
@@ -16740,6 +16826,9 @@ private:
 
 // #include <nlohmann/detail/json_ref.hpp>
 
+#include <initializer_list>
+#include <utility>
+
 // #include <nlohmann/detail/meta/type_traits.hpp>
 
 namespace nlohmann {
@@ -16821,14 +16910,28 @@ private:
 
 // #include <nlohmann/detail/output/binary_writer.hpp>
 
+#include <algorithm> // reverse
+#include <array>     // array
+#include <cmath>     // isnan, isinf
+#include <cstdint>   // uint8_t, uint16_t, uint32_t, uint64_t
+#include <cstring>   // memcpy
+#include <limits>    // numeric_limits
+#include <string>    // string
+
 // #include <nlohmann/detail/input/binary_reader.hpp>
 
 // #include <nlohmann/detail/macro_scope.hpp>
 
 // #include <nlohmann/detail/output/output_adapters.hpp>
 
-#include <ios>     // streamsize
-#include <ostream> // basic_ostream
+#include <algorithm> // copy
+#include <cstddef>   // size_t
+#include <ios>       // streamsize
+#include <iterator>  // back_inserter
+#include <memory>    // shared_ptr, make_shared
+#include <ostream>   // basic_ostream
+#include <string>    // basic_string
+#include <vector>    // vector
 // #include <nlohmann/detail/macro_scope.hpp>
 
 namespace nlohmann {
@@ -17679,7 +17782,7 @@ private:
           std::to_string(it) + ")"));
     }
 
-    return /*id*/ 1UL + name.size() + /*zero-terminator*/ 1U;
+    return /*id*/ 1ul + name.size() + /*zero-terminator*/ 1u;
   }
 
   /*!
@@ -17690,7 +17793,7 @@ private:
   {
     oa->write_character(to_char_type(element_type)); // boolean
     oa->write_characters(reinterpret_cast<const CharType*>(name.c_str()),
-                         name.size() + 1U);
+                         name.size() + 1u);
   }
 
   /*!
@@ -17716,7 +17819,7 @@ private:
    */
   static std::size_t calc_bson_string_size(const string_t& value)
   {
-    return sizeof(std::int32_t) + value.size() + 1UL;
+    return sizeof(std::int32_t) + value.size() + 1ul;
   }
 
   /*!
@@ -17727,7 +17830,7 @@ private:
     write_bson_entry_header(name, 0x02);
 
     write_number<std::int32_t, true>(
-      static_cast<std::int32_t>(value.size() + 1UL));
+      static_cast<std::int32_t>(value.size() + 1ul));
     oa->write_characters(reinterpret_cast<const CharType*>(value.c_str()),
                          value.size() + 1);
   }
@@ -17815,7 +17918,7 @@ private:
   static std::size_t calc_bson_array_size(
     const typename BasicJsonType::array_t& value)
   {
-    std::size_t array_index = 0UL;
+    std::size_t array_index = 0ul;
 
     const std::size_t embedded_document_size = std::accumulate(
       std::begin(value),
@@ -17827,7 +17930,7 @@ private:
                calc_bson_element_size(std::to_string(array_index++), el);
       });
 
-    return sizeof(std::int32_t) + embedded_document_size + 1UL;
+    return sizeof(std::int32_t) + embedded_document_size + 1ul;
   }
 
   /*!
@@ -17836,7 +17939,7 @@ private:
   static std::size_t calc_bson_binary_size(
     const typename BasicJsonType::binary_t& value)
   {
-    return sizeof(std::int32_t) + value.size() + 1UL;
+    return sizeof(std::int32_t) + value.size() + 1ul;
   }
 
   /*!
@@ -17849,7 +17952,7 @@ private:
     write_number<std::int32_t, true>(
       static_cast<std::int32_t>(calc_bson_array_size(value)));
 
-    std::size_t array_index = 0UL;
+    std::size_t array_index = 0ul;
 
     for (const auto& el : value) {
       write_bson_element(std::to_string(array_index++), el);
@@ -17893,10 +17996,10 @@ private:
         return header_size + calc_bson_binary_size(*j.m_value.binary);
 
       case value_t::boolean:
-        return header_size + 1UL;
+        return header_size + 1ul;
 
       case value_t::number_float:
-        return header_size + 8UL;
+        return header_size + 8ul;
 
       case value_t::number_integer:
         return header_size + calc_bson_integer_size(j.m_value.number_integer);
@@ -17908,12 +18011,12 @@ private:
         return header_size + calc_bson_string_size(*j.m_value.string);
 
       case value_t::null:
-        return header_size + 0UL;
+        return header_size + 0ul;
 
         // LCOV_EXCL_START
       default:
         JSON_ASSERT(false);
-        return 0UL;
+        return 0ul;
         // LCOV_EXCL_STOP
     }
   }
@@ -17981,7 +18084,7 @@ private:
         return result += calc_bson_element_size(el.first, el.second);
       });
 
-    return sizeof(std::int32_t) + document_size + 1UL;
+    return sizeof(std::int32_t) + document_size + 1ul;
   }
 
   /*!
@@ -18364,7 +18467,26 @@ private:
 
 // #include <nlohmann/detail/output/serializer.hpp>
 
+#include <algorithm>   // reverse, remove, fill, find, none_of
+#include <array>       // array
+#include <clocale>     // localeconv, lconv
+#include <cmath>       // labs, isfinite, isnan, signbit
+#include <cstddef>     // size_t, ptrdiff_t
+#include <cstdint>     // uint8_t
+#include <cstdio>      // snprintf
+#include <limits>      // numeric_limits
+#include <string>      // string, char_traits
+#include <type_traits> // is_same
+#include <utility>     // move
+
 // #include <nlohmann/detail/conversions/to_chars.hpp>
+
+#include <array>       // array
+#include <cmath>       // signbit, isfinite
+#include <cstdint>     // intN_t, uintN_t
+#include <cstring>     // memcpy, memmove
+#include <limits>      // numeric_limits
+#include <type_traits> // conditional
 
 // #include <nlohmann/detail/macro_scope.hpp>
 
@@ -18461,21 +18583,21 @@ struct diyfp // f * 2^e
     //
     //   = p_lo + 2^64 p_hi
 
-    const std::uint64_t u_lo = x.f & 0xFFFFFFFFU;
-    const std::uint64_t u_hi = x.f >> 32U;
-    const std::uint64_t v_lo = y.f & 0xFFFFFFFFU;
-    const std::uint64_t v_hi = y.f >> 32U;
+    const std::uint64_t u_lo = x.f & 0xFFFFFFFFu;
+    const std::uint64_t u_hi = x.f >> 32u;
+    const std::uint64_t v_lo = y.f & 0xFFFFFFFFu;
+    const std::uint64_t v_hi = y.f >> 32u;
 
     const std::uint64_t p0 = u_lo * v_lo;
     const std::uint64_t p1 = u_lo * v_hi;
     const std::uint64_t p2 = u_hi * v_lo;
     const std::uint64_t p3 = u_hi * v_hi;
 
-    const std::uint64_t p0_hi = p0 >> 32U;
-    const std::uint64_t p1_lo = p1 & 0xFFFFFFFFU;
-    const std::uint64_t p1_hi = p1 >> 32U;
-    const std::uint64_t p2_lo = p2 & 0xFFFFFFFFU;
-    const std::uint64_t p2_hi = p2 >> 32U;
+    const std::uint64_t p0_hi = p0 >> 32u;
+    const std::uint64_t p1_lo = p1 & 0xFFFFFFFFu;
+    const std::uint64_t p1_hi = p1 >> 32u;
+    const std::uint64_t p2_lo = p2 & 0xFFFFFFFFu;
+    const std::uint64_t p2_hi = p2 >> 32u;
 
     std::uint64_t Q = p0_hi + p1_lo + p2_lo;
 
@@ -18488,9 +18610,9 @@ struct diyfp // f * 2^e
     // Effectively we only need to add the highest bit in p_lo to p_hi (and
     // Q_hi + 1 does not overflow).
 
-    Q += std::uint64_t{ 1 } << (64U - 32U - 1U); // round, ties up
+    Q += std::uint64_t{ 1 } << (64u - 32u - 1u); // round, ties up
 
-    const std::uint64_t h = p3 + p2_hi + p1_hi + (Q >> 32U);
+    const std::uint64_t h = p3 + p2_hi + p1_hi + (Q >> 32u);
 
     return { h, x.e + y.e + 64 };
   }
@@ -18503,8 +18625,8 @@ struct diyfp // f * 2^e
   {
     JSON_ASSERT(x.f != 0);
 
-    while ((x.f >> 63U) == 0) {
-      x.f <<= 1U;
+    while ((x.f >> 63u) == 0) {
+      x.f <<= 1u;
       x.e--;
     }
 
@@ -18599,10 +18721,10 @@ compute_boundaries(FloatType value)
   //                       v-     m-     v             m+            v+
 
   const bool lower_boundary_is_closer = F == 0 && E > 1;
-  const diyfp m_plus = diyfp((2 * v.f) + 1, v.e - 1);
+  const diyfp m_plus = diyfp(2 * v.f + 1, v.e - 1);
   const diyfp m_minus = lower_boundary_is_closer
-                          ? diyfp((4 * v.f) - 1, v.e - 2)  // (B)
-                          : diyfp((2 * v.f) - 1, v.e - 1); // (A)
+                          ? diyfp(4 * v.f - 1, v.e - 2)  // (B)
+                          : diyfp(2 * v.f - 1, v.e - 1); // (A)
 
   // Determine the normalized w+ = m+.
   const diyfp w_plus = diyfp::normalize(m_plus);
@@ -18791,7 +18913,7 @@ get_cached_power_for_binary_exponent(int e)
   JSON_ASSERT(e >= -1500);
   JSON_ASSERT(e <= 1500);
   const int f = kAlpha - e - 1;
-  const int k = ((f * 78913) / (1 << 18)) + static_cast<int>(f > 0);
+  const int k = (f * 78913) / (1 << 18) + static_cast<int>(f > 0);
 
   const int index = (-kCachedPowersMinDecExp + k + (kCachedPowersDecStep - 1)) /
                     kCachedPowersDecStep;
@@ -18818,7 +18940,7 @@ find_largest_pow10(const std::uint32_t n, std::uint32_t& pow10)
     return 10;
   }
   // LCOV_EXCL_STOP
-  if (n >= 100000000) {
+  else if (n >= 100000000) {
     pow10 = 100000000;
     return 9;
   } else if (n >= 10000000) {
@@ -19272,13 +19394,13 @@ append_exponent(char* buf, int e)
     *buf++ = '0';
     *buf++ = static_cast<char>('0' + k);
   } else if (k < 100) {
-    *buf++ = static_cast<char>('0' + (k / 10));
+    *buf++ = static_cast<char>('0' + k / 10);
     k %= 10;
     *buf++ = static_cast<char>('0' + k);
   } else {
-    *buf++ = static_cast<char>('0' + (k / 100));
+    *buf++ = static_cast<char>('0' + k / 100);
     k %= 100;
-    *buf++ = static_cast<char>('0' + (k / 10));
+    *buf++ = static_cast<char>('0' + k / 10);
     k %= 10;
     *buf++ = static_cast<char>('0' + k);
   }
@@ -19863,8 +19985,8 @@ private:
                     string_buffer.data() + bytes,
                     13,
                     "\\u%04x\\u%04x",
-                    static_cast<std::uint16_t>(0xD7C0U + (codepoint >> 10U)),
-                    static_cast<std::uint16_t>(0xDC00U + (codepoint & 0x3FFU)));
+                    static_cast<std::uint16_t>(0xD7C0u + (codepoint >> 10u)),
+                    static_cast<std::uint16_t>(0xDC00u + (codepoint & 0x3FFu)));
                   bytes += 12;
                 }
               } else {
@@ -19895,7 +20017,7 @@ private:
           switch (error_handler) {
             case error_handler_t::strict: {
               std::string sn(3, '\0');
-              (std::snprintf)(sn.data(), sn.size(), "%.2X", byte);
+              (std::snprintf)(&sn[0], sn.size(), "%.2X", byte);
               JSON_THROW(type_error::create(316,
                                             "invalid UTF-8 byte at index " +
                                               std::to_string(i) + ": 0x" + sn));
@@ -19984,7 +20106,7 @@ private:
         case error_handler_t::strict: {
           std::string sn(3, '\0');
           (std::snprintf)(
-            sn.data(), sn.size(), "%.2X", static_cast<std::uint8_t>(s.back()));
+            &sn[0], sn.size(), "%.2X", static_cast<std::uint8_t>(s.back()));
           JSON_THROW(type_error::create(
             316, "incomplete UTF-8 string; last byte: 0x" + sn));
         }
@@ -20021,7 +20143,7 @@ private:
    @param[in] x  unsigned integer number to count its digits
    @return    number of decimal digits
    */
-  unsigned int count_digits(number_unsigned_t x) noexcept
+  inline unsigned int count_digits(number_unsigned_t x) noexcept
   {
     unsigned int n_digits = 1;
     for (;;) {
@@ -20037,7 +20159,7 @@ private:
       if (x < 10000) {
         return n_digits + 3;
       }
-      x = x / 10000U;
+      x = x / 10000u;
       n_digits += 4;
     }
   }
@@ -20094,7 +20216,7 @@ private:
     }
 
     // use a pointer to fill the buffer
-    auto* buffer_ptr = number_buffer.begin();
+    auto buffer_ptr = number_buffer.begin();
 
     const bool is_negative =
       std::is_same<NumberType, number_integer_t>::value &&
@@ -20199,7 +20321,7 @@ private:
 
     // erase thousands separator
     if (thousands_sep != '\0') {
-      auto* const end = std::remove(
+      const auto end = std::remove(
         number_buffer.begin(), number_buffer.begin() + len, thousands_sep);
       std::fill(end, number_buffer.end(), '\0');
       JSON_ASSERT((end - number_buffer.begin()) <= len);
@@ -20208,7 +20330,7 @@ private:
 
     // convert decimal point to '.'
     if (decimal_point != '\0' && decimal_point != '.') {
-      auto* const dec_pos =
+      const auto dec_pos =
         std::find(number_buffer.begin(), number_buffer.end(), decimal_point);
       if (dec_pos != number_buffer.end()) {
         *dec_pos = '.';
@@ -20298,11 +20420,11 @@ private:
 
     const std::uint8_t type = utf8d[byte];
 
-    codep = (state != UTF8_ACCEPT) ? (byte & 0x3fU) | (codep << 6U)
-                                   : (0xFFU >> type) & (byte);
+    codep = (state != UTF8_ACCEPT) ? (byte & 0x3fu) | (codep << 6u)
+                                   : (0xFFu >> type) & (byte);
 
     std::size_t index =
-      256U + (static_cast<size_t>(state) * 16U) + static_cast<size_t>(type);
+      256u + static_cast<size_t>(state) * 16u + static_cast<size_t>(type);
     JSON_ASSERT(index < 400);
     state = utf8d[index];
     return state;
@@ -20328,12 +20450,13 @@ private:
    * absolute values of INT_MIN and INT_MAX are usually not the same. See
    * #1708 for details.
    */
-  number_unsigned_t remove_sign(number_integer_t x) noexcept
+  inline number_unsigned_t remove_sign(number_integer_t x) noexcept
   {
     JSON_ASSERT(x < 0 && x < (std::numeric_limits<number_integer_t>::max)());
     return static_cast<number_unsigned_t>(-(x + 1)) + 1;
   }
 
+private:
   /// the output of the serializer
   output_adapter_t<char> o = nullptr;
 
@@ -20366,6 +20489,11 @@ private:
 // #include <nlohmann/json_fwd.hpp>
 
 // #include <nlohmann/ordered_map.hpp>
+
+#include <functional> // less
+#include <memory>     // allocator
+#include <utility>    // pair
+#include <vector>     // vector
 
 namespace nlohmann {
 
@@ -22658,6 +22786,7 @@ public:
 
   /// @}
 
+public:
   ///////////////////////
   // object inspection //
   ///////////////////////
@@ -25234,6 +25363,7 @@ public:
     return const_reverse_iterator(cbegin());
   }
 
+public:
   /*!
    @brief wrapper to access iterator member functions in range-based for
 
@@ -26522,6 +26652,7 @@ public:
 
   /// @}
 
+public:
   //////////////////////////////////////////
   // lexicographical comparison operators //
   //////////////////////////////////////////

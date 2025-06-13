@@ -18,10 +18,7 @@ namespace tools_optimization {
 //! @param lower_bounds
 //! @param upper_bounds
 //! @param objective The optimizer's objective function
-inline Optimizer::Optimizer()
-   
-{
-}
+inline Optimizer::Optimizer() {}
 
 //! @brief Sets the optimizer's controls..
 //!

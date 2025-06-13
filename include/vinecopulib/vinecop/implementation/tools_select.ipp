@@ -617,7 +617,6 @@ VinecopSelector::get_hfunc_sub(const VertexProperties& vertex_data,
       return vertex_data.hfunc1_sub;
     }
     return vertex_data.hfunc1;
-
   }
   if (vertex_data.hfunc2_sub.size() != 0) {
     return vertex_data.hfunc2_sub;
