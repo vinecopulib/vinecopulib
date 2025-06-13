@@ -1,23 +1,61 @@
 name: Build Status 
-
 on: [push, pull_request]
+env:
+  BOOST_VERSION: 1.84.0
+  EIGEN_VERSION: 3.4.0
 
 jobs:
-  style:
-    name: clang-format
+  clang-format:
+    name: Clang-Format Style analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install clang-format
         run: |
           sudo apt-get update
           sudo apt-get install -y clang-format-18
-
       - name: Check formatting
         run: |
           FILES=$(git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$')
           clang-format-18 --dry-run --Werror $FILES
+  clang-tidy:
+    name: Clang-Tidy Static Code Analysis
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cfg:
+          - { name: Clang, cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work' }
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          platform: ${{ matrix.cfg.platform }}
+          boost_install_dir: ${{ matrix.cfg.root_install_dir }}
+          eigen_install_dir: ${{ matrix.cfg.root_install_dir }}
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          R: false  # optional here
+      - name: Set environment variables
+        run: |
+          echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
+          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
+      - name: Generate compilation database
+        run: |
+          mkdir debug && cd debug
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cd ..
+      - name: Install and run clang-tidy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-tidy-18
+          clang-tidy-18 -p debug -quiet test/test_all.cpp
   build:
     strategy:
       fail-fast: false
@@ -30,10 +68,6 @@ jobs:
           - { os: macos-14,    name: Clang,  cc: clang, cxx: clang++, platform: arm64, root_install_dir: '/Users/runner/work'} # apple silicon runner
           - { os: windows-latest,  name: x32, cc: cl,    cxx: cl,      platform: x32, root_install_dir: 'D:\'}
           - { os: windows-latest,  name: x64, cc: cl,    cxx: cl,      platform: x64, root_install_dir: 'D:\'}
-    env:
-      BOOST_VERSION: 1.84.0
-      EIGEN_VERSION: 3.4.0
-
     runs-on: ${{ matrix.cfg.os }}
     name:    ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
     steps:
@@ -63,7 +97,6 @@ jobs:
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
           fi
-
         shell: bash
       - name: Compile the debug version
         run:   |
@@ -85,12 +118,6 @@ jobs:
             cmake --build .
           fi
         shell: bash
-      - name: Run clang-tidy static analysis
-        if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.name == 'Clang'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-tidy-18
-          clang-tidy-18 -p debug -quiet test/test_all.cpp
       - name: Code coverage
         uses: codecov/codecov-action@v5
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
