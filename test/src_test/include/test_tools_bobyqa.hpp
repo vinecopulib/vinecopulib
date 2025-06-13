@@ -15,6 +15,8 @@ namespace test_tools_bobyqa {
 
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST(test_tools_bobyqa, const_function)
 {
 
@@ -127,4 +129,6 @@ TEST(test_tools_bobyqa, quadratic_function_with_jump)
   ASSERT_TRUE(fabs(result.first(0) - 0.49899) < 1e-5);
   ASSERT_TRUE(fabs(result.first(1) - 0.49800) < 1e-5);
 }
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

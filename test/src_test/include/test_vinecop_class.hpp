@@ -14,6 +14,8 @@
 namespace test_vinecop_class {
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST_F(VinecopTest, constructors_without_error)
 {
   Vinecop vinecop(5);
@@ -758,5 +760,6 @@ TEST_F(VinecopTest, tawn_flipping)
     }
   }
 }
-
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

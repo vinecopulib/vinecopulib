@@ -12,6 +12,8 @@
 namespace test_vinecop_sanity_checks {
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST(vinecop_sanity_checks, catches_wrong_tree)
 {
   Vinecop vinecop(3);
@@ -108,4 +110,6 @@ TEST(vinecop_sanity_checks, controls_check)
   EXPECT_ANY_THROW(controls.set_threshold(-1.0));
   EXPECT_ANY_THROW(controls.set_threshold(2.0));
 }
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

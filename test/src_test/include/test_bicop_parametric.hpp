@@ -10,6 +10,8 @@
 #include "rscript.hpp"
 
 namespace test_bicop_parametric {
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 using namespace vinecopulib;
 using namespace tools_stl;
 std::vector<int> rotations = { 0, 90, 180, 270 };
@@ -206,4 +208,6 @@ INSTANTIATE_TEST_SUITE_P(
   ParBicopTest,
   testing::Combine(testing::ValuesIn(bicop_families::parametric),
                    testing::ValuesIn(rotations)));
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

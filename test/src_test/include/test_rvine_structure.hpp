@@ -14,6 +14,8 @@ namespace test_rvine_structure {
 
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST(rvine_structure, triangular_array_works)
 {
   TriangularArray<size_t> my_rvm({ { 2, 3, 1, 1, 1, 1 },
@@ -248,4 +250,6 @@ TEST(rvine_structure, cvine_structure)
   EXPECT_EQ(test.get_trunc_lvl(), 4);
   EXPECT_EQ(test_tr.get_trunc_lvl(), 2);
 }
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

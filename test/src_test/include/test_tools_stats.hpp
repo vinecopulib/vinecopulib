@@ -14,6 +14,8 @@ namespace test_tools_stats {
 
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST(test_tools_stats, to_pseudo_obs_is_correct)
 {
 
@@ -210,4 +212,6 @@ TEST(test_tools_stats, find_latent_sample)
   EXPECT_THROW(tools_stats::find_latent_sample(u, bandwidth, niter),
                std::runtime_error);
 }
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

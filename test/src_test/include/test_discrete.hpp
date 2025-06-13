@@ -14,6 +14,8 @@ namespace test_discrete {
 
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST(discrete, bicop)
 {
   for (auto rot : { 0, 90, 180, 270 }) {
@@ -284,4 +286,6 @@ TEST(zero_inflated, vinecop)
     }
   }
 }
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

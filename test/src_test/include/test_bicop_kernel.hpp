@@ -12,6 +12,8 @@
 namespace test_bicop_kernel {
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST_P(TrafokernelTest, sanity_checks)
 {
   auto values = bicop_.get_parameters();
@@ -125,4 +127,6 @@ TEST_P(TrafokernelTest, reset)
 INSTANTIATE_TEST_SUITE_P(TrafokernelTest,
                          TrafokernelTest,
                          ::testing::Values("constant", "linear", "quadratic"));
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

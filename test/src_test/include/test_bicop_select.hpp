@@ -12,6 +12,8 @@
 namespace test_bicop_select {
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST(bicop_select, works_in_parallel)
 {
   Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
@@ -69,4 +71,6 @@ TEST(bicop_select, fit_stats_are_correct)
   EXPECT_NEAR(cop.get_mbic(), cop.mbic(u), 1e-10);
   EXPECT_NEAR(cop.get_mbic(), cop.mbic(), 1e-10);
 }
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }
