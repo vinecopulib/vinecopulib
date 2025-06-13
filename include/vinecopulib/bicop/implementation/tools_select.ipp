@@ -107,7 +107,8 @@ get_c1c2(const Eigen::MatrixXd& data,
   Eigen::MatrixXd z2 = x;
   x = tools_stats::qnorm(data);
 
-  int count1 = 0, count2 = 0;
+  int count1 = 0;
+  int count2 = 0;
   for (size_t j = 0; j < n; ++j) {
     if (tau > 0) {
       if ((x(j, 0) > 0) && (x(j, 1) > 0)) {
@@ -131,7 +132,8 @@ get_c1c2(const Eigen::MatrixXd& data,
   }
 
   // if one of the quadrants is empty, we see it as independent
-  double c1, c2;
+  double c1;
+  double c2;
   Eigen::VectorXd w;
 
   if (count1 == 0) {
@@ -161,8 +163,10 @@ preselect_family(std::vector<double> c, double tau, const Bicop& bicop)
   bool preselect = false;
   if (is_member(family, bicop_families::rotationless)) {
     preselect = true;
-    if ((std::fabs(c[0] - c[1]) > 0.3) & (family == BicopFamily::frank))
+    if (static_cast<int>((std::fabs(c[0] - c[1]) > 0.3) &
+                         static_cast<int>(family == BicopFamily::frank)) != 0) {
       preselect = false;
+    }
   } else {
     if (is_member(family, bicop_families::bb)) {
       if ((tau > 0) && is_member(rotation, { 0, 180 })) {

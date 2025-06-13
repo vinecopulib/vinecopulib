@@ -22,11 +22,11 @@ public:
                  double final_trust_region,
                  size_t maxeval);
 
-  double get_initial_trust_region();
+  double get_initial_trust_region() const;
 
-  double get_final_trust_region();
+  double get_final_trust_region() const;
 
-  size_t get_maxeval();
+  size_t get_maxeval() const;
 
 private:
   double initial_trust_region_; //! Initial trust region
@@ -35,9 +35,9 @@ private:
 
   //! Sanity checks
   //! @{
-  void check_parameters(double initial_trust_region,
-                        double final_trust_region,
-                        size_t maxeval);
+  static void check_parameters(double initial_trust_region,
+                               double final_trust_region,
+                               size_t maxeval);
   //! @}
 };
 
@@ -61,9 +61,9 @@ public:
   double get_objective_max() const;
 
 private:
-  void check_parameters_size(const Eigen::VectorXd& initial_parameters,
-                             const Eigen::VectorXd& lower_bounds,
-                             const Eigen::VectorXd& upper_bounds) const;
+  static void check_parameters_size(const Eigen::VectorXd& initial_parameters,
+                                    const Eigen::VectorXd& lower_bounds,
+                                    const Eigen::VectorXd& upper_bounds);
 
   BobyqaControls controls_;
   size_t objective_calls_{ 0 };

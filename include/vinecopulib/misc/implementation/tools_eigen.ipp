@@ -20,8 +20,9 @@ remove_nans(Eigen::MatrixXd& x)
   // if a row has nan, move it to the end
   size_t last = x.rows() - 1;
   for (size_t i = 0; i < last + 1; i++) {
-    if (x.row(i).array().isNaN().any())
+    if (x.row(i).array().isNaN().any()) {
       x.row(i--).swap(x.row(last--));
+    }
   }
   // remove nan rows
   x.conservativeResize(last + 1, x.cols());
@@ -34,8 +35,9 @@ remove_nans(Eigen::MatrixXd& x)
 inline void
 remove_nans(Eigen::MatrixXd& x, Eigen::VectorXd& weights)
 {
-  if ((weights.size() > 0) && (weights.size() != x.rows()))
+  if ((weights.size() > 0) && (weights.size() != x.rows())) {
     throw std::runtime_error("sizes of x and weights don't match.");
+  }
 
   // if a row has nan or weight is zero, move it to the end
   size_t last = x.rows() - 1;
@@ -46,16 +48,18 @@ remove_nans(Eigen::MatrixXd& x, Eigen::VectorXd& weights)
       row_has_nan = row_has_nan || (weights(i) == 0.0);
     }
     if (row_has_nan) {
-      if (weights.size() > 0)
+      if (weights.size() > 0) {
         std::swap(weights(i), weights(last));
+      }
       x.row(i--).swap(x.row(last--));
     }
   }
 
   // remove nan rows
   x.conservativeResize(last + 1, x.cols());
-  if (weights.size() > 0)
+  if (weights.size() > 0) {
     weights.conservativeResize(last + 1);
+  }
 }
 
 //! trims all elements in the matrix to the interval `[lower, upper]`.
@@ -66,11 +70,12 @@ inline void
 trim(Eigen::MatrixXd& x, const double& lower, const double& upper)
 {
   // code of std::for_each (save some compile time by not including <algorithm>)
-  auto it = x.data();
-  auto last = x.data() + x.size();
+  auto* it = x.data();
+  auto* last = x.data() + x.size();
   for (; it != last; ++it) {
-    if (!std::isnan(*it))
+    if (!std::isnan(*it)) {
       *it = std::min(std::max(*it, lower), upper);
+    }
   }
 }
 
@@ -82,11 +87,12 @@ inline void
 trim(Eigen::VectorXd& x, const double& lower, const double& upper)
 {
   // code of std::for_each (save some compile time by not including <algorithm>)
-  auto it = x.data();
-  auto last = x.data() + x.size();
+  auto* it = x.data();
+  auto* last = x.data() + x.size();
   for (; it != last; ++it) {
-    if (!std::isnan(*it))
+    if (!std::isnan(*it)) {
       *it = std::min(std::max(*it, lower), upper);
+    }
   }
 }
 
@@ -120,7 +126,7 @@ unique(const Eigen::VectorXd& x)
   std::sort(v.begin(), v.end()); // 1 1 2 2 3 3 3 4 4 5 5 6 7
   auto last = std::unique(v.begin(), v.end());
   v.erase(last, v.end());
-  return Eigen::Map<Eigen::VectorXd>(&v[0], v.size());
+  return Eigen::Map<Eigen::VectorXd>(v.data(), v.size());
 }
 
 //! computes the inverse \f$ f^{-1} \f$ of a function \f$ f \f$ by the
@@ -211,7 +217,8 @@ read_matxd(const char* filename, int max_buffer_size)
 {
   using namespace std;
 
-  int cols = 0, rows = 0;
+  int cols = 0;
+  int rows = 0;
   double* buff = new double[max_buffer_size];
 
   // Read numbers from file into buffer.
@@ -224,7 +231,7 @@ read_matxd(const char* filename, int max_buffer_size)
     int temp_cols = 0;
     stringstream stream(line);
     while (!stream.eof()) {
-      stream >> buff[cols * rows + temp_cols++];
+      stream >> buff[(cols * rows) + temp_cols++];
     }
     if (temp_cols == 0) {
       continue;
@@ -243,7 +250,7 @@ read_matxd(const char* filename, int max_buffer_size)
   Eigen::MatrixXd result(rows, cols);
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      result(i, j) = buff[cols * i + j];
+      result(i, j) = buff[(cols * i) + j];
     }
   }
 

@@ -47,8 +47,8 @@ class Bicop
 
 public:
   // Constructors
-  Bicop(const BicopFamily family = BicopFamily::indep,
-        const int rotation = 0,
+  Bicop(BicopFamily family = BicopFamily::indep,
+        int rotation = 0,
         const Eigen::MatrixXd& parameters = Eigen::MatrixXd(),
         const std::vector<std::string>& var_types = { "c", "c" });
 
@@ -86,9 +86,9 @@ public:
   size_t get_nobs() const;
   double get_aic() const;
   double get_bic() const;
-  double get_mbic(const double psi0 = 0.9) const;
+  double get_mbic(double psi0 = 0.9) const;
 
-  void set_rotation(const int rotation);
+  void set_rotation(int rotation);
 
   void set_parameters(const Eigen::MatrixXd& parameters);
 
@@ -111,7 +111,7 @@ public:
 
   Eigen::MatrixXd simulate(
     const size_t& n,
-    const bool qrng = false,
+    bool qrng = false,
     const std::vector<int>& seeds = std::vector<int>()) const;
 
   // Methods modifying the family/rotation/parameters
@@ -129,7 +129,7 @@ public:
   double bic(const Eigen::MatrixXd& u = Eigen::MatrixXd()) const;
 
   double mbic(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
-              const double psi0 = 0.9) const;
+              double psi0 = 0.9) const;
 
   // Misc
   std::string str() const;
@@ -159,18 +159,18 @@ private:
 
   void check_data_dim(const Eigen::MatrixXd& u) const;
 
-  void check_var_types(const std::vector<std::string>& var_types) const;
+  static void check_var_types(const std::vector<std::string>& var_types);
 
   void flip_abstract_var_types();
 
-  void check_weights_size(const Eigen::VectorXd& weights,
-                          const Eigen::MatrixXd& data) const;
+  static void check_weights_size(const Eigen::VectorXd& weights,
+                                 const Eigen::MatrixXd& data);
 
   void check_fitted() const;
 
   unsigned short get_n_discrete() const;
 
-  double compute_mbic_penalty(const size_t nobs, const double psi0) const;
+  double compute_mbic_penalty(size_t nobs, double psi0) const;
 
   BicopPtr get_bicop() const;
 

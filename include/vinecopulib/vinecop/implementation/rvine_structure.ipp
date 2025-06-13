@@ -38,22 +38,26 @@ inline RVineStructure::RVineStructure(
   }
 
   order_ = get_order(mat);
-  if (check)
+  if (check) {
     check_antidiagonal();
+  }
 
   trunc_lvl_ = find_trunc_lvl(mat);
   struct_array_ = to_rvine_array(mat);
 
-  if (check)
+  if (check) {
     check_upper_tri();
+  }
 
   struct_array_ = to_natural_order();
-  if (check)
+  if (check) {
     check_columns();
+  }
 
   min_array_ = compute_min_array();
-  if (check)
+  if (check) {
     check_proximity_condition();
+  }
 
   needed_hfunc1_ = compute_needed_hfunc1();
   needed_hfunc2_ = compute_needed_hfunc2();
@@ -82,8 +86,9 @@ inline RVineStructure::RVineStructure(const std::vector<size_t>& order,
       true,
       false)
 {
-  if (check)
+  if (check) {
     check_antidiagonal();
+  }
 }
 
 //! @brief Instantiates from the variable order (diagonal elements of the
@@ -109,7 +114,8 @@ inline RVineStructure::RVineStructure(
   , struct_array_(struct_array)
 {
   if (check) {
-    if ((trunc_lvl_ > 0) & (struct_array.get_dim() != d_)) {
+    if (static_cast<int>((trunc_lvl_ > 0) &
+                         static_cast<int>(struct_array.get_dim() != d_)) != 0) {
       throw std::runtime_error("order and struct_array have "
                                "incompatible dimensions");
     }
@@ -117,16 +123,20 @@ inline RVineStructure::RVineStructure(
   }
 
   if (trunc_lvl_ > 0) {
-    if (check)
+    if (check) {
       check_upper_tri();
-    if (!natural_order)
+    }
+    if (!natural_order) {
       struct_array_ = to_natural_order();
-    if (check)
+    }
+    if (check) {
       check_columns();
+    }
 
     min_array_ = compute_min_array();
-    if (check)
+    if (check) {
       check_proximity_condition();
+    }
 
     needed_hfunc1_ = compute_needed_hfunc1();
     needed_hfunc2_ = compute_needed_hfunc2();
@@ -301,14 +311,14 @@ RVineStructure::min_array(size_t tree, size_t edge) const
 inline bool
 RVineStructure::needed_hfunc1(size_t tree, size_t edge) const
 {
-  return needed_hfunc1_(tree, edge);
+  return needed_hfunc1_(tree, edge) != 0u;
 }
 
 //! @brief Access elements of the needed_hfunc2 array.
 inline bool
 RVineStructure::needed_hfunc2(size_t tree, size_t edge) const
 {
-  return needed_hfunc2_(tree, edge);
+  return needed_hfunc2_(tree, edge) != 0u;
 }
 
 //! @brief Truncates the R-vine structure.
@@ -370,7 +380,8 @@ RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
 
   // A is the R-vine matrix we want to create (upper right-triag format).
   // B is a random binary representation that we need to convert.
-  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> A(d, d), B(d, d);
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> A(d, d);
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> B(d, d);
   A.setZero();
   B = (U.leftCols(d).array() > 0.5).cast<size_t>();
 
@@ -455,7 +466,7 @@ RVineStructure::get_matrix() const
 //! @param mat An array representing the R-vine array.
 inline size_t
 RVineStructure::find_trunc_lvl(
-  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat)
 {
   size_t trunc_lvl;
   size_t d = mat.cols();
@@ -467,11 +478,13 @@ RVineStructure::find_trunc_lvl(
 
   for (trunc_lvl = d - 1; trunc_lvl > 0; trunc_lvl--) {
     std::vector<size_t> row_vec(d - trunc_lvl);
-    Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(&row_vec[0], d - trunc_lvl) =
+    Eigen::Matrix<size_t, Eigen::Dynamic, 1>::Map(row_vec.data(),
+                                                  d - trunc_lvl) =
       mat.row(trunc_lvl - 1).head(d - trunc_lvl);
 
-    if (*(std::min_element(row_vec.begin(), row_vec.end())) != 0)
+    if (*(std::min_element(row_vec.begin(), row_vec.end())) != 0) {
       break;
+    }
   }
 
   return trunc_lvl;
@@ -486,8 +499,9 @@ RVineStructure::get_order(
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
 {
   std::vector<size_t> order(d_);
-  for (size_t i = 0; i < d_; i++)
+  for (size_t i = 0; i < d_; i++) {
     order[i] = mat(d_ - i - 1, i);
+  }
 
   return order;
 }
@@ -579,8 +593,9 @@ RVineStructure::compute_needed_hfunc1() const
 
   for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
     for (size_t j = 0; j < d_ - 2 - i; j++) {
-      if (struct_array_(i + 1, j) != min_array_(i + 1, j))
+      if (struct_array_(i + 1, j) != min_array_(i + 1, j)) {
         needed_hfunc1(i, min_array_(i + 1, j) - 1) = 1;
+      }
     }
   }
 
@@ -598,8 +613,9 @@ RVineStructure::compute_needed_hfunc2() const
   for (size_t i = 0; i < std::min(d_ - 2, trunc_lvl_ - 1); i++) {
     for (size_t j = 0; j < d_ - 2 - i; j++) {
       needed_hfunc2(i, j) = 1;
-      if (struct_array_(i + 1, j) == min_array_(i + 1, j))
+      if (struct_array_(i + 1, j) == min_array_(i + 1, j)) {
         needed_hfunc2(i, min_array_(i + 1, j) - 1) = 1;
+      }
     }
   }
 
@@ -608,7 +624,7 @@ RVineStructure::compute_needed_hfunc2() const
 
 inline void
 RVineStructure::check_if_quadratic(
-  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat)
 {
   std::string problem = "must be quadratic.";
   if (mat.rows() != mat.cols()) {
@@ -649,7 +665,7 @@ RVineStructure::check_upper_tri() const
 inline void
 RVineStructure::check_columns() const
 {
-  std::string problem = "";
+  std::string problem;
   for (size_t j = 0; j < d_ - 1; j++) {
     // read column into vector so we can use stl methods
     std::vector<size_t> col(std::min(trunc_lvl_, d_ - 1 - j));
@@ -667,7 +683,7 @@ RVineStructure::check_columns() const
     if (unique_in_col != col.size()) {
       problem = "a column must not contain duplicate entries.";
     }
-    if (problem != "") {
+    if (!problem.empty()) {
       throw std::runtime_error("not a valid R-vine array: " + problem);
     }
   }
@@ -689,7 +705,8 @@ RVineStructure::check_proximity_condition() const
 {
   for (size_t t = 1; t < trunc_lvl_; ++t) {
     for (size_t e = 0; e < d_ - t - 1; ++e) {
-      std::vector<size_t> target_set(t + 1), test_set(t + 1);
+      std::vector<size_t> target_set(t + 1);
+      std::vector<size_t> test_set(t + 1);
       // conditioning set
       for (size_t i = 0; i < t; i++) {
         target_set[i] = struct_array_(i, e);

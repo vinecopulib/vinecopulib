@@ -23,9 +23,9 @@ unaryExpr_or_nan(const Eigen::MatrixXd& x, const T& func)
   return x.unaryExpr([&func](const double& y) {
     if ((std::isnan)(y)) {
       return std::numeric_limits<double>::quiet_NaN();
-    } else {
-      return func(y);
     }
+    return func(y);
+   
   });
 }
 
@@ -36,9 +36,9 @@ binaryExpr_or_nan(const Eigen::MatrixXd& u, const T& func)
   auto func_or_nan = [&func](const double& u1, const double& u2) {
     if ((std::isnan)(u1) || (std::isnan)(u2)) {
       return std::numeric_limits<double>::quiet_NaN();
-    } else {
-      return func(u1, u2);
     }
+    return func(u1, u2);
+   
   };
   return u.col(0).binaryExpr(u.col(1), func_or_nan);
 }
@@ -71,8 +71,8 @@ unique(const Eigen::VectorXd& x);
 Eigen::VectorXd
 invert_f(const Eigen::VectorXd& x,
          std::function<Eigen::VectorXd(const Eigen::VectorXd&)> f,
-         const double lb = 1e-20,
-         const double ub = 1 - 1e-20,
+         double lb = 1e-20,
+         double ub = 1 - 1e-20,
          int n_iter = 35);
 
 Eigen::MatrixXd

@@ -33,7 +33,7 @@ private:
 
   Eigen::MatrixXd tau_to_parameters(const double& tau) override;
 
-  Eigen::VectorXd get_start_parameters(const double) override;
+  Eigen::VectorXd get_start_parameters(double /*tau*/) override;
 
   void flip() override;
 };

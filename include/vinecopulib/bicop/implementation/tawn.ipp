@@ -27,7 +27,7 @@ TawnBicop::pickands(const double& t)
   double theta = this->parameters_(2);
 
   double temp = std::pow(psi2 * t, theta) + std::pow(psi1 * (1 - t), theta);
-  return (1 - psi1) * (1 - t) + (1 - psi2) * t + std::pow(temp, 1 / theta);
+  return ((1 - psi1) * (1 - t)) + ((1 - psi2) * t) + std::pow(temp, 1 / theta);
 }
 
 inline double
@@ -38,9 +38,9 @@ TawnBicop::pickands_derivative(const double& t)
   double theta = this->parameters_(2);
 
   double temp = std::pow(psi2 * t, theta) + std::pow(psi1 * (1 - t), theta);
-  double temp2 = psi2 * std::pow(psi2 * t, theta - 1) -
-                 psi1 * std::pow(psi1 * (1 - t), theta - 1);
-  return psi1 - psi2 + std::pow(temp, 1 / theta - 1) * temp2;
+  double temp2 = (psi2 * std::pow(psi2 * t, theta - 1)) -
+                 (psi1 * std::pow(psi1 * (1 - t), theta - 1));
+  return psi1 - psi2 + (std::pow(temp, (1 / theta) - 1) * temp2);
 }
 
 inline double
@@ -51,16 +51,16 @@ TawnBicop::pickands_derivative2(const double& t)
   double theta = this->parameters_(2);
 
   double temp = std::pow(psi2 * t, theta) + std::pow(psi1 * (1 - t), theta);
-  double temp2 = psi2 * std::pow(psi2 * t, theta - 1) -
-                 psi1 * std::pow(psi1 * (1 - t), theta - 1);
-  double temp3 = std::pow(psi2, 2) * std::pow(psi2 * t, theta - 2) +
-                 std::pow(psi1, 2) * std::pow(psi1 * (1 - t), theta - 2);
-  return (1 - theta) * std::pow(temp, 1 / theta - 2) * std::pow(temp2, 2) +
-         std::pow(temp, 1 / theta - 1) * (theta - 1) * temp3;
+  double temp2 = (psi2 * std::pow(psi2 * t, theta - 1)) -
+                 (psi1 * std::pow(psi1 * (1 - t), theta - 1));
+  double temp3 = (std::pow(psi2, 2) * std::pow(psi2 * t, theta - 2)) +
+                 (std::pow(psi1, 2) * std::pow(psi1 * (1 - t), theta - 2));
+  return ((1 - theta) * std::pow(temp, (1 / theta) - 2) * std::pow(temp2, 2)) +
+         (std::pow(temp, (1 / theta) - 1) * (theta - 1) * temp3);
 }
 
 inline Eigen::VectorXd
-TawnBicop::get_start_parameters(const double)
+TawnBicop::get_start_parameters(const double /*tau*/)
 {
   Eigen::MatrixXd lb = this->get_parameters_lower_bounds();
   Eigen::VectorXd parameters = lb + Eigen::VectorXd::Constant(3, 0.5);

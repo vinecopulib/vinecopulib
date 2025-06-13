@@ -40,7 +40,7 @@ calculate_criterion(const Eigen::MatrixXd& data,
     } else if (tree_criterion == "joe") {
       // mutual information for Gaussian copula
       w = wdm::wdm(tools_stats::qnorm(data_no_nan), "pearson", weights)(0, 1);
-      w = -0.5 * std::log(1 - w * w);
+      w = -0.5 * std::log(1 - (w * w));
     } else {
       w = wdm::wdm(data_no_nan, tree_criterion, weights)(0, 1);
     }
@@ -242,7 +242,9 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
       // copulas change to avoid getting stuck in local minimum)
       if (num_changed / num_total > 0.1) {
         num_changed = 0.0;
-        if (select_trunc_lvl & (mbicv_trunc >= mbicv) & (t > 0)) {
+        if (static_cast<int>((select_trunc_lvl) &
+                             static_cast<int>(mbicv_trunc >= mbicv) &
+                             static_cast<int>(t > 0)) != 0) {
           // mbicv did not improve
           // check if it can be improved by removing trees
           loglik -= loglik_tree;
@@ -250,8 +252,9 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
           while (t > 1) {
             loglik_tree = get_loglik_of_tree(t - 1);
             mbicv_tree = get_mbicv_of_tree(t - 1, loglik_tree);
-            if (mbicv_tree <= 0)
+            if (mbicv_tree <= 0) {
               break;
+            }
             loglik -= loglik_tree;
             mbicv_trunc -= mbicv_tree;
             t--;
@@ -338,7 +341,7 @@ VinecopSelector::get_nobs() const
 inline double
 VinecopSelector::get_next_threshold(std::vector<double>& thresholded_crits)
 {
-  if (thresholded_crits.size() == 0) {
+  if (thresholded_crits.empty()) {
     return 1.0;
   }
   // sort in descending order
@@ -384,7 +387,7 @@ VinecopSelector::add_allowed_edges(VineTree& vine_tree)
       auto pc_data = get_pc_data(v0, v1, vine_tree);
       double crit =
         calculate_criterion(pc_data, tree_criterion, controls_.get_weights());
-      double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
+      double w = 1.0 - (static_cast<double>(crit >= threshold) * crit);
 
       {
         std::lock_guard<std::mutex> lk(m);
@@ -461,7 +464,8 @@ VinecopSelector::finalize(size_t trunc_lvl)
             continue; // not a leaf
           }
           // find position of leaf in the edge
-          ptrdiff_t pos = (boost::out_degree(v1, trees_[t]) == 1);
+          ptrdiff_t pos =
+            static_cast<ptrdiff_t>(boost::out_degree(v1, trees_[t]) == 1);
           if (pos == 1) {
             trees_[t][e].pair_copula.flip();
           }
@@ -499,7 +503,8 @@ VinecopSelector::finalize(size_t trunc_lvl)
             // next matrix entry is conditioned variable of new edge
             // that's not equal to the diagonal entry of this column
             auto e_new = trees_[t - k][e];
-            ptrdiff_t pos = (order[col] == e_new.conditioned[1]);
+            ptrdiff_t pos =
+              static_cast<ptrdiff_t>(order[col] == e_new.conditioned[1]);
             if (pos == 1) {
               e_new.pair_copula.flip();
             }
@@ -533,8 +538,9 @@ VinecopSelector::finalize(size_t trunc_lvl)
           mat(i, j) += 1;
         }
       }
-      for (size_t i = 0; i < d_; i++)
+      for (size_t i = 0; i < d_; i++) {
         order[i] += 1;
+      }
     } else {
       // order doesn't matter for truncated
       order = tools_stl::seq_int(1, d_);
@@ -598,9 +604,8 @@ VinecopSelector::get_hfunc(const VertexProperties& vertex_data, bool is_first)
 {
   if (is_first) {
     return vertex_data.hfunc1;
-  } else {
-    return vertex_data.hfunc2;
   }
+  return vertex_data.hfunc2;
 }
 
 inline Eigen::VectorXd
@@ -608,17 +613,16 @@ VinecopSelector::get_hfunc_sub(const VertexProperties& vertex_data,
                                bool is_first)
 {
   if (is_first) {
-    if (vertex_data.hfunc1_sub.size()) {
+    if (vertex_data.hfunc1_sub.size() != 0) {
       return vertex_data.hfunc1_sub;
-    } else {
-      return vertex_data.hfunc1;
     }
+    return vertex_data.hfunc1;
+
   } else {
-    if (vertex_data.hfunc2_sub.size()) {
+    if (vertex_data.hfunc2_sub.size() != 0) {
       return vertex_data.hfunc2_sub;
-    } else {
-      return vertex_data.hfunc2;
     }
+    return vertex_data.hfunc2;
   }
 }
 
@@ -691,15 +695,15 @@ VinecopSelector::get_mbicv_of_tree(size_t t, double loglik)
   size_t non_indeps = get_num_non_indeps_of_tree(t);
   size_t indeps = d_ - t - 1 - non_indeps;
   double psi0 = std::pow(psi0_, t + 1);
-  double log_prior = static_cast<double>(non_indeps) * std::log(psi0) +
-                     static_cast<double>(indeps) * std::log(1.0 - psi0);
+  double log_prior = (static_cast<double>(non_indeps) * std::log(psi0)) +
+                     (static_cast<double>(indeps) * std::log(1.0 - psi0));
   double n_eff = static_cast<double>(n_);
   if (controls_.get_weights().size() > 0) {
     n_eff = std::pow(controls_.get_weights().sum(), 2);
     n_eff /= controls_.get_weights().array().pow(2).sum();
   }
 
-  return -2 * loglik + std::log(n_eff) * npars - 2 * log_prior;
+  return (-2 * loglik) + (std::log(n_eff) * npars) - (2 * log_prior);
 }
 
 //! @brief Calculates the log-likelihood of a tree.
@@ -873,11 +877,10 @@ VinecopSelector::find_common_neighbor(size_t v0,
   auto ei1 = tree[v1].prev_edge_indices;
   auto ei_common = intersect(ei0, ei1);
 
-  if (ei_common.size() == 0) {
+  if (ei_common.empty()) {
     return -1;
-  } else {
-    return ei_common[0];
   }
+  return ei_common[0];
 }
 
 //! @brief Computes a fit id; can be used to re-use already fitted pair-copulas.
@@ -1093,16 +1096,17 @@ VinecopSelector::get_pc_index(const EdgeIterator& e, const VineTree& tree)
   // add 1 everywhere for user-facing representation (boost::graph
   // starts at 0)
   index << tree[e].conditioned[0] + 1 << "," << tree[e].conditioned[1] + 1;
-  if (tree[e].conditioning.size() > 0) {
+  if (!tree[e].conditioning.empty()) {
     index << " | ";
     for (unsigned int i = 0; i < tree[e].conditioning.size(); ++i) {
       index << tree[e].conditioning[i] + 1;
-      if (i < tree[e].conditioning.size() - 1)
+      if (i < tree[e].conditioning.size() - 1) {
         index << ",";
+      }
     }
   }
 
-  return index.str().c_str();
+  return index.str();
 }
 }
 }

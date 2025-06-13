@@ -63,7 +63,7 @@ chol22(const Eigen::Matrix2d& B)
   rB(0, 0) = std::sqrt(B(0, 0));
   rB(0, 1) = 0.0;
   rB(1, 0) = B(1, 0) / rB(0, 0);
-  rB(1, 1) = std::sqrt(B(1, 1) - rB(1, 0) * rB(1, 0));
+  rB(1, 1) = std::sqrt(B(1, 1) - (rB(1, 0) * rB(1, 0)));
 
   return rB;
 }
@@ -102,12 +102,14 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
   Eigen::Vector2d f1;
   Eigen::Vector2d b;
   Eigen::Matrix2d S(B);
-  Eigen::MatrixXd zz(n, 2), zz2(n, 2);
+  Eigen::MatrixXd zz(n, 2);
+  Eigen::MatrixXd zz2(n, 2);
   for (size_t k = 0; k < m; ++k) {
     zz = z_data - z.row(k).replicate(n, 1);
     kernels = gaussian_kernel_2d(zz) * det_irB;
-    if (weights.size() > 0)
+    if (weights.size() > 0) {
       kernels = kernels.cwiseProduct(weights);
+    }
     double f0 = kernels.mean();
     if (method != "constant") {
       zz = (irB * zz.transpose()).transpose();
