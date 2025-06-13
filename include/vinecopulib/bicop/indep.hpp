@@ -39,13 +39,13 @@ private:
 
   Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
 
-  Eigen::MatrixXd tau_to_parameters(const double&);
+  Eigen::MatrixXd tau_to_parameters(const double& /*tau*/);
 
-  double parameters_to_tau(const Eigen::MatrixXd&);
+  double parameters_to_tau(const Eigen::MatrixXd& /*parameters*/);
 
   void flip();
 
-  Eigen::VectorXd get_start_parameters(const double tau);
+  Eigen::VectorXd get_start_parameters(double tau);
 };
 }
 

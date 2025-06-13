@@ -227,7 +227,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
 
   // construct default grid (equally spaced on Gaussian scale)
   size_t m = 30;
-  auto grid_points = this->make_normal_grid(m);
+  auto grid_points = vinecopulib::TllBicop::make_normal_grid(m);
 
   // expand the interpolation grid; a matrix with two columns where each row
   // contains one combination of the grid points

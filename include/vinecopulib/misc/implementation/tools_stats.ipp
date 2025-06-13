@@ -41,14 +41,13 @@ simulate_uniform(const size_t& n,
   if (qrng) {
     if (d > 300) {
       return tools_stats::sobol(n, d, seeds);
-    } else {
-      return tools_stats::ghalton(n, d, seeds);
     }
+    return tools_stats::ghalton(n, d, seeds);
   }
   if ((n < 1) || (d < 1)) {
     throw std::runtime_error("n and d must be at least 1.");
   }
-  if (seeds.size() == 0) {
+  if (seeds.empty()) {
     // no seeds provided, seed randomly
     std::random_device rd{};
     seeds = std::vector<int>(20);
@@ -102,9 +101,10 @@ to_pseudo_obs(Eigen::MatrixXd x,
               const Eigen::VectorXd& weights,
               std::vector<int> seeds)
 {
-  for (int j = 0; j < x.cols(); ++j)
+  for (int j = 0; j < x.cols(); ++j) {
     x.col(j) = to_pseudo_obs_1d(
       static_cast<Eigen::VectorXd>(x.col(j)), ties_method, weights, seeds);
+  }
 
   return x;
 }
@@ -187,14 +187,16 @@ BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
 
   for (size_t k = l0; k < u0; k++) {
     for (size_t j = l1; j < u1; j++) {
-      for (auto& i : boxes_[k][j]->indices_) {
+      for (const auto& i : boxes_[k][j]->indices_) {
         if ((k == l0) || (k == u0 - 1)) {
-          if ((u_(i, 0) < lower(0)) || (u_(i, 0) > upper(0)))
+          if ((u_(i, 0) < lower(0)) || (u_(i, 0) > upper(0))) {
             continue;
+          }
         }
         if ((j == l1) || (j == u1 - 1)) {
-          if ((u_(i, 1) < lower(1)) || (u_(i, 1) > upper(1)))
+          if ((u_(i, 1) < lower(1)) || (u_(i, 1) > upper(1))) {
             continue;
+          }
         }
         indices.push_back(i);
       }
@@ -253,7 +255,8 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   lb = pnorm(lb.array() - b);
   ub = pnorm(ub.array() + b);
 
-  Eigen::MatrixXd x(n, 2), norm_sim(n, 2);
+  Eigen::MatrixXd x(n, 2);
+  Eigen::MatrixXd norm_sim(n, 2);
 
   for (uint16_t it = 0; it < niter; it++) {
     uu = to_pseudo_obs(uu);
@@ -293,12 +296,12 @@ win(const Eigen::VectorXd& x, size_t wl = 5)
 {
   size_t n = x.size();
   // pad length to powers of 2 to force FFT to use its fastest algorithm
-  size_t fftSize = next_power_of_two(n + 2 * wl);
+  size_t fftSize = next_power_of_two(n + (2 * wl));
 
   Eigen::VectorXd xx = Eigen::VectorXd::Zero(fftSize);
   Eigen::VectorXd yy = Eigen::VectorXd::Zero(fftSize);
   xx.segment(2 * wl, n) = x;
-  yy.head(2 * wl + 1) = Eigen::VectorXd::Ones(2 * wl + 1);
+  yy.head((2 * wl) + 1) = Eigen::VectorXd::Ones((2 * wl) + 1);
 
   Eigen::FFT<double> fft;
   Eigen::VectorXcd tmp1 = fft.fwd(xx);
@@ -308,7 +311,7 @@ win(const Eigen::VectorXd& x, size_t wl = 5)
   tmp2 = fft.inv(tmp1);
 
   Eigen::VectorXd result = tmp2.real().segment(wl, n);
-  result /= 2.0 * static_cast<double>(wl) + 1.0;
+  result /= (2.0 * static_cast<double>(wl)) + 1.0;
   result.head(wl).setConstant(result(wl));
   result.tail(wl).setConstant(result(n - wl - 1));
 
@@ -363,7 +366,8 @@ ace(const Eigen::MatrixXd& data,                        // data
   Eigen::Matrix<size_t, Eigen::Dynamic, 2> ind(n, 2);
   Eigen::Matrix<size_t, Eigen::Dynamic, 2> ranks(n, 2);
   for (size_t i = 0; i < 2; i++) {
-    std::vector<double> xvec(data.data() + n * i, data.data() + n * (i + 1));
+    std::vector<double> xvec(data.data() + (n * i),
+                             data.data() + (n * (i + 1)));
     auto order = tools_stl::get_order(xvec);
     for (auto j : order) {
       ind(j, i) = order[j];
@@ -373,7 +377,7 @@ ace(const Eigen::MatrixXd& data,                        // data
 
   // initialize output
   Eigen::MatrixXd phi = ranks.cast<double>();
-  phi.array() -= (n_dbl - 1.0) / 2.0 - 1.0;
+  phi.array() -= ((n_dbl - 1.0) / 2.0) - 1.0;
   phi /= std::sqrt(n_dbl * (n_dbl - 1.0) / 12.0);
   if (nw > 0) {
     phi.col(0) = phi.col(0).cwiseProduct(w);
@@ -538,7 +542,7 @@ sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
   for (size_t i = 1; i < n; i++) {
     C(i) = 1;
     size_t value = i;
-    while (value & 1) {
+    while ((value & 1) != 0u) {
       value >>= 1;
       C(i)++;
     }
@@ -571,21 +575,24 @@ sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
       tools_sobol::minit_sobol[j], s);
 
     // Compute direction numbers scaled by pow(2,32)
-    for (size_t i = 0; i < std::min(L, s); i++)
+    for (size_t i = 0; i < std::min(L, s); i++) {
       V(i) = m(i) << (32 - (i + 1));
+    }
 
     if (L > s) {
       for (size_t i = s; i < L; i++) {
         V(i) = V(i - s) ^ (V(i - s) >> s);
-        for (size_t k = 0; k < s - 1; k++)
+        for (size_t k = 0; k < s - 1; k++) {
           V(i) ^= (((a >> (s - 2 - k)) & 1) * V(i - k - 1));
+        }
       }
     }
 
     // Evalulate X
     X(0) = static_cast<size_t>(scrambling(j + 1) * std::pow(2.0, 32));
-    for (size_t i = 1; i < n; i++)
+    for (size_t i = 1; i < n; i++) {
       X(i) = X(i - 1) ^ V(C(i - 1) - 1);
+    }
     output.block(0, j + 1, n, 1) = X.cast<double>();
   }
 
@@ -616,11 +623,22 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
   double ors = 1 - pow(rho, 2.0);
 
   auto f = [snu, nu, ors, rho](double h, double k) {
-    double d1, d2, bvt, gmph, gmpk, xnkh, xnhk, btnckh, btnchk, btpdkh, btpdhk;
-    int hs, ks;
+    double d1;
+    double d2;
+    double bvt;
+    double gmph;
+    double gmpk;
+    double xnkh;
+    double xnhk;
+    double btnckh;
+    double btnchk;
+    double btpdkh;
+    double btpdhk;
+    int hs;
+    int ks;
 
-    double hrk = h - rho * k;
-    double krh = k - rho * h;
+    double hrk = h - (rho * k);
+    double krh = k - (rho * h);
     if (std::fabs(hrk) + ors > 0.) {
       /* Computing 2nd power */
       d1 = hrk;
@@ -641,9 +659,9 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
       xnkh = 0.;
     }
     d1 = h - rho * k;
-    hs = static_cast<int>(d1 >= 0 ? 1 : -1); // d_sign(&c_b91, &d1);
+    hs = (d1 >= 0 ? 1 : -1); // d_sign(&c_b91, &d1);
     d1 = k - rho * h;
-    ks = static_cast<int>(d1 >= 0 ? 1 : -1);
+    ks = (d1 >= 0 ? 1 : -1);
     if (nu % 2 == 0) {
       bvt = atan2(sqrt(ors), -rho) / 6.2831853071795862;
       /* Computing 2nd power */
@@ -677,13 +695,14 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
       d1 = h;
       /* Computing 2nd power */
       d2 = k;
-      double qhrk = sqrt(d1 * d1 + d2 * d2 - rho * 2 * h * k + nu * ors);
-      double hkrn = h * k + rho * nu;
-      double hkn = h * k - nu;
+      double qhrk =
+        sqrt((d1 * d1) + (d2 * d2) - (rho * 2 * h * k) + (nu * ors));
+      double hkrn = (h * k) + (rho * nu);
+      double hkn = (h * k) - nu;
       double hpk = h + k;
-      bvt =
-        atan2(-snu * (hkn * qhrk + hpk * hkrn), hkn * hkrn - nu * hpk * qhrk) /
-        6.2831853071795862;
+      bvt = atan2(-snu * (hkn * qhrk + hpk * hkrn),
+                  (hkn * hkrn) - (nu * hpk * qhrk)) /
+            6.2831853071795862;
       if (bvt < -1e-15) {
         bvt += 1;
       }
@@ -751,7 +770,8 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
   } else {
     lg = 10;
   }
-  Eigen::VectorXd w(lg), x(lg);
+  Eigen::VectorXd w(lg);
+  Eigen::VectorXd x(lg);
   if (std::fabs(rho) < .3f) {
     w << 0.1713244923791705, 0.3607615730481384, 0.4679139345726904;
     x << -.9324695142031522, -.6612093864662647, -.238619186083197;
@@ -773,7 +793,10 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
 
   auto f = [lg, rho, x, w, phi](double h, double k) {
     size_t i1;
-    double d1, d2, hk, bvn;
+    double d1;
+    double d2;
+    double hk;
+    double bvn;
     h = -h;
     k = -k;
     hk = h * k;
@@ -804,7 +827,7 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
         double bs = d1 * d1;
         double c = (4 - hk) / 8;
         double d = (12 - hk) / 16;
-        bvn = a * std::exp(-(bs / as + hk) / 2) *
+        bvn = a * std::exp(-((bs / as) + hk) / 2) *
               (1 - c * (bs - as) * (1 - d * bs / 5) / 3 + c * d * as * as / 5);
         if (hk > -160.) {
           double b = std::sqrt(bs);
@@ -819,16 +842,17 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
           d1 = a * (x(i) + 1);
           double xs = d1 * d1;
           double rs = std::sqrt(1 - xs);
-          bvn += a * w(i) *
-                 (std::exp(-bs / (xs * 2) - hk / (rs + 1)) / rs -
-                  std::exp(-(bs / xs + hk) / 2) * (c * xs * (d * xs + 1) + 1));
+          bvn +=
+            a * w(i) *
+            (std::exp((-bs / (xs * 2)) - (hk / (rs + 1))) / rs -
+             std::exp(-((bs / xs) + hk) / 2) * (c * xs * (d * xs + 1) + 1));
           /* Computing 2nd power */
           d1 = -x(i) + 1;
           xs = as * (d1 * d1) / 4;
           rs = std::sqrt(1 - xs);
           /* Computing 2nd power */
           d1 = rs + 1;
-          bvn += a * w(i) * std::exp(-(bs / xs + hk) / 2) *
+          bvn += a * w(i) * std::exp(-((bs / xs) + hk) / 2) *
                  (std::exp(-hk * xs / (d1 * d1 * 2)) / rs -
                   (c * xs * (d * xs + 1) + 1));
         }

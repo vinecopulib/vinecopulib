@@ -84,12 +84,14 @@ TriangularArray<T>::TriangularArray(size_t d, size_t trunc_lvl)
   : d_(d)
   , trunc_lvl_(std::min(d - 1, trunc_lvl))
 {
-  if (d < 1)
+  if (d < 1) {
     throw std::runtime_error("d should be greater than 0");
+  }
 
   arr_ = std::vector<std::vector<T>>(trunc_lvl_);
-  for (size_t i = 0; i < trunc_lvl_; i++)
+  for (size_t i = 0; i < trunc_lvl_; i++) {
     arr_[i] = std::vector<T>(d_ - i);
+  }
 }
 
 //! @brief Construct a truncated triangular array from nested vector.
@@ -105,9 +107,9 @@ TriangularArray<T>::TriangularArray(const std::vector<std::vector<T>>& rows)
 {
   if (trunc_lvl_ == 0) {
     return;
-  } else {
-    d_ = rows[0].size() + 1;
   }
+  d_ = rows[0].size() + 1;
+
   if (trunc_lvl_ > d_) {
     throw std::runtime_error("Not a triangular array: more rows than columns.");
   }
@@ -165,13 +167,15 @@ template<typename T>
 bool
 TriangularArray<T>::operator==(const TriangularArray<T>& rhs) const
 {
-  if ((d_ != rhs.get_dim()) || (trunc_lvl_ != rhs.get_trunc_lvl()))
+  if ((d_ != rhs.get_dim()) || (trunc_lvl_ != rhs.get_trunc_lvl())) {
     return false;
+  }
 
   for (size_t i = 0; i < trunc_lvl_; i++) {
     for (size_t j = 0; j < d_ - 1 - i; j++) {
-      if ((*this)(i, j) != rhs(i, j))
+      if ((*this)(i, j) != rhs(i, j)) {
         return false;
+      }
     }
   }
   return true;
@@ -183,19 +187,23 @@ template<typename T>
 bool
 TriangularArray<T>::operator<(const TriangularArray<T>& rhs) const
 {
-  if (d_ != rhs.get_dim())
+  if (d_ != rhs.get_dim()) {
     return d_ < rhs.get_dim();
-  if (trunc_lvl_ != rhs.get_trunc_lvl())
+  }
+  if (trunc_lvl_ != rhs.get_trunc_lvl()) {
     return trunc_lvl_ < rhs.get_trunc_lvl();
+  }
 
   for (size_t i = 0; i < trunc_lvl_; i++) {
     for (size_t j = 0; j < d_ - 1 - i; j++) {
       const T& lhs_val = (*this)(i, j);
       const T& rhs_val = rhs(i, j);
-      if (lhs_val < rhs_val)
+      if (lhs_val < rhs_val) {
         return true;
-      if (lhs_val > rhs_val)
+      }
+      if (lhs_val > rhs_val) {
         return false;
+      }
     }
   }
   return false; // all elements are equal

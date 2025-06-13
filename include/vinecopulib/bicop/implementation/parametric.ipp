@@ -57,7 +57,7 @@ ParBicop::get_npars() const
 }
 
 inline void
-ParBicop::set_npars(const double&)
+ParBicop::set_npars(const double& /*npars*/)
 {
   // does nothing
 }
@@ -66,7 +66,7 @@ ParBicop::set_npars(const double&)
 inline void
 ParBicop::fit(const Eigen::MatrixXd& data,
               std::string method,
-              double,
+              double /*mult*/,
               const Eigen::VectorXd& weights)
 {
   // for independence copula we don't have to do anything
@@ -79,7 +79,8 @@ ParBicop::fit(const Eigen::MatrixXd& data,
   double tau = wdm::wdm(data, "tau", weights)(0, 1);
 
   // for method itau and one-parameter families we don't need to optimize
-  int npars = static_cast<int>(get_npars()) - (method == "itau");
+  int npars =
+    static_cast<int>(get_npars()) - static_cast<int>(method == "itau");
   if (npars == 0) {
     set_parameters(tau_to_parameters(tau));
     set_loglik(loglik(data, weights));
@@ -191,7 +192,8 @@ ParBicop::adjust_parameters_bounds(Eigen::MatrixXd& lb,
   }
 
   if (family_ == BicopFamily::tawn) {
-    Eigen::VectorXd lb2(3), ub2(3);
+    Eigen::VectorXd lb2(3);
+    Eigen::VectorXd ub2(3);
     lb2 << 0.3, 0.3, 1.5;
     ub2 << 1, 1, 7;
     lb = lb2;

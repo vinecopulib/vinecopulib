@@ -92,7 +92,7 @@ AbstractBicop::create(BicopFamily family, const Eigen::MatrixXd& parameters)
 //!@}
 
 inline Eigen::MatrixXd
-AbstractBicop::no_tau_to_parameters(const double&)
+AbstractBicop::no_tau_to_parameters(const double& /*unused*/)
 {
   throw std::runtime_error("Method not implemented for this family");
 }
@@ -233,9 +233,8 @@ AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
       }
     }
     return h.cwiseAbs();
-  } else {
-    return hfunc1_raw(u.leftCols(2));
   }
+  return hfunc1_raw(u.leftCols(2));
 }
 
 inline Eigen::VectorXd
@@ -259,9 +258,8 @@ AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
       }
     }
     return h.cwiseAbs();
-  } else {
-    return hfunc2_raw(u.leftCols(2));
   }
+  return hfunc2_raw(u.leftCols(2));
 }
 
 inline Eigen::VectorXd
@@ -269,9 +267,8 @@ AbstractBicop::hinv1(const Eigen::MatrixXd& u)
 {
   if (var_types_[0] == "c") {
     return hinv1_raw(u.leftCols(2));
-  } else {
-    return hinv1_num(u);
   }
+  return hinv1_num(u);
 }
 
 inline Eigen::VectorXd
@@ -279,9 +276,8 @@ AbstractBicop::hinv2(const Eigen::MatrixXd& u)
 {
   if (var_types_[1] == "c") {
     return hinv2_raw(u.leftCols(2));
-  } else {
-    return hinv2_num(u);
   }
+  return hinv2_num(u);
 }
 
 //! evaluates the log-likelihood.

@@ -242,9 +242,9 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
       // copulas change to avoid getting stuck in local minimum)
       if (num_changed / num_total > 0.1) {
         num_changed = 0.0;
-        if (static_cast<int>((select_trunc_lvl) &
-                             static_cast<int>(mbicv_trunc >= mbicv) &
-                             static_cast<int>(t > 0)) != 0) {
+        if ((static_cast<int>(select_trunc_lvl) &
+             static_cast<int>(mbicv_trunc >= mbicv) &
+             static_cast<int>(t > 0)) != 0) {
           // mbicv did not improve
           // check if it can be improved by removing trees
           loglik -= loglik_tree;
@@ -618,12 +618,11 @@ VinecopSelector::get_hfunc_sub(const VertexProperties& vertex_data,
     }
     return vertex_data.hfunc1;
 
-  } else {
-    if (vertex_data.hfunc2_sub.size() != 0) {
-      return vertex_data.hfunc2_sub;
-    }
-    return vertex_data.hfunc2;
   }
+  if (vertex_data.hfunc2_sub.size() != 0) {
+    return vertex_data.hfunc2_sub;
+  }
+  return vertex_data.hfunc2;
 }
 
 inline Eigen::MatrixXd

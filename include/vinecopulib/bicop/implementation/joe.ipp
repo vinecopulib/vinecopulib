@@ -54,7 +54,7 @@ JoeBicop::pdf_raw(const Eigen::MatrixXd& u)
   auto f = [theta](const double& u1, const double& u2) {
     double t1 = std::pow(1 - u1, theta);
     double t2 = std::pow(1 - u2, theta);
-    return std::pow(t1 + t2 - t1 * t2, 1 / theta - 2) *
+    return std::pow(t1 + t2 - (t1 * t2), (1 / theta) - 2) *
            std::pow(1 - u1, theta - 1) * std::pow(1 - u2, theta - 1) *
            (theta - 1 + t1 + t2 - t1 * t2);
   };
@@ -94,9 +94,9 @@ inline double
 JoeBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
 {
   double par = parameters(0);
-  double tau = 2 / par + 1;
+  double tau = (2 / par) + 1;
   tau = boost::math::digamma(2.0) - boost::math::digamma(tau);
-  return 1 + 2 * tau / (2 - par);
+  return 1 + (2 * tau / (2 - par));
 }
 
 inline Eigen::VectorXd
@@ -113,11 +113,33 @@ JoeBicop::get_start_parameters(const double tau)
 inline double
 qcondjoe(const double& q, const double& u, const double& de)
 {
-  double t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t13, t15, t16, t19, t23,
-    t28, t31;
-  double c21, pdf;
+  double t1;
+  double t2;
+  double t3;
+  double t4;
+  double t5;
+  double t6;
+  double t7;
+  double t8;
+  double t9;
+  double t10;
+  double t11;
+  double t13;
+  double t15;
+  double t16;
+  double t19;
+  double t23;
+  double t28;
+  double t31;
+  double c21;
+  double pdf;
   int iter;
-  double diff, v, de1, dtem, de1inv, tem;
+  double diff;
+  double v;
+  double de1;
+  double dtem;
+  double de1inv;
+  double tem;
 
   t1 = 1.0 - u;
   t2 = std::pow(t1, 1.0 * (de));
@@ -161,11 +183,13 @@ qcondjoe(const double& q, const double& u, const double& de)
     if ((std::isnan)(pdf) || (std::isnan)(c21)) {
       diff /= -2.;
     } // added for de>=30
-    else
+    else {
       diff = (c21 - q) / pdf;
+    }
     v -= diff;
     int iter2 = 0;
-    while ((v <= 0 || v >= 1 || fabs(diff) > 0.25) & (iter2 < 20)) {
+    while (static_cast<int>((v <= 0 || v >= 1 || fabs(diff) > 0.25) &
+                            static_cast<int>(iter2 < 20)) != 0) {
       ++iter2;
       diff /= 2.;
       v += diff;

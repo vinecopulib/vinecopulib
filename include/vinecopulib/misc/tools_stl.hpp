@@ -148,9 +148,8 @@ log1p(const double& x)
 {
   if (x < -0.5) {
     return std::log(1.0 + x);
-  } else {
-    return std::log1p(x);
   }
+  return std::log1p(x);
 }
 
 // Function to format vectors of strings like a DataFrame and return a

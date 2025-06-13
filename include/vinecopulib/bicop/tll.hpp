@@ -36,14 +36,14 @@ private:
                                        std::string method,
                                        const Eigen::VectorXd& weights);
 
-  double calculate_infl(const size_t& n,
-                        const double& f0,
-                        const Eigen::Vector2d& b,
-                        const Eigen::Matrix2d& B,
-                        const double& det_irB,
-                        const Eigen::Matrix2d& S,
-                        const std::string& method,
-                        const double& weight);
+  static double calculate_infl(const size_t& n,
+                               const double& f0,
+                               const Eigen::Vector2d& b,
+                               const Eigen::Matrix2d& B,
+                               const double& det_irB,
+                               const Eigen::Matrix2d& S,
+                               const std::string& method,
+                               const double& weight);
 
   void fit(const Eigen::MatrixXd& data,
            std::string method,

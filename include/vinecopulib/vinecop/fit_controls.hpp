@@ -128,9 +128,9 @@ private:
   std::vector<int> seeds_;
   boost::random::mt19937 rng_;
 
-  void check_tree_criterion(std::string tree_criterion);
+  static void check_tree_criterion(std::string tree_criterion);
 
-  void check_threshold(double threshold);
+  static void check_threshold(double threshold);
 };
 }
 

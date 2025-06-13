@@ -317,8 +317,9 @@ inline size_t
 FitControlsBicop::process_num_threads(size_t num_threads)
 {
   // zero threads means everything is done in main thread
-  if (num_threads == 1)
+  if (num_threads == 1) {
     num_threads = 0;
+  }
 
   // don't use more threads than supported by the system
   size_t max_threads = std::thread::hardware_concurrency();
@@ -371,7 +372,7 @@ FitControlsBicop::str_internal(bool print_threads) const
                  << (get_num_threads() == 0 ? 1 : get_num_threads())
                  << std::endl;
   }
-  return controls_str.str().c_str();
+  return controls_str.str();
 }
 
 }

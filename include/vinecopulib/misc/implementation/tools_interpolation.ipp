@@ -141,7 +141,12 @@ InterpolationGrid::bilinear_interpolation(double z11,
                                           double x,
                                           double y)
 {
-  double x2x1, y2y1, x2x, y2y, yy1, xx1;
+  double x2x1;
+  double y2y1;
+  double x2x;
+  double y2y;
+  double yy1;
+  double xx1;
   x2x1 = x2 - x1;
   y2y1 = y2 - y1;
   x2x = x2 - x;
@@ -192,7 +197,8 @@ InterpolationGrid::integrate_1d(const Eigen::MatrixXd& u, size_t cond_var)
 
   auto f = [this, m, cond_var, &tmpvals, &tmpgrid](double u1, double u2) {
     double upr = 0.0;
-    double tmpint = 0.0, int1;
+    double tmpint = 0.0;
+    double int1;
     if (cond_var == 1) {
       upr = u2;
       tmpgrid.col(0) = Eigen::VectorXd::Constant(m, u1);
@@ -220,12 +226,15 @@ inline Eigen::VectorXd
 InterpolationGrid::integrate_2d(const Eigen::MatrixXd& u)
 {
   ptrdiff_t m = grid_points_.size();
-  Eigen::VectorXd tmpvals(m), tmpvals2(m);
+  Eigen::VectorXd tmpvals(m);
+  Eigen::VectorXd tmpvals2(m);
   Eigen::MatrixXd tmpgrid(m, 2);
   tmpgrid.col(1) = grid_points_;
 
   auto f = [this, m, &tmpvals, &tmpvals2, &tmpgrid](double u1, double u2) {
-    double upr, tmpint, tmpint1;
+    double upr;
+    double tmpint;
+    double tmpint1;
     upr = u2;
     for (ptrdiff_t k = 0; k < m; ++k) {
       tmpgrid.col(0) = Eigen::VectorXd::Constant(m, grid_points_(k));
@@ -262,8 +271,9 @@ InterpolationGrid::int_on_grid(const double& upr,
     // go up the grid and integrate
     for (ptrdiff_t k = 0; k < (grid.size() - 1); ++k) {
       // stop loop if fully integrated
-      if (upr < grid(k))
+      if (upr < grid(k)) {
         break;
+      }
 
       // don't integrate over full cell if upr is in interior
       if (upr < grid(k + 1)) {

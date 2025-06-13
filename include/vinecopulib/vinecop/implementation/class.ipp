@@ -1442,9 +1442,9 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   size_t bytes_required = (8 * 2 * n * d * d) + (8 * n * d) + (4 * 4 * d * d);
   // if the problem is too large (requires more than 1 GB memory), split
   // the data into two halves and call simulate on the reduced data.
-  if (static_cast<int>((n > 1) & static_cast<int>(bytes_required >
-                                                  static_cast<size_t>(1e9))) !=
-      0) {
+  if (static_cast<int>(
+        static_cast<int>(n > 1) &
+        static_cast<int>(bytes_required > static_cast<size_t>(1e9))) != 0) {
     size_t n_half = n / 2;
     size_t n_left = n - n_half;
     U_vine.block(0, 0, n_half, d) =
@@ -1525,7 +1525,7 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
   size_t d_data = data.cols();
   auto n_disc = get_n_discrete();
   size_t d_exp = d_ + n_disc;
-  if (static_cast<int>((d_data != d_exp) &
+  if (static_cast<int>(static_cast<int>(d_data != d_exp) &
                        static_cast<int>(d_data != 2 * d_)) != 0) {
     std::stringstream msg;
     msg << "data has wrong number of columns; " << "expected: " << d_exp

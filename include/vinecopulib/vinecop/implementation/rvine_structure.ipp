@@ -114,7 +114,7 @@ inline RVineStructure::RVineStructure(
   , struct_array_(struct_array)
 {
   if (check) {
-    if (static_cast<int>((trunc_lvl_ > 0) &
+    if (static_cast<int>(static_cast<int>(trunc_lvl_ > 0) &
                          static_cast<int>(struct_array.get_dim() != d_)) != 0) {
       throw std::runtime_error("order and struct_array have "
                                "incompatible dimensions");
@@ -311,14 +311,14 @@ RVineStructure::min_array(size_t tree, size_t edge) const
 inline bool
 RVineStructure::needed_hfunc1(size_t tree, size_t edge) const
 {
-  return needed_hfunc1_(tree, edge) != 0u;
+  return needed_hfunc1_(tree, edge) != 0U;
 }
 
 //! @brief Access elements of the needed_hfunc2 array.
 inline bool
 RVineStructure::needed_hfunc2(size_t tree, size_t edge) const
 {
-  return needed_hfunc2_(tree, edge) != 0u;
+  return needed_hfunc2_(tree, edge) != 0U;
 }
 
 //! @brief Truncates the R-vine structure.

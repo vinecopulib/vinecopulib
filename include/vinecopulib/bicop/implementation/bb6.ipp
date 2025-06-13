@@ -67,7 +67,7 @@ Bb6Bicop::pdf_raw(const Eigen::MatrixXd& u)
   double t32 = delta - 1.0;
   double t38 = 2.0 * delta;
   double t39 = -1.0 + t38;
-  double t47 = 3.0 * delta - 1.0;
+  double t47 = (3.0 * delta) - 1.0;
 
   auto f = [theta, delta, t12, t16, t32, t38, t39, t47](const double& u1,
                                                         const double& u2) {
