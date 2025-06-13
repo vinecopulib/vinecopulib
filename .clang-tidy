@@ -10,7 +10,12 @@
 #   misc-*,
 #   hicpp-*,
 #   boost-*
-Checks: '-*,bugprone-*,readability-*,-readability-identifier-length'
+Checks: >
+  -*,
+  bugprone-*,
+  readability-*,
+  -readability-identifier-length, # we have internal variables that are short
+  -readability-magic-numbers # we use magic numbers in tests
 
 WarningsAsErrors: ''
 
