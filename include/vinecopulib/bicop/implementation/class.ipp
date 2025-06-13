@@ -857,16 +857,6 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
   nobs_ = data_no_nan.rows();
 }
 
-inline void
-trigger_static_analysis_checks()
-{
-  int x = 3.14;         // narrowing
-  int* p = new int(42); // leak
-  int y = (int)3.14;    // C-style cast
-  if ((x = 0)) {
-  } // assignment in condition
-}
-
 //! @brief Selects the best fitting model.
 //!
 //! @details The function calls `Bicop::fit()` for all families in
@@ -890,7 +880,6 @@ trigger_static_analysis_checks()
 inline void
 Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
 {
-  trigger_static_analysis_checks(); // <--- Required for instantiation
   using namespace tools_select;
   check_weights_size(controls.get_weights(), data);
   Eigen::MatrixXd data_no_nan = data;
