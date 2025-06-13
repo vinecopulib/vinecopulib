@@ -146,7 +146,9 @@ protected:
 
   void select_edges(VineTree& vine_tree);
 
-  Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
+  static Eigen::MatrixXd get_pc_data(size_t v0,
+                                     size_t v1,
+                                     const VineTree& tree);
 
   static Eigen::VectorXd get_hfunc(const VertexProperties& vertex_data,
                                    bool is_first);
@@ -184,9 +186,9 @@ protected:
 
   void min_spanning_tree(VineTree& graph);
 
-  void add_edge_info(VineTree& tree);
+  static void add_edge_info(VineTree& tree);
 
-  void add_pc_info(const EdgeIterator& e, VineTree& tree);
+  static void add_pc_info(const EdgeIterator& e, VineTree& tree);
 
   static void remove_edge_data(VineTree& tree);
 

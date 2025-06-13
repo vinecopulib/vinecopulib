@@ -190,8 +190,9 @@ TEST(discrete, vinecop)
     }
   }
 
-  for (auto& pc : pcs[0])
+  for (auto& pc : pcs[0]) {
     pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
+  }
   Vinecop vc3(vc2.get_rvine_structure(), pcs, var_types);
   vc3.fit(u, controls);
 

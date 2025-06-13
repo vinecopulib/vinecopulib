@@ -62,7 +62,7 @@ ArchimedeanBicop::hinv2_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-ArchimedeanBicop::get_start_parameters(const double)
+ArchimedeanBicop::get_start_parameters(const double /*tau*/)
 {
   Eigen::MatrixXd lb = this->get_parameters_lower_bounds();
   Eigen::VectorXd parameters = lb + Eigen::VectorXd::Constant(2, 0.1);
