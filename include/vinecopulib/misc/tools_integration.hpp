@@ -21,7 +21,7 @@
 #define sprintf _sprintf_do_nothing
 namespace std {
 constexpr int
-_sprintf_do_nothing(char*, const char*, ...)
+_sprintf_do_nothing(char* /*unused*/, const char* /*unused*/, ...)
 {
   return 0;
 }

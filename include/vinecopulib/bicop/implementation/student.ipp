@@ -51,14 +51,13 @@ StudentBicop::cdf(const Eigen::MatrixXd& u)
   if (nu == round(nu)) {
     int inu = static_cast<int>(nu);
     return pbvt(qt(u, inu), inu, rho);
-  } else {
-    int nu1 = static_cast<int>(std::floor(nu));
-    int nu2 = static_cast<int>(std::ceil(nu));
-    double weight = (nu - static_cast<double>(nu1)) /
-                    (static_cast<double>(nu2) - static_cast<double>(nu1));
-    return pbvt(qt(u, nu1), nu1, rho) * (1 - weight) +
-           pbvt(qt(u, nu2), nu2, rho) * weight;
   }
+  int nu1 = static_cast<int>(std::floor(nu));
+  int nu2 = static_cast<int>(std::ceil(nu));
+  double weight = (nu - static_cast<double>(nu1)) /
+                  (static_cast<double>(nu2) - static_cast<double>(nu1));
+  return pbvt(qt(u, nu1), nu1, rho) * (1 - weight) +
+         pbvt(qt(u, nu2), nu2, rho) * weight;
 }
 
 inline Eigen::VectorXd

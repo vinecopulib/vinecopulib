@@ -54,8 +54,8 @@ public:
     const FitControlsVinecop& controls = FitControlsVinecop());
 
   // Constructors from files/serialized objects
-  explicit Vinecop(const std::string& filename, const bool check = true);
-  explicit Vinecop(const nlohmann::json& input, const bool check = true);
+  explicit Vinecop(const std::string& filename, bool check = true);
+  explicit Vinecop(const nlohmann::json& input, bool check = true);
 
   // Serialize
   nlohmann::json to_json() const;
@@ -67,7 +67,7 @@ public:
 
   void fit(const Eigen::MatrixXd& data,
            const FitControlsBicop& controls = FitControlsBicop(),
-           const size_t num_threads = 1);
+           size_t num_threads = 1);
 
   DEPRECATED void select_all(
     const Eigen::MatrixXd& data,
@@ -118,28 +118,28 @@ public:
   size_t get_nobs() const;
   double get_aic() const;
   double get_bic() const;
-  double get_mbicv(const double psi0 = 0.9) const;
+  double get_mbicv(double psi0 = 0.9) const;
 
   // Stats methods
-  Eigen::VectorXd pdf(Eigen::MatrixXd u, const size_t num_threads = 1) const;
+  Eigen::VectorXd pdf(Eigen::MatrixXd u, size_t num_threads = 1) const;
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const size_t N = 1e4,
-                      const size_t num_threads = 1,
+                      size_t N = 1e4,
+                      size_t num_threads = 1,
                       std::vector<int> seeds = std::vector<int>()) const;
 
   Eigen::MatrixXd simulate(
-    const size_t n,
-    const bool qrng = false,
-    const size_t num_threads = 1,
+    size_t n,
+    bool qrng = false,
+    size_t num_threads = 1,
     const std::vector<int>& seeds = std::vector<int>()) const;
 
   Eigen::MatrixXd rosenblatt(Eigen::MatrixXd u,
-                             const size_t num_threads = 1,
+                             size_t num_threads = 1,
                              bool randomize_discrete = true,
                              std::vector<int> seeds = {}) const;
   Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& u,
-                                     const size_t num_threads = 1) const;
+                                     size_t num_threads = 1) const;
 
   void set_all_pair_copulas(
     const std::vector<std::vector<Bicop>>& pair_copulas);
@@ -151,22 +151,22 @@ public:
   double get_npars() const;
 
   double loglik(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
-                const size_t num_threads = 1) const;
+                size_t num_threads = 1) const;
 
   double aic(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
-             const size_t num_threads = 1) const;
+             size_t num_threads = 1) const;
 
   double bic(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
-             const size_t num_threads = 1) const;
+             size_t num_threads = 1) const;
 
   double mbicv(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
-               const double psi0 = 0.9,
-               const size_t num_threads = 1) const;
+               double psi0 = 0.9,
+               size_t num_threads = 1) const;
 
   // Misc methods
   static std::vector<std::vector<Bicop>> make_pair_copula_store(
-    const size_t d,
-    const size_t trunc_lvl = std::numeric_limits<size_t>::max());
+    size_t d,
+    size_t trunc_lvl = std::numeric_limits<size_t>::max());
   void truncate(size_t trunc_lvl);
 
   std::string str(const std::vector<size_t>& trees = {}) const;
@@ -184,13 +184,13 @@ protected:
   void check_data(const Eigen::MatrixXd& data) const;
   void check_pair_copulas_rvine_structure(
     const std::vector<std::vector<Bicop>>& pair_copulas) const;
-  double calculate_mbicv_penalty(const size_t nobs, const double psi0) const;
+  double calculate_mbicv_penalty(size_t nobs, double psi0) const;
   void finalize_fit(const tools_select::VinecopSelector& selector);
-  void check_weights_size(const Eigen::VectorXd& weights,
-                          const Eigen::MatrixXd& data) const;
-  void check_enough_data(const Eigen::MatrixXd& data) const;
+  static void check_weights_size(const Eigen::VectorXd& weights,
+                                 const Eigen::MatrixXd& data);
+  static void check_enough_data(const Eigen::MatrixXd& data);
   void check_fitted() const;
-  void check_indices(const size_t tree, const size_t edge) const;
+  void check_indices(size_t tree, size_t edge) const;
   void check_var_types(const std::vector<std::string>& var_types) const;
   void set_continuous_var_types() const;
   void set_var_types_internal(const std::vector<std::string>& var_types) const;

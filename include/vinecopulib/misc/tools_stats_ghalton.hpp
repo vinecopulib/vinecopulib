@@ -13,6 +13,7 @@ namespace tools_ghalton {
 //! Maximal dimension allowed for generalized Halton quasi Monte Carlo.
 #define ghalton_max_dim 360
 
+// NOLINTBEGIN
 //! Primes for `ghalton()`
 static Eigen::Matrix<int, ghalton_max_dim, 1> primes = [] {
   Eigen::Matrix<int, ghalton_max_dim, 1> tmp;
@@ -76,6 +77,7 @@ static Eigen::Matrix<int, ghalton_max_dim, 1> permTN2 = [] {
     1860;
   return tmp;
 }();
+// NOLINTEND
 }
 }
 }

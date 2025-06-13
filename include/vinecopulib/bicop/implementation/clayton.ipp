@@ -29,7 +29,7 @@ inline double
 ClaytonBicop::generator_inv(const double& u)
 {
   double theta = double(this->parameters_(0));
-  return std::pow(1 + theta * u, -1 / theta);
+  return std::pow(1 + (theta * u), -1 / theta);
 }
 
 inline double
@@ -55,7 +55,7 @@ ClaytonBicop::pdf_raw(const Eigen::MatrixXd& u)
   }
 
   auto f = [theta](const double& u1, const double& u2) {
-    double temp = std::log1p(theta) - (1.0 + theta) * std::log(u1 * u2);
+    double temp = std::log1p(theta) - ((1.0 + theta) * std::log(u1 * u2));
     temp = temp - (2.0 + 1.0 / (theta)) *
                     std::log(std::pow(u1, -theta) + std::pow(u2, -theta) - 1.0);
     return std::exp(temp);

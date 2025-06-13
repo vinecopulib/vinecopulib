@@ -87,7 +87,7 @@ protected:
   virtual Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u) = 0;
 
   virtual Eigen::MatrixXd tau_to_parameters(const double& tau) = 0;
-  Eigen::MatrixXd no_tau_to_parameters(const double&);
+  static Eigen::MatrixXd no_tau_to_parameters(const double& /*unused*/);
 
   // Misc methods
   Eigen::VectorXd hinv1_num(const Eigen::MatrixXd& u);
@@ -99,7 +99,7 @@ protected:
   Eigen::VectorXd pdf_d_d(const Eigen::MatrixXd& u);
 
   double loglik(const Eigen::MatrixXd& u,
-                const Eigen::VectorXd weights = Eigen::VectorXd());
+                Eigen::VectorXd weights = Eigen::VectorXd());
 
   // Data members
   BicopFamily family_;

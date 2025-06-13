@@ -15,6 +15,7 @@ namespace tools_sobol {
 // Maximal dimension allowed for Sobol numbers.
 #define sobol_max_dim 21201
 
+// NOLINTBEGIN
 static size_t a_sobol[sobol_max_dim] = {
   0,      1,      1,      2,      1,      4,      2,      4,      7,
   11,     13,     14,     1,      13,     16,     19,     22,     25,
@@ -350500,6 +350501,7 @@ static size_t minit_sobol[sobol_max_dim][18] = {
     114603,
     86317 }
 };
+// NOLINTEND
 }
 }
 }

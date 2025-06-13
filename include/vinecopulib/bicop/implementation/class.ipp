@@ -441,10 +441,9 @@ Bicop::loglik(const Eigen::MatrixXd& u) const
 {
   if (u.rows() < 1) {
     return get_loglik();
-  } else {
-    tools_eigen::check_if_in_unit_cube(u);
-    return bicop_->loglik(prep_for_abstract(u));
   }
+  tools_eigen::check_if_in_unit_cube(u);
+  return bicop_->loglik(prep_for_abstract(u));
 }
 
 //! @brief Evaluates the Akaike information criterion (AIC).
@@ -462,7 +461,7 @@ Bicop::loglik(const Eigen::MatrixXd& u) const
 inline double
 Bicop::aic(const Eigen::MatrixXd& u) const
 {
-  return -2 * loglik(u) + 2 * get_npars();
+  return (-2 * loglik(u)) + (2 * get_npars());
 }
 
 //! @brief Evaluates the Bayesian information criterion (BIC).
@@ -486,7 +485,7 @@ Bicop::bic(const Eigen::MatrixXd& u) const
     tools_eigen::remove_nans(u_no_nan);
     n = static_cast<double>(u_no_nan.rows());
   }
-  return -2 * loglik(u_no_nan) + get_npars() * log(n);
+  return (-2 * loglik(u_no_nan)) + (get_npars() * log(n));
 }
 
 // clang-format off
@@ -511,13 +510,14 @@ Bicop::mbic(const Eigen::MatrixXd& u, const double psi0) const
   Eigen::MatrixXd u_no_nan = u;
   bool is_indep = (this->get_family() == BicopFamily::indep);
   double npars = this->get_npars();
-  double log_prior = static_cast<double>(!is_indep) * std::log(psi0) +
-                     static_cast<double>(is_indep) * std::log(1.0 - psi0);
+  double log_prior = (static_cast<double>(!is_indep) * std::log(psi0)) +
+                     (static_cast<double>(is_indep) * std::log(1.0 - psi0));
   double n = static_cast<double>(nobs_);
   if (u.rows() > 0) {
     n = static_cast<double>(u_no_nan.rows());
   }
-  return -2 * this->loglik(u_no_nan) + std::log(n) * npars - 2 * log_prior;
+  return (-2 * this->loglik(u_no_nan)) + (std::log(n) * npars) -
+         (2 * log_prior);
 }
 
 //! @brief The number of parameters of the copula model.
@@ -607,7 +607,7 @@ inline double
 Bicop::get_aic() const
 {
   check_fitted();
-  return -2 * bicop_->get_loglik() + 2 * bicop_->get_npars();
+  return (-2 * bicop_->get_loglik()) + (2 * bicop_->get_npars());
 }
 
 //! @brief Gets the bic (only for fitted objects).
@@ -616,7 +616,7 @@ Bicop::get_bic() const
 {
   check_fitted();
   double npars = bicop_->get_npars();
-  return -2 * bicop_->get_loglik() + std::log(nobs_) * npars;
+  return (-2 * bicop_->get_loglik()) + (std::log(nobs_) * npars);
 }
 
 //! @brief Gets the modified bic (only for fitted objects).
@@ -624,7 +624,7 @@ inline double
 Bicop::get_mbic(const double psi0) const
 {
   check_fitted();
-  return -2 * bicop_->get_loglik() + compute_mbic_penalty(nobs_, psi0);
+  return (-2 * bicop_->get_loglik()) + compute_mbic_penalty(nobs_, psi0);
 }
 
 inline double
@@ -632,9 +632,9 @@ Bicop::compute_mbic_penalty(const size_t nobs, const double psi0) const
 {
   double npars = bicop_->get_npars();
   bool is_indep = (this->get_family() == BicopFamily::indep);
-  double log_prior = static_cast<double>(!is_indep) * std::log(psi0) +
-                     static_cast<double>(is_indep) * std::log(1.0 - psi0);
-  return std::log(nobs) * npars - 2 * log_prior;
+  double log_prior = (static_cast<double>(!is_indep) * std::log(psi0)) +
+                     (static_cast<double>(is_indep) * std::log(1.0 - psi0));
+  return (std::log(nobs) * npars) - (2 * log_prior);
 }
 
 //! @brief Gets the Kendall's tau.
@@ -669,7 +669,8 @@ Bicop::check_data_dim(const Eigen::MatrixXd& u) const
   size_t n_cols = u.cols();
   int n_disc = get_n_discrete();
   unsigned short n_cols_exp = static_cast<unsigned short>(2 + n_disc);
-  if ((n_cols != n_cols_exp) & (n_cols != 4)) {
+  if (static_cast<int>(static_cast<int>(n_cols != n_cols_exp) &
+                       static_cast<int>(n_cols != 4)) != 0) {
     std::stringstream msg;
     msg << "data has wrong number of columns; " << "expected: " << n_cols_exp
         << " or 4, actual: " << n_cols << " (model contains ";
@@ -774,7 +775,7 @@ Bicop::str() const
   } else if (get_family() != BicopFamily::indep) {
     bicop_str << "  parameters = " << get_parameters() << "\n";
   }
-  return bicop_str.str().c_str();
+  return bicop_str.str();
 }
 
 //! @brief Gets lower bounds for copula parameters.
@@ -803,8 +804,9 @@ inline Bicop
 Bicop::as_continuous() const
 {
   std::vector<std::string> cc = { "c", "c" };
-  if (var_types_ == cc)
+  if (var_types_ == cc) {
     return *this;
+  }
   auto bc_new = *this;
   bc_new.set_var_types(cc);
   return bc_new;
@@ -931,8 +933,8 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
           // correction for mBIC
           bool is_indep = (cop.get_family() == BicopFamily::indep);
           double psi0 = controls.get_psi0();
-          double log_prior = static_cast<double>(!is_indep) * log(psi0) +
-                             static_cast<double>(is_indep) * log(1.0 - psi0);
+          double log_prior = (static_cast<double>(!is_indep) * log(psi0)) +
+                             (static_cast<double>(is_indep) * log(1.0 - psi0));
           new_criterion -= 2 * log_prior;
         }
       }
@@ -966,13 +968,14 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
   auto n_disc = get_n_discrete();
   if (n_disc == 0) {
     return u.leftCols(2);
-  } else if (n_disc == 2) {
+  }
+  if (n_disc == 2) {
     return u;
   }
   // n_disc = 1:
   Eigen::MatrixXd u_new(u.rows(), 4);
   u_new.leftCols(2) = u.leftCols(2);
-  int disc_col = (var_types_[1] == "d");
+  int disc_col = static_cast<int>(var_types_[1] == "d");
   int cont_col = 1 - disc_col;
   // We already know that there is one discrete and one continuous variable. Now
   // there are two cases:
@@ -981,7 +984,8 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
   // 2. `u.cols() == 4`: Then the F(x^-) values for the discrete variable is in
   // the third column if variable 1 is discrete, and in the fourth column if
   // variable 2 is discrete. Thus, `u.col(2 + disc_col)`.
-  int old_disc_col = 2 + (u.cols() == 4) * disc_col;
+  int old_disc_col =
+    2 + static_cast<int>(static_cast<int>(u.cols() == 4) * disc_col);
   u_new.col(2 + disc_col) = u.col(old_disc_col);
   u_new.col(2 + cont_col) = u.col(cont_col);
   return u_new;
@@ -1055,7 +1059,7 @@ Bicop::check_rotation(int rotation) const
 //! @brief Checks whether weights and data have matching sizes.
 inline void
 Bicop::check_weights_size(const Eigen::VectorXd& weights,
-                          const Eigen::MatrixXd& data) const
+                          const Eigen::MatrixXd& data)
 {
   if ((weights.size() > 0) && (weights.size() != data.rows())) {
     throw std::runtime_error("sizes of weights and data don't match.");
@@ -1075,7 +1079,7 @@ Bicop::check_fitted() const
 //! @brief Checks whether var_types have the correct length and are either "c"
 //! or "d".
 inline void
-Bicop::check_var_types(const std::vector<std::string>& var_types) const
+Bicop::check_var_types(const std::vector<std::string>& var_types)
 {
   if (var_types.size() != 2) {
     throw std::runtime_error("var_types must have size two.");
@@ -1093,7 +1097,7 @@ Bicop::get_n_discrete() const
 {
   int n_discrete = 0;
   for (auto t : var_types_) {
-    n_discrete += (t == "d");
+    n_discrete += static_cast<int>(t == "d");
   }
   return static_cast<unsigned short>(n_discrete);
 }

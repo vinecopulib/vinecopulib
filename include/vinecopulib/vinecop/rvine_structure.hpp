@@ -107,8 +107,8 @@ public:
                  const TriangularArray<size_t>& struct_array,
                  bool natural_order = false,
                  bool check = true);
-  explicit RVineStructure(const std::string& filename, const bool check = true);
-  explicit RVineStructure(const nlohmann::json& input, const bool check = true);
+  explicit RVineStructure(const std::string& filename, bool check = true);
+  explicit RVineStructure(const nlohmann::json& input, bool check = true);
 
   nlohmann::json to_json() const;
   void to_file(const std::string& filename) const;
@@ -137,8 +137,8 @@ public:
                                  std::vector<int> seeds = std::vector<int>());
 
 protected:
-  size_t find_trunc_lvl(
-    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+  static size_t find_trunc_lvl(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat);
   std::vector<size_t> get_order(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
   TriangularArray<size_t> to_rvine_array(
@@ -153,8 +153,8 @@ protected:
   TriangularArray<short unsigned> compute_needed_hfunc1() const;
   TriangularArray<short unsigned> compute_needed_hfunc2() const;
 
-  void check_if_quadratic(
-    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+  static void check_if_quadratic(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat);
   void check_lower_tri(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
   void check_upper_tri() const;

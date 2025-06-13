@@ -41,19 +41,19 @@ public:
 private:
   Eigen::Matrix<ptrdiff_t, 1, 2> get_indices(double x0, double x1);
   ptrdiff_t binary_search(double x);
-  double bilinear_interpolation(double z11,
-                                double z12,
-                                double z21,
-                                double z22,
-                                double x1,
-                                double x2,
-                                double y1,
-                                double y2,
-                                double x,
-                                double y);
-  double int_on_grid(const double& upr,
-                     const Eigen::VectorXd& vals,
-                     const Eigen::VectorXd& grid);
+  static double bilinear_interpolation(double z11,
+                                       double z12,
+                                       double z21,
+                                       double z22,
+                                       double x1,
+                                       double x2,
+                                       double y1,
+                                       double y2,
+                                       double x,
+                                       double y);
+  static double int_on_grid(const double& upr,
+                            const Eigen::VectorXd& vals,
+                            const Eigen::VectorXd& grid);
 
   Eigen::VectorXd grid_points_;
   Eigen::MatrixXd values_;

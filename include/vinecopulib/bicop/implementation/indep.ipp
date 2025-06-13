@@ -56,13 +56,13 @@ IndepBicop::hinv2_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::MatrixXd
-IndepBicop::tau_to_parameters(const double&)
+IndepBicop::tau_to_parameters(const double& /*tau*/)
 {
   return Eigen::VectorXd();
 }
 
 inline double
-IndepBicop::parameters_to_tau(const Eigen::MatrixXd&)
+IndepBicop::parameters_to_tau(const Eigen::MatrixXd& /*parameters*/)
 {
   return 0.0;
 }

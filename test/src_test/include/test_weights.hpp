@@ -12,6 +12,8 @@
 namespace test_weights {
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST(test_weights, catches_incompatible_sizes)
 {
   auto u = tools_stats::simulate_uniform(20, 2);
@@ -64,4 +66,6 @@ TEST(test_weights, works_in_vinecop_select)
   EXPECT_EQ(cop_uw.get_all_families(), cop_w.get_all_families());
   EXPECT_EQ(cop_uw.get_all_parameters(), cop_w.get_all_parameters());
 }
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

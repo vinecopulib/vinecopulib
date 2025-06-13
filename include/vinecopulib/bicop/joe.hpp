@@ -44,7 +44,7 @@ private:
 
   double parameters_to_tau(const Eigen::MatrixXd& par);
 
-  Eigen::VectorXd get_start_parameters(const double tau);
+  Eigen::VectorXd get_start_parameters(double tau);
 };
 }
 

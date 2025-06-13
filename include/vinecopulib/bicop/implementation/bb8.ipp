@@ -24,7 +24,7 @@ Bb8Bicop::generator(const double& u)
 {
   double theta = double(parameters_(0));
   double delta = double(parameters_(1));
-  double res = (1 - std::pow(1 - delta * u, theta));
+  double res = (1 - std::pow(1 - (delta * u), theta));
   return -std::log(res / (1 - std::pow(1 - delta, theta)));
 }
 
@@ -42,8 +42,8 @@ Bb8Bicop::generator_derivative(const double& u)
 {
   double theta = double(parameters_(0));
   double delta = double(parameters_(1));
-  double res = delta * theta * std::pow(1 - delta * u, theta - 1);
-  return -res / (1 - std::pow(1 - delta * u, theta));
+  double res = delta * theta * std::pow(1 - (delta * u), theta - 1);
+  return -res / (1 - std::pow(1 - (delta * u), theta));
 }
 
 // inline double Bb8Bicop::generator_derivative2(const double &u)
@@ -70,14 +70,14 @@ Bb8Bicop::pdf_raw(const Eigen::MatrixXd& u)
 
   auto f = [theta, delta, t10, t16, t38, t39, t59](const double& u1,
                                                    const double& u2) {
-    double t2 = 1.0 - delta * u1;
+    double t2 = 1.0 - (delta * u1);
     double t3 = std::pow(t2, theta);
     double t11 = std::pow(t10, theta);
     double t12 = 1.0 - t11;
     double t33 = theta * t3;
     double t49 = std::pow(t2, t38);
     double t69 = t12 * t12;
-    double t6 = 1.0 - delta * u2;
+    double t6 = 1.0 - (delta * u2);
     double t7 = std::pow(t6, theta);
     double t25 = t3 * t7;
     double t26 = t11 - t7 - t3 + t25;
@@ -86,10 +86,11 @@ Bb8Bicop::pdf_raw(const Eigen::MatrixXd& u)
     double t45 = t3 * t44;
     double t50 = t49 * t7;
     double t54 = t49 * t44;
-    double t62 = -2.0 * t25 * t11 + t25 - t33 * t7 + 3.0 * t33 * t7 * t11 -
-                 3.0 * t33 * t7 * t39 + t25 * t39 + 2.0 * t45 * t11 -
-                 t45 * t39 + 2.0 * t50 * t11 - t50 * t39 - 2.0 * t54 * t11 +
-                 t54 * t39 + t54 - t50 - t45 + t33 * t7 * t59;
+    double t62 = (-2.0 * t25 * t11) + t25 - (t33 * t7) +
+                 (3.0 * t33 * t7 * t11) - (3.0 * t33 * t7 * t39) + (t25 * t39) +
+                 (2.0 * t45 * t11) - (t45 * t39) + (2.0 * t50 * t11) -
+                 (t50 * t39) - (2.0 * t54 * t11) + (t54 * t39) + t54 - t50 -
+                 t45 + (t33 * t7 * t59);
     double t67 = t26 * t26;
 
     return -delta * t29 * t62 / t6 / t2 / t67 / t69;
@@ -103,11 +104,12 @@ Bb8Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   double theta = parameters(0);
   double delta = parameters(1);
   auto f = [theta, delta](const double t) {
-    double tmp = std::pow(1 - t * delta, theta);
+    double tmp = std::pow(1 - (t * delta), theta);
     double res = std::log((tmp - 1) / (std::pow(1 - delta, theta) - 1));
-    return res * (1 - t * delta - std::pow(1 - t * delta, 1 - theta));
+    return res * (1 - t * delta - std::pow(1 - (t * delta), 1 - theta));
   };
-  return 1 - 4 / (delta * theta) * tools_integration::integrate_zero_to_one(f);
+  return 1 -
+         (4 / (delta * theta) * tools_integration::integrate_zero_to_one(f));
 }
 
 inline Eigen::MatrixXd

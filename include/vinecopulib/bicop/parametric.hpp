@@ -36,17 +36,17 @@ protected:
 
   void fit(const Eigen::MatrixXd& data,
            std::string method,
-           double,
+           double /*mult*/,
            const Eigen::VectorXd& weights);
 
   double get_npars() const;
 
   void set_npars(const double& npars);
 
-  virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
+  virtual Eigen::VectorXd get_start_parameters(double tau) = 0;
 
 private:
-  double winsorize_tau(double tau) const;
+  static double winsorize_tau(double tau);
 
   void adjust_parameters_bounds(Eigen::MatrixXd& lb,
                                 Eigen::MatrixXd& ub,

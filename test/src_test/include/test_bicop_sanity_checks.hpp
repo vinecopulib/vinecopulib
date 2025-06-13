@@ -12,6 +12,8 @@
 namespace test_bicop_sanity_checks {
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST(bicop_sanity_checks, catches_wrong_parameter_size)
 {
   for (auto family : bicop_families::nonparametric) {
@@ -153,4 +155,6 @@ TEST(bicop_sanity_checks, copy)
   EXPECT_EQ(bc2.get_loglik(), bc3.get_loglik());
   EXPECT_EQ(bc2.get_nobs(), bc3.get_nobs());
 }
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

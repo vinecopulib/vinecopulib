@@ -13,7 +13,7 @@ inline KernelBicop::KernelBicop()
 {
   // construct default grid (equally spaced on Gaussian scale)
   size_t m = 30;
-  auto grid_points = this->make_normal_grid(m);
+  auto grid_points = vinecopulib::KernelBicop::make_normal_grid(m);
 
   // move boundary points to 0/1, so we don't have to extrapolate
   grid_points(0) = 0.0;
@@ -176,9 +176,10 @@ inline Eigen::VectorXd
 KernelBicop::make_normal_grid(size_t m)
 {
   Eigen::VectorXd grid_points(m);
-  for (size_t i = 0; i < m; ++i)
+  for (size_t i = 0; i < m; ++i) {
     grid_points(i) =
       -3.25 + static_cast<double>(i) * (6.5 / static_cast<double>(m - 1));
+  }
   grid_points = tools_stats::pnorm(grid_points);
 
   return grid_points;

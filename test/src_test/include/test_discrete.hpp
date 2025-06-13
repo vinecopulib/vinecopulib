@@ -14,6 +14,8 @@ namespace test_discrete {
 
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
 TEST(discrete, bicop)
 {
   for (auto rot : { 0, 90, 180, 270 }) {
@@ -190,8 +192,9 @@ TEST(discrete, vinecop)
     }
   }
 
-  for (auto& pc : pcs[0])
+  for (auto& pc : pcs[0]) {
     pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
+  }
   Vinecop vc3(vc2.get_rvine_structure(), pcs, var_types);
   vc3.fit(u, controls);
 
@@ -283,4 +286,6 @@ TEST(zero_inflated, vinecop)
     }
   }
 }
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)
 }

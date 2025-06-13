@@ -22,8 +22,9 @@ struct Batch
 inline size_t
 compute_num_batches(size_t num_tasks, size_t num_threads)
 {
-  if (num_tasks < num_threads)
+  if (num_tasks < num_threads) {
     return num_tasks;
+  }
   size_t num_batches =
     num_threads *
     static_cast<size_t>(std::floor(std::sqrt(num_tasks / num_threads)));
@@ -33,8 +34,9 @@ compute_num_batches(size_t num_tasks, size_t num_threads)
 inline std::vector<Batch>
 create_batches(size_t num_tasks, size_t num_threads)
 {
-  if (num_tasks == 0)
+  if (num_tasks == 0) {
     return { Batch{ 0, 0 } };
+  }
   num_threads = std::max(static_cast<size_t>(1), num_threads);
 
   size_t num_batches = compute_num_batches(num_tasks, num_threads);
@@ -43,7 +45,7 @@ create_batches(size_t num_tasks, size_t num_threads)
   size_t min_size = num_tasks / num_batches;
   ptrdiff_t rem_size = num_tasks % num_batches;
   for (size_t i = 0, k = 0; i < num_tasks; k++) {
-    batches[k] = Batch{ i, min_size + (rem_size-- > 0) };
+    batches[k] = Batch{ i, min_size + static_cast<size_t>(rem_size-- > 0) };
     i += batches[k].size;
   }
 

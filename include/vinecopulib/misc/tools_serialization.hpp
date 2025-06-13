@@ -92,7 +92,7 @@ json_to_matrix(const nlohmann::json& input)
   Eigen::MatrixXd matrix;
   if (!input["data"].is_null()) {
     std::vector<double> vec = input["data"];
-    matrix = Eigen::MatrixXd::Map(&vec[0], rows, cols);
+    matrix = Eigen::MatrixXd::Map(vec.data(), rows, cols);
   } else {
     matrix = Eigen::MatrixXd();
   }

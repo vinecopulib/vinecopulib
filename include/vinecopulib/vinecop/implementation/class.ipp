@@ -37,11 +37,11 @@ inline Vinecop::Vinecop(const RVineStructure& structure,
   , rvine_structure_(structure)
 {
 
-  if (pair_copulas.size() > 0) {
+  if (!pair_copulas.empty()) {
     set_all_pair_copulas(pair_copulas);
   }
 
-  if (var_types.size() > 0) {
+  if (!var_types.empty()) {
     set_var_types(var_types);
   } else {
     set_continuous_var_types();
@@ -86,14 +86,14 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
     d_ = structure.get_dim();
     rvine_structure_ = structure;
   } else {
-    if (var_types.size() > 0) {
+    if (!var_types.empty()) {
       d_ = var_types.size();
     } else {
       d_ = data.cols();
     }
     rvine_structure_ = RVineStructure(d_, static_cast<size_t>(0));
   }
-  if (var_types.size() == 0) {
+  if (var_types.empty()) {
     set_continuous_var_types();
   } else {
     set_var_types(var_types);
@@ -132,7 +132,7 @@ inline Vinecop::Vinecop(
 inline Vinecop::Vinecop(const nlohmann::json& input, const bool check)
 {
   rvine_structure_ = RVineStructure(input["structure"], check);
-  d_ = static_cast<size_t>(rvine_structure_.get_dim());
+  d_ = rvine_structure_.get_dim();
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
 
   nlohmann::json pcs_json = input["pair copulas"];
@@ -366,15 +366,19 @@ Vinecop::fit(const Eigen::MatrixXd& data,
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
-  if (trunc_lvl == 0)
+  if (trunc_lvl == 0) {
     return;
+  }
 
   auto order = rvine_structure_.get_order();
   auto disc_cols = tools_select::get_disc_cols(var_types_);
   size_t n = u.rows();
 
   // temporary storage objects (all data must be in (0, 1))
-  Eigen::MatrixXd hfunc1, hfunc2, hfunc1_sub, hfunc2_sub;
+  Eigen::MatrixXd hfunc1;
+  Eigen::MatrixXd hfunc2;
+  Eigen::MatrixXd hfunc1_sub;
+  Eigen::MatrixXd hfunc2_sub;
   hfunc1 = Eigen::MatrixXd::Zero(n, d_);
   hfunc2 = Eigen::MatrixXd::Zero(n, d_);
   if (get_n_discrete() > 0) {
@@ -404,7 +408,8 @@ Vinecop::fit(const Eigen::MatrixXd& data,
       auto var_types = edge_copula->get_var_types();
       size_t m = rvine_structure_.min_array(tree, edge);
 
-      auto u_e = Eigen::MatrixXd(n, 2), u_e_sub = Eigen::MatrixXd(n, 2);
+      auto u_e = Eigen::MatrixXd(n, 2);
+      auto u_e_sub = Eigen::MatrixXd(n, 2);
       u_e.col(0) = hfunc2.col(edge);
       if (m == rvine_structure_.struct_array(tree, edge, true)) {
         u_e.col(1) = hfunc2.col(m - 1);
@@ -736,7 +741,7 @@ inline double
 Vinecop::get_aic() const
 {
   check_fitted();
-  return -2 * loglik_ + 2 * get_npars();
+  return (-2 * loglik_) + (2 * get_npars());
 }
 
 //! @brief Gets the BIC.
@@ -746,7 +751,7 @@ inline double
 Vinecop::get_bic() const
 {
   check_fitted();
-  return -2 * loglik_ + get_npars() * std::log(nobs_);
+  return (-2 * loglik_) + (get_npars() * std::log(nobs_));
 }
 
 //! @brief Gets the log-likelihood.
@@ -756,7 +761,7 @@ inline double
 Vinecop::get_mbicv(const double psi0) const
 {
   check_fitted();
-  return -2 * loglik_ + this->calculate_mbicv_penalty(nobs_, psi0);
+  return (-2 * loglik_) + this->calculate_mbicv_penalty(nobs_, psi0);
 }
 
 //! @brief Computes the penalty term for mBICV.
@@ -792,7 +797,7 @@ Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
                         (1 - psis.array()).log())
                        .sum();
 
-  return std::log(nobs) * npars - 2.0 * log_prior;
+  return (std::log(nobs) * npars) - (2.0 * log_prior);
 }
 
 //! @brief Gets the threshold.
@@ -851,12 +856,13 @@ inline void
 Vinecop::set_var_types_internal(const std::vector<std::string>& var_types) const
 {
   var_types_ = var_types;
-  if (pair_copulas_.size() == 0) {
+  if (pair_copulas_.empty()) {
     return;
   }
 
   // set new var_types for all pair-copulas
-  std::vector<std::string> natural_types(d_), pair_types(2);
+  std::vector<std::string> natural_types(d_);
+  std::vector<std::string> pair_types(2);
   for (size_t j = 0; j < d_; ++j) {
     natural_types[j] = var_types[rvine_structure_.get_order()[j] - 1];
   }
@@ -929,7 +935,12 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects (all data must be in (0, 1))
-    Eigen::MatrixXd hfunc1, hfunc2, u_e, hfunc1_sub, hfunc2_sub, u_e_sub;
+    Eigen::MatrixXd hfunc1;
+    Eigen::MatrixXd hfunc2;
+    Eigen::MatrixXd u_e;
+    Eigen::MatrixXd hfunc1_sub;
+    Eigen::MatrixXd hfunc2_sub;
+    Eigen::MatrixXd u_e_sub;
     hfunc1 = Eigen::MatrixXd::Zero(b.size, d_);
     hfunc2 = Eigen::MatrixXd::Zero(b.size, d_);
     if (is_discrete()) {
@@ -1111,9 +1122,8 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
   if (u.rows() < 1) {
     return this->get_loglik();
-  } else {
-    return pdf(u, num_threads).array().log().sum();
   }
+  return pdf(u, num_threads).array().log().sum();
 }
 
 //! @brief Evaluates the Akaike information criterion (AIC).
@@ -1135,7 +1145,7 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 inline double
 Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
-  return -2 * this->loglik(u, num_threads) + 2 * get_npars();
+  return (-2 * this->loglik(u, num_threads)) + (2 * get_npars());
 }
 
 //! @brief Evaluates the Bayesian information criterion (BIC).
@@ -1157,8 +1167,8 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 inline double
 Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
-  return -2 * this->loglik(u, num_threads) +
-         get_npars() * log(static_cast<double>(u.rows()));
+  return (-2 * this->loglik(u, num_threads)) +
+         (get_npars() * log(static_cast<double>(u.rows())));
 }
 
 // clang-format off
@@ -1192,7 +1202,7 @@ Vinecop::mbicv(const Eigen::MatrixXd& u,
 
   size_t n = u.rows();
   double ll = this->loglik(u, num_threads);
-  return -2.0 * ll + this->calculate_mbicv_penalty(n, psi0);
+  return (-2.0 * ll) + this->calculate_mbicv_penalty(n, psi0);
 }
 
 //! @brief Returns sum of the number of parameters for all pair copulas (see.
@@ -1277,8 +1287,10 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
 
   // fill first row of hfunc2 matrix with evaluation points;
   // points have to be reordered to correspond to natural order
-  Eigen::MatrixXd hfunc1(n, d), hfunc2(n, d), hfunc1_sub(n, d),
-    hfunc2_sub(n, d);
+  Eigen::MatrixXd hfunc1(n, d);
+  Eigen::MatrixXd hfunc2(n, d);
+  Eigen::MatrixXd hfunc1_sub(n, d);
+  Eigen::MatrixXd hfunc2_sub(n, d);
   for (size_t j = 0; j < d; ++j) {
     hfunc2.col(j) = u.col(order[j] - 1);
   }
@@ -1298,7 +1310,8 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
   }
 
   auto do_batch = [&](const tools_batch::Batch& b) {
-    Eigen::MatrixXd u_e, u_e_sub;
+    Eigen::MatrixXd u_e;
+    Eigen::MatrixXd u_e_sub;
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
       tools_interface::check_user_interrupt(
         static_cast<double>(n) * static_cast<double>(d) > 1e5);
@@ -1429,7 +1442,8 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   size_t bytes_required = (8 * 2 * n * d * d) + (8 * n * d) + (4 * 4 * d * d);
   // if the problem is too large (requires more than 1 GB memory), split
   // the data into two halves and call simulate on the reduced data.
-  if ((n > 1) & (bytes_required > static_cast<size_t>(1e9))) {
+  if ((static_cast<int>(n > 1) &
+       static_cast<int>(bytes_required > static_cast<size_t>(1e9))) != 0) {
     size_t n_half = n / 2;
     size_t n_left = n - n_half;
     U_vine.block(0, 0, n_half, d) =
@@ -1510,7 +1524,8 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
   size_t d_data = data.cols();
   auto n_disc = get_n_discrete();
   size_t d_exp = d_ + n_disc;
-  if ((d_data != d_exp) & (d_data != 2 * d_)) {
+  if ((static_cast<int>(d_data != d_exp) &
+       static_cast<int>(d_data != 2 * d_)) != 0) {
     std::stringstream msg;
     msg << "data has wrong number of columns; " << "expected: " << d_exp
         << " or " << 2 * d_ << ", actual: " << d_data << " (model contains ";
@@ -1575,7 +1590,7 @@ Vinecop::finalize_fit(const tools_select::VinecopSelector& selector)
 //! Checks if weights are compatible with the data.
 inline void
 Vinecop::check_weights_size(const Eigen::VectorXd& weights,
-                            const Eigen::MatrixXd& data) const
+                            const Eigen::MatrixXd& data)
 {
   if ((weights.size() > 0) && (weights.size() != data.rows())) {
     throw std::runtime_error("sizes of weights and data don't match.");
@@ -1584,7 +1599,7 @@ Vinecop::check_weights_size(const Eigen::VectorXd& weights,
 
 //! Checks if data size is large enough.
 inline void
-Vinecop::check_enough_data(const Eigen::MatrixXd& data) const
+Vinecop::check_enough_data(const Eigen::MatrixXd& data)
 {
   if (data.rows() == 1) {
     throw std::runtime_error("data must have more than one row");
@@ -1644,8 +1659,9 @@ inline void
 Vinecop::set_continuous_var_types() const
 {
   var_types_ = std::vector<std::string>(d_);
-  for (auto& t : var_types_)
+  for (auto& t : var_types_) {
     t = "c";
+  }
   set_var_types_internal(var_types_);
 }
 
@@ -1655,7 +1671,7 @@ Vinecop::get_n_discrete() const
 {
   int n_discrete = 0;
   for (auto t : var_types_) {
-    n_discrete += (t == "d");
+    n_discrete += static_cast<int>(t == "d");
   }
   return n_discrete;
 }
@@ -1692,7 +1708,7 @@ Vinecop::str(const std::vector<size_t>& trees) const
   std::vector<size_t> trees_to_summarize;
   std::vector<size_t> all_trees(rvine_structure_.get_trunc_lvl());
   std::iota(all_trees.begin(), all_trees.end(), 0);
-  if (trees.size() == 0) {
+  if (trees.empty()) {
     trees_to_summarize = all_trees;
   } else {
     trees_to_summarize = tools_stl::intersect(all_trees, trees);
@@ -1740,7 +1756,7 @@ Vinecop::str(const std::vector<size_t>& trees) const
       conditioned_variables.push_back(std::to_string(order[e]) + ", " +
                                       std::to_string(arr(t, e)));
       if (t > 0) {
-        std::string cv = "";
+        std::string cv;
         for (size_t cv_ = t - 1; cv_ > 0; --cv_) {
           cv += std::to_string(arr(cv_, e)) + ", ";
         }

@@ -96,17 +96,17 @@ private:
   size_t num_threads_;
   bool allow_rotations_;
 
-  void check_parametric_method(std::string parametric_method);
+  static void check_parametric_method(std::string parametric_method);
 
-  void check_nonparametric_method(std::string nonparametric_method);
+  static void check_nonparametric_method(std::string nonparametric_method);
 
-  void check_nonparametric_mult(double nonparametric_mult);
+  static void check_nonparametric_mult(double nonparametric_mult);
 
-  void check_selection_criterion(std::string selection_criterion);
+  static void check_selection_criterion(std::string selection_criterion);
 
-  void check_psi0(double psi0);
+  static void check_psi0(double psi0);
 
-  size_t process_num_threads(size_t num_threads);
+  static size_t process_num_threads(size_t num_threads);
 };
 }
 

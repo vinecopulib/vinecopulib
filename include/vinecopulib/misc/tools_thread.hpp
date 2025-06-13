@@ -77,8 +77,9 @@ inline ThreadPool::ThreadPool()
 //!    work pushed to the pool will be done in the main thread.
 inline ThreadPool::ThreadPool(size_t nWorkers)
 {
-  for (size_t w = 0; w < nWorkers; ++w)
+  for (size_t w = 0; w < nWorkers; ++w) {
     this->start_worker();
+  }
 }
 
 //! destructor joins all threads if possible.
@@ -102,14 +103,15 @@ template<class F, class... Args>
 void
 ThreadPool::push(F&& f, Args&&... args)
 {
-  if (workers_.size() == 0) {
+  if (workers_.empty()) {
     f(args...); // if there are no workers, do the job in the main thread
     return;
   } else {
     // must hold lock while modifying the shared queue
     std::lock_guard<std::mutex> lk(m_tasks_);
-    if (stopped_)
+    if (stopped_) {
       throw std::runtime_error("cannot push to joined thread pool");
+    }
     jobs_.emplace([f, args...] { f(args...); });
   }
   // signal a waiting worker that there's a new job
@@ -125,8 +127,9 @@ template<class F, class I>
 void
 ThreadPool::map(F&& f, I&& items)
 {
-  for (auto&& item : items)
+  for (auto&& item : items) {
     this->push(f, item);
+  }
 }
 
 //! waits for all jobs to finish, but does not join the threads.
@@ -139,8 +142,9 @@ ThreadPool::wait()
         this->clear(); // cancel all remaining jobs
         continue;      // wait for currently running jobs
       }
-      if (this->has_errored() || this->all_jobs_done())
+      if (this->has_errored() || this->all_jobs_done()) {
         break;
+      }
     }
     std::this_thread::yield();
   }
@@ -182,8 +186,9 @@ ThreadPool::start_worker()
       cv_tasks_.wait(lk, [this] { return stopped_ || !jobs_.empty(); });
 
       // queue can be empty if thread pool is stopped
-      if (jobs_.empty())
+      if (jobs_.empty()) {
         continue;
+      }
 
       // take job from the queue
       job = std::move(jobs_.front());
@@ -248,10 +253,11 @@ ThreadPool::announce_stop()
 inline void
 ThreadPool::join_workers()
 {
-  if (workers_.size() > 0) {
+  if (!workers_.empty()) {
     for (auto& worker : workers_) {
-      if (worker.joinable())
+      if (worker.joinable()) {
         worker.join();
+      }
     }
   }
 }
@@ -288,8 +294,9 @@ ThreadPool::wait_for_wake_up_event()
 inline void
 ThreadPool::rethrow_exceptions()
 {
-  if (this->has_errored())
+  if (this->has_errored()) {
     std::rethrow_exception(error_ptr_);
+  }
 }
 
 }

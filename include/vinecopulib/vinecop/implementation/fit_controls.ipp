@@ -16,7 +16,7 @@
 namespace vinecopulib {
 //! Instantiates default controls for fitting vine copula models.
 inline FitControlsVinecop::FitControlsVinecop()
-  : FitControlsBicop()
+
 {
   trunc_lvl_ = std::numeric_limits<size_t>::max();
   threshold_ = 0.0;
@@ -353,7 +353,8 @@ FitControlsVinecop::set_select_threshold(bool select_threshold)
 inline bool
 FitControlsVinecop::needs_sparse_select() const
 {
-  return (select_trunc_lvl_ | select_threshold_);
+  return (static_cast<int>(select_trunc_lvl_) |
+          static_cast<int>(select_threshold_)) != 0;
 }
 
 //! @brief Gets the fit controls for bivariate fitting.
@@ -401,7 +402,7 @@ FitControlsVinecop::set_tree_algorithm(std::string tree_algorithm)
 inline void
 FitControlsVinecop::set_seeds(std::vector<int> seeds)
 {
-  if (seeds.size() == 0) {
+  if (seeds.empty()) {
     // no seeds provided, seed randomly
     std::random_device rd{};
     seeds = std::vector<int>(20);
@@ -446,7 +447,7 @@ FitControlsVinecop::str() const
   controls_str << "Number of threads: "
                << (get_num_threads() == 0 ? 1 : get_num_threads()) << std::endl;
   controls_str << "MST algorithm: " << get_tree_algorithm() << std::endl;
-  return controls_str.str().c_str();
+  return controls_str.str();
 }
 
 }

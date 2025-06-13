@@ -52,10 +52,10 @@ GumbelBicop::pdf_raw(const Eigen::MatrixXd& u)
   double thetha1 = 1.0 / theta;
   auto f = [theta, thetha1](const double& u1, const double& u2) {
     double t1 = std::pow(-std::log(u1), theta) + std::pow(-std::log(u2), theta);
-    double temp = -std::pow(t1, thetha1) + (2 * thetha1 - 2.0) * std::log(t1) +
-                  (theta - 1.0) * std::log(std::log(u1) * std::log(u2)) -
-                  std::log(u1 * u2) +
-                  std::log1p((theta - 1.0) * std::pow(t1, -thetha1));
+    double temp =
+      -std::pow(t1, thetha1) + ((2 * thetha1 - 2.0) * std::log(t1)) +
+      ((theta - 1.0) * std::log(std::log(u1) * std::log(u2))) -
+      std::log(u1 * u2) + std::log1p((theta - 1.0) * std::pow(t1, -thetha1));
     return std::exp(temp);
   };
   return tools_eigen::binaryExpr_or_nan(u, f);
@@ -103,7 +103,13 @@ GumbelBicop::get_start_parameters(const double tau)
 inline double
 qcondgum(const double& q, const double& u, const double& de)
 {
-  double a, p, z1, z2, con, de1, dif;
+  double a;
+  double p;
+  double z1;
+  double z2;
+  double con;
+  double de1;
+  double dif;
   double mxdif;
   int iter;
 
@@ -116,8 +122,8 @@ qcondgum(const double& q, const double& u, const double& de)
   iter = 0;
   dif = .1; // needed in case first step leads to NaN
   while ((mxdif > 1.e-6) && (iter < 20)) {
-    double g = a + de1 * std::log(a) + con;
-    double gp = 1. + de1 / a;
+    double g = a + (de1 * std::log(a)) + con;
+    double gp = 1. + (de1 / a);
     if ((std::isnan)(g) || (std::isnan)(gp) || (std::isnan)(g / gp)) {
       // added for de>50
       dif /= -2.;

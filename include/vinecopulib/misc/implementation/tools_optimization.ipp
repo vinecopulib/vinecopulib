@@ -19,7 +19,7 @@ namespace tools_optimization {
 //! @param upper_bounds
 //! @param objective The optimizer's objective function
 inline Optimizer::Optimizer()
-  : controls_(BobyqaControls())
+   
 {
 }
 
@@ -112,7 +112,7 @@ Optimizer::get_objective_max() const
 inline void
 Optimizer::check_parameters_size(const Eigen::VectorXd& initial_parameters,
                                  const Eigen::VectorXd& lower_bounds,
-                                 const Eigen::VectorXd& upper_bounds) const
+                                 const Eigen::VectorXd& upper_bounds)
 {
   if (initial_parameters.size() != upper_bounds.size()) {
     throw std::runtime_error(
@@ -177,21 +177,21 @@ BobyqaControls::check_parameters(double initial_trust_region,
 
 //! @return the initial trust region.
 inline double
-BobyqaControls::get_initial_trust_region()
+BobyqaControls::get_initial_trust_region() const
 {
   return initial_trust_region_;
 }
 
 //! @return the final trust region.
 inline double
-BobyqaControls::get_final_trust_region()
+BobyqaControls::get_final_trust_region() const
 {
   return final_trust_region_;
 }
 
 //! @return the maximal number of evaluations of the objective.
 inline size_t
-BobyqaControls::get_maxeval()
+BobyqaControls::get_maxeval() const
 {
   return maxeval_;
 }

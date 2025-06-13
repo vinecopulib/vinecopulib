@@ -10,7 +10,7 @@
 #   misc-*,
 #   hicpp-*,
 #   boost-*
-Checks: '-*,bugprone-*,readability-*'
+Checks: '-*,bugprone-*,readability-*,-readability-identifier-length'
 
 WarningsAsErrors: ''
 
@@ -19,8 +19,3 @@ ExcludeHeaderFilterRegex: '.*(_deps|eigen3|boost|gtest).*'
 SystemHeaders: false
 HeaderFileExtensions: ['', 'h','hh','hpp','ipp','hxx']
 FormatStyle: file
-
-CheckOptions:
-  # Because gtest is using tons of those and we don't care
-  - key: readability-function-cognitive-complexity.MacroNestingPenalty
-    value: '0'

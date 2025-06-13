@@ -82,10 +82,10 @@ Bb1Bicop::pdf_raw(const Eigen::MatrixXd& u)
     double t43 = t4 * theta;
     double t59 = t43 * t27 * t29;
 
-    return t25 * t6 * t27 * t4 * t29 * t36 * t3 * t39 -
-           t13 * t6 * t43 * t27 * t29 * t33 * t3 * t38 * t17 * t20 +
-           t13 * t3 * t38 * t17 * t33 * t20 * t6 * delta * t59 +
-           t25 * t3 * t39 * t36 * t6 * t59;
+    return (t25 * t6 * t27 * t4 * t29 * t36 * t3 * t39) -
+           (t13 * t6 * t43 * t27 * t29 * t33 * t3 * t38 * t17 * t20) +
+           (t13 * t3 * t38 * t17 * t33 * t20 * t6 * delta * t59) +
+           (t25 * t3 * t39 * t36 * t6 * t59);
   };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
@@ -93,7 +93,7 @@ Bb1Bicop::pdf_raw(const Eigen::MatrixXd& u)
 inline double
 Bb1Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
 {
-  return 1 - 2 / (parameters(1) * (parameters(0) + 2));
+  return 1 - (2 / (parameters(1) * (parameters(0) + 2)));
 }
 
 inline Eigen::MatrixXd

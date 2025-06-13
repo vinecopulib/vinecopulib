@@ -134,7 +134,7 @@ protected:
 
   void set_tree_to_indep(size_t t);
 
-  void print_pair_copulas_of_tree(size_t);
+  void print_pair_copulas_of_tree(size_t /*t*/);
 
   std::vector<double> get_thresholded_crits();
 
@@ -146,14 +146,19 @@ protected:
 
   void select_edges(VineTree& vine_tree);
 
-  Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
+  static Eigen::MatrixXd get_pc_data(size_t v0,
+                                     size_t v1,
+                                     const VineTree& tree);
 
-  Eigen::VectorXd get_hfunc(const VertexProperties& vertex_data, bool is_first);
+  static Eigen::VectorXd get_hfunc(const VertexProperties& vertex_data,
+                                   bool is_first);
 
-  Eigen::VectorXd get_hfunc_sub(const VertexProperties& vertex_data,
-                                bool is_first);
+  static Eigen::VectorXd get_hfunc_sub(const VertexProperties& vertex_data,
+                                       bool is_first);
 
-  ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
+  static ptrdiff_t find_common_neighbor(size_t v0,
+                                        size_t v1,
+                                        const VineTree& tree);
 
   virtual double compute_fit_id(const EdgeProperties& e);
 
@@ -172,27 +177,27 @@ protected:
   double threshold_;
   double psi0_; // initial prior probability for mbicv
 
-  double get_next_threshold(std::vector<double>& thresholded_crits);
+  static double get_next_threshold(std::vector<double>& thresholded_crits);
 
   // functions for manipulation of trees ----------------
   VineTree make_base_tree(const Eigen::MatrixXd& data);
 
-  VineTree edges_as_vertices(const VineTree& prev_tree);
+  static VineTree edges_as_vertices(const VineTree& prev_tree);
 
-  void min_spanning_tree(VineTree& tree);
+  void min_spanning_tree(VineTree& graph);
 
-  void add_edge_info(VineTree& tree);
+  static void add_edge_info(VineTree& tree);
 
-  void add_pc_info(const EdgeIterator& e, VineTree& tree);
+  static void add_pc_info(const EdgeIterator& e, VineTree& tree);
 
-  void remove_edge_data(VineTree& tree);
+  static void remove_edge_data(VineTree& tree);
 
-  void remove_vertex_data(VineTree& tree);
+  static void remove_vertex_data(VineTree& tree);
 
   void select_pair_copulas(VineTree& tree,
                            const VineTree& tree_opt = VineTree());
 
-  FoundEdge find_old_fit(double fit_id, const VineTree& old_graph);
+  static FoundEdge find_old_fit(double fit_id, const VineTree& old_graph);
 
   double get_tree_loglik(const VineTree& tree);
 
@@ -200,7 +205,7 @@ protected:
 
   size_t get_num_non_indeps_of_tree(size_t t);
 
-  std::string get_pc_index(const EdgeIterator& e, const VineTree& tree);
+  static std::string get_pc_index(const EdgeIterator& e, const VineTree& tree);
 };
 }
 }
