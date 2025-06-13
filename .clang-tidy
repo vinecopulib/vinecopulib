@@ -3,7 +3,7 @@ Checks: >
   bugprone-*,
   performance-*,
   readability-*,
-  modernize-*,
+  modernize-*,  
   cppcoreguidelines-*,
   portability-*,
   clang-analyzer-*,

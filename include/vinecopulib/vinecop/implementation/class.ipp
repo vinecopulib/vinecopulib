@@ -831,8 +831,8 @@ Vinecop::check_var_types(const std::vector<std::string>& var_types) const
 {
   std::stringstream msg;
   if (var_types.size() > d_) {
-    msg << "more var_types (" << var_types.size() << ") "
-        << "than variables (" << d_ << ")" << std::endl;
+    msg << "more var_types (" << var_types.size() << ") " << "than variables ("
+        << d_ << ")" << std::endl;
     throw std::runtime_error(msg.str());
   }
   for (auto t : var_types) {
@@ -1512,9 +1512,8 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
   size_t d_exp = d_ + n_disc;
   if ((d_data != d_exp) & (d_data != 2 * d_)) {
     std::stringstream msg;
-    msg << "data has wrong number of columns; "
-        << "expected: " << d_exp << " or " << 2 * d_ << ", actual: " << d_data
-        << " (model contains ";
+    msg << "data has wrong number of columns; " << "expected: " << d_exp
+        << " or " << 2 * d_ << ", actual: " << d_data << " (model contains ";
     if (n_disc == 0) {
       msg << "no discrete variables)." << std::endl;
     } else if (n_disc == 1) {
@@ -1546,8 +1545,8 @@ Vinecop::check_pair_copulas_rvine_structure(
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
   if (pair_copulas.size() > std::min(d_ - 1, trunc_lvl)) {
     std::stringstream message;
-    message << "pair_copulas is too large; "
-            << "expected size: < " << std::min(d_ - 1, trunc_lvl) << ", "
+    message << "pair_copulas is too large; " << "expected size: < "
+            << std::min(d_ - 1, trunc_lvl) << ", "
             << "actual size: " << pair_copulas.size() << std::endl;
     throw std::runtime_error(message.str().c_str());
   }
