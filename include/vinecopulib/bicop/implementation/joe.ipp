@@ -188,9 +188,8 @@ qcondjoe(const double& q, const double& u, const double& de)
     }
     v -= diff;
     int iter2 = 0;
-    while (
-      static_cast<int>(static_cast<int>(v <= 0 || v >= 1 || fabs(diff) > 0.25) &
-                       static_cast<int>(iter2 < 20)) != 0) {
+    while ((static_cast<int>(v <= 0 || v >= 1 || fabs(diff) > 0.25) &
+            static_cast<int>(iter2 < 20)) != 0) {
       ++iter2;
       diff /= 2.;
       v += diff;
