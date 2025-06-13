@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/tvatter/Dropbox/github/vinecopulib/build-clang-tidy/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

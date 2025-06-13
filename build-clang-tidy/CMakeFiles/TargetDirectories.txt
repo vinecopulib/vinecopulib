@@ -1,3 +1,0 @@
-/home/tvatter/Dropbox/github/vinecopulib/build-clang-tidy/CMakeFiles/main.dir
-/home/tvatter/Dropbox/github/vinecopulib/build-clang-tidy/CMakeFiles/edit_cache.dir
-/home/tvatter/Dropbox/github/vinecopulib/build-clang-tidy/CMakeFiles/rebuild_cache.dir
