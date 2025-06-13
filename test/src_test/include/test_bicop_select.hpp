@@ -6,9 +6,7 @@
 
 #pragma once
 
-// NOLINTBEGIN
 #include "gtest/gtest.h"
-// NOLINTEND
 #include <vinecopulib.hpp>
 
 namespace test_bicop_select {

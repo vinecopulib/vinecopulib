@@ -6,9 +6,7 @@
 
 #pragma once
 
-// NOLINTBEGIN
 #include "gtest/gtest.h"
-// NOLINTEND
 #include <boost/math/constants/constants.hpp>
 #include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_eigen.hpp>

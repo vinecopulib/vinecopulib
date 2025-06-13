@@ -7,9 +7,7 @@
 #pragma once
 
 #include "rscript.hpp"
-// NOLINTBEGIN
 #include "gtest/gtest.h"
-// NOLINTEND
 #include <vinecopulib.hpp>
 
 class VinecopTest : public ::testing::Test

@@ -6,9 +6,7 @@
 
 #pragma once
 
-// NOLINTBEGIN
 #include "gtest/gtest.h"
-// NOLINTEND
 #include <vinecopulib.hpp>
 
 using namespace vinecopulib;

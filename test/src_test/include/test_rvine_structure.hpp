@@ -6,9 +6,7 @@
 
 #pragma once
 
-// NOLINTBEGIN
 #include "gtest/gtest.h"
-// NOLINTEND
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
 
