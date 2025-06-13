@@ -8,7 +8,8 @@ Checks: >
   portability-*,
   clang-analyzer-*,
   misc-*,
-  hicpp-*
+  hicpp-*,
+  boost-*
 
 WarningsAsErrors: ''
 
