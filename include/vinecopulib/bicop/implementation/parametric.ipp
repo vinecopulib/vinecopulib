@@ -141,7 +141,7 @@ ParBicop::fit(const Eigen::MatrixXd& data,
 //! ensures that starting values are sufficiently separated from bounds
 //! @param tau Kendall's tau
 inline double
-ParBicop::winsorize_tau(double tau) const
+ParBicop::winsorize_tau(double tau)
 {
   double sign = 1.0;
   if (tau < 0) {

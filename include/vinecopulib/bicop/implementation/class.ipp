@@ -1055,7 +1055,7 @@ Bicop::check_rotation(int rotation) const
 //! @brief Checks whether weights and data have matching sizes.
 inline void
 Bicop::check_weights_size(const Eigen::VectorXd& weights,
-                          const Eigen::MatrixXd& data) const
+                          const Eigen::MatrixXd& data)
 {
   if ((weights.size() > 0) && (weights.size() != data.rows())) {
     throw std::runtime_error("sizes of weights and data don't match.");
@@ -1075,7 +1075,7 @@ Bicop::check_fitted() const
 //! @brief Checks whether var_types have the correct length and are either "c"
 //! or "d".
 inline void
-Bicop::check_var_types(const std::vector<std::string>& var_types) const
+Bicop::check_var_types(const std::vector<std::string>& var_types)
 {
   if (var_types.size() != 2) {
     throw std::runtime_error("var_types must have size two.");
