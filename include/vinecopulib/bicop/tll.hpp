@@ -30,11 +30,11 @@ private:
                                           std::string method,
                                           const Eigen::VectorXd& weights);
 
-  Eigen::MatrixXd fit_local_likelihood(const Eigen::MatrixXd& x,
-                                       const Eigen::MatrixXd& x_data,
-                                       const Eigen::Matrix2d& B,
-                                       std::string method,
-                                       const Eigen::VectorXd& weights);
+  static Eigen::MatrixXd fit_local_likelihood(const Eigen::MatrixXd& x,
+                                              const Eigen::MatrixXd& x_data,
+                                              const Eigen::Matrix2d& B,
+                                              std::string method,
+                                              const Eigen::VectorXd& weights);
 
   static double calculate_infl(const size_t& n,
                                const double& f0,

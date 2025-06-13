@@ -16,7 +16,8 @@ TEST(bicop_select, works_in_parallel)
 {
   Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
   auto u = cop.simulate(15);
-  Bicop fit1, fit2;
+  Bicop fit1;
+  Bicop fit2;
   fit1.select(u);
   FitControlsBicop controls;
   controls.set_num_threads(2);

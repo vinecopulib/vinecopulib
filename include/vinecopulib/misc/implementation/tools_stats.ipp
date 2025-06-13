@@ -542,7 +542,7 @@ sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
   for (size_t i = 1; i < n; i++) {
     C(i) = 1;
     size_t value = i;
-    while ((value & 1) != 0u) {
+    while ((value & 1) != 0U) {
       value >>= 1;
       C(i)++;
     }

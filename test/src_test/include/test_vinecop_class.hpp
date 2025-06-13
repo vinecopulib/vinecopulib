@@ -403,8 +403,9 @@ TEST_F(VinecopTest, fit_parameters_is_correct)
   auto rvine_structure = vc.get_rvine_structure();
 
   auto pcs = vc.get_all_pair_copulas();
-  for (auto& pc : pcs[0])
+  for (auto& pc : pcs[0]) {
     pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
+  }
   Vinecop vc2(rvine_structure, pcs);
   vc2.fit(u, controls);
 
@@ -488,8 +489,9 @@ TEST_F(VinecopTest, works_multi_threaded)
   Vinecop fit2(u, RVineStructure(), {}, controls);
 
   auto pcs = fit1.get_all_pair_copulas();
-  for (auto& pc : pcs[0])
+  for (auto& pc : pcs[0]) {
     pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
+  }
   Vinecop fit3(fit1.get_rvine_structure(), pcs);
   fit3.fit(u, controls, 2);
 
@@ -516,8 +518,8 @@ get_pairs_unequal(
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix2,
   size_t trunc_lvl)
 {
-  std::vector<std::vector<std::vector<size_t>>> vc_sets(trunc_lvl),
-    vcl_sets(trunc_lvl);
+  std::vector<std::vector<std::vector<size_t>>> vc_sets(trunc_lvl);
+  std::vector<std::vector<std::vector<size_t>>> vcl_sets(trunc_lvl);
   size_t pairs_unequal = 0;
   for (size_t tree = 0; tree < trunc_lvl; ++tree) {
     vc_sets[tree].resize(trunc_lvl - tree);
@@ -731,8 +733,9 @@ TEST_F(VinecopTest, partial_selection)
   int count2 = 0;
   for (int i = 0; i < 6; i++) {
     //  diagonal element         base element
-    if ((rvm(6 - i, i) == 2) || (rvm(0, i) == 2))
+    if ((rvm(6 - i, i) == 2) || (rvm(0, i) == 2)) {
       count2++;
+    }
   }
   EXPECT_EQ(count2, 6);
 }

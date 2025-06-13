@@ -54,8 +54,8 @@ TEST(test_tools_bobyqa, complex_quadratic_function)
 {
 
   auto f = [](long /*n*/, const double* x) -> double {
-    return -4 * x[0] * x[1] + 5 * x[0] * x[0] + 8 * x[1] * x[1] +
-           16 * sqrt(5.0) * x[0] + 8 * sqrt(5.0) * x[1] - 44.0;
+    return (-4 * x[0] * x[1]) + (5 * x[0] * x[0]) + (8 * x[1] * x[1]) +
+           (16 * sqrt(5.0) * x[0]) + (8 * sqrt(5.0) * x[1]) - 44.0;
   };
 
   const long variables_count = 2;
@@ -93,8 +93,8 @@ TEST(test_tools_bobyqa, quadratic_function_with_jump)
 {
 
   auto f = [](long /*n*/, const double* x) -> double {
-    return x[1] < 0.5 ? x[0] * x[0] + x[1] * x[1]
-                      : x[0] * x[0] + x[1] * x[1] + 10;
+    return x[1] < 0.5 ? (x[0] * x[0]) + (x[1] * x[1])
+                      : (x[0] * x[0]) + (x[1] * x[1]) + 10;
   };
 
   const long variables_count = 2;

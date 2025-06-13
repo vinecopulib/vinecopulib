@@ -197,7 +197,8 @@ debye1(const double& x)
     1.434929627468612270000000000000e-42
   };
 
-  double sum = 0, sumold = 1;
+  double sum = 0;
+  double sumold = 1;
   const double x2pi = x * m_1_2pi;
   for (short k = 1; (k < 70) && (sum != sumold); k++) {
     sumold = sum;

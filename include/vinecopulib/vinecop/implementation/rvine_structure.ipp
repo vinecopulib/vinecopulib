@@ -114,8 +114,8 @@ inline RVineStructure::RVineStructure(
   , struct_array_(struct_array)
 {
   if (check) {
-    if (static_cast<int>(static_cast<int>(trunc_lvl_ > 0) &
-                         static_cast<int>(struct_array.get_dim() != d_)) != 0) {
+    if ((static_cast<int>(trunc_lvl_ > 0) &
+         static_cast<int>(struct_array.get_dim() != d_)) != 0) {
       throw std::runtime_error("order and struct_array have "
                                "incompatible dimensions");
     }

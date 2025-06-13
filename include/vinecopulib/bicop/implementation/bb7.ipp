@@ -90,10 +90,10 @@ Bb7Bicop::pdf_raw(const Eigen::MatrixXd& u)
     double t42 = 1.0 / t12;
     double t54 = t37 * t18 * t20;
 
-    return -t16 * t8 * t6 * t18 * t20 * t27 * t4 * t32 +
-           t35 * t8 * t37 * t18 * t20 * t24 * t4 * t30 * t31 * t42 +
-           t35 * t4 * t30 * t31 * t24 * t42 * t8 * delta * t54 +
-           t16 * t4 * t32 * t27 * t8 * t54;
+    return (-t16 * t8 * t6 * t18 * t20 * t27 * t4 * t32) +
+           (t35 * t8 * t37 * t18 * t20 * t24 * t4 * t30 * t31 * t42) +
+           (t35 * t4 * t30 * t31 * t24 * t42 * t8 * delta * t54) +
+           (t16 * t4 * t32 * t27 * t8 * t54);
   };
   return tools_eigen::binaryExpr_or_nan(u, f);
 }

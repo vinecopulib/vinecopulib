@@ -66,7 +66,11 @@ TEST(test_tools_stats, qrng_are_correct)
   auto U1 = tools_stats::sobol(N, d);
   auto U2 = tools_stats::simulate_uniform(N, d);
 
-  Eigen::VectorXd x(N), p(n), p1(N), x2(N), p2(n);
+  Eigen::VectorXd x(N);
+  Eigen::VectorXd p(n);
+  Eigen::VectorXd p1(N);
+  Eigen::VectorXd x2(N);
+  Eigen::VectorXd p2(n);
   p2 = Eigen::VectorXd::Zero(n);
   for (size_t i = 0; i < n; i++) {
     auto f = [i, u](const double& u1, const double& u2) {

@@ -65,8 +65,9 @@ protected:
         parameters(0) /= (parameters(1) * (-1 + tau));
       } else {
         double delta = 1.5;
-        if (family == BicopFamily::bb8)
+        if (family == BicopFamily::bb8) {
           delta = 0.8;
+        }
         auto tau_v = Eigen::VectorXd::Constant(1, std::fabs(tau));
         auto f = [this, delta](const Eigen::VectorXd& v) {
           Eigen::VectorXd par(2);
@@ -93,8 +94,9 @@ protected:
     } else {
       if (tools_stl::is_member(rotation, { 90, 270 })) {
         parameters *= -1;
-        if (family == BicopFamily::tawn)
+        if (family == BicopFamily::tawn) {
           parameters(0) *= -1;
+        }
       }
     }
 

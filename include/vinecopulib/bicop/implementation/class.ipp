@@ -669,7 +669,7 @@ Bicop::check_data_dim(const Eigen::MatrixXd& u) const
   size_t n_cols = u.cols();
   int n_disc = get_n_discrete();
   unsigned short n_cols_exp = static_cast<unsigned short>(2 + n_disc);
-  if (static_cast<int>((n_cols != n_cols_exp) &
+  if (static_cast<int>(static_cast<int>(n_cols != n_cols_exp) &
                        static_cast<int>(n_cols != 4)) != 0) {
     std::stringstream msg;
     msg << "data has wrong number of columns; " << "expected: " << n_cols_exp
@@ -984,7 +984,8 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
   // 2. `u.cols() == 4`: Then the F(x^-) values for the discrete variable is in
   // the third column if variable 1 is discrete, and in the fourth column if
   // variable 2 is discrete. Thus, `u.col(2 + disc_col)`.
-  int old_disc_col = 2 + static_cast<int>((u.cols() == 4) * disc_col);
+  int old_disc_col =
+    2 + static_cast<int>(static_cast<int>(u.cols() == 4) * disc_col);
   u_new.col(2 + disc_col) = u.col(old_disc_col);
   u_new.col(2 + cont_col) = u.col(cont_col);
   return u_new;
