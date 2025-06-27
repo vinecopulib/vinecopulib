@@ -518,15 +518,15 @@ inline size_t
 get_pairs_unequal(
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix1,
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix2,
-  size_t trunc_lvl)
+  Index trunc_lvl)
 {
   std::vector<std::vector<std::vector<size_t>>> vc_sets(trunc_lvl);
   std::vector<std::vector<std::vector<size_t>>> vcl_sets(trunc_lvl);
   size_t pairs_unequal = 0;
-  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+  for (Index tree = 0; tree < trunc_lvl; ++tree) {
     vc_sets[tree].resize(trunc_lvl - tree);
     vcl_sets[tree].resize(trunc_lvl - tree);
-    for (size_t edge = 0; edge < trunc_lvl - tree; ++edge) {
+    for (Index edge = 0; edge < trunc_lvl - tree; ++edge) {
       vc_sets[tree][edge].resize(2);
       vc_sets[tree][edge][0] = matrix1(tree, edge);
       vc_sets[tree][edge][1] = matrix1(trunc_lvl - edge, edge);
@@ -560,7 +560,8 @@ TEST_F(VinecopTest, select_finds_right_structure_prim)
   auto vcl_matrix = fit.get_matrix();
 
   // check if the same conditioned sets appear for each tree
-  size_t pairs_unequal = get_pairs_unequal(vc_matrix, vcl_matrix, 6);
+  size_t pairs_unequal =
+    get_pairs_unequal(vc_matrix, vcl_matrix, static_cast<Index>(6));
   EXPECT_EQ(pairs_unequal, 0);
 }
 
@@ -579,7 +580,8 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
   auto vcl_matrix = fit.get_matrix();
 
   // check if the same conditioned sets appear for each tree
-  size_t pairs_unequal = get_pairs_unequal(vc_matrix, vcl_matrix, 6);
+  size_t pairs_unequal =
+    get_pairs_unequal(vc_matrix, vcl_matrix, static_cast<Index>(6));
   EXPECT_EQ(pairs_unequal, 0);
 }
 
@@ -658,8 +660,8 @@ TEST_F(VinecopTest, fixed_truncation)
   EXPECT_EQ(fit3.get_all_pair_copulas().size(), 6);
 
   fit3.truncate(2);
-  size_t pairs_unequal =
-    get_pairs_unequal(fit3.get_matrix(), fit.get_matrix(), 2);
+  size_t pairs_unequal = get_pairs_unequal(
+    fit3.get_matrix(), fit.get_matrix(), static_cast<Index>(2));
   EXPECT_EQ(pairs_unequal, 0);
 }
 

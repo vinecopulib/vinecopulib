@@ -81,7 +81,7 @@ inline FitControlsVinecop::FitControlsVinecop(
   std::vector<BicopFamily> family_set,
   std::string parametric_method,
   std::string nonparametric_method,
-  double nonparametric_mult,
+  double nonparametric_mult, // NOLINT(bugprone-easily-swappable-parameters)
   size_t trunc_lvl,
   std::string tree_criterion,
   double threshold,

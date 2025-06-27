@@ -165,8 +165,8 @@ inline BoxCovering::BoxCovering(const Eigen::MatrixXd& u, uint16_t K)
 
   n_ = u.rows();
   for (size_t i = 0; i < n_; i++) {
-    size_t k = static_cast<size_t>(std::floor(u(i, 0) * K));
-    size_t j = static_cast<size_t>(std::floor(u(i, 1) * K));
+    size_t k = tools_eigen::to_size_t(std::floor(u(i, 0) * K));
+    size_t j = tools_eigen::to_size_t(std::floor(u(i, 1) * K));
     boxes_[k][j]->indices_.insert(i);
   }
 }
@@ -180,10 +180,10 @@ BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
 {
   std::vector<size_t> indices;
   indices.reserve(n_);
-  auto l0 = static_cast<size_t>(std::floor(lower(0) * K_));
-  auto l1 = static_cast<size_t>(std::floor(lower(1) * K_));
-  auto u0 = static_cast<size_t>(std::ceil(upper(0) * K_));
-  auto u1 = static_cast<size_t>(std::ceil(upper(1) * K_));
+  auto l0 = tools_eigen::to_size_t(std::floor(lower(0) * K_));
+  auto l1 = tools_eigen::to_size_t(std::floor(lower(1) * K_));
+  auto u0 = tools_eigen::to_size_t(std::ceil(upper(0) * K_));
+  auto u1 = tools_eigen::to_size_t(std::ceil(upper(1) * K_));
 
   for (size_t k = l0; k < u0; k++) {
     for (size_t j = l1; j < u1; j++) {
@@ -209,15 +209,15 @@ BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
 // Swap a sample in the box covering.
 // @param i Index of the sample to swap.
 inline void
-BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
+BoxCovering::swap_sample(Index i, const Eigen::VectorXd& new_sample)
 {
-  auto k = static_cast<size_t>(std::floor(u_(i, 0) * K_));
-  auto j = static_cast<size_t>(std::floor(u_(i, 1) * K_));
+  auto k = tools_eigen::to_index(std::floor(u_(i, 0) * K_));
+  auto j = tools_eigen::to_index(std::floor(u_(i, 1) * K_));
   boxes_[k][j]->indices_.erase(i);
 
   u_.row(i) = new_sample;
-  k = static_cast<size_t>(std::floor(new_sample(0) * K_));
-  j = static_cast<size_t>(std::floor(new_sample(1) * K_));
+  k = tools_eigen::to_index(std::floor(new_sample(0) * K_));
+  j = tools_eigen::to_index(std::floor(new_sample(1) * K_));
   boxes_[k][j]->indices_.insert(i);
 }
 
@@ -264,11 +264,11 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     norm_sim = simulate_normal(n, 2, true, { it, 5 }).array() * b;
     w = simulate_uniform(n, 1, true, { it, 55 });
 
-    for (size_t i = 0; i < n; i++) {
+    for (Index i = 0; i < tools_eigen::to_index(n); i++) {
       indices = covering.get_box_indices(lb.row(i), ub.row(i));
       double n_idx = static_cast<double>(indices.size());
       if (n_idx > 0) {
-        size_t j = indices.at(static_cast<size_t>(w(i) * n_idx));
+        Index j = indices.at(tools_eigen::to_index(w(i) * n_idx));
         x.row(i) = x.row(j) + norm_sim.row(i);
         uu.row(i) = pnorm(x.row(i));
         covering.swap_sample(i, uu.row(i));
@@ -280,10 +280,10 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
 }
 
 // Utility function to compute the next power of 2.
-inline size_t
-next_power_of_two(size_t n)
+inline Index
+next_power_of_two(Index n)
 {
-  size_t power = 1;
+  Index power = 1;
   while (power < n) {
     power *= 2;
   }
@@ -292,11 +292,11 @@ next_power_of_two(size_t n)
 
 //! window smoother
 inline Eigen::VectorXd
-win(const Eigen::VectorXd& x, size_t wl = 5)
+win(const Eigen::VectorXd& x, Index wl = 5)
 {
-  size_t n = x.size();
+  Index n = x.size();
   // pad length to powers of 2 to force FFT to use its fastest algorithm
-  size_t fftSize = next_power_of_two(n + (2 * wl));
+  Index fftSize = next_power_of_two(n + (2 * wl));
 
   Eigen::VectorXd xx = Eigen::VectorXd::Zero(fftSize);
   Eigen::VectorXd yy = Eigen::VectorXd::Zero(fftSize);
@@ -321,9 +321,9 @@ win(const Eigen::VectorXd& x, size_t wl = 5)
 //! helper routine for ace (In R, this would be win(x[ind], wl)[ranks])
 inline Eigen::VectorXd
 cef(const Eigen::VectorXd& x,
-    const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& ind,
-    const Eigen::Matrix<size_t, Eigen::Dynamic, 1>& ranks,
-    size_t wl = 5)
+    const Eigen::Matrix<Index, Eigen::Dynamic, 1>& ind,
+    const Eigen::Matrix<Index, Eigen::Dynamic, 1>& ranks,
+    Index wl = 5)
 {
   Eigen::VectorXd cey = x(ind);
   cey = win(cey, wl);
@@ -341,10 +341,10 @@ ace(const Eigen::MatrixXd& data,                        // data
     double inner_abs_tol = 1e-4)  // inner stopping criterion
 {
   // sample size and memory allocation for the outer/inner loops
-  size_t n = data.rows();
+  Index n = data.rows();
   Eigen::VectorXd tmp(n);
 
-  size_t nw = weights.size();
+  Index nw = weights.size();
   Eigen::VectorXd w(n);
   if (nw == 0) {
     w = Eigen::VectorXd::Ones(n);
@@ -359,19 +359,21 @@ ace(const Eigen::MatrixXd& data,                        // data
   // default window size
   double n_dbl = static_cast<double>(n);
   if (wl == 0) {
-    wl = static_cast<size_t>(std::ceil(n_dbl / 5));
+    wl = tools_eigen::to_size_t(std::ceil(n_dbl / 5));
   }
 
   // assign order/ranks to ind/ranks
-  Eigen::Matrix<size_t, Eigen::Dynamic, 2> ind(n, 2);
-  Eigen::Matrix<size_t, Eigen::Dynamic, 2> ranks(n, 2);
-  for (size_t i = 0; i < 2; i++) {
+  Eigen::Matrix<Index, Eigen::Dynamic, 2> ind(n, 2);
+  Eigen::Matrix<Index, Eigen::Dynamic, 2> ranks(n, 2);
+  for (Index i = 0; i < 2; i++) {
     std::vector<double> xvec(data.data() + (n * i),
                              data.data() + (n * (i + 1)));
     auto order = tools_stl::get_order(xvec);
     for (auto j : order) {
-      ind(j, i) = order[j];
-      ranks(order[j], i) = j;
+      auto idx = tools_eigen::to_index(j);
+      auto rank = tools_eigen::to_index(order[j]);
+      ind(idx, i) = rank;
+      ranks(rank, i) = idx;
     }
   }
 
@@ -400,7 +402,7 @@ ace(const Eigen::MatrixXd& data,                        // data
     while (inner_iter <= inner_iter_max && inner_abs_err > inner_abs_tol) {
       // conditional expectation
       phi.col(1) =
-        cef(phi.col(0).cwiseProduct(w), ind.col(1), ranks.col(1), wl);
+        cef(phi.col(0).cwiseProduct(w), ind.col(1), ranks.col(1), tools_eigen::to_index(wl));
 
       // center and standardize
       double m1 = phi.col(1).sum() / n_dbl;
@@ -417,7 +419,7 @@ ace(const Eigen::MatrixXd& data,                        // data
     }
 
     // conditional expectation
-    phi.col(0) = cef(phi.col(1).cwiseProduct(w), ind.col(0), ranks.col(0), wl);
+    phi.col(0) = cef(phi.col(1).cwiseProduct(w), ind.col(0), ranks.col(0), tools_eigen::to_index(wl));
 
     // center and standardize
     double m0 = phi.col(0).sum() / n_dbl;
@@ -469,7 +471,7 @@ ghalton(const size_t& n, const size_t& d, const std::vector<int>& seeds)
   // Coefficients of the shift
   Eigen::MatrixXi shcoeff(d, 32);
   Eigen::VectorXi base = tools_ghalton::primes.block(0, 0, d, 1);
-  Eigen::MatrixXd u = Eigen::VectorXd::Zero(d, 1);
+  Eigen::MatrixXd u = Eigen::VectorXd::Zero(tools_eigen::to_index(d), 1);
   auto U = simulate_uniform(d, 32, false, seeds);
   for (int k = 31; k >= 0; k--) {
     shcoeff.col(k) =
@@ -482,11 +484,11 @@ ghalton(const size_t& n, const size_t& d, const std::vector<int>& seeds)
   Eigen::MatrixXi coeff(d, 32);
   Eigen::VectorXi tmp(d);
   auto mod = [](const int& u1, const int& u2) { return u1 % u2; };
-  for (size_t i = 1; i < n; i++) {
+  for (Index i = 1; i < tools_eigen::to_index(n); i++) {
 
     // Find i in the prime base
-    tmp = Eigen::VectorXi::Constant(d, static_cast<int>(i));
-    coeff = Eigen::MatrixXi::Zero(d, 32);
+    tmp = Eigen::VectorXi::Constant(tools_eigen::to_index(d), tools_eigen::to_size_t(i));
+    coeff = Eigen::MatrixXi::Zero(tools_eigen::to_index(d), 32);
     int k = 0;
     while ((tmp.maxCoeff() > 0) && (k < 32)) {
       coeff.col(k) = tmp.binaryExpr(base, mod);
@@ -494,7 +496,7 @@ ghalton(const size_t& n, const size_t& d, const std::vector<int>& seeds)
       k++;
     }
 
-    u = Eigen::VectorXd::Zero(d);
+    u = Eigen::VectorXd::Zero(tools_eigen::to_index(d));
     k = 31;
     while (k >= 0) {
       tmp = perm.cwiseProduct(coeff.col(k)) + shcoeff.col(k);
@@ -527,19 +529,19 @@ sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 {
 
   // output matrix
-  Eigen::MatrixXd output = Eigen::MatrixXd::Zero(n, d);
+  Eigen::MatrixXd output = Eigen::MatrixXd::Zero(tools_eigen::to_index(n), tools_eigen::to_index(d));
 
   // L = max number of bits needed
-  size_t L =
-    static_cast<size_t>(std::ceil(log(static_cast<double>(n)) / log(2.0)));
+  auto L =
+    tools_eigen::to_index(std::ceil(log(static_cast<double>(n)) / log(2.0)));
 
   // Vector of scrambling factors
   Eigen::MatrixXd scrambling = simulate_uniform(d, 1, false, seeds);
 
   // C(i) = index from the right of the first zero bit of i + 1
-  Eigen::Matrix<size_t, Eigen::Dynamic, 1> C(n);
+  Eigen::Matrix<Index, Eigen::Dynamic, 1> C(n);
   C(0) = 1;
-  for (size_t i = 1; i < n; i++) {
+  for (Index i = 1; i < tools_eigen::to_index(n); i++) {
     C(i) = 1;
     size_t value = i;
     while ((value & 1) != 0U) {
@@ -551,46 +553,44 @@ sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
   // Compute the first dimension
 
   // Compute direction numbers scaled by pow(2,32)
-  Eigen::Matrix<size_t, Eigen::Dynamic, 1> V(L);
-  for (size_t i = 0; i < L; i++) {
-    V(i) = static_cast<size_t>(std::pow(2, 32 - (i + 1))); // all m's = 1
+  Eigen::Matrix<Index, Eigen::Dynamic, 1> V(L);
+  for (Index i = 0; i < L; i++) {
+    V(i) = static_cast<Index>(std::pow(2, 32 - (i + 1))); // all m's = 1
   }
 
   // Evalulate X scaled by pow(2,32)
   Eigen::Matrix<size_t, Eigen::Dynamic, 1> X(n);
-  X(0) = static_cast<size_t>(scrambling(0) * std::pow(2.0, 32));
-  for (size_t i = 1; i < n; i++) {
+  X(0) = static_cast<size_t>(std::llround(scrambling(0) * std::pow(2.0, 32)));
+  for (Index i = 1; i < tools_eigen::to_index(n); i++) {
     X(i) = X(i - 1) ^ V(C(i - 1) - 1);
   }
   output.block(0, 0, n, 1) = X.cast<double>();
 
   // Compute the remaining dimensions
-  for (size_t j = 0; j < d - 1; j++) {
+  for (Index j = 0; j < tools_eigen::to_index(d) - 1; j++) {
 
     // Get parameters from static vectors
-    size_t a = tools_sobol::a_sobol[j];
-    size_t s = tools_sobol::s_sobol[j];
-
-    Eigen::Map<Eigen::Matrix<size_t, Eigen::Dynamic, 1>> m(
-      tools_sobol::minit_sobol[j], s);
+    auto a = tools_sobol::a_sobol[j];
+    auto s = tools_sobol::s_sobol[j];
+    const auto& m = tools_sobol::minit_sobol[j];
 
     // Compute direction numbers scaled by pow(2,32)
-    for (size_t i = 0; i < std::min(L, s); i++) {
-      V(i) = m(i) << (32 - (i + 1));
+    for (Index i = 0; i < std::min(L, s); i++) {
+      V(i) = m[i] << (32 - (i + 1));
     }
 
     if (L > s) {
-      for (size_t i = s; i < L; i++) {
+      for (Index i = s; i < L; i++) {
         V(i) = V(i - s) ^ (V(i - s) >> s);
-        for (size_t k = 0; k < s - 1; k++) {
+        for (Index k = 0; k < s - 1; k++) {
           V(i) ^= (((a >> (s - 2 - k)) & 1) * V(i - k - 1));
         }
       }
     }
 
     // Evalulate X
-    X(0) = static_cast<size_t>(scrambling(j + 1) * std::pow(2.0, 32));
-    for (size_t i = 1; i < n; i++) {
+    X(0) = static_cast<size_t>(std::llround(scrambling(j + 1) * std::pow(2.0, 32)));
+    for (Index i = 1; i < n; i++) {
       X(i) = X(i - 1) ^ V(C(i - 1) - 1);
     }
     output.block(0, j + 1, n, 1) = X.cast<double>();
@@ -674,7 +674,7 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
       btpdkh = sqrt(xnkh * (1 - xnkh)) * 2 / 3.14159265358979323844;
       btnchk = atan2(sqrt(xnhk), sqrt(1 - xnhk)) * 2 / 3.14159265358979323844;
       btpdhk = sqrt(xnhk * (1 - xnhk)) * 2 / 3.14159265358979323844;
-      size_t i1 = static_cast<size_t>(nu / 2);
+      size_t i1 = tools_eigen::to_size_t(nu / 2);
       for (size_t j = 1; j <= i1; ++j) {
         double jj = static_cast<double>(j << 1);
         bvt += gmph * (ks * btnckh + 1);
@@ -716,7 +716,7 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
       btpdkh = btnckh;
       btnchk = sqrt(xnhk);
       btpdhk = btnchk;
-      size_t i1 = static_cast<size_t>((nu - 1) / 2);
+      size_t i1 = tools_eigen::to_size_t((nu - 1) / 2);
       for (size_t j = 1; j <= i1; ++j) {
         double jj = static_cast<double>(j << 1);
         bvt += gmph * (ks * btnckh + 1);
@@ -751,9 +751,10 @@ pbvt(const Eigen::MatrixXd& z, int nu, double rho)
 //!
 //! @param z An \f$ n \times 2 \f$ matrix of evaluation points.
 //! @param rho Correlation.
-//!
 //! @return An \f$ n \times 1 \f$ vector of probabilities.
+//!
 inline Eigen::VectorXd
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 pbvnorm(const Eigen::MatrixXd& z, double rho)
 {
 
@@ -762,7 +763,7 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
   auto phi = [&dist](double y) { return boost::math::cdf(dist, y); };
 
   // set-up required constants
-  size_t lg;
+  Index lg;
   if (std::fabs(rho) < .3f) {
     lg = 3;
   } else if (std::fabs(rho) < .75f) {
@@ -805,7 +806,7 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
       double hs = (h * h + k * k) / 2;
       double asr = asin(rho);
       i1 = lg;
-      for (size_t i = 0; i < i1; ++i) {
+      for (Index i = 0; i < i1; ++i) {
         double sn = std::sin(asr * (x(i) + 1) / 2);
         bvn += w(i) * std::exp((sn * hk - hs) / (1 - sn * sn));
         sn = std::sin(asr * (-x(i) + 1) / 2);
@@ -837,7 +838,7 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
         }
         a /= 2;
         i1 = lg;
-        for (size_t i = 0; i < i1; ++i) {
+        for (Index i = 0; i < i1; ++i) {
           /* Computing 2nd power */
           d1 = a * (x(i) + 1);
           double xs = d1 * d1;

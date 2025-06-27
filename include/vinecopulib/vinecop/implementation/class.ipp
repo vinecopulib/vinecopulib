@@ -160,6 +160,7 @@ inline Vinecop::Vinecop(const nlohmann::json& input, const bool check)
     nobs_ = static_cast<size_t>(input["nobs_"]);
     threshold_ = static_cast<double>(input["threshold"]);
     loglik_ = static_cast<double>(input["loglik"]);
+    // NOLINTNEXTLINE(bugprone-empty-catch)
   } catch (...) {
   }
 }
@@ -357,6 +358,7 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 //! `FitControlsBicop()`).
 //! @param num_threads The number of threads to use for parallel computation.
 inline void
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 Vinecop::fit(const Eigen::MatrixXd& data,
              const FitControlsBicop& controls,
              const size_t num_threads)
@@ -365,22 +367,23 @@ Vinecop::fit(const Eigen::MatrixXd& data,
   auto u = collapse_data(data);
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
-  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
+  auto trunc_lvl = tools_eigen::to_index(rvine_structure_.get_trunc_lvl());
+  auto d = tools_eigen::to_index(d_);
   if (trunc_lvl == 0) {
     return;
   }
 
   auto order = rvine_structure_.get_order();
   auto disc_cols = tools_select::get_disc_cols(var_types_);
-  size_t n = u.rows();
+  Index n = u.rows();
 
   // temporary storage objects (all data must be in (0, 1))
   Eigen::MatrixXd hfunc1;
   Eigen::MatrixXd hfunc2;
   Eigen::MatrixXd hfunc1_sub;
   Eigen::MatrixXd hfunc2_sub;
-  hfunc1 = Eigen::MatrixXd::Zero(n, d_);
-  hfunc2 = Eigen::MatrixXd::Zero(n, d_);
+  hfunc1 = Eigen::MatrixXd::Zero(n, d);
+  hfunc2 = Eigen::MatrixXd::Zero(n, d);
   if (get_n_discrete() > 0) {
     hfunc1_sub = hfunc1;
     hfunc2_sub = hfunc2;
@@ -391,22 +394,23 @@ Vinecop::fit(const Eigen::MatrixXd& data,
 
   // fill first row of hfunc2 matrix with observed data;
   // points have to be reordered to correspond to natural order
-  for (size_t j = 0; j < d_; ++j) {
-    hfunc2.col(j) = u.col(order[j] - 1);
+  for (Index j = 0; j < d; ++j) {
+    hfunc2.col(j) = u.col(tools_eigen::to_index(order[j]) - 1);
     if (var_types_[order[j] - 1] == "d") {
-      hfunc2_sub.col(j) = u.col(d_ + disc_cols[order[j] - 1]);
+      hfunc2_sub.col(j) =
+        u.col(d + tools_eigen::to_index(disc_cols[order[j] - 1]));
     }
   }
 
-  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+  for (Index tree = 0; tree < trunc_lvl; ++tree) {
     tools_interface::check_user_interrupt();
-    auto fit_edge = [&](size_t edge) {
+    auto fit_edge = [&](Index edge) {
       tools_interface::check_user_interrupt(edge % 5 == 0);
       // extract evaluation point from hfunction matrices (have been
       // computed in previous tree level)
       Bicop* edge_copula = &pair_copulas_[tree][edge];
       auto var_types = edge_copula->get_var_types();
-      size_t m = rvine_structure_.min_array(tree, edge);
+      Index m = tools_eigen::to_index(rvine_structure_.min_array(tree, edge));
 
       auto u_e = Eigen::MatrixXd(n, 2);
       auto u_e_sub = Eigen::MatrixXd(n, 2);
@@ -766,34 +770,37 @@ Vinecop::get_mbicv(const double psi0) const
 
 //! @brief Computes the penalty term for mBICV.
 inline double
-Vinecop::calculate_mbicv_penalty(const size_t nobs, const double psi0) const
+Vinecop::calculate_mbicv_penalty(
+  const size_t nobs, // NOLINT(bugprone-easily-swappable-parameters)
+  const double psi0) const
 {
   if ((psi0 <= 0.0) || (psi0 >= 1.0)) {
     throw std::runtime_error("psi0 must be in the interval (0, 1)");
   }
   auto all_fams = get_all_families();
+  auto d = tools_eigen::to_index(d_);
   Eigen::Matrix<size_t, Eigen::Dynamic, 1> non_indeps(d_ - 1);
   non_indeps.setZero();
-  for (size_t t = 0; t < d_ - 1; t++) {
+  for (Index t = 0; t < d - 1; t++) {
     if (t == all_fams.size()) {
       break;
     }
-    for (size_t e = 0; e < d_ - 1 - t; e++) {
+    for (Index e = 0; e < d - 1 - t; e++) {
       if (all_fams[t][e] != BicopFamily::indep) {
         non_indeps(t)++;
       }
     }
   }
-  auto sq0 = tools_stl::seq_int(1, d_ - 1);
-  Eigen::Matrix<size_t, Eigen::Dynamic, 1> sq(d_ - 1);
-  auto psis = Eigen::VectorXd(d_ - 1);
-  for (size_t i = 0; i < d_ - 1; i++) {
+  auto sq0 = tools_stl::seq_int(static_cast<size_t>(1), d_ - 1);
+  Eigen::Matrix<size_t, Eigen::Dynamic, 1> sq(d - 1);
+  auto psis = Eigen::VectorXd(d - 1);
+  for (Index i = 0; i < d - 1; i++) {
     sq(i) = sq0[i];
     psis(i) = std::pow(psi0, sq0[i]);
   }
   double npars = this->get_npars();
   double log_prior = (non_indeps.cast<double>().array() * psis.array().log() +
-                      (d_ - non_indeps.array() - sq.array()).cast<double>() *
+                      (d - non_indeps.array() - sq.array()).cast<double>() *
                         (1 - psis.array()).log())
                        .sum();
 
@@ -836,8 +843,8 @@ Vinecop::check_var_types(const std::vector<std::string>& var_types) const
 {
   std::stringstream msg;
   if (var_types.size() > d_) {
-    msg << "more var_types (" << var_types.size() << ") " << "than variables ("
-        << d_ << ")" << std::endl;
+    msg << "more var_types (" << var_types.size() << ") "
+        << "than variables (" << d_ << ")" << std::endl;
     throw std::runtime_error(msg.str());
   }
   for (auto t : var_types) {
@@ -920,19 +927,22 @@ Vinecop::get_var_types() const
 //!   of `u`.
 //! @return A vector of length `n` containing the copula density values.
 inline Eigen::VectorXd
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 {
   check_data(u);
   u = collapse_data(u);
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
-  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
+  auto trunc_lvl = tools_eigen::to_index(rvine_structure_.get_trunc_lvl());
+  auto d = tools_eigen::to_index(d_);
   auto order = rvine_structure_.get_order();
   auto disc_cols = tools_select::get_disc_cols(var_types_);
 
   // initial value must be 1.0 for multiplication
   Eigen::VectorXd pdf = Eigen::VectorXd::Constant(u.rows(), 1.0);
 
+  // NOLINTNEXTLINE(readability-function-cognitive-complexity)
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects (all data must be in (0, 1))
     Eigen::MatrixXd hfunc1;
@@ -941,8 +951,8 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
     Eigen::MatrixXd hfunc1_sub;
     Eigen::MatrixXd hfunc2_sub;
     Eigen::MatrixXd u_e_sub;
-    hfunc1 = Eigen::MatrixXd::Zero(b.size, d_);
-    hfunc2 = Eigen::MatrixXd::Zero(b.size, d_);
+    hfunc1 = Eigen::MatrixXd::Zero(tools_eigen::to_index(b.size), d);
+    hfunc2 = Eigen::MatrixXd::Zero(tools_eigen::to_index(b.size), d);
     if (is_discrete()) {
       hfunc1_sub = hfunc1;
       hfunc2_sub = hfunc2;
@@ -950,24 +960,30 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 
     // fill first row of hfunc2 matrix with evaluation points;
     // points have to be reordered to correspond to natural order
-    for (size_t j = 0; j < d_; ++j) {
-      hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
+    for (Index j = 0; j < d; ++j) {
+      hfunc2.col(j) = u.block(tools_eigen::to_index(b.begin),
+                              tools_eigen::to_index(order[j]) - 1,
+                              b.size,
+                              1);
       if (var_types_[order[j] - 1] == "d") {
         hfunc2_sub.col(j) =
-          u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
+          u.block(tools_eigen::to_index(b.begin),
+                  d + tools_eigen::to_index(disc_cols[order[j] - 1]),
+                  b.size,
+                  1);
       }
     }
 
-    for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+    for (Index tree = 0; tree < trunc_lvl; ++tree) {
       tools_interface::check_user_interrupt(
         static_cast<double>(u.rows()) * static_cast<double>(d_) > 1e5);
-      for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
+      for (Index edge = 0; edge < d_ - tree - 1; ++edge) {
         tools_interface::check_user_interrupt(edge % 100 == 0);
         // extract evaluation point from hfunction matrices (have been
         // computed in previous tree level)
         Bicop* edge_copula = &pair_copulas_[tree][edge];
         auto var_types = edge_copula->get_var_types();
-        size_t m = rvine_structure_.min_array(tree, edge);
+        auto m = tools_eigen::to_index(rvine_structure_.min_array(tree, edge));
 
         u_e = Eigen::MatrixXd(b.size, 2);
         u_e.col(0) = hfunc2.col(edge);
@@ -978,7 +994,7 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
         }
 
         if ((var_types[0] == "d") || (var_types[1] == "d")) {
-          u_e.conservativeResize(b.size, 4);
+          u_e.conservativeResize(tools_eigen::to_index(b.size), 4);
           u_e.col(2) = hfunc2_sub.col(edge);
           if (m == rvine_structure_.struct_array(tree, edge, true)) {
             u_e.col(3) = hfunc2_sub.col(m - 1);
@@ -987,8 +1003,9 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
           }
         }
 
-        pdf.segment(b.begin, b.size) =
-          pdf.segment(b.begin, b.size).cwiseProduct(edge_copula->pdf(u_e));
+        pdf.segment(tools_eigen::to_index(b.begin), b.size) =
+          pdf.segment(tools_eigen::to_index(b.begin), b.size)
+            .cwiseProduct(edge_copula->pdf(u_e));
 
         // h-functions are only evaluated if needed in next step
         if (rvine_structure_.needed_hfunc1(tree, edge)) {
@@ -1065,11 +1082,11 @@ Vinecop::cdf(const Eigen::MatrixXd& u,
   // Simulate N quasi-random numbers from the vine model
   auto u_sim = simulate(N, true, num_threads, seeds);
 
-  size_t n = u.rows();
+  Index n = u.rows();
   Eigen::VectorXd vine_distribution(n);
   Eigen::ArrayXXd x(N, 1);
   Eigen::RowVectorXd temp(d_);
-  for (size_t i = 0; i < n; i++) {
+  for (Index i = 0; i < n; i++) {
     tools_interface::check_user_interrupt(i % 1000 == 0);
     temp = u.block(i, 0, 1, d_);
     x = (u_sim.rowwise() - temp).rowwise().maxCoeff().array();
@@ -1195,9 +1212,10 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! @return The mBICV as a double.
 // clang-format on
 inline double
-Vinecop::mbicv(const Eigen::MatrixXd& u,
-               const double psi0,
-               const size_t num_threads) const
+Vinecop::mbicv(
+  const Eigen::MatrixXd& u,
+  const double psi0, // NOLINT(bugprone-easily-swappable-parameters)
+  const size_t num_threads) const
 {
 
   size_t n = u.rows();
@@ -1268,6 +1286,7 @@ Vinecop::get_npars() const
 //!
 //! @return An \f$ n \times d \f$ matrix of independent uniform variates.
 inline Eigen::MatrixXd
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 Vinecop::rosenblatt(Eigen::MatrixXd u,
                     const size_t num_threads,
                     bool randomize_discrete,
@@ -1276,11 +1295,11 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
   check_data(u);
   u = collapse_data(u);
 
-  size_t d = d_;
-  size_t n = u.rows();
+  Index d = tools_eigen::to_index(d_);
+  Index n = u.rows();
 
   // info about the vine structure
-  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
+  Index trunc_lvl = tools_eigen::to_index(rvine_structure_.get_trunc_lvl());
   auto order = rvine_structure_.get_order();
   auto inverse_order = tools_stl::invert_permutation(order);
   auto disc_cols = tools_select::get_disc_cols(var_types_);
@@ -1291,8 +1310,8 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
   Eigen::MatrixXd hfunc2(n, d);
   Eigen::MatrixXd hfunc1_sub(n, d);
   Eigen::MatrixXd hfunc2_sub(n, d);
-  for (size_t j = 0; j < d; ++j) {
-    hfunc2.col(j) = u.col(order[j] - 1);
+  for (Index j = 0; j < d; ++j) {
+    hfunc2.col(j) = u.col(tools_eigen::to_index(order[j]) - 1);
   }
   hfunc1 = hfunc2; // just ensure data is in [0, 1]^d
   if (is_discrete()) {
@@ -1302,60 +1321,69 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
 
   // fill first row of hfunc2 matrix with evaluation points;
   // points have to be reordered to correspond to natural order
-  for (size_t j = 0; j < d_; ++j) {
-    hfunc2.col(j) = u.col(order[j] - 1);
+  for (Index j = 0; j < d; ++j) {
+    hfunc2.col(j) = u.col(tools_eigen::to_index(order[j]) - 1);
     if (var_types_[order[j] - 1] == "d") {
-      hfunc2_sub.col(j) = u.col(d_ + disc_cols[order[j] - 1]);
+      hfunc2_sub.col(j) =
+        u.col(d + tools_eigen::to_index(disc_cols[order[j] - 1]));
     }
   }
 
+  // NOLINTNEXTLINE(readability-function-cognitive-complexity)
   auto do_batch = [&](const tools_batch::Batch& b) {
     Eigen::MatrixXd u_e;
     Eigen::MatrixXd u_e_sub;
-    for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+    for (Index tree = 0; tree < trunc_lvl; ++tree) {
       tools_interface::check_user_interrupt(
         static_cast<double>(n) * static_cast<double>(d) > 1e5);
-      for (size_t edge = 0; edge < d - tree - 1; ++edge) {
+      for (Index edge = 0; edge < d - tree - 1; ++edge) {
         tools_interface::check_user_interrupt(edge % 100 == 0);
         // extract evaluation point from hfunction matrices (have been
         // computed in previous tree level)
         Bicop* edge_copula = &pair_copulas_[tree][edge];
         auto var_types = edge_copula->get_var_types();
-        size_t m = rvine_structure_.min_array(tree, edge);
+        auto m = tools_eigen::to_index(rvine_structure_.min_array(tree, edge));
 
         u_e = Eigen::MatrixXd(b.size, 2);
-        u_e.col(0) = hfunc2.block(b.begin, edge, b.size, 1);
+        u_e.col(0) = hfunc2.block(tools_eigen::to_index(b.begin), edge, b.size, 1);
         if (m == rvine_structure_.struct_array(tree, edge, true)) {
-          u_e.col(1) = hfunc2.block(b.begin, m - 1, b.size, 1);
+          u_e.col(1) =
+            hfunc2.block(tools_eigen::to_index(b.begin), m - 1, b.size, 1);
         } else {
-          u_e.col(1) = hfunc1.block(b.begin, m - 1, b.size, 1);
+          u_e.col(1) =
+            hfunc1.block(tools_eigen::to_index(b.begin), m - 1, b.size, 1);
         }
 
         if ((var_types[0] == "d") || (var_types[1] == "d")) {
-          u_e.conservativeResize(b.size, 4);
-          u_e.col(2) = hfunc2_sub.block(b.begin, edge, b.size, 1);
+          u_e.conservativeResize(tools_eigen::to_index(b.size), 4);
+          u_e.col(2) =
+            hfunc2_sub.block(tools_eigen::to_index(b.begin), edge, b.size, 1);
           if (m == rvine_structure_.struct_array(tree, edge, true)) {
-            u_e.col(3) = hfunc2_sub.block(b.begin, m - 1, b.size, 1);
+            u_e.col(3) =
+              hfunc2_sub.block(tools_eigen::to_index(b.begin), m - 1, b.size, 1);
           } else {
-            u_e.col(3) = hfunc1_sub.block(b.begin, m - 1, b.size, 1);
+            u_e.col(3) =
+              hfunc1_sub.block(tools_eigen::to_index(b.begin), m - 1, b.size, 1);
           }
         }
 
         // h-functions are only evaluated if needed in next step
         if (rvine_structure_.needed_hfunc1(tree, edge)) {
-          hfunc1.block(b.begin, edge, b.size, 1) = edge_copula->hfunc1(u_e);
+          hfunc1.block(tools_eigen::to_index(b.begin), edge, b.size, 1) =
+            edge_copula->hfunc1(u_e);
           if (var_types[1] == "d") {
             u_e_sub = u_e;
             u_e_sub.col(1) = u_e.col(3);
-            hfunc1_sub.block(b.begin, edge, b.size, 1) =
+            hfunc1_sub.block(tools_eigen::to_index(b.begin), edge, b.size, 1) =
               edge_copula->hfunc1(u_e_sub);
           }
         }
-        hfunc2.block(b.begin, edge, b.size, 1) = edge_copula->hfunc2(u_e);
+        hfunc2.block(tools_eigen::to_index(b.begin), edge, b.size, 1) =
+          edge_copula->hfunc2(u_e);
         if (var_types[0] == "d") {
           u_e_sub = u_e;
-          u_e_sub.col(0) = u_e.col(2);
-          hfunc2_sub.block(b.begin, edge, b.size, 1) =
+          u_e_sub.col(0) = u_e.col(2); // NOLINT
+          hfunc2_sub.block(tools_eigen::to_index(b.begin), edge, b.size, 1) =
             edge_copula->hfunc2(u_e_sub);
         }
       }
@@ -1370,16 +1398,17 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
 
   // go back to original order
   Eigen::MatrixXd U(n, 2 * d);
-  for (size_t j = 0; j < d; j++) {
-    U.col(j) = hfunc2.col(inverse_order[j]);
+  for (Index j = 0; j < d; j++) {
+    U.col(j) = hfunc2.col(tools_eigen::to_index(inverse_order[j]));
   }
 
   if (randomize_discrete && is_discrete()) {
     // fill second half of U with left-sided limits of the conditional CDF
     // (equal to conditional CDF for continuous variables)
-    for (size_t j = 0; j < d; j++) {
-      U.col(d + j) = var_types_[j] == "d" ? hfunc2_sub.col(inverse_order[j])
-                                          : hfunc2.col(inverse_order[j]);
+    for (Index j = 0; j < d; j++) {
+      U.col(d + j) = var_types_[j] == "d"
+                       ? hfunc2_sub.col(tools_eigen::to_index(inverse_order[j]))
+                       : hfunc2.col(tools_eigen::to_index(inverse_order[j]));
     }
     // randomize by weighting left and right limits with independent uniforms
     auto R = tools_stats::simulate_uniform(u.rows(), d, false, seeds);
@@ -1427,6 +1456,7 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
 //!   of `u`.
 //! @return An \f$ n \times d \f$ matrix of evaluations.
 inline Eigen::MatrixXd
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const size_t num_threads) const
 {
@@ -1434,18 +1464,19 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   set_continuous_var_types();
   check_data(u);
 
-  size_t n = u.rows();
-  size_t d = d_;
+  Index n = u.rows();
+  Index d = tools_eigen::to_index(d_);
 
   Eigen::MatrixXd U_vine = u.leftCols(d); // output matrix
   //                   (direct + indirect)    (U_vine)       (info matrices)
-  size_t bytes_required = (8 * 2 * n * d * d) + (8 * n * d) + (4 * 4 * d * d);
+  Index bytes_required = (tools_eigen::to_index(8) * tools_eigen::to_index(2) * n * d * d) + (8 * n * d) +
+                         (tools_eigen::to_index(4) * tools_eigen::to_index(4) * d * d);
   // if the problem is too large (requires more than 1 GB memory), split
   // the data into two halves and call simulate on the reduced data.
   if ((static_cast<int>(n > 1) &
-       static_cast<int>(bytes_required > static_cast<size_t>(1e9))) != 0) {
-    size_t n_half = n / 2;
-    size_t n_left = n - n_half;
+       static_cast<int>(bytes_required > tools_eigen::to_index(1e9))) != 0) {
+    Index n_half = n / 2;
+    Index n_left = n - n_half;
     U_vine.block(0, 0, n_half, d) =
       inverse_rosenblatt(u.block(0, 0, n_half, d), num_threads);
     U_vine.block(n_half, 0, n_left, d) =
@@ -1454,7 +1485,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   }
 
   // info about the vine structure (in upper triangular matrix notation)
-  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
+  Index trunc_lvl = tools_eigen::to_index(rvine_structure_.get_trunc_lvl());
   auto order = rvine_structure_.get_order();
   auto inverse_order = tools_stl::invert_permutation(order);
 
@@ -1465,23 +1496,26 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
     // initialize with independent uniforms (corresponding to natural
     // order)
-    for (size_t j = 0; j < d; ++j) {
+    for (Index j = 0; j < d; ++j) {
       hinv2(std::min(trunc_lvl, d - j - 1), j) =
-        u.block(b.begin, order[j] - 1, b.size, 1);
+        u.block(tools_eigen::to_index(b.begin),
+                tools_eigen::to_index(order[j]) - 1,
+                b.size,
+                1);
     }
     hfunc1(0, d - 1) = hinv2(0, d - 1);
 
     // loop through variables (0 is just the initial uniform)
-    for (ptrdiff_t var = d - 2; var >= 0; --var) {
+    for (Index var = d - 2; var >= 0; --var) {
       tools_interface::check_user_interrupt(
         static_cast<double>(n) * static_cast<double>(d) > 1e5);
-      size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
-      for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
+      Index tree_start = std::min(trunc_lvl - 1, d - var - 2);
+      for (Index tree = tree_start; tree >= 0; --tree) {
         Bicop edge_copula = pair_copulas_[tree][var].as_continuous();
 
         // extract data for conditional pair
         Eigen::MatrixXd U_e(b.size, 2);
-        size_t m = rvine_structure_.min_array(tree, var);
+        Index m = tools_eigen::to_index(rvine_structure_.min_array(tree, var));
         U_e.col(0) = hinv2(tree + 1, var);
         if (m == rvine_structure_.struct_array(tree, var, true)) {
           U_e.col(1) = hinv2(tree, m - 1);
@@ -1493,7 +1527,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
         hinv2(tree, var) = edge_copula.hinv2(U_e);
 
         // if required at later stage, also calculate hfunc2
-        if (var < static_cast<ptrdiff_t>(d_) - 1) {
+        if (var < tools_eigen::to_index(d_) - 1) {
           if (rvine_structure_.needed_hfunc1(tree, var)) {
             U_e.col(0) = hinv2(tree, var);
             hfunc1(tree + 1, var) = edge_copula.hfunc1(U_e);
@@ -1502,8 +1536,9 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
       }
     }
     // go back to original order
-    for (size_t j = 0; j < d; j++) {
-      U_vine.block(b.begin, j, b.size, 1) = hinv2(0, inverse_order[j]);
+    for (Index j = 0; j < d; j++) {
+      U_vine.block(tools_eigen::to_index(b.begin), j, b.size, 1) =
+        hinv2(0, inverse_order[j]);
     }
   };
 
@@ -1527,8 +1562,9 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
   if ((static_cast<int>(d_data != d_exp) &
        static_cast<int>(d_data != 2 * d_)) != 0) {
     std::stringstream msg;
-    msg << "data has wrong number of columns; " << "expected: " << d_exp
-        << " or " << 2 * d_ << ", actual: " << d_data << " (model contains ";
+    msg << "data has wrong number of columns; "
+        << "expected: " << d_exp << " or " << 2 * d_ << ", actual: " << d_data
+        << " (model contains ";
     if (n_disc == 0) {
       msg << "no discrete variables)." << std::endl;
     } else if (n_disc == 1) {
@@ -1560,8 +1596,8 @@ Vinecop::check_pair_copulas_rvine_structure(
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
   if (pair_copulas.size() > std::min(d_ - 1, trunc_lvl)) {
     std::stringstream message;
-    message << "pair_copulas is too large; " << "expected size: < "
-            << std::min(d_ - 1, trunc_lvl) << ", "
+    message << "pair_copulas is too large; "
+            << "expected size: < " << std::min(d_ - 1, trunc_lvl) << ", "
             << "actual size: " << pair_copulas.size() << std::endl;
     throw std::runtime_error(message.str().c_str());
   }
@@ -1686,15 +1722,16 @@ Vinecop::is_discrete() const
 inline Eigen::MatrixXd
 Vinecop::collapse_data(const Eigen::MatrixXd& u) const
 {
-  if (static_cast<size_t>(u.cols()) == d_ + get_n_discrete()) {
+  if (tools_eigen::to_size_t(u.cols()) == d_ + get_n_discrete()) {
     return u;
   }
   Eigen::MatrixXd u_new(u.rows(), d_ + get_n_discrete());
   u_new.leftCols(d_) = u.leftCols(d_);
-  size_t disc_count = 0;
-  for (size_t i = 0; i < d_; ++i) {
+  Index disc_count = 0;
+  Index d = tools_eigen::to_index(d_);
+  for (Index i = 0; i < d; ++i) {
     if (var_types_[i] == "d") {
-      u_new.col(d_ + disc_count++) = u.col(d_ + i);
+      u_new.col(d + disc_count++) = u.col(d + i);
     }
   }
   return u_new;
@@ -1703,6 +1740,7 @@ Vinecop::collapse_data(const Eigen::MatrixXd& u) const
 //! @brief Summarizes the model into a string (can be used for printing).
 //! @param trees A vector of tree indices to summarize; if empty, all trees.
 inline std::string
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 Vinecop::str(const std::vector<size_t>& trees) const
 {
   std::vector<size_t> trees_to_summarize;

@@ -237,16 +237,18 @@ TEST(rvine_structure, random_sampling)
 
 TEST(rvine_structure, dvine_structure)
 {
-  DVineStructure test(tools_stl::seq_int(1, 5));
-  DVineStructure test_tr(tools_stl::seq_int(1, 5), 2);
+  std::vector<size_t> order = { 1, 2, 3, 4, 5 };
+  DVineStructure test(order);
+  DVineStructure test_tr(order, 2);
   EXPECT_EQ(test.get_trunc_lvl(), 4);
   EXPECT_EQ(test_tr.get_trunc_lvl(), 2);
 }
 
 TEST(rvine_structure, cvine_structure)
 {
-  CVineStructure test(tools_stl::seq_int(1, 5));
-  CVineStructure test_tr(tools_stl::seq_int(1, 5), 2);
+  std::vector<size_t> order = { 1, 2, 3, 4, 5 };
+  CVineStructure test(order);
+  CVineStructure test_tr(order, 2);
   EXPECT_EQ(test.get_trunc_lvl(), 4);
   EXPECT_EQ(test_tr.get_trunc_lvl(), 2);
 }

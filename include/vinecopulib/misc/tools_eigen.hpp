@@ -11,8 +11,25 @@
 
 namespace vinecopulib {
 
+using Index = Eigen::Index;
+
 //! Tools for working with Eigen types
 namespace tools_eigen {
+
+inline Index
+to_index(size_t x)
+{
+  assert(x <= static_cast<size_t>(std::numeric_limits<Index>::max()));
+  return static_cast<Index>(x);
+}
+
+inline size_t
+to_size_t(Index x)
+{
+  assert(x >= 0);
+  return static_cast<size_t>(x);
+}
+
 //! An `Eigen::Matrix` containing `bool`s (similar to `Eigen::MatrixXd`).
 typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
 

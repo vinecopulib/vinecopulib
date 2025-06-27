@@ -11,7 +11,6 @@
 #include <vinecopulib.hpp>
 
 namespace test_tools_stats {
-
 using namespace vinecopulib;
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
@@ -30,8 +29,8 @@ TEST(test_tools_stats, to_pseudo_obs_is_correct)
   // U = pobs(X)
   Eigen::MatrixXd U = tools_stats::to_pseudo_obs(X);
   for (int i = 0; i < 9; i++) {
-    EXPECT_NEAR(U(i, 0), (i + 1.0) * 0.1, 1e-2);
-    EXPECT_NEAR(U(i, 1), 1.0 - (i + 1.0) * 0.1, 1e-2);
+    EXPECT_NEAR(U(i, 0), ((i + 1.0) * 0.1), 1e-2);
+    EXPECT_NEAR(U(i, 1), 1.0 - ((i + 1.0) * 0.1), 1e-2);
   }
 
   Eigen::MatrixXd X2 = tools_stats::simulate_uniform(100, 2);
@@ -73,8 +72,8 @@ TEST(test_tools_stats, qrng_are_correct)
   Eigen::VectorXd p1(N);
   Eigen::VectorXd x2(N);
   Eigen::VectorXd p2(n);
-  p2 = Eigen::VectorXd::Zero(n);
-  for (size_t i = 0; i < n; i++) {
+  p2 = Eigen::VectorXd::Zero(tools_eigen::to_index(n));
+  for (Index i = 0; i < tools_eigen::to_index(n); i++) {
     auto f = [i, u](const double& u1, const double& u2) {
       return (u1 <= u(i, 0) && u2 <= u(i, 1)) ? 1.0 : 0.0;
     };

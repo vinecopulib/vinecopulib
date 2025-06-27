@@ -73,11 +73,11 @@ inline ThreadPool::ThreadPool()
 }
 
 //! constructs a thread pool with `nThreads` threads.
-//! @param nWorkers Number of worker threads to create; if `nThreads = 0`, all
+//! @param nThreads Number of worker threads to create; if `nThreads = 0`, all
 //!    work pushed to the pool will be done in the main thread.
-inline ThreadPool::ThreadPool(size_t nWorkers)
+inline ThreadPool::ThreadPool(size_t nThreads)
 {
-  for (size_t w = 0; w < nWorkers; ++w) {
+  for (size_t w = 0; w < nThreads; ++w) {
     this->start_worker();
   }
 }
@@ -89,6 +89,7 @@ inline ThreadPool::~ThreadPool() noexcept
   try {
     this->announce_stop();
     this->join_workers();
+    // NOLINTNEXTLINE(bugprone-empty-catch)
   } catch (...) {
   }
 }
@@ -106,14 +107,15 @@ ThreadPool::push(F&& f, Args&&... args)
   if (workers_.empty()) {
     f(args...); // if there are no workers, do the job in the main thread
     return;
-  } else {
-    // must hold lock while modifying the shared queue
-    std::lock_guard<std::mutex> lk(m_tasks_);
-    if (stopped_) {
-      throw std::runtime_error("cannot push to joined thread pool");
-    }
-    jobs_.emplace([f, args...] { f(args...); });
   }
+  // must hold lock while modifying the shared queue
+  std::lock_guard<std::mutex> lk(m_tasks_);
+  if (stopped_) {
+    throw std::runtime_error("cannot push to joined thread pool");
+  }
+  // NOLINTNEXTLINE(bugprone-exception-escape)
+  jobs_.emplace([f, args...] { f(args...); });
+
   // signal a waiting worker that there's a new job
   cv_tasks_.notify_one();
 }

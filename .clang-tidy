@@ -10,7 +10,7 @@
 #   misc-*,
 #   hicpp-*,
 #   boost-*
-Checks: '-*,bugprone-*,readability-*,-readability-identifier-length'
+Checks: '-*,bugprone-*,readability-*,-readability-identifier-length,-readability-magic-numbers,-bugprone-easily-swappable-parameters'
 
 WarningsAsErrors: ''
 

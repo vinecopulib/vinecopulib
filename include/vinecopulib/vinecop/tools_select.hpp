@@ -109,7 +109,6 @@ public:
     size_t trunc_lvl);
 
   void select_all_trees(const Eigen::MatrixXd& data);
-
   void sparse_select_all_trees(const Eigen::MatrixXd& data);
 
   double get_loglik() const;
@@ -122,19 +121,23 @@ public:
   std::vector<VineTree> get_trees_opt() const { return trees_opt_; };
 
 protected:
-  virtual void select_tree(size_t t);
+  virtual void select_tree(size_t prev_tree);
 
   void finalize(size_t trunc_lvl);
 
-  double get_mbicv_of_tree(size_t t, double loglik);
+  void finalize_structure_unknown();
 
-  double get_loglik_of_tree(size_t t);
+  double get_mbicv_of_tree(
+    size_t tree,
+    double loglik); // NOLINT(bugprone-easily-swappable-parameters)
 
-  double get_npars_of_tree(size_t t);
+  double get_loglik_of_tree(size_t tree);
 
-  void set_tree_to_indep(size_t t);
+  double get_npars_of_tree(size_t tree);
 
-  void print_pair_copulas_of_tree(size_t /*t*/);
+  void set_tree_to_indep(size_t tree);
+
+  void print_pair_copulas_of_tree(size_t /*tree*/);
 
   std::vector<double> get_thresholded_crits();
 
@@ -146,8 +149,8 @@ protected:
 
   void select_edges(VineTree& vine_tree);
 
-  static Eigen::MatrixXd get_pc_data(size_t v0,
-                                     size_t v1,
+  static Eigen::MatrixXd get_pc_data(size_t vertex0,
+                                     size_t vertex1,
                                      const VineTree& tree);
 
   static Eigen::VectorXd get_hfunc(const VertexProperties& vertex_data,
@@ -156,9 +159,9 @@ protected:
   static Eigen::VectorXd get_hfunc_sub(const VertexProperties& vertex_data,
                                        bool is_first);
 
-  static ptrdiff_t find_common_neighbor(size_t v0,
-                                        size_t v1,
-                                        const VineTree& tree);
+  static Index find_common_neighbor(size_t vertex0,
+                                    size_t vertex1,
+                                    const VineTree& tree);
 
   virtual double compute_fit_id(const EdgeProperties& e);
 
@@ -188,7 +191,7 @@ protected:
 
   static void add_edge_info(VineTree& tree);
 
-  static void add_pc_info(const EdgeIterator& e, VineTree& tree);
+  static void add_pc_info(const EdgeIterator& edge, VineTree& tree);
 
   static void remove_edge_data(VineTree& tree);
 

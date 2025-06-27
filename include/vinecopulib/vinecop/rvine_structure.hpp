@@ -155,8 +155,8 @@ protected:
 
   static void check_if_quadratic(
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat);
-  void check_lower_tri(
-    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
+  static void check_lower_tri(
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat);
   void check_upper_tri() const;
   void check_columns() const;
   void check_antidiagonal() const;

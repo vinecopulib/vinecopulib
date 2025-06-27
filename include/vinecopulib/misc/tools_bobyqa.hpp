@@ -8,12 +8,14 @@
 
 #pragma once
 
-#include <Eigen/Dense>
 #include <algorithm>
 #include <cmath>
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
 
+// NOLINTBEGIN(readability-function-cognitive-complexity,
+// bugprone-easily-swappable-parameters)
 namespace tools_bobyqa {
 
 constexpr double sqrt_2 = 1.41421356237309504880168872420969807;
@@ -2387,7 +2389,7 @@ bobyqa(const Function& function,
   try {
     optimum = tools_bobyqa::impl(
       function, n, npt, x, xl, xu, rhobeg, rhoend, maxfun, w);
-    for (size_t i = 0; i < static_cast<size_t>(n); i++) {
+    for (Index i = 0; i < n; i++) {
       optimized_parameters(i) = x[i];
     }
   } catch (std::invalid_argument& err) {
@@ -2396,6 +2398,7 @@ bobyqa(const Function& function,
     err_msg = std::string("Ran out of memory. ") + err.what();
   } catch (std::runtime_error& err) {
     err_msg = std::string("Generic failure. ") + err.what();
+    // NOLINTNEXTLINE(bugprone-empty-catch)
   } catch (...) {
     // do nothing for other errors (results are fine)
   }
@@ -2415,4 +2418,6 @@ bobyqa(const Function& function,
   return result;
 }
 }
+// NOLINTEND(readability-function-cognitive-complexity,
+// bugprone-easily-swappable-parameters)
 }

@@ -67,7 +67,9 @@ inline RVineStructure::RVineStructure(
 //! @param d The dimension.
 //! @param trunc_lvl The truncation level. By default, it is dim - 1.
 inline RVineStructure::RVineStructure(const size_t& d, const size_t& trunc_lvl)
-  : RVineStructure(tools_stl::seq_int(1, d), std::min(d - 1, trunc_lvl), false)
+  : RVineStructure(tools_stl::seq_int(static_cast<size_t>(1), d),
+                   std::min(d - 1, trunc_lvl),
+                   false)
 {
 }
 
@@ -380,12 +382,12 @@ RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
 
   // A is the R-vine matrix we want to create (upper right-triag format).
   // B is a random binary representation that we need to convert.
-  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> A(d, d);
-  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> B(d, d);
+  Eigen::Matrix<Index, Eigen::Dynamic, Eigen::Dynamic> A(d, d);
+  Eigen::Matrix<Index, Eigen::Dynamic, Eigen::Dynamic> B(d, d);
   A.setZero();
-  B = (U.leftCols(d).array() > 0.5).cast<size_t>();
+  B = (U.leftCols(d).array() > 0.5).cast<Index>();
 
-  for (size_t i = 0; i < d; i++) {
+  for (Index i = 0; i < tools_eigen::to_index(d); i++) {
     A(i, i) = i + 1;
     B(i, i) = 1;
     if (i > 0) {
@@ -398,10 +400,11 @@ RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
     A(0, 2) = 1;
   }
 
-  for (size_t j = 3; j < d; j++) {
-    size_t ac = j - 2;
-    auto to_assign = tools_stl::seq_int(1, j - 1);
-    for (ptrdiff_t k = j - 2; k >= 0; k--) {
+  for (Index j = 3; j < tools_eigen::to_index(d); j++) {
+    Index ac = j - 2;
+    std::vector<Index> to_assign =
+      tools_stl::seq_int(tools_eigen::to_index(1), j - 1);
+    for (Index k = j - 2; k >= 0; k--) {
       if (B(k, j) == 1) {
         A(k, j) = ac + 1;
         to_assign = tools_stl::set_diff(to_assign, { A(k, j) });
@@ -417,9 +420,9 @@ RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
   }
 
   // need to convert to upper left triangular form (our notation)
-  auto rvm =
-    RVineStructure(Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>(
-      A.rowwise().reverse()));
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> A_size_t =
+    A.rowwise().reverse().template cast<size_t>();
+  auto rvm = RVineStructure(A_size_t);
 
   // sampling the variable order randomly the first column of U has not been
   // used to construct B, hence it is stochastically independent of B. Calling
@@ -446,13 +449,15 @@ RVineStructure::get_matrix() const
 {
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(d_, d_);
   mat.fill(0);
-  for (size_t i = 0; i < trunc_lvl_; ++i) {
-    for (size_t j = 0; j < d_ - i - 1; ++j) {
+  Index d = tools_eigen::to_index(d_);
+  Index trunc_lvl = tools_eigen::to_index(trunc_lvl_);
+  for (Index i = 0; i < trunc_lvl; ++i) {
+    for (Index j = 0; j < d - i - 1; ++j) {
       mat(i, j) = this->struct_array(i, j, false);
     }
   }
-  for (size_t i = 0; i < d_; ++i) {
-    mat(d_ - i - 1, i) = order_[i];
+  for (Index i = 0; i < d; ++i) {
+    mat(d - i - 1, i) = order_[i];
   }
   return mat;
 }
@@ -468,8 +473,8 @@ inline size_t
 RVineStructure::find_trunc_lvl(
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat)
 {
-  size_t trunc_lvl;
-  size_t d = mat.cols();
+  Index trunc_lvl;
+  Index d = mat.cols();
 
   std::stringstream problem;
   problem << "not a valid R-vine array: "
@@ -487,7 +492,7 @@ RVineStructure::find_trunc_lvl(
     }
   }
 
-  return trunc_lvl;
+  return tools_eigen::to_size_t(trunc_lvl);
 }
 
 //! @brief Find the order of an R-vine array.
@@ -499,8 +504,9 @@ RVineStructure::get_order(
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
 {
   std::vector<size_t> order(d_);
-  for (size_t i = 0; i < d_; i++) {
-    order[i] = mat(d_ - i - 1, i);
+  Index d = tools_eigen::to_index(d_);
+  for (Index i = 0; i < d; i++) {
+    order[i] = mat(d - i - 1, i);
   }
 
   return order;
@@ -515,8 +521,10 @@ RVineStructure::to_rvine_array(
 {
   // copy upper triangle
   TriangularArray<size_t> struct_array(d_, trunc_lvl_);
-  for (size_t j = 0; j < d_ - 1; j++) {
-    for (size_t i = 0; i < std::min(d_ - 1 - j, trunc_lvl_); i++) {
+  Index d = tools_eigen::to_index(d_);
+  Index trunc_lvl = tools_eigen::to_index(trunc_lvl_);
+  for (Index j = 0; j < d - 1; j++) {
+    for (Index i = 0; i < std::min(d - 1 - j, trunc_lvl); i++) {
       struct_array(i, j) = mat(i, j);
     }
   }
@@ -634,12 +642,13 @@ RVineStructure::check_if_quadratic(
 
 inline void
 RVineStructure::check_lower_tri(
-  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat) const
+  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& mat)
 {
   std::string problem = "the lower right triangle must only contain zeros";
   size_t sum_lwr = 0;
-  for (size_t j = 1; j < d_; ++j) {
-    sum_lwr += mat.block(d_ - j, j, j, 1).array().sum();
+  Index d = mat.cols();
+  for (Index j = 1; j < d; ++j) {
+    sum_lwr += mat.block(d - j, j, j, 1).array().sum();
     if (sum_lwr != 0) {
       throw std::runtime_error("not a valid R-vine array: " + problem);
     }
@@ -695,7 +704,8 @@ RVineStructure::check_antidiagonal() const
   std::string problem;
   problem += "the order/antidiagonal must contain the numbers ";
   problem += "1, ..., d (the number of variables)";
-  if (!tools_stl::is_same_set(order_, tools_stl::seq_int(1, d_))) {
+  if (!tools_stl::is_same_set(order_,
+                              tools_stl::seq_int(static_cast<size_t>(1), d_))) {
     throw std::runtime_error("not a valid R-vine array: " + problem);
   }
 }

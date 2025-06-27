@@ -14,6 +14,9 @@
 
 using namespace vinecopulib;
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-magic-numbers)
+
 // Test class for parametric bivariate copulas
 class ParBicopTest
   : public ::testing::TestWithParam<::testing::tuple<BicopFamily, int>>
@@ -104,3 +107,5 @@ protected:
     set_parameters(parameters);
   }
 };
+// NOLINTEND(readability-magic-numbers)
+// NOLINTEND(readability-function-cognitive-complexity)

@@ -89,12 +89,12 @@ InterpolationGrid::normalize_margins(int times)
   }
 }
 
-inline ptrdiff_t
+inline Index
 InterpolationGrid::binary_search(double x)
 {
-  ptrdiff_t low = 0;
-  ptrdiff_t high = grid_points_.size() - 2; // there's one cell less than points
-  ptrdiff_t mid;
+  Index low = 0;
+  Index high = grid_points_.size() - 2; // there's one cell less than points
+  Index mid;
 
   while (low < high) {
     mid = (low + high + 1) / 2; // Use upper midpoint
@@ -108,10 +108,10 @@ InterpolationGrid::binary_search(double x)
   return low;
 }
 
-inline Eigen::Matrix<ptrdiff_t, 1, 2>
+inline Eigen::Matrix<Index, 1, 2>
 InterpolationGrid::get_indices(double x0, double x1)
 {
-  Eigen::Matrix<ptrdiff_t, 1, 2> out;
+  Eigen::Matrix<Index, 1, 2> out;
   out(0) = this->binary_search(x0);
   out(1) = this->binary_search(x1);
   return out;
@@ -191,7 +191,7 @@ InterpolationGrid::interpolate(const Eigen::MatrixXd& x)
 inline Eigen::VectorXd
 InterpolationGrid::integrate_1d(const Eigen::MatrixXd& u, size_t cond_var)
 {
-  ptrdiff_t m = grid_points_.size();
+  Index m = grid_points_.size();
   Eigen::VectorXd tmpvals(m);
   Eigen::MatrixXd tmpgrid(m, 2);
 
@@ -225,7 +225,7 @@ InterpolationGrid::integrate_1d(const Eigen::MatrixXd& u, size_t cond_var)
 inline Eigen::VectorXd
 InterpolationGrid::integrate_2d(const Eigen::MatrixXd& u)
 {
-  ptrdiff_t m = grid_points_.size();
+  Index m = grid_points_.size();
   Eigen::VectorXd tmpvals(m);
   Eigen::VectorXd tmpvals2(m);
   Eigen::MatrixXd tmpgrid(m, 2);
@@ -236,7 +236,7 @@ InterpolationGrid::integrate_2d(const Eigen::MatrixXd& u)
     double tmpint;
     double tmpint1;
     upr = u2;
-    for (ptrdiff_t k = 0; k < m; ++k) {
+    for (Index k = 0; k < m; ++k) {
       tmpgrid.col(0) = Eigen::VectorXd::Constant(m, grid_points_(k));
       tmpvals = interpolate(tmpgrid);
       tmpint = int_on_grid(upr, tmpvals, grid_points_);
@@ -269,7 +269,7 @@ InterpolationGrid::int_on_grid(const double& upr,
 
   if (upr > grid(0)) {
     // go up the grid and integrate
-    for (ptrdiff_t k = 0; k < (grid.size() - 1); ++k) {
+    for (Index k = 0; k < (grid.size() - 1); ++k) {
       // stop loop if fully integrated
       if (upr < grid(k)) {
         break;

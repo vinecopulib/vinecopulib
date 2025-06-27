@@ -86,8 +86,8 @@ inline Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
 json_to_matrix(const nlohmann::json& input)
 {
 
-  size_t rows = input["shape"][0];
-  size_t cols = input["shape"][1];
+  auto rows = tools_eigen::to_index(input["shape"][0]);
+  auto cols = tools_eigen::to_index(input["shape"][1]);
 
   Eigen::MatrixXd matrix;
   if (!input["data"].is_null()) {

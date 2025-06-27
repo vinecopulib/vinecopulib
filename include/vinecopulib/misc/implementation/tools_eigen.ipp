@@ -176,11 +176,11 @@ invert_f(const Eigen::VectorXd& x,
 inline Eigen::MatrixXd
 expand_grid(const Eigen::VectorXd& grid_points)
 {
-  ptrdiff_t m = grid_points.size();
+  Index m = grid_points.size();
   Eigen::MatrixXd grid_2d(m * m, 2);
-  ptrdiff_t k = 0;
-  for (ptrdiff_t i = 0; i < m; ++i) {
-    for (ptrdiff_t j = 0; j < m; ++j) {
+  Index k = 0;
+  for (Index i = 0; i < m; ++i) {
+    for (Index j = 0; j < m; ++j) {
       grid_2d(k, 0) = grid_points(i);
       grid_2d(k, 1) = grid_points(j);
       ++k;

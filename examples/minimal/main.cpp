@@ -8,9 +8,11 @@
 
 using namespace vinecopulib;
 
-int main() {
-    // Minimal usage to force instantiation of core headers
-    auto bicop = Bicop();
-    auto vinecop = Vinecop();
-    return 0;
+int
+main()
+{
+  // Minimal usage to force instantiation of core headers
+  auto bicop = Bicop();
+  auto vinecop = Vinecop();
+  return 0;
 }

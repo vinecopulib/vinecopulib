@@ -43,7 +43,7 @@ create_batches(size_t num_tasks, size_t num_threads)
   std::vector<Batch> batches(num_batches);
 
   size_t min_size = num_tasks / num_batches;
-  ptrdiff_t rem_size = num_tasks % num_batches;
+  size_t rem_size = num_tasks % num_batches;
   for (size_t i = 0, k = 0; i < num_tasks; k++) {
     batches[k] = Batch{ i, min_size + static_cast<size_t>(rem_size-- > 0) };
     i += batches[k].size;

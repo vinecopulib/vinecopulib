@@ -124,10 +124,14 @@ is_member(const std::vector<T>& x, const std::vector<T>& y)
 }
 
 //! Integer sequence starting at 1
-inline std::vector<size_t>
-seq_int(size_t from, size_t length)
+template<typename IntType>
+inline std::vector<IntType>
+seq_int(IntType from, std::size_t length)
 {
-  std::vector<size_t> seq(length);
+  static_assert(std::is_integral<IntType>::value,
+                "seq_int requires an integral type");
+
+  std::vector<IntType> seq(length);
   std::iota(seq.begin(), seq.end(), from);
   return seq;
 }
@@ -135,7 +139,7 @@ seq_int(size_t from, size_t length)
 inline std::vector<size_t>
 invert_permutation(const std::vector<size_t>& perm)
 {
-  auto inv_perm = seq_int(0, perm.size());
+  auto inv_perm = seq_int(static_cast<size_t>(0), perm.size());
   std::sort(inv_perm.begin(), inv_perm.end(), [&](size_t i, size_t j) {
     return perm[i] < perm[j];
   });
