@@ -303,7 +303,6 @@ TEST_F(VinecopTest, cdf_is_correct)
   auto u2 = vinecop.simulate(10);
   ASSERT_TRUE(vinecop.cdf(u2, 10000).isApprox(bicop.cdf(u2), 1e-2));
 
-
   // verify that qrng stuff works
   Vinecop vinecop2(301);
   vinecop.simulate(10, true);
@@ -371,7 +370,6 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
     vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
 }
 
-
 TEST_F(VinecopTest, scores_stepwise)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
@@ -418,8 +416,8 @@ TEST_F(VinecopTest, scores_joint)
   EXPECT_FALSE(J.isUpperTriangular());
 
   Eigen::MatrixXd Jinv = J.triangularView<Eigen::Upper>()
-                           .solve(Eigen::MatrixXd::Identity(J.cols(),
-                           J.cols())) .triangularView<Eigen::Upper>();
+                           .solve(Eigen::MatrixXd::Identity(J.cols(), J.cols()))
+                           .triangularView<Eigen::Upper>();
   // std::cout << J << std::endl << std::endl;
   // std::cout << Jinv * I << std::endl;
   I = vinecop.scores_cov(uu, true);
