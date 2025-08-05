@@ -268,7 +268,7 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
       indices = covering.get_box_indices(lb.row(i), ub.row(i));
       double n_idx = static_cast<double>(indices.size());
       if (n_idx > 0) {
-        Index j = indices.at(tools_eigen::to_index(w(i) * n_idx));
+        Index j = indices.at(tools_eigen::to_index(static_cast<size_t>(w(i) * n_idx)));
         x.row(i) = x.row(j) + norm_sim.row(i);
         uu.row(i) = pnorm(x.row(i));
         covering.swap_sample(i, uu.row(i));

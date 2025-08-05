@@ -125,7 +125,7 @@ public:
   explicit BoxCovering(const Eigen::MatrixXd& u, uint16_t K = 40);
   std::vector<size_t> get_box_indices(const Eigen::VectorXd& lower,
                                       const Eigen::VectorXd& upper) const;
-  void swap_sample(size_t i, const Eigen::VectorXd& new_sample);
+  void swap_sample(Index i, const Eigen::VectorXd& new_sample);
 
 private:
   struct Box
