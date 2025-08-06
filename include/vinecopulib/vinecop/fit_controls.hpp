@@ -33,6 +33,7 @@ public:
     std::string parametric_method = "mle",
     std::string nonparametric_method = "constant",
     double nonparametric_mult = 1.0,
+    size_t nonparametric_grid_size = 30,
     size_t trunc_lvl = std::numeric_limits<size_t>::max(),
     std::string tree_criterion = "tau",
     double threshold = 0.0,

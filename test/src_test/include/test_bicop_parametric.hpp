@@ -143,6 +143,7 @@ TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct)
     "mle",
     "quadratic",
     1.0,
+    30,
     "bic");
 
   if (needs_check_) {
@@ -186,6 +187,7 @@ TEST_P(ParBicopTest, bicop_select_itau_bic_is_correct)
       "itau",
       "quadratic",
       1.0,
+      30,
       "bic");
 
     if (needs_check_) {
