@@ -156,7 +156,16 @@ VinecopSelector::make_pair_copula_store(size_t d, size_t trunc_lvl)
 inline void
 VinecopSelector::select_all_trees(const Eigen::MatrixXd& data)
 {
-  if (controls_.get_tree_algorithm() == "sa") {
+
+  if (d_ == 1) {
+    loglik_ = 0.0;
+    n_ = data.rows();
+    pair_copulas_ = make_pair_copula_store(d_, controls_.get_trunc_lvl());
+    vine_struct_ = RVineStructure(d_);
+    return;
+  }
+
+    if (controls_.get_tree_algorithm() == "sa") {
     controls_.set_tree_algorithm("mst_prim");
     rand_select_all_trees(data);
     return;
@@ -185,6 +194,15 @@ VinecopSelector::select_all_trees(const Eigen::MatrixXd& data)
 inline void
 VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
 {
+  if (d_ == 1) {
+    loglik_ = 0.0;
+    n_ = data.rows();
+    pair_copulas_ = make_pair_copula_store(d_, controls_.get_trunc_lvl());
+    vine_struct_ = RVineStructure(d_);
+    return;
+  }
+  loglik_ = 0.0;
+
   // family set must be reset after each iteration of the threshold search
   auto family_set = controls_.get_family_set();
   double d = static_cast<double>(d_);
@@ -1150,7 +1168,7 @@ VinecopSelector::min_spanning_tree(VineTree& graph)
       WeightMap original_weights = get(boost::edge_weight, graph);
       std::map<EdgeIterator, double> inv_weights;
       for (auto e : boost::make_iterator_range(edges(graph))) {
-        inv_weights[e] = 1.0 / (original_weights[e] + 1e-10);
+        inv_weights[e] = 1.0 - original_weights[e];
       }
       boost::associative_property_map<std::map<EdgeIterator, double>>
         inv_weight_map(inv_weights);

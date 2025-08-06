@@ -31,6 +31,11 @@ inline InterpolationGrid::InterpolationGrid(const Eigen::VectorXd& grid_points,
 
   grid_points_ = grid_points;
   values_ = values;
+
+  // move boundary points to 0/1, so we don't have to extrapolate
+  grid_points_(0) = 0.0;
+  grid_points_(grid_points.size() - 1) = 1.0;
+
   normalize_margins(norm_times);
 }
 

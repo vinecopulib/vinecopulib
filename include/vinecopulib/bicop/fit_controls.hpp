@@ -22,6 +22,7 @@ public:
                    std::string parametric_method = "mle",
                    std::string nonparametric_method = "constant",
                    double nonparametric_mult = 1.0,
+                   size_t nonparametric_grid_size = 30,
                    std::string selection_criterion = "aic",
                    const Eigen::VectorXd& weights = Eigen::VectorXd(),
                    double psi0 = 0.9,
@@ -32,7 +33,8 @@ public:
   explicit FitControlsBicop(std::string parametric_method);
 
   explicit FitControlsBicop(std::string nonparametric_method,
-                            double nonparametric_mult = 1.0);
+                            double nonparametric_mult = 1.0,
+                            size_t nonparametric_grid_size = 30);
 
   explicit FitControlsBicop(const FitControlsConfig& config);
 
@@ -44,6 +46,8 @@ public:
   std::string get_nonparametric_method() const;
 
   double get_nonparametric_mult() const;
+
+  size_t get_nonparametric_grid_size() const;
 
   std::string get_selection_criterion() const;
 
@@ -65,6 +69,8 @@ public:
   void set_nonparametric_method(std::string nonparametric_method);
 
   void set_nonparametric_mult(double nonparametric_mult);
+
+  void set_nonparametric_grid_size(size_t nonparametric_grid_size);
 
   void set_selection_criterion(std::string selection_criterion);
 
@@ -89,6 +95,7 @@ private:
   std::string parametric_method_;
   std::string nonparametric_method_;
   double nonparametric_mult_;
+  size_t nonparametric_grid_size_;
   std::string selection_criterion_;
   Eigen::VectorXd weights_;
   bool preselect_families_;
@@ -101,6 +108,8 @@ private:
   void check_nonparametric_method(std::string nonparametric_method);
 
   void check_nonparametric_mult(double nonparametric_mult);
+
+  void check_nonparametric_grid_size(size_t nonparametric_grid_size);
 
   void check_selection_criterion(std::string selection_criterion);
 

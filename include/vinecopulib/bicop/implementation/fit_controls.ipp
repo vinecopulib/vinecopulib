@@ -20,7 +20,9 @@ namespace vinecopulib {
 //!     nonparametric family (TLLs); possible choices: `"constant"`,
 //!     `"linear"`, `"quadratic"`.
 //! @param nonparametric_mult A factor with which the smoothing parameters
-//!     are multiplied.
+//!     are multiplied (default: 1.0).
+//! @param nonparametric_grid_size The grid size for the post-estimation
+//!     interpolation in nonparametric models (default: 30).
 //! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
 //!     or `"bic"`) for the pair copula families.
 //! @param weights A vector of weights for the observations.
@@ -37,6 +39,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
                                           std::string parametric_method,
                                           std::string nonparametric_method,
                                           double nonparametric_mult,
+                                          size_t nonparametric_grid_size,
                                           std::string selection_criterion,
                                           const Eigen::VectorXd& weights,
                                           double psi0,
@@ -48,6 +51,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
   set_parametric_method(parametric_method);
   set_nonparametric_method(nonparametric_method);
   set_nonparametric_mult(nonparametric_mult);
+  set_nonparametric_grid_size(nonparametric_grid_size);
   set_selection_criterion(selection_criterion);
   set_weights(weights);
   set_preselect_families(preselect_families);
@@ -70,13 +74,17 @@ inline FitControlsBicop::FitControlsBicop(std::string parametric_method)
 //!     nonparametric family (TLLs); possible choices: `"constant"`,
 //!     `"linear"`, `"quadratic"`.
 //! @param nonparametric_mult A factor with which the smoothing parameters
-//!     are multiplied.
+//!     are multiplied (default: 1.0).
+//! @param nonparametric_grid_size The grid size for the post-estimation
+//!     interpolation in nonparametric models (default: 30).
 inline FitControlsBicop::FitControlsBicop(std::string nonparametric_method,
-                                          double nonparametric_mult)
+                                          double nonparametric_mult,
+                                          size_t nonparametric_grid_size)
   : FitControlsBicop()
 {
   set_nonparametric_method(nonparametric_method);
   set_nonparametric_mult(nonparametric_mult);
+  set_nonparametric_grid_size(nonparametric_grid_size);
 }
 
 //! @brief Instantiates the controls from a configuration object.
@@ -95,6 +103,10 @@ inline FitControlsBicop::FitControlsBicop(const FitControlsConfig& config)
   }
   if (optional::has_value(config.nonparametric_mult)) {
     set_nonparametric_mult(optional::value(config.nonparametric_mult));
+  }
+  if (optional::has_value(config.nonparametric_grid_size)) {
+    set_nonparametric_grid_size(
+      optional::value(config.nonparametric_grid_size));
   }
   if (optional::has_value(config.selection_criterion)) {
     set_selection_criterion(optional::value(config.selection_criterion));
@@ -141,6 +153,14 @@ FitControlsBicop::check_nonparametric_mult(double nonparametric_mult)
 {
   if (nonparametric_mult <= 0.0) {
     throw std::runtime_error("nonparametric_mult must be positive");
+  }
+}
+
+inline void
+FitControlsBicop::check_nonparametric_grid_size(size_t nonparametric_grid_size)
+{
+  if (nonparametric_grid_size < 3) {
+    throw std::runtime_error("nonparametric_grid_size must be at least 3");
   }
 }
 
@@ -194,6 +214,13 @@ inline double
 FitControlsBicop::get_nonparametric_mult() const
 {
   return nonparametric_mult_;
+}
+
+//! @brief Gets the nonparametric grid size.
+inline size_t
+FitControlsBicop::get_nonparametric_grid_size() const
+{
+  return nonparametric_grid_size_;
 }
 
 //! @brief Gets the number of threads.
@@ -266,6 +293,14 @@ FitControlsBicop::set_nonparametric_mult(double nonparametric_mult)
 {
   check_nonparametric_mult(nonparametric_mult);
   nonparametric_mult_ = nonparametric_mult;
+}
+
+//! @brief Sets the nonparametric grid size.
+inline void
+FitControlsBicop::set_nonparametric_grid_size(size_t nonparametric_grid_size)
+{
+  check_nonparametric_grid_size(nonparametric_grid_size);
+  nonparametric_grid_size_ = nonparametric_grid_size;
 }
 
 //! @brief Sets the selection criterion.
@@ -354,6 +389,8 @@ FitControlsBicop::str_internal(bool print_threads) const
   controls_str << "Nonparametric method: " << get_nonparametric_method()
                << std::endl;
   controls_str << "Nonparametric multiplier: " << get_nonparametric_mult()
+               << std::endl;
+  controls_str << "Nonparametric grid size: " << get_nonparametric_grid_size()
                << std::endl;
   controls_str << "Weights: "
                << static_cast<std::string>(get_weights().size() == 0 ? "no"

@@ -87,6 +87,7 @@ TEST(bicop_sanity_checks, controls_checks)
   EXPECT_ANY_THROW(controls.set_nonparametric_method("foo"));
   EXPECT_ANY_THROW(controls.set_parametric_method("foo"));
   EXPECT_ANY_THROW(controls.set_nonparametric_mult(0.0));
+  EXPECT_ANY_THROW(controls.set_nonparametric_grid_size(2));
   EXPECT_ANY_THROW(controls.set_psi0(0.0));
   EXPECT_ANY_THROW(controls.set_psi0(1.0));
 }
@@ -99,6 +100,7 @@ TEST(bicop_sanity_checks, fit_controls_config_works)
   controls.set_parametric_method("itau");
   controls.set_nonparametric_method("quadratic");
   controls.set_nonparametric_mult(2.0);
+  controls.set_nonparametric_grid_size(100);
   controls.set_selection_criterion("bic");
   controls.set_weights(Eigen::VectorXd::Ones(10));
   controls.set_psi0(0.6);
@@ -112,6 +114,7 @@ TEST(bicop_sanity_checks, fit_controls_config_works)
   config.parametric_method = controls.get_parametric_method();
   config.nonparametric_method = controls.get_nonparametric_method();
   config.nonparametric_mult = controls.get_nonparametric_mult();
+  config.nonparametric_grid_size = controls.get_nonparametric_grid_size();
   config.selection_criterion = controls.get_selection_criterion();
   config.weights = controls.get_weights();
   config.psi0 = controls.get_psi0();
@@ -128,6 +131,8 @@ TEST(bicop_sanity_checks, fit_controls_config_works)
             controls2.get_nonparametric_method());
   EXPECT_EQ(controls.get_nonparametric_mult(),
             controls2.get_nonparametric_mult());
+  EXPECT_EQ(controls.get_nonparametric_grid_size(),
+            controls2.get_nonparametric_grid_size());
   EXPECT_EQ(controls.get_selection_criterion(),
             controls2.get_selection_criterion());
   EXPECT_EQ(controls.get_weights(), controls2.get_weights());

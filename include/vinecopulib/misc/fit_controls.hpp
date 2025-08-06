@@ -34,6 +34,9 @@ struct FitControlsConfig
   //! "constant".
   optional::optional<double> nonparametric_mult;
 
+  //! Grid size for nonparametric estimation. Default: 30.
+  optional::optional<size_t> nonparametric_grid_size;
+
   //! Criterion for model selection (e.g., "aic"). Default: "aic".
   optional::optional<std::string> selection_criterion;
 

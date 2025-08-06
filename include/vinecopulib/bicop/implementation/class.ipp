@@ -854,6 +854,7 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
   bicop_->fit(prep_for_abstract(data_no_nan),
               method,
               controls.get_nonparametric_mult(),
+              controls.get_nonparametric_grid_size(),
               w);
   nobs_ = data_no_nan.rows();
 }

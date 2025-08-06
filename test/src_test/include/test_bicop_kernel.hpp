@@ -17,12 +17,16 @@ TEST_P(TrafokernelTest, sanity_checks)
   auto values = bicop_.get_parameters();
   EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0, 0, 30, 1)));
   EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0, 0, 1, 30)));
+  EXPECT_NO_THROW(bicop_.set_parameters(values.block(0, 0, 10, 10)));
+  EXPECT_ANY_THROW(bicop_.set_parameters(values.block(0, 0, 2, 2)));
   EXPECT_ANY_THROW(bicop_.set_parameters(-1 * values));
 }
 
 TEST_P(TrafokernelTest, fit)
 {
   bicop_.fit(u, controls);
+  EXPECT_EQ(bicop_.get_parameters().rows(), 30);
+  EXPECT_EQ(bicop_.get_parameters().cols(), 30);
 
   // make sure that npars are copied
   auto bicop_cpy = bicop_;
@@ -31,6 +35,11 @@ TEST_P(TrafokernelTest, fit)
   // catches bugs when n < (grid size)^2
   controls.set_weights(Eigen::VectorXd::Constant(20, 1.0));
   bicop_.fit(u.topRows(20), controls);
+
+  controls.set_nonparametric_grid_size(10);
+  bicop_.fit(u, controls);
+  EXPECT_EQ(bicop_.get_parameters().rows(), 10);
+  EXPECT_EQ(bicop_.get_parameters().cols(), 10);
 }
 
 TEST_P(TrafokernelTest, serialization)
@@ -119,7 +128,7 @@ TEST_P(TrafokernelTest, reset)
   EXPECT_EQ(cop.get_parameters(), cop_new.get_parameters());
   EXPECT_EQ(cop.get_family(), cop_new.get_family());
   EXPECT_EQ(cop.get_rotation(), cop_new.get_rotation());
-  EXPECT_EQ(cop.loglik(u), cop_new.loglik(u));
+  EXPECT_NEAR(cop.loglik(u), cop_new.loglik(u), 1e-8);
 }
 
 INSTANTIATE_TEST_SUITE_P(TrafokernelTest,
