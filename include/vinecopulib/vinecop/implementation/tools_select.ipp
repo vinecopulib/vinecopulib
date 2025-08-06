@@ -165,7 +165,7 @@ VinecopSelector::select_all_trees(const Eigen::MatrixXd& data)
     return;
   }
 
-    if (controls_.get_tree_algorithm() == "sa") {
+  if (controls_.get_tree_algorithm() == "sa") {
     controls_.set_tree_algorithm("mst_prim");
     rand_select_all_trees(data);
     return;
@@ -349,7 +349,7 @@ VinecopSelector::rand_select_all_trees(const Eigen::MatrixXd& data)
     }
   }
 
-  auto trees_best = trees_;
+  std::vector<VineTree> trees_best = trees_;
   double ll_best = loglik_;
   trees_opt_ = trees_;
 
@@ -363,13 +363,18 @@ VinecopSelector::rand_select_all_trees(const Eigen::MatrixXd& data)
     VineTree candidate = rand_modify_tree(t_sel);
     double ll_new = get_loglik_of_tree(candidate);
 
-    // std::cout << "iteration " << iter << " | ll_new: " << ll_new << ", ll_prev: " << ll_prev << std::endl;
+    // std::cout << "iter " << iter << " | ll_new: " << ll_new
+    //           << ", ll_prev: " << ll_prev << std::endl;
     auto u = boost::uniform_real<double>(0, 1)(gen);
-    auto p = std::exp((ll_new - ll_prev) / static_cast<double>(n_) * 0.1 * std::pow(1.1, iter));
-    if (p > u) {
+    auto p = std::exp((ll_new - ll_prev) / static_cast<double>(n_) * 0.1 *
+                      std::pow(1.1, iter));
+    if (p != 1.0 && p > u) {
+      // print_pair_copulas_of_tree(t_sel);
       // std::cout << "accepting new model: " << p << " > " << u << std::endl;
+
       // accept new model
       trees_[t_sel + 1] = candidate;
+      // print_pair_copulas_of_tree(t_sel);
 
       for (size_t t = t_sel + 1; t <= max_tree; ++t) {
         select_tree(t);
@@ -383,12 +388,12 @@ VinecopSelector::rand_select_all_trees(const Eigen::MatrixXd& data)
       ll += get_loglik_of_tree(t);
     }
     if (ll > ll_best) {
-      // std::cout << "------------------------------------------------"
-      //           << std::endl;
-      // std::cout << "new loglik: " << ll << ", old loglik: " << ll_best
-      //           << std::endl;
-      // std::cout << "------------------------------------------------"
-      //           << std::endl;
+      std::cout << "------------------------------------------------"
+                << std::endl;
+      std::cout << "new loglik: " << ll << ", old loglik: " << ll_best
+                << std::endl;
+      std::cout << "------------------------------------------------"
+                << std::endl;
       loglik_ = ll;
       trees_best = trees_;
       ll_best = ll;
@@ -786,7 +791,7 @@ VinecopSelector::rand_modify_tree(size_t t)
   // remove_edge_data(trees_[t]); // no longer needed
   add_allowed_edges(new_tree);
 
-  auto& prev_tree = trees_[t + 1];
+  auto prev_tree = trees_[t + 1];
   auto gen = controls_.get_rng();
 
   std::uniform_real_distribution<double> dist(0.0, 1.0);
@@ -819,17 +824,13 @@ VinecopSelector::rand_modify_tree(size_t t)
     }
   }
 
-  // for (auto e : boost::edges(new_tree)) {
-  //     put(boost::edge_weight, new_tree, e, 100);
-  // }
-
   min_spanning_tree(new_tree);
 
   if (boost::num_vertices(new_tree) > 0) {
     add_edge_info(new_tree);      // for pc estimation and next tree
     remove_vertex_data(new_tree); // no longer needed
-    // select_pair_copulas(new_tree, prev_tree);
-    select_pair_copulas(new_tree);
+    select_pair_copulas(new_tree, prev_tree);
+    // select_pair_copulas(new_tree);
   }
 
   return new_tree;
@@ -1049,12 +1050,12 @@ inline double
 VinecopSelector::compute_fit_id(const EdgeProperties& e)
 {
   double id = 0.0;
-  if (controls_.needs_sparse_select()) {
+  // if (controls_.needs_sparse_select()) {
     // the formula is quite arbitrary, but sufficient for
     // identifying situations where fits can be re-used
     id = (e.pc_data.col(0) - 2 * e.pc_data.col(1)).sum();
     id += 5.0 * static_cast<double>(e.crit < controls_.get_threshold());
-  }
+  // }
 
   return id;
 }
