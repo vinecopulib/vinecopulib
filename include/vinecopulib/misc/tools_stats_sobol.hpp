@@ -18,7 +18,7 @@ namespace tools_sobol {
 // Maximal dimension allowed for Sobol numbers.
 #define sobol_max_dim 21201
 
-inline constexpr std::array<std::ptrdiff_t, sobol_max_dim> a_sobol = {
+static constexpr std::array<std::ptrdiff_t, sobol_max_dim> a_sobol = {
   0,      1,      1,      2,      1,      4,      2,      4,      7,
   11,     13,     14,     1,      13,     16,     19,     22,     25,
   1,      4,      7,      8,      14,     19,     21,     28,     31,
@@ -2377,7 +2377,7 @@ inline constexpr std::array<std::ptrdiff_t, sobol_max_dim> a_sobol = {
   130976, 131006, 131008, 131020, 131059
 };
 
-inline constexpr std::array<std::ptrdiff_t, sobol_max_dim> s_sobol = {
+static constexpr std::array<std::ptrdiff_t, sobol_max_dim> s_sobol = {
   1,  2,  3,  3,  4,  4,  5,  5,  5,  5,  5,  5,  6,  6,  6,  6,  6,  6,  7,
   7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  8,  8,
   8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  9,  9,  9,  9,  9,
@@ -3496,7 +3496,7 @@ inline constexpr std::array<std::ptrdiff_t, sobol_max_dim> s_sobol = {
   18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18
 };
 
-inline constexpr std::array<std::array<std::ptrdiff_t, 18>, sobol_max_dim>
+static constexpr std::array<std::array<std::ptrdiff_t, 18>, sobol_max_dim>
   minit_sobol = {
     { { { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
       { { 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },

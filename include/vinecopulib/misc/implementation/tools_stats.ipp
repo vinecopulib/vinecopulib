@@ -165,8 +165,8 @@ inline BoxCovering::BoxCovering(const Eigen::MatrixXd& u, uint16_t K)
 
   n_ = u.rows();
   for (size_t i = 0; i < n_; i++) {
-    size_t k = tools_eigen::to_size_t(std::floor(u(i, 0) * K));
-    size_t j = tools_eigen::to_size_t(std::floor(u(i, 1) * K));
+    size_t k = static_cast<size_t>(std::floor(u(i, 0) * K));
+    size_t j = static_cast<size_t>(std::floor(u(i, 1) * K));
     boxes_[k][j]->indices_.insert(i);
   }
 }
@@ -180,10 +180,10 @@ BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
 {
   std::vector<size_t> indices;
   indices.reserve(n_);
-  auto l0 = tools_eigen::to_size_t(std::floor(lower(0) * K_));
-  auto l1 = tools_eigen::to_size_t(std::floor(lower(1) * K_));
-  auto u0 = tools_eigen::to_size_t(std::ceil(upper(0) * K_));
-  auto u1 = tools_eigen::to_size_t(std::ceil(upper(1) * K_));
+  auto l0 = static_cast<size_t>(std::floor(lower(0) * K_));
+  auto l1 = static_cast<size_t>(std::floor(lower(1) * K_));
+  auto u0 = static_cast<size_t>(std::ceil(upper(0) * K_));
+  auto u1 = static_cast<size_t>(std::ceil(upper(1) * K_));
 
   for (size_t k = l0; k < u0; k++) {
     for (size_t j = l1; j < u1; j++) {
@@ -268,7 +268,8 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
       indices = covering.get_box_indices(lb.row(i), ub.row(i));
       double n_idx = static_cast<double>(indices.size());
       if (n_idx > 0) {
-        Index j = indices.at(tools_eigen::to_index(static_cast<size_t>(w(i) * n_idx)));
+        Index j =
+          indices.at(tools_eigen::to_index(static_cast<size_t>(w(i) * n_idx)));
         x.row(i) = x.row(j) + norm_sim.row(i);
         uu.row(i) = pnorm(x.row(i));
         covering.swap_sample(i, uu.row(i));
@@ -359,7 +360,7 @@ ace(const Eigen::MatrixXd& data,                        // data
   // default window size
   double n_dbl = static_cast<double>(n);
   if (wl == 0) {
-    wl = tools_eigen::to_size_t(std::ceil(n_dbl / 5));
+    wl = static_cast<size_t>(std::ceil(n_dbl / 5));
   }
 
   // assign order/ranks to ind/ranks
@@ -401,8 +402,10 @@ ace(const Eigen::MatrixXd& data,                        // data
     // inner loop (expectation of the second variable given the first)
     while (inner_iter <= inner_iter_max && inner_abs_err > inner_abs_tol) {
       // conditional expectation
-      phi.col(1) =
-        cef(phi.col(0).cwiseProduct(w), ind.col(1), ranks.col(1), tools_eigen::to_index(wl));
+      phi.col(1) = cef(phi.col(0).cwiseProduct(w),
+                       ind.col(1),
+                       ranks.col(1),
+                       tools_eigen::to_index(wl));
 
       // center and standardize
       double m1 = phi.col(1).sum() / n_dbl;
@@ -419,7 +422,10 @@ ace(const Eigen::MatrixXd& data,                        // data
     }
 
     // conditional expectation
-    phi.col(0) = cef(phi.col(1).cwiseProduct(w), ind.col(0), ranks.col(0), tools_eigen::to_index(wl));
+    phi.col(0) = cef(phi.col(1).cwiseProduct(w),
+                     ind.col(0),
+                     ranks.col(0),
+                     tools_eigen::to_index(wl));
 
     // center and standardize
     double m0 = phi.col(0).sum() / n_dbl;
@@ -487,7 +493,8 @@ ghalton(const size_t& n, const size_t& d, const std::vector<int>& seeds)
   for (Index i = 1; i < tools_eigen::to_index(n); i++) {
 
     // Find i in the prime base
-    tmp = Eigen::VectorXi::Constant(tools_eigen::to_index(d), tools_eigen::to_size_t(i));
+    tmp = Eigen::VectorXi::Constant(tools_eigen::to_index(d),
+                                    tools_eigen::to_size_t(i));
     coeff = Eigen::MatrixXi::Zero(tools_eigen::to_index(d), 32);
     int k = 0;
     while ((tmp.maxCoeff() > 0) && (k < 32)) {
@@ -529,7 +536,8 @@ sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 {
 
   // output matrix
-  Eigen::MatrixXd output = Eigen::MatrixXd::Zero(tools_eigen::to_index(n), tools_eigen::to_index(d));
+  Eigen::MatrixXd output =
+    Eigen::MatrixXd::Zero(tools_eigen::to_index(n), tools_eigen::to_index(d));
 
   // L = max number of bits needed
   auto L =
@@ -589,7 +597,8 @@ sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
     }
 
     // Evalulate X
-    X(0) = static_cast<size_t>(std::llround(scrambling(j + 1) * std::pow(2.0, 32)));
+    X(0) =
+      static_cast<size_t>(std::llround(scrambling(j + 1) * std::pow(2.0, 32)));
     for (Index i = 1; i < n; i++) {
       X(i) = X(i - 1) ^ V(C(i - 1) - 1);
     }

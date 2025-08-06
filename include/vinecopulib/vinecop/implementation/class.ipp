@@ -1345,7 +1345,8 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
         auto m = tools_eigen::to_index(rvine_structure_.min_array(tree, edge));
 
         u_e = Eigen::MatrixXd(b.size, 2);
-        u_e.col(0) = hfunc2.block(tools_eigen::to_index(b.begin), edge, b.size, 1);
+        u_e.col(0) =
+          hfunc2.block(tools_eigen::to_index(b.begin), edge, b.size, 1);
         if (m == rvine_structure_.struct_array(tree, edge, true)) {
           u_e.col(1) =
             hfunc2.block(tools_eigen::to_index(b.begin), m - 1, b.size, 1);
@@ -1359,11 +1360,11 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
           u_e.col(2) =
             hfunc2_sub.block(tools_eigen::to_index(b.begin), edge, b.size, 1);
           if (m == rvine_structure_.struct_array(tree, edge, true)) {
-            u_e.col(3) =
-              hfunc2_sub.block(tools_eigen::to_index(b.begin), m - 1, b.size, 1);
+            u_e.col(3) = hfunc2_sub.block(
+              tools_eigen::to_index(b.begin), m - 1, b.size, 1);
           } else {
-            u_e.col(3) =
-              hfunc1_sub.block(tools_eigen::to_index(b.begin), m - 1, b.size, 1);
+            u_e.col(3) = hfunc1_sub.block(
+              tools_eigen::to_index(b.begin), m - 1, b.size, 1);
           }
         }
 
@@ -1469,8 +1470,9 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
   Eigen::MatrixXd U_vine = u.leftCols(d); // output matrix
   //                   (direct + indirect)    (U_vine)       (info matrices)
-  Index bytes_required = (tools_eigen::to_index(8) * tools_eigen::to_index(2) * n * d * d) + (8 * n * d) +
-                         (tools_eigen::to_index(4) * tools_eigen::to_index(4) * d * d);
+  Index bytes_required =
+    (tools_eigen::to_index(8) * tools_eigen::to_index(2) * n * d * d) +
+    (8 * n * d) + (tools_eigen::to_index(4) * tools_eigen::to_index(4) * d * d);
   // if the problem is too large (requires more than 1 GB memory), split
   // the data into two halves and call simulate on the reduced data.
   if ((static_cast<int>(n > 1) &

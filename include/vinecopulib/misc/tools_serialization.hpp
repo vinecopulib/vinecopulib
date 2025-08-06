@@ -10,6 +10,7 @@
 #include <fstream>
 #include <vector>
 #include <vinecopulib/misc/nlohmann_json.hpp>
+#include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/misc/triangular_array.hpp>
 
 namespace vinecopulib {
