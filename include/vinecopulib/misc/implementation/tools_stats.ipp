@@ -212,13 +212,13 @@ BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
 inline void
 BoxCovering::swap_sample(Index i, const Eigen::VectorXd& new_sample)
 {
-  auto k = tools_eigen::to_index(std::floor(u_(i, 0) * K_));
-  auto j = tools_eigen::to_index(std::floor(u_(i, 1) * K_));
+  auto k = static_cast<Index>(std::floor(u_(i, 0) * K_));
+  auto j = static_cast<Index>(std::floor(u_(i, 1) * K_));
   boxes_[k][j]->indices_.erase(i);
 
   u_.row(i) = new_sample;
-  k = tools_eigen::to_index(std::floor(new_sample(0) * K_));
-  j = tools_eigen::to_index(std::floor(new_sample(1) * K_));
+  k = static_cast<Index>(std::floor(new_sample(0) * K_));
+  j = static_cast<Index>(std::floor(new_sample(1) * K_));
   boxes_[k][j]->indices_.insert(i);
 }
 
@@ -542,7 +542,7 @@ sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 
   // L = max number of bits needed
   auto L =
-    tools_eigen::to_index(std::ceil(log(static_cast<double>(n)) / log(2.0)));
+    static_cast<Index>(std::ceil(log(static_cast<double>(n)) / log(2.0)));
 
   // Vector of scrambling factors
   Eigen::MatrixXd scrambling = simulate_uniform(d, 1, false, seeds);

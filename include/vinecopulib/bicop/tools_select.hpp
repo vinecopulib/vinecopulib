@@ -9,6 +9,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
 namespace tools_select {
