@@ -7,7 +7,7 @@
 #pragma once
 
 #include "kernel_test.hpp"
-#include "rscript.hpp"
+#include "rscript.hpp" // NOLINT(clang-diagnostic-error)
 
 namespace test_bicop_kernel {
 using namespace vinecopulib;

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "rscript.hpp"
+#include "rscript.hpp" // NOLINT(clang-diagnostic-error)
 #include "gtest/gtest.h"
 #include <vinecopulib.hpp>
 

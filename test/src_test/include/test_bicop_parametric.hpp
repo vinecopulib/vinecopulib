@@ -7,7 +7,7 @@
 #pragma once
 
 #include "parbicop_test.hpp"
-#include "rscript.hpp"
+#include "rscript.hpp" // NOLINT(clang-diagnostic-error)
 
 namespace test_bicop_parametric {
 // NOLINTBEGIN(readability-function-cognitive-complexity)
