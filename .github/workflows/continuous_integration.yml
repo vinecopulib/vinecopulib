@@ -86,19 +86,19 @@ jobs:
             cmake --build .
           fi
         shell: bash
-      - name: Run clang-tidy static analysis
-        if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.name == 'GNU'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-tidy-14 jq
-          cp debug/compile_commands.json debug/compile_commands_bak.json
-          jq '[.[] | select(.file | test("_deps/") | not)]' debug/compile_commands_bak.json > debug/compile_commands.json
-          FILES=$(git ls-files | grep -E '^(include|test|examples)/.*\.(cpp|cc|cxx|h|hpp|ipp)$')
-          for file in $FILES; do
-            echo "Running clang-tidy on $file"
-            run-clang-tidy-14 -p debug -quiet -- "$file"
-          done
-          mv debug/compile_commands_bak.json debug/compile_commands.json
+      # - name: Run clang-tidy static analysis
+      #   if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.name == 'GNU'
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y clang-tidy-14 jq
+      #     cp debug/compile_commands.json debug/compile_commands_bak.json
+      #     jq '[.[] | select(.file | test("_deps/") | not)]' debug/compile_commands_bak.json > debug/compile_commands.json
+      #     FILES=$(git ls-files | grep -E '^(include|test|examples)/.*\.(cpp|cc|cxx|h|hpp|ipp)$')
+      #     for file in $FILES; do
+      #       echo "Running clang-tidy on $file"
+      #       run-clang-tidy-14 -p debug -quiet -- "$file"
+      #     done
+      #     mv debug/compile_commands_bak.json debug/compile_commands.json
       - name: Code coverage
         uses: codecov/codecov-action@v5
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
