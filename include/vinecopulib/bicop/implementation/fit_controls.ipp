@@ -105,7 +105,8 @@ inline FitControlsBicop::FitControlsBicop(const FitControlsConfig& config)
     set_nonparametric_mult(optional::value(config.nonparametric_mult));
   }
   if (optional::has_value(config.nonparametric_grid_size)) {
-    set_nonparametric_grid_size(optional::value(config.nonparametric_grid_size));
+    set_nonparametric_grid_size(
+      optional::value(config.nonparametric_grid_size));
   }
   if (optional::has_value(config.selection_criterion)) {
     set_selection_criterion(optional::value(config.selection_criterion));

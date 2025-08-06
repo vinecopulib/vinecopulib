@@ -257,7 +257,8 @@ TllBicop::fit(const Eigen::MatrixXd& data,
     ll_fit.col(0).cwiseQuotient(tools_stats::dnorm(z).rowwise().prod());
   // store values in mxm grid
   Eigen::MatrixXd values(grid_size, grid_size);
-  values = Eigen::Map<Eigen::MatrixXd>(c.data(), grid_size, grid_size).transpose();
+  values =
+    Eigen::Map<Eigen::MatrixXd>(c.data(), grid_size, grid_size).transpose();
 
   // create interpolation grid
   interp_grid_ = std::make_shared<InterpolationGrid>(grid_points, values);
@@ -266,7 +267,8 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   // stabilize interpolation by restricting to plausible range
   Eigen::VectorXd infl_vec = ll_fit.col(1).cwiseMin(1.3).cwiseMax(-0.2);
   Eigen::MatrixXd infl(grid_size, grid_size);
-  infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), grid_size, grid_size).transpose();
+  infl = Eigen::Map<Eigen::MatrixXd>(infl_vec.data(), grid_size, grid_size)
+           .transpose();
   // don't normalize margins of the EDF! (norm_times = 0)
   auto infl_grid = InterpolationGrid(grid_points, infl, 0);
   if ((var_types_[0] == "d") || (var_types_[1] == "d")) {
