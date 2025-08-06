@@ -388,11 +388,13 @@ FitControlsVinecop::set_tree_algorithm(std::string tree_algorithm)
   if (!tools_stl::is_member(tree_algorithm,
                             { "mst_prim",
                               "mst_kruskal",
+                              "mst_move",
                               "random_weighted",
-                              "random_unweighted" })) {
+                              "random_unweighted",
+                              "sa" })) {
     throw std::runtime_error(
       "tree_algorithm must be one of 'mst_prim', 'mst_kruskal', "
-      "'random_weighted', or 'random_unweighted'");
+      "'random_weighted', 'random_unweighted', or 'sa'");
   }
   tree_algorithm_ = tree_algorithm;
 }

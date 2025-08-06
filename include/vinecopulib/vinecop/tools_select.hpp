@@ -112,6 +112,8 @@ public:
 
   void sparse_select_all_trees(const Eigen::MatrixXd& data);
 
+  void rand_select_all_trees(const Eigen::MatrixXd& data);
+
   double get_loglik() const;
 
   double get_threshold() const;
@@ -124,11 +126,15 @@ public:
 protected:
   virtual void select_tree(size_t t);
 
+  VineTree rand_modify_tree(size_t t);
+
   void finalize(size_t trunc_lvl);
 
   double get_mbicv_of_tree(size_t t, double loglik);
 
   double get_loglik_of_tree(size_t t);
+
+  double get_loglik_of_tree(const VineTree& tree);
 
   double get_npars_of_tree(size_t t);
 
@@ -145,6 +151,7 @@ protected:
   void add_allowed_edges(VineTree& vine_tree);
 
   void select_edges(VineTree& vine_tree);
+  
 
   Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
 

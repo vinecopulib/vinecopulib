@@ -156,6 +156,12 @@ VinecopSelector::make_pair_copula_store(size_t d, size_t trunc_lvl)
 inline void
 VinecopSelector::select_all_trees(const Eigen::MatrixXd& data)
 {
+  if (controls_.get_tree_algorithm() == "sa") {
+    controls_.set_tree_algorithm("mst_prim");
+    rand_select_all_trees(data);
+    return;
+  }
+
   loglik_ = 0.0;
   initialize_new_fit(data);
   for (size_t t = 0; t < d_ - 1; ++t) {
@@ -300,6 +306,79 @@ VinecopSelector::sparse_select_all_trees(const Eigen::MatrixXd& data)
 
   // set final model
   trees_ = trees_opt_;
+  finalize(controls_.get_trunc_lvl());
+}
+
+inline void
+VinecopSelector::rand_select_all_trees(const Eigen::MatrixXd& data)
+{
+  loglik_ = 0.0;
+  initialize_new_fit(data);
+
+  for (size_t t = 0; t < d_ - 1; ++t) {
+    select_tree(t); // select pair copulas (+ structure) of tree t
+    loglik_ += get_loglik_of_tree(t);
+
+    if (controls_.get_show_trace()) {
+      std::stringstream tree_heading;
+      std::cout << "** Tree: " << t << std::endl;
+      print_pair_copulas_of_tree(t);
+    }
+
+    if (controls_.get_trunc_lvl() == t + 1) {
+      // don't need to fit the remaining trees
+      break;
+    }
+  }
+
+  auto trees_best = trees_;
+  double ll_best = loglik_;
+  trees_opt_ = trees_;
+
+  boost::mt19937 gen = controls_.get_rng();
+  for (size_t iter = 0; iter < 100; ++iter) {
+    auto max_tree = std::min(controls_.get_trunc_lvl(), d_ - 2);
+    auto t_sel = boost::uniform_int<size_t>(0, max_tree)(gen);
+
+    // std::cout << "candidate tree search: " << t_sel << std::endl;
+    double ll_prev = get_loglik_of_tree(trees_[t_sel + 1]);
+    VineTree candidate = rand_modify_tree(t_sel);
+    double ll_new = get_loglik_of_tree(candidate);
+
+    // std::cout << "iteration " << iter << " | ll_new: " << ll_new << ", ll_prev: " << ll_prev << std::endl;
+    auto u = boost::uniform_real<double>(0, 1)(gen);
+    auto p = std::exp((ll_new - ll_prev) / static_cast<double>(n_) * 0.1 * std::pow(1.1, iter));
+    if (p > u) {
+      // std::cout << "accepting new model: " << p << " > " << u << std::endl;
+      // accept new model
+      trees_[t_sel + 1] = candidate;
+
+      for (size_t t = t_sel + 1; t <= max_tree; ++t) {
+        select_tree(t);
+      }
+    }
+
+    trees_opt_ = trees_;
+
+    double ll = 0;
+    for (size_t t = 0; t <= max_tree; ++t) {
+      ll += get_loglik_of_tree(t);
+    }
+    if (ll > ll_best) {
+      // std::cout << "------------------------------------------------"
+      //           << std::endl;
+      // std::cout << "new loglik: " << ll << ", old loglik: " << ll_best
+      //           << std::endl;
+      // std::cout << "------------------------------------------------"
+      //           << std::endl;
+      loglik_ = ll;
+      trees_best = trees_;
+      ll_best = ll;
+    }
+  }
+
+  trees_ = trees_best;
+  trees_opt_ = trees_best;
   finalize(controls_.get_trunc_lvl());
 }
 
@@ -451,7 +530,6 @@ VinecopSelector::finalize(size_t trunc_lvl)
           std::max(std::min(trunc_lvl, d_ - 1 - col), static_cast<size_t>(1));
         // start with highest tree in this column
         for (auto e : boost::edges(trees_[t])) {
-
           // find an edge that contains a leaf
           size_t v0 = boost::source(e, trees_[t]);
           size_t v1 = boost::target(e, trees_[t]);
@@ -656,16 +734,15 @@ inline void
 VinecopSelector::select_tree(size_t t)
 {
   auto new_tree = edges_as_vertices(trees_[t]);
-  remove_edge_data(trees_[t]); // no longer needed
+  // remove_edge_data(trees_[t]); // no longer needed
 
   if (t >= vine_struct_.get_trunc_lvl()) {
     // only important if proximity_ was previously false (partial selection)
     structure_unknown_ = true;
   }
   add_allowed_edges(new_tree);
-  if (boost::num_vertices(new_tree) > 2) {
-    select_edges(new_tree);
-  }
+  min_spanning_tree(new_tree);
+
   if (boost::num_vertices(new_tree) > 0) {
     add_edge_info(new_tree);      // for pc estimation and next tree
     remove_vertex_data(new_tree); // no longer needed
@@ -682,6 +759,62 @@ VinecopSelector::select_tree(size_t t)
   // make sure there is space for new tree
   trees_.resize(t + 2);
   trees_[t + 1] = new_tree;
+}
+
+inline VineTree
+VinecopSelector::rand_modify_tree(size_t t)
+{
+  auto new_tree = edges_as_vertices(trees_[t]);
+  // remove_edge_data(trees_[t]); // no longer needed
+  add_allowed_edges(new_tree);
+
+  auto& prev_tree = trees_[t + 1];
+  auto gen = controls_.get_rng();
+
+  std::uniform_real_distribution<double> dist(0.0, 1.0);
+  double num_leafs = 0;
+  for (auto v : boost::vertices(prev_tree)) {
+    if (boost::out_degree(v, prev_tree) == 1)
+      num_leafs += 1.0;
+  }
+  double p = 1 / num_leafs;
+  auto r = dist(gen);
+
+  auto contains_leaf = [](const EdgeIterator& e, const VineTree& G) {
+    auto u = source(e, G);
+    auto v = target(e, G);
+    return degree(u, G) == 1 || degree(v, G) == 1;
+  };
+
+  for (auto e : boost::edges(prev_tree)) {
+    if (contains_leaf(e, prev_tree)) {
+      auto u = source(e, prev_tree);
+      auto v = target(e, prev_tree);
+
+      if (r < p) {
+        auto new_e = boost::edge(u, v, new_tree).first;
+        boost::put(boost::edge_weight, new_tree, new_e, 100);
+        // break;
+      } else {
+        p += 1.0 / num_leafs; // increase probability
+      }
+    }
+  }
+
+  // for (auto e : boost::edges(new_tree)) {
+  //     put(boost::edge_weight, new_tree, e, 100);
+  // }
+
+  min_spanning_tree(new_tree);
+
+  if (boost::num_vertices(new_tree) > 0) {
+    add_edge_info(new_tree);      // for pc estimation and next tree
+    remove_vertex_data(new_tree); // no longer needed
+    // select_pair_copulas(new_tree, prev_tree);
+    select_pair_copulas(new_tree);
+  }
+
+  return new_tree;
 }
 
 inline double
@@ -710,6 +843,17 @@ VinecopSelector::get_loglik_of_tree(size_t t)
   // trees_[0] is base tree, see make_base_tree()
   for (const auto& e : boost::edges(trees_[t + 1])) {
     ll += trees_[t + 1][e].pair_copula.get_loglik();
+  }
+  return ll;
+}
+
+//! @brief Calculates the log-likelihood of a tree.
+inline double
+VinecopSelector::get_loglik_of_tree(const VineTree& tree)
+{
+  double ll = 0.0;
+  for (const auto& e : boost::edges(tree)) {
+    ll += tree[e].pair_copula.get_loglik();
   }
   return ll;
 }
@@ -880,7 +1024,8 @@ VinecopSelector::find_common_neighbor(size_t v0,
   }
 }
 
-//! @brief Computes a fit id; can be used to re-use already fitted pair-copulas.
+//! @brief Computes a fit id; can be used to re-use already fitted
+//! pair-copulas.
 //! @param edge.
 inline double
 VinecopSelector::compute_fit_id(const EdgeProperties& e)
@@ -913,6 +1058,58 @@ VinecopSelector::min_spanning_tree(VineTree& graph)
         return targets[source] != target && targets[target] != source;
       },
       graph);
+  } else if (controls_.get_tree_algorithm() == "mst_move") {
+    size_t d = num_vertices(graph);
+    std::vector<size_t> targets(d), predecessors(d);
+    WeightMap weights = get(boost::edge_weight, graph);
+
+    prim_minimum_spanning_tree(graph, targets.data());
+
+    for (auto&& e : boost::edges(graph)) {
+      auto source = boost::source(e, graph);
+      auto target = boost::target(e, graph);
+      int deg1 = boost::out_degree(source, graph);
+      int deg2 = boost::out_degree(target, graph);
+      bool has_leaf = (deg1 == 1) || (deg2 == 1);
+
+      if ((targets[source] == target || targets[target] == source) &&
+          !has_leaf) {
+        weights[e] = 0.0; // definitely keep edge
+      }
+    }
+
+    // std::cout << "MST done" << std::endl;
+
+    boost::mt19937 gen = controls_.get_rng();
+    // Randomize root vertex
+    boost::uniform_int<size_t> root_dist(0, d_ - 1);
+    size_t root = root_dist(gen);
+
+    std::map<EdgeIterator, double> inv_weights;
+    for (auto e : boost::edges(graph)) {
+      inv_weights[e] = 1 - weights[e];
+    }
+
+    // std::cout << "set inv_weights" << std::endl;
+
+    boost::associative_property_map<std::map<EdgeIterator, double>>
+      inv_weight_map(inv_weights);
+    boost::random_spanning_tree(graph,
+                                gen,
+                                boost::predecessor_map(predecessors.data())
+                                  .root_vertex(root)
+                                  .weight_map(inv_weight_map));
+    // std::cout << "rand ST" << std::endl;
+
+    remove_edge_if(
+      [&](const EdgeIterator& e) {
+        auto source = boost::source(e, graph);
+        auto target = boost::target(e, graph);
+        return predecessors[source] != target && predecessors[target] != source;
+      },
+      graph);
+    // std::cout << "removed edges" << std::endl;
+
   } else if (controls_.get_tree_algorithm() == "mst_kruskal") {
     std::vector<EdgeIterator> spanning_tree;
     kruskal_minimum_spanning_tree(graph, std::back_inserter(spanning_tree));
@@ -936,7 +1133,7 @@ VinecopSelector::min_spanning_tree(VineTree& graph)
     boost::mt19937 gen = controls_.get_rng();
 
     // Randomize root vertex
-    std::uniform_int_distribution<size_t> root_dist(0, d - 1);
+    boost::uniform_int<size_t> root_dist(0, d - 1);
     size_t root = root_dist(gen);
 
     if (controls_.get_tree_algorithm() == "random_unweighted") {
@@ -1026,7 +1223,6 @@ VinecopSelector::select_pair_copulas(VineTree& tree, const VineTree& tree_opt)
     tools_interface::check_user_interrupt();
     bool is_thresholded = (tree[e].crit < controls_.get_threshold());
     bool used_old_fit = false;
-
     tree[e].fit_id = compute_fit_id(tree[e]);
     if (boost::num_edges(tree_opt) > 0) {
       auto old_fit = find_old_fit(tree[e].fit_id, tree_opt);
