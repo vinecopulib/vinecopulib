@@ -953,7 +953,7 @@ VinecopSelector::min_spanning_tree(VineTree& graph)
       WeightMap original_weights = get(boost::edge_weight, graph);
       std::map<EdgeIterator, double> inv_weights;
       for (auto e : boost::make_iterator_range(edges(graph))) {
-        inv_weights[e] = 1.0 / (original_weights[e] + 1e-10);
+        inv_weights[e] = 1.0 - original_weights[e];
       }
       boost::associative_property_map<std::map<EdgeIterator, double>>
         inv_weight_map(inv_weights);
