@@ -7,7 +7,7 @@
 #pragma once
 
 #include <Eigen/Dense>
-
+#include <vinecopulib/misc/tools_eigen.hpp>
 namespace vinecopulib {
 
 namespace tools_interpolation {

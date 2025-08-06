@@ -5,7 +5,6 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <stdexcept>
-#include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
 

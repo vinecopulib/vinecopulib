@@ -97,6 +97,7 @@ preselect_candidates(std::vector<Bicop>& bicops,
 }
 
 inline std::vector<double>
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 get_c1c2(const Eigen::MatrixXd& data,
          double tau,
          const Eigen::VectorXd& weights)
@@ -154,6 +155,7 @@ get_c1c2(const Eigen::MatrixXd& data,
 }
 
 inline bool
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 preselect_family(std::vector<double> c, double tau, const Bicop& bicop)
 {
   using namespace tools_stl;

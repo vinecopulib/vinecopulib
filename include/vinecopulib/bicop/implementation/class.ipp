@@ -98,6 +98,7 @@ inline Bicop::Bicop(const nlohmann::json& input)
     nobs_ = static_cast<size_t>(input["nobs"]);
     bicop_->set_loglik(input["ll"]);
     bicop_->set_npars(input["npars"]);
+    // NOLINTNEXTLINE(bugprone-empty-catch)
   } catch (...) {
   }
 }
@@ -997,6 +998,7 @@ inline void
 Bicop::rotate_data(Eigen::MatrixXd& u) const
 {
   // counter-clockwise rotations
+  // NOLINTNEXTLINE(bugprone-switch-missing-default-case)
   switch (rotation_) {
     case 0:
       break;

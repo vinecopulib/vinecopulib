@@ -175,6 +175,7 @@ inline BoxCovering::BoxCovering(const Eigen::MatrixXd& u, uint16_t K)
 // @param lower Lower bounds of the box.
 // @param upper Upper bounds of the box.
 inline std::vector<size_t>
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
                              const Eigen::VectorXd& upper) const
 {
@@ -258,7 +259,7 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   Eigen::MatrixXd x(n, 2);
   Eigen::MatrixXd norm_sim(n, 2);
 
-  for (uint16_t it = 0; it < niter; it++) {
+  for (uint16_t it = 0; it < static_cast<uint16_t>(niter); it++) {
     uu = to_pseudo_obs(uu);
     x = qnorm(uu);
     norm_sim = simulate_normal(n, 2, true, { it, 5 }).array() * b;
