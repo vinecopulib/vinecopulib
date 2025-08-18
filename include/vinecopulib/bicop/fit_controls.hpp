@@ -14,11 +14,19 @@
 namespace vinecopulib {
 //! @brief A class for controlling fits of bivariate copula models.
 //!
-class FitControlsBicop
+//! @deprecated This class is deprecated and will be removed in v1.8. 
+//!             Use FitControlsConfig instead.
+class [[deprecated("Use FitControlsConfig instead (will be removed in v1.8)")]]
+FitControlsBicop
 {
 public:
-  // Constructor
-  FitControlsBicop(std::vector<BicopFamily> family_set = bicop_families::all,
+  // Constructors
+  FitControlsBicop();
+
+  explicit FitControlsBicop(FitControlsConfig cfg);
+
+  // Legacy constructor kept for compatibility
+  FitControlsBicop(std::vector<BicopFamily> family_set,
                    std::string parametric_method = "mle",
                    std::string nonparametric_method = "constant",
                    double nonparametric_mult = 1.0,
@@ -36,53 +44,35 @@ public:
                             double nonparametric_mult = 1.0,
                             size_t nonparametric_grid_size = 30);
 
-  explicit FitControlsBicop(const FitControlsConfig& config);
-
-  // Getters
+  // Getters - forward to config
   std::vector<BicopFamily> get_family_set() const;
-
   std::string get_parametric_method() const;
-
   std::string get_nonparametric_method() const;
-
   double get_nonparametric_mult() const;
-
   size_t get_nonparametric_grid_size() const;
-
   std::string get_selection_criterion() const;
-
   Eigen::VectorXd get_weights() const;
-
   bool get_preselect_families() const;
-
   double get_psi0() const;
-
   size_t get_num_threads() const;
-
   bool get_allow_rotations() const;
 
-  // Setters
+  // Setters - forward to config with validation
   void set_family_set(std::vector<BicopFamily> family_set);
-
   void set_parametric_method(std::string parametric_method);
-
   void set_nonparametric_method(std::string nonparametric_method);
-
   void set_nonparametric_mult(double nonparametric_mult);
-
   void set_nonparametric_grid_size(size_t nonparametric_grid_size);
-
   void set_selection_criterion(std::string selection_criterion);
-
   void set_weights(const Eigen::VectorXd& weights);
-
   void set_preselect_families(bool preselect_families);
-
   void set_psi0(double psi0);
-
   void set_num_threads(size_t num_threads);
-
   void set_allow_rotations(bool allow_rotations);
+
+  // Access to underlying config
+  const FitControlsConfig& config() const { return config_; }
+  FitControlsConfig& config() { return config_; }
 
   // Misc
   std::string str() const;
@@ -91,31 +81,7 @@ protected:
   std::string str_internal(bool print_threads = true) const;
 
 private:
-  std::vector<BicopFamily> family_set_;
-  std::string parametric_method_;
-  std::string nonparametric_method_;
-  double nonparametric_mult_;
-  size_t nonparametric_grid_size_;
-  std::string selection_criterion_;
-  Eigen::VectorXd weights_;
-  bool preselect_families_;
-  double psi0_;
-  size_t num_threads_;
-  bool allow_rotations_;
-
-  void check_parametric_method(std::string parametric_method);
-
-  void check_nonparametric_method(std::string nonparametric_method);
-
-  void check_nonparametric_mult(double nonparametric_mult);
-
-  void check_nonparametric_grid_size(size_t nonparametric_grid_size);
-
-  void check_selection_criterion(std::string selection_criterion);
-
-  void check_psi0(double psi0);
-
-  size_t process_num_threads(size_t num_threads);
+  FitControlsConfig config_;
 };
 }
 

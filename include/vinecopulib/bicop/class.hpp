@@ -52,6 +52,13 @@ public:
         const Eigen::MatrixXd& parameters = Eigen::MatrixXd(),
         const std::vector<std::string>& var_types = { "c", "c" });
 
+  // Modern constructor using FitControlsConfig
+  explicit Bicop(const Eigen::MatrixXd& data,
+                 const FitControlsConfig& controls,
+                 const std::vector<std::string>& var_types = { "c", "c" });
+
+  // Deprecated constructor using FitControlsBicop  
+  [[deprecated("Use Bicop(data, FitControlsConfig, var_types) instead")]]
   explicit Bicop(const Eigen::MatrixXd& data,
                  const FitControlsBicop& controls = FitControlsBicop(),
                  const std::vector<std::string>& var_types = { "c", "c" });
@@ -114,10 +121,17 @@ public:
     const bool qrng = false,
     const std::vector<int>& seeds = std::vector<int>()) const;
 
-  // Methods modifying the family/rotation/parameters
+  // Modern methods using FitControlsConfig
+  void fit(const Eigen::MatrixXd& data, const FitControlsConfig& controls);
+
+  void select(const Eigen::MatrixXd& data, FitControlsConfig controls);
+
+  // Deprecated methods using FitControlsBicop
+  [[deprecated("Use fit(data, FitControlsConfig) instead")]]
   void fit(const Eigen::MatrixXd& data,
            const FitControlsBicop& controls = FitControlsBicop());
 
+  [[deprecated("Use select(data, FitControlsConfig) instead")]]
   void select(const Eigen::MatrixXd& data,
               FitControlsBicop controls = FitControlsBicop());
 

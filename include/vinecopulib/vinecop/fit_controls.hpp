@@ -10,24 +10,21 @@
 #include <limits>
 #include <vinecopulib/bicop/fit_controls.hpp>
 
-#if defined(__GNUC__) || defined(__clang__)
-#define DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
-#define DEPRECATED __declspec(deprecated)
-#else
-#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
-#define DEPRECATED
-#endif
-
 namespace vinecopulib {
 //! @brief A class for controlling fits of vine copula models.
 //!
-class FitControlsVinecop : public FitControlsBicop
+//! @deprecated This class is deprecated and will be removed in v1.8. 
+//!             Use FitControlsConfig instead.
+class [[deprecated("Use FitControlsConfig instead (will be removed in v1.8)")]]
+FitControlsVinecop : public FitControlsBicop
 {
 public:
-  // Constructor
+  // Constructors
   FitControlsVinecop();
 
+  explicit FitControlsVinecop(FitControlsConfig cfg);
+
+  // Legacy constructors for backward compatibility
   explicit FitControlsVinecop(
     std::vector<BicopFamily> family_set,
     std::string parametric_method = "mle",
@@ -62,76 +59,41 @@ public:
     std::string tree_algorithm = "mst_prim",
     std::vector<int> seeds = std::vector<int>());
 
-  explicit FitControlsVinecop(const FitControlsConfig& config);
-
-  // Getters
-  DEPRECATED size_t get_truncation_level() const;
+  // Getters - vine-specific ones forward to config
+  [[deprecated("Use get_trunc_lvl() instead")]] size_t get_truncation_level() const;
   size_t get_trunc_lvl() const;
-
   std::string get_tree_criterion() const;
-
   double get_threshold() const;
-
   bool get_show_trace() const;
-
-  DEPRECATED bool get_select_truncation_level() const;
+  [[deprecated("Use get_select_trunc_lvl() instead")]] bool get_select_truncation_level() const;
   bool get_select_trunc_lvl() const;
-
   bool get_select_threshold() const;
-
   bool get_select_families() const;
-
   bool needs_sparse_select() const;
-
   FitControlsBicop get_fit_controls_bicop() const;
-
   std::string get_tree_algorithm() const;
-
   std::vector<int> get_seeds() const;
-
   boost::random::mt19937 get_rng() const;
 
-  // Setters
-  DEPRECATED void set_truncation_level(size_t trunc_lvl);
+  // Setters - vine-specific ones forward to config with validation
+  [[deprecated("Use set_trunc_lvl() instead")]] void set_truncation_level(size_t trunc_lvl);
   void set_trunc_lvl(size_t trunc_lvl);
-
   void set_tree_criterion(std::string tree_criterion);
-
   void set_threshold(double threshold);
-
   void set_show_trace(bool show_trace);
-
-  DEPRECATED void set_select_truncation_level(bool select_trunc_lvl);
+  [[deprecated("Use set_select_trunc_lvl() instead")]] void set_select_truncation_level(bool select_trunc_lvl);
   void set_select_trunc_lvl(bool select_trunc_lvl);
-
   void set_select_threshold(bool select_threshold);
-
   void set_select_families(bool select_families);
-
   void set_fit_controls_bicop(FitControlsBicop controls);
-
   void set_tree_algorithm(std::string tree_algorithm);
-
   void set_seeds(std::vector<int> seeds);
 
   // Misc
   std::string str() const;
 
 private:
-  size_t trunc_lvl_;
-  std::string tree_criterion_;
-  double threshold_;
-  bool show_trace_;
-  bool select_trunc_lvl_;
-  bool select_threshold_;
-  bool select_families_;
-  std::string tree_algorithm_;
-  std::vector<int> seeds_;
-  boost::random::mt19937 rng_;
-
-  void check_tree_criterion(std::string tree_criterion);
-
-  void check_threshold(double threshold);
+  mutable boost::random::mt19937 rng_; // For backward compatibility
 };
 }
 

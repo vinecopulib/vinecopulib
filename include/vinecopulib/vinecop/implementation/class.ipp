@@ -105,6 +105,46 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 //! @brief Instantiates from data.
 //!
 //! @details Equivalent to creating a default `Vinecop()` and
+//! selecting the model using `select()`.
+//!
+//! @param data An \f$ n \times d \f$ matrix of observations.
+//! @param structure An RVineStructure object specifying the vine structure.
+//!    If empty, then it is selected as part of the fit.
+//! @param var_types Strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+//!   If empty, then all variables are set as continuous.
+//! @param controls See `FitControlsConfig()`.
+inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
+                        const RVineStructure& structure,
+                        const std::vector<std::string>& var_types,
+                        const FitControlsConfig& controls)
+{
+  check_enough_data(data);
+  if (structure.get_dim() > 1) {
+    d_ = structure.get_dim();
+    rvine_structure_ = structure;
+  } else {
+    if (var_types.size() > 0) {
+      d_ = var_types.size();
+    } else {
+      d_ = data.cols();
+    }
+    rvine_structure_ = RVineStructure(d_, static_cast<size_t>(0));
+  }
+  if (var_types.size() == 0) {
+    set_continuous_var_types();
+  } else {
+    set_var_types(var_types);
+  }
+  if (controls.weights) {
+    check_weights_size(*controls.weights, data);
+  }
+  select(data, controls);
+}
+
+//! @brief Instantiates from data.
+//!
+//! @details Equivalent to creating a default `Vinecop()` and
 //! then selecting the model using `select()`.
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
@@ -120,6 +160,28 @@ inline Vinecop::Vinecop(
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
   const std::vector<std::string>& var_types,
   const FitControlsVinecop& controls)
+  : Vinecop(data, RVineStructure(matrix), var_types, controls)
+{
+}
+
+//! @brief Instantiates from data.
+//!
+//! @details Equivalent to creating a default `Vinecop()` and
+//! then selecting the model using `select()`.
+//!
+//! @param data An \f$ n \times d \f$ matrix of observations.
+//! @param matrix Either an empty matrix (default) or an R-vine structure
+//!     matrix, see `select()`. If empty, then it is selected as part of the
+//!     fit.
+//! @param var_types Strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+//!   If empty, then all variables are set as continuous.
+//! @param controls See `FitControlsConfig()`.
+inline Vinecop::Vinecop(
+  const Eigen::MatrixXd& data,
+  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
+  const std::vector<std::string>& var_types,
+  const FitControlsConfig& controls)
   : Vinecop(data, RVineStructure(matrix), var_types, controls)
 {
 }
@@ -342,6 +404,25 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
   }
 }
 
+//! @brief Selects the best fitting vine copula model.
+//!
+//! @details The function uses a two-step procedure where each tree is built
+//! sequentially. For each tree, all pair-copulas are fitted and their AICs
+//! are computed. The R-vine matrix is then constructed according to the
+//! MST algorithm.
+//!
+//!
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   observations, where \f$ k \f$ is the number of discrete variables.
+//! @param controls The controls to the algorithm (see `FitControlsConfig()`).
+inline void
+Vinecop::select(const Eigen::MatrixXd& data, const FitControlsConfig& controls)
+{
+  // Convert to old-style controls for now
+  FitControlsVinecop old_controls(controls);
+  select(data, old_controls);
+}
+
 //! @brief Fits the parameters of a pre-specified vine copula model.
 //!
 //! @details This method fits the pair-copulas of a vine copula model. It is
@@ -454,6 +535,30 @@ Vinecop::fit(const Eigen::MatrixXd& data,
       loglik_ += pair_copulas_[tree][edge].get_loglik();
     }
   }
+}
+
+//! @brief Fits the parameters of a pre-specified vine copula model.
+//!
+//! @details This method fits the pair-copulas of a vine copula model. It is
+//! assumed that the structure  and pair-copula families are already set.
+//! The method is equivalent to calling `fit()` for each pair-copula in the
+//! model. The same can be achieved by calling `select()` with the same data
+//! and a `FitControlsConfig` object instantiated
+//! with `select_families = false`.
+//!
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   observations, where \f$ k \f$ is the number of discrete variables.
+//! @param controls The controls for each bivariate fit (see
+//! `FitControlsConfig()`).
+//! @param num_threads The number of threads to use for parallel computation.
+inline void
+Vinecop::fit(const Eigen::MatrixXd& data,
+             const FitControlsConfig& controls,
+             const size_t num_threads)
+{
+  // Convert to old-style controls for now
+  FitControlsBicop old_controls(controls);
+  fit(data, old_controls, num_threads);
 }
 
 //! @brief Automatically fits and selects a vine copula model.

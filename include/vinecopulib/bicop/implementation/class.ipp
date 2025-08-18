@@ -39,7 +39,24 @@ inline Bicop::Bicop(const BicopFamily family,
   set_var_types(var_types);
 }
 
-//! @brief Instantiates from data.
+//! @brief Instantiates from data using modern FitControlsConfig.
+//!
+//! @details Equivalent to creating a default `Bicop()` and then selecting
+//!  the model using `Bicop::select()`.
+//!
+//! @param data See `Bicop::select()`.
+//! @param controls See FitControlsConfig.
+//! @param var_types Two strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+inline Bicop::Bicop(const Eigen::MatrixXd& data,
+                    const FitControlsConfig& controls,
+                    const std::vector<std::string>& var_types)
+{
+  set_var_types(var_types);
+  select(data, controls);
+}
+
+//! @brief Instantiates from data using deprecated FitControlsBicop.
 //!
 //! @details Equivalent to creating a default `Bicop()` and then selecting
 //!  the model using `Bicop::select()`.
@@ -811,7 +828,23 @@ Bicop::as_continuous() const
   return bc_new;
 }
 
-//! @brief Fits a bivariate copula (with fixed family) to data.
+//! @brief Fits a bivariate copula (with fixed family) to data using modern FitControlsConfig.
+//!
+//! @details This is a modern interface that wraps the legacy implementation.
+//!   For detailed parameter fitting behavior, see the deprecated version below.
+//!
+//! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
+//! @param controls The controls (see `FitControlsConfig`).
+inline void
+Bicop::fit(const Eigen::MatrixXd& data, const FitControlsConfig& controls)
+{
+  // Convert to shim for implementation
+  FitControlsBicop legacy_controls(controls);
+  fit(data, legacy_controls);
+}
+
+//! @brief Fits a bivariate copula (with fixed family) to data using deprecated FitControlsBicop.
 //!
 //! @details For parametric models, two different methods are available. `"mle"`
 //! fits the parameters by maximum-likelihood. `"itau"` uses inversion of
@@ -861,7 +894,23 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 
 //
 
-//! @brief Selects the best fitting model.
+//! @brief Selects the best fitting model using modern FitControlsConfig.
+//!
+//! @details This is a modern interface that wraps the legacy implementation.
+//!   For detailed selection behavior, see the deprecated version below.
+//!
+//! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
+//! @param controls The controls (see `FitControlsConfig`).
+inline void
+Bicop::select(const Eigen::MatrixXd& data, FitControlsConfig controls)
+{
+  // Convert to shim for implementation
+  FitControlsBicop legacy_controls(controls);
+  select(data, legacy_controls);
+}
+
+//! @brief Selects the best fitting model using deprecated FitControlsBicop.
 //!
 //! @details The function calls `Bicop::fit()` for all families in
 //! `family_set` and selecting the best fitting model by either BIC or AIC,

@@ -4,37 +4,29 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <sstream>
 #include <stdexcept>
 #include <thread>
 #include <vinecopulib/misc/tools_stl.hpp>
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib {
-//! @brief Instantiates the controls for fitting bivariate copula models.
-//!
-//! @param family_set The set of copula families to consider (if empty, then
-//!     all families are included).
-//! @param parametric_method The fit method for parametric families;
-//!     possible choices: `"mle"`, `"itau"`.
-//! @param nonparametric_method The fit method for the local-likelihood
-//!     nonparametric family (TLLs); possible choices: `"constant"`,
-//!     `"linear"`, `"quadratic"`.
-//! @param nonparametric_mult A factor with which the smoothing parameters
-//!     are multiplied (default: 1.0).
-//! @param nonparametric_grid_size The grid size for the post-estimation
-//!     interpolation in nonparametric models (default: 30).
-//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
-//!     or `"bic"`) for the pair copula families.
-//! @param weights A vector of weights for the observations.
-//! @param psi0 Only for `selection_criterion = "mbic"`, the prior probability
-//!     of non-independence.
-//! @param preselect_families Whether to exclude families before fitting
-//!     based on symmetry properties of the data.
-//! @param allow_rotations Allow rotations for the families when doing
-//!     model selection (default: true).
-//! @param num_threads Number of concurrent threads to use while fitting
-//!     copulas for different families; never uses more than the number
-//!     of concurrent threads supported by the implementation.
+
+//! @brief Default constructor.
+inline FitControlsBicop::FitControlsBicop()
+  : config_(FitControlsConfig::bicop_defaults())
+{
+  config_.validate_and_set_defaults();
+}
+
+//! @brief Construct from a FitControlsConfig.
+inline FitControlsBicop::FitControlsBicop(FitControlsConfig cfg)
+  : config_(std::move(cfg))
+{
+  config_.validate_and_set_defaults();
+}
+
+//! @brief Legacy constructor for backward compatibility.
 inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
                                           std::string parametric_method,
                                           std::string nonparametric_method,
@@ -47,268 +39,163 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
                                           bool allow_rotations,
                                           size_t num_threads)
 {
-  set_family_set(family_set);
-  set_parametric_method(parametric_method);
-  set_nonparametric_method(nonparametric_method);
-  set_nonparametric_mult(nonparametric_mult);
-  set_nonparametric_grid_size(nonparametric_grid_size);
-  set_selection_criterion(selection_criterion);
-  set_weights(weights);
-  set_preselect_families(preselect_families);
-  set_allow_rotations(allow_rotations);
-  set_psi0(psi0);
-  set_num_threads(num_threads);
+  config_ = FitControlsConfig::bicop_defaults();
+  config_.family_set = family_set;
+  config_.parametric_method = parametric_method;
+  config_.nonparametric_method = nonparametric_method;
+  config_.nonparametric_mult = nonparametric_mult;
+  config_.nonparametric_grid_size = nonparametric_grid_size;
+  config_.selection_criterion = selection_criterion;
+  config_.weights = weights;
+  config_.psi0 = psi0;
+  config_.preselect_families = preselect_families;
+  config_.allow_rotations = allow_rotations;
+  config_.num_threads = num_threads;
+  config_.validate_and_set_defaults();
 }
 
-//! @brief Instantiates default controls except for the parameteric method.
-//! @param parametric_method The fit method for parametric families;
-//!     possible choices: `"mle"`, `"itau"`.
+//! @brief Constructor specifying only parametric method.
 inline FitControlsBicop::FitControlsBicop(std::string parametric_method)
-  : FitControlsBicop()
 {
-  set_parametric_method(parametric_method);
+  config_ = FitControlsConfig::bicop_defaults();
+  config_.parametric_method = parametric_method;
+  config_.validate_and_set_defaults();
 }
 
-//! @brief Instantiates default controls except for the nonparametric method.
-//! @param nonparametric_method The fit method for the local-likelihood
-//!     nonparametric family (TLLs); possible choices: `"constant"`,
-//!     `"linear"`, `"quadratic"`.
-//! @param nonparametric_mult A factor with which the smoothing parameters
-//!     are multiplied (default: 1.0).
-//! @param nonparametric_grid_size The grid size for the post-estimation
-//!     interpolation in nonparametric models (default: 30).
+//! @brief Constructor specifying nonparametric settings.
 inline FitControlsBicop::FitControlsBicop(std::string nonparametric_method,
                                           double nonparametric_mult,
                                           size_t nonparametric_grid_size)
-  : FitControlsBicop()
 {
-  set_nonparametric_method(nonparametric_method);
-  set_nonparametric_mult(nonparametric_mult);
-  set_nonparametric_grid_size(nonparametric_grid_size);
+  config_ = FitControlsConfig::bicop_defaults();
+  config_.nonparametric_method = nonparametric_method;
+  config_.nonparametric_mult = nonparametric_mult;
+  config_.nonparametric_grid_size = nonparametric_grid_size;
+  config_.validate_and_set_defaults();
 }
-
-//! @brief Instantiates the controls from a configuration object.
-//! @param config The configuration object.
-inline FitControlsBicop::FitControlsBicop(const FitControlsConfig& config)
-  : FitControlsBicop() // Call default constructor
-{
-  if (optional::has_value(config.family_set)) {
-    set_family_set(optional::value(config.family_set));
-  }
-  if (optional::has_value(config.parametric_method)) {
-    set_parametric_method(optional::value(config.parametric_method));
-  }
-  if (optional::has_value(config.nonparametric_method)) {
-    set_nonparametric_method(optional::value(config.nonparametric_method));
-  }
-  if (optional::has_value(config.nonparametric_mult)) {
-    set_nonparametric_mult(optional::value(config.nonparametric_mult));
-  }
-  if (optional::has_value(config.nonparametric_grid_size)) {
-    set_nonparametric_grid_size(
-      optional::value(config.nonparametric_grid_size));
-  }
-  if (optional::has_value(config.selection_criterion)) {
-    set_selection_criterion(optional::value(config.selection_criterion));
-  }
-  if (optional::has_value(config.weights)) {
-    set_weights(optional::value(config.weights));
-  }
-  if (optional::has_value(config.psi0)) {
-    set_psi0(optional::value(config.psi0));
-  }
-  if (optional::has_value(config.preselect_families)) {
-    set_preselect_families(optional::value(config.preselect_families));
-  }
-  if (optional::has_value(config.num_threads)) {
-    set_num_threads(optional::value(config.num_threads));
-  }
-  if (optional::has_value(config.allow_rotations)) {
-    set_allow_rotations(optional::value(config.allow_rotations));
-  }
-}
-
-//! @name Sanity checks
-//! @{
-inline void
-FitControlsBicop::check_parametric_method(std::string parametric_method)
-{
-  if (!tools_stl::is_member(parametric_method, { "itau", "mle" })) {
-    throw std::runtime_error("parametric_method should be mle or itau");
-  }
-}
-
-inline void
-FitControlsBicop::check_nonparametric_method(std::string nonparametric_method)
-{
-  if (!tools_stl::is_member(nonparametric_method,
-                            { "constant", "linear", "quadratic" })) {
-    throw std::runtime_error(
-      "parametric_method should be constant, linear or quadratic");
-  }
-}
-
-inline void
-FitControlsBicop::check_nonparametric_mult(double nonparametric_mult)
-{
-  if (nonparametric_mult <= 0.0) {
-    throw std::runtime_error("nonparametric_mult must be positive");
-  }
-}
-
-inline void
-FitControlsBicop::check_nonparametric_grid_size(size_t nonparametric_grid_size)
-{
-  if (nonparametric_grid_size < 3) {
-    throw std::runtime_error("nonparametric_grid_size must be at least 3");
-  }
-}
-
-inline void
-FitControlsBicop::check_selection_criterion(std::string selection_criterion)
-{
-  std::vector<std::string> allowed_crits = {
-    "loglik", "aic", "bic", "mbic", "mbicv"
-  };
-  if (!tools_stl::is_member(selection_criterion, allowed_crits)) {
-    throw std::runtime_error(
-      "selection_criterion should be 'loglik', 'aic', 'bic', or 'mbic'");
-  }
-}
-
-inline void
-FitControlsBicop::check_psi0(double psi0)
-{
-  if ((psi0 <= 0.0) || (psi0 >= 1.0)) {
-    throw std::runtime_error("psi0 must be in the interval (0, 1)");
-  }
-}
-//! @}
-
-//! @name Getters and setters.
-//! @{
 
 //! @brief Gets the family set.
 inline std::vector<BicopFamily>
 FitControlsBicop::get_family_set() const
 {
-  return family_set_;
+  return optional::value(config_.family_set);
 }
 
 //! @brief Gets the parametric method.
 inline std::string
 FitControlsBicop::get_parametric_method() const
 {
-  return parametric_method_;
+  return optional::value(config_.parametric_method);
 }
 
 //! @brief Gets the nonparametric method.
 inline std::string
 FitControlsBicop::get_nonparametric_method() const
 {
-  return nonparametric_method_;
+  return optional::value(config_.nonparametric_method);
 }
 
 //! @brief Gets the nonparametric bandwidth multiplier.
 inline double
 FitControlsBicop::get_nonparametric_mult() const
 {
-  return nonparametric_mult_;
+  return optional::value(config_.nonparametric_mult);
 }
 
 //! @brief Gets the nonparametric grid size.
 inline size_t
 FitControlsBicop::get_nonparametric_grid_size() const
 {
-  return nonparametric_grid_size_;
+  return optional::value(config_.nonparametric_grid_size);
 }
 
-//! @brief Gets the number of threads.
-inline size_t
-FitControlsBicop::get_num_threads() const
-{
-  return num_threads_;
-}
-
+//! @brief Gets the selection criterion.
 inline std::string
 FitControlsBicop::get_selection_criterion() const
 {
-  return selection_criterion_;
+  return optional::value(config_.selection_criterion);
 }
 
 //! @brief Gets the observation weights.
 inline Eigen::VectorXd
 FitControlsBicop::get_weights() const
 {
-  return weights_;
+  return optional::value(config_.weights);
 }
 
 //! @brief Gets whether to preselect families.
 inline bool
 FitControlsBicop::get_preselect_families() const
 {
-  return preselect_families_;
+  return optional::value(config_.preselect_families);
 }
 
 //! @brief Gets the baseline probability for mBIC selection.
 inline double
 FitControlsBicop::get_psi0() const
 {
-  return psi0_;
+  return optional::value(config_.psi0);
+}
+
+//! @brief Gets the number of threads.
+inline size_t
+FitControlsBicop::get_num_threads() const
+{
+  return optional::value(config_.num_threads);
 }
 
 //! @brief Gets whether to allow rotations.
 inline bool
 FitControlsBicop::get_allow_rotations() const
 {
-  return allow_rotations_;
+  return optional::value(config_.allow_rotations);
 }
 
 //! @brief Sets the family set.
 inline void
 FitControlsBicop::set_family_set(std::vector<BicopFamily> family_set)
 {
-  family_set_ = family_set;
+  config_.family_set = family_set;
 }
 
 //! @brief Sets the parametric method.
 inline void
 FitControlsBicop::set_parametric_method(std::string parametric_method)
 {
-  check_parametric_method(parametric_method);
-  parametric_method_ = parametric_method;
+  config_.parametric_method = parametric_method;
+  config_.check_parametric_method();
 }
 
-//! @brief Sets the nonparmetric method.
+//! @brief Sets the nonparametric method.
 inline void
 FitControlsBicop::set_nonparametric_method(std::string nonparametric_method)
 {
-  check_nonparametric_method(nonparametric_method);
-  nonparametric_method_ = nonparametric_method;
+  config_.nonparametric_method = nonparametric_method;
+  config_.check_nonparametric_method();
 }
 
 //! @brief Sets the nonparametric multiplier.
 inline void
 FitControlsBicop::set_nonparametric_mult(double nonparametric_mult)
 {
-  check_nonparametric_mult(nonparametric_mult);
-  nonparametric_mult_ = nonparametric_mult;
+  config_.nonparametric_mult = nonparametric_mult;
+  config_.check_nonparametric_mult();
 }
 
 //! @brief Sets the nonparametric grid size.
 inline void
 FitControlsBicop::set_nonparametric_grid_size(size_t nonparametric_grid_size)
 {
-  check_nonparametric_grid_size(nonparametric_grid_size);
-  nonparametric_grid_size_ = nonparametric_grid_size;
+  config_.nonparametric_grid_size = nonparametric_grid_size;
+  config_.check_nonparametric_grid_size();
 }
 
 //! @brief Sets the selection criterion.
 inline void
 FitControlsBicop::set_selection_criterion(std::string selection_criterion)
 {
-  check_selection_criterion(selection_criterion);
-  selection_criterion_ = selection_criterion;
+  config_.selection_criterion = selection_criterion;
+  config_.check_selection_criterion();
 }
 
 //! @brief Sets the observation weights.
@@ -316,52 +203,37 @@ inline void
 FitControlsBicop::set_weights(const Eigen::VectorXd& weights)
 {
   // store standardized weights (should sum up to number of observations)
-  weights_ = weights / weights.sum() * weights.size();
+  config_.weights = weights / weights.sum() * weights.size();
 }
 
 //! @brief Sets whether to preselect the families.
 inline void
 FitControlsBicop::set_preselect_families(bool preselect_families)
 {
-  preselect_families_ = preselect_families;
+  config_.preselect_families = preselect_families;
 }
 
 //! @brief Sets the prior probability for mBIC.
 inline void
 FitControlsBicop::set_psi0(double psi0)
 {
-  check_psi0(psi0);
-  psi0_ = psi0;
+  config_.psi0 = psi0;
+  config_.check_psi0();
 }
 
 //! @brief Sets the number of threads.
 inline void
 FitControlsBicop::set_num_threads(size_t num_threads)
 {
-  num_threads_ = process_num_threads(num_threads);
+  config_.num_threads = config_.process_num_threads(num_threads);
 }
 
 //! @brief Sets whether to allow rotations.
 inline void
 FitControlsBicop::set_allow_rotations(bool allow_rotations)
 {
-  allow_rotations_ = allow_rotations;
+  config_.allow_rotations = allow_rotations;
 }
-
-inline size_t
-FitControlsBicop::process_num_threads(size_t num_threads)
-{
-  // zero threads means everything is done in main thread
-  if (num_threads == 1)
-    num_threads = 0;
-
-  // don't use more threads than supported by the system
-  size_t max_threads = std::thread::hardware_concurrency();
-  num_threads = std::min(num_threads, max_threads);
-
-  return num_threads;
-}
-//! @}
 
 //! @brief Summarizes the controls into a string (can be used for printing).
 inline std::string
