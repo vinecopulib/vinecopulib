@@ -16,6 +16,8 @@
 // Forward declaration - we need the full include later for implementations
 namespace vinecopulib {
 enum class BicopFamily;
+class FitControlsBicop;
+class FitControlsVinecop;
 }
 
 namespace vinecopulib {
@@ -100,9 +102,16 @@ struct FitControlsConfig
   //! for parts of the algorithm that are randomized (e.g., random tree selection).
   optional::optional<std::vector<int>> seeds;
 
+  // Default constructor
+  FitControlsConfig() = default;
+
   //! Factory methods for creating configs with appropriate defaults.
   static FitControlsConfig bicop_defaults();
   static FitControlsConfig vinecop_defaults();
+
+  // Static factory methods from deprecated classes (defined after the full types are available)
+  // static FitControlsConfig from_bicop(const FitControlsBicop& controls);
+  // static FitControlsConfig from_vinecop(const FitControlsVinecop& controls);
 
   // Validation methods - called internally when using the shim classes
   void validate_and_set_defaults();

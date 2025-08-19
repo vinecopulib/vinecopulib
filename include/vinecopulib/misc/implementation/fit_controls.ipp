@@ -270,4 +270,12 @@ FitControlsConfig::process_num_threads(size_t num_threads) const
   return num_threads;
 }
 
+//! @brief Conversion factory method from FitControlsBicop
+//! This can only be implemented after FitControlsBicop is fully defined
+// inline FitControlsConfig FitControlsConfig::from_bicop(const FitControlsBicop& controls);
+
+//! @brief Conversion factory method from FitControlsVinecop
+//! This can only be implemented after FitControlsVinecop is fully defined  
+// inline FitControlsConfig FitControlsConfig::from_vinecop(const FitControlsVinecop& controls);
+
 }

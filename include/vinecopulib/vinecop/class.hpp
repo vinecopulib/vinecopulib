@@ -56,17 +56,16 @@ public:
   // Deprecated constructors using FitControlsVinecop
   [[deprecated("Use Vinecop(data, structure, var_types, FitControlsConfig) instead")]]
   explicit Vinecop(const Eigen::MatrixXd& data,
-                   const RVineStructure& structure = RVineStructure(),
-                   const std::vector<std::string>& var_types = {},
-                   const FitControlsVinecop& controls = FitControlsVinecop());
+                   const RVineStructure& structure,
+                   const std::vector<std::string>& var_types,
+                   const FitControlsVinecop& controls);
 
   [[deprecated("Use Vinecop(data, matrix, var_types, FitControlsConfig) instead")]]
   explicit Vinecop(
     const Eigen::MatrixXd& data,
-    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix =
-      Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>(),
-    const std::vector<std::string>& var_types = {},
-    const FitControlsVinecop& controls = FitControlsVinecop());
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
+    const std::vector<std::string>& var_types,
+    const FitControlsVinecop& controls);
 
   // Constructors from files/serialized objects
   explicit Vinecop(const std::string& filename, const bool check = true);
@@ -76,30 +75,30 @@ public:
   nlohmann::json to_json() const;
   void to_file(const std::string& filename) const;
 
-  // Modern methods using FitControlsConfig
-  void select(const Eigen::MatrixXd& data, const FitControlsConfig& controls);
+  // Select and fit methods
+  void select(const Eigen::MatrixXd& data, 
+              const FitControlsConfig& controls = FitControlsConfig::vinecop_defaults());
 
   void fit(const Eigen::MatrixXd& data,
-           const FitControlsConfig& controls,
+           const FitControlsConfig& controls = FitControlsConfig::vinecop_defaults(),
            const size_t num_threads = 1);
 
-  // Deprecated methods using old controls
   [[deprecated("Use select(data, FitControlsConfig) instead")]]
   void select(const Eigen::MatrixXd& data,
-              const FitControlsVinecop& controls = FitControlsVinecop());
+              const FitControlsVinecop& controls);
 
   [[deprecated("Use fit(data, FitControlsConfig, num_threads) instead")]]
   void fit(const Eigen::MatrixXd& data,
-           const FitControlsBicop& controls = FitControlsBicop(),
+           const FitControlsBicop& controls,
            const size_t num_threads = 1);
 
   [[deprecated("Use select() instead")]] void select_all(
     const Eigen::MatrixXd& data,
-    const FitControlsVinecop& controls = FitControlsVinecop());
+    const FitControlsVinecop& controls);
 
   [[deprecated("Use select() instead")]] void select_families(
     const Eigen::MatrixXd& data,
-    const FitControlsVinecop& controls = FitControlsVinecop());
+    const FitControlsVinecop& controls);
 
   // Getters for a single pair copula
   Bicop get_pair_copula(size_t tree, size_t edge) const;
