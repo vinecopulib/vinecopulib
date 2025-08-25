@@ -8,6 +8,7 @@
 #include <vinecopulib/bicop/abstract.hpp>
 #include <vinecopulib/bicop/tools_select.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
+#include <vinecopulib/misc/tools_optional.hpp>
 #include <vinecopulib/misc/tools_serialization.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
@@ -39,7 +40,24 @@ inline Bicop::Bicop(const BicopFamily family,
   set_var_types(var_types);
 }
 
-//! @brief Instantiates from data.
+//! @brief Instantiates from data using modern FitControlsConfig.
+//!
+//! @details Equivalent to creating a default `Bicop()` and then selecting
+//!  the model using `Bicop::select()`.
+//!
+//! @param data See `Bicop::select()`.
+//! @param controls See FitControlsConfig.
+//! @param var_types Two strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+inline Bicop::Bicop(const Eigen::MatrixXd& data,
+                    const FitControlsConfig& controls,
+                    const std::vector<std::string>& var_types)
+{
+  set_var_types(var_types);
+  select(data, controls);
+}
+
+//! @brief Instantiates from data using deprecated FitControlsBicop.
 //!
 //! @details Equivalent to creating a default `Bicop()` and then selecting
 //!  the model using `Bicop::select()`.
@@ -811,57 +829,67 @@ Bicop::as_continuous() const
   return bc_new;
 }
 
-//! @brief Fits a bivariate copula (with fixed family) to data.
+//! @brief Fits a bivariate copula (with fixed family) to data using modern FitControlsConfig.
 //!
 //! @details For parametric models, two different methods are available. `"mle"`
 //! fits the parameters by maximum-likelihood. `"itau"` uses inversion of
-//! Kendall's \f$ \tau \f$, but is only available for one-parameter families
-//! and the Student t copula. For the latter, there is a one-to-one
-//! transformation for the first parameter, the second is found by profile
-//! likelihood optimization (with accuracy of at least 0.5). Nonparametric
-//! families have specialized methods, no specification is required.
+//! Kendall's tau (only for one-parameter copula families with analytical
+//! relationship between parameter and Kendall's tau).
 //!
-//! When at least one variable is discrete, two types of "observations"
-//! are required: the first \f$ n \times 2 \f$ block contains realizations of
-//! \f$ F_{X_1}(X_1), F_{X_2}(X_2) \f$. Let \f$ k \f$ denote the number of
-//! discrete variables (either one or two). Then the second \f$ n \times k \f$
-//! block contains realizations of \f$ F_{X_k}(X_k^-) \f$. The minus indicates a
-//! left-sided limit of the cdf. For continuous variables the left limit and the
-//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
-//! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
-//!
-//! Incomplete observations (i.e., ones with a NaN value) are discarded.
+//! For nonparametric models, the method is specified by the
+//! `nonparametric_method` option. Different methods are available:
+//! `"constant"` fits a constant on each sub-interval,
+//! `"linear"` fits a linear function on each sub-interval,
+//! `"quadratic"` fits a quadratic function on each sub-interval.
+//! The fit is performed on a transformed grid that is uniform over the copula
+//! domain \f$ [0, 1] \times [0, 1] \f$. The grid size is controlled by the
+//! `nonparametric_grid_size` option.
 //!
 //! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls (see `FitControlsBicop`).
+//! @param controls The controls (see `FitControlsConfig`).
 inline void
-Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
+Bicop::fit(const Eigen::MatrixXd& data, const FitControlsConfig& controls)
 {
+  FitControlsConfig local_controls = controls;
+  local_controls.validate_and_set_defaults();
+  
   std::string method;
   if (tools_stl::is_member(bicop_->get_family(), bicop_families::parametric)) {
-    method = controls.get_parametric_method();
+    method = vinecopulib::optional::value_or(local_controls.parametric_method, std::string());
   } else {
-    method = controls.get_nonparametric_method();
+    method = vinecopulib::optional::value_or(local_controls.nonparametric_method, std::string());
   }
   tools_eigen::check_if_in_unit_cube(data);
 
-  auto w = controls.get_weights();
+  auto w = vinecopulib::optional::value_or(local_controls.weights, Eigen::VectorXd());
   Eigen::MatrixXd data_no_nan = data;
   check_weights_size(w, data);
   tools_eigen::remove_nans(data_no_nan, w);
 
   bicop_->fit(prep_for_abstract(data_no_nan),
               method,
-              controls.get_nonparametric_mult(),
-              controls.get_nonparametric_grid_size(),
+              vinecopulib::optional::value_or(local_controls.nonparametric_mult, 0.0),
+              vinecopulib::optional::value_or(local_controls.nonparametric_grid_size, size_t(0)),
               w);
   nobs_ = data_no_nan.rows();
 }
 
+//! @brief Fits a bivariate copula (with fixed family) to data using deprecated FitControlsBicop.
+//!
+//! @deprecated Use fit(data, FitControlsConfig) instead.
+//! @param data See fit(data, FitControlsConfig).
+//! @param controls The controls (see `FitControlsBicop`).
+inline void
+Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
+{
+  // Delegate to modern implementation
+  fit(data, controls.config());
+}
+
 //
 
-//! @brief Selects the best fitting model.
+//! @brief Selects the best fitting model using modern FitControlsConfig.
 //!
 //! @details The function calls `Bicop::fit()` for all families in
 //! `family_set` and selecting the best fitting model by either BIC or AIC,
@@ -880,18 +908,16 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 //!
 //! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
 //!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls (see `FitControlsBicop`).
+//! @param controls The controls (see `FitControlsConfig`).
 inline void
-Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
+Bicop::select(const Eigen::MatrixXd& data, FitControlsConfig controls)
 {
   using namespace tools_select;
-  check_weights_size(controls.get_weights(), data);
+  
+  auto weights = vinecopulib::optional::value_or(controls.weights, Eigen::VectorXd());
+  check_weights_size(weights, data);
   Eigen::MatrixXd data_no_nan = data;
-  {
-    auto w = controls.get_weights();
-    tools_eigen::remove_nans(data_no_nan, w);
-    controls.set_weights(w);
-  }
+  tools_eigen::remove_nans(data_no_nan, weights);
   check_data(data_no_nan);
   nobs_ = data_no_nan.rows();
 
@@ -901,7 +927,10 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
   bicop_->set_loglik(0.0);
   if (data_no_nan.rows() >= 10) {
     tools_eigen::trim(data_no_nan);
-    std::vector<Bicop> bicops = create_candidate_bicops(data_no_nan, controls);
+    
+    // Convert to shim for create_candidate_bicops which still expects FitControlsBicop
+    FitControlsBicop legacy_controls(controls);
+    std::vector<Bicop> bicops = create_candidate_bicops(data_no_nan, legacy_controls);
     for (auto& bc : bicops) {
       bc.set_var_types(var_types_);
     }
@@ -918,23 +947,23 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
       // Compute the selection criterion
       double new_criterion;
       double ll = cop.get_loglik();
-      if (controls.get_selection_criterion() == "loglik") {
+      if (optional::value(controls.selection_criterion) == "loglik") {
         new_criterion = -ll;
-      } else if (controls.get_selection_criterion() == "aic") {
+      } else if (optional::value(controls.selection_criterion) == "aic") {
         new_criterion = -2 * ll + 2 * cop.get_npars();
       } else {
         double n_eff = static_cast<double>(data_no_nan.rows());
-        if (controls.get_weights().size() > 0) {
-          n_eff = std::pow(controls.get_weights().sum(), 2);
-          n_eff /= controls.get_weights().array().pow(2).sum();
+        if (weights.size() > 0) {
+          n_eff = std::pow(weights.sum(), 2);
+          n_eff /= weights.array().pow(2).sum();
         }
         double npars = cop.get_npars();
 
         new_criterion = -2 * ll + log(n_eff) * npars; // BIC
-        if (controls.get_selection_criterion() == "mbic") {
+        if (optional::value(controls.selection_criterion) == "mbic") {
           // correction for mBIC
           bool is_indep = (cop.get_family() == BicopFamily::indep);
-          double psi0 = controls.get_psi0();
+          double psi0 = optional::value(controls.psi0);
           double log_prior = static_cast<double>(!is_indep) * log(psi0) +
                              static_cast<double>(is_indep) * log(1.0 - psi0);
           new_criterion -= 2 * log_prior;
@@ -955,10 +984,22 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
       }
     };
 
-    tools_thread::ThreadPool pool(controls.get_num_threads());
+    tools_thread::ThreadPool pool(optional::value(controls.num_threads));
     pool.map(fit_and_compare, bicops);
     pool.wait();
   }
+}
+
+//! @brief Selects the best fitting model using deprecated FitControlsBicop.
+//!
+//! @deprecated Use select(data, FitControlsConfig) instead.
+//! @param data See select(data, FitControlsConfig).
+//! @param controls The controls (see `FitControlsBicop`).
+inline void
+Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
+{
+  // Delegate to modern implementation
+  select(data, controls.config());
 }
 
 //! @brief Adds an additional column if there's only one discrete variable;

@@ -35,6 +35,13 @@ value(const optional<T>& opt)
   return opt.value();
 }
 
+template<typename T>
+T
+value_or(const optional<T>& opt, const T& default_value)
+{
+  return opt.value_or(default_value);
+}
+
 } // namespace optional
 } // namespace vinecopulib
 #else
@@ -64,6 +71,13 @@ const T&
 value(const optional<T>& opt)
 {
   return opt.get();
+}
+
+template<typename T>
+T
+value_or(const optional<T>& opt, const T& default_value)
+{
+  return opt ? opt.get() : default_value;
 }
 
 } // namespace optional
