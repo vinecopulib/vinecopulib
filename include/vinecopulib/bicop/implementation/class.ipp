@@ -689,9 +689,8 @@ Bicop::check_data_dim(const Eigen::MatrixXd& u) const
   unsigned short n_cols_exp = static_cast<unsigned short>(2 + n_disc);
   if ((n_cols != n_cols_exp) & (n_cols != 4)) {
     std::stringstream msg;
-    msg << "data has wrong number of columns; "
-        << "expected: " << n_cols_exp << " or 4, actual: " << n_cols
-        << " (model contains ";
+    msg << "data has wrong number of columns; " << "expected: " << n_cols_exp
+        << " or 4, actual: " << n_cols << " (model contains ";
     if (n_disc == 0) {
       msg << "no discrete variables)." << std::endl;
     } else if (n_disc == 1) {
@@ -829,7 +828,8 @@ Bicop::as_continuous() const
   return bc_new;
 }
 
-//! @brief Fits a bivariate copula (with fixed family) to data using modern FitControlsConfig.
+//! @brief Fits a bivariate copula (with fixed family) to data using modern
+//! FitControlsConfig.
 //!
 //! @details For parametric models, two different methods are available. `"mle"`
 //! fits the parameters by maximum-likelihood. `"itau"` uses inversion of
@@ -853,29 +853,35 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsConfig& controls)
 {
   FitControlsConfig local_controls = controls;
   local_controls.validate_and_set_defaults();
-  
+
   std::string method;
   if (tools_stl::is_member(bicop_->get_family(), bicop_families::parametric)) {
-    method = vinecopulib::optional::value_or(local_controls.parametric_method, std::string());
+    method = vinecopulib::optional::value_or(local_controls.parametric_method,
+                                             std::string());
   } else {
-    method = vinecopulib::optional::value_or(local_controls.nonparametric_method, std::string());
+    method = vinecopulib::optional::value_or(
+      local_controls.nonparametric_method, std::string());
   }
   tools_eigen::check_if_in_unit_cube(data);
 
-  auto w = vinecopulib::optional::value_or(local_controls.weights, Eigen::VectorXd());
+  auto w =
+    vinecopulib::optional::value_or(local_controls.weights, Eigen::VectorXd());
   Eigen::MatrixXd data_no_nan = data;
   check_weights_size(w, data);
   tools_eigen::remove_nans(data_no_nan, w);
 
-  bicop_->fit(prep_for_abstract(data_no_nan),
-              method,
-              vinecopulib::optional::value_or(local_controls.nonparametric_mult, 0.0),
-              vinecopulib::optional::value_or(local_controls.nonparametric_grid_size, size_t(0)),
-              w);
+  bicop_->fit(
+    prep_for_abstract(data_no_nan),
+    method,
+    vinecopulib::optional::value_or(local_controls.nonparametric_mult, 0.0),
+    vinecopulib::optional::value_or(local_controls.nonparametric_grid_size,
+                                    size_t(0)),
+    w);
   nobs_ = data_no_nan.rows();
 }
 
-//! @brief Fits a bivariate copula (with fixed family) to data using deprecated FitControlsBicop.
+//! @brief Fits a bivariate copula (with fixed family) to data using deprecated
+//! FitControlsBicop.
 //!
 //! @deprecated Use fit(data, FitControlsConfig) instead.
 //! @param data See fit(data, FitControlsConfig).
@@ -913,8 +919,9 @@ inline void
 Bicop::select(const Eigen::MatrixXd& data, FitControlsConfig controls)
 {
   using namespace tools_select;
-  
-  auto weights = vinecopulib::optional::value_or(controls.weights, Eigen::VectorXd());
+
+  auto weights =
+    vinecopulib::optional::value_or(controls.weights, Eigen::VectorXd());
   check_weights_size(weights, data);
   Eigen::MatrixXd data_no_nan = data;
   tools_eigen::remove_nans(data_no_nan, weights);
@@ -927,10 +934,12 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsConfig controls)
   bicop_->set_loglik(0.0);
   if (data_no_nan.rows() >= 10) {
     tools_eigen::trim(data_no_nan);
-    
-    // Convert to shim for create_candidate_bicops which still expects FitControlsBicop
+
+    // Convert to shim for create_candidate_bicops which still expects
+    // FitControlsBicop
     FitControlsBicop legacy_controls(controls);
-    std::vector<Bicop> bicops = create_candidate_bicops(data_no_nan, legacy_controls);
+    std::vector<Bicop> bicops =
+      create_candidate_bicops(data_no_nan, legacy_controls);
     for (auto& bc : bicops) {
       bc.set_var_types(var_types_);
     }

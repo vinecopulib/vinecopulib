@@ -385,8 +385,9 @@ inline void
 Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 {
   // Delegate to modern implementation
-  // For now, use the base FitControlsBicop config() - this loses vinecop-specific settings
-  // but allows compilation. A proper solution would need a vinecop-specific config() method.
+  // For now, use the base FitControlsBicop config() - this loses
+  // vinecop-specific settings but allows compilation. A proper solution would
+  // need a vinecop-specific config() method.
   select(data, static_cast<const FitControlsBicop&>(controls).config());
 }
 
@@ -413,7 +414,8 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsConfig& controls)
     }
     Eigen::MatrixXd u = collapse_data(data);
 
-    // Convert to shim for VinecopSelector which still expects FitControlsVinecop
+    // Convert to shim for VinecopSelector which still expects
+    // FitControlsVinecop
     FitControlsVinecop legacy_controls(controls);
     tools_select::VinecopSelector selector(
       u, rvine_structure_, legacy_controls, var_types_);
@@ -430,18 +432,21 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsConfig& controls)
       bicop_controls.set_parametric_method(controls.parametric_method.value());
     }
     if (controls.nonparametric_method) {
-      bicop_controls.set_nonparametric_method(controls.nonparametric_method.value());
+      bicop_controls.set_nonparametric_method(
+        controls.nonparametric_method.value());
     }
     if (controls.nonparametric_mult) {
-      bicop_controls.set_nonparametric_mult(controls.nonparametric_mult.value());
+      bicop_controls.set_nonparametric_mult(
+        controls.nonparametric_mult.value());
     }
     if (controls.nonparametric_grid_size) {
-      bicop_controls.set_nonparametric_grid_size(controls.nonparametric_grid_size.value());
+      bicop_controls.set_nonparametric_grid_size(
+        controls.nonparametric_grid_size.value());
     }
     if (controls.weights) {
       bicop_controls.set_weights(controls.weights.value());
     }
-    
+
     fit(data, bicop_controls, controls.num_threads.value_or(1));
   }
 }
@@ -1049,8 +1054,8 @@ Vinecop::check_var_types(const std::vector<std::string>& var_types) const
 {
   std::stringstream msg;
   if (var_types.size() > d_) {
-    msg << "more var_types (" << var_types.size() << ") "
-        << "than variables (" << d_ << ")" << std::endl;
+    msg << "more var_types (" << var_types.size() << ") " << "than variables ("
+        << d_ << ")" << std::endl;
     throw std::runtime_error(msg.str());
   }
   for (auto t : var_types) {
@@ -1996,9 +2001,8 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
   size_t d_exp = d_ + n_disc;
   if ((d_data != d_exp) & (d_data != 2 * d_)) {
     std::stringstream msg;
-    msg << "data has wrong number of columns; "
-        << "expected: " << d_exp << " or " << 2 * d_ << ", actual: " << d_data
-        << " (model contains ";
+    msg << "data has wrong number of columns; " << "expected: " << d_exp
+        << " or " << 2 * d_ << ", actual: " << d_data << " (model contains ";
     if (n_disc == 0) {
       msg << "no discrete variables)." << std::endl;
     } else if (n_disc == 1) {
@@ -2030,8 +2034,8 @@ Vinecop::check_pair_copulas_rvine_structure(
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
   if (pair_copulas.size() > std::min(d_ - 1, trunc_lvl)) {
     std::stringstream message;
-    message << "pair_copulas is too large; "
-            << "expected size: < " << std::min(d_ - 1, trunc_lvl) << ", "
+    message << "pair_copulas is too large; " << "expected size: < "
+            << std::min(d_ - 1, trunc_lvl) << ", "
             << "actual size: " << pair_copulas.size() << std::endl;
     throw std::runtime_error(message.str().c_str());
   }

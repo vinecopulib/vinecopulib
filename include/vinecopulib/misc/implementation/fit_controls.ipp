@@ -36,7 +36,7 @@ inline FitControlsConfig
 FitControlsConfig::vinecop_defaults()
 {
   FitControlsConfig config = bicop_defaults(); // Start with bicop defaults
-  
+
   // Add vine-specific defaults
   config.trunc_lvl = std::numeric_limits<size_t>::max();
   config.tree_criterion = "tau";
@@ -47,7 +47,7 @@ FitControlsConfig::vinecop_defaults()
   config.show_trace = false;
   config.tree_algorithm = "mst_prim";
   config.seeds = std::vector<int>();
-  
+
   return config;
 }
 
@@ -59,94 +59,94 @@ FitControlsConfig::validate_and_set_defaults()
   if (!optional::has_value(family_set)) {
     family_set = bicop_families::all;
   }
-  
+
   if (!optional::has_value(parametric_method)) {
     parametric_method = "mle";
   }
   check_parametric_method();
-  
+
   if (!optional::has_value(nonparametric_method)) {
     nonparametric_method = "constant";
   }
   check_nonparametric_method();
-  
+
   if (!optional::has_value(nonparametric_mult)) {
     nonparametric_mult = 1.0;
   }
   check_nonparametric_mult();
-  
+
   if (!optional::has_value(nonparametric_grid_size)) {
     nonparametric_grid_size = 30;
   }
   check_nonparametric_grid_size();
-  
+
   if (!optional::has_value(selection_criterion)) {
     selection_criterion = "aic";
   }
   check_selection_criterion();
-  
+
   if (!optional::has_value(weights)) {
     weights = Eigen::VectorXd();
   }
-  
+
   if (!optional::has_value(psi0)) {
     psi0 = 0.9;
   }
   check_psi0();
-  
+
   if (!optional::has_value(preselect_families)) {
     preselect_families = true;
   }
-  
+
   if (!optional::has_value(allow_rotations)) {
     allow_rotations = true;
   }
-  
+
   if (!optional::has_value(num_threads)) {
     num_threads = 1;
   }
   // Process num_threads (validation and adjustment)
   num_threads = process_num_threads(optional::value(num_threads));
-  
+
   // Vine-specific defaults and validation
   if (!optional::has_value(trunc_lvl)) {
     trunc_lvl = std::numeric_limits<size_t>::max();
   }
-  
+
   if (!optional::has_value(tree_criterion)) {
     tree_criterion = "tau";
   }
   check_tree_criterion();
-  
+
   if (!optional::has_value(threshold)) {
     threshold = 0.0;
   }
   check_threshold();
-  
+
   if (!optional::has_value(select_trunc_lvl)) {
     select_trunc_lvl = false;
   }
-  
+
   if (!optional::has_value(select_threshold)) {
     select_threshold = false;
   }
-  
+
   if (!optional::has_value(select_families)) {
     select_families = true;
   }
-  
+
   if (!optional::has_value(show_trace)) {
     show_trace = false;
   }
-  
+
   if (!optional::has_value(tree_algorithm)) {
     tree_algorithm = "mst_prim";
   }
-  
+
   if (!optional::has_value(seeds)) {
     seeds = std::vector<int>();
   }
-  
+
   // Normalize weights if provided
   if (optional::has_value(weights) && optional::value(weights).size() > 0) {
     auto w = optional::value(weights);
@@ -272,10 +272,12 @@ FitControlsConfig::process_num_threads(size_t num_threads) const
 
 //! @brief Conversion factory method from FitControlsBicop
 //! This can only be implemented after FitControlsBicop is fully defined
-// inline FitControlsConfig FitControlsConfig::from_bicop(const FitControlsBicop& controls);
+// inline FitControlsConfig FitControlsConfig::from_bicop(const
+// FitControlsBicop& controls);
 
 //! @brief Conversion factory method from FitControlsVinecop
-//! This can only be implemented after FitControlsVinecop is fully defined  
-// inline FitControlsConfig FitControlsConfig::from_vinecop(const FitControlsVinecop& controls);
+//! This can only be implemented after FitControlsVinecop is fully defined
+// inline FitControlsConfig FitControlsConfig::from_vinecop(const
+// FitControlsVinecop& controls);
 
 }

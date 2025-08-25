@@ -37,3 +37,19 @@ For documentation of the library's functionality and
 instructions how to use it, check out our
 [website](https://vinecopulib.github.io/vinecopulib/) or the `docs/` folder
 in this repository.
+
+#### Code Formatting
+
+This project uses clang-format for C++ code formatting. The style is defined in `.clang-format`.
+
+**Check formatting before committing:**
+
+```bash
+git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$' | xargs clang-format --dry-run --Werror
+```
+
+**Auto-fix formatting:**
+
+```bash
+git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$' | xargs clang-format -i
+```

@@ -29,13 +29,15 @@ namespace vinecopulib {
 //! is not set. Includes built-in validation when values are set.
 struct FitControlsConfig
 {
-  //! The set of copula families to consider (if empty, then all families are included).
+  //! The set of copula families to consider (if empty, then all families are
+  //! included).
   optional::optional<std::vector<BicopFamily>> family_set;
 
-  //! The fit method for parametric families; possible choices: `"mle"`, `"itau"`.
+  //! The fit method for parametric families; possible choices: `"mle"`,
+  //! `"itau"`.
   optional::optional<std::string> parametric_method;
 
-  //! The fit method for the local-likelihood nonparametric family (TLLs); 
+  //! The fit method for the local-likelihood nonparametric family (TLLs);
   //! possible choices: `"constant"`, `"linear"`, `"quadratic"`.
   optional::optional<std::string> nonparametric_method;
 
@@ -45,30 +47,35 @@ struct FitControlsConfig
   //! Grid size for nonparametric estimation.
   optional::optional<size_t> nonparametric_grid_size;
 
-  //! The selection criterion (`"loglik"`, `"aic"` or `"bic"`) for the pair copula families.
+  //! The selection criterion (`"loglik"`, `"aic"` or `"bic"`) for the pair
+  //! copula families.
   optional::optional<std::string> selection_criterion;
 
   //! A vector of weights for the observations.
   optional::optional<Eigen::VectorXd> weights;
 
-  //! Only for `selection_criterion = "mbic"`, prior probability of non-independence.
+  //! Only for `selection_criterion = "mbic"`, prior probability of
+  //! non-independence.
   optional::optional<double> psi0;
 
-  //! Whether to exclude families before fitting based on symmetry properties of the data.
+  //! Whether to exclude families before fitting based on symmetry properties of
+  //! the data.
   optional::optional<bool> preselect_families;
 
   //! Whether to allow rotations for the families when doing model selection.
   optional::optional<bool> allow_rotations;
 
-  //! Number of concurrent threads to use while fitting pair copulas within a tree; 
-  //! never uses more than the number of concurrent threads supported by the implementation.
+  //! Number of concurrent threads to use while fitting pair copulas within a
+  //! tree; never uses more than the number of concurrent threads supported by
+  //! the implementation.
   optional::optional<size_t> num_threads;
 
   //! Truncation level for truncated vines.
   optional::optional<size_t> trunc_lvl;
 
-  //! The criterion for selecting the spanning tree (`"tau"`, `"hoeffd"`, `"rho"`, and `"mcor"` implemented so far)
-  //! during the tree-wise structure selection.
+  //! The criterion for selecting the spanning tree (`"tau"`, `"hoeffd"`,
+  //! `"rho"`, and `"mcor"` implemented so far) during the tree-wise structure
+  //! selection.
   optional::optional<std::string> tree_criterion;
 
   //! For thresholded vines (0 = no threshold).
@@ -80,14 +87,16 @@ struct FitControlsConfig
   //! Whether the truncation shall be selected automatically.
   optional::optional<bool> select_trunc_lvl;
 
-  //! Whether the families shall be selected automatically, or should the method simply 
-  //! update the parameters for the pair copulas already present in the model.
+  //! Whether the families shall be selected automatically, or should the method
+  //! simply update the parameters for the pair copulas already present in the
+  //! model.
   optional::optional<bool> select_families;
 
   //! Whether to show a trace of the building progress.
   optional::optional<bool> show_trace;
 
-  //! The algorithm for building the spanning tree (`"mst_prim"`, `"mst_kruskal"`, `"random_weighted"`, or
+  //! The algorithm for building the spanning tree (`"mst_prim"`,
+  //! `"mst_kruskal"`, `"random_weighted"`, or
   //! `"random_unweighted"`) during the tree-wise structure selection.
   //! `"mst_prim"` and `"mst_kruskal"` use Prim's and Kruskal's algorithms
   //! respectively to select the maximum spanning tree, maximizing
@@ -99,7 +108,8 @@ struct FitControlsConfig
   optional::optional<std::string> tree_algorithm;
 
   //! A vector of random seeds for the random number generator
-  //! for parts of the algorithm that are randomized (e.g., random tree selection).
+  //! for parts of the algorithm that are randomized (e.g., random tree
+  //! selection).
   optional::optional<std::vector<int>> seeds;
 
   // Default constructor
@@ -109,9 +119,10 @@ struct FitControlsConfig
   static FitControlsConfig bicop_defaults();
   static FitControlsConfig vinecop_defaults();
 
-  // Static factory methods from deprecated classes (defined after the full types are available)
-  // static FitControlsConfig from_bicop(const FitControlsBicop& controls);
-  // static FitControlsConfig from_vinecop(const FitControlsVinecop& controls);
+  // Static factory methods from deprecated classes (defined after the full
+  // types are available) static FitControlsConfig from_bicop(const
+  // FitControlsBicop& controls); static FitControlsConfig from_vinecop(const
+  // FitControlsVinecop& controls);
 
   // Validation methods - called internally when using the shim classes
   void validate_and_set_defaults();

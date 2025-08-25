@@ -216,16 +216,16 @@ ParBicop::check_parameters_size(const Eigen::MatrixXd& parameters)
   if (parameters.size() != parameters_.size()) {
     if (parameters.rows() != parameters_.rows()) {
       std::stringstream message;
-      message << "parameters have has wrong number of rows "
-              << "for " << get_family_name() << " copula; "
+      message << "parameters have has wrong number of rows " << "for "
+              << get_family_name() << " copula; "
               << "expected: " << parameters_.rows() << ", "
               << "actual: " << parameters.rows() << std::endl;
       throw std::runtime_error(message.str().c_str());
     }
     if (parameters.cols() != parameters_.cols()) {
       std::stringstream message;
-      message << "parameters have wrong number of columns "
-              << "for " << get_family_name() << " copula; "
+      message << "parameters have wrong number of columns " << "for "
+              << get_family_name() << " copula; "
               << "expected: " << parameters_.cols() << ", "
               << "actual: " << parameters.cols() << std::endl;
       throw std::runtime_error(message.str().c_str());
@@ -239,8 +239,8 @@ ParBicop::check_parameters_lower(const Eigen::MatrixXd& parameters)
   if (parameters_lower_bounds_.size() > 0) {
     std::stringstream message;
     if ((parameters.array() < parameters_lower_bounds_.array()).any()) {
-      message << "parameters exceed lower bound "
-              << "for " << get_family_name() << " copula; " << std::endl
+      message << "parameters exceed lower bound " << "for " << get_family_name()
+              << " copula; " << std::endl
               << "bound:" << std::endl
               << parameters_lower_bounds_ << std::endl
               << "actual:" << std::endl
@@ -256,8 +256,8 @@ ParBicop::check_parameters_upper(const Eigen::MatrixXd& parameters)
   if (parameters_upper_bounds_.size() > 0) {
     std::stringstream message;
     if ((parameters.array() > parameters_upper_bounds_.array()).any()) {
-      message << "parameters exceed upper bound "
-              << "for " << get_family_name() << " copula; " << std::endl
+      message << "parameters exceed upper bound " << "for " << get_family_name()
+              << " copula; " << std::endl
               << "bound:" << std::endl
               << parameters_upper_bounds_ << std::endl
               << "actual:" << std::endl
