@@ -18,29 +18,34 @@ class FitControlsBicop
 {
 public:
   // Constructor
-  FitControlsBicop(std::vector<BicopFamily> family_set = bicop_families::all,
-                   std::string parametric_method = "mle",
-                   std::string nonparametric_method = "constant",
-                   double nonparametric_mult = 1.0,
-                   size_t nonparametric_grid_size = 30,
-                   std::string selection_criterion = "aic",
-                   const Eigen::VectorXd& weights = Eigen::VectorXd(),
-                   double psi0 = 0.9,
-                   bool preselect_families = true,
-                   bool allow_rotations = true,
-                   size_t num_threads = 1);
+  [[deprecated("Use FitControls instead")]]
+  FitControlsBicop(
+    std::vector<BicopFamily> family_set = bicop_families::all,
+    std::string parametric_method = "mle",
+    std::string nonparametric_method = "constant",
+    double nonparametric_mult = 1.0,
+    size_t nonparametric_grid_size = 30,
+    std::string selection_criterion = "aic",
+    const Eigen::VectorXd& weights = Eigen::VectorXd(),
+    double psi0 = 0.9,
+    bool preselect_families = true,
+    bool allow_rotations = true,
+    size_t num_threads = 1
+  );
 
+  [[deprecated("Use FitControls instead")]]
   explicit FitControlsBicop(std::string parametric_method);
 
+  [[deprecated("Use FitControls instead")]]
   explicit FitControlsBicop(std::string nonparametric_method,
                             double nonparametric_mult = 1.0,
                             size_t nonparametric_grid_size = 30);
 
-  explicit FitControlsBicop(const FitControlsConfig& config);
+  [[deprecated("Use FitControls instead")]]
+  explicit FitControlsBicop(const FitControls& controls);
 
   // Getters
   std::vector<BicopFamily> get_family_set() const;
-
   std::string get_parametric_method() const;
 
   std::string get_nonparametric_method() const;
@@ -60,6 +65,8 @@ public:
   size_t get_num_threads() const;
 
   bool get_allow_rotations() const;
+
+  FitControls get_controls() const;
 
   // Setters
   void set_family_set(std::vector<BicopFamily> family_set);
@@ -89,33 +96,7 @@ public:
 
 protected:
   std::string str_internal(bool print_threads = true) const;
-
-private:
-  std::vector<BicopFamily> family_set_;
-  std::string parametric_method_;
-  std::string nonparametric_method_;
-  double nonparametric_mult_;
-  size_t nonparametric_grid_size_;
-  std::string selection_criterion_;
-  Eigen::VectorXd weights_;
-  bool preselect_families_;
-  double psi0_;
-  size_t num_threads_;
-  bool allow_rotations_;
-
-  void check_parametric_method(std::string parametric_method);
-
-  void check_nonparametric_method(std::string nonparametric_method);
-
-  void check_nonparametric_mult(double nonparametric_mult);
-
-  void check_nonparametric_grid_size(size_t nonparametric_grid_size);
-
-  void check_selection_criterion(std::string selection_criterion);
-
-  void check_psi0(double psi0);
-
-  size_t process_num_threads(size_t num_threads);
+  FitControls controls_;
 };
 }
 

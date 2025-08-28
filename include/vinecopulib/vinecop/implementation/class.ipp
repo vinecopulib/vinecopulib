@@ -113,11 +113,11 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
-//! @param controls See `FitControlsConfig()`.
+//! @param controls See `FitControls()`.
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                         const RVineStructure& structure,
                         const std::vector<std::string>& var_types,
-                        const FitControlsConfig& controls)
+                        const FitControls& controls)
 {
   check_enough_data(data);
   if (structure.get_dim() > 1) {
@@ -176,12 +176,12 @@ inline Vinecop::Vinecop(
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
-//! @param controls See `FitControlsConfig()`.
+//! @param controls See `FitControls()`.
 inline Vinecop::Vinecop(
   const Eigen::MatrixXd& data,
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
   const std::vector<std::string>& var_types,
-  const FitControlsConfig& controls)
+  const FitControls& controls)
   : Vinecop(data, RVineStructure(matrix), var_types, controls)
 {
 }
@@ -378,17 +378,13 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //!
 //! @brief Selects the best fitting vine copula model (deprecated).
 //!
-//! @deprecated Use select(data, FitControlsConfig) instead.
-//! @param data See select(data, FitControlsConfig).
+//! @deprecated Use select(data, FitControls) instead.
+//! @param data See select(data, FitControls).
 //! @param controls The controls (see `FitControlsVinecop`).
 inline void
 Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 {
-  // Delegate to modern implementation
-  // For now, use the base FitControlsBicop config() - this loses
-  // vinecop-specific settings but allows compilation. A proper solution would
-  // need a vinecop-specific config() method.
-  select(data, static_cast<const FitControlsBicop&>(controls).config());
+  select(data, controls.get_controls());
 }
 
 //! @brief Selects the best fitting vine copula model.
@@ -401,11 +397,12 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls to the algorithm (see `FitControlsConfig()`).
+//! @param controls The controls to the algorithm (see `FitControls()`).
 inline void
-Vinecop::select(const Eigen::MatrixXd& data, const FitControlsConfig& controls)
+Vinecop::select(const Eigen::MatrixXd& data, FitControls& controls)
 {
-  if (controls.select_families.value_or(true)) {
+  controls.validate_and_set_defaults_vinecop();
+  if (controls.select_families.value()) {
     check_data(data);
     if (d_ == 1) {
       loglik_ = 0;
@@ -414,42 +411,19 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsConfig& controls)
     }
     Eigen::MatrixXd u = collapse_data(data);
 
-    // Convert to shim for VinecopSelector which still expects
-    // FitControlsVinecop
-    FitControlsVinecop legacy_controls(controls);
     tools_select::VinecopSelector selector(
-      u, rvine_structure_, legacy_controls, var_types_);
-    if (legacy_controls.needs_sparse_select()) {
+      u, rvine_structure_, controls, var_types_);
+    if (controls.needs_sparse_select()) {
       selector.sparse_select_all_trees(u);
     } else {
       selector.select_all_trees(u);
     }
     finalize_fit(selector);
   } else {
-    // Convert to FitControlsBicop for legacy fit method
-    FitControlsBicop bicop_controls;
-    if (controls.parametric_method) {
-      bicop_controls.set_parametric_method(controls.parametric_method.value());
-    }
-    if (controls.nonparametric_method) {
-      bicop_controls.set_nonparametric_method(
-        controls.nonparametric_method.value());
-    }
-    if (controls.nonparametric_mult) {
-      bicop_controls.set_nonparametric_mult(
-        controls.nonparametric_mult.value());
-    }
-    if (controls.nonparametric_grid_size) {
-      bicop_controls.set_nonparametric_grid_size(
-        controls.nonparametric_grid_size.value());
-    }
-    if (controls.weights) {
-      bicop_controls.set_weights(controls.weights.value());
-    }
-
-    fit(data, bicop_controls, controls.num_threads.value_or(1));
+    fit(data, controls);
   }
 }
+
 
 //! @brief Fits the parameters of a pre-specified vine copula model.
 //!
@@ -457,19 +431,19 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsConfig& controls)
 //! assumed that the structure  and pair-copula families are already set.
 //! The method is equivalent to calling `fit()` for each pair-copula in the
 //! model. The same can be achieved by calling `select()` with the same data
-//! and a `FitControlsVinecop` object instantiated
+//! and a `FitControls` object instantiated
 //! with `select_families = false`.
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls for each bivariate fit (see
-//! `FitControlsBicop()`).
-//! @param num_threads The number of threads to use for parallel computation.
+//! `FitControls()`).
 inline void
 Vinecop::fit(const Eigen::MatrixXd& data,
-             const FitControlsBicop& controls,
-             const size_t num_threads)
+             FitControls& controls)
 {
+  controls.validate_and_set_defaults_vinecop();
+  auto num_threads = controls.num_threads.value();
   check_data(data);
   auto u = collapse_data(data);
 
@@ -563,177 +537,6 @@ Vinecop::fit(const Eigen::MatrixXd& data,
       loglik_ += pair_copulas_[tree][edge].get_loglik();
     }
   }
-}
-
-//! @brief Fits the parameters of a pre-specified vine copula model.
-//!
-//! @details This method fits the pair-copulas of a vine copula model. It is
-//! assumed that the structure  and pair-copula families are already set.
-//! The method is equivalent to calling `fit()` for each pair-copula in the
-//! model. The same can be achieved by calling `select()` with the same data
-//! and a `FitControlsConfig` object instantiated
-//! with `select_families = false`.
-//!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
-//!   observations, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls for each bivariate fit (see
-//! `FitControlsConfig()`).
-//! @param num_threads The number of threads to use for parallel computation.
-inline void
-Vinecop::fit(const Eigen::MatrixXd& data,
-             const FitControlsConfig& controls,
-             const size_t num_threads)
-{
-  check_data(data);
-  auto u = collapse_data(data);
-
-  // info about the vine structure (reverse rows (!) for more natural indexing)
-  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
-  if (trunc_lvl == 0)
-    return;
-
-  auto order = rvine_structure_.get_order();
-  auto disc_cols = tools_select::get_disc_cols(var_types_);
-  size_t n = u.rows();
-
-  // temporary storage objects (all data must be in (0, 1))
-  Eigen::MatrixXd hfunc1, hfunc2, hfunc1_sub, hfunc2_sub;
-  hfunc1 = Eigen::MatrixXd::Zero(n, d_);
-  hfunc2 = Eigen::MatrixXd::Zero(n, d_);
-  if (get_n_discrete() > 0) {
-    hfunc1_sub = hfunc1;
-    hfunc2_sub = hfunc2;
-  }
-
-  // set up thread pool
-  tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
-
-  // fill first row of hfunc2 matrix with observed data;
-  // points have to be reordered to correspond to natural order
-  for (size_t j = 0; j < d_; ++j) {
-    hfunc2.col(j) = u.col(order[j] - 1);
-    if (var_types_[order[j] - 1] == "d") {
-      hfunc2_sub.col(j) = u.col(d_ + disc_cols[order[j] - 1]);
-    }
-  }
-
-  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-    tools_interface::check_user_interrupt();
-    auto fit_edge = [&](size_t edge) {
-      tools_interface::check_user_interrupt(edge % 5 == 0);
-      // extract evaluation point from hfunction matrices (have been
-      // computed in previous tree level)
-      Bicop* edge_copula = &pair_copulas_[tree][edge];
-      auto var_types = edge_copula->get_var_types();
-      size_t m = rvine_structure_.min_array(tree, edge);
-
-      auto u_e = Eigen::MatrixXd(n, 2), u_e_sub = Eigen::MatrixXd(n, 2);
-      u_e.col(0) = hfunc2.col(edge);
-      if (m == rvine_structure_.struct_array(tree, edge, true)) {
-        u_e.col(1) = hfunc2.col(m - 1);
-      } else {
-        u_e.col(1) = hfunc1.col(m - 1);
-      }
-
-      if ((var_types[0] == "d") || (var_types[1] == "d")) {
-        u_e.conservativeResize(n, 4);
-        u_e.col(2) = hfunc2_sub.col(edge);
-        if (m == rvine_structure_.struct_array(tree, edge, true)) {
-          u_e.col(3) = hfunc2_sub.col(m - 1);
-        } else {
-          u_e.col(3) = hfunc1_sub.col(m - 1);
-        }
-      }
-
-      edge_copula->fit(u_e, controls);
-
-      // h-functions are only evaluated if needed in next tree
-      if (rvine_structure_.needed_hfunc1(tree, edge)) {
-        hfunc1.col(edge) = edge_copula->hfunc1(u_e);
-        if (var_types[1] == "d") {
-          u_e_sub = u_e;
-          u_e_sub.col(1) = u_e.col(3);
-          hfunc1_sub.col(edge) = edge_copula->hfunc1(u_e_sub);
-        }
-      }
-      if (rvine_structure_.needed_hfunc2(tree, edge)) {
-        hfunc2.col(edge) = edge_copula->hfunc2(u_e);
-        if (var_types[0] == "d") {
-          u_e_sub = u_e;
-          u_e_sub.col(0) = u_e.col(2);
-          hfunc2_sub.col(edge) = edge_copula->hfunc2(u_e_sub);
-        }
-      }
-    };
-
-    pool.map(fit_edge, tools_stl::seq_int(0, d_ - tree - 1));
-    pool.wait();
-  }
-  pool.join();
-
-  loglik_ = 0, nobs_ = n;
-  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-    for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
-      loglik_ += pair_copulas_[tree][edge].get_loglik();
-    }
-  }
-}
-
-//! @brief Automatically fits and selects a vine copula model.
-//!
-//! Selection of the structure is performed using the algorithm of
-//! Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013).
-//! *Selecting and estimating regular vine copulae and application to
-//! financial returns.* Computational Statistics & Data Analysis, 59 (1),
-//! 52-69.
-//!
-//! @details When at least one variable is discrete, two types of "observations"
-//! are required: the first \f$ n \times d \f$ block contains realizations of
-//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
-//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
-//! left-sided limit of the cdf. For continuous variables the left limit and the
-//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
-//! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
-//! be omitted.
-//!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
-//!   observations, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls to the algorithm (see `FitControlsVinecop()`).
-inline void
-Vinecop::select_all(const Eigen::MatrixXd& data,
-                    const FitControlsVinecop& controls)
-{
-  rvine_structure_ = RVineStructure(d_, static_cast<size_t>(0));
-  select(data, controls);
-}
-
-//! @brief Automatically selects all pair-copula families and fits all.
-//! parameters.
-//!
-//!
-//! @details When at least one variable is discrete, two types of "observations"
-//! are required: the first \f$ n \times d \f$ block contains realizations of
-//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
-//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
-//! left-sided limit of the cdf. For continuous variables the left limit and the
-//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
-//! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
-//! be omitted.
-//!
-//! If there are missing data (i.e., NaN entries), incomplete observations are
-//! discarded before fitting a pair-copula. This is done on a pair-by-pair basis
-//! so that the maximal available information is used.
-//!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
-//!   observations, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls to the algorithm (see `FitControlsVinecop()`).
-inline void
-Vinecop::select_families(const Eigen::MatrixXd& data,
-                         const FitControlsVinecop& controls)
-{
-  auto controls_trunc_lvl = controls;
-  controls_trunc_lvl.set_trunc_lvl(rvine_structure_.get_trunc_lvl());
-  select(data, controls);
 }
 
 //! @name Getters and setters
@@ -1874,7 +1677,7 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
 //! If the problem is too large, it is split recursively into halves (w.r.t.
 //! \f$ n \f$, the number of observations).
 //! "Too large" means that the required memory will exceed 1 GB. An
-//! examplary configuration requiring less than 1 GB is \f$ n = 1000 \f$,
+//! examplary controls requiring less than 1 GB is \f$ n = 1000 \f$,
 //! \f$ d = 200\f$.
 //!
 //! The Rosenblatt transform (Rosenblatt, 1952) \f$ U = T(V) \f$ of a random

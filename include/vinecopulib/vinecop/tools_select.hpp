@@ -90,12 +90,12 @@ class VinecopSelector
 {
 public:
   VinecopSelector(const Eigen::MatrixXd& data,
-                  const FitControlsVinecop& controls,
+                  const FitControls& controls,
                   std::vector<std::string> var_types);
 
   VinecopSelector(const Eigen::MatrixXd& data,
                   const RVineStructure& vine_struct,
-                  const FitControlsVinecop& controls,
+                  const FitControls& controls,
                   std::vector<std::string> var_types);
 
   virtual ~VinecopSelector() = default;
@@ -161,7 +161,7 @@ protected:
   size_t d_;
   bool structure_unknown_{ true };
   std::vector<std::string> var_types_;
-  FitControlsVinecop controls_;
+  FitControls controls_;
   tools_thread::ThreadPool pool_;
   std::vector<VineTree> trees_;
   RVineStructure vine_struct_;
@@ -170,7 +170,9 @@ protected:
   std::vector<VineTree> trees_opt_;
   double loglik_;
   double threshold_;
-  double psi0_; // initial prior probability for mbicv
+  double psi0_; // initial prior probability for 
+  // for random stuff
+  boost::random::mt19937 rng_;
 
   double get_next_threshold(std::vector<double>& thresholded_crits);
 

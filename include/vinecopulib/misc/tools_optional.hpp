@@ -14,34 +14,6 @@ namespace optional {
 template<typename T>
 using optional = std::optional<T>;
 
-template<typename T>
-bool
-has_value(const optional<T>& opt)
-{
-  return opt.has_value();
-}
-
-template<typename T>
-T&
-value(optional<T>& opt)
-{
-  return opt.value();
-}
-
-template<typename T>
-const T&
-value(const optional<T>& opt)
-{
-  return opt.value();
-}
-
-template<typename T>
-T
-value_or(const optional<T>& opt, const T& default_value)
-{
-  return opt.value_or(default_value);
-}
-
 } // namespace optional
 } // namespace vinecopulib
 #else
@@ -51,34 +23,6 @@ namespace optional {
 
 template<typename T>
 using optional = boost::optional<T>;
-
-template<typename T>
-bool
-has_value(const optional<T>& opt)
-{
-  return static_cast<bool>(opt);
-}
-
-template<typename T>
-T&
-value(optional<T>& opt)
-{
-  return opt.get();
-}
-
-template<typename T>
-const T&
-value(const optional<T>& opt)
-{
-  return opt.get();
-}
-
-template<typename T>
-T
-value_or(const optional<T>& opt, const T& default_value)
-{
-  return opt ? opt.get() : default_value;
-}
 
 } // namespace optional
 } // namespace vinecopulib

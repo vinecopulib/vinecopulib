@@ -14,16 +14,17 @@ namespace tools_select {
 //! association direction.
 //! @param data Captured by reference to avoid data copies;
 //!     should NOT be modified though.
+//! @param controls The controls (see `FitControls`).
 inline std::vector<Bicop>
 create_candidate_bicops(const Eigen::MatrixXd& data,
-                        const FitControlsBicop& controls)
+                        const FitControls& controls)
 {
   std::vector<BicopFamily> families = get_candidate_families(controls);
 
   // check whether dependence is negative or positive
-  double tau = wdm::wdm(data.leftCols(2), "tau", controls.get_weights())(0, 1);
+  double tau = wdm::wdm(data.leftCols(2), "tau", controls.weights.value())(0, 1);
   std::vector<int> which_rotations;
-  if (controls.get_allow_rotations()) {
+  if (controls.allow_rotations.value()) {
     if (tau > 0) {
       which_rotations = { 0, 180 };
     } else {
@@ -37,7 +38,7 @@ create_candidate_bicops(const Eigen::MatrixXd& data,
     if (tools_stl::is_member(fam, bicop_families::rotationless)) {
       new_bicops.push_back(Bicop(fam, 0));
     } else {
-      if (controls.get_allow_rotations()) {
+      if (controls.allow_rotations.value()) {
         new_bicops.push_back(Bicop(fam, which_rotations[0]));
         new_bicops.push_back(Bicop(fam, which_rotations[1]));
       } else if (tau > 0) {
@@ -47,28 +48,28 @@ create_candidate_bicops(const Eigen::MatrixXd& data,
   }
 
   // remove combinations based on symmetry characteristics
-  if (controls.get_preselect_families()) {
+  if (controls.preselect_families.value()) {
     preselect_candidates(
-      new_bicops, data.leftCols(2), tau, controls.get_weights());
+      new_bicops, data.leftCols(2), tau, controls.weights.value());
   }
 
   return new_bicops;
 }
 
 inline std::vector<BicopFamily>
-get_candidate_families(const FitControlsBicop& controls)
+get_candidate_families(const FitControls& controls)
 {
   //! adjusts the family_set according to parameteric_method.
-  std::vector<BicopFamily> family_set = controls.get_family_set();
+  std::vector<BicopFamily> family_set = controls.family_set.value();
   if (family_set.empty()) {
     // use all (allowed) families
-    if (controls.get_parametric_method() == "itau") {
+    if (controls.parametric_method.value() == "itau") {
       family_set = bicop_families::itau;
     } else {
       family_set = bicop_families::all;
     }
   } else {
-    if (controls.get_parametric_method() == "itau") {
+    if (controls.parametric_method.value() == "itau") {
       family_set = tools_stl::intersect(family_set, bicop_families::itau);
       if (family_set.empty()) {
         throw std::runtime_error("No family with method itau provided");

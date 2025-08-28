@@ -92,7 +92,7 @@ TEST(bicop_sanity_checks, controls_checks)
   EXPECT_ANY_THROW(controls.set_psi0(1.0));
 }
 
-TEST(bicop_sanity_checks, fit_controls_config_works)
+TEST(bicop_sanity_checks, fit_controls_controls_works)
 {
   // Some non-default controls for testing
   FitControlsBicop controls;
@@ -108,22 +108,22 @@ TEST(bicop_sanity_checks, fit_controls_config_works)
   controls.set_allow_rotations(false);
   // can't use non-default num_threads in CI
 
-  // Create a config object from the controls
-  FitControlsConfig config;
-  config.family_set = controls.get_family_set();
-  config.parametric_method = controls.get_parametric_method();
-  config.nonparametric_method = controls.get_nonparametric_method();
-  config.nonparametric_mult = controls.get_nonparametric_mult();
-  config.nonparametric_grid_size = controls.get_nonparametric_grid_size();
-  config.selection_criterion = controls.get_selection_criterion();
-  config.weights = controls.get_weights();
-  config.psi0 = controls.get_psi0();
-  config.preselect_families = controls.get_preselect_families();
-  config.allow_rotations = controls.get_allow_rotations();
-  config.num_threads = controls.get_num_threads();
+  // Create a controls object from the controls
+  FitControls controls;
+  controls.family_set = controls.get_family_set();
+  controls.parametric_method = controls.get_parametric_method();
+  controls.nonparametric_method = controls.get_nonparametric_method();
+  controls.nonparametric_mult = controls.get_nonparametric_mult();
+  controls.nonparametric_grid_size = controls.get_nonparametric_grid_size();
+  controls.selection_criterion = controls.get_selection_criterion();
+  controls.weights = controls.get_weights();
+  controls.psi0 = controls.get_psi0();
+  controls.preselect_families = controls.get_preselect_families();
+  controls.allow_rotations = controls.get_allow_rotations();
+  controls.num_threads = controls.get_num_threads();
 
-  // Create and test new controls from the config object
-  FitControlsBicop controls2(config);
+  // Create and test new controls from the controls object
+  FitControlsBicop controls2(controls);
   EXPECT_EQ(controls.get_family_set(), controls2.get_family_set());
   EXPECT_EQ(controls.get_parametric_method(),
             controls2.get_parametric_method());

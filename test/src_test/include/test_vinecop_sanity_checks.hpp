@@ -58,7 +58,7 @@ TEST(vinecop_sanity_checks, controls_print)
   EXPECT_NO_THROW(controls.str());
 }
 
-TEST(vinecop_sanity_checks, fit_controls_config_works)
+TEST(vinecop_sanity_checks, fit_controls_controls_works)
 {
   // Some controls for testing
   // Only the non FitControlsBicop fields are tested here
@@ -74,21 +74,21 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
   std::vector<int> seeds = { 1, 2, 3, 4, 5 };
   controls.set_seeds(seeds);
 
-  // Create a config object from the controls
-  FitControlsConfig config;
-  config.trunc_lvl = controls.get_trunc_lvl();
-  config.tree_criterion = controls.get_tree_criterion();
-  config.threshold = controls.get_threshold();
-  config.select_threshold = controls.get_select_threshold();
-  config.select_trunc_lvl = controls.get_select_trunc_lvl();
-  config.select_families = controls.get_select_families();
-  config.show_trace = controls.get_show_trace();
-  config.num_threads = controls.get_num_threads();
-  config.tree_algorithm = controls.get_tree_algorithm();
-  config.seeds = controls.get_seeds();
+  // Create a controls object from the controls
+  FitControls controls;
+  controls.trunc_lvl = controls.get_trunc_lvl();
+  controls.tree_criterion = controls.get_tree_criterion();
+  controls.threshold = controls.get_threshold();
+  controls.select_threshold = controls.get_select_threshold();
+  controls.select_trunc_lvl = controls.get_select_trunc_lvl();
+  controls.select_families = controls.get_select_families();
+  controls.show_trace = controls.get_show_trace();
+  controls.num_threads = controls.get_num_threads();
+  controls.tree_algorithm = controls.get_tree_algorithm();
+  controls.seeds = controls.get_seeds();
 
-  // Create and test new controls from the config object
-  FitControlsVinecop controls2(config);
+  // Create and test new controls from the controls object
+  FitControlsVinecop controls2(controls);
   EXPECT_EQ(controls.get_trunc_lvl(), controls2.get_trunc_lvl());
   EXPECT_EQ(controls.get_tree_criterion(), controls2.get_tree_criterion());
   EXPECT_EQ(controls.get_threshold(), controls2.get_threshold());

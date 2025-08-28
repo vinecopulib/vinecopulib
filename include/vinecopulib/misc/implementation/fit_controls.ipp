@@ -5,6 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <limits>
+#include <random>
 #include <stdexcept>
 #include <thread>
 #include <vinecopulib/bicop/family.hpp>
@@ -12,252 +13,224 @@
 
 namespace vinecopulib {
 
-//! @brief Creates default configuration for bivariate copula models.
-inline FitControlsConfig
-FitControlsConfig::bicop_defaults()
+// A dummy checker that does nothing.
+#define NO_CHECK(x) ((void)0)
+
+// Bicop fields (field, default, checker)
+#define BICOP_FIELDS                                                           \
+  X(family_set, bicop_families::all, check_family_set)                         \
+  X(parametric_method, "mle", check_parametric_method)                         \
+  X(nonparametric_method, "constant", check_nonparametric_method)              \
+  X(nonparametric_mult, 1.0, check_nonparametric_mult)                         \
+  X(nonparametric_grid_size, 30, check_nonparametric_grid_size)                \
+  X(selection_criterion, "aic", check_selection_criterion)                     \
+  X(psi0, 0.9, check_psi0)                                                     \
+  X(preselect_families, true, NO_CHECK)                                        \
+  X(allow_rotations, true, NO_CHECK)                                           \
+  X(num_threads, 1, NO_CHECK)                                                  \
+  X(weights, Eigen::VectorXd(), NO_CHECK)
+
+// Vine-only fields (field, default, checker)
+#define VINECOP_FIELDS                                                         \
+  X(trunc_lvl, std::numeric_limits<size_t>::max(), NO_CHECK)                   \
+  X(tree_criterion, "tau", check_tree_criterion)                               \
+  X(threshold, 0.0, check_threshold)                                           \
+  X(select_trunc_lvl, false, NO_CHECK)                                         \
+  X(select_threshold, false, NO_CHECK)                                         \
+  X(select_families, true, NO_CHECK)                                           \
+  X(show_trace, false, NO_CHECK)                                               \
+  X(tree_algorithm, "mst_prim", check_tree_algorithm)                          \
+  X(seeds, std::vector<int>(), NO_CHECK)
+
+//! @brief Creates default controls for bivariate copula models.
+inline FitControls
+FitControls::defaults_bicop()
 {
-  FitControlsConfig config;
-  config.family_set = bicop_families::all;
-  config.parametric_method = "mle";
-  config.nonparametric_method = "constant";
-  config.nonparametric_mult = 1.0;
-  config.nonparametric_grid_size = 30;
-  config.selection_criterion = "aic";
-  config.weights = Eigen::VectorXd();
-  config.psi0 = 0.9;
-  config.preselect_families = true;
-  config.allow_rotations = true;
-  config.num_threads = 1;
-  return config;
+  FitControls controls;
+#define X(field, default, check) controls.field = default;
+  BICOP_FIELDS
+#undef X
+  return controls;
 }
 
-//! @brief Creates default configuration for vine copula models.
-inline FitControlsConfig
-FitControlsConfig::vinecop_defaults()
+//! @brief Creates default controls for vine copula models.
+inline FitControls
+FitControls::defaults_vinecop()
 {
-  FitControlsConfig config = bicop_defaults(); // Start with bicop defaults
+  FitControls controls;
+#define X(field, default, check) controls.field = default;
+  BICOP_FIELDS
+  VINECOP_FIELDS
+#undef X
+  return controls;
+}
 
-  // Add vine-specific defaults
-  config.trunc_lvl = std::numeric_limits<size_t>::max();
-  config.tree_criterion = "tau";
-  config.threshold = 0.0;
-  config.select_trunc_lvl = false;
-  config.select_threshold = false;
-  config.select_families = true;
-  config.show_trace = false;
-  config.tree_algorithm = "mst_prim";
-  config.seeds = std::vector<int>();
+//! @brief Validates and applies defaults for unset values for Bicop
+inline void
+FitControls::validate_and_set_defaults_bicop()
+{
+  // Start with defaults
+  const auto defaults = defaults_bicop();
 
-  return config;
+// Overlay
+#define X(field, fallback, check) field = field.value_or(fallback);
+  BICOP_FIELDS
+#undef X
+
+// Checks
+#define X(field, fallback, check) check(field.value());
+  BICOP_FIELDS
+#undef X
+
+  // Post-processing
+  num_threads = process_num_threads(num_threads.value());
+
+  // Normalize weights if provided
+  if (weights.has_value() && weights.value().size() > 0) {
+    auto w = weights.value();
+    weights = w / w.sum() * w.size();
+  }
 }
 
 //! @brief Validates all set values and applies defaults for unset values.
 inline void
-FitControlsConfig::validate_and_set_defaults()
+FitControls::validate_and_set_defaults_vinecop()
 {
-  // Apply defaults for unset values, then validate
-  if (!optional::has_value(family_set)) {
-    family_set = bicop_families::all;
-  }
+  // Overlay bicop + vine fields
+#define X(field, fallback, check) field = field.value_or(fallback);
+  BICOP_FIELDS
+  VINECOP_FIELDS
+#undef X
 
-  if (!optional::has_value(parametric_method)) {
-    parametric_method = "mle";
-  }
-  check_parametric_method();
+// Checks bicop + vine
+#define X(field, fallback, check) check(field.value());
+  BICOP_FIELDS
+  VINECOP_FIELDS
+#undef X
 
-  if (!optional::has_value(nonparametric_method)) {
-    nonparametric_method = "constant";
-  }
-  check_nonparametric_method();
-
-  if (!optional::has_value(nonparametric_mult)) {
-    nonparametric_mult = 1.0;
-  }
-  check_nonparametric_mult();
-
-  if (!optional::has_value(nonparametric_grid_size)) {
-    nonparametric_grid_size = 30;
-  }
-  check_nonparametric_grid_size();
-
-  if (!optional::has_value(selection_criterion)) {
-    selection_criterion = "aic";
-  }
-  check_selection_criterion();
-
-  if (!optional::has_value(weights)) {
-    weights = Eigen::VectorXd();
-  }
-
-  if (!optional::has_value(psi0)) {
-    psi0 = 0.9;
-  }
-  check_psi0();
-
-  if (!optional::has_value(preselect_families)) {
-    preselect_families = true;
-  }
-
-  if (!optional::has_value(allow_rotations)) {
-    allow_rotations = true;
-  }
-
-  if (!optional::has_value(num_threads)) {
-    num_threads = 1;
-  }
-  // Process num_threads (validation and adjustment)
-  num_threads = process_num_threads(optional::value(num_threads));
-
-  // Vine-specific defaults and validation
-  if (!optional::has_value(trunc_lvl)) {
-    trunc_lvl = std::numeric_limits<size_t>::max();
-  }
-
-  if (!optional::has_value(tree_criterion)) {
-    tree_criterion = "tau";
-  }
-  check_tree_criterion();
-
-  if (!optional::has_value(threshold)) {
-    threshold = 0.0;
-  }
-  check_threshold();
-
-  if (!optional::has_value(select_trunc_lvl)) {
-    select_trunc_lvl = false;
-  }
-
-  if (!optional::has_value(select_threshold)) {
-    select_threshold = false;
-  }
-
-  if (!optional::has_value(select_families)) {
-    select_families = true;
-  }
-
-  if (!optional::has_value(show_trace)) {
-    show_trace = false;
-  }
-
-  if (!optional::has_value(tree_algorithm)) {
-    tree_algorithm = "mst_prim";
-  }
-
-  if (!optional::has_value(seeds)) {
-    seeds = std::vector<int>();
-  }
-
-  // Normalize weights if provided
-  if (optional::has_value(weights) && optional::value(weights).size() > 0) {
-    auto w = optional::value(weights);
+  // Post-processing (same as bicop, plus seeds)
+  num_threads = process_num_threads(num_threads.value());
+  if (weights.has_value() && weights.value().size() > 0) {
+    auto w = weights.value();
     weights = w / w.sum() * w.size();
+  }
+
+  // Lazy seed generation
+  if (!seeds || seeds->empty()) {
+    std::random_device rd{};
+    seeds.emplace(20);
+    std::generate(
+      seeds->begin(), seeds->end(), [&] { return static_cast<int>(rd()); });
+  }
+}
+
+//! @brief Validates family set.
+inline void
+FitControls::check_family_set(const std::vector<BicopFamily>& family_set) const
+{
+  // Non empty set
+  if (family_set.size() == 0) {
+    throw std::runtime_error("family_set must not be empty");
   }
 }
 
 //! @brief Validates parametric method.
 inline void
-FitControlsConfig::check_parametric_method() const
+FitControls::check_parametric_method(const std::string& method) const
 {
-  if (optional::has_value(parametric_method)) {
-    const auto& method = optional::value(parametric_method);
-    if (!tools_stl::is_member(method, { "itau", "mle" })) {
-      throw std::runtime_error("parametric_method should be mle or itau");
-    }
+  if (!tools_stl::is_member(method, { "itau", "mle" })) {
+    throw std::runtime_error("parametric_method should be mle or itau");
   }
 }
 
 //! @brief Validates nonparametric method.
 inline void
-FitControlsConfig::check_nonparametric_method() const
+FitControls::check_nonparametric_method(const std::string& method) const
 {
-  if (optional::has_value(nonparametric_method)) {
-    const auto& method = optional::value(nonparametric_method);
-    if (!tools_stl::is_member(method, { "constant", "linear", "quadratic" })) {
-      throw std::runtime_error(
-        "nonparametric_method should be constant, linear or quadratic");
-    }
+  if (!tools_stl::is_member(method, { "constant", "linear", "quadratic" })) {
+    throw std::runtime_error(
+      "nonparametric_method should be constant, linear or quadratic");
   }
 }
 
 //! @brief Validates nonparametric multiplier.
 inline void
-FitControlsConfig::check_nonparametric_mult() const
+FitControls::check_nonparametric_mult(double mult) const
 {
-  if (optional::has_value(nonparametric_mult)) {
-    if (optional::value(nonparametric_mult) <= 0.0) {
-      throw std::runtime_error("nonparametric_mult must be positive");
-    }
+  if (mult <= 0.0) {
+    throw std::runtime_error("nonparametric_mult must be positive");
   }
 }
 
 //! @brief Validates nonparametric grid size.
 inline void
-FitControlsConfig::check_nonparametric_grid_size() const
+FitControls::check_nonparametric_grid_size(size_t grid_size) const
 {
-  if (optional::has_value(nonparametric_grid_size)) {
-    if (optional::value(nonparametric_grid_size) < 3) {
-      throw std::runtime_error("nonparametric_grid_size must be at least 3");
-    }
+  if (grid_size < 3) {
+    throw std::runtime_error("nonparametric_grid_size must be at least 3");
   }
 }
 
 //! @brief Validates selection criterion.
 inline void
-FitControlsConfig::check_selection_criterion() const
+FitControls::check_selection_criterion(const std::string& criterion) const
 {
-  if (optional::has_value(selection_criterion)) {
-    const auto& criterion = optional::value(selection_criterion);
-    std::vector<std::string> allowed_crits = {
-      "loglik", "aic", "bic", "mbic", "mbicv"
-    };
-    if (!tools_stl::is_member(criterion, allowed_crits)) {
-      throw std::runtime_error(
-        "selection_criterion should be 'loglik', 'aic', 'bic', or 'mbic'");
-    }
+  std::vector<std::string> allowed_crits = {
+    "loglik", "aic", "bic", "mbic", "mbicv"
+  };
+  if (!tools_stl::is_member(criterion, allowed_crits)) {
+    throw std::runtime_error(
+      "selection_criterion should be 'loglik', 'aic', 'bic', or 'mbic'");
   }
 }
 
 //! @brief Validates psi0 parameter.
 inline void
-FitControlsConfig::check_psi0() const
+FitControls::check_psi0(double psi0) const
 {
-  if (optional::has_value(psi0)) {
-    const auto& val = optional::value(psi0);
-    if ((val <= 0.0) || (val >= 1.0)) {
-      throw std::runtime_error("psi0 must be in the interval (0, 1)");
-    }
+  if ((psi0 <= 0.0) || (psi0 >= 1.0)) {
+    throw std::runtime_error("psi0 must be in the interval (0, 1)");
   }
 }
 
 //! @brief Validates tree criterion.
 inline void
-FitControlsConfig::check_tree_criterion() const
+FitControls::check_tree_criterion(const std::string& criterion) const
 {
-  if (optional::has_value(tree_criterion)) {
-    const auto& criterion = optional::value(tree_criterion);
-    if (!tools_stl::is_member(criterion,
-                              { "tau", "rho", "joe", "hoeffd", "mcor" })) {
-      throw std::runtime_error("tree_criterion must be one of "
-                               "'tau', 'rho', 'hoeffd', 'mcor', or 'joe'");
-    }
+  if (!tools_stl::is_member(criterion,
+                            { "tau", "rho", "joe", "hoeffd", "mcor" })) {
+    throw std::runtime_error("tree_criterion must be one of "
+                             "'tau', 'rho', 'hoeffd', 'mcor', or 'joe'");
+  }
+}
+
+//! @brief Validates tree algorithm.
+inline void
+FitControls::check_tree_algorithm(const std::string& algorithm) const
+{
+  if (!tools_stl::is_member(algorithm,
+                            { "mst_prim",
+                              "mst_kruskal",
+                              "random_weighted",
+                              "random_unweighted" })) {
+    throw std::runtime_error(
+      "tree_algorithm must be one of 'mst_prim', 'mst_kruskal', "
+      "'random_weighted', or 'random_unweighted'");
   }
 }
 
 //! @brief Validates threshold parameter.
 inline void
-FitControlsConfig::check_threshold() const
+FitControls::check_threshold(double threshold) const
 {
-  if (optional::has_value(threshold)) {
-    const auto& val = optional::value(threshold);
-    if (val < 0 || val > 1) {
-      throw std::runtime_error("threshold should be in [0,1]");
-    }
+  if (threshold < 0 || threshold > 1) {
+    throw std::runtime_error("threshold should be in [0,1]");
   }
 }
 
 //! @brief Processes and validates number of threads.
 inline size_t
-FitControlsConfig::process_num_threads(size_t num_threads) const
+FitControls::process_num_threads(size_t num_threads) const
 {
   // zero threads means everything is done in main thread
   if (num_threads == 1)
@@ -270,14 +243,9 @@ FitControlsConfig::process_num_threads(size_t num_threads) const
   return num_threads;
 }
 
-//! @brief Conversion factory method from FitControlsBicop
-//! This can only be implemented after FitControlsBicop is fully defined
-// inline FitControlsConfig FitControlsConfig::from_bicop(const
-// FitControlsBicop& controls);
-
-//! @brief Conversion factory method from FitControlsVinecop
-//! This can only be implemented after FitControlsVinecop is fully defined
-// inline FitControlsConfig FitControlsConfig::from_vinecop(const
-// FitControlsVinecop& controls);
-
+inline bool
+FitControls::needs_sparse_select() const
+{
+  return select_trunc_lvl.value_or(false) | select_threshold.value_or(false);
+}
 }

@@ -173,60 +173,39 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
   set_seeds(seeds);
 }
 
-//! @brief Instantiates the controls from a configuration object.
-//! @param config The configuration object.
-inline FitControlsVinecop::FitControlsVinecop(const FitControlsConfig& config)
-  : FitControlsBicop(config)
+//! @brief Instantiates the controls from a controls object.
+//! @param controls The controls object.
+inline FitControlsVinecop::FitControlsVinecop(const FitControls& controls)
+  : FitControlsBicop(controls)
 {
-  if (optional::has_value(config.trunc_lvl)) {
-    set_trunc_lvl(optional::value(config.trunc_lvl));
+  if (controls.trunc_lvl.has_value()) {
+    set_trunc_lvl(controls.trunc_lvl.value());
   }
-  if (optional::has_value(config.tree_criterion)) {
-    set_tree_criterion(optional::value(config.tree_criterion));
+  if (controls.tree_criterion.has_value()) {
+    set_tree_criterion(controls.tree_criterion.value());
   }
-  if (optional::has_value(config.threshold)) {
-    set_threshold(optional::value(config.threshold));
+  if (controls.threshold.has_value()) {
+    set_threshold(controls.threshold.value());
   }
-  if (optional::has_value(config.select_trunc_lvl)) {
-    set_select_trunc_lvl(optional::value(config.select_trunc_lvl));
+  if (controls.select_trunc_lvl.has_value()) {
+    set_select_trunc_lvl(controls.select_trunc_lvl.value());
   }
-  if (optional::has_value(config.select_threshold)) {
-    set_select_threshold(optional::value(config.select_threshold));
+  if (controls.select_threshold.has_value()) {
+    set_select_threshold(controls.select_threshold.value());
   }
-  if (optional::has_value(config.select_families)) {
-    set_select_families(optional::value(config.select_families));
+  if (controls.select_families.has_value()) {
+    set_select_families(controls.select_families.value());
   }
-  if (optional::has_value(config.show_trace)) {
-    set_show_trace(optional::value(config.show_trace));
+  if (controls.show_trace.has_value()) {
+    set_show_trace(controls.show_trace.value());
   }
-  if (optional::has_value(config.tree_algorithm)) {
-    set_tree_algorithm(optional::value(config.tree_algorithm));
+  if (controls.tree_algorithm.has_value()) {
+    set_tree_algorithm(controls.tree_algorithm.value());
   }
-  if (optional::has_value(config.seeds)) {
-    set_seeds(optional::value(config.seeds));
+  if (controls.seeds.has_value()) {
+    set_seeds(controls.seeds.value());
   }
 }
-
-//! @name Sanity checks
-//! @{
-inline void
-FitControlsVinecop::check_tree_criterion(std::string tree_criterion)
-{
-  if (!tools_stl::is_member(tree_criterion,
-                            { "tau", "rho", "joe", "hoeffd", "mcor" })) {
-    throw std::runtime_error("tree_criterion must be one of "
-                             "'tau', 'rho', 'hoeffd', 'mcor', or 'joe'");
-  }
-}
-
-inline void
-FitControlsVinecop::check_threshold(double threshold)
-{
-  if (threshold < 0 || threshold > 1) {
-    throw std::runtime_error("threshold should be in [0,1]");
-  }
-}
-//! @}
 
 //! @name Getters and setters.
 //! @{
@@ -235,127 +214,107 @@ FitControlsVinecop::check_threshold(double threshold)
 inline size_t
 FitControlsVinecop::get_trunc_lvl() const
 {
-  return trunc_lvl_;
+  return controls_.trunc_lvl.value_or(std::numeric_limits<size_t>::max());
 }
 
 //! @brief Sets the truncation level.
 inline void
 FitControlsVinecop::set_trunc_lvl(size_t trunc_lvl)
 {
-  trunc_lvl_ = trunc_lvl;
+  controls_.trunc_lvl = trunc_lvl;
 }
 
 //! @brief Gets whether to select the truncation level automatically.
 inline bool
 FitControlsVinecop::get_select_trunc_lvl() const
 {
-  return select_trunc_lvl_;
+  return controls_.select_trunc_lvl.value_or(false);
 }
 
 //! @brief Sets whether to select the truncation level automatically.
 inline void
 FitControlsVinecop::set_select_trunc_lvl(bool select_trunc_lvl)
 {
-  select_trunc_lvl_ = select_trunc_lvl;
+  controls_.select_trunc_lvl = select_trunc_lvl;
 }
 
 //! @brief Gets whether to select the families automatically.
 inline bool
 FitControlsVinecop::get_select_families() const
 {
-  return select_families_;
+  return controls_.select_families.value();
 }
 
-//! @brief Sets whether to select the families automatically.
+//! @brief Gets whether to select the families automatically.
 inline void
 FitControlsVinecop::set_select_families(bool select_families)
 {
-  select_families_ = select_families;
+  controls_.select_families = select_families;
 }
 
 //! @brief Gets the criterion for tree selection.
 inline std::string
 FitControlsVinecop::get_tree_criterion() const
 {
-  return tree_criterion_;
+  return controls_.tree_criterion.value_or("tau");
 }
 
 //! @brief Sets the criterion for tree selection.
 inline void
 FitControlsVinecop::set_tree_criterion(std::string tree_criterion)
 {
-  check_tree_criterion(tree_criterion);
-  tree_criterion_ = tree_criterion;
+  controls_.check_tree_criterion(tree_criterion);
+  controls_.tree_criterion = tree_criterion;
 }
 
 //! @brief Gets the threshold parameter.
 inline double
 FitControlsVinecop::get_threshold() const
 {
-  return threshold_;
+  return controls_.threshold.value_or(0.0);
 }
 
 //! @brief Sets the threshold parameter.
 inline void
 FitControlsVinecop::set_threshold(double threshold)
 {
-  check_threshold(threshold);
-  threshold_ = threshold;
+  controls_.check_threshold(threshold);
+  controls_.threshold = threshold;
 }
 
 //! @brief Gets whether to show a trace is during fitting.
 inline bool
 FitControlsVinecop::get_show_trace() const
 {
-  return show_trace_;
+  return controls_.show_trace.value_or(false);
 }
 
 //! @brief Gets whether to show a trace is during fitting.
 inline void
 FitControlsVinecop::set_show_trace(bool show_trace)
 {
-  show_trace_ = show_trace;
+  controls_.show_trace = show_trace;
 }
 
 //! @brief Gets whether to select the threshold automatically.
 inline bool
 FitControlsVinecop::get_select_threshold() const
 {
-  return select_threshold_;
-}
-
-//! @brief Gets the maximum spanning tree algorithm.
-inline std::string
-FitControlsVinecop::get_tree_algorithm() const
-{
-  return tree_algorithm_;
-}
-
-//! @brief Gets the random seeds for the random number generator.
-inline std::vector<int>
-FitControlsVinecop::get_seeds() const
-{
-  return seeds_;
-}
-
-//! @brief Gets the random number generator.
-inline boost::random::mt19937
-FitControlsVinecop::get_rng() const
-{
-  return rng_;
+  return controls_.select_threshold.value_or(false);
 }
 
 //! @brief Sets whether to select the threshold automatically.
 inline void
 FitControlsVinecop::set_select_threshold(bool select_threshold)
 {
-  select_threshold_ = select_threshold;
+  controls_.select_threshold = select_threshold;
 }
 
-inline bool
-FitControlsVinecop::needs_sparse_select() const
+//! @brief Gets the random seeds for the random number generator.
+inline std::vector<int>
+FitControlsVinecop::get_seeds() const
 {
-  return (select_trunc_lvl_ | select_threshold_);
+  return controls_.seeds.value_or(std::vector<int>());
 }
 
 //! @brief Gets the fit controls for bivariate fitting.
@@ -391,35 +350,40 @@ FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)
 inline void
 FitControlsVinecop::set_tree_algorithm(std::string tree_algorithm)
 {
-  if (!tools_stl::is_member(tree_algorithm,
-                            { "mst_prim",
-                              "mst_kruskal",
-                              "random_weighted",
-                              "random_unweighted" })) {
-    throw std::runtime_error(
-      "tree_algorithm must be one of 'mst_prim', 'mst_kruskal', "
-      "'random_weighted', or 'random_unweighted'");
-  }
-  tree_algorithm_ = tree_algorithm;
+  controls_.check_tree_algorithm(tree_algorithm);
+  controls_.tree_algorithm = tree_algorithm;
 }
 
-//! @brief Sets the random seeds for the random number generator.
+//! @brief Gets 
+  FitControlsBicop get_fit_controls_bicop() const;
+the maximum spanning tree algorithm.
+inline std::string
+FitControlsVinecop::get_tree_algorithm() const
+{
+  return controls_.tree_algorithm.value_or("mst_prim");
+}
+
+//! @brief Sets the seeds for the random number generator.
 inline void
 FitControlsVinecop::set_seeds(std::vector<int> seeds)
 {
-  if (seeds.size() == 0) {
-    // no seeds provided, seed randomly
-    std::random_device rd{};
-    seeds = std::vector<int>(20);
-    std::generate(
-      seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
-  }
-  seeds_ = seeds;
-  boost::random::seed_seq seq(seeds.begin(), seeds.end());
-  rng_.seed(seq);
+  controls_.seeds = seeds;
+}
+
+//! @brief Gets the seeds for the random number generator.
+inline std::vector<int>
+FitControlsVinecop::get_seeds() const
+{
+  return controls_.seeds.value();
 }
 
 //! @}
+
+inline bool
+FitControlsVinecop::needs_sparse_select() const
+{
+  return controls_.needs_sparse_select();
+}
 
 //! @brief Summarizes the controls into a string (can be used for printing).
 inline std::string

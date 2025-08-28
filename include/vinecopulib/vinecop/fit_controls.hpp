@@ -10,15 +10,6 @@
 #include <limits>
 #include <vinecopulib/bicop/fit_controls.hpp>
 
-#if defined(__GNUC__) || defined(__clang__)
-#define DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
-#define DEPRECATED __declspec(deprecated)
-#else
-#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
-#define DEPRECATED
-#endif
-
 namespace vinecopulib {
 //! @brief A class for controlling fits of vine copula models.
 //!
@@ -26,8 +17,10 @@ class FitControlsVinecop : public FitControlsBicop
 {
 public:
   // Constructor
+  [[deprecated("Use FitControls instead")]]
   FitControlsVinecop();
 
+  [[deprecated("Use FitControls instead")]]
   explicit FitControlsVinecop(
     std::vector<BicopFamily> family_set,
     std::string parametric_method = "mle",
@@ -50,6 +43,7 @@ public:
     bool allow_rotations = true,
     std::vector<int> seeds = std::vector<int>());
 
+  [[deprecated("Use FitControls instead")]]
   explicit FitControlsVinecop(
     const FitControlsBicop& controls,
     size_t trunc_lvl = std::numeric_limits<size_t>::max(),
@@ -62,76 +56,50 @@ public:
     std::string tree_algorithm = "mst_prim",
     std::vector<int> seeds = std::vector<int>());
 
-  explicit FitControlsVinecop(const FitControlsConfig& config);
+  explicit FitControlsVinecop(const FitControls& controls);
 
-  // Getters
-  DEPRECATED size_t get_truncation_level() const;
+  [[deprecated("Use get_trunc_lvl() instead")]]
+  size_t get_truncation_level() const;
   size_t get_trunc_lvl() const;
 
-  std::string get_tree_criterion() const;
-
-  double get_threshold() const;
-
-  bool get_show_trace() const;
-
-  DEPRECATED bool get_select_truncation_level() const;
-  bool get_select_trunc_lvl() const;
-
-  bool get_select_threshold() const;
-
-  bool get_select_families() const;
-
-  bool needs_sparse_select() const;
-
-  FitControlsBicop get_fit_controls_bicop() const;
-
-  std::string get_tree_algorithm() const;
-
-  std::vector<int> get_seeds() const;
-
-  boost::random::mt19937 get_rng() const;
-
-  // Setters
-  DEPRECATED void set_truncation_level(size_t trunc_lvl);
+  [[deprecated("Use set_trunc_lvl() instead")]]
+  void set_truncation_level(size_t trunc_lvl);
   void set_trunc_lvl(size_t trunc_lvl);
 
+  std::string get_tree_criterion() const;
   void set_tree_criterion(std::string tree_criterion);
 
+  double get_threshold() const;
   void set_threshold(double threshold);
 
+  bool get_show_trace() const;
   void set_show_trace(bool show_trace);
 
-  DEPRECATED void set_select_truncation_level(bool select_trunc_lvl);
+  [[deprecated("Use get_select_trunc_lvl() instead")]]
+  bool get_select_truncation_level() const;
+  bool get_select_trunc_lvl() const;
+  [[deprecated("Use set_select_trunc_lvl() instead")]]
+  void set_select_truncation_level(bool select_trunc_lvl);
   void set_select_trunc_lvl(bool select_trunc_lvl);
 
+  bool get_select_threshold() const;
   void set_select_threshold(bool select_threshold);
 
+  bool get_select_families() const;
   void set_select_families(bool select_families);
 
-  void set_fit_controls_bicop(FitControlsBicop controls);
-
+  std::string get_tree_algorithm() const;
   void set_tree_algorithm(std::string tree_algorithm);
 
+  std::vector<int> get_seeds() const;
   void set_seeds(std::vector<int> seeds);
 
+  FitControlsBicop get_fit_controls_bicop() const;
+  void set_fit_controls_bicop(FitControlsBicop controls);
+
   // Misc
+  bool needs_sparse_select() const;
   std::string str() const;
-
-private:
-  size_t trunc_lvl_;
-  std::string tree_criterion_;
-  double threshold_;
-  bool show_trace_;
-  bool select_trunc_lvl_;
-  bool select_threshold_;
-  bool select_families_;
-  std::string tree_algorithm_;
-  std::vector<int> seeds_;
-  boost::random::mt19937 rng_;
-
-  void check_tree_criterion(std::string tree_criterion);
-
-  void check_threshold(double threshold);
 };
 }
 

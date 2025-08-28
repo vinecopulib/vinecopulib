@@ -23,12 +23,12 @@ endif()
 # Check if Boost_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED Boost_INCLUDE_DIRS)
   # try to find Boost in CONFIG mode first
-  find_package(Boost 1.56 CONFIG)
+  find_package(Boost 1.63 CONFIG)
   if (Boost_FOUND)
     message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")  
   else ()
     # fallback to MODULE mode
-    find_package(Boost 1.56 MODULE REQUIRED)
+    find_package(Boost 1.63 MODULE REQUIRED)
   endif ()
 endif()
 
