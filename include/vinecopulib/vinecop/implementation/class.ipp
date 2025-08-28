@@ -98,6 +98,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   } else {
     set_var_types(var_types);
   }
+  controls.validate_and_set_defaults_vinecop();
   select(data, controls);
 }
 

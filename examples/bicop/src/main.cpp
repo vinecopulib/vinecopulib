@@ -26,8 +26,8 @@ main()
             << std::endl;
 
   // check the default fit controls
-  auto controls = FitControlsBicop();
-  std::cout << controls.str() << std::endl;
+  auto controls = FitControls::defaults_bicop();
+  std::cout << controls.str_bicop() << std::endl;
 
   return 0;
 }

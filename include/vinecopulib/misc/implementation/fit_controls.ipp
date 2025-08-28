@@ -155,8 +155,6 @@ FitControls::validate_and_set_defaults_bicop()
 
   // Post-processing
   num_threads = process_num_threads(num_threads.value());
-
-  // Normalize weights if provided
   if (weights.has_value() && weights.value().size() > 0) {
     weights = normalize_weights(weights.value());
   }

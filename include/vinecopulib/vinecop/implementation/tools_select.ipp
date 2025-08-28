@@ -103,6 +103,7 @@ inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
   , d_(var_types.size())
   , var_types_(var_types)
   , controls_(controls)
+  , weights_(controls.weights.value())
   , pool_(controls.num_threads.value())
   , trees_(std::vector<VineTree>(1))
   , threshold_(controls.threshold.value())
@@ -1061,6 +1062,7 @@ VinecopSelector::select_pair_copulas(VineTree& tree, const VineTree& tree_opt)
       tree[e].pair_copula = vinecopulib::Bicop();
       tree[e].pair_copula.set_var_types(tree[e].var_types);
       if (!is_thresholded) {
+        controls_.weights = weights_;
         tree[e].pair_copula.select(tree[e].pc_data, controls_);
       }
     }

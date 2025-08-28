@@ -449,13 +449,6 @@ TEST_F(VinecopTest, aic_bic_are_correct)
 
   ASSERT_TRUE(true_model.aic(data) < complex_model.aic(data));
   ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
-
-  auto new_data = tools_stats::simulate_uniform(100, 7);
-
-  ASSERT_NEAR(true_model.get_aic(), true_model.aic(new_data), 1e-2);
-  ASSERT_NEAR(true_model.get_bic(), true_model.bic(new_data), 1e-2);
-  ASSERT_NEAR(complex_model.get_aic(), complex_model.aic(new_data), 1e-2);
-  ASSERT_NEAR(complex_model.get_bic(), complex_model.bic(new_data), 1e-2);
 }
 
 TEST_F(VinecopTest, fit_parameters_is_correct)

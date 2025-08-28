@@ -48,8 +48,8 @@ main()
   Vinecop fitted2(data);
 
   // check the default fit controls
-  auto controls = FitControlsVinecop();
-  std::cout << controls.str() << std::endl;
+  auto controls = FitControls::defaults_vinecop();
+  std::cout << controls.str_vinecop() << std::endl;
 
   return 0;
 }

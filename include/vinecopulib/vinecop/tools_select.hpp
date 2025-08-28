@@ -162,6 +162,7 @@ protected:
   bool structure_unknown_{ true };
   std::vector<std::string> var_types_;
   FitControls controls_;
+  Eigen::VectorXd weights_;
   tools_thread::ThreadPool pool_;
   std::vector<VineTree> trees_;
   RVineStructure vine_struct_;

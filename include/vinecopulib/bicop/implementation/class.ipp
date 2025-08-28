@@ -867,6 +867,7 @@ inline void
 Bicop::fit(const Eigen::MatrixXd& data, FitControls& controls)
 {
   controls.validate_and_set_defaults_bicop();
+  controls.check_weights_size(data);
 
   std::string method;
   if (tools_stl::is_member(bicop_->get_family(), bicop_families::parametric)) {
@@ -875,10 +876,9 @@ Bicop::fit(const Eigen::MatrixXd& data, FitControls& controls)
     method = controls.nonparametric_method.value();
   }
   tools_eigen::check_if_in_unit_cube(data);
-
-  controls.check_weights_size(data);
+  
   Eigen::MatrixXd data_no_nan = data;
-  auto weights_no_nan = controls.weights.value();
+  Eigen::VectorXd weights_no_nan = controls.weights.value();
   tools_eigen::remove_nans(data_no_nan, weights_no_nan);
 
   bicop_->fit(prep_for_abstract(data_no_nan),
@@ -970,11 +970,12 @@ inline void
 Bicop::select(const Eigen::MatrixXd& data, FitControls& controls)
 {
   controls.validate_and_set_defaults_bicop();
+  controls.check_weights_size(data);
+  Eigen::VectorXd weights = controls.weights.value();
   using namespace tools_select;
 
-  controls.check_weights_size(data);
   Eigen::MatrixXd data_no_nan = data;
-  auto weights_no_nan = controls.weights.value();
+  Eigen::VectorXd weights_no_nan = weights;
   tools_eigen::remove_nans(data_no_nan, weights_no_nan);
   check_data(data_no_nan);
   controls.weights = weights_no_nan;
@@ -1045,6 +1046,7 @@ Bicop::select(const Eigen::MatrixXd& data, FitControls& controls)
     tools_thread::ThreadPool pool(controls.num_threads.value());
     pool.map(fit_and_compare, bicops);
     pool.wait();
+    controls.weights = weights;
   }
 }
 
