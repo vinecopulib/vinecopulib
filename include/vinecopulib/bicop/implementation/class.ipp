@@ -876,7 +876,7 @@ Bicop::fit(const Eigen::MatrixXd& data, FitControls& controls)
     method = controls.nonparametric_method.value();
   }
   tools_eigen::check_if_in_unit_cube(data);
-  
+
   Eigen::MatrixXd data_no_nan = data;
   Eigen::VectorXd weights_no_nan = controls.weights.value();
   tools_eigen::remove_nans(data_no_nan, weights_no_nan);
