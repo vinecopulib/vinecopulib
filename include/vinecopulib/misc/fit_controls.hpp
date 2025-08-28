@@ -133,8 +133,6 @@ struct FitControls
   //! @brief Validates and applies defaults for unset values for Bicop
   void validate_and_set_defaults_bicop();
 
-  //! @name Validation methods
-  //! @{
   void check_family_set(const std::vector<BicopFamily>& family_set) const;
   void check_parametric_method(const std::string& method) const;
   void check_nonparametric_method(const std::string& method) const;
@@ -151,8 +149,17 @@ struct FitControls
   //! @brief Processes and validates number of threads.
   size_t process_num_threads(size_t num_threads) const;
 
+  //! @brief Normalizes weights to sum to n.
+  Eigen::VectorXd normalize_weights(Eigen::VectorXd& weights) const;
+
   //! @brief Whether sparse selection is needed
   bool needs_sparse_select() const;
+
+  //! @brief String representation of the controls for Bicop
+  std::string str_bicop() const;
+
+  //! @brief String representation of the controls for Vinecop
+  std::string str_vinecop() const;
 };
 
 } // namespace vinecopulib

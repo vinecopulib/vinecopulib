@@ -6,9 +6,9 @@
 
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
+#include <vinecopulib/misc/tools_print.hpp>
 #include <vinecopulib/misc/tools_serialization.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
-#include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/vinecop/tools_select.hpp>
 
 #include <stdexcept>
@@ -2282,7 +2282,7 @@ Vinecop::str(const std::vector<size_t>& trees) const
     taus
   };
 
-  vinecop_str << tools_stl::dataframe_to_string(vinecop_str_vec).str();
+  vinecop_str << tools_print::dataframe_to_string(vinecop_str_vec).str();
   return vinecop_str.str();
 }
 }

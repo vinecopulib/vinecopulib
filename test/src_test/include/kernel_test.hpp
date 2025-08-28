@@ -17,6 +17,6 @@ public:
   TrafokernelTest();
 
   Bicop bicop_;
-  FitControlsBicop controls;
+  FitControls controls;
   Eigen::MatrixXd u;
 };

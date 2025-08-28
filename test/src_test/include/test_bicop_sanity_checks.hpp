@@ -76,8 +76,11 @@ TEST(bicop_sanity_checks, select_can_handle_zeros_and_ones)
 
 TEST(bicop_sanity_checks, controls_print)
 {
-  auto controls = FitControlsBicop();
+  auto controls = FitControls::defaults_bicop();
+  EXPECT_NO_THROW(controls.str_bicop());
+  auto controls2 = FitControlsBicop();
   EXPECT_NO_THROW(controls.str());
+
 }
 
 TEST(bicop_sanity_checks, controls_checks)
@@ -92,7 +95,7 @@ TEST(bicop_sanity_checks, controls_checks)
   EXPECT_ANY_THROW(controls.set_psi0(1.0));
 }
 
-TEST(bicop_sanity_checks, fit_controls_controls_works)
+TEST(bicop_sanity_checks, fit_controls_works)
 {
   // Some non-default controls for testing
   FitControlsBicop controls;
@@ -109,21 +112,21 @@ TEST(bicop_sanity_checks, fit_controls_controls_works)
   // can't use non-default num_threads in CI
 
   // Create a controls object from the controls
-  FitControls controls;
-  controls.family_set = controls.get_family_set();
-  controls.parametric_method = controls.get_parametric_method();
-  controls.nonparametric_method = controls.get_nonparametric_method();
-  controls.nonparametric_mult = controls.get_nonparametric_mult();
-  controls.nonparametric_grid_size = controls.get_nonparametric_grid_size();
-  controls.selection_criterion = controls.get_selection_criterion();
-  controls.weights = controls.get_weights();
-  controls.psi0 = controls.get_psi0();
-  controls.preselect_families = controls.get_preselect_families();
-  controls.allow_rotations = controls.get_allow_rotations();
-  controls.num_threads = controls.get_num_threads();
+  FitControls fit_controls;
+  fit_controls.family_set = controls.get_family_set();
+  fit_controls.parametric_method = controls.get_parametric_method();
+  fit_controls.nonparametric_method = controls.get_nonparametric_method();
+  fit_controls.nonparametric_mult = controls.get_nonparametric_mult();
+  fit_controls.nonparametric_grid_size = controls.get_nonparametric_grid_size();
+  fit_controls.selection_criterion = controls.get_selection_criterion();
+  fit_controls.weights = controls.get_weights();
+  fit_controls.psi0 = controls.get_psi0();
+  fit_controls.preselect_families = controls.get_preselect_families();
+  fit_controls.allow_rotations = controls.get_allow_rotations();
+  fit_controls.num_threads = controls.get_num_threads();
 
   // Create and test new controls from the controls object
-  FitControlsBicop controls2(controls);
+  FitControlsBicop controls2(fit_controls);
   EXPECT_EQ(controls.get_family_set(), controls2.get_family_set());
   EXPECT_EQ(controls.get_parametric_method(),
             controls2.get_parametric_method());

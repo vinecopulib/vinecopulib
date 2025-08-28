@@ -371,34 +371,7 @@ FitControlsVinecop::needs_sparse_select() const
 inline std::string
 FitControlsVinecop::str() const
 {
-  std::stringstream controls_str;
-
-  controls_str << str_internal(false);
-  controls_str << "Truncation level: "
-               << (get_trunc_lvl() == std::numeric_limits<size_t>::max()
-                     ? "none (default)"
-                     : std::to_string(get_trunc_lvl()))
-               << std::endl;
-  controls_str << "Tree criterion: " << get_tree_criterion() << std::endl;
-  controls_str << "Threshold: " << get_threshold() << std::endl;
-  controls_str << "Select truncation level: "
-               << static_cast<std::string>(get_select_trunc_lvl() ? "yes"
-                                                                  : "no")
-               << std::endl;
-  controls_str << "Select threshold: "
-               << static_cast<std::string>(get_select_trunc_lvl() ? "yes"
-                                                                  : "no")
-               << std::endl;
-  controls_str << "Select families: "
-               << static_cast<std::string>(get_select_families() ? "yes" : "no")
-               << std::endl;
-  controls_str << "Show trace: "
-               << static_cast<std::string>(get_show_trace() ? "yes" : "no")
-               << std::endl;
-  controls_str << "Number of threads: "
-               << (get_num_threads() == 0 ? 1 : get_num_threads()) << std::endl;
-  controls_str << "MST algorithm: " << get_tree_algorithm() << std::endl;
-  return controls_str.str().c_str();
+  return controls_.str_vinecop();
 }
 
 }

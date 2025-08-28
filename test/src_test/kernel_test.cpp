@@ -9,8 +9,10 @@
 
 TrafokernelTest::TrafokernelTest()
   : bicop_(Bicop(vinecopulib::BicopFamily::tll, 0))
-  , controls(
-      FitControlsBicop({ vinecopulib::BicopFamily::tll }, "mle", GetParam()))
+  , controls()
   , u(tools_stats::simulate_uniform(20, 2, true, { 1 }))
 {
+  controls.family_set = std::vector<BicopFamily>({ vinecopulib::BicopFamily::tll });
+  controls.nonparametric_method = GetParam();
+
 }

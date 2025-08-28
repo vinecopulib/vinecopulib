@@ -9,45 +9,122 @@
 #include <stdexcept>
 #include <thread>
 #include <vinecopulib/bicop/family.hpp>
-#include <vinecopulib/misc/tools_stl.hpp>
+#include <vinecopulib/misc/tools_print.hpp>
 
 namespace vinecopulib {
 
 // A dummy checker that does nothing.
 #define NO_CHECK(x) ((void)0)
 
-// Bicop fields (field, default, checker)
+// Bicop fields (field, default, checker, label, printer)
 #define BICOP_FIELDS                                                           \
-  X(family_set, bicop_families::all, check_family_set)                         \
-  X(parametric_method, "mle", check_parametric_method)                         \
-  X(nonparametric_method, "constant", check_nonparametric_method)              \
-  X(nonparametric_mult, 1.0, check_nonparametric_mult)                         \
-  X(nonparametric_grid_size, 30, check_nonparametric_grid_size)                \
-  X(selection_criterion, "aic", check_selection_criterion)                     \
-  X(psi0, 0.9, check_psi0)                                                     \
-  X(preselect_families, true, NO_CHECK)                                        \
-  X(allow_rotations, true, NO_CHECK)                                           \
-  X(num_threads, 1, NO_CHECK)                                                  \
-  X(weights, Eigen::VectorXd(), NO_CHECK)
+  X(family_set,                                                                \
+    bicop_families::all,                                                       \
+    check_family_set,                                                          \
+    "Family set: ",                                                            \
+    tools_print::PrintFamilies{})                                              \
+  X(parametric_method,                                                         \
+    "mle",                                                                     \
+    check_parametric_method,                                                   \
+    "Parametric method: ",                                                     \
+    tools_print::PrintDefault{})                                               \
+  X(nonparametric_method,                                                      \
+    "constant",                                                                \
+    check_nonparametric_method,                                                \
+    "Nonparametric method: ",                                                  \
+    tools_print::PrintDefault{})                                               \
+  X(nonparametric_mult,                                                        \
+    1.0,                                                                       \
+    check_nonparametric_mult,                                                  \
+    "Nonparametric multiplier: ",                                              \
+    tools_print::PrintDefault{})                                               \
+  X(nonparametric_grid_size,                                                   \
+    30,                                                                        \
+    check_nonparametric_grid_size,                                             \
+    "Nonparametric grid size: ",                                               \
+    tools_print::PrintDefault{})                                               \
+  X(weights,                                                                   \
+    Eigen::VectorXd(),                                                         \
+    NO_CHECK,                                                                  \
+    "Weights: ",                                                               \
+    tools_print::PrintWeights{})                                               \
+  X(selection_criterion,                                                       \
+    "aic",                                                                     \
+    check_selection_criterion,                                                 \
+    "Selection criterion: ",                                                   \
+    tools_print::PrintDefault{})                                               \
+  X(preselect_families,                                                        \
+    true,                                                                      \
+    NO_CHECK,                                                                  \
+    "Preselect families: ",                                                    \
+    tools_print::PrintYesNo{})                                                 \
+  X(psi0,                                                                      \
+    0.9,                                                                       \
+    check_psi0,                                                                \
+    "mBIC prior probability: ",                                                \
+    tools_print::PrintDefault{})                                               \
+  X(allow_rotations,                                                           \
+    true,                                                                      \
+    NO_CHECK,                                                                  \
+    "Allow rotations: ",                                                       \
+    tools_print::PrintYesNo{})                                                 \
+  X(num_threads,                                                               \
+    1,                                                                         \
+    NO_CHECK,                                                                  \
+    "Number of threads: ",                                                     \
+    tools_print::PrintSkip{})
 
-// Vine-only fields (field, default, checker)
+// Vinecop fields (field, default, checker, label, printer)
 #define VINECOP_FIELDS                                                         \
-  X(trunc_lvl, std::numeric_limits<size_t>::max(), NO_CHECK)                   \
-  X(tree_criterion, "tau", check_tree_criterion)                               \
-  X(threshold, 0.0, check_threshold)                                           \
-  X(select_trunc_lvl, false, NO_CHECK)                                         \
-  X(select_threshold, false, NO_CHECK)                                         \
-  X(select_families, true, NO_CHECK)                                           \
-  X(show_trace, false, NO_CHECK)                                               \
-  X(tree_algorithm, "mst_prim", check_tree_algorithm)                          \
-  X(seeds, std::vector<int>(), NO_CHECK)
+  X(trunc_lvl,                                                                 \
+    std::numeric_limits<size_t>::max(),                                        \
+    NO_CHECK,                                                                  \
+    "Truncation level: ",                                                      \
+    tools_print::PrintDefault{})                                               \
+  X(tree_criterion,                                                            \
+    "tau",                                                                     \
+    check_tree_criterion,                                                      \
+    "Tree criterion: ",                                                        \
+    tools_print::PrintDefault{})                                               \
+  X(threshold,                                                                 \
+    0.0,                                                                       \
+    check_threshold,                                                           \
+    "Threshold: ",                                                             \
+    tools_print::PrintDefault{})                                               \
+  X(select_trunc_lvl,                                                          \
+    false,                                                                     \
+    NO_CHECK,                                                                  \
+    "Select trunc lvl: ",                                                      \
+    tools_print::PrintYesNo{})                                                 \
+  X(select_threshold,                                                          \
+    false,                                                                     \
+    NO_CHECK,                                                                  \
+    "Select threshold: ",                                                      \
+    tools_print::PrintYesNo{})                                                 \
+  X(select_families,                                                           \
+    true,                                                                      \
+    NO_CHECK,                                                                  \
+    "Select families: ",                                                       \
+    tools_print::PrintYesNo{})                                                 \
+  X(show_trace, false, NO_CHECK, "Show trace: ", tools_print::PrintYesNo{})    \
+  X(tree_algorithm,                                                            \
+    "mst_prim",                                                                \
+    check_tree_algorithm,                                                      \
+    "Tree algorithm: ",                                                        \
+    tools_print::PrintDefault{})                                               \
+  X(seeds,                                                                     \
+    std::vector<int>(),                                                        \
+    NO_CHECK,                                                                  \
+    "Seeds: ",                                                                 \
+    tools_print::PrintSkip{})
 
 //! @brief Creates default controls for bivariate copula models.
 inline FitControls
 FitControls::defaults_bicop()
 {
   FitControls controls;
-#define X(field, default, check) controls.field = default;
+#define X(field, default_value, check, label, printer)                         \
+  controls.field = default_value;
   BICOP_FIELDS
 #undef X
   return controls;
@@ -58,7 +135,8 @@ inline FitControls
 FitControls::defaults_vinecop()
 {
   FitControls controls;
-#define X(field, default, check) controls.field = default;
+#define X(field, default_value, check, label, printer)                         \
+  controls.field = default_value;
   BICOP_FIELDS
   VINECOP_FIELDS
 #undef X
@@ -73,12 +151,13 @@ FitControls::validate_and_set_defaults_bicop()
   const auto defaults = defaults_bicop();
 
 // Overlay
-#define X(field, fallback, check) field = field.value_or(fallback);
+#define X(field, default_value, check, label, printer)                         \
+  field = field.value_or(default_value);
   BICOP_FIELDS
 #undef X
 
 // Checks
-#define X(field, fallback, check) check(field.value());
+#define X(field, default_value, check, label, printer) check(field.value());
   BICOP_FIELDS
 #undef X
 
@@ -87,8 +166,7 @@ FitControls::validate_and_set_defaults_bicop()
 
   // Normalize weights if provided
   if (weights.has_value() && weights.value().size() > 0) {
-    auto w = weights.value();
-    weights = w / w.sum() * w.size();
+    weights = normalize_weights(weights.value());
   }
 }
 
@@ -97,13 +175,14 @@ inline void
 FitControls::validate_and_set_defaults_vinecop()
 {
   // Overlay bicop + vine fields
-#define X(field, fallback, check) field = field.value_or(fallback);
+#define X(field, default_value, check, label, printer)                         \
+  field = field.value_or(default_value);
   BICOP_FIELDS
   VINECOP_FIELDS
 #undef X
 
 // Checks bicop + vine
-#define X(field, fallback, check) check(field.value());
+#define X(field, default_value, check, label, printer) check(field.value());
   BICOP_FIELDS
   VINECOP_FIELDS
 #undef X
@@ -111,8 +190,7 @@ FitControls::validate_and_set_defaults_vinecop()
   // Post-processing (same as bicop, plus seeds)
   num_threads = process_num_threads(num_threads.value());
   if (weights.has_value() && weights.value().size() > 0) {
-    auto w = weights.value();
-    weights = w / w.sum() * w.size();
+    weights = normalize_weights(weights.value());
   }
 
   // Lazy seed generation
@@ -251,9 +329,54 @@ FitControls::process_num_threads(size_t num_threads) const
   return num_threads;
 }
 
+//! @brief Normalizes weights to sum to n.
+inline Eigen::VectorXd
+FitControls::normalize_weights(Eigen::VectorXd& weights) const
+{
+  if (weights.size() > 0) {
+    return weights / weights.sum() * weights.size();
+  } else {
+    throw std::runtime_error("Empty weights vector cannot be normalized.");
+  }
+}
+
 inline bool
 FitControls::needs_sparse_select() const
 {
   return select_trunc_lvl.value_or(false) | select_threshold.value_or(false);
 }
+
+inline std::string
+FitControls::str_bicop() const
+{
+  std::ostringstream os;
+
+#define X(field, default_value, check, label, printer)                         \
+  tools_print::print_field(os, label, field, printer);
+  BICOP_FIELDS
+#undef X
+
+  tools_print::print_field(
+    os, "Number of threads: ", num_threads, tools_print::PrintThreads{});
+
+  return os.str();
+}
+
+inline std::string
+FitControls::str_vinecop() const
+{
+  std::ostringstream os;
+
+#define X(field, default_value, check, label, printer)                         \
+  tools_print::print_field(os, label, field, printer);
+  BICOP_FIELDS
+  VINECOP_FIELDS
+#undef X
+
+  tools_print::print_field(
+    os, "Number of threads: ", num_threads, tools_print::PrintThreads{});
+
+  return os.str();
+}
+
 }

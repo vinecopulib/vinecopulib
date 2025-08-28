@@ -33,10 +33,10 @@ TEST_P(TrafokernelTest, fit)
   EXPECT_GT(bicop_cpy.get_npars(), 1.0);
 
   // catches bugs when n < (grid size)^2
-  controls.set_weights(Eigen::VectorXd::Constant(20, 1.0));
+  controls.weights = Eigen::VectorXd::Constant(20, 1.0);
   bicop_.fit(u.topRows(20), controls);
 
-  controls.set_nonparametric_grid_size(10);
+  controls.nonparametric_grid_size = 10;
   bicop_.fit(u, controls);
   EXPECT_EQ(bicop_.get_parameters().rows(), 10);
   EXPECT_EQ(bicop_.get_parameters().cols(), 10);

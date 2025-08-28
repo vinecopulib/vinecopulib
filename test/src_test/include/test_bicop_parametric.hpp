@@ -138,13 +138,11 @@ TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct)
   std::vector<int> positive_rotations = { 0, 180 };
   auto true_family = bicop_.get_family_name();
   auto true_rotation = bicop_.get_rotation();
-  FitControlsBicop controls(
-    { BicopFamily::indep, BicopFamily::gaussian, bicop_.get_family() },
-    "mle",
-    "quadratic",
-    1.0,
-    30,
-    "bic");
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>(
+    { BicopFamily::indep, BicopFamily::gaussian, bicop_.get_family() });
+  controls.parametric_method = "mle";
+  controls.selection_criterion = "bic";
 
   if (needs_check_) {
     auto data = bicop_.simulate(get_n());
@@ -182,13 +180,11 @@ TEST_P(ParBicopTest, bicop_select_itau_bic_is_correct)
   if (is_member(bicop_.get_family(), bicop_families::itau)) {
     auto true_family = bicop_.get_family_name();
     auto true_rotation = bicop_.get_rotation();
-    FitControlsBicop controls(
-      { BicopFamily::indep, BicopFamily::gaussian, bicop_.get_family() },
-      "itau",
-      "quadratic",
-      1.0,
-      30,
-      "bic");
+    FitControls controls;
+    controls.family_set = std::vector<BicopFamily>(
+      { BicopFamily::indep, BicopFamily::gaussian, bicop_.get_family() });
+    controls.parametric_method = "itau";
+    controls.selection_criterion = "bic";
 
     if (needs_check_) {
       auto data = bicop_.simulate(get_n());

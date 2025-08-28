@@ -277,48 +277,7 @@ FitControlsBicop::set_allow_rotations(bool allow_rotations)
 inline std::string
 FitControlsBicop::str() const
 {
-  return str_internal();
-}
-
-inline std::string
-FitControlsBicop::str_internal(bool print_threads) const
-{
-  std::stringstream controls_str;
-
-  controls_str << "Family set: ";
-  auto family_set = get_family_set();
-  for (size_t j = 0; j < family_set.size(); j++) {
-    if (j > 0) {
-      controls_str << ", ";
-    }
-    controls_str << get_family_name(family_set[j]);
-  }
-  controls_str << std::endl;
-
-  controls_str << "Parametric method: " << get_parametric_method() << std::endl;
-  controls_str << "Nonparametric method: " << get_nonparametric_method()
-               << std::endl;
-  controls_str << "Nonparametric multiplier: " << get_nonparametric_mult()
-               << std::endl;
-  controls_str << "Nonparametric grid size: " << get_nonparametric_grid_size()
-               << std::endl;
-  controls_str << "Weights: "
-               << static_cast<std::string>(get_weights().size() == 0 ? "no"
-                                                                     : "yes")
-               << std::endl;
-  controls_str << "Selection criterion: " << get_selection_criterion()
-               << std::endl;
-  controls_str << "Preselect families: "
-               << static_cast<std::string>(get_preselect_families() ? "yes"
-                                                                    : "no")
-               << std::endl;
-  controls_str << "mBIC prior probability: " << get_psi0() << std::endl;
-  if (print_threads) {
-    controls_str << "Number of threads: "
-                 << (get_num_threads() == 0 ? 1 : get_num_threads())
-                 << std::endl;
-  }
-  return controls_str.str().c_str();
+  return controls_.str_bicop();
 }
 
 }

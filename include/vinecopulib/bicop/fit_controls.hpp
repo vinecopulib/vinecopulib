@@ -98,7 +98,6 @@ public:
   std::string str() const;
 
 protected:
-  std::string str_internal(bool print_threads = true) const;
   FitControls controls_;
 };
 }
