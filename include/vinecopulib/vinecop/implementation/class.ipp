@@ -70,16 +70,16 @@ inline Vinecop::Vinecop(
 //! selecting the model using `select()`.
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
+//! @param controls See `FitControls()`.
 //! @param structure An RVineStructure object specifying the vine structure.
 //!    If empty, then it is selected as part of the fit.
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
-//! @param controls See `FitControlsVinecop()`.
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
+                        FitControls& controls,
                         const RVineStructure& structure,
-                        const std::vector<std::string>& var_types,
-                        const FitControlsVinecop& controls)
+                        const std::vector<std::string>& var_types)
 {
   check_enough_data(data);
   if (structure.get_dim() > 1) {
@@ -98,8 +98,26 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   } else {
     set_var_types(var_types);
   }
-  check_weights_size(controls.get_weights(), data);
   select(data, controls);
+}
+
+//! @brief Instantiates from data.
+//!
+//! @details Equivalent to creating a default `Vinecop()` and then
+//! selecting the model using `select()`.
+//!
+//! @param data An \f$ n \times d \f$ matrix of observations.
+//! @param structure An RVineStructure object specifying the vine structure.
+//!    If empty, then it is selected as part of the fit.
+//! @param var_types Strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+//!   If empty, then all variables are set as continuous.
+inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
+                        const RVineStructure& structure,
+                        const std::vector<std::string>& var_types)
+{
+  auto controls = FitControls::defaults_vinecop();
+  *this = Vinecop(data, controls, structure, var_types);
 }
 
 //! @brief Instantiates from data.
@@ -113,35 +131,16 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
-//! @param controls See `FitControls()`.
+//! @param controls See `FitControlsVinecop()`.
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                         const RVineStructure& structure,
                         const std::vector<std::string>& var_types,
-                        const FitControls& controls)
+                        const FitControlsVinecop& controls)
 {
-  check_enough_data(data);
-  if (structure.get_dim() > 1) {
-    d_ = structure.get_dim();
-    rvine_structure_ = structure;
-  } else {
-    if (var_types.size() > 0) {
-      d_ = var_types.size();
-    } else {
-      d_ = data.cols();
-    }
-    rvine_structure_ = RVineStructure(d_, static_cast<size_t>(0));
-  }
-  if (var_types.size() == 0) {
-    set_continuous_var_types();
-  } else {
-    set_var_types(var_types);
-  }
-  if (controls.weights) {
-    check_weights_size(*controls.weights, data);
-  }
-  select(data, controls);
+  auto fit_controls = controls.get_controls();
+  *this = Vinecop(data, fit_controls, structure, var_types);
 }
-
+ 
 //! @brief Instantiates from data.
 //!
 //! @details Equivalent to creating a default `Vinecop()` and
@@ -176,13 +175,34 @@ inline Vinecop::Vinecop(
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
-//! @param controls See `FitControls()`.
 inline Vinecop::Vinecop(
   const Eigen::MatrixXd& data,
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
-  const std::vector<std::string>& var_types,
-  const FitControls& controls)
-  : Vinecop(data, RVineStructure(matrix), var_types, controls)
+  const std::vector<std::string>& var_types)
+{
+  auto controls = FitControls::defaults_vinecop();
+  *this = Vinecop(data, controls, matrix, var_types);
+}
+
+//! @brief Instantiates from data.
+//!
+//! @details Equivalent to creating a default `Vinecop()` and
+//! then selecting the model using `select()`.
+//!
+//! @param data An \f$ n \times d \f$ matrix of observations.
+//! @param controls See `FitControls()`.
+//! @param matrix Either an empty matrix (default) or an R-vine structure
+//!     matrix, see `select()`. If empty, then it is selected as part of the
+//!     fit.
+//! @param var_types Strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+//!   If empty, then all variables are set as continuous.
+inline Vinecop::Vinecop(
+  const Eigen::MatrixXd& data,
+  FitControls& controls,
+  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
+  const std::vector<std::string>& var_types)
+  : Vinecop(data, controls, RVineStructure(matrix), var_types)
 {
 }
 
@@ -384,15 +404,72 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 inline void
 Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 {
-  select(data, controls.get_controls());
+  auto fit_controls = controls.get_controls();
+  select(data, controls);
 }
 
-//! @brief Selects the best fitting vine copula model.
+//! @brief Automatically fits and selects a vine copula model.
 //!
-//! @details The function uses a two-step procedure where each tree is built
-//! sequentially. For each tree, all pair-copulas are fitted and their AICs
-//! are computed. The R-vine matrix is then constructed according to the
-//! MST algorithm.
+//! @details This method can be used to select either the pair-copulas only,
+//! or the pair-copulas and the structure. The latter is done by specifying
+//! a truncation level in the controls. The method then selects the structure
+//! and fits the pair-copulas for all trees up to the truncation level.
+
+//! In other words, `select()` behaves differently depending on its current
+//! truncation level and the truncation level specified in the controls,
+//! respectively called `trunc_lvl` and `controls.trunc_lvl` in what follows.
+//! Essentially, `controls.trunc_lvl` defines the object's truncation level
+//! after calling `select()`:
+//!
+//!   - If `controls.trunc_lvl <= trunc_lvl`, the families and parameters for
+//!     all pairs in trees smaller or equal to `controls.trunc_lvl`
+//!     are selected, using the current structure.
+//!   - If `controls.trunc_lvl > trunc_lvl`, `select()` behaves as above for
+//!     all trees that are smaller or equal to `trunc_lvl`, and then it selects
+//!     the structure for higher trees along with the families and parameters.
+//!     This includes the case where `trunc_lvl = 0`, namely where the
+//!     structure is fully unspecified.
+//!
+//! Selection of the structure is performed using the algorithm of
+//! Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013).
+//! *Selecting and estimating regular vine copulae and application to
+//! financial returns.* Computational Statistics & Data Analysis, 59 (1),
+//! 52-69.
+//! The dependence measure used to select trees (default: Kendall's tau) is
+//! corrected for ties (see the [wdm](https://github.com/tnagler/wdm) library).
+//! The dependence measure can be changed using the `controls.tree_criterion`,
+//! which can be set to `"tau"`, `"rho"` or `"hoeffd"`.
+//! Both Prim's (default: `"mst_prim"`) and Kruskal's ()`"mst_kruskal"`) 
+//! algorithms are available through `controls.tree_algorithm` for the 
+//! maximum spanning tree selection.
+//! An alternative to the maximum spanning tree selection is to use random
+//! spanning trees, which can be selected using `controls.tree_algorithm` and
+//! come in two flavors, both using Wilson's algorithm loop erased random walks:
+//!
+//!   - "random_weighted"` generates a random spanning tree with probability
+//!     proportional to the product of the weights (i.e., the dependence) of
+//!     the edges in the tree.
+//!   - "random_unweighted"` generates a random spanning tree uniformly over all
+//!     spanning trees satisfying the proximity condition.
+//!
+//! If the `controls` object has been instantiated with
+//! `select_families = false`, then the method simply updates the parameters of
+//! the pair-copulas without selecting the families or the structure.
+//! In this case, this is equivalent to calling `fit()` for each pair-copula,
+//! albeit potentially in parallel if `num_threads > 1`.
+//!
+//! When at least one variable is discrete, two types of
+//! "observations" are required: the first \f$ n \times d \f$ block contains
+//! realizations of \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block
+//! contains realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus
+//! indicates a left-sided limit of the cdf. For continuous variables the left
+//! limit and the cdf itself coincide. For, e.g., an integer-valued variable, it
+//! holds \f$ F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second
+//! block can be omitted.
+//!
+//! If there are missing data (i.e., NaN entries), incomplete observations are
+//! discarded before fitting a pair-copula. This is done on a pair-by-pair basis
+//! so that the maximal available information is used.
 //!
 //!
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
@@ -402,6 +479,7 @@ inline void
 Vinecop::select(const Eigen::MatrixXd& data, FitControls& controls)
 {
   controls.validate_and_set_defaults_vinecop();
+  controls.check_weights_size(data);
   if (controls.select_families.value()) {
     check_data(data);
     if (d_ == 1) {
@@ -424,11 +502,84 @@ Vinecop::select(const Eigen::MatrixXd& data, FitControls& controls)
   }
 }
 
+//! @brief Automatically fits and selects a vine copula model.
+//!
+//! @details This method can be used to select either the pair-copulas only,
+//! or the pair-copulas and the structure. The latter is done by specifying
+//! a truncation level in the controls. The method then selects the structure
+//! and fits the pair-copulas for all trees up to the truncation level.
+
+//! In other words, `select()` behaves differently depending on its current
+//! truncation level and the truncation level specified in the controls,
+//! respectively called `trunc_lvl` and `controls.trunc_lvl` in what follows.
+//! Essentially, `controls.trunc_lvl` defines the object's truncation level
+//! after calling `select()`:
+//!
+//!   - If `controls.trunc_lvl <= trunc_lvl`, the families and parameters for
+//!     all pairs in trees smaller or equal to `controls.trunc_lvl`
+//!     are selected, using the current structure.
+//!   - If `controls.trunc_lvl > trunc_lvl`, `select()` behaves as above for
+//!     all trees that are smaller or equal to `trunc_lvl`, and then it selects
+//!     the structure for higher trees along with the families and parameters.
+//!     This includes the case where `trunc_lvl = 0`, namely where the
+//!     structure is fully unspecified.
+//!
+//! Selection of the structure is performed using the algorithm of
+//! Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013).
+//! *Selecting and estimating regular vine copulae and application to
+//! financial returns.* Computational Statistics & Data Analysis, 59 (1),
+//! 52-69.
+//! The dependence measure used to select trees (default: Kendall's tau) is
+//! corrected for ties (see the [wdm](https://github.com/tnagler/wdm) library).
+//! The dependence measure can be changed using the `controls.tree_criterion`,
+//! which can be set to `"tau"`, `"rho"` or `"hoeffd"`.
+//! Both Prim's (default: `"mst_prim"`) and Kruskal's ()`"mst_kruskal"`) 
+//! algorithms are available through `controls.tree_algorithm` for the 
+//! maximum spanning tree selection.
+//! An alternative to the maximum spanning tree selection is to use random
+//! spanning trees, which can be selected using `controls.tree_algorithm` and
+//! come in two flavors, both using Wilson's algorithm loop erased random walks:
+//!
+//!   - "random_weighted"` generates a random spanning tree with probability
+//!     proportional to the product of the weights (i.e., the dependence) of
+//!     the edges in the tree.
+//!   - "random_unweighted"` generates a random spanning tree uniformly over all
+//!     spanning trees satisfying the proximity condition.
+//!
+//! If the `controls` object has been instantiated with
+//! `select_families = false`, then the method simply updates the parameters of
+//! the pair-copulas without selecting the families or the structure.
+//! In this case, this is equivalent to calling `fit()` for each pair-copula,
+//! albeit potentially in parallel if `num_threads > 1`.
+//!
+//! When at least one variable is discrete, two types of
+//! "observations" are required: the first \f$ n \times d \f$ block contains
+//! realizations of \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block
+//! contains realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus
+//! indicates a left-sided limit of the cdf. For continuous variables the left
+//! limit and the cdf itself coincide. For, e.g., an integer-valued variable, it
+//! holds \f$ F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second
+//! block can be omitted.
+//!
+//! If there are missing data (i.e., NaN entries), incomplete observations are
+//! discarded before fitting a pair-copula. This is done on a pair-by-pair basis
+//! so that the maximal available information is used.
+//!
+//!
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   observations, where \f$ k \f$ is the number of discrete variables.
+inline void
+Vinecop::select(const Eigen::MatrixXd& data)
+{
+  auto controls = FitControls::defaults_vinecop();
+  select(data, controls);
+}
+
 
 //! @brief Fits the parameters of a pre-specified vine copula model.
 //!
 //! @details This method fits the pair-copulas of a vine copula model. It is
-//! assumed that the structure  and pair-copula families are already set.
+//! assumed that the strucontrolscture  and pair-copula families are already set.
 //! The method is equivalent to calling `fit()` for each pair-copula in the
 //! model. The same can be achieved by calling `select()` with the same data
 //! and a `FitControls` object instantiated
@@ -443,6 +594,7 @@ Vinecop::fit(const Eigen::MatrixXd& data,
              FitControls& controls)
 {
   controls.validate_and_set_defaults_vinecop();
+  controls.check_weights_size(data);
   auto num_threads = controls.num_threads.value();
   check_data(data);
   auto u = collapse_data(data);
@@ -537,6 +689,46 @@ Vinecop::fit(const Eigen::MatrixXd& data,
       loglik_ += pair_copulas_[tree][edge].get_loglik();
     }
   }
+}
+
+//! @brief Fits the parameters of a pre-specified vine copula model.
+//!
+//! @details This method fits the pair-copulas of a vine copula model. It is
+//! assumed that the structure  and pair-copula families are already set.
+//! The method is equivalent to calling `fit()` for each pair-copula in the
+//! model. The same can be achieved by calling `select()` with the same data
+//! and a default `FitControls` object instantiated
+//! with `select_families = false`.
+//!
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   observations, where \f$ k \f$ is the number of discrete variables.
+inline void
+Vinecop::fit(const Eigen::MatrixXd& data) 
+{
+  auto controls = FitControls::defaults_vinecop();
+  fit(data, controls);
+}
+
+
+//! @brief Fits the parameters of a pre-specified vine copula model.
+//!
+//! @details This method fits the pair-copulas of a vine copula model. It is
+//! assumed that the strucontrolscture  and pair-copula families are already set.
+//! The method is equivalent to calling `fit()` for each pair-copula in the
+//! model. The same can be achieved by calling `select()` with the same data
+//! and a `FitControls` object instantiated
+//! with `select_families = false`.
+//!
+//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   observations, where \f$ k \f$ is the number of discrete variables.
+//! @param controls The controls for each bivariate fit (see
+//! `FitControlsBicop()`).
+inline void
+Vinecop::fit(const Eigen::MatrixXd& data,
+             const FitControlsBicop& controls)
+{
+  auto fit_controls = controls.get_controls();
+  select(data, fit_controls);
 }
 
 //! @name Getters and setters
@@ -1862,16 +2054,6 @@ Vinecop::finalize_fit(const tools_select::VinecopSelector& selector)
   loglik_ = selector.get_loglik();
   nobs_ = selector.get_nobs();
   pair_copulas_ = selector.get_pair_copulas();
-}
-
-//! Checks if weights are compatible with the data.
-inline void
-Vinecop::check_weights_size(const Eigen::VectorXd& weights,
-                            const Eigen::MatrixXd& data) const
-{
-  if ((weights.size() > 0) && (weights.size() != data.rows())) {
-    throw std::runtime_error("sizes of weights and data don't match.");
-  }
 }
 
 //! Checks if data size is large enough.

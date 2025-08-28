@@ -15,10 +15,10 @@ namespace tools_select {
 
 std::vector<Bicop>
 create_candidate_bicops(const Eigen::MatrixXd& data,
-                        const FitControlsBicop& controls);
+                        FitControls& controls);
 
 std::vector<BicopFamily>
-get_candidate_families(const FitControlsBicop& controls);
+get_candidate_families(FitControls& controls);
 
 void
 preselect_candidates(std::vector<Bicop>& bicops,

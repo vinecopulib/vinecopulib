@@ -17,7 +17,7 @@ namespace tools_select {
 //! @param controls The controls (see `FitControls`).
 inline std::vector<Bicop>
 create_candidate_bicops(const Eigen::MatrixXd& data,
-                        const FitControls& controls)
+                        FitControls& controls)
 {
   std::vector<BicopFamily> families = get_candidate_families(controls);
 
@@ -57,7 +57,7 @@ create_candidate_bicops(const Eigen::MatrixXd& data,
 }
 
 inline std::vector<BicopFamily>
-get_candidate_families(const FitControls& controls)
+get_candidate_families(FitControls& controls)
 {
   //! adjusts the family_set according to parameteric_method.
   std::vector<BicopFamily> family_set = controls.family_set.value();

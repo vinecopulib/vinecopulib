@@ -145,6 +145,7 @@ struct FitControls
   void check_tree_criterion(const std::string& criterion) const;
   void check_tree_algorithm(const std::string& algorithm) const;
   void check_threshold(double threshold) const;
+  void check_weights_size(const Eigen::MatrixXd& data) const;
   //! @}
 
   //! @brief Processes and validates number of threads.

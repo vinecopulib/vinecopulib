@@ -16,17 +16,8 @@
 namespace vinecopulib {
 //! Instantiates default controls for fitting vine copula models.
 inline FitControlsVinecop::FitControlsVinecop()
-  : FitControlsBicop()
+: FitControlsVinecop(FitControls::defaults_vinecop())
 {
-  trunc_lvl_ = std::numeric_limits<size_t>::max();
-  threshold_ = 0.0;
-  tree_criterion_ = "tau";
-  select_trunc_lvl_ = false;
-  select_threshold_ = false;
-  select_families_ = true;
-  show_trace_ = false;
-  tree_algorithm_ = "mst_prim";
-  set_seeds(std::vector<int>());
 }
 
 //! @brief Instantiates custom controls for fitting vine copula models.
@@ -214,7 +205,7 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControls& controls)
 inline size_t
 FitControlsVinecop::get_trunc_lvl() const
 {
-  return controls_.trunc_lvl.value_or(std::numeric_limits<size_t>::max());
+  return controls_.trunc_lvl.value();
 }
 
 //! @brief Sets the truncation level.
@@ -228,7 +219,7 @@ FitControlsVinecop::set_trunc_lvl(size_t trunc_lvl)
 inline bool
 FitControlsVinecop::get_select_trunc_lvl() const
 {
-  return controls_.select_trunc_lvl.value_or(false);
+  return controls_.select_trunc_lvl.value();
 }
 
 //! @brief Sets whether to select the truncation level automatically.
@@ -256,7 +247,7 @@ FitControlsVinecop::set_select_families(bool select_families)
 inline std::string
 FitControlsVinecop::get_tree_criterion() const
 {
-  return controls_.tree_criterion.value_or("tau");
+  return controls_.tree_criterion.value();
 }
 
 //! @brief Sets the criterion for tree selection.
@@ -271,7 +262,7 @@ FitControlsVinecop::set_tree_criterion(std::string tree_criterion)
 inline double
 FitControlsVinecop::get_threshold() const
 {
-  return controls_.threshold.value_or(0.0);
+  return controls_.threshold.value();
 }
 
 //! @brief Sets the threshold parameter.
@@ -286,7 +277,7 @@ FitControlsVinecop::set_threshold(double threshold)
 inline bool
 FitControlsVinecop::get_show_trace() const
 {
-  return controls_.show_trace.value_or(false);
+  return controls_.show_trace.value();
 }
 
 //! @brief Gets whether to show a trace is during fitting.
@@ -300,7 +291,7 @@ FitControlsVinecop::set_show_trace(bool show_trace)
 inline bool
 FitControlsVinecop::get_select_threshold() const
 {
-  return controls_.select_threshold.value_or(false);
+  return controls_.select_threshold.value();
 }
 
 //! @brief Sets whether to select the threshold automatically.
@@ -308,13 +299,6 @@ inline void
 FitControlsVinecop::set_select_threshold(bool select_threshold)
 {
   controls_.select_threshold = select_threshold;
-}
-
-//! @brief Gets the random seeds for the random number generator.
-inline std::vector<int>
-FitControlsVinecop::get_seeds() const
-{
-  return controls_.seeds.value_or(std::vector<int>());
 }
 
 //! @brief Gets the fit controls for bivariate fitting.
@@ -354,13 +338,11 @@ FitControlsVinecop::set_tree_algorithm(std::string tree_algorithm)
   controls_.tree_algorithm = tree_algorithm;
 }
 
-//! @brief Gets 
-  FitControlsBicop get_fit_controls_bicop() const;
-the maximum spanning tree algorithm.
+//! @brief Gets the maximum spanning tree algorithm.
 inline std::string
 FitControlsVinecop::get_tree_algorithm() const
 {
-  return controls_.tree_algorithm.value_or("mst_prim");
+  return controls_.tree_algorithm.value();
 }
 
 //! @brief Sets the seeds for the random number generator.

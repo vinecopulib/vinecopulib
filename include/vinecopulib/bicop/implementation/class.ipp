@@ -50,11 +50,27 @@ inline Bicop::Bicop(const BicopFamily family,
 //! @param var_types Two strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 inline Bicop::Bicop(const Eigen::MatrixXd& data,
-                    const FitControls& controls,
-                    const std::vector<std::string>& var_types)
+                    FitControls& controls,
+                    std::vector<std::string> var_types)
 {
   set_var_types(var_types);
   select(data, controls);
+}
+
+//! @brief Instantiates from data using FitControls.
+//!
+//! @details Equivalent to creating a default `Bicop()` and then selecting
+//!  the model using `Bicop::select()`.
+//!
+//! @param data See `Bicop::select()`.
+//! @param var_types Two strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+inline Bicop::Bicop(const Eigen::MatrixXd& data,
+                    std::vector<std::string> var_types)
+{
+    auto controls = FitControls::defaults_bicop();
+    // delegate
+    *this = Bicop(data, controls, var_types);
 }
 
 //! @brief Instantiates from data using deprecated FitControlsBicop.
@@ -70,8 +86,8 @@ inline Bicop::Bicop(const Eigen::MatrixXd& data,
                     const FitControlsBicop& controls,
                     const std::vector<std::string>& var_types)
 {
-  set_var_types(var_types);
-  select(data, controls);
+    auto fit_controls = controls.get_controls();
+    *this = Bicop(data, fit_controls, var_types);
 }
 
 //! @brief Copy constructor (deep copy)
@@ -828,8 +844,7 @@ Bicop::as_continuous() const
   return bc_new;
 }
 
-//! @brief Fits a bivariate copula (with fixed family) to data using modern
-//! FitControls.
+//! @brief Fits a bivariate copula (with fixed family) to data.
 //!
 //! @details For parametric models, two different methods are available. `"mle"`
 //! fits the parameters by maximum-likelihood. `"itau"` uses inversion of
@@ -861,34 +876,76 @@ Bicop::fit(const Eigen::MatrixXd& data, FitControls& controls)
   }
   tools_eigen::check_if_in_unit_cube(data);
 
-  auto w = controls.weights.value();
+  controls.check_weights_size(data);
   Eigen::MatrixXd data_no_nan = data;
-  check_weights_size(w, data);
-  tools_eigen::remove_nans(data_no_nan, w);
+  auto weights_no_nan = controls.weights.value();
+  tools_eigen::remove_nans(data_no_nan, weights_no_nan);
 
   bicop_->fit(
     prep_for_abstract(data_no_nan),
     method,
     controls.nonparametric_mult.value(),
     controls.nonparametric_grid_size.value(),
-    w);
+    weights_no_nan);
   nobs_ = data_no_nan.rows();
 }
 
-//! @brief Fits a bivariate copula (with fixed family) to data using deprecated
-//! FitControlsBicop.
+//! @brief Fits a bivariate copula (with fixed family) to data.
 //!
-//! @deprecated Use fit(data, FitControls) instead.
-//! @param data See fit(data, FitControls).
+//! @details For parametric models, two different methods are available. `"mle"`
+//! fits the parameters by maximum-likelihood. `"itau"` uses inversion of
+//! Kendall's \f$ \tau \f$, but is only available for one-parameter families
+//! and the Student t copula. For the latter, there is a one-to-one
+//! transformation for the first parameter, the second is found by profile
+//! likelihood optimization (with accuracy of at least 0.5). Nonparametric
+//! families have specialized methods, no specification is required.
+//!
+//! When at least one variable is discrete, two types of "observations"
+//! are required: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ F_{X_1}(X_1), F_{X_2}(X_2) \f$. Let \f$ k \f$ denote the number of
+//! discrete variables (either one or two). Then the second \f$ n \times k \f$
+//! block contains realizations of \f$ F_{X_k}(X_k^-) \f$. The minus indicates a
+//! left-sided limit of the cdf. For continuous variables the left limit and the
+//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
+//! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
+//!
+//! Incomplete observations (i.e., ones with a NaN value) are discarded.
+//!
+//! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
+//! @param controls The controls (see `FitControls`).
+inline void
+Bicop::fit(const Eigen::MatrixXd& data)
+{
+  auto controls = FitControls::defaults_bicop();
+  fit(data, controls);
+}
+
+//! @brief Fits a bivariate copula (with fixed family) to data
+//!
+//! @details For parametric models, two different methods are available. `"mle"`
+//! fits the parameters by maximum-likelihood. `"itau"` uses inversion of
+//! Kendall's tau (only for one-parameter copula families with analytical
+//! relationship between parameter and Kendall's tau).
+//!
+//! For nonparametric models, the method is specified by the
+//! `nonparametric_method` option. Different methods are available:
+//! `"constant"` fits a constant on each sub-interval,
+//! `"linear"` fits a linear function on each sub-interval,
+//! `"quadratic"` fits a quadratic function on each sub-interval.
+//! The fit is performed on a transformed grid that is uniform over the copula
+//! domain \f$ [0, 1] \times [0, 1] \f$. The grid size is controlled by the
+//! `nonparametric_grid_size` option.
+//!
+//! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls (see `FitControlsBicop`).
 inline void
 Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 {
-  // Delegate to modern implementation
-  fit(data, controls.get_controls());
+  auto fit_controls = controls.get_controls();
+  fit(data, fit_controls);
 }
-
-//
 
 //! @brief Selects the best fitting model using FitControls.
 //!
@@ -916,11 +973,13 @@ Bicop::select(const Eigen::MatrixXd& data, FitControls& controls)
   controls.validate_and_set_defaults_bicop();
   using namespace tools_select;
 
-  auto weights = controls.weights.value();
-  check_weights_size(weights, data);
+  
+  controls.check_weights_size(data);
   Eigen::MatrixXd data_no_nan = data;
-  tools_eigen::remove_nans(data_no_nan, weights);
+  auto weights_no_nan = controls.weights.value();
+  tools_eigen::remove_nans(data_no_nan, weights_no_nan);
   check_data(data_no_nan);
+  controls.weights = weights_no_nan;
   nobs_ = data_no_nan.rows();
 
   bicop_ = AbstractBicop::create();
@@ -954,9 +1013,9 @@ Bicop::select(const Eigen::MatrixXd& data, FitControls& controls)
         new_criterion = -2 * ll + 2 * cop.get_npars();
       } else {
         double n_eff = static_cast<double>(data_no_nan.rows());
-        if (weights.size() > 0) {
-          n_eff = std::pow(weights.sum(), 2);
-          n_eff /= weights.array().pow(2).sum();
+        if (weights_no_nan.size() > 0) {
+          n_eff = std::pow(weights_no_nan.sum(), 2);
+          n_eff /= weights_no_nan.array().pow(2).sum();
         }
         double npars = cop.get_npars();
 
@@ -991,6 +1050,32 @@ Bicop::select(const Eigen::MatrixXd& data, FitControls& controls)
   }
 }
 
+//! @brief Selects the best fitting model using the defaults.
+//!
+//! @details The function calls `Bicop::fit()` for all families in
+//! `family_set` and selecting the best fitting model by either BIC or AIC,
+//! see `Bicop::bic()` and `Bicop::aic()`.
+//!
+//! When at least one variable is discrete, two types of "observations"
+//! are required: the first \f$ n \times 2 \f$ block contains realizations of
+//! \f$ F_{X_1}(X_1), F_{X_2}(X_2) \f$. Let \f$ k \f$ denote the number of
+//! discrete variables (either one or two). Then the second \f$ n \times k \f$
+//! block contains realizations of \f$ F_{X_k}(X_k^-) \f$. The minus indicates a
+//! left-sided limit of the cdf. For continuous variables the left limit and the
+//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
+//! F_{X_k}(X_k^-) = F_{X_k}(X_k - 1) \f$.
+//!
+//! Incomplete observations (i.e., ones with a NaN value) are discarded.
+//!
+//! @param data An \f$ n \times (2 + k) \f$ matrix of observations contained in
+//!   \f$(0, 1) \f$, where \f$ k \f$ is the number of discrete variables.
+inline void
+Bicop::select(const Eigen::MatrixXd& data)
+{
+  auto controls = FitControls::defaults_bicop();
+  select(data, controls);
+}
+
 //! @brief Selects the best fitting model using deprecated FitControlsBicop.
 //!
 //! @deprecated Use select(data, FitControls) instead.
@@ -999,8 +1084,8 @@ Bicop::select(const Eigen::MatrixXd& data, FitControls& controls)
 inline void
 Bicop::select(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 {
-  // Delegate to modern implementation
-  select(data, controls.get_controls());
+  auto fit_controls = controls.get_controls();
+  select(data, fit_controls);
 }
 
 //! @brief Adds an additional column if there's only one discrete variable;
@@ -1095,16 +1180,6 @@ Bicop::check_rotation(int rotation) const
       throw std::runtime_error("rotation must be 0 for the " +
                                bicop_->get_family_name() + " copula");
     }
-  }
-}
-
-//! @brief Checks whether weights and data have matching sizes.
-inline void
-Bicop::check_weights_size(const Eigen::VectorXd& weights,
-                          const Eigen::MatrixXd& data) const
-{
-  if ((weights.size() > 0) && (weights.size() != data.rows())) {
-    throw std::runtime_error("sizes of weights and data don't match.");
   }
 }
 

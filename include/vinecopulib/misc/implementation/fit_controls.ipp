@@ -228,6 +228,14 @@ FitControls::check_threshold(double threshold) const
   }
 }
 
+inline void
+FitControls::check_weights_size(const Eigen::MatrixXd& data) const
+{
+  if ((weights.value().size() > 0) && (weights.value().size() != data.rows())) {
+    throw std::runtime_error("sizes of weights and data don't match.");
+  }
+}
+
 //! @brief Processes and validates number of threads.
 inline size_t
 FitControls::process_num_threads(size_t num_threads) const

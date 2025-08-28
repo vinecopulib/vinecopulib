@@ -977,7 +977,7 @@ VinecopSelector::min_spanning_tree(VineTree& graph)
       boost::associative_property_map<std::map<EdgeIterator, double>>
         inv_weight_map(inv_weights);
       boost::random_spanning_tree(graph,
-                                  gen,
+                                  rng_,
                                   boost::predecessor_map(predecessors.data())
                                     .root_vertex(root)
                                     .weight_map(inv_weight_map));

@@ -10,6 +10,13 @@
 
 //! Tools for bivariate and vine copula modeling
 namespace vinecopulib {
+
+//! @brief Instantiates the controls for fitting bivariate copula models.
+inline FitControlsBicop::FitControlsBicop()
+: controls_(FitControls::defaults_bicop())
+{
+}
+
 //! @brief Instantiates the controls for fitting bivariate copula models.
 //!
 //! @param family_set The set of copula families to consider (if empty, then

@@ -17,10 +17,13 @@ namespace vinecopulib {
 class FitControlsBicop
 {
 public:
-  // Constructor
+  // Constructors
+  [[deprecated("Use FitControls instead")]]
+  FitControlsBicop();
+
   [[deprecated("Use FitControls instead")]]
   FitControlsBicop(
-    std::vector<BicopFamily> family_set = bicop_families::all,
+    std::vector<BicopFamily> family_set,
     std::string parametric_method = "mle",
     std::string nonparametric_method = "constant",
     double nonparametric_mult = 1.0,
