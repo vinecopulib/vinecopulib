@@ -56,6 +56,9 @@ TEST(vinecop_sanity_checks, controls_print)
 {
   auto controls = FitControlsVinecop();
   EXPECT_NO_THROW(controls.str());
+
+  auto fit_controls = FitControls::defaults_vinecop();
+  EXPECT_NO_THROW(fit_controls.str_bicop());
 }
 
 TEST(vinecop_sanity_checks, fit_controls_controls_works)
@@ -75,17 +78,17 @@ TEST(vinecop_sanity_checks, fit_controls_controls_works)
   controls.set_seeds(seeds);
 
   // Create a controls object from the controls
-  FitControls controls;
-  controls.trunc_lvl = controls.get_trunc_lvl();
-  controls.tree_criterion = controls.get_tree_criterion();
-  controls.threshold = controls.get_threshold();
-  controls.select_threshold = controls.get_select_threshold();
-  controls.select_trunc_lvl = controls.get_select_trunc_lvl();
-  controls.select_families = controls.get_select_families();
-  controls.show_trace = controls.get_show_trace();
-  controls.num_threads = controls.get_num_threads();
-  controls.tree_algorithm = controls.get_tree_algorithm();
-  controls.seeds = controls.get_seeds();
+  FitControls fit_controls;
+  fit_controls.trunc_lvl = controls.get_trunc_lvl();
+  fit_controls.tree_criterion = controls.get_tree_criterion();
+  fit_controls.threshold = controls.get_threshold();
+  fit_controls.select_threshold = controls.get_select_threshold();
+  fit_controls.select_trunc_lvl = controls.get_select_trunc_lvl();
+  fit_controls.select_families = controls.get_select_families();
+  fit_controls.show_trace = controls.get_show_trace();
+  fit_controls.num_threads = controls.get_num_threads();
+  fit_controls.tree_algorithm = controls.get_tree_algorithm();
+  fit_controls.seeds = controls.get_seeds();
 
   // Create and test new controls from the controls object
   FitControlsVinecop controls2(controls);
@@ -105,7 +108,14 @@ TEST(vinecop_sanity_checks, controls_check)
 {
   auto controls = FitControlsVinecop();
   EXPECT_ANY_THROW(controls.set_tree_criterion("foo"));
+  EXPECT_ANY_THROW(controls.set_tree_algorithm("foo"));
   EXPECT_ANY_THROW(controls.set_threshold(-1.0));
   EXPECT_ANY_THROW(controls.set_threshold(2.0));
+
+  auto fit_controls = FitControls::defaults_vinecop();
+  EXPECT_ANY_THROW(fit_controls.check_tree_criterion("foo"));
+  EXPECT_ANY_THROW(fit_controls.check_tree_algorithm("foo"));
+  EXPECT_ANY_THROW(fit_controls.check_threshold(-1.0));
+  EXPECT_ANY_THROW(fit_controls.check_threshold(2.0));
 }
 }

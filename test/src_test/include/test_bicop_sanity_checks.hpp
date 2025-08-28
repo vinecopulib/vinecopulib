@@ -79,7 +79,7 @@ TEST(bicop_sanity_checks, controls_print)
   auto controls = FitControls::defaults_bicop();
   EXPECT_NO_THROW(controls.str_bicop());
   auto controls2 = FitControlsBicop();
-  EXPECT_NO_THROW(controls.str());
+  EXPECT_NO_THROW(controls2.str());
 
 }
 
@@ -93,6 +93,15 @@ TEST(bicop_sanity_checks, controls_checks)
   EXPECT_ANY_THROW(controls.set_nonparametric_grid_size(2));
   EXPECT_ANY_THROW(controls.set_psi0(0.0));
   EXPECT_ANY_THROW(controls.set_psi0(1.0));
+
+  auto fit_controls = FitControls::defaults_bicop();
+  EXPECT_ANY_THROW(fit_controls.check_selection_criterion("foo"));
+  EXPECT_ANY_THROW(fit_controls.check_nonparametric_method("foo"));
+  EXPECT_ANY_THROW(fit_controls.check_parametric_method("foo"));
+  EXPECT_ANY_THROW(fit_controls.check_nonparametric_mult(0.0));
+  EXPECT_ANY_THROW(fit_controls.check_nonparametric_grid_size(2));
+  EXPECT_ANY_THROW(fit_controls.check_psi0(0.0));
+  EXPECT_ANY_THROW(fit_controls.check_psi0(1.0));
 }
 
 TEST(bicop_sanity_checks, fit_controls_works)

@@ -139,8 +139,8 @@ TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct)
   auto true_family = bicop_.get_family_name();
   auto true_rotation = bicop_.get_rotation();
   FitControls controls;
-  controls.family_set = std::vector<BicopFamily>(
-    { BicopFamily::indep, BicopFamily::gaussian, bicop_.get_family() });
+  controls.family_set = std::vector<BicopFamily>
+    { BicopFamily::indep, BicopFamily::gaussian, bicop_.get_family() };
   controls.parametric_method = "mle";
   controls.selection_criterion = "bic";
 
@@ -181,8 +181,8 @@ TEST_P(ParBicopTest, bicop_select_itau_bic_is_correct)
     auto true_family = bicop_.get_family_name();
     auto true_rotation = bicop_.get_rotation();
     FitControls controls;
-    controls.family_set = std::vector<BicopFamily>(
-      { BicopFamily::indep, BicopFamily::gaussian, bicop_.get_family() });
+    controls.family_set = std::vector<BicopFamily>
+      { BicopFamily::indep, BicopFamily::gaussian, bicop_.get_family() };
     controls.parametric_method = "itau";
     controls.selection_criterion = "bic";
 

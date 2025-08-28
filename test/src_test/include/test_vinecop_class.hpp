@@ -110,7 +110,8 @@ TEST_F(VinecopTest, print)
   EXPECT_EQ(last_line, expected_last_line);
 
   auto data = tools_stats::simulate_uniform(100, 5);
-  auto controls = FitControlsVinecop({ BicopFamily::tll });
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::tll };
   vc1.select(data, controls);
 
   // check if first and second are correct
@@ -243,8 +244,10 @@ TEST_F(VinecopTest, 1dim)
 TEST_F(VinecopTest, fit_statistics_getters_are_correct)
 {
   auto data = tools_stats::simulate_uniform(100, 3);
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::clayton };
   auto vc = Vinecop(
-    data, RVineStructure(), {}, FitControlsVinecop({ BicopFamily::clayton }));
+    data, controls);
   EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
   EXPECT_NEAR(static_cast<double>(vc.get_nobs()), 100, 1e-10);
   EXPECT_NEAR(vc.get_aic(), vc.aic(data), 1e-10);
@@ -442,20 +445,26 @@ TEST_F(VinecopTest, aic_bic_are_correct)
   }
   Vinecop complex_model(model_matrix, pair_copulas);
 
+  true_model.fit(data);
+  complex_model.fit(data);
+
   ASSERT_TRUE(true_model.aic(data) < complex_model.aic(data));
   ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
-  true_model.select(data);
+  
+  auto new_data = tools_stats::simulate_uniform(100, 7);
 
-  FitControlsVinecop controls({ BicopFamily::gaussian, BicopFamily::tll });
-  complex_model.select(data);
-  ASSERT_NEAR(complex_model.get_aic(), complex_model.aic(data), 1e-2);
-  ASSERT_NEAR(complex_model.get_bic(), complex_model.bic(data), 1e-2);
+  ASSERT_NEAR(true_model.get_aic(), true_model.aic(new_data), 1e-2);
+  ASSERT_NEAR(true_model.get_bic(), true_model.bic(new_data), 1e-2);
+  ASSERT_NEAR(complex_model.get_aic(), complex_model.aic(new_data), 1e-2);
+  ASSERT_NEAR(complex_model.get_bic(), complex_model.bic(new_data), 1e-2);
 }
 
 TEST_F(VinecopTest, fit_parameters_is_correct)
 {
   u.conservativeResize(50, 7);
-  auto controls = FitControlsVinecop({ BicopFamily::clayton }, "itau");
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::clayton };
+  controls.parametric_method = "itau";
   Vinecop vc(7);
   vc.select(u, controls);
   auto rvine_structure = vc.get_rvine_structure();
@@ -472,7 +481,7 @@ TEST_F(VinecopTest, fit_parameters_is_correct)
   ASSERT_TRUE(vc.str() == vc2.str());
 
   Vinecop vc3(rvine_structure, pcs);
-  controls.set_select_families(false);
+  controls.select_families = false;
   vc3.select(u, controls);
   ASSERT_TRUE(vc.str() == vc3.str());
 }
@@ -489,9 +498,11 @@ TEST_F(VinecopTest, family_select_finds_true_rotations)
   Vinecop vinecop(model_matrix, pair_copulas);
   auto data = vinecop.simulate(2000);
 
-  auto controls = FitControlsVinecop({ BicopFamily::clayton }, "itau");
-  // controls.set_show_trace(true);
-  Vinecop fit(data, model_matrix, {}, controls);
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::clayton };
+  controls.parametric_method = "itau";
+  // controls.show_trace = true;
+  Vinecop fit(data, controls, model_matrix);
 
   // don't check last two trees to avoid random failures because of
   // estimation uncertainty
@@ -514,10 +525,12 @@ TEST_F(VinecopTest, family_select_returns_pcs_in_right_order)
   }
   Vinecop vinecop(model_matrix, pair_copulas);
 
-  auto controls = FitControlsVinecop(bicop_families::itau, "itau");
-  // controls.set_show_trace(true);
-  Vinecop fit_struct(u, RVineStructure(), {}, controls);
-  Vinecop fit_fam(u, fit_struct.get_matrix(), {}, controls);
+  FitControls controls;
+  controls.family_set = bicop_families::itau;
+  controls.parametric_method = "itau";
+  // controls.show_trace = true;
+  Vinecop fit_struct(u, controls);
+  Vinecop fit_fam(u, controls, fit_struct.get_matrix());
 
   EXPECT_EQ(fit_struct.get_all_parameters(), fit_fam.get_all_parameters());
 }
@@ -525,12 +538,14 @@ TEST_F(VinecopTest, family_select_returns_pcs_in_right_order)
 TEST_F(VinecopTest, trace_works)
 {
   u.conservativeResize(10, 7);
-  FitControlsVinecop controls(bicop_families::itau, "itau");
-  controls.set_show_trace(true);
-  controls.set_select_threshold(true);
-  controls.set_trunc_lvl(3);
+  FitControls controls;
+  controls.family_set = bicop_families::itau;
+  controls.parametric_method = "itau";
+  controls.show_trace = true;
+  controls.select_threshold = true;
+  controls.trunc_lvl = 3;
   testing::internal::CaptureStdout();
-  Vinecop fit(u, RVineStructure(), {}, controls);
+  Vinecop fit(u, controls);
   std::string output = testing::internal::GetCapturedStdout();
   EXPECT_TRUE(!output.empty());
 }
@@ -538,18 +553,20 @@ TEST_F(VinecopTest, trace_works)
 TEST_F(VinecopTest, works_multi_threaded)
 {
   u.conservativeResize(100, 7);
-  FitControlsVinecop controls(bicop_families::itau, "itau");
-  controls.set_select_trunc_lvl(true);
+  FitControls controls;
+  controls.family_set = bicop_families::itau;
+  controls.parametric_method = "itau";
+  controls.select_trunc_lvl = true;
 
-  Vinecop fit1(u, RVineStructure(), {}, controls);
-  controls.set_num_threads(2);
-  Vinecop fit2(u, RVineStructure(), {}, controls);
+  Vinecop fit1(u, controls);
+  controls.num_threads = 2;
+  Vinecop fit2(u, controls);
 
   auto pcs = fit1.get_all_pair_copulas();
   for (auto& pc : pcs[0])
     pc.set_parameters(Eigen::VectorXd::Constant(1, 1));
   Vinecop fit3(fit1.get_rvine_structure(), pcs);
-  fit3.fit(u, controls, 2);
+  fit3.fit(u, controls);
 
   // check for equality in likelihood, since the pair copulas may be stored
   // in a different order when running in parallel
@@ -610,7 +627,9 @@ TEST_F(VinecopTest, select_finds_right_structure_prim)
 
   // select structure and get matrix
   Vinecop fit(7);
-  fit.select(u, FitControlsVinecop({ BicopFamily::indep }));
+  FitControls  controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::indep };
+  fit.select(u, controls);
   auto vcl_matrix = fit.get_matrix();
 
   // check if the same conditioned sets appear for each tree
@@ -622,10 +641,9 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
 {
   // check whether the same structure appears if we only allow for
   // independence (pair-copula estimates differ otherwise)
-  FitControlsVinecop controls({ BicopFamily::indep });
-  EXPECT_EQ(controls.get_tree_algorithm(), "mst_prim");
-  EXPECT_ANY_THROW(controls.set_tree_algorithm("foobar"));
-  controls.set_tree_algorithm("mst_kruskal");
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::indep };
+  controls.tree_algorithm = "mst_kruskal";
 
   // select structure and get matrix
   Vinecop fit(7);
@@ -640,11 +658,13 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
 TEST_F(VinecopTest, select_finds_different_structures_random)
 {
   // Initialize the controls
-  FitControlsVinecop controls_weighted({ BicopFamily::tll });
-  controls_weighted.set_tree_algorithm("random_weighted");
+  FitControls controls_weighted;
+  controls_weighted.family_set = std::vector<BicopFamily>{ BicopFamily::tll };
+  controls_weighted.tree_algorithm = "random_weighted";
 
-  FitControlsVinecop controls_unweighted({ BicopFamily::tll });
-  controls_unweighted.set_tree_algorithm("random_unweighted");
+  FitControls controls_unweighted;
+  controls_unweighted.family_set = std::vector<BicopFamily>{ BicopFamily::tll };
+  controls_unweighted.tree_algorithm = "random_unweighted";
 
   // For reseeding the random number generator
   std::random_device rd;
@@ -663,31 +683,21 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
     // Seed controls randomly for each test run
     std::generate(
       seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
-    controls_weighted.set_seeds(seeds);
-    controls_unweighted.set_seeds(seeds);
-
-    // Check RNG output changes
-    auto rng_sample_weighted =
-      controls_weighted.get_rng()(); // Get first sample
-    first_rng_outputs.insert(rng_sample_weighted);
-
-    auto rng_sample_unweighted =
-      controls_unweighted.get_rng()(); // Get first sample
-    first_rng_outputs.insert(rng_sample_unweighted);
+    controls_weighted.seeds = seeds;
+    controls_unweighted.seeds = seeds;
 
     // Select a random structure for the weighted method
-    Vinecop fit_weighted(u, RVineStructure(), {}, controls_weighted);
+    Vinecop fit_weighted(u, controls_weighted, RVineStructure(), {});
     auto struct_array_weighted = fit_weighted.get_struct_array();
     unique_structures_weighted.insert(struct_array_weighted);
 
     // Select a random structure for the unweighted method
-    Vinecop fit_unweighted(u, RVineStructure(), {}, controls_unweighted);
+    Vinecop fit_unweighted(u, controls_unweighted, RVineStructure(), {});
     auto struct_array_unweighted = fit_unweighted.get_struct_array();
     unique_structures_unweighted.insert(struct_array_unweighted);
   }
 
   // The probability that any 2 samples are the same by chance is very low
-  EXPECT_EQ(first_rng_outputs.size(), num_trials);
   EXPECT_EQ(unique_structures_weighted.size(), num_trials);
   EXPECT_EQ(unique_structures_unweighted.size(), num_trials);
 }
@@ -695,9 +705,10 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
 TEST_F(VinecopTest, fixed_truncation)
 {
   u.conservativeResize(10, 7);
-  FitControlsVinecop controls({ BicopFamily::indep });
-  controls.set_trunc_lvl(2);
-  // controls.set_show_trace(true);
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::indep };
+  controls.trunc_lvl = 2;
+  // controls.show_trace = true;
   Vinecop fit(7);
   fit.select(u, controls);
   EXPECT_EQ(fit.get_all_pair_copulas().size(), 2);
@@ -705,7 +716,7 @@ TEST_F(VinecopTest, fixed_truncation)
   fit.select(u, controls);
   EXPECT_EQ(fit.get_all_pair_copulas().size(), 2);
 
-  Vinecop fit2(u, fit.get_rvine_structure(), {}, controls);
+  Vinecop fit2(u, controls, fit.get_rvine_structure());
   EXPECT_EQ(fit2.get_all_pair_copulas().size(), 2);
 
   Vinecop fit3(u, fit.get_rvine_structure());
@@ -721,11 +732,13 @@ TEST_F(VinecopTest, sparse_threshold_selection)
 {
   u.conservativeResize(20, 7);
 
-  FitControlsVinecop controls(bicop_families::itau, "itau");
-  controls.set_select_threshold(true);
-  controls.set_threshold(NAN);
-  // controls.set_show_trace(true);
-  controls.set_selection_criterion("mbicv");
+  FitControls controls;
+  controls.family_set = bicop_families::itau;
+  controls.parametric_method = "itau";
+  controls.select_threshold = true;
+  controls.threshold = NAN;
+  // controls.show_trace = true;
+  controls.selection_criterion = "mbicv";
 
   Vinecop fit(7);
   fit.select(u, controls);
@@ -740,9 +753,11 @@ TEST_F(VinecopTest, sparse_threshold_selection)
 TEST_F(VinecopTest, sparse_truncation_selection)
 {
   u.conservativeResize(50, 7);
-  FitControlsVinecop controls(bicop_families::itau, "itau");
-  controls.set_select_trunc_lvl(true);
-  // controls.set_show_trace(true);
+  FitControls controls;
+  controls.family_set = bicop_families::itau;
+  controls.parametric_method = "itau";
+  controls.select_trunc_lvl = true;
+  // controls.show_trace = true;
   u = tools_stats::simulate_uniform(100, 7);
   Vinecop fit(7);
   fit.select(u, controls);
@@ -756,12 +771,14 @@ TEST_F(VinecopTest, sparse_truncation_selection)
 TEST_F(VinecopTest, sparse_both_selection)
 {
   u.conservativeResize(20, 7);
-  FitControlsVinecop controls(bicop_families::itau, "itau");
-  controls.set_select_trunc_lvl(true);
-  controls.set_select_threshold(true);
-  controls.set_tree_criterion("joe");
-  controls.set_selection_criterion("mbicv");
-  // controls.set_show_trace(true);
+  FitControls controls;
+  controls.family_set = bicop_families::itau;
+  controls.parametric_method = "itau";
+  controls.select_trunc_lvl = true;
+  controls.select_threshold = true;
+  controls.tree_criterion = "joe";
+  controls.selection_criterion = "mbicv";
+  // controls.show_trace = true;
   Vinecop fit(7);
   fit.select(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
@@ -777,8 +794,10 @@ TEST_F(VinecopTest, sparse_both_selection)
 TEST_F(VinecopTest, partial_selection)
 {
   u.conservativeResize(20, 7);
-  FitControlsVinecop controls(bicop_families::itau, "itau");
-  // controls.set_show_trace(true);
+  FitControls controls;
+  controls.family_set = bicop_families::itau;
+  controls.parametric_method = "itau";
+  // controls.show_trace = true;
   auto fixed = CVineStructure(std::vector<size_t>{ 5, 4, 7, 1, 3, 6, 2 });
   fixed.truncate(1);
   Vinecop fit(fixed);
@@ -797,7 +816,8 @@ TEST_F(VinecopTest, partial_selection)
 
 TEST_F(VinecopTest, tawn_flipping)
 {
-  FitControlsVinecop controls({ BicopFamily::tawn });
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::tawn };
   Vinecop fit1(7);
   fit1.select(u, controls);
   Vinecop fit2(fit1.get_rvine_structure());

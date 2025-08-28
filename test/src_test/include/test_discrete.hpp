@@ -67,7 +67,9 @@ TEST(discrete, bicop)
     bc.select(uu.topRows(20)); // all families
 
     // tll
-    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
+    FitControls controls;
+    controls.family_set = std::vector<BicopFamily>{ BicopFamily::tll };
+    bc.select(uu.topRows(20), controls);
     bc.parameters_to_tau(bc.get_parameters());
   }
 }
@@ -107,7 +109,9 @@ TEST(zero_inflated, bicop)
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
     // tll
-    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
+    FitControls controls;
+    controls.family_set = std::vector<BicopFamily>{ BicopFamily::tll };
+    bc.select(uu.topRows(20), controls);
     EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
 
     // c_d
@@ -124,7 +128,7 @@ TEST(zero_inflated, bicop)
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
     // tll
-    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
+    bc.select(uu.topRows(20), controls);
     EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
 
     // d_d
@@ -139,7 +143,7 @@ TEST(zero_inflated, bicop)
     bc.select(uu.topRows(20)); // all families
 
     // tll
-    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
+    bc.select(uu.topRows(20), controls);
     EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
   }
 }
@@ -174,9 +178,10 @@ TEST(discrete, vinecop)
   u.col(5 + 2) = (utmp.col(3).array() * 10).floor() / 10;
 
   // fit vine
-  auto controls = FitControlsVinecop({ BicopFamily::clayton });
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::clayton };
   auto vc2 = vc;
-  // controls.set_show_trace(true);
+  // controls.show_trace = true;
   vc2.select(u, controls);
   vc2.pdf(u);
 
@@ -268,8 +273,9 @@ TEST(zero_inflated, vinecop)
   u.col(5 + 2) = (utmp.col(3).array() < 0.1).select(zero, u.col(3));
 
   // fit vine
-  auto controls = FitControlsVinecop({ BicopFamily::clayton });
-  // controls.set_show_trace(true);
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::clayton };
+  // controls.show_trace = true;
   vc.select(u, controls);
   vc.pdf(u);
 

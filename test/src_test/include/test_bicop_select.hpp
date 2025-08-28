@@ -18,8 +18,8 @@ TEST(bicop_select, works_in_parallel)
   auto u = cop.simulate(15);
   Bicop fit1, fit2;
   fit1.select(u);
-  FitControlsBicop controls;
-  controls.set_num_threads(2);
+  FitControls controls;
+  controls.num_threads = 2;
   fit2.select(u, controls);
   EXPECT_EQ(fit1.get_family(), fit2.get_family());
   EXPECT_EQ(fit1.get_parameters(), fit2.get_parameters());
@@ -29,26 +29,22 @@ TEST(bicop_select, allows_all_selcrits)
 {
   Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
   auto u = cop.simulate(15);
-  FitControlsBicop controls;
-  controls.set_selection_criterion("loglik");
-  cop.select(u, controls);
-  controls.set_selection_criterion("aic");
-  cop.select(u, controls);
-  controls.set_selection_criterion("bic");
-  cop.select(u, controls);
-  controls.set_selection_criterion("mbic");
-  cop.select(u, controls);
+  for(auto selection_criterion : {"loglik", "aic", "bic", "mbic"}) {
+    FitControls controls;
+    controls.selection_criterion = selection_criterion;
+    cop.select(u, controls);
+  }
 }
 
 TEST(bicop_select, allow_rotations_works)
 {
   Bicop cop(BicopFamily::clayton, 180, Eigen::VectorXd::Constant(1, 5));
   auto u = cop.simulate(static_cast<size_t>(5e3));
-  FitControlsBicop controls;
-  controls.set_family_set({ BicopFamily::clayton });
+  FitControls controls;
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::clayton };
   cop.select(u, controls);
   EXPECT_EQ(cop.get_rotation(), 180);
-  controls.set_allow_rotations(false);
+  controls.allow_rotations = false;
   cop.select(u, controls);
   EXPECT_EQ(cop.get_rotation(), 0);
 }

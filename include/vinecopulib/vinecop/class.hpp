@@ -42,24 +42,24 @@ public:
 
   // Contructors with data
   explicit Vinecop(const Eigen::MatrixXd& data,
-    FitControls& controls,
-                   const RVineStructure& structure = RVineStructure(),
-                   const std::vector<std::string>& var_types = {}
-                   );
+                   FitControls& controls,
+                   const std::vector<std::string>& var_types = {});
   explicit Vinecop(const Eigen::MatrixXd& data,
-                   const RVineStructure& structure = RVineStructure(),
+                   const RVineStructure& structure,
+                   const std::vector<std::string>& var_types = {});
+  explicit Vinecop(const Eigen::MatrixXd& data,
+                   FitControls& controls,
+                   const RVineStructure& structure,
                    const std::vector<std::string>& var_types = {});
 
   explicit Vinecop(
     const Eigen::MatrixXd& data,
-    FitControls& controls,
-    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix =
-      Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>(),
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
     const std::vector<std::string>& var_types = {});
   explicit Vinecop(
     const Eigen::MatrixXd& data,
-    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix =
-      Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>(),
+    FitControls& controls,
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
     const std::vector<std::string>& var_types = {});
 
   // Deprecated constructors using FitControlsVinecop

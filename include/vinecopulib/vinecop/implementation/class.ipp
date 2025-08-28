@@ -71,7 +71,7 @@ inline Vinecop::Vinecop(
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
 //! @param controls See `FitControls()`.
-//! @param structure An RVineStructure object specifying the vine structure.
+//! @param structure An `RVineStructure` object specifying the vine structure.
 //!    If empty, then it is selected as part of the fit.
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
@@ -107,7 +107,25 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 //! selecting the model using `select()`.
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
-//! @param structure An RVineStructure object specifying the vine structure.
+//! @param controls See `FitControls()`.
+//! @param var_types Strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+//!   If empty, then all variables are set as continuous.
+inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
+                        FitControls& controls,
+                        const std::vector<std::string>& var_types)
+: Vinecop(data, controls, RVineStructure{}, var_types)
+{
+
+}
+
+//! @brief Instantiates from data.
+//!
+//! @details Equivalent to creating a default `Vinecop()` and then
+//! selecting the model using `select()`.
+//!
+//! @param data An \f$ n \times d \f$ matrix of observations.
+//! @param structure An `RVineStructure` object specifying the vine structure.
 //!    If empty, then it is selected as part of the fit.
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
@@ -118,6 +136,50 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 {
   auto controls = FitControls::defaults_vinecop();
   *this = Vinecop(data, controls, structure, var_types);
+}
+
+
+//! @brief Instantiates from data.
+//!
+//! @details Equivalent to creating a default `Vinecop()` and
+//! then selecting the model using `select()`.
+//!
+//! @param data An \f$ n \times d \f$ matrix of observations.
+//! @param matrix Either an empty matrix (default) or an R-vine structure
+//!     matrix, see `select()`. If empty, then it is selected as part of the
+//!     fit.
+//! @param var_types Strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+//!   If empty, then all variables are set as continuous.
+inline Vinecop::Vinecop(
+  const Eigen::MatrixXd& data,
+  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
+  const std::vector<std::string>& var_types)
+{
+  auto controls = FitControls::defaults_vinecop();
+  *this = Vinecop(data, controls, matrix, var_types);
+}
+
+//! @brief Instantiates from data.
+//!
+//! @details Equivalent to creating a default `Vinecop()` and
+//! then selecting the model using `select()`.
+//!
+//! @param data An \f$ n \times d \f$ matrix of observations.
+//! @param controls See `FitControls()`.
+//! @param matrix Either an empty matrix (default) or an R-vine structure
+//!     matrix, see `select()`. If empty, then it is selected as part of the
+//!     fit.
+//! @param var_types Strings specifying the types of the variables,
+//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+//!   If empty, then all variables are set as continuous.
+inline Vinecop::Vinecop(
+  const Eigen::MatrixXd& data,
+  FitControls& controls,
+  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
+  const std::vector<std::string>& var_types)
+  : Vinecop(data, controls, RVineStructure(matrix), var_types)
+{
 }
 
 //! @brief Instantiates from data.
@@ -160,49 +222,6 @@ inline Vinecop::Vinecop(
   const std::vector<std::string>& var_types,
   const FitControlsVinecop& controls)
   : Vinecop(data, RVineStructure(matrix), var_types, controls)
-{
-}
-
-//! @brief Instantiates from data.
-//!
-//! @details Equivalent to creating a default `Vinecop()` and
-//! then selecting the model using `select()`.
-//!
-//! @param data An \f$ n \times d \f$ matrix of observations.
-//! @param matrix Either an empty matrix (default) or an R-vine structure
-//!     matrix, see `select()`. If empty, then it is selected as part of the
-//!     fit.
-//! @param var_types Strings specifying the types of the variables,
-//!   e.g., `("c", "d")` means first variable continuous, second discrete.
-//!   If empty, then all variables are set as continuous.
-inline Vinecop::Vinecop(
-  const Eigen::MatrixXd& data,
-  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
-  const std::vector<std::string>& var_types)
-{
-  auto controls = FitControls::defaults_vinecop();
-  *this = Vinecop(data, controls, matrix, var_types);
-}
-
-//! @brief Instantiates from data.
-//!
-//! @details Equivalent to creating a default `Vinecop()` and
-//! then selecting the model using `select()`.
-//!
-//! @param data An \f$ n \times d \f$ matrix of observations.
-//! @param controls See `FitControls()`.
-//! @param matrix Either an empty matrix (default) or an R-vine structure
-//!     matrix, see `select()`. If empty, then it is selected as part of the
-//!     fit.
-//! @param var_types Strings specifying the types of the variables,
-//!   e.g., `("c", "d")` means first variable continuous, second discrete.
-//!   If empty, then all variables are set as continuous.
-inline Vinecop::Vinecop(
-  const Eigen::MatrixXd& data,
-  FitControls& controls,
-  const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
-  const std::vector<std::string>& var_types)
-  : Vinecop(data, controls, RVineStructure(matrix), var_types)
 {
 }
 
