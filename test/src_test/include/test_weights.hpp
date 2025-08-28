@@ -20,8 +20,7 @@ TEST(test_weights, catches_incompatible_sizes)
   controls.weights = w;
   EXPECT_ANY_THROW(Bicop(u, controls));
   u = tools_stats::simulate_uniform(20, 4);
-  EXPECT_ANY_THROW(
-    Vinecop(u, controls));
+  EXPECT_ANY_THROW(Vinecop(u, controls));
 }
 
 TEST(test_weights, allows_nans)
@@ -59,8 +58,7 @@ TEST(test_weights, works_in_vinecop_select)
 
   FitControls controls;
   controls.family_set = bicop_families::parametric;
-  auto cop_uw = Vinecop(
-    u.block(0, 0, 100, 7), controls);
+  auto cop_uw = Vinecop(u.block(0, 0, 100, 7), controls);
   controls.weights = w;
   auto cop_w = Vinecop(u, controls);
   EXPECT_EQ(cop_uw.get_all_families(), cop_w.get_all_families());

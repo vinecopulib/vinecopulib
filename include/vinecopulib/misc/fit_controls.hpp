@@ -24,21 +24,21 @@ namespace vinecopulib {
 
 //! @brief controls options for bivariate and vine copula models.
 //!
-//! @details This struct provides a flexible way to controlsure copula fitting parameters.
-//! Each field is optional, and default values are applied if the field
-//! is not set. Includes built-in validation when values are set.
+//! @details This struct provides a flexible way to controlsure copula fitting
+//! parameters. Each field is optional, and default values are applied if the
+//! field is not set. Includes built-in validation when values are set.
 struct FitControls
 {
-  //! @brief The set of copula families to consider (if empty, then all families are
-  //! included).
+  //! @brief The set of copula families to consider (if empty, then all families
+  //! are included).
   optional::optional<std::vector<BicopFamily>> family_set;
 
   //! @brief The fit method for parametric families; possible choices: `"mle"`,
   //! `"itau"`.
   optional::optional<std::string> parametric_method;
 
-  //! @brief The fit method for the local-likelihood nonparametric family (TLLs);
-  //! possible choices: `"constant"`, `"linear"`, `"quadratic"`.
+  //! @brief The fit method for the local-likelihood nonparametric family
+  //! (TLLs); possible choices: `"constant"`, `"linear"`, `"quadratic"`.
   optional::optional<std::string> nonparametric_method;
 
   //! @brief A factor with which the smoothing parameters are multiplied.
@@ -58,16 +58,17 @@ struct FitControls
   //! non-independence.
   optional::optional<double> psi0;
 
-  //! @brief Whether to exclude families before fitting based on symmetry properties of
-  //! the data.
+  //! @brief Whether to exclude families before fitting based on symmetry
+  //! properties of the data.
   optional::optional<bool> preselect_families;
 
-  //! @brief Whether to allow rotations for the families when doing model selection.
+  //! @brief Whether to allow rotations for the families when doing model
+  //! selection.
   optional::optional<bool> allow_rotations;
 
-  //! @brief Number of concurrent threads to use while fitting pair copulas within a
-  //! tree; never uses more than the number of concurrent threads supported by
-  //! the implementation.
+  //! @brief Number of concurrent threads to use while fitting pair copulas
+  //! within a tree; never uses more than the number of concurrent threads
+  //! supported by the implementation.
   optional::optional<size_t> num_threads;
 
   //! @brief Truncation level for truncated vines.
@@ -101,9 +102,9 @@ struct FitControls
   //! @brief The algorithm for building the spanning tree (`"mst_prim"`,
   //! `"mst_kruskal"`, `"random_weighted"`, or
   //! `"random_unweighted"`) during the tree-wise structure selection.
-  //! 
-  //! @details `"mst_prim"` and `"mst_kruskal"` use Prim's and Kruskal's algorithms
-  //! respectively to select the maximum spanning tree, maximizing
+  //!
+  //! @details `"mst_prim"` and `"mst_kruskal"` use Prim's and Kruskal's
+  //! algorithms respectively to select the maximum spanning tree, maximizing
   //! the sum of the edge weights (i.e., `tree_criterion`).
   //! `"random_weighted"` and `"random_unweighted"` use Wilson's
   //! algorithm to generate a random spanning tree, either with probability

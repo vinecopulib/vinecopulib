@@ -114,9 +114,8 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
                         FitControls& controls,
                         const std::vector<std::string>& var_types)
-: Vinecop(data, controls, RVineStructure{}, var_types)
+  : Vinecop(data, controls, RVineStructure{}, var_types)
 {
-
 }
 
 //! @brief Instantiates from data.
@@ -137,7 +136,6 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   auto controls = FitControls::defaults_vinecop();
   *this = Vinecop(data, controls, structure, var_types);
 }
-
 
 //! @brief Instantiates from data.
 //!
@@ -202,7 +200,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   auto fit_controls = controls.get_controls();
   *this = Vinecop(data, fit_controls, structure, var_types);
 }
- 
+
 //! @brief Instantiates from data.
 //!
 //! @details Equivalent to creating a default `Vinecop()` and
@@ -458,8 +456,8 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 //! corrected for ties (see the [wdm](https://github.com/tnagler/wdm) library).
 //! The dependence measure can be changed using the `controls.tree_criterion`,
 //! which can be set to `"tau"`, `"rho"` or `"hoeffd"`.
-//! Both Prim's (default: `"mst_prim"`) and Kruskal's ()`"mst_kruskal"`) 
-//! algorithms are available through `controls.tree_algorithm` for the 
+//! Both Prim's (default: `"mst_prim"`) and Kruskal's ()`"mst_kruskal"`)
+//! algorithms are available through `controls.tree_algorithm` for the
 //! maximum spanning tree selection.
 //! An alternative to the maximum spanning tree selection is to use random
 //! spanning trees, which can be selected using `controls.tree_algorithm` and
@@ -552,8 +550,8 @@ Vinecop::select(const Eigen::MatrixXd& data, FitControls& controls)
 //! corrected for ties (see the [wdm](https://github.com/tnagler/wdm) library).
 //! The dependence measure can be changed using the `controls.tree_criterion`,
 //! which can be set to `"tau"`, `"rho"` or `"hoeffd"`.
-//! Both Prim's (default: `"mst_prim"`) and Kruskal's ()`"mst_kruskal"`) 
-//! algorithms are available through `controls.tree_algorithm` for the 
+//! Both Prim's (default: `"mst_prim"`) and Kruskal's ()`"mst_kruskal"`)
+//! algorithms are available through `controls.tree_algorithm` for the
 //! maximum spanning tree selection.
 //! An alternative to the maximum spanning tree selection is to use random
 //! spanning trees, which can be selected using `controls.tree_algorithm` and
@@ -594,12 +592,11 @@ Vinecop::select(const Eigen::MatrixXd& data)
   select(data, controls);
 }
 
-
 //! @brief Fits the parameters of a pre-specified vine copula model.
 //!
 //! @details This method fits the pair-copulas of a vine copula model. It is
-//! assumed that the strucontrolscture  and pair-copula families are already set.
-//! The method is equivalent to calling `fit()` for each pair-copula in the
+//! assumed that the strucontrolscture  and pair-copula families are already
+//! set. The method is equivalent to calling `fit()` for each pair-copula in the
 //! model. The same can be achieved by calling `select()` with the same data
 //! and a `FitControls` object instantiated
 //! with `select_families = false`.
@@ -609,8 +606,7 @@ Vinecop::select(const Eigen::MatrixXd& data)
 //! @param controls The controls for each bivariate fit (see
 //! `FitControls()`).
 inline void
-Vinecop::fit(const Eigen::MatrixXd& data,
-             FitControls& controls)
+Vinecop::fit(const Eigen::MatrixXd& data, FitControls& controls)
 {
   controls.validate_and_set_defaults_vinecop();
   controls.check_weights_size(data);
@@ -722,18 +718,17 @@ Vinecop::fit(const Eigen::MatrixXd& data,
 //! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 inline void
-Vinecop::fit(const Eigen::MatrixXd& data) 
+Vinecop::fit(const Eigen::MatrixXd& data)
 {
   auto controls = FitControls::defaults_vinecop();
   fit(data, controls);
 }
 
-
 //! @brief Fits the parameters of a pre-specified vine copula model.
 //!
 //! @details This method fits the pair-copulas of a vine copula model. It is
-//! assumed that the strucontrolscture  and pair-copula families are already set.
-//! The method is equivalent to calling `fit()` for each pair-copula in the
+//! assumed that the strucontrolscture  and pair-copula families are already
+//! set. The method is equivalent to calling `fit()` for each pair-copula in the
 //! model. The same can be achieved by calling `select()` with the same data
 //! and a `FitControls` object instantiated
 //! with `select_families = false`.
@@ -743,8 +738,7 @@ Vinecop::fit(const Eigen::MatrixXd& data)
 //! @param controls The controls for each bivariate fit (see
 //! `FitControlsBicop()`).
 inline void
-Vinecop::fit(const Eigen::MatrixXd& data,
-             const FitControlsBicop& controls)
+Vinecop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
 {
   auto fit_controls = controls.get_controls();
   select(data, fit_controls);

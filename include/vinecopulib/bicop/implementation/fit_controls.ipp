@@ -13,7 +13,7 @@ namespace vinecopulib {
 
 //! @brief Instantiates the controls for fitting bivariate copula models.
 inline FitControlsBicop::FitControlsBicop()
-: controls_(FitControls::defaults_bicop())
+  : controls_(FitControls::defaults_bicop())
 {
 }
 
@@ -52,7 +52,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
                                           double psi0,
                                           bool preselect_families,
                                           bool allow_rotations,
-                                          size_t num_threads)      
+                                          size_t num_threads)
 {
   set_family_set(family_set);
   set_parametric_method(parametric_method);

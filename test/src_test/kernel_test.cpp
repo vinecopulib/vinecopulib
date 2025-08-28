@@ -12,7 +12,7 @@ TrafokernelTest::TrafokernelTest()
   , controls()
   , u(tools_stats::simulate_uniform(20, 2, true, { 1 }))
 {
-  controls.family_set = std::vector<BicopFamily>{ vinecopulib::BicopFamily::tll };
+  controls.family_set =
+    std::vector<BicopFamily>{ vinecopulib::BicopFamily::tll };
   controls.nonparametric_method = GetParam();
-
 }

@@ -29,7 +29,7 @@ TEST(bicop_select, allows_all_selcrits)
 {
   Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
   auto u = cop.simulate(15);
-  for(auto selection_criterion : {"loglik", "aic", "bic", "mbic"}) {
+  for (auto selection_criterion : { "loglik", "aic", "bic", "mbic" }) {
     FitControls controls;
     controls.selection_criterion = selection_criterion;
     cop.select(u, controls);

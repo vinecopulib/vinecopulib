@@ -80,7 +80,6 @@ TEST(bicop_sanity_checks, controls_print)
   EXPECT_NO_THROW(controls.str_bicop());
   auto controls2 = FitControlsBicop();
   EXPECT_NO_THROW(controls2.str());
-
 }
 
 TEST(bicop_sanity_checks, controls_checks)

@@ -246,8 +246,7 @@ TEST_F(VinecopTest, fit_statistics_getters_are_correct)
   auto data = tools_stats::simulate_uniform(100, 3);
   FitControls controls;
   controls.family_set = std::vector<BicopFamily>{ BicopFamily::clayton };
-  auto vc = Vinecop(
-    data, controls);
+  auto vc = Vinecop(data, controls);
   EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
   EXPECT_NEAR(static_cast<double>(vc.get_nobs()), 100, 1e-10);
   EXPECT_NEAR(vc.get_aic(), vc.aic(data), 1e-10);
@@ -450,7 +449,7 @@ TEST_F(VinecopTest, aic_bic_are_correct)
 
   ASSERT_TRUE(true_model.aic(data) < complex_model.aic(data));
   ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
-  
+
   auto new_data = tools_stats::simulate_uniform(100, 7);
 
   ASSERT_NEAR(true_model.get_aic(), true_model.aic(new_data), 1e-2);
@@ -627,7 +626,7 @@ TEST_F(VinecopTest, select_finds_right_structure_prim)
 
   // select structure and get matrix
   Vinecop fit(7);
-  FitControls  controls;
+  FitControls controls;
   controls.family_set = std::vector<BicopFamily>{ BicopFamily::indep };
   fit.select(u, controls);
   auto vcl_matrix = fit.get_matrix();

@@ -170,7 +170,7 @@ protected:
   std::vector<VineTree> trees_opt_;
   double loglik_;
   double threshold_;
-  double psi0_; // initial prior probability for 
+  double psi0_; // initial prior probability for
   // for random stuff
   boost::random::mt19937 rng_;
 

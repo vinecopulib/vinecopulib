@@ -127,7 +127,7 @@ public:
   void fit(const Eigen::MatrixXd& data);
   [[deprecated("Use fit(data, FitControls) instead")]]
   void fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls);
-  
+
   void select(const Eigen::MatrixXd& data, FitControls& controls);
   void select(const Eigen::MatrixXd& data);
   [[deprecated("Use select(data, FitControls) instead")]]

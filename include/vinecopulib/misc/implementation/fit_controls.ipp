@@ -68,11 +68,7 @@ namespace vinecopulib {
     NO_CHECK,                                                                  \
     "Allow rotations: ",                                                       \
     tools_print::PrintYesNo{})                                                 \
-  X(num_threads,                                                               \
-    0,                                                                         \
-    NO_CHECK,                                                                  \
-    "Number of threads: ",                                                     \
-    tools_print::PrintSkip{})
+  X(num_threads, 0, NO_CHECK, "Number of threads: ", tools_print::PrintSkip{})
 
 // Vinecop fields (field, default, checker, label, printer)
 #define VINECOP_FIELDS                                                         \
@@ -112,11 +108,7 @@ namespace vinecopulib {
     check_tree_algorithm,                                                      \
     "Tree algorithm: ",                                                        \
     tools_print::PrintDefault{})                                               \
-  X(seeds,                                                                     \
-    std::vector<int>(),                                                        \
-    NO_CHECK,                                                                  \
-    "Seeds: ",                                                                 \
-    tools_print::PrintSkip{})
+  X(seeds, std::vector<int>(), NO_CHECK, "Seeds: ", tools_print::PrintSkip{})
 
 //! @brief Creates default controls for bivariate copula models.
 inline FitControls

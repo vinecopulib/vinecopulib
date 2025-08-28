@@ -10,67 +10,85 @@
 #include <vinecopulib/misc/tools_optional.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
-
 namespace vinecopulib {
 
 namespace tools_print {
 
 // Printer tags
-struct PrintSkip {};        // do nothing
-struct PrintDefault {};     // use operator<< on the resolved value
-struct PrintYesNo {};       // print "yes"/"no" for bools
-struct PrintFamilies {};    // vector<BicopFamily> -> comma-separated names
-struct PrintThreads {};     // size_t -> max(1, value)
-struct PrintWeights {};     // Eigen::VectorXd -> "yes"/"no" by size>0
+struct PrintSkip
+{}; // do nothing
+struct PrintDefault
+{}; // use operator<< on the resolved value
+struct PrintYesNo
+{}; // print "yes"/"no" for bools
+struct PrintFamilies
+{}; // vector<BicopFamily> -> comma-separated names
+struct PrintThreads
+{}; // size_t -> max(1, value)
+struct PrintWeights
+{}; // Eigen::VectorXd -> "yes"/"no" by size>0
 
 // Generic
-template <class Os, class Opt>
-void print_field(Os& os, const char* label, const Opt& opt, PrintDefault) {
+template<class Os, class Opt>
+void
+print_field(Os& os, const char* label, const Opt& opt, PrintDefault)
+{
   os << label << opt.value() << '\n';
 }
 
 // Intentionally empty
-template <class Os, class Opt>
-void print_field(Os&, const char*, const Opt&, PrintSkip) {
-
+template<class Os, class Opt>
+void
+print_field(Os&, const char*, const Opt&, PrintSkip)
+{
 }
 
 // Booleans as yes/no
-template <class Os, class Opt>
-void print_field(Os& os, const char* label, const Opt& opt, PrintYesNo) {
+template<class Os, class Opt>
+void
+print_field(Os& os, const char* label, const Opt& opt, PrintYesNo)
+{
   os << label << (opt.value() ? "yes" : "no") << '\n';
 }
 
 // Families: vector<BicopFamily>
-template <class Os>
-void print_field(Os& os, const char* label,
-                 const optional::optional<std::vector<BicopFamily>>& opt,
-                 PrintFamilies) {
+template<class Os>
+void
+print_field(Os& os,
+            const char* label,
+            const optional::optional<std::vector<BicopFamily>>& opt,
+            PrintFamilies)
+{
   os << label;
   const auto& fs = opt.value();
   for (size_t j = 0; j < fs.size(); ++j) {
-    if (j) os << ", ";
+    if (j)
+      os << ", ";
     os << get_family_name(fs[j]);
   }
   os << '\n';
 }
 
 // Threads
-template <class Os, class Opt>
-void print_field(Os& os, const char* label, const Opt& opt, PrintThreads) {
+template<class Os, class Opt>
+void
+print_field(Os& os, const char* label, const Opt& opt, PrintThreads)
+{
   auto n = opt.value();
-  os << label << (n == 0 ? size_t{1} : n) << '\n';
+  os << label << (n == 0 ? size_t{ 1 } : n) << '\n';
 }
 
 // Weights: Eigen::VectorXd -> "yes"/"no" by size>0
-template <class Os>
-void print_field(Os& os, const char* label,
-                 const optional::optional<Eigen::VectorXd>& opt,
-                 PrintWeights) {
+template<class Os>
+void
+print_field(Os& os,
+            const char* label,
+            const optional::optional<Eigen::VectorXd>& opt,
+            PrintWeights)
+{
   const auto& w = opt.value();
   os << label << (w.size() > 0 ? "yes" : "no") << '\n';
 }
-
 
 // Function to format vectors of strings like a DataFrame and return a
 // stringstream

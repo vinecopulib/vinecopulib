@@ -16,13 +16,13 @@ namespace tools_select {
 //!     should NOT be modified though.
 //! @param controls The controls (see `FitControls`).
 inline std::vector<Bicop>
-create_candidate_bicops(const Eigen::MatrixXd& data,
-                        FitControls& controls)
+create_candidate_bicops(const Eigen::MatrixXd& data, FitControls& controls)
 {
   std::vector<BicopFamily> families = get_candidate_families(controls);
 
   // check whether dependence is negative or positive
-  double tau = wdm::wdm(data.leftCols(2), "tau", controls.weights.value())(0, 1);
+  double tau =
+    wdm::wdm(data.leftCols(2), "tau", controls.weights.value())(0, 1);
   std::vector<int> which_rotations;
   if (controls.allow_rotations.value()) {
     if (tau > 0) {

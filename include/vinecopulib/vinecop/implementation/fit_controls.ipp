@@ -16,7 +16,7 @@
 namespace vinecopulib {
 //! Instantiates default controls for fitting vine copula models.
 inline FitControlsVinecop::FitControlsVinecop()
-: FitControlsVinecop(FitControls::defaults_vinecop())
+  : FitControlsVinecop(FitControls::defaults_vinecop())
 {
 }
 

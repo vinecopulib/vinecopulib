@@ -68,9 +68,9 @@ inline Bicop::Bicop(const Eigen::MatrixXd& data,
 inline Bicop::Bicop(const Eigen::MatrixXd& data,
                     std::vector<std::string> var_types)
 {
-    auto controls = FitControls::defaults_bicop();
-    // delegate
-    *this = Bicop(data, controls, var_types);
+  auto controls = FitControls::defaults_bicop();
+  // delegate
+  *this = Bicop(data, controls, var_types);
 }
 
 //! @brief Instantiates from data using deprecated FitControlsBicop.
@@ -86,8 +86,8 @@ inline Bicop::Bicop(const Eigen::MatrixXd& data,
                     const FitControlsBicop& controls,
                     const std::vector<std::string>& var_types)
 {
-    auto fit_controls = controls.get_controls();
-    *this = Bicop(data, fit_controls, var_types);
+  auto fit_controls = controls.get_controls();
+  *this = Bicop(data, fit_controls, var_types);
 }
 
 //! @brief Copy constructor (deep copy)
@@ -881,12 +881,11 @@ Bicop::fit(const Eigen::MatrixXd& data, FitControls& controls)
   auto weights_no_nan = controls.weights.value();
   tools_eigen::remove_nans(data_no_nan, weights_no_nan);
 
-  bicop_->fit(
-    prep_for_abstract(data_no_nan),
-    method,
-    controls.nonparametric_mult.value(),
-    controls.nonparametric_grid_size.value(),
-    weights_no_nan);
+  bicop_->fit(prep_for_abstract(data_no_nan),
+              method,
+              controls.nonparametric_mult.value(),
+              controls.nonparametric_grid_size.value(),
+              weights_no_nan);
   nobs_ = data_no_nan.rows();
 }
 
@@ -973,7 +972,6 @@ Bicop::select(const Eigen::MatrixXd& data, FitControls& controls)
   controls.validate_and_set_defaults_bicop();
   using namespace tools_select;
 
-  
   controls.check_weights_size(data);
   Eigen::MatrixXd data_no_nan = data;
   auto weights_no_nan = controls.weights.value();

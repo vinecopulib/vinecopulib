@@ -22,19 +22,17 @@ public:
   FitControlsBicop();
 
   [[deprecated("Use FitControls instead")]]
-  FitControlsBicop(
-    std::vector<BicopFamily> family_set,
-    std::string parametric_method = "mle",
-    std::string nonparametric_method = "constant",
-    double nonparametric_mult = 1.0,
-    size_t nonparametric_grid_size = 30,
-    std::string selection_criterion = "aic",
-    const Eigen::VectorXd& weights = Eigen::VectorXd(),
-    double psi0 = 0.9,
-    bool preselect_families = true,
-    bool allow_rotations = true,
-    size_t num_threads = 1
-  );
+  FitControlsBicop(std::vector<BicopFamily> family_set,
+                   std::string parametric_method = "mle",
+                   std::string nonparametric_method = "constant",
+                   double nonparametric_mult = 1.0,
+                   size_t nonparametric_grid_size = 30,
+                   std::string selection_criterion = "aic",
+                   const Eigen::VectorXd& weights = Eigen::VectorXd(),
+                   double psi0 = 0.9,
+                   bool preselect_families = true,
+                   bool allow_rotations = true,
+                   size_t num_threads = 1);
 
   [[deprecated("Use FitControls instead")]]
   explicit FitControlsBicop(std::string parametric_method);
