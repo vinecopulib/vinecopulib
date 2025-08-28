@@ -134,24 +134,25 @@ struct FitControls
   //! @brief Validates and applies defaults for unset values for Bicop
   void validate_and_set_defaults_bicop();
 
-  void check_family_set(const std::vector<BicopFamily>& family_set) const;
-  void check_parametric_method(const std::string& method) const;
-  void check_nonparametric_method(const std::string& method) const;
-  void check_nonparametric_mult(double mult) const;
-  void check_nonparametric_grid_size(size_t grid_size) const;
-  void check_selection_criterion(const std::string& criterion) const;
-  void check_psi0(double psi0) const;
-  void check_tree_criterion(const std::string& criterion) const;
-  void check_tree_algorithm(const std::string& algorithm) const;
-  void check_threshold(double threshold) const;
-  void check_weights_size(const Eigen::MatrixXd& data) const;
+  static void check_family_set(const std::vector<BicopFamily>& family_set);
+  static void check_parametric_method(const std::string& method);
+  static void check_nonparametric_method(const std::string& method);
+  static void check_nonparametric_mult(double mult);
+  static void check_nonparametric_grid_size(size_t grid_size);
+  static void check_selection_criterion(const std::string& criterion);
+  static void check_psi0(double psi0);
+  static void check_tree_criterion(const std::string& criterion);
+  static void check_tree_algorithm(const std::string& algorithm);
+  static void check_threshold(double threshold);
+  static void check_weights_size(const Eigen::MatrixXd& data,
+                                 const Eigen::VectorXd& weights);
   //! @}
 
   //! @brief Processes and validates number of threads.
-  size_t process_num_threads(size_t num_threads) const;
+  static size_t process_num_threads(size_t num_threads);
 
   //! @brief Normalizes weights to sum to n.
-  Eigen::VectorXd normalize_weights(Eigen::VectorXd& weights) const;
+  static Eigen::VectorXd normalize_weights(const Eigen::VectorXd& weights);
 
   //! @brief Whether sparse selection is needed
   bool needs_sparse_select() const;

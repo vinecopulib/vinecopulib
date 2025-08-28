@@ -178,9 +178,9 @@ FitControls::validate_and_set_defaults_vinecop()
 #undef X
 
   // Post-processing (same as bicop, plus seeds)
-  num_threads = process_num_threads(num_threads.value());
+  num_threads = FitControls::process_num_threads(num_threads.value());
   if (weights.has_value() && weights.value().size() > 0) {
-    weights = normalize_weights(weights.value());
+    weights = FitControls::normalize_weights(weights.value());
   }
 
   // Lazy seed generation
@@ -194,7 +194,7 @@ FitControls::validate_and_set_defaults_vinecop()
 
 //! @brief Validates family set.
 inline void
-FitControls::check_family_set(const std::vector<BicopFamily>& family_set) const
+FitControls::check_family_set(const std::vector<BicopFamily>& family_set)
 {
   // Non empty set
   if (family_set.size() == 0) {
@@ -204,7 +204,7 @@ FitControls::check_family_set(const std::vector<BicopFamily>& family_set) const
 
 //! @brief Validates parametric method.
 inline void
-FitControls::check_parametric_method(const std::string& method) const
+FitControls::check_parametric_method(const std::string& method)
 {
   if (!tools_stl::is_member(method, { "itau", "mle" })) {
     throw std::runtime_error("parametric_method should be mle or itau");
@@ -213,7 +213,7 @@ FitControls::check_parametric_method(const std::string& method) const
 
 //! @brief Validates nonparametric method.
 inline void
-FitControls::check_nonparametric_method(const std::string& method) const
+FitControls::check_nonparametric_method(const std::string& method)
 {
   if (!tools_stl::is_member(method, { "constant", "linear", "quadratic" })) {
     throw std::runtime_error(
@@ -223,7 +223,7 @@ FitControls::check_nonparametric_method(const std::string& method) const
 
 //! @brief Validates nonparametric multiplier.
 inline void
-FitControls::check_nonparametric_mult(double mult) const
+FitControls::check_nonparametric_mult(double mult)
 {
   if (mult <= 0.0) {
     throw std::runtime_error("nonparametric_mult must be positive");
@@ -232,7 +232,7 @@ FitControls::check_nonparametric_mult(double mult) const
 
 //! @brief Validates nonparametric grid size.
 inline void
-FitControls::check_nonparametric_grid_size(size_t grid_size) const
+FitControls::check_nonparametric_grid_size(size_t grid_size)
 {
   if (grid_size < 3) {
     throw std::runtime_error("nonparametric_grid_size must be at least 3");
@@ -241,7 +241,7 @@ FitControls::check_nonparametric_grid_size(size_t grid_size) const
 
 //! @brief Validates selection criterion.
 inline void
-FitControls::check_selection_criterion(const std::string& criterion) const
+FitControls::check_selection_criterion(const std::string& criterion)
 {
   std::vector<std::string> allowed_crits = {
     "loglik", "aic", "bic", "mbic", "mbicv"
@@ -254,7 +254,7 @@ FitControls::check_selection_criterion(const std::string& criterion) const
 
 //! @brief Validates psi0 parameter.
 inline void
-FitControls::check_psi0(double psi0) const
+FitControls::check_psi0(double psi0)
 {
   if ((psi0 <= 0.0) || (psi0 >= 1.0)) {
     throw std::runtime_error("psi0 must be in the interval (0, 1)");
@@ -263,7 +263,7 @@ FitControls::check_psi0(double psi0) const
 
 //! @brief Validates tree criterion.
 inline void
-FitControls::check_tree_criterion(const std::string& criterion) const
+FitControls::check_tree_criterion(const std::string& criterion)
 {
   if (!tools_stl::is_member(criterion,
                             { "tau", "rho", "joe", "hoeffd", "mcor" })) {
@@ -274,7 +274,7 @@ FitControls::check_tree_criterion(const std::string& criterion) const
 
 //! @brief Validates tree algorithm.
 inline void
-FitControls::check_tree_algorithm(const std::string& algorithm) const
+FitControls::check_tree_algorithm(const std::string& algorithm)
 {
   if (!tools_stl::is_member(algorithm,
                             { "mst_prim",
@@ -289,7 +289,7 @@ FitControls::check_tree_algorithm(const std::string& algorithm) const
 
 //! @brief Validates threshold parameter.
 inline void
-FitControls::check_threshold(double threshold) const
+FitControls::check_threshold(double threshold)
 {
   if (threshold < 0 || threshold > 1) {
     throw std::runtime_error("threshold should be in [0,1]");
@@ -297,16 +297,17 @@ FitControls::check_threshold(double threshold) const
 }
 
 inline void
-FitControls::check_weights_size(const Eigen::MatrixXd& data) const
+FitControls::check_weights_size(const Eigen::MatrixXd& data,
+                                const Eigen::VectorXd& weights)
 {
-  if ((weights.value().size() > 0) && (weights.value().size() != data.rows())) {
+  if ((weights.size() > 0) && (weights.size() != data.rows())) {
     throw std::runtime_error("sizes of weights and data don't match.");
   }
 }
 
 //! @brief Processes and validates number of threads.
 inline size_t
-FitControls::process_num_threads(size_t num_threads) const
+FitControls::process_num_threads(size_t num_threads)
 {
   // zero threads means everything is done in main thread
   if (num_threads == 1)
@@ -321,7 +322,7 @@ FitControls::process_num_threads(size_t num_threads) const
 
 //! @brief Normalizes weights to sum to n.
 inline Eigen::VectorXd
-FitControls::normalize_weights(Eigen::VectorXd& weights) const
+FitControls::normalize_weights(const Eigen::VectorXd& weights)
 {
   if (weights.size() > 0) {
     return weights / weights.sum() * weights.size();

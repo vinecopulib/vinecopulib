@@ -705,8 +705,9 @@ Bicop::check_data_dim(const Eigen::MatrixXd& u) const
   unsigned short n_cols_exp = static_cast<unsigned short>(2 + n_disc);
   if ((n_cols != n_cols_exp) & (n_cols != 4)) {
     std::stringstream msg;
-    msg << "data has wrong number of columns; " << "expected: " << n_cols_exp
-        << " or 4, actual: " << n_cols << " (model contains ";
+    msg << "data has wrong number of columns; "
+        << "expected: " << n_cols_exp << " or 4, actual: " << n_cols
+        << " (model contains ";
     if (n_disc == 0) {
       msg << "no discrete variables)." << std::endl;
     } else if (n_disc == 1) {
@@ -867,7 +868,7 @@ inline void
 Bicop::fit(const Eigen::MatrixXd& data, FitControls& controls)
 {
   controls.validate_and_set_defaults_bicop();
-  controls.check_weights_size(data);
+  FitControls::check_weights_size(data, controls.weights.value());
 
   std::string method;
   if (tools_stl::is_member(bicop_->get_family(), bicop_families::parametric)) {
@@ -970,7 +971,7 @@ inline void
 Bicop::select(const Eigen::MatrixXd& data, FitControls& controls)
 {
   controls.validate_and_set_defaults_bicop();
-  controls.check_weights_size(data);
+  FitControls::check_weights_size(data, controls.weights.value());
   Eigen::VectorXd weights = controls.weights.value();
   using namespace tools_select;
 

@@ -59,10 +59,11 @@ public:
   explicit Bicop(const Eigen::MatrixXd& data,
                  std::vector<std::string> var_types = { "c", "c" });
 
-  [[deprecated("Use Bicop(data, FitControls, var_types) instead")]]
-  explicit Bicop(const Eigen::MatrixXd& data,
-                 const FitControlsBicop& controls,
-                 const std::vector<std::string>& var_types = { "c", "c" });
+  [[deprecated("Use Bicop(data, FitControls, var_types) "
+               "instead")]] explicit Bicop(
+    const Eigen::MatrixXd& data,
+    const FitControlsBicop& controls,
+    const std::vector<std::string>& var_types = { "c", "c" });
 
   Bicop(const Bicop& other);
 
@@ -125,13 +126,15 @@ public:
   // Fit and select methods
   void fit(const Eigen::MatrixXd& data, FitControls& controls);
   void fit(const Eigen::MatrixXd& data);
-  [[deprecated("Use fit(data, FitControls) instead")]]
-  void fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls);
+  [[deprecated("Use fit(data, FitControls) instead")]] void fit(
+    const Eigen::MatrixXd& data,
+    const FitControlsBicop& controls);
 
   void select(const Eigen::MatrixXd& data, FitControls& controls);
   void select(const Eigen::MatrixXd& data);
-  [[deprecated("Use select(data, FitControls) instead")]]
-  void select(const Eigen::MatrixXd& data, const FitControlsBicop& controls);
+  [[deprecated("Use select(data, FitControls) instead")]] void select(
+    const Eigen::MatrixXd& data,
+    const FitControlsBicop& controls);
 
   // Fit statistics
   double loglik(const Eigen::MatrixXd& u = Eigen::MatrixXd()) const;

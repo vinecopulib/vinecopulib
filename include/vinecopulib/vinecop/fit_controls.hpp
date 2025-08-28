@@ -17,11 +17,9 @@ class FitControlsVinecop : public FitControlsBicop
 {
 public:
   // Constructor
-  [[deprecated("Use FitControls instead")]]
-  FitControlsVinecop();
+  [[deprecated("Use FitControls instead")]] FitControlsVinecop();
 
-  [[deprecated("Use FitControls instead")]]
-  explicit FitControlsVinecop(
+  [[deprecated("Use FitControls instead")]] explicit FitControlsVinecop(
     std::vector<BicopFamily> family_set,
     std::string parametric_method = "mle",
     std::string nonparametric_method = "constant",
@@ -43,8 +41,7 @@ public:
     bool allow_rotations = true,
     std::vector<int> seeds = std::vector<int>());
 
-  [[deprecated("Use FitControls instead")]]
-  explicit FitControlsVinecop(
+  [[deprecated("Use FitControls instead")]] explicit FitControlsVinecop(
     const FitControlsBicop& controls,
     size_t trunc_lvl = std::numeric_limits<size_t>::max(),
     std::string tree_criterion = "tau",
@@ -58,12 +55,12 @@ public:
 
   explicit FitControlsVinecop(const FitControls& controls);
 
-  [[deprecated("Use get_trunc_lvl() instead")]]
-  size_t get_truncation_level() const;
+  [[deprecated("Use get_trunc_lvl() instead")]] size_t get_truncation_level()
+    const;
   size_t get_trunc_lvl() const;
 
-  [[deprecated("Use set_trunc_lvl() instead")]]
-  void set_truncation_level(size_t trunc_lvl);
+  [[deprecated("Use set_trunc_lvl() instead")]] void set_truncation_level(
+    size_t trunc_lvl);
   void set_trunc_lvl(size_t trunc_lvl);
 
   std::string get_tree_criterion() const;
@@ -75,11 +72,11 @@ public:
   bool get_show_trace() const;
   void set_show_trace(bool show_trace);
 
-  [[deprecated("Use get_select_trunc_lvl() instead")]]
-  bool get_select_truncation_level() const;
+  [[deprecated("Use get_select_trunc_lvl() instead")]] bool
+  get_select_truncation_level() const;
   bool get_select_trunc_lvl() const;
-  [[deprecated("Use set_select_trunc_lvl() instead")]]
-  void set_select_truncation_level(bool select_trunc_lvl);
+  [[deprecated("Use set_select_trunc_lvl() instead")]] void
+  set_select_truncation_level(bool select_trunc_lvl);
   void set_select_trunc_lvl(bool select_trunc_lvl);
 
   bool get_select_threshold() const;

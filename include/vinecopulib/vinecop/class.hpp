@@ -63,14 +63,15 @@ public:
     const std::vector<std::string>& var_types = {});
 
   // Deprecated constructors using FitControlsVinecop
-  [[deprecated("Use Vinecop(data, structure, var_types, FitControls) instead")]]
-  explicit Vinecop(const Eigen::MatrixXd& data,
-                   const RVineStructure& structure,
-                   const std::vector<std::string>& var_types,
-                   const FitControlsVinecop& controls);
+  [[deprecated("Use Vinecop(data, structure, var_types, FitControls) "
+               "instead")]] explicit Vinecop(
+    const Eigen::MatrixXd& data,
+    const RVineStructure& structure,
+    const std::vector<std::string>& var_types,
+    const FitControlsVinecop& controls);
 
-  [[deprecated("Use Vinecop(data, matrix, var_types, FitControls) instead")]]
-  explicit Vinecop(
+  [[deprecated("Use Vinecop(data, matrix, var_types, FitControls) "
+               "instead")]] explicit Vinecop(
     const Eigen::MatrixXd& data,
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
     const std::vector<std::string>& var_types,
@@ -87,13 +88,15 @@ public:
   // Select and fit methods
   void fit(const Eigen::MatrixXd& data, FitControls& controls);
   void fit(const Eigen::MatrixXd& data);
-  [[deprecated("Use fit(data, FitControls) instead")]]
-  void fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls);
+  [[deprecated("Use fit(data, FitControls) instead")]] void fit(
+    const Eigen::MatrixXd& data,
+    const FitControlsBicop& controls);
 
   void select(const Eigen::MatrixXd& data, FitControls& controls);
   void select(const Eigen::MatrixXd& data);
-  [[deprecated("Use select(data, FitControls) instead")]]
-  void select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls);
+  [[deprecated("Use select(data, FitControls) instead")]] void select(
+    const Eigen::MatrixXd& data,
+    const FitControlsVinecop& controls);
 
   // Getters for a single pair copula
   Bicop get_pair_copula(size_t tree, size_t edge) const;
