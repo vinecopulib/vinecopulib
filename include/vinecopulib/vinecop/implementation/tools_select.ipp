@@ -1062,8 +1062,9 @@ VinecopSelector::select_pair_copulas(VineTree& tree, const VineTree& tree_opt)
       tree[e].pair_copula = vinecopulib::Bicop();
       tree[e].pair_copula.set_var_types(tree[e].var_types);
       if (!is_thresholded) {
-        controls_.weights = weights_;
-        tree[e].pair_copula.select(tree[e].pc_data, controls_);
+        // Create a mutable copy for this thread
+        FitControls local_controls = controls_;
+        tree[e].pair_copula.select(tree[e].pc_data, local_controls);
       }
     }
 
@@ -1081,7 +1082,7 @@ VinecopSelector::select_pair_copulas(VineTree& tree, const VineTree& tree_opt)
     }
   };
 
-  // make sure that Bicop.select() doesn't spawn too many new threads
+  // Make sure that Bicop.select() doesn't spawn too many new threads
   size_t num_threads = controls_.num_threads.value();
   controls_.num_threads = num_threads / boost::num_edges(tree);
   pool_.map(select_pc, boost::edges(tree));
