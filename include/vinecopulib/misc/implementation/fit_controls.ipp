@@ -69,7 +69,7 @@ namespace vinecopulib {
     "Allow rotations: ",                                                       \
     tools_print::PrintYesNo{})                                                 \
   X(num_threads,                                                               \
-    1,                                                                         \
+    0,                                                                         \
     NO_CHECK,                                                                  \
     "Number of threads: ",                                                     \
     tools_print::PrintSkip{})

@@ -62,3 +62,18 @@ set(VINECOPULIB_DEFINITIONS
 )
 
 add_compile_definitions(${VINECOPULIB_DEFINITIONS})
+
+add_library(test_warnings INTERFACE)
+
+if(TESTS_IGNORE_DEPRECATED)
+  if(MSVC)
+    # 4996 = deprecated-declarations on MSVC
+    target_compile_options(test_warnings INTERFACE /wd4996)
+  else()
+    # Don't show deprecation warnings; and don't fail if -Werror is on
+    target_compile_options(test_warnings INTERFACE
+      -Wno-deprecated-declarations
+      -Wno-error=deprecated-declarations
+    )
+  endif()
+endif()
