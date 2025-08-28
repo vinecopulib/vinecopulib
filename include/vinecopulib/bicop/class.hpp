@@ -60,10 +60,10 @@ public:
                  std::vector<std::string> var_types = { "c", "c" });
 
   [[deprecated("Use Bicop(data, FitControls, var_types) "
-               "instead")]] explicit Bicop(
-    const Eigen::MatrixXd& data,
-    const FitControlsBicop& controls,
-    const std::vector<std::string>& var_types = { "c", "c" });
+               "instead")]] explicit Bicop(const Eigen::MatrixXd& data,
+                                           const FitControlsBicop& controls,
+                                           const std::vector<std::string>&
+                                             var_types = { "c", "c" });
 
   Bicop(const Bicop& other);
 

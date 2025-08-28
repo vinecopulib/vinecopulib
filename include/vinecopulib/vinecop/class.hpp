@@ -63,19 +63,21 @@ public:
     const std::vector<std::string>& var_types = {});
 
   // Deprecated constructors using FitControlsVinecop
-  [[deprecated("Use Vinecop(data, structure, var_types, FitControls) "
-               "instead")]] explicit Vinecop(
-    const Eigen::MatrixXd& data,
-    const RVineStructure& structure,
-    const std::vector<std::string>& var_types,
-    const FitControlsVinecop& controls);
+  [[deprecated(
+    "Use Vinecop(data, structure, var_types, FitControls) "
+    "instead")]] explicit Vinecop(const Eigen::MatrixXd& data,
+                                  const RVineStructure& structure,
+                                  const std::vector<std::string>& var_types,
+                                  const FitControlsVinecop& controls);
 
-  [[deprecated("Use Vinecop(data, matrix, var_types, FitControls) "
-               "instead")]] explicit Vinecop(
-    const Eigen::MatrixXd& data,
-    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
-    const std::vector<std::string>& var_types,
-    const FitControlsVinecop& controls);
+  [[deprecated(
+    "Use Vinecop(data, matrix, var_types, FitControls) "
+    "instead")]] explicit Vinecop(const Eigen::MatrixXd& data,
+                                  const Eigen::Matrix<size_t,
+                                                      Eigen::Dynamic,
+                                                      Eigen::Dynamic>& matrix,
+                                  const std::vector<std::string>& var_types,
+                                  const FitControlsVinecop& controls);
 
   // Constructors from files/serialized objects
   explicit Vinecop(const std::string& filename, const bool check = true);
