@@ -177,6 +177,11 @@ FitControls::validate_and_set_defaults_vinecop()
   VINECOP_FIELDS
 #undef X
 
+  if (tree_criterion.value() == "custom" && !tree_criterion_function) {
+    throw std::invalid_argument(
+      "tree_criterion=\"custom\" requires a tree_criterion_function callable");
+  }
+
   // Post-processing (same as bicop, plus seeds)
   num_threads = FitControls::process_num_threads(num_threads.value());
   if (weights.has_value() && weights.value().size() > 0) {
@@ -265,10 +270,11 @@ FitControls::check_psi0(double psi0)
 inline void
 FitControls::check_tree_criterion(const std::string& criterion)
 {
-  if (!tools_stl::is_member(criterion,
-                            { "tau", "rho", "joe", "hoeffd", "mcor" })) {
-    throw std::runtime_error("tree_criterion must be one of "
-                             "'tau', 'rho', 'hoeffd', 'mcor', or 'joe'");
+  if (!tools_stl::is_member(
+        criterion, { "tau", "rho", "joe", "hoeffd", "mcor", "custom" })) {
+    throw std::runtime_error(
+      "tree_criterion must be one of "
+      "'tau', 'rho', 'hoeffd', 'mcor', 'joe', or 'custom'");
   }
 }
 

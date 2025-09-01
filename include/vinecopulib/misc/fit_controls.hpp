@@ -22,6 +22,9 @@ class FitControlsVinecop;
 
 namespace vinecopulib {
 
+using TreeCriterionFunction =
+  std::function<double(const Eigen::MatrixXd&, const Eigen::VectorXd&)>;
+
 //! @brief controls options for bivariate and vine copula models.
 //!
 //! @details This struct provides a flexible way to controlsure copula fitting
@@ -78,6 +81,10 @@ struct FitControls
   //! `"rho"`, and `"mcor"` implemented so far) during the tree-wise structure
   //! selection.
   optional::optional<std::string> tree_criterion;
+
+  //! @brief A custom criterion function for selecting the spanning tree.
+  //! Required when `tree_criterion` is set to `"custom"`.
+  optional::optional<TreeCriterionFunction> tree_criterion_function;
 
   //! @brief For thresholded vines (0 = no threshold).
   optional::optional<double> threshold;

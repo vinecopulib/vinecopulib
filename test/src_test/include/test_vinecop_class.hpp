@@ -694,6 +694,39 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
   EXPECT_EQ(unique_structures_unweighted.size(), num_trials);
 }
 
+TEST_F(VinecopTest, tree_criterion_custom_works)
+{
+  // select structure and get matrix
+  Vinecop fit(7);
+  FitControls controls;
+  controls.tree_criterion = "custom";
+  controls.tree_criterion_function = [](const Eigen::MatrixXd& data,
+                                        const Eigen::VectorXd& weights) {
+    return wdm::wdm(data, "tau", weights)(0, 1);
+  };
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::indep };
+  fit.select(u, controls);
+  auto vcl_matrix = fit.get_matrix();
+
+  // check if the same conditioned sets appear for each tree
+  size_t pairs_unequal = get_pairs_unequal(vc_matrix, vcl_matrix, 6);
+  EXPECT_EQ(pairs_unequal, 0);
+
+  // again but with non-independent families
+  controls.tree_criterion = "tau";
+  controls.family_set = std::vector<BicopFamily>{ BicopFamily::tll };
+  fit.select(u, controls);
+  auto vcl_matrix_tll = fit.get_matrix();
+
+  controls.tree_criterion = "custom";
+  fit.select(u, controls);
+  auto vcl_matrix_tll_custom = fit.get_matrix();
+
+  // check if the same conditioned sets appear for each tree
+  pairs_unequal = get_pairs_unequal(vcl_matrix_tll, vcl_matrix_tll_custom, 6);
+  EXPECT_EQ(pairs_unequal, 0);
+}
+
 TEST_F(VinecopTest, fixed_truncation)
 {
   u.conservativeResize(10, 7);

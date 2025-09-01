@@ -45,11 +45,11 @@ This project uses clang-format for C++ code formatting. The style is defined in 
 **Check formatting before committing:**
 
 ```bash
-git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$' | xargs clang-format --dry-run --Werror
+git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$' | xargs clang-format-14 --dry-run --Werror
 ```
 
 **Auto-fix formatting:**
 
 ```bash
-git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$' | xargs clang-format -i
+git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$' | xargs clang-format-14 -i
 ```
