@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <boost/hana.hpp>
 #include <limits>
 #include <random>
 #include <stdexcept>
@@ -12,113 +13,174 @@
 #include <vinecopulib/misc/tools_print.hpp>
 
 namespace vinecopulib {
+namespace hana = boost::hana;
 
-// A dummy checker that does nothing.
-#define NO_CHECK(x) ((void)0)
+// -------------- Bicop descriptors --------------
+inline auto const&
+bicop_fields()
+{
+  static const auto t =
+    hana::make_tuple(
+      // member ptr,        default-factory, checker-fn,  label, printer-tag
+      hana::make_tuple(
+        &FitControls::family_set,
+        [] { return bicop_families::all; },
+        [](auto const& fs) { FitControls::check_family_set(fs); },
+        "Family set: ",
+        tools_print::PrintFamilies{}),
 
-// Bicop fields (field, default, checker, label, printer)
-#define BICOP_FIELDS                                                           \
-  X(family_set,                                                                \
-    bicop_families::all,                                                       \
-    check_family_set,                                                          \
-    "Family set: ",                                                            \
-    tools_print::PrintFamilies{})                                              \
-  X(parametric_method,                                                         \
-    "mle",                                                                     \
-    check_parametric_method,                                                   \
-    "Parametric method: ",                                                     \
-    tools_print::PrintDefault{})                                               \
-  X(nonparametric_method,                                                      \
-    "constant",                                                                \
-    check_nonparametric_method,                                                \
-    "Nonparametric method: ",                                                  \
-    tools_print::PrintDefault{})                                               \
-  X(nonparametric_mult,                                                        \
-    1.0,                                                                       \
-    check_nonparametric_mult,                                                  \
-    "Nonparametric multiplier: ",                                              \
-    tools_print::PrintDefault{})                                               \
-  X(nonparametric_grid_size,                                                   \
-    30,                                                                        \
-    check_nonparametric_grid_size,                                             \
-    "Nonparametric grid size: ",                                               \
-    tools_print::PrintDefault{})                                               \
-  X(weights,                                                                   \
-    Eigen::VectorXd(),                                                         \
-    NO_CHECK,                                                                  \
-    "Weights: ",                                                               \
-    tools_print::PrintWeights{})                                               \
-  X(selection_criterion,                                                       \
-    "aic",                                                                     \
-    check_selection_criterion,                                                 \
-    "Selection criterion: ",                                                   \
-    tools_print::PrintDefault{})                                               \
-  X(preselect_families,                                                        \
-    true,                                                                      \
-    NO_CHECK,                                                                  \
-    "Preselect families: ",                                                    \
-    tools_print::PrintYesNo{})                                                 \
-  X(psi0,                                                                      \
-    0.9,                                                                       \
-    check_psi0,                                                                \
-    "mBIC prior probability: ",                                                \
-    tools_print::PrintDefault{})                                               \
-  X(allow_rotations,                                                           \
-    true,                                                                      \
-    NO_CHECK,                                                                  \
-    "Allow rotations: ",                                                       \
-    tools_print::PrintYesNo{})                                                 \
-  X(num_threads, 0, NO_CHECK, "Number of threads: ", tools_print::PrintSkip{})
+      hana::make_tuple(
+        &FitControls::parametric_method,
+        [] { return std::string("mle"); },
+        [](auto const& s) { FitControls::check_parametric_method(s); },
+        "Parametric method: ",
+        tools_print::PrintDefault{}),
 
-// Vinecop fields (field, default, checker, label, printer)
-#define VINECOP_FIELDS                                                         \
-  X(trunc_lvl,                                                                 \
-    std::numeric_limits<size_t>::max(),                                        \
-    NO_CHECK,                                                                  \
-    "Truncation level: ",                                                      \
-    tools_print::PrintDefault{})                                               \
-  X(tree_criterion,                                                            \
-    "tau",                                                                     \
-    check_tree_criterion,                                                      \
-    "Tree criterion: ",                                                        \
-    tools_print::PrintDefault{})                                               \
-  X(threshold,                                                                 \
-    0.0,                                                                       \
-    check_threshold,                                                           \
-    "Threshold: ",                                                             \
-    tools_print::PrintDefault{})                                               \
-  X(select_trunc_lvl,                                                          \
-    false,                                                                     \
-    NO_CHECK,                                                                  \
-    "Select trunc lvl: ",                                                      \
-    tools_print::PrintYesNo{})                                                 \
-  X(select_threshold,                                                          \
-    false,                                                                     \
-    NO_CHECK,                                                                  \
-    "Select threshold: ",                                                      \
-    tools_print::PrintYesNo{})                                                 \
-  X(select_families,                                                           \
-    true,                                                                      \
-    NO_CHECK,                                                                  \
-    "Select families: ",                                                       \
-    tools_print::PrintYesNo{})                                                 \
-  X(show_trace, false, NO_CHECK, "Show trace: ", tools_print::PrintYesNo{})    \
-  X(tree_algorithm,                                                            \
-    "mst_prim",                                                                \
-    check_tree_algorithm,                                                      \
-    "Tree algorithm: ",                                                        \
-    tools_print::PrintDefault{})                                               \
-  X(seeds, std::vector<int>(), NO_CHECK, "Seeds: ", tools_print::PrintSkip{})
+      hana::make_tuple(
+        &FitControls::nonparametric_method,
+        [] { return std::string("constant"); },
+        [](auto const& s) { FitControls::check_nonparametric_method(s); },
+        "Nonparametric method: ",
+        tools_print::PrintDefault{}),
+
+      hana::make_tuple(
+        &FitControls::nonparametric_mult,
+        [] { return 1.0; },
+        [](double x) { FitControls::check_nonparametric_mult(x); },
+        "Nonparametric multiplier: ",
+        tools_print::PrintDefault{}),
+
+      hana::make_tuple(
+        &FitControls::nonparametric_grid_size,
+        [] { return size_t{ 30 }; },
+        [](size_t n) { FitControls::check_nonparametric_grid_size(n); },
+        "Nonparametric grid size: ",
+        tools_print::PrintDefault{}),
+
+      hana::make_tuple(
+        &FitControls::selection_criterion,
+        [] { return std::string("aic"); },
+        [](auto const& s) { FitControls::check_selection_criterion(s); },
+        "Selection criterion: ",
+        tools_print::PrintDefault{}),
+
+      hana::make_tuple(
+        &FitControls::weights,
+        [] { return Eigen::VectorXd(); },
+        [](Eigen::VectorXd const&) { /* NO_CHECK */ },
+        "Weights: ",
+        tools_print::PrintWeights{}),
+
+      hana::make_tuple(
+        &FitControls::preselect_families,
+        [] { return true; },
+        [](bool) { /* NO_CHECK */ },
+        "Preselect families: ",
+        tools_print::PrintYesNo{}),
+
+      hana::make_tuple(
+        &FitControls::psi0,
+        [] { return 0.9; },
+        [](double x) { FitControls::check_psi0(x); },
+        "mBIC prior probability: ",
+        tools_print::PrintDefault{}),
+
+      hana::make_tuple(
+        &FitControls::allow_rotations,
+        [] { return true; },
+        [](bool) { /* NO_CHECK */ },
+        "Allow rotations: ",
+        tools_print::PrintYesNo{}),
+
+      hana::make_tuple(
+        &FitControls::num_threads,
+        [] { return size_t{ 0 }; }, // you post-process → max(1,·)
+        [](size_t) { /* NO_CHECK */ },
+        "Number of threads: ",
+        tools_print::PrintSkip{}));
+  return t;
+}
+
+// -------------- Vine-only descriptors --------------
+inline auto const&
+vinecop_fields()
+{
+  static const auto t = hana::make_tuple(
+    hana::make_tuple(
+      &FitControls::trunc_lvl,
+      [] { return std::numeric_limits<size_t>::max(); },
+      [](size_t) { /* NO_CHECK */ },
+      "Truncation level: ",
+      tools_print::PrintDefault{}),
+
+    hana::make_tuple(
+      &FitControls::tree_criterion,
+      [] { return std::string("tau"); },
+      [](auto const& s) { FitControls::check_tree_criterion(s); },
+      "Tree criterion: ",
+      tools_print::PrintDefault{}),
+
+    hana::make_tuple(
+      &FitControls::threshold,
+      [] { return 0.0; },
+      [](double x) { FitControls::check_threshold(x); },
+      "Threshold: ",
+      tools_print::PrintDefault{}),
+
+    hana::make_tuple(
+      &FitControls::select_trunc_lvl,
+      [] { return false; },
+      [](bool) { /* NO_CHECK */ },
+      "Select trunc lvl: ",
+      tools_print::PrintYesNo{}),
+
+    hana::make_tuple(
+      &FitControls::select_threshold,
+      [] { return false; },
+      [](bool) { /* NO_CHECK */ },
+      "Select threshold: ",
+      tools_print::PrintYesNo{}),
+
+    hana::make_tuple(
+      &FitControls::select_families,
+      [] { return true; },
+      [](bool) { /* NO_CHECK */ },
+      "Select families: ",
+      tools_print::PrintYesNo{}),
+
+    hana::make_tuple(
+      &FitControls::show_trace,
+      [] { return false; },
+      [](bool) { /* NO_CHECK */ },
+      "Show trace: ",
+      tools_print::PrintYesNo{}),
+
+    hana::make_tuple(
+      &FitControls::tree_algorithm,
+      [] { return std::string("mst_prim"); },
+      [](auto const& s) { FitControls::check_tree_algorithm(s); },
+      "Tree algorithm: ",
+      tools_print::PrintDefault{}),
+
+    hana::make_tuple(
+      &FitControls::seeds,
+      [] { return std::vector<int>{}; }, // lazy generation later
+      [](std::vector<int> const&) { /* NO_CHECK */ },
+      "Seeds: ",
+      tools_print::PrintSkip{}));
+  return t;
+}
 
 //! @brief Creates default controls for bivariate copula models.
 inline FitControls
 FitControls::defaults_bicop()
 {
   FitControls controls;
-#define X(field, default_value, check, label, printer)                         \
-  controls.field = default_value;
-  BICOP_FIELDS
-#undef X
+  hana::for_each(bicop_fields(), [&](auto const& d) {
+    auto ptr = hana::at_c<0>(d);
+    auto make = hana::at_c<1>(d);
+    (controls.*ptr) = make();
+  });
   return controls;
 }
 
@@ -126,12 +188,12 @@ FitControls::defaults_bicop()
 inline FitControls
 FitControls::defaults_vinecop()
 {
-  FitControls controls;
-#define X(field, default_value, check, label, printer)                         \
-  controls.field = default_value;
-  BICOP_FIELDS
-  VINECOP_FIELDS
-#undef X
+  FitControls controls = FitControls::defaults_bicop();
+  hana::for_each(vinecop_fields(), [&](auto const& d) {
+    auto ptr = hana::at_c<0>(d);
+    auto make = hana::at_c<1>(d);
+    (controls.*ptr) = make();
+  });
   return controls;
 }
 
@@ -139,19 +201,16 @@ FitControls::defaults_vinecop()
 inline void
 FitControls::validate_and_set_defaults_bicop()
 {
-  // Start with defaults
-  const auto defaults = defaults_bicop();
+  hana::for_each(bicop_fields(), [&](auto const& d) {
+    auto ptr = hana::at_c<0>(d);
+    auto make = hana::at_c<1>(d);
+    auto check = hana::at_c<2>(d);
 
-// Overlay
-#define X(field, default_value, check, label, printer)                         \
-  field = field.value_or(default_value);
-  BICOP_FIELDS
-#undef X
-
-// Checks
-#define X(field, default_value, check, label, printer) check(field.value());
-  BICOP_FIELDS
-#undef X
+    auto& opt = this->*ptr;
+    if (!opt)
+      opt = make();
+    check(opt.value());
+  });
 
   // Post-processing
   num_threads = process_num_threads(num_threads.value());
@@ -164,24 +223,20 @@ FitControls::validate_and_set_defaults_bicop()
 inline void
 FitControls::validate_and_set_defaults_vinecop()
 {
-  // Overlay bicop + vine fields
-#define X(field, default_value, check, label, printer)                         \
-  field = field.value_or(default_value);
-  BICOP_FIELDS
-  VINECOP_FIELDS
-#undef X
+  // bicop first
+  validate_and_set_defaults_bicop();
 
-// Checks bicop + vine
-#define X(field, default_value, check, label, printer) check(field.value());
-  BICOP_FIELDS
-  VINECOP_FIELDS
-#undef X
+  // vine-only overlay + checks
+  hana::for_each(vinecop_fields(), [&](auto const& d) {
+    auto ptr = hana::at_c<0>(d);
+    auto make = hana::at_c<1>(d);
+    auto check = hana::at_c<2>(d);
 
-  // Post-processing (same as bicop, plus seeds)
-  num_threads = FitControls::process_num_threads(num_threads.value());
-  if (weights.has_value() && weights.value().size() > 0) {
-    weights = FitControls::normalize_weights(weights.value());
-  }
+    auto& opt = this->*ptr;
+    if (!opt)
+      opt = make();
+    check(opt.value());
+  });
 
   // Lazy seed generation
   if (!seeds || seeds->empty()) {
@@ -342,10 +397,12 @@ FitControls::str_bicop() const
 {
   std::ostringstream os;
 
-#define X(field, default_value, check, label, printer)                         \
-  tools_print::print_field(os, label, field, printer);
-  BICOP_FIELDS
-#undef X
+  hana::for_each(bicop_fields(), [&](auto const& d) {
+    auto ptr = hana::at_c<0>(d);
+    auto label = hana::at_c<3>(d);
+    auto printer = hana::at_c<4>(d);
+    tools_print::print_field(os, label, this->*ptr, printer);
+  });
 
   tools_print::print_field(
     os, "Number of threads: ", num_threads, tools_print::PrintThreads{});
@@ -358,11 +415,19 @@ FitControls::str_vinecop() const
 {
   std::ostringstream os;
 
-#define X(field, default_value, check, label, printer)                         \
-  tools_print::print_field(os, label, field, printer);
-  BICOP_FIELDS
-  VINECOP_FIELDS
-#undef X
+  hana::for_each(bicop_fields(), [&](auto const& d) {
+    auto ptr = hana::at_c<0>(d);
+    auto label = hana::at_c<3>(d);
+    auto printer = hana::at_c<4>(d);
+    tools_print::print_field(os, label, this->*ptr, printer);
+  });
+
+  hana::for_each(vinecop_fields(), [&](auto const& d) {
+    auto ptr = hana::at_c<0>(d);
+    auto label = hana::at_c<3>(d);
+    auto printer = hana::at_c<4>(d);
+    tools_print::print_field(os, label, this->*ptr, printer);
+  });
 
   tools_print::print_field(
     os, "Number of threads: ", num_threads, tools_print::PrintThreads{});
