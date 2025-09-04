@@ -19,85 +19,84 @@ namespace hana = boost::hana;
 inline auto const&
 bicop_fields()
 {
-  static const auto t =
+  static const auto t = hana::make_tuple(
+    // member ptr,        default-factory, checker-fn,  label, printer-tag
     hana::make_tuple(
-      // member ptr,        default-factory, checker-fn,  label, printer-tag
-      hana::make_tuple(
-        &FitControls::family_set,
-        [] { return bicop_families::all; },
-        [](auto const& fs) { FitControls::check_family_set(fs); },
-        "Family set: ",
-        tools_print::PrintFamilies{}),
+      &FitControls::family_set,
+      [] { return bicop_families::all; },
+      [](auto const& fs) { FitControls::check_family_set(fs); },
+      "Family set: ",
+      tools_print::PrintFamilies{}),
 
-      hana::make_tuple(
-        &FitControls::parametric_method,
-        [] { return std::string("mle"); },
-        [](auto const& s) { FitControls::check_parametric_method(s); },
-        "Parametric method: ",
-        tools_print::PrintDefault{}),
+    hana::make_tuple(
+      &FitControls::parametric_method,
+      [] { return std::string("mle"); },
+      [](auto const& s) { FitControls::check_parametric_method(s); },
+      "Parametric method: ",
+      tools_print::PrintDefault{}),
 
-      hana::make_tuple(
-        &FitControls::nonparametric_method,
-        [] { return std::string("constant"); },
-        [](auto const& s) { FitControls::check_nonparametric_method(s); },
-        "Nonparametric method: ",
-        tools_print::PrintDefault{}),
+    hana::make_tuple(
+      &FitControls::nonparametric_method,
+      [] { return std::string("constant"); },
+      [](auto const& s) { FitControls::check_nonparametric_method(s); },
+      "Nonparametric method: ",
+      tools_print::PrintDefault{}),
 
-      hana::make_tuple(
-        &FitControls::nonparametric_mult,
-        [] { return 1.0; },
-        [](double x) { FitControls::check_nonparametric_mult(x); },
-        "Nonparametric multiplier: ",
-        tools_print::PrintDefault{}),
+    hana::make_tuple(
+      &FitControls::nonparametric_mult,
+      [] { return 1.0; },
+      [](double x) { FitControls::check_nonparametric_mult(x); },
+      "Nonparametric multiplier: ",
+      tools_print::PrintDefault{}),
 
-      hana::make_tuple(
-        &FitControls::nonparametric_grid_size,
-        [] { return size_t{ 30 }; },
-        [](size_t n) { FitControls::check_nonparametric_grid_size(n); },
-        "Nonparametric grid size: ",
-        tools_print::PrintDefault{}),
+    hana::make_tuple(
+      &FitControls::nonparametric_grid_size,
+      [] { return size_t{ 30 }; },
+      [](size_t n) { FitControls::check_nonparametric_grid_size(n); },
+      "Nonparametric grid size: ",
+      tools_print::PrintDefault{}),
 
-      hana::make_tuple(
-        &FitControls::selection_criterion,
-        [] { return std::string("aic"); },
-        [](auto const& s) { FitControls::check_selection_criterion(s); },
-        "Selection criterion: ",
-        tools_print::PrintDefault{}),
+    hana::make_tuple(
+      &FitControls::selection_criterion,
+      [] { return std::string("aic"); },
+      [](auto const& s) { FitControls::check_selection_criterion(s); },
+      "Selection criterion: ",
+      tools_print::PrintDefault{}),
 
-      hana::make_tuple(
-        &FitControls::weights,
-        [] { return Eigen::VectorXd(); },
-        [](Eigen::VectorXd const&) { /* NO_CHECK */ },
-        "Weights: ",
-        tools_print::PrintWeights{}),
+    hana::make_tuple(
+      &FitControls::weights,
+      [] { return Eigen::VectorXd(); },
+      [](Eigen::VectorXd const&) { /* NO_CHECK */ },
+      "Weights: ",
+      tools_print::PrintWeights{}),
 
-      hana::make_tuple(
-        &FitControls::preselect_families,
-        [] { return true; },
-        [](bool) { /* NO_CHECK */ },
-        "Preselect families: ",
-        tools_print::PrintYesNo{}),
+    hana::make_tuple(
+      &FitControls::preselect_families,
+      [] { return true; },
+      [](bool) { /* NO_CHECK */ },
+      "Preselect families: ",
+      tools_print::PrintYesNo{}),
 
-      hana::make_tuple(
-        &FitControls::psi0,
-        [] { return 0.9; },
-        [](double x) { FitControls::check_psi0(x); },
-        "mBIC prior probability: ",
-        tools_print::PrintDefault{}),
+    hana::make_tuple(
+      &FitControls::psi0,
+      [] { return 0.9; },
+      [](double x) { FitControls::check_psi0(x); },
+      "mBIC prior probability: ",
+      tools_print::PrintDefault{}),
 
-      hana::make_tuple(
-        &FitControls::allow_rotations,
-        [] { return true; },
-        [](bool) { /* NO_CHECK */ },
-        "Allow rotations: ",
-        tools_print::PrintYesNo{}),
+    hana::make_tuple(
+      &FitControls::allow_rotations,
+      [] { return true; },
+      [](bool) { /* NO_CHECK */ },
+      "Allow rotations: ",
+      tools_print::PrintYesNo{}),
 
-      hana::make_tuple(
-        &FitControls::num_threads,
-        [] { return size_t{ 0 }; }, // you post-process → max(1,·)
-        [](size_t) { /* NO_CHECK */ },
-        "Number of threads: ",
-        tools_print::PrintSkip{}));
+    hana::make_tuple(
+      &FitControls::num_threads,
+      [] { return size_t{ 0 }; }, // you post-process → max(1,·)
+      [](size_t) { /* NO_CHECK */ },
+      "Number of threads: ",
+      tools_print::PrintSkip{}));
   return t;
 }
 
