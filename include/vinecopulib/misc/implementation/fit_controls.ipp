@@ -12,6 +12,60 @@
 #include <vinecopulib/bicop/family.hpp>
 #include <vinecopulib/misc/tools_print.hpp>
 
+namespace defaults {
+
+template<typename T>
+struct ParameterDefault
+{
+  T value;
+  std::function<void(T const&)> check_fn;
+  std::function<std::string(const T&)> print_fn;
+};
+
+static const auto family_set = ParameterDefault<std::vector<BicopFamily>>{
+  bicop_families::all /* default value */,
+  [](const std::vector<BicopFamily>& v) { /* check method */ },
+  [](const std::vector<BicopFamily>& v) { /* print method */ }
+};
+
+// other default parameters ...
+} // end namespace defaults
+
+#define FITCONTROLSBICOP_PARAMS                                                \
+  X(family_set)                                                                \
+  X(parametric_method)                                                         \
+  // ....
+
+struct FitControlsBicop
+{
+private:
+#define X(name) decltype(defaults::name.value) name##_ = defaults::name.value;
+  FITCONTROLSBICOP_PARAMS
+#undef X
+
+#define X(name)                                                                \
+  const auto& name() const { return name##_; }                                 \
+  FitControlsBicop& name(const decltype(defaults::name.value)& v)              \
+  {                                                                            \
+    if (!defaults::name.check_fn(v))                                           \
+      throw std::invalid_argument("invalid value for " #name);                 \
+    name##_ = v;                                                               \
+    return *this;                                                              \
+  }
+  FITCONTROLSBICOP_PARAMS
+#undef X
+
+  std::string str() const
+  {
+    std::ostringstream oss;
+#define X(name)                                                                \
+  oss << #name << ": " << defaults::name.print_fn(name##_) << "\n";
+    FITCONTROLSBICOP_PARAMS
+#undef X
+    return oss.str();
+  }
+};
+
 namespace vinecopulib {
 namespace hana = boost::hana;
 
@@ -433,5 +487,4 @@ FitControls::str_vinecop() const
 
   return os.str();
 }
-
 }
