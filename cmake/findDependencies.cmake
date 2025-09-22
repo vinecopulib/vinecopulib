@@ -12,9 +12,9 @@ endif ()
 
 # Check if EIGEN3_INCLUDE_DIR is defined and if not, try to find it
 if(NOT DEFINED EIGEN3_INCLUDE_DIR)
-  find_package(Eigen3 REQUIRED)
-  if (EIGEN3_FOUND)
-    message(STATUS "Found Eigen3: ${EIGEN3_INCLUDE_DIR} (found suitable version \"${Eigen3_VERSION}\")")
+  find_package(Eigen3 REQUIRED CONFIG)
+  if (Eigen3_FOUND)
+    message(STATUS "Found Eigen3: ${Eigen3_DIR} (found suitable version \"${Eigen3_VERSION}\")")
   else()
     message(FATAL_ERROR "Could not find Eigen3")
   endif()
