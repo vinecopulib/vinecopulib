@@ -240,7 +240,6 @@ InterpolationGrid::integrate_2d(const Eigen::MatrixXd& u)
     }
     upr = u1;
     tmpint = int_on_grid(upr, tmpvals2, grid_points_);
-    tmpint1 = int_on_grid(1.0, tmpvals2, grid_points_);
     return std::min(std::max(tmpint, 1e-10), 1 - 1e-10);
   };
 
