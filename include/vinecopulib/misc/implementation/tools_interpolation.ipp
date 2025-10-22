@@ -230,7 +230,7 @@ InterpolationGrid::integrate_2d(const Eigen::MatrixXd& u)
   tmpgrid.col(1) = grid_points_;
 
   auto f = [this, m, &tmpvals, &tmpvals2, &tmpgrid](double u1, double u2) {
-    double upr, tmpint, tmpint1;
+    double upr, tmpint;
     upr = u2;
     for (ptrdiff_t k = 0; k < m; ++k) {
       tmpgrid.col(0) = Eigen::VectorXd::Constant(m, grid_points_(k));
