@@ -44,8 +44,8 @@ inline FitControlsVinecop::FitControlsVinecop()
 //!     tree (`"tau"`, `"hoeffd"`, `"rho"`, and `"mcor"` implemented so far)
 //!     during the tree-wise structure selection.
 //! @param threshold For thresholded vines (0 = no threshold).
-//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
-//!     or `"bic"`) for the pair copula families.
+//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`,
+//!     `"bic"`, `"mbic"`, or `"mbicv"`) for the pair copula families.
 //! @param weights A vector of weights for the observations.
 //! @param psi0 Only for `selection_criterion = "mbic"`, prior probability of
 //!     non-independence.

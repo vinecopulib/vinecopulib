@@ -38,6 +38,8 @@ TEST(bicop_select, allows_all_selcrits)
   cop.select(u, controls);
   controls.set_selection_criterion("mbic");
   cop.select(u, controls);
+  controls.set_selection_criterion("mbicv");
+  cop.select(u, controls);
 }
 
 TEST(bicop_select, allow_rotations_works)
