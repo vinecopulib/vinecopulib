@@ -171,8 +171,8 @@ FitControlsBicop::check_selection_criterion(std::string selection_criterion)
     "loglik", "aic", "bic", "mbic", "mbicv"
   };
   if (!tools_stl::is_member(selection_criterion, allowed_crits)) {
-    throw std::runtime_error(
-      "selection_criterion should be 'loglik', 'aic', 'bic', 'mbic', or 'mbicv'");
+    throw std::runtime_error("selection_criterion should be 'loglik', 'aic', "
+                             "'bic', 'mbic', or 'mbicv'");
   }
 }
 
