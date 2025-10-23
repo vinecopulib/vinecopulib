@@ -23,8 +23,8 @@ namespace vinecopulib {
 //!     are multiplied (default: 1.0).
 //! @param nonparametric_grid_size The grid size for the post-estimation
 //!     interpolation in nonparametric models (default: 30).
-//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`
-//!     or `"bic"`) for the pair copula families.
+//! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`,
+//!     `"bic"`, `"mbic"`, or `"mbicv"`) for the pair copula families.
 //! @param weights A vector of weights for the observations.
 //! @param psi0 Only for `selection_criterion = "mbic"`, the prior probability
 //!     of non-independence.
@@ -171,8 +171,8 @@ FitControlsBicop::check_selection_criterion(std::string selection_criterion)
     "loglik", "aic", "bic", "mbic", "mbicv"
   };
   if (!tools_stl::is_member(selection_criterion, allowed_crits)) {
-    throw std::runtime_error(
-      "selection_criterion should be 'loglik', 'aic', 'bic', or 'mbic'");
+    throw std::runtime_error("selection_criterion should be 'loglik', 'aic', "
+                             "'bic', 'mbic', or 'mbicv'");
   }
 }
 

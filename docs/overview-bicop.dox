@@ -132,7 +132,7 @@ degree zero, one and two.
 - `double nonparametric_mult` a factor with which the smoothing parameters
 are multiplied.
 - `std::string selection_criterion` describes the criterion to compare the
-families. It can take either `"loglik"`, `"aic"`, or `"bic"`(default).
+families. It can take either `"loglik"`, `"aic"`, `"bic"`(default), `"mbic"`, or `"mbicv"`.
 - `Eigen::VectorXd weights` an optional vector of weights for the observations.
 - `bool preselect_families` describes a heuristic preselection method (default
 is `true`) based on symmetry properties of the data (e.g., the unrotated
