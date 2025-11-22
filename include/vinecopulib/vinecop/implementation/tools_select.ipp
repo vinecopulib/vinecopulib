@@ -513,8 +513,8 @@ VinecopSelector::select_edges(VineTree& vine_tree)
 
     remove_edge_if(
       [&](const EdgeIterator& e) {
-        auto source = boost::source(e, graph);
-        auto target = boost::target(e, graph);
+        auto source = boost::source(e, vine_tree);
+        auto target = boost::target(e, vine_tree);
         return predecessors[source] != target && predecessors[target] != source;
       },
       vine_tree);
