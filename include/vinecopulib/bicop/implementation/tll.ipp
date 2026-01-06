@@ -112,36 +112,41 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
       offset += n; // Move the offset for the next block
     }
 
+    // View as n×m, column-major: column i is the n-vector for evaluation point i
+    Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>>
+      K(kernel_values.data(), static_cast<Eigen::Index>(n), static_cast<Eigen::Index>(m));
+
     Eigen::VectorXd unweighted_sums(m);
     if (weights.size() > 0) {
       // For the influence calculation
-      unweighted_sums = kernel_values.colwise().sum();
+      unweighted_sums = K.colwise().sum();
       // Apply weights
-      kernel_values = kernel_values.array().colwise() * weights.array();
+      K.array().colwise() *= weights.array();
     }
 
-    res.col(0) = kernel_values.colwise().mean();
+    res.col(0) = K.colwise().mean();
+
+    const double k0 = gaussian_kernel_2d(Eigen::MatrixXd::Zero(1, 2))(0);
     if (weights.size() > 0) {
       // Compute weighted sums for w calculation
-      Eigen::VectorXd kernel_sums = kernel_values.colwise().sum();
+      Eigen::VectorXd kernel_sums = K.colwise().sum();
 
       // Compute `w` values for each evaluation point
       Eigen::VectorXd w = kernel_sums.array() / unweighted_sums.array();
 
       // Compute inflation for weighted case
-      res.col(1) = gaussian_kernel_2d(Eigen::MatrixXd::Zero(1, 2))(0) *
+      res.col(1) = k0 *
                    det_irB / res.col(0).array() // 1 / f0
                    * w.array() / static_cast<double>(n);
 
     } else {
 
       // Compute inflation for unweighted case (w = 1)
-      res.col(1) = gaussian_kernel_2d(Eigen::MatrixXd::Zero(1, 2))(0) *
+      res.col(1) = k0 *
                    det_irB / res.col(0).array() // 1 / f0
                    / static_cast<double>(n);
     }
   } else {
-
     res.col(0) = Eigen::VectorXd::Ones(m); // result will be a product
     Eigen::VectorXd kernels(n);
     Eigen::Vector2d f1;
