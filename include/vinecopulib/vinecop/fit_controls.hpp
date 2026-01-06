@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <boost/random/mersenne_twister.hpp>
 #include <limits>
 #include <vinecopulib/bicop/fit_controls.hpp>
 
@@ -32,6 +33,7 @@ public:
     std::string parametric_method = "mle",
     std::string nonparametric_method = "constant",
     double nonparametric_mult = 1.0,
+    size_t nonparametric_grid_size = 30,
     size_t trunc_lvl = std::numeric_limits<size_t>::max(),
     std::string tree_criterion = "tau",
     double threshold = 0.0,
@@ -44,7 +46,9 @@ public:
     bool select_families = true,
     bool show_trace = false,
     size_t num_threads = 1,
-    std::string mst_algorithm = "prim");
+    std::string tree_algorithm = "mst_prim",
+    bool allow_rotations = true,
+    std::vector<int> seeds = std::vector<int>());
 
   explicit FitControlsVinecop(
     const FitControlsBicop& controls,
@@ -55,8 +59,10 @@ public:
     bool select_threshold = false,
     bool select_families = true,
     bool show_trace = false,
-    size_t num_threads = 1,
-    std::string mst_algorithm = "prim");
+    std::string tree_algorithm = "mst_prim",
+    std::vector<int> seeds = std::vector<int>());
+
+  explicit FitControlsVinecop(const FitControlsConfig& config);
 
   // Getters
   DEPRECATED size_t get_truncation_level() const;
@@ -79,7 +85,11 @@ public:
 
   FitControlsBicop get_fit_controls_bicop() const;
 
-  std::string get_mst_algorithm() const;
+  std::string get_tree_algorithm() const;
+
+  std::vector<int> get_seeds() const;
+
+  boost::random::mt19937 get_rng() const;
 
   // Setters
   DEPRECATED void set_truncation_level(size_t trunc_lvl);
@@ -100,7 +110,9 @@ public:
 
   void set_fit_controls_bicop(FitControlsBicop controls);
 
-  void set_mst_algorithm(std::string mst_algorithm);
+  void set_tree_algorithm(std::string tree_algorithm);
+
+  void set_seeds(std::vector<int> seeds);
 
   // Misc
   std::string str() const;
@@ -113,7 +125,9 @@ private:
   bool select_trunc_lvl_;
   bool select_threshold_;
   bool select_families_;
-  std::string mst_algorithm_;
+  std::string tree_algorithm_;
+  std::vector<int> seeds_;
+  boost::random::mt19937 rng_;
 
   void check_tree_criterion(std::string tree_criterion);
 

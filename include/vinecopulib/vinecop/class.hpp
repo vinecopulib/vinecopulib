@@ -169,10 +169,23 @@ public:
     const size_t trunc_lvl = std::numeric_limits<size_t>::max());
   void truncate(size_t trunc_lvl);
 
-  std::string str(const std::vector<size_t>& trees={}) const;
+  std::string str(const std::vector<size_t>& trees = {}) const;
+  Eigen::MatrixXd scores(Eigen::MatrixXd u,
+                         bool step_wise = true,
+                         const size_t num_threads = 1);
+  TriangularArray<std::vector<Eigen::MatrixXd>> hessian(
+    Eigen::MatrixXd u,
+    bool step_wise = true,
+    const size_t num_threads = 1);
+  Eigen::MatrixXd hessian_avg(Eigen::MatrixXd u,
+                              bool step_wise = true,
+                              const size_t num_threads = 1);
+  Eigen::MatrixXd scores_cov(Eigen::MatrixXd u,
+                             bool step_wise = true,
+                             const size_t num_threads = 1);
 
 protected:
-  size_t d_;
+  size_t d_{ 1 };
   RVineStructure rvine_structure_;
   mutable std::vector<std::vector<Bicop>> pair_copulas_;
   double threshold_{ 0.0 };

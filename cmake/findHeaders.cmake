@@ -1,6 +1,6 @@
 set(vinecopulib_includes ${CMAKE_SOURCE_DIR}/include)
 
-if(VINECOPULIB_SHARED_LIB)
+if(VINECOPULIB_PRECOMPILED)
     set(vinecopulib_generated_sources ${CMAKE_BINARY_DIR}/generated/src)
     set(vinecopulib_generated_includes ${CMAKE_BINARY_DIR}/generated/include)
 

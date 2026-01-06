@@ -67,6 +67,7 @@ inline void
 ParBicop::fit(const Eigen::MatrixXd& data,
               std::string method,
               double,
+              size_t,
               const Eigen::VectorXd& weights)
 {
   // for independence copula we don't have to do anything
@@ -188,6 +189,14 @@ ParBicop::adjust_parameters_bounds(Eigen::MatrixXd& lb,
     // make sure that parameter bounds are respected
     lb = lb2.cwiseMax(lb);
     ub = ub2.cwiseMin(ub);
+  }
+
+  if (family_ == BicopFamily::tawn) {
+    Eigen::VectorXd lb2(3), ub2(3);
+    lb2 << 0.3, 0.3, 1.5;
+    ub2 << 1, 1, 7;
+    lb = lb2;
+    ub = ub2;
   }
 }
 

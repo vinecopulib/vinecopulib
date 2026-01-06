@@ -118,7 +118,8 @@ TEST_F(VinecopTest, print)
   // but at least we see it doesn't crash
   expected_first_line = "Vinecop model with 5 variables";
   expected_second_line =
-    "tree edge conditioned variables conditioning variables var_types family rotation   parameters   df   tau ";
+    "tree edge conditioned variables conditioning variables var_types family "
+    "rotation   parameters   df   tau ";
 
   input.clear();
   input.str(vc1.str());
@@ -369,6 +370,64 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
     vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
 }
 
+TEST_F(VinecopTest, scores_stepwise)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 270, par);
+    }
+  }
+  Vinecop vinecop(model_matrix, pair_copulas);
+
+  auto uu = vinecop.simulate(100, false, 1, { 1 });
+
+  auto J = vinecop.hessian_avg(uu, true);
+  EXPECT_TRUE(J.isUpperTriangular());
+  // Eigen::MatrixXd Jinv = J.triangularView<Eigen::Upper>()
+  //                          .solve(Eigen::MatrixXd::Identity(J.cols(),
+  //                          J.cols())) .triangularView<Eigen::Upper>();
+  // // std::cout << J << std::endl << std::endl;
+  // // std::cout << Jinv << std::endl;
+  // auto I = vinecop.scores_cov(uu, true);
+  // std::cout << (Jinv * I * Jinv.transpose() /
+  // u.rows()).diagonal().cwiseSqrt()
+  //           << std::endl
+  //           << std::endl;
+  // std::cout << vinecop.str() << std::endl;
+}
+
+TEST_F(VinecopTest, scores_joint)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 270, par);
+    }
+  }
+  Vinecop vinecop(model_matrix, pair_copulas);
+
+  auto uu = vinecop.simulate(100, false, 1, { 1 });
+  auto J = vinecop.hessian_avg(uu, false);
+  auto I = vinecop.scores_cov(uu, false);
+
+  EXPECT_FALSE(J.isUpperTriangular());
+
+  Eigen::MatrixXd Jinv = J.triangularView<Eigen::Upper>()
+                           .solve(Eigen::MatrixXd::Identity(J.cols(), J.cols()))
+                           .triangularView<Eigen::Upper>();
+  // std::cout << J << std::endl << std::endl;
+  // std::cout << Jinv * I << std::endl;
+  I = vinecop.scores_cov(uu, true);
+  // std::cout << (Jinv * I * Jinv.transpose() /
+  // u.rows()).diagonal().cwiseSqrt()
+  //           << std::endl
+  //           << std::endl;
+  // std::cout << vinecop.str() << std::endl;
+}
+
 TEST_F(VinecopTest, aic_bic_are_correct)
 {
   int d = 7;
@@ -385,6 +444,12 @@ TEST_F(VinecopTest, aic_bic_are_correct)
 
   ASSERT_TRUE(true_model.aic(data) < complex_model.aic(data));
   ASSERT_TRUE(true_model.bic(data) < complex_model.bic(data));
+  true_model.select(data);
+
+  FitControlsVinecop controls({ BicopFamily::gaussian, BicopFamily::tll });
+  complex_model.select(data);
+  ASSERT_NEAR(complex_model.get_aic(), complex_model.aic(data), 1e-2);
+  ASSERT_NEAR(complex_model.get_bic(), complex_model.bic(data), 1e-2);
 }
 
 TEST_F(VinecopTest, fit_parameters_is_correct)
@@ -401,6 +466,9 @@ TEST_F(VinecopTest, fit_parameters_is_correct)
   Vinecop vc2(rvine_structure, pcs);
   vc2.fit(u, controls);
 
+  ASSERT_NEAR(vc2.get_loglik(), vc2.loglik(u), 1e-2);
+  ASSERT_NEAR(vc2.get_aic(), vc2.aic(u), 1e-2);
+  ASSERT_NEAR(vc2.get_bic(), vc2.bic(u), 1e-2);
   ASSERT_TRUE(vc.str() == vc2.str());
 
   Vinecop vc3(rvine_structure, pcs);
@@ -555,8 +623,9 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
   // check whether the same structure appears if we only allow for
   // independence (pair-copula estimates differ otherwise)
   FitControlsVinecop controls({ BicopFamily::indep });
-  EXPECT_ANY_THROW(controls.set_mst_algorithm("foobar"));
-  controls.set_mst_algorithm("kruskal");
+  EXPECT_EQ(controls.get_tree_algorithm(), "mst_prim");
+  EXPECT_ANY_THROW(controls.set_tree_algorithm("foobar"));
+  controls.set_tree_algorithm("mst_kruskal");
 
   // select structure and get matrix
   Vinecop fit(7);
@@ -566,6 +635,61 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
   // check if the same conditioned sets appear for each tree
   size_t pairs_unequal = get_pairs_unequal(vc_matrix, vcl_matrix, 6);
   EXPECT_EQ(pairs_unequal, 0);
+}
+
+TEST_F(VinecopTest, select_finds_different_structures_random)
+{
+  // Initialize the controls
+  FitControlsVinecop controls_weighted({ BicopFamily::tll });
+  controls_weighted.set_tree_algorithm("random_weighted");
+
+  FitControlsVinecop controls_unweighted({ BicopFamily::tll });
+  controls_unweighted.set_tree_algorithm("random_unweighted");
+
+  // For reseeding the random number generator
+  std::random_device rd;
+  std::vector<int> seeds(20);
+
+  // To store the unique structures
+  std::set<TriangularArray<size_t>> unique_structures_weighted;
+  std::set<TriangularArray<size_t>> unique_structures_unweighted;
+
+  // To store the first RNG value after each reseeding
+  std::set<uint32_t> first_rng_outputs;
+
+  const size_t num_trials = 10;
+
+  for (size_t i = 0; i < num_trials; ++i) {
+    // Seed controls randomly for each test run
+    std::generate(
+      seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
+    controls_weighted.set_seeds(seeds);
+    controls_unweighted.set_seeds(seeds);
+
+    // Check RNG output changes
+    auto rng_sample_weighted =
+      controls_weighted.get_rng()(); // Get first sample
+    first_rng_outputs.insert(rng_sample_weighted);
+
+    auto rng_sample_unweighted =
+      controls_unweighted.get_rng()(); // Get first sample
+    first_rng_outputs.insert(rng_sample_unweighted);
+
+    // Select a random structure for the weighted method
+    Vinecop fit_weighted(u, RVineStructure(), {}, controls_weighted);
+    auto struct_array_weighted = fit_weighted.get_struct_array();
+    unique_structures_weighted.insert(struct_array_weighted);
+
+    // Select a random structure for the unweighted method
+    Vinecop fit_unweighted(u, RVineStructure(), {}, controls_unweighted);
+    auto struct_array_unweighted = fit_unweighted.get_struct_array();
+    unique_structures_unweighted.insert(struct_array_unweighted);
+  }
+
+  // The probability that any 2 samples are the same by chance is very low
+  EXPECT_EQ(first_rng_outputs.size(), num_trials);
+  EXPECT_EQ(unique_structures_weighted.size(), num_trials);
+  EXPECT_EQ(unique_structures_unweighted.size(), num_trials);
 }
 
 TEST_F(VinecopTest, fixed_truncation)
@@ -598,8 +722,8 @@ TEST_F(VinecopTest, sparse_threshold_selection)
   u.conservativeResize(20, 7);
 
   FitControlsVinecop controls(bicop_families::itau, "itau");
-  controls.set_select_threshold(NAN);
-  controls.set_threshold(true);
+  controls.set_select_threshold(true);
+  controls.set_threshold(NAN);
   // controls.set_show_trace(true);
   controls.set_selection_criterion("mbicv");
 
@@ -670,4 +794,24 @@ TEST_F(VinecopTest, partial_selection)
   }
   EXPECT_EQ(count2, 6);
 }
+
+TEST_F(VinecopTest, tawn_flipping)
+{
+  FitControlsVinecop controls({ BicopFamily::tawn });
+  Vinecop fit1(7);
+  fit1.select(u, controls);
+  Vinecop fit2(fit1.get_rvine_structure());
+  fit2.select(u, controls);
+
+  for (size_t tree = 0; tree < fit1.get_trunc_lvl(); ++tree) {
+    for (size_t edge = 0; edge < 6 - tree; ++edge) {
+      auto pc1 = fit1.get_pair_copula(tree, edge);
+      auto pc2 = fit2.get_pair_copula(tree, edge);
+      ASSERT_EQ(pc1.get_family(), pc2.get_family());
+      ASSERT_EQ(pc1.get_rotation(), pc2.get_rotation());
+      ASSERT_TRUE(pc1.get_parameters().isApprox(pc2.get_parameters(), 0.01));
+    }
+  }
+}
+
 }

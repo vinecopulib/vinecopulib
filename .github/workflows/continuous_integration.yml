@@ -3,6 +3,22 @@ name: Build Status
 on: [push, pull_request]
 
 jobs:
+  style:
+    name: clang-format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Install the version specified in your .clang-format (here LLVM 14).
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format-14
+
+      - name: Check formatting
+        run: |
+          FILES=$(git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$')
+          clang-format-14 --dry-run --Werror $FILES
   build:
     strategy:
       fail-fast: false
@@ -57,7 +73,8 @@ jobs:
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
               cmake .. -DSTRICT_COMPILER=ON \
               -DCODE_COVERAGE=ON \
-              -DCMAKE_BUILD_TYPE=Debug
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
               make vinecopulib_coverage
             else
               cmake .. -DCMAKE_BUILD_TYPE=Debug
@@ -69,6 +86,19 @@ jobs:
             cmake --build .
           fi
         shell: bash
+      # - name: Run clang-tidy static analysis
+      #   if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.name == 'GNU'
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y clang-tidy-14 jq
+      #     cp debug/compile_commands.json debug/compile_commands_bak.json
+      #     jq '[.[] | select(.file | test("_deps/") | not)]' debug/compile_commands_bak.json > debug/compile_commands.json
+      #     FILES=$(git ls-files | grep -E '^(include|test|examples)/.*\.(cpp|cc|cxx|h|hpp|ipp)$')
+      #     for file in $FILES; do
+      #       echo "Running clang-tidy on $file"
+      #       run-clang-tidy-14 -p debug -quiet -- "$file"
+      #     done
+      #     mv debug/compile_commands_bak.json debug/compile_commands.json
       - name: Code coverage
         uses: codecov/codecov-action@v5
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
@@ -79,14 +109,14 @@ jobs:
         run:   |
           mkdir release && cd release
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
             make && sudo make install
             bin/test_all
           else
             cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
-            -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_SHARED_LIB=ON
+            -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
             cmake --build . --config Release
-            "bin/Release/test_all.exe"
+            cmd.exe /c bin\\Release\\test_all.exe
             cmake --build . --config Release --target install
           fi
         shell: bash
@@ -100,6 +130,6 @@ jobs:
           else
             cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}"
             cmake --build . --config Release
-            "../bin/Release/main.exe"
+            cmd.exe /c ..\\bin\\Release\\main.exe
           fi
         shell: bash

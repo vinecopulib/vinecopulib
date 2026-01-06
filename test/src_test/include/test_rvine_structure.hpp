@@ -47,6 +47,29 @@ TEST(rvine_structure, triangular_array_works)
     { { 2, 3, 1, 1, 1, 1 }, { 1, 1, 4, 3, 2 } }));
   my_rvm.truncate(2);
   EXPECT_EQ(my_rvm.get_trunc_lvl(), 2);
+
+  // Different dimension
+  TriangularArray<size_t> smaller_d({ { 1, 2, 3 }, { 4, 5 }, { 6 } });
+  TriangularArray<size_t> larger_d(
+    { { 1, 2, 3, 4 }, { 4, 5, 6 }, { 6, 7 }, { 8 } });
+  EXPECT_TRUE(smaller_d < larger_d);
+  EXPECT_FALSE(larger_d < smaller_d);
+
+  // Same dimension, different truncation level
+  TriangularArray<size_t> ta1({ { 1, 2, 3 }, { 4, 5 }, { 6 } });
+  TriangularArray<size_t> ta2({ { 1, 2, 3 }, { 4, 5 }, { 6 } });
+  ta1.truncate(2);
+  ta2.truncate(3);
+  EXPECT_TRUE(ta1 < ta2);
+  EXPECT_FALSE(ta2 < ta1);
+
+  // Same dimension, trunc level, and values
+  TriangularArray<size_t> ta3({ { 1, 2, 3 }, { 4, 5 }, { 6 } });
+  TriangularArray<size_t> ta4({ { 1, 2, 3 }, { 4, 5 }, { 6 } });
+  ta3.truncate(3);
+  ta4.truncate(3);
+  EXPECT_FALSE(ta3 < ta4);
+  EXPECT_FALSE(ta4 < ta3);
 }
 
 TEST(rvine_structure, rvine_structure_print)

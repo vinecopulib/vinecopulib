@@ -1,7 +1,7 @@
 if(NOT WIN32)
 
     if(STRICT_COMPILER AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-      set(CMAKE_CXX_FLAGS                "-Werror -Wno-delete-non-virtual-dtor -Wall -Wextra -Wconversion")
+      set(CMAKE_CXX_FLAGS                "-Werror -Wno-delete-non-virtual-dtor -Wall -Wextra -Wpedantic -Wconversion")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wstrict-aliasing -pedantic -fmax-errors=5 -Werror=return-type")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wunreachable-code -Wcast-align -Wcast-qual")
         set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op")
@@ -53,10 +53,12 @@ if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()
 
-add_compile_definitions(
+set(VINECOPULIB_DEFINITIONS
   BOOST_NO_AUTO_PTR
   BOOST_ALLOW_DEPRECATED_HEADERS
   BOOST_MATH_PROMOTE_DOUBLE_POLICY=false
   BOOST_ALL_NO_LIB
   USE_BOOST
 )
+
+add_compile_definitions(${VINECOPULIB_DEFINITIONS})

@@ -50,6 +50,7 @@ public:
   T& operator()(size_t row, size_t column);
   T operator()(size_t row, size_t column) const;
   bool operator==(const TriangularArray<T>& rhs) const;
+  bool operator<(const TriangularArray<T>& rhs) const;
   void truncate(size_t trunc_lvl);
 
   size_t get_trunc_lvl() const;
@@ -70,7 +71,8 @@ private:
 template<typename T>
 TriangularArray<T>::TriangularArray(size_t d)
   : TriangularArray(d, d - 1)
-{}
+{
+}
 
 //! @brief Construct a truncated triangular array.
 //!
@@ -175,6 +177,30 @@ TriangularArray<T>::operator==(const TriangularArray<T>& rhs) const
   return true;
 }
 
+//! @brief Lexicographic comparison operator for sorting.
+//! @param rhs Right-hand-side of the less-than operator.
+template<typename T>
+bool
+TriangularArray<T>::operator<(const TriangularArray<T>& rhs) const
+{
+  if (d_ != rhs.get_dim())
+    return d_ < rhs.get_dim();
+  if (trunc_lvl_ != rhs.get_trunc_lvl())
+    return trunc_lvl_ < rhs.get_trunc_lvl();
+
+  for (size_t i = 0; i < trunc_lvl_; i++) {
+    for (size_t j = 0; j < d_ - 1 - i; j++) {
+      const T& lhs_val = (*this)(i, j);
+      const T& rhs_val = rhs(i, j);
+      if (lhs_val < rhs_val)
+        return true;
+      if (lhs_val > rhs_val)
+        return false;
+    }
+  }
+  return false; // all elements are equal
+}
+
 //! @brief Gets the truncation level of the underlying vine..
 template<typename T>
 size_t
@@ -183,8 +209,8 @@ TriangularArray<T>::get_trunc_lvl() const
   return trunc_lvl_;
 }
 
-//! @brief Gets the dimension of the underlying vine (the matrix has `d-1` columns and.
-//! `min(trunv_lvl, d-1)` rows).
+//! @brief Gets the dimension of the underlying vine (the matrix has `d-1`
+//! columns and. `min(trunv_lvl, d-1)` rows).
 template<typename T>
 size_t
 TriangularArray<T>::get_dim() const
