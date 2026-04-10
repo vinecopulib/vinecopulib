@@ -301,13 +301,13 @@ TEST(discrete, check_d_d_stability)
 
   Eigen::MatrixXd u_disc(n, 4);
   for (size_t i = 0; i < n; ++i) {
-    const int x1 = boost::math::quantile(nbinom1, u(i, 0));
-    const int x2 = boost::math::quantile(nbinom2, u(i, 1));
+    const double x1 = boost::math::quantile(nbinom1, u(i, 0));
+    const double x2 = boost::math::quantile(nbinom2, u(i, 1));
 
     u_disc(i, 0) = boost::math::cdf(nbinom1, x1);
     u_disc(i, 1) = boost::math::cdf(nbinom2, x2);
-    u_disc(i, 2) = boost::math::cdf(nbinom1, std::max(x1 - 1, 0));
-    u_disc(i, 3) = boost::math::cdf(nbinom2, std::max(x2 - 1, 0));
+    u_disc(i, 2) = boost::math::cdf(nbinom1, std::max(x1 - 1, 0.0));
+    u_disc(i, 3) = boost::math::cdf(nbinom2, std::max(x2 - 1, 0.0));
   }
 
   const std::vector<std::string> var_types = { "d", "d" };
