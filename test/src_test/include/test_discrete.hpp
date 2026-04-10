@@ -16,7 +16,6 @@ namespace test_discrete {
 
 using namespace vinecopulib;
 
-
 TEST(discrete, bicop)
 {
   for (auto rot : { 0, 90, 180, 270 }) {
@@ -292,10 +291,12 @@ TEST(discrete, check_d_d_stability)
   constexpr size_t n = 200;
   constexpr double rho_true = 0.6;
 
-  auto cop = Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, rho_true));
-  auto u = cop.simulate(n, false, { 5});
+  auto cop =
+    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, rho_true));
+  auto u = cop.simulate(n, false, { 5 });
 
-  auto nbinom1 = boost::math::negative_binomial_distribution<>(2, 2.0 / (302.0));
+  auto nbinom1 =
+    boost::math::negative_binomial_distribution<>(2, 2.0 / (302.0));
   auto nbinom2 = boost::math::negative_binomial_distribution<>(2, 1.0 / (51.0));
 
   Eigen::MatrixXd u_disc(n, 4);
@@ -313,9 +314,10 @@ TEST(discrete, check_d_d_stability)
   auto vine_controls = FitControlsVinecop({ BicopFamily::gaussian }, "mle");
   auto bicop_controls = FitControlsBicop({ BicopFamily::gaussian }, "mle");
 
-  auto vinecop_fit = Vinecop(u_disc, RVineStructure(), var_types, vine_controls);
-  auto vinecop_fit2 =
-    Vinecop(u_disc, vinecop_fit.get_rvine_structure(), var_types, vine_controls);
+  auto vinecop_fit =
+    Vinecop(u_disc, RVineStructure(), var_types, vine_controls);
+  auto vinecop_fit2 = Vinecop(
+    u_disc, vinecop_fit.get_rvine_structure(), var_types, vine_controls);
 
   Bicop bicop_fit;
   bicop_fit.set_var_types(var_types);
@@ -333,5 +335,3 @@ TEST(discrete, check_d_d_stability)
 }
 
 }
-
-
