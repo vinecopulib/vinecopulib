@@ -9,11 +9,15 @@
 void
 ParBicopTest::set_family(BicopFamily family, int rotation)
 {
+  family_ = 0;
   switch (family) {
     case BicopFamily::indep:
       family_ = 0;
       break;
     case BicopFamily::gaussian:
+      family_ = 1;
+      break;
+    case BicopFamily::gaussian_mix:
       family_ = 1;
       break;
     case BicopFamily::student:

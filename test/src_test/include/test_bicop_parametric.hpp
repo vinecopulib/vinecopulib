@@ -38,7 +38,7 @@ TEST_P(ParBicopTest, bicop_serialization_is_correct)
 // Test if the C++ implementation of the basic methods is correct
 TEST_P(ParBicopTest, parametric_bicop_is_correct)
 {
-  if (needs_check_) {
+  if (needs_check_ && has_r_reference_) {
     std::string cmd = std::string(RSCRIPT) + std::string(TEST_BICOP);
     cmd += " " + std::to_string(get_n());
     cmd += " " + std::to_string(get_family());
@@ -156,9 +156,17 @@ TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct)
     EXPECT_NO_THROW(bicop.mbic());
 
     auto selected_family = bicop.get_family_name();
-    EXPECT_EQ(selected_family, true_family)
-      << bicop_.str() << std::endl
-      << bicop.bic(data) << " " << bicop_.bic(data);
+    if (bicop_.get_family() == BicopFamily::gaussian_mix) {
+      EXPECT_TRUE(is_member(selected_family,
+                            { std::string("Gaussian mix (30/70)"),
+                              std::string("Gaussian") }))
+        << bicop_.str() << std::endl
+        << bicop.bic(data) << " " << bicop_.bic(data);
+    } else {
+      EXPECT_EQ(selected_family, true_family)
+        << bicop_.str() << std::endl
+        << bicop.bic(data) << " " << bicop_.bic(data);
+    }
 
     if (is_member(bicop_.get_family(), bicop_families::bb)) {
       int rot_sel = bicop.get_rotation();

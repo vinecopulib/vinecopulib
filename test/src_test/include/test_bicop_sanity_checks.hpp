@@ -33,6 +33,54 @@ TEST(bicop_sanity_checks, catches_parameters_out_of_bounds)
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, 0, -wrong_par));
 }
 
+TEST(bicop_sanity_checks, gaussian_mix_matches_weighted_components)
+{
+  Eigen::VectorXd par_mix(2);
+  par_mix << -0.2, 0.6;
+  Bicop mix(BicopFamily::gaussian_mix, 0, par_mix);
+
+  Eigen::VectorXd par1(1), par2(1);
+  par1 << par_mix(0);
+  par2 << par_mix(1);
+  Bicop g1(BicopFamily::gaussian, 0, par1);
+  Bicop g2(BicopFamily::gaussian, 0, par2);
+
+  Eigen::MatrixXd u(4, 2);
+  u << 0.2, 0.3,
+       0.8, 0.4,
+       0.6, 0.7,
+       0.4, 0.9;
+
+  Eigen::VectorXd exp_pdf =
+    (0.3 * g1.pdf(u).array() + 0.7 * g2.pdf(u).array()).matrix();
+  Eigen::VectorXd exp_cdf =
+    (0.3 * g1.cdf(u).array() + 0.7 * g2.cdf(u).array()).matrix();
+  Eigen::VectorXd exp_h1 =
+    (0.3 * g1.hfunc1(u).array() + 0.7 * g2.hfunc1(u).array()).matrix();
+  Eigen::VectorXd exp_h2 =
+    (0.3 * g1.hfunc2(u).array() + 0.7 * g2.hfunc2(u).array()).matrix();
+
+  EXPECT_TRUE(mix.pdf(u).isApprox(exp_pdf, 1e-10));
+  EXPECT_TRUE(mix.cdf(u).isApprox(exp_cdf, 1e-10));
+  EXPECT_TRUE(mix.hfunc1(u).isApprox(exp_h1, 1e-10));
+  EXPECT_TRUE(mix.hfunc2(u).isApprox(exp_h2, 1e-10));
+
+  Eigen::MatrixXd u_inv(5, 2);
+  u_inv << 0.1, 0.2,
+           0.3, 0.7,
+           0.5, 0.5,
+           0.8, 0.4,
+           0.9, 0.9;
+
+  Eigen::MatrixXd arg1 = u_inv;
+  arg1.col(1) = mix.hinv1(u_inv);
+  EXPECT_TRUE(mix.hfunc1(arg1).isApprox(u_inv.col(1), 1e-6));
+
+  Eigen::MatrixXd arg2 = u_inv;
+  arg2.col(0) = mix.hinv2(u_inv);
+  EXPECT_TRUE(mix.hfunc2(arg2).isApprox(u_inv.col(0), 1e-6));
+}
+
 TEST(bicop_sanity_checks, catches_wrong_rotation)
 {
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, -10));
@@ -63,6 +111,17 @@ TEST(bicop_sanity_checks, catches_not_fitted_to_data)
   EXPECT_ANY_THROW(bc.get_aic());
   EXPECT_ANY_THROW(bc.get_bic());
   EXPECT_ANY_THROW(bc.get_mbic(0.6));
+}
+
+TEST(bicop_sanity_checks, gaussian_mix_rejects_itau)
+{
+  Eigen::VectorXd par_mix(2);
+  par_mix << -0.2, 0.6;
+  Bicop mix(BicopFamily::gaussian_mix, 0, par_mix);
+  auto u = mix.simulate(200);
+  FitControlsBicop controls;
+  controls.set_parametric_method("itau");
+  EXPECT_ANY_THROW(mix.fit(u, controls));
 }
 
 TEST(bicop_sanity_checks, select_can_handle_zeros_and_ones)

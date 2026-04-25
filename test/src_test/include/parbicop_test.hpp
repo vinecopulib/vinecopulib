@@ -38,12 +38,18 @@ protected:
   double par2_;
   Bicop bicop_;
   bool needs_check_;
+  bool has_r_reference_;
 
   virtual void SetUp()
   {
     n_ = static_cast<int>(5e3);
     auto family = ::testing::get<0>(GetParam());
     auto rotation = ::testing::get<1>(GetParam());
+    has_r_reference_ = true;
+    if ((family == BicopFamily::gaussian_mix) ||
+        (family == BicopFamily::xtd_gumbel)) {
+      has_r_reference_ = false;
+    }
     if (tools_stl::is_member(family, bicop_families::rotationless)) {
       bicop_ = Bicop(family);
     } else {
@@ -59,6 +65,12 @@ protected:
       if (family == BicopFamily::student) {
         parameters(0) = sin(tau * boost::math::constants::pi<double>() / 2);
         parameters(1) = 4;
+      } else if (family == BicopFamily::gaussian_mix) {
+        // Keep both Gaussian correlations in (-1, 1); this family doesn't
+        // support VineCopula reference checks, but still participates in
+        // serialization/selection tests.
+        parameters(0) = sin(tau * boost::math::constants::pi<double>() / 2);
+        parameters(1) = sin(0.5 * tau * boost::math::constants::pi<double>() / 2);
       } else if (family == BicopFamily::bb1) {
         parameters(1) = 1.5;
         parameters(0) = -(2 * (1 - parameters(1) + parameters(1) * tau));
