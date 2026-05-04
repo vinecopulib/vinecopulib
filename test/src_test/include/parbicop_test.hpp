@@ -47,6 +47,7 @@ protected:
     auto rotation = ::testing::get<1>(GetParam());
     has_r_reference_ = true;
     if ((family == BicopFamily::gaussian_mix) ||
+        (family == BicopFamily::gumbel_mix) ||
         (family == BicopFamily::xtd_gumbel)) {
       has_r_reference_ = false;
     }
@@ -71,6 +72,11 @@ protected:
         // serialization/selection tests.
         parameters(0) = sin(tau * boost::math::constants::pi<double>() / 2);
         parameters(1) = sin(0.5 * tau * boost::math::constants::pi<double>() / 2);
+      } else if (family == BicopFamily::gumbel_mix) {
+        // XTd-style parameters are in [-20, 20] and mapped to theta by
+        // abs(par) + 1 in the implementation.
+        parameters(0) = 0.4;
+        parameters(1) = 0.8;
       } else if (family == BicopFamily::bb1) {
         parameters(1) = 1.5;
         parameters(0) = -(2 * (1 - parameters(1) + parameters(1) * tau));

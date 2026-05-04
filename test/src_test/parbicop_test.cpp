@@ -20,6 +20,9 @@ ParBicopTest::set_family(BicopFamily family, int rotation)
     case BicopFamily::gaussian_mix:
       family_ = 1;
       break;
+    case BicopFamily::gumbel_mix:
+      family_ = 4;
+      break;
     case BicopFamily::student:
       family_ = 2;
       break;
