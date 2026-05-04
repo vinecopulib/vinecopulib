@@ -129,6 +129,39 @@ TEST(bicop_sanity_checks, gumbel_mix_matches_weighted_components)
   EXPECT_TRUE(mix.hfunc2(arg2).isApprox(u_inv.col(0), 1e-6));
 }
 
+TEST(bicop_sanity_checks, gumbel_mix_negative_parameters_rotate_components)
+{
+  Eigen::VectorXd par_mix(2);
+  par_mix << -0.5, -1.2;
+  Bicop mix(BicopFamily::gumbel_mix, 0, par_mix);
+
+  Eigen::VectorXd par1(1), par2(1);
+  par1 << std::abs(par_mix(0)) + 1.0;
+  par2 << std::abs(par_mix(1)) + 1.0;
+  Bicop g1(BicopFamily::gumbel, 180, par1);
+  Bicop g2(BicopFamily::gumbel, 270, par2);
+
+  Eigen::MatrixXd u(4, 2);
+  u << 0.2, 0.3,
+       0.8, 0.4,
+       0.6, 0.7,
+       0.4, 0.9;
+
+  Eigen::VectorXd exp_pdf =
+    (0.5 * g1.pdf(u).array() + 0.5 * g2.pdf(u).array()).matrix();
+  Eigen::VectorXd exp_cdf =
+    (0.5 * g1.cdf(u).array() + 0.5 * g2.cdf(u).array()).matrix();
+  Eigen::VectorXd exp_h1 =
+    (0.5 * g1.hfunc1(u).array() + 0.5 * g2.hfunc1(u).array()).matrix();
+  Eigen::VectorXd exp_h2 =
+    (0.5 * g1.hfunc2(u).array() + 0.5 * g2.hfunc2(u).array()).matrix();
+
+  EXPECT_TRUE(mix.pdf(u).isApprox(exp_pdf, 1e-8));
+  EXPECT_TRUE(mix.cdf(u).isApprox(exp_cdf, 1e-8));
+  EXPECT_TRUE(mix.hfunc1(u).isApprox(exp_h1, 1e-8));
+  EXPECT_TRUE(mix.hfunc2(u).isApprox(exp_h2, 1e-8));
+}
+
 TEST(bicop_sanity_checks, catches_wrong_rotation)
 {
   EXPECT_ANY_THROW(Bicop(BicopFamily::gaussian, -10));
