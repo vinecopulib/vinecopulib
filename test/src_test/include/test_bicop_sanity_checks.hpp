@@ -91,7 +91,7 @@ TEST(bicop_sanity_checks, gumbel_mix_matches_weighted_components)
   par1 << std::abs(par_mix(0)) + 1.0;
   par2 << std::abs(par_mix(1)) + 1.0;
   Bicop g1(BicopFamily::gumbel, 0, par1);
-  Bicop g2(BicopFamily::gumbel, 90, par2);
+  Bicop g2(BicopFamily::gumbel, 180, par2);
 
   Eigen::MatrixXd u(4, 2);
   u << 0.2, 0.3,
@@ -138,7 +138,7 @@ TEST(bicop_sanity_checks, gumbel_mix_negative_parameters_rotate_components)
   Eigen::VectorXd par1(1), par2(1);
   par1 << std::abs(par_mix(0)) + 1.0;
   par2 << std::abs(par_mix(1)) + 1.0;
-  Bicop g1(BicopFamily::gumbel, 180, par1);
+  Bicop g1(BicopFamily::gumbel, 90, par1);
   Bicop g2(BicopFamily::gumbel, 270, par2);
 
   Eigen::MatrixXd u(4, 2);
