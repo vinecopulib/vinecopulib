@@ -292,8 +292,7 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //!     proportional to the product of the weights (i.e., the dependence) of
 //!     the edges in the tree.
 //!   - `"random_unweighted"` generates a random spanning tree uniformly over
-//!   all
-//!     spanning trees satisfying the proximity condition.
+//!     all spanning trees satisfying the proximity condition.
 //!
 //! If the `controls` object has been instantiated with
 //! `select_families = false`, then the method simply updates the parameters of
