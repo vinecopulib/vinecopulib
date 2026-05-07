@@ -7,6 +7,8 @@
 #pragma once
 
 #include "gtest/gtest.h"
+#include <boost/math/distributions/negative_binomial.hpp>
+#include <cmath>
 #include <vinecopulib.hpp>
 #include <wdm/eigen.hpp>
 
@@ -283,4 +285,53 @@ TEST(zero_inflated, vinecop)
     }
   }
 }
+
+TEST(discrete, check_d_d_stability)
+{
+  constexpr size_t n = 200;
+  constexpr double rho_true = 0.6;
+
+  auto cop =
+    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, rho_true));
+  auto u = cop.simulate(n, false, { 5 });
+
+  auto nbinom1 =
+    boost::math::negative_binomial_distribution<>(2, 2.0 / (302.0));
+  auto nbinom2 = boost::math::negative_binomial_distribution<>(2, 1.0 / (51.0));
+
+  Eigen::MatrixXd u_disc(n, 4);
+  for (size_t i = 0; i < n; ++i) {
+    const double x1 = boost::math::quantile(nbinom1, u(i, 0));
+    const double x2 = boost::math::quantile(nbinom2, u(i, 1));
+
+    u_disc(i, 0) = boost::math::cdf(nbinom1, x1);
+    u_disc(i, 1) = boost::math::cdf(nbinom2, x2);
+    u_disc(i, 2) = boost::math::cdf(nbinom1, std::max(x1 - 1, 0.0));
+    u_disc(i, 3) = boost::math::cdf(nbinom2, std::max(x2 - 1, 0.0));
+  }
+
+  const std::vector<std::string> var_types = { "d", "d" };
+  auto vine_controls = FitControlsVinecop({ BicopFamily::gaussian }, "mle");
+  auto bicop_controls = FitControlsBicop({ BicopFamily::gaussian }, "mle");
+
+  auto vinecop_fit =
+    Vinecop(u_disc, RVineStructure(), var_types, vine_controls);
+  auto vinecop_fit2 = Vinecop(
+    u_disc, vinecop_fit.get_rvine_structure(), var_types, vine_controls);
+
+  Bicop bicop_fit;
+  bicop_fit.set_var_types(var_types);
+  bicop_fit.select(u_disc, bicop_controls);
+
+  const double vine1 =
+    vinecop_fit.get_all_pair_copulas().at(0).at(0).get_parameters()(0);
+  const double vine2 =
+    vinecop_fit2.get_all_pair_copulas().at(0).at(0).get_parameters()(0);
+  const double bicop = bicop_fit.get_parameters()(0);
+
+  EXPECT_NEAR(vine1, vine2, 1e-2);
+  EXPECT_NEAR(vine1, bicop, 1e-2);
+  EXPECT_NEAR(vine2, bicop, 1e-2);
+}
+
 }

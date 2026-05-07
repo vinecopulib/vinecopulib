@@ -10,6 +10,7 @@
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/graph/random_spanning_tree.hpp>
+#include <boost/random.hpp>
 #include <cmath>
 #include <iostream>
 #include <wdm/eigen.hpp>
@@ -483,7 +484,7 @@ VinecopSelector::select_edges(VineTree& vine_tree)
     boost::mt19937 gen = controls_.get_rng();
 
     // Randomize root vertex
-    std::uniform_int_distribution<size_t> root_dist(0, d - 1);
+    boost::random::uniform_int_distribution<size_t> root_dist(0, d - 1);
     size_t root = root_dist(gen);
 
     if (controls_.get_tree_algorithm() == "random_unweighted") {
