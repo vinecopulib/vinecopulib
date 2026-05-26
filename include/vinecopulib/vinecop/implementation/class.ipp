@@ -1009,6 +1009,131 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
   return pdf;
 }
 
+//! @brief Returns intermediate h-functions used in `pdf()` recursion.
+//!
+//! @details The return value contains two stores corresponding to h-functions
+//! 1 and 2. For each tree level, only edges with `needed_hfunc1` or
+//! `needed_hfunc2` equal to true are included. Each entry is a pair consisting
+//! of the edge index and the corresponding vector of h-function evaluations.
+//!
+//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables.
+//! @param num_threads The number of threads used for computations.
+//! @return A pair of stores with h-function values used during `pdf()`.
+inline std::pair<Vinecop::PdfHfuncStore, Vinecop::PdfHfuncStore>
+Vinecop::hfuncs(Eigen::MatrixXd u, const size_t num_threads) const
+{
+  check_data(u);
+  u = collapse_data(u);
+
+  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
+  auto order = rvine_structure_.get_order();
+  auto disc_cols = tools_select::get_disc_cols(var_types_);
+
+  PdfHfuncStore hfunc1_out(trunc_lvl), hfunc2_out(trunc_lvl);
+  std::vector<std::vector<int>> hfunc1_pos(trunc_lvl), hfunc2_pos(trunc_lvl);
+  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+    hfunc1_pos[tree] = std::vector<int>(d_ - tree - 1, -1);
+    hfunc2_pos[tree] = std::vector<int>(d_ - tree - 1, -1);
+    for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
+      if (rvine_structure_.needed_hfunc1(tree, edge)) {
+        hfunc1_pos[tree][edge] = static_cast<int>(hfunc1_out[tree].size());
+        hfunc1_out[tree].push_back(
+          { edge, Eigen::VectorXd::Zero(u.rows()) });
+      }
+      if (rvine_structure_.needed_hfunc2(tree, edge)) {
+        hfunc2_pos[tree][edge] = static_cast<int>(hfunc2_out[tree].size());
+        hfunc2_out[tree].push_back(
+          { edge, Eigen::VectorXd::Zero(u.rows()) });
+      }
+    }
+  }
+
+  auto do_batch = [&](const tools_batch::Batch& b) {
+    Eigen::MatrixXd hfunc1, hfunc2, u_e, hfunc1_sub, hfunc2_sub, u_e_sub;
+    hfunc1 = Eigen::MatrixXd::Zero(b.size, d_);
+    hfunc2 = Eigen::MatrixXd::Zero(b.size, d_);
+    if (is_discrete()) {
+      hfunc1_sub = hfunc1;
+      hfunc2_sub = hfunc2;
+    }
+
+    for (size_t j = 0; j < d_; ++j) {
+      hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
+      if (var_types_[order[j] - 1] == "d") {
+        hfunc2_sub.col(j) =
+          u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
+      }
+    }
+
+    for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+      tools_interface::check_user_interrupt(
+        static_cast<double>(u.rows()) * static_cast<double>(d_) > 1e5);
+      for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
+        tools_interface::check_user_interrupt(edge % 100 == 0);
+        Bicop* edge_copula = &pair_copulas_[tree][edge];
+        auto var_types = edge_copula->get_var_types();
+        size_t m = rvine_structure_.min_array(tree, edge);
+
+        u_e = Eigen::MatrixXd(b.size, 2);
+        u_e.col(0) = hfunc2.col(edge);
+        if (m == rvine_structure_.struct_array(tree, edge, true)) {
+          u_e.col(1) = hfunc2.col(m - 1);
+        } else {
+          u_e.col(1) = hfunc1.col(m - 1);
+        }
+
+        if ((var_types[0] == "d") || (var_types[1] == "d")) {
+          u_e.conservativeResize(b.size, 4);
+          u_e.col(2) = hfunc2_sub.col(edge);
+          if (m == rvine_structure_.struct_array(tree, edge, true)) {
+            u_e.col(3) = hfunc2_sub.col(m - 1);
+          } else {
+            u_e.col(3) = hfunc1_sub.col(m - 1);
+          }
+        }
+
+        if (rvine_structure_.needed_hfunc1(tree, edge)) {
+          Eigen::VectorXd h1 = edge_copula->hfunc1(u_e);
+          hfunc1.col(edge) = h1;
+          int pos = hfunc1_pos[tree][edge];
+          if (pos >= 0) {
+            hfunc1_out[tree][static_cast<size_t>(pos)]
+              .second.segment(b.begin, b.size) = h1;
+          }
+          if (var_types[1] == "d") {
+            u_e_sub = u_e;
+            u_e_sub.col(1) = u_e.col(3);
+            hfunc1_sub.col(edge) = edge_copula->hfunc1(u_e_sub);
+          }
+        }
+        if (rvine_structure_.needed_hfunc2(tree, edge)) {
+          Eigen::VectorXd h2 = edge_copula->hfunc2(u_e);
+          hfunc2.col(edge) = h2;
+          int pos = hfunc2_pos[tree][edge];
+          if (pos >= 0) {
+            hfunc2_out[tree][static_cast<size_t>(pos)]
+              .second.segment(b.begin, b.size) = h2;
+          }
+          if (var_types[0] == "d") {
+            u_e_sub = u_e;
+            u_e_sub.col(0) = u_e.col(2);
+            hfunc2_sub.col(edge) = edge_copula->hfunc2(u_e_sub);
+          }
+        }
+      }
+    }
+  };
+
+  if (trunc_lvl > 0) {
+    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
+    pool.map(do_batch, tools_batch::create_batches(u.rows(), num_threads));
+    pool.join();
+  }
+
+  return { hfunc1_out, hfunc2_out };
+}
+
 //! @brief Evaluates the score function.
 //!
 //! The score function is defined as the gradient of the log-likelihood

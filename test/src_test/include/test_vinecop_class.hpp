@@ -284,6 +284,64 @@ TEST_F(VinecopTest, pdf_is_correct)
   ASSERT_TRUE(vinecop.pdf(u).isApprox(f, 1e-4));
 }
 
+TEST_F(VinecopTest, hfuncs_is_correct)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
+  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 270, par);
+    }
+  }
+  Vinecop vinecop(model_matrix, pair_copulas);
+
+  auto hfunc = vinecop.hfuncs(u);
+  auto hfunc1_out = hfunc.first;
+  auto hfunc2_out = hfunc.second;
+
+  auto rvine_structure = vinecop.get_rvine_structure();
+  size_t d = vinecop.get_dim();
+  size_t trunc_lvl = rvine_structure.get_trunc_lvl();
+
+  ASSERT_EQ(hfunc1_out.size(), trunc_lvl);
+  ASSERT_EQ(hfunc2_out.size(), trunc_lvl);
+
+  std::vector<std::vector<int>> hfunc1_pos(trunc_lvl), hfunc2_pos(trunc_lvl);
+  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+    hfunc1_pos[tree] = std::vector<int>(d - tree - 1, -1);
+    hfunc2_pos[tree] = std::vector<int>(d - tree - 1, -1);
+
+    size_t n_needed_hfunc1 = 0;
+    size_t n_needed_hfunc2 = 0;
+    for (size_t edge = 0; edge < d - tree - 1; ++edge) {
+      if (rvine_structure.needed_hfunc1(tree, edge)) {
+        ++n_needed_hfunc1;
+      }
+      if (rvine_structure.needed_hfunc2(tree, edge)) {
+        ++n_needed_hfunc2;
+      }
+    }
+
+    EXPECT_EQ(hfunc1_out[tree].size(), n_needed_hfunc1);
+    EXPECT_EQ(hfunc2_out[tree].size(), n_needed_hfunc2);
+
+    for (size_t i = 0; i < hfunc1_out[tree].size(); ++i) {
+      size_t edge = hfunc1_out[tree][i].first;
+      ASSERT_LT(edge, d - tree - 1);
+      EXPECT_EQ(hfunc1_pos[tree][edge], -1);
+      EXPECT_EQ(hfunc1_out[tree][i].second.size(), u.rows());
+      hfunc1_pos[tree][edge] = static_cast<int>(i);
+    }
+    for (size_t i = 0; i < hfunc2_out[tree].size(); ++i) {
+      size_t edge = hfunc2_out[tree][i].first;
+      ASSERT_LT(edge, d - tree - 1);
+      EXPECT_EQ(hfunc2_pos[tree][edge], -1);
+      EXPECT_EQ(hfunc2_out[tree][i].second.size(), u.rows());
+      hfunc2_pos[tree][edge] = static_cast<int>(i);
+    }
+  }
+}
+
 TEST_F(VinecopTest, cdf_is_correct)
 {
   // Create a bivariate copula and a corresponding vine with two variables

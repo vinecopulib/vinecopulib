@@ -7,6 +7,7 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <utility>
 #include <vinecopulib/vinecop/fit_controls.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
 
@@ -121,7 +122,14 @@ public:
   double get_mbicv(const double psi0 = 0.9) const;
 
   // Stats methods
+  using PdfHfuncStore =
+    std::vector<std::vector<std::pair<size_t, Eigen::VectorXd>>>;
+
   Eigen::VectorXd pdf(Eigen::MatrixXd u, const size_t num_threads = 1) const;
+
+  std::pair<PdfHfuncStore, PdfHfuncStore> hfuncs(
+    Eigen::MatrixXd u,
+    const size_t num_threads = 1) const;
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
                       const size_t N = 1e4,
