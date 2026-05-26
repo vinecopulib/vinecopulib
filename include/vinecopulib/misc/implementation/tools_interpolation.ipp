@@ -230,7 +230,7 @@ InterpolationGrid::integrate_2d(const Eigen::MatrixXd& u)
   tmpgrid.col(1) = grid_points_;
 
   auto f = [this, m, &tmpvals, &tmpvals2, &tmpgrid](double u1, double u2) {
-    double upr, tmpint;
+    double upr, tmpint, tmpint1;
     upr = u2;
     for (ptrdiff_t k = 0; k < m; ++k) {
       tmpgrid.col(0) = Eigen::VectorXd::Constant(m, grid_points_(k));
@@ -240,7 +240,8 @@ InterpolationGrid::integrate_2d(const Eigen::MatrixXd& u)
     }
     upr = u1;
     tmpint = int_on_grid(upr, tmpvals2, grid_points_);
-    return std::min(std::max(tmpint, 1e-10), 1 - 1e-10);
+    tmpint1 = int_on_grid(1.0, tmpvals2, grid_points_);
+    return std::min(std::max(tmpint * u2 / tmpint1, 1e-10), 1 - 1e-10);
   };
 
   return tools_eigen::binaryExpr_or_nan(u, f);
