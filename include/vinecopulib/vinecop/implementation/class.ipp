@@ -1038,13 +1038,11 @@ Vinecop::hfuncs(Eigen::MatrixXd u, const size_t num_threads) const
     for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
       if (rvine_structure_.needed_hfunc1(tree, edge)) {
         hfunc1_pos[tree][edge] = static_cast<int>(hfunc1_out[tree].size());
-        hfunc1_out[tree].push_back(
-          { edge, Eigen::VectorXd::Zero(u.rows()) });
+        hfunc1_out[tree].push_back({ edge, Eigen::VectorXd::Zero(u.rows()) });
       }
       if (rvine_structure_.needed_hfunc2(tree, edge)) {
         hfunc2_pos[tree][edge] = static_cast<int>(hfunc2_out[tree].size());
-        hfunc2_out[tree].push_back(
-          { edge, Eigen::VectorXd::Zero(u.rows()) });
+        hfunc2_out[tree].push_back({ edge, Eigen::VectorXd::Zero(u.rows()) });
       }
     }
   }
@@ -1098,8 +1096,8 @@ Vinecop::hfuncs(Eigen::MatrixXd u, const size_t num_threads) const
           hfunc1.col(edge) = h1;
           int pos = hfunc1_pos[tree][edge];
           if (pos >= 0) {
-            hfunc1_out[tree][static_cast<size_t>(pos)]
-              .second.segment(b.begin, b.size) = h1;
+            hfunc1_out[tree][static_cast<size_t>(pos)].second.segment(
+              b.begin, b.size) = h1;
           }
           if (var_types[1] == "d") {
             u_e_sub = u_e;
@@ -1112,8 +1110,8 @@ Vinecop::hfuncs(Eigen::MatrixXd u, const size_t num_threads) const
           hfunc2.col(edge) = h2;
           int pos = hfunc2_pos[tree][edge];
           if (pos >= 0) {
-            hfunc2_out[tree][static_cast<size_t>(pos)]
-              .second.segment(b.begin, b.size) = h2;
+            hfunc2_out[tree][static_cast<size_t>(pos)].second.segment(
+              b.begin, b.size) = h2;
           }
           if (var_types[0] == "d") {
             u_e_sub = u_e;
