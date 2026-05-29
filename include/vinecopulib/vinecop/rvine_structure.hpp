@@ -113,8 +113,11 @@ public:
   nlohmann::json to_json() const;
   void to_file(const std::string& filename) const;
 
+  //! @return the dimension of the vine (number of variables).
   size_t get_dim() const;
+  //! @return the truncation level (the number of trees, at most `dim - 1`).
   size_t get_trunc_lvl() const;
+  //! @return the natural ordering of variables in the first tree.
   std::vector<size_t> get_order() const;
   TriangularArray<size_t> get_struct_array(bool natural_order = false) const;
   TriangularArray<size_t> get_min_array() const;
