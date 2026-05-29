@@ -912,9 +912,12 @@ Vinecop::get_var_types() const
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
-//! @return A vector of length `n` containing the copula density values.
-inline Eigen::VectorXd
-Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
+//! @param keep_all Whether to keep and return per-edge pdfs and h-functions.
+//! @return The copula density together with optional intermediate h-functions.
+inline Vinecop::PdfWithHfuncsResult
+Vinecop::pdf_full(Eigen::MatrixXd u,
+                  const size_t num_threads,
+                  const bool keep_all) const
 {
   check_data(u);
   u = collapse_data(u);
@@ -924,8 +927,31 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
   auto order = rvine_structure_.get_order();
   auto disc_cols = tools_select::get_disc_cols(var_types_);
 
+  PdfWithHfuncsResult result;
+
+  if (keep_all) {
+    result.pdf_edges = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
+    result.hfunc1 = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
+    result.hfunc2 = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
+    result.hfunc1_sub = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
+    result.hfunc2_sub = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
+    for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+      for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
+        result.pdf_edges(tree, edge) = Eigen::VectorXd::Zero(u.rows());
+        if (rvine_structure_.needed_hfunc1(tree, edge)) {
+          result.hfunc1(tree, edge) = Eigen::VectorXd::Zero(u.rows());
+          result.hfunc1_sub(tree, edge) = Eigen::VectorXd::Zero(u.rows());
+        }
+        if (rvine_structure_.needed_hfunc2(tree, edge)) {
+          result.hfunc2(tree, edge) = Eigen::VectorXd::Zero(u.rows());
+          result.hfunc2_sub(tree, edge) = Eigen::VectorXd::Zero(u.rows());
+        }
+      }
+    }
+  }
+
   // initial value must be 1.0 for multiplication
-  Eigen::VectorXd pdf = Eigen::VectorXd::Constant(u.rows(), 1.0);
+  result.pdf = Eigen::VectorXd::Constant(u.rows(), 1.0);
 
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects (all data must be in (0, 1))
@@ -976,8 +1002,9 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
           }
         }
 
-        pdf.segment(b.begin, b.size) =
-          pdf.segment(b.begin, b.size).cwiseProduct(edge_copula->pdf(u_e));
+        Eigen::VectorXd edge_pdf = edge_copula->pdf(u_e);
+        result.pdf.segment(b.begin, b.size) =
+          result.pdf.segment(b.begin, b.size).cwiseProduct(edge_pdf);
 
         // h-functions are only evaluated if needed in next step
         if (rvine_structure_.needed_hfunc1(tree, edge)) {
@@ -996,6 +1023,22 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
             hfunc2_sub.col(edge) = edge_copula->hfunc2(u_e_sub);
           }
         }
+
+        if (keep_all) {
+          result.pdf_edges(tree, edge).segment(b.begin, b.size) = edge_pdf;
+          if (rvine_structure_.needed_hfunc1(tree, edge)) {
+            result.hfunc1(tree, edge).segment(b.begin, b.size) =
+              hfunc1.col(edge);
+            result.hfunc1_sub(tree, edge).segment(b.begin, b.size) =
+              is_discrete() ? hfunc1_sub.col(edge) : hfunc1.col(edge);
+          }
+          if (rvine_structure_.needed_hfunc2(tree, edge)) {
+            result.hfunc2(tree, edge).segment(b.begin, b.size) =
+              hfunc2.col(edge);
+            result.hfunc2_sub(tree, edge).segment(b.begin, b.size) =
+              is_discrete() ? hfunc2_sub.col(edge) : hfunc2.col(edge);
+          }
+        }
       }
     }
   };
@@ -1006,130 +1049,14 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
     pool.join();
   }
 
-  return pdf;
+  return result;
 }
 
-//! @brief Returns intermediate h-functions used in `pdf()` recursion.
-//!
-//! @details The return value contains two stores corresponding to h-functions
-//! 1 and 2. For each tree level, only edges with `needed_hfunc1` or
-//! `needed_hfunc2` equal to true are included. Each entry is a pair consisting
-//! of the edge index and the corresponding vector of h-function evaluations.
-//!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
-//!   evaluation points, where \f$ k \f$ is the number of discrete variables.
-//! @param num_threads The number of threads used for computations.
-//! @return A pair of stores with h-function values used during `pdf()`.
-inline std::pair<Vinecop::PdfHfuncStore, Vinecop::PdfHfuncStore>
-Vinecop::hfuncs(Eigen::MatrixXd u, const size_t num_threads) const
+//! @return A vector of length `n` containing the copula density values.
+inline Eigen::VectorXd
+Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 {
-  check_data(u);
-  u = collapse_data(u);
-
-  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
-  auto order = rvine_structure_.get_order();
-  auto disc_cols = tools_select::get_disc_cols(var_types_);
-
-  PdfHfuncStore hfunc1_out(trunc_lvl), hfunc2_out(trunc_lvl);
-  std::vector<std::vector<int>> hfunc1_pos(trunc_lvl), hfunc2_pos(trunc_lvl);
-  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-    hfunc1_pos[tree] = std::vector<int>(d_ - tree - 1, -1);
-    hfunc2_pos[tree] = std::vector<int>(d_ - tree - 1, -1);
-    for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
-      if (rvine_structure_.needed_hfunc1(tree, edge)) {
-        hfunc1_pos[tree][edge] = static_cast<int>(hfunc1_out[tree].size());
-        hfunc1_out[tree].push_back({ edge, Eigen::VectorXd::Zero(u.rows()) });
-      }
-      if (rvine_structure_.needed_hfunc2(tree, edge)) {
-        hfunc2_pos[tree][edge] = static_cast<int>(hfunc2_out[tree].size());
-        hfunc2_out[tree].push_back({ edge, Eigen::VectorXd::Zero(u.rows()) });
-      }
-    }
-  }
-
-  auto do_batch = [&](const tools_batch::Batch& b) {
-    Eigen::MatrixXd hfunc1, hfunc2, u_e, hfunc1_sub, hfunc2_sub, u_e_sub;
-    hfunc1 = Eigen::MatrixXd::Zero(b.size, d_);
-    hfunc2 = Eigen::MatrixXd::Zero(b.size, d_);
-    if (is_discrete()) {
-      hfunc1_sub = hfunc1;
-      hfunc2_sub = hfunc2;
-    }
-
-    for (size_t j = 0; j < d_; ++j) {
-      hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
-      if (var_types_[order[j] - 1] == "d") {
-        hfunc2_sub.col(j) =
-          u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
-      }
-    }
-
-    for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-      tools_interface::check_user_interrupt(
-        static_cast<double>(u.rows()) * static_cast<double>(d_) > 1e5);
-      for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
-        tools_interface::check_user_interrupt(edge % 100 == 0);
-        Bicop* edge_copula = &pair_copulas_[tree][edge];
-        auto var_types = edge_copula->get_var_types();
-        size_t m = rvine_structure_.min_array(tree, edge);
-
-        u_e = Eigen::MatrixXd(b.size, 2);
-        u_e.col(0) = hfunc2.col(edge);
-        if (m == rvine_structure_.struct_array(tree, edge, true)) {
-          u_e.col(1) = hfunc2.col(m - 1);
-        } else {
-          u_e.col(1) = hfunc1.col(m - 1);
-        }
-
-        if ((var_types[0] == "d") || (var_types[1] == "d")) {
-          u_e.conservativeResize(b.size, 4);
-          u_e.col(2) = hfunc2_sub.col(edge);
-          if (m == rvine_structure_.struct_array(tree, edge, true)) {
-            u_e.col(3) = hfunc2_sub.col(m - 1);
-          } else {
-            u_e.col(3) = hfunc1_sub.col(m - 1);
-          }
-        }
-
-        if (rvine_structure_.needed_hfunc1(tree, edge)) {
-          Eigen::VectorXd h1 = edge_copula->hfunc1(u_e);
-          hfunc1.col(edge) = h1;
-          int pos = hfunc1_pos[tree][edge];
-          if (pos >= 0) {
-            hfunc1_out[tree][static_cast<size_t>(pos)].second.segment(
-              b.begin, b.size) = h1;
-          }
-          if (var_types[1] == "d") {
-            u_e_sub = u_e;
-            u_e_sub.col(1) = u_e.col(3);
-            hfunc1_sub.col(edge) = edge_copula->hfunc1(u_e_sub);
-          }
-        }
-        if (rvine_structure_.needed_hfunc2(tree, edge)) {
-          Eigen::VectorXd h2 = edge_copula->hfunc2(u_e);
-          hfunc2.col(edge) = h2;
-          int pos = hfunc2_pos[tree][edge];
-          if (pos >= 0) {
-            hfunc2_out[tree][static_cast<size_t>(pos)].second.segment(
-              b.begin, b.size) = h2;
-          }
-          if (var_types[0] == "d") {
-            u_e_sub = u_e;
-            u_e_sub.col(0) = u_e.col(2);
-            hfunc2_sub.col(edge) = edge_copula->hfunc2(u_e_sub);
-          }
-        }
-      }
-    }
-  };
-
-  if (trunc_lvl > 0) {
-    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
-    pool.map(do_batch, tools_batch::create_batches(u.rows(), num_threads));
-    pool.join();
-  }
-
-  return { hfunc1_out, hfunc2_out };
+  return pdf_full(std::move(u), num_threads, false).pdf;
 }
 
 //! @brief Evaluates the score function.

@@ -122,14 +122,21 @@ public:
   double get_mbicv(const double psi0 = 0.9) const;
 
   // Stats methods
-  using PdfHfuncStore =
-    std::vector<std::vector<std::pair<size_t, Eigen::VectorXd>>>;
-
   Eigen::VectorXd pdf(Eigen::MatrixXd u, const size_t num_threads = 1) const;
 
-  std::pair<PdfHfuncStore, PdfHfuncStore> hfuncs(
-    Eigen::MatrixXd u,
-    const size_t num_threads = 1) const;
+  struct PdfWithHfuncsResult
+  {
+    Eigen::VectorXd pdf;
+    TriangularArray<Eigen::VectorXd> pdf_edges;
+    TriangularArray<Eigen::VectorXd> hfunc1;
+    TriangularArray<Eigen::VectorXd> hfunc2;
+    TriangularArray<Eigen::VectorXd> hfunc1_sub;
+    TriangularArray<Eigen::VectorXd> hfunc2_sub;
+  };
+
+  PdfWithHfuncsResult pdf_full(Eigen::MatrixXd u,
+                               const size_t num_threads,
+                               const bool keep_all = true) const;
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
                       const size_t N = 1e4,
