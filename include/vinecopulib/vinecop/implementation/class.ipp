@@ -891,7 +891,7 @@ Vinecop::get_var_types() const
 
 //! @}
 
-//! @brief Evaluates the copula density.
+//! @brief Evaluates the per-pair copula density and h-functions.
 //!
 //! @details The copula density is defined as joint density divided by marginal
 //! densities, irrespective of variable types.
@@ -913,7 +913,21 @@ Vinecop::get_var_types() const
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
 //! @param keep_all Whether to keep and return per-edge pdfs and h-functions.
-//! @return The copula density together with optional intermediate h-functions.
+//! @return A struct containing:
+//!   - `pdf`: the copula density evaluated at `u`.
+//! If `keep_all = true`, the struct also contains the following fields:
+//!   - `pdf_edges`: a triangular array of vectors containing
+//!     the per-edge copula densities evaluated at `u`.
+//!   - `hfunc1`:  a triangular array of vectors containing the first h-function
+//!   of each edge evaluated at `u`.
+//!   - `hfunc2`:  a triangular array of vectors containing the second
+//!   h-function of each edge evaluated at `u`.
+//!   - `hfunc1_sub`: a triangular array of vectors containing the first
+//!   h-function of each edge evaluated at the second block of `u` (i.e., the
+//!   left-sided limits), if at least one variable is discrete.
+//!   - `hfunc2_sub`: a triangular array of vectors containing the second
+//!   h-function of each edge evaluated at the second block of `u` (i.e., the
+//!   left-sided limits), if at least one variable is discrete.
 inline Vinecop::PdfWithHfuncsResult
 Vinecop::pdf_full(Eigen::MatrixXd u,
                   const size_t num_threads,
@@ -1052,6 +1066,27 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
   return result;
 }
 
+//! @brief Evaluates the copula density.
+//!
+//! @details The copula density is defined as joint density divided by marginal
+//! densities, irrespective of variable types.
+//!
+//! When at least one variable is discrete, two types of
+//! "observations" are required in `u`: the first \f$ n \; x \; d \f$ block
+//! contains realizations of \f$ F_{X_j}(X_j) \f$.
+//! The second \f$ n \; x \; d \f$
+//! block contains realizations of \f$ F_{X_j}(X_j^-) \f$. The minus indicates a
+//! left-sided limit of the cdf. For, e.g., an integer-valued variable, it holds
+//! \f$ F_{X_j}(X_j^-) = F_{X_j}(X_j - 1) \f$. For continuous variables the left
+//! limit and the cdf itself coincide. Respective columns can be omitted in the
+//! second block.
+//!
+//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables
+//!   (see `Vinecop::select()`).
+//! @param num_threads The number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
 //! @return A vector of length `n` containing the copula density values.
 inline Eigen::VectorXd
 Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
