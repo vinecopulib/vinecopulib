@@ -309,17 +309,17 @@ TEST_F(VinecopTest, hfuncs_is_correct)
 
   for (size_t tree = 0; tree < trunc_lvl; ++tree) {
     for (size_t edge = 0; edge < d - tree - 1; ++edge) {
-      EXPECT_EQ(r.pdf_edges(tree, edge).size(), (Eigen::Index)u.rows());
+      EXPECT_EQ(r.pdf_edges(tree, edge).size(), u.rows());
       if (rvine_structure.needed_hfunc1(tree, edge)) {
-        EXPECT_EQ(r.hfunc1(tree, edge).size(), (Eigen::Index)u.rows());
-        EXPECT_EQ(r.hfunc1_sub(tree, edge).size(), (Eigen::Index)u.rows());
+        EXPECT_EQ(r.hfunc1(tree, edge).size(), u.rows());
+        EXPECT_EQ(r.hfunc1_sub(tree, edge).size(), u.rows());
       } else {
         EXPECT_EQ(r.hfunc1(tree, edge).size(), 0);
         EXPECT_EQ(r.hfunc1_sub(tree, edge).size(), 0);
       }
       if (rvine_structure.needed_hfunc2(tree, edge)) {
-        EXPECT_EQ(r.hfunc2(tree, edge).size(), (Eigen::Index)u.rows());
-        EXPECT_EQ(r.hfunc2_sub(tree, edge).size(), (Eigen::Index)u.rows());
+        EXPECT_EQ(r.hfunc2(tree, edge).size(), u.rows());
+        EXPECT_EQ(r.hfunc2_sub(tree, edge).size(), u.rows());
       } else {
         EXPECT_EQ(r.hfunc2(tree, edge).size(), 0);
         EXPECT_EQ(r.hfunc2_sub(tree, edge).size(), 0);
