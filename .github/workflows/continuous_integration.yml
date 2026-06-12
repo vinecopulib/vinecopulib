@@ -60,7 +60,6 @@ jobs:
           echo "Boost_INCLUDE_DIR =${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
           echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
-            cmd "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.cfg.platform }}
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
           fi
@@ -81,7 +80,11 @@ jobs:
               make
             fi
           else
-            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
+            CMAKE_ARCH="Win32"
+            if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
+              CMAKE_ARCH="x64"
+            fi
+            cmake .. -G "Visual Studio 17 2022" -A "$CMAKE_ARCH" \
             -DCMAKE_BUILD_TYPE=Debug
             cmake --build .
           fi
@@ -113,7 +116,11 @@ jobs:
             make && sudo make install
             bin/test_all
           else
-            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}" \
+            CMAKE_ARCH="Win32"
+            if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
+              CMAKE_ARCH="x64"
+            fi
+            cmake .. -G "Visual Studio 17 2022" -A "$CMAKE_ARCH" \
             -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
             cmake --build . --config Release
             cmd.exe /c bin\\Release\\test_all.exe
@@ -128,7 +135,11 @@ jobs:
             cmake .. && make
             ../bin/main
           else
-            cmake .. -G "Visual Studio 17 2022" -A "${CMAKE_GEN_PLAT}"
+            CMAKE_ARCH="Win32"
+            if [ "${{ matrix.cfg.platform }}" == "x64" ]; then
+              CMAKE_ARCH="x64"
+            fi
+            cmake .. -G "Visual Studio 17 2022" -A "$CMAKE_ARCH"
             cmake --build . --config Release
             cmd.exe /c ..\\bin\\Release\\main.exe
           fi
