@@ -103,18 +103,21 @@
             </dt>
             <dd>A class for bivariate copula models.</dd>
             <dt>
+              class <a href="classvinecopulib_1_1_c_vine_structure.html" class="m-doc">CVineStructure</a>
+            </dt>
+            <dd>A class for C-vine structures.</dd>
+            <dt>
+              class <a href="classvinecopulib_1_1_d_vine_structure.html" class="m-doc">DVineStructure</a>
+            </dt>
+            <dd>A class for D-vine structures.</dd>
+            <dt>
               class <a href="classvinecopulib_1_1_fit_controls_bicop.html" class="m-doc">FitControlsBicop</a>
             </dt>
             <dd>A class for controlling fits of bivariate copula models.</dd>
             <dt>
-              <div class="m-doc-template">template&lt;typename T&gt;</div>
-              class <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>
+              struct <a href="structvinecopulib_1_1_fit_controls_config.html" class="m-doc">FitControlsConfig</a>
             </dt>
-            <dd>Triangular arrays.</dd>
-            <dt>
-              class <a href="classvinecopulib_1_1_vinecop.html" class="m-doc">Vinecop</a>
-            </dt>
-            <dd>A class for vine copula models.</dd>
+            <dd></dd>
             <dt>
               class <a href="classvinecopulib_1_1_fit_controls_vinecop.html" class="m-doc">FitControlsVinecop</a>
             </dt>
@@ -124,13 +127,14 @@
             </dt>
             <dd>A class for R-vine structures.</dd>
             <dt>
-              class <a href="classvinecopulib_1_1_d_vine_structure.html" class="m-doc">DVineStructure</a>
+              <div class="m-doc-template">template&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">typename</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">T</a>&gt;</div>
+              class <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>
             </dt>
-            <dd>A class for D-vine structures.</dd>
+            <dd>Triangular arrays.</dd>
             <dt>
-              class <a href="classvinecopulib_1_1_c_vine_structure.html" class="m-doc">CVineStructure</a>
+              class <a href="classvinecopulib_1_1_vinecop.html" class="m-doc">Vinecop</a>
             </dt>
-            <dd>A class for C-vine structures.</dd>
+            <dd>A class for vine copula models.</dd>
           </dl>
         </section>
         <section id="enum-members">
@@ -167,13 +171,13 @@
             <dd>Converts a string name into a BicopFamily.</dd>
             <dt>
               <div class="m-doc-template">template&lt;typename T&gt;</div>
-              <span class="m-doc-wrap-bumper">auto <a href="#a84bb80714f45441e76d85c7dd049db02" class="m-doc">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
-              const <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;T&gt;&amp; tri_array) -&gt; std::ostream&amp;</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#aff162e800d6be74d0445dfacf842997d" class="m-doc">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">T</a>&gt;&amp; tri_array) -&gt; std::ostream&amp;</span>
             </dt>
             <dd>Ostream method for <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>, to be used with <code>std::cout</code>.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#a903371123a404c8736f5418da502b81c" class="m-doc">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
-              const <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>&amp; rvs) -&gt; std::ostream&amp;</span>
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>&amp; rvs) -&gt; std::ostream&amp;</span>
             </dt>
             <dd>Ostream method for <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>, to be used with <code>std::cout</code>.</dd>
           </dl>
@@ -185,85 +189,86 @@
               enum class vinecopulib::<wbr /><a href="#a42e95cc06d33896199caab0c11ad44f3" class="m-doc-self">BicopFamily</a>
             </h3>
             <p>A bivariate copula family identifier.</p>
+<p>The list below summarises each family&#x27;s parameter count, parameter range, available rotations, and tail-dependence behaviour. The exact parameter bounds enforced at fit time are visible via <code><a href="classvinecopulib_1_1_bicop.html#aa777c88702169cb1419bad3ad3729f17" class="m-doc">Bicop::<wbr />get_parameters_lower_bounds()</a></code> / <code><a href="classvinecopulib_1_1_bicop.html#a7602f071c93374e6d2167da4c8c344fc" class="m-doc">Bicop::<wbr />get_parameters_upper_bounds()</a></code>. The Kendall&#x27;s-tau column refers to the closed-form mapping implemented by <code><a href="classvinecopulib_1_1_bicop.html#ac3d54d13bccaab2ab249599ee133c3c5" class="m-doc">Bicop::<wbr />parameters_to_tau()</a></code> / <code><a href="classvinecopulib_1_1_bicop.html#a2664461e9ef54c1596a2db7d1592af20" class="m-doc">Bicop::<wbr />tau_to_parameters()</a></code>.</p>
             <table class="m-table m-fullwidth m-flat m-doc">
               <thead><tr><th style="width: 1%">Enumerators</th><th></th></tr></thead>
               <tbody>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3af49b022096e968010a7b9bd941805a65">indep</a></td>
                   <td>
-                  <p>Independence copula.</p>
+<p>Independence copula. 0 parameters; rotationless; no tail dependence; Kendall&#x27;s tau is 0.</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3a304e2a3b544f6b9f267a151e1bcee487" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3a304e2a3b544f6b9f267a151e1bcee487">gaussian</a></td>
                   <td>
-                  <p>Gaussian copula.</p>
+<p>Gaussian copula. 1 parameter (rho in (-1, 1)); rotationless; no tail dependence; Kendall&#x27;s tau is (2 / pi) * arcsin(rho).</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3acd73502828457d15655bbd7a63fb0bc8" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3acd73502828457d15655bbd7a63fb0bc8">student</a></td>
                   <td>
-                  <p>Student t copula.</p>
+<p>Student-t copula. 2 parameters (rho in (-1, 1), df &gt; 2); rotationless; symmetric tail dependence; Kendall&#x27;s tau is (2 / pi) * arcsin(rho).</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3ad0b8c94bb241f6f7a4b96cd6d3e26c36" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3ad0b8c94bb241f6f7a4b96cd6d3e26c36">clayton</a></td>
                   <td>
-                  <p>Clayton copula.</p>
+<p>Clayton copula. 1 parameter (theta &gt; 0); rotations 0 / 90 / 180 / 270 degrees; lower-tail dependence; Kendall&#x27;s tau is theta / (theta + 2).</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3a7bfb9d9ee5abbfa800e56bbe62db9bbe" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3a7bfb9d9ee5abbfa800e56bbe62db9bbe">gumbel</a></td>
                   <td>
-                  <p>Gumbel copula.</p>
+<p>Gumbel copula (also extreme-value). 1 parameter (theta &gt;= 1); rotations 0 / 90 / 180 / 270 degrees; upper-tail dependence; Kendall&#x27;s tau is 1 - 1 / theta.</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3a26253c50741faa9c2e2b836773c69fe6" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3a26253c50741faa9c2e2b836773c69fe6">frank</a></td>
                   <td>
-                  <p>Frank copula.</p>
+<p>Frank copula. 1 parameter (theta in R \ {0}); rotationless; no tail dependence; Kendall&#x27;s tau given by the Debye-function form.</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3a8ff32489f92f33416694be8fdc2d4c22" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3a8ff32489f92f33416694be8fdc2d4c22">joe</a></td>
                   <td>
-                  <p>Joe copula.</p>
+<p>Joe copula. 1 parameter (theta &gt;= 1); rotations 0 / 90 / 180 / 270 degrees; upper-tail dependence; Kendall&#x27;s tau via a series expansion.</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3a8a2e0a5eece6b7020e5308bcd0df4aa3" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3a8a2e0a5eece6b7020e5308bcd0df4aa3">bb1</a></td>
                   <td>
-                  <p>BB1 copula.</p>
+<p>BB1 copula (two-parameter Archimedean). 2 parameters (theta &gt; 0, delta &gt;= 1); rotations 0 / 90 / 180 / 270 degrees; both lower- and upper-tail dependence; Kendall&#x27;s tau in closed form.</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3aa2d33c13012f342a80bdc94b60538c68" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3aa2d33c13012f342a80bdc94b60538c68">bb6</a></td>
                   <td>
-                  <p>BB6 copula.</p>
+<p>BB6 copula (two-parameter Archimedean). 2 parameters (theta &gt;= 1, delta &gt;= 1); rotations 0 / 90 / 180 / 270 degrees; upper-tail dependence; Kendall&#x27;s tau in closed form.</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3ac9e791d6604a5fcc1f4e6ad574f43328" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3ac9e791d6604a5fcc1f4e6ad574f43328">bb7</a></td>
                   <td>
-                  <p>BB7 copula.</p>
+<p>BB7 copula (two-parameter Archimedean). 2 parameters (theta &gt;= 1, delta &gt; 0); rotations 0 / 90 / 180 / 270 degrees; both lower- and upper-tail dependence; Kendall&#x27;s tau in closed form.</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3adf8b15ba30764e3b9ce084c11336603a" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3adf8b15ba30764e3b9ce084c11336603a">bb8</a></td>
                   <td>
-                  <p>BB8 copula.</p>
+<p>BB8 copula (two-parameter Archimedean). 2 parameters (theta &gt;= 1, delta in (0, 1]); rotations 0 / 90 / 180 / 270 degrees; upper-tail dependence; Kendall&#x27;s tau in closed form.</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3a02b1a109294fe9171a04d3b5f9614705" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3a02b1a109294fe9171a04d3b5f9614705">tawn</a></td>
                   <td>
-                  <p>Tawn copula.</p>
+<p>Tawn copula (extreme-value, asymmetric). 3 parameters; rotations 0 / 90 / 180 / 270 degrees; (asymmetric) upper-tail dependence; Kendall&#x27;s tau via the Pickands dependence function.</p>
                   </td>
                 </tr>
                 <tr>
                   <td><a href="#a42e95cc06d33896199caab0c11ad44f3a9b0d6b8b82f0af7ca85d5a216f97f5b8" class="m-doc-self" id="a42e95cc06d33896199caab0c11ad44f3a9b0d6b8b82f0af7ca85d5a216f97f5b8">tll</a></td>
                   <td>
-                  <p>Transformation local likelihood kernel estimator.</p>
+<p>Transformation Local Likelihood (TLL) nonparametric estimator. No finite parametric form: the copula density is fit on a grid in the inverse-normal-transformed copula space. Data-driven rotation and tail behaviour; Kendall&#x27;s tau is rank-based on the fitted density.</p>
                   </td>
                 </tr>
               </tbody>
@@ -306,13 +311,13 @@
               </tbody>
             </table>
           </div></section>
-          <section class="m-doc-details" id="a84bb80714f45441e76d85c7dd049db02"><div>
+          <section class="m-doc-details" id="aff162e800d6be74d0445dfacf842997d"><div>
             <h3>
               <div class="m-doc-template">
                 template&lt;typename T&gt;
               </div>
-              <span class="m-doc-wrap-bumper">std::ostream&amp; vinecopulib::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a84bb80714f45441e76d85c7dd049db02" class="m-doc-self">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
-              const <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;T&gt;&amp; tri_array)</span></span>
+              <span class="m-doc-wrap-bumper">std::ostream&amp; vinecopulib::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aff162e800d6be74d0445dfacf842997d" class="m-doc-self">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">T</a>&gt;&amp; tri_array)</span></span>
             </h3>
             <p>Ostream method for <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">TriangularArray</a>, to be used with <code>std::cout</code>.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -334,7 +339,7 @@
           <section class="m-doc-details" id="a903371123a404c8736f5418da502b81c"><div>
             <h3>
               <span class="m-doc-wrap-bumper">std::ostream&amp; vinecopulib::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a903371123a404c8736f5418da502b81c" class="m-doc-self">operator&lt;&lt;</a>(</span><span class="m-doc-wrap">std::ostream&amp; os,
-              const <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>&amp; rvs)</span></span>
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>&amp; rvs)</span></span>
             </h3>
             <p>Ostream method for <a href="classvinecopulib_1_1_r_vine_structure.html" class="m-doc">RVineStructure</a>, to be used with <code>std::cout</code>.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -398,7 +403,7 @@
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.9.1 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.9.8 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>

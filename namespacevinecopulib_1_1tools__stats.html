@@ -87,86 +87,86 @@
           <h2><a href="#func-members">Functions</a></h2>
           <dl class="m-doc">
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a18b1782149896e177d8954e7903a737d" class="m-doc">simulate_uniform</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
-              const size_t&amp; d,
-              bool qrng,
-              std::vector&lt;int&gt; seeds) -&gt; Eigen::MatrixXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a18b1782149896e177d8954e7903a737d" class="m-doc">simulate_uniform</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; n,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; d,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">bool</a> qrng,
+              std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt; seeds) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Simulates from the multivariate uniform distribution.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a16f0d046c59f7a4b6a28988517353194" class="m-doc">simulate_normal</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
-              const size_t&amp; d,
-              bool qrng,
-              std::vector&lt;int&gt; seeds) -&gt; Eigen::MatrixXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a16f0d046c59f7a4b6a28988517353194" class="m-doc">simulate_normal</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; n,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; d,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">bool</a> qrng,
+              std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt; seeds) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Simulates from independendent normals.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#adc5439da7d935814ed882414e0750d0b" class="m-doc">to_pseudo_obs</a>(</span><span class="m-doc-wrap">Eigen::MatrixXd x,
-              const std::string&amp; ties_method,
-              const Eigen::VectorXd&amp; weights,
-              std::vector&lt;int&gt; seeds) -&gt; Eigen::MatrixXd</span>
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> std::string&amp; ties_method,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::VectorXd&amp; weights,
+              std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt; seeds) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Applies the empirical probability integral transform to a data matrix.</dd>
             <dt>
               <span class="m-doc-wrap-bumper">auto <a href="#acb96fe94c53952e8b7491c682816e4d5" class="m-doc">to_pseudo_obs_1d</a>(</span><span class="m-doc-wrap">Eigen::VectorXd x,
-              const std::string&amp; ties_method,
-              const Eigen::VectorXd&amp; weights,
-              std::vector&lt;int&gt; seeds) -&gt; Eigen::VectorXd</span>
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> std::string&amp; ties_method,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::VectorXd&amp; weights,
+              std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt; seeds) -&gt; Eigen::VectorXd</span>
             </dt>
             <dd>Applies the empirical probability integral transform to a data vector.</dd>
             <dt id="a0f2e1fc8de5b7855d986e389c2974307">
-              <span class="m-doc-wrap-bumper">auto <a href="#a0f2e1fc8de5b7855d986e389c2974307" class="m-doc-self">pairwise_mcor</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x,
-              const Eigen::VectorXd&amp; weights) -&gt; double</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a0f2e1fc8de5b7855d986e389c2974307" class="m-doc-self">pairwise_mcor</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::VectorXd&amp; weights) -&gt; <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a></span>
             </dt>
             <dd>calculates the pairwise maximum correlation coefficient.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a362c74f35349c71a0e8e92bf5895db7c" class="m-doc">ghalton</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
-              const size_t&amp; d,
-              const std::vector&lt;int&gt;&amp; seeds) -&gt; Eigen::MatrixXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a362c74f35349c71a0e8e92bf5895db7c" class="m-doc">ghalton</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; n,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; d,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt;&amp; seeds) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Simulates from the multivariate Generalized Halton Sequence.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a17a52a49b0f1e03bb2609dcfb971ee7c" class="m-doc">sobol</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
-              const size_t&amp; d,
-              const std::vector&lt;int&gt;&amp; seeds) -&gt; Eigen::MatrixXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a17a52a49b0f1e03bb2609dcfb971ee7c" class="m-doc">sobol</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; n,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; d,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt;&amp; seeds) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Simulates from the multivariate Sobol sequence.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#aee3ed415fa5264e359d20d6144919c5a" class="m-doc">pbvt</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; z,
-              int nu,
-              double rho) -&gt; Eigen::VectorXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#aee3ed415fa5264e359d20d6144919c5a" class="m-doc">pbvt</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; z,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a> nu,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a> rho) -&gt; Eigen::VectorXd</span>
             </dt>
             <dd>Computes bivariate t probabilities.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a4ce72fad3658994025804af4d16c7748" class="m-doc">pbvnorm</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; z,
-              double rho) -&gt; Eigen::VectorXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a4ce72fad3658994025804af4d16c7748" class="m-doc">pbvnorm</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; z,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a> rho) -&gt; Eigen::VectorXd</span>
             </dt>
             <dd>Compute bivariate normal probabilities.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a249880b93e82211207869f94821de440" class="m-doc">dnorm</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x) -&gt; Eigen::MatrixXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a249880b93e82211207869f94821de440" class="m-doc">dnorm</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Density function of the Standard normal distribution.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#aa380a12540c4749e14049cdd0b163352" class="m-doc">pnorm</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x) -&gt; Eigen::MatrixXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#aa380a12540c4749e14049cdd0b163352" class="m-doc">pnorm</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Distribution function of the Standard normal distribution.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a4772a68417aa49b50e69c957db8533f7" class="m-doc">qnorm</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x) -&gt; Eigen::MatrixXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a4772a68417aa49b50e69c957db8533f7" class="m-doc">qnorm</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Quantile function of the Standard normal distribution.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#abc09bc02add2d7b7781aa42a406be7d9" class="m-doc">dt</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x,
-              double nu) -&gt; Eigen::MatrixXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#abc09bc02add2d7b7781aa42a406be7d9" class="m-doc">dt</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a> nu) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Density function of the Student t distribution.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a1f65dc25a8284fe4629f092969e2861a" class="m-doc">pt</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x,
-              double nu) -&gt; Eigen::MatrixXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a1f65dc25a8284fe4629f092969e2861a" class="m-doc">pt</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a> nu) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Distribution function of the Student t distribution.</dd>
             <dt>
-              <span class="m-doc-wrap-bumper">auto <a href="#a17eb427c3a562c72d2e87438da1cd279" class="m-doc">qt</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x,
-              double nu) -&gt; Eigen::MatrixXd</span>
+              <span class="m-doc-wrap-bumper">auto <a href="#a17eb427c3a562c72d2e87438da1cd279" class="m-doc">qt</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a> nu) -&gt; Eigen::MatrixXd</span>
             </dt>
             <dd>Quantile function of the Student t distribution.</dd>
           </dl>
@@ -175,10 +175,10 @@
           <h2>Function documentation</h2>
           <section class="m-doc-details" id="a18b1782149896e177d8954e7903a737d"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a18b1782149896e177d8954e7903a737d" class="m-doc-self">simulate_uniform</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
-              const size_t&amp; d,
-              bool qrng,
-              std::vector&lt;int&gt; seeds)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a18b1782149896e177d8954e7903a737d" class="m-doc-self">simulate_uniform</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; n,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; d,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">bool</a> qrng,
+              std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt; seeds)</span></span>
             </h3>
             <p>Simulates from the multivariate uniform distribution.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -265,10 +265,10 @@ $ d \leq 300 $
           </div></section>
           <section class="m-doc-details" id="a16f0d046c59f7a4b6a28988517353194"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a16f0d046c59f7a4b6a28988517353194" class="m-doc-self">simulate_normal</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
-              const size_t&amp; d,
-              bool qrng,
-              std::vector&lt;int&gt; seeds)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a16f0d046c59f7a4b6a28988517353194" class="m-doc-self">simulate_normal</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; n,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; d,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">bool</a> qrng,
+              std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt; seeds)</span></span>
             </h3>
             <p>Simulates from independendent normals.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -338,9 +338,9 @@ $ \mathrm{N}(0, 1) $
           <section class="m-doc-details" id="adc5439da7d935814ed882414e0750d0b"><div>
             <h3>
               <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#adc5439da7d935814ed882414e0750d0b" class="m-doc-self">to_pseudo_obs</a>(</span><span class="m-doc-wrap">Eigen::MatrixXd x,
-              const std::string&amp; ties_method,
-              const Eigen::VectorXd&amp; weights,
-              std::vector&lt;int&gt; seeds)</span></span>
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> std::string&amp; ties_method,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::VectorXd&amp; weights,
+              std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt; seeds)</span></span>
             </h3>
             <p>Applies the empirical probability integral transform to a data matrix.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -409,9 +409,9 @@ $ n + 1 $
           <section class="m-doc-details" id="acb96fe94c53952e8b7491c682816e4d5"><div>
             <h3>
               <span class="m-doc-wrap-bumper">Eigen::VectorXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#acb96fe94c53952e8b7491c682816e4d5" class="m-doc-self">to_pseudo_obs_1d</a>(</span><span class="m-doc-wrap">Eigen::VectorXd x,
-              const std::string&amp; ties_method,
-              const Eigen::VectorXd&amp; weights,
-              std::vector&lt;int&gt; seeds)</span></span>
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> std::string&amp; ties_method,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::VectorXd&amp; weights,
+              std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt; seeds)</span></span>
             </h3>
             <p>Applies the empirical probability integral transform to a data vector.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -479,9 +479,9 @@ $ n + 1 $
           </div></section>
           <section class="m-doc-details" id="a362c74f35349c71a0e8e92bf5895db7c"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a362c74f35349c71a0e8e92bf5895db7c" class="m-doc-self">ghalton</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
-              const size_t&amp; d,
-              const std::vector&lt;int&gt;&amp; seeds)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a362c74f35349c71a0e8e92bf5895db7c" class="m-doc-self">ghalton</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; n,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; d,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt;&amp; seeds)</span></span>
             </h3>
             <p>Simulates from the multivariate Generalized Halton Sequence.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -547,9 +547,9 @@ $ \mathrm{U}[0, 1] $
           </div></section>
           <section class="m-doc-details" id="a17a52a49b0f1e03bb2609dcfb971ee7c"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a17a52a49b0f1e03bb2609dcfb971ee7c" class="m-doc-self">sobol</a>(</span><span class="m-doc-wrap">const size_t&amp; n,
-              const size_t&amp; d,
-              const std::vector&lt;int&gt;&amp; seeds)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a17a52a49b0f1e03bb2609dcfb971ee7c" class="m-doc-self">sobol</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; n,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">size_<wbr />t</a>&amp; d,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> std::vector&lt;<a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a>&gt;&amp; seeds)</span></span>
             </h3>
             <p>Simulates from the multivariate Sobol sequence.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -615,9 +615,9 @@ $ \mathrm{U}[0, 1] $
           </div></section>
           <section class="m-doc-details" id="aee3ed415fa5264e359d20d6144919c5a"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::VectorXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aee3ed415fa5264e359d20d6144919c5a" class="m-doc-self">pbvt</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; z,
-              int nu,
-              double rho)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::VectorXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aee3ed415fa5264e359d20d6144919c5a" class="m-doc-self">pbvt</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; z,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">int</a> nu,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a> rho)</span></span>
             </h3>
             <p>Computes bivariate t probabilities.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -677,8 +677,8 @@ $ n \times 1 $
           </div></section>
           <section class="m-doc-details" id="a4ce72fad3658994025804af4d16c7748"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::VectorXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a4ce72fad3658994025804af4d16c7748" class="m-doc-self">pbvnorm</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; z,
-              double rho)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::VectorXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a4ce72fad3658994025804af4d16c7748" class="m-doc-self">pbvnorm</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; z,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a> rho)</span></span>
             </h3>
             <p>Compute bivariate normal probabilities.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -734,7 +734,7 @@ $ n \times 1 $
           </div></section>
           <section class="m-doc-details" id="a249880b93e82211207869f94821de440"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a249880b93e82211207869f94821de440" class="m-doc-self">dnorm</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a249880b93e82211207869f94821de440" class="m-doc-self">dnorm</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x)</span></span>
             </h3>
             <p>Density function of the Standard normal distribution.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -771,7 +771,7 @@ $ n \times d $
           </div></section>
           <section class="m-doc-details" id="aa380a12540c4749e14049cdd0b163352"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aa380a12540c4749e14049cdd0b163352" class="m-doc-self">pnorm</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#aa380a12540c4749e14049cdd0b163352" class="m-doc-self">pnorm</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x)</span></span>
             </h3>
             <p>Distribution function of the Standard normal distribution.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -808,7 +808,7 @@ $ n \times d $
           </div></section>
           <section class="m-doc-details" id="a4772a68417aa49b50e69c957db8533f7"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a4772a68417aa49b50e69c957db8533f7" class="m-doc-self">qnorm</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a4772a68417aa49b50e69c957db8533f7" class="m-doc-self">qnorm</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x)</span></span>
             </h3>
             <p>Quantile function of the Standard normal distribution.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -845,8 +845,8 @@ $ n \times d $
           </div></section>
           <section class="m-doc-details" id="abc09bc02add2d7b7781aa42a406be7d9"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#abc09bc02add2d7b7781aa42a406be7d9" class="m-doc-self">dt</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x,
-              double nu)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#abc09bc02add2d7b7781aa42a406be7d9" class="m-doc-self">dt</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a> nu)</span></span>
             </h3>
             <p>Density function of the Student t distribution.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -887,8 +887,8 @@ $ n \times d $
           </div></section>
           <section class="m-doc-details" id="a1f65dc25a8284fe4629f092969e2861a"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a1f65dc25a8284fe4629f092969e2861a" class="m-doc-self">pt</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x,
-              double nu)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a1f65dc25a8284fe4629f092969e2861a" class="m-doc-self">pt</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a> nu)</span></span>
             </h3>
             <p>Distribution function of the Student t distribution.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -929,8 +929,8 @@ $ n \times d $
           </div></section>
           <section class="m-doc-details" id="a17eb427c3a562c72d2e87438da1cd279"><div>
             <h3>
-              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a17eb427c3a562c72d2e87438da1cd279" class="m-doc-self">qt</a>(</span><span class="m-doc-wrap">const Eigen::MatrixXd&amp; x,
-              double nu)</span></span>
+              <span class="m-doc-wrap-bumper">Eigen::MatrixXd vinecopulib::<wbr />tools_stats::<wbr /></span><span class="m-doc-wrap"><span class="m-doc-wrap-bumper"><a href="#a17eb427c3a562c72d2e87438da1cd279" class="m-doc-self">qt</a>(</span><span class="m-doc-wrap"><a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">const</a> Eigen::MatrixXd&amp; x,
+              <a href="classvinecopulib_1_1_triangular_array.html" class="m-doc">double</a> nu)</span></span>
             </h3>
             <p>Quantile function of the Student t distribution.</p>
             <table class="m-table m-fullwidth m-flat">
@@ -1014,7 +1014,7 @@ $ n \times d $
   <div class="m-container">
     <div class="m-row">
       <div class="m-col-l-10 m-push-l-1">
-        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.9.1 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
+        <p>vinecopulib A C++ library for vine copulas. Created with <a href="https://doxygen.org/">Doxygen</a> 1.9.8 and <a href="https://mcss.mosra.cz/">m.css</a>.</p>
       </div>
     </div>
   </div>
