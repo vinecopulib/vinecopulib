@@ -106,11 +106,7 @@ runs:
             cmake .. -DCMAKE_BUILD_TYPE=Release
             sudo make install
           elif [ "${{ inputs.os }}" == "windows-latest" ]; then
-            CMAKE_ARCH="Win32"
-            if [ "${{ inputs.platform }}" == "x64" ]; then
-              CMAKE_ARCH="x64"
-            fi
-            cmake .. -G "Visual Studio 17 2022" -A "$CMAKE_ARCH" \
+            cmake .. -G Ninja \
               -DCMAKE_BUILD_TYPE=Release
             cmake --build . --target install
           fi
