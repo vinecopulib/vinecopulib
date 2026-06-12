@@ -7,6 +7,7 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <utility>
 #include <vinecopulib/vinecop/fit_controls.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
 
@@ -159,6 +160,20 @@ public:
 
   // Stats methods
   Eigen::VectorXd pdf(Eigen::MatrixXd u, const size_t num_threads = 1) const;
+
+  struct PdfWithHfuncsResult
+  {
+    Eigen::VectorXd pdf;
+    TriangularArray<Eigen::VectorXd> pdf_edges;
+    TriangularArray<Eigen::VectorXd> hfunc1;
+    TriangularArray<Eigen::VectorXd> hfunc2;
+    TriangularArray<Eigen::VectorXd> hfunc1_sub;
+    TriangularArray<Eigen::VectorXd> hfunc2_sub;
+  };
+
+  PdfWithHfuncsResult pdf_full(Eigen::MatrixXd u,
+                               const size_t num_threads,
+                               const bool keep_all = true) const;
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
                       const size_t N = 1e4,
