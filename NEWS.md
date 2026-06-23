@@ -1,3 +1,40 @@
+## vinecopulib 0.8.0 (June 12, 2026)
+
+### NEW FEATURES
+
+* Add `Vinecop::hfuncs` to return intermediate h-function values (#669)
+
+* Add a grid size option for kernel bicop (#654)
+
+* Add score and Hessian support (#645)
+
+### BUG FIXES
+
+* Fix CDF of TLL family (#667)
+
+* Fix discrete-discrete PDFs and adjust threshold for analytical derivatives (#664)
+
+* Add early exit in model selection when the structure is already a tree (#661)
+
+* Fix Wilson correction implementation (#653)
+
+### MAINTENANCE, BUILD, AND DOCS
+
+* Improve Python-binding API docs for property getters/setters (#670)
+
+* Add per-family parameter/rotation/tail-dependence docs for `BicopFamily` (#668)
+
+* Fix Doxygen typos and mBIC documentation details (#665, #660)
+
+* Add Eigen 5.x compatibility in CMake (#658)
+
+* Update CI for deprecated macOS images and Windows path handling (#663, #655, #647)
+
+* Enforce clang-format in GitHub Actions and apply code analysis cleanups (#646, #649)
+
+* Remove an unused option (#662)
+
+
 ## vinecopulib 0.7.3 (April 23, 2025)
 
 ### BREAKING API CHANGES
