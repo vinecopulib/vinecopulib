@@ -2,6 +2,12 @@
 
 ### NEW FEATURES
 
+* Allow a user-supplied edge-weight function for vine structure selection via
+  `tree_criterion = "custom"` together with
+  `FitControlsVinecop::set_tree_criterion_function` (or
+  `FitControlsConfig::tree_criterion_function`), enabling custom dependence
+  criteria during Dissmann's algorithm (#764).
+
 * Add `Vinecop::hfuncs` to return intermediate h-function values (#669)
 
 * Add a grid size option for kernel bicop (#654)
