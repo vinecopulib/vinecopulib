@@ -39,6 +39,16 @@ private:
 
   Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
 
+  // bring the base class' parameter-aware overloads into scope (the
+  // independence copula has no parameters, so they reduce to the no-arg
+  // versions); this silences -Woverloaded-virtual.
+  using AbstractBicop::cdf;
+  using AbstractBicop::hfunc1_raw;
+  using AbstractBicop::hfunc2_raw;
+  using AbstractBicop::hinv1_raw;
+  using AbstractBicop::hinv2_raw;
+  using AbstractBicop::pdf_raw;
+
   Eigen::MatrixXd tau_to_parameters(const double&);
 
   double parameters_to_tau(const Eigen::MatrixXd&);

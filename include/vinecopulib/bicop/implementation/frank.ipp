@@ -20,39 +20,43 @@ inline FrankBicop::FrankBicop()
 }
 
 inline double
-FrankBicop::generator(const double& u)
+FrankBicop::generator(const double& u,
+                      const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(this->parameters_(0));
+  double theta = double(parameters(0));
   return -std::log(std::expm1(-theta * u) / std::expm1(-theta));
 }
 
 inline double
-FrankBicop::generator_inv(const double& u)
+FrankBicop::generator_inv(const double& u,
+                          const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(this->parameters_(0));
+  double theta = double(parameters(0));
   return -std::log1p(std::expm1(-theta) * std::exp(-u)) / theta;
 }
 
 inline double
-FrankBicop::generator_derivative(const double& u)
+FrankBicop::generator_derivative(
+  const double& u,
+  const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(this->parameters_(0));
+  double theta = double(parameters(0));
   return -theta / std::expm1(theta * u);
 }
-
-// inline double FrankBicop::generator_derivative2(const double &u)
-//{
-//    double theta = double(this->parameters_(0));
-//    return std::pow(theta, 2) /
-//           std::pow(std::expm1(theta * u) * std::exp(-theta * u / 2),
-//           2);
-//}
 
 inline Eigen::VectorXd
 FrankBicop::pdf_raw(const Eigen::MatrixXd& u)
 {
-  double theta = static_cast<double>(parameters_(0));
-  auto f = [theta](const double& u1, const double& u2) {
+  return pdf_raw(u, this->parameters_);
+}
+
+inline Eigen::VectorXd
+FrankBicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
+{
+  auto f = [](const double& u1,
+              const double& u2,
+              const Eigen::Ref<const Eigen::VectorXd>& par) {
+    double theta = double(par(0));
     return (theta * std::expm1(theta) *
             std::exp(theta * u2 + theta * u1 + theta)) /
            std::pow(std::exp(theta * u2 + theta * u1) -
@@ -60,7 +64,7 @@ FrankBicop::pdf_raw(const Eigen::MatrixXd& u)
                       std::exp(theta * u1 + theta) + std::exp(theta),
                     2.0);
   };
-  return tools_eigen::binaryExpr_or_nan(u, f);
+  return tools_eigen::binaryExpr_or_nan(u, parameters, f);
 }
 
 inline Eigen::MatrixXd

@@ -43,6 +43,55 @@ binaryExpr_or_nan(const Eigen::MatrixXd& u, const T& func)
   return u.col(0).binaryExpr(u.col(1), func_or_nan);
 }
 
+//! @brief Applies a bivariate function row-wise with per-observation
+//! parameters, propagating NaNs.
+//!
+//! @param u An \f$ n \times 2 \f$ matrix of evaluation points.
+//! @param parameters A \f$ p \times m \f$ matrix of parameters with
+//!   \f$ m \in \{1, n\} \f$. Column \f$ j \f$ holds the \f$ p \f$ parameters
+//!   for observation \f$ j \f$; a single column is broadcast to all rows.
+//! @param func A callable
+//!   `(double u1, double u2, const Eigen::Ref<const Eigen::VectorXd>& par) ->
+//!   double`.
+template<typename T>
+Eigen::VectorXd
+binaryExpr_or_nan(const Eigen::MatrixXd& u,
+                  const Eigen::MatrixXd& parameters,
+                  const T& func)
+{
+  const Eigen::Index n = u.rows();
+  const bool broadcast = (parameters.cols() == 1);
+  Eigen::VectorXd out(n);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    const double u1 = u(i, 0);
+    const double u2 = u(i, 1);
+    if ((std::isnan)(u1) || (std::isnan)(u2)) {
+      out(i) = std::numeric_limits<double>::quiet_NaN();
+    } else {
+      out(i) = func(u1, u2, parameters.col(broadcast ? 0 : i));
+    }
+  }
+  return out;
+}
+
+//! @brief Returns the `k`-th parameter as a length-`n` vector, broadcasting
+//! a single parameter set.
+//!
+//! @param parameters A \f$ p \times m \f$ matrix of parameters with
+//!   \f$ m \in \{1, n\} \f$ (see `binaryExpr_or_nan`).
+//! @param k The index of the parameter to extract.
+//! @param n The desired output length.
+inline Eigen::VectorXd
+parameter_as_vector(const Eigen::MatrixXd& parameters,
+                    const Eigen::Index k,
+                    const Eigen::Index n)
+{
+  if (parameters.cols() == 1) {
+    return Eigen::VectorXd::Constant(n, parameters(k, 0));
+  }
+  return parameters.row(k).transpose();
+}
+
 void
 remove_nans(Eigen::MatrixXd& x);
 

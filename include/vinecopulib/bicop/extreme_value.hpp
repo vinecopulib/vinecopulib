@@ -33,12 +33,39 @@ private:
 
   Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
 
-  // pickands dependence functions and its derivatives
-  virtual double pickands(const double& t) = 0;
+  // parameter-aware overloads (`parameters` is p x m, m in {1, n}); the
+  // state-based versions above delegate to these passing the stored parameters
+  Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
+                      const Eigen::MatrixXd& parameters) override;
 
-  virtual double pickands_derivative(const double& t) = 0;
+  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters) override;
 
-  virtual double pickands_derivative2(const double& t) = 0;
+  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters) override;
+
+  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters) override;
+
+  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& parameters) override;
+
+  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& parameters) override;
+
+  // pickands dependence functions and its derivatives; `parameters` is a single
+  // parameter set (a p x 1 column)
+  virtual double pickands(
+    const double& t,
+    const Eigen::Ref<const Eigen::VectorXd>& parameters) = 0;
+
+  virtual double pickands_derivative(
+    const double& t,
+    const Eigen::Ref<const Eigen::VectorXd>& parameters) = 0;
+
+  virtual double pickands_derivative2(
+    const double& t,
+    const Eigen::Ref<const Eigen::VectorXd>& parameters) = 0;
 
   // link between Kendall's tau and the par_bicop parameter
   double parameters_to_tau(const Eigen::MatrixXd& par);

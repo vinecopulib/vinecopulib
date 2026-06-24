@@ -8,6 +8,7 @@
 
 #include "parbicop_test.hpp"
 #include "rscript.hpp"
+#include <cmath>
 
 namespace test_bicop_parametric {
 using namespace vinecopulib;
@@ -201,6 +202,113 @@ TEST_P(ParBicopTest, bicop_select_itau_bic_is_correct)
         << bicop.bic(data) << " " << bicop_.bic(data);
     }
   }
+}
+
+// Test that per-row-parameter evaluation matches a row-by-row loop over
+// single-parameter Bicop objects (the unchanged, state-based path).
+TEST_P(ParBicopTest, per_row_parameters_match_loop)
+{
+  if (!needs_check_)
+    return;
+  // per-row parameters are meaningless for the parameterless independence
+  // copula
+  if (bicop_.get_parameters().size() == 0)
+    return;
+
+  auto family = bicop_.get_family();
+  auto rotation = bicop_.get_rotation();
+  auto var_types = bicop_.get_var_types();
+  Eigen::Index n = 100;
+  Eigen::MatrixXd u = bicop_.simulate(n);
+
+  // build n distinct, in-bounds parameter sets (one per row)
+  Eigen::VectorXd lb = bicop_.get_parameters_lower_bounds();
+  Eigen::VectorXd ub = bicop_.get_parameters_upper_bounds();
+  Eigen::Index p = lb.size();
+  Eigen::VectorXd a = lb + 0.2 * (ub - lb);
+  Eigen::VectorXd c = lb + 0.6 * (ub - lb);
+  Eigen::MatrixXd P(n, p);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    double w = static_cast<double>(i % 5) / 4.0;
+    P.row(i) = ((1 - w) * a + w * c).transpose();
+  }
+
+  // ground truth: loop over single-parameter Bicops (state-based path)
+  Eigen::VectorXd ref_pdf(n), ref_cdf(n), ref_h1(n), ref_h2(n), ref_i1(n),
+    ref_i2(n);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    Bicop bi(family, rotation, P.row(i).transpose().eval(), var_types);
+    Eigen::MatrixXd ui = u.row(i);
+    ref_pdf(i) = bi.pdf(ui)(0);
+    ref_cdf(i) = bi.cdf(ui)(0);
+    ref_h1(i) = bi.hfunc1(ui)(0);
+    ref_h2(i) = bi.hfunc2(ui)(0);
+    ref_i1(i) = bi.hinv1(ui)(0);
+    ref_i2(i) = bi.hinv2(ui)(0);
+  }
+
+  ASSERT_TRUE(bicop_.pdf(u, P).isApprox(ref_pdf, 1e-8)) << bicop_.str();
+  ASSERT_TRUE(bicop_.cdf(u, P).isApprox(ref_cdf, 1e-8)) << bicop_.str();
+  ASSERT_TRUE(bicop_.hfunc1(u, P).isApprox(ref_h1, 1e-8)) << bicop_.str();
+  ASSERT_TRUE(bicop_.hfunc2(u, P).isApprox(ref_h2, 1e-8)) << bicop_.str();
+  ASSERT_TRUE(bicop_.hinv1(u, P).isApprox(ref_i1, 1e-8)) << bicop_.str();
+  ASSERT_TRUE(bicop_.hinv2(u, P).isApprox(ref_i2, 1e-8)) << bicop_.str();
+
+  // loglik matches the (NaN-ignoring) sum of the looped log-densities
+  double ref_ll = 0.0;
+  for (Eigen::Index i = 0; i < n; ++i) {
+    double lp = std::log(ref_pdf(i));
+    if (!(std::isnan)(lp))
+      ref_ll += lp;
+  }
+  ASSERT_NEAR(bicop_.loglik(u, P, 1), ref_ll, 1e-8) << bicop_.str();
+
+  // threading parity (results must not depend on num_threads)
+  ASSERT_TRUE(bicop_.pdf(u, P, 3).isApprox(bicop_.pdf(u, P, 1), 1e-12))
+    << bicop_.str();
+  ASSERT_TRUE(bicop_.hinv1(u, P, 3).isApprox(bicop_.hinv1(u, P, 1), 1e-12))
+    << bicop_.str();
+
+  // a single parameter set per row (broadcast) matches the single-arg path
+  Eigen::MatrixXd Pb = bicop_.get_parameters().transpose().replicate(n, 1);
+  ASSERT_TRUE(bicop_.pdf(u, Pb).isApprox(bicop_.pdf(u), 1e-8)) << bicop_.str();
+  ASSERT_TRUE(bicop_.hfunc1(u, Pb).isApprox(bicop_.hfunc1(u), 1e-8))
+    << bicop_.str();
+
+  // validation errors
+  EXPECT_ANY_THROW(bicop_.pdf(u, P.topRows(n - 1))); // wrong number of rows
+  {
+    Eigen::MatrixXd Pbad(n, p + 1);
+    Pbad.leftCols(p) = P;
+    Pbad.col(p).setConstant(0.5);
+    EXPECT_ANY_THROW(bicop_.pdf(u, Pbad)); // wrong number of columns
+  }
+
+  // discrete parity (both variables discrete)
+  {
+    Bicop disc = bicop_;
+    disc.set_var_types({ "d", "d" });
+    Eigen::MatrixXd u4(n, 4);
+    u4.leftCols(2) = u;
+    u4.rightCols(2) = (u.array() * 0.9).matrix(); // left limits below the cdf
+    Eigen::VectorXd ref_dpdf(n);
+    for (Eigen::Index i = 0; i < n; ++i) {
+      Bicop bi(family, rotation, P.row(i).transpose().eval(), { "d", "d" });
+      ref_dpdf(i) = bi.pdf(u4.row(i))(0);
+    }
+    ASSERT_TRUE(disc.pdf(u4, P).isApprox(ref_dpdf, 1e-8)) << bicop_.str();
+  }
+}
+
+// Test that nonparametric families reject per-row parameters
+TEST(BicopPerRowParameters, tll_throws)
+{
+  Bicop tll(BicopFamily::tll);
+  Eigen::MatrixXd u(2, 2);
+  u << 0.3, 0.4, 0.5, 0.6;
+  Eigen::MatrixXd parameters(2, 1);
+  parameters << 1.0, 1.0;
+  EXPECT_ANY_THROW(tll.pdf(u, parameters));
 }
 
 INSTANTIATE_TEST_SUITE_P(

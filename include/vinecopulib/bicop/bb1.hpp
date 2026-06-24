@@ -26,16 +26,23 @@ public:
 
 private:
   // generator, its inverse and derivatives for the archimedean copula
-  double generator(const double& u);
+  double generator(
+    const double& u,
+    const Eigen::Ref<const Eigen::VectorXd>& parameters) override;
 
-  double generator_inv(const double& u);
+  double generator_inv(
+    const double& u,
+    const Eigen::Ref<const Eigen::VectorXd>& parameters) override;
 
-  double generator_derivative(const double& u);
-
-  double generator_derivative2(const double& u);
+  double generator_derivative(
+    const double& u,
+    const Eigen::Ref<const Eigen::VectorXd>& parameters) override;
 
   // pdf
   Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
+
+  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters) override;
 
   // link between Kendall's tau and the par_bicop parameter
   double parameters_to_tau(const Eigen::MatrixXd& par);

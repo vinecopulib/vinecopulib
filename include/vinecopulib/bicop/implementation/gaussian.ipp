@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 
 namespace vinecopulib {
@@ -62,6 +63,69 @@ GaussianBicop::hinv1_raw(const Eigen::MatrixXd& u)
   Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
   Eigen::MatrixXd tmp = tools_stats::qnorm(u);
   hinv = tmp.col(1) * sqrt(1.0 - pow(rho, 2.0)) + rho * tmp.col(0);
+  return tools_stats::pnorm(hinv);
+}
+
+inline Eigen::VectorXd
+GaussianBicop::pdf_raw(const Eigen::MatrixXd& u,
+                       const Eigen::MatrixXd& parameters)
+{
+  const Eigen::Index n = u.rows();
+  Eigen::ArrayXd rho =
+    tools_eigen::parameter_as_vector(parameters, 0, n).array();
+  Eigen::ArrayXd s = (1.0 - rho.square()).sqrt(); // sqrt(1 - rho^2)
+
+  Eigen::MatrixXd z = tools_stats::qnorm(u);
+  Eigen::MatrixXd zL(n, 2);
+  zL.col(0) = z.col(0);
+  zL.col(1) = (z.col(1).array() - rho * z.col(0).array()) / s;
+
+  Eigen::VectorXd f = tools_stats::dnorm(zL).rowwise().prod();
+  f = f.cwiseQuotient(tools_stats::dnorm(z).rowwise().prod());
+  f = (f.array() / s).matrix();
+  return f;
+}
+
+inline Eigen::VectorXd
+GaussianBicop::cdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
+{
+  Eigen::MatrixXd z = tools_stats::qnorm(u);
+  if (parameters.cols() == 1) {
+    return tools_stats::pbvnorm(z, double(parameters(0, 0)));
+  }
+  const Eigen::Index n = u.rows();
+  Eigen::VectorXd p(n);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    p(i) = tools_stats::pbvnorm(z.row(i), double(parameters(0, i)))(0);
+  }
+  return p;
+}
+
+inline Eigen::VectorXd
+GaussianBicop::hfunc1_raw(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters)
+{
+  const Eigen::Index n = u.rows();
+  Eigen::ArrayXd rho =
+    tools_eigen::parameter_as_vector(parameters, 0, n).array();
+  Eigen::MatrixXd z = tools_stats::qnorm(u);
+  Eigen::VectorXd h =
+    ((z.col(1).array() - rho * z.col(0).array()) / (1.0 - rho.square()).sqrt())
+      .matrix();
+  return tools_stats::pnorm(h);
+}
+
+inline Eigen::VectorXd
+GaussianBicop::hinv1_raw(const Eigen::MatrixXd& u,
+                         const Eigen::MatrixXd& parameters)
+{
+  const Eigen::Index n = u.rows();
+  Eigen::ArrayXd rho =
+    tools_eigen::parameter_as_vector(parameters, 0, n).array();
+  Eigen::MatrixXd z = tools_stats::qnorm(u);
+  Eigen::VectorXd hinv =
+    (z.col(1).array() * (1.0 - rho.square()).sqrt() + rho * z.col(0).array())
+      .matrix();
   return tools_stats::pnorm(hinv);
 }
 

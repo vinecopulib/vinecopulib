@@ -19,10 +19,8 @@ inline StudentBicop::StudentBicop()
 }
 
 inline Eigen::VectorXd
-StudentBicop::pdf_raw(const Eigen::MatrixXd& u)
+StudentBicop::pdf_impl(const Eigen::MatrixXd& u, double rho, double nu)
 {
-  double rho = double(this->parameters_(0));
-  double nu = double(this->parameters_(1));
   Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
   Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
 
@@ -39,12 +37,9 @@ StudentBicop::pdf_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-StudentBicop::cdf(const Eigen::MatrixXd& u)
+StudentBicop::cdf_impl(const Eigen::MatrixXd& u, double rho, double nu)
 {
   using namespace tools_stats;
-
-  double rho = double(this->parameters_(0));
-  double nu = double(this->parameters_(1));
 
   // for integer nu, just use pbvt
   // otherwise, interpolate linearly between floor(nu) and ceil(nu)
@@ -62,10 +57,8 @@ StudentBicop::cdf(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u)
+StudentBicop::hfunc1_impl(const Eigen::MatrixXd& u, double rho, double nu)
 {
-  double rho = double(this->parameters_(0));
-  double nu = double(this->parameters_(1));
   Eigen::VectorXd h = Eigen::VectorXd::Ones(u.rows());
   Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
   h = nu * h + tmp.col(0).cwiseAbs2();
@@ -77,10 +70,8 @@ StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-StudentBicop::hinv1_raw(const Eigen::MatrixXd& u)
+StudentBicop::hinv1_impl(const Eigen::MatrixXd& u, double rho, double nu)
 {
-  double rho = double(this->parameters_(0));
-  double nu = double(this->parameters_(1));
   Eigen::VectorXd hinv = Eigen::VectorXd::Ones(u.rows());
   Eigen::VectorXd tmp = u.col(1);
   Eigen::VectorXd tmp2 = u.col(0);
@@ -93,6 +84,93 @@ StudentBicop::hinv1_raw(const Eigen::MatrixXd& u)
   hinv = tools_stats::pt(hinv, nu);
 
   return hinv;
+}
+
+inline Eigen::VectorXd
+StudentBicop::pdf_raw(const Eigen::MatrixXd& u)
+{
+  return pdf_impl(
+    u, double(this->parameters_(0)), double(this->parameters_(1)));
+}
+
+inline Eigen::VectorXd
+StudentBicop::cdf(const Eigen::MatrixXd& u)
+{
+  return cdf_impl(
+    u, double(this->parameters_(0)), double(this->parameters_(1)));
+}
+
+inline Eigen::VectorXd
+StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u)
+{
+  return hfunc1_impl(
+    u, double(this->parameters_(0)), double(this->parameters_(1)));
+}
+
+inline Eigen::VectorXd
+StudentBicop::hinv1_raw(const Eigen::MatrixXd& u)
+{
+  return hinv1_impl(
+    u, double(this->parameters_(0)), double(this->parameters_(1)));
+}
+
+inline Eigen::VectorXd
+StudentBicop::pdf_raw(const Eigen::MatrixXd& u,
+                      const Eigen::MatrixXd& parameters)
+{
+  if (parameters.cols() == 1) {
+    return pdf_impl(u, double(parameters(0, 0)), double(parameters(1, 0)));
+  }
+  Eigen::VectorXd out(u.rows());
+  for (Eigen::Index i = 0; i < u.rows(); ++i) {
+    out(i) =
+      pdf_impl(u.row(i), double(parameters(0, i)), double(parameters(1, i)))(0);
+  }
+  return out;
+}
+
+inline Eigen::VectorXd
+StudentBicop::cdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
+{
+  if (parameters.cols() == 1) {
+    return cdf_impl(u, double(parameters(0, 0)), double(parameters(1, 0)));
+  }
+  Eigen::VectorXd out(u.rows());
+  for (Eigen::Index i = 0; i < u.rows(); ++i) {
+    out(i) =
+      cdf_impl(u.row(i), double(parameters(0, i)), double(parameters(1, i)))(0);
+  }
+  return out;
+}
+
+inline Eigen::VectorXd
+StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u,
+                         const Eigen::MatrixXd& parameters)
+{
+  if (parameters.cols() == 1) {
+    return hfunc1_impl(u, double(parameters(0, 0)), double(parameters(1, 0)));
+  }
+  Eigen::VectorXd out(u.rows());
+  for (Eigen::Index i = 0; i < u.rows(); ++i) {
+    out(i) = hfunc1_impl(
+      u.row(i), double(parameters(0, i)), double(parameters(1, i)))(0);
+  }
+  return out;
+}
+
+inline Eigen::VectorXd
+StudentBicop::hinv1_raw(const Eigen::MatrixXd& u,
+                        const Eigen::MatrixXd& parameters)
+{
+  if (parameters.cols() == 1) {
+    return hinv1_impl(u, double(parameters(0, 0)), double(parameters(1, 0)));
+  }
+  Eigen::VectorXd out(u.rows());
+  for (Eigen::Index i = 0; i < u.rows(); ++i) {
+    out(i) = hinv1_impl(
+      u.row(i), double(parameters(0, i)), double(parameters(1, i)))(0);
+  }
+  return out;
 }
 
 inline Eigen::VectorXd

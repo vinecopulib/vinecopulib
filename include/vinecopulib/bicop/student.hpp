@@ -36,6 +36,35 @@ private:
   // inverse hfunction
   Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
 
+  // parameter-aware overloads (`parameters` is 2 x m, m in {1, n}); these loop
+  // per row because the t-distribution helpers take scalar parameters
+  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters) override;
+
+  Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
+                      const Eigen::MatrixXd& parameters) override;
+
+  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters) override;
+
+  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& parameters) override;
+
+  // single source of truth for the math (shared by the state-based and
+  // parameter-aware leaves)
+  static Eigen::VectorXd pdf_impl(const Eigen::MatrixXd& u,
+                                  double rho,
+                                  double nu);
+  static Eigen::VectorXd cdf_impl(const Eigen::MatrixXd& u,
+                                  double rho,
+                                  double nu);
+  static Eigen::VectorXd hfunc1_impl(const Eigen::MatrixXd& u,
+                                     double rho,
+                                     double nu);
+  static Eigen::VectorXd hinv1_impl(const Eigen::MatrixXd& u,
+                                    double rho,
+                                    double nu);
+
   Eigen::MatrixXd tau_to_parameters(const double& tau);
 
   Eigen::VectorXd get_start_parameters(const double tau);

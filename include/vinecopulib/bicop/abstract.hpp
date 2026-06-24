@@ -87,6 +87,46 @@ protected:
 
   virtual Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u) = 0;
 
+  // Parameter-aware overloads. `parameters` has shape p x m with m in {1, n}:
+  // column j holds the p parameters for observation j; a single column is
+  // broadcast to all rows. These let a copula be evaluated at a different
+  // parameter set per row of `u` without mutating object state. The leaves
+  // (pdf_raw, cdf, hfunc*_raw, hinv*_raw) default to ignoring `parameters` and
+  // using object state, so nonparametric families need no overrides;
+  // parametric families override them with the actual (stateless) math.
+  Eigen::VectorXd pdf(const Eigen::MatrixXd& u,
+                      const Eigen::MatrixXd& parameters);
+
+  Eigen::VectorXd hfunc1(const Eigen::MatrixXd& u,
+                         const Eigen::MatrixXd& parameters);
+
+  Eigen::VectorXd hfunc2(const Eigen::MatrixXd& u,
+                         const Eigen::MatrixXd& parameters);
+
+  Eigen::VectorXd hinv1(const Eigen::MatrixXd& u,
+                        const Eigen::MatrixXd& parameters);
+
+  Eigen::VectorXd hinv2(const Eigen::MatrixXd& u,
+                        const Eigen::MatrixXd& parameters);
+
+  virtual Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
+                              const Eigen::MatrixXd& parameters);
+
+  virtual Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
+                                  const Eigen::MatrixXd& parameters);
+
+  virtual Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
+                                     const Eigen::MatrixXd& parameters);
+
+  virtual Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
+                                     const Eigen::MatrixXd& parameters);
+
+  virtual Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
+                                    const Eigen::MatrixXd& parameters);
+
+  virtual Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
+                                    const Eigen::MatrixXd& parameters);
+
   virtual Eigen::MatrixXd tau_to_parameters(const double& tau) = 0;
   Eigen::MatrixXd no_tau_to_parameters(const double&);
 
@@ -98,6 +138,18 @@ protected:
   Eigen::VectorXd pdf_c_d(const Eigen::MatrixXd& u);
 
   Eigen::VectorXd pdf_d_d(const Eigen::MatrixXd& u);
+
+  Eigen::VectorXd hinv1_num(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& parameters);
+
+  Eigen::VectorXd hinv2_num(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& parameters);
+
+  Eigen::VectorXd pdf_c_d(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters);
+
+  Eigen::VectorXd pdf_d_d(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters);
 
   double loglik(const Eigen::MatrixXd& u,
                 const Eigen::VectorXd weights = Eigen::VectorXd());
