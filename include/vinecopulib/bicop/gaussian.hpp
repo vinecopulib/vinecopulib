@@ -38,16 +38,16 @@ private:
 
   // parameter-aware overloads (`parameters` is 1 x m, m in {1, n})
   Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
-                          const Eigen::MatrixXd& parameters) override;
+                          const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters) override;
+                      const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters) override;
+                             const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters) override;
+                            const Eigen::MatrixXd& parameters);
 
   Eigen::MatrixXd tau_to_parameters(const double& tau);
 

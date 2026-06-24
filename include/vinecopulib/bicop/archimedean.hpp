@@ -36,19 +36,19 @@ private:
   // parameter-aware overloads (`parameters` is p x m, m in {1, n}); the
   // state-based versions above delegate to these passing the stored parameters
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters) override;
+                      const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters) override;
+                             const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters) override;
+                             const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters) override;
+                            const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters) override;
+                            const Eigen::MatrixXd& parameters);
 
   // generator, its inverse and derivative; `parameters` is a single parameter
   // set (a p x 1 column)

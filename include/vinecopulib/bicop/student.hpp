@@ -39,16 +39,16 @@ private:
   // parameter-aware overloads (`parameters` is 2 x m, m in {1, n}); these loop
   // per row because the t-distribution helpers take scalar parameters
   Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
-                          const Eigen::MatrixXd& parameters) override;
+                          const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters) override;
+                      const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters) override;
+                             const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters) override;
+                            const Eigen::MatrixXd& parameters);
 
   // single source of truth for the math (shared by the state-based and
   // parameter-aware leaves)

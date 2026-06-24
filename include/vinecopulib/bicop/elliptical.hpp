@@ -29,10 +29,10 @@ private:
 
   // parameter-aware overloads (thread `parameters` through the column swap)
   Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters) override;
+                             const Eigen::MatrixXd& parameters);
 
   Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters) override;
+                            const Eigen::MatrixXd& parameters);
 
   // link between Kendall's tau and the par_bicop parameter
   double parameters_to_tau(const Eigen::MatrixXd& parameters);
