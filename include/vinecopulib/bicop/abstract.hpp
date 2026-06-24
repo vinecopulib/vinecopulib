@@ -135,10 +135,6 @@ protected:
 
   Eigen::VectorXd hinv2_num(const Eigen::MatrixXd& u);
 
-  Eigen::VectorXd pdf_c_d(const Eigen::MatrixXd& u);
-
-  Eigen::VectorXd pdf_d_d(const Eigen::MatrixXd& u);
-
   Eigen::VectorXd hinv1_num(const Eigen::MatrixXd& u,
                             const Eigen::MatrixXd& parameters);
 
