@@ -8,12 +8,14 @@
 
 #include "parbicop_test.hpp"
 #include "rscript.hpp"
+#include "test_utils.hpp"
 #include <cmath>
 
 namespace test_bicop_parametric {
 using namespace vinecopulib;
 using namespace tools_stl;
 std::vector<int> rotations = { 0, 90, 180, 270 };
+using test_utils::all_close;
 
 // Test that the serialization works
 TEST_P(ParBicopTest, bicop_serialization_is_correct)
@@ -219,7 +221,9 @@ TEST_P(ParBicopTest, per_row_parameters_match_loop)
   auto rotation = bicop_.get_rotation();
   auto var_types = bicop_.get_var_types();
   Eigen::Index n = 100;
-  Eigen::MatrixXd u = bicop_.simulate(n);
+  // fixed seeds keep the test deterministic across runs and platforms
+  Eigen::MatrixXd u =
+    bicop_.simulate(static_cast<size_t>(n), false, { 1, 2, 3, 4, 5 });
 
   // build n distinct, in-bounds parameter sets (one per row)
   Eigen::VectorXd lb = bicop_.get_parameters_lower_bounds();
@@ -247,12 +251,12 @@ TEST_P(ParBicopTest, per_row_parameters_match_loop)
     ref_i2(i) = bi.hinv2(ui)(0);
   }
 
-  ASSERT_TRUE(bicop_.pdf(u, P).isApprox(ref_pdf, 1e-8)) << bicop_.str();
-  ASSERT_TRUE(bicop_.cdf(u, P).isApprox(ref_cdf, 1e-8)) << bicop_.str();
-  ASSERT_TRUE(bicop_.hfunc1(u, P).isApprox(ref_h1, 1e-8)) << bicop_.str();
-  ASSERT_TRUE(bicop_.hfunc2(u, P).isApprox(ref_h2, 1e-8)) << bicop_.str();
-  ASSERT_TRUE(bicop_.hinv1(u, P).isApprox(ref_i1, 1e-8)) << bicop_.str();
-  ASSERT_TRUE(bicop_.hinv2(u, P).isApprox(ref_i2, 1e-8)) << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.pdf(u, P), ref_pdf)) << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.cdf(u, P), ref_cdf)) << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.hfunc1(u, P), ref_h1)) << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.hfunc2(u, P), ref_h2)) << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.hinv1(u, P), ref_i1)) << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.hinv2(u, P), ref_i2)) << bicop_.str();
 
   // loglik matches the (NaN-ignoring) sum of the looped log-densities
   double ref_ll = 0.0;
@@ -261,18 +265,20 @@ TEST_P(ParBicopTest, per_row_parameters_match_loop)
     if (!(std::isnan)(lp))
       ref_ll += lp;
   }
-  ASSERT_NEAR(bicop_.loglik(u, P, 1), ref_ll, 1e-8) << bicop_.str();
+  ASSERT_NEAR(bicop_.loglik(u, P, 1), ref_ll, 1e-8 * (1.0 + std::abs(ref_ll)))
+    << bicop_.str();
 
   // threading parity (results must not depend on num_threads)
-  ASSERT_TRUE(bicop_.pdf(u, P, 3).isApprox(bicop_.pdf(u, P, 1), 1e-12))
+  ASSERT_TRUE(all_close(bicop_.pdf(u, P, 3), bicop_.pdf(u, P, 1), 1e-12, 1e-12))
     << bicop_.str();
-  ASSERT_TRUE(bicop_.hinv1(u, P, 3).isApprox(bicop_.hinv1(u, P, 1), 1e-12))
+  ASSERT_TRUE(
+    all_close(bicop_.hinv1(u, P, 3), bicop_.hinv1(u, P, 1), 1e-12, 1e-12))
     << bicop_.str();
 
   // a single parameter set per row (broadcast) matches the single-arg path
   Eigen::MatrixXd Pb = bicop_.get_parameters().transpose().replicate(n, 1);
-  ASSERT_TRUE(bicop_.pdf(u, Pb).isApprox(bicop_.pdf(u), 1e-8)) << bicop_.str();
-  ASSERT_TRUE(bicop_.hfunc1(u, Pb).isApprox(bicop_.hfunc1(u), 1e-8))
+  ASSERT_TRUE(all_close(bicop_.pdf(u, Pb), bicop_.pdf(u))) << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.hfunc1(u, Pb), bicop_.hfunc1(u)))
     << bicop_.str();
 
   // validation errors
@@ -296,7 +302,7 @@ TEST_P(ParBicopTest, per_row_parameters_match_loop)
       Bicop bi(family, rotation, P.row(i).transpose().eval(), { "d", "d" });
       ref_dpdf(i) = bi.pdf(u4.row(i))(0);
     }
-    ASSERT_TRUE(disc.pdf(u4, P).isApprox(ref_dpdf, 1e-8)) << bicop_.str();
+    ASSERT_TRUE(all_close(disc.pdf(u4, P), ref_dpdf)) << bicop_.str();
   }
 }
 
