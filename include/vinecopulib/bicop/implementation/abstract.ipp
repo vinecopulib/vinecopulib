@@ -215,7 +215,7 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u)
 inline Eigen::VectorXd
 AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
 {
-  if (var_types_[0] == "d") {
+  if (var_types_[0] == "d" && u.cols() == 4) {
     auto uu = u;
     uu.col(3) = uu.col(1);
     auto u1diff = (uu.col(0) - uu.col(2)).cwiseAbs();
@@ -241,7 +241,7 @@ AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
 inline Eigen::VectorXd
 AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
 {
-  if (var_types_[1] == "d") {
+  if (var_types_[1] == "d" && u.cols() == 4) {
     auto uu = u;
     uu.col(2) = uu.col(0);
     auto u2diff = (uu.col(1) - uu.col(3)).cwiseAbs();
@@ -468,7 +468,7 @@ inline Eigen::VectorXd
 AbstractBicop::hfunc1(const Eigen::MatrixXd& u,
                       const Eigen::MatrixXd& parameters)
 {
-  if (var_types_[0] == "d") {
+  if (var_types_[0] == "d" && u.cols() == 4) {
     auto uu = u;
     uu.col(3) = uu.col(1);
     auto u1diff = (uu.col(0) - uu.col(2)).cwiseAbs();
@@ -496,7 +496,7 @@ inline Eigen::VectorXd
 AbstractBicop::hfunc2(const Eigen::MatrixXd& u,
                       const Eigen::MatrixXd& parameters)
 {
-  if (var_types_[1] == "d") {
+  if (var_types_[1] == "d" && u.cols() == 4) {
     auto uu = u;
     uu.col(2) = uu.col(0);
     auto u2diff = (uu.col(1) - uu.col(3)).cwiseAbs();
