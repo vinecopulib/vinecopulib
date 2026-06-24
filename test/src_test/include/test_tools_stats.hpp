@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "test_utils.hpp"
 #include "test_vinecop_sanity_checks.hpp"
 #include "gtest/gtest.h"
 #include <vinecopulib.hpp>
@@ -13,6 +14,7 @@
 namespace test_tools_stats {
 
 using namespace vinecopulib;
+using test_utils::all_close;
 
 TEST(test_tools_stats, to_pseudo_obs_is_correct)
 {
@@ -81,9 +83,9 @@ TEST(test_tools_stats, qrng_are_correct)
   }
 
   x = cop.cdf(u);
-  if (p2.isApprox(x, 1e-2)) {
-    ASSERT_TRUE(p.isApprox(x, 1e-2));
-    ASSERT_TRUE(p1.isApprox(x, 1e-2));
+  if (all_close(p2, x, 1e-2, 1e-2)) {
+    ASSERT_TRUE(all_close(p, x, 1e-2, 1e-2));
+    ASSERT_TRUE(all_close(p1, x, 1e-2, 1e-2));
   }
 }
 
@@ -145,17 +147,17 @@ TEST(test_tools_stats, dpqnorm_work)
   // tools_stats::dnorm is the same as dnorm_boost
   auto d1 = tools_stats::dnorm(X);
   auto d2 = dnorm_boost(X);
-  ASSERT_TRUE(d1.isApprox(d2, 1e-6));
+  ASSERT_TRUE(all_close(d1, d2, 1e-6, 1e-6));
 
   // tools_stats::pnorm is the same as pnorm_boost
   auto p1 = tools_stats::pnorm(X);
   auto p2 = pnorm_boost(X);
-  ASSERT_TRUE(p1.isApprox(p2, 1e-6));
+  ASSERT_TRUE(all_close(p1, p2, 1e-6, 1e-6));
 
   // tools_stats::qnorm is the same as qnorm_boost
   auto q1 = tools_stats::qnorm(p1);
   auto q2 = qnorm_boost(p1);
-  ASSERT_TRUE(q1.isApprox(q2, 1e-6));
+  ASSERT_TRUE(all_close(q1, q2, 1e-6, 1e-6));
 }
 
 TEST(test_tools_stats, dpqnorm_are_nan_safe)

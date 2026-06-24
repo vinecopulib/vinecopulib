@@ -8,9 +8,11 @@
 
 #include "kernel_test.hpp"
 #include "rscript.hpp"
+#include "test_utils.hpp"
 
 namespace test_bicop_kernel {
 using namespace vinecopulib;
+using test_utils::all_close;
 
 TEST_P(TrafokernelTest, sanity_checks)
 {
@@ -58,7 +60,8 @@ TEST_P(TrafokernelTest, serialization)
   EXPECT_EQ(bicop_.get_family_name(), pc.get_family_name());
   EXPECT_EQ(bicop_.get_var_types(), pc.get_var_types());
   EXPECT_EQ(bicop_.get_npars(), pc.get_npars());
-  ASSERT_TRUE(bicop_.get_parameters().isApprox(pc.get_parameters(), 1e-4));
+  ASSERT_TRUE(
+    all_close(bicop_.get_parameters(), pc.get_parameters(), 1e-4, 1e-4));
 }
 
 TEST_P(TrafokernelTest, eval_funcs)
@@ -110,7 +113,7 @@ TEST_P(TrafokernelTest, flip)
   u.col(0).swap(u.col(1));
   bicop_.flip();
   auto pdf_flipped = bicop_.pdf(u);
-  EXPECT_TRUE(pdf.isApprox(pdf_flipped, 1e-10));
+  EXPECT_TRUE(all_close(pdf, pdf_flipped, 1e-10, 1e-10));
 }
 
 TEST_P(TrafokernelTest, tau)

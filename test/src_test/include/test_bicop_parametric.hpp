@@ -35,7 +35,8 @@ TEST_P(ParBicopTest, bicop_serialization_is_correct)
   EXPECT_EQ(bicop_.get_family_name(), pc.get_family_name());
   EXPECT_EQ(bicop_.get_var_types(), pc.get_var_types());
   EXPECT_EQ(bicop_.get_npars(), pc.get_npars());
-  ASSERT_TRUE(bicop_.get_parameters().isApprox(pc.get_parameters(), 1e-4));
+  ASSERT_TRUE(
+    all_close(bicop_.get_parameters(), pc.get_parameters(), 1e-4, 1e-4));
 }
 
 // Test if the C++ implementation of the basic methods is correct
@@ -72,32 +73,38 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     // evaluate pdf in C++
     Eigen::VectorXd f = bicop_.pdf(u);
     // assert approximate equality
-    ASSERT_TRUE(f.isApprox(results.block(0, 3, n, 1), 1e-4)) << bicop_.str();
+    ASSERT_TRUE(all_close(f, results.block(0, 3, n, 1), 1e-4, 1e-4))
+      << bicop_.str();
 
     // evaluate cdf in C++
     f = bicop_.cdf(u);
     // assert approximate equality
-    ASSERT_TRUE(f.isApprox(results.block(0, 4, n, 1), 1e-4)) << bicop_.str();
+    ASSERT_TRUE(all_close(f, results.block(0, 4, n, 1), 1e-4, 1e-4))
+      << bicop_.str();
 
     // evaluate hfunc1 in C++
     f = bicop_.hfunc1(u);
     // assert approximate equality
-    ASSERT_TRUE(f.isApprox(results.block(0, 5, n, 1), 1e-4)) << bicop_.str();
+    ASSERT_TRUE(all_close(f, results.block(0, 5, n, 1), 1e-4, 1e-4))
+      << bicop_.str();
 
     // evaluate hfunc2 in C++
     f = bicop_.hfunc2(u);
     // assert approximate equality
-    ASSERT_TRUE(f.isApprox(results.block(0, 6, n, 1), 1e-4)) << bicop_.str();
+    ASSERT_TRUE(all_close(f, results.block(0, 6, n, 1), 1e-4, 1e-4))
+      << bicop_.str();
 
     // evaluate hinv1 in C++
     f = bicop_.hinv1(u);
     // assert approximate equality
-    ASSERT_TRUE(f.isApprox(results.block(0, 7, n, 1), 1e-4)) << bicop_.str();
+    ASSERT_TRUE(all_close(f, results.block(0, 7, n, 1), 1e-4, 1e-4))
+      << bicop_.str();
 
     // evaluate hinv2 in C++
     f = bicop_.hinv2(u);
     // assert approximate equality
-    ASSERT_TRUE(f.isApprox(results.block(0, 8, n, 1), 1e-4)) << bicop_.str();
+    ASSERT_TRUE(all_close(f, results.block(0, 8, n, 1), 1e-4, 1e-4))
+      << bicop_.str();
 
     u(0, 0) = std::numeric_limits<double>::quiet_NaN();
     u(1, 1) = std::numeric_limits<double>::quiet_NaN();
@@ -290,19 +297,36 @@ TEST_P(ParBicopTest, per_row_parameters_match_loop)
     EXPECT_ANY_THROW(bicop_.pdf(u, Pbad)); // wrong number of columns
   }
 
-  // discrete parity (both variables discrete)
+  // discrete parity: per-row parameters through the discrete density,
+  // h-function and h-inverse code paths (pdf_c_d / pdf_d_d, the discrete
+  // h-functions, and the numeric h-inverses) for all combinations of
+  // discrete/continuous variables.
   {
-    Bicop disc = bicop_;
-    disc.set_var_types({ "d", "d" });
     Eigen::MatrixXd u4(n, 4);
     u4.leftCols(2) = u;
     u4.rightCols(2) = (u.array() * 0.9).matrix(); // left limits below the cdf
-    Eigen::VectorXd ref_dpdf(n);
-    for (Eigen::Index i = 0; i < n; ++i) {
-      Bicop bi(family, rotation, P.row(i).transpose().eval(), { "d", "d" });
-      ref_dpdf(i) = bi.pdf(u4.row(i))(0);
+    const std::vector<std::vector<std::string>> var_type_sets = {
+      { "d", "d" }, { "c", "d" }, { "d", "c" }
+    };
+    for (const auto& vt : var_type_sets) {
+      Bicop disc = bicop_;
+      disc.set_var_types(vt);
+      Eigen::VectorXd r_pdf(n), r_h1(n), r_h2(n), r_i1(n), r_i2(n);
+      for (Eigen::Index i = 0; i < n; ++i) {
+        Bicop bi(family, rotation, P.row(i).transpose().eval(), vt);
+        Eigen::MatrixXd u4i = u4.row(i);
+        r_pdf(i) = bi.pdf(u4i)(0);
+        r_h1(i) = bi.hfunc1(u4i)(0);
+        r_h2(i) = bi.hfunc2(u4i)(0);
+        r_i1(i) = bi.hinv1(u4i)(0);
+        r_i2(i) = bi.hinv2(u4i)(0);
+      }
+      ASSERT_TRUE(all_close(disc.pdf(u4, P), r_pdf)) << disc.str();
+      ASSERT_TRUE(all_close(disc.hfunc1(u4, P), r_h1)) << disc.str();
+      ASSERT_TRUE(all_close(disc.hfunc2(u4, P), r_h2)) << disc.str();
+      ASSERT_TRUE(all_close(disc.hinv1(u4, P), r_i1)) << disc.str();
+      ASSERT_TRUE(all_close(disc.hinv2(u4, P), r_i2)) << disc.str();
     }
-    ASSERT_TRUE(all_close(disc.pdf(u4, P), ref_dpdf)) << bicop_.str();
   }
 }
 
@@ -315,6 +339,22 @@ TEST(BicopPerRowParameters, tll_throws)
   Eigen::MatrixXd parameters(2, 1);
   parameters << 1.0, 1.0;
   EXPECT_ANY_THROW(tll.pdf(u, parameters));
+}
+
+// The independence copula has no parameters (p = 0); the per-row overloads
+// accept an n x 0 matrix and fall back to the parameter-free leaves.
+TEST(BicopPerRowParameters, independence_zero_parameters)
+{
+  Bicop ind(BicopFamily::indep);
+  const Eigen::Index n = 20;
+  Eigen::MatrixXd u = ind.simulate(static_cast<size_t>(n), false, { 1, 2, 3 });
+  Eigen::MatrixXd P(n, 0); // no parameters
+  EXPECT_TRUE(all_close(ind.pdf(u, P), ind.pdf(u)));
+  EXPECT_TRUE(all_close(ind.cdf(u, P), ind.cdf(u)));
+  EXPECT_TRUE(all_close(ind.hfunc1(u, P), ind.hfunc1(u)));
+  EXPECT_TRUE(all_close(ind.hfunc2(u, P), ind.hfunc2(u)));
+  EXPECT_TRUE(all_close(ind.hinv1(u, P), ind.hinv1(u)));
+  EXPECT_TRUE(all_close(ind.hinv2(u, P), ind.hinv2(u)));
 }
 
 INSTANTIATE_TEST_SUITE_P(
