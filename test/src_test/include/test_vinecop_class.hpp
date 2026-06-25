@@ -681,6 +681,39 @@ TEST_F(VinecopTest, select_finds_right_structure_kruskal)
   EXPECT_EQ(pairs_unequal, 0);
 }
 
+TEST_F(VinecopTest, tree_criterion_custom_works)
+{
+  auto tau_fn = [](const Eigen::MatrixXd& data,
+                   const Eigen::VectorXd& weights) {
+    return wdm::wdm(data, "tau", weights)(0, 1);
+  };
+
+  // setter path: a custom criterion equal to Kendall's tau must recover the
+  // same structure as the built-in "tau" (independence families so the
+  // structure is determined solely by the criterion).
+  Vinecop fit(7);
+  FitControlsVinecop controls({ BicopFamily::indep });
+  controls.set_tree_criterion("custom");
+  controls.set_tree_criterion_function(tau_fn);
+  fit.select(u, controls);
+  EXPECT_EQ(get_pairs_unequal(vc_matrix, fit.get_matrix(), 6), 0);
+
+  // FitControlsConfig construction path covers the new optional field.
+  FitControlsConfig cfg;
+  cfg.family_set = std::vector<BicopFamily>{ BicopFamily::indep };
+  cfg.tree_criterion = "custom";
+  cfg.tree_criterion_function = tau_fn;
+  Vinecop fit_cfg(7);
+  fit_cfg.select(u, FitControlsVinecop(cfg));
+  EXPECT_EQ(get_pairs_unequal(vc_matrix, fit_cfg.get_matrix(), 6), 0);
+
+  // "custom" without a callable must throw during selection.
+  FitControlsVinecop bad({ BicopFamily::indep });
+  bad.set_tree_criterion("custom");
+  Vinecop fit_bad(7);
+  EXPECT_ANY_THROW(fit_bad.select(u, bad));
+}
+
 TEST_F(VinecopTest, select_finds_different_structures_random)
 {
   // Initialize the controls
