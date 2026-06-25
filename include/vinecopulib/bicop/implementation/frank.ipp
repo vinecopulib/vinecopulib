@@ -23,7 +23,7 @@ inline double
 FrankBicop::generator(const double& u,
                       const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(parameters(0));
+  double theta = parameters(0);
   return -std::log(std::expm1(-theta * u) / std::expm1(-theta));
 }
 
@@ -31,7 +31,7 @@ inline double
 FrankBicop::generator_inv(const double& u,
                           const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(parameters(0));
+  double theta = parameters(0);
   return -std::log1p(std::expm1(-theta) * std::exp(-u)) / theta;
 }
 
@@ -40,14 +40,8 @@ FrankBicop::generator_derivative(
   const double& u,
   const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(parameters(0));
+  double theta = parameters(0);
   return -theta / std::expm1(theta * u);
-}
-
-inline Eigen::VectorXd
-FrankBicop::pdf_raw(const Eigen::MatrixXd& u)
-{
-  return pdf_raw(u, this->parameters_);
 }
 
 inline Eigen::VectorXd
@@ -56,7 +50,7 @@ FrankBicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
   auto f = [](const double& u1,
               const double& u2,
               const Eigen::Ref<const Eigen::VectorXd>& par) {
-    double theta = double(par(0));
+    double theta = par(0);
     return (theta * std::expm1(theta) *
             std::exp(theta * u2 + theta * u1 + theta)) /
            std::pow(std::exp(theta * u2 + theta * u1) -

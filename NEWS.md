@@ -20,6 +20,11 @@
 
 ### BUG FIXES
 
+* Fix an out-of-bounds memory access in the bivariate h-inverse for mixed
+  discrete/continuous copulas whose inverse is computed numerically (e.g. Frank,
+  the BB families, Tawn): a continuous h-inverse re-entered the discrete
+  difference-quotient branch on a stripped two-column matrix (#675)
+
 * Fix CDF of TLL family (#667)
 
 * Fix discrete-discrete PDFs and adjust threshold for analytical derivatives (#664)
@@ -29,6 +34,10 @@
 * Fix Wilson correction implementation (#653)
 
 ### MAINTENANCE, BUILD, AND DOCS
+
+* Collapse the internal bivariate-copula evaluation leaves to a single
+  parameter-aware interface (removing the duplicated state-based primitives),
+  so each family implements its math once (#675)
 
 * Improve Python-binding API docs for property getters/setters (#670)
 

@@ -37,16 +37,10 @@ Bb1Bicop::generator_derivative(
   const double& u,
   const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(parameters(0));
-  double delta = double(parameters(1));
+  double theta = parameters(0);
+  double delta = parameters(1);
   double res = -delta * theta * std::pow(u, -(1 + theta));
   return res * std::pow(std::pow(u, -theta) - 1, delta - 1);
-}
-
-inline Eigen::VectorXd
-Bb1Bicop::pdf_raw(const Eigen::MatrixXd& u)
-{
-  return pdf_raw(u, this->parameters_);
 }
 
 inline Eigen::VectorXd
@@ -55,8 +49,8 @@ Bb1Bicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
   auto f = [](const double& u1,
               const double& u2,
               const Eigen::Ref<const Eigen::VectorXd>& par) {
-    double theta = double(par(0));
-    double delta = double(par(1));
+    double theta = par(0);
+    double delta = par(1);
     double t1 = std::pow(u1, -theta);
     double t2 = t1 - 1.0;
     double t3 = std::pow(t2, delta);

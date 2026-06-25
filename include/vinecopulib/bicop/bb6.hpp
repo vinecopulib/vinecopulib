@@ -36,8 +36,6 @@ private:
     const Eigen::Ref<const Eigen::VectorXd>& parameters);
 
   // pdf
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
-
   Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
                           const Eigen::MatrixXd& parameters);
 

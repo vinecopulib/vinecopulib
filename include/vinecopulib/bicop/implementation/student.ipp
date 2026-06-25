@@ -87,44 +87,15 @@ StudentBicop::hinv1_impl(const Eigen::MatrixXd& u, double rho, double nu)
 }
 
 inline Eigen::VectorXd
-StudentBicop::pdf_raw(const Eigen::MatrixXd& u)
-{
-  return pdf_impl(
-    u, double(this->parameters_(0)), double(this->parameters_(1)));
-}
-
-inline Eigen::VectorXd
-StudentBicop::cdf(const Eigen::MatrixXd& u)
-{
-  return cdf_impl(
-    u, double(this->parameters_(0)), double(this->parameters_(1)));
-}
-
-inline Eigen::VectorXd
-StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u)
-{
-  return hfunc1_impl(
-    u, double(this->parameters_(0)), double(this->parameters_(1)));
-}
-
-inline Eigen::VectorXd
-StudentBicop::hinv1_raw(const Eigen::MatrixXd& u)
-{
-  return hinv1_impl(
-    u, double(this->parameters_(0)), double(this->parameters_(1)));
-}
-
-inline Eigen::VectorXd
 StudentBicop::pdf_raw(const Eigen::MatrixXd& u,
                       const Eigen::MatrixXd& parameters)
 {
-  if (parameters.cols() == 1) {
-    return pdf_impl(u, double(parameters(0, 0)), double(parameters(1, 0)));
+  if (parameters.rows() == 1) {
+    return pdf_impl(u, parameters(0, 0), parameters(0, 1));
   }
   Eigen::VectorXd out(u.rows());
   for (Eigen::Index i = 0; i < u.rows(); ++i) {
-    out(i) =
-      pdf_impl(u.row(i), double(parameters(0, i)), double(parameters(1, i)))(0);
+    out(i) = pdf_impl(u.row(i), parameters(i, 0), parameters(i, 1))(0);
   }
   return out;
 }
@@ -132,13 +103,12 @@ StudentBicop::pdf_raw(const Eigen::MatrixXd& u,
 inline Eigen::VectorXd
 StudentBicop::cdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 {
-  if (parameters.cols() == 1) {
-    return cdf_impl(u, double(parameters(0, 0)), double(parameters(1, 0)));
+  if (parameters.rows() == 1) {
+    return cdf_impl(u, parameters(0, 0), parameters(0, 1));
   }
   Eigen::VectorXd out(u.rows());
   for (Eigen::Index i = 0; i < u.rows(); ++i) {
-    out(i) =
-      cdf_impl(u.row(i), double(parameters(0, i)), double(parameters(1, i)))(0);
+    out(i) = cdf_impl(u.row(i), parameters(i, 0), parameters(i, 1))(0);
   }
   return out;
 }
@@ -147,13 +117,12 @@ inline Eigen::VectorXd
 StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u,
                          const Eigen::MatrixXd& parameters)
 {
-  if (parameters.cols() == 1) {
-    return hfunc1_impl(u, double(parameters(0, 0)), double(parameters(1, 0)));
+  if (parameters.rows() == 1) {
+    return hfunc1_impl(u, parameters(0, 0), parameters(0, 1));
   }
   Eigen::VectorXd out(u.rows());
   for (Eigen::Index i = 0; i < u.rows(); ++i) {
-    out(i) = hfunc1_impl(
-      u.row(i), double(parameters(0, i)), double(parameters(1, i)))(0);
+    out(i) = hfunc1_impl(u.row(i), parameters(i, 0), parameters(i, 1))(0);
   }
   return out;
 }
@@ -162,13 +131,12 @@ inline Eigen::VectorXd
 StudentBicop::hinv1_raw(const Eigen::MatrixXd& u,
                         const Eigen::MatrixXd& parameters)
 {
-  if (parameters.cols() == 1) {
-    return hinv1_impl(u, double(parameters(0, 0)), double(parameters(1, 0)));
+  if (parameters.rows() == 1) {
+    return hinv1_impl(u, parameters(0, 0), parameters(0, 1));
   }
   Eigen::VectorXd out(u.rows());
   for (Eigen::Index i = 0; i < u.rows(); ++i) {
-    out(i) = hinv1_impl(
-      u.row(i), double(parameters(0, i)), double(parameters(1, i)))(0);
+    out(i) = hinv1_impl(u.row(i), parameters(i, 0), parameters(i, 1))(0);
   }
   return out;
 }

@@ -613,8 +613,8 @@ Bicop::loglik(const Eigen::MatrixXd& u,
 }
 //! @}
 
-//! @brief Validates per-row parameters and returns them transposed to the
-//! internal `p x n` layout (one column per observation).
+//! @brief Validates per-row parameters (the internal leaves use the same
+//! `n x p` layout as the public API, one parameter set per row).
 inline Eigen::MatrixXd
 Bicop::format_parameters(const Eigen::MatrixXd& u,
                          const Eigen::MatrixXd& parameters) const
@@ -655,15 +655,15 @@ Bicop::format_parameters(const Eigen::MatrixXd& u,
       }
     }
   }
-  return parameters.transpose();
+  return parameters;
 }
 
-//! @brief Evaluates `f` over row-batches of `u`/`parameters_t`, possibly in
+//! @brief Evaluates `f` over row-batches of `u`/`parameters`, possibly in
 //! parallel, and assembles the results.
 inline Eigen::VectorXd
 Bicop::eval_in_batches(
   const Eigen::MatrixXd& u,
-  const Eigen::MatrixXd& parameters_t,
+  const Eigen::MatrixXd& parameters,
   const size_t num_threads,
   const std::function<Eigen::VectorXd(const Eigen::MatrixXd&,
                                       const Eigen::MatrixXd&)>& f) const
@@ -674,8 +674,8 @@ Bicop::eval_in_batches(
     return out;
   }
   auto do_batch = [&](const tools_batch::Batch& b) {
-    out.segment(b.begin, b.size) = f(u.middleRows(b.begin, b.size),
-                                     parameters_t.middleCols(b.begin, b.size));
+    out.segment(b.begin, b.size) =
+      f(u.middleRows(b.begin, b.size), parameters.middleRows(b.begin, b.size));
   };
   if (num_threads <= 1) {
     do_batch(tools_batch::Batch{ 0, n });

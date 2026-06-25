@@ -9,12 +9,6 @@
 
 namespace vinecopulib {
 inline Eigen::VectorXd
-ExtremeValueBicop::cdf(const Eigen::MatrixXd& u)
-{
-  return cdf(u, this->parameters_);
-}
-
-inline Eigen::VectorXd
 ExtremeValueBicop::cdf(const Eigen::MatrixXd& u,
                        const Eigen::MatrixXd& parameters)
 {
@@ -27,12 +21,6 @@ ExtremeValueBicop::cdf(const Eigen::MatrixXd& u,
     return std::exp(t);
   };
   return tools_eigen::binaryExpr_or_nan(u, parameters, f);
-}
-
-inline Eigen::VectorXd
-ExtremeValueBicop::pdf_raw(const Eigen::MatrixXd& u)
-{
-  return pdf_raw(u, this->parameters_);
 }
 
 inline Eigen::VectorXd
@@ -57,12 +45,6 @@ ExtremeValueBicop::pdf_raw(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-ExtremeValueBicop::hfunc1_raw(const Eigen::MatrixXd& u)
-{
-  return hfunc1_raw(u, this->parameters_);
-}
-
-inline Eigen::VectorXd
 ExtremeValueBicop::hfunc1_raw(const Eigen::MatrixXd& u,
                               const Eigen::MatrixXd& parameters)
 {
@@ -78,12 +60,6 @@ ExtremeValueBicop::hfunc1_raw(const Eigen::MatrixXd& u,
     return std::exp(t2) * t3 / u1;
   };
   return tools_eigen::binaryExpr_or_nan(u, parameters, f);
-}
-
-inline Eigen::VectorXd
-ExtremeValueBicop::hfunc2_raw(const Eigen::MatrixXd& u)
-{
-  return hfunc2_raw(u, this->parameters_);
 }
 
 inline Eigen::VectorXd
@@ -105,31 +81,17 @@ ExtremeValueBicop::hfunc2_raw(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-ExtremeValueBicop::hinv1_raw(const Eigen::MatrixXd& u)
-{
-  Eigen::VectorXd hinv = hinv1_num(u);
-  return hinv;
-}
-
-inline Eigen::VectorXd
 ExtremeValueBicop::hinv1_raw(const Eigen::MatrixXd& u,
                              const Eigen::MatrixXd& parameters)
 {
-  return hinv1_num(u, parameters);
-}
-
-inline Eigen::VectorXd
-ExtremeValueBicop::hinv2_raw(const Eigen::MatrixXd& u)
-{
-  Eigen::VectorXd hinv = hinv2_num(u);
-  return hinv;
+  return hinv1_num_raw(u, parameters);
 }
 
 inline Eigen::VectorXd
 ExtremeValueBicop::hinv2_raw(const Eigen::MatrixXd& u,
                              const Eigen::MatrixXd& parameters)
 {
-  return hinv2_num(u, parameters);
+  return hinv2_num_raw(u, parameters);
 }
 
 inline double

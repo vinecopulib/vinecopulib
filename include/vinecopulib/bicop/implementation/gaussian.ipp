@@ -20,57 +20,28 @@ inline GaussianBicop::GaussianBicop()
 }
 
 inline Eigen::VectorXd
-GaussianBicop::pdf_raw(const Eigen::MatrixXd& u)
-{
-  // Inverse Cholesky of the correlation matrix
-  double rho = double(this->parameters_(0));
-  Eigen::Matrix2d L;
-  L(0, 0) = 1;
-  L(1, 1) = 1 / sqrt(1.0 - pow(rho, 2.0));
-  L(0, 1) = -rho * L(1, 1);
-  L(1, 0) = 0;
-
-  // Compute copula density
-  Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
-  Eigen::MatrixXd tmp = tools_stats::qnorm(u);
-  f = f.cwiseQuotient(tools_stats::dnorm(tmp).rowwise().prod());
-  tmp = tmp * L;
-  f = f.cwiseProduct(tools_stats::dnorm(tmp).rowwise().prod());
-  return f / sqrt(1.0 - pow(rho, 2.0));
-}
-
-inline Eigen::VectorXd
-GaussianBicop::cdf(const Eigen::MatrixXd& u)
-{
-  return tools_stats::pbvnorm(tools_stats::qnorm(u),
-                              double(this->parameters_(0)));
-}
-
-inline Eigen::VectorXd
-GaussianBicop::hfunc1_raw(const Eigen::MatrixXd& u)
-{
-  double rho = double(this->parameters_(0));
-  Eigen::VectorXd h = Eigen::VectorXd::Zero(u.rows());
-  Eigen::MatrixXd tmp = tools_stats::qnorm(u);
-  h = (tmp.col(1) - rho * tmp.col(0)) / sqrt(1.0 - pow(rho, 2.0));
-  return tools_stats::pnorm(h);
-}
-
-inline Eigen::VectorXd
-GaussianBicop::hinv1_raw(const Eigen::MatrixXd& u)
-{
-  double rho = double(this->parameters_(0));
-  Eigen::VectorXd hinv = Eigen::VectorXd::Zero(u.rows());
-  Eigen::MatrixXd tmp = tools_stats::qnorm(u);
-  hinv = tmp.col(1) * sqrt(1.0 - pow(rho, 2.0)) + rho * tmp.col(0);
-  return tools_stats::pnorm(hinv);
-}
-
-inline Eigen::VectorXd
 GaussianBicop::pdf_raw(const Eigen::MatrixXd& u,
                        const Eigen::MatrixXd& parameters)
 {
   const Eigen::Index n = u.rows();
+  if (parameters.rows() == 1) {
+    // broadcast: scalar inverse-Cholesky form (bit-identical to the historical
+    // state-based path)
+    double rho = parameters(0, 0);
+    Eigen::Matrix2d L;
+    L(0, 0) = 1;
+    L(1, 1) = 1 / sqrt(1.0 - pow(rho, 2.0));
+    L(0, 1) = -rho * L(1, 1);
+    L(1, 0) = 0;
+
+    Eigen::VectorXd f = Eigen::VectorXd::Ones(n);
+    Eigen::MatrixXd tmp = tools_stats::qnorm(u);
+    f = f.cwiseQuotient(tools_stats::dnorm(tmp).rowwise().prod());
+    tmp = tmp * L;
+    f = f.cwiseProduct(tools_stats::dnorm(tmp).rowwise().prod());
+    return f / sqrt(1.0 - pow(rho, 2.0));
+  }
+
   Eigen::ArrayXd rho =
     tools_eigen::parameter_as_vector(parameters, 0, n).array();
   Eigen::ArrayXd s = (1.0 - rho.square()).sqrt(); // sqrt(1 - rho^2)
@@ -90,13 +61,13 @@ inline Eigen::VectorXd
 GaussianBicop::cdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 {
   Eigen::MatrixXd z = tools_stats::qnorm(u);
-  if (parameters.cols() == 1) {
-    return tools_stats::pbvnorm(z, double(parameters(0, 0)));
+  if (parameters.rows() == 1) {
+    return tools_stats::pbvnorm(z, parameters(0, 0));
   }
   const Eigen::Index n = u.rows();
   Eigen::VectorXd p(n);
   for (Eigen::Index i = 0; i < n; ++i) {
-    p(i) = tools_stats::pbvnorm(z.row(i), double(parameters(0, i)))(0);
+    p(i) = tools_stats::pbvnorm(z.row(i), parameters(i, 0))(0);
   }
   return p;
 }

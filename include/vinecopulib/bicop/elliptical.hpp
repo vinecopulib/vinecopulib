@@ -22,12 +22,7 @@ namespace vinecopulib {
 class EllipticalBicop : public ParBicop
 {
 private:
-  // hfunction and its inverse
-  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u);
-
-  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
-
-  // parameter-aware overloads (thread `parameters` through the column swap)
+  // hfunction and its inverse (thread `parameters` through the column swap)
   Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
                              const Eigen::MatrixXd& parameters);
 

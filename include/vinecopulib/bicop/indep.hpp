@@ -24,30 +24,25 @@ public:
   IndepBicop();
 
 private:
-  // PDF
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
+  // evaluation leaves; the independence copula has no parameters, so they
+  // ignore `parameters`
+  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters);
 
-  // PDF
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u);
+  Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
+                      const Eigen::MatrixXd& parameters);
 
-  // hfunctions and their inverses
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters);
 
-  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters);
 
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
+  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& parameters);
 
-  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
-
-  // bring the base class' parameter-aware overloads into scope (the
-  // independence copula has no parameters, so they reduce to the no-arg
-  // versions); this silences -Woverloaded-virtual.
-  using AbstractBicop::cdf;
-  using AbstractBicop::hfunc1_raw;
-  using AbstractBicop::hfunc2_raw;
-  using AbstractBicop::hinv1_raw;
-  using AbstractBicop::hinv2_raw;
-  using AbstractBicop::pdf_raw;
+  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& parameters);
 
   Eigen::MatrixXd tau_to_parameters(const double&);
 

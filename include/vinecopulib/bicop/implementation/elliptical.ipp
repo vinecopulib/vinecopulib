@@ -10,18 +10,6 @@
 namespace vinecopulib {
 
 inline Eigen::VectorXd
-EllipticalBicop::hfunc2_raw(const Eigen::MatrixXd& u)
-{
-  return hfunc1_raw(tools_eigen::swap_cols(u));
-}
-
-inline Eigen::VectorXd
-EllipticalBicop::hinv2_raw(const Eigen::MatrixXd& u)
-{
-  return hinv1_raw(tools_eigen::swap_cols(u));
-}
-
-inline Eigen::VectorXd
 EllipticalBicop::hfunc2_raw(const Eigen::MatrixXd& u,
                             const Eigen::MatrixXd& parameters)
 {

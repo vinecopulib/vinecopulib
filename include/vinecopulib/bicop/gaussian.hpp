@@ -24,19 +24,7 @@ public:
   GaussianBicop();
 
 private:
-  // PDF
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
-
-  // CDF
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u);
-
-  // hfunction
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
-
-  // inverse hfunction
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
-
-  // parameter-aware overloads (`parameters` is 1 x m, m in {1, n})
+  // evaluation leaves (`parameters` is m x 1, m in {1, n})
   Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
                           const Eigen::MatrixXd& parameters);
 

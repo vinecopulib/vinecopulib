@@ -24,20 +24,8 @@ public:
   StudentBicop();
 
 private:
-  // PDF
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
-
-  // CDF
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u);
-
-  // hfunction
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
-
-  // inverse hfunction
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
-
-  // parameter-aware overloads (`parameters` is 2 x m, m in {1, n}); these loop
-  // per row because the t-distribution helpers take scalar parameters
+  // evaluation leaves (`parameters` is m x 2, m in {1, n}); these loop per row
+  // because the t-distribution helpers take scalar parameters
   Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
                           const Eigen::MatrixXd& parameters);
 

@@ -32,34 +32,32 @@ public:
   KernelBicop();
 
 protected:
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u) override;
+  // evaluation leaves; kernel estimators store an interpolation grid rather
+  // than a per-row parameter vector, so they ignore `parameters`
+  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters) override;
 
+  Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
+                      const Eigen::MatrixXd& parameters) override;
+
+  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters) override;
+
+  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters) override;
+
+  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& parameters) override;
+
+  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& parameters) override;
+
+  // state-based dispatchers (overridden for grid-specific jitter handling)
   Eigen::VectorXd pdf(const Eigen::MatrixXd& u) override;
-
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u) override;
-
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u) override;
-
-  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u) override;
 
   Eigen::VectorXd hfunc1(const Eigen::MatrixXd& u) override;
 
   Eigen::VectorXd hfunc2(const Eigen::MatrixXd& u) override;
-
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u) override;
-
-  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u) override;
-
-  // bring the base class' parameter-aware overloads into scope (kernel
-  // estimators store an interpolation grid rather than a per-row parameter
-  // vector, so they reduce to the no-arg versions); silences
-  // -Woverloaded-virtual.
-  using AbstractBicop::cdf;
-  using AbstractBicop::hfunc1_raw;
-  using AbstractBicop::hfunc2_raw;
-  using AbstractBicop::hinv1_raw;
-  using AbstractBicop::hinv2_raw;
-  using AbstractBicop::pdf_raw;
 
   double get_npars() const override;
 

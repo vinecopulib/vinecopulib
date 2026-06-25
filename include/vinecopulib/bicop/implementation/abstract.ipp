@@ -140,36 +140,42 @@ AbstractBicop::pdf(const Eigen::MatrixXd& u)
 {
   if (var_types_ != std::vector<std::string>{ "c", "c" }) {
     // discrete margins go through the parameter-aware difference quotients
-    return pdf(u, get_parameters());
+    return pdf(u, get_parameters().transpose());
   }
-  Eigen::VectorXd pdf = pdf_raw(u.leftCols(2));
+  Eigen::VectorXd pdf = pdf_raw(u.leftCols(2), get_parameters().transpose());
   tools_eigen::trim(pdf, DBL_MIN, DBL_MAX);
   return pdf;
 }
 
 inline Eigen::VectorXd
+AbstractBicop::cdf(const Eigen::MatrixXd& u)
+{
+  return cdf(u.leftCols(2), get_parameters().transpose());
+}
+
+inline Eigen::VectorXd
 AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
 {
-  if (var_types_[0] == "d" && u.cols() == 4) {
-    return hfunc1(u, get_parameters());
+  if (var_types_[0] == "d") {
+    return hfunc1(u, get_parameters().transpose());
   }
-  return hfunc1_raw(u.leftCols(2));
+  return hfunc1_raw(u.leftCols(2), get_parameters().transpose());
 }
 
 inline Eigen::VectorXd
 AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
 {
-  if (var_types_[1] == "d" && u.cols() == 4) {
-    return hfunc2(u, get_parameters());
+  if (var_types_[1] == "d") {
+    return hfunc2(u, get_parameters().transpose());
   }
-  return hfunc2_raw(u.leftCols(2));
+  return hfunc2_raw(u.leftCols(2), get_parameters().transpose());
 }
 
 inline Eigen::VectorXd
 AbstractBicop::hinv1(const Eigen::MatrixXd& u)
 {
   if (var_types_[0] == "c") {
-    return hinv1_raw(u.leftCols(2));
+    return hinv1_raw(u.leftCols(2), get_parameters().transpose());
   } else {
     return hinv1_num(u);
   }
@@ -179,7 +185,7 @@ inline Eigen::VectorXd
 AbstractBicop::hinv2(const Eigen::MatrixXd& u)
 {
   if (var_types_[1] == "c") {
-    return hinv2_raw(u.leftCols(2));
+    return hinv2_raw(u.leftCols(2), get_parameters().transpose());
   } else {
     return hinv2_num(u);
   }
@@ -210,60 +216,23 @@ AbstractBicop::loglik(const Eigen::MatrixXd& u, const Eigen::VectorXd weights)
 inline Eigen::VectorXd
 AbstractBicop::hinv1_num(const Eigen::MatrixXd& u)
 {
-  return hinv1_num(u, get_parameters());
+  return hinv1_num(u, get_parameters().transpose());
 }
 
 inline Eigen::VectorXd
 AbstractBicop::hinv2_num(const Eigen::MatrixXd& u)
 {
-  return hinv2_num(u, get_parameters());
+  return hinv2_num(u, get_parameters().transpose());
 }
 //! @}
 
-//! @name Parameter-aware overloads
+//! @name Parameter-aware leaves and dispatchers
 //!
-//! These mirror the state-based methods above but read the parameters from the
-//! `parameters` argument (shape p x m, m in {1, n}) instead of object state,
-//! enabling evaluation at a different parameter set per row of `u`.
+//! `parameters` has shape m x p with m in {1, n}: row i holds the p parameters
+//! for observation i; a single row is broadcast to all observations. These are
+//! the sole evaluation interface; the state-based methods above call them with
+//! the stored parameters as a 1 x p broadcast row.
 //! @{
-
-//! @brief Base-default parameter-aware leaves: ignore `parameters` and use
-//! object state. Parametric families override these with stateless math.
-inline Eigen::VectorXd
-AbstractBicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
-{
-  return pdf_raw(u);
-}
-
-inline Eigen::VectorXd
-AbstractBicop::cdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
-{
-  return cdf(u);
-}
-
-inline Eigen::VectorXd
-AbstractBicop::hfunc1_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
-{
-  return hfunc1_raw(u);
-}
-
-inline Eigen::VectorXd
-AbstractBicop::hfunc2_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
-{
-  return hfunc2_raw(u);
-}
-
-inline Eigen::VectorXd
-AbstractBicop::hinv1_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
-{
-  return hinv1_raw(u);
-}
-
-inline Eigen::VectorXd
-AbstractBicop::hinv2_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
-{
-  return hinv2_raw(u);
-}
 
 inline Eigen::VectorXd
 AbstractBicop::pdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
@@ -295,9 +264,9 @@ AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u,
     udiff = (u.col(1) - u.col(3)).cwiseAbs();
   }
 
-  const bool bc = (parameters.cols() == 1);
+  const bool bc = (parameters.rows() == 1);
   for (Eigen::Index i = 0; i < u.rows(); i++) {
-    const Eigen::MatrixXd par_i = parameters.col(bc ? 0 : i);
+    const Eigen::MatrixXd par_i = parameters.row(bc ? 0 : i);
     if (udiff(i) > 5e-5) {
       if (var_types_[0] != "c") {
         pdf(i) =
@@ -323,9 +292,9 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u,
   Eigen::MatrixXd umin = u.rightCols(2);
   Eigen::MatrixXd udiff = (umax - umin).cwiseAbs();
 
-  const bool bc = (parameters.cols() == 1);
+  const bool bc = (parameters.rows() == 1);
   for (Eigen::Index i = 0; i < u.rows(); i++) {
-    const Eigen::MatrixXd par_i = parameters.col(bc ? 0 : i);
+    const Eigen::MatrixXd par_i = parameters.row(bc ? 0 : i);
     // the difference quotient can be instable, use derivative if denominator
     // too small
     if (udiff.row(i).maxCoeff() < 5e-5) {
@@ -357,15 +326,15 @@ inline Eigen::VectorXd
 AbstractBicop::hfunc1(const Eigen::MatrixXd& u,
                       const Eigen::MatrixXd& parameters)
 {
-  if (var_types_[0] == "d" && u.cols() == 4) {
+  if (var_types_[0] == "d") {
     auto uu = u;
     uu.col(3) = uu.col(1);
     auto u1diff = (uu.col(0) - uu.col(2)).cwiseAbs();
     Eigen::VectorXd h(u.rows());
 
-    const bool bc = (parameters.cols() == 1);
+    const bool bc = (parameters.rows() == 1);
     for (Eigen::Index i = 0; i < u.rows(); i++) {
-      const Eigen::MatrixXd par_i = parameters.col(bc ? 0 : i);
+      const Eigen::MatrixXd par_i = parameters.row(bc ? 0 : i);
       if (std::abs(u1diff(i)) > 5e-5) {
         h(i) = cdf(uu.row(i).leftCols(2), par_i)(0) -
                cdf(uu.row(i).rightCols(2), par_i)(0);
@@ -385,15 +354,15 @@ inline Eigen::VectorXd
 AbstractBicop::hfunc2(const Eigen::MatrixXd& u,
                       const Eigen::MatrixXd& parameters)
 {
-  if (var_types_[1] == "d" && u.cols() == 4) {
+  if (var_types_[1] == "d") {
     auto uu = u;
     uu.col(2) = uu.col(0);
     auto u2diff = (uu.col(1) - uu.col(3)).cwiseAbs();
     Eigen::VectorXd h(u.rows());
 
-    const bool bc = (parameters.cols() == 1);
+    const bool bc = (parameters.rows() == 1);
     for (Eigen::Index i = 0; i < u.rows(); i++) {
-      const Eigen::MatrixXd par_i = parameters.col(bc ? 0 : i);
+      const Eigen::MatrixXd par_i = parameters.row(bc ? 0 : i);
       if (u2diff(i) > 5e-5) {
         h(i) = cdf(uu.row(i).leftCols(2), par_i)(0) -
                cdf(uu.row(i).rightCols(2), par_i)(0);
@@ -452,6 +421,32 @@ AbstractBicop::hinv2_num(const Eigen::MatrixXd& u,
   auto h1 = [&](const Eigen::VectorXd& x) {
     u_new.col(0) = x;
     return hfunc2(u_new, parameters);
+  };
+
+  return tools_eigen::invert_f(u.col(0), h1);
+}
+
+inline Eigen::VectorXd
+AbstractBicop::hinv1_num_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters)
+{
+  Eigen::MatrixXd u_new = u;
+  auto h1 = [&](const Eigen::VectorXd& v) {
+    u_new.col(1) = v;
+    return hfunc1_raw(u_new.leftCols(2), parameters);
+  };
+
+  return tools_eigen::invert_f(u.col(1), h1);
+}
+
+inline Eigen::VectorXd
+AbstractBicop::hinv2_num_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters)
+{
+  Eigen::MatrixXd u_new = u;
+  auto h1 = [&](const Eigen::VectorXd& x) {
+    u_new.col(0) = x;
+    return hfunc2_raw(u_new.leftCols(2), parameters);
   };
 
   return tools_eigen::invert_f(u.col(0), h1);

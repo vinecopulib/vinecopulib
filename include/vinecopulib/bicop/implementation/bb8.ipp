@@ -23,8 +23,8 @@ inline double
 Bb8Bicop::generator(const double& u,
                     const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(parameters(0));
-  double delta = double(parameters(1));
+  double theta = parameters(0);
+  double delta = parameters(1);
   double res = (1 - std::pow(1 - delta * u, theta));
   return -std::log(res / (1 - std::pow(1 - delta, theta)));
 }
@@ -33,8 +33,8 @@ inline double
 Bb8Bicop::generator_inv(const double& u,
                         const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(parameters(0));
-  double delta = double(parameters(1));
+  double theta = parameters(0);
+  double delta = parameters(1);
   double res = std::exp(-u) * (std::pow(1 - delta, theta) - 1);
   return (1 - std::pow(1 + res, 1 / theta)) / delta;
 }
@@ -44,16 +44,10 @@ Bb8Bicop::generator_derivative(
   const double& u,
   const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(parameters(0));
-  double delta = double(parameters(1));
+  double theta = parameters(0);
+  double delta = parameters(1);
   double res = delta * theta * std::pow(1 - delta * u, theta - 1);
   return -res / (1 - std::pow(1 - delta * u, theta));
-}
-
-inline Eigen::VectorXd
-Bb8Bicop::pdf_raw(const Eigen::MatrixXd& u)
-{
-  return pdf_raw(u, this->parameters_);
 }
 
 inline Eigen::VectorXd
@@ -62,8 +56,8 @@ Bb8Bicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
   auto f = [](const double& u1,
               const double& u2,
               const Eigen::Ref<const Eigen::VectorXd>& par) {
-    double theta = double(par(0));
-    double delta = double(par(1));
+    double theta = par(0);
+    double delta = par(1);
     double t10 = 1.0 - delta;
     double t16 = 1.0 / theta;
     double t38 = 2.0 * theta;

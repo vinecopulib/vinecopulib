@@ -20,21 +20,8 @@ namespace vinecopulib {
 class ExtremeValueBicop : public ParBicop
 {
 private:
-  // pdf, cdf, hfunctions and inverses
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u);
-
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u);
-
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u);
-
-  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u);
-
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u);
-
-  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u);
-
-  // parameter-aware overloads (`parameters` is p x m, m in {1, n}); the
-  // state-based versions above delegate to these passing the stored parameters
+  // pdf, cdf, hfunctions and inverses (`parameters` is m x p, m in {1, n}; a
+  // single row is broadcast to all observations)
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
                       const Eigen::MatrixXd& parameters);
 

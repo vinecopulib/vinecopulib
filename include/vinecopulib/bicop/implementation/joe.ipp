@@ -39,14 +39,8 @@ JoeBicop::generator_derivative(
   const double& u,
   const Eigen::Ref<const Eigen::VectorXd>& parameters)
 {
-  double theta = double(parameters(0));
+  double theta = parameters(0);
   return (-theta) * std::pow(1 - u, theta - 1) / (1 - std::pow(1 - u, theta));
-}
-
-inline Eigen::VectorXd
-JoeBicop::pdf_raw(const Eigen::MatrixXd& u)
-{
-  return pdf_raw(u, this->parameters_);
 }
 
 inline Eigen::VectorXd
@@ -55,7 +49,7 @@ JoeBicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
   auto f = [](const double& u1,
               const double& u2,
               const Eigen::Ref<const Eigen::VectorXd>& par) {
-    double theta = double(par(0));
+    double theta = par(0);
     double t1 = std::pow(1 - u1, theta);
     double t2 = std::pow(1 - u2, theta);
     return std::pow(t1 + t2 - t1 * t2, 1 / theta - 2) *
@@ -66,12 +60,6 @@ JoeBicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 }
 
 // inverse h-function
-inline Eigen::VectorXd
-JoeBicop::hinv1_raw(const Eigen::MatrixXd& u)
-{
-  return hinv1_raw(u, this->parameters_);
-}
-
 inline Eigen::VectorXd
 JoeBicop::hinv1_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 {
