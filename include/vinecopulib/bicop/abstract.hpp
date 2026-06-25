@@ -67,8 +67,6 @@ protected:
   // following are virtual so they can be overriden by KernelBicop
   virtual Eigen::VectorXd pdf(const Eigen::MatrixXd& u);
 
-  virtual Eigen::VectorXd cdf(const Eigen::MatrixXd& u);
-
   virtual Eigen::VectorXd hfunc1(const Eigen::MatrixXd& u);
 
   virtual Eigen::VectorXd hfunc2(const Eigen::MatrixXd& u);

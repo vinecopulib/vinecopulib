@@ -148,12 +148,6 @@ AbstractBicop::pdf(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::cdf(const Eigen::MatrixXd& u)
-{
-  return cdf(u.leftCols(2), get_parameters().transpose());
-}
-
-inline Eigen::VectorXd
 AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
 {
   if (var_types_[0] == "d") {

@@ -204,7 +204,8 @@ inline Eigen::VectorXd
 Bicop::cdf(const Eigen::MatrixXd& u) const
 {
   check_data(u);
-  Eigen::VectorXd p = bicop_->cdf(prep_for_abstract(u).leftCols(2));
+  Eigen::VectorXd p = bicop_->cdf(prep_for_abstract(u).leftCols(2),
+                                  bicop_->get_parameters().transpose());
   switch (rotation_) {
     default:
       return p;
