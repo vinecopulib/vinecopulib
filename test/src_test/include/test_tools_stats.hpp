@@ -62,14 +62,19 @@ TEST(test_tools_stats, qrng_are_correct)
   size_t N = 1000;
   double Nd = static_cast<double>(N);
 
+  // seeded so the simulated evaluation points (and hence the test) are
+  // deterministic across runs and platforms
+  std::vector<int> seeds = { 1, 2, 3, 4, 5 };
   auto cop = Bicop(BicopFamily::gaussian);
-  auto u = cop.simulate(n);
+  auto u = cop.simulate(n, false, seeds);
   auto U = tools_stats::ghalton(N, d);
   auto U1 = tools_stats::sobol(N, d);
-  auto U2 = tools_stats::simulate_uniform(N, d);
 
-  Eigen::VectorXd x(N), p(n), p1(N), x2(N), p2(n);
-  p2 = Eigen::VectorXd::Zero(n);
+  // Monte-Carlo CDF estimate at each simulated point using each low-discrepancy
+  // sequence: p(i) = (1/N) sum_j 1{U_j1 <= u_i1, hinv1(U_j) <= u_i2}. ghalton
+  // and sobol converge much faster than plain Monte Carlo, so at N = 1000 they
+  // recover the analytical copula CDF to well within 1e-2.
+  Eigen::VectorXd x(N), p(n), p1(n);
   for (size_t i = 0; i < n; i++) {
     auto f = [i, u](const double& u1, const double& u2) {
       return (u1 <= u(i, 0) && u2 <= u(i, 1)) ? 1.0 : 0.0;
@@ -78,15 +83,11 @@ TEST(test_tools_stats, qrng_are_correct)
     p(i) = x.sum() / Nd;
     x = U1.col(0).binaryExpr(cop.hinv1(U1), f);
     p1(i) = x.sum() / Nd;
-    x2 = U2.col(0).binaryExpr(cop.hinv1(U2), f);
-    p2(i) = x2.sum() / Nd;
   }
 
   x = cop.cdf(u);
-  if (all_close(p2, x, 1e-2, 1e-2)) {
-    ASSERT_TRUE(all_close(p, x, 1e-2, 1e-2));
-    ASSERT_TRUE(all_close(p1, x, 1e-2, 1e-2));
-  }
+  ASSERT_TRUE(all_close(p, x, 1e-2, 1e-2));  // ghalton
+  ASSERT_TRUE(all_close(p1, x, 1e-2, 1e-2)); // sobol
 }
 
 TEST(test_tools_stats, mcor_works)
