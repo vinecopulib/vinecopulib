@@ -61,14 +61,21 @@ binaryExpr_or_nan(const Eigen::MatrixXd& u,
 {
   const Eigen::Index n = u.rows();
   const bool broadcast = (parameters.rows() == 1);
+  // hoist the broadcast parameter set out of the loop so the common
+  // single-parameter (state-based) path does not rebuild it on every row
+  const Eigen::VectorXd par0 =
+    broadcast ? parameters.row(0).transpose() : Eigen::VectorXd();
   Eigen::VectorXd out(n);
   for (Eigen::Index i = 0; i < n; ++i) {
     const double u1 = u(i, 0);
     const double u2 = u(i, 1);
     if ((std::isnan)(u1) || (std::isnan)(u2)) {
       out(i) = std::numeric_limits<double>::quiet_NaN();
+    } else if (broadcast) {
+      out(i) = func(u1, u2, par0);
     } else {
-      out(i) = func(u1, u2, parameters.row(broadcast ? 0 : i).transpose());
+      const Eigen::VectorXd par_i = parameters.row(i).transpose();
+      out(i) = func(u1, u2, par_i);
     }
   }
   return out;

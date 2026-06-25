@@ -76,10 +76,17 @@ inline Eigen::VectorXd
 GaussianBicop::hfunc1_raw(const Eigen::MatrixXd& u,
                           const Eigen::MatrixXd& parameters)
 {
+  Eigen::MatrixXd z = tools_stats::qnorm(u);
+  if (parameters.rows() == 1) {
+    // broadcast: scalar form (computes sqrt(1 - rho^2) once; bit-identical to
+    // the historical state-based path)
+    double rho = parameters(0, 0);
+    Eigen::VectorXd h = (z.col(1) - rho * z.col(0)) / sqrt(1.0 - pow(rho, 2.0));
+    return tools_stats::pnorm(h);
+  }
   const Eigen::Index n = u.rows();
   Eigen::ArrayXd rho =
     tools_eigen::parameter_as_vector(parameters, 0, n).array();
-  Eigen::MatrixXd z = tools_stats::qnorm(u);
   Eigen::VectorXd h =
     ((z.col(1).array() - rho * z.col(0).array()) / (1.0 - rho.square()).sqrt())
       .matrix();
@@ -90,10 +97,16 @@ inline Eigen::VectorXd
 GaussianBicop::hinv1_raw(const Eigen::MatrixXd& u,
                          const Eigen::MatrixXd& parameters)
 {
+  Eigen::MatrixXd z = tools_stats::qnorm(u);
+  if (parameters.rows() == 1) {
+    double rho = parameters(0, 0);
+    Eigen::VectorXd hinv =
+      z.col(1) * sqrt(1.0 - pow(rho, 2.0)) + rho * z.col(0);
+    return tools_stats::pnorm(hinv);
+  }
   const Eigen::Index n = u.rows();
   Eigen::ArrayXd rho =
     tools_eigen::parameter_as_vector(parameters, 0, n).array();
-  Eigen::MatrixXd z = tools_stats::qnorm(u);
   Eigen::VectorXd hinv =
     (z.col(1).array() * (1.0 - rho.square()).sqrt() + rho * z.col(0).array())
       .matrix();
