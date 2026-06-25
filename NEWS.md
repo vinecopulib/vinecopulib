@@ -5,7 +5,12 @@
 * Add per-row-parameter overloads of `Bicop::pdf`, `cdf`, `hfunc1`, `hfunc2`, `hinv1`, `hinv2`,
   and `loglik` that evaluate a bivariate copula at a different parameter set per row of `u` in a
   single (optionally multi-threaded) call. The new overloads take an `n x p` matrix of parameters
-  (one row per observation) and are available for parametric families.
+  (one row per observation) and are available for parametric families (#675).
+* Allow a user-supplied edge-weight function for vine structure selection via
+  `tree_criterion = "custom"` together with
+  `FitControlsVinecop::set_tree_criterion_function` (or
+  `FitControlsConfig::tree_criterion_function`), enabling custom dependence
+  criteria during Dissmann's algorithm (#674).
 
 * Add `Vinecop::hfuncs` to return intermediate h-function values (#669)
 
