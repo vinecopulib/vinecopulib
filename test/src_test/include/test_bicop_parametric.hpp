@@ -10,6 +10,7 @@
 #include "rscript.hpp"
 #include "test_utils.hpp"
 #include <cmath>
+#include <limits>
 
 namespace test_bicop_parametric {
 using namespace vinecopulib;
@@ -278,6 +279,11 @@ TEST_P(ParBicopTest, per_row_parameters_match_loop)
   // threading parity (results must not depend on num_threads)
   ASSERT_TRUE(all_close(bicop_.pdf(u, P, 3), bicop_.pdf(u, P, 1), 1e-12, 1e-12))
     << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.cdf(u, P, 3), bicop_.cdf(u, P, 1), 1e-12, 1e-12))
+    << bicop_.str();
+  ASSERT_TRUE(
+    all_close(bicop_.hfunc2(u, P, 3), bicop_.hfunc2(u, P, 1), 1e-12, 1e-12))
+    << bicop_.str();
   ASSERT_TRUE(
     all_close(bicop_.hinv1(u, P, 3), bicop_.hinv1(u, P, 1), 1e-12, 1e-12))
     << bicop_.str();
@@ -285,8 +291,13 @@ TEST_P(ParBicopTest, per_row_parameters_match_loop)
   // a single parameter set per row (broadcast) matches the single-arg path
   Eigen::MatrixXd Pb = bicop_.get_parameters().transpose().replicate(n, 1);
   ASSERT_TRUE(all_close(bicop_.pdf(u, Pb), bicop_.pdf(u))) << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.cdf(u, Pb), bicop_.cdf(u))) << bicop_.str();
   ASSERT_TRUE(all_close(bicop_.hfunc1(u, Pb), bicop_.hfunc1(u)))
     << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.hfunc2(u, Pb), bicop_.hfunc2(u)))
+    << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.hinv1(u, Pb), bicop_.hinv1(u))) << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.hinv2(u, Pb), bicop_.hinv2(u))) << bicop_.str();
 
   // validation errors
   EXPECT_ANY_THROW(bicop_.pdf(u, P.topRows(n - 1))); // wrong number of rows
@@ -295,6 +306,16 @@ TEST_P(ParBicopTest, per_row_parameters_match_loop)
     Pbad.leftCols(p) = P;
     Pbad.col(p).setConstant(0.5);
     EXPECT_ANY_THROW(bicop_.pdf(u, Pbad)); // wrong number of columns
+  }
+  {
+    Eigen::MatrixXd Pnan = P;
+    Pnan(0, 0) = std::numeric_limits<double>::quiet_NaN();
+    EXPECT_ANY_THROW(bicop_.pdf(u, Pnan)); // NaN parameter
+  }
+  {
+    Eigen::MatrixXd Poob = P;
+    Poob(0, 0) = lb(0) - 1.0;              // below the lower bound
+    EXPECT_ANY_THROW(bicop_.pdf(u, Poob)); // out-of-bounds parameter
   }
 
   // discrete parity: per-row parameters through the discrete density,
@@ -327,6 +348,36 @@ TEST_P(ParBicopTest, per_row_parameters_match_loop)
       ASSERT_TRUE(all_close(disc.hinv1(u4, P), r_i1)) << disc.str();
       ASSERT_TRUE(all_close(disc.hinv2(u4, P), r_i2)) << disc.str();
     }
+  }
+
+  // when the conditioning variable is continuous, the h-inverse strips the
+  // discrete companion column and must reproduce the purely-continuous result
+  // (the discrete left-limit provably cannot enter the conditional quantile).
+  {
+    Eigen::MatrixXd u4(n, 4);
+    u4.leftCols(2) = u;
+    u4.rightCols(2) = (u.array() * 0.9).matrix();
+    Bicop dc = bicop_;
+    dc.set_var_types({ "d", "c" }); // hinv2 conditions on the continuous var 2
+    Bicop cd = bicop_;
+    cd.set_var_types({ "c", "d" }); // hinv1 conditions on the continuous var 1
+    ASSERT_TRUE(all_close(dc.hinv2(u4, P), bicop_.hinv2(u, P), 0.0, 1e-12))
+      << bicop_.str();
+    ASSERT_TRUE(all_close(cd.hinv1(u4, P), bicop_.hinv1(u, P), 0.0, 1e-12))
+      << bicop_.str();
+  }
+
+  // the h-inverse inverts its own h-function (continuous round-trip):
+  // hfunc1(u1, hinv1(u1, w)) == w and hfunc2(hinv2(w, u2), u2) == w
+  {
+    Eigen::MatrixXd u1inv = u;
+    u1inv.col(1) = bicop_.hinv1(u, P);
+    ASSERT_TRUE(all_close(bicop_.hfunc1(u1inv, P), u.col(1), 1e-5, 1e-5))
+      << bicop_.str();
+    Eigen::MatrixXd u2inv = u;
+    u2inv.col(0) = bicop_.hinv2(u, P);
+    ASSERT_TRUE(all_close(bicop_.hfunc2(u2inv, P), u.col(0), 1e-5, 1e-5))
+      << bicop_.str();
   }
 }
 
