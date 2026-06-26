@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "test_utils.hpp"
 #include "vinecop_test.hpp"
 #include <string>
 #include <vinecopulib.hpp>
@@ -13,6 +14,7 @@
 
 namespace test_vinecop_class {
 using namespace vinecopulib;
+using test_utils::all_close;
 
 TEST_F(VinecopTest, constructors_without_error)
 {
@@ -281,7 +283,7 @@ TEST_F(VinecopTest, pdf_is_correct)
   }
   Vinecop vinecop(model_matrix, pair_copulas);
 
-  ASSERT_TRUE(vinecop.pdf(u).isApprox(f, 1e-4));
+  ASSERT_TRUE(all_close(vinecop.pdf(u), f, 1e-4, 1e-4));
 }
 
 TEST_F(VinecopTest, hfuncs_is_correct)
@@ -345,7 +347,7 @@ TEST_F(VinecopTest, cdf_is_correct)
 
   // Test whether the analytic and simulated versions are "close" enough
   auto u2 = vinecop.simulate(10);
-  ASSERT_TRUE(vinecop.cdf(u2, 10000).isApprox(bicop.cdf(u2), 1e-2));
+  ASSERT_TRUE(all_close(vinecop.cdf(u2, 10000), bicop.cdf(u2), 1e-2, 1e-2));
 
   // verify that qrng stuff works
   Vinecop vinecop2(301);
@@ -366,7 +368,7 @@ TEST_F(VinecopTest, simulate_is_correct)
   // only check if it works
   vinecop.simulate(10);
   // check the underlying transformation from independent samples
-  ASSERT_TRUE(vinecop.inverse_rosenblatt(u).isApprox(sim, 1e-4));
+  ASSERT_TRUE(all_close(vinecop.inverse_rosenblatt(u), sim, 1e-4, 1e-4));
 
   // verify that qrng stuff works
   vinecop.simulate(10, true);
@@ -385,8 +387,8 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
   }
   Vinecop vinecop(model_matrix, pair_copulas);
   auto u2 = vinecop.simulate(5);
-  ASSERT_TRUE(
-    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u2)).isApprox(u2, 1e-6));
+  ASSERT_TRUE(all_close(
+    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u2)), u2, 1e-6, 1e-6));
 
   // truncated multivariate
   pair_copulas = Vinecop::make_pair_copula_store(7, 2);
@@ -396,8 +398,8 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
     }
   }
   vinecop = Vinecop(model_matrix, pair_copulas);
-  ASSERT_TRUE(
-    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+  ASSERT_TRUE(all_close(
+    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)), u, 1e-6, 1e-6));
 
   // bivariate case
   pair_copulas = Vinecop::make_pair_copula_store(2);
@@ -410,8 +412,8 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
   mat << 1, 1, 2, 0;
   vinecop = Vinecop(mat, pair_copulas);
   u = vinecop.simulate(5);
-  ASSERT_TRUE(
-    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)).isApprox(u, 1e-6));
+  ASSERT_TRUE(all_close(
+    vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)), u, 1e-6, 1e-6));
 }
 
 TEST_F(VinecopTest, scores_stepwise)
@@ -601,10 +603,11 @@ TEST_F(VinecopTest, works_multi_threaded)
   EXPECT_NEAR(fit1.loglik(u), fit3.loglik(u), 1e-2);
 
   // check if parallel evaluators have same output as single threaded ones
-  EXPECT_TRUE(fit2.pdf(u, 2).isApprox(fit2.pdf(u), 1e-10));
+  EXPECT_TRUE(all_close(fit2.pdf(u, 2), fit2.pdf(u), 1e-10, 1e-10));
+  EXPECT_TRUE(all_close(
+    fit2.inverse_rosenblatt(u, 2), fit2.inverse_rosenblatt(u), 1e-10, 1e-10));
   EXPECT_TRUE(
-    fit2.inverse_rosenblatt(u, 2).isApprox(fit2.inverse_rosenblatt(u), 1e-10));
-  EXPECT_TRUE(fit2.rosenblatt(u, 2).isApprox(fit2.rosenblatt(u), 1e-10));
+    all_close(fit2.rosenblatt(u, 2), fit2.rosenblatt(u), 1e-10, 1e-10));
 
   // just check that it works
   fit2.simulate(2, false, 3);
@@ -886,7 +889,8 @@ TEST_F(VinecopTest, tawn_flipping)
       auto pc2 = fit2.get_pair_copula(tree, edge);
       ASSERT_EQ(pc1.get_family(), pc2.get_family());
       ASSERT_EQ(pc1.get_rotation(), pc2.get_rotation());
-      ASSERT_TRUE(pc1.get_parameters().isApprox(pc2.get_parameters(), 0.01));
+      ASSERT_TRUE(
+        all_close(pc1.get_parameters(), pc2.get_parameters(), 0.01, 0.01));
     }
   }
 }

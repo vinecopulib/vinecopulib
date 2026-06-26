@@ -2,11 +2,15 @@
 
 ### NEW FEATURES
 
+* Add per-row-parameter overloads of `Bicop::pdf`, `cdf`, `hfunc1`, `hfunc2`, `hinv1`, `hinv2`,
+  and `loglik` that evaluate a bivariate copula at a different parameter set per row of `u` in a
+  single (optionally multi-threaded) call. The new overloads take an `n x p` matrix of parameters
+  (one row per observation) and are available for parametric families (#675).
 * Allow a user-supplied edge-weight function for vine structure selection via
   `tree_criterion = "custom"` together with
   `FitControlsVinecop::set_tree_criterion_function` (or
   `FitControlsConfig::tree_criterion_function`), enabling custom dependence
-  criteria during Dissmann's algorithm (#764).
+  criteria during Dissmann's algorithm (#674).
 
 * Add `Vinecop::hfuncs` to return intermediate h-function values (#669)
 
@@ -15,6 +19,11 @@
 * Add score and Hessian support (#645)
 
 ### BUG FIXES
+
+* Fix an out-of-bounds memory access in the bivariate h-inverse for mixed
+  discrete/continuous copulas whose inverse is computed numerically (e.g. Frank,
+  the BB families, Tawn): a continuous h-inverse re-entered the discrete
+  difference-quotient branch on a stripped two-column matrix (#675)
 
 * Fix CDF of TLL family (#667)
 
@@ -25,6 +34,10 @@
 * Fix Wilson correction implementation (#653)
 
 ### MAINTENANCE, BUILD, AND DOCS
+
+* Collapse the internal bivariate-copula evaluation leaves to a single
+  parameter-aware interface (removing the duplicated state-based primitives),
+  so each family implements its math once (#675)
 
 * Improve Python-binding API docs for property getters/setters (#670)
 
@@ -39,7 +52,6 @@
 * Enforce clang-format in GitHub Actions and apply code analysis cleanups (#646, #649)
 
 * Remove an unused option (#662)
-
 
 ## vinecopulib 0.7.3 (April 23, 2025)
 

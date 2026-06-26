@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "test_utils.hpp"
 #include "test_vinecop_sanity_checks.hpp"
 #include "gtest/gtest.h"
 #include <vinecopulib.hpp>
@@ -13,6 +14,7 @@
 namespace test_tools_stats {
 
 using namespace vinecopulib;
+using test_utils::all_close;
 
 TEST(test_tools_stats, to_pseudo_obs_is_correct)
 {
@@ -60,14 +62,19 @@ TEST(test_tools_stats, qrng_are_correct)
   size_t N = 1000;
   double Nd = static_cast<double>(N);
 
+  // seeded so the simulated evaluation points (and hence the test) are
+  // deterministic across runs and platforms
+  std::vector<int> seeds = { 1, 2, 3, 4, 5 };
   auto cop = Bicop(BicopFamily::gaussian);
-  auto u = cop.simulate(n);
+  auto u = cop.simulate(n, false, seeds);
   auto U = tools_stats::ghalton(N, d);
   auto U1 = tools_stats::sobol(N, d);
-  auto U2 = tools_stats::simulate_uniform(N, d);
 
-  Eigen::VectorXd x(N), p(n), p1(N), x2(N), p2(n);
-  p2 = Eigen::VectorXd::Zero(n);
+  // Monte-Carlo CDF estimate at each simulated point using each low-discrepancy
+  // sequence: p(i) = (1/N) sum_j 1{U_j1 <= u_i1, hinv1(U_j) <= u_i2}. ghalton
+  // and sobol converge much faster than plain Monte Carlo, so at N = 1000 they
+  // recover the analytical copula CDF to well within 1e-2.
+  Eigen::VectorXd x(N), p(n), p1(n);
   for (size_t i = 0; i < n; i++) {
     auto f = [i, u](const double& u1, const double& u2) {
       return (u1 <= u(i, 0) && u2 <= u(i, 1)) ? 1.0 : 0.0;
@@ -76,15 +83,11 @@ TEST(test_tools_stats, qrng_are_correct)
     p(i) = x.sum() / Nd;
     x = U1.col(0).binaryExpr(cop.hinv1(U1), f);
     p1(i) = x.sum() / Nd;
-    x2 = U2.col(0).binaryExpr(cop.hinv1(U2), f);
-    p2(i) = x2.sum() / Nd;
   }
 
   x = cop.cdf(u);
-  if (p2.isApprox(x, 1e-2)) {
-    ASSERT_TRUE(p.isApprox(x, 1e-2));
-    ASSERT_TRUE(p1.isApprox(x, 1e-2));
-  }
+  ASSERT_TRUE(all_close(p, x, 1e-2, 1e-2));  // ghalton
+  ASSERT_TRUE(all_close(p1, x, 1e-2, 1e-2)); // sobol
 }
 
 TEST(test_tools_stats, mcor_works)
@@ -145,17 +148,17 @@ TEST(test_tools_stats, dpqnorm_work)
   // tools_stats::dnorm is the same as dnorm_boost
   auto d1 = tools_stats::dnorm(X);
   auto d2 = dnorm_boost(X);
-  ASSERT_TRUE(d1.isApprox(d2, 1e-6));
+  ASSERT_TRUE(all_close(d1, d2, 1e-6, 1e-6));
 
   // tools_stats::pnorm is the same as pnorm_boost
   auto p1 = tools_stats::pnorm(X);
   auto p2 = pnorm_boost(X);
-  ASSERT_TRUE(p1.isApprox(p2, 1e-6));
+  ASSERT_TRUE(all_close(p1, p2, 1e-6, 1e-6));
 
   // tools_stats::qnorm is the same as qnorm_boost
   auto q1 = tools_stats::qnorm(p1);
   auto q2 = qnorm_boost(p1);
-  ASSERT_TRUE(q1.isApprox(q2, 1e-6));
+  ASSERT_TRUE(all_close(q1, q2, 1e-6, 1e-6));
 }
 
 TEST(test_tools_stats, dpqnorm_are_nan_safe)
