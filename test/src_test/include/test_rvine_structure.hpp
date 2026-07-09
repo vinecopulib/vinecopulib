@@ -7,7 +7,6 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include <vinecopulib/misc/tools_serialization.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
 
@@ -111,11 +110,6 @@ TEST(rvine_structure, triangular_array_conversions_work)
   EXPECT_EQ(filled_rows[0].size(), static_cast<size_t>(4));
   EXPECT_EQ(filled_rows[1].size(), static_cast<size_t>(3));
   EXPECT_TRUE(TriangularArray<size_t>(filled_rows) == filled);
-
-  // The tools_serialization free functions delegate to the class methods.
-  EXPECT_EQ(tools_serialization::triangular_array_to_json(ta), ta.to_json());
-  EXPECT_TRUE(
-    tools_serialization::json_to_triangular_array<size_t>(ta.to_json()) == ta);
 }
 
 TEST(rvine_structure, rvine_structure_print)

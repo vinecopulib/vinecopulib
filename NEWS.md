@@ -8,9 +8,9 @@
   (one row per observation) and are available for parametric families (#675).
 * Make `TriangularArray<T>` own its conversions like the other user-facing classes: add
   `to_json()`, a JSON constructor, and `to_list()` (the rows as a nested vector, complementing
-  the existing nested-vector constructor). The free helpers
-  `tools_serialization::triangular_array_to_json` / `json_to_triangular_array` now delegate to
-  them.
+  the existing nested-vector constructor). The internal free helpers
+  `tools_serialization::triangular_array_to_json` / `json_to_triangular_array` are removed in
+  favor of the class methods.
 * Allow a user-supplied edge-weight function for vine structure selection via
   `tree_criterion = "custom"` together with
   `FitControlsVinecop::set_tree_criterion_function` (or
