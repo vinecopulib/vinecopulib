@@ -450,7 +450,8 @@ Infrastructure shared across both modules:
 - **`tools_thread` + `tools_interface` + `tools_batch`** — a `std::thread`
   `ThreadPool`, batched work partitioning, and the `INTERFACED_FROM_R`
   switch that swaps in RcppThread + R printing/interrupt handling when the
-  library is compiled inside R.
+  library is compiled inside R. **Never include `tools_thread.hpp`
+  directly; always pull it implicitly through `tools_interface.hpp`.**
 - **`triangular_array.hpp`** — `TriangularArray<T>`, the ragged container
   that mirrors a (possibly truncated) vine.
 - **`tools_eigen`, `tools_stl`, `tools_integration`, `tools_constants`,
