@@ -46,23 +46,7 @@ template<class T>
 inline nlohmann::json
 triangular_array_to_json(const TriangularArray<T>& array)
 {
-  nlohmann::json output;
-  size_t d = array.get_dim();
-  size_t trunc_lvl = array.get_trunc_lvl();
-  output["d"] = d;
-  output["t"] = trunc_lvl;
-
-  nlohmann::json json_data;
-  for (size_t i = 0; i < std::min(d - -1, trunc_lvl); i++) {
-    nlohmann::json row;
-    for (size_t j = 0; j < d - 1 - i; j++) {
-      row.push_back(array(i, j));
-    }
-    json_data.push_back(row);
-  }
-  output["data"] = json_data;
-
-  return output;
+  return array.to_json();
 }
 
 //! conversion from std::vector to nlohmann::json
@@ -107,9 +91,7 @@ template<typename T>
 inline TriangularArray<T>
 json_to_triangular_array(const nlohmann::json& input)
 {
-
-  std::vector<std::vector<T>> vec = input["data"];
-  return TriangularArray<T>(vec);
+  return TriangularArray<T>(input);
 }
 
 //! conversion from nlohmann::json to std::vector
