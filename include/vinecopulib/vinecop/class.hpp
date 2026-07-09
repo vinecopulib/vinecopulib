@@ -236,13 +236,13 @@ public:
   Eigen::MatrixXd scores(Eigen::MatrixXd u,
                          bool step_wise = true,
                          const size_t num_threads = 1);
-  TriangularArray<std::vector<Eigen::MatrixXd>> hessian(
+  Eigen::MatrixXd hessian(Eigen::MatrixXd u,
+                          bool step_wise = true,
+                          const size_t num_threads = 1);
+  TriangularArray<std::vector<Eigen::MatrixXd>> hessian_full(
     Eigen::MatrixXd u,
     bool step_wise = true,
     const size_t num_threads = 1);
-  Eigen::MatrixXd hessian_avg(Eigen::MatrixXd u,
-                              bool step_wise = true,
-                              const size_t num_threads = 1);
   Eigen::MatrixXd scores_cov(Eigen::MatrixXd u,
                              bool step_wise = true,
                              const size_t num_threads = 1);

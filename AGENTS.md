@@ -407,7 +407,7 @@ For any behaviour change:
   accessors (`get_pair_copula`, `get_all_families`, …), structure
   accessors (`get_matrix`, `get_struct_array`, `get_order`), fit
   statistics (`loglik`/`aic`/`bic`/`mbicv`), `truncate`, the asymptotic
-  helpers (`scores`, `hessian`, `scores_cov`), and JSON I/O.
+  helpers (`scores`, `scores_cov`, `hessian`, `hessian_full`), and JSON I/O.
 - **`RVineStructure` / `CVineStructure` / `DVineStructure`**
   ([rvine_structure.hpp](include/vinecopulib/vinecop/rvine_structure.hpp))
   — the tree structure as an R-vine matrix / triangular array, with
