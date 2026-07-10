@@ -10,18 +10,19 @@
   (indep, gaussian, student, clayton, gumbel, frank, joe; feature parity with
   VineCopula's `BiCopDeriv`/`BiCopDeriv2`/`BiCopHfuncDeriv`/`BiCopHfuncDeriv2`)
   and internal central finite differences for the other parametric families.
-  `Vinecop::scores` and `Vinecop::hessian` now use them: the step-wise scores
-  differentiate each edge's log-density analytically, the full gradient is an
-  analytic RVineGrad-style cascade through the vine, and the joint
-  (non-step-wise) Hessian is an analytic second-order cascade à la
-  VineCopula's `RVineHessian` (Stoeber & Schepsmeier, 2013) — all falling
-  back to finite differences for models with discrete variables (the
-  step-wise Hessian also stays finite-difference). Models with nonparametric
-  (TLL) pair copulas are now rejected by `scores`/`hessian` (differentiating
-  w.r.t. an interpolation grid is meaningless). New `Vinecop::scores_full`
-  exposes the per-edge derivative caches behind the scores (`keep_all`
-  option, mirroring `pdf`/`pdf_full`), and `Vinecop::gradient` returns the
-  observation-average of the scores (mirroring how `hessian` averages
+  `Vinecop::scores` and `Vinecop::hessian` now use them, all computed
+  analytically through a shared per-edge derivative cascade: the step-wise
+  scores differentiate each edge's log-density, the full gradient is an
+  RVineGrad-style cascade through the vine, and both the joint (non-step-wise)
+  and step-wise Hessians are analytic (the joint one à la VineCopula's
+  `RVineHessian`; Stoeber & Schepsmeier, 2013), falling back to finite
+  differences only for models with discrete variables. Models with
+  nonparametric (TLL) pair copulas are now rejected by `scores`/`hessian`
+  (differentiating w.r.t. an interpolation grid is meaningless). New
+  `Vinecop::scores_full` exposes the per-edge derivative caches behind the
+  scores (`keep_all` option, mirroring `pdf`/`pdf_full`), and
+  `Vinecop::gradient` returns the observation-average of the scores
+  (mirroring how `hessian` averages
   `hessian_full`) (#683)
 * Add `Bicop::parameters_to_taildep()`/`Bicop::get_taildep()` to compute the tail
   dependence coefficients (returned as a 2x2 matrix collecting all four corners of

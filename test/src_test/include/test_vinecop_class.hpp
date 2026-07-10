@@ -638,6 +638,67 @@ TEST(VinecopDerivatives, hessian_matches_brute_force)
                         1e-12)); // threading determinism
 }
 
+// The analytic step-wise Hessian must match central finite differences of
+// the step-wise scores (the quantity the finite-difference path produced),
+// including a two-parameter (Student) edge's own-edge cross block.
+TEST(VinecopDerivatives, stepwise_hessian_matches_fd_of_scores)
+{
+  auto P1 = [](double v) { return Eigen::VectorXd::Constant(1, v).eval(); };
+  auto pcs = Vinecop::make_pair_copula_store(5);
+  pcs[0][0] = Bicop(BicopFamily::gaussian, 0, P1(0.6));
+  pcs[0][1] = Bicop(BicopFamily::clayton, 90, P1(2.5));
+  pcs[0][2] = Bicop(BicopFamily::gumbel, 180, P1(1.8));
+  pcs[0][3] = Bicop(BicopFamily::joe, 270, P1(2.2));
+  pcs[1][0] = Bicop(BicopFamily::frank, 0, P1(4.0));
+  Eigen::VectorXd st_par(2);
+  st_par << 0.5, 6.0;
+  pcs[1][1] = Bicop(BicopFamily::student, 0, st_par);
+  pcs[1][2] = Bicop(BicopFamily::clayton, 180, P1(1.2));
+  pcs[2][0] = Bicop(BicopFamily::gumbel, 0, P1(1.4));
+  pcs[2][1] = Bicop(BicopFamily::gaussian, 0, P1(-0.3));
+  pcs[3][0] = Bicop(BicopFamily::gaussian, 0, P1(0.2));
+  auto structure = DVineStructure({ 1, 2, 3, 4, 5 });
+  Vinecop vc(structure, pcs);
+  auto u = vc.simulate(120, false, 1, { 5, 6, 7 });
+
+  auto Ha = vc.hessian_full(u, true, 1);
+
+  std::vector<std::array<size_t, 3>> pl;
+  for (size_t t = 0; t < 4; ++t) {
+    for (size_t e = 0; e < 4 - t; ++e) {
+      size_t np = static_cast<size_t>(pcs[t][e].get_parameters().size());
+      for (size_t p = 0; p < np; ++p) {
+        pl.push_back({ t, e, p });
+      }
+    }
+  }
+  auto bump = [&](std::vector<std::vector<Bicop>> pp, size_t a, double h) {
+    auto pr = pp[pl[a][0]][pl[a][1]].get_parameters();
+    pr(pl[a][2]) += h;
+    pp[pl[a][0]][pl[a][1]].set_parameters(pr);
+    return pp;
+  };
+  for (size_t a = 0; a < pl.size(); ++a) {
+    double base = std::abs(pcs[pl[a][0]][pl[a][1]].get_parameters()(pl[a][2]));
+    double h = 1e-4 * std::max(1.0, base);
+    Eigen::MatrixXd sp = Vinecop(structure, bump(pcs, a, h)).scores(u, true, 1);
+    Eigen::MatrixXd sm =
+      Vinecop(structure, bump(pcs, a, -h)).scores(u, true, 1);
+    Eigen::MatrixXd fd = (sp - sm) / (2 * h);
+    EXPECT_TRUE(all_close(Ha(pl[a][0], pl[a][1])[pl[a][2]], fd, 1e-3, 1e-3))
+      << "param " << a;
+  }
+  // threading determinism
+  auto Ha3 = vc.hessian_full(u, true, 3);
+  for (size_t t = 0; t < 4; ++t) {
+    for (size_t e = 0; e < 4 - t; ++e) {
+      for (size_t p = 0; p < Ha(t, e).size(); ++p) {
+        EXPECT_TRUE(all_close(Ha(t, e)[p], Ha3(t, e)[p], 1e-12, 1e-12));
+      }
+    }
+  }
+}
+
 // A vine with a family outside the analytic set (bb1) still gets an analytic
 // joint Hessian: the second-order cascade calls the pair copula's derivative
 // leaves, which fall back to finite differences inside the leaf for bb1.

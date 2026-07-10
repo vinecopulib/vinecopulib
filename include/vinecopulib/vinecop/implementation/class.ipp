@@ -1729,13 +1729,13 @@ Vinecop::gradient(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 //!
 //! Hessian is meant loosely as "gradients of each component of the score
 //! function", i.e. `hess(t, e)[p](i, a) = ∂² log-likelihood_i / (∂θ_{t,e,p}
-//! ∂θ_a)`. For the joint (non-step-wise) Hessian of a continuous model it is
-//! computed analytically by a second-order cascade through the vine (the
-//! second derivative of the RVineGrad-style gradient cascade in `scores()`),
-//! using the pair copulas' analytic first and second derivatives; the
-//! step-wise Hessian and models with discrete variables use central finite
-//! differences of `scores()` instead. Models with nonparametric pair copulas
-//! are rejected.
+//! ∂θ_a)`. For a continuous model it is computed analytically from the pair
+//! copulas' first and second derivatives: the joint (non-step-wise) Hessian
+//! by a second-order cascade through the vine (the second derivative of the
+//! RVineGrad-style gradient cascade in `scores()`), and the step-wise Hessian
+//! by a first-order cascade of the step-wise score's argument derivatives.
+//! Models with discrete variables use central finite differences of
+//! `scores()` instead; models with nonparametric pair copulas are rejected.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
@@ -1763,9 +1763,9 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
 
   TriangularArray<std::vector<Eigen::MatrixXd>> hess(d_);
 
-  if (step_wise || (get_n_discrete() > 0)) {
+  if (get_n_discrete() > 0) {
     // central finite differences of the (analytic-where-possible) scores;
-    // used for the step-wise Hessian and for models with discrete variables
+    // used for models with discrete variables (both step-wise and joint)
     for (size_t t = 0; t < trunc_lvl; t++) {
       for (size_t e = 0; e < d_ - 1 - t; e++) {
         auto pars = pair_copulas_[t][e].get_parameters();
@@ -1794,25 +1794,20 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
     return hess;
   }
 
-  // Analytic joint Hessian: differentiate the gradient cascade a second
-  // time. For a parameter pair (α, β) a forward walk propagates the first
-  // derivatives of each edge's arguments w.r.t. α ("hat") and β ("tilde")
-  // and their mixed second derivative ("bar"), accumulating
-  //   H_αβ = Σ_e [ ∂²logc/∂p²·P^α P^β + ∂²logc/∂p∂q·(P^α Q^β + Q^α P^β)
-  //               + ∂²logc/∂q²·Q^α Q^β + ∂logc/∂p·P^{αβ} + ∂logc/∂q·Q^{αβ}
-  //               + θ-argument cross terms and the ∂²logc/∂θ² seed ],
-  // where the bar quantities propagate with the h-function's own second
-  // derivatives. Every derivative is a Bicop leaf (using ∂h2/∂u1 =
-  // ∂h1/∂u2 = c); see hessian_full()'s @literature reference.
+  // Analytic Hessian (continuous, all-parametric). Both variants use the
+  // per-edge derivative caches from build_deriv_cache() and the shared
+  // first-order propagation; see hessian_full()'s @literature reference.
   const size_t npars = static_cast<size_t>(this->get_npars());
 
-  // flat parameter index -> (tree, edge, param), and allocate the per-edge
-  // per-observation output blocks
+  // flat parameter index <-> (tree, edge, param), the first flat index of
+  // each edge, and the per-edge per-observation output blocks
   std::vector<std::array<size_t, 3>> par_of(npars);
+  TriangularArray<size_t> par0(d_, trunc_lvl);
   {
     size_t idx = 0;
     for (size_t t = 0; t < trunc_lvl; t++) {
       for (size_t e = 0; e < d_ - 1 - t; e++) {
+        par0(t, e) = idx;
         size_t np =
           static_cast<size_t>(pair_copulas_[t][e].get_parameters().size());
         hess(t, e).resize(np);
@@ -1824,6 +1819,98 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
     }
   }
 
+  if (step_wise) {
+    // Analytic step-wise Hessian: the step-wise score of edge e', parameter
+    // p', is s = ∂logc_{e'}/∂θ_{p'} evaluated at fixed pseudo-observations,
+    // so its derivative w.r.t. a parameter α of edge (tα, eα) is only
+    //   ∂²logc_{eα}/∂θ_p∂θ_{p'}          (α's own edge, u_e fixed), or
+    //   ∂²logc_{e'}/∂θ_{p'}∂u1 · P^α + ∂²logc/∂θ_{p'}∂u2 · Q^α   (deeper e'),
+    // where P^α, Q^α are the first-order perturbations of e''s arguments,
+    // propagated by the same cascade as the gradient. No second-order
+    // ("bar") propagation is needed. Upper-triangular in the flat order.
+    auto do_batch = [&](const tools_batch::Batch& b) {
+      const size_t m = b.size;
+      auto cache = build_deriv_cache(u, b.begin, m, true);
+
+      Eigen::MatrixXd tilde1(m, d_), tilde2(m, d_);
+      std::vector<char> aff1(d_), aff2(d_);
+      for (size_t a = 0; a < npars; ++a) {
+        size_t ta = par_of[a][0], ea = par_of[a][1], pa = par_of[a][2];
+        const DerivCache& seed = cache(ta, ea);
+
+        // own edge: ∂ s_{(ta,ea,cp)} / ∂θ_{(ta,ea,pa)} = ∂²logc/∂θ_pa∂θ_cp
+        for (size_t cp = 0; cp < seed.np; ++cp) {
+          hess(ta, ea)[pa].block(b.begin, par0(ta, ea) + cp, m, 1) =
+            seed.lpar_par[pa][cp];
+        }
+
+        // propagate α's first-order perturbation to the deeper edges
+        std::fill(aff1.begin(), aff1.end(), 0);
+        std::fill(aff2.begin(), aff2.end(), 0);
+        if (seed.o1.active) {
+          tilde1.col(ea) = seed.o1.dpar[pa];
+          aff1[ea] = 1;
+        }
+        if (seed.o2.active) {
+          tilde2.col(ea) = seed.o2.dpar[pa];
+          aff2[ea] = 1;
+        }
+        for (size_t t = ta + 1; t < trunc_lvl; ++t) {
+          for (size_t e = 0; e < d_ - t - 1; ++e) {
+            const DerivCache& ce = cache(t, e);
+            size_t msrc = ce.msrc;
+            bool a1 = (aff2[e] != 0);
+            bool a2 = ce.direct ? (aff2[msrc - 1] != 0) : (aff1[msrc - 1] != 0);
+            if (!a1 && !a2) {
+              aff1[e] = 0;
+              aff2[e] = 0;
+              continue;
+            }
+            Eigen::VectorXd v1 = Eigen::VectorXd::Zero(m);
+            Eigen::VectorXd v2 = Eigen::VectorXd::Zero(m);
+            if (a1) {
+              v1 = tilde2.col(e);
+            }
+            if (a2) {
+              v2 = ce.direct ? tilde2.col(msrc - 1) : tilde1.col(msrc - 1);
+            }
+            for (size_t cp = 0; cp < ce.np; ++cp) {
+              hess(ta, ea)[pa].block(b.begin, par0(t, e) + cp, m, 1) =
+                ce.lpar_u1[cp].cwiseProduct(v1) +
+                ce.lpar_u2[cp].cwiseProduct(v2);
+            }
+            if (ce.o2.active) {
+              tilde2.col(e) =
+                propagate_first_order(ce.o2.du1, ce.o2.du2, v1, v2);
+            }
+            if (ce.o1.active) {
+              tilde1.col(e) =
+                propagate_first_order(ce.o1.du1, ce.o1.du2, v1, v2);
+            }
+            aff1[e] = ce.o1.active ? 1 : 0;
+            aff2[e] = ce.o2.active ? 1 : 0;
+          }
+        }
+      }
+    };
+
+    if (trunc_lvl > 0) {
+      tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
+      pool.map(do_batch, tools_batch::create_batches(u.rows(), num_threads));
+      pool.join();
+    }
+    return hess;
+  }
+
+  // Analytic joint Hessian: differentiate the gradient cascade a second
+  // time. For a parameter pair (α, β) a forward walk propagates the first
+  // derivatives of each edge's arguments w.r.t. α ("hat") and β ("tilde")
+  // and their mixed second derivative ("bar"), accumulating
+  //   H_αβ = Σ_e [ ∂²logc/∂p²·P^α P^β + ∂²logc/∂p∂q·(P^α Q^β + Q^α P^β)
+  //               + ∂²logc/∂q²·Q^α Q^β + ∂logc/∂p·P^{αβ} + ∂logc/∂q·Q^{αβ}
+  //               + θ-argument cross terms and the ∂²logc/∂θ² seed ],
+  // where the bar quantities propagate with the h-function's own second
+  // derivatives.
   auto do_batch = [&](const tools_batch::Batch& b) {
     const size_t m = b.size;
     // one forward walk fills every per-edge first- and second-order leaf
@@ -1960,23 +2047,37 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
 inline Eigen::MatrixXd
 Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
-  auto hess = this->hessian_full(u, step_wise, num_threads);
-  size_t npars = static_cast<size_t>(this->get_npars());
-  Eigen::MatrixXd H(npars, npars);
-
+  const size_t npars = static_cast<size_t>(this->get_npars());
+  Eigen::MatrixXd H = Eigen::MatrixXd::Zero(npars, npars);
+  const size_t n = static_cast<size_t>(u.rows());
+  if (n == 0 || npars == 0) {
+    return H;
+  }
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
-  size_t ipar = 0;
-  for (size_t t = 0; t < trunc_lvl; t++) {
-    for (size_t e = 0; e < d_ - 1 - t; e++) {
-      for (size_t p = 0;
-           p < static_cast<size_t>(pair_copulas_[t][e].get_parameters().size());
-           p++) {
-        H.row(ipar++) = hess(t, e)[p].colwise().mean();
+
+  // ponytail: process observations in row-chunks so peak memory is
+  // O(chunk * npars^2) rather than O(n * npars^2) -- hessian_full()
+  // materialises the per-observation Hessian, which hessian() only needs in
+  // aggregate. The chunk caps that at ~4M doubles; call hessian_full()
+  // directly (or raise the cap) if you need the full per-observation tensor.
+  // The overall analytic cascade is O(n * d^6) (npars^2 pairs x O(d^2)
+  // edges) for one-parameter families.
+  const size_t chunk =
+    std::max<size_t>(1, 4000000 / std::max<size_t>(1, npars * npars));
+  for (size_t begin = 0; begin < n; begin += chunk) {
+    size_t size = std::min(chunk, n - begin);
+    auto hess =
+      this->hessian_full(u.middleRows(begin, size), step_wise, num_threads);
+    size_t ipar = 0;
+    for (size_t t = 0; t < trunc_lvl; t++) {
+      for (size_t e = 0; e < d_ - 1 - t; e++) {
+        for (size_t p = 0; p < hess(t, e).size(); p++) {
+          H.row(ipar++) += hess(t, e)[p].colwise().sum();
+        }
       }
     }
   }
-
-  return H;
+  return H / static_cast<double>(n);
 }
 
 //! @brief Computes the covariance matrix of scores.
