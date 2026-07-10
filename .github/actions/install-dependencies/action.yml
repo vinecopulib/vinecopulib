@@ -127,11 +127,22 @@ runs:
 
     - name: Install VineCopula
       if: inputs.R == 'true'
+      env:
+        # authenticate the GitHub API call so install_github does not fall back
+        # to the rate-limited bundled PAT (mirrors the job-level GITHUB_PAT;
+        # set here too so the action stays self-contained)
+        GITHUB_PAT: ${{ github.token }}
       run: |
         if [ "${{ inputs.os }}" == "ubuntu-latest" ]; then
             sudo apt-get install --no-install-recommends -y libgsl0-dev
         elif [ "${{ inputs.os }}" == "macos-latest" ]; then
             brew install gsl
         fi
-        Rscript -e "install.packages('VineCopula', repos='http://cran.rstudio.com/')"
+        # Install the CRAN release first (pulls in every dependency as a
+        # binary), then upgrade VineCopula itself to the GitHub version: 2.6.2
+        # is required by the derivative parity tests (RVineGrad / RVineHessian
+        # rotation + sample-size fixes, tnagler/VineCopula #101, #102) but is
+        # not on CRAN yet, so only VineCopula compiles from source.
+        Rscript -e "install.packages(c('VineCopula', 'remotes'), repos='http://cran.rstudio.com/')"
+        Rscript -e "remotes::install_github('tnagler/VineCopula', upgrade = 'never')"
       shell: bash
