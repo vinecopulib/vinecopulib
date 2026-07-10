@@ -72,6 +72,46 @@ TEST(rvine_structure, triangular_array_works)
   EXPECT_FALSE(ta4 < ta3);
 }
 
+TEST(rvine_structure, triangular_array_conversions_work)
+{
+  std::vector<std::vector<size_t>> rows = {
+    { 1, 2, 3, 4 }, { 4, 5, 6 }, { 6, 7 }, { 8 }
+  };
+  TriangularArray<size_t> ta(rows);
+
+  // to_list() returns the rows; round-trips through the nested-vector
+  // constructor.
+  EXPECT_EQ(ta.to_list(), rows);
+  EXPECT_TRUE(TriangularArray<size_t>(ta.to_list()) == ta);
+
+  // to_json() carries dimension, truncation level, and rows; round-trips
+  // through the JSON constructor.
+  auto json = ta.to_json();
+  EXPECT_EQ(json["d"].get<size_t>(), ta.get_dim());
+  EXPECT_EQ(json["t"].get<size_t>(), ta.get_trunc_lvl());
+  EXPECT_TRUE(TriangularArray<size_t>(json) == ta);
+
+  // Truncated arrays keep the reduced number of rows.
+  ta.truncate(2);
+  EXPECT_EQ(ta.to_list().size(), static_cast<size_t>(2));
+  EXPECT_EQ(ta.to_json()["t"].get<size_t>(), static_cast<size_t>(2));
+  EXPECT_TRUE(TriangularArray<size_t>(ta.to_json()) == ta);
+
+  // Arrays allocated by dimension (internal rows are over-allocated by one
+  // element) still convert to rows of the logical length d - 1 - i.
+  TriangularArray<size_t> filled(5, 2);
+  for (size_t i = 0; i < 2; i++) {
+    for (size_t j = 0; j < 5 - 1 - i; j++) {
+      filled(i, j) = i + j;
+    }
+  }
+  auto filled_rows = filled.to_list();
+  ASSERT_EQ(filled_rows.size(), static_cast<size_t>(2));
+  EXPECT_EQ(filled_rows[0].size(), static_cast<size_t>(4));
+  EXPECT_EQ(filled_rows[1].size(), static_cast<size_t>(3));
+  EXPECT_TRUE(TriangularArray<size_t>(filled_rows) == filled);
+}
+
 TEST(rvine_structure, rvine_structure_print)
 {
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(7, 7);

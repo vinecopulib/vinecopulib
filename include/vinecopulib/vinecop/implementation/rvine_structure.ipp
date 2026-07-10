@@ -145,10 +145,9 @@ inline RVineStructure::RVineStructure(
 //!      a valid R-vine structure.
 inline RVineStructure::RVineStructure(const nlohmann::json& input,
                                       const bool check)
-  : RVineStructure(
-      tools_serialization::json_to_vector<size_t>(input["order"]),
-      tools_serialization::json_to_triangular_array<size_t>(input["array"]),
-      check)
+  : RVineStructure(tools_serialization::json_to_vector<size_t>(input["order"]),
+                   TriangularArray<size_t>(input["array"]),
+                   check)
 {
 }
 
@@ -176,11 +175,8 @@ inline nlohmann::json
 RVineStructure::to_json() const
 {
   nlohmann::json output;
-  auto array_json =
-    tools_serialization::triangular_array_to_json(struct_array_);
-  output["array"] = array_json;
-  auto order_json = tools_serialization::vector_to_json(order_);
-  output["order"] = order_json;
+  output["array"] = struct_array_.to_json();
+  output["order"] = tools_serialization::vector_to_json(order_);
 
   return output;
 }
