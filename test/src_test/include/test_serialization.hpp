@@ -100,11 +100,6 @@ TEST(serialization, parametric_bicop_cbor_roundtrip)
   TemporaryFile automatic_file("serialization_parametric.cbor");
   bicop.to_file(automatic_file.filename());
   expect_bicops_equal(bicop, Bicop(automatic_file.filename()));
-
-  TemporaryFile explicit_file("serialization_parametric.bin");
-  bicop.to_file(explicit_file.filename(), SerializationFormat::cbor);
-  expect_bicops_equal(
-    bicop, Bicop(explicit_file.filename(), SerializationFormat::cbor));
 }
 
 TEST(serialization, tll_bicop_cbor_roundtrip)
@@ -129,10 +124,9 @@ TEST(serialization, mixed_vinecop_cbor_roundtrip)
 
   auto truncated = vinecop;
   truncated.truncate(2);
-  TemporaryFile explicit_file("serialization_vinecop_truncated.bin");
-  truncated.to_file(explicit_file.filename(), SerializationFormat::cbor);
-  expect_vinecops_equal(
-    truncated, Vinecop(explicit_file.filename(), SerializationFormat::cbor));
+  TemporaryFile truncated_file("serialization_vinecop_truncated.cbor");
+  truncated.to_file(truncated_file.filename());
+  expect_vinecops_equal(truncated, Vinecop(truncated_file.filename()));
 }
 
 TEST(serialization, rvine_structure_cbor_roundtrip)
@@ -187,7 +181,7 @@ TEST(serialization, malformed_files_report_the_encoding)
   }
 }
 
-TEST(serialization, reports_open_and_format_errors)
+TEST(serialization, reports_open_and_write_errors)
 {
   EXPECT_THROW(Bicop(std::string("serialization_missing/model.json")),
                std::runtime_error);
@@ -195,10 +189,5 @@ TEST(serialization, reports_open_and_format_errors)
   const Bicop bicop;
   EXPECT_THROW(bicop.to_file("serialization_missing/model.cbor"),
                std::runtime_error);
-
-  TemporaryFile file("serialization_unsupported");
-  const auto unsupported = static_cast<SerializationFormat>(100);
-  EXPECT_THROW(bicop.to_file(file.filename(), unsupported),
-               std::invalid_argument);
 }
 }

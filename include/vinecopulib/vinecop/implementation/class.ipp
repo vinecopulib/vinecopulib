@@ -185,19 +185,6 @@ inline Vinecop::Vinecop(const std::string& filename, const bool check)
 {
 }
 
-//! @brief Instantiates from a JSON or CBOR file.
-//!
-//! @param filename The name of the file to read.
-//! @param format The file encoding.
-//! @param check Whether to check if the `"structure"` node of the input
-//! represents a valid R-vine structure.
-inline Vinecop::Vinecop(const std::string& filename,
-                        const SerializationFormat format,
-                        const bool check)
-  : Vinecop(tools_serialization::file_to_json(filename, format), check)
-{
-}
-
 //! @brief Converts the copula into a nlohmann::json object.
 //!
 //! @details The `nlohmann::json` object contains two nodes : `"structure"`
@@ -253,17 +240,6 @@ inline void
 Vinecop::to_file(const std::string& filename) const
 {
   tools_serialization::json_to_file(filename, this->to_json());
-}
-
-//! @brief Writes the copula object into a JSON or CBOR file.
-//!
-//! @param filename The name of the file to write.
-//! @param format The file encoding.
-inline void
-Vinecop::to_file(const std::string& filename,
-                 const SerializationFormat format) const
-{
-  tools_serialization::json_to_file(filename, this->to_json(), format);
 }
 
 //! @brief Initializes object for storing pair copulas.

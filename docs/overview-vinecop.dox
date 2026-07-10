@@ -241,13 +241,9 @@ Vinecop vinecop3(std::string("myfile.json"));
 // The .cbor extension selects binary CBOR automatically
 vinecop.to_file(std::string("myfile.cbor"));
 Vinecop vinecop4(std::string("myfile.cbor"));
-
-// The format can also be selected explicitly, independently of the extension
-vinecop.to_file(std::string("myfile.bin"), SerializationFormat::cbor);
-Vinecop vinecop5(std::string("myfile.bin"), SerializationFormat::cbor);
 ```
 
 For backwards compatibility, filenames without a `.cbor` extension continue
-to use JSON unless `SerializationFormat::cbor` is specified explicitly.
+to use JSON.
 
 */

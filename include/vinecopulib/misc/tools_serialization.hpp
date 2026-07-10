@@ -25,41 +25,20 @@
 
 namespace vinecopulib {
 
-//! @brief Encoding used for model persistence.
-//!
-//! JSON is the human-readable interchange format. CBOR is a binary encoding
-//! of the same logical `nlohmann::json` representation.
-enum class SerializationFormat
-{
-  json,
-  cbor
-};
-
 namespace tools_serialization {
 
-inline const char*
-serialization_format_name(const SerializationFormat format)
-{
-  switch (format) {
-    case SerializationFormat::json:
-      return "JSON";
-    case SerializationFormat::cbor:
-      return "CBOR";
-    default:
-      throw std::invalid_argument("unsupported serialization format");
-  }
-}
-
-inline SerializationFormat
-serialization_format_from_filename(const std::string& filename)
+//! @brief Whether a filename selects the binary CBOR encoding.
+//!
+//! CBOR is a binary encoding of the same logical `nlohmann::json`
+//! representation; filenames ending in `.cbor` use it, all others use JSON.
+inline bool
+is_cbor_filename(const std::string& filename)
 {
   const std::string extension = ".cbor";
-  if (filename.size() >= extension.size() &&
-      filename.compare(
-        filename.size() - extension.size(), extension.size(), extension) == 0) {
-    return SerializationFormat::cbor;
-  }
-  return SerializationFormat::json;
+  return filename.size() >= extension.size() &&
+         filename.compare(filename.size() - extension.size(),
+                          extension.size(),
+                          extension) == 0;
 }
 
 //! conversion from Eigen::Matrix to nlohmann::json
@@ -171,12 +150,15 @@ json_to_vector(const nlohmann::json& input)
   return res;
 }
 
+//! @brief Reads a `nlohmann::json` from a JSON or CBOR file.
+//!
+//! Files ending in `.cbor` are read as CBOR, all others as JSON.
 inline nlohmann::json
-file_to_json(const std::string& filename, const SerializationFormat format)
+file_to_json(const std::string& filename)
 {
-  const auto format_name = serialization_format_name(format);
+  const bool cbor = is_cbor_filename(filename);
   auto mode = std::ios::in;
-  if (format == SerializationFormat::cbor) {
+  if (cbor) {
     mode |= std::ios::binary;
   }
   std::ifstream file(filename, mode);
@@ -185,26 +167,28 @@ file_to_json(const std::string& filename, const SerializationFormat format)
   }
 
   try {
-    if (format == SerializationFormat::cbor) {
+    if (cbor) {
       return nlohmann::json::from_cbor(file);
     }
     nlohmann::json output;
     file >> output;
     return output;
   } catch (const nlohmann::json::exception& exception) {
-    throw std::runtime_error("failed to parse " + std::string(format_name) +
-                             " file " + filename + ": " + exception.what());
+    throw std::runtime_error("failed to parse " +
+                             std::string(cbor ? "CBOR" : "JSON") + " file " +
+                             filename + ": " + exception.what());
   }
 }
 
+//! @brief Writes a `nlohmann::json` to a JSON or CBOR file.
+//!
+//! Filenames ending in `.cbor` are written as CBOR, all others as JSON.
 inline void
-json_to_file(const std::string& filename,
-             const nlohmann::json& json,
-             const SerializationFormat format)
+json_to_file(const std::string& filename, const nlohmann::json& json)
 {
-  serialization_format_name(format);
+  const bool cbor = is_cbor_filename(filename);
   auto mode = std::ios::out;
-  if (format == SerializationFormat::cbor) {
+  if (cbor) {
     mode |= std::ios::binary;
   }
   std::ofstream file(filename, mode);
@@ -212,7 +196,7 @@ json_to_file(const std::string& filename,
     throw std::runtime_error("could not open " + filename + " for writing");
   }
 
-  if (format == SerializationFormat::cbor) {
+  if (cbor) {
     nlohmann::json::to_cbor(json, file);
   } else {
     file << json << std::endl;
@@ -221,18 +205,6 @@ json_to_file(const std::string& filename,
   if (!file) {
     throw std::runtime_error("failed to write " + filename);
   }
-}
-
-inline nlohmann::json
-file_to_json(const std::string& filename)
-{
-  return file_to_json(filename, serialization_format_from_filename(filename));
-}
-
-inline void
-json_to_file(const std::string& filename, const nlohmann::json& json)
-{
-  json_to_file(filename, json, serialization_format_from_filename(filename));
 }
 }
 }

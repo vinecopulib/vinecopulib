@@ -108,15 +108,10 @@ public:
                  bool natural_order = false,
                  bool check = true);
   explicit RVineStructure(const std::string& filename, const bool check = true);
-  explicit RVineStructure(const std::string& filename,
-                          const SerializationFormat format,
-                          const bool check = true);
   explicit RVineStructure(const nlohmann::json& input, const bool check = true);
 
   nlohmann::json to_json() const;
   void to_file(const std::string& filename) const;
-  void to_file(const std::string& filename,
-               const SerializationFormat format) const;
 
   //! @return the dimension of the vine (number of variables).
   size_t get_dim() const;

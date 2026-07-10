@@ -120,16 +120,6 @@ inline Bicop::Bicop(const std::string& filename)
 {
 }
 
-//! @brief Instantiates from a JSON or CBOR file.
-//!
-//! @param filename The name of the file to read.
-//! @param format The file encoding.
-inline Bicop::Bicop(const std::string& filename,
-                    const SerializationFormat format)
-  : Bicop(tools_serialization::file_to_json(filename, format))
-{
-}
-
 //! @brief Convert the copula into a nlohmann::json object.
 //!
 //! @details The `nlohmann::json` is contains of three values named
@@ -172,17 +162,6 @@ inline void
 Bicop::to_file(const std::string& filename) const
 {
   tools_serialization::json_to_file(filename, to_json());
-}
-
-//! @brief Writes the copula object into a JSON or CBOR file.
-//!
-//! @param filename The name of the file to write.
-//! @param format The file encoding.
-inline void
-Bicop::to_file(const std::string& filename,
-               const SerializationFormat format) const
-{
-  tools_serialization::json_to_file(filename, to_json(), format);
 }
 
 //! @brief Evaluates the copula density.

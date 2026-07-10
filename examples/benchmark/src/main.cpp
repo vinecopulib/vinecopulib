@@ -156,21 +156,19 @@ benchmark_persistence(int d = 10, unsigned int repeats = 10)
   const std::string cbor_filename = "persistence_benchmark.cbor";
   const auto seeds = Eigen::VectorXi::LinSpaced(repeats, 1, repeats);
 
-  const auto json_write = benchmark_func(
-    [&](unsigned) { model.to_file(json_filename, SerializationFormat::json); },
-    seeds);
-  const auto cbor_write = benchmark_func(
-    [&](unsigned) { model.to_file(cbor_filename, SerializationFormat::cbor); },
-    seeds);
+  const auto json_write =
+    benchmark_func([&](unsigned) { model.to_file(json_filename); }, seeds);
+  const auto cbor_write =
+    benchmark_func([&](unsigned) { model.to_file(cbor_filename); }, seeds);
   const auto json_read = benchmark_func(
     [&](unsigned) {
-      const Vinecop restored(json_filename, SerializationFormat::json);
+      const Vinecop restored(json_filename);
       (void)restored;
     },
     seeds);
   const auto cbor_read = benchmark_func(
     [&](unsigned) {
-      const Vinecop restored(cbor_filename, SerializationFormat::cbor);
+      const Vinecop restored(cbor_filename);
       (void)restored;
     },
     seeds);
@@ -191,13 +189,8 @@ benchmark_persistence(int d = 10, unsigned int repeats = 10)
 }
 
 int
-main(int argc, char** argv)
+main()
 {
-  if (argc > 1 && std::string(argv[1]) == "persistence") {
-    benchmark_persistence();
-    return 0;
-  }
-
   benchmark_vinecop_fitting();
   benchmark_bicop_tll();
   benchmark_persistence();
