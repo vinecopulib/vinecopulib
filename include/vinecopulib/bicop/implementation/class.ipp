@@ -854,8 +854,35 @@ Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters) const
 //! \f$ M(i, j) \f$ is the coefficient as \f$ U_1 \to i \f$ and
 //! \f$ U_2 \to j \f$, with \f$ i, j \in \{0, 1\} \f$ (0 = lower, 1 = upper).
 //! Thus \f$ M(0, 0) \f$ is the classical lower and \f$ M(1, 1) \f$ the
-//! classical upper tail dependence coefficient. The coefficients are \c NaN
-//! for the nonparametric (`tll`) family.
+//! classical upper tail dependence coefficient.
+//!
+//! For the unrotated family, the lower \f$ \lambda_L = M(0, 0) \f$ and upper
+//! \f$ \lambda_U = M(1, 1) \f$ coefficients are:
+//!
+//! | Family | Lower \f$ \lambda_L \f$ | Upper \f$ \lambda_U \f$ |
+//! | --- | --- | --- |
+//! | Independence, Gaussian, Frank | \f$ 0 \f$ | \f$ 0 \f$ |
+//! | Student t | \f$ \lambda_t \f$ (see below) | \f$ \lambda_t \f$ |
+//! | Clayton | \f$ 2^{-1/\theta} \f$ | \f$ 0 \f$ |
+//! | Gumbel | \f$ 0 \f$ | \f$ 2 - 2^{1/\theta} \f$ |
+//! | Joe | \f$ 0 \f$ | \f$ 2 - 2^{1/\theta} \f$ |
+//! | BB1 | \f$ 2^{-1/(\theta\delta)} \f$ | \f$ 2 - 2^{1/\delta} \f$ |
+//! | BB6 | \f$ 0 \f$ | \f$ 2 - 2^{1/(\theta\delta)} \f$ |
+//! | BB7 | \f$ 2^{-1/\delta} \f$ | \f$ 2 - 2^{1/\theta} \f$ |
+//! | BB8 | \f$ 0 \f$ | \f$ 2 - 2^{1/\theta} \f$ if \f$ \delta=1 \f$, else 0 |
+//! | Tawn (extreme-value) | \f$ 0 \f$ | \f$ 2 (1 - A(1/2)) \f$ |
+//! | TLL (nonparametric) | \c NaN | \c NaN |
+//!
+//! Here \f$ \theta \f$ (and \f$ \delta \f$ for two-parameter families) denote
+//! the copula parameters and \f$ A \f$ the Pickands dependence function. For
+//! the Student t copula, with correlation \f$ \rho \f$, degrees of freedom
+//! \f$ \nu \f$, and \f$ t_{\nu+1} \f$ the Student t cdf,
+//! \f$ \lambda_t = 2\, t_{\nu+1}(-\sqrt{(\nu+1)(1-\rho)/(1+\rho)}) \f$; it
+//! additionally has equal dependence in the two off-diagonal (discordant)
+//! corners, obtained by replacing \f$ \rho \f$ with \f$ -\rho \f$. All other
+//! parametric families have zero off-diagonal coefficients. Rotations permute
+//! the corners: 180 degrees swaps lower/upper, while 90/270 degrees move
+//! dependence to the off-diagonal corners.
 //!
 //! @param parameters The parameters (must be a valid parametrization of
 //!     the current family).
@@ -878,6 +905,10 @@ Bicop::parameters_to_taildep(const Eigen::MatrixXd& parameters) const
 }
 
 //! @brief Converts the copula parameters to Blomqvist's \f$ \beta \f$.
+//!
+//! @details Blomqvist's beta is computed from the copula cdf as
+//! \f$ \beta = 4\, C(0.5, 0.5) - 1 \f$, using the same formula for every
+//! family (including the nonparametric `tll`).
 //!
 //! @param parameters The parameters (must be a valid parametrization of
 //!     the current family).
