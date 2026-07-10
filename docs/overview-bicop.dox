@@ -196,8 +196,12 @@ auto bic  = bicop.bic(sim_data);
 ```
 
 
-Bivariate copula models can also be written to and constructed from JSON files
-and [`nlohmann::json` objects](https://github.com/nlohmann/json):
+Bivariate copula models can also be written to and constructed from JSON or
+CBOR files and
+[`nlohmann::json` objects](https://github.com/nlohmann/json). CBOR is a binary
+encoding of exactly the same logical JSON representation. It is generally
+substantially smaller and faster to parse than the JSON output, while JSON
+remains useful for inspection and interchange.
 
 ```
 // Gauss copula with parameter 0.5
@@ -207,18 +211,30 @@ Bicop bicop(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
 nlohmann::json bicop_json = bicop.to_json();
 
 // Write into a JSON file
-std::string filename = "myfile.json"
-std::ofstream file(myfile);
+std::string filename = "myfile.json";
+std::ofstream file(filename);
 file << bicop_json << std::endl;
+file.close();
 
 // Equivalently
-bicop.to_file(std::string("myfile.json"));
+bicop.to_file(filename);
 
 // Then a new Bicop can be constructed from the nlohmann::json object
 Bicop bicop2(bicop_json);
 
 // Or from the JSON file
 Bicop bicop3(std::string("myfile.json"));
+
+// The .cbor extension selects binary CBOR automatically
+bicop.to_file(std::string("myfile.cbor"));
+Bicop bicop4(std::string("myfile.cbor"));
+
+// The format can also be selected explicitly, independently of the extension
+bicop.to_file(std::string("myfile.bin"), SerializationFormat::cbor);
+Bicop bicop5(std::string("myfile.bin"), SerializationFormat::cbor);
 ```
+
+For backwards compatibility, filenames without a `.cbor` extension continue
+to use JSON unless `SerializationFormat::cbor` is specified explicitly.
 
 */

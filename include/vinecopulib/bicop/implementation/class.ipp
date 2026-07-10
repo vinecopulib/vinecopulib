@@ -104,17 +104,29 @@ inline Bicop::Bicop(const nlohmann::json& input)
   }
 }
 
-//! @brief Instantiates from a JSON file.
+//! @brief Instantiates from a JSON or CBOR file.
 //!
-//! @details The input file contains four attributes:
+//! @details Files ending in `.cbor` are read as CBOR. All other filenames are
+//! read as JSON for backwards compatibility. The input contains four
+//! attributes:
 //! `"fam"`, `"rot"`, `"par"`, `"vt"` respectively a
 //! string for the family name, an integer for the rotation, and a numeric
 //! matrix for the parameters, and a list of two strings for the variable
 //! types.
 //!
-//! @param filename The name of the JSON file to read.
+//! @param filename The name of the file to read.
 inline Bicop::Bicop(const std::string& filename)
   : Bicop(tools_serialization::file_to_json(filename))
+{
+}
+
+//! @brief Instantiates from a JSON or CBOR file.
+//!
+//! @param filename The name of the file to read.
+//! @param format The file encoding.
+inline Bicop::Bicop(const std::string& filename,
+                    const SerializationFormat format)
+  : Bicop(tools_serialization::file_to_json(filename, format))
 {
 }
 
@@ -142,9 +154,11 @@ Bicop::to_json() const
   return output;
 }
 
-//! @brief Write the copula object into a JSON file.
+//! @brief Writes the copula object into a JSON or CBOR file.
 //!
-//! @details The written file contains four attributes:
+//! @details Filenames ending in `.cbor` are written as CBOR. All other
+//! filenames are written as JSON for backwards compatibility. The written
+//! representation contains four attributes:
 //! `"fam"`, `"rot"`, `"par"`, `"vt"`, `"nobs"`, `"ll"`, `"npars"`
 //! respectively a string for the family name, an integer for the rotation, and
 //! a numeric matrix for the parameters, a list of two strings for the
@@ -158,6 +172,17 @@ inline void
 Bicop::to_file(const std::string& filename) const
 {
   tools_serialization::json_to_file(filename, to_json());
+}
+
+//! @brief Writes the copula object into a JSON or CBOR file.
+//!
+//! @param filename The name of the file to write.
+//! @param format The file encoding.
+inline void
+Bicop::to_file(const std::string& filename,
+               const SerializationFormat format) const
+{
+  tools_serialization::json_to_file(filename, to_json(), format);
 }
 
 //! @brief Evaluates the copula density.

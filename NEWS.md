@@ -2,6 +2,10 @@
 
 ### NEW FEATURES
 
+* Add binary CBOR persistence for `Bicop`, `Vinecop`, and `RVineStructure`,
+  with automatic `.cbor` extension detection and explicit
+  `SerializationFormat` overloads (#684).
+
 * Add per-row-parameter overloads of `Bicop::pdf`, `cdf`, `hfunc1`, `hfunc2`, `hinv1`, `hinv2`,
   and `loglik` that evaluate a bivariate copula at a different parameter set per row of `u` in a
   single (optionally multi-threaded) call. The new overloads take an `n x p` matrix of parameters

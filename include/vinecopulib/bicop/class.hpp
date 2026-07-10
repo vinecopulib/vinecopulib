@@ -7,7 +7,7 @@
 #pragma once
 
 #include <vinecopulib/bicop/fit_controls.hpp>
-#include <vinecopulib/misc/nlohmann_json.hpp>
+#include <vinecopulib/misc/tools_serialization.hpp>
 
 namespace vinecopulib {
 
@@ -60,6 +60,8 @@ public:
 
   explicit Bicop(const std::string& filename);
 
+  explicit Bicop(const std::string& filename, const SerializationFormat format);
+
   explicit Bicop(const nlohmann::json& input);
 
   Bicop& operator=(Bicop other);
@@ -68,6 +70,9 @@ public:
   nlohmann::json to_json() const;
 
   void to_file(const std::string& filename) const;
+
+  void to_file(const std::string& filename,
+               const SerializationFormat format) const;
 
   // Getters and setters
 
