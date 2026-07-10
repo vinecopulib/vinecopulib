@@ -81,6 +81,15 @@ private:
     const Eigen::MatrixXd& u,
     const Eigen::MatrixXd& parameters,
     int comp);
+
+  // central finite differences of a scalar objective `f` w.r.t. each
+  // optimization variable, used as the gradient fallback when no analytic
+  // score is available (e.g. discrete data). Steps are clipped to `[lb, ub]`.
+  Eigen::VectorXd fd_grad(
+    const std::function<double(const Eigen::VectorXd&)>& f,
+    const Eigen::VectorXd& x,
+    const Eigen::VectorXd& lb,
+    const Eigen::VectorXd& ub);
   double winsorize_tau(double tau) const;
 
   void adjust_parameters_bounds(Eigen::MatrixXd& lb,

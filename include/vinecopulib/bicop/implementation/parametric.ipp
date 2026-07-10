@@ -4,7 +4,6 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include <vinecopulib/misc/tools_bobyqa.hpp>
 #include <vinecopulib/misc/tools_optimization.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
@@ -93,24 +92,82 @@ ParBicop::fit(const Eigen::MatrixXd& data,
   adjust_parameters_bounds(lb, ub, tau, method);
   auto initial_parameters = get_start_parameters(winsorize_tau(tau));
 
-  // find (pseudo-) mle
-  std::function<double(const Eigen::VectorXd&)> objective;
+  // find (pseudo-) mle. the optimizer works in an unconstrained space and only
+  // ever sees natural parameters; it needs both the value and the gradient.
+  // continuous data uses the analytic (or finite-difference) score leaves via
+  // `logpdf_deriv_raw`; discrete data (whose likelihood uses h-function
+  // differences) falls back to a finite difference of the total log-likelihood.
+  const bool continuous = (var_types_ == std::vector<std::string>{ "c", "c" });
+  tools_optimization::Objective objective;
   if (method == "mle") {
-    objective = [&data, &weights, this](const Eigen::VectorXd& pars) {
+    objective = [&data, &weights, this, continuous, lb, ub](
+                  const Eigen::VectorXd& pars, Eigen::VectorXd& grad) {
       this->set_parameters(pars);
-      return this->loglik(data, weights);
+      double val = this->loglik(data, weights);
+      if (grad.size() > 0) {
+        if (continuous) {
+          Eigen::ArrayXd w = Eigen::ArrayXd::Ones(data.rows());
+          if (weights.size() > 0)
+            w = weights.array();
+          for (Eigen::Index k = 0; k < pars.size(); ++k) {
+            Eigen::ArrayXd dw =
+              this
+                ->logpdf_deriv_raw(
+                  data, pars.transpose(), "par" + std::to_string(k + 1))
+                .array() *
+              w;
+            grad(k) = dw.isFinite().select(dw, 0.0).sum();
+          }
+        } else {
+          grad = this->fd_grad(
+            [&data, &weights, this](const Eigen::VectorXd& p) {
+              this->set_parameters(p);
+              return this->loglik(data, weights);
+            },
+            pars,
+            lb,
+            ub);
+        }
+      }
+      return val;
     };
   } else {
-    // profile likelihood
+    // profile likelihood: the first parameter is held fixed, only the second
+    // is optimized.
     set_parameters(initial_parameters);
     initial_parameters(0) = initial_parameters(1);
     initial_parameters.conservativeResize(1);
-    objective = [&data, &weights, this](const Eigen::VectorXd& pars) {
+    objective = [&data, &weights, this, continuous, lb, ub](
+                  const Eigen::VectorXd& pars, Eigen::VectorXd& grad) {
       Eigen::VectorXd newpars(2);
       newpars(0) = this->get_parameters()(0);
       newpars(1) = pars(0);
       this->set_parameters(newpars);
-      return this->loglik(data, weights);
+      double val = this->loglik(data, weights);
+      if (grad.size() > 0) {
+        if (continuous) {
+          Eigen::ArrayXd w = Eigen::ArrayXd::Ones(data.rows());
+          if (weights.size() > 0)
+            w = weights.array();
+          Eigen::ArrayXd dw =
+            this->logpdf_deriv_raw(data, newpars.transpose(), "par2").array() *
+            w;
+          grad(0) = dw.isFinite().select(dw, 0.0).sum();
+        } else {
+          grad = this->fd_grad(
+            [&data, &weights, this](const Eigen::VectorXd& p) {
+              Eigen::VectorXd np(2);
+              np(0) = this->get_parameters()(0);
+              np(1) = p(0);
+              this->set_parameters(np);
+              return this->loglik(data, weights);
+            },
+            pars,
+            lb,
+            ub);
+        }
+      }
+      return val;
     };
   }
 
@@ -330,6 +387,29 @@ ParBicop::fd_deriv(
   Eigen::ArrayXd eps = u_plus.col(col).array() - u_minus.col(col).array();
   return ((f(u_plus, parameters) - f(u_minus, parameters)).array() / eps)
     .matrix();
+}
+
+//! central finite differences of a scalar objective `f` w.r.t. each
+//! optimization variable, with steps clipped to `[lb, ub]`.
+inline Eigen::VectorXd
+ParBicop::fd_grad(const std::function<double(const Eigen::VectorXd&)>& f,
+                  const Eigen::VectorXd& x,
+                  const Eigen::VectorXd& lb,
+                  const Eigen::VectorXd& ub)
+{
+  Eigen::VectorXd grad(x.size());
+  for (Eigen::Index k = 0; k < x.size(); ++k) {
+    double eps = 1e-4 * std::max(1.0, std::fabs(x(k)));
+    double xp = std::min(x(k) + eps, ub(k));
+    double xm = std::max(x(k) - eps, lb(k));
+    Eigen::VectorXd xpv = x;
+    Eigen::VectorXd xmv = x;
+    xpv(k) = xp;
+    xmv(k) = xm;
+    double denom = xp - xm;
+    grad(k) = denom > 0.0 ? (f(xpv) - f(xmv)) / denom : 0.0;
+  }
+  return grad;
 }
 
 inline Eigen::VectorXd

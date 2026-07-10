@@ -68,6 +68,15 @@
   dependence coefficients (returned as a 2x2 matrix collecting all four corners of
   the unit square) and `Bicop::parameters_to_beta()`/`Bicop::get_beta()` to compute
   Blomqvist's beta, analogous to VineCopula's `BiCopPar2TailDep`/`BiCopPar2Beta` (#682).
+
+* Replace the vendored BOBYQA optimizer (`misc/tools_bobyqa.hpp`, ~2300 lines)
+  with a compact, gradient-based BFGS optimizer (`misc/tools_optimization`)
+  that handles bound constraints via automatic parameter transforms
+  (`misc/tools_transforms`, inferred from the parameter bounds). Parametric
+  maximum-likelihood fitting now consumes the analytic (or finite-difference)
+  scores added above, optimizing over an unconstrained space so the family
+  never sees the transform. This is an internal change with no public-API
+  impact (#683)
 * Add per-row-parameter overloads of `Bicop::pdf`, `cdf`, `hfunc1`, `hfunc2`, `hinv1`, `hinv2`,
   and `loglik` that evaluate a bivariate copula at a different parameter set per row of `u` in a
   single (optionally multi-threaded) call. The new overloads take an `n x p` matrix of parameters
