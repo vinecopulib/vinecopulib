@@ -508,9 +508,8 @@ TEST_P(ParBicopTest, derivatives_match_finite_differences)
             col);
         } else {
           Eigen::Index k = std::stoi(c2.substr(3)) - 1;
-          ref =
-            fd_par([&](const Bicop& b) { return eval_first(b, u, method, c1); },
-                   k);
+          ref = fd_par(
+            [&](const Bicop& b) { return eval_first(b, u, method, c1); }, k);
         }
         Eigen::VectorXd val;
         if (method == "pdf") {
@@ -539,8 +538,7 @@ TEST_P(ParBicopTest, derivatives_match_finite_differences)
   if (p > 0) {
     Eigen::ArrayXd c_1 = cop.pdf_deriv(u, "par1").array();
     Eigen::VectorXd ref =
-      (cop.pdf_deriv2(u, "par1par1").array() / c - (c_1 / c).square())
-        .matrix();
+      (cop.pdf_deriv2(u, "par1par1").array() / c - (c_1 / c).square()).matrix();
     ASSERT_TRUE(all_close(cop.logpdf_deriv2(u, "par1par1"), ref, 1e-6, 1e-6))
       << cop.str();
   }
@@ -628,7 +626,8 @@ TEST_P(ParBicopTest, derivatives_per_row_parameters_match_loop)
 
   // broadcasting a single parameter set matches the stored-parameter path
   Eigen::MatrixXd Pb = bicop_.get_parameters().transpose().replicate(n, 1);
-  ASSERT_TRUE(all_close(bicop_.pdf_deriv(u, "u1", Pb), bicop_.pdf_deriv(u, "u1")))
+  ASSERT_TRUE(
+    all_close(bicop_.pdf_deriv(u, "u1", Pb), bicop_.pdf_deriv(u, "u1")))
     << bicop_.str();
   ASSERT_TRUE(all_close(bicop_.hfunc2_deriv(u, "par1", Pb),
                         bicop_.hfunc2_deriv(u, "par1")))
@@ -636,6 +635,128 @@ TEST_P(ParBicopTest, derivatives_per_row_parameters_match_loop)
 
   // validation errors propagate through format_parameters
   EXPECT_ANY_THROW(bicop_.pdf_deriv(u, "par1", P.topRows(n - 1)));
+}
+
+// Derivatives must match the VineCopula R implementation (BiCopDeriv,
+// BiCopDeriv2, BiCopHfuncDeriv, BiCopHfuncDeriv2). VineCopula encodes
+// rotations in the family code with negated parameters, so parameter
+// derivatives flip sign once per parameter differentiation at 90/270
+// (chain rule for theta -> -theta); argument derivatives need no fix.
+// VineCopula's BiCopHfuncDeriv* differentiate h2(u1|u2); oracles for h1
+// come from swapped arguments with the 90/270 code decades exchanged.
+TEST_P(ParBicopTest, parametric_bicop_derivatives_match_R)
+{
+  if (!needs_check_)
+    return;
+  // the R oracle only implements derivatives for these families (indep is
+  // trivial and covered by the finite-difference/identity tests)
+  std::vector<BicopFamily> supported = {
+    BicopFamily::gaussian, BicopFamily::student, BicopFamily::clayton,
+    BicopFamily::gumbel,   BicopFamily::frank,   BicopFamily::joe
+  };
+  if (!is_member(bicop_.get_family(), supported))
+    return;
+
+  int n = 500;
+  std::string cmd = std::string(RSCRIPT) + std::string(TEST_BICOP_DERIV);
+  cmd += " " + std::to_string(n);
+  cmd += " " + std::to_string(get_family());
+  cmd += " " + std::to_string(get_par());
+  cmd += " " + std::to_string(get_par2());
+  int sys_exit_code = system(cmd.c_str());
+  if (sys_exit_code != 0) {
+    throw std::runtime_error("error in system call");
+  }
+  Eigen::MatrixXd results = tools_eigen::read_matxd("temp_deriv");
+  cmd = rm + "temp_deriv";
+  sys_exit_code += system(cmd.c_str());
+  if (sys_exit_code != 0) {
+    throw std::runtime_error("error in system call");
+  }
+
+  Eigen::MatrixXd u = results.block(0, 0, n, 2);
+  bool st = (bicop_.get_family() == BicopFamily::student);
+  bool r90 = is_member(bicop_.get_rotation(), { 90, 270 });
+  double s = r90 ? -1.0 : 1.0;
+  auto col = [&](int k) { return results.block(0, k - 1, n, 1).eval(); };
+  auto check = [&](const Eigen::VectorXd& val,
+                   int k,
+                   double sign,
+                   const std::string& what) {
+    ASSERT_TRUE(all_close(val, (sign * col(k)).eval(), 1e-4, 1e-4))
+      << bicop_.str() << what << " (oracle column " << k << ")";
+  };
+
+  // first derivatives of the density
+  check(bicop_.pdf_deriv(u, "par1"), 3, s, "pdf_deriv par1");
+  if (st)
+    check(bicop_.pdf_deriv(u, "par2"), 4, s, "pdf_deriv par2");
+  check(bicop_.pdf_deriv(u, "u1"), 5, 1.0, "pdf_deriv u1");
+  check(bicop_.pdf_deriv(u, "u2"), 6, 1.0, "pdf_deriv u2");
+
+  // first derivatives of the log-density
+  check(bicop_.logpdf_deriv(u, "par1"), 7, s, "logpdf_deriv par1");
+  if (st)
+    check(bicop_.logpdf_deriv(u, "par2"), 8, s, "logpdf_deriv par2");
+
+  // second derivatives of the density; VineCopula's pure second parameter
+  // derivatives are inconsistent with its own pdf for 90/270 codes (the
+  // 90-degree branch of diff2PDF_mod reflects (u, 1-v) where diffPDF_mod
+  // uses (1-u, v), deriv2.c:53-66), so those columns are skipped there and
+  // covered by the finite-difference self-consistency test instead.
+  if (!r90)
+    check(bicop_.pdf_deriv2(u, "par1par1"), 9, 1.0, "pdf_deriv2 par1par1");
+  if (st)
+    check(bicop_.pdf_deriv2(u, "par2par2"), 10, 1.0, "pdf_deriv2 par2par2");
+  check(bicop_.pdf_deriv2(u, "u1u1"), 11, 1.0, "pdf_deriv2 u1u1");
+  check(bicop_.pdf_deriv2(u, "u2u2"), 12, 1.0, "pdf_deriv2 u2u2");
+  if (st)
+    check(bicop_.pdf_deriv2(u, "par1par2"), 13, 1.0, "pdf_deriv2 par1par2");
+  check(bicop_.pdf_deriv2(u, "par1u1"), 14, s, "pdf_deriv2 par1u1");
+  if (st)
+    check(bicop_.pdf_deriv2(u, "par2u1"), 15, s, "pdf_deriv2 par2u1");
+  check(bicop_.pdf_deriv2(u, "par1u2"), 16, s, "pdf_deriv2 par1u2");
+  if (st)
+    check(bicop_.pdf_deriv2(u, "par2u2"), 17, s, "pdf_deriv2 par2u2");
+
+  // derivatives of the second h-function h2(u1|u2)
+  check(bicop_.hfunc2_deriv(u, "par1"), 18, s, "hfunc2_deriv par1");
+  if (st)
+    check(bicop_.hfunc2_deriv(u, "par2"), 19, s, "hfunc2_deriv par2");
+  check(bicop_.hfunc2_deriv(u, "u2"), 20, 1.0, "hfunc2_deriv u2");
+  if (!r90)
+    check(
+      bicop_.hfunc2_deriv2(u, "par1par1"), 21, 1.0, "hfunc2_deriv2 par1par1");
+  if (st)
+    check(
+      bicop_.hfunc2_deriv2(u, "par2par2"), 22, 1.0, "hfunc2_deriv2 par2par2");
+  check(bicop_.hfunc2_deriv2(u, "u2u2"), 23, 1.0, "hfunc2_deriv2 u2u2");
+  if (st)
+    check(
+      bicop_.hfunc2_deriv2(u, "par1par2"), 24, 1.0, "hfunc2_deriv2 par1par2");
+  check(bicop_.hfunc2_deriv2(u, "par1u2"), 25, s, "hfunc2_deriv2 par1u2");
+  if (st)
+    check(bicop_.hfunc2_deriv2(u, "par2u2"), 26, s, "hfunc2_deriv2 par2u2");
+
+  // derivatives of the first h-function h1(u2|u1); the swapped oracle's
+  // "u2" selector corresponds to our u1 (the conditioning argument)
+  check(bicop_.hfunc1_deriv(u, "par1"), 27, s, "hfunc1_deriv par1");
+  if (st)
+    check(bicop_.hfunc1_deriv(u, "par2"), 28, s, "hfunc1_deriv par2");
+  check(bicop_.hfunc1_deriv(u, "u1"), 29, 1.0, "hfunc1_deriv u1");
+  if (!r90)
+    check(
+      bicop_.hfunc1_deriv2(u, "par1par1"), 30, 1.0, "hfunc1_deriv2 par1par1");
+  if (st)
+    check(
+      bicop_.hfunc1_deriv2(u, "par2par2"), 31, 1.0, "hfunc1_deriv2 par2par2");
+  check(bicop_.hfunc1_deriv2(u, "u1u1"), 32, 1.0, "hfunc1_deriv2 u1u1");
+  if (st)
+    check(
+      bicop_.hfunc1_deriv2(u, "par1par2"), 33, 1.0, "hfunc1_deriv2 par1par2");
+  check(bicop_.hfunc1_deriv2(u, "par1u1"), 34, s, "hfunc1_deriv2 par1u1");
+  if (st)
+    check(bicop_.hfunc1_deriv2(u, "par2u1"), 35, s, "hfunc1_deriv2 par2u1");
 }
 
 // Selector and family validation for the derivative methods
@@ -666,7 +787,7 @@ TEST(BicopDerivatives, selector_and_family_validation)
   EXPECT_ANY_THROW(cl.pdf_deriv(u, "par2"));
   EXPECT_ANY_THROW(cl.pdf_deriv(u, "bogus"));
   EXPECT_ANY_THROW(cl.pdf_deriv(u, ""));
-  EXPECT_ANY_THROW(cl.pdf_deriv(u, "par1u1"));  // second order selector
+  EXPECT_ANY_THROW(cl.pdf_deriv(u, "par1u1"));    // second order selector
   EXPECT_ANY_THROW(cl.pdf_deriv2(u, "par1u1u2")); // third order selector
   Bicop ind(BicopFamily::indep);
   EXPECT_ANY_THROW(ind.pdf_deriv(u, "par1")); // no parameters
@@ -674,15 +795,15 @@ TEST(BicopDerivatives, selector_and_family_validation)
   // aliases: "par" = "par1", components may come in any order
   EXPECT_TRUE(
     all_close(cl.pdf_deriv(u, "par"), cl.pdf_deriv(u, "par1"), 0.0, 0.0));
-  EXPECT_TRUE(all_close(
-    cl.pdf_deriv2(u, "par"), cl.pdf_deriv2(u, "par1par1"), 0.0, 0.0));
+  EXPECT_TRUE(
+    all_close(cl.pdf_deriv2(u, "par"), cl.pdf_deriv2(u, "par1par1"), 0.0, 0.0));
   EXPECT_TRUE(all_close(
     cl.pdf_deriv2(u, "u1par1"), cl.pdf_deriv2(u, "par1u1"), 0.0, 0.0));
 
   // independence copula: argument derivatives vanish, h-function derivative
   // w.r.t. the conditioned argument is the density (= 1)
-  EXPECT_TRUE(all_close(
-    ind.pdf_deriv(u, "u1"), Eigen::VectorXd::Zero(2), 1e-10, 1e-10));
+  EXPECT_TRUE(
+    all_close(ind.pdf_deriv(u, "u1"), Eigen::VectorXd::Zero(2), 1e-10, 1e-10));
   EXPECT_TRUE(all_close(
     ind.hfunc1_deriv(u, "u1"), Eigen::VectorXd::Zero(2), 1e-10, 1e-10));
   EXPECT_TRUE(all_close(

@@ -552,11 +552,9 @@ AbstractBicop::logpdf_deriv2_raw(const Eigen::MatrixXd& u,
   Eigen::ArrayXd c = pdf_raw(u, parameters).array().max(DBL_MIN);
   Eigen::ArrayXd c_xy = pdf_deriv2_raw(u, parameters, deriv).array();
   Eigen::ArrayXd c_x =
-    pdf_deriv_raw(u, parameters, tools_deriv::comp_to_string(comps[0]))
-      .array();
+    pdf_deriv_raw(u, parameters, tools_deriv::comp_to_string(comps[0])).array();
   Eigen::ArrayXd c_y =
-    pdf_deriv_raw(u, parameters, tools_deriv::comp_to_string(comps[1]))
-      .array();
+    pdf_deriv_raw(u, parameters, tools_deriv::comp_to_string(comps[1])).array();
   return (c_xy / c - (c_x / c) * (c_y / c)).matrix();
 }
 //! @}
@@ -598,8 +596,7 @@ parse_components(const std::string& deriv)
       }
       comps.push_back(static_cast<int>(k) - 1);
     } else {
-      throw std::runtime_error("invalid derivative selector: '" + deriv +
-                               "'");
+      throw std::runtime_error("invalid derivative selector: '" + deriv + "'");
     }
   }
   if (comps.empty()) {
@@ -646,18 +643,16 @@ canonicalize(const std::string& deriv, size_t order, size_t npars)
     comps.push_back(comps[0]);
   }
   if (comps.size() != order) {
-    throw std::runtime_error(
-      "derivative selector '" + deriv + "' has " +
-      std::to_string(comps.size()) + " components; expected " +
-      std::to_string(order));
+    throw std::runtime_error("derivative selector '" + deriv + "' has " +
+                             std::to_string(comps.size()) +
+                             " components; expected " + std::to_string(order));
   }
   for (auto comp : comps) {
     if (comp >= static_cast<int>(npars)) {
-      throw std::runtime_error("derivative selector '" + deriv +
-                               "' refers to parameter " +
-                               std::to_string(comp + 1) +
-                               ", but the family has " +
-                               std::to_string(npars) + " parameter(s)");
+      throw std::runtime_error(
+        "derivative selector '" + deriv + "' refers to parameter " +
+        std::to_string(comp + 1) + ", but the family has " +
+        std::to_string(npars) + " parameter(s)");
     }
   }
   return components_to_string(comps);

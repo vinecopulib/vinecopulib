@@ -233,9 +233,30 @@ public:
   void truncate(size_t trunc_lvl);
 
   std::string str(const std::vector<size_t>& trees = {}) const;
+
+  struct ScoresResult
+  {
+    Eigen::MatrixXd scores;
+    TriangularArray<Eigen::VectorXd> pdf_edges;
+    TriangularArray<std::vector<Eigen::VectorXd>> logpdf_deriv_pars;
+    TriangularArray<std::vector<Eigen::VectorXd>> hfunc1_deriv_pars;
+    TriangularArray<std::vector<Eigen::VectorXd>> hfunc2_deriv_pars;
+    TriangularArray<Eigen::VectorXd> logpdf_deriv_u1;
+    TriangularArray<Eigen::VectorXd> logpdf_deriv_u2;
+    TriangularArray<Eigen::VectorXd> hfunc1_deriv_u1;
+    TriangularArray<Eigen::VectorXd> hfunc2_deriv_u2;
+  };
+
+  ScoresResult scores_full(Eigen::MatrixXd u,
+                           bool step_wise = true,
+                           const size_t num_threads = 1,
+                           const bool keep_all = true);
   Eigen::MatrixXd scores(Eigen::MatrixXd u,
                          bool step_wise = true,
                          const size_t num_threads = 1);
+  Eigen::VectorXd gradient(Eigen::MatrixXd u,
+                           bool step_wise = true,
+                           const size_t num_threads = 1);
   Eigen::MatrixXd hessian(Eigen::MatrixXd u,
                           bool step_wise = true,
                           const size_t num_threads = 1);

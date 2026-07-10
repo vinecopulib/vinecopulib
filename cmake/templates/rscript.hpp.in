@@ -10,7 +10,9 @@
 
 #define RSCRIPT "Rscript --vanilla "
 #define TEST_BICOP "\"test/test_bicop_parametric.R\""
+#define TEST_BICOP_DERIV "\"test/test_bicop_derivatives.R\""
 #define TEST_VINECOP "\"test/test_vinecop_parametric.R\""
+#define TEST_VINECOP_DERIV "\"test/test_vinecop_derivatives.R\""
 
 #if defined(WIN32) || defined(_WIN32) ||                                       \
   defined(__WIN32) && !defined(__CYGWIN__)

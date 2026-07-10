@@ -4,6 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <boost/math/special_functions/beta.hpp>
+#include <boost/math/special_functions/digamma.hpp>
+#include <boost/math/special_functions/trigamma.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/seed_seq.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
@@ -854,6 +857,498 @@ pbvnorm(const Eigen::MatrixXd& z, double rho)
   };
 
   return tools_eigen::binaryExpr_or_nan(z, f);
+}
+
+// continued-fraction coefficients a_1, b_1 of I_x(p, q) and their first two
+// derivatives w.r.t. p; ported from VineCopula incompleteBeta.c
+// (incompleBeta_an1_bn1_p)
+inline void
+inbeder_an1_bn1_p(double x, double p, double q, double* an, double* bn)
+{
+  double t2 = 1.0 / (1.0 - x);
+  double t3 = x * t2;
+  double t4 = q - 1.0;
+  double t5 = p + 1.0;
+  double t9 = t5 * t5;
+  double t19 = q * x * t2;
+  double t20 = 2.0 * t19;
+  double t21 = 4.0 * q;
+  double t27 = p * q;
+  double t28 = p - 2.0 - t19;
+  double t31 = 1 / q;
+  double t32 =
+    (t20 + t21 + 2.0 * (t19 + 2.0 * q) * (p - 1.0) + t27 * t28) * t31;
+  double t33 = 1.0 / p;
+  double t34 = p + 2.0;
+  double t35 = 1 / t34;
+  double t36 = t33 * t35;
+  double t40 = (t20 + t21 + q * t28 + t27) * t31;
+  double t42 = p * p;
+  double t43 = 1 / t42;
+  double t44 = t43 * t35;
+  double t46 = t34 * t34;
+  double t47 = 1 / t46;
+  double t48 = t33 * t47;
+  an[0] = t3 * t4 / t5;
+  an[1] = -t3 * t4 / t9;
+  an[2] = 2.0 * t3 * t4 / t9 / t5;
+  bn[0] = t32 * t36;
+  bn[1] = t40 * t36 - t32 * t44 - t32 * t48;
+  bn[2] = 2.0 * t36 - 2.0 * t40 * t44 - 2.0 * t40 * t48 +
+          2.0 * t32 / t42 / p * t35 + 2.0 * t32 * t43 * t47 +
+          2.0 * t32 * t33 / t46 / t34;
+}
+
+// same, for the swapped tail I_x(p, q) = 1 - I_{1-x}(q, p); ported from
+// VineCopula incompleteBeta.c (incompleBeta_an1_bn1_q)
+inline void
+inbeder_an1_bn1_q(double x, double p, double q, double* an, double* bn)
+{
+  double t2 = 1.0 / (1.0 - x);
+  double t3 = x * t2;
+  double t6 = 1.0 / (p + 1.0);
+  double t11 = q * x * t2;
+  double t16 = p - 1.0;
+  double t19 = p * q;
+  double t20 = p - 2.0 - t11;
+  double t22 = 2.0 * t11 + 4.0 * q + 2.0 * (t11 + 2.0 * q) * t16 + t19 * t20;
+  double t23 = 1.0 / q;
+  double t27 = 1.0 / (p + 2.0);
+  double t28 = 1.0 / p * t27;
+  double t36 = 2.0 * t3 + 4.0 + 2.0 * (t3 + 2.0) * t16 + p * t20 - t19 * t3;
+  double t39 = q * q;
+  double t40 = 1.0 / t39;
+  an[0] = t3 * (q - 1.0) * t6;
+  an[1] = t3 * t6;
+  an[2] = 0.0;
+  bn[0] = t22 * t23 * t28;
+  bn[1] = t36 * t23 * t28 - t22 * t40 * t28;
+  bn[2] =
+    -2.0 * t3 * t23 * t27 - 2.0 * t36 * t40 * t28 + 2.0 * t22 / t39 / q * t28;
+}
+
+// continued-fraction coefficients a_n, b_n (n >= 2) and their first two
+// derivatives w.r.t. p; ported from VineCopula incompleteBeta.c
+// (incompleBeta_an_bn_p)
+inline void
+inbeder_an_bn_p(double x, double p, double q, int n, double* an, double* bn)
+{
+  double t1 = x * x;
+  double t2 = 1.0 - x;
+  double t3 = t2 * t2;
+  double t5 = t1 / t3;
+  double t6 = n - 1.0;
+  double t9 = t5 * t6 * (p + q + n - 2.0);
+  double t10 = p + n - 1.0;
+  double t11 = q - n;
+  double t12 = t10 * t11;
+  double t13 = 2.0 * n;
+  double t14 = p + t13 - 3.0;
+  double t15 = 1 / t14;
+  double t16 = p + t13 - 2.0;
+  double t17 = t16 * t16;
+  double t18 = 1 / t17;
+  double t19 = t15 * t18;
+  double t20 = p + t13 - 1.0;
+  double t21 = 1 / t20;
+  double t26 = t5 * t6 * t10;
+  double t27 = t11 * t15;
+  double t28 = t18 * t21;
+  double t29 = t27 * t28;
+  double t32 = t14 * t14;
+  double t33 = 1 / t32;
+  double t34 = t33 * t18;
+  double t39 = 1 / t17 / t16;
+  double t40 = t15 * t39;
+  double t45 = t20 * t20;
+  double t46 = 1 / t45;
+  double t55 = t11 * t33 * t28;
+  double t59 = t27 * t39 * t21;
+  double t63 = t27 * t18 * t46;
+  double t88 = t17 * t17;
+  double t105 = 2.0 * t5 * t6 * t29 - 2.0 * t26 * t55 - 4.0 * t26 * t59 -
+                2.0 * t26 * t63 - 2.0 * t9 * t55 - 4.0 * t9 * t59 -
+                2.0 * t9 * t63 + 2.0 * t9 * t12 / t32 / t14 * t18 * t21 +
+                4.0 * t9 * t12 * t33 * t39 * t21 + 2.0 * t9 * t12 * t34 * t46 +
+                6.0 * t9 * t12 * t15 / t88 * t21 + 4.0 * t9 * t12 * t40 * t46 +
+                2.0 * t9 * t12 * t19 / t45 / t20;
+  double t108 = q * x / t2;
+  double t110 = t108 + 2.0 * q;
+  double t111 = n * n;
+  double t118 = p * q;
+  double t119 = p - 2.0 - t108;
+  double t122 = 1 / q;
+  double t123 =
+    (2.0 * t110 * t111 + 2.0 * t110 * (p - 1.0) * n + t118 * t119) * t122;
+  double t124 = 1 / t16;
+  double t125 = p + t13;
+  double t126 = 1 / t125;
+  double t127 = t124 * t126;
+  double t133 = (2.0 * t110 * n + q * t119 + t118) * t122;
+  double t135 = t18 * t126;
+  double t137 = t125 * t125;
+  double t138 = 1 / t137;
+  double t139 = t124 * t138;
+  an[0] = t9 * t12 * t19 * t21;
+  an[1] = t26 * t29 + t9 * t29 - t9 * t12 * t34 * t21 -
+          2.0 * t9 * t12 * t40 * t21 - t9 * t12 * t19 * t46;
+  an[2] = t105;
+  bn[0] = t123 * t127;
+  bn[1] = t133 * t127 - t123 * t135 - t123 * t139;
+  bn[2] = 2.0 * t127 - 2.0 * t133 * t135 - 2.0 * t133 * t139 +
+          2.0 * t123 * t39 * t126 + 2.0 * t123 * t18 * t138 +
+          2.0 * t123 * t124 / t137 / t125;
+}
+
+// same, for the swapped tail; ported from VineCopula incompleteBeta.c
+// (incompleBeta_an_bn_q)
+inline void
+inbeder_an_bn_q(double x, double p, double q, int n, double* an, double* bn)
+{
+  double t1 = x * x;
+  double t2 = 1.0 - x;
+  double t3 = t2 * t2;
+  double t5 = t1 / t3;
+  double t6 = n - 1.0;
+  double t9 = t5 * t6 * (p + q + n - 2.0);
+  double t10 = p + n - 1.0;
+  double t11 = q - n;
+  double t13 = 2.0 * n;
+  double t15 = 1.0 / (p + t13 - 3.0);
+  double t16 = p + t13 - 2.0;
+  double t17 = t16 * t16;
+  double t18 = 1.0 / t17;
+  double t21 = 1.0 / (p + t13 - 1.0);
+  double t28 = t18 * t21;
+  double t32 = t10 * t15 * t28;
+  double t39 = 1.0 / t2;
+  double t40 = q * x * t39;
+  double t42 = t40 + 2.0 * q;
+  double t43 = n * n;
+  double t46 = p - 1.0;
+  double t50 = p * q;
+  double t51 = p - 2.0 - t40;
+  double t53 = 2.0 * t42 * t43 + 2.0 * t42 * t46 * n + t50 * t51;
+  double t54 = 1.0 / q;
+  double t56 = 1.0 / t16;
+  double t58 = 1.0 / (p + t13);
+  double t59 = t56 * t58;
+  double t61 = x * t39;
+  double t62 = t61 + 2.0;
+  double t70 = 2.0 * t62 * t43 + 2.0 * t62 * t46 * n + p * t51 - t50 * t61;
+  double t73 = q * q;
+  double t74 = 1.0 / t73;
+  an[0] = t9 * t10 * t11 * t15 * t18 * t21;
+  an[1] = t5 * t6 * t10 * t11 * t15 * t28 + t9 * t32;
+  an[2] = 2.0 * t5 * t6 * t32;
+  bn[0] = t53 * t54 * t59;
+  bn[1] = t70 * t54 * t59 - t53 * t74 * t59;
+  bn[2] = -2.0 * p * x * t39 * t54 * t56 * t58 - 2.0 * t70 * t74 * t59 +
+          2.0 * t53 / t73 / q * t59;
+}
+
+//! @brief Incomplete beta function ratio and its first two derivatives
+//! w.r.t. `p` (see tools_stats.hpp); ported from VineCopula
+//! incompleteBeta.c (`inbeder`).
+inline Eigen::Vector3d
+inbeder(double x_in, double p_in, double q_in)
+{
+  double err = 1e-12;
+  double p, q, x;
+  int minappx = 3, maxappx = 200, n = 0;
+
+  // use I_x(p, q) = 1 - I_{1-x}(q, p) if x > p / (p + q)
+  bool swap_tail = (x_in > p_in / (p_in + q_in));
+  if (swap_tail) {
+    x = 1 - x_in;
+    p = q_in;
+    q = p_in;
+  } else {
+    x = x_in;
+    p = p_in;
+    q = q_in;
+  }
+
+  // compute log-beta, digamma, and trigamma functions
+  double lbet = boost::math::lgamma(p) + boost::math::lgamma(q) -
+                boost::math::lgamma(p + q);
+  double pa = boost::math::digamma(p);
+  double pa1 = boost::math::trigamma(p);
+  double pb = boost::math::digamma(q);
+  double pb1 = boost::math::trigamma(q);
+  double pab = boost::math::digamma(p + q);
+  double pab1 = boost::math::trigamma(p + q);
+
+  double omx = 1 - x;
+  double logx = std::log(x);
+  double logomx = std::log(omx);
+
+  // compute derivatives of K(x, p, q) = x^p (1-x)^(q-1) / [p beta(p, q)]
+  double c[3];
+  c[0] = p * logx + (q - 1) * logomx - lbet - std::log(p);
+  double c0 = std::exp(c[0]);
+  if (swap_tail) {
+    c[1] = logomx - pb + pab;
+    c[2] = c[1] * c[1] - pb1 + pab1;
+  } else {
+    c[1] = logx - 1 / p - pa + pab;
+    c[2] = c[1] * c[1] + 1 / p / p - pa1 + pab1;
+  }
+
+  int del = 1, i = 0;
+  double an[3], bn[3], an1[3], an2[3], bn1[3], bn2[3], dr[3];
+  double dan[3], dbn[3], der_old[3], d1[3];
+  double Rn = 0, pr = 0, d = 0;
+  Eigen::Vector3d der;
+
+  an1[0] = 1;
+  an2[0] = 1;
+  bn1[0] = 1;
+  bn2[0] = 0;
+  der_old[0] = 0;
+  for (i = 1; i < 3; i++) {
+    an1[i] = 0;
+    an2[i] = 0;
+    bn1[i] = 0;
+    bn2[i] = 0;
+    der_old[i] = 0;
+  }
+
+  while (del == 1) {
+    n++;
+    if (n == 1) {
+      if (swap_tail) {
+        inbeder_an1_bn1_q(x, p, q, an, bn);
+      } else {
+        inbeder_an1_bn1_p(x, p, q, an, bn);
+      }
+    } else {
+      if (swap_tail) {
+        inbeder_an_bn_q(x, p, q, n, an, bn);
+      } else {
+        inbeder_an_bn_p(x, p, q, n, an, bn);
+      }
+    }
+
+    // use forward recurrence relations to compute A_n, B_n, and derivatives
+    dan[0] = an[0] * an2[0] + bn[0] * an1[0];
+    dbn[0] = an[0] * bn2[0] + bn[0] * bn1[0];
+    dan[1] = an[1] * an2[0] + an[0] * an2[1] + bn[1] * an1[0] + bn[0] * an1[1];
+    dbn[1] = an[1] * bn2[0] + an[0] * bn2[1] + bn[1] * bn1[0] + bn[0] * bn1[1];
+    dan[2] = an[2] * an2[0] + 2 * an[1] * an2[1] + an[0] * an2[2] +
+             bn[2] * an1[0] + 2 * bn[1] * an1[1] + bn[0] * an1[2];
+    dbn[2] = an[2] * bn2[0] + 2 * an[1] * bn2[1] + an[0] * bn2[2] +
+             bn[2] * bn1[0] + 2 * bn[1] * bn1[1] + bn[0] * bn1[2];
+
+    // scale derivatives to prevent overflow
+    Rn = dan[0];
+    if (std::fabs(dbn[0]) > std::fabs(dan[0])) {
+      Rn = dbn[0];
+    }
+    for (i = 0; i < 3; i++) {
+      an1[i] = an1[i] / Rn;
+      bn1[i] = bn1[i] / Rn;
+    }
+    dan[1] = dan[1] / Rn;
+    dan[2] = dan[2] / Rn;
+    dbn[1] = dbn[1] / Rn;
+    dbn[2] = dbn[2] / Rn;
+    if (std::fabs(dbn[0]) > std::fabs(dan[0])) {
+      dan[0] = dan[0] / dbn[0];
+      dbn[0] = 1;
+    } else {
+      dbn[0] = dbn[0] / dan[0];
+      dan[0] = 1;
+    }
+
+    // compute components of derivatives of the nth approximant
+    dr[0] = dan[0] / dbn[0];
+    Rn = dr[0];
+    dr[1] = (dan[1] - Rn * dbn[1]) / dbn[0];
+    dr[2] =
+      (-2 * dan[1] * dbn[1] + 2 * Rn * dbn[1] * dbn[1]) / dbn[0] / dbn[0] +
+      (dan[2] - Rn * dbn[2]) / dbn[0];
+
+    // save terms corresponding to approximants n-1 and n-2
+    for (i = 0; i < 3; i++) {
+      an2[i] = an1[i];
+      an1[i] = dan[i];
+      bn2[i] = bn1[i];
+      bn1[i] = dbn[i];
+    }
+
+    // compute nth approximants
+    pr = 0;
+    if (dr[0] > 0) {
+      pr = std::exp(c[0] + std::log(dr[0]));
+    }
+    der(0) = pr;
+    der(1) = pr * c[1] + c0 * dr[1];
+    der(2) = pr * c[2] + 2 * c0 * c[1] * dr[1] + c0 * dr[2];
+
+    // check for convergence, maximum and minimum iterations
+    for (i = 0; i < 3; i++) {
+      d1[i] = std::max(err, std::fabs(der(i)));
+      d1[i] = std::fabs(der_old[i] - der(i)) / d1[i];
+      der_old[i] = der(i);
+    }
+    d = std::max(std::max(d1[0], d1[1]), d1[2]);
+
+    if (n < minappx) {
+      d = 1;
+    }
+    if (n >= maxappx) {
+      d = 0;
+    }
+    del = 0;
+    if (d > err) {
+      del = 1;
+    }
+  }
+
+  // adjust results if I_x(p, q) = 1 - I_{1-x}(q, p) was used
+  if (swap_tail) {
+    der(0) = 1 - der(0);
+    der(1) = -der(1);
+    der(2) = -der(2);
+  }
+
+  return der;
+}
+
+//! @brief Derivative of the Student t quantile w.r.t. the degrees of freedom
+//! (see tools_stats.hpp); ported from VineCopula tcopuladeriv_new.c
+//! (`diffX_nu_tCopula`).
+inline double
+diff_x_nu(double x, double nu)
+{
+  double x_help = (x >= 0) ? x : -x;
+  double xmax = nu / (nu + x_help * x_help);
+
+  boost::math::students_t dist(nu);
+  double t1 = boost::math::pdf(dist, x_help);
+  double t2 = nu / 2.0;
+  Eigen::Vector3d ib = inbeder(xmax, t2, 0.5);
+  double t4 = (nu + 1.0) / 2.0;
+  double t5 = std::pow(nu, nu / 2.0 - 1.0) * x_help;
+  double t6 = std::pow(1.0 / (x_help * x_help + nu), t4);
+  double t7 = boost::math::beta(nu / 2.0, 0.5);
+
+  double out = 1.0 / (2.0 * t1) * (0.5 * ib(1) + (t5 * t6) / t7);
+  return (x < 0) ? -out : out;
+}
+
+//! @brief Derivative of the Student t distribution function w.r.t. the
+//! degrees of freedom (see tools_stats.hpp); ported from VineCopula
+//! tcopuladeriv_new.c (`diff_t_nu`).
+inline double
+diff_t_nu(double x, double nu)
+{
+  double x_help = (x >= 0) ? x : -x;
+  double xmax = nu / (nu + x_help * x_help);
+
+  double t2 = nu / 2.0;
+  Eigen::Vector3d ib = inbeder(xmax, t2, 0.5);
+  double t4 = (nu + 1.0) / 2.0;
+  double t5 = std::pow(nu, nu / 2.0 - 1.0) * x_help;
+  double t6 = std::pow(1.0 / (x_help * x_help + nu), t4);
+  double t7 = boost::math::beta(t2, 0.5);
+
+  double out = -0.5 * (0.5 * ib(1) + (t5 * t6) / t7);
+  return (x < 0) ? -out : out;
+}
+
+//! @brief Second derivative of the Student t distribution function w.r.t.
+//! the degrees of freedom (see tools_stats.hpp); ported from VineCopula
+//! tcopuladeriv_new.c (`diff_t_nu_nu`).
+inline double
+diff_t_nu_nu(double x, double nu)
+{
+  double x_help = (x >= 0) ? x : -x;
+  double xmax = nu / (nu + x_help * x_help);
+
+  double t1 = 1.0 / (x_help * x_help + nu);
+  double t2 = nu / 2.0;
+  Eigen::Vector3d ib = inbeder(xmax, t2, 0.5);
+  double t4 = (nu + 1.0) / 2.0;
+  double t5 = std::pow(nu, nu / 2.0 - 1.0) * x_help;
+  double t6 = std::pow(t1, t4);
+  double t7 = boost::math::beta(t2, 0.5);
+  double t8 = t5 * t6;
+  double t9 = nu * t1;
+
+  double t11 = boost::math::digamma(0.5 * nu);
+  double t12 = boost::math::digamma(0.5 * nu + 0.5);
+  double t13 = t11 - t12;
+  double t14 = 1.0 / t7;
+
+  double t10 =
+    -t1 * t4 + (t2 - 1.0) / nu + 0.5 * std::log(t1) + 0.5 * std::log(nu);
+
+  double out = -1.0 / 8.0 * ib(2) +
+               t8 * t14 * (-0.25 * std::log(t9) + 0.5 * t13 - 0.5 * t10);
+  return (x < 0) ? -out : out;
+}
+
+//! @brief Derivative of the Student t density w.r.t. its argument (see
+//! tools_stats.hpp); ported from VineCopula tcopuladeriv_new.c
+//! (`diff_dt_x`).
+inline double
+diff_dt_x(double x, double nu)
+{
+  double t2 = (nu + 1.0) / nu;
+  double t3 = std::sqrt(nu);
+  double t4 = 1.0 / t3 / boost::math::beta(nu * 0.5, 0.5);
+  double t5 = 1.0 + (x * x) / nu;
+  double t6 = (nu + 3.0) / 2.0;
+  double t7 = std::pow(t5, -t6);
+  return -t4 * t2 * x * t7;
+}
+
+//! @brief Derivative of the Student t density w.r.t. the degrees of freedom
+//! (see tools_stats.hpp); ported from VineCopula tcopuladeriv_new.c
+//! (`diff_dt_nu`).
+inline double
+diff_dt_nu(double x, double nu)
+{
+  double t1 = (nu + 1.0) / 2.0;
+  double t2 = boost::math::digamma(t1);
+  double t3 = boost::math::beta(nu * 0.5, 0.5);
+  double t4 = std::sqrt(nu);
+  double t6 = boost::math::digamma(0.5 * nu);
+  double t10 = -0.5 / t3 / t4 * (t6 - t2 + 1.0 / nu);
+  double t11 = 1.0 + (x * x) / nu;
+  double t13 = std::pow(t11, -t1);
+  double t14 = 1.0 / t3 / t4;
+  double t15 = std::log(t11);
+  double t16 = -t1 * x * x / nu / nu / t11;
+
+  return t10 * t13 + t14 * (t13 * (-0.5 * t15 - t16));
+}
+
+//! @brief Logarithmic derivative of the Student t density w.r.t. its
+//! argument (see tools_stats.hpp); ported from VineCopula
+//! tcopuladeriv_new.c (`diff_dt_u`).
+inline double
+diff_dt_u(double x, double nu)
+{
+  return -(x * (nu + 1.0) / nu) / (1.0 + (x * x) / nu);
+}
+
+//! @brief Second derivative of the Student t quantile w.r.t. the degrees of
+//! freedom (see tools_stats.hpp); ported from VineCopula
+//! tcopuladeriv_new.c (`diff2_x_nu`).
+inline double
+diff2_x_nu(double x, double nu)
+{
+  boost::math::students_t dist(nu);
+  double t1 = boost::math::pdf(dist, x);
+  double t2 = diff_t_nu_nu(x, nu);
+  double t3 = diff_dt_nu(x, nu);
+  double t4 = diff_x_nu(x, nu);
+  double t5 = diff_dt_x(x, nu);
+
+  return (-t5 * t4 * t4 - t2 - 2.0 * t3 * t4) / t1;
 }
 }
 }

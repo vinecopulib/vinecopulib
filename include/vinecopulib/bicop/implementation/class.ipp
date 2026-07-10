@@ -652,10 +652,9 @@ Bicop::pdf_deriv(const Eigen::MatrixXd& u, const std::string& deriv) const
   check_data(u);
   check_deriv_preconditions();
   auto spec = map_pdf_deriv(tools_deriv::canonicalize(deriv, 1, deriv_npars()));
-  return spec.sign *
-         bicop_->pdf_deriv_raw(prep_for_abstract(u).leftCols(2),
-                               bicop_->get_parameters().transpose(),
-                               spec.deriv);
+  return spec.sign * bicop_->pdf_deriv_raw(prep_for_abstract(u).leftCols(2),
+                                           bicop_->get_parameters().transpose(),
+                                           spec.deriv);
 }
 
 //! @brief Evaluates a second derivative of the copula density.
@@ -1038,7 +1037,8 @@ Bicop::logpdf_deriv2(const Eigen::MatrixXd& u,
       });
   }
   Eigen::ArrayXd c = pdf(u, parameters, num_threads).array();
-  Eigen::ArrayXd c_xy = pdf_deriv2(u, canonical, parameters, num_threads).array();
+  Eigen::ArrayXd c_xy =
+    pdf_deriv2(u, canonical, parameters, num_threads).array();
   Eigen::ArrayXd c_x =
     pdf_deriv(u, tools_deriv::comp_to_string(comps[0]), parameters, num_threads)
       .array();
