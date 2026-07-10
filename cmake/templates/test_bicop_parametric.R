@@ -13,6 +13,7 @@ if (!("VineCopula" %in% rownames(installed.packages()))) {
 set.seed(0)
 u1 <- runif(n)
 u2 <- runif(n)
+taildep <- VineCopula::BiCopPar2TailDep(family, par, par2)
 results <- cbind(
   VineCopula::BiCopPar2Tau(family, par, par2), u1, u2,
   VineCopula::BiCopPDF(u1, u2, family, par, par2),
@@ -20,7 +21,9 @@ results <- cbind(
   VineCopula::BiCopHfunc1(u1, u2, family, par, par2),
   VineCopula::BiCopHfunc2(u1, u2, family, par, par2),
   VineCopula::BiCopHinv1(u1, u2, family, par, par2),
-  VineCopula::BiCopHinv2(u1, u2, family, par, par2)
+  VineCopula::BiCopHinv2(u1, u2, family, par, par2),
+  VineCopula::BiCopPar2Beta(family, par, par2),
+  taildep$lower, taildep$upper
 )
 
 write.table(results, file = "temp", col.names = FALSE, row.names = FALSE)

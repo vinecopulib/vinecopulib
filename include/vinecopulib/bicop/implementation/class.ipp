@@ -847,6 +847,50 @@ Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters) const
   return tau;
 }
 
+//! @brief Converts the copula parameters to the tail dependence coefficients.
+//!
+//! @details The result is a \f$ 2 \times 2 \f$ matrix \f$ M \f$ collecting the
+//! tail dependence coefficients in the four corners of the unit square:
+//! \f$ M(i, j) \f$ is the coefficient as \f$ U_1 \to i \f$ and
+//! \f$ U_2 \to j \f$, with \f$ i, j \in \{0, 1\} \f$ (0 = lower, 1 = upper).
+//! Thus \f$ M(0, 0) \f$ is the classical lower and \f$ M(1, 1) \f$ the
+//! classical upper tail dependence coefficient. The coefficients are \c NaN
+//! for the nonparametric (`tll`) family.
+//!
+//! @param parameters The parameters (must be a valid parametrization of
+//!     the current family).
+inline Eigen::MatrixXd
+Bicop::parameters_to_taildep(const Eigen::MatrixXd& parameters) const
+{
+  Eigen::MatrixXd m = bicop_->parameters_to_taildep(parameters);
+  // rotate the 2x2 matrix like a grid, counter-clockwise, to match the
+  // (counter-clockwise) rotation applied to the data in `rotate_data`.
+  switch (rotation_) {
+    case 90:
+      return m.transpose().colwise().reverse();
+    case 180:
+      return m.reverse();
+    case 270:
+      return m.transpose().rowwise().reverse();
+    default:
+      return m;
+  }
+}
+
+//! @brief Converts the copula parameters to Blomqvist's \f$ \beta \f$.
+//!
+//! @param parameters The parameters (must be a valid parametrization of
+//!     the current family).
+inline double
+Bicop::parameters_to_beta(const Eigen::MatrixXd& parameters) const
+{
+  double beta = bicop_->parameters_to_beta(parameters);
+  if (tools_stl::is_member(rotation_, { 90, 270 })) {
+    beta *= -1;
+  }
+  return beta;
+}
+
 //! @name Getters and setters
 //!
 //! @{
@@ -935,6 +979,23 @@ inline double
 Bicop::get_tau() const
 {
   return parameters_to_tau(bicop_->get_parameters());
+}
+
+//! @brief Gets the tail dependence coefficients.
+//!
+//! @details See Bicop::parameters_to_taildep() for the layout of the returned
+//! \f$ 2 \times 2 \f$ matrix.
+inline Eigen::MatrixXd
+Bicop::get_taildep() const
+{
+  return parameters_to_taildep(bicop_->get_parameters());
+}
+
+//! @brief Gets Blomqvist's beta.
+inline double
+Bicop::get_beta() const
+{
+  return parameters_to_beta(bicop_->get_parameters());
 }
 
 //! @brief Sets the rotation.

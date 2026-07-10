@@ -114,6 +114,14 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   return wdm::wdm(u, "tau")(0, 1);
 }
 
+inline Eigen::MatrixXd
+KernelBicop::parameters_to_taildep(const Eigen::MatrixXd&)
+{
+  // tail dependence is a limiting quantity that cannot be reliably estimated
+  // from a nonparametric fit, so it is reported as NaN.
+  return Eigen::MatrixXd::Constant(2, 2, NAN);
+}
+
 inline double
 KernelBicop::get_npars() const
 {
