@@ -1100,12 +1100,12 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 //! The score function is defined as the gradient of the log-likelihood
 //! with respect to the parameters.
 //!
-//! For continuous models with parametric pair copulas, the scores are
-//! computed analytically from the pair copulas' derivatives (`Bicop::
-//! logpdf_deriv()` and, for the full gradient, the h-function derivatives
-//! propagated through the vine by the chain rule); models with
-//! nonparametric pair copulas or discrete variables use central finite
-//! differences instead (in which case the caches below stay empty).
+//! The scores are computed analytically from the pair copulas' derivatives
+//! (`Bicop::logpdf_deriv()` and, for the full gradient, the h-function
+//! derivatives propagated through the vine by the chain rule); models with
+//! discrete variables use central finite differences instead (in which case
+//! the caches below stay empty). Models with nonparametric pair copulas are
+//! rejected (differentiating w.r.t. the interpolation grid is meaningless).
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
@@ -1153,6 +1153,21 @@ Vinecop::scores_full(Eigen::MatrixXd u,
   auto disc_cols = tools_select::get_disc_cols(var_types_);
   const size_t n = static_cast<size_t>(u.rows());
 
+  // derivatives w.r.t. a nonparametric pair copula's grid values are
+  // meaningless (get_parameters() is the interpolation grid, not the
+  // effective parameters), so reject such models rather than write out of
+  // bounds
+  for (size_t t = 0; t < trunc_lvl; t++) {
+    for (size_t e = 0; e < d_ - 1 - t; e++) {
+      if (!tools_stl::is_member(pair_copulas_[t][e].get_family(),
+                                bicop_families::parametric)) {
+        throw std::runtime_error(
+          "scores() is only available for models with parametric "
+          "pair copulas");
+      }
+    }
+  }
+
   ScoresResult result;
   result.scores =
     Eigen::MatrixXd::Zero(n, static_cast<size_t>(this->get_npars()));
@@ -1161,15 +1176,10 @@ Vinecop::scores_full(Eigen::MatrixXd u,
   }
 
   if (!step_wise) {
-    // the analytic cascade requires derivative support on every edge
-    // (parametric families) and continuous variables
+    // the analytic cascade requires continuous variables (nonparametric
+    // families are already rejected above); discrete variables keep the
+    // finite-difference path
     bool analytic_ok = (get_n_discrete() == 0);
-    for (size_t t = 0; t < trunc_lvl; t++) {
-      for (size_t e = 0; e < d_ - 1 - t; e++) {
-        analytic_ok &= tools_stl::is_member(pair_copulas_[t][e].get_family(),
-                                            bicop_families::parametric);
-      }
-    }
 
     if (!analytic_ok) {
       // fall back to finite differences of the whole-vine log-density
@@ -1522,12 +1532,10 @@ Vinecop::scores_full(Eigen::MatrixXd u,
         }
 
         auto pars = edge_copula.get_parameters();
-        if (tools_stl::is_member(edge_copula.get_family(),
-                                 bicop_families::parametric) &&
-            (var_types == std::vector<std::string>{ "c", "c" })) {
+        if (var_types == std::vector<std::string>{ "c", "c" }) {
           // analytic per-edge gradient of the log-density (closed forms for
           // bicop_families::analytic_derivs, internal finite differences of
-          // the density otherwise)
+          // the density otherwise); nonparametric edges were rejected above
           for (size_t p = 0; p < static_cast<size_t>(pars.size()); p++) {
             Eigen::VectorXd col =
               edge_copula.logpdf_deriv(u_e, "par" + std::to_string(p + 1));
@@ -1539,8 +1547,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
             ipar++;
           }
         } else {
-          // nonparametric or discrete edges: finite differences of the
-          // edge log-density
+          // discrete edges: finite differences of the edge log-density
           auto ub = edge_copula.get_parameters_upper_bounds();
           auto lb = edge_copula.get_parameters_lower_bounds();
           for (size_t p = 0; p < static_cast<size_t>(pars.size()); p++) {
@@ -1643,8 +1650,14 @@ Vinecop::gradient(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 //! @brief Evaluates the hessian per observation.
 //!
 //! Hessian is meant loosely as "gradients of each component of the score
-//! function"; it is computed by central finite differences of `scores()`
-//! (which is itself analytic where the model permits, see `scores()`).
+//! function", i.e. `hess(t, e)[p](i, a) = ∂² log-likelihood_i / (∂θ_{t,e,p}
+//! ∂θ_a)`. For the joint (non-step-wise) Hessian of a continuous model it is
+//! computed analytically by a second-order cascade through the vine (the
+//! second derivative of the RVineGrad-style gradient cascade in `scores()`),
+//! using the pair copulas' analytic first and second derivatives; the
+//! step-wise Hessian and models with discrete variables use central finite
+//! differences of `scores()` instead. Models with nonparametric pair copulas
+//! are rejected.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
@@ -1654,6 +1667,10 @@ Vinecop::gradient(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
+//!
+//! @literature
+//! Stoeber, J. and Schepsmeier, U. (2013). Estimating standard errors in
+//! regular vine copula models. Computational Statistics, 28 (6), 2679-2707.
 inline TriangularArray<std::vector<Eigen::MatrixXd>>
 Vinecop::hessian_full(Eigen::MatrixXd u,
                       bool step_wise,
@@ -1663,31 +1680,324 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
   u = collapse_data(u);
 
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
-  TriangularArray<std::vector<Eigen::MatrixXd>> hess(d_);
+
+  // see scores(): differentiating w.r.t. a nonparametric grid is meaningless
   for (size_t t = 0; t < trunc_lvl; t++) {
     for (size_t e = 0; e < d_ - 1 - t; e++) {
-      auto pars = pair_copulas_[t][e].get_parameters();
-      auto ub = pair_copulas_[t][e].get_parameters_upper_bounds();
-      auto lb = pair_copulas_[t][e].get_parameters_lower_bounds();
-      hess(t, e).resize(pars.size());
-      for (size_t p = 0; p < static_cast<size_t>(pars.size()); p++) {
-        auto pars_tmp = pars;
-        double eps = 0;
-
-        pars_tmp(p) = std::min(pars(p) + 1e-3, ub(p));
-        eps += pars_tmp(p) - pars(p);
-        pair_copulas_[t][e].set_parameters(pars_tmp);
-        Eigen::MatrixXd f1 = this->scores(u, step_wise, num_threads);
-
-        pars_tmp(p) = std::max(pars(p) - 1e-3, lb(p));
-        eps -= pars_tmp(p) - pars(p);
-        pair_copulas_[t][e].set_parameters(pars_tmp);
-        Eigen::MatrixXd f2 = this->scores(u, step_wise, num_threads);
-
-        hess(t, e)[p] = (f1 - f2) / eps;
-        pair_copulas_[t][e].set_parameters(pars);
+      if (!tools_stl::is_member(pair_copulas_[t][e].get_family(),
+                                bicop_families::parametric)) {
+        throw std::runtime_error(
+          "hessian() is only available for models with parametric "
+          "pair copulas");
       }
     }
+  }
+
+  TriangularArray<std::vector<Eigen::MatrixXd>> hess(d_);
+
+  if (step_wise || (get_n_discrete() > 0)) {
+    // central finite differences of the (analytic-where-possible) scores;
+    // used for the step-wise Hessian and for models with discrete variables
+    for (size_t t = 0; t < trunc_lvl; t++) {
+      for (size_t e = 0; e < d_ - 1 - t; e++) {
+        auto pars = pair_copulas_[t][e].get_parameters();
+        auto ub = pair_copulas_[t][e].get_parameters_upper_bounds();
+        auto lb = pair_copulas_[t][e].get_parameters_lower_bounds();
+        hess(t, e).resize(pars.size());
+        for (size_t p = 0; p < static_cast<size_t>(pars.size()); p++) {
+          auto pars_tmp = pars;
+          double eps = 0;
+
+          pars_tmp(p) = std::min(pars(p) + 1e-3, ub(p));
+          eps += pars_tmp(p) - pars(p);
+          pair_copulas_[t][e].set_parameters(pars_tmp);
+          Eigen::MatrixXd f1 = this->scores(u, step_wise, num_threads);
+
+          pars_tmp(p) = std::max(pars(p) - 1e-3, lb(p));
+          eps -= pars_tmp(p) - pars(p);
+          pair_copulas_[t][e].set_parameters(pars_tmp);
+          Eigen::MatrixXd f2 = this->scores(u, step_wise, num_threads);
+
+          hess(t, e)[p] = (f1 - f2) / eps;
+          pair_copulas_[t][e].set_parameters(pars);
+        }
+      }
+    }
+    return hess;
+  }
+
+  // Analytic joint Hessian: differentiate the gradient cascade a second
+  // time. For a parameter pair (α, β) a forward walk propagates the first
+  // derivatives of each edge's arguments w.r.t. α ("hat") and β ("tilde")
+  // and their mixed second derivative ("bar"), accumulating
+  //   H_αβ = Σ_e [ ∂²logc/∂p²·P^α P^β + ∂²logc/∂p∂q·(P^α Q^β + Q^α P^β)
+  //               + ∂²logc/∂q²·Q^α Q^β + ∂logc/∂p·P^{αβ} + ∂logc/∂q·Q^{αβ}
+  //               + θ-argument cross terms and the ∂²logc/∂θ² seed ],
+  // where the bar quantities propagate with the h-function's own second
+  // derivatives. Every derivative is a Bicop leaf (using ∂h2/∂u1 =
+  // ∂h1/∂u2 = c); see hessian_full()'s @literature reference.
+  const size_t npars = static_cast<size_t>(this->get_npars());
+  auto order = rvine_structure_.get_order();
+
+  // flat parameter index <-> (tree, edge, param) and the first flat index of
+  // each edge
+  std::vector<std::array<size_t, 3>> par_of(npars);
+  TriangularArray<size_t> par0(d_, trunc_lvl);
+  {
+    size_t idx = 0;
+    for (size_t t = 0; t < trunc_lvl; t++) {
+      for (size_t e = 0; e < d_ - 1 - t; e++) {
+        par0(t, e) = idx;
+        size_t np =
+          static_cast<size_t>(pair_copulas_[t][e].get_parameters().size());
+        hess(t, e).resize(np);
+        for (size_t p = 0; p < np; p++) {
+          hess(t, e)[p] = Eigen::MatrixXd::Zero(u.rows(), npars);
+          par_of[idx++] = { t, e, p };
+        }
+      }
+    }
+  }
+
+  // per-edge, per-observation-batch caches of the density's and h-functions'
+  // derivatives (independent of the differentiated parameters)
+  struct OutCache
+  {
+    Eigen::VectorXd du1, du2, du1u1, du1u2, du2u2;
+    std::vector<Eigen::VectorXd> dth, dthu1, dthu2;
+    std::vector<std::vector<Eigen::VectorXd>> dthth;
+    bool active = false;
+  };
+  struct EdgeCache
+  {
+    size_t np, msrc;
+    bool direct;
+    Eigen::VectorXd Dp, Dq, Lpp, Lpq, Lqq;
+    std::vector<Eigen::VectorXd> Lthp, Lthq;
+    std::vector<std::vector<Eigen::VectorXd>> Lthth;
+    OutCache o1, o2;
+  };
+  auto sel = [](size_t p) { return "par" + std::to_string(p + 1); };
+
+  auto do_batch = [&](const tools_batch::Batch& b) {
+    const size_t m = b.size;
+
+    // forward pass: compute per-edge derivative caches and the h-function
+    // values needed to assemble deeper edges' arguments
+    std::vector<std::vector<EdgeCache>> C(trunc_lvl);
+    Eigen::MatrixXd hf1 = Eigen::MatrixXd::Zero(m, d_);
+    Eigen::MatrixXd hf2 = Eigen::MatrixXd::Zero(m, d_);
+    for (size_t j = 0; j < d_; ++j) {
+      hf2.col(j) = u.block(b.begin, order[j] - 1, m, 1);
+    }
+    for (size_t t = 0; t < trunc_lvl; ++t) {
+      C[t].resize(d_ - 1 - t);
+      tools_interface::check_user_interrupt(
+        static_cast<double>(u.rows()) * static_cast<double>(d_) > 1e3);
+      for (size_t e = 0; e < d_ - 1 - t; ++e) {
+        tools_interface::check_user_interrupt(e % 100 == 0);
+        Bicop ec = get_pair_copula(t, e);
+        EdgeCache& C_te = C[t][e];
+        size_t np = static_cast<size_t>(ec.get_parameters().size());
+        size_t msrc = rvine_structure_.min_array(t, e);
+        bool direct = (msrc == rvine_structure_.struct_array(t, e, true));
+        C_te.np = np;
+        C_te.msrc = msrc;
+        C_te.direct = direct;
+
+        Eigen::MatrixXd u_e(m, 2);
+        u_e.col(0) = hf2.col(e);
+        u_e.col(1) = direct ? hf2.col(msrc - 1) : hf1.col(msrc - 1);
+
+        // density (log) derivatives; c and the argument/parameter density
+        // derivatives are shared by both h-function outputs
+        Eigen::VectorXd c = ec.pdf(u_e);
+        Eigen::VectorXd cpu1 = ec.pdf_deriv(u_e, "u1");
+        Eigen::VectorXd cpu2 = ec.pdf_deriv(u_e, "u2");
+        std::vector<Eigen::VectorXd> cpth(np);
+        for (size_t p = 0; p < np; ++p) {
+          cpth[p] = ec.pdf_deriv(u_e, sel(p));
+        }
+        C_te.Dp = ec.logpdf_deriv(u_e, "u1");
+        C_te.Dq = ec.logpdf_deriv(u_e, "u2");
+        C_te.Lpp = ec.logpdf_deriv2(u_e, "u1u1");
+        C_te.Lpq = ec.logpdf_deriv2(u_e, "u1u2");
+        C_te.Lqq = ec.logpdf_deriv2(u_e, "u2u2");
+        C_te.Lthp.resize(np);
+        C_te.Lthq.resize(np);
+        C_te.Lthth.assign(np, std::vector<Eigen::VectorXd>(np));
+        for (size_t p = 0; p < np; ++p) {
+          C_te.Lthp[p] = ec.logpdf_deriv2(u_e, sel(p) + "u1");
+          C_te.Lthq[p] = ec.logpdf_deriv2(u_e, sel(p) + "u2");
+          for (size_t q = p; q < np; ++q) {
+            C_te.Lthth[p][q] = ec.logpdf_deriv2(u_e, sel(p) + sel(q));
+            C_te.Lthth[q][p] = C_te.Lthth[p][q];
+          }
+        }
+
+        bool push = (t + 1 < trunc_lvl);
+        // hfunc2 output (direct): conditions on u2, ∂h2/∂u1 = c
+        if (push && rvine_structure_.needed_hfunc2(t, e)) {
+          OutCache& o = C_te.o2;
+          o.active = true;
+          o.du1 = c;
+          o.du2 = ec.hfunc2_deriv(u_e, "u2");
+          o.du1u1 = cpu1;
+          o.du1u2 = cpu2;
+          o.du2u2 = ec.hfunc2_deriv2(u_e, "u2u2");
+          o.dth.resize(np);
+          o.dthu1.resize(np);
+          o.dthu2.resize(np);
+          o.dthth.assign(np, std::vector<Eigen::VectorXd>(np));
+          for (size_t p = 0; p < np; ++p) {
+            o.dth[p] = ec.hfunc2_deriv(u_e, sel(p));
+            o.dthu1[p] = cpth[p];
+            o.dthu2[p] = ec.hfunc2_deriv2(u_e, sel(p) + "u2");
+            for (size_t q = p; q < np; ++q) {
+              o.dthth[p][q] = ec.hfunc2_deriv2(u_e, sel(p) + sel(q));
+              o.dthth[q][p] = o.dthth[p][q];
+            }
+          }
+        }
+        // hfunc1 output (indirect): conditions on u1, ∂h1/∂u2 = c
+        if (push && rvine_structure_.needed_hfunc1(t, e)) {
+          OutCache& o = C_te.o1;
+          o.active = true;
+          o.du1 = ec.hfunc1_deriv(u_e, "u1");
+          o.du2 = c;
+          o.du1u1 = ec.hfunc1_deriv2(u_e, "u1u1");
+          o.du1u2 = cpu1;
+          o.du2u2 = cpu2;
+          o.dth.resize(np);
+          o.dthu1.resize(np);
+          o.dthu2.resize(np);
+          o.dthth.assign(np, std::vector<Eigen::VectorXd>(np));
+          for (size_t p = 0; p < np; ++p) {
+            o.dth[p] = ec.hfunc1_deriv(u_e, sel(p));
+            o.dthu1[p] = ec.hfunc1_deriv2(u_e, sel(p) + "u1");
+            o.dthu2[p] = cpth[p];
+            for (size_t q = p; q < np; ++q) {
+              o.dthth[p][q] = ec.hfunc1_deriv2(u_e, sel(p) + sel(q));
+              o.dthth[q][p] = o.dthth[p][q];
+            }
+          }
+        }
+
+        if (rvine_structure_.needed_hfunc1(t, e)) {
+          hf1.col(e) = ec.hfunc1(u_e);
+        }
+        if (rvine_structure_.needed_hfunc2(t, e)) {
+          hf2.col(e) = ec.hfunc2(u_e);
+        }
+      }
+    }
+
+    // second-order cascade for each parameter pair (only the upper triangle;
+    // H is symmetric)
+    std::vector<Eigen::VectorXd> hat1(d_), hat2(d_), til1(d_), til2(d_),
+      bar1(d_), bar2(d_);
+    for (size_t a = 0; a < npars; ++a) {
+      size_t ta = par_of[a][0], ea = par_of[a][1], pa = par_of[a][2];
+      for (size_t bfl = a; bfl < npars; ++bfl) {
+        size_t tb = par_of[bfl][0], eb = par_of[bfl][1], pb = par_of[bfl][2];
+
+        for (size_t col = 0; col < d_; ++col) {
+          hat1[col] = Eigen::VectorXd::Zero(m);
+          hat2[col] = Eigen::VectorXd::Zero(m);
+          til1[col] = Eigen::VectorXd::Zero(m);
+          til2[col] = Eigen::VectorXd::Zero(m);
+          bar1[col] = Eigen::VectorXd::Zero(m);
+          bar2[col] = Eigen::VectorXd::Zero(m);
+        }
+        Eigen::VectorXd Hval = Eigen::VectorXd::Zero(m);
+
+        for (size_t t = 0; t < trunc_lvl; ++t) {
+          for (size_t e = 0; e < d_ - 1 - t; ++e) {
+            const EdgeCache& C_te = C[t][e];
+            size_t msrc = C_te.msrc;
+            bool direct = C_te.direct;
+            bool isA = (t == ta) && (e == ea);
+            bool isB = (t == tb) && (e == eb);
+
+            // input-argument perturbations (p_e from column e's hfunc2,
+            // q_e from column msrc-1's hfunc2/hfunc1). p_e's column is
+            // overwritten by the propagation below, so copy it by value;
+            // q_e's column (msrc-1 > e) is untouched this step.
+            Eigen::VectorXd hp = hat2[e];
+            Eigen::VectorXd tp = til2[e];
+            Eigen::VectorXd bp = bar2[e];
+            const Eigen::VectorXd& hq =
+              direct ? hat2[msrc - 1] : hat1[msrc - 1];
+            const Eigen::VectorXd& tq =
+              direct ? til2[msrc - 1] : til1[msrc - 1];
+            const Eigen::VectorXd& bq =
+              direct ? bar2[msrc - 1] : bar1[msrc - 1];
+
+            // accumulate the Hessian contribution of this edge
+            Hval += C_te.Lpp.cwiseProduct(hp).cwiseProduct(tp);
+            Hval +=
+              C_te.Lpq.cwiseProduct(hp.cwiseProduct(tq) + hq.cwiseProduct(tp));
+            Hval += C_te.Lqq.cwiseProduct(hq).cwiseProduct(tq);
+            Hval += C_te.Dp.cwiseProduct(bp) + C_te.Dq.cwiseProduct(bq);
+            if (isA) {
+              Hval +=
+                C_te.Lthp[pa].cwiseProduct(tp) + C_te.Lthq[pa].cwiseProduct(tq);
+            }
+            if (isB) {
+              Hval +=
+                C_te.Lthp[pb].cwiseProduct(hp) + C_te.Lthq[pb].cwiseProduct(hq);
+            }
+            if (isA && isB) {
+              Hval += C_te.Lthth[pa][pb];
+            }
+
+            // propagate the perturbations to this edge's h-function outputs
+            auto propagate = [&](const OutCache& o,
+                                 Eigen::VectorXd& oh,
+                                 Eigen::VectorXd& ot,
+                                 Eigen::VectorXd& ob) {
+              oh = o.du1.cwiseProduct(hp) + o.du2.cwiseProduct(hq);
+              ot = o.du1.cwiseProduct(tp) + o.du2.cwiseProduct(tq);
+              ob = o.du1u1.cwiseProduct(hp).cwiseProduct(tp) +
+                   o.du1u2.cwiseProduct(hp.cwiseProduct(tq) +
+                                        hq.cwiseProduct(tp)) +
+                   o.du2u2.cwiseProduct(hq).cwiseProduct(tq) +
+                   o.du1.cwiseProduct(bp) + o.du2.cwiseProduct(bq);
+              if (isA) {
+                oh += o.dth[pa];
+                ob +=
+                  o.dthu1[pa].cwiseProduct(tp) + o.dthu2[pa].cwiseProduct(tq);
+              }
+              if (isB) {
+                ot += o.dth[pb];
+                ob +=
+                  o.dthu1[pb].cwiseProduct(hp) + o.dthu2[pb].cwiseProduct(hq);
+              }
+              if (isA && isB) {
+                ob += o.dthth[pa][pb];
+              }
+            };
+            if (C_te.o2.active) {
+              propagate(C_te.o2, hat2[e], til2[e], bar2[e]);
+            }
+            if (C_te.o1.active) {
+              propagate(C_te.o1, hat1[e], til1[e], bar1[e]);
+            }
+          }
+        }
+
+        hess(ta, ea)[pa].block(b.begin, bfl, m, 1) = Hval;
+        if (a != bfl) {
+          hess(tb, eb)[pb].block(b.begin, a, m, 1) = Hval;
+        }
+      }
+    }
+  };
+
+  if (trunc_lvl > 0) {
+    tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
+    pool.map(do_batch, tools_batch::create_batches(u.rows(), num_threads));
+    pool.join();
   }
 
   return hess;

@@ -558,10 +558,160 @@ TEST(VinecopDerivatives, full_scores_match_RVineGrad_and_RVineHessian)
   // deterministic across the number of threads
   EXPECT_TRUE(all_close(vc.scores(u, false, 3), s, 1e-12, 1e-12));
 
-  // Hessian: finite differences of the analytic gradient vs RVineHessian's
-  // analytic Hessian of the sample log-likelihood
+  // Hessian: our analytic joint Hessian vs the R oracle's central finite
+  // differences of RVineGrad (the R side carries the finite-difference
+  // error, so the tolerance is looser than the gradient's)
   Eigen::MatrixXd H = vc.hessian(u, false, 1) * static_cast<double>(u.rows());
-  EXPECT_TRUE(all_close(H, hess_r, 1e-3, 1e-2));
+  EXPECT_TRUE(all_close(H, hess_r, 1e-4, 1e-3));
+  EXPECT_TRUE(all_close(H, H.transpose().eval(), 1e-10, 1e-10)); // symmetric
+}
+
+// The analytic joint Hessian must match brute-force central finite
+// differences of the whole-vine log-likelihood — the unforgiving ground
+// truth, and (unlike the R oracle) valid for 90/270 rotations and
+// truncation, which VineCopula's RVineHessian cannot provide.
+TEST(VinecopDerivatives, hessian_matches_brute_force)
+{
+  auto P1 = [](double v) { return Eigen::VectorXd::Constant(1, v).eval(); };
+  auto pcs = Vinecop::make_pair_copula_store(5);
+  pcs[0][0] = Bicop(BicopFamily::gaussian, 0, P1(0.6));
+  pcs[0][1] = Bicop(BicopFamily::clayton, 90, P1(2.5));
+  pcs[0][2] = Bicop(BicopFamily::gumbel, 180, P1(1.8));
+  pcs[0][3] = Bicop(BicopFamily::joe, 270, P1(2.2));
+  pcs[1][0] = Bicop(BicopFamily::frank, 0, P1(4.0));
+  Eigen::VectorXd st_par(2);
+  st_par << 0.5, 6.0;
+  pcs[1][1] = Bicop(BicopFamily::student, 0, st_par);
+  pcs[1][2] = Bicop(BicopFamily::clayton, 180, P1(1.2));
+  pcs[2][0] = Bicop(BicopFamily::gumbel, 0, P1(1.4));
+  pcs[2][1] = Bicop(BicopFamily::gaussian, 0, P1(-0.3));
+  pcs[3][0] = Bicop(BicopFamily::gaussian, 0, P1(0.2));
+  Vinecop vc(DVineStructure({ 1, 2, 3, 4, 5 }), pcs);
+  auto u = vc.simulate(150, false, 1, { 42, 1, 2 });
+
+  size_t npars = static_cast<size_t>(vc.get_npars());
+  Eigen::MatrixXd H = vc.hessian(u, false, 1) * static_cast<double>(u.rows());
+
+  // flat (t, e, p) list in hessian()'s column order
+  std::vector<std::array<size_t, 3>> pl;
+  for (size_t t = 0; t < 4; ++t) {
+    for (size_t e = 0; e < 4 - t; ++e) {
+      size_t np = static_cast<size_t>(pcs[t][e].get_parameters().size());
+      for (size_t p = 0; p < np; ++p) {
+        pl.push_back({ t, e, p });
+      }
+    }
+  }
+  auto structure = vc.get_rvine_structure();
+  auto loglik = [&](const std::vector<std::vector<Bicop>>& pp) {
+    return Vinecop(structure, pp).pdf(u).array().max(1e-300).log().sum();
+  };
+  auto bump = [&](std::vector<std::vector<Bicop>> pp, size_t a, double h) {
+    auto pr = pp[pl[a][0]][pl[a][1]].get_parameters();
+    pr(pl[a][2]) += h;
+    pp[pl[a][0]][pl[a][1]].set_parameters(pr);
+    return pp;
+  };
+  double base = loglik(pcs);
+  double h = 1e-4;
+  for (size_t a = 0; a < npars; ++a) {
+    for (size_t bb = a; bb < npars; ++bb) {
+      double fd;
+      if (a == bb) {
+        fd = (loglik(bump(pcs, a, h)) - 2 * base + loglik(bump(pcs, a, -h))) /
+             (h * h);
+      } else {
+        fd = (loglik(bump(bump(pcs, a, h), bb, h)) -
+              loglik(bump(bump(pcs, a, h), bb, -h)) -
+              loglik(bump(bump(pcs, a, -h), bb, h)) +
+              loglik(bump(bump(pcs, a, -h), bb, -h))) /
+             (4 * h * h);
+      }
+      EXPECT_NEAR(H(a, bb), fd, 1e-3 * (1.0 + std::abs(fd)))
+        << "H(" << a << ", " << bb << ")";
+    }
+  }
+  EXPECT_TRUE(all_close(H, H.transpose().eval(), 1e-10, 1e-10));
+  EXPECT_TRUE(all_close(vc.hessian(u, false, 3) * static_cast<double>(u.rows()),
+                        H,
+                        1e-12,
+                        1e-12)); // threading determinism
+}
+
+// A vine with a family outside the analytic set (bb1) still gets an analytic
+// joint Hessian: the second-order cascade calls the pair copula's derivative
+// leaves, which fall back to finite differences inside the leaf for bb1.
+TEST(VinecopDerivatives, hessian_bb1_edge_matches_brute_force)
+{
+  auto P1 = [](double v) { return Eigen::VectorXd::Constant(1, v).eval(); };
+  auto pcs = Vinecop::make_pair_copula_store(3);
+  Eigen::VectorXd bb1_par(2);
+  bb1_par << 1.0, 1.5;
+  pcs[0][0] = Bicop(BicopFamily::bb1, 0, bb1_par);
+  pcs[0][1] = Bicop(BicopFamily::gaussian, 0, P1(0.5));
+  pcs[1][0] = Bicop(BicopFamily::gumbel, 0, P1(1.5));
+  Vinecop vc(DVineStructure({ 1, 2, 3 }), pcs);
+  auto u = vc.simulate(100, false, 1, { 3 });
+
+  size_t npars = static_cast<size_t>(vc.get_npars());
+  Eigen::MatrixXd H = vc.hessian(u, false, 1) * static_cast<double>(u.rows());
+  EXPECT_TRUE(H.allFinite());
+
+  std::vector<std::array<size_t, 3>> pl;
+  for (size_t t = 0; t < 2; ++t) {
+    for (size_t e = 0; e < 2 - t; ++e) {
+      size_t np = static_cast<size_t>(pcs[t][e].get_parameters().size());
+      for (size_t p = 0; p < np; ++p) {
+        pl.push_back({ t, e, p });
+      }
+    }
+  }
+  auto structure = vc.get_rvine_structure();
+  auto loglik = [&](const std::vector<std::vector<Bicop>>& pp) {
+    return Vinecop(structure, pp).pdf(u).array().max(1e-300).log().sum();
+  };
+  auto bump = [&](std::vector<std::vector<Bicop>> pp, size_t a, double hh) {
+    auto pr = pp[pl[a][0]][pl[a][1]].get_parameters();
+    pr(pl[a][2]) += hh;
+    pp[pl[a][0]][pl[a][1]].set_parameters(pr);
+    return pp;
+  };
+  double base = loglik(pcs);
+  double h = 1e-4;
+  // looser tolerance: bb1's second derivatives come from the leaf-level
+  // finite-difference fallback, so the cascade carries that error
+  for (size_t a = 0; a < npars; ++a) {
+    for (size_t bb = a; bb < npars; ++bb) {
+      double fd;
+      if (a == bb) {
+        fd = (loglik(bump(pcs, a, h)) - 2 * base + loglik(bump(pcs, a, -h))) /
+             (h * h);
+      } else {
+        fd = (loglik(bump(bump(pcs, a, h), bb, h)) -
+              loglik(bump(bump(pcs, a, h), bb, -h)) -
+              loglik(bump(bump(pcs, a, -h), bb, h)) +
+              loglik(bump(bump(pcs, a, -h), bb, -h))) /
+             (4 * h * h);
+      }
+      EXPECT_NEAR(H(a, bb), fd, 5e-2 * (1.0 + std::abs(fd)))
+        << "H(" << a << ", " << bb << ")";
+    }
+  }
+}
+
+// scores() and hessian() reject models with nonparametric pair copulas
+// (differentiating w.r.t. the interpolation grid is meaningless; mirrors
+// the guard added in the perf-overhaul PR).
+TEST(VinecopDerivatives, reject_nonparametric)
+{
+  auto data = tools_stats::simulate_uniform(200, 3);
+  Vinecop vc(DVineStructure({ 1, 2, 3 }));
+  vc.select(data, FitControlsVinecop({ BicopFamily::tll }));
+  EXPECT_THROW(vc.scores(data, true), std::runtime_error);
+  EXPECT_THROW(vc.scores(data, false), std::runtime_error);
+  EXPECT_THROW(vc.hessian(data, true), std::runtime_error);
+  EXPECT_THROW(vc.hessian(data, false), std::runtime_error);
+  EXPECT_THROW(vc.gradient(data, false), std::runtime_error);
 }
 
 // The step-wise scores must match per-edge finite differences of the edge
@@ -681,8 +831,9 @@ TEST_F(VinecopTest, full_scores_match_brute_force_on_truncated_vine)
 TEST(VinecopDerivatives, fallback_paths_run)
 {
   auto P1 = [](double v) { return Eigen::VectorXd::Constant(1, v).eval(); };
-  // a bb1 edge forces the whole-vine finite-difference branch for the full
-  // gradient (and the internal finite-difference leaves for step-wise)
+  // a bb1 edge is parametric, so scores/hessian still take the analytic
+  // cascade — the bb1 pair copula's derivative leaves simply fall back to
+  // finite differences internally
   auto pcs = Vinecop::make_pair_copula_store(3);
   Eigen::VectorXd bb1_par(2);
   bb1_par << 1.0, 1.5;
