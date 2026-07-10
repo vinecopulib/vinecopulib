@@ -268,6 +268,44 @@ public:
                              bool step_wise = true,
                              const size_t num_threads = 1);
 
+private:
+  // Per-edge derivative caches shared by the analytic score/gradient/Hessian
+  // cascades (one forward walk fills them; the cascades then read them). For
+  // an h-function output, `du1`/`du2` are ∂h/∂u1, ∂h/∂u2 (one of them equals
+  // the density `c` by the identity ∂h2/∂u1 = ∂h1/∂u2 = c).
+  struct DerivLeaf
+  {
+    Eigen::VectorXd du1, du2;          // ∂h/∂u1, ∂h/∂u2
+    std::vector<Eigen::VectorXd> dpar; // ∂h/∂θ_p (cascade seed)
+    // second-order (only when requested):
+    Eigen::VectorXd du1u1, du1u2, du2u2;           // ∂²h/∂{u1²,u1u2,u2²}
+    std::vector<Eigen::VectorXd> dpar_u1, dpar_u2; // ∂²h/∂θ_p∂{u1,u2}
+    std::vector<std::vector<Eigen::VectorXd>> dpar_par; // ∂²h/∂θ_p∂θ_q
+    bool active{ false }; // output feeds a deeper tree
+  };
+  struct DerivCache
+  {
+    size_t np{ 0 }, msrc{ 0 };
+    bool direct{ false };
+    Eigen::VectorXd c, lu1, lu2;       // c, ∂logc/∂u1, ∂logc/∂u2
+    std::vector<Eigen::VectorXd> lpar; // ∂logc/∂θ_p (step-wise score)
+    // second-order log-density (only when requested):
+    Eigen::VectorXd lu1u1, lu1u2, lu2u2;
+    std::vector<Eigen::VectorXd> lpar_u1, lpar_u2;
+    std::vector<std::vector<Eigen::VectorXd>> lpar_par;
+    DerivLeaf o1, o2; // hfunc1 (indirect) and hfunc2 (direct) outputs
+  };
+  // one forward walk over the rows [begin, begin + size) of `u`, filling the
+  // per-edge derivative caches (second-order fields only when `second_order`).
+  TriangularArray<DerivCache> build_deriv_cache(const Eigen::MatrixXd& u,
+                                                size_t begin,
+                                                size_t size,
+                                                bool second_order) const;
+
+  // throws if any pair copula is nonparametric (differentiating w.r.t. an
+  // interpolation grid is meaningless); `fn` names the calling method.
+  void check_parametric(const char* fn) const;
+
 protected:
   size_t d_{ 1 };
   RVineStructure rvine_structure_;

@@ -1094,6 +1094,181 @@ Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
   return pdf_full(std::move(u), num_threads, false).pdf;
 }
 
+//! throws if the model has a nonparametric pair copula (see scores()).
+inline void
+Vinecop::check_parametric(const char* fn) const
+{
+  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
+  for (size_t t = 0; t < trunc_lvl; t++) {
+    for (size_t e = 0; e < d_ - 1 - t; e++) {
+      if (!tools_stl::is_member(pair_copulas_[t][e].get_family(),
+                                bicop_families::parametric)) {
+        throw std::runtime_error(
+          std::string(fn) +
+          " is only available for models with parametric pair copulas");
+      }
+    }
+  }
+}
+
+//! first-order chain-rule push-forward of an argument perturbation through
+//! an h-function output: `∂h/∂u1 · v1 + ∂h/∂u2 · v2` (shared by the gradient
+//! cascade and the Hessian's hat/til propagations).
+inline Eigen::VectorXd
+propagate_first_order(const Eigen::VectorXd& du1,
+                      const Eigen::VectorXd& du2,
+                      const Eigen::VectorXd& v1,
+                      const Eigen::VectorXd& v2)
+{
+  return du1.cwiseProduct(v1) + du2.cwiseProduct(v2);
+}
+
+//! @brief Builds the per-edge derivative caches by one forward walk over the
+//! rows `[begin, begin + size)` of `u`.
+//!
+//! This is the single forward pass shared by the analytic gradient, joint
+//! Hessian, and step-wise Hessian: it assembles each edge's arguments `u_e`
+//! from the previous tree's h-functions and evaluates the pair copulas'
+//! derivative leaves. Continuous, all-parametric models only (the callers
+//! reject nonparametric families and route discrete/step-wise=true to finite
+//! differences). Second-order leaves are computed only when `second_order`.
+inline TriangularArray<Vinecop::DerivCache>
+Vinecop::build_deriv_cache(const Eigen::MatrixXd& u,
+                           size_t begin,
+                           size_t size,
+                           bool second_order) const
+{
+  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
+  auto order = rvine_structure_.get_order();
+  const size_t m = size;
+  TriangularArray<DerivCache> cache(d_, trunc_lvl);
+
+  Eigen::MatrixXd hf1 = Eigen::MatrixXd::Zero(m, d_);
+  Eigen::MatrixXd hf2 = Eigen::MatrixXd::Zero(m, d_);
+  for (size_t j = 0; j < d_; ++j) {
+    hf2.col(j) = u.block(begin, order[j] - 1, m, 1);
+  }
+  auto sel = [](size_t p) { return "par" + std::to_string(p + 1); };
+
+  Eigen::MatrixXd u_e;
+  for (size_t t = 0; t < trunc_lvl; ++t) {
+    tools_interface::check_user_interrupt(
+      static_cast<double>(u.rows()) * static_cast<double>(d_) > 1e3);
+    for (size_t e = 0; e < d_ - 1 - t; ++e) {
+      tools_interface::check_user_interrupt(e % 100 == 0);
+      const Bicop& ec = pair_copulas_[t][e]; // const ref: no per-edge copy
+      DerivCache& ce = cache(t, e);
+      size_t np = static_cast<size_t>(ec.get_parameters().size());
+      ce.np = np;
+      ce.msrc = rvine_structure_.min_array(t, e);
+      ce.direct = (ce.msrc == rvine_structure_.struct_array(t, e, true));
+
+      u_e = Eigen::MatrixXd(m, 2);
+      u_e.col(0) = hf2.col(e);
+      u_e.col(1) = ce.direct ? hf2.col(ce.msrc - 1) : hf1.col(ce.msrc - 1);
+
+      ce.c = ec.pdf(u_e);
+      ce.lu1 = ec.logpdf_deriv(u_e, "u1");
+      ce.lu2 = ec.logpdf_deriv(u_e, "u2");
+      ce.lpar.resize(np);
+      for (size_t p = 0; p < np; ++p) {
+        ce.lpar[p] = ec.logpdf_deriv(u_e, sel(p));
+      }
+
+      // ∂c/∂u1, ∂c/∂u2, ∂c/∂θ are shared by the two h-outputs' 2nd-order
+      // fields (via ∂h2/∂u1 = ∂h1/∂u2 = c); only needed for second order
+      Eigen::VectorXd cpu1, cpu2;
+      std::vector<Eigen::VectorXd> cppar;
+      if (second_order) {
+        cpu1 = ec.pdf_deriv(u_e, "u1");
+        cpu2 = ec.pdf_deriv(u_e, "u2");
+        cppar.resize(np);
+        for (size_t p = 0; p < np; ++p) {
+          cppar[p] = ec.pdf_deriv(u_e, sel(p));
+        }
+        ce.lu1u1 = ec.logpdf_deriv2(u_e, "u1u1");
+        ce.lu1u2 = ec.logpdf_deriv2(u_e, "u1u2");
+        ce.lu2u2 = ec.logpdf_deriv2(u_e, "u2u2");
+        ce.lpar_u1.resize(np);
+        ce.lpar_u2.resize(np);
+        ce.lpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
+        for (size_t p = 0; p < np; ++p) {
+          ce.lpar_u1[p] = ec.logpdf_deriv2(u_e, sel(p) + "u1");
+          ce.lpar_u2[p] = ec.logpdf_deriv2(u_e, sel(p) + "u2");
+          for (size_t q = p; q < np; ++q) {
+            ce.lpar_par[p][q] = ec.logpdf_deriv2(u_e, sel(p) + sel(q));
+            ce.lpar_par[q][p] = ce.lpar_par[p][q];
+          }
+        }
+      }
+
+      bool push = (t + 1 < trunc_lvl);
+      // hfunc2 output (direct): ∂h2/∂u1 = c (identity), ∂h2/∂u2 conditioning
+      if (push && rvine_structure_.needed_hfunc2(t, e)) {
+        DerivLeaf& o = ce.o2;
+        o.active = true;
+        o.du1 = ce.c;
+        o.du2 = ec.hfunc2_deriv(u_e, "u2");
+        o.dpar.resize(np);
+        for (size_t p = 0; p < np; ++p) {
+          o.dpar[p] = ec.hfunc2_deriv(u_e, sel(p));
+        }
+        if (second_order) {
+          o.du1u1 = cpu1;
+          o.du1u2 = cpu2;
+          o.du2u2 = ec.hfunc2_deriv2(u_e, "u2u2");
+          o.dpar_u1.resize(np);
+          o.dpar_u2.resize(np);
+          o.dpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
+          for (size_t p = 0; p < np; ++p) {
+            o.dpar_u1[p] = cppar[p]; // ∂²h2/∂θ∂u1 = ∂c/∂θ
+            o.dpar_u2[p] = ec.hfunc2_deriv2(u_e, sel(p) + "u2");
+            for (size_t q = p; q < np; ++q) {
+              o.dpar_par[p][q] = ec.hfunc2_deriv2(u_e, sel(p) + sel(q));
+              o.dpar_par[q][p] = o.dpar_par[p][q];
+            }
+          }
+        }
+      }
+      // hfunc1 output (indirect): ∂h1/∂u2 = c (identity), ∂h1/∂u1 conditioning
+      if (push && rvine_structure_.needed_hfunc1(t, e)) {
+        DerivLeaf& o = ce.o1;
+        o.active = true;
+        o.du1 = ec.hfunc1_deriv(u_e, "u1");
+        o.du2 = ce.c;
+        o.dpar.resize(np);
+        for (size_t p = 0; p < np; ++p) {
+          o.dpar[p] = ec.hfunc1_deriv(u_e, sel(p));
+        }
+        if (second_order) {
+          o.du1u1 = ec.hfunc1_deriv2(u_e, "u1u1");
+          o.du1u2 = cpu1; // ∂²h1/∂u1∂u2 = ∂c/∂u1
+          o.du2u2 = cpu2; // ∂²h1/∂u2²   = ∂c/∂u2
+          o.dpar_u1.resize(np);
+          o.dpar_u2.resize(np);
+          o.dpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
+          for (size_t p = 0; p < np; ++p) {
+            o.dpar_u1[p] = ec.hfunc1_deriv2(u_e, sel(p) + "u1");
+            o.dpar_u2[p] = cppar[p]; // ∂²h1/∂θ∂u2 = ∂c/∂θ
+            for (size_t q = p; q < np; ++q) {
+              o.dpar_par[p][q] = ec.hfunc1_deriv2(u_e, sel(p) + sel(q));
+              o.dpar_par[q][p] = o.dpar_par[p][q];
+            }
+          }
+        }
+      }
+
+      if (rvine_structure_.needed_hfunc1(t, e)) {
+        hf1.col(e) = ec.hfunc1(u_e);
+      }
+      if (rvine_structure_.needed_hfunc2(t, e)) {
+        hf2.col(e) = ec.hfunc2(u_e);
+      }
+    }
+  }
+  return cache;
+}
+
 //! @brief Evaluates the score function together with the per-edge
 //! derivative caches.
 //!
@@ -1153,20 +1328,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
   auto disc_cols = tools_select::get_disc_cols(var_types_);
   const size_t n = static_cast<size_t>(u.rows());
 
-  // derivatives w.r.t. a nonparametric pair copula's grid values are
-  // meaningless (get_parameters() is the interpolation grid, not the
-  // effective parameters), so reject such models rather than write out of
-  // bounds
-  for (size_t t = 0; t < trunc_lvl; t++) {
-    for (size_t e = 0; e < d_ - 1 - t; e++) {
-      if (!tools_stl::is_member(pair_copulas_[t][e].get_family(),
-                                bicop_families::parametric)) {
-        throw std::runtime_error(
-          "scores() is only available for models with parametric "
-          "pair copulas");
-      }
-    }
-  }
+  check_parametric("scores()");
 
   ScoresResult result;
   result.scores =
@@ -1217,226 +1379,155 @@ Vinecop::scores_full(Eigen::MatrixXd u,
     // Analytic full gradient: the log-density of the vine is a sum over
     // edges whose arguments are h-functions of earlier trees, so a
     // parameter of edge (t0, e0) also enters all deeper edges fed by it.
-    // The forward pass below caches, per edge, the density and the argument
-    // derivatives (which do not depend on the differentiated parameter);
-    // each parameter then only requires seeding the perturbations
-    // (d h1/d theta, d h2/d theta) at its own edge and propagating them
-    // through the cached quantities by the chain rule:
+    // A parameter's cascade seeds the perturbation of its own edge's
+    // h-functions (dh/dtheta) and propagates it to deeper edges by the chain
+    // rule, accumulating
     //   score      += (dc/du1)/c * v1 + (dc/du2)/c * v2,
     //   v_direct'   = c * v1 + (dh2/du2) * v2,
     //   v_indirect' = (dh1/du1) * v1 + c * v2,
-    // where v1/v2 are the perturbations of the edge's arguments and
-    // dh1(u2|u1)/du2 = dh2(u1|u2)/du1 = c was used.
+    // where dh1(u2|u1)/du2 = dh2(u1|u2)/du1 = c was used. All per-edge
+    // derivatives come from build_deriv_cache().
     //
     // Reference: Stoeber, J. and U. Schepsmeier (2013), Estimating standard
     // errors in regular vine copula models, Computational Statistics, 28
     // (6), 2679-2707 (the C implementation is VineCopula's rvinederiv.c).
-
-    // allocate the caches; they double as the working storage of the
-    // cascade and are dropped at the end unless keep_all
-    result.pdf_edges = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
-    result.logpdf_deriv_pars =
-      TriangularArray<std::vector<Eigen::VectorXd>>(d_, trunc_lvl);
-    result.hfunc1_deriv_pars =
-      TriangularArray<std::vector<Eigen::VectorXd>>(d_, trunc_lvl);
-    result.hfunc2_deriv_pars =
-      TriangularArray<std::vector<Eigen::VectorXd>>(d_, trunc_lvl);
-    result.logpdf_deriv_u1 = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
-    result.logpdf_deriv_u2 = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
-    result.hfunc1_deriv_u1 = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
-    result.hfunc2_deriv_u2 = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
-    for (size_t t = 0; t < trunc_lvl; ++t) {
-      for (size_t e = 0; e < d_ - 1 - t; ++e) {
-        size_t npars =
-          static_cast<size_t>(pair_copulas_[t][e].get_parameters().size());
-        result.pdf_edges(t, e) = Eigen::VectorXd(n);
-        result.logpdf_deriv_pars(t, e).resize(npars);
-        result.hfunc1_deriv_pars(t, e).resize(npars);
-        result.hfunc2_deriv_pars(t, e).resize(npars);
-        for (size_t p = 0; p < npars; ++p) {
-          result.logpdf_deriv_pars(t, e)[p] = Eigen::VectorXd(n);
-        }
-        if (t > 0) {
-          // argument derivatives are needed wherever perturbations of
-          // earlier trees can arrive (any tree but the first)
-          result.logpdf_deriv_u1(t, e) = Eigen::VectorXd(n);
-          result.logpdf_deriv_u2(t, e) = Eigen::VectorXd(n);
-        }
-        // h-function derivatives are only needed (and computed) where a
-        // deeper (non-truncated) tree consumes them
-        bool push = (t + 1 < trunc_lvl);
-        if (push && rvine_structure_.needed_hfunc1(t, e)) {
-          result.hfunc1_deriv_u1(t, e) = Eigen::VectorXd(n);
-          for (size_t p = 0; p < npars; ++p) {
-            result.hfunc1_deriv_pars(t, e)[p] = Eigen::VectorXd(n);
+    if (keep_all) {
+      // per-edge caches returned to the caller (filled per batch below);
+      // argument log-derivatives exist only for trees > 0 (where a
+      // perturbation can arrive) and h-function derivatives only where a
+      // deeper non-truncated tree consumes the output
+      result.pdf_edges = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
+      result.logpdf_deriv_pars =
+        TriangularArray<std::vector<Eigen::VectorXd>>(d_, trunc_lvl);
+      result.hfunc1_deriv_pars =
+        TriangularArray<std::vector<Eigen::VectorXd>>(d_, trunc_lvl);
+      result.hfunc2_deriv_pars =
+        TriangularArray<std::vector<Eigen::VectorXd>>(d_, trunc_lvl);
+      result.logpdf_deriv_u1 = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
+      result.logpdf_deriv_u2 = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
+      result.hfunc1_deriv_u1 = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
+      result.hfunc2_deriv_u2 = TriangularArray<Eigen::VectorXd>(d_, trunc_lvl);
+      for (size_t t = 0; t < trunc_lvl; ++t) {
+        for (size_t e = 0; e < d_ - 1 - t; ++e) {
+          size_t np =
+            static_cast<size_t>(pair_copulas_[t][e].get_parameters().size());
+          result.pdf_edges(t, e) = Eigen::VectorXd(n);
+          result.logpdf_deriv_pars(t, e).resize(np);
+          result.hfunc1_deriv_pars(t, e).resize(np);
+          result.hfunc2_deriv_pars(t, e).resize(np);
+          for (size_t p = 0; p < np; ++p) {
+            result.logpdf_deriv_pars(t, e)[p] = Eigen::VectorXd(n);
           }
-        }
-        if (push && rvine_structure_.needed_hfunc2(t, e)) {
-          result.hfunc2_deriv_u2(t, e) = Eigen::VectorXd(n);
-          for (size_t p = 0; p < npars; ++p) {
-            result.hfunc2_deriv_pars(t, e)[p] = Eigen::VectorXd(n);
+          if (t > 0) {
+            result.logpdf_deriv_u1(t, e) = Eigen::VectorXd(n);
+            result.logpdf_deriv_u2(t, e) = Eigen::VectorXd(n);
+          }
+          bool push = (t + 1 < trunc_lvl);
+          if (push && rvine_structure_.needed_hfunc1(t, e)) {
+            result.hfunc1_deriv_u1(t, e) = Eigen::VectorXd(n);
+            for (size_t p = 0; p < np; ++p) {
+              result.hfunc1_deriv_pars(t, e)[p] = Eigen::VectorXd(n);
+            }
+          }
+          if (push && rvine_structure_.needed_hfunc2(t, e)) {
+            result.hfunc2_deriv_u2(t, e) = Eigen::VectorXd(n);
+            for (size_t p = 0; p < np; ++p) {
+              result.hfunc2_deriv_pars(t, e)[p] = Eigen::VectorXd(n);
+            }
           }
         }
       }
     }
 
     auto do_batch = [&](const tools_batch::Batch& b) {
-      // forward pass: h-function storage as in pdf(), filling the caches
-      Eigen::MatrixXd hfunc1 = Eigen::MatrixXd::Zero(b.size, d_);
-      Eigen::MatrixXd hfunc2 = Eigen::MatrixXd::Zero(b.size, d_);
-      for (size_t j = 0; j < d_; ++j) {
-        hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
-      }
+      auto cache = build_deriv_cache(u, b.begin, b.size, false);
 
-      Eigen::MatrixXd u_e;
-      for (size_t tree = 0; tree < trunc_lvl; ++tree) {
-        tools_interface::check_user_interrupt(
-          static_cast<double>(u.rows()) * static_cast<double>(d_) > 1e3);
-        for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
-          tools_interface::check_user_interrupt(edge % 100 == 0);
-          Bicop edge_copula = get_pair_copula(tree, edge);
-          size_t m = rvine_structure_.min_array(tree, edge);
-
-          u_e = Eigen::MatrixXd(b.size, 2);
-          u_e.col(0) = hfunc2.col(edge);
-          if (m == rvine_structure_.struct_array(tree, edge, true)) {
-            u_e.col(1) = hfunc2.col(m - 1);
-          } else {
-            u_e.col(1) = hfunc1.col(m - 1);
-          }
-
-          result.pdf_edges(tree, edge).segment(b.begin, b.size) =
-            edge_copula.pdf(u_e);
-          if (tree > 0) {
-            result.logpdf_deriv_u1(tree, edge).segment(b.begin, b.size) =
-              edge_copula.logpdf_deriv(u_e, "u1");
-            result.logpdf_deriv_u2(tree, edge).segment(b.begin, b.size) =
-              edge_copula.logpdf_deriv(u_e, "u2");
-          }
-          bool push = (tree + 1 < trunc_lvl);
-          if (push && rvine_structure_.needed_hfunc1(tree, edge)) {
-            result.hfunc1_deriv_u1(tree, edge).segment(b.begin, b.size) =
-              edge_copula.hfunc1_deriv(u_e, "u1");
-          }
-          if (push && rvine_structure_.needed_hfunc2(tree, edge)) {
-            result.hfunc2_deriv_u2(tree, edge).segment(b.begin, b.size) =
-              edge_copula.hfunc2_deriv(u_e, "u2");
-          }
-
-          size_t npars = result.logpdf_deriv_pars(tree, edge).size();
-          for (size_t p = 0; p < npars; ++p) {
-            std::string sel = "par" + std::to_string(p + 1);
-            result.logpdf_deriv_pars(tree, edge)[p].segment(b.begin, b.size) =
-              edge_copula.logpdf_deriv(u_e, sel);
-            if (push && rvine_structure_.needed_hfunc1(tree, edge)) {
-              result.hfunc1_deriv_pars(tree, edge)[p].segment(b.begin, b.size) =
-                edge_copula.hfunc1_deriv(u_e, sel);
+      if (keep_all) {
+        for (size_t t = 0; t < trunc_lvl; ++t) {
+          for (size_t e = 0; e < d_ - 1 - t; ++e) {
+            const DerivCache& ce = cache(t, e);
+            result.pdf_edges(t, e).segment(b.begin, b.size) = ce.c;
+            if (t > 0) {
+              result.logpdf_deriv_u1(t, e).segment(b.begin, b.size) = ce.lu1;
+              result.logpdf_deriv_u2(t, e).segment(b.begin, b.size) = ce.lu2;
             }
-            if (push && rvine_structure_.needed_hfunc2(tree, edge)) {
-              result.hfunc2_deriv_pars(tree, edge)[p].segment(b.begin, b.size) =
-                edge_copula.hfunc2_deriv(u_e, sel);
+            for (size_t p = 0; p < ce.np; ++p) {
+              result.logpdf_deriv_pars(t, e)[p].segment(b.begin, b.size) =
+                ce.lpar[p];
             }
-          }
-
-          if (rvine_structure_.needed_hfunc1(tree, edge)) {
-            hfunc1.col(edge) = edge_copula.hfunc1(u_e);
-          }
-          if (rvine_structure_.needed_hfunc2(tree, edge)) {
-            hfunc2.col(edge) = edge_copula.hfunc2(u_e);
+            if (ce.o1.active) {
+              result.hfunc1_deriv_u1(t, e).segment(b.begin, b.size) = ce.o1.du1;
+              for (size_t p = 0; p < ce.np; ++p) {
+                result.hfunc1_deriv_pars(t, e)[p].segment(b.begin, b.size) =
+                  ce.o1.dpar[p];
+              }
+            }
+            if (ce.o2.active) {
+              result.hfunc2_deriv_u2(t, e).segment(b.begin, b.size) = ce.o2.du2;
+              for (size_t p = 0; p < ce.np; ++p) {
+                result.hfunc2_deriv_pars(t, e)[p].segment(b.begin, b.size) =
+                  ce.o2.dpar[p];
+              }
+            }
           }
         }
       }
 
-      // per-parameter cascades (pure arithmetic on the cached quantities);
-      // tilde2/tilde1 hold the perturbations of the direct (hfunc2) and
-      // indirect (hfunc1) storage columns of the current tree level
+      // per-parameter cascade over the cache; tilde2/tilde1 hold the
+      // perturbations of the direct (hfunc2) and indirect (hfunc1) storage
+      // columns of the current tree level
       Eigen::MatrixXd tilde1(b.size, d_), tilde2(b.size, d_);
       std::vector<char> aff1(d_), aff2(d_);
       size_t ipar = 0;
       for (size_t t0 = 0; t0 < trunc_lvl; ++t0) {
         for (size_t e0 = 0; e0 < d_ - t0 - 1; ++e0) {
-          size_t npars = result.logpdf_deriv_pars(t0, e0).size();
-          for (size_t p = 0; p < npars; ++p) {
-            Eigen::VectorXd sc =
-              result.logpdf_deriv_pars(t0, e0)[p].segment(b.begin, b.size);
+          const DerivCache& seed = cache(t0, e0);
+          for (size_t p = 0; p < seed.np; ++p) {
+            Eigen::VectorXd sc = seed.lpar[p];
             std::fill(aff1.begin(), aff1.end(), 0);
             std::fill(aff2.begin(), aff2.end(), 0);
-            bool push0 = (t0 + 1 < trunc_lvl);
-            if (push0 && rvine_structure_.needed_hfunc1(t0, e0)) {
-              tilde1.col(e0) =
-                result.hfunc1_deriv_pars(t0, e0)[p].segment(b.begin, b.size);
+            if (seed.o1.active) {
+              tilde1.col(e0) = seed.o1.dpar[p];
               aff1[e0] = 1;
             }
-            if (push0 && rvine_structure_.needed_hfunc2(t0, e0)) {
-              tilde2.col(e0) =
-                result.hfunc2_deriv_pars(t0, e0)[p].segment(b.begin, b.size);
+            if (seed.o2.active) {
+              tilde2.col(e0) = seed.o2.dpar[p];
               aff2[e0] = 1;
             }
 
             for (size_t t = t0 + 1; t < trunc_lvl; ++t) {
               for (size_t e = 0; e < d_ - t - 1; ++e) {
-                size_t m = rvine_structure_.min_array(t, e);
+                const DerivCache& ce = cache(t, e);
+                size_t m = ce.msrc;
                 // the proximity condition guarantees m - 1 > e, so columns
                 // read here are not yet overwritten at this tree level
-                bool direct = (m == rvine_structure_.struct_array(t, e, true));
                 bool a1 = (aff2[e] != 0);
-                bool a2 = direct ? (aff2[m - 1] != 0) : (aff1[m - 1] != 0);
+                bool a2 = ce.direct ? (aff2[m - 1] != 0) : (aff1[m - 1] != 0);
                 if (!a1 && !a2) {
                   aff1[e] = 0;
                   aff2[e] = 0;
                   continue;
                 }
-                Eigen::VectorXd v1, v2;
+                Eigen::VectorXd v1 = Eigen::VectorXd::Zero(b.size);
+                Eigen::VectorXd v2 = Eigen::VectorXd::Zero(b.size);
                 if (a1) {
                   v1 = tilde2.col(e);
-                  sc += result.logpdf_deriv_u1(t, e)
-                          .segment(b.begin, b.size)
-                          .cwiseProduct(v1);
+                  sc += ce.lu1.cwiseProduct(v1);
                 }
                 if (a2) {
-                  v2 = direct ? tilde2.col(m - 1) : tilde1.col(m - 1);
-                  sc += result.logpdf_deriv_u2(t, e)
-                          .segment(b.begin, b.size)
-                          .cwiseProduct(v2);
+                  v2 = ce.direct ? tilde2.col(m - 1) : tilde1.col(m - 1);
+                  sc += ce.lu2.cwiseProduct(v2);
                 }
-                // pushes are only needed (and their caches only exist) when
-                // a deeper tree can consume them; near the truncation level
-                // the needed_hfunc flags may still be set for trees that
-                // were truncated away
-                bool push = (t + 1 < trunc_lvl);
-                if (push && rvine_structure_.needed_hfunc2(t, e)) {
-                  Eigen::VectorXd nt2 = Eigen::VectorXd::Zero(b.size);
-                  if (a1) {
-                    nt2 += result.pdf_edges(t, e)
-                             .segment(b.begin, b.size)
-                             .cwiseProduct(v1);
-                  }
-                  if (a2) {
-                    nt2 += result.hfunc2_deriv_u2(t, e)
-                             .segment(b.begin, b.size)
-                             .cwiseProduct(v2);
-                  }
-                  tilde2.col(e) = nt2;
+                if (ce.o2.active) {
+                  tilde2.col(e) =
+                    propagate_first_order(ce.o2.du1, ce.o2.du2, v1, v2);
                 }
-                if (push && rvine_structure_.needed_hfunc1(t, e)) {
-                  Eigen::VectorXd nt1 = Eigen::VectorXd::Zero(b.size);
-                  if (a1) {
-                    nt1 += result.hfunc1_deriv_u1(t, e)
-                             .segment(b.begin, b.size)
-                             .cwiseProduct(v1);
-                  }
-                  if (a2) {
-                    nt1 += result.pdf_edges(t, e)
-                             .segment(b.begin, b.size)
-                             .cwiseProduct(v2);
-                  }
-                  tilde1.col(e) = nt1;
+                if (ce.o1.active) {
+                  tilde1.col(e) =
+                    propagate_first_order(ce.o1.du1, ce.o1.du2, v1, v2);
                 }
-                // only columns actually written may be read at the next level
-                aff1[e] =
-                  (push && rvine_structure_.needed_hfunc1(t, e)) ? 1 : 0;
-                aff2[e] =
-                  (push && rvine_structure_.needed_hfunc2(t, e)) ? 1 : 0;
+                aff1[e] = ce.o1.active ? 1 : 0;
+                aff2[e] = ce.o2.active ? 1 : 0;
               }
             }
             result.scores.col(ipar++).segment(b.begin, b.size) = sc;
@@ -1449,19 +1540,6 @@ Vinecop::scores_full(Eigen::MatrixXd u,
     pool.map(do_batch, tools_batch::create_batches(n, num_threads));
     pool.join();
 
-    if (!keep_all) {
-      result.pdf_edges = TriangularArray<Eigen::VectorXd>();
-      result.logpdf_deriv_pars =
-        TriangularArray<std::vector<Eigen::VectorXd>>();
-      result.hfunc1_deriv_pars =
-        TriangularArray<std::vector<Eigen::VectorXd>>();
-      result.hfunc2_deriv_pars =
-        TriangularArray<std::vector<Eigen::VectorXd>>();
-      result.logpdf_deriv_u1 = TriangularArray<Eigen::VectorXd>();
-      result.logpdf_deriv_u2 = TriangularArray<Eigen::VectorXd>();
-      result.hfunc1_deriv_u1 = TriangularArray<Eigen::VectorXd>();
-      result.hfunc2_deriv_u2 = TriangularArray<Eigen::VectorXd>();
-    }
     return result;
   }
 
@@ -1681,17 +1759,7 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
 
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
 
-  // see scores(): differentiating w.r.t. a nonparametric grid is meaningless
-  for (size_t t = 0; t < trunc_lvl; t++) {
-    for (size_t e = 0; e < d_ - 1 - t; e++) {
-      if (!tools_stl::is_member(pair_copulas_[t][e].get_family(),
-                                bicop_families::parametric)) {
-        throw std::runtime_error(
-          "hessian() is only available for models with parametric "
-          "pair copulas");
-      }
-    }
-  }
+  check_parametric("hessian()");
 
   TriangularArray<std::vector<Eigen::MatrixXd>> hess(d_);
 
@@ -1737,17 +1805,14 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
   // derivatives. Every derivative is a Bicop leaf (using ∂h2/∂u1 =
   // ∂h1/∂u2 = c); see hessian_full()'s @literature reference.
   const size_t npars = static_cast<size_t>(this->get_npars());
-  auto order = rvine_structure_.get_order();
 
-  // flat parameter index <-> (tree, edge, param) and the first flat index of
-  // each edge
+  // flat parameter index -> (tree, edge, param), and allocate the per-edge
+  // per-observation output blocks
   std::vector<std::array<size_t, 3>> par_of(npars);
-  TriangularArray<size_t> par0(d_, trunc_lvl);
   {
     size_t idx = 0;
     for (size_t t = 0; t < trunc_lvl; t++) {
       for (size_t e = 0; e < d_ - 1 - t; e++) {
-        par0(t, e) = idx;
         size_t np =
           static_cast<size_t>(pair_copulas_[t][e].get_parameters().size());
         hess(t, e).resize(np);
@@ -1759,141 +1824,14 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
     }
   }
 
-  // per-edge, per-observation-batch caches of the density's and h-functions'
-  // derivatives (independent of the differentiated parameters)
-  struct OutCache
-  {
-    Eigen::VectorXd du1, du2, du1u1, du1u2, du2u2;
-    std::vector<Eigen::VectorXd> dth, dthu1, dthu2;
-    std::vector<std::vector<Eigen::VectorXd>> dthth;
-    bool active = false;
-  };
-  struct EdgeCache
-  {
-    size_t np, msrc;
-    bool direct;
-    Eigen::VectorXd Dp, Dq, Lpp, Lpq, Lqq;
-    std::vector<Eigen::VectorXd> Lthp, Lthq;
-    std::vector<std::vector<Eigen::VectorXd>> Lthth;
-    OutCache o1, o2;
-  };
-  auto sel = [](size_t p) { return "par" + std::to_string(p + 1); };
-
   auto do_batch = [&](const tools_batch::Batch& b) {
     const size_t m = b.size;
-
-    // forward pass: compute per-edge derivative caches and the h-function
-    // values needed to assemble deeper edges' arguments
-    std::vector<std::vector<EdgeCache>> C(trunc_lvl);
-    Eigen::MatrixXd hf1 = Eigen::MatrixXd::Zero(m, d_);
-    Eigen::MatrixXd hf2 = Eigen::MatrixXd::Zero(m, d_);
-    for (size_t j = 0; j < d_; ++j) {
-      hf2.col(j) = u.block(b.begin, order[j] - 1, m, 1);
-    }
-    for (size_t t = 0; t < trunc_lvl; ++t) {
-      C[t].resize(d_ - 1 - t);
-      tools_interface::check_user_interrupt(
-        static_cast<double>(u.rows()) * static_cast<double>(d_) > 1e3);
-      for (size_t e = 0; e < d_ - 1 - t; ++e) {
-        tools_interface::check_user_interrupt(e % 100 == 0);
-        Bicop ec = get_pair_copula(t, e);
-        EdgeCache& C_te = C[t][e];
-        size_t np = static_cast<size_t>(ec.get_parameters().size());
-        size_t msrc = rvine_structure_.min_array(t, e);
-        bool direct = (msrc == rvine_structure_.struct_array(t, e, true));
-        C_te.np = np;
-        C_te.msrc = msrc;
-        C_te.direct = direct;
-
-        Eigen::MatrixXd u_e(m, 2);
-        u_e.col(0) = hf2.col(e);
-        u_e.col(1) = direct ? hf2.col(msrc - 1) : hf1.col(msrc - 1);
-
-        // density (log) derivatives; c and the argument/parameter density
-        // derivatives are shared by both h-function outputs
-        Eigen::VectorXd c = ec.pdf(u_e);
-        Eigen::VectorXd cpu1 = ec.pdf_deriv(u_e, "u1");
-        Eigen::VectorXd cpu2 = ec.pdf_deriv(u_e, "u2");
-        std::vector<Eigen::VectorXd> cpth(np);
-        for (size_t p = 0; p < np; ++p) {
-          cpth[p] = ec.pdf_deriv(u_e, sel(p));
-        }
-        C_te.Dp = ec.logpdf_deriv(u_e, "u1");
-        C_te.Dq = ec.logpdf_deriv(u_e, "u2");
-        C_te.Lpp = ec.logpdf_deriv2(u_e, "u1u1");
-        C_te.Lpq = ec.logpdf_deriv2(u_e, "u1u2");
-        C_te.Lqq = ec.logpdf_deriv2(u_e, "u2u2");
-        C_te.Lthp.resize(np);
-        C_te.Lthq.resize(np);
-        C_te.Lthth.assign(np, std::vector<Eigen::VectorXd>(np));
-        for (size_t p = 0; p < np; ++p) {
-          C_te.Lthp[p] = ec.logpdf_deriv2(u_e, sel(p) + "u1");
-          C_te.Lthq[p] = ec.logpdf_deriv2(u_e, sel(p) + "u2");
-          for (size_t q = p; q < np; ++q) {
-            C_te.Lthth[p][q] = ec.logpdf_deriv2(u_e, sel(p) + sel(q));
-            C_te.Lthth[q][p] = C_te.Lthth[p][q];
-          }
-        }
-
-        bool push = (t + 1 < trunc_lvl);
-        // hfunc2 output (direct): conditions on u2, ∂h2/∂u1 = c
-        if (push && rvine_structure_.needed_hfunc2(t, e)) {
-          OutCache& o = C_te.o2;
-          o.active = true;
-          o.du1 = c;
-          o.du2 = ec.hfunc2_deriv(u_e, "u2");
-          o.du1u1 = cpu1;
-          o.du1u2 = cpu2;
-          o.du2u2 = ec.hfunc2_deriv2(u_e, "u2u2");
-          o.dth.resize(np);
-          o.dthu1.resize(np);
-          o.dthu2.resize(np);
-          o.dthth.assign(np, std::vector<Eigen::VectorXd>(np));
-          for (size_t p = 0; p < np; ++p) {
-            o.dth[p] = ec.hfunc2_deriv(u_e, sel(p));
-            o.dthu1[p] = cpth[p];
-            o.dthu2[p] = ec.hfunc2_deriv2(u_e, sel(p) + "u2");
-            for (size_t q = p; q < np; ++q) {
-              o.dthth[p][q] = ec.hfunc2_deriv2(u_e, sel(p) + sel(q));
-              o.dthth[q][p] = o.dthth[p][q];
-            }
-          }
-        }
-        // hfunc1 output (indirect): conditions on u1, ∂h1/∂u2 = c
-        if (push && rvine_structure_.needed_hfunc1(t, e)) {
-          OutCache& o = C_te.o1;
-          o.active = true;
-          o.du1 = ec.hfunc1_deriv(u_e, "u1");
-          o.du2 = c;
-          o.du1u1 = ec.hfunc1_deriv2(u_e, "u1u1");
-          o.du1u2 = cpu1;
-          o.du2u2 = cpu2;
-          o.dth.resize(np);
-          o.dthu1.resize(np);
-          o.dthu2.resize(np);
-          o.dthth.assign(np, std::vector<Eigen::VectorXd>(np));
-          for (size_t p = 0; p < np; ++p) {
-            o.dth[p] = ec.hfunc1_deriv(u_e, sel(p));
-            o.dthu1[p] = ec.hfunc1_deriv2(u_e, sel(p) + "u1");
-            o.dthu2[p] = cpth[p];
-            for (size_t q = p; q < np; ++q) {
-              o.dthth[p][q] = ec.hfunc1_deriv2(u_e, sel(p) + sel(q));
-              o.dthth[q][p] = o.dthth[p][q];
-            }
-          }
-        }
-
-        if (rvine_structure_.needed_hfunc1(t, e)) {
-          hf1.col(e) = ec.hfunc1(u_e);
-        }
-        if (rvine_structure_.needed_hfunc2(t, e)) {
-          hf2.col(e) = ec.hfunc2(u_e);
-        }
-      }
-    }
+    // one forward walk fills every per-edge first- and second-order leaf
+    auto cache = build_deriv_cache(u, b.begin, m, true);
 
     // second-order cascade for each parameter pair (only the upper triangle;
-    // H is symmetric)
+    // H is symmetric). tilde/hat/bar hold, per storage column, the first
+    // derivatives w.r.t. alpha, beta and their mixed second derivative.
     std::vector<Eigen::VectorXd> hat1(d_), hat2(d_), til1(d_), til2(d_),
       bar1(d_), bar2(d_);
     for (size_t a = 0; a < npars; ++a) {
@@ -1913,9 +1851,9 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
 
         for (size_t t = 0; t < trunc_lvl; ++t) {
           for (size_t e = 0; e < d_ - 1 - t; ++e) {
-            const EdgeCache& C_te = C[t][e];
-            size_t msrc = C_te.msrc;
-            bool direct = C_te.direct;
+            const DerivCache& ce = cache(t, e);
+            size_t msrc = ce.msrc;
+            bool direct = ce.direct;
             bool isA = (t == ta) && (e == ea);
             bool isB = (t == tb) && (e == eb);
 
@@ -1934,54 +1872,55 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
               direct ? bar2[msrc - 1] : bar1[msrc - 1];
 
             // accumulate the Hessian contribution of this edge
-            Hval += C_te.Lpp.cwiseProduct(hp).cwiseProduct(tp);
+            Hval += ce.lu1u1.cwiseProduct(hp).cwiseProduct(tp);
             Hval +=
-              C_te.Lpq.cwiseProduct(hp.cwiseProduct(tq) + hq.cwiseProduct(tp));
-            Hval += C_te.Lqq.cwiseProduct(hq).cwiseProduct(tq);
-            Hval += C_te.Dp.cwiseProduct(bp) + C_te.Dq.cwiseProduct(bq);
+              ce.lu1u2.cwiseProduct(hp.cwiseProduct(tq) + hq.cwiseProduct(tp));
+            Hval += ce.lu2u2.cwiseProduct(hq).cwiseProduct(tq);
+            Hval += ce.lu1.cwiseProduct(bp) + ce.lu2.cwiseProduct(bq);
             if (isA) {
-              Hval +=
-                C_te.Lthp[pa].cwiseProduct(tp) + C_te.Lthq[pa].cwiseProduct(tq);
+              Hval += ce.lpar_u1[pa].cwiseProduct(tp) +
+                      ce.lpar_u2[pa].cwiseProduct(tq);
             }
             if (isB) {
-              Hval +=
-                C_te.Lthp[pb].cwiseProduct(hp) + C_te.Lthq[pb].cwiseProduct(hq);
+              Hval += ce.lpar_u1[pb].cwiseProduct(hp) +
+                      ce.lpar_u2[pb].cwiseProduct(hq);
             }
             if (isA && isB) {
-              Hval += C_te.Lthth[pa][pb];
+              Hval += ce.lpar_par[pa][pb];
             }
 
-            // propagate the perturbations to this edge's h-function outputs
-            auto propagate = [&](const OutCache& o,
+            // propagate the perturbations to this edge's h-function outputs:
+            // hat/til are first order (propagate_first_order), bar is second
+            auto propagate = [&](const DerivLeaf& o,
                                  Eigen::VectorXd& oh,
                                  Eigen::VectorXd& ot,
                                  Eigen::VectorXd& ob) {
-              oh = o.du1.cwiseProduct(hp) + o.du2.cwiseProduct(hq);
-              ot = o.du1.cwiseProduct(tp) + o.du2.cwiseProduct(tq);
+              oh = propagate_first_order(o.du1, o.du2, hp, hq);
+              ot = propagate_first_order(o.du1, o.du2, tp, tq);
               ob = o.du1u1.cwiseProduct(hp).cwiseProduct(tp) +
                    o.du1u2.cwiseProduct(hp.cwiseProduct(tq) +
                                         hq.cwiseProduct(tp)) +
                    o.du2u2.cwiseProduct(hq).cwiseProduct(tq) +
                    o.du1.cwiseProduct(bp) + o.du2.cwiseProduct(bq);
               if (isA) {
-                oh += o.dth[pa];
-                ob +=
-                  o.dthu1[pa].cwiseProduct(tp) + o.dthu2[pa].cwiseProduct(tq);
+                oh += o.dpar[pa];
+                ob += o.dpar_u1[pa].cwiseProduct(tp) +
+                      o.dpar_u2[pa].cwiseProduct(tq);
               }
               if (isB) {
-                ot += o.dth[pb];
-                ob +=
-                  o.dthu1[pb].cwiseProduct(hp) + o.dthu2[pb].cwiseProduct(hq);
+                ot += o.dpar[pb];
+                ob += o.dpar_u1[pb].cwiseProduct(hp) +
+                      o.dpar_u2[pb].cwiseProduct(hq);
               }
               if (isA && isB) {
-                ob += o.dthth[pa][pb];
+                ob += o.dpar_par[pa][pb];
               }
             };
-            if (C_te.o2.active) {
-              propagate(C_te.o2, hat2[e], til2[e], bar2[e]);
+            if (ce.o2.active) {
+              propagate(ce.o2, hat2[e], til2[e], bar2[e]);
             }
-            if (C_te.o1.active) {
-              propagate(C_te.o1, hat1[e], til1[e], bar1[e]);
+            if (ce.o1.active) {
+              propagate(ce.o1, hat1[e], til1[e], bar1[e]);
             }
           }
         }
