@@ -1256,7 +1256,7 @@ Vinecop::scores(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 
 //! @brief Evaluates the hessian per observation.
 //!
-//! Hessian is meant losely as "gradients of each component of the score
+//! Hessian is meant loosely as "gradients of each component of the score
 //! function".
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
@@ -1268,7 +1268,9 @@ Vinecop::scores(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
 inline TriangularArray<std::vector<Eigen::MatrixXd>>
-Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
+Vinecop::hessian_full(Eigen::MatrixXd u,
+                      bool step_wise,
+                      const size_t num_threads)
 {
   check_data(u);
   u = collapse_data(u);
@@ -1304,10 +1306,12 @@ Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
   return hess;
 }
 
-//! @brief Evaluates the average hessian.
+//! @brief Evaluates the averaged Hessian of the log-likelihood.
 //!
-//! Hessian is meant losely as "gradients of each component of the score
-//! function". The Hessian is averaged over all samples in `u`.
+//! Hessian is meant loosely as "gradients of each component of the score
+//! function". The Hessian is averaged over all samples in `u`, yielding an
+//! \f$ \mathrm{npars} \times \mathrm{npars} \f$ matrix (use `hessian_full()`
+//! for the per-observation decomposition).
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
@@ -1318,11 +1322,9 @@ Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
 inline Eigen::MatrixXd
-Vinecop::hessian_avg(Eigen::MatrixXd u,
-                     bool step_wise,
-                     const size_t num_threads)
+Vinecop::hessian(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
-  auto hess = this->hessian(u, step_wise, num_threads);
+  auto hess = this->hessian_full(u, step_wise, num_threads);
   size_t npars = static_cast<size_t>(this->get_npars());
   Eigen::MatrixXd H(npars, npars);
 
@@ -1343,6 +1345,10 @@ Vinecop::hessian_avg(Eigen::MatrixXd u,
 
 //! @brief Computes the covariance matrix of scores.
 //!
+//! Returns the (mean-centered, divided by `n`) covariance of the
+//! per-observation scores as an \f$ \mathrm{npars} \times \mathrm{npars} \f$
+//! matrix. Together with `hessian()` this forms the sandwich estimator of the
+//! asymptotic covariance.
 //!
 //! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables

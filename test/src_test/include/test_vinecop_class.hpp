@@ -429,19 +429,32 @@ TEST_F(VinecopTest, scores_stepwise)
 
   auto uu = vinecop.simulate(100, false, 1, { 1 });
 
-  auto J = vinecop.hessian_avg(uu, true);
+  auto J = vinecop.hessian(uu, true);
   EXPECT_TRUE(J.isUpperTriangular());
-  // Eigen::MatrixXd Jinv = J.triangularView<Eigen::Upper>()
-  //                          .solve(Eigen::MatrixXd::Identity(J.cols(),
-  //                          J.cols())) .triangularView<Eigen::Upper>();
-  // // std::cout << J << std::endl << std::endl;
-  // // std::cout << Jinv << std::endl;
-  // auto I = vinecop.scores_cov(uu, true);
-  // std::cout << (Jinv * I * Jinv.transpose() /
-  // u.rows()).diagonal().cwiseSqrt()
-  //           << std::endl
-  //           << std::endl;
-  // std::cout << vinecop.str() << std::endl;
+
+  // hessian() is the observation-average of hessian_full()
+  auto H = vinecop.hessian_full(uu, true);
+  Eigen::MatrixXd J_manual(J.rows(), J.cols());
+  size_t d = vinecop.get_dim();
+  size_t trunc_lvl = vinecop.get_trunc_lvl();
+  size_t ipar = 0;
+  for (size_t t = 0; t < trunc_lvl; t++) {
+    for (size_t e = 0; e < d - 1 - t; e++) {
+      size_t np = static_cast<size_t>(
+        vinecop.get_pair_copula(t, e).get_parameters().size());
+      for (size_t p = 0; p < np; p++) {
+        J_manual.row(ipar++) = H(t, e)[p].colwise().mean();
+      }
+    }
+  }
+  EXPECT_TRUE(all_close(J, J_manual, 1e-10, 1e-10));
+
+  // scores_cov() is the mean-centered covariance of scores()
+  auto s = vinecop.scores(uu, true);
+  Eigen::MatrixXd sc = s.rowwise() - s.colwise().mean();
+  Eigen::MatrixXd I_manual =
+    (sc.adjoint() * sc) / static_cast<double>(s.rows());
+  EXPECT_TRUE(all_close(vinecop.scores_cov(uu, true), I_manual, 1e-10, 1e-10));
 }
 
 TEST_F(VinecopTest, scores_joint)
@@ -456,7 +469,7 @@ TEST_F(VinecopTest, scores_joint)
   Vinecop vinecop(model_matrix, pair_copulas);
 
   auto uu = vinecop.simulate(100, false, 1, { 1 });
-  auto J = vinecop.hessian_avg(uu, false);
+  auto J = vinecop.hessian(uu, false);
   auto I = vinecop.scores_cov(uu, false);
 
   EXPECT_FALSE(J.isUpperTriangular());
