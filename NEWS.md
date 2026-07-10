@@ -2,6 +2,10 @@
 
 ### NEW FEATURES
 
+* Add `Bicop::parameters_to_taildep()`/`Bicop::get_taildep()` to compute the tail
+  dependence coefficients (returned as a 2x2 matrix collecting all four corners of
+  the unit square) and `Bicop::parameters_to_beta()`/`Bicop::get_beta()` to compute
+  Blomqvist's beta, analogous to VineCopula's `BiCopPar2TailDep`/`BiCopPar2Beta` (#XXX).
 * Add per-row-parameter overloads of `Bicop::pdf`, `cdf`, `hfunc1`, `hfunc2`, `hinv1`, `hinv2`,
   and `loglik` that evaluate a bivariate copula at a different parameter set per row of `u` in a
   single (optionally multi-threaded) call. The new overloads take an `n x p` matrix of parameters
