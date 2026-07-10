@@ -97,12 +97,14 @@ AbstractBicop::no_tau_to_parameters(const double&)
   throw std::runtime_error("Method not implemented for this family");
 }
 
-//! Default tail dependence: no tail dependence in any of the four corners.
-//! Families with a closed form override this.
+//! Default tail dependence: not implemented for this family, so all four
+//! corners are reported as NaN. Families with a closed form override this
+//! (including those that genuinely have zero tail dependence, e.g. `indep`,
+//! `gaussian`, `frank`).
 inline Eigen::MatrixXd
 AbstractBicop::parameters_to_taildep(const Eigen::MatrixXd&)
 {
-  return Eigen::MatrixXd::Zero(2, 2);
+  return Eigen::MatrixXd::Constant(2, 2, NAN);
 }
 
 //! Blomqvist's beta computed generically from the copula cdf as

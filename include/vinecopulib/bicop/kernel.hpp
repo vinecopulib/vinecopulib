@@ -73,9 +73,6 @@ protected:
 
   double parameters_to_tau(const Eigen::MatrixXd& parameters) override;
 
-  Eigen::MatrixXd parameters_to_taildep(
-    const Eigen::MatrixXd& parameters) override;
-
   void flip() override;
 
   Eigen::MatrixXd tau_to_parameters(const double& tau) override;

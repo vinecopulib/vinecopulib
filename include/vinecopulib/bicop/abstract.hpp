@@ -62,8 +62,9 @@ protected:
 
   virtual double parameters_to_tau(const Eigen::MatrixXd& parameters) = 0;
 
-  // following two are non-pure: most families have no tail dependence and
-  // Blomqvist's beta has a generic implementation via the cdf.
+  // following two are non-pure: tail dependence defaults to NaN ("not
+  // implemented") and Blomqvist's beta has a generic implementation via the
+  // cdf.
   virtual Eigen::MatrixXd parameters_to_taildep(
     const Eigen::MatrixXd& parameters);
 
