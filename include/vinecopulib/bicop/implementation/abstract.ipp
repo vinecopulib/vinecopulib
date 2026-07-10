@@ -554,7 +554,10 @@ AbstractBicop::logpdf_deriv2_raw(const Eigen::MatrixXd& u,
   Eigen::ArrayXd c_x =
     pdf_deriv_raw(u, parameters, tools_deriv::comp_to_string(comps[0])).array();
   Eigen::ArrayXd c_y =
-    pdf_deriv_raw(u, parameters, tools_deriv::comp_to_string(comps[1])).array();
+    (comps[0] == comps[1])
+      ? c_x
+      : pdf_deriv_raw(u, parameters, tools_deriv::comp_to_string(comps[1]))
+          .array();
   return (c_xy / c - (c_x / c) * (c_y / c)).matrix();
 }
 //! @}
@@ -671,6 +674,17 @@ swap_args(const std::string& deriv)
     }
   }
   return components_to_string(comps);
+}
+
+//! whether a selector involves `"u2"` but not `"u1"` (an exchangeable family
+//! can then route it to its `"u1"`-flavored leaf via `swap_args`).
+inline bool
+is_u2_only(const std::string& deriv)
+{
+  auto comps = parse_components(deriv);
+  bool has_u1 = std::find(comps.begin(), comps.end(), -1) != comps.end();
+  bool has_u2 = std::find(comps.begin(), comps.end(), -2) != comps.end();
+  return has_u2 && !has_u1;
 }
 }
 }

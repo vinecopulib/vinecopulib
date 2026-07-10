@@ -791,6 +791,7 @@ Bicop::logpdf_deriv(const Eigen::MatrixXd& u, const std::string& deriv) const
                                     bicop_->get_parameters().transpose(),
                                     canonical);
   }
+  // pdf() is trimmed to [DBL_MIN, DBL_MAX], so the denominator is positive
   Eigen::ArrayXd c = pdf(u).array();
   return (pdf_deriv(u, canonical).array() / c).matrix();
 }
@@ -811,12 +812,15 @@ Bicop::logpdf_deriv2(const Eigen::MatrixXd& u, const std::string& deriv) const
                                      bicop_->get_parameters().transpose(),
                                      canonical);
   }
+  // pdf() is trimmed to [DBL_MIN, DBL_MAX], so the denominator is positive
   Eigen::ArrayXd c = pdf(u).array();
   Eigen::ArrayXd c_xy = pdf_deriv2(u, canonical).array();
   Eigen::ArrayXd c_x =
     pdf_deriv(u, tools_deriv::comp_to_string(comps[0])).array();
   Eigen::ArrayXd c_y =
-    pdf_deriv(u, tools_deriv::comp_to_string(comps[1])).array();
+    (comps[0] == comps[1])
+      ? c_x
+      : pdf_deriv(u, tools_deriv::comp_to_string(comps[1])).array();
   return (c_xy / c - (c_x / c) * (c_y / c)).matrix();
 }
 
@@ -1043,8 +1047,11 @@ Bicop::logpdf_deriv2(const Eigen::MatrixXd& u,
     pdf_deriv(u, tools_deriv::comp_to_string(comps[0]), parameters, num_threads)
       .array();
   Eigen::ArrayXd c_y =
-    pdf_deriv(u, tools_deriv::comp_to_string(comps[1]), parameters, num_threads)
-      .array();
+    (comps[0] == comps[1])
+      ? c_x
+      : pdf_deriv(
+          u, tools_deriv::comp_to_string(comps[1]), parameters, num_threads)
+          .array();
   return (c_xy / c - (c_x / c) * (c_y / c)).matrix();
 }
 //! @}

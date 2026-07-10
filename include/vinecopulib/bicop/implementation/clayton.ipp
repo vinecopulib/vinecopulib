@@ -72,10 +72,7 @@ ClaytonBicop::pdf_deriv_raw(const Eigen::MatrixXd& u,
 {
   // the copula is exchangeable: route "u2"-flavored selectors through a
   // column/argument swap
-  auto comps = tools_deriv::parse_components(deriv);
-  bool has_u1 = std::find(comps.begin(), comps.end(), -1) != comps.end();
-  bool has_u2 = std::find(comps.begin(), comps.end(), -2) != comps.end();
-  if (has_u2 && !has_u1) {
+  if (tools_deriv::is_u2_only(deriv)) {
     return pdf_deriv_raw(
       tools_eigen::swap_cols(u), parameters, tools_deriv::swap_args(deriv));
   }
@@ -134,10 +131,7 @@ ClaytonBicop::pdf_deriv2_raw(const Eigen::MatrixXd& u,
 {
   // the copula is exchangeable: route "u2"-flavored selectors through a
   // column/argument swap
-  auto comps = tools_deriv::parse_components(deriv);
-  bool has_u1 = std::find(comps.begin(), comps.end(), -1) != comps.end();
-  bool has_u2 = std::find(comps.begin(), comps.end(), -2) != comps.end();
-  if (has_u2 && !has_u1) {
+  if (tools_deriv::is_u2_only(deriv)) {
     return pdf_deriv2_raw(
       tools_eigen::swap_cols(u), parameters, tools_deriv::swap_args(deriv));
   }
@@ -452,6 +446,9 @@ ClaytonBicop::logpdf_deriv_raw(const Eigen::MatrixXd& u,
                                const Eigen::MatrixXd& parameters,
                                const std::string& deriv)
 {
+  // fused single-pass form kept for performance: the base
+  // logpdf_deriv*_raw would compose this as (pdf_deriv)/pdf, recomputing the
+  // shared pdf temporaries 2-3x; this leaf is on the scores/Hessian hot paths.
   if (deriv == "par1") {
     // ported from VineCopula logderiv.c difflPDF (family 3 branch)
     auto f = [](const double& u1,
@@ -480,6 +477,9 @@ ClaytonBicop::logpdf_deriv2_raw(const Eigen::MatrixXd& u,
                                 const Eigen::MatrixXd& parameters,
                                 const std::string& deriv)
 {
+  // fused single-pass form kept for performance: the base
+  // logpdf_deriv*_raw would compose this as (pdf_deriv)/pdf, recomputing the
+  // shared pdf temporaries 2-3x; this leaf is on the scores/Hessian hot paths.
   if (deriv == "par1par1") {
     // ported from VineCopula logderiv.c diff2lPDF (family 3 branch)
     auto f = [](const double& u1,

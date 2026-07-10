@@ -204,10 +204,7 @@ StudentBicop::pdf_deriv_raw(const Eigen::MatrixXd& u,
                             const Eigen::MatrixXd& parameters,
                             const std::string& deriv)
 {
-  auto comps = tools_deriv::parse_components(deriv);
-  bool has_u1 = std::find(comps.begin(), comps.end(), -1) != comps.end();
-  bool has_u2 = std::find(comps.begin(), comps.end(), -2) != comps.end();
-  if (has_u2 && !has_u1) {
+  if (tools_deriv::is_u2_only(deriv)) {
     // exchangeability: c(u1, u2) = c(u2, u1)
     return pdf_deriv_raw(
       tools_eigen::swap_cols(u), parameters, tools_deriv::swap_args(deriv));
@@ -227,10 +224,7 @@ StudentBicop::pdf_deriv2_raw(const Eigen::MatrixXd& u,
                              const Eigen::MatrixXd& parameters,
                              const std::string& deriv)
 {
-  auto comps = tools_deriv::parse_components(deriv);
-  bool has_u1 = std::find(comps.begin(), comps.end(), -1) != comps.end();
-  bool has_u2 = std::find(comps.begin(), comps.end(), -2) != comps.end();
-  if (has_u2 && !has_u1) {
+  if (tools_deriv::is_u2_only(deriv)) {
     // exchangeability: c(u1, u2) = c(u2, u1)
     return pdf_deriv2_raw(
       tools_eigen::swap_cols(u), parameters, tools_deriv::swap_args(deriv));

@@ -35,6 +35,9 @@ canonicalize(const std::string& deriv, size_t order, size_t npars);
 
 std::string
 swap_args(const std::string& deriv);
+
+bool
+is_u2_only(const std::string& deriv);
 }
 
 //! @brief An abstract class for bivariate copula families.
