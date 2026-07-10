@@ -488,12 +488,20 @@ TEST_F(VinecopTest, scores_joint)
 }
 
 // The analytic full gradient (step_wise = false) must match VineCopula's
-// RVineGrad, and the finite-difference-of-analytic-scores Hessian must match
-// central finite differences of RVineGrad (VineCopula's own RVineHessian is
-// inconsistent with its RVineGrad, so the differentiated gradient is the
-// reliable R-anchored Hessian reference). The R oracle
-// (test_vinecop_derivatives.R) hardcodes the same model as below and already
-// reorders/sign-fixes its output to vinecopulib's parameter order.
+// RVineGrad and the analytic joint Hessian must match RVineHessian, both
+// element-wise (analytic vs analytic). Requires VineCopula >= 2.6.2, whose
+// #101 fix makes RVineHessian depend on the data so it can be used directly
+// (not finite-differenced). The R oracle (test_vinecop_derivatives.R)
+// hardcodes the same model and reorders RVineGrad and RVineHessian into
+// vinecopulib's parameter order.
+//
+// The model uses only 0/180 families: vinecopulib and VineCopula do not share
+// the same structure / swapped-rotation conventions, so a 90/270 vine cannot
+// be built identically in both (see the R oracle's header). 0/180 families
+// are symmetric under the argument swap that distinguishes the conventions.
+// Vine-level rotations are validated against brute force instead
+// (hessian_matches_brute_force, below), and rotated bicop derivatives against
+// BiCopDeriv* (ParBicopTest).
 TEST(VinecopDerivatives, full_scores_match_RVineGrad_and_RVineHessian)
 {
   std::string cmd =
@@ -514,10 +522,8 @@ TEST(VinecopDerivatives, full_scores_match_RVineGrad_and_RVineHessian)
     throw std::runtime_error("error in system call");
   }
 
-  // must stay in sync with the R script; the model avoids 90/270 rotations
-  // entirely because VineCopula's RVineGrad/RVineHessian are broken for
-  // models containing them (rotated-cascade coverage comes from the
-  // finite-difference tests below instead)
+  // must stay in sync with the R script (0/180 families only; pair copula
+  // (t, e) <-> VineCopula matrix cell [d - t, e + 1])
   auto P1 = [](double v) { return Eigen::VectorXd::Constant(1, v).eval(); };
   auto pcs = Vinecop::make_pair_copula_store(5);
   pcs[0][0] = Bicop(BicopFamily::gaussian, 0, P1(0.6));
@@ -535,10 +541,10 @@ TEST(VinecopDerivatives, full_scores_match_RVineGrad_and_RVineHessian)
   Vinecop vc(RVineStructure(mat), pcs);
   ASSERT_EQ(static_cast<size_t>(vc.get_npars()), grads.rows());
 
-  // full gradient: sum of per-observation scores and a single observation
+  // full gradient vs RVineGrad: sum over observations, and a single row
   Eigen::MatrixXd s = vc.scores(u, false, 1);
   EXPECT_TRUE(all_close(
-    s.colwise().sum().transpose().eval(), grads.col(0).eval(), 1e-4, 1e-3));
+    s.colwise().sum().transpose().eval(), grads.col(0).eval(), 1e-4, 1e-4));
   EXPECT_TRUE(
     all_close(s.row(0).transpose().eval(), grads.col(1).eval(), 1e-4, 1e-4));
 
@@ -558,11 +564,10 @@ TEST(VinecopDerivatives, full_scores_match_RVineGrad_and_RVineHessian)
   // deterministic across the number of threads
   EXPECT_TRUE(all_close(vc.scores(u, false, 3), s, 1e-12, 1e-12));
 
-  // Hessian: our analytic joint Hessian vs the R oracle's central finite
-  // differences of RVineGrad (the R side carries the finite-difference
-  // error, so the tolerance is looser than the gradient's)
+  // joint Hessian vs RVineHessian, element-wise. n * hessian() is the summed
+  // observed information, as RVineHessian returns.
   Eigen::MatrixXd H = vc.hessian(u, false, 1) * static_cast<double>(u.rows());
-  EXPECT_TRUE(all_close(H, hess_r, 1e-4, 1e-3));
+  EXPECT_TRUE(all_close(H, hess_r, 1e-4, 1e-4));
   EXPECT_TRUE(all_close(H, H.transpose().eval(), 1e-10, 1e-10)); // symmetric
 }
 

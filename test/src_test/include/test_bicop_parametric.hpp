@@ -699,13 +699,9 @@ TEST_P(ParBicopTest, parametric_bicop_derivatives_match_R)
   if (st)
     check(bicop_.logpdf_deriv(u, "par2"), 8, s, "logpdf_deriv par2");
 
-  // second derivatives of the density; VineCopula's pure second parameter
-  // derivatives are inconsistent with its own pdf for 90/270 codes (the
-  // 90-degree branch of diff2PDF_mod reflects (u, 1-v) where diffPDF_mod
-  // uses (1-u, v), deriv2.c:53-66), so those columns are skipped there and
-  // covered by the finite-difference self-consistency test instead.
-  if (!r90)
-    check(bicop_.pdf_deriv2(u, "par1par1"), 9, 1.0, "pdf_deriv2 par1par1");
+  // second derivatives of the density (the pure second parameter derivatives
+  // at 90/270 were fixed in VineCopula 2.6.2, tnagler/VineCopula #102)
+  check(bicop_.pdf_deriv2(u, "par1par1"), 9, 1.0, "pdf_deriv2 par1par1");
   if (st)
     check(bicop_.pdf_deriv2(u, "par2par2"), 10, 1.0, "pdf_deriv2 par2par2");
   check(bicop_.pdf_deriv2(u, "u1u1"), 11, 1.0, "pdf_deriv2 u1u1");
@@ -724,9 +720,7 @@ TEST_P(ParBicopTest, parametric_bicop_derivatives_match_R)
   if (st)
     check(bicop_.hfunc2_deriv(u, "par2"), 19, s, "hfunc2_deriv par2");
   check(bicop_.hfunc2_deriv(u, "u2"), 20, 1.0, "hfunc2_deriv u2");
-  if (!r90)
-    check(
-      bicop_.hfunc2_deriv2(u, "par1par1"), 21, 1.0, "hfunc2_deriv2 par1par1");
+  check(bicop_.hfunc2_deriv2(u, "par1par1"), 21, 1.0, "hfunc2_deriv2 par1par1");
   if (st)
     check(
       bicop_.hfunc2_deriv2(u, "par2par2"), 22, 1.0, "hfunc2_deriv2 par2par2");
@@ -744,9 +738,7 @@ TEST_P(ParBicopTest, parametric_bicop_derivatives_match_R)
   if (st)
     check(bicop_.hfunc1_deriv(u, "par2"), 28, s, "hfunc1_deriv par2");
   check(bicop_.hfunc1_deriv(u, "u1"), 29, 1.0, "hfunc1_deriv u1");
-  if (!r90)
-    check(
-      bicop_.hfunc1_deriv2(u, "par1par1"), 30, 1.0, "hfunc1_deriv2 par1par1");
+  check(bicop_.hfunc1_deriv2(u, "par1par1"), 30, 1.0, "hfunc1_deriv2 par1par1");
   if (st)
     check(
       bicop_.hfunc1_deriv2(u, "par2par2"), 31, 1.0, "hfunc1_deriv2 par2par2");

@@ -12,8 +12,15 @@ family <- as.numeric(args[2])
 par <- as.numeric(args[3])
 par2 <- as.numeric(args[4])
 
-if (!("VineCopula" %in% rownames(installed.packages()))) {
-  install.packages("VineCopula", repos = "http://cran.rstudio.com/")
+# VineCopula >= 2.6.2 fixes the 90/270 second parameter derivatives
+# (BiCopDeriv2 / BiCopHfuncDeriv2; tnagler/VineCopula #102).
+have <- tryCatch(as.character(packageVersion("VineCopula")),
+                 error = function(e) "0")
+if (utils::compareVersion(have, "2.6.2") < 0) {
+  if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes", repos = "http://cran.rstudio.com/")
+  }
+  remotes::install_github("tnagler/VineCopula", upgrade = "never")
 }
 
 set.seed(0)
