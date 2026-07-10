@@ -171,6 +171,72 @@ public:
                 const Eigen::MatrixXd& parameters,
                 const size_t num_threads) const;
 
+  // Derivatives of the density and h-functions w.r.t. parameters/arguments
+  Eigen::VectorXd pdf_deriv(const Eigen::MatrixXd& u,
+                            const std::string& deriv) const;
+
+  Eigen::VectorXd pdf_deriv2(const Eigen::MatrixXd& u,
+                             const std::string& deriv) const;
+
+  Eigen::VectorXd hfunc1_deriv(const Eigen::MatrixXd& u,
+                               const std::string& deriv) const;
+
+  Eigen::VectorXd hfunc1_deriv2(const Eigen::MatrixXd& u,
+                                const std::string& deriv) const;
+
+  Eigen::VectorXd hfunc2_deriv(const Eigen::MatrixXd& u,
+                               const std::string& deriv) const;
+
+  Eigen::VectorXd hfunc2_deriv2(const Eigen::MatrixXd& u,
+                                const std::string& deriv) const;
+
+  Eigen::VectorXd logpdf_deriv(const Eigen::MatrixXd& u,
+                               const std::string& deriv) const;
+
+  Eigen::VectorXd logpdf_deriv2(const Eigen::MatrixXd& u,
+                                const std::string& deriv) const;
+
+  // Derivatives with per-row parameters (parametric families only)
+  Eigen::VectorXd pdf_deriv(const Eigen::MatrixXd& u,
+                            const std::string& deriv,
+                            const Eigen::MatrixXd& parameters,
+                            const size_t num_threads = 1) const;
+
+  Eigen::VectorXd pdf_deriv2(const Eigen::MatrixXd& u,
+                             const std::string& deriv,
+                             const Eigen::MatrixXd& parameters,
+                             const size_t num_threads = 1) const;
+
+  Eigen::VectorXd hfunc1_deriv(const Eigen::MatrixXd& u,
+                               const std::string& deriv,
+                               const Eigen::MatrixXd& parameters,
+                               const size_t num_threads = 1) const;
+
+  Eigen::VectorXd hfunc1_deriv2(const Eigen::MatrixXd& u,
+                                const std::string& deriv,
+                                const Eigen::MatrixXd& parameters,
+                                const size_t num_threads = 1) const;
+
+  Eigen::VectorXd hfunc2_deriv(const Eigen::MatrixXd& u,
+                               const std::string& deriv,
+                               const Eigen::MatrixXd& parameters,
+                               const size_t num_threads = 1) const;
+
+  Eigen::VectorXd hfunc2_deriv2(const Eigen::MatrixXd& u,
+                                const std::string& deriv,
+                                const Eigen::MatrixXd& parameters,
+                                const size_t num_threads = 1) const;
+
+  Eigen::VectorXd logpdf_deriv(const Eigen::MatrixXd& u,
+                               const std::string& deriv,
+                               const Eigen::MatrixXd& parameters,
+                               const size_t num_threads = 1) const;
+
+  Eigen::VectorXd logpdf_deriv2(const Eigen::MatrixXd& u,
+                                const std::string& deriv,
+                                const Eigen::MatrixXd& parameters,
+                                const size_t num_threads = 1) const;
+
   Eigen::MatrixXd simulate(
     const size_t& n,
     const bool qrng = false,
@@ -229,6 +295,25 @@ private:
     const size_t num_threads,
     const std::function<Eigen::VectorXd(const Eigen::MatrixXd&,
                                         const Eigen::MatrixXd&)>& f) const;
+
+  // rotation-resolved derivative call: canonical selector for the (unrotated)
+  // leaf, chain-rule sign, and, for h-functions, whether the rotation swaps
+  // which h-function's leaf is used
+  struct DerivSpec
+  {
+    std::string deriv;
+    double sign;
+    bool swap_hfunc;
+  };
+
+  size_t deriv_npars() const;
+
+  void check_deriv_preconditions() const;
+
+  DerivSpec map_pdf_deriv(const std::string& canonical) const;
+
+  DerivSpec map_hfunc_deriv(const std::string& canonical,
+                            bool first_hfunc) const;
 
   void check_rotation(int rotation) const;
 
