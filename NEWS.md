@@ -1,4 +1,4 @@
-## vinecopulib 0.8.1 (unreleased)
+## vinecopulib 0.8.0 (June 12, 2026)
 
 ### NEW FEATURES
 
@@ -11,12 +11,7 @@
   (faster and exact). VineCopula has no closed forms for these families, so the
   expressions were derived from the generator / Pickands derivative calculus and
   code-generated (see `tools/derivs/`); correctness is gated by the
-  analytic-vs-finite-difference tests (#TBD)
-
-## vinecopulib 0.8.0 (June 12, 2026)
-
-### NEW FEATURES
-
+  analytic-vs-finite-difference tests (#687)
 * Add analytic derivatives of the copula density and h-functions with respect
   to the parameters and arguments: `Bicop::pdf_deriv`, `pdf_deriv2`,
   `hfunc1_deriv`, `hfunc1_deriv2`, `hfunc2_deriv`, `hfunc2_deriv2`,
