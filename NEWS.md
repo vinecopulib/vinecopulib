@@ -2,6 +2,11 @@
 
 ### NEW FEATURES
 
+* Speed up `tools_stats`: SIMD `qnorm` via Eigen's packetized `pndtri`
+  (~2–3× faster, roughly halving the Gaussian-copula pdf cost), leaner
+  `pbvnorm`/`pbvt` kernels, single weight conversion in `to_pseudo_obs`,
+  reusable FFT workspace for `"mcor"`, flattened `BoxCovering`, and faster
+  `simulate_uniform`/`sobol` fills (#690).
 * Add `Bicop::parameters_to_taildep()`/`Bicop::get_taildep()` to compute the tail
   dependence coefficients (returned as a 2x2 matrix collecting all four corners of
   the unit square) and `Bicop::parameters_to_beta()`/`Bicop::get_beta()` to compute
