@@ -1,3 +1,13 @@
+## vinecopulib 0.8.1 (development version)
+
+### NEW FEATURES
+
+* Speed up TLL fitting and evaluation: fused conditional-cdf interpolation
+  (single pass, no per-query allocation), direct closed-form inversion of the
+  conditional cdf replacing 35-sweep bisection, bucket-accelerated cell
+  lookup, O(m) cached `integrate_2d`, and fixed-size influence matrices in
+  the local-likelihood fit (#691).
+
 ## vinecopulib 0.8.0 (June 12, 2026)
 
 ### NEW FEATURES
