@@ -588,15 +588,14 @@ inline StudentBicop::StudentBicop()
 }
 
 inline Eigen::VectorXd
-StudentBicop::pdf_impl(const Eigen::MatrixXd& u, double rho, double nu)
+StudentBicop::pdf_impl(const tools_eigen::ConstMatRef& u, double rho, double nu)
 {
-  Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
   Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
 
-  f = tmp.col(0).cwiseAbs2() + tmp.col(1).cwiseAbs2() -
-      (2 * rho) * tmp.rowwise().prod();
+  Eigen::VectorXd f = tmp.col(0).cwiseAbs2() + tmp.col(1).cwiseAbs2() -
+                      (2 * rho) * tmp.rowwise().prod();
   f /= nu * (1.0 - pow(rho, 2.0));
-  f = f + Eigen::VectorXd::Ones(u.rows());
+  f.array() += 1.0;
   f = f.array().pow(-(nu + 2.0) / 2.0);
   f = f.cwiseQuotient(tools_stats::dt(tmp, nu).rowwise().prod());
   f *= boost::math::tgamma_ratio((nu + 2.0) / 2.0, nu / 2.0);
@@ -606,7 +605,7 @@ StudentBicop::pdf_impl(const Eigen::MatrixXd& u, double rho, double nu)
 }
 
 inline Eigen::VectorXd
-StudentBicop::cdf_impl(const Eigen::MatrixXd& u, double rho, double nu)
+StudentBicop::cdf_impl(const tools_eigen::ConstMatRef& u, double rho, double nu)
 {
   using namespace tools_stats;
 
@@ -626,11 +625,13 @@ StudentBicop::cdf_impl(const Eigen::MatrixXd& u, double rho, double nu)
 }
 
 inline Eigen::VectorXd
-StudentBicop::hfunc1_impl(const Eigen::MatrixXd& u, double rho, double nu)
+StudentBicop::hfunc1_impl(const tools_eigen::ConstMatRef& u,
+                          double rho,
+                          double nu)
 {
-  Eigen::VectorXd h = Eigen::VectorXd::Ones(u.rows());
   Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
-  h = nu * h + tmp.col(0).cwiseAbs2();
+  Eigen::VectorXd h = tmp.col(0).cwiseAbs2();
+  h.array() += nu;
   h *= (1.0 - pow(rho, 2)) / (nu + 1.0);
   h = h.cwiseSqrt().cwiseInverse().cwiseProduct(tmp.col(1) - rho * tmp.col(0));
   h = tools_stats::pt(h, nu + 1.0);
@@ -639,15 +640,15 @@ StudentBicop::hfunc1_impl(const Eigen::MatrixXd& u, double rho, double nu)
 }
 
 inline Eigen::VectorXd
-StudentBicop::hinv1_impl(const Eigen::MatrixXd& u, double rho, double nu)
+StudentBicop::hinv1_impl(const tools_eigen::ConstMatRef& u,
+                         double rho,
+                         double nu)
 {
-  Eigen::VectorXd hinv = Eigen::VectorXd::Ones(u.rows());
-  Eigen::VectorXd tmp = u.col(1);
-  Eigen::VectorXd tmp2 = u.col(0);
-  tmp = tools_stats::qt(tmp, nu + 1.0);
-  tmp2 = tools_stats::qt(tmp2, nu);
+  Eigen::VectorXd tmp = tools_stats::qt(u.col(1), nu + 1.0);
+  Eigen::VectorXd tmp2 = tools_stats::qt(u.col(0), nu);
 
-  hinv = nu * hinv + tmp2.cwiseAbs2();
+  Eigen::VectorXd hinv = tmp2.cwiseAbs2();
+  hinv.array() += nu;
   hinv *= (1.0 - pow(rho, 2)) / (nu + 1.0);
   hinv = hinv.cwiseSqrt().cwiseProduct(tmp) + rho * tmp2;
   hinv = tools_stats::pt(hinv, nu);
@@ -656,8 +657,8 @@ StudentBicop::hinv1_impl(const Eigen::MatrixXd& u, double rho, double nu)
 }
 
 inline Eigen::VectorXd
-StudentBicop::pdf_raw(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters)
+StudentBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
+                      const tools_eigen::ConstMatRef& parameters)
 {
   if (parameters.rows() == 1) {
     return pdf_impl(u, parameters(0, 0), parameters(0, 1));
@@ -670,7 +671,8 @@ StudentBicop::pdf_raw(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-StudentBicop::cdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
+StudentBicop::cdf(const tools_eigen::ConstMatRef& u,
+                  const tools_eigen::ConstMatRef& parameters)
 {
   if (parameters.rows() == 1) {
     return cdf_impl(u, parameters(0, 0), parameters(0, 1));
@@ -683,8 +685,8 @@ StudentBicop::cdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 }
 
 inline Eigen::VectorXd
-StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u,
-                         const Eigen::MatrixXd& parameters)
+StudentBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
+                         const tools_eigen::ConstMatRef& parameters)
 {
   if (parameters.rows() == 1) {
     return hfunc1_impl(u, parameters(0, 0), parameters(0, 1));
@@ -697,8 +699,8 @@ StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-StudentBicop::hinv1_raw(const Eigen::MatrixXd& u,
-                        const Eigen::MatrixXd& parameters)
+StudentBicop::hinv1_raw(const tools_eigen::ConstMatRef& u,
+                        const tools_eigen::ConstMatRef& parameters)
 {
   if (parameters.rows() == 1) {
     return hinv1_impl(u, parameters(0, 0), parameters(0, 1));

@@ -157,6 +157,15 @@ AbstractBicop::set_var_types(const std::vector<std::string>& var_types)
     throw std::runtime_error("var_types must have size two.");
   }
   var_types_ = var_types;
+  all_continuous_ = (var_types_[0] == "c") && (var_types_[1] == "c");
+}
+
+inline const Eigen::MatrixXd&
+AbstractBicop::parameters_row() const
+{
+  static thread_local Eigen::MatrixXd storage;
+  storage = get_parameters().transpose();
+  return storage;
 }
 //! @}
 
@@ -165,11 +174,11 @@ AbstractBicop::set_var_types(const std::vector<std::string>& var_types)
 inline Eigen::VectorXd
 AbstractBicop::pdf(const Eigen::MatrixXd& u)
 {
-  if (var_types_ != std::vector<std::string>{ "c", "c" }) {
+  if (!all_continuous_) {
     // discrete margins go through the parameter-aware difference quotients
-    return pdf(u, get_parameters().transpose());
+    return pdf(u, parameters_row());
   }
-  Eigen::VectorXd pdf = pdf_raw(u.leftCols(2), get_parameters().transpose());
+  Eigen::VectorXd pdf = pdf_raw(u.leftCols(2), parameters_row());
   tools_eigen::trim(pdf, DBL_MIN, DBL_MAX);
   return pdf;
 }
@@ -178,25 +187,25 @@ inline Eigen::VectorXd
 AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
 {
   if (var_types_[0] == "d") {
-    return hfunc1(u, get_parameters().transpose());
+    return hfunc1(u, parameters_row());
   }
-  return hfunc1_raw(u.leftCols(2), get_parameters().transpose());
+  return hfunc1_raw(u.leftCols(2), parameters_row());
 }
 
 inline Eigen::VectorXd
 AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
 {
   if (var_types_[1] == "d") {
-    return hfunc2(u, get_parameters().transpose());
+    return hfunc2(u, parameters_row());
   }
-  return hfunc2_raw(u.leftCols(2), get_parameters().transpose());
+  return hfunc2_raw(u.leftCols(2), parameters_row());
 }
 
 inline Eigen::VectorXd
 AbstractBicop::hinv1(const Eigen::MatrixXd& u)
 {
   if (var_types_[0] == "c") {
-    return hinv1_raw(u.leftCols(2), get_parameters().transpose());
+    return hinv1_raw(u.leftCols(2), parameters_row());
   } else {
     return hinv1_num(u);
   }
@@ -206,19 +215,36 @@ inline Eigen::VectorXd
 AbstractBicop::hinv2(const Eigen::MatrixXd& u)
 {
   if (var_types_[1] == "c") {
-    return hinv2_raw(u.leftCols(2), get_parameters().transpose());
+    return hinv2_raw(u.leftCols(2), parameters_row());
   } else {
     return hinv2_num(u);
   }
+}
+
+//! default log-density: log of the (trimmed) density.
+inline Eigen::VectorXd
+AbstractBicop::log_pdf_raw(const tools_eigen::ConstMatRef& u,
+                           const tools_eigen::ConstMatRef& parameters)
+{
+  Eigen::VectorXd pdf = pdf_raw(u, parameters);
+  tools_eigen::trim(pdf, DBL_MIN, DBL_MAX);
+  return pdf.array().log().matrix();
 }
 
 //! evaluates the log-likelihood.
 //! @param u Data matrix.
 //! @param weights Optional weights for each observation.
 inline double
-AbstractBicop::loglik(const Eigen::MatrixXd& u, const Eigen::VectorXd weights)
+AbstractBicop::loglik(const Eigen::MatrixXd& u, const Eigen::VectorXd& weights)
 {
-  Eigen::MatrixXd log_pdf = this->pdf(u).array().log();
+  Eigen::MatrixXd log_pdf;
+  if (all_continuous_) {
+    // same clamp semantics as trimming the density to [DBL_MIN, DBL_MAX]
+    log_pdf = log_pdf_raw(u.leftCols(2), parameters_row());
+    tools_eigen::trim(log_pdf, std::log(DBL_MIN), std::log(DBL_MAX));
+  } else {
+    log_pdf = this->pdf(u).array().log();
+  }
   if (weights.size() > 0) {
     log_pdf = log_pdf.cwiseProduct(weights);
   }
@@ -237,13 +263,13 @@ AbstractBicop::loglik(const Eigen::MatrixXd& u, const Eigen::VectorXd weights)
 inline Eigen::VectorXd
 AbstractBicop::hinv1_num(const Eigen::MatrixXd& u)
 {
-  return hinv1_num(u, get_parameters().transpose());
+  return hinv1_num(u, parameters_row());
 }
 
 inline Eigen::VectorXd
 AbstractBicop::hinv2_num(const Eigen::MatrixXd& u)
 {
-  return hinv2_num(u, get_parameters().transpose());
+  return hinv2_num(u, parameters_row());
 }
 //! @}
 
@@ -256,12 +282,13 @@ AbstractBicop::hinv2_num(const Eigen::MatrixXd& u)
 //! @{
 
 inline Eigen::VectorXd
-AbstractBicop::pdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
+AbstractBicop::pdf(const tools_eigen::ConstMatRef& u,
+                   const tools_eigen::ConstMatRef& parameters)
 {
-  Eigen::VectorXd pdf(u.rows());
-  if (var_types_ == std::vector<std::string>{ "c", "c" }) {
+  Eigen::VectorXd pdf;
+  if (all_continuous_) {
     pdf = pdf_raw(u.leftCols(2), parameters);
-  } else if (var_types_ == std::vector<std::string>{ "d", "d" }) {
+  } else if ((var_types_[0] == "d") && (var_types_[1] == "d")) {
     pdf = pdf_d_d(u, parameters);
   } else {
     pdf = pdf_c_d(u, parameters);
@@ -271,8 +298,8 @@ AbstractBicop::pdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 }
 
 inline Eigen::VectorXd
-AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u,
-                       const Eigen::MatrixXd& parameters)
+AbstractBicop::pdf_c_d(const tools_eigen::ConstMatRef& u,
+                       const tools_eigen::ConstMatRef& parameters)
 {
   Eigen::VectorXd pdf(u.rows());
   Eigen::MatrixXd umax = u.leftCols(2);
@@ -286,8 +313,14 @@ AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u,
   }
 
   const bool bc = (parameters.rows() == 1);
+  Eigen::MatrixXd par_i;
+  if (bc) {
+    par_i = parameters.row(0);
+  }
   for (Eigen::Index i = 0; i < u.rows(); i++) {
-    const Eigen::MatrixXd par_i = parameters.row(bc ? 0 : i);
+    if (!bc) {
+      par_i = parameters.row(i);
+    }
     if (udiff(i) > 5e-5) {
       if (var_types_[0] != "c") {
         pdf(i) =
@@ -305,8 +338,8 @@ AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u,
-                       const Eigen::MatrixXd& parameters)
+AbstractBicop::pdf_d_d(const tools_eigen::ConstMatRef& u,
+                       const tools_eigen::ConstMatRef& parameters)
 {
   Eigen::VectorXd pdf(u.rows());
   Eigen::MatrixXd umax = u.leftCols(2);
@@ -314,8 +347,14 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u,
   Eigen::MatrixXd udiff = (umax - umin).cwiseAbs();
 
   const bool bc = (parameters.rows() == 1);
+  Eigen::MatrixXd par_i;
+  if (bc) {
+    par_i = parameters.row(0);
+  }
   for (Eigen::Index i = 0; i < u.rows(); i++) {
-    const Eigen::MatrixXd par_i = parameters.row(bc ? 0 : i);
+    if (!bc) {
+      par_i = parameters.row(i);
+    }
     // the difference quotient can be instable, use derivative if denominator
     // too small
     if (udiff.row(i).maxCoeff() < 5e-5) {
@@ -344,18 +383,24 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hfunc1(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters)
+AbstractBicop::hfunc1(const tools_eigen::ConstMatRef& u,
+                      const tools_eigen::ConstMatRef& parameters)
 {
   if (var_types_[0] == "d") {
-    auto uu = u;
+    Eigen::MatrixXd uu = u;
     uu.col(3) = uu.col(1);
     auto u1diff = (uu.col(0) - uu.col(2)).cwiseAbs();
     Eigen::VectorXd h(u.rows());
 
     const bool bc = (parameters.rows() == 1);
+    Eigen::MatrixXd par_i;
+    if (bc) {
+      par_i = parameters.row(0);
+    }
     for (Eigen::Index i = 0; i < u.rows(); i++) {
-      const Eigen::MatrixXd par_i = parameters.row(bc ? 0 : i);
+      if (!bc) {
+        par_i = parameters.row(i);
+      }
       if (std::abs(u1diff(i)) > 5e-5) {
         h(i) = cdf(uu.row(i).leftCols(2), par_i)(0) -
                cdf(uu.row(i).rightCols(2), par_i)(0);
@@ -372,18 +417,24 @@ AbstractBicop::hfunc1(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hfunc2(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters)
+AbstractBicop::hfunc2(const tools_eigen::ConstMatRef& u,
+                      const tools_eigen::ConstMatRef& parameters)
 {
   if (var_types_[1] == "d") {
-    auto uu = u;
+    Eigen::MatrixXd uu = u;
     uu.col(2) = uu.col(0);
     auto u2diff = (uu.col(1) - uu.col(3)).cwiseAbs();
     Eigen::VectorXd h(u.rows());
 
     const bool bc = (parameters.rows() == 1);
+    Eigen::MatrixXd par_i;
+    if (bc) {
+      par_i = parameters.row(0);
+    }
     for (Eigen::Index i = 0; i < u.rows(); i++) {
-      const Eigen::MatrixXd par_i = parameters.row(bc ? 0 : i);
+      if (!bc) {
+        par_i = parameters.row(i);
+      }
       if (u2diff(i) > 5e-5) {
         h(i) = cdf(uu.row(i).leftCols(2), par_i)(0) -
                cdf(uu.row(i).rightCols(2), par_i)(0);
@@ -400,8 +451,8 @@ AbstractBicop::hfunc2(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv1(const Eigen::MatrixXd& u,
-                     const Eigen::MatrixXd& parameters)
+AbstractBicop::hinv1(const tools_eigen::ConstMatRef& u,
+                     const tools_eigen::ConstMatRef& parameters)
 {
   if (var_types_[0] == "c") {
     return hinv1_raw(u.leftCols(2), parameters);
@@ -411,8 +462,8 @@ AbstractBicop::hinv1(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv2(const Eigen::MatrixXd& u,
-                     const Eigen::MatrixXd& parameters)
+AbstractBicop::hinv2(const tools_eigen::ConstMatRef& u,
+                     const tools_eigen::ConstMatRef& parameters)
 {
   if (var_types_[1] == "c") {
     return hinv2_raw(u.leftCols(2), parameters);
@@ -422,8 +473,8 @@ AbstractBicop::hinv2(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv1_num(const Eigen::MatrixXd& u,
-                         const Eigen::MatrixXd& parameters)
+AbstractBicop::hinv1_num(const tools_eigen::ConstMatRef& u,
+                         const tools_eigen::ConstMatRef& parameters)
 {
   Eigen::MatrixXd u_new = u;
   auto h1 = [&](const Eigen::VectorXd& v) {
@@ -435,8 +486,8 @@ AbstractBicop::hinv1_num(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv2_num(const Eigen::MatrixXd& u,
-                         const Eigen::MatrixXd& parameters)
+AbstractBicop::hinv2_num(const tools_eigen::ConstMatRef& u,
+                         const tools_eigen::ConstMatRef& parameters)
 {
   Eigen::MatrixXd u_new = u;
   auto h1 = [&](const Eigen::VectorXd& x) {
@@ -447,30 +498,67 @@ AbstractBicop::hinv2_num(const Eigen::MatrixXd& u,
   return tools_eigen::invert_f(u.col(0), h1);
 }
 
-inline Eigen::VectorXd
-AbstractBicop::hinv1_num_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters)
+//! builds the active-row evaluator for the safeguarded Newton h-inverse.
+//! `cond_col` is the fixed conditioning column and `solve_col` is filled with
+//! the current iterates; the returned callback evaluates the h-function and
+//! density (its derivative) on just the unconverged rows, gathering the
+//! matching per-row parameters when they vary by row.
+inline tools_eigen::NewtonEval
+AbstractBicop::make_hinv_eval(const tools_eigen::ConstMatRef& u,
+                              const tools_eigen::ConstMatRef& parameters,
+                              int cond_col,
+                              int solve_col,
+                              HinvHFunc hfunc)
 {
-  Eigen::MatrixXd u_new = u;
-  auto h1 = [&](const Eigen::VectorXd& v) {
-    u_new.col(1) = v;
-    return hfunc1_raw(u_new.leftCols(2), parameters);
+  const bool per_row = parameters.rows() > 1;
+  const Eigen::VectorXd ucond = u.col(cond_col);
+  // Capture an OWNING copy of the parameters: the returned callback outlives
+  // this call, and in the broadcast case a captured `Ref` would alias
+  // `parameters_row()`'s thread_local buffer (clobbered by any state-based
+  // evaluation). The copy is 1 x p in the common broadcast case.
+  const Eigen::MatrixXd params = parameters;
+  return [this, ucond, params, cond_col, solve_col, per_row, hfunc](
+           const std::vector<Eigen::Index>& active,
+           const Eigen::VectorXd& v_active,
+           Eigen::VectorXd& f_out,
+           Eigen::VectorXd& fprime_out) {
+    const Eigen::Index m = static_cast<Eigen::Index>(active.size());
+    Eigen::MatrixXd uu(m, 2);
+    for (Eigen::Index k = 0; k < m; ++k) {
+      uu(k, cond_col) = ucond(active[k]);
+      uu(k, solve_col) = v_active(k);
+    }
+    if (per_row) {
+      Eigen::MatrixXd par_sub(m, params.cols());
+      for (Eigen::Index k = 0; k < m; ++k) {
+        par_sub.row(k) = params.row(active[k]);
+      }
+      f_out = (this->*hfunc)(uu, par_sub);
+      fprime_out = pdf_raw(uu, par_sub);
+    } else {
+      f_out = (this->*hfunc)(uu, params);
+      fprime_out = pdf_raw(uu, params);
+    }
   };
-
-  return tools_eigen::invert_f(u.col(1), h1);
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hinv2_num_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters)
+AbstractBicop::hinv1_num_raw(const tools_eigen::ConstMatRef& u,
+                             const tools_eigen::ConstMatRef& parameters)
 {
-  Eigen::MatrixXd u_new = u;
-  auto h1 = [&](const Eigen::VectorXd& x) {
-    u_new.col(0) = x;
-    return hfunc2_raw(u_new.leftCols(2), parameters);
-  };
+  // invert h1(u2 | u1) over u2; d h1 / d u2 = c(u1, u2) = pdf, so the
+  // density is the derivative that drives the safeguarded Newton step
+  auto eval = make_hinv_eval(u, parameters, 0, 1, &AbstractBicop::hfunc1_raw);
+  return tools_eigen::invert_f_newton(u.col(1), eval);
+}
 
-  return tools_eigen::invert_f(u.col(0), h1);
+inline Eigen::VectorXd
+AbstractBicop::hinv2_num_raw(const tools_eigen::ConstMatRef& u,
+                             const tools_eigen::ConstMatRef& parameters)
+{
+  // invert h2(u1 | u2) over u1; d h2 / d u1 = c(u1, u2) = pdf
+  auto eval = make_hinv_eval(u, parameters, 1, 0, &AbstractBicop::hfunc2_raw);
+  return tools_eigen::invert_f_newton(u.col(0), eval);
 }
 //! @}
 

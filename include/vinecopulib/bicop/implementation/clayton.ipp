@@ -46,23 +46,94 @@ ClaytonBicop::generator_derivative(
 }
 
 inline Eigen::VectorXd
-ClaytonBicop::pdf_raw(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters)
+ClaytonBicop::log_pdf_raw(const tools_eigen::ConstMatRef& u,
+                          const tools_eigen::ConstMatRef& parameters)
 {
+  if (parameters.rows() == 1) {
+    // vectorized evaluation for a single (broadcast) parameter set
+    const double theta = parameters(0, 0);
+    const auto u1 = u.col(0).array();
+    const auto u2 = u.col(1).array();
+    Eigen::ArrayXd out;
+    if (theta < 1e-10) {
+      // avoid numerical issues when copula is too close to independence
+      out = (u1.isNaN() || u2.isNaN())
+              .select(std::numeric_limits<double>::quiet_NaN(),
+                      Eigen::ArrayXd::Zero(u.rows()));
+    } else {
+      out = std::log1p(theta) - (1.0 + theta) * (u1 * u2).log() -
+            (2.0 + 1.0 / theta) * (u1.pow(-theta) + u2.pow(-theta) - 1.0).log();
+    }
+    return out.matrix();
+  }
+
   auto f = [](const double& u1,
               const double& u2,
               const Eigen::Ref<const Eigen::VectorXd>& par) {
     double theta = par(0);
     // avoid numerical issues when copula is too close to independence
     if (theta < 1e-10) {
-      return 1.0;
+      return 0.0;
     }
     double temp = std::log1p(theta) - (1.0 + theta) * std::log(u1 * u2);
-    temp = temp - (2.0 + 1.0 / (theta)) *
+    return temp - (2.0 + 1.0 / (theta)) *
                     std::log(std::pow(u1, -theta) + std::pow(u2, -theta) - 1.0);
-    return std::exp(temp);
   };
   return tools_eigen::binaryExpr_or_nan(u, parameters, f);
+}
+
+inline Eigen::VectorXd
+ClaytonBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
+                      const tools_eigen::ConstMatRef& parameters)
+{
+  return log_pdf_raw(u, parameters).array().exp().matrix();
+}
+
+//! closed-form h-function h(uother | ucond); replaces the generic
+//! generator-based per-element evaluation (which needs four virtual calls
+//! per observation) and the full-matrix `swap_cols` copy for `hfunc2`.
+inline Eigen::VectorXd
+ClaytonBicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
+                             const Eigen::Ref<const Eigen::VectorXd>& uother,
+                             const tools_eigen::ConstMatRef& parameters) const
+{
+  // near-independence guard (theta < 1e-10): h = uother, consistent with the
+  // density's guard
+  return apply_closed_form_h(
+    ucond,
+    uother,
+    parameters,
+    [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
+      const double theta = parameters(0, 0);
+      if (theta < 1e-10) {
+        return uo;
+      }
+      return uc.pow(-(1.0 + theta)) *
+             (uc.pow(-theta) + uo.pow(-theta) - 1.0).pow(-1.0 - 1.0 / theta);
+    },
+    [&](Eigen::Index i, double uc, double uo) -> double {
+      const double theta = parameters(i, 0);
+      if (theta < 1e-10) {
+        return uo;
+      }
+      return std::pow(uc, -(1.0 + theta)) *
+             std::pow(std::pow(uc, -theta) + std::pow(uo, -theta) - 1.0,
+                      -1.0 - 1.0 / theta);
+    });
+}
+
+inline Eigen::VectorXd
+ClaytonBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
+                         const tools_eigen::ConstMatRef& parameters)
+{
+  return hfunc_internal(u.col(0), u.col(1), parameters);
+}
+
+inline Eigen::VectorXd
+ClaytonBicop::hfunc2_raw(const tools_eigen::ConstMatRef& u,
+                         const tools_eigen::ConstMatRef& parameters)
+{
+  return hfunc_internal(u.col(1), u.col(0), parameters);
 }
 
 inline Eigen::VectorXd
@@ -532,8 +603,8 @@ ClaytonBicop::logpdf_deriv2_raw(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-ClaytonBicop::hinv1_raw(const Eigen::MatrixXd& u,
-                        const Eigen::MatrixXd& parameters)
+ClaytonBicop::hinv1_raw(const tools_eigen::ConstMatRef& u,
+                        const tools_eigen::ConstMatRef& parameters)
 {
   // theta is bounded above by 28 < 75, so the closed form is always used
   const Eigen::Index n = u.rows();
