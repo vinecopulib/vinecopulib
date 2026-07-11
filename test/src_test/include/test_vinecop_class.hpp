@@ -768,8 +768,8 @@ TEST(VinecopDerivatives, hessian_bb1_edge_matches_brute_force)
   };
   double base = loglik(pcs);
   double h = 1e-4;
-  // looser tolerance: bb1's second derivatives come from the leaf-level
-  // finite-difference fallback, so the cascade carries that error
+  // bb1 now has analytic derivative leaves (like the other families), so the
+  // cascade agrees with brute force to the finite-difference truncation error.
   for (size_t a = 0; a < npars; ++a) {
     for (size_t bb = a; bb < npars; ++bb) {
       double fd;
@@ -783,7 +783,7 @@ TEST(VinecopDerivatives, hessian_bb1_edge_matches_brute_force)
               loglik(bump(bump(pcs, a, -h), bb, -h))) /
              (4 * h * h);
       }
-      EXPECT_NEAR(H(a, bb), fd, 5e-2 * (1.0 + std::abs(fd)))
+      EXPECT_NEAR(H(a, bb), fd, 1e-3 * (1.0 + std::abs(fd)))
         << "H(" << a << ", " << bb << ")";
     }
   }
