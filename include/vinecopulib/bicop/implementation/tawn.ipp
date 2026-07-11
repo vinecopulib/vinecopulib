@@ -5049,10 +5049,16 @@ TawnBicop::logpdf_deriv2_raw(const Eigen::MatrixXd& u,
 // [END generated derivative leaves]
 
 inline Eigen::VectorXd
-TawnBicop::get_start_parameters(const double)
+TawnBicop::get_start_parameters(const double tau)
 {
-  Eigen::MatrixXd lb = this->get_parameters_lower_bounds();
-  Eigen::VectorXd parameters = lb + Eigen::VectorXd::Constant(3, 0.5);
+  // Initialize the power parameter from Kendall's tau as in VineCopula's
+  // `BiCopEst.R` (theta ~ 1 + 6 * |tau|); a fixed start left it far from the
+  // truth for strongly dependent data and stranded the optimizer. The two
+  // asymmetry weights start at a moderate interior value.
+  Eigen::VectorXd parameters(3);
+  parameters << 0.5, 0.5, 1.0 + 6.0 * std::fabs(tau);
+  parameters = parameters.cwiseMax(this->get_parameters_lower_bounds())
+                 .cwiseMin(this->get_parameters_upper_bounds());
   return parameters;
 }
 
