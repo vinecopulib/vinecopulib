@@ -39,6 +39,10 @@ if(BUILD_TESTING)
     file(COPY ${r_scripts} DESTINATION ${PROJECT_BINARY_DIR}/test)
 endif(BUILD_TESTING)
 
+if(VINECOPULIB_BUILD_BENCHMARKS)
+    add_subdirectory(benchmarks)
+endif()
+
 # Related to exports for linux/mac and code coverage
 ####
 # Installation
