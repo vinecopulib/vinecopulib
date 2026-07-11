@@ -305,26 +305,49 @@ TEST_F(VinecopTest, hfuncs_is_correct)
 
   ASSERT_EQ(r.hfunc1.get_trunc_lvl(), trunc_lvl);
   ASSERT_EQ(r.hfunc2.get_trunc_lvl(), trunc_lvl);
-  ASSERT_EQ(r.hfunc1_sub.get_trunc_lvl(), trunc_lvl);
-  ASSERT_EQ(r.hfunc2_sub.get_trunc_lvl(), trunc_lvl);
   ASSERT_EQ(r.pdf_edges.get_trunc_lvl(), trunc_lvl);
+  // the _sub arrays are only filled when at least one variable is discrete
+  ASSERT_EQ(r.hfunc1_sub.get_trunc_lvl(), 0);
+  ASSERT_EQ(r.hfunc2_sub.get_trunc_lvl(), 0);
 
   for (size_t tree = 0; tree < trunc_lvl; ++tree) {
     for (size_t edge = 0; edge < d - tree - 1; ++edge) {
       EXPECT_EQ(r.pdf_edges(tree, edge).size(), u.rows());
       if (rvine_structure.needed_hfunc1(tree, edge)) {
         EXPECT_EQ(r.hfunc1(tree, edge).size(), u.rows());
-        EXPECT_EQ(r.hfunc1_sub(tree, edge).size(), u.rows());
       } else {
         EXPECT_EQ(r.hfunc1(tree, edge).size(), 0);
-        EXPECT_EQ(r.hfunc1_sub(tree, edge).size(), 0);
       }
       if (rvine_structure.needed_hfunc2(tree, edge)) {
         EXPECT_EQ(r.hfunc2(tree, edge).size(), u.rows());
-        EXPECT_EQ(r.hfunc2_sub(tree, edge).size(), u.rows());
       } else {
         EXPECT_EQ(r.hfunc2(tree, edge).size(), 0);
-        EXPECT_EQ(r.hfunc2_sub(tree, edge).size(), 0);
+      }
+    }
+  }
+
+  // discrete model: _sub arrays must be allocated and filled
+  std::vector<std::string> var_types(7, "c");
+  var_types[0] = "d";
+  Vinecop vinecop_disc(model_matrix, pair_copulas, var_types);
+  Eigen::MatrixXd u_disc(u.rows(), 8);
+  u_disc.leftCols(7) = u;
+  u_disc.col(0) = (u.col(0).array() * 10).ceil() / 10;
+  u_disc.col(7) = (u.col(0).array() * 10).floor() / 10;
+  auto r_disc = vinecop_disc.pdf_full(u_disc, 1, true);
+  ASSERT_EQ(r_disc.hfunc1_sub.get_trunc_lvl(), trunc_lvl);
+  ASSERT_EQ(r_disc.hfunc2_sub.get_trunc_lvl(), trunc_lvl);
+  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
+    for (size_t edge = 0; edge < d - tree - 1; ++edge) {
+      if (rvine_structure.needed_hfunc1(tree, edge)) {
+        EXPECT_EQ(r_disc.hfunc1_sub(tree, edge).size(), u.rows());
+      } else {
+        EXPECT_EQ(r_disc.hfunc1_sub(tree, edge).size(), 0);
+      }
+      if (rvine_structure.needed_hfunc2(tree, edge)) {
+        EXPECT_EQ(r_disc.hfunc2_sub(tree, edge).size(), u.rows());
+      } else {
+        EXPECT_EQ(r_disc.hfunc2_sub(tree, edge).size(), 0);
       }
     }
   }

@@ -266,6 +266,26 @@ TEST(rvine_structure, rvine_struct_sanity_checks_work)
   EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
 }
 
+TEST(rvine_structure, proximity_condition_multiword)
+{
+  // Exercise the >64-dimensional proximity check, where the rolling column
+  // bitmasks span more than one 64-bit word (d = 70 -> 2 words). The 7x7
+  // case above only covers a single word.
+  const size_t d = 70;
+  auto mat = CVineStructure(tools_stl::seq_int(1, d)).get_matrix();
+
+  // a valid structure must pass the multi-word proximity check
+  EXPECT_NO_THROW(RVineStructure{ mat }); // check = true by default
+
+  // a proximity violation must still be caught with multi-word masks:
+  // swapping two non-antidiagonal entries within a column keeps the column's
+  // value set and the diagonal intact, so only the proximity check rejects it
+  // (verified to raise the "proximity condition violated" error)
+  auto wrong_mat = mat;
+  std::swap(wrong_mat(0, 0), wrong_mat(2, 0));
+  EXPECT_ANY_THROW(RVineStructure{ wrong_mat });
+}
+
 TEST(rvine_structure, random_sampling)
 {
   for (size_t i = 0; i < 20; i++) {
