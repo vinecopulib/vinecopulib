@@ -1358,7 +1358,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
                      const bool keep_all)
 {
   check_data(u);
-  collapse_data_inplace(u);
+  u = collapse_data(u);
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
@@ -1824,7 +1824,7 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
                       const size_t num_threads)
 {
   check_data(u);
-  collapse_data_inplace(u);
+  u = collapse_data(u);
 
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
 
