@@ -2,6 +2,12 @@
 
 ### NEW FEATURES
 
+* Speed up shared primitives: `tools_eigen` helpers take `Eigen::Ref`
+  (`ConstMatRef`) with raw-pointer inner loops and gain a safeguarded-Newton
+  inverter; `ThreadPool::push` binds arguments instead of capturing a
+  by-value lambda; `integrate_zero_to_one` is templated on the callable with
+  integration tolerance 1e-12 → 1e-9 (Kendall's τ of integrated families may
+  shift by up to ~1e-7) (#689).
 * Add `Bicop::parameters_to_taildep()`/`Bicop::get_taildep()` to compute the tail
   dependence coefficients (returned as a 2x2 matrix collecting all four corners of
   the unit square) and `Bicop::parameters_to_beta()`/`Bicop::get_beta()` to compute
