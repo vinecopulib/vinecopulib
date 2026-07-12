@@ -2,6 +2,8 @@
 
 ### NEW FEATURES
 
+* Add binary CBOR persistence for `Bicop`, `Vinecop`, and `RVineStructure`,
+  selected automatically by a `.cbor` filename extension (#684).
 * Add an opt-in google/benchmark suite (`VINECOPULIB_BUILD_BENCHMARKS`, off by
   default), a numerical parity harness (`parity_dump` +
   `scripts/compare_parity.py` with per-key tolerance gates in
