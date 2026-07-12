@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <boost/math/tools/minima.hpp>
 #include <cmath>
 #include <limits>
 #include <stdexcept>
@@ -18,14 +19,17 @@ inline Optimizer::Optimizer(Controls controls)
 {
 }
 
-//! @brief maximizes `objective` over a box using unconstrained BFGS.
+//! @brief maximizes `objective` over a box.
 //!
-//! The problem is transformed to an unconstrained one via tools_transforms
-//! (identity / softplus / logistic inferred from the bounds) and minimized in
-//! `eta`-space with a backtracking-Armijo line search; the chain rule maps the
-//! natural-space gradient supplied by `objective` to `eta`-space. The best
-//! point seen is always returned, so a bad line-search step cannot regress the
-//! result.
+//! One-dimensional problems with finite bounds use Brent's derivative-free
+//! bracketing search (it needs only ~10 value evaluations on the narrowed
+//! intervals used for fitting, which a gradient method cannot beat). Higher
+//! dimensions use unconstrained BFGS: the problem is transformed via
+//! tools_transforms (identity / softplus / logistic inferred from the bounds)
+//! and minimized in `eta`-space with a backtracking-Armijo line search; the
+//! chain rule maps the natural-space gradient supplied by `objective` to
+//! `eta`-space. The best point seen is always returned, so a bad line-search
+//! step cannot regress the result.
 inline Eigen::VectorXd
 Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
                     const Eigen::VectorXd& lower_bounds,
@@ -35,6 +39,21 @@ Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
   check_parameters_size(initial_parameters, lower_bounds, upper_bounds);
 
   const Eigen::Index n = initial_parameters.size();
+
+  if ((n == 1) && std::isfinite(lower_bounds(0)) &&
+      std::isfinite(upper_bounds(0))) {
+    // 1-d: Brent's method on the (slightly shrunk) bracket; value-only.
+    const double eps = 1e-6;
+    Eigen::VectorXd no_grad; // empty: the objective skips the gradient
+    auto f = [&](double x) {
+      ++objective_calls_;
+      return -objective(Eigen::VectorXd::Constant(1, x), no_grad);
+    };
+    auto result = boost::math::tools::brent_find_minima(
+      f, lower_bounds(0) + eps, upper_bounds(0) - eps, 20);
+    objective_max_ = -result.second;
+    return Eigen::VectorXd::Constant(1, result.first);
+  }
   const auto transform = tools_transforms::ParameterTransform::from_bounds(
     lower_bounds, upper_bounds, controls_.eta_max);
 
@@ -89,7 +108,11 @@ Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
   double best_m = m;
 
   const Eigen::MatrixXd Id = Eigen::MatrixXd::Identity(n, n);
-  Eigen::MatrixXd H = Id; // inverse-Hessian approximation
+  // initial inverse Hessian, scaled so the first step has magnitude ~1 in
+  // eta-space; the raw gradient scales with the number of observations, and
+  // an O(n) first step would only burn line-search halvings. Overwritten by
+  // the Nocedal-Wright rescale after the first accepted step.
+  Eigen::MatrixXd H = Id / std::max(1.0, grad.cwiseAbs().maxCoeff());
   const double eps_c = 1e-10;
   const double c1 = 1e-4;
   const double alpha_min = 1e-12;
@@ -108,21 +131,31 @@ Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
       break; // gradient is (numerically) zero: stationary point
     }
 
-    // backtracking-Armijo line search (value only).
+    // backtracking-Armijo line search. The first trial (usually accepted)
+    // also computes the gradient, so the common case needs no separate
+    // re-evaluation at the accepted point; backtracked trials are value-only.
     double alpha = 1.0;
     Eigen::VectorXd eta_new;
+    Eigen::VectorXd grad_new(n);
     double m_new = m;
     bool ls_ok = false;
+    bool have_grad = false;
+    bool first_trial = true;
     while (n_eval < controls_.maxeval) {
       eta_new = transform.clamp_eta(eta + alpha * p);
       double m_trial = m;
-      Eigen::VectorXd unused;
-      if (eval(eta_new, false, m_trial, unused) &&
+      Eigen::VectorXd grad_trial;
+      if (eval(eta_new, first_trial, m_trial, grad_trial) &&
           m_trial <= m + c1 * alpha * gp) {
         m_new = m_trial;
+        if (first_trial) {
+          grad_new = grad_trial;
+          have_grad = true;
+        }
         ls_ok = true;
         break;
       }
+      first_trial = false;
       alpha *= 0.5;
       if (alpha < alpha_min) {
         break;
@@ -132,11 +165,12 @@ Optimizer::optimize(const Eigen::VectorXd& initial_parameters,
       break; // line search failed: stop and return the best point seen
     }
 
-    // gradient at the accepted iterate.
-    Eigen::VectorXd grad_new(n);
-    double m_unused;
-    if (!eval(eta_new, true, m_unused, grad_new)) {
-      break;
+    // gradient at the accepted iterate (only needed after backtracking).
+    if (!have_grad) {
+      double m_unused;
+      if (!eval(eta_new, true, m_unused, grad_new)) {
+        break;
+      }
     }
 
     const Eigen::VectorXd s = eta_new - eta;

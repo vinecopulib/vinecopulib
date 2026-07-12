@@ -70,8 +70,9 @@
   Blomqvist's beta, analogous to VineCopula's `BiCopPar2TailDep`/`BiCopPar2Beta` (#682).
 
 * Replace the vendored BOBYQA optimizer (`misc/tools_bobyqa.hpp`, ~2300 lines)
-  with a compact, gradient-based BFGS optimizer (`misc/tools_optimization`)
-  that handles bound constraints via automatic parameter transforms
+  with a compact optimizer (`misc/tools_optimization`): Brent's bracketing
+  search for one-dimensional fits and a gradient-based BFGS otherwise, the
+  latter handling bound constraints via automatic parameter transforms
   (`misc/tools_transforms`, inferred from the parameter bounds). Parametric
   maximum-likelihood fitting now consumes the analytic (or finite-difference)
   scores added above, optimizing over an unconstrained space so the family

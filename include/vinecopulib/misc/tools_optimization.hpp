@@ -13,10 +13,11 @@ namespace vinecopulib {
 
 //! @brief Utilities for numerical optimization.
 //!
-//! A small, self-contained BFGS optimizer used for parametric maximum
-//! likelihood. Bound constraints are handled by optimizing over an
-//! unconstrained space and mapping back with tools_transforms, so the
-//! objective always sees natural parameters.
+//! A small optimizer used for parametric maximum likelihood: Brent's
+//! derivative-free bracketing search for one-dimensional problems, and BFGS
+//! for higher dimensions. For BFGS, bound constraints are handled by
+//! optimizing over an unconstrained space and mapping back with
+//! tools_transforms, so the objective always sees natural parameters.
 namespace tools_optimization {
 
 //! @brief Controls for the BFGS optimizer.
@@ -33,12 +34,14 @@ struct Controls
 //!
 //! Returns the value `f(theta)`. If `grad` has non-zero size on entry (equal
 //! to `theta`), it must be filled with the gradient `df/dtheta`; the optimizer
-//! passes an empty `grad` during the line search (value only) and a sized
-//! `grad` at accepted iterates.
+//! passes an empty `grad` when only the value is needed (1-d Brent search and
+//! backtracked line-search trials) and a sized `grad` where the gradient is
+//! consumed.
 using Objective =
   std::function<double(const Eigen::VectorXd& theta, Eigen::VectorXd& grad)>;
 
-//! @brief An unconstrained BFGS optimizer with automatic bound transforms.
+//! @brief A box-constrained maximizer: Brent in 1-d, BFGS with automatic
+//! bound transforms otherwise.
 class Optimizer
 {
 public:
