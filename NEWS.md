@@ -8,13 +8,30 @@
   selection fast paths (NaN-free criterion, moved h-function storage, final
   tree h-functions skipped, in-place candidate fits). `pdf_full` no longer
   fills `hfunc*_sub` with duplicated continuous h-functions (#692).
-* Speed up `Vinecop` evaluation and structure selection: no per-edge
-  `Bicop` deep copies in `inverse_rosenblatt`, in-place data collapsing with
-  lazy discrete sub-buffers, parallel allocation-free Monte-Carlo `cdf`,
-  selection fast paths (NaN-free criterion, moved h-function storage, final
-  tree h-functions skipped, in-place candidate fits), and an allocation-free
-  rolling-bitmask proximity check in `RVineStructure`. `pdf_full` no longer
-  fills `hfunc*_sub` with duplicated continuous h-functions (#692).
+* Speed up TLL fitting and evaluation: fused conditional-cdf interpolation
+  (single pass, no per-query allocation), direct closed-form inversion of the
+  conditional cdf replacing 35-sweep bisection, bucket-accelerated cell
+  lookup, O(m) cached `integrate_2d`, and fixed-size influence matrices in
+  the local-likelihood fit (#691).
+* Speed up `tools_stats`: SIMD `qnorm` via Eigen's packetized `pndtri`
+  (~2–3× faster, roughly halving the Gaussian-copula pdf cost), leaner
+  `pbvnorm`/`pbvt` kernels, single weight conversion in `to_pseudo_obs`,
+  reusable FFT workspace for `"mcor"`, flattened `BoxCovering`, and faster
+  `simulate_uniform`/`sobol` fills (#690).
+* Speed up shared primitives: `tools_eigen` helpers take `Eigen::Ref`
+  (`ConstMatRef`) with raw-pointer inner loops and gain a safeguarded-Newton
+  inverter; `ThreadPool::push` binds arguments instead of capturing a
+  by-value lambda; `integrate_zero_to_one` is templated on the callable with
+  integration tolerance 1e-12 → 1e-9 (Kendall's τ of integrated families may
+  shift by up to ~1e-7) (#689).
+* Add binary CBOR persistence for `Bicop`, `Vinecop`, and `RVineStructure`,
+  selected automatically by a `.cbor` filename extension (#684).
+* Add an opt-in google/benchmark suite (`VINECOPULIB_BUILD_BENCHMARKS`, off by
+  default), a numerical parity harness (`parity_dump` +
+  `scripts/compare_parity.py` with per-key tolerance gates in
+  `scripts/parity_gates.json`), and golden-value tests freezing QRNG streams,
+  Genz `pbvnorm`/`pbvt` kernels, pseudo-observations, seeded TLL fits, and
+  h∘hinv round trips (#688).
 * Add `Bicop::parameters_to_taildep()`/`Bicop::get_taildep()` to compute the tail
   dependence coefficients (returned as a 2x2 matrix collecting all four corners of
   the unit square) and `Bicop::parameters_to_beta()`/`Bicop::get_beta()` to compute

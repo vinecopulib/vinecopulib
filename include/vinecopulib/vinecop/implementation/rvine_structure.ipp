@@ -4,7 +4,6 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include <cstdint>
 #include <vinecopulib/misc/tools_serialization.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
@@ -688,50 +687,21 @@ RVineStructure::check_antidiagonal() const
 inline void
 RVineStructure::check_proximity_condition() const
 {
-  if (trunc_lvl_ < 2) {
-    return;
-  }
-  // The sets to compare consist of distinct values in 1, ..., d (enforced by
-  // check_columns), so they can be represented as bitmasks. The conditioning
-  // sets are prefixes of the structure array columns; the masks are grown
-  // one row at a time, giving O(d^3 / 64) work without any allocation in
-  // the loop (compared to a copy + sort per pair for the set version).
-  const size_t w = d_ / 64 + 1; // 64-bit words per column mask
-  std::vector<uint64_t> masks(d_ * w, 0);
   for (size_t t = 1; t < trunc_lvl_; ++t) {
-    // fold row t - 1 into the column masks
-    for (size_t e = 0; e < d_ - t; ++e) {
-      const size_t v = struct_array_(t - 1, e);
-      masks[e * w + (v >> 6)] |= (uint64_t(1) << (v & 63));
-    }
     for (size_t e = 0; e < d_ - t - 1; ++e) {
-      const size_t m = min_array_(t, e);
-      const size_t b1 = struct_array_(t, e);
-      const size_t b2 = m;
-      bool equal = true;
-      for (size_t k = 0; k < w; ++k) {
-        uint64_t m1 = masks[e * w + k];
-        uint64_t m2 = masks[(m - 1) * w + k];
-        if ((b1 >> 6) == k) {
-          m1 |= (uint64_t(1) << (b1 & 63));
-        }
-        if ((b2 >> 6) == k) {
-          m2 |= (uint64_t(1) << (b2 & 63));
-        }
-        if (m1 != m2) {
-          equal = false;
-          break;
-        }
+      std::vector<size_t> target_set(t + 1), test_set(t + 1);
+      // conditioning set
+      for (size_t i = 0; i < t; i++) {
+        target_set[i] = struct_array_(i, e);
+        test_set[i] = struct_array_(i, min_array_(t, e) - 1);
       }
 
-      if (!equal) {
-        // cold path: rebuild the sets for the error message
-        std::vector<size_t> target_set(t + 1);
-        for (size_t i = 0; i < t; i++) {
-          target_set[i] = struct_array_(i, e);
-        }
-        target_set[t] = struct_array_(t, e);
+      // non-diagonal conditioned variable
+      target_set[t] = struct_array_(t, e);
+      // diagonal conditioned variable in other column
+      test_set[t] = min_array_(t, e);
 
+      if (!tools_stl::is_same_set(target_set, test_set)) {
         std::stringstream problem;
         problem << "not a valid R-vine array: "
                 << "proximity condition violated; "
