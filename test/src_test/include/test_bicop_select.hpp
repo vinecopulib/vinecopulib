@@ -15,7 +15,7 @@ using namespace vinecopulib;
 TEST(bicop_select, works_in_parallel)
 {
   Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
-  auto u = cop.simulate(15);
+  auto u = cop.simulate(15, false, { 1 });
   Bicop fit1, fit2;
   fit1.select(u);
   FitControlsBicop controls;
@@ -28,7 +28,7 @@ TEST(bicop_select, works_in_parallel)
 TEST(bicop_select, allows_all_selcrits)
 {
   Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
-  auto u = cop.simulate(15);
+  auto u = cop.simulate(15, false, { 1 });
   FitControlsBicop controls;
   controls.set_selection_criterion("loglik");
   cop.select(u, controls);
@@ -45,7 +45,7 @@ TEST(bicop_select, allows_all_selcrits)
 TEST(bicop_select, allow_rotations_works)
 {
   Bicop cop(BicopFamily::clayton, 180, Eigen::VectorXd::Constant(1, 5));
-  auto u = cop.simulate(static_cast<size_t>(5e3));
+  auto u = cop.simulate(static_cast<size_t>(5e3), false, { 1 });
   FitControlsBicop controls;
   controls.set_family_set({ BicopFamily::clayton });
   cop.select(u, controls);
@@ -58,7 +58,7 @@ TEST(bicop_select, allow_rotations_works)
 TEST(bicop_select, fit_stats_are_correct)
 {
   Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
-  auto u = cop.simulate(15);
+  auto u = cop.simulate(15, false, { 1 });
   cop.select(u);
   EXPECT_EQ(cop.get_nobs(), 15);
   EXPECT_NEAR(cop.get_loglik(), cop.loglik(u), 1e-10);

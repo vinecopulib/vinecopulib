@@ -209,8 +209,12 @@ auto aic = model.aic(data)
 auto bic = model.bic(data)
 ```
 
-Vine copula models can also be written to and constructed from JSON files
-and [`nlohmann::json` objects](https://github.com/nlohmann/json):
+Vine copula models can also be written to and constructed from JSON or CBOR
+files and
+[`nlohmann::json` objects](https://github.com/nlohmann/json). CBOR is a binary
+encoding of exactly the same logical JSON representation. It is generally
+substantially smaller and faster to parse than the JSON output, while JSON
+remains useful for inspection and interchange.
 
 ```
 // 5-dimensional vine copula
@@ -220,17 +224,26 @@ Vinecop vinecop(5);
 nlohmann::json vinecop_json = vinecop.to_json();
 
 // Write into a JSON file
-std::ofstream file(std::string("myfile.json"));
+std::string filename = "myfile.json";
+std::ofstream file(filename);
 file << vinecop_json << std::endl;
+file.close();
 
 // Equivalently
-vinecop.to_file(myfile);
+vinecop.to_file(filename);
 
 // Then a new Vine can be constructed from the nlohmann::json object
 Vinecop vinecop2(vinecop_json);
 
 // Or from the JSON file
-Vinecop vinecop2(std::string("myfile.json"));
+Vinecop vinecop3(std::string("myfile.json"));
+
+// The .cbor extension selects binary CBOR automatically
+vinecop.to_file(std::string("myfile.cbor"));
+Vinecop vinecop4(std::string("myfile.cbor"));
 ```
+
+For backwards compatibility, filenames without a `.cbor` extension continue
+to use JSON.
 
 */

@@ -27,6 +27,7 @@ if(BUILD_TESTING)
             test_bicop_kernel
             test_bicop_select
             test_rvine_structure
+            test_serialization
             test_tools_bobyqa
             test_tools_stats
             test_vinecop_class
@@ -38,6 +39,10 @@ if(BUILD_TESTING)
     file(GLOB_RECURSE r_scripts cmake/templates/*R)
     file(COPY ${r_scripts} DESTINATION ${PROJECT_BINARY_DIR}/test)
 endif(BUILD_TESTING)
+
+if(VINECOPULIB_BUILD_BENCHMARKS)
+    add_subdirectory(benchmarks)
+endif()
 
 # Related to exports for linux/mac and code coverage
 ####

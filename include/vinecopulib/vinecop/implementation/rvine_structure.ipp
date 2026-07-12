@@ -151,12 +151,14 @@ inline RVineStructure::RVineStructure(const nlohmann::json& input,
 {
 }
 
-//! @brief Instantiates an RVineStructure from a JSON file.
+//! @brief Instantiates an RVineStructure from a JSON or CBOR file.
 //!
-//! @details The file needs to contain two values: `"array"` for the
-//! structure triangular array and `"order"` for the order vector.
+//! @details Files ending in `.cbor` are read as CBOR. All other filenames are
+//! read as JSON for backwards compatibility. The file needs to contain two
+//! values: `"array"` for the structure triangular array and `"order"` for the
+//! order vector.
 //!
-//! @param filename The name of the JSON file to read.
+//! @param filename The name of the file to read.
 //! @param check Whether to check if the input represents
 //!      a valid R-vine matrix.
 inline RVineStructure::RVineStructure(const std::string& filename,
@@ -181,10 +183,12 @@ RVineStructure::to_json() const
   return output;
 }
 
-//! @brief Write the structure into a JSON file.
+//! @brief Writes the structure into a JSON or CBOR file.
 //!
-//! @details The written file contains two values: `"array"` for the structure
-//! triangular array and `"order"` for the order vector.
+//! @details Filenames ending in `.cbor` are written as CBOR. All other
+//! filenames are written as JSON for backwards compatibility. The written file
+//! contains two values: `"array"` for the structure triangular array and
+//! `"order"` for the order vector.
 //!
 //! @param filename The name of the file to write.
 inline void

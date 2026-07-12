@@ -1,4 +1,6 @@
 #include "benchmark.hpp"
+#include <cstdio>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <random>
@@ -125,12 +127,73 @@ benchmark_bicop_tll(int n = 1000, unsigned int repeats = 10)
   }
 }
 
+std::streamoff
+file_size(const std::string& filename)
+{
+  std::ifstream file(filename, std::ios::binary | std::ios::ate);
+  return file.tellg();
+}
+
+void
+benchmark_persistence(int d = 10, unsigned int repeats = 10)
+{
+  std::vector<size_t> order(d);
+  for (int i = 0; i < d; ++i) {
+    order[i] = static_cast<size_t>(i + 1);
+  }
+
+  const FitControlsBicop controls({ BicopFamily::tll });
+  const Bicop tll(generate_data(1000, 2, 1), controls);
+  auto pair_copulas = Vinecop::make_pair_copula_store(d);
+  for (auto& tree : pair_copulas) {
+    for (auto& pair_copula : tree) {
+      pair_copula = tll;
+    }
+  }
+  const Vinecop model(DVineStructure(order), pair_copulas);
+
+  const std::string json_filename = "persistence_benchmark.json";
+  const std::string cbor_filename = "persistence_benchmark.cbor";
+  const auto seeds = Eigen::VectorXi::LinSpaced(repeats, 1, repeats);
+
+  const auto json_write =
+    benchmark_func([&](unsigned) { model.to_file(json_filename); }, seeds);
+  const auto cbor_write =
+    benchmark_func([&](unsigned) { model.to_file(cbor_filename); }, seeds);
+  const auto json_read = benchmark_func(
+    [&](unsigned) {
+      const Vinecop restored(json_filename);
+      (void)restored;
+    },
+    seeds);
+  const auto cbor_read = benchmark_func(
+    [&](unsigned) {
+      const Vinecop restored(cbor_filename);
+      (void)restored;
+    },
+    seeds);
+
+  cout << "Persistence benchmark for a " << d << "-dimensional TLL vine"
+       << endl;
+  cout << "file sizes (bytes): JSON=" << file_size(json_filename)
+       << ", CBOR=" << file_size(cbor_filename) << endl;
+  cout << "JSON write (ms): " << benchmark_stats(json_write).transpose()
+       << endl;
+  cout << "CBOR write (ms): " << benchmark_stats(cbor_write).transpose()
+       << endl;
+  cout << "JSON read (ms): " << benchmark_stats(json_read).transpose() << endl;
+  cout << "CBOR read (ms): " << benchmark_stats(cbor_read).transpose() << endl;
+
+  std::remove(json_filename.c_str());
+  std::remove(cbor_filename.c_str());
+}
+
 int
 main()
 {
-
   benchmark_vinecop_fitting();
   benchmark_bicop_tll();
+  benchmark_persistence();
 
   return 0;
 }
