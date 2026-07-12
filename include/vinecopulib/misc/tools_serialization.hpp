@@ -10,17 +10,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <vector>
-
-// GCC 11 diagnoses a fallthrough in the vendored CBOR parser when its stream
-// overload is instantiated.
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-#endif
 #include <vinecopulib/misc/nlohmann_json.hpp>
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 #include <vinecopulib/misc/triangular_array.hpp>
 
 namespace vinecopulib {
