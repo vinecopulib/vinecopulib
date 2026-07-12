@@ -49,7 +49,7 @@ TEST(bicop_sanity_checks, catches_var_types)
 TEST(bicop_sanity_checks, catches_data_dim)
 {
   Bicop bicop;
-  auto u = tools_stats::simulate_uniform(10, 3);
+  auto u = tools_stats::simulate_uniform(10, 3, false, { 1 });
   EXPECT_ANY_THROW(bicop.select(u));
   bicop.set_var_types({ "d", "d" });
   EXPECT_ANY_THROW(bicop.select(u));
@@ -68,7 +68,7 @@ TEST(bicop_sanity_checks, catches_not_fitted_to_data)
 TEST(bicop_sanity_checks, select_can_handle_zeros_and_ones)
 {
   Bicop bicop;
-  auto u = bicop.simulate(10);
+  auto u = bicop.simulate(10, false, { 1 });
   u(0, 0) = 0.0;
   u(1, 0) = 1.0;
   EXPECT_NO_THROW(bicop.select(u));
@@ -152,7 +152,7 @@ TEST(bicop_sanity_checks, copy)
   EXPECT_EQ(bc1.get_parameters(), rho);
   EXPECT_ANY_THROW(bc1.get_loglik());
 
-  auto u = bc1.simulate(10);
+  auto u = bc1.simulate(10, false, { 1 });
   bc2.select(u);
   auto bc3 = bc2;
   EXPECT_EQ(bc2.get_loglik(), bc3.get_loglik());

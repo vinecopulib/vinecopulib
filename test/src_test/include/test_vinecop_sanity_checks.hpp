@@ -39,10 +39,10 @@ TEST(vinecop_sanity_checks, catches_wrong_size)
   EXPECT_ANY_THROW(vinecop.select(U));
 
   vinecop = Vinecop(301);
-  U = tools_stats::simulate_uniform(1, 301);
-  EXPECT_NO_THROW(vinecop.cdf(U));
+  U = tools_stats::simulate_uniform(1, 301, false, { 1 });
+  EXPECT_NO_THROW(vinecop.cdf(U, 1e4, 1, { 1 }));
   vinecop = Vinecop(21202);
-  U = tools_stats::simulate_uniform(1, 21202);
+  U = tools_stats::simulate_uniform(1, 21202, false, { 1 });
   EXPECT_ANY_THROW(vinecop.cdf(U));
 
   pair_copulas.resize(4); // too many
