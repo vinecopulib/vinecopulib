@@ -2,6 +2,12 @@
 
 ### NEW FEATURES
 
+* Add an opt-in google/benchmark suite (`VINECOPULIB_BUILD_BENCHMARKS`, off by
+  default), a numerical parity harness (`parity_dump` +
+  `scripts/compare_parity.py` with per-key tolerance gates in
+  `scripts/parity_gates.json`), and golden-value tests freezing QRNG streams,
+  Genz `pbvnorm`/`pbvt` kernels, pseudo-observations, seeded TLL fits, and
+  h∘hinv round trips (#688).
 * Add `Bicop::parameters_to_taildep()`/`Bicop::get_taildep()` to compute the tail
   dependence coefficients (returned as a 2x2 matrix collecting all four corners of
   the unit square) and `Bicop::parameters_to_beta()`/`Bicop::get_beta()` to compute
