@@ -136,7 +136,8 @@ TEST(bicop_taildep, getters_match_parameter_methods)
 // Blomqvist's beta (computable from the cdf).
 TEST(bicop_taildep, tll_taildep_is_nan_beta_is_finite)
 {
-  auto u = Bicop(BicopFamily::clayton, 0, par1(2.0)).simulate(1000);
+  auto u =
+    Bicop(BicopFamily::clayton, 0, par1(2.0)).simulate(1000, false, { 1 });
   Bicop tll(BicopFamily::tll);
   tll.fit(u);
   auto td = tll.get_taildep();

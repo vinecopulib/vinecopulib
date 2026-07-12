@@ -269,7 +269,8 @@ TEST(rvine_structure, rvine_struct_sanity_checks_work)
 TEST(rvine_structure, random_sampling)
 {
   for (size_t i = 0; i < 20; i++) {
-    RVineStructure test = RVineStructure::simulate(10);
+    RVineStructure test =
+      RVineStructure::simulate(10, false, { static_cast<int>(i + 1) });
   }
 }
 

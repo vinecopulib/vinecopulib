@@ -331,6 +331,10 @@ For any behaviour change:
 
 - **Style: `BasedOnStyle: Mozilla`** (2-space indent, ~80-column),
   enforced by clang-format 14.
+- **Compiler warnings.** Do not suppress warnings with diagnostic pragmas.
+  Fix the underlying code instead, including in vendored headers when the
+  warning originates there. If a warning cannot reasonably be fixed, keep any
+  exception narrowly scoped and document why it is unavoidable.
 - **Declaration / implementation split.** Every public `foo.hpp`
   declares the interface and ends with
   `#include <vinecopulib/<module>/implementation/foo.ipp>`. The `.ipp`
