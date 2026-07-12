@@ -4,7 +4,6 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include <algorithm>
 #include <cmath>
 #include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>

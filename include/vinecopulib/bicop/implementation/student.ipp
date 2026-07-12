@@ -4,7 +4,6 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include <algorithm>
 #include <vinecopulib/misc/tools_eigen.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 
@@ -370,8 +369,8 @@ StudentBicop::diff_lpdf_nu(double u1, double u2, double rho, double nu)
 
   double x1 = boost::math::quantile(dist, u1);
   double x2 = boost::math::quantile(dist, u2);
-  double out1 = tools_stats::diff_x_nu(x1, nu);
-  double out2 = tools_stats::diff_x_nu(x2, nu);
+  double out1 = tools_stats::dqt_dnu(x1, nu);
+  double out2 = tools_stats::dqt_dnu(x2, nu);
   double t7 = 1.0 + 2.0 * x1 * out1;
   double t8 = 1.0 + 2.0 * x2 * out2;
   double t9 = (nu + 1.0) / 2.0 * (t7 / (nu + x1 * x1) + t8 / (nu + x2 * x2));
@@ -417,8 +416,8 @@ StudentBicop::diff2_lpdf_nu(double u1, double u2, double rho, double nu)
 
   double x1 = boost::math::quantile(dist, u1);
   double x2 = boost::math::quantile(dist, u2);
-  double out1 = tools_stats::diff_x_nu(x1, nu);
-  double out2 = tools_stats::diff_x_nu(x2, nu);
+  double out1 = tools_stats::dqt_dnu(x1, nu);
+  double out2 = tools_stats::dqt_dnu(x2, nu);
   double M = nu * t6 + x1 * x1 + x2 * x2 - 2.0 * rho * x1 * x2;
   double t8 = x1 * out2 + out1 * x2;
   double M_nu = t6 + 2.0 * x1 * out1 + 2.0 * x2 * out2 - 2.0 * rho * t8;
@@ -431,8 +430,8 @@ StudentBicop::diff2_lpdf_nu(double u1, double u2, double rho, double nu)
   double t15 = nu + x2 * x2;
   double t16 = t14 / t15;
 
-  double out3 = tools_stats::diff2_x_nu(x1, nu);
-  double out4 = tools_stats::diff2_x_nu(x2, nu);
+  double out3 = tools_stats::d2qt_dnu2(x1, nu);
+  double out4 = tools_stats::d2qt_dnu2(x2, nu);
 
   double t17 = 2.0 * out1 * out1 + 2.0 * x1 * out3;
   double t18 = t17 / t12;
@@ -463,8 +462,8 @@ StudentBicop::diff2_lpdf_rho_nu(double u1, double u2, double rho, double nu)
 
   double x1 = boost::math::quantile(dist, u1);
   double x2 = boost::math::quantile(dist, u2);
-  double out1 = tools_stats::diff_x_nu(x1, nu);
-  double out2 = tools_stats::diff_x_nu(x2, nu);
+  double out1 = tools_stats::dqt_dnu(x1, nu);
+  double out2 = tools_stats::dqt_dnu(x2, nu);
   double M = nu * t4 + x1 * x1 + x2 * x2 - 2.0 * rho * x1 * x2;
   double M_rho = -2.0 * (nu * rho + x1 * x2);
   double t8 = x1 * out2 + out1 * x2;
@@ -497,7 +496,7 @@ StudentBicop::diff_pdf_u1(double u1, double u2, double rho, double nu)
   double c = pdf_scalar(u1, u2, rho, nu);
   double x1 = boost::math::quantile(dist, u1);
   double x2 = boost::math::quantile(dist, u2);
-  double out1 = tools_stats::diff_dt_u(x1, nu);
+  double out1 = tools_stats::dlogdt_dx(x1, nu);
   double t1 = c / boost::math::pdf(dist, x1);
   double t2 = (nu + 2.0) * (x1 - rho * x2);
   double t6 = rho * rho;
@@ -579,11 +578,11 @@ StudentBicop::diff2_pdf_nu_u1(double u1, double u2, double rho, double nu)
   double M = nu * t4 + t15 + t16 - 2.0 * rho * x1 * x2;
   double t2 = boost::math::pdf(dist, x1);
   double diff_pdf = diff_pdf_nu(u1, u2, rho, nu);
-  double diff_dt = tools_stats::diff_dt_nu(x1, nu);
-  double diff_dt2 = tools_stats::diff_dt_u(x1, nu);
-  double diff_dt3 = tools_stats::diff_dt_x(x1, nu);
-  double out1 = tools_stats::diff_x_nu(x1, nu);
-  double out2 = tools_stats::diff_x_nu(x2, nu);
+  double diff_dt = tools_stats::ddt_dnu(x1, nu);
+  double diff_dt2 = tools_stats::dlogdt_dx(x1, nu);
+  double diff_dt3 = tools_stats::ddt_dx(x1, nu);
+  double out1 = tools_stats::dqt_dnu(x1, nu);
+  double out2 = tools_stats::dqt_dnu(x2, nu);
   double t8 = x1 * out2 + out1 * x2;
   double M_nu = t4 + 2.0 * x1 * out1 + 2.0 * x2 * out2 - 2.0 * rho * t8;
 
@@ -616,7 +615,7 @@ StudentBicop::diff2_pdf_u1(double u1, double u2, double rho, double nu)
   double M = nu * t4 + t15 + t16 - 2.0 * rho * x1 * x2;
   double t2 = boost::math::pdf(dist, x1);
   double diff_pdf = diff_pdf_u1(u1, u2, rho, nu);
-  double diff_dt2 = tools_stats::diff_dt_u(x1, nu);
+  double diff_dt2 = tools_stats::dlogdt_dx(x1, nu);
 
   double t7 = x1 - rho * x2;
 
@@ -652,8 +651,8 @@ StudentBicop::diff2_pdf_u1_u2(double u1, double u2, double rho, double nu)
   double t6 = x1 - rho * x2;
   double t7 = x2 - rho * x1;
 
-  double diff_dt1 = tools_stats::diff_dt_u(x1, nu);
-  double diff_dt2 = tools_stats::diff_dt_u(x2, nu);
+  double diff_dt1 = tools_stats::dlogdt_dx(x1, nu);
+  double diff_dt2 = tools_stats::dlogdt_dx(x2, nu);
 
   double t8 = c / t2 / t5;
   double t9 = t1 * t6 / M + diff_dt1;
@@ -703,9 +702,9 @@ StudentBicop::diff_hfunc1_nu(double u1, double u2, double rho, double nu)
   double t9 = boost::math::pdf(dist1, t10);
   double t11 = nu + 1.0;
 
-  double diff_t = tools_stats::diff_t_nu(t10, t11);
-  double out1 = tools_stats::diff_x_nu(t1, nu);
-  double out2 = tools_stats::diff_x_nu(t2, nu);
+  double diff_t = tools_stats::dpt_dnu(t10, t11);
+  double out1 = tools_stats::dqt_dnu(t1, nu);
+  double out2 = tools_stats::dqt_dnu(t2, nu);
 
   double t12 = out1 - rho * out2;
   double t13 = t12 / t8;
@@ -763,7 +762,7 @@ StudentBicop::diff2_hfunc1_rho(double u1, double u2, double rho, double nu)
   double t9 = boost::math::pdf(dist1, t10);
   double t11 = nu + 1.0;
 
-  double diff_t = tools_stats::diff_dt_x(t10, t11);
+  double diff_t = tools_stats::ddt_dx(t10, t11);
 
   double t12 = -t2 / t8;
   double t13 = t10 / t7 * rho * t14;
@@ -792,14 +791,14 @@ StudentBicop::diff2_hfunc1_nu(double u1, double u2, double rho, double nu)
   double t9 = boost::math::pdf(dist1, t10);
   double t11 = nu + 1.0;
 
-  double diff_t = tools_stats::diff_dt_x(t10, t11);
-  double diff_t2 = tools_stats::diff_t_nu_nu(t10, t11);
-  double diff_t3 = tools_stats::diff_dt_nu(t10, t11);
+  double diff_t = tools_stats::ddt_dx(t10, t11);
+  double diff_t2 = tools_stats::d2pt_dnu2(t10, t11);
+  double diff_t3 = tools_stats::ddt_dnu(t10, t11);
 
-  double out1 = tools_stats::diff_x_nu(t1, nu);
-  double out2 = tools_stats::diff_x_nu(t2, nu);
-  double out3 = tools_stats::diff2_x_nu(t1, nu);
-  double out4 = tools_stats::diff2_x_nu(t2, nu);
+  double out1 = tools_stats::dqt_dnu(t1, nu);
+  double out2 = tools_stats::dqt_dnu(t2, nu);
+  double out3 = tools_stats::d2qt_dnu2(t1, nu);
+  double out4 = tools_stats::d2qt_dnu2(t2, nu);
 
   double t12 = out1 - rho * out2;
   double t13 = t12 / t8;
@@ -837,11 +836,11 @@ StudentBicop::diff2_hfunc1_rho_nu(double u1, double u2, double rho, double nu)
   double t9 = boost::math::pdf(dist1, t10);
   double t11 = nu + 1.0;
 
-  double diff_t = tools_stats::diff_dt_x(t10, t11);
-  double diff_t3 = tools_stats::diff_dt_nu(t10, t11);
+  double diff_t = tools_stats::ddt_dx(t10, t11);
+  double diff_t3 = tools_stats::ddt_dnu(t10, t11);
 
-  double out1 = tools_stats::diff_x_nu(t1, nu);
-  double out2 = tools_stats::diff_x_nu(t2, nu);
+  double out1 = tools_stats::dqt_dnu(t1, nu);
+  double out2 = tools_stats::dqt_dnu(t2, nu);
 
   double t12 = out1 - rho * out2;
   double t13 = t12 / t8;
@@ -880,7 +879,7 @@ StudentBicop::diff2_hfunc1_rho_u1(double u1, double u2, double rho, double nu)
   double t9 = boost::math::pdf(dist1, t10);
   double t11 = nu + 1.0;
 
-  double diff_t = tools_stats::diff_dt_x(t10, t11);
+  double diff_t = tools_stats::ddt_dx(t10, t11);
 
   double t12 = boost::math::pdf(dist, t2);
   double t13 = -t2 / t8 + t10 / t7 * rho * t4 / t6;
@@ -913,13 +912,13 @@ StudentBicop::diff2_hfunc1_nu_u1(double u1, double u2, double rho, double nu)
   double t9 = boost::math::pdf(dist1, t10);
   double t11 = nu + 1.0;
 
-  double diff_t = tools_stats::diff_dt_nu(t2, nu);
-  double diff_t2 = tools_stats::diff_dt_x(t10, t11);
-  double diff_t3 = tools_stats::diff_dt_nu(t10, t11);
-  double diff_t4 = tools_stats::diff_dt_x(t2, nu);
+  double diff_t = tools_stats::ddt_dnu(t2, nu);
+  double diff_t2 = tools_stats::ddt_dx(t10, t11);
+  double diff_t3 = tools_stats::ddt_dnu(t10, t11);
+  double diff_t4 = tools_stats::ddt_dx(t2, nu);
 
-  double out1 = tools_stats::diff_x_nu(t1, nu);
-  double out2 = tools_stats::diff_x_nu(t2, nu);
+  double out1 = tools_stats::dqt_dnu(t1, nu);
+  double out2 = tools_stats::dqt_dnu(t2, nu);
 
   double t12 = boost::math::pdf(dist, t2);
 
@@ -961,8 +960,8 @@ StudentBicop::diff2_hfunc1_u1(double u1, double u2, double rho, double nu)
   double t9 = boost::math::pdf(dist1, t10);
   double t11 = nu + 1.0;
 
-  double diff_t = tools_stats::diff_dt_x(t10, t11);
-  double diff_t2 = tools_stats::diff_dt_x(t2, nu);
+  double diff_t = tools_stats::ddt_dx(t10, t11);
+  double diff_t2 = tools_stats::ddt_dx(t2, nu);
   double t12 = boost::math::pdf(dist, t2);
 
   double t13 = -rho / t8 - t10 / t7 * t5 / t6 * t2;
