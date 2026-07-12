@@ -2,6 +2,11 @@
 
 ### NEW FEATURES
 
+* Speed up TLL fitting and evaluation: fused conditional-cdf interpolation
+  (single pass, no per-query allocation), direct closed-form inversion of the
+  conditional cdf replacing 35-sweep bisection, bucket-accelerated cell
+  lookup, O(m) cached `integrate_2d`, and fixed-size influence matrices in
+  the local-likelihood fit (#691).
 * Speed up `tools_stats`: SIMD `qnorm` via Eigen's packetized `pndtri`
   (~2–3× faster, roughly halving the Gaussian-copula pdf cost), leaner
   `pbvnorm`/`pbvt` kernels, single weight conversion in `to_pseudo_obs`,
