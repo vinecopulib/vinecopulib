@@ -118,43 +118,43 @@ inbeder(double x, double p, double q);
 //! (holding the probability level \f$ u \f$ fixed). Ported from VineCopula
 //! `tcopuladeriv_new.c` (`diffX_nu_tCopula`).
 double
-diff_x_nu(double x, double nu);
+dqt_dnu(double x, double nu);
 
 //! @brief Second derivative of the Student t quantile w.r.t. the degrees of
-//! freedom (see `diff_x_nu()`); ported from VineCopula `tcopuladeriv_new.c`
+//! freedom (see `dqt_dnu()`); ported from VineCopula `tcopuladeriv_new.c`
 //! (`diff2_x_nu`).
 double
-diff2_x_nu(double x, double nu);
+d2qt_dnu2(double x, double nu);
 
 //! @brief Derivative of the Student t distribution function w.r.t. the
 //! degrees of freedom, \f$ \partial_\nu T_\nu(x) \f$; ported from VineCopula
 //! `tcopuladeriv_new.c` (`diff_t_nu`).
 double
-diff_t_nu(double x, double nu);
+dpt_dnu(double x, double nu);
 
 //! @brief Second derivative of the Student t distribution function w.r.t.
 //! the degrees of freedom, \f$ \partial_\nu^2 T_\nu(x) \f$; ported from
 //! VineCopula `tcopuladeriv_new.c` (`diff_t_nu_nu`).
 double
-diff_t_nu_nu(double x, double nu);
+d2pt_dnu2(double x, double nu);
 
 //! @brief Derivative of the Student t density w.r.t. its argument,
 //! \f$ \partial_x t_\nu(x) \f$; ported from VineCopula
 //! `tcopuladeriv_new.c` (`diff_dt_x`).
 double
-diff_dt_x(double x, double nu);
+ddt_dx(double x, double nu);
 
 //! @brief Derivative of the Student t density w.r.t. the degrees of freedom,
 //! \f$ \partial_\nu t_\nu(x) \f$; ported from VineCopula
 //! `tcopuladeriv_new.c` (`diff_dt_nu`).
 double
-diff_dt_nu(double x, double nu);
+ddt_dnu(double x, double nu);
 
 //! @brief Logarithmic derivative of the Student t density w.r.t. its
 //! argument, \f$ \partial_x \log t_\nu(x) \f$; ported from VineCopula
 //! `tcopuladeriv_new.c` (`diff_dt_u`).
 double
-diff_dt_u(double x, double nu);
+dlogdt_dx(double x, double nu);
 
 Eigen::MatrixXd
 simulate_uniform(const size_t& n,

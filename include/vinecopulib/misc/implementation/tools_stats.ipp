@@ -1220,7 +1220,7 @@ inbeder(double x_in, double p_in, double q_in)
 //! (see tools_stats.hpp); ported from VineCopula tcopuladeriv_new.c
 //! (`diffX_nu_tCopula`).
 inline double
-diff_x_nu(double x, double nu)
+dqt_dnu(double x, double nu)
 {
   double x_help = (x >= 0) ? x : -x;
   double xmax = nu / (nu + x_help * x_help);
@@ -1242,7 +1242,7 @@ diff_x_nu(double x, double nu)
 //! degrees of freedom (see tools_stats.hpp); ported from VineCopula
 //! tcopuladeriv_new.c (`diff_t_nu`).
 inline double
-diff_t_nu(double x, double nu)
+dpt_dnu(double x, double nu)
 {
   double x_help = (x >= 0) ? x : -x;
   double xmax = nu / (nu + x_help * x_help);
@@ -1262,7 +1262,7 @@ diff_t_nu(double x, double nu)
 //! the degrees of freedom (see tools_stats.hpp); ported from VineCopula
 //! tcopuladeriv_new.c (`diff_t_nu_nu`).
 inline double
-diff_t_nu_nu(double x, double nu)
+d2pt_dnu2(double x, double nu)
 {
   double x_help = (x >= 0) ? x : -x;
   double xmax = nu / (nu + x_help * x_help);
@@ -1294,7 +1294,7 @@ diff_t_nu_nu(double x, double nu)
 //! tools_stats.hpp); ported from VineCopula tcopuladeriv_new.c
 //! (`diff_dt_x`).
 inline double
-diff_dt_x(double x, double nu)
+ddt_dx(double x, double nu)
 {
   double t2 = (nu + 1.0) / nu;
   double t3 = std::sqrt(nu);
@@ -1309,7 +1309,7 @@ diff_dt_x(double x, double nu)
 //! (see tools_stats.hpp); ported from VineCopula tcopuladeriv_new.c
 //! (`diff_dt_nu`).
 inline double
-diff_dt_nu(double x, double nu)
+ddt_dnu(double x, double nu)
 {
   double t1 = (nu + 1.0) / 2.0;
   double t2 = boost::math::digamma(t1);
@@ -1330,7 +1330,7 @@ diff_dt_nu(double x, double nu)
 //! argument (see tools_stats.hpp); ported from VineCopula
 //! tcopuladeriv_new.c (`diff_dt_u`).
 inline double
-diff_dt_u(double x, double nu)
+dlogdt_dx(double x, double nu)
 {
   return -(x * (nu + 1.0) / nu) / (1.0 + (x * x) / nu);
 }
@@ -1339,14 +1339,14 @@ diff_dt_u(double x, double nu)
 //! freedom (see tools_stats.hpp); ported from VineCopula
 //! tcopuladeriv_new.c (`diff2_x_nu`).
 inline double
-diff2_x_nu(double x, double nu)
+d2qt_dnu2(double x, double nu)
 {
   boost::math::students_t dist(nu);
   double t1 = boost::math::pdf(dist, x);
-  double t2 = diff_t_nu_nu(x, nu);
-  double t3 = diff_dt_nu(x, nu);
-  double t4 = diff_x_nu(x, nu);
-  double t5 = diff_dt_x(x, nu);
+  double t2 = d2pt_dnu2(x, nu);
+  double t3 = ddt_dnu(x, nu);
+  double t4 = dqt_dnu(x, nu);
+  double t5 = ddt_dx(x, nu);
 
   return (-t5 * t4 * t4 - t2 - 2.0 * t3 * t4) / t1;
 }
