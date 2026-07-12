@@ -164,18 +164,20 @@ inline Vinecop::Vinecop(const nlohmann::json& input, const bool check)
   }
 }
 
-//! @brief Instantiates from a JSON file.
+//! @brief Instantiates from a JSON or CBOR file.
 //!
-//! @details The input file contains 2 attributes : `"structure"` for the vine
-//! structure, which itself contains attributes `"array"` for the structure
-//! triangular array and `"order"` for the order vector, and `"pair copulas"`.
+//! @details Files ending in `.cbor` are read as CBOR. All other filenames are
+//! read as JSON for backwards compatibility. The input contains 2 attributes:
+//! `"structure"` for the vine structure, which itself contains attributes
+//! `"array"` for the structure triangular array and `"order"` for the order
+//! vector, and `"pair copulas"`.
 //! `"pair copulas"` contains a list of attributes for the trees
 //! (`"tree1"`, `"tree2"`, etc), each containing
 //! a list of attributes for the edges (`"pc1"`, `"pc2"`, etc).
 //! See the corresponding method of `Bicop` objects for the encoding of
 //! pair-copulas.
 //!
-//! @param filename The name of the JSON file to read.
+//! @param filename The name of the file to read.
 //! @param check Whether to check if the `"structure"` node of the input
 //! represents a valid R-vine structure.
 inline Vinecop::Vinecop(const std::string& filename, const bool check)
@@ -220,11 +222,13 @@ Vinecop::to_json() const
   return output;
 }
 
-//! @brief Writes the copula object into a JSON file.
+//! @brief Writes the copula object into a JSON or CBOR file.
 //!
-//! @details The output file contains 2 attributes : `"structure"` for the vine
-//! structure, which itself contains attributes `"array"` for the structure
-//! triangular array and `"order"` for the order vector, and `"pair copulas"`.
+//! @details Filenames ending in `.cbor` are written as CBOR. All other
+//! filenames are written as JSON for backwards compatibility. The output
+//! contains 2 attributes: `"structure"` for the vine structure, which itself
+//! contains attributes `"array"` for the structure triangular array and
+//! `"order"` for the order vector, and `"pair copulas"`.
 //! `"pair copulas"` contains a list of attributes for the trees
 //! (`"tree1"`, `"tree2"`, etc), each containing
 //! a list of attributes for the edges (`"pc1"`, `"pc2"`, etc).

@@ -8,6 +8,8 @@
   by-value lambda; `integrate_zero_to_one` is templated on the callable with
   integration tolerance 1e-12 → 1e-9 (Kendall's τ of integrated families may
   shift by up to ~1e-7) (#689).
+* Add binary CBOR persistence for `Bicop`, `Vinecop`, and `RVineStructure`,
+  selected automatically by a `.cbor` filename extension (#684).
 * Add an opt-in google/benchmark suite (`VINECOPULIB_BUILD_BENCHMARKS`, off by
   default), a numerical parity harness (`parity_dump` +
   `scripts/compare_parity.py` with per-key tolerance gates in
