@@ -2,6 +2,11 @@
 
 ### NEW FEATURES
 
+* Speed up `tools_stats`: SIMD `qnorm` via Eigen's packetized `pndtri`
+  (~2–3× faster, roughly halving the Gaussian-copula pdf cost), leaner
+  `pbvnorm`/`pbvt` kernels, single weight conversion in `to_pseudo_obs`,
+  reusable FFT workspace for `"mcor"`, flattened `BoxCovering`, and faster
+  `simulate_uniform`/`sobol` fills (#690).
 * Speed up shared primitives: `tools_eigen` helpers take `Eigen::Ref`
   (`ConstMatRef`) with raw-pointer inner loops and gain a safeguarded-Newton
   inverter; `ThreadPool::push` binds arguments instead of capturing a
