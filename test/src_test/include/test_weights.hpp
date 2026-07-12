@@ -14,20 +14,20 @@ using namespace vinecopulib;
 
 TEST(test_weights, catches_incompatible_sizes)
 {
-  auto u = tools_stats::simulate_uniform(20, 2);
-  auto w = tools_stats::simulate_uniform(9, 1);
+  auto u = tools_stats::simulate_uniform(20, 2, false, { 1 });
+  auto w = tools_stats::simulate_uniform(9, 1, false, { 2 });
   FitControlsBicop controls;
   controls.set_weights(w);
   EXPECT_ANY_THROW(Bicop(u, controls));
-  u = tools_stats::simulate_uniform(20, 4);
+  u = tools_stats::simulate_uniform(20, 4, false, { 3 });
   EXPECT_ANY_THROW(
     Vinecop(u, RVineStructure(), {}, FitControlsVinecop(controls)));
 }
 
 TEST(test_weights, allows_nans)
 {
-  auto u = tools_stats::simulate_uniform(20, 2);
-  auto w = tools_stats::simulate_uniform(20, 1);
+  auto u = tools_stats::simulate_uniform(20, 2, false, { 1 });
+  auto w = tools_stats::simulate_uniform(20, 1, false, { 2 });
   w(1) = std::numeric_limits<double>::quiet_NaN();
   FitControlsBicop controls;
   controls.set_weights(w);
@@ -37,7 +37,7 @@ TEST(test_weights, allows_nans)
 TEST(test_weights, works_in_bicop_select)
 {
   // if half of the weights are zero
-  auto u = tools_stats::simulate_uniform(200, 2);
+  auto u = tools_stats::simulate_uniform(200, 2, false, { 1 });
   Eigen::VectorXd w = Eigen::VectorXd::Zero(200);
   w.head(100) = Eigen::VectorXd::Ones(100);
 
@@ -52,7 +52,7 @@ TEST(test_weights, works_in_bicop_select)
 TEST(test_weights, works_in_vinecop_select)
 {
   // if half of the weights are zero
-  auto u = tools_stats::simulate_uniform(200, 7);
+  auto u = tools_stats::simulate_uniform(200, 7, false, { 1 });
   Eigen::VectorXd w = Eigen::VectorXd::Zero(200);
   w.head(100) = Eigen::VectorXd::Ones(100);
 

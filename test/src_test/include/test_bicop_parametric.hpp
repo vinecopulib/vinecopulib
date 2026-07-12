@@ -68,6 +68,16 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     auto absdiff = fabs(bicop_.get_tau() - results(0, 0));
     ASSERT_TRUE(absdiff < 1e-2) << bicop_.str();
 
+    // check Blomqvist's beta against VineCopula
+    absdiff = fabs(bicop_.get_beta() - results(0, 9));
+    ASSERT_TRUE(absdiff < 1e-2) << bicop_.str();
+
+    // check the two diagonal tail dependence coefficients against VineCopula
+    // (VineCopula only reports the lower/upper, i.e. diagonal, corners)
+    Eigen::MatrixXd taildep = bicop_.get_taildep();
+    ASSERT_TRUE(fabs(taildep(0, 0) - results(0, 10)) < 1e-2) << bicop_.str();
+    ASSERT_TRUE(fabs(taildep(1, 1) - results(0, 11)) < 1e-2) << bicop_.str();
+
     // Get u-data
     Eigen::MatrixXd u = results.block(0, 1, n, 2);
 
@@ -132,7 +142,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     EXPECT_ANY_THROW(bicop_.aic());
     EXPECT_ANY_THROW(bicop_.bic());
     EXPECT_ANY_THROW(bicop_.mbic());
-    EXPECT_NO_THROW(bicop_.simulate(10, true));
+    EXPECT_NO_THROW(bicop_.simulate(10, true, { 1 }));
     EXPECT_NO_THROW(bicop_.str());
     if ((bicop_.get_parameters().size() > 1) &&
         (bicop_.get_family() != BicopFamily::student)) {
@@ -158,7 +168,7 @@ TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct)
     "bic");
 
   if (needs_check_) {
-    auto data = bicop_.simulate(get_n());
+    auto data = bicop_.simulate(get_n(), false, { 1 });
     auto bicop = Bicop(data, controls);
     EXPECT_EQ(bicop.loglik(data), bicop.get_loglik()) << bicop_.str();
 
@@ -202,7 +212,7 @@ TEST_P(ParBicopTest, bicop_select_itau_bic_is_correct)
       "bic");
 
     if (needs_check_) {
-      auto data = bicop_.simulate(get_n());
+      auto data = bicop_.simulate(get_n(), false, { 1 });
       auto bicop = Bicop(data, controls);
       auto selected_family = bicop.get_family_name();
       EXPECT_EQ(selected_family, true_family)

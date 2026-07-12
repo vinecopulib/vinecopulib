@@ -8,6 +8,7 @@
 #include "src_test/include/test_bicop_parametric.hpp"
 #include "src_test/include/test_bicop_sanity_checks.hpp"
 #include "src_test/include/test_bicop_select.hpp"
+#include "src_test/include/test_bicop_taildep.hpp"
 #include "src_test/include/test_discrete.hpp"
 #include "src_test/include/test_rvine_structure.hpp"
 #include "src_test/include/test_serialization.hpp"
@@ -21,6 +22,7 @@ using namespace test_bicop_sanity_checks;
 using namespace test_bicop_parametric;
 using namespace test_bicop_kernel;
 using namespace test_bicop_select;
+using namespace test_bicop_taildep;
 using namespace test_discrete;
 using namespace test_rvine_structure;
 using namespace test_serialization;

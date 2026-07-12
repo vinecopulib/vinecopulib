@@ -111,7 +111,7 @@ TEST_F(VinecopTest, print)
   }
   EXPECT_EQ(last_line, expected_last_line);
 
-  auto data = tools_stats::simulate_uniform(100, 5);
+  auto data = tools_stats::simulate_uniform(100, 5, false, { 1 });
   auto controls = FitControlsVinecop({ BicopFamily::tll });
   vc1.select(data, controls);
 
@@ -227,7 +227,7 @@ TEST_F(VinecopTest, getters_are_correct)
 
 TEST_F(VinecopTest, 1dim)
 {
-  auto data = tools_stats::simulate_uniform(3, 1);
+  auto data = tools_stats::simulate_uniform(3, 1, false, { 1 });
   auto vc = Vinecop(1);
   vc.select(data);
   EXPECT_TRUE((vc.pdf(data).array() == 1).all());
@@ -235,7 +235,7 @@ TEST_F(VinecopTest, 1dim)
   EXPECT_TRUE((vc.inverse_rosenblatt(data).array() == data.array()).all());
   vc.loglik();
   vc.aic();
-  vc.simulate(3);
+  vc.simulate(3, false, 1, { 1 });
   Vinecop::make_pair_copula_store(1, 2);
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(1, 1);
   mat(0, 0) = 1;
@@ -244,7 +244,7 @@ TEST_F(VinecopTest, 1dim)
 
 TEST_F(VinecopTest, fit_statistics_getters_are_correct)
 {
-  auto data = tools_stats::simulate_uniform(100, 3);
+  auto data = tools_stats::simulate_uniform(100, 3, false, { 1 });
   auto vc = Vinecop(
     data, RVineStructure(), {}, FitControlsVinecop({ BicopFamily::clayton }));
   EXPECT_NEAR(vc.get_loglik(), vc.loglik(data), 1e-10);
@@ -346,12 +346,13 @@ TEST_F(VinecopTest, cdf_is_correct)
   Vinecop vinecop(matrix, pair_copulas);
 
   // Test whether the analytic and simulated versions are "close" enough
-  auto u2 = vinecop.simulate(10);
-  ASSERT_TRUE(all_close(vinecop.cdf(u2, 10000), bicop.cdf(u2), 1e-2, 1e-2));
+  auto u2 = vinecop.simulate(10, false, 1, { 1 });
+  ASSERT_TRUE(
+    all_close(vinecop.cdf(u2, 10000, 1, { 1 }), bicop.cdf(u2), 1e-2, 1e-2));
 
   // verify that qrng stuff works
   Vinecop vinecop2(301);
-  vinecop.simulate(10, true);
+  vinecop.simulate(10, true, 1, { 1 });
 }
 
 TEST_F(VinecopTest, simulate_is_correct)
@@ -366,14 +367,14 @@ TEST_F(VinecopTest, simulate_is_correct)
   Vinecop vinecop(model_matrix, pair_copulas);
 
   // only check if it works
-  vinecop.simulate(10);
+  vinecop.simulate(10, false, 1, { 1 });
   // check the underlying transformation from independent samples
   ASSERT_TRUE(all_close(vinecop.inverse_rosenblatt(u), sim, 1e-4, 1e-4));
 
   // verify that qrng stuff works
-  vinecop.simulate(10, true);
+  vinecop.simulate(10, true, 1, { 1 });
   Vinecop vinecop2(301);
-  vinecop.simulate(10, true);
+  vinecop.simulate(10, true, 1, { 1 });
 }
 
 TEST_F(VinecopTest, rosenblatt_is_correct)
@@ -386,7 +387,7 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
     }
   }
   Vinecop vinecop(model_matrix, pair_copulas);
-  auto u2 = vinecop.simulate(5);
+  auto u2 = vinecop.simulate(5, false, 1, { 1 });
   ASSERT_TRUE(all_close(
     vinecop.rosenblatt(vinecop.inverse_rosenblatt(u2)), u2, 1e-6, 1e-6));
 
@@ -411,7 +412,7 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
   Eigen::Matrix<size_t, 2, 2> mat;
   mat << 1, 1, 2, 0;
   vinecop = Vinecop(mat, pair_copulas);
-  u = vinecop.simulate(5);
+  u = vinecop.simulate(5, false, 1, { 1 });
   ASSERT_TRUE(all_close(
     vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)), u, 1e-6, 1e-6));
 }
@@ -429,19 +430,32 @@ TEST_F(VinecopTest, scores_stepwise)
 
   auto uu = vinecop.simulate(100, false, 1, { 1 });
 
-  auto J = vinecop.hessian_avg(uu, true);
+  auto J = vinecop.hessian(uu, true);
   EXPECT_TRUE(J.isUpperTriangular());
-  // Eigen::MatrixXd Jinv = J.triangularView<Eigen::Upper>()
-  //                          .solve(Eigen::MatrixXd::Identity(J.cols(),
-  //                          J.cols())) .triangularView<Eigen::Upper>();
-  // // std::cout << J << std::endl << std::endl;
-  // // std::cout << Jinv << std::endl;
-  // auto I = vinecop.scores_cov(uu, true);
-  // std::cout << (Jinv * I * Jinv.transpose() /
-  // u.rows()).diagonal().cwiseSqrt()
-  //           << std::endl
-  //           << std::endl;
-  // std::cout << vinecop.str() << std::endl;
+
+  // hessian() is the observation-average of hessian_full()
+  auto H = vinecop.hessian_full(uu, true);
+  Eigen::MatrixXd J_manual(J.rows(), J.cols());
+  size_t d = vinecop.get_dim();
+  size_t trunc_lvl = vinecop.get_trunc_lvl();
+  size_t ipar = 0;
+  for (size_t t = 0; t < trunc_lvl; t++) {
+    for (size_t e = 0; e < d - 1 - t; e++) {
+      size_t np = static_cast<size_t>(
+        vinecop.get_pair_copula(t, e).get_parameters().size());
+      for (size_t p = 0; p < np; p++) {
+        J_manual.row(ipar++) = H(t, e)[p].colwise().mean();
+      }
+    }
+  }
+  EXPECT_TRUE(all_close(J, J_manual, 1e-10, 1e-10));
+
+  // scores_cov() is the mean-centered covariance of scores()
+  auto s = vinecop.scores(uu, true);
+  Eigen::MatrixXd sc = s.rowwise() - s.colwise().mean();
+  Eigen::MatrixXd I_manual =
+    (sc.adjoint() * sc) / static_cast<double>(s.rows());
+  EXPECT_TRUE(all_close(vinecop.scores_cov(uu, true), I_manual, 1e-10, 1e-10));
 }
 
 TEST_F(VinecopTest, scores_joint)
@@ -456,7 +470,7 @@ TEST_F(VinecopTest, scores_joint)
   Vinecop vinecop(model_matrix, pair_copulas);
 
   auto uu = vinecop.simulate(100, false, 1, { 1 });
-  auto J = vinecop.hessian_avg(uu, false);
+  auto J = vinecop.hessian(uu, false);
   auto I = vinecop.scores_cov(uu, false);
 
   EXPECT_FALSE(J.isUpperTriangular());
@@ -477,7 +491,7 @@ TEST_F(VinecopTest, scores_joint)
 TEST_F(VinecopTest, aic_bic_are_correct)
 {
   int d = 7;
-  auto data = tools_stats::simulate_uniform(100, 7);
+  auto data = tools_stats::simulate_uniform(100, 7, false, { 1 });
   Vinecop true_model(d);
 
   auto pair_copulas = Vinecop::make_pair_copula_store(d);
@@ -533,7 +547,7 @@ TEST_F(VinecopTest, family_select_finds_true_rotations)
     }
   }
   Vinecop vinecop(model_matrix, pair_copulas);
-  auto data = vinecop.simulate(2000);
+  auto data = vinecop.simulate(2000, false, 1, { 1 });
 
   auto controls = FitControlsVinecop({ BicopFamily::clayton }, "itau");
   // controls.set_show_trace(true);
@@ -610,8 +624,8 @@ TEST_F(VinecopTest, works_multi_threaded)
     all_close(fit2.rosenblatt(u, 2), fit2.rosenblatt(u), 1e-10, 1e-10));
 
   // just check that it works
-  fit2.simulate(2, false, 3);
-  fit2.cdf(u, 100, 2);
+  fit2.simulate(2, false, 3, { 1 });
+  fit2.cdf(u, 100, 2, { 1 });
 }
 
 // check if the same conditioned sets appear for each tree
@@ -726,8 +740,8 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
   FitControlsVinecop controls_unweighted({ BicopFamily::tll });
   controls_unweighted.set_tree_algorithm("random_unweighted");
 
-  // For reseeding the random number generator
-  std::random_device rd;
+  // For reseeding the random number generator (deterministic, so the test
+  // is reproducible in CI)
   std::vector<int> seeds(20);
 
   // To store the unique structures
@@ -740,9 +754,11 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
   const size_t num_trials = 10;
 
   for (size_t i = 0; i < num_trials; ++i) {
-    // Seed controls randomly for each test run
-    std::generate(
-      seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
+    // Deterministic but distinct seeds for each trial, so every run uses a
+    // different RNG stream (and hence a different random structure) without
+    // depending on std::random_device.
+    for (size_t k = 0; k < seeds.size(); ++k)
+      seeds[k] = static_cast<int>(i * seeds.size() + k + 1);
     controls_weighted.set_seeds(seeds);
     controls_unweighted.set_seeds(seeds);
 
@@ -766,7 +782,8 @@ TEST_F(VinecopTest, select_finds_different_structures_random)
     unique_structures_unweighted.insert(struct_array_unweighted);
   }
 
-  // The probability that any 2 samples are the same by chance is very low
+  // With distinct seeds the RNG streams and selected structures should all
+  // differ; being deterministic, this is stable across runs.
   EXPECT_EQ(first_rng_outputs.size(), num_trials);
   EXPECT_EQ(unique_structures_weighted.size(), num_trials);
   EXPECT_EQ(unique_structures_unweighted.size(), num_trials);
@@ -813,7 +830,7 @@ TEST_F(VinecopTest, sparse_threshold_selection)
   fit.select(u, controls);
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 
-  u = tools_stats::simulate_uniform(100, 7);
+  u = tools_stats::simulate_uniform(100, 7, false, { 1 });
   fit.select(u, controls);
 }
 
@@ -823,7 +840,7 @@ TEST_F(VinecopTest, sparse_truncation_selection)
   FitControlsVinecop controls(bicop_families::itau, "itau");
   controls.set_select_trunc_lvl(true);
   // controls.set_show_trace(true);
-  u = tools_stats::simulate_uniform(100, 7);
+  u = tools_stats::simulate_uniform(100, 7, false, { 1 });
   Vinecop fit(7);
   fit.select(u, controls);
   EXPECT_LE(fit.get_rvine_structure().get_trunc_lvl(), 6);

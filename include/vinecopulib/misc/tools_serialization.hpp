@@ -53,33 +53,6 @@ matrix_to_json(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matrix)
   return output;
 }
 
-//! conversion from vinecopulib::TriangularArray to nlohmann::json
-//!
-//! @param array The vinecopulib::TriangularArray to convert.
-//! @return the corresponding nlohmann::json.
-template<class T>
-inline nlohmann::json
-triangular_array_to_json(const TriangularArray<T>& array)
-{
-  nlohmann::json output;
-  size_t d = array.get_dim();
-  size_t trunc_lvl = array.get_trunc_lvl();
-  output["d"] = d;
-  output["t"] = trunc_lvl;
-
-  nlohmann::json json_data;
-  for (size_t i = 0; i < std::min(d - -1, trunc_lvl); i++) {
-    nlohmann::json row;
-    for (size_t j = 0; j < d - 1 - i; j++) {
-      row.push_back(array(i, j));
-    }
-    json_data.push_back(row);
-  }
-  output["data"] = json_data;
-
-  return output;
-}
-
 //! conversion from std::vector to nlohmann::json
 //!
 //! @param vec The std::vector to convert.
@@ -112,19 +85,6 @@ json_to_matrix(const nlohmann::json& input)
     matrix = Eigen::MatrixXd();
   }
   return matrix.cast<T>();
-}
-
-//! conversion from nlohmann::json to vinecopulib::TriangularArray
-//!
-//! @param input The nlohmann::json to convert.
-//! @return the corresponding vinecopulib::TriangularArray
-template<typename T>
-inline TriangularArray<T>
-json_to_triangular_array(const nlohmann::json& input)
-{
-
-  std::vector<std::vector<T>> vec = input["data"];
-  return TriangularArray<T>(vec);
 }
 
 //! conversion from nlohmann::json to std::vector

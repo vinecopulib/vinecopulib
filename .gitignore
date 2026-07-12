@@ -80,3 +80,10 @@ Temporary Items
 debug/
 release/
 
+.claude/
+build*/
+
+# generated benchmark & parity-comparison artifacts (see scripts/bench_baseline.sh
+# and scripts/compare_parity.py); tracked JSON such as scripts/parity_gates.json
+# and .zenodo.json is intentionally not ignored
+bench_results/
