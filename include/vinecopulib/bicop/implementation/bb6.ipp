@@ -18,10 +18,16 @@ Bb6Bicop::cdf(const tools_eigen::ConstMatRef& u,
   if (parameters.rows() == 1) {
     const double theta = parameters(0, 0);
     const double delta = parameters(0, 1);
-    Eigen::ArrayXd l1 = -(-(1.0 - u.col(0).array()).pow(theta)).log1p();
-    Eigen::ArrayXd l2 = -(-(1.0 - u.col(1).array()).pow(theta)).log1p();
-    Eigen::ArrayXd w = (l1.pow(delta) + l2.pow(delta)).pow(1.0 / delta);
-    return (1.0 - (-(-w).expm1()).pow(1.0 / theta)).matrix();
+    // powers via exp(c*log(x)) (packetized log/exp beat generic_pow)
+    Eigen::ArrayXd l1 =
+      -(-(theta * (1.0 - u.col(0).array()).log()).exp()).log1p();
+    Eigen::ArrayXd l2 =
+      -(-(theta * (1.0 - u.col(1).array()).log()).exp()).log1p();
+    Eigen::ArrayXd w =
+      ((1.0 / delta) *
+       ((delta * l1.log()).exp() + (delta * l2.log()).exp()).log())
+        .exp();
+    return (1.0 - ((1.0 / theta) * (-(-w).expm1()).log()).exp()).matrix();
   }
   return ArchimedeanBicop::cdf(u, parameters);
 }
@@ -137,15 +143,18 @@ Bb6Bicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
     [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
       const double theta = parameters(0, 0);
       const double delta = parameters(0, 1);
-      Eigen::ArrayXd p1 = (1.0 - uc).pow(theta);
+      // powers via exp(c*log(x)) (packetized log/exp beat generic_pow)
+      Eigen::ArrayXd p1 = (theta * (1.0 - uc).log()).exp();
       Eigen::ArrayXd el1 = -(-p1).log1p(); // -log(1 - p1)
-      Eigen::ArrayXd s1 = el1.pow(delta);
-      Eigen::ArrayXd s = s1 + (-(-(1.0 - uo).pow(theta)).log1p()).pow(delta);
-      Eigen::ArrayXd w = s.pow(1.0 / delta);
+      Eigen::ArrayXd s1 = (delta * el1.log()).exp();
+      Eigen::ArrayXd s =
+        s1 +
+        (delta * (-(-(theta * (1.0 - uo).log()).exp()).log1p()).log()).exp();
+      Eigen::ArrayXd w = ((1.0 / delta) * s.log()).exp();
       Eigen::ArrayXd e = (-w).exp();
       Eigen::ArrayXd m = -(-w).expm1(); // 1 - e^-w
       return (s1 / el1) * (w / s) * (p1 / (1.0 - uc)) * (e / (1.0 - p1)) *
-             m.pow(1.0 / theta) / m;
+             ((1.0 / theta) * m.log()).exp() / m;
     },
     [&](Eigen::Index i, double uc, double uo) -> double {
       const double theta = parameters(i, 0);

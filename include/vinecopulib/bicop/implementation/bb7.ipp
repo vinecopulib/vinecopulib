@@ -108,15 +108,17 @@ Bb7Bicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
     [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
       const double theta = parameters(0, 0);
       const double delta = parameters(0, 1);
-      Eigen::ArrayXd p1 = (1.0 - uc).pow(theta);
+      // powers via exp(c*log(x)) (packetized log/exp beat generic_pow)
+      Eigen::ArrayXd p1 = (theta * (1.0 - uc).log()).exp();
       Eigen::ArrayXd b1 = 1.0 - p1;
-      Eigen::ArrayXd g1 = b1.pow(-delta);
+      Eigen::ArrayXd g1 = (-delta * b1.log()).exp();
       Eigen::ArrayXd sp1 =
-        g1 + (1.0 - (1.0 - uo).pow(theta)).pow(-delta) - 1.0; // 1 + S
-      Eigen::ArrayXd bw = sp1.pow(-1.0 / delta);
+        g1 + (-delta * (1.0 - (theta * (1.0 - uo).log()).exp()).log()).exp() -
+        1.0; // 1 + S
+      Eigen::ArrayXd bw = ((-1.0 / delta) * sp1.log()).exp();
       Eigen::ArrayXd m = 1.0 - bw;
-      return (g1 * p1) / (b1 * (1.0 - uc)) * bw * m.pow(1.0 / theta) /
-             (sp1 * m);
+      return (g1 * p1) / (b1 * (1.0 - uc)) * bw *
+             ((1.0 / theta) * m.log()).exp() / (sp1 * m);
     },
     [&](Eigen::Index i, double uc, double uo) -> double {
       const double theta = parameters(i, 0);

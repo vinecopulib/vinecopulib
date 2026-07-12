@@ -18,9 +18,13 @@ Bb8Bicop::cdf(const tools_eigen::ConstMatRef& u,
     const double theta = parameters(0, 0);
     const double delta = parameters(0, 1);
     const double k = 1.0 - std::pow(1.0 - delta, theta);
-    Eigen::ArrayXd n1 = 1.0 - (1.0 - delta * u.col(0).array()).pow(theta);
-    Eigen::ArrayXd n2 = 1.0 - (1.0 - delta * u.col(1).array()).pow(theta);
-    return ((1.0 / delta) * (1.0 - (1.0 - n1 * n2 / k).pow(1.0 / theta)))
+    // powers via exp(c*log(x)) (packetized log/exp beat generic_pow)
+    Eigen::ArrayXd n1 =
+      1.0 - (theta * (1.0 - delta * u.col(0).array()).log()).exp();
+    Eigen::ArrayXd n2 =
+      1.0 - (theta * (1.0 - delta * u.col(1).array()).log()).exp();
+    return ((1.0 / delta) *
+            (1.0 - ((1.0 / theta) * (1.0 - n1 * n2 / k).log()).exp()))
       .matrix();
   }
   return ArchimedeanBicop::cdf(u, parameters);
@@ -87,14 +91,14 @@ Bb8Bicop::pdf_raw(const tools_eigen::ConstMatRef& u,
     const auto u1 = u.col(0).array();
     const auto u2 = u.col(1).array();
     Eigen::ArrayXd t2 = 1.0 - delta * u1;
-    Eigen::ArrayXd t3 = t2.pow(theta);
+    Eigen::ArrayXd t3 = (theta * t2.log()).exp();
     Eigen::ArrayXd t33 = theta * t3;
     Eigen::ArrayXd t49 = t3 * t3;
     Eigen::ArrayXd t6 = 1.0 - delta * u2;
-    Eigen::ArrayXd t7 = t6.pow(theta);
+    Eigen::ArrayXd t7 = (theta * t6.log()).exp();
     Eigen::ArrayXd t25 = t3 * t7;
     Eigen::ArrayXd t26 = s11 - t7 - t3 + t25;
-    Eigen::ArrayXd t29 = (-t26 / s12).pow(s16);
+    Eigen::ArrayXd t29 = (s16 * (-t26 / s12).log()).exp();
     Eigen::ArrayXd t44 = t7 * t7;
     Eigen::ArrayXd t45 = t3 * t44;
     Eigen::ArrayXd t50 = t49 * t7;
@@ -162,11 +166,13 @@ Bb8Bicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
       const double theta = parameters(0, 0);
       const double delta = parameters(0, 1);
       const double k = 1.0 - std::pow(1.0 - delta, theta);
+      // powers via exp(c*log(x)) (packetized log/exp beat generic_pow)
       Eigen::ArrayXd q1 = 1.0 - delta * uc;
-      Eigen::ArrayXd p1 = q1.pow(theta);
+      Eigen::ArrayXd p1 = (theta * q1.log()).exp();
       Eigen::ArrayXd n1 = 1.0 - p1;
-      Eigen::ArrayXd m = 1.0 - n1 * (1.0 - (1.0 - delta * uo).pow(theta)) / k;
-      return p1 * (m.pow(1.0 / theta) / m) * (1.0 - m) / (q1 * n1);
+      Eigen::ArrayXd m =
+        1.0 - n1 * (1.0 - (theta * (1.0 - delta * uo).log()).exp()) / k;
+      return p1 * (((1.0 / theta) * m.log()).exp() / m) * (1.0 - m) / (q1 * n1);
     },
     [&](Eigen::Index i, double uc, double uo) -> double {
       const double theta = parameters(i, 0);

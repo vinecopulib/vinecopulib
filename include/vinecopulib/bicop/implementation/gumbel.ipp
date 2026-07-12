@@ -16,9 +16,12 @@ GumbelBicop::cdf(const tools_eigen::ConstMatRef& u,
 {
   if (parameters.rows() == 1) {
     const double theta = parameters(0, 0);
-    Eigen::ArrayXd s = u.col(0).array().inverse().log().pow(theta) +
-                       u.col(1).array().inverse().log().pow(theta);
-    return (-s.pow(1.0 / theta)).exp().matrix();
+    // powers via exp(c*log(x)) (packetized log/exp beat generic_pow);
+    // l = -log(u) > 0, so log(l) is safe
+    Eigen::ArrayXd l1 = -u.col(0).array().log();
+    Eigen::ArrayXd l2 = -u.col(1).array().log();
+    Eigen::ArrayXd s = (theta * l1.log()).exp() + (theta * l2.log()).exp();
+    return (-((1.0 / theta) * s.log()).exp()).exp().matrix();
   }
   return ArchimedeanBicop::cdf(u, parameters);
 }
@@ -67,12 +70,18 @@ GumbelBicop::log_pdf_raw(const tools_eigen::ConstMatRef& u,
     const double thetha1 = 1.0 / theta;
     const auto u1 = u.col(0).array();
     const auto u2 = u.col(1).array();
+    // powers via exp(c*log(x)) with all logs shared: la/lb feed both the
+    // theta-powers and the (theta-1)*log(l1*l2) term, lt feeds three terms;
+    // -log(u1*u2) = l1 + l2 (packetized log/exp beat generic_pow)
     Eigen::ArrayXd l1 = -u1.log();
     Eigen::ArrayXd l2 = -u2.log();
-    Eigen::ArrayXd t1 = l1.pow(theta) + l2.pow(theta);
-    Eigen::ArrayXd out = -t1.pow(thetha1) + (2 * thetha1 - 2.0) * t1.log() +
-                         (theta - 1.0) * (l1 * l2).log() - (u1 * u2).log() +
-                         ((theta - 1.0) * t1.pow(-thetha1)).log1p();
+    Eigen::ArrayXd la = l1.log();
+    Eigen::ArrayXd lb = l2.log();
+    Eigen::ArrayXd t1 = (theta * la).exp() + (theta * lb).exp();
+    Eigen::ArrayXd lt = t1.log();
+    Eigen::ArrayXd out = -(thetha1 * lt).exp() + (2 * thetha1 - 2.0) * lt +
+                         (theta - 1.0) * (la + lb) + (l1 + l2) +
+                         ((theta - 1.0) * (-thetha1 * lt).exp()).log1p();
     return out.matrix();
   }
 
@@ -110,10 +119,12 @@ GumbelBicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
     parameters,
     [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
       const double theta = parameters(0, 0);
+      // powers via exp(c*log(x)); lc^(theta-1) = lc^theta / lc reuses tc
       Eigen::ArrayXd lc = -uc.log();
-      Eigen::ArrayXd t1 = lc.pow(theta) + (-uo.log()).pow(theta);
-      Eigen::ArrayXd t1p = t1.pow(1.0 / theta); // -log(C)
-      return (-t1p).exp() * lc.pow(theta - 1.0) * t1p / t1 / uc;
+      Eigen::ArrayXd tc = (theta * lc.log()).exp();
+      Eigen::ArrayXd t1 = tc + (theta * (-uo.log()).log()).exp();
+      Eigen::ArrayXd t1p = ((1.0 / theta) * t1.log()).exp(); // -log(C)
+      return (-t1p).exp() * (tc / lc) * t1p / t1 / uc;
     },
     [&](Eigen::Index i, double uc, double uo) -> double {
       const double theta = parameters(i, 0);

@@ -108,8 +108,12 @@ TawnBicop::pickands_arr(const Eigen::ArrayXd& t,
   const double psi1 = parameters(0);
   const double psi2 = parameters(1);
   const double theta = parameters(2);
-  Eigen::ArrayXd temp = (psi2 * t).pow(theta) + (psi1 * (1.0 - t)).pow(theta);
-  return (1.0 - psi1) * (1.0 - t) + (1.0 - psi2) * t + temp.pow(1.0 / theta);
+  // powers via exp(c*log(x)) (packetized log/exp beat generic_pow); a zero
+  // base still maps to 0: exp(theta * log(0)) = exp(-inf) = 0 for theta > 0
+  Eigen::ArrayXd temp =
+    (theta * (psi2 * t).log()).exp() + (theta * (psi1 * (1.0 - t)).log()).exp();
+  return (1.0 - psi1) * (1.0 - t) + (1.0 - psi2) * t +
+         ((1.0 / theta) * temp.log()).exp();
 }
 
 //! vectorized fused Pickands evaluation with the same shared-power
@@ -129,12 +133,15 @@ TawnBicop::pickands_all(const Eigen::ArrayXd& t,
   Eigen::ArrayXd x = psi2 * t;
   Eigen::ArrayXd y = psi1 * (1.0 - t);
 
-  Eigen::ArrayXd xt2 = x.pow(theta - 2.0);
-  Eigen::ArrayXd yt2 = y.pow(theta - 2.0);
+  // powers via exp(c*log(x)) (packetized log/exp beat generic_pow);
+  // boundary elements (zero base) produce inf/NaN here but are recomputed
+  // by the scalar fallback loop below
+  Eigen::ArrayXd xt2 = ((theta - 2.0) * x.log()).exp();
+  Eigen::ArrayXd yt2 = ((theta - 2.0) * y.log()).exp();
   Eigen::ArrayXd xt1 = xt2 * x;
   Eigen::ArrayXd yt1 = yt2 * y;
   Eigen::ArrayXd temp = xt1 * x + yt1 * y;
-  Eigen::ArrayXd tp2 = temp.pow(1.0 / theta - 2.0);
+  Eigen::ArrayXd tp2 = ((1.0 / theta - 2.0) * temp.log()).exp();
   Eigen::ArrayXd tp1 = tp2 * temp;
   Eigen::ArrayXd temp2 = psi2 * xt1 - psi1 * yt1;
   Eigen::ArrayXd temp3 = psi2 * psi2 * xt2 + psi1 * psi1 * yt2;

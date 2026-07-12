@@ -61,8 +61,14 @@ ClaytonBicop::log_pdf_raw(const tools_eigen::ConstMatRef& u,
               .select(std::numeric_limits<double>::quiet_NaN(),
                       Eigen::ArrayXd::Zero(u.rows()));
     } else {
-      out = std::log1p(theta) - (1.0 + theta) * (u1 * u2).log() -
-            (2.0 + 1.0 / theta) * (u1.pow(-theta) + u2.pow(-theta) - 1.0).log();
+      // u^(-theta) as exp(-theta*log(u)): Eigen's packetized log/exp kernels
+      // are several times cheaper than its generic_pow, and the logs are
+      // shared with the -(1+theta)*log(u1*u2) term
+      Eigen::ArrayXd lu1 = u1.log();
+      Eigen::ArrayXd lu2 = u2.log();
+      out = std::log1p(theta) - (1.0 + theta) * (lu1 + lu2) -
+            (2.0 + 1.0 / theta) *
+              ((-theta * lu1).exp() + (-theta * lu2).exp() - 1.0).log();
     }
     return out.matrix();
   }
@@ -108,8 +114,12 @@ ClaytonBicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
       if (theta < 1e-10) {
         return uo;
       }
-      return uc.pow(-(1.0 + theta)) *
-             (uc.pow(-theta) + uo.pow(-theta) - 1.0).pow(-1.0 - 1.0 / theta);
+      // x^(-theta) via exp(-theta*log(x)) (packetized log/exp beat
+      // generic_pow); uc^(-1-theta) = uc^(-theta) / uc
+      Eigen::ArrayXd tc = (-theta * uc.log()).exp();
+      return (tc / uc) * ((-1.0 - 1.0 / theta) *
+                          (tc + (-theta * uo.log()).exp() - 1.0).log())
+                           .exp();
     },
     [&](Eigen::Index i, double uc, double uo) -> double {
       const double theta = parameters(i, 0);
@@ -612,12 +622,13 @@ ClaytonBicop::hinv1_raw(const tools_eigen::ConstMatRef& u,
     tools_eigen::parameter_as_vector(parameters, 0, n).array();
   Eigen::ArrayXd u0 = u.col(0).array();
   Eigen::ArrayXd u1 = u.col(1).array();
-  Eigen::ArrayXd hinv = u0.pow(theta + 1.0);
-  hinv = u1 * hinv;
-  hinv = hinv.pow(-theta / (theta + 1.0));
-  Eigen::ArrayXd x = u0.pow(-theta);
-  hinv = hinv - x + 1.0;
-  hinv = hinv.pow(-1.0 / theta);
+  // powers via exp(c*log(x)) with the log of u0 shared (packetized log/exp
+  // kernels beat Eigen's generic_pow)
+  Eigen::ArrayXd lu0 = u0.log();
+  Eigen::ArrayXd hinv = u1 * ((theta + 1.0) * lu0).exp();
+  hinv = ((-theta / (theta + 1.0)) * hinv.log()).exp();
+  hinv = hinv - (-theta * lu0).exp() + 1.0;
+  hinv = ((-1.0 / theta) * hinv.log()).exp();
   return hinv.matrix();
 }
 

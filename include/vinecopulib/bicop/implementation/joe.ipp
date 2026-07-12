@@ -18,9 +18,10 @@ JoeBicop::cdf(const tools_eigen::ConstMatRef& u,
 {
   if (parameters.rows() == 1) {
     const double theta = parameters(0, 0);
-    Eigen::ArrayXd a1 = (1.0 - u.col(0).array()).pow(theta);
-    Eigen::ArrayXd a2 = (1.0 - u.col(1).array()).pow(theta);
-    return (1.0 - (a1 + a2 - a1 * a2).pow(1.0 / theta)).matrix();
+    // powers via exp(c*log(x)) (packetized log/exp beat generic_pow)
+    Eigen::ArrayXd a1 = (theta * (1.0 - u.col(0).array()).log()).exp();
+    Eigen::ArrayXd a2 = (theta * (1.0 - u.col(1).array()).log()).exp();
+    return (1.0 - ((1.0 / theta) * (a1 + a2 - a1 * a2).log()).exp()).matrix();
   }
   return ArchimedeanBicop::cdf(u, parameters);
 }
@@ -68,13 +69,16 @@ JoeBicop::log_pdf_raw(const tools_eigen::ConstMatRef& u,
     const double theta = parameters(0, 0);
     const auto u1 = u.col(0).array();
     const auto u2 = u.col(1).array();
-    Eigen::ArrayXd om1 = 1.0 - u1;
-    Eigen::ArrayXd om2 = 1.0 - u2;
-    Eigen::ArrayXd t1 = om1.pow(theta);
-    Eigen::ArrayXd t2 = om2.pow(theta);
+    // powers via exp(theta*log(1-u)); the logs are shared with the
+    // (theta-1)*(log(om1)+log(om2)) term (packetized log/exp beat
+    // generic_pow)
+    Eigen::ArrayXd lo1 = (1.0 - u1).log();
+    Eigen::ArrayXd lo2 = (1.0 - u2).log();
+    Eigen::ArrayXd t1 = (theta * lo1).exp();
+    Eigen::ArrayXd t2 = (theta * lo2).exp();
     Eigen::ArrayXd t12 = t1 + t2 - t1 * t2;
     Eigen::ArrayXd out = (1.0 / theta - 2.0) * t12.log() +
-                         (theta - 1.0) * (om1.log() + om2.log()) +
+                         (theta - 1.0) * (lo1 + lo2) +
                          (theta - 1.0 + t12).log();
     return out.matrix();
   }
@@ -113,11 +117,14 @@ JoeBicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
     parameters,
     [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
       const double theta = parameters(0, 0);
+      // powers via exp(c*log(x)); omc^(theta-1) = omc^theta / omc reuses
+      // tc, and t12^(1/theta-1) = t12^(1/theta) / t12 shares log(t12)
       Eigen::ArrayXd omc = 1.0 - uc;
-      Eigen::ArrayXd to = (1.0 - uo).pow(theta);
-      Eigen::ArrayXd tc = omc.pow(theta);
+      Eigen::ArrayXd to = (theta * (1.0 - uo).log()).exp();
+      Eigen::ArrayXd tc = (theta * omc.log()).exp();
       Eigen::ArrayXd t12 = tc + to - tc * to;
-      return omc.pow(theta - 1.0) * (1.0 - to) * t12.pow(1.0 / theta - 1.0);
+      return (tc / omc) * (1.0 - to) *
+             (((1.0 / theta) * t12.log()).exp() / t12);
     },
     [&](Eigen::Index i, double uc, double uo) -> double {
       const double theta = parameters(i, 0);
