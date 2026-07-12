@@ -270,9 +270,18 @@ public:
 
 private:
   // Per-edge derivative caches shared by the analytic score/gradient/Hessian
-  // cascades (one forward walk fills them; the cascades then read them). For
-  // an h-function output, `du1`/`du2` are ∂h/∂u1, ∂h/∂u2 (one of them equals
-  // the density `c` by the identity ∂h2/∂u1 = ∂h1/∂u2 = c).
+  // cascades. One forward walk over the vine (build_deriv_cache) fills them;
+  // the cascades then only read them.
+  //
+  // Each edge's pair copula c(u1, u2) consumes two arguments produced by the
+  // previous tree and produces (up to) two h-function outputs consumed by
+  // deeper trees: hfunc1 = P(u2 <= . | u1) and hfunc2 = P(u1 <= . | u2).
+  // A DerivLeaf holds the derivatives of ONE such h-function output; it is
+  // what the chain rule propagates through when a parameter perturbation
+  // travels from its own edge to the deeper edges that (indirectly) depend
+  // on it. For an h-function output, `du1`/`du2` are ∂h/∂u1, ∂h/∂u2 (one of
+  // them equals the copula density `c` by the identity ∂h2/∂u1 = ∂h1/∂u2 =
+  // c).
   struct DerivLeaf
   {
     Eigen::VectorXd du1, du2;          // ∂h/∂u1, ∂h/∂u2
@@ -281,8 +290,20 @@ private:
     Eigen::VectorXd du1u1, du1u2, du2u2;           // ∂²h/∂{u1²,u1u2,u2²}
     std::vector<Eigen::VectorXd> dpar_u1, dpar_u2; // ∂²h/∂θ_p∂{u1,u2}
     std::vector<std::vector<Eigen::VectorXd>> dpar_par; // ∂²h/∂θ_p∂θ_q
-    bool active{ false }; // output feeds a deeper tree
+    // whether any deeper tree consumes this h-function output (from the
+    // structure's needed_hfunc1/2 masks); inactive leaves are left empty
+    // and the cascades skip them
+    bool active{ false };
   };
+  // All derivative data of one edge: the log-density derivatives (lu*/lpar*,
+  // used for the score/Hessian contributions of the edge itself) plus the
+  // two output leaves `o1` (its hfunc1 output) and `o2` (its hfunc2 output,
+  // the "direct" one) through which perturbations propagate to deeper trees.
+  // `msrc` is this edge's min_array entry: the storage column of the
+  // previous tree that provides the edge's second argument; `direct` says
+  // whether that argument is the column's hfunc2 (direct) or hfunc1
+  // (indirect) value — mirroring how the pdf/rosenblatt passes assemble
+  // their arguments.
   struct DerivCache
   {
     size_t np{ 0 }, msrc{ 0 };

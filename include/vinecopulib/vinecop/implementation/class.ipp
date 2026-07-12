@@ -1473,9 +1473,22 @@ Vinecop::scores_full(Eigen::MatrixXd u,
         }
       }
 
-      // per-parameter cascade over the cache; tilde2/tilde1 hold the
-      // perturbations of the direct (hfunc2) and indirect (hfunc1) storage
-      // columns of the current tree level
+      // Per-parameter cascade over the cache: for each parameter θ (of edge
+      // (t0, e0)), walk the deeper trees and accumulate the full score
+      // ∂/∂θ Σ_edges log c via the chain rule.
+      //
+      // State per tree level, indexed by storage column e:
+      //  - tilde1.col(e) / tilde2.col(e): the current first-order
+      //    perturbations ∂hfunc1/∂θ and ∂hfunc2/∂θ of column e's h-function
+      //    values (hfunc1 = "indirect", hfunc2 = "direct", as in the pdf
+      //    pass). They are seeded with ∂h/∂θ at the parameter's own edge
+      //    and updated tree by tree via ce.o1/ce.o2 (the edge's output
+      //    derivative leaves).
+      //  - aff1[e] / aff2[e]: flags marking whether column e's
+      //    hfunc1/hfunc2 values are affected by θ at the current level
+      //    (i.e. whether the corresponding tilde column is valid). Edges
+      //    whose two input columns are both unaffected are skipped and
+      //    contribute nothing.
       Eigen::MatrixXd tilde1(b.size, d_), tilde2(b.size, d_);
       std::vector<char> aff1(d_), aff2(d_);
       size_t ipar = 0;
@@ -1499,25 +1512,35 @@ Vinecop::scores_full(Eigen::MatrixXd u,
               for (size_t e = 0; e < d_ - t - 1; ++e) {
                 const DerivCache& ce = cache(t, e);
                 size_t m = ce.msrc;
-                // the proximity condition guarantees m - 1 > e, so columns
-                // read here are not yet overwritten at this tree level
+                // is either input argument of this edge perturbed by θ?
+                // (first argument = column e's hfunc2; second argument =
+                // column m - 1's hfunc2 or hfunc1, depending on `direct`).
+                // The proximity condition guarantees m - 1 > e, so columns
+                // read here are not yet overwritten at this tree level.
                 bool a1 = (aff2[e] != 0);
                 bool a2 = ce.direct ? (aff2[m - 1] != 0) : (aff1[m - 1] != 0);
                 if (!a1 && !a2) {
+                  // θ does not reach this edge; its outputs are unperturbed
                   aff1[e] = 0;
                   aff2[e] = 0;
                   continue;
                 }
+                // v1/v2 = ∂(arg1)/∂θ and ∂(arg2)/∂θ for this edge
                 Eigen::VectorXd v1 = Eigen::VectorXd::Zero(b.size);
                 Eigen::VectorXd v2 = Eigen::VectorXd::Zero(b.size);
                 if (a1) {
                   v1 = tilde2.col(e);
+                  // chain rule: this edge's log-density term responds to
+                  // the perturbation of its first argument
                   sc += ce.lu1.cwiseProduct(v1);
                 }
                 if (a2) {
                   v2 = ce.direct ? tilde2.col(m - 1) : tilde1.col(m - 1);
                   sc += ce.lu2.cwiseProduct(v2);
                 }
+                // push the argument perturbations through this edge's
+                // h-function outputs for the next tree level:
+                // ∂h/∂θ = ∂h/∂u1 · v1 + ∂h/∂u2 · v2
                 if (ce.o2.active) {
                   tilde2.col(e) =
                     propagate_first_order(ce.o2.du1, ce.o2.du2, v1, v2);
@@ -1832,6 +1855,11 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
       const size_t m = b.size;
       auto cache = build_deriv_cache(u, b.begin, m, true);
 
+      // tilde1/tilde2 and aff1/aff2 play the same role as in the gradient
+      // cascade of scores_full: per storage column, the current first-order
+      // perturbations of the column's hfunc1/hfunc2 values w.r.t. the
+      // parameter, and flags marking which columns are affected (see the
+      // DerivLeaf/DerivCache documentation in class.hpp)
       Eigen::MatrixXd tilde1(m, d_), tilde2(m, d_);
       std::vector<char> aff1(d_), aff2(d_);
       for (size_t a = 0; a < npars; ++a) {
@@ -1916,9 +1944,15 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
     // one forward walk fills every per-edge first- and second-order leaf
     auto cache = build_deriv_cache(u, b.begin, m, true);
 
-    // second-order cascade for each parameter pair (only the upper triangle;
-    // H is symmetric). tilde/hat/bar hold, per storage column, the first
-    // derivatives w.r.t. alpha, beta and their mixed second derivative.
+    // Second-order cascade for each parameter pair (only the upper triangle;
+    // H is symmetric). Per storage column e (suffix 1 = the column's hfunc1
+    // values, 2 = its hfunc2 values, as in the gradient cascade):
+    //   hat*[e] = ∂(column value)/∂α,
+    //   til*[e] = ∂(column value)/∂β,
+    //   bar*[e] = ∂²(column value)/∂α∂β,
+    // seeded at the two parameters' own edges and pushed through each
+    // deeper edge's output leaves ce.o1/ce.o2 (see class.hpp). There are no
+    // aff flags here; unaffected columns simply carry zero vectors.
     std::vector<Eigen::VectorXd> hat1(d_), hat2(d_), til1(d_), til2(d_),
       bar1(d_), bar2(d_);
     for (size_t a = 0; a < npars; ++a) {
