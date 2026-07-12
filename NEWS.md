@@ -1,4 +1,4 @@
-## vinecopulib 0.8.1 (development version)
+## vinecopulib 0.8.0 (June 12, 2026)
 
 ### NEW FEATURES
 
@@ -7,11 +7,6 @@
   conditional cdf replacing 35-sweep bisection, bucket-accelerated cell
   lookup, O(m) cached `integrate_2d`, and fixed-size influence matrices in
   the local-likelihood fit (#691).
-
-## vinecopulib 0.8.0 (June 12, 2026)
-
-### NEW FEATURES
-
 * Add `Bicop::parameters_to_taildep()`/`Bicop::get_taildep()` to compute the tail
   dependence coefficients (returned as a 2x2 matrix collecting all four corners of
   the unit square) and `Bicop::parameters_to_beta()`/`Bicop::get_beta()` to compute
