@@ -2,6 +2,12 @@
 
 ### NEW FEATURES
 
+* Speed up shared primitives: `tools_eigen` helpers take `Eigen::Ref`
+  (`ConstMatRef`) with raw-pointer inner loops and gain a safeguarded-Newton
+  inverter; `ThreadPool::push` binds arguments instead of capturing a
+  by-value lambda; `integrate_zero_to_one` is templated on the callable with
+  integration tolerance 1e-12 → 1e-9 (Kendall's τ of integrated families may
+  shift by up to ~1e-7) (#689).
 * Add binary CBOR persistence for `Bicop`, `Vinecop`, and `RVineStructure`,
   selected automatically by a `.cbor` filename extension (#684).
 * Add an opt-in google/benchmark suite (`VINECOPULIB_BUILD_BENCHMARKS`, off by
