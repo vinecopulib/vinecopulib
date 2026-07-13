@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <Eigen/Dense>
@@ -155,12 +156,13 @@ protected:
   // sorted concatenation like `"par1u1"` (parameters first, then `"u1"`,
   // then `"u2"`). The facade canonicalizes user input and resolves rotations
   // before calling these, so implementations only see canonical selectors
-  // and 0-degree-rotation data. The defaults here throw (nonparametric
-  // families); ParBicop overrides them with central finite differences so
-  // every parametric family works; families with closed forms override
-  // those in turn. The logpdf defaults compose the pdf leaves by the
-  // quotient rule; families override the parameter selectors where dedicated
-  // closed forms exist.
+  // and 0-degree-rotation data. The defaults here compute central finite
+  // differences of the value leaves (via fd_deriv), so every family with
+  // parameter bounds works out of the box; families with closed forms
+  // override them in turn, and nonparametric families override where finite
+  // differences are meaningless. The logpdf defaults compose the pdf leaves
+  // by the quotient rule; families override the parameter selectors where
+  // dedicated closed forms exist.
   virtual Eigen::VectorXd pdf_deriv_raw(const Eigen::MatrixXd& u,
                                         const Eigen::MatrixXd& parameters,
                                         const std::string& deriv);
@@ -192,6 +194,19 @@ protected:
   virtual Eigen::VectorXd logpdf_deriv2_raw(const Eigen::MatrixXd& u,
                                             const Eigen::MatrixXd& parameters,
                                             const std::string& deriv);
+
+  // Central-difference helper backing the derivative-leaf defaults above.
+  // Differentiates `f` w.r.t. component `comp` (0-based parameter index, `-1`
+  // for the first argument, `-2` for the second). The parameter branch clips
+  // steps to the family's parameter bounds via the virtual bound getters, so
+  // each family controls its own clamping; the argument branch stays strictly
+  // inside the unit interval.
+  Eigen::VectorXd fd_deriv(
+    const std::function<Eigen::VectorXd(const Eigen::MatrixXd&,
+                                        const Eigen::MatrixXd&)>& f,
+    const Eigen::MatrixXd& u,
+    const Eigen::MatrixXd& parameters,
+    int comp);
 
   virtual Eigen::MatrixXd tau_to_parameters(const double& tau) = 0;
   Eigen::MatrixXd no_tau_to_parameters(const double&);

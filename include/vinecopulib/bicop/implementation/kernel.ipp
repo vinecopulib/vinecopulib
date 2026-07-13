@@ -95,6 +95,79 @@ KernelBicop::hinv2_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
   return interp_grid_->inverse_integrate_1d(u, 2);
 }
 
+inline Eigen::VectorXd
+KernelBicop::pdf_deriv_raw(const Eigen::MatrixXd& u,
+                           const Eigen::MatrixXd&,
+                           const std::string& deriv)
+{
+  auto comps = tools_deriv::parse_components(deriv);
+  if (comps[0] >= 0) {
+    throw std::runtime_error("derivatives with respect to the interpolation "
+                             "grid are not defined for the " +
+                             get_family_name() + " copula");
+  }
+
+  // exact slope of the bilinear interpolant w.r.t. u1 (comp -1) or u2 (-2)
+  size_t var = (comps[0] == -1) ? 0 : 1;
+  Eigen::VectorXd grad = interp_grid_->gradient(u, var);
+  // pdf_raw clamps the density to [1e-20, DBL_MAX]; where it is clamped the
+  // surface is flat, so the derivative vanishes there (NaNs stay NaN)
+  Eigen::VectorXd val = interp_grid_->interpolate(u);
+  for (Eigen::Index k = 0; k < grad.size(); ++k) {
+    if (val(k) < 1e-20) {
+      grad(k) = 0.0;
+    }
+  }
+  return grad;
+}
+
+inline Eigen::VectorXd
+KernelBicop::pdf_deriv2_raw(const Eigen::MatrixXd&,
+                            const Eigen::MatrixXd&,
+                            const std::string&)
+{
+  throw std::runtime_error("second-order derivatives are not defined for the " +
+                           get_family_name() + " copula");
+}
+
+inline Eigen::VectorXd
+KernelBicop::hfunc1_deriv_raw(const Eigen::MatrixXd&,
+                              const Eigen::MatrixXd&,
+                              const std::string&)
+{
+  throw std::runtime_error(
+    "h-function derivatives are not implemented for the " + get_family_name() +
+    " copula");
+}
+
+inline Eigen::VectorXd
+KernelBicop::hfunc1_deriv2_raw(const Eigen::MatrixXd&,
+                               const Eigen::MatrixXd&,
+                               const std::string&)
+{
+  throw std::runtime_error("second-order derivatives are not defined for the " +
+                           get_family_name() + " copula");
+}
+
+inline Eigen::VectorXd
+KernelBicop::hfunc2_deriv_raw(const Eigen::MatrixXd&,
+                              const Eigen::MatrixXd&,
+                              const std::string&)
+{
+  throw std::runtime_error(
+    "h-function derivatives are not implemented for the " + get_family_name() +
+    " copula");
+}
+
+inline Eigen::VectorXd
+KernelBicop::hfunc2_deriv2_raw(const Eigen::MatrixXd&,
+                               const Eigen::MatrixXd&,
+                               const std::string&)
+{
+  throw std::runtime_error("second-order derivatives are not defined for the " +
+                           get_family_name() + " copula");
+}
+
 inline double
 KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
 {
