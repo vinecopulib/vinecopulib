@@ -295,26 +295,27 @@ private:
     // and the cascades skip them
     bool active{ false };
   };
-  // All derivative data of one edge: the log-density derivatives (lu*/lpar*,
+  // All derivative data of one edge: the log-density derivatives (du*/dpar*,
   // used for the score/Hessian contributions of the edge itself) plus the
-  // two output leaves `o1` (its hfunc1 output) and `o2` (its hfunc2 output,
-  // the "direct" one) through which perturbations propagate to deeper trees.
-  // `msrc` is this edge's min_array entry: the storage column of the
-  // previous tree that provides the edge's second argument; `direct` says
-  // whether that argument is the column's hfunc2 (direct) or hfunc1
-  // (indirect) value — mirroring how the pdf/rosenblatt passes assemble
-  // their arguments.
+  // two output leaves `h1` (its hfunc1 output) and `h2` (its hfunc2 output)
+  // through which perturbations propagate to deeper trees. `arg2_col` is this
+  // edge's min_array entry: the storage column of the previous tree that
+  // provides the edge's second argument; `arg2_is_h2` says whether that
+  // argument is that column's hfunc2 (true) or hfunc1 (false) value —
+  // mirroring how the pdf/rosenblatt passes assemble their arguments.
+  // (The du*/dpar* here are derivatives of `log c`; the identically named
+  // fields of `DerivLeaf` are derivatives of an h-function `h`.)
   struct DerivCache
   {
-    size_t np{ 0 }, msrc{ 0 };
-    bool direct{ false };
-    Eigen::VectorXd c, lu1, lu2;       // c, ∂logc/∂u1, ∂logc/∂u2
-    std::vector<Eigen::VectorXd> lpar; // ∂logc/∂θ_p (step-wise score)
+    size_t np{ 0 }, arg2_col{ 0 };
+    bool arg2_is_h2{ false };
+    Eigen::VectorXd c, du1, du2;       // c, ∂logc/∂u1, ∂logc/∂u2
+    std::vector<Eigen::VectorXd> dpar; // ∂logc/∂θ_p (step-wise score)
     // second-order log-density (only when requested):
-    Eigen::VectorXd lu1u1, lu1u2, lu2u2;
-    std::vector<Eigen::VectorXd> lpar_u1, lpar_u2;
-    std::vector<std::vector<Eigen::VectorXd>> lpar_par;
-    DerivLeaf o1, o2; // hfunc1 (indirect) and hfunc2 (direct) outputs
+    Eigen::VectorXd du1u1, du1u2, du2u2;
+    std::vector<Eigen::VectorXd> dpar_u1, dpar_u2;
+    std::vector<std::vector<Eigen::VectorXd>> dpar_par;
+    DerivLeaf h1, h2; // the edge's hfunc1 and hfunc2 output leaves
   };
   // one forward walk over the rows [begin, begin + size) of `u`, filling the
   // per-edge derivative caches (second-order fields only when `second_order`).

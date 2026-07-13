@@ -836,7 +836,7 @@ TEST(VinecopDerivatives, stepwise_scores_match_per_edge_reference)
   for (size_t t = 0; t < d - 1; ++t) {
     for (size_t e = 0; e < d - 1 - t; ++e) {
       size_t m = structure.min_array(t, e);
-      bool direct = (m == structure.struct_array(t, e, true));
+      bool arg2_is_h2 = (m == structure.struct_array(t, e, true));
       Eigen::MatrixXd u_e(u.rows(), 2);
       if (t == 0) {
         u_e.col(0) = u.col(order[e] - 1);
@@ -844,7 +844,7 @@ TEST(VinecopDerivatives, stepwise_scores_match_per_edge_reference)
       } else {
         u_e.col(0) = full.hfunc2(t - 1, e);
         u_e.col(1) =
-          direct ? full.hfunc2(t - 1, m - 1) : full.hfunc1(t - 1, m - 1);
+          arg2_is_h2 ? full.hfunc2(t - 1, m - 1) : full.hfunc1(t - 1, m - 1);
       }
 
       // old-style central differences of the edge log-density

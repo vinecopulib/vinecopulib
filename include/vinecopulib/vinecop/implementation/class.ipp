@@ -1174,10 +1174,10 @@ Vinecop::build_deriv_cache(const Eigen::MatrixXd& u,
   const size_t m = size;
   TriangularArray<DerivCache> cache(d_, trunc_lvl);
 
-  Eigen::MatrixXd hf1 = Eigen::MatrixXd::Zero(m, d_);
-  Eigen::MatrixXd hf2 = Eigen::MatrixXd::Zero(m, d_);
+  Eigen::MatrixXd hfunc1 = Eigen::MatrixXd::Zero(m, d_);
+  Eigen::MatrixXd hfunc2 = Eigen::MatrixXd::Zero(m, d_);
   for (size_t j = 0; j < d_; ++j) {
-    hf2.col(j) = u.block(begin, order[j] - 1, m, 1);
+    hfunc2.col(j) = u.block(begin, order[j] - 1, m, 1);
   }
   auto sel = [](size_t p) { return "par" + std::to_string(p + 1); };
 
@@ -1191,109 +1191,111 @@ Vinecop::build_deriv_cache(const Eigen::MatrixXd& u,
       DerivCache& ce = cache(t, e);
       size_t np = static_cast<size_t>(ec.get_parameters().size());
       ce.np = np;
-      ce.msrc = rvine_structure_.min_array(t, e);
-      ce.direct = (ce.msrc == rvine_structure_.struct_array(t, e, true));
+      ce.arg2_col = rvine_structure_.min_array(t, e);
+      ce.arg2_is_h2 =
+        (ce.arg2_col == rvine_structure_.struct_array(t, e, true));
 
       u_e = Eigen::MatrixXd(m, 2);
-      u_e.col(0) = hf2.col(e);
-      u_e.col(1) = ce.direct ? hf2.col(ce.msrc - 1) : hf1.col(ce.msrc - 1);
+      u_e.col(0) = hfunc2.col(e);
+      u_e.col(1) = ce.arg2_is_h2 ? hfunc2.col(ce.arg2_col - 1)
+                                 : hfunc1.col(ce.arg2_col - 1);
 
       ce.c = ec.pdf(u_e);
-      ce.lu1 = ec.logpdf_deriv(u_e, "u1");
-      ce.lu2 = ec.logpdf_deriv(u_e, "u2");
-      ce.lpar.resize(np);
+      ce.du1 = ec.logpdf_deriv(u_e, "u1");
+      ce.du2 = ec.logpdf_deriv(u_e, "u2");
+      ce.dpar.resize(np);
       for (size_t p = 0; p < np; ++p) {
-        ce.lpar[p] = ec.logpdf_deriv(u_e, sel(p));
+        ce.dpar[p] = ec.logpdf_deriv(u_e, sel(p));
       }
 
       // ∂c/∂u1, ∂c/∂u2, ∂c/∂θ are shared by the two h-outputs' 2nd-order
       // fields (via ∂h2/∂u1 = ∂h1/∂u2 = c); only needed for second order
-      Eigen::VectorXd cpu1, cpu2;
-      std::vector<Eigen::VectorXd> cppar;
+      Eigen::VectorXd c_u1, c_u2;
+      std::vector<Eigen::VectorXd> c_par;
       if (second_order) {
-        cpu1 = ec.pdf_deriv(u_e, "u1");
-        cpu2 = ec.pdf_deriv(u_e, "u2");
-        cppar.resize(np);
+        c_u1 = ec.pdf_deriv(u_e, "u1");
+        c_u2 = ec.pdf_deriv(u_e, "u2");
+        c_par.resize(np);
         for (size_t p = 0; p < np; ++p) {
-          cppar[p] = ec.pdf_deriv(u_e, sel(p));
+          c_par[p] = ec.pdf_deriv(u_e, sel(p));
         }
-        ce.lu1u1 = ec.logpdf_deriv2(u_e, "u1u1");
-        ce.lu1u2 = ec.logpdf_deriv2(u_e, "u1u2");
-        ce.lu2u2 = ec.logpdf_deriv2(u_e, "u2u2");
-        ce.lpar_u1.resize(np);
-        ce.lpar_u2.resize(np);
-        ce.lpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
+        ce.du1u1 = ec.logpdf_deriv2(u_e, "u1u1");
+        ce.du1u2 = ec.logpdf_deriv2(u_e, "u1u2");
+        ce.du2u2 = ec.logpdf_deriv2(u_e, "u2u2");
+        ce.dpar_u1.resize(np);
+        ce.dpar_u2.resize(np);
+        ce.dpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
         for (size_t p = 0; p < np; ++p) {
-          ce.lpar_u1[p] = ec.logpdf_deriv2(u_e, sel(p) + "u1");
-          ce.lpar_u2[p] = ec.logpdf_deriv2(u_e, sel(p) + "u2");
+          ce.dpar_u1[p] = ec.logpdf_deriv2(u_e, sel(p) + "u1");
+          ce.dpar_u2[p] = ec.logpdf_deriv2(u_e, sel(p) + "u2");
           for (size_t q = p; q < np; ++q) {
-            ce.lpar_par[p][q] = ec.logpdf_deriv2(u_e, sel(p) + sel(q));
-            ce.lpar_par[q][p] = ce.lpar_par[p][q];
+            ce.dpar_par[p][q] = ec.logpdf_deriv2(u_e, sel(p) + sel(q));
+            ce.dpar_par[q][p] = ce.dpar_par[p][q];
           }
         }
       }
 
-      bool push = (t + 1 < trunc_lvl);
-      // hfunc2 output (direct): ∂h2/∂u1 = c (identity), ∂h2/∂u2 conditioning
-      if (push && rvine_structure_.needed_hfunc2(t, e)) {
-        DerivLeaf& o = ce.o2;
-        o.active = true;
-        o.du1 = ce.c;
-        o.du2 = ec.hfunc2_deriv(u_e, "u2");
-        o.dpar.resize(np);
+      bool has_deeper_tree = (t + 1 < trunc_lvl);
+      // hfunc2 output: ∂h2/∂u1 = c (identity), ∂h2/∂u2 conditioning
+      if (has_deeper_tree && rvine_structure_.needed_hfunc2(t, e)) {
+        DerivLeaf& leaf = ce.h2;
+        leaf.active = true;
+        leaf.du1 = ce.c;
+        leaf.du2 = ec.hfunc2_deriv(u_e, "u2");
+        leaf.dpar.resize(np);
         for (size_t p = 0; p < np; ++p) {
-          o.dpar[p] = ec.hfunc2_deriv(u_e, sel(p));
+          leaf.dpar[p] = ec.hfunc2_deriv(u_e, sel(p));
         }
         if (second_order) {
-          o.du1u1 = cpu1;
-          o.du1u2 = cpu2;
-          o.du2u2 = ec.hfunc2_deriv2(u_e, "u2u2");
-          o.dpar_u1.resize(np);
-          o.dpar_u2.resize(np);
-          o.dpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
+          leaf.du1u1 = c_u1;
+          leaf.du1u2 = c_u2;
+          leaf.du2u2 = ec.hfunc2_deriv2(u_e, "u2u2");
+          leaf.dpar_u1.resize(np);
+          leaf.dpar_u2.resize(np);
+          leaf.dpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
           for (size_t p = 0; p < np; ++p) {
-            o.dpar_u1[p] = cppar[p]; // ∂²h2/∂θ∂u1 = ∂c/∂θ
-            o.dpar_u2[p] = ec.hfunc2_deriv2(u_e, sel(p) + "u2");
+            leaf.dpar_u1[p] = c_par[p]; // ∂²h2/∂θ∂u1 = ∂c/∂θ
+            leaf.dpar_u2[p] = ec.hfunc2_deriv2(u_e, sel(p) + "u2");
             for (size_t q = p; q < np; ++q) {
-              o.dpar_par[p][q] = ec.hfunc2_deriv2(u_e, sel(p) + sel(q));
-              o.dpar_par[q][p] = o.dpar_par[p][q];
+              leaf.dpar_par[p][q] = ec.hfunc2_deriv2(u_e, sel(p) + sel(q));
+              leaf.dpar_par[q][p] = leaf.dpar_par[p][q];
             }
           }
         }
       }
-      // hfunc1 output (indirect): ∂h1/∂u2 = c (identity), ∂h1/∂u1 conditioning
-      if (push && rvine_structure_.needed_hfunc1(t, e)) {
-        DerivLeaf& o = ce.o1;
-        o.active = true;
-        o.du1 = ec.hfunc1_deriv(u_e, "u1");
-        o.du2 = ce.c;
-        o.dpar.resize(np);
+      // hfunc1 output: ∂h1/∂u2 = c (identity), ∂h1/∂u1 conditioning
+      if (has_deeper_tree && rvine_structure_.needed_hfunc1(t, e)) {
+        DerivLeaf& leaf = ce.h1;
+        leaf.active = true;
+        leaf.du1 = ec.hfunc1_deriv(u_e, "u1");
+        leaf.du2 = ce.c;
+        leaf.dpar.resize(np);
         for (size_t p = 0; p < np; ++p) {
-          o.dpar[p] = ec.hfunc1_deriv(u_e, sel(p));
+          leaf.dpar[p] = ec.hfunc1_deriv(u_e, sel(p));
         }
         if (second_order) {
-          o.du1u1 = ec.hfunc1_deriv2(u_e, "u1u1");
-          o.du1u2 = cpu1; // ∂²h1/∂u1∂u2 = ∂c/∂u1
-          o.du2u2 = cpu2; // ∂²h1/∂u2²   = ∂c/∂u2
-          o.dpar_u1.resize(np);
-          o.dpar_u2.resize(np);
-          o.dpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
+          leaf.du1u1 = ec.hfunc1_deriv2(u_e, "u1u1");
+          leaf.du1u2 = c_u1; // ∂²h1/∂u1∂u2 = ∂c/∂u1
+          leaf.du2u2 = c_u2; // ∂²h1/∂u2²   = ∂c/∂u2
+          leaf.dpar_u1.resize(np);
+          leaf.dpar_u2.resize(np);
+          leaf.dpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
           for (size_t p = 0; p < np; ++p) {
-            o.dpar_u1[p] = ec.hfunc1_deriv2(u_e, sel(p) + "u1");
-            o.dpar_u2[p] = cppar[p]; // ∂²h1/∂θ∂u2 = ∂c/∂θ
+            leaf.dpar_u1[p] = ec.hfunc1_deriv2(u_e, sel(p) + "u1");
+            leaf.dpar_u2[p] = c_par[p]; // ∂²h1/∂θ∂u2 = ∂c/∂θ
             for (size_t q = p; q < np; ++q) {
-              o.dpar_par[p][q] = ec.hfunc1_deriv2(u_e, sel(p) + sel(q));
-              o.dpar_par[q][p] = o.dpar_par[p][q];
+              leaf.dpar_par[p][q] = ec.hfunc1_deriv2(u_e, sel(p) + sel(q));
+              leaf.dpar_par[q][p] = leaf.dpar_par[p][q];
             }
           }
         }
       }
 
       if (rvine_structure_.needed_hfunc1(t, e)) {
-        hf1.col(e) = ec.hfunc1(u_e);
+        hfunc1.col(e) = ec.hfunc1(u_e);
       }
       if (rvine_structure_.needed_hfunc2(t, e)) {
-        hf2.col(e) = ec.hfunc2(u_e);
+        hfunc2.col(e) = ec.hfunc2(u_e);
       }
     }
   }
@@ -1413,9 +1415,9 @@ Vinecop::scores_full(Eigen::MatrixXd u,
     // A parameter's cascade seeds the perturbation of its own edge's
     // h-functions (dh/dtheta) and propagates it to deeper edges by the chain
     // rule, accumulating
-    //   score      += (dc/du1)/c * v1 + (dc/du2)/c * v2,
-    //   v_direct'   = c * v1 + (dh2/du2) * v2,
-    //   v_indirect' = (dh1/du1) * v1 + c * v2,
+    //   score      += (dc/du1)/c * darg1 + (dc/du2)/c * darg2,
+    //   v_h2' = c * darg1 + (dh2/du2) * darg2,
+    //   v_h1' = (dh1/du1) * darg1 + c * darg2,
     // where dh1(u2|u1)/du2 = dh2(u1|u2)/du1 = c was used. All per-edge
     // derivatives come from build_deriv_cache().
     //
@@ -1453,14 +1455,14 @@ Vinecop::scores_full(Eigen::MatrixXd u,
             result.logpdf_deriv_u1(t, e) = Eigen::VectorXd(n);
             result.logpdf_deriv_u2(t, e) = Eigen::VectorXd(n);
           }
-          bool push = (t + 1 < trunc_lvl);
-          if (push && rvine_structure_.needed_hfunc1(t, e)) {
+          bool has_deeper_tree = (t + 1 < trunc_lvl);
+          if (has_deeper_tree && rvine_structure_.needed_hfunc1(t, e)) {
             result.hfunc1_deriv_u1(t, e) = Eigen::VectorXd(n);
             for (size_t p = 0; p < np; ++p) {
               result.hfunc1_deriv_pars(t, e)[p] = Eigen::VectorXd(n);
             }
           }
-          if (push && rvine_structure_.needed_hfunc2(t, e)) {
+          if (has_deeper_tree && rvine_structure_.needed_hfunc2(t, e)) {
             result.hfunc2_deriv_u2(t, e) = Eigen::VectorXd(n);
             for (size_t p = 0; p < np; ++p) {
               result.hfunc2_deriv_pars(t, e)[p] = Eigen::VectorXd(n);
@@ -1479,25 +1481,25 @@ Vinecop::scores_full(Eigen::MatrixXd u,
             const DerivCache& ce = cache(t, e);
             result.pdf_edges(t, e).segment(b.begin, b.size) = ce.c;
             if (t > 0) {
-              result.logpdf_deriv_u1(t, e).segment(b.begin, b.size) = ce.lu1;
-              result.logpdf_deriv_u2(t, e).segment(b.begin, b.size) = ce.lu2;
+              result.logpdf_deriv_u1(t, e).segment(b.begin, b.size) = ce.du1;
+              result.logpdf_deriv_u2(t, e).segment(b.begin, b.size) = ce.du2;
             }
             for (size_t p = 0; p < ce.np; ++p) {
               result.logpdf_deriv_pars(t, e)[p].segment(b.begin, b.size) =
-                ce.lpar[p];
+                ce.dpar[p];
             }
-            if (ce.o1.active) {
-              result.hfunc1_deriv_u1(t, e).segment(b.begin, b.size) = ce.o1.du1;
+            if (ce.h1.active) {
+              result.hfunc1_deriv_u1(t, e).segment(b.begin, b.size) = ce.h1.du1;
               for (size_t p = 0; p < ce.np; ++p) {
                 result.hfunc1_deriv_pars(t, e)[p].segment(b.begin, b.size) =
-                  ce.o1.dpar[p];
+                  ce.h1.dpar[p];
               }
             }
-            if (ce.o2.active) {
-              result.hfunc2_deriv_u2(t, e).segment(b.begin, b.size) = ce.o2.du2;
+            if (ce.h2.active) {
+              result.hfunc2_deriv_u2(t, e).segment(b.begin, b.size) = ce.h2.du2;
               for (size_t p = 0; p < ce.np; ++p) {
                 result.hfunc2_deriv_pars(t, e)[p].segment(b.begin, b.size) =
-                  ce.o2.dpar[p];
+                  ce.h2.dpar[p];
               }
             }
           }
@@ -1509,82 +1511,86 @@ Vinecop::scores_full(Eigen::MatrixXd u,
       // ∂/∂θ Σ_edges log c via the chain rule.
       //
       // State per tree level, indexed by storage column e:
-      //  - tilde1.col(e) / tilde2.col(e): the current first-order
+      //  - dh1.col(e) / dh2.col(e): the current first-order
       //    perturbations ∂hfunc1/∂θ and ∂hfunc2/∂θ of column e's h-function
-      //    values (hfunc1 = "indirect", hfunc2 = "direct", as in the pdf
+      //    values (hfunc1 and hfunc2, as in the pdf
       //    pass). They are seeded with ∂h/∂θ at the parameter's own edge
-      //    and updated tree by tree via ce.o1/ce.o2 (the edge's output
+      //    and updated tree by tree via ce.h1/ce.h2 (the edge's output
       //    derivative leaves).
-      //  - aff1[e] / aff2[e]: flags marking whether column e's
+      //  - h1_affected[e] / h2_affected[e]: flags marking whether column e's
       //    hfunc1/hfunc2 values are affected by θ at the current level
       //    (i.e. whether the corresponding tilde column is valid). Edges
       //    whose two input columns are both unaffected are skipped and
       //    contribute nothing.
-      Eigen::MatrixXd tilde1(b.size, d_), tilde2(b.size, d_);
-      std::vector<char> aff1(d_), aff2(d_);
+      Eigen::MatrixXd dh1(b.size, d_), dh2(b.size, d_);
+      std::vector<char> h1_affected(d_), h2_affected(d_);
       size_t ipar = 0;
       for (size_t t0 = 0; t0 < trunc_lvl; ++t0) {
         for (size_t e0 = 0; e0 < d_ - t0 - 1; ++e0) {
           const DerivCache& seed = cache(t0, e0);
           for (size_t p = 0; p < seed.np; ++p) {
-            Eigen::VectorXd sc = seed.lpar[p];
-            std::fill(aff1.begin(), aff1.end(), 0);
-            std::fill(aff2.begin(), aff2.end(), 0);
-            if (seed.o1.active) {
-              tilde1.col(e0) = seed.o1.dpar[p];
-              aff1[e0] = 1;
+            Eigen::VectorXd score = seed.dpar[p];
+            std::fill(h1_affected.begin(), h1_affected.end(), 0);
+            std::fill(h2_affected.begin(), h2_affected.end(), 0);
+            if (seed.h1.active) {
+              dh1.col(e0) = seed.h1.dpar[p];
+              h1_affected[e0] = 1;
             }
-            if (seed.o2.active) {
-              tilde2.col(e0) = seed.o2.dpar[p];
-              aff2[e0] = 1;
+            if (seed.h2.active) {
+              dh2.col(e0) = seed.h2.dpar[p];
+              h2_affected[e0] = 1;
             }
 
             for (size_t t = t0 + 1; t < trunc_lvl; ++t) {
               for (size_t e = 0; e < d_ - t - 1; ++e) {
                 const DerivCache& ce = cache(t, e);
-                size_t m = ce.msrc;
+                size_t arg2_col = ce.arg2_col;
                 // is either input argument of this edge perturbed by θ?
                 // (first argument = column e's hfunc2; second argument =
-                // column m - 1's hfunc2 or hfunc1, depending on `direct`).
-                // The proximity condition guarantees m - 1 > e, so columns
-                // read here are not yet overwritten at this tree level.
-                bool a1 = (aff2[e] != 0);
-                bool a2 = ce.direct ? (aff2[m - 1] != 0) : (aff1[m - 1] != 0);
-                if (!a1 && !a2) {
+                // column arg2_col - 1's hfunc2 or hfunc1, depending on
+                // `arg2_is_h2`). The proximity condition guarantees arg2_col -
+                // 1 > e, so columns read here are not yet overwritten at this
+                // tree level.
+                bool arg1_affected = (h2_affected[e] != 0);
+                bool arg2_affected = ce.arg2_is_h2
+                                       ? (h2_affected[arg2_col - 1] != 0)
+                                       : (h1_affected[arg2_col - 1] != 0);
+                if (!arg1_affected && !arg2_affected) {
                   // θ does not reach this edge; its outputs are unperturbed
-                  aff1[e] = 0;
-                  aff2[e] = 0;
+                  h1_affected[e] = 0;
+                  h2_affected[e] = 0;
                   continue;
                 }
-                // v1/v2 = ∂(arg1)/∂θ and ∂(arg2)/∂θ for this edge
-                Eigen::VectorXd v1 = Eigen::VectorXd::Zero(b.size);
-                Eigen::VectorXd v2 = Eigen::VectorXd::Zero(b.size);
-                if (a1) {
-                  v1 = tilde2.col(e);
+                // darg1/darg2 = ∂(arg1)/∂θ and ∂(arg2)/∂θ for this edge
+                Eigen::VectorXd darg1 = Eigen::VectorXd::Zero(b.size);
+                Eigen::VectorXd darg2 = Eigen::VectorXd::Zero(b.size);
+                if (arg1_affected) {
+                  darg1 = dh2.col(e);
                   // chain rule: this edge's log-density term responds to
                   // the perturbation of its first argument
-                  sc += ce.lu1.cwiseProduct(v1);
+                  score += ce.du1.cwiseProduct(darg1);
                 }
-                if (a2) {
-                  v2 = ce.direct ? tilde2.col(m - 1) : tilde1.col(m - 1);
-                  sc += ce.lu2.cwiseProduct(v2);
+                if (arg2_affected) {
+                  darg2 = ce.arg2_is_h2 ? dh2.col(arg2_col - 1)
+                                        : dh1.col(arg2_col - 1);
+                  score += ce.du2.cwiseProduct(darg2);
                 }
-                // push the argument perturbations through this edge's
-                // h-function outputs for the next tree level:
-                // ∂h/∂θ = ∂h/∂u1 · v1 + ∂h/∂u2 · v2
-                if (ce.o2.active) {
-                  tilde2.col(e) =
-                    propagate_first_order(ce.o2.du1, ce.o2.du2, v1, v2);
+                // has_deeper_tree the argument perturbations through this
+                // edge's h-function outputs for the next tree level: ∂h/∂θ =
+                // ∂h/∂u1 · darg1 + ∂h/∂u2 · darg2
+                if (ce.h2.active) {
+                  dh2.col(e) =
+                    propagate_first_order(ce.h2.du1, ce.h2.du2, darg1, darg2);
                 }
-                if (ce.o1.active) {
-                  tilde1.col(e) =
-                    propagate_first_order(ce.o1.du1, ce.o1.du2, v1, v2);
+                if (ce.h1.active) {
+                  dh1.col(e) =
+                    propagate_first_order(ce.h1.du1, ce.h1.du2, darg1, darg2);
                 }
-                aff1[e] = ce.o1.active ? 1 : 0;
-                aff2[e] = ce.o2.active ? 1 : 0;
+                h1_affected[e] = ce.h1.active ? 1 : 0;
+                h2_affected[e] = ce.h2.active ? 1 : 0;
               }
             }
-            result.scores.col(ipar++).segment(b.begin, b.size) = sc;
+            result.scores.col(ipar++).segment(b.begin, b.size) = score;
           }
         }
       }
@@ -1856,12 +1862,12 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
   // flat parameter index <-> (tree, edge, param), the first flat index of
   // each edge, and the per-edge per-observation output blocks
   std::vector<std::array<size_t, 3>> par_of(npars);
-  TriangularArray<size_t> par0(d_, trunc_lvl);
+  TriangularArray<size_t> edge_par0(d_, trunc_lvl);
   {
     size_t idx = 0;
     for (size_t t = 0; t < trunc_lvl; t++) {
       for (size_t e = 0; e < d_ - 1 - t; e++) {
-        par0(t, e) = idx;
+        edge_par0(t, e) = idx;
         size_t np =
           static_cast<size_t>(pair_copulas_[t][e].get_parameters().size());
         hess(t, e).resize(np);
@@ -1886,68 +1892,71 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
       const size_t m = b.size;
       auto cache = build_deriv_cache(u, b.begin, m, true);
 
-      // tilde1/tilde2 and aff1/aff2 play the same role as in the gradient
-      // cascade of scores_full: per storage column, the current first-order
-      // perturbations of the column's hfunc1/hfunc2 values w.r.t. the
-      // parameter, and flags marking which columns are affected (see the
+      // dh1/dh2 and h1_affected/h2_affected play the same role as in the
+      // gradient cascade of scores_full: per storage column, the current
+      // first-order perturbations of the column's hfunc1/hfunc2 values w.r.t.
+      // the parameter, and flags marking which columns are affected (see the
       // DerivLeaf/DerivCache documentation in class.hpp)
-      Eigen::MatrixXd tilde1(m, d_), tilde2(m, d_);
-      std::vector<char> aff1(d_), aff2(d_);
+      Eigen::MatrixXd dh1(m, d_), dh2(m, d_);
+      std::vector<char> h1_affected(d_), h2_affected(d_);
       for (size_t a = 0; a < npars; ++a) {
         size_t ta = par_of[a][0], ea = par_of[a][1], pa = par_of[a][2];
         const DerivCache& seed = cache(ta, ea);
 
         // own edge: ∂ s_{(ta,ea,cp)} / ∂θ_{(ta,ea,pa)} = ∂²logc/∂θ_pa∂θ_cp
         for (size_t cp = 0; cp < seed.np; ++cp) {
-          hess(ta, ea)[pa].block(b.begin, par0(ta, ea) + cp, m, 1) =
-            seed.lpar_par[pa][cp];
+          hess(ta, ea)[pa].block(b.begin, edge_par0(ta, ea) + cp, m, 1) =
+            seed.dpar_par[pa][cp];
         }
 
         // propagate α's first-order perturbation to the deeper edges
-        std::fill(aff1.begin(), aff1.end(), 0);
-        std::fill(aff2.begin(), aff2.end(), 0);
-        if (seed.o1.active) {
-          tilde1.col(ea) = seed.o1.dpar[pa];
-          aff1[ea] = 1;
+        std::fill(h1_affected.begin(), h1_affected.end(), 0);
+        std::fill(h2_affected.begin(), h2_affected.end(), 0);
+        if (seed.h1.active) {
+          dh1.col(ea) = seed.h1.dpar[pa];
+          h1_affected[ea] = 1;
         }
-        if (seed.o2.active) {
-          tilde2.col(ea) = seed.o2.dpar[pa];
-          aff2[ea] = 1;
+        if (seed.h2.active) {
+          dh2.col(ea) = seed.h2.dpar[pa];
+          h2_affected[ea] = 1;
         }
         for (size_t t = ta + 1; t < trunc_lvl; ++t) {
           for (size_t e = 0; e < d_ - t - 1; ++e) {
             const DerivCache& ce = cache(t, e);
-            size_t msrc = ce.msrc;
-            bool a1 = (aff2[e] != 0);
-            bool a2 = ce.direct ? (aff2[msrc - 1] != 0) : (aff1[msrc - 1] != 0);
-            if (!a1 && !a2) {
-              aff1[e] = 0;
-              aff2[e] = 0;
+            size_t arg2_col = ce.arg2_col;
+            bool arg1_affected = (h2_affected[e] != 0);
+            bool arg2_affected = ce.arg2_is_h2
+                                   ? (h2_affected[arg2_col - 1] != 0)
+                                   : (h1_affected[arg2_col - 1] != 0);
+            if (!arg1_affected && !arg2_affected) {
+              h1_affected[e] = 0;
+              h2_affected[e] = 0;
               continue;
             }
-            Eigen::VectorXd v1 = Eigen::VectorXd::Zero(m);
-            Eigen::VectorXd v2 = Eigen::VectorXd::Zero(m);
-            if (a1) {
-              v1 = tilde2.col(e);
+            Eigen::VectorXd darg1 = Eigen::VectorXd::Zero(m);
+            Eigen::VectorXd darg2 = Eigen::VectorXd::Zero(m);
+            if (arg1_affected) {
+              darg1 = dh2.col(e);
             }
-            if (a2) {
-              v2 = ce.direct ? tilde2.col(msrc - 1) : tilde1.col(msrc - 1);
+            if (arg2_affected) {
+              darg2 =
+                ce.arg2_is_h2 ? dh2.col(arg2_col - 1) : dh1.col(arg2_col - 1);
             }
             for (size_t cp = 0; cp < ce.np; ++cp) {
-              hess(ta, ea)[pa].block(b.begin, par0(t, e) + cp, m, 1) =
-                ce.lpar_u1[cp].cwiseProduct(v1) +
-                ce.lpar_u2[cp].cwiseProduct(v2);
+              hess(ta, ea)[pa].block(b.begin, edge_par0(t, e) + cp, m, 1) =
+                ce.dpar_u1[cp].cwiseProduct(darg1) +
+                ce.dpar_u2[cp].cwiseProduct(darg2);
             }
-            if (ce.o2.active) {
-              tilde2.col(e) =
-                propagate_first_order(ce.o2.du1, ce.o2.du2, v1, v2);
+            if (ce.h2.active) {
+              dh2.col(e) =
+                propagate_first_order(ce.h2.du1, ce.h2.du2, darg1, darg2);
             }
-            if (ce.o1.active) {
-              tilde1.col(e) =
-                propagate_first_order(ce.o1.du1, ce.o1.du2, v1, v2);
+            if (ce.h1.active) {
+              dh1.col(e) =
+                propagate_first_order(ce.h1.du1, ce.h1.du2, darg1, darg2);
             }
-            aff1[e] = ce.o1.active ? 1 : 0;
-            aff2[e] = ce.o2.active ? 1 : 0;
+            h1_affected[e] = ce.h1.active ? 1 : 0;
+            h2_affected[e] = ce.h2.active ? 1 : 0;
           }
         }
       }
@@ -1982,104 +1991,107 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
     //   til*[e] = ∂(column value)/∂β,
     //   bar*[e] = ∂²(column value)/∂α∂β,
     // seeded at the two parameters' own edges and pushed through each
-    // deeper edge's output leaves ce.o1/ce.o2 (see class.hpp). There are no
+    // deeper edge's output leaves ce.h1/ce.h2 (see class.hpp). There are no
     // aff flags here; unaffected columns simply carry zero vectors.
-    std::vector<Eigen::VectorXd> hat1(d_), hat2(d_), til1(d_), til2(d_),
-      bar1(d_), bar2(d_);
+    std::vector<Eigen::VectorXd> dh1_a(d_), dh2_a(d_), dh1_b(d_), dh2_b(d_),
+      d2h1(d_), d2h2(d_);
     for (size_t a = 0; a < npars; ++a) {
       size_t ta = par_of[a][0], ea = par_of[a][1], pa = par_of[a][2];
       for (size_t bfl = a; bfl < npars; ++bfl) {
         size_t tb = par_of[bfl][0], eb = par_of[bfl][1], pb = par_of[bfl][2];
 
         for (size_t col = 0; col < d_; ++col) {
-          hat1[col] = Eigen::VectorXd::Zero(m);
-          hat2[col] = Eigen::VectorXd::Zero(m);
-          til1[col] = Eigen::VectorXd::Zero(m);
-          til2[col] = Eigen::VectorXd::Zero(m);
-          bar1[col] = Eigen::VectorXd::Zero(m);
-          bar2[col] = Eigen::VectorXd::Zero(m);
+          dh1_a[col] = Eigen::VectorXd::Zero(m);
+          dh2_a[col] = Eigen::VectorXd::Zero(m);
+          dh1_b[col] = Eigen::VectorXd::Zero(m);
+          dh2_b[col] = Eigen::VectorXd::Zero(m);
+          d2h1[col] = Eigen::VectorXd::Zero(m);
+          d2h2[col] = Eigen::VectorXd::Zero(m);
         }
-        Eigen::VectorXd Hval = Eigen::VectorXd::Zero(m);
+        Eigen::VectorXd H_ab = Eigen::VectorXd::Zero(m);
 
         for (size_t t = 0; t < trunc_lvl; ++t) {
           for (size_t e = 0; e < d_ - 1 - t; ++e) {
             const DerivCache& ce = cache(t, e);
-            size_t msrc = ce.msrc;
-            bool direct = ce.direct;
-            bool isA = (t == ta) && (e == ea);
-            bool isB = (t == tb) && (e == eb);
+            size_t arg2_col = ce.arg2_col;
+            bool arg2_is_h2 = ce.arg2_is_h2;
+            bool is_edge_a = (t == ta) && (e == ea);
+            bool is_edge_b = (t == tb) && (e == eb);
 
             // input-argument perturbations (p_e from column e's hfunc2,
-            // q_e from column msrc-1's hfunc2/hfunc1). p_e's column is
+            // q_e from column arg2_col-1's hfunc2/hfunc1). p_e's column is
             // overwritten by the propagation below, so copy it by value;
-            // q_e's column (msrc-1 > e) is untouched this step.
-            Eigen::VectorXd hp = hat2[e];
-            Eigen::VectorXd tp = til2[e];
-            Eigen::VectorXd bp = bar2[e];
-            const Eigen::VectorXd& hq =
-              direct ? hat2[msrc - 1] : hat1[msrc - 1];
-            const Eigen::VectorXd& tq =
-              direct ? til2[msrc - 1] : til1[msrc - 1];
-            const Eigen::VectorXd& bq =
-              direct ? bar2[msrc - 1] : bar1[msrc - 1];
+            // q_e's column (arg2_col-1 > e) is untouched this step.
+            Eigen::VectorXd darg1_a = dh2_a[e];
+            Eigen::VectorXd darg1_b = dh2_b[e];
+            Eigen::VectorXd d2arg1 = d2h2[e];
+            const Eigen::VectorXd& darg2_a =
+              arg2_is_h2 ? dh2_a[arg2_col - 1] : dh1_a[arg2_col - 1];
+            const Eigen::VectorXd& darg2_b =
+              arg2_is_h2 ? dh2_b[arg2_col - 1] : dh1_b[arg2_col - 1];
+            const Eigen::VectorXd& d2arg2 =
+              arg2_is_h2 ? d2h2[arg2_col - 1] : d2h1[arg2_col - 1];
 
             // accumulate the Hessian contribution of this edge
-            Hval += ce.lu1u1.cwiseProduct(hp).cwiseProduct(tp);
-            Hval +=
-              ce.lu1u2.cwiseProduct(hp.cwiseProduct(tq) + hq.cwiseProduct(tp));
-            Hval += ce.lu2u2.cwiseProduct(hq).cwiseProduct(tq);
-            Hval += ce.lu1.cwiseProduct(bp) + ce.lu2.cwiseProduct(bq);
-            if (isA) {
-              Hval += ce.lpar_u1[pa].cwiseProduct(tp) +
-                      ce.lpar_u2[pa].cwiseProduct(tq);
+            H_ab += ce.du1u1.cwiseProduct(darg1_a).cwiseProduct(darg1_b);
+            H_ab += ce.du1u2.cwiseProduct(darg1_a.cwiseProduct(darg2_b) +
+                                          darg2_a.cwiseProduct(darg1_b));
+            H_ab += ce.du2u2.cwiseProduct(darg2_a).cwiseProduct(darg2_b);
+            H_ab += ce.du1.cwiseProduct(d2arg1) + ce.du2.cwiseProduct(d2arg2);
+            if (is_edge_a) {
+              H_ab += ce.dpar_u1[pa].cwiseProduct(darg1_b) +
+                      ce.dpar_u2[pa].cwiseProduct(darg2_b);
             }
-            if (isB) {
-              Hval += ce.lpar_u1[pb].cwiseProduct(hp) +
-                      ce.lpar_u2[pb].cwiseProduct(hq);
+            if (is_edge_b) {
+              H_ab += ce.dpar_u1[pb].cwiseProduct(darg1_a) +
+                      ce.dpar_u2[pb].cwiseProduct(darg2_a);
             }
-            if (isA && isB) {
-              Hval += ce.lpar_par[pa][pb];
+            if (is_edge_a && is_edge_b) {
+              H_ab += ce.dpar_par[pa][pb];
             }
 
             // propagate the perturbations to this edge's h-function outputs:
             // hat/til are first order (propagate_first_order), bar is second
-            auto propagate = [&](const DerivLeaf& o,
-                                 Eigen::VectorXd& oh,
-                                 Eigen::VectorXd& ot,
-                                 Eigen::VectorXd& ob) {
-              oh = propagate_first_order(o.du1, o.du2, hp, hq);
-              ot = propagate_first_order(o.du1, o.du2, tp, tq);
-              ob = o.du1u1.cwiseProduct(hp).cwiseProduct(tp) +
-                   o.du1u2.cwiseProduct(hp.cwiseProduct(tq) +
-                                        hq.cwiseProduct(tp)) +
-                   o.du2u2.cwiseProduct(hq).cwiseProduct(tq) +
-                   o.du1.cwiseProduct(bp) + o.du2.cwiseProduct(bq);
-              if (isA) {
-                oh += o.dpar[pa];
-                ob += o.dpar_u1[pa].cwiseProduct(tp) +
-                      o.dpar_u2[pa].cwiseProduct(tq);
+            auto propagate = [&](const DerivLeaf& leaf,
+                                 Eigen::VectorXd& out_a,
+                                 Eigen::VectorXd& out_b,
+                                 Eigen::VectorXd& out_ab) {
+              out_a =
+                propagate_first_order(leaf.du1, leaf.du2, darg1_a, darg2_a);
+              out_b =
+                propagate_first_order(leaf.du1, leaf.du2, darg1_b, darg2_b);
+              out_ab = leaf.du1u1.cwiseProduct(darg1_a).cwiseProduct(darg1_b) +
+                       leaf.du1u2.cwiseProduct(darg1_a.cwiseProduct(darg2_b) +
+                                               darg2_a.cwiseProduct(darg1_b)) +
+                       leaf.du2u2.cwiseProduct(darg2_a).cwiseProduct(darg2_b) +
+                       leaf.du1.cwiseProduct(d2arg1) +
+                       leaf.du2.cwiseProduct(d2arg2);
+              if (is_edge_a) {
+                out_a += leaf.dpar[pa];
+                out_ab += leaf.dpar_u1[pa].cwiseProduct(darg1_b) +
+                          leaf.dpar_u2[pa].cwiseProduct(darg2_b);
               }
-              if (isB) {
-                ot += o.dpar[pb];
-                ob += o.dpar_u1[pb].cwiseProduct(hp) +
-                      o.dpar_u2[pb].cwiseProduct(hq);
+              if (is_edge_b) {
+                out_b += leaf.dpar[pb];
+                out_ab += leaf.dpar_u1[pb].cwiseProduct(darg1_a) +
+                          leaf.dpar_u2[pb].cwiseProduct(darg2_a);
               }
-              if (isA && isB) {
-                ob += o.dpar_par[pa][pb];
+              if (is_edge_a && is_edge_b) {
+                out_ab += leaf.dpar_par[pa][pb];
               }
             };
-            if (ce.o2.active) {
-              propagate(ce.o2, hat2[e], til2[e], bar2[e]);
+            if (ce.h2.active) {
+              propagate(ce.h2, dh2_a[e], dh2_b[e], d2h2[e]);
             }
-            if (ce.o1.active) {
-              propagate(ce.o1, hat1[e], til1[e], bar1[e]);
+            if (ce.h1.active) {
+              propagate(ce.h1, dh1_a[e], dh1_b[e], d2h1[e]);
             }
           }
         }
 
-        hess(ta, ea)[pa].block(b.begin, bfl, m, 1) = Hval;
+        hess(ta, ea)[pa].block(b.begin, bfl, m, 1) = H_ab;
         if (a != bfl) {
-          hess(tb, eb)[pb].block(b.begin, a, m, 1) = Hval;
+          hess(tb, eb)[pb].block(b.begin, a, m, 1) = H_ab;
         }
       }
     }
@@ -2586,7 +2598,7 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   size_t d = d_;
 
   Eigen::MatrixXd U_vine = u.leftCols(d); // output matrix
-  //                   (direct + indirect)    (U_vine)       (info matrices)
+  //                   (hfunc1 + hfunc2)      (U_vine)       (info matrices)
   size_t bytes_required = (8 * 2 * n * d * d) + (8 * n * d) + (4 * 4 * d * d);
   // if the problem is too large (requires more than 1 GB memory), split
   // the data into two halves and call simulate on the reduced data.
