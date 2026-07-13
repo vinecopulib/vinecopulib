@@ -233,9 +233,30 @@ public:
   void truncate(size_t trunc_lvl);
 
   std::string str(const std::vector<size_t>& trees = {}) const;
+
+  struct ScoresResult
+  {
+    Eigen::MatrixXd scores;
+    TriangularArray<Eigen::VectorXd> pdf_edges;
+    TriangularArray<std::vector<Eigen::VectorXd>> logpdf_deriv_pars;
+    TriangularArray<std::vector<Eigen::VectorXd>> hfunc1_deriv_pars;
+    TriangularArray<std::vector<Eigen::VectorXd>> hfunc2_deriv_pars;
+    TriangularArray<Eigen::VectorXd> logpdf_deriv_u1;
+    TriangularArray<Eigen::VectorXd> logpdf_deriv_u2;
+    TriangularArray<Eigen::VectorXd> hfunc1_deriv_u1;
+    TriangularArray<Eigen::VectorXd> hfunc2_deriv_u2;
+  };
+
+  ScoresResult scores_full(Eigen::MatrixXd u,
+                           bool step_wise = true,
+                           const size_t num_threads = 1,
+                           const bool keep_all = true);
   Eigen::MatrixXd scores(Eigen::MatrixXd u,
                          bool step_wise = true,
                          const size_t num_threads = 1);
+  Eigen::VectorXd gradient(Eigen::MatrixXd u,
+                           bool step_wise = true,
+                           const size_t num_threads = 1);
   Eigen::MatrixXd hessian(Eigen::MatrixXd u,
                           bool step_wise = true,
                           const size_t num_threads = 1);
@@ -246,6 +267,66 @@ public:
   Eigen::MatrixXd scores_cov(Eigen::MatrixXd u,
                              bool step_wise = true,
                              const size_t num_threads = 1);
+
+private:
+  // Per-edge derivative caches shared by the analytic score/gradient/Hessian
+  // cascades. One forward walk over the vine (build_deriv_cache) fills them;
+  // the cascades then only read them.
+  //
+  // Each edge's pair copula c(u1, u2) consumes two arguments produced by the
+  // previous tree and produces (up to) two h-function outputs consumed by
+  // deeper trees: hfunc1 = P(u2 <= . | u1) and hfunc2 = P(u1 <= . | u2).
+  // A DerivLeaf holds the derivatives of ONE such h-function output; it is
+  // what the chain rule propagates through when a parameter perturbation
+  // travels from its own edge to the deeper edges that (indirectly) depend
+  // on it. For an h-function output, `du1`/`du2` are ∂h/∂u1, ∂h/∂u2 (one of
+  // them equals the copula density `c` by the identity ∂h2/∂u1 = ∂h1/∂u2 =
+  // c).
+  struct DerivLeaf
+  {
+    Eigen::VectorXd du1, du2;          // ∂h/∂u1, ∂h/∂u2
+    std::vector<Eigen::VectorXd> dpar; // ∂h/∂θ_p (cascade seed)
+    // second-order (only when requested):
+    Eigen::VectorXd du1u1, du1u2, du2u2;           // ∂²h/∂{u1²,u1u2,u2²}
+    std::vector<Eigen::VectorXd> dpar_u1, dpar_u2; // ∂²h/∂θ_p∂{u1,u2}
+    std::vector<std::vector<Eigen::VectorXd>> dpar_par; // ∂²h/∂θ_p∂θ_q
+    // whether any deeper tree consumes this h-function output (from the
+    // structure's needed_hfunc1/2 masks); inactive leaves are left empty
+    // and the cascades skip them
+    bool active{ false };
+  };
+  // All derivative data of one edge: the log-density derivatives (du*/dpar*,
+  // used for the score/Hessian contributions of the edge itself) plus the
+  // two output leaves `h1` (its hfunc1 output) and `h2` (its hfunc2 output)
+  // through which perturbations propagate to deeper trees. `arg2_col` is this
+  // edge's min_array entry: the storage column of the previous tree that
+  // provides the edge's second argument; `arg2_is_h2` says whether that
+  // argument is that column's hfunc2 (true) or hfunc1 (false) value —
+  // mirroring how the pdf/rosenblatt passes assemble their arguments.
+  // (The du*/dpar* here are derivatives of `log c`; the identically named
+  // fields of `DerivLeaf` are derivatives of an h-function `h`.)
+  struct DerivCache
+  {
+    size_t np{ 0 }, arg2_col{ 0 };
+    bool arg2_is_h2{ false };
+    Eigen::VectorXd c, du1, du2;       // c, ∂logc/∂u1, ∂logc/∂u2
+    std::vector<Eigen::VectorXd> dpar; // ∂logc/∂θ_p (step-wise score)
+    // second-order log-density (only when requested):
+    Eigen::VectorXd du1u1, du1u2, du2u2;
+    std::vector<Eigen::VectorXd> dpar_u1, dpar_u2;
+    std::vector<std::vector<Eigen::VectorXd>> dpar_par;
+    DerivLeaf h1, h2; // the edge's hfunc1 and hfunc2 output leaves
+  };
+  // one forward walk over the rows [begin, begin + size) of `u`, filling the
+  // per-edge derivative caches (second-order fields only when `second_order`).
+  TriangularArray<DerivCache> build_deriv_cache(const Eigen::MatrixXd& u,
+                                                size_t begin,
+                                                size_t size,
+                                                bool second_order) const;
+
+  // throws if any pair copula is nonparametric (differentiating w.r.t. an
+  // interpolation grid is meaningless); `fn` names the calling method.
+  void check_parametric(const char* fn) const;
 
 protected:
   size_t d_{ 1 };

@@ -2,6 +2,28 @@
 
 ### NEW FEATURES
 
+* Add analytic derivatives of the copula density and h-functions with respect
+  to the parameters and arguments: `Bicop::pdf_deriv`, `pdf_deriv2`,
+  `hfunc1_deriv`, `hfunc1_deriv2`, `hfunc2_deriv`, `hfunc2_deriv2`,
+  `logpdf_deriv`, and `logpdf_deriv2` (with per-row-parameter overloads),
+  using closed forms for the families in `bicop_families::analytic_derivs`
+  (indep, gaussian, student, clayton, gumbel, frank, joe; feature parity with
+  VineCopula's `BiCopDeriv`/`BiCopDeriv2`/`BiCopHfuncDeriv`/`BiCopHfuncDeriv2`)
+  and internal central finite differences for the other parametric families.
+  `Vinecop::scores` and `Vinecop::hessian` now use them, all computed
+  analytically through a shared per-edge derivative cascade: the step-wise
+  scores differentiate each edge's log-density, the full gradient is an
+  RVineGrad-style cascade through the vine, and both the joint (non-step-wise)
+  and step-wise Hessians are analytic (the joint one à la VineCopula's
+  `RVineHessian`; Stoeber & Schepsmeier, 2013), falling back to finite
+  differences only for models with discrete variables. Models with
+  nonparametric (TLL) pair copulas are now rejected by `scores`/`hessian`
+  (differentiating w.r.t. an interpolation grid is meaningless). New
+  `Vinecop::scores_full` exposes the per-edge derivative caches behind the
+  scores (`keep_all` option, mirroring `pdf`/`pdf_full`), and
+  `Vinecop::gradient` returns the observation-average of the scores
+  (mirroring how `hessian` averages
+  `hessian_full`) (#683)
 * Speed up `Vinecop` evaluation and structure selection: no per-edge
   `Bicop` deep copies in `inverse_rosenblatt`, in-place data collapsing with
   lazy discrete sub-buffers, parallel allocation-free Monte-Carlo `cdf`, and
@@ -35,7 +57,7 @@
 * Add `Bicop::parameters_to_taildep()`/`Bicop::get_taildep()` to compute the tail
   dependence coefficients (returned as a 2x2 matrix collecting all four corners of
   the unit square) and `Bicop::parameters_to_beta()`/`Bicop::get_beta()` to compute
-  Blomqvist's beta, analogous to VineCopula's `BiCopPar2TailDep`/`BiCopPar2Beta` (#XXX).
+  Blomqvist's beta, analogous to VineCopula's `BiCopPar2TailDep`/`BiCopPar2Beta` (#682).
 * Add per-row-parameter overloads of `Bicop::pdf`, `cdf`, `hfunc1`, `hfunc2`, `hinv1`, `hinv2`,
   and `loglik` that evaluate a bivariate copula at a different parameter set per row of `u` in a
   single (optionally multi-threaded) call. The new overloads take an `n x p` matrix of parameters

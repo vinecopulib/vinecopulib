@@ -34,6 +34,10 @@ jobs:
     env:
       BOOST_VERSION: 1.84.0
       EIGEN_VERSION: 3.4.0
+      # Authenticate remotes::install_github against the GitHub API using the
+      # automatic Actions token instead of the rate-limited bundled PAT (the
+      # VineCopula >= 2.6.2 install below, and any test-time fallback, need it).
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     runs-on: ${{ matrix.cfg.os }}
     name:    ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
