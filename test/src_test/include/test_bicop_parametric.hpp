@@ -142,7 +142,7 @@ TEST_P(ParBicopTest, parametric_bicop_is_correct)
     EXPECT_ANY_THROW(bicop_.aic());
     EXPECT_ANY_THROW(bicop_.bic());
     EXPECT_ANY_THROW(bicop_.mbic());
-    EXPECT_NO_THROW(bicop_.simulate(10, true));
+    EXPECT_NO_THROW(bicop_.simulate(10, true, { 1 }));
     EXPECT_NO_THROW(bicop_.str());
     if ((bicop_.get_parameters().size() > 1) &&
         (bicop_.get_family() != BicopFamily::student)) {
@@ -168,7 +168,7 @@ TEST_P(ParBicopTest, bicop_select_mle_bic_is_correct)
     "bic");
 
   if (needs_check_) {
-    auto data = bicop_.simulate(get_n());
+    auto data = bicop_.simulate(get_n(), false, { 1 });
     auto bicop = Bicop(data, controls);
     EXPECT_EQ(bicop.loglik(data), bicop.get_loglik()) << bicop_.str();
 
@@ -212,7 +212,7 @@ TEST_P(ParBicopTest, bicop_select_itau_bic_is_correct)
       "bic");
 
     if (needs_check_) {
-      auto data = bicop_.simulate(get_n());
+      auto data = bicop_.simulate(get_n(), false, { 1 });
       auto bicop = Bicop(data, controls);
       auto selected_family = bicop.get_family_name();
       EXPECT_EQ(selected_family, true_family)

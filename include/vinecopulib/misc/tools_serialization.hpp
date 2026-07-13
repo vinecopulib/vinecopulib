@@ -8,6 +8,7 @@
 
 #include <Eigen/Dense>
 #include <fstream>
+#include <stdexcept>
 #include <vector>
 #include <vinecopulib/misc/nlohmann_json.hpp>
 #include <vinecopulib/misc/triangular_array.hpp>
@@ -15,6 +16,20 @@
 namespace vinecopulib {
 
 namespace tools_serialization {
+
+//! @brief Whether a filename selects the binary CBOR encoding.
+//!
+//! CBOR is a binary encoding of the same logical `nlohmann::json`
+//! representation; filenames ending in `.cbor` use it, all others use JSON.
+inline bool
+is_cbor_filename(const std::string& filename)
+{
+  const std::string extension = ".cbor";
+  return filename.size() >= extension.size() &&
+         filename.compare(filename.size() - extension.size(),
+                          extension.size(),
+                          extension) == 0;
+}
 
 //! conversion from Eigen::Matrix to nlohmann::json
 //!
@@ -85,20 +100,61 @@ json_to_vector(const nlohmann::json& input)
   return res;
 }
 
+//! @brief Reads a `nlohmann::json` from a JSON or CBOR file.
+//!
+//! Files ending in `.cbor` are read as CBOR, all others as JSON.
 inline nlohmann::json
 file_to_json(const std::string& filename)
 {
-  nlohmann::json output;
-  std::ifstream file(filename);
-  file >> output;
-  return output;
+  const bool cbor = is_cbor_filename(filename);
+  auto mode = std::ios::in;
+  if (cbor) {
+    mode |= std::ios::binary;
+  }
+  std::ifstream file(filename, mode);
+  if (!file.is_open()) {
+    throw std::runtime_error("could not open " + filename + " for reading");
+  }
+
+  try {
+    if (cbor) {
+      return nlohmann::json::from_cbor(file);
+    }
+    nlohmann::json output;
+    file >> output;
+    return output;
+  } catch (const nlohmann::json::exception& exception) {
+    throw std::runtime_error("failed to parse " +
+                             std::string(cbor ? "CBOR" : "JSON") + " file " +
+                             filename + ": " + exception.what());
+  }
 }
 
+//! @brief Writes a `nlohmann::json` to a JSON or CBOR file.
+//!
+//! Filenames ending in `.cbor` are written as CBOR, all others as JSON.
 inline void
 json_to_file(const std::string& filename, const nlohmann::json& json)
 {
-  std::ofstream file(filename);
-  file << json << std::endl;
+  const bool cbor = is_cbor_filename(filename);
+  auto mode = std::ios::out;
+  if (cbor) {
+    mode |= std::ios::binary;
+  }
+  std::ofstream file(filename, mode);
+  if (!file.is_open()) {
+    throw std::runtime_error("could not open " + filename + " for writing");
+  }
+
+  if (cbor) {
+    nlohmann::json::to_cbor(json, file);
+  } else {
+    file << json << std::endl;
+  }
+  file.flush();
+  if (!file) {
+    throw std::runtime_error("failed to write " + filename);
+  }
 }
 }
 }

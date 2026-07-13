@@ -335,6 +335,7 @@ protected:
   double loglik_{ NAN };
   size_t nobs_{ 0 };
   mutable std::vector<std::string> var_types_;
+  mutable int n_discrete_{ 0 };
 
   void check_data_dim(const Eigen::MatrixXd& data) const;
   void check_data(const Eigen::MatrixXd& data) const;
@@ -353,6 +354,7 @@ protected:
   int get_n_discrete() const;
   bool is_discrete() const;
   Eigen::MatrixXd collapse_data(const Eigen::MatrixXd& u) const;
+  void collapse_data_inplace(Eigen::MatrixXd& u) const;
 };
 }
 

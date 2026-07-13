@@ -266,10 +266,29 @@ TEST(rvine_structure, rvine_struct_sanity_checks_work)
   EXPECT_ANY_THROW(rvm = RVineStructure(wrong_mat));
 }
 
+TEST(rvine_structure, proximity_condition_large_d)
+{
+  // exercise the proximity check in a higher dimension than the 7x7 case
+  // above, including the error path
+  const size_t d = 70;
+  auto mat = CVineStructure(tools_stl::seq_int(1, d)).get_matrix();
+
+  // a valid structure must pass the check
+  EXPECT_NO_THROW(RVineStructure{ mat }); // check = true by default
+
+  // swapping two non-antidiagonal entries within a column keeps the column's
+  // value set and the diagonal intact, so only the proximity check rejects it
+  // (raises the "proximity condition violated" error)
+  auto wrong_mat = mat;
+  std::swap(wrong_mat(0, 0), wrong_mat(2, 0));
+  EXPECT_ANY_THROW(RVineStructure{ wrong_mat });
+}
+
 TEST(rvine_structure, random_sampling)
 {
   for (size_t i = 0; i < 20; i++) {
-    RVineStructure test = RVineStructure::simulate(10);
+    RVineStructure test =
+      RVineStructure::simulate(10, false, { static_cast<int>(i + 1) });
   }
 }
 
