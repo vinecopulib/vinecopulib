@@ -106,9 +106,12 @@
 
 ### MAINTENANCE, BUILD, AND DOCS
 
-* Collapse the internal bivariate-copula evaluation leaves to a single
-  parameter-aware interface (removing the duplicated state-based primitives),
-  so each family implements its math once (#675)
+* Speed up the Student t log-density parameter scores (`logpdf_deriv` w.r.t.
+  the degrees of freedom): the degrees-of-freedom-only quantities (digamma,
+  beta, the distribution object, and `nu^(nu/2-1)`) are now computed once per
+  call instead of once per observation. Algebraically identical (the
+  analytic-vs-finite-difference and R-parity tests are unchanged); this speeds
+  up `Vinecop::scores`/`hessian` and t maximum-likelihood fitting (#693)
 
 * Improve Python-binding API docs for property getters/setters (#670)
 
