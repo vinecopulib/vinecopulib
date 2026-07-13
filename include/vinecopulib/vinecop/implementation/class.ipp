@@ -1145,10 +1145,10 @@ Vinecop::check_parametric(const char* fn) const
 //! first-order chain-rule push-forward of an argument perturbation through an
 //! h-function output, `∂h/∂u1 · v1 + ∂h/∂u2 · v2`, written directly into `out`
 //! (a vector or a matrix column). Shared by the gradient cascade and the
-//! Hessian's hat/til propagations. `out` is a coefficient-wise assignment
-//! target distinct from every operand at all call sites, so writing in place
-//! needs no aliasing temporary and avoids a returned `VectorXd` in the hot
-//! loops.
+//! Hessian's `dh*_a`/`dh*_b` propagations. `out` is a coefficient-wise
+//! assignment target distinct from every operand at all call sites, so
+//! writing in place needs no aliasing temporary and avoids a returned
+//! `VectorXd` in the hot loops.
 inline void
 propagate_first_order_into(Eigen::Ref<Eigen::VectorXd> out,
                            const Eigen::VectorXd& du1,
@@ -1524,7 +1524,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
       //    derivative leaves).
       //  - h1_affected[e] / h2_affected[e]: flags marking whether column e's
       //    hfunc1/hfunc2 values are affected by θ at the current level
-      //    (i.e. whether the corresponding tilde column is valid). Edges
+      //    (i.e. whether the corresponding dh1/dh2 column is valid). Edges
       //    whose two input columns are both unaffected are skipped and
       //    contribute nothing.
       Eigen::MatrixXd dh1(b.size, d_), dh2(b.size, d_);
@@ -1896,7 +1896,7 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
     //   ∂²logc_{e'}/∂θ_{p'}∂u1 · P^α + ∂²logc/∂θ_{p'}∂u2 · Q^α   (deeper e'),
     // where P^α, Q^α are the first-order perturbations of e''s arguments,
     // propagated by the same cascade as the gradient. No second-order
-    // ("bar") propagation is needed. Upper-triangular in the flat order.
+    // (`d2h*`) propagation is needed. Upper-triangular in the flat order.
     auto do_batch = [&](const tools_batch::Batch& b) {
       const size_t m = b.size;
       auto cache = build_deriv_cache(u, b.begin, m, true);

@@ -180,7 +180,8 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   auto oldpars = this->get_parameters();
   auto old_types = var_types_;
   this->set_parameters(parameters);
-  var_types_ = { "c", "c" };
+  // go through the setter to keep the all_continuous_ cache coherent
+  this->set_var_types({ "c", "c" });
 
   std::vector<int> seeds = {
     204967043, 733593603, 184618802, 399707801, 290266245
@@ -189,7 +190,7 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   u.col(1) = hinv1_raw(u, Eigen::MatrixXd());
 
   this->set_parameters(oldpars);
-  var_types_ = old_types;
+  this->set_var_types(old_types);
   return wdm::wdm(u, "tau")(0, 1);
 }
 
