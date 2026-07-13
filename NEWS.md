@@ -2,6 +2,12 @@
 
 ### NEW FEATURES
 
+* Speed up `Vinecop` evaluation and structure selection: no per-edge
+  `Bicop` deep copies in `inverse_rosenblatt`, in-place data collapsing with
+  lazy discrete sub-buffers, parallel allocation-free Monte-Carlo `cdf`, and
+  selection fast paths (NaN-free criterion, moved h-function storage, final
+  tree h-functions skipped, in-place candidate fits). `pdf_full` no longer
+  fills `hfunc*_sub` with duplicated continuous h-functions (#692).
 * Speed up TLL fitting and evaluation: fused conditional-cdf interpolation
   (single pass, no per-query allocation), direct closed-form inversion of the
   conditional cdf replacing 35-sweep bisection, bucket-accelerated cell
