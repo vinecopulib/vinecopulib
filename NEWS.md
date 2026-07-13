@@ -2,6 +2,18 @@
 
 ### NEW FEATURES
 
+* Add the exact argument gradient of the density for the nonparametric **TLL**
+  family: `Bicop::pdf_deriv(u, "u1")`/`"u2"` (and `logpdf_deriv`) now return the
+  closed-form slope of the bilinear interpolation grid instead of throwing,
+  backed by the new `InterpolationGrid::gradient`. Derivatives with respect to
+  the grid values, all second-order derivatives, and the h-function derivatives
+  remain undefined for TLL and throw with a clear message; `tll` is not added to
+  `bicop_families::analytic_derivs`, and `Vinecop::scores`/`hessian` still reject
+  TLL pair copulas. Internally, the finite-difference derivative fallback moved
+  from `ParBicop` up to `AbstractBicop`, so it is shared by every family (each
+  controlling its own step clamping through the parameter-bound getters);
+  parametric families are unaffected, as their closed forms still take
+  precedence (#694).
 * Extend the analytic copula-derivative leaves (`Bicop::pdf_deriv`,
   `pdf_deriv2`, `hfunc1_deriv`, `hfunc1_deriv2`, `hfunc2_deriv`,
   `hfunc2_deriv2`, `logpdf_deriv`, `logpdf_deriv2`) to the **BB1, BB6, BB7, BB8,
