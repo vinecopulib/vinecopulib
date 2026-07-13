@@ -116,69 +116,6 @@ qt(const Eigen::MatrixXd& x, double nu)
   return tools_eigen::unaryExpr_or_nan(x, f);
 }
 
-//! @brief Incomplete beta function ratio \f$ I_x(p, q) \f$ and its first two
-//! derivatives w.r.t. \f$ p \f$.
-//!
-//! Implements the continued-fraction algorithm of Boik and Robinson-Cox
-//! (1998), ported from the VineCopula C sources (`incompleteBeta.c`).
-//!
-//! @param x Evaluation point in \f$ [0, 1] \f$.
-//! @param p First shape parameter.
-//! @param q Second shape parameter.
-//!
-//! @return The vector \f$ (I_x(p, q), \partial_p I_x(p, q),
-//! \partial_p^2 I_x(p, q)) \f$.
-//!
-//! @literature
-//! Boik, R. J. and Robinson-Cox, J. F. (1998). Derivatives of the incomplete
-//! beta function. Journal of Statistical Software 3(1).
-Eigen::Vector3d
-inbeder(double x, double p, double q);
-
-//! @brief Derivative of the Student t quantile w.r.t. the degrees of freedom.
-//!
-//! Computes \f$ \partial_\nu t_\nu^{-1}(u) \f$ at \f$ x = t_\nu^{-1}(u) \f$
-//! (holding the probability level \f$ u \f$ fixed). Ported from VineCopula
-//! `tcopuladeriv_new.c` (`diffX_nu_tCopula`).
-double
-dqt_dnu(double x, double nu);
-
-//! @brief Second derivative of the Student t quantile w.r.t. the degrees of
-//! freedom (see `dqt_dnu()`); ported from VineCopula `tcopuladeriv_new.c`
-//! (`diff2_x_nu`).
-double
-d2qt_dnu2(double x, double nu);
-
-//! @brief Derivative of the Student t distribution function w.r.t. the
-//! degrees of freedom, \f$ \partial_\nu T_\nu(x) \f$; ported from VineCopula
-//! `tcopuladeriv_new.c` (`diff_t_nu`).
-double
-dpt_dnu(double x, double nu);
-
-//! @brief Second derivative of the Student t distribution function w.r.t.
-//! the degrees of freedom, \f$ \partial_\nu^2 T_\nu(x) \f$; ported from
-//! VineCopula `tcopuladeriv_new.c` (`diff_t_nu_nu`).
-double
-d2pt_dnu2(double x, double nu);
-
-//! @brief Derivative of the Student t density w.r.t. its argument,
-//! \f$ \partial_x t_\nu(x) \f$; ported from VineCopula
-//! `tcopuladeriv_new.c` (`diff_dt_x`).
-double
-ddt_dx(double x, double nu);
-
-//! @brief Derivative of the Student t density w.r.t. the degrees of freedom,
-//! \f$ \partial_\nu t_\nu(x) \f$; ported from VineCopula
-//! `tcopuladeriv_new.c` (`diff_dt_nu`).
-double
-ddt_dnu(double x, double nu);
-
-//! @brief Logarithmic derivative of the Student t density w.r.t. its
-//! argument, \f$ \partial_x \log t_\nu(x) \f$; ported from VineCopula
-//! `tcopuladeriv_new.c` (`diff_dt_u`).
-double
-dlogdt_dx(double x, double nu);
-
 Eigen::MatrixXd
 simulate_uniform(const size_t& n,
                  const size_t& d,
