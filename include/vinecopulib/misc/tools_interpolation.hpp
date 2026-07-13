@@ -34,6 +34,10 @@ public:
 
   Eigen::VectorXd interpolate(const tools_eigen::ConstMatRef& x);
 
+  //! partial derivative of the bilinear interpolant w.r.t. one coordinate.
+  //! @param var 0 for the first coordinate (rows), 1 for the second (columns).
+  Eigen::VectorXd gradient(const tools_eigen::ConstMatRef& x, size_t var);
+
   Eigen::VectorXd integrate_1d(const tools_eigen::ConstMatRef& u,
                                size_t cond_var);
 

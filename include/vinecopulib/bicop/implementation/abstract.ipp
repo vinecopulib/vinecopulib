@@ -5,6 +5,7 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include <algorithm>
+#include <cmath>
 #include <stdexcept>
 
 #include <vinecopulib/bicop/bb1.hpp>
@@ -475,63 +476,133 @@ AbstractBicop::hinv2_num_raw(const Eigen::MatrixXd& u,
 
 //! @name Derivative leaves (defaults)
 //!
-//! Nonparametric families have no analytical derivatives; ParBicop overrides
-//! these with finite-difference fallbacks and analytic families override
-//! those in turn.
+//! The defaults difference the value leaves by central finite differences, so
+//! every family with parameter bounds and value leaves supports the derivative
+//! interface out of the box; the second-order versions difference the
+//! (possibly analytic) first-derivative leaves. Analytic families override
+//! these with closed forms; nonparametric families override where finite
+//! differences are meaningless. Steps are clipped to the parameter bounds /
+//! the unit interval, with the effective step kept in the denominator.
 //! @{
 
+//! differentiates `f` w.r.t. component `comp` (0-based parameter index, `-1`
+//! for the first argument, `-2` for the second) by central differences.
 inline Eigen::VectorXd
-AbstractBicop::pdf_deriv_raw(const Eigen::MatrixXd&,
-                             const Eigen::MatrixXd&,
-                             const std::string&)
+AbstractBicop::fd_deriv(
+  const std::function<Eigen::VectorXd(const Eigen::MatrixXd&,
+                                      const Eigen::MatrixXd&)>& f,
+  const Eigen::MatrixXd& u,
+  const Eigen::MatrixXd& parameters,
+  int comp)
 {
-  throw std::runtime_error("derivatives are not implemented for the " +
-                           get_family_name() + " copula");
+  if (comp >= 0) {
+    Eigen::MatrixXd par_plus = parameters;
+    Eigen::MatrixXd par_minus = parameters;
+    // each family controls its own clamping through the bound getters
+    Eigen::MatrixXd lb_bounds = get_parameters_lower_bounds();
+    Eigen::MatrixXd ub_bounds = get_parameters_upper_bounds();
+    double lb = lb_bounds(comp);
+    double ub = ub_bounds(comp);
+    for (Eigen::Index i = 0; i < parameters.rows(); ++i) {
+      double par = parameters(i, comp);
+      double eps = 1e-4 * std::max(1.0, std::fabs(par));
+      par_plus(i, comp) = std::min(par + eps, ub);
+      par_minus(i, comp) = std::max(par - eps, lb);
+    }
+    Eigen::VectorXd diff = f(u, par_plus) - f(u, par_minus);
+    if (parameters.rows() == 1) {
+      return diff / (par_plus(0, comp) - par_minus(0, comp));
+    }
+    Eigen::ArrayXd eps = (par_plus.col(comp) - par_minus.col(comp)).array();
+    return (diff.array() / eps).matrix();
+  }
+
+  // argument derivative; stay strictly inside the unit interval
+  Eigen::Index col = (comp == -1) ? 0 : 1;
+  Eigen::MatrixXd u_plus = u;
+  Eigen::MatrixXd u_minus = u;
+  u_plus.col(col) = (u.col(col).array() + 1e-5).min(1 - 1e-10);
+  u_minus.col(col) = (u.col(col).array() - 1e-5).max(1e-10);
+  Eigen::ArrayXd eps = u_plus.col(col).array() - u_minus.col(col).array();
+  return ((f(u_plus, parameters) - f(u_minus, parameters)).array() / eps)
+    .matrix();
 }
 
 inline Eigen::VectorXd
-AbstractBicop::pdf_deriv2_raw(const Eigen::MatrixXd&,
-                              const Eigen::MatrixXd&,
-                              const std::string&)
+AbstractBicop::pdf_deriv_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters,
+                             const std::string& deriv)
 {
-  throw std::runtime_error("derivatives are not implemented for the " +
-                           get_family_name() + " copula");
+  auto comps = tools_deriv::parse_components(deriv);
+  auto f = [this](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
+    return pdf_raw(uu, pp);
+  };
+  return fd_deriv(f, u, parameters, comps[0]);
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hfunc1_deriv_raw(const Eigen::MatrixXd&,
-                                const Eigen::MatrixXd&,
-                                const std::string&)
+AbstractBicop::pdf_deriv2_raw(const Eigen::MatrixXd& u,
+                              const Eigen::MatrixXd& parameters,
+                              const std::string& deriv)
 {
-  throw std::runtime_error("derivatives are not implemented for the " +
-                           get_family_name() + " copula");
+  // difference the first-derivative leaf w.r.t. the second component; this
+  // uses the analytic first derivative when the family provides one
+  auto comps = tools_deriv::parse_components(deriv);
+  auto first = tools_deriv::comp_to_string(comps[0]);
+  auto f = [this, first](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
+    return pdf_deriv_raw(uu, pp, first);
+  };
+  return fd_deriv(f, u, parameters, comps[1]);
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hfunc1_deriv2_raw(const Eigen::MatrixXd&,
-                                 const Eigen::MatrixXd&,
-                                 const std::string&)
+AbstractBicop::hfunc1_deriv_raw(const Eigen::MatrixXd& u,
+                                const Eigen::MatrixXd& parameters,
+                                const std::string& deriv)
 {
-  throw std::runtime_error("derivatives are not implemented for the " +
-                           get_family_name() + " copula");
+  auto comps = tools_deriv::parse_components(deriv);
+  auto f = [this](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
+    return hfunc1_raw(uu, pp);
+  };
+  return fd_deriv(f, u, parameters, comps[0]);
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hfunc2_deriv_raw(const Eigen::MatrixXd&,
-                                const Eigen::MatrixXd&,
-                                const std::string&)
+AbstractBicop::hfunc1_deriv2_raw(const Eigen::MatrixXd& u,
+                                 const Eigen::MatrixXd& parameters,
+                                 const std::string& deriv)
 {
-  throw std::runtime_error("derivatives are not implemented for the " +
-                           get_family_name() + " copula");
+  auto comps = tools_deriv::parse_components(deriv);
+  auto first = tools_deriv::comp_to_string(comps[0]);
+  auto f = [this, first](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
+    return hfunc1_deriv_raw(uu, pp, first);
+  };
+  return fd_deriv(f, u, parameters, comps[1]);
 }
 
 inline Eigen::VectorXd
-AbstractBicop::hfunc2_deriv2_raw(const Eigen::MatrixXd&,
-                                 const Eigen::MatrixXd&,
-                                 const std::string&)
+AbstractBicop::hfunc2_deriv_raw(const Eigen::MatrixXd& u,
+                                const Eigen::MatrixXd& parameters,
+                                const std::string& deriv)
 {
-  throw std::runtime_error("derivatives are not implemented for the " +
-                           get_family_name() + " copula");
+  auto comps = tools_deriv::parse_components(deriv);
+  auto f = [this](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
+    return hfunc2_raw(uu, pp);
+  };
+  return fd_deriv(f, u, parameters, comps[0]);
+}
+
+inline Eigen::VectorXd
+AbstractBicop::hfunc2_deriv2_raw(const Eigen::MatrixXd& u,
+                                 const Eigen::MatrixXd& parameters,
+                                 const std::string& deriv)
+{
+  auto comps = tools_deriv::parse_components(deriv);
+  auto first = tools_deriv::comp_to_string(comps[0]);
+  auto f = [this, first](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
+    return hfunc2_deriv_raw(uu, pp, first);
+  };
+  return fd_deriv(f, u, parameters, comps[1]);
 }
 
 inline Eigen::VectorXd

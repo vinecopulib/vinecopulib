@@ -757,13 +757,21 @@ TEST(BicopDerivatives, selector_and_family_validation)
   Eigen::MatrixXd u(2, 2);
   u << 0.3, 0.4, 0.5, 0.6;
 
-  // nonparametric families have no derivatives
+  // the nonparametric tll exposes only the exact argument gradient of its
+  // density; parameter, second-order, and h-function derivatives throw. The
+  // default tll grid is the independence copula (a spatially flat density), so
+  // the gradient (and hence the logpdf gradient) is identically zero.
   Bicop tll(BicopFamily::tll);
-  EXPECT_ANY_THROW(tll.pdf_deriv(u, "u1"));
-  EXPECT_ANY_THROW(tll.pdf_deriv2(u, "u1u1"));
-  EXPECT_ANY_THROW(tll.hfunc1_deriv(u, "u1"));
+  EXPECT_TRUE(
+    all_close(tll.pdf_deriv(u, "u1"), Eigen::VectorXd::Zero(2), 1e-10, 1e-10));
+  EXPECT_TRUE(
+    all_close(tll.pdf_deriv(u, "u2"), Eigen::VectorXd::Zero(2), 1e-10, 1e-10));
+  EXPECT_TRUE(all_close(
+    tll.logpdf_deriv(u, "u1"), Eigen::VectorXd::Zero(2), 1e-10, 1e-10));
+  EXPECT_ANY_THROW(tll.pdf_deriv(u, "par1"));  // grid derivatives undefined
+  EXPECT_ANY_THROW(tll.pdf_deriv2(u, "u1u1")); // no meaningful second order
+  EXPECT_ANY_THROW(tll.hfunc1_deriv(u, "u1")); // h-function derivs not exposed
   EXPECT_ANY_THROW(tll.hfunc2_deriv(u, "u2"));
-  EXPECT_ANY_THROW(tll.logpdf_deriv(u, "u1"));
 
   Bicop cl(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 2.0));
 

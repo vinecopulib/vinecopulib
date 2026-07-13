@@ -1060,12 +1060,17 @@ Bicop::logpdf_deriv2(const Eigen::MatrixXd& u,
 }
 //! @}
 
-//! checks that derivatives are available for the model (parametric family,
-//! continuous variable types).
+//! checks that derivatives are available for the model (a family that
+//! implements them, continuous variable types).
 inline void
 Bicop::check_deriv_preconditions() const
 {
-  if (!tools_stl::is_member(get_family(), bicop_families::parametric)) {
+  // parametric families implement the full derivative interface; the
+  // nonparametric tll exposes only the exact argument gradient of its density
+  // (its leaves throw for parameter, second-order, and h-function selectors).
+  // Any other family has no derivatives at all.
+  if (!tools_stl::is_member(get_family(), bicop_families::parametric) &&
+      (get_family() != BicopFamily::tll)) {
     throw std::runtime_error("derivatives are not implemented for the " +
                              get_family_name() + " copula");
   }
