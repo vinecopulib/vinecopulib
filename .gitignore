@@ -87,3 +87,7 @@ build*/
 # and scripts/compare_parity.py); tracked JSON such as scripts/parity_gates.json
 # and .zenodo.json is intentionally not ignored
 bench_results/
+
+# Python bytecode (tools/derivs codegen)
+__pycache__/
+*.pyc

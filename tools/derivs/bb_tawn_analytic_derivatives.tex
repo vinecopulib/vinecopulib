@@ -1,0 +1,496 @@
+\documentclass[10pt]{article}
+
+\usepackage[a4paper,margin=1.8cm]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs,tabularx,array}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\setlist{nosep,leftmargin=*}
+\newcommand{\ind}{\mathbf{1}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\e}{\mathrm{e}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\T}{\mathcal{T}}
+\newcommand{\D}{\mathcal{D}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\parone}{\eta_1}
+\newcommand{\partwo}{\eta_2}
+\newcommand{\parthree}{\eta_3}
+
+\title{Analytic derivatives for the BB and Tawn bivariate copulas in \texttt{vinecopulib}}
+\author{}
+\date{11 July 2026}
+
+\begin{document}
+\maketitle
+\vspace{-2.2em}
+
+\paragraph{Scope.}
+This note gives exact, implementation-ready formulas for the unrotated BB1, BB6,
+BB7, BB8, and Tawn copulas in the parameterizations used by
+\texttt{vinecopulib}.  It covers the copula $C$, the two library h-functions
+$h_1=C_u$ and $h_2=C_v$, the density $c=C_{uv}$, and every first- and
+second-order derivative of $c,h_1,h_2$ with respect to their arguments and
+parameters.  Thus it covers the selectors accepted by
+\texttt{pdf\_deriv}, \texttt{pdf\_deriv2},
+\texttt{hfunc1\_deriv}, \texttt{hfunc1\_deriv2},
+\texttt{hfunc2\_deriv}, and \texttt{hfunc2\_deriv2}; derivatives of
+$\log c$ follow at no additional cost.  Rotations are not repeated here,
+because the public \texttt{Bicop} facade already applies their chain rules.
+
+\section{Coordinates and derivative selectors}
+
+Let
+$ x=(u,v,\eta_1,\ldots,\eta_p) $ and write $D_i=\partial/\partial x_i$.
+The correspondence with the library is
+\texttt{u1}$\leftrightarrow u$, \texttt{u2}$\leftrightarrow v$, and
+\texttt{par}$r\leftrightarrow\eta_r$.  For any positive scalar function $f$,
+write
+\begin{align*}
+D_i\log f &= \frac{D_i f}{f},
+&
+D_{ij}\log f &= \frac{D_{ij}f}{f}-\frac{D_i f\,D_j f}{f^2},\\
+D_i f &= f\,D_i\log f,
+&
+D_{ij}f &= f\{D_{ij}\log f+(D_i\log f)(D_j\log f)\}.
+\end{align*}
+These identities are used repeatedly below and are numerically preferable to
+fully expanded expressions.
+
+\section{BB1, BB6, BB7, and BB8}
+
+\subsection{Generators, copulas, h-functions, and densities}
+
+All four families are strict Archimedean copulas on the interior of their
+parameter spaces.  With decreasing generator $\phi$ and inverse $q=\phi^{-1}$,
+set
+\begin{align*}
+s &= \phi(u;\eta)+\phi(v;\eta),
+&
+w &= q(s;\eta)=C(u,v;\eta).
+\end{align*}
+The parameterizations in \texttt{vinecopulib} are as follows.  The ``code
+range'' records the finite bounds currently used by the implementation; the
+formulas below concern the mathematical interior, with boundary cases obtained
+by continuity.
+
+\renewcommand{\arraystretch}{1.25}
+\begin{center}
+\small
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}p{2.3cm}X X@{}}
+\toprule
+Family & Parameters / code range & $\phi(z)$ & $q(s)$ \\
+\midrule
+BB1
+& $\theta>0,\ \delta\ge1$; $[0,7]\times[1,7]$
+& $(z^{-\theta}-1)^\delta$
+& $(1+s^{1/\delta})^{-1/\theta}$ \\
+BB6
+& $\theta\ge1,\ \delta\ge1$; $[1,6]\times[1,8]$
+& $\{-\log[1-(1-z)^\theta]\}^\delta$
+& $1-\{1-\exp(-s^{1/\delta})\}^{1/\theta}$ \\
+BB7
+& $\theta\ge1,\ \delta>0$; $[1,6]\times[0.01,25]$
+& $[1-(1-z)^\theta]^{-\delta}-1$
+& $1-\{1-(1+s)^{-1/\delta}\}^{1/\theta}$ \\
+BB8
+& $\theta\ge1,\ 0<\delta\le1$; $[1,8]\times[10^{-4},1]$
+& $-\log\!\left\{\dfrac{1-(1-\delta z)^\theta}{1-(1-\delta)^\theta}\right\}$
+& $\dfrac{1-\{1-\kappa\exp(-s)\}^{1/\theta}}{\delta}$,
+$\ \kappa=1-(1-\delta)^\theta$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Differentiating $\phi(w)=\phi(u)+\phi(v)$ gives the exact formulas used by the
+Archimedean implementation:
+\begin{align*}
+h_1(u,v;\eta) &= C_u=\frac{\phi_z(u)}{\phi_z(w)},\\
+h_2(u,v;\eta) &= C_v=\frac{\phi_z(v)}{\phi_z(w)},\\
+c(u,v;\eta) &= C_{uv}
+=-\frac{\phi_z(u)\phi_z(v)\phi_{zz}(w)}{\phi_z(w)^3}.
+\end{align*}
+
+\subsection{A universal exact derivative calculus}
+
+For a scalar $f(z,\eta)$ evaluated at a scalar map $z=z(x)$, define
+$e_i^a=\ind\{x_i=\eta_a\}$ and
+\begin{align*}
+\T_i[f;z]
+&=f_z z_i+\sum_a f_a e_i^a,\\
+\T_{ij}[f;z]
+&=f_{zz}z_i z_j+f_z z_{ij}
+ +\sum_a f_{za}(z_i e_j^a+z_j e_i^a)
+ +\sum_{a,b}f_{ab}e_i^a e_j^b.
+\end{align*}
+For $z=u$ and $z=v$,
+\begin{align*}
+u_i&=\ind\{x_i=u\},&u_{ij}&=0,
+&v_i&=\ind\{x_i=v\},&v_{ij}&=0.
+\end{align*}
+For $z=w=C(u,v;\eta)$, implicit differentiation gives
+\begin{align*}
+w_i
+&=\frac{\T_i[\phi;u]+\T_i[\phi;v]-\sum_a\phi_a(w)e_i^a}
+        {\phi_z(w)},\\
+w_{ij}
+&=\frac{\T_{ij}[\phi;u]+\T_{ij}[\phi;v]-R_{ij}^{(w)}}
+        {\phi_z(w)},\\
+R_{ij}^{(w)}
+&=\phi_{zz}(w)w_iw_j
+ +\sum_a\phi_{za}(w)(w_i e_j^a+w_j e_i^a)
+ +\sum_{a,b}\phi_{ab}(w)e_i^a e_j^b.
+\end{align*}
+Hence $C_i=w_i$ and $C_{ij}=w_{ij}$.
+
+Now define the two scalar log-building blocks
+\begin{align*}
+G(z,\eta)&=\log[-\phi_z(z;\eta)],
+&
+R(z,\eta)&=\log \phi_{zz}(z;\eta).
+\end{align*}
+Then
+\begin{align*}
+H_1&=\log h_1=G(u)-G(w),\\
+H_2&=\log h_2=G(v)-G(w),\\
+L&=\log c=G(u)+G(v)+R(w)-3G(w).
+\end{align*}
+All requested first- and second-order derivatives are therefore
+\begin{align*}
+(H_1)_i
+&=\T_i[G;u]-\T_i[G;w],\\
+(H_1)_{ij}
+&=\T_{ij}[G;u]-\T_{ij}[G;w],\\
+(H_2)_i
+&=\T_i[G;v]-\T_i[G;w],\\
+(H_2)_{ij}
+&=\T_{ij}[G;v]-\T_{ij}[G;w],\\
+L_i
+&=\T_i[G;u]+\T_i[G;v]+\T_i[R;w]-3\T_i[G;w],\\
+L_{ij}
+&=\T_{ij}[G;u]+\T_{ij}[G;v]+\T_{ij}[R;w]-3\T_{ij}[G;w],\\
+D_i h_k
+&=h_k(H_k)_i,\\
+D_{ij}h_k
+&=h_k\{(H_k)_{ij}+(H_k)_i(H_k)_j\},\qquad k\in\{1,2\},\\
+D_i c
+&=cL_i,\\
+D_{ij}c
+&=c\{L_{ij}+L_iL_j\}.
+\end{align*}
+In particular, the analytic log-density leaves are simply
+$D_i\log c=L_i$ and $D_{ij}\log c=L_{ij}$.
+
+The partial derivatives of $G$ and $R$ required by $\T_i$ and $\T_{ij}$ are
+obtained from derivatives of $\phi$.  With $g=\phi_z$ and $r=\phi_{zz}$,
+\begin{align*}
+G_z&=\frac{r}{g},
+&G_{zz}&=\frac{\phi_{zzz}}{g}-\left(\frac{r}{g}\right)^2,\\
+G_a&=\frac{\phi_{za}}{g},
+&G_{za}&=\frac{\phi_{zza}}{g}-\frac{r\phi_{za}}{g^2},\\
+G_{ab}&=\frac{\phi_{zab}}{g}-\frac{\phi_{za}\phi_{zb}}{g^2},\\[0.2em]
+R_z&=\frac{\phi_{zzz}}{r},
+&R_{zz}&=\frac{\phi_{zzzz}}{r}-\left(\frac{\phi_{zzz}}{r}\right)^2,\\
+R_a&=\frac{\phi_{zza}}{r},
+&R_{za}&=\frac{\phi_{zzza}}{r}-\frac{\phi_{zzz}\phi_{zza}}{r^2},\\
+R_{ab}&=\frac{\phi_{zzab}}{r}-\frac{\phi_{zza}\phi_{zzb}}{r^2}.
+\end{align*}
+Thus only generator derivatives $\partial_z^k\partial_\eta^\alpha\phi$ with
+$k\le4$ and $|\alpha|\le2$ are needed.
+
+\subsection{Exact generator jets without expanded expressions}
+
+The required generator derivatives are most compactly evaluated as finite
+multivariate jets.  For a multi-index $\alpha$, let $f_\alpha=\partial^\alpha f$,
+$\binom{\alpha}{\beta}=\prod_j\binom{\alpha_j}{\beta_j}$, and $e_j$ denote a
+unit multi-index.  If $f=\exp(g)$, then
+\begin{align*}
+f_{\alpha+e_j}
+=\sum_{\beta\le\alpha}\binom{\alpha}{\beta}
+ f_\beta g_{\alpha-\beta+e_j}.
+\end{align*}
+If $g=\log f$, the same identity can be solved for the highest derivative:
+\begin{align*}
+g_{\alpha+e_j}
+=\frac{f_{\alpha+e_j}
+ -\displaystyle\sum_{0<\beta\le\alpha}\binom{\alpha}{\beta}
+ f_\beta g_{\alpha-\beta+e_j}}{f}.
+\end{align*}
+Products use the multivariate Leibniz rule
+\begin{align*}
+(fg)_\alpha
+=\sum_{\beta\le\alpha}\binom{\alpha}{\beta}f_\beta g_{\alpha-\beta}.
+\end{align*}
+Applying these identities to the following log-domain representations gives
+all generator partials exactly, without finite differences or unmanageably long
+CAS expansions:
+\begin{align*}
+\text{BB1:}\quad
+&\phi=\exp(q),
+&q&=\delta\log\{\exp(-\theta\log z)-1\},\\
+\text{BB6:}\quad
+&\phi=\exp(q),
+&q&=\delta\log\{-\log[1-\exp\{\theta\log(1-z)\}]\},\\
+\text{BB7:}\quad
+&\phi=\exp(q)-1,
+&q&=-\delta\log[1-\exp\{\theta\log(1-z)\}],\\
+\text{BB8:}\quad
+&\phi=-\log[1-\exp\{\theta\log(1-\delta z)\}]
+ +\log[1-\exp\{\theta\log(1-\delta)\}].
+\end{align*}
+For the pure $z$ derivatives of an exponential, the first four cases reduce to
+\begin{align*}
+(\e^q)'&=\e^q q',\\
+(\e^q)''&=\e^q(q''+q'^2),\\
+(\e^q)'''&=\e^q(q'''+3q'q''+q'^3),\\
+(\e^q)''''&=\e^q(q''''+4q'q'''+3q''^2+6q'^2q''+q'^4).
+\end{align*}
+The multivariate recurrence is preferable in code because it simultaneously
+produces the mixed parameter derivatives needed above.
+
+\section{Tawn copula}
+
+\subsection{Pickands function, copula, h-functions, and density}
+
+The implementation uses parameters
+$\eta=(\psi_1,\psi_2,\theta)$ with
+$0\le\psi_1,\psi_2\le1$ and $\theta\ge1$; the code bounds $\theta$ by $60$.
+Let
+\begin{align*}
+a&=-\log u,
+&b&=-\log v,
+&r&=a+b,
+&t&=\frac{b}{r},\\
+S&=(\psi_2t)^\theta+[\psi_1(1-t)]^\theta,\\
+A(t)&=(1-\psi_1)(1-t)+(1-\psi_2)t+S^{1/\theta}.
+\end{align*}
+Write $A_k=\partial_t^k A$.  Define
+\begin{align*}
+P&=A_0-tA_1,
+&Q&=A_0+(1-t)A_1,
+&d&=t(1-t),\\
+B&=PQ+\frac{dA_2}{r}.
+\end{align*}
+Then the formulas implemented by the extreme-value base class are
+\begin{align*}
+C(u,v;\eta)&=\exp[-rA(t)],\\
+h_1=C_u&=\frac{CP}{u},\\
+h_2=C_v&=\frac{CQ}{v},\\
+c=C_{uv}&=\frac{CB}{uv}.
+\end{align*}
+Equivalently,
+\begin{align*}
+B
+=A^2+(1-2t)AA_1-t(1-t)A_1^2+\frac{t(1-t)}{r}A_2,
+\end{align*}
+which is the source expression after using $\log(uv)=-r$.
+
+For reference, let
+\begin{align*}
+x&=\psi_2t,
+&y&=\psi_1(1-t),\\
+M&=\psi_2x^{\theta-1}-\psi_1y^{\theta-1},\\
+N&=\psi_2^2x^{\theta-2}+\psi_1^2y^{\theta-2},\\
+O&=\psi_2^3x^{\theta-3}-\psi_1^3y^{\theta-3},\\
+J&=\psi_2^4x^{\theta-4}+\psi_1^4y^{\theta-4},
+&q&=\frac1\theta.
+\end{align*}
+The argument derivatives needed below are
+\begin{align*}
+A_1
+&=\psi_1-\psi_2+S^{q-1}M,\\
+A_2
+&=(\theta-1)\{S^{q-1}N-S^{q-2}M^2\},\\
+A_3
+&=(\theta-1)\{(2\theta-1)S^{q-3}M^3
+ -3(\theta-1)S^{q-2}MN
+ +(\theta-2)S^{q-1}O\},\\
+A_4
+&=(\theta-1)\{-(2\theta-1)(3\theta-1)S^{q-4}M^4
+ +6(\theta-1)(2\theta-1)S^{q-3}M^2N\\
+&\hspace{4.3em}
+ -3(\theta-1)^2S^{q-2}N^2
+ -4(\theta-1)(\theta-2)S^{q-2}MO
+ +(\theta-2)(\theta-3)S^{q-1}J\}.
+\end{align*}
+
+\subsection{Coordinate pullback}
+
+For $x_i\in\{u,v,\psi_1,\psi_2,\theta\}$, define
+\begin{align*}
+a_i&=-\frac{\ind\{x_i=u\}}{u},
+&a_{ij}&=\frac{\ind\{x_i=u\}\ind\{x_j=u\}}{u^2},\\
+b_i&=-\frac{\ind\{x_i=v\}}{v},
+&b_{ij}&=\frac{\ind\{x_i=v\}\ind\{x_j=v\}}{v^2},\\
+r_i&=a_i+b_i,
+&r_{ij}&=a_{ij}+b_{ij},\\
+t_i&=\frac{b_i-tr_i}{r},\\
+t_{ij}&=\frac{b_{ij}-t_jr_i-t_ir_j-tr_{ij}}{r}.
+\end{align*}
+For any scalar $F(r,t,\eta)$, define
+\begin{align*}
+\D_iF
+&=F_r r_i+F_t t_i+\sum_aF_a e_i^a,\\
+\D_{ij}F
+&=F_{rr}r_ir_j+F_{rt}(r_it_j+t_ir_j)+F_{tt}t_it_j
+ +F_r r_{ij}+F_t t_{ij}\\
+&\quad
+ +\sum_aF_{ra}(r_ie_j^a+r_je_i^a)
+ +\sum_aF_{ta}(t_ie_j^a+t_je_i^a)
+ +\sum_{a,b}F_{ab}e_i^ae_j^b.
+\end{align*}
+
+Set $E=-rA_0$.  The required base derivatives are
+\begin{align*}
+E_r&=-A_0,&E_t&=-rA_1,&E_a&=-rA_{0,a},\\
+E_{rr}&=0,&E_{rt}&=-A_1,&E_{ra}&=-A_{0,a},\\
+E_{tt}&=-rA_2,&E_{ta}&=-rA_{1,a},&E_{ab}&=-rA_{0,ab},
+\end{align*}
+\begin{align*}
+P_r&=0,&P_t&=-tA_2,&P_a&=A_{0,a}-tA_{1,a},\\
+P_{rr}&=P_{rt}=P_{ra}=0,
+&P_{tt}&=-A_2-tA_3,\\
+P_{ta}&=-tA_{2,a},
+&P_{ab}&=A_{0,ab}-tA_{1,ab},
+\end{align*}
+\begin{align*}
+Q_r&=0,&Q_t&=(1-t)A_2,&Q_a&=A_{0,a}+(1-t)A_{1,a},\\
+Q_{rr}&=Q_{rt}=Q_{ra}=0,
+&Q_{tt}&=-A_2+(1-t)A_3,\\
+Q_{ta}&=(1-t)A_{2,a},
+&Q_{ab}&=A_{0,ab}+(1-t)A_{1,ab}.
+\end{align*}
+Writing $d'=1-2t$ and $d''=-2$, the derivatives of
+$B=PQ+dA_2/r$ are
+\begin{align*}
+B_r
+&=-\frac{dA_2}{r^2},\\
+B_t
+&=P_tQ+PQ_t+\frac{d'A_2+dA_3}{r},\\
+B_a
+&=P_aQ+PQ_a+\frac{dA_{2,a}}{r},\\
+B_{rr}
+&=\frac{2dA_2}{r^3},\\
+B_{rt}
+&=-\frac{d'A_2+dA_3}{r^2},\\
+B_{ra}
+&=-\frac{dA_{2,a}}{r^2},\\
+B_{tt}
+&=P_{tt}Q+2P_tQ_t+PQ_{tt}
+ +\frac{d''A_2+2d'A_3+dA_4}{r},\\
+B_{ta}
+&=P_{ta}Q+P_tQ_a+P_aQ_t+PQ_{ta}
+ +\frac{d'A_{2,a}+dA_{3,a}}{r},\\
+B_{ab}
+&=P_{ab}Q+P_aQ_b+P_bQ_a+PQ_{ab}
+ +\frac{dA_{2,ab}}{r}.
+\end{align*}
+
+Define the log-values
+\begin{align*}
+\Lambda_1&=\log h_1=E+\log P+a,\\
+\Lambda_2&=\log h_2=E+\log Q+b,\\
+L&=\log c=E+\log B+a+b.
+\end{align*}
+For $F\in\{P,Q,B\}$, write
+\begin{align*}
+\mathcal{L}_i(F)&=\frac{\D_iF}{F},\\
+\mathcal{L}_{ij}(F)&=\frac{\D_{ij}F}{F}
+ -\frac{(\D_iF)(\D_jF)}{F^2}.
+\end{align*}
+Then every requested derivative is given by
+\begin{align*}
+(\Lambda_1)_i
+&=\D_iE+\mathcal{L}_i(P)+a_i,\\
+(\Lambda_1)_{ij}
+&=\D_{ij}E+\mathcal{L}_{ij}(P)+a_{ij},\\
+(\Lambda_2)_i
+&=\D_iE+\mathcal{L}_i(Q)+b_i,\\
+(\Lambda_2)_{ij}
+&=\D_{ij}E+\mathcal{L}_{ij}(Q)+b_{ij},\\
+L_i
+&=\D_iE+\mathcal{L}_i(B)+a_i+b_i,\\
+L_{ij}
+&=\D_{ij}E+\mathcal{L}_{ij}(B)+a_{ij}+b_{ij},\\
+D_i h_k
+&=h_k(\Lambda_k)_i,\\
+D_{ij}h_k
+&=h_k\{(\Lambda_k)_{ij}+(\Lambda_k)_i(\Lambda_k)_j\},\\
+D_i c
+&=cL_i,\\
+D_{ij}c
+&=c\{L_{ij}+L_iL_j\}.
+\end{align*}
+The copula derivatives themselves are
+\begin{align*}
+D_iC&=C\D_iE,
+&D_{ij}C&=C\{\D_{ij}E+(\D_iE)(\D_jE)\}.
+\end{align*}
+
+\subsection{Exact parameter derivatives of the Pickands function}
+
+The preceding formulas require
+$A_{k,a}$ and $A_{k,ab}$ for $0\le k\le3$ and $0\le k\le2$,
+respectively.  They are obtained exactly from
+\begin{align*}
+X&=\exp\{\theta(\log\psi_2+\log t)\},\\
+Y&=\exp\{\theta(\log\psi_1+\log(1-t))\},\\
+S&=X+Y,\\
+q&=\theta^{-1}\log S,\\
+R&=\exp(q),\\
+A&=(1-\psi_1)(1-t)+(1-\psi_2)t+R,
+\end{align*}
+using the multivariate exponential, logarithm, and product recurrences stated
+in Section 2.3.  Only indices satisfying
+$\alpha_t\le4$ and
+$\alpha_{\psi_1}+\alpha_{\psi_2}+\alpha_\theta\le2$ need be retained.
+This is an analytic forward jet, not numerical differentiation.  At
+$\psi_i=0$, evaluate the continuous limits of
+$\psi_i^\theta\log^m\psi_i$ (zero for $\theta>0$) rather than forming
+$\log0$.
+
+\section{Implementation remarks}
+
+\begin{itemize}
+\item The formulas are for the unrotated leaves.  Existing rotation handling
+      supplies argument swaps and signs, while Tawn flipping exchanges
+      $\psi_1$ and $\psi_2$.
+\item Evaluate the primitive generators in the same stable forms as the current
+      source: \texttt{log1p} and \texttt{expm1} for BB6/BB8 and log-domain
+      products for small probabilities.
+\item At independence or other parameter boundaries, use analytic limits or the
+      existing boundary dispatch; interior formulas contain removable
+      singularities such as $1/\theta$ for the BB1 limit $\theta\downarrow0$.
+\item The identities for $C,h_1,h_2,c$ and the displayed $A_1,\ldots,A_4$
+      were numerically checked at interior parameter values against automatic
+      differentiation to double precision.
+\end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{SchepsmeierStoeber2014}
+U.~Schepsmeier and J.~St\"ober.
+\newblock Derivatives and Fisher information of bivariate copulas.
+\newblock \emph{Statistical Papers}, 55:525--542, 2014.
+\newblock \href{https://doi.org/10.1007/s00362-013-0498-x}{doi:10.1007/s00362-013-0498-x}.
+
+\bibitem{SchepsmeierStoeberSupplement}
+U.~Schepsmeier and J.~St\"ober.
+\newblock Web supplement: Derivatives and Fisher information of bivariate copulas.
+
+\bibitem{Joe2014}
+H.~Joe.
+\newblock \emph{Dependence Modeling with Copulas}.
+\newblock CRC Press, 2014.
+
+\bibitem{vinecopulib}
+T.~Nagler and T.~Vatter.
+\newblock \texttt{vinecopulib}: a C++ library for vine copula models.
+\newblock Source parameterizations inspected on branch \texttt{bicop-derivs},
+11 July 2026.
+\end{thebibliography}
+
+\end{document}

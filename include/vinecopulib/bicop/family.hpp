@@ -176,7 +176,8 @@ const std::vector<BicopFamily> itau = {
 const std::vector<BicopFamily> analytic_derivs = {
   BicopFamily::indep,   BicopFamily::gaussian, BicopFamily::student,
   BicopFamily::clayton, BicopFamily::gumbel,   BicopFamily::frank,
-  BicopFamily::joe
+  BicopFamily::joe,     BicopFamily::bb1,      BicopFamily::bb6,
+  BicopFamily::bb7,     BicopFamily::bb8,      BicopFamily::tawn
 };
 
 } // end of namespace BicopFamilies

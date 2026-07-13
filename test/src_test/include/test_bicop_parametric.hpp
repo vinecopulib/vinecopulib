@@ -802,6 +802,42 @@ TEST(BicopDerivatives, selector_and_family_validation)
     ind.hfunc1_deriv(u, "u2"), Eigen::VectorXd::Ones(2), 1e-10, 1e-10));
 }
 
+// Boundary-parameter smoke check: the BB/Tawn analytic leaves clamp degenerate
+// parameters (BB8 delta->1, Tawn psi_i->0, BB1 theta->0) so derivatives stay
+// finite where the interior formulas hit removable singularities. The
+// finite-difference test cannot see this (it clamps parameters off the bounds).
+TEST(BicopDerivatives, boundary_params_finite)
+{
+  Eigen::MatrixXd u(4, 2);
+  u << 0.2, 0.7, 0.4, 0.4, 0.6, 0.3, 0.8, 0.9;
+
+  auto finite_at_boundary = [&u](const Bicop& c) {
+    for (const std::string& d : { std::string("par1"), std::string("u1") }) {
+      EXPECT_TRUE(c.pdf_deriv(u, d).allFinite())
+        << c.get_family_name() << " " << d;
+      EXPECT_TRUE(c.hfunc1_deriv(u, d).allFinite())
+        << c.get_family_name() << " " << d;
+    }
+    EXPECT_TRUE(c.pdf_deriv2(u, "par1par1").allFinite()) << c.get_family_name();
+    EXPECT_TRUE(c.hfunc2_deriv(u, "par1").allFinite()) << c.get_family_name();
+    EXPECT_TRUE(c.logpdf_deriv(u, "par1").allFinite()) << c.get_family_name();
+  };
+
+  Eigen::VectorXd bb8(2);
+  bb8 << 2.0, 1.0; // delta at its upper bound (BB8 degenerates to Joe)
+  finite_at_boundary(Bicop(BicopFamily::bb8, 0, bb8));
+
+  Eigen::VectorXd tawn(3);
+  tawn << 0.0, 0.5, 3.0; // psi1 at its lower bound
+  finite_at_boundary(Bicop(BicopFamily::tawn, 0, tawn));
+  tawn << 0.5, 0.0, 3.0; // psi2 at its lower bound
+  finite_at_boundary(Bicop(BicopFamily::tawn, 0, tawn));
+
+  Eigen::VectorXd bb1(2);
+  bb1 << 0.0, 1.5; // theta at its lower bound
+  finite_at_boundary(Bicop(BicopFamily::bb1, 0, bb1));
+}
+
 // Test that nonparametric families reject per-row parameters
 TEST(BicopPerRowParameters, tll_throws)
 {
