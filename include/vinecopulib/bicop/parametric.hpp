@@ -22,6 +22,8 @@ protected:
   // Getters and setters
   Eigen::MatrixXd get_parameters() const;
 
+  const Eigen::MatrixXd& parameters_row() const override;
+
   Eigen::MatrixXd get_parameters_lower_bounds() const;
 
   Eigen::MatrixXd get_parameters_upper_bounds() const;

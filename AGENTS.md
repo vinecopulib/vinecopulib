@@ -103,7 +103,7 @@ Three design principles inform the rest of this file:
 ## API stability & releases
 
 `vinecopulib` follows **semantic versioning** (`MAJOR.MINOR.PATCH`;
-currently 0.7.3). Because the R and Python interfaces pin a tag of this
+see [version.hpp](include/vinecopulib/version.hpp) for the current version). Because the R and Python interfaces pin a tag of this
 repo, public-API changes are real breaks for downstream users.
 
 - **Record every change in [NEWS.md](NEWS.md).** Each release has
@@ -112,9 +112,9 @@ repo, public-API changes are real breaks for downstream users.
   There is no separate `CHANGELOG.md`.
 - **Bump both version macros in
   [version.hpp](include/vinecopulib/version.hpp)** on release:
-  `VINECOPULIB_VERSION` (encoded integer, `000703` for 0.7.3 —
+  `VINECOPULIB_VERSION` (encoded integer, e.g. `000800` for 0.8.0 —
   `major*100000 + minor*100 + patch`) and `VINECOPULIB_LIB_VERSION`
-  (string, `"0_7_3"`).
+  (string, e.g. `"0_8"`).
 - **Prefer deprecation over a hard break.** The `DEPRECATED` macro
   (defined in
   [vinecop/fit_controls.hpp](include/vinecopulib/vinecop/fit_controls.hpp))

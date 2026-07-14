@@ -36,8 +36,24 @@ private:
     const Eigen::Ref<const Eigen::VectorXd>& parameters);
 
   // pdf
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
-                          const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd pdf_raw(const tools_eigen::ConstMatRef& u,
+                          const tools_eigen::ConstMatRef& parameters);
+  Eigen::VectorXd log_pdf_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
+
+  Eigen::VectorXd hfunc1_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
+
+  Eigen::VectorXd hfunc2_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
+
+  Eigen::VectorXd hfunc_internal(
+    const Eigen::Ref<const Eigen::VectorXd>& ucond,
+    const Eigen::Ref<const Eigen::VectorXd>& uother,
+    const tools_eigen::ConstMatRef& parameters) const;
 
   // analytic derivatives (ported from the VineCopula R package)
   Eigen::VectorXd pdf_deriv_raw(const Eigen::MatrixXd& u,
@@ -65,8 +81,8 @@ private:
                                     const std::string& deriv);
 
   // inverse hfunction
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hinv1_raw(const tools_eigen::ConstMatRef& u,
+                            const tools_eigen::ConstMatRef& parameters);
 
   // link between Kendall's tau and the par_bicop parameter
   Eigen::MatrixXd tau_to_parameters(const double& tau);

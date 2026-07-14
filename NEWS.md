@@ -2,6 +2,18 @@
 
 ### NEW FEATURES
 
+* Speed up the bivariate copula evaluation engine: all internal evaluation
+  leaves take `Eigen::Ref` (`tools_eigen::ConstMatRef`), removing an n x 2
+  copy on every `pdf`/`hfunc`/`hinv`/`cdf` call; a new `log_pdf_raw` pathway
+  avoids the exp-then-log round trip per optimizer iteration; vectorized
+  densities and closed-form vectorized h-functions/cdfs (written as
+  shared-log `exp` forms, faster than both scalar `pow` and Eigen's
+  `generic_pow` on every tested microarchitecture) replace the
+  per-element generator paths for Clayton/Gumbel/Frank/Joe/BB1-8 and the
+  extreme-value families; a closed-form Frank h-inverse and
+  safeguarded-Newton inverses replace 35-sweep bisections; and the
+  analytic derivative cascade reuses its buffers (`Vinecop::hessian` a few
+  percent faster, allocation-free inner loops) (#681)
 * Add the exact argument gradient of the density for the nonparametric **TLL**
   family: `Bicop::pdf_deriv(u, "u1")`/`"u2"` (and `logpdf_deriv`) now return the
   closed-form slope of the bilinear interpolation grid instead of throwing,

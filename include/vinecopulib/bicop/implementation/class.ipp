@@ -207,8 +207,8 @@ inline Eigen::VectorXd
 Bicop::cdf(const Eigen::MatrixXd& u) const
 {
   check_data(u);
-  Eigen::VectorXd p = bicop_->cdf(prep_for_abstract(u).leftCols(2),
-                                  bicop_->get_parameters().transpose());
+  Eigen::VectorXd p =
+    bicop_->cdf(prep_for_abstract(u).leftCols(2), bicop_->parameters_row());
   switch (rotation_) {
     default:
       return p;
@@ -1787,6 +1787,28 @@ Bicop::fit(const Eigen::MatrixXd& data, const FitControlsBicop& controls)
   nobs_ = data_no_nan.rows();
 }
 
+//! (private) fit on data that is already validated, NaN-free, and trimmed
+//! (as guaranteed inside `select()`); skips the re-checks and the full data
+//! copy of the public `fit()`.
+inline void
+Bicop::fit_internal(const Eigen::MatrixXd& clean_data,
+                    const FitControlsBicop& controls,
+                    const Eigen::VectorXd& weights)
+{
+  std::string method;
+  if (tools_stl::is_member(bicop_->get_family(), bicop_families::parametric)) {
+    method = controls.get_parametric_method();
+  } else {
+    method = controls.get_nonparametric_method();
+  }
+  bicop_->fit(prep_for_abstract(clean_data),
+              method,
+              controls.get_nonparametric_mult(),
+              controls.get_nonparametric_grid_size(),
+              weights);
+  nobs_ = clean_data.rows();
+}
+
 //
 
 //! @brief Selects the best fitting model.
@@ -1835,35 +1857,39 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
     }
 
     // Estimate all models and select the best one using the
-    // selection_criterion
+    // selection_criterion; loop invariants (which the getters would
+    // otherwise copy per candidate) are hoisted out of the lambda
+    const std::string criterion = controls.get_selection_criterion();
+    const Eigen::VectorXd weights = controls.get_weights();
+    const double psi0 = controls.get_psi0();
+    double n_eff = static_cast<double>(data_no_nan.rows());
+    if (weights.size() > 0) {
+      n_eff = std::pow(weights.sum(), 2);
+      n_eff /= weights.array().pow(2).sum();
+    }
+
     double fitted_criterion = std::numeric_limits<double>::max();
     std::mutex m;
-    auto fit_and_compare = [&](Bicop cop) {
+    auto fit_and_compare = [&](size_t i) {
+      Bicop& cop = bicops[i];
       tools_interface::check_user_interrupt();
       // Estimate the model
-      cop.fit(data_no_nan, controls);
+      cop.fit_internal(data_no_nan, controls, weights);
 
       // Compute the selection criterion
       double new_criterion;
       double ll = cop.get_loglik();
-      if (controls.get_selection_criterion() == "loglik") {
+      if (criterion == "loglik") {
         new_criterion = -ll;
-      } else if (controls.get_selection_criterion() == "aic") {
+      } else if (criterion == "aic") {
         new_criterion = -2 * ll + 2 * cop.get_npars();
       } else {
-        double n_eff = static_cast<double>(data_no_nan.rows());
-        if (controls.get_weights().size() > 0) {
-          n_eff = std::pow(controls.get_weights().sum(), 2);
-          n_eff /= controls.get_weights().array().pow(2).sum();
-        }
         double npars = cop.get_npars();
 
         new_criterion = -2 * ll + log(n_eff) * npars; // BIC
-        if (controls.get_selection_criterion() == "mbic" ||
-            controls.get_selection_criterion() == "mbicv") {
+        if (criterion == "mbic" || criterion == "mbicv") {
           // correction for mBIC or mBICV
           bool is_indep = (cop.get_family() == BicopFamily::indep);
-          double psi0 = controls.get_psi0();
           double log_prior = static_cast<double>(!is_indep) * log(psi0) +
                              static_cast<double>(is_indep) * log(1.0 - psi0);
           new_criterion -= 2 * log_prior;
@@ -1885,7 +1911,8 @@ Bicop::select(const Eigen::MatrixXd& data, FitControlsBicop controls)
     };
 
     tools_thread::ThreadPool pool(controls.get_num_threads());
-    pool.map(fit_and_compare, bicops);
+    pool.map(fit_and_compare,
+             tools_stl::seq_int(static_cast<size_t>(0), bicops.size()));
     pool.wait();
   }
 }

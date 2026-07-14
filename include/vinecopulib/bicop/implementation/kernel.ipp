@@ -23,7 +23,8 @@ inline KernelBicop::KernelBicop()
 }
 
 inline Eigen::VectorXd
-KernelBicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
+KernelBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
+                     const tools_eigen::ConstMatRef&)
 {
   auto pdf = interp_grid_->interpolate(u);
   tools_eigen::trim(pdf, 1e-20, DBL_MAX);
@@ -42,19 +43,22 @@ KernelBicop::pdf(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-KernelBicop::cdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
+KernelBicop::cdf(const tools_eigen::ConstMatRef& u,
+                 const tools_eigen::ConstMatRef&)
 {
   return interp_grid_->integrate_2d(u);
 }
 
 inline Eigen::VectorXd
-KernelBicop::hfunc1_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
+KernelBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
+                        const tools_eigen::ConstMatRef&)
 {
   return interp_grid_->integrate_1d(u, 1);
 }
 
 inline Eigen::VectorXd
-KernelBicop::hfunc2_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
+KernelBicop::hfunc2_raw(const tools_eigen::ConstMatRef& u,
+                        const tools_eigen::ConstMatRef&)
 {
   return interp_grid_->integrate_1d(u, 2);
 }
@@ -82,7 +86,8 @@ KernelBicop::hfunc2(const Eigen::MatrixXd& u)
 }
 
 inline Eigen::VectorXd
-KernelBicop::hinv1_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
+KernelBicop::hinv1_raw(const tools_eigen::ConstMatRef& u,
+                       const tools_eigen::ConstMatRef&)
 {
   // direct inversion of the interpolated conditional cdf; replaces the
   // generic bisection (which re-integrated the grid 35 times per point)
@@ -90,7 +95,8 @@ KernelBicop::hinv1_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
 }
 
 inline Eigen::VectorXd
-KernelBicop::hinv2_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd&)
+KernelBicop::hinv2_raw(const tools_eigen::ConstMatRef& u,
+                       const tools_eigen::ConstMatRef&)
 {
   return interp_grid_->inverse_integrate_1d(u, 2);
 }
@@ -174,7 +180,8 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   auto oldpars = this->get_parameters();
   auto old_types = var_types_;
   this->set_parameters(parameters);
-  var_types_ = { "c", "c" };
+  // go through the setter to keep the all_continuous_ cache coherent
+  this->set_var_types({ "c", "c" });
 
   std::vector<int> seeds = {
     204967043, 733593603, 184618802, 399707801, 290266245
@@ -183,7 +190,7 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   u.col(1) = hinv1_raw(u, Eigen::MatrixXd());
 
   this->set_parameters(oldpars);
-  var_types_ = old_types;
+  this->set_var_types(old_types);
   return wdm::wdm(u, "tau")(0, 1);
 }
 

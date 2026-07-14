@@ -280,6 +280,10 @@ public:
   Bicop as_continuous() const;
 
 private:
+  void fit_internal(const Eigen::MatrixXd& clean_data,
+                    const FitControlsBicop& controls,
+                    const Eigen::VectorXd& weights);
+
   Eigen::MatrixXd format_data(const Eigen::MatrixXd& u) const;
 
   void rotate_data(Eigen::MatrixXd& u) const;

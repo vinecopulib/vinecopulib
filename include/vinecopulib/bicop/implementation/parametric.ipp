@@ -17,6 +17,16 @@ ParBicop::get_parameters() const
   return parameters_;
 }
 
+inline const Eigen::MatrixXd&
+ParBicop::parameters_row() const
+{
+  // thread-local so concurrent evaluations of the same object don't race;
+  // the assignment reuses the buffer when sizes match (no allocation)
+  static thread_local Eigen::MatrixXd storage;
+  storage = parameters_.transpose();
+  return storage;
+}
+
 inline Eigen::MatrixXd
 ParBicop::get_parameters_lower_bounds() const
 {
@@ -176,7 +186,7 @@ ParBicop::adjust_parameters_bounds(Eigen::MatrixXd& lb,
   }
 
   // refine search interval for Brent algorithm
-  double eps = (var_types_ == std::vector<std::string>{ "c", "c" }) ? 0.1 : 0.6;
+  double eps = all_continuous_ ? 0.1 : 0.6;
   if (tools_stl::is_member(family_, bicop_families::one_par)) {
     auto lb2 = lb;
     auto ub2 = ub;
@@ -238,8 +248,8 @@ inline void
 ParBicop::check_parameters_lower(const Eigen::MatrixXd& parameters)
 {
   if (parameters_lower_bounds_.size() > 0) {
-    std::stringstream message;
     if ((parameters.array() < parameters_lower_bounds_.array()).any()) {
+      std::stringstream message;
       message << "parameters exceed lower bound "
               << "for " << get_family_name() << " copula; " << std::endl
               << "bound:" << std::endl
@@ -255,8 +265,8 @@ inline void
 ParBicop::check_parameters_upper(const Eigen::MatrixXd& parameters)
 {
   if (parameters_upper_bounds_.size() > 0) {
-    std::stringstream message;
     if ((parameters.array() > parameters_upper_bounds_.array()).any()) {
+      std::stringstream message;
       message << "parameters exceed upper bound "
               << "for " << get_family_name() << " copula; " << std::endl
               << "bound:" << std::endl

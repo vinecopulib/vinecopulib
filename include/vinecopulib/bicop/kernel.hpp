@@ -34,23 +34,27 @@ public:
 protected:
   // evaluation leaves; kernel estimators store an interpolation grid rather
   // than a per-row parameter vector, so they ignore `parameters`
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
-                          const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd pdf_raw(const tools_eigen::ConstMatRef& u,
+                          const tools_eigen::ConstMatRef& parameters) override;
 
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd cdf(const tools_eigen::ConstMatRef& u,
+                      const tools_eigen::ConstMatRef& parameters) override;
 
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd hfunc1_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
 
-  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd hfunc2_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
 
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd hinv1_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
 
-  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd hinv2_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
 
   // derivative leaves. Only the pdf gradient w.r.t. the arguments (u1, u2) is
   // defined analytically (the exact slope of the bilinear interpolation grid);

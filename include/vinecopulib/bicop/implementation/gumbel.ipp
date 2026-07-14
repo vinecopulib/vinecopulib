@@ -8,6 +8,24 @@
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
+
+//! closed-form vectorized cdf (broadcast parameter case)
+inline Eigen::VectorXd
+GumbelBicop::cdf(const tools_eigen::ConstMatRef& u,
+                 const tools_eigen::ConstMatRef& parameters)
+{
+  if (parameters.rows() == 1) {
+    const double theta = parameters(0, 0);
+    // powers via exp(c*log(x)) (packetized log/exp beat generic_pow);
+    // l = -log(u) > 0, so log(l) is safe
+    Eigen::ArrayXd l1 = -u.col(0).array().log();
+    Eigen::ArrayXd l2 = -u.col(1).array().log();
+    Eigen::ArrayXd s = (theta * l1.log()).exp() + (theta * l2.log()).exp();
+    return (-((1.0 / theta) * s.log()).exp()).exp().matrix();
+  }
+  return ArchimedeanBicop::cdf(u, parameters);
+}
+
 inline GumbelBicop::GumbelBicop()
 {
   family_ = BicopFamily::gumbel;
@@ -43,27 +61,97 @@ GumbelBicop::generator_derivative(
 }
 
 inline Eigen::VectorXd
-GumbelBicop::pdf_raw(const Eigen::MatrixXd& u,
-                     const Eigen::MatrixXd& parameters)
+GumbelBicop::log_pdf_raw(const tools_eigen::ConstMatRef& u,
+                         const tools_eigen::ConstMatRef& parameters)
 {
+  if (parameters.rows() == 1) {
+    // vectorized evaluation for a single (broadcast) parameter set
+    const double theta = parameters(0, 0);
+    const double thetha1 = 1.0 / theta;
+    const auto u1 = u.col(0).array();
+    const auto u2 = u.col(1).array();
+    // powers via exp(c*log(x)) with all logs shared: la/lb feed both the
+    // theta-powers and the (theta-1)*log(l1*l2) term, lt feeds three terms;
+    // -log(u1*u2) = l1 + l2 (packetized log/exp beat generic_pow)
+    Eigen::ArrayXd l1 = -u1.log();
+    Eigen::ArrayXd l2 = -u2.log();
+    Eigen::ArrayXd la = l1.log();
+    Eigen::ArrayXd lb = l2.log();
+    Eigen::ArrayXd t1 = (theta * la).exp() + (theta * lb).exp();
+    Eigen::ArrayXd lt = t1.log();
+    Eigen::ArrayXd out = -(thetha1 * lt).exp() + (2 * thetha1 - 2.0) * lt +
+                         (theta - 1.0) * (la + lb) + (l1 + l2) +
+                         ((theta - 1.0) * (-thetha1 * lt).exp()).log1p();
+    return out.matrix();
+  }
+
   auto f = [](const double& u1,
               const double& u2,
               const Eigen::Ref<const Eigen::VectorXd>& par) {
     double theta = par(0);
     double thetha1 = 1.0 / theta;
     double t1 = std::pow(-std::log(u1), theta) + std::pow(-std::log(u2), theta);
-    double temp = -std::pow(t1, thetha1) + (2 * thetha1 - 2.0) * std::log(t1) +
-                  (theta - 1.0) * std::log(std::log(u1) * std::log(u2)) -
-                  std::log(u1 * u2) +
-                  std::log1p((theta - 1.0) * std::pow(t1, -thetha1));
-    return std::exp(temp);
+    return -std::pow(t1, thetha1) + (2 * thetha1 - 2.0) * std::log(t1) +
+           (theta - 1.0) * std::log(std::log(u1) * std::log(u2)) -
+           std::log(u1 * u2) +
+           std::log1p((theta - 1.0) * std::pow(t1, -thetha1));
   };
   return tools_eigen::binaryExpr_or_nan(u, parameters, f);
 }
 
 inline Eigen::VectorXd
-GumbelBicop::hinv1_raw(const Eigen::MatrixXd& u,
-                       const Eigen::MatrixXd& parameters)
+GumbelBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
+                     const tools_eigen::ConstMatRef& parameters)
+{
+  return log_pdf_raw(u, parameters).array().exp().matrix();
+}
+
+//! closed-form h-function h(uother | ucond); replaces the generic
+//! generator-based per-element evaluation and the `swap_cols` copy.
+inline Eigen::VectorXd
+GumbelBicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
+                            const Eigen::Ref<const Eigen::VectorXd>& uother,
+                            const tools_eigen::ConstMatRef& parameters) const
+{
+  return apply_closed_form_h(
+    ucond,
+    uother,
+    parameters,
+    [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
+      const double theta = parameters(0, 0);
+      // powers via exp(c*log(x)); lc^(theta-1) = lc^theta / lc reuses tc
+      Eigen::ArrayXd lc = -uc.log();
+      Eigen::ArrayXd tc = (theta * lc.log()).exp();
+      Eigen::ArrayXd t1 = tc + (theta * (-uo.log()).log()).exp();
+      Eigen::ArrayXd t1p = ((1.0 / theta) * t1.log()).exp(); // -log(C)
+      return (-t1p).exp() * (tc / lc) * t1p / t1 / uc;
+    },
+    [&](Eigen::Index i, double uc, double uo) -> double {
+      const double theta = parameters(i, 0);
+      const double lc = -std::log(uc);
+      const double t1 = std::pow(lc, theta) + std::pow(-std::log(uo), theta);
+      const double t1p = std::pow(t1, 1.0 / theta);
+      return std::exp(-t1p) * std::pow(lc, theta - 1.0) * t1p / t1 / uc;
+    });
+}
+
+inline Eigen::VectorXd
+GumbelBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
+                        const tools_eigen::ConstMatRef& parameters)
+{
+  return hfunc_internal(u.col(0), u.col(1), parameters);
+}
+
+inline Eigen::VectorXd
+GumbelBicop::hfunc2_raw(const tools_eigen::ConstMatRef& u,
+                        const tools_eigen::ConstMatRef& parameters)
+{
+  return hfunc_internal(u.col(1), u.col(0), parameters);
+}
+
+inline Eigen::VectorXd
+GumbelBicop::hinv1_raw(const tools_eigen::ConstMatRef& u,
+                       const tools_eigen::ConstMatRef& parameters)
 {
   auto qcondgum_func =
     [](const double& u1,

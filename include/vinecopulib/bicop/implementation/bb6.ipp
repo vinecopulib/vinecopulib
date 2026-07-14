@@ -9,6 +9,29 @@
 #include <vinecopulib/misc/tools_stl.hpp>
 
 namespace vinecopulib {
+
+//! closed-form vectorized cdf (broadcast parameter case)
+inline Eigen::VectorXd
+Bb6Bicop::cdf(const tools_eigen::ConstMatRef& u,
+              const tools_eigen::ConstMatRef& parameters)
+{
+  if (parameters.rows() == 1) {
+    const double theta = parameters(0, 0);
+    const double delta = parameters(0, 1);
+    // powers via exp(c*log(x)) (packetized log/exp beat generic_pow)
+    Eigen::ArrayXd l1 =
+      -(-(theta * (1.0 - u.col(0).array()).log()).exp()).log1p();
+    Eigen::ArrayXd l2 =
+      -(-(theta * (1.0 - u.col(1).array()).log()).exp()).log1p();
+    Eigen::ArrayXd w =
+      ((1.0 / delta) *
+       ((delta * l1.log()).exp() + (delta * l2.log()).exp()).log())
+        .exp();
+    return (1.0 - ((1.0 / theta) * (-(-w).expm1()).log()).exp()).matrix();
+  }
+  return ArchimedeanBicop::cdf(u, parameters);
+}
+
 inline Bb6Bicop::Bb6Bicop()
 {
   family_ = BicopFamily::bb6;
@@ -49,7 +72,8 @@ Bb6Bicop::generator_derivative(
 }
 
 inline Eigen::VectorXd
-Bb6Bicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
+Bb6Bicop::pdf_raw(const tools_eigen::ConstMatRef& u,
+                  const tools_eigen::ConstMatRef& parameters)
 {
   auto f = [](const double& u1,
               const double& u2,
@@ -59,40 +83,41 @@ Bb6Bicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
     double t12 = 1 / delta;
     double t16 = 1 / theta;
     double t32 = delta - 1.0;
-    double t38 = 2.0 * delta;
-    double t39 = -1.0 + t38;
-    double t47 = 3.0 * delta - 1.0;
     double t1 = 1.0 - u1;
     double t2 = std::pow(t1, theta);
     double t3 = 1.0 - t2;
     double t4 = std::log(t3);
-    double t5 = std::pow(-t4, delta);
-    double t40 = std::pow(-t4, t39);
+    // the five powers of -t4 (exponents d-1, d, 2d-1, 2d, 3d-1) factor
+    // through the single pow t50 = (-t4)^(d-1); likewise for -t9 below
     double t50 = std::pow(-t4, t32);
-    double t61 = std::pow(-t4, t47);
-    double t90 = std::pow(-t4, t38);
+    double t5 = t50 * (-t4);
+    double t40 = t5 * t50;
+    double t90 = t5 * t5;
+    double t61 = t90 * t50;
 
     double t6 = 1.0 - u2;
     double t7 = std::pow(t6, theta);
     double t8 = 1.0 - t7;
     double t9 = std::log(t8);
-    double t10 = std::pow(-t9, delta);
+    double t56 = std::pow(-t9, t32);
+    double t10 = t56 * (-t9);
+    double t42 = t10 * t56;
+    double t93 = t10 * t10;
+    double t48 = t93 * t56;
+
     double t11 = t5 + t10;
     double t13 = std::pow(t11, t12);
-    double t14 = std::exp(-t13);
-    double t35 = std::pow(t11, -2.0 * t32 * t12);
+    double t34 = t13 / t11;
+    double t35 = t34 * t34; // t11^(-2 (d-1) / d)
     double t36 = t35 * theta;
     double t37 = std::exp(t13);
-    double t42 = std::pow(-t9, t39);
-    double t48 = std::pow(-t9, t47);
     double t53 = t13 * delta;
-    double t56 = std::pow(-t9, t32);
     double t57 = t37 * t50 * t56;
     double t59 = t13 * theta;
     double t78 = t37 - 1.0;
-    double t80 = std::pow(t78 * t14, t16);
+    // (t37 - 1) e^(-t13) = 1 - e^(-t13)
+    double t80 = std::pow(-std::expm1(-t13), t16);
     double t87 = t78 * t78;
-    double t93 = std::pow(-t9, t38);
 
     return (2.0 * t36 * t37 * t40 * t42 + t36 * t37 * t48 * t50 +
             t53 * theta * t57 - t59 * t57 + t36 * t37 * t61 * t56 -
@@ -102,6 +127,63 @@ Bb6Bicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
            t6;
   };
   return tools_eigen::binaryExpr_or_nan(u, parameters, f);
+}
+
+//! closed-form h-function h(uother | ucond) with shared power terms;
+//! replaces the generic generator-based path and the `swap_cols` copy.
+inline Eigen::VectorXd
+Bb6Bicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
+                         const Eigen::Ref<const Eigen::VectorXd>& uother,
+                         const tools_eigen::ConstMatRef& parameters) const
+{
+  return apply_closed_form_h(
+    ucond,
+    uother,
+    parameters,
+    [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
+      const double theta = parameters(0, 0);
+      const double delta = parameters(0, 1);
+      // powers via exp(c*log(x)) (packetized log/exp beat generic_pow)
+      Eigen::ArrayXd p1 = (theta * (1.0 - uc).log()).exp();
+      Eigen::ArrayXd el1 = -(-p1).log1p(); // -log(1 - p1)
+      Eigen::ArrayXd s1 = (delta * el1.log()).exp();
+      Eigen::ArrayXd s =
+        s1 +
+        (delta * (-(-(theta * (1.0 - uo).log()).exp()).log1p()).log()).exp();
+      Eigen::ArrayXd w = ((1.0 / delta) * s.log()).exp();
+      Eigen::ArrayXd e = (-w).exp();
+      Eigen::ArrayXd m = -(-w).expm1(); // 1 - e^-w
+      return (s1 / el1) * (w / s) * (p1 / (1.0 - uc)) * (e / (1.0 - p1)) *
+             ((1.0 / theta) * m.log()).exp() / m;
+    },
+    [&](Eigen::Index i, double uc, double uo) -> double {
+      const double theta = parameters(i, 0);
+      const double delta = parameters(i, 1);
+      const double p1 = std::pow(1.0 - uc, theta);
+      const double el1 = -std::log1p(-p1);
+      const double s1 = std::pow(el1, delta);
+      const double s =
+        s1 + std::pow(-std::log1p(-std::pow(1.0 - uo, theta)), delta);
+      const double w = std::pow(s, 1.0 / delta);
+      const double e = std::exp(-w);
+      const double m = -std::expm1(-w);
+      return (s1 / el1) * (w / s) * (p1 / (1.0 - uc)) * (e / (1.0 - p1)) *
+             std::pow(m, 1.0 / theta) / m;
+    });
+}
+
+inline Eigen::VectorXd
+Bb6Bicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
+                     const tools_eigen::ConstMatRef& parameters)
+{
+  return hfunc_internal(u.col(0), u.col(1), parameters);
+}
+
+inline Eigen::VectorXd
+Bb6Bicop::hfunc2_raw(const tools_eigen::ConstMatRef& u,
+                     const tools_eigen::ConstMatRef& parameters)
+{
+  return hfunc_internal(u.col(1), u.col(0), parameters);
 }
 
 // [BEGIN generated derivative leaves]
