@@ -49,8 +49,7 @@ Bb7Bicop::generator_derivative(
 }
 
 inline Eigen::VectorXd
-Bb7Bicop::pdf_raw(const tools_eigen::ConstMatRef& u,
-                  const tools_eigen::ConstMatRef& parameters)
+Bb7Bicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 {
   auto f = [](const double& u1,
               const double& u2,
@@ -92,61 +91,6 @@ Bb7Bicop::pdf_raw(const tools_eigen::ConstMatRef& u,
            t16 * t4 * t32 * t27 * t8 * t54;
   };
   return tools_eigen::binaryExpr_or_nan(u, parameters, f);
-}
-
-//! closed-form h-function h(uother | ucond) with shared power terms;
-//! replaces the generic generator-based path and the `swap_cols` copy.
-inline Eigen::VectorXd
-Bb7Bicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
-                         const Eigen::Ref<const Eigen::VectorXd>& uother,
-                         const tools_eigen::ConstMatRef& parameters) const
-{
-  return apply_closed_form_h(
-    ucond,
-    uother,
-    parameters,
-    [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
-      const double theta = parameters(0, 0);
-      const double delta = parameters(0, 1);
-      // powers via exp(c*log(x)) (packetized log/exp beat generic_pow)
-      Eigen::ArrayXd p1 = (theta * (1.0 - uc).log()).exp();
-      Eigen::ArrayXd b1 = 1.0 - p1;
-      Eigen::ArrayXd g1 = (-delta * b1.log()).exp();
-      Eigen::ArrayXd sp1 =
-        g1 + (-delta * (1.0 - (theta * (1.0 - uo).log()).exp()).log()).exp() -
-        1.0; // 1 + S
-      Eigen::ArrayXd bw = ((-1.0 / delta) * sp1.log()).exp();
-      Eigen::ArrayXd m = 1.0 - bw;
-      return (g1 * p1) / (b1 * (1.0 - uc)) * bw *
-             ((1.0 / theta) * m.log()).exp() / (sp1 * m);
-    },
-    [&](Eigen::Index i, double uc, double uo) -> double {
-      const double theta = parameters(i, 0);
-      const double delta = parameters(i, 1);
-      const double p1 = std::pow(1.0 - uc, theta);
-      const double b1 = 1.0 - p1;
-      const double g1 = std::pow(b1, -delta);
-      const double sp1 =
-        g1 + std::pow(1.0 - std::pow(1.0 - uo, theta), -delta) - 1.0;
-      const double bw = std::pow(sp1, -1.0 / delta);
-      const double m = 1.0 - bw;
-      return (g1 * p1) / (b1 * (1.0 - uc)) * bw * std::pow(m, 1.0 / theta) /
-             (sp1 * m);
-    });
-}
-
-inline Eigen::VectorXd
-Bb7Bicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
-                     const tools_eigen::ConstMatRef& parameters)
-{
-  return hfunc_internal(u.col(0), u.col(1), parameters);
-}
-
-inline Eigen::VectorXd
-Bb7Bicop::hfunc2_raw(const tools_eigen::ConstMatRef& u,
-                     const tools_eigen::ConstMatRef& parameters)
-{
-  return hfunc_internal(u.col(1), u.col(0), parameters);
 }
 
 // [BEGIN generated derivative leaves]

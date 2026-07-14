@@ -8,21 +8,6 @@
 
 namespace vinecopulib {
 
-//! closed-form vectorized cdf (broadcast parameter case)
-inline Eigen::VectorXd
-FrankBicop::cdf(const tools_eigen::ConstMatRef& u,
-                const tools_eigen::ConstMatRef& parameters)
-{
-  if (parameters.rows() == 1) {
-    const double theta = parameters(0, 0);
-    const double d = std::expm1(-theta);
-    Eigen::ArrayXd a1 = (-theta * u.col(0).array()).expm1();
-    Eigen::ArrayXd a2 = (-theta * u.col(1).array()).expm1();
-    return (-(a1 * a2 / d).log1p() / theta).matrix();
-  }
-  return ArchimedeanBicop::cdf(u, parameters);
-}
-
 inline FrankBicop::FrankBicop()
 {
   family_ = BicopFamily::frank;
@@ -60,167 +45,20 @@ FrankBicop::generator_derivative(
 }
 
 inline Eigen::VectorXd
-FrankBicop::log_pdf_raw(const tools_eigen::ConstMatRef& u,
-                        const tools_eigen::ConstMatRef& parameters)
+FrankBicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 {
-  if (parameters.rows() == 1) {
-    // vectorized evaluation for a single (broadcast) parameter set; the
-    // log form works with |denominator| (the density is positive) and
-    // hoists all theta-only terms out of the data pass
-    const double theta = parameters(0, 0);
-    const auto u1 = u.col(0).array();
-    const auto u2 = u.col(1).array();
-    Eigen::ArrayXd out;
-    if (std::fabs(theta) < 1e-5) {
-      // the formula suffers catastrophic cancellation near independence
-      // (same guard as in parameters_to_tau)
-      out = (u1.isNaN() || u2.isNaN())
-              .select(std::numeric_limits<double>::quiet_NaN(),
-                      Eigen::ArrayXd::Zero(u.rows()));
-    } else {
-      const double et = std::exp(theta);
-      const double log_num = std::log(theta * std::expm1(theta));
-      Eigen::ArrayXd e1 = (theta * u1).exp();
-      Eigen::ArrayXd e2 = (theta * u2).exp();
-      Eigen::ArrayXd den = e1 * e2 - et * (e1 + e2) + et;
-      out = log_num + theta * (u1 + u2 + 1.0) - 2.0 * den.abs().log();
-    }
-    return out.matrix();
-  }
-
   auto f = [](const double& u1,
               const double& u2,
               const Eigen::Ref<const Eigen::VectorXd>& par) {
     double theta = par(0);
-    if (std::fabs(theta) < 1e-5) {
-      // the formula suffers catastrophic cancellation near independence
-      return 0.0;
-    }
-    double den = std::exp(theta * u2 + theta * u1) -
-                 std::exp(theta * u2 + theta) - std::exp(theta * u1 + theta) +
-                 std::exp(theta);
-    return std::log(theta * std::expm1(theta)) + theta * (u1 + u2 + 1.0) -
-           2.0 * std::log(std::fabs(den));
+    return (theta * std::expm1(theta) *
+            std::exp(theta * u2 + theta * u1 + theta)) /
+           std::pow(std::exp(theta * u2 + theta * u1) -
+                      std::exp(theta * u2 + theta) -
+                      std::exp(theta * u1 + theta) + std::exp(theta),
+                    2.0);
   };
   return tools_eigen::binaryExpr_or_nan(u, parameters, f);
-}
-
-inline Eigen::VectorXd
-FrankBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
-                    const tools_eigen::ConstMatRef& parameters)
-{
-  return log_pdf_raw(u, parameters).array().exp().matrix();
-}
-
-//! closed-form h-function h(uother | ucond); replaces the generic
-//! generator-based per-element evaluation and the `swap_cols` copy.
-inline Eigen::VectorXd
-FrankBicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
-                           const Eigen::Ref<const Eigen::VectorXd>& uother,
-                           const tools_eigen::ConstMatRef& parameters) const
-{
-  return apply_closed_form_h(
-    ucond,
-    uother,
-    parameters,
-    [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
-      // near-independence guard (|theta| < 1e-5): h = uother
-      const double theta = parameters(0, 0);
-      if (std::fabs(theta) < 1e-5) {
-        return uo;
-      }
-      const double em_t = std::expm1(-theta);
-      Eigen::ArrayXd a1 = (-theta * uc).expm1(); // e^{-theta * uc} - 1
-      Eigen::ArrayXd a2 = (-theta * uo).expm1();
-      return (a1 + 1.0) * a2 / (em_t + a1 * a2);
-    },
-    [&](Eigen::Index i, double uc, double uo) -> double {
-      const double theta = parameters(i, 0);
-      if (std::fabs(theta) < 1e-5) {
-        return uo;
-      }
-      const double a1 = std::expm1(-theta * uc);
-      const double a2 = std::expm1(-theta * uo);
-      return (a1 + 1.0) * a2 / (std::expm1(-theta) + a1 * a2);
-    });
-}
-
-inline Eigen::VectorXd
-FrankBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
-                       const tools_eigen::ConstMatRef& parameters)
-{
-  return hfunc_internal(u.col(0), u.col(1), parameters);
-}
-
-inline Eigen::VectorXd
-FrankBicop::hfunc2_raw(const tools_eigen::ConstMatRef& u,
-                       const tools_eigen::ConstMatRef& parameters)
-{
-  return hfunc_internal(u.col(1), u.col(0), parameters);
-}
-
-//! closed-form inverse h-function (solves h(v | ucond) = q for v);
-//! replaces the generic 35-iteration vector bisection.
-inline Eigen::VectorXd
-FrankBicop::hinv_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
-                          const Eigen::Ref<const Eigen::VectorXd>& q,
-                          const tools_eigen::ConstMatRef& parameters) const
-{
-  const Eigen::Index n = ucond.size();
-  if (parameters.rows() == 1) {
-    const double theta = parameters(0, 0);
-    const auto uc = ucond.array();
-    const auto qq = q.array();
-    Eigen::ArrayXd out;
-    if (std::fabs(theta) < 1e-5) {
-      // consistent with the near-independence guard of the density
-      out = qq;
-      out = uc.isNaN().select(std::numeric_limits<double>::quiet_NaN(), out);
-    } else {
-      const double em_t = std::expm1(-theta);
-      Eigen::ArrayXd a1 = (-theta * uc).expm1(); // e^{-theta * uc} - 1
-      // a2 = e^{-theta * v} - 1 solves q = (a1 + 1) a2 / (em_t + a1 a2)
-      Eigen::ArrayXd a2 = qq * em_t / (a1 + 1.0 - qq * a1);
-      out = -a2.log1p() / theta;
-    }
-    // match the old bisection's [lb, ub] bracket so an edge-input rounding
-    // excursion can't return a value outside (0, 1) (keeps NaN as NaN)
-    out = out.isNaN().select(out, out.min(1.0 - 1e-20).max(1e-20));
-    return out.matrix();
-  }
-
-  Eigen::VectorXd out(n);
-  for (Eigen::Index i = 0; i < n; ++i) {
-    const double uc = ucond(i);
-    const double qi = q(i);
-    if ((std::isnan)(uc) || (std::isnan)(qi)) {
-      out(i) = std::numeric_limits<double>::quiet_NaN();
-      continue;
-    }
-    const double theta = parameters(i, 0);
-    if (std::fabs(theta) < 1e-5) {
-      out(i) = qi;
-    } else {
-      const double a1 = std::expm1(-theta * uc);
-      const double a2 = qi * std::expm1(-theta) / (a1 + 1.0 - qi * a1);
-      out(i) = std::min(std::max(-std::log1p(a2) / theta, 1e-20), 1.0 - 1e-20);
-    }
-  }
-  return out;
-}
-
-inline Eigen::VectorXd
-FrankBicop::hinv1_raw(const tools_eigen::ConstMatRef& u,
-                      const tools_eigen::ConstMatRef& parameters)
-{
-  return hinv_internal(u.col(0), u.col(1), parameters);
-}
-
-inline Eigen::VectorXd
-FrankBicop::hinv2_raw(const tools_eigen::ConstMatRef& u,
-                      const tools_eigen::ConstMatRef& parameters)
-{
-  return hinv_internal(u.col(1), u.col(0), parameters);
 }
 
 inline Eigen::MatrixXd

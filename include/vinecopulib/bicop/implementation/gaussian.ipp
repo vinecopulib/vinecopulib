@@ -21,8 +21,8 @@ inline GaussianBicop::GaussianBicop()
 }
 
 inline Eigen::VectorXd
-GaussianBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
-                       const tools_eigen::ConstMatRef& parameters)
+GaussianBicop::pdf_raw(const Eigen::MatrixXd& u,
+                       const Eigen::MatrixXd& parameters)
 {
   const Eigen::Index n = u.rows();
   if (parameters.rows() == 1) {
@@ -59,8 +59,7 @@ GaussianBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
 }
 
 inline Eigen::VectorXd
-GaussianBicop::cdf(const tools_eigen::ConstMatRef& u,
-                   const tools_eigen::ConstMatRef& parameters)
+GaussianBicop::cdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 {
   Eigen::MatrixXd z = tools_stats::qnorm(u);
   if (parameters.rows() == 1) {
@@ -75,8 +74,8 @@ GaussianBicop::cdf(const tools_eigen::ConstMatRef& u,
 }
 
 inline Eigen::VectorXd
-GaussianBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
-                          const tools_eigen::ConstMatRef& parameters)
+GaussianBicop::hfunc1_raw(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters)
 {
   Eigen::MatrixXd z = tools_stats::qnorm(u);
   if (parameters.rows() == 1) {
@@ -96,8 +95,8 @@ GaussianBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
 }
 
 inline Eigen::VectorXd
-GaussianBicop::hinv1_raw(const tools_eigen::ConstMatRef& u,
-                         const tools_eigen::ConstMatRef& parameters)
+GaussianBicop::hinv1_raw(const Eigen::MatrixXd& u,
+                         const Eigen::MatrixXd& parameters)
 {
   Eigen::MatrixXd z = tools_stats::qnorm(u);
   if (parameters.rows() == 1) {
