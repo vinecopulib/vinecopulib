@@ -450,115 +450,47 @@ Vinecop::reorient(const std::vector<size_t>& conditioning_set)
     return;
   }
 
-  // ---- decompose the current matrix into an edge list ----
-  auto mat = get_matrix();
-  struct Edge
-  {
-    std::vector<size_t> cond;    // the two conditioned variables
-    std::vector<size_t> all_idx; // sorted (conditioned + conditioning)
-    Bicop bicop;
-    size_t diag_orig; // variable currently on this edge's diagonal (= arg1)
-    size_t tree;
-    bool used;
-  };
-  std::vector<Edge> edges;
-  for (size_t t = 0; t < d_ - 1; ++t) {
-    for (size_t e = 0; e < d_ - 1 - t; ++e) {
-      Edge ed;
-      size_t diag = mat(d_ - 1 - e, e);
-      ed.cond = { diag, mat(t, e) };
-      ed.all_idx = ed.cond;
-      for (size_t r = 0; r < t; ++r)
-        ed.all_idx.push_back(mat(r, e));
-      std::sort(ed.all_idx.begin(), ed.all_idx.end());
-      ed.bicop = pair_copulas_[t][e];
-      ed.diag_orig = diag;
-      ed.tree = t;
-      ed.used = false;
-      edges.push_back(ed);
-    }
-  }
-  auto conditioning_of = [](const Edge& ed) {
-    std::vector<size_t> ning;
-    for (auto v : ed.all_idx)
-      if ((v != ed.cond[0]) && (v != ed.cond[1]))
-        ning.push_back(v);
-    return ning;
+  // Re-orient via the shared RVineTrees primitive: decompose the fitted vine
+  // into its tree list (carrying pair copulas), then peel it back into a
+  // matrix while steering the diagonal so the conditioning set lands at the
+  // tail. For the leading columns we put a non-conditioning leaf on the
+  // diagonal, for the trailing columns a conditioning one. Because the
+  // conditioning set forms a self-contained sub-vine block (guaranteed when
+  // fitted via `set_conditioning_set()`), the required leaf is always present;
+  // the tail check + `RVineStructure` validation below guard the general case.
+  auto to_tail =
+    [&](size_t col,
+        const std::vector<std::vector<size_t>>& leaf_edges) -> size_t {
+    bool want_cond = (col >= d_ - k);
+    for (const auto& options : leaf_edges)
+      for (auto v : options)
+        if (want_cond ? (in_b[v] != 0) : (in_b[v] == 0))
+          return v;
+    return leaf_edges.front().front();
   };
 
-  // ---- rebuild the matrix column by column (direct O(d^2), no enumeration).
-  //      At each column choose which endpoint of the tree's top edge goes on
-  //      the diagonal: a non-conditioning variable for the leading columns
-  //      (head of the order), a conditioning variable for the trailing columns
-  //      + root (tail). Because the conditioning set forms a self-contained
-  //      sub-vine (its edges are the low trees; every other edge involves a
-  //      non-conditioning variable), the required endpoint is always available;
-  //      the final tail check guards against any structure that is not a block.
-  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mnew(d_, d_);
-  mnew.fill(0);
-  auto pcs = make_pair_copula_store(d_, d_ - 1);
+  std::vector<size_t> new_order;
+  TriangularArray<size_t> new_struct_array(d_, d_ - 1);
+  std::vector<std::vector<Bicop>> new_pair_copulas;
   bool ok = true;
-  for (size_t e = 0; (e < d_ - 1) && ok; ++e) {
-    size_t t_top = d_ - 2 - e;
-    Edge* top = nullptr;
-    for (auto& ed : edges)
-      if (!ed.used && (ed.tree == t_top)) {
-        top = &ed;
-        break;
-      }
-    if (top == nullptr) {
-      ok = false;
-      break;
-    }
-    size_t c0 = top->cond[0], c1 = top->cond[1];
-    bool want_cond = (e >= d_ - k); // tail columns take the conditioning set
-    size_t s = want_cond ? (in_b[c0] ? c0 : c1) : (in_b[c0] ? c1 : c0);
-    size_t partner = (s == c0) ? c1 : c0;
-
-    mnew(d_ - 1 - e, e) = s;
-    mnew(t_top, e) = partner;
-    pcs[t_top][e] = top->bicop;
-    if (top->diag_orig != s)
-      pcs[t_top][e].flip();
-    top->used = true;
-
-    auto ning = conditioning_of(*top);
-    for (size_t row = t_top; row-- > 0;) {
-      std::vector<size_t> want = ning;
-      want.push_back(s);
-      std::sort(want.begin(), want.end());
-      Edge* nxt = nullptr;
-      for (auto& ed : edges)
-        if (!ed.used && (ed.tree == row) && (ed.all_idx == want)) {
-          nxt = &ed;
-          break;
-        }
-      if (nxt == nullptr) {
-        ok = false;
-        break;
-      }
-      mnew(row, e) = (nxt->cond[0] == s) ? nxt->cond[1] : nxt->cond[0];
-      pcs[row][e] = nxt->bicop;
-      if (nxt->diag_orig != s)
-        pcs[row][e].flip();
-      nxt->used = true;
-      ning = conditioning_of(*nxt);
-    }
+  try {
+    auto dec = get_trees().to_struct_array(to_tail);
+    new_order = std::move(dec.order);
+    new_struct_array = std::move(dec.struct_array);
+    new_pair_copulas = std::move(dec.pair_copulas);
+  } catch (const std::exception&) {
+    ok = false; // infeasible (proximity / no admissible leaf)
   }
-  mnew(0, d_ - 1) = mnew(0, d_ - 2); // root (last remaining variable)
-
-  // ---- validate: the tail must equal B, then the full R-vine check ----
-  std::vector<size_t> new_order(d_);
-  for (size_t i = 0; i < d_; ++i)
-    new_order[i] = mnew(d_ - 1 - i, i);
   if (!ok || !tail_is_b(new_order)) {
     throw std::runtime_error(
       "conditioning set is not admissible as a sampling-order tail of this "
       "vine; fit with FitControlsVinecop::set_conditioning_set() or condition "
       "on an admissible set.");
   }
-  rvine_structure_ = RVineStructure(mnew); // check = true (proximity etc.)
-  pair_copulas_ = pcs;
+
+  // full R-vine validation (proximity etc.); loglik/threshold/nobs invariant
+  rvine_structure_ = RVineStructure(new_order, new_struct_array, false, true);
+  pair_copulas_ = std::move(new_pair_copulas);
 }
 
 //! @brief Fits the parameters of a pre-specified vine copula model.
@@ -934,6 +866,18 @@ inline TriangularArray<size_t>
 Vinecop::get_struct_array(bool natural_order) const
 {
   return rvine_structure_.get_struct_array(natural_order);
+}
+
+//! @brief Gets the vine as a list-of-trees decomposition, each edge carrying
+//! its fitted pair-copula (stored with its first argument on the diagonal).
+inline RVineTrees
+Vinecop::get_trees() const
+{
+  // decompose in original labels: the diagonal `get_order()`, the original-
+  // label structure array, and the pair-copulas share the same labelling.
+  return RVineTrees(rvine_structure_.get_order(),
+                    rvine_structure_.get_struct_array(false),
+                    pair_copulas_);
 }
 
 //! @brief Gets the log-likelihood (throws an error if model has not been.

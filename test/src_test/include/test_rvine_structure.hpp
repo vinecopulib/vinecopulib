@@ -72,6 +72,64 @@ TEST(rvine_structure, triangular_array_works)
   EXPECT_FALSE(ta4 < ta3);
 }
 
+TEST(rvine_structure, rvine_trees_works)
+{
+  TriangularArray<size_t> struct_array({ { 5, 2, 6, 6, 6, 6 },
+                                         { 6, 6, 1, 2, 5 },
+                                         { 2, 5, 2, 5 },
+                                         { 1, 1, 5 },
+                                         { 3, 7 },
+                                         { 7 } });
+  std::vector<size_t> order = { 4, 3, 7, 1, 2, 5, 6 };
+
+  EXPECT_NO_THROW(RVineTrees(order, struct_array));
+  RVineTrees rvt(order, struct_array);
+
+  // trees -> (order, struct_array) round-trip is the identity here
+  auto rt = rvt.to_struct_array();
+  EXPECT_EQ(order, std::get<0>(rt));
+  EXPECT_EQ(struct_array, std::get<1>(rt));
+
+  // RVineStructure <-> RVineTrees round-trips
+  RVineStructure rvs(order, struct_array);
+  EXPECT_NO_THROW(RVineStructure{ rvt });
+  EXPECT_EQ(rvs, RVineStructure(rvt));
+  EXPECT_NO_THROW(RVineStructure(rvt, false));
+  EXPECT_EQ(rvs, RVineStructure(rvs.get_trees())); // the get_trees() round-trip
+
+  // truncated vine (truncate at level 3)
+  TriangularArray<size_t> truncated_array(struct_array);
+  truncated_array.truncate(3);
+  RVineStructure rvs_trunc(order, truncated_array);
+
+  EXPECT_NO_THROW(RVineTrees(order, truncated_array));
+  RVineTrees rvt_trunc(order, truncated_array);
+  auto rt_trunc = rvt_trunc.to_struct_array();
+  EXPECT_EQ(order, std::get<0>(rt_trunc));
+  EXPECT_EQ(truncated_array, std::get<1>(rt_trunc));
+  EXPECT_EQ(rvs_trunc, RVineStructure(rvt_trunc));
+  EXPECT_EQ(rvs_trunc, RVineStructure(rvs_trunc.get_trees()));
+}
+
+TEST(rvine_structure, rvine_trees_sanity_checks)
+{
+  std::vector<size_t> order = { 1, 2, 3, 4 };
+
+  // dimension mismatch between order and structure array
+  TriangularArray<size_t> struct_array1({ { 2, 3 }, { 1 } });
+  EXPECT_THROW(RVineTrees(order, struct_array1), std::runtime_error);
+
+  // tree 0 does not mention every variable (variable 4 missing)
+  TriangularArray<size_t> struct_array2({ { 2, 3, 3 }, { 4, 1 }, { 2 } });
+  RVineTrees rvt2(order, struct_array2);
+  EXPECT_THROW(rvt2.to_struct_array(), std::runtime_error);
+
+  // proximity condition violated
+  TriangularArray<size_t> struct_array3({ { 2, 3, 4 }, { 5, 1 }, { 6 } });
+  RVineTrees rvt3(order, struct_array3);
+  EXPECT_THROW(rvt3.to_struct_array(), std::runtime_error);
+}
+
 TEST(rvine_structure, triangular_array_conversions_work)
 {
   std::vector<std::vector<size_t>> rows = {

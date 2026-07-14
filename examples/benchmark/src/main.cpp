@@ -127,6 +127,77 @@ benchmark_bicop_tll(int n = 1000, unsigned int repeats = 10)
   }
 }
 
+void
+benchmark_vinecop_selection(int n = 1000, unsigned int repeats = 8)
+{
+  const Eigen::VectorXi seeds = Eigen::VectorXi::LinSpaced(repeats, 1, repeats);
+  const std::vector<int> dims{ 5, 10, 20, 30, 50 };
+  const auto fam = bicop_families::itau;
+
+  cout << "Benchmark Results for Vinecop Selection (ms):" << endl;
+  cout << "d\tselect\tconditional\treorient" << endl;
+  for (int d : dims) {
+    // data-generation cost (subtracted from the select timings)
+    const Eigen::VectorXd t_gen = benchmark_func(
+      [&](unsigned s) { auto u = generate_data(n, d, s); }, seeds);
+
+    // (1) normal structure selection (cheap itau so structural work shows)
+    const Eigen::VectorXd t_sel = benchmark_func(
+      [&](unsigned s) {
+        auto u = generate_data(n, d, s);
+        FitControlsVinecop controls(fam);
+        controls.set_parametric_method("itau");
+        Vinecop vc(static_cast<size_t>(d));
+        vc.select(u, controls);
+      },
+      seeds);
+
+    // (2) conditioning-aware selection (invokes reorient() internally)
+    const std::vector<size_t> cond{ 1,
+                                    static_cast<size_t>((d + 1) / 2),
+                                    static_cast<size_t>(d) };
+    const Eigen::VectorXd t_cond = benchmark_func(
+      [&](unsigned s) {
+        auto u = generate_data(n, d, s);
+        FitControlsVinecop controls(fam);
+        controls.set_parametric_method("itau");
+        controls.set_conditioning_set(cond);
+        Vinecop vc(static_cast<size_t>(d));
+        vc.select(u, controls);
+      },
+      seeds);
+
+    // (3) isolated reorient() on a D-vine: reorient to the far path-end {1}
+    //     (always an admissible, non-trivial tail); subtract the copy cost.
+    auto pcs = Vinecop::make_pair_copula_store(static_cast<size_t>(d));
+    const auto par = Eigen::VectorXd::Constant(1, 2.0);
+    for (auto& tree : pcs)
+      for (auto& pc : tree)
+        pc = Bicop(BicopFamily::clayton, 0, par);
+    std::vector<size_t> ord(static_cast<size_t>(d));
+    for (int i = 0; i < d; ++i)
+      ord[static_cast<size_t>(i)] = static_cast<size_t>(i + 1);
+    const Vinecop base(DVineStructure(ord), pcs);
+
+    const Eigen::VectorXd t_copy = benchmark_func(
+      [&](unsigned) {
+        Vinecop vr = base;
+        (void)vr;
+      },
+      seeds);
+    const Eigen::VectorXd t_reo = benchmark_func(
+      [&](unsigned) {
+        Vinecop vr = base;
+        vr.reorient({ 1 });
+      },
+      seeds);
+
+    cout << d << "\t" << median(t_sel) - median(t_gen) << "\t"
+         << median(t_cond) - median(t_gen) << "\t"
+         << median(t_reo) - median(t_copy) << endl;
+  }
+}
+
 std::streamoff
 file_size(const std::string& filename)
 {
@@ -194,6 +265,7 @@ main()
   benchmark_vinecop_fitting();
   benchmark_bicop_tll();
   benchmark_persistence();
+  benchmark_vinecop_selection();
 
   return 0;
 }
