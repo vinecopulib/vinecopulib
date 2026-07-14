@@ -32,6 +32,20 @@
   reproduces the conditioning values exactly. Discrete conditioning variables
   are supported via the randomized Rosenblatt transform (each requires its
   left-limit CDF as an extra column of the conditioning matrix) (#696)
+
+* Add conditioning-aware vine structure selection via
+  `FitControlsVinecop::set_conditioning_set()` (also settable through
+  `FitControlsConfig::conditioning_set`): `Vinecop::select()` fits the
+  conditioning set's own optimal sub-vine and grows the remaining variables on
+  top of it, then places the conditioning set at the tail of the order (drawn
+  first) so it can be conditioned on with `simulate_conditional()`. The
+  conditioned variables' sub-structure is chosen by the usual Dissmann
+  selection (no degenerate fallback). Requires an MST `tree_algorithm` (#697)
+
+* Add `Vinecop::reorient()`, which relabels a fitted vine to an equivalent one
+  whose order tail equals a given set of variables (a value-preserving change:
+  `pdf`/`loglik` are invariant), so the model can be re-targeted for
+  conditioning without re-fitting (#697)
 * Speed up the bivariate copula evaluation engine: all internal evaluation
   leaves take `Eigen::Ref` (`tools_eigen::ConstMatRef`), removing an n x 2
   copy on every `pdf`/`hfunc`/`hinv`/`cdf` call; a new `log_pdf_raw` pathway
