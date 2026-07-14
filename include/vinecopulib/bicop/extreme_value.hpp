@@ -22,23 +22,23 @@ class ExtremeValueBicop : public ParBicop
 private:
   // pdf, cdf, hfunctions and inverses (`parameters` is m x p, m in {1, n}; a
   // single row is broadcast to all observations)
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd cdf(const tools_eigen::ConstMatRef& u,
+                      const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
-                          const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd pdf_raw(const tools_eigen::ConstMatRef& u,
+                          const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hfunc1_raw(const tools_eigen::ConstMatRef& u,
+                             const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hfunc2_raw(const tools_eigen::ConstMatRef& u,
+                             const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hinv1_raw(const tools_eigen::ConstMatRef& u,
+                            const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hinv2_raw(const tools_eigen::ConstMatRef& u,
+                            const tools_eigen::ConstMatRef& parameters);
 
   // pickands dependence functions and its derivatives; `parameters` is a single
   // parameter set (a p x 1 column)
@@ -53,6 +53,29 @@ private:
   virtual double pickands_derivative2(
     const double& t,
     const Eigen::Ref<const Eigen::VectorXd>& parameters) = 0;
+
+protected:
+  // fused evaluation of the Pickands function and its two derivatives;
+  // families with shared subexpressions across the three override this
+  virtual void pickands_all(const double& t,
+                            const Eigen::Ref<const Eigen::VectorXd>& parameters,
+                            double& A,
+                            double& A1,
+                            double& A2);
+
+  // array-valued Pickands function alone (for the cdf, which needs no
+  // derivatives); the default loops over the scalar version
+  virtual Eigen::ArrayXd pickands_arr(
+    const Eigen::ArrayXd& t,
+    const Eigen::Ref<const Eigen::VectorXd>& parameters);
+
+  // array-valued fused evaluation; the default loops over the scalar
+  // version, families override with a vectorized implementation
+  virtual void pickands_all(const Eigen::ArrayXd& t,
+                            const Eigen::Ref<const Eigen::VectorXd>& parameters,
+                            Eigen::ArrayXd& A,
+                            Eigen::ArrayXd& A1,
+                            Eigen::ArrayXd& A2);
 
   // link between Kendall's tau and the par_bicop parameter
   double parameters_to_tau(const Eigen::MatrixXd& par);

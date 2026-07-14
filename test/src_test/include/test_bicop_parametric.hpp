@@ -607,8 +607,17 @@ TEST_P(ParBicopTest, derivatives_per_row_parameters_match_loop)
     }
     // looser tolerance: the broadcast and per-row leaves may take different
     // (equivalent) evaluation paths, and nested finite differencing of the
-    // fallback amplifies the resulting machine-precision noise
-    ASSERT_TRUE(all_close(bicop_.pdf_deriv2(u, d, P), r_pdf, 1e-5, 1e-5))
+    // fallback (dividing by step^2) amplifies the resulting machine-precision
+    // noise. Analytic families agree tightly; the finite-difference-fallback
+    // families (BB1/6/7/8, Tawn) need extra slack because the vectorized
+    // broadcast value path diverges from the scalar per-row path at the FD
+    // noise floor -- and -O3/FMA reassociation in Release widens that gap
+    // further (~1.2e-4 for Tawn), so 1e-4 is not Release-safe. 1e-3 still
+    // catches gross per-row/broadcast disagreement (which is O(0.1) or more);
+    // this branch disappears once those families gain analytic derivatives.
+    const double tol =
+      is_member(family, bicop_families::analytic_derivs) ? 1e-5 : 1e-3;
+    ASSERT_TRUE(all_close(bicop_.pdf_deriv2(u, d, P), r_pdf, tol, tol))
       << bicop_.str() << "deriv: " << d;
   }
 
@@ -757,13 +766,21 @@ TEST(BicopDerivatives, selector_and_family_validation)
   Eigen::MatrixXd u(2, 2);
   u << 0.3, 0.4, 0.5, 0.6;
 
-  // nonparametric families have no derivatives
+  // the nonparametric tll exposes only the exact argument gradient of its
+  // density; parameter, second-order, and h-function derivatives throw. The
+  // default tll grid is the independence copula (a spatially flat density), so
+  // the gradient (and hence the logpdf gradient) is identically zero.
   Bicop tll(BicopFamily::tll);
-  EXPECT_ANY_THROW(tll.pdf_deriv(u, "u1"));
-  EXPECT_ANY_THROW(tll.pdf_deriv2(u, "u1u1"));
-  EXPECT_ANY_THROW(tll.hfunc1_deriv(u, "u1"));
+  EXPECT_TRUE(
+    all_close(tll.pdf_deriv(u, "u1"), Eigen::VectorXd::Zero(2), 1e-10, 1e-10));
+  EXPECT_TRUE(
+    all_close(tll.pdf_deriv(u, "u2"), Eigen::VectorXd::Zero(2), 1e-10, 1e-10));
+  EXPECT_TRUE(all_close(
+    tll.logpdf_deriv(u, "u1"), Eigen::VectorXd::Zero(2), 1e-10, 1e-10));
+  EXPECT_ANY_THROW(tll.pdf_deriv(u, "par1"));  // grid derivatives undefined
+  EXPECT_ANY_THROW(tll.pdf_deriv2(u, "u1u1")); // no meaningful second order
+  EXPECT_ANY_THROW(tll.hfunc1_deriv(u, "u1")); // h-function derivs not exposed
   EXPECT_ANY_THROW(tll.hfunc2_deriv(u, "u2"));
-  EXPECT_ANY_THROW(tll.logpdf_deriv(u, "u1"));
 
   Bicop cl(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 2.0));
 
@@ -870,4 +887,233 @@ INSTANTIATE_TEST_SUITE_P(
   ParBicopTest,
   testing::Combine(testing::ValuesIn(bicop_families::parametric),
                    testing::ValuesIn(rotations)));
+
+// Edge-case coverage for the vectorized/closed-form evaluation branches:
+// near-independence guards, NaN propagation through both the broadcast and
+// the per-row-parameters paths, and boundary parameters.
+TEST(test_bicop_parametric_edge_cases, near_independence_guards)
+{
+  Eigen::MatrixXd u(3, 2);
+  u << 0.2, 0.7, 0.5, 0.5, 0.9, 0.1;
+
+  // clayton at the smallest admissible parameter is near-independent
+  // (the theta < 1e-10 guard itself is unreachable through the public API,
+  // which enforces the lower bound)
+  auto clayton =
+    Bicop(BicopFamily::clayton, 0, Eigen::MatrixXd::Constant(1, 1, 1e-10));
+  EXPECT_TRUE(
+    test_utils::all_close(clayton.pdf(u), Eigen::VectorXd::Ones(3), 0.0, 1e-5));
+  EXPECT_TRUE(test_utils::all_close(clayton.hfunc1(u), u.col(1), 0.0, 1e-5));
+  EXPECT_TRUE(test_utils::all_close(clayton.hfunc2(u), u.col(0), 0.0, 1e-5));
+
+  auto frank =
+    Bicop(BicopFamily::frank, 0, Eigen::MatrixXd::Constant(1, 1, 1e-6));
+  EXPECT_TRUE(
+    test_utils::all_close(frank.pdf(u), Eigen::VectorXd::Ones(3), 0.0, 1e-12));
+  EXPECT_TRUE(test_utils::all_close(frank.hfunc1(u), u.col(1), 0.0, 1e-12));
+  EXPECT_TRUE(test_utils::all_close(frank.hinv1(u), u.col(1), 0.0, 1e-12));
+
+  // per-row-parameters path takes the scalar branches
+  Eigen::MatrixXd par_rows = Eigen::MatrixXd::Constant(3, 1, 1e-10);
+  EXPECT_TRUE(test_utils::all_close(
+    clayton.pdf(u, par_rows), Eigen::VectorXd::Ones(3), 0.0, 1e-5));
+  EXPECT_TRUE(
+    test_utils::all_close(clayton.hfunc1(u, par_rows), u.col(1), 0.0, 1e-5));
+  par_rows.setConstant(1e-6);
+  EXPECT_TRUE(test_utils::all_close(
+    frank.pdf(u, par_rows), Eigen::VectorXd::Ones(3), 0.0, 1e-12));
+  EXPECT_TRUE(
+    test_utils::all_close(frank.hinv1(u, par_rows), u.col(1), 0.0, 1e-12));
+}
+
+TEST(test_bicop_parametric_edge_cases, nan_propagation)
+{
+  Eigen::MatrixXd u(4, 2);
+  u << 0.2, 0.7, NAN, 0.5, 0.9, NAN, 0.3, 0.3;
+
+  for (auto family : { BicopFamily::clayton,
+                       BicopFamily::gumbel,
+                       BicopFamily::frank,
+                       BicopFamily::joe }) {
+    auto bc = Bicop(family, 0, Eigen::MatrixXd::Constant(1, 1, 2.0));
+    Eigen::MatrixXd par_rows = Eigen::MatrixXd::Constant(4, 1, 2.0);
+    for (const auto& v : { bc.pdf(u),
+                           bc.hfunc1(u),
+                           bc.hfunc2(u),
+                           bc.hinv1(u),
+                           bc.hinv2(u),
+                           bc.pdf(u, par_rows),
+                           bc.hfunc1(u, par_rows),
+                           bc.hfunc2(u, par_rows),
+                           bc.hinv1(u, par_rows),
+                           bc.hinv2(u, par_rows) }) {
+      EXPECT_TRUE((std::isnan)(v(1))) << bc.str();
+      EXPECT_TRUE((std::isnan)(v(2))) << bc.str();
+      EXPECT_FALSE((std::isnan)(v(0))) << bc.str();
+      EXPECT_FALSE((std::isnan)(v(3))) << bc.str();
+    }
+  }
+}
+
+TEST(test_bicop_parametric_edge_cases, tawn_boundary_parameters)
+{
+  // psi2 = 0 makes psi2 * t vanish, which exercises the boundary fallback
+  // of the fused Pickands evaluation (and the base-class implementation)
+  Eigen::VectorXd par(3);
+  par << 0.8, 0.0, 2.0;
+  auto tawn = Bicop(BicopFamily::tawn, 0, par);
+  Eigen::MatrixXd u(3, 2);
+  u << 0.2, 0.7, 0.5, 0.5, 0.9, 0.1;
+
+  auto pdf = tawn.pdf(u);
+  auto h1 = tawn.hfunc1(u);
+  auto cdf = tawn.cdf(u);
+  for (Eigen::Index i = 0; i < 3; ++i) {
+    EXPECT_TRUE(std::isfinite(pdf(i)));
+    EXPECT_GE(h1(i), 0.0);
+    EXPECT_LE(h1(i), 1.0);
+    EXPECT_GE(cdf(i), 0.0);
+    EXPECT_LE(cdf(i), 1.0);
+  }
+  EXPECT_TRUE(std::isfinite(tawn.parameters_to_tau(par)));
+}
+
+TEST(test_bicop_parametric_edge_cases, gumbel_extreme_corner)
+{
+  // u close to (1, 1) with a large theta underflows the generator terms;
+  // the h-function falls back to its independence limit (second argument)
+  auto bc = Bicop(BicopFamily::gumbel, 0, Eigen::MatrixXd::Constant(1, 1, 50));
+  Eigen::MatrixXd u(1, 2);
+  u << 1.0 - 1e-12, 1.0 - 1e-12;
+  auto h = bc.hfunc1(u);
+  EXPECT_GE(h(0), 0.0);
+  EXPECT_LE(h(0), 1.0);
+}
+
+// The safeguarded-Newton numeric h-inverse (bb1/6/7/8/tawn) must invert the
+// h-function even at strong dependence and near the unit-square boundary,
+// where the density on the flat wings would send a plain Newton step into a
+// limit cycle. Checks h(hinv(u)) == q and monotonicity of the inverse in q.
+TEST(test_bicop_parametric_edge_cases, newton_hinv_round_trip_extreme)
+{
+  std::vector<Eigen::VectorXd> pars;
+  std::vector<BicopFamily> fams;
+  auto add = [&](BicopFamily f, std::vector<double> p) {
+    Eigen::VectorXd v(p.size());
+    for (size_t i = 0; i < p.size(); ++i)
+      v(i) = p[i];
+    fams.push_back(f);
+    pars.push_back(v);
+  };
+  add(BicopFamily::bb1, { 6.0, 6.0 });
+  add(BicopFamily::bb6, { 6.0, 6.0 });
+  add(BicopFamily::bb7, { 6.0, 6.0 });
+  add(BicopFamily::bb8, { 6.0, 0.99 });
+  add(BicopFamily::tawn, { 0.5, 1.0, 6.0 });
+  add(BicopFamily::tawn, { 0.95, 0.95, 10.0 });
+
+  std::vector<double> pts = { 0.01, 0.05, 0.1, 0.3, 0.5, 0.7, 0.9, 0.95, 0.99 };
+  const Eigen::Index m = static_cast<Eigen::Index>(pts.size());
+  Eigen::MatrixXd u(m * m, 2);
+  Eigen::Index k = 0;
+  for (Eigen::Index i = 0; i < m; ++i)
+    for (Eigen::Index j = 0; j < m; ++j) {
+      u(k, 0) = pts[i];
+      u(k, 1) = pts[j];
+      ++k;
+    }
+
+  for (size_t c = 0; c < fams.size(); ++c) {
+    Bicop bc(fams[c], 0, pars[c]);
+    for (int dir = 1; dir <= 2; ++dir) {
+      Eigen::VectorXd v = (dir == 1) ? bc.hinv1(u) : bc.hinv2(u);
+      Eigen::MatrixXd uu = u;
+      if (dir == 1)
+        uu.col(1) = v;
+      else
+        uu.col(0) = v;
+      Eigen::VectorXd back = (dir == 1) ? bc.hfunc1(uu) : bc.hfunc2(uu);
+      Eigen::VectorXd q = (dir == 1) ? u.col(1) : u.col(0);
+      // the h-function is nearly flat/steep in the corners, so the round trip
+      // loosens there; this still catches the ~0.1 error of a Newton limit
+      // cycle (the bug the safeguard prevents)
+      EXPECT_TRUE(test_utils::all_close(back, q, 0.0, 1e-4))
+        << bc.str() << " dir=" << dir;
+
+      // monotone in the conditioned quantile: hold the first coordinate,
+      // sweep q upward, the inverse must not decrease
+      Eigen::MatrixXd mono(m, 2);
+      for (Eigen::Index i = 0; i < m; ++i) {
+        mono(i, dir == 1 ? 0 : 1) = 0.4;
+        mono(i, dir == 1 ? 1 : 0) = pts[i];
+      }
+      Eigen::VectorXd vv = (dir == 1) ? bc.hinv1(mono) : bc.hinv2(mono);
+      for (Eigen::Index i = 1; i < m; ++i)
+        EXPECT_GE(vv(i) + 1e-10, vv(i - 1)) << bc.str() << " dir=" << dir;
+    }
+  }
+}
+
+// The Newton h-inverse must agree with a high-iteration bisection reference
+// (computed through the public h-function) to 1e-9 on an interior lattice,
+// at both moderate and strong dependence.
+TEST(test_bicop_parametric_edge_cases, newton_hinv_matches_bisection)
+{
+  std::vector<Eigen::VectorXd> pars;
+  std::vector<BicopFamily> fams;
+  auto add = [&](BicopFamily f, std::vector<double> p) {
+    Eigen::VectorXd v(p.size());
+    for (size_t i = 0; i < p.size(); ++i)
+      v(i) = p[i];
+    fams.push_back(f);
+    pars.push_back(v);
+  };
+  add(BicopFamily::bb1, { 1.0, 1.5 });
+  add(BicopFamily::bb1, { 5.0, 5.0 });
+  add(BicopFamily::bb6, { 1.5, 1.5 });
+  add(BicopFamily::bb6, { 5.0, 5.0 });
+  add(BicopFamily::bb7, { 1.5, 1.0 });
+  add(BicopFamily::bb7, { 5.0, 5.0 });
+  add(BicopFamily::bb8, { 3.0, 0.8 });
+  add(BicopFamily::bb8, { 6.0, 0.95 });
+  add(BicopFamily::tawn, { 0.8, 0.5, 2.0 });
+  add(BicopFamily::tawn, { 0.5, 1.0, 6.0 });
+
+  const int m = 21;
+  Eigen::MatrixXd u(m * m, 2);
+  Eigen::Index k = 0;
+  for (int i = 1; i <= m; ++i)
+    for (int j = 1; j <= m; ++j) {
+      u(k, 0) = i / (m + 1.0);
+      u(k, 1) = j / (m + 1.0);
+      ++k;
+    }
+
+  for (size_t c = 0; c < fams.size(); ++c) {
+    Bicop bc(fams[c], 0, pars[c]);
+    auto oracle = [&](bool dir1) {
+      const Eigen::Index nr = u.rows();
+      Eigen::VectorXd lo = Eigen::VectorXd::Constant(nr, 1e-12);
+      Eigen::VectorXd hi = Eigen::VectorXd::Constant(nr, 1 - 1e-12);
+      Eigen::VectorXd q = dir1 ? u.col(1) : u.col(0);
+      Eigen::MatrixXd uu = u;
+      for (int it = 0; it < 45; ++it) {
+        Eigen::VectorXd mid = 0.5 * (lo + hi);
+        (dir1 ? uu.col(1) : uu.col(0)) = mid;
+        Eigen::VectorXd hv = dir1 ? bc.hfunc1(uu) : bc.hfunc2(uu);
+        for (Eigen::Index r = 0; r < nr; ++r) {
+          if (hv(r) < q(r))
+            lo(r) = mid(r);
+          else
+            hi(r) = mid(r);
+        }
+      }
+      return Eigen::VectorXd(0.5 * (lo + hi));
+    };
+    EXPECT_TRUE(test_utils::all_close(bc.hinv1(u), oracle(true), 0.0, 1e-9))
+      << bc.str();
+    EXPECT_TRUE(test_utils::all_close(bc.hinv2(u), oracle(false), 0.0, 1e-9))
+      << bc.str();
+  }
+}
 }

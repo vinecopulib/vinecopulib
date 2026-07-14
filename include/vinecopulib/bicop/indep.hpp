@@ -26,23 +26,23 @@ public:
 private:
   // evaluation leaves; the independence copula has no parameters, so they
   // ignore `parameters`
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
-                          const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd pdf_raw(const tools_eigen::ConstMatRef& u,
+                          const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd cdf(const tools_eigen::ConstMatRef& u,
+                      const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hfunc1_raw(const tools_eigen::ConstMatRef& u,
+                             const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hfunc2_raw(const tools_eigen::ConstMatRef& u,
+                             const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hinv1_raw(const tools_eigen::ConstMatRef& u,
+                            const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hinv2_raw(const tools_eigen::ConstMatRef& u,
+                            const tools_eigen::ConstMatRef& parameters);
 
   Eigen::MatrixXd tau_to_parameters(const double&);
 

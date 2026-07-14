@@ -26,17 +26,17 @@ public:
 private:
   // evaluation leaves (`parameters` is m x 2, m in {1, n}); these loop per row
   // because the t-distribution helpers take scalar parameters
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
-                          const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd pdf_raw(const tools_eigen::ConstMatRef& u,
+                          const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd cdf(const tools_eigen::ConstMatRef& u,
+                      const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hfunc1_raw(const tools_eigen::ConstMatRef& u,
+                             const tools_eigen::ConstMatRef& parameters);
 
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd hinv1_raw(const tools_eigen::ConstMatRef& u,
+                            const tools_eigen::ConstMatRef& parameters);
 
   // analytic derivative leaves (canonical selectors; see tools_deriv),
   // ported from the VineCopula C sources (tcopuladeriv.c,
@@ -108,16 +108,16 @@ private:
 
   // single source of truth for the math (shared by the state-based and
   // parameter-aware leaves)
-  static Eigen::VectorXd pdf_impl(const Eigen::MatrixXd& u,
+  static Eigen::VectorXd pdf_impl(const tools_eigen::ConstMatRef& u,
                                   double rho,
                                   double nu);
-  static Eigen::VectorXd cdf_impl(const Eigen::MatrixXd& u,
+  static Eigen::VectorXd cdf_impl(const tools_eigen::ConstMatRef& u,
                                   double rho,
                                   double nu);
-  static Eigen::VectorXd hfunc1_impl(const Eigen::MatrixXd& u,
+  static Eigen::VectorXd hfunc1_impl(const tools_eigen::ConstMatRef& u,
                                      double rho,
                                      double nu);
-  static Eigen::VectorXd hinv1_impl(const Eigen::MatrixXd& u,
+  static Eigen::VectorXd hinv1_impl(const tools_eigen::ConstMatRef& u,
                                     double rho,
                                     double nu);
 

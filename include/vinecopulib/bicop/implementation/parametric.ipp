@@ -16,6 +16,16 @@ ParBicop::get_parameters() const
   return parameters_;
 }
 
+inline const Eigen::MatrixXd&
+ParBicop::parameters_row() const
+{
+  // thread-local so concurrent evaluations of the same object don't race;
+  // the assignment reuses the buffer when sizes match (no allocation)
+  static thread_local Eigen::MatrixXd storage;
+  storage = parameters_.transpose();
+  return storage;
+}
+
 inline Eigen::MatrixXd
 ParBicop::get_parameters_lower_bounds() const
 {
@@ -233,7 +243,7 @@ ParBicop::adjust_parameters_bounds(Eigen::MatrixXd& lb,
   }
 
   // refine search interval for Brent algorithm
-  double eps = (var_types_ == std::vector<std::string>{ "c", "c" }) ? 0.1 : 0.6;
+  double eps = all_continuous_ ? 0.1 : 0.6;
   if (tools_stl::is_member(family_, bicop_families::one_par)) {
     auto lb2 = lb;
     auto ub2 = ub;
@@ -295,8 +305,8 @@ inline void
 ParBicop::check_parameters_lower(const Eigen::MatrixXd& parameters)
 {
   if (parameters_lower_bounds_.size() > 0) {
-    std::stringstream message;
     if ((parameters.array() < parameters_lower_bounds_.array()).any()) {
+      std::stringstream message;
       message << "parameters exceed lower bound "
               << "for " << get_family_name() << " copula; " << std::endl
               << "bound:" << std::endl
@@ -312,8 +322,8 @@ inline void
 ParBicop::check_parameters_upper(const Eigen::MatrixXd& parameters)
 {
   if (parameters_upper_bounds_.size() > 0) {
-    std::stringstream message;
     if ((parameters.array() > parameters_upper_bounds_.array()).any()) {
+      std::stringstream message;
       message << "parameters exceed upper bound "
               << "for " << get_family_name() << " copula; " << std::endl
               << "bound:" << std::endl
@@ -341,54 +351,6 @@ ParBicop::check_fit_method(const std::string& method)
 
 //! @}
 
-//! @name Finite-difference derivative fallbacks
-//!
-//! Central differences of the value leaves w.r.t. a single component; the
-//! second-order versions difference the (possibly analytic) first-derivative
-//! leaves. Steps are clipped to the parameter bounds / the unit interval,
-//! with the effective step kept in the denominator.
-//! @{
-
-//! differentiates `f` w.r.t. component `comp` (0-based parameter index, `-1`
-//! for the first argument, `-2` for the second) by central differences.
-inline Eigen::VectorXd
-ParBicop::fd_deriv(
-  const std::function<Eigen::VectorXd(const Eigen::MatrixXd&,
-                                      const Eigen::MatrixXd&)>& f,
-  const Eigen::MatrixXd& u,
-  const Eigen::MatrixXd& parameters,
-  int comp)
-{
-  if (comp >= 0) {
-    Eigen::MatrixXd par_plus = parameters;
-    Eigen::MatrixXd par_minus = parameters;
-    double lb = parameters_lower_bounds_(comp);
-    double ub = parameters_upper_bounds_(comp);
-    for (Eigen::Index i = 0; i < parameters.rows(); ++i) {
-      double par = parameters(i, comp);
-      double eps = 1e-4 * std::max(1.0, std::fabs(par));
-      par_plus(i, comp) = std::min(par + eps, ub);
-      par_minus(i, comp) = std::max(par - eps, lb);
-    }
-    Eigen::VectorXd diff = f(u, par_plus) - f(u, par_minus);
-    if (parameters.rows() == 1) {
-      return diff / (par_plus(0, comp) - par_minus(0, comp));
-    }
-    Eigen::ArrayXd eps = (par_plus.col(comp) - par_minus.col(comp)).array();
-    return (diff.array() / eps).matrix();
-  }
-
-  // argument derivative; stay strictly inside the unit interval
-  Eigen::Index col = (comp == -1) ? 0 : 1;
-  Eigen::MatrixXd u_plus = u;
-  Eigen::MatrixXd u_minus = u;
-  u_plus.col(col) = (u.col(col).array() + 1e-5).min(1 - 1e-10);
-  u_minus.col(col) = (u.col(col).array() - 1e-5).max(1e-10);
-  Eigen::ArrayXd eps = u_plus.col(col).array() - u_minus.col(col).array();
-  return ((f(u_plus, parameters) - f(u_minus, parameters)).array() / eps)
-    .matrix();
-}
-
 //! central finite differences of a scalar objective `f` w.r.t. each
 //! optimization variable, with steps clipped to `[lb, ub]`.
 inline Eigen::VectorXd
@@ -412,81 +374,4 @@ ParBicop::fd_grad(const std::function<double(const Eigen::VectorXd&)>& f,
   return grad;
 }
 
-inline Eigen::VectorXd
-ParBicop::pdf_deriv_raw(const Eigen::MatrixXd& u,
-                        const Eigen::MatrixXd& parameters,
-                        const std::string& deriv)
-{
-  auto comps = tools_deriv::parse_components(deriv);
-  auto f = [this](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
-    return pdf_raw(uu, pp);
-  };
-  return fd_deriv(f, u, parameters, comps[0]);
-}
-
-inline Eigen::VectorXd
-ParBicop::pdf_deriv2_raw(const Eigen::MatrixXd& u,
-                         const Eigen::MatrixXd& parameters,
-                         const std::string& deriv)
-{
-  // difference the first-derivative leaf w.r.t. the second component; this
-  // uses the analytic first derivative when the family provides one
-  auto comps = tools_deriv::parse_components(deriv);
-  auto first = tools_deriv::comp_to_string(comps[0]);
-  auto f = [this, first](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
-    return pdf_deriv_raw(uu, pp, first);
-  };
-  return fd_deriv(f, u, parameters, comps[1]);
-}
-
-inline Eigen::VectorXd
-ParBicop::hfunc1_deriv_raw(const Eigen::MatrixXd& u,
-                           const Eigen::MatrixXd& parameters,
-                           const std::string& deriv)
-{
-  auto comps = tools_deriv::parse_components(deriv);
-  auto f = [this](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
-    return hfunc1_raw(uu, pp);
-  };
-  return fd_deriv(f, u, parameters, comps[0]);
-}
-
-inline Eigen::VectorXd
-ParBicop::hfunc1_deriv2_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters,
-                            const std::string& deriv)
-{
-  auto comps = tools_deriv::parse_components(deriv);
-  auto first = tools_deriv::comp_to_string(comps[0]);
-  auto f = [this, first](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
-    return hfunc1_deriv_raw(uu, pp, first);
-  };
-  return fd_deriv(f, u, parameters, comps[1]);
-}
-
-inline Eigen::VectorXd
-ParBicop::hfunc2_deriv_raw(const Eigen::MatrixXd& u,
-                           const Eigen::MatrixXd& parameters,
-                           const std::string& deriv)
-{
-  auto comps = tools_deriv::parse_components(deriv);
-  auto f = [this](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
-    return hfunc2_raw(uu, pp);
-  };
-  return fd_deriv(f, u, parameters, comps[0]);
-}
-
-inline Eigen::VectorXd
-ParBicop::hfunc2_deriv2_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters,
-                            const std::string& deriv)
-{
-  auto comps = tools_deriv::parse_components(deriv);
-  auto first = tools_deriv::comp_to_string(comps[0]);
-  auto f = [this, first](const Eigen::MatrixXd& uu, const Eigen::MatrixXd& pp) {
-    return hfunc2_deriv_raw(uu, pp, first);
-  };
-  return fd_deriv(f, u, parameters, comps[1]);
-}
-//! @}
 }

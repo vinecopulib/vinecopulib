@@ -22,6 +22,8 @@ protected:
   // Getters and setters
   Eigen::MatrixXd get_parameters() const;
 
+  const Eigen::MatrixXd& parameters_row() const override;
+
   Eigen::MatrixXd get_parameters_lower_bounds() const;
 
   Eigen::MatrixXd get_parameters_upper_bounds() const;
@@ -47,41 +49,7 @@ protected:
 
   virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
 
-  // fallback derivative leaves: central finite differences of the value
-  // leaves, so that every parametric family supports the derivative
-  // interface; families with closed forms override these.
-  Eigen::VectorXd pdf_deriv_raw(const Eigen::MatrixXd& u,
-                                const Eigen::MatrixXd& parameters,
-                                const std::string& deriv);
-
-  Eigen::VectorXd pdf_deriv2_raw(const Eigen::MatrixXd& u,
-                                 const Eigen::MatrixXd& parameters,
-                                 const std::string& deriv);
-
-  Eigen::VectorXd hfunc1_deriv_raw(const Eigen::MatrixXd& u,
-                                   const Eigen::MatrixXd& parameters,
-                                   const std::string& deriv);
-
-  Eigen::VectorXd hfunc1_deriv2_raw(const Eigen::MatrixXd& u,
-                                    const Eigen::MatrixXd& parameters,
-                                    const std::string& deriv);
-
-  Eigen::VectorXd hfunc2_deriv_raw(const Eigen::MatrixXd& u,
-                                   const Eigen::MatrixXd& parameters,
-                                   const std::string& deriv);
-
-  Eigen::VectorXd hfunc2_deriv2_raw(const Eigen::MatrixXd& u,
-                                    const Eigen::MatrixXd& parameters,
-                                    const std::string& deriv);
-
 private:
-  Eigen::VectorXd fd_deriv(
-    const std::function<Eigen::VectorXd(const Eigen::MatrixXd&,
-                                        const Eigen::MatrixXd&)>& f,
-    const Eigen::MatrixXd& u,
-    const Eigen::MatrixXd& parameters,
-    int comp);
-
   // central finite differences of a scalar objective `f` w.r.t. each
   // optimization variable, used as the gradient fallback when no analytic
   // score is available (e.g. discrete data). Steps are clipped to `[lb, ub]`.
@@ -90,6 +58,7 @@ private:
     const Eigen::VectorXd& x,
     const Eigen::VectorXd& lb,
     const Eigen::VectorXd& ub);
+    
   double winsorize_tau(double tau) const;
 
   void adjust_parameters_bounds(Eigen::MatrixXd& lb,

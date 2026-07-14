@@ -46,23 +46,104 @@ ClaytonBicop::generator_derivative(
 }
 
 inline Eigen::VectorXd
-ClaytonBicop::pdf_raw(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters)
+ClaytonBicop::log_pdf_raw(const tools_eigen::ConstMatRef& u,
+                          const tools_eigen::ConstMatRef& parameters)
 {
+  if (parameters.rows() == 1) {
+    // vectorized evaluation for a single (broadcast) parameter set
+    const double theta = parameters(0, 0);
+    const auto u1 = u.col(0).array();
+    const auto u2 = u.col(1).array();
+    Eigen::ArrayXd out;
+    if (theta < 1e-10) {
+      // avoid numerical issues when copula is too close to independence
+      out = (u1.isNaN() || u2.isNaN())
+              .select(std::numeric_limits<double>::quiet_NaN(),
+                      Eigen::ArrayXd::Zero(u.rows()));
+    } else {
+      // u^(-theta) as exp(-theta*log(u)): Eigen's packetized log/exp kernels
+      // are several times cheaper than its generic_pow, and the logs are
+      // shared with the -(1+theta)*log(u1*u2) term
+      Eigen::ArrayXd lu1 = u1.log();
+      Eigen::ArrayXd lu2 = u2.log();
+      out = std::log1p(theta) - (1.0 + theta) * (lu1 + lu2) -
+            (2.0 + 1.0 / theta) *
+              ((-theta * lu1).exp() + (-theta * lu2).exp() - 1.0).log();
+    }
+    return out.matrix();
+  }
+
   auto f = [](const double& u1,
               const double& u2,
               const Eigen::Ref<const Eigen::VectorXd>& par) {
     double theta = par(0);
     // avoid numerical issues when copula is too close to independence
     if (theta < 1e-10) {
-      return 1.0;
+      return 0.0;
     }
     double temp = std::log1p(theta) - (1.0 + theta) * std::log(u1 * u2);
-    temp = temp - (2.0 + 1.0 / (theta)) *
+    return temp - (2.0 + 1.0 / (theta)) *
                     std::log(std::pow(u1, -theta) + std::pow(u2, -theta) - 1.0);
-    return std::exp(temp);
   };
   return tools_eigen::binaryExpr_or_nan(u, parameters, f);
+}
+
+inline Eigen::VectorXd
+ClaytonBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
+                      const tools_eigen::ConstMatRef& parameters)
+{
+  return log_pdf_raw(u, parameters).array().exp().matrix();
+}
+
+//! closed-form h-function h(uother | ucond); replaces the generic
+//! generator-based per-element evaluation (which needs four virtual calls
+//! per observation) and the full-matrix `swap_cols` copy for `hfunc2`.
+inline Eigen::VectorXd
+ClaytonBicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
+                             const Eigen::Ref<const Eigen::VectorXd>& uother,
+                             const tools_eigen::ConstMatRef& parameters) const
+{
+  // near-independence guard (theta < 1e-10): h = uother, consistent with the
+  // density's guard
+  return apply_closed_form_h(
+    ucond,
+    uother,
+    parameters,
+    [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
+      const double theta = parameters(0, 0);
+      if (theta < 1e-10) {
+        return uo;
+      }
+      // x^(-theta) via exp(-theta*log(x)) (packetized log/exp beat
+      // generic_pow); uc^(-1-theta) = uc^(-theta) / uc
+      Eigen::ArrayXd tc = (-theta * uc.log()).exp();
+      return (tc / uc) * ((-1.0 - 1.0 / theta) *
+                          (tc + (-theta * uo.log()).exp() - 1.0).log())
+                           .exp();
+    },
+    [&](Eigen::Index i, double uc, double uo) -> double {
+      const double theta = parameters(i, 0);
+      if (theta < 1e-10) {
+        return uo;
+      }
+      return std::pow(uc, -(1.0 + theta)) *
+             std::pow(std::pow(uc, -theta) + std::pow(uo, -theta) - 1.0,
+                      -1.0 - 1.0 / theta);
+    });
+}
+
+inline Eigen::VectorXd
+ClaytonBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
+                         const tools_eigen::ConstMatRef& parameters)
+{
+  return hfunc_internal(u.col(0), u.col(1), parameters);
+}
+
+inline Eigen::VectorXd
+ClaytonBicop::hfunc2_raw(const tools_eigen::ConstMatRef& u,
+                         const tools_eigen::ConstMatRef& parameters)
+{
+  return hfunc_internal(u.col(1), u.col(0), parameters);
 }
 
 inline Eigen::VectorXd
@@ -532,8 +613,8 @@ ClaytonBicop::logpdf_deriv2_raw(const Eigen::MatrixXd& u,
 }
 
 inline Eigen::VectorXd
-ClaytonBicop::hinv1_raw(const Eigen::MatrixXd& u,
-                        const Eigen::MatrixXd& parameters)
+ClaytonBicop::hinv1_raw(const tools_eigen::ConstMatRef& u,
+                        const tools_eigen::ConstMatRef& parameters)
 {
   // theta is bounded above by 28 < 75, so the closed form is always used
   const Eigen::Index n = u.rows();
@@ -541,12 +622,13 @@ ClaytonBicop::hinv1_raw(const Eigen::MatrixXd& u,
     tools_eigen::parameter_as_vector(parameters, 0, n).array();
   Eigen::ArrayXd u0 = u.col(0).array();
   Eigen::ArrayXd u1 = u.col(1).array();
-  Eigen::ArrayXd hinv = u0.pow(theta + 1.0);
-  hinv = u1 * hinv;
-  hinv = hinv.pow(-theta / (theta + 1.0));
-  Eigen::ArrayXd x = u0.pow(-theta);
-  hinv = hinv - x + 1.0;
-  hinv = hinv.pow(-1.0 / theta);
+  // powers via exp(c*log(x)) with the log of u0 shared (packetized log/exp
+  // kernels beat Eigen's generic_pow)
+  Eigen::ArrayXd lu0 = u0.log();
+  Eigen::ArrayXd hinv = u1 * ((theta + 1.0) * lu0).exp();
+  hinv = ((-theta / (theta + 1.0)) * hinv.log()).exp();
+  hinv = hinv - (-theta * lu0).exp() + 1.0;
+  hinv = ((-1.0 / theta) * hinv.log()).exp();
   return hinv.matrix();
 }
 

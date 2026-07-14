@@ -37,8 +37,21 @@ private:
     const Eigen::Ref<const Eigen::VectorXd>& parameters);
 
   // pdf
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
-                          const Eigen::MatrixXd& parameters);
+  Eigen::VectorXd pdf_raw(const tools_eigen::ConstMatRef& u,
+                          const tools_eigen::ConstMatRef& parameters);
+
+  Eigen::VectorXd hfunc1_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
+
+  Eigen::VectorXd hfunc2_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
+
+  Eigen::VectorXd hfunc_internal(
+    const Eigen::Ref<const Eigen::VectorXd>& ucond,
+    const Eigen::Ref<const Eigen::VectorXd>& uother,
+    const tools_eigen::ConstMatRef& parameters) const;
 
   // analytic derivatives (per-selector closed forms; see bb1.ipp)
   Eigen::VectorXd pdf_deriv_raw(const Eigen::MatrixXd& u,
