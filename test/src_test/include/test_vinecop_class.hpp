@@ -440,6 +440,110 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
     vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)), u, 1e-6, 1e-6));
 }
 
+// helper: a Clayton D-vine on 1..d, whose order is 1..d so the sampling order
+// (and hence the admissible conditioning tail) is well-defined and R-free.
+namespace {
+inline Vinecop
+make_clayton_dvine(size_t d, double par_value = 4.0, int rotation = 0)
+{
+  auto pcs = Vinecop::make_pair_copula_store(d);
+  auto par = Eigen::VectorXd::Constant(1, par_value);
+  for (auto& tree : pcs)
+    for (auto& pc : tree)
+      pc = Bicop(BicopFamily::clayton, rotation, par);
+  std::vector<size_t> order(d);
+  for (size_t i = 0; i < d; ++i)
+    order[i] = i + 1;
+  return Vinecop(DVineStructure(order), pcs);
+}
+}
+
+TEST_F(VinecopTest, simulate_conditional_is_correct)
+{
+  size_t d = 4;
+  auto vc = make_clayton_dvine(d);
+  auto order = vc.get_order();
+  // the conditioning variables are the last two of the order (drawn first);
+  // u_cond column i corresponds to variable order[d - k + i].
+  size_t c0 = order[d - 2] - 1; // <-> u_cond column 0
+  size_t c1 = order[d - 1] - 1; // <-> u_cond column 1
+  size_t n = 1000;
+
+  // (a) fixed conditioning point repeated n times: the conditioning columns
+  //     are reproduced exactly and n samples are drawn.
+  Eigen::MatrixXd u0(1, 2);
+  u0 << 0.3, 0.7;
+  auto U = vc.simulate_conditional(u0.replicate(n, 1), false, 1, { 1 });
+  ASSERT_EQ(static_cast<size_t>(U.rows()), n);
+  ASSERT_EQ(static_cast<size_t>(U.cols()), d);
+  EXPECT_TRUE(
+    all_close(U.col(c0), Eigen::VectorXd::Constant(n, 0.3), 1e-9, 1e-9));
+  EXPECT_TRUE(
+    all_close(U.col(c1), Eigen::VectorXd::Constant(n, 0.7), 1e-9, 1e-9));
+
+  // (b) per-sample form: one conditioning row per output sample
+  Eigen::MatrixXd ucn(n, 2);
+  ucn.col(0) = Eigen::VectorXd::LinSpaced(n, 0.1, 0.9);
+  ucn.col(1).setConstant(0.5);
+  auto Un = vc.simulate_conditional(ucn, false, 1, { 2 });
+  EXPECT_TRUE(all_close(Un.col(c0), ucn.col(0), 1e-9, 1e-9));
+  EXPECT_TRUE(all_close(Un.col(c1), ucn.col(1), 1e-9, 1e-9));
+
+  // (c) multi-threaded == single-threaded (identical seeds)
+  auto uc = u0.replicate(n, 1);
+  auto U_mt = vc.simulate_conditional(uc, false, 2, { 1 });
+  EXPECT_TRUE(all_close(U_mt, U, 1e-10, 1e-10));
+
+  // (d) determinism: identical seeds -> identical output
+  auto U_again = vc.simulate_conditional(uc, false, 1, { 1 });
+  EXPECT_TRUE(all_close(U_again, U, 1e-12, 1e-12));
+
+  // (e) statistical correctness: the conditional mean of a free variable
+  //     matches a large unconditional sample filtered near the conditioning
+  //     values, and clearly differs from the unconditional mean.
+  size_t freevar = order[0] - 1; // drawn last, conditioned on all others
+  Eigen::MatrixXd u02(1, 2);
+  u02 << 0.8, 0.8;
+  auto Uc = vc.simulate_conditional(u02.replicate(100000, 1), false, 1, { 7 });
+  double cond_mean = Uc.col(freevar).mean();
+
+  auto big = vc.simulate(1000000, false, 1, { 11 });
+  double sum = 0.0, cnt = 0.0, eps = 0.03;
+  for (int i = 0; i < big.rows(); ++i) {
+    if ((std::abs(big(i, c0) - 0.8) < eps) &&
+        (std::abs(big(i, c1) - 0.8) < eps)) {
+      sum += big(i, freevar);
+      cnt += 1.0;
+    }
+  }
+  double ref_mean = sum / cnt;
+  EXPECT_NEAR(cond_mean, ref_mean, 0.02);
+  EXPECT_GT(std::abs(cond_mean - big.col(freevar).mean()), 0.1);
+}
+
+TEST_F(VinecopTest, simulate_conditional_throws)
+{
+  size_t d = 4;
+  auto vc = make_clayton_dvine(d, 2.0);
+  Eigen::MatrixXd uc(3, 2);
+  uc.setConstant(0.5);
+
+  // empty conditioning set (0 columns)
+  EXPECT_ANY_THROW(
+    vc.simulate_conditional(Eigen::MatrixXd(3, 0), false, 1, { 1 }));
+  // too many columns (k >= d)
+  EXPECT_ANY_THROW(vc.simulate_conditional(
+    Eigen::MatrixXd::Constant(3, d, 0.5), false, 1, { 1 }));
+  // values outside the unit cube
+  Eigen::MatrixXd uc_bad(1, 2);
+  uc_bad << 0.3, 1.5;
+  EXPECT_ANY_THROW(vc.simulate_conditional(uc_bad, false, 1, { 1 }));
+  // discrete variables are not supported
+  auto vc_disc = make_clayton_dvine(d, 2.0);
+  vc_disc.set_var_types({ "c", "c", "c", "d" });
+  EXPECT_ANY_THROW(vc_disc.simulate_conditional(uc, false, 1, { 1 }));
+}
+
 TEST_F(VinecopTest, scores_stepwise)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);

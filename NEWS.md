@@ -2,6 +2,13 @@
 
 ### NEW FEATURES
 
+* Add `Vinecop::simulate_conditional()` for sampling from the conditional
+  distribution given fixed values of a subset of variables. The conditioning
+  variables are the last `k` of the vine order `get_order()` (the columns of
+  the conditioning matrix, left to right, correspond to those last `k`
+  entries); the method is built on `rosenblatt()`/`inverse_rosenblatt()` and
+  reproduces the conditioning values exactly. Continuous variables only (#696)
+
 * Speed up the bivariate copula evaluation engine: all internal evaluation
   leaves take `Eigen::Ref` (`tools_eigen::ConstMatRef`), removing an n x 2
   copy on every `pdf`/`hfunc`/`hinv`/`cdf` call; a new `log_pdf_raw` pathway

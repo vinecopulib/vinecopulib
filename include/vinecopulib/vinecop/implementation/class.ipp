@@ -2292,6 +2292,86 @@ Vinecop::simulate(const size_t n,
   ;
 }
 
+//! @brief Simulates from the conditional distribution of a subset of variables
+//! given fixed values of the remaining variables.
+//!
+//! @details The conditioning variables are the last `k = u_cond.cols()`
+//! variables of the vine order `get_order()` (they are drawn first by the vine
+//! and form a self-contained sub-vine). Each row of `u_cond` is one
+//! conditioning point; the corresponding output row is drawn from the
+//! remaining variables' distribution conditional on that point. It is
+//! implemented as a Rosenblatt transform of the conditioning variables
+//! followed by an inverse Rosenblatt transform (see `rosenblatt()` /
+//! `inverse_rosenblatt()`); the conditioning columns of the result therefore
+//! reproduce `u_cond` exactly. Only continuous variables are supported.
+//!
+//! @param u_cond An \f$ n \times k \f$ matrix of conditioning values; row `j`
+//!   is the conditioning point for output sample `j` (the number of samples
+//!   `n` is `u_cond.rows()`). Column `i` holds the values of variable
+//!   `get_order()[d - k + i]`, i.e. the columns correspond, left to right, to
+//!   the last `k` entries of `get_order()`. To draw many samples at a single
+//!   conditioning point, pass that point repeated (e.g. `u0.replicate(n, 1)`).
+//! @param qrng Set to true for quasi-random numbers (over the conditioned
+//!   variables).
+//! @param num_threads The number of threads to use for computations.
+//! @param seeds Seeds of the random number generator; if empty (default),
+//!   the random number generator is seeded randomly.
+//! @return An \f$ n \times d \f$ matrix; the conditioning columns equal the
+//!   conditioning values and the remaining columns are draws from the
+//!   conditional distribution.
+inline Eigen::MatrixXd
+Vinecop::simulate_conditional(const Eigen::MatrixXd& u_cond,
+                              const bool qrng,
+                              const size_t num_threads,
+                              const std::vector<int>& seeds) const
+{
+  size_t n = static_cast<size_t>(u_cond.rows());
+  size_t k = static_cast<size_t>(u_cond.cols());
+
+  // ---- validation ----
+  if (is_discrete()) {
+    throw std::runtime_error("simulate_conditional() currently supports "
+                             "continuous variables only.");
+  }
+  if ((k == 0) || (k >= d_)) {
+    throw std::runtime_error("u_cond must have between 1 and d - 1 columns "
+                             "(the number of conditioning variables).");
+  }
+  if (!tools_eigen::check_if_in_unit_cube(u_cond)) {
+    throw std::runtime_error("all elements of u_cond must be in (0, 1).");
+  }
+
+  // The conditioning variables are the last k of the vine order; they are
+  // drawn first and form a self-contained sub-vine, so any tail is admissible.
+  // Column i of u_cond holds the values of variable order[d - k + i].
+  auto order = rvine_structure_.get_order();
+
+  // ---- algorithm (reuse the tested Rosenblatt primitives) ----
+  // 1. Embed the conditioning values into a full data matrix. The filler
+  //    values are irrelevant: the conditioning block is self-contained, so its
+  //    Rosenblatt transform depends only on the conditioning values.
+  Eigen::MatrixXd u_completed = Eigen::MatrixXd::Constant(n, d_, 0.5);
+  for (size_t i = 0; i < k; ++i) {
+    size_t col = order[d_ - k + i] - 1;
+    u_completed.col(col) = u_cond.col(i);
+  }
+
+  // 2. Recover the independent-uniform seeds of the conditioning block.
+  Eigen::MatrixXd w = rosenblatt(u_completed, num_threads, false);
+
+  // 3. Assemble the seed matrix: conditioning seeds + fresh uniforms for the
+  //    conditioned variables.
+  Eigen::MatrixXd u = tools_stats::simulate_uniform(n, d_, qrng, seeds);
+  for (size_t i = 0; i < k; ++i) {
+    size_t col = order[d_ - k + i] - 1;
+    u.col(col) = w.col(col);
+  }
+
+  // 4. Inverse Rosenblatt: reproduces u_cond in the conditioning columns and
+  //    draws the remaining variables from their conditional distribution.
+  return inverse_rosenblatt(u, num_threads);
+}
+
 //! @brief Evaluates the log-likelihood.
 //!
 //! @details The log-likelihood is defined as

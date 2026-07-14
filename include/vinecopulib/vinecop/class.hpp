@@ -186,6 +186,12 @@ public:
     const size_t num_threads = 1,
     const std::vector<int>& seeds = std::vector<int>()) const;
 
+  Eigen::MatrixXd simulate_conditional(
+    const Eigen::MatrixXd& u_cond,
+    const bool qrng = false,
+    const size_t num_threads = 1,
+    const std::vector<int>& seeds = std::vector<int>()) const;
+
   Eigen::MatrixXd rosenblatt(Eigen::MatrixXd u,
                              const size_t num_threads = 1,
                              bool randomize_discrete = true,
