@@ -585,12 +585,8 @@ TEST(VinecopDerivatives, full_scores_match_RVineGrad_and_RVineHessian)
   EXPECT_EQ(full.logpdf_deriv_pars(0, 0).size(), 1u);
   EXPECT_EQ(full.logpdf_deriv_pars(0, 0)[0].size(), u.rows());
 
-  // consistent across the number of threads. Not bit-identical: the
-  // vectorized copula leaves evaluate each thread batch as SIMD packets
-  // plus a scalar libm tail, and Eigen's packet log/exp kernels differ
-  // from scalar libm by ~1 ulp, so batch boundaries shift leaf values at
-  // the ulp level, amplified through the score cascade (~1e-12..1e-11).
-  EXPECT_TRUE(all_close(vc.scores(u, false, 3), s, 1e-10, 1e-10));
+  // deterministic across the number of threads
+  EXPECT_TRUE(all_close(vc.scores(u, false, 3), s, 1e-12, 1e-12));
 
   // joint Hessian vs RVineHessian, element-wise. n * hessian() is the summed
   // observed information, as RVineHessian returns.
@@ -667,8 +663,8 @@ TEST(VinecopDerivatives, hessian_matches_brute_force)
   EXPECT_TRUE(all_close(H, H.transpose().eval(), 1e-10, 1e-10));
   EXPECT_TRUE(all_close(vc.hessian(u, false, 3) * static_cast<double>(u.rows()),
                         H,
-                        1e-10,
-                        1e-10)); // threading consistency (SIMD tails: ~ulp)
+                        1e-12,
+                        1e-12)); // threading determinism
 }
 
 // The analytic step-wise Hessian must match central finite differences of
@@ -726,7 +722,7 @@ TEST(VinecopDerivatives, stepwise_hessian_matches_fd_of_scores)
   for (size_t t = 0; t < 4; ++t) {
     for (size_t e = 0; e < 4 - t; ++e) {
       for (size_t p = 0; p < Ha(t, e).size(); ++p) {
-        EXPECT_TRUE(all_close(Ha(t, e)[p], Ha3(t, e)[p], 1e-10, 1e-10));
+        EXPECT_TRUE(all_close(Ha(t, e)[p], Ha3(t, e)[p], 1e-12, 1e-12));
       }
     }
   }
@@ -877,7 +873,7 @@ TEST(VinecopDerivatives, stepwise_scores_match_per_edge_reference)
   }
   EXPECT_EQ(ipar, static_cast<size_t>(vc.get_npars()));
 
-  EXPECT_TRUE(all_close(vc.scores(u, true, 3), s, 1e-10, 1e-10));
+  EXPECT_TRUE(all_close(vc.scores(u, true, 3), s, 1e-12, 1e-12));
 }
 
 // The analytic cascade must agree with brute-force finite differences of

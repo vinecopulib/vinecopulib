@@ -28,7 +28,7 @@ if(BUILD_TESTING)
             test_bicop_select
             test_rvine_structure
             test_serialization
-            test_tools_bobyqa
+            test_tools_optimization
             test_tools_stats
             test_vinecop_class
             test_vinecop_sanity_checks

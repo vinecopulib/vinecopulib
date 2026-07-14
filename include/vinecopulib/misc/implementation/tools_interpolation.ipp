@@ -233,46 +233,6 @@ InterpolationGrid::interpolate(const tools_eigen::ConstMatRef& x)
   return tools_eigen::binaryExpr_or_nan(x, f);
 }
 
-//! Partial derivative of the bilinear interpolant in one direction.
-//!
-//! The interpolant is linear inside each cell, so the closed-form partials are
-//! the finite differences of the two corner pairs weighted by the position
-//! along the *other* axis (mirrors the `bilinear_interpolation` layout). The
-//! cell lookup is the same half-open search as `interpolate`, so evaluation on
-//! a grid line or at `x = 1` takes the derivative from the adjacent interior
-//! cell (right/top), and interior points get the exact bilinear slope.
-//!
-//! @param x Mx2 matrix of evaluation points.
-//! @param var 0 for the derivative w.r.t. the first coordinate (rows), 1 for
-//!     the second coordinate (columns).
-//! @return a vector of the interpolated partial derivatives.
-inline Eigen::VectorXd
-InterpolationGrid::gradient(const tools_eigen::ConstMatRef& x, size_t var)
-{
-  auto f = [this, var](double x0, double x1) {
-    auto indices = this->get_indices(x0, x1);
-    const ptrdiff_t i = indices(0);
-    const ptrdiff_t j = indices(1);
-    const double z11 = this->values_(i, j);
-    const double z12 = this->values_(i, j + 1);
-    const double z21 = this->values_(i + 1, j);
-    const double z22 = this->values_(i + 1, j + 1);
-    const double gx1 = this->grid_points_(i);
-    const double gx2 = this->grid_points_(i + 1);
-    const double gy1 = this->grid_points_(j);
-    const double gy2 = this->grid_points_(j + 1);
-    const double denom = (gx2 - gx1) * (gy2 - gy1);
-    if (var == 0) {
-      // partial w.r.t. the first coordinate (rows)
-      return ((z21 - z11) * (gy2 - x1) + (z22 - z12) * (x1 - gy1)) / denom;
-    }
-    // partial w.r.t. the second coordinate (columns)
-    return ((z12 - z11) * (gx2 - x0) + (z22 - z21) * (x0 - gx1)) / denom;
-  };
-
-  return tools_eigen::binaryExpr_or_nan(x, f);
-}
-
 //! conditional cdf along one axis, fused: one cell search for the
 //! conditioning coordinate, the interpolated knot values on the fly, and a
 //! single pass accumulating both the partial and the full integral (no

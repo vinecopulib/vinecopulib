@@ -68,22 +68,6 @@ private:
                                     const Eigen::MatrixXd& parameters,
                                     const std::string& deriv);
 
-  void pickands_all(const double& t,
-                    const Eigen::Ref<const Eigen::VectorXd>& parameters,
-                    double& A,
-                    double& A1,
-                    double& A2) override;
-
-  Eigen::ArrayXd pickands_arr(
-    const Eigen::ArrayXd& t,
-    const Eigen::Ref<const Eigen::VectorXd>& parameters) override;
-
-  void pickands_all(const Eigen::ArrayXd& t,
-                    const Eigen::Ref<const Eigen::VectorXd>& parameters,
-                    Eigen::ArrayXd& A,
-                    Eigen::ArrayXd& A1,
-                    Eigen::ArrayXd& A2) override;
-
   Eigen::MatrixXd tau_to_parameters(const double& tau) override;
 
   Eigen::VectorXd get_start_parameters(const double) override;

@@ -23,11 +23,11 @@ class EllipticalBicop : public ParBicop
 {
 private:
   // hfunction and its inverse (thread `parameters` through the column swap)
-  Eigen::VectorXd hfunc2_raw(const tools_eigen::ConstMatRef& u,
-                             const tools_eigen::ConstMatRef& parameters);
+  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters);
 
-  Eigen::VectorXd hinv2_raw(const tools_eigen::ConstMatRef& u,
-                            const tools_eigen::ConstMatRef& parameters);
+  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& parameters);
 
   // elliptical copulas are exchangeable: the second h-function derivatives
   // are the first ones at swapped arguments/selectors
