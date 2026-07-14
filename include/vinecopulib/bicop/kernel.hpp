@@ -34,23 +34,59 @@ public:
 protected:
   // evaluation leaves; kernel estimators store an interpolation grid rather
   // than a per-row parameter vector, so they ignore `parameters`
-  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
-                          const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd pdf_raw(const tools_eigen::ConstMatRef& u,
+                          const tools_eigen::ConstMatRef& parameters) override;
 
-  Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd cdf(const tools_eigen::ConstMatRef& u,
+                      const tools_eigen::ConstMatRef& parameters) override;
 
-  Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd hfunc1_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
 
-  Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd hfunc2_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
 
-  Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd hinv1_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
 
-  Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters) override;
+  Eigen::VectorXd hinv2_raw(
+    const tools_eigen::ConstMatRef& u,
+    const tools_eigen::ConstMatRef& parameters) override;
+
+  // derivative leaves. Only the pdf gradient w.r.t. the arguments (u1, u2) is
+  // defined analytically (the exact slope of the bilinear interpolation grid);
+  // everything else throws. Derivatives w.r.t. the grid values are undefined,
+  // a bilinear surface has no meaningful curvature (second order), and
+  // finite-difference h-function derivatives are intentionally not exposed
+  // (only closed-form parametric families provide those). The logpdf leaves
+  // are inherited: they compose these, so the logpdf argument gradient is
+  // exact and everything else transitively throws.
+  Eigen::VectorXd pdf_deriv_raw(const Eigen::MatrixXd& u,
+                                const Eigen::MatrixXd& parameters,
+                                const std::string& deriv) override;
+
+  Eigen::VectorXd pdf_deriv2_raw(const Eigen::MatrixXd& u,
+                                 const Eigen::MatrixXd& parameters,
+                                 const std::string& deriv) override;
+
+  Eigen::VectorXd hfunc1_deriv_raw(const Eigen::MatrixXd& u,
+                                   const Eigen::MatrixXd& parameters,
+                                   const std::string& deriv) override;
+
+  Eigen::VectorXd hfunc1_deriv2_raw(const Eigen::MatrixXd& u,
+                                    const Eigen::MatrixXd& parameters,
+                                    const std::string& deriv) override;
+
+  Eigen::VectorXd hfunc2_deriv_raw(const Eigen::MatrixXd& u,
+                                   const Eigen::MatrixXd& parameters,
+                                   const std::string& deriv) override;
+
+  Eigen::VectorXd hfunc2_deriv2_raw(const Eigen::MatrixXd& u,
+                                    const Eigen::MatrixXd& parameters,
+                                    const std::string& deriv) override;
 
   // state-based dispatchers (overridden for grid-specific jitter handling)
   Eigen::VectorXd pdf(const Eigen::MatrixXd& u) override;

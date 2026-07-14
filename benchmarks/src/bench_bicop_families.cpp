@@ -126,6 +126,33 @@ register_discrete_benchmarks(BicopFamily family)
     });
 }
 
+// Times the analytic parameter scores d log c / d theta_k. Independent of the
+// optimizer; isolates the cost of the `logpdf_deriv_raw` leaves (the Student
+// df score in particular).
+void
+register_score_benchmarks(BicopFamily family)
+{
+  const std::string fam_name = get_family_name(family);
+  const auto par = bench::family_parameters(family);
+  const int npars = static_cast<int>(par.rows());
+  for (size_t n : { size_t(1000), size_t(10000) }) {
+    auto data =
+      std::make_shared<const Eigen::MatrixXd>(bench::sim_data(family, 0, n));
+    const Bicop bc(family, 0, par);
+    for (int k = 1; k <= npars; ++k) {
+      const std::string sel = "par" + std::to_string(k);
+      benchmark::RegisterBenchmark(("bicop/logpdf_deriv/" + fam_name + "/" +
+                                    sel + "/n=" + std::to_string(n))
+                                     .c_str(),
+                                   [bc, data, sel](benchmark::State& st) {
+                                     for (auto _ : st)
+                                       benchmark::DoNotOptimize(
+                                         bc.logpdf_deriv(*data, sel));
+                                   });
+    }
+  }
+}
+
 void
 register_smoke_benchmark()
 {
@@ -154,6 +181,7 @@ struct Registrar
     for (auto family : families) {
       register_eval_benchmarks(family);
       register_fit_benchmarks(family);
+      register_score_benchmarks(family);
     }
     for (auto family : { BicopFamily::gaussian, BicopFamily::clayton }) {
       register_discrete_benchmarks(family);
