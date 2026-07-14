@@ -90,6 +90,7 @@ private:
     const Eigen::VectorXd& x,
     const Eigen::VectorXd& lb,
     const Eigen::VectorXd& ub);
+    
   double winsorize_tau(double tau) const;
 
   void adjust_parameters_bounds(Eigen::MatrixXd& lb,
