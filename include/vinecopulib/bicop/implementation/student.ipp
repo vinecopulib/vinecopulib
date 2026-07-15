@@ -374,93 +374,26 @@ inbeder(double x_in, double p_in, double q_in)
   return der;
 }
 
-//! @brief Degrees-of-freedom-only quantities shared by the t log-density
-//! score (`diff_lpdf_nu`) and the quantile df-derivative (`dqt_dnu`).
-//!
-//! These depend on `nu` alone (digamma/beta/power/the distribution object),
-//! so computing them once per fit instead of once per observation is what
-//! keeps the analytic t score cheap in the fitting loop.
-struct StudentDfConsts
-{
-  boost::math::students_t dist;
-  double digamma_nup1_2; // digamma((nu + 1) / 2)
-  double digamma_nu_2;   // digamma(nu / 2)
-  double half_log_nu;    // 0.5 * log(nu)
-  double nu_m2_over_2nu; // (nu - 2) / (2 nu)
-  double half_nup2;      // (nu + 2) / 2
-  double half_nup1;      // (nu + 1) / 2
-  double half_nu;        // nu / 2
-  double beta_nu2_half;  // beta(nu / 2, 1/2)
-  double nu_pow;         // nu^(nu / 2 - 1)
-
-  explicit StudentDfConsts(double nu)
-    : dist(nu)
-    , digamma_nup1_2(boost::math::digamma((nu + 1.0) / 2.0))
-    , digamma_nu_2(boost::math::digamma(nu / 2.0))
-    , half_log_nu(0.5 * std::log(nu))
-    , nu_m2_over_2nu((nu - 2.0) / (2.0 * nu))
-    , half_nup2((nu + 2.0) / 2.0)
-    , half_nup1((nu + 1.0) / 2.0)
-    , half_nu(nu / 2.0)
-    , beta_nu2_half(boost::math::beta(nu / 2.0, 0.5))
-    , nu_pow(std::pow(nu, nu / 2.0 - 1.0))
-  {
-  }
-};
-
-//! @brief Derivative of the Student t quantile w.r.t. the degrees of freedom,
-//! reusing precomputed df-only constants; ported from VineCopula
-//! tcopuladeriv_new.c (`diffX_nu_tCopula`).
+//! @brief Derivative of the Student t quantile w.r.t. the degrees of freedom
+//! (see tools_stats.hpp); ported from VineCopula tcopuladeriv_new.c
+//! (`diffX_nu_tCopula`).
 inline double
-dqt_dnu(double x, double nu, const StudentDfConsts& c)
+dqt_dnu(double x, double nu)
 {
   double x_help = (x >= 0) ? x : -x;
   double xmax = nu / (nu + x_help * x_help);
 
-  double t1 = boost::math::pdf(c.dist, x_help);
-  Eigen::Vector3d ib = inbeder(xmax, c.half_nu, 0.5);
-  double t5 = c.nu_pow * x_help;
-  double t6 = std::pow(1.0 / (x_help * x_help + nu), c.half_nup1);
+  boost::math::students_t dist(nu);
+  double t1 = boost::math::pdf(dist, x_help);
+  double t2 = nu / 2.0;
+  Eigen::Vector3d ib = inbeder(xmax, t2, 0.5);
+  double t4 = (nu + 1.0) / 2.0;
+  double t5 = std::pow(nu, nu / 2.0 - 1.0) * x_help;
+  double t6 = std::pow(1.0 / (x_help * x_help + nu), t4);
+  double t7 = boost::math::beta(nu / 2.0, 0.5);
 
-  double out = 1.0 / (2.0 * t1) * (0.5 * ib(1) + (t5 * t6) / c.beta_nu2_half);
+  double out = 1.0 / (2.0 * t1) * (0.5 * ib(1) + (t5 * t6) / t7);
   return (x < 0) ? -out : out;
-}
-
-//! @brief Convenience overload that builds the df-only constants on the fly
-//! (used off the fitting hot path, e.g. by `d2qt_dnu2`).
-inline double
-dqt_dnu(double x, double nu)
-{
-  return dqt_dnu(x, nu, StudentDfConsts(nu));
-}
-
-//! @brief Log-density score w.r.t. `nu`, reusing precomputed df-only
-//! constants; ported from VineCopula logderiv.c (`difflPDF_nu_tCopula_new`).
-inline double
-diff_lpdf_nu_impl(double u1,
-                  double u2,
-                  double rho,
-                  double nu,
-                  const StudentDfConsts& c)
-{
-  double t3 = 0.5 * std::log(1.0 - rho * rho);
-  double t6 =
-    -c.digamma_nup1_2 + c.digamma_nu_2 + t3 - c.nu_m2_over_2nu - c.half_log_nu;
-
-  double x1 = boost::math::quantile(c.dist, u1);
-  double x2 = boost::math::quantile(c.dist, u2);
-  double out1 = dqt_dnu(x1, nu, c);
-  double out2 = dqt_dnu(x2, nu, c);
-  double t7 = 1.0 + 2.0 * x1 * out1;
-  double t8 = 1.0 + 2.0 * x2 * out2;
-  double t9 = c.half_nup1 * (t7 / (nu + x1 * x1) + t8 / (nu + x2 * x2));
-  double M = nu * (1.0 - rho * rho) + x1 * x1 + x2 * x2 - 2.0 * rho * x1 * x2;
-  double t11 = 1.0 - rho * rho + 2.0 * x1 * out1 + 2.0 * x2 * out2 -
-               2.0 * rho * (x1 * out2 + x2 * out1);
-  double t12 = 0.5 * std::log((nu + x1 * x1) * (nu + x2 * x2));
-  double t13 = 0.5 * std::log(M);
-
-  return t6 + t9 + t12 - c.half_nup2 * t11 / M - t13;
 }
 
 //! @brief Derivative of the Student t distribution function w.r.t. the
@@ -588,14 +521,15 @@ inline StudentBicop::StudentBicop()
 }
 
 inline Eigen::VectorXd
-StudentBicop::pdf_impl(const tools_eigen::ConstMatRef& u, double rho, double nu)
+StudentBicop::pdf_impl(const Eigen::MatrixXd& u, double rho, double nu)
 {
+  Eigen::VectorXd f = Eigen::VectorXd::Ones(u.rows());
   Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
 
-  Eigen::VectorXd f = tmp.col(0).cwiseAbs2() + tmp.col(1).cwiseAbs2() -
-                      (2 * rho) * tmp.rowwise().prod();
+  f = tmp.col(0).cwiseAbs2() + tmp.col(1).cwiseAbs2() -
+      (2 * rho) * tmp.rowwise().prod();
   f /= nu * (1.0 - pow(rho, 2.0));
-  f.array() += 1.0;
+  f = f + Eigen::VectorXd::Ones(u.rows());
   f = f.array().pow(-(nu + 2.0) / 2.0);
   f = f.cwiseQuotient(tools_stats::dt(tmp, nu).rowwise().prod());
   f *= boost::math::tgamma_ratio((nu + 2.0) / 2.0, nu / 2.0);
@@ -605,7 +539,7 @@ StudentBicop::pdf_impl(const tools_eigen::ConstMatRef& u, double rho, double nu)
 }
 
 inline Eigen::VectorXd
-StudentBicop::cdf_impl(const tools_eigen::ConstMatRef& u, double rho, double nu)
+StudentBicop::cdf_impl(const Eigen::MatrixXd& u, double rho, double nu)
 {
   using namespace tools_stats;
 
@@ -625,13 +559,11 @@ StudentBicop::cdf_impl(const tools_eigen::ConstMatRef& u, double rho, double nu)
 }
 
 inline Eigen::VectorXd
-StudentBicop::hfunc1_impl(const tools_eigen::ConstMatRef& u,
-                          double rho,
-                          double nu)
+StudentBicop::hfunc1_impl(const Eigen::MatrixXd& u, double rho, double nu)
 {
+  Eigen::VectorXd h = Eigen::VectorXd::Ones(u.rows());
   Eigen::MatrixXd tmp = tools_stats::qt(u, nu);
-  Eigen::VectorXd h = tmp.col(0).cwiseAbs2();
-  h.array() += nu;
+  h = nu * h + tmp.col(0).cwiseAbs2();
   h *= (1.0 - pow(rho, 2)) / (nu + 1.0);
   h = h.cwiseSqrt().cwiseInverse().cwiseProduct(tmp.col(1) - rho * tmp.col(0));
   h = tools_stats::pt(h, nu + 1.0);
@@ -640,15 +572,15 @@ StudentBicop::hfunc1_impl(const tools_eigen::ConstMatRef& u,
 }
 
 inline Eigen::VectorXd
-StudentBicop::hinv1_impl(const tools_eigen::ConstMatRef& u,
-                         double rho,
-                         double nu)
+StudentBicop::hinv1_impl(const Eigen::MatrixXd& u, double rho, double nu)
 {
-  Eigen::VectorXd tmp = tools_stats::qt(u.col(1), nu + 1.0);
-  Eigen::VectorXd tmp2 = tools_stats::qt(u.col(0), nu);
+  Eigen::VectorXd hinv = Eigen::VectorXd::Ones(u.rows());
+  Eigen::VectorXd tmp = u.col(1);
+  Eigen::VectorXd tmp2 = u.col(0);
+  tmp = tools_stats::qt(tmp, nu + 1.0);
+  tmp2 = tools_stats::qt(tmp2, nu);
 
-  Eigen::VectorXd hinv = tmp2.cwiseAbs2();
-  hinv.array() += nu;
+  hinv = nu * hinv + tmp2.cwiseAbs2();
   hinv *= (1.0 - pow(rho, 2)) / (nu + 1.0);
   hinv = hinv.cwiseSqrt().cwiseProduct(tmp) + rho * tmp2;
   hinv = tools_stats::pt(hinv, nu);
@@ -657,8 +589,8 @@ StudentBicop::hinv1_impl(const tools_eigen::ConstMatRef& u,
 }
 
 inline Eigen::VectorXd
-StudentBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
-                      const tools_eigen::ConstMatRef& parameters)
+StudentBicop::pdf_raw(const Eigen::MatrixXd& u,
+                      const Eigen::MatrixXd& parameters)
 {
   if (parameters.rows() == 1) {
     return pdf_impl(u, parameters(0, 0), parameters(0, 1));
@@ -671,8 +603,7 @@ StudentBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
 }
 
 inline Eigen::VectorXd
-StudentBicop::cdf(const tools_eigen::ConstMatRef& u,
-                  const tools_eigen::ConstMatRef& parameters)
+StudentBicop::cdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 {
   if (parameters.rows() == 1) {
     return cdf_impl(u, parameters(0, 0), parameters(0, 1));
@@ -685,8 +616,8 @@ StudentBicop::cdf(const tools_eigen::ConstMatRef& u,
 }
 
 inline Eigen::VectorXd
-StudentBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
-                         const tools_eigen::ConstMatRef& parameters)
+StudentBicop::hfunc1_raw(const Eigen::MatrixXd& u,
+                         const Eigen::MatrixXd& parameters)
 {
   if (parameters.rows() == 1) {
     return hfunc1_impl(u, parameters(0, 0), parameters(0, 1));
@@ -699,8 +630,8 @@ StudentBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
 }
 
 inline Eigen::VectorXd
-StudentBicop::hinv1_raw(const tools_eigen::ConstMatRef& u,
-                        const tools_eigen::ConstMatRef& parameters)
+StudentBicop::hinv1_raw(const Eigen::MatrixXd& u,
+                        const Eigen::MatrixXd& parameters)
 {
   if (parameters.rows() == 1) {
     return hinv1_impl(u, parameters(0, 0), parameters(0, 1));
@@ -860,18 +791,6 @@ StudentBicop::logpdf_deriv_raw(const Eigen::MatrixXd& u,
   if (deriv == "par1") {
     return apply_kernel(u, parameters, &diff_lpdf_rho);
   } else if (deriv == "par2") {
-    // fitting hot path: a single (broadcast) parameter set. Hoist the df-only
-    // digamma/beta/power terms out of the per-observation loop; the per-row
-    // kernel would otherwise recompute them for every observation.
-    if (parameters.rows() == 1) {
-      const double rho = parameters(0, 0);
-      const double nu = parameters(0, 1);
-      const StudentDfConsts c(nu);
-      return tools_eigen::binaryExpr_or_nan(
-        u, [&c, rho, nu](double u1, double u2) {
-          return diff_lpdf_nu_impl(u1, u2, rho, nu, c);
-        });
-    }
     return apply_kernel(u, parameters, &diff_lpdf_nu);
   }
   return AbstractBicop::logpdf_deriv_raw(u, parameters, deriv);
@@ -936,14 +855,33 @@ StudentBicop::diff_lpdf_rho(double u1, double u2, double rho, double nu)
   return t3 * (t4 + t5) / t6 + t7;
 }
 
-//! ported from VineCopula logderiv.c difflPDF_nu_tCopula_new. The per-row
-//! scalar kernel (used for the per-observation-parameter path) builds the
-//! df-only constants each call; the fitting hot path calls `diff_lpdf_nu_impl`
-//! directly with constants hoisted out of the observation loop.
+//! ported from VineCopula logderiv.c difflPDF_nu_tCopula_new
 inline double
 StudentBicop::diff_lpdf_nu(double u1, double u2, double rho, double nu)
 {
-  return diff_lpdf_nu_impl(u1, u2, rho, nu, StudentDfConsts(nu));
+  boost::math::students_t dist(nu);
+  double t1 = boost::math::digamma((nu + 1.0) / 2.0);
+  double t2 = boost::math::digamma(nu / 2.0);
+  double t3 = 0.5 * std::log(1.0 - rho * rho);
+  double t4 = (nu - 2.0) / (2.0 * nu);
+  double t5 = 0.5 * std::log(nu);
+  double t6 = -t1 + t2 + t3 - t4 - t5;
+  double t10 = (nu + 2.0) / 2.0;
+
+  double x1 = boost::math::quantile(dist, u1);
+  double x2 = boost::math::quantile(dist, u2);
+  double out1 = dqt_dnu(x1, nu);
+  double out2 = dqt_dnu(x2, nu);
+  double t7 = 1.0 + 2.0 * x1 * out1;
+  double t8 = 1.0 + 2.0 * x2 * out2;
+  double t9 = (nu + 1.0) / 2.0 * (t7 / (nu + x1 * x1) + t8 / (nu + x2 * x2));
+  double M = nu * (1.0 - rho * rho) + x1 * x1 + x2 * x2 - 2.0 * rho * x1 * x2;
+  double t11 = 1.0 - rho * rho + 2.0 * x1 * out1 + 2.0 * x2 * out2 -
+               2.0 * rho * (x1 * out2 + x2 * out1);
+  double t12 = 0.5 * std::log((nu + x1 * x1) * (nu + x2 * x2));
+  double t13 = 0.5 * std::log(M);
+
+  return t6 + t9 + t12 - t10 * t11 / M - t13;
 }
 
 //! ported from VineCopula logderiv.c diff2lPDF_rho_tCopula

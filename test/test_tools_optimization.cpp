@@ -4,9 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include "src_test/include/test_tools_bobyqa.hpp"
+#include "src_test/include/test_tools_optimization.hpp"
 
-using namespace test_tools_bobyqa;
+using namespace test_tools_optimization;
 
 int
 main(int argc, char** argv)

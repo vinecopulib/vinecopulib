@@ -10,22 +10,6 @@
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
-
-//! closed-form vectorized cdf (broadcast parameter case)
-inline Eigen::VectorXd
-JoeBicop::cdf(const tools_eigen::ConstMatRef& u,
-              const tools_eigen::ConstMatRef& parameters)
-{
-  if (parameters.rows() == 1) {
-    const double theta = parameters(0, 0);
-    // powers via exp(c*log(x)) (packetized log/exp beat generic_pow)
-    Eigen::ArrayXd a1 = (theta * (1.0 - u.col(0).array()).log()).exp();
-    Eigen::ArrayXd a2 = (theta * (1.0 - u.col(1).array()).log()).exp();
-    return (1.0 - ((1.0 / theta) * (a1 + a2 - a1 * a2).log()).exp()).matrix();
-  }
-  return ArchimedeanBicop::cdf(u, parameters);
-}
-
 inline JoeBicop::JoeBicop()
 {
   family_ = BicopFamily::joe;
@@ -61,99 +45,24 @@ JoeBicop::generator_derivative(
 }
 
 inline Eigen::VectorXd
-JoeBicop::log_pdf_raw(const tools_eigen::ConstMatRef& u,
-                      const tools_eigen::ConstMatRef& parameters)
+JoeBicop::pdf_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 {
-  if (parameters.rows() == 1) {
-    // vectorized evaluation for a single (broadcast) parameter set
-    const double theta = parameters(0, 0);
-    const auto u1 = u.col(0).array();
-    const auto u2 = u.col(1).array();
-    // powers via exp(theta*log(1-u)); the logs are shared with the
-    // (theta-1)*(log(om1)+log(om2)) term (packetized log/exp beat
-    // generic_pow)
-    Eigen::ArrayXd lo1 = (1.0 - u1).log();
-    Eigen::ArrayXd lo2 = (1.0 - u2).log();
-    Eigen::ArrayXd t1 = (theta * lo1).exp();
-    Eigen::ArrayXd t2 = (theta * lo2).exp();
-    Eigen::ArrayXd t12 = t1 + t2 - t1 * t2;
-    Eigen::ArrayXd out = (1.0 / theta - 2.0) * t12.log() +
-                         (theta - 1.0) * (lo1 + lo2) +
-                         (theta - 1.0 + t12).log();
-    return out.matrix();
-  }
-
   auto f = [](const double& u1,
               const double& u2,
               const Eigen::Ref<const Eigen::VectorXd>& par) {
     double theta = par(0);
     double t1 = std::pow(1 - u1, theta);
     double t2 = std::pow(1 - u2, theta);
-    double t12 = t1 + t2 - t1 * t2;
-    return (1 / theta - 2) * std::log(t12) +
-           (theta - 1) * (std::log(1 - u1) + std::log(1 - u2)) +
-           std::log(theta - 1 + t12);
+    return std::pow(t1 + t2 - t1 * t2, 1 / theta - 2) *
+           std::pow(1 - u1, theta - 1) * std::pow(1 - u2, theta - 1) *
+           (theta - 1 + t1 + t2 - t1 * t2);
   };
   return tools_eigen::binaryExpr_or_nan(u, parameters, f);
 }
 
-inline Eigen::VectorXd
-JoeBicop::pdf_raw(const tools_eigen::ConstMatRef& u,
-                  const tools_eigen::ConstMatRef& parameters)
-{
-  return log_pdf_raw(u, parameters).array().exp().matrix();
-}
-
-//! closed-form h-function h(uother | ucond); replaces the generic
-//! generator-based per-element evaluation and the `swap_cols` copy.
-inline Eigen::VectorXd
-JoeBicop::hfunc_internal(const Eigen::Ref<const Eigen::VectorXd>& ucond,
-                         const Eigen::Ref<const Eigen::VectorXd>& uother,
-                         const tools_eigen::ConstMatRef& parameters) const
-{
-  return apply_closed_form_h(
-    ucond,
-    uother,
-    parameters,
-    [&](const auto& uc, const auto& uo) -> Eigen::ArrayXd {
-      const double theta = parameters(0, 0);
-      // powers via exp(c*log(x)); omc^(theta-1) = omc^theta / omc reuses
-      // tc, and t12^(1/theta-1) = t12^(1/theta) / t12 shares log(t12)
-      Eigen::ArrayXd omc = 1.0 - uc;
-      Eigen::ArrayXd to = (theta * (1.0 - uo).log()).exp();
-      Eigen::ArrayXd tc = (theta * omc.log()).exp();
-      Eigen::ArrayXd t12 = tc + to - tc * to;
-      return (tc / omc) * (1.0 - to) *
-             (((1.0 / theta) * t12.log()).exp() / t12);
-    },
-    [&](Eigen::Index i, double uc, double uo) -> double {
-      const double theta = parameters(i, 0);
-      const double tc = std::pow(1.0 - uc, theta);
-      const double to = std::pow(1.0 - uo, theta);
-      const double t12 = tc + to - tc * to;
-      return std::pow(1.0 - uc, theta - 1.0) * (1.0 - to) *
-             std::pow(t12, 1.0 / theta - 1.0);
-    });
-}
-
-inline Eigen::VectorXd
-JoeBicop::hfunc1_raw(const tools_eigen::ConstMatRef& u,
-                     const tools_eigen::ConstMatRef& parameters)
-{
-  return hfunc_internal(u.col(0), u.col(1), parameters);
-}
-
-inline Eigen::VectorXd
-JoeBicop::hfunc2_raw(const tools_eigen::ConstMatRef& u,
-                     const tools_eigen::ConstMatRef& parameters)
-{
-  return hfunc_internal(u.col(1), u.col(0), parameters);
-}
-
 // inverse h-function
 inline Eigen::VectorXd
-JoeBicop::hinv1_raw(const tools_eigen::ConstMatRef& u,
-                    const tools_eigen::ConstMatRef& parameters)
+JoeBicop::hinv1_raw(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 {
   auto qcondjoe_func =
     [](const double& u1,

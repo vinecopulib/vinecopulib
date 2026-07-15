@@ -1142,21 +1142,16 @@ Vinecop::check_parametric(const char* fn) const
   }
 }
 
-//! first-order chain-rule push-forward of an argument perturbation through an
-//! h-function output, `∂h/∂u1 · v1 + ∂h/∂u2 · v2`, written directly into `out`
-//! (a vector or a matrix column). Shared by the gradient cascade and the
-//! Hessian's `dh*_a`/`dh*_b` propagations. `out` is a coefficient-wise
-//! assignment target distinct from every operand at all call sites, so
-//! writing in place needs no aliasing temporary and avoids a returned
-//! `VectorXd` in the hot loops.
-inline void
-propagate_first_order_into(Eigen::Ref<Eigen::VectorXd> out,
-                           const Eigen::VectorXd& du1,
-                           const Eigen::VectorXd& du2,
-                           const Eigen::VectorXd& v1,
-                           const Eigen::VectorXd& v2)
+//! first-order chain-rule push-forward of an argument perturbation through
+//! an h-function output: `∂h/∂u1 · v1 + ∂h/∂u2 · v2` (shared by the gradient
+//! cascade and the Hessian's hat/til propagations).
+inline Eigen::VectorXd
+propagate_first_order(const Eigen::VectorXd& du1,
+                      const Eigen::VectorXd& du2,
+                      const Eigen::VectorXd& v1,
+                      const Eigen::VectorXd& v2)
 {
-  out = du1.cwiseProduct(v1) + du2.cwiseProduct(v2);
+  return du1.cwiseProduct(v1) + du2.cwiseProduct(v2);
 }
 
 //! @brief Builds the per-edge derivative caches by one forward walk over the
@@ -1200,7 +1195,7 @@ Vinecop::build_deriv_cache(const Eigen::MatrixXd& u,
       ce.arg2_is_h2 =
         (ce.arg2_col == rvine_structure_.struct_array(t, e, true));
 
-      u_e.resize(m, 2); // reused buffer: cols fully overwritten each edge
+      u_e = Eigen::MatrixXd(m, 2);
       u_e.col(0) = hfunc2.col(e);
       u_e.col(1) = ce.arg2_is_h2 ? hfunc2.col(ce.arg2_col - 1)
                                  : hfunc1.col(ce.arg2_col - 1);
@@ -1524,13 +1519,11 @@ Vinecop::scores_full(Eigen::MatrixXd u,
       //    derivative leaves).
       //  - h1_affected[e] / h2_affected[e]: flags marking whether column e's
       //    hfunc1/hfunc2 values are affected by θ at the current level
-      //    (i.e. whether the corresponding dh1/dh2 column is valid). Edges
+      //    (i.e. whether the corresponding tilde column is valid). Edges
       //    whose two input columns are both unaffected are skipped and
       //    contribute nothing.
       Eigen::MatrixXd dh1(b.size, d_), dh2(b.size, d_);
       std::vector<char> h1_affected(d_), h2_affected(d_);
-      // reused per-edge perturbation buffers (set fresh every inner iteration)
-      Eigen::VectorXd darg1(b.size), darg2(b.size);
       size_t ipar = 0;
       for (size_t t0 = 0; t0 < trunc_lvl; ++t0) {
         for (size_t e0 = 0; e0 < d_ - t0 - 1; ++e0) {
@@ -1569,31 +1562,29 @@ Vinecop::scores_full(Eigen::MatrixXd u,
                   continue;
                 }
                 // darg1/darg2 = ∂(arg1)/∂θ and ∂(arg2)/∂θ for this edge
+                Eigen::VectorXd darg1 = Eigen::VectorXd::Zero(b.size);
+                Eigen::VectorXd darg2 = Eigen::VectorXd::Zero(b.size);
                 if (arg1_affected) {
                   darg1 = dh2.col(e);
                   // chain rule: this edge's log-density term responds to
                   // the perturbation of its first argument
                   score += ce.du1.cwiseProduct(darg1);
-                } else {
-                  darg1.setZero();
                 }
                 if (arg2_affected) {
                   darg2 = ce.arg2_is_h2 ? dh2.col(arg2_col - 1)
                                         : dh1.col(arg2_col - 1);
                   score += ce.du2.cwiseProduct(darg2);
-                } else {
-                  darg2.setZero();
                 }
-                // propagate the argument perturbations through this
+                // has_deeper_tree the argument perturbations through this
                 // edge's h-function outputs for the next tree level: ∂h/∂θ =
                 // ∂h/∂u1 · darg1 + ∂h/∂u2 · darg2
                 if (ce.h2.active) {
-                  propagate_first_order_into(
-                    dh2.col(e), ce.h2.du1, ce.h2.du2, darg1, darg2);
+                  dh2.col(e) =
+                    propagate_first_order(ce.h2.du1, ce.h2.du2, darg1, darg2);
                 }
                 if (ce.h1.active) {
-                  propagate_first_order_into(
-                    dh1.col(e), ce.h1.du1, ce.h1.du2, darg1, darg2);
+                  dh1.col(e) =
+                    propagate_first_order(ce.h1.du1, ce.h1.du2, darg1, darg2);
                 }
                 h1_affected[e] = ce.h1.active ? 1 : 0;
                 h2_affected[e] = ce.h2.active ? 1 : 0;
@@ -1660,7 +1651,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
         auto var_types = edge_copula.get_var_types();
         size_t m = rvine_structure_.min_array(tree, edge);
 
-        u_e.resize(b.size, 2);
+        u_e = Eigen::MatrixXd(b.size, 2);
         u_e.col(0) = hfunc2.col(edge);
         if (m == rvine_structure_.struct_array(tree, edge, true)) {
           u_e.col(1) = hfunc2.col(m - 1);
@@ -1896,7 +1887,7 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
     //   ∂²logc_{e'}/∂θ_{p'}∂u1 · P^α + ∂²logc/∂θ_{p'}∂u2 · Q^α   (deeper e'),
     // where P^α, Q^α are the first-order perturbations of e''s arguments,
     // propagated by the same cascade as the gradient. No second-order
-    // (`d2h*`) propagation is needed. Upper-triangular in the flat order.
+    // ("bar") propagation is needed. Upper-triangular in the flat order.
     auto do_batch = [&](const tools_batch::Batch& b) {
       const size_t m = b.size;
       auto cache = build_deriv_cache(u, b.begin, m, true);
@@ -1908,8 +1899,6 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
       // DerivLeaf/DerivCache documentation in class.hpp)
       Eigen::MatrixXd dh1(m, d_), dh2(m, d_);
       std::vector<char> h1_affected(d_), h2_affected(d_);
-      // reused per-edge perturbation buffers (set fresh every inner iteration)
-      Eigen::VectorXd darg1(m), darg2(m);
       for (size_t a = 0; a < npars; ++a) {
         size_t ta = par_of[a][0], ea = par_of[a][1], pa = par_of[a][2];
         const DerivCache& seed = cache(ta, ea);
@@ -1944,16 +1933,14 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
               h2_affected[e] = 0;
               continue;
             }
+            Eigen::VectorXd darg1 = Eigen::VectorXd::Zero(m);
+            Eigen::VectorXd darg2 = Eigen::VectorXd::Zero(m);
             if (arg1_affected) {
               darg1 = dh2.col(e);
-            } else {
-              darg1.setZero();
             }
             if (arg2_affected) {
               darg2 =
                 ce.arg2_is_h2 ? dh2.col(arg2_col - 1) : dh1.col(arg2_col - 1);
-            } else {
-              darg2.setZero();
             }
             for (size_t cp = 0; cp < ce.np; ++cp) {
               hess(ta, ea)[pa].block(b.begin, edge_par0(t, e) + cp, m, 1) =
@@ -1961,12 +1948,12 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
                 ce.dpar_u2[cp].cwiseProduct(darg2);
             }
             if (ce.h2.active) {
-              propagate_first_order_into(
-                dh2.col(e), ce.h2.du1, ce.h2.du2, darg1, darg2);
+              dh2.col(e) =
+                propagate_first_order(ce.h2.du1, ce.h2.du2, darg1, darg2);
             }
             if (ce.h1.active) {
-              propagate_first_order_into(
-                dh1.col(e), ce.h1.du1, ce.h1.du2, darg1, darg2);
+              dh1.col(e) =
+                propagate_first_order(ce.h1.du1, ce.h1.du2, darg1, darg2);
             }
             h1_affected[e] = ce.h1.active ? 1 : 0;
             h2_affected[e] = ce.h2.active ? 1 : 0;
@@ -1985,14 +1972,13 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
 
   // Analytic joint Hessian: differentiate the gradient cascade a second
   // time. For a parameter pair (α, β) a forward walk propagates the first
-  // derivatives of each edge's arguments w.r.t. α (the `_a` buffers) and β
-  // (the `_b` buffers) and their mixed second derivative (`d2*`),
-  // accumulating
+  // derivatives of each edge's arguments w.r.t. α ("hat") and β ("tilde")
+  // and their mixed second derivative ("bar"), accumulating
   //   H_αβ = Σ_e [ ∂²logc/∂p²·P^α P^β + ∂²logc/∂p∂q·(P^α Q^β + Q^α P^β)
   //               + ∂²logc/∂q²·Q^α Q^β + ∂logc/∂p·P^{αβ} + ∂logc/∂q·Q^{αβ}
   //               + θ-argument cross terms and the ∂²logc/∂θ² seed ],
-  // where the mixed second derivatives propagate with the h-function's own
-  // second-order leaves.
+  // where the bar quantities propagate with the h-function's own second
+  // derivatives.
   auto do_batch = [&](const tools_batch::Batch& b) {
     const size_t m = b.size;
     // one forward walk fills every per-edge first- and second-order leaf
@@ -2001,34 +1987,28 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
     // Second-order cascade for each parameter pair (only the upper triangle;
     // H is symmetric). Per storage column e (suffix 1 = the column's hfunc1
     // values, 2 = its hfunc2 values, as in the gradient cascade):
-    //   dh*_a[e] = ∂(column value)/∂α,
-    //   dh*_b[e] = ∂(column value)/∂β,
-    //   d2h*[e] = ∂²(column value)/∂α∂β,
+    //   hat*[e] = ∂(column value)/∂α,
+    //   til*[e] = ∂(column value)/∂β,
+    //   bar*[e] = ∂²(column value)/∂α∂β,
     // seeded at the two parameters' own edges and pushed through each
     // deeper edge's output leaves ce.h1/ce.h2 (see class.hpp). There are no
     // aff flags here; unaffected columns simply carry zero vectors.
-    std::vector<Eigen::VectorXd> dh1_a(d_, Eigen::VectorXd(m)),
-      dh2_a(d_, Eigen::VectorXd(m)), dh1_b(d_, Eigen::VectorXd(m)),
-      dh2_b(d_, Eigen::VectorXd(m)), d2h1(d_, Eigen::VectorXd(m)),
-      d2h2(d_, Eigen::VectorXd(m));
-    // reused per-pair accumulator and per-edge first-argument copies (the
-    // first-argument columns get overwritten by the propagation, so they
-    // must be copied before it)
-    Eigen::VectorXd H_ab(m), darg1_a(m), darg1_b(m), d2arg1(m);
+    std::vector<Eigen::VectorXd> dh1_a(d_), dh2_a(d_), dh1_b(d_), dh2_b(d_),
+      d2h1(d_), d2h2(d_);
     for (size_t a = 0; a < npars; ++a) {
       size_t ta = par_of[a][0], ea = par_of[a][1], pa = par_of[a][2];
       for (size_t bfl = a; bfl < npars; ++bfl) {
         size_t tb = par_of[bfl][0], eb = par_of[bfl][1], pb = par_of[bfl][2];
 
         for (size_t col = 0; col < d_; ++col) {
-          dh1_a[col].setZero();
-          dh2_a[col].setZero();
-          dh1_b[col].setZero();
-          dh2_b[col].setZero();
-          d2h1[col].setZero();
-          d2h2[col].setZero();
+          dh1_a[col] = Eigen::VectorXd::Zero(m);
+          dh2_a[col] = Eigen::VectorXd::Zero(m);
+          dh1_b[col] = Eigen::VectorXd::Zero(m);
+          dh2_b[col] = Eigen::VectorXd::Zero(m);
+          d2h1[col] = Eigen::VectorXd::Zero(m);
+          d2h2[col] = Eigen::VectorXd::Zero(m);
         }
-        H_ab.setZero();
+        Eigen::VectorXd H_ab = Eigen::VectorXd::Zero(m);
 
         for (size_t t = 0; t < trunc_lvl; ++t) {
           for (size_t e = 0; e < d_ - 1 - t; ++e) {
@@ -2042,9 +2022,9 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
             // q_e from column arg2_col-1's hfunc2/hfunc1). p_e's column is
             // overwritten by the propagation below, so copy it by value;
             // q_e's column (arg2_col-1 > e) is untouched this step.
-            darg1_a = dh2_a[e];
-            darg1_b = dh2_b[e];
-            d2arg1 = d2h2[e];
+            Eigen::VectorXd darg1_a = dh2_a[e];
+            Eigen::VectorXd darg1_b = dh2_b[e];
+            Eigen::VectorXd d2arg1 = d2h2[e];
             const Eigen::VectorXd& darg2_a =
               arg2_is_h2 ? dh2_a[arg2_col - 1] : dh1_a[arg2_col - 1];
             const Eigen::VectorXd& darg2_b =
@@ -2071,16 +2051,15 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
             }
 
             // propagate the perturbations to this edge's h-function outputs:
-            // the _a/_b outputs are first order (propagate_first_order_into),
-            // the _ab output is second order
+            // hat/til are first order (propagate_first_order), bar is second
             auto propagate = [&](const DerivLeaf& leaf,
                                  Eigen::VectorXd& out_a,
                                  Eigen::VectorXd& out_b,
                                  Eigen::VectorXd& out_ab) {
-              propagate_first_order_into(
-                out_a, leaf.du1, leaf.du2, darg1_a, darg2_a);
-              propagate_first_order_into(
-                out_b, leaf.du1, leaf.du2, darg1_b, darg2_b);
+              out_a =
+                propagate_first_order(leaf.du1, leaf.du2, darg1_a, darg2_a);
+              out_b =
+                propagate_first_order(leaf.du1, leaf.du2, darg1_b, darg2_b);
               out_ab = leaf.du1u1.cwiseProduct(darg1_a).cwiseProduct(darg1_b) +
                        leaf.du1u2.cwiseProduct(darg1_a.cwiseProduct(darg2_b) +
                                                darg2_a.cwiseProduct(darg1_b)) +

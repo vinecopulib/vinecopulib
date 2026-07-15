@@ -35,41 +35,9 @@ private:
     const double& u,
     const Eigen::Ref<const Eigen::VectorXd>& parameters);
 
-  Eigen::VectorXd cdf(const tools_eigen::ConstMatRef& u,
-                      const tools_eigen::ConstMatRef& parameters) override;
-
   // pdf
-  Eigen::VectorXd pdf_raw(const tools_eigen::ConstMatRef& u,
-                          const tools_eigen::ConstMatRef& parameters);
-  Eigen::VectorXd log_pdf_raw(
-    const tools_eigen::ConstMatRef& u,
-    const tools_eigen::ConstMatRef& parameters) override;
-
-  Eigen::VectorXd hfunc1_raw(
-    const tools_eigen::ConstMatRef& u,
-    const tools_eigen::ConstMatRef& parameters) override;
-
-  Eigen::VectorXd hfunc2_raw(
-    const tools_eigen::ConstMatRef& u,
-    const tools_eigen::ConstMatRef& parameters) override;
-
-  Eigen::VectorXd hfunc_internal(
-    const Eigen::Ref<const Eigen::VectorXd>& ucond,
-    const Eigen::Ref<const Eigen::VectorXd>& uother,
-    const tools_eigen::ConstMatRef& parameters) const;
-
-  Eigen::VectorXd hinv1_raw(
-    const tools_eigen::ConstMatRef& u,
-    const tools_eigen::ConstMatRef& parameters) override;
-
-  Eigen::VectorXd hinv2_raw(
-    const tools_eigen::ConstMatRef& u,
-    const tools_eigen::ConstMatRef& parameters) override;
-
-  Eigen::VectorXd hinv_internal(
-    const Eigen::Ref<const Eigen::VectorXd>& ucond,
-    const Eigen::Ref<const Eigen::VectorXd>& q,
-    const tools_eigen::ConstMatRef& parameters) const;
+  Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters);
 
   // analytic derivatives of pdf, hfunc1, and log-pdf
   Eigen::VectorXd pdf_deriv_raw(const Eigen::MatrixXd& u,

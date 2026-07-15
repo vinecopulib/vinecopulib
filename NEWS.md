@@ -8,7 +8,6 @@
   the conditioning matrix, left to right, correspond to those last `k`
   entries); the method is built on `rosenblatt()`/`inverse_rosenblatt()` and
   reproduces the conditioning values exactly. Continuous variables only (#696)
-
 * Speed up the bivariate copula evaluation engine: all internal evaluation
   leaves take `Eigen::Ref` (`tools_eigen::ConstMatRef`), removing an n x 2
   copy on every `pdf`/`hfunc`/`hinv`/`cdf` call; a new `log_pdf_raw` pathway
@@ -99,6 +98,17 @@
   dependence coefficients (returned as a 2x2 matrix collecting all four corners of
   the unit square) and `Bicop::parameters_to_beta()`/`Bicop::get_beta()` to compute
   Blomqvist's beta, analogous to VineCopula's `BiCopPar2TailDep`/`BiCopPar2Beta` (#682).
+
+* Replace the vendored BOBYQA optimizer (`misc/tools_bobyqa.hpp`, ~2300 lines)
+  with a compact optimizer (`misc/tools_optimization`): Brent's bracketing
+  search for one-dimensional fits and a gradient-based BFGS otherwise, the
+  latter handling bound constraints via automatic parameter transforms
+  (`misc/tools_transforms`, inferred from the parameter bounds). Parametric
+  maximum-likelihood fitting now consumes the analytic (or finite-difference)
+  scores added above, optimizing over an unconstrained space so the family
+  never sees the transform. This is an internal change with no public-API
+  impact (#685)
+
 * Add per-row-parameter overloads of `Bicop::pdf`, `cdf`, `hfunc1`, `hfunc2`, `hinv1`, `hinv2`,
   and `loglik` that evaluate a bivariate copula at a different parameter set per row of `u` in a
   single (optionally multi-threaded) call. The new overloads take an `n x p` matrix of parameters
@@ -137,12 +147,9 @@
 
 ### MAINTENANCE, BUILD, AND DOCS
 
-* Speed up the Student t log-density parameter scores (`logpdf_deriv` w.r.t.
-  the degrees of freedom): the degrees-of-freedom-only quantities (digamma,
-  beta, the distribution object, and `nu^(nu/2-1)`) are now computed once per
-  call instead of once per observation. Algebraically identical (the
-  analytic-vs-finite-difference and R-parity tests are unchanged); this speeds
-  up `Vinecop::scores`/`hessian` and t maximum-likelihood fitting (#693)
+* Collapse the internal bivariate-copula evaluation leaves to a single
+  parameter-aware interface (removing the duplicated state-based primitives),
+  so each family implements its math once (#675)
 
 * Improve Python-binding API docs for property getters/setters (#670)
 

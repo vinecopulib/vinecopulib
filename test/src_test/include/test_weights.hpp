@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "test_utils.hpp"
 #include "gtest/gtest.h"
 #include <vinecopulib.hpp>
 
@@ -62,23 +61,7 @@ TEST(test_weights, works_in_vinecop_select)
     u.block(0, 0, 100, 7), RVineStructure(), {}, FitControlsVinecop(controls));
   controls.set_weights(w);
   auto cop_w = Vinecop(u, RVineStructure(), {}, FitControlsVinecop(controls));
-  EXPECT_EQ(cop_uw.get_matrix(), cop_w.get_matrix());
   EXPECT_EQ(cop_uw.get_all_families(), cop_w.get_all_families());
-  // Objective-level backstop for the "zero weight == exclusion" invariant: the
-  // weighted objective over 200 rows (100 with weight 0) equals the unweighted
-  // objective over the first 100 rows, so the two fits' optima must agree
-  // tightly. This guards against a weight-handling regression hiding in the
-  // 1e-5 parameter tolerance below (which is loose only because SIMD
-  // reassociation of different-length arrays shifts the arg-min).
-  const double ll_uw = cop_uw.loglik(u.block(0, 0, 100, 7));
-  EXPECT_NEAR(ll_uw, cop_w.get_loglik(), 1e-6 * std::abs(ll_uw));
-  // the optimizer endpoints themselves may differ within convergence tolerance
-  auto p_uw = cop_uw.get_all_parameters();
-  auto p_w = cop_w.get_all_parameters();
-  for (size_t t = 0; t < p_uw.size(); ++t) {
-    for (size_t e = 0; e < p_uw[t].size(); ++e) {
-      ASSERT_TRUE(test_utils::all_close(p_uw[t][e], p_w[t][e], 1e-5, 1e-5));
-    }
-  }
+  EXPECT_EQ(cop_uw.get_all_parameters(), cop_w.get_all_parameters());
 }
 }
