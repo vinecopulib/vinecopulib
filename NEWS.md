@@ -7,7 +7,9 @@
   variables are the last `k` of the vine order `get_order()` (the columns of
   the conditioning matrix, left to right, correspond to those last `k`
   entries); the method is built on `rosenblatt()`/`inverse_rosenblatt()` and
-  reproduces the conditioning values exactly. Continuous variables only (#696)
+  reproduces the conditioning values exactly. Discrete conditioning variables
+  are supported via the randomized Rosenblatt transform (each requires its
+  left-limit CDF as an extra column of the conditioning matrix) (#696)
 * Speed up the bivariate copula evaluation engine: all internal evaluation
   leaves take `Eigen::Ref` (`tools_eigen::ConstMatRef`), removing an n x 2
   copy on every `pdf`/`hfunc`/`hinv`/`cdf` call; a new `log_pdf_raw` pathway
