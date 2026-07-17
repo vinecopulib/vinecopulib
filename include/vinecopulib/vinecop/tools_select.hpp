@@ -94,7 +94,7 @@ public:
                   const FitControlsVinecop& controls,
                   std::vector<std::string> var_types);
 
-  ~VinecopSelector() = default;
+  virtual ~VinecopSelector() = default;
 
   std::vector<std::vector<Bicop>> get_pair_copulas() const;
 
@@ -114,8 +114,11 @@ public:
 
   size_t get_nobs() const;
 
+  std::vector<VineTree> get_trees() const { return trees_; }
+  std::vector<VineTree> get_trees_opt() const { return trees_opt_; }
+
 protected:
-  void select_tree(size_t t);
+  virtual void select_tree(size_t t);
 
   bool is_last_tree(size_t t) const;
 
@@ -182,7 +185,7 @@ protected:
 
   ptrdiff_t find_common_neighbor(size_t v0, size_t v1, const VineTree& tree);
 
-  double compute_fit_id(const EdgeProperties& e);
+  virtual double compute_fit_id(const EdgeProperties& e);
 
   size_t n_;
   size_t d_;
@@ -248,6 +251,10 @@ protected:
                                 const VineTree& tree_opt);
 
   FoundEdge find_old_fit(double fit_id, const VineTree& old_graph);
+
+  double get_tree_loglik(const VineTree& tree);
+
+  double get_tree_npars(const VineTree& tree);
 
   size_t get_num_non_indeps_of_tree(size_t t);
 
