@@ -2,6 +2,38 @@
 
 ### NEW FEATURES
 
+* Add `Vinecop::simulate_conditional()` for sampling from the conditional
+  distribution given fixed values of a subset of variables. The conditioning
+  variables are the last `k` of the vine order `get_order()` (the columns of
+  the conditioning matrix, left to right, correspond to those last `k`
+  entries); the method is built on `rosenblatt()`/`inverse_rosenblatt()` and
+  reproduces the conditioning values exactly. Discrete conditioning variables
+  are supported via the randomized Rosenblatt transform (each requires its
+  left-limit CDF as an extra column of the conditioning matrix) (#696)
+* Speed up the bivariate copula evaluation engine: all internal evaluation
+  leaves take `Eigen::Ref` (`tools_eigen::ConstMatRef`), removing an n x 2
+  copy on every `pdf`/`hfunc`/`hinv`/`cdf` call; a new `log_pdf_raw` pathway
+  avoids the exp-then-log round trip per optimizer iteration; vectorized
+  densities and closed-form vectorized h-functions/cdfs (written as
+  shared-log `exp` forms, faster than both scalar `pow` and Eigen's
+  `generic_pow` on every tested microarchitecture) replace the
+  per-element generator paths for Clayton/Gumbel/Frank/Joe/BB1-8 and the
+  extreme-value families; a closed-form Frank h-inverse and
+  safeguarded-Newton inverses replace 35-sweep bisections; and the
+  analytic derivative cascade reuses its buffers (`Vinecop::hessian` a few
+  percent faster, allocation-free inner loops) (#681)
+* Add the exact argument gradient of the density for the nonparametric **TLL**
+  family: `Bicop::pdf_deriv(u, "u1")`/`"u2"` (and `logpdf_deriv`) now return the
+  closed-form slope of the bilinear interpolation grid instead of throwing,
+  backed by the new `InterpolationGrid::gradient`. Derivatives with respect to
+  the grid values, all second-order derivatives, and the h-function derivatives
+  remain undefined for TLL and throw with a clear message; `tll` is not added to
+  `bicop_families::analytic_derivs`, and `Vinecop::scores`/`hessian` still reject
+  TLL pair copulas. Internally, the finite-difference derivative fallback moved
+  from `ParBicop` up to `AbstractBicop`, so it is shared by every family (each
+  controlling its own step clamping through the parameter-bound getters);
+  parametric families are unaffected, as their closed forms still take
+  precedence (#694).
 * Extend the analytic copula-derivative leaves (`Bicop::pdf_deriv`,
   `pdf_deriv2`, `hfunc1_deriv`, `hfunc1_deriv2`, `hfunc2_deriv`,
   `hfunc2_deriv2`, `logpdf_deriv`, `logpdf_deriv2`) to the **BB1, BB6, BB7, BB8,

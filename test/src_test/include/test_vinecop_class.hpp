@@ -440,6 +440,207 @@ TEST_F(VinecopTest, rosenblatt_is_correct)
     vinecop.rosenblatt(vinecop.inverse_rosenblatt(u)), u, 1e-6, 1e-6));
 }
 
+// helper: a Clayton D-vine on 1..d, whose order is 1..d so the sampling order
+// (and hence the admissible conditioning tail) is well-defined and R-free.
+namespace {
+inline Vinecop
+make_clayton_dvine(size_t d, double par_value = 4.0, int rotation = 0)
+{
+  auto pcs = Vinecop::make_pair_copula_store(d);
+  auto par = Eigen::VectorXd::Constant(1, par_value);
+  for (auto& tree : pcs)
+    for (auto& pc : tree)
+      pc = Bicop(BicopFamily::clayton, rotation, par);
+  std::vector<size_t> order(d);
+  for (size_t i = 0; i < d; ++i)
+    order[i] = i + 1;
+  return Vinecop(DVineStructure(order), pcs);
+}
+}
+
+TEST_F(VinecopTest, simulate_conditional_is_correct)
+{
+  size_t d = 4;
+  auto vc = make_clayton_dvine(d);
+  auto order = vc.get_order();
+  // the conditioning variables are the last two of the order (drawn first);
+  // u_cond column i corresponds to variable order[d - k + i].
+  size_t c0 = order[d - 2] - 1; // <-> u_cond column 0
+  size_t c1 = order[d - 1] - 1; // <-> u_cond column 1
+  size_t n = 1000;
+
+  // (a) fixed conditioning point repeated n times: the conditioning columns
+  //     are reproduced exactly and n samples are drawn.
+  Eigen::MatrixXd u0(1, 2);
+  u0 << 0.3, 0.7;
+  auto U = vc.simulate_conditional(u0.replicate(n, 1), false, 1, { 1 });
+  ASSERT_EQ(static_cast<size_t>(U.rows()), n);
+  ASSERT_EQ(static_cast<size_t>(U.cols()), d);
+  EXPECT_TRUE(
+    all_close(U.col(c0), Eigen::VectorXd::Constant(n, 0.3), 1e-9, 1e-9));
+  EXPECT_TRUE(
+    all_close(U.col(c1), Eigen::VectorXd::Constant(n, 0.7), 1e-9, 1e-9));
+
+  // (b) per-sample form: one conditioning row per output sample
+  Eigen::MatrixXd ucn(n, 2);
+  ucn.col(0) = Eigen::VectorXd::LinSpaced(n, 0.1, 0.9);
+  ucn.col(1).setConstant(0.5);
+  auto Un = vc.simulate_conditional(ucn, false, 1, { 2 });
+  EXPECT_TRUE(all_close(Un.col(c0), ucn.col(0), 1e-9, 1e-9));
+  EXPECT_TRUE(all_close(Un.col(c1), ucn.col(1), 1e-9, 1e-9));
+
+  // (c) multi-threaded == single-threaded (identical seeds)
+  auto uc = u0.replicate(n, 1);
+  auto U_mt = vc.simulate_conditional(uc, false, 2, { 1 });
+  EXPECT_TRUE(all_close(U_mt, U, 1e-10, 1e-10));
+
+  // (d) determinism: identical seeds -> identical output
+  auto U_again = vc.simulate_conditional(uc, false, 1, { 1 });
+  EXPECT_TRUE(all_close(U_again, U, 1e-12, 1e-12));
+
+  // (e) statistical correctness: the conditional mean of a free variable
+  //     matches a large unconditional sample filtered near the conditioning
+  //     values, and clearly differs from the unconditional mean.
+  size_t freevar = order[0] - 1; // drawn last, conditioned on all others
+  Eigen::MatrixXd u02(1, 2);
+  u02 << 0.8, 0.8;
+  auto Uc = vc.simulate_conditional(u02.replicate(100000, 1), false, 1, { 7 });
+  double cond_mean = Uc.col(freevar).mean();
+
+  auto big = vc.simulate(1000000, false, 1, { 11 });
+  double sum = 0.0, cnt = 0.0, eps = 0.03;
+  for (int i = 0; i < big.rows(); ++i) {
+    if ((std::abs(big(i, c0) - 0.8) < eps) &&
+        (std::abs(big(i, c1) - 0.8) < eps)) {
+      sum += big(i, freevar);
+      cnt += 1.0;
+    }
+  }
+  double ref_mean = sum / cnt;
+  EXPECT_NEAR(cond_mean, ref_mean, 0.02);
+  EXPECT_GT(std::abs(cond_mean - big.col(freevar).mean()), 0.1);
+}
+
+TEST_F(VinecopTest, simulate_conditional_throws)
+{
+  size_t d = 4;
+  auto vc = make_clayton_dvine(d, 2.0);
+
+  // empty conditioning set (0 columns)
+  EXPECT_ANY_THROW(
+    vc.simulate_conditional(Eigen::MatrixXd(3, 0), false, 1, { 1 }));
+  // too many columns (matches no k)
+  EXPECT_ANY_THROW(vc.simulate_conditional(
+    Eigen::MatrixXd::Constant(3, d, 0.5), false, 1, { 1 }));
+  // values outside the unit cube
+  Eigen::MatrixXd uc_bad(1, 2);
+  uc_bad << 0.3, 1.5;
+  EXPECT_ANY_THROW(vc.simulate_conditional(uc_bad, false, 1, { 1 }));
+
+  // discrete vine: a column count that matches no k must throw. With var_types
+  // {c,c,d,c} (order 1..4), valid column counts are {1, 3, 4}; 2 is in a gap
+  // (it would require variable 3, which is discrete and needs a left-limit).
+  auto vc_gap = make_clayton_dvine(d, 2.0);
+  vc_gap.set_var_types({ "c", "c", "d", "c" });
+  EXPECT_ANY_THROW(vc_gap.simulate_conditional(
+    Eigen::MatrixXd::Constant(3, 2, 0.5), false, 1, { 1 }));
+
+  // discrete conditioning variable with F(x^-) > F(x) must throw
+  auto vc_disc = make_clayton_dvine(d, 2.0);
+  vc_disc.set_var_types({ "c", "c", "c", "d" }); // variable 4 = order tail
+  Eigen::MatrixXd uc_bad_lim(1, 2);
+  uc_bad_lim << 0.4, 0.7; // F(x) = 0.4 < F(x^-) = 0.7
+  EXPECT_ANY_THROW(vc_disc.simulate_conditional(uc_bad_lim, false, 1, { 1 }));
+}
+
+TEST_F(VinecopTest, simulate_conditional_discrete_is_correct)
+{
+  size_t d = 4;
+  auto vc = make_clayton_dvine(d, 3.0);
+  vc.set_var_types({ "c", "c", "c", "d" }); // variable 4 is discrete
+  auto order = vc.get_order();              // [1, 2, 3, 4]
+
+  // k = 1: condition on order[d - 1] = 4 (the discrete variable). u_cond has
+  // two columns: F(x) and the left-limit F(x^-), i.e. the atom interval [a, b].
+  double a = 0.6, b = 0.8;
+  size_t condvar = order[d - 1] - 1; // 3
+  size_t freevar = order[0] - 1;     // 0, drawn last (conditioned on all)
+  size_t n = 200000;
+
+  Eigen::MatrixXd u_cond(1, 2);
+  u_cond << b, a; // F(x) = b, F(x^-) = a
+  auto U = vc.simulate_conditional(u_cond.replicate(n, 1), false, 1, { 7 });
+  ASSERT_EQ(static_cast<size_t>(U.cols()), d);
+
+  // (1) the conditioning column lands inside the atom interval [a, b] (it is
+  //     reproduced up to the atom, not exactly)
+  EXPECT_TRUE((U.col(condvar).array() >= a - 1e-9).all());
+  EXPECT_TRUE((U.col(condvar).array() <= b + 1e-9).all());
+
+  // (2) statistical correctness: E[free | U_condvar in [a, b]] matches a large
+  //     unconditional sample filtered to the atom interval, and differs
+  //     clearly from the unconditional mean.
+  double cond_mean = U.col(freevar).mean();
+  auto big = vc.simulate(2000000, false, 1, { 11 });
+  double sum = 0.0, cnt = 0.0;
+  for (int i = 0; i < big.rows(); ++i) {
+    if ((big(i, condvar) >= a) && (big(i, condvar) <= b)) {
+      sum += big(i, freevar);
+      cnt += 1.0;
+    }
+  }
+  double ref_mean = sum / cnt;
+  EXPECT_NEAR(cond_mean, ref_mean, 0.02);
+  EXPECT_GT(std::abs(cond_mean - big.col(freevar).mean()), 0.02);
+
+  // (3) determinism: identical seeds -> identical output
+  auto U2 = vc.simulate_conditional(u_cond.replicate(n, 1), false, 1, { 7 });
+  EXPECT_TRUE(all_close(U2, U, 1e-12, 1e-12));
+}
+
+TEST_F(VinecopTest, simulate_conditional_multi_discrete)
+{
+  // Two discrete conditioning variables stacked in draw order (the conditioning
+  // set is a self-contained sub-vine). The conditioned (free) draws must remain
+  // correct; the first-drawn discrete conditioning column lands exactly in its
+  // atom, while a later-drawn one may land slightly outside (hence not
+  // asserted).
+  size_t d = 4;
+  auto vc = make_clayton_dvine(d, 3.0);
+  vc.set_var_types({ "c", "c", "d", "d" }); // variables 3 and 4 discrete
+  auto order = vc.get_order();              // [1, 2, 3, 4]
+  size_t cv_first = order[d - 1] - 1;       // variable 4, drawn first
+  size_t freevar = order[0] - 1;            // variable 1, drawn last
+  size_t n = 50000;
+
+  double a3 = 0.5, b3 = 0.7, a4 = 0.6, b4 = 0.8;
+  // u_cond columns: [F(x3), F(x4), F(x3^-), F(x4^-)] (values then left-limits)
+  Eigen::MatrixXd row(1, 4);
+  row << b3, b4, a3, a4;
+  Eigen::MatrixXd U;
+  EXPECT_NO_THROW(
+    U = vc.simulate_conditional(row.replicate(n, 1), false, 1, { 5 }));
+
+  // the first-drawn discrete conditioning column is reproduced within its atom
+  EXPECT_TRUE((U.col(cv_first).array() >= a4 - 1e-9).all());
+  EXPECT_TRUE((U.col(cv_first).array() <= b4 + 1e-9).all());
+
+  // conditioned draws are correct: the free mean matches a large unconditional
+  // sample filtered to both atoms
+  double cond_mean = U.col(freevar).mean();
+  auto big = vc.simulate(500000, false, 1, { 6 });
+  size_t cv3 = order[d - 2] - 1;
+  double sum = 0.0, cnt = 0.0;
+  for (int i = 0; i < big.rows(); ++i) {
+    if ((big(i, cv3) >= a3) && (big(i, cv3) <= b3) &&
+        (big(i, cv_first) >= a4) && (big(i, cv_first) <= b4)) {
+      sum += big(i, freevar);
+      cnt += 1.0;
+    }
+  }
+  EXPECT_NEAR(cond_mean, sum / cnt, 0.03);
+}
+
 TEST_F(VinecopTest, scores_stepwise)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);
