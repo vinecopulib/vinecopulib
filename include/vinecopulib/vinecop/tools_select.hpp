@@ -114,13 +114,29 @@ public:
 
   size_t get_nobs() const;
 
-  std::vector<VineTree> get_trees() const { return trees_; };
-  std::vector<VineTree> get_trees_opt() const { return trees_opt_; };
+  std::vector<VineTree> get_trees() const { return trees_; }
+  std::vector<VineTree> get_trees_opt() const { return trees_opt_; }
 
 protected:
   virtual void select_tree(size_t t);
 
+  bool is_last_tree(size_t t) const;
+
   void finalize(size_t trunc_lvl);
+
+  void finalize_known_structure(size_t trunc_lvl);
+
+  void finalize_unknown_structure(size_t trunc_lvl);
+
+  void fill_structure_column(size_t col,
+                             size_t t,
+                             TriangularArray<size_t>& mat,
+                             std::vector<size_t>& order,
+                             std::vector<size_t>& ning_set);
+
+  void shift_to_one_based(TriangularArray<size_t>& mat,
+                          std::vector<size_t>& order,
+                          size_t trunc_lvl);
 
   double get_mbicv_of_tree(size_t t, double loglik);
 
@@ -140,7 +156,23 @@ protected:
 
   void add_allowed_edges(VineTree& vine_tree);
 
+  void add_allowed_edges_proximity(VineTree& vine_tree,
+                                   const std::string& tree_criterion,
+                                   const Eigen::VectorXd& weights,
+                                   const TreeCriterionFunction& criterion_fun);
+
+  void add_allowed_edges_structured(VineTree& vine_tree,
+                                    const std::string& tree_criterion,
+                                    const Eigen::VectorXd& weights,
+                                    const TreeCriterionFunction& criterion_fun);
+
   void select_edges(VineTree& vine_tree);
+
+  void select_edges_mst_prim(VineTree& vine_tree);
+
+  void select_edges_mst_kruskal(VineTree& vine_tree);
+
+  void select_edges_random(VineTree& vine_tree);
 
   Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
 
@@ -172,6 +204,31 @@ protected:
 
   double get_next_threshold(std::vector<double>& thresholded_crits);
 
+  // bundles the accumulators of one threshold-search pass over all trees
+  struct ThresholdPass
+  {
+    double mbicv = 0.0;
+    double mbicv_trunc = 0.0;
+    double loglik = 0.0;
+    double num_changed = 0.0;
+    double num_total = 0.0;
+    bool select_trunc_lvl = false;
+    bool select_threshold = false;
+  };
+
+  ThresholdPass run_threshold_pass(bool& needs_break);
+
+  void check_truncation_rollback(ThresholdPass& pass,
+                                 size_t& t,
+                                 double loglik_tree,
+                                 double mbicv_tree,
+                                 bool& needs_break);
+
+  void update_optimum(const ThresholdPass& pass,
+                      double& mbicv_opt,
+                      bool& needs_break,
+                      std::vector<double>& thresholded_crits);
+
   // functions for manipulation of trees ----------------
   VineTree make_base_tree(const Eigen::MatrixXd& data);
 
@@ -188,6 +245,10 @@ protected:
   void select_pair_copulas(VineTree& tree,
                            const VineTree& tree_opt = VineTree(),
                            bool last_tree = false);
+
+  void fit_or_reuse_pair_copula(const EdgeIterator& e,
+                                VineTree& tree,
+                                const VineTree& tree_opt);
 
   FoundEdge find_old_fit(double fit_id, const VineTree& old_graph);
 
