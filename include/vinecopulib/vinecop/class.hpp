@@ -274,6 +274,37 @@ public:
                              bool step_wise = true,
                              const size_t num_threads = 1);
 
+  // Scores, gradient, and Hessian with per-observation parameters. `parameters`
+  // is an n x npars matrix, one full-vine parameter vector per observation,
+  // with columns in the (tree, edge, parameter) order of scores(). Continuous,
+  // all-parametric models only.
+  ScoresResult scores_full(Eigen::MatrixXd u,
+                           const Eigen::MatrixXd& parameters,
+                           bool step_wise = true,
+                           const size_t num_threads = 1,
+                           const bool keep_all = true);
+  Eigen::MatrixXd scores(Eigen::MatrixXd u,
+                         const Eigen::MatrixXd& parameters,
+                         bool step_wise = true,
+                         const size_t num_threads = 1);
+  Eigen::VectorXd gradient(Eigen::MatrixXd u,
+                           const Eigen::MatrixXd& parameters,
+                           bool step_wise = true,
+                           const size_t num_threads = 1);
+  Eigen::MatrixXd hessian(Eigen::MatrixXd u,
+                          const Eigen::MatrixXd& parameters,
+                          bool step_wise = true,
+                          const size_t num_threads = 1);
+  TriangularArray<std::vector<Eigen::MatrixXd>> hessian_full(
+    Eigen::MatrixXd u,
+    const Eigen::MatrixXd& parameters,
+    bool step_wise = true,
+    const size_t num_threads = 1);
+  Eigen::MatrixXd scores_cov(Eigen::MatrixXd u,
+                             const Eigen::MatrixXd& parameters,
+                             bool step_wise = true,
+                             const size_t num_threads = 1);
+
 private:
   // Per-edge derivative caches shared by the analytic score/gradient/Hessian
   // cascades. One forward walk over the vine (build_deriv_cache) fills them;
@@ -325,14 +356,25 @@ private:
   };
   // one forward walk over the rows [begin, begin + size) of `u`, filling the
   // per-edge derivative caches (second-order fields only when `second_order`).
-  TriangularArray<DerivCache> build_deriv_cache(const Eigen::MatrixXd& u,
-                                                size_t begin,
-                                                size_t size,
-                                                bool second_order) const;
+  // When `per_obs_params` is non-empty (an n x npars matrix), each edge reads
+  // its own per-observation parameters from the matching column block instead
+  // of the pair copula's stored parameters; an empty matrix (the default)
+  // leaves the fixed-parameter fast path unchanged.
+  TriangularArray<DerivCache> build_deriv_cache(
+    const Eigen::MatrixXd& u,
+    size_t begin,
+    size_t size,
+    bool second_order,
+    const Eigen::MatrixXd& per_obs_params = Eigen::MatrixXd()) const;
 
   // throws if any pair copula is nonparametric (differentiating w.r.t. an
   // interpolation grid is meaningless); `fn` names the calling method.
   void check_parametric(const char* fn) const;
+
+  // validates a per-observation parameter matrix for the score/Hessian
+  // overloads: rejects discrete variables and checks the n x npars shape.
+  void check_per_obs_params(const Eigen::MatrixXd& u,
+                            const Eigen::MatrixXd& per_obs_params) const;
 
 protected:
   size_t d_{ 1 };

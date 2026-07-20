@@ -637,6 +637,209 @@ TEST_P(ParBicopTest, derivatives_per_row_parameters_match_loop)
   EXPECT_ANY_THROW(bicop_.pdf_deriv(u, "par1", P.topRows(n - 1)));
 }
 
+// Bicop scores/gradient/Hessian are thin aggregations of the log-density
+// parameter derivatives. Verify the definitional identities (scores columns
+// are logpdf_deriv, gradient is their mean, hessian averages hessian_full),
+// the covariance/bundled-result helpers, and independent finite-difference
+// checks of the averaged gradient and Hessian.
+TEST_P(ParBicopTest, scores_gradient_hessian_match_derivatives)
+{
+  if (!needs_check_)
+    return;
+
+  auto family = bicop_.get_family();
+  auto rotation = bicop_.get_rotation();
+
+  // deterministic interior grid (derivatives explode at the boundary)
+  const Eigen::Index m = 9;
+  Eigen::MatrixXd u(m * m, 2);
+  for (Eigen::Index i = 0; i < m; ++i) {
+    for (Eigen::Index j = 0; j < m; ++j) {
+      u(i * m + j, 0) = 0.05 + 0.1 * static_cast<double>(i);
+      u(i * m + j, 1) = 0.05 + 0.1 * static_cast<double>(j);
+    }
+  }
+  const Eigen::Index n = u.rows();
+  const Eigen::Index p = bicop_.get_parameters().size();
+
+  // parameters strictly inside the bounds for stable finite differences
+  Eigen::VectorXd par(p), lb(p), ub(p);
+  if (p > 0) {
+    par = bicop_.get_parameters();
+    lb = bicop_.get_parameters_lower_bounds();
+    ub = bicop_.get_parameters_upper_bounds();
+    for (Eigen::Index k = 0; k < p; ++k) {
+      par(k) = std::min(std::max(par(k), lb(k) + 1e-2), ub(k) - 1e-2);
+    }
+  }
+  Bicop cop(family, rotation, par);
+
+  Eigen::MatrixXd s = cop.scores(u);
+  ASSERT_EQ(s.rows(), n);
+  ASSERT_EQ(s.cols(), p);
+
+  // scores columns are the log-density parameter derivatives
+  for (Eigen::Index k = 0; k < p; ++k) {
+    ASSERT_TRUE(
+      all_close(s.col(k), cop.logpdf_deriv(u, "par" + std::to_string(k + 1))))
+      << cop.str();
+  }
+
+  // gradient = observation-average of the scores; scores_full carries the same
+  // matrix; scores_cov is the mean-centered covariance
+  ASSERT_TRUE(all_close(
+    cop.gradient(u), s.colwise().mean().transpose().eval(), 1e-12, 1e-12))
+    << cop.str();
+  ASSERT_TRUE(all_close(cop.scores_full(u).scores, s)) << cop.str();
+  Eigen::MatrixXd sc = s.rowwise() - s.colwise().mean();
+  ASSERT_TRUE(
+    all_close(cop.scores_cov(u), (sc.adjoint() * sc) / static_cast<double>(n)))
+    << cop.str();
+
+  // hessian: symmetric, equals the mean of the per-observation Hessians
+  Eigen::MatrixXd H = cop.hessian(u);
+  ASSERT_EQ(H.rows(), p);
+  ASSERT_EQ(H.cols(), p);
+  ASSERT_TRUE(all_close(H, H.transpose().eval())) << cop.str();
+
+  auto hess_full = cop.hessian_full(u);
+  ASSERT_EQ(static_cast<Eigen::Index>(hess_full.size()), n);
+  Eigen::MatrixXd H_avg = Eigen::MatrixXd::Zero(p, p);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    ASSERT_TRUE(all_close(hess_full[i], hess_full[i].transpose().eval()))
+      << cop.str();
+    H_avg += hess_full[i];
+  }
+  if (n > 0)
+    H_avg /= static_cast<double>(n);
+  ASSERT_TRUE(all_close(H, H_avg, 1e-12, 1e-12)) << cop.str();
+
+  if (p > 0) {
+    // gradient against a finite difference of the mean log-density
+    for (Eigen::Index k = 0; k < p; ++k) {
+      double h = 1e-4 * std::max(1.0, std::abs(par(k)));
+      Eigen::VectorXd par_p = par, par_m = par;
+      par_p(k) += h;
+      par_m(k) -= h;
+      Bicop cop_p(family, rotation, par_p), cop_m(family, rotation, par_m);
+      double fd = (cop_p.pdf(u).array().log().mean() -
+                   cop_m.pdf(u).array().log().mean()) /
+                  (2 * h);
+      ASSERT_NEAR(cop.gradient(u)(k), fd, 1e-3 * (1.0 + std::abs(fd)))
+        << cop.str();
+    }
+
+    // hessian against a finite difference of the averaged scores
+    for (Eigen::Index a = 0; a < p; ++a) {
+      for (Eigen::Index b = 0; b < p; ++b) {
+        double h = 1e-4 * std::max(1.0, std::abs(par(b)));
+        Eigen::VectorXd par_p = par, par_m = par;
+        par_p(b) += h;
+        par_m(b) -= h;
+        Bicop cop_p(family, rotation, par_p), cop_m(family, rotation, par_m);
+        double fd =
+          (cop_p.scores(u).col(a).mean() - cop_m.scores(u).col(a).mean()) /
+          (2 * h);
+        ASSERT_NEAR(H(a, b), fd, 5e-3 * (1.0 + std::abs(fd))) << cop.str();
+      }
+    }
+  }
+}
+
+// Per-row-parameter scores/gradient/Hessian must match a loop over
+// single-parameter Bicops, be thread-count-invariant, and reduce to the
+// stored-parameter path when a single parameter set is broadcast.
+TEST_P(ParBicopTest, scores_per_row_parameters_match_loop)
+{
+  if (!needs_check_)
+    return;
+  if (bicop_.get_parameters().size() == 0)
+    return;
+
+  auto family = bicop_.get_family();
+  auto rotation = bicop_.get_rotation();
+  auto var_types = bicop_.get_var_types();
+  Eigen::Index n = 100;
+  Eigen::MatrixXd u =
+    bicop_.simulate(static_cast<size_t>(n), false, { 1, 2, 3, 4, 5 });
+
+  Eigen::VectorXd lb = bicop_.get_parameters_lower_bounds();
+  Eigen::VectorXd ub = bicop_.get_parameters_upper_bounds();
+  Eigen::Index p = lb.size();
+  Eigen::VectorXd a = lb + 0.2 * (ub - lb);
+  Eigen::VectorXd c = lb + 0.6 * (ub - lb);
+  Eigen::MatrixXd P(n, p);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    double w = static_cast<double>(i % 5) / 4.0;
+    P.row(i) = ((1 - w) * a + w * c).transpose();
+  }
+
+  // scores(u, P): row i is the score at (u_i, P_i)
+  Eigen::MatrixXd s = bicop_.scores(u, P);
+  ASSERT_EQ(s.rows(), n);
+  ASSERT_EQ(s.cols(), p);
+  for (Eigen::Index k = 0; k < p; ++k) {
+    ASSERT_TRUE(all_close(
+      s.col(k), bicop_.logpdf_deriv(u, "par" + std::to_string(k + 1), P)))
+      << bicop_.str();
+  }
+
+  // ground truth: loop over single-parameter Bicops
+  Eigen::MatrixXd Href = Eigen::MatrixXd::Zero(p, p);
+  auto hess_full = bicop_.hessian_full(u, P);
+  ASSERT_EQ(static_cast<Eigen::Index>(hess_full.size()), n);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    Bicop bi(family, rotation, P.row(i).transpose().eval(), var_types);
+    Eigen::MatrixXd ui = u.row(i);
+    ASSERT_TRUE(all_close(s.row(i), bi.scores(ui).row(0), 1e-8, 1e-8))
+      << bicop_.str();
+    ASSERT_TRUE(all_close(hess_full[i], bi.hessian(ui), 1e-8, 1e-8))
+      << bicop_.str();
+    Href += hess_full[i];
+  }
+  Href /= static_cast<double>(n);
+  ASSERT_TRUE(all_close(bicop_.hessian(u, P), Href, 1e-10, 1e-10))
+    << bicop_.str();
+
+  // threading parity
+  ASSERT_TRUE(
+    all_close(bicop_.scores(u, P, 3), bicop_.scores(u, P, 1), 1e-12, 1e-12))
+    << bicop_.str();
+
+  // broadcasting the stored parameters matches the single-argument path
+  Eigen::MatrixXd Pb = bicop_.get_parameters().transpose().replicate(n, 1);
+  ASSERT_TRUE(all_close(bicop_.scores(u, Pb), bicop_.scores(u), 1e-10, 1e-10))
+    << bicop_.str();
+  ASSERT_TRUE(
+    all_close(bicop_.gradient(u, Pb), bicop_.gradient(u), 1e-10, 1e-10))
+    << bicop_.str();
+  ASSERT_TRUE(all_close(bicop_.hessian(u, Pb), bicop_.hessian(u), 1e-10, 1e-10))
+    << bicop_.str();
+
+  // validation errors propagate through format_parameters
+  EXPECT_ANY_THROW(bicop_.scores(u, P.topRows(n - 1)));
+}
+
+// scores/gradient/Hessian require parametric families and continuous
+// variables, mirroring the derivative preconditions.
+TEST(BicopScores, reject_discrete_and_nonparametric)
+{
+  Eigen::MatrixXd u(3, 2);
+  u << 0.2, 0.3, 0.5, 0.6, 0.7, 0.4;
+
+  Bicop tll(BicopFamily::tll);
+  EXPECT_ANY_THROW(tll.scores(u));
+  EXPECT_ANY_THROW(tll.hessian(u));
+
+  Bicop cl(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 2.0));
+  cl.set_var_types({ "d", "d" });
+  Eigen::MatrixXd u4(3, 4);
+  u4.leftCols(2) = u;
+  u4.rightCols(2) = (u.array() * 0.9).matrix();
+  EXPECT_ANY_THROW(cl.scores(u4));
+  EXPECT_ANY_THROW(cl.hessian_full(u4));
+}
+
 // Derivatives must match the VineCopula R implementation (BiCopDeriv,
 // BiCopDeriv2, BiCopHfuncDeriv, BiCopHfuncDeriv2). VineCopula encodes
 // rotations in the family code with negated parameters, so parameter

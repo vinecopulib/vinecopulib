@@ -2,6 +2,26 @@
 
 ### NEW FEATURES
 
+* Add scores, gradient, and Hessian of the log-likelihood to `Bicop`:
+  `scores` (the n x p per-observation score matrix), `gradient` (its
+  observation-average), `hessian` and `hessian_full` (the averaged and
+  per-observation p x p Hessians), `scores_cov`, and `scores_full` — thin
+  aggregations of `logpdf_deriv`/`logpdf_deriv2`, mirroring the `Vinecop`
+  asymptotic API. As for the derivatives, they require parametric families and
+  continuous variable types. Each also has a per-row-parameter overload that
+  evaluates at a different parameter set per row of `u` (#697)
+* Add per-observation-parameter overloads of `Vinecop::scores`, `scores_full`,
+  `gradient`, `hessian`, `hessian_full`, and `scores_cov`, taking an
+  n x npars matrix `parameters` (one full-vine parameter vector per
+  observation, columns in the `(tree, edge, parameter)` order of `scores()`).
+  Row i is evaluated as if the vine carried that row's parameters, enabling
+  scores/Hessians for conditional/covariate vine models where the pair-copula
+  parameters vary by observation. Continuous, all-parametric models only
+  (discrete variables and nonparametric pair copulas are rejected). The
+  default fixed-parameter path is unchanged: the shared forward walk
+  (`build_deriv_cache`) simply switches each edge's evaluations to the
+  matching per-row `Bicop` overloads when a parameter matrix is supplied, so
+  models that do not need this feature pay nothing (#697)
 * Add `Vinecop::simulate_conditional()` for sampling from the conditional
   distribution given fixed values of a subset of variables. The conditioning
   variables are the last `k` of the vine order `get_order()` (the columns of

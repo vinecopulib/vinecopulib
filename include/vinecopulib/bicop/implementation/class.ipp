@@ -1060,6 +1060,231 @@ Bicop::logpdf_deriv2(const Eigen::MatrixXd& u,
 }
 //! @}
 
+//! @name Scores, gradient, and Hessian of the log-likelihood
+//!
+//! @details These methods aggregate the log-density parameter derivatives into
+//! the score (the gradient of each observation's log-density contribution), its
+//! observation-average (`gradient`), and the Hessian. They are thin wrappers
+//! around `logpdf_deriv()` / `logpdf_deriv2()`: with `p = get_parameters()`
+//! parameters, the score of observation `i` w.r.t. parameter `k` is
+//! \f$ \partial \log c(u_i; \theta) / \partial \theta_k \f$, and the (per-obs
+//! and averaged) Hessians collect the second log-density derivatives. Like the
+//! derivatives they build on, they require parametric families and continuous
+//! variable types; nonparametric or discrete models throw.
+//!
+//! The per-row-parameter overloads evaluate at a different parameter set per
+//! row of `u` (see the corresponding `pdf()` overload for the layout and
+//! validation rules).
+//!
+//! @param u An \f$ n \times 2 \f$ matrix of observations contained in
+//!   \f$ (0, 1)^2 \f$.
+//! @{
+
+//! @brief Evaluates the per-observation scores.
+//!
+//! @return An \f$ n \times p \f$ matrix whose column `k` is
+//! \f$ \partial \log c / \partial \theta_{k+1} \f$.
+inline Eigen::MatrixXd
+Bicop::scores(const Eigen::MatrixXd& u) const
+{
+  check_data(u);
+  check_deriv_preconditions();
+  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
+  Eigen::MatrixXd s(u.rows(), p);
+  for (Eigen::Index k = 0; k < p; ++k) {
+    s.col(k) = logpdf_deriv(u, "par" + std::to_string(k + 1));
+  }
+  return s;
+}
+
+//! @brief Evaluates the gradient of the average log-likelihood.
+//!
+//! @return The observation-average of `scores()`, a vector of length `p`.
+inline Eigen::VectorXd
+Bicop::gradient(const Eigen::MatrixXd& u) const
+{
+  return scores(u).colwise().mean().transpose();
+}
+
+//! @brief Evaluates the Hessian of the average log-likelihood.
+//!
+//! @return A symmetric \f$ p \times p \f$ matrix whose entry \f$ (a, b) \f$ is
+//! the observation-average of
+//! \f$ \partial^2 \log c / \partial \theta_{a+1} \partial \theta_{b+1} \f$.
+inline Eigen::MatrixXd
+Bicop::hessian(const Eigen::MatrixXd& u) const
+{
+  check_data(u);
+  check_deriv_preconditions();
+  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
+  Eigen::MatrixXd h(p, p);
+  for (Eigen::Index a = 0; a < p; ++a) {
+    for (Eigen::Index b = a; b < p; ++b) {
+      h(a, b) =
+        logpdf_deriv2(
+          u, "par" + std::to_string(a + 1) + "par" + std::to_string(b + 1))
+          .mean();
+      h(b, a) = h(a, b);
+    }
+  }
+  return h;
+}
+
+//! @brief Evaluates the per-observation Hessians.
+//!
+//! @return A vector of `n` symmetric \f$ p \times p \f$ matrices; entry `i`'s
+//! \f$ (a, b) \f$ element is
+//! \f$ \partial^2 \log c(u_i; \theta) / \partial \theta_{a+1} \partial
+//! \theta_{b+1} \f$.
+inline std::vector<Eigen::MatrixXd>
+Bicop::hessian_full(const Eigen::MatrixXd& u) const
+{
+  check_data(u);
+  check_deriv_preconditions();
+  const Eigen::Index n = u.rows();
+  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
+  std::vector<Eigen::MatrixXd> hess(static_cast<size_t>(n),
+                                    Eigen::MatrixXd(p, p));
+  for (Eigen::Index a = 0; a < p; ++a) {
+    for (Eigen::Index b = a; b < p; ++b) {
+      Eigen::VectorXd d = logpdf_deriv2(
+        u, "par" + std::to_string(a + 1) + "par" + std::to_string(b + 1));
+      for (Eigen::Index i = 0; i < n; ++i) {
+        hess[static_cast<size_t>(i)](a, b) = d(i);
+        hess[static_cast<size_t>(i)](b, a) = d(i);
+      }
+    }
+  }
+  return hess;
+}
+
+//! @brief Computes the covariance matrix of the scores.
+//!
+//! @return The mean-centered, divided-by-`n` covariance of `scores()`, a
+//! \f$ p \times p \f$ matrix.
+inline Eigen::MatrixXd
+Bicop::scores_cov(const Eigen::MatrixXd& u) const
+{
+  Eigen::MatrixXd s = scores(u);
+  // materialize the centered scores; a lazy expression would be evaluated
+  // twice by the product below
+  Eigen::MatrixXd sc = s.rowwise() - s.colwise().mean();
+  return (sc.adjoint() * sc) / static_cast<double>(s.rows());
+}
+
+//! @brief Evaluates the scores, bundled in a `ScoresResult`.
+//!
+//! @details Provided for parity with `Vinecop::scores_full()`; a single pair
+//! copula has no cascade caches, so the result only carries the score matrix.
+inline Bicop::ScoresResult
+Bicop::scores_full(const Eigen::MatrixXd& u) const
+{
+  ScoresResult result;
+  result.scores = scores(u);
+  return result;
+}
+
+//! @brief Evaluates the per-observation scores with per-row parameters.
+inline Eigen::MatrixXd
+Bicop::scores(const Eigen::MatrixXd& u,
+              const Eigen::MatrixXd& parameters,
+              const size_t num_threads) const
+{
+  check_deriv_preconditions();
+  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
+  Eigen::MatrixXd s(u.rows(), p);
+  for (Eigen::Index k = 0; k < p; ++k) {
+    s.col(k) =
+      logpdf_deriv(u, "par" + std::to_string(k + 1), parameters, num_threads);
+  }
+  return s;
+}
+
+//! @brief Evaluates the gradient of the average log-likelihood with per-row
+//! parameters.
+inline Eigen::VectorXd
+Bicop::gradient(const Eigen::MatrixXd& u,
+                const Eigen::MatrixXd& parameters,
+                const size_t num_threads) const
+{
+  return scores(u, parameters, num_threads).colwise().mean().transpose();
+}
+
+//! @brief Evaluates the Hessian of the average log-likelihood with per-row
+//! parameters.
+inline Eigen::MatrixXd
+Bicop::hessian(const Eigen::MatrixXd& u,
+               const Eigen::MatrixXd& parameters,
+               const size_t num_threads) const
+{
+  check_deriv_preconditions();
+  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
+  Eigen::MatrixXd h(p, p);
+  for (Eigen::Index a = 0; a < p; ++a) {
+    for (Eigen::Index b = a; b < p; ++b) {
+      h(a, b) = logpdf_deriv2(u,
+                              "par" + std::to_string(a + 1) + "par" +
+                                std::to_string(b + 1),
+                              parameters,
+                              num_threads)
+                  .mean();
+      h(b, a) = h(a, b);
+    }
+  }
+  return h;
+}
+
+//! @brief Evaluates the per-observation Hessians with per-row parameters.
+inline std::vector<Eigen::MatrixXd>
+Bicop::hessian_full(const Eigen::MatrixXd& u,
+                    const Eigen::MatrixXd& parameters,
+                    const size_t num_threads) const
+{
+  check_deriv_preconditions();
+  const Eigen::Index n = u.rows();
+  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
+  std::vector<Eigen::MatrixXd> hess(static_cast<size_t>(n),
+                                    Eigen::MatrixXd(p, p));
+  for (Eigen::Index a = 0; a < p; ++a) {
+    for (Eigen::Index b = a; b < p; ++b) {
+      Eigen::VectorXd d = logpdf_deriv2(u,
+                                        "par" + std::to_string(a + 1) + "par" +
+                                          std::to_string(b + 1),
+                                        parameters,
+                                        num_threads);
+      for (Eigen::Index i = 0; i < n; ++i) {
+        hess[static_cast<size_t>(i)](a, b) = d(i);
+        hess[static_cast<size_t>(i)](b, a) = d(i);
+      }
+    }
+  }
+  return hess;
+}
+
+//! @brief Computes the covariance matrix of the scores with per-row parameters.
+inline Eigen::MatrixXd
+Bicop::scores_cov(const Eigen::MatrixXd& u,
+                  const Eigen::MatrixXd& parameters,
+                  const size_t num_threads) const
+{
+  Eigen::MatrixXd s = scores(u, parameters, num_threads);
+  Eigen::MatrixXd sc = s.rowwise() - s.colwise().mean();
+  return (sc.adjoint() * sc) / static_cast<double>(s.rows());
+}
+
+//! @brief Evaluates the scores with per-row parameters, bundled in a
+//! `ScoresResult`.
+inline Bicop::ScoresResult
+Bicop::scores_full(const Eigen::MatrixXd& u,
+                   const Eigen::MatrixXd& parameters,
+                   const size_t num_threads) const
+{
+  ScoresResult result;
+  result.scores = scores(u, parameters, num_threads);
+  return result;
+}
+//! @}
+
 //! checks that derivatives are available for the model (parametric family,
 //! continuous variable types).
 inline void
