@@ -1242,47 +1242,49 @@ Vinecop::build_deriv_cache(const Eigen::MatrixXd& u,
       if (per_obs) {
         pars_e = per_obs_params.block(begin, par_offset, m, np);
       }
-      auto PDF = [&]() { return per_obs ? ec.pdf(u_e, pars_e) : ec.pdf(u_e); };
-      auto LPD = [&](const std::string& s) {
+      auto ec_pdf = [&]() {
+        return per_obs ? ec.pdf(u_e, pars_e) : ec.pdf(u_e);
+      };
+      auto ec_logpdf_deriv = [&](const std::string& s) {
         return per_obs ? ec.logpdf_deriv(u_e, s, pars_e)
                        : ec.logpdf_deriv(u_e, s);
       };
-      auto PD = [&](const std::string& s) {
+      auto ec_pdf_deriv = [&](const std::string& s) {
         return per_obs ? ec.pdf_deriv(u_e, s, pars_e) : ec.pdf_deriv(u_e, s);
       };
-      auto LPD2 = [&](const std::string& s) {
+      auto ec_logpdf_deriv2 = [&](const std::string& s) {
         return per_obs ? ec.logpdf_deriv2(u_e, s, pars_e)
                        : ec.logpdf_deriv2(u_e, s);
       };
-      auto H1 = [&]() {
+      auto ec_hfunc1 = [&]() {
         return per_obs ? ec.hfunc1(u_e, pars_e) : ec.hfunc1(u_e);
       };
-      auto H2 = [&]() {
+      auto ec_hfunc2 = [&]() {
         return per_obs ? ec.hfunc2(u_e, pars_e) : ec.hfunc2(u_e);
       };
-      auto H1D = [&](const std::string& s) {
+      auto ec_hfunc1_deriv = [&](const std::string& s) {
         return per_obs ? ec.hfunc1_deriv(u_e, s, pars_e)
                        : ec.hfunc1_deriv(u_e, s);
       };
-      auto H2D = [&](const std::string& s) {
+      auto ec_hfunc2_deriv = [&](const std::string& s) {
         return per_obs ? ec.hfunc2_deriv(u_e, s, pars_e)
                        : ec.hfunc2_deriv(u_e, s);
       };
-      auto H1D2 = [&](const std::string& s) {
+      auto ec_hfunc1_deriv2 = [&](const std::string& s) {
         return per_obs ? ec.hfunc1_deriv2(u_e, s, pars_e)
                        : ec.hfunc1_deriv2(u_e, s);
       };
-      auto H2D2 = [&](const std::string& s) {
+      auto ec_hfunc2_deriv2 = [&](const std::string& s) {
         return per_obs ? ec.hfunc2_deriv2(u_e, s, pars_e)
                        : ec.hfunc2_deriv2(u_e, s);
       };
 
-      ce.c = PDF();
-      ce.du1 = LPD("u1");
-      ce.du2 = LPD("u2");
+      ce.c = ec_pdf();
+      ce.du1 = ec_logpdf_deriv("u1");
+      ce.du2 = ec_logpdf_deriv("u2");
       ce.dpar.resize(np);
       for (size_t p = 0; p < np; ++p) {
-        ce.dpar[p] = LPD(sel(p));
+        ce.dpar[p] = ec_logpdf_deriv(sel(p));
       }
 
       // ∂c/∂u1, ∂c/∂u2, ∂c/∂θ are shared by the two h-outputs' 2nd-order
@@ -1290,23 +1292,23 @@ Vinecop::build_deriv_cache(const Eigen::MatrixXd& u,
       Eigen::VectorXd c_u1, c_u2;
       std::vector<Eigen::VectorXd> c_par;
       if (second_order) {
-        c_u1 = PD("u1");
-        c_u2 = PD("u2");
+        c_u1 = ec_pdf_deriv("u1");
+        c_u2 = ec_pdf_deriv("u2");
         c_par.resize(np);
         for (size_t p = 0; p < np; ++p) {
-          c_par[p] = PD(sel(p));
+          c_par[p] = ec_pdf_deriv(sel(p));
         }
-        ce.du1u1 = LPD2("u1u1");
-        ce.du1u2 = LPD2("u1u2");
-        ce.du2u2 = LPD2("u2u2");
+        ce.du1u1 = ec_logpdf_deriv2("u1u1");
+        ce.du1u2 = ec_logpdf_deriv2("u1u2");
+        ce.du2u2 = ec_logpdf_deriv2("u2u2");
         ce.dpar_u1.resize(np);
         ce.dpar_u2.resize(np);
         ce.dpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
         for (size_t p = 0; p < np; ++p) {
-          ce.dpar_u1[p] = LPD2(sel(p) + "u1");
-          ce.dpar_u2[p] = LPD2(sel(p) + "u2");
+          ce.dpar_u1[p] = ec_logpdf_deriv2(sel(p) + "u1");
+          ce.dpar_u2[p] = ec_logpdf_deriv2(sel(p) + "u2");
           for (size_t q = p; q < np; ++q) {
-            ce.dpar_par[p][q] = LPD2(sel(p) + sel(q));
+            ce.dpar_par[p][q] = ec_logpdf_deriv2(sel(p) + sel(q));
             ce.dpar_par[q][p] = ce.dpar_par[p][q];
           }
         }
@@ -1318,23 +1320,23 @@ Vinecop::build_deriv_cache(const Eigen::MatrixXd& u,
         DerivLeaf& leaf = ce.h2;
         leaf.active = true;
         leaf.du1 = ce.c;
-        leaf.du2 = H2D("u2");
+        leaf.du2 = ec_hfunc2_deriv("u2");
         leaf.dpar.resize(np);
         for (size_t p = 0; p < np; ++p) {
-          leaf.dpar[p] = H2D(sel(p));
+          leaf.dpar[p] = ec_hfunc2_deriv(sel(p));
         }
         if (second_order) {
           leaf.du1u1 = c_u1;
           leaf.du1u2 = c_u2;
-          leaf.du2u2 = H2D2("u2u2");
+          leaf.du2u2 = ec_hfunc2_deriv2("u2u2");
           leaf.dpar_u1.resize(np);
           leaf.dpar_u2.resize(np);
           leaf.dpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
           for (size_t p = 0; p < np; ++p) {
             leaf.dpar_u1[p] = c_par[p]; // ∂²h2/∂θ∂u1 = ∂c/∂θ
-            leaf.dpar_u2[p] = H2D2(sel(p) + "u2");
+            leaf.dpar_u2[p] = ec_hfunc2_deriv2(sel(p) + "u2");
             for (size_t q = p; q < np; ++q) {
-              leaf.dpar_par[p][q] = H2D2(sel(p) + sel(q));
+              leaf.dpar_par[p][q] = ec_hfunc2_deriv2(sel(p) + sel(q));
               leaf.dpar_par[q][p] = leaf.dpar_par[p][q];
             }
           }
@@ -1344,24 +1346,24 @@ Vinecop::build_deriv_cache(const Eigen::MatrixXd& u,
       if (has_deeper_tree && rvine_structure_.needed_hfunc1(t, e)) {
         DerivLeaf& leaf = ce.h1;
         leaf.active = true;
-        leaf.du1 = H1D("u1");
+        leaf.du1 = ec_hfunc1_deriv("u1");
         leaf.du2 = ce.c;
         leaf.dpar.resize(np);
         for (size_t p = 0; p < np; ++p) {
-          leaf.dpar[p] = H1D(sel(p));
+          leaf.dpar[p] = ec_hfunc1_deriv(sel(p));
         }
         if (second_order) {
-          leaf.du1u1 = H1D2("u1u1");
+          leaf.du1u1 = ec_hfunc1_deriv2("u1u1");
           leaf.du1u2 = c_u1; // ∂²h1/∂u1∂u2 = ∂c/∂u1
           leaf.du2u2 = c_u2; // ∂²h1/∂u2²   = ∂c/∂u2
           leaf.dpar_u1.resize(np);
           leaf.dpar_u2.resize(np);
           leaf.dpar_par.assign(np, std::vector<Eigen::VectorXd>(np));
           for (size_t p = 0; p < np; ++p) {
-            leaf.dpar_u1[p] = H1D2(sel(p) + "u1");
+            leaf.dpar_u1[p] = ec_hfunc1_deriv2(sel(p) + "u1");
             leaf.dpar_u2[p] = c_par[p]; // ∂²h1/∂θ∂u2 = ∂c/∂θ
             for (size_t q = p; q < np; ++q) {
-              leaf.dpar_par[p][q] = H1D2(sel(p) + sel(q));
+              leaf.dpar_par[p][q] = ec_hfunc1_deriv2(sel(p) + sel(q));
               leaf.dpar_par[q][p] = leaf.dpar_par[p][q];
             }
           }
@@ -1369,10 +1371,10 @@ Vinecop::build_deriv_cache(const Eigen::MatrixXd& u,
       }
 
       if (rvine_structure_.needed_hfunc1(t, e)) {
-        hfunc1.col(e) = H1();
+        hfunc1.col(e) = ec_hfunc1();
       }
       if (rvine_structure_.needed_hfunc2(t, e)) {
-        hfunc2.col(e) = H2();
+        hfunc2.col(e) = ec_hfunc2();
       }
 
       par_offset += np;
