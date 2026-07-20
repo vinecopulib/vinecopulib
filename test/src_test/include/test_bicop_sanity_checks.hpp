@@ -25,6 +25,19 @@ TEST(bicop_sanity_checks, catches_wrong_parameter_size)
   }
 }
 
+TEST(bicop_sanity_checks, catches_transposed_parameter_shape)
+{
+  // Regression test for PR #700: a same-size but transposed shape (1 x 2
+  // instead of the expected 2 x 1) must be rejected up front. It used to slip
+  // past the size check (equal total size) and reach the coefficient-wise
+  // bound comparisons with mismatched dimensions (an out-of-bounds read).
+  auto par = (Eigen::MatrixXd(2, 1) << 0.5, 4.0).finished();
+  auto bc = Bicop(BicopFamily::student, 0, par);
+  Eigen::MatrixXd transposed = bc.get_parameters().transpose(); // 1 x 2
+  ASSERT_EQ(transposed.size(), bc.get_parameters().size());
+  EXPECT_ANY_THROW(bc.set_parameters(transposed));
+}
+
 TEST(bicop_sanity_checks, catches_parameters_out_of_bounds)
 {
   auto cop = Bicop(BicopFamily::gaussian);

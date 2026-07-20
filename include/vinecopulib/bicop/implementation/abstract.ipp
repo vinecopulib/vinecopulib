@@ -287,7 +287,7 @@ AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u,
   const bool bc = (parameters.rows() != u.rows());
   for (Eigen::Index i = 0; i < u.rows(); i++) {
     const Eigen::MatrixXd par_i =
-        parameters.rows() == 0 ? parameters : parameters.row(bc ? 0 : i);
+      parameters.rows() == 0 ? parameters : parameters.row(bc ? 0 : i);
     if (udiff(i) > 5e-5) {
       if (var_types_[0] != "c") {
         pdf(i) =
@@ -316,7 +316,7 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u,
   const bool bc = (parameters.rows() != u.rows());
   for (Eigen::Index i = 0; i < u.rows(); i++) {
     const Eigen::MatrixXd par_i =
-        parameters.rows() == 0 ? parameters : parameters.row(bc ? 0 : i);
+      parameters.rows() == 0 ? parameters : parameters.row(bc ? 0 : i);
     // the difference quotient can be instable, use derivative if denominator
     // too small
     if (udiff.row(i).maxCoeff() < 5e-5) {
