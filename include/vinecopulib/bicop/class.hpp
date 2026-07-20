@@ -169,7 +169,7 @@ public:
 
   double loglik(const Eigen::MatrixXd& u,
                 const Eigen::MatrixXd& parameters,
-                const size_t num_threads) const;
+                const size_t num_threads = 1) const;
 
   // Derivatives of the density and h-functions w.r.t. parameters/arguments
   Eigen::VectorXd pdf_deriv(const Eigen::MatrixXd& u,

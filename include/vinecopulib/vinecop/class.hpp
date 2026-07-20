@@ -175,6 +175,19 @@ public:
                                const size_t num_threads,
                                const bool keep_all = true) const;
 
+  // Stats methods with per-observation parameters. `parameters` is an
+  // n x npars matrix, one full-vine parameter vector per observation, with
+  // columns in the (tree, edge, parameter) order of scores(). Continuous,
+  // all-parametric models only.
+  Eigen::VectorXd pdf(Eigen::MatrixXd u,
+                      const Eigen::MatrixXd& parameters,
+                      const size_t num_threads = 1) const;
+
+  PdfWithHfuncsResult pdf_full(Eigen::MatrixXd u,
+                               const Eigen::MatrixXd& parameters,
+                               const size_t num_threads,
+                               const bool keep_all = true) const;
+
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
                       const size_t N = 1e4,
                       const size_t num_threads = 1,
@@ -220,6 +233,12 @@ public:
   double get_npars() const;
 
   double loglik(const Eigen::MatrixXd& u = Eigen::MatrixXd(),
+                const size_t num_threads = 1) const;
+
+  //! Log-likelihood with per-observation parameters (see the per-observation
+  //! `pdf()` overload for the `parameters` layout and restrictions).
+  double loglik(const Eigen::MatrixXd& u,
+                const Eigen::MatrixXd& parameters,
                 const size_t num_threads = 1) const;
 
   double aic(const Eigen::MatrixXd& u = Eigen::MatrixXd(),

@@ -840,6 +840,17 @@ TEST(BicopScores, reject_discrete_and_nonparametric)
   EXPECT_ANY_THROW(cl.hessian_full(u4));
 }
 
+// The per-row loglik overload takes num_threads by default (it was the only
+// per-row method lacking the default); calling it without the argument must
+// compile and equal the explicit single-threaded call.
+TEST(BicopPerRowParameters, loglik_default_num_threads)
+{
+  Bicop cop(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 2.0));
+  Eigen::MatrixXd u = cop.simulate(20, false, { 1 });
+  Eigen::MatrixXd P = cop.get_parameters().transpose().replicate(u.rows(), 1);
+  EXPECT_NEAR(cop.loglik(u, P), cop.loglik(u, P, 1), 1e-12);
+}
+
 // Derivatives must match the VineCopula R implementation (BiCopDeriv,
 // BiCopDeriv2, BiCopHfuncDeriv, BiCopHfuncDeriv2). VineCopula encodes
 // rotations in the family code with negated parameters, so parameter

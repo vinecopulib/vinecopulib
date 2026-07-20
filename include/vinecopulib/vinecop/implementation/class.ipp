@@ -953,8 +953,31 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
                   const size_t num_threads,
                   const bool keep_all) const
 {
+  return pdf_full(std::move(u), Eigen::MatrixXd(), num_threads, keep_all);
+}
+
+//! @brief Evaluates the copula density (and per-edge quantities) with
+//! per-observation parameters.
+//!
+//! Same as `pdf_full()`, but each observation uses its own full-vine parameter
+//! vector, supplied as an \f$ n \times \mathrm{npars} \f$ matrix `parameters`
+//! whose columns follow the (tree, edge, parameter) order of `scores()`.
+//! Continuous, all-parametric models only (discrete variables and nonparametric
+//! pair copulas are rejected).
+inline Vinecop::PdfWithHfuncsResult
+Vinecop::pdf_full(Eigen::MatrixXd u,
+                  const Eigen::MatrixXd& parameters,
+                  const size_t num_threads,
+                  const bool keep_all) const
+{
   check_data(u);
   collapse_data_inplace(u);
+
+  const bool per_obs = parameters.size() > 0;
+  if (per_obs) {
+    check_parametric("pdf()/loglik() with per-observation parameters");
+    check_per_obs_params(u, parameters);
+  }
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
@@ -1014,6 +1037,10 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
       }
     }
 
+    // running column offset of the current edge's parameters within the flat
+    // (tree, edge, parameter) order of `parameters` (per-observation path only)
+    size_t par_offset = 0;
+
     for (size_t tree = 0; tree < trunc_lvl; ++tree) {
       tools_interface::check_user_interrupt(
         static_cast<double>(u.rows()) * static_cast<double>(d_) > 1e5);
@@ -1043,13 +1070,37 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
           }
         }
 
-        Eigen::VectorXd edge_pdf = edge_copula->pdf(u_e);
+        // per-edge dispatch: on the per-observation path each helper slices
+        // this edge's n x np parameter block and routes to the per-row Bicop
+        // overload; on the fixed path it calls the stored-parameter method
+        // unchanged. Discrete never arises here (per-observation requires
+        // continuous), so the _sub h-functions stay on the scalar path.
+        Eigen::MatrixXd pars_e;
+        if (per_obs) {
+          size_t np = static_cast<size_t>(edge_copula->get_parameters().size());
+          pars_e = parameters.block(b.begin, par_offset, b.size, np);
+          par_offset += np;
+        }
+        auto ec_pdf = [&]() {
+          return per_obs ? edge_copula->pdf(u_e, pars_e)
+                         : edge_copula->pdf(u_e);
+        };
+        auto ec_hfunc1 = [&]() {
+          return per_obs ? edge_copula->hfunc1(u_e, pars_e)
+                         : edge_copula->hfunc1(u_e);
+        };
+        auto ec_hfunc2 = [&]() {
+          return per_obs ? edge_copula->hfunc2(u_e, pars_e)
+                         : edge_copula->hfunc2(u_e);
+        };
+
+        Eigen::VectorXd edge_pdf = ec_pdf();
         result.pdf.segment(b.begin, b.size) =
           result.pdf.segment(b.begin, b.size).cwiseProduct(edge_pdf);
 
         // h-functions are only evaluated if needed in next step
         if (rvine_structure_.needed_hfunc1(tree, edge)) {
-          hfunc1.col(edge) = edge_copula->hfunc1(u_e);
+          hfunc1.col(edge) = ec_hfunc1();
           if (var_types[1] == "d") {
             u_e_sub = u_e;
             u_e_sub.col(1) = u_e.col(3);
@@ -1057,7 +1108,7 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
           }
         }
         if (rvine_structure_.needed_hfunc2(tree, edge)) {
-          hfunc2.col(edge) = edge_copula->hfunc2(u_e);
+          hfunc2.col(edge) = ec_hfunc2();
           if (var_types[0] == "d") {
             u_e_sub = u_e;
             u_e_sub.col(0) = u_e.col(2);
@@ -1123,6 +1174,18 @@ inline Eigen::VectorXd
 Vinecop::pdf(Eigen::MatrixXd u, const size_t num_threads) const
 {
   return pdf_full(std::move(u), num_threads, false).pdf;
+}
+
+//! @brief Evaluates the copula density with per-observation parameters.
+//!
+//! Per-observation counterpart of `pdf()`; see the per-observation
+//! `pdf_full()` overload for the `parameters` layout and restrictions.
+inline Eigen::VectorXd
+Vinecop::pdf(Eigen::MatrixXd u,
+             const Eigen::MatrixXd& parameters,
+             const size_t num_threads) const
+{
+  return pdf_full(std::move(u), parameters, num_threads, false).pdf;
 }
 
 //! throws if the model has a nonparametric pair copula (see scores()).
@@ -2629,6 +2692,20 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
   } else {
     return pdf(u, num_threads).array().log().sum();
   }
+}
+
+//! @brief Evaluates the log-likelihood with per-observation parameters.
+//!
+//! Per-observation counterpart of `loglik()`: the sum over observations of
+//! \f$ \log c(u_i; \theta_i) \f$, where row `i` of `parameters` is
+//! \f$ \theta_i \f$. See the per-observation `pdf_full()` overload for the
+//! `parameters` layout and restrictions.
+inline double
+Vinecop::loglik(const Eigen::MatrixXd& u,
+                const Eigen::MatrixXd& parameters,
+                const size_t num_threads) const
+{
+  return pdf(u, parameters, num_threads).array().log().sum();
 }
 
 //! @brief Evaluates the Akaike information criterion (AIC).
