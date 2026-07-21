@@ -1060,6 +1060,61 @@ Bicop::logpdf_deriv2(const Eigen::MatrixXd& u,
 }
 //! @}
 
+//! @brief Assembles an \f$ n \times p \f$ score matrix from a per-parameter
+//! column evaluator (`col(k)` returns column `k`). Shared by the fixed- and
+//! per-row-parameter `scores()` overloads so each keeps its own optimal
+//! `logpdf_deriv()` path (broadcast vs. per-row) while the loop lives once.
+inline Eigen::MatrixXd
+assemble_scores(Eigen::Index n,
+                Eigen::Index p,
+                const std::function<Eigen::VectorXd(Eigen::Index)>& col)
+{
+  Eigen::MatrixXd s(n, p);
+  for (Eigen::Index k = 0; k < p; ++k) {
+    s.col(k) = col(k);
+  }
+  return s;
+}
+
+//! @brief Assembles the averaged, symmetric \f$ p \times p \f$ Hessian from a
+//! per-\f$ (a, b) \f$ second-derivative column evaluator (upper triangle only).
+inline Eigen::MatrixXd
+assemble_hessian(
+  Eigen::Index p,
+  const std::function<Eigen::VectorXd(Eigen::Index, Eigen::Index)>& col)
+{
+  Eigen::MatrixXd h(p, p);
+  for (Eigen::Index a = 0; a < p; ++a) {
+    for (Eigen::Index b = a; b < p; ++b) {
+      h(a, b) = col(a, b).mean();
+      h(b, a) = h(a, b);
+    }
+  }
+  return h;
+}
+
+//! @brief Assembles the per-observation, symmetric \f$ p \times p \f$ Hessians
+//! (one per row of `u`) from the same per-\f$ (a, b) \f$ column evaluator.
+inline std::vector<Eigen::MatrixXd>
+assemble_hessian_full(
+  Eigen::Index n,
+  Eigen::Index p,
+  const std::function<Eigen::VectorXd(Eigen::Index, Eigen::Index)>& col)
+{
+  std::vector<Eigen::MatrixXd> hess(static_cast<size_t>(n),
+                                    Eigen::MatrixXd(p, p));
+  for (Eigen::Index a = 0; a < p; ++a) {
+    for (Eigen::Index b = a; b < p; ++b) {
+      Eigen::VectorXd d = col(a, b);
+      for (Eigen::Index i = 0; i < n; ++i) {
+        hess[static_cast<size_t>(i)](a, b) = d(i);
+        hess[static_cast<size_t>(i)](b, a) = d(i);
+      }
+    }
+  }
+  return hess;
+}
+
 //! @name Scores, gradient, and Hessian of the log-likelihood
 //!
 //! @details These methods aggregate the log-density parameter derivatives into
@@ -1089,12 +1144,10 @@ Bicop::scores(const Eigen::MatrixXd& u) const
 {
   check_data(u);
   check_deriv_preconditions();
-  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
-  Eigen::MatrixXd s(u.rows(), p);
-  for (Eigen::Index k = 0; k < p; ++k) {
-    s.col(k) = logpdf_deriv(u, "par" + std::to_string(k + 1));
-  }
-  return s;
+  return assemble_scores(
+    u.rows(), static_cast<Eigen::Index>(deriv_npars()), [&](Eigen::Index k) {
+      return logpdf_deriv(u, "par" + std::to_string(k + 1));
+    });
 }
 
 //! @brief Evaluates the gradient of the average log-likelihood.
@@ -1116,18 +1169,12 @@ Bicop::hessian(const Eigen::MatrixXd& u) const
 {
   check_data(u);
   check_deriv_preconditions();
-  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
-  Eigen::MatrixXd h(p, p);
-  for (Eigen::Index a = 0; a < p; ++a) {
-    for (Eigen::Index b = a; b < p; ++b) {
-      h(a, b) =
-        logpdf_deriv2(
-          u, "par" + std::to_string(a + 1) + "par" + std::to_string(b + 1))
-          .mean();
-      h(b, a) = h(a, b);
-    }
-  }
-  return h;
+  return assemble_hessian(
+    static_cast<Eigen::Index>(deriv_npars()),
+    [&](Eigen::Index a, Eigen::Index b) {
+      return logpdf_deriv2(
+        u, "par" + std::to_string(a + 1) + "par" + std::to_string(b + 1));
+    });
 }
 
 //! @brief Evaluates the per-observation Hessians.
@@ -1141,21 +1188,13 @@ Bicop::hessian_full(const Eigen::MatrixXd& u) const
 {
   check_data(u);
   check_deriv_preconditions();
-  const Eigen::Index n = u.rows();
-  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
-  std::vector<Eigen::MatrixXd> hess(static_cast<size_t>(n),
-                                    Eigen::MatrixXd(p, p));
-  for (Eigen::Index a = 0; a < p; ++a) {
-    for (Eigen::Index b = a; b < p; ++b) {
-      Eigen::VectorXd d = logpdf_deriv2(
+  return assemble_hessian_full(
+    u.rows(),
+    static_cast<Eigen::Index>(deriv_npars()),
+    [&](Eigen::Index a, Eigen::Index b) {
+      return logpdf_deriv2(
         u, "par" + std::to_string(a + 1) + "par" + std::to_string(b + 1));
-      for (Eigen::Index i = 0; i < n; ++i) {
-        hess[static_cast<size_t>(i)](a, b) = d(i);
-        hess[static_cast<size_t>(i)](b, a) = d(i);
-      }
-    }
-  }
-  return hess;
+    });
 }
 
 //! @brief Computes the covariance matrix of the scores.
@@ -1191,13 +1230,11 @@ Bicop::scores(const Eigen::MatrixXd& u,
               const size_t num_threads) const
 {
   check_deriv_preconditions();
-  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
-  Eigen::MatrixXd s(u.rows(), p);
-  for (Eigen::Index k = 0; k < p; ++k) {
-    s.col(k) =
-      logpdf_deriv(u, "par" + std::to_string(k + 1), parameters, num_threads);
-  }
-  return s;
+  return assemble_scores(
+    u.rows(), static_cast<Eigen::Index>(deriv_npars()), [&](Eigen::Index k) {
+      return logpdf_deriv(
+        u, "par" + std::to_string(k + 1), parameters, num_threads);
+    });
 }
 
 //! @brief Evaluates the gradient of the average log-likelihood with per-row
@@ -1218,20 +1255,15 @@ Bicop::hessian(const Eigen::MatrixXd& u,
                const size_t num_threads) const
 {
   check_deriv_preconditions();
-  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
-  Eigen::MatrixXd h(p, p);
-  for (Eigen::Index a = 0; a < p; ++a) {
-    for (Eigen::Index b = a; b < p; ++b) {
-      h(a, b) = logpdf_deriv2(u,
-                              "par" + std::to_string(a + 1) + "par" +
-                                std::to_string(b + 1),
-                              parameters,
-                              num_threads)
-                  .mean();
-      h(b, a) = h(a, b);
-    }
-  }
-  return h;
+  return assemble_hessian(static_cast<Eigen::Index>(deriv_npars()),
+                          [&](Eigen::Index a, Eigen::Index b) {
+                            return logpdf_deriv2(u,
+                                                 "par" + std::to_string(a + 1) +
+                                                   "par" +
+                                                   std::to_string(b + 1),
+                                                 parameters,
+                                                 num_threads);
+                          });
 }
 
 //! @brief Evaluates the per-observation Hessians with per-row parameters.
@@ -1241,24 +1273,16 @@ Bicop::hessian_full(const Eigen::MatrixXd& u,
                     const size_t num_threads) const
 {
   check_deriv_preconditions();
-  const Eigen::Index n = u.rows();
-  const Eigen::Index p = static_cast<Eigen::Index>(deriv_npars());
-  std::vector<Eigen::MatrixXd> hess(static_cast<size_t>(n),
-                                    Eigen::MatrixXd(p, p));
-  for (Eigen::Index a = 0; a < p; ++a) {
-    for (Eigen::Index b = a; b < p; ++b) {
-      Eigen::VectorXd d = logpdf_deriv2(u,
-                                        "par" + std::to_string(a + 1) + "par" +
-                                          std::to_string(b + 1),
-                                        parameters,
-                                        num_threads);
-      for (Eigen::Index i = 0; i < n; ++i) {
-        hess[static_cast<size_t>(i)](a, b) = d(i);
-        hess[static_cast<size_t>(i)](b, a) = d(i);
-      }
-    }
-  }
-  return hess;
+  return assemble_hessian_full(u.rows(),
+                               static_cast<Eigen::Index>(deriv_npars()),
+                               [&](Eigen::Index a, Eigen::Index b) {
+                                 return logpdf_deriv2(
+                                   u,
+                                   "par" + std::to_string(a + 1) + "par" +
+                                     std::to_string(b + 1),
+                                   parameters,
+                                   num_threads);
+                               });
 }
 
 //! @brief Computes the covariance matrix of the scores with per-row parameters.
