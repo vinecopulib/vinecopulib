@@ -169,7 +169,7 @@ public:
 
   double loglik(const Eigen::MatrixXd& u,
                 const Eigen::MatrixXd& parameters,
-                const size_t num_threads) const;
+                const size_t num_threads = 1) const;
 
   // Derivatives of the density and h-functions w.r.t. parameters/arguments
   Eigen::VectorXd pdf_deriv(const Eigen::MatrixXd& u,
@@ -236,6 +236,55 @@ public:
                                 const std::string& deriv,
                                 const Eigen::MatrixXd& parameters,
                                 const size_t num_threads = 1) const;
+
+  // Scores, gradient, and Hessian of the log-likelihood (parametric,
+  // continuous families only)
+
+  //! @brief Bundles the per-observation scores.
+  //!
+  //! @details Mirrors `Vinecop::ScoresResult`; a single pair copula has no
+  //! cascade caches to expose, so only the score matrix is carried.
+  struct ScoresResult
+  {
+    Eigen::MatrixXd scores;
+  };
+
+  Eigen::MatrixXd scores(const Eigen::MatrixXd& u) const;
+
+  Eigen::VectorXd gradient(const Eigen::MatrixXd& u) const;
+
+  Eigen::MatrixXd hessian(const Eigen::MatrixXd& u) const;
+
+  std::vector<Eigen::MatrixXd> hessian_full(const Eigen::MatrixXd& u) const;
+
+  Eigen::MatrixXd scores_cov(const Eigen::MatrixXd& u) const;
+
+  ScoresResult scores_full(const Eigen::MatrixXd& u) const;
+
+  // Scores, gradient, and Hessian with per-row parameters
+  Eigen::MatrixXd scores(const Eigen::MatrixXd& u,
+                         const Eigen::MatrixXd& parameters,
+                         const size_t num_threads = 1) const;
+
+  Eigen::VectorXd gradient(const Eigen::MatrixXd& u,
+                           const Eigen::MatrixXd& parameters,
+                           const size_t num_threads = 1) const;
+
+  Eigen::MatrixXd hessian(const Eigen::MatrixXd& u,
+                          const Eigen::MatrixXd& parameters,
+                          const size_t num_threads = 1) const;
+
+  std::vector<Eigen::MatrixXd> hessian_full(const Eigen::MatrixXd& u,
+                                            const Eigen::MatrixXd& parameters,
+                                            const size_t num_threads = 1) const;
+
+  Eigen::MatrixXd scores_cov(const Eigen::MatrixXd& u,
+                             const Eigen::MatrixXd& parameters,
+                             const size_t num_threads = 1) const;
+
+  ScoresResult scores_full(const Eigen::MatrixXd& u,
+                           const Eigen::MatrixXd& parameters,
+                           const size_t num_threads = 1) const;
 
   Eigen::MatrixXd simulate(
     const size_t& n,

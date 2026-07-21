@@ -1157,6 +1157,267 @@ TEST(VinecopDerivatives, fallback_paths_run)
   EXPECT_TRUE(s_disc_full.allFinite());
 }
 
+// The per-observation-parameter overloads must (a) reduce to the fixed-
+// parameter path when a single parameter vector is broadcast to every row and
+// (b) for heterogeneous per-observation parameters, reproduce row i from a
+// vine built with observation i's parameter vector — the unforgiving ground
+// truth that the whole per-observation cascade is correct, for both
+// step_wise settings and for scores and the (per-observation) Hessian.
+TEST(VinecopDerivatives, per_obs_scores_and_hessian)
+{
+  auto P1 = [](double v) { return Eigen::VectorXd::Constant(1, v).eval(); };
+  auto pcs = Vinecop::make_pair_copula_store(5);
+  pcs[0][0] = Bicop(BicopFamily::gaussian, 0, P1(0.6));
+  pcs[0][1] = Bicop(BicopFamily::clayton, 90, P1(2.5));
+  pcs[0][2] = Bicop(BicopFamily::gumbel, 180, P1(1.8));
+  pcs[0][3] = Bicop(BicopFamily::joe, 270, P1(2.2));
+  pcs[1][0] = Bicop(BicopFamily::frank, 0, P1(4.0));
+  Eigen::VectorXd st_par(2);
+  st_par << 0.5, 6.0;
+  pcs[1][1] = Bicop(BicopFamily::student, 0, st_par);
+  pcs[1][2] = Bicop(BicopFamily::clayton, 180, P1(1.2));
+  pcs[2][0] = Bicop(BicopFamily::gumbel, 0, P1(1.4));
+  pcs[2][1] = Bicop(BicopFamily::gaussian, 0, P1(-0.3));
+  pcs[3][0] = Bicop(BicopFamily::gaussian, 0, P1(0.2));
+  Vinecop vc(DVineStructure({ 1, 2, 3, 4, 5 }), pcs);
+  auto u = vc.simulate(50, false, 1, { 42, 1, 2 });
+  const Eigen::Index n = u.rows();
+  const size_t npars = static_cast<size_t>(vc.get_npars());
+
+  // flatten the stored parameters (and their bounds) in the (t, e, p) column
+  // order that scores() and the `parameters` argument share
+  Eigen::VectorXd theta0(npars), lb_flat(npars), ub_flat(npars);
+  {
+    size_t idx = 0;
+    for (size_t t = 0; t < 4; ++t) {
+      for (size_t e = 0; e < 4 - t; ++e) {
+        auto pr = pcs[t][e].get_parameters();
+        auto lb = pcs[t][e].get_parameters_lower_bounds();
+        auto ub = pcs[t][e].get_parameters_upper_bounds();
+        for (Eigen::Index p = 0; p < pr.size(); ++p) {
+          theta0(idx) = pr(p);
+          lb_flat(idx) = lb(p);
+          ub_flat(idx) = ub(p);
+          idx++;
+        }
+      }
+    }
+  }
+
+  // (a) broadcasting the stored parameters reduces to the fixed-parameter path
+  Eigen::MatrixXd P0 = theta0.transpose().replicate(n, 1);
+  for (bool sw : { true, false }) {
+    EXPECT_TRUE(
+      all_close(vc.scores(u, P0, sw, 1), vc.scores(u, sw, 1), 1e-10, 1e-10));
+    EXPECT_TRUE(all_close(
+      vc.gradient(u, P0, sw, 1), vc.gradient(u, sw, 1), 1e-10, 1e-10));
+    EXPECT_TRUE(
+      all_close(vc.hessian(u, P0, sw, 1), vc.hessian(u, sw, 1), 1e-10, 1e-10));
+    EXPECT_TRUE(all_close(
+      vc.scores_cov(u, P0, sw, 1), vc.scores_cov(u, sw, 1), 1e-10, 1e-10));
+    auto hf_pr = vc.hessian_full(u, P0, sw, 1);
+    auto hf_fx = vc.hessian_full(u, sw, 1);
+    for (size_t t = 0; t < 4; ++t) {
+      for (size_t e = 0; e < 4 - t; ++e) {
+        for (size_t p = 0; p < hf_fx(t, e).size(); ++p) {
+          EXPECT_TRUE(all_close(hf_pr(t, e)[p], hf_fx(t, e)[p], 1e-10, 1e-10));
+        }
+      }
+    }
+  }
+
+  // threading determinism on the per-observation path
+  EXPECT_TRUE(
+    all_close(vc.scores(u, P0, false, 3), vc.scores(u, P0, false, 1), 1e-12));
+  EXPECT_TRUE(
+    all_close(vc.scores(u, P0, true, 3), vc.scores(u, P0, true, 1), 1e-12));
+
+  // (b) heterogeneous per-observation parameters (interior-clamped), compared
+  // row by row against a vine rebuilt with that observation's parameters
+  Eigen::MatrixXd P(n, npars);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    double w = 0.85 + 0.30 * static_cast<double>(i % 4) / 3.0; // [0.85, 1.15]
+    for (size_t k = 0; k < npars; ++k) {
+      double lo = lb_flat(k) + 1e-2 * (ub_flat(k) - lb_flat(k));
+      double hi = ub_flat(k) - 1e-2 * (ub_flat(k) - lb_flat(k));
+      P(i, k) = std::min(std::max(theta0(k) * w, lo), hi);
+    }
+  }
+
+  for (bool sw : { true, false }) {
+    Eigen::MatrixXd s = vc.scores(u, P, sw, 1);
+    auto hf = vc.hessian_full(u, P, sw, 1);
+    // threading determinism with heterogeneous parameters
+    EXPECT_TRUE(all_close(vc.scores(u, P, sw, 3), s, 1e-12));
+    for (Eigen::Index i = 0; i < n; ++i) {
+      auto pcs_i = pcs;
+      size_t idx = 0;
+      for (size_t t = 0; t < 4; ++t) {
+        for (size_t e = 0; e < 4 - t; ++e) {
+          Eigen::VectorXd pr = pcs_i[t][e].get_parameters();
+          for (Eigen::Index p = 0; p < pr.size(); ++p) {
+            pr(p) = P(i, idx++);
+          }
+          pcs_i[t][e].set_parameters(pr);
+        }
+      }
+      Vinecop vc_i(vc.get_rvine_structure(), pcs_i);
+      Eigen::MatrixXd ui = u.row(i);
+      EXPECT_TRUE(
+        all_close(s.row(i), vc_i.scores(ui, sw, 1).row(0), 1e-9, 1e-9))
+        << "row " << i;
+      auto hi = vc_i.hessian_full(ui, sw, 1);
+      for (size_t t = 0; t < 4; ++t) {
+        for (size_t e = 0; e < 4 - t; ++e) {
+          for (size_t p = 0; p < hi(t, e).size(); ++p) {
+            EXPECT_TRUE(
+              all_close(hf(t, e)[p].row(i), hi(t, e)[p].row(0), 1e-9, 1e-9))
+              << "row " << i << " edge (" << t << ", " << e << ") par " << p;
+          }
+        }
+      }
+    }
+  }
+}
+
+// The per-observation path rejects discrete variables (its finite-difference
+// fallback would mutate shared parameters) and validates the n x npars shape.
+TEST(VinecopDerivatives, per_obs_rejects_discrete_and_bad_shape)
+{
+  auto P1 = [](double v) { return Eigen::VectorXd::Constant(1, v).eval(); };
+  auto pcs = Vinecop::make_pair_copula_store(3);
+  pcs[0][0] = Bicop(BicopFamily::clayton, 0, P1(2.0));
+  pcs[0][1] = Bicop(BicopFamily::gaussian, 0, P1(0.5));
+  pcs[1][0] = Bicop(BicopFamily::gumbel, 0, P1(1.5));
+  Vinecop vc(DVineStructure({ 1, 2, 3 }), pcs);
+  auto u = vc.simulate(30, false, 1, { 5 });
+  const size_t npars = static_cast<size_t>(vc.get_npars());
+
+  Eigen::MatrixXd P(u.rows(), npars);
+  {
+    size_t idx = 0;
+    for (size_t t = 0; t < 2; ++t) {
+      for (size_t e = 0; e < 2 - t; ++e) {
+        auto pr = pcs[t][e].get_parameters();
+        for (Eigen::Index p = 0; p < pr.size(); ++p) {
+          P.col(idx++).setConstant(pr(p));
+        }
+      }
+    }
+  }
+  EXPECT_NO_THROW(vc.scores(u, P, false, 1));
+  EXPECT_NO_THROW(vc.pdf(u, P));
+  EXPECT_NO_THROW(vc.loglik(u, P));
+
+  // wrong number of columns / rows
+  EXPECT_ANY_THROW(vc.scores(u, P.leftCols(npars - 1)));
+  EXPECT_ANY_THROW(vc.scores(u, P.topRows(u.rows() - 1)));
+  EXPECT_ANY_THROW(vc.pdf(u, P.leftCols(npars - 1)));
+  EXPECT_ANY_THROW(vc.loglik(u, P.topRows(u.rows() - 1)));
+
+  // discrete variables are rejected on the per-observation path
+  Vinecop vc_disc(DVineStructure({ 1, 2, 3 }), pcs);
+  vc_disc.set_var_types({ "c", "d", "c" });
+  Eigen::MatrixXd u4(u.rows(), 4);
+  u4.leftCols(3) = u;
+  u4.col(3) = (u.col(1).array() * 0.9).matrix();
+  EXPECT_ANY_THROW(vc_disc.scores(u4, P, true, 1));
+  EXPECT_ANY_THROW(vc_disc.hessian(u4, P, false, 1));
+  EXPECT_ANY_THROW(vc_disc.pdf(u4, P));
+  EXPECT_ANY_THROW(vc_disc.loglik(u4, P));
+}
+
+// Per-observation-parameter pdf/pdf_full/loglik must (a) reduce to the fixed
+// path when a single parameter vector is broadcast to every row and (b) for
+// heterogeneous per-observation parameters reproduce row i from a vine built
+// with observation i's parameter vector (and loglik = sum of those log
+// densities) — the same ground truth used for the per-observation scores.
+TEST(VinecopDerivatives, per_obs_pdf_and_loglik)
+{
+  auto P1 = [](double v) { return Eigen::VectorXd::Constant(1, v).eval(); };
+  auto pcs = Vinecop::make_pair_copula_store(5);
+  pcs[0][0] = Bicop(BicopFamily::gaussian, 0, P1(0.6));
+  pcs[0][1] = Bicop(BicopFamily::clayton, 90, P1(2.5));
+  pcs[0][2] = Bicop(BicopFamily::gumbel, 180, P1(1.8));
+  pcs[0][3] = Bicop(BicopFamily::joe, 270, P1(2.2));
+  pcs[1][0] = Bicop(BicopFamily::frank, 0, P1(4.0));
+  Eigen::VectorXd st_par(2);
+  st_par << 0.5, 6.0;
+  pcs[1][1] = Bicop(BicopFamily::student, 0, st_par);
+  pcs[1][2] = Bicop(BicopFamily::clayton, 180, P1(1.2));
+  pcs[2][0] = Bicop(BicopFamily::gumbel, 0, P1(1.4));
+  pcs[2][1] = Bicop(BicopFamily::gaussian, 0, P1(-0.3));
+  pcs[3][0] = Bicop(BicopFamily::gaussian, 0, P1(0.2));
+  Vinecop vc(DVineStructure({ 1, 2, 3, 4, 5 }), pcs);
+  auto u = vc.simulate(50, false, 1, { 42, 1, 2 });
+  const Eigen::Index n = u.rows();
+  const size_t npars = static_cast<size_t>(vc.get_npars());
+
+  Eigen::VectorXd theta0(npars), lb_flat(npars), ub_flat(npars);
+  {
+    size_t idx = 0;
+    for (size_t t = 0; t < 4; ++t) {
+      for (size_t e = 0; e < 4 - t; ++e) {
+        auto pr = pcs[t][e].get_parameters();
+        auto lb = pcs[t][e].get_parameters_lower_bounds();
+        auto ub = pcs[t][e].get_parameters_upper_bounds();
+        for (Eigen::Index p = 0; p < pr.size(); ++p) {
+          theta0(idx) = pr(p);
+          lb_flat(idx) = lb(p);
+          ub_flat(idx) = ub(p);
+          idx++;
+        }
+      }
+    }
+  }
+
+  // (a) broadcasting the stored parameters reduces to the fixed-parameter path
+  Eigen::MatrixXd P0 = theta0.transpose().replicate(n, 1);
+  EXPECT_TRUE(all_close(vc.pdf(u, P0), vc.pdf(u), 1e-10, 1e-10));
+  EXPECT_TRUE(all_close(vc.pdf_full(u, P0, 1).pdf, vc.pdf(u), 1e-10, 1e-10));
+  double ll_fixed = vc.loglik(u);
+  EXPECT_NEAR(vc.loglik(u, P0), ll_fixed, 1e-8 * (1.0 + std::abs(ll_fixed)));
+  // threading determinism on the per-observation path
+  EXPECT_TRUE(all_close(vc.pdf(u, P0, 3), vc.pdf(u, P0, 1), 1e-12));
+
+  // (b) heterogeneous per-observation parameters (interior-clamped), compared
+  // row by row against a vine rebuilt with that observation's parameters
+  Eigen::MatrixXd P(n, npars);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    double w = 0.85 + 0.30 * static_cast<double>(i % 4) / 3.0; // [0.85, 1.15]
+    for (size_t k = 0; k < npars; ++k) {
+      double lo = lb_flat(k) + 1e-2 * (ub_flat(k) - lb_flat(k));
+      double hi = ub_flat(k) - 1e-2 * (ub_flat(k) - lb_flat(k));
+      P(i, k) = std::min(std::max(theta0(k) * w, lo), hi);
+    }
+  }
+
+  Eigen::VectorXd pdf_po = vc.pdf(u, P, 1);
+  double ll_po = vc.loglik(u, P, 1);
+  EXPECT_TRUE(
+    all_close(vc.pdf(u, P, 3), pdf_po, 1e-12)); // threading determinism
+  double ll_ref = 0.0;
+  for (Eigen::Index i = 0; i < n; ++i) {
+    auto pcs_i = pcs;
+    size_t idx = 0;
+    for (size_t t = 0; t < 4; ++t) {
+      for (size_t e = 0; e < 4 - t; ++e) {
+        Eigen::VectorXd pr = pcs_i[t][e].get_parameters();
+        for (Eigen::Index p = 0; p < pr.size(); ++p) {
+          pr(p) = P(i, idx++);
+        }
+        pcs_i[t][e].set_parameters(pr);
+      }
+    }
+    Vinecop vc_i(vc.get_rvine_structure(), pcs_i);
+    double pdf_i = vc_i.pdf(u.row(i))(0);
+    EXPECT_NEAR(pdf_po(i), pdf_i, 1e-9 * (1.0 + std::abs(pdf_i)))
+      << "row " << i;
+    ll_ref += std::log(pdf_i);
+  }
+  EXPECT_NEAR(ll_po, ll_ref, 1e-8 * (1.0 + std::abs(ll_ref)));
+}
+
 TEST_F(VinecopTest, aic_bic_are_correct)
 {
   int d = 7;
