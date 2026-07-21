@@ -334,4 +334,67 @@ TEST(discrete, check_d_d_stability)
   EXPECT_NEAR(vine2, bicop, 1e-2);
 }
 
+// Regression test for PR #700: the per-row parameter evaluation in the
+// discrete leaves (pdf_c_d, pdf_d_d and the discrete branches of hfunc1 /
+// hfunc2) must not index the parameter matrix row-by-row for families whose
+// parameter matrix is neither 1 x p nor n x p. Two such shapes exist:
+//   - a parameterless family (independence, 0 x 0 parameters); and
+//   - a nonparametric family (tll, a 30 x 30 interpolation grid).
+// Both used to read out of bounds (Eigen abort with assertions on, silent UB
+// under -DNDEBUG) whenever a discrete variable was involved.
+TEST(discrete, edge_case_parameter_shapes)
+{
+  // Discretized sample from a Clayton copula.
+  auto clayton =
+    Bicop(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 3));
+  auto u = clayton.simulate(200, true, { 1 });
+
+  Eigen::MatrixXd u_disc(u.rows(), 4);
+  u_disc.col(0) = (u.col(0).array() * 5).ceil() / 5;
+  u_disc.col(2) = (u.col(0).array() * 5).floor() / 5;
+  u_disc.col(1) = (u.col(1).array() * 5).ceil() / 5;
+  u_disc.col(3) = (u.col(1).array() * 5).floor() / 5;
+
+  // d_c / c_d layouts reuse the discrete corner columns.
+  Eigen::MatrixXd u_dc(u.rows(), 3);
+  u_dc.col(0) = u_disc.col(0);
+  u_dc.col(1) = u.col(1);
+  u_dc.col(2) = u_disc.col(2);
+
+  Eigen::MatrixXd u_cd(u.rows(), 4);
+  u_cd.col(0) = u.col(0);
+  u_cd.col(2) = u.col(0);
+  u_cd.col(1) = u_disc.col(1);
+  u_cd.col(3) = u_disc.col(3);
+
+  // Parameterless family: independence has a 0 x 0 parameter matrix. Its
+  // density is 1 everywhere, discrete margins included, in every layout.
+  auto check_indep = [](const std::vector<std::string>& var_types,
+                        const Eigen::MatrixXd& uu) {
+    auto indep = Bicop(BicopFamily::indep);
+    indep.set_var_types(var_types);
+    Eigen::VectorXd pdf;
+    ASSERT_NO_THROW(pdf = indep.pdf(uu));
+    EXPECT_LE((pdf.array() - 1.0).abs().maxCoeff(), 1e-10);
+    EXPECT_NO_THROW(indep.hfunc1(uu));
+    EXPECT_NO_THROW(indep.hfunc2(uu));
+  };
+  check_indep({ "d", "d" }, u_disc);
+  check_indep({ "c", "d" }, u_cd);
+  check_indep({ "d", "c" }, u_dc);
+
+  // Nonparametric family: tll stores a 30 x 30 grid. Evaluating on more than
+  // 30 rows must not index the grid row-by-row.
+  ASSERT_GT(u_disc.rows(), 30);
+  auto tll = Bicop();
+  tll.set_var_types({ "d", "d" });
+  tll.select(u_disc, FitControlsBicop({ BicopFamily::tll }));
+  Eigen::VectorXd pdf_tll;
+  ASSERT_NO_THROW(pdf_tll = tll.pdf(u_disc));
+  EXPECT_GE(pdf_tll.minCoeff(), 0);
+  EXPECT_TRUE(pdf_tll.allFinite());
+  EXPECT_NO_THROW(tll.hfunc1(u_disc));
+  EXPECT_NO_THROW(tll.hfunc2(u_disc));
+}
+
 }

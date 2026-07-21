@@ -134,6 +134,15 @@
 
 ### BUG FIXES
 
+* Fix out-of-bounds parameter indexing in the per-row bivariate evaluation of
+  discrete leaves (`pdf_c_d`, `pdf_d_d`, and the discrete branches of `hfunc1` /
+  `hfunc2`) for families whose parameter matrix is neither `1 x p` nor `n x p`:
+  parameterless families (independence, `0 x 0`) and nonparametric families
+  (TLL, a `p x p` grid). Also validate parameter rows and columns
+  unconditionally in `check_parameters`, so a same-size-but-transposed shape
+  (`1 x p` vs `p x 1`) is rejected instead of reaching the coefficient-wise
+  bound checks (#700)
+
 * Fix an out-of-bounds memory access in the bivariate h-inverse for mixed
   discrete/continuous copulas whose inverse is computed numerically (e.g. Frank,
   the BB families, Tawn): a continuous h-inverse re-entered the discrete
