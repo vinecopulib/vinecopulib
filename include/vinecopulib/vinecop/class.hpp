@@ -139,6 +139,10 @@ public:
   //! original variable order.
   TriangularArray<size_t> get_struct_array(bool natural_order = false) const;
 
+  //! @return the vine as a list-of-trees decomposition, with each edge
+  //! carrying its fitted pair-copula.
+  RVineTrees get_trees() const;
+
   // getters for fit statistics
 
   //! @return the absolute-dependence threshold used during structure

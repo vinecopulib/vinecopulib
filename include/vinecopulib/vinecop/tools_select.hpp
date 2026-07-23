@@ -128,16 +128,6 @@ protected:
 
   void finalize_unknown_structure(size_t trunc_lvl);
 
-  void fill_structure_column(size_t col,
-                             size_t t,
-                             TriangularArray<size_t>& mat,
-                             std::vector<size_t>& order,
-                             std::vector<size_t>& ning_set);
-
-  void shift_to_one_based(TriangularArray<size_t>& mat,
-                          std::vector<size_t>& order,
-                          size_t trunc_lvl);
-
   double get_mbicv_of_tree(size_t t, double loglik);
 
   double get_loglik_of_tree(size_t t);

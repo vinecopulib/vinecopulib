@@ -687,136 +687,52 @@ VinecopSelector::finalize_known_structure(size_t trunc_lvl)
 }
 
 //! @brief Reconstructs the R-vine structure from the selected trees.
+//!
+//! @details Rebuilds the R-vine via the shared `RVineTrees` primitive: the
+//! fitted trees are converted into a list-of-trees decomposition (1-based
+//! labels, carrying the fitted pair copulas), then peeled back into an
+//! `(order, struct_array, pair_copulas)` triple. The peeling reproduces the
+//! former hand-rolled `fill_structure_column`: leaves are taken in
+//! graph-iteration order, the `conditioned[1]` endpoint goes on the diagonal,
+//! and each pair copula is flipped when its stored orientation no longer
+//! matches its new position.
 inline void
 VinecopSelector::finalize_unknown_structure(size_t trunc_lvl)
 {
   trees_opt_ = trees_;
-  TriangularArray<size_t> mat(d_, trunc_lvl);
-  std::vector<size_t> order(d_);
 
-  if (trunc_lvl > 0) {
-    std::vector<size_t> ning_set;
-
-    // fill matrix column by column
-    for (size_t col = 0; col < d_ - 1; ++col) {
-      tools_interface::check_user_interrupt();
-      // matrix above trunc_lvl is left empty
-      size_t t =
-        std::max(std::min(trunc_lvl, d_ - 1 - col), static_cast<size_t>(1));
-      fill_structure_column(col, t, mat, order, ning_set);
-    }
-
-    // The last column contains a single element which must be different
-    // from all other diagonal elements. Based on the properties of an
-    // R-vine matrix, this must be the element next to it.
-    order[d_ - 1] = mat(0, d_ - 2);
-
-    // change to user-facing format
-    // (variable index starting at 1 instead of 0)
-    shift_to_one_based(mat, order, trunc_lvl);
-  } else {
-    // order doesn't matter for truncated
-    order = tools_stl::seq_int(1, d_);
+  if (trunc_lvl == 0) {
+    // order doesn't matter for a fully truncated vine
+    vine_struct_ =
+      RVineStructure(tools_stl::seq_int(1, d_), TriangularArray<size_t>(d_, 0));
+    return;
   }
 
-  // return as RVineStructure
-  vine_struct_ = RVineStructure(order, mat);
-}
-
-//! @brief Fills one column of the R-vine matrix from the fitted trees.
-//!
-//! Consumes edges from `trees_` (removing them so they are not reused) and
-//! threads the running conditioning set `ning_set` across the column.
-inline void
-VinecopSelector::fill_structure_column(size_t col,
-                                       size_t t,
-                                       TriangularArray<size_t>& mat,
-                                       std::vector<size_t>& order,
-                                       std::vector<size_t>& ning_set)
-{
-  // start with highest tree in this column
-  for (auto e : boost::edges(trees_[t])) {
-
-    // find an edge that contains a leaf
-    size_t v0 = boost::source(e, trees_[t]);
-    size_t v1 = boost::target(e, trees_[t]);
-    size_t min_deg = std::min(boost::out_degree(v0, trees_[t]),
-                              boost::out_degree(v1, trees_[t]));
-    if (min_deg > 1) {
-      continue; // not a leaf
-    }
-    // find position of leaf in the edge
-    ptrdiff_t pos = (boost::out_degree(v1, trees_[t]) == 1);
-    if (pos == 1) {
-      trees_[t][e].pair_copula.flip();
-    }
-
-    // fill diagonal entry with leaf index
-    order[col] = trees_[t][e].conditioned[pos];
-
-    // entry in row t-1 is other index of the edge
-    mat(t - 1, col) = trees_[t][e].conditioned[std::abs(1 - pos)];
-
-    // assign fitted pair copula to appropriate entry, see
-    // `Vinecop::get_pair_copula()`.
-    pair_copulas_[t - 1][col] = trees_[t][e].pair_copula;
-
-    // initialize running set with full conditioning set of this edge
-    ning_set = trees_[t][e].conditioning;
-
-    // remove edge (must not be reused in another column!)
-    boost::remove_edge(v0, v1, trees_[t]);
-    break;
-  }
-
-  // fill column bottom to top
-  for (size_t k = 1; k < t; ++k) {
-    auto check_set = cat(order[col], ning_set);
-    for (auto e : boost::edges(trees_[t - k])) {
-      // search for an edge in lower tree that shares all
-      // indices in the conditioning set + diagonal entry
-      if (!is_same_set(trees_[t - k][e].all_indices, check_set)) {
-        continue;
-      }
-      // found suitable edge ->
-      // next matrix entry is conditioned variable of new edge
-      // that's not equal to the diagonal entry of this column
-      auto e_new = trees_[t - k][e];
-      ptrdiff_t pos = (order[col] == e_new.conditioned[1]);
-      if (pos == 1) {
-        e_new.pair_copula.flip();
-      }
-      mat(t - k - 1, col) = e_new.conditioned[std::abs(1 - pos)];
-
-      // assign fitted pair copula to appropriate entry, see
-      // Vinecop::get_pair_copula().
-      pair_copulas_[t - 1 - k][col] = e_new.pair_copula;
-
-      // start over with conditioned set of next edge
-      ning_set = e_new.conditioning;
-
-      // remove edge (must not be reused in another column!)
-      size_t v0 = boost::source(e, trees_[t - k]);
-      size_t v1 = boost::target(e, trees_[t - k]);
-      boost::remove_edge(v0, v1, trees_[t - k]);
-      break;
+  std::vector<RVineTrees::Tree> tree_list(trunc_lvl);
+  for (size_t t = 1; t <= trunc_lvl; ++t) {
+    tools_interface::check_user_interrupt();
+    for (auto e : boost::edges(trees_[t])) {
+      const auto& edge = trees_[t][e];
+      std::set<size_t> conditioning;
+      for (auto c : edge.conditioning)
+        conditioning.insert(c + 1);
+      tree_list[t - 1].push_back(RVineTrees::Edge(edge.conditioned[0] + 1,
+                                                  edge.conditioned[1] + 1,
+                                                  conditioning,
+                                                  edge.pair_copula));
     }
   }
-}
 
-//! @brief Converts matrix/order entries to the 1-based user-facing format.
-inline void
-VinecopSelector::shift_to_one_based(TriangularArray<size_t>& mat,
-                                    std::vector<size_t>& order,
-                                    size_t trunc_lvl)
-{
-  for (size_t i = 0; i < std::min(d_ - 1, trunc_lvl); ++i) {
-    for (size_t j = 0; j < d_ - i - 1; ++j) {
-      mat(i, j) += 1;
-    }
-  }
-  for (size_t i = 0; i < d_; i++)
-    order[i] += 1;
+  // "first leaf edge, diagonal = conditioned[1] endpoint" ==
+  // fill_structure_column
+  auto dec =
+    RVineTrees(d_, std::move(tree_list))
+      .to_struct_array(
+        [](size_t, const std::vector<std::vector<size_t>>& leaf_edges) {
+          return leaf_edges[0].back();
+        });
+  vine_struct_ = RVineStructure(dec.order, dec.struct_array);
+  pair_copulas_ = std::move(dec.pair_copulas);
 }
 
 //! @brief Gets pair copula pseudo-observations from h-functions.
