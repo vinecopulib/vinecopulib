@@ -46,7 +46,6 @@
   whose order tail equals a given set of variables (a value-preserving change:
   `pdf`/`loglik` are invariant), so the model can be re-targeted for
   conditioning without re-fitting (#697)
-
 * Add `RVineTrees`, a list-of-trees decomposition of an R-vine that round-trips
   with the matrix representation (`RVineStructure(trees)` /
   `RVineStructure::get_trees()`) and carries the fitted pair-copulas
@@ -54,7 +53,6 @@
   `Vinecop::reorient()` and the structure finalisation during `select()`,
   replacing two hand-rolled copies of the leaf-peeling matrix reconstruction
   (behaviour is byte-for-byte unchanged) (#698)
-
 * Speed up the bivariate copula evaluation engine: all internal evaluation
   leaves take `Eigen::Ref` (`tools_eigen::ConstMatRef`), removing an n x 2
   copy on every `pdf`/`hfunc`/`hinv`/`cdf` call; a new `log_pdf_raw` pathway
