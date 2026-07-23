@@ -335,6 +335,12 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
       nobs_ = data.rows();
       return;
     }
+
+    auto conditioning_set = controls.get_conditioning_set();
+    if (!conditioning_set.empty()) {
+      check_conditioning_set(conditioning_set, controls);
+    }
+
     Eigen::MatrixXd u = collapse_data(data);
 
     tools_select::VinecopSelector selector(
@@ -345,9 +351,214 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
       selector.select_all_trees(u);
     }
     finalize_fit(selector);
+
+    // Relabel the fitted vine (a value-preserving re-orientation, no re-fit) so
+    // the conditioning set becomes the tail of the order and can be conditioned
+    // on with simulate_conditional(). The constrained first tree makes this
+    // achievable.
+    if (!conditioning_set.empty()) {
+      reorient(conditioning_set);
+    }
   } else {
     fit(data, controls.get_fit_controls_bicop(), controls.get_num_threads());
   }
+}
+
+//! @brief Validates the conditioning set against the vine dimension and
+//! selection controls (called from `select()` where `d_` is known).
+inline void
+Vinecop::check_conditioning_set(const std::vector<size_t>& conditioning_set,
+                                const FitControlsVinecop& controls) const
+{
+  if (conditioning_set.size() >= d_) {
+    throw std::runtime_error(
+      "conditioning_set must contain at most d - 1 variables.");
+  }
+  for (auto v : conditioning_set) {
+    if ((v < 1) || (v > d_)) {
+      throw std::runtime_error(
+        "conditioning_set entries must be in 1, ..., d.");
+    }
+  }
+  auto algo = controls.get_tree_algorithm();
+  if ((algo != "mst_prim") && (algo != "mst_kruskal")) {
+    throw std::runtime_error(
+      "conditioning-aware selection requires an MST tree_algorithm "
+      "('mst_prim' or 'mst_kruskal').");
+  }
+  // v1: re-orientation operates on the full R-vine matrix, so structural
+  // truncation is not supported (thresholding, which keeps the structure full,
+  // is fine).
+  if (controls.get_select_trunc_lvl() || (controls.get_trunc_lvl() < d_ - 1)) {
+    throw std::runtime_error(
+      "conditioning-aware selection does not support truncation "
+      "(trunc_lvl / select_trunc_lvl) in this version.");
+  }
+}
+
+//! @brief Relabels the vine to an equivalent one whose order tail equals
+//! `conditioning_set`.
+//!
+//! @details This is a value-preserving re-orientation (a port of VineCopulas'
+//! `samplingmatrix`): the fitted model is unchanged (`pdf`/`loglik` invariant),
+//! only its sampling-order representation changes so that the variables in
+//! `conditioning_set` are drawn first and can be conditioned on with
+//! `simulate_conditional()`. It chooses, per tree, which conditioned variable
+//! sits on the matrix diagonal, and flips each pair copula whose stored
+//! orientation no longer matches its new position. Throws if the current
+//! structure admits no sampling order ending in `conditioning_set` (fit with
+//! `FitControlsVinecop::set_conditioning_set()` to guarantee one exists).
+//!
+//! @param conditioning_set 1-based variable indices to place at the tail of
+//! `get_order()`.
+inline void
+Vinecop::reorient(const std::vector<size_t>& conditioning_set)
+{
+  size_t k = conditioning_set.size();
+
+  // ---- validation ----
+  if ((k == 0) || (k >= d_)) {
+    throw std::runtime_error(
+      "conditioning_set must contain between 1 and d - 1 variables.");
+  }
+  auto sorted = conditioning_set;
+  std::sort(sorted.begin(), sorted.end());
+  if (std::adjacent_find(sorted.begin(), sorted.end()) != sorted.end()) {
+    throw std::runtime_error("conditioning_set must not contain duplicates.");
+  }
+  if ((sorted.front() < 1) || (sorted.back() > d_)) {
+    throw std::runtime_error("conditioning_set entries must be in 1, ..., d.");
+  }
+  if (rvine_structure_.get_trunc_lvl() != d_ - 1) {
+    throw std::runtime_error(
+      "reorient() requires a non-truncated vine (trunc_lvl == d - 1).");
+  }
+
+  std::vector<char> in_b(d_ + 1, 0);
+  for (auto v : conditioning_set)
+    in_b[v] = 1;
+
+  auto tail_is_b = [&](const std::vector<size_t>& order) {
+    for (size_t i = d_ - k; i < d_; ++i)
+      if (!in_b[order[i]])
+        return false;
+    return true;
+  };
+
+  // early no-op: the conditioning set is already the tail of the order
+  if (tail_is_b(rvine_structure_.get_order())) {
+    return;
+  }
+
+  // ---- decompose the current matrix into an edge list ----
+  auto mat = get_matrix();
+  struct Edge
+  {
+    std::vector<size_t> cond;    // the two conditioned variables
+    std::vector<size_t> all_idx; // sorted (conditioned + conditioning)
+    Bicop bicop;
+    size_t diag_orig; // variable currently on this edge's diagonal (= arg1)
+    size_t tree;
+    bool used;
+  };
+  std::vector<Edge> edges;
+  for (size_t t = 0; t < d_ - 1; ++t) {
+    for (size_t e = 0; e < d_ - 1 - t; ++e) {
+      Edge ed;
+      size_t diag = mat(d_ - 1 - e, e);
+      ed.cond = { diag, mat(t, e) };
+      ed.all_idx = ed.cond;
+      for (size_t r = 0; r < t; ++r)
+        ed.all_idx.push_back(mat(r, e));
+      std::sort(ed.all_idx.begin(), ed.all_idx.end());
+      ed.bicop = pair_copulas_[t][e];
+      ed.diag_orig = diag;
+      ed.tree = t;
+      ed.used = false;
+      edges.push_back(ed);
+    }
+  }
+  auto conditioning_of = [](const Edge& ed) {
+    std::vector<size_t> ning;
+    for (auto v : ed.all_idx)
+      if ((v != ed.cond[0]) && (v != ed.cond[1]))
+        ning.push_back(v);
+    return ning;
+  };
+
+  // ---- rebuild the matrix column by column (direct O(d^2), no enumeration).
+  //      At each column choose which endpoint of the tree's top edge goes on
+  //      the diagonal: a non-conditioning variable for the leading columns
+  //      (head of the order), a conditioning variable for the trailing columns
+  //      + root (tail). Because the conditioning set forms a self-contained
+  //      sub-vine (its edges are the low trees; every other edge involves a
+  //      non-conditioning variable), the required endpoint is always available;
+  //      the final tail check guards against any structure that is not a block.
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mnew(d_, d_);
+  mnew.fill(0);
+  auto pcs = make_pair_copula_store(d_, d_ - 1);
+  bool ok = true;
+  for (size_t e = 0; (e < d_ - 1) && ok; ++e) {
+    size_t t_top = d_ - 2 - e;
+    Edge* top = nullptr;
+    for (auto& ed : edges)
+      if (!ed.used && (ed.tree == t_top)) {
+        top = &ed;
+        break;
+      }
+    if (top == nullptr) {
+      ok = false;
+      break;
+    }
+    size_t c0 = top->cond[0], c1 = top->cond[1];
+    bool want_cond = (e >= d_ - k); // tail columns take the conditioning set
+    size_t s = want_cond ? (in_b[c0] ? c0 : c1) : (in_b[c0] ? c1 : c0);
+    size_t partner = (s == c0) ? c1 : c0;
+
+    mnew(d_ - 1 - e, e) = s;
+    mnew(t_top, e) = partner;
+    pcs[t_top][e] = top->bicop;
+    if (top->diag_orig != s)
+      pcs[t_top][e].flip();
+    top->used = true;
+
+    auto ning = conditioning_of(*top);
+    for (size_t row = t_top; row-- > 0;) {
+      std::vector<size_t> want = ning;
+      want.push_back(s);
+      std::sort(want.begin(), want.end());
+      Edge* nxt = nullptr;
+      for (auto& ed : edges)
+        if (!ed.used && (ed.tree == row) && (ed.all_idx == want)) {
+          nxt = &ed;
+          break;
+        }
+      if (nxt == nullptr) {
+        ok = false;
+        break;
+      }
+      mnew(row, e) = (nxt->cond[0] == s) ? nxt->cond[1] : nxt->cond[0];
+      pcs[row][e] = nxt->bicop;
+      if (nxt->diag_orig != s)
+        pcs[row][e].flip();
+      nxt->used = true;
+      ning = conditioning_of(*nxt);
+    }
+  }
+  mnew(0, d_ - 1) = mnew(0, d_ - 2); // root (last remaining variable)
+
+  // ---- validate: the tail must equal B, then the full R-vine check ----
+  std::vector<size_t> new_order(d_);
+  for (size_t i = 0; i < d_; ++i)
+    new_order[i] = mnew(d_ - 1 - i, i);
+  if (!ok || !tail_is_b(new_order)) {
+    throw std::runtime_error(
+      "conditioning set is not admissible as a sampling-order tail of this "
+      "vine; fit with FitControlsVinecop::set_conditioning_set() or condition "
+      "on an admissible set.");
+  }
+  rvine_structure_ = RVineStructure(mnew); // check = true (proximity etc.)
+  pair_copulas_ = pcs;
 }
 
 //! @brief Fits the parameters of a pre-specified vine copula model.

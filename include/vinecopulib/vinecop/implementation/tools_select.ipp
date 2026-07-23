@@ -117,6 +117,16 @@ inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
   , psi0_(controls.get_psi0())
 {
   vine_struct_ = RVineStructure(tools_stl::seq_int(1, d_), 1, false);
+
+  // conditioning-aware selection bookkeeping (empty set -> ordinary selection)
+  auto cond = controls.get_conditioning_set();
+  n_cond_ = cond.size();
+  in_cond_ = std::vector<char>(d_, 0);
+  for (auto v : cond) {
+    if ((v >= 1) && (v <= d_)) {
+      in_cond_[v - 1] = 1;
+    }
+  }
 }
 
 inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
@@ -465,6 +475,33 @@ VinecopSelector::add_allowed_edges_proximity(
     double crit =
       calculate_criterion(pc_data, tree_criterion, weights, criterion_fun);
     double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
+
+    // Conditioning-aware selection: penalize edges that involve any
+    // non-conditioning variable. Since base weights lie in [0, 1], adding `d_`
+    // keeps all weights non-negative (required by Boost's Prim) while making
+    // every all-conditioning edge strictly cheaper. The (minimum) spanning tree
+    // then selects the conditioning set's own optimal sub-vine at every tree
+    // before attaching any other variable, so every remaining edge involves at
+    // least one non-conditioning variable. This makes the conditioning set a
+    // self-contained block that `Vinecop::reorient()` can place at the tail of
+    // the sampling order. Only `w` (the tree weight) is shifted; `crit` (used
+    // for thresholding/fit reuse) is left unchanged.
+    if (n_cond_ > 0) {
+      bool all_cond = true;
+      for (auto var : vine_tree[v0].all_indices)
+        if (!in_cond_[var]) {
+          all_cond = false;
+          break;
+        }
+      if (all_cond)
+        for (auto var : vine_tree[v1].all_indices)
+          if (!in_cond_[var]) {
+            all_cond = false;
+            break;
+          }
+      if (!all_cond)
+        w += static_cast<double>(d_);
+    }
 
     {
       std::lock_guard<std::mutex> lk(m);

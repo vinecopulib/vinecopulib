@@ -190,6 +190,12 @@ protected:
   size_t n_;
   size_t d_;
   bool structure_unknown_{ true };
+  // conditioning-aware selection: in_cond_[v] == 1 iff variable v (0-based) is
+  // in the conditioning set; n_cond_ = |conditioning set|. n_cond_ == 0 means
+  // ordinary (unconditional) selection and every conditioning-specific branch
+  // below is skipped, leaving the default path byte-for-byte unchanged.
+  std::vector<char> in_cond_;
+  size_t n_cond_{ 0 };
   std::vector<std::string> var_types_;
   FitControlsVinecop controls_;
   tools_thread::ThreadPool pool_;

@@ -205,6 +205,8 @@ public:
     const size_t num_threads = 1,
     const std::vector<int>& seeds = std::vector<int>()) const;
 
+  void reorient(const std::vector<size_t>& conditioning_set);
+
   Eigen::MatrixXd rosenblatt(Eigen::MatrixXd u,
                              const size_t num_threads = 1,
                              bool randomize_discrete = true,
@@ -411,6 +413,8 @@ protected:
     const std::vector<std::vector<Bicop>>& pair_copulas) const;
   double calculate_mbicv_penalty(const size_t nobs, const double psi0) const;
   void finalize_fit(const tools_select::VinecopSelector& selector);
+  void check_conditioning_set(const std::vector<size_t>& conditioning_set,
+                              const FitControlsVinecop& controls) const;
   void check_weights_size(const Eigen::VectorXd& weights,
                           const Eigen::MatrixXd& data) const;
   void check_enough_data(const Eigen::MatrixXd& data) const;

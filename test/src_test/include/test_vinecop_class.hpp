@@ -641,6 +641,166 @@ TEST_F(VinecopTest, simulate_conditional_multi_discrete)
   EXPECT_NEAR(cond_mean, sum / cnt, 0.03);
 }
 
+TEST_F(VinecopTest, conditional_select_places_conditioning_set_at_tail)
+{
+  size_t d = 6;
+  auto data = make_clayton_dvine(d, 3.0).simulate(2000, false, 1, { 1 });
+  auto fam = std::vector<BicopFamily>{ BicopFamily::gaussian,
+                                       BicopFamily::clayton,
+                                       BicopFamily::gumbel,
+                                       BicopFamily::frank };
+  std::vector<std::vector<size_t>> sets{ { 3 }, { 2, 5 }, { 1, 4, 6 } };
+  for (auto B : sets) {
+    FitControlsVinecop c;
+    c.set_family_set(fam);
+    c.set_conditioning_set(B);
+    Vinecop vc(d);
+    vc.select(data, c);
+
+    // the conditioning set must be the tail of the order (drawn first)
+    auto order = vc.get_order();
+    std::vector<size_t> tail(order.end() - static_cast<ptrdiff_t>(B.size()),
+                             order.end());
+    std::sort(tail.begin(), tail.end());
+    auto b_sorted = B;
+    std::sort(b_sorted.begin(), b_sorted.end());
+    EXPECT_EQ(tail, b_sorted);
+    // and the produced structure is a valid R-vine (checked on construction)
+    EXPECT_NO_THROW(RVineStructure(vc.get_matrix()));
+  }
+}
+
+TEST_F(VinecopTest, conditional_select_empty_equals_plain)
+{
+  size_t d = 6;
+  auto data = make_clayton_dvine(d, 3.0).simulate(2000, false, 1, { 1 });
+  auto fam =
+    std::vector<BicopFamily>{ BicopFamily::gaussian, BicopFamily::clayton };
+  FitControlsVinecop c;
+  c.set_family_set(fam);
+  Vinecop a(d);
+  a.select(data, c);
+
+  FitControlsVinecop c2;
+  c2.set_family_set(fam);
+  c2.set_conditioning_set({}); // empty -> ordinary selection
+  Vinecop b(d);
+  b.select(data, c2);
+
+  EXPECT_TRUE(a.get_matrix() == b.get_matrix());
+  EXPECT_NEAR(a.get_loglik(), b.get_loglik(), 1e-10);
+}
+
+TEST_F(VinecopTest, conditional_select_then_simulate_conditional)
+{
+  size_t d = 5;
+  auto data = make_clayton_dvine(d, 3.0).simulate(2000, false, 1, { 3 });
+  FitControlsVinecop c;
+  c.set_family_set(
+    { BicopFamily::gaussian, BicopFamily::clayton, BicopFamily::frank });
+  std::vector<size_t> B{ 2, 4 };
+  c.set_conditioning_set(B);
+  Vinecop vc(d);
+  vc.select(data, c);
+
+  // condition on the tail (== B); the tail columns must be reproduced exactly
+  auto order = vc.get_order();
+  Eigen::MatrixXd uc = Eigen::MatrixXd::Constant(400, B.size(), 0.4);
+  auto U = vc.simulate_conditional(uc, false, 1, { 9 });
+  for (size_t i = 0; i < B.size(); ++i) {
+    size_t col = order[d - B.size() + i] - 1;
+    EXPECT_TRUE(
+      all_close(U.col(col), Eigen::VectorXd::Constant(400, 0.4), 1e-9, 1e-9));
+  }
+}
+
+TEST_F(VinecopTest, reorient_preserves_model)
+{
+  size_t d = 6;
+  // rotated Clayton D-vine (asymmetric + rotations) so the flip logic in
+  // reorient() is genuinely exercised
+  auto pcs = Vinecop::make_pair_copula_store(d);
+  auto par = Eigen::VectorXd::Constant(1, 3.0);
+  for (size_t t = 0; t < d - 1; ++t)
+    for (auto& pc : pcs[t])
+      pc = Bicop(BicopFamily::clayton, (t % 2 == 0) ? 90 : 270, par);
+  Vinecop model(DVineStructure(std::vector<size_t>{ 1, 2, 3, 4, 5, 6 }), pcs);
+  auto data = model.simulate(500, false, 1, { 7 });
+
+  auto fam = std::vector<BicopFamily>{ BicopFamily::gaussian,
+                                       BicopFamily::clayton,
+                                       BicopFamily::gumbel };
+  Vinecop vc(d);
+  {
+    FitControlsVinecop c;
+    c.set_family_set(fam);
+    vc.select(data, c);
+  }
+  auto pdf0 = vc.pdf(data);
+
+  size_t feasible = 0;
+  std::vector<std::vector<size_t>> candidates{
+    { 1 },    { 2 },    { 3 },    { 4 },       { 5 },      { 6 },
+    { 1, 2 }, { 2, 5 }, { 3, 6 }, { 1, 4, 6 }, { 2, 3, 5 }
+  };
+  for (auto B : candidates) {
+    Vinecop vr = vc;
+    try {
+      vr.reorient(B);
+    } catch (const std::exception&) {
+      continue; // infeasible for this structure -> allowed
+    }
+    ++feasible;
+    // reorient is a pure relabeling: the density is unchanged (up to fp)
+    EXPECT_TRUE(all_close(vr.pdf(data), pdf0, 1e-6, 1e-6));
+    // the conditioning set is now the tail of the order
+    auto o = vr.get_order();
+    std::vector<size_t> tail(o.end() - static_cast<ptrdiff_t>(B.size()),
+                             o.end());
+    std::sort(tail.begin(), tail.end());
+    auto bs = B;
+    std::sort(bs.begin(), bs.end());
+    EXPECT_EQ(tail, bs);
+    EXPECT_NO_THROW(RVineStructure(vr.get_matrix()));
+  }
+  EXPECT_GT(feasible, 0u); // at least some sets are admissible tails
+
+  // validation throws
+  EXPECT_ANY_THROW(vc.reorient({}));                   // empty
+  EXPECT_ANY_THROW(vc.reorient({ 1, 2, 3, 4, 5, 6 })); // |B| == d
+  EXPECT_ANY_THROW(vc.reorient({ 7 }));                // out of range
+  EXPECT_ANY_THROW(vc.reorient({ 2, 2 }));             // duplicate
+}
+
+TEST_F(VinecopTest, conditional_select_throws)
+{
+  size_t d = 5;
+  auto data = make_clayton_dvine(d, 2.0).simulate(500, false, 1, { 1 });
+  {
+    // index out of range
+    FitControlsVinecop c;
+    c.set_conditioning_set({ 6 });
+    Vinecop vc(d);
+    EXPECT_ANY_THROW(vc.select(data, c));
+  }
+  {
+    // |B| == d (no free variable)
+    FitControlsVinecop c;
+    c.set_conditioning_set({ 1, 2, 3, 4, 5 });
+    Vinecop vc(d);
+    EXPECT_ANY_THROW(vc.select(data, c));
+  }
+  {
+    // random tree_algorithm is incompatible with conditioning-aware selection
+    FitControlsVinecop c;
+    c.set_conditioning_set({ 2 });
+    c.set_tree_algorithm("random_weighted");
+    c.set_seeds({ 1 });
+    Vinecop vc(d);
+    EXPECT_ANY_THROW(vc.select(data, c));
+  }
+}
+
 TEST_F(VinecopTest, scores_stepwise)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7, 3);

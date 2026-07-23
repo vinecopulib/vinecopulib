@@ -73,6 +73,7 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
   controls.set_tree_algorithm("mst_kruskal");
   std::vector<int> seeds = { 1, 2, 3, 4, 5 };
   controls.set_seeds(seeds);
+  controls.set_conditioning_set({ 2, 4 });
 
   // Create a config object from the controls
   FitControlsConfig config;
@@ -86,6 +87,7 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
   config.num_threads = controls.get_num_threads();
   config.tree_algorithm = controls.get_tree_algorithm();
   config.seeds = controls.get_seeds();
+  config.conditioning_set = controls.get_conditioning_set();
 
   // Create and test new controls from the config object
   FitControlsVinecop controls2(config);
@@ -99,6 +101,7 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
   EXPECT_EQ(controls.get_num_threads(), controls2.get_num_threads());
   EXPECT_EQ(controls.get_tree_algorithm(), controls2.get_tree_algorithm());
   EXPECT_EQ(controls.get_seeds(), controls2.get_seeds());
+  EXPECT_EQ(controls.get_conditioning_set(), controls2.get_conditioning_set());
 }
 
 TEST(vinecop_sanity_checks, controls_check)
@@ -107,5 +110,7 @@ TEST(vinecop_sanity_checks, controls_check)
   EXPECT_ANY_THROW(controls.set_tree_criterion("foo"));
   EXPECT_ANY_THROW(controls.set_threshold(-1.0));
   EXPECT_ANY_THROW(controls.set_threshold(2.0));
+  EXPECT_ANY_THROW(controls.set_conditioning_set({ 0 }));
+  EXPECT_ANY_THROW(controls.set_conditioning_set({ 2, 2 }));
 }
 }
