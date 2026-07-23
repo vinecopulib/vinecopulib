@@ -6,12 +6,13 @@
 
 #pragma once
 
+#include <algorithm>
 #include <functional>
 #include <map>
-#include <set>
 #include <tuple>
 #include <vector>
 #include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/misc/triangular_array.hpp>
 
 namespace vinecopulib {
@@ -35,24 +36,39 @@ public:
   //! and the associated pair-copula (independence by default).
   struct Edge
   {
-    size_t a{ 0 };        //!< first conditioned variable (pair-copula arg1)
-    size_t b{ 0 };        //!< second conditioned variable
-    std::set<size_t> C{}; //!< conditioning set
-    Bicop pair_copula{};  //!< pair-copula (independence by default)
+    size_t a{ 0 };           //!< first conditioned variable (arg1)
+    size_t b{ 0 };           //!< second conditioned variable
+    std::vector<size_t> C{}; //!< conditioning set, kept sorted ascending
+    std::vector<size_t> all_indices{}; //!< sorted {a} ∪ {b} ∪ C (precomputed)
+    Bicop pair_copula{}; //!< pair-copula (independence by default)
 
     Edge() = default;
-    Edge(size_t a_arg, size_t b_arg, std::set<size_t> c_arg)
+    Edge(size_t a_arg, size_t b_arg, std::vector<size_t> c_arg)
       : a(a_arg)
       , b(b_arg)
       , C(std::move(c_arg))
     {
+      finalize();
     }
-    Edge(size_t a_arg, size_t b_arg, std::set<size_t> c_arg, Bicop pc)
+    Edge(size_t a_arg, size_t b_arg, std::vector<size_t> c_arg, Bicop pc)
       : a(a_arg)
       , b(b_arg)
       , C(std::move(c_arg))
       , pair_copula(std::move(pc))
     {
+      finalize();
+    }
+
+  private:
+    //! Canonicalizes `C` (sort + unique) and precomputes `all_indices`.
+    void finalize()
+    {
+      std::sort(C.begin(), C.end());
+      C.erase(std::unique(C.begin(), C.end()), C.end());
+      all_indices = C;
+      all_indices.reserve(C.size() + 2);
+      tools_stl::insert_sorted(all_indices, a);
+      tools_stl::insert_sorted(all_indices, b);
     }
   };
   using Tree = std::vector<Edge>;
@@ -74,11 +90,22 @@ public:
     std::vector<std::vector<Bicop>> pair_copulas; //!< indexed `[tree][edge]`
   };
 
+  //! @brief One edge of the augmented (line-graph) view: its two incident node
+  //! ids plus a non-owning pointer to the underlying `Edge` (in `trees_`).
+  struct AugmentedEdge
+  {
+    size_t node1{ 0 };
+    size_t node2{ 0 };
+    const Edge* edge{ nullptr };
+    bool consumed{ false };
+  };
+
   //! @brief The augmented (line-graph) view of a tree used during conversion.
+  //! `degrees` is indexed by node id (contiguous), avoiding a `std::map`.
   struct AugmentedTree
   {
-    std::vector<std::tuple<size_t, size_t, Edge>> edges;
-    std::map<size_t, size_t> degrees;
+    std::vector<AugmentedEdge> edges;
+    std::vector<size_t> degrees;
   };
 
   RVineTrees()
@@ -109,8 +136,8 @@ private:
   size_t trunc_lvl_;
   std::vector<Tree> trees_;
 
-  std::map<std::pair<size_t, std::set<size_t>>, size_t> build_lookup(
-    const std::vector<std::tuple<size_t, size_t, Edge>>& edges) const;
+  std::map<std::pair<size_t, std::vector<size_t>>, size_t> build_lookup(
+    const std::vector<AugmentedEdge>& edges) const;
   void check_missing_vars(const std::vector<Edge>& edges, size_t d) const;
   std::vector<AugmentedTree> trees_to_augmented() const;
   Decomposition peel(const DiagonalPolicy& diagonal_policy,
