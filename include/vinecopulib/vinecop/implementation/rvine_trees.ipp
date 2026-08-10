@@ -21,9 +21,10 @@ inline RVineTrees::RVineTrees(const std::vector<size_t>& order,
   trees_.resize(trunc_lvl_);
   for (size_t t = 0; t < trunc_lvl_; ++t) {
     for (size_t e = 0; e < d_ - 1 - t; ++e) {
-      std::set<size_t> conditioning;
+      std::vector<size_t> conditioning;
+      conditioning.reserve(t);
       for (size_t k = 0; k < t; ++k)
-        conditioning.insert(struct_array(k, e));
+        conditioning.push_back(struct_array(k, e));
       trees_[t].push_back(Edge(order[e], struct_array(t, e), conditioning));
     }
   }
@@ -48,9 +49,10 @@ inline RVineTrees::RVineTrees(
   trees_.resize(trunc_lvl_);
   for (size_t t = 0; t < trunc_lvl_; ++t) {
     for (size_t e = 0; e < d_ - 1 - t; ++e) {
-      std::set<size_t> conditioning;
+      std::vector<size_t> conditioning;
+      conditioning.reserve(t);
       for (size_t k = 0; k < t; ++k)
-        conditioning.insert(struct_array(k, e));
+        conditioning.push_back(struct_array(k, e));
       trees_[t].push_back(
         Edge(order[e], struct_array(t, e), conditioning, pair_copulas[t][e]));
     }
@@ -135,11 +137,13 @@ RVineTrees::peel(const DiagonalPolicy& diagonal_policy,
     // its leaf endpoint(s) as diagonal options (endpoint `a` before `b`)
     std::vector<std::vector<size_t>> leaf_edges;
     for (const auto& e : tree.edges) {
-      const Edge& ed = std::get<2>(e);
+      if (e.consumed)
+        continue;
+      const Edge& ed = *e.edge;
       std::vector<size_t> options;
-      if (tree.degrees[std::get<0>(e)] == 1)
+      if (tree.degrees[e.node1] == 1)
         options.push_back(ed.a);
-      if (tree.degrees[std::get<1>(e)] == 1)
+      if (tree.degrees[e.node2] == 1)
         options.push_back(ed.b);
       if (!options.empty())
         leaf_edges.push_back(std::move(options));
@@ -153,12 +157,14 @@ RVineTrees::peel(const DiagonalPolicy& diagonal_policy,
 
     // locate the (unique) leaf edge carrying `diag`, consume it, and seed the
     // running conditioning set for the descent
-    std::set<size_t> check_set;
+    std::vector<size_t> check_set;
     bool found = false;
-    for (auto it = tree.edges.begin(); it != tree.edges.end(); ++it) {
-      const Edge& ed = std::get<2>(*it);
-      bool as_a = (tree.degrees[std::get<0>(*it)] == 1) && (ed.a == diag);
-      bool as_b = (tree.degrees[std::get<1>(*it)] == 1) && (ed.b == diag);
+    for (auto& e : tree.edges) {
+      if (e.consumed)
+        continue;
+      const Edge& ed = *e.edge;
+      bool as_a = (tree.degrees[e.node1] == 1) && (ed.a == diag);
+      bool as_b = (tree.degrees[e.node2] == 1) && (ed.b == diag);
       if (!as_a && !as_b)
         continue;
       struct_array(t - 1, col) = as_a ? ed.b : ed.a;
@@ -168,9 +174,9 @@ RVineTrees::peel(const DiagonalPolicy& diagonal_policy,
           pair_copulas[t - 1][col].flip();
       }
       check_set = ed.C;
-      tree.degrees[std::get<0>(*it)]--;
-      tree.degrees[std::get<1>(*it)]--;
-      tree.edges.erase(it);
+      tree.degrees[e.node1]--;
+      tree.degrees[e.node2]--;
+      e.consumed = true;
       found = true;
       break;
     }
@@ -184,14 +190,13 @@ RVineTrees::peel(const DiagonalPolicy& diagonal_policy,
     for (size_t k = 1; k < t; ++k) {
       size_t tree_idx = t - 1 - k;
       AugmentedTree& ltree = augmented[tree_idx];
-      check_set.insert(diag);
+      tools_stl::insert_sorted(check_set, diag);
       bool matched = false;
-      for (auto it = ltree.edges.begin(); it != ltree.edges.end(); ++it) {
-        const Edge& ed = std::get<2>(*it);
-        std::set<size_t> all_indices = ed.C;
-        all_indices.insert(ed.a);
-        all_indices.insert(ed.b);
-        if (all_indices != check_set)
+      for (auto& e : ltree.edges) {
+        if (e.consumed)
+          continue;
+        const Edge& ed = *e.edge;
+        if (ed.all_indices != check_set)
           continue;
         struct_array(tree_idx, col) = (ed.a == diag) ? ed.b : ed.a;
         if (carry_copulas) {
@@ -200,9 +205,9 @@ RVineTrees::peel(const DiagonalPolicy& diagonal_policy,
             pair_copulas[tree_idx][col].flip();
         }
         check_set = ed.C;
-        ltree.degrees[std::get<0>(*it)]--;
-        ltree.degrees[std::get<1>(*it)]--;
-        ltree.edges.erase(it);
+        ltree.degrees[e.node1]--;
+        ltree.degrees[e.node2]--;
+        e.consumed = true;
         matched = true;
         break;
       }
@@ -221,19 +226,18 @@ RVineTrees::peel(const DiagonalPolicy& diagonal_policy,
 
 //! @brief Builds the map from `(variable, conditioning ∪ partner)` to the edge
 //! index in the previous tree (i.e. the incident node in the line graph).
-inline std::map<std::pair<size_t, std::set<size_t>>, size_t>
-RVineTrees::build_lookup(
-  const std::vector<std::tuple<size_t, size_t, Edge>>& edges) const
+inline std::map<std::pair<size_t, std::vector<size_t>>, size_t>
+RVineTrees::build_lookup(const std::vector<AugmentedEdge>& edges) const
 {
-  std::map<std::pair<size_t, std::set<size_t>>, size_t> lookup;
+  std::map<std::pair<size_t, std::vector<size_t>>, size_t> lookup;
   for (size_t i = 0; i < edges.size(); ++i) {
-    const Edge& ed = std::get<2>(edges[i]);
-    std::set<size_t> key_a = ed.C;
-    key_a.insert(ed.b);
-    lookup[{ ed.a, key_a }] = i;
-    std::set<size_t> key_b = ed.C;
-    key_b.insert(ed.a);
-    lookup[{ ed.b, key_b }] = i;
+    const Edge& ed = *edges[i].edge;
+    std::vector<size_t> key = ed.C; // already sorted ascending
+    tools_stl::insert_sorted(key, ed.b);
+    lookup[{ ed.a, key }] = i;
+    key = ed.C;
+    tools_stl::insert_sorted(key, ed.a);
+    lookup[{ ed.b, key }] = i;
   }
   return lookup;
 }
@@ -272,10 +276,12 @@ RVineTrees::trees_to_augmented() const
   for (size_t t = 0; t < trunc_lvl_; ++t) {
     const Tree& edges = trees_[t];
     AugmentedTree atree;
+    atree.edges.reserve(edges.size());
     if (t == 0) {
       check_missing_vars(edges, d_);
       for (const auto& ed : edges)
-        atree.edges.push_back(std::make_tuple(ed.a, ed.b, ed));
+        atree.edges.push_back({ ed.a, ed.b, &ed, false });
+      atree.degrees.assign(d_ + 1, 0); // 1-based labels; index 0 unused
     } else {
       auto lookup = build_lookup(augmented[t - 1].edges);
       for (size_t i = 0; i < edges.size(); ++i) {
@@ -292,12 +298,13 @@ RVineTrees::trees_to_augmented() const
           problem += ")";
           throw std::runtime_error(problem);
         }
-        atree.edges.push_back(std::make_tuple(it1->second, it2->second, ed));
+        atree.edges.push_back({ it1->second, it2->second, &ed, false });
       }
+      atree.degrees.assign(augmented[t - 1].edges.size(), 0);
     }
     for (const auto& e : atree.edges) {
-      atree.degrees[std::get<0>(e)]++;
-      atree.degrees[std::get<1>(e)]++;
+      atree.degrees[e.node1]++;
+      atree.degrees[e.node2]++;
     }
     augmented[t] = std::move(atree);
   }

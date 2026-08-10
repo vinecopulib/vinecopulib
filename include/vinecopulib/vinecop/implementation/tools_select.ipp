@@ -713,9 +713,10 @@ VinecopSelector::finalize_unknown_structure(size_t trunc_lvl)
     tools_interface::check_user_interrupt();
     for (auto e : boost::edges(trees_[t])) {
       const auto& edge = trees_[t][e];
-      std::set<size_t> conditioning;
+      std::vector<size_t> conditioning;
+      conditioning.reserve(edge.conditioning.size());
       for (auto c : edge.conditioning)
-        conditioning.insert(c + 1);
+        conditioning.push_back(c + 1);
       tree_list[t - 1].push_back(RVineTrees::Edge(edge.conditioned[0] + 1,
                                                   edge.conditioned[1] + 1,
                                                   conditioning,
