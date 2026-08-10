@@ -691,11 +691,13 @@ VinecopSelector::finalize_known_structure(size_t trunc_lvl)
 //! @details Rebuilds the R-vine via the shared `RVineTrees` primitive: the
 //! fitted trees are converted into a list-of-trees decomposition (1-based
 //! labels, carrying the fitted pair copulas), then peeled back into an
-//! `(order, struct_array, pair_copulas)` triple. The peeling reproduces the
-//! former hand-rolled `fill_structure_column`: leaves are taken in
-//! graph-iteration order, the `conditioned[1]` endpoint goes on the diagonal,
-//! and each pair copula is flipped when its stored orientation no longer
-//! matches its new position.
+//! `(order, struct_array, pair_copulas)` triple, using the same
+//! (first-leaf-edge, `conditioned[0]` endpoint on the diagonal) policy as the
+//! default `RVineTrees::to_struct_array()`. Since each edge stores its
+//! pair copula with the first argument on `conditioned[0]`, placing
+//! `conditioned[0]` on the diagonal keeps the finalization flip-free: pair
+//! copulas are placed exactly as fitted, and `select()` and the structure
+//! round-trip (`RVineStructure::get_trees()`) share one diagonal convention.
 inline void
 VinecopSelector::finalize_unknown_structure(size_t trunc_lvl)
 {
@@ -724,14 +726,10 @@ VinecopSelector::finalize_unknown_structure(size_t trunc_lvl)
     }
   }
 
-  // "first leaf edge, diagonal = conditioned[1] endpoint" ==
-  // fill_structure_column
-  auto dec =
-    RVineTrees(d_, std::move(tree_list))
-      .to_struct_array(
-        [](size_t, const std::vector<std::vector<size_t>>& leaf_edges) {
-          return leaf_edges[0].back();
-        });
+  // Finalize with the default (flip-free, conditioned[0]) diagonal policy — the
+  // same convention as the RVineStructure round-trip, so no bespoke policy is
+  // needed here.
+  auto dec = RVineTrees(d_, std::move(tree_list)).to_struct_array();
   vine_struct_ = RVineStructure(dec.order, dec.struct_array);
   pair_copulas_ = std::move(dec.pair_copulas);
 }

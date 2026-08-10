@@ -64,8 +64,8 @@ inline RVineStructure::RVineStructure(
 //! @param check Whether `trees` shall be checked for validity.
 inline RVineStructure::RVineStructure(const RVineTrees& trees, bool check)
   : RVineStructure([&]() {
-    auto array = trees.to_struct_array();
-    return RVineStructure(std::get<0>(array), std::get<1>(array), false, check);
+    auto dec = trees.to_struct_array();
+    return RVineStructure(dec.order, dec.struct_array, false, check);
   }())
 {
 }

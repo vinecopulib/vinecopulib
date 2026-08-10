@@ -70,27 +70,15 @@ inline RVineTrees::RVineTrees(size_t d, std::vector<Tree> trees)
 {
 }
 
-//! @brief Converts back to an `(order, struct_array)` representation.
-//! @details Leaves are peeled in edge-iteration order; validates the proximity
-//! condition. Throws if a tree does not have the expected number of edges.
-inline std::tuple<std::vector<size_t>, TriangularArray<size_t>>
-RVineTrees::to_struct_array() const
+//! @brief The default diagonal policy: the `conditioned[0]` (first) leaf
+//! endpoint of the first leaf edge — flip-free, and shared by `select()`
+//! finalization and the `RVineStructure` round-trip.
+inline RVineTrees::DiagonalPolicy
+RVineTrees::default_diagonal_policy()
 {
-  for (size_t t = 0; t < trunc_lvl_; ++t) {
-    if (trees_[t].size() != d_ - 1 - t) {
-      throw std::runtime_error(
-        "Tree " + std::to_string(t) +
-        " does not have the correct number of edges. Expected " +
-        std::to_string(d_ - 1 - t) + " edges, but got " +
-        std::to_string(trees_[t].size()) + ".");
-    }
-  }
-  auto dec = peel(
-    [](size_t, const std::vector<std::vector<size_t>>& leaf_edges) {
-      return leaf_edges[0][0];
-    },
-    false);
-  return std::make_tuple(std::move(dec.order), std::move(dec.struct_array));
+  return [](size_t, const std::vector<std::vector<size_t>>& leaf_edges) {
+    return leaf_edges[0][0];
+  };
 }
 
 //! @brief Converts back to matrix form, choosing diagonals with a policy and

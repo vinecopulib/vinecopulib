@@ -87,8 +87,8 @@ TEST(rvine_structure, rvine_trees_works)
 
   // trees -> (order, struct_array) round-trip is the identity here
   auto rt = rvt.to_struct_array();
-  EXPECT_EQ(order, std::get<0>(rt));
-  EXPECT_EQ(struct_array, std::get<1>(rt));
+  EXPECT_EQ(order, rt.order);
+  EXPECT_EQ(struct_array, rt.struct_array);
 
   // RVineStructure <-> RVineTrees round-trips
   RVineStructure rvs(order, struct_array);
@@ -105,8 +105,8 @@ TEST(rvine_structure, rvine_trees_works)
   EXPECT_NO_THROW(RVineTrees(order, truncated_array));
   RVineTrees rvt_trunc(order, truncated_array);
   auto rt_trunc = rvt_trunc.to_struct_array();
-  EXPECT_EQ(order, std::get<0>(rt_trunc));
-  EXPECT_EQ(truncated_array, std::get<1>(rt_trunc));
+  EXPECT_EQ(order, rt_trunc.order);
+  EXPECT_EQ(truncated_array, rt_trunc.struct_array);
   EXPECT_EQ(rvs_trunc, RVineStructure(rvt_trunc));
   EXPECT_EQ(rvs_trunc, RVineStructure(rvs_trunc.get_trees()));
 }

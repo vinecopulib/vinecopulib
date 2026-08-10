@@ -124,9 +124,18 @@ public:
 
   const std::vector<Tree>& get_trees() const { return trees_; }
 
-  std::tuple<std::vector<size_t>, TriangularArray<size_t>> to_struct_array()
-    const;
-  Decomposition to_struct_array(const DiagonalPolicy& diagonal_policy) const;
+  //! @brief The default diagonal policy: the `conditioned[0]` (first) leaf
+  //! endpoint of the first leaf edge. It is flip-free — each edge stores its
+  //! pair copula aligned to `conditioned[0]`, so placing that endpoint on the
+  //! diagonal needs no flip — and it is the convention shared by `select()`
+  //! finalization and the `RVineStructure` round-trip.
+  static DiagonalPolicy default_diagonal_policy();
+
+  //! @brief Converts back to matrix form, choosing diagonals with
+  //! `diagonal_policy` (default: `default_diagonal_policy()`) and
+  //! carrying/flipping the pair-copulas.
+  Decomposition to_struct_array(
+    const DiagonalPolicy& diagonal_policy = default_diagonal_policy()) const;
 
   size_t get_dim() const { return d_; }
   size_t get_trunc_lvl() const { return trunc_lvl_; }
