@@ -213,6 +213,13 @@
 
 ### MAINTENANCE, BUILD, AND DOCS
 
+* Make the `Vinecop::simulate_conditional`, `Vinecop::reorient`, and
+  `RVineStructure::get_trees` docstrings wrapper-friendly: describe argument /
+  return shapes in prose (rather than Eigen `.cols()` / `.rows()` / `.replicate`
+  idioms), reference the variable order instead of `get_order()`, drop internal
+  provenance, and document the `get_trees` return format. No API or behavior
+  change; downstream `pyvinecopulib` / `rvinecopulib` render cleaner docs (#703)
+
 * Collapse the internal bivariate-copula evaluation leaves to a single
   parameter-aware interface (removing the duplicated state-based primitives),
   so each family implements its math once (#675)

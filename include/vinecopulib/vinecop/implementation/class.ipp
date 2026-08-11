@@ -399,18 +399,18 @@ Vinecop::check_conditioning_set(const std::vector<size_t>& conditioning_set,
 //! @brief Relabels the vine to an equivalent one whose order tail equals
 //! `conditioning_set`.
 //!
-//! @details This is a value-preserving re-orientation (a port of VineCopulas'
-//! `samplingmatrix`): the fitted model is unchanged (`pdf`/`loglik` invariant),
-//! only its sampling-order representation changes so that the variables in
+//! @details A value-preserving re-orientation: the fitted model is unchanged
+//! (both the density `pdf` and the log-likelihood `loglik` are invariant), only
+//! its sampling-order representation changes, so that the variables in
 //! `conditioning_set` are drawn first and can be conditioned on with
-//! `simulate_conditional()`. It chooses, per tree, which conditioned variable
+//! `simulate_conditional`. It chooses, per tree, which conditioned variable
 //! sits on the matrix diagonal, and flips each pair copula whose stored
 //! orientation no longer matches its new position. Throws if the current
-//! structure admits no sampling order ending in `conditioning_set` (fit with
-//! `FitControlsVinecop::set_conditioning_set()` to guarantee one exists).
+//! structure admits no sampling order ending in `conditioning_set` (fit with a
+//! conditioning set via `FitControlsVinecop` to guarantee one exists).
 //!
-//! @param conditioning_set 1-based variable indices to place at the tail of
-//! `get_order()`.
+//! @param conditioning_set 1-based variable indices to place at the tail of the
+//! variable order.
 inline void
 Vinecop::reorient(const std::vector<size_t>& conditioning_set)
 {
@@ -2701,9 +2701,9 @@ Vinecop::simulate(const size_t n,
 //! @brief Simulates from the conditional distribution of a subset of variables
 //! given fixed values of the remaining variables.
 //!
-//! @details The conditioning variables are the last `k = u_cond.cols()`
-//! variables of the vine order `get_order()` (they are drawn first by the vine
-//! and form a self-contained sub-vine). Each row of `u_cond` is one
+//! @details The conditioning variables are the last `k` variables of the vine
+//! order (they are drawn first by the vine and form a self-contained sub-vine).
+//! Each row of `u_cond` is one
 //! conditioning point; the corresponding output row is drawn from the
 //! remaining variables' distribution conditional on that point. It is
 //! implemented as a Rosenblatt transform of the conditioning variables
@@ -2720,17 +2720,17 @@ Vinecop::simulate(const size_t n,
 //! @param u_cond An \f$ n \times (k + k_d) \f$ matrix of conditioning values,
 //!   where `k` is the number of conditioning variables and `k_d` the number of
 //!   discrete ones among them. Row `j` is the conditioning point for output
-//!   sample `j` (`n` is `u_cond.rows()`). The first `k` columns hold the values
-//!   \f$ F(x) \f$; column `i` corresponds to variable `get_order()[d - k + i]`,
-//!   i.e. the columns correspond, left to right, to the last `k` entries of
-//!   `get_order()`. The next `k_d` columns hold the left-limits \f$ F(x^-) \f$
-//!   of the discrete conditioning variables, in the order those variables
-//!   appear among the first `k` columns. For all-continuous conditioning this
-//!   is simply an \f$ n \times k \f$ matrix. `k` is inferred from the column
-//!   count; supplying only `k` columns when a conditioning variable is discrete
-//!   may be silently reinterpreted as a different `k`. To draw many samples at
-//!   a single conditioning point, pass that point repeated
-//!   (e.g. `u0.replicate(n, 1)`).
+//!   sample `j` (`n` is the number of rows of `u_cond`). The first `k` columns
+//!   hold the values \f$ F(x) \f$; column `i` corresponds to the
+//!   `(d - k + i)`-th variable of the vine order, i.e. the columns correspond,
+//!   left to right, to the last `k` entries of the order. The next `k_d`
+//!   columns hold the left-limits \f$ F(x^-) \f$ of the discrete conditioning
+//!   variables, in the order those variables appear among the first `k`
+//!   columns. For all-continuous conditioning this is simply an
+//!   \f$ n \times k \f$ matrix. `k` is inferred from the column count;
+//!   supplying only `k` columns when a conditioning variable is discrete may be
+//!   silently reinterpreted as a different `k`. To draw many samples at a
+//!   single conditioning point, pass that point repeated over `n` rows.
 //! @param qrng Set to true for quasi-random numbers (over the conditioned
 //!   variables).
 //! @param num_threads The number of threads to use for computations.

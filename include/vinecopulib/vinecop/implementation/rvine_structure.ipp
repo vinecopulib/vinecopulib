@@ -468,6 +468,11 @@ RVineStructure::get_matrix() const
 }
 
 //! @brief Gets the list-of-trees representation of the structure.
+//!
+//! @return The tree-by-tree decomposition: for each tree, a list of edges, each
+//! an `(a, b, conditioning)` triple of 1-based variable labels -- the
+//! conditioned pair `a`, `b` and the (possibly empty) conditioning set. It is
+//! the inverse of the list-of-trees constructor (`from_trees`).
 inline RVineTrees
 RVineStructure::get_trees() const
 {
