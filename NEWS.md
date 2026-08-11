@@ -175,6 +175,18 @@
 
 * Add score and Hessian support (#645)
 
+* Unify the R-vine matrix diagonal convention on the `conditioned[0]` endpoint:
+  `Vinecop::select()` / `from_data()` now finalize with the same
+  (first-leaf-edge, `conditioned[0]`) diagonal policy as
+  `RVineStructure::get_trees()` and the `RVineTrees` default, so structure
+  selection and the `get_trees()` round-trip share one convention. Because each
+  edge stores its pair copula with the first argument on `conditioned[0]`, the
+  finalization is now flip-free — selected pair copulas are placed exactly as
+  fitted, and no longer flipped onto the `conditioned[1]` diagonal. The result
+  is the same vine (identical density, log-likelihood, and per-tree conditioned
+  sets); only the matrix / order representation and the per-edge orientation of
+  the pair copulas in the both-endpoints-are-leaves columns change (#702)
+
 ### BUG FIXES
 
 * Fix out-of-bounds parameter indexing in the per-row bivariate evaluation of
