@@ -13,7 +13,9 @@
 #include <boost/graph/random_spanning_tree.hpp>
 #include <boost/random.hpp>
 #include <cmath>
+#include <functional>
 #include <iostream>
+#include <unordered_set>
 #include <wdm/eigen.hpp>
 
 namespace vinecopulib {
@@ -599,10 +601,18 @@ VinecopSelector::select_edges_mst_kruskal(VineTree& vine_tree)
 {
   std::vector<EdgeIterator> spanning_tree;
   kruskal_minimum_spanning_tree(vine_tree, std::back_inserter(spanning_tree));
-  // Using a hashmap to make the lookup faster
-  // boost::unordered set is used instead of std::set
-  // because std::pair doesn't have a default hash function
-  boost::unordered_set<std::pair<size_t, size_t>> edges_set;
+  // A hash set makes the lookup below O(1); std::pair has no default hash, so
+  // the set carries its own.
+  struct PairHash
+  {
+    size_t operator()(const std::pair<size_t, size_t>& e) const noexcept
+    {
+      const size_t h = std::hash<size_t>()(e.first);
+      return h ^
+             (std::hash<size_t>()(e.second) + 0x9e3779b9 + (h << 6) + (h >> 2));
+    }
+  };
+  std::unordered_set<std::pair<size_t, size_t>, PairHash> edges_set;
   for (auto e : spanning_tree) {
     edges_set.insert(
       { boost::source(e, vine_tree), boost::target(e, vine_tree) });
