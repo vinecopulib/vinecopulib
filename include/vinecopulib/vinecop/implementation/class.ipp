@@ -461,7 +461,7 @@ Vinecop::reorient(const std::vector<size_t>& conditioning_set)
   // the tail check + `RVineStructure` validation below guard the general case.
   auto to_tail =
     [&](size_t col,
-        const std::vector<std::vector<size_t>>& leaf_edges) -> size_t {
+        const std::vector<std::vector<size_t>>& leaf_edges) noexcept -> size_t {
     bool want_cond = (col >= d_ - k);
     for (const auto& options : leaf_edges)
       for (auto v : options)
