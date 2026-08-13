@@ -34,7 +34,7 @@ get_family_name(BicopFamily family)
 //! @brief Converts a string name into a BicopFamily.
 //! @param family The family name.
 inline BicopFamily
-get_family_enum(std::string family)
+get_family_enum(const std::string& family)
 {
   return family_names.right.at(family);
 }

@@ -215,7 +215,7 @@ AbstractBicop::hinv2(const Eigen::MatrixXd& u)
 //! @param u Data matrix.
 //! @param weights Optional weights for each observation.
 inline double
-AbstractBicop::loglik(const Eigen::MatrixXd& u, const Eigen::VectorXd weights)
+AbstractBicop::loglik(const Eigen::MatrixXd& u, const Eigen::VectorXd& weights)
 {
   Eigen::MatrixXd log_pdf = this->pdf(u).array().log();
   if (weights.size() > 0) {

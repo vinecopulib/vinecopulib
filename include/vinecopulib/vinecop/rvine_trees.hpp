@@ -50,14 +50,14 @@ public:
     {
       finalize();
     }
-    Edge(size_t a_arg, size_t b_arg, std::vector<size_t> c_arg, Bicop pc)
+    Edge(size_t a_arg, size_t b_arg, std::vector<size_t> c_arg, const Bicop& pc)
       : a(a_arg)
       , b(b_arg)
       , C(std::move(c_arg))
-      // Bicop's user-declared copy constructor suppresses its implicit move
-      // constructor, so this move is a copy today; keep the intent.
-      // NOLINTNEXTLINE(performance-move-const-arg)
-      , pair_copula(std::move(pc))
+      // By const reference rather than by value + move: Bicop's user-declared
+      // copy constructor suppresses its implicit move, so by-value would copy
+      // twice.
+      , pair_copula(pc)
     {
       finalize();
     }

@@ -223,7 +223,7 @@ protected:
                           const Eigen::MatrixXd& parameters);
 
   double loglik(const Eigen::MatrixXd& u,
-                const Eigen::VectorXd weights = Eigen::VectorXd());
+                const Eigen::VectorXd& weights = Eigen::VectorXd());
 
   // Data members
   BicopFamily family_;

@@ -330,6 +330,12 @@ For any behaviour change:
   annotated, worked around, or left for later behind an explanatory comment.
   When the real fix genuinely belongs in a separate change, say so in the PR
   description and open an issue for it — a comment is not a substitute.
+- **Never merge to `main` without express consent.** Open the pull request, get
+  it green, and stop. A green matrix and an approved plan are not authorization
+  to merge — the maintainers merge, after review. Where changes build on one
+  another, **stack the pull requests** (each branching off the previous one)
+  rather than merging to unblock yourself. This applies equally to pushing tags
+  and to changing repository settings.
 
 ## Coding conventions
 

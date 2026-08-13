@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <utility>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
@@ -108,8 +109,9 @@ inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
                                         const FitControlsVinecop& controls,
                                         std::vector<std::string> var_types)
   : n_(data.rows())
+  // d_ is declared before var_types_, so it is initialized before the move.
   , d_(var_types.size())
-  , var_types_(var_types)
+  , var_types_(std::move(var_types))
   , controls_(controls)
   , pool_(controls_.get_num_threads())
   , trees_(std::vector<VineTree>(1))
@@ -133,7 +135,7 @@ inline VinecopSelector::VinecopSelector(const Eigen::MatrixXd& data,
                                         const RVineStructure& vine_struct,
                                         const FitControlsVinecop& controls,
                                         std::vector<std::string> var_types)
-  : VinecopSelector(data, controls, var_types)
+  : VinecopSelector(data, controls, std::move(var_types))
 {
   vine_struct_ = vine_struct;
   structure_unknown_ = false;

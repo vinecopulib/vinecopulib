@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <utility>
 #include <vinecopulib/misc/tools_serialization.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
@@ -387,7 +388,7 @@ RVineStructure::str() const
 inline RVineStructure
 RVineStructure::simulate(size_t d, bool natural_order, std::vector<int> seeds)
 {
-  auto U = tools_stats::simulate_uniform(d, d, false, seeds);
+  auto U = tools_stats::simulate_uniform(d, d, false, std::move(seeds));
 
   // A is the R-vine matrix we want to create (upper right-triag format).
   // B is a random binary representation that we need to convert.

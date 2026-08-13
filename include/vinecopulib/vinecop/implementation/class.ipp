@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <utility>
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
 #include <vinecopulib/misc/tools_serialization.hpp>
@@ -2586,7 +2587,7 @@ Vinecop::hessian(Eigen::MatrixXd u,
 inline Eigen::MatrixXd
 Vinecop::scores_cov(Eigen::MatrixXd u, bool step_wise, const size_t num_threads)
 {
-  auto s = this->scores(u, step_wise, num_threads);
+  auto s = this->scores(std::move(u), step_wise, num_threads);
   // materialize the centered scores; a lazy expression would be evaluated
   // twice by the product below
   Eigen::MatrixXd sc = s.rowwise() - s.colwise().mean();
@@ -2604,7 +2605,7 @@ Vinecop::scores_cov(Eigen::MatrixXd u,
                     bool step_wise,
                     const size_t num_threads)
 {
-  auto s = this->scores(u, parameters, step_wise, num_threads);
+  auto s = this->scores(std::move(u), parameters, step_wise, num_threads);
   Eigen::MatrixXd sc = s.rowwise() - s.colwise().mean();
   return (sc.adjoint() * sc) / static_cast<double>(s.rows());
 }
@@ -2640,7 +2641,7 @@ inline Eigen::VectorXd
 Vinecop::cdf(const Eigen::MatrixXd& u,
              const size_t N,
              const size_t num_threads,
-             std::vector<int> seeds) const
+             const std::vector<int>& seeds) const
 {
   if (d_ > 21201) {
     std::stringstream message;
@@ -3111,7 +3112,8 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
                                           : hfunc2.col(inverse_order[j]);
     }
     // randomize by weighting left and right limits with independent uniforms
-    auto R = tools_stats::simulate_uniform(u.rows(), d, false, seeds);
+    auto R =
+      tools_stats::simulate_uniform(u.rows(), d, false, std::move(seeds));
     U.leftCols(d) = U.leftCols(d).array() * R.array() +
                     U.rightCols(d).array() * (1 - R.array());
   }

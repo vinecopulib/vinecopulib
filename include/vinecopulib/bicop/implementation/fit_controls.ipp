@@ -6,6 +6,7 @@
 
 #include <stdexcept>
 #include <thread>
+#include <utility>
 #include <vinecopulib/misc/tools_stl.hpp>
 
 //! Tools for bivariate and vine copula modeling
@@ -47,12 +48,12 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
                                           bool allow_rotations,
                                           size_t num_threads)
 {
-  set_family_set(family_set);
-  set_parametric_method(parametric_method);
-  set_nonparametric_method(nonparametric_method);
+  set_family_set(std::move(family_set));
+  set_parametric_method(std::move(parametric_method));
+  set_nonparametric_method(std::move(nonparametric_method));
   set_nonparametric_mult(nonparametric_mult);
   set_nonparametric_grid_size(nonparametric_grid_size);
-  set_selection_criterion(selection_criterion);
+  set_selection_criterion(std::move(selection_criterion));
   set_weights(weights);
   set_preselect_families(preselect_families);
   set_allow_rotations(allow_rotations);
@@ -66,7 +67,7 @@ inline FitControlsBicop::FitControlsBicop(std::vector<BicopFamily> family_set,
 inline FitControlsBicop::FitControlsBicop(std::string parametric_method)
   : FitControlsBicop()
 {
-  set_parametric_method(parametric_method);
+  set_parametric_method(std::move(parametric_method));
 }
 
 //! @brief Instantiates default controls except for the nonparametric method.
@@ -82,7 +83,7 @@ inline FitControlsBicop::FitControlsBicop(std::string nonparametric_method,
                                           size_t nonparametric_grid_size)
   : FitControlsBicop()
 {
-  set_nonparametric_method(nonparametric_method);
+  set_nonparametric_method(std::move(nonparametric_method));
   set_nonparametric_mult(nonparametric_mult);
   set_nonparametric_grid_size(nonparametric_grid_size);
 }
@@ -133,7 +134,7 @@ inline FitControlsBicop::FitControlsBicop(const FitControlsConfig& config)
 inline void
 FitControlsBicop::check_parametric_method(std::string parametric_method)
 {
-  if (!tools_stl::is_member(parametric_method, { "itau", "mle" })) {
+  if (!tools_stl::is_member(std::move(parametric_method), { "itau", "mle" })) {
     throw std::runtime_error("parametric_method should be mle or itau");
   }
 }
@@ -141,7 +142,7 @@ FitControlsBicop::check_parametric_method(std::string parametric_method)
 inline void
 FitControlsBicop::check_nonparametric_method(std::string nonparametric_method)
 {
-  if (!tools_stl::is_member(nonparametric_method,
+  if (!tools_stl::is_member(std::move(nonparametric_method),
                             { "constant", "linear", "quadratic" })) {
     throw std::runtime_error(
       "parametric_method should be constant, linear or quadratic");
@@ -170,7 +171,7 @@ FitControlsBicop::check_selection_criterion(std::string selection_criterion)
   std::vector<std::string> allowed_crits = {
     "loglik", "aic", "bic", "mbic", "mbicv"
   };
-  if (!tools_stl::is_member(selection_criterion, allowed_crits)) {
+  if (!tools_stl::is_member(std::move(selection_criterion), allowed_crits)) {
     throw std::runtime_error("selection_criterion should be 'loglik', 'aic', "
                              "'bic', 'mbic', or 'mbicv'");
   }
@@ -268,7 +269,7 @@ FitControlsBicop::get_allow_rotations() const
 inline void
 FitControlsBicop::set_family_set(std::vector<BicopFamily> family_set)
 {
-  family_set_ = family_set;
+  family_set_ = std::move(family_set);
 }
 
 //! @brief Sets the parametric method.
@@ -276,7 +277,7 @@ inline void
 FitControlsBicop::set_parametric_method(std::string parametric_method)
 {
   check_parametric_method(parametric_method);
-  parametric_method_ = parametric_method;
+  parametric_method_ = std::move(parametric_method);
 }
 
 //! @brief Sets the nonparmetric method.
@@ -284,7 +285,7 @@ inline void
 FitControlsBicop::set_nonparametric_method(std::string nonparametric_method)
 {
   check_nonparametric_method(nonparametric_method);
-  nonparametric_method_ = nonparametric_method;
+  nonparametric_method_ = std::move(nonparametric_method);
 }
 
 //! @brief Sets the nonparametric multiplier.
@@ -308,7 +309,7 @@ inline void
 FitControlsBicop::set_selection_criterion(std::string selection_criterion)
 {
   check_selection_criterion(selection_criterion);
-  selection_criterion_ = selection_criterion;
+  selection_criterion_ = std::move(selection_criterion);
 }
 
 //! @brief Sets the observation weights.

@@ -354,3 +354,9 @@ jobs:
             ':(exclude)include/vinecopulib/misc/tools_stats_sobol.hpp' \
             | /usr/lib/llvm-14/share/clang/clang-tidy-diff.py \
                 -p1 -path build-tidy -clang-tidy-binary clang-tidy-14 -use-color
+
+      # test_all.cpp includes every test header, and so transitively the whole
+      # library: one translation unit covers the tree. Keeps the backlog at zero
+      # rather than only gating new code.
+      - name: Run clang-tidy over the whole library
+        run: clang-tidy-14 -p build-tidy --quiet test/test_all.cpp

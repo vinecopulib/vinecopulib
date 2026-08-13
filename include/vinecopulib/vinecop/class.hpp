@@ -196,7 +196,7 @@ public:
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
                       const size_t N = 1e4,
                       const size_t num_threads = 1,
-                      std::vector<int> seeds = std::vector<int>()) const;
+                      const std::vector<int>& seeds = std::vector<int>()) const;
 
   Eigen::MatrixXd simulate(
     const size_t n,

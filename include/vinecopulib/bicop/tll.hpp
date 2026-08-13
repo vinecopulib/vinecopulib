@@ -27,13 +27,13 @@ private:
   static Eigen::VectorXd gaussian_kernel_2d(const Eigen::MatrixXd& x);
 
   Eigen::Matrix2d select_bandwidth(const Eigen::MatrixXd& x,
-                                   std::string method,
+                                   const std::string& method,
                                    const Eigen::VectorXd& weights);
 
   Eigen::MatrixXd fit_local_likelihood(const Eigen::MatrixXd& x,
                                        const Eigen::MatrixXd& x_data,
                                        const Eigen::Matrix2d& B,
-                                       std::string method,
+                                       const std::string& method,
                                        const Eigen::VectorXd& weights);
 
   double calculate_infl(const size_t& n,
