@@ -124,19 +124,19 @@ TEST(test_tools_stats, seed_works)
 
 TEST(test_tools_stats, dpqnorm_work)
 {
-  auto dnorm_boost = [](Eigen::MatrixXd x) {
+  auto dnorm_boost = [](const Eigen::MatrixXd& x) {
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::pdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
   };
 
-  auto pnorm_boost = [](Eigen::MatrixXd x) {
+  auto pnorm_boost = [](const Eigen::MatrixXd& x) {
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::cdf(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);
   };
 
-  auto qnorm_boost = [](Eigen::MatrixXd x) {
+  auto qnorm_boost = [](const Eigen::MatrixXd& x) {
     boost::math::normal dist;
     auto f = [&dist](double y) { return boost::math::quantile(dist, y); };
     return tools_eigen::unaryExpr_or_nan(x, f);

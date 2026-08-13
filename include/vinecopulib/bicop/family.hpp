@@ -75,7 +75,7 @@ std::string
 get_family_name(BicopFamily family);
 
 BicopFamily
-get_family_enum(std::string family);
+get_family_enum(const std::string& family);
 
 //! Convenience definitions of sets of bivariate copula families
 namespace bicop_families {

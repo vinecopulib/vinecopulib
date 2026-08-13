@@ -58,6 +58,10 @@ public:
 
   Bicop(const Bicop& other);
 
+  // Required, not redundant: the copy constructor above suppresses the implicit
+  // move, and copying deep-clones the family object.
+  Bicop(Bicop&& other) = default;
+
   explicit Bicop(const std::string& filename);
 
   explicit Bicop(const nlohmann::json& input);

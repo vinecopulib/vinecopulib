@@ -7,6 +7,7 @@
 #include <boost/random/seed_seq.hpp>
 #include <random>
 #include <stdexcept>
+#include <utility>
 #include <vinecopulib/misc/tools_stl.hpp>
 
 //! @file vinecop/implementation/fit_controls.ipp
@@ -98,12 +99,12 @@ inline FitControlsVinecop::FitControlsVinecop(
   std::string tree_algorithm,
   bool allow_rotations,
   std::vector<int> seeds)
-  : FitControlsBicop(family_set,
-                     parametric_method,
-                     nonparametric_method,
+  : FitControlsBicop(std::move(family_set),
+                     std::move(parametric_method),
+                     std::move(nonparametric_method),
                      nonparametric_mult,
                      nonparametric_grid_size,
-                     selection_criterion,
+                     std::move(selection_criterion),
                      weights,
                      psi0,
                      preselect_families,
@@ -111,14 +112,14 @@ inline FitControlsVinecop::FitControlsVinecop(
                      num_threads)
 {
   set_trunc_lvl(trunc_lvl);
-  set_tree_criterion(tree_criterion);
+  set_tree_criterion(std::move(tree_criterion));
   set_threshold(threshold);
   set_select_trunc_lvl(select_trunc_lvl);
   set_select_threshold(select_threshold);
   set_select_families(select_families);
   set_show_trace(show_trace);
-  set_tree_algorithm(tree_algorithm);
-  set_seeds(seeds);
+  set_tree_algorithm(std::move(tree_algorithm));
+  set_seeds(std::move(seeds));
 }
 
 //! @brief Instantiates custom controls for fitting vine copula models.
@@ -163,14 +164,14 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
   : FitControlsBicop(controls)
 {
   set_trunc_lvl(trunc_lvl);
-  set_tree_criterion(tree_criterion);
+  set_tree_criterion(std::move(tree_criterion));
   set_threshold(threshold);
   set_select_trunc_lvl(select_trunc_lvl);
   set_select_threshold(select_threshold);
   set_select_families(select_families);
   set_show_trace(show_trace);
-  set_tree_algorithm(tree_algorithm);
-  set_seeds(seeds);
+  set_tree_algorithm(std::move(tree_algorithm));
+  set_seeds(std::move(seeds));
 }
 
 //! @brief Instantiates the controls from a configuration object.
@@ -220,7 +221,8 @@ inline void
 FitControlsVinecop::check_tree_criterion(std::string tree_criterion)
 {
   if (!tools_stl::is_member(
-        tree_criterion, { "tau", "rho", "joe", "hoeffd", "mcor", "custom" })) {
+        std::move(tree_criterion),
+        { "tau", "rho", "joe", "hoeffd", "mcor", "custom" })) {
     throw std::runtime_error("tree_criterion must be one of "
                              "'tau', 'rho', 'hoeffd', 'mcor', 'joe', or "
                              "'custom'");
@@ -313,7 +315,7 @@ inline void
 FitControlsVinecop::set_tree_criterion(std::string tree_criterion)
 {
   check_tree_criterion(tree_criterion);
-  tree_criterion_ = tree_criterion;
+  tree_criterion_ = std::move(tree_criterion);
 }
 
 //! @brief Gets the custom criterion function for tree selection.
@@ -328,7 +330,7 @@ inline void
 FitControlsVinecop::set_tree_criterion_function(
   TreeCriterionFunction tree_criterion_function)
 {
-  tree_criterion_function_ = tree_criterion_function;
+  tree_criterion_function_ = std::move(tree_criterion_function);
 }
 
 //! @brief Gets the threshold parameter.
@@ -393,7 +395,7 @@ inline void
 FitControlsVinecop::set_conditioning_set(std::vector<size_t> conditioning_set)
 {
   check_conditioning_set(conditioning_set);
-  conditioning_set_ = conditioning_set;
+  conditioning_set_ = std::move(conditioning_set);
 }
 
 //! @brief Gets the random number generator.
@@ -434,7 +436,7 @@ FitControlsVinecop::get_fit_controls_bicop() const
 
 //! @brief Sets the fit controls for bivariate fitting.
 inline void
-FitControlsVinecop::set_fit_controls_bicop(FitControlsBicop controls)
+FitControlsVinecop::set_fit_controls_bicop(const FitControlsBicop& controls)
 {
   set_family_set(controls.get_family_set());
   set_parametric_method(controls.get_parametric_method());
@@ -458,14 +460,14 @@ FitControlsVinecop::set_tree_algorithm(std::string tree_algorithm)
       "tree_algorithm must be one of 'mst_prim', 'mst_kruskal', "
       "'random_weighted', or 'random_unweighted'");
   }
-  tree_algorithm_ = tree_algorithm;
+  tree_algorithm_ = std::move(tree_algorithm);
 }
 
 //! @brief Sets the random seeds for the random number generator.
 inline void
 FitControlsVinecop::set_seeds(std::vector<int> seeds)
 {
-  if (seeds.size() == 0) {
+  if (seeds.empty()) {
     // no seeds provided, seed randomly
     std::random_device rd{};
     seeds = std::vector<int>(20);
@@ -518,7 +520,7 @@ FitControlsVinecop::str() const
       controls_str << v << " ";
   }
   controls_str << std::endl;
-  return controls_str.str().c_str();
+  return controls_str.str();
 }
 
 }

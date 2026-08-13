@@ -20,7 +20,7 @@ namespace tools_interpolation {
 class InterpolationGrid
 {
 public:
-  InterpolationGrid() {}
+  InterpolationGrid() = default;
 
   InterpolationGrid(const Eigen::VectorXd& grid_points,
                     const Eigen::MatrixXd& values,

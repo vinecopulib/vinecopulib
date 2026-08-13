@@ -223,7 +223,7 @@ protected:
                           const Eigen::MatrixXd& parameters);
 
   double loglik(const Eigen::MatrixXd& u,
-                const Eigen::VectorXd weights = Eigen::VectorXd());
+                const Eigen::VectorXd& weights = Eigen::VectorXd());
 
   // Data members
   BicopFamily family_;
@@ -232,7 +232,7 @@ protected:
 };
 
 //! A shared pointer to an object of class AbstracBicop.
-typedef std::shared_ptr<AbstractBicop> BicopPtr;
+using BicopPtr = std::shared_ptr<AbstractBicop>;
 }
 
 #include <vinecopulib/bicop/implementation/abstract.ipp>

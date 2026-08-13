@@ -88,12 +88,27 @@ runs:
     - name: Install Eigen ${{inputs.eigen_version}}
       if: inputs.eigen == 'true'
       run: |
+          # Both sources are flaky enough to have failed CI on a 503, so retry.
+          retry() {
+            for attempt in 1 2 3; do
+              "$@" && return 0
+              echo "attempt $attempt failed; retrying in $((attempt * 15))s"
+              sleep $((attempt * 15))
+            done
+            return 1
+          }
+          clone_eigen() {
+            # git clone refuses a non-empty destination, so start clean.
+            rm -rf "${{runner.temp}}/eigen"
+            git clone --depth 1 --branch ${{inputs.eigen_version}} \
+              https://gitlab.com/libeigen/eigen.git/ "${{runner.temp}}/eigen"
+          }
           if [ "${{ inputs.os }}" != "windows-latest" ]; then
-            git clone --depth 1 --branch ${{inputs.eigen_version}} https://gitlab.com/libeigen/eigen.git/ ${{runner.temp}}/eigen
+            retry clone_eigen
             cmake ${{runner.temp}}/eigen -B ${{runner.temp}}/eigen/build -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
             make install -C ${{runner.temp}}/eigen/build
           else
-            choco install eigen --version="${{inputs.eigen_version}}"
+            retry choco install eigen --version="${{inputs.eigen_version}}"
           fi
       shell: bash
 

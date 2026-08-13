@@ -145,7 +145,7 @@ public:
 
   void set_select_families(bool select_families);
 
-  void set_fit_controls_bicop(FitControlsBicop controls);
+  void set_fit_controls_bicop(const FitControlsBicop& controls);
 
   void set_tree_algorithm(std::string tree_algorithm);
 

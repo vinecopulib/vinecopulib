@@ -7,6 +7,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
+#include <limits>
 #include <vinecopulib.hpp>
 
 namespace test_bicop_select {
@@ -69,5 +70,21 @@ TEST(bicop_select, fit_stats_are_correct)
   EXPECT_NEAR(cop.get_bic(), cop.bic(), 1e-10);
   EXPECT_NEAR(cop.get_mbic(), cop.mbic(u), 1e-10);
   EXPECT_NEAR(cop.get_mbic(), cop.mbic(), 1e-10);
+}
+
+TEST(bicop_select, mbic_and_bic_agree_on_sample_size_with_nans)
+{
+  Bicop cop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, -0.5));
+  auto u = cop.simulate(30, false, { 1 });
+  cop.select(u);
+
+  // Append rows containing NaN; both criteria must count complete cases only,
+  // so appending incomplete observations must not change either penalty.
+  Eigen::MatrixXd u_nan(u.rows() + 3, 2);
+  u_nan << u,
+    Eigen::MatrixXd::Constant(3, 2, std::numeric_limits<double>::quiet_NaN());
+
+  EXPECT_NEAR(cop.bic(u_nan), cop.bic(u), 1e-10);
+  EXPECT_NEAR(cop.mbic(u_nan), cop.mbic(u), 1e-10);
 }
 }
