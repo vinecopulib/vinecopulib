@@ -54,7 +54,7 @@ natural-order normalization, and how truncation is represented.
 @note The representation changed in release 1.0.0: `get_matrix()`,
 `get_order()`, `get_struct_array()` and the orientation of individual pair
 copulas differ from earlier releases for the same model. Densities and
-log-likelihoods are unaffected; see the release notes in NEWS.md.
+log-likelihoods are unaffected. See @ref migrating-to-1-0.
 
 `RVineStructure` has two order-determined specializations, `CVineStructure` and
 `DVineStructure`, and can also generate random structures.

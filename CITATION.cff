@@ -28,7 +28,7 @@ url: https://vinecopulib.github.io/vinecopulib/
 # Zenodo reads this file in preference to .zenodo.json. Keep `version` and
 # `date-released` in step with CMakeLists.txt at release time;
 # scripts/check_version.py enforces it.
-version: 0.8.0
+version: 1.0.0
 date-released: '2026-06-12'
 identifiers:
   - type: doi
