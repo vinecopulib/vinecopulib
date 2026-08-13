@@ -317,12 +317,20 @@ jobs:
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: false
           lcov: false
+      # Same shape as every other job: export BOOST_ROOT so find_package picks
+      # it up via CMP0074. Passing -DBoost_INCLUDE_DIR on the command line does
+      # not work -- findDependencies.cmake tests the *plural*
+      # Boost_INCLUDE_DIRS, so the guard does not fire and Boost::boost never
+      # gets defined.
+      - name: Set environment variables
+        run: |
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
+          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
       - name: Build the documentation
         run: |
           mkdir build-docs && cd build-docs
-          cmake .. -DBUILD_DOC=ON -DBUILD_TESTING=OFF \
-            -DBoost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include \
-            -DEIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3
+          cmake .. -DBUILD_DOC=ON -DBUILD_TESTING=OFF
           make doc 2>&1 | tee doxygen.log
       - name: Summarize Doxygen warnings
         if: always()
@@ -362,12 +370,15 @@ jobs:
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: true
+      - name: Set environment variables
+        run: |
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
+          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
       - name: Configure to generate compile_commands.json
         run: |
           mkdir build-tidy && cd build-tidy
-          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-            -DBoost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include \
-            -DEIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           # FetchContent puts googletest translation units in the database; they
           # are not ours to lint.
           jq '[.[] | select(.file | test("_deps/") | not)]' compile_commands.json > filtered.json

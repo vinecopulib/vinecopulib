@@ -45,6 +45,16 @@ jobs:
           R: false
           lcov: false
 
+      # BOOST_ROOT has to be exported rather than passed as -DBoost_INCLUDE_DIR:
+      # findDependencies.cmake guards on the *plural* Boost_INCLUDE_DIRS, so the
+      # singular command-line variable does not satisfy it and Boost::boost is
+      # never defined.
+      - name: Set environment variables
+        run: |
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
+          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
+
       # A manual build rather than autobuild: the precompiled configuration is
       # what turns the .ipp tree into real translation units, so it is the only
       # mode in which CodeQL actually sees the implementation code.
@@ -53,9 +63,7 @@ jobs:
           mkdir build-codeql && cd build-codeql
           cmake .. -DCMAKE_BUILD_TYPE=Release \
             -DVINECOPULIB_PRECOMPILED=ON \
-            -DBUILD_TESTING=OFF \
-            -DBoost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include \
-            -DEIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3
+            -DBUILD_TESTING=OFF
           make -j"$(nproc)"
 
       - name: Perform CodeQL analysis
