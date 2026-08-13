@@ -33,15 +33,15 @@ main()
   Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> mat(3, 3);
   mat << 1, 1, 1, 2, 2, 0, 3, 0, 0;
 
-  // instantiate a custom model using pair_copulas and
-  Vinecop custom_model(pair_copulas, mat);
+  // instantiate a custom model from the structure matrix and the pair copulas
+  Vinecop custom_model(mat, pair_copulas);
 
   // simulate data
   Eigen::MatrixXd data = custom_model.simulate(1e3);
 
-  // instantiate a D-vine and select the families
+  // instantiate a D-vine and fit the pair copulas on its fixed structure
   Vinecop fitted(d);
-  fitted.select_families(data);
+  fitted.fit(data);
 
   // alternatively, instantiate a new object by
   // selecting the structure along with the families

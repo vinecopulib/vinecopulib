@@ -1,10 +1,7 @@
 name: Release
 
-# Releases used to be a plain merge commit on main plus a hand-pushed tag, with
-# nothing verifying the two agreed. The 0.8.0 cycle bumped every version string
-# and dated the NEWS heading but never pushed a tag, and nobody noticed for
-# months. This workflow makes the tag the trigger and refuses to publish unless
-# the declared version, the tag, and the changelog all match.
+# The tag is the trigger. Refuses to publish unless the declared version, the
+# tag, and the NEWS.md heading all agree. See docs/releasing.md.
 
 on:
   push:
@@ -45,8 +42,7 @@ jobs:
 
       - name: Extract this version's NEWS.md section
         run: |
-          # Everything between the first '## vinecopulib ...' heading and the
-          # next one becomes the release body.
+          # The first NEWS.md section becomes the release body.
           awk '/^## vinecopulib /{n++; if (n>1) exit} n==1' NEWS.md \
             | tail -n +2 > release-notes.md
           if [ ! -s release-notes.md ]; then
@@ -62,8 +58,7 @@ jobs:
           name: release-notes
           path: release-notes.md
 
-  # Re-run the full matrix against the exact tagged tree. A tag that cannot
-  # build is not a release.
+  # A tag that cannot build is not a release.
   build:
     name: re-run CI on the tag
     needs: verify

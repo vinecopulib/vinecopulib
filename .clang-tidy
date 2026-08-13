@@ -1,20 +1,13 @@
-# clang-tidy 14 (matching the clang-format version pinned in CI).
+# clang-tidy 14, matching the clang-format version pinned in CI.
 #
-# The previous configuration enabled eight wildcard groups with
-# `WarningsAsErrors: ''` and drove a CI job that was commented out, so nothing
-# was ever enforced. Wholesale `cppcoreguidelines-*` + `hicpp-*` +
-# `readability-*` on an Eigen-heavy numerical codebase yields thousands of
-# findings (magic numbers, identifier length, pro-bounds, signed bitwise), which
-# is precisely why it was never turned on.
+# A curated list, not wildcard groups: every check here is one we are willing to
+# fail a pull request over, and WarningsAsErrors is '*' so there is no
+# reported-but-tolerated tier. The CI job runs on the pull-request diff, so a new
+# check does not require fixing the whole tree at once.
 #
-# This is a curated list instead: every check below is one we are willing to fail
-# a pull request over. The CI job runs it on the pull-request diff only (see
-# .github/workflows/continuous_integration.yml), so adding a check does not
-# require fixing the whole tree at once.
-#
-# To propose a new check: add it here, run
+# To propose a check: add it, run
 #   run-clang-tidy-14 -p <build-dir> -checks='-*,<the-new-check>' include/
-# and either fix the findings in the same pull request or leave the check out.
+# and either fix the findings in the same pull request or leave it out.
 
 Checks: >
   -*,
@@ -90,18 +83,11 @@ Checks: >
   readability-static-definition-in-anonymous-namespace,
   readability-string-compare
 
-# '*' means "every check enabled above is an error". Spelling the list out twice
-# would just let the two copies drift; anything worth reporting here is worth
-# failing on, so there is deliberately no reported-but-tolerated tier.
 WarningsAsErrors: '*'
 
-# clang-tidy matches this against each header's *absolute* path, so the previous
-# '^(/)?(include|test|examples)/' could never match anything under /home/... and
-# every header diagnostic was silently dropped. Anchor on the repository
-# subdirectories instead. The vendored nlohmann_json.hpp and the generated
-# tools_stats_sobol.hpp / tools_stats_ghalton.hpp tables are excluded by the
-# alternation rather than by a second regex, because
-# ExcludeHeaderFilterRegex only exists in clang-tidy 18 and later.
+# Matched against each header's *absolute* path, so this must not be anchored at
+# the repository root. The vendored and generated headers are left out via the
+# alternation; ExcludeHeaderFilterRegex needs clang-tidy 18.
 HeaderFilterRegex: '.*/(include/vinecopulib/(bicop|vinecop)|include/vinecopulib/misc/(tools_(eigen|stl|stats|serialization|interpolation|optimization|transforms|integration|thread|interface|batch|constants|optional)|triangular_array|fit_controls)|test/src_test|benchmarks/src)'
 
 FormatStyle: file

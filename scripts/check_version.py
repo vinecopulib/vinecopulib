@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """Check that the version is stated consistently everywhere it appears.
 
-The version of vinecopulib lives in several hand-maintained places. Nothing
-used to verify that they agree, and the 0.8.0 cycle showed what that costs:
-``CMakeLists.txt``, ``version.hpp``, both Doxyfiles and ``NEWS.md`` were all
-bumped to 0.8.0 and dated, but no ``v0.8.0`` tag was ever pushed, and the tree
-sat in that half-released state for months.
+The version lives in several hand-maintained places: ``CMakeLists.txt``,
+``version.hpp``, the Doxyfiles, ``NEWS.md``, ``CITATION.cff`` and
+``.zenodo.json``. This checks that they agree.
 
 Run with no arguments to check internal consistency (the ``version`` CI job on
 every pull request)::
@@ -95,12 +93,8 @@ def check_version_header(failures: Failures, major: int, minor: int, patch: int)
         return
     literal = match.group(1)  # type: ignore[union-attr]
 
-    # A leading zero makes this an octal literal, so it either decodes to the
-    # wrong number (0.7.3 shipped as 000703, i.e. octal 451) or does not compile
-    # at all (0.8.0 shipped as 000800, and 8 is not a valid octal digit -- the
-    # documented `VINECOPULIB_VERSION / 100 % 1000` arithmetic in version.hpp is
-    # a hard compile error the moment anyone actually uses it). Require a plain
-    # decimal literal so the documented contract works.
+    # A leading zero would make this octal, breaking the arithmetic that
+    # version.hpp documents.
     is_decimal = re.fullmatch(r"0|[1-9]\d*", literal) is not None
     failures.check(
         is_decimal,
@@ -132,8 +126,6 @@ def check_doxyfiles(failures: Failures, version: str) -> None:
     for relative_path in ("docs/Doxyfile", "docs/Doxyfile.in"):
         text = read(relative_path)
         if text is None:
-            # docs/Doxyfile is deliberately removed once the two are collapsed
-            # into a single template; absence is not a failure.
             continue
         match = re.search(r"^\s*PROJECT_NUMBER\s*=\s*(.*)$", text, re.MULTILINE)
         if match is None:
@@ -141,7 +133,7 @@ def check_doxyfiles(failures: Failures, version: str) -> None:
             continue
         found = match.group(1).strip()
         if found.startswith("@") and found.endswith("@"):
-            # Substituted by CMake from PROJECT_VERSION; nothing to compare.
+            # Substituted by CMake from PROJECT_VERSION.
             print(f"  [ok  ] {relative_path}: PROJECT_NUMBER templated ({found})")
             continue
         failures.check(
@@ -175,7 +167,6 @@ def parse_news_heading(failures: Failures) -> tuple[str, str] | None:
 def check_citation(failures: Failures, version: str) -> None:
     text = read("CITATION.cff")
     if text is None:
-        # Added later in the release; absence is not a failure.
         return
     match = re.search(r"^version:\s*['\"]?([^'\"\s]+)", text, re.MULTILINE)
     if match is None:
@@ -193,8 +184,7 @@ def check_zenodo(failures: Failures, version: str) -> None:
         return
     match = re.search(r'"version"\s*:\s*"([^"]+)"', text)
     if match is None:
-        # .zenodo.json has no version field today; Zenodo falls back to the
-        # release tag, so this is optional rather than wrong.
+        # Optional: Zenodo falls back to the release tag.
         return
     failures.check(
         match.group(1) == version,

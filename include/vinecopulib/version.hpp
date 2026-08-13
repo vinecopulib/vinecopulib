@@ -16,10 +16,8 @@
 //  VINECOPULIB_VERSION / 100 % 1000 is the minor version
 //  VINECOPULIB_VERSION / 100000 is the major version
 //
-//  This must be a plain decimal literal with no leading zeros: a leading zero
-//  makes it octal, which either decodes to the wrong version or -- for any
-//  digit above 7 -- is not a valid literal at all, turning the arithmetic
-//  above into a compile error. `scripts/check_version.py` enforces this.
+//  Must be a plain decimal literal: a leading zero makes it octal and breaks
+//  the arithmetic above. Enforced by scripts/check_version.py.
 
 #define VINECOPULIB_VERSION 800
 

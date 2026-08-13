@@ -1,13 +1,8 @@
 name: Release drift
 
-# The 0.8.0 failure mode, caught on a schedule: every version string in the tree
-# said 0.8.0 and the NEWS heading carried a real date, but no v0.8.0 tag was ever
-# pushed. Nothing was watching, so the repo sat half-released for months.
-#
-# This has to be scheduled rather than push-triggered: between the release PR
-# merging and the tag being pushed, the tree legitimately sits in the
-# dated-but-untagged state for a few minutes. A weekly check means a forgotten
-# tag surfaces within a week instead of never.
+# Catches a version that NEWS.md declares released but that was never tagged.
+# Scheduled rather than push-triggered, because the tree legitimately sits
+# dated-but-untagged between the release PR merging and the tag being pushed.
 
 on:
   schedule:
