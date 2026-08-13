@@ -440,15 +440,24 @@ Bicop::hinv2_continuous(const Eigen::MatrixXd& u, bool flipped) const
   return hi;
 }
 
-inline BicopView::BicopView(const Bicop& bicop, bool flipped)
+inline BicopView::BicopView(const Bicop& bicop, bool flipped, bool continuous)
   : bicop_(&bicop)
   , flipped_(flipped)
+  , continuous_(continuous)
 {
+}
+
+inline BicopView
+BicopView::as_continuous() const
+{
+  return BicopView(*bicop_, flipped_, true);
 }
 
 inline std::vector<std::string>
 BicopView::get_var_types() const
 {
+  if (continuous_)
+    return { "c", "c" };
   auto var_types = bicop_->get_var_types();
   if (flipped_)
     std::swap(var_types[0], var_types[1]);
@@ -458,25 +467,25 @@ BicopView::get_var_types() const
 inline Eigen::VectorXd
 BicopView::hfunc1(const Eigen::MatrixXd& u) const
 {
+  if (continuous_)
+    return bicop_->hfunc1_continuous(u, flipped_);
   return flipped_ ? bicop_->hfunc2(swap_arguments(u)) : bicop_->hfunc1(u);
 }
 
 inline Eigen::VectorXd
 BicopView::hfunc2(const Eigen::MatrixXd& u) const
 {
+  if (continuous_)
+    return bicop_->hfunc1_continuous(swap_arguments(u), !flipped_);
   return flipped_ ? bicop_->hfunc1(swap_arguments(u)) : bicop_->hfunc2(u);
 }
 
 inline Eigen::VectorXd
-BicopView::hfunc1_continuous(const Eigen::MatrixXd& u) const
+BicopView::hinv2(const Eigen::MatrixXd& u) const
 {
-  return bicop_->hfunc1_continuous(u, flipped_);
-}
-
-inline Eigen::VectorXd
-BicopView::hinv2_continuous(const Eigen::MatrixXd& u) const
-{
-  return bicop_->hinv2_continuous(u, flipped_);
+  if (continuous_)
+    return bicop_->hinv2_continuous(u, flipped_);
+  return flipped_ ? bicop_->hinv1(swap_arguments(u)) : bicop_->hinv2(u);
 }
 
 inline Eigen::MatrixXd

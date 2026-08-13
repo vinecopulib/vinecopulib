@@ -89,6 +89,53 @@ TEST(rvine_structure, rvine_trees_works)
   auto rt = rvt.to_struct_array();
   EXPECT_EQ(order, rt.order);
   EXPECT_EQ(struct_array, rt.struct_array);
+  auto map = rvt.to_struct_array_map();
+  EXPECT_TRUE(map.pair_copulas.empty());
+  for (size_t tree = 0; tree < struct_array.get_trunc_lvl(); ++tree) {
+    for (size_t edge = 0; edge < order.size() - 1 - tree; ++edge) {
+      auto location = map.pair_copula_locations(tree, edge);
+      EXPECT_EQ(location.tree, tree);
+      EXPECT_EQ(location.edge, edge);
+      EXPECT_FALSE(location.flipped);
+    }
+  }
+
+  // The source map reconstructs exactly the pair copulas carried and flipped
+  // by the materializing path, including under a different diagonal policy.
+  std::vector<std::vector<Bicop>> pair_copulas(order.size() - 1);
+  for (size_t tree = 0; tree < order.size() - 1; ++tree) {
+    pair_copulas[tree].resize(order.size() - 1 - tree);
+    for (size_t edge = 0; edge < pair_copulas[tree].size(); ++edge) {
+      Eigen::VectorXd parameters(3);
+      parameters << 0.2 + 0.01 * edge, 0.8 - 0.01 * tree, 2.0;
+      pair_copulas[tree][edge] = Bicop(BicopFamily::tawn, 0, parameters);
+    }
+  }
+  auto reverse_policy = [](size_t,
+                           const std::vector<std::vector<size_t>>& leaves) {
+    return leaves.back().back();
+  };
+  auto carried = RVineTrees(order, struct_array, pair_copulas)
+                   .to_struct_array(reverse_policy);
+  auto mapped = rvt.to_struct_array_map(reverse_policy);
+  bool has_flip = false;
+  for (size_t tree = 0; tree < struct_array.get_trunc_lvl(); ++tree) {
+    for (size_t edge = 0; edge < order.size() - 1 - tree; ++edge) {
+      auto location = mapped.pair_copula_locations(tree, edge);
+      auto reconstructed = pair_copulas[location.tree][location.edge];
+      if (location.flipped) {
+        reconstructed.flip();
+        has_flip = true;
+      }
+      EXPECT_EQ(reconstructed.get_family(),
+                carried.pair_copulas[tree][edge].get_family());
+      EXPECT_EQ(reconstructed.get_rotation(),
+                carried.pair_copulas[tree][edge].get_rotation());
+      EXPECT_TRUE(reconstructed.get_parameters().isApprox(
+        carried.pair_copulas[tree][edge].get_parameters()));
+    }
+  }
+  EXPECT_TRUE(has_flip);
 
   // RVineStructure <-> RVineTrees round-trips
   RVineStructure rvs(order, struct_array);

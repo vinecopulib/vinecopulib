@@ -420,19 +420,22 @@ private:
 class BicopView
 {
 public:
-  explicit BicopView(const Bicop& bicop, bool flipped = false);
+  explicit BicopView(const Bicop& bicop,
+                     bool flipped = false,
+                     bool continuous = false);
 
+  BicopView as_continuous() const;
   std::vector<std::string> get_var_types() const;
   Eigen::VectorXd hfunc1(const Eigen::MatrixXd& u) const;
   Eigen::VectorXd hfunc2(const Eigen::MatrixXd& u) const;
-  Eigen::VectorXd hfunc1_continuous(const Eigen::MatrixXd& u) const;
-  Eigen::VectorXd hinv2_continuous(const Eigen::MatrixXd& u) const;
+  Eigen::VectorXd hinv2(const Eigen::MatrixXd& u) const;
 
 private:
   static Eigen::MatrixXd swap_arguments(const Eigen::MatrixXd& u);
 
   const Bicop* bicop_;
   bool flipped_;
+  bool continuous_;
 };
 //! @endcond
 }

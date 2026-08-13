@@ -452,6 +452,31 @@ TEST_F(VinecopTest, inverse_rosenblatt_does_not_mutate_discrete_model)
                         1e-12));
 }
 
+TEST_F(VinecopTest, bicop_view_as_continuous_matches_materialized_copula)
+{
+  Eigen::VectorXd parameters(3);
+  parameters << 0.3, 0.8, 2.0;
+  auto u = tools_stats::simulate_uniform(40, 2, false, { 37 });
+
+  for (int rotation : { 0, 90, 180, 270 }) {
+    Bicop bicop(BicopFamily::tawn, rotation, parameters, { "d", "c" });
+    for (bool flipped : { false, true }) {
+      Bicop materialized = bicop;
+      if (flipped)
+        materialized.flip();
+      materialized = materialized.as_continuous();
+      auto view = BicopView(bicop, flipped).as_continuous();
+
+      EXPECT_EQ(view.get_var_types(), std::vector<std::string>({ "c", "c" }));
+      EXPECT_TRUE(
+        all_close(view.hfunc1(u), materialized.hfunc1(u), 1e-10, 1e-10));
+      EXPECT_TRUE(
+        all_close(view.hfunc2(u), materialized.hfunc2(u), 1e-10, 1e-10));
+      EXPECT_TRUE(all_close(view.hinv2(u), materialized.hinv2(u), 1e-8, 1e-8));
+    }
+  }
+}
+
 TEST_F(VinecopTest, inverse_rosenblatt_is_safe_for_concurrent_calls)
 {
   const size_t d = 5;
@@ -657,6 +682,7 @@ TEST_F(VinecopTest, reoriented_transforms_validate_conditioning_set)
   EXPECT_ANY_THROW(model.rosenblatt(u, std::vector<size_t>{}, 1, false));
   EXPECT_ANY_THROW(model.inverse_rosenblatt(u, std::vector<size_t>{ 2, 2 }));
   EXPECT_ANY_THROW(model.rosenblatt(u, std::vector<size_t>{ 5 }, 1, false));
+  EXPECT_ANY_THROW(model.inverse_rosenblatt(u, std::vector<size_t>{ 1, 3 }));
 
   model.truncate(2);
   EXPECT_ANY_THROW(model.inverse_rosenblatt(u, std::vector<size_t>{ 1 }));
@@ -941,6 +967,7 @@ TEST_F(VinecopTest, reorient_preserves_model)
     vc.select(data, c);
   }
   auto pdf0 = vc.pdf(data);
+  auto w = tools_stats::simulate_uniform(50, d, false, { 71 });
 
   size_t feasible = 0;
   std::vector<std::vector<size_t>> candidates{
@@ -957,6 +984,12 @@ TEST_F(VinecopTest, reorient_preserves_model)
     ++feasible;
     // reorient is a pure relabeling: the density is unchanged (up to fp)
     EXPECT_TRUE(all_close(vr.pdf(data), pdf0, 1e-6, 1e-6));
+    EXPECT_TRUE(all_close(
+      vc.inverse_rosenblatt(w, B), vr.inverse_rosenblatt(w), 1e-10, 1e-10));
+    EXPECT_TRUE(all_close(vc.rosenblatt(data, B, 1, false),
+                          vr.rosenblatt(data, 1, false),
+                          1e-10,
+                          1e-10));
     // the conditioning set is now the tail of the order
     auto o = vr.get_order();
     std::vector<size_t> tail(o.end() - static_cast<ptrdiff_t>(B.size()),
