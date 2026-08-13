@@ -14,7 +14,7 @@ across PRs.
 
 ## Project overview
 
-`vinecopulib` is a **header-only C++14 library** for vine-copula and
+`vinecopulib` is a **header-only C++17 library** for vine-copula and
 bivariate-copula inference, built on
 [Eigen](https://eigen.tuxfamily.org/). It provides high-performance
 implementations of the core features of the
@@ -103,7 +103,7 @@ Three design principles inform the rest of this file:
 ## API stability & releases
 
 `vinecopulib` follows **semantic versioning** (`MAJOR.MINOR.PATCH`;
-currently 0.7.3). Because the R and Python interfaces pin a tag of this
+currently 0.8.0). Because the R and Python interfaces pin a tag of this
 repo, public-API changes are real breaks for downstream users.
 
 - **Record every change in [NEWS.md](NEWS.md).** Each release has
@@ -112,9 +112,9 @@ repo, public-API changes are real breaks for downstream users.
   There is no separate `CHANGELOG.md`.
 - **Bump both version macros in
   [version.hpp](include/vinecopulib/version.hpp)** on release:
-  `VINECOPULIB_VERSION` (encoded integer, `000703` for 0.7.3 —
+  `VINECOPULIB_VERSION` (encoded integer, `800` for 0.8.0 —
   `major*100000 + minor*100 + patch`) and `VINECOPULIB_LIB_VERSION`
-  (string, `"0_7_3"`).
+  (string, `"x_y[_z]"` — currently `"0_8"`).
 - **Prefer deprecation over a hard break.** The `DEPRECATED` macro
   (defined in
   [vinecop/fit_controls.hpp](include/vinecopulib/vinecop/fit_controls.hpp))
@@ -133,7 +133,7 @@ repo, public-API changes are real breaks for downstream users.
 vinecopulib/
   AGENTS.md, CLAUDE.md           # this file + thin pointer (`@AGENTS.md`)
   README.md, NEWS.md, LICENSE, .zenodo.json
-  CMakeLists.txt                 # 19-line entry point; includes the cmake/ modules
+  CMakeLists.txt                 # 24-line entry point; includes the cmake/ modules
   .clang-format, .clang-tidy     # Mozilla style; advisory tidy checks
   codecov.yml, .codacy.yml       # coverage / static-analysis service config
 
@@ -165,7 +165,7 @@ vinecopulib/
         tools_interpolation.hpp  # InterpolationGrid (TLL)
         tools_serialization.hpp, nlohmann_json.hpp # JSON
         tools_thread.hpp, tools_interface.hpp, tools_batch.hpp  # parallelism
-        tools_integration.hpp, tools_constants.hpp, tools_optional.hpp
+        tools_integration.hpp, tools_constants.hpp
         triangular_array.hpp     # TriangularArray<T> (vine container)
         fit_controls.hpp         # FitControlsConfig (optional-field builder)
         implementation/*.ipp
@@ -187,7 +187,7 @@ There is **no** `src/` of library `.cpp` files, **no** `lib/` /
 
 ## Build & tooling
 
-CMake **≥ 3.10**, C++ **14**. The 19-line root
+CMake **≥ 3.14**, C++ **17**. The 24-line root
 [CMakeLists.txt](CMakeLists.txt) sets the standard, the project version,
 and includes the `cmake/` modules in order.
 
@@ -216,12 +216,16 @@ a `.cpp` under the generated tree.
 | --- | --- | --- |
 | `VINECOPULIB_PRECOMPILED` | `OFF` | Compile a real library vs. header-only `INTERFACE`. |
 | `BUILD_TESTING` | `ON` | Build the GoogleTest suite (fetches GoogleTest + finds Rscript). |
-| `OPT_ASAN` | `ON` | Add `-fsanitize=address,undefined` to Debug builds. |
-| `CODE_COVERAGE` | `OFF` | Add `--coverage` flags (Debug + `BUILD_TESTING`, non-Windows). |
-| `STRICT_COMPILER` | `OFF` | GCC: `-Werror` plus a long list of `-W…` flags. |
-| `BUILD_DOC` | `OFF` | Add the Doxygen `doc` target. |
+| `VINECOPULIB_SANITIZERS` | `OFF` | Add `-fsanitize=address,undefined` to Debug builds. |
+| `VINECOPULIB_CODE_COVERAGE` | `OFF` | Add `--coverage` flags (Debug + `BUILD_TESTING`, non-Windows). |
+| `VINECOPULIB_STRICT_COMPILER` | `OFF` | GCC: `-Werror` plus a long list of `-W…` flags. |
+| `VINECOPULIB_BUILD_DOC` | `OFF` | Add the Doxygen `doc` target. |
+| `VINECOPULIB_BUILD_BENCHMARKS` | `OFF` | Build the benchmark suite (fetches google/benchmark). |
+| `VINECOPULIB_NATIVE_ARCH` | `OFF` | Tune Release for the build machine's CPU (not redistributable). |
 
-Default `CMAKE_BUILD_TYPE` is `Release` when unset.
+Default `CMAKE_BUILD_TYPE` is `Release` when unset. The developer-facing
+switches apply to a top-level build only, so consumers pulling the project in
+via `add_subdirectory` / `FetchContent` keep their own settings.
 
 ### Dependencies
 
@@ -230,10 +234,13 @@ Discovered in
 
 - **Eigen3** — `find_package(Eigen3 REQUIRED CONFIG)`; or set
   `EIGEN3_INCLUDE_DIR`. Target: `Eigen3::Eigen`.
-- **Boost ≥ 1.56** — CONFIG mode then MODULE fallback; or set
-  `Boost_INCLUDE_DIRS`. Used for math distributions (Student-t etc.), RNG
-  (`boost::random`), `boost::optional` (C++14), and `odeint`
-  (integration). Target: `Boost::boost`.
+- **Boost ≥ 1.75** — CONFIG mode then MODULE fallback; or set
+  `Boost_INCLUDE_DIRS`. Target: `Boost::boost`. Deliberately narrowed to three
+  header-only components — keep it that way, and prefer the standard library
+  when it suffices: **Graph** (`adjacency_list` and the spanning-tree engines
+  behind `tree_algorithm`), **Math** (distributions, constants, special
+  functions, `quadrature::tanh_sinh` for 1-d integration, `tools::minima`),
+  and **Random** (`mt19937`, behind QRNG scrambling and structure simulation).
 - **wdm 0.2.6** — `find_package(wdm 0.2.6 QUIET)` with a **FetchContent
   fallback** that clones `tnagler/wdm`. Installed under
   `<prefix>/include/vinecopulib/wdm/`.
@@ -241,15 +248,17 @@ Discovered in
 - **GoogleTest 1.14** — FetchContent, only when `BUILD_TESTING`.
 - **Rscript** (optional) — enables the R parity tests; see
   [cmake/findR.cmake](cmake/findR.cmake).
-- **Doxygen** — only when `BUILD_DOC`.
+- **Doxygen** — only when `VINECOPULIB_BUILD_DOC`.
 
 Global compile definitions set in
 [cmake/compilerDefOpt.cmake](cmake/compilerDefOpt.cmake) (and mirrored in
 the umbrella header): `BOOST_NO_AUTO_PTR`,
 `BOOST_ALLOW_DEPRECATED_HEADERS`, `BOOST_MATH_PROMOTE_DOUBLE_POLICY=false`,
-`BOOST_ALL_NO_LIB`, `USE_BOOST`. Release flags `-O3 -march=native -DNDEBUG`
-(an `-mcpu=apple-m1` variant on Apple silicon); always-on warnings
-`-Wall -Wextra -Werror=return-type`.
+`BOOST_ALL_NO_LIB`, `USE_BOOST`. Release flags `-O3 -DNDEBUG`, Debug
+`-g -O0 -DDEBUG`; always-on warnings `-Wall -Wextra -Werror=return-type`.
+`-march=native` (`-mcpu=apple-m1` on Apple silicon) is opt-in behind
+`VINECOPULIB_NATIVE_ARCH`, since the result only runs on CPUs at least as new
+as the builder's.
 
 ### Build / test / install
 
@@ -287,8 +296,8 @@ up via `gtest_discover_tests(test_all)` on non-Windows and
   (`bugprone-*`, `performance-*`, `modernize-*`, `cppcoreguidelines-*`,
   …) but is **advisory**: the CI clang-tidy job is commented out and not
   enforced.
-- **docs** — `cmake .. -DBUILD_DOC=ON && make doc` runs Doxygen. The
-  website is built with [m.css](https://github.com/mosra/m.css) via
+- **docs** — `cmake .. -DVINECOPULIB_BUILD_DOC=ON && make doc` runs Doxygen.
+  The website is built with [m.css](https://github.com/mosra/m.css) via
   `doxygen.py docs/Doxyfile-mcss`; see
   [docs/create-docs.md](docs/create-docs.md).
 
@@ -404,7 +413,7 @@ For any behavior change:
   parameters that are stored (the `FitControls` setters) are likewise by value
   and `std::move`d into the member. Converting either kind to `const&` is a
   performance regression, not a cleanup, even though clang-tidy may suggest it.
-- **C++14 + Eigen.** `Eigen::MatrixXd` / `VectorXd` are the workhorse
+- **C++17 + Eigen.** `Eigen::MatrixXd` / `VectorXd` are the workhorse
   types; prefer `.array()`, `.unaryExpr`, and the helpers in
   [misc/tools_eigen.hpp](include/vinecopulib/misc/tools_eigen.hpp)
   (`trim`, `remove_nans`, `unaryExpr_or_nan`, …) over hand-rolled loops.
@@ -505,9 +514,9 @@ Infrastructure shared across both modules:
   directly; always pull it implicitly through `tools_interface.hpp`.**
 - **`triangular_array.hpp`** — `TriangularArray<T>`, the ragged container
   that mirrors a (possibly truncated) vine.
-- **`tools_eigen`, `tools_stl`, `tools_integration`, `tools_constants`,
-  `tools_optional`** — Eigen/STL helpers, 1-d numerical integration
-  (Boost.odeint), constants, and a C++14/17 `optional` shim.
+- **`tools_eigen`, `tools_stl`, `tools_integration`, `tools_constants`** —
+  Eigen/STL helpers, 1-d numerical integration (Boost.Math `tanh_sinh`
+  quadrature), and constants.
 
 ## Public API
 
@@ -533,7 +542,7 @@ headers (`vinecopulib/bicop/class.hpp`, etc.).
 GoogleTest, under [test/](test/). The layout is split: thin
 `test/test_<topic>.cpp` translation units register the suites, while the
 actual logic lives in `test/src_test/*.cpp` with fixtures in
-`test/src_test/include/*.hpp`. The executable list (12 binaries, including
+`test/src_test/include/*.hpp`. The executable list (13 binaries, including
 the aggregate `test_all`) is in
 [cmake/buildTargets.cmake](cmake/buildTargets.cmake); each links
 `gtest vinecopulib … src_test`.
@@ -543,9 +552,9 @@ Conventions:
 - **Run** `bin/test_all` (or `ctest`) from the build directory after
   `make`.
 - **Coverage** is collected on the Ubuntu/GNU Debug CI build
-  (`-DCODE_COVERAGE=ON`, target `vinecopulib_coverage`) and uploaded to
-  Codecov; [codecov.yml](codecov.yml) ignores `test/` and the vendored
-  `nlohmann_json.hpp`.
+  (`-DVINECOPULIB_CODE_COVERAGE=ON`, target `vinecopulib_coverage`) and
+  uploaded to Codecov; [codecov.yml](codecov.yml) ignores `test/` and the
+  vendored `nlohmann_json.hpp`.
 - **R parity tests** are optional: with Rscript available, the
   `cmake/templates/*.R` scripts cross-check parametric bicop / vinecop
   results against the VineCopula R package.
