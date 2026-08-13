@@ -3093,6 +3093,18 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
                          std::move(seeds));
 }
 
+//! @brief Evaluates the Rosenblatt transform for a conditioning set.
+//!
+//! @details The vine is evaluated in an admissible sampling order whose tail
+//! contains exactly `conditioning_set`. The model itself is not modified.
+//!
+//! @param u An \f$ n \times d \f$ matrix of evaluation points.
+//! @param conditioning_set The 1-based indices of the conditioning variables.
+//! @param num_threads The number of threads to use for computations.
+//! @param randomize_discrete Whether to randomize the transform for discrete
+//!   variables.
+//! @param seeds Seeds used for discrete randomization.
+//! @return An \f$ n \times d \f$ matrix of independent uniform variates.
 inline Eigen::MatrixXd
 Vinecop::rosenblatt(Eigen::MatrixXd u,
                     const std::vector<size_t>& conditioning_set,
@@ -3269,6 +3281,15 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
   return inverse_rosenblatt_impl(u, VinecopView(*this), num_threads);
 }
 
+//! @brief Evaluates the inverse Rosenblatt transform for a conditioning set.
+//!
+//! @details The vine is evaluated in an admissible sampling order whose tail
+//! contains exactly `conditioning_set`. The model itself is not modified.
+//!
+//! @param u An \f$ n \times d \f$ matrix of independent uniform variates.
+//! @param conditioning_set The 1-based indices of the conditioning variables.
+//! @param num_threads The number of threads to use for computations.
+//! @return An \f$ n \times d \f$ matrix of transformed values.
 inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const std::vector<size_t>& conditioning_set,

@@ -216,15 +216,6 @@ public:
                              const size_t num_threads = 1,
                              bool randomize_discrete = true,
                              std::vector<int> seeds = {}) const;
-  //! Evaluates the Rosenblatt transform in an admissible sampling order whose
-  //! tail contains exactly `conditioning_set`.
-  //! The model itself is not modified.
-  //! @param u An n x d matrix of evaluation points.
-  //! @param conditioning_set 1-based indices of the conditioning variables.
-  //! @param num_threads Number of threads to use.
-  //! @param randomize_discrete Whether to randomize discrete variables.
-  //! @param seeds Seeds used for discrete randomization.
-  //! @return An n x d matrix of independent uniform variates.
   Eigen::MatrixXd rosenblatt(Eigen::MatrixXd u,
                              const std::vector<size_t>& conditioning_set,
                              const size_t num_threads = 1,
@@ -232,13 +223,6 @@ public:
                              std::vector<int> seeds = {}) const;
   Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& u,
                                      const size_t num_threads = 1) const;
-  //! Evaluates the inverse Rosenblatt transform in an admissible sampling
-  //! order whose tail contains exactly `conditioning_set`.
-  //! The model itself is not modified.
-  //! @param u An n x d matrix of independent uniform variates.
-  //! @param conditioning_set 1-based indices of the conditioning variables.
-  //! @param num_threads Number of threads to use.
-  //! @return An n x d matrix of transformed values.
   Eigen::MatrixXd inverse_rosenblatt(
     const Eigen::MatrixXd& u,
     const std::vector<size_t>& conditioning_set,
