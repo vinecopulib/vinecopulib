@@ -26,15 +26,8 @@ option(VINECOPULIB_BUILD_DOC     "Build documentation"               OFF)
 option(VINECOPULIB_BUILD_BENCHMARKS "Build benchmark suite"          OFF)
 option(VINECOPULIB_NATIVE_ARCH   "Optimize for the build machine's CPU (not redistributable)" OFF)
 
-# The unprefixed names, honoured for one release.
-foreach(_old_new "OPT_ASAN;VINECOPULIB_SANITIZERS"
-                 "CODE_COVERAGE;VINECOPULIB_CODE_COVERAGE"
-                 "STRICT_COMPILER;VINECOPULIB_STRICT_COMPILER"
-                 "BUILD_DOC;VINECOPULIB_BUILD_DOC")
-  list(GET _old_new 0 _old)
-  list(GET _old_new 1 _new)
-  if(DEFINED ${_old})
-    message(DEPRECATION "${_old} is deprecated; use ${_new}.")
-    set(${_new} ${${_old}})
-  endif()
-endforeach()
+# Removed in 1.0.0: the unprefixed OPT_ASAN, CODE_COVERAGE, STRICT_COMPILER and
+# BUILD_DOC. Passing one is inert, and CMake reports it as an unused variable.
+# Do not add a compatibility shim: dependencies declare some of those names
+# themselves, so a build cannot tell an old-style request apart from a
+# dependency's own option.

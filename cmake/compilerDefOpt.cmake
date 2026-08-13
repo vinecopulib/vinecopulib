@@ -1,4 +1,4 @@
-# Append, never assign: assigning shadows the cache entry CMake initialises from
+# Append, never assign: assigning shadows the cache entry CMake initializes from
 # $CXXFLAGS, discarding distribution hardening flags and user-supplied options.
 
 if(NOT WIN32)

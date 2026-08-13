@@ -194,7 +194,11 @@ TEST(test_tools_optimization, rosenbrock)
 
 TEST(test_tools_optimization, size_checks_throw)
 {
-  Objective f = [](const Eigen::VectorXd&, Eigen::VectorXd&) { return 0.0; };
+  // `noexcept` keeps -Wnoexcept quiet: the throw under test comes from
+  // `optimize`, not from the objective.
+  Objective f = [](const Eigen::VectorXd&, Eigen::VectorXd&) noexcept {
+    return 0.0;
+  };
   Eigen::VectorXd x0(2), lb(2), ub(1);
   x0 << 0.0, 0.0;
   lb << -1.0, -1.0;
