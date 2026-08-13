@@ -336,6 +336,13 @@ For any behaviour change:
   another, **stack the pull requests** (each branching off the previous one)
   rather than merging to unblock yourself. This applies equally to pushing tags
   and to changing repository settings.
+- **Squash on merge: one pull request, one commit on `main`.** The iterations
+  taken to reach a working state are review history, not project history, so the
+  squashed message — not the intermediate commits — is what has to explain the
+  change. Write it as the summary of the whole pull request: what changed, why,
+  and anything a future reader needs (behaviour changes, follow-ups). The
+  `(#NNN)` suffix keeps the pull request discoverable from `git log`, which is
+  where [NEWS.md](NEWS.md) entries are sourced.
 
 ## Coding conventions
 
@@ -374,6 +381,14 @@ For any behaviour change:
   see the per-family docs on the `BicopFamily` enum in
   [bicop/family.hpp](include/vinecopulib/bicop/family.hpp) for the house
   style.
+- **Parameter passing.** Read-only parameters come in by `const&`. A parameter
+  the body needs as a mutable working buffer — `Vinecop::pdf`, `pdf_full`,
+  `rosenblatt`, `scores*`, `gradient`, `hessian*`, which pass `u` to
+  `collapse_data_inplace()` or move it onward — is taken **by value and moved**,
+  never `const&`: a reference would force an extra n × d copy inside. Value
+  parameters that are stored (the `FitControls` setters) are likewise by value
+  and `std::move`d into the member. Converting either kind to `const&` is a
+  performance regression, not a cleanup, even though clang-tidy may suggest it.
 - **C++14 + Eigen.** `Eigen::MatrixXd` / `VectorXd` are the workhorse
   types; prefer `.array()`, `.unaryExpr`, and the helpers in
   [misc/tools_eigen.hpp](include/vinecopulib/misc/tools_eigen.hpp)

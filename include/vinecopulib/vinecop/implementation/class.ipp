@@ -2560,8 +2560,8 @@ Vinecop::hessian(Eigen::MatrixXd u,
     size_t ipar = 0;
     for (size_t t = 0; t < trunc_lvl; t++) {
       for (size_t e = 0; e < d_ - 1 - t; e++) {
-        for (size_t p = 0; p < hess(t, e).size(); p++) {
-          H.row(ipar++) += hess(t, e)[p].colwise().sum();
+        for (const auto& block : hess(t, e)) {
+          H.row(ipar++) += block.colwise().sum();
         }
       }
     }
