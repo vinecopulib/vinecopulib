@@ -117,8 +117,11 @@ runs:
     - name: Install wdm (pinned to ${{inputs.wdm_ref}})
       if: inputs.wdm == 'true'
       run: |
-          git clone https://github.com/tnagler/wdm.git ${{runner.temp}}/wdm
-          cd ${{runner.temp}}/wdm
+          # Clone into a relative path, not ${{runner.temp}}: on Windows that
+          # expands to a backslash path (D:\a\_temp) and bash swallows the
+          # backslashes, so `cd` lands on a nonexistent `D:a_temp/wdm`.
+          git clone https://github.com/tnagler/wdm.git wdm
+          cd wdm
           git checkout --detach ${{ inputs.wdm_ref }}
           mkdir release && cd release
           if [ "${{ inputs.os }}" != "windows-latest" ]; then
@@ -128,6 +131,7 @@ runs:
             cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
             cmake --build . --target install
           fi
+          cd ../.. && rm -rf wdm
       shell: bash
 
     - name: Install lcov
