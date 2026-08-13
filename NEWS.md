@@ -173,7 +173,7 @@
   be used with any `num_threads`, and the pair-copula fits stay parallel. The
   criterion and the callable may be set in either order, but a fit is now
   rejected up front when only one of the two is given, instead of failing deep
-  inside selection or silently ignoring the callable (#674, #000).
+  inside selection or silently ignoring the callable (#674, #722).
 
 * Add `Vinecop::hfuncs` to return intermediate h-function values (#669)
 
