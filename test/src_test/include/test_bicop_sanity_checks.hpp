@@ -12,6 +12,35 @@
 namespace test_bicop_sanity_checks {
 using namespace vinecopulib;
 
+//! Pins the documented contract of the two tau maps: `parameters_to_tau` is
+//! available for every family, `tau_to_parameters` only where tau determines
+//! the parameters completely.
+TEST(bicop_sanity_checks, tau_maps_are_available_where_documented)
+{
+  const std::vector<BicopFamily> invertible = {
+    BicopFamily::indep,  BicopFamily::gaussian, BicopFamily::clayton,
+    BicopFamily::gumbel, BicopFamily::frank,    BicopFamily::joe
+  };
+  for (auto family : bicop_families::all) {
+    Bicop bicop(family);
+    const bool expected = tools_stl::is_member(family, invertible);
+
+    // parameters_to_tau: every family
+    EXPECT_NO_THROW(bicop.parameters_to_tau(bicop.get_parameters()))
+      << bicop.get_family_name();
+
+    // tau_to_parameters: only the families listed above. Student is in
+    // bicop_families::itau yet is not invertible here, because tau pins its
+    // correlation and leaves the degrees of freedom free.
+    if (expected) {
+      EXPECT_NO_THROW(bicop.tau_to_parameters(0.4)) << bicop.get_family_name();
+    } else {
+      EXPECT_THROW(bicop.tau_to_parameters(0.4), std::runtime_error)
+        << bicop.get_family_name();
+    }
+  }
+}
+
 TEST(bicop_sanity_checks, catches_wrong_parameter_size)
 {
   for (auto family : bicop_families::nonparametric) {
