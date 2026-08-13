@@ -1,8 +1,6 @@
 name: CodeQL
 
-# Replaces Codacy, whose badge 404s and whose `.codacy.yml` uses an `engines:`
-# format the service abandoned years ago. CodeQL supports C++ natively, needs no
-# third-party account, and reports into the repository's Security tab.
+# Reports into the repository's Security tab.
 
 on:
   push:
@@ -45,19 +43,14 @@ jobs:
           R: false
           lcov: false
 
-      # BOOST_ROOT has to be exported rather than passed as -DBoost_INCLUDE_DIR:
-      # findDependencies.cmake guards on the *plural* Boost_INCLUDE_DIRS, so the
-      # singular command-line variable does not satisfy it and Boost::boost is
-      # never defined.
+      # BOOST_ROOT must be exported: find_package picks it up via CMP0074.
       - name: Set environment variables
         run: |
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
           echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
           echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
 
-      # A manual build rather than autobuild: the precompiled configuration is
-      # what turns the .ipp tree into real translation units, so it is the only
-      # mode in which CodeQL actually sees the implementation code.
+      # Precompiled, so the .ipp files become translation units CodeQL can see.
       - name: Build (precompiled, so the .ipp tree is compiled)
         run: |
           mkdir build-codeql && cd build-codeql

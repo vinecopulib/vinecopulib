@@ -326,11 +326,21 @@ For any behaviour change:
 - Run the validation sequence: `clang-format-14`, a Debug build +
   `bin/test_all`, and — for anything touching the install/precompiled
   path — a `VINECOPULIB_PRECOMPILED=ON` release build.
+- **Fix what you find.** A defect uncovered along the way is addressed, not
+  annotated, worked around, or left for later behind an explanatory comment.
+  When the real fix genuinely belongs in a separate change, say so in the PR
+  description and open an issue for it — a comment is not a substitute.
 
 ## Coding conventions
 
 - **Style: `BasedOnStyle: Mozilla`** (2-space indent, ~80-column),
   enforced by clang-format 14.
+- **Comments are documentation, not history.** Keep them short and aimed at
+  whoever reads the code next: the constraint, the invariant, or the reason a
+  non-obvious choice is required. Previous bugs, benchmark numbers, review
+  discussion, and the reasoning behind a change belong in the commit message
+  and the PR description. If a comment needs a paragraph, it probably belongs
+  there instead. This applies equally to CMake, CI workflows, and configs.
 - **Compiler warnings.** Do not suppress warnings with diagnostic pragmas.
   Fix the underlying code instead, including in vendored headers when the
   warning originates there. If a warning cannot reasonably be fixed, keep any

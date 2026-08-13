@@ -108,9 +108,9 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 //! then selecting the model using `select()`.
 //!
 //! @param data An \f$ n \times d \f$ matrix of observations.
-//! @param matrix Either an empty matrix (default) or an R-vine structure
-//!     matrix, see `select()`. If empty, then it is selected as part of the
-//!     fit.
+//! @param matrix Either an R-vine structure matrix, see `select()`, or an
+//!     empty matrix, in which case the structure is selected as part of the
+//!     fit. To select the structure, prefer `Vinecop(data)`.
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.

@@ -7,13 +7,10 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-  # Called by release.yml so a tag is re-verified against the full matrix
-  # before anything is published.
+  # release.yml re-runs the matrix against the tag before publishing.
   workflow_call:
 
-# One run per ref. Previously `on: [push, pull_request]` meant every same-repo
-# pull request triggered two identical matrix runs, and nothing cancelled a
-# superseded run when a branch was pushed twice.
+# One run per ref; supersede in-flight runs.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -34,19 +31,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # Installed from PyPI rather than apt: `clang-format-14` is only in the
-      # ubuntu-latest image until the image rolls forward, at which point the
-      # package disappears and this job breaks with no code change. A pinned
-      # wheel also means contributors can install the exact same binary, so
-      # local formatting matches CI by construction.
+      # From PyPI, not apt: pins the exact binary so local runs match CI.
       - name: Install clang-format ${{ env.CLANG_FORMAT_VERSION }}
         run: pipx install "clang-format==${{ env.CLANG_FORMAT_VERSION }}"
 
       - name: Check formatting
         run: |
-          # nlohmann_json.hpp is vendored verbatim; tools_stats_sobol.hpp is a
-          # 3.4 MB generated table, and reformatting it on every run costs time
-          # for a file no human edits.
+          # Skip the vendored JSON header and the generated Sobol table.
           git ls-files -z '*.h' '*.hpp' '*.ipp' '*.cpp' '*.cc' \
             | grep -zv '^include/vinecopulib/misc/nlohmann_json\.hpp$' \
             | grep -zv '^include/vinecopulib/misc/tools_stats_sobol\.hpp$' \
@@ -133,28 +124,16 @@ jobs:
             cmake --build .
           fi
         shell: bash
-      # The Debug build enables -fsanitize=address,undefined (OPT_ASAN is ON by
-      # default), so not running it was leaving the entire point of that build
-      # unobserved on every leg except ubuntu/GNU, where the coverage target
-      # runs the tests as a side effect.
-      #
-      # This runs the single test_all binary rather than `ctest`. Measured on a
-      # 64-core machine: test_all runs all 645 tests in ~71 s, while `ctest -j64`
-      # had not finished after 13 minutes -- the R-parity fixtures shell out to
-      # Rscript and exchange data through hardcoded `temp`/`temp2`/`temp3` files
-      # in the working directory (test/src_test/vinecop_test.cpp:18-31 and
-      # cmake/templates/test_vinecop_parametric.R:42-45), so concurrent cases
-      # clobber and delete each other's files and wedge. Making those paths
-      # unique per test is a prerequisite for using ctest's parallelism.
+      # Debug enables -fsanitize=address,undefined, so these tests must run.
+      # Use test_all, not ctest: the R-parity fixtures share fixed temp file
+      # names, so they cannot run concurrently.
       - name: Run the debug tests
         if: matrix.cfg.os != 'ubuntu-latest' || matrix.cfg.name != 'GNU'
         run: |
           cd debug
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then bin/test_all; else bin/test_all.exe; fi
         shell: bash
-      # Cheap guard for the test-registration wiring that nothing exercised
-      # before: gtest_discover_tests writes a `<target>_NOT_BUILT` placeholder
-      # when discovery fails, so a healthy build must list far more than one.
+      # gtest_discover_tests registers a `_NOT_BUILT` placeholder on failure.
       - name: Check that ctest discovery works
         if: matrix.cfg.os != 'windows-latest'
         run: |
@@ -171,9 +150,6 @@ jobs:
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          # `file:` was silently ignored -- the input has been `files:` since
-          # codecov-action v4, so the explicit path did nothing and the uploader
-          # only worked by falling back to auto-discovery.
           files: debug/coverage.info
           disable_search: true
           fail_ci_if_error: true
@@ -206,10 +182,8 @@ jobs:
           done
         shell: bash
 
-  # The default, header-only configuration had no CI coverage at all: both
-  # installs above set VINECOPULIB_PRECOMPILED=ON, so the .hpp + .ipp install
-  # tree that most users and both wrapper libraries consume was never built,
-  # installed, or linked against.
+  # The default configuration: .hpp + .ipp install, as consumed by the R and
+  # Python wrappers. The matrix above only covers VINECOPULIB_PRECOMPILED=ON.
   header-only-install:
     name: header-only install (ubuntu, GNU)
     runs-on: ubuntu-latest
@@ -248,10 +222,8 @@ jobs:
             ( cd "examples/$ex" && mkdir build && cd build && cmake .. && make && ../bin/main )
           done
 
-  # bench_all and parity_dump were built by no workflow, so the whole #688
-  # benchmark and numerical-parity infrastructure could rot against header
-  # changes without anyone noticing. The parity self-comparison is cheap and
-  # proves the dump populates every group and that the gates file parses.
+  # Keeps the benchmark and parity targets compiling. The self-comparison
+  # checks that every group is populated and that the gates file parses.
   benchmarks:
     name: benchmarks and parity harness
     runs-on: ubuntu-latest
@@ -295,9 +267,7 @@ jobs:
           path: bench_results/parity.json
           if-no-files-found: warn
 
-  # Doxygen was never even smoke-built, which is how ~10 uncompilable snippets
-  # and a stale Doxyfile went unnoticed. This job currently only proves the
-  # configuration still runs; the docs rewrite tightens it to WARN_AS_ERROR.
+  # Smoke-builds the docs. To be tightened to WARN_AS_ERROR with the docs rewrite.
   docs:
     name: doxygen
     runs-on: ubuntu-latest
@@ -317,11 +287,7 @@ jobs:
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: false
           lcov: false
-      # Same shape as every other job: export BOOST_ROOT so find_package picks
-      # it up via CMP0074. Passing -DBoost_INCLUDE_DIR on the command line does
-      # not work -- findDependencies.cmake tests the *plural*
-      # Boost_INCLUDE_DIRS, so the guard does not fire and Boost::boost never
-      # gets defined.
+      # BOOST_ROOT must be exported: find_package picks it up via CMP0074.
       - name: Set environment variables
         run: |
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
@@ -346,9 +312,7 @@ jobs:
           path: build-docs/doxygen.log
           if-no-files-found: warn
 
-  # Replaces the block that sat commented out in this file. Runs only on the
-  # pull-request diff, so the curated check list is enforceable as an error
-  # instead of producing thousands of findings nobody reads.
+  # Diff-only, so the curated check list can be enforced as an error.
   clang-tidy:
     name: clang-tidy (diff)
     if: github.event_name == 'pull_request'
@@ -379,8 +343,7 @@ jobs:
         run: |
           mkdir build-tidy && cd build-tidy
           cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          # FetchContent puts googletest translation units in the database; they
-          # are not ours to lint.
+          # Drop FetchContent (googletest) translation units.
           jq '[.[] | select(.file | test("_deps/") | not)]' compile_commands.json > filtered.json
           mv filtered.json compile_commands.json
       - name: Run clang-tidy on the diff

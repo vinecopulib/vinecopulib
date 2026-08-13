@@ -47,10 +47,11 @@ public:
                    const std::vector<std::string>& var_types = {},
                    const FitControlsVinecop& controls = FitControlsVinecop());
 
+  // `matrix` must not be defaulted: that makes `Vinecop(data)` ambiguous with
+  // the overload above.
   explicit Vinecop(
     const Eigen::MatrixXd& data,
-    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix =
-      Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>(),
+    const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
     const std::vector<std::string>& var_types = {},
     const FitControlsVinecop& controls = FitControlsVinecop());
 
