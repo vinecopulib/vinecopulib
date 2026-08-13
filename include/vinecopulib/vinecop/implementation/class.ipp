@@ -423,23 +423,40 @@ Vinecop::check_tree_criterion_function(const FitControlsVinecop& controls)
   }
 }
 
-//! @brief Relabels the vine to an equivalent one whose order tail equals
-//! `conditioning_set`.
-//!
-//! @details A value-preserving re-orientation: the fitted model is unchanged
-//! (both the density `pdf` and the log-likelihood `loglik` are invariant), only
-//! its sampling-order representation changes, so that the variables in
-//! `conditioning_set` are drawn first and can be conditioned on with
-//! `simulate_conditional`. It chooses, per tree, which conditioned variable
-//! sits on the matrix diagonal, and flips each pair copula whose stored
-//! orientation no longer matches its new position. Throws if the current
-//! structure admits no sampling order ending in `conditioning_set` (fit with a
-//! conditioning set via `FitControlsVinecop` to guarantee one exists).
-//!
-//! @param conditioning_set 1-based variable indices to place at the tail of the
-//! variable order.
-inline void
-Vinecop::reorient(const std::vector<size_t>& conditioning_set)
+inline Vinecop::VinecopView::VinecopView(const Vinecop& vinecop)
+  : vinecop_(&vinecop)
+  , reorientation_(nullptr)
+{
+}
+
+inline Vinecop::VinecopView::VinecopView(const Vinecop& vinecop,
+                                         const ReorientationMap& reorientation)
+  : vinecop_(&vinecop)
+  , reorientation_(reorientation.identity ? nullptr : &reorientation)
+{
+}
+
+inline const RVineStructure&
+Vinecop::VinecopView::get_structure() const
+{
+  return reorientation_ ? reorientation_->structure
+                        : vinecop_->rvine_structure_;
+}
+
+inline BicopView
+Vinecop::VinecopView::get_pair_copula(size_t tree, size_t edge) const
+{
+  if (!reorientation_)
+    return BicopView(vinecop_->pair_copulas_[tree][edge]);
+
+  auto location = reorientation_->pair_copulas(tree, edge);
+  return BicopView(vinecop_->pair_copulas_[location.tree][location.edge],
+                   location.flipped);
+}
+
+inline Vinecop::ReorientationMap
+Vinecop::make_reorientation_map(
+  const std::vector<size_t>& conditioning_set) const
 {
   size_t k = conditioning_set.size();
 
@@ -472,19 +489,16 @@ Vinecop::reorient(const std::vector<size_t>& conditioning_set)
     return true;
   };
 
-  // early no-op: the conditioning set is already the tail of the order
+  // Preserve the exact representation if the requested variables already
+  // form the sampling-order tail.
   if (tail_is_b(rvine_structure_.get_order())) {
-    return;
+    ReorientationMap identity;
+    identity.identity = true;
+    return identity;
   }
 
-  // Re-orient via the shared RVineTrees primitive: decompose the fitted vine
-  // into its tree list (carrying pair copulas), then peel it back into a
-  // matrix while steering the diagonal so the conditioning set lands at the
-  // tail. For the leading columns we put a non-conditioning leaf on the
-  // diagonal, for the trailing columns a conditioning one. Because the
-  // conditioning set forms a self-contained sub-vine block (guaranteed when
-  // fitted via `set_conditioning_set()`), the required leaf is always present;
-  // the tail check + `RVineStructure` validation below guard the general case.
+  // Peel the structure while steering the diagonal so that the conditioning
+  // set lands at the tail. No fitted pair copulas are copied here.
   auto to_tail =
     [&](size_t col,
         const std::vector<std::vector<size_t>>& leaf_edges) noexcept -> size_t {
@@ -496,28 +510,63 @@ Vinecop::reorient(const std::vector<size_t>& conditioning_set)
     return leaf_edges.front().front();
   };
 
-  std::vector<size_t> new_order;
-  TriangularArray<size_t> new_struct_array(d_, d_ - 1);
-  std::vector<std::vector<Bicop>> new_pair_copulas;
-  bool ok = true;
+  const std::string inadmissible =
+    "conditioning set is not admissible as a sampling-order tail of this "
+    "vine; fit with FitControlsVinecop::set_conditioning_set() or condition "
+    "on an admissible set.";
+  RVineTrees::Decomposition decomposition;
   try {
-    auto dec = get_trees().to_struct_array(to_tail);
-    new_order = std::move(dec.order);
-    new_struct_array = std::move(dec.struct_array);
-    new_pair_copulas = std::move(dec.pair_copulas);
+    decomposition = rvine_structure_.get_trees().to_struct_array_map(to_tail);
   } catch (const std::exception&) {
-    ok = false; // infeasible (proximity / no admissible leaf)
+    throw std::runtime_error(inadmissible);
   }
-  if (!ok || !tail_is_b(new_order)) {
-    throw std::runtime_error(
-      "conditioning set is not admissible as a sampling-order tail of this "
-      "vine; fit with FitControlsVinecop::set_conditioning_set() or condition "
-      "on an admissible set.");
+  if (!tail_is_b(decomposition.order)) {
+    throw std::runtime_error(inadmissible);
   }
 
-  // full R-vine validation (proximity etc.); loglik/threshold/nobs invariant
-  rvine_structure_ = RVineStructure(new_order, new_struct_array, false, true);
-  pair_copulas_ = std::move(new_pair_copulas);
+  RVineStructure structure(
+    decomposition.order, decomposition.struct_array, false, true);
+  return { std::move(structure),
+           std::move(decomposition.pair_copula_locations),
+           false };
+}
+
+//! @brief Relabels the vine to an equivalent one whose order tail equals
+//! `conditioning_set`.
+//!
+//! @details A value-preserving re-orientation: the fitted model is unchanged
+//! (both the density `pdf` and the log-likelihood `loglik` are invariant), only
+//! its sampling-order representation changes, so that the variables in
+//! `conditioning_set` are drawn first and can be conditioned on with
+//! `simulate_conditional`. It chooses, per tree, which conditioned variable
+//! sits on the matrix diagonal, and flips each pair copula whose stored
+//! orientation no longer matches its new position. Throws if the current
+//! structure admits no sampling order ending in `conditioning_set` (fit with a
+//! conditioning set via `FitControlsVinecop` to guarantee one exists).
+//!
+//! @param conditioning_set 1-based variable indices to place at the tail of the
+//! variable order.
+inline void
+Vinecop::reorient(const std::vector<size_t>& conditioning_set)
+{
+  auto reorientation = make_reorientation_map(conditioning_set);
+  if (reorientation.identity)
+    return;
+
+  std::vector<std::vector<Bicop>> pair_copulas(d_ - 1);
+  for (size_t tree = 0; tree < d_ - 1; ++tree) {
+    pair_copulas[tree].reserve(d_ - 1 - tree);
+    for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
+      auto location = reorientation.pair_copulas(tree, edge);
+      pair_copulas[tree].emplace_back(
+        pair_copulas_[location.tree][location.edge]);
+      if (location.flipped)
+        pair_copulas[tree].back().flip();
+    }
+  }
+
+  rvine_structure_ = std::move(reorientation.structure);
+  pair_copulas_ = std::move(pair_copulas);
 }
 
 //! @brief Fits the parameters of a pre-specified vine copula model.
@@ -3037,6 +3086,47 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
                     bool randomize_discrete,
                     std::vector<int> seeds) const
 {
+  return rosenblatt_impl(std::move(u),
+                         VinecopView(*this),
+                         num_threads,
+                         randomize_discrete,
+                         std::move(seeds));
+}
+
+//! @brief Evaluates the Rosenblatt transform for a conditioning set.
+//!
+//! @details The vine is evaluated in an admissible sampling order whose tail
+//! contains exactly `conditioning_set`. The model itself is not modified.
+//!
+//! @param u An \f$ n \times d \f$ matrix of evaluation points.
+//! @param conditioning_set The 1-based indices of the conditioning variables.
+//! @param num_threads The number of threads to use for computations.
+//! @param randomize_discrete Whether to randomize the transform for discrete
+//!   variables.
+//! @param seeds Seeds used for discrete randomization.
+//! @return An \f$ n \times d \f$ matrix of independent uniform variates.
+inline Eigen::MatrixXd
+Vinecop::rosenblatt(Eigen::MatrixXd u,
+                    const std::vector<size_t>& conditioning_set,
+                    const size_t num_threads,
+                    bool randomize_discrete,
+                    std::vector<int> seeds) const
+{
+  auto reorientation = make_reorientation_map(conditioning_set);
+  return rosenblatt_impl(std::move(u),
+                         VinecopView(*this, reorientation),
+                         num_threads,
+                         randomize_discrete,
+                         std::move(seeds));
+}
+
+inline Eigen::MatrixXd
+Vinecop::rosenblatt_impl(Eigen::MatrixXd u,
+                         const VinecopView& view,
+                         size_t num_threads,
+                         bool randomize_discrete,
+                         std::vector<int> seeds) const
+{
   check_data(u);
   collapse_data_inplace(u);
 
@@ -3044,8 +3134,9 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
   size_t n = u.rows();
 
   // info about the vine structure
-  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
-  auto order = rvine_structure_.get_order();
+  const auto& structure = view.get_structure();
+  size_t trunc_lvl = structure.get_trunc_lvl();
+  auto order = structure.get_order();
   auto inverse_order = tools_stl::invert_permutation(order);
   auto disc_cols = tools_select::get_disc_cols(var_types_);
 
@@ -3075,13 +3166,13 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
         tools_interface::check_user_interrupt(edge % 100 == 0);
         // extract evaluation point from hfunction matrices (have been
         // computed in previous tree level)
-        Bicop* edge_copula = &pair_copulas_[tree][edge];
-        auto var_types = edge_copula->get_var_types();
-        size_t m = rvine_structure_.min_array(tree, edge);
+        auto edge_copula = view.get_pair_copula(tree, edge);
+        auto var_types = edge_copula.get_var_types();
+        size_t m = structure.min_array(tree, edge);
 
         u_e.resize(b.size, 2);
         u_e.col(0) = hfunc2.block(b.begin, edge, b.size, 1);
-        if (m == rvine_structure_.struct_array(tree, edge, true)) {
+        if (m == structure.struct_array(tree, edge, true)) {
           u_e.col(1) = hfunc2.block(b.begin, m - 1, b.size, 1);
         } else {
           u_e.col(1) = hfunc1.block(b.begin, m - 1, b.size, 1);
@@ -3090,7 +3181,7 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
         if ((var_types[0] == "d") || (var_types[1] == "d")) {
           u_e.conservativeResize(b.size, 4);
           u_e.col(2) = hfunc2_sub.block(b.begin, edge, b.size, 1);
-          if (m == rvine_structure_.struct_array(tree, edge, true)) {
+          if (m == structure.struct_array(tree, edge, true)) {
             u_e.col(3) = hfunc2_sub.block(b.begin, m - 1, b.size, 1);
           } else {
             u_e.col(3) = hfunc1_sub.block(b.begin, m - 1, b.size, 1);
@@ -3098,21 +3189,21 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
         }
 
         // h-functions are only evaluated if needed in next step
-        if (rvine_structure_.needed_hfunc1(tree, edge)) {
-          hfunc1.block(b.begin, edge, b.size, 1) = edge_copula->hfunc1(u_e);
+        if (structure.needed_hfunc1(tree, edge)) {
+          hfunc1.block(b.begin, edge, b.size, 1) = edge_copula.hfunc1(u_e);
           if (var_types[1] == "d") {
             u_e_sub = u_e;
             u_e_sub.col(1) = u_e.col(3);
             hfunc1_sub.block(b.begin, edge, b.size, 1) =
-              edge_copula->hfunc1(u_e_sub);
+              edge_copula.hfunc1(u_e_sub);
           }
         }
-        hfunc2.block(b.begin, edge, b.size, 1) = edge_copula->hfunc2(u_e);
+        hfunc2.block(b.begin, edge, b.size, 1) = edge_copula.hfunc2(u_e);
         if (var_types[0] == "d") {
           u_e_sub = u_e;
           u_e_sub.col(0) = u_e.col(2);
           hfunc2_sub.block(b.begin, edge, b.size, 1) =
-            edge_copula->hfunc2(u_e_sub);
+            edge_copula.hfunc2(u_e_sub);
         }
       }
     }
@@ -3187,6 +3278,33 @@ inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const size_t num_threads) const
 {
+  return inverse_rosenblatt_impl(u, VinecopView(*this), num_threads);
+}
+
+//! @brief Evaluates the inverse Rosenblatt transform for a conditioning set.
+//!
+//! @details The vine is evaluated in an admissible sampling order whose tail
+//! contains exactly `conditioning_set`. The model itself is not modified.
+//!
+//! @param u An \f$ n \times d \f$ matrix of independent uniform variates.
+//! @param conditioning_set The 1-based indices of the conditioning variables.
+//! @param num_threads The number of threads to use for computations.
+//! @return An \f$ n \times d \f$ matrix of transformed values.
+inline Eigen::MatrixXd
+Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
+                            const std::vector<size_t>& conditioning_set,
+                            const size_t num_threads) const
+{
+  auto reorientation = make_reorientation_map(conditioning_set);
+  return inverse_rosenblatt_impl(
+    u, VinecopView(*this, reorientation), num_threads);
+}
+
+inline Eigen::MatrixXd
+Vinecop::inverse_rosenblatt_impl(const Eigen::MatrixXd& u,
+                                 const VinecopView& view,
+                                 size_t num_threads) const
+{
   const size_t n_cols = static_cast<size_t>(u.cols());
   if ((n_cols != d_) && (n_cols != 2 * d_)) {
     throw std::runtime_error(
@@ -3212,15 +3330,16 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
     size_t n_half = n / 2;
     size_t n_left = n - n_half;
     U_vine.block(0, 0, n_half, d) =
-      inverse_rosenblatt(u.block(0, 0, n_half, d), num_threads);
+      inverse_rosenblatt_impl(u.block(0, 0, n_half, d), view, num_threads);
     U_vine.block(n_half, 0, n_left, d) =
-      inverse_rosenblatt(u.block(n_half, 0, n_left, d), num_threads);
+      inverse_rosenblatt_impl(u.block(n_half, 0, n_left, d), view, num_threads);
     return U_vine;
   }
 
   // info about the vine structure (in upper triangular matrix notation)
-  size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
-  auto order = rvine_structure_.get_order();
+  const auto& structure = view.get_structure();
+  size_t trunc_lvl = structure.get_trunc_lvl();
+  auto order = structure.get_order();
   auto inverse_order = tools_stl::invert_permutation(order);
 
   auto do_batch = [&](const tools_batch::Batch& b) {
@@ -3243,25 +3362,25 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
         static_cast<double>(n) * static_cast<double>(d) > 1e5);
       size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
       for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
-        const Bicop& edge_copula = pair_copulas_[tree][var];
+        auto edge_copula = view.get_pair_copula(tree, var).as_continuous();
 
         // extract data for conditional pair
-        size_t m = rvine_structure_.min_array(tree, var);
+        size_t m = structure.min_array(tree, var);
         U_e.col(0) = hinv2(tree + 1, var);
-        if (m == rvine_structure_.struct_array(tree, var, true)) {
+        if (m == structure.struct_array(tree, var, true)) {
           U_e.col(1) = hinv2(tree, m - 1);
         } else {
           U_e.col(1) = hfunc1(tree, m - 1);
         }
 
         // inverse Rosenblatt transform simulates data for conditional pair
-        hinv2(tree, var) = edge_copula.hinv2_continuous(U_e);
+        hinv2(tree, var) = edge_copula.hinv2(U_e);
 
         // if required at a later stage, also calculate hfunc1
         if (var < static_cast<ptrdiff_t>(d_) - 1) {
-          if (rvine_structure_.needed_hfunc1(tree, var)) {
+          if (structure.needed_hfunc1(tree, var)) {
             U_e.col(0) = hinv2(tree, var);
-            hfunc1(tree + 1, var) = edge_copula.hfunc1_continuous(U_e);
+            hfunc1(tree + 1, var) = edge_copula.hfunc1(U_e);
           }
         }
       }

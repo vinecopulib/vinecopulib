@@ -216,8 +216,17 @@ public:
                              const size_t num_threads = 1,
                              bool randomize_discrete = true,
                              std::vector<int> seeds = {}) const;
+  Eigen::MatrixXd rosenblatt(Eigen::MatrixXd u,
+                             const std::vector<size_t>& conditioning_set,
+                             const size_t num_threads = 1,
+                             bool randomize_discrete = true,
+                             std::vector<int> seeds = {}) const;
   Eigen::MatrixXd inverse_rosenblatt(const Eigen::MatrixXd& u,
                                      const size_t num_threads = 1) const;
+  Eigen::MatrixXd inverse_rosenblatt(
+    const Eigen::MatrixXd& u,
+    const std::vector<size_t>& conditioning_set,
+    const size_t num_threads = 1) const;
 
   //! Sets every pair copula in one shot.
   //! @param pair_copulas nested list of `Bicop` instances, shaped like
@@ -332,6 +341,38 @@ public:
                              const size_t num_threads = 1);
 
 private:
+  struct ReorientationMap
+  {
+    RVineStructure structure;
+    TriangularArray<RVineTrees::PairCopulaLocation> pair_copulas;
+    bool identity{ false };
+  };
+
+  class VinecopView
+  {
+  public:
+    explicit VinecopView(const Vinecop& vinecop);
+    VinecopView(const Vinecop& vinecop, const ReorientationMap& reorientation);
+
+    const RVineStructure& get_structure() const;
+    BicopView get_pair_copula(size_t tree, size_t edge) const;
+
+  private:
+    const Vinecop* vinecop_;
+    const ReorientationMap* reorientation_;
+  };
+
+  ReorientationMap make_reorientation_map(
+    const std::vector<size_t>& conditioning_set) const;
+  Eigen::MatrixXd rosenblatt_impl(Eigen::MatrixXd u,
+                                  const VinecopView& view,
+                                  size_t num_threads,
+                                  bool randomize_discrete,
+                                  std::vector<int> seeds) const;
+  Eigen::MatrixXd inverse_rosenblatt_impl(const Eigen::MatrixXd& u,
+                                          const VinecopView& view,
+                                          size_t num_threads) const;
+
   // Per-edge derivative caches shared by the analytic score/gradient/Hessian
   // cascades. One forward walk over the vine (build_deriv_cache) fills them;
   // the cascades then only read them.
