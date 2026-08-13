@@ -1019,7 +1019,7 @@ Vinecop::check_var_types(const std::vector<std::string>& var_types) const
 //! @param var_types A vector specifying the types of the variables,
 //!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
 inline void
-Vinecop::set_var_types_internal(const std::vector<std::string>& var_types) const
+Vinecop::set_var_types_internal(const std::vector<std::string>& var_types)
 {
   var_types_ = var_types;
   n_discrete_ = 0;
@@ -3161,9 +3161,17 @@ inline Eigen::MatrixXd
 Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
                             const size_t num_threads) const
 {
-  auto var_types = get_var_types();
-  set_continuous_var_types();
-  check_data(u);
+  const size_t n_cols = static_cast<size_t>(u.cols());
+  if ((n_cols != d_) && (n_cols != 2 * d_)) {
+    throw std::runtime_error(
+      "data has wrong number of columns; expected: " + std::to_string(d_) +
+      " or " + std::to_string(2 * d_) + ", actual: " + std::to_string(n_cols) +
+      ".");
+  }
+  if (u.rows() < 1) {
+    throw std::runtime_error("data must have at least one row");
+  }
+  tools_eigen::check_if_in_unit_cube(u);
 
   size_t n = u.rows();
   size_t d = d_;
@@ -3209,8 +3217,6 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
         static_cast<double>(n) * static_cast<double>(d) > 1e5);
       size_t tree_start = std::min(trunc_lvl - 1, d - var - 2);
       for (ptrdiff_t tree = tree_start; tree >= 0; --tree) {
-        // var types have already been set to continuous above, so no copy
-        // via as_continuous() is needed
         const Bicop& edge_copula = pair_copulas_[tree][var];
 
         // extract data for conditional pair
@@ -3223,13 +3229,13 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
         }
 
         // inverse Rosenblatt transform simulates data for conditional pair
-        hinv2(tree, var) = edge_copula.hinv2(U_e);
+        hinv2(tree, var) = edge_copula.hinv2_continuous(U_e);
 
-        // if required at later stage, also calculate hfunc2
+        // if required at a later stage, also calculate hfunc1
         if (var < static_cast<ptrdiff_t>(d_) - 1) {
           if (rvine_structure_.needed_hfunc1(tree, var)) {
             U_e.col(0) = hinv2(tree, var);
-            hfunc1(tree + 1, var) = edge_copula.hfunc1(U_e);
+            hfunc1(tree + 1, var) = edge_copula.hfunc1_continuous(U_e);
           }
         }
       }
@@ -3246,7 +3252,6 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
     pool.join();
   }
 
-  set_var_types_internal(var_types);
   return U_vine;
 }
 
@@ -3387,9 +3392,8 @@ Vinecop::truncate(size_t trunc_lvl)
 
 //! @brief Sets all variable types to continuous.
 //!
-//! @details The function can be const, because var_types_ is mutable.
 inline void
-Vinecop::set_continuous_var_types() const
+Vinecop::set_continuous_var_types()
 {
   var_types_ = std::vector<std::string>(d_);
   for (auto& t : var_types_)

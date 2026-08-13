@@ -8,6 +8,7 @@
 
 #include "test_utils.hpp"
 #include "vinecop_test.hpp"
+#include <future>
 #include <string>
 #include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
@@ -398,6 +399,81 @@ TEST_F(VinecopTest, simulate_is_correct)
   vinecop.simulate(10, true, 1, { 1 });
   Vinecop vinecop2(301);
   vinecop.simulate(10, true, 1, { 1 });
+}
+
+TEST_F(VinecopTest, inverse_rosenblatt_does_not_mutate_discrete_model)
+{
+  const size_t d = 5;
+  auto pair_copulas = Vinecop::make_pair_copula_store(d);
+  auto par = Eigen::VectorXd::Constant(1, 2.0);
+  for (size_t tree = 0; tree < pair_copulas.size(); ++tree) {
+    for (auto& pc : pair_copulas[tree]) {
+      pc = Bicop(BicopFamily::clayton, tree % 2 == 0 ? 90 : 270, par);
+    }
+  }
+  auto structure = DVineStructure(std::vector<size_t>{ 1, 2, 3, 4, 5 });
+  auto var_types = std::vector<std::string>{ "d", "c", "d", "d", "c" };
+  Vinecop discrete(structure, pair_copulas, var_types);
+  Vinecop continuous(structure, pair_copulas);
+  auto w = tools_stats::simulate_uniform(100, d, false, { 17 });
+
+  EXPECT_TRUE(all_close(discrete.inverse_rosenblatt(w),
+                        continuous.inverse_rosenblatt(w),
+                        1e-12,
+                        1e-12));
+  EXPECT_EQ(discrete.get_var_types(), var_types);
+
+  auto pair_copulas_before = discrete.get_all_pair_copulas();
+  EXPECT_ANY_THROW(discrete.inverse_rosenblatt(w.leftCols(d - 1)));
+  EXPECT_EQ(discrete.get_var_types(), var_types);
+  auto pair_copulas_after = discrete.get_all_pair_copulas();
+  for (size_t tree = 0; tree < pair_copulas_before.size(); ++tree) {
+    for (size_t edge = 0; edge < pair_copulas_before[tree].size(); ++edge) {
+      EXPECT_EQ(pair_copulas_after[tree][edge].get_var_types(),
+                pair_copulas_before[tree][edge].get_var_types());
+    }
+  }
+
+  auto tll_data =
+    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.5))
+      .simulate(200, false, { 29 });
+  Bicop tll(tll_data, FitControlsBicop({ BicopFamily::tll }));
+  std::vector<std::vector<Bicop>> tll_pair_copulas{ { tll } };
+  auto tll_structure = DVineStructure(std::vector<size_t>{ 1, 2 });
+  Vinecop tll_continuous(tll_structure, tll_pair_copulas);
+  Vinecop tll_discrete(tll_structure, tll_pair_copulas, { "d", "c" });
+  auto w_tll = tools_stats::simulate_uniform(20, 2, false, { 31 });
+  EXPECT_TRUE(all_close(tll_discrete.inverse_rosenblatt(w_tll),
+                        tll_continuous.inverse_rosenblatt(w_tll),
+                        1e-12,
+                        1e-12));
+}
+
+TEST_F(VinecopTest, inverse_rosenblatt_is_safe_for_concurrent_calls)
+{
+  const size_t d = 5;
+  auto pair_copulas = Vinecop::make_pair_copula_store(d);
+  auto par = Eigen::VectorXd::Constant(1, 2.0);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 90, par);
+    }
+  }
+  const Vinecop model(DVineStructure(std::vector<size_t>{ 1, 2, 3, 4, 5 }),
+                      pair_copulas,
+                      { "d", "c", "d", "d", "c" });
+  auto w = tools_stats::simulate_uniform(100, d, false, { 23 });
+  auto expected = model.inverse_rosenblatt(w);
+
+  std::vector<std::future<Eigen::MatrixXd>> results;
+  for (size_t i = 0; i < 4; ++i) {
+    results.emplace_back(std::async(std::launch::async, [&model, &w]() {
+      return model.inverse_rosenblatt(w);
+    }));
+  }
+  for (auto& result : results) {
+    EXPECT_TRUE(all_close(result.get(), expected, 1e-12, 1e-12));
+  }
 }
 
 TEST_F(VinecopTest, rosenblatt_is_correct)
