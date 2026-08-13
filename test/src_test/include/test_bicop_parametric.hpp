@@ -15,7 +15,7 @@
 namespace test_bicop_parametric {
 using namespace vinecopulib;
 using namespace tools_stl;
-std::vector<int> rotations = { 0, 90, 180, 270 };
+const std::vector<int> rotations = { 0, 90, 180, 270 };
 using test_utils::all_close;
 
 // Test that the serialization works

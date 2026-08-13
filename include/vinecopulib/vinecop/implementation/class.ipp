@@ -3170,7 +3170,8 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 
   Eigen::MatrixXd U_vine = u.leftCols(d); // output matrix
   //                   (hfunc1 + hfunc2)      (U_vine)       (info matrices)
-  size_t bytes_required = (8 * 2 * n * d * d) + (8 * n * d) + (4 * 4 * d * d);
+  size_t bytes_required =
+    (size_t{ 16 } * n * d * d) + (size_t{ 8 } * n * d) + (size_t{ 16 } * d * d);
   // if the problem is too large (requires more than 1 GB memory), split
   // the data into two halves and call simulate on the reduced data.
   if ((n > 1) & (bytes_required > static_cast<size_t>(1e9))) {

@@ -50,14 +50,11 @@ public:
     {
       finalize();
     }
-    Edge(size_t a_arg, size_t b_arg, std::vector<size_t> c_arg, const Bicop& pc)
+    Edge(size_t a_arg, size_t b_arg, std::vector<size_t> c_arg, Bicop pc)
       : a(a_arg)
       , b(b_arg)
       , C(std::move(c_arg))
-      // By const reference rather than by value + move: Bicop's user-declared
-      // copy constructor suppresses its implicit move, so by-value would copy
-      // twice.
-      , pair_copula(pc)
+      , pair_copula(std::move(pc))
     {
       finalize();
     }
