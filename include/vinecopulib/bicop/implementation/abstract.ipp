@@ -92,10 +92,17 @@ AbstractBicop::create(BicopFamily family, const Eigen::MatrixXd& parameters)
 
 //!@}
 
+//! Fallback for families that cannot be parametrized by Kendall's tau alone:
+//! everything outside `bicop_families::itau`, plus `student`, whose tau pins
+//! rho but leaves the degrees of freedom free.
 inline Eigen::MatrixXd
 AbstractBicop::no_tau_to_parameters(const double&)
 {
-  throw std::runtime_error("Method not implemented for this family");
+  throw std::runtime_error(
+    "tau_to_parameters() is not available for the " + get_family_name() +
+    " family: its parameters are not determined by Kendall's tau alone. It is "
+    "available for the one-parameter families in bicop_families::itau "
+    "(indep, gaussian, clayton, gumbel, frank, joe).");
 }
 
 //! Default tail dependence: not implemented for this family, so all four

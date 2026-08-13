@@ -1668,17 +1668,32 @@ Bicop::get_npars() const
 
 //! @brief Converts a Kendall's \f$ \tau \f$ into copula parameters
 //! for one-parameter families.
+//!
+//! @details Only available where \f$ \tau \f$ determines the parameters
+//! completely: the one-parameter families in `bicop_families::itau`, i.e.
+//! `indep`, `gaussian`, `clayton`, `gumbel`, `frank` and `joe`. Note that
+//! `student` belongs to `bicop_families::itau` — it can be *fitted* by
+//! inverting \f$ \tau \f$ — but is not invertible here, because \f$ \tau
+//! \f$ pins its correlation and leaves the degrees of freedom free.
+//!
 //! @param tau A value in \f$ (-1, 1) \f$.
+//! @throws std::runtime_error if the family is not one of those listed above.
+//! @see parameters_to_tau(), which is available for every family.
 inline Eigen::MatrixXd
 Bicop::tau_to_parameters(const double& tau) const
 {
   return bicop_->tau_to_parameters(tau);
 }
 
-//! @brief Converts the copula parameters to Kendall's \f$ tau \f$.
+//! @brief Converts the copula parameters to Kendall's \f$ \tau \f$.
+//!
+//! @details Available for every family. For the families whose \f$ \tau \f$
+//! has no closed form (`bb6`, `bb7`, `bb8`, `tawn`) it is computed by
+//! quadrature. The sign is flipped for the 90 and 270 degree rotations.
 //!
 //! @param parameters The parameters (must be a valid parametrization of
 //!     the current family).
+//! @see tau_to_parameters() for the inverse, which only some families admit.
 inline double
 Bicop::parameters_to_tau(const Eigen::MatrixXd& parameters) const
 {
