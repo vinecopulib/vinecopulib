@@ -71,14 +71,6 @@ public:
            const FitControlsBicop& controls = FitControlsBicop(),
            const size_t num_threads = 1);
 
-  DEPRECATED void select_all(
-    const Eigen::MatrixXd& data,
-    const FitControlsVinecop& controls = FitControlsVinecop());
-
-  DEPRECATED void select_families(
-    const Eigen::MatrixXd& data,
-    const FitControlsVinecop& controls = FitControlsVinecop());
-
   // Getters for a single pair copula
 
   //! @return the pair copula at the given `(tree, edge)` position.
@@ -177,7 +169,7 @@ public:
   };
 
   PdfWithHfuncsResult pdf_full(Eigen::MatrixXd u,
-                               const size_t num_threads,
+                               const size_t num_threads = 1,
                                const bool keep_all = true) const;
 
   // Stats methods with per-observation parameters. `parameters` is an
@@ -190,7 +182,7 @@ public:
 
   PdfWithHfuncsResult pdf_full(Eigen::MatrixXd u,
                                const Eigen::MatrixXd& parameters,
-                               const size_t num_threads,
+                               const size_t num_threads = 1,
                                const bool keep_all = true) const;
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,

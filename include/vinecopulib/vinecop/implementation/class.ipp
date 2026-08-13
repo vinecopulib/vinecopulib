@@ -690,63 +690,6 @@ Vinecop::fit(const Eigen::MatrixXd& data,
   }
 }
 
-//! @brief Automatically fits and selects a vine copula model.
-//!
-//! Selection of the structure is performed using the algorithm of
-//! Dissmann, J. F., E. C. Brechmann, C. Czado, and D. Kurowicka (2013).
-//! *Selecting and estimating regular vine copulae and application to
-//! financial returns.* Computational Statistics & Data Analysis, 59 (1),
-//! 52-69.
-//!
-//! @details When at least one variable is discrete, two types of "observations"
-//! are required: the first \f$ n \times d \f$ block contains realizations of
-//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
-//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
-//! left-sided limit of the cdf. For continuous variables the left limit and the
-//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
-//! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
-//! be omitted.
-//!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
-//!   observations, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls to the algorithm (see `FitControlsVinecop()`).
-inline void
-Vinecop::select_all(const Eigen::MatrixXd& data,
-                    const FitControlsVinecop& controls)
-{
-  rvine_structure_ = RVineStructure(d_, static_cast<size_t>(0));
-  select(data, controls);
-}
-
-//! @brief Automatically selects all pair-copula families and fits all.
-//! parameters.
-//!
-//!
-//! @details When at least one variable is discrete, two types of "observations"
-//! are required: the first \f$ n \times d \f$ block contains realizations of
-//! \f$ F_Y(Y), F_X(X) \f$; the second \f$ n \times d \f$ block contains
-//! realizations of \f$ F_Y(Y^-), F_X(X^-), ... \f$. The minus indicates a
-//! left-sided limit of the cdf. For continuous variables the left limit and the
-//! cdf itself coincide. For, e.g., an integer-valued variable, it holds \f$
-//! F_Y(Y^-) = F_Y(Y - 1) \f$. Continuous variables in the second block can
-//! be omitted.
-//!
-//! If there are missing data (i.e., NaN entries), incomplete observations are
-//! discarded before fitting a pair-copula. This is done on a pair-by-pair basis
-//! so that the maximal available information is used.
-//!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
-//!   observations, where \f$ k \f$ is the number of discrete variables.
-//! @param controls The controls to the algorithm (see `FitControlsVinecop()`).
-inline void
-Vinecop::select_families(const Eigen::MatrixXd& data,
-                         const FitControlsVinecop& controls)
-{
-  auto controls_trunc_lvl = controls;
-  controls_trunc_lvl.set_trunc_lvl(rvine_structure_.get_trunc_lvl());
-  select(data, controls);
-}
-
 //! @name Getters and setters
 //! @{
 
