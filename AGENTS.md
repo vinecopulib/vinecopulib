@@ -405,6 +405,24 @@ For any behavior change:
   see the per-family docs on the `BicopFamily` enum in
   [bicop/family.hpp](include/vinecopulib/bicop/family.hpp) for the house
   style.
+
+  **Write for the caller, not the implementer.** Doxygen text says what a
+  method does, what its arguments mean, and what it returns — never how it is
+  computed internally. The algorithm a method delegates to, which helper it
+  calls, why a branch exists, and what it does or does not allocate are all
+  implementation details: they belong in the code, the commit message, or
+  nowhere. These comments are the downstream Python and R docstrings, so a
+  sentence that only makes sense to someone reading this file is noise to
+  every user who ends up reading it.
+
+  **Do not restate what a sibling overload already documents.** Overloads
+  differing in one argument get a short `@brief` and only the text specific to
+  them; shared semantics live once, in the base overload or in an `@name`
+  group block (see the `//! @name Stats methods with per-row parameters` group
+  in [bicop/implementation/class.ipp](include/vinecopulib/bicop/implementation/class.ipp),
+  where each per-row overload is a one-line `@brief`). Copying the sibling's
+  `@details`, its literature reference, or its edge-case list into a new
+  overload is duplication that will drift.
 - **Parameter passing.** Read-only parameters come in by `const&`. A parameter
   the body needs as a mutable working buffer — `Vinecop::pdf`, `pdf_full`,
   `rosenblatt`, `scores*`, `gradient`, `hessian*`, which pass `u` to

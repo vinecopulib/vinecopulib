@@ -195,6 +195,20 @@ auto aic  = bicop.aic(sim_data);
 auto bic  = bicop.bic(sim_data);
 ```
 
+For parametric families, `pdf()`, `cdf()`, `hfunc1()`, `hfunc2()`, `hinv1()`,
+`hinv2()`, `loglik()`, and `simulate()` also have overloads taking one
+parameter set per observation, as in conditional or covariate-dependent
+copula models.
+
+```
+// Simulate 100 observations, each from its own Gauss copula
+Eigen::MatrixXd parameters = Eigen::VectorXd::LinSpaced(100, 0.1, 0.8);
+auto sim_par = bicop.simulate(parameters);
+
+// Evaluate the pdf at the same per-observation parameters
+auto pdf_par = bicop.pdf(sim_par, parameters);
+```
+
 
 Bivariate copula models can also be written to and constructed from JSON or
 CBOR files and

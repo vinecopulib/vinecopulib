@@ -391,6 +391,114 @@ TEST_P(ParBicopTest, per_row_parameters_match_loop)
   }
 }
 
+// Simulation with one parameter set per observation: the sample is the
+// inverse Rosenblatt transform of the same uniforms the fixed-parameter
+// overload would draw, evaluated at each observation's own parameters.
+TEST_P(ParBicopTest, simulate_per_row_parameters_match_loop)
+{
+  if (!needs_check_)
+    return;
+  if (bicop_.get_parameters().size() == 0)
+    return;
+
+  auto family = bicop_.get_family();
+  auto rotation = bicop_.get_rotation();
+  auto var_types = bicop_.get_var_types();
+  Eigen::Index n = 200;
+  const std::vector<int> seeds = { 7, 8, 9 };
+
+  Eigen::VectorXd lb = bicop_.get_parameters_lower_bounds();
+  Eigen::VectorXd ub = bicop_.get_parameters_upper_bounds();
+  Eigen::Index p = lb.size();
+  Eigen::VectorXd a = lb + 0.2 * (ub - lb);
+  Eigen::VectorXd c = lb + 0.6 * (ub - lb);
+  Eigen::MatrixXd P(n, p);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    double w = static_cast<double>(i % 5) / 4.0;
+    P.row(i) = ((1 - w) * a + w * c).transpose();
+  }
+
+  Eigen::MatrixXd sim = bicop_.simulate(P, false, seeds);
+  ASSERT_EQ(sim.rows(), n);
+  ASSERT_EQ(sim.cols(), 2);
+
+  // the uniforms come from the same stream as in the fixed-parameter overload
+  Eigen::MatrixXd u =
+    tools_stats::simulate_uniform(static_cast<size_t>(n), 2, false, seeds);
+  ASSERT_TRUE(all_close(sim.col(0), u.col(0), 0.0, 0.0)) << bicop_.str();
+
+  // ground truth: loop over single-parameter Bicops
+  Eigen::VectorXd ref(n);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    Bicop bi(family, rotation, P.row(i).transpose().eval(), var_types);
+    ref(i) = bi.hinv1(u.row(i).eval())(0);
+  }
+  ASSERT_TRUE(all_close(sim.col(1), ref)) << bicop_.str();
+  ASSERT_TRUE(all_close(sim.col(1), bicop_.hinv1(u, P), 0.0, 0.0))
+    << bicop_.str();
+
+  // threading parity (results must not depend on num_threads)
+  ASSERT_TRUE(all_close(bicop_.simulate(P, false, seeds, 3), sim, 1e-12, 1e-12))
+    << bicop_.str();
+
+  // broadcasting the stored parameters reproduces the fixed-parameter overload;
+  // the uniforms are identical, the h-inverse only up to floating-point error
+  // (the leaves take a different branch for a single parameter row)
+  {
+    Eigen::MatrixXd Pb = bicop_.get_parameters().transpose().replicate(n, 1);
+    Eigen::MatrixXd s_par = bicop_.simulate(Pb, false, seeds);
+    Eigen::MatrixXd s_fix =
+      bicop_.simulate(static_cast<size_t>(n), false, seeds);
+    ASSERT_TRUE(all_close(s_par.col(0), s_fix.col(0), 0.0, 0.0))
+      << bicop_.str();
+    ASSERT_TRUE(all_close(s_par.col(1), s_fix.col(1), 1e-8, 1e-8))
+      << bicop_.str();
+  }
+
+  // quasi-random numbers take the same path
+  {
+    const std::vector<int> qseeds = { 1, 2, 3 };
+    Eigen::MatrixXd sq = bicop_.simulate(P, true, qseeds);
+    Eigen::MatrixXd uq =
+      tools_stats::simulate_uniform(static_cast<size_t>(n), 2, true, qseeds);
+    ASSERT_TRUE(all_close(sq.col(0), uq.col(0), 0.0, 0.0)) << bicop_.str();
+    ASSERT_TRUE(all_close(sq.col(1), bicop_.hinv1(uq, P), 0.0, 0.0))
+      << bicop_.str();
+  }
+
+  // discrete variable types still yield the latent continuous sample
+  {
+    const std::vector<std::vector<std::string>> var_type_sets = {
+      { "d", "d" }, { "c", "d" }, { "d", "c" }
+    };
+    for (const auto& vt : var_type_sets) {
+      Bicop disc = bicop_;
+      disc.set_var_types(vt);
+      ASSERT_TRUE(all_close(disc.simulate(P, false, seeds), sim, 0.0, 0.0))
+        << disc.str();
+    }
+  }
+
+  // validation errors
+  EXPECT_ANY_THROW(bicop_.simulate(P.topRows(0).eval())); // no rows
+  {
+    Eigen::MatrixXd Pbad(n, p + 1);
+    Pbad.leftCols(p) = P;
+    Pbad.col(p).setConstant(0.5);
+    EXPECT_ANY_THROW(bicop_.simulate(Pbad)); // wrong number of columns
+  }
+  {
+    Eigen::MatrixXd Pnan = P;
+    Pnan(0, 0) = std::numeric_limits<double>::quiet_NaN();
+    EXPECT_ANY_THROW(bicop_.simulate(Pnan)); // NaN parameter
+  }
+  {
+    Eigen::MatrixXd Poob = P;
+    Poob(0, 0) = lb(0) - 1.0;
+    EXPECT_ANY_THROW(bicop_.simulate(Poob)); // out-of-bounds parameter
+  }
+}
+
 // Analytic (or fallback) derivatives must match central finite differences
 // of the public (rotation-aware) pdf/hfunc1/hfunc2. This validates both the
 // derivative formulas and the facade's rotation chain rule; second-order
@@ -1077,6 +1185,35 @@ TEST(BicopPerRowParameters, independence_zero_parameters)
   EXPECT_TRUE(all_close(ind.hfunc2(u, P), ind.hfunc2(u)));
   EXPECT_TRUE(all_close(ind.hinv1(u, P), ind.hinv1(u)));
   EXPECT_TRUE(all_close(ind.hinv2(u, P), ind.hinv2(u)));
+}
+
+// Degenerate families and overload resolution for the per-row simulate().
+TEST(BicopSimulate, per_row_parameters_edge_cases)
+{
+  // nonparametric families have no per-observation parameter vector
+  Bicop tll(BicopFamily::tll);
+  EXPECT_ANY_THROW(tll.simulate(Eigen::MatrixXd::Constant(5, 1, 1.0)));
+
+  // the independence copula takes an n x 0 matrix and leaves column 1 alone
+  Bicop ind(BicopFamily::indep);
+  const Eigen::Index n = 20;
+  Eigen::MatrixXd P(n, 0);
+  Eigen::MatrixXd s = ind.simulate(P, false, { 1, 2, 3 });
+  EXPECT_EQ(s.rows(), n);
+  EXPECT_EQ(s.cols(), 2);
+  EXPECT_TRUE(all_close(
+    s, ind.simulate(static_cast<size_t>(n), false, { 1, 2, 3 }), 0.0, 0.0));
+  EXPECT_ANY_THROW(ind.simulate(Eigen::MatrixXd(0, 0)));
+  EXPECT_ANY_THROW(ind.simulate(Eigen::MatrixXd::Constant(5, 1, 0.5)));
+
+  // an integral first argument must keep resolving to the fixed-parameter
+  // overload, an Eigen one to the per-row overload
+  Bicop g(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.5));
+  EXPECT_EQ(g.simulate(10).rows(), 10);
+  EXPECT_EQ(g.simulate(size_t{ 10 }, true, { 1 }).rows(), 10);
+  Eigen::MatrixXd sv = g.simulate(Eigen::VectorXd::Constant(10, 0.5));
+  EXPECT_EQ(sv.rows(), 10);
+  EXPECT_EQ(sv.cols(), 2);
 }
 
 INSTANTIATE_TEST_SUITE_P(

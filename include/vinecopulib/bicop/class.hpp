@@ -296,6 +296,11 @@ public:
     const bool qrng = false,
     const std::vector<int>& seeds = std::vector<int>()) const;
 
+  Eigen::MatrixXd simulate(const Eigen::MatrixXd& parameters,
+                           const bool qrng = false,
+                           const std::vector<int>& seeds = std::vector<int>(),
+                           const size_t num_threads = 1) const;
+
   // Methods modifying the family/rotation/parameters
   void fit(const Eigen::MatrixXd& data,
            const FitControlsBicop& controls = FitControlsBicop());

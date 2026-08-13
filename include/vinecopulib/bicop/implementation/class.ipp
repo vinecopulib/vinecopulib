@@ -1552,6 +1552,42 @@ Bicop::simulate(const size_t& n,
   return u;
 }
 
+//! @brief Simulates from a bivariate copula with per-row parameters.
+//!
+//! @details Observation `i` is drawn from the copula carrying row `i` of
+//! `parameters`, without mutating the object's stored parameters. The family,
+//! rotation, and variable types are taken from the object; only the parameter
+//! values vary by observation. Available for parametric families only.
+//!
+//! @param parameters An \f$ n \times p \f$ matrix of parameters, where `n` is
+//!   the number of observations to simulate, `p` is the number of family
+//!   parameters (`get_parameters().size()`), and row `i` holds the parameter
+//!   set used for observation `i`. Parameters are given in the family's
+//!   natural (unrotated) parameterization, as for `get_parameters()`.
+//! @param qrng Set to true for quasi-random numbers.
+//! @param seeds Seeds of the (quasi-)random number generator; if empty
+//! (default), the (quasi-)random number generator is seeded randomly.
+//! @param num_threads The number of threads to parallelize the simulation over
+//!   observations.
+//! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
+inline Eigen::MatrixXd
+Bicop::simulate(const Eigen::MatrixXd& parameters,
+                const bool qrng,
+                const std::vector<int>& seeds,
+                const size_t num_threads) const
+{
+  if (parameters.rows() < 1) {
+    throw std::runtime_error("parameters must have at least one row (one "
+                             "parameter set per simulated observation).");
+  }
+  auto u = tools_stats::simulate_uniform(
+    static_cast<size_t>(parameters.rows()), 2, qrng, seeds);
+  // use inverse Rosenblatt transform to generate a sample from the copula
+  // (always simulate continuous data)
+  u.col(1) = this->as_continuous().hinv1(u, parameters, num_threads);
+  return u;
+}
+
 //! @brief Evaluates the log-likelihood.
 //!
 //! @details The log-likelihood is defined as
