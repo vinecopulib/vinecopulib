@@ -401,57 +401,92 @@ Bicop::hinv2(const Eigen::MatrixXd& u) const
 }
 
 inline Eigen::VectorXd
-Bicop::hfunc1_continuous(const Eigen::MatrixXd& u) const
+Bicop::hfunc1_continuous(const Eigen::MatrixXd& u, bool flipped) const
 {
-  auto u_new = prep_for_abstract_continuous(u);
+  auto u_new =
+    prep_for_abstract_continuous(flipped ? tools_eigen::swap_cols(u) : u);
   // TLL leaves read their interpolation grid directly and ignore the parameter
   // argument; do not materialize the full grid merely to pass it unused.
   Eigen::MatrixXd parameters = get_family() == BicopFamily::tll
                                  ? Eigen::MatrixXd()
                                  : bicop_->get_parameters().transpose();
-  Eigen::VectorXd h(u.rows());
-  switch (rotation_) {
-    default:
-      h = bicop_->hfunc1_raw(u_new, parameters);
-      break;
-    case 90:
-      h = bicop_->hfunc2_raw(u_new, parameters);
-      break;
-    case 180:
-      h = 1.0 - bicop_->hfunc1_raw(u_new, parameters).array();
-      break;
-    case 270:
-      h = 1.0 - bicop_->hfunc2_raw(u_new, parameters).array();
-      break;
-  }
+  bool use_hfunc1 = (rotation_ % 180 == 0) != flipped;
+  Eigen::VectorXd h = use_hfunc1 ? bicop_->hfunc1_raw(u_new, parameters)
+                                 : bicop_->hfunc2_raw(u_new, parameters);
+  bool complement =
+    rotation_ == 180 || (flipped ? rotation_ == 90 : rotation_ == 270);
+  if (complement)
+    h = 1.0 - h.array();
   tools_eigen::trim(h, 0.0, 1.0);
   return h;
 }
 
 inline Eigen::VectorXd
-Bicop::hinv2_continuous(const Eigen::MatrixXd& u) const
+Bicop::hinv2_continuous(const Eigen::MatrixXd& u, bool flipped) const
 {
-  auto u_new = prep_for_abstract_continuous(u);
+  auto u_new =
+    prep_for_abstract_continuous(flipped ? tools_eigen::swap_cols(u) : u);
   Eigen::MatrixXd parameters = get_family() == BicopFamily::tll
                                  ? Eigen::MatrixXd()
                                  : bicop_->get_parameters().transpose();
-  Eigen::VectorXd hi(u.rows());
-  switch (rotation_) {
-    default:
-      hi = bicop_->hinv2_raw(u_new, parameters);
-      break;
-    case 90:
-      hi = 1.0 - bicop_->hinv1_raw(u_new, parameters).array();
-      break;
-    case 180:
-      hi = 1.0 - bicop_->hinv2_raw(u_new, parameters).array();
-      break;
-    case 270:
-      hi = bicop_->hinv1_raw(u_new, parameters);
-      break;
-  }
+  bool use_hinv1 = (rotation_ % 180 != 0) != flipped;
+  Eigen::VectorXd hi = use_hinv1 ? bicop_->hinv1_raw(u_new, parameters)
+                                 : bicop_->hinv2_raw(u_new, parameters);
+  bool complement =
+    rotation_ == 180 || (flipped ? rotation_ == 270 : rotation_ == 90);
+  if (complement)
+    hi = 1.0 - hi.array();
   tools_eigen::trim(hi, 0.0, 1.0);
   return hi;
+}
+
+inline BicopView::BicopView(const Bicop& bicop, bool flipped)
+  : bicop_(&bicop)
+  , flipped_(flipped)
+{
+}
+
+inline std::vector<std::string>
+BicopView::get_var_types() const
+{
+  auto var_types = bicop_->get_var_types();
+  if (flipped_)
+    std::swap(var_types[0], var_types[1]);
+  return var_types;
+}
+
+inline Eigen::VectorXd
+BicopView::hfunc1(const Eigen::MatrixXd& u) const
+{
+  return flipped_ ? bicop_->hfunc2(swap_arguments(u)) : bicop_->hfunc1(u);
+}
+
+inline Eigen::VectorXd
+BicopView::hfunc2(const Eigen::MatrixXd& u) const
+{
+  return flipped_ ? bicop_->hfunc1(swap_arguments(u)) : bicop_->hfunc2(u);
+}
+
+inline Eigen::VectorXd
+BicopView::hfunc1_continuous(const Eigen::MatrixXd& u) const
+{
+  return bicop_->hfunc1_continuous(u, flipped_);
+}
+
+inline Eigen::VectorXd
+BicopView::hinv2_continuous(const Eigen::MatrixXd& u) const
+{
+  return bicop_->hinv2_continuous(u, flipped_);
+}
+
+inline Eigen::MatrixXd
+BicopView::swap_arguments(const Eigen::MatrixXd& u)
+{
+  Eigen::MatrixXd swapped = u;
+  swapped.col(0).swap(swapped.col(1));
+  if (swapped.cols() == 4)
+    swapped.col(2).swap(swapped.col(3));
+  return swapped;
 }
 //! @}
 

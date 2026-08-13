@@ -537,6 +537,131 @@ make_clayton_dvine(size_t d, double par_value = 4.0, int rotation = 0)
 }
 }
 
+TEST_F(VinecopTest, reoriented_transforms_match_materialized_model)
+{
+  const size_t d = 5;
+  auto pcs = Vinecop::make_pair_copula_store(d);
+  auto clayton_par = Eigen::VectorXd::Constant(1, 2.0);
+  for (size_t tree = 0; tree < pcs.size(); ++tree) {
+    for (size_t edge = 0; edge < pcs[tree].size(); ++edge) {
+      int rotation = static_cast<int>(90 * ((tree + edge) % 4));
+      pcs[tree][edge] = Bicop(BicopFamily::clayton, rotation, clayton_par);
+    }
+  }
+  Eigen::VectorXd tawn_par(3);
+  tawn_par << 0.3, 0.8, 2.0;
+  pcs[0][0] = Bicop(BicopFamily::tawn, 90, tawn_par);
+
+  std::vector<size_t> order{ 1, 2, 3, 4, 5 };
+  Vinecop model(DVineStructure(order), pcs);
+  std::vector<size_t> conditioning_set{ 1, 2 };
+  Vinecop materialized = model;
+  materialized.reorient(conditioning_set);
+
+  auto w = tools_stats::simulate_uniform(50, d, false, { 41 });
+  auto expected_inverse = materialized.inverse_rosenblatt(w, 2);
+  auto actual_inverse = model.inverse_rosenblatt(w, conditioning_set, 2);
+  EXPECT_TRUE(all_close(actual_inverse, expected_inverse, 1e-10, 1e-10));
+
+  auto expected = materialized.rosenblatt(expected_inverse, 2, false);
+  auto actual = model.rosenblatt(expected_inverse, conditioning_set, 2, false);
+  EXPECT_TRUE(all_close(actual, expected, 1e-10, 1e-10));
+  EXPECT_TRUE(all_close(actual, w, 1e-6, 1e-6));
+
+  // The view-based transform leaves the model representation untouched.
+  EXPECT_EQ(model.get_order(), order);
+
+  // Requesting the existing tail is exactly the original transform.
+  std::vector<size_t> current_tail{ 5 };
+  EXPECT_TRUE(all_close(model.inverse_rosenblatt(w, current_tail),
+                        model.inverse_rosenblatt(w),
+                        1e-12,
+                        1e-12));
+  EXPECT_TRUE(
+    all_close(model.rosenblatt(expected_inverse, current_tail, 1, false),
+              model.rosenblatt(expected_inverse, 1, false),
+              1e-12,
+              1e-12));
+}
+
+TEST_F(VinecopTest, reoriented_transforms_handle_discrete_variables)
+{
+  const size_t d = 4;
+  auto pcs = Vinecop::make_pair_copula_store(d);
+  auto par = Eigen::VectorXd::Constant(1, 1.5);
+  for (size_t tree = 0; tree < pcs.size(); ++tree) {
+    for (auto& pc : pcs[tree])
+      pc = Bicop(BicopFamily::clayton, tree % 2 == 0 ? 90 : 270, par);
+  }
+  std::vector<std::string> var_types{ "d", "c", "d", "c" };
+  Vinecop model(DVineStructure({ 1, 2, 3, 4 }), pcs, var_types);
+  std::vector<size_t> conditioning_set{ 1 };
+  Vinecop materialized = model;
+  materialized.reorient(conditioning_set);
+
+  auto values = tools_stats::simulate_uniform(60, d, false, { 43 });
+  Eigen::MatrixXd data(values.rows(), d + 2);
+  data.leftCols(d) = values;
+  data.col(d) = 0.7 * values.col(0);
+  data.col(d + 1) = 0.7 * values.col(2);
+
+  EXPECT_TRUE(all_close(model.rosenblatt(data, conditioning_set, 2, false),
+                        materialized.rosenblatt(data, 2, false),
+                        1e-12,
+                        1e-12));
+  EXPECT_TRUE(
+    all_close(model.rosenblatt(data, conditioning_set, 2, true, { 47 }),
+              materialized.rosenblatt(data, 2, true, { 47 }),
+              1e-12,
+              1e-12));
+
+  auto w = tools_stats::simulate_uniform(60, d, false, { 53 });
+  EXPECT_TRUE(all_close(model.inverse_rosenblatt(w, conditioning_set, 2),
+                        materialized.inverse_rosenblatt(w, 2),
+                        1e-12,
+                        1e-12));
+  EXPECT_EQ(model.get_var_types(), var_types);
+}
+
+TEST_F(VinecopTest, reoriented_transforms_handle_tll_without_materializing_grid)
+{
+  auto training_data =
+    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.6))
+      .simulate(300, false, { 59 });
+  Bicop tll(training_data, FitControlsBicop({ BicopFamily::tll }));
+  auto pcs = Vinecop::make_pair_copula_store(3);
+  for (auto& tree : pcs)
+    for (auto& pc : tree)
+      pc = tll;
+
+  Vinecop model(DVineStructure({ 1, 2, 3 }), pcs);
+  std::vector<size_t> conditioning_set{ 1 };
+  Vinecop materialized = model;
+  materialized.reorient(conditioning_set);
+
+  auto w = tools_stats::simulate_uniform(20, 3, false, { 61 });
+  auto expected_inverse = materialized.inverse_rosenblatt(w);
+  auto actual_inverse = model.inverse_rosenblatt(w, conditioning_set);
+  EXPECT_TRUE(all_close(actual_inverse, expected_inverse, 1e-8, 1e-8));
+  EXPECT_TRUE(
+    all_close(model.rosenblatt(actual_inverse, conditioning_set, 1, false),
+              materialized.rosenblatt(expected_inverse, 1, false),
+              1e-8,
+              1e-8));
+}
+
+TEST_F(VinecopTest, reoriented_transforms_validate_conditioning_set)
+{
+  auto model = make_clayton_dvine(4, 2.0);
+  auto u = tools_stats::simulate_uniform(10, 4, false, { 67 });
+  EXPECT_ANY_THROW(model.rosenblatt(u, std::vector<size_t>{}, 1, false));
+  EXPECT_ANY_THROW(model.inverse_rosenblatt(u, std::vector<size_t>{ 2, 2 }));
+  EXPECT_ANY_THROW(model.rosenblatt(u, std::vector<size_t>{ 5 }, 1, false));
+
+  model.truncate(2);
+  EXPECT_ANY_THROW(model.inverse_rosenblatt(u, std::vector<size_t>{ 1 }));
+}
+
 TEST_F(VinecopTest, simulate_conditional_is_correct)
 {
   size_t d = 4;
