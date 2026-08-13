@@ -35,6 +35,10 @@ private:
   double pickands_derivative2(
     const double& t,
     const Eigen::Ref<const Eigen::VectorXd>& parameters) override;
+
+  double pickands_peak(
+    const Eigen::Ref<const Eigen::VectorXd>& parameters) override;
+
   // analytic derivatives (per-selector closed forms; see tawn.ipp)
   Eigen::VectorXd pdf_deriv_raw(const Eigen::MatrixXd& u,
                                 const Eigen::MatrixXd& parameters,

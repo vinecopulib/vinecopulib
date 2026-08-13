@@ -171,4 +171,63 @@ TEST(bicop_sanity_checks, copy)
   EXPECT_EQ(bc2.get_loglik(), bc3.get_loglik());
   EXPECT_EQ(bc2.get_nobs(), bc3.get_nobs());
 }
+
+// Kendall's tau of the families whose tau is a numerical integral. The
+// expectations are 50-digit references (Gauss-Kronrod on the same integrand),
+// and each parameter set is one where the previous implementation lost
+// precision or failed outright.
+TEST(bicop_sanity_checks, tau_of_integral_families_is_accurate)
+{
+  struct Case
+  {
+    BicopFamily family;
+    std::vector<double> parameters;
+    double tau;
+  };
+
+  // References computed at 50 digits. The corners matter: each of these was
+  // wrong by between 5e-4 and 100% before the tau integrands were reformulated.
+  const std::vector<Case> cases = {
+    // large theta: A'' is a narrow peak
+    { BicopFamily::tawn, { 0.5, 0.5, 50.0 }, 0.33100293306647305 },
+    { BicopFamily::tawn, { 0.5, 0.5, 60.0 }, 0.33140637575860532 },
+    { BicopFamily::tawn, { 0.9, 0.9, 60.0 }, 0.80695186456976831 },
+    { BicopFamily::tawn, { 0.999, 0.999, 60.0 }, 0.98140077647182433 },
+    { BicopFamily::tawn, { 0.5, 0.5, 2.0 }, 0.21460183660255169 },
+    // small psi1: the peak moves to psi1 / (psi1 + psi2), far from 1/2
+    { BicopFamily::tawn, { 1e-4, 0.5, 60.0 }, 9.9989819367449941e-05 },
+    { BicopFamily::tawn, { 1e-3, 0.5, 10.0 }, 0.00099884000269966056 },
+    { BicopFamily::tawn, { 0.01, 0.5, 60.0 }, 0.0098992116497294558 },
+    // BB7/BB8 near the upper limits, where the integrand used to cancel to
+    // exactly zero
+    { BicopFamily::bb7, { 6.0, 0.01 }, 0.72294689117590216 },
+    { BicopFamily::bb7, { 1.5, 1.0 }, 0.42857142857142860 },
+    { BicopFamily::bb8, { 8.0, 1.0 }, 0.78325404384180519 },
+    { BicopFamily::bb8, { 3.0, 0.8 }, 0.34731888449523796 },
+  };
+
+  for (const auto& c : cases) {
+    Eigen::VectorXd par(c.parameters.size());
+    for (size_t i = 0; i < c.parameters.size(); ++i)
+      par(i) = c.parameters[i];
+    Bicop bicop(c.family, 0, par);
+    EXPECT_NEAR(bicop.get_tau(), c.tau, 1e-9)
+      << "family " << bicop.get_family_name() << ", parameters "
+      << par.transpose();
+  }
+}
+
+// tau is monotone in Tawn's theta, which the pre-fix implementation violated by
+// collapsing to zero above theta = 50.
+TEST(bicop_sanity_checks, tawn_tau_is_monotone_in_theta)
+{
+  double previous = -1.0;
+  for (double theta : { 1.5, 5.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0 }) {
+    Eigen::VectorXd par(3);
+    par << 0.9, 0.9, theta;
+    const double tau = Bicop(BicopFamily::tawn, 0, par).get_tau();
+    EXPECT_GT(tau, previous) << "theta = " << theta;
+    previous = tau;
+  }
+}
 }

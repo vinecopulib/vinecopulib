@@ -31,3 +31,6 @@ target_include_directories(bench_all PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_executable(parity_dump src/parity_dump.cpp)
 target_link_libraries(parity_dump PRIVATE vinecopulib)
+
+add_executable(quadrature_study src/quadrature_study.cpp)
+target_link_libraries(quadrature_study PRIVATE vinecopulib)

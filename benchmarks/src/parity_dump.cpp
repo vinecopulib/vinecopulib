@@ -243,6 +243,35 @@ dump_tau_sweeps()
     }
     out["tawn"] = sweep(BicopFamily::tawn, pars);
   }
+  // Near-boundary corners, kept in separate keys so the interior sweeps above
+  // stay index-stable. The integrands are worst-conditioned here, so this is
+  // where a quadrature or reformulation change shows up first.
+  auto corners = [](const std::vector<std::vector<double>>& rows) {
+    std::vector<Eigen::VectorXd> pars;
+    for (const auto& row : rows) {
+      Eigen::VectorXd p(row.size());
+      for (size_t i = 0; i < row.size(); ++i) {
+        p(static_cast<Eigen::Index>(i)) = row[i];
+      }
+      pars.push_back(p);
+    }
+    return pars;
+  };
+  out["bb6_edge"] = sweep(
+    BicopFamily::bb6,
+    corners({ { 1.0, 1.0 }, { 1.001, 8.0 }, { 6.0, 1.0 }, { 6.0, 8.0 } }));
+  out["bb7_edge"] = sweep(
+    BicopFamily::bb7,
+    corners({ { 1.0, 0.01 }, { 1.001, 25.0 }, { 6.0, 0.01 }, { 6.0, 25.0 } }));
+  out["bb8_edge"] = sweep(
+    BicopFamily::bb8,
+    corners({ { 1.0, 1e-4 }, { 1.001, 1.0 }, { 8.0, 1e-4 }, { 8.0, 1.0 } }));
+  out["tawn_edge"] = sweep(BicopFamily::tawn,
+                           corners({ { 0.001, 0.5, 60.0 },
+                                     { 0.5, 0.5, 50.0 },
+                                     { 0.5, 0.5, 60.0 },
+                                     { 0.999, 0.999, 60.0 },
+                                     { 1.0, 1.0, 60.0 } }));
   return out;
 }
 

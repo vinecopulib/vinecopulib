@@ -6,10 +6,6 @@ if (VINECOPULIB_PRECOMPILED)
     set_property(TARGET vinecopulib PROPERTY POSITION_INDEPENDENT_CODE ON)
     target_link_libraries(vinecopulib PUBLIC Eigen3::Eigen wdm Boost::headers Threads::Threads)
     target_compile_features(vinecopulib PUBLIC cxx_std_17)
-    # non windows
-    if (NOT WIN32)
-        target_compile_options(vinecopulib PRIVATE -Wno-uninitialized) # Boost triggers this warning in strict mode
-    endif()
 else()
     add_library(vinecopulib INTERFACE)
     target_link_libraries(vinecopulib INTERFACE Eigen3::Eigen wdm Boost::headers Threads::Threads)
@@ -103,7 +99,7 @@ if (VINECOPULIB_PRECOMPILED)
             EXPORT "${targets_export_name}"
             LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
             ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" # on Windows, the dll file is categorised as RUNTIME
+            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" # on Windows, the dll file is categorized as RUNTIME
     )
 else()
     install(TARGETS vinecopulib EXPORT "${targets_export_name}")

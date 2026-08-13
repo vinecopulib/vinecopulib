@@ -19,7 +19,7 @@
   "bicop_eval/BB8/rot0/hinv2": 1e-09,
   "bicop_eval/Tawn/rot0/hinv1": 1e-09,
   "bicop_eval/Tawn/rot0/hinv2": 1e-09,
-  "_comment_tau": "integration tolerance relaxed 1e-12 -> 1e-9 (plan gate: 1e-7)",
+  "_comment_tau": "tau integrands reformulated and integrated with tanh-sinh (split at the peak for extreme-value families); interior lattice points move <=5e-9, the near-boundary *_edge sweeps by far more because they were wrong before -- see test_bicop_sanity_checks for 50-digit references",
   "tau/": 1e-07,
   "bicop_eval/BB6/rot0/tau": 1e-07,
   "bicop_eval/BB7/rot0/tau": 1e-07,
