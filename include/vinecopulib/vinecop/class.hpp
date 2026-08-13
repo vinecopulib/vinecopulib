@@ -194,7 +194,7 @@ public:
                                const bool keep_all = true) const;
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const size_t N = 1e4,
+                      const size_t N = 10000,
                       const size_t num_threads = 1,
                       const std::vector<int>& seeds = std::vector<int>()) const;
 

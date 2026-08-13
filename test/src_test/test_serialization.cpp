@@ -4,9 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#pragma once
-
-#include "test_utils.hpp"
+#include "include/test_utils.hpp"
 #include "gtest/gtest.h"
 #include <cstdio>
 #include <fstream>

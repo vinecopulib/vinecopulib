@@ -4,11 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#pragma once
-
-#include "parbicop_test.hpp"
-#include "rscript.hpp"
-#include "test_utils.hpp"
+#include "include/parbicop_test.hpp"
+#include "include/r_parity.hpp"
+#include "include/test_utils.hpp"
 #include <cmath>
 #include <limits>
 
@@ -22,15 +20,9 @@ using test_utils::all_close;
 TEST_P(ParBicopTest, bicop_serialization_is_correct)
 {
 
-  bicop_.to_file(std::string("temp"));
-  Bicop pc(std::string("temp"));
-
-  // Remove temp file
-  std::string cmd = rm + "temp";
-  int sys_exit_code = system(cmd.c_str());
-  if (sys_exit_code != 0) {
-    throw std::runtime_error("error in system call");
-  }
+  test_r_parity::RTempDir dir;
+  bicop_.to_file(dir.file("bicop.json"));
+  Bicop pc(dir.file("bicop.json"));
 
   EXPECT_EQ(bicop_.get_rotation(), pc.get_rotation());
   EXPECT_EQ(bicop_.get_family_name(), pc.get_family_name());
@@ -44,26 +36,15 @@ TEST_P(ParBicopTest, bicop_serialization_is_correct)
 TEST_P(ParBicopTest, parametric_bicop_is_correct)
 {
   if (needs_check_) {
-    std::string cmd = std::string(RSCRIPT) + std::string(TEST_BICOP);
-    cmd += " " + std::to_string(get_n());
-    cmd += " " + std::to_string(get_family());
-    cmd += " " + std::to_string(get_par());
-    cmd += " " + std::to_string(get_par2());
-    int sys_exit_code = system(cmd.c_str());
-    if (sys_exit_code != 0) {
-      throw std::runtime_error("error in system call");
-    }
+    SKIP_WITHOUT_RSCRIPT();
+    test_r_parity::RTempDir dir;
+    dir.run(TEST_BICOP,
+            std::to_string(get_n()) + " " + std::to_string(get_family()) + " " +
+              std::to_string(get_par()) + " " + std::to_string(get_par2()));
 
     int n = get_n();
 
-    Eigen::MatrixXd results = tools_eigen::read_matxd("temp");
-
-    // Remove temp file
-    cmd = rm + "temp";
-    sys_exit_code += system(cmd.c_str());
-    if (sys_exit_code != 0) {
-      throw std::runtime_error("error in system call");
-    }
+    Eigen::MatrixXd results = tools_eigen::read_matxd(dir.file("temp").c_str());
 
     auto absdiff = fabs(bicop_.get_tau() - results(0, 0));
     ASSERT_TRUE(absdiff < 1e-2) << bicop_.str();
@@ -978,23 +959,15 @@ TEST_P(ParBicopTest, parametric_bicop_derivatives_match_R)
   };
   if (!is_member(bicop_.get_family(), supported))
     return;
+  SKIP_WITHOUT_RSCRIPT();
 
   int n = 500;
-  std::string cmd = std::string(RSCRIPT) + std::string(TEST_BICOP_DERIV);
-  cmd += " " + std::to_string(n);
-  cmd += " " + std::to_string(get_family());
-  cmd += " " + std::to_string(get_par());
-  cmd += " " + std::to_string(get_par2());
-  int sys_exit_code = system(cmd.c_str());
-  if (sys_exit_code != 0) {
-    throw std::runtime_error("error in system call");
-  }
-  Eigen::MatrixXd results = tools_eigen::read_matxd("temp_deriv");
-  cmd = rm + "temp_deriv";
-  sys_exit_code += system(cmd.c_str());
-  if (sys_exit_code != 0) {
-    throw std::runtime_error("error in system call");
-  }
+  test_r_parity::RTempDir dir;
+  dir.run(TEST_BICOP_DERIV,
+          std::to_string(n) + " " + std::to_string(get_family()) + " " +
+            std::to_string(get_par()) + " " + std::to_string(get_par2()));
+  Eigen::MatrixXd results =
+    tools_eigen::read_matxd(dir.file("temp_deriv").c_str());
 
   Eigen::MatrixXd u = results.block(0, 0, n, 2);
   bool st = (bicop_.get_family() == BicopFamily::student);

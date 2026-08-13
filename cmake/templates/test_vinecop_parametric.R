@@ -1,4 +1,9 @@
 #!/usr/bin/env Rscript
+# Output goes to the directory the test allocated for this run, so that
+# concurrent test processes cannot overwrite each other's files.
+outdir <- Sys.getenv("VINECOPULIB_TEST_OUTDIR", unset = ".")
+out <- function(f) file.path(outdir, f)
+
 if (!("VineCopula" %in% rownames(installed.packages()))) {
   install.packages("VineCopula", repos = "http://cran.rstudio.com/")
 }
@@ -39,7 +44,7 @@ write.table(cbind(
   VineCopula::RVinePDF(u, model),
   VineCopula::RVineSim(1000, model, U = u)
 ),
-file = "temp", col.names = FALSE, row.names = FALSE
+file = out("temp"), col.names = FALSE, row.names = FALSE
 )
-write.table(mat, file = "temp2", col.names = FALSE, row.names = FALSE)
-write.table(fit$Matrix, file = "temp3", col.names = FALSE, row.names = FALSE)
+write.table(mat, file = out("temp2"), col.names = FALSE, row.names = FALSE)
+write.table(fit$Matrix, file = out("temp3"), col.names = FALSE, row.names = FALSE)

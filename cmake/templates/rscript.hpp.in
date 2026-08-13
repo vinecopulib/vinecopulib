@@ -1,4 +1,4 @@
-// Copyright © 2018 Thomas Nagler and Thibault Vatter
+// Copyright © 2016-2025 Thomas Nagler and Thibault Vatter
 //
 // This file is part of the vinecopulib library and licensed under the terms of
 // the MIT license. For a copy, see the LICENSE file in the root directory of
@@ -6,17 +6,14 @@
 
 #pragma once
 
-#include <string>
+//! 1 when Rscript was found at configure time. The parity tests skip when 0,
+//! so the suite builds and runs without R.
+#define VINECOPULIB_HAS_RSCRIPT @VINECOPULIB_HAS_RSCRIPT@
 
-#define RSCRIPT "Rscript --vanilla "
-#define TEST_BICOP "\"test/test_bicop_parametric.R\""
-#define TEST_BICOP_DERIV "\"test/test_bicop_derivatives.R\""
-#define TEST_VINECOP "\"test/test_vinecop_parametric.R\""
-#define TEST_VINECOP_DERIV "\"test/test_vinecop_derivatives.R\""
+#define RSCRIPT "\"@RSCRIPT_EXECUTABLE@\" --vanilla "
 
-#if defined(WIN32) || defined(_WIN32) ||                                       \
-  defined(__WIN32) && !defined(__CYGWIN__)
-static const std::string rm = "del ";
-#else
-static const std::string rm = "rm ";
-#endif
+// Absolute paths: the tests must not depend on the working directory.
+#define TEST_BICOP "\"@r_script_dir@/test_bicop_parametric.R\""
+#define TEST_BICOP_DERIV "\"@r_script_dir@/test_bicop_derivatives.R\""
+#define TEST_VINECOP "\"@r_script_dir@/test_vinecop_parametric.R\""
+#define TEST_VINECOP_DERIV "\"@r_script_dir@/test_vinecop_derivatives.R\""

@@ -88,28 +88,34 @@ runs:
     - name: Install Eigen ${{inputs.eigen_version}}
       if: inputs.eigen == 'true'
       run: |
-          # Both sources return 503 intermittently.
+          # Both sources fail intermittently: gitlab.com returns 503, and the
+          # Chocolatey eigen package periodically fails to unpack.
           retry() {
-            for attempt in 1 2 3; do
+            for attempt in 1 2 3 4 5; do
               "$@" && return 0
-              echo "attempt $attempt failed; retrying in $((attempt * 15))s"
-              sleep $((attempt * 15))
+              echo "attempt $attempt failed; retrying in $((attempt * 20))s"
+              sleep $((attempt * 20))
             done
             return 1
           }
+          # A relative destination: runner.temp is a backslash path on Windows,
+          # which bash mangles.
           clone_eigen() {
             # git clone refuses a non-empty destination, so start clean.
-            rm -rf "${{runner.temp}}/eigen"
+            rm -rf eigen-src
             git clone --depth 1 --branch ${{inputs.eigen_version}} \
-              https://gitlab.com/libeigen/eigen.git/ "${{runner.temp}}/eigen"
+              https://gitlab.com/libeigen/eigen.git/ eigen-src
           }
-          if [ "${{ inputs.os }}" != "windows-latest" ]; then
-            retry clone_eigen
-            cmake ${{runner.temp}}/eigen -B ${{runner.temp}}/eigen/build -DCMAKE_INSTALL_PREFIX=${{ inputs.eigen_install_dir }}
-            make install -C ${{runner.temp}}/eigen/build
-          else
-            retry choco install eigen --version="${{inputs.eigen_version}}"
-          fi
+          # Same source everywhere. Eigen is header-only, and the Chocolatey
+          # package is unreliable, so Windows builds it from the clone too; the
+          # install provides the Eigen3Config.cmake that find_package needs.
+          prefix=$(echo '${{ inputs.eigen_install_dir }}' | tr '\\' '/')
+          retry clone_eigen
+          cmake -S eigen-src -B eigen-src/build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$prefix" \
+            -DBUILD_TESTING=OFF
+          cmake --build eigen-src/build --config Release --target install
       shell: bash
 
     - name: Install wdm (pinned to ${{inputs.wdm_ref}})

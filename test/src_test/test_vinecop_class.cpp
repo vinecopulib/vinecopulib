@@ -4,10 +4,8 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#pragma once
-
-#include "test_utils.hpp"
-#include "vinecop_test.hpp"
+#include "include/test_utils.hpp"
+#include "include/vinecop_test.hpp"
 #include <future>
 #include <mutex>
 #include <set>
@@ -156,18 +154,9 @@ TEST_F(VinecopTest, serialization)
   auto vc = Vinecop(mat, pc_store);
   vc.truncate(3);
 
-  // serialize
-  vc.to_file(std::string("temp"));
-
-  // unserialize
-  auto vc2 = Vinecop(std::string("temp"));
-
-  // Remove temp file
-  std::string cmd = rm + "temp";
-  int sys_exit_code = system(cmd.c_str());
-  if (sys_exit_code != 0) {
-    throw std::runtime_error("error in system call");
-  }
+  test_r_parity::RTempDir dir;
+  vc.to_file(dir.file("vinecop.json"));
+  auto vc2 = Vinecop(dir.file("vinecop.json"));
 
   EXPECT_EQ(vc.get_all_rotations(), vc2.get_all_rotations());
   EXPECT_EQ(vc.get_all_families(), vc2.get_all_families());
@@ -1132,23 +1121,16 @@ TEST_F(VinecopTest, scores_joint)
 // BiCopDeriv* (ParBicopTest).
 TEST(VinecopDerivatives, full_scores_match_RVineGrad_and_RVineHessian)
 {
-  std::string cmd =
-    std::string(RSCRIPT) + std::string(TEST_VINECOP_DERIV) + " 300";
-  int sys_exit_code = system(cmd.c_str());
-  if (sys_exit_code != 0) {
-    throw std::runtime_error("error in system call");
-  }
-  auto mat =
-    tools_eigen::read_matxs("temp_vderiv_matrix").colwise().reverse().eval();
-  auto u = tools_eigen::read_matxd("temp_vderiv_data");
-  auto grads = tools_eigen::read_matxd("temp_vderiv_grad");
-  auto hess_r = tools_eigen::read_matxd("temp_vderiv_hess");
-  cmd = rm + "temp_vderiv_data temp_vderiv_matrix temp_vderiv_grad "
-             "temp_vderiv_hess";
-  sys_exit_code += system(cmd.c_str());
-  if (sys_exit_code != 0) {
-    throw std::runtime_error("error in system call");
-  }
+  SKIP_WITHOUT_RSCRIPT();
+  test_r_parity::RTempDir dir;
+  dir.run(TEST_VINECOP_DERIV, "300");
+  auto mat = tools_eigen::read_matxs(dir.file("temp_vderiv_matrix").c_str())
+               .colwise()
+               .reverse()
+               .eval();
+  auto u = tools_eigen::read_matxd(dir.file("temp_vderiv_data").c_str());
+  auto grads = tools_eigen::read_matxd(dir.file("temp_vderiv_grad").c_str());
+  auto hess_r = tools_eigen::read_matxd(dir.file("temp_vderiv_hess").c_str());
 
   // must stay in sync with the R script (0/180 families only; pair copula
   // (t, e) <-> VineCopula matrix cell [d - t, e + 1])
