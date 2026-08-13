@@ -93,39 +93,38 @@ inline FitControlsBicop::FitControlsBicop(std::string nonparametric_method,
 inline FitControlsBicop::FitControlsBicop(const FitControlsConfig& config)
   : FitControlsBicop() // Call default constructor
 {
-  if (optional::has_value(config.family_set)) {
-    set_family_set(optional::value(config.family_set));
+  if (config.family_set.has_value()) {
+    set_family_set(*config.family_set);
   }
-  if (optional::has_value(config.parametric_method)) {
-    set_parametric_method(optional::value(config.parametric_method));
+  if (config.parametric_method.has_value()) {
+    set_parametric_method(*config.parametric_method);
   }
-  if (optional::has_value(config.nonparametric_method)) {
-    set_nonparametric_method(optional::value(config.nonparametric_method));
+  if (config.nonparametric_method.has_value()) {
+    set_nonparametric_method(*config.nonparametric_method);
   }
-  if (optional::has_value(config.nonparametric_mult)) {
-    set_nonparametric_mult(optional::value(config.nonparametric_mult));
+  if (config.nonparametric_mult.has_value()) {
+    set_nonparametric_mult(*config.nonparametric_mult);
   }
-  if (optional::has_value(config.nonparametric_grid_size)) {
-    set_nonparametric_grid_size(
-      optional::value(config.nonparametric_grid_size));
+  if (config.nonparametric_grid_size.has_value()) {
+    set_nonparametric_grid_size(*config.nonparametric_grid_size);
   }
-  if (optional::has_value(config.selection_criterion)) {
-    set_selection_criterion(optional::value(config.selection_criterion));
+  if (config.selection_criterion.has_value()) {
+    set_selection_criterion(*config.selection_criterion);
   }
-  if (optional::has_value(config.weights)) {
-    set_weights(optional::value(config.weights));
+  if (config.weights.has_value()) {
+    set_weights(*config.weights);
   }
-  if (optional::has_value(config.psi0)) {
-    set_psi0(optional::value(config.psi0));
+  if (config.psi0.has_value()) {
+    set_psi0(*config.psi0);
   }
-  if (optional::has_value(config.preselect_families)) {
-    set_preselect_families(optional::value(config.preselect_families));
+  if (config.preselect_families.has_value()) {
+    set_preselect_families(*config.preselect_families);
   }
-  if (optional::has_value(config.num_threads)) {
-    set_num_threads(optional::value(config.num_threads));
+  if (config.num_threads.has_value()) {
+    set_num_threads(*config.num_threads);
   }
-  if (optional::has_value(config.allow_rotations)) {
-    set_allow_rotations(optional::value(config.allow_rotations));
+  if (config.allow_rotations.has_value()) {
+    set_allow_rotations(*config.allow_rotations);
   }
 }
 

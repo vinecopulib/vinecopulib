@@ -10,24 +10,31 @@ if(VINECOPULIB_PRECOMPILED)
             "// the MIT license. For a copy, see the LICENSE file in the root directory of \n"
             "// vinecopulib or https://vinecopulib.github.io/vinecopulib/. \n")
 
-    file(GLOB_RECURSE vinecopulib_ipp ${vinecopulib_includes}/*.ipp)
+    file(GLOB_RECURSE vinecopulib_ipp CONFIGURE_DEPENDS ${vinecopulib_includes}/*.ipp)
     foreach (file ${vinecopulib_ipp})
 
-        # Get directory, name and path for header/source files
+        # Get directory, name and path for header/source files. Paths are
+        # manipulated with string(REPLACE), not regexes: the source directory is
+        # arbitrary and may contain regex metacharacters such as '+' or '.'.
         get_filename_component(name_without_extension ${file} NAME_WE)
         get_filename_component(directory ${file} DIRECTORY)
-        string(REGEX REPLACE "/implementation" "" directory ${directory})
+        string(REGEX REPLACE "/implementation$" "" directory ${directory})
         set(header_file ${directory}/${name_without_extension}.hpp)
-        string(REGEX REPLACE "${vinecopulib_includes}/" ""
+        string(REPLACE "${vinecopulib_includes}/" ""
                 header_file ${header_file})
-        string(REGEX REPLACE ${vinecopulib_includes}/vinecopulib
-                ${vinecopulib_generated_sources} source_folder ${directory})
+        string(REPLACE "${vinecopulib_includes}/vinecopulib"
+                "${vinecopulib_generated_sources}" source_folder ${directory})
         set(source_file "${source_folder}/${name_without_extension}.cpp")
 
-        # Scrap file content, remove inline & add include
+        # Turn the .ipp into a translation unit: drop the banner (re-added
+        # below) and the `inline` keywords, then include the header.
         file(READ ${file} file_content)
-        string(REGEX REPLACE "inline " "" file_content "${file_content}")
-        string(SUBSTRING "${file_content}" 282 -1 file_content)
+        # Anchored to the start of a line so the word is not stripped out of
+        # comments or string literals.
+        string(REGEX REPLACE "(^|\n)inline ([A-Za-z_])" "\\1\\2" file_content "${file_content}")
+        # Match the banner rather than a fixed byte count, which the banner
+        # length would otherwise have to be kept in sync with.
+        string(REGEX REPLACE "^(//[^\n]*\n)+" "" file_content "${file_content}")
         string(CONCAT file_content "${license}"
                 "\n#include <${header_file}>" "${file_content}")
 

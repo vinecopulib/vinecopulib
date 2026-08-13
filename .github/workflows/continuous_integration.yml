@@ -113,8 +113,8 @@ jobs:
           mkdir debug && cd debug
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
-              cmake .. -DSTRICT_COMPILER=ON \
-                -DCODE_COVERAGE=ON \
+              cmake .. -DVINECOPULIB_STRICT_COMPILER=ON \
+                -DVINECOPULIB_CODE_COVERAGE=ON \
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
               make vinecopulib_coverage
@@ -304,7 +304,7 @@ jobs:
       - name: Build the documentation
         run: |
           mkdir build-docs && cd build-docs
-          cmake .. -DBUILD_DOC=ON -DBUILD_TESTING=OFF
+          cmake .. -DVINECOPULIB_BUILD_DOC=ON -DBUILD_TESTING=OFF
           make doc 2>&1 | tee doxygen.log
       - name: Summarize Doxygen warnings
         if: always()

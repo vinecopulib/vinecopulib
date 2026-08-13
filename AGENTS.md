@@ -31,7 +31,7 @@ git submodule, and there is no vendored `lib/` tree.
 This repository is the **upstream**. Two interface libraries wrap it and
 track its tags: [`rvinecopulib`](https://github.com/vinecopulib/rvinecopulib)
 (R) and [`pyvinecopulib`](https://github.com/vinecopulib/pyvinecopulib)
-(Python). Behaviour and API changes here ripple downstream.
+(Python). Behavior and API changes here ripple downstream.
 
 Three design principles inform the rest of this file:
 
@@ -41,14 +41,14 @@ Three design principles inform the rest of this file:
   [NEWS.md](NEWS.md).
 - **Header-only, with an optional precompiled mode.** The `.hpp`
   (declaration) / `.ipp` (inline implementation) split is the single
-  source of truth; there are no generated, gitignored artefacts to keep
+  source of truth; there are no generated, gitignored artifacts to keep
   in sync. The `VINECOPULIB_PRECOMPILED` build merely *derives* `.cpp`
   translation units from the same `.ipp` files — see
   [Build modes](#build-modes).
 - **Code is quantitatively sensitive.** Pseudo-observation transforms,
-  h-functions, the Rosenblatt cascade, family parameterisations,
+  h-functions, the Rosenblatt cascade, family parameterizations,
   Kendall's-τ ↔ parameter maps, TLL interpolation grids, and JSON
-  round-trips all encode mathematically precise behaviour. Small
+  round-trips all encode mathematically precise behavior. Small
   "obvious-looking" changes can silently break copula identities. Treat
   numerical paths as correctness-critical and prefer round-trip / parity
   tests over structural ones.
@@ -57,31 +57,31 @@ Three design principles inform the rest of this file:
 
 ### Included
 
-- **Bivariate copula modelling** — every family in `BicopFamily`
+- **Bivariate copula modeling** — every family in `BicopFamily`
   ([bicop/family.hpp](include/vinecopulib/bicop/family.hpp)): `indep`,
   `gaussian`, `student`, `clayton`, `gumbel`, `frank`, `joe`,
   `bb1/6/7/8`, `tawn`, and the nonparametric `tll` (transformation local
   likelihood); with rotations (`0/90/180/270`), mixed-discrete handling
   (`var_types` of `"c"`/`"d"`), and family-set constraints via
   `FitControlsBicop`.
-- **Vine copula modelling** — `Vinecop` with Dissmann selection over
+- **Vine copula modeling** — `Vinecop` with Dissmann selection over
   maximum spanning trees (`mst_prim` / `mst_kruskal`) and random
   spanning trees (`random_weighted` / `random_unweighted`), and
   user-supplied `RVineStructure` / `CVineStructure` / `DVineStructure`.
   Truncation, dependence thresholding, sparse (mBICv) selection,
   threading, and family sets are exposed through `FitControlsVinecop`.
 - **Vine structures** — `RVineStructure` and its `CVineStructure` /
-  `DVineStructure` specialisations, the underlying `TriangularArray<T>`
+  `DVineStructure` specializations, the underlying `TriangularArray<T>`
   container, and random-structure simulation.
 - **Dependence measures** — via `wdm` (Kendall's τ, Spearman's ρ, etc.),
   used as edge-weighting criteria during structure selection.
 - **Quasi-random sampling** — `sobol` (up to 21201 dimensions) and
   `ghalton`, behind `simulate_uniform`.
-- **Pseudo-observations** — `to_pseudo_obs` (rank-normalise to the unit
+- **Pseudo-observations** — `to_pseudo_obs` (rank-normalize to the unit
   hypercube), the canonical input transform for copula fitting.
 - **Numerics infrastructure** — bound-constrained MLE (Powell's BOBYQA),
   bilinear interpolation grids for TLL, 1-d numerical integration, a
-  thread pool, and JSON (de)serialisation.
+  thread pool, and JSON (de)serialization.
 
 ### Excluded (explicit)
 
@@ -305,19 +305,19 @@ Before changing code, read in this order:
 3. The public header you're about to touch (the `.hpp`), then its
    `implementation/*.ipp`.
 4. The matching `test/test_<topic>.cpp` (and its logic in
-   `test/src_test/`) for expected behaviour.
+   `test/src_test/`) for expected behavior.
 
 Match existing local patterns rather than introducing new ones.
 
 ### Definition of done
 
-For any behaviour change:
+For any behavior change:
 
 - Diffs are scoped to the task; no opportunistic refactors that span
   unrelated files.
 - Tests added or extended (GoogleTest). Prefer extending an existing
   `test/test_<topic>.cpp` over duplicating logic.
-- Public-API or behaviour changes are recorded in [NEWS.md](NEWS.md)
+- Public-API or behavior changes are recorded in [NEWS.md](NEWS.md)
   under the appropriate `### …` heading with a PR number; breaking
   changes use the `DEPRECATED` macro where a soft migration is feasible.
 - Doxygen `//!` comments on changed declarations are kept accurate
@@ -340,7 +340,7 @@ For any behaviour change:
   taken to reach a working state are review history, not project history, so the
   squashed message — not the intermediate commits — is what has to explain the
   change. Write it as the summary of the whole pull request: what changed, why,
-  and anything a future reader needs (behaviour changes, follow-ups). The
+  and anything a future reader needs (behavior changes, follow-ups). The
   `(#NNN)` suffix keeps the pull request discoverable from `git log`, which is
   where [NEWS.md](NEWS.md) entries are sourced.
 
@@ -354,6 +354,21 @@ For any behaviour change:
   discussion, and the reasoning behind a change belong in the commit message
   and the PR description. If a comment needs a paragraph, it probably belongs
   there instead. This applies equally to CMake, CI workflows, and configs.
+
+  The test: **would the comment still make sense in a file that had never had
+  the bug?** If yes it is documentation; if it only reads as a contrast with
+  what the code used to do, it is history and belongs in the commit message.
+
+  ```cmake
+  # documentation — states the constraint
+  # 3.14 for FetchContent_MakeAvailable; do not lower.
+
+  # history — only makes sense against the old code
+  # 3.14 is the real floor: the previous 3.10 could not configure at all.
+  ```
+
+- **American English** in code, comments, documentation, commit messages, and
+  changelog entries: *behavior*, *normalize*, *center*, *modeling*, *honored*.
 - **Compiler warnings.** Do not suppress warnings with diagnostic pragmas.
   Fix the underlying code instead, including in vendored headers when the
   warning originates there. If a warning cannot reasonably be fixed, keep any
@@ -449,7 +464,7 @@ For any behaviour change:
   — the tree structure as an R-vine matrix / triangular array, with
   truncation, the precomputed `needed_hfunc1/2` masks, validity checks,
   and `RVineStructure::simulate` for random structures. C- and D-vines are
-  order-determined specialisations.
+  order-determined specializations.
 - **`FitControlsVinecop`**
   ([fit_controls.hpp](include/vinecopulib/vinecop/fit_controls.hpp))
   inherits `FitControlsBicop` and adds the structure knobs: `trunc_lvl`,
@@ -475,12 +490,12 @@ Infrastructure shared across both modules:
   matrices (via `wdm`), and the `BoxCovering` machinery for discrete-ties
   latent-sample recovery.
 - **`tools_optimization` + `tools_bobyqa`** — Powell's BOBYQA
-  bound-constrained optimiser behind an `Optimizer` wrapper; the engine
+  bound-constrained optimizer behind an `Optimizer` wrapper; the engine
   for parametric MLE.
 - **`tools_interpolation`** — `InterpolationGrid`, the bilinear unit-square
-  grid backing the `tll` family, with Sinkhorn margin normalisation and
+  grid backing the `tll` family, with Sinkhorn margin normalization and
   `integrate_1d` / `integrate_2d`.
-- **`tools_serialization` + `nlohmann_json.hpp`** — JSON (de)serialisation
+- **`tools_serialization` + `nlohmann_json.hpp`** — JSON (de)serialization
   of matrices, vectors, and triangular arrays; `nlohmann_json.hpp` is
   vendored verbatim (excluded from formatting and coverage).
 - **`tools_thread` + `tools_interface` + `tools_batch`** — a `std::thread`

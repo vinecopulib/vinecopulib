@@ -76,9 +76,10 @@ inline RVineTrees::RVineTrees(size_t d, std::vector<Tree> trees)
 inline RVineTrees::DiagonalPolicy
 RVineTrees::default_diagonal_policy()
 {
-  return [](size_t, const std::vector<std::vector<size_t>>& leaf_edges) {
-    return leaf_edges[0][0];
-  };
+  return
+    [](size_t, const std::vector<std::vector<size_t>>& leaf_edges) noexcept {
+      return leaf_edges[0][0];
+    };
 }
 
 //! @brief Converts back to matrix form, choosing diagonals with a policy and

@@ -4,9 +4,20 @@ include(CMakeFindDependencyMacro)
 find_dependency(Eigen3)
 find_dependency(wdm)
 find_dependency(Boost CONFIG)
+# Threads::Threads appears in the exported link interface, so the consumer needs
+# the imported target to exist.
+find_dependency(Threads)
 
 set_and_check(VINECOPULIB_INCLUDE_DIR "@PACKAGE_include_install_dir@")
 include("${CMAKE_CURRENT_LIST_DIR}/@targets_export_name@.cmake")
 check_required_components("@PROJECT_NAME@")
 
-set(VINECOPULIB_LIBRARIES vinecopulib)
+# Whether the package ships a compiled library or the .ipp tree.
+set(VINECOPULIB_PRECOMPILED @VINECOPULIB_PRECOMPILED@)
+
+# The exported target is vinecopulib::vinecopulib. The unqualified name and
+# VINECOPULIB_LIBRARIES are kept for consumers written against earlier releases.
+if(TARGET vinecopulib::vinecopulib AND NOT TARGET vinecopulib)
+  add_library(vinecopulib ALIAS vinecopulib::vinecopulib)
+endif()
+set(VINECOPULIB_LIBRARIES vinecopulib::vinecopulib)

@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 project (Example)
 
@@ -9,7 +9,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # C++ compile flags
 if (NOT WIN32)
-  set(CMAKE_CXX_FLAGS "-Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O3 -march=native -DNDEBUG")
+  set(CMAKE_CXX_FLAGS "-Wextra -Wall -Wno-delete-non-virtual-dtor -Werror=return-type -O3 -DNDEBUG")
 endif()
 
 if (POLICY CMP0074)

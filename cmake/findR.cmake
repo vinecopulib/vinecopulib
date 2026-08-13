@@ -14,8 +14,12 @@ if(BUILD_TESTING)
 
     if(RSCRIPT_EXECUTABLE)
         configure_file(${CMAKE_CURRENT_LIST_DIR}/templates/rscript.hpp.in ${CMAKE_BINARY_DIR}/generated/test/rscript.hpp)
-    elseif(RSCRIPT_EXECUTABLE)
-        message(SEND_ERROR "BUILD_TESTING requires Rscript to be installed in a standard location.")
-    endif(RSCRIPT_EXECUTABLE)
+    else()
+        # Fail here rather than at build time with a missing rscript.hpp.
+        message(FATAL_ERROR
+                "BUILD_TESTING requires Rscript on PATH (the R parity tests shell "
+                "out to it). Configure with -DBUILD_TESTING=OFF to build without "
+                "the test suite.")
+    endif()
 
 endif(BUILD_TESTING)
