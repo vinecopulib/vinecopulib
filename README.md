@@ -1,8 +1,7 @@
 # vinecopulib
 
-[![Build Status](https://github.com/vinecopulib/vinecopulib/workflows/Build%20Status/badge.svg)](https://github.com/vinecopulib/vinecopulib/actions)
+[![Build Status](https://github.com/vinecopulib/vinecopulib/actions/workflows/continuous_integration.yml/badge.svg?branch=main)](https://github.com/vinecopulib/vinecopulib/actions/workflows/continuous_integration.yml)
 [![Coverage Status](https://img.shields.io/codecov/c/github/vinecopulib/vinecopulib/main.svg)](https://codecov.io/github/vinecopulib/vinecopulib?branch=main)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/2c8d45ebcb954082b409b4a2bd31af2b)](https://www.codacy.com/gh/vinecopulib/vinecopulib/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vinecopulib/vinecopulib&amp;utm_campaign=Badge_Grade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/website/http/vinecopulib.github.io/vinecopulib.svg)](https://vinecopulib.github.io/vinecopulib/)
 [![DOI](https://zenodo.org/badge/76354683.svg)](https://zenodo.org/badge/latestdoi/76354683)

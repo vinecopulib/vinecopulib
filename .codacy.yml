@@ -1,8 +1,0 @@
----
-engines:
- cppcheck:
-   enabled: true
-   language: c++
-exclude_paths:
-  - '**.md'
-  - 'include/vinecopulib/misc/nlohmann_json.hpp'

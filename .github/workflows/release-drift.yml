@@ -1,0 +1,54 @@
+name: Release drift
+
+# The 0.8.0 failure mode, caught on a schedule: every version string in the tree
+# said 0.8.0 and the NEWS heading carried a real date, but no v0.8.0 tag was ever
+# pushed. Nothing was watching, so the repo sat half-released for months.
+#
+# This has to be scheduled rather than push-triggered: between the release PR
+# merging and the tag being pushed, the tree legitimately sits in the
+# dated-but-untagged state for a few minutes. A weekly check means a forgotten
+# tag surfaces within a week instead of never.
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'  # Mondays, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  drift:
+    name: declared version is tagged
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0  # need the tags
+
+      - name: Compare the declared version against the tags
+        run: |
+          version=$(sed -nE 's/^project\(vinecopulib VERSION ([0-9.]+)\).*/\1/p' CMakeLists.txt)
+          if [ -z "$version" ]; then
+            echo "::error::could not read the project version from CMakeLists.txt"
+            exit 1
+          fi
+          echo "Declared version: $version"
+
+          news_heading=$(grep -m1 '^## vinecopulib ' NEWS.md)
+          echo "Top NEWS heading: $news_heading"
+
+          if printf '%s' "$news_heading" | grep -qi '(unreleased)'; then
+            echo "Version $version is marked unreleased in NEWS.md; nothing to tag yet."
+            exit 0
+          fi
+
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "Tag v$version exists. No drift."
+            exit 0
+          fi
+
+          echo "::error::NEWS.md declares $version as released but tag v$version does not exist."
+          echo "Either push the tag (see docs/releasing.md) or set the NEWS heading back to (unreleased)."
+          exit 1
