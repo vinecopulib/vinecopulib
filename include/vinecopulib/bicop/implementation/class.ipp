@@ -1498,6 +1498,61 @@ Bicop::simulate(const size_t& n,
   return u;
 }
 
+//! @brief Simulates from a bivariate copula with a different parameter set per
+//! observation.
+//!
+//! @details This is the counterpart of the fixed-parameter `simulate()` for
+//! models whose parameters vary from observation to observation, as in
+//! conditional or covariate-dependent copula models. Observation `i` is drawn
+//! from the copula carrying row `i` of `parameters`, and the number of
+//! observations is the number of rows of `parameters`. The family, rotation,
+//! and variable types are taken from the object, which is left unchanged.
+//!
+//! Sampling uses the inverse Rosenblatt transform: a pair of independent
+//! uniform variables is drawn per observation, and the second one is
+//! transformed by the inverse of the first h-function (see `hinv1()`) at that
+//! observation's parameters. The draws are always continuous, even when the
+//! model has discrete variable types.
+//!
+//! Only parametric families are supported; nonparametric families store an
+//! interpolation grid rather than a per-observation parameter vector.
+//!
+//! If `qrng = TRUE`, generalized Halton sequences are used.
+//! For more information on Generalized Halton sequences, see
+//! Faure, H., Lemieux, C. (2009). Generalized Halton Sequences in 2008:
+//! A Comparative Study. ACM-TOMACS 19(4), Article 15.
+//!
+//! @param parameters An \f$ n \times p \f$ matrix of parameters, where `n` is
+//!   the number of observations to simulate and `p` is the number of family
+//!   parameters (`get_parameters().size()`). Row `i` holds the parameter set
+//!   used for observation `i`, in the family's natural (unrotated)
+//!   parameterization, as for `get_parameters()`. There must be one row per
+//!   simulated observation. The independence copula has no parameters, so `p`
+//!   is zero and only the number of rows matters.
+//! @param qrng Set to true for quasi-random numbers.
+//! @param seeds Seeds of the (quasi-)random number generator; if empty
+//! (default), the (quasi-)random number generator is seeded randomly.
+//! @param num_threads The number of threads to parallelize the inverse
+//!   h-function over observations.
+//! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
+inline Eigen::MatrixXd
+Bicop::simulate(const Eigen::MatrixXd& parameters,
+                const bool qrng,
+                const std::vector<int>& seeds,
+                const size_t num_threads) const
+{
+  if (parameters.rows() < 1) {
+    throw std::runtime_error("parameters must have at least one row (one "
+                             "parameter set per simulated observation).");
+  }
+  auto u = tools_stats::simulate_uniform(
+    static_cast<size_t>(parameters.rows()), 2, qrng, seeds);
+  // use inverse Rosenblatt transform to generate a sample from the copula
+  // (always simulate continuous data)
+  u.col(1) = this->as_continuous().hinv1(u, parameters, num_threads);
+  return u;
+}
+
 //! @brief Evaluates the log-likelihood.
 //!
 //! @details The log-likelihood is defined as

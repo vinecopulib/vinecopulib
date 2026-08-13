@@ -2,6 +2,21 @@
 
 ### NEW FEATURES
 
+* Add a per-row-parameter overload of `Bicop::simulate`:
+  `simulate(const Eigen::MatrixXd& parameters, bool qrng = false,
+  const std::vector<int>& seeds = {}, size_t num_threads = 1)`. Observation `i`
+  is drawn from the copula carrying row `i` of the `n x p` parameter matrix
+  (the layout of the per-row `pdf`/`hinv1` overloads); the number of
+  observations is `parameters.rows()`, so there is no separate `n` argument,
+  and an empty `parameters` throws. Quasi-random numbers and seeding behave as
+  in the fixed-parameter overload, and the draws are always continuous, even
+  for discrete variable types. Parametric families only; the independence
+  copula takes an `n x 0` matrix. This moves the vectorized-parameter sampling
+  that `rvinecopulib` implemented in its own interface code upstream, so
+  `pyvinecopulib` gets it too. Existing call sites are unaffected, but code
+  taking the address of `&Bicop::simulate` must now disambiguate, e.g. with
+  `py::overload_cast<const size_t&, bool, const std::vector<int>&>(
+  &Bicop::simulate, py::const_)` (#719)
 * Add scores, gradient, and Hessian of the log-likelihood to `Bicop`:
   `scores` (the n x p per-observation score matrix), `gradient` (its
   observation-average), `hessian` and `hessian_full` (the averaged and
@@ -188,6 +203,12 @@
   the pair copulas in the both-endpoints-are-leaves columns change (#702)
 
 ### BUG FIXES
+
+* Reject `n < 1` (and `d < 1`) in `tools_stats::ghalton` and
+  `tools_stats::sobol` instead of writing past the end of the output matrix.
+  Only the pseudo-random branch of `simulate_uniform` validated its arguments,
+  so `simulate_uniform(0, d, true)` reached the quasi-random generators with a
+  zero-column result (#719)
 
 * Fix out-of-bounds parameter indexing in the per-row bivariate evaluation of
   discrete leaves (`pdf_c_d`, `pdf_d_d`, and the discrete branches of `hfunc1` /

@@ -485,6 +485,9 @@ pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 inline Eigen::MatrixXd
 ghalton(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 {
+  if ((n < 1) || (d < 1)) {
+    throw std::runtime_error("n and d must be at least 1.");
+  }
 
   Eigen::MatrixXd res(d, n);
 
@@ -547,6 +550,9 @@ ghalton(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 inline Eigen::MatrixXd
 sobol(const size_t& n, const size_t& d, const std::vector<int>& seeds)
 {
+  if ((n < 1) || (d < 1)) {
+    throw std::runtime_error("n and d must be at least 1.");
+  }
 
   // output matrix
   Eigen::MatrixXd output = Eigen::MatrixXd::Zero(n, d);

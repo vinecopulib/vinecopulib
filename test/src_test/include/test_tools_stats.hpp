@@ -122,6 +122,16 @@ TEST(test_tools_stats, seed_works)
   ASSERT_TRUE(U2.cwiseEqual(U3).all());
 }
 
+TEST(test_tools_stats, degenerate_dimensions_throw)
+{
+  EXPECT_ANY_THROW(tools_stats::ghalton(0, 2));
+  EXPECT_ANY_THROW(tools_stats::ghalton(2, 0));
+  EXPECT_ANY_THROW(tools_stats::sobol(0, 2));
+  EXPECT_ANY_THROW(tools_stats::sobol(2, 0));
+  EXPECT_ANY_THROW(tools_stats::simulate_uniform(0, 2));
+  EXPECT_ANY_THROW(tools_stats::simulate_uniform(0, 2, true));
+}
+
 TEST(test_tools_stats, dpqnorm_work)
 {
   auto dnorm_boost = [](const Eigen::MatrixXd& x) {
