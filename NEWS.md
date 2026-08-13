@@ -17,6 +17,11 @@
   taking the address of `&Bicop::simulate` must now disambiguate, e.g. with
   `py::overload_cast<const size_t&, bool, const std::vector<int>&>(
   &Bicop::simulate, py::const_)` (#719)
+
+* Add conditioning-set overloads to `Vinecop::rosenblatt()` and
+  `Vinecop::inverse_rosenblatt()`. The transforms internally reorient the vine
+  through non-owning views, leaving the fitted model unchanged and avoiding
+  pair-copula copies, including TLL interpolation grids (#715)
 * Add scores, gradient, and Hessian of the log-likelihood to `Bicop`:
   `scores` (the n x p per-observation score matrix), `gradient` (its
   observation-average), `hessian` and `hessian_full` (the averaged and
