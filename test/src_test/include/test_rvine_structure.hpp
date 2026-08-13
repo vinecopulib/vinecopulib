@@ -107,14 +107,15 @@ TEST(rvine_structure, rvine_trees_works)
     pair_copulas[tree].resize(order.size() - 1 - tree);
     for (size_t edge = 0; edge < pair_copulas[tree].size(); ++edge) {
       Eigen::VectorXd parameters(3);
-      parameters << 0.2 + 0.01 * edge, 0.8 - 0.01 * tree, 2.0;
+      parameters << 0.2 + 0.01 * static_cast<double>(edge),
+        0.8 - 0.01 * static_cast<double>(tree), 2.0;
       pair_copulas[tree][edge] = Bicop(BicopFamily::tawn, 0, parameters);
     }
   }
-  auto reverse_policy = [](size_t,
-                           const std::vector<std::vector<size_t>>& leaves) {
-    return leaves.back().back();
-  };
+  auto reverse_policy =
+    [](size_t, const std::vector<std::vector<size_t>>& leaves) noexcept {
+      return leaves.back().back();
+    };
   auto carried = RVineTrees(order, struct_array, pair_copulas)
                    .to_struct_array(reverse_policy);
   auto mapped = rvt.to_struct_array_map(reverse_policy);

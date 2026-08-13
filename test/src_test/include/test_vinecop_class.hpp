@@ -456,7 +456,7 @@ TEST_F(VinecopTest, bicop_view_as_continuous_matches_materialized_copula)
 {
   Eigen::VectorXd parameters(3);
   parameters << 0.3, 0.8, 2.0;
-  auto u = tools_stats::simulate_uniform(40, 2, false, { 37 });
+  auto eval_data = tools_stats::simulate_uniform(40, 2, false, { 37 });
 
   for (int rotation : { 0, 90, 180, 270 }) {
     Bicop bicop(BicopFamily::tawn, rotation, parameters, { "d", "c" });
@@ -468,11 +468,12 @@ TEST_F(VinecopTest, bicop_view_as_continuous_matches_materialized_copula)
       auto view = BicopView(bicop, flipped).as_continuous();
 
       EXPECT_EQ(view.get_var_types(), std::vector<std::string>({ "c", "c" }));
-      EXPECT_TRUE(
-        all_close(view.hfunc1(u), materialized.hfunc1(u), 1e-10, 1e-10));
-      EXPECT_TRUE(
-        all_close(view.hfunc2(u), materialized.hfunc2(u), 1e-10, 1e-10));
-      EXPECT_TRUE(all_close(view.hinv2(u), materialized.hinv2(u), 1e-8, 1e-8));
+      EXPECT_TRUE(all_close(
+        view.hfunc1(eval_data), materialized.hfunc1(eval_data), 1e-10, 1e-10));
+      EXPECT_TRUE(all_close(
+        view.hfunc2(eval_data), materialized.hfunc2(eval_data), 1e-10, 1e-10));
+      EXPECT_TRUE(all_close(
+        view.hinv2(eval_data), materialized.hinv2(eval_data), 1e-8, 1e-8));
     }
   }
 }
@@ -678,14 +679,19 @@ TEST_F(VinecopTest, reoriented_transforms_handle_tll_without_materializing_grid)
 TEST_F(VinecopTest, reoriented_transforms_validate_conditioning_set)
 {
   auto model = make_clayton_dvine(4, 2.0);
-  auto u = tools_stats::simulate_uniform(10, 4, false, { 67 });
-  EXPECT_ANY_THROW(model.rosenblatt(u, std::vector<size_t>{}, 1, false));
-  EXPECT_ANY_THROW(model.inverse_rosenblatt(u, std::vector<size_t>{ 2, 2 }));
-  EXPECT_ANY_THROW(model.rosenblatt(u, std::vector<size_t>{ 5 }, 1, false));
-  EXPECT_ANY_THROW(model.inverse_rosenblatt(u, std::vector<size_t>{ 1, 3 }));
+  auto eval_data = tools_stats::simulate_uniform(10, 4, false, { 67 });
+  EXPECT_ANY_THROW(
+    model.rosenblatt(eval_data, std::vector<size_t>{}, 1, false));
+  EXPECT_ANY_THROW(
+    model.inverse_rosenblatt(eval_data, std::vector<size_t>{ 2, 2 }));
+  EXPECT_ANY_THROW(
+    model.rosenblatt(eval_data, std::vector<size_t>{ 5 }, 1, false));
+  EXPECT_ANY_THROW(
+    model.inverse_rosenblatt(eval_data, std::vector<size_t>{ 1, 3 }));
 
   model.truncate(2);
-  EXPECT_ANY_THROW(model.inverse_rosenblatt(u, std::vector<size_t>{ 1 }));
+  EXPECT_ANY_THROW(
+    model.inverse_rosenblatt(eval_data, std::vector<size_t>{ 1 }));
 }
 
 TEST_F(VinecopTest, simulate_conditional_is_correct)
