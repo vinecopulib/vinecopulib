@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+title: vinecopulib
+message: If you use this software, please cite it as below.
+type: software
+authors:
+  - family-names: Nagler
+    given-names: Thomas
+    orcid: https://orcid.org/0000-0003-1855-0046
+  - family-names: Vatter
+    given-names: Thibault
+    orcid: https://orcid.org/0000-0001-9212-0218
+abstract: >-
+  A header-only C++ library for vine copula models, built on Eigen. It provides
+  high-performance implementations of the core features of the VineCopula R
+  package, in particular inference algorithms for both vine copula and bivariate
+  copula models, with nonparametric and multi-parameter families, lower runtimes
+  and lower memory consumption in high dimensions.
+keywords:
+  - copula
+  - vine copula
+  - pair copula construction
+  - dependence modeling
+  - simulation
+  - C++
+license: MIT
+repository-code: https://github.com/vinecopulib/vinecopulib
+url: https://vinecopulib.github.io/vinecopulib/
+# Zenodo reads this file in preference to .zenodo.json. Keep `version` and
+# `date-released` in step with CMakeLists.txt at release time;
+# scripts/check_version.py enforces it.
+version: 0.8.0
+date-released: '2026-06-12'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.1401557
+    description: Concept DOI, resolving to the latest release.

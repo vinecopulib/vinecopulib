@@ -22,20 +22,14 @@ replace the built-in table (use as gates are relaxed per phase).
 import argparse
 import json
 import math
+import pathlib
 import sys
 
-# Built-in gate table; update as optimization phases land (see plan).
-# Ordered by specificity: first match wins.
-DEFAULT_GATES = [
-    # Phase 2.6: integration tolerance 1e-12 -> 1e-9 on tau
-    # ("tau/", 1e-7),
-    # Phase 2: log-pdf pathway + vectorized leaves (fp reassociation)
-    # ("bicop_eval/", 1e-12),
-    # ("bicop_fit/", 1e-8),
-    # Phase 3: tll overhaul
-    # ("tll/", 1e-6),
-    # ("vinecop/", 1e-9),
-]
+# The accepted gates live in parity_gates.json next to this script, which is the
+# default for --tol-config. There is deliberately no built-in table: an empty one
+# silently demands bit-identical results everywhere, which no real comparison
+# meets.
+DEFAULT_TOL_CONFIG = pathlib.Path(__file__).with_name("parity_gates.json")
 
 
 def flatten(obj, prefix=""):
@@ -85,8 +79,9 @@ def main():
     ap.add_argument("branch")
     ap.add_argument("--strict", action="store_true",
                     help="require bit-identical everywhere")
-    ap.add_argument("--tol-config", default=None,
-                    help="JSON file: {prefix: tol} overriding the gate table")
+    ap.add_argument("--tol-config", default=str(DEFAULT_TOL_CONFIG),
+                    help="JSON file of {prefix: tolerance} gates "
+                         "(default: %(default)s)")
     args = ap.parse_args()
 
     with open(args.master) as f:
@@ -94,11 +89,14 @@ def main():
     with open(args.branch) as f:
         branch = flatten(json.load(f))
 
-    gates = [] if args.strict else list(DEFAULT_GATES)
-    if args.tol_config and not args.strict:
+    gates = []
+    if not args.strict:
         with open(args.tol_config) as f:
-            gates = sorted(json.load(f).items(),
-                           key=lambda kv: -len(kv[0]))
+            # _comment* keys document why a gate was relaxed; they are prose,
+            # not prefixes, and their string values would break the comparison.
+            entries = {k: v for k, v in json.load(f).items()
+                       if not k.startswith("_comment")}
+        gates = sorted(entries.items(), key=lambda kv: -len(kv[0]))
 
     missing = sorted(set(master) - set(branch))
     added = sorted(set(branch) - set(master))

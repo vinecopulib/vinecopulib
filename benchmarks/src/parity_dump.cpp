@@ -4,12 +4,11 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-// Dumps a JSON file of numerical outputs across the surfaces touched by the
-// performance work, for before/after comparison via
-// scripts/compare_parity.py. Fully deterministic (fixed seeds everywhere).
+// Dumps a JSON file of numerical outputs across the surfaces the optimization
+// work touches, for before/after comparison via scripts/compare_parity.py.
+// Fully deterministic (fixed seeds everywhere). See scripts/README.md.
 //
 // Usage: parity_dump [output.json]  (default: bench_results/parity.json)
-// Keep generated dumps under bench_results/ so they stay gitignored.
 
 #include "helpers.hpp"
 #include <fstream>

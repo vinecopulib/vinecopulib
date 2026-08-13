@@ -45,7 +45,6 @@ cmake-build/
 examples/*/build/
 examples/*/bin/
 compile_commands.json
-.vscode/
 
 # Ctags
 src/tags
@@ -80,7 +79,8 @@ Temporary Items
 debug/
 release/
 
-.claude/
+.claude/settings.local.json
+.claude/*.local.json
 build*/
 
 # generated benchmark & parity-comparison artifacts (see scripts/bench_baseline.sh
@@ -102,3 +102,12 @@ myvine.cbor
 docs/html/
 docs/xml/
 docs/search/
+CMakeUserPresets.json
+.cache/
+*.orig
+*.rej
+*.gcda
+*.gcno
+*.info
+Testing/
+cmake-build-*
