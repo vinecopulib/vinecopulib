@@ -42,8 +42,9 @@ inline FitControlsVinecop::FitControlsVinecop()
 //!     are multiplied.
 //! @param trunc_lvl Truncation level for truncated vines.
 //! @param tree_criterion The criterion for selecting the spanning
-//!     tree (`"tau"`, `"hoeffd"`, `"rho"`, and `"mcor"` implemented so far)
-//!     during the tree-wise structure selection.
+//!     tree (`"tau"`, `"rho"`, `"hoeffd"`, `"mcor"`, `"joe"`, or `"custom"`)
+//!     during the tree-wise structure selection. `"custom"` uses the callable
+//!     set through `set_tree_criterion_function()`.
 //! @param threshold For thresholded vines (0 = no threshold).
 //! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`,
 //!     `"bic"`, `"mbic"`, or `"mbicv"`) for the pair copula families.
@@ -62,7 +63,8 @@ inline FitControlsVinecop::FitControlsVinecop()
 //! @param show_trace Whether to show a trace of the building progress.
 //! @param num_threads Number of concurrent threads to use while fitting
 //!     pair copulas within a tree; never uses more than the number
-//!     of concurrent threads supported by the implementation.
+//!     of concurrent threads supported by the implementation. A custom
+//!     tree criterion is exempt and always runs on the calling thread.
 //! @param tree_algorithm The algorithm for building the spanning
 //!     tree (`"mst_prim"`, `"mst_kruskal"`, `"random_weighted"`, or
 //!     `"random_unweighted"`) during the tree-wise structure selection.
@@ -127,8 +129,9 @@ inline FitControlsVinecop::FitControlsVinecop(
 //! @param controls See `FitControlsBicop()`.
 //! @param trunc_lvl Truncation level for truncated vines.
 //! @param tree_criterion The criterion for selecting the spanning
-//!     tree (`"tau"`, `"hoeffd"`, `"rho"`, and `"mcor"` implemented so far)
-//!     during the tree-wise structure selection.
+//!     tree (`"tau"`, `"rho"`, `"hoeffd"`, `"mcor"`, `"joe"`, or `"custom"`)
+//!     during the tree-wise structure selection. `"custom"` uses the callable
+//!     set through `set_tree_criterion_function()`.
 //! @param threshold For thresholded vines (`0` = no threshold).
 //! @param show_trace Whether to show a trace of the building progress.
 //! @param select_trunc_lvl Whether the truncation shall be selected

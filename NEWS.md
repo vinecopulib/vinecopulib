@@ -182,7 +182,13 @@
   `tree_criterion = "custom"` together with
   `FitControlsVinecop::set_tree_criterion_function` (or
   `FitControlsConfig::tree_criterion_function`), enabling custom dependence
-  criteria during Dissmann's algorithm (#674).
+  criteria during Dissmann's algorithm. The function is always invoked,
+  copied, and destroyed on the thread that starts the fit, never from a worker
+  thread, so it need not be thread safe: an R closure or a Python callable can
+  be used with any `num_threads`, and the pair-copula fits stay parallel. The
+  criterion and the callable may be set in either order, but a fit is now
+  rejected up front when only one of the two is given, instead of failing deep
+  inside selection or silently ignoring the callable (#674, #722).
 
 * Add `Vinecop::hfuncs` to return intermediate h-function values (#669)
 

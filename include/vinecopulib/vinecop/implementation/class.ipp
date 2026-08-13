@@ -288,8 +288,12 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! 52-69.
 //! The dependence measure used to select trees (default: Kendall's tau) is
 //! corrected for ties (see the [wdm](https://github.com/tnagler/wdm) library).
-//! The dependence measure can be changed using the `controls.tree_criterion`,
-//! which can be set to `"tau"`, `"rho"` or `"hoeffd"`.
+//! The dependence measure can be changed using `controls.tree_criterion`,
+//! which can be set to `"tau"`, `"rho"`, `"hoeffd"`, `"mcor"`, `"joe"`, or
+//! `"custom"`. The last one uses the callable supplied through
+//! `controls.tree_criterion_function`, which is always called on the thread
+//! that starts the fit, so it need not be thread safe; the pair-copula fits
+//! still use `controls.num_threads` threads.
 //! Both Prim's (default: `"mst_prim"`) and Kruskal's (`"mst_kruskal"`)
 //! algorithms are available through `controls.tree_algorithm` for the
 //! maximum spanning tree selection.
@@ -330,6 +334,7 @@ inline void
 Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
 {
   if (controls.get_select_families()) {
+    check_tree_criterion_function(controls);
     check_data(data);
     if (d_ == 1) {
       loglik_ = 0;
@@ -394,6 +399,27 @@ Vinecop::check_conditioning_set(const std::vector<size_t>& conditioning_set,
     throw std::runtime_error(
       "conditioning-aware selection does not support truncation "
       "(trunc_lvl / select_trunc_lvl) in this version.");
+  }
+}
+
+//! @brief Validates the custom edge-weight function against the criterion it
+//! belongs to (called from `select()`, the single entry point to structure
+//! selection; the two fields can be set in either order, so the pairing can
+//! only be checked once the fit starts).
+inline void
+Vinecop::check_tree_criterion_function(const FitControlsVinecop& controls)
+{
+  bool is_custom = (controls.get_tree_criterion() == "custom");
+  bool has_function = static_cast<bool>(controls.get_tree_criterion_function());
+  if (is_custom && !has_function) {
+    throw std::runtime_error("tree_criterion = \"custom\" requires a "
+                             "tree_criterion_function callable");
+  }
+  if (has_function && !is_custom) {
+    throw std::runtime_error(
+      "a tree_criterion_function was provided, but tree_criterion is \"" +
+      controls.get_tree_criterion() +
+      "\"; set tree_criterion = \"custom\" to use it");
   }
 }
 
