@@ -354,6 +354,18 @@ For any behaviour change:
   discussion, and the reasoning behind a change belong in the commit message
   and the PR description. If a comment needs a paragraph, it probably belongs
   there instead. This applies equally to CMake, CI workflows, and configs.
+
+  The test: **would the comment still make sense in a file that had never had
+  the bug?** If yes it is documentation; if it only reads as a contrast with
+  what the code used to do, it is history and belongs in the commit message.
+
+  ```cmake
+  # documentation — states the constraint
+  # 3.14 for FetchContent_MakeAvailable; do not lower.
+
+  # history — only makes sense against the old code
+  # 3.14 is the real floor: the previous 3.10 could not configure at all.
+  ```
 - **Compiler warnings.** Do not suppress warnings with diagnostic pragmas.
   Fix the underlying code instead, including in vendored headers when the
   warning originates there. If a warning cannot reasonably be fixed, keep any

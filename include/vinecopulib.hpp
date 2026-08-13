@@ -25,6 +25,8 @@
 #define BOOST_ALL_NO_LIB
 #endif
 
+// wdm/random.hpp selects Boost's mt19937 over std::mt19937 on this; keep it in
+// sync with VINECOPULIB_DEFINITIONS so header-only and precompiled agree.
 #ifndef USE_BOOST
 #define USE_BOOST
 #endif

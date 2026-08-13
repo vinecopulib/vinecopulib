@@ -1,0 +1,72 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 19, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Release, header-only",
+      "binaryDir": "${sourceDir}/build/default",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "dev",
+      "displayName": "Debug with sanitizers and strict warnings",
+      "binaryDir": "${sourceDir}/build/dev",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VINECOPULIB_SANITIZERS": "ON",
+        "VINECOPULIB_STRICT_COMPILER": "ON"
+      }
+    },
+    {
+      "name": "coverage",
+      "displayName": "Debug with coverage instrumentation",
+      "binaryDir": "${sourceDir}/build/coverage",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VINECOPULIB_CODE_COVERAGE": "ON"
+      }
+    },
+    {
+      "name": "bench",
+      "displayName": "Release with benchmarks, tuned for this machine",
+      "binaryDir": "${sourceDir}/build/bench",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VINECOPULIB_BUILD_BENCHMARKS": "ON",
+        "VINECOPULIB_NATIVE_ARCH": "ON",
+        "BUILD_TESTING": "OFF"
+      }
+    },
+    {
+      "name": "precompiled",
+      "displayName": "Release, compiled library",
+      "binaryDir": "${sourceDir}/build/precompiled",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VINECOPULIB_PRECOMPILED": "ON"
+      }
+    },
+    {
+      "name": "docs",
+      "displayName": "Doxygen documentation",
+      "binaryDir": "${sourceDir}/build/docs",
+      "cacheVariables": {
+        "VINECOPULIB_BUILD_DOC": "ON",
+        "BUILD_TESTING": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "default", "configurePreset": "default" },
+    { "name": "dev", "configurePreset": "dev" },
+    { "name": "coverage", "configurePreset": "coverage", "targets": ["vinecopulib_coverage"] },
+    { "name": "bench", "configurePreset": "bench", "targets": ["bench_all", "parity_dump"] },
+    { "name": "precompiled", "configurePreset": "precompiled" },
+    { "name": "docs", "configurePreset": "docs", "targets": ["doc"] }
+  ],
+  "testPresets": [
+    { "name": "dev", "configurePreset": "dev", "output": { "outputOnFailure": true } },
+    { "name": "default", "configurePreset": "default", "output": { "outputOnFailure": true } }
+  ]
+}

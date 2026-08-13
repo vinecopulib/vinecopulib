@@ -18,17 +18,23 @@ if(NOT DEFINED EIGEN3_INCLUDE_DIR)
   else()
     message(FATAL_ERROR "Could not find Eigen3")
   endif()
+  # Eigen 5.x exposes its include path only through the target and no longer
+  # sets EIGEN3_INCLUDE_DIR, which external_includes below needs.
+  if(TARGET Eigen3::Eigen)
+    get_target_property(EIGEN3_INCLUDE_DIR Eigen3::Eigen
+                        INTERFACE_INCLUDE_DIRECTORIES)
+  endif()
 endif()
 
 # Check if Boost_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED Boost_INCLUDE_DIRS)
   # try to find Boost in CONFIG mode first
-  find_package(Boost 1.56 CONFIG)
+  find_package(Boost 1.75 CONFIG)
   if (Boost_FOUND)
     message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")  
   else ()
     # fallback to MODULE mode
-    find_package(Boost 1.56 MODULE REQUIRED)
+    find_package(Boost 1.75 MODULE REQUIRED)
   endif ()
 endif()
 
@@ -43,7 +49,7 @@ if(NOT DEFINED wdm_INCLUDE_DIRS)
     FetchContent_Declare(
       wdm
       GIT_REPOSITORY https://github.com/tnagler/wdm.git
-      GIT_TAG        c837460 
+      GIT_TAG        c837460853570690ccd9367c059e41b851d6f816 # v0.2.6
     )
     FetchContent_MakeAvailable(wdm)
     set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
@@ -80,7 +86,7 @@ if(VINECOPULIB_BUILD_BENCHMARKS)
   FetchContent_Declare(
     googlebenchmark
     GIT_REPOSITORY https://github.com/google/benchmark.git
-    GIT_TAG        v1.9.1
+    GIT_TAG        96afad55c79e02f5dfca1374e772c2be72ba631b # v1.9.1
   )
   FetchContent_MakeAvailable(googlebenchmark)
 endif()
@@ -88,7 +94,7 @@ endif()
 # Set all the external dependencies
 set(external_includes ${EIGEN3_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${wdm_INCLUDE_DIRS})
 
-if(BUILD_DOC)
+if(VINECOPULIB_BUILD_DOC)
   # Find doxygen and configure if found
   find_package(Doxygen REQUIRED)
   configure_file(

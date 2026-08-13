@@ -88,7 +88,7 @@ runs:
     - name: Install Eigen ${{inputs.eigen_version}}
       if: inputs.eigen == 'true'
       run: |
-          # Both sources are flaky enough to have failed CI on a 503, so retry.
+          # Both sources return 503 intermittently.
           retry() {
             for attempt in 1 2 3; do
               "$@" && return 0

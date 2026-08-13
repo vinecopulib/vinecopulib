@@ -179,39 +179,38 @@ inline FitControlsVinecop::FitControlsVinecop(const FitControlsBicop& controls,
 inline FitControlsVinecop::FitControlsVinecop(const FitControlsConfig& config)
   : FitControlsBicop(config)
 {
-  if (optional::has_value(config.trunc_lvl)) {
-    set_trunc_lvl(optional::value(config.trunc_lvl));
+  if (config.trunc_lvl.has_value()) {
+    set_trunc_lvl(*config.trunc_lvl);
   }
-  if (optional::has_value(config.tree_criterion)) {
-    set_tree_criterion(optional::value(config.tree_criterion));
+  if (config.tree_criterion.has_value()) {
+    set_tree_criterion(*config.tree_criterion);
   }
-  if (optional::has_value(config.tree_criterion_function)) {
-    set_tree_criterion_function(
-      optional::value(config.tree_criterion_function));
+  if (config.tree_criterion_function.has_value()) {
+    set_tree_criterion_function(*config.tree_criterion_function);
   }
-  if (optional::has_value(config.threshold)) {
-    set_threshold(optional::value(config.threshold));
+  if (config.threshold.has_value()) {
+    set_threshold(*config.threshold);
   }
-  if (optional::has_value(config.select_trunc_lvl)) {
-    set_select_trunc_lvl(optional::value(config.select_trunc_lvl));
+  if (config.select_trunc_lvl.has_value()) {
+    set_select_trunc_lvl(*config.select_trunc_lvl);
   }
-  if (optional::has_value(config.select_threshold)) {
-    set_select_threshold(optional::value(config.select_threshold));
+  if (config.select_threshold.has_value()) {
+    set_select_threshold(*config.select_threshold);
   }
-  if (optional::has_value(config.select_families)) {
-    set_select_families(optional::value(config.select_families));
+  if (config.select_families.has_value()) {
+    set_select_families(*config.select_families);
   }
-  if (optional::has_value(config.show_trace)) {
-    set_show_trace(optional::value(config.show_trace));
+  if (config.show_trace.has_value()) {
+    set_show_trace(*config.show_trace);
   }
-  if (optional::has_value(config.tree_algorithm)) {
-    set_tree_algorithm(optional::value(config.tree_algorithm));
+  if (config.tree_algorithm.has_value()) {
+    set_tree_algorithm(*config.tree_algorithm);
   }
-  if (optional::has_value(config.seeds)) {
-    set_seeds(optional::value(config.seeds));
+  if (config.seeds.has_value()) {
+    set_seeds(*config.seeds);
   }
-  if (optional::has_value(config.conditioning_set)) {
-    set_conditioning_set(optional::value(config.conditioning_set));
+  if (config.conditioning_set.has_value()) {
+    set_conditioning_set(*config.conditioning_set);
   }
 }
 
