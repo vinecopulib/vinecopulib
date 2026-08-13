@@ -19,9 +19,8 @@ namespace vinecopulib {
 //!
 //! Maps a two-column matrix of pair-copula data and a vector of weights to a
 //! scalar dependence value. Used when `tree_criterion` is set to `"custom"`.
-//! The function is always invoked, copied, and destroyed on the calling
-//! thread (the thread that starts the fit), never from a worker thread, so it
-//! need not be thread safe.
+//! It is always called on the thread that starts the fit, so it need not be
+//! thread safe.
 using TreeCriterionFunction =
   std::function<double(const Eigen::MatrixXd&, const Eigen::VectorXd&)>;
 

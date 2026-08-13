@@ -321,9 +321,6 @@ FitControlsVinecop::set_tree_criterion(std::string tree_criterion)
 }
 
 //! @brief Gets the custom criterion function for tree selection.
-//!
-//! @details It is always called on the thread that starts the fit, so it need
-//! not be thread safe.
 inline TreeCriterionFunction
 FitControlsVinecop::get_tree_criterion_function() const
 {
@@ -331,10 +328,6 @@ FitControlsVinecop::get_tree_criterion_function() const
 }
 
 //! @brief Sets the custom criterion function for tree selection.
-//!
-//! @details Required when `tree_criterion` is `"custom"`, and rejected
-//! otherwise; the two can be set in either order. It is always called on the
-//! thread that starts the fit, so it need not be thread safe.
 inline void
 FitControlsVinecop::set_tree_criterion_function(
   TreeCriterionFunction tree_criterion_function)

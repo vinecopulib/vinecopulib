@@ -129,7 +129,7 @@ public:
   void set_tree_criterion(std::string tree_criterion);
 
   //! Sets the custom edge-weight function used when `tree_criterion` is
-  //! `"custom"`. The two can be set in either order, but the fit is rejected
+  //! `"custom"`. The two may be set in either order, but a fit is rejected
   //! unless both are set. The function is always called on the thread that
   //! starts the fit, so it need not be thread safe; the pair-copula fits still
   //! use `num_threads` threads.
