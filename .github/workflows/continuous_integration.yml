@@ -1,52 +1,93 @@
-name: Build Status 
+name: Build Status
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  # Called by release.yml so a tag is re-verified against the full matrix
+  # before anything is published.
+  workflow_call:
+
+# One run per ref. Previously `on: [push, pull_request]` meant every same-repo
+# pull request triggered two identical matrix runs, and nothing cancelled a
+# superseded run when a branch was pushed twice.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  BOOST_VERSION: 1.84.0
+  EIGEN_VERSION: 3.4.0
+  CLANG_FORMAT_VERSION: 14.0.6
 
 jobs:
   style:
     name: clang-format
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      # Install the version specified in your .clang-format (here LLVM 14).
-      - name: Install clang-format
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-format-14
+      # Installed from PyPI rather than apt: `clang-format-14` is only in the
+      # ubuntu-latest image until the image rolls forward, at which point the
+      # package disappears and this job breaks with no code change. A pinned
+      # wheel also means contributors can install the exact same binary, so
+      # local formatting matches CI by construction.
+      - name: Install clang-format ${{ env.CLANG_FORMAT_VERSION }}
+        run: pipx install "clang-format==${{ env.CLANG_FORMAT_VERSION }}"
 
       - name: Check formatting
         run: |
-          FILES=$(git ls-files | grep -E '\.(h|hpp|ipp|cpp|cc)$' | grep -v '^include/vinecopulib/misc/nlohmann_json.hpp$')
-          clang-format-14 --dry-run --Werror $FILES
+          # nlohmann_json.hpp is vendored verbatim; tools_stats_sobol.hpp is a
+          # 3.4 MB generated table, and reformatting it on every run costs time
+          # for a file no human edits.
+          git ls-files -z '*.h' '*.hpp' '*.ipp' '*.cpp' '*.cc' \
+            | grep -zv '^include/vinecopulib/misc/nlohmann_json\.hpp$' \
+            | grep -zv '^include/vinecopulib/misc/tools_stats_sobol\.hpp$' \
+            | xargs -0 clang-format --dry-run --Werror
+
+  version:
+    name: version consistency
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check that the version agrees everywhere it is stated
+        run: python3 scripts/check_version.py
+
   build:
     strategy:
       fail-fast: false
-      max-parallel: 6 
+      max-parallel: 6
       matrix:
         cfg:
-          - { os: ubuntu-latest,   name: GNU,    cc: gcc,   cxx: g++,     platform: x64, root_install_dir: '/home/runner/work'}
-          - { os: ubuntu-latest,   name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/home/runner/work'}
-          - { os: macos-15-intel,    name: Clang,  cc: clang, cxx: clang++, platform: x64, root_install_dir: '/Users/runner/work'} # intel runner
-          - { os: macos-15,    name: Clang,  cc: clang, cxx: clang++, platform: arm64, root_install_dir: '/Users/runner/work'} # apple silicon runner
-          - { os: windows-latest,  name: x32, cc: cl,    cxx: cl,      platform: x32, root_install_dir: 'D:\'}
-          - { os: windows-latest,  name: x64, cc: cl,    cxx: cl,      platform: x64, root_install_dir: 'D:\'}
+          - { os: ubuntu-latest,  name: GNU,   cc: gcc,   cxx: g++,     platform: x64,   root_install_dir: '/home/runner/work' }
+          - { os: ubuntu-latest,  name: Clang, cc: clang, cxx: clang++, platform: x64,   root_install_dir: '/home/runner/work' }
+          - { os: macos-15-intel, name: Clang, cc: clang, cxx: clang++, platform: x64,   root_install_dir: '/Users/runner/work' } # intel runner
+          - { os: macos-15,       name: Clang, cc: clang, cxx: clang++, platform: arm64, root_install_dir: '/Users/runner/work' } # apple silicon runner
+          - { os: windows-latest, name: x32,   cc: cl,    cxx: cl,      platform: x32,   root_install_dir: 'D:\' }
+          - { os: windows-latest, name: x64,   cc: cl,    cxx: cl,      platform: x64,   root_install_dir: 'D:\' }
     env:
-      BOOST_VERSION: 1.84.0
-      EIGEN_VERSION: 3.4.0
       # Authenticate remotes::install_github against the GitHub API using the
       # automatic Actions token instead of the rate-limited bundled PAT (the
-      # VineCopula >= 2.6.2 install below, and any test-time fallback, need it).
+      # VineCopula >= 2.6.2 install, and any test-time fallback, need it).
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     runs-on: ${{ matrix.cfg.os }}
-    name:    ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
+    name: ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
+    timeout-minutes: 90
     steps:
-      - name: Checkout project 
-        uses: actions/checkout@v4
+      - name: Checkout project
+        uses: actions/checkout@v5
       - name: Set up MSVC environment
         if: matrix.cfg.os == 'windows-latest'
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
         with:
           arch: ${{ matrix.cfg.platform == 'x32' && 'x86' || matrix.cfg.platform }}
       - name: Install dependencies
@@ -57,87 +98,285 @@ jobs:
           platform: ${{ matrix.cfg.platform }}
           boost_install_dir: ${{ matrix.cfg.root_install_dir }}
           eigen_install_dir: ${{ matrix.cfg.root_install_dir }}
-          # wdm_install_dir: ${{ matrix.cfg.root_install_dir }}
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: true
       - name: Set environment variables and path
-        run:   |
+        run: |
           echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
           echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR =${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
+          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
           echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
+            echo "D:\a\vinecopulib\vinecopulib\debug" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
           fi
-
         shell: bash
       - name: Compile the debug version
-        run:   |
+        run: |
           mkdir debug && cd debug
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
               cmake .. -DSTRICT_COMPILER=ON \
-              -DCODE_COVERAGE=ON \
-              -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+                -DCODE_COVERAGE=ON \
+                -DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
               make vinecopulib_coverage
             else
               cmake .. -DCMAKE_BUILD_TYPE=Debug
               make
             fi
           else
-            cmake .. -G Ninja \
-            -DCMAKE_BUILD_TYPE=Debug
+            cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug
             cmake --build .
           fi
         shell: bash
-      # - name: Run clang-tidy static analysis
-      #   if: matrix.cfg.os == 'ubuntu-latest' && matrix.cfg.name == 'GNU'
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y clang-tidy-14 jq
-      #     cp debug/compile_commands.json debug/compile_commands_bak.json
-      #     jq '[.[] | select(.file | test("_deps/") | not)]' debug/compile_commands_bak.json > debug/compile_commands.json
-      #     FILES=$(git ls-files | grep -E '^(include|test|examples)/.*\.(cpp|cc|cxx|h|hpp|ipp)$')
-      #     for file in $FILES; do
-      #       echo "Running clang-tidy on $file"
-      #       run-clang-tidy-14 -p debug -quiet -- "$file"
-      #     done
-      #     mv debug/compile_commands_bak.json debug/compile_commands.json
+      # The Debug build enables -fsanitize=address,undefined (OPT_ASAN is ON by
+      # default), so not running it was leaving the entire point of that build
+      # unobserved on every leg except ubuntu/GNU, where the coverage target
+      # runs the tests as a side effect.
+      #
+      # This runs the single test_all binary rather than `ctest`. Measured on a
+      # 64-core machine: test_all runs all 645 tests in ~71 s, while `ctest -j64`
+      # had not finished after 13 minutes -- the R-parity fixtures shell out to
+      # Rscript and exchange data through hardcoded `temp`/`temp2`/`temp3` files
+      # in the working directory (test/src_test/vinecop_test.cpp:18-31 and
+      # cmake/templates/test_vinecop_parametric.R:42-45), so concurrent cases
+      # clobber and delete each other's files and wedge. Making those paths
+      # unique per test is a prerequisite for using ctest's parallelism.
+      - name: Run the debug tests
+        if: matrix.cfg.os != 'ubuntu-latest' || matrix.cfg.name != 'GNU'
+        run: |
+          cd debug
+          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then bin/test_all; else bin/test_all.exe; fi
+        shell: bash
+      # Cheap guard for the test-registration wiring that nothing exercised
+      # before: gtest_discover_tests writes a `<target>_NOT_BUILT` placeholder
+      # when discovery fails, so a healthy build must list far more than one.
+      - name: Check that ctest discovery works
+        if: matrix.cfg.os != 'windows-latest'
+        run: |
+          cd debug
+          n=$(ctest -N | sed -n 's/^Total Tests: //p')
+          echo "ctest discovered $n test(s)"
+          if [ "${n:-0}" -lt 100 ]; then
+            echo "::error::ctest discovered only ${n:-0} tests; gtest_discover_tests is broken"
+            exit 1
+          fi
+        shell: bash
       - name: Code coverage
         uses: codecov/codecov-action@v5
         if: contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
         with:
-          token: ${{secrets.CODECOV_TOKEN}}
-          file: debug/coverage.info 
-      - name: Compile, test and install the release version
-        run:   |
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # `file:` was silently ignored -- the input has been `files:` since
+          # codecov-action v4, so the explicit path did nothing and the uploader
+          # only worked by falling back to auto-discovery.
+          files: debug/coverage.info
+          disable_search: true
+          fail_ci_if_error: true
+      - name: Compile, test and install the precompiled release version
+        run: |
           mkdir release && cd release
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             cmake .. -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
-            make && sudo make install
+            make
             bin/test_all
+            sudo make install
           else
-            cmake .. -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
+            cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DVINECOPULIB_PRECOMPILED=ON
             cmake --build .
             bin/test_all.exe
             cmake --build . --target install
           fi
         shell: bash
-      - name: Test the install
-        run:   |
-          cd examples/bicop
-          mkdir build && cd build
-          if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
-            cmake .. && make
-            ../bin/main
-          else
-            cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
-            cmake --build .
-            ../bin/main.exe
-          fi
+      - name: Test the install (bicop and vinecop examples)
+        run: |
+          for ex in bicop vinecop; do
+            ( cd "examples/$ex" && mkdir build && cd build
+              if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
+                cmake .. && make && ../bin/main
+              else
+                cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+                cmake --build .
+                ../bin/main.exe
+              fi )
+          done
         shell: bash
+
+  # The default, header-only configuration had no CI coverage at all: both
+  # installs above set VINECOPULIB_PRECOMPILED=ON, so the .hpp + .ipp install
+  # tree that most users and both wrapper libraries consume was never built,
+  # installed, or linked against.
+  header-only-install:
+    name: header-only install (ubuntu, GNU)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          R: true
+      - name: Set environment variables
+        run: |
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
+          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
+      - name: Configure, build, test and install (header-only)
+        run: |
+          mkdir release && cd release
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          make
+          bin/test_all
+          sudo make install
+      - name: Verify the .ipp tree was installed
+        run: |
+          test -f /usr/local/include/vinecopulib/bicop/implementation/class.ipp \
+            || { echo "header-only install did not ship the .ipp tree"; exit 1; }
+      - name: Link the examples against the header-only install
+        run: |
+          for ex in bicop vinecop; do
+            ( cd "examples/$ex" && mkdir build && cd build && cmake .. && make && ../bin/main )
+          done
+
+  # bench_all and parity_dump were built by no workflow, so the whole #688
+  # benchmark and numerical-parity infrastructure could rot against header
+  # changes without anyone noticing. The parity self-comparison is cheap and
+  # proves the dump populates every group and that the gates file parses.
+  benchmarks:
+    name: benchmarks and parity harness
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          R: false
+      - name: Set environment variables
+        run: |
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
+          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
+      - name: Build bench_all and parity_dump
+        run: |
+          mkdir build-bench && cd build-bench
+          cmake .. -DCMAKE_BUILD_TYPE=Release \
+            -DVINECOPULIB_BUILD_BENCHMARKS=ON -DBUILD_TESTING=OFF
+          make bench_all parity_dump
+      - name: Smoke-run the benchmark suite
+        run: build-bench/bin/bench_all --benchmark_min_time=1x --benchmark_filter='bicop/pdf'
+      - name: Parity dump and self-comparison
+        run: |
+          mkdir -p bench_results
+          build-bench/bin/parity_dump bench_results/parity.json
+          cp bench_results/parity.json bench_results/parity_ref.json
+          python3 scripts/compare_parity.py \
+            bench_results/parity_ref.json bench_results/parity.json \
+            --tol-config scripts/parity_gates.json
+      - name: Upload the parity dump
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: parity-dump
+          path: bench_results/parity.json
+          if-no-files-found: warn
+
+  # Doxygen was never even smoke-built, which is how ~10 uncompilable snippets
+  # and a stale Doxyfile went unnoticed. This job currently only proves the
+  # configuration still runs; the docs rewrite tightens it to WARN_AS_ERROR.
+  docs:
+    name: doxygen
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y doxygen graphviz
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          R: false
+          lcov: false
+      - name: Build the documentation
+        run: |
+          mkdir build-docs && cd build-docs
+          cmake .. -DBUILD_DOC=ON -DBUILD_TESTING=OFF \
+            -DBoost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include \
+            -DEIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3
+          make doc 2>&1 | tee doxygen.log
+      - name: Summarize Doxygen warnings
+        if: always()
+        run: |
+          count=$(grep -c -i 'warning' build-docs/doxygen.log || true)
+          echo "Doxygen emitted $count warning line(s)."
+          grep -i 'warning' build-docs/doxygen.log | head -50 || true
+      - name: Upload the Doxygen log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-log
+          path: build-docs/doxygen.log
+          if-no-files-found: warn
+
+  # Replaces the block that sat commented out in this file. Runs only on the
+  # pull-request diff, so the curated check list is enforceable as an error
+  # instead of producing thousands of findings nobody reads.
+  clang-tidy:
+    name: clang-tidy (diff)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Install clang-tidy
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y clang-tidy-14 jq
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          R: true
+      - name: Configure to generate compile_commands.json
+        run: |
+          mkdir build-tidy && cd build-tidy
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DBoost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include \
+            -DEIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3
+          # FetchContent puts googletest translation units in the database; they
+          # are not ours to lint.
+          jq '[.[] | select(.file | test("_deps/") | not)]' compile_commands.json > filtered.json
+          mv filtered.json compile_commands.json
+      - name: Run clang-tidy on the diff
+        run: |
+          git diff -U0 "origin/${{ github.base_ref }}...HEAD" \
+            -- '*.hpp' '*.ipp' '*.cpp' '*.cc' '*.h' \
+            ':(exclude)include/vinecopulib/misc/nlohmann_json.hpp' \
+            ':(exclude)include/vinecopulib/misc/tools_stats_sobol.hpp' \
+            | /usr/lib/llvm-14/share/clang/clang-tidy-diff.py \
+                -p1 -path build-tidy -clang-tidy-binary clang-tidy-14 -use-color

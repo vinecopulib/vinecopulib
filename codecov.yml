@@ -1,6 +1,6 @@
 codecov:
   notify:
-    require_ci_to_pass: yes
+    require_ci_to_pass: true
 
 coverage:
   precision: 2
@@ -18,19 +18,26 @@ coverage:
         threshold: 0.5%
         base: auto
         target: auto
+
 parsers:
   gcov:
     branch_detection:
-      conditional: yes
-      loop: yes
-      method: no
-      macro: no
+      conditional: true
+      loop: true
+      method: false
+      macro: false
 
 comment:
   layout: "reach, diff, flags, files, footer"
   behavior: default
-  require_changes: no
+  require_changes: false
 
 ignore:
   - "test/"
+  - "benchmarks/"
+  - "examples/"
   - "include/vinecopulib/misc/nlohmann_json.hpp"
+  # Generated tables, not hand-written code: the Sobol direction numbers alone
+  # are 3.4 MB, which distorts the line-coverage denominator.
+  - "include/vinecopulib/misc/tools_stats_sobol.hpp"
+  - "include/vinecopulib/misc/tools_stats_ghalton.hpp"

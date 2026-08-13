@@ -1,16 +1,107 @@
+# clang-tidy 14 (matching the clang-format version pinned in CI).
+#
+# The previous configuration enabled eight wildcard groups with
+# `WarningsAsErrors: ''` and drove a CI job that was commented out, so nothing
+# was ever enforced. Wholesale `cppcoreguidelines-*` + `hicpp-*` +
+# `readability-*` on an Eigen-heavy numerical codebase yields thousands of
+# findings (magic numbers, identifier length, pro-bounds, signed bitwise), which
+# is precisely why it was never turned on.
+#
+# This is a curated list instead: every check below is one we are willing to fail
+# a pull request over. The CI job runs it on the pull-request diff only (see
+# .github/workflows/continuous_integration.yml), so adding a check does not
+# require fixing the whole tree at once.
+#
+# To propose a new check: add it here, run
+#   run-clang-tidy-14 -p <build-dir> -checks='-*,<the-new-check>' include/
+# and either fix the findings in the same pull request or leave the check out.
+
 Checks: >
   -*,
-  bugprone-*,
-  performance-*,
-  readability-*,
-  modernize-*,
-  cppcoreguidelines-*,
-  portability-*,
-  clang-analyzer-*,
-  misc-*,
-  hicpp-*
+  bugprone-argument-comment,
+  bugprone-assert-side-effect,
+  bugprone-bool-pointer-implicit-conversion,
+  bugprone-copy-constructor-init,
+  bugprone-dangling-handle,
+  bugprone-fold-init-type,
+  bugprone-forward-declaration-namespace,
+  bugprone-inaccurate-erase,
+  bugprone-incorrect-roundings,
+  bugprone-integer-division,
+  bugprone-macro-repeated-side-effects,
+  bugprone-misplaced-widening-cast,
+  bugprone-move-forwarding-reference,
+  bugprone-multiple-statement-macro,
+  bugprone-parent-virtual-call,
+  bugprone-redundant-branch-condition,
+  bugprone-string-constructor,
+  bugprone-string-integer-assignment,
+  bugprone-suspicious-memset-usage,
+  bugprone-suspicious-semicolon,
+  bugprone-suspicious-string-compare,
+  bugprone-swapped-arguments,
+  bugprone-terminating-continue,
+  bugprone-undefined-memory-manipulation,
+  bugprone-undelegated-constructor,
+  bugprone-unused-raii,
+  bugprone-unused-return-value,
+  bugprone-use-after-move,
+  bugprone-virtual-near-miss,
+  misc-misplaced-const,
+  misc-redundant-expression,
+  misc-static-assert,
+  misc-uniqueptr-reset-release,
+  misc-unused-alias-decls,
+  misc-unused-using-decls,
+  modernize-deprecated-headers,
+  modernize-loop-convert,
+  modernize-make-shared,
+  modernize-make-unique,
+  modernize-redundant-void-arg,
+  modernize-use-bool-literals,
+  modernize-use-emplace,
+  modernize-use-equals-default,
+  modernize-use-equals-delete,
+  modernize-use-nullptr,
+  modernize-use-override,
+  modernize-use-using,
+  performance-faster-string-find,
+  performance-for-range-copy,
+  performance-implicit-conversion-in-loop,
+  performance-inefficient-algorithm,
+  performance-inefficient-string-concatenation,
+  performance-inefficient-vector-operation,
+  performance-move-const-arg,
+  performance-move-constructor-init,
+  performance-no-automatic-move,
+  performance-noexcept-move-constructor,
+  performance-trivially-destructible,
+  performance-unnecessary-copy-initialization,
+  performance-unnecessary-value-param,
+  readability-const-return-type,
+  readability-container-size-empty,
+  readability-delete-null-pointer,
+  readability-misleading-indentation,
+  readability-redundant-control-flow,
+  readability-redundant-smartptr-get,
+  readability-redundant-string-cstr,
+  readability-redundant-string-init,
+  readability-simplify-boolean-expr,
+  readability-static-definition-in-anonymous-namespace,
+  readability-string-compare
 
-WarningsAsErrors: ''
+# '*' means "every check enabled above is an error". Spelling the list out twice
+# would just let the two copies drift; anything worth reporting here is worth
+# failing on, so there is deliberately no reported-but-tolerated tier.
+WarningsAsErrors: '*'
 
-HeaderFilterRegex: '^(/)?(include|test|examples)/'
+# clang-tidy matches this against each header's *absolute* path, so the previous
+# '^(/)?(include|test|examples)/' could never match anything under /home/... and
+# every header diagnostic was silently dropped. Anchor on the repository
+# subdirectories instead. The vendored nlohmann_json.hpp and the generated
+# tools_stats_sobol.hpp / tools_stats_ghalton.hpp tables are excluded by the
+# alternation rather than by a second regex, because
+# ExcludeHeaderFilterRegex only exists in clang-tidy 18 and later.
+HeaderFilterRegex: '.*/(include/vinecopulib/(bicop|vinecop)|include/vinecopulib/misc/(tools_(eigen|stl|stats|serialization|interpolation|optimization|transforms|integration|thread|interface|batch|constants|optional)|triangular_array|fit_controls)|test/src_test|benchmarks/src)'
+
 FormatStyle: file

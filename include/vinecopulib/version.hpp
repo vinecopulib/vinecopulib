@@ -15,8 +15,13 @@
 //  VINECOPULIB_VERSION % 100 is the patch level
 //  VINECOPULIB_VERSION / 100 % 1000 is the minor version
 //  VINECOPULIB_VERSION / 100000 is the major version
+//
+//  This must be a plain decimal literal with no leading zeros: a leading zero
+//  makes it octal, which either decodes to the wrong version or -- for any
+//  digit above 7 -- is not a valid literal at all, turning the arithmetic
+//  above into a compile error. `scripts/check_version.py` enforces this.
 
-#define VINECOPULIB_VERSION 000800
+#define VINECOPULIB_VERSION 800
 
 //
 //  VINECOPULIB_LIB_VERSION must be defined to be the same as

@@ -1,0 +1,64 @@
+name: CodeQL
+
+# Replaces Codacy, whose badge 404s and whose `.codacy.yml` uses an `engines:`
+# format the service abandoned years ago. CodeQL supports C++ natively, needs no
+# third-party account, and reports into the repository's Security tab.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '41 5 * * 1'  # Mondays, 05:41 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: analyze C++
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: cpp
+          queries: security-and-quality
+
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          boost_version: 1.84.0
+          eigen_version: 3.4.0
+          R: false
+          lcov: false
+
+      # A manual build rather than autobuild: the precompiled configuration is
+      # what turns the .ipp tree into real translation units, so it is the only
+      # mode in which CodeQL actually sees the implementation code.
+      - name: Build (precompiled, so the .ipp tree is compiled)
+        run: |
+          mkdir build-codeql && cd build-codeql
+          cmake .. -DCMAKE_BUILD_TYPE=Release \
+            -DVINECOPULIB_PRECOMPILED=ON \
+            -DBUILD_TESTING=OFF \
+            -DBoost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include \
+            -DEIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3
+          make -j"$(nproc)"
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:cpp
