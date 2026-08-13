@@ -35,13 +35,13 @@ create_candidate_bicops(const Eigen::MatrixXd& data,
   std::vector<Bicop> new_bicops;
   for (auto& fam : families) {
     if (tools_stl::is_member(fam, bicop_families::rotationless)) {
-      new_bicops.push_back(Bicop(fam, 0));
+      new_bicops.emplace_back(fam, 0);
     } else {
       if (controls.get_allow_rotations()) {
-        new_bicops.push_back(Bicop(fam, which_rotations[0]));
-        new_bicops.push_back(Bicop(fam, which_rotations[1]));
+        new_bicops.emplace_back(fam, which_rotations[0]);
+        new_bicops.emplace_back(fam, which_rotations[1]);
       } else if (tau > 0) {
-        new_bicops.push_back(Bicop(fam, 0));
+        new_bicops.emplace_back(fam, 0);
       }
     }
   }

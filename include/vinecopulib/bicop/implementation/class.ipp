@@ -1947,7 +1947,7 @@ Bicop::str() const
   } else if (get_family() != BicopFamily::indep) {
     bicop_str << "  parameters = " << get_parameters() << "\n";
   }
-  return bicop_str.str().c_str();
+  return bicop_str.str();
 }
 
 //! @brief Gets lower bounds for copula parameters.

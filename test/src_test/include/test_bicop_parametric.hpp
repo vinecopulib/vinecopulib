@@ -454,8 +454,8 @@ TEST_P(ParBicopTest, derivatives_match_finite_differences)
   for (Eigen::Index k = 0; k < p; ++k) {
     comps.push_back("par" + std::to_string(k + 1));
   }
-  comps.push_back("u1");
-  comps.push_back("u2");
+  comps.emplace_back("u1");
+  comps.emplace_back("u2");
 
   auto fd_first = [&](const std::string& method, const std::string& comp) {
     auto eval = [&method](const Bicop& b,

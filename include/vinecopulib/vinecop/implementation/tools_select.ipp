@@ -403,7 +403,7 @@ VinecopSelector::get_nobs() const
 inline double
 VinecopSelector::get_next_threshold(std::vector<double>& thresholded_crits)
 {
-  if (thresholded_crits.size() == 0) {
+  if (thresholded_crits.empty()) {
     return 1.0;
   }
   // sort in descending order
@@ -1077,7 +1077,7 @@ VinecopSelector::find_common_neighbor(size_t v0,
   auto ei1 = tree[v1].prev_edge_indices;
   auto ei_common = intersect(ei0, ei1);
 
-  if (ei_common.size() == 0) {
+  if (ei_common.empty()) {
     return -1;
   } else {
     return ei_common[0];
@@ -1241,7 +1241,7 @@ VinecopSelector::get_pc_index(const EdgeIterator& e, const VineTree& tree)
   // add 1 everywhere for user-facing representation (boost::graph
   // starts at 0)
   index << tree[e].conditioned[0] + 1 << "," << tree[e].conditioned[1] + 1;
-  if (tree[e].conditioning.size() > 0) {
+  if (!tree[e].conditioning.empty()) {
     index << " | ";
     for (unsigned int i = 0; i < tree[e].conditioning.size(); ++i) {
       index << tree[e].conditioning[i] + 1;
@@ -1250,7 +1250,7 @@ VinecopSelector::get_pc_index(const EdgeIterator& e, const VineTree& tree)
     }
   }
 
-  return index.str().c_str();
+  return index.str();
 }
 }
 }

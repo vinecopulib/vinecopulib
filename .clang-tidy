@@ -5,6 +5,9 @@
 # reported-but-tolerated tier. The CI job runs on the pull-request diff, so a new
 # check does not require fixing the whole tree at once.
 #
+# modernize-loop-convert is deliberately absent: on this codebase it rewrote a
+# loop over `hess(t, e)` into a loop over `hess`, which is a different container.
+#
 # To propose a check: add it, run
 #   run-clang-tidy-14 -p <build-dir> -checks='-*,<the-new-check>' include/
 # and either fix the findings in the same pull request or leave it out.
@@ -47,7 +50,6 @@ Checks: >
   misc-unused-alias-decls,
   misc-unused-using-decls,
   modernize-deprecated-headers,
-  modernize-loop-convert,
   modernize-make-shared,
   modernize-make-unique,
   modernize-redundant-void-arg,

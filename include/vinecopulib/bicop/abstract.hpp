@@ -232,7 +232,7 @@ protected:
 };
 
 //! A shared pointer to an object of class AbstracBicop.
-typedef std::shared_ptr<AbstractBicop> BicopPtr;
+using BicopPtr = std::shared_ptr<AbstractBicop>;
 }
 
 #include <vinecopulib/bicop/implementation/abstract.ipp>

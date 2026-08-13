@@ -9,7 +9,7 @@
 
 namespace vinecopulib {
 
-typedef boost::bimap<BicopFamily, std::string> family_bimap;
+using family_bimap = boost::bimap<BicopFamily, std::string>;
 const family_bimap family_names =
   boost::assign::list_of<family_bimap::relation>(
     BicopFamily::indep,

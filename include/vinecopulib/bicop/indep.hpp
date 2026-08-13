@@ -27,33 +27,34 @@ private:
   // evaluation leaves; the independence copula has no parameters, so they
   // ignore `parameters`
   Eigen::VectorXd pdf_raw(const Eigen::MatrixXd& u,
-                          const Eigen::MatrixXd& parameters);
+                          const Eigen::MatrixXd& parameters) override;
 
   Eigen::VectorXd cdf(const Eigen::MatrixXd& u,
-                      const Eigen::MatrixXd& parameters);
+                      const Eigen::MatrixXd& parameters) override;
 
   Eigen::VectorXd hfunc1_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters);
+                             const Eigen::MatrixXd& parameters) override;
 
   Eigen::VectorXd hfunc2_raw(const Eigen::MatrixXd& u,
-                             const Eigen::MatrixXd& parameters);
+                             const Eigen::MatrixXd& parameters) override;
 
   Eigen::VectorXd hinv1_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters);
+                            const Eigen::MatrixXd& parameters) override;
 
   Eigen::VectorXd hinv2_raw(const Eigen::MatrixXd& u,
-                            const Eigen::MatrixXd& parameters);
+                            const Eigen::MatrixXd& parameters) override;
 
-  Eigen::MatrixXd tau_to_parameters(const double&);
+  Eigen::MatrixXd tau_to_parameters(const double&) override;
 
-  double parameters_to_tau(const Eigen::MatrixXd&);
+  double parameters_to_tau(const Eigen::MatrixXd&) override;
 
   // the independence copula has no tail dependence in any corner
-  Eigen::MatrixXd parameters_to_taildep(const Eigen::MatrixXd& parameters);
+  Eigen::MatrixXd parameters_to_taildep(
+    const Eigen::MatrixXd& parameters) override;
 
-  void flip();
+  void flip() override;
 
-  Eigen::VectorXd get_start_parameters(const double tau);
+  Eigen::VectorXd get_start_parameters(const double tau) override;
 };
 }
 

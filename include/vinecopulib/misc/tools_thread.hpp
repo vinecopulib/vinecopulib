@@ -102,7 +102,7 @@ template<class F, class... Args>
 void
 ThreadPool::push(F&& f, Args&&... args)
 {
-  if (workers_.size() == 0) {
+  if (workers_.empty()) {
     f(args...); // if there are no workers, do the job in the main thread
     return;
   } else {
@@ -250,7 +250,7 @@ ThreadPool::announce_stop()
 inline void
 ThreadPool::join_workers()
 {
-  if (workers_.size() > 0) {
+  if (!workers_.empty()) {
     for (auto& worker : workers_) {
       if (worker.joinable())
         worker.join();

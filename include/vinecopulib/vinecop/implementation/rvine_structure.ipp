@@ -684,7 +684,7 @@ RVineStructure::check_upper_tri() const
 inline void
 RVineStructure::check_columns() const
 {
-  std::string problem = "";
+  std::string problem;
   for (size_t j = 0; j < d_ - 1; j++) {
     // read column into vector so we can use stl methods
     std::vector<size_t> col(std::min(trunc_lvl_, d_ - 1 - j));
@@ -702,7 +702,7 @@ RVineStructure::check_columns() const
     if (unique_in_col != col.size()) {
       problem = "a column must not contain duplicate entries.";
     }
-    if (problem != "") {
+    if (!problem.empty()) {
       throw std::runtime_error("not a valid R-vine array: " + problem);
     }
   }

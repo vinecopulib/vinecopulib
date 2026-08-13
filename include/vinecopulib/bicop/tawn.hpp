@@ -38,35 +38,35 @@ private:
   // analytic derivatives (per-selector closed forms; see tawn.ipp)
   Eigen::VectorXd pdf_deriv_raw(const Eigen::MatrixXd& u,
                                 const Eigen::MatrixXd& parameters,
-                                const std::string& deriv);
+                                const std::string& deriv) override;
 
   Eigen::VectorXd pdf_deriv2_raw(const Eigen::MatrixXd& u,
                                  const Eigen::MatrixXd& parameters,
-                                 const std::string& deriv);
+                                 const std::string& deriv) override;
 
   Eigen::VectorXd hfunc1_deriv_raw(const Eigen::MatrixXd& u,
                                    const Eigen::MatrixXd& parameters,
-                                   const std::string& deriv);
+                                   const std::string& deriv) override;
 
   Eigen::VectorXd hfunc1_deriv2_raw(const Eigen::MatrixXd& u,
                                     const Eigen::MatrixXd& parameters,
-                                    const std::string& deriv);
+                                    const std::string& deriv) override;
 
   Eigen::VectorXd hfunc2_deriv_raw(const Eigen::MatrixXd& u,
                                    const Eigen::MatrixXd& parameters,
-                                   const std::string& deriv);
+                                   const std::string& deriv) override;
 
   Eigen::VectorXd hfunc2_deriv2_raw(const Eigen::MatrixXd& u,
                                     const Eigen::MatrixXd& parameters,
-                                    const std::string& deriv);
+                                    const std::string& deriv) override;
 
   Eigen::VectorXd logpdf_deriv_raw(const Eigen::MatrixXd& u,
                                    const Eigen::MatrixXd& parameters,
-                                   const std::string& deriv);
+                                   const std::string& deriv) override;
 
   Eigen::VectorXd logpdf_deriv2_raw(const Eigen::MatrixXd& u,
                                     const Eigen::MatrixXd& parameters,
-                                    const std::string& deriv);
+                                    const std::string& deriv) override;
 
   Eigen::MatrixXd tau_to_parameters(const double& tau) override;
 

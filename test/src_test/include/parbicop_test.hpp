@@ -39,7 +39,7 @@ protected:
   Bicop bicop_;
   bool needs_check_;
 
-  virtual void SetUp()
+  void SetUp() override
   {
     n_ = static_cast<int>(5e3);
     auto family = ::testing::get<0>(GetParam());

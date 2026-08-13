@@ -49,7 +49,7 @@ private:
            std::string method,
            double mult,
            size_t grid_size,
-           const Eigen::VectorXd& weights);
+           const Eigen::VectorXd& weights) override;
 };
 }
 

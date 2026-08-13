@@ -465,7 +465,7 @@ FitControlsVinecop::set_tree_algorithm(std::string tree_algorithm)
 inline void
 FitControlsVinecop::set_seeds(std::vector<int> seeds)
 {
-  if (seeds.size() == 0) {
+  if (seeds.empty()) {
     // no seeds provided, seed randomly
     std::random_device rd{};
     seeds = std::vector<int>(20);
@@ -518,7 +518,7 @@ FitControlsVinecop::str() const
       controls_str << v << " ";
   }
   controls_str << std::endl;
-  return controls_str.str().c_str();
+  return controls_str.str();
 }
 
 }

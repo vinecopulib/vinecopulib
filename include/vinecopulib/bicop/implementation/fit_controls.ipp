@@ -408,7 +408,7 @@ FitControlsBicop::str_internal(bool print_threads) const
                  << (get_num_threads() == 0 ? 1 : get_num_threads())
                  << std::endl;
   }
-  return controls_str.str().c_str();
+  return controls_str.str();
 }
 
 }

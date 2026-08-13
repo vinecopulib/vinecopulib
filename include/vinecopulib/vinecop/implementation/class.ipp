@@ -37,11 +37,11 @@ inline Vinecop::Vinecop(const RVineStructure& structure,
   , rvine_structure_(structure)
 {
 
-  if (pair_copulas.size() > 0) {
+  if (!pair_copulas.empty()) {
     set_all_pair_copulas(pair_copulas);
   }
 
-  if (var_types.size() > 0) {
+  if (!var_types.empty()) {
     set_var_types(var_types);
   } else {
     set_continuous_var_types();
@@ -86,14 +86,14 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
     d_ = structure.get_dim();
     rvine_structure_ = structure;
   } else {
-    if (var_types.size() > 0) {
+    if (!var_types.empty()) {
       d_ = var_types.size();
     } else {
       d_ = data.cols();
     }
     rvine_structure_ = RVineStructure(d_, static_cast<size_t>(0));
   }
-  if (var_types.size() == 0) {
+  if (var_types.empty()) {
     set_continuous_var_types();
   } else {
     set_var_types(var_types);
@@ -1025,7 +1025,7 @@ Vinecop::set_var_types_internal(const std::vector<std::string>& var_types) const
   for (const auto& t : var_types_) {
     n_discrete_ += (t == "d");
   }
-  if (pair_copulas_.size() == 0) {
+  if (pair_copulas_.empty()) {
     return;
   }
 
@@ -3443,7 +3443,7 @@ Vinecop::str(const std::vector<size_t>& trees) const
   std::vector<size_t> trees_to_summarize;
   std::vector<size_t> all_trees(rvine_structure_.get_trunc_lvl());
   std::iota(all_trees.begin(), all_trees.end(), 0);
-  if (trees.size() == 0) {
+  if (trees.empty()) {
     trees_to_summarize = all_trees;
   } else {
     trees_to_summarize = tools_stl::intersect(all_trees, trees);
@@ -3465,16 +3465,16 @@ Vinecop::str(const std::vector<size_t>& trees) const
   std::vector<std::string> parameters;
   std::vector<std::string> dfs;
   std::vector<std::string> taus;
-  trees_s.push_back("tree");
-  edges.push_back("edge");
-  conditioned_variables.push_back("conditioned variables");
-  conditioning_variables.push_back("conditioning variables");
-  var_types.push_back("var_types");
-  families.push_back("family");
-  rotations.push_back("rotation");
-  parameters.push_back("parameters");
-  dfs.push_back("df");
-  taus.push_back("tau");
+  trees_s.emplace_back("tree");
+  edges.emplace_back("edge");
+  conditioned_variables.emplace_back("conditioned variables");
+  conditioning_variables.emplace_back("conditioning variables");
+  var_types.emplace_back("var_types");
+  families.emplace_back("family");
+  rotations.emplace_back("rotation");
+  parameters.emplace_back("parameters");
+  dfs.emplace_back("df");
+  taus.emplace_back("tau");
 
   std::stringstream params_ss;   // 2 decimal places
   std::stringstream dfs_ss;      // 1 decimal place
@@ -3491,14 +3491,14 @@ Vinecop::str(const std::vector<size_t>& trees) const
       conditioned_variables.push_back(std::to_string(order[e]) + ", " +
                                       std::to_string(arr(t, e)));
       if (t > 0) {
-        std::string cv = "";
+        std::string cv;
         for (size_t cv_ = t - 1; cv_ > 0; --cv_) {
           cv += std::to_string(arr(cv_, e)) + ", ";
         }
         cv += std::to_string(arr(0, e));
         conditioning_variables.push_back(cv);
       } else {
-        conditioning_variables.push_back("");
+        conditioning_variables.emplace_back("");
       }
       var_types.push_back(var_types_[order[e] - 1] + ", " +
                           var_types_[arr(t, e) - 1]);
@@ -3538,10 +3538,10 @@ Vinecop::str(const std::vector<size_t>& trees) const
 
       } else {
         families.push_back(get_family_name(BicopFamily::indep));
-        rotations.push_back("");
-        parameters.push_back("");
-        taus.push_back("0.0");
-        dfs.push_back("");
+        rotations.emplace_back("");
+        parameters.emplace_back("");
+        taus.emplace_back("0.0");
+        dfs.emplace_back("");
       }
     }
   }

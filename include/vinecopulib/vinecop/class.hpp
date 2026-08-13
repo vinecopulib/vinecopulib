@@ -27,7 +27,7 @@ class Vinecop
 {
 public:
   // default constructors
-  Vinecop() {}
+  Vinecop() = default;
 
   explicit Vinecop(size_t d);
 

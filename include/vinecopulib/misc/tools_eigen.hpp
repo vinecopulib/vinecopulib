@@ -15,11 +15,11 @@ namespace vinecopulib {
 //! Tools for working with Eigen types
 namespace tools_eigen {
 //! An `Eigen::Matrix` containing `bool`s (similar to `Eigen::MatrixXd`).
-typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
+using MatrixXb = Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic>;
 
 //! A reference to a constant `Eigen::MatrixXd`; binds blocks (e.g.
 //! `u.leftCols(2)`) and full matrices without copying.
-typedef Eigen::Ref<const Eigen::MatrixXd> ConstMatRef;
+using ConstMatRef = Eigen::Ref<const Eigen::MatrixXd>;
 
 template<typename T>
 Eigen::MatrixXd
