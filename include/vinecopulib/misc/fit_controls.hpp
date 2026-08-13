@@ -11,6 +11,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <vinecopulib/bicop/family.hpp>
 
 namespace vinecopulib {
 
