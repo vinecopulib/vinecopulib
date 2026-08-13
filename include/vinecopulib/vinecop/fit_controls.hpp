@@ -75,7 +75,8 @@ public:
   std::string get_tree_criterion() const;
 
   //! @return the custom edge-weight function used when `tree_criterion` is
-  //! `"custom"` (empty otherwise).
+  //! `"custom"` (empty otherwise). It is always called on the thread that
+  //! starts the fit, so it need not be thread safe.
   TreeCriterionFunction get_tree_criterion_function() const;
 
   //! @return the absolute-dependence threshold below which pair copulas
@@ -128,7 +129,10 @@ public:
   void set_tree_criterion(std::string tree_criterion);
 
   //! Sets the custom edge-weight function used when `tree_criterion` is
-  //! `"custom"`.
+  //! `"custom"`. The two can be set in either order, but the fit is rejected
+  //! unless both are set. The function is always called on the thread that
+  //! starts the fit, so it need not be thread safe; the pair-copula fits still
+  //! use `num_threads` threads.
   //! @param tree_criterion_function a callable mapping a two-column matrix of
   //! pair-copula data and a vector of weights to a scalar dependence value.
   void set_tree_criterion_function(

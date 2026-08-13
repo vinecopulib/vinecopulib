@@ -9,7 +9,10 @@
 #include "test_utils.hpp"
 #include "vinecop_test.hpp"
 #include <future>
+#include <mutex>
+#include <set>
 #include <string>
+#include <thread>
 #include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 
@@ -1794,6 +1797,34 @@ TEST_F(VinecopTest, works_multi_threaded)
   fit2.cdf(u, 100, 2, { 1 });
 }
 
+// Records where a custom tree criterion is evaluated from. The bookkeeping is
+// mutex-guarded so that a regression fails the assertions instead of racing on
+// the recorder itself.
+struct CriterionRecorder
+{
+  std::mutex m;
+  std::set<std::thread::id> ids;
+  size_t num_calls = 0;
+
+  TreeCriterionFunction tau_function()
+  {
+    return [this](const Eigen::MatrixXd& data, const Eigen::VectorXd& weights) {
+      {
+        std::lock_guard<std::mutex> lk(m);
+        ids.insert(std::this_thread::get_id());
+        ++num_calls;
+      }
+      return wdm::wdm(data, "tau", weights)(0, 1);
+    };
+  }
+
+  void reset()
+  {
+    ids.clear();
+    num_calls = 0;
+  }
+};
+
 // check if the same conditioned sets appear for each tree
 inline size_t
 get_pairs_unequal(
@@ -1895,6 +1926,76 @@ TEST_F(VinecopTest, tree_criterion_custom_works)
   bad.set_tree_criterion("custom");
   Vinecop fit_bad(7);
   EXPECT_ANY_THROW(fit_bad.select(u, bad));
+  bad.set_num_threads(4);
+  Vinecop fit_bad_mt(7);
+  EXPECT_ANY_THROW(fit_bad_mt.select(u, bad));
+
+  // a callable that no criterion would ever use must not be silently ignored
+  FitControlsVinecop unused({ BicopFamily::indep });
+  unused.set_tree_criterion_function(tau_fn);
+  Vinecop fit_unused(7);
+  EXPECT_ANY_THROW(fit_unused.select(u, unused));
+
+  // the two fields may be set in either order
+  FitControlsVinecop reversed({ BicopFamily::indep });
+  reversed.set_tree_criterion_function(tau_fn);
+  reversed.set_tree_criterion("custom");
+  Vinecop fit_reversed(7);
+  EXPECT_NO_THROW(fit_reversed.select(u, reversed));
+}
+
+// A custom criterion is arbitrary user code (an R closure or a Python callable
+// in the wrappers), so it must run on the thread that starts the fit no matter
+// how many threads the fit is allowed to use.
+TEST_F(VinecopTest, tree_criterion_custom_is_serial)
+{
+  CriterionRecorder recorder;
+  FitControlsVinecop controls({ BicopFamily::indep });
+  controls.set_tree_criterion("custom");
+  controls.set_tree_criterion_function(recorder.tau_function());
+
+  Vinecop fit1(7);
+  fit1.select(u, controls);
+  size_t num_calls_serial = recorder.num_calls;
+  EXPECT_EQ(recorder.ids.size(), static_cast<size_t>(1));
+  EXPECT_EQ(*recorder.ids.begin(), std::this_thread::get_id());
+  // tree 1 alone enumerates C(7, 2) = 21 candidate edges
+  EXPECT_GT(num_calls_serial, static_cast<size_t>(20));
+
+  recorder.reset();
+  controls.set_num_threads(4);
+  Vinecop fit4(7);
+  fit4.select(u, controls);
+
+  EXPECT_EQ(recorder.ids.size(), static_cast<size_t>(1));
+  EXPECT_EQ(*recorder.ids.begin(), std::this_thread::get_id());
+  // the candidate edges are enumerated serially, so the number of criterion
+  // evaluations cannot depend on the thread count
+  EXPECT_EQ(recorder.num_calls, num_calls_serial);
+  EXPECT_EQ(get_pairs_unequal(fit1.get_matrix(), fit4.get_matrix(), 6), 0);
+  EXPECT_EQ(get_pairs_unequal(vc_matrix, fit4.get_matrix(), 6), 0);
+}
+
+// Sparse selection re-enters add_allowed_edges once per threshold pass; the
+// criterion must stay on the calling thread there too.
+TEST_F(VinecopTest, tree_criterion_custom_is_serial_sparse)
+{
+  u.conservativeResize(200, 7); // above the 10-row floor of the criterion
+
+  CriterionRecorder recorder;
+  FitControlsVinecop controls({ BicopFamily::indep, BicopFamily::gaussian });
+  controls.set_tree_criterion("custom");
+  controls.set_tree_criterion_function(recorder.tau_function());
+  controls.set_select_threshold(true);
+  controls.set_select_trunc_lvl(true);
+  controls.set_num_threads(4);
+
+  Vinecop fit(7);
+  fit.select(u, controls);
+
+  EXPECT_GT(recorder.num_calls, static_cast<size_t>(20));
+  EXPECT_EQ(recorder.ids.size(), static_cast<size_t>(1));
+  EXPECT_EQ(*recorder.ids.begin(), std::this_thread::get_id());
 }
 
 TEST_F(VinecopTest, select_finds_different_structures_random)

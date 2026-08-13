@@ -450,7 +450,10 @@ VinecopSelector::add_allowed_edges(VineTree& vine_tree)
 //!
 //! Used when the structure is unknown. The candidate edges are enumerated
 //! single-threaded (insertion order is significant); their weights are then
-//! computed in parallel, with graph writes guarded by a mutex.
+//! computed in parallel, with graph writes guarded by a mutex. A custom
+//! criterion is the exception: it is user code that the library cannot assume
+//! to be thread safe (and that the R and Python bindings may only run on the
+//! thread that entered the library), so those weights are computed serially.
 inline void
 VinecopSelector::add_allowed_edges_proximity(
   VineTree& vine_tree,
@@ -516,8 +519,15 @@ VinecopSelector::add_allowed_edges_proximity(
     }
   };
 
-  pool_.map(process_edge, edge_list);
-  pool_.wait();
+  if (tree_criterion == "custom") {
+    for (const auto& edge : edge_list) {
+      tools_interface::check_user_interrupt();
+      process_edge(edge);
+    }
+  } else {
+    pool_.map(process_edge, edge_list);
+    pool_.wait();
+  }
 }
 
 //! @brief Adds the edges dictated by a fixed vine structure.

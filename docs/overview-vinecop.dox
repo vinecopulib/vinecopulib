@@ -141,7 +141,11 @@ additional data members to control the structure selection:
 minimum spanning tree (see
 [Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf)).
 It can take `"tau"` (default) for Kendall's tau, `"rho"` for Spearman's rho,
-or `"hoeffd"` for Hoeffding's D (suited for non-monotonic relationships).
+`"hoeffd"` for Hoeffding's D (suited for non-monotonic relationships),
+`"mcor"` for the maximum correlation, `"joe"` for the Gaussian-copula mutual
+information, or `"custom"` for a user-supplied function (see
+`FitControlsVinecop::set_tree_criterion_function()`, which is always evaluated
+on the calling thread).
 - `double threshold` describes a value (default is 0) of `tree_criterion` under
 which the corresponding pair-copula is set to independence.
 - `bool select_trunc_lvl` can be set to true to select the truncation

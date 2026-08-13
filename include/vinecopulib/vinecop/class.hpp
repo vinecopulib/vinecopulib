@@ -420,6 +420,7 @@ protected:
   void finalize_fit(const tools_select::VinecopSelector& selector);
   void check_conditioning_set(const std::vector<size_t>& conditioning_set,
                               const FitControlsVinecop& controls) const;
+  static void check_tree_criterion_function(const FitControlsVinecop& controls);
   void check_weights_size(const Eigen::VectorXd& weights,
                           const Eigen::MatrixXd& data) const;
   void check_enough_data(const Eigen::MatrixXd& data) const;

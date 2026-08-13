@@ -18,6 +18,9 @@ namespace vinecopulib {
 //!
 //! Maps a two-column matrix of pair-copula data and a vector of weights to a
 //! scalar dependence value. Used when `tree_criterion` is set to `"custom"`.
+//! The function is always invoked, copied, and destroyed on the calling
+//! thread (the thread that starts the fit), never from a worker thread, so it
+//! need not be thread safe.
 using TreeCriterionFunction =
   std::function<double(const Eigen::MatrixXd&, const Eigen::VectorXd&)>;
 
@@ -71,7 +74,9 @@ struct FitControlsConfig
   std::optional<std::string> tree_criterion;
 
   //! A custom edge-weight function for the spanning tree. Required when
-  //! `tree_criterion` is set to `"custom"`.
+  //! `tree_criterion` is set to `"custom"`, and rejected otherwise. It is
+  //! always called on the thread that starts the fit, so it need not be
+  //! thread safe.
   std::optional<TreeCriterionFunction> tree_criterion_function;
 
   //! Threshold for thresholded vines. Default: 0.
