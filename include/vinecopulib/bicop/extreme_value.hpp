@@ -54,6 +54,11 @@ private:
     const double& t,
     const Eigen::Ref<const Eigen::VectorXd>& parameters) = 0;
 
+  // where A'' peaks; `parameters_to_tau` splits its integral there, because the
+  // peak can be far narrower than any subdivision reachable from [0, 1]
+  virtual double pickands_peak(
+    const Eigen::Ref<const Eigen::VectorXd>& parameters);
+
   // link between Kendall's tau and the par_bicop parameter
   double parameters_to_tau(const Eigen::MatrixXd& par) override;
 
