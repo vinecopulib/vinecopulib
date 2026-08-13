@@ -399,6 +399,60 @@ Bicop::hinv2(const Eigen::MatrixXd& u) const
   tools_eigen::trim(hi, 0.0, 1.0);
   return hi;
 }
+
+inline Eigen::VectorXd
+Bicop::hfunc1_continuous(const Eigen::MatrixXd& u) const
+{
+  auto u_new = prep_for_abstract_continuous(u);
+  // TLL leaves read their interpolation grid directly and ignore the parameter
+  // argument; do not materialize the full grid merely to pass it unused.
+  Eigen::MatrixXd parameters = get_family() == BicopFamily::tll
+                                 ? Eigen::MatrixXd()
+                                 : bicop_->get_parameters().transpose();
+  Eigen::VectorXd h(u.rows());
+  switch (rotation_) {
+    default:
+      h = bicop_->hfunc1_raw(u_new, parameters);
+      break;
+    case 90:
+      h = bicop_->hfunc2_raw(u_new, parameters);
+      break;
+    case 180:
+      h = 1.0 - bicop_->hfunc1_raw(u_new, parameters).array();
+      break;
+    case 270:
+      h = 1.0 - bicop_->hfunc2_raw(u_new, parameters).array();
+      break;
+  }
+  tools_eigen::trim(h, 0.0, 1.0);
+  return h;
+}
+
+inline Eigen::VectorXd
+Bicop::hinv2_continuous(const Eigen::MatrixXd& u) const
+{
+  auto u_new = prep_for_abstract_continuous(u);
+  Eigen::MatrixXd parameters = get_family() == BicopFamily::tll
+                                 ? Eigen::MatrixXd()
+                                 : bicop_->get_parameters().transpose();
+  Eigen::VectorXd hi(u.rows());
+  switch (rotation_) {
+    default:
+      hi = bicop_->hinv2_raw(u_new, parameters);
+      break;
+    case 90:
+      hi = 1.0 - bicop_->hinv1_raw(u_new, parameters).array();
+      break;
+    case 180:
+      hi = 1.0 - bicop_->hinv2_raw(u_new, parameters).array();
+      break;
+    case 270:
+      hi = bicop_->hinv1_raw(u_new, parameters);
+      break;
+  }
+  tools_eigen::trim(hi, 0.0, 1.0);
+  return hi;
+}
 //! @}
 
 //! @name Stats methods with per-row parameters
@@ -2207,6 +2261,15 @@ inline Eigen::MatrixXd
 Bicop::prep_for_abstract(const Eigen::MatrixXd& u) const
 {
   auto u_new = format_data(u);
+  tools_eigen::trim(u_new);
+  rotate_data(u_new);
+  return u_new;
+}
+
+inline Eigen::MatrixXd
+Bicop::prep_for_abstract_continuous(const Eigen::MatrixXd& u) const
+{
+  Eigen::MatrixXd u_new = u.leftCols(2);
   tools_eigen::trim(u_new);
   rotate_data(u_new);
   return u_new;

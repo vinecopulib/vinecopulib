@@ -409,8 +409,8 @@ protected:
   double threshold_{ 0.0 };
   double loglik_{ NAN };
   size_t nobs_{ 0 };
-  mutable std::vector<std::string> var_types_;
-  mutable int n_discrete_{ 0 };
+  std::vector<std::string> var_types_;
+  int n_discrete_{ 0 };
 
   void check_data_dim(const Eigen::MatrixXd& data) const;
   void check_data(const Eigen::MatrixXd& data) const;
@@ -426,8 +426,8 @@ protected:
   void check_fitted() const;
   void check_indices(const size_t tree, const size_t edge) const;
   void check_var_types(const std::vector<std::string>& var_types) const;
-  void set_continuous_var_types() const;
-  void set_var_types_internal(const std::vector<std::string>& var_types) const;
+  void set_continuous_var_types();
+  void set_var_types_internal(const std::vector<std::string>& var_types);
   int get_n_discrete() const;
   bool is_discrete() const;
   Eigen::MatrixXd collapse_data(const Eigen::MatrixXd& u) const;

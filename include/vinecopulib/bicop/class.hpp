@@ -44,6 +44,7 @@ using BicopPtr = std::shared_ptr<AbstractBicop>;
 //!
 class Bicop
 {
+  friend class Vinecop;
 
 public:
   // Constructors
@@ -333,11 +334,22 @@ public:
   Bicop as_continuous() const;
 
 private:
+  // Evaluate the continuous copula represented by this object without
+  // consulting or changing its stored variable types. These are used by the
+  // inverse Rosenblatt transform, whose input and output always have
+  // continuous uniform margins even when the fitted model has discrete
+  // variables.
+  Eigen::VectorXd hfunc1_continuous(const Eigen::MatrixXd& u) const;
+
+  Eigen::VectorXd hinv2_continuous(const Eigen::MatrixXd& u) const;
+
   Eigen::MatrixXd format_data(const Eigen::MatrixXd& u) const;
 
   void rotate_data(Eigen::MatrixXd& u) const;
 
   Eigen::MatrixXd prep_for_abstract(const Eigen::MatrixXd& u) const;
+
+  Eigen::MatrixXd prep_for_abstract_continuous(const Eigen::MatrixXd& u) const;
 
   Eigen::MatrixXd format_parameters(const Eigen::MatrixXd& u,
                                     const Eigen::MatrixXd& parameters) const;
