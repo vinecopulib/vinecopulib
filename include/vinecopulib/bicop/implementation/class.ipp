@@ -1595,6 +1595,7 @@ Bicop::mbic(const Eigen::MatrixXd& u, const double psi0) const
                      static_cast<double>(is_indep) * std::log(1.0 - psi0);
   double n = static_cast<double>(nobs_);
   if (u.rows() > 0) {
+    tools_eigen::remove_nans(u_no_nan);
     n = static_cast<double>(u_no_nan.rows());
   }
   return -2 * this->loglik(u_no_nan) + std::log(n) * npars - 2 * log_prior;
@@ -2257,7 +2258,7 @@ Bicop::check_var_types(const std::vector<std::string>& var_types) const
   if (var_types.size() != 2) {
     throw std::runtime_error("var_types must have size two.");
   }
-  for (auto t : var_types) {
+  for (const auto& t : var_types) {
     if (!tools_stl::is_member(t, { "c", "d" })) {
       throw std::runtime_error("var type must be either 'c' or 'd'.");
     }
@@ -2269,7 +2270,7 @@ inline unsigned short
 Bicop::get_n_discrete() const
 {
   int n_discrete = 0;
-  for (auto t : var_types_) {
+  for (const auto& t : var_types_) {
     n_discrete += (t == "d");
   }
   return static_cast<unsigned short>(n_discrete);

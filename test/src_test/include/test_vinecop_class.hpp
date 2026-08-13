@@ -650,7 +650,7 @@ TEST_F(VinecopTest, conditional_select_places_conditioning_set_at_tail)
                                        BicopFamily::gumbel,
                                        BicopFamily::frank };
   std::vector<std::vector<size_t>> sets{ { 3 }, { 2, 5 }, { 1, 4, 6 } };
-  for (auto B : sets) {
+  for (const auto& B : sets) {
     FitControlsVinecop c;
     c.set_family_set(fam);
     c.set_conditioning_set(B);
@@ -743,7 +743,7 @@ TEST_F(VinecopTest, reorient_preserves_model)
     { 1 },    { 2 },    { 3 },    { 4 },       { 5 },      { 6 },
     { 1, 2 }, { 2, 5 }, { 3, 6 }, { 1, 4, 6 }, { 2, 3, 5 }
   };
-  for (auto B : candidates) {
+  for (const auto& B : candidates) {
     Vinecop vr = vc;
     try {
       vr.reorient(B);
@@ -1739,9 +1739,9 @@ get_pairs_unequal(
       vcl_sets[tree][edge][0] = matrix2(tree, edge);
       vcl_sets[tree][edge][1] = matrix2(trunc_lvl - edge, edge);
     }
-    for (auto s1 : vc_sets[tree]) {
+    for (const auto& s1 : vc_sets[tree]) {
       bool is_in_both = false;
-      for (auto s2 : vcl_sets[tree]) {
+      for (const auto& s2 : vcl_sets[tree]) {
         if (tools_stl::is_same_set(s1, s2)) {
           is_in_both = true;
         }

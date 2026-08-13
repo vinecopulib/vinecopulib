@@ -185,7 +185,7 @@ TEST(discrete, vinecop)
   // check output
   auto pcs = vc2.get_all_pair_copulas();
   for (size_t t = 0; t < 4; t++) {
-    for (auto pc : pcs[t]) {
+    for (const auto& pc : pcs[t]) {
       EXPECT_EQ(pc.get_rotation(), 90);
       EXPECT_NEAR(
         pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
@@ -213,7 +213,7 @@ TEST(discrete, vinecop)
   vc2.pdf(u);
   pcs = vc2.get_all_pair_copulas();
   for (size_t t = 0; t < 4; t++) {
-    for (auto pc : pcs[t]) {
+    for (const auto& pc : pcs[t]) {
       EXPECT_EQ(pc.get_rotation(), 90);
       EXPECT_NEAR(
         pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);
@@ -278,7 +278,7 @@ TEST(zero_inflated, vinecop)
   // check output
   auto pcs = vc.get_all_pair_copulas();
   for (size_t t = 0; t < 4; t++) {
-    for (auto pc : pcs[t]) {
+    for (const auto& pc : pcs[t]) {
       EXPECT_EQ(pc.get_rotation(), 90);
       EXPECT_NEAR(
         pc.get_parameters()(0), 2.0 / (static_cast<double>(t) + 1.0), 0.5);

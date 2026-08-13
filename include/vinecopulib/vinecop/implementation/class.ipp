@@ -1005,7 +1005,7 @@ Vinecop::check_var_types(const std::vector<std::string>& var_types) const
         << "than variables (" << d_ << ")" << std::endl;
     throw std::runtime_error(msg.str());
   }
-  for (auto t : var_types) {
+  for (const auto& t : var_types) {
     if (!tools_stl::is_member(t, { "c", "d" })) {
       msg << "variable type must be 'c' or 'd' (not '" << t << "')."
           << std::endl;

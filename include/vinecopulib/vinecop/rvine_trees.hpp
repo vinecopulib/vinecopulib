@@ -54,6 +54,9 @@ public:
       : a(a_arg)
       , b(b_arg)
       , C(std::move(c_arg))
+      // Bicop's user-declared copy constructor suppresses its implicit move
+      // constructor, so this move is a copy today; keep the intent.
+      // NOLINTNEXTLINE(performance-move-const-arg)
       , pair_copula(std::move(pc))
     {
       finalize();
