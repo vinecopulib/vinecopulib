@@ -1498,42 +1498,23 @@ Bicop::simulate(const size_t& n,
   return u;
 }
 
-//! @brief Simulates from a bivariate copula with a different parameter set per
-//! observation.
+//! @brief Simulates from a bivariate copula with per-row parameters.
 //!
-//! @details This is the counterpart of the fixed-parameter `simulate()` for
-//! models whose parameters vary from observation to observation, as in
-//! conditional or covariate-dependent copula models. Observation `i` is drawn
-//! from the copula carrying row `i` of `parameters`, and the number of
-//! observations is the number of rows of `parameters`. The family, rotation,
-//! and variable types are taken from the object, which is left unchanged.
-//!
-//! Sampling uses the inverse Rosenblatt transform: a pair of independent
-//! uniform variables is drawn per observation, and the second one is
-//! transformed by the inverse of the first h-function (see `hinv1()`) at that
-//! observation's parameters. The draws are always continuous, even when the
-//! model has discrete variable types.
-//!
-//! Only parametric families are supported; nonparametric families store an
-//! interpolation grid rather than a per-observation parameter vector.
-//!
-//! If `qrng = TRUE`, generalized Halton sequences are used.
-//! For more information on Generalized Halton sequences, see
-//! Faure, H., Lemieux, C. (2009). Generalized Halton Sequences in 2008:
-//! A Comparative Study. ACM-TOMACS 19(4), Article 15.
+//! @details Observation `i` is drawn from the copula carrying row `i` of
+//! `parameters`, without mutating the object's stored parameters. The family,
+//! rotation, and variable types are taken from the object; only the parameter
+//! values vary by observation. Available for parametric families only.
 //!
 //! @param parameters An \f$ n \times p \f$ matrix of parameters, where `n` is
-//!   the number of observations to simulate and `p` is the number of family
-//!   parameters (`get_parameters().size()`). Row `i` holds the parameter set
-//!   used for observation `i`, in the family's natural (unrotated)
-//!   parameterization, as for `get_parameters()`. There must be one row per
-//!   simulated observation. The independence copula has no parameters, so `p`
-//!   is zero and only the number of rows matters.
+//!   the number of observations to simulate, `p` is the number of family
+//!   parameters (`get_parameters().size()`), and row `i` holds the parameter
+//!   set used for observation `i`. Parameters are given in the family's
+//!   natural (unrotated) parameterization, as for `get_parameters()`.
 //! @param qrng Set to true for quasi-random numbers.
 //! @param seeds Seeds of the (quasi-)random number generator; if empty
 //! (default), the (quasi-)random number generator is seeded randomly.
-//! @param num_threads The number of threads to parallelize the inverse
-//!   h-function over observations.
+//! @param num_threads The number of threads to parallelize the simulation over
+//!   observations.
 //! @return An \f$ n \times 2 \f$ matrix of samples from the copula model.
 inline Eigen::MatrixXd
 Bicop::simulate(const Eigen::MatrixXd& parameters,
