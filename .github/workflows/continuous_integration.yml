@@ -281,7 +281,8 @@ jobs:
           path: bench_results/parity.json
           if-no-files-found: warn
 
-  # Smoke-builds the docs. To be tightened to WARN_AS_ERROR with the docs rewrite.
+  # Compiles and runs the documentation snippets, then builds the pages with
+  # WARN_AS_ERROR so prose and code cannot drift apart.
   docs:
     name: doxygen
     runs-on: ubuntu-latest
@@ -307,10 +308,22 @@ jobs:
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
           echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
           echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
-      - name: Build the documentation
+      - name: Configure
         run: |
           mkdir build-docs && cd build-docs
           cmake .. -DVINECOPULIB_BUILD_DOC=ON -DBUILD_TESTING=OFF
+      - name: Compile and run the documentation snippets
+        run: |
+          cd build-docs
+          make -j$(nproc) doc_snippets
+          # Running them is what catches an example that compiles but throws.
+          for snippet in docs/snippets/doc_snippet_*; do
+            echo "--- $snippet"
+            (cd "$(mktemp -d)" && "$GITHUB_WORKSPACE/build-docs/$snippet")
+          done
+      - name: Build the documentation
+        run: |
+          cd build-docs
           make doc 2>&1 | tee doxygen.log
       - name: Summarize Doxygen warnings
         if: always()

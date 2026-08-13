@@ -101,10 +101,17 @@ if(VINECOPULIB_BUILD_DOC)
           ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in
           ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY
       )
+  # The m.css variant only overrides a few tags and @INCLUDEs the above.
+  configure_file(
+          ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile-mcss.in
+          ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile-mcss @ONLY
+      )
   add_custom_target(doc
           ${DOXYGEN_EXECUTABLE}
           ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
           COMMENT "Generating API documentation with Doxygen" VERBATIM
       )
+  # The snippets the pages reference must compile before the pages are built.
+  add_dependencies(doc doc_snippets)
 endif()

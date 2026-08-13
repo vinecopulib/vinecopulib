@@ -91,3 +91,14 @@ bench_results/
 # Python bytecode (tools/derivs codegen)
 __pycache__/
 *.pyc
+
+# documentation snippet output (the examples write to the working directory)
+myfile.json
+myfile.cbor
+myvine.json
+myvine.cbor
+
+# generated documentation (an in-tree doxygen run writes here)
+docs/html/
+docs/xml/
+docs/search/

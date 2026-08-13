@@ -6,7 +6,9 @@
 - [Set up a custom bivariate copula model](#bicop-custom)
 - [Fit and select a bivariate copula](#bicop-fit)
 - [Work with a bivariate copula model](#bicop-model)
-
+- [Dependence measures](#bicop-dependence)
+- [Per-observation parameters](#bicop-per-row)
+- [Serialization](#bicop-serialization)
 
 Bivariate copula models are implemented as the `Bicop` class, and `BicopFamily`
 is a closely related enum class describing the type or "family" of copula.
@@ -14,237 +16,152 @@ To use bivariate copula models in your code, include the header
 `vinecopulib/bicop/class.hpp` (or simply `vinecopulib.hpp`) at the top of
 your source file.
 
+Discrete variables are covered in @ref discrete, and the score, gradient and
+Hessian of the log-likelihood in @ref inference.
+
 @section bicop-families Implemented bivariate copula families
 
-| type          | name                  | BicopFamily |
-|---------------|-----------------------|-------|
-| -             | Independence          | indep     |
-| Elliptical    | Gaussian              | gaussian     |
-|               | Student t             | student     |
-| Archimedean   | Clayton               | clayton     |
-|               | Gumbel                | gumbel     |
-|               | Frank                 | frank     |
-|               | Joe                   | joe     |
-|               | BB1                   | bb1     |
-|               | BB6                   | bb6     |
-|               | BB7                   | bb7     |
-|               | BB8                   | bb8    |
-| Extreme-Value | Tawn                  | tawn     |
-| Nonparametric | Transformation kernel | tll  |
+| type          | name                  | BicopFamily | parameters |
+|---------------|-----------------------|-------------|------------|
+| -             | Independence          | `indep`     | 0 |
+| Elliptical    | Gaussian              | `gaussian`  | 1 |
+|               | Student t             | `student`   | 2 |
+| Archimedean   | Clayton               | `clayton`   | 1 |
+|               | Gumbel                | `gumbel`    | 1 |
+|               | Frank                 | `frank`     | 1 |
+|               | Joe                   | `joe`       | 1 |
+|               | BB1                   | `bb1`       | 2 |
+|               | BB6                   | `bb6`       | 2 |
+|               | BB7                   | `bb7`       | 2 |
+|               | BB8                   | `bb8`       | 2 |
+| Extreme-Value | Tawn                  | `tawn`      | 3 |
+| Nonparametric | Transformation kernel | `tll`       | (a grid) |
 
-Note that several convenience vectors of families are included in the
-sub-namespace `bicop_families`:
-- `all` contains all the families
-- `parametric` contains the parametric families (all except `tll`)
-- `nonparametric` contains the nonparametric families (`indep` and `tll`)
-- `one_par` contains the parametric families with a single parameter
-(`gaussian`, `clayton`, `gumbel`, `frank`, and `joe`)
-- `two_par` contains the parametric families with two parameters
-(`student`, `bb1`, `bb6`, `bb7`, and `bb8`)
-- `three_par` contains the parametric families with three parameters
-(`tawn`)
-- `elliptical` contains the elliptical families
-- `archimedean` contains the archimedean families
-- `extreme_value` contains the extreme-value families (`gumbel`, `tawn`)
-- `bb` contains the BB families
-- `itau` families for which estimation by Kendall's tau inversion is available
-(`indep`,`gaussian`, `student`,`clayton`, `gumbel`, `frank`, `joe`)
+Each family's parameter ranges, admissible rotations and tail behavior are
+documented on the `BicopFamily` enum itself.
 
-```
-// print all available families
-std::cout << "Available families : ";
-for (auto family : vinecopulib::bicop_families::all) {
-		std::cout << get_family_name(family) << " ";
-}
-```
+Several convenience vectors of families live in the sub-namespace
+`bicop_families`, and are the intended way to constrain a search space:
 
+| vector | contents |
+|--------|----------|
+| `all` | every family |
+| `parametric` | all except `tll` |
+| `nonparametric` | `indep` and `tll` |
+| `one_par` | `gaussian`, `clayton`, `gumbel`, `frank`, `joe` |
+| `two_par` | `student`, `bb1`, `bb6`, `bb7`, `bb8` |
+| `three_par` | `tawn` |
+| `elliptical` | `gaussian`, `student` |
+| `archimedean` | `clayton`, `gumbel`, `frank`, `joe`, `bb1`, `bb6`, `bb7`, `bb8` |
+| `extreme_value` | `tawn`, `gumbel` |
+| `bb` | `bb1`, `bb6`, `bb7`, `bb8` |
+| `rotationless` | `indep`, `gaussian`, `student`, `frank`, `tll` — they already cover both signs of dependence |
+| `lt` | stronger lower-tail dependence: `clayton`, `bb1`, `bb7`, `tawn` |
+| `ut` | stronger upper-tail dependence: `gumbel`, `joe`, `bb1`, `bb6`, `bb7`, `bb8`, `tawn` |
+| `itau` | estimation by Kendall's \f$ \tau \f$ inversion is available: `indep`, `gaussian`, `student`, `clayton`, `gumbel`, `frank`, `joe` |
+| `analytic_derivs` | closed-form density and h-function derivatives; other parametric families fall back to finite differences |
+
+@snippet bicop.cpp families
 
 @section bicop-custom Set up a custom bivariate copula model
 
-There are essentially two ways of setting-up bivariate copulas:
+There are essentially two ways of setting up a bivariate copula:
 - with known parameters,
 - from data (i.e., with estimated parameters).
 
-The constructor with known parameters takes 3 arguments:
-- The copula family (default to `indep`)
-- The rotation (default to `0`)
-- The parameters (default to parameters corresponding to an independence copula)
+The constructor with known parameters takes four arguments, all defaulted:
+- the copula family (default `indep`),
+- the rotation, one of `0`, `90`, `180`, `270` (default `0`),
+- the parameters (default: those of an independence copula),
+- the variable types (default `{"c", "c"}`, i.e. both continuous).
 
-```
-// 90 degree rotated Clayton with default parameter (corresponds to independence)
-Bicop clayton(BicopFamily::clayton, 90);
+@snippet bicop.cpp custom
 
-// Gauss copula with parameter 0.5
-Bicop gauss(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
-```
-The constructor from data takes the same arguments as the select method and is
+The constructor from data takes the same arguments as `select()` and is
 described in the next section.
-
 
 @section bicop-fit Fit and select a bivariate copula
 
-You can either fit the parameters of a given `Bicop` object with `fit()` or
+You can either fit the parameters of a given `Bicop` object with `fit()`, or
 select the best fitting model from a set of families with `select()`.
 
-``` cpp
-// create a Gauss copula with parameter 0.5 and simulate 1e3 observations
-Bicop model(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
-auto data = model.simulate(1e3);
+@snippet bicop.cpp fit
 
-// instantiate a gaussian copula with default parameters and fit to data
-Bicop fitted(BicopFamily::gaussian);
-fitted.fit(data);
-std::cout <<
-       "estimated parameter: " <<
-       fitted.get_parameters() <<
-       std::endl;
+As it is arguably the most important function of the `Bicop` class, it is worth
+understanding the second argument of `select()`, an object of the class
+`FitControlsBicop`:
 
-// assign another family to the same variable and fit to data
-fitted = Bicop(BicopFamily::student);
-fitted.fit(data);
-std::cout <<
-       "estimated parameter: " <<
-       fitted.get_parameters() <<
-       std::endl;
+- `std::vector<BicopFamily> family_set` — the set of families to select from.
+  Takes a user-specified vector or any of the vectors above (default
+  `bicop_families::all`).
+- `std::string parametric_method` — `"mle"` (default) for maximum likelihood, or
+  `"itau"` for Kendall's \f$ \tau \f$ inversion (only for families in
+  `bicop_families::itau`).
+- `std::string nonparametric_method` — the degree of the density approximation
+  for the transformation kernel estimator: `"constant"` (default), `"linear"` or
+  `"quadratic"`.
+- `double nonparametric_mult` — a factor multiplying the smoothing parameters.
+- `size_t nonparametric_grid_size` — the size of the interpolation grid backing
+  `tll` (default `30`).
+- `std::string selection_criterion` — `"loglik"`, `"aic"` (default), `"bic"` or
+  `"mbic"`.
+- `Eigen::VectorXd weights` — optional observation weights.
+- `double psi0` — the prior probability of non-independence used by `"mbic"`
+  (default `0.9`).
+- `bool preselect_families` — a heuristic preselection (default `true`) based on
+  symmetry properties of the data; the unrotated Clayton is not preselected when
+  the data show upper-tail dependence, for instance.
+- `bool allow_rotations` — whether rotations may be selected (default `true`).
+- `size_t num_threads` — threads used when fitting several families.
 
-// alternatively, assign to a family and fit automatically
-fitted.select(data);
-std::cout <<
-       "family: " << fitted.get_family_name() <<
-       "rotation: " <<  fitted.get_rotation() <<
-       std::endl;
-```
+@warning `nonparametric_grid_size` was inserted before `selection_criterion` in
+release 1.0.0. Code that passed these positionally must be revisited; see the release notes
+in NEWS.md.
 
-As it's arguably the most important function of the `Bicop` class, it's worth
-understanding the second argument of `select()`, namely an object of the class
-`FitControlsBicop`, which contain several data members:
-- `std::vector<BicopFamily> family_set` describes the set of family to select
-from. It can take a user specified vector of
-families or any of those mentioned above (default is `bicop_families::all`).
-- `std::string parametric_method` describes the estimation method. It can take
-     `"mle"` (default, for maximum-likelihood estimation) and
-`"itau"` (for Kendall's tau inversion, although only available for families
-included in `bicop_families::itau`).
-- `std::string nonparametric_method` describes the degree of the density
-approximation for the transformation kernel estimator. It can take
-`constant` (default), `linear` and `quadratic` for approximations of
-degree zero, one and two.
-- `double nonparametric_mult` a factor with which the smoothing parameters
-are multiplied.
-- `std::string selection_criterion` describes the criterion to compare the
-families. It can take either `"loglik"`, `"aic"`, `"bic"`(default), `"mbic"`, or `"mbicv"`.
-- `Eigen::VectorXd weights` an optional vector of weights for the observations.
-- `bool preselect_families` describes a heuristic preselection method (default
-is `true`) based on symmetry properties of the data (e.g., the unrotated
-Clayton won't be preselected if the data displays upper-tail dependence).
-- `size_t num_threads` number of threads to run in parallel when fitting
-several families.
+As mentioned [above](#bicop-custom), the arguments of `select()` can be given to
+a constructor, instantiating a fitted object directly:
 
-As mentioned [above](#bicop-custom), the arguments
-of `select()` can be used as arguments to a
-    constructor allowing to instantiate a new object directly:
-
-``` cpp
-// instantiate an archimedean copula by selecting the "best" family according to
-// the BIC and parameters corresponding to the MLE
-Bicop best_archimedean(data, FitControlsBicop(bicop_families::archimedean));
-std::cout <<
-       "family: " << best_archimedean.get_family_name() <<
-       "rotation: " <<  best_archimedean.get_rotation() <<
-       best_archimedean.get_parameters() <<
-       std::endl
-
-// instantiate a bivariate copula by selecting the "best" family according to
-// the AIC and parameters corresponding to Kendall's tau inversion
-FitControlsBicop controls(bicop_families::itau, "itau");
-controls.set_selection_criterion("aic");
-Bicop best_itau(data, controls));
-std::cout <<
-       "family: " << best_itau.get_family_name() <<
-       "rotation: " <<  best_itau.get_rotation() <<
-       best_itau.get_parameters() <<
-       std::endl
-```
+@snippet bicop.cpp select-controls
 
 @section bicop-model Work with a bivariate copula model
 
-You can simulate from a model and evaluate the pdf, h-functions, inverse
-h-functions, log-likelihood, AIC, and BIC.
+You can simulate from a model, and evaluate its density, distribution function,
+h-functions, inverse h-functions, log-likelihood and information criteria.
 
-```
-// Gauss copula with parameter 0.5
-Bicop bicop(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
+@snippet bicop.cpp model
 
-// Simulate 100 observations
-auto sim_data = bicop.simulate(100);
+@section bicop-dependence Dependence measures
 
-// Evaluate the pdf
-auto pdf  = bicop.pdf(sim_data);
+`get_tau()` reports Kendall's \f$ \tau \f$ of the current parameters, and
+`parameters_to_tau()` does the same for an arbitrary parametrization of the
+current family. The inverse, `tau_to_parameters()`, only exists where \f$ \tau
+\f$ determines the parameters completely — see its documentation for the exact
+set of families.
 
-// Evaluate the two h-functions
-auto h1   = bicop.hfunc1(sim_data);
-auto h2   = bicop.hfunc2(sim_data);
+`get_beta()` returns Blomqvist's beta, and `get_taildep()` a \f$ 2 \times 2 \f$
+matrix whose \f$ (0,0) \f$ and \f$ (1,1) \f$ entries are the lower and upper
+tail-dependence coefficients (`NaN` for families with no closed form).
 
-// Evalute the two inverse h-functions
-auto hi1  = bicop.hinv1(sim_data);
-auto hi2  = bicop.hinv2(sim_data);
+@snippet bicop.cpp dependence
 
-// Evaluate the log-likelihood, AIC, and BIC
-auto ll   = bicop.loglik(sim_data);
-auto aic  = bicop.aic(sim_data);
-auto bic  = bicop.bic(sim_data);
-```
+@section bicop-per-row Per-observation parameters
 
 For parametric families, `pdf()`, `cdf()`, `hfunc1()`, `hfunc2()`, `hinv1()`,
-`hinv2()`, `loglik()`, and `simulate()` also have overloads taking one
-parameter set per observation, as in conditional or covariate-dependent
-copula models.
+`hinv2()`, `loglik()`, `simulate()` and the derivative methods also have
+overloads taking one parameter set per observation, as in conditional or
+covariate-dependent copula models.
 
-```
-// Simulate 100 observations, each from its own Gauss copula
-Eigen::MatrixXd parameters = Eigen::VectorXd::LinSpaced(100, 0.1, 0.8);
-auto sim_par = bicop.simulate(parameters);
+@snippet bicop.cpp per-row
 
-// Evaluate the pdf at the same per-observation parameters
-auto pdf_par = bicop.pdf(sim_par, parameters);
-```
+@section bicop-serialization Serialization
 
+Bivariate copula models can be written to and constructed from JSON or CBOR
+files and [`nlohmann::json` objects](https://github.com/nlohmann/json). CBOR is
+a binary encoding of exactly the same logical representation: it is generally
+substantially smaller and faster to parse, while JSON remains useful for
+inspection and interchange. A `.cbor` extension selects CBOR; any other
+extension is JSON.
 
-Bivariate copula models can also be written to and constructed from JSON or
-CBOR files and
-[`nlohmann::json` objects](https://github.com/nlohmann/json). CBOR is a binary
-encoding of exactly the same logical JSON representation. It is generally
-substantially smaller and faster to parse than the JSON output, while JSON
-remains useful for inspection and interchange.
-
-```
-// Gauss copula with parameter 0.5
-Bicop bicop(BicopFamily::gaussian, 0,  Eigen::VectorXd::Constant(1, 0.5));
-
-// Save as a nlohmann::json object
-nlohmann::json bicop_json = bicop.to_json();
-
-// Write into a JSON file
-std::string filename = "myfile.json";
-std::ofstream file(filename);
-file << bicop_json << std::endl;
-file.close();
-
-// Equivalently
-bicop.to_file(filename);
-
-// Then a new Bicop can be constructed from the nlohmann::json object
-Bicop bicop2(bicop_json);
-
-// Or from the JSON file
-Bicop bicop3(std::string("myfile.json"));
-
-// The .cbor extension selects binary CBOR automatically
-bicop.to_file(std::string("myfile.cbor"));
-Bicop bicop4(std::string("myfile.cbor"));
-```
-
-For backwards compatibility, filenames without a `.cbor` extension continue
-to use JSON.
+@snippet bicop.cpp serialization
 
 */

@@ -87,20 +87,8 @@ simulate_normal(const size_t& n,
   return qnorm(tools_stats::simulate_uniform(n, d, qrng, seeds));
 }
 
-//! @brief Applies the empirical probability integral transform to a data
-//! matrix.
-//!
-//! Gives pseudo-observations from the copula by applying the empirical
-//! distribution function (scaled by \f$ n + 1 \f$) to each margin/column.
-//!
-//! @param x A matrix of real numbers.
-//! @param ties_method Indicates how to treat ties; same as in R, see
-//! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
-//! @param weights Vector of weights for the observations.
-//! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$
-//! (column-wise).
-//! (internal) 1-d worker with pre-converted weights; moves `xvec` into
-//! `wdm::impl::rank` to avoid a copy.
+// (internal) 1-d worker with pre-converted weights; moves `xvec` into
+// `wdm::impl::rank` to avoid a copy.
 inline Eigen::VectorXd
 pseudo_obs_1d_impl(std::vector<double>&& xvec,
                    const std::string& ties_method,
@@ -119,6 +107,20 @@ pseudo_obs_1d_impl(std::vector<double>&& xvec,
          (static_cast<double>(n) + 1.0);
 }
 
+//! @brief Applies the empirical probability integral transform to a data
+//! matrix.
+//!
+//! Gives pseudo-observations from the copula by applying the empirical
+//! distribution function (scaled by \f$ n + 1 \f$) to each margin/column.
+//!
+//! @param x A matrix of real numbers.
+//! @param ties_method Indicates how to treat ties; same as in R, see
+//! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
+//! @param weights Vector of weights for the observations.
+//! @param seeds Seeds for the random number generator, used only when
+//! `ties_method = "random"`.
+//! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$
+//! (column-wise).
 inline Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x,
               const std::string& ties_method,
@@ -146,6 +148,8 @@ to_pseudo_obs(Eigen::MatrixXd x,
 //! @param ties_method Indicates how to treat ties; same as in R, see
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
 //! @param weights Vector of weights for the observations.
+//! @param seeds Seeds for the random number generator, used only when
+//! `ties_method = "random"`.
 //! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$.
 inline Eigen::VectorXd
 to_pseudo_obs_1d(Eigen::VectorXd x,
@@ -458,6 +462,9 @@ ace(const Eigen::MatrixXd& data,                        // data
   // return result
   return phi;
 }
+
+//! @name Dependence measures
+//! @{
 
 //! calculates the pairwise maximum correlation coefficient.
 inline double
