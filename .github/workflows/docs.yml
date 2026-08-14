@@ -1,8 +1,8 @@
 name: Website
 
-# Publishes the m.css site to the gh-pages branch, which is what
-# https://vinecopulib.github.io/vinecopulib/ serves. Tags publish; every pull
-# request only build-checks the site, in the docs job of the CI workflow.
+# Publishes the m.css site to https://vinecopulib.github.io/vinecopulib/. Tags
+# publish; every pull request only build-checks the site, in the docs job of the
+# CI workflow. Needs the repository's Pages source set to GitHub Actions.
 
 on:
   push:
@@ -31,7 +31,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
-      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -67,24 +71,13 @@ jobs:
         with:
           build_dir: build-docs
 
-      # Commits on top of gh-pages rather than replacing it, so an unexpected
-      # result can be reverted by reverting one commit.
-      - name: Publish to gh-pages
-        run: |
-          remote="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
-          site=$(mktemp -d)
-          git clone -q --depth=1 --branch gh-pages "$remote" "$site"
-          find "$site" -mindepth 1 -maxdepth 1 -not -name .git -exec rm -rf {} +
-          cp -r build-docs/docs/. "$site/"
-          # .nojekyll keeps Pages from dropping m.css's _-prefixed assets.
-          touch "$site/.nojekyll"
-          cd "$site"
-          git config user.name  'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add -A
-          if git diff --quiet --cached; then
-            echo "The rendered site is identical to what is published; nothing to do."
-            exit 0
-          fi
-          git commit -q -m "docs: publish the website for ${GITHUB_REF_NAME}"
-          git push -q "$remote" gh-pages
+      # .nojekyll keeps Pages from dropping m.css's _-prefixed assets.
+      - name: Mark the site as not Jekyll
+        run: touch build-docs/docs/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: build-docs/docs
+
+      - id: deploy
+        uses: actions/deploy-pages@v5
