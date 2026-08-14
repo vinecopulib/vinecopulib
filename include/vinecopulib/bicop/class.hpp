@@ -45,9 +45,7 @@ using BicopPtr = std::shared_ptr<AbstractBicop>;
 //!
 class Bicop
 {
-  //! @cond INTERNAL
   friend class BicopView;
-  //! @endcond
 
 public:
   // Constructors
