@@ -79,7 +79,7 @@ Three design principles inform the rest of this file:
   `ghalton`, behind `simulate_uniform`.
 - **Pseudo-observations** — `to_pseudo_obs` (rank-normalize to the unit
   hypercube), the canonical input transform for copula fitting.
-- **Numerics infrastructure** — bound-constrained MLE (Powell's BOBYQA),
+- **Numerics infrastructure** — bound-constrained MLE (Brent and BFGS),
   bilinear interpolation grids for TLL, 1-d numerical integration, a
   thread pool, and JSON (de)serialization.
 
@@ -102,9 +102,11 @@ Three design principles inform the rest of this file:
 
 ## API stability & releases
 
-`vinecopulib` follows **semantic versioning** (`MAJOR.MINOR.PATCH`;
-currently 0.8.0). Because the R and Python interfaces pin a tag of this
-repo, public-API changes are real breaks for downstream users.
+`vinecopulib` follows **semantic versioning** (`MAJOR.MINOR.PATCH`). The
+authoritative version lives in `CMakeLists.txt` and
+[version.hpp](include/vinecopulib/version.hpp) — deliberately not repeated here,
+so this file cannot go stale. Because the R and Python interfaces pin a tag of
+this repo, public-API changes are real breaks for downstream users.
 
 - **Record every change in [NEWS.md](NEWS.md).** Each release has
   `### BREAKING API CHANGES`, `### NEW FEATURES`, and `### BUG FIXES`
@@ -115,17 +117,14 @@ repo, public-API changes are real breaks for downstream users.
   `VINECOPULIB_VERSION` (encoded integer, `800` for 0.8.0 —
   `major*100000 + minor*100 + patch`) and `VINECOPULIB_LIB_VERSION`
   (string, `"x_y[_z]"` — currently `"0_8"`).
-- **Prefer deprecation over a hard break.** The `DEPRECATED` macro
-  (defined in
-  [vinecop/fit_controls.hpp](include/vinecopulib/vinecop/fit_controls.hpp))
-  marks superseded API while keeping it callable — e.g.
-  `Vinecop::select_all` / `select_families` (use `select`),
-  `FitControlsVinecop::get_truncation_level` (use `get_trunc_lvl`). When
-  a rename is unavoidable, ship both for a cycle and document the
-  migration. Recent examples: `mst_algorithm` → `tree_algorithm` and the
-  `"prim"`/`"kruskal"` → `"mst_prim"`/`"mst_kruskal"` value renames
-  (#637); the CMake option `VINECOPULIB_BUILD_SHARED_LIBS` →
-  `VINECOPULIB_PRECOMPILED` (#641).
+- **Prefer deprecation over a hard break.** When a rename is unavoidable, ship
+  both spellings for a cycle and document the migration; the 1.0.0 removals
+  had been deprecated since 0.3.1. Recent examples: `mst_algorithm` →
+  `tree_algorithm` and the `"prim"`/`"kruskal"` → `"mst_prim"`/`"mst_kruskal"`
+  value renames (#637); the CMake option `VINECOPULIB_BUILD_SHARED_LIBS` →
+  `VINECOPULIB_PRECOMPILED` (#641). There is no `DEPRECATED` macro at present —
+  1.0.0 removed its last users along with the macro. Reintroduce one when it is
+  next needed rather than leaving a macro with no callers.
 
 ## Project layout
 
@@ -135,7 +134,7 @@ vinecopulib/
   README.md, NEWS.md, LICENSE, .zenodo.json
   CMakeLists.txt                 # 24-line entry point; includes the cmake/ modules
   .clang-format, .clang-tidy     # Mozilla style; advisory tidy checks
-  codecov.yml, .codacy.yml       # coverage / static-analysis service config
+  codecov.yml                    # coverage service config
 
   include/
     vinecopulib.hpp              # umbrella header — the canonical user include
@@ -161,7 +160,7 @@ vinecopulib/
         tools_stats.hpp          # pseudo-obs, QRNG, distributions, dep. measures
         tools_stats_sobol.hpp, tools_stats_ghalton.hpp
         tools_eigen.hpp, tools_stl.hpp
-        tools_optimization.hpp, tools_bobyqa.hpp   # BOBYQA MLE
+        tools_optimization.hpp, tools_transforms.hpp  # Brent/BFGS MLE
         tools_interpolation.hpp  # InterpolationGrid (TLL)
         tools_serialization.hpp, nlohmann_json.hpp # JSON
         tools_thread.hpp, tools_interface.hpp, tools_batch.hpp  # parallelism
@@ -175,11 +174,19 @@ vinecopulib/
     compilerDefOpt.cmake, buildTargets.cmake, codeCoverage.cmake,
     findR.cmake, printInfo.cmake
     templates/                   # Config.cmake.in, rscript.hpp.in, *.R parity tests
-  test/                          # GoogleTest; thin test_*.cpp + src_test/ logic
+  test/                          # GoogleTest; test_all.cpp + one TU per area in src_test/
   examples/                      # bicop/, vinecop/, benchmark/ — standalone projects
-  docs/                          # Doxyfile(.in), Doxyfile-mcss, *.dox, create-docs.md
-  .github/workflows/             # continuous_integration.yml
+                                 # (benchmark/ is an old chrono harness, unrelated to benchmarks/)
+  benchmarks/                    # google/benchmark suite, parity_dump, quadrature_study
+  scripts/                       # parity comparison, benchmark baselines, version check
+  tools/derivs/                  # the derivative-generation tooling
+  bench_results/                 # benchmark and parity output (gitignored)
+  docs/                          # Doxyfile.in, Doxyfile-mcss.in, *.dox, snippets/
+  .github/workflows/             # continuous_integration, release, release-drift, codeql, docs
 ```
+
+The listing above is the orientation, not an inventory: directories come and go,
+so check the tree rather than trusting it to be exhaustive.
 
 There is **no** `src/` of library `.cpp` files, **no** `lib/` /
 `contrib/` vendored tree, **no** git submodules, and **no**
@@ -517,9 +524,10 @@ Infrastructure shared across both modules:
   densities·CDFs·quantiles, bivariate normal/t CDFs, dependence-measure
   matrices (via `wdm`), and the `BoxCovering` machinery for discrete-ties
   latent-sample recovery.
-- **`tools_optimization` + `tools_bobyqa`** — Powell's BOBYQA
-  bound-constrained optimizer behind an `Optimizer` wrapper; the engine
-  for parametric MLE.
+- **`tools_optimization` + `tools_transforms`** — Brent's bracketing search
+  in one dimension and BFGS above it, behind an `Optimizer` wrapper; the engine
+  for parametric MLE. Bound constraints are handled by transforming the
+  parameters (`tools_transforms`) rather than by the optimizer.
 - **`tools_interpolation`** — `InterpolationGrid`, the bilinear unit-square
   grid backing the `tll` family, with Sinkhorn margin normalization and
   `integrate_1d` / `integrate_2d`.
@@ -558,25 +566,32 @@ headers (`vinecopulib/bicop/class.hpp`, etc.).
 
 ## Tests
 
-GoogleTest, under [test/](test/). The layout is split: thin
-`test/test_<topic>.cpp` translation units register the suites, while the
-actual logic lives in `test/src_test/*.cpp` with fixtures in
-`test/src_test/include/*.hpp`. The executable list (13 binaries, including
-the aggregate `test_all`) is in
-[cmake/buildTargets.cmake](cmake/buildTargets.cmake); each links
-`gtest vinecopulib … src_test`.
+GoogleTest, under [test/](test/). `test/test_all.cpp` is just `main()`; the
+tests live one translation unit per area in `test/src_test/test_*.cpp`, with
+fixtures and helpers in `test/src_test/include/`. Each area is its own **OBJECT**
+library — a test's only visible effect is the static initializer that registers
+it, so a static library would drop it at link time and the suite would run zero
+tests while exiting 0. `test/CheckTestCount.cmake` guards against exactly that.
 
 Conventions:
 
-- **Run** `bin/test_all` (or `ctest`) from the build directory after
-  `make`.
+- **Run** `bin/test_all`, or `ctest -j` (the R fixtures are parallel-safe: each
+  test gets its own exchange directory). Neither depends on the working
+  directory.
+- **Iterate on one area** with `make test_<area>_only`, which compiles and runs
+  only that area; the objects are shared with `test_all`, so nothing is compiled
+  twice. `--gtest_filter` selects a subset without rebuilding.
 - **Coverage** is collected on the Ubuntu/GNU Debug CI build
   (`-DVINECOPULIB_CODE_COVERAGE=ON`, target `vinecopulib_coverage`) and
   uploaded to Codecov; [codecov.yml](codecov.yml) ignores `test/` and the
   vendored `nlohmann_json.hpp`.
-- **R parity tests** are optional: with Rscript available, the
-  `cmake/templates/*.R` scripts cross-check parametric bicop / vinecop
-  results against the VineCopula R package.
+- **R parity tests** are optional, behind `VINECOPULIB_R_PARITY_TESTS`
+  (default ON iff Rscript is found). The `cmake/templates/*.R` scripts
+  cross-check parametric bicop / vinecop results against **VineCopula >= 2.6.2
+  from GitHub, not CRAN**; with the option off the tests skip rather than fail.
+- **Golden values and parity**: the golden-value tests are the CI-enforced part;
+  the before/after `parity_dump` comparison is a manual tool for numerical
+  changes. Both are documented in [scripts/README.md](scripts/README.md).
 - **Round-trip / parity invariants to preserve** when touching numerics:
   JSON `to_file` → constructor round-trips for `Bicop`, `Vinecop`, and
   `RVineStructure`; copula identities (h-function ↔ inverse, Rosenblatt ↔

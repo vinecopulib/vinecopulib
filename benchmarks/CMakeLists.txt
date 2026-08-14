@@ -1,21 +1,7 @@
-# Benchmark suite (google/benchmark) + numerical parity harness.
-#
-# Not built by default and never installed. Enable with:
-#   cmake -S . -B build-bench -DCMAKE_BUILD_TYPE=Release \
-#         -DVINECOPULIB_BUILD_BENCHMARKS=ON -DBUILD_TESTING=OFF
-#   cmake --build build-bench -j
-#
-# Baseline capture (reference machine, performance governor pinned):
-#   build-bench/bin/bench_all --benchmark_repetitions=10 \
-#     --benchmark_report_aggregates_only=true \
-#     --benchmark_out=baseline.json --benchmark_out_format=json
-# Then after changes, write contender.json the same way and compare with
-#   _deps/googlebenchmark-src/tools/compare.py benchmarks baseline.json contender.json
-#
-# Numerical parity:
-#   build-bench/bin/parity_dump parity_master.json     (on master)
-#   build-bench/bin/parity_dump parity_branch.json     (on the branch)
-#   python3 scripts/compare_parity.py parity_master.json parity_branch.json
+# Benchmark suite (google/benchmark), numerical parity harness, and the
+# quadrature study. Not built by default and never installed:
+#   cmake --preset bench && cmake --build build-bench -j
+# See benchmarks/README.md and scripts/README.md.
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
