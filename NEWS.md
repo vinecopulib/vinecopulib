@@ -100,6 +100,10 @@ wrong thing.
   reorient the vine through non-owning views rather than copying pair copulas
   (#715)
 
+* Accept and document both the expanded `2d` and compact `d + k` data layouts
+  consistently across bivariate and vine copula operations, including the
+  Rosenblatt transforms and conditional simulation (#729)
+
 * Evaluate copulas with one parameter set per observation: `pdf`, `cdf`,
   h-functions, `loglik`, `simulate` and the derivative methods on `Bicop`, and
   the corresponding `Vinecop` surfaces (#675, #699, #719)
@@ -141,6 +145,10 @@ wrong thing.
 * Exit structure selection early when the graph is already a tree (#661)
 
 ### BUG FIXES
+
+* Treat omitted pair-copulas as implicit independence during evaluation of a
+  `Vinecop` constructed from a full structure, preventing conditional
+  simulation from accessing an empty pair-copula store (#729)
 
 * Fix four numerical defects in `parameters_to_tau`: Tawn's `A''` evaluated to
   `inf * 0` for small psi and cancelled to a negative value elsewhere, its

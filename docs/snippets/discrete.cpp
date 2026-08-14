@@ -29,16 +29,15 @@ void
 snippet_bicop_discrete()
 {
   //! [bicop]
-  // A discrete variable needs two columns: F(x) and the left limit F(x-). The
-  // data matrix therefore carries one extra column per discrete variable, all
-  // the left limits following the d ordinary columns.
+  // The preferred layout has two full blocks: F(x), followed by F(x-).
   auto continuous = tools_stats::simulate_uniform(500, 2, false, { 1 });
   auto disc = discretize(continuous.col(0), 5);
 
-  Eigen::MatrixXd data(500, 3);
+  Eigen::MatrixXd data(500, 4);
   data.col(0) = disc.first; // F(x) of the discrete variable
   data.col(1) = continuous.col(1);
   data.col(2) = disc.second; // F(x-) of the discrete variable
+  data.col(3) = data.col(1); // F(x-) = F(x) for a continuous variable
 
   // Declare the types, then fit as usual.
   FitControlsBicop controls({ BicopFamily::gaussian, BicopFamily::clayton });
@@ -58,20 +57,20 @@ void
 snippet_vinecop_discrete()
 {
   //! [vinecop]
-  // Same convention for vines: n x (d + k) columns, where k is the number of
-  // discrete variables.
+  // Same convention for vines: the expanded layout has 2d columns.
   size_t d = 4;
   auto continuous = tools_stats::simulate_uniform(500, d, false, { 2 });
   auto disc0 = discretize(continuous.col(0), 4);
   auto disc2 = discretize(continuous.col(2), 6);
 
-  Eigen::MatrixXd data(500, d + 2);
+  Eigen::MatrixXd data(500, 2 * d);
   data.col(0) = disc0.first;
   data.col(1) = continuous.col(1);
   data.col(2) = disc2.first;
   data.col(3) = continuous.col(3);
-  data.col(4) = disc0.second; // left limits, in the order the discrete
-  data.col(5) = disc2.second; // variables appear among the first d columns
+  data.rightCols(d) = data.leftCols(d);
+  data.col(d) = disc0.second;
+  data.col(d + 2) = disc2.second;
 
   Vinecop model(data, RVineStructure(), { "d", "c", "d", "c" });
 

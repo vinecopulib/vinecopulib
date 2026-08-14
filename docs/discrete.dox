@@ -13,17 +13,22 @@ that scale has atoms: the model needs both \f$ F(x) \f$ and the left limit
 
 @section discrete-layout The data layout
 
-Every data-taking method uses the same convention. For `d` variables of which
-`k` are discrete, the data matrix has \f$ d + k \f$ columns:
+Every data-taking method accepts two equivalent conventions. The preferred
+expanded layout has \f$ 2d \f$ columns:
 
 - the first `d` columns hold \f$ F(x) \f$ for every variable, in the model's
   variable order;
-- the next `k` columns hold \f$ F(x^-) \f$ for the discrete variables only, in
-  the order in which those variables appear among the first `d`.
+- the next `d` columns hold \f$ F(x^-) \f$ in the same order.
 
-For an all-discrete model this is the \f$ n \times 2d \f$ case. Continuous
-variables need no second column, since for them the left limit and the
-distribution function coincide.
+For continuous variables \f$ F(x^-) = F(x) \f$, so their columns in the second
+block duplicate the corresponding columns in the first block. These duplicate
+columns may be omitted: if `k` of the `d` variables are discrete, the compact
+layout has \f$ d + k \f$ columns, with the `k` left-limits ordered by the
+positions of the discrete variables in the first block.
+
+Both layouts are accepted throughout the library. The expanded layout is often
+more convenient for interfaces because its shape does not depend on
+`var_types`; the compact layout avoids storing duplicate continuous columns.
 
 @section discrete-bicop Bivariate copulas
 
@@ -35,7 +40,7 @@ mixed-discrete expressions (`pdf_c_d`, `pdf_d_d` internally).
 
 @section discrete-vinecop Vine copulas
 
-The same convention applies to `Vinecop`, whose `var_types` has one entry per
+The same conventions apply to `Vinecop`, whose `var_types` has one entry per
 variable. `simulate()` returns the `d` \f$ F(x) \f$ columns only.
 
 `set_var_types()` on an existing model re-types the pair copulas according to

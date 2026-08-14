@@ -208,6 +208,12 @@ public:
     const bool qrng = false,
     const size_t num_threads = 1,
     const std::vector<int>& seeds = std::vector<int>()) const;
+  Eigen::MatrixXd simulate_conditional(
+    const Eigen::MatrixXd& u_cond,
+    const std::vector<size_t>& conditioning_set,
+    const bool qrng = false,
+    const size_t num_threads = 1,
+    const std::vector<int>& seeds = std::vector<int>()) const;
 
   void reorient(const std::vector<size_t>& conditioning_set);
 
@@ -361,6 +367,7 @@ private:
     VinecopView(const Vinecop& vinecop, const ReorientationMap& reorientation);
 
     const RVineStructure& get_structure() const;
+    size_t get_trunc_lvl() const;
     BicopView get_pair_copula(size_t tree, size_t edge) const;
 
   private:
@@ -370,6 +377,13 @@ private:
 
   ReorientationMap make_reorientation_map(
     const std::vector<size_t>& conditioning_set) const;
+  Eigen::MatrixXd simulate_conditional_impl(
+    const Eigen::MatrixXd& u_cond,
+    const std::vector<size_t>& conditioning_set,
+    const VinecopView& view,
+    bool qrng,
+    size_t num_threads,
+    const std::vector<int>& seeds) const;
   Eigen::MatrixXd rosenblatt_impl(Eigen::MatrixXd u,
                                   const VinecopView& view,
                                   size_t num_threads,
@@ -448,6 +462,7 @@ private:
   // overloads: rejects discrete variables and checks the n x npars shape.
   void check_per_obs_params(const Eigen::MatrixXd& u,
                             const Eigen::MatrixXd& per_obs_params) const;
+  size_t get_effective_trunc_lvl() const;
 
 protected:
   size_t d_{ 1 };

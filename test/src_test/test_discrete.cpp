@@ -172,6 +172,7 @@ TEST(discrete, vinecop)
 
   u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
   u.col(5 + 2) = (utmp.col(3).array() * 10).floor() / 10;
+  auto u_compact = u;
 
   // fit vine
   auto controls = FitControlsVinecop({ BicopFamily::clayton });
@@ -207,6 +208,11 @@ TEST(discrete, vinecop)
   u.col(7) = (utmp.col(2).array() * 10).floor() / 10;
   u.col(3) = (utmp.col(3).array() * 10).ceil() / 10;
   u.col(8) = (utmp.col(3).array() * 10).floor() / 10;
+  EXPECT_TRUE(
+    vc.pdf(u_compact.topRows(100)).isApprox(vc.pdf(u.topRows(100)), 1e-12));
+  EXPECT_TRUE(
+    vc.rosenblatt(u_compact.topRows(100), 1, true, { 5 })
+      .isApprox(vc.rosenblatt(u.topRows(100), 1, true, { 5 }), 1e-12));
   vc2.select(u, controls);
   vc2.pdf(u);
   pcs = vc2.get_all_pair_copulas();
