@@ -106,15 +106,14 @@ when `RVineStructure()` is called:
 
 @section vinecop-fit Fit and select a vine copula model
 
-The method `select_all()` performs parameter estimation and automatic
-model selection when the vine structure is unknown (i.e., it modifies the
-structure of the object), using the sequential procedure proposed by
-    [Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf).
-    Alternatively, `select_families()` performs parameter estimation and automatic
-    model selection for a known structure (i.e., using the structure of the
-    object). In both cases, the only mandatory argument is the data
-    (stored in a `Eigen::MatrixXd`), while controls argument allow for
-    customization of the fit.
+The method `select()` performs parameter estimation and automatic model
+selection, using the sequential procedure proposed by
+[Dissman et al. (2013)](https://mediatum.ub.tum.de/doc/1079277/1079277.pdf).
+It selects the structure as well as the families unless the object already
+carries a structure, in which case that structure is kept. `fit()` refits
+families and parameters on a fixed structure. The only mandatory argument is
+the data (stored in a `Eigen::MatrixXd`); the controls argument allows for
+customization of the fit.
 ```
 // specify the dimension of the model
 int d = 5;
@@ -122,15 +121,16 @@ int d = 5;
 // simulate dummy data
 Eigen::MatrixXd data = tools_stats::simulate_uniform(100, d);
 
-// instantiate a D-vine and select the families
+// select the structure along with the families
 Vinecop model(d);
-model.select_families(data);
+model.select(data);
 
-// alternatively, select the structure along with the families
-model.select_all(data);
+// keep a known structure and select only the families
+Vinecop model2(structure);
+model2.select(data);
 ```
 
-Note that the second argument to `select_all()` and `select_families()` is
+Note that the second argument to `select()` is
 similar to the one of `select()` for `Bicop` objects. Objects of the class
 `FitControlsVinecop` inherit from `FitControlsBicop` and extend them with
 additional data members to control the structure selection:
@@ -155,9 +155,9 @@ automatically (default is `false`).
 - `size_t num_threads` number of threads to run in parallel when fitting pair
 copulas within one tree.
 
-As mentioned [above](#set-up-a-custom-vine-copula-model), the arguments
-of `select_all()` and `select_families()` can be used as arguments to a
-    constructor allowing to instantiate a new object directly:
+As mentioned [above](#set-up-a-custom-vine-copula-model), the arguments of
+`select()` can be used as arguments to a constructor allowing to instantiate a
+new object directly:
 
 ```
 // specify the dimension of the model
