@@ -4,8 +4,6 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#pragma once
-
 #include "gtest/gtest.h"
 #include <boost/math/distributions/negative_binomial.hpp>
 #include <cmath>

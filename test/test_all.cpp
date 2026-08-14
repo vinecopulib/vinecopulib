@@ -4,34 +4,10 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include "src_test/include/test_bicop_kernel.hpp"
-#include "src_test/include/test_bicop_parametric.hpp"
-#include "src_test/include/test_bicop_sanity_checks.hpp"
-#include "src_test/include/test_bicop_select.hpp"
-#include "src_test/include/test_bicop_taildep.hpp"
-#include "src_test/include/test_discrete.hpp"
-#include "src_test/include/test_rvine_structure.hpp"
-#include "src_test/include/test_serialization.hpp"
-#include "src_test/include/test_tools_optimization.hpp"
-#include "src_test/include/test_tools_stats.hpp"
-#include "src_test/include/test_vinecop_class.hpp"
-#include "src_test/include/test_vinecop_sanity_checks.hpp"
-#include "src_test/include/test_weights.hpp"
+// The tests themselves live in test/src_test/test_*.cpp, one translation unit
+// per area, so that editing one area recompiles only that area.
 
-using namespace test_bicop_sanity_checks;
-using namespace test_bicop_parametric;
-using namespace test_bicop_kernel;
-using namespace test_bicop_select;
-using namespace test_bicop_taildep;
-using namespace test_discrete;
-using namespace test_rvine_structure;
-using namespace test_serialization;
-using namespace test_tools_optimization;
-using namespace test_tools_stats;
-using namespace test_vinecop_class;
-using namespace test_vinecop_sanity_checks;
-using namespace test_weights;
-using namespace test_weights;
+#include <gtest/gtest.h>
 
 int
 main(int argc, char** argv)

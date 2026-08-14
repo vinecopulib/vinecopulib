@@ -5,31 +5,30 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include "include/vinecop_test.hpp"
-#include <stdexcept>
 
-VinecopTest::VinecopTest()
+void
+VinecopTest::SetUp()
 {
-  // write temp files for the test using VineCopula
-  std::string cmd = std::string(RSCRIPT) + std::string(TEST_VINECOP);
-  int sys_exit_code = system(cmd.c_str());
+  SKIP_WITHOUT_RSCRIPT();
+
+  // write the exchange files for the test using VineCopula
+  test_r_parity::RTempDir dir;
+  dir.run(TEST_VINECOP);
 
   // vine structures (C++ representation reverses rows)
-  model_matrix =
-    vinecopulib::tools_eigen::read_matxs("temp2").colwise().reverse();
-  vc_matrix = vinecopulib::tools_eigen::read_matxs("temp3").colwise().reverse();
+  model_matrix = vinecopulib::tools_eigen::read_matxs(dir.file("temp2").c_str())
+                   .colwise()
+                   .reverse();
+  vc_matrix = vinecopulib::tools_eigen::read_matxs(dir.file("temp3").c_str())
+                .colwise()
+                .reverse();
 
   // u, pdf, sim
-  Eigen::MatrixXd temp = vinecopulib::tools_eigen::read_matxd("temp");
+  Eigen::MatrixXd temp =
+    vinecopulib::tools_eigen::read_matxd(dir.file("temp").c_str());
   size_t n = temp.rows();
   size_t m = model_matrix.rows();
   u = temp.block(0, 0, n, m);
   f = temp.block(0, m, n, 1);
   sim = temp.block(0, m + 1, n, m);
-
-  // remove temp files
-  cmd = rm + "temp temp2 temp3";
-  sys_exit_code += system(cmd.c_str());
-  if (sys_exit_code != 0) {
-    throw std::runtime_error("error in system call");
-  }
 }

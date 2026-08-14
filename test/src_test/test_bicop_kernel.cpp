@@ -4,11 +4,9 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#pragma once
-
-#include "kernel_test.hpp"
-#include "rscript.hpp"
-#include "test_utils.hpp"
+#include "include/kernel_test.hpp"
+#include "include/r_parity.hpp"
+#include "include/test_utils.hpp"
 
 namespace test_bicop_kernel {
 using namespace vinecopulib;
@@ -46,15 +44,9 @@ TEST_P(TrafokernelTest, fit)
 
 TEST_P(TrafokernelTest, serialization)
 {
-  bicop_.to_file(std::string("temp"));
-  Bicop pc(std::string("temp"));
-
-  // Remove temp file
-  std::string cmd = rm + "temp";
-  int sys_exit_code = system(cmd.c_str());
-  if (sys_exit_code != 0) {
-    throw std::runtime_error("error in system call");
-  }
+  test_r_parity::RTempDir dir;
+  bicop_.to_file(dir.file("bicop.json"));
+  Bicop pc(dir.file("bicop.json"));
 
   EXPECT_EQ(bicop_.get_rotation(), pc.get_rotation());
   EXPECT_EQ(bicop_.get_family_name(), pc.get_family_name());

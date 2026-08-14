@@ -4,8 +4,9 @@ on:
   push:
     branches: [main]
     tags: ['v*']
+  # No branch filter: stacked pull requests target the branch below them, and
+  # they need the matrix as much as the ones targeting main.
   pull_request:
-    branches: [main]
   workflow_dispatch:
   # release.yml re-runs the matrix against the tag before publishing.
   workflow_call:
@@ -103,6 +104,11 @@ jobs:
           echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
           echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
+            # Linux and macOS runners ship an Eigen that find_package locates on
+            # its own; Windows does not, so point it at the one we installed.
+            # CMP0074 makes find_package honor <Package>_ROOT from the
+            # environment.
+            echo "Eigen3_ROOT=D:/" >> $GITHUB_ENV
             echo "D:\a\vinecopulib\vinecopulib\debug" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH

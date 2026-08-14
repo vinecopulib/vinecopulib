@@ -6,14 +6,19 @@
 
 #pragma once
 
-#include "rscript.hpp"
+#include "r_parity.hpp"
 #include "gtest/gtest.h"
 #include <vinecopulib.hpp>
 
+//! @brief Fixture whose data comes from VineCopula, via the R oracle.
+//!
+//! Every test on this fixture consumes that data, so the whole fixture skips
+//! when the build has no Rscript; loading happens in SetUp() because
+//! GTEST_SKIP() is not usable from a constructor.
 class VinecopTest : public ::testing::Test
 {
 public:
-  VinecopTest();
+  void SetUp() override;
 
   Eigen::MatrixXd u;
   Eigen::VectorXd f;
