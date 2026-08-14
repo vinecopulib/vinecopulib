@@ -245,26 +245,10 @@ inline Eigen::VectorXd
 Bicop::hfunc1(const Eigen::MatrixXd& u) const
 {
   check_data(u);
-  Eigen::VectorXd h(u.rows());
-  switch (rotation_) {
-    default:
-      h = bicop_->hfunc1(prep_for_abstract(u));
-      break;
-
-    case 90:
-      h = bicop_->hfunc2(prep_for_abstract(u));
-      break;
-
-    case 180:
-      h = 1.0 - bicop_->hfunc1(prep_for_abstract(u)).array();
-      break;
-
-    case 270:
-      h = 1.0 - bicop_->hfunc2(prep_for_abstract(u)).array();
-      break;
-  }
-  tools_eigen::trim(h, 0.0, 1.0);
-  return h;
+  const auto spec = get_conditional_spec(true);
+  const auto u_new = prep_for_abstract(u);
+  auto h = spec.use_first ? bicop_->hfunc1(u_new) : bicop_->hfunc2(u_new);
+  return finalize_conditional(std::move(h), spec.complement);
 }
 
 //! @brief Evaluates the second h-function.
@@ -288,26 +272,10 @@ inline Eigen::VectorXd
 Bicop::hfunc2(const Eigen::MatrixXd& u) const
 {
   check_data(u);
-  Eigen::VectorXd h(u.rows());
-  switch (rotation_) {
-    default:
-      h = bicop_->hfunc2(prep_for_abstract(u));
-      break;
-
-    case 90:
-      h = 1.0 - bicop_->hfunc1(prep_for_abstract(u)).array();
-      break;
-
-    case 180:
-      h = 1.0 - bicop_->hfunc2(prep_for_abstract(u)).array();
-      break;
-
-    case 270:
-      h = bicop_->hfunc1(prep_for_abstract(u)).array();
-      break;
-  }
-  tools_eigen::trim(h, 0.0, 1.0);
-  return h;
+  const auto spec = get_conditional_spec(false);
+  const auto u_new = prep_for_abstract(u);
+  auto h = spec.use_first ? bicop_->hfunc1(u_new) : bicop_->hfunc2(u_new);
+  return finalize_conditional(std::move(h), spec.complement);
 }
 
 //! @brief Evaluates the inverse of the first h-function.
@@ -333,26 +301,10 @@ inline Eigen::VectorXd
 Bicop::hinv1(const Eigen::MatrixXd& u) const
 {
   check_data(u);
-  Eigen::VectorXd hi(u.rows());
-  switch (rotation_) {
-    default:
-      hi = bicop_->hinv1(prep_for_abstract(u));
-      break;
-
-    case 90:
-      hi = bicop_->hinv2(prep_for_abstract(u));
-      break;
-
-    case 180:
-      hi = 1.0 - bicop_->hinv1(prep_for_abstract(u)).array();
-      break;
-
-    case 270:
-      hi = 1.0 - bicop_->hinv2(prep_for_abstract(u)).array();
-      break;
-  }
-  tools_eigen::trim(hi, 0.0, 1.0);
-  return hi;
+  const auto spec = get_conditional_spec(true);
+  const auto u_new = prep_for_abstract(u);
+  auto hi = spec.use_first ? bicop_->hinv1(u_new) : bicop_->hinv2(u_new);
+  return finalize_conditional(std::move(hi), spec.complement);
 }
 
 //! @brief Evaluates the inverse of the second h-function.
@@ -378,26 +330,10 @@ inline Eigen::VectorXd
 Bicop::hinv2(const Eigen::MatrixXd& u) const
 {
   check_data(u);
-  Eigen::VectorXd hi(u.rows());
-  switch (rotation_) {
-    default:
-      hi = bicop_->hinv2(prep_for_abstract(u));
-      break;
-
-    case 90:
-      hi = 1.0 - bicop_->hinv1(prep_for_abstract(u)).array();
-      break;
-
-    case 180:
-      hi = 1.0 - bicop_->hinv2(prep_for_abstract(u)).array();
-      break;
-
-    case 270:
-      hi = bicop_->hinv1(prep_for_abstract(u));
-      break;
-  }
-  tools_eigen::trim(hi, 0.0, 1.0);
-  return hi;
+  const auto spec = get_conditional_spec(false);
+  const auto u_new = prep_for_abstract(u);
+  auto hi = spec.use_first ? bicop_->hinv1(u_new) : bicop_->hinv2(u_new);
+  return finalize_conditional(std::move(hi), spec.complement);
 }
 
 inline Eigen::VectorXd
@@ -410,15 +346,10 @@ Bicop::hfunc1_continuous(const Eigen::MatrixXd& u, bool flipped) const
   Eigen::MatrixXd parameters = get_family() == BicopFamily::tll
                                  ? Eigen::MatrixXd()
                                  : bicop_->get_parameters().transpose();
-  bool use_hfunc1 = (rotation_ % 180 == 0) != flipped;
-  Eigen::VectorXd h = use_hfunc1 ? bicop_->hfunc1_raw(u_new, parameters)
-                                 : bicop_->hfunc2_raw(u_new, parameters);
-  bool complement =
-    rotation_ == 180 || (flipped ? rotation_ == 90 : rotation_ == 270);
-  if (complement)
-    h = 1.0 - h.array();
-  tools_eigen::trim(h, 0.0, 1.0);
-  return h;
+  const auto spec = get_conditional_spec(!flipped);
+  auto h = spec.use_first ? bicop_->hfunc1_raw(u_new, parameters)
+                          : bicop_->hfunc2_raw(u_new, parameters);
+  return finalize_conditional(std::move(h), spec.complement);
 }
 
 inline Eigen::VectorXd
@@ -429,15 +360,35 @@ Bicop::hinv2_continuous(const Eigen::MatrixXd& u, bool flipped) const
   Eigen::MatrixXd parameters = get_family() == BicopFamily::tll
                                  ? Eigen::MatrixXd()
                                  : bicop_->get_parameters().transpose();
-  bool use_hinv1 = (rotation_ % 180 != 0) != flipped;
-  Eigen::VectorXd hi = use_hinv1 ? bicop_->hinv1_raw(u_new, parameters)
-                                 : bicop_->hinv2_raw(u_new, parameters);
-  bool complement =
-    rotation_ == 180 || (flipped ? rotation_ == 270 : rotation_ == 90);
-  if (complement)
-    hi = 1.0 - hi.array();
-  tools_eigen::trim(hi, 0.0, 1.0);
-  return hi;
+  const auto spec = get_conditional_spec(flipped);
+  auto hi = spec.use_first ? bicop_->hinv1_raw(u_new, parameters)
+                           : bicop_->hinv2_raw(u_new, parameters);
+  return finalize_conditional(std::move(hi), spec.complement);
+}
+
+inline Bicop::ConditionalSpec
+Bicop::get_conditional_spec(bool first_function) const
+{
+  switch (rotation_) {
+    case 90:
+      return { !first_function, !first_function };
+    case 180:
+      return { first_function, true };
+    case 270:
+      return { !first_function, first_function };
+    default:
+      return { first_function, false };
+  }
+}
+
+inline Eigen::VectorXd
+Bicop::finalize_conditional(Eigen::VectorXd value, bool complement)
+{
+  if (complement) {
+    value = 1.0 - value.array();
+  }
+  tools_eigen::trim(value, 0.0, 1.0);
+  return value;
 }
 
 inline BicopView::BicopView(const Bicop& bicop, bool flipped, bool continuous)
@@ -570,30 +521,18 @@ Bicop::hfunc1(const Eigen::MatrixXd& u,
               const size_t num_threads) const
 {
   Eigen::MatrixXd par_t = format_parameters(u, parameters);
-  return eval_in_batches(
-    u,
-    par_t,
-    num_threads,
-    [this](const Eigen::MatrixXd& ub,
-           const Eigen::MatrixXd& pb) -> Eigen::VectorXd {
-      Eigen::VectorXd h(ub.rows());
-      switch (rotation_) {
-        case 90:
-          h = bicop_->hfunc2(prep_for_abstract(ub), pb);
-          break;
-        case 180:
-          h = 1.0 - bicop_->hfunc1(prep_for_abstract(ub), pb).array();
-          break;
-        case 270:
-          h = 1.0 - bicop_->hfunc2(prep_for_abstract(ub), pb).array();
-          break;
-        default:
-          h = bicop_->hfunc1(prep_for_abstract(ub), pb);
-          break;
-      }
-      tools_eigen::trim(h, 0.0, 1.0);
-      return h;
-    });
+  return eval_in_batches(u,
+                         par_t,
+                         num_threads,
+                         [this](const Eigen::MatrixXd& ub,
+                                const Eigen::MatrixXd& pb) -> Eigen::VectorXd {
+                           const auto spec = get_conditional_spec(true);
+                           const auto u_new = prep_for_abstract(ub);
+                           auto h = spec.use_first ? bicop_->hfunc1(u_new, pb)
+                                                   : bicop_->hfunc2(u_new, pb);
+                           return finalize_conditional(std::move(h),
+                                                       spec.complement);
+                         });
 }
 
 //! @brief Evaluates the second h-function with per-row parameters.
@@ -603,30 +542,18 @@ Bicop::hfunc2(const Eigen::MatrixXd& u,
               const size_t num_threads) const
 {
   Eigen::MatrixXd par_t = format_parameters(u, parameters);
-  return eval_in_batches(
-    u,
-    par_t,
-    num_threads,
-    [this](const Eigen::MatrixXd& ub,
-           const Eigen::MatrixXd& pb) -> Eigen::VectorXd {
-      Eigen::VectorXd h(ub.rows());
-      switch (rotation_) {
-        case 90:
-          h = 1.0 - bicop_->hfunc1(prep_for_abstract(ub), pb).array();
-          break;
-        case 180:
-          h = 1.0 - bicop_->hfunc2(prep_for_abstract(ub), pb).array();
-          break;
-        case 270:
-          h = bicop_->hfunc1(prep_for_abstract(ub), pb);
-          break;
-        default:
-          h = bicop_->hfunc2(prep_for_abstract(ub), pb);
-          break;
-      }
-      tools_eigen::trim(h, 0.0, 1.0);
-      return h;
-    });
+  return eval_in_batches(u,
+                         par_t,
+                         num_threads,
+                         [this](const Eigen::MatrixXd& ub,
+                                const Eigen::MatrixXd& pb) -> Eigen::VectorXd {
+                           const auto spec = get_conditional_spec(false);
+                           const auto u_new = prep_for_abstract(ub);
+                           auto h = spec.use_first ? bicop_->hfunc1(u_new, pb)
+                                                   : bicop_->hfunc2(u_new, pb);
+                           return finalize_conditional(std::move(h),
+                                                       spec.complement);
+                         });
 }
 
 //! @brief Evaluates the inverse of the first h-function with per-row
@@ -637,30 +564,18 @@ Bicop::hinv1(const Eigen::MatrixXd& u,
              const size_t num_threads) const
 {
   Eigen::MatrixXd par_t = format_parameters(u, parameters);
-  return eval_in_batches(
-    u,
-    par_t,
-    num_threads,
-    [this](const Eigen::MatrixXd& ub,
-           const Eigen::MatrixXd& pb) -> Eigen::VectorXd {
-      Eigen::VectorXd hi(ub.rows());
-      switch (rotation_) {
-        case 90:
-          hi = bicop_->hinv2(prep_for_abstract(ub), pb);
-          break;
-        case 180:
-          hi = 1.0 - bicop_->hinv1(prep_for_abstract(ub), pb).array();
-          break;
-        case 270:
-          hi = 1.0 - bicop_->hinv2(prep_for_abstract(ub), pb).array();
-          break;
-        default:
-          hi = bicop_->hinv1(prep_for_abstract(ub), pb);
-          break;
-      }
-      tools_eigen::trim(hi, 0.0, 1.0);
-      return hi;
-    });
+  return eval_in_batches(u,
+                         par_t,
+                         num_threads,
+                         [this](const Eigen::MatrixXd& ub,
+                                const Eigen::MatrixXd& pb) -> Eigen::VectorXd {
+                           const auto spec = get_conditional_spec(true);
+                           const auto u_new = prep_for_abstract(ub);
+                           auto hi = spec.use_first ? bicop_->hinv1(u_new, pb)
+                                                    : bicop_->hinv2(u_new, pb);
+                           return finalize_conditional(std::move(hi),
+                                                       spec.complement);
+                         });
 }
 
 //! @brief Evaluates the inverse of the second h-function with per-row
@@ -671,30 +586,18 @@ Bicop::hinv2(const Eigen::MatrixXd& u,
              const size_t num_threads) const
 {
   Eigen::MatrixXd par_t = format_parameters(u, parameters);
-  return eval_in_batches(
-    u,
-    par_t,
-    num_threads,
-    [this](const Eigen::MatrixXd& ub,
-           const Eigen::MatrixXd& pb) -> Eigen::VectorXd {
-      Eigen::VectorXd hi(ub.rows());
-      switch (rotation_) {
-        case 90:
-          hi = 1.0 - bicop_->hinv1(prep_for_abstract(ub), pb).array();
-          break;
-        case 180:
-          hi = 1.0 - bicop_->hinv2(prep_for_abstract(ub), pb).array();
-          break;
-        case 270:
-          hi = bicop_->hinv1(prep_for_abstract(ub), pb);
-          break;
-        default:
-          hi = bicop_->hinv2(prep_for_abstract(ub), pb);
-          break;
-      }
-      tools_eigen::trim(hi, 0.0, 1.0);
-      return hi;
-    });
+  return eval_in_batches(u,
+                         par_t,
+                         num_threads,
+                         [this](const Eigen::MatrixXd& ub,
+                                const Eigen::MatrixXd& pb) -> Eigen::VectorXd {
+                           const auto spec = get_conditional_spec(false);
+                           const auto u_new = prep_for_abstract(ub);
+                           auto hi = spec.use_first ? bicop_->hinv1(u_new, pb)
+                                                    : bicop_->hinv2(u_new, pb);
+                           return finalize_conditional(std::move(hi),
+                                                       spec.complement);
+                         });
 }
 
 //! @brief Evaluates the log-likelihood contributions with per-row parameters

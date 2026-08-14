@@ -359,6 +359,17 @@ private:
 
   Eigen::MatrixXd prep_for_abstract_continuous(const Eigen::MatrixXd& u) const;
 
+  struct ConditionalSpec
+  {
+    bool use_first;
+    bool complement;
+  };
+
+  ConditionalSpec get_conditional_spec(bool first_function) const;
+
+  static Eigen::VectorXd finalize_conditional(Eigen::VectorXd value,
+                                              bool complement);
+
   Eigen::MatrixXd format_parameters(const Eigen::MatrixXd& u,
                                     const Eigen::MatrixXd& parameters) const;
 
