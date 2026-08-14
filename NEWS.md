@@ -146,6 +146,10 @@ wrong thing.
 
 ### BUG FIXES
 
+* Treat omitted pair-copulas as implicit independence during evaluation of a
+  `Vinecop` constructed from a full structure, preventing conditional
+  simulation from accessing an empty pair-copula store (#729)
+
 * Fix four numerical defects in `parameters_to_tau`: Tawn's `A''` evaluated to
   `inf * 0` for small psi and cancelled to a negative value elsewhere, its
   integrand peaks away from 1/2 for asymmetric parameters, and the BB7 and BB8

@@ -33,6 +33,25 @@ TEST_F(VinecopTest, constructors_without_error)
   Vinecop vinecop_parametrized(model_matrix, pair_copulas);
 }
 
+TEST(VinecopConstructor, omitted_pair_copulas_are_independence)
+{
+  const size_t d = 4;
+  Vinecop model(DVineStructure({ 1, 2, 3, 4 }));
+
+  ASSERT_TRUE(model.get_all_pair_copulas().empty());
+  auto data = tools_stats::simulate_uniform(20, d, false, { 1 });
+  EXPECT_TRUE(all_close(model.pdf(data), Eigen::VectorXd::Ones(data.rows())));
+
+  std::vector<size_t> conditioning_set{ 1, 2 };
+  Eigen::MatrixXd u_cond(20, conditioning_set.size());
+  u_cond.col(0).setConstant(0.3);
+  u_cond.col(1).setConstant(0.8);
+  auto simulated =
+    model.simulate_conditional(u_cond, conditioning_set, false, 1, { 2 });
+  EXPECT_TRUE(all_close(simulated.col(0), u_cond.col(0)));
+  EXPECT_TRUE(all_close(simulated.col(1), u_cond.col(1)));
+}
+
 TEST_F(VinecopTest, copy)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7);
