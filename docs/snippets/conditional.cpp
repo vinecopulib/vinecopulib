@@ -38,15 +38,10 @@ void
 snippet_simulate_conditional()
 {
   //! [simulate]
-  size_t d = 4;
-  auto data = tools_stats::simulate_uniform(500, d, false, { 2 });
+  Vinecop model(DVineStructure({ 1, 2, 3, 4 }));
+  std::vector<size_t> conditioning_set{ 1, 2 };
 
-  FitControlsVinecop controls;
-  controls.set_conditioning_set({ 3, 4 });
-  Vinecop model(data, RVineStructure(), {}, controls);
-
-  // One conditioning point per output row; the columns correspond, left to
-  // right, to the last k entries of the vine order -- here variables 3 and 4.
+  // One conditioning point per output row; columns follow conditioning_set.
   size_t n = 100;
   Eigen::MatrixXd u_cond(n, 2);
   u_cond.col(0).setConstant(0.3);
@@ -54,7 +49,8 @@ snippet_simulate_conditional()
 
   // n x d: the conditioning columns reproduce u_cond, the rest are draws from
   // the conditional distribution.
-  Eigen::MatrixXd sim = model.simulate_conditional(u_cond, false, 1, { 7 });
+  Eigen::MatrixXd sim =
+    model.simulate_conditional(u_cond, conditioning_set, false, 1, { 7 });
   std::cout << "conditional draws: " << sim.rows() << " x " << sim.cols()
             << std::endl;
   //! [simulate]

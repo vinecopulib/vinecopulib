@@ -208,6 +208,12 @@ public:
     const bool qrng = false,
     const size_t num_threads = 1,
     const std::vector<int>& seeds = std::vector<int>()) const;
+  Eigen::MatrixXd simulate_conditional(
+    const Eigen::MatrixXd& u_cond,
+    const std::vector<size_t>& conditioning_set,
+    const bool qrng = false,
+    const size_t num_threads = 1,
+    const std::vector<int>& seeds = std::vector<int>()) const;
 
   void reorient(const std::vector<size_t>& conditioning_set);
 
@@ -370,6 +376,13 @@ private:
 
   ReorientationMap make_reorientation_map(
     const std::vector<size_t>& conditioning_set) const;
+  Eigen::MatrixXd simulate_conditional_impl(
+    const Eigen::MatrixXd& u_cond,
+    const std::vector<size_t>& conditioning_set,
+    const VinecopView& view,
+    bool qrng,
+    size_t num_threads,
+    const std::vector<int>& seeds) const;
   Eigen::MatrixXd rosenblatt_impl(Eigen::MatrixXd u,
                                   const VinecopView& view,
                                   size_t num_threads,

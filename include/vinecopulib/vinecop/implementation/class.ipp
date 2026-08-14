@@ -2719,10 +2719,7 @@ Vinecop::simulate(const size_t n,
 //! order (they are drawn first by the vine and form a self-contained sub-vine).
 //! Each row of `u_cond` is one
 //! conditioning point; the corresponding output row is drawn from the
-//! remaining variables' distribution conditional on that point. It is
-//! implemented as a Rosenblatt transform of the conditioning variables
-//! followed by an inverse Rosenblatt transform (see `rosenblatt()` /
-//! `inverse_rosenblatt()`).
+//! remaining variables' distribution conditional on that point.
 //!
 //! Discrete conditioning variables are supported. As for the other data-taking
 //! methods, a discrete variable requires its left-limit CDF \f$ F(x^-) \f$ in
@@ -2763,81 +2760,106 @@ Vinecop::simulate_conditional(const Eigen::MatrixXd& u_cond,
                               const size_t num_threads,
                               const std::vector<int>& seeds) const
 {
-  size_t n = static_cast<size_t>(u_cond.rows());
   size_t n_cols = static_cast<size_t>(u_cond.cols());
   auto order = rvine_structure_.get_order();
 
-  // ---- recover the number of conditioning variables `k` from the column
-  //      count. `u_cond` has `k` value columns plus one left-limit column
-  //      F(x^-) per discrete conditioning variable, i.e.
-  //      `n_cols = k + #discrete(order[d-k..d-1])`. This is strictly increasing
-  //      in `k`, so the match is unique. The conditioning variables are the
-  //      last `k` of the vine order (drawn first, a self-contained sub-vine).
   size_t k = 0;
-  bool found = false;
-  for (size_t kk = 1; (kk <= d_ - 1) && !found; ++kk) {
+  for (size_t kk = 1; kk <= d_ - 1; ++kk) {
     size_t kd = 0;
     for (size_t i = 0; i < kk; ++i)
       if (var_types_[order[d_ - kk + i] - 1] == "d")
         ++kd;
     if (n_cols == kk + kd) {
       k = kk;
-      found = true;
+      break;
     }
   }
-  if (!found) {
+  if (k == 0) {
     throw std::runtime_error(
       "u_cond has an invalid number of columns; expected k + (number of "
       "discrete conditioning variables) columns for some number of "
       "conditioning variables k in 1, ..., d - 1.");
   }
+
+  std::vector<size_t> conditioning_set(k);
+  for (size_t i = 0; i < k; ++i)
+    conditioning_set[i] = order[d_ - k + i];
+  return simulate_conditional_impl(
+    u_cond, conditioning_set, VinecopView(*this), qrng, num_threads, seeds);
+}
+
+//! @brief Simulates conditionally on a specified set of variables.
+//!
+//! @param conditioning_set The 1-based conditioning-variable indices. The
+//!   first `k` columns of `u_cond` correspond to these variables in the given
+//!   order; left-limit columns follow in the same order among the discrete
+//!   variables.
+inline Eigen::MatrixXd
+Vinecop::simulate_conditional(const Eigen::MatrixXd& u_cond,
+                              const std::vector<size_t>& conditioning_set,
+                              const bool qrng,
+                              const size_t num_threads,
+                              const std::vector<int>& seeds) const
+{
+  auto reorientation = make_reorientation_map(conditioning_set);
+  return simulate_conditional_impl(u_cond,
+                                   conditioning_set,
+                                   VinecopView(*this, reorientation),
+                                   qrng,
+                                   num_threads,
+                                   seeds);
+}
+
+inline Eigen::MatrixXd
+Vinecop::simulate_conditional_impl(const Eigen::MatrixXd& u_cond,
+                                   const std::vector<size_t>& conditioning_set,
+                                   const VinecopView& view,
+                                   bool qrng,
+                                   size_t num_threads,
+                                   const std::vector<int>& seeds) const
+{
+  const size_t n = static_cast<size_t>(u_cond.rows());
+  const size_t k = conditioning_set.size();
+  const size_t kd = static_cast<size_t>(std::count_if(
+    conditioning_set.begin(), conditioning_set.end(), [&](size_t var) {
+      return var_types_[var - 1] == "d";
+    }));
+  if (static_cast<size_t>(u_cond.cols()) != k + kd) {
+    throw std::runtime_error(
+      "u_cond must have one column per conditioning variable plus one "
+      "left-limit column per discrete conditioning variable.");
+  }
   if (!tools_eigen::check_if_in_unit_cube(u_cond)) {
     throw std::runtime_error("all elements of u_cond must be in (0, 1).");
   }
 
-  // ---- algorithm (reuse the tested Rosenblatt primitives) ----
-  // 1. Embed the conditioning values into a full data matrix in the collapsed
-  //    `n x (d + n_discrete)` layout: value columns F(x), plus a left-limit
-  //    column F(x^-) for each discrete conditioning variable. The fillers are
-  //    irrelevant: the conditioning block is self-contained, so its Rosenblatt
-  //    transform depends only on the conditioning values.
   auto disc_cols = tools_select::get_disc_cols(var_types_);
   Eigen::MatrixXd u_completed =
     Eigen::MatrixXd::Constant(n, d_ + get_n_discrete(), 0.5);
   size_t kd_seen = 0;
   for (size_t i = 0; i < k; ++i) {
-    size_t var = order[d_ - k + i] - 1;
-    u_completed.col(var) = u_cond.col(i); // F(x)
+    size_t var = conditioning_set[i] - 1;
+    u_completed.col(var) = u_cond.col(i);
     if (var_types_[var] == "d") {
       if ((u_cond.col(k + kd_seen).array() > u_cond.col(i).array()).any()) {
         throw std::runtime_error(
           "for discrete conditioning variables, the left-limit columns of "
           "u_cond (F(x^-)) must not exceed the value columns (F(x)).");
       }
-      u_completed.col(d_ + disc_cols[var]) = u_cond.col(k + kd_seen); // F(x^-)
+      u_completed.col(d_ + disc_cols[var]) = u_cond.col(k + kd_seen);
       ++kd_seen;
     }
   }
 
-  // 2. Recover the independent-uniform seeds of the conditioning block.
-  //    `randomize_discrete = true` is required: for a discrete conditioning
-  //    value the seed is drawn across the atom's [F(x^-), F(x)] interval
-  //    (Brockwell), so the conditioned draws are unbiased. It is a no-op for
-  //    continuous models.
-  Eigen::MatrixXd w = rosenblatt(u_completed, num_threads, true, seeds);
+  Eigen::MatrixXd w =
+    rosenblatt_impl(std::move(u_completed), view, num_threads, true, seeds);
 
-  // 3. Assemble the seed matrix: conditioning seeds + fresh uniforms for the
-  //    conditioned variables.
   Eigen::MatrixXd u = tools_stats::simulate_uniform(n, d_, qrng, seeds);
-  for (size_t i = 0; i < k; ++i) {
-    size_t col = order[d_ - k + i] - 1;
-    u.col(col) = w.col(col);
+  for (auto var : conditioning_set) {
+    u.col(var - 1) = w.col(var - 1);
   }
 
-  // 4. Inverse Rosenblatt: reproduces the conditioning values (exactly for
-  //    continuous variables, up to the atom for discrete ones) and draws the
-  //    remaining variables from their conditional distribution.
-  return inverse_rosenblatt(u, num_threads);
+  return inverse_rosenblatt_impl(u, view, num_threads);
 }
 
 //! @brief Evaluates the log-likelihood.
