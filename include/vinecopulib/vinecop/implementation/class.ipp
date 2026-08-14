@@ -2808,11 +2808,22 @@ Vinecop::simulate_conditional(const Eigen::MatrixXd& u_cond,
 
 //! @brief Simulates conditionally on a specified set of variables.
 //!
+//! @param u_cond An \f$ n \times (k + k_d) \f$ compact or \f$ n \times 2k
+//!   \f$ expanded matrix of conditioning values, with one conditioning point
+//!   per row. The first `k` columns follow `conditioning_set`; left-limits
+//!   follow in the same order for the expanded layout and only for discrete
+//!   variables in the compact layout.
 //! @param conditioning_set The 1-based conditioning-variable indices. The
 //!   first `k` columns of `u_cond` correspond to these variables in the given
 //!   order. In the expanded layout, the next `k` columns contain their
 //!   left-limits in the same order; in the compact layout, only left-limits of
 //!   discrete variables follow.
+//! @param qrng Set to true for quasi-random numbers (over the conditioned
+//!   variables).
+//! @param num_threads The number of threads to use for computations.
+//! @param seeds Seeds of the random number generator; if empty (default),
+//!   the random number generator is seeded randomly.
+//! @return An \f$ n \times d \f$ matrix of conditional samples.
 inline Eigen::MatrixXd
 Vinecop::simulate_conditional(const Eigen::MatrixXd& u_cond,
                               const std::vector<size_t>& conditioning_set,

@@ -32,12 +32,12 @@ columns of `u_cond` correspond to `conditioning_set` in the supplied order.
 `u_cond` has one row per output sample; to draw many samples at a single
 conditioning point, repeat that point over the rows.
 
-With an explicit `conditioning_set`, `u_cond` can use either layout described
-in @ref discrete: the preferred expanded layout has `2k` columns, while the
-compact layout has `k + k_d` columns, where `k_d` is the number of discrete
-conditioning variables. The overload without `conditioning_set` infers `k`
-from the column count and retains the compact interpretation when the two
-layouts are ambiguous.
+With an explicit `conditioning_set`, `u_cond` can use either layout from the
+@ref discrete "discrete-data documentation". The preferred expanded layout has
+`2k` columns, while the compact layout has `k + k_d` columns, where `k_d` is the
+number of discrete conditioning variables. The overload without
+`conditioning_set` infers `k` from the column count and retains the compact
+interpretation when the two layouts are ambiguous.
 
 The result is an \f$ n \times d \f$ matrix in which the conditioning columns
 reproduce `u_cond` and the remaining ones are draws from the conditional
