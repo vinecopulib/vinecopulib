@@ -344,7 +344,7 @@ jobs:
     name: clang-tidy (diff)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v7
         with:
@@ -352,7 +352,9 @@ jobs:
       - name: Install clang-tidy
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y clang-tidy-14 jq
+          # doxygen: configuring with VINECOPULIB_BUILD_DOC=ON below requires it,
+          # even though only the snippet targets are wanted here.
+          sudo apt-get install --no-install-recommends -y clang-tidy-14 jq doxygen
       - name: Install dependencies
         id: install-dependencies
         uses: ./.github/actions/install-dependencies
@@ -369,21 +371,32 @@ jobs:
       - name: Configure to generate compile_commands.json
         run: |
           mkdir build-tidy && cd build-tidy
-          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          # Benchmarks and the documentation snippets are off by default; enable
+          # them so their translation units appear in compile_commands.json,
+          # without which clang-tidy lints them using default flags.
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DVINECOPULIB_BUILD_BENCHMARKS=ON -DVINECOPULIB_BUILD_DOC=ON
           # Drop FetchContent (googletest) translation units.
           jq '[.[] | select(.file | test("_deps/") | not)]' compile_commands.json > filtered.json
           mv filtered.json compile_commands.json
+      # Only translation units: headers have no compile_commands.json entry, so
+      # clang-tidy would lint them with default flags and report the resulting
+      # clang-diagnostic-errors as findings. The repo-wide pass below covers
+      # them, transitively and with the right flags.
       - name: Run clang-tidy on the diff
         run: |
           git diff -U0 "origin/${{ github.base_ref }}...HEAD" \
-            -- '*.hpp' '*.ipp' '*.cpp' '*.cc' '*.h' \
+            -- '*.cpp' '*.cc' \
             ':(exclude)include/vinecopulib/misc/nlohmann_json.hpp' \
             ':(exclude)include/vinecopulib/misc/tools_stats_sobol.hpp' \
             | /usr/lib/llvm-14/share/clang/clang-tidy-diff.py \
                 -p1 -path build-tidy -clang-tidy-binary clang-tidy-14 -use-color
 
-      # test_all.cpp includes every test header, and so transitively the whole
-      # library: one translation unit covers the tree. Keeps the backlog at zero
-      # rather than only gating new code.
+      # The per-area test translation units include the whole library between
+      # them, so this keeps the backlog at zero rather than only gating new
+      # code. (test_all.cpp is just main() and covers nothing.) Each one takes
+      # minutes, so run them in parallel.
       - name: Run clang-tidy over the whole library
-        run: clang-tidy-14 -p build-tidy --quiet test/test_all.cpp
+        run: |
+          run-clang-tidy-14 -p build-tidy -quiet -j "$(nproc)" \
+            'test/src_test/test_.*[.]cpp'
