@@ -1,274 +1,231 @@
-## vinecopulib 0.8.0 (June 12, 2026)
+## vinecopulib 1.0.0 (unreleased)
+
+The first stable release. It collects a large amount of work: analytic
+derivatives and asymptotic-inference tooling, conditional simulation, discrete
+and per-observation-parameter surfaces, substantially faster evaluation and
+fitting, a modernized C++17 build, and documentation whose every example is
+compiled and run in CI.
+
+Several changes require action. See
+[docs/migrating-to-1.0.md](docs/migrating-to-1.0.md) — in particular the
+`FitControlsBicop` / `FitControlsVinecop` constructor argument that was inserted
+in the middle, which compiles silently against old positional calls and does the
+wrong thing.
+
+### BREAKING API CHANGES
+
+* `nonparametric_grid_size` is a new `FitControlsBicop` and `FitControlsVinecop`
+  constructor argument, inserted after `nonparametric_mult`. Positional calls
+  written against earlier releases still compile and silently rebind every later
+  argument; see the migration guide (#654)
+
+* Remove `FitControlsVinecop::get_truncation_level`,
+  `get_select_truncation_level`, `set_truncation_level` and
+  `set_select_truncation_level`, deprecated since 0.3.1. Use the `trunc_lvl`
+  spellings. The four had no definitions, so calling one was a link error (#718)
+
+* Remove `Vinecop::select_all` and `Vinecop::select_families`, deprecated since
+  0.3.1. Use `select`, which selects the structure unless the object already
+  carries one (#718)
+
+* Rename `Vinecop::hessian_avg` to `hessian` and the former `hessian` to
+  `hessian_full`, matching the `pdf` / `pdf_full` pair (#679)
+
+* Replace `tools_serialization::triangular_array_to_json` and
+  `json_to_triangular_array` with `TriangularArray::to_json()`, a JSON
+  constructor, and `to_list()`. The on-disk format is unchanged (#680)
+
+* Delete `misc/tools_bobyqa.hpp`. No public signature changes, but the header is
+  gone for anyone including it directly (#685)
+
+* `Vinecop`'s data constructor no longer defaults its `matrix` argument, which
+  made `Vinecop(data)` ambiguous (#709)
+
+* The public umbrella header no longer disables Boost's concept assertions.
+  Consumers reaching Boost through `vinecopulib.hpp` may see concept diagnostics
+  that were previously suppressed in their own translation units (#714)
+
+* `VINECOPULIB_VERSION` is now a plain decimal literal. It was written with
+  leading zeros, making it an octal constant, so any consumer comparing against
+  it was comparing a different number than it looked like
+
+* Require C++17, CMake 3.14 and Boost 1.75. The installed target is
+  `vinecopulib::vinecopulib`; the unqualified name remains as an alias (#711)
+
+* Rename the CMake options to a `VINECOPULIB_` prefix and remove the unprefixed
+  `OPT_ASAN`, `CODE_COVERAGE`, `STRICT_COMPILER` and `BUILD_DOC`. Sanitizers now
+  default to off, and `-march=native` is behind `VINECOPULIB_NATIVE_ARCH` so the
+  default release build is redistributable (#711)
+
+* Remove the `BUILD_SHARED_LIBS` option; use `VINECOPULIB_PRECOMPILED` (#662)
+
+* Eigen is found in CONFIG mode, so a module-mode-only Eigen install no longer
+  configures (#658)
+
+### BEHAVIOR CHANGES
+
+* TLL fits change near the boundary of the unit square: the endpoint clamping of
+  the interpolation grid was removed, so every `tll` fit differs slightly from
+  0.7.3 (#654)
+
+* Kendall's tau of `bb6`, `bb7`, `bb8` and `tawn` changes. Four numerical
+  defects in `parameters_to_tau` are fixed, the worst of which returned about
+  1e-11 where the true value was 0.33; see BUG FIXES (#713)
+
+* Maximum-likelihood estimates shift in the low digits: BOBYQA is replaced by
+  Brent and BFGS (#685)
+
+* `file_to_json` and `json_to_file` now throw on I/O failure instead of failing
+  silently, and a `.cbor` extension selects the binary encoding (#684)
+
+* The R-vine structure is stored with the conditioned variable on the diagonal,
+  so `get_matrix()`, `get_order()`, `get_struct_array()` and edge orientation
+  differ for the same model. Densities and log-likelihoods do not (#702)
 
 ### NEW FEATURES
 
-* Add a per-row-parameter overload of `Bicop::simulate`:
-  `simulate(const Eigen::MatrixXd& parameters, bool qrng = false,
-  const std::vector<int>& seeds = {}, size_t num_threads = 1)`. Observation `i`
-  is drawn from the copula carrying row `i` of the `n x p` parameter matrix
-  (the layout of the per-row `pdf`/`hinv1` overloads); the number of
-  observations is `parameters.rows()`, so there is no separate `n` argument,
-  and an empty `parameters` throws. Quasi-random numbers and seeding behave as
-  in the fixed-parameter overload, and the draws are always continuous, even
-  for discrete variable types. Parametric families only; the independence
-  copula takes an `n x 0` matrix. This moves the vectorized-parameter sampling
-  that `rvinecopulib` implemented in its own interface code upstream, so
-  `pyvinecopulib` gets it too. Existing call sites are unaffected, but code
-  taking the address of `&Bicop::simulate` must now disambiguate, e.g. with
-  `py::overload_cast<const size_t&, bool, const std::vector<int>&>(
-  &Bicop::simulate, py::const_)` (#719)
+* Add scores, gradient, Hessian and score covariance to `Bicop` and `Vinecop`,
+  with `scores_full` and `hessian_full` exposing the per-edge intermediates for
+  callers that need several of them (#645, #683, #699)
 
-* Add conditioning-set overloads to `Vinecop::rosenblatt()` and
-  `Vinecop::inverse_rosenblatt()`. The transforms internally reorient the vine
-  through non-owning views, leaving the fitted model unchanged and avoiding
-  pair-copula copies, including TLL interpolation grids (#715)
-* Add scores, gradient, and Hessian of the log-likelihood to `Bicop`:
-  `scores` (the n x p per-observation score matrix), `gradient` (its
-  observation-average), `hessian` and `hessian_full` (the averaged and
-  per-observation p x p Hessians), `scores_cov`, and `scores_full` — thin
-  aggregations of `logpdf_deriv`/`logpdf_deriv2`, mirroring the `Vinecop`
-  asymptotic API. As for the derivatives, they require parametric families and
-  continuous variable types. Each also has a per-row-parameter overload that
-  evaluates at a different parameter set per row of `u` (#699)
-* Add per-observation-parameter overloads to `Vinecop`: `pdf`, `pdf_full`,
-  `loglik`, `scores`, `scores_full`, `gradient`, `hessian`, `hessian_full`, and
-  `scores_cov` all take an n x npars matrix `parameters` (one full-vine
-  parameter vector per observation, columns in the `(tree, edge, parameter)`
-  order of `scores()`). Row i is evaluated as if the vine carried that row's
-  parameters, enabling the density, log-likelihood, scores, and Hessians for
-  conditional/covariate vine models where the pair-copula parameters vary by
-  observation. Continuous, all-parametric models only (discrete variables and
-  nonparametric pair copulas are rejected). The default fixed-parameter path is
-  unchanged: the shared forward walks (`build_deriv_cache` and `pdf_full`)
-  switch each edge's evaluations to the matching per-row `Bicop` overloads only
-  when a parameter matrix is supplied, so models that do not need this feature
-  pay nothing. Also give `Bicop::loglik(u, parameters)` a default
-  `num_threads = 1`, consistent with the other per-row overloads (#699)
-* Add `Vinecop::simulate_conditional()` for sampling from the conditional
-  distribution given fixed values of a subset of variables. The conditioning
-  variables are the last `k` of the vine order `get_order()` (the columns of
-  the conditioning matrix, left to right, correspond to those last `k`
-  entries); the method is built on `rosenblatt()`/`inverse_rosenblatt()` and
-  reproduces the conditioning values exactly. Discrete conditioning variables
-  are supported via the randomized Rosenblatt transform (each requires its
-  left-limit CDF as an extra column of the conditioning matrix) (#696)
+* Add analytic derivatives of the density and h-functions for every parametric
+  family, including the BB families, Tawn and TLL; other families fall back to
+  finite differences (#683, #687, #694)
 
-* Add conditioning-aware vine structure selection via
-  `FitControlsVinecop::set_conditioning_set()` (also settable through
-  `FitControlsConfig::conditioning_set`): `Vinecop::select()` fits the
-  conditioning set's own optimal sub-vine and grows the remaining variables on
-  top of it, then places the conditioning set at the tail of the order (drawn
-  first) so it can be conditioned on with `simulate_conditional()`. The
-  conditioned variables' sub-structure is chosen by the usual Dissmann
-  selection (no degenerate fallback). Requires an MST `tree_algorithm` (#697)
+* Add conditional simulation: `Vinecop::simulate_conditional`,
+  `FitControlsVinecop::set_conditioning_set` for conditioning-aware structure
+  selection, and `reorient` to relabel an already-fitted vine (#696, #697)
 
-* Add `Vinecop::reorient()`, which relabels a fitted vine to an equivalent one
-  whose order tail equals a given set of variables (a value-preserving change:
-  `pdf`/`loglik` are invariant), so the model can be re-targeted for
-  conditioning without re-fitting (#697)
-* Add `RVineTrees`, a list-of-trees decomposition of an R-vine that round-trips
-  with the matrix representation (`RVineStructure(trees)` /
-  `RVineStructure::get_trees()`) and carries the fitted pair-copulas
-  (`Vinecop::get_trees()`). It is now the single primitive behind both
-  `Vinecop::reorient()` and the structure finalisation during `select()`,
-  replacing two hand-rolled copies of the leaf-peeling matrix reconstruction
-  (behaviour is byte-for-byte unchanged) (#698)
-* Speed up the bivariate copula evaluation engine: all internal evaluation
-  leaves take `Eigen::Ref` (`tools_eigen::ConstMatRef`), removing an n x 2
-  copy on every `pdf`/`hfunc`/`hinv`/`cdf` call; a new `log_pdf_raw` pathway
-  avoids the exp-then-log round trip per optimizer iteration; vectorized
-  densities and closed-form vectorized h-functions/cdfs (written as
-  shared-log `exp` forms, faster than both scalar `pow` and Eigen's
-  `generic_pow` on every tested microarchitecture) replace the
-  per-element generator paths for Clayton/Gumbel/Frank/Joe/BB1-8 and the
-  extreme-value families; a closed-form Frank h-inverse and
-  safeguarded-Newton inverses replace 35-sweep bisections; and the
-  analytic derivative cascade reuses its buffers (`Vinecop::hessian` a few
-  percent faster, allocation-free inner loops) (#681)
-* Add the exact argument gradient of the density for the nonparametric **TLL**
-  family: `Bicop::pdf_deriv(u, "u1")`/`"u2"` (and `logpdf_deriv`) now return the
-  closed-form slope of the bilinear interpolation grid instead of throwing,
-  backed by the new `InterpolationGrid::gradient`. Derivatives with respect to
-  the grid values, all second-order derivatives, and the h-function derivatives
-  remain undefined for TLL and throw with a clear message; `tll` is not added to
-  `bicop_families::analytic_derivs`, and `Vinecop::scores`/`hessian` still reject
-  TLL pair copulas. Internally, the finite-difference derivative fallback moved
-  from `ParBicop` up to `AbstractBicop`, so it is shared by every family (each
-  controlling its own step clamping through the parameter-bound getters);
-  parametric families are unaffected, as their closed forms still take
-  precedence (#694).
-* Extend the analytic copula-derivative leaves (`Bicop::pdf_deriv`,
-  `pdf_deriv2`, `hfunc1_deriv`, `hfunc1_deriv2`, `hfunc2_deriv`,
-  `hfunc2_deriv2`, `logpdf_deriv`, `logpdf_deriv2`) to the **BB1, BB6, BB7, BB8,
-  and Tawn** families, which previously fell back to internal central finite
-  differences. All five are now in `bicop_families::analytic_derivs`, so
-  `Vinecop::scores`/`gradient`/`hessian` are analytic for them as well
-  (faster and exact). VineCopula has no closed forms for these families, so the
-  expressions were derived from the generator / Pickands derivative calculus and
-  code-generated (see `tools/derivs/`); correctness is gated by the
-  analytic-vs-finite-difference tests (#687)
-* Add analytic derivatives of the copula density and h-functions with respect
-  to the parameters and arguments: `Bicop::pdf_deriv`, `pdf_deriv2`,
-  `hfunc1_deriv`, `hfunc1_deriv2`, `hfunc2_deriv`, `hfunc2_deriv2`,
-  `logpdf_deriv`, and `logpdf_deriv2` (with per-row-parameter overloads),
-  using closed forms for the families in `bicop_families::analytic_derivs`
-  (indep, gaussian, student, clayton, gumbel, frank, joe; feature parity with
-  VineCopula's `BiCopDeriv`/`BiCopDeriv2`/`BiCopHfuncDeriv`/`BiCopHfuncDeriv2`)
-  and internal central finite differences for the other parametric families.
-  `Vinecop::scores` and `Vinecop::hessian` now use them, all computed
-  analytically through a shared per-edge derivative cascade: the step-wise
-  scores differentiate each edge's log-density, the full gradient is an
-  RVineGrad-style cascade through the vine, and both the joint (non-step-wise)
-  and step-wise Hessians are analytic (the joint one à la VineCopula's
-  `RVineHessian`; Stoeber & Schepsmeier, 2013), falling back to finite
-  differences only for models with discrete variables. Models with
-  nonparametric (TLL) pair copulas are now rejected by `scores`/`hessian`
-  (differentiating w.r.t. an interpolation grid is meaningless). New
-  `Vinecop::scores_full` exposes the per-edge derivative caches behind the
-  scores (`keep_all` option, mirroring `pdf`/`pdf_full`), and
-  `Vinecop::gradient` returns the observation-average of the scores
-  (mirroring how `hessian` averages
-  `hessian_full`) (#683)
-* Speed up `Vinecop` evaluation and structure selection: no per-edge
-  `Bicop` deep copies in `inverse_rosenblatt`, in-place data collapsing with
-  lazy discrete sub-buffers, parallel allocation-free Monte-Carlo `cdf`, and
-  selection fast paths (NaN-free criterion, moved h-function storage, final
-  tree h-functions skipped, in-place candidate fits). `pdf_full` no longer
-  fills `hfunc*_sub` with duplicated continuous h-functions (#692).
-* Speed up TLL fitting and evaluation: fused conditional-cdf interpolation
-  (single pass, no per-query allocation), direct closed-form inversion of the
-  conditional cdf replacing 35-sweep bisection, bucket-accelerated cell
-  lookup, O(m) cached `integrate_2d`, and fixed-size influence matrices in
-  the local-likelihood fit (#691).
-* Speed up `tools_stats`: SIMD `qnorm` via Eigen's packetized `pndtri`
-  (~2–3× faster, roughly halving the Gaussian-copula pdf cost), leaner
-  `pbvnorm`/`pbvt` kernels, single weight conversion in `to_pseudo_obs`,
-  reusable FFT workspace for `"mcor"`, flattened `BoxCovering`, and faster
-  `simulate_uniform`/`sobol` fills (#690).
-* Speed up shared primitives: `tools_eigen` helpers take `Eigen::Ref`
-  (`ConstMatRef`) with raw-pointer inner loops and gain a safeguarded-Newton
-  inverter; `ThreadPool::push` binds arguments instead of capturing a
-  by-value lambda; `integrate_zero_to_one` is templated on the callable with
-  integration tolerance 1e-12 → 1e-9 (Kendall's τ of integrated families may
-  shift by up to ~1e-7) (#689).
-* Add binary CBOR persistence for `Bicop`, `Vinecop`, and `RVineStructure`,
-  selected automatically by a `.cbor` filename extension (#684).
-* Add an opt-in google/benchmark suite (`VINECOPULIB_BUILD_BENCHMARKS`, off by
-  default), a numerical parity harness (`parity_dump` +
-  `scripts/compare_parity.py` with per-key tolerance gates in
-  `scripts/parity_gates.json`), and golden-value tests freezing QRNG streams,
-  Genz `pbvnorm`/`pbvt` kernels, pseudo-observations, seeded TLL fits, and
-  h∘hinv round trips (#688).
-* Add `Bicop::parameters_to_taildep()`/`Bicop::get_taildep()` to compute the tail
-  dependence coefficients (returned as a 2x2 matrix collecting all four corners of
-  the unit square) and `Bicop::parameters_to_beta()`/`Bicop::get_beta()` to compute
-  Blomqvist's beta, analogous to VineCopula's `BiCopPar2TailDep`/`BiCopPar2Beta` (#682).
+* Add conditioning-set overloads to `rosenblatt` and `inverse_rosenblatt`, which
+  reorient the vine through non-owning views rather than copying pair copulas
+  (#715)
 
-* Replace the vendored BOBYQA optimizer (`misc/tools_bobyqa.hpp`, ~2300 lines)
-  with a compact optimizer (`misc/tools_optimization`): Brent's bracketing
-  search for one-dimensional fits and a gradient-based BFGS otherwise, the
-  latter handling bound constraints via automatic parameter transforms
-  (`misc/tools_transforms`, inferred from the parameter bounds). Parametric
-  maximum-likelihood fitting now consumes the analytic (or finite-difference)
-  scores added above, optimizing over an unconstrained space so the family
-  never sees the transform. This is an internal change with no public-API
-  impact (#685)
+* Evaluate copulas with one parameter set per observation: `pdf`, `cdf`,
+  h-functions, `loglik`, `simulate` and the derivative methods on `Bicop`, and
+  the corresponding `Vinecop` surfaces (#675, #699, #719)
 
-* Add per-row-parameter overloads of `Bicop::pdf`, `cdf`, `hfunc1`, `hfunc2`, `hinv1`, `hinv2`,
-  and `loglik` that evaluate a bivariate copula at a different parameter set per row of `u` in a
-  single (optionally multi-threaded) call. The new overloads take an `n x p` matrix of parameters
-  (one row per observation) and are available for parametric families (#675).
-* Make `TriangularArray<T>` own its conversions like the other user-facing classes: add
-  `to_json()`, a JSON constructor, and `to_list()` (the rows as a nested vector, complementing
-  the existing nested-vector constructor). The internal free helpers
-  `tools_serialization::triangular_array_to_json` / `json_to_triangular_array` are removed in
-  favor of the class methods.
-* Allow a user-supplied edge-weight function for vine structure selection via
-  `tree_criterion = "custom"` together with
-  `FitControlsVinecop::set_tree_criterion_function` (or
-  `FitControlsConfig::tree_criterion_function`), enabling custom dependence
-  criteria during Dissmann's algorithm. The function is always invoked,
-  copied, and destroyed on the thread that starts the fit, never from a worker
-  thread, so it need not be thread safe: an R closure or a Python callable can
-  be used with any `num_threads`, and the pair-copula fits stay parallel. The
-  criterion and the callable may be set in either order, but a fit is now
-  rejected up front when only one of the two is given, instead of failing deep
-  inside selection or silently ignoring the callable (#674, #722).
+* Add `Vinecop::pdf_full`, returning the density together with the per-edge
+  densities and h-functions computed along the way (#669, #699)
 
-* Add `Vinecop::hfuncs` to return intermediate h-function values (#669)
+* Add `Bicop::get_taildep` and `Bicop::get_beta` for tail-dependence
+  coefficients and Blomqvist's beta (#682)
 
-* Add a grid size option for kernel bicop (#654)
+* Allow a user-supplied `tree_criterion` function for structure selection, via
+  `set_tree_criterion_function()` and `tree_criterion = "custom"` (#674)
 
-* Add score and Hessian support (#645)
+* Add `RVineTrees`, an explicit edge-list view of a structure, with
+  `Vinecop::get_trees()` and an `RVineStructure` constructor from it (#698)
 
-* Unify the R-vine matrix diagonal convention on the `conditioned[0]` endpoint:
-  `Vinecop::select()` / `from_data()` now finalize with the same
-  (first-leaf-edge, `conditioned[0]`) diagonal policy as
-  `RVineStructure::get_trees()` and the `RVineTrees` default, so structure
-  selection and the `get_trees()` round-trip share one convention. Because each
-  edge stores its pair copula with the first argument on `conditioned[0]`, the
-  finalization is now flip-free — selected pair copulas are placed exactly as
-  fitted, and no longer flipped onto the `conditioned[1]` diagonal. The result
-  is the same vine (identical density, log-likelihood, and per-tree conditioned
-  sets); only the matrix / order representation and the per-edge orientation of
-  the pair copulas in the both-endpoints-are-leaves columns change (#702)
+* Add a `nonparametric_grid_size` control for the TLL interpolation grid (#654)
+
+* Persist models as CBOR as well as JSON, selected by the file extension (#684)
+
+### PERFORMANCE
+
+* Speed up the bivariate evaluation engine and tighten allocation in the
+  derivative cascade (#681)
+
+* Speed up shared Eigen, thread and integration primitives (#689)
+
+* Speed up `tools_stats`: SIMD `qnorm`, the bivariate normal and t kernels,
+  pseudo-observations and `BoxCovering` (#690)
+
+* Speed up TLL fitting and evaluation through fused interpolation (#691)
+
+* Speed up vine evaluation and structure selection (#692)
+
+* Compute the Student t score's degrees-of-freedom terms once per call (#693)
+
+* Speed up the `RVineTrees` peel; results are byte-identical (#701)
+
+* Exit structure selection early when the graph is already a tree (#661)
 
 ### BUG FIXES
 
-* Reject `n < 1` (and `d < 1`) in `tools_stats::ghalton` and
-  `tools_stats::sobol` instead of writing past the end of the output matrix.
-  Only the pseudo-random branch of `simulate_uniform` validated its arguments,
-  so `simulate_uniform(0, d, true)` reached the quasi-random generators with a
-  zero-column result (#719)
+* Fix four numerical defects in `parameters_to_tau`: Tawn's `A''` evaluated to
+  `inf * 0` for small psi and cancelled to a negative value elsewhere, its
+  integrand peaks away from 1/2 for asymmetric parameters, and the BB7 and BB8
+  integrands cancelled to exactly zero near their boundaries (#713)
 
-* Fix out-of-bounds parameter indexing in the per-row bivariate evaluation of
-  discrete leaves (`pdf_c_d`, `pdf_d_d`, and the discrete branches of `hfunc1` /
-  `hfunc2`) for families whose parameter matrix is neither `1 x p` nor `n x p`:
-  parameterless families (independence, `0 x 0`) and nonparametric families
-  (TLL, a `p x p` grid). Also validate parameter rows and columns
-  unconditionally in `check_parameters`, so a same-size-but-transposed shape
-  (`1 x p` vs `p x 1`) is rejected instead of reaching the coefficient-wise
-  bound checks (#700)
+* Fix the TLL CDF and the two-dimensional integration it relies on (#659, #667)
 
-* Fix an out-of-bounds memory access in the bivariate h-inverse for mixed
-  discrete/continuous copulas whose inverse is computed numerically (e.g. Frank,
-  the BB families, Tawn): a continuous h-inverse re-entered the discrete
-  difference-quotient branch on a stripped two-column matrix (#675)
+* Make `inverse_rosenblatt` thread-safe (#712)
 
-* Fix CDF of TLL family (#667)
+* Evaluate a custom tree criterion serially, since a user-supplied callable is
+  not required to be thread-safe (#722)
 
-* Fix discrete-discrete PDFs and adjust threshold for analytical derivatives (#664)
+* Fix Wilson's algorithm for random spanning trees (#653)
 
-* Add early exit in model selection when the structure is already a tree (#661)
+* Fix a typo in `pdf_d_d` and adjust the threshold for analytical derivatives
+  (#664)
 
-* Fix Wilson correction implementation (#653)
+* Fix starting parameters for discrete models (#677)
 
-### MAINTENANCE, BUILD, AND DOCS
+* Handle edge-case parameter shapes in per-row evaluation (#700)
 
-* Make the `Vinecop::simulate_conditional`, `Vinecop::reorient`, and
-  `RVineStructure::get_trees` docstrings wrapper-friendly: describe argument /
-  return shapes in prose (rather than Eigen `.cols()` / `.rows()` / `.replicate`
-  idioms), reference the variable order instead of `get_order()`, drop internal
-  provenance, and document the `get_trees` return format. No API or behavior
-  change; downstream `pyvinecopulib` / `rvinecopulib` render cleaner docs (#703)
+* Include the thread header explicitly where it was relied on transitively
+  (#676)
 
-* Collapse the internal bivariate-copula evaluation leaves to a single
-  parameter-aware interface (removing the duplicated state-based primitives),
-  so each family implements its math once (#675)
+### BUILD SYSTEM AND DEPENDENCIES
 
-* Improve Python-binding API docs for property getters/setters (#670)
+* Modernize the CMake project: `GNUInstallDirs`, a namespaced export,
+  `target_compile_features`, an architecture-independent version file,
+  `CMakePresets.json`, and appended rather than assigned compiler flags, so
+  distribution hardening flags and user `CXXFLAGS` survive (#711)
 
-* Add per-family parameter/rotation/tail-dependence docs for `BicopFamily` (#668)
+* Replace the byte-offset arithmetic in the `.ipp` to `.cpp` code generation
+  with a regex, and add real dependency edges, so an edited `.ipp` can no longer
+  leave a stale generated source behind (#711)
 
-* Fix Doxygen typos and mBIC documentation details (#665, #660)
+* Reduce Boost to Graph, Math and Random. Odeint, Bimap, Assign, Unordered and
+  Concept are gone; `std::optional` replaces the `boost::optional` shim (#711,
+  #713, #714)
 
-* Add Eigen 5.x compatibility in CMake (#658)
+* Build one test binary plus one per area, make the R parity tests
+  parallel-safe, and make R optional behind `VINECOPULIB_R_PARITY_TESTS` (#717)
 
-* Update CI for deprecated macOS images and Windows path handling (#663, #655, #647)
+* Rebuild the CI, release and analysis workflows, with version-consistency,
+  header-only-install, benchmark, documentation and clang-tidy jobs, plus
+  release automation and a weekly check for a release that was written up but
+  never tagged
 
-* Enforce clang-format in GitHub Actions and apply code analysis cleanups (#646, #649)
+* Safeguard the vendored `nlohmann_json.hpp` against a newer Xcode (#678)
 
-* Remove an unused option (#662)
+* Fix several Windows CI issues (#647, #655) and drop the deprecated macos-13
+  runner (#663)
+
+### DOCUMENTATION AND TOOLING
+
+* Rewrite the user documentation. Every example is now a `\snippet` of a source
+  under `docs/snippets/`, compiled and run in CI, and new pages cover discrete
+  variables, conditional simulation, and scores and Hessians. Doxygen runs with
+  `WARN_AS_ERROR`
+
+* Document where the Kendall's tau maps apply. `tau_to_parameters` is available
+  only for the one-parameter families in `bicop_families::itau`, notably not for
+  `student` (#723)
+
+* Add a benchmark suite, a numerical parity harness and golden-value tests, with
+  `benchmarks/README.md` and `scripts/README.md` describing both (#688)
+
+* Add `CONTRIBUTING.md`, `CITATION.cff`, `SECURITY.md`, `CODE_OF_CONDUCT.md`,
+  `docs/releasing.md`, and issue and pull-request templates
+
+* Clear the clang-tidy backlog and widen the enabled checks (#710)
+
+* Add `AGENTS.md`, a normative engineering spec for the repository (#672)
+
+* Document per-family parameters, rotations and tail dependence on the
+  `BicopFamily` enum, and the property getters and setters that the Python
+  bindings extract (#668, #670)
+
+* Seed the RNG-dependent unit tests to remove flakiness (#686)
+
+* Decompose `VinecopSelector` for readability (#695)
+
+* Enforce the clang-format style in CI (#646, #649)
+
+* Fix documentation typos and the mBIC formula (#660, #665, #703, #716)
 
 ## vinecopulib 0.7.3 (April 23, 2025)
 

@@ -19,7 +19,7 @@
 //  Must be a plain decimal literal: a leading zero makes it octal and breaks
 //  the arithmetic above. Enforced by scripts/check_version.py.
 
-#define VINECOPULIB_VERSION 800
+#define VINECOPULIB_VERSION 100000
 
 //
 //  VINECOPULIB_LIB_VERSION must be defined to be the same as
@@ -27,4 +27,4 @@
 //  major version number, y is the minor version number, and z is the patch
 //  level if not 0.
 
-#define VINECOPULIB_LIB_VERSION "0_8"
+#define VINECOPULIB_LIB_VERSION "1_0"
