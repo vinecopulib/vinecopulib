@@ -34,7 +34,14 @@ cd build-docs && python3 ../m.css/documentation/doxygen.py Doxyfile-mcss
 The result lands in `build-docs/docs/` (`HTML_OUTPUT` is `.`). LaTeX is needed
 because m.css renders `\f$...\f$` math to SVG.
 
-@note m.css requires a Doxygen version it agrees with: with Doxygen 1.9.8 its
-`parse_func` aborts on a `memberdef` that carries no `argsstring`
-(`AttributeError: 'NoneType' object has no attribute 'endswith'`). Deployment is
-therefore still manual; automating it needs a pinned Doxygen or a patched m.css.
+`.github/actions/build-site` runs exactly these steps with m.css pinned to a
+commit. Every pull request builds the site and uploads it as the `website`
+artifact; `docs.yml` builds it again on a `v*` tag and commits the result to the
+`gh-pages` branch, which is what the published site serves.
+
+@note m.css is stricter than Doxygen and aborts where Doxygen only warns — an
+undocumented `friend` declaration, for instance, reaches its `parse_func` as a
+member with an empty `argsstring` and raises
+`AttributeError: 'NoneType' object has no attribute 'endswith'`. Wrap such
+declarations in `@cond INTERNAL` / `@endcond`. The pull-request build is what
+catches this before a tag does.

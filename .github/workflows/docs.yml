@@ -1,0 +1,90 @@
+name: Website
+
+# Publishes the m.css site to the gh-pages branch, which is what
+# https://vinecopulib.github.io/vinecopulib/ serves. Tags publish; every pull
+# request only build-checks the site, in the docs job of the CI workflow.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Ref to publish (defaults to the current branch).'
+        required: false
+        type: string
+
+concurrency:
+  group: website
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  BOOST_VERSION: 1.84.0
+  EIGEN_VERSION: 3.4.0
+
+jobs:
+  publish:
+    name: build and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y doxygen graphviz
+
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          R: false
+          lcov: false
+
+      # BOOST_ROOT must be exported: find_package picks it up via CMP0074.
+      - name: Set environment variables
+        run: |
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
+          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
+
+      - name: Configure
+        run: cmake -S . -B build-docs -DVINECOPULIB_BUILD_DOC=ON -DBUILD_TESTING=OFF
+
+      - name: Build the site
+        uses: ./.github/actions/build-site
+        with:
+          build_dir: build-docs
+
+      # Commits on top of gh-pages rather than replacing it, so an unexpected
+      # result can be reverted by reverting one commit.
+      - name: Publish to gh-pages
+        run: |
+          remote="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          site=$(mktemp -d)
+          git clone -q --depth=1 --branch gh-pages "$remote" "$site"
+          find "$site" -mindepth 1 -maxdepth 1 -not -name .git -exec rm -rf {} +
+          cp -r build-docs/docs/. "$site/"
+          # .nojekyll keeps Pages from dropping m.css's _-prefixed assets.
+          touch "$site/.nojekyll"
+          cd "$site"
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --quiet --cached; then
+            echo "The rendered site is identical to what is published; nothing to do."
+            exit 0
+          fi
+          git commit -q -m "docs: publish the website for ${GITHUB_REF_NAME}"
+          git push -q "$remote" gh-pages

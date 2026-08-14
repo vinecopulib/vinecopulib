@@ -338,6 +338,19 @@ jobs:
           name: doxygen-log
           path: build-docs/doxygen.log
           if-no-files-found: warn
+      # The site is what docs.yml publishes on a tag, and m.css is stricter
+      # than Doxygen: it aborts on constructs Doxygen only warns about. Build
+      # it here so a tag cannot be the first time anyone finds out.
+      - name: Build the site
+        uses: ./.github/actions/build-site
+        with:
+          build_dir: build-docs
+      - name: Upload the site
+        uses: actions/upload-artifact@v6
+        with:
+          name: website
+          path: build-docs/docs
+          if-no-files-found: error
 
   # Diff-only, so the curated check list can be enforced as an error.
   clang-tidy:
