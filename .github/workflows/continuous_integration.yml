@@ -392,11 +392,11 @@ jobs:
             | /usr/lib/llvm-14/share/clang/clang-tidy-diff.py \
                 -p1 -path build-tidy -clang-tidy-binary clang-tidy-14 -use-color
 
-      # The per-area test translation units include the whole library between
-      # them, so this keeps the backlog at zero rather than only gating new
-      # code. (test_all.cpp is just main() and covers nothing.) Each one takes
-      # minutes, so run them in parallel.
+      # Keeps the backlog at zero rather than only gating new code. Two
+      # translation units suffice: one including <vinecopulib.hpp> reaches every
+      # library header bar version.hpp, and one parametric-bicop unit reaches the
+      # shared test fixtures. (test_all.cpp is just main() and covers nothing.)
       - name: Run clang-tidy over the whole library
         run: |
-          run-clang-tidy-14 -p build-tidy -quiet -j "$(nproc)" \
-            'test/src_test/test_.*[.]cpp'
+          clang-tidy-14 -p build-tidy --quiet \
+            docs/snippets/vinecop.cpp test/src_test/test_bicop_parametric.cpp
