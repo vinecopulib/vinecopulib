@@ -31,10 +31,49 @@ TEST(vinecop_sanity_checks, catches_wrong_size)
   Vinecop vinecop(mat, pair_copulas);
 
   Eigen::MatrixXd U = Eigen::MatrixXd::Constant(4, 4, 0.5);
-  EXPECT_ANY_THROW(vinecop.pdf(U));
+  try {
+    vinecop.pdf(U);
+    FAIL() << "expected invalid column count to throw";
+  } catch (const std::runtime_error& error) {
+    EXPECT_EQ(error.what(),
+              std::string("data has wrong number of columns; expected: 3 "
+                          "(n x d continuous layout), actual: 4 (model "
+                          "contains no discrete variables)."));
+  }
   EXPECT_ANY_THROW(vinecop.cdf(U));
-  EXPECT_ANY_THROW(vinecop.inverse_rosenblatt(U));
+  try {
+    vinecop.inverse_rosenblatt(U);
+    FAIL() << "expected invalid inverse Rosenblatt column count to throw";
+  } catch (const std::runtime_error& error) {
+    EXPECT_EQ(error.what(),
+              std::string("data has wrong number of columns; expected: 3 "
+                          "(n x d input), actual: 4."));
+  }
   EXPECT_ANY_THROW(vinecop.select(U));
+
+  vinecop.set_var_types({ "d", "c", "c" });
+  auto U_discrete = Eigen::MatrixXd::Constant(4, 3, 0.5);
+  try {
+    vinecop.pdf(U_discrete);
+    FAIL() << "expected invalid discrete column count to throw";
+  } catch (const std::runtime_error& error) {
+    EXPECT_EQ(error.what(),
+              std::string("data has wrong number of columns; expected: 6 "
+                          "(n x 2d expanded layout) or 4 (n x (d + k) "
+                          "compact layout), actual: 3 (model contains 1 "
+                          "discrete variable)."));
+  }
+
+  vinecop.set_var_types({ "d", "d", "d" });
+  try {
+    vinecop.pdf(U_discrete);
+    FAIL() << "expected missing discrete left-limit columns to throw";
+  } catch (const std::runtime_error& error) {
+    EXPECT_EQ(error.what(),
+              std::string("data has wrong number of columns; expected: 6 "
+                          "(n x 2d expanded or n x (d + k) compact layout), "
+                          "actual: 3 (model contains 3 discrete variables)."));
+  }
 
   vinecop = Vinecop(301);
   U = tools_stats::simulate_uniform(1, 301, false, { 1 });
