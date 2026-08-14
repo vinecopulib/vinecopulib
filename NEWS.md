@@ -100,6 +100,10 @@ wrong thing.
   reorient the vine through non-owning views rather than copying pair copulas
   (#715)
 
+* Accept and document both the expanded `2d` and compact `d + k` data layouts
+  consistently across bivariate and vine copula operations, including the
+  Rosenblatt transforms and conditional simulation
+
 * Evaluate copulas with one parameter set per observation: `pdf`, `cdf`,
   h-functions, `loglik`, `simulate` and the derivative methods on `Bicop`, and
   the corresponding `Vinecop` surfaces (#675, #699, #719)

@@ -327,7 +327,7 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! so that the maximal available information is used.
 //!
 //!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param data \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls to the algorithm (see `FitControlsVinecop()`).
 inline void
@@ -578,7 +578,7 @@ Vinecop::reorient(const std::vector<size_t>& conditioning_set)
 //! and a `FitControlsVinecop` object instantiated
 //! with `select_families = false`.
 //!
-//! @param data \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param data \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   observations, where \f$ k \f$ is the number of discrete variables.
 //! @param controls The controls for each bivariate fit (see
 //! `FitControlsBicop()`).
@@ -1095,7 +1095,7 @@ Vinecop::get_var_types() const
 //! limit and the cdf itself coincide. Respective columns can be omitted in the
 //! second block.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()`).
 //! @param num_threads The number of threads to use for computations; if greater
@@ -1332,7 +1332,7 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
 //! limit and the cdf itself coincide. Respective columns can be omitted in the
 //! second block.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()`).
 //! @param num_threads The number of threads to use for computations; if greater
@@ -1628,7 +1628,7 @@ Vinecop::build_deriv_cache(const Eigen::MatrixXd& u,
 //! the caches below stay empty). Models with nonparametric pair copulas are
 //! rejected (differentiating w.r.t. the interpolation grid is meaningless).
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `select()`).
 //! @param step_wise if `false`, full gradient of the log-likelihood; if `true`,
@@ -2097,7 +2097,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
 //! with respect to the parameters. This is a thin wrapper around
 //! `scores_full()`; see there for the computational details.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `select()`).
 //! @param step_wise if `false`, full gradient of the log-likelihood; if `true`,
@@ -2131,7 +2131,7 @@ Vinecop::scores(Eigen::MatrixXd u,
 //! Returns the observation-average of `scores()` as a vector of length
 //! `npars`, mirroring how `hessian()` averages `hessian_full()`.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `select()`).
 //! @param step_wise if `false`, full gradient of the log-likelihood; if `true`,
@@ -2178,7 +2178,7 @@ Vinecop::gradient(Eigen::MatrixXd u,
 //! Models with discrete variables use central finite differences of
 //! `scores()` instead; models with nonparametric pair copulas are rejected.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `select()`).
 //! @param step_wise if `false`, full gradient of the log-likelihood; if `true`,
@@ -2513,7 +2513,7 @@ Vinecop::hessian_full(Eigen::MatrixXd u,
 //! \f$ \mathrm{npars} \times \mathrm{npars} \f$ matrix (use `hessian_full()`
 //! for the per-observation decomposition).
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `select()`).
 //! @param step_wise if `false`, full gradient of the log-likelihood; if `true`,
@@ -2589,7 +2589,7 @@ Vinecop::hessian(Eigen::MatrixXd u,
 //! matrix. Together with `hessian()` this forms the sandwich estimator of the
 //! asymptotic covariance.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `select()`).
 //! @param step_wise if `false`, full gradient of the log-likelihood; if `true`,
@@ -2639,7 +2639,7 @@ Vinecop::scores_cov(Eigen::MatrixXd u,
 //! limit and the cdf itself coincide. Respective columns can be omitted in the
 //! second block.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()`).
 //! @param N Integer for the number of quasi-random numbers to draw
@@ -2742,6 +2742,10 @@ Vinecop::simulate(const size_t n,
 //!   supplying only `k` columns when a conditioning variable is discrete may be
 //!   silently reinterpreted as a different `k`. To draw many samples at a
 //!   single conditioning point, pass that point repeated over `n` rows.
+//!   The overload taking `conditioning_set` also accepts the expanded
+//!   \f$ n \times 2k \f$ layout, with one left-limit column per conditioning
+//!   variable. Use that overload whenever the expanded layout is ambiguous
+//!   with a compact layout for a different number of conditioning variables.
 //! @param qrng Set to true for quasi-random numbers (over the conditioned
 //!   variables).
 //! @param num_threads The number of threads to use for computations.
@@ -2792,8 +2796,9 @@ Vinecop::simulate_conditional(const Eigen::MatrixXd& u_cond,
 //!
 //! @param conditioning_set The 1-based conditioning-variable indices. The
 //!   first `k` columns of `u_cond` correspond to these variables in the given
-//!   order; left-limit columns follow in the same order among the discrete
-//!   variables.
+//!   order. In the expanded layout, the next `k` columns contain their
+//!   left-limits in the same order; in the compact layout, only left-limits of
+//!   discrete variables follow.
 inline Eigen::MatrixXd
 Vinecop::simulate_conditional(const Eigen::MatrixXd& u_cond,
                               const std::vector<size_t>& conditioning_set,
@@ -2824,10 +2829,12 @@ Vinecop::simulate_conditional_impl(const Eigen::MatrixXd& u_cond,
     conditioning_set.begin(), conditioning_set.end(), [&](size_t var) {
       return var_types_[var - 1] == "d";
     }));
-  if (static_cast<size_t>(u_cond.cols()) != k + kd) {
+  const size_t n_cols = static_cast<size_t>(u_cond.cols());
+  const bool expanded = n_cols == 2 * k;
+  if (!expanded && (n_cols != k + kd)) {
     throw std::runtime_error(
-      "u_cond must have one column per conditioning variable plus one "
-      "left-limit column per discrete conditioning variable.");
+      "u_cond must have 2 * k columns or one column per conditioning variable "
+      "plus one left-limit column per discrete conditioning variable.");
   }
   if (!tools_eigen::check_if_in_unit_cube(u_cond)) {
     throw std::runtime_error("all elements of u_cond must be in (0, 1).");
@@ -2841,12 +2848,13 @@ Vinecop::simulate_conditional_impl(const Eigen::MatrixXd& u_cond,
     size_t var = conditioning_set[i] - 1;
     u_completed.col(var) = u_cond.col(i);
     if (var_types_[var] == "d") {
-      if ((u_cond.col(k + kd_seen).array() > u_cond.col(i).array()).any()) {
+      size_t left_col = expanded ? k + i : k + kd_seen;
+      if ((u_cond.col(left_col).array() > u_cond.col(i).array()).any()) {
         throw std::runtime_error(
           "for discrete conditioning variables, the left-limit columns of "
           "u_cond (F(x^-)) must not exceed the value columns (F(x)).");
       }
-      u_completed.col(d_ + disc_cols[var]) = u_cond.col(k + kd_seen);
+      u_completed.col(d_ + disc_cols[var]) = u_cond.col(left_col);
       ++kd_seen;
     }
   }
@@ -2868,7 +2876,7 @@ Vinecop::simulate_conditional_impl(const Eigen::MatrixXd& u_cond,
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, ..., U_{d, i}), \f]
 //! where \f$ c \f$ is the copula density, see `Vinecop::pdf()`.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `select()` or `Vinecop::pdf()`).
 //! @param num_threads The number of threads to use for computations; if greater
@@ -2908,7 +2916,7 @@ Vinecop::loglik(const Eigen::MatrixXd& u,
 //! The AIC is a consistent model selection criterion even
 //! for nonparametric models.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `select()` or `Vinecop::pdf()`).
 //! @param num_threads The number of threads to use for computations; if greater
@@ -2930,7 +2938,7 @@ Vinecop::aic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! The BIC is a consistent model selection criterion
 //! for nonparametric models.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()` or `Vinecop::pdf()`).
 //! @param num_threads The number of threads to use for computations; if greater
@@ -2958,7 +2966,7 @@ Vinecop::bic(const Eigen::MatrixXd& u, const size_t num_threads) const
 //! selection criterion for parametric sparse vine copula models when
 //! \f$ d = o(\sqrt{n \log n})\f$.
 //!
-//! @param u An \f$ n \times (d + k) \f$ or \f$ n \times 2d \f$ matrix of
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
 //!   evaluation points, where \f$ k \f$ is the number of discrete variables
 //!   (see `Vinecop::select()` or `Vinecop::pdf()`).
 //! @param psi0 Baseline prior probability of a non-independence copula.
@@ -3029,7 +3037,8 @@ Vinecop::get_npars() const
 //! \f[ F(V_{M[d - j, j]} | V_{M[d - j - 1, j - 1]}, \dots, V_{M[0, 0]}), \f]
 //! set `randomize_discrete = FALSE`.
 //!
-//! @param u An \f$ n \times d \f$ matrix of evaluation points.
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables.
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -3058,7 +3067,8 @@ Vinecop::rosenblatt(Eigen::MatrixXd u,
 //! @details The vine is evaluated in an admissible sampling order whose tail
 //! contains exactly `conditioning_set`. The model itself is not modified.
 //!
-//! @param u An \f$ n \times d \f$ matrix of evaluation points.
+//! @param u An \f$ n \times 2d \f$ or \f$ n \times (d + k) \f$ matrix of
+//!   evaluation points, where \f$ k \f$ is the number of discrete variables.
 //! @param conditioning_set The 1-based indices of the conditioning variables.
 //! @param num_threads The number of threads to use for computations.
 //! @param randomize_discrete Whether to randomize the transform for discrete
@@ -3229,7 +3239,10 @@ Vinecop::rosenblatt_impl(Eigen::MatrixXd u,
 //! `Vinecop::inverse_rosenblatt()` computes \f[ V_{M[d - j, j]}= F^{-1}(U_{M[d
 //! - j, j]} | U_{M[d - j - 1, j - 1]}, \dots, U_{M[0, 0]}). \f]
 //!
-//! @param u An \f$ n \times d \f$ matrix of evaluation points.
+//! @param u An \f$ n \times 2d \f$, \f$ n \times (d + k) \f$, or
+//!   \f$ n \times d \f$ matrix of independent uniform variates, where \f$ k \f$
+//!   is the number of discrete variables. Only the first \f$ d \f$ columns are
+//!   used.
 //! @param num_threads The number of threads to use for computations; if greater
 //!   than 1, the function will be applied concurrently to `num_threads` batches
 //!   of `u`.
@@ -3246,7 +3259,10 @@ Vinecop::inverse_rosenblatt(const Eigen::MatrixXd& u,
 //! @details The vine is evaluated in an admissible sampling order whose tail
 //! contains exactly `conditioning_set`. The model itself is not modified.
 //!
-//! @param u An \f$ n \times d \f$ matrix of independent uniform variates.
+//! @param u An \f$ n \times 2d \f$, \f$ n \times (d + k) \f$, or
+//!   \f$ n \times d \f$ matrix of independent uniform variates, where \f$ k \f$
+//!   is the number of discrete variables. Only the first \f$ d \f$ columns are
+//!   used.
 //! @param conditioning_set The 1-based indices of the conditioning variables.
 //! @param num_threads The number of threads to use for computations.
 //! @return An \f$ n \times d \f$ matrix of transformed values.
@@ -3266,11 +3282,12 @@ Vinecop::inverse_rosenblatt_impl(const Eigen::MatrixXd& u,
                                  size_t num_threads) const
 {
   const size_t n_cols = static_cast<size_t>(u.cols());
-  if ((n_cols != d_) && (n_cols != 2 * d_)) {
+  const size_t compact_cols = d_ + get_n_discrete();
+  if ((n_cols != d_) && (n_cols != compact_cols) && (n_cols != 2 * d_)) {
     throw std::runtime_error(
-      "data has wrong number of columns; expected: " + std::to_string(d_) +
-      " or " + std::to_string(2 * d_) + ", actual: " + std::to_string(n_cols) +
-      ".");
+      "data has wrong number of columns; expected: " + std::to_string(2 * d_) +
+      ", " + std::to_string(compact_cols) + ", or " + std::to_string(d_) +
+      ", actual: " + std::to_string(n_cols) + ".");
   }
   if (u.rows() < 1) {
     throw std::runtime_error("data must have at least one row");
@@ -3370,7 +3387,7 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
   if ((d_data != d_exp) & (d_data != 2 * d_)) {
     std::stringstream msg;
     msg << "data has wrong number of columns; "
-        << "expected: " << d_exp << " or " << 2 * d_ << ", actual: " << d_data
+        << "expected: " << 2 * d_ << " or " << d_exp << ", actual: " << d_data
         << " (model contains ";
     if (n_disc == 0) {
       msg << "no discrete variables)." << std::endl;

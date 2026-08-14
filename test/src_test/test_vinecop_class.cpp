@@ -396,6 +396,7 @@ TEST_F(VinecopTest, simulate_is_correct)
 TEST_F(VinecopTest, inverse_rosenblatt_does_not_mutate_discrete_model)
 {
   const size_t d = 5;
+  const size_t n_discrete = 3;
   auto pair_copulas = Vinecop::make_pair_copula_store(d);
   auto par = Eigen::VectorXd::Constant(1, 2.0);
   for (size_t tree = 0; tree < pair_copulas.size(); ++tree) {
@@ -409,10 +410,20 @@ TEST_F(VinecopTest, inverse_rosenblatt_does_not_mutate_discrete_model)
   Vinecop continuous(structure, pair_copulas);
   auto w = tools_stats::simulate_uniform(100, d, false, { 17 });
 
-  EXPECT_TRUE(all_close(discrete.inverse_rosenblatt(w),
-                        continuous.inverse_rosenblatt(w),
-                        1e-12,
-                        1e-12));
+  auto expected = discrete.inverse_rosenblatt(w);
+  EXPECT_TRUE(
+    all_close(expected, continuous.inverse_rosenblatt(w), 1e-12, 1e-12));
+
+  Eigen::MatrixXd w_compact(w.rows(), d + n_discrete);
+  w_compact.leftCols(d) = w;
+  w_compact.rightCols(n_discrete) = w.leftCols(n_discrete);
+  Eigen::MatrixXd w_expanded(w.rows(), 2 * d);
+  w_expanded.leftCols(d) = w;
+  w_expanded.rightCols(d) = w;
+  EXPECT_TRUE(
+    all_close(discrete.inverse_rosenblatt(w_compact), expected, 1e-12, 1e-12));
+  EXPECT_TRUE(
+    all_close(discrete.inverse_rosenblatt(w_expanded), expected, 1e-12, 1e-12));
   EXPECT_EQ(discrete.get_var_types(), var_types);
 
   auto pair_copulas_before = discrete.get_all_pair_copulas();
@@ -765,6 +776,11 @@ TEST(VinecopConditionalSimulation, accepts_custom_conditioning_set)
   u_cond.col(1).setConstant(0.7);
   auto actual =
     model.simulate_conditional(u_cond, conditioning_set, true, 2, { 71 });
+  Eigen::MatrixXd u_cond_expanded(u_cond.rows(), 2 * u_cond.cols());
+  u_cond_expanded.leftCols(u_cond.cols()) = u_cond;
+  u_cond_expanded.rightCols(u_cond.cols()) = u_cond;
+  auto actual_expanded = model.simulate_conditional(
+    u_cond_expanded, conditioning_set, true, 2, { 71 });
 
   auto materialized = model;
   materialized.reorient(conditioning_set);
@@ -779,6 +795,7 @@ TEST(VinecopConditionalSimulation, accepts_custom_conditioning_set)
     materialized.simulate_conditional(u_cond_tail, true, 2, { 71 });
 
   EXPECT_TRUE(all_close(actual, expected, 1e-12, 1e-12));
+  EXPECT_TRUE(all_close(actual_expanded, actual, 1e-12, 1e-12));
   EXPECT_TRUE(all_close(actual.col(1), u_cond.col(0), 1e-12, 1e-12));
   EXPECT_TRUE(all_close(actual.col(0), u_cond.col(1), 1e-12, 1e-12));
   EXPECT_EQ(model.get_order(), original_order);
@@ -788,18 +805,25 @@ TEST(VinecopConditionalSimulation, custom_set_handles_discrete_variables)
 {
   auto model = make_clayton_dvine(4, 2.0, 270);
   model.set_var_types({ "d", "c", "d", "c" });
-  const std::vector<size_t> conditioning_set{ 1 };
+  const std::vector<size_t> conditioning_set{ 2, 1 };
 
-  Eigen::MatrixXd u_cond(100, 2);
-  u_cond.col(0).setConstant(0.8);
-  u_cond.col(1).setConstant(0.6);
+  Eigen::MatrixXd u_cond(100, 3);
+  u_cond.col(0).setConstant(0.4);
+  u_cond.col(1).setConstant(0.8);
+  u_cond.col(2).setConstant(0.6);
   auto actual =
     model.simulate_conditional(u_cond, conditioning_set, false, 2, { 73 });
 
-  auto materialized = model;
-  materialized.reorient(conditioning_set);
-  auto expected = materialized.simulate_conditional(u_cond, false, 2, { 73 });
-  EXPECT_TRUE(all_close(actual, expected, 1e-12, 1e-12));
+  Eigen::MatrixXd u_cond_expanded(100, 4);
+  u_cond_expanded.col(0) = u_cond.col(0);
+  u_cond_expanded.col(1) = u_cond.col(1);
+  u_cond_expanded.col(2) = u_cond.col(0);
+  u_cond_expanded.col(3) = u_cond.col(2);
+  auto actual_expanded = model.simulate_conditional(
+    u_cond_expanded, conditioning_set, false, 2, { 73 });
+
+  EXPECT_TRUE(all_close(actual_expanded, actual, 1e-12, 1e-12));
+  EXPECT_TRUE(all_close(actual.col(1), u_cond.col(0), 1e-12, 1e-12));
   EXPECT_TRUE((actual.col(0).array() >= 0.6 - 1e-12).all());
   EXPECT_TRUE((actual.col(0).array() <= 0.8 + 1e-12).all());
 }
