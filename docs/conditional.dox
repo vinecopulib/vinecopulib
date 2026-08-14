@@ -1,0 +1,51 @@
+/** @page conditional Conditional simulation
+
+@tableofcontents
+
+- [Fitting with a conditioning set](#conditional-select)
+- [Simulating conditionally](#conditional-simulate)
+- [Re-orienting an existing model](#conditional-reorient)
+
+Drawing from the conditional distribution of some variables given others is a
+question of the *sampling order*: a vine can be sampled in sequence along its
+order, so the variables you want to condition on must sit at the **tail** of that
+order. `Vinecop` therefore offers two ways to arrange for that — asking the fit
+for it, or relabeling an existing model.
+
+@section conditional-select Fitting with a conditioning set
+
+`FitControlsVinecop::set_conditioning_set()` constrains structure selection so
+that the given variables end up last in the order. Indices are 1-based, matching
+the vine order.
+
+@snippet conditional.cpp select
+
+@section conditional-simulate Simulating conditionally
+
+`simulate_conditional(u_cond, ...)` draws the remaining variables given the
+conditioning values. `u_cond` has one row per output sample, and its columns
+correspond, left to right, to the **last `k` entries of the vine order**. To draw
+many samples at a single conditioning point, repeat that point over the rows.
+
+The result is an \f$ n \times d \f$ matrix in which the conditioning columns
+reproduce `u_cond` and the remaining ones are draws from the conditional
+distribution. Discrete conditioning variables are supported and need their
+left-limit column as well, as everywhere else — see @ref discrete, and the
+method's own documentation for the exact column layout.
+
+@snippet conditional.cpp simulate
+
+@section conditional-reorient Re-orienting an existing model
+
+`reorient(conditioning_set)` relabels an already-fitted vine to an equivalent one
+whose order ends in `conditioning_set`. It is value-preserving: the density and
+the log-likelihood are invariant, only the sampling-order representation moves.
+
+Not every set can be reached this way — only those admissible as a sampling-order
+tail of the current structure — and `reorient()` throws when the set is not. If
+you know in advance which variables you want to condition on, fit with
+`set_conditioning_set()` instead, which guarantees one exists.
+
+@snippet conditional.cpp reorient
+
+*/

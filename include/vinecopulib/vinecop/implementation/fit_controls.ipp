@@ -40,6 +40,8 @@ inline FitControlsVinecop::FitControlsVinecop()
 //!     `"linear"`, `"quadratic"`.
 //! @param nonparametric_mult A factor with which the smoothing parameters
 //!     are multiplied.
+//! @param nonparametric_grid_size The size of the interpolation grid backing
+//!     the local-likelihood nonparametric family (TLLs).
 //! @param trunc_lvl Truncation level for truncated vines.
 //! @param tree_criterion The criterion for selecting the spanning
 //!     tree (`"tau"`, `"rho"`, `"hoeffd"`, `"mcor"`, `"joe"`, or `"custom"`)

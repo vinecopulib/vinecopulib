@@ -1,0 +1,72 @@
+/** @page inference Scores, gradients and Hessians
+
+@tableofcontents
+
+- [Bivariate copulas](#inference-bicop)
+- [Vine copulas](#inference-vinecop)
+- [Reusing intermediate quantities](#inference-reuse)
+- [Per-observation parameters](#inference-per-row)
+
+Both `Bicop` and `Vinecop` expose the derivatives of the log-likelihood with
+respect to the parameters. These are the ingredients for standard errors,
+Wald tests, sandwich covariance estimates and gradient-based optimization, and
+they are available for parametric families only.
+
+@section inference-bicop Bivariate copulas
+
+- `scores(u)` — an \f$ n \times p \f$ matrix of per-observation scores,
+  \f$ \partial \log c(u_i; \theta) / \partial \theta \f$.
+- `gradient(u)` — the summed score, i.e. the gradient of the log-likelihood.
+- `hessian(u)` — the \f$ p \times p \f$ Hessian of the log-likelihood.
+- `hessian_full(u)` — the per-observation Hessians, not summed.
+- `scores_cov(u)` — \f$ \sum_i s_i s_i^\top \f$, the outer-product ("BHHH")
+  covariance of the scores.
+- `scores_full(u)` — the scores together with the intermediate quantities.
+
+At a maximum-likelihood fit the gradient is numerically zero, which is the
+cheapest available check that a fit converged.
+
+@snippet inference.cpp bicop
+
+@section inference-vinecop Vine copulas
+
+The vine versions take the same names. The columns of `scores()`, and hence the
+entries of `gradient()` and the rows and columns of `hessian()`, are ordered
+`(tree, edge, parameter)`: tree 0's edges from left to right, and within an edge
+the pair copula's own parameters in order.
+
+The `step_wise` flag selects which derivative you get:
+
+- `step_wise = true` (the default) gives the score of the **step-wise** MLE. Each
+  pair copula's gradient treats its pseudo-observations as fixed, which is what
+  the sequential fitting procedure actually optimizes.
+- `step_wise = false` gives the gradient of the **full** log-likelihood,
+  propagating through the h-function cascade.
+
+The distinction is not cosmetic: at a fitted model the step-wise gradient
+vanishes while the full gradient generally does not, because the sequential
+procedure is not a joint maximizer.
+
+@snippet inference.cpp vinecop
+
+@section inference-reuse Reusing intermediate quantities
+
+The derivative cascade is the expensive part. `scores_full()` returns the
+per-edge densities, h-functions and their derivatives alongside the scores, and
+`hessian_full()` returns the per-edge Hessian blocks rather than assembling them,
+so a caller that needs several of these pays for the cascade once.
+
+@snippet inference.cpp reuse
+
+@section inference-per-row Per-observation parameters
+
+`pdf()`, `pdf_full()`, `scores()`, `scores_full()`, `gradient()` and `hessian()`
+also accept an \f$ n \times p \f$ matrix holding one full-vine parameter vector
+per observation, with columns in the same `(tree, edge, parameter)` order.
+Broadcasting a single vector across the rows reproduces the fixed-parameter
+results exactly; varying the rows is what makes covariate-dependent parameters
+possible. Continuous, all-parametric models only.
+
+@snippet inference.cpp per-row
+
+*/

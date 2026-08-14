@@ -32,6 +32,10 @@ if(VINECOPULIB_BUILD_BENCHMARKS)
     add_subdirectory(benchmarks)
 endif()
 
+if(VINECOPULIB_BUILD_DOC)
+    add_subdirectory(docs/snippets)
+endif()
+
 # Related to exports for linux/mac and code coverage
 ####
 # Installation

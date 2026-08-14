@@ -158,6 +158,13 @@ public:
   // Stats methods
   Eigen::VectorXd pdf(Eigen::MatrixXd u, const size_t num_threads = 1) const;
 
+  //! @brief The density together with the per-edge quantities computed on the
+  //! way, as returned by `pdf_full()`.
+  //!
+  //! The triangular arrays are indexed `(tree, edge)`. `_sub` holds the
+  //! h-functions of the second ("sub") argument needed for discrete variables.
+  //! The derivative routines take these as input rather than recomputing the
+  //! h-function cascade.
   struct PdfWithHfuncsResult
   {
     Eigen::VectorXd pdf;
@@ -267,6 +274,13 @@ public:
 
   std::string str(const std::vector<size_t>& trees = {}) const;
 
+  //! @brief The scores together with the per-edge quantities computed on the
+  //! way, as returned by `scores_full()`.
+  //!
+  //! `scores` is \f$ n \times p \f$ with columns in `(tree, edge, parameter)`
+  //! order. The remaining members are indexed `(tree, edge)` and hold the
+  //! pair-copula densities and the derivatives of the log-density and
+  //! h-functions with respect to the parameters and the arguments.
   struct ScoresResult
   {
     Eigen::MatrixXd scores;

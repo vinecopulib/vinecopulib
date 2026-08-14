@@ -164,6 +164,12 @@ Bicop::to_file(const std::string& filename) const
   tools_serialization::json_to_file(filename, to_json());
 }
 
+//! @name Stats methods
+//!
+//! @details These evaluate the copula at the object's stored parameters. See
+//! below for the overloads taking one parameter set per row.
+//! @{
+
 //! @brief Evaluates the copula density.
 //!
 //! @details The copula density is defined as joint density divided by marginal
@@ -391,6 +397,7 @@ Bicop::finalize_conditional(Eigen::VectorXd value, bool complement)
   return value;
 }
 
+//! @cond INTERNAL
 inline BicopView::BicopView(const Bicop& bicop, bool flipped, bool continuous)
   : bicop_(&bicop)
   , flipped_(flipped)
@@ -448,6 +455,7 @@ BicopView::swap_arguments(const Eigen::MatrixXd& u)
     swapped.col(2).swap(swapped.col(3));
   return swapped;
 }
+//! @endcond
 //! @}
 
 //! @name Stats methods with per-row parameters
@@ -459,15 +467,15 @@ BicopView::swap_arguments(const Eigen::MatrixXd& u)
 //! parametric families only (nonparametric families store an interpolation
 //! grid rather than a per-observation parameter vector).
 //!
-//! @param u An \f$ n \times (2 + k) \f$ matrix of observations (see the
+//! Common arguments:
+//!
+//! - `u`: an \f$ n \times (2 + k) \f$ matrix of observations (see the
 //!   single-argument overloads for the layout with discrete variables).
-//! @param parameters An \f$ n \times p \f$ matrix of parameters, where `p` is
-//!   the number of family parameters (`get_parameters().size()`) and row `i`
-//!   holds the parameter set used for row `i` of `u`. Parameters are given in
-//!   the family's natural (unrotated) parameterization, as for
-//!   `get_parameters()`.
-//! @param num_threads The number of threads to parallelize the evaluation over
-//!   rows.
+//! - `parameters`: an \f$ n \times p \f$ matrix, where `p` is the number of
+//!   family parameters (`get_parameters().size()`) and row `i` holds the
+//!   parameter set used for row `i` of `u`. Parameters are given in the
+//!   family's natural (unrotated) parameterization, as for `get_parameters()`.
+//! - `num_threads`: the number of threads to parallelize over rows.
 //! @{
 
 //! @brief Evaluates the copula density with per-row parameters.
@@ -641,10 +649,9 @@ Bicop::loglik(const Eigen::MatrixXd& u,
 //! parameter set per row of `u` (see the corresponding `pdf()` overload for
 //! the layout and validation rules).
 //!
-//! @param u An \f$ n \times 2 \f$ matrix of observations contained in
-//!   \f$ (0, 1)^2 \f$.
-//! @param deriv The derivative selector.
-//! @return A length n vector of derivatives evaluated at `u`.
+//! Common arguments: `u` is an \f$ n \times 2 \f$ matrix of observations in
+//! \f$ (0, 1)^2 \f$ and `deriv` selects the derivative; each method returns a
+//! length-`n` vector evaluated at `u`.
 //! @{
 
 //! @brief Evaluates a first derivative of the copula density.
@@ -1132,8 +1139,8 @@ assemble_hessian_full(
 //! row of `u` (see the corresponding `pdf()` overload for the layout and
 //! validation rules).
 //!
-//! @param u An \f$ n \times 2 \f$ matrix of observations contained in
-//!   \f$ (0, 1)^2 \f$.
+//! In every method here, `u` is an \f$ n \times 2 \f$ matrix of observations
+//! in \f$ (0, 1)^2 \f$.
 //! @{
 
 //! @brief Evaluates the per-observation scores.
@@ -1611,7 +1618,7 @@ Bicop::bic(const Eigen::MatrixXd& u) const
 //!
 //! @details The mBIC is defined as
 //! \f[ \mathrm{BIC} = -2\, \mathrm{loglik} +  p \log(n) - 2 (I \log(\psi_0) + (1 - I) \log(1 - \psi_0), \f]
-//! where \f$ \mathrm{loglik} \f$ is the \log-liklihood
+//! where \f$ \mathrm{loglik} \f$ is the log-likelihood
 //! (see `Bicop::loglik()`), \f$ p \f$ is the (effective) number of parameters of the
 //! model, and \f$ \psi_0 \f$ is the prior probability of having a
 //! non-independence copula and \f$ I \f$ is an indicator for the family being
@@ -1926,8 +1933,6 @@ Bicop::set_parameters(const Eigen::MatrixXd& parameters)
 }
 
 //! @brief Sets variable types.
-//! @param var_types A vector of size two specifying the types of the variables,
-//!   e.g., `{"c", "d"}` means first variable continuous, second discrete.
 inline void
 Bicop::set_var_types(const std::vector<std::string>& var_types)
 {

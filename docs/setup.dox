@@ -10,7 +10,7 @@
     - [Using a system install](#include-install)
     - [In a CMake project](#include-cmake)
 
-@section Requirements
+@section requirements Requirements
 
 To build the library, you'll need at minimum:
 
@@ -37,13 +37,13 @@ cmake --build wdm\build --config Release --target install
 ```
 
 Optionally, you'll need:
-   - [Doxygen](http://www.stack.nl/~dimitri/doxygen/) and [graphviz](https://www.graphviz.org/) (to build the documentations)
+   - [Doxygen](https://www.doxygen.nl/) and [graphviz](https://www.graphviz.org/) (to build the documentations)
    - [R](https://www.r-project.org/about.html) and [VineCopula](https://github.com/tnagler/VineCopula) (to run the unit tests)
 
 Note that:
 
-   - The [C++11 thread support library](http://en.cppreference.com/w/cpp/thread),
-   available along with any C++11 compiler on
+   - The [C++ thread support library](https://en.cppreference.com/w/cpp/thread),
+   available along with any C++17 compiler on
    OSX/Windows/most-linux-distributions, is used for multithreading.
    - A `findR.cmake` looks for R and VineCopula in the default locations for
    linux and osx, but problems might occur with versions installed from
@@ -101,6 +101,24 @@ Additionally, a `Debug` mode is available via
 `-DVINECOPULIB_STRICT_COMPILER=ON`.
 Finally, note that using `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` is useful if
 one is interested in using autocomplete or linting when working with the library.
+
+The full set of options:
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `VINECOPULIB_PRECOMPILED` | `OFF` | Compile a real library instead of the header-only `INTERFACE` target. |
+| `BUILD_TESTING` | `ON` | Build the test suite. |
+| `VINECOPULIB_R_PARITY_TESTS` | `ON` iff `Rscript` is found | Cross-check results against the VineCopula R package. Needs **VineCopula >= 2.6.2 from GitHub, not CRAN**; the tests skip when off. |
+| `VINECOPULIB_SANITIZERS` | `OFF` | Add `-fsanitize=address,undefined` to Debug builds. |
+| `VINECOPULIB_CODE_COVERAGE` | `OFF` | Add `--coverage` (Debug, non-Windows). |
+| `VINECOPULIB_STRICT_COMPILER` | `OFF` | GCC: `-Werror` plus a long list of `-W...` flags. |
+| `VINECOPULIB_NATIVE_ARCH` | `OFF` | Optimize for the build machine's CPU. The result is **not redistributable**. |
+| `VINECOPULIB_BUILD_BENCHMARKS` | `OFF` | Build the google/benchmark suite and the parity harness. |
+| `VINECOPULIB_BUILD_DOC` | `OFF` | Add the Doxygen `doc` target and compile the documentation snippets. |
+
+`CMakePresets.json` bundles the usual combinations, so
+`cmake --preset dev` (Debug, sanitizers, strict) or `cmake --preset bench`
+saves spelling them out; `cmake --list-presets` shows them all.
 
 On Windows, CMake will generate Visual Studio files instead of Makefiles,
 the following sequence of commands can be used to perform compilation using the command prompt:
@@ -187,7 +205,7 @@ could then be:
 add_executable(main main.cpp)
 
 # Link to vinecopulib
-target_link_libraries(main ${VINECOPULIB_LIBRARIES})
+target_link_libraries(main vinecopulib::vinecopulib)
 ```
 
 **/

@@ -880,7 +880,6 @@ Vinecop::get_matrix() const
 }
 
 //! @brief Gets the above diagonal coefficients of the vine copula model.
-//! @param natural_order Whether indices correspond to natural order.
 inline TriangularArray<size_t>
 Vinecop::get_struct_array(bool natural_order) const
 {
@@ -994,8 +993,6 @@ Vinecop::get_threshold() const
 }
 
 //! @brief Sets variable types.
-//! @param var_types A vector specifying the types of the variables,
-//!   e.g., `{"c", "d"}` means first varible continuous, second discrete.
 inline void
 Vinecop::set_var_types(const std::vector<std::string>& var_types)
 {
@@ -1004,8 +1001,6 @@ Vinecop::set_var_types(const std::vector<std::string>& var_types)
 }
 
 //! @brief Sets all pair-copulas.
-//! @param pair_copulas A vector of pair-copulas that has to be consistent with
-//!     the current structure (see `Vinecop()`).
 inline void
 Vinecop::set_all_pair_copulas(
   const std::vector<std::vector<Bicop>>& pair_copulas)

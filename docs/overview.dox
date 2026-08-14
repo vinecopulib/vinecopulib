@@ -1,13 +1,19 @@
 /** @page overview Overview
 
-- [Bivariate copulas models](overview-bicop.html)
+- [Bivariate copula models](overview-bicop.html)
 - [Vine copula models](overview-vinecop.html)
+- [Discrete variables](discrete.html)
+- [Conditional simulation](conditional.html)
+- [Scores, gradients and Hessians](inference.html)
 
-In all examples, it is assumed that
-`using namespace vinecopulib;` is used. While the namespace `vinecopulib`
-contains the most important functionalities described below, there are a two
-others that are available to the user:
--  `bicop_families`: convenience definitions of sets of bivariate copula families
--  `tools_stats`: utilities for statistical analysis
+All examples assume `using namespace vinecopulib;`. Each one is an excerpt of a
+complete program under `docs/snippets/`, compiled and run as part of the
+documentation build.
+
+While the namespace `vinecopulib` contains the most important functionality,
+two others are meant for direct use:
+- `bicop_families`: convenience definitions of sets of bivariate copula families,
+- `tools_stats`: utilities for statistical analysis, including `to_pseudo_obs()`
+  and the quasi-random generators behind `simulate_uniform()`.
 
 */
