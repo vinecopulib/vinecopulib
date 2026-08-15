@@ -858,12 +858,48 @@ TEST(VinecopConditionalSimulation, custom_set_validates_inputs)
     u_cond, std::vector<size_t>{ 1, 1 }, false, 1, { 1 }));
   EXPECT_ANY_THROW(model.simulate_conditional(
     u_cond, std::vector<size_t>{ 1, 3 }, false, 1, { 1 }));
-  EXPECT_ANY_THROW(
+  try {
     model.simulate_conditional(Eigen::MatrixXd::Constant(3, 1, 0.5),
                                std::vector<size_t>{ 1, 2 },
                                false,
                                1,
-                               { 1 }));
+                               { 1 });
+    FAIL() << "expected invalid conditional column count to throw";
+  } catch (const std::runtime_error& error) {
+    EXPECT_EQ(error.what(),
+              std::string("u_cond has wrong number of columns; expected: 2 "
+                          "(n x k continuous layout), actual: 1."));
+  }
+
+  model.set_var_types({ "d", "c", "c", "c" });
+  try {
+    model.simulate_conditional(Eigen::MatrixXd::Constant(3, 2, 0.5),
+                               std::vector<size_t>{ 1, 2 },
+                               false,
+                               1,
+                               { 1 });
+    FAIL() << "expected invalid discrete conditional column count to throw";
+  } catch (const std::runtime_error& error) {
+    EXPECT_EQ(error.what(),
+              std::string("u_cond has wrong number of columns; expected: 4 "
+                          "(n x 2k expanded layout) or 3 (n x (k + k_d) "
+                          "compact layout), actual: 2."));
+  }
+
+  model.set_var_types({ "d", "d", "c", "c" });
+  try {
+    model.simulate_conditional(Eigen::MatrixXd::Constant(3, 3, 0.5),
+                               std::vector<size_t>{ 1, 2 },
+                               false,
+                               1,
+                               { 1 });
+    FAIL() << "expected missing discrete conditional column to throw";
+  } catch (const std::runtime_error& error) {
+    EXPECT_EQ(error.what(),
+              std::string("u_cond has wrong number of columns; expected: 4 "
+                          "(n x 2k expanded or n x (k + k_d) compact layout), "
+                          "actual: 3."));
+  }
 }
 
 TEST_F(VinecopTest, simulate_conditional_throws)

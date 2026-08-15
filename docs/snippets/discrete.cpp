@@ -29,7 +29,7 @@ void
 snippet_bicop_discrete()
 {
   //! [bicop]
-  // The preferred layout has two full blocks: F(x), followed by F(x-).
+  // A discrete model uses an F(x) block followed by an F(x-) block.
   auto continuous = tools_stats::simulate_uniform(500, 2, false, { 1 });
   auto disc = discretize(continuous.col(0), 5);
 
@@ -57,7 +57,7 @@ void
 snippet_vinecop_discrete()
 {
   //! [vinecop]
-  // Same convention for vines: the expanded layout has 2d columns.
+  // Same convention for vines: discrete data uses two d-column blocks.
   size_t d = 4;
   auto continuous = tools_stats::simulate_uniform(500, d, false, { 2 });
   auto disc0 = discretize(continuous.col(0), 4);

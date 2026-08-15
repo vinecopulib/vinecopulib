@@ -90,9 +90,39 @@ TEST(bicop_sanity_checks, catches_data_dim)
 {
   Bicop bicop;
   auto u = tools_stats::simulate_uniform(10, 3, false, { 1 });
-  EXPECT_ANY_THROW(bicop.select(u));
+  try {
+    bicop.select(u);
+    FAIL() << "expected invalid column count to throw";
+  } catch (const std::runtime_error& error) {
+    EXPECT_EQ(error.what(),
+              std::string("data has wrong number of columns; expected: 2 "
+                          "(n x 2 continuous layout), actual: 3 (model "
+                          "contains no discrete variables)."));
+  }
+
+  bicop.set_var_types({ "d", "c" });
+  auto u_continuous_shape = tools_stats::simulate_uniform(10, 2, false, { 2 });
+  try {
+    bicop.select(u_continuous_shape);
+    FAIL() << "expected missing discrete left-limit column to throw";
+  } catch (const std::runtime_error& error) {
+    EXPECT_EQ(error.what(),
+              std::string("data has wrong number of columns; expected: 4 "
+                          "(n x 4 expanded layout) or 3 (n x (2 + k) compact "
+                          "layout), actual: 2 (model contains 1 discrete "
+                          "variable)."));
+  }
+
   bicop.set_var_types({ "d", "d" });
-  EXPECT_ANY_THROW(bicop.select(u));
+  try {
+    bicop.select(u);
+    FAIL() << "expected invalid discrete column count to throw";
+  } catch (const std::runtime_error& error) {
+    EXPECT_EQ(error.what(),
+              std::string("data has wrong number of columns; expected: 4 "
+                          "(n x 4 expanded or n x (2 + k) compact layout), "
+                          "actual: 3 (model contains 2 discrete variables)."));
+  }
 }
 
 TEST(bicop_sanity_checks, catches_not_fitted_to_data)

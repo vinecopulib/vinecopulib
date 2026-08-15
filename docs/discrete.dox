@@ -13,22 +13,23 @@ that scale has atoms: the model needs both \f$ F(x) \f$ and the left limit
 
 @section discrete-layout The data layout
 
-Every data-taking method accepts two equivalent conventions. The preferred
-expanded layout has \f$ 2d \f$ columns:
+For an all-continuous model, every data-taking method uses the usual
+\f$ n \times d \f$ matrix: its `d` columns contain \f$ F(x) \f$ in the
+model's variable order. In particular, `Bicop` methods take an
+\f$ n \times 2 \f$ matrix by default.
 
-- the first `d` columns hold \f$ F(x) \f$ for every variable, in the model's
-  variable order;
-- the next `d` columns hold \f$ F(x^-) \f$ in the same order.
+Extra columns are needed only when variables are discrete. In that case, the
+expanded layout has \f$ 2d \f$ columns: its first `d` columns hold
+\f$ F(x) \f$ and its next `d` columns hold \f$ F(x^-) \f$ in the same order.
 
 For continuous variables \f$ F(x^-) = F(x) \f$, so their columns in the second
-block duplicate the corresponding columns in the first block. These duplicate
-columns may be omitted: if `k` of the `d` variables are discrete, the compact
-layout has \f$ d + k \f$ columns, with the `k` left-limits ordered by the
-positions of the discrete variables in the first block.
+block are duplicates. These duplicates may be omitted: if `k` of the `d`
+variables are discrete, the compact \f$ n \times (d + k) \f$ layout appends
+only their `k` left-limits, ordered by their positions in the first block.
 
-Both layouts are accepted throughout the library. The expanded layout is often
-more convenient for interfaces because its shape does not depend on
-`var_types`; the compact layout avoids storing duplicate continuous columns.
+Both discrete-data layouts are accepted throughout the library. The expanded
+layout has a fixed shape independent of `var_types`; the compact layout avoids
+storing duplicate continuous columns.
 
 @section discrete-bicop Bivariate copulas
 
