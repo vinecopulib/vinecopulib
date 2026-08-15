@@ -829,7 +829,10 @@ EXCLUDE_PATTERNS       = */tools_stats_sobol.hpp */tools_stats_ghalton.hpp
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = *relabel_one* \
+# A friend declaration reaches the XML even with EXTRACT_PRIVATE = NO, and the
+# m.css site build cannot parse one; BicopView is internal in any case.
+EXCLUDE_SYMBOLS        = *BicopView* \
+                         *relabel_one* \
                          *relabel_elements* \
                          *BicopPtr* \
                          *ace* \
