@@ -1,0 +1,45 @@
+name: 'Build the website'
+description: >
+  Renders the Doxygen XML of an already-configured build tree into the m.css
+  site. Leaves the result in <build_dir>/docs.
+inputs:
+  build_dir:
+    description: 'Build tree configured with VINECOPULIB_BUILD_DOC=ON'
+    required: false
+    default: 'build-docs'
+  mcss_ref:
+    description: 'm.css commit to render with'
+    required: false
+    default: '0a460a7a9973a41db48f735e7b49e4da9a876325'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install the site toolchain
+      shell: bash
+      run: |
+        python3 -m pip install --disable-pip-version-check jinja2 Pygments
+        # m.css renders \f$...\f$ math to SVG through LaTeX, so the TeX packages
+        # are a hard requirement; --no-install-recommends drops font metrics
+        # that dvisvgm then cannot resolve.
+        sudo apt-get update
+        sudo apt-get install -y \
+          texlive-latex-recommended texlive-latex-extra \
+          texlive-fonts-recommended texlive-fonts-extra \
+          preview-latex-style dvisvgm
+
+    - name: Check out m.css
+      uses: actions/checkout@v7
+      with:
+        repository: mosra/m.css
+        ref: ${{ inputs.mcss_ref }}
+        path: m.css
+
+    - name: Render the site
+      shell: bash
+      run: |
+        cd "${{ inputs.build_dir }}"
+        # doxygen.py runs Doxygen itself, so starting from an empty output
+        # directory keeps the site free of whatever the `doc` target left there.
+        rm -rf docs
+        python3 "$GITHUB_WORKSPACE/m.css/documentation/doxygen.py" Doxyfile-mcss
+        test -f docs/index.html
