@@ -209,6 +209,10 @@ wrong thing.
   variables, conditional simulation, and scores and Hessians. Doxygen runs with
   `WARN_AS_ERROR`
 
+* Publish the website from CI. Every pull request renders the m.css site and
+  uploads it as an artifact, and a `v*` tag commits it to `gh-pages`, so the
+  published documentation can no longer lag the code (#731)
+
 * Document where the Kendall's tau maps apply. `tau_to_parameters` is available
   only for the one-parameter families in `bicop_families::itau`, notably not for
   `student` (#723)

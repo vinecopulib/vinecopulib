@@ -76,12 +76,14 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-debug/
-release/
+# Anchored: build trees live at the root, and unanchored patterns silently
+# swallow paths such as .github/actions/build-site/.
+/debug/
+/release/
+/build*/
 
 .claude/settings.local.json
 .claude/*.local.json
-build*/
 
 # generated benchmark & parity-comparison artifacts (see scripts/bench_baseline.sh
 # and scripts/compare_parity.py); tracked JSON such as scripts/parity_gates.json
