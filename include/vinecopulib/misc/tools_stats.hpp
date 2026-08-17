@@ -172,9 +172,6 @@ pairwise_mcor(const Eigen::MatrixXd& x,
               const Eigen::VectorXd& weights = Eigen::VectorXd());
 
 Eigen::MatrixXd
-dependence_matrix(const Eigen::MatrixXd& x, const std::string& measure);
-
-Eigen::MatrixXd
 ghalton(const size_t& n,
         const size_t& d,
         const std::vector<int>& seeds = std::vector<int>());

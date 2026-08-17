@@ -93,6 +93,26 @@ TEST(vinecop_sanity_checks, controls_print)
 {
   auto controls = FitControlsVinecop();
   EXPECT_NO_THROW(controls.str());
+
+  // Each flag has to report itself. The two "Select ..." lines are adjacent
+  // and otherwise identical, so one reading the other's getter still prints
+  // something plausible.
+  auto reports = [](const FitControlsVinecop& c, const std::string& label) {
+    const auto str = c.str();
+    const auto at = str.find(label + ": ");
+    EXPECT_NE(at, std::string::npos) << label << " missing from str()";
+    return str.substr(at + label.size() + 2, 3) == "yes";
+  };
+
+  controls.set_select_trunc_lvl(true);
+  controls.set_select_threshold(false);
+  EXPECT_TRUE(reports(controls, "Select truncation level"));
+  EXPECT_FALSE(reports(controls, "Select threshold"));
+
+  controls.set_select_trunc_lvl(false);
+  controls.set_select_threshold(true);
+  EXPECT_FALSE(reports(controls, "Select truncation level"));
+  EXPECT_TRUE(reports(controls, "Select threshold"));
 }
 
 TEST(vinecop_sanity_checks, fit_controls_config_works)
