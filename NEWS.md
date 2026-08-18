@@ -146,6 +146,12 @@ wrong thing.
 
 ### BUG FIXES
 
+* Report `select_threshold` rather than `select_trunc_lvl` on the
+  "Select threshold" line of `FitControlsVinecop::str()` (#735)
+
+* Remove the declaration of `tools_stats::dependence_matrix`, which had no
+  definition anywhere in the library, so any call to it failed to link (#735)
+
 * Treat omitted pair-copulas as implicit independence during evaluation of a
   `Vinecop` constructed from a full structure, preventing conditional
   simulation from accessing an empty pair-copula store (#729)

@@ -504,7 +504,7 @@ FitControlsVinecop::str() const
                                                                   : "no")
                << std::endl;
   controls_str << "Select threshold: "
-               << static_cast<std::string>(get_select_trunc_lvl() ? "yes"
+               << static_cast<std::string>(get_select_threshold() ? "yes"
                                                                   : "no")
                << std::endl;
   controls_str << "Select families: "
