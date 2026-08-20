@@ -14,10 +14,11 @@
 // It is a study, not a regression test: run it when changing the
 // normalization scheme, its iteration bound, or the knot clamp.
 //
-// Sections A-D read the grid a `tll` fit stores, i.e. after normalization.
-// To see instead how each arm behaves on the raw local-likelihood surface --
-// which is what the shipped scheme actually faces, and where the arms differ
-// most -- pass `norm_times = 0` where `TllBicop::fit` builds the grid
+// The arms are measured from the grid a `tll` fit stores, pushed back off the
+// uniform-margin manifold by a row and column rescaling: the same scaling
+// class, hence the same limit, but the same amount of work to reach it as the
+// raw local-likelihood surface. To measure that surface itself, pass
+// `norm_maxiter = 0` where `TllBicop::fit` builds the grid
 // (`bicop/implementation/tll.ipp`), rebuild, and run again.
 //
 // Every arm is a positive row/column rescaling, so all of them stay in one
@@ -366,6 +367,22 @@ sim(BicopFamily family, double par, size_t n, int seed)
   return bc.simulate(n, false, { seed });
 }
 
+//! Rescales a grid off the uniform-margin manifold, so the arms face the work
+//! the raw local-likelihood surface would give them. Any positive row/column
+//! rescaling leaves the doubly stochastic limit unchanged.
+Eigen::MatrixXd
+unnormalize(Eigen::MatrixXd v)
+{
+  const ptrdiff_t m = v.rows();
+  Eigen::VectorXd s(m);
+  for (ptrdiff_t i = 0; i < m; ++i) {
+    s(i) = std::exp(std::sin(3.0 * static_cast<double>(i)));
+  }
+  v.array().colwise() *= s.array();
+  v.array().rowwise() *= s.transpose().array();
+  return v;
+}
+
 //! the grid a `tll` fit stores, i.e. after the shipped normalization
 Eigen::MatrixXd
 fitted_grid(const Case& cs, int seed, bool swap_args)
@@ -447,34 +464,36 @@ validate()
     ok = ok && (d < 1e-15);
   }
 
-  // the sweep itself, exactly: this validates the weights, the trapezoid
-  // rule, the row-then-column order and the guard at once
+  // the shipped iteration, exactly: this validates the weights, the trapezoid
+  // rule, the averaging and the guard at once
   {
+    const Eigen::MatrixXd raw = unnormalize(v3);
     double worst = 0.0;
     for (int k : { 1, 2, 3, 5 }) {
-      InterpolationGrid ig(g, v3, 0);
-      ig.set_values(v3, k);
-      Eigen::MatrixXd mine = v3;
+      InterpolationGrid ig(g, raw, 0);
+      ig.set_values(raw, k);
+      Eigen::MatrixXd mine = raw;
       for (int i = 0; i < k; ++i)
-        step_alt(mine, w);
+        step_altsym(mine, w);
       worst = std::max(worst,
                        ((mine - ig.get_values()).array().abs() /
                         ig.get_values().array().abs().max(1e-300))
                          .maxCoeff());
     }
-    std::cout << "   `alt` reproduces set_values(V, k) max rel = " << worst
-              << (worst < 1e-14 ? "   ok\n" : "   MISMATCH\n");
-    ok = ok && (worst < 1e-14);
+    std::cout << "   `altsym` reproduces set_values(V, k) max rel = " << worst
+              << (worst < 1e-13 ? "   ok\n" : "   MISMATCH\n");
+    ok = ok && (worst < 1e-13);
   }
 
   // the sweep map is memoryless, which licenses starting every arm from the
   // grid the library already normalized three times
   {
+    const Eigen::MatrixXd raw = unnormalize(v3);
     double worst = 0.0;
     for (int k : { 2, 7, 22 }) {
-      InterpolationGrid a(g, v3, 0), b(g, v3, 0);
-      a.set_values(v3, 3 + k);
-      b.set_values(v3, 3);
+      InterpolationGrid a(g, raw, 0), b(g, raw, 0);
+      a.set_values(raw, 3 + k);
+      b.set_values(raw, 3);
       const Eigen::MatrixXd mid = b.get_values();
       b.set_values(mid, k);
       worst = std::max(
@@ -536,12 +555,13 @@ validate()
 void
 section_a()
 {
-  std::cout << "== A. where the shipped three sweeps land\n\n"
-            << "   R1 = max_i |int c(., u_i) du - 1| (first argument, the "
-               "margin the\n"
-            << "   shipped sweep leaves last), R2 the same for the second. "
-               "asym is\n"
-            << "   max |N(V)' - N(V')| / max |N(V)| on the fitted grid.\n\n";
+  std::cout << "== A. residual and asymmetry after three passes\n\n"
+            << "   R1 = max_i |int c(., u_i) du - 1| (first argument), R2 "
+               "the same for\n"
+            << "   the second, both after three `alt` passes -- which is what "
+               "used to\n"
+            << "   ship, and why R2 is exact. asym is\n"
+            << "   max |N(V)' - N(V')| / max |N(V)| after three passes.\n\n";
   std::cout << std::left << std::setw(26) << "case" << std::right
             << std::setw(12) << "R1" << std::setw(12) << "R2" << std::setw(12)
             << "asym(alt)" << std::setw(12) << "asym(altsym)"
@@ -553,13 +573,14 @@ section_a()
   for (const auto& cs : study_cases()) {
     const Eigen::VectorXd g = grid_points(cs.m);
     const Eigen::VectorXd w = trapezoid_weights(g);
-    const Eigen::MatrixXd v3 = fitted_grid(cs, 11, false);
-    const Residual r = residual(v3, w);
-    // the asymmetry the three shipped sweeps introduce, measured from the
-    // raw grid's stand-in: undo nothing, just compare the two orderings
-    Eigen::MatrixXd raw = v3;
-    const double a_alt = asymmetry(arms[0], raw, w, 3);
-    const double a_as = asymmetry(arms[1], raw, w, 3);
+    const Eigen::MatrixXd v3 = unnormalize(fitted_grid(cs, 11, false));
+    Eigen::MatrixXd after_alt = v3;
+    for (int k = 0; k < 3; ++k) {
+      step_alt(after_alt, w);
+    }
+    const Residual r = residual(after_alt, w);
+    const double a_alt = asymmetry(arms[0], v3, w, 3);
+    const double a_as = asymmetry(arms[1], v3, w, 3);
     std::cout << std::left << std::setw(26) << cs.label << std::right
               << std::setw(12) << r.r1 << std::setw(12) << r.r2 << std::setw(12)
               << a_alt << std::setw(12) << a_as << "\n";
@@ -583,7 +604,7 @@ section_b()
         cs.label.find("m=50") != std::string::npos)
       continue;
     const Eigen::VectorXd w = trapezoid_weights(grid_points(cs.m));
-    const Eigen::MatrixXd v3 = fitted_grid(cs, 11, false);
+    const Eigen::MatrixXd v3 = unnormalize(fitted_grid(cs, 11, false));
     std::cout << cs.label << "  (residual at k=0 is " << residual(v3, w).worst()
               << ")\n";
     std::cout << std::left << std::setw(14) << "  arm" << std::right;
@@ -611,7 +632,11 @@ section_c()
   std::cout << "== C. iterations to tolerance, and time, from the fitted "
                "grid\n\n"
             << "   ns/iter is measured on the m of the case; the cap is "
-               "250.\n\n";
+               "250. These are\n"
+            << "   reference implementations, so they allocate where the "
+               "shipped one does\n"
+            << "   not -- compare iteration counts, and take timings as "
+               "relative.\n\n";
   const auto arms = all_arms();
   std::cout << std::left << std::setw(26) << "case" << std::setw(14) << "arm"
             << std::right << std::setw(9) << "k(1e-8)" << std::setw(9)
@@ -622,7 +647,7 @@ section_c()
 
   for (const auto& cs : study_cases()) {
     const Eigen::VectorXd w = trapezoid_weights(grid_points(cs.m));
-    const Eigen::MatrixXd v3 = fitted_grid(cs, 11, false);
+    const Eigen::MatrixXd v3 = unnormalize(fitted_grid(cs, 11, false));
     for (const auto& arm : arms) {
       int k8 = 0, k10 = 0, k12 = 0;
       {
@@ -756,7 +781,7 @@ section_e()
                "(section 0), so this\n"
             << "   is about the iteration count, not the scheme.\n\n";
   std::cout << std::left << std::setw(12) << "rho" << std::right
-            << std::setw(14) << "ISE(alt x3)" << std::setw(12) << "x5"
+            << std::setw(14) << "ISE(x3)" << std::setw(12) << "x5"
             << std::setw(12) << "x10" << std::setw(12) << "x25" << std::setw(12)
             << "converged"
             << "\n";
@@ -792,11 +817,12 @@ section_e()
       Bicop bc(BicopFamily::tll);
       bc.fit(u, controls);
       const Eigen::MatrixXd v3 = bc.get_parameters();
-      const std::vector<int> extra = { 0, 2, 7, 22, 500 };
+      const Eigen::MatrixXd raw = unnormalize(v3);
+      const std::vector<int> extra = { 3, 5, 10, 25, 500 };
       for (size_t s = 0; s < extra.size(); ++s) {
-        Eigen::MatrixXd v = v3;
+        Eigen::MatrixXd v = raw;
         for (int k = 0; k < extra[s]; ++k)
-          step_alt(v, w);
+          step_altsym(v, w);
         const Eigen::MatrixXd d = (v - truth).array().square();
         ise[s] += w.transpose() * d * w;
       }
