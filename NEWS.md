@@ -157,7 +157,7 @@ wrong thing.
   that does not cover the structure array is an error instead of a read past its
   end. `Vinecop::fit` no longer returns silently when the model has no pair
   copulas to fit; a vine whose structure is truncated at zero now records the
-  independence fit (`loglik` 0) rather than staying unfitted (#748)
+  independence fit (`loglik` 0) rather than staying unfitted (#752)
 
 * Read an empty pair-copula store as independence in the paths that still
   assumed a full one, completing (#729). `Vinecop::reorient` and `get_trees`
