@@ -64,6 +64,10 @@ wrong thing.
 
 ### BEHAVIOR CHANGES
 
+* `Vinecop::fit` throws when the model has no pair copulas to fit, rather than
+  returning and leaving it unfitted, and a model whose structure is truncated at
+  zero records the independence fit (`loglik` 0) instead; see BUG FIXES (#752)
+
 * Every discrete or mixed fit with a nonparametric (`tll`) pair copula changes:
   the fitted grid, density, `loglik`, `aic`, `bic` and `mbicv` all move, so
   family and structure selection can differ. `tll` is the default family, so
