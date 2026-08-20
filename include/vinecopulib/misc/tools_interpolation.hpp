@@ -49,14 +49,7 @@ private:
   // normalizes the grid margins; internal only (callers must refresh the
   // cached integrals afterwards, as the ctor and set_values do)
   void normalize_margins(int max_iter);
-  // trapezoid weights of `grid_points_`: `row_integrals(v, w)` integrates the
-  // piecewise linear function through (grid_points_, v) over [0, 1]
-  Eigen::VectorXd trapezoid_weights() const;
-  // integral of every row of `v`. Column integrals are the row integrals of
-  // the transpose, so both margins come out of this one routine -- which is
-  // what makes `normalize_margins` commute with transposition to the last bit
-  static Eigen::VectorXd row_integrals(const Eigen::MatrixXd& v,
-                                       const Eigen::VectorXd& w);
+  void update_weights();
   Eigen::Matrix<ptrdiff_t, 1, 2> get_indices(double x0, double x1);
   ptrdiff_t binary_search(double x);
   ptrdiff_t find_cell(double x) const;
@@ -83,6 +76,10 @@ private:
   // bucket acceleration table for cell searches; built once (the grid is
   // immutable after construction)
   std::vector<ptrdiff_t> cell_lookup_;
+  // trapezoid weights of `grid_points_`, so that `weights_.dot(v)` integrates
+  // the piecewise linear function through (grid_points_, v) over [0, 1];
+  // built once alongside `cell_lookup_`
+  Eigen::VectorXd weights_;
   // cumulative row integrals R(k, j) = int_0^{grid_j} values_(k, .);
   // refreshed eagerly whenever values_ changes (lazy caching would race
   // when a shared grid is evaluated from multiple threads)
