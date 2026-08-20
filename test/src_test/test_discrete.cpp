@@ -107,7 +107,9 @@ TEST(zero_inflated, bicop)
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
     // tll
-    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
+    // The whole sample, not topRows(20): now that the latent sample
+    // reaches the fit, 20 observations no longer identify the density.
+    bc.select(uu, FitControlsBicop({ BicopFamily::tll }));
     EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
 
     // c_d
@@ -124,7 +126,9 @@ TEST(zero_inflated, bicop)
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
               bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
     // tll
-    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
+    // The whole sample, not topRows(20): now that the latent sample
+    // reaches the fit, 20 observations no longer identify the density.
+    bc.select(uu, FitControlsBicop({ BicopFamily::tll }));
     EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
 
     // d_d
@@ -139,7 +143,9 @@ TEST(zero_inflated, bicop)
     bc.select(uu.topRows(20)); // all families
 
     // tll
-    bc.select(uu.topRows(20), FitControlsBicop({ BicopFamily::tll }));
+    // The whole sample, not topRows(20): now that the latent sample
+    // reaches the fit, 20 observations no longer identify the density.
+    bc.select(uu, FitControlsBicop({ BicopFamily::tll }));
     EXPECT_NEAR(bc.parameters_to_tau(bc.get_parameters()), tau, 0.15);
   }
 }
@@ -399,6 +405,77 @@ TEST(discrete, edge_case_parameter_shapes)
   EXPECT_TRUE(pdf_tll.allFinite());
   EXPECT_NO_THROW(tll.hfunc1(u_disc));
   EXPECT_NO_THROW(tll.hfunc2(u_disc));
+}
+
+// A discrete/continuous density must satisfy, for every u2,
+//
+//     sum_atoms c(u1, u2) * (u1 - u1^-)  =  h2(1, u2) - h2(0, u2)  =  1,
+//
+// because the difference quotients telescope over the atoms. KernelBicop used
+// to override pdf / hfunc1 / hfunc2 and return the *continuous* density at the
+// atom midpoint instead, which violates this by up to 10% and does not converge
+// away as the atoms shrink. The parametric families satisfy it exactly, so the
+// same check is run on gaussian as a control.
+TEST(discrete, kernel_pdf_is_normalized)
+{
+  auto gauss =
+    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.6));
+  auto u = gauss.simulate(2000, true, { 7 });
+
+  // Fit continuously and declare the types afterwards, so this exercises the
+  // evaluation path alone and not the (separate) discrete fit.
+  auto tll = Bicop();
+  tll.select(u, FitControlsBicop({ BicopFamily::tll }));
+
+  for (const auto& family : { BicopFamily::tll, BicopFamily::gaussian }) {
+    auto bc = family == BicopFamily::tll ? tll : gauss;
+    bc.set_var_types({ "d", "c" });
+    for (size_t k : { 2, 8, 32 }) {
+      for (double u2 : { 0.1, 0.5, 0.9 }) {
+        Eigen::MatrixXd uu(k, 4);
+        for (size_t i = 0; i < k; ++i) {
+          uu(i, 0) = static_cast<double>(i + 1) / static_cast<double>(k);
+          uu(i, 2) = static_cast<double>(i) / static_cast<double>(k);
+          uu(i, 1) = u2;
+          uu(i, 3) = u2;
+        }
+        const auto pdf = bc.pdf(uu);
+        const double mass =
+          (pdf.array() * (uu.col(0) - uu.col(2)).array()).sum();
+        EXPECT_NEAR(mass, 1.0, 1e-6) << "family " << bc.get_family_name()
+                                     << ", k = " << k << ", u2 = " << u2;
+      }
+    }
+  }
+}
+
+// TllBicop::fit computes a latent sample for discrete data via
+// find_latent_sample. Its result used to be assigned to `psobs` and never fed
+// back into `z_data`, so the fitted grid was bit-identical to the one the same
+// data produces when declared continuous -- i.e. declaring a variable discrete
+// had no effect on the fit at all.
+TEST(discrete, kernel_fit_uses_the_latent_sample)
+{
+  auto gauss =
+    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.6));
+  auto u = gauss.simulate(2000, true, { 3 });
+
+  Eigen::MatrixXd u_disc(u.rows(), 4);
+  u_disc.col(0) = (u.col(0).array() * 5).ceil() / 5;
+  u_disc.col(2) = (u.col(0).array() * 5).floor() / 5;
+  u_disc.col(1) = (u.col(1).array() * 5).ceil() / 5;
+  u_disc.col(3) = (u.col(1).array() * 5).floor() / 5;
+
+  auto cont = Bicop();
+  cont.select(u_disc.leftCols(2), FitControlsBicop({ BicopFamily::tll }));
+
+  auto disc = Bicop();
+  disc.set_var_types({ "d", "d" });
+  disc.select(u_disc, FitControlsBicop({ BicopFamily::tll }));
+
+  const double diff =
+    (disc.get_parameters() - cont.get_parameters()).array().abs().maxCoeff();
+  EXPECT_GT(diff, 1e-6);
 }
 
 }
