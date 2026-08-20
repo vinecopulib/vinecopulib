@@ -6,6 +6,7 @@
 
 #include "helpers.hpp"
 #include <benchmark/benchmark.h>
+#include <cmath>
 #include <memory>
 #include <vector>
 #include <vinecopulib/misc/tools_interpolation.hpp>
@@ -23,16 +24,26 @@ make_grid_points(size_t m)
   return tools_stats::pnorm(z);
 }
 
-//! The density values of a real TLL fit, so that the normalization
-//! benchmarks see a realistic magnitude range rather than an all-ones grid.
+//! A real TLL fit at strong dependence, pushed back off the uniform-margin
+//! manifold by a row/column rescaling. Normalizing an already-normalized grid
+//! would measure the convergence test rather than the work, and strong
+//! dependence is what keeps the iteration from converging early.
 Eigen::MatrixXd
-fitted_values(size_t m)
+unnormalized_values(size_t m)
 {
   FitControlsBicop controls({ BicopFamily::tll });
   controls.set_nonparametric_grid_size(m);
+  Bicop gauss(BicopFamily::gaussian, 0, Eigen::MatrixXd::Constant(1, 1, 0.9));
   Bicop bc(BicopFamily::tll);
-  bc.fit(bench::sim_data(BicopFamily::gaussian, 0, 1000), controls);
-  return bc.get_parameters();
+  bc.fit(gauss.simulate(1000, false, { 5 }), controls);
+
+  Eigen::MatrixXd values = bc.get_parameters();
+  Eigen::VectorXd s(m);
+  for (size_t i = 0; i < m; ++i)
+    s(i) = std::exp(std::sin(3.0 * static_cast<double>(i)));
+  values.array().colwise() *= s.array();
+  values.array().rowwise() *= s.transpose().array();
+  return values;
 }
 
 //! Builds a grid mimicking a fitted TLL surface: pnorm of an equidistant
@@ -88,7 +99,7 @@ void
 register_normalize(size_t m, const std::vector<int>& norm_times)
 {
   auto grid_points = make_grid_points(m);
-  auto values = std::make_shared<const Eigen::MatrixXd>(fitted_values(m));
+  auto values = std::make_shared<const Eigen::MatrixXd>(unnormalized_values(m));
   auto grid = std::make_shared<tools_interpolation::InterpolationGrid>(
     grid_points, *values, 0);
 
