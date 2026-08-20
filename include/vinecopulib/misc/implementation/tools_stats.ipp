@@ -237,11 +237,32 @@ BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
   boxes_[k * K_ + j].insert(i);
 }
 
-// Recovers a (continuous) latent sample from a sample of a discrete copula by
-// treating it as an interval-censored density estimation problem.
-// @param u A matrix of samples.
-// @param b The bandwidth of the kernel density estimator.
-// @param niter The number of iterations.
+//! @brief Recovers a continuous latent sample from a sample of a discrete
+//! copula.
+//!
+//! Treats the discrete sample as an interval-censored density estimation
+//! problem: observation \f$ i \f$ is only known to lie in the rectangle
+//! \f$ (u_{i1}^-, u_{i1}] \times (u_{i2}^-, u_{i2}] \f$. A latent point is
+//! initialized inside that rectangle and then refined by `niter` sweeps: for
+//! each observation, one of the observations whose current latent point falls
+//! in its own rectangle (widened by \f$ b \f$ on the normal scale) is picked
+//! uniformly at random, and the latent point is set to that neighbor's value
+//! plus Gaussian noise of scale \f$ b \f$ --- a draw from a Gaussian kernel
+//! density estimate restricted to the compatible observations. The refined
+//! points are not confined to the original rectangles.
+//!
+//! The draw is deterministic: every random component is a quasi-random sequence
+//! with a fixed seed, so repeated calls on the same input agree bit for bit.
+//!
+//! @param u An \f$ n \times 4 \f$ matrix \f$ (u_1, u_2, u_1^-, u_2^-) \f$
+//! holding each observation's distribution function values and their left
+//! limits; any other number of columns throws.
+//! @param b The bandwidth of the kernel density estimator.
+//! @param niter The number of sweeps.
+//!
+//! @return An \f$ n \times 2 \f$ matrix of pseudo-observations of the latent
+//! sample, i.e. on the copula scale rather than the normal scale the sweeps run
+//! on.
 inline Eigen::MatrixXd
 find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
 {
