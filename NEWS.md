@@ -207,6 +207,13 @@ wrong thing.
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
+* Regenerate the precompiled translation units when the header they are derived
+  from changes. The `.ipp` to `.cpp` translation runs at configure time, and
+  `CONFIGURE_DEPENDS` on the glob only re-runs it when the set of files changes,
+  so editing a header in a `VINECOPULIB_PRECOMPILED` build tree silently linked
+  the previous implementation. A CI step now edits an `.ipp` and checks that its
+  translation unit follows (#753)
+
 * Modernize the CMake project: `GNUInstallDirs`, a namespaced export,
   `target_compile_features`, an architecture-independent version file,
   `CMakePresets.json`, and appended rather than assigned compiler flags, so
