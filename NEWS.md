@@ -64,6 +64,12 @@ wrong thing.
 
 ### BEHAVIOR CHANGES
 
+* Every discrete or mixed fit with a nonparametric (`tll`) pair copula changes:
+  the fitted grid, density, `loglik`, `aic`, `bic` and `mbicv` all move, so
+  family and structure selection can differ. `tll` is the default family, so
+  this is the default path for discrete data. Continuous fits are unaffected;
+  see BUG FIXES (#739)
+
 * TLL fits change near the boundary of the unit square: the endpoint clamping of
   the interpolation grid was removed, so every `tll` fit differs slightly from
   0.7.3 (#654)
@@ -145,6 +151,19 @@ wrong thing.
 * Exit structure selection early when the graph is already a tree (#661)
 
 ### BUG FIXES
+
+* Compute a real discrete density for kernel pair copulas. `KernelBicop`
+  overrode `pdf`, `hfunc1` and `hfunc2` to return the continuous quantity at the
+  atom midpoint, so the difference quotients in `AbstractBicop::pdf_c_d` /
+  `pdf_d_d` were unreachable. The midpoint rule violates
+  `sum_atoms c * (u1 - u1^-) = 1` by up to 10% without converging, reached 40%
+  per cell, and shifted a three-dimensional discrete vine's `loglik` by 6.5
+  (#739)
+
+* Use the latent sample when fitting a `tll` pair copula to discrete data.
+  `TllBicop::fit` assigned `find_latent_sample`'s result to `psobs` but fitted on
+  `z_data`, which was already built from the jittered ranks, so declaring a
+  variable discrete had no effect on the fitted grid at all (#736, #739)
 
 * Report `select_threshold` rather than `select_trunc_lvl` on the
   "Select threshold" line of `FitControlsVinecop::str()` (#735)
