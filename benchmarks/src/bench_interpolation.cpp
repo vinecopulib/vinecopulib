@@ -7,12 +7,33 @@
 #include "helpers.hpp"
 #include <benchmark/benchmark.h>
 #include <memory>
+#include <vector>
 #include <vinecopulib/misc/tools_interpolation.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 
 using namespace vinecopulib;
 
 namespace {
+
+//! The grid points a fitted TLL model uses: pnorm of an equidistant z-grid.
+Eigen::VectorXd
+make_grid_points(size_t m)
+{
+  Eigen::VectorXd z = Eigen::VectorXd::LinSpaced(m, -3.25, 3.25);
+  return tools_stats::pnorm(z);
+}
+
+//! The density values of a real TLL fit, so that the normalization
+//! benchmarks see a realistic magnitude range rather than an all-ones grid.
+Eigen::MatrixXd
+fitted_values(size_t m)
+{
+  FitControlsBicop controls({ BicopFamily::tll });
+  controls.set_nonparametric_grid_size(m);
+  Bicop bc(BicopFamily::tll);
+  bc.fit(bench::sim_data(BicopFamily::gaussian, 0, 1000), controls);
+  return bc.get_parameters();
+}
 
 //! Builds a grid mimicking a fitted TLL surface: pnorm of an equidistant
 //! z-grid with a smooth positive density-like surface.
@@ -60,12 +81,45 @@ register_interpolation(size_t m)
     });
 }
 
+//! Isolates `normalize_margins`: `set_values` differs from the constructor
+//! by not rebuilding the cell-lookup table, whose 1024 binary searches cost
+//! about as much as a sweep. `norm=0` is the baseline to subtract.
+void
+register_normalize(size_t m, const std::vector<int>& norm_times)
+{
+  auto grid_points = make_grid_points(m);
+  auto values = std::make_shared<const Eigen::MatrixXd>(fitted_values(m));
+  auto grid = std::make_shared<tools_interpolation::InterpolationGrid>(
+    grid_points, *values, 0);
+
+  for (int times : norm_times) {
+    benchmark::RegisterBenchmark(("interp/set_values/m=" + std::to_string(m) +
+                                  "/norm=" + std::to_string(times))
+                                   .c_str(),
+                                 [grid, values, times](benchmark::State& st) {
+                                   for (auto _ : st)
+                                     grid->set_values(*values, times);
+                                 });
+  }
+
+  if (m == 30) {
+    benchmark::RegisterBenchmark(
+      "interp/ctor/m=30/norm=3", [grid_points, values](benchmark::State& st) {
+        for (auto _ : st)
+          benchmark::DoNotOptimize(
+            tools_interpolation::InterpolationGrid(grid_points, *values, 3));
+      });
+  }
+}
+
 struct Registrar
 {
   Registrar()
   {
     register_interpolation(30);
     register_interpolation(50);
+    register_normalize(30, { 0, 1, 3, 10, 25 });
+    register_normalize(50, { 0, 3, 25 });
   }
 };
 const Registrar registrar;
