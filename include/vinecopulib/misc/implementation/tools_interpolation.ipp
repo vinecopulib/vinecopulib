@@ -125,22 +125,41 @@ InterpolationGrid::flip()
   update_cached_integrals();
 }
 
+//! trapezoid weights, so that `w.dot(v)` is the integral over [0, 1] of the
+//! piecewise linear function through `(grid_points_, v)`. They sum to 1,
+//! because the sum telescopes to `grid_points_(m - 1) - grid_points_(0)`.
+inline Eigen::VectorXd
+InterpolationGrid::trapezoid_weights() const
+{
+  const ptrdiff_t m = grid_points_.size();
+  Eigen::VectorXd w(m);
+  w(0) = (grid_points_(1) - grid_points_(0)) / 2.0;
+  w.segment(1, m - 2) =
+    (grid_points_.tail(m - 2) - grid_points_.head(m - 2)) / 2.0;
+  w(m - 1) = (grid_points_(m - 1) - grid_points_(m - 2)) / 2.0;
+  return w;
+}
+
 //! renormalizes the estimate to uniform margins
 //!
 //! @param times How many times the normalization routine should run.
 inline void
 InterpolationGrid::normalize_margins(int times)
 {
-  size_t m = grid_points_.size();
+  const ptrdiff_t m = grid_points_.size();
+  if ((times < 1) || (m < 2)) {
+    return;
+  }
+
+  const double min_mass = 1e-20; // prevent 0/0
+  const Eigen::VectorXd w = trapezoid_weights();
+  Eigen::VectorXd scale(m);
+
   for (int k = 0; k < times; ++k) {
-    for (size_t i = 0; i < m; ++i) {
-      values_.row(i) /= // prevent 0/0
-        std::max(int_on_grid(1.0, values_.row(i), grid_points_), 1e-20);
-    }
-    for (size_t j = 0; j < m; ++j) {
-      values_.col(j) /= // prevent 0/0
-        std::max(int_on_grid(1.0, values_.col(j), grid_points_), 1e-20);
-    }
+    scale = (values_ * w).cwiseMax(min_mass).cwiseInverse();
+    values_.array().colwise() *= scale.array();
+    scale = (values_.transpose() * w).cwiseMax(min_mass).cwiseInverse();
+    values_.array().rowwise() *= scale.transpose().array();
   }
 }
 

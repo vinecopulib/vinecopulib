@@ -49,6 +49,9 @@ private:
   // normalizes the grid margins; internal only (callers must refresh the
   // cached integrals afterwards, as the ctor and set_values do)
   void normalize_margins(int times);
+  // trapezoid weights of `grid_points_`: `w.dot(v)` integrates the piecewise
+  // linear function through (grid_points_, v) over [0, 1]
+  Eigen::VectorXd trapezoid_weights() const;
   Eigen::Matrix<ptrdiff_t, 1, 2> get_indices(double x0, double x1);
   ptrdiff_t binary_search(double x);
   ptrdiff_t find_cell(double x) const;
