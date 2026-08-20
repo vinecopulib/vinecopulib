@@ -64,6 +64,11 @@ wrong thing.
 
 ### BEHAVIOR CHANGES
 
+* The density of a discrete/discrete pair changes where an atom is narrower than
+  `5e-5`: the collapsed argument is now the atom midpoint for both h-function
+  evaluations, so `pdf`, and any `loglik` over such observations, move by
+  `O(atom width)`; see BUG FIXES (#744)
+
 * Every discrete or mixed fit with a nonparametric (`tll`) pair copula changes:
   the fitted grid, density, `loglik`, `aic`, `bic` and `mbicv` all move, so
   family and structure selection can differ. `tll` is the default family, so
