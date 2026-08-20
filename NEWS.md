@@ -152,6 +152,12 @@ wrong thing.
 
 ### BUG FIXES
 
+* Collapse a degenerate atom to its midpoint once in `AbstractBicop::pdf_d_d`.
+  Both degenerate branches assigned the midpoint to one endpoint and then
+  recomputed it from the value they had just written, so the second h-function
+  was evaluated at `(a + 3b) / 4` rather than at the midpoint again. `pdf`
+  values change for discrete pairs whose atom is narrower than `5e-5` (#744)
+
 * Compute a real discrete density for kernel pair copulas. `KernelBicop`
   overrode `pdf`, `hfunc1` and `hfunc2` to return the continuous quantity at the
   atom midpoint, so the difference quotients in `AbstractBicop::pdf_c_d` /
