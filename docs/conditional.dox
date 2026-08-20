@@ -60,6 +60,11 @@ tail of the current structure — and `reorient()` throws when the set is not. I
 you know in advance which variables you want to condition on, fit with
 `set_conditioning_set()` instead, which guarantees one exists.
 
+Truncated models are relabeled too: only the trees the model stores take part,
+and the truncation level is preserved. A model truncated at zero is independence,
+so any order represents it and the conditioning variables are simply moved to the
+tail.
+
 @snippet conditional.cpp reorient
 
 */

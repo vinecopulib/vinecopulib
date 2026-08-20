@@ -403,14 +403,6 @@ Vinecop::check_conditioning_set(const std::vector<size_t>& conditioning_set,
       "conditioning-aware selection requires an MST tree_algorithm "
       "('mst_prim' or 'mst_kruskal').");
   }
-  // v1: re-orientation operates on the full R-vine matrix, so structural
-  // truncation is not supported (thresholding, which keeps the structure full,
-  // is fine).
-  if (controls.get_select_trunc_lvl() || (controls.get_trunc_lvl() < d_ - 1)) {
-    throw std::runtime_error(
-      "conditioning-aware selection does not support truncation "
-      "(trunc_lvl / select_trunc_lvl) in this version.");
-  }
 }
 
 //! @brief Validates the custom edge-weight function against the criterion it
@@ -490,10 +482,6 @@ Vinecop::make_reorientation_map(
   if ((sorted.front() < 1) || (sorted.back() > d_)) {
     throw std::runtime_error("conditioning_set entries must be in 1, ..., d.");
   }
-  if (rvine_structure_.get_trunc_lvl() != d_ - 1) {
-    throw std::runtime_error(
-      "reorient() requires a non-truncated vine (trunc_lvl == d - 1).");
-  }
 
   std::vector<char> in_b(d_ + 1, 0);
   for (auto v : conditioning_set)
@@ -512,6 +500,21 @@ Vinecop::make_reorientation_map(
     ReorientationMap identity;
     identity.identity = true;
     return identity;
+  }
+
+  // A vine truncated at zero has no trees to peel: every pair copula is
+  // independence, so any order represents the same model and the tail is
+  // placed by permuting the diagonal, keeping the relative order on each side.
+  if (rvine_structure_.get_trunc_lvl() == 0) {
+    std::vector<size_t> order;
+    order.reserve(d_);
+    for (auto keep_b : { false, true })
+      for (auto v : rvine_structure_.get_order())
+        if ((in_b[v] != 0) == keep_b)
+          order.push_back(v);
+    return { RVineStructure(order, static_cast<size_t>(0)),
+             TriangularArray<RVineTrees::PairCopulaLocation>(d_, 0),
+             false };
   }
 
   // Peel the structure while steering the diagonal so that the conditioning
@@ -557,9 +560,11 @@ Vinecop::make_reorientation_map(
 //! `conditioning_set` are drawn first and can be conditioned on with
 //! `simulate_conditional`. It chooses, per tree, which conditioned variable
 //! sits on the matrix diagonal, and flips each pair copula whose stored
-//! orientation no longer matches its new position. Throws if the current
-//! structure admits no sampling order ending in `conditioning_set` (fit with a
-//! conditioning set via `FitControlsVinecop` to guarantee one exists).
+//! orientation no longer matches its new position. Truncated models are
+//! supported: only the trees they store take part, and the truncation level is
+//! preserved. Throws if the current structure admits no sampling order ending
+//! in `conditioning_set` (fit with a conditioning set via `FitControlsVinecop`
+//! to guarantee one exists).
 //!
 //! @param conditioning_set 1-based variable indices to place at the tail of the
 //! variable order.
@@ -577,8 +582,11 @@ Vinecop::reorient(const std::vector<size_t>& conditioning_set)
     return;
   }
 
-  std::vector<std::vector<Bicop>> pair_copulas(d_ - 1);
-  for (size_t tree = 0; tree < d_ - 1; ++tree) {
+  // the reorientation map covers the stored trees; a truncated model has no
+  // pair copulas beyond them
+  const size_t trunc_lvl = pair_copulas_.size();
+  std::vector<std::vector<Bicop>> pair_copulas(trunc_lvl);
+  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
     pair_copulas[tree].reserve(d_ - 1 - tree);
     for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
       auto location = reorientation.pair_copulas(tree, edge);

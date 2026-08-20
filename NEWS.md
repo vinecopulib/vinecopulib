@@ -90,6 +90,13 @@ wrong thing.
 
 ### NEW FEATURES
 
+* `Vinecop::reorient` and conditioning-aware selection now support truncated
+  models. Only the trees a model stores take part in the re-orientation and the
+  truncation level is preserved, so `FitControlsVinecop::set_conditioning_set()`
+  can be combined with `trunc_lvl`, `select_trunc_lvl` and thresholding; a model
+  truncated at zero is independence, and its conditioning variables are moved to
+  the tail of the order (#752)
+
 * Add scores, gradient, Hessian and score covariance to `Bicop` and `Vinecop`,
   with `scores_full` and `hessian_full` exposing the per-edge intermediates for
   callers that need several of them (#645, #683, #699)
