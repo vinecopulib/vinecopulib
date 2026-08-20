@@ -24,11 +24,11 @@ public:
 
   InterpolationGrid(const Eigen::VectorXd& grid_points,
                     const Eigen::MatrixXd& values,
-                    int norm_times = 3);
+                    int norm_maxiter = 25);
 
   Eigen::MatrixXd get_values() const;
 
-  void set_values(const Eigen::MatrixXd& values, int norm_times = 3);
+  void set_values(const Eigen::MatrixXd& values, int norm_maxiter = 25);
 
   void flip();
 
@@ -48,10 +48,15 @@ public:
 private:
   // normalizes the grid margins; internal only (callers must refresh the
   // cached integrals afterwards, as the ctor and set_values do)
-  void normalize_margins(int times);
-  // trapezoid weights of `grid_points_`: `w.dot(v)` integrates the piecewise
-  // linear function through (grid_points_, v) over [0, 1]
+  void normalize_margins(int max_iter);
+  // trapezoid weights of `grid_points_`: `row_integrals(v, w)` integrates the
+  // piecewise linear function through (grid_points_, v) over [0, 1]
   Eigen::VectorXd trapezoid_weights() const;
+  // integral of every row of `v`. Column integrals are the row integrals of
+  // the transpose, so both margins come out of this one routine -- which is
+  // what makes `normalize_margins` commute with transposition to the last bit
+  static Eigen::VectorXd row_integrals(const Eigen::MatrixXd& v,
+                                       const Eigen::VectorXd& w);
   Eigen::Matrix<ptrdiff_t, 1, 2> get_indices(double x0, double x1);
   ptrdiff_t binary_search(double x);
   ptrdiff_t find_cell(double x) const;

@@ -140,26 +140,68 @@ InterpolationGrid::trapezoid_weights() const
   return w;
 }
 
+inline Eigen::VectorXd
+InterpolationGrid::row_integrals(const Eigen::MatrixXd& v,
+                                 const Eigen::VectorXd& w)
+{
+  return v * w;
+}
+
 //! renormalizes the estimate to uniform margins
 //!
-//! @param times How many times the normalization routine should run.
+//! @details Rescaling rows and then columns drives the second margin to
+//! uniform and leaves the first carrying the whole residual, and the result
+//! depends on which one came last -- so fitting `(u1, u2)` and fitting
+//! `(u2, u1)` would not give transposed grids. Averaging the two orders
+//! splits the residual evenly between the margins and makes the result
+//! exactly equivariant under transposition, converged or not.
+//!
+//! @param max_iter Maximum number of rescaling passes; `0` leaves the values
+//! untouched. Rescaling also stops as soon as both margins integrate to 1
+//! within `1e-10`.
 inline void
-InterpolationGrid::normalize_margins(int times)
+InterpolationGrid::normalize_margins(int max_iter)
 {
   const ptrdiff_t m = grid_points_.size();
-  if ((times < 1) || (m < 2)) {
+  if ((max_iter < 1) || (m < 2)) {
     return;
   }
 
+  const double tol = 1e-10;
   const double min_mass = 1e-20; // prevent 0/0
   const Eigen::VectorXd w = trapezoid_weights();
-  Eigen::VectorXd scale(m);
+  Eigen::MatrixXd vt(m, m);
 
-  for (int k = 0; k < times; ++k) {
-    scale = (values_ * w).cwiseMax(min_mass).cwiseInverse();
-    values_.array().colwise() *= scale.array();
-    scale = (values_.transpose() * w).cwiseMax(min_mass).cwiseInverse();
-    values_.array().rowwise() *= scale.transpose().array();
+  for (int k = 0; k < max_iter; ++k) {
+    // both margins go through `row_integrals`, one of them on an explicit
+    // transpose, so transposing the grid swaps them bit for bit
+    vt = values_.transpose();
+    const Eigen::VectorXd r = row_integrals(values_, w).cwiseMax(min_mass);
+    const Eigen::VectorXd c = row_integrals(vt, w).cwiseMax(min_mass);
+    const double err = std::max((r.array() - 1.0).abs().maxCoeff(),
+                                (c.array() - 1.0).abs().maxCoeff());
+    if (err < tol) {
+      break;
+    }
+
+    // Both orders are rank-one rescalings of the same values, so the second
+    // margin of each is an integral against reweighted grid weights and no
+    // intermediate grid is needed: rows-then-columns divides by
+    // `r_i * c2_j`, columns-then-rows by `c_j * r2_i`.
+    const Eigen::VectorXd r2 =
+      row_integrals(values_, w.cwiseQuotient(c)).cwiseMax(min_mass);
+    const Eigen::VectorXd c2 =
+      row_integrals(vt, w.cwiseQuotient(r)).cwiseMax(min_mass);
+    const Eigen::VectorXd sr = r.cwiseProduct(r2).cwiseSqrt().cwiseInverse();
+    const Eigen::VectorXd sc = c.cwiseProduct(c2).cwiseSqrt().cwiseInverse();
+
+    // one fused pass: two successive rank-one scalings would round the two
+    // orders differently and lose the equivariance
+    for (ptrdiff_t j = 0; j < m; ++j) {
+      for (ptrdiff_t i = 0; i < m; ++i) {
+        values_(i, j) *= sr(i) * sc(j);
+      }
+    }
   }
 }
 
@@ -271,7 +313,8 @@ InterpolationGrid::cond_cdf(double u_cond, double u, size_t cond_var) const
   const double xx1 = u_cond - x1;
   const double x2x1 = x2 - x1;
 
-  // interpolated (and clamped) grid-line value at knot j
+  // interpolated grid-line value at knot j; bilinear interpolation of a
+  // nonnegative grid is nonnegative, so the guard only absorbs rounding
   auto knot = [&](ptrdiff_t j) {
     double v;
     if (cond_var == 1) {
@@ -279,7 +322,7 @@ InterpolationGrid::cond_cdf(double u_cond, double u, size_t cond_var) const
     } else {
       v = (values_(j, i) * x2x + values_(j, i + 1) * xx1) / x2x1;
     }
-    return std::max(v, 1e-4);
+    return std::max(v, 0.0);
   };
 
   double tmpint = 0.0, int1 = 0.0;
@@ -301,12 +344,13 @@ InterpolationGrid::cond_cdf(double u_cond, double u, size_t cond_var) const
     v_k = v_k1;
   }
 
-  return std::min(std::max(tmpint / int1, 1e-10), 1 - 1e-10);
+  return std::min(std::max(tmpint / std::max(int1, 1e-20), 1e-10), 1 - 1e-10);
 }
 
 //! inverts `cond_cdf` in its second argument: the conditional cdf is
-//! piecewise quadratic and strictly increasing (the knots are clamped away
-//! from zero), so the quantile has a closed form within the bracketing cell.
+//! piecewise quadratic and nondecreasing, so the quantile has a closed form
+//! within the bracketing cell. Where the density vanishes the cdf is flat and
+//! the inverse is not unique; the smallest quantile is returned.
 inline double
 InterpolationGrid::cond_quantile(double u_cond, double p, size_t cond_var) const
 {
@@ -325,7 +369,7 @@ InterpolationGrid::cond_quantile(double u_cond, double p, size_t cond_var) const
     } else {
       v = (values_(j, i) * x2x + values_(j, i + 1) * xx1) / x2x1;
     }
-    return std::max(v, 1e-4);
+    return std::max(v, 0.0);
   };
 
   // total mass (normalization of the conditional cdf)
@@ -336,7 +380,8 @@ InterpolationGrid::cond_quantile(double u_cond, double p, size_t cond_var) const
     int1 += (v_k1 + v_k) * (grid_points_(k + 1) - grid_points_(k)) / 2.0;
     v_k = v_k1;
   }
-  const double target = std::min(std::max(p, 1e-10), 1 - 1e-10) * int1;
+  const double target =
+    std::min(std::max(p, 1e-10), 1 - 1e-10) * std::max(int1, 1e-20);
 
   // locate the bracketing cell and solve the quadratic within it
   double cum = 0.0;
@@ -353,11 +398,16 @@ InterpolationGrid::cond_quantile(double u_cond, double p, size_t cond_var) const
       const double b = v_k;
       const double c = cum - target;
       const double disc = std::max(b * b - 4.0 * a * c, 0.0);
+      const double denom = b + std::sqrt(disc);
       double s;
-      if (std::fabs(a) < 1e-300) {
+      if (denom <= 0.0) {
+        // the cell carries no mass: the cdf is flat across it, so every point
+        // in it is a quantile and the left endpoint is the smallest
+        s = 0.0;
+      } else if (std::fabs(a) < 1e-300) {
         s = -c / b;
       } else {
-        s = 2.0 * (-c) / (b + std::sqrt(disc));
+        s = 2.0 * (-c) / denom;
       }
       s = std::min(std::max(s, 0.0), dg);
       return g_k + s;

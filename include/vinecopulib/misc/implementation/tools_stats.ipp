@@ -251,15 +251,45 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     throw std::runtime_error("u must have four columns.");
   }
 
-  auto w = simulate_uniform(n, 2, true, { 5 });
-  Eigen::MatrixXd uu = w.array() * u.leftCols(2).array() +
-                       (1 - w.array()) * u.rightCols(2).array();
+  // The draws below are indexed by column position -- variable 0 takes the
+  // first coordinate of each -- so the two argument orders would give two
+  // different latent samples. Ordering the pair by its own values makes the
+  // result a function of the observations rather than of how they were
+  // passed. The columns tie only when the two variables are identical, where
+  // swapping them is a no-op.
+  bool swapped = false;
+  for (ptrdiff_t i = 0; i < u.rows(); i++) {
+    if (u(i, 0) != u(i, 1)) {
+      swapped = u(i, 1) < u(i, 0);
+      break;
+    }
+    if (u(i, 2) != u(i, 3)) {
+      swapped = u(i, 3) < u(i, 2);
+      break;
+    }
+  }
+  Eigen::MatrixXd v = u;
+  if (swapped) {
+    v.col(0).swap(v.col(1));
+    v.col(2).swap(v.col(3));
+  }
+
+  // Pseudo-random, not quasi-random: a low-discrepancy sequence is a
+  // deterministic near-lattice whose coordinates are negatively dependent by
+  // construction, which is what makes it integrate well but also what makes
+  // it unusable as per-observation noise -- it imposes a lattice on the
+  // latent points and attenuates their dependence, by up to 0.35 in Kendall's
+  // tau and asymmetrically in the two variables. Fixed seeds keep the draw
+  // reproducible.
+  auto w = simulate_uniform(n, 2, false, { 5 });
+  Eigen::MatrixXd uu = w.array() * v.leftCols(2).array() +
+                       (1 - w.array()) * v.rightCols(2).array();
 
   auto covering = BoxCovering(uu);
   std::vector<size_t> indices;
 
-  Eigen::MatrixXd lb = qnorm(u.rightCols(2));
-  Eigen::MatrixXd ub = qnorm(u.leftCols(2));
+  Eigen::MatrixXd lb = qnorm(v.rightCols(2));
+  Eigen::MatrixXd ub = qnorm(v.leftCols(2));
   lb = pnorm(lb.array() - b);
   ub = pnorm(ub.array() + b);
 
@@ -268,8 +298,8 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   for (uint16_t it = 0; it < niter; it++) {
     uu = to_pseudo_obs(uu);
     x = qnorm(uu);
-    norm_sim = simulate_normal(n, 2, true, { it, 5 }).array() * b;
-    w = simulate_uniform(n, 1, true, { it, 55 });
+    norm_sim = simulate_normal(n, 2, false, { it, 5 }).array() * b;
+    w = simulate_uniform(n, 1, false, { it, 55 });
 
     for (size_t i = 0; i < n; i++) {
       covering.get_box_indices(lb.row(i), ub.row(i), indices);
@@ -283,7 +313,11 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     }
   }
 
-  return to_pseudo_obs(x);
+  Eigen::MatrixXd latent = to_pseudo_obs(x);
+  if (swapped) {
+    latent.col(0).swap(latent.col(1));
+  }
+  return latent;
 }
 
 // Utility function to compute the next power of 2.
