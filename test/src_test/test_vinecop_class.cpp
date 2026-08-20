@@ -52,6 +52,47 @@ TEST(VinecopConstructor, omitted_pair_copulas_are_independence)
   EXPECT_TRUE(all_close(simulated.col(1), u_cond.col(1)));
 }
 
+// An empty pair-copula store means independence, whatever the structure's
+// truncation level, so no structural operation may index it.
+TEST(VinecopConstructor, omitted_pair_copulas_survive_structure_operations)
+{
+  const size_t d = 4;
+  const auto data = tools_stats::simulate_uniform(20, d, false, { 1 });
+  const Eigen::VectorXd ones = Eigen::VectorXd::Ones(data.rows());
+  const Vinecop model(DVineStructure({ 1, 2, 3, 4 }));
+
+  // {1} is not the order tail, so this does not take the identity fast path
+  Vinecop reoriented = model;
+  ASSERT_NO_THROW(reoriented.reorient({ 1 }));
+  EXPECT_EQ(reoriented.get_order().back(), 1u);
+  EXPECT_TRUE(reoriented.get_all_pair_copulas().empty());
+  EXPECT_TRUE(all_close(reoriented.pdf(data), ones));
+  EXPECT_NO_THROW(RVineStructure(reoriented.get_matrix()));
+
+  // every edge of the decomposition is independence, and it still round-trips
+  const auto trees = model.get_trees();
+  ASSERT_EQ(trees.get_trunc_lvl(), d - 1);
+  for (const auto& tree : trees.get_trees()) {
+    for (const auto& edge : tree) {
+      EXPECT_EQ(edge.pair_copula.get_family(), BicopFamily::indep);
+    }
+  }
+  EXPECT_EQ(model.get_rvine_structure(), RVineStructure(trees));
+
+  // truncation keeps the store empty rather than adding empty tree slots
+  Vinecop truncated = model;
+  truncated.truncate(2);
+  EXPECT_EQ(truncated.get_trunc_lvl(), 2u);
+  EXPECT_TRUE(truncated.get_all_pair_copulas().empty());
+  EXPECT_TRUE(all_close(truncated.pdf(data), ones));
+
+  // variable types are labelled in the original order and survive relabeling
+  Vinecop discrete(DVineStructure({ 1, 2, 3, 4 }), {}, { "c", "d", "c", "d" });
+  ASSERT_NO_THROW(discrete.reorient({ 1 }));
+  EXPECT_EQ(discrete.get_var_types(),
+            std::vector<std::string>({ "c", "d", "c", "d" }));
+}
+
 TEST_F(VinecopTest, copy)
 {
   auto pair_copulas = Vinecop::make_pair_copula_store(7);

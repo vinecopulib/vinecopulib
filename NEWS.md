@@ -159,6 +159,12 @@ wrong thing.
   values change for discrete pairs whose atom is narrower than `5e-5`. The
   parity harness now covers the discrete/discrete leaf, which had no case at
   all, so a change there is no longer invisible to it (#744)
+  
+* Read an empty pair-copula store as independence in the paths that still
+  assumed a full one, completing (#729). `Vinecop::reorient` and `get_trees`
+  indexed the store out of bounds, `truncate` gave it tree slots holding no pair
+  copula at all, which `pdf` then dereferenced, and deserializing a vine written
+  without pair copulas threw a JSON type error instead of round-tripping (#743)
 
 * Compute a real discrete density for kernel pair copulas. `KernelBicop`
   overrode `pdf`, `hfunc1` and `hfunc2` to return the continuous quantity at the

@@ -127,6 +127,24 @@ TEST(serialization, mixed_vinecop_cbor_roundtrip)
   expect_vinecops_equal(truncated, Vinecop(truncated_file.filename()));
 }
 
+TEST(serialization, structure_only_vinecop_cbor_roundtrip)
+{
+  // an empty pair-copula store means independence; nothing is written for it,
+  // so the reader has to accept a file without a single tree
+  const Vinecop vinecop(DVineStructure({ 1, 2, 3, 4 }));
+  ASSERT_TRUE(vinecop.get_all_pair_copulas().empty());
+
+  TemporaryFile file("serialization_vinecop_structure_only.cbor");
+  vinecop.to_file(file.filename());
+  const Vinecop restored(file.filename());
+
+  expect_vinecops_equal(vinecop, restored);
+  EXPECT_TRUE(restored.get_all_pair_copulas().empty());
+  const auto data = tools_stats::simulate_uniform(20, 4, false, { 1 });
+  EXPECT_TRUE(
+    all_close(restored.pdf(data), Eigen::VectorXd::Ones(data.rows())));
+}
+
 TEST(serialization, rvine_structure_cbor_roundtrip)
 {
   const RVineStructure structure(DVineStructure({ 1, 2, 3, 4 }, 2));

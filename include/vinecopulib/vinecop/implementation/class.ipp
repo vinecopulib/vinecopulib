@@ -134,26 +134,32 @@ inline Vinecop::Vinecop(
 //!      a valid R-vine structure.
 inline Vinecop::Vinecop(const nlohmann::json& input, const bool check)
 {
-  rvine_structure_ = RVineStructure(input["structure"], check);
+  rvine_structure_ = RVineStructure(input.at("structure"), check);
   d_ = static_cast<size_t>(rvine_structure_.get_dim());
   size_t trunc_lvl = rvine_structure_.get_trunc_lvl();
 
-  nlohmann::json pcs_json = input["pair copulas"];
+  const auto pcs_json = input.value("pair copulas", nlohmann::json::object());
   for (size_t tree = 0; tree < std::min(d_, trunc_lvl); ++tree) {
-    nlohmann::json tree_json;
-    try {
-      tree_json = pcs_json["tree" + std::to_string(tree)];
-    } catch (...) {
-      break; // vine was truncated, no more trees to parse
+    const auto tree_key = "tree" + std::to_string(tree);
+    if (!pcs_json.contains(tree_key)) {
+      break; // fewer trees stored than the structure has; the rest are
+             // independence
     }
+    const auto& tree_json = pcs_json[tree_key];
+
     // reserve space for pair copulas of this tree
     pair_copulas_.resize(tree + 1);
     pair_copulas_[tree].resize(d_ - tree - 1);
 
     for (size_t edge = 0; edge < d_ - tree - 1; ++edge) {
-      nlohmann::json pc_json = tree_json["pc" + std::to_string(edge)];
-      pair_copulas_[tree][edge] = Bicop(pc_json);
+      pair_copulas_[tree][edge] =
+        Bicop(tree_json.at("pc" + std::to_string(edge)));
     }
+  }
+
+  // as in set_all_pair_copulas(): the structure follows the store it has
+  if (!pair_copulas_.empty()) {
+    rvine_structure_.truncate(pair_copulas_.size());
   }
 
   // try block for backwards compatibility
@@ -564,6 +570,13 @@ Vinecop::reorient(const std::vector<size_t>& conditioning_set)
   if (reorientation.identity)
     return;
 
+  // an empty store means every pair copula is independence: there is nothing
+  // to permute or flip, only the representation changes
+  if (pair_copulas_.empty()) {
+    rvine_structure_ = std::move(reorientation.structure);
+    return;
+  }
+
   std::vector<std::vector<Bicop>> pair_copulas(d_ - 1);
   for (size_t tree = 0; tree < d_ - 1; ++tree) {
     pair_copulas[tree].reserve(d_ - 1 - tree);
@@ -913,6 +926,12 @@ Vinecop::get_trees() const
 {
   // decompose in original labels: the diagonal `get_order()`, the original-
   // label structure array, and the pair-copulas share the same labelling.
+  if (pair_copulas_.empty()) {
+    // an empty store means independence, which is what this constructor puts
+    // on every edge
+    return RVineTrees(rvine_structure_.get_order(),
+                      rvine_structure_.get_struct_array(false));
+  }
   return RVineTrees(rvine_structure_.get_order(),
                     rvine_structure_.get_struct_array(false),
                     pair_copulas_);
@@ -3594,7 +3613,11 @@ Vinecop::truncate(size_t trunc_lvl)
 {
   if (trunc_lvl < this->get_trunc_lvl()) {
     rvine_structure_.truncate(trunc_lvl);
-    pair_copulas_.resize(trunc_lvl);
+    // an empty store already means independence at every level; resizing it
+    // would add tree slots holding no pair copula at all
+    if (!pair_copulas_.empty()) {
+      pair_copulas_.resize(trunc_lvl);
+    }
   }
 }
 
