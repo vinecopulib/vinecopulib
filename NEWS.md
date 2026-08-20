@@ -70,7 +70,7 @@ wrong thing.
   density at `1e-4`, and the discrete latent sample no longer depends on which
   variable is passed first. Grids, densities, h-functions, `loglik`, `aic`,
   `bic` and `mbicv` all move, so family and structure selection can differ.
-  `tll` is the default family; see BUG FIXES (#PR)
+  `tll` is the default family; see BUG FIXES (#750)
 
 * Every discrete or mixed fit with a nonparametric (`tll`) pair copula changes:
   the fitted grid, density, `loglik`, `aic`, `bic` and `mbicv` all move, so
@@ -143,7 +143,7 @@ wrong thing.
 * Speed up `InterpolationGrid`'s margin normalization about fourfold. It
   integrated each grid line through a function taking `const Eigen::VectorXd&`,
   so every row and column was materialized into a heap-allocated temporary --
-  180 allocations per grid at the default size (#PR)
+  180 allocations per grid at the default size (#748)
 
 * Speed up the bivariate evaluation engine and tighten allocation in the
   derivative cascade (#681)
@@ -172,7 +172,7 @@ wrong thing.
   direction -- and did not commute with transposition. Averaging the two sweep
   orders balances the margins and makes the result exactly equivariant, so
   `Vinecop::select` and a refit on the selected structure now agree to ~4e-15
-  where they differed by 7e-2 (#742, #PR)
+  where they differed by 7e-2 (#742, #750)
 
 * Draw the discrete latent sample from pseudo-random rather than quasi-random
   numbers, and make it independent of argument order. A low-discrepancy
@@ -184,13 +184,13 @@ wrong thing.
   one case flipped its sign. Since `Vinecop::select` reuses pair copulas in
   either orientation, roughly half the discrete `tll` edges of a vine got the
   degraded draw. The draw remains reproducible, and the two argument orders now
-  agree bit for bit (#742, #PR)
+  agree bit for bit (#742, #750)
 
 * Stop `hfunc` and `hinv` from flooring the interpolated density at `1e-4`.
   `pdf` floors at `1e-20` and `cdf` not at all, so on a strongly dependent
   `tll` fit -- where two thirds of the grid can sit below `1e-4` -- the
   h-functions were not the conditional cdf of the density the same object
-  reported, by up to 7.5e-5 (#742, #PR)
+  reported, by up to 7.5e-5 (#742, #750)
 
 * Compute a real discrete density for kernel pair copulas. `KernelBicop`
   overrode `pdf`, `hfunc1` and `hfunc2` to return the continuous quantity at the
