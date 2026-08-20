@@ -298,10 +298,9 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
 
   // Pseudo-random, not quasi-random: a low-discrepancy sequence is a
   // deterministic near-lattice whose coordinates are negatively dependent by
-  // construction, which is what makes it integrate well but also what makes
-  // it unusable as per-observation noise -- it imposes a lattice on the
-  // latent points and attenuates their dependence, by up to 0.35 in Kendall's
-  // tau and asymmetrically in the two variables. Fixed seeds keep the draw
+  // construction, which is what makes it integrate well and what makes it
+  // unusable as per-observation noise -- it imposes that lattice on the latent
+  // points and attenuates their dependence. Fixed seeds keep the draw
   // reproducible.
   auto w = simulate_uniform(n, 2, false, { 5 });
   Eigen::MatrixXd uu = w.array() * v.leftCols(2).array() +

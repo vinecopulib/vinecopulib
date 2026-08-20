@@ -56,7 +56,10 @@ private:
   void update_cell_lookup();
   void update_cached_integrals();
   double cond_cdf(double u_cond, double u, size_t cond_var) const;
-  double cond_quantile(double u_cond, double p, size_t cond_var) const;
+  double cond_quantile(double u_cond,
+                       double p,
+                       size_t cond_var,
+                       Eigen::VectorXd& knots) const;
   double bilinear_interpolation(double z11,
                                 double z12,
                                 double z21,

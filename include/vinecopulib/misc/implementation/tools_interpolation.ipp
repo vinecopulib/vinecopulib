@@ -148,12 +148,12 @@ InterpolationGrid::update_weights()
 
 //! renormalizes the estimate to uniform margins
 //!
-//! @details Rescaling rows and then columns drives the second margin to
-//! uniform and leaves the first carrying the whole residual, and the result
-//! depends on which one came last -- so fitting `(u1, u2)` and fitting
-//! `(u2, u1)` would not give transposed grids. Averaging the two orders
-//! splits the residual evenly between the margins and makes the result
-//! exactly equivariant under transposition, converged or not.
+//! @details Each pass is the elementwise geometric mean of the two ways of
+//! rescaling the grid: rows then columns, and columns then rows. Averaging
+//! them leaves the two margins equally close to uniform and makes the pass
+//! commute with transposition exactly, so a grid and its flipped counterpart
+//! normalize to flipped counterparts whether or not the iteration has
+//! converged.
 //!
 //! @param max_iter Maximum number of rescaling passes; `0` leaves the values
 //! untouched. Rescaling also stops as soon as both margins integrate to 1
@@ -352,7 +352,10 @@ InterpolationGrid::cond_cdf(double u_cond, double u, size_t cond_var) const
 //! within the bracketing cell. Where the density vanishes the cdf is flat and
 //! the inverse is not unique; the smallest quantile is returned.
 inline double
-InterpolationGrid::cond_quantile(double u_cond, double p, size_t cond_var) const
+InterpolationGrid::cond_quantile(double u_cond,
+                                 double p,
+                                 size_t cond_var,
+                                 Eigen::VectorXd& knots) const
 {
   const ptrdiff_t m = grid_points_.size();
   const ptrdiff_t i = find_cell(u_cond);
@@ -362,29 +365,25 @@ InterpolationGrid::cond_quantile(double u_cond, double p, size_t cond_var) const
   const double xx1 = u_cond - x1;
   const double x2x1 = x2 - x1;
 
-  auto knot = [&](ptrdiff_t j) {
-    double v;
-    if (cond_var == 1) {
-      v = (values_(i, j) * x2x + values_(i + 1, j) * xx1) / x2x1;
-    } else {
-      v = (values_(j, i) * x2x + values_(j, i + 1) * xx1) / x2x1;
-    }
-    return std::max(v, 0.0);
-  };
+  // the grid line is walked twice below, so interpolate it once into the
+  // caller's buffer
+  for (ptrdiff_t j = 0; j < m; ++j) {
+    const double v = (cond_var == 1)
+                       ? (values_(i, j) * x2x + values_(i + 1, j) * xx1) / x2x1
+                       : (values_(j, i) * x2x + values_(j, i + 1) * xx1) / x2x1;
+    knots(j) = std::max(v, 0.0);
+  }
 
   // total mass (normalization of the conditional cdf)
-  double int1 = 0.0;
-  for (ptrdiff_t k = 0; k < m; ++k) {
-    int1 += weights_(k) * knot(k);
-  }
+  const double int1 = weights_.dot(knots);
   const double target =
     std::min(std::max(p, 1e-10), 1 - 1e-10) * std::max(int1, 1e-20);
 
   // locate the bracketing cell and solve the quadratic within it
   double cum = 0.0;
-  double v_k = knot(0);
+  double v_k = knots(0);
   for (ptrdiff_t k = 0; k < m - 1; ++k) {
-    const double v_k1 = knot(k + 1);
+    const double v_k1 = knots(k + 1);
     const double g_k = grid_points_(k);
     const double dg = grid_points_(k + 1) - g_k;
     const double cell = (v_k1 + v_k) * dg / 2.0;
@@ -441,9 +440,10 @@ inline Eigen::VectorXd
 InterpolationGrid::inverse_integrate_1d(const tools_eigen::ConstMatRef& u,
                                         size_t cond_var)
 {
-  auto f = [this, cond_var](double u1, double u2) {
-    return (cond_var == 1) ? cond_quantile(u1, u2, 1)
-                           : cond_quantile(u2, u1, 2);
+  Eigen::VectorXd knots(grid_points_.size());
+  auto f = [this, cond_var, &knots](double u1, double u2) {
+    return (cond_var == 1) ? cond_quantile(u1, u2, 1, knots)
+                           : cond_quantile(u2, u1, 2, knots);
   };
 
   return tools_eigen::binaryExpr_or_nan(u, f);
