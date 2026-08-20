@@ -152,6 +152,12 @@ wrong thing.
 
 ### BUG FIXES
 
+* Read an empty pair-copula store as independence in the paths that still
+  assumed a full one, completing (#729). `Vinecop::reorient` and `get_trees`
+  indexed the store out of bounds, `truncate` gave it tree slots holding no pair
+  copula at all, which `pdf` then dereferenced, and deserializing a vine written
+  without pair copulas threw a JSON type error instead of round-tripping (#743)
+
 * Compute a real discrete density for kernel pair copulas. `KernelBicop`
   overrode `pdf`, `hfunc1` and `hfunc2` to return the continuous quantity at the
   atom midpoint, so the difference quotients in `AbstractBicop::pdf_c_d` /
