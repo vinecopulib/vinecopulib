@@ -79,12 +79,30 @@ TEST(VinecopConstructor, omitted_pair_copulas_survive_structure_operations)
   }
   EXPECT_EQ(model.get_rvine_structure(), RVineStructure(trees));
 
-  // truncation keeps the store empty rather than adding empty tree slots
+  // truncation keeps the store empty rather than adding empty tree slots, and
+  // the decomposition follows the truncated structure
   Vinecop truncated = model;
   truncated.truncate(2);
   EXPECT_EQ(truncated.get_trunc_lvl(), 2u);
   EXPECT_TRUE(truncated.get_all_pair_copulas().empty());
   EXPECT_TRUE(all_close(truncated.pdf(data), ones));
+  EXPECT_EQ(truncated.get_trees().get_trunc_lvl(), 2u);
+
+  // a truncated vine that does have pair copulas decomposes into exactly its
+  // stored trees, each edge carrying its own copula
+  auto pcs = Vinecop::make_pair_copula_store(d);
+  for (auto& tree : pcs)
+    for (auto& pc : tree)
+      pc = Bicop(BicopFamily::clayton, 90, Eigen::VectorXd::Constant(1, 3.0));
+  Vinecop fitted(DVineStructure({ 1, 2, 3, 4 }), pcs);
+  fitted.truncate(2);
+  const auto fitted_trees = fitted.get_trees();
+  ASSERT_EQ(fitted_trees.get_trunc_lvl(), 2u);
+  for (const auto& tree : fitted_trees.get_trees()) {
+    for (const auto& edge : tree) {
+      EXPECT_EQ(edge.pair_copula.get_family(), BicopFamily::clayton);
+    }
+  }
 
   // variable types are labelled in the original order and survive relabeling
   Vinecop discrete(DVineStructure({ 1, 2, 3, 4 }), {}, { "c", "d", "c", "d" });

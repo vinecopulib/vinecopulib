@@ -10,6 +10,22 @@
 namespace test_vinecop_sanity_checks {
 using namespace vinecopulib;
 
+// A model constructed from a structure alone has no families to fit; fitting a
+// truncated-at-zero model is the independence fit, whose log-likelihood is 0.
+TEST(vinecop_sanity_checks, fit_needs_pair_copulas)
+{
+  const auto data = tools_stats::simulate_uniform(50, 4, false, { 1 });
+
+  Vinecop no_families(DVineStructure({ 1, 2, 3, 4 }));
+  EXPECT_THROW(no_families.fit(data), std::runtime_error);
+
+  Vinecop independence(4); // a D-vine truncated at 0
+  ASSERT_EQ(independence.get_trunc_lvl(), static_cast<size_t>(0));
+  EXPECT_NO_THROW(independence.fit(data));
+  EXPECT_EQ(independence.get_loglik(), 0.0);
+  EXPECT_EQ(independence.get_nobs(), static_cast<size_t>(50));
+}
+
 TEST(vinecop_sanity_checks, catches_wrong_tree)
 {
   Vinecop vinecop(3);
