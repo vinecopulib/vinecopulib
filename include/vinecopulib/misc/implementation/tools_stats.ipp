@@ -251,8 +251,11 @@ BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
 //! density estimate restricted to the compatible observations. The refined
 //! points are not confined to the original rectangles.
 //!
-//! The draw is deterministic: every random component is a quasi-random sequence
-//! with a fixed seed, so repeated calls on the same input agree bit for bit.
+//! The draw is deterministic: every random component is drawn from a
+//! fixed-seed generator, so repeated calls on the same input agree bit for
+//! bit. It is also independent of argument order: recovering the latent sample
+//! of \f$ (u_1, u_2) \f$ and of \f$ (u_2, u_1) \f$ gives the same pair of
+//! columns, swapped.
 //!
 //! @param u An \f$ n \times 4 \f$ matrix \f$ (u_1, u_2, u_1^-, u_2^-) \f$
 //! holding each observation's distribution function values and their left
@@ -272,12 +275,10 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     throw std::runtime_error("u must have four columns.");
   }
 
-  // The draws below are indexed by column position -- variable 0 takes the
-  // first coordinate of each -- so the two argument orders would give two
-  // different latent samples. Ordering the pair by its own values makes the
-  // result a function of the observations rather than of how they were
-  // passed. The columns tie only when the two variables are identical, where
-  // swapping them is a no-op.
+  // The draws below are indexed by column position, so ordering the pair by
+  // its own values is what makes the result a function of the observations
+  // rather than of how they were passed. The columns tie only when the two
+  // variables are identical, where swapping them is a no-op.
   bool swapped = false;
   for (ptrdiff_t i = 0; i < u.rows(); i++) {
     if (u(i, 0) != u(i, 1)) {
