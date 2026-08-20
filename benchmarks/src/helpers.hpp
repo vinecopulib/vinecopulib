@@ -91,6 +91,19 @@ discretize_first(const Eigen::MatrixXd& u, double levels = 10.0)
   return u_disc;
 }
 
+//! Discretizes both margins onto a `levels`-point grid, in the 4-column
+//! (value, left-limit) layout.
+inline Eigen::MatrixXd
+discretize_both(const Eigen::MatrixXd& u, double levels = 10.0)
+{
+  Eigen::MatrixXd u_disc(u.rows(), 4);
+  u_disc.col(0) = (u.col(0).array() * levels).ceil() / levels;
+  u_disc.col(1) = (u.col(1).array() * levels).ceil() / levels;
+  u_disc.col(2) = (u.col(0).array() * levels).floor() / levels;
+  u_disc.col(3) = (u.col(1).array() * levels).floor() / levels;
+  return u_disc;
+}
+
 //! Simulates data from a Gaussian d-dimensional vine (deterministic).
 inline vinecopulib::Vinecop
 make_gaussian_vine(size_t d, int seed = 5)

@@ -156,7 +156,9 @@ wrong thing.
   Both degenerate branches assigned the midpoint to one endpoint and then
   recomputed it from the value they had just written, so the second h-function
   was evaluated at `(a + 3b) / 4` rather than at the midpoint again. `pdf`
-  values change for discrete pairs whose atom is narrower than `5e-5` (#744)
+  values change for discrete pairs whose atom is narrower than `5e-5`. The
+  parity harness now covers the discrete/discrete leaf, which had no case at
+  all, so a change there is no longer invisible to it (#744)
 
 * Compute a real discrete density for kernel pair copulas. `KernelBicop`
   overrode `pdf`, `hfunc1` and `hfunc2` to return the continuous quantity at the
