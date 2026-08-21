@@ -26,7 +26,7 @@ algorithms for both vine copula and bivariate copula models — with
 | CMake | **3.14** or later |
 | [Eigen](https://eigen.tuxfamily.org/) | 3.3 or later |
 | [Boost](https://www.boost.org/) | **1.75** or later (headers only) |
-| [wdm](https://github.com/tnagler/wdm) | commit `e13b5f6` or later (post-0.2.6, for Chatterjee's xi) — found via `find_package`, otherwise fetched at configure time |
+| [wdm](https://github.com/tnagler/wdm) | commit `03651d7` or later (post-0.2.6, for Chatterjee's xi) — found via `find_package`, otherwise fetched at configure time |
 | R (optional) | only for the parity tests, with VineCopula >= 2.6.2 |
 
 ## Quickstart

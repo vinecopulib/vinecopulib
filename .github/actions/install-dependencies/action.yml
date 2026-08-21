@@ -42,7 +42,7 @@ inputs:
       The wdm commit to install. Keep in sync with the FetchContent GIT_TAG in
       cmake/findDependencies.cmake.
     required: false
-    default: 'e13b5f61191620be234ac04f8d9bc8680e4248b9'
+    default: '03651d719152ee1ba28578ee737e919ff19abb73'
   lcov:
     description: 'Whether to install lcov'
     required: false
@@ -123,13 +123,9 @@ runs:
       run: |
           # Relative path: ${{runner.temp}} is a backslash path on Windows,
           # which bash mangles.
-          git init wdm
+          git clone https://github.com/tnagler/wdm.git wdm
           cd wdm
-          git remote add origin https://github.com/tnagler/wdm.git
-          # Fetch the commit by name: a pin may point at a commit that no
-          # branch reaches, which a plain clone would not bring along.
-          git fetch --depth 1 origin ${{ inputs.wdm_ref }}
-          git checkout --detach FETCH_HEAD
+          git checkout --detach ${{ inputs.wdm_ref }}
           mkdir release && cd release
           if [ "${{ inputs.os }}" != "windows-latest" ]; then
             cmake .. -DCMAKE_BUILD_TYPE=Release
