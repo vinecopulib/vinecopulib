@@ -1,8 +1,10 @@
 # Benchmarks
 
 A [google/benchmark](https://github.com/google/benchmark) suite (`bench_all`)
-and a numerical parity harness (`parity_dump`), plus the quadrature study that
-chose the Kendall's-tau integration rule (`quadrature_study`).
+and a numerical parity harness (`parity_dump`), plus two standalone studies:
+the one that chose the Kendall's-tau integration rule (`quadrature_study`) and
+the one that chose the TLL margin-normalization scheme
+(`normalization_study`).
 
 > **Not** `examples/benchmark/`. That is an unrelated, pre-existing `chrono`
 > harness and has nothing to do with this suite.
@@ -43,6 +45,8 @@ Useful flags:
 | `src/bench_vinecop.cpp` | vine selection, evaluation, simulation, Rosenblatt |
 | `src/bench_main.cpp` | hand-rolled `main` |
 | `src/helpers.hpp` | seeded fixtures shared by all of the above |
+| `src/normalization_study.cpp` | standalone: TLL margin normalization and the knot clamp |
+| `src/quadrature_study.cpp` | standalone: the Kendall's-tau integration rule |
 
 `bench_main.cpp` is hand-written rather than `BENCHMARK_MAIN()` only so that the
 file stays a normal translation unit; it does exactly what the macro does.
@@ -93,4 +97,27 @@ integration rule.
 ```bash
 cmake --build build-bench -j --target quadrature_study
 build-bench/bin/quadrature_study
+```
+
+## The normalization study
+
+`src/normalization_study.cpp` measures accuracy *and* time for the schemes
+that could renormalize a TLL grid to uniform margins -- the shipped
+alternating sweep, the geometric mean of the two sweep orderings, the
+simultaneous (Jacobi) update with and without over-relaxation, the same
+iteration on log-domain dual potentials, and an Anderson-accelerated variant
+-- plus the `1e-4` knot clamp in `cond_cdf` / `cond_quantile`. It validates
+its own restatement of the shipped sweep against `InterpolationGrid` first, so
+a mismatch means the study is wrong rather than the library.
+
+Sections A-D read the grid a fit stores, i.e. after normalization. To see how
+each arm behaves on the raw local-likelihood surface, pass `norm_times = 0`
+where `TllBicop::fit` builds the grid and rebuild.
+
+Like the quadrature study, it is a study rather than a regression test: run it
+when changing the scheme, its iteration bound, or the clamp.
+
+```bash
+cmake --build build-bench -j --target normalization_study
+build-bench/bin/normalization_study
 ```
