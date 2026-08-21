@@ -32,6 +32,29 @@ register_tll_fit(const std::string& method, size_t n)
     });
 }
 
+//! Grid size is the one axis on which the fit and the margin normalization
+//! scale together, so the ratio between them is only measurable if both are
+//! benchmarked at the same `m`.
+void
+register_tll_fit_grid_size(const std::string& method, size_t m, size_t n)
+{
+  auto data = std::make_shared<const Eigen::MatrixXd>(
+    bench::sim_data(BicopFamily::gaussian, 0, n));
+  FitControlsBicop controls({ BicopFamily::tll });
+  controls.set_nonparametric_method(method);
+  controls.set_nonparametric_grid_size(m);
+  benchmark::RegisterBenchmark(("tll/fit/" + method + "/m=" +
+                                std::to_string(m) + "/n=" + std::to_string(n))
+                                 .c_str(),
+                               [data, controls](benchmark::State& st) {
+                                 for (auto _ : st) {
+                                   Bicop bc(BicopFamily::tll);
+                                   bc.fit(*data, controls);
+                                   benchmark::DoNotOptimize(bc);
+                                 }
+                               });
+}
+
 void
 register_tll_eval(const std::string& method)
 {
@@ -96,6 +119,11 @@ struct Registrar
     }
     register_tll_fit("constant", 5000);
     register_tll_fit("quadratic", 5000);
+    // normalization is O(m^2) and n-independent while the fit is O(m^2 n),
+    // so the smallest sample is where its share of the fit is largest
+    register_tll_fit("constant", 200);
+    register_tll_fit("quadratic", 200);
+    register_tll_fit_grid_size("quadratic", 50, 1000);
     register_tll_discrete_fit();
   }
 };

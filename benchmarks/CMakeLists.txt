@@ -20,3 +20,7 @@ target_link_libraries(parity_dump PRIVATE vinecopulib)
 
 add_executable(quadrature_study src/quadrature_study.cpp)
 target_link_libraries(quadrature_study PRIVATE vinecopulib)
+
+add_executable(normalization_study src/normalization_study.cpp)
+target_link_libraries(normalization_study PRIVATE vinecopulib)
+target_include_directories(normalization_study PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

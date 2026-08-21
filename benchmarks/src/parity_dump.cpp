@@ -28,6 +28,22 @@ to_vec(const Eigen::MatrixXd& m)
   return std::vector<double>(m.data(), m.data() + m.size());
 }
 
+//! Rows reaching every branch of the discrete/discrete density: both atoms
+//! wide (the rectangle formula), either one narrower than the 5e-5 cutoff (one
+//! argument collapsed to its midpoint, a difference quotient in the other), and
+//! both narrow (the continuous density at the midpoint).
+Eigen::MatrixXd
+narrow_atoms()
+{
+  const double wide = 0.4, narrow = 4e-5, tiny = 1e-6;
+  Eigen::MatrixXd u(4, 4);
+  u.row(0) << 0.7, 0.6, 0.7 - wide, 0.6 - wide;
+  u.row(1) << 0.5, 0.7, 0.5 - narrow, 0.7 - wide;
+  u.row(2) << 0.7, 0.5, 0.7 - wide, 0.5 - narrow;
+  u.row(3) << 0.5, 0.5, 0.5 - tiny, 0.5 - tiny;
+  return u;
+}
+
 //! 21x21 lattice on (0.025, ..., 0.975)^2.
 Eigen::MatrixXd
 lattice()
@@ -77,6 +93,21 @@ dump_bicop_eval()
     bc.set_var_types({ "d", "c" });
     const auto u_disc = bench::discretize_first(u);
     const std::string key = get_family_name(family) + "/disc";
+    out[key]["pdf"] = to_vec(bc.pdf(u_disc));
+    out[key]["hfunc1"] = to_vec(bc.hfunc1(u_disc));
+    out[key]["hfunc2"] = to_vec(bc.hfunc2(u_disc));
+    out[key]["hinv1"] = to_vec(bc.hinv1(u_disc));
+  }
+  // discrete/discrete dispatch, on the lattice plus the degenerate rows: the
+  // lattice alone never leaves the rectangle formula
+  const auto narrow = narrow_atoms();
+  for (auto family : { BicopFamily::gaussian, BicopFamily::clayton }) {
+    Bicop bc(family, 0, bench::family_parameters(family));
+    bc.set_var_types({ "d", "d" });
+    Eigen::MatrixXd u_disc(u.rows() + narrow.rows(), 4);
+    u_disc.topRows(u.rows()) = bench::discretize_both(u);
+    u_disc.bottomRows(narrow.rows()) = narrow;
+    const std::string key = get_family_name(family) + "/disc_dd";
     out[key]["pdf"] = to_vec(bc.pdf(u_disc));
     out[key]["hfunc1"] = to_vec(bc.hfunc1(u_disc));
     out[key]["hfunc2"] = to_vec(bc.hfunc2(u_disc));

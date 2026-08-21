@@ -197,6 +197,23 @@ TEST(test_tools_stats, pbvt_and_pbvnorm_are_nan_safe)
   EXPECT_NO_THROW(tools_stats::pbvnorm(X, rho));
 }
 
+namespace {
+
+//! Discretizes both variables to `levels` support points and returns the
+//! four-column (u, u^-) layout `find_latent_sample` expects.
+Eigen::MatrixXd
+discretize_both(const Eigen::MatrixXd& u, double levels = 8.0)
+{
+  Eigen::MatrixXd out(u.rows(), 4);
+  out.col(0) = (u.col(0).array() * levels).ceil() / levels;
+  out.col(1) = (u.col(1).array() * levels).ceil() / levels;
+  out.col(2) = (u.col(0).array() * levels).floor() / levels;
+  out.col(3) = (u.col(1).array() * levels).floor() / levels;
+  return out;
+}
+
+} // namespace
+
 TEST(test_tools_stats, find_latent_sample)
 {
   Eigen::MatrixXd u(4, 4);
@@ -215,6 +232,34 @@ TEST(test_tools_stats, find_latent_sample)
   u.resize(2, 8);
   EXPECT_THROW(tools_stats::find_latent_sample(u, bandwidth, niter),
                std::runtime_error);
+}
+
+// Every random component is a fixed-seed quasi-random sequence, so the draw is
+// reproducible.
+TEST(test_tools_stats, find_latent_sample_is_deterministic)
+{
+  Bicop gauss(BicopFamily::gaussian, 0, Eigen::MatrixXd::Constant(1, 1, 0.7));
+  const Eigen::MatrixXd u = discretize_both(gauss.simulate(300, false, { 5 }));
+  EXPECT_EQ(tools_stats::find_latent_sample(u, 0.2),
+            tools_stats::find_latent_sample(u, 0.2));
+}
+
+// The draws are indexed by column position, so without a canonical ordering
+// the same pair of variables recovers two unrelated latent samples depending
+// on which one is passed first -- and a vine reuses pair copulas in either
+// orientation.
+TEST(test_tools_stats, find_latent_sample_ignores_argument_order)
+{
+  Bicop gauss(BicopFamily::gaussian, 0, Eigen::MatrixXd::Constant(1, 1, 0.7));
+  const Eigen::MatrixXd u = discretize_both(gauss.simulate(300, false, { 5 }));
+  Eigen::MatrixXd u_swapped = u;
+  u_swapped.col(0).swap(u_swapped.col(1));
+  u_swapped.col(2).swap(u_swapped.col(3));
+
+  Eigen::MatrixXd swapped_back =
+    tools_stats::find_latent_sample(u_swapped, 0.2);
+  swapped_back.col(0).swap(swapped_back.col(1));
+  EXPECT_EQ(tools_stats::find_latent_sample(u, 0.2), swapped_back);
 }
 
 // Golden-value regression guards for the performance work: these pin the

@@ -67,6 +67,17 @@ wrong thing.
 * `Vinecop::fit` throws when the model has no pair copulas to fit, rather than
   returning and leaving it unfitted, and a model whose structure is truncated at
   zero records the independence fit (`loglik` 0) instead; see BUG FIXES (#752)
+* Every `tll` fit changes, continuous and discrete alike. The interpolation
+  grid's margins are now balanced and rescaled to a tolerance rather than by
+  three fixed sweeps, `hfunc` and `hinv` no longer floor the interpolated
+  density at `1e-4`, and the discrete latent sample no longer depends on which
+  variable is passed first. Grids, densities, h-functions, `loglik`, `aic`,
+  `bic` and `mbicv` all move, so family and structure selection can differ.
+  `tll` is the default family; see BUG FIXES (#751)
+* The density of a discrete/discrete pair changes where an atom is narrower than
+  `5e-5`: the collapsed argument is now the atom midpoint for both h-function
+  evaluations, so `pdf`, and any `loglik` over such observations, move by
+  `O(atom width)`; see BUG FIXES (#744)
 
 * Every discrete or mixed fit with a nonparametric (`tll`) pair copula changes:
   the fitted grid, density, `loglik`, `aic`, `bic` and `mbicv` all move, so
@@ -143,6 +154,11 @@ wrong thing.
 
 ### PERFORMANCE
 
+* Speed up `InterpolationGrid`'s margin normalization about fourfold. It
+  integrated each grid line through a function taking `const Eigen::VectorXd&`,
+  so every row and column was materialized into a heap-allocated temporary --
+  180 allocations per grid at the default size (#751)
+
 * Speed up the bivariate evaluation engine and tighten allocation in the
   derivative cascade (#681)
 
@@ -170,6 +186,41 @@ wrong thing.
   copulas to fit; a vine whose structure is truncated at zero now records the
   independence fit (`loglik` 0) rather than staying unfitted (#752)
 
+* Make a `tll` fit a function of the data rather than of the argument order.
+  `InterpolationGrid`'s margin normalization ran three row-then-column sweeps,
+  which left the second margin exact and the first off by up to 3.3e-2 at
+  strong dependence -- so a fitted grid was not a copula density in one
+  direction -- and did not commute with transposition. Averaging the two sweep
+  orders balances the margins and makes the result exactly equivariant, so
+  `Vinecop::select` and a refit on the selected structure now agree to ~4e-15
+  where they differed by 7e-2 (#742, #751)
+
+* Draw the discrete latent sample from pseudo-random rather than quasi-random
+  numbers, and make it independent of argument order. A low-discrepancy
+  sequence is a deterministic near-lattice whose coordinates are negatively
+  dependent by construction, so using one as per-observation noise attenuated
+  the recovered sample's dependence -- by up to 0.35 in Kendall's tau, and
+  asymmetrically, so that `find_latent_sample(u1, u2)` recovered the
+  dependence well while `find_latent_sample(u2, u1)` lost a third of it and in
+  one case flipped its sign. Since `Vinecop::select` reuses pair copulas in
+  either orientation, roughly half the discrete `tll` edges of a vine got the
+  degraded draw. The draw remains reproducible, and the two argument orders now
+  agree bit for bit (#742, #751)
+
+* Stop `hfunc` and `hinv` from flooring the interpolated density at `1e-4`.
+  `pdf` floors at `1e-20` and `cdf` not at all, so on a strongly dependent
+  `tll` fit -- where two thirds of the grid can sit below `1e-4` -- the
+  h-functions were not the conditional cdf of the density the same object
+  reported, by up to 7.5e-5 (#742, #751)
+
+* Collapse a degenerate atom to its midpoint once in `AbstractBicop::pdf_d_d`.
+  Both degenerate branches assigned the midpoint to one endpoint and then
+  recomputed it from the value they had just written, so the second h-function
+  was evaluated at `(a + 3b) / 4` rather than at the midpoint again. `pdf`
+  values change for discrete pairs whose atom is narrower than `5e-5`. The
+  parity harness now covers the discrete/discrete leaf, which had no case at
+  all, so a change there is no longer invisible to it (#744)
+  
 * Read an empty pair-copula store as independence in the paths that still
   assumed a full one, completing (#729). `Vinecop::reorient` and `get_trees`
   indexed the store out of bounds, `truncate` gave it tree slots holding no pair
@@ -224,6 +275,13 @@ wrong thing.
   (#676)
 
 ### BUILD SYSTEM AND DEPENDENCIES
+
+* Regenerate the precompiled translation units when the header they are derived
+  from changes. The `.ipp` to `.cpp` translation runs at configure time, and
+  `CONFIGURE_DEPENDS` on the glob only re-runs it when the set of files changes,
+  so editing a header in a `VINECOPULIB_PRECOMPILED` build tree silently linked
+  the previous implementation. A CI step now edits an `.ipp` and checks that its
+  translation unit follows (#753)
 
 * Modernize the CMake project: `GNUInstallDirs`, a namespaced export,
   `target_compile_features`, an architecture-independent version file,

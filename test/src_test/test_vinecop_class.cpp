@@ -2660,4 +2660,30 @@ TEST_F(VinecopTest, tawn_flipping)
   }
 }
 
+// Selection reuses the pair copulas it fitted while building the trees, and
+// places one flipped whenever the finalized slot's diagonal variable is not
+// the edge's first argument. Refitting on the selected structure fits in the
+// finalized order instead, so the two only agree if a `tll` fit is a function
+// of the observations rather than of the order they arrive in.
+TEST_F(VinecopTest, tll_selection_is_reproducible)
+{
+  FitControlsVinecop controls({ BicopFamily::tll });
+  controls.set_num_threads(1);
+  Vinecop fit1(7);
+  fit1.select(u, controls);
+  Vinecop fit2(fit1.get_rvine_structure());
+  fit2.select(u, controls);
+
+  for (size_t tree = 0; tree < fit1.get_trunc_lvl(); ++tree) {
+    for (size_t edge = 0; edge < 6 - tree; ++edge) {
+      auto pc1 = fit1.get_pair_copula(tree, edge);
+      auto pc2 = fit2.get_pair_copula(tree, edge);
+      ASSERT_EQ(pc1.get_family(), pc2.get_family());
+      ASSERT_TRUE(
+        all_close(pc1.get_parameters(), pc2.get_parameters(), 1e-10, 1e-10))
+        << "tree " << tree << ", edge " << edge;
+    }
+  }
+}
+
 }
