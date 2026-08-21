@@ -142,6 +142,22 @@ TEST(test_tools_stats, cxi_works)
   EXPECT_NEAR(tools_stats::pairwise_cxi(V, weights),
               tools_stats::pairwise_cxi(V.topRows(V.rows() / 2)),
               0.05);
+
+  // ties are broken at random, so without a fixed seed the criterion would
+  // differ between calls on the same data and between the two column orders
+  Eigen::MatrixXd tied(60, 2);
+  for (Eigen::Index i = 0; i < tied.rows(); ++i) {
+    tied(i, 0) = static_cast<double>(i / 12) / 5.0;
+    tied(i, 1) = static_cast<double>(i % 12) / 11.0;
+  }
+  Eigen::MatrixXd tied_swapped(tied.rows(), 2);
+  tied_swapped.col(0) = tied.col(1);
+  tied_swapped.col(1) = tied.col(0);
+  double tied_cxi = tools_stats::pairwise_cxi(tied);
+  for (int rep = 0; rep < 5; ++rep) {
+    EXPECT_DOUBLE_EQ(tools_stats::pairwise_cxi(tied), tied_cxi);
+  }
+  EXPECT_DOUBLE_EQ(tools_stats::pairwise_cxi(tied_swapped), tied_cxi);
 }
 
 TEST(test_tools_stats, seed_works)

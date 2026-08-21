@@ -288,10 +288,8 @@ wrong thing.
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
-* Require wdm at commit `6b85eeb` or later, for Chatterjee's xi and for the
-  random tie-breaking fix. Since xi carries wdm's unchanged `0.2.6` version
-  number, no version check can rule out an older wdm, so whichever include
-  directory is used is checked for `wdm/cxi.hpp` (#754)
+* Require wdm 0.2.7, for Chatterjee's xi and for the random tie-breaking fix
+  (#754)
 
 * Fix `-Dwdm_INCLUDE_DIRS=<path>`, which configured but failed every link with
   `cannot find -lwdm`: the build links wdm by target name, and that target is

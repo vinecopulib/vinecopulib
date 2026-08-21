@@ -248,7 +248,7 @@ Discovered in
   behind `tree_algorithm`), **Math** (distributions, constants, special
   functions, `quadrature::tanh_sinh` for 1-d integration, `tools::minima`),
   and **Random** (`mt19937`, behind QRNG scrambling and structure simulation).
-- **wdm 0.2.6** — `find_package(wdm 0.2.6 QUIET)` with a **FetchContent
+- **wdm 0.2.7** — `find_package(wdm 0.2.7 QUIET)` with a **FetchContent
   fallback** that clones `tnagler/wdm`. Installed under
   `<prefix>/include/vinecopulib/wdm/`.
 - **Threads** — required.

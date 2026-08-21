@@ -43,29 +43,20 @@ find_package(Threads                      REQUIRED)
 # Check if wdm_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED wdm_INCLUDE_DIRS)
   # Download if not found
-  find_package(wdm 0.2.6 QUIET)
+  # 0.2.7 for Chatterjee's xi; do not lower.
+  find_package(wdm 0.2.7 QUIET)
   if(NOT wdm_FOUND)
     include(FetchContent)
     FetchContent_Declare(
       wdm
       GIT_REPOSITORY https://github.com/tnagler/wdm.git
-      GIT_TAG        6b85eebc3e0097672be1047f6f43848bc77acb52 # tnagler/wdm#17
+      GIT_TAG        536099dbc8da175b8e3ad63edc335a6e4f1d36e3 # the 0.2.7 bump; no tag yet
     )
     FetchContent_MakeAvailable(wdm)
     set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
   else()
     message(STATUS "Found wdm: ${wdm_INCLUDE_DIRS} (found suitable version \"${wdm_VERSION}\")")
   endif()
-endif()
-
-# Chatterjee's xi carries wdm's 0.2.6 version number, so neither the version
-# check above nor a caller-supplied wdm_INCLUDE_DIRS can rule out a wdm that
-# predates it.
-if(NOT EXISTS "${wdm_INCLUDE_DIRS}/wdm/cxi.hpp")
-  message(FATAL_ERROR "The wdm at ${wdm_INCLUDE_DIRS} is missing wdm/cxi.hpp, "
-          "which the \"cxi\" tree criterion needs. Point wdm_DIR or "
-          "wdm_INCLUDE_DIRS at wdm 6b85eeb or later, or unset both to have it "
-          "fetched at configure time.")
 endif()
 
 # The build links wdm by target name, which find_package and FetchContent both
