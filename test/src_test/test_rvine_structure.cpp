@@ -174,6 +174,28 @@ TEST(rvine_structure, rvine_trees_sanity_checks)
   TriangularArray<size_t> struct_array3({ { 2, 3, 4 }, { 5, 1 }, { 6 } });
   RVineTrees rvt3(order, struct_array3);
   EXPECT_THROW(rvt3.to_struct_array(), std::runtime_error);
+
+  // an empty pair-copula store means independence on every edge; a non-empty
+  // one has to cover the array, rather than being read past its end
+  TriangularArray<size_t> struct_array4({ { 2, 3, 4 }, { 3, 4 }, { 4 } });
+  RVineTrees rvt4(order, struct_array4, {});
+  for (const auto& tree : rvt4.get_trees()) {
+    for (const auto& edge : tree) {
+      EXPECT_EQ(edge.pair_copula.get_family(), BicopFamily::indep);
+    }
+  }
+  std::vector<std::vector<Bicop>> pcs{ std::vector<Bicop>(3),
+                                       std::vector<Bicop>(2),
+                                       std::vector<Bicop>(1) };
+  EXPECT_NO_THROW(RVineTrees(order, struct_array4, pcs));
+  auto too_few_trees = pcs;
+  too_few_trees.pop_back();
+  EXPECT_THROW(RVineTrees(order, struct_array4, too_few_trees),
+               std::runtime_error);
+  auto too_few_edges = pcs;
+  too_few_edges[1].pop_back();
+  EXPECT_THROW(RVineTrees(order, struct_array4, too_few_edges),
+               std::runtime_error);
 }
 
 TEST(rvine_structure, triangular_array_conversions_work)

@@ -79,12 +79,30 @@ TEST(VinecopConstructor, omitted_pair_copulas_survive_structure_operations)
   }
   EXPECT_EQ(model.get_rvine_structure(), RVineStructure(trees));
 
-  // truncation keeps the store empty rather than adding empty tree slots
+  // truncation keeps the store empty rather than adding empty tree slots, and
+  // the decomposition follows the truncated structure
   Vinecop truncated = model;
   truncated.truncate(2);
   EXPECT_EQ(truncated.get_trunc_lvl(), 2u);
   EXPECT_TRUE(truncated.get_all_pair_copulas().empty());
   EXPECT_TRUE(all_close(truncated.pdf(data), ones));
+  EXPECT_EQ(truncated.get_trees().get_trunc_lvl(), 2u);
+
+  // a truncated vine that does have pair copulas decomposes into exactly its
+  // stored trees, each edge carrying its own copula
+  auto pcs = Vinecop::make_pair_copula_store(d);
+  for (auto& tree : pcs)
+    for (auto& pc : tree)
+      pc = Bicop(BicopFamily::clayton, 90, Eigen::VectorXd::Constant(1, 3.0));
+  Vinecop fitted(DVineStructure({ 1, 2, 3, 4 }), pcs);
+  fitted.truncate(2);
+  const auto fitted_trees = fitted.get_trees();
+  ASSERT_EQ(fitted_trees.get_trunc_lvl(), 2u);
+  for (const auto& tree : fitted_trees.get_trees()) {
+    for (const auto& edge : tree) {
+      EXPECT_EQ(edge.pair_copula.get_family(), BicopFamily::clayton);
+    }
+  }
 
   // variable types are labelled in the original order and survive relabeling
   Vinecop discrete(DVineStructure({ 1, 2, 3, 4 }), {}, { "c", "d", "c", "d" });
@@ -756,9 +774,16 @@ TEST_F(VinecopTest, reoriented_transforms_validate_conditioning_set)
   EXPECT_ANY_THROW(
     model.inverse_rosenblatt(eval_data, std::vector<size_t>{ 1, 3 }));
 
+  // a truncated model is supported: the conditioning-set overload evaluates the
+  // re-oriented model without materializing it, and agrees with reorient()
   model.truncate(2);
-  EXPECT_ANY_THROW(
-    model.inverse_rosenblatt(eval_data, std::vector<size_t>{ 1 }));
+  Vinecop materialized = model;
+  materialized.reorient(std::vector<size_t>{ 1 });
+  EXPECT_TRUE(
+    all_close(model.inverse_rosenblatt(eval_data, std::vector<size_t>{ 1 }),
+              materialized.inverse_rosenblatt(eval_data),
+              1e-10,
+              1e-10));
 }
 
 TEST_F(VinecopTest, simulate_conditional_is_correct)
@@ -1199,6 +1224,119 @@ TEST_F(VinecopTest, reorient_preserves_model)
   EXPECT_ANY_THROW(vc.reorient({ 1, 2, 3, 4, 5, 6 })); // |B| == d
   EXPECT_ANY_THROW(vc.reorient({ 7 }));                // out of range
   EXPECT_ANY_THROW(vc.reorient({ 2, 2 }));             // duplicate
+}
+
+// A truncated model is relabeled like any other: the peeling works from the top
+// stored tree down, so only the stored trees are permuted and the truncation
+// level is preserved.
+TEST(VinecopReorient, handles_truncated_vines)
+{
+  const size_t d = 6;
+  auto model = make_clayton_dvine(d, 3.0, 90);
+  model.truncate(2);
+  ASSERT_EQ(model.get_trunc_lvl(), 2u);
+  ASSERT_EQ(model.get_all_pair_copulas().size(), 2u);
+
+  const auto data = tools_stats::simulate_uniform(200, d, false, { 7 });
+  const auto pdf0 = model.pdf(data);
+  const auto w = tools_stats::simulate_uniform(20, d, false, { 71 });
+
+  size_t feasible = 0;
+  const std::vector<std::vector<size_t>> candidates{ { 1 },    { 3 },
+                                                     { 6 },    { 1, 2 },
+                                                     { 2, 5 }, { 1, 3, 6 } };
+  for (const auto& B : candidates) {
+    Vinecop vr = model;
+    try {
+      vr.reorient(B);
+    } catch (const std::exception&) {
+      continue; // inadmissible tail -> allowed, as for a full vine
+    }
+    ++feasible;
+    EXPECT_EQ(vr.get_trunc_lvl(), 2u);
+    EXPECT_EQ(vr.get_all_pair_copulas().size(), 2u);
+    EXPECT_TRUE(all_close(vr.pdf(data), pdf0, 1e-9, 1e-9));
+    EXPECT_TRUE(all_close(
+      model.inverse_rosenblatt(w, B), vr.inverse_rosenblatt(w), 1e-10, 1e-10));
+    auto o = vr.get_order();
+    std::vector<size_t> tail(o.end() - static_cast<ptrdiff_t>(B.size()),
+                             o.end());
+    std::sort(tail.begin(), tail.end());
+    auto bs = B;
+    std::sort(bs.begin(), bs.end());
+    EXPECT_EQ(tail, bs);
+    EXPECT_NO_THROW(RVineStructure(vr.get_matrix()));
+  }
+  EXPECT_GT(feasible, 0u);
+}
+
+// A vine truncated at zero has no trees to peel: every order represents the
+// same independence model, so the tail is placed by permuting the diagonal.
+TEST(VinecopReorient, handles_a_vine_truncated_at_zero)
+{
+  const size_t d = 5;
+  const Vinecop model(d);
+  ASSERT_EQ(model.get_trunc_lvl(), 0u);
+
+  const std::vector<size_t> B{ 2, 4 };
+  Vinecop vr = model;
+  ASSERT_NO_THROW(vr.reorient(B));
+  EXPECT_EQ(vr.get_order(), std::vector<size_t>({ 1, 3, 5, 2, 4 }));
+  EXPECT_EQ(vr.get_trunc_lvl(), 0u);
+  EXPECT_TRUE(vr.get_all_pair_copulas().empty());
+
+  const auto data = tools_stats::simulate_uniform(20, d, false, { 1 });
+  EXPECT_TRUE(all_close(vr.pdf(data), Eigen::VectorXd::Ones(data.rows())));
+
+  Eigen::MatrixXd u_cond(20, B.size());
+  u_cond.col(0).setConstant(0.3);
+  u_cond.col(1).setConstant(0.7);
+  const auto simulated = vr.simulate_conditional(u_cond, false, 1, { 3 });
+  EXPECT_TRUE(all_close(simulated.col(1), u_cond.col(0))); // variable 2
+  EXPECT_TRUE(all_close(simulated.col(3), u_cond.col(1))); // variable 4
+}
+
+// Conditioning-aware selection under truncation: the fit stops at the
+// truncation level and the re-orientation that follows works from there.
+TEST(VinecopConditionalSelection, supports_truncation)
+{
+  const size_t d = 6;
+  const auto data = make_clayton_dvine(d, 2.0).simulate(400, false, 1, { 5 });
+  const std::vector<size_t> B{ 1, 5 };
+
+  for (const bool select_trunc : { false, true }) {
+    FitControlsVinecop controls;
+    controls.set_family_set({ BicopFamily::gaussian, BicopFamily::clayton });
+    controls.set_conditioning_set(B);
+    if (select_trunc) {
+      controls.set_select_trunc_lvl(true);
+    } else {
+      controls.set_trunc_lvl(2);
+    }
+
+    Vinecop vc(d);
+    ASSERT_NO_THROW(vc.select(data, controls));
+    EXPECT_EQ(vc.get_all_pair_copulas().size(), vc.get_trunc_lvl());
+    if (!select_trunc) {
+      EXPECT_EQ(vc.get_trunc_lvl(), 2u);
+    }
+
+    auto o = vc.get_order();
+    std::vector<size_t> tail(o.end() - static_cast<ptrdiff_t>(B.size()),
+                             o.end());
+    std::sort(tail.begin(), tail.end());
+    EXPECT_EQ(tail, B);
+
+    Eigen::MatrixXd u_cond(30, B.size());
+    u_cond.col(0).setConstant(0.35);
+    u_cond.col(1).setConstant(0.65);
+    const auto simulated = vc.simulate_conditional(u_cond, false, 1, { 9 });
+    for (size_t j = 0; j < B.size(); ++j) {
+      const auto col = static_cast<long>(o[d - B.size() + j] - 1);
+      EXPECT_TRUE(
+        all_close(simulated.col(col), u_cond.col(static_cast<long>(j))));
+    }
+  }
 }
 
 TEST_F(VinecopTest, conditional_select_throws)

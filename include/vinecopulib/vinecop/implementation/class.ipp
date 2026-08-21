@@ -403,14 +403,6 @@ Vinecop::check_conditioning_set(const std::vector<size_t>& conditioning_set,
       "conditioning-aware selection requires an MST tree_algorithm "
       "('mst_prim' or 'mst_kruskal').");
   }
-  // v1: re-orientation operates on the full R-vine matrix, so structural
-  // truncation is not supported (thresholding, which keeps the structure full,
-  // is fine).
-  if (controls.get_select_trunc_lvl() || (controls.get_trunc_lvl() < d_ - 1)) {
-    throw std::runtime_error(
-      "conditioning-aware selection does not support truncation "
-      "(trunc_lvl / select_trunc_lvl) in this version.");
-  }
 }
 
 //! @brief Validates the custom edge-weight function against the criterion it
@@ -490,10 +482,6 @@ Vinecop::make_reorientation_map(
   if ((sorted.front() < 1) || (sorted.back() > d_)) {
     throw std::runtime_error("conditioning_set entries must be in 1, ..., d.");
   }
-  if (rvine_structure_.get_trunc_lvl() != d_ - 1) {
-    throw std::runtime_error(
-      "reorient() requires a non-truncated vine (trunc_lvl == d - 1).");
-  }
 
   std::vector<char> in_b(d_ + 1, 0);
   for (auto v : conditioning_set)
@@ -512,6 +500,21 @@ Vinecop::make_reorientation_map(
     ReorientationMap identity;
     identity.identity = true;
     return identity;
+  }
+
+  // A vine truncated at zero has no trees to peel: every pair copula is
+  // independence, so any order represents the same model and the tail is
+  // placed by permuting the diagonal, keeping the relative order on each side.
+  if (rvine_structure_.get_trunc_lvl() == 0) {
+    std::vector<size_t> order;
+    order.reserve(d_);
+    for (auto keep_b : { false, true })
+      for (auto v : rvine_structure_.get_order())
+        if ((in_b[v] != 0) == keep_b)
+          order.push_back(v);
+    return { RVineStructure(order, static_cast<size_t>(0)),
+             TriangularArray<RVineTrees::PairCopulaLocation>(d_, 0),
+             false };
   }
 
   // Peel the structure while steering the diagonal so that the conditioning
@@ -557,9 +560,11 @@ Vinecop::make_reorientation_map(
 //! `conditioning_set` are drawn first and can be conditioned on with
 //! `simulate_conditional`. It chooses, per tree, which conditioned variable
 //! sits on the matrix diagonal, and flips each pair copula whose stored
-//! orientation no longer matches its new position. Throws if the current
-//! structure admits no sampling order ending in `conditioning_set` (fit with a
-//! conditioning set via `FitControlsVinecop` to guarantee one exists).
+//! orientation no longer matches its new position. Truncated models are
+//! supported: only the trees they store take part, and the truncation level is
+//! preserved. Throws if the current structure admits no sampling order ending
+//! in `conditioning_set` (fit with a conditioning set via `FitControlsVinecop`
+//! to guarantee one exists).
 //!
 //! @param conditioning_set 1-based variable indices to place at the tail of the
 //! variable order.
@@ -577,8 +582,11 @@ Vinecop::reorient(const std::vector<size_t>& conditioning_set)
     return;
   }
 
-  std::vector<std::vector<Bicop>> pair_copulas(d_ - 1);
-  for (size_t tree = 0; tree < d_ - 1; ++tree) {
+  // the reorientation map covers the stored trees; a truncated model has no
+  // pair copulas beyond them
+  const size_t trunc_lvl = pair_copulas_.size();
+  std::vector<std::vector<Bicop>> pair_copulas(trunc_lvl);
+  for (size_t tree = 0; tree < trunc_lvl; ++tree) {
     pair_copulas[tree].reserve(d_ - 1 - tree);
     for (size_t edge = 0; edge < d_ - 1 - tree; ++edge) {
       auto location = reorientation.pair_copulas(tree, edge);
@@ -620,8 +628,20 @@ Vinecop::fit(const Eigen::MatrixXd& data,
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = get_effective_trunc_lvl();
-  if (trunc_lvl == 0)
+  if (trunc_lvl == 0) {
+    if (pair_copulas_.empty() && (rvine_structure_.get_trunc_lvl() > 0)) {
+      // an empty store means independence everywhere else, but here the caller
+      // passed data to fit: there are no families to fit it to
+      throw std::runtime_error(
+        "no pair copulas to fit: this model was constructed without them. Use "
+        "select() to choose families, or set_all_pair_copulas() to set them.");
+    }
+    // the structure itself is truncated at 0, so the model is independence and
+    // its log-likelihood is exactly 0
+    loglik_ = 0;
+    nobs_ = static_cast<size_t>(u.rows());
     return;
+  }
 
   auto order = rvine_structure_.get_order();
   auto disc_cols = tools_select::get_disc_cols(var_types_);
@@ -925,13 +945,9 @@ inline RVineTrees
 Vinecop::get_trees() const
 {
   // decompose in original labels: the diagonal `get_order()`, the original-
-  // label structure array, and the pair-copulas share the same labelling.
-  if (pair_copulas_.empty()) {
-    // an empty store means independence, which is what this constructor puts
-    // on every edge
-    return RVineTrees(rvine_structure_.get_order(),
-                      rvine_structure_.get_struct_array(false));
-  }
+  // label structure array, and the pair-copulas share the same labelling. An
+  // empty store is passed through as such: `RVineTrees` reads it as
+  // independence on every edge.
   return RVineTrees(rvine_structure_.get_order(),
                     rvine_structure_.get_struct_array(false),
                     pair_copulas_);

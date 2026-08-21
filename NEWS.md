@@ -64,6 +64,9 @@ wrong thing.
 
 ### BEHAVIOR CHANGES
 
+* `Vinecop::fit` throws when the model has no pair copulas to fit, rather than
+  returning and leaving it unfitted, and a model whose structure is truncated at
+  zero records the independence fit (`loglik` 0) instead; see BUG FIXES (#752)
 * Every `tll` fit changes, continuous and discrete alike. The interpolation
   grid's margins are now balanced and rescaled to a tolerance rather than by
   three fixed sweeps, `hfunc` and `hinv` no longer floor the interpolated
@@ -101,6 +104,13 @@ wrong thing.
   differ for the same model. Densities and log-likelihoods do not (#702)
 
 ### NEW FEATURES
+
+* `Vinecop::reorient` and conditioning-aware selection now support truncated
+  models. Only the trees a model stores take part in the re-orientation and the
+  truncation level is preserved, so `FitControlsVinecop::set_conditioning_set()`
+  can be combined with `trunc_lvl`, `select_trunc_lvl` and thresholding; a model
+  truncated at zero is independence, and its conditioning variables are moved to
+  the tail of the order (#752)
 
 * Add scores, gradient, Hessian and score covariance to `Bicop` and `Vinecop`,
   with `scores_full` and `hessian_full` exposing the per-edge intermediates for
@@ -168,6 +178,13 @@ wrong thing.
 * Exit structure selection early when the graph is already a tree (#661)
 
 ### BUG FIXES
+
+* Validate the pair-copula store in the `RVineTrees` constructor rather than
+  indexing it blindly: an empty store means independence on every edge, and one
+  that does not cover the structure array is an error instead of a read past its
+  end. `Vinecop::fit` no longer returns silently when the model has no pair
+  copulas to fit; a vine whose structure is truncated at zero now records the
+  independence fit (`loglik` 0) rather than staying unfitted (#752)
 
 * Make a `tll` fit a function of the data rather than of the argument order.
   `InterpolationGrid`'s margin normalization ran three row-then-column sweeps,
