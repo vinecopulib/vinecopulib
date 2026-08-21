@@ -344,6 +344,42 @@ TEST(discrete, check_d_d_stability)
   EXPECT_NEAR(vine2, bicop, 1e-2);
 }
 
+// When an atom is narrower than the 5e-5 cutoff, pdf_d_d replaces the
+// difference quotient in that argument by an h-function evaluated at the atom's
+// midpoint. Both h-function evaluations have to use the same midpoint, so the
+// result is the difference quotient of the remaining argument.
+TEST(discrete, d_d_degenerate_branch_uses_the_atom_midpoint)
+{
+  const auto par = Eigen::VectorXd::Constant(1, 0.6);
+  const auto reference = Bicop(BicopFamily::gaussian, 0, par);
+  auto bicop = Bicop(BicopFamily::gaussian, 0, par);
+  bicop.set_var_types({ "d", "d" });
+
+  const double narrow = 4e-5; // below the cutoff; the wide atom is 0.4
+  Eigen::MatrixXd u(1, 4);
+  Eigen::MatrixXd upper(1, 2), lower(1, 2);
+
+  // narrow atom in the first argument: h1 collapsed in u1, differenced in u2
+  u << 0.5, 0.7, 0.5 - narrow, 0.3;
+  const double mid1 = (u(0, 0) + u(0, 2)) / 2;
+  upper << mid1, u(0, 1);
+  lower << mid1, u(0, 3);
+  EXPECT_NEAR(bicop.pdf(u)(0),
+              (reference.hfunc1(upper)(0) - reference.hfunc1(lower)(0)) /
+                (u(0, 1) - u(0, 3)),
+              1e-12);
+
+  // and the mirror case: h2 collapsed in u2, differenced in u1
+  u << 0.7, 0.5, 0.3, 0.5 - narrow;
+  const double mid2 = (u(0, 1) + u(0, 3)) / 2;
+  upper << u(0, 0), mid2;
+  lower << u(0, 2), mid2;
+  EXPECT_NEAR(bicop.pdf(u)(0),
+              (reference.hfunc2(upper)(0) - reference.hfunc2(lower)(0)) /
+                (u(0, 0) - u(0, 2)),
+              1e-12);
+}
+
 // Regression test for PR #700: the per-row parameter evaluation in the
 // discrete leaves (pdf_c_d, pdf_d_d and the discrete branches of hfunc1 /
 // hfunc2) must not index the parameter matrix row-by-row for families whose
