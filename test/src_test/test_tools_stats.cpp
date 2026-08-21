@@ -6,6 +6,7 @@
 
 #include "include/test_utils.hpp"
 #include "gtest/gtest.h"
+#include <algorithm>
 #include <vinecopulib.hpp>
 
 namespace test_tools_stats {
@@ -429,19 +430,29 @@ TEST(test_tools_stats, golden_pseudo_obs)
   random_exp <<
     0.090909090909090912, 0.90909090909090906,
     0.27272727272727271, 0.27272727272727271,
-    0.27272727272727271, 0.45454545454545453,
+    0.36363636363636365, 0.45454545454545453,
     0.72727272727272729, 0.090909090909090912,
     0.18181818181818182, 0.18181818181818182,
     0.90909090909090906, 0.54545454545454541,
-    0.54545454545454541, 0.54545454545454541,
+    0.63636363636363635, 0.63636363636363635,
     0.54545454545454541, 0.81818181818181823,
     0.81818181818181823, 0.36363636363636365,
     0.45454545454545453, 0.72727272727272729;
   // clang-format on
-  EXPECT_TRUE(all_close(
-    tools_stats::to_pseudo_obs(x, "random", Eigen::VectorXd(), { 17 }),
-    random_exp,
-    1e-14,
-    1e-14));
+  auto random_obs =
+    tools_stats::to_pseudo_obs(x, "random", Eigen::VectorXd(), { 17 });
+  EXPECT_TRUE(all_close(random_obs, random_exp, 1e-14, 1e-14));
+
+  // `"random"` breaks ties, so each column is a permutation of
+  // 1 / (n + 1), ..., n / (n + 1); golden values alone would not catch a tie
+  // group collapsing onto one rank.
+  double n = static_cast<double>(x.rows());
+  for (Eigen::Index j = 0; j < random_obs.cols(); ++j) {
+    Eigen::VectorXd sorted = random_obs.col(j);
+    std::sort(sorted.data(), sorted.data() + sorted.size());
+    for (Eigen::Index i = 0; i < sorted.size(); ++i) {
+      EXPECT_NEAR(sorted(i), (static_cast<double>(i) + 1.0) / (n + 1.0), 1e-14);
+    }
+  }
 }
 }
