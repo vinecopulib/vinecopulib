@@ -108,7 +108,7 @@ wrong thing.
 * Add `"cxi"` as a `tree_criterion`, weighting edges by Chatterjee's xi
   symmetrized as `max(xi(X, Y), xi(Y, X))`. Like `"hoeffd"` it picks up
   non-monotonic dependence, and unlike it, it detects functional relationships
-  even when they are not smooth. Requires wdm at commit `61a88ac` or later, so
+  even when they are not smooth. Requires wdm at commit `ca1c0bd` or later, so
   the pinned version was bumped (#754)
 
 * `Vinecop::reorient` and conditioning-aware selection now support truncated
