@@ -64,6 +64,13 @@ wrong thing.
 
 ### BEHAVIOR CHANGES
 
+* `to_pseudo_obs(..., "random")` returns different values for a given seed, and
+  every discrete `tll` fit moves with it, because the jitter it applies goes
+  through that path. wdm's random tie-breaking assigned its offsets one step out
+  of phase, so a tie group of two always came out equal and larger groups lost
+  one rank; ranks are now a permutation of `1, ..., n` as intended. Requires the
+  wdm bump under BUILD SYSTEM AND DEPENDENCIES (#754)
+
 * `Vinecop::fit` throws when the model has no pair copulas to fit, rather than
   returning and leaving it unfitted, and a model whose structure is truncated at
   zero records the independence fit (`loglik` 0) instead; see BUG FIXES (#752)
@@ -108,8 +115,7 @@ wrong thing.
 * Add `"cxi"` as a `tree_criterion`, weighting edges by Chatterjee's xi
   symmetrized as `max(xi(X, Y), xi(Y, X))`. Like `"hoeffd"` it picks up
   non-monotonic dependence, and unlike it, it detects functional relationships
-  even when they are not smooth. Requires wdm at commit `ca1c0bd` or later, so
-  the pinned version was bumped (#754)
+  even when they are not smooth (#754)
 
 * `Vinecop::reorient` and conditioning-aware selection now support truncated
   models. Only the trees a model stores take part in the re-orientation and the
@@ -281,6 +287,12 @@ wrong thing.
   (#676)
 
 ### BUILD SYSTEM AND DEPENDENCIES
+
+* Require wdm at commit `e13b5f6` or later, for Chatterjee's xi and for the
+  random tie-breaking fix. Since xi carries wdm's unchanged `0.2.6` version
+  number, `find_package` cannot rule out an older installation on the version
+  alone, so the include directory it reports is checked for `wdm/cxi.hpp`
+  (#754)
 
 * Regenerate the precompiled translation units when the header they are derived
   from changes. The `.ipp` to `.cpp` translation runs at configure time, and
