@@ -43,14 +43,14 @@ find_package(Threads                      REQUIRED)
 # Check if wdm_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED wdm_INCLUDE_DIRS)
   # Download if not found
-  # 0.2.7 for Chatterjee's xi; do not lower.
-  find_package(wdm 0.2.7 QUIET)
+  # 0.3.0 for Chatterjee's xi; do not lower.
+  find_package(wdm 0.3.0 QUIET)
   if(NOT wdm_FOUND)
     include(FetchContent)
     FetchContent_Declare(
       wdm
       GIT_REPOSITORY https://github.com/tnagler/wdm.git
-      GIT_TAG        536099dbc8da175b8e3ad63edc335a6e4f1d36e3 # the 0.2.7 bump; no tag yet
+      GIT_TAG        ae077fccacbb4ba980cb5e7dbc14105f821ea98e # tnagler/wdm#26; 0.3.0 is not tagged
     )
     FetchContent_MakeAvailable(wdm)
     set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")

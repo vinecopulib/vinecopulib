@@ -143,8 +143,9 @@ TEST(test_tools_stats, cxi_works)
               tools_stats::pairwise_cxi(V.topRows(V.rows() / 2)),
               0.05);
 
-  // ties are broken at random, so without a fixed seed the criterion would
-  // differ between calls on the same data and between the two column orders
+  // wdm breaks predictor ties at random but seeds that deterministically, so
+  // the criterion must not vary between calls on the same data, nor between
+  // the two column orders
   Eigen::MatrixXd tied(60, 2);
   for (Eigen::Index i = 0; i < tied.rows(); ++i) {
     tied(i, 0) = static_cast<double>(i / 12) / 5.0;

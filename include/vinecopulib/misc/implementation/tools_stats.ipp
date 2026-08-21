@@ -542,13 +542,8 @@ pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 inline double
 pairwise_cxi(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 {
-  // wdm breaks ties in the first argument at random, seeding from
-  // std::random_device when no seed is given. A fixed seed keeps the criterion
-  // a deterministic function of the data, and gives every pair the same
-  // tie-breaking realization.
-  static const std::vector<int> seeds = { 5 };
-  double xi12 = wdm::wdm(x.col(0), x.col(1), "cxi", weights, true, seeds);
-  double xi21 = wdm::wdm(x.col(1), x.col(0), "cxi", weights, true, seeds);
+  double xi12 = wdm::wdm(x.col(0), x.col(1), "cxi", weights);
+  double xi21 = wdm::wdm(x.col(1), x.col(0), "cxi", weights);
   if (std::isnan(xi12) || std::isnan(xi21)) {
     return std::numeric_limits<double>::quiet_NaN();
   }

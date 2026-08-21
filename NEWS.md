@@ -288,7 +288,7 @@ wrong thing.
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
-* Require wdm 0.2.7, for Chatterjee's xi and for the random tie-breaking fix
+* Require wdm 0.3.0, for Chatterjee's xi and for the random tie-breaking fix
   (#754)
 
 * Fix `-Dwdm_INCLUDE_DIRS=<path>`, which configured but failed every link with
