@@ -48,6 +48,8 @@ calculate_criterion_clean(const Eigen::MatrixXd& data,
       w = tree_criterion_function(data, weights);
     } else if (tree_criterion == "mcor") {
       w = tools_stats::pairwise_mcor(data, weights);
+    } else if (tree_criterion == "cxi") {
+      w = tools_stats::pairwise_cxi(data, weights);
     } else if (tree_criterion == "joe") {
       // mutual information for Gaussian copula
       w = wdm::wdm(tools_stats::qnorm(data), "pearson", weights)(0, 1);

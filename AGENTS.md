@@ -502,7 +502,8 @@ For any behavior change:
 - **`FitControlsVinecop`**
   ([fit_controls.hpp](include/vinecopulib/vinecop/fit_controls.hpp))
   inherits `FitControlsBicop` and adds the structure knobs: `trunc_lvl`,
-  `tree_criterion` (`"tau"`/`"rho"`/`"hoeffd"`/`"mcor"`/`"joe"`/`"custom"`,
+  `tree_criterion`
+  (`"tau"`/`"rho"`/`"hoeffd"`/`"mcor"`/`"cxi"`/`"joe"`/`"custom"`,
   the last backed by `tree_criterion_function`), `threshold`,
   `tree_algorithm` (`"mst_prim"` default, `"mst_kruskal"`,
   `"random_weighted"`, `"random_unweighted"`), `select_trunc_lvl` /

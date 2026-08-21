@@ -105,6 +105,44 @@ TEST(test_tools_stats, mcor_works)
   ASSERT_TRUE(std::fabs(a1 - a2) < 0.05);
 }
 
+TEST(test_tools_stats, cxi_works)
+{
+  std::vector<int> seeds = { 1, 2, 3, 4, 5 };
+  Eigen::MatrixXd Z = tools_stats::simulate_uniform(2000, 2, false, seeds);
+  Z = tools_stats::qnorm(Z);
+
+  // under independence, xi is centered at zero
+  EXPECT_NEAR(tools_stats::pairwise_cxi(Z), 0.0, 0.1);
+
+  // a deterministic but non-monotonic relationship: Kendall's tau is blind to
+  // it, xi is not
+  Eigen::MatrixXd V(Z.rows(), 2);
+  V.col(0) = Z.col(0);
+  V.col(1) = Z.col(0).cwiseAbs2();
+  EXPECT_NEAR(std::fabs(wdm::wdm(V, "tau")(0, 1)), 0.0, 0.1);
+  EXPECT_GT(tools_stats::pairwise_cxi(V), 0.9);
+
+  // the two directions genuinely differ here, so taking the larger of them is
+  // what makes the criterion independent of the column order
+  double xi12 = wdm::wdm(V.col(0), V.col(1), "cxi");
+  double xi21 = wdm::wdm(V.col(1), V.col(0), "cxi");
+  EXPECT_GT(xi12 - xi21, 0.1);
+  Eigen::MatrixXd V_swapped(V.rows(), 2);
+  V_swapped.col(0) = V.col(1);
+  V_swapped.col(1) = V.col(0);
+  EXPECT_DOUBLE_EQ(tools_stats::pairwise_cxi(V),
+                   tools_stats::pairwise_cxi(V_swapped));
+
+  // uniform weights must not change anything, zero weights must drop rows
+  Eigen::VectorXd weights = Eigen::VectorXd::Ones(V.rows());
+  EXPECT_NEAR(
+    tools_stats::pairwise_cxi(V, weights), tools_stats::pairwise_cxi(V), 1e-10);
+  weights.tail(V.rows() / 2) = Eigen::VectorXd::Zero(V.rows() / 2);
+  EXPECT_NEAR(tools_stats::pairwise_cxi(V, weights),
+              tools_stats::pairwise_cxi(V.topRows(V.rows() / 2)),
+              0.05);
+}
+
 TEST(test_tools_stats, seed_works)
 {
   size_t d = 2;

@@ -105,6 +105,12 @@ wrong thing.
 
 ### NEW FEATURES
 
+* Add `"cxi"` as a `tree_criterion`, weighting edges by Chatterjee's xi
+  symmetrized as `max(xi(X, Y), xi(Y, X))`. Like `"hoeffd"` it picks up
+  non-monotonic dependence, and unlike it, it detects functional relationships
+  even when they are not smooth. Requires wdm at commit `61a88ac` or later, so
+  the pinned version was bumped (#754)
+
 * `Vinecop::reorient` and conditioning-aware selection now support truncated
   models. Only the trees a model stores take part in the re-orientation and the
   truncation level is preserved, so `FitControlsVinecop::set_conditioning_set()`

@@ -171,6 +171,10 @@ double
 pairwise_mcor(const Eigen::MatrixXd& x,
               const Eigen::VectorXd& weights = Eigen::VectorXd());
 
+double
+pairwise_cxi(const Eigen::MatrixXd& x,
+             const Eigen::VectorXd& weights = Eigen::VectorXd());
+
 Eigen::MatrixXd
 ghalton(const size_t& n,
         const size_t& d,
