@@ -71,6 +71,10 @@ wrong thing.
   variable is passed first. Grids, densities, h-functions, `loglik`, `aic`,
   `bic` and `mbicv` all move, so family and structure selection can differ.
   `tll` is the default family; see BUG FIXES (#751)
+* The density of a discrete/discrete pair changes where an atom is narrower than
+  `5e-5`: the collapsed argument is now the atom midpoint for both h-function
+  evaluations, so `pdf`, and any `loglik` over such observations, move by
+  `O(atom width)`; see BUG FIXES (#744)
 
 * Every discrete or mixed fit with a nonparametric (`tll`) pair copula changes:
   the fitted grid, density, `loglik`, `aic`, `bic` and `mbicv` all move, so
@@ -192,6 +196,14 @@ wrong thing.
   h-functions were not the conditional cdf of the density the same object
   reported, by up to 7.5e-5 (#742, #751)
 
+* Collapse a degenerate atom to its midpoint once in `AbstractBicop::pdf_d_d`.
+  Both degenerate branches assigned the midpoint to one endpoint and then
+  recomputed it from the value they had just written, so the second h-function
+  was evaluated at `(a + 3b) / 4` rather than at the midpoint again. `pdf`
+  values change for discrete pairs whose atom is narrower than `5e-5`. The
+  parity harness now covers the discrete/discrete leaf, which had no case at
+  all, so a change there is no longer invisible to it (#744)
+  
 * Read an empty pair-copula store as independence in the paths that still
   assumed a full one, completing (#729). `Vinecop::reorient` and `get_trees`
   indexed the store out of bounds, `truncate` gave it tree slots holding no pair
@@ -246,6 +258,13 @@ wrong thing.
   (#676)
 
 ### BUILD SYSTEM AND DEPENDENCIES
+
+* Regenerate the precompiled translation units when the header they are derived
+  from changes. The `.ipp` to `.cpp` translation runs at configure time, and
+  `CONFIGURE_DEPENDS` on the glob only re-runs it when the set of files changes,
+  so editing a header in a `VINECOPULIB_PRECOMPILED` build tree silently linked
+  the previous implementation. A CI step now edits an `.ipp` and checks that its
+  translation unit follows (#753)
 
 * Modernize the CMake project: `GNUInstallDirs`, a namespaced export,
   `target_compile_features`, an architecture-independent version file,

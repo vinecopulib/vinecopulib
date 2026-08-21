@@ -11,6 +11,13 @@ if(VINECOPULIB_PRECOMPILED)
             "// vinecopulib or https://vinecopulib.github.io/vinecopulib/. \n")
 
     file(GLOB_RECURSE vinecopulib_ipp CONFIGURE_DEPENDS ${vinecopulib_includes}/*.ipp)
+    file(GLOB_RECURSE vinecopulib_all_hpp CONFIGURE_DEPENDS
+            ${vinecopulib_includes}/*.hpp)
+    # The translation below runs at configure time, and CONFIGURE_DEPENDS on a
+    # glob only re-runs it when the set of matched files changes. Depend on the
+    # contents as well, so that editing a header regenerates what it feeds.
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+            ${vinecopulib_ipp} ${vinecopulib_all_hpp})
     foreach (file ${vinecopulib_ipp})
 
         # Get directory, name and path for header/source files. Paths are
@@ -51,7 +58,8 @@ if(VINECOPULIB_PRECOMPILED)
 
     endforeach ()
 
-    file(GLOB_RECURSE vinecopulib_hpp ${vinecopulib_includes}/vinecopulib/*.hpp)
+    file(GLOB_RECURSE vinecopulib_hpp CONFIGURE_DEPENDS
+            ${vinecopulib_includes}/vinecopulib/*.hpp)
     foreach (file ${vinecopulib_hpp})
         # Get directory, name and path for header/source files
         get_filename_component(name_without_extension ${file} NAME_WE)

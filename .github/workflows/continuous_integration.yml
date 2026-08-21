@@ -182,6 +182,14 @@ jobs:
             cmake --build . --target install
           fi
         shell: bash
+      - name: Check that an edited .ipp regenerates its translation unit
+        run: |
+          probe=include/vinecopulib/bicop/implementation/abstract.ipp
+          printf '\n// regeneration probe\n' >> "$probe"
+          cmake --build release --target vinecopulib
+          grep -q "regeneration probe" release/generated/src/bicop/abstract.cpp
+          git checkout -- "$probe"
+        shell: bash
       - name: Test the install (bicop and vinecop examples)
         run: |
           for ex in bicop vinecop; do
