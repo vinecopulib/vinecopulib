@@ -49,7 +49,7 @@ if(NOT DEFINED wdm_INCLUDE_DIRS)
     FetchContent_Declare(
       wdm
       GIT_REPOSITORY https://github.com/tnagler/wdm.git
-      GIT_TAG        1c444ae923104987abf537ac022a09cbd215647b # tnagler/wdm#17
+      GIT_TAG        6b85eebc3e0097672be1047f6f43848bc77acb52 # tnagler/wdm#17
     )
     FetchContent_MakeAvailable(wdm)
     set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
@@ -59,7 +59,7 @@ if(NOT DEFINED wdm_INCLUDE_DIRS)
     if(NOT EXISTS "${wdm_INCLUDE_DIRS}/wdm/cxi.hpp")
       message(FATAL_ERROR "The wdm installation at ${wdm_INCLUDE_DIRS} is "
               "missing wdm/cxi.hpp, which the \"cxi\" tree criterion needs. "
-              "Install wdm from commit 1c444ae or later, or point wdm_DIR at "
+              "Install wdm from commit 6b85eeb or later, or point wdm_DIR at "
               "an installation that has it.")
     endif()
     message(STATUS "Found wdm: ${wdm_INCLUDE_DIRS} (found suitable version \"${wdm_VERSION}\")")

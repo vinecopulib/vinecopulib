@@ -18,7 +18,7 @@ To build the library, you'll need at minimum:
    - [CMake 3.14 (or later)](https://cmake.org/)
    - [Boost 1.75 (or later)](http://www.boost.org/)
    - [Eigen 3.3 (or later)](http://eigen.tuxfamily.org/index.php?title=Main_Page)
-   - [wdm](https://github.com/tnagler/wdm) (commit `1c444ae` or later)
+   - [wdm](https://github.com/tnagler/wdm) (commit `6b85eeb` or later)
 
 
 On Linux or OSX, you can install wdm with:

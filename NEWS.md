@@ -288,7 +288,7 @@ wrong thing.
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
-* Require wdm at commit `1c444ae` or later, for Chatterjee's xi and for the
+* Require wdm at commit `6b85eeb` or later, for Chatterjee's xi and for the
   random tie-breaking fix. Since xi carries wdm's unchanged `0.2.6` version
   number, `find_package` cannot rule out an older installation on the version
   alone, so the include directory it reports is checked for `wdm/cxi.hpp`
