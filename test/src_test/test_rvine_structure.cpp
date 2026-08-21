@@ -433,4 +433,33 @@ TEST(rvine_structure, cvine_structure)
   EXPECT_EQ(test.get_trunc_lvl(), 4);
   EXPECT_EQ(test_tr.get_trunc_lvl(), 2);
 }
+
+TEST(rvine_structure, per_entry_accessors_reject_a_slot_that_is_not_stored)
+{
+  // A truncated structure stores only `trunc_lvl` rows, and the per-entry
+  // accessors used to index straight into the trapezoid: `operator()` asserts
+  // its bounds, and `assert` is compiled out of a release build. Reading a tree
+  // above the truncation therefore read out of bounds instead of complaining.
+  DVineStructure trunc(tools_stl::seq_int(1, 6), 2);
+  EXPECT_EQ(trunc.get_trunc_lvl(), 2);
+
+  // In range: the two stored trees answer.
+  EXPECT_NO_THROW(trunc.struct_array(1, 0));
+  EXPECT_NO_THROW(trunc.min_array(1, 0));
+  EXPECT_NO_THROW(trunc.needed_hfunc1(1, 0));
+  EXPECT_NO_THROW(trunc.needed_hfunc2(1, 0));
+
+  // Above the truncation: all four refuse.
+  EXPECT_ANY_THROW(trunc.struct_array(2, 0));
+  EXPECT_ANY_THROW(trunc.min_array(2, 0));
+  EXPECT_ANY_THROW(trunc.needed_hfunc1(2, 0));
+  EXPECT_ANY_THROW(trunc.needed_hfunc2(2, 0));
+  EXPECT_ANY_THROW(trunc.struct_array(5, 0));
+
+  // Past the end of a stored row, which shortens as the tree index grows.
+  DVineStructure full(tools_stl::seq_int(1, 6));
+  EXPECT_NO_THROW(full.struct_array(4, 0));
+  EXPECT_ANY_THROW(full.struct_array(4, 1));
+  EXPECT_ANY_THROW(full.struct_array(0, 5));
+}
 }
