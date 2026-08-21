@@ -54,16 +54,27 @@ if(NOT DEFINED wdm_INCLUDE_DIRS)
     FetchContent_MakeAvailable(wdm)
     set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
   else()
-    # Chatterjee's xi carries wdm's 0.2.6 version number, so the version check
-    # above cannot rule out an installation that predates it.
-    if(NOT EXISTS "${wdm_INCLUDE_DIRS}/wdm/cxi.hpp")
-      message(FATAL_ERROR "The wdm installation at ${wdm_INCLUDE_DIRS} is "
-              "missing wdm/cxi.hpp, which the \"cxi\" tree criterion needs. "
-              "Install wdm from commit 6b85eeb or later, or point wdm_DIR at "
-              "an installation that has it.")
-    endif()
     message(STATUS "Found wdm: ${wdm_INCLUDE_DIRS} (found suitable version \"${wdm_VERSION}\")")
   endif()
+endif()
+
+# Chatterjee's xi carries wdm's 0.2.6 version number, so neither the version
+# check above nor a caller-supplied wdm_INCLUDE_DIRS can rule out a wdm that
+# predates it.
+if(NOT EXISTS "${wdm_INCLUDE_DIRS}/wdm/cxi.hpp")
+  message(FATAL_ERROR "The wdm at ${wdm_INCLUDE_DIRS} is missing wdm/cxi.hpp, "
+          "which the \"cxi\" tree criterion needs. Point wdm_DIR or "
+          "wdm_INCLUDE_DIRS at wdm 6b85eeb or later, or unset both to have it "
+          "fetched at configure time.")
+endif()
+
+# The build links wdm by target name, which find_package and FetchContent both
+# define but a caller-supplied wdm_INCLUDE_DIRS does not. Without this the name
+# is taken for a library to search for, and every link fails on -lwdm.
+if(NOT TARGET wdm)
+  add_library(wdm INTERFACE IMPORTED GLOBAL)
+  set_target_properties(wdm PROPERTIES
+                        INTERFACE_INCLUDE_DIRECTORIES "${wdm_INCLUDE_DIRS}")
 endif()
 
 # Ensure R is available and download googlestest

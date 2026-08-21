@@ -290,9 +290,13 @@ wrong thing.
 
 * Require wdm at commit `6b85eeb` or later, for Chatterjee's xi and for the
   random tie-breaking fix. Since xi carries wdm's unchanged `0.2.6` version
-  number, `find_package` cannot rule out an older installation on the version
-  alone, so the include directory it reports is checked for `wdm/cxi.hpp`
-  (#754)
+  number, no version check can rule out an older wdm, so whichever include
+  directory is used is checked for `wdm/cxi.hpp` (#754)
+
+* Fix `-Dwdm_INCLUDE_DIRS=<path>`, which configured but failed every link with
+  `cannot find -lwdm`: the build links wdm by target name, and that target is
+  only defined on the `find_package` and FetchContent paths. It is now defined
+  for a caller-supplied path too (#754)
 
 * Regenerate the precompiled translation units when the header they are derived
   from changes. The `.ipp` to `.cpp` translation runs at configure time, and
