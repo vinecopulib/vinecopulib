@@ -179,6 +179,14 @@ wrong thing.
 
 ### BUG FIXES
 
+* `RVineStructure::struct_array()`, `min_array()`, `needed_hfunc1()` and
+  `needed_hfunc2()` throw when the requested tree or edge is not stored, rather
+  than reading past the trapezoid. `TriangularArray::operator()` asserts its
+  bounds and `assert` is compiled out of a release build, so a truncated
+  structure -- which stores only `trunc_lvl` rows -- segfaulted on any tree
+  above its truncation. These four accessors are public, so the crash was
+  reachable from a few lines of user code in any binding.
+
 * Validate the pair-copula store in the `RVineTrees` constructor rather than
   indexing it blindly: an empty store means independence on every edge, and one
   that does not cover the structure array is an error instead of a read past its
