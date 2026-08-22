@@ -50,7 +50,7 @@ if(NOT DEFINED wdm_INCLUDE_DIRS)
     FetchContent_Declare(
       wdm
       GIT_REPOSITORY https://github.com/tnagler/wdm.git
-      GIT_TAG        ae077fccacbb4ba980cb5e7dbc14105f821ea98e # tnagler/wdm#26; 0.3.0 is not tagged
+      GIT_TAG        v0.3.0
     )
     FetchContent_MakeAvailable(wdm)
     set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
