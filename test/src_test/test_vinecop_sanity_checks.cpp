@@ -180,6 +180,7 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
 TEST(vinecop_sanity_checks, controls_check)
 {
   auto controls = FitControlsVinecop();
+  EXPECT_NO_THROW(controls.set_tree_criterion("cxi"));
   EXPECT_ANY_THROW(controls.set_tree_criterion("foo"));
   EXPECT_ANY_THROW(controls.set_threshold(-1.0));
   EXPECT_ANY_THROW(controls.set_threshold(2.0));

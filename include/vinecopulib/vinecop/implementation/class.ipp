@@ -297,8 +297,8 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! The dependence measure used to select trees (default: Kendall's tau) is
 //! corrected for ties (see the [wdm](https://github.com/tnagler/wdm) library).
 //! The dependence measure can be changed using `controls.tree_criterion`,
-//! which can be set to `"tau"`, `"rho"`, `"hoeffd"`, `"mcor"`, `"joe"`, or
-//! `"custom"`. The last one uses the callable supplied through
+//! which can be set to `"tau"`, `"rho"`, `"hoeffd"`, `"mcor"`, `"cxi"`,
+//! `"joe"`, or `"custom"`. The last one uses the callable supplied through
 //! `controls.tree_criterion_function`, which is always called on the thread
 //! that starts the fit, so it need not be thread safe; the pair-copula fits
 //! still use `controls.num_threads` threads.

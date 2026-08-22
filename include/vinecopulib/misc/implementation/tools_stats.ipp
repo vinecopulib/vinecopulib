@@ -528,6 +528,27 @@ pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
   Eigen::MatrixXd phi = ace(x, weights);
   return wdm::wdm(phi, "cor", weights)(0, 1);
 }
+
+//! @brief calculates the pairwise symmetrized Chatterjee's xi.
+//!
+//! Chatterjee's xi measures how well one variable is a measurable function of
+//! the other and is therefore asymmetric. The symmetrized version is the
+//! larger of the two directions, so it detects a functional relationship
+//! whichever way it runs.
+//!
+//! @literature
+//! Chatterjee, Sourav. *A New Coefficient of Correlation*. Journal of the
+//! American Statistical Association 116(536), 2009-2022, 2021
+inline double
+pairwise_cxi(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
+{
+  double xi12 = wdm::wdm(x.col(0), x.col(1), "cxi", weights);
+  double xi21 = wdm::wdm(x.col(1), x.col(0), "cxi", weights);
+  if (std::isnan(xi12) || std::isnan(xi21)) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  return std::max(xi12, xi21);
+}
 //! @}
 
 //! @brief Simulates from the multivariate Generalized Halton Sequence.

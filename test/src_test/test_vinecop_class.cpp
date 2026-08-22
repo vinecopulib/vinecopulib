@@ -2425,6 +2425,29 @@ TEST_F(VinecopTest, tree_criterion_custom_works)
   EXPECT_NO_THROW(fit_reversed.select(u, reversed));
 }
 
+TEST_F(VinecopTest, tree_criterion_cxi_works)
+{
+  FitControlsVinecop controls({ BicopFamily::indep });
+  controls.set_tree_criterion("cxi");
+  Vinecop fit(7);
+  fit.select(u, controls);
+  EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
+
+  // "cxi" must be exactly the symmetrized Chatterjee's xi, so a custom
+  // criterion spelling it out has to select the same structure
+  auto cxi_fn = [](const Eigen::MatrixXd& data,
+                   const Eigen::VectorXd& weights) {
+    return std::max(wdm::wdm(data.col(0), data.col(1), "cxi", weights),
+                    wdm::wdm(data.col(1), data.col(0), "cxi", weights));
+  };
+  FitControlsVinecop custom({ BicopFamily::indep });
+  custom.set_tree_criterion("custom");
+  custom.set_tree_criterion_function(cxi_fn);
+  Vinecop fit_custom(7);
+  fit_custom.select(u, custom);
+  EXPECT_EQ(fit.get_matrix(), fit_custom.get_matrix());
+}
+
 // A custom criterion is arbitrary user code (an R closure or a Python callable
 // in the wrappers), so it must run on the thread that starts the fit no matter
 // how many threads the fit is allowed to use.

@@ -43,19 +43,29 @@ find_package(Threads                      REQUIRED)
 # Check if wdm_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED wdm_INCLUDE_DIRS)
   # Download if not found
-  find_package(wdm 0.2.6 QUIET)
+  # 0.3.0 for Chatterjee's xi; do not lower.
+  find_package(wdm 0.3.0 QUIET)
   if(NOT wdm_FOUND)
     include(FetchContent)
     FetchContent_Declare(
       wdm
       GIT_REPOSITORY https://github.com/tnagler/wdm.git
-      GIT_TAG        c837460853570690ccd9367c059e41b851d6f816 # v0.2.6
+      GIT_TAG        v0.3.0
     )
     FetchContent_MakeAvailable(wdm)
     set(wdm_INCLUDE_DIRS "${wdm_SOURCE_DIR}/include")
   else()
     message(STATUS "Found wdm: ${wdm_INCLUDE_DIRS} (found suitable version \"${wdm_VERSION}\")")
   endif()
+endif()
+
+# The build links wdm by target name, which find_package and FetchContent both
+# define but a caller-supplied wdm_INCLUDE_DIRS does not. Without this the name
+# is taken for a library to search for, and every link fails on -lwdm.
+if(NOT TARGET wdm)
+  add_library(wdm INTERFACE IMPORTED GLOBAL)
+  set_target_properties(wdm PROPERTIES
+                        INTERFACE_INCLUDE_DIRECTORIES "${wdm_INCLUDE_DIRS}")
 endif()
 
 # Ensure R is available and download googlestest

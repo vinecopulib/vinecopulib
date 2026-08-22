@@ -248,7 +248,7 @@ Discovered in
   behind `tree_algorithm`), **Math** (distributions, constants, special
   functions, `quadrature::tanh_sinh` for 1-d integration, `tools::minima`),
   and **Random** (`mt19937`, behind QRNG scrambling and structure simulation).
-- **wdm 0.2.6** — `find_package(wdm 0.2.6 QUIET)` with a **FetchContent
+- **wdm 0.3.0** — `find_package(wdm 0.3.0 QUIET)` with a **FetchContent
   fallback** that clones `tnagler/wdm`. Installed under
   `<prefix>/include/vinecopulib/wdm/`.
 - **Threads** — required.
@@ -502,7 +502,8 @@ For any behavior change:
 - **`FitControlsVinecop`**
   ([fit_controls.hpp](include/vinecopulib/vinecop/fit_controls.hpp))
   inherits `FitControlsBicop` and adds the structure knobs: `trunc_lvl`,
-  `tree_criterion` (`"tau"`/`"rho"`/`"hoeffd"`/`"mcor"`/`"joe"`/`"custom"`,
+  `tree_criterion`
+  (`"tau"`/`"rho"`/`"hoeffd"`/`"mcor"`/`"cxi"`/`"joe"`/`"custom"`,
   the last backed by `tree_criterion_function`), `threshold`,
   `tree_algorithm` (`"mst_prim"` default, `"mst_kruskal"`,
   `"random_weighted"`, `"random_unweighted"`), `select_trunc_lvl` /

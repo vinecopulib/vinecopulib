@@ -6,6 +6,7 @@
 
 #include "include/test_utils.hpp"
 #include "gtest/gtest.h"
+#include <algorithm>
 #include <vinecopulib.hpp>
 
 namespace test_tools_stats {
@@ -103,6 +104,61 @@ TEST(test_tools_stats, mcor_works)
   weights.block(5000, 0, 5000, 1) = Eigen::VectorXd::Zero(5000);
   a2 = tools_stats::pairwise_mcor(Z, weights);
   ASSERT_TRUE(std::fabs(a1 - a2) < 0.05);
+}
+
+TEST(test_tools_stats, cxi_works)
+{
+  std::vector<int> seeds = { 1, 2, 3, 4, 5 };
+  Eigen::MatrixXd Z = tools_stats::simulate_uniform(2000, 2, false, seeds);
+  Z = tools_stats::qnorm(Z);
+
+  // under independence, xi is centered at zero
+  EXPECT_NEAR(tools_stats::pairwise_cxi(Z), 0.0, 0.1);
+
+  // a deterministic but non-monotonic relationship: Kendall's tau is blind to
+  // it, xi is not
+  Eigen::MatrixXd V(Z.rows(), 2);
+  V.col(0) = Z.col(0);
+  V.col(1) = Z.col(0).cwiseAbs2();
+  EXPECT_NEAR(std::fabs(wdm::wdm(V, "tau")(0, 1)), 0.0, 0.1);
+  EXPECT_GT(tools_stats::pairwise_cxi(V), 0.9);
+
+  // the two directions genuinely differ here, so taking the larger of them is
+  // what makes the criterion independent of the column order
+  double xi12 = wdm::wdm(V.col(0), V.col(1), "cxi");
+  double xi21 = wdm::wdm(V.col(1), V.col(0), "cxi");
+  EXPECT_GT(xi12 - xi21, 0.1);
+  Eigen::MatrixXd V_swapped(V.rows(), 2);
+  V_swapped.col(0) = V.col(1);
+  V_swapped.col(1) = V.col(0);
+  EXPECT_DOUBLE_EQ(tools_stats::pairwise_cxi(V),
+                   tools_stats::pairwise_cxi(V_swapped));
+
+  // uniform weights must not change anything, zero weights must drop rows
+  Eigen::VectorXd weights = Eigen::VectorXd::Ones(V.rows());
+  EXPECT_NEAR(
+    tools_stats::pairwise_cxi(V, weights), tools_stats::pairwise_cxi(V), 1e-10);
+  weights.tail(V.rows() / 2) = Eigen::VectorXd::Zero(V.rows() / 2);
+  EXPECT_NEAR(tools_stats::pairwise_cxi(V, weights),
+              tools_stats::pairwise_cxi(V.topRows(V.rows() / 2)),
+              0.05);
+
+  // wdm breaks predictor ties at random but seeds that deterministically, so
+  // the criterion must not vary between calls on the same data, nor between
+  // the two column orders
+  Eigen::MatrixXd tied(60, 2);
+  for (Eigen::Index i = 0; i < tied.rows(); ++i) {
+    tied(i, 0) = static_cast<double>(i / 12) / 5.0;
+    tied(i, 1) = static_cast<double>(i % 12) / 11.0;
+  }
+  Eigen::MatrixXd tied_swapped(tied.rows(), 2);
+  tied_swapped.col(0) = tied.col(1);
+  tied_swapped.col(1) = tied.col(0);
+  double tied_cxi = tools_stats::pairwise_cxi(tied);
+  for (int rep = 0; rep < 5; ++rep) {
+    EXPECT_DOUBLE_EQ(tools_stats::pairwise_cxi(tied), tied_cxi);
+  }
+  EXPECT_DOUBLE_EQ(tools_stats::pairwise_cxi(tied_swapped), tied_cxi);
 }
 
 TEST(test_tools_stats, seed_works)
@@ -391,19 +447,29 @@ TEST(test_tools_stats, golden_pseudo_obs)
   random_exp <<
     0.090909090909090912, 0.90909090909090906,
     0.27272727272727271, 0.27272727272727271,
-    0.27272727272727271, 0.45454545454545453,
+    0.36363636363636365, 0.45454545454545453,
     0.72727272727272729, 0.090909090909090912,
     0.18181818181818182, 0.18181818181818182,
     0.90909090909090906, 0.54545454545454541,
-    0.54545454545454541, 0.54545454545454541,
+    0.63636363636363635, 0.63636363636363635,
     0.54545454545454541, 0.81818181818181823,
     0.81818181818181823, 0.36363636363636365,
     0.45454545454545453, 0.72727272727272729;
   // clang-format on
-  EXPECT_TRUE(all_close(
-    tools_stats::to_pseudo_obs(x, "random", Eigen::VectorXd(), { 17 }),
-    random_exp,
-    1e-14,
-    1e-14));
+  auto random_obs =
+    tools_stats::to_pseudo_obs(x, "random", Eigen::VectorXd(), { 17 });
+  EXPECT_TRUE(all_close(random_obs, random_exp, 1e-14, 1e-14));
+
+  // `"random"` breaks ties, so each column is a permutation of
+  // 1 / (n + 1), ..., n / (n + 1); golden values alone would not catch a tie
+  // group collapsing onto one rank.
+  double n = static_cast<double>(x.rows());
+  for (Eigen::Index j = 0; j < random_obs.cols(); ++j) {
+    Eigen::VectorXd sorted = random_obs.col(j);
+    std::sort(sorted.data(), sorted.data() + sorted.size());
+    for (Eigen::Index i = 0; i < sorted.size(); ++i) {
+      EXPECT_NEAR(sorted(i), (static_cast<double>(i) + 1.0) / (n + 1.0), 1e-14);
+    }
+  }
 }
 }
