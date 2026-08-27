@@ -191,6 +191,17 @@ wrong thing.
 
 ### BUG FIXES
 
+* `Bicop::get_tau()` returns the limiting value for the Joe copula at
+  `theta = 2` instead of `NaN`. Its Kendall's tau,
+  `1 + 2 [psi(2) - psi(2/theta + 1)] / (2 - theta)`, has a removable
+  singularity there: the bracket and the denominator vanish together, so the
+  quotient evaluated to `NaN` at exactly that point and lost most of its
+  significant digits nearby. The limit is `1 - psi'(2) = 2 - pi^2/6`, and a
+  series expansion now covers a small neighbourhood, agreeing with the closed
+  form to about `1e-10` where the direct quotient does not. `theta = 2` is an
+  ordinary interior point of the parameter space that a user can specify
+  directly or reach from a fit.
+
 * `RVineStructure::struct_array()`, `min_array()`, `needed_hfunc1()` and
   `needed_hfunc2()` throw when the requested tree or edge is not stored, rather
   than reading past the trapezoid. `TriangularArray::operator()` asserts its
