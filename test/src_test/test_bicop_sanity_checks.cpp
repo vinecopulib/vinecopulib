@@ -5,6 +5,8 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include "gtest/gtest.h"
+#include <boost/math/special_functions/digamma.hpp>
+#include <cmath>
 #include <vinecopulib.hpp>
 
 namespace test_bicop_sanity_checks {
@@ -271,6 +273,47 @@ TEST(bicop_sanity_checks, tau_of_integral_families_is_accurate)
     EXPECT_NEAR(bicop.get_tau(), c.tau, 1e-9)
       << "family " << bicop.get_family_name() << ", parameters "
       << par.transpose();
+  }
+}
+
+// Joe's tau has a removable singularity at theta = 2, where the closed form
+// 1 + 2 [psi(2) - psi(2/theta + 1)] / (2 - theta) is 0/0. The limit is
+// 1 - psi'(2) = 2 - pi^2 / 6; the pre-fix implementation returned NaN there and
+// lost most of its significant digits nearby.
+TEST(bicop_sanity_checks, joe_tau_is_finite_at_the_removable_singularity)
+{
+  // 2 - pi^2 / 6
+  const double limit = 2.0 - 1.6449340668482264;
+  Eigen::VectorXd par(1);
+
+  par << 2.0;
+  const double tau = Bicop(BicopFamily::joe, 0, par).get_tau();
+  EXPECT_TRUE(std::isfinite(tau));
+  EXPECT_NEAR(tau, limit, 1e-14);
+
+  // Inside the expansion window the series must track the closed form more
+  // closely than the closed form's own cancellation error. A sign error on the
+  // psi''(2) term shows up here at about 2e-6.
+  const auto closed_form = [](double theta) {
+    return 1.0 + 2.0 *
+                   (boost::math::digamma(2.0) -
+                    boost::math::digamma(2.0 / theta + 1.0)) /
+                   (2.0 - theta);
+  };
+  for (double d : { -1e-5, -5e-6, 5e-6, 1e-5 }) {
+    par << 2.0 + d;
+    EXPECT_NEAR(
+      Bicop(BicopFamily::joe, 0, par).get_tau(), closed_form(2.0 + d), 1e-8)
+      << "theta = " << 2.0 + d;
+  }
+
+  // and tau stays monotone through the singularity
+  double previous = -1.0;
+  for (double theta : { 1.99, 1.999, 1.9999, 2.0, 2.0001, 2.001, 2.01 }) {
+    par << theta;
+    const double t = Bicop(BicopFamily::joe, 0, par).get_tau();
+    EXPECT_GT(t, previous) << "theta = " << theta;
+    previous = t;
   }
 }
 
