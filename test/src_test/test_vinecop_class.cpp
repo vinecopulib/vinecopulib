@@ -2502,6 +2502,31 @@ TEST_F(VinecopTest, tree_criterion_custom_is_serial_sparse)
   EXPECT_EQ(*recorder.ids.begin(), std::this_thread::get_id());
 }
 
+// Wilson's algorithm walks to the next vertex with probability proportional
+// to the incident weights, so a vertex whose incident weights are all zero is
+// one the walk can never leave. `calculate_criterion` returns exactly 0 for
+// every edge when there are 10 or fewer observations, which makes every
+// weight zero and the walk non-terminating.
+TEST_F(VinecopTest, select_random_weighted_survives_zero_criteria)
+{
+  auto data = tools_stats::simulate_uniform(10, 4, false, { 1 });
+
+  FitControlsVinecop controls({ BicopFamily::gaussian });
+  controls.set_tree_algorithm("random_weighted");
+  controls.set_seeds({ 1, 2, 3, 4, 5 });
+
+  Vinecop fit(4);
+  fit.select(data, controls);
+  EXPECT_EQ(fit.get_dim(), static_cast<size_t>(4));
+
+  // One row above the floor the criteria are informative again; the same
+  // draw has to keep working there.
+  auto more = tools_stats::simulate_uniform(11, 4, false, { 1 });
+  Vinecop fit_more(4);
+  fit_more.select(more, controls);
+  EXPECT_EQ(fit_more.get_dim(), static_cast<size_t>(4));
+}
+
 TEST_F(VinecopTest, select_finds_different_structures_random)
 {
   // Initialize the controls
