@@ -645,6 +645,7 @@ VinecopSelector::select_edges_mst_kruskal(VineTree& vine_tree)
 inline void
 VinecopSelector::select_edges_random(VineTree& vine_tree)
 {
+  constexpr double min_weight = 1e-10;
   size_t d = num_vertices(vine_tree);
   std::vector<size_t> predecessors(d);
   boost::mt19937 gen = controls_.get_rng();
@@ -664,10 +665,22 @@ VinecopSelector::select_edges_random(VineTree& vine_tree)
     // Here we inverse the weights to get a spanning tree
     // with probability proportional to the product of the weights
     // (i.e., the higher the weight, the more likely it is to be selected)
+    //
+    // The floor keeps every weight strictly positive. Wilson's algorithm
+    // walks to the next vertex with probability proportional to the incident
+    // weights, so a vertex whose incident weights are all zero is one the
+    // walk can never leave and `random_spanning_tree` does not terminate.
+    // That is reachable: `calculate_criterion` returns exactly 0 for every
+    // edge when there are 10 or fewer observations, and returns 0 for an
+    // individual edge whose criterion is NaN or below the threshold.
+    // Flooring only changes the draw when a vertex has no positive weight at
+    // all, where it samples uniformly among the alternatives rather than
+    // hanging -- with any positive weight present, the floored edges keep a
+    // vanishing share of the mass, as they had before.
     WeightMap original_weights = get(boost::edge_weight, vine_tree);
     std::map<EdgeIterator, double> inv_weights;
     for (auto e : boost::make_iterator_range(edges(vine_tree))) {
-      inv_weights[e] = 1.0 - original_weights[e];
+      inv_weights[e] = std::max(1.0 - original_weights[e], min_weight);
     }
     boost::associative_property_map<std::map<EdgeIterator, double>>
       inv_weight_map(inv_weights);
