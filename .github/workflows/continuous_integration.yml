@@ -283,7 +283,7 @@ jobs:
             --tol-config scripts/parity_gates.json
       - name: Upload the parity dump
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: parity-dump
           path: bench_results/parity.json
@@ -341,7 +341,7 @@ jobs:
           grep -i 'warning' build-docs/doxygen.log | head -50 || true
       - name: Upload the Doxygen log
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: doxygen-log
           path: build-docs/doxygen.log
@@ -354,7 +354,7 @@ jobs:
         with:
           build_dir: build-docs
       - name: Upload the site
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: website
           path: build-docs/docs
