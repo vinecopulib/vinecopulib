@@ -434,6 +434,20 @@ TEST(rvine_structure, cvine_structure)
   EXPECT_EQ(test_tr.get_trunc_lvl(), 2);
 }
 
+TEST(rvine_structure, empty_matrix_is_rejected)
+{
+  // `d_ = mat.cols()` accepted an empty array: every check_*() is vacuous at
+  // d = 0, and find_trunc_lvl() then wrapped `d - 1` around and indexed a row
+  // that does not exist. The guard is unconditional because `check = false`
+  // reaches find_trunc_lvl() too.
+  Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic> empty(0, 0);
+  // Braces, not parentheses: `RVineStructure(empty)` inside the macro parses
+  // as a declaration of a variable named `empty` (the most vexing parse) and
+  // silently calls the `d = 1` default constructor instead.
+  EXPECT_ANY_THROW(RVineStructure{ empty });
+  EXPECT_ANY_THROW(RVineStructure(empty, false));
+}
+
 TEST(rvine_structure, per_entry_accessors_reject_a_slot_that_is_not_stored)
 {
   // A truncated structure stores only `trunc_lvl` rows, and the per-entry

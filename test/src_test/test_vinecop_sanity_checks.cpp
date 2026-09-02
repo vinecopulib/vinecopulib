@@ -105,6 +105,19 @@ TEST(vinecop_sanity_checks, catches_wrong_size)
   EXPECT_ANY_THROW(Vinecop(mat, pair_copulas));
 }
 
+TEST(vinecop_sanity_checks, var_types_needs_one_entry_per_variable)
+{
+  // `check_var_types` rejected a vector longer than the dimension but accepted
+  // a shorter one, which `set_var_types_internal` then stored and the pair-type
+  // derivation indexed per variable -- an out-of-bounds read on every
+  // evaluation. `Bicop::check_var_types` has always required exactly two.
+  auto vinecop = Vinecop(RVineStructure(std::vector<size_t>{ 1, 2, 3, 4 }));
+  EXPECT_ANY_THROW(vinecop.set_var_types({ "c", "c" }));
+  EXPECT_ANY_THROW(vinecop.set_var_types({ "c" }));
+  EXPECT_ANY_THROW(vinecop.set_var_types({ "c", "c", "c", "c", "c" }));
+  EXPECT_NO_THROW(vinecop.set_var_types({ "c", "d", "c", "d" }));
+}
+
 TEST(vinecop_sanity_checks, controls_print)
 {
   auto controls = FitControlsVinecop();
