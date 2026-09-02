@@ -67,6 +67,39 @@ TEST(bicop_sanity_checks, catches_transposed_parameter_shape)
   EXPECT_ANY_THROW(bc.set_parameters(transposed));
 }
 
+TEST(bicop_sanity_checks, catches_wrong_parameter_shape_in_converters)
+{
+  // `set_parameters` has validated its argument's shape since PR #700, but
+  // `parameters_to_tau`, `parameters_to_taildep` and `parameters_to_beta` took
+  // one straight to the leaf, which indexes it positionally. An empty matrix
+  // has no storage at all, so `parameters(0)` dereferenced a null pointer.
+  for (auto family : bicop_families::all) {
+    auto bc = Bicop(family);
+    const auto expected = bc.get_parameters();
+    // An empty argument is the family's own shape for `indep`, so it stays
+    // legal there; every other family must reject it.
+    if (expected.size() > 0) {
+      EXPECT_ANY_THROW(bc.parameters_to_tau(Eigen::MatrixXd()))
+        << bc.get_family_name();
+      EXPECT_ANY_THROW(bc.parameters_to_taildep(Eigen::MatrixXd()))
+        << bc.get_family_name();
+      EXPECT_ANY_THROW(bc.parameters_to_beta(Eigen::MatrixXd()))
+        << bc.get_family_name();
+    }
+    // The family's own parametrization is always accepted.
+    EXPECT_NO_THROW(bc.parameters_to_tau(expected)) << bc.get_family_name();
+    EXPECT_NO_THROW(bc.parameters_to_taildep(expected)) << bc.get_family_name();
+    EXPECT_NO_THROW(bc.parameters_to_beta(expected)) << bc.get_family_name();
+  }
+
+  // A wrong arity within a parametric family reads past its own storage: a
+  // 1 x 1 argument to a two-parameter family used to return a value computed
+  // from whatever followed the single double in memory.
+  auto bb1_par = (Eigen::MatrixXd(2, 1) << 1.0, 1.5).finished();
+  auto bb1 = Bicop(BicopFamily::bb1, 0, bb1_par);
+  EXPECT_ANY_THROW(bb1.parameters_to_tau(Eigen::MatrixXd::Constant(1, 1, 2.0)));
+}
+
 TEST(bicop_sanity_checks, catches_parameters_out_of_bounds)
 {
   auto cop = Bicop(BicopFamily::gaussian);

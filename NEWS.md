@@ -191,6 +191,22 @@ wrong thing.
 
 ### BUG FIXES
 
+* `Bicop::parameters_to_tau()`, `parameters_to_taildep()` and
+  `parameters_to_beta()` check the shape of their argument, which used to go
+  straight to the leaf family and be indexed positionally. `eigen_assert` is
+  compiled out of a release build, so a wrong shape read past the end of its own
+  storage and an empty matrix dereferenced a null pointer (#761)
+
+* `RVineStructure(mat)` rejects an empty array. Every validity check is vacuous
+  at `d = 0`, and `find_trunc_lvl()` then wrapped `d - 1` around and indexed a
+  row that does not exist. The guard is unconditional, because `check = false`
+  reaches `find_trunc_lvl()` too (#761)
+
+* `Vinecop::set_var_types()` requires one entry per variable. A longer vector
+  was rejected but a shorter one was stored and then indexed per variable,
+  reading out of bounds on every later evaluation; `Bicop::set_var_types()` has
+  always required exactly two (#761)
+
 * `Bicop::get_tau()` returns the limiting value for the Joe copula at
   `theta = 2` instead of `NaN`. Its Kendall's tau,
   `1 + 2 [psi(2) - psi(2/theta + 1)] / (2 - theta)`, has a removable
