@@ -202,6 +202,20 @@ wrong thing.
 
 ### BUG FIXES
 
+* `Vinecop::fit()` no longer lets the edges of a tree race on the h-functions.
+  Every edge reads `hfunc1`/`hfunc2` columns that edges of higher index in the
+  same tree write, so the serial order gave each of them the previous tree's
+  values and running the edges concurrently removed that guarantee: an edge
+  could be fitted against the current tree's h-functions instead. With more
+  than one thread the edges now read a snapshot of the previous tree (#774)
+
+* `ThreadPool::wait()` and `join()` consume the exception they report, so a
+  pool that ran a failing job can be used again. The stored exception was kept
+  after being rethrown, so every later `wait()` rethrew it and, because a
+  stored exception cancels the queue, dropped the jobs pushed in the meantime
+  without running them. `join()` stops and joins its threads even when a job
+  threw, and the first exception is the one reported when several jobs fail
+  (#774)
 * `Vinecop::loglik()` leaves out the observations that have no likelihood
   instead of returning `NaN` for the whole sample, matching `Bicop::loglik()`;
   `aic()`, `bic()` and `mbicv()` follow it. Evaluation is unchanged and still
@@ -363,6 +377,20 @@ wrong thing.
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
+* Fix `-DEIGEN3_INCLUDE_DIR=<path>` and `-DBoost_INCLUDE_DIRS=<path>`. Either
+  one skips the matching `find_package`, and the build links Eigen and Boost by
+  target name, so a precompiled build failed at generate time and a build with
+  no in-tree consumer of the target exported a `vinecopulibTargets.cmake` that
+  only broke for consumers. All three dependency paths now define the target
+  they stand in for, as `wdm_INCLUDE_DIRS` already did, which also supplies the
+  `Boost::headers` that CMake 3.14's `FindBoost` module predates (#774)
+
+* Fix the precompiled build when the source path contains a regex
+  metacharacter. `findHeaders.cmake` matched path-derived patterns as regexes,
+  so a directory such as `vine+copulib` generated none of the headers and left
+  every `.ipp` both inlined and compiled as its own translation unit, for a
+  `redefinition of ...` error against an installed copy of the headers. Paths
+  are now compared literally (#774)
 * Update the vendored nlohmann/json from 3.9.1 to 3.12.0, now stored verbatim
   instead of reformatted, with the patches that remove its suppressed compiler
   diagnostics re-applied. The on-disk JSON and CBOR formats are unchanged
@@ -441,6 +469,15 @@ wrong thing.
 * Seed the RNG-dependent unit tests to remove flakiness (#686)
 
 * Decompose `VinecopSelector` for readability (#695)
+
+* Add a ThreadSanitizer CI job. `VINECOPULIB_SANITIZERS` adds the address and
+  UB sanitizers, neither of which sees a data race, so the thread-pool race
+  fixed in #764 and the h-function race fixed in #774 were both green in CI
+  throughout. The job builds the test areas that drive the thread pool with
+  `-fsanitize=thread` in a build tree of its own, since that flag cannot be
+  combined with the address sanitizer, and uses clang, whose runtime does not
+  lose the happens-before edge across `pthread_cond_timedwait`. A second job
+  covers the two defects above that are visible at configure time (#774)
 
 * Add a codespell-based spelling and prose check, run in CI and available as a
   pre-commit hook: `en-GB_to_en-US` enforces American English, and
