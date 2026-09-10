@@ -121,8 +121,6 @@ jobs:
           echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
           echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
             # Linux and macOS runners ship an Eigen that find_package locates on
             # its own; Windows does not, so point it at the one we installed.
@@ -245,8 +243,6 @@ jobs:
       - name: Set environment variables
         run: |
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
       - name: Configure, build, test and install (header-only)
         run: |
           mkdir release && cd release
@@ -263,6 +259,159 @@ jobs:
           for ex in bicop vinecop; do
             ( cd "examples/$ex" && mkdir build && cd build && cmake .. && make && ../bin/main )
           done
+
+  # Two configure-time behaviors the matrix above cannot reach: it lets
+  # find_package do the work, from a conventional source path. Nothing is
+  # compiled here, because both defects are visible by the end of generation.
+  configure-checks:
+    name: cmake configure checks (ubuntu)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          R: false
+          lcov: false
+      # Each of these skips a find_package, so the imported target the link
+      # line names has to come from the path instead. Eigen3::Eigen and
+      # Boost::headers are namespaced and fail generation when missing; the
+      # plain name wdm would only fail at link time, so check the generated
+      # link line, which BUILD_SHARED_LIBS writes at generate time.
+      - name: Configure with caller-supplied dependency paths
+        run: |
+          cmake -S . -B build-dep-paths \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DVINECOPULIB_PRECOMPILED=ON \
+            -DBUILD_SHARED_LIBS=ON \
+            -DBUILD_TESTING=OFF \
+            -DEIGEN3_INCLUDE_DIR="${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" \
+            -DBoost_INCLUDE_DIRS="${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" \
+            -Dwdm_INCLUDE_DIRS=/usr/local/include
+          link_txt=build-dep-paths/CMakeFiles/vinecopulib.dir/link.txt
+          if [ ! -f "$link_txt" ]; then
+            echo "::error::$link_txt was not generated; the check below is void"
+            exit 1
+          fi
+          if grep -q -- '-lwdm' "$link_txt"; then
+            echo "::error::wdm reached the link line as -lwdm; its target is missing"
+            exit 1
+          fi
+        shell: bash
+      # findHeaders.cmake derives every generated source and header from paths,
+      # and a path is not a pattern: a metacharacter in the source directory
+      # left the generated headers unwritten, so each .ipp was both inlined and
+      # compiled. The translation runs at configure time, so these counts are
+      # already final.
+      - name: Configure from a source path containing regex metacharacters
+        run: |
+          src="$RUNNER_TEMP/vine+copu.lib"
+          cp -a "$GITHUB_WORKSPACE" "$src"
+          cmake -S "$src" -B "$src/build" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DVINECOPULIB_PRECOMPILED=ON \
+            -DBUILD_TESTING=OFF
+          expected_hpp=$(find "$src/include/vinecopulib" -name '*.hpp' | wc -l)
+          actual_hpp=$(find "$src/build/generated/include/vinecopulib" \
+            -name '*.hpp' 2>/dev/null | wc -l)
+          expected_cpp=$(find "$src/include" -name '*.ipp' | wc -l)
+          actual_cpp=$(find "$src/build/generated/src" \
+            -name '*.cpp' 2>/dev/null | wc -l)
+          echo "headers $actual_hpp/$expected_hpp, sources $actual_cpp/$expected_cpp"
+          if [ "$actual_hpp" -ne "$expected_hpp" ] \
+             || [ "$actual_cpp" -ne "$expected_cpp" ]; then
+            echo "::error::the generated tree is incomplete"
+            exit 1
+          fi
+          # An .ipp left in a generated header is what makes an implementation
+          # both inlined and compiled as its own translation unit.
+          if grep -rl '\.ipp>' "$src/build/generated/include"; then
+            echo "::error::a generated header still includes its .ipp"
+            exit 1
+          fi
+          # A destination path that does not translate stays in the source
+          # tree, and the generated content is written over the original.
+          if [ -n "$(git -C "$src" status --porcelain -- include)" ]; then
+            echo "::error::configure wrote into the source tree"
+            exit 1
+          fi
+        shell: bash
+
+  # -fsanitize=address,undefined, which VINECOPULIB_SANITIZERS adds to the
+  # Debug builds above, cannot see a data race, and cannot be combined with
+  # -fsanitize=thread either — hence a build tree of its own. Only the areas
+  # that drive the thread pool are built and run, since ThreadSanitizer slows
+  # execution by an order of magnitude.
+  #
+  # clang, not GCC: GCC 11's libtsan loses the happens-before edge across
+  # pthread_cond_timedwait, so every access the mutex protects is reported for
+  # any use of std::condition_variable::wait_for. ThreadPool::wait() is one,
+  # which would make a GCC job pure false positives.
+  thread-sanitizer:
+    name: thread sanitizer (ubuntu, clang)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      # A report exits 66, which fails the step. halt_on_error stops at the
+      # first one rather than grinding through an instrumented suite that is
+      # already going to fail, and second_deadlock_stack makes a lock-order
+      # report name both acquisition sites.
+      TSAN_OPTIONS: halt_on_error=1 second_deadlock_stack=1
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      # R, because the VinecopTest fixture skips every one of its tests when
+      # Rscript was not found, and those are the vine fits that use the pool.
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          R: true
+          lcov: false
+      # RelWithDebInfo, not Debug: the suite takes twenty minutes unoptimized
+      # before ThreadSanitizer multiplies it, and race detection is a
+      # happens-before analysis that does not depend on the optimization level.
+      # VINECOPULIB_SANITIZERS is left off so that the address sanitizer is not
+      # added. The <area>_only executables are EXCLUDE_FROM_ALL and share their
+      # objects with test_all, so this compiles three areas instead of fourteen.
+      - name: Configure and build with ThreadSanitizer
+        run: |
+          cmake -S . -B build-tsan \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DCMAKE_CXX_FLAGS="-fsanitize=thread -fno-omit-frame-pointer -g" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=thread"
+          cmake --build build-tsan -j"$(nproc)" --target \
+            test_tools_thread_only test_bicop_select_only test_vinecop_class_only
+        shell: bash
+      # setarch -R, because ThreadSanitizer's shadow memory assumes a bounded
+      # mmap randomization and aborts with "unexpected memory mapping" when the
+      # kernel's vm.mmap_rnd_bits exceeds it. The wrapper needs no privileges,
+      # unlike lowering the sysctl, so the job does not depend on the runner's
+      # kernel settings.
+      - name: Run the thread-pool tests under ThreadSanitizer
+        run: |
+          arch=$(uname -m)
+          setarch "$arch" -R build-tsan/bin/test_tools_thread_only
+          setarch "$arch" -R build-tsan/bin/test_bicop_select_only
+          # Only the fits that ask for more than one thread are worth the
+          # slowdown: the rest of this area runs the pool with no workers,
+          # executing each job inline at the push site.
+          setarch "$arch" -R build-tsan/bin/test_vinecop_class_only \
+            --gtest_filter='VinecopFit.parallel_fit_matches_serial:VinecopTest.works_multi_threaded:VinecopTest.tree_criterion_*:VinecopTest.inverse_rosenblatt_is_safe_for_concurrent_calls' \
+            | tee tsan-vinecop.log
+          # A filter that matches nothing exits 0, which would leave this job
+          # green while running none of it.
+          grep -qE '^\[  PASSED  \] [1-9][0-9]* test' tsan-vinecop.log
+        shell: bash
 
   # Keeps the benchmark and parity targets compiling. The self-comparison
   # checks that every group is populated and that the gates file parses.
@@ -283,8 +432,6 @@ jobs:
       - name: Set environment variables
         run: |
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
       - name: Build bench_all and parity_dump
         run: |
           mkdir build-bench && cd build-bench
@@ -334,8 +481,6 @@ jobs:
       - name: Set environment variables
         run: |
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
       - name: Configure
         run: |
           mkdir build-docs && cd build-docs
@@ -407,8 +552,6 @@ jobs:
       - name: Set environment variables
         run: |
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
       - name: Configure to generate compile_commands.json
         run: |
           mkdir build-tidy && cd build-tidy

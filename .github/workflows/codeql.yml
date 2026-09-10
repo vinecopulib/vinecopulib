@@ -52,7 +52,6 @@ jobs:
       - name: Set environment variables
         run: |
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
           echo "Eigen3_ROOT=${{ runner.temp }}/eigen" >> $GITHUB_ENV
 
       # Precompiled, so the .ipp files become translation units CodeQL can see.

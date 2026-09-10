@@ -611,6 +611,14 @@ Conventions:
   (default ON iff Rscript is found). The `cmake/templates/*.R` scripts
   cross-check parametric bicop / vinecop results against **VineCopula >= 2.6.2
   from GitHub, not CRAN**; with the option off the tests skip rather than fail.
+  The whole `VinecopTest` fixture skips with them, so an area filtered down to
+  those tests runs nothing.
+- **Data races** are outside what `VINECOPULIB_SANITIZERS` covers: the address
+  and UB sanitizers cannot see one, and neither can be combined with
+  `-fsanitize=thread`. The `thread sanitizer` CI job builds the areas that
+  drive the thread pool with that flag, in a build tree of its own and with
+  clang — GCC 11's runtime loses the happens-before edge across
+  `pthread_cond_timedwait`, which `ThreadPool::wait()` relies on.
 - **Golden values and parity**: the golden-value tests are the CI-enforced part;
   the before/after `parity_dump` comparison is a manual tool for numerical
   changes. Both are documented in [scripts/README.md](scripts/README.md).
