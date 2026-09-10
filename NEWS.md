@@ -64,6 +64,11 @@ wrong thing.
 
 ### BEHAVIOR CHANGES
 
+* `Vinecop::pdf()` is the exponential of a log-space sum rather than a running
+  product of edge densities, so its values move at the `1e-15` level (observed
+  maximum `1.4e-15` relative across the parity sweep). Downstream bit-for-bit
+  comparisons against this library need re-baselining; see BUG FIXES (#770)
+
 * `to_pseudo_obs(..., "random")` returns different values for a given seed, and
   every discrete `tll` fit moves with it, because the jitter it applies goes
   through that path. wdm's random tie-breaking assigned its offsets one step out
@@ -111,6 +116,12 @@ wrong thing.
   differ for the same model. Densities and log-likelihoods do not (#702)
 
 ### NEW FEATURES
+
+* Add `Vinecop::logpdf()`, the per-observation log-density, alongside a `logpdf`
+  field on the `pdf_full()` result. A vine density is a product of one factor
+  per edge, so `pdf()` underflows to `0` in high dimensions or under strong
+  dependence while the log-density is still an ordinary double; `logpdf()` is
+  the accurate way to obtain it, and `loglik()` sums it (#770)
 
 * Add `"cxi"` as a `tree_criterion`, weighting edges by Chatterjee's xi
   symmetrized as `max(xi(X, Y), xi(Y, X))`. Like `"hoeffd"` it picks up
@@ -190,6 +201,16 @@ wrong thing.
 * Exit structure selection early when the graph is already a tree (#661)
 
 ### BUG FIXES
+
+* `Vinecop::loglik()` is finite whenever the log-likelihood is representable,
+  and so are `aic()`, `bic()` and `mbicv()`, which route through it. The density
+  was accumulated as a running product over up to `d(d-1)/2` edges, so a true
+  log-density below about `-745` underflowed to exactly `0` and the
+  log-likelihood to `-inf`; the accumulator is now in log space. A genuinely
+  zero edge density still gives `-inf`, which is correct. The discrete branch of
+  `scores_full()` differenced two densities floored at `1e-20`, so on such a row
+  both legs were equal and the score came out `0` rather than wrong-and-visible;
+  it now differences the log-densities directly (#770)
 
 * `Bicop::parameters_to_tau()`, `parameters_to_taildep()` and
   `parameters_to_beta()` check the shape of their argument, which used to go
