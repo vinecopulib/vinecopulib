@@ -276,8 +276,15 @@ jobs:
           os: ubuntu-latest
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
+          eigen_install_dir: ${{ runner.temp }}/eigen
           R: false
           lcov: false
+      # find_package picks both up via CMP0074, which the second step needs:
+      # it configures the way an ordinary build does.
+      - name: Set environment variables
+        run: |
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Eigen3_ROOT=${{ runner.temp }}/eigen" >> $GITHUB_ENV
       # Each of these skips a find_package, so the imported target the link
       # line names has to come from the path instead. Eigen3::Eigen and
       # Boost::headers are namespaced and fail generation when missing; the
@@ -285,13 +292,24 @@ jobs:
       # link line, which BUILD_SHARED_LIBS writes at generate time.
       - name: Configure with caller-supplied dependency paths
         run: |
+          # Each dependency keeps its headers under <prefix>/include, Eigen one
+          # level further down. Assert that before configuring, so a change in
+          # the layout fails here instead of looking like the defect below.
+          eigen_inc="${{ runner.temp }}/eigen/include/eigen3"
+          boost_inc="$BOOST_ROOT/include"
+          test -f "$eigen_inc/Eigen/Dense" \
+            || { echo "::error::no Eigen headers under $eigen_inc"; exit 1; }
+          test -d "$boost_inc/boost" \
+            || { echo "::error::no Boost headers under $boost_inc"; exit 1; }
+          test -f /usr/local/include/wdm.hpp \
+            || { echo "::error::no wdm headers under /usr/local/include"; exit 1; }
           cmake -S . -B build-dep-paths \
             -DCMAKE_BUILD_TYPE=Release \
             -DVINECOPULIB_PRECOMPILED=ON \
             -DBUILD_SHARED_LIBS=ON \
             -DBUILD_TESTING=OFF \
-            -DEIGEN3_INCLUDE_DIR="${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" \
-            -DBoost_INCLUDE_DIRS="${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" \
+            -DEIGEN3_INCLUDE_DIR="$eigen_inc" \
+            -DBoost_INCLUDE_DIRS="$boost_inc" \
             -Dwdm_INCLUDE_DIRS=/usr/local/include
           link_txt=build-dep-paths/CMakeFiles/vinecopulib.dir/link.txt
           if [ ! -f "$link_txt" ]; then
@@ -374,8 +392,14 @@ jobs:
           os: ubuntu-latest
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
+          eigen_install_dir: ${{ runner.temp }}/eigen
           R: true
           lcov: false
+      # find_package picks both up via CMP0074.
+      - name: Set environment variables
+        run: |
+          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
+          echo "Eigen3_ROOT=${{ runner.temp }}/eigen" >> $GITHUB_ENV
       # RelWithDebInfo, not Debug: the suite takes twenty minutes unoptimized
       # before ThreadSanitizer multiplies it, and race detection is a
       # happens-before analysis that does not depend on the optimization level.
