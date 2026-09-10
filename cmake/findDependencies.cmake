@@ -8,6 +8,34 @@ if (POLICY CMP0144)
   cmake_policy(SET CMP0144 NEW)
 endif ()
 
+# The build links its header-only dependencies by target name. find_package
+# defines those targets, and FetchContent does for wdm, but a caller-supplied
+# include path does not: so every path variable also has to define the target
+# it stands in for. Without that, the namespaced names fail at generate time
+# with "links to Eigen3::Eigen ... not found", and the plain name wdm is taken
+# for a library to search for and fails every link on -lwdm.
+#
+# Call this after the find_package that may define the target, never before:
+# Eigen3Config and BoostConfig create their imported targets unconditionally
+# and abort on a name that already exists.
+#
+# GLOBAL, because an imported target created in a function is otherwise
+# visible only inside that function.
+function(vinecopulib_add_header_only_target target include_dirs_var)
+  if(TARGET ${target})
+    return()
+  endif()
+  if(NOT ${include_dirs_var})
+    message(FATAL_ERROR
+            "${target} is not defined and ${include_dirs_var} is empty. Set "
+            "${include_dirs_var} to the directory holding the headers, or "
+            "leave it unset and let find_package look for the package.")
+  endif()
+  add_library(${target} INTERFACE IMPORTED GLOBAL)
+  set_target_properties(${target} PROPERTIES
+                        INTERFACE_INCLUDE_DIRECTORIES "${${include_dirs_var}}")
+endfunction()
+
 # Find the main dependencies
 
 # Check if EIGEN3_INCLUDE_DIR is defined and if not, try to find it
@@ -25,6 +53,7 @@ if(NOT DEFINED EIGEN3_INCLUDE_DIR)
                         INTERFACE_INCLUDE_DIRECTORIES)
   endif()
 endif()
+vinecopulib_add_header_only_target(Eigen3::Eigen EIGEN3_INCLUDE_DIR)
 
 # Check if Boost_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED Boost_INCLUDE_DIRS)
@@ -37,6 +66,10 @@ if(NOT DEFINED Boost_INCLUDE_DIRS)
     find_package(Boost 1.75 MODULE REQUIRED)
   endif ()
 endif()
+# CMake's FindBoost module gained Boost::headers in 3.15, one minor version
+# above this project's floor, so the MODULE fallback can leave only
+# Boost::boost behind.
+vinecopulib_add_header_only_target(Boost::headers Boost_INCLUDE_DIRS)
 
 find_package(Threads                      REQUIRED)
 
@@ -59,14 +92,7 @@ if(NOT DEFINED wdm_INCLUDE_DIRS)
   endif()
 endif()
 
-# The build links wdm by target name, which find_package and FetchContent both
-# define but a caller-supplied wdm_INCLUDE_DIRS does not. Without this the name
-# is taken for a library to search for, and every link fails on -lwdm.
-if(NOT TARGET wdm)
-  add_library(wdm INTERFACE IMPORTED GLOBAL)
-  set_target_properties(wdm PROPERTIES
-                        INTERFACE_INCLUDE_DIRECTORIES "${wdm_INCLUDE_DIRS}")
-endif()
+vinecopulib_add_header_only_target(wdm wdm_INCLUDE_DIRS)
 
 # Ensure R is available and download googlestest
 if(BUILD_TESTING)

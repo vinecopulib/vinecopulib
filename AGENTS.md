@@ -246,7 +246,7 @@ Discovered in
 - **Eigen3** — `find_package(Eigen3 REQUIRED CONFIG)`; or set
   `EIGEN3_INCLUDE_DIR`. Target: `Eigen3::Eigen`.
 - **Boost ≥ 1.75** — CONFIG mode then MODULE fallback; or set
-  `Boost_INCLUDE_DIRS`. Target: `Boost::boost`. Deliberately narrowed to three
+  `Boost_INCLUDE_DIRS`. Target: `Boost::headers`. Deliberately narrowed to three
   header-only components — keep it that way, and prefer the standard library
   when it suffices: **Graph** (`adjacency_list` and the spanning-tree engines
   behind `tree_algorithm`), **Math** (distributions, constants, special
@@ -260,6 +260,13 @@ Discovered in
 - **Rscript** (optional) — enables the R parity tests; see
   [cmake/findR.cmake](cmake/findR.cmake).
 - **Doxygen** — only when `VINECOPULIB_BUILD_DOC`.
+
+Setting `EIGEN3_INCLUDE_DIR`, `Boost_INCLUDE_DIRS` or `wdm_INCLUDE_DIRS` skips
+the matching `find_package`. The build links these dependencies by target name,
+so `findDependencies.cmake` defines the target from the given path instead
+(`vinecopulib_add_header_only_target`). A dependency added to a link line needs
+the same treatment, or a caller-supplied path configures and then fails to
+link.
 
 Global compile definitions set in
 [cmake/compilerDefOpt.cmake](cmake/compilerDefOpt.cmake) (and mirrored in
