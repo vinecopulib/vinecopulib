@@ -6,12 +6,16 @@
 
 #pragma once
 
-#include <atomic>
+#include <chrono>
 #include <condition_variable>
+#include <exception>
+#include <functional>
 #include <future>
 #include <mutex>
 #include <queue>
+#include <stdexcept>
 #include <thread>
+#include <utility>
 #include <vector>
 
 namespace vinecopulib {
