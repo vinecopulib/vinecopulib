@@ -290,6 +290,17 @@ TEST(test_tools_stats, find_latent_sample)
                std::runtime_error);
 }
 
+// The sweep counter has to be as wide as `niter`, or a count above its range
+// wraps to zero and the loop never ends.
+TEST(test_tools_stats, find_latent_sample_sweeps_more_than_a_short_can_count)
+{
+  Eigen::MatrixXd u(2, 4);
+  u << 0.25, 0.75, 0.0, 0.5, 0.75, 0.25, 0.5, 0.0;
+
+  const size_t niter = 70000;
+  EXPECT_EQ(tools_stats::find_latent_sample(u, 0.1, niter).rows(), u.rows());
+}
+
 // Every random component is a fixed-seed quasi-random sequence, so the draw is
 // reproducible.
 TEST(test_tools_stats, find_latent_sample_is_deterministic)
