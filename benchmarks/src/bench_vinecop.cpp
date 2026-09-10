@@ -114,6 +114,57 @@ register_select(size_t d, const std::string& label, FitControlsVinecop controls)
   }
 }
 
+//! Thread-pool scaling. `select` dispatches one job per edge, so the pool's
+//! own cost grows with the dimension while each job stays cheap at small `n` --
+//! which is where pool overhead is the largest share of the runtime. `pdf`
+//! batches rows instead, at `num_threads * floor(sqrt(n / num_threads))` jobs,
+//! so it needs a large `n` to queue a comparable number. `threads=1` is the
+//! control: both paths map it to a pool with no workers and run inline.
+void
+register_select_scaling(size_t d, size_t n)
+{
+  auto vc = bench::make_gaussian_vine(d);
+  auto u =
+    std::make_shared<const Eigen::MatrixXd>(vc.simulate(n, false, 1, { 5 }));
+  const std::string suffix =
+    "d=" + std::to_string(d) + "/n=" + std::to_string(n);
+
+  for (size_t threads : { size_t(1), size_t(8), size_t(16), size_t(32) }) {
+    FitControlsVinecop ctrl(bicop_families::itau, "itau");
+    ctrl.set_num_threads(threads);
+    benchmark::RegisterBenchmark(("vinecop/threads/select/" + suffix +
+                                  "/threads=" + std::to_string(threads))
+                                   .c_str(),
+                                 [u, ctrl](benchmark::State& st) {
+                                   for (auto _ : st) {
+                                     Vinecop fitted(
+                                       *u, RVineStructure(), {}, ctrl);
+                                     benchmark::DoNotOptimize(fitted);
+                                   }
+                                 });
+  }
+}
+
+void
+register_pdf_scaling(size_t d, size_t n)
+{
+  auto vc = std::make_shared<const Vinecop>(bench::make_gaussian_vine(d));
+  auto u =
+    std::make_shared<const Eigen::MatrixXd>(vc->simulate(n, false, 1, { 5 }));
+  const std::string suffix =
+    "d=" + std::to_string(d) + "/n=" + std::to_string(n);
+
+  for (size_t threads : { size_t(1), size_t(8), size_t(16), size_t(32) }) {
+    benchmark::RegisterBenchmark(
+      ("vinecop/threads/pdf/" + suffix + "/threads=" + std::to_string(threads))
+        .c_str(),
+      [vc, u, threads](benchmark::State& st) {
+        for (auto _ : st)
+          benchmark::DoNotOptimize(vc->pdf(*u, threads));
+      });
+  }
+}
+
 void
 register_cdf()
 {
@@ -144,6 +195,13 @@ struct Registrar
     register_select(
       10, "itau", FitControlsVinecop(bicop_families::itau, "itau"));
     register_select(5, "tll", FitControlsVinecop({ BicopFamily::tll }));
+
+    for (size_t d : { size_t(5), size_t(10), size_t(20) }) {
+      for (size_t n : { size_t(200), size_t(1000) })
+        register_select_scaling(d, n);
+      for (size_t n : { size_t(1000), size_t(10000) })
+        register_pdf_scaling(d, n);
+    }
   }
 };
 const Registrar registrar;
