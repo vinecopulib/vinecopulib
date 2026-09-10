@@ -1,0 +1,12 @@
+# Run `pre-commit install` after cloning to enable these hooks, or
+# `pre-commit run --all-files` to check the whole tree.
+
+repos:
+  # American English (AGENTS.md) plus ordinary typos, over prose and code
+  # alike. The rules live in .codespellrc and .codespell-prose.txt; `rev`
+  # matches the version the CI spelling job installs, so a local run and CI
+  # agree on the dictionaries.
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.3
+    hooks:
+      - id: codespell

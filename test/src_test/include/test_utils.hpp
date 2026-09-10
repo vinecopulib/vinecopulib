@@ -18,7 +18,7 @@ namespace test_utils {
 //!
 //! Finite entries must agree within `atol + rtol * |b(i, j)|`, while non-finite
 //! entries must agree exactly (both NaN, or equal infinities). This is useful
-//! because some copula quantities are genuinely NaN/Inf at specific parameter
+//! because some copula quantities really are NaN/Inf at specific parameter
 //! values (e.g., the Frank density at `theta = 0`, which is `0/0` and evaluates
 //! to NaN or a finite value depending on the platform's floating-point
 //! contraction), whereas `Eigen::DenseBase::isApprox` treats any NaN as a

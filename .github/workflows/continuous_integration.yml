@@ -23,6 +23,7 @@ env:
   BOOST_VERSION: 1.84.0
   EIGEN_VERSION: 3.4.0
   CLANG_FORMAT_VERSION: 14.0.6
+  CODESPELL_VERSION: 2.4.3
 
 jobs:
   style:
@@ -43,6 +44,25 @@ jobs:
             | grep -zv '^include/vinecopulib/misc/nlohmann_json\.hpp$' \
             | grep -zv '^include/vinecopulib/misc/tools_stats_sobol\.hpp$' \
             | xargs -0 clang-format --dry-run --Werror
+
+  spelling:
+    name: codespell
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      # From PyPI, not apt: pins the exact binary so local runs match CI. Keep
+      # in sync with the `rev` in .pre-commit-config.yaml.
+      - name: Install codespell ${{ env.CODESPELL_VERSION }}
+        run: pipx install "codespell==${{ env.CODESPELL_VERSION }}"
+
+      - name: Check spelling and prose
+        run: |
+          # Tracked files only: the build steps clone eigen-src and wdm into
+          # the workspace, and a skip list cannot anticipate every directory a
+          # build step drops there. Exclusions live in .codespellrc.
+          git ls-files -z | xargs -0 codespell
 
   version:
     name: version consistency

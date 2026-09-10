@@ -6,7 +6,7 @@ modes, conventions, and where to look for what.
 
 For the **user-facing pitch** and install pointers see
 [README.md](README.md); for the **release-by-release history** see
-[NEWS.md](NEWS.md); for **prose documentation** of the maths and the API
+[NEWS.md](NEWS.md); for **prose documentation** of the math and the API
 see the `docs/` folder (`*.dox`) and the rendered
 [website](https://vinecopulib.github.io/vinecopulib/). This file does not
 duplicate those — it concentrates on engineering invariants that survive
@@ -132,8 +132,12 @@ this repo, public-API changes are real breaks for downstream users.
 vinecopulib/
   AGENTS.md, CLAUDE.md           # this file + thin pointer (`@AGENTS.md`)
   README.md, NEWS.md, LICENSE, .zenodo.json
+  CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, CITATION.cff
   CMakeLists.txt                 # 24-line entry point; includes the cmake/ modules
-  .clang-format, .clang-tidy     # Mozilla style; advisory tidy checks
+  .clang-format, .clang-tidy     # Mozilla style; enforced tidy checks
+  .codespellrc                   # codespell: en-US + typos
+  .codespell-prose.txt           # the banned-word list
+  .pre-commit-config.yaml        # runs codespell locally
   codecov.yml                    # coverage service config
 
   include/
@@ -189,8 +193,8 @@ The listing above is the orientation, not an inventory: directories come and go,
 so check the tree rather than trusting it to be exhaustive.
 
 There is **no** `src/` of library `.cpp` files, **no** `lib/` /
-`contrib/` vendored tree, **no** git submodules, and **no**
-`CONTRIBUTING.md` — the workflow lives in this file and in CI.
+`contrib/` vendored tree, and **no** git submodules. The contribution
+workflow lives in [CONTRIBUTING.md](CONTRIBUTING.md), this file, and CI.
 
 ## Build & tooling
 
@@ -299,10 +303,20 @@ up via `gtest_discover_tests(test_all)` on non-Windows and
   excluding the vendored
   [misc/nlohmann_json.hpp](include/vinecopulib/misc/nlohmann_json.hpp).
   Format with clang-format 14 before committing.
+- **codespell** — [.codespellrc](.codespellrc) enables the `en-GB_to_en-US`
+  dictionary, which is what enforces the American-English rule under
+  [Coding conventions](#coding-conventions), alongside the banned-word list
+  in [.codespell-prose.txt](.codespell-prose.txt). CI's `spelling` job runs
+  it over `git ls-files`, and `pre-commit run --all-files` runs the same
+  check locally. Where a banned word is the right word, wrap the lines in
+  `codespell:ignore-begin` / `codespell:ignore-end`. NEWS.md, the vendored
+  JSON header, and the Doxyfile templates are excluded.
 - **clang-tidy** — [.clang-tidy](.clang-tidy) enables a broad check set
   (`bugprone-*`, `performance-*`, `modernize-*`, `cppcoreguidelines-*`,
-  …) but is **advisory**: the CI clang-tidy job is commented out and not
-  enforced.
+  …) and is **enforced** on pull requests by the `clang-tidy (diff)` job:
+  one pass over the changed `*.cpp` / `*.cc` through `clang-tidy-diff.py`,
+  and a repo-wide pass over two translation units that between them reach
+  every library header. Use clang-tidy 14.
 - **docs** — `cmake .. -DVINECOPULIB_BUILD_DOC=ON && make doc` runs Doxygen.
   The website is built with [m.css](https://github.com/mosra/m.css) via
   `doxygen.py docs/Doxyfile-mcss`; see
@@ -344,7 +358,7 @@ For any behavior change:
   path — a `VINECOPULIB_PRECOMPILED=ON` release build.
 - **Fix what you find.** A defect uncovered along the way is addressed, not
   annotated, worked around, or left for later behind an explanatory comment.
-  When the real fix genuinely belongs in a separate change, say so in the PR
+  When the real fix actually belongs in a separate change, say so in the PR
   description and open an issue for it — a comment is not a substitute.
 - **Never merge to `main` without express consent.** Open the pull request, get
   it green, and stop. A green matrix and an approved plan are not authorization
@@ -438,7 +452,7 @@ For any behavior change:
   parameters that are stored (the `FitControls` setters) are likewise by value
   and `std::move`d into the member. Converting either kind to `const&` is a
   performance regression, not a cleanup, even though clang-tidy may suggest it.
-- **C++17 + Eigen.** `Eigen::MatrixXd` / `VectorXd` are the workhorse
+- **C++17 + Eigen.** `Eigen::MatrixXd` / `VectorXd` are the primary
   types; prefer `.array()`, `.unaryExpr`, and the helpers in
   [misc/tools_eigen.hpp](include/vinecopulib/misc/tools_eigen.hpp)
   (`trim`, `remove_nans`, `unaryExpr_or_nan`, …) over hand-rolled loops.

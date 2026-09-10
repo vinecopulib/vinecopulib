@@ -165,7 +165,7 @@ puts the other headers in a subfolder `<prefix>/include/vinecopulib`, but using
 @subsection include-cmake In a CMake project
 
 The easiest way to include vinecopulib in another project (and to avoid writing makefiles)
-is to use CMake. For instance, an example projet where the source code to be linked could contain
+is to use CMake. For instance, an example project where the source code to be linked could contain
 - a `CMakeLists.txt` file for the project's setup,
 - a subfolder `src` for the source code, containing
    - the source code,

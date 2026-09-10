@@ -31,7 +31,7 @@ needed.
 
 `nonparametric_grid_size` was inserted into both fit-control constructors, after
 `nonparametric_mult`. Positional calls written for 0.7.3 still compile, because
-the neighbouring parameters have compatible types, and every argument after the
+the neighboring parameters have compatible types, and every argument after the
 insertion point silently shifts by one.
 
 Before, where the sixth argument was the selection criterion:
