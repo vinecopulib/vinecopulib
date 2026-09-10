@@ -123,8 +123,8 @@ TEST(test_tools_stats, cxi_works)
   EXPECT_NEAR(std::fabs(wdm::wdm(V, "tau")(0, 1)), 0.0, 0.1);
   EXPECT_GT(tools_stats::pairwise_cxi(V), 0.9);
 
-  // the two directions genuinely differ here, so taking the larger of them is
-  // what makes the criterion independent of the column order
+  // the two directions differ substantially here, so taking the larger of
+  // them is what makes the criterion independent of the column order
   double xi12 = wdm::wdm(V.col(0), V.col(1), "cxi");
   double xi21 = wdm::wdm(V.col(1), V.col(0), "cxi");
   EXPECT_GT(xi12 - xi21, 0.1);

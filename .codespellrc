@@ -1,0 +1,34 @@
+# Read by the pre-commit hook and by the CI spelling job. Relative paths are
+# resolved against the working directory, so run codespell from the repo root.
+[codespell]
+# `en-GB_to_en-US` enforces the American-English rule from AGENTS.md; `clear`
+# and `rare` catch ordinary typos in the same pass.
+builtin = clear,rare,en-GB_to_en-US
+# The banned-word list. Each entry carries a reason after a comma, which is what
+# makes codespell report a suggestion instead of auto-fixing: the right
+# replacement depends on the sentence. The file must come first -- a value
+# beginning with `-` is read as another flag.
+dictionary = .codespell-prose.txt,-
+# A banned word is sometimes the right word. To use one, wrap the lines in
+# `codespell:ignore-begin` / `-end`, in whatever comment syntax the file uses.
+# The trailing `.*?` is what lets the markers sit inside a delimited comment
+# such as `<!-- ... -->`.
+ignore-multiline-regex = codespell:ignore-begin.*?\n.*?codespell:ignore-end.*?\n
+# Vendored or generated: nlohmann_json.hpp is vendored verbatim and the Doxyfile
+# templates carry doxygen's own boilerplate, so a typo in either is fixed
+# upstream. NEWS.md records what each release said at the time. The prose list
+# holds the banned words themselves.
+#
+# A file pattern needs the leading `*`: for a path given on the command line
+# codespell fnmatches the path as passed and never the basename, so a bare
+# `nlohmann_json.hpp` would not match `include/.../nlohmann_json.hpp`.
+#
+# The `./` entries only matter to an ad-hoc `codespell .`; the hook and CI pass
+# tracked files, which never include a build tree. They are anchored for the
+# reason .gitignore gives: an unanchored `build*` also swallows
+# `.github/actions/build-site/` and `cmake/buildTargets.cmake`.
+skip = *nlohmann_json.hpp,*Doxyfile.in,*Doxyfile-mcss.in,*NEWS.md,*.codespell-prose.txt,./debug*,./release*,./build*,./bench_results*,./docs/html*,./docs/xml*,./eigen-src*,./wdm*
+# `Aas` is Kjersti Aas, author of the paper the vine literature is built on;
+# `Nd` is a local double in test_tools_stats; `ede` is the delta indicator in
+# the derivative codegen.
+ignore-words-list = aas,nd,ede

@@ -104,7 +104,7 @@ TEST(VinecopConstructor, omitted_pair_copulas_survive_structure_operations)
     }
   }
 
-  // variable types are labelled in the original order and survive relabeling
+  // variable types are labeled in the original order and survive relabeling
   Vinecop discrete(DVineStructure({ 1, 2, 3, 4 }), {}, { "c", "d", "c", "d" });
   ASSERT_NO_THROW(discrete.reorient({ 1 }));
   EXPECT_EQ(discrete.get_var_types(),
@@ -1165,7 +1165,7 @@ TEST_F(VinecopTest, reorient_preserves_model)
 {
   size_t d = 6;
   // rotated Clayton D-vine (asymmetric + rotations) so the flip logic in
-  // reorient() is genuinely exercised
+  // reorient() is actually exercised
   auto pcs = Vinecop::make_pair_copula_store(d);
   auto par = Eigen::VectorXd::Constant(1, 3.0);
   for (size_t t = 0; t < d - 1; ++t)

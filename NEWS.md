@@ -397,6 +397,11 @@ wrong thing.
 
 * Decompose `VinecopSelector` for readability (#695)
 
+* Add a codespell-based spelling and prose check, run in CI and available as a
+  pre-commit hook: `en-GB_to_en-US` enforces American English, and
+  `.codespell-prose.txt` bans a list of filler terms. Also fixes the typos and
+  British spellings it surfaced across the headers and documentation (#762)
+
 * Enforce the clang-format style in CI (#646, #649)
 
 * Fix documentation typos and the mBIC formula (#660, #665, #703, #716)
