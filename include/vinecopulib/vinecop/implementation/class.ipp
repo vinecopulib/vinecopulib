@@ -659,6 +659,19 @@ Vinecop::fit(const Eigen::MatrixXd& data,
   // set up thread pool
   tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
 
+  // The edges of a tree are fitted concurrently, and an edge writes the
+  // h-function column that an edge of lower index in the same tree reads. When
+  // that can happen, the edges read a snapshot of the previous tree instead,
+  // which is what the serial order gives every one of them.
+  const bool snapshot_hfuncs = num_threads > 1;
+  Eigen::MatrixXd hfunc1_prev, hfunc2_prev, hfunc1_sub_prev, hfunc2_sub_prev;
+  const Eigen::MatrixXd& hfunc1_in = snapshot_hfuncs ? hfunc1_prev : hfunc1;
+  const Eigen::MatrixXd& hfunc2_in = snapshot_hfuncs ? hfunc2_prev : hfunc2;
+  const Eigen::MatrixXd& hfunc1_sub_in =
+    snapshot_hfuncs ? hfunc1_sub_prev : hfunc1_sub;
+  const Eigen::MatrixXd& hfunc2_sub_in =
+    snapshot_hfuncs ? hfunc2_sub_prev : hfunc2_sub;
+
   // fill first row of hfunc2 matrix with observed data;
   // points have to be reordered to correspond to natural order
   for (size_t j = 0; j < d_; ++j) {
@@ -670,6 +683,12 @@ Vinecop::fit(const Eigen::MatrixXd& data,
 
   for (size_t tree = 0; tree < trunc_lvl; ++tree) {
     tools_interface::check_user_interrupt();
+    if (snapshot_hfuncs) {
+      hfunc1_prev = hfunc1;
+      hfunc2_prev = hfunc2;
+      hfunc1_sub_prev = hfunc1_sub;
+      hfunc2_sub_prev = hfunc2_sub;
+    }
     // scale down the per-fit thread budget: the edges of this tree already
     // run concurrently on the pool, so nested threading would oversubscribe
     FitControlsBicop tree_controls = controls;
@@ -686,20 +705,20 @@ Vinecop::fit(const Eigen::MatrixXd& data,
       size_t m = rvine_structure_.min_array(tree, edge);
 
       Eigen::MatrixXd u_e(n, 2), u_e_sub;
-      u_e.col(0) = hfunc2.col(edge);
+      u_e.col(0) = hfunc2_in.col(edge);
       if (m == rvine_structure_.struct_array(tree, edge, true)) {
-        u_e.col(1) = hfunc2.col(m - 1);
+        u_e.col(1) = hfunc2_in.col(m - 1);
       } else {
-        u_e.col(1) = hfunc1.col(m - 1);
+        u_e.col(1) = hfunc1_in.col(m - 1);
       }
 
       if ((var_types[0] == "d") || (var_types[1] == "d")) {
         u_e.conservativeResize(n, 4);
-        u_e.col(2) = hfunc2_sub.col(edge);
+        u_e.col(2) = hfunc2_sub_in.col(edge);
         if (m == rvine_structure_.struct_array(tree, edge, true)) {
-          u_e.col(3) = hfunc2_sub.col(m - 1);
+          u_e.col(3) = hfunc2_sub_in.col(m - 1);
         } else {
-          u_e.col(3) = hfunc1_sub.col(m - 1);
+          u_e.col(3) = hfunc1_sub_in.col(m - 1);
         }
       }
 

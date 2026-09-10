@@ -2266,6 +2266,35 @@ TEST(VinecopDerivatives, per_obs_pdf_and_loglik)
   EXPECT_NEAR(ll_po, ll_ref, 1e-8 * (1.0 + std::abs(ll_ref)));
 }
 
+// An edge reads the h-function columns that edges of higher index in the same
+// tree write, so fitting the edges concurrently has to give the serial result.
+TEST(VinecopFit, parallel_fit_matches_serial)
+{
+  const size_t d = 8;
+  const auto u = tools_stats::simulate_uniform(300, d, false, { 3, 5, 7, 11 });
+  FitControlsVinecop controls(bicop_families::itau, "itau");
+
+  // one selected model, then the same pair copulas refitted both ways
+  const Vinecop model(u, RVineStructure(), {}, controls);
+  Vinecop serial(model.get_rvine_structure(), model.get_all_pair_copulas());
+  Vinecop parallel(model.get_rvine_structure(), model.get_all_pair_copulas());
+  serial.fit(u, controls, 1);
+  parallel.fit(u, controls, 4);
+
+  EXPECT_EQ(serial.loglik(u), parallel.loglik(u));
+  for (size_t tree = 0; tree < serial.get_trunc_lvl(); ++tree) {
+    for (size_t edge = 0; edge < d - tree - 1; ++edge) {
+      EXPECT_EQ(serial.get_family(tree, edge), parallel.get_family(tree, edge))
+        << "tree " << tree << ", edge " << edge;
+      EXPECT_TRUE(all_close(serial.get_parameters(tree, edge),
+                            parallel.get_parameters(tree, edge),
+                            0.0,
+                            0.0))
+        << "tree " << tree << ", edge " << edge;
+    }
+  }
+}
+
 TEST_F(VinecopTest, aic_bic_are_correct)
 {
   int d = 7;
