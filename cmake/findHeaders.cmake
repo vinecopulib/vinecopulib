@@ -18,14 +18,18 @@ if(VINECOPULIB_PRECOMPILED)
     # contents as well, so that editing a header regenerates what it feeds.
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
             ${vinecopulib_ipp} ${vinecopulib_all_hpp})
+    # Both loops below rewrite paths as literal text, with string(REPLACE):
+    # the source and binary directories come from the caller and may contain
+    # regex metacharacters such as '+' or '.', which a pattern reads as
+    # operators and then fails to match. A regex is right only where the
+    # pattern is written out here in full and merely the subject comes from a
+    # path.
     foreach (file ${vinecopulib_ipp})
 
-        # Get directory, name and path for header/source files. Paths are
-        # manipulated with string(REPLACE), not regexes: the source directory is
-        # arbitrary and may contain regex metacharacters such as '+' or '.'.
+        # Get directory, name and path for header/source files.
         get_filename_component(name_without_extension ${file} NAME_WE)
         get_filename_component(directory ${file} DIRECTORY)
-        string(REGEX REPLACE "/implementation$" "" directory ${directory})
+        string(REGEX REPLACE "/implementation$" "" directory "${directory}")
         set(header_file ${directory}/${name_without_extension}.hpp)
         string(REPLACE "${vinecopulib_includes}/" ""
                 header_file ${header_file})
@@ -65,14 +69,14 @@ if(VINECOPULIB_PRECOMPILED)
         get_filename_component(name_without_extension ${file} NAME_WE)
         get_filename_component(directory ${file} DIRECTORY)
         set(ipp_file ${directory}/implementation/${name_without_extension}.ipp)
-        string(REGEX REPLACE "${vinecopulib_includes}/" "" ipp_file ${ipp_file})
-        string(REGEX REPLACE ${vinecopulib_includes} ${vinecopulib_generated_includes}
-                header_folder ${directory})
+        string(REPLACE "${vinecopulib_includes}/" "" ipp_file "${ipp_file}")
+        string(REPLACE "${vinecopulib_includes}"
+                "${vinecopulib_generated_includes}" header_folder "${directory}")
         set(header_file "${header_folder}/${name_without_extension}.hpp")
 
         # File scrap content and remove ipp include
         file(READ ${file} file_content)
-        string(REGEX REPLACE "#include <${ipp_file}>" ""
+        string(REPLACE "#include <${ipp_file}>" ""
                 file_content "${file_content}")
 
         # If header does not exists or has changed, generate new header file
