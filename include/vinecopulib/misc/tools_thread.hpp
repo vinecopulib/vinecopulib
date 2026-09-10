@@ -62,6 +62,7 @@ private:
 
   bool has_errored_locked() const;
   bool all_jobs_done_locked() const;
+  void wait_for_jobs();
   bool wait_for_wake_up_event(std::unique_lock<std::mutex>& lk);
   void rethrow_exceptions();
 
@@ -143,34 +144,28 @@ ThreadPool::map(F&& f, I&& items)
 }
 
 //! waits for all jobs to finish, but does not join the threads.
+//!
+//! If a job threw, its exception is rethrown here and the jobs that had not
+//! started are canceled. The exception is reported once, and the pool accepts
+//! new jobs afterwards.
 inline void
 ThreadPool::wait()
 {
-  {
-    // must hold the lock while reading the shared state; the wake up event
-    // releases it while waiting
-    std::unique_lock<std::mutex> lk(m_tasks_);
-    while (true) {
-      if (this->wait_for_wake_up_event(lk)) {
-        if (this->all_jobs_done_locked())
-          break;
-        // an error makes the jobs that have not started pointless; the ones
-        // already running still have to finish
-        this->clear_locked();
-      }
-    }
-  } // the lock must be released before the exception is rethrown
-
+  this->wait_for_jobs();
   this->rethrow_exceptions();
 }
 
 //! waits for all jobs to finish and joins all threads.
+//!
+//! The threads are stopped and joined even when a job threw; the exception is
+//! rethrown once they are. Jobs can no longer be pushed to the pool.
 inline void
 ThreadPool::join()
 {
-  this->wait();
+  this->wait_for_jobs();
   this->announce_stop();
   this->join_workers();
+  this->rethrow_exceptions();
 }
 
 //! clears the pool from all open jobs.
@@ -234,7 +229,10 @@ ThreadPool::do_job(std::function<void()>&& job)
   } catch (...) {
     {
       std::lock_guard<std::mutex> lk(m_tasks_);
-      error_ptr_ = std::current_exception();
+      // the first failure is the one that cancels the jobs that have not
+      // started, and the one reported to the caller
+      if (!this->has_errored_locked())
+        error_ptr_ = std::current_exception();
     }
     cv_busy_.notify_one();
   }
@@ -296,6 +294,27 @@ ThreadPool::all_jobs_done_locked() const
   return (num_busy_ == 0) && jobs_.empty();
 }
 
+//! waits until no job is queued or running.
+//!
+//! An error cancels the jobs that have not started; reporting it is left to
+//! `rethrow_exceptions()`, which the lock must be released for.
+inline void
+ThreadPool::wait_for_jobs()
+{
+  // must hold the lock while reading the shared state; the wake up event
+  // releases it while waiting
+  std::unique_lock<std::mutex> lk(m_tasks_);
+  while (true) {
+    if (this->wait_for_wake_up_event(lk)) {
+      if (this->all_jobs_done_locked())
+        return;
+      // an error makes the jobs that have not started pointless; the ones
+      // already running still have to finish
+      this->clear_locked();
+    }
+  }
+}
+
 //! checks whether `wait()` needs to wake up, i.e., all jobs are done or an
 //! error makes the jobs that have not started pointless.
 //! @param lk A lock on `m_tasks_` held by the caller; released while waiting.
@@ -313,8 +332,8 @@ ThreadPool::wait_for_wake_up_event(std::unique_lock<std::mutex>& lk)
   return wake_up_event_occurred();
 }
 
-//! rethrows exceptions (exceptions from workers are caught and stored; the
-//! wait loop only checks, but does not throw exceptions)
+//! rethrows the exception stored by a failing job, if there is one, and
+//! consumes it, so that it is reported to a single `wait()` or `join()`.
 inline void
 ThreadPool::rethrow_exceptions()
 {
@@ -322,7 +341,7 @@ ThreadPool::rethrow_exceptions()
   {
     // must hold the lock while reading the stored exception
     std::lock_guard<std::mutex> lk(m_tasks_);
-    error_ptr = error_ptr_;
+    std::swap(error_ptr, error_ptr_);
   }
   if (error_ptr)
     std::rethrow_exception(error_ptr);
