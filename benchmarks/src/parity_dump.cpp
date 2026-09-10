@@ -190,6 +190,22 @@ dump_tll()
     out["disc_constant"]["loglik"] = bc.get_loglik();
     out["disc_constant"]["pdf"] = to_vec(bc.pdf(bench::discretize_first(u)));
   }
+  // discrete/discrete tll: the rectangle route, which the c/d layout above
+  // never reaches
+  {
+    const auto data_disc = bench::discretize_both(data);
+    FitControlsBicop controls({ BicopFamily::tll });
+    Bicop bc(BicopFamily::tll);
+    bc.set_var_types({ "d", "d" });
+    bc.fit(data_disc, controls);
+    out["disc_dd_constant"]["npars"] = bc.get_npars();
+    out["disc_dd_constant"]["loglik"] = bc.get_loglik();
+    out["disc_dd_constant"]["pdf"] = to_vec(bc.pdf(bench::discretize_both(u)));
+    out["disc_dd_constant"]["hfunc1"] =
+      to_vec(bc.hfunc1(bench::discretize_both(u)));
+    out["disc_dd_constant"]["hfunc2"] =
+      to_vec(bc.hfunc2(bench::discretize_both(u)));
+  }
   return out;
 }
 

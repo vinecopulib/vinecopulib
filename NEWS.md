@@ -64,6 +64,11 @@ wrong thing.
 
 ### BEHAVIOR CHANGES
 
+* Every discrete `tll` evaluation moves, by up to `1e-9` on the density and
+  `9e-10` on the log-likelihood, because the rectangle probabilities behind it
+  are now computed without cancellation; see NEW FEATURES. Parametric families
+  are bit-identical (#771)
+
 * `Vinecop::pdf()` is the exponential of a log-space sum rather than a running
   product of edge densities, so its values move at the `1e-15` level (observed
   maximum `1.4e-15` relative across the parity sweep). Downstream bit-for-bit

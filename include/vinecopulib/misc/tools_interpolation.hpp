@@ -13,10 +13,12 @@
 namespace vinecopulib {
 
 namespace tools_interpolation {
-//! A class for cubic spline interpolation of bivariate copulas
+//! A class for bilinear interpolation of bivariate copulas
 //!
 //! The class is used for implementing kernel estimators. It makes storing the
-//! observations obsolete and allows for fast numerical integration.
+//! observations obsolete and allows for fast numerical integration. The
+//! interpolant is piecewise bilinear, so its mass over a grid-aligned
+//! rectangle is available in closed form; see `rect_mass()`.
 class InterpolationGrid
 {
 public:
@@ -45,7 +47,21 @@ public:
 
   Eigen::VectorXd integrate_2d(const tools_eigen::ConstMatRef& u);
 
+  //! probability of one rectangle, without the cancellation a difference of
+  //! four `integrate_2d()` values carries.
+  double rect_mass(double a1, double b1, double a2, double b2) const;
+
+  //! probability of one interval in the free coordinate, given the other.
+  double cond_interval_mass(double u_cond,
+                            double lo,
+                            double hi,
+                            size_t cond_var) const;
+
 private:
+  // nonnegative quadrature weights for a sub-interval of the grid, and the
+  // partial row integrals both of the above are built from
+  ptrdiff_t interval_weights(double lo, double hi, Eigen::VectorXd& w) const;
+  void row_integrals(double u, Eigen::VectorXd& out) const;
   // normalizes the grid margins; internal only (callers must refresh the
   // cached integrals afterwards, as the ctor and set_values do)
   void normalize_margins(int max_iter);
