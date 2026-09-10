@@ -125,6 +125,11 @@ You can simulate from a model and evaluate its density, distribution function
 (by Monte Carlo), log-likelihood and information criteria, apply the Rosenblatt
 transform and its inverse, and truncate an existing model.
 
+`logpdf()` is the log-density, and the accurate way to obtain it: a vine density
+is a product of one factor per edge, so in high dimensions or under strong
+dependence `pdf()` underflows to `0` while the log-density is still an ordinary
+double. `loglik()` sums it.
+
 `pdf_full()` returns, alongside the density, the per-edge pair-copula densities
 and h-functions computed on the way; the derivative routines reuse them rather
 than recomputing the cascade.

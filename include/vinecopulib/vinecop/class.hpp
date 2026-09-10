@@ -158,6 +158,8 @@ public:
   // Stats methods
   Eigen::VectorXd pdf(Eigen::MatrixXd u, const size_t num_threads = 1) const;
 
+  Eigen::VectorXd logpdf(Eigen::MatrixXd u, const size_t num_threads = 1) const;
+
   //! @brief The density together with the per-edge quantities computed on the
   //! way, as returned by `pdf_full()`.
   //!
@@ -168,6 +170,7 @@ public:
   struct PdfWithHfuncsResult
   {
     Eigen::VectorXd pdf;
+    Eigen::VectorXd logpdf;
     TriangularArray<Eigen::VectorXd> pdf_edges;
     TriangularArray<Eigen::VectorXd> hfunc1;
     TriangularArray<Eigen::VectorXd> hfunc2;
@@ -186,6 +189,10 @@ public:
   Eigen::VectorXd pdf(Eigen::MatrixXd u,
                       const Eigen::MatrixXd& parameters,
                       const size_t num_threads = 1) const;
+
+  Eigen::VectorXd logpdf(Eigen::MatrixXd u,
+                         const Eigen::MatrixXd& parameters,
+                         const size_t num_threads = 1) const;
 
   PdfWithHfuncsResult pdf_full(Eigen::MatrixXd u,
                                const Eigen::MatrixXd& parameters,
