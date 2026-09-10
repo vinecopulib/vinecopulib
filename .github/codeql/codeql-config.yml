@@ -17,11 +17,8 @@ query-filters:
   - exclude:
       id: cpp/commented-out-code
 
-# Only a backstop: for an analysis that builds the code, path filters are not
-# what keeps a dependency out of the results -- being outside the workspace is
-# (see the Eigen3_ROOT export in codeql.yml). Alert paths are relative to the
-# workspace, so the vendored header needs a glob: it is analyzed through the
-# copy findHeaders.cmake derives under build-codeql/generated/.
-paths-ignore:
-  - eigen-src
-  - '**/nlohmann_json.hpp'
+# No `paths-ignore`: path filters are documented for interpreted languages and
+# for compiled languages analyzed without building, and a dispatch run measured
+# them filtering nothing here. What keeps a dependency out of the results is
+# being outside the workspace -- see the Eigen3_ROOT export in codeql.yml. The
+# vendored JSON header is inside it, so its remaining findings are dismissed.
