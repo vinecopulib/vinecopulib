@@ -332,6 +332,11 @@ wrong thing.
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
+* Update the vendored nlohmann/json from 3.9.1 to 3.12.0, now stored verbatim
+  instead of reformatted, with the patches that remove its suppressed compiler
+  diagnostics re-applied. The on-disk JSON and CBOR formats are unchanged
+  (#765)
+
 * Require wdm 0.3.0, for Chatterjee's xi and for the random tie-breaking fix
   (#754)
 
