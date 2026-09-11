@@ -321,6 +321,15 @@ wrong thing.
 * Include the thread header explicitly where it was relied on transitively
   (#676)
 
+* Synchronize `ThreadPool`: it read the stop flag, the job queue, the busy
+  count and the stored exception without holding its mutex, a data race that
+  could let a worker exit or `wait()` return with jobs still queued. An
+  exception stored by a job now also wakes `wait()` (#764)
+
+* Fix `tools_stats::find_latent_sample`, which counted its sweeps in a
+  `uint16_t` against a `size_t niter`: a count above 65535 wrapped to zero and
+  the loop never terminated. Results are unchanged (#764)
+
 ### BUILD SYSTEM AND DEPENDENCIES
 
 * Require wdm 0.3.0, for Chatterjee's xi and for the random tie-breaking fix
@@ -405,6 +414,11 @@ wrong thing.
 * Enforce the clang-format style in CI (#646, #649)
 
 * Fix documentation typos and the mBIC formula (#660, #665, #703, #716)
+
+* Report only actionable CodeQL results: Eigen now installs and resolves
+  outside the workspace, so its own findings are no longer attributed to this
+  repository, and the two query classes that cannot be satisfied here are
+  excluded through a config file (#764)
 
 ## vinecopulib 0.7.3 (April 23, 2025)
 

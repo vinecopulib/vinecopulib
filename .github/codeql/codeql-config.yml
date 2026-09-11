@@ -1,0 +1,24 @@
+name: vinecopulib
+
+# `queries` is additive: the default suite runs regardless, and
+# security-and-quality adds the maintainability checks on top of it.
+queries:
+  - uses: security-and-quality
+
+# Two of those maintainability checks cannot be satisfied here.
+query-filters:
+  # Fires on the derivative dispatch functions in bicop/implementation, which
+  # are generated from tools/derivs and run to hundreds of lines of algebra.
+  - exclude:
+      id: cpp/poorly-documented-function
+  # The vendored JSON header is an amalgamation, and the `// #include
+  # <nlohmann/detail/...>` provenance markers it is assembled from are comments
+  # that parse as code.
+  - exclude:
+      id: cpp/commented-out-code
+
+# No `paths-ignore`: path filters are documented for interpreted languages and
+# for compiled languages analyzed without building, and a dispatch run measured
+# them filtering nothing here. What keeps a dependency out of the results is
+# being outside the workspace -- see the Eigen3_ROOT export in codeql.yml. The
+# vendored JSON header is inside it, so its remaining findings are dismissed.

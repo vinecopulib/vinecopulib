@@ -31,7 +31,7 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           languages: cpp
-          queries: security-and-quality
+          config-file: ./.github/codeql/codeql-config.yml
 
       - name: Install dependencies
         id: install-dependencies
@@ -40,15 +40,20 @@ jobs:
           os: ubuntu-latest
           boost_version: 1.84.0
           eigen_version: 3.4.0
+          # Outside the workspace: CodeQL reports only files under it, so this
+          # is what keeps Eigen's headers out of the results.
+          eigen_install_dir: ${{ runner.temp }}/eigen
           R: false
           lcov: false
 
-      # BOOST_ROOT must be exported: find_package picks it up via CMP0074.
+      # BOOST_ROOT and Eigen3_ROOT must be exported: find_package picks them
+      # up via CMP0074, ahead of CMake's user package registry, where the
+      # in-workspace eigen-src build tree registers itself.
       - name: Set environment variables
         run: |
           echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
           echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
+          echo "Eigen3_ROOT=${{ runner.temp }}/eigen" >> $GITHUB_ENV
 
       # Precompiled, so the .ipp files become translation units CodeQL can see.
       - name: Build (precompiled, so the .ipp tree is compiled)
@@ -56,7 +61,8 @@ jobs:
           mkdir build-codeql && cd build-codeql
           cmake .. -DCMAKE_BUILD_TYPE=Release \
             -DVINECOPULIB_PRECOMPILED=ON \
-            -DBUILD_TESTING=OFF
+            -DBUILD_TESTING=OFF \
+            -DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF
           make -j"$(nproc)"
 
       - name: Perform CodeQL analysis
