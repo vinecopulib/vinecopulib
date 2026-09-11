@@ -377,6 +377,20 @@ wrong thing.
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
+* Require CMake 3.20, with an upper bound of 4.0, and find Boost in CONFIG
+  mode only. `CMP0167` removes the `FindBoost` module, so the MODULE fallback
+  was going to stop working; Boost has shipped a config package since 1.70,
+  below the 1.75 required here. The `CMP0074` and `CMP0144` blocks go with it,
+  and `findHeaders.cmake` takes paths apart with `cmake_path()` rather than
+  matching them as text (#774)
+
+* Carry the dependency paths into the installed package. The exported link
+  interface names `Eigen3::Eigen`, `Boost::headers` and `wdm`, and the
+  installed config resolved each with `find_dependency`, so a build pointed at
+  a directory rather than a package shipped a package that failed on the
+  consumer's side. Those directories are now recorded and used when the
+  package cannot be found (#774)
+
 * Fix `-DEIGEN3_INCLUDE_DIR=<path>` and `-DBoost_INCLUDE_DIRS=<path>`. Either
   one skips the matching `find_package`, and the build links Eigen and Boost by
   target name, so a precompiled build failed at generate time and a build with
@@ -390,6 +404,7 @@ wrong thing.
   so a directory such as `vine+copulib` generated none of the headers and left
   every `.ipp` both inlined and compiled as its own translation unit, for a
   `redefinition of ...` error against an installed copy of the headers. Paths
+  are now taken apart with `cmake_path()` (#774)
   are now compared literally (#774)
 * Update the vendored nlohmann/json from 3.9.1 to 3.12.0, now stored verbatim
   instead of reformatted, with the patches that remove its suppressed compiler

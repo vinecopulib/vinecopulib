@@ -198,7 +198,7 @@ workflow lives in [CONTRIBUTING.md](CONTRIBUTING.md), this file, and CI.
 
 ## Build & tooling
 
-CMake **≥ 3.14**, C++ **17**. The 24-line root
+CMake **3.20–4.0**, C++ **17**. The 24-line root
 [CMakeLists.txt](CMakeLists.txt) sets the standard, the project version,
 and includes the `cmake/` modules in order.
 
@@ -245,7 +245,7 @@ Discovered in
 
 - **Eigen3** — `find_package(Eigen3 REQUIRED CONFIG)`; or set
   `EIGEN3_INCLUDE_DIR`. Target: `Eigen3::Eigen`.
-- **Boost ≥ 1.75** — CONFIG mode then MODULE fallback; or set
+- **Boost ≥ 1.75** — CONFIG mode only (`CMP0167` removes `FindBoost`); or set
   `Boost_INCLUDE_DIRS`. Target: `Boost::headers`. Deliberately narrowed to three
   header-only components — keep it that way, and prefer the standard library
   when it suffices: **Graph** (`adjacency_list` and the spanning-tree engines
@@ -253,8 +253,7 @@ Discovered in
   functions, `quadrature::tanh_sinh` for 1-d integration, `tools::minima`),
   and **Random** (`mt19937`, behind QRNG scrambling and structure simulation).
 - **wdm 0.3.0** — `find_package(wdm 0.3.0 QUIET)` with a **FetchContent
-  fallback** that clones `tnagler/wdm`. Installed under
-  `<prefix>/include/vinecopulib/wdm/`.
+  fallback** that clones `tnagler/wdm`. This project does not install it.
 - **Threads** — required.
 - **GoogleTest 1.14** — FetchContent, only when `BUILD_TESTING`.
 - **Rscript** (optional) — enables the R parity tests; see
@@ -264,9 +263,9 @@ Discovered in
 Setting `EIGEN3_INCLUDE_DIR`, `Boost_INCLUDE_DIRS` or `wdm_INCLUDE_DIRS` skips
 the matching `find_package`. The build links these dependencies by target name,
 so `findDependencies.cmake` defines the target from the given path instead
-(`vinecopulib_add_header_only_target`). A dependency added to a link line needs
-the same treatment, or a caller-supplied path configures and then fails to
-link.
+(`vinecopulib_add_header_only_target`), and records it in the installed package
+so a consumer can resolve it too. A dependency added to a link line needs both,
+or a caller-supplied path configures and then fails to link.
 
 Global compile definitions set in
 [cmake/compilerDefOpt.cmake](cmake/compilerDefOpt.cmake) (and mirrored in
@@ -398,10 +397,10 @@ For any behavior change:
 
   ```cmake
   # documentation — states the constraint
-  # 3.14 for FetchContent_MakeAvailable; do not lower.
+  # 3.20 for cmake_path(); the upper bound opts into policies up to 4.0.
 
   # history — only makes sense against the old code
-  # 3.14 is the real floor: the previous 3.10 could not configure at all.
+  # 3.20 is the real floor: the previous 3.14 could not configure at all.
   ```
 
 - **American English** in code, comments, documentation, commit messages, and
