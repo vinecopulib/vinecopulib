@@ -144,4 +144,79 @@ TEST(test_tools_thread, repeated_shutdown_is_consistent)
     EXPECT_EQ(ran.load(), n_jobs);
   }
 }
+
+// A reported error is consumed, so the pool is ready for the next round.
+TEST(test_tools_thread, reusable_after_a_reported_error)
+{
+  ThreadPool pool(4);
+  pool.push([] { throw std::runtime_error("job failed"); });
+  EXPECT_THROW(pool.wait(), std::runtime_error);
+
+  std::atomic<int> ran{ 0 };
+  pool.push([&ran]() noexcept { ++ran; });
+  EXPECT_NO_THROW(pool.wait());
+  EXPECT_EQ(ran.load(), 1);
+  EXPECT_NO_THROW(pool.join());
+}
+
+// join() shuts the pool down whether or not a job threw.
+TEST(test_tools_thread, join_stops_the_workers_after_an_error)
+{
+  ThreadPool pool(2);
+  pool.push([] { throw std::runtime_error("job failed"); });
+  EXPECT_THROW(pool.join(), std::runtime_error);
+
+  try {
+    pool.push([]() noexcept {});
+    FAIL() << "push() was accepted by a joined thread pool";
+  } catch (const std::runtime_error& e) {
+    EXPECT_STREQ(e.what(), "cannot push to joined thread pool");
+  }
+  EXPECT_NO_THROW(pool.join());
+}
+
+// Jobs pushed after an error was reported are not canceled.
+TEST(test_tools_thread, queued_jobs_survive_a_reported_error)
+{
+  const int n_jobs = 200;
+  ThreadPool pool(1);
+  pool.push([] { throw std::runtime_error("job failed"); });
+  EXPECT_THROW(pool.wait(), std::runtime_error);
+
+  std::atomic<int> ran{ 0 };
+  pool.push([&ran] {
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    ++ran;
+  });
+  for (int i = 0; i < n_jobs; ++i)
+    pool.push([&ran]() noexcept { ++ran; });
+  EXPECT_NO_THROW(pool.wait());
+  EXPECT_EQ(ran.load(), n_jobs + 1);
+  pool.join();
+}
+
+// One worker runs jobs in order, so the first failure is the one reported.
+TEST(test_tools_thread, first_error_is_the_one_reported)
+{
+  std::atomic<int> failed{ 0 };
+  ThreadPool pool(1);
+  pool.push([&failed] {
+    ++failed;
+    throw std::runtime_error("first job failed");
+  });
+  pool.push([&failed] {
+    ++failed;
+    throw std::runtime_error("second job failed");
+  });
+  while (failed.load() < 2)
+    std::this_thread::yield();
+
+  try {
+    pool.wait();
+    FAIL() << "wait() did not rethrow a job's exception";
+  } catch (const std::runtime_error& e) {
+    EXPECT_STREQ(e.what(), "first job failed");
+  }
+  pool.join();
+}
 }

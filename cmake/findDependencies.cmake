@@ -1,42 +1,39 @@
-if (POLICY CMP0074)
-  # find_package() uses <PackageName>_ROOT variables
-  cmake_policy(SET CMP0074 NEW)
-endif ()
-
-if (POLICY CMP0144)
-  # find_package() uses upper-case <PACKAGENAME>_ROOT variables.
-  cmake_policy(SET CMP0144 NEW)
-endif ()
+# The build links these by target name, so a caller-supplied path has to define
+# the target too. Call after the find_package that may already define it.
+function(vinecopulib_add_header_only_target target include_dirs_var)
+  if(TARGET ${target})
+    return()
+  endif()
+  if(NOT ${include_dirs_var})
+    message(FATAL_ERROR
+            "${target} is not defined and ${include_dirs_var} is empty. Set "
+            "${include_dirs_var} to the directory holding the headers, or "
+            "leave it unset and let find_package look for the package.")
+  endif()
+  add_library(${target} INTERFACE IMPORTED GLOBAL)
+  set_target_properties(${target} PROPERTIES
+                        INTERFACE_INCLUDE_DIRECTORIES "${${include_dirs_var}}")
+endfunction()
 
 # Find the main dependencies
 
 # Check if EIGEN3_INCLUDE_DIR is defined and if not, try to find it
 if(NOT DEFINED EIGEN3_INCLUDE_DIR)
   find_package(Eigen3 REQUIRED CONFIG)
-  if (Eigen3_FOUND)
-    message(STATUS "Found Eigen3: ${Eigen3_DIR} (found suitable version \"${Eigen3_VERSION}\")")
-  else()
-    message(FATAL_ERROR "Could not find Eigen3")
-  endif()
-  # Eigen 5.x exposes its include path only through the target and no longer
-  # sets EIGEN3_INCLUDE_DIR, which external_includes below needs.
-  if(TARGET Eigen3::Eigen)
-    get_target_property(EIGEN3_INCLUDE_DIR Eigen3::Eigen
-                        INTERFACE_INCLUDE_DIRECTORIES)
-  endif()
+  message(STATUS "Found Eigen3: ${Eigen3_DIR} (found suitable version \"${Eigen3_VERSION}\")")
+  # Eigen 5.x sets no EIGEN3_INCLUDE_DIR; external_includes below needs one.
+  get_target_property(EIGEN3_INCLUDE_DIR Eigen3::Eigen
+                      INTERFACE_INCLUDE_DIRECTORIES)
 endif()
+vinecopulib_add_header_only_target(Eigen3::Eigen EIGEN3_INCLUDE_DIR)
 
 # Check if Boost_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED Boost_INCLUDE_DIRS)
-  # try to find Boost in CONFIG mode first
-  find_package(Boost 1.75 CONFIG)
-  if (Boost_FOUND)
-    message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")  
-  else ()
-    # fallback to MODULE mode
-    find_package(Boost 1.75 MODULE REQUIRED)
-  endif ()
+  # CONFIG only: CMP0167 removes the FindBoost module.
+  find_package(Boost 1.75 REQUIRED CONFIG)
+  message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")
 endif()
+vinecopulib_add_header_only_target(Boost::headers Boost_INCLUDE_DIRS)
 
 find_package(Threads                      REQUIRED)
 
@@ -59,14 +56,7 @@ if(NOT DEFINED wdm_INCLUDE_DIRS)
   endif()
 endif()
 
-# The build links wdm by target name, which find_package and FetchContent both
-# define but a caller-supplied wdm_INCLUDE_DIRS does not. Without this the name
-# is taken for a library to search for, and every link fails on -lwdm.
-if(NOT TARGET wdm)
-  add_library(wdm INTERFACE IMPORTED GLOBAL)
-  set_target_properties(wdm PROPERTIES
-                        INTERFACE_INCLUDE_DIRECTORIES "${wdm_INCLUDE_DIRS}")
-endif()
+vinecopulib_add_header_only_target(wdm wdm_INCLUDE_DIRS)
 
 # Ensure R is available and download googlestest
 if(BUILD_TESTING)

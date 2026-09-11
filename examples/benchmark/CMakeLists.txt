@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20...4.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -13,16 +13,6 @@ if (NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG")
   MESSAGE(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 endif()
-
-if (POLICY CMP0074)
-  # find_package() uses <PackageName>_ROOT variables
-  cmake_policy(SET CMP0074 NEW)
-endif ()
-
-if (POLICY CMP0144)
-  # find_package() uses upper-case <PACKAGENAME>_ROOT variables.
-  cmake_policy(SET CMP0144 NEW)
-endif ()
 
 # Find vinecopulib package and dependencies
 find_package(vinecopulib REQUIRED)

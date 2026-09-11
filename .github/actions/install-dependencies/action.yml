@@ -116,6 +116,13 @@ runs:
             -DCMAKE_INSTALL_PREFIX="$prefix" \
             -DBUILD_TESTING=OFF
           cmake --build eigen-src/build --config Release --target install
+          echo "Eigen3_ROOT=$prefix" >> $GITHUB_ENV
+      shell: bash
+
+    # find_package reads both through CMP0074, so every caller needs them.
+    - name: Export the dependency roots
+      if: inputs.boost == 'true'
+      run: echo "BOOST_ROOT=${{ steps.boost.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
       shell: bash
 
     - name: Install wdm (pinned to ${{inputs.wdm_ref}})

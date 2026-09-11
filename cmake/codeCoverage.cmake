@@ -156,8 +156,8 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 
     # Show info where to find the report
     ADD_CUSTOM_COMMAND(TARGET ${_targetname} POST_BUILD
-            COMMAND ;
-            COMMENT "Open ./${_outputname}/index.html in your browser to view the coverage report."
+            COMMAND ${CMAKE_COMMAND} -E echo
+                    "Open ./${_outputname}/index.html to view the coverage report."
             )
 
 ENDFUNCTION() # SETUP_TARGET_FOR_COVERAGE

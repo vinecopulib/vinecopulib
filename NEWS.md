@@ -202,6 +202,16 @@ wrong thing.
 
 ### BUG FIXES
 
+* `Vinecop::fit()` no longer lets the edges of a tree race on the h-functions.
+  Each edge reads columns that edges of higher index write, so only the serial
+  order gave every one of them the previous tree's values; with more than one
+  thread they now read a snapshot of it (#774)
+
+* `ThreadPool::wait()` and `join()` consume the exception they report, so a
+  pool that ran a failing job is usable again; it used to rethrow the stale
+  exception and silently drop the jobs pushed since. `join()` now stops its
+  threads even when a job threw (#774)
+
 * `Vinecop::loglik()` leaves out the observations that have no likelihood
   instead of returning `NaN` for the whole sample, matching `Bicop::loglik()`;
   `aic()`, `bic()` and `mbicv()` follow it. Evaluation is unchanged and still
@@ -363,6 +373,24 @@ wrong thing.
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
+* Require CMake 3.20, with an upper bound of 4.0, and find Boost in CONFIG
+  mode only, since `CMP0167` removes the `FindBoost` module. `findHeaders.cmake`
+  takes paths apart with `cmake_path()` rather than matching them as text
+  (#774)
+
+* Record the dependency include paths in the installed package, so a build
+  configured with `-DEIGEN3_INCLUDE_DIR` and friends produces one that a
+  consumer can resolve (#774)
+
+* Fix `-DEIGEN3_INCLUDE_DIR=<path>` and `-DBoost_INCLUDE_DIRS=<path>`: either
+  skips the matching `find_package`, and the build links Eigen and Boost by
+  target name, so that target was never defined. All three dependency paths now
+  define the target they stand in for, as `wdm_INCLUDE_DIRS` already did (#774)
+
+* Fix the precompiled build when the source path contains a regex
+  metacharacter, such as `vine+copulib`: `findHeaders.cmake` matched
+  path-derived patterns as regexes, and generated none of the headers (#774)
+
 * Update the vendored nlohmann/json from 3.9.1 to 3.12.0, now stored verbatim
   instead of reformatted, with the patches that remove its suppressed compiler
   diagnostics re-applied. The on-disk JSON and CBOR formats are unchanged
@@ -441,6 +469,10 @@ wrong thing.
 * Seed the RNG-dependent unit tests to remove flakiness (#686)
 
 * Decompose `VinecopSelector` for readability (#695)
+
+* Add a ThreadSanitizer CI job, and one covering what the build system
+  promises users. `VINECOPULIB_SANITIZERS` adds the address and UB sanitizers,
+  neither of which sees a data race (#774)
 
 * Add a codespell-based spelling and prose check, run in CI and available as a
   pre-commit hook: `en-GB_to_en-US` enforces American English, and

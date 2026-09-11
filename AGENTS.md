@@ -198,7 +198,7 @@ workflow lives in [CONTRIBUTING.md](CONTRIBUTING.md), this file, and CI.
 
 ## Build & tooling
 
-CMake **≥ 3.14**, C++ **17**. The 24-line root
+CMake **3.20–4.0**, C++ **17**. The 24-line root
 [CMakeLists.txt](CMakeLists.txt) sets the standard, the project version,
 and includes the `cmake/` modules in order.
 
@@ -245,21 +245,27 @@ Discovered in
 
 - **Eigen3** — `find_package(Eigen3 REQUIRED CONFIG)`; or set
   `EIGEN3_INCLUDE_DIR`. Target: `Eigen3::Eigen`.
-- **Boost ≥ 1.75** — CONFIG mode then MODULE fallback; or set
-  `Boost_INCLUDE_DIRS`. Target: `Boost::boost`. Deliberately narrowed to three
+- **Boost ≥ 1.75** — CONFIG mode only (`CMP0167` removes `FindBoost`); or set
+  `Boost_INCLUDE_DIRS`. Target: `Boost::headers`. Deliberately narrowed to three
   header-only components — keep it that way, and prefer the standard library
   when it suffices: **Graph** (`adjacency_list` and the spanning-tree engines
   behind `tree_algorithm`), **Math** (distributions, constants, special
   functions, `quadrature::tanh_sinh` for 1-d integration, `tools::minima`),
   and **Random** (`mt19937`, behind QRNG scrambling and structure simulation).
 - **wdm 0.3.0** — `find_package(wdm 0.3.0 QUIET)` with a **FetchContent
-  fallback** that clones `tnagler/wdm`. Installed under
-  `<prefix>/include/vinecopulib/wdm/`.
+  fallback** that clones `tnagler/wdm`. This project does not install it.
 - **Threads** — required.
 - **GoogleTest 1.14** — FetchContent, only when `BUILD_TESTING`.
 - **Rscript** (optional) — enables the R parity tests; see
   [cmake/findR.cmake](cmake/findR.cmake).
 - **Doxygen** — only when `VINECOPULIB_BUILD_DOC`.
+
+Setting `EIGEN3_INCLUDE_DIR`, `Boost_INCLUDE_DIRS` or `wdm_INCLUDE_DIRS` skips
+the matching `find_package`. The build links these dependencies by target name,
+so `findDependencies.cmake` defines the target from the given path instead
+(`vinecopulib_add_header_only_target`), and records it in the installed package
+so a consumer can resolve it too. A dependency added to a link line needs both,
+or a caller-supplied path configures and then fails to link.
 
 Global compile definitions set in
 [cmake/compilerDefOpt.cmake](cmake/compilerDefOpt.cmake) (and mirrored in
@@ -391,10 +397,10 @@ For any behavior change:
 
   ```cmake
   # documentation — states the constraint
-  # 3.14 for FetchContent_MakeAvailable; do not lower.
+  # 3.20 for cmake_path(); the upper bound opts into policies up to 4.0.
 
   # history — only makes sense against the old code
-  # 3.14 is the real floor: the previous 3.10 could not configure at all.
+  # 3.20 is the real floor: the previous 3.14 could not configure at all.
   ```
 
 - **American English** in code, comments, documentation, commit messages, and
@@ -604,6 +610,14 @@ Conventions:
   (default ON iff Rscript is found). The `cmake/templates/*.R` scripts
   cross-check parametric bicop / vinecop results against **VineCopula >= 2.6.2
   from GitHub, not CRAN**; with the option off the tests skip rather than fail.
+  The whole `VinecopTest` fixture skips with them, so an area filtered down to
+  those tests runs nothing.
+- **Data races** are outside what `VINECOPULIB_SANITIZERS` covers: the address
+  and UB sanitizers cannot see one, and neither can be combined with
+  `-fsanitize=thread`. The `thread sanitizer` CI job builds the areas that
+  drive the thread pool with that flag, in a build tree of its own and with
+  clang — GCC 11's runtime loses the happens-before edge across
+  `pthread_cond_timedwait`, which `ThreadPool::wait()` relies on.
 - **Golden values and parity**: the golden-value tests are the CI-enforced part;
   the before/after `parity_dump` comparison is a manual tool for numerical
   changes. Both are documented in [scripts/README.md](scripts/README.md).

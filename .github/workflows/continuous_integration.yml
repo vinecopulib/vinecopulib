@@ -120,15 +120,7 @@ jobs:
         run: |
           echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
           echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
-            # Linux and macOS runners ship an Eigen that find_package locates on
-            # its own; Windows does not, so point it at the one we installed.
-            # CMP0074 makes find_package honor <Package>_ROOT from the
-            # environment.
-            echo "Eigen3_ROOT=D:/" >> $GITHUB_ENV
             echo "D:\a\vinecopulib\vinecopulib\debug" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
@@ -141,8 +133,11 @@ jobs:
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
               cmake .. -DVINECOPULIB_STRICT_COMPILER=ON \
                 -DVINECOPULIB_CODE_COVERAGE=ON \
+                -DVINECOPULIB_SANITIZERS=ON \
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+              ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1 \
+              UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 \
               make vinecopulib_coverage
             else
               cmake .. -DCMAKE_BUILD_TYPE=Debug
@@ -242,11 +237,6 @@ jobs:
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: true
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
       - name: Configure, build, test and install (header-only)
         run: |
           mkdir release && cd release
@@ -264,6 +254,129 @@ jobs:
             ( cd "examples/$ex" && mkdir build && cd build && cmake .. && make && ../bin/main )
           done
 
+  # What the build system promises users: dependency paths that work, a
+  # generated tree that does not depend on the source path, and an installed
+  # package a consumer can resolve. Only the last one compiles anything.
+  packaging:
+    name: packaging (ubuntu)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          eigen_install_dir: ${{ runner.temp }}/eigen
+          R: false
+          lcov: false
+      - name: Record where the dependencies were installed
+        run: |
+          eigen="$RUNNER_TEMP/eigen/include/eigen3"
+          test -f "$eigen/Eigen/Dense" || { echo "::error::no Eigen in $eigen"; exit 1; }
+          test -d "$BOOST_ROOT/include/boost" || { echo "::error::no Boost in $BOOST_ROOT"; exit 1; }
+          test -f /usr/local/include/wdm.hpp || { echo "::error::no wdm in /usr/local"; exit 1; }
+          echo "DEP_PATHS=-DEIGEN3_INCLUDE_DIR=$eigen -DBoost_INCLUDE_DIRS=$BOOST_ROOT/include -Dwdm_INCLUDE_DIRS=/usr/local/include" >> $GITHUB_ENV
+      # A missing namespaced target fails generation; the plain name wdm would
+      # only fail at link time, so check the generated link line too.
+      - name: Configure with caller-supplied dependency paths
+        run: |
+          cmake -S . -B build-paths -DVINECOPULIB_PRECOMPILED=ON \
+            -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON $DEP_PATHS
+          if grep -q -- '-lwdm' build-paths/CMakeFiles/vinecopulib.dir/link.txt; then
+            echo "::error::wdm reached the link line as -lwdm"; exit 1
+          fi
+      # The translation runs at configure time, so these counts are final.
+      - name: Configure from a source path containing regex metacharacters
+        run: |
+          src="$RUNNER_TEMP/vine+copu.lib"
+          cp -a "$GITHUB_WORKSPACE" "$src"
+          cmake -S "$src" -B "$src/build" -DVINECOPULIB_PRECOMPILED=ON -DBUILD_TESTING=OFF
+          count() { find "$1" -name "$2" 2>/dev/null | wc -l; }
+          hpp=$(count "$src/build/generated/include/vinecopulib" '*.hpp')
+          cpp=$(count "$src/build/generated/src" '*.cpp')
+          echo "generated $hpp/$(count "$src/include/vinecopulib" '*.hpp') headers," \
+               "$cpp/$(count "$src/include" '*.ipp') sources"
+          [ "$hpp" -eq "$(count "$src/include/vinecopulib" '*.hpp')" ] \
+            && [ "$cpp" -eq "$(count "$src/include" '*.ipp')" ] \
+            || { echo "::error::the generated tree is incomplete"; exit 1; }
+          # A leftover .ipp include gets the implementation compiled twice.
+          ! grep -rl '\.ipp>' "$src/build/generated/include" || exit 1
+          # An untranslated destination path stays in the source tree.
+          [ -z "$(git -C "$src" status --porcelain -- include)" ] \
+            || { echo "::error::configure wrote into the source tree"; exit 1; }
+      # CMAKE_DISABLE_FIND_PACKAGE_* leaves the consumer unable to find the
+      # dependencies, so the paths recorded in the package have to serve.
+      - name: Install with those paths, then consume the package without them
+        run: |
+          cmake -S . -B build-install -DCMAKE_INSTALL_PREFIX="$RUNNER_TEMP/prefix" \
+            -DBUILD_TESTING=OFF $DEP_PATHS
+          cmake --install build-install
+          cp -a examples/bicop "$RUNNER_TEMP/consumer"
+          cmake -S "$RUNNER_TEMP/consumer" -B "$RUNNER_TEMP/consumer/build" \
+            -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/prefix" \
+            -DCMAKE_DISABLE_FIND_PACKAGE_Eigen3=ON \
+            -DCMAKE_DISABLE_FIND_PACKAGE_Boost=ON \
+            -DCMAKE_DISABLE_FIND_PACKAGE_wdm=ON
+          cmake --build "$RUNNER_TEMP/consumer/build" -j"$(nproc)"
+          "$RUNNER_TEMP/consumer/bin/main" > /dev/null
+
+  # VINECOPULIB_SANITIZERS cannot see a data race and cannot be combined
+  # with -fsanitize=thread, so this needs a build tree of its own. clang,
+  # because GCC's libtsan reports false races on
+  # std::condition_variable::wait_for, which ThreadPool::wait() uses.
+  thread-sanitizer:
+    name: thread sanitizer (ubuntu, clang)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      # A report exits 66, which fails the step.
+      TSAN_OPTIONS: halt_on_error=1 second_deadlock_stack=1
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      # R, or the VinecopTest fixture skips every one of its tests.
+      - name: Install dependencies
+        id: install-dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          os: ubuntu-latest
+          boost_version: ${{ env.BOOST_VERSION }}
+          eigen_version: ${{ env.EIGEN_VERSION }}
+          eigen_install_dir: ${{ runner.temp }}/eigen
+          R: true
+          lcov: false
+      # RelWithDebInfo, because ThreadSanitizer multiplies an already slow
+      # Debug suite; the <area>_only targets build three areas, not fourteen.
+      - name: Configure and build with ThreadSanitizer
+        run: |
+          cmake -S . -B build-tsan \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DCMAKE_CXX_FLAGS="-fsanitize=thread -fno-omit-frame-pointer -g" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=thread"
+          cmake --build build-tsan -j"$(nproc)" --target \
+            test_tools_thread_only test_bicop_select_only test_vinecop_class_only
+        shell: bash
+      # setarch -R, or TSan aborts when vm.mmap_rnd_bits exceeds what its
+      # shadow mapping supports; unlike the sysctl it needs no privileges.
+      - name: Run the thread-pool tests under ThreadSanitizer
+        run: |
+          # A filter that matches nothing exits 0, so count what passed.
+          run() {
+            setarch "$(uname -m)" -R "build-tsan/bin/$1" "${@:2}" | tee tsan.log
+            grep -qE '^\[  PASSED  \] [1-9][0-9]* test' tsan.log
+          }
+          run test_tools_thread_only
+          run test_bicop_select_only
+          # Only the fits that ask for more than one thread use the pool.
+          run test_vinecop_class_only \
+            --gtest_filter='VinecopFit.parallel_fit_matches_serial:VinecopTest.works_multi_threaded:VinecopTest.tree_criterion_*:VinecopTest.inverse_rosenblatt_is_safe_for_concurrent_calls'
+        shell: bash
+
   # Keeps the benchmark and parity targets compiling. The self-comparison
   # checks that every group is populated and that the gates file parses.
   benchmarks:
@@ -280,11 +393,6 @@ jobs:
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: false
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
       - name: Build bench_all and parity_dump
         run: |
           mkdir build-bench && cd build-bench
@@ -330,12 +438,6 @@ jobs:
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: false
           lcov: false
-      # BOOST_ROOT must be exported: find_package picks it up via CMP0074.
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
       - name: Configure
         run: |
           mkdir build-docs && cd build-docs
@@ -404,11 +506,6 @@ jobs:
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: true
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Boost_INCLUDE_DIR=${{ steps.install-dependencies.outputs.BOOST_ROOT }}/include" >> $GITHUB_ENV
-          echo "EIGEN3_INCLUDE_DIR=${{ steps.install-dependencies.outputs.EIGEN3_ROOT }}/include/eigen3" >> $GITHUB_ENV
       - name: Configure to generate compile_commands.json
         run: |
           mkdir build-tidy && cd build-tidy
