@@ -132,8 +132,9 @@ snippet_model()
   auto data = dependent_data(200, 4, 3);
   Vinecop model(data);
 
-  // density, and the Monte-Carlo distribution function
+  // density, log-density, and the Monte-Carlo distribution function
   auto pdf = model.pdf(data);
+  auto logpdf = model.logpdf(data);
   auto cdf = model.cdf(data, 1000);
 
   // pdf_full also returns the pair-copula densities and h-functions computed

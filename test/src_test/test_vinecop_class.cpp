@@ -7,7 +7,9 @@
 #include "include/test_utils.hpp"
 #include "include/vinecop_test.hpp"
 #include <future>
+#include <limits>
 #include <mutex>
+#include <numeric>
 #include <set>
 #include <string>
 #include <thread>
@@ -355,6 +357,131 @@ TEST_F(VinecopTest, pdf_is_correct)
   Vinecop vinecop(model_matrix, pair_copulas);
 
   ASSERT_TRUE(all_close(vinecop.pdf(u), f, 1e-4, 1e-4));
+  ASSERT_TRUE(
+    all_close(vinecop.logpdf(u), f.array().log().matrix(), 1e-4, 1e-4));
+  EXPECT_NEAR(vinecop.loglik(u), f.array().log().sum(), 1e-4);
+}
+
+// The density is a product of one factor per edge, so a high-dimensional or
+// strongly dependent model reaches values that underflow to exactly 0 while
+// their logarithm is still an ordinary double. `logpdf()` has to stay finite
+// there, and `loglik()` with it.
+TEST(VinecopLogPdf, survives_a_density_that_underflows)
+{
+  const size_t d = 50;
+  const auto par = Eigen::VectorXd::Constant(1, 0.9);
+  auto pair_copulas = Vinecop::make_pair_copula_store(d, 1);
+  for (auto& pc : pair_copulas[0]) {
+    pc = Bicop(BicopFamily::gaussian, 0, par);
+  }
+  std::vector<size_t> order(d);
+  std::iota(order.begin(), order.end(), 1);
+  Vinecop vinecop(DVineStructure(order, 1), pair_copulas);
+
+  // countermonotone rows: every consecutive pair sits in a corner the model
+  // gives almost no mass to
+  Eigen::MatrixXd u(1, d);
+  for (size_t j = 0; j < d; ++j) {
+    u(0, j) = (j % 2 == 0) ? 0.99 : 0.01;
+  }
+
+  // truncated at the first tree, so the reference is the sum over the d - 1
+  // consecutive pairs, each evaluated by Bicop itself
+  Eigen::MatrixXd pair(1, 2);
+  pair << 0.99, 0.01;
+  const double reference =
+    static_cast<double>(d - 1) *
+    std::log(Bicop(BicopFamily::gaussian, 0, par).pdf(pair)(0));
+  ASSERT_LT(reference, -745.0);
+
+  EXPECT_DOUBLE_EQ(vinecop.pdf(u)(0), 0.0);
+  EXPECT_TRUE(std::isfinite(vinecop.logpdf(u)(0)));
+  EXPECT_NEAR(vinecop.logpdf(u)(0), reference, 1e-9);
+  EXPECT_NEAR(vinecop.loglik(u), reference, 1e-9);
+  EXPECT_NEAR(vinecop.aic(u), -2 * reference + 2 * vinecop.get_npars(), 1e-9);
+}
+
+// `loglik()` sums only the observations that have a likelihood, and reports the
+// value recorded by the fit when handed no observations. Both conventions have
+// to hold for the per-observation-parameters overload too, which used to sum
+// over zero rows and return 0 where the other overload returns `get_loglik()`.
+TEST(VinecopLogLik, conventions_hold_for_both_overloads)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(4);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.5));
+    }
+  }
+  Vinecop vinecop(DVineStructure({ 1, 2, 3, 4 }), pair_copulas);
+  const auto u = vinecop.simulate(50, false, 1, { 7 });
+  vinecop.fit(u, FitControlsVinecop({ BicopFamily::gaussian }));
+
+  // no observations: report the stored fit, from either overload
+  EXPECT_NEAR(vinecop.loglik(Eigen::MatrixXd()), vinecop.get_loglik(), 1e-10);
+  EXPECT_NEAR(vinecop.loglik(Eigen::MatrixXd(), Eigen::MatrixXd()),
+              vinecop.get_loglik(),
+              1e-10);
+
+  // a row with a missing value has no likelihood and drops out of the sum
+  const double full = vinecop.loglik(u);
+  Eigen::MatrixXd u_nan = u;
+  u_nan(3, 2) = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_TRUE(std::isfinite(vinecop.loglik(u_nan)));
+  EXPECT_NEAR(vinecop.loglik(u_nan), full - vinecop.logpdf(u)(3), 1e-10);
+
+  // evaluation still propagates it; only the likelihood drops the row
+  EXPECT_TRUE((std::isnan)(vinecop.logpdf(u_nan)(3)));
+  EXPECT_TRUE((std::isnan)(vinecop.pdf(u_nan)(3)));
+
+  // and the criteria built on the log-likelihood follow it
+  EXPECT_TRUE(std::isfinite(vinecop.aic(u_nan)));
+  EXPECT_TRUE(std::isfinite(vinecop.bic(u_nan)));
+  EXPECT_TRUE(std::isfinite(vinecop.mbicv(u_nan, 0.9)));
+
+  // an observation the model rules out keeps its -inf: that is not a missing
+  // value, and dropping it would invent a likelihood the model does not give
+  auto underflowing = Vinecop::make_pair_copula_store(50, 1);
+  for (auto& pc : underflowing[0]) {
+    pc = Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.9));
+  }
+  std::vector<size_t> order(50);
+  std::iota(order.begin(), order.end(), 1);
+  Vinecop ruled_out(DVineStructure(order, 1), underflowing);
+  Eigen::MatrixXd tail(1, 50);
+  for (size_t j = 0; j < 50; ++j) {
+    tail(0, j) = (j % 2 == 0) ? 0.99 : 0.01;
+  }
+  EXPECT_DOUBLE_EQ(ruled_out.pdf(tail)(0), 0.0);
+  EXPECT_TRUE(std::isfinite(ruled_out.loglik(tail)));
+  EXPECT_TRUE(std::isinf(std::log(ruled_out.pdf(tail)(0))));
+}
+
+// `logpdf()` is the sum of the per-edge log-densities `pdf_full()` reports, and
+// `pdf()` is its exponential.
+TEST(VinecopLogPdf, agrees_with_the_per_edge_densities)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(5);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::clayton, 90, Eigen::VectorXd::Constant(1, 2.0));
+    }
+  }
+  Vinecop vinecop(DVineStructure({ 1, 2, 3, 4, 5 }), pair_copulas);
+  const auto u = vinecop.simulate(20, false, 1, { 5 });
+
+  const auto r = vinecop.pdf_full(u, 1, true);
+  Eigen::VectorXd reference = Eigen::VectorXd::Zero(u.rows());
+  for (size_t tree = 0; tree < r.pdf_edges.get_trunc_lvl(); ++tree) {
+    for (size_t edge = 0; edge < 5 - tree - 1; ++edge) {
+      reference += r.pdf_edges(tree, edge).array().log().matrix();
+    }
+  }
+
+  EXPECT_TRUE(all_close(r.logpdf, reference, 1e-12, 1e-12));
+  EXPECT_TRUE(all_close(vinecop.logpdf(u), reference, 1e-12, 1e-12));
+  EXPECT_TRUE(all_close(r.pdf, r.logpdf.array().exp().matrix(), 1e-12, 1e-12));
+  EXPECT_NEAR(vinecop.loglik(u), reference.sum(), 1e-12);
 }
 
 TEST_F(VinecopTest, hfuncs_is_correct)
@@ -377,6 +504,7 @@ TEST_F(VinecopTest, hfuncs_is_correct)
   ASSERT_EQ(r.hfunc1.get_trunc_lvl(), trunc_lvl);
   ASSERT_EQ(r.hfunc2.get_trunc_lvl(), trunc_lvl);
   ASSERT_EQ(r.pdf_edges.get_trunc_lvl(), trunc_lvl);
+  ASSERT_EQ(r.logpdf.size(), u.rows());
   // the _sub arrays are only filled when at least one variable is discrete
   ASSERT_EQ(r.hfunc1_sub.get_trunc_lvl(), 0);
   ASSERT_EQ(r.hfunc2_sub.get_trunc_lvl(), 0);
@@ -1554,7 +1682,7 @@ TEST(VinecopDerivatives, hessian_matches_brute_force)
   }
   auto structure = vc.get_rvine_structure();
   auto loglik = [&](const std::vector<std::vector<Bicop>>& pp) {
-    return Vinecop(structure, pp).pdf(u).array().max(1e-300).log().sum();
+    return Vinecop(structure, pp).loglik(u);
   };
   auto bump = [&](std::vector<std::vector<Bicop>> pp, size_t a, double h) {
     auto pr = pp[pl[a][0]][pl[a][1]].get_parameters();
@@ -1679,7 +1807,7 @@ TEST(VinecopDerivatives, hessian_bb1_edge_matches_brute_force)
   }
   auto structure = vc.get_rvine_structure();
   auto loglik = [&](const std::vector<std::vector<Bicop>>& pp) {
-    return Vinecop(structure, pp).pdf(u).array().max(1e-300).log().sum();
+    return Vinecop(structure, pp).loglik(u);
   };
   auto bump = [&](std::vector<std::vector<Bicop>> pp, size_t a, double hh) {
     auto pr = pp[pl[a][0]][pl[a][1]].get_parameters();
@@ -1779,11 +1907,11 @@ TEST(VinecopDerivatives, stepwise_scores_match_per_edge_reference)
         pars_tmp(p) = std::min(pars(p) + 1e-3, ub(p));
         eps += pars_tmp(p) - pars(p);
         ec.set_parameters(pars_tmp);
-        Eigen::VectorXd f1 = ec.pdf(u_e).array().max(1e-20).log();
+        Eigen::VectorXd f1 = ec.pdf(u_e).array().log();
         pars_tmp(p) = std::max(pars(p) - 1e-3, lb(p));
         eps -= pars_tmp(p) - pars(p);
         ec.set_parameters(pars_tmp);
-        Eigen::VectorXd f2 = ec.pdf(u_e).array().max(1e-20).log();
+        Eigen::VectorXd f2 = ec.pdf(u_e).array().log();
         ec.set_parameters(pars);
         EXPECT_TRUE(
           all_close(s.col(ipar).eval(), ((f1 - f2) / eps).eval(), 1e-3, 1e-4))
@@ -1818,7 +1946,7 @@ TEST_F(VinecopTest, full_scores_match_brute_force_on_truncated_vine)
 
   auto loglik_of = [&](const std::vector<std::vector<Bicop>>& pcs) {
     Vinecop v(model_matrix, pcs);
-    return v.pdf(uu).array().max(1e-300).log().sum();
+    return v.loglik(uu);
   };
   size_t ipar = 0;
   for (size_t t = 0; t < 3; ++t) {
@@ -2268,6 +2396,7 @@ TEST_F(VinecopTest, works_multi_threaded)
 
   // check if parallel evaluators have same output as single threaded ones
   EXPECT_TRUE(all_close(fit2.pdf(u, 2), fit2.pdf(u), 1e-10, 1e-10));
+  EXPECT_TRUE(all_close(fit2.logpdf(u, 2), fit2.logpdf(u), 1e-10, 1e-10));
   EXPECT_TRUE(all_close(
     fit2.inverse_rosenblatt(u, 2), fit2.inverse_rosenblatt(u), 1e-10, 1e-10));
   EXPECT_TRUE(

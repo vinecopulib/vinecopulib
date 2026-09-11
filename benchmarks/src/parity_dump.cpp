@@ -313,6 +313,7 @@ dump_vinecop()
   const auto u = vc.simulate(100, false, 1, { 5 });
   out["simulate"] = to_vec(u.topRows(3));
   out["pdf"] = to_vec(vc.pdf(u));
+  out["logpdf"] = to_vec(vc.logpdf(u));
   out["loglik"] = vc.loglik(u);
   out["rosenblatt"] = to_vec(vc.rosenblatt(u).topRows(5));
   out["inverse_rosenblatt"] = to_vec(vc.inverse_rosenblatt(u).topRows(5));

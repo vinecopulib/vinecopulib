@@ -1163,6 +1163,7 @@ Vinecop::get_var_types() const
 //! @param keep_all Whether to keep and return per-edge pdfs and h-functions.
 //! @return A struct containing:
 //!   - `pdf`: the copula density evaluated at `u`.
+//!   - `logpdf`: the log-density evaluated at `u`.
 //! If `keep_all = true`, the struct also contains the following fields:
 //!   - `pdf_edges`: a triangular array of vectors containing
 //!     the per-edge copula densities evaluated at `u`.
@@ -1242,8 +1243,10 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
     }
   }
 
-  // initial value must be 1.0 for multiplication
-  result.pdf = Eigen::VectorXd::Constant(u.rows(), 1.0);
+  // the density is accumulated in log space: the product of up to d(d - 1)/2
+  // edge densities underflows to exactly 0 well before the log-density stops
+  // being representable
+  result.logpdf = Eigen::VectorXd::Zero(u.rows());
 
   auto do_batch = [&](const tools_batch::Batch& b) {
     // temporary storage objects (all data must be in (0, 1))
@@ -1323,8 +1326,8 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
         };
 
         Eigen::VectorXd edge_pdf = ec_pdf();
-        result.pdf.segment(b.begin, b.size) =
-          result.pdf.segment(b.begin, b.size).cwiseProduct(edge_pdf);
+        result.logpdf.segment(b.begin, b.size) +=
+          edge_pdf.array().log().matrix();
 
         // h-functions are only evaluated if needed in next step
         if (rvine_structure_.needed_hfunc1(tree, edge)) {
@@ -1372,6 +1375,7 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
     pool.map(do_batch, tools_batch::create_batches(u.rows(), num_threads));
     pool.join();
   }
+  result.pdf = result.logpdf.array().exp();
 
   return result;
 }
@@ -1416,6 +1420,41 @@ Vinecop::pdf(Eigen::MatrixXd u,
              const size_t num_threads) const
 {
   return pdf_full(std::move(u), parameters, num_threads, false).pdf;
+}
+
+//! @brief Evaluates the copula log-density.
+//!
+//! @details The logarithm of `pdf()`, and the accurate way to obtain it: a vine
+//! density is a product of up to \f$ d(d-1)/2 \f$ pair-copula densities, so for
+//! a high-dimensional or strongly dependent model `pdf()` underflows to `0`,
+//! and `log(pdf())` to \f$ -\infty \f$, while the log-density is still
+//! perfectly representable. `loglik()` is the sum of these values.
+//!
+//! @param u An \f$ n \times d \f$ matrix of evaluation points for a
+//!   continuous model. For a model with \f$ k \f$ discrete variables, use an
+//!   \f$ n \times 2d \f$ matrix containing the values and their left-limits;
+//!   left-limit columns for continuous variables may be omitted to obtain the
+//!   compact \f$ n \times (d + k) \f$ layout (see @ref discrete).
+//! @param num_threads The number of threads to use for computations; if greater
+//!   than 1, the function will be applied concurrently to `num_threads` batches
+//!   of `u`.
+//! @return A vector of length `n` containing the copula log-density values.
+inline Eigen::VectorXd
+Vinecop::logpdf(Eigen::MatrixXd u, const size_t num_threads) const
+{
+  return pdf_full(std::move(u), num_threads, false).logpdf;
+}
+
+//! @brief Evaluates the copula log-density with per-observation parameters.
+//!
+//! Per-observation counterpart of `logpdf()`; see the per-observation
+//! `pdf_full()` overload for the `parameters` layout and restrictions.
+inline Eigen::VectorXd
+Vinecop::logpdf(Eigen::MatrixXd u,
+                const Eigen::MatrixXd& parameters,
+                const size_t num_threads) const
+{
+  return pdf_full(std::move(u), parameters, num_threads, false).logpdf;
 }
 
 //! throws if the model has a nonparametric pair copula (see scores()).
@@ -1791,14 +1830,12 @@ Vinecop::scores_full(Eigen::MatrixXd u,
             pars_tmp(p) = std::min(pars(p) + 1e-3, ub(p));
             eps += pars_tmp(p) - pars(p);
             pair_copulas_[t][e].set_parameters(pars_tmp);
-            Eigen::VectorXd f1 =
-              this->pdf(u, num_threads).array().max(1e-20).log();
+            Eigen::VectorXd f1 = this->logpdf(u, num_threads);
 
             pars_tmp(p) = std::max(pars(p) - 1e-3, lb(p));
             eps -= pars_tmp(p) - pars(p);
             pair_copulas_[t][e].set_parameters(pars_tmp);
-            Eigen::VectorXd f2 =
-              this->pdf(u, num_threads).array().max(1e-20).log();
+            Eigen::VectorXd f2 = this->logpdf(u, num_threads);
 
             result.scores.col(ipar++) = (f1 - f2) / eps;
             pair_copulas_[t][e].set_parameters(pars);
@@ -2104,12 +2141,12 @@ Vinecop::scores_full(Eigen::MatrixXd u,
             pars_tmp(p) = std::min(pars(p) + 1e-3, ub(p));
             eps += pars_tmp(p) - pars(p);
             edge_copula.set_parameters(pars_tmp);
-            Eigen::VectorXd f1 = edge_copula.pdf(u_e).array().max(1e-20).log();
+            Eigen::VectorXd f1 = edge_copula.pdf(u_e).array().log();
 
             pars_tmp(p) = std::max(pars(p) - 1e-3, lb(p));
             eps -= pars_tmp(p) - pars(p);
             edge_copula.set_parameters(pars_tmp);
-            Eigen::VectorXd f2 = edge_copula.pdf(u_e).array().max(1e-20).log();
+            Eigen::VectorXd f2 = edge_copula.pdf(u_e).array().log();
 
             Eigen::VectorXd col = (f1 - f2) / eps;
             result.scores.col(ipar).segment(b.begin, b.size) = col;
@@ -2970,11 +3007,28 @@ Vinecop::simulate_conditional_impl(const Eigen::MatrixXd& u_cond,
   return inverse_rosenblatt_impl(u, view, num_threads);
 }
 
+//! sums a vector of log-densities over the observations that have one. An
+//! observation containing `NaN` has a `NaN` log-density and is left out,
+//! matching `Bicop::loglik()`; a log-density of \f$ -\infty \f$ is kept,
+//! which is the right answer for an observation the model rules out.
+inline double
+Vinecop::sum_loglik(const Eigen::VectorXd& lpdf)
+{
+  Eigen::MatrixXd finite = lpdf;
+  tools_eigen::remove_nans(finite);
+  return finite.sum();
+}
+
 //! @brief Evaluates the log-likelihood.
 //!
 //! @details The log-likelihood is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, ..., U_{d, i}), \f]
-//! where \f$ c \f$ is the copula density, see `Vinecop::pdf()`.
+//! where \f$ c \f$ is the copula density, see `Vinecop::pdf()`. Summing the
+//! log-densities keeps the result finite wherever it is representable, which a
+//! product of pair-copula densities is not; see `Vinecop::logpdf()`. An
+//! observation containing `NaN` has no likelihood and is left out of the sum,
+//! as it is for `Bicop::loglik()`; an empty `u` reports the value recorded by
+//! the fit.
 //!
 //! @param u An \f$ n \times d \f$ matrix of evaluation points for a
 //!   continuous model. For a model with \f$ k \f$ discrete variables, use an
@@ -2990,9 +3044,8 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
   if (u.rows() < 1) {
     return this->get_loglik();
-  } else {
-    return pdf(u, num_threads).array().log().sum();
   }
+  return sum_loglik(logpdf(u, num_threads));
 }
 
 //! @brief Evaluates the log-likelihood with per-observation parameters.
@@ -3006,7 +3059,10 @@ Vinecop::loglik(const Eigen::MatrixXd& u,
                 const Eigen::MatrixXd& parameters,
                 const size_t num_threads) const
 {
-  return pdf(u, parameters, num_threads).array().log().sum();
+  if (u.rows() < 1) {
+    return this->get_loglik();
+  }
+  return sum_loglik(logpdf(u, parameters, num_threads));
 }
 
 //! @brief Evaluates the Akaike information criterion (AIC).
