@@ -133,8 +133,11 @@ jobs:
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
               cmake .. -DVINECOPULIB_STRICT_COMPILER=ON \
                 -DVINECOPULIB_CODE_COVERAGE=ON \
+                -DVINECOPULIB_SANITIZERS=ON \
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+              ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1 \
+              UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 \
               make vinecopulib_coverage
             else
               cmake .. -DCMAKE_BUILD_TYPE=Debug
