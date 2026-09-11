@@ -1,9 +1,39 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
-find_dependency(Eigen3)
-find_dependency(wdm)
-find_dependency(Boost CONFIG)
+
+# The link interface names these targets, so each has to exist here. Where the
+# build was pointed at a directory instead of a package, that directory is
+# recorded below and used when the package cannot be found.
+macro(vinecopulib_find_dependency package target include_dirs)
+  if(NOT TARGET ${target})
+    find_package(${package} QUIET ${ARGN})
+  endif()
+  if(NOT TARGET ${target})
+    set(_vinecopulib_dirs "${include_dirs}")
+    foreach(_vinecopulib_dir IN LISTS _vinecopulib_dirs)
+      if(NOT IS_DIRECTORY "${_vinecopulib_dir}")
+        set(_vinecopulib_dirs "")
+        break()
+      endif()
+    endforeach()
+    if(_vinecopulib_dirs)
+      add_library(${target} INTERFACE IMPORTED)
+      set_target_properties(${target} PROPERTIES
+                            INTERFACE_INCLUDE_DIRECTORIES "${_vinecopulib_dirs}")
+    else()
+      set(${CMAKE_FIND_PACKAGE_NAME}_FOUND FALSE)
+      set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE
+          "vinecopulib requires ${target}: ${package} was not found, and the \
+directory this build used (${include_dirs}) is not present either.")
+      return()
+    endif()
+  endif()
+endmacro()
+
+vinecopulib_find_dependency(Eigen3 Eigen3::Eigen "@EIGEN3_INCLUDE_DIR@" CONFIG)
+vinecopulib_find_dependency(Boost Boost::headers "@Boost_INCLUDE_DIRS@" 1.75 CONFIG)
+vinecopulib_find_dependency(wdm wdm "@wdm_INCLUDE_DIRS@" 0.3.0)
 # Threads::Threads appears in the exported link interface, so the consumer needs
 # the imported target to exist.
 find_dependency(Threads)
