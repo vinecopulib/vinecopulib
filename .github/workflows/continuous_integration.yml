@@ -273,7 +273,9 @@ jobs:
             -DBoost_INCLUDE_DIRS="$BOOST_ROOT/include" \
             -Dwdm_INCLUDE_DIRS=/usr/local/include
           cmake --install build-prefix
+          # without the build tree and binary the step above left behind
           cp -a examples/bicop "$RUNNER_TEMP/consumer"
+          rm -rf "$RUNNER_TEMP/consumer/build" "$RUNNER_TEMP/consumer/bin"
           cmake -S "$RUNNER_TEMP/consumer" -B "$RUNNER_TEMP/consumer/build" \
             -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/prefix" \
             -DCMAKE_DISABLE_FIND_PACKAGE_Eigen3=ON \
