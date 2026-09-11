@@ -159,8 +159,7 @@ TEST(test_tools_thread, reusable_after_a_reported_error)
   EXPECT_NO_THROW(pool.join());
 }
 
-// join() shuts the pool down on both paths, so it is the same pool afterwards
-// whether or not a job threw.
+// join() shuts the pool down whether or not a job threw.
 TEST(test_tools_thread, join_stops_the_workers_after_an_error)
 {
   ThreadPool pool(2);
@@ -176,8 +175,7 @@ TEST(test_tools_thread, join_stops_the_workers_after_an_error)
   EXPECT_NO_THROW(pool.join());
 }
 
-// Jobs pushed after an error was reported are a new round of work, and none of
-// them is canceled.
+// Jobs pushed after an error was reported are not canceled.
 TEST(test_tools_thread, queued_jobs_survive_a_reported_error)
 {
   const int n_jobs = 200;
@@ -197,8 +195,7 @@ TEST(test_tools_thread, queued_jobs_survive_a_reported_error)
   pool.join();
 }
 
-// One worker runs the jobs in the order they were pushed, so the first of two
-// failures is the one the caller is told about.
+// One worker runs jobs in order, so the first failure is the one reported.
 TEST(test_tools_thread, first_error_is_the_one_reported)
 {
   std::atomic<int> failed{ 0 };

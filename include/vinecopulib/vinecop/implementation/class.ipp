@@ -659,10 +659,8 @@ Vinecop::fit(const Eigen::MatrixXd& data,
   // set up thread pool
   tools_thread::ThreadPool pool((num_threads == 1) ? 0 : num_threads);
 
-  // The edges of a tree are fitted concurrently, and an edge writes the
-  // h-function column that an edge of lower index in the same tree reads. When
-  // that can happen, the edges read a snapshot of the previous tree instead,
-  // which is what the serial order gives every one of them.
+  // Concurrent edges write h-function columns their siblings read, so they
+  // read a snapshot of the previous tree, as the serial order gave them.
   const bool snapshot_hfuncs = num_threads > 1;
   Eigen::MatrixXd hfunc1_prev, hfunc2_prev, hfunc1_sub_prev, hfunc2_sub_prev;
   const Eigen::MatrixXd& hfunc1_in = snapshot_hfuncs ? hfunc1_prev : hfunc1;

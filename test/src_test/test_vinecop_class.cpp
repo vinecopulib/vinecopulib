@@ -2266,8 +2266,7 @@ TEST(VinecopDerivatives, per_obs_pdf_and_loglik)
   EXPECT_NEAR(ll_po, ll_ref, 1e-8 * (1.0 + std::abs(ll_ref)));
 }
 
-// An edge reads the h-function columns that edges of higher index in the same
-// tree write, so fitting the edges concurrently has to give the serial result.
+// Fitting the edges concurrently must give the serial result.
 TEST(VinecopFit, parallel_fit_matches_serial)
 {
   const size_t d = 8;
