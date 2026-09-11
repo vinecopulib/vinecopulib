@@ -143,9 +143,10 @@ ThreadPool::map(F&& f, I&& items)
     this->push(f, item);
 }
 
-//! waits for all jobs to finish, but does not join the threads.
+//! @brief Waits for all jobs to finish, but does not join the threads.
 //!
-//! A job's exception is rethrown here once, and leaves the pool reusable.
+//! @details A job's exception is rethrown here once, and cancels the jobs that
+//! have not started. The pool stays usable afterwards.
 inline void
 ThreadPool::wait()
 {
@@ -153,9 +154,9 @@ ThreadPool::wait()
   this->rethrow_exceptions();
 }
 
-//! waits for all jobs to finish and joins all threads.
+//! @brief Waits for all jobs to finish and joins all threads.
 //!
-//! The threads are stopped and joined even when a job threw.
+//! @details The threads are stopped and joined even when a job threw.
 inline void
 ThreadPool::join()
 {
@@ -290,7 +291,7 @@ ThreadPool::all_jobs_done_locked() const
   return (num_busy_ == 0) && jobs_.empty();
 }
 
-//! waits until no job is queued or running.
+//! @brief Waits until no job is queued or running.
 inline void
 ThreadPool::wait_for_jobs()
 {
@@ -325,7 +326,7 @@ ThreadPool::wait_for_wake_up_event(std::unique_lock<std::mutex>& lk)
   return wake_up_event_occurred();
 }
 
-//! rethrows the exception stored by a failing job, and consumes it.
+//! @brief Rethrows the exception stored by a failing job, and consumes it.
 inline void
 ThreadPool::rethrow_exceptions()
 {

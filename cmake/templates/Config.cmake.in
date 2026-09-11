@@ -2,9 +2,8 @@
 
 include(CMakeFindDependencyMacro)
 
-# The link interface names these targets, so each has to exist here. Where the
-# build was pointed at a directory instead of a package, that directory is
-# recorded below and used when the package cannot be found.
+# The link interface names these targets, so each has to exist here. A build
+# given a directory instead of a package records it, for use as a fallback.
 macro(vinecopulib_find_dependency package target include_dirs)
   if(NOT TARGET ${target})
     find_package(${package} QUIET ${ARGN})

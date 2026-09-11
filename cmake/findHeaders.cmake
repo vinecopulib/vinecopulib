@@ -18,8 +18,8 @@ if(VINECOPULIB_PRECOMPILED)
     # contents as well, so that editing a header regenerates what it feeds.
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
             ${vinecopulib_ipp} ${vinecopulib_all_hpp})
-    # Paths are taken apart with cmake_path, never matched as text: the source
-    # directory comes from the caller and may contain regex metacharacters.
+    # cmake_path, not text matching: the source directory comes from the
+    # caller and may contain regex metacharacters.
     foreach (file ${vinecopulib_ipp})
 
         # <includes>/vinecopulib/<mod>/implementation/<name>.ipp becomes

@@ -29,8 +29,7 @@ vinecopulib_add_header_only_target(Eigen3::Eigen EIGEN3_INCLUDE_DIR)
 
 # Check if Boost_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED Boost_INCLUDE_DIRS)
-  # CONFIG only: CMP0167 removed the FindBoost module, and Boost has shipped a
-  # config package since 1.70, below the 1.75 required here.
+  # CONFIG only: CMP0167 removes the FindBoost module.
   find_package(Boost 1.75 REQUIRED CONFIG)
   message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")
 endif()
