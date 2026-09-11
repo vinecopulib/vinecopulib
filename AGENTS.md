@@ -108,10 +108,15 @@ authoritative version lives in `CMakeLists.txt` and
 so this file cannot go stale. Because the R and Python interfaces pin a tag of
 this repo, public-API changes are real breaks for downstream users.
 
-- **Record every change in [NEWS.md](NEWS.md).** Each release has
-  `### BREAKING API CHANGES`, `### NEW FEATURES`, and `### BUG FIXES`
-  sections, with every item tagged by its PR number (e.g. `(#637)`).
-  There is no separate `CHANGELOG.md`.
+- **Record every change in [NEWS.md](NEWS.md).** A release groups its entries
+  under `### BREAKING API CHANGES`, `### BEHAVIOR CHANGES`, `### NEW FEATURES`,
+  `### PERFORMANCE`, `### BUG FIXES`, `### BUILD SYSTEM AND DEPENDENCIES` and
+  `### DOCUMENTATION AND TOOLING`, with every item tagged by its PR number
+  (e.g. `(#637)`). There is no separate `CHANGELOG.md`. Keep an entry to a few
+  lines: what changed, and what it means for someone using the library.
+  Derivations, measurements and the alternatives weighed belong in the pull
+  request, for the same reason comments do not carry them (see
+  [Coding conventions](#coding-conventions)).
 - **Bump both version macros in
   [version.hpp](include/vinecopulib/version.hpp)** on release:
   `VINECOPULIB_VERSION` (encoded integer, `800` for 0.8.0 —

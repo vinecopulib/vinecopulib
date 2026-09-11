@@ -65,9 +65,7 @@ wrong thing.
 ### BEHAVIOR CHANGES
 
 * Every discrete `tll` evaluation moves, by up to `1e-9` on the density and
-  `9e-10` on the log-likelihood, because the rectangle probabilities behind it
-  are now computed without cancellation; see NEW FEATURES. Parametric families
-  are bit-identical (#771)
+  `9e-10` on the log-likelihood; parametric families are bit-identical (#771)
 
 * `Vinecop::pdf()` is the exponential of a log-space sum rather than a running
   product of edge densities, so its values move at the `1e-15` level (observed
@@ -121,6 +119,12 @@ wrong thing.
   differ for the same model. Densities and log-likelihoods do not (#702)
 
 ### NEW FEATURES
+
+* Evaluate mixed-discrete densities of `tll` pair copulas as exact rectangle
+  probabilities on the interpolation grid rather than as differences of four
+  `cdf` values, which costs one power of the atom width instead of two: the
+  worst relative error at the widths inner vine trees reach drops from `3e-8`
+  to `4e-11` (#771)
 
 * Add `Vinecop::logpdf()`, the per-observation log-density, alongside a `logpdf`
   field on the `pdf_full()` result. A vine density is a product of one factor
@@ -181,6 +185,11 @@ wrong thing.
 * Persist models as CBOR as well as JSON, selected by the file extension (#684)
 
 ### PERFORMANCE
+
+* `tll` evaluation shares one set of cumulative grid integrals between the
+  distribution function and the discrete paths: `cdf` drops about 26% and a
+  discrete h-function about 39%, against about 6% more on a `c`/`d` density,
+  which now builds its conditional grid line explicitly (#771)
 
 * Speed up `InterpolationGrid`'s margin normalization about fourfold. It
   integrated each grid line through a function taking `const Eigen::VectorXd&`,

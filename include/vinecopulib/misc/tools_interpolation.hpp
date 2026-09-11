@@ -47,19 +47,20 @@ public:
 
   Eigen::VectorXd integrate_2d(const tools_eigen::ConstMatRef& u);
 
-  //! probability of one rectangle, without the cancellation a difference of
-  //! four `integrate_2d()` values carries.
+  //! @brief probability of one rectangle, without the cancellation a
+  //! difference of four `integrate_2d()` values carries.
   double rect_mass(double a1, double b1, double a2, double b2) const;
 
-  //! probability of one interval in the free coordinate, given the other.
+  //! @brief probability of one interval in the free coordinate, given the
+  //! other.
   double cond_interval_mass(double u_cond,
                             double lo,
                             double hi,
                             size_t cond_var) const;
 
 private:
-  // nonnegative quadrature weights for a sub-interval of the grid, and the
-  // partial row integrals both of the above are built from
+  // nonnegative quadrature weights for a sub-interval, and the partial row
+  // integrals; `integrate_2d` and `rect_mass` are both built from these
   ptrdiff_t interval_weights(double lo, double hi, Eigen::VectorXd& w) const;
   void row_integrals(double u, Eigen::VectorXd& out) const;
   // normalizes the grid margins; internal only (callers must refresh the

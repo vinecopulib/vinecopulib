@@ -456,26 +456,10 @@ InterpolationGrid::inverse_integrate_1d(const tools_eigen::ConstMatRef& u,
 inline Eigen::VectorXd
 InterpolationGrid::integrate_2d(const tools_eigen::ConstMatRef& u)
 {
-  ptrdiff_t m = grid_points_.size();
-  Eigen::VectorXd tmpvals2(m);
+  Eigen::VectorXd tmpvals2;
 
-  auto f = [this, m, &tmpvals2](double u1, double u2) {
-    // partial row integrals up to u2, from the cached cumulative integrals
-    // plus the remaining partial cell (one O(m) pass instead of m
-    // interpolation sweeps per query)
-    const ptrdiff_t j = find_cell(u2);
-    const double g_j = grid_points_(j);
-    const double dg = grid_points_(j + 1) - g_j;
-    const double s = u2 - g_j;
-    for (ptrdiff_t k = 0; k < m; ++k) {
-      double partial = 0.0;
-      if (u2 > grid_points_(0)) {
-        partial =
-          (2 * values_(k, j) + (values_(k, j + 1) - values_(k, j)) * s / dg) *
-          s / 2.0;
-      }
-      tmpvals2(k) = row_cum_int_(k, j) + partial;
-    }
+  auto f = [this, &tmpvals2](double u1, double u2) {
+    row_integrals(u2, tmpvals2);
     double tmpint = int_on_grid(u1, tmpvals2, grid_points_);
     double tmpint1 = weights_.dot(tmpvals2);
     return std::min(std::max(tmpint * u2 / tmpint1, 1e-10), 1 - 1e-10);
@@ -484,73 +468,58 @@ InterpolationGrid::integrate_2d(const tools_eigen::ConstMatRef& u)
   return tools_eigen::binaryExpr_or_nan(u, f);
 }
 
-//! nonnegative quadrature weights for the integral over `[lo, hi]`.
+//! @brief Nonnegative quadrature weights for the integral over `[lo, hi]`.
 //!
-//! @details Fills `w` with the weights of the nodes the interval covers and
-//! returns the index of the first of them, so that
-//! `w.dot(v.segment(first, w.size()))` is exactly the integral over `[lo, hi]`
-//! of the piecewise linear function through `(grid_points_, v)`. Every weight
-//! is nonnegative, because the hat functions are, which is what makes a mass
-//! built from them free of cancellation however narrow the interval. Endpoints
-//! are clamped to `[0, 1]`, which the constructor makes the grid's own range,
-//! and an empty or inverted interval gives zero weights.
+//! @details Every weight is nonnegative, because the hat functions are, so a
+//! mass built from them carries no cancellation however narrow the interval.
+//!
+//! @param lo,hi Interval bounds, clamped to `[0, 1]`; `hi <= lo` gives zero.
+//! @param w Filled with the weights of the nodes the interval covers.
+//! @return The index of the first of those nodes, so that
+//!   `w.dot(v.segment(first, w.size()))` integrates the piecewise linear
+//!   function through `(grid_points_, v)`.
 inline ptrdiff_t
 InterpolationGrid::interval_weights(double lo,
                                     double hi,
                                     Eigen::VectorXd& w) const
 {
-  const ptrdiff_t m = grid_points_.size();
-  const double a = std::min(std::max(lo, grid_points_(0)), grid_points_(m - 1));
-  const double b = std::min(std::max(hi, a), grid_points_(m - 1));
+  const double a = std::min(std::max(lo, 0.0), 1.0);
+  const double b = std::min(std::max(hi, a), 1.0);
   const ptrdiff_t ka = find_cell(a);
   const ptrdiff_t kb = find_cell(b);
   w.setZero(kb - ka + 2);
 
-  // a partial cell is parameterized by its width rather than by its upper end,
-  // so a narrow interval is never formed as a difference of two numbers of
-  // order one -- which would put the 1 / width amplification back into the
-  // weights the exact route exists to avoid
-  auto add_cell = [&](ptrdiff_t k, double s0, double d) {
+  for (ptrdiff_t k = ka; k <= kb; ++k) {
+    // offset and width of the cell's sub-interval; a width rather than an
+    // upper end, so a narrow interval is not a difference of two order-one
+    // numbers
     const double h = grid_points_(k + 1) - grid_points_(k);
+    const double s0 = std::max(a - grid_points_(k), 0.0) / h;
+    const double d =
+      (std::min(b, grid_points_(k + 1)) - std::max(a, grid_points_(k))) / h;
     const double q = 0.5 * d * (2.0 * s0 + d);
     w(k - ka) += h * (d - q);
     w(k - ka + 1) += h * q;
-  };
-
-  if (ka == kb) {
-    const double h = grid_points_(ka + 1) - grid_points_(ka);
-    add_cell(ka, (a - grid_points_(ka)) / h, (b - a) / h);
-    return ka;
-  }
-
-  const double ha = grid_points_(ka + 1) - grid_points_(ka);
-  const double s0 = (a - grid_points_(ka)) / ha;
-  add_cell(ka, s0, 1.0 - s0);
-  const double hb = grid_points_(kb + 1) - grid_points_(kb);
-  add_cell(kb, 0.0, (b - grid_points_(kb)) / hb);
-  // the trapezoid rule is exact for a piecewise linear integrand, so each whole
-  // cell in between contributes half its width to both of its nodes
-  for (ptrdiff_t k = ka + 1; k < kb; ++k) {
-    const double h = grid_points_(k + 1) - grid_points_(k);
-    w(k - ka) += h / 2.0;
-    w(k - ka + 1) += h / 2.0;
   }
   return ka;
 }
 
-//! partial integrals of every grid line up to `u`, from the cached cumulative
-//! integrals plus the remaining partial cell (one pass over the grid lines
-//! instead of one interpolation sweep each). `u` is clamped as in
-//! `interval_weights()`.
+//! @brief Partial integrals of every grid line over `[0, u]`.
+//!
+//! @details Reads the cached cumulative integrals and adds the one partial
+//! cell, so a query costs a pass over the grid lines rather than a sweep along
+//! each.
+//!
+//! @param u Upper limit, clamped to `[0, 1]`.
+//! @param out Filled with one integral per grid line.
 inline void
 InterpolationGrid::row_integrals(double u, Eigen::VectorXd& out) const
 {
   const ptrdiff_t m = grid_points_.size();
-  const double y = std::min(std::max(u, grid_points_(0)), grid_points_(m - 1));
+  const double y = std::min(std::max(u, 0.0), 1.0);
   const ptrdiff_t j = find_cell(y);
-  const double g_j = grid_points_(j);
-  const double dg = grid_points_(j + 1) - g_j;
-  const double s = y - g_j;
+  const double dg = grid_points_(j + 1) - grid_points_(j);
+  const double s = y - grid_points_(j);
   out.resize(m);
   for (ptrdiff_t k = 0; k < m; ++k) {
     out(k) =
@@ -560,19 +529,12 @@ InterpolationGrid::row_integrals(double u, Eigen::VectorXd& out) const
   }
 }
 
-//! probability of `(a1, b1] x (a2, b2]`, the value a difference of four
-//! `integrate_2d()` values defines, arranged so that almost none of it cancels.
+//! @brief Probability of the rectangle `(a1, b1] x (a2, b2]`.
 //!
-//! @details Differencing four corners turns an absolute error `eps` into
-//! `~4 eps / (w1 w2)` in the rectangle's widths, which a mixed-discrete density
-//! then divides by `w1 w2` again. Writing `M` for the interpolant's own mass
-//! and `lambda(y) = y / M(1, y)` for the rescaling `integrate_2d()` applies to
-//! each grid line, that difference is identically `lambda(b2) R + (lambda(b2) -
-//! lambda(a2)) S`, with `R` the rectangle's mass and `S` the mass of `(a1, b1]
-//! x (0, a2]`. Both are sums of nonnegative terms against a nonnegative grid
-//! and do not cancel at all; only the two `lambda` cancel, and they multiply a
-//! term of order `w1` rather than one of order one. The amplification is
-//! therefore `1 / w2` alone, one power instead of two.
+//! @details The value a difference of four `integrate_2d()` values defines,
+//! arranged so that almost none of it cancels: differencing amplifies an
+//! absolute error by `4 / (w1 w2)` in the rectangle's widths, this route by
+//! `1 / w2` alone.
 //!
 //! @param a1,b1 Bounds in the first argument, in either order.
 //! @param a2,b2 Bounds in the second argument, in either order.
@@ -580,9 +542,7 @@ InterpolationGrid::row_integrals(double u, Eigen::VectorXd& out) const
 inline double
 InterpolationGrid::rect_mass(double a1, double b1, double a2, double b2) const
 {
-  // rotating the data can leave a left limit above its own value, so the
-  // rectangle is oriented here rather than by taking an absolute value of the
-  // result, which would hide a sign error instead of preventing one
+  // rotating the data can leave a left limit above its own value
   const double x0 = std::min(a1, b1);
   const double x1 = std::max(a1, b1);
   const double y0 = std::min(a2, b2);
@@ -591,79 +551,69 @@ InterpolationGrid::rect_mass(double a1, double b1, double a2, double b2) const
     return 0.0;
   }
 
-  Eigen::VectorXd wx, wy, rows;
+  // the mass of each grid line over the rectangle's own strip, and below it
+  Eigen::VectorXd wx, wy, strip, below;
   const ptrdiff_t i0 = interval_weights(x0, x1, wx);
-  const ptrdiff_t j0 = interval_weights(y0, y1, wy);
-  const auto strip = values_.middleCols(j0, wy.size());
-
-  // the rectangle's own mass, and the mass of the whole strip it sits in
-  const double mass = wx.dot(strip.middleRows(i0, wx.size()) * wy);
-  const double strip_mass = weights_.dot(strip * wy);
-
-  if (!(y0 > grid_points_(0))) {
-    // no lower corner to subtract: the probability is the mass rescaled so
-    // that the strip carries exactly its own marginal probability
-    return y1 * mass / std::max(strip_mass, 1e-20);
+  row_integrals(y0, below);
+  if (y0 > 0.0) {
+    const ptrdiff_t j0 = interval_weights(y0, y1, wy);
+    strip = values_.middleCols(j0, wy.size()) * wy;
+  } else {
+    // nothing below to subtract, so the cached integrals are the strip itself
+    row_integrals(y1, strip);
   }
 
-  // Below the rectangle, the mass of `(x0, x1] x (0, y0]` and its marginal
-  // counterpart. `lambda(y) = y / M(1, y)` is the rescaling the distribution
-  // function applies to each grid line, and the probability is
-  // `lambda(y1) mass + (lambda(y1) - lambda(y0)) below`. Only the difference of
-  // the two lambdas cancels, and writing it over the strip's own mass keeps
-  // that cancellation proportional to the strip's width rather than to one: the
-  // two terms of the numerator agree to the extent that the fitted margin is
-  // uniform, and a rectangle the model gives almost no mass to would otherwise
-  // come out with the wrong sign.
-  row_integrals(y0, rows);
-  const double below_marginal = std::max(weights_.dot(rows), 1e-20);
-  const double below = wx.dot(rows.segment(i0, wx.size()));
-  const double marginal = std::max(below_marginal + strip_mass, 1e-20);
-  const double dlambda = ((y1 - y0) * below_marginal - y0 * strip_mass) /
-                         (marginal * below_marginal);
+  const double m_strip = weights_.dot(strip);
+  const double m_below = std::max(weights_.dot(below), 1e-20);
+  const double total = std::max(m_below + m_strip, 1e-20);
 
-  return y1 * mass / marginal + dlambda * below;
+  // `integrate_2d()` rescales each grid line by `lambda(y) = y / M(1, y)`, so
+  // the probability is `lambda(y1) strip + (lambda(y1) - lambda(y0)) below`.
+  // The lambda difference is the only part that cancels; expanded over the
+  // common denominator it cancels against `y1 - y0` rather than against one.
+  const double dlambda =
+    ((y1 - y0) * m_below - y0 * m_strip) / (total * m_below);
+
+  return y1 * wx.dot(strip.segment(i0, wx.size())) / total +
+         dlambda * wx.dot(below.segment(i0, wx.size()));
 }
 
-//! probability that the free coordinate falls in `(lo, hi]`, given the other.
+//! @brief Probability that the free coordinate falls in `(lo, hi]`, given the
+//! other.
 //!
 //! @details The value a difference of two `integrate_1d()` values defines. A
-//! conditional distribution function is the interpolated grid line divided by
-//! its own total, so this is a ratio of two nonnegative sums and does not
-//! cancel at all -- a partition of the free axis therefore sums to exactly `1`.
+//! conditional distribution function is the interpolated grid line over its own
+//! total, so this is a ratio of nonnegative sums and does not cancel at all.
 //!
 //! @param u_cond The coordinate held fixed.
 //! @param lo,hi Bounds in the free coordinate, in either order.
-//! @param cond_var Either 1 or 2; the axis considered fixed, as for
-//!   `integrate_1d()`.
+//! @param cond_var Either 1 or 2; the axis held fixed, as for `integrate_1d()`.
+//! @return The conditional probability.
 inline double
 InterpolationGrid::cond_interval_mass(double u_cond,
                                       double lo,
                                       double hi,
                                       size_t cond_var) const
 {
-  const ptrdiff_t m = grid_points_.size();
   const ptrdiff_t i = find_cell(u_cond);
-  const double x1 = grid_points_(i);
-  const double x2 = grid_points_(i + 1);
-  const double x2x = x2 - u_cond;
-  const double xx1 = u_cond - x1;
-  const double x2x1 = x2 - x1;
+  const double s =
+    (u_cond - grid_points_(i)) / (grid_points_(i + 1) - grid_points_(i));
 
-  // the grid line at the conditioning coordinate; bilinear interpolation of a
-  // nonnegative grid is nonnegative, so the guard only absorbs rounding
-  Eigen::VectorXd knots(m);
-  for (ptrdiff_t j = 0; j < m; ++j) {
-    const double v = (cond_var == 1)
-                       ? (values_(i, j) * x2x + values_(i + 1, j) * xx1) / x2x1
-                       : (values_(j, i) * x2x + values_(j, i + 1) * xx1) / x2x1;
-    knots(j) = std::max(v, 0.0);
+  // the grid line at the conditioning coordinate; interpolating a nonnegative
+  // grid is nonnegative, so the floor only absorbs rounding
+  Eigen::VectorXd line;
+  if (cond_var == 1) {
+    line = (values_.row(i) * (1 - s) + values_.row(i + 1) * s)
+             .cwiseMax(0.0)
+             .transpose();
+  } else {
+    line = (values_.col(i) * (1 - s) + values_.col(i + 1) * s).cwiseMax(0.0);
   }
 
   Eigen::VectorXd w;
   const ptrdiff_t j0 = interval_weights(std::min(lo, hi), std::max(lo, hi), w);
-  return w.dot(knots.segment(j0, w.size())) /
-         std::max(weights_.dot(knots), 1e-20);
+  return w.dot(line.segment(j0, w.size())) /
+         std::max(weights_.dot(line), 1e-20);
 }
 
 // ---------------- Utility functions for integration ----------------
