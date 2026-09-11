@@ -18,24 +18,24 @@ if(VINECOPULIB_PRECOMPILED)
     # contents as well, so that editing a header regenerates what it feeds.
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
             ${vinecopulib_ipp} ${vinecopulib_all_hpp})
-    # Both loops below rewrite paths as literal text, with string(REPLACE):
-    # the source and binary directories come from the caller and may contain
-    # regex metacharacters such as '+' or '.', which a pattern reads as
-    # operators and then fails to match. A regex is right only where the
-    # pattern is written out here in full and merely the subject comes from a
-    # path.
+    # Paths are taken apart with cmake_path, never matched as text: the source
+    # directory comes from the caller and may contain regex metacharacters.
     foreach (file ${vinecopulib_ipp})
 
-        # Get directory, name and path for header/source files.
-        get_filename_component(name_without_extension ${file} NAME_WE)
-        get_filename_component(directory ${file} DIRECTORY)
-        string(REGEX REPLACE "/implementation$" "" directory "${directory}")
-        set(header_file ${directory}/${name_without_extension}.hpp)
-        string(REPLACE "${vinecopulib_includes}/" ""
-                header_file ${header_file})
-        string(REPLACE "${vinecopulib_includes}/vinecopulib"
-                "${vinecopulib_generated_sources}" source_folder ${directory})
-        set(source_file "${source_folder}/${name_without_extension}.cpp")
+        # <includes>/vinecopulib/<mod>/implementation/<name>.ipp becomes
+        # <generated>/src/<mod>/<name>.cpp, including <mod>/<name>.hpp.
+        cmake_path(GET file STEM name_without_extension)
+        cmake_path(GET file PARENT_PATH directory)
+        cmake_path(GET directory PARENT_PATH directory)
+        cmake_path(RELATIVE_PATH directory
+                BASE_DIRECTORY "${vinecopulib_includes}"
+                OUTPUT_VARIABLE header_folder)
+        set(header_file "${header_folder}/${name_without_extension}.hpp")
+        cmake_path(RELATIVE_PATH directory
+                BASE_DIRECTORY "${vinecopulib_includes}/vinecopulib"
+                OUTPUT_VARIABLE module_folder)
+        set(source_file
+                "${vinecopulib_generated_sources}/${module_folder}/${name_without_extension}.cpp")
 
         # Turn the .ipp into a translation unit: drop the banner (re-added
         # below) and the `inline` keywords, then include the header.
@@ -65,16 +65,17 @@ if(VINECOPULIB_PRECOMPILED)
     file(GLOB_RECURSE vinecopulib_hpp CONFIGURE_DEPENDS
             ${vinecopulib_includes}/vinecopulib/*.hpp)
     foreach (file ${vinecopulib_hpp})
-        # Get directory, name and path for header/source files
-        get_filename_component(name_without_extension ${file} NAME_WE)
-        get_filename_component(directory ${file} DIRECTORY)
-        set(ipp_file ${directory}/implementation/${name_without_extension}.ipp)
-        string(REPLACE "${vinecopulib_includes}/" "" ipp_file "${ipp_file}")
-        string(REPLACE "${vinecopulib_includes}"
-                "${vinecopulib_generated_includes}" header_folder "${directory}")
-        set(header_file "${header_folder}/${name_without_extension}.hpp")
+        # The same header under <generated>/include, without its .ipp include.
+        cmake_path(GET file STEM name_without_extension)
+        cmake_path(GET file PARENT_PATH directory)
+        cmake_path(RELATIVE_PATH directory
+                BASE_DIRECTORY "${vinecopulib_includes}"
+                OUTPUT_VARIABLE header_folder)
+        set(ipp_file
+                "${header_folder}/implementation/${name_without_extension}.ipp")
+        set(header_file
+                "${vinecopulib_generated_includes}/${header_folder}/${name_without_extension}.hpp")
 
-        # File scrap content and remove ipp include
         file(READ ${file} file_content)
         string(REPLACE "#include <${ipp_file}>" ""
                 file_content "${file_content}")

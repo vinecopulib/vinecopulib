@@ -1,26 +1,5 @@
-if (POLICY CMP0074)
-  # find_package() uses <PackageName>_ROOT variables
-  cmake_policy(SET CMP0074 NEW)
-endif ()
-
-if (POLICY CMP0144)
-  # find_package() uses upper-case <PACKAGENAME>_ROOT variables.
-  cmake_policy(SET CMP0144 NEW)
-endif ()
-
-# The build links its header-only dependencies by target name. find_package
-# defines those targets, and FetchContent does for wdm, but a caller-supplied
-# include path does not: so every path variable also has to define the target
-# it stands in for. Without that, the namespaced names fail at generate time
-# with "links to Eigen3::Eigen ... not found", and the plain name wdm is taken
-# for a library to search for and fails every link on -lwdm.
-#
-# Call this after the find_package that may define the target, never before:
-# Eigen3Config and BoostConfig create their imported targets unconditionally
-# and abort on a name that already exists.
-#
-# GLOBAL, because an imported target created in a function is otherwise
-# visible only inside that function.
+# The build links these by target name, so a caller-supplied path has to define
+# the target too. Call after the find_package that may already define it.
 function(vinecopulib_add_header_only_target target include_dirs_var)
   if(TARGET ${target})
     return()
@@ -41,34 +20,20 @@ endfunction()
 # Check if EIGEN3_INCLUDE_DIR is defined and if not, try to find it
 if(NOT DEFINED EIGEN3_INCLUDE_DIR)
   find_package(Eigen3 REQUIRED CONFIG)
-  if (Eigen3_FOUND)
-    message(STATUS "Found Eigen3: ${Eigen3_DIR} (found suitable version \"${Eigen3_VERSION}\")")
-  else()
-    message(FATAL_ERROR "Could not find Eigen3")
-  endif()
-  # Eigen 5.x exposes its include path only through the target and no longer
-  # sets EIGEN3_INCLUDE_DIR, which external_includes below needs.
-  if(TARGET Eigen3::Eigen)
-    get_target_property(EIGEN3_INCLUDE_DIR Eigen3::Eigen
-                        INTERFACE_INCLUDE_DIRECTORIES)
-  endif()
+  message(STATUS "Found Eigen3: ${Eigen3_DIR} (found suitable version \"${Eigen3_VERSION}\")")
+  # Eigen 5.x sets no EIGEN3_INCLUDE_DIR; external_includes below needs one.
+  get_target_property(EIGEN3_INCLUDE_DIR Eigen3::Eigen
+                      INTERFACE_INCLUDE_DIRECTORIES)
 endif()
 vinecopulib_add_header_only_target(Eigen3::Eigen EIGEN3_INCLUDE_DIR)
 
 # Check if Boost_INCLUDE_DIRS is defined and if not, try to find it
 if(NOT DEFINED Boost_INCLUDE_DIRS)
-  # try to find Boost in CONFIG mode first
-  find_package(Boost 1.75 CONFIG)
-  if (Boost_FOUND)
-    message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")  
-  else ()
-    # fallback to MODULE mode
-    find_package(Boost 1.75 MODULE REQUIRED)
-  endif ()
+  # CONFIG only: CMP0167 removed the FindBoost module, and Boost has shipped a
+  # config package since 1.70, below the 1.75 required here.
+  find_package(Boost 1.75 REQUIRED CONFIG)
+  message(STATUS "Found Boost: ${Boost_DIR} (found suitable version \"${Boost_VERSION}\")")
 endif()
-# CMake's FindBoost module gained Boost::headers in 3.15, one minor version
-# above this project's floor, so the MODULE fallback can leave only
-# Boost::boost behind.
 vinecopulib_add_header_only_target(Boost::headers Boost_INCLUDE_DIRS)
 
 find_package(Threads                      REQUIRED)
