@@ -469,6 +469,10 @@ private:
   // overloads: rejects discrete variables and checks the n x npars shape.
   void check_per_obs_params(const Eigen::MatrixXd& u,
                             const Eigen::MatrixXd& per_obs_params) const;
+
+  // sums a vector of log-densities over the observations that have one; shared
+  // by the two `loglik()` overloads
+  static double sum_loglik(const Eigen::VectorXd& lpdf);
   size_t get_effective_trunc_lvl() const;
 
 protected:

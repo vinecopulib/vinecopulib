@@ -3007,11 +3007,28 @@ Vinecop::simulate_conditional_impl(const Eigen::MatrixXd& u_cond,
   return inverse_rosenblatt_impl(u, view, num_threads);
 }
 
+//! sums a vector of log-densities over the observations that have one. An
+//! observation containing `NaN` has a `NaN` log-density and is left out,
+//! matching `Bicop::loglik()`; a log-density of \f$ -\infty \f$ is kept,
+//! which is the right answer for an observation the model rules out.
+inline double
+Vinecop::sum_loglik(const Eigen::VectorXd& lpdf)
+{
+  Eigen::MatrixXd finite = lpdf;
+  tools_eigen::remove_nans(finite);
+  return finite.sum();
+}
+
 //! @brief Evaluates the log-likelihood.
 //!
 //! @details The log-likelihood is defined as
 //! \f[ \mathrm{loglik} = \sum_{i = 1}^n \log c(U_{1, i}, ..., U_{d, i}), \f]
-//! where \f$ c \f$ is the copula density, see `Vinecop::pdf()`.
+//! where \f$ c \f$ is the copula density, see `Vinecop::pdf()`. Summing the
+//! log-densities keeps the result finite wherever it is representable, which a
+//! product of pair-copula densities is not; see `Vinecop::logpdf()`. An
+//! observation containing `NaN` has no likelihood and is left out of the sum,
+//! as it is for `Bicop::loglik()`; an empty `u` reports the value recorded by
+//! the fit.
 //!
 //! @param u An \f$ n \times d \f$ matrix of evaluation points for a
 //!   continuous model. For a model with \f$ k \f$ discrete variables, use an
@@ -3027,9 +3044,8 @@ Vinecop::loglik(const Eigen::MatrixXd& u, const size_t num_threads) const
 {
   if (u.rows() < 1) {
     return this->get_loglik();
-  } else {
-    return logpdf(u, num_threads).sum();
   }
+  return sum_loglik(logpdf(u, num_threads));
 }
 
 //! @brief Evaluates the log-likelihood with per-observation parameters.
@@ -3043,7 +3059,10 @@ Vinecop::loglik(const Eigen::MatrixXd& u,
                 const Eigen::MatrixXd& parameters,
                 const size_t num_threads) const
 {
-  return logpdf(u, parameters, num_threads).sum();
+  if (u.rows() < 1) {
+    return this->get_loglik();
+  }
+  return sum_loglik(logpdf(u, parameters, num_threads));
 }
 
 //! @brief Evaluates the Akaike information criterion (AIC).

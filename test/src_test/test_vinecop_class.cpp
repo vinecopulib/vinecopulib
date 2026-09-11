@@ -7,6 +7,7 @@
 #include "include/test_utils.hpp"
 #include "include/vinecop_test.hpp"
 #include <future>
+#include <limits>
 #include <mutex>
 #include <numeric>
 #include <set>
@@ -398,6 +399,62 @@ TEST(VinecopLogPdf, survives_a_density_that_underflows)
   EXPECT_NEAR(vinecop.logpdf(u)(0), reference, 1e-9);
   EXPECT_NEAR(vinecop.loglik(u), reference, 1e-9);
   EXPECT_NEAR(vinecop.aic(u), -2 * reference + 2 * vinecop.get_npars(), 1e-9);
+}
+
+// `loglik()` sums only the observations that have a likelihood, and reports the
+// value recorded by the fit when handed no observations. Both conventions have
+// to hold for the per-observation-parameters overload too, which used to sum
+// over zero rows and return 0 where the other overload returns `get_loglik()`.
+TEST(VinecopLogLik, conventions_hold_for_both_overloads)
+{
+  auto pair_copulas = Vinecop::make_pair_copula_store(4);
+  for (auto& tree : pair_copulas) {
+    for (auto& pc : tree) {
+      pc = Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.5));
+    }
+  }
+  Vinecop vinecop(DVineStructure({ 1, 2, 3, 4 }), pair_copulas);
+  const auto u = vinecop.simulate(50, false, 1, { 7 });
+  vinecop.fit(u, FitControlsVinecop({ BicopFamily::gaussian }));
+
+  // no observations: report the stored fit, from either overload
+  EXPECT_NEAR(vinecop.loglik(Eigen::MatrixXd()), vinecop.get_loglik(), 1e-10);
+  EXPECT_NEAR(vinecop.loglik(Eigen::MatrixXd(), Eigen::MatrixXd()),
+              vinecop.get_loglik(),
+              1e-10);
+
+  // a row with a missing value has no likelihood and drops out of the sum
+  const double full = vinecop.loglik(u);
+  Eigen::MatrixXd u_nan = u;
+  u_nan(3, 2) = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_TRUE(std::isfinite(vinecop.loglik(u_nan)));
+  EXPECT_NEAR(vinecop.loglik(u_nan), full - vinecop.logpdf(u)(3), 1e-10);
+
+  // evaluation still propagates it; only the likelihood drops the row
+  EXPECT_TRUE((std::isnan)(vinecop.logpdf(u_nan)(3)));
+  EXPECT_TRUE((std::isnan)(vinecop.pdf(u_nan)(3)));
+
+  // and the criteria built on the log-likelihood follow it
+  EXPECT_TRUE(std::isfinite(vinecop.aic(u_nan)));
+  EXPECT_TRUE(std::isfinite(vinecop.bic(u_nan)));
+  EXPECT_TRUE(std::isfinite(vinecop.mbicv(u_nan, 0.9)));
+
+  // an observation the model rules out keeps its -inf: that is not a missing
+  // value, and dropping it would invent a likelihood the model does not give
+  auto underflowing = Vinecop::make_pair_copula_store(50, 1);
+  for (auto& pc : underflowing[0]) {
+    pc = Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.9));
+  }
+  std::vector<size_t> order(50);
+  std::iota(order.begin(), order.end(), 1);
+  Vinecop ruled_out(DVineStructure(order, 1), underflowing);
+  Eigen::MatrixXd tail(1, 50);
+  for (size_t j = 0; j < 50; ++j) {
+    tail(0, j) = (j % 2 == 0) ? 0.99 : 0.01;
+  }
+  EXPECT_DOUBLE_EQ(ruled_out.pdf(tail)(0), 0.0);
+  EXPECT_TRUE(std::isfinite(ruled_out.loglik(tail)));
+  EXPECT_TRUE(std::isinf(std::log(ruled_out.pdf(tail)(0))));
 }
 
 // `logpdf()` is the sum of the per-edge log-densities `pdf_full()` reports, and

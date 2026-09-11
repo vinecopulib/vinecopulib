@@ -202,6 +202,16 @@ wrong thing.
 
 ### BUG FIXES
 
+* `Vinecop::loglik()` leaves out the observations that have no likelihood
+  instead of returning `NaN` for the whole sample, matching `Bicop::loglik()`;
+  `aic()`, `bic()` and `mbicv()` follow it. Evaluation is unchanged and still
+  propagates `NaN`, which is the house convention: a missing value has no
+  density, but it also has no likelihood to contribute. A log-density of
+  `-inf` is not a missing value and is kept. The per-observation-parameters
+  overload also honors the empty-`u` convention now, reporting the value
+  recorded by the fit rather than summing over zero rows and returning `0`
+  (#770)
+
 * `Vinecop::loglik()` is finite whenever the log-likelihood is representable,
   and so are `aic()`, `bic()` and `mbicv()`, which route through it. The density
   was accumulated as a running product over up to `d(d-1)/2` edges, so a true
