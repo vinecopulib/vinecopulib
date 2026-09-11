@@ -7,6 +7,7 @@
 #include "include/kernel_test.hpp"
 #include "include/r_parity.hpp"
 #include "include/test_utils.hpp"
+#include <limits>
 
 namespace test_bicop_kernel {
 using namespace vinecopulib;
@@ -273,10 +274,16 @@ TEST(test_bicop_kernel_margins, hfunc1_is_the_conditional_cdf_of_the_pdf)
 
 namespace {
 
-// The probability of a rectangle, from `(grid_points, values)` alone and in
-// long double, so it can serve as truth for the double-precision routes below.
-// This is the four-corner definition -- `C(u1, u2) = M(u1, u2) * u2 / M(1, u2)`
-// for the interpolant's mass `M` -- evaluated with about 18 significant digits.
+// The probability of a rectangle, from `(grid_points, values)` alone: the
+// four-corner definition `C(u1, u2) = M(u1, u2) * u2 / M(1, u2)` for the
+// interpolant's mass `M`, evaluated in `long double`.
+//
+// Differencing four corners of an order-one function costs an absolute `eps`
+// whatever the summation accuracy, so a `double` evaluation of this cannot
+// serve as truth for a route that avoids that difference -- it would carry the
+// very error being measured, and correlate with the route it is meant to judge.
+// The caller therefore requires a `long double` wider than `double`, which
+// x86-64 has (64-bit mantissa) and arm64 and MSVC do not.
 long double
 rect_prob_reference(const Eigen::VectorXd& g,
                     const Eigen::MatrixXd& v,
@@ -320,6 +327,11 @@ rect_prob_reference(const Eigen::VectorXd& g,
 // consume, so the difference is not academic.
 TEST(test_bicop_kernel_accuracy, discrete_density_beats_a_cdf_difference)
 {
+  if (std::numeric_limits<long double>::digits <=
+      std::numeric_limits<double>::digits) {
+    GTEST_SKIP() << "needs a long double wider than double for the reference";
+  }
+
   const Bicop tll = fit_tll(0.7, 1000);
   const Eigen::MatrixXd v = tll.get_parameters();
   const Eigen::VectorXd g = tll_grid_points(static_cast<int>(v.rows()));
@@ -327,9 +339,11 @@ TEST(test_bicop_kernel_accuracy, discrete_density_beats_a_cdf_difference)
   Bicop dd = tll;
   dd.set_var_types({ "d", "d" });
 
-  // dyadic atoms, so every bound is exactly representable and the reference
-  // sees the same rectangle the library does
-  for (int k : { 8, 64, 512 }) {
+  // Dyadic atoms, so every bound is exactly representable and the reference
+  // sees the same rectangle the library does. Widths start at 1/64: at 1/8 both
+  // routes sit on the rounding floor of the corners themselves and the ratio
+  // between them is noise, so there is nothing there to assert.
+  for (int k : { 64, 512, 4096 }) {
     const double w = 1.0 / k;
     const int step = std::max(1, k / 12);
     double worst_exact = 0.0;
@@ -363,12 +377,14 @@ TEST(test_bicop_kernel_accuracy, discrete_density_beats_a_cdf_difference)
           std::abs(static_cast<double>((differenced - truth) / truth)));
       }
     }
-    EXPECT_LT(worst_exact, worst_corners)
+    // one power of the atom width rather than two. The margin is an order of
+    // magnitude and more on every width tested, but the fitted grid differs
+    // between platforms, so the assertion is deliberately not on the ratio's
+    // size
+    EXPECT_GT(worst_corners, 3.0 * worst_exact)
       << "atom width 1/" << k << ": exact " << worst_exact << ", four-corner "
       << worst_corners;
-    // one power of the width rather than two; at 1/512 the differenced route is
-    // already past 1e-9 while this one is still near 1e-10
-    EXPECT_LT(worst_exact, 1e-9) << "atom width 1/" << k;
+    EXPECT_LT(worst_exact, 1e-9) << "atom width 1/" << k << ": " << worst_exact;
   }
 }
 
