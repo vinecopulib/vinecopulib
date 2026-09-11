@@ -7,6 +7,8 @@
 #include "helpers.hpp"
 #include <benchmark/benchmark.h>
 #include <memory>
+#include <string>
+#include <vector>
 
 using namespace vinecopulib;
 
@@ -107,6 +109,40 @@ register_tll_discrete_fit()
                                });
 }
 
+//! Mixed-discrete evaluation: the density is a rectangle probability divided by
+//! the atom's area, so it is the one evaluation path whose cost depends on how
+//! that probability is obtained.
+void
+register_tll_discrete_eval()
+{
+  const size_t n = 1000;
+  const auto u = bench::sim_data(BicopFamily::gaussian, 0, n);
+  Bicop fitted(BicopFamily::tll);
+  fitted.fit(u, FitControlsBicop({ BicopFamily::tll }));
+
+  for (const auto& types : { std::vector<std::string>{ "d", "c" },
+                             std::vector<std::string>{ "d", "d" } }) {
+    auto bc = std::make_shared<Bicop>(fitted);
+    bc->set_var_types(types);
+    auto data = std::make_shared<const Eigen::MatrixXd>(
+      types[1] == "c" ? bench::discretize_first(u) : bench::discretize_both(u));
+    const std::string key = types[0] + types[1];
+    benchmark::RegisterBenchmark(("tll/pdf_disc/" + key + "/n=1000").c_str(),
+                                 [bc, data](benchmark::State& st) {
+                                   for (auto _ : st) {
+                                     benchmark::DoNotOptimize(bc->pdf(*data));
+                                   }
+                                 });
+    benchmark::RegisterBenchmark(("tll/hfunc1_disc/" + key + "/n=1000").c_str(),
+                                 [bc, data](benchmark::State& st) {
+                                   for (auto _ : st) {
+                                     benchmark::DoNotOptimize(
+                                       bc->hfunc1(*data));
+                                   }
+                                 });
+  }
+}
+
 struct Registrar
 {
   Registrar()
@@ -123,6 +159,7 @@ struct Registrar
     // so the smallest sample is where its share of the fit is largest
     register_tll_fit("constant", 200);
     register_tll_fit("quadratic", 200);
+    register_tll_discrete_eval();
     register_tll_fit_grid_size("quadratic", 50, 1000);
     register_tll_discrete_fit();
   }
