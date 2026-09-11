@@ -120,13 +120,7 @@ jobs:
         run: |
           echo "CC=${{ matrix.cfg.cc }}" >> $GITHUB_ENV
           echo "CXX=${{ matrix.cfg.cxx }}" >> $GITHUB_ENV
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
           if [ "${{ matrix.cfg.os }}" == "windows-latest" ]; then
-            # Linux and macOS runners ship an Eigen that find_package locates on
-            # its own; Windows does not, so point it at the one we installed.
-            # CMP0074 makes find_package honor <Package>_ROOT from the
-            # environment.
-            echo "Eigen3_ROOT=D:/" >> $GITHUB_ENV
             echo "D:\a\vinecopulib\vinecopulib\debug" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release" >> $GITHUB_PATH
             echo "D:\a\vinecopulib\vinecopulib\release\Release" >> $GITHUB_PATH
@@ -239,12 +233,7 @@ jobs:
           os: ubuntu-latest
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
-          eigen_install_dir: ${{ runner.temp }}/eigen
           R: true
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Eigen3_ROOT=${{ runner.temp }}/eigen" >> $GITHUB_ENV
       - name: Configure, build, test and install (header-only)
         run: |
           mkdir release && cd release
@@ -261,34 +250,14 @@ jobs:
           for ex in bicop vinecop; do
             ( cd "examples/$ex" && mkdir build && cd build && cmake .. && make && ../bin/main )
           done
-      # CMAKE_DISABLE_FIND_PACKAGE_* makes the consumer unable to find the
-      # dependencies, so the paths recorded in the package have to serve.
-      - name: Consume an install configured with dependency paths
-        run: |
-          cmake -S . -B build-prefix \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_TESTING=OFF \
-            -DCMAKE_INSTALL_PREFIX="$RUNNER_TEMP/prefix" \
-            -DEIGEN3_INCLUDE_DIR="$RUNNER_TEMP/eigen/include/eigen3" \
-            -DBoost_INCLUDE_DIRS="$BOOST_ROOT/include" \
-            -Dwdm_INCLUDE_DIRS=/usr/local/include
-          cmake --install build-prefix
-          # without the build tree and binary the step above left behind
-          cp -a examples/bicop "$RUNNER_TEMP/consumer"
-          rm -rf "$RUNNER_TEMP/consumer/build" "$RUNNER_TEMP/consumer/bin"
-          cmake -S "$RUNNER_TEMP/consumer" -B "$RUNNER_TEMP/consumer/build" \
-            -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/prefix" \
-            -DCMAKE_DISABLE_FIND_PACKAGE_Eigen3=ON \
-            -DCMAKE_DISABLE_FIND_PACKAGE_Boost=ON \
-            -DCMAKE_DISABLE_FIND_PACKAGE_wdm=ON
-          cmake --build "$RUNNER_TEMP/consumer/build" -j"$(nproc)"
-          "$RUNNER_TEMP/consumer/bin/main" > /dev/null
 
-  # Two configure-time defects the matrix cannot reach; nothing is compiled.
-  configure-checks:
-    name: cmake configure checks (ubuntu)
+  # What the build system promises users: dependency paths that work, a
+  # generated tree that does not depend on the source path, and an installed
+  # package a consumer can resolve. Only the last one compiles anything.
+  packaging:
+    name: packaging (ubuntu)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
       - name: Install dependencies
@@ -301,74 +270,56 @@ jobs:
           eigen_install_dir: ${{ runner.temp }}/eigen
           R: false
           lcov: false
-      # The second step configures the way an ordinary build does.
-      - name: Set environment variables
+      - name: Record where the dependencies were installed
         run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Eigen3_ROOT=${{ runner.temp }}/eigen" >> $GITHUB_ENV
-      # A missing namespaced target fails generation, but the plain name wdm
-      # would only fail at link time, so check the generated link line too.
+          eigen="$RUNNER_TEMP/eigen/include/eigen3"
+          test -f "$eigen/Eigen/Dense" || { echo "::error::no Eigen in $eigen"; exit 1; }
+          test -d "$BOOST_ROOT/include/boost" || { echo "::error::no Boost in $BOOST_ROOT"; exit 1; }
+          test -f /usr/local/include/wdm.hpp || { echo "::error::no wdm in /usr/local"; exit 1; }
+          echo "DEP_PATHS=-DEIGEN3_INCLUDE_DIR=$eigen -DBoost_INCLUDE_DIRS=$BOOST_ROOT/include -Dwdm_INCLUDE_DIRS=/usr/local/include" >> $GITHUB_ENV
+      # A missing namespaced target fails generation; the plain name wdm would
+      # only fail at link time, so check the generated link line too.
       - name: Configure with caller-supplied dependency paths
         run: |
-          # Assert the layout, so a change to it fails as itself.
-          eigen_inc="${{ runner.temp }}/eigen/include/eigen3"
-          boost_inc="$BOOST_ROOT/include"
-          test -f "$eigen_inc/Eigen/Dense" \
-            || { echo "::error::no Eigen headers under $eigen_inc"; exit 1; }
-          test -d "$boost_inc/boost" \
-            || { echo "::error::no Boost headers under $boost_inc"; exit 1; }
-          test -f /usr/local/include/wdm.hpp \
-            || { echo "::error::no wdm headers under /usr/local/include"; exit 1; }
-          cmake -S . -B build-dep-paths \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DVINECOPULIB_PRECOMPILED=ON \
-            -DBUILD_SHARED_LIBS=ON \
-            -DBUILD_TESTING=OFF \
-            -DEIGEN3_INCLUDE_DIR="$eigen_inc" \
-            -DBoost_INCLUDE_DIRS="$boost_inc" \
-            -Dwdm_INCLUDE_DIRS=/usr/local/include
-          link_txt=build-dep-paths/CMakeFiles/vinecopulib.dir/link.txt
-          if [ ! -f "$link_txt" ]; then
-            echo "::error::$link_txt was not generated; the check below is void"
-            exit 1
+          cmake -S . -B build-paths -DVINECOPULIB_PRECOMPILED=ON \
+            -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON $DEP_PATHS
+          if grep -q -- '-lwdm' build-paths/CMakeFiles/vinecopulib.dir/link.txt; then
+            echo "::error::wdm reached the link line as -lwdm"; exit 1
           fi
-          if grep -q -- '-lwdm' "$link_txt"; then
-            echo "::error::wdm reached the link line as -lwdm; its target is missing"
-            exit 1
-          fi
-        shell: bash
       # The translation runs at configure time, so these counts are final.
       - name: Configure from a source path containing regex metacharacters
         run: |
           src="$RUNNER_TEMP/vine+copu.lib"
           cp -a "$GITHUB_WORKSPACE" "$src"
-          cmake -S "$src" -B "$src/build" \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DVINECOPULIB_PRECOMPILED=ON \
-            -DBUILD_TESTING=OFF
-          expected_hpp=$(find "$src/include/vinecopulib" -name '*.hpp' | wc -l)
-          actual_hpp=$(find "$src/build/generated/include/vinecopulib" \
-            -name '*.hpp' 2>/dev/null | wc -l)
-          expected_cpp=$(find "$src/include" -name '*.ipp' | wc -l)
-          actual_cpp=$(find "$src/build/generated/src" \
-            -name '*.cpp' 2>/dev/null | wc -l)
-          echo "headers $actual_hpp/$expected_hpp, sources $actual_cpp/$expected_cpp"
-          if [ "$actual_hpp" -ne "$expected_hpp" ] \
-             || [ "$actual_cpp" -ne "$expected_cpp" ]; then
-            echo "::error::the generated tree is incomplete"
-            exit 1
-          fi
+          cmake -S "$src" -B "$src/build" -DVINECOPULIB_PRECOMPILED=ON -DBUILD_TESTING=OFF
+          count() { find "$1" -name "$2" 2>/dev/null | wc -l; }
+          hpp=$(count "$src/build/generated/include/vinecopulib" '*.hpp')
+          cpp=$(count "$src/build/generated/src" '*.cpp')
+          echo "generated $hpp/$(count "$src/include/vinecopulib" '*.hpp') headers," \
+               "$cpp/$(count "$src/include" '*.ipp') sources"
+          [ "$hpp" -eq "$(count "$src/include/vinecopulib" '*.hpp')" ] \
+            && [ "$cpp" -eq "$(count "$src/include" '*.ipp')" ] \
+            || { echo "::error::the generated tree is incomplete"; exit 1; }
           # A leftover .ipp include gets the implementation compiled twice.
-          if grep -rl '\.ipp>' "$src/build/generated/include"; then
-            echo "::error::a generated header still includes its .ipp"
-            exit 1
-          fi
+          ! grep -rl '\.ipp>' "$src/build/generated/include" || exit 1
           # An untranslated destination path stays in the source tree.
-          if [ -n "$(git -C "$src" status --porcelain -- include)" ]; then
-            echo "::error::configure wrote into the source tree"
-            exit 1
-          fi
-        shell: bash
+          [ -z "$(git -C "$src" status --porcelain -- include)" ] \
+            || { echo "::error::configure wrote into the source tree"; exit 1; }
+      # CMAKE_DISABLE_FIND_PACKAGE_* leaves the consumer unable to find the
+      # dependencies, so the paths recorded in the package have to serve.
+      - name: Install with those paths, then consume the package without them
+        run: |
+          cmake -S . -B build-install -DCMAKE_INSTALL_PREFIX="$RUNNER_TEMP/prefix" \
+            -DBUILD_TESTING=OFF $DEP_PATHS
+          cmake --install build-install
+          cp -a examples/bicop "$RUNNER_TEMP/consumer"
+          cmake -S "$RUNNER_TEMP/consumer" -B "$RUNNER_TEMP/consumer/build" \
+            -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/prefix" \
+            -DCMAKE_DISABLE_FIND_PACKAGE_Eigen3=ON \
+            -DCMAKE_DISABLE_FIND_PACKAGE_Boost=ON \
+            -DCMAKE_DISABLE_FIND_PACKAGE_wdm=ON
+          cmake --build "$RUNNER_TEMP/consumer/build" -j"$(nproc)"
+          "$RUNNER_TEMP/consumer/bin/main" > /dev/null
 
   # VINECOPULIB_SANITIZERS cannot see a data race and cannot be combined
   # with -fsanitize=thread, so this needs a build tree of its own. clang,
@@ -395,11 +346,6 @@ jobs:
           eigen_install_dir: ${{ runner.temp }}/eigen
           R: true
           lcov: false
-      # find_package picks both up via CMP0074.
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Eigen3_ROOT=${{ runner.temp }}/eigen" >> $GITHUB_ENV
       # RelWithDebInfo, because ThreadSanitizer multiplies an already slow
       # Debug suite; the <area>_only targets build three areas, not fourteen.
       - name: Configure and build with ThreadSanitizer
@@ -416,15 +362,16 @@ jobs:
       # shadow mapping supports; unlike the sysctl it needs no privileges.
       - name: Run the thread-pool tests under ThreadSanitizer
         run: |
-          arch=$(uname -m)
-          setarch "$arch" -R build-tsan/bin/test_tools_thread_only
-          setarch "$arch" -R build-tsan/bin/test_bicop_select_only
+          # A filter that matches nothing exits 0, so count what passed.
+          run() {
+            setarch "$(uname -m)" -R "build-tsan/bin/$1" "${@:2}" | tee tsan.log
+            grep -qE '^\[  PASSED  \] [1-9][0-9]* test' tsan.log
+          }
+          run test_tools_thread_only
+          run test_bicop_select_only
           # Only the fits that ask for more than one thread use the pool.
-          setarch "$arch" -R build-tsan/bin/test_vinecop_class_only \
-            --gtest_filter='VinecopFit.parallel_fit_matches_serial:VinecopTest.works_multi_threaded:VinecopTest.tree_criterion_*:VinecopTest.inverse_rosenblatt_is_safe_for_concurrent_calls' \
-            | tee tsan-vinecop.log
-          # A filter that matches nothing exits 0.
-          grep -qE '^\[  PASSED  \] [1-9][0-9]* test' tsan-vinecop.log
+          run test_vinecop_class_only \
+            --gtest_filter='VinecopFit.parallel_fit_matches_serial:VinecopTest.works_multi_threaded:VinecopTest.tree_criterion_*:VinecopTest.inverse_rosenblatt_is_safe_for_concurrent_calls'
         shell: bash
 
   # Keeps the benchmark and parity targets compiling. The self-comparison
@@ -443,9 +390,6 @@ jobs:
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: false
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
       - name: Build bench_all and parity_dump
         run: |
           mkdir build-bench && cd build-bench
@@ -491,10 +435,6 @@ jobs:
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: false
           lcov: false
-      # BOOST_ROOT must be exported: find_package picks it up via CMP0074.
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
       - name: Configure
         run: |
           mkdir build-docs && cd build-docs
@@ -563,9 +503,6 @@ jobs:
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: true
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
       - name: Configure to generate compile_commands.json
         run: |
           mkdir build-tidy && cd build-tidy

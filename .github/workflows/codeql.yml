@@ -46,14 +46,6 @@ jobs:
           R: false
           lcov: false
 
-      # BOOST_ROOT and Eigen3_ROOT must be exported: find_package picks them
-      # up via CMP0074, ahead of CMake's user package registry, where the
-      # in-workspace eigen-src build tree registers itself.
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-          echo "Eigen3_ROOT=${{ runner.temp }}/eigen" >> $GITHUB_ENV
-
       # Precompiled, so the .ipp files become translation units CodeQL can see.
       - name: Build (precompiled, so the .ipp tree is compiled)
         run: |

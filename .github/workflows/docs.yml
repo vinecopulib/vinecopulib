@@ -56,11 +56,6 @@ jobs:
           R: false
           lcov: false
 
-      # BOOST_ROOT must be exported: find_package picks it up via CMP0074.
-      - name: Set environment variables
-        run: |
-          echo "BOOST_ROOT=${{ steps.install-dependencies.outputs.BOOST_ROOT }}" >> $GITHUB_ENV
-
       - name: Configure
         run: cmake -S . -B build-docs -DVINECOPULIB_BUILD_DOC=ON -DBUILD_TESTING=OFF
 
