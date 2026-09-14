@@ -1,0 +1,390 @@
+# Circular copulas and mixed vines: implementation plan
+
+Status: planning; implementation has not started. Updated September 15, 2026.
+
+This checklist tracks the first feature release for circular variables. The
+release includes circular-circular and circular-linear pair copulas,
+nonparametric estimation, and integration with `Vinecop`. Individual stages
+are reviewable implementation steps, not separate definitions of a complete
+feature release. Follow [AGENTS.md](../../AGENTS.md) throughout.
+
+Files under `docs/plans/` are excluded from the Doxygen input and never
+appear on the website.
+
+## Release scope
+
+- Fit, select, evaluate, simulate, and serialize circular-circular and
+  circular-linear `Bicop` models.
+- Support mixtures of circular and linear variables in `Vinecop`, including
+  supplied structures, automatic selection, and Rosenblatt transforms.
+- Provide parametric families and a nonparametric estimator that respects
+  the geometry of each axis.
+- Preserve existing linear models, defaults, serialized models, and the
+  continuous/discrete meaning of `"c"` and `"d"` in `var_types`.
+- Continue to accept copula-scale data. The library sees a circular variable
+  as `u` in `[0, 1]` with `0` identified with `1`. Units, angular direction,
+  the cut, and the angle-to-CDF mapping are downstream concerns (marginal
+  estimation and the R/Python bindings); the library documents them but does
+  not implement them.
+
+The initial implementation targets continuous circular and continuous linear
+variables. New combinations involving circular and discrete variables need a
+separate mathematical and API decision; reject unsupported combinations
+explicitly. Existing discrete functionality must continue to work.
+
+### Proposed family set
+
+These are mathematical family names; enum names and parameter conventions
+will be settled in stage 1.
+
+| Pair geometry | Parametric candidates | Nonparametric candidate |
+| --- | --- | --- |
+| Linear-linear | Existing families | Existing TLL |
+| Circular-circular | Cardioid, wrapped Cauchy, and von Mises binding densities | Local likelihood on two periodic axes |
+| Circular-linear, either order | Quadratic and cubic sections with phase; reuse the binding-density construction where appropriate | Local likelihood on one periodic axis and one probit-transformed axis |
+| Any supported pair | Existing independence family | — |
+
+The binding-density construction is
+
+$$
+c(u,v)=2\pi g\{2\pi(v-qu)-\mu\},\qquad q\in\{-1,1\},
+$$
+
+where `g` is a centered circular density, `mu` is a phase, and `q` selects
+the association orientation. It is periodic in both coordinates. It is also
+valid for circular-linear pairs, but imposes equality at the two ends of
+the linear coordinate; it cannot replace the cylindrical sections families.
+See [Jones, Pewsey, and Kato](#references) and [Hodel and Fieberg](#references).
+
+Facts about this construction that later stages rely on (all three proposed
+`g` are symmetric about zero):
+
+- The h-functions are differences of the circular CDF `G`, and the inverse
+  h-functions reduce to `G^{-1}`. Cardioid and wrapped Cauchy have closed-form
+  `G`; von Mises needs a series or quadrature for `G` and a root solve for
+  `G^{-1}`. Boost.Math, already a dependency, provides the Bessel functions.
+- Rotating by 180 degrees maps `mu` to `-mu`; rotating by 90 degrees is
+  exactly `q = -1`. The families therefore have two distinct rotations,
+  `{0, 90}`, not one and not four.
+- `flip()` negates the phase when `q = 1` and is the identity when `q = -1`
+  (the density is then exchangeable).
+- With `q = 1` and a half-turn phase, a perfectly dependent pair has linear
+  Kendall's tau exactly zero. Linear tau must not drive candidate
+  generation, preselection, or tree weights for circular pairs.
+
+Multimodal parametric mixtures, general Fourier families, and a separate
+Bernstein estimator are later extensions. The nonparametric estimator should
+already accommodate patterns beyond a single circular diagonal.
+
+## Stages and dependencies
+
+| Stage | Depends on | Reviewable outcome |
+| --- | --- | --- |
+| 1. Mathematical and API contract | — | Documented conventions, family formulas, and acceptance cases |
+| 2. Geometry and compatibility | 1 | Geometry token, family eligibility, and serialization contracts |
+| 3. Parametric pairs | 2 | Complete circular-circular and circular-linear `Bicop` support |
+| 4. Nonparametric pairs | 2, 3 | Periodic and mixed-axis fits, usable wherever a parametric circular pair is |
+| 5. Supplied vine structures | 3 | Mixed-vine fitting, evaluation, transforms, and simulation; `select` rejects circular input |
+| 6. Automatic selection | 5 | Geometry-aware family and structure selection |
+| 7. Release validation | 1–6 | Validated mixed-vine feature with documentation and examples |
+
+Stage 4 is a parallel track. It is exploratory by nature and must not sit on
+the critical path: stages 5 and 6 complete with parametric circular families
+only, and stage 4 plugs in through the eligibility filtering from stage 2.
+
+Each stage is additive behind the new geometry token and changes nothing for
+existing callers, so each stage's pull requests are merged to `main` as they
+are approved rather than held in a long stack. Collect entries in an
+unreleased section of `NEWS.md` and cut the release after stage 7. Record
+actual PR numbers beside completed tasks. Do not merge, tag, or publish
+without express authorization.
+
+## 1. Mathematical and API contract
+
+- [ ] Fix the spelling of the new `var_types` value; the token approach in
+  stage 2 is decided. The spelling reaches the R and Python signatures, so it
+  is settled here, not later.
+- [ ] Document that the library takes `u` in `[0, 1]` with `0` identified
+  with `1`, and that the cut is wherever the caller's marginal CDF puts it.
+  State that ranks (`to_pseudo_obs`) place the cut at the caller's zero angle.
+- [ ] Define endpoint behavior: densities join at `0` and `1` on circular
+  axes; CDFs and h-functions retain their anchored probability semantics.
+  Inverses must return the correct branch on the chosen interval.
+- [ ] Derive density, CDF, both h-functions, and both inverses for each
+  proposed parametric family. Identify numerical integrations and root solves
+  (von Mises `G` and `G^{-1}`; cubic sections constraints).
+- [ ] Fix concentration bounds, the independence limit, parameter
+  identifiability, and the number of fitted parameters. The wrapped Cauchy
+  concentration needs an upper bound strictly below its singular limit.
+  Derive parameter constraints for the phased cubic-sections family explicitly.
+- [ ] Fix the orientation and phase conventions: `q` is represented by the
+  copula rotation in `{0, 90}`; `mu` is a periodic, unbounded parameter in
+  the optimizer (no bound to hit, no finite-difference problem at a cut).
+  Specify how `allow_rotations` maps onto the two distinct rotations.
+- [ ] Record the `flip()` transformations for every family, including the
+  phased cylindrical families, which need not be exchangeable.
+- [ ] Define ordinary Kendall's tau and Blomqvist's beta relative to the
+  chosen cut. Keep their current meanings; expose circular dependence
+  summaries separately. Specify tail-dependence behavior. `itau` stays
+  unavailable for circular families; `parameters_to_tau` is defined, its
+  inverse is not.
+- [ ] State the periodicity condition for a mixed vine: the conditional CDF
+  of a circular variable wraps from `0` to `1`, so every pair copula in which
+  that variable (or its h-transform) is a conditioned argument must have
+  equal density at both ends of that coordinate. A circular variable that
+  appears only in a conditioning set imposes nothing on the pair copula.
+- [ ] Distinguish density periodicity from changing the cut and refitting.
+  Investigate how changing cuts affects the simplifying assumption: a shift
+  of a conditional circular CDF can depend on the conditioning values.
+  Do not promise arbitrary-cut invariance of simplified vines without proof.
+- [ ] Specify tolerances and independent numerical reference calculations
+  for the identities used in the later test stages.
+
+## 2. Geometry, family eligibility, and compatibility
+
+Proposal: a third `var_types` value marking a continuous circular variable.
+`"c"` and `"d"` keep their meaning; the new value is a kind of continuous
+variable. This reuses the existing propagation through trees
+([vinecop/class.ipp](../../include/vinecopulib/vinecop/implementation/class.ipp),
+`set_var_types_internal`, and the selector's per-edge `var_types`), the
+constructors' default arguments, the `"vt"` JSON field, the views, and the
+binding signatures. Legacy JSON reads work unchanged. A separate per-variable
+attribute would duplicate all of that; the circular-discrete combination,
+when it comes, can be a further value.
+
+- [ ] Accept the new value in `Bicop::check_var_types` and
+  `Vinecop::check_var_types`. Audit every `== "d"` and `get_n_discrete()`
+  branch to confirm it stays correct with a third value; `as_continuous()`
+  and the `BicopView` / `VinecopView` continuous paths must preserve it.
+- [ ] Decide whether circular families infer geometry when constructed
+  explicitly, and validate contradictory family/geometry combinations.
+- [ ] Define family capabilities for both argument orders, including the
+  geometry-dependent nonparametric estimator. Include independence in every
+  supported candidate set.
+- [ ] Update family registration, name conversion, convenience groups, and
+  factory dispatch. Add the new families to `bicop_families::all`; the
+  eligibility filter keeps the effective default search unchanged for
+  linear callers. Add a group for the two-rotation families.
+- [ ] Thread geometry into `tools_select::create_candidate_bicops`, which
+  today receives only data and controls, chooses rotations from the sign of
+  linear tau, and would drop one orientation of a circular family.
+- [ ] Specify filtering for explicit and empty family sets and behavior when
+  no compatible candidate remains. Apply the same rules to fitting and selection.
+- [ ] Preserve geometry through copying, views, flipping, rotations, resetting,
+  truncation, structure conversions, and conditional/reoriented interfaces.
+- [ ] Define the JSON field for nonparametric grid geometry. The `Bicop` JSON
+  carries only family, rotation, parameters, `var_types`, and fit statistics,
+  and `KernelBicop::set_parameters` rebuilds knots from the row count alone,
+  so a circular grid cannot reload without it. Test legacy reads and complete
+  round-trips; reject unsupported formats clearly.
+- [ ] Audit all special cases keyed on `BicopFamily::tll` before choosing
+  between geometry-dependent `tll` and separate family identifiers.
+
+Main code: [bicop/class.hpp](../../include/vinecopulib/bicop/class.hpp),
+[family.hpp](../../include/vinecopulib/bicop/family.hpp),
+[abstract.hpp](../../include/vinecopulib/bicop/abstract.hpp),
+[vinecop/class.hpp](../../include/vinecopulib/vinecop/class.hpp), their `.ipp`
+implementations, and fit controls.
+
+## 3. Parametric pair copulas
+
+- [ ] Implement cardioid, wrapped Cauchy, and von Mises binding families in
+  the existing `.hpp` / inline `.ipp` pattern, sharing the circular primitives
+  (`g`, `G`, `G^{-1}`) that have identical semantics.
+- [ ] Implement quadratic and cubic sections, phase handling, and both axis
+  orders. Support circular-linear use of binding families without duplicating
+  their mathematical implementations.
+- [ ] Implement stable lifted circular CDFs and inverses, retaining the number
+  of completed turns. Audit cancellation and concentration limits, including
+  the von Mises normalizing constant and wrapped Cauchy near-singular limit.
+- [ ] Implement likelihood fitting with circular initialization and periodic
+  phase optimization. The existing tau-based starting values and search
+  bounds must not constrain these fits incorrectly.
+- [ ] Implement or validate derivative support. Support broadcast and
+  per-observation parameter matrices under the existing contract.
+- [ ] Honor observation weights, missing-value handling, parameter validation,
+  seeded simulation, and fit statistics.
+- [ ] Update candidate construction and preselection: produce exactly the two
+  rotations for circular families and bypass the tau-sign and tail
+  (`lt` / `ut`) heuristics for them.
+- [ ] Test normalization, uniform marginals, CDF boundary values, CDF/density
+  derivatives, h/inverse identities, independence limits, flip identities,
+  simulation moments, and recovery of phases near the cut. Include the
+  zero-tau half-turn case as a fit-recovery test.
+
+Main code: [parametric.ipp](../../include/vinecopulib/bicop/implementation/parametric.ipp),
+[tools_select.ipp](../../include/vinecopulib/bicop/implementation/tools_select.ipp),
+new family files, and numerical helpers under `misc/`.
+
+## 4. Nonparametric estimation (parallel track)
+
+The current TLL fit transforms both coordinates with `qnorm`. Its local
+likelihood formulas, bandwidth selection, and influence calculation assume
+that transformed geometry. A circular extension needs new fitting formulas;
+matching the two boundary rows after an ordinary TLL fit is insufficient.
+A circular axis has no boundary, so it needs no transform; the probit
+transform and its Jacobian apply to linear axes only.
+
+- [ ] Prototype periodic smoothing in circular coordinates and probit
+  smoothing in linear coordinates. Compare wrapped Gaussian and von Mises
+  kernels.
+- [ ] Derive the periodic/mixed local-likelihood estimator and its supported
+  polynomial orders. Use a positive periodic kernel estimate as a numerical
+  reference. Specify unsupported method choices rather than silently
+  substituting a different estimator.
+- [ ] Define bandwidth selection for both geometries, including observation
+  weights. Evaluate held-out likelihood, cut sensitivity, and strong or
+  multimodal dependence before choosing defaults.
+- [ ] Give each axis its own knot vector. `InterpolationGrid` takes one
+  vector for both axes and `make_normal_grid` concentrates knots in the
+  tails; a circular axis needs uniform knots on `[0, 1]`.
+- [ ] Represent a circular grid boundary consistently, either with shared
+  endpoint values or an explicit wraparound cell. Keep density nonnegative
+  and enforce uniform marginal integrals with the appropriate grid weights.
+- [ ] Ensure margin normalization preserves periodic endpoint equality.
+  Require both constraints to meet tolerance before accepting the fit.
+- [ ] Adapt interpolation, one- and two-dimensional integration, and direct
+  conditional inversion. Preserve anchored CDF values at `0` and `1`.
+- [ ] Preserve knots, axis geometry, density values, and effective degrees of
+  freedom through `get_parameters`, `set_parameters`, flipping, and JSON.
+  Values alone must not reload onto a different grid.
+- [ ] Derive or validate the influence/effective-degrees-of-freedom calculation
+  before using AIC, BIC, or mBIC penalties. Reusing the Gaussian TLL influence
+  formula for a different smoother needs justification.
+- [ ] Test periodic densities and arbitrary asymmetric/multimodal patterns,
+  h/inverse identities, grid refinement, bandwidth extremes, fit statistics,
+  axis swaps, and compatibility with existing linear TLL reference fits.
+- [ ] Register the estimator in the eligibility tables from stage 2 and add
+  it to the mixed-vine tests of stages 5 and 6 once those have landed.
+
+Main code: [tll.ipp](../../include/vinecopulib/bicop/implementation/tll.ipp),
+[kernel.ipp](../../include/vinecopulib/bicop/implementation/kernel.ipp), and
+[tools_interpolation.ipp](../../include/vinecopulib/misc/implementation/tools_interpolation.ipp).
+
+## 5. Vine models with supplied structures
+
+- [ ] Derive pair geometry from the conditioned variable identities at every
+  tree level, following the existing `var_types` propagation. A circular
+  variable retains its geometry after its conditional probability transform;
+  a circular variable only in the conditioning set does not make two linear
+  conditioned variables circular.
+- [ ] Make `Vinecop::select` (and the threshold and truncation searches) throw
+  on circular input until stage 6 lands. With the default tau criterion a
+  perfectly dependent half-turn pair has weight zero and any positive
+  `threshold` sets it to independence.
+- [ ] Validate supplied pair families and propagate geometry through order
+  changes, edge flips, truncation, and omitted independence edges.
+- [ ] Support sequential refitting (`fit` on a fixed structure) and verify
+  `pdf`, `pdf_full`, `loglik`, `cdf`, `rosenblatt`, `inverse_rosenblatt`,
+  and simulation.
+- [ ] Cover conditional simulation, supported reorientations, and the
+  associated views without losing axis geometry or nonparametric grids.
+- [ ] Verify scores and Hessians for supported parametric models; retain
+  explicit unsupported-operation behavior for nonparametric derivatives.
+- [ ] Test small circular-linear-linear and circular-circular-linear models
+  against an independently assembled pair-density product and numerical
+  marginalization. Include higher-tree circular edges and a larger mixed vine.
+- [ ] Verify joint density equality at each circular boundary, Rosenblatt
+  round-trips, simulated uniform marginals, and serial/threaded consistency.
+
+Main code: [vinecop/class.hpp](../../include/vinecopulib/vinecop/class.hpp),
+[vinecop/tools_select.hpp](../../include/vinecopulib/vinecop/tools_select.hpp),
+their implementations, and structure/view conversion code.
+
+## 6. Automatic family and structure selection
+
+- [ ] Apply compatible candidate sets at every tree level, including the
+  nonparametric estimator when available and both circular-linear argument
+  orders.
+- [ ] Benchmark the existing bounded criteria first: `cxi` (Chatterjee's xi,
+  detects any functional relationship and is nearly cut-invariant) and
+  `hoeffd`, on the zero-tau half-turn case, reflective association, and
+  multimodal patterns. Compare against circular correlation statistics and
+  likelihood gain over independence; the latter is unbounded and costs one
+  full candidate fit per edge per tree, so it is an option, not the baseline.
+- [ ] Choose the default criterion for pairs involving a circular variable
+  and specify weighting, missing observations, small samples, and
+  independence behavior.
+- [ ] Integrate the criterion with existing spanning-tree algorithms and
+  custom criteria. Cache fitted edge candidates if likelihood-based weights
+  are offered.
+- [ ] Audit thresholds, automatic threshold search, truncation selection,
+  and mBICv against the chosen criterion's scale. Remove the stage 5 rejection
+  of circular input.
+- [ ] Test selection on known mixed vines and nonlinear circular associations,
+  including the zero-tau half-turn case. Verify reproducibility and behavior
+  for explicit family restrictions and incompatible candidate sets.
+- [ ] Benchmark selection cost and confirm existing linear defaults retain
+  their current effective candidate sets and numerical behavior.
+
+Main code: [vinecop/tools_select.ipp](../../include/vinecopulib/vinecop/implementation/tools_select.ipp),
+bivariate candidate selection, and both fit-control classes.
+
+## 7. Release checklist
+
+- [ ] All preceding stages have implementation PRs and their acceptance tests.
+- [ ] Extend existing GoogleTest areas where suitable; keep circular cases
+  independent of R parity fixtures that only recognize existing families.
+- [ ] Add numerical reference tests for formulas not supported by those R
+  fixtures. Use `cylcop` comparisons where conventions match, with core
+  correctness tests that do not require that package.
+- [ ] Run clang-format 14 and the required lint/spelling checks, the Debug
+  build and `bin/test_all`, and the precompiled Release build and tests.
+  Verify an installed consumer can include and use the new families.
+- [ ] Benchmark pair fitting/evaluation, grid resolution, and mixed-vine
+  fitting/simulation. Record accuracy and runtime together.
+- [ ] Add Doxygen documentation and compiled examples for circular-circular
+  pairs, circular-linear pairs in both orders, and a mixed parametric/TLL vine.
+- [ ] Document marginal transforms, cuts, phase versus copula rotation,
+  dependence summaries, simplifying-assumption limitations, supported
+  variable types, and nonparametric method choices.
+- [ ] Document new API and JSON fields and coordinate the downstream R/Python
+  work. Consolidate the unreleased `NEWS.md` entries for the release.
+- [ ] Confirm the release delivers mixed-vine selection and nonparametric
+  fits as well as the bivariate parametric families.
+
+## References
+
+These sources motivate the design. Application papers provide examples of
+mixed vines; the mathematical contracts and numerical tests above remain
+required for a general library implementation.
+
+- [Jones, Pewsey, and Kato (2015), *On a class of circulas: copulas for circular
+  distributions*](https://doi.org/10.1007/s10463-014-0493-6): binding-density
+  construction, phase and orientation, CDFs, and circular dependence measures.
+- [Hodel and Fieberg (2022), *Circular-linear copulae for animal movement
+  data*](https://doi.org/10.1111/2041-210X.13821): cylindrical quadratic/cubic
+  sections, reflection constructions, and the accompanying `cylcop` software.
+- [Wang et al. (2021), *Circular-linear-linear probabilistic model based on
+  vine copulas*](https://doi.org/10.1016/j.jweia.2021.104704): combining
+  cylindrical and ordinary pair copulas in a trivariate model.
+- [Nagar et al., *A dependent circular-linear model for multivariate
+  biomechanical data: Ilizarov ring fixator study*](https://arxiv.org/abs/2312.10159):
+  a six-variable application combining all three pair geometries and truncation.
+- [Carnicero, Ausin, and Wiper (2013), *Non-parametric copulas for
+  circular-linear and circular-circular data: an application to wind
+  directions*](https://doi.org/10.1007/s00477-013-0733-y): continuity constraints
+  for circular Bernstein copulas; a comparison for periodic nonparametric fits.
+- [Garcia-Portugues, Crujeiras, and Gonzalez-Manteiga, *Kernel density
+  estimation for directional-linear data*](https://arxiv.org/abs/1210.3214):
+  directional-linear kernel estimation as background for mixed-axis smoothing.
+
+## Decision record
+
+Resolved design choices: decision, rationale, validation evidence, and
+implementing PR. Entries without a PR were settled during planning.
+
+| Decision | Rationale | Evidence / PR |
+| --- | --- | --- |
+| Pair copulas use the binding-density construction for circular-circular pairs and cylindrical sections for circular-linear pairs. | Closed-form or one-dimensional numerics throughout; covers the published mixed-vine applications. | Jones, Pewsey, and Kato; Hodel and Fieberg |
+| Continuous circular and continuous linear variables only; circular-discrete is rejected explicitly. | Mixed circular/discrete needs its own mathematical and API decision. | planning |
+| Marginal transforms, cuts, and angular conventions stay downstream; the library takes `u` in `[0, 1]` with `0` identified with `1`. | Matches the existing copula-scale contract and the `kde1d` exclusion in AGENTS.md. | planning |
+| Geometry is a third `var_types` value (spelling fixed in stage 1). | Reuses propagation, JSON, views, and binding signatures; a parallel attribute would duplicate them. | planning (confirmed by maintainer, September 15, 2026) |
+| Orientation `q` is the copula rotation in `{0, 90}`; phase `mu` is periodic and unbounded. | Symmetric `g` makes 180 and 270 redundant; a periodic phase has no bound to hit. | planning (confirmed by maintainer, September 15, 2026) |
+| `itau` stays unavailable for circular families. | No valid identification result from linear tau. | planning |
+| Stage 4 (nonparametric) is a parallel track; stages 5 and 6 ship with parametric circular families. | Exploratory work must not gate the release. | planning |
+| Stages merge to `main` as approved; the release is cut after stage 7. | Every stage is additive behind the new token; a seven-deep stack under squash-merge is not maintainable. | planning |
+
+Still open: public names and the token spelling, parameter conventions,
+nonparametric fitting formulas, and the default tree criterion for circular
+pairs.
