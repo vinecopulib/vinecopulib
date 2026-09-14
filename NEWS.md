@@ -19,6 +19,11 @@ wrong thing.
   written against earlier releases still compile and silently rebind every later
   argument; see the migration guide (#654)
 
+* Rename `Bicop::as_continuous()` to `with_var_types()`, which takes the types
+  rather than assuming both continuous and so goes in either direction. The old
+  spelling is the default argument: `bc.as_continuous()` becomes
+  `bc.with_var_types()` (#777)
+
 * Remove `FitControlsVinecop::get_truncation_level`,
   `get_select_truncation_level`, `set_truncation_level` and
   `set_select_truncation_level`, deprecated since 0.3.1. Use the `trunc_lvl`

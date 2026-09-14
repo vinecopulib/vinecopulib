@@ -670,7 +670,7 @@ TEST_F(VinecopTest, bicop_view_as_continuous_matches_materialized_copula)
       Bicop materialized = bicop;
       if (flipped)
         materialized.flip();
-      materialized = materialized.as_continuous();
+      materialized = materialized.with_var_types();
       auto view = BicopView(bicop, flipped).as_continuous();
 
       EXPECT_EQ(view.get_var_types(), std::vector<std::string>({ "c", "c" }));

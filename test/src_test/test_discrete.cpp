@@ -41,7 +41,7 @@ TEST(discrete, bicop)
     bc.fit(uu);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
-              bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+              bc.with_var_types().cdf(uu.leftCols(2).topRows(20)));
 
     // c_d
     uu = Eigen::MatrixXd(u.rows(), 4);
@@ -54,7 +54,7 @@ TEST(discrete, bicop)
     bc.fit(uu);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
-              bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+              bc.with_var_types().cdf(uu.leftCols(2).topRows(20)));
 
     // d_d
     uu = u_disc;
@@ -63,7 +63,7 @@ TEST(discrete, bicop)
     bc.fit(uu);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
-              bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+              bc.with_var_types().cdf(uu.leftCols(2).topRows(20)));
     bc.select(uu.topRows(20)); // all families
 
     // tll
@@ -105,7 +105,7 @@ TEST(zero_inflated, bicop)
     bc.fit(uu);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
-              bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+              bc.with_var_types().cdf(uu.leftCols(2).topRows(20)));
     // tll
     // The whole sample, not topRows(20): now that the latent sample
     // reaches the fit, 20 observations no longer identify the density.
@@ -124,7 +124,7 @@ TEST(zero_inflated, bicop)
     bc.fit(uu);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
-              bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+              bc.with_var_types().cdf(uu.leftCols(2).topRows(20)));
     // tll
     // The whole sample, not topRows(20): now that the latent sample
     // reaches the fit, 20 observations no longer identify the density.
@@ -139,7 +139,7 @@ TEST(zero_inflated, bicop)
     bc.fit(uu);
     EXPECT_NEAR(bc.get_parameters()(0), 3, 0.5);
     EXPECT_EQ(bc.cdf(uu.topRows(20)),
-              bc.as_continuous().cdf(uu.leftCols(2).topRows(20)));
+              bc.with_var_types().cdf(uu.leftCols(2).topRows(20)));
     bc.select(uu.topRows(20)); // all families
 
     // tll
@@ -512,6 +512,42 @@ TEST(discrete, kernel_fit_uses_the_latent_sample)
   const double diff =
     (disc.get_parameters() - cont.get_parameters()).array().abs().maxCoeff();
   EXPECT_GT(diff, 1e-6);
+}
+
+TEST(discrete, with_var_types_round_trips_the_variable_types)
+{
+  auto u = Bicop(BicopFamily::clayton, 0, Eigen::VectorXd::Constant(1, 3))
+             .simulate(500, true, { 1 });
+  Eigen::MatrixXd uu(u.rows(), 4);
+  uu.col(0) = (u.col(0).array() * 8).ceil() / 8;
+  uu.col(2) = (u.col(0).array() * 8).floor() / 8;
+  uu.col(1) = (u.col(1).array() * 8).ceil() / 8;
+  uu.col(3) = (u.col(1).array() * 8).floor() / 8;
+
+  auto cont = Bicop();
+  cont.select(u, FitControlsBicop({ BicopFamily::tll }));
+  const std::vector<std::string> dd = { "d", "d" };
+
+  // the declaration is the only difference, so the two are bit-identical
+  auto declared = cont;
+  declared.set_var_types(dd);
+  auto viewed = cont.with_var_types(dd);
+  EXPECT_EQ(viewed.get_var_types(), dd);
+  EXPECT_EQ(viewed.pdf(uu), declared.pdf(uu));
+  EXPECT_EQ(viewed.hfunc1(uu), declared.hfunc1(uu));
+  EXPECT_EQ(viewed.hfunc2(uu), declared.hfunc2(uu));
+
+  // and the source is left alone, which is what makes it a view rather than a
+  // setter
+  EXPECT_EQ(cont.get_var_types(), std::vector<std::string>({ "c", "c" }));
+
+  // the default is the continuous case, so the two directions are inverse
+  EXPECT_EQ(viewed.with_var_types().get_var_types(), cont.get_var_types());
+  EXPECT_EQ(viewed.with_var_types().pdf(u), cont.pdf(u));
+  EXPECT_EQ(declared.with_var_types(dd).get_var_types(), dd);
+
+  EXPECT_ANY_THROW(cont.with_var_types({ "c" }));
+  EXPECT_ANY_THROW(cont.with_var_types({ "c", "x" }));
 }
 
 }
