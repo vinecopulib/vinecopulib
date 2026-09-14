@@ -186,16 +186,6 @@ wrong thing.
 
 ### PERFORMANCE
 
-* `tll` evaluation is faster wherever it touches the interpolation grid's
-  integrals: a mixed-discrete density drops about 60%, a discrete h-function
-  about 40% and `cdf` about 24%, against about 2% more on the continuous
-  h-function and its inverse (#771)
-
-* Speed up `InterpolationGrid`'s margin normalization about fourfold. It
-  integrated each grid line through a function taking `const Eigen::VectorXd&`,
-  so every row and column was materialized into a heap-allocated temporary --
-  180 allocations per grid at the default size (#751)
-
 * Speed up the bivariate evaluation engine and tighten allocation in the
   derivative cascade (#681)
 
@@ -204,7 +194,7 @@ wrong thing.
 * Speed up `tools_stats`: SIMD `qnorm`, the bivariate normal and t kernels,
   pseudo-observations and `BoxCovering` (#690)
 
-* Speed up TLL fitting and evaluation through fused interpolation (#691)
+* Speed up TLL fitting and evaluation through fused interpolation (#691, #751, #771)
 
 * Speed up vine evaluation and structure selection (#692)
 
