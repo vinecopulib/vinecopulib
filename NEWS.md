@@ -186,10 +186,10 @@ wrong thing.
 
 ### PERFORMANCE
 
-* `tll` evaluation shares one set of cumulative grid integrals between the
-  distribution function and the discrete paths: `cdf` drops about 26% and a
-  discrete h-function about 39%, against about 6% more on a `c`/`d` density,
-  which now builds its conditional grid line explicitly (#771)
+* `tll` evaluation is faster wherever it touches the interpolation grid's
+  integrals: a mixed-discrete density drops about 60%, a discrete h-function
+  about 40% and `cdf` about 24%, against about 2% more on the continuous
+  h-function and its inverse (#771)
 
 * Speed up `InterpolationGrid`'s margin normalization about fourfold. It
   integrated each grid line through a function taking `const Eigen::VectorXd&`,
