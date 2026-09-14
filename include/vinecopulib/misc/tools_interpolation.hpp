@@ -7,6 +7,7 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <utility>
 #include <vector>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
@@ -59,8 +60,24 @@ public:
                             size_t cond_var) const;
 
 private:
-  // nonnegative quadrature weights for a sub-interval, and the partial row
-  // integrals; `integrate_2d` and `rect_mass` are both built from these
+  // the grid line at a fixed conditioning coordinate; `cond_knot` evaluates a
+  // knot of it on demand, so no caller has to materialize the line
+  struct CondLine
+  {
+    ptrdiff_t cell;
+    double x2x, xx1, x2x1;
+    size_t cond_var;
+  };
+  CondLine cond_line(double u_cond, size_t cond_var) const;
+  double cond_knot(const CondLine& line, ptrdiff_t j) const;
+
+  // the weights of the two nodes of a cell `[g0, g1]`, integrating the linear
+  // basis over the cell's overlap with `[a, b]`; the quadrature every integral
+  // here is built from
+  static std::pair<double, double> cell_weights(double g0,
+                                                double g1,
+                                                double a,
+                                                double b);
   ptrdiff_t interval_weights(double lo, double hi, Eigen::VectorXd& w) const;
   void row_integrals(double u, Eigen::VectorXd& out) const;
   // normalizes the grid margins; internal only (callers must refresh the
@@ -72,7 +89,6 @@ private:
   ptrdiff_t find_cell(double x) const;
   void update_cell_lookup();
   void update_cached_integrals();
-  double cond_cdf(double u_cond, double u, size_t cond_var) const;
   double cond_quantile(double u_cond,
                        double p,
                        size_t cond_var,
@@ -87,9 +103,7 @@ private:
                                 double y2,
                                 double x,
                                 double y);
-  double int_on_grid(const double& upr,
-                     const Eigen::VectorXd& vals,
-                     const Eigen::VectorXd& grid);
+  double int_on_grid(double upr, const Eigen::VectorXd& vals) const;
 
   Eigen::VectorXd grid_points_;
   Eigen::MatrixXd values_;

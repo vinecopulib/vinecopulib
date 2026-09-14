@@ -355,8 +355,8 @@ AbstractBicop::pdf_d_d(const Eigen::MatrixXd& u,
 
 //! @brief probability of the rectangle spanned by two corners.
 //!
-//! @details The generic route, a difference of `cdf` values. A bound of `0` is
-//! the distribution's own lower limit, so its corners contribute nothing.
+//! @details A bound of `0` is the distribution's own lower limit, so its
+//! corners contribute nothing.
 //!
 //! @param a1,b1 Bounds in the first argument, in either order.
 //! @param a2,b2 Bounds in the second argument, in either order.
@@ -387,8 +387,6 @@ AbstractBicop::rect_prob(double a1,
 
 //! @brief probability that the free argument falls in an interval, given the
 //! other.
-//!
-//! @details The generic route, a difference of h-function values.
 //!
 //! @param u_cond The argument held fixed.
 //! @param lo,hi Bounds in the free argument, in either order.

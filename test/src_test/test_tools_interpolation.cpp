@@ -126,6 +126,68 @@ TEST(tools_interpolation, rect_mass_orients_its_own_bounds)
   EXPECT_DOUBLE_EQ(grid.cond_interval_mass(0.4, 0.3, 0.3, 1), 0.0);
 }
 
+// A narrow interval is built from the overlap's own width, not from a
+// difference of cumulative integrals, so it stays exact whether it sits inside
+// one cell or straddles a grid point -- and splitting it must reproduce it.
+TEST(tools_interpolation, narrow_intervals_are_exact_within_and_across_cells)
+{
+  auto grid = skewed_grid(17); // grid points at k / 16
+  const double knot = 8.0 / 16;
+  for (size_t cond_var : { 1u, 2u }) {
+    for (double w : { 1e-2, 1e-5, 1e-9 }) {
+      for (double lo : { knot + 1e-2, knot - w / 2 }) { // inside, straddling
+        const double m = grid.cond_interval_mass(0.4, lo, lo + w, cond_var);
+        EXPECT_GT(m, 0.0);
+        const double split =
+          grid.cond_interval_mass(0.4, lo, lo + w / 2, cond_var) +
+          grid.cond_interval_mass(0.4, lo + w / 2, lo + w, cond_var);
+        EXPECT_NEAR(m, split, 1e-12 * m)
+          << "cond_var " << cond_var << ", width " << w << ", lo " << lo;
+      }
+    }
+  }
+}
+
+// An interval mass is not a clipped probability: the whole line is exactly one,
+// an empty interval exactly zero, and bounds outside the unit interval clip to
+// it rather than contributing.
+TEST(tools_interpolation, conditional_interval_mass_handles_the_boundary)
+{
+  auto grid = skewed_grid(30);
+  for (size_t cond_var : { 1u, 2u }) {
+    EXPECT_NEAR(grid.cond_interval_mass(0.4, 0.0, 1.0, cond_var), 1.0, 1e-14);
+    EXPECT_DOUBLE_EQ(grid.cond_interval_mass(0.4, 0.3, 0.3, cond_var), 0.0);
+    EXPECT_DOUBLE_EQ(grid.cond_interval_mass(0.4, 1.0, 1.0, cond_var), 0.0);
+    EXPECT_DOUBLE_EQ(grid.cond_interval_mass(0.4, -0.5, 0.25, cond_var),
+                     grid.cond_interval_mass(0.4, 0.0, 0.25, cond_var));
+    EXPECT_DOUBLE_EQ(grid.cond_interval_mass(0.4, 0.75, 1.5, cond_var),
+                     grid.cond_interval_mass(0.4, 0.75, 1.0, cond_var));
+  }
+}
+
+// `integrate_1d` is that mass over `[0, u]`, clipped because it is consumed as
+// a probability, and `inverse_integrate_1d` inverts it.
+TEST(tools_interpolation, conditional_cdf_and_quantile_agree)
+{
+  auto grid = skewed_grid(30);
+  for (size_t cond_var : { 1u, 2u }) {
+    for (double u_cond : { 0.1, 0.5, 0.9 }) {
+      for (double u : { 0.05, 0.25, 0.5, 0.75, 0.95 }) {
+        Eigen::MatrixXd q(1, 2);
+        q << (cond_var == 1 ? u_cond : u), (cond_var == 1 ? u : u_cond);
+        const double p = grid.integrate_1d(q, cond_var)(0);
+        EXPECT_NEAR(p, grid.cond_interval_mass(u_cond, 0.0, u, cond_var), 1e-14)
+          << "cond_var " << cond_var << ", u_cond " << u_cond << ", u " << u;
+
+        Eigen::MatrixXd probe(1, 2);
+        probe << (cond_var == 1 ? u_cond : p), (cond_var == 1 ? p : u_cond);
+        EXPECT_NEAR(grid.inverse_integrate_1d(probe, cond_var)(0), u, 1e-9)
+          << "cond_var " << cond_var << ", u_cond " << u_cond << ", u " << u;
+      }
+    }
+  }
+}
+
 // The exact route is the value the four-corner difference defines, so on a
 // rectangle wide enough for that difference to be accurate the two agree.
 TEST(tools_interpolation, rect_mass_agrees_with_a_cdf_difference)

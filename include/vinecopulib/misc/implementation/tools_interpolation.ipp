@@ -293,61 +293,45 @@ InterpolationGrid::interpolate(const tools_eigen::ConstMatRef& x)
   return tools_eigen::binaryExpr_or_nan(x, f);
 }
 
-//! conditional cdf along one axis, fused: one cell search for the
-//! conditioning coordinate, the interpolated knot values on the fly, and a
-//! single pass accumulating both the partial and the full integral (no
-//! allocation per query).
-//!
-//! @param u_cond The conditioning coordinate.
-//! @param u The coordinate up to which the density is integrated.
-//! @param cond_var Either 1 or 2; the axis considered fixed.
-inline double
-InterpolationGrid::cond_cdf(double u_cond, double u, size_t cond_var) const
+//! the bracketing cell and interpolation distances of the grid line at
+//! `u_cond`, for `cond_knot()` to evaluate a knot from
+inline InterpolationGrid::CondLine
+InterpolationGrid::cond_line(double u_cond, size_t cond_var) const
 {
-  const ptrdiff_t m = grid_points_.size();
   const ptrdiff_t i = find_cell(u_cond);
-  const double x1 = grid_points_(i);
-  const double x2 = grid_points_(i + 1);
-  const double x2x = x2 - u_cond;
-  const double xx1 = u_cond - x1;
-  const double x2x1 = x2 - x1;
-
-  // interpolated grid-line value at knot j; bilinear interpolation of a
-  // nonnegative grid is nonnegative, so the guard only absorbs rounding
-  auto knot = [&](ptrdiff_t j) {
-    double v;
-    if (cond_var == 1) {
-      v = (values_(i, j) * x2x + values_(i + 1, j) * xx1) / x2x1;
-    } else {
-      v = (values_(j, i) * x2x + values_(j, i + 1) * xx1) / x2x1;
-    }
-    return std::max(v, 0.0);
-  };
-
-  double tmpint = 0.0, int1 = 0.0;
-  double v_k = knot(0);
-  const bool do_partial = (u > grid_points_(0));
-  for (ptrdiff_t k = 0; k < m - 1; ++k) {
-    const double v_k1 = knot(k + 1);
-    const double g_k = grid_points_(k);
-    const double g_k1 = grid_points_(k + 1);
-    int1 += weights_(k) * v_k;
-    if (do_partial && !(u < g_k)) {
-      if (u < g_k1) {
-        tmpint +=
-          (2 * v_k + (v_k1 - v_k) * (u - g_k) / (g_k1 - g_k)) * (u - g_k) / 2.0;
-      } else {
-        tmpint += (v_k1 + v_k) * (g_k1 - g_k) / 2.0;
-      }
-    }
-    v_k = v_k1;
-  }
-  int1 += weights_(m - 1) * v_k;
-
-  return std::min(std::max(tmpint / std::max(int1, 1e-20), 1e-10), 1 - 1e-10);
+  return { i,
+           grid_points_(i + 1) - u_cond,
+           u_cond - grid_points_(i),
+           grid_points_(i + 1) - grid_points_(i),
+           cond_var };
 }
 
-//! inverts `cond_cdf` in its second argument: the conditional cdf is
+//! knot `j` of the line; the floor only absorbs rounding, as interpolating a
+//! nonnegative grid is nonnegative
+inline double
+InterpolationGrid::cond_knot(const CondLine& line, ptrdiff_t j) const
+{
+  const ptrdiff_t i = line.cell;
+  const double v =
+    (line.cond_var == 1)
+      ? (values_(i, j) * line.x2x + values_(i + 1, j) * line.xx1) / line.x2x1
+      : (values_(j, i) * line.x2x + values_(j, i + 1) * line.xx1) / line.x2x1;
+  return std::max(v, 0.0);
+}
+
+//! the weights of the nodes at `g0` and `g1` integrating the linear basis over
+//! the cell's overlap with `[a, b]`; zero for a cell outside it. Callers take
+//! wholly covered cells themselves, where the trapezoid needs no division.
+inline std::pair<double, double>
+InterpolationGrid::cell_weights(double g0, double g1, double a, double b)
+{
+  const double off = std::max(a - g0, 0.0);
+  const double len = std::max(std::min(b, g1) - std::max(a, g0), 0.0);
+  const double upper = 0.5 * len * (2.0 * off + len) / (g1 - g0);
+  return { len - upper, upper };
+}
+
+//! inverts `integrate_1d` in its second argument: the conditional cdf is
 //! piecewise quadratic and nondecreasing, so the quantile has a closed form
 //! within the bracketing cell. Where the density vanishes the cdf is flat and
 //! the inverse is not unique; the smallest quantile is returned.
@@ -358,20 +342,12 @@ InterpolationGrid::cond_quantile(double u_cond,
                                  Eigen::VectorXd& knots) const
 {
   const ptrdiff_t m = grid_points_.size();
-  const ptrdiff_t i = find_cell(u_cond);
-  const double x1 = grid_points_(i);
-  const double x2 = grid_points_(i + 1);
-  const double x2x = x2 - u_cond;
-  const double xx1 = u_cond - x1;
-  const double x2x1 = x2 - x1;
 
   // the grid line is walked twice below, so interpolate it once into the
   // caller's buffer
+  const CondLine line = cond_line(u_cond, cond_var);
   for (ptrdiff_t j = 0; j < m; ++j) {
-    const double v = (cond_var == 1)
-                       ? (values_(i, j) * x2x + values_(i + 1, j) * xx1) / x2x1
-                       : (values_(j, i) * x2x + values_(j, i + 1) * xx1) / x2x1;
-    knots(j) = std::max(v, 0.0);
+    knots(j) = cond_knot(line, j);
   }
 
   // total mass (normalization of the conditional cdf)
@@ -424,7 +400,10 @@ InterpolationGrid::integrate_1d(const tools_eigen::ConstMatRef& u,
                                 size_t cond_var)
 {
   auto f = [this, cond_var](double u1, double u2) {
-    return (cond_var == 1) ? cond_cdf(u1, u2, 1) : cond_cdf(u2, u1, 2);
+    const double p = (cond_var == 1) ? cond_interval_mass(u1, 0.0, u2, 1)
+                                     : cond_interval_mass(u2, 0.0, u1, 2);
+    // clipped here rather than in `cond_interval_mass`, which is a mass
+    return std::min(std::max(p, 1e-10), 1 - 1e-10);
   };
 
   return tools_eigen::binaryExpr_or_nan(u, f);
@@ -460,7 +439,7 @@ InterpolationGrid::integrate_2d(const tools_eigen::ConstMatRef& u)
 
   auto f = [this, &tmpvals2](double u1, double u2) {
     row_integrals(u2, tmpvals2);
-    double tmpint = int_on_grid(u1, tmpvals2, grid_points_);
+    double tmpint = int_on_grid(u1, tmpvals2);
     double tmpint1 = weights_.dot(tmpvals2);
     return std::min(std::max(tmpint * u2 / tmpint1, 1e-10), 1 - 1e-10);
   };
@@ -469,9 +448,6 @@ InterpolationGrid::integrate_2d(const tools_eigen::ConstMatRef& u)
 }
 
 //! @brief Nonnegative quadrature weights for the integral over `[lo, hi]`.
-//!
-//! @details Every weight is nonnegative, because the hat functions are, so a
-//! mass built from them carries no cancellation however narrow the interval.
 //!
 //! @param lo,hi Interval bounds, clamped to `[0, 1]`; `hi <= lo` gives zero.
 //! @param w Filled with the weights of the nodes the interval covers.
@@ -490,25 +466,15 @@ InterpolationGrid::interval_weights(double lo,
   w.setZero(kb - ka + 2);
 
   for (ptrdiff_t k = ka; k <= kb; ++k) {
-    // offset and width of the cell's sub-interval; a width rather than an
-    // upper end, so a narrow interval is not a difference of two order-one
-    // numbers
-    const double h = grid_points_(k + 1) - grid_points_(k);
-    const double s0 = std::max(a - grid_points_(k), 0.0) / h;
-    const double d =
-      (std::min(b, grid_points_(k + 1)) - std::max(a, grid_points_(k))) / h;
-    const double q = 0.5 * d * (2.0 * s0 + d);
-    w(k - ka) += h * (d - q);
-    w(k - ka + 1) += h * q;
+    const auto [w0, w1] =
+      cell_weights(grid_points_(k), grid_points_(k + 1), a, b);
+    w(k - ka) += w0;
+    w(k - ka + 1) += w1;
   }
   return ka;
 }
 
 //! @brief Partial integrals of every grid line over `[0, u]`.
-//!
-//! @details Reads the cached cumulative integrals and adds the one partial
-//! cell, so a query costs a pass over the grid lines rather than a sweep along
-//! each.
 //!
 //! @param u Upper limit, clamped to `[0, 1]`.
 //! @param out Filled with one integral per grid line.
@@ -531,10 +497,8 @@ InterpolationGrid::row_integrals(double u, Eigen::VectorXd& out) const
 
 //! @brief Probability of the rectangle `(a1, b1] x (a2, b2]`.
 //!
-//! @details The value a difference of four `integrate_2d()` values defines,
-//! arranged so that almost none of it cancels: differencing amplifies an
-//! absolute error by `4 / (w1 w2)` in the rectangle's widths, this route by
-//! `1 / w2` alone.
+//! @details Not clipped, unlike `integrate_2d()`: an empty rectangle is
+//! exactly `0`.
 //!
 //! @param a1,b1 Bounds in the first argument, in either order.
 //! @param a2,b2 Bounds in the second argument, in either order.
@@ -581,9 +545,8 @@ InterpolationGrid::rect_mass(double a1, double b1, double a2, double b2) const
 //! @brief Probability that the free coordinate falls in `(lo, hi]`, given the
 //! other.
 //!
-//! @details The value a difference of two `integrate_1d()` values defines. A
-//! conditional distribution function is the interpolated grid line over its own
-//! total, so this is a ratio of nonnegative sums and does not cancel at all.
+//! @details Not clipped, unlike `integrate_1d()`: an empty interval is exactly
+//! `0` and the whole line exactly `1`, so the masses of a partition sum to one.
 //!
 //! @param u_cond The coordinate held fixed.
 //! @param lo,hi Bounds in the free coordinate, in either order.
@@ -595,62 +558,59 @@ InterpolationGrid::cond_interval_mass(double u_cond,
                                       double hi,
                                       size_t cond_var) const
 {
-  const ptrdiff_t i = find_cell(u_cond);
-  const double s =
-    (u_cond - grid_points_(i)) / (grid_points_(i + 1) - grid_points_(i));
+  const ptrdiff_t m = grid_points_.size();
+  const double a = std::min(std::max(std::min(lo, hi), 0.0), 1.0);
+  const double b = std::min(std::max(std::max(lo, hi), a), 1.0);
 
-  // the grid line at the conditioning coordinate; interpolating a nonnegative
-  // grid is nonnegative, so the floor only absorbs rounding
-  Eigen::VectorXd line;
-  if (cond_var == 1) {
-    line = (values_.row(i) * (1 - s) + values_.row(i + 1) * s)
-             .cwiseMax(0.0)
-             .transpose();
-  } else {
-    line = (values_.col(i) * (1 - s) + values_.col(i + 1) * s).cwiseMax(0.0);
+  const CondLine line = cond_line(u_cond, cond_var);
+  double mass = 0.0, total = 0.0;
+  double v_k = cond_knot(line, 0);
+  double g_k = grid_points_(0);
+  for (ptrdiff_t k = 0; k < m - 1; ++k) {
+    const double v_k1 = cond_knot(line, k + 1);
+    const double g_k1 = grid_points_(k + 1);
+    total += weights_(k) * v_k;
+    if (g_k < b && g_k1 > a) {
+      if (a <= g_k && b >= g_k1) {
+        mass += 0.5 * (g_k1 - g_k) * (v_k + v_k1);
+      } else {
+        const auto [w0, w1] = cell_weights(g_k, g_k1, a, b);
+        mass += w0 * v_k + w1 * v_k1;
+      }
+    }
+    v_k = v_k1;
+    g_k = g_k1;
   }
+  total += weights_(m - 1) * v_k;
 
-  Eigen::VectorXd w;
-  const ptrdiff_t j0 = interval_weights(std::min(lo, hi), std::max(lo, hi), w);
-  return w.dot(line.segment(j0, w.size())) /
-         std::max(weights_.dot(line), 1e-20);
+  return mass / std::max(total, 1e-20);
 }
 
 // ---------------- Utility functions for integration ----------------
 
-//! Integrate using a trapezoid rule
+//! @brief Integral of the piecewise linear function through
+//! `(grid_points_, vals)` over `[0, upr]`.
 //!
-//! @param upr Upper limit of integration (lower is 0).
-//! @param vals Vector of values to be interpolated and integrated.
-//! @param grid Vector of grid points on which vals has been computed.
-//!
-//! @return integral of a piecewise linear function defined by (grid_i, vals_i).
+//! @param upr Upper limit, clamped to `[0, 1]`.
+//! @param vals One value per grid point.
 inline double
-InterpolationGrid::int_on_grid(const double& upr,
-                               const Eigen::VectorXd& vals,
-                               const Eigen::VectorXd& grid)
+InterpolationGrid::int_on_grid(double upr, const Eigen::VectorXd& vals) const
 {
-  double tmpint = 0.0;
-
-  if (upr > grid(0)) {
-    // go up the grid and integrate
-    for (ptrdiff_t k = 0; k < (grid.size() - 1); ++k) {
-      // stop loop if fully integrated
-      if (upr < grid(k))
-        break;
-
-      // don't integrate over full cell if upr is in interior
-      if (upr < grid(k + 1)) {
-        tmpint += (2 * vals(k) + (vals(k + 1) - vals(k)) * (upr - grid(k)) /
-                                   (grid(k + 1) - grid(k))) *
-                  (upr - grid(k)) / 2.0;
-      } else {
-        tmpint += (vals(k + 1) + vals(k)) * (grid(k + 1) - grid(k)) / 2.0;
-      }
+  const double b = std::min(std::max(upr, 0.0), 1.0);
+  double total = 0.0;
+  double g_k = grid_points_(0);
+  for (ptrdiff_t k = 0; g_k < b; ++k) {
+    const double g_k1 = grid_points_(k + 1);
+    if (b < g_k1) {
+      const auto [w0, w1] = cell_weights(g_k, g_k1, 0.0, b);
+      return total + w0 * vals(k) + w1 * vals(k + 1);
     }
+    // a whole cell, where the trapezoid factors a multiply cheaper than the
+    // two weights `cell_weights()` returns
+    total += (vals(k + 1) + vals(k)) * (g_k1 - g_k) / 2.0;
+    g_k = g_k1;
   }
-
-  return tmpint;
+  return total;
 }
 }
 }
