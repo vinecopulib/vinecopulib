@@ -84,7 +84,6 @@ private:
   // cached integrals afterwards, as the ctor and set_values do)
   void normalize_margins(int max_iter);
   void update_weights();
-  Eigen::Matrix<ptrdiff_t, 1, 2> get_indices(double x0, double x1);
   ptrdiff_t binary_search(double x);
   ptrdiff_t find_cell(double x) const;
   void update_cell_lookup();
@@ -93,16 +92,6 @@ private:
                        double p,
                        size_t cond_var,
                        Eigen::VectorXd& knots) const;
-  double bilinear_interpolation(double z11,
-                                double z12,
-                                double z21,
-                                double z22,
-                                double x1,
-                                double x2,
-                                double y1,
-                                double y2,
-                                double x,
-                                double y);
   double int_on_grid(double upr, const Eigen::VectorXd& vals) const;
 
   Eigen::VectorXd grid_points_;

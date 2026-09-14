@@ -223,71 +223,24 @@ InterpolationGrid::binary_search(double x)
   return low;
 }
 
-inline Eigen::Matrix<ptrdiff_t, 1, 2>
-InterpolationGrid::get_indices(double x0, double x1)
-{
-  Eigen::Matrix<ptrdiff_t, 1, 2> out;
-  out(0) = this->find_cell(x0);
-  out(1) = this->find_cell(x1);
-  return out;
-}
-
-//! Interpolate linearly in two dimensions
-//!
-//! @param z11 Value corresponding to (x1, y1)
-//! @param z12 Value corresponding to (x1, y2)
-//! @param z21 Value corresponding to (x2, y1)
-//! @param z22 Value corresponding to (x2, y2)
-//! @param x1 First cell value for the first dimension
-//! @param x2 Second cell value for the first dimension
-//! @param y1 First cell value for the second dimension
-//! @param y2 Second cell value for the second dimension
-//! @param x Evaluation point for the first dimension
-//! @param y Evaluation point for the second dimension
-inline double
-InterpolationGrid::bilinear_interpolation(double z11,
-                                          double z12,
-                                          double z21,
-                                          double z22,
-                                          double x1,
-                                          double x2,
-                                          double y1,
-                                          double y2,
-                                          double x,
-                                          double y)
-{
-  double x2x1, y2y1, x2x, y2y, yy1, xx1;
-  x2x1 = x2 - x1;
-  y2y1 = y2 - y1;
-  x2x = x2 - x;
-  y2y = y2 - y;
-  yy1 = y - y1;
-  xx1 = x - x1;
-  return (z11 * x2x * y2y + z21 * xx1 * y2y + z12 * x2x * yy1 +
-          z22 * xx1 * yy1) /
-         (x2x1 * y2y1);
-}
-
-//! Interpolation in two dimensions
+//! @brief Bilinear interpolation in two dimensions.
 //!
 //! @param x Mx2 matrix of evaluation points.
 //! @return a vector of resulting interpolated values
 inline Eigen::VectorXd
 InterpolationGrid::interpolate(const tools_eigen::ConstMatRef& x)
 {
-
-  auto f = [this](double x0, double x1) {
-    auto indices = this->get_indices(x0, x1);
-    return bilinear_interpolation(this->values_(indices(0), indices(1)),
-                                  this->values_(indices(0), indices(1) + 1),
-                                  this->values_(indices(0) + 1, indices(1)),
-                                  this->values_(indices(0) + 1, indices(1) + 1),
-                                  this->grid_points_(indices(0)),
-                                  this->grid_points_(indices(0) + 1),
-                                  this->grid_points_(indices(1)),
-                                  this->grid_points_(indices(1) + 1),
-                                  x0,
-                                  x1);
+  auto f = [this](double u1, double u2) {
+    const ptrdiff_t i = find_cell(u1);
+    const ptrdiff_t j = find_cell(u2);
+    const double x2x = grid_points_(i + 1) - u1;
+    const double xx1 = u1 - grid_points_(i);
+    const double y2y = grid_points_(j + 1) - u2;
+    const double yy1 = u2 - grid_points_(j);
+    return (values_(i, j) * x2x * y2y + values_(i + 1, j) * xx1 * y2y +
+            values_(i, j + 1) * x2x * yy1 + values_(i + 1, j + 1) * xx1 * yy1) /
+           ((grid_points_(i + 1) - grid_points_(i)) *
+            (grid_points_(j + 1) - grid_points_(j)));
   };
 
   return tools_eigen::binaryExpr_or_nan(x, f);
