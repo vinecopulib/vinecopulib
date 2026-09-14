@@ -2891,4 +2891,27 @@ TEST_F(VinecopTest, tll_selection_is_reproducible)
   }
 }
 
+TEST_F(VinecopTest, density_does_not_depend_on_batching)
+{
+  // Past a thousand rows Eigen reaches its vectorized logarithm, which rounds
+  // differently from the scalar one -- so a density accumulated in log space
+  // would depend on how many rows a caller passed and, through the batches, on
+  // `num_threads`. Both must be bit-identical, which is what a product of edge
+  // densities was for free.
+  auto big = tools_stats::simulate_uniform(4000, 7, false, { 5 });
+  FitControlsVinecop controls(bicop_families::itau, "itau");
+  Vinecop fit(big, RVineStructure(), {}, controls);
+
+  const Eigen::VectorXd serial = fit.logpdf(big);
+  for (size_t threads : { size_t(2), size_t(4) }) {
+    EXPECT_EQ(fit.logpdf(big, threads), serial) << "threads: " << threads;
+    EXPECT_EQ(fit.pdf(big, threads), fit.pdf(big)) << "threads: " << threads;
+  }
+
+  // And on the number of rows, which is the same freedom seen from outside.
+  const Eigen::MatrixXd head = big.topRows(1500);
+  EXPECT_EQ(fit.logpdf(head), serial.head(1500));
+  EXPECT_EQ(fit.pdf(head), fit.pdf(big).head(1500));
+}
+
 }
