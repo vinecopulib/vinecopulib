@@ -10,8 +10,8 @@ needed.
 - [ ] Do you construct `FitControlsBicop` or `FitControlsVinecop` with
       **positional** arguments? → [Constructor arguments](#migrate-ctor).
       **This one compiles silently and does the wrong thing.**
-- [ ] Do you call `hessian_avg`, `select_all`, `select_families`, or any
-      `*_truncation_level` setter or getter? →
+- [ ] Do you call `as_continuous`, `hessian_avg`, `select_all`,
+      `select_families`, or any `*_truncation_level` setter or getter? →
       [Renamed and removed API](#migrate-removed).
 - [ ] Do you include `misc/tools_bobyqa.hpp` or call
       `tools_serialization::triangular_array_to_json`? →
@@ -64,6 +64,7 @@ Note also that `selection_criterion` **defaults to `"aic"`**, not `"bic"`; the
 
 | removed | replacement |
 | --- | --- |
+| `Bicop::as_continuous()` | `Bicop::with_var_types()` |
 | `Vinecop::hessian_avg` | `Vinecop::hessian` |
 | `Vinecop::hessian` (per-observation) | `Vinecop::hessian_full` |
 | `Vinecop::select_all` | `Vinecop::select` |
@@ -73,6 +74,11 @@ Note also that `selection_criterion` **defaults to `"aic"`**, not `"bic"`; the
 | `tools_serialization::triangular_array_to_json` | `TriangularArray::to_json()` |
 | `tools_serialization::json_to_triangular_array` | the `TriangularArray` JSON constructor |
 | `misc/tools_bobyqa.hpp` | none; the optimizer is internal |
+
+`with_var_types()` takes the variable types rather than assuming both
+continuous, so it replaces `as_continuous()` and goes in either direction. The
+old spelling is its default argument: `bc.as_continuous()` becomes
+`bc.with_var_types()`.
 
 The `*_truncation_level` members were declared but never defined, so a call was
 already a link error rather than a deprecation warning.
