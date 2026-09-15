@@ -7,6 +7,7 @@
 #include "include/kernel_test.hpp"
 #include "include/r_parity.hpp"
 #include "include/test_utils.hpp"
+#include <limits>
 
 namespace test_bicop_kernel {
 using namespace vinecopulib;
@@ -268,6 +269,122 @@ TEST(test_bicop_kernel_margins, hfunc1_is_the_conditional_cdf_of_the_pdf)
           << "rho = " << rho << ", u1 = " << u1 << ", knot " << k;
       }
     }
+  }
+}
+
+namespace {
+
+// The probability of a rectangle, from `(grid_points, values)` alone: the
+// four-corner definition `C(u1, u2) = M(u1, u2) * u2 / M(1, u2)` for the
+// interpolant's mass `M`, evaluated in `long double`.
+//
+// Differencing four corners of an order-one function costs an absolute `eps`
+// whatever the summation accuracy, so a `double` evaluation of this cannot
+// serve as truth for a route that avoids that difference -- it would carry the
+// very error being measured, and correlate with the route it is meant to judge.
+// The caller therefore requires a `long double` wider than `double`, which
+// x86-64 has (64-bit mantissa) and arm64 and MSVC do not.
+long double
+rect_prob_reference(const Eigen::VectorXd& g,
+                    const Eigen::MatrixXd& v,
+                    double a1,
+                    double b1,
+                    double a2,
+                    double b2)
+{
+  using ld = long double;
+  const int m = static_cast<int>(g.size());
+  auto mass = [&](ld x, ld y) {
+    ld total = 0.0L;
+    for (int i = 0; i + 1 < m && x > static_cast<ld>(g(i)); ++i) {
+      const ld hx = static_cast<ld>(g(i + 1)) - static_cast<ld>(g(i));
+      const ld sx = (std::min<ld>(x, g(i + 1)) - g(i)) / hx;
+      for (int j = 0; j + 1 < m && y > static_cast<ld>(g(j)); ++j) {
+        const ld hy = static_cast<ld>(g(j + 1)) - static_cast<ld>(g(j));
+        const ld sy = (std::min<ld>(y, g(j + 1)) - g(j)) / hy;
+        total += hx * hy *
+                 ((sx - sx * sx / 2) * (sy - sy * sy / 2) * v(i, j) +
+                  (sx * sx / 2) * (sy - sy * sy / 2) * v(i + 1, j) +
+                  (sx - sx * sx / 2) * (sy * sy / 2) * v(i, j + 1) +
+                  (sx * sx / 2) * (sy * sy / 2) * v(i + 1, j + 1));
+      }
+    }
+    return total;
+  };
+  auto cdf = [&](ld x, ld y) {
+    return (x <= 0.0L || y <= 0.0L) ? 0.0L : mass(x, y) * y / mass(1.0L, y);
+  };
+  return (cdf(b1, b2) + cdf(a1, a2)) - (cdf(a1, b2) + cdf(b1, a2));
+}
+
+} // namespace
+
+// A mixed-discrete density is a rectangle probability divided by the atom's
+// area, so it amplifies any absolute error in the corners by the reciprocal of
+// that area. For a kernel pair the probability is a sum of nonnegative hat
+// weights against a nonnegative grid, which costs one power of the atom width
+// instead of two -- and the density is what the fit and every vine evaluation
+// consume, so the difference is not academic.
+TEST(test_bicop_kernel_accuracy, discrete_density_beats_a_cdf_difference)
+{
+  if (std::numeric_limits<long double>::digits <=
+      std::numeric_limits<double>::digits) {
+    GTEST_SKIP() << "needs a long double wider than double for the reference";
+  }
+
+  const Bicop tll = fit_tll(0.7, 1000);
+  const Eigen::MatrixXd v = tll.get_parameters();
+  const Eigen::VectorXd g = tll_grid_points(static_cast<int>(v.rows()));
+
+  Bicop dd = tll;
+  dd.set_var_types({ "d", "d" });
+
+  // Dyadic atoms, so every bound is exactly representable and the reference
+  // sees the same rectangle the library does. Widths start at 1/64: at 1/8 both
+  // routes sit on the rounding floor of the corners themselves and the ratio
+  // between them is noise, so there is nothing there to assert.
+  for (int k : { 64, 512, 4096 }) {
+    const double w = 1.0 / k;
+    const int step = std::max(1, k / 12);
+    double worst_exact = 0.0;
+    double worst_corners = 0.0;
+    for (int i = step; i < k; i += step) {
+      for (int j = step; j < k; j += step) {
+        const double b1 = i * w, a1 = b1 - w, b2 = j * w, a2 = b2 - w;
+        // away from the boundary, where the atom stops being the small quantity
+        if (a1 < 0.1 || b1 > 0.9 || a2 < 0.1 || b2 > 0.9) {
+          continue;
+        }
+        // the density is the absolute value of the rectangle probability, so
+        // that is what both routes are measured against
+        const long double truth =
+          std::abs(rect_prob_reference(g, v, a1, b1, a2, b2));
+        ASSERT_GT(truth, 0.0L);
+
+        Eigen::MatrixXd atom(1, 4);
+        atom << b1, b2, a1, a2;
+        const double exact = dd.pdf(atom)(0) * w * w;
+
+        Eigen::MatrixXd corners(4, 2);
+        corners << b1, b2, a1, b2, b1, a2, a1, a2;
+        const Eigen::VectorXd c = tll.cdf(corners);
+        const double differenced = std::abs((c(0) + c(3)) - (c(1) + c(2)));
+
+        worst_exact = std::max(
+          worst_exact, std::abs(static_cast<double>((exact - truth) / truth)));
+        worst_corners = std::max(
+          worst_corners,
+          std::abs(static_cast<double>((differenced - truth) / truth)));
+      }
+    }
+    // one power of the atom width rather than two. The margin is an order of
+    // magnitude and more on every width tested, but the fitted grid differs
+    // between platforms, so the assertion is deliberately not on the ratio's
+    // size
+    EXPECT_GT(worst_corners, 3.0 * worst_exact)
+      << "atom width 1/" << k << ": exact " << worst_exact << ", four-corner "
+      << worst_corners;
+    EXPECT_LT(worst_exact, 1e-9) << "atom width 1/" << k << ": " << worst_exact;
   }
 }
 

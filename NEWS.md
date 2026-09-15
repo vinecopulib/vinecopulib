@@ -64,6 +64,9 @@ wrong thing.
 
 ### BEHAVIOR CHANGES
 
+* Every discrete `tll` evaluation moves, by up to `1e-9` on the density and
+  `9e-10` on the log-likelihood; parametric families are bit-identical (#771)
+
 * `Vinecop::pdf()` is the exponential of a log-space sum rather than a running
   product of edge densities, so its values move at the `1e-15` level (observed
   maximum `1.4e-15` relative across the parity sweep). Downstream bit-for-bit
@@ -116,6 +119,12 @@ wrong thing.
   differ for the same model. Densities and log-likelihoods do not (#702)
 
 ### NEW FEATURES
+
+* Evaluate mixed-discrete densities of `tll` pair copulas as exact rectangle
+  probabilities on the interpolation grid rather than as differences of four
+  `cdf` values, which costs one power of the atom width instead of two: the
+  worst relative error at the widths inner vine trees reach drops from `3e-8`
+  to `4e-11` (#771)
 
 * Add `Vinecop::logpdf()`, the per-observation log-density, alongside a `logpdf`
   field on the `pdf_full()` result. A vine density is a product of one factor
@@ -177,11 +186,6 @@ wrong thing.
 
 ### PERFORMANCE
 
-* Speed up `InterpolationGrid`'s margin normalization about fourfold. It
-  integrated each grid line through a function taking `const Eigen::VectorXd&`,
-  so every row and column was materialized into a heap-allocated temporary --
-  180 allocations per grid at the default size (#751)
-
 * Speed up the bivariate evaluation engine and tighten allocation in the
   derivative cascade (#681)
 
@@ -190,7 +194,7 @@ wrong thing.
 * Speed up `tools_stats`: SIMD `qnorm`, the bivariate normal and t kernels,
   pseudo-observations and `BoxCovering` (#690)
 
-* Speed up TLL fitting and evaluation through fused interpolation (#691)
+* Speed up TLL fitting and evaluation through fused interpolation (#691, #751, #771)
 
 * Speed up vine evaluation and structure selection (#692)
 
