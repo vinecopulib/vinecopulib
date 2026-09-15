@@ -190,6 +190,31 @@ TEST(vinecop_sanity_checks, fit_controls_config_works)
   EXPECT_EQ(controls.get_conditioning_set(), controls2.get_conditioning_set());
 }
 
+TEST(vinecop_sanity_checks, seeds_report_what_was_set)
+{
+  // An empty `seeds` means "seed the RNG non-reproducibly", and the getter has
+  // to keep saying so: it is the only way a caller can tell whether seeds were
+  // chosen. The RNG is still seeded, just not from anything reported back.
+  FitControlsVinecop unseeded;
+  EXPECT_TRUE(unseeded.get_seeds().empty());
+
+  FitControlsVinecop other;
+  auto rng1 = unseeded.get_rng();
+  auto rng2 = other.get_rng();
+  EXPECT_NE(rng1(), rng2());
+
+  std::vector<int> seeds = { 1, 2, 3, 4, 5 };
+  FitControlsVinecop seeded;
+  seeded.set_seeds(seeds);
+  EXPECT_EQ(seeded.get_seeds(), seeds);
+
+  FitControlsVinecop same;
+  same.set_seeds(seeds);
+  auto a = seeded.get_rng();
+  auto b = same.get_rng();
+  EXPECT_EQ(a(), b());
+}
+
 TEST(vinecop_sanity_checks, controls_check)
 {
   auto controls = FitControlsVinecop();
