@@ -75,7 +75,8 @@ wrong thing.
 * `Vinecop::pdf()` is the exponential of a log-space sum rather than a running
   product of edge densities, so its values move at the `1e-15` level (observed
   maximum `1.4e-15` relative across the parity sweep). Downstream bit-for-bit
-  comparisons against this library need re-baselining; see BUG FIXES (#770)
+  comparisons against this library need re-baselining; see BUG FIXES (#770,
+  #779)
 
 * `to_pseudo_obs(..., "random")` returns different values for a given seed, and
   every discrete `tll` fit moves with it, because the jitter it applies goes
@@ -240,6 +241,13 @@ wrong thing.
   `scores_full()` differenced two densities floored at `1e-20`, so on such a row
   both legs were equal and the score came out `0` rather than wrong-and-visible;
   it now differences the log-densities directly (#770)
+
+* `Vinecop::pdf()` and `logpdf()` do not depend on how many rows they are
+  handed, nor on `num_threads`. Past a thousand rows Eigen reaches its
+  vectorized logarithm, which rounds differently from the scalar one, so the
+  log-space accumulator above had made a batch's own length visible in its
+  result; the logarithm and the final exponential are now taken elementwise.
+  Measured `2-3%` faster at `d = 5`, `10` and `25` besides (#779)
 
 * `Bicop::parameters_to_tau()`, `parameters_to_taildep()` and
   `parameters_to_beta()` check the shape of their argument, which used to go

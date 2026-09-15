@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <cmath>
 #include <utility>
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
@@ -1342,8 +1343,14 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
         };
 
         Eigen::VectorXd edge_pdf = ec_pdf();
+        // `unaryExpr`, not `array().log()`: Eigen's vectorized logarithm and
+        // its scalar one round differently, and which elements reach which
+        // depends on the length of the vector -- so the density would depend
+        // on how many rows a caller passed and, through the batches below, on
+        // `num_threads`. Multiplication had no such freedom, so this is the
+        // one place accumulating in log space could cost determinism.
         result.logpdf.segment(b.begin, b.size) +=
-          edge_pdf.array().log().matrix();
+          edge_pdf.unaryExpr([](double p) { return std::log(p); });
 
         // h-functions are only evaluated if needed in next step
         if (rvine_structure_.needed_hfunc1(tree, edge)) {
@@ -1391,7 +1398,10 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
     pool.map(do_batch, tools_batch::create_batches(u.rows(), num_threads));
     pool.join();
   }
-  result.pdf = result.logpdf.array().exp();
+  // Scalar for the same reason as the logarithm above: this one runs over
+  // the whole sample rather than over a batch, so it would make the density
+  // depend on the number of rows even on one thread.
+  result.pdf = result.logpdf.unaryExpr([](double l) { return std::exp(l); });
 
   return result;
 }
