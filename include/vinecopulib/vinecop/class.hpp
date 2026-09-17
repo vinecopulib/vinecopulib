@@ -360,6 +360,7 @@ public:
                              const size_t num_threads = 1);
 
 private:
+  //! @brief A relabeled structure and where each pair copula moved to.
   struct ReorientationMap
   {
     RVineStructure structure;
@@ -367,6 +368,8 @@ private:
     bool identity{ false };
   };
 
+  //! @brief Reads a vine through an optional reorientation, so a cascade
+  //! evaluates a relabeled model without copying it.
   class VinecopView
   {
   public:
@@ -413,6 +416,7 @@ private:
   // on it. For an h-function output, `du1`/`du2` are ∂h/∂u1, ∂h/∂u2 (one of
   // them equals the copula density `c` by the identity ∂h2/∂u1 = ∂h1/∂u2 =
   // c).
+  //! @brief One edge's h-function derivatives, the seed of the cascade.
   struct DerivLeaf
   {
     Eigen::VectorXd du1, du2;          // ∂h/∂u1, ∂h/∂u2
@@ -436,6 +440,7 @@ private:
   // mirroring how the pdf/rosenblatt passes assemble their arguments.
   // (The du*/dpar* here are derivatives of `log c`; the identically named
   // fields of `DerivLeaf` are derivatives of an h-function `h`.)
+  //! @brief One edge's log-density derivatives, accumulated over a pass.
   struct DerivCache
   {
     size_t np{ 0 }, arg2_col{ 0 };

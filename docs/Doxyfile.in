@@ -787,7 +787,12 @@ INPUT_ENCODING         = UTF-8
 # *.md, *.mm, *.dox, *.py, *.f90, *.f, *.for, *.tcl, *.vhd, *.vhdl, *.ucf,
 # *.qsf, *.as and *.js.
 
-FILE_PATTERNS          = *.h *.hpp *.ipp *.dox *.md
+# The published set: what a user of the library reads. Everything else is
+# parsed by `Doxyfile-lint` instead, which checks it without publishing it --
+# doxygen validates a doc comment only while emitting that entity's output, so
+# the two sets cannot be separated inside one configuration.
+FILE_PATTERNS          = mainpage.h vinecopulib.hpp class* fit* rvine* \
+                         tools_stat* family* triangular* *.dox *.md
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -832,13 +837,17 @@ EXCLUDE_PATTERNS       = */tools_stats_sobol.hpp */tools_stats_ghalton.hpp \
 
 # A friend declaration reaches the XML even with EXTRACT_PRIVATE = NO, and the
 # m.css site build cannot parse one; BicopView is internal in any case.
+# The last three are qualified rather than substrings: `*ace*` matched
+# `get_show_trace` / `set_show_trace`, dropping two public accessors from the
+# site and their doc comments from the check, and `*win*` is one rename away
+# from swallowing `winsorize_tau`. They name the TLL fit's smoothing helpers.
 EXCLUDE_SYMBOLS        = *BicopView* \
                          *relabel_one* \
                          *relabel_elements* \
                          *BicopPtr* \
-                         *ace* \
-                         *cef* \
-                         *win*
+                         vinecopulib::tools_stats::ace \
+                         vinecopulib::tools_stats::cef \
+                         vinecopulib::tools_stats::win
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include

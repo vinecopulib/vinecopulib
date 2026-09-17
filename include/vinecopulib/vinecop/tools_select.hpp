@@ -215,6 +215,7 @@ protected:
   double get_next_threshold(std::vector<double>& thresholded_crits);
 
   // bundles the accumulators of one threshold-search pass over all trees
+  //! @brief The accumulators of one threshold-search pass over all trees.
   struct ThresholdPass
   {
     double mbicv = 0.0;
