@@ -632,7 +632,7 @@ Vinecop::fit(const Eigen::MatrixXd& u,
   if (trunc_lvl == 0) {
     if (pair_copulas_.empty() && (rvine_structure_.get_trunc_lvl() > 0)) {
       // an empty store means independence everywhere else, but here the caller
-      // passed no data to fit: there are no families to fit it to
+      // passed data to fit: there are no families to fit it to
       throw std::runtime_error(
         "no pair copulas to fit: this model was constructed without them. Use "
         "select() to choose families, or set_all_pair_copulas() to set them.");
@@ -3577,9 +3577,9 @@ Vinecop::inverse_rosenblatt_impl(const Eigen::MatrixXd& u,
 
 //! Checks if dimension d of the data matches the dimension of the vine.
 inline void
-Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
+Vinecop::check_data_dim(const Eigen::MatrixXd& u) const
 {
-  size_t d_data = data.cols();
+  size_t d_data = u.cols();
   auto n_disc = get_n_discrete();
   size_t d_exp = d_ + n_disc;
   if ((d_data != d_exp) & (d_data != 2 * d_)) {
@@ -3604,17 +3604,17 @@ Vinecop::check_data_dim(const Eigen::MatrixXd& data) const
     throw std::runtime_error(msg.str());
   }
 
-  if (data.rows() < 1) {
+  if (u.rows() < 1) {
     throw std::runtime_error("data must have at least one row");
   }
 }
 
 //! Checks if dimension d of the data matches the dimension of the vine.
 inline void
-Vinecop::check_data(const Eigen::MatrixXd& data) const
+Vinecop::check_data(const Eigen::MatrixXd& u) const
 {
-  check_data_dim(data);
-  tools_eigen::check_if_in_unit_cube(data);
+  check_data_dim(u);
+  tools_eigen::check_if_in_unit_cube(u);
 }
 
 //! Checks if pair copulas are compatible with the R-vine structure.
@@ -3664,9 +3664,9 @@ Vinecop::check_weights_size(const Eigen::VectorXd& weights,
 
 //! Checks if data size is large enough.
 inline void
-Vinecop::check_enough_data(const Eigen::MatrixXd& data) const
+Vinecop::check_enough_data(const Eigen::MatrixXd& u) const
 {
-  if (data.rows() == 1) {
+  if (u.rows() == 1) {
     throw std::runtime_error("data must have more than one row");
   }
 }

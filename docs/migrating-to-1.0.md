@@ -24,6 +24,9 @@ needed.
 - [ ] Do you read `get_matrix()`, `get_order()` or `get_struct_array()`, or
       index pair copulas by position? →
       [R-vine matrix representation](#migrate-structure).
+- [ ] Do you call `fit`, `select` or a data constructor with a **named** or
+      designated argument, or lift parameter names into another language? →
+      [Renamed and removed API](#migrate-removed).
 - [ ] Do you build with CMake, or reach Boost through `vinecopulib.hpp`? →
       [Build, CMake, and C++17](#migrate-build).
 
@@ -84,8 +87,18 @@ The `*_truncation_level` members were declared but never defined, so a call was
 already a link error rather than a deprecation warning.
 
 `Vinecop`'s data constructor no longer defaults its `matrix` argument, since that
-made `Vinecop(data)` ambiguous. Pass a structure explicitly, or use the
+made `Vinecop(u)` ambiguous. Pass a structure explicitly, or use the
 `RVineStructure` overload.
+
+**The observations are named `u` on every method, fitting included.**
+`Bicop::fit` / `select` / the data constructor and `Vinecop::fit` / `select` /
+its two data constructors took a parameter named `data`, while `pdf`, `cdf`,
+`hfunc*`, `hinv*`, `loglik` and the score and derivative surfaces on the same
+classes all took `u`. Positional calls — which is every ordinary C++ call — are
+unaffected and need no edit. Two callers do need one: anyone naming the
+argument in a designated initializer or a wrapper, and any binding that lifts
+the parameter name, since `vinecopulib`'s own Doxygen text is what the Python
+and R interfaces render.
 
 **`VINECOPULIB_VERSION` was octal.** It was written `000703`, which C++ reads as
 octal, so

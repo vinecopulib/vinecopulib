@@ -485,8 +485,8 @@ protected:
   std::vector<std::string> var_types_;
   int n_discrete_{ 0 };
 
-  void check_data_dim(const Eigen::MatrixXd& data) const;
-  void check_data(const Eigen::MatrixXd& data) const;
+  void check_data_dim(const Eigen::MatrixXd& u) const;
+  void check_data(const Eigen::MatrixXd& u) const;
   void check_pair_copulas_rvine_structure(
     const std::vector<std::vector<Bicop>>& pair_copulas) const;
   double calculate_mbicv_penalty(const size_t nobs, const double psi0) const;
@@ -496,7 +496,7 @@ protected:
   static void check_tree_criterion_function(const FitControlsVinecop& controls);
   void check_weights_size(const Eigen::VectorXd& weights,
                           const Eigen::MatrixXd& data) const;
-  void check_enough_data(const Eigen::MatrixXd& data) const;
+  void check_enough_data(const Eigen::MatrixXd& u) const;
   void check_fitted() const;
   void check_indices(const size_t tree, const size_t edge) const;
   void check_var_types(const std::vector<std::string>& var_types) const;
