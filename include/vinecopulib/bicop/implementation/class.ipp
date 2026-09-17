@@ -2118,7 +2118,7 @@ Bicop::with_var_types(const std::vector<std::string>& var_types) const
 //!
 //! Incomplete observations (i.e., ones with a NaN value) are discarded.
 //!
-//! @param data An \f$ n \times 2 \f$ matrix of observations for a continuous
+//! @param u An \f$ n \times 2 \f$ matrix of observations for a continuous
 //!   model. For a model with \f$ k \f$ discrete variables, use an
 //!   \f$ n \times 4 \f$ matrix containing the values and their left-limits;
 //!   left-limit columns for continuous variables may be omitted to obtain the
@@ -2169,7 +2169,7 @@ Bicop::fit(const Eigen::MatrixXd& u, const FitControlsBicop& controls)
 //!
 //! Incomplete observations (i.e., ones with a NaN value) are discarded.
 //!
-//! @param data An \f$ n \times 2 \f$ matrix of observations for a continuous
+//! @param u An \f$ n \times 2 \f$ matrix of observations for a continuous
 //!   model. For a model with \f$ k \f$ discrete variables, use an
 //!   \f$ n \times 4 \f$ matrix containing the values and their left-limits;
 //!   left-limit columns for continuous variables may be omitted to obtain the

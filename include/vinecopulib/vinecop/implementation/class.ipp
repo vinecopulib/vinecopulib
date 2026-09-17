@@ -336,7 +336,7 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //! so that the maximal available information is used.
 //!
 //!
-//! @param data An \f$ n \times d \f$ matrix of observations for a continuous
+//! @param u An \f$ n \times d \f$ matrix of observations for a continuous
 //!   model. For a model with \f$ k \f$ discrete variables, use an
 //!   \f$ n \times 2d \f$ matrix containing the values and their left-limits;
 //!   left-limit columns for continuous variables may be omitted to obtain the
@@ -611,7 +611,7 @@ Vinecop::reorient(const std::vector<size_t>& conditioning_set)
 //! and a `FitControlsVinecop` object instantiated
 //! with `select_families = false`.
 //!
-//! @param data An \f$ n \times d \f$ matrix of observations for a continuous
+//! @param u An \f$ n \times d \f$ matrix of observations for a continuous
 //!   model. For a model with \f$ k \f$ discrete variables, use an
 //!   \f$ n \times 2d \f$ matrix containing the values and their left-limits;
 //!   left-limit columns for continuous variables may be omitted to obtain the
