@@ -42,15 +42,15 @@ public:
     const std::vector<std::string>& var_types = {});
 
   // Constructors from data
-  explicit Vinecop(const Eigen::MatrixXd& data,
+  explicit Vinecop(const Eigen::MatrixXd& u,
                    const RVineStructure& structure = RVineStructure(),
                    const std::vector<std::string>& var_types = {},
                    const FitControlsVinecop& controls = FitControlsVinecop());
 
-  // `matrix` must not be defaulted: that makes `Vinecop(data)` ambiguous with
+  // `matrix` must not be defaulted: that makes `Vinecop(u)` ambiguous with
   // the overload above.
   explicit Vinecop(
-    const Eigen::MatrixXd& data,
+    const Eigen::MatrixXd& u,
     const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
     const std::vector<std::string>& var_types = {},
     const FitControlsVinecop& controls = FitControlsVinecop());
@@ -64,10 +64,10 @@ public:
   void to_file(const std::string& filename) const;
 
   // Methods modifying structure and/or families and parameters
-  void select(const Eigen::MatrixXd& data,
+  void select(const Eigen::MatrixXd& u,
               const FitControlsVinecop& controls = FitControlsVinecop());
 
-  void fit(const Eigen::MatrixXd& data,
+  void fit(const Eigen::MatrixXd& u,
            const FitControlsBicop& controls = FitControlsBicop(),
            const size_t num_threads = 1);
 

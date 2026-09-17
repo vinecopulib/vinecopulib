@@ -24,6 +24,12 @@ wrong thing.
   spelling is the default argument: `bc.as_continuous()` becomes
   `bc.with_var_types()` (#777)
 
+* Name the observations `u` on `Bicop::fit` / `select` / the data constructor
+  and on `Vinecop::fit` / `select` / the two data constructors, which is what
+  every evaluation method already calls them. A C++ caller passing positionally
+  is unaffected; a binding that lifts the parameter name (Python, R) sees `u`
+  instead of `data`
+
 * Remove `FitControlsVinecop::get_truncation_level`,
   `get_select_truncation_level`, `set_truncation_level` and
   `set_select_truncation_level`, deprecated since 0.3.1. Use the `trunc_lvl`

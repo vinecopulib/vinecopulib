@@ -73,19 +73,19 @@ inline Vinecop::Vinecop(
 //! @details Equivalent to creating a default `Vinecop()` and then
 //! selecting the model using `select()`.
 //!
-//! @param data An \f$ n \times d \f$ matrix of observations.
+//! @param u An \f$ n \times d \f$ matrix of observations.
 //! @param structure An RVineStructure object specifying the vine structure.
 //!    If empty, then it is selected as part of the fit.
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
 //! @param controls See `FitControlsVinecop()`.
-inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
+inline Vinecop::Vinecop(const Eigen::MatrixXd& u,
                         const RVineStructure& structure,
                         const std::vector<std::string>& var_types,
                         const FitControlsVinecop& controls)
 {
-  check_enough_data(data);
+  check_enough_data(u);
   if (structure.get_dim() > 1) {
     d_ = structure.get_dim();
     rvine_structure_ = structure;
@@ -93,7 +93,7 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
     if (!var_types.empty()) {
       d_ = var_types.size();
     } else {
-      d_ = data.cols();
+      d_ = u.cols();
     }
     rvine_structure_ = RVineStructure(d_, static_cast<size_t>(0));
   }
@@ -102,8 +102,8 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
   } else {
     set_var_types(var_types);
   }
-  check_weights_size(controls.get_weights(), data);
-  select(data, controls);
+  check_weights_size(controls.get_weights(), u);
+  select(u, controls);
 }
 
 //! @brief Instantiates from data.
@@ -111,20 +111,20 @@ inline Vinecop::Vinecop(const Eigen::MatrixXd& data,
 //! @details Equivalent to creating a default `Vinecop()` and
 //! then selecting the model using `select()`.
 //!
-//! @param data An \f$ n \times d \f$ matrix of observations.
+//! @param u An \f$ n \times d \f$ matrix of observations.
 //! @param matrix Either an R-vine structure matrix, see `select()`, or an
 //!     empty matrix, in which case the structure is selected as part of the
-//!     fit. To select the structure, prefer `Vinecop(data)`.
+//!     fit. To select the structure, prefer `Vinecop(u)` with no matrix.
 //! @param var_types Strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete.
 //!   If empty, then all variables are set as continuous.
 //! @param controls See `FitControlsVinecop()`.
 inline Vinecop::Vinecop(
-  const Eigen::MatrixXd& data,
+  const Eigen::MatrixXd& u,
   const Eigen::Matrix<size_t, Eigen::Dynamic, Eigen::Dynamic>& matrix,
   const std::vector<std::string>& var_types,
   const FitControlsVinecop& controls)
-  : Vinecop(data, RVineStructure(matrix), var_types, controls)
+  : Vinecop(u, RVineStructure(matrix), var_types, controls)
 {
 }
 
@@ -343,14 +343,14 @@ Vinecop::make_pair_copula_store(const size_t d, const size_t trunc_lvl)
 //!   compact \f$ n \times (d + k) \f$ layout (see @ref discrete).
 //! @param controls The controls to the algorithm (see `FitControlsVinecop()`).
 inline void
-Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
+Vinecop::select(const Eigen::MatrixXd& u, const FitControlsVinecop& controls)
 {
   if (controls.get_select_families()) {
     check_tree_criterion_function(controls);
-    check_data(data);
+    check_data(u);
     if (d_ == 1) {
       loglik_ = 0;
-      nobs_ = data.rows();
+      nobs_ = u.rows();
       return;
     }
 
@@ -359,14 +359,14 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
       check_conditioning_set(conditioning_set, controls);
     }
 
-    Eigen::MatrixXd u = collapse_data(data);
+    Eigen::MatrixXd uc = collapse_data(u);
 
     tools_select::VinecopSelector selector(
-      u, rvine_structure_, controls, var_types_);
+      uc, rvine_structure_, controls, var_types_);
     if (controls.needs_sparse_select()) {
-      selector.sparse_select_all_trees(u);
+      selector.sparse_select_all_trees(uc);
     } else {
-      selector.select_all_trees(u);
+      selector.select_all_trees(uc);
     }
     finalize_fit(selector);
 
@@ -378,7 +378,7 @@ Vinecop::select(const Eigen::MatrixXd& data, const FitControlsVinecop& controls)
       reorient(conditioning_set);
     }
   } else {
-    fit(data, controls.get_fit_controls_bicop(), controls.get_num_threads());
+    fit(u, controls.get_fit_controls_bicop(), controls.get_num_threads());
   }
 }
 
@@ -620,19 +620,19 @@ Vinecop::reorient(const std::vector<size_t>& conditioning_set)
 //! `FitControlsBicop()`).
 //! @param num_threads The number of threads to use for parallel computation.
 inline void
-Vinecop::fit(const Eigen::MatrixXd& data,
+Vinecop::fit(const Eigen::MatrixXd& u,
              const FitControlsBicop& controls,
              const size_t num_threads)
 {
-  check_data(data);
-  auto u = collapse_data(data);
+  check_data(u);
+  auto uc = collapse_data(u);
 
   // info about the vine structure (reverse rows (!) for more natural indexing)
   size_t trunc_lvl = get_effective_trunc_lvl();
   if (trunc_lvl == 0) {
     if (pair_copulas_.empty() && (rvine_structure_.get_trunc_lvl() > 0)) {
       // an empty store means independence everywhere else, but here the caller
-      // passed data to fit: there are no families to fit it to
+      // passed no data to fit: there are no families to fit it to
       throw std::runtime_error(
         "no pair copulas to fit: this model was constructed without them. Use "
         "select() to choose families, or set_all_pair_copulas() to set them.");
@@ -640,15 +640,15 @@ Vinecop::fit(const Eigen::MatrixXd& data,
     // the structure itself is truncated at 0, so the model is independence and
     // its log-likelihood is exactly 0
     loglik_ = 0;
-    nobs_ = static_cast<size_t>(u.rows());
+    nobs_ = static_cast<size_t>(uc.rows());
     return;
   }
 
   auto order = rvine_structure_.get_order();
   auto disc_cols = tools_select::get_disc_cols(var_types_);
-  size_t n = u.rows();
+  size_t n = uc.rows();
 
-  // temporary storage objects (all data must be in (0, 1))
+  // temporary storage objects (all values must be in (0, 1))
   Eigen::MatrixXd hfunc1, hfunc2, hfunc1_sub, hfunc2_sub;
   hfunc1 = Eigen::MatrixXd::Zero(n, d_);
   hfunc2 = Eigen::MatrixXd::Zero(n, d_);
@@ -670,12 +670,12 @@ Vinecop::fit(const Eigen::MatrixXd& data,
   const Eigen::MatrixXd& hfunc2_sub_in =
     snapshot_hfuncs ? hfunc2_sub_prev : hfunc2_sub;
 
-  // fill first row of hfunc2 matrix with observed data;
+  // fill first row of hfunc2 matrix with the observations;
   // points have to be reordered to correspond to natural order
   for (size_t j = 0; j < d_; ++j) {
-    hfunc2.col(j) = u.col(order[j] - 1);
+    hfunc2.col(j) = uc.col(order[j] - 1);
     if (var_types_[order[j] - 1] == "d") {
-      hfunc2_sub.col(j) = u.col(d_ + disc_cols[order[j] - 1]);
+      hfunc2_sub.col(j) = uc.col(d_ + disc_cols[order[j] - 1]);
     }
   }
 
