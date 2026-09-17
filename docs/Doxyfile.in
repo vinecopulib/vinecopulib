@@ -787,7 +787,7 @@ INPUT_ENCODING         = UTF-8
 # *.md, *.mm, *.dox, *.py, *.f90, *.f, *.for, *.tcl, *.vhd, *.vhdl, *.ucf,
 # *.qsf, *.as and *.js.
 
-FILE_PATTERNS          = mainpage.h vinecopulib.hpp class* fit* rvine* tools_stat* family* triangular* *.dox *.md
+FILE_PATTERNS          = *.h *.hpp *.ipp *.dox *.md
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -818,7 +818,8 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */tools_stats_sobol.hpp */tools_stats_ghalton.hpp
+EXCLUDE_PATTERNS       = */tools_stats_sobol.hpp */tools_stats_ghalton.hpp \
+                         */nlohmann_json.hpp
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
