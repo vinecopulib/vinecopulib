@@ -29,7 +29,7 @@ url: https://vinecopulib.github.io/vinecopulib/
 # `date-released` in step with CMakeLists.txt at release time;
 # scripts/check_version.py enforces it.
 version: 1.0.0
-date-released: '2026-06-12'
+date-released: '2026-09-18'
 identifiers:
   - type: doi
     value: 10.5281/zenodo.1401557
