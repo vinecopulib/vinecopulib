@@ -1,3 +1,5 @@
+## vinecopulib 1.1.0 (unreleased)
+
 ## vinecopulib 1.0.0 (September 18, 2026)
 
 The first stable release. It collects a large amount of work: analytic
