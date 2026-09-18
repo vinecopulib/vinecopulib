@@ -442,6 +442,11 @@ jobs:
         run: |
           mkdir build-docs && cd build-docs
           cmake .. -DVINECOPULIB_BUILD_DOC=ON -DBUILD_TESTING=OFF
+      - name: Check every doc comment
+        # `doc` publishes the curated set; this parses the whole tree and
+        # publishes nothing, so a comment outside the published set is still
+        # checked. Needs nothing compiled, so it fails in under a second.
+        run: cd build-docs && make doc_lint
       - name: Compile and run the documentation snippets
         run: |
           cd build-docs

@@ -106,11 +106,22 @@ if(VINECOPULIB_BUILD_DOC)
           ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile-mcss.in
           ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile-mcss @ONLY
       )
+  # The lint variant does the same, widening the input and publishing nothing.
+  configure_file(
+          ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile-lint.in
+          ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile-lint @ONLY
+      )
   add_custom_target(doc
           ${DOXYGEN_EXECUTABLE}
           ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
           COMMENT "Generating API documentation with Doxygen" VERBATIM
+      )
+  add_custom_target(doc_lint
+          ${DOXYGEN_EXECUTABLE}
+          ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile-lint
+          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+          COMMENT "Checking every doc comment with Doxygen" VERBATIM
       )
   # The snippets the pages reference must compile before the pages are built.
   add_dependencies(doc doc_snippets)

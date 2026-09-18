@@ -1,0 +1,28 @@
+# Parses every header, publishes nothing. `Doxyfile`'s FILE_PATTERNS is the
+# published set -- what a user of the library reads -- and doxygen checks a doc
+# comment only against an entity it is generating output for, so a comment
+# outside that set is never checked there. This configuration widens the input
+# to the whole tree and keeps WARN_AS_ERROR, so the check set and the publish
+# set move independently.
+#
+# Configured into the build tree next to `Doxyfile`, so both stay in sync with
+# the project version and paths.
+@INCLUDE                = @CMAKE_CURRENT_BINARY_DIR@/Doxyfile
+
+FILE_PATTERNS           = *.h *.hpp *.ipp *.dox *.md
+
+# XML is the cheapest format that still drives every check: a run generating
+# nothing reports nothing. It also carries the private and protected members
+# HTML drops, whose doc comments are then checked with the rest -- which is
+# what reaches the `@param` blocks on a selector's protected members.
+GENERATE_HTML           = NO
+GENERATE_XML            = YES
+XML_PROGRAMLISTING      = NO
+EXTRACT_PRIVATE         = YES
+
+# Its own directory, so a lint run cannot touch the published site.
+OUTPUT_DIRECTORY        = doxygen-lint
+
+# These are excluded from the published build so the m.css site does not choke
+# on a friend declaration. Nothing is published here, so they are checked.
+EXCLUDE_SYMBOLS         =

@@ -16,6 +16,18 @@ runs with `WARN_AS_ERROR = YES` — an undocumented parameter or a broken
 reference fails the build. CI runs the same target, and also runs each snippet
 binary, on every pull request.
 
+```bash
+cmake --build build-docs --target doc_lint
+```
+
+`doc_lint` checks every doc comment in the tree and publishes nothing. The two
+targets exist because Doxygen validates a comment only while emitting that
+entity's output, so one configuration cannot both publish a curated set and
+check the rest: `Doxyfile`'s `FILE_PATTERNS` is what a user reads, and
+`Doxyfile-lint` widens the input to the whole tree, turns on `EXTRACT_PRIVATE`,
+and writes XML to a throwaway directory. It needs nothing compiled and takes
+under a second. CI runs it on every pull request.
+
 ## The website
 
 The published site uses the [m.css](https://github.com/mosra/m.css) theme rather
