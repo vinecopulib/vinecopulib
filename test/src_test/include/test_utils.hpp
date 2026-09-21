@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 
 //! Shared helpers for the unit tests.
 namespace test_utils {

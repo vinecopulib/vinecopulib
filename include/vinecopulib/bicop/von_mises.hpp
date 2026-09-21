@@ -38,11 +38,13 @@ private:
 
   double concentration_from_resultant(double rbar) const override;
 
-  // the Bessel ratios of the series, recomputed only when the concentration
-  // changes between consecutive calls; the leaves evaluate rows sequentially
+  //! @brief The Bessel-function ratios of the von Mises series for one
+  //! concentration, kept between consecutive calls with the same value.
   struct Series
   {
+    //! the concentration the ratios belong to; negative when unset
     double kappa = -1.0;
+    //! the ratios \f$ I_k(\kappa) / I_0(\kappa) \f$ for \f$ k \ge 1 \f$
     std::vector<double> ratios;
   };
   static const std::vector<double>& ratios_for(Series& series, double kappa);

@@ -83,7 +83,8 @@ HEADER = """// Copyright © 2016-2026 Thomas Nagler and Thibault Vatter
 
 namespace test_circular_golden {
 
-inline const char* json = R"golden(%s)golden";
+inline const char* json =
+  R"golden(%s)golden";
 
 } // namespace test_circular_golden
 """
