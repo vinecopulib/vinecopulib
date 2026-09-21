@@ -432,11 +432,11 @@ BicopView::as_continuous() const
 inline std::vector<std::string>
 BicopView::get_var_types() const
 {
-  if (continuous_)
-    return { "c", "c" };
   auto var_types = bicop_->get_var_types();
   if (flipped_)
     std::swap(var_types[0], var_types[1]);
+  if (continuous_)
+    var_types = tools_var_types::as_continuous(var_types);
   return var_types;
 }
 
@@ -1347,7 +1347,7 @@ Bicop::check_deriv_preconditions() const
     throw std::runtime_error("derivatives are not implemented for the " +
                              get_family_name() + " copula");
   }
-  if (var_types_ != std::vector<std::string>{ "c", "c" }) {
+  if (!tools_var_types::all_continuous(var_types_)) {
     throw std::runtime_error(
       "derivatives are only available for continuous variable types");
   }
@@ -2271,7 +2271,7 @@ Bicop::format_data(const Eigen::MatrixXd& u) const
   // n_disc = 1:
   Eigen::MatrixXd u_new(u.rows(), 4);
   u_new.leftCols(2) = u.leftCols(2);
-  int disc_col = (var_types_[1] == "d");
+  int disc_col = tools_var_types::is_discrete(var_types_[1]);
   int cont_col = 1 - disc_col;
   // We already know that there is one discrete and one continuous variable. Now
   // there are two cases:
@@ -2412,7 +2412,7 @@ Bicop::check_var_types(const std::vector<std::string>& var_types) const
     throw std::runtime_error("var_types must have size two.");
   }
   for (const auto& t : var_types) {
-    if (!tools_stl::is_member(t, { "c", "d" })) {
+    if (!(tools_var_types::is_linear(t) || tools_var_types::is_discrete(t))) {
       throw std::runtime_error("var type must be either 'c' or 'd'.");
     }
   }
@@ -2422,10 +2422,7 @@ Bicop::check_var_types(const std::vector<std::string>& var_types) const
 inline unsigned short
 Bicop::get_n_discrete() const
 {
-  int n_discrete = 0;
-  for (const auto& t : var_types_) {
-    n_discrete += (t == "d");
-  }
-  return static_cast<unsigned short>(n_discrete);
+  return static_cast<unsigned short>(
+    tools_var_types::count_discrete(var_types_));
 }
 }

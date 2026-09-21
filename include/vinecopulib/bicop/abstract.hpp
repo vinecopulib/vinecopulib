@@ -10,6 +10,7 @@
 
 #include <Eigen/Dense>
 #include <vinecopulib/bicop/family.hpp>
+#include <vinecopulib/misc/tools_var_types.hpp>
 
 namespace vinecopulib {
 
@@ -245,7 +246,8 @@ protected:
   // Data members
   BicopFamily family_;
   double loglik_{ NAN };
-  std::vector<std::string> var_types_{ "c", "c" };
+  std::vector<std::string> var_types_ =
+    tools_var_types::all_continuous_types(2);
 };
 
 //! A shared pointer to an object of class AbstracBicop.

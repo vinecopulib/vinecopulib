@@ -251,7 +251,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   B *= mult;
 
   // find latent sample in case observations are discrete
-  if (var_types_[0] == "d" || var_types_[1] == "d") {
+  if (!tools_var_types::all_continuous(var_types_)) {
     psobs =
       tools_stats::find_latent_sample(data, std::pow(B(0, 0) * B(1, 1), 0.25));
     z_data = tools_stats::qnorm(psobs);
@@ -279,7 +279,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
            .transpose();
   // don't normalize margins of the EDF! (norm_times = 0)
   auto infl_grid = InterpolationGrid(grid_points, infl, 0);
-  if ((var_types_[0] == "d") || (var_types_[1] == "d")) {
+  if (!tools_var_types::all_continuous(var_types_)) {
     // for discrete, use mid ranks to compute EDF and log-likelihood
     // (this is closer to "observations" than jittered or "upper" pseudo data)
     psobs = 0.5 * (data.leftCols(2) + data.rightCols(2)).array();
