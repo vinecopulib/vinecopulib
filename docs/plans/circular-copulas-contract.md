@@ -558,6 +558,24 @@ Kendall's $\tau$. `preselect_candidates` does not apply the `lt` / `ut`
 heuristics to circular families. Linear families are never candidates for a
 pair with a circular variable.
 
+### Tree criterion
+
+An edge whose pair has a circular conditioned variable is weighted by
+`tools_stats::pairwise_circular` under every built-in `tree_criterion`. For
+two circular variables the measure is
+$\max_{q = \pm 1} \bigl| E\, e^{i 2\pi (V - qU)} \bigr|$, the larger
+mean resultant length of the angle differences and sums; it is one exactly
+for a rotation or reflection and does not depend on the cut of either
+variable. For a circular $U$ and a linear $V$ it is
+$\bigl(|E\, e^{i 2\pi U} f_1(V)|^2 + |E\, e^{i 2\pi U} f_2(V)|^2\bigr)^{1/2}$
+with the orthonormal Legendre polynomials $f_1(v) = \sqrt{3}(2v - 1)$ and
+$f_2(v) = \sqrt{5}(6v^2 - 6v + 1)$, the moments that identify the sections
+copulas; it does not depend on the cut of $U$ and is invariant under
+$V \to 1 - V$. Both are bounded by one and vanish under independence. The
+`"custom"` criterion receives the pair data unchanged. Rank-based criteria are
+not used for such pairs because they depend on the cut: Kendall's $\tau$ of
+the half-turn pair is zero.
+
 ### Derivatives and views
 
 `Bicop::check_deriv_preconditions` accepts circular variable types; the
