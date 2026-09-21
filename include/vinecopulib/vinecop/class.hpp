@@ -424,8 +424,8 @@ private:
     Eigen::VectorXd du1, du2;          // ∂h/∂u1, ∂h/∂u2
     std::vector<Eigen::VectorXd> dpar; // ∂h/∂θ_p (cascade seed)
     // second-order (only when requested):
-    Eigen::VectorXd du1u1, du1u2, du2u2;           // ∂²h/∂{u1²,u1u2,u2²}
-    std::vector<Eigen::VectorXd> dpar_u1, dpar_u2; // ∂²h/∂θ_p∂{u1,u2}
+    Eigen::VectorXd du1u1, du1u2, du2u2;                // ∂²h/∂{u1²,u1u2,u2²}
+    std::vector<Eigen::VectorXd> dpar_u1, dpar_u2;      // ∂²h/∂θ_p∂{u1,u2}
     std::vector<std::vector<Eigen::VectorXd>> dpar_par; // ∂²h/∂θ_p∂θ_q
     // whether any deeper tree consumes this h-function output (from the
     // structure's needed_hfunc1/2 masks); inactive leaves are left empty
@@ -509,6 +509,7 @@ protected:
   void check_var_types(const std::vector<std::string>& var_types) const;
   void set_continuous_var_types();
   void set_var_types_internal(const std::vector<std::string>& var_types);
+  std::vector<std::string> edge_var_types(size_t tree, size_t edge) const;
   int get_n_discrete() const;
   bool is_discrete() const;
   Eigen::MatrixXd collapse_data(const Eigen::MatrixXd& u) const;
