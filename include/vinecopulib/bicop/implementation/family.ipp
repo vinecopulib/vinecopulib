@@ -6,6 +6,8 @@
 
 #include <stdexcept>
 #include <unordered_map>
+#include <vinecopulib/misc/tools_stl.hpp>
+#include <vinecopulib/misc/tools_var_types.hpp>
 
 namespace vinecopulib {
 
@@ -30,7 +32,12 @@ family_name_table()
     { BicopFamily::bb7, "BB7" },
     { BicopFamily::bb8, "BB8" },
     { BicopFamily::tawn, "Tawn" },
-    { BicopFamily::tll, "TLL" }
+    { BicopFamily::tll, "TLL" },
+    { BicopFamily::cardioid, "Cardioid" },
+    { BicopFamily::wrapped_cauchy, "Wrapped Cauchy" },
+    { BicopFamily::von_mises, "von Mises" },
+    { BicopFamily::quad_sections, "Quadratic sections" },
+    { BicopFamily::cubic_sections, "Cubic sections" }
   };
   return table;
 }
@@ -79,5 +86,61 @@ inline BicopFamily
 get_family_enum(const std::string& family)
 {
   return name_to_enum().at(family);
+}
+
+//! @brief Whether a family can model a pair with the given variable types.
+//!
+//! @details The independence copula and the nonparametric `tll` estimator
+//! accept every pair. The other families split by geometry: the linear
+//! families (`gaussian`, ..., `tawn`) need two non-circular variables; the
+//! binding-density circulas need at least one circular variable; the
+//! cylindrical sections copulas need exactly one circular and one linear
+//! variable. A circular variable paired with a discrete one is never
+//! accepted.
+//!
+//! @param family The family.
+//! @param var_types Two variable types, each `"c"`, `"d"`, or `"a"`.
+//! @return Whether `family` is eligible for a pair of these types.
+inline bool
+family_accepts_var_types(BicopFamily family,
+                         const std::vector<std::string>& var_types)
+{
+  using namespace tools_var_types;
+  if (var_types.size() != 2) {
+    return false;
+  }
+  const size_t n_circular =
+    is_circular(var_types[0]) + is_circular(var_types[1]);
+  if (n_circular > 0 && count_discrete(var_types) > 0) {
+    return false;
+  }
+  if (family == BicopFamily::indep || family == BicopFamily::tll) {
+    return true;
+  }
+  if (tools_stl::is_member(family, bicop_families::cylindrical)) {
+    return n_circular == 1;
+  }
+  if (tools_stl::is_member(family, bicop_families::circular)) {
+    return n_circular > 0;
+  }
+  return n_circular == 0;
+}
+
+//! @brief Filters a family set down to the families eligible for a pair.
+//! @param families The candidate families.
+//! @param var_types Two variable types, each `"c"`, `"d"`, or `"a"`.
+//! @return The members of `families` for which `family_accepts_var_types()`
+//!   holds, in their original order.
+inline std::vector<BicopFamily>
+eligible_families(const std::vector<BicopFamily>& families,
+                  const std::vector<std::string>& var_types)
+{
+  std::vector<BicopFamily> out;
+  for (auto fam : families) {
+    if (family_accepts_var_types(fam, var_types)) {
+      out.push_back(fam);
+    }
+  }
+  return out;
 }
 }
