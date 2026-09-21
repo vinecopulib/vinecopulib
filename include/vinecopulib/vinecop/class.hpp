@@ -8,6 +8,7 @@
 
 #include <Eigen/Dense>
 #include <utility>
+#include <vinecopulib/misc/tools_var_types.hpp>
 #include <vinecopulib/vinecop/fit_controls.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
 

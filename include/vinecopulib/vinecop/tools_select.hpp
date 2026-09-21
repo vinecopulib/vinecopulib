@@ -9,6 +9,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/misc/tools_interface.hpp>
+#include <vinecopulib/misc/tools_var_types.hpp>
 #include <vinecopulib/vinecop/fit_controls.hpp>
 #include <vinecopulib/vinecop/rvine_structure.hpp>
 
@@ -56,7 +57,7 @@ struct VertexProperties
   Eigen::VectorXd hfunc2;
   Eigen::VectorXd hfunc1_sub;
   Eigen::VectorXd hfunc2_sub;
-  std::vector<std::string> var_types{ "c", "c" };
+  std::vector<std::string> var_types = tools_var_types::all_continuous_types(2);
 };
 
 //! @brief An edge of a vine tree, i.e. one pair copula and what it is fitted
@@ -75,7 +76,7 @@ struct EdgeProperties
   Eigen::VectorXd hfunc2;
   Eigen::VectorXd hfunc1_sub;
   Eigen::VectorXd hfunc2_sub;
-  std::vector<std::string> var_types{ "c", "c" };
+  std::vector<std::string> var_types = tools_var_types::all_continuous_types(2);
   double weight;
   double crit;
   vinecopulib::Bicop pair_copula;
