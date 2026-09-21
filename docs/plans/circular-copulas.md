@@ -1,8 +1,8 @@
 # Circular copulas and mixed vines: implementation plan
 
-Status: stages 1 to 3 implemented on the integration branch `feat/circulas`;
-stages 4 and 5 are next.
-Updated September 21, 2026.
+Status: stages 1 to 3 and 5 implemented on the integration branch
+`feat/circulas`; stage 6 is in progress and stage 4 follows.
+Updated September 22, 2026.
 
 This checklist tracks the first feature release for circular variables. The
 release includes circular-circular and circular-linear pair copulas,
@@ -294,28 +294,33 @@ Main code: [tll.ipp](../../include/vinecopulib/bicop/implementation/tll.ipp),
 
 ## 5. Vine models with supplied structures
 
-- [ ] Derive pair geometry from the conditioned variable identities at every
+- [x] (#793) Derive pair geometry from the conditioned variable identities at every
   tree level, following the existing `var_types` propagation. A circular
   variable retains its geometry after its conditional probability transform;
   a circular variable only in the conditioning set does not make two linear
-  conditioned variables circular.
-- [ ] Make `Vinecop::select` (and the threshold and truncation searches) throw
+  conditioned variables circular. Implemented as `Vinecop::edge_var_types`,
+  read directly from the structure, and used both for the propagation and
+  for omitted pair copulas.
+- [x] (#790) Make `Vinecop::select` (and the threshold and truncation searches) throw
   on circular input until stage 6 lands. With the default tau criterion a
   perfectly dependent half-turn pair has weight zero and any positive
   `threshold` sets it to independence.
-- [ ] Validate supplied pair families and propagate geometry through order
+- [x] (#793) Validate supplied pair families and propagate geometry through order
   changes, edge flips, truncation, and omitted independence edges.
-- [ ] Support sequential refitting (`fit` on a fixed structure) and verify
+- [x] (#793) Support sequential refitting (`fit` on a fixed structure) and verify
   `pdf`, `pdf_full`, `loglik`, `cdf`, `rosenblatt`, `inverse_rosenblatt`,
   and simulation.
-- [ ] Cover conditional simulation, supported reorientations, and the
+- [x] (#793) Cover conditional simulation, supported reorientations, and the
   associated views without losing axis geometry or nonparametric grids.
-- [ ] Verify scores and Hessians for supported parametric models; retain
-  explicit unsupported-operation behavior for nonparametric derivatives.
-- [ ] Test small circular-linear-linear and circular-circular-linear models
+- [x] (#793) Verify scores and Hessians for supported parametric models; retain
+  explicit unsupported-operation behavior for nonparametric derivatives. The
+  circular families use the finite-difference derivative leaves; the full
+  (`step_wise = false`) vine scores agree with finite differences of the
+  joint log-likelihood.
+- [x] (#793) Test small circular-linear-linear and circular-circular-linear models
   against an independently assembled pair-density product and numerical
   marginalization. Include higher-tree circular edges and a larger mixed vine.
-- [ ] Verify joint density equality at each circular boundary, Rosenblatt
+- [x] (#793) Verify joint density equality at each circular boundary, Rosenblatt
   round-trips, simulated uniform marginals, and serial/threaded consistency.
 
 Main code: [vinecop/class.hpp](../../include/vinecopulib/vinecop/class.hpp),
