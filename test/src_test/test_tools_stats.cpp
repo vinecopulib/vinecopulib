@@ -233,6 +233,45 @@ TEST(test_tools_stats, dpqnorm_are_nan_safe)
   EXPECT_NO_THROW(tools_stats::qnorm(tools_stats::pnorm(X)));
 }
 
+// The normal CDF saturates at 0 and 1 far in the tails, including at
+// infinite arguments, and passes NaN through.
+TEST(test_tools_stats, pnorm_saturates_in_the_tails)
+{
+  const double inf = std::numeric_limits<double>::infinity();
+  Eigen::VectorXd X(6);
+  X << inf, -inf, 1e300, -1e300, 50.0, -50.0;
+  Eigen::VectorXd expected(6);
+  expected << 1, 0, 1, 0, 1, 0;
+  EXPECT_EQ(tools_stats::pnorm(X), expected);
+
+  Eigen::VectorXd nan =
+    Eigen::VectorXd::Constant(1, std::numeric_limits<double>::quiet_NaN());
+  EXPECT_TRUE(std::isnan(tools_stats::pnorm(nan)(0)));
+}
+
+// A coordinate of exactly one and bounds beyond the unit square fall into the
+// boundary cells instead of past the end of the covering.
+TEST(test_tools_stats, box_covering_handles_the_boundary)
+{
+  Eigen::MatrixXd u(3, 2);
+  u << 1.0, 1.0, 0.0, 0.0, 0.5, 1.0;
+  tools_stats::BoxCovering covering(u, 4);
+
+  Eigen::VectorXd lower(2), upper(2);
+  lower << 0.9, 0.9;
+  upper << 1.0, 1.0;
+  EXPECT_EQ(covering.get_box_indices(lower, upper), std::vector<size_t>{ 0 });
+
+  lower << 0.0, 0.0;
+  upper << 1.5, 1.5;
+  EXPECT_EQ(covering.get_box_indices(lower, upper).size(), 3u);
+
+  covering.swap_sample(1, Eigen::Vector2d(1.0, 0.0));
+  lower << 0.9, 0.0;
+  upper << 1.0, 0.1;
+  EXPECT_EQ(covering.get_box_indices(lower, upper), std::vector<size_t>{ 1 });
+}
+
 TEST(test_tools_stats, dpt_are_nan_safe)
 {
   Eigen::VectorXd X = Eigen::VectorXd::Random(10);

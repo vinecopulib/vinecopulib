@@ -37,7 +37,15 @@ inline Eigen::MatrixXd
 pnorm(const Eigen::MatrixXd& x)
 {
   static const double sqrt2 = std::sqrt(2.0);
-  return 0.5 * (1.0 + (x.array() / sqrt2).erf());
+  // The CDF is exactly 0 or 1 in double precision beyond |x| = 40, so the
+  // clamp is exact; it also keeps infinite arguments away from Eigen's erf,
+  // which not every release evaluates there. Comparisons with NaN are false,
+  // so NaN passes through unchanged.
+  const double bound = 40.0;
+  auto z = x.array();
+  Eigen::ArrayXXd clamped =
+    (z > bound).select(bound, (z < -bound).select(-bound, z));
+  return 0.5 * (1.0 + (clamped / sqrt2).erf());
 }
 
 //! @brief Quantile function of the Standard normal distribution.
@@ -156,6 +164,9 @@ public:
   void swap_sample(size_t i, const Eigen::VectorXd& new_sample);
 
 private:
+  size_t cell(double x) const;
+  size_t cell_end(double x) const;
+
   Eigen::MatrixXd u_;
   size_t n_;
   uint16_t K_;
