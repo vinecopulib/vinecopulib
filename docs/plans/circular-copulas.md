@@ -1,6 +1,7 @@
 # Circular copulas and mixed vines: implementation plan
 
-Status: planning; implementation has not started. Updated September 15, 2026.
+Status: stage 1 in progress on the integration branch `feat/circulas`.
+Updated September 21, 2026.
 
 This checklist tracks the first feature release for circular variables. The
 release includes circular-circular and circular-linear pair copulas,
@@ -92,18 +93,20 @@ Stage 4 is a parallel track. It is exploratory by nature and must not sit on
 the critical path: stages 5 and 6 complete with parametric circular families
 only, and stage 4 plugs in through the eligibility filtering from stage 2.
 
-Each stage is additive behind the new geometry token and changes nothing for
-existing callers, so each stage's pull requests are merged to `main` as they
-are approved rather than held in a long stack. Collect entries in an
-unreleased section of `NEWS.md` and cut the release after stage 7. Record
-actual PR numbers beside completed tasks. Do not merge, tag, or publish
-without express authorization.
+All stages are collected on the integration branch `feat/circulas`. Each
+stage is one pull request against that branch, stacked on its predecessor
+where the dependency table requires it, and made of meaningful intermediate
+commits rather than a single squashed step. `feat/circulas` merges to `main`
+after stage 7. Collect entries in the unreleased section of `NEWS.md` and cut
+the release after the merge. Record actual PR numbers beside completed tasks.
+Do not merge, tag, or publish without express authorization.
 
 ## 1. Mathematical and API contract
 
-- [ ] Fix the spelling of the new `var_types` value; the token approach in
+- [x] Fix the spelling of the new `var_types` value; the token approach in
   stage 2 is decided. The spelling reaches the R and Python signatures, so it
-  is settled here, not later.
+  is settled here, not later. Settled: `"a"` (angular); see the decision
+  record.
 - [ ] Document that the library takes `u` in `[0, 1]` with `0` identified
   with `1`, and that the cut is wherever the caller's marginal CDF puts it.
   State that ranks (`to_pseudo_obs`) place the cut at the caller's zero angle.
@@ -156,6 +159,13 @@ when it comes, can be a further value.
   `Vinecop::check_var_types`. Audit every `== "d"` and `get_n_discrete()`
   branch to confirm it stays correct with a third value; `as_continuous()`
   and the `BicopView` / `VinecopView` continuous paths must preserve it.
+  Audit result (September 21, 2026): the `== "d"` and `get_n_discrete()`
+  branches are safe; the hazards are the twelve tests that check continuity
+  positively (`== "c"`, `== {"c", "c"}` and their negations) in
+  `abstract.ipp`, `parametric.ipp`, `Bicop::check_deriv_preconditions`, and
+  the vine score path, plus the literal `{"c", "c"}` returned by
+  `Bicop::as_continuous` and `BicopView::get_var_types`. Replace all literal
+  comparisons by named type predicates before any circular code lands.
 - [ ] Decide whether circular families infer geometry when constructed
   explicitly, and validate contradictory family/geometry combinations.
 - [ ] Define family capabilities for both argument orders, including the
@@ -177,8 +187,12 @@ when it comes, can be a further value.
   and `KernelBicop::set_parameters` rebuilds knots from the row count alone,
   so a circular grid cannot reload without it. Test legacy reads and complete
   round-trips; reject unsupported formats clearly.
-- [ ] Audit all special cases keyed on `BicopFamily::tll` before choosing
-  between geometry-dependent `tll` and separate family identifiers.
+- [x] Audit all special cases keyed on `BicopFamily::tll` before choosing
+  between geometry-dependent `tll` and separate family identifiers. Four
+  sites: the factory in `abstract.ipp`, the two parameter-skipping branches
+  in `Bicop::hfunc1_continuous` / `hinv2_continuous` (which should test
+  `bicop_families::nonparametric`), and the grid line of both `str()`
+  methods. Decision: one geometry-dependent `tll`; see the decision record.
 
 Main code: [bicop/class.hpp](../../include/vinecopulib/bicop/class.hpp),
 [family.hpp](../../include/vinecopulib/bicop/family.hpp),
@@ -379,12 +393,14 @@ implementing PR. Entries without a PR were settled during planning.
 | Pair copulas use the binding-density construction for circular-circular pairs and cylindrical sections for circular-linear pairs. | Closed-form or one-dimensional numerics throughout; covers the published mixed-vine applications. | Jones, Pewsey, and Kato; Hodel and Fieberg |
 | Continuous circular and continuous linear variables only; circular-discrete is rejected explicitly. | Mixed circular/discrete needs its own mathematical and API decision. | planning |
 | Marginal transforms, cuts, and angular conventions stay downstream; the library takes `u` in `[0, 1]` with `0` identified with `1`. | Matches the existing copula-scale contract and the `kde1d` exclusion in AGENTS.md. | planning |
-| Geometry is a third `var_types` value (spelling fixed in stage 1). | Reuses propagation, JSON, views, and binding signatures; a parallel attribute would duplicate them. | planning (confirmed by maintainer, September 15, 2026) |
+| Geometry is a third `var_types` value. | Reuses propagation, JSON, views, and binding signatures; a parallel attribute would duplicate them. `Vinecop::set_var_types_internal` and the selector's edge inheritance already propagate any token without literal comparisons. | planning (confirmed by maintainer, September 15, 2026; propagation verified September 21, 2026) |
+| The token is `"a"` (angular). | Short and parallel to `"c"` / `"d"`. The literal is confined to the type predicates, so the spelling can change later at one site. | maintainer, September 21, 2026 |
 | Orientation `q` is the copula rotation in `{0, 90}`; phase `mu` is periodic and unbounded. | Symmetric `g` makes 180 and 270 redundant; a periodic phase has no bound to hit. | planning (confirmed by maintainer, September 15, 2026) |
 | `itau` stays unavailable for circular families. | No valid identification result from linear tau. | planning |
 | Stage 4 (nonparametric) is a parallel track; stages 5 and 6 ship with parametric circular families. | Exploratory work must not gate the release. | planning |
-| Stages merge to `main` as approved; the release is cut after stage 7. | Every stage is additive behind the new token; a seven-deep stack under squash-merge is not maintainable. | planning |
+| One geometry-dependent `tll`; the estimator reads the axis geometry from `var_types`. | The `"vt"` JSON field already records the geometry; a separate identifier would be a second source of truth that can disagree with it. `family_set = {tll}` keeps meaning "nonparametric" for every geometry, as `{gaussian}` needs no circular twin. | audit, September 21, 2026 |
+| Family names: `cardioid`, `wrapped_cauchy`, `von_mises` (binding), `quad_sections`, `cubic_sections` (cylindrical); new group `bicop_families::two_rotations`. | Bare snake_case values match the flat existing enum; `create_candidate_bicops` branches on rotation arity, so the two-rotation families need their own group beside `rotationless`. | maintainer, September 21, 2026 |
+| Stage pull requests target the integration branch `feat/circulas`, stacked where a stage depends on its predecessor; `feat/circulas` merges to `main` after stage 7. | Keeps `main` free of a half-finished feature while each stage still gets its own review. | maintainer, September 21, 2026 |
 
-Still open: public names and the token spelling, parameter conventions,
-nonparametric fitting formulas, and the default tree criterion for circular
-pairs.
+Still open: parameter conventions, nonparametric fitting formulas, and the
+default tree criterion for circular pairs.
