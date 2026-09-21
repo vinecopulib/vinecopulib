@@ -100,6 +100,41 @@ TEST(serialization, parametric_bicop_cbor_roundtrip)
   expect_bicops_equal(bicop, Bicop(automatic_file.filename()));
 }
 
+TEST(serialization, discrete_bicop_evaluates_the_same_after_roundtrip)
+{
+  // the reloaded model must evaluate with its stored variable types, not
+  // merely report them
+  const Bicop bicop(BicopFamily::gaussian,
+                    0,
+                    Eigen::VectorXd::Constant(1, 0.7),
+                    std::vector<std::string>{ "c", "d" });
+  const Bicop reloaded(bicop.to_json());
+  EXPECT_EQ(reloaded.get_var_types(), bicop.get_var_types());
+
+  Eigen::MatrixXd u(2, 4);
+  u << 0.3, 0.6, 0.3, 0.2, 0.8, 0.9, 0.8, 0.5; // F(x2) and F(x2^-) columns
+  EXPECT_TRUE(all_close(reloaded.pdf(u), bicop.pdf(u)));
+  EXPECT_TRUE(all_close(reloaded.hfunc1(u), bicop.hfunc1(u)));
+  EXPECT_TRUE(all_close(reloaded.hfunc2(u), bicop.hfunc2(u)));
+  EXPECT_TRUE(all_close(reloaded.cdf(u), bicop.cdf(u)));
+}
+
+TEST(serialization, discrete_vinecop_evaluates_the_same_after_roundtrip)
+{
+  auto vinecop = make_mixed_vinecop();
+  vinecop.set_var_types({ "c", "d", "c", "d" });
+  const Vinecop reloaded(vinecop.to_json());
+  EXPECT_EQ(reloaded.get_var_types(), vinecop.get_var_types());
+
+  auto u = tools_stats::simulate_uniform(20, 6, true, { 7 });
+  // left limits below the values for the two discrete variables
+  u.col(4) = u.col(1) * 0.5;
+  u.col(5) = u.col(3) * 0.5;
+  EXPECT_TRUE(all_close(reloaded.pdf(u), vinecop.pdf(u)));
+  EXPECT_TRUE(all_close(reloaded.rosenblatt(u, 1, false),
+                        vinecop.rosenblatt(u, 1, false)));
+}
+
 TEST(serialization, tll_bicop_cbor_roundtrip)
 {
   const auto data = tools_stats::simulate_uniform(30, 2, true, { 1 });

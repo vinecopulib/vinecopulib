@@ -1,5 +1,12 @@
 ## vinecopulib 1.1.0 (unreleased)
 
+### BUG FIXES
+
+- A `Bicop` or `Vinecop` with discrete variables loaded from JSON or CBOR now
+  evaluates with its stored variable types. Previously the reloaded model
+  reported the types correctly but computed densities, h-functions, and CDFs as
+  if every variable were continuous (#789).
+
 ## vinecopulib 1.0.0 (September 18, 2026)
 
 The first stable release. It collects a large amount of work: analytic
