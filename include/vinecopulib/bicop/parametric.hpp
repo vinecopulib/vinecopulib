@@ -47,6 +47,17 @@ protected:
 
   virtual Eigen::VectorXd get_start_parameters(const double tau) = 0;
 
+  // the maximum-likelihood search from given starting values and bounds;
+  // `method` "itau" holds the first parameter fixed (profile likelihood)
+  void fit_mle(const Eigen::MatrixXd& data,
+               const Eigen::VectorXd& weights,
+               const std::string& method,
+               Eigen::VectorXd initial_parameters,
+               const Eigen::MatrixXd& lb,
+               const Eigen::MatrixXd& ub);
+
+  void check_fit_method(const std::string& method);
+
   // fallback derivative leaves: central finite differences of the value
   // leaves, so that every parametric family supports the derivative
   // interface; families with closed forms override these.
@@ -105,8 +116,6 @@ private:
   void check_parameters_upper(const Eigen::MatrixXd& parameters);
 
   void check_parameters_lower(const Eigen::MatrixXd& parameters);
-
-  void check_fit_method(const std::string& method);
 };
 }
 
