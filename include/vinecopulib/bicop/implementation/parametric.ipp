@@ -97,7 +97,7 @@ ParBicop::fit(const Eigen::MatrixXd& data,
   // continuous data uses the analytic (or finite-difference) score leaves via
   // `logpdf_deriv_raw`; discrete data (whose likelihood uses h-function
   // differences) falls back to a finite difference of the total log-likelihood.
-  const bool continuous = (var_types_ == std::vector<std::string>{ "c", "c" });
+  const bool continuous = tools_var_types::all_continuous(var_types_);
   tools_optimization::Objective objective;
   if (method == "mle") {
     objective = [&data, &weights, this, continuous, lb, ub](
@@ -233,7 +233,7 @@ ParBicop::adjust_parameters_bounds(Eigen::MatrixXd& lb,
   }
 
   // refine search interval for Brent algorithm
-  double eps = (var_types_ == std::vector<std::string>{ "c", "c" }) ? 0.1 : 0.6;
+  double eps = tools_var_types::all_continuous(var_types_) ? 0.1 : 0.6;
   if (tools_stl::is_member(family_, bicop_families::one_par)) {
     auto lb2 = lb;
     auto ub2 = ub;

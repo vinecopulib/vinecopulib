@@ -167,10 +167,7 @@ inline Vinecop::Vinecop(const nlohmann::json& input, const bool check)
   try {
     var_types_ =
       tools_serialization::json_to_vector<std::string>(input["var_types"]);
-    n_discrete_ = 0;
-    for (const auto& t : var_types_) {
-      n_discrete_ += (t == "d");
-    }
+    n_discrete_ = static_cast<int>(tools_var_types::count_discrete(var_types_));
     nobs_ = static_cast<size_t>(input["nobs_"]);
     threshold_ = static_cast<double>(input["threshold"]);
     loglik_ = static_cast<double>(input["loglik"]);
@@ -674,7 +671,7 @@ Vinecop::fit(const Eigen::MatrixXd& u,
   // points have to be reordered to correspond to natural order
   for (size_t j = 0; j < d_; ++j) {
     hfunc2.col(j) = uc.col(order[j] - 1);
-    if (var_types_[order[j] - 1] == "d") {
+    if (tools_var_types::is_discrete(var_types_[order[j] - 1])) {
       hfunc2_sub.col(j) = uc.col(d_ + disc_cols[order[j] - 1]);
     }
   }
@@ -710,7 +707,7 @@ Vinecop::fit(const Eigen::MatrixXd& u,
         u_e.col(1) = hfunc1_in.col(m - 1);
       }
 
-      if ((var_types[0] == "d") || (var_types[1] == "d")) {
+      if (!tools_var_types::all_continuous(var_types)) {
         u_e.conservativeResize(n, 4);
         u_e.col(2) = hfunc2_sub_in.col(edge);
         if (m == rvine_structure_.struct_array(tree, edge, true)) {
@@ -725,7 +722,7 @@ Vinecop::fit(const Eigen::MatrixXd& u,
       // h-functions are only evaluated if needed in next tree
       if (rvine_structure_.needed_hfunc1(tree, edge)) {
         hfunc1.col(edge) = edge_copula->hfunc1(u_e);
-        if (var_types[1] == "d") {
+        if (tools_var_types::is_discrete(var_types[1])) {
           u_e_sub = u_e;
           u_e_sub.col(1) = u_e.col(3);
           hfunc1_sub.col(edge) = edge_copula->hfunc1(u_e_sub);
@@ -733,7 +730,7 @@ Vinecop::fit(const Eigen::MatrixXd& u,
       }
       if (rvine_structure_.needed_hfunc2(tree, edge)) {
         hfunc2.col(edge) = edge_copula->hfunc2(u_e);
-        if (var_types[0] == "d") {
+        if (tools_var_types::is_discrete(var_types[0])) {
           u_e_sub = u_e;
           u_e_sub.col(0) = u_e.col(2);
           hfunc2_sub.col(edge) = edge_copula->hfunc2(u_e_sub);
@@ -1094,7 +1091,7 @@ Vinecop::check_var_types(const std::vector<std::string>& var_types) const
     throw std::runtime_error(msg.str());
   }
   for (const auto& t : var_types) {
-    if (!tools_stl::is_member(t, { "c", "d" })) {
+    if (!(tools_var_types::is_linear(t) || tools_var_types::is_discrete(t))) {
       msg << "variable type must be 'c' or 'd' (not '" << t << "')."
           << std::endl;
       throw std::runtime_error(msg.str());
@@ -1109,10 +1106,7 @@ inline void
 Vinecop::set_var_types_internal(const std::vector<std::string>& var_types)
 {
   var_types_ = var_types;
-  n_discrete_ = 0;
-  for (const auto& t : var_types_) {
-    n_discrete_ += (t == "d");
-  }
+  n_discrete_ = static_cast<int>(tools_var_types::count_discrete(var_types_));
   if (pair_copulas_.empty()) {
     return;
   }
@@ -1279,7 +1273,7 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
     // points have to be reordered to correspond to natural order
     for (size_t j = 0; j < d_; ++j) {
       hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
-      if (var_types_[order[j] - 1] == "d") {
+      if (tools_var_types::is_discrete(var_types_[order[j] - 1])) {
         hfunc2_sub.col(j) =
           u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
       }
@@ -1308,7 +1302,7 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
           u_e.col(1) = hfunc1.col(m - 1);
         }
 
-        if ((var_types[0] == "d") || (var_types[1] == "d")) {
+        if (!tools_var_types::all_continuous(var_types)) {
           u_e.conservativeResize(b.size, 4);
           u_e.col(2) = hfunc2_sub.col(edge);
           if (m == rvine_structure_.struct_array(tree, edge, true)) {
@@ -1355,7 +1349,7 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
         // h-functions are only evaluated if needed in next step
         if (rvine_structure_.needed_hfunc1(tree, edge)) {
           hfunc1.col(edge) = ec_hfunc1();
-          if (var_types[1] == "d") {
+          if (tools_var_types::is_discrete(var_types[1])) {
             u_e_sub = u_e;
             u_e_sub.col(1) = u_e.col(3);
             hfunc1_sub.col(edge) = edge_copula->hfunc1(u_e_sub);
@@ -1363,7 +1357,7 @@ Vinecop::pdf_full(Eigen::MatrixXd u,
         }
         if (rvine_structure_.needed_hfunc2(tree, edge)) {
           hfunc2.col(edge) = ec_hfunc2();
-          if (var_types[0] == "d") {
+          if (tools_var_types::is_discrete(var_types[0])) {
             u_e_sub = u_e;
             u_e_sub.col(0) = u_e.col(2);
             hfunc2_sub.col(edge) = edge_copula->hfunc2(u_e_sub);
@@ -2096,7 +2090,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
     // points have to be reordered to correspond to natural order
     for (size_t j = 0; j < d_; ++j) {
       hfunc2.col(j) = u.block(b.begin, order[j] - 1, b.size, 1);
-      if (var_types_[order[j] - 1] == "d") {
+      if (tools_var_types::is_discrete(var_types_[order[j] - 1])) {
         hfunc2_sub.col(j) =
           u.block(b.begin, d_ + disc_cols[order[j] - 1], b.size, 1);
       }
@@ -2122,7 +2116,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
           u_e.col(1) = hfunc1.col(m - 1);
         }
 
-        if ((var_types[0] == "d") || (var_types[1] == "d")) {
+        if (!tools_var_types::all_continuous(var_types)) {
           u_e.conservativeResize(b.size, 4);
           u_e.col(2) = hfunc2_sub.col(edge);
           if (m == rvine_structure_.struct_array(tree, edge, true)) {
@@ -2139,7 +2133,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
         if (per_obs) {
           pars_e = per_obs_params.block(b.begin, ipar, b.size, pars.size());
         }
-        if (var_types == std::vector<std::string>{ "c", "c" }) {
+        if (tools_var_types::all_continuous(var_types)) {
           // analytic per-edge gradient of the log-density (closed forms for
           // bicop_families::analytic_derivs, internal finite differences of
           // the density otherwise); nonparametric edges were rejected above
@@ -2191,7 +2185,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
         if (rvine_structure_.needed_hfunc1(tree, edge)) {
           hfunc1.col(edge) =
             per_obs ? edge_copula.hfunc1(u_e, pars_e) : edge_copula.hfunc1(u_e);
-          if (var_types[1] == "d") {
+          if (tools_var_types::is_discrete(var_types[1])) {
             u_e_sub = u_e;
             u_e_sub.col(1) = u_e.col(3);
             hfunc1_sub.col(edge) = edge_copula.hfunc1(u_e_sub);
@@ -2200,7 +2194,7 @@ Vinecop::scores_full(Eigen::MatrixXd u,
         if (rvine_structure_.needed_hfunc2(tree, edge)) {
           hfunc2.col(edge) =
             per_obs ? edge_copula.hfunc2(u_e, pars_e) : edge_copula.hfunc2(u_e);
-          if (var_types[0] == "d") {
+          if (tools_var_types::is_discrete(var_types[0])) {
             u_e_sub = u_e;
             u_e_sub.col(0) = u_e.col(2);
             hfunc2_sub.col(edge) = edge_copula.hfunc2(u_e_sub);
@@ -2912,7 +2906,7 @@ Vinecop::simulate_conditional(const Eigen::MatrixXd& u_cond,
   for (size_t kk = 1; kk <= d_ - 1; ++kk) {
     size_t kd = 0;
     for (size_t i = 0; i < kk; ++i)
-      if (var_types_[order[d_ - kk + i] - 1] == "d")
+      if (tools_var_types::is_discrete(var_types_[order[d_ - kk + i] - 1]))
         ++kd;
     if (n_cols == kk + kd) {
       k = kk;
@@ -2981,7 +2975,7 @@ Vinecop::simulate_conditional_impl(const Eigen::MatrixXd& u_cond,
   const size_t k = conditioning_set.size();
   const size_t kd = static_cast<size_t>(std::count_if(
     conditioning_set.begin(), conditioning_set.end(), [&](size_t var) {
-      return var_types_[var - 1] == "d";
+      return tools_var_types::is_discrete(var_types_[var - 1]);
     }));
   const size_t n_cols = static_cast<size_t>(u_cond.cols());
   const bool expanded = n_cols == 2 * k;
@@ -3010,7 +3004,7 @@ Vinecop::simulate_conditional_impl(const Eigen::MatrixXd& u_cond,
   for (size_t i = 0; i < k; ++i) {
     size_t var = conditioning_set[i] - 1;
     u_completed.col(var) = u_cond.col(i);
-    if (var_types_[var] == "d") {
+    if (tools_var_types::is_discrete(var_types_[var])) {
       size_t left_col = expanded ? k + i : k + kd_seen;
       if ((u_cond.col(left_col).array() > u_cond.col(i).array()).any()) {
         throw std::runtime_error(
@@ -3317,7 +3311,7 @@ Vinecop::rosenblatt_impl(Eigen::MatrixXd u,
     hfunc1_sub = hfunc1;
     hfunc2_sub = hfunc2;
     for (size_t j = 0; j < d_; ++j) {
-      if (var_types_[order[j] - 1] == "d") {
+      if (tools_var_types::is_discrete(var_types_[order[j] - 1])) {
         hfunc2_sub.col(j) = u.col(d_ + disc_cols[order[j] - 1]);
       }
     }
@@ -3344,7 +3338,7 @@ Vinecop::rosenblatt_impl(Eigen::MatrixXd u,
           u_e.col(1) = hfunc1.block(b.begin, m - 1, b.size, 1);
         }
 
-        if ((var_types[0] == "d") || (var_types[1] == "d")) {
+        if (!tools_var_types::all_continuous(var_types)) {
           u_e.conservativeResize(b.size, 4);
           u_e.col(2) = hfunc2_sub.block(b.begin, edge, b.size, 1);
           if (m == structure.struct_array(tree, edge, true)) {
@@ -3357,7 +3351,7 @@ Vinecop::rosenblatt_impl(Eigen::MatrixXd u,
         // h-functions are only evaluated if needed in next step
         if (structure.needed_hfunc1(tree, edge)) {
           hfunc1.block(b.begin, edge, b.size, 1) = edge_copula.hfunc1(u_e);
-          if (var_types[1] == "d") {
+          if (tools_var_types::is_discrete(var_types[1])) {
             u_e_sub = u_e;
             u_e_sub.col(1) = u_e.col(3);
             hfunc1_sub.block(b.begin, edge, b.size, 1) =
@@ -3365,7 +3359,7 @@ Vinecop::rosenblatt_impl(Eigen::MatrixXd u,
           }
         }
         hfunc2.block(b.begin, edge, b.size, 1) = edge_copula.hfunc2(u_e);
-        if (var_types[0] == "d") {
+        if (tools_var_types::is_discrete(var_types[0])) {
           u_e_sub = u_e;
           u_e_sub.col(0) = u_e.col(2);
           hfunc2_sub.block(b.begin, edge, b.size, 1) =
@@ -3391,8 +3385,9 @@ Vinecop::rosenblatt_impl(Eigen::MatrixXd u,
     // fill second half of U with left-sided limits of the conditional CDF
     // (equal to conditional CDF for continuous variables)
     for (size_t j = 0; j < d; j++) {
-      U.col(d + j) = var_types_[j] == "d" ? hfunc2_sub.col(inverse_order[j])
-                                          : hfunc2.col(inverse_order[j]);
+      U.col(d + j) = tools_var_types::is_discrete(var_types_[j])
+                       ? hfunc2_sub.col(inverse_order[j])
+                       : hfunc2.col(inverse_order[j]);
     }
     // randomize by weighting left and right limits with independent uniforms
     auto R =
@@ -3726,10 +3721,7 @@ Vinecop::truncate(size_t trunc_lvl)
 inline void
 Vinecop::set_continuous_var_types()
 {
-  var_types_ = std::vector<std::string>(d_);
-  for (auto& t : var_types_)
-    t = "c";
-  set_var_types_internal(var_types_);
+  set_var_types_internal(tools_var_types::all_continuous_types(d_));
 }
 
 //! @brief Returns the number of discrete variables.
@@ -3756,7 +3748,7 @@ Vinecop::collapse_data(const Eigen::MatrixXd& u) const
   u_new.leftCols(d_) = u.leftCols(d_);
   size_t disc_count = 0;
   for (size_t i = 0; i < d_; ++i) {
-    if (var_types_[i] == "d") {
+    if (tools_var_types::is_discrete(var_types_[i])) {
       u_new.col(d_ + disc_count++) = u.col(d_ + i);
     }
   }

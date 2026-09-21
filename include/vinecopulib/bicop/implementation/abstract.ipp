@@ -171,7 +171,7 @@ AbstractBicop::set_var_types(const std::vector<std::string>& var_types)
 inline Eigen::VectorXd
 AbstractBicop::pdf(const Eigen::MatrixXd& u)
 {
-  if (var_types_ != std::vector<std::string>{ "c", "c" }) {
+  if (!tools_var_types::all_continuous(var_types_)) {
     // discrete margins go through the parameter-aware difference quotients
     return pdf(u, get_parameters().transpose());
   }
@@ -183,7 +183,7 @@ AbstractBicop::pdf(const Eigen::MatrixXd& u)
 inline Eigen::VectorXd
 AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
 {
-  if (var_types_[0] == "d") {
+  if (tools_var_types::is_discrete(var_types_[0])) {
     return hfunc1(u, get_parameters().transpose());
   }
   return hfunc1_raw(u.leftCols(2), get_parameters().transpose());
@@ -192,7 +192,7 @@ AbstractBicop::hfunc1(const Eigen::MatrixXd& u)
 inline Eigen::VectorXd
 AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
 {
-  if (var_types_[1] == "d") {
+  if (tools_var_types::is_discrete(var_types_[1])) {
     return hfunc2(u, get_parameters().transpose());
   }
   return hfunc2_raw(u.leftCols(2), get_parameters().transpose());
@@ -201,7 +201,7 @@ AbstractBicop::hfunc2(const Eigen::MatrixXd& u)
 inline Eigen::VectorXd
 AbstractBicop::hinv1(const Eigen::MatrixXd& u)
 {
-  if (var_types_[0] == "c") {
+  if (tools_var_types::is_continuous(var_types_[0])) {
     return hinv1_raw(u.leftCols(2), get_parameters().transpose());
   } else {
     return hinv1_num(u);
@@ -211,7 +211,7 @@ AbstractBicop::hinv1(const Eigen::MatrixXd& u)
 inline Eigen::VectorXd
 AbstractBicop::hinv2(const Eigen::MatrixXd& u)
 {
-  if (var_types_[1] == "c") {
+  if (tools_var_types::is_continuous(var_types_[1])) {
     return hinv2_raw(u.leftCols(2), get_parameters().transpose());
   } else {
     return hinv2_num(u);
@@ -265,9 +265,9 @@ inline Eigen::VectorXd
 AbstractBicop::pdf(const Eigen::MatrixXd& u, const Eigen::MatrixXd& parameters)
 {
   Eigen::VectorXd pdf(u.rows());
-  if (var_types_ == std::vector<std::string>{ "c", "c" }) {
+  if (tools_var_types::all_continuous(var_types_)) {
     pdf = pdf_raw(u.leftCols(2), parameters);
-  } else if (var_types_ == std::vector<std::string>{ "d", "d" }) {
+  } else if (tools_var_types::all_discrete(var_types_)) {
     pdf = pdf_d_d(u, parameters);
   } else {
     pdf = pdf_c_d(u, parameters);
@@ -285,7 +285,7 @@ AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u,
   Eigen::MatrixXd umin = u.rightCols(2);
   Eigen::VectorXd udiff(u.rows());
 
-  if (var_types_[0] != "c") {
+  if (tools_var_types::is_discrete(var_types_[0])) {
     udiff = (u.col(0) - u.col(2)).cwiseAbs();
   } else {
     udiff = (u.col(1) - u.col(3)).cwiseAbs();
@@ -298,7 +298,7 @@ AbstractBicop::pdf_c_d(const Eigen::MatrixXd& u,
     if (udiff(i) > 5e-5) {
       // the discrete argument is integrated over its atom, the continuous one
       // is the conditioning coordinate
-      if (var_types_[0] != "c") {
+      if (tools_var_types::is_discrete(var_types_[0])) {
         pdf(i) = cond_interval_prob(u(i, 1), u(i, 2), u(i, 0), 2, par_i);
       } else {
         pdf(i) = cond_interval_prob(u(i, 0), u(i, 3), u(i, 1), 1, par_i);
@@ -415,7 +415,7 @@ inline Eigen::VectorXd
 AbstractBicop::hfunc1(const Eigen::MatrixXd& u,
                       const Eigen::MatrixXd& parameters)
 {
-  if (var_types_[0] == "d") {
+  if (tools_var_types::is_discrete(var_types_[0])) {
     auto uu = u;
     uu.col(3) = uu.col(1);
     auto u1diff = (uu.col(0) - uu.col(2)).cwiseAbs();
@@ -444,7 +444,7 @@ inline Eigen::VectorXd
 AbstractBicop::hfunc2(const Eigen::MatrixXd& u,
                       const Eigen::MatrixXd& parameters)
 {
-  if (var_types_[1] == "d") {
+  if (tools_var_types::is_discrete(var_types_[1])) {
     auto uu = u;
     uu.col(2) = uu.col(0);
     auto u2diff = (uu.col(1) - uu.col(3)).cwiseAbs();
@@ -471,7 +471,7 @@ inline Eigen::VectorXd
 AbstractBicop::hinv1(const Eigen::MatrixXd& u,
                      const Eigen::MatrixXd& parameters)
 {
-  if (var_types_[0] == "c") {
+  if (tools_var_types::is_continuous(var_types_[0])) {
     return hinv1_raw(u.leftCols(2), parameters);
   } else {
     return hinv1_num(u, parameters);
@@ -482,7 +482,7 @@ inline Eigen::VectorXd
 AbstractBicop::hinv2(const Eigen::MatrixXd& u,
                      const Eigen::MatrixXd& parameters)
 {
-  if (var_types_[1] == "c") {
+  if (tools_var_types::is_continuous(var_types_[1])) {
     return hinv2_raw(u.leftCols(2), parameters);
   } else {
     return hinv2_num(u, parameters);

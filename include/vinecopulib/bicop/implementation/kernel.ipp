@@ -88,7 +88,7 @@ KernelBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
   auto oldpars = this->get_parameters();
   auto old_types = var_types_;
   this->set_parameters(parameters);
-  var_types_ = { "c", "c" };
+  var_types_ = tools_var_types::as_continuous(var_types_);
 
   std::vector<int> seeds = {
     204967043, 733593603, 184618802, 399707801, 290266245

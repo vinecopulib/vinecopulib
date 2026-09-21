@@ -100,7 +100,7 @@ get_disc_cols(std::vector<std::string> var_types)
   std::vector<size_t> disc_cols(d);
   size_t disc_count = 0;
   for (size_t i = 0; i < d; ++i) {
-    if (var_types[i] == "d") {
+    if (tools_var_types::is_discrete(var_types[i])) {
       disc_cols[i] = disc_count++;
     } else {
       disc_cols[i] = 0;
@@ -794,7 +794,7 @@ VinecopSelector::add_pc_info(const EdgeIterator& e, VineTree& tree)
   // collect pseudo observations for next tree
   tree[e].pc_data.col(0) = get_hfunc(tree[v0], pos0 == 0);
   tree[e].pc_data.col(1) = get_hfunc(tree[v1], pos1 == 0);
-  if ((tree[e].var_types[0] == "d") || (tree[e].var_types[1] == "d")) {
+  if (!tools_var_types::all_continuous(tree[e].var_types)) {
     tree[e].pc_data.conservativeResize(n, 4);
     tree[e].pc_data.col(2) = get_hfunc_sub(tree[v0], pos0 == 0);
     tree[e].pc_data.col(3) = get_hfunc_sub(tree[v1], pos1 == 0);
@@ -1043,9 +1043,10 @@ VinecopSelector::make_base_tree(const Eigen::MatrixXd& data)
     // data need are reordered to correspond to natural order (necessary
     // when structure is fixed)
     base_tree[e].hfunc1 = data.col(order[target] - 1);
-    if (var_types_[order[target] - 1] == "d") {
+    const auto& type = var_types_[order[target] - 1];
+    base_tree[e].var_types = { type, type };
+    if (tools_var_types::is_discrete(type)) {
       base_tree[e].hfunc1_sub = data.col(d_ + disc_cols[order[target] - 1]);
-      base_tree[e].var_types = { "d", "d" };
     }
 
     // identify edge with variable "target" and initialize sets
@@ -1210,12 +1211,12 @@ compute_edge_hfuncs(const EdgeIterator& e, VineTree& tree)
 {
   tree[e].hfunc1 = tree[e].pair_copula.hfunc1(tree[e].pc_data);
   tree[e].hfunc2 = tree[e].pair_copula.hfunc2(tree[e].pc_data);
-  if (tree[e].var_types[1] == "d") {
+  if (tools_var_types::is_discrete(tree[e].var_types[1])) {
     auto sub_data = tree[e].pc_data;
     sub_data.col(1) = sub_data.col(3);
     tree[e].hfunc1_sub = tree[e].pair_copula.hfunc1(sub_data);
   }
-  if (tree[e].var_types[0] == "d") {
+  if (tools_var_types::is_discrete(tree[e].var_types[0])) {
     auto sub_data = tree[e].pc_data;
     sub_data.col(0) = sub_data.col(2);
     tree[e].hfunc2_sub = tree[e].pair_copula.hfunc2(sub_data);
