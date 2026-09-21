@@ -345,6 +345,11 @@ Vinecop::select(const Eigen::MatrixXd& u, const FitControlsVinecop& controls)
   if (controls.get_select_families()) {
     check_tree_criterion_function(controls);
     check_data(u);
+    if (tools_var_types::any_circular(var_types_)) {
+      throw std::runtime_error(
+        "structure selection is not available for circular variables yet; "
+        "supply an RVineStructure and use fit()");
+    }
     if (d_ == 1) {
       loglik_ = 0;
       nobs_ = u.rows();
@@ -1091,11 +1096,19 @@ Vinecop::check_var_types(const std::vector<std::string>& var_types) const
     throw std::runtime_error(msg.str());
   }
   for (const auto& t : var_types) {
-    if (!(tools_var_types::is_linear(t) || tools_var_types::is_discrete(t))) {
-      msg << "variable type must be 'c' or 'd' (not '" << t << "')."
+    if (!tools_var_types::is_valid(t)) {
+      msg << "variable type must be 'c', 'd', or 'a' (not '" << t << "')."
           << std::endl;
       throw std::runtime_error(msg.str());
     }
+  }
+  // every pair of variables is conditioned together in some tree, so a vine
+  // with both kinds would contain a circular-discrete pair copula
+  if (tools_var_types::any_circular(var_types) &&
+      tools_var_types::count_discrete(var_types) > 0) {
+    msg << "circular ('a') and discrete ('d') variables cannot be combined "
+        << "in one model." << std::endl;
+    throw std::runtime_error(msg.str());
   }
 }
 

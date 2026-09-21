@@ -20,8 +20,8 @@ using BicopPtr = std::shared_ptr<AbstractBicop>;
 //!
 //! @details The model is fully characterized by the family,
 //! rotation (one of `0`, `90`, `180`, `270`), a matrix of parameters, and
-//! variable types (two strings, one for each variable, either `"c"`
-//! for continuous or `"d"` for discrete).
+//! variable types (two strings, one for each variable, `"c"` for
+//! continuous, `"d"` for discrete, or `"a"` for continuous circular).
 //!
 //! Implemented families (see `BicopFamily`):
 //!
@@ -127,12 +127,14 @@ public:
   void set_parameters(const Eigen::MatrixXd& parameters);
 
   //! Sets the variable types.
-  //! @param var_types a length-2 vector with each entry either `"c"`
-  //! (continuous, default) or `"d"` (discrete).
+  //! @param var_types a length-2 vector with each entry `"c"` (continuous,
+  //! default), `"d"` (discrete), or `"a"` (continuous circular). A circular
+  //! variable cannot be paired with a discrete one, and the family must
+  //! accept the pair of types; see `family_accepts_var_types()`.
   void set_var_types(const std::vector<std::string>& var_types = { "c", "c" });
 
   //! @return the variable types of the two variables (each `"c"` for
-  //! continuous or `"d"` for discrete).
+  //! continuous, `"d"` for discrete, or `"a"` for continuous circular).
   std::vector<std::string> get_var_types() const;
 
   // Stats methods
@@ -410,6 +412,8 @@ private:
   void check_data_dim(const Eigen::MatrixXd& u) const;
 
   void check_var_types(const std::vector<std::string>& var_types) const;
+
+  static std::string family_var_types_hint(BicopFamily family);
 
   void flip_abstract_var_types();
 

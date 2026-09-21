@@ -157,8 +157,8 @@ binding signatures. Legacy JSON reads work unchanged. A separate per-variable
 attribute would duplicate all of that; the circular-discrete combination,
 when it comes, can be a further value.
 
-- [ ] Accept the new value in `Bicop::check_var_types` and
-  `Vinecop::check_var_types`. Audit every `== "d"` and `get_n_discrete()`
+- [x] (#790) Accept the new value in `Bicop::check_var_types` and
+  `Vinecop::check_var_types`.  Audit every `== "d"` and `get_n_discrete()`
   branch to confirm it stays correct with a third value; `as_continuous()`
   and the `BicopView` / `VinecopView` continuous paths must preserve it.
   Audit result (September 21, 2026): the `== "d"` and `get_n_discrete()`
@@ -168,20 +168,23 @@ when it comes, can be a further value.
   the vine score path, plus the literal `{"c", "c"}` returned by
   `Bicop::as_continuous` and `BicopView::get_var_types`. Replace all literal
   comparisons by named type predicates before any circular code lands.
-- [ ] Decide whether circular families infer geometry when constructed
-  explicitly, and validate contradictory family/geometry combinations.
-- [ ] Define family capabilities for both argument orders, including the
+- [x] (#790) Decide whether circular families infer geometry when constructed
+  explicitly, and validate contradictory family/geometry combinations. Decided: no inference; a circular family constructed with linear
+  types throws, as does a linear family with a circular type.
+- [x] (#790) Define family capabilities for both argument orders, including the
   geometry-dependent nonparametric estimator. Include independence in every
-  supported candidate set.
-- [ ] Update family registration, name conversion, convenience groups, and
+  supported candidate set. `family_accepts_var_types()` / `eligible_families()`.
+- [x] (#790) Update family registration, name conversion, convenience groups, and
   factory dispatch. Add the new families to `bicop_families::all`; the
   eligibility filter keeps the effective default search unchanged for
-  linear callers. Add a group for the two-rotation families.
-- [ ] Thread geometry into `tools_select::create_candidate_bicops`, which
+  linear callers. Add a group for the two-rotation families. Enum values, names, `two_rotations`, `circular`, and `cylindrical`
+  groups added; the families join `all`, `parametric`, `two_par`, and
+  `three_par` in stage 3, when they become constructible.
+- [x] (#790) Thread geometry into `tools_select::create_candidate_bicops`, which
   today receives only data and controls, chooses rotations from the sign of
-  linear tau, and would drop one orientation of a circular family.
-- [ ] Specify filtering for explicit and empty family sets and behavior when
-  no compatible candidate remains. Apply the same rules to fitting and selection.
+  linear tau, and would drop one orientation of a circular family. 
+- [x] (#790) Specify filtering for explicit and empty family sets and behavior when
+  no compatible candidate remains. Apply the same rules to fitting and selection. 
 - [ ] Preserve geometry through copying, views, flipping, rotations, resetting,
   truncation, structure conversions, and conditional/reoriented interfaces.
 - [ ] Define the JSON field for nonparametric grid geometry. The `Bicop` JSON

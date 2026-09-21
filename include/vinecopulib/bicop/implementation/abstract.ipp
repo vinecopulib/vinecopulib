@@ -78,6 +78,13 @@ AbstractBicop::create(BicopFamily family, const Eigen::MatrixXd& parameters)
     case BicopFamily::tll:
       new_bicop = BicopPtr(new TllBicop());
       break;
+    case BicopFamily::cardioid:
+    case BicopFamily::wrapped_cauchy:
+    case BicopFamily::von_mises:
+    case BicopFamily::quad_sections:
+    case BicopFamily::cubic_sections:
+      throw std::runtime_error("the " + vinecopulib::get_family_name(family) +
+                               " copula is not implemented yet");
 
     default:
       throw std::runtime_error(std::string("Family not implemented"));

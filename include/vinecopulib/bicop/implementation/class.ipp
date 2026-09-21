@@ -20,11 +20,13 @@ namespace vinecopulib {
 //! @brief Instantiates a specific bivariate copula model.
 //! @param family The copula family.
 //! @param rotation The rotation of the copula; one of 0, 90, 180, or 270
-//!     (for Independence, Gaussian, Student, Frank, and nonparametric
-//!     families, only 0 is allowed).
+//!     (for Independence, Gaussian, Student, Frank, nonparametric, and
+//!     cylindrical families, only 0 is allowed; for the circulas, 0 or 90).
 //! @param parameters The copula parameters.
 //! @param var_types Two strings specifying the types of the variables,
-//!   e.g., `("c", "d")` means first variable continuous, second discrete.
+//!   e.g., `("c", "d")` means first variable continuous, second discrete,
+//!   and `("a", "c")` first variable circular, second continuous. The
+//!   family must accept the pair of types; see `family_accepts_var_types()`.
 inline Bicop::Bicop(const BicopFamily family,
                     const int rotation,
                     const Eigen::MatrixXd& parameters,
@@ -96,7 +98,8 @@ inline Bicop::Bicop(const nlohmann::json& input)
 {
   // try block for backwards compatibility
   try {
-    var_types_ = tools_serialization::json_to_vector<std::string>(input["vt"]);
+    set_var_types(
+      tools_serialization::json_to_vector<std::string>(input["vt"]));
     nobs_ = static_cast<size_t>(input["nobs"]);
     bicop_->set_loglik(input["ll"]);
     bicop_->set_npars(input["npars"]);
@@ -1980,6 +1983,12 @@ inline void
 Bicop::set_var_types(const std::vector<std::string>& var_types)
 {
   check_var_types(var_types);
+  if (bicop_ && !family_accepts_var_types(get_family(), var_types)) {
+    throw std::runtime_error(
+      "the " + get_family_name() + " copula cannot model a pair with " +
+      "var_types (" + var_types[0] + ", " + var_types[1] + "); " +
+      family_var_types_hint(get_family()));
+  }
   var_types_ = var_types;
   if (bicop_) {
     bicop_->set_var_types(var_types);
@@ -2195,7 +2204,8 @@ Bicop::select(const Eigen::MatrixXd& u, FitControlsBicop controls)
   bicop_->set_loglik(0.0);
   if (u_no_nan.rows() >= 10) {
     tools_eigen::trim(u_no_nan);
-    std::vector<Bicop> bicops = create_candidate_bicops(u_no_nan, controls);
+    std::vector<Bicop> bicops =
+      create_candidate_bicops(u_no_nan, controls, var_types_);
     for (auto& bc : bicops) {
       bc.set_var_types(var_types_);
     }
@@ -2358,6 +2368,27 @@ Bicop::check_rotation(int rotation) const
                                bicop_->get_family_name() + " copula");
     }
   }
+  if (is_member(bicop_->get_family(), bicop_families::two_rotations)) {
+    if (!is_member(rotation, { 0, 90 })) {
+      throw std::runtime_error("rotation must be 0 or 90 for the " +
+                               bicop_->get_family_name() + " copula");
+    }
+  }
+}
+
+//! the variable types a family accepts, for error messages.
+inline std::string
+Bicop::family_var_types_hint(BicopFamily family)
+{
+  using namespace tools_stl;
+  if (is_member(family, bicop_families::cylindrical)) {
+    return "it needs one circular ('a') and one continuous ('c') variable";
+  }
+  if (is_member(family, bicop_families::circular)) {
+    return "it needs at least one circular ('a') variable and no discrete "
+           "('d') one";
+  }
+  return "it needs continuous ('c') or discrete ('d') variables";
 }
 
 //! @brief Checks that a parameter matrix has the current family's shape.
@@ -2403,18 +2434,24 @@ Bicop::check_fitted() const
   }
 }
 
-//! @brief Checks whether var_types have the correct length and are either "c"
-//! or "d".
+//! @brief Checks whether var_types have the correct length, are each "c",
+//! "d", or "a", and do not pair a circular with a discrete variable.
 inline void
 Bicop::check_var_types(const std::vector<std::string>& var_types) const
 {
+  using namespace tools_var_types;
   if (var_types.size() != 2) {
     throw std::runtime_error("var_types must have size two.");
   }
   for (const auto& t : var_types) {
-    if (!(tools_var_types::is_linear(t) || tools_var_types::is_discrete(t))) {
-      throw std::runtime_error("var type must be either 'c' or 'd'.");
+    if (!is_valid(t)) {
+      throw std::runtime_error("var type must be 'c', 'd', or 'a' (not '" + t +
+                               "').");
     }
+  }
+  if (any_circular(var_types) && count_discrete(var_types) > 0) {
+    throw std::runtime_error(
+      "a circular ('a') and a discrete ('d') variable cannot be paired.");
   }
 }
 

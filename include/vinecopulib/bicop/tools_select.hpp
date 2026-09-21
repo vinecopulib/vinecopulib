@@ -9,16 +9,21 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_var_types.hpp>
 
 namespace vinecopulib {
 namespace tools_select {
 
 std::vector<Bicop>
 create_candidate_bicops(const Eigen::MatrixXd& data,
-                        const FitControlsBicop& controls);
+                        const FitControlsBicop& controls,
+                        const std::vector<std::string>& var_types =
+                          tools_var_types::all_continuous_types(2));
 
 std::vector<BicopFamily>
-get_candidate_families(const FitControlsBicop& controls);
+get_candidate_families(const FitControlsBicop& controls,
+                       const std::vector<std::string>& var_types =
+                         tools_var_types::all_continuous_types(2));
 
 void
 preselect_candidates(std::vector<Bicop>& bicops,

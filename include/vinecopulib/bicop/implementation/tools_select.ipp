@@ -10,17 +10,21 @@
 
 namespace vinecopulib {
 namespace tools_select {
-//! @brief Gets only those rotations that yield the appropriate
-//! association direction.
+//! @brief Creates the candidate models for a pair: the eligible families
+//! with the rotations that fit the association direction.
 //! @param data Captured by reference to avoid data copies;
 //!     should NOT be modified though.
 //! @param controls The controls for the pair-copula fit, whose family set and
 //!     selection criterion the candidates are drawn from.
+//! @param var_types The pair's variable types; they decide which families
+//!     are eligible and how rotations are chosen.
 inline std::vector<Bicop>
 create_candidate_bicops(const Eigen::MatrixXd& data,
-                        const FitControlsBicop& controls)
+                        const FitControlsBicop& controls,
+                        const std::vector<std::string>& var_types)
 {
-  std::vector<BicopFamily> families = get_candidate_families(controls);
+  std::vector<BicopFamily> families =
+    get_candidate_families(controls, var_types);
 
   // check whether dependence is negative or positive
   double tau = wdm::wdm(data.leftCols(2), "tau", controls.get_weights())(0, 1);
@@ -33,17 +37,33 @@ create_candidate_bicops(const Eigen::MatrixXd& data,
     }
   }
 
-  // create Bicop objects for all valid family/rotation combinations
+  // create Bicop objects for all valid family/rotation combinations; the
+  // circular families are constructed with the pair's types because their
+  // default types would be rejected
   std::vector<Bicop> new_bicops;
+  const Eigen::MatrixXd no_pars;
+  auto add = [&](BicopFamily fam, int rotation) {
+    if (tools_stl::is_member(fam, bicop_families::circular)) {
+      new_bicops.emplace_back(fam, rotation, no_pars, var_types);
+    } else {
+      new_bicops.emplace_back(fam, rotation);
+    }
+  };
   for (auto& fam : families) {
     if (tools_stl::is_member(fam, bicop_families::rotationless)) {
-      new_bicops.emplace_back(fam, 0);
+      add(fam, 0);
+    } else if (tools_stl::is_member(fam, bicop_families::two_rotations)) {
+      // both circular orientations; linear tau carries no information here
+      add(fam, 0);
+      if (controls.get_allow_rotations()) {
+        add(fam, 90);
+      }
     } else {
       if (controls.get_allow_rotations()) {
-        new_bicops.emplace_back(fam, which_rotations[0]);
-        new_bicops.emplace_back(fam, which_rotations[1]);
+        add(fam, which_rotations[0]);
+        add(fam, which_rotations[1]);
       } else if (tau > 0) {
-        new_bicops.emplace_back(fam, 0);
+        add(fam, 0);
       }
     }
   }
@@ -57,10 +77,15 @@ create_candidate_bicops(const Eigen::MatrixXd& data,
   return new_bicops;
 }
 
+//! @brief The families to try for a pair: the family set of the controls
+//! (all families when empty), restricted to the parametric method and to the
+//! families eligible for the pair's variable types.
+//! @param controls The fit controls.
+//! @param var_types The pair's variable types.
 inline std::vector<BicopFamily>
-get_candidate_families(const FitControlsBicop& controls)
+get_candidate_families(const FitControlsBicop& controls,
+                       const std::vector<std::string>& var_types)
 {
-  //! adjusts the family_set according to parameteric_method.
   std::vector<BicopFamily> family_set = controls.get_family_set();
   if (family_set.empty()) {
     // use all (allowed) families
@@ -76,6 +101,18 @@ get_candidate_families(const FitControlsBicop& controls)
         throw std::runtime_error("No family with method itau provided");
       }
     }
+  }
+
+  family_set = eligible_families(family_set, var_types);
+  if (family_set.empty()) {
+    std::string eligible;
+    for (auto fam : eligible_families(bicop_families::all, var_types)) {
+      eligible += (eligible.empty() ? "" : ", ") + get_family_name(fam);
+    }
+    throw std::runtime_error(
+      "no family in the family set can model a pair with var_types (" +
+      var_types[0] + ", " + var_types[1] +
+      "); eligible families are: " + eligible);
   }
 
   return family_set;
@@ -161,7 +198,10 @@ preselect_family(std::vector<double> c, double tau, const Bicop& bicop)
   int rotation = bicop.get_rotation();
 
   bool preselect = false;
-  if (is_member(family, bicop_families::rotationless)) {
+  if (is_member(family, bicop_families::circular)) {
+    // the tail and sign heuristics below are defined for linear dependence
+    preselect = true;
+  } else if (is_member(family, bicop_families::rotationless)) {
     preselect = true;
     if ((std::fabs(c[0] - c[1]) > 0.3) & (family == BicopFamily::frank))
       preselect = false;

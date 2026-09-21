@@ -68,7 +68,31 @@ enum class BicopFamily
   //! finite parametric form: the copula density is fit on a grid in the
   //! inverse-normal-transformed copula space. Data-driven rotation and
   //! tail behavior; Kendall's tau is rank-based on the fitted density.
-  tll
+  tll,
+  //! Cardioid circula (circular-circular, also usable circular-linear).
+  //! 2 parameters (concentration rho in [0, 1/2], phase mu in radians);
+  //! rotations 0 / 90 degrees; no tail dependence; Kendall's tau by
+  //! numerical integration, no inverse.
+  cardioid,
+  //! Wrapped Cauchy circula (circular-circular, also usable circular-linear).
+  //! 2 parameters (concentration rho in [0, 0.99], phase mu in radians);
+  //! rotations 0 / 90 degrees; no tail dependence; Kendall's tau by
+  //! numerical integration, no inverse.
+  wrapped_cauchy,
+  //! von Mises circula (circular-circular, also usable circular-linear).
+  //! 2 parameters (concentration kappa in [0, 100], phase mu in radians);
+  //! rotations 0 / 90 degrees; no tail dependence; Kendall's tau by
+  //! numerical integration, no inverse.
+  von_mises,
+  //! Circular-linear copula with quadratic sections in the linear variable.
+  //! 2 parameters (amplitude a in [0, 1], phase mu in radians); rotationless;
+  //! no tail dependence; Kendall's tau is 2 a sin(mu) / (3 pi).
+  quad_sections,
+  //! Circular-linear copula with cubic sections in the linear variable.
+  //! 3 parameters (amplitudes a in [0, 1] and b in [-1, 1], phase mu in
+  //! radians); rotationless; no tail dependence; Kendall's tau is
+  //! (a + b) sin(mu) / (3 pi).
+  cubic_sections
 };
 
 std::string
@@ -76,6 +100,14 @@ get_family_name(BicopFamily family);
 
 BicopFamily
 get_family_enum(const std::string& family);
+
+bool
+family_accepts_var_types(BicopFamily family,
+                         const std::vector<std::string>& var_types);
+
+std::vector<BicopFamily>
+eligible_families(const std::vector<BicopFamily>& families,
+                  const std::vector<std::string>& var_types);
 
 //! Convenience definitions of sets of bivariate copula families
 namespace bicop_families {
@@ -141,11 +173,37 @@ const std::vector<BicopFamily> bb = { BicopFamily::bb1,
 //! @brief All copulas that don't have a rotation.
 //!
 //! (because they already cover positive and negative dependence)
-const std::vector<BicopFamily> rotationless = { BicopFamily::indep,
-                                                BicopFamily::gaussian,
-                                                BicopFamily::student,
-                                                BicopFamily::frank,
-                                                BicopFamily::tll };
+const std::vector<BicopFamily> rotationless = {
+  BicopFamily::indep,         BicopFamily::gaussian, BicopFamily::student,
+  BicopFamily::frank,         BicopFamily::tll,      BicopFamily::quad_sections,
+  BicopFamily::cubic_sections
+};
+
+//! @brief All copulas with exactly two distinct rotations, 0 and 90 degrees.
+//!
+//! The 180- and 270-degree rotations of these families coincide with a
+//! change of their phase parameter, so only 0 (positive circular association)
+//! and 90 (negative circular association) are allowed.
+const std::vector<BicopFamily> two_rotations = { BicopFamily::cardioid,
+                                                 BicopFamily::wrapped_cauchy,
+                                                 BicopFamily::von_mises };
+
+//! @brief All families that need a circular variable (`var_types` `"a"`).
+//!
+//! The binding-density circulas (`cardioid`, `wrapped_cauchy`, `von_mises`)
+//! accept circular-circular and circular-linear pairs; the cylindrical
+//! sections copulas (`quad_sections`, `cubic_sections`) accept circular-linear
+//! pairs only.
+const std::vector<BicopFamily> circular = { BicopFamily::cardioid,
+                                            BicopFamily::wrapped_cauchy,
+                                            BicopFamily::von_mises,
+                                            BicopFamily::quad_sections,
+                                            BicopFamily::cubic_sections };
+
+//! @brief The circular-linear families that require exactly one circular and
+//! one linear variable.
+const std::vector<BicopFamily> cylindrical = { BicopFamily::quad_sections,
+                                               BicopFamily::cubic_sections };
 
 //! Families with stronger dependence in the lower tail
 const std::vector<BicopFamily> lt = { BicopFamily::clayton,
