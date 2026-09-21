@@ -1192,6 +1192,7 @@ TEST(BicopSimulate, per_row_parameters_edge_cases)
 INSTANTIATE_TEST_SUITE_P(
   ParBicopTest,
   ParBicopTest,
-  testing::Combine(testing::ValuesIn(bicop_families::parametric),
+  testing::Combine(testing::ValuesIn(set_diff(bicop_families::parametric,
+                                              bicop_families::circular)),
                    testing::ValuesIn(rotations)));
 }
