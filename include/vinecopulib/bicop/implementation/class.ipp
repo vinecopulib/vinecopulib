@@ -96,7 +96,8 @@ inline Bicop::Bicop(const nlohmann::json& input)
 {
   // try block for backwards compatibility
   try {
-    var_types_ = tools_serialization::json_to_vector<std::string>(input["vt"]);
+    set_var_types(
+      tools_serialization::json_to_vector<std::string>(input["vt"]));
     nobs_ = static_cast<size_t>(input["nobs"]);
     bicop_->set_loglik(input["ll"]);
     bicop_->set_npars(input["npars"]);

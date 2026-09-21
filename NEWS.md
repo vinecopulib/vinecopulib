@@ -15,6 +15,10 @@
 * CI builds and tests against Eigen 5.0.1 as well as 3.4.0, with the address
   and undefined-behavior sanitizers, so a regression that only one major
   version exposes is caught (#792)
+- A `Bicop` or `Vinecop` with discrete variables loaded from JSON or CBOR now
+  evaluates with its stored variable types. Previously the reloaded model
+  reported the types correctly but computed densities, h-functions, and CDFs as
+  if every variable were continuous (#789).
 
 ## vinecopulib 1.0.0 (September 18, 2026)
 
