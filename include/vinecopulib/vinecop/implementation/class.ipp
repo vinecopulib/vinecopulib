@@ -345,11 +345,6 @@ Vinecop::select(const Eigen::MatrixXd& u, const FitControlsVinecop& controls)
   if (controls.get_select_families()) {
     check_tree_criterion_function(controls);
     check_data(u);
-    if (tools_var_types::any_circular(var_types_)) {
-      throw std::runtime_error(
-        "structure selection is not available for circular variables yet; "
-        "supply an RVineStructure and use fit()");
-    }
     if (d_ == 1) {
       loglik_ = 0;
       nobs_ = u.rows();

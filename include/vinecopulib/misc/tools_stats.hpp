@@ -175,6 +175,11 @@ double
 pairwise_cxi(const Eigen::MatrixXd& x,
              const Eigen::VectorXd& weights = Eigen::VectorXd());
 
+double
+pairwise_circular(const Eigen::MatrixXd& x,
+                  const std::vector<std::string>& var_types,
+                  const Eigen::VectorXd& weights = Eigen::VectorXd());
+
 Eigen::MatrixXd
 ghalton(const size_t& n,
         const size_t& d,

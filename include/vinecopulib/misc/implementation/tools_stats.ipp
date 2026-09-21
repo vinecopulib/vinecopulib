@@ -8,11 +8,13 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/seed_seq.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
+#include <complex>
 #include <memory>
 #include <unsupported/Eigen/FFT>
 #include <vinecopulib/misc/tools_stats_ghalton.hpp>
 #include <vinecopulib/misc/tools_stats_sobol.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
+#include <vinecopulib/misc/tools_var_types.hpp>
 #include <wdm/eigen.hpp>
 #include <wdm/ranks.hpp>
 
@@ -551,6 +553,62 @@ pairwise_cxi(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
     return std::numeric_limits<double>::quiet_NaN();
   }
   return std::max(xi12, xi21);
+}
+
+//! @brief calculates a dependence measure for a pair with a circular variable.
+//!
+//! The measure does not depend on where the circle of a circular variable is
+//! cut, which the rank-based measures do (Kendall's tau of a perfectly
+//! dependent pair can be zero), and it is zero for independence and bounded
+//! by one.
+//!
+//! For two circular variables it is the larger mean resultant length of the
+//! angle sums and differences, $ \max_{q = \pm 1} |E e^{i 2\pi (V - q U)}| $,
+//! which is one exactly when the pair is a rotation or reflection. For a
+//! circular and a linear variable it is
+//! $ (|E e^{i 2\pi U} f_1(V)|^2 + |E e^{i 2\pi U} f_2(V)|^2)^{1/2} $ with the
+//! first two orthonormal Legendre polynomials $ f_1, f_2 $ on $ [0, 1] $,
+//! the moments that identify the quadratic- and cubic-sections copulas.
+//!
+//! @param x An $ n \times 2 $ matrix of copula data.
+//! @param var_types The two variable types, at least one of them `"a"`.
+//! @param weights Optional observation weights.
+inline double
+pairwise_circular(const Eigen::MatrixXd& x,
+                  const std::vector<std::string>& var_types,
+                  const Eigen::VectorXd& weights)
+{
+  const double two_pi = 2.0 * boost::math::constants::pi<double>();
+  const bool first_circular = tools_var_types::is_circular(var_types[0]);
+  const bool second_circular = tools_var_types::is_circular(var_types[1]);
+  if (!first_circular && !second_circular) {
+    throw std::runtime_error("pairwise_circular needs a circular variable");
+  }
+  std::complex<double> m1(0.0, 0.0), m2(0.0, 0.0);
+  double wsum = 0.0;
+  for (Eigen::Index i = 0; i < x.rows(); ++i) {
+    const double w = (weights.size() > 0) ? weights(i) : 1.0;
+    wsum += w;
+    if (first_circular && second_circular) {
+      m1 += w * std::polar(1.0, two_pi * (x(i, 1) - x(i, 0)));
+      m2 += w * std::polar(1.0, two_pi * (x(i, 1) + x(i, 0)));
+    } else {
+      const double u = first_circular ? x(i, 0) : x(i, 1);
+      const double v = first_circular ? x(i, 1) : x(i, 0);
+      const std::complex<double> z = std::polar(1.0, two_pi * u);
+      m1 += w * z * (std::sqrt(3.0) * (2.0 * v - 1.0));
+      m2 += w * z * (std::sqrt(5.0) * (6.0 * v * v - 6.0 * v + 1.0));
+    }
+  }
+  if (wsum <= 0.0) {
+    return 0.0;
+  }
+  m1 /= wsum;
+  m2 /= wsum;
+  if (first_circular && second_circular) {
+    return std::max(std::abs(m1), std::abs(m2));
+  }
+  return std::min(1.0, std::sqrt(std::norm(m1) + std::norm(m2)));
 }
 //! @}
 
