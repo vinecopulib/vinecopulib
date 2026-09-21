@@ -1,5 +1,15 @@
 ## vinecopulib 1.1.0 (unreleased)
 
+### BUG FIXES
+
+* `tools_stats::pnorm` clamps its argument before calling Eigen's `erf`, so
+  infinite and very large arguments give exactly 0 or 1 with every Eigen
+  release. Eigen 5 returns NaN from `erf` at infinity, which turned the box
+  bounds in `find_latent_sample` into NaN and read past the end of the box
+  covering: the segfault reported for discrete models built against Eigen 5.
+  The covering itself now also assigns coordinates of exactly 1 to the last
+  cell instead of one past it (#792)
+
 ## vinecopulib 1.0.0 (September 18, 2026)
 
 The first stable release. It collects a large amount of work: analytic
