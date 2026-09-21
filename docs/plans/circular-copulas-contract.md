@@ -563,8 +563,24 @@ Parameter order and domains are as in the tables above. The optimizer bounds
 are the domain bounds, with $\pm\infty$ for phases. `get_npars()` returns the
 parameter count. JSON serialization of the parametric families is unchanged:
 `"fam"`, `"rot"`, `"par"`, `"vt"`, and the fit statistics suffice, and the new
-family names round-trip through `get_family_name` / `get_family_enum`. The
-grid geometry field for the nonparametric estimator is a stage 2 decision.
+family names round-trip through `get_family_name` / `get_family_enum`.
+
+### Nonparametric grid serialization
+
+A `tll` model whose grid is not the default normal grid on two linear axes
+carries an additional JSON object `"grid"` with two fields: `"knots"`, a list
+of two vectors holding the knot positions of the first and second axis, and
+`"types"`, the two axis types (`"c"` or `"a"`) the knots were built for. The
+`"par"` field keeps the density values on the knot lattice, row `i` and
+column `j` belonging to the `i`-th knot of the first axis and the `j`-th of
+the second. On reading, a model with a `"grid"` field rebuilds its
+interpolation grid from those knots; a model without one rebuilds the normal
+grid from the row count of `"par"`, as today, so every existing file reloads
+unchanged. A `"grid"` whose knot counts disagree with the shape of `"par"`,
+whose types disagree with `"vt"`, or whose knots are not increasing in
+`[0, 1]` is rejected with a message naming the field. Writing a linear `tll`
+fit does not add the field, so files written by a linear-only library are
+read unchanged.
 
 ### Candidate generation and preselection
 

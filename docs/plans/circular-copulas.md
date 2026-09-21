@@ -1,6 +1,7 @@
 # Circular copulas and mixed vines: implementation plan
 
-Status: stage 1 in progress on the integration branch `feat/circulas`.
+Status: stages 1 to 3 implemented on the integration branch `feat/circulas`;
+stages 4 and 5 are next.
 Updated September 21, 2026.
 
 This checklist tracks the first feature release for circular variables. The
@@ -185,13 +186,20 @@ when it comes, can be a further value.
   linear tau, and would drop one orientation of a circular family. 
 - [x] (#790) Specify filtering for explicit and empty family sets and behavior when
   no compatible candidate remains. Apply the same rules to fitting and selection. 
-- [ ] Preserve geometry through copying, views, flipping, rotations, resetting,
-  truncation, structure conversions, and conditional/reoriented interfaces.
-- [ ] Define the JSON field for nonparametric grid geometry. The `Bicop` JSON
-  carries only family, rotation, parameters, `var_types`, and fit statistics,
-  and `KernelBicop::set_parameters` rebuilds knots from the row count alone,
-  so a circular grid cannot reload without it. Test legacy reads and complete
-  round-trips; reject unsupported formats clearly.
+- [x] (#791) Preserve geometry through copying, views, flipping, rotations,
+  resetting, truncation, structure conversions, and conditional/reoriented
+  interfaces. Done at the `Bicop` level (copy, `BicopView::as_continuous`,
+  `flip()` with the two-rotation canonicalization, `set_rotation`, JSON);
+  the vine-level interfaces (truncation, relabeling, `VinecopView`,
+  conditional simulation and reorientation) are verified by the stage 5
+  tasks once a circular vine can be built.
+- [x] (#791) Define the JSON field for nonparametric grid geometry. The
+  `Bicop` JSON carries only family, rotation, parameters, `var_types`, and fit
+  statistics, and `KernelBicop::set_parameters` rebuilds knots from the row
+  count alone, so a circular grid cannot reload without it. Test legacy reads
+  and complete round-trips; reject unsupported formats clearly. Defined in the
+  contract (*Nonparametric grid serialization*); stage 4 implements and tests
+  it.
 - [x] Audit all special cases keyed on `BicopFamily::tll` before choosing
   between geometry-dependent `tll` and separate family identifiers. Four
   sites: the factory in `abstract.ipp`, the two parameter-skipping branches
@@ -207,29 +215,33 @@ implementations, and fit controls.
 
 ## 3. Parametric pair copulas
 
-- [ ] Implement cardioid, wrapped Cauchy, and von Mises binding families in
+- [x] (#791) Implement cardioid, wrapped Cauchy, and von Mises binding families in
   the existing `.hpp` / inline `.ipp` pattern, sharing the circular primitives
   (`g`, `G`, `G^{-1}`) that have identical semantics.
-- [ ] Implement quadratic and cubic sections, phase handling, and both axis
+- [x] (#791) Implement quadratic and cubic sections, phase handling, and both axis
   orders. Support circular-linear use of binding families without duplicating
   their mathematical implementations.
-- [ ] Implement stable lifted circular CDFs and inverses, retaining the number
+- [x] (#791) Implement stable lifted circular CDFs and inverses, retaining the number
   of completed turns. Audit cancellation and concentration limits, including
   the von Mises normalizing constant and wrapped Cauchy near-singular limit.
-- [ ] Implement likelihood fitting with circular initialization and periodic
+- [x] (#791) Implement likelihood fitting with circular initialization and periodic
   phase optimization. The existing tau-based starting values and search
   bounds must not constrain these fits incorrectly.
-- [ ] Implement or validate derivative support. Support broadcast and
+- [x] (#791) Implement or validate derivative support. Support broadcast and
   per-observation parameter matrices under the existing contract.
-- [ ] Honor observation weights, missing-value handling, parameter validation,
+- [x] (#791) Honor observation weights, missing-value handling, parameter validation,
   seeded simulation, and fit statistics.
-- [ ] Update candidate construction and preselection: produce exactly the two
+- [x] (#791) Update candidate construction and preselection: produce exactly the two
   rotations for circular families and bypass the tau-sign and tail
   (`lt` / `ut`) heuristics for them.
-- [ ] Test normalization, uniform marginals, CDF boundary values, CDF/density
+- [x] (#791) Test normalization, uniform marginals, CDF boundary values, CDF/density
   derivatives, h/inverse identities, independence limits, flip identities,
   simulation moments, and recovery of phases near the cut. Include the
-  zero-tau half-turn case as a fit-recovery test.
+  zero-tau half-turn case as a fit-recovery test. `BindingBicop` holds the leaves in terms of the lifted CDF; the
+  families supply `g`, the lifted CDF, its inverse, and the moment map. `SectionsBicop` reads the argument order from `var_types`. Bracketed Newton for the cardioid and von Mises inverses; closed
+  form for the wrapped Cauchy. `CircularBicop::fit` starts from moment estimates and calls the
+  extracted `ParBicop::fit_mle` with an unbounded phase. Finite-difference fallback of `ParBicop`; per-row parameters via
+  `binaryExpr_or_nan`. Done in stage 2b. `test_circular`, with golden values from `tools/circulas`.
 
 Main code: [parametric.ipp](../../include/vinecopulib/bicop/implementation/parametric.ipp),
 [tools_select.ipp](../../include/vinecopulib/bicop/implementation/tools_select.ipp),

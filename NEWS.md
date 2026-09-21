@@ -1,5 +1,18 @@
 ## vinecopulib 1.1.0 (unreleased)
 
+### NEW FEATURES
+
+- Circular variables: `var_types` accepts `"a"` for a continuous circular
+  (angular) variable, given on the copula scale as `u` in `[0, 1]` with `0`
+  identified with `1`. Five pair-copula families model them: the circulas
+  `cardioid`, `wrapped_cauchy`, and `von_mises` (circular-circular, also usable
+  circular-linear; rotations 0 and 90) and the cylindrical `quad_sections` and
+  `cubic_sections` (circular-linear in either argument order). Each has a phase
+  parameter in radians. `Bicop` fits, selects, evaluates, simulates, and
+  serializes them; `family_accepts_var_types()` tells which families model a
+  pair, and linear families reject circular variables. `Vinecop` accepts the
+  type but does not select structures with it yet (#791).
+
 ## vinecopulib 1.0.0 (September 18, 2026)
 
 The first stable release. It collects a large amount of work: analytic
