@@ -11,15 +11,20 @@
 #include <vinecopulib/bicop/bb6.hpp>
 #include <vinecopulib/bicop/bb7.hpp>
 #include <vinecopulib/bicop/bb8.hpp>
+#include <vinecopulib/bicop/cardioid.hpp>
 #include <vinecopulib/bicop/clayton.hpp>
+#include <vinecopulib/bicop/cubic_sections.hpp>
 #include <vinecopulib/bicop/frank.hpp>
 #include <vinecopulib/bicop/gaussian.hpp>
 #include <vinecopulib/bicop/gumbel.hpp>
 #include <vinecopulib/bicop/indep.hpp>
 #include <vinecopulib/bicop/joe.hpp>
+#include <vinecopulib/bicop/quad_sections.hpp>
 #include <vinecopulib/bicop/student.hpp>
 #include <vinecopulib/bicop/tawn.hpp>
 #include <vinecopulib/bicop/tll.hpp>
+#include <vinecopulib/bicop/von_mises.hpp>
+#include <vinecopulib/bicop/wrapped_cauchy.hpp>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
@@ -79,12 +84,20 @@ AbstractBicop::create(BicopFamily family, const Eigen::MatrixXd& parameters)
       new_bicop = BicopPtr(new TllBicop());
       break;
     case BicopFamily::cardioid:
+      new_bicop = BicopPtr(new CardioidBicop());
+      break;
     case BicopFamily::wrapped_cauchy:
+      new_bicop = BicopPtr(new WrappedCauchyBicop());
+      break;
     case BicopFamily::von_mises:
+      new_bicop = BicopPtr(new VonMisesBicop());
+      break;
     case BicopFamily::quad_sections:
+      new_bicop = BicopPtr(new QuadSectionsBicop());
+      break;
     case BicopFamily::cubic_sections:
-      throw std::runtime_error("the " + vinecopulib::get_family_name(family) +
-                               " copula is not implemented yet");
+      new_bicop = BicopPtr(new CubicSectionsBicop());
+      break;
 
     default:
       throw std::runtime_error(std::string("Family not implemented"));

@@ -113,20 +113,36 @@ eligible_families(const std::vector<BicopFamily>& families,
 namespace bicop_families {
 
 //! All implemented families
-const std::vector<BicopFamily> all = {
-  BicopFamily::indep,   BicopFamily::gaussian, BicopFamily::student,
-  BicopFamily::clayton, BicopFamily::gumbel,   BicopFamily::frank,
-  BicopFamily::joe,     BicopFamily::bb1,      BicopFamily::bb6,
-  BicopFamily::bb7,     BicopFamily::bb8,      BicopFamily::tawn,
-  BicopFamily::tll
-};
+const std::vector<BicopFamily> all = { BicopFamily::indep,
+                                       BicopFamily::gaussian,
+                                       BicopFamily::student,
+                                       BicopFamily::clayton,
+                                       BicopFamily::gumbel,
+                                       BicopFamily::frank,
+                                       BicopFamily::joe,
+                                       BicopFamily::bb1,
+                                       BicopFamily::bb6,
+                                       BicopFamily::bb7,
+                                       BicopFamily::bb8,
+                                       BicopFamily::tawn,
+                                       BicopFamily::tll,
+                                       BicopFamily::cardioid,
+                                       BicopFamily::wrapped_cauchy,
+                                       BicopFamily::von_mises,
+                                       BicopFamily::quad_sections,
+                                       BicopFamily::cubic_sections };
 
 //! All parametric families
 const std::vector<BicopFamily> parametric = {
-  BicopFamily::indep,   BicopFamily::gaussian, BicopFamily::student,
-  BicopFamily::clayton, BicopFamily::gumbel,   BicopFamily::frank,
-  BicopFamily::joe,     BicopFamily::bb1,      BicopFamily::bb6,
-  BicopFamily::bb7,     BicopFamily::bb8,      BicopFamily::tawn
+  BicopFamily::indep,         BicopFamily::gaussian,
+  BicopFamily::student,       BicopFamily::clayton,
+  BicopFamily::gumbel,        BicopFamily::frank,
+  BicopFamily::joe,           BicopFamily::bb1,
+  BicopFamily::bb6,           BicopFamily::bb7,
+  BicopFamily::bb8,           BicopFamily::tawn,
+  BicopFamily::cardioid,      BicopFamily::wrapped_cauchy,
+  BicopFamily::von_mises,     BicopFamily::quad_sections,
+  BicopFamily::cubic_sections
 };
 
 //! All nonparametric families
@@ -144,10 +160,15 @@ const std::vector<BicopFamily> two_par = { BicopFamily::student,
                                            BicopFamily::bb1,
                                            BicopFamily::bb6,
                                            BicopFamily::bb7,
-                                           BicopFamily::bb8 };
+                                           BicopFamily::bb8,
+                                           BicopFamily::cardioid,
+                                           BicopFamily::wrapped_cauchy,
+                                           BicopFamily::von_mises,
+                                           BicopFamily::quad_sections };
 
 //! All three-parameter families
-const std::vector<BicopFamily> three_par = { BicopFamily::tawn };
+const std::vector<BicopFamily> three_par = { BicopFamily::tawn,
+                                             BicopFamily::cubic_sections };
 
 //! All elliptical copulas
 const std::vector<BicopFamily> elliptical = { BicopFamily::gaussian,

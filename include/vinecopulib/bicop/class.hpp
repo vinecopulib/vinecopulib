@@ -415,6 +415,9 @@ private:
 
   static std::string family_var_types_hint(BicopFamily family);
 
+  static std::vector<std::string> var_types_from_json(
+    const nlohmann::json& input);
+
   void flip_abstract_var_types();
 
   void check_parameters_size(const Eigen::MatrixXd& parameters) const;
