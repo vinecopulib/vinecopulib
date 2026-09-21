@@ -103,46 +103,46 @@ Do not merge, tag, or publish without express authorization.
 
 ## 1. Mathematical and API contract
 
-- [x] Fix the spelling of the new `var_types` value; the token approach in
+- [x] (#785) Fix the spelling of the new `var_types` value; the token approach in
   stage 2 is decided. The spelling reaches the R and Python signatures, so it
   is settled here, not later. Settled: `"a"` (angular); see the decision
   record.
-- [x] Document that the library takes `u` in `[0, 1]` with `0` identified
+- [x] (#785) Document that the library takes `u` in `[0, 1]` with `0` identified
   with `1`, and that the cut is wherever the caller's marginal CDF puts it.
   State that ranks (`to_pseudo_obs`) place the cut at the caller's zero angle. Done in [circular-copulas-contract.md](circular-copulas-contract.md), *Copula-scale conventions*.
-- [x] Define endpoint behavior: densities join at `0` and `1` on circular
+- [x] (#785) Define endpoint behavior: densities join at `0` and `1` on circular
   axes; CDFs and h-functions retain their anchored probability semantics.
   Inverses must return the correct branch on the chosen interval. Done, *Endpoint behavior*.
-- [x] Derive density, CDF, both h-functions, and both inverses for each
+- [x] (#785) Derive density, CDF, both h-functions, and both inverses for each
   proposed parametric family. Identify numerical integrations and root solves
   (von Mises `G` and `G^{-1}`; cubic sections constraints). Done, *Binding-density circulas* and *Cylindrical sections copulas*;
   verified by `tools/circulas/check_contract.py`.
-- [x] Fix concentration bounds, the independence limit, parameter
+- [x] (#785) Fix concentration bounds, the independence limit, parameter
   identifiability, and the number of fitted parameters. The wrapped Cauchy
   concentration needs an upper bound strictly below its singular limit.
   Derive parameter constraints for the phased cubic-sections family explicitly. Done, *Parameter domains* and *Cubic sections*: the cubic feasible region
   is exactly the box, so only box constraints are needed.
-- [x] Fix the orientation and phase conventions: `q` is represented by the
+- [x] (#785) Fix the orientation and phase conventions: `q` is represented by the
   copula rotation in `{0, 90}`; `mu` is a periodic, unbounded parameter in
   the optimizer (no bound to hit, no finite-difference problem at a cut).
   Specify how `allow_rotations` maps onto the two distinct rotations. Done, *Phase parameters* and *Orientation and rotation*.
-- [x] Record the `flip()` transformations for every family, including the
+- [x] (#785) Record the `flip()` transformations for every family, including the
   phased cylindrical families, which need not be exchangeable. Done, *Flip* and *Symmetries of the cylindrical families*.
-- [x] Define ordinary Kendall's tau and Blomqvist's beta relative to the
+- [x] (#785) Define ordinary Kendall's tau and Blomqvist's beta relative to the
   chosen cut. Keep their current meanings; expose circular dependence
   summaries separately. Specify tail-dependence behavior. `itau` stays
   unavailable for circular families; `parameters_to_tau` is defined, its
   inverse is not. Done, *Dependence measures*.
-- [x] State the periodicity condition for a mixed vine: the conditional CDF
+- [x] (#785) State the periodicity condition for a mixed vine: the conditional CDF
   of a circular variable wraps from `0` to `1`, so every pair copula in which
   that variable (or its h-transform) is a conditioned argument must have
   equal density at both ends of that coordinate. A circular variable that
   appears only in a conditioning set imposes nothing on the pair copula. Done, *Mixed vines: the periodicity condition*, with a proof sketch.
-- [x] Distinguish density periodicity from changing the cut and refitting.
+- [x] (#785) Distinguish density periodicity from changing the cut and refitting.
   Investigate how changing cuts affects the simplifying assumption: a shift
   of a conditional circular CDF can depend on the conditioning values.
   Do not promise arbitrary-cut invariance of simplified vines without proof. Done, *Changing the cut*: no invariance is promised beyond tree 1.
-- [x] Specify tolerances and independent numerical reference calculations
+- [x] (#785) Specify tolerances and independent numerical reference calculations
   for the identities used in the later test stages. Done, *Acceptance cases and tolerances*; references in `tools/circulas/`.
 
 ## 2. Geometry, family eligibility, and compatibility
