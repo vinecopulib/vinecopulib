@@ -66,10 +66,14 @@ sites. Both questions are answered through named predicates, never by
 comparing against the literal.
 
 Supported pair geometries are `{"a", "a"}` (circular-circular),
-`{"a", "c"}` and `{"c", "a"}` (circular-linear in either order), and the
-existing linear and discrete combinations. The pairs `{"a", "d"}` and
-`{"d", "a"}` are rejected by `check_var_types` with a message that names the
-combination; supporting them needs a separate mathematical decision.
+`{"a", "c"}` and `{"c", "a"}` (circular-linear in either order), the
+existing linear and discrete combinations, and `{"a", "d"}` and `{"d", "a"}`:
+a circular variable paired with a discrete *linear* variable. The discrete
+variable is handled as for any other pair, through differences of the CDF
+and of the h-functions over its atom, which only needs the anchored CDF that
+every circular family has. A discrete circular variable (an angle on a
+lattice) is not representable: its atoms are arcs and one of them straddles
+the cut, which would need a cut convention of its own.
 
 ## Binding-density circulas (circular-circular)
 
@@ -494,7 +498,7 @@ Cut sensitivity of higher-tree fits is a stage 6 validation item.
 | `{"c", "c"}`, `{"c", "d"}`, `{"d", "c"}`, `{"d", "d"}` | all existing families; unchanged |
 | `{"a", "a"}` | `indep`, `cardioid`, `wrapped_cauchy`, `von_mises`, `tll` |
 | `{"a", "c"}`, `{"c", "a"}` | `indep`, `cardioid`, `wrapped_cauchy`, `von_mises`, `cubic_sections`, `tll` |
-| `{"a", "d"}`, `{"d", "a"}` | rejected |
+| `{"a", "d"}`, `{"d", "a"}` | `indep`, `cardioid`, `wrapped_cauchy`, `von_mises`, `cubic_sections` (no `tll`: the latent sample it recovers for a discrete variable lives on the normal scale) |
 
 Eligibility is a function of `(family, var_types)` exposed in one place and
 used by construction, `set_var_types`, fitting, selection, and the vine. The
@@ -518,8 +522,9 @@ triggers this.
 - A linear family with an `"a"` in its `var_types` is rejected for the same
   reason: its density is not periodic, and the vine condition would be
   violated silently.
-- `check_var_types` in both classes accepts `"a"` and rejects the
-  circular-discrete pairs listed above.
+- `check_var_types` in both classes accepts `"a"` alongside `"c"` and
+  `"d"`; eligibility, not the type check, decides which families model a
+  pair.
 - `Vinecop::select` and the threshold and truncation searches throw when any
   variable is circular until stage 6 replaces the tree criterion; `Vinecop::fit`
   on a supplied structure is supported from stage 5.
