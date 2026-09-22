@@ -135,6 +135,18 @@ TEST(test_circular_tll, knots_follow_the_variable_types)
   retyped.set_var_types(aa);
   EXPECT_EQ(retyped.to_json()["grid"]["knots"],
             circular.to_json()["grid"]["knots"]);
+
+  // values of a new shape land on the default knots; bad values, shapes,
+  // and degrees of freedom are rejected
+  Eigen::MatrixXd values = Eigen::MatrixXd::Constant(12, 20, 1.0);
+  retyped.set_parameters(values);
+  knots = read_knots(retyped.to_json());
+  EXPECT_EQ(knots[0].size(), 12);
+  EXPECT_EQ(knots[1].size(), 20);
+  EXPECT_THROW(retyped.set_parameters(Eigen::MatrixXd::Constant(2, 5, 1.0)),
+               std::runtime_error);
+  EXPECT_THROW(retyped.set_parameters(Eigen::MatrixXd::Constant(5, 5, -1.0)),
+               std::runtime_error);
 }
 
 TEST(test_circular_tll, json_round_trip_keeps_the_grid)
