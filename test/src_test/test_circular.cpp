@@ -572,7 +572,7 @@ TEST(test_circular, discrete_linear_variable_next_to_a_circular_one)
     DVineStructure(std::vector<size_t>{ 1, 2, 3 }),
     { { make(BicopFamily::cubic_sections, 0, { 0.7, -0.5, 1.0 }, ac),
         make(BicopFamily::gaussian, 0, { 0.6 }, cc) },
-      { make(BicopFamily::quad_sections, 0, { 0.5, 0.0 }, ac) } },
+      { make(BicopFamily::cubic_sections, 0, { 0.5, 0.5, 0.0 }, ac) } },
     { "a", "c", "c" });
   auto u = truth.simulate(400, false, 1, { 16 });
   Eigen::MatrixXd data(u.rows(), 4);

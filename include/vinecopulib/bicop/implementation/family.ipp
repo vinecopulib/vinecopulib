@@ -89,13 +89,13 @@ get_family_enum(const std::string& family)
 
 //! @brief Whether a family can model a pair with the given variable types.
 //!
-//! @details The independence copula and the nonparametric `tll` estimator
-//! accept every pair. The other families split by geometry: the linear
-//! families (`gaussian`, ..., `tawn`) need two non-circular variables; the
-//! binding-density circulas need at least one circular variable; the
-//! cylindrical sections copulas need exactly one circular and one linear
-//! variable. A circular variable paired with a discrete one is never
-//! accepted.
+//! @details The independence copula accepts every pair. The other families
+//! split by geometry: the linear families (`gaussian`, ..., `tawn`) need two
+//! non-circular variables; the binding-density circulas need at least one
+//! circular variable; the cylindrical sections copula `cubic_sections` needs
+//! exactly one circular and one linear (continuous or discrete) variable. The
+//! nonparametric `tll` estimator accepts every pair except a circular
+//! variable next to a discrete one.
 //!
 //! @param family The family.
 //! @param var_types Two variable types, each `"c"`, `"d"`, or `"a"`.

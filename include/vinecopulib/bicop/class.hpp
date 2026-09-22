@@ -128,9 +128,8 @@ public:
 
   //! Sets the variable types.
   //! @param var_types a length-2 vector with each entry `"c"` (continuous,
-  //! default), `"d"` (discrete), or `"a"` (continuous circular). A circular
-  //! variable cannot be paired with a discrete one, and the family must
-  //! accept the pair of types; see `family_accepts_var_types()`.
+  //! default), `"d"` (discrete), or `"a"` (continuous circular). The family
+  //! must accept the pair of types; see `family_accepts_var_types()`.
   void set_var_types(const std::vector<std::string>& var_types = { "c", "c" });
 
   //! @return the variable types of the two variables (each `"c"` for
