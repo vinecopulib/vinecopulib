@@ -155,8 +155,8 @@ variable. This reuses the existing propagation through trees
 `set_var_types_internal`, and the selector's per-edge `var_types`), the
 constructors' default arguments, the `"vt"` JSON field, the views, and the
 binding signatures. Legacy JSON reads work unchanged. A separate per-variable
-attribute would duplicate all of that; the circular-discrete combination,
-when it comes, can be a further value.
+attribute would duplicate all of that; a discrete circular variable, when it
+comes, can be a further value.
 
 - [x] (#790) Accept the new value in `Bicop::check_var_types` and
   `Vinecop::check_var_types`.  Audit every `== "d"` and `get_n_discrete()`
@@ -485,7 +485,7 @@ implementing PR. Entries without a PR were settled during planning.
 | Decision | Rationale | Evidence / PR |
 | --- | --- | --- |
 | Pair copulas use the binding-density construction for circular-circular pairs and cylindrical sections for circular-linear pairs. | Closed-form or one-dimensional numerics throughout; covers the published mixed-vine applications. | Jones, Pewsey, and Kato; Hodel and Fieberg |
-| Continuous circular and continuous linear variables only; circular-discrete is rejected explicitly. | Mixed circular/discrete needs its own mathematical and API decision. | planning |
+| Circular variables pair with continuous and with discrete linear variables; a discrete circular variable is not representable. | The discrete machinery is CDF and h-function differences over an atom, which the circular families support as they are (#797); a discrete circular variable's atoms straddle the cut and need a convention of their own. | planning, revised September 22, 2026 |
 | Marginal transforms, cuts, and angular conventions stay downstream; the library takes `u` in `[0, 1]` with `0` identified with `1`. | Matches the existing copula-scale contract and the `kde1d` exclusion in AGENTS.md. | planning |
 | Geometry is a third `var_types` value. | Reuses propagation, JSON, views, and binding signatures; a parallel attribute would duplicate them. `Vinecop::set_var_types_internal` and the selector's edge inheritance already propagate any token without literal comparisons. | planning (confirmed by maintainer, September 15, 2026; propagation verified September 21, 2026) |
 | The token is `"a"` (angular). | Short and parallel to `"c"` / `"d"`. The literal is confined to the type predicates, so the spelling can change later at one site. | maintainer, September 21, 2026 |

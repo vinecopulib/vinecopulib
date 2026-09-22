@@ -89,13 +89,13 @@ get_family_enum(const std::string& family)
 
 //! @brief Whether a family can model a pair with the given variable types.
 //!
-//! @details The independence copula and the nonparametric `tll` estimator
-//! accept every pair. The other families split by geometry: the linear
-//! families (`gaussian`, ..., `tawn`) need two non-circular variables; the
-//! binding-density circulas need at least one circular variable; the
-//! cylindrical sections copulas need exactly one circular and one linear
-//! variable. A circular variable paired with a discrete one is never
-//! accepted.
+//! @details The independence copula accepts every pair. The other families
+//! split by geometry: the linear families (`gaussian`, ..., `tawn`) need two
+//! non-circular variables; the binding-density circulas need at least one
+//! circular variable; the cylindrical sections copula `cubic_sections` needs
+//! exactly one circular and one linear (continuous or discrete) variable. The
+//! nonparametric `tll` estimator accepts every pair except a circular
+//! variable next to a discrete one.
 //!
 //! @param family The family.
 //! @param var_types Two variable types, each `"c"`, `"d"`, or `"a"`.
@@ -110,11 +110,13 @@ family_accepts_var_types(BicopFamily family,
   }
   const size_t n_circular =
     is_circular(var_types[0]) + is_circular(var_types[1]);
-  if (n_circular > 0 && count_discrete(var_types) > 0) {
-    return false;
-  }
-  if (family == BicopFamily::indep || family == BicopFamily::tll) {
+  if (family == BicopFamily::indep) {
     return true;
+  }
+  if (family == BicopFamily::tll) {
+    // the nonparametric estimator recovers a latent sample of a discrete
+    // variable on the normal scale, which has no circular counterpart yet
+    return n_circular == 0 || count_discrete(var_types) == 0;
   }
   if (tools_stl::is_member(family, bicop_families::cylindrical)) {
     return n_circular == 1;

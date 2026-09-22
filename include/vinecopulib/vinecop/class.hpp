@@ -248,8 +248,9 @@ public:
     const std::vector<std::vector<Bicop>>& pair_copulas);
   //! Sets the variable types.
   //! @param var_types a length-`dim` vector with each entry `"c"`
-  //! (continuous), `"d"` (discrete), or `"a"` (continuous circular); circular
-  //! and discrete variables cannot be combined in one model.
+  //! (continuous), `"d"` (discrete), or `"a"` (continuous circular). Every
+  //! pair copula must accept the types of its edge; see
+  //! `family_accepts_var_types()`.
   void set_var_types(const std::vector<std::string>& var_types);
 
   //! @return the variable types of each variable (each `"c"` for

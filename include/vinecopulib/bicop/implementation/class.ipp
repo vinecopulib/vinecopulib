@@ -2441,11 +2441,10 @@ Bicop::family_var_types_hint(BicopFamily family)
 {
   using namespace tools_stl;
   if (is_member(family, bicop_families::cylindrical)) {
-    return "it needs one circular ('a') and one continuous ('c') variable";
+    return "it needs one circular ('a') and one linear ('c' or 'd') variable";
   }
   if (is_member(family, bicop_families::circular)) {
-    return "it needs at least one circular ('a') variable and no discrete "
-           "('d') one";
+    return "it needs at least one circular ('a') variable";
   }
   return "it needs continuous ('c') or discrete ('d') variables";
 }
@@ -2504,8 +2503,8 @@ Bicop::var_types_from_json(const nlohmann::json& input)
   return tools_var_types::all_continuous_types(2);
 }
 
-//! @brief Checks whether var_types have the correct length, are each "c",
-//! "d", or "a", and do not pair a circular with a discrete variable.
+//! @brief Checks whether var_types have the correct length and are each
+//! "c", "d", or "a".
 inline void
 Bicop::check_var_types(const std::vector<std::string>& var_types) const
 {
@@ -2518,10 +2517,6 @@ Bicop::check_var_types(const std::vector<std::string>& var_types) const
       throw std::runtime_error("var type must be 'c', 'd', or 'a' (not '" + t +
                                "').");
     }
-  }
-  if (any_circular(var_types) && count_discrete(var_types) > 0) {
-    throw std::runtime_error(
-      "a circular ('a') and a discrete ('d') variable cannot be paired.");
   }
 }
 

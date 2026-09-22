@@ -1107,14 +1107,6 @@ Vinecop::check_var_types(const std::vector<std::string>& var_types) const
       throw std::runtime_error(msg.str());
     }
   }
-  // every pair of variables is conditioned together in some tree, so a vine
-  // with both kinds would contain a circular-discrete pair copula
-  if (tools_var_types::any_circular(var_types) &&
-      tools_var_types::count_discrete(var_types) > 0) {
-    msg << "circular ('a') and discrete ('d') variables cannot be combined "
-        << "in one model." << std::endl;
-    throw std::runtime_error(msg.str());
-  }
 }
 
 //! @brief Sets variable types.
