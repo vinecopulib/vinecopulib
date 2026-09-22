@@ -248,6 +248,12 @@ TEST(tools_interpolation, rectangular_grid_interpolates_bilinear_exactly)
   EXPECT_EQ(grid.get_grid_points(0), g1);
   EXPECT_EQ(grid.get_grid_points(1), g2);
   EXPECT_EQ(grid.get_values(), v);
+  // the knots must match the values, and one knot vector needs a square
+  EXPECT_THROW(InterpolationGrid(g1, v), std::runtime_error);
+  EXPECT_THROW(InterpolationGrid(g2, g2, v), std::runtime_error);
+  EXPECT_THROW(InterpolationGrid(g1, g1, v), std::runtime_error);
+  EXPECT_THROW(grid.set_values(v.transpose()), std::runtime_error);
+  EXPECT_THROW(grid.set_values(v.leftCols(5)), std::runtime_error);
 
   auto x = tools_stats::simulate_uniform(200, 2, false, { 3 });
   auto vals = grid.interpolate(x);
