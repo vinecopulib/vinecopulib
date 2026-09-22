@@ -172,17 +172,9 @@ TEST(test_circular_tll, json_round_trip_keeps_the_grid)
 // -------------------------------------------------------------------------
 // the estimator
 
-TEST(test_circular_tll, quadratic_is_rejected_for_circular_pairs)
-{
-  auto u = von_mises().simulate(100, false, { 7 });
-  EXPECT_THROW(fit_tll(u, aa, "quadratic"), std::runtime_error);
-  EXPECT_THROW(fit_tll(u, ac, "quadratic"), std::runtime_error);
-  EXPECT_NO_THROW(fit_tll(u, cc, "quadratic"));
-}
-
 TEST(test_circular_tll, fit_is_a_periodic_copula_density)
 {
-  for (const char* method : { "constant", "linear" }) {
+  for (const char* method : { "constant", "linear", "quadratic" }) {
     for (const auto& truth : { von_mises(), cubic() }) {
       const auto var_types = truth.get_var_types();
       auto u = truth.simulate(800, false, { 11 });
