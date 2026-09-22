@@ -291,7 +291,9 @@ TEST(test_circular_vinecop, transforms_round_trip_and_simulation_is_uniform)
       std::sort(col.begin(), col.end());
       double max_dev = 0;
       for (size_t i = 0; i < n; ++i) {
-        max_dev = std::max(max_dev, std::abs(col[i] - (i + 0.5) / n));
+        const double target =
+          (static_cast<double>(i) + 0.5) / static_cast<double>(n);
+        max_dev = std::max(max_dev, std::abs(col[i] - target));
       }
       EXPECT_LT(max_dev, 0.05) << "variable " << j + 1;
     }
