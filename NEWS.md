@@ -14,6 +14,19 @@
   on where the circle is cut, so `parameters_to_tau()` returns `NaN` for them. `Vinecop` accepts the
   type but does not select structures with it yet (#791).
 
+- Vine copulas with circular variables on a supplied structure: every pair
+  copula takes the geometry of its edge's two conditioned variables, so a
+  circular variable stays circular through the conditional transforms while a
+  variable that is only conditioned on does not affect the pair. Construction
+  and `set_all_pair_copulas()` reject a family that does not support its edge,
+  naming the tree and edge; `get_pair_copula()` reports the edge's variable
+  types for an omitted (independence) pair copula. Fitting on a fixed
+  structure, density, log-likelihood, CDF, Rosenblatt transforms, simulation,
+  conditional simulation, reorientation, truncation, scores, Hessians, and
+  JSON work with circular variables; the joint density is periodic in each
+  circular variable. Structure selection still throws for circular input
+  (#793).
+
 ## vinecopulib 1.0.0 (September 18, 2026)
 
 The first stable release. It collects a large amount of work: analytic

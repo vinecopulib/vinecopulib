@@ -768,7 +768,9 @@ Vinecop::get_pair_copula(const size_t tree, const size_t edge) const
 {
   this->check_indices(tree, edge);
   if (tree >= pair_copulas_.size()) {
-    return Bicop(); // vine is truncated
+    // vine is truncated: independence, with the geometry of the edge
+    return Bicop(
+      BicopFamily::indep, 0, Eigen::MatrixXd(), edge_var_types(tree, edge));
   }
   return pair_copulas_[tree][edge];
 }
@@ -1075,6 +1077,11 @@ Vinecop::set_var_types(const std::vector<std::string>& var_types)
 }
 
 //! @brief Sets all pair-copulas.
+//!
+//! @details Every pair copula takes the variable types of its edge, which are
+//! derived from the model's variable types; a family that does not support
+//! its edge's geometry (for example, a linear family on an edge between two
+//! circular variables) is rejected.
 inline void
 Vinecop::set_all_pair_copulas(
   const std::vector<std::vector<Bicop>>& pair_copulas)
@@ -1082,6 +1089,9 @@ Vinecop::set_all_pair_copulas(
   check_pair_copulas_rvine_structure(pair_copulas);
   pair_copulas_ = pair_copulas;
   rvine_structure_.truncate(pair_copulas.size());
+  if (var_types_.size() == d_) {
+    set_var_types_internal(var_types_);
+  }
 }
 
 inline void
@@ -1124,32 +1134,38 @@ Vinecop::set_var_types_internal(const std::vector<std::string>& var_types)
     return;
   }
 
-  // set new var_types for all pair-copulas
-  const auto order = rvine_structure_.get_order();
-  std::vector<std::string> natural_types(d_), pair_types(2);
-  for (size_t j = 0; j < d_; ++j) {
-    natural_types[j] = var_types[order[j] - 1];
-  }
-  // we set the first tree explicitly and deduce later trees
-  for (size_t e = 0; e < d_ - 1; ++e) {
-    pair_types[0] = natural_types[e];
-    pair_types[1] =
-      natural_types[rvine_structure_.struct_array(0, e, true) - 1];
-    pair_copulas_[0][e].set_var_types(pair_types);
-  }
-
-  for (size_t t = 1; t < pair_copulas_.size(); ++t) {
-    for (size_t e = 0; e < d_ - t - 1; ++e) {
-      size_t m = rvine_structure_.min_array(t, e);
-      pair_types[0] = pair_copulas_[t - 1][e].get_var_types()[0];
-      if (m == rvine_structure_.struct_array(t, e, true)) {
-        pair_types[1] = pair_copulas_[t - 1][m - 1].get_var_types()[0];
-      } else {
-        pair_types[1] = pair_copulas_[t - 1][m - 1].get_var_types()[1];
+  // Each pair takes the types of its two conditioned variables: a variable
+  // keeps its type through the conditional transforms, and a variable that
+  // is only conditioned on does not affect the pair. The pair copula rejects
+  // a family that does not support the resulting geometry.
+  auto assign =
+    [this](size_t t, size_t e, const std::vector<std::string>& types) {
+      try {
+        pair_copulas_[t][e].set_var_types(types);
+      } catch (const std::exception& err) {
+        std::stringstream msg;
+        msg << "pair copula in tree " << t + 1 << ", edge " << e + 1 << ": "
+            << err.what();
+        throw std::runtime_error(msg.str());
       }
-      pair_copulas_[t][e].set_var_types(pair_types);
+    };
+  for (size_t t = 0; t < pair_copulas_.size(); ++t) {
+    for (size_t e = 0; e < d_ - t - 1; ++e) {
+      assign(t, e, edge_var_types(t, e));
     }
   }
+}
+
+//! @brief The variable types of an edge's two conditioned variables.
+//!
+//! @param tree Tree index (starting with 0).
+//! @param edge Edge index (starting with 0).
+inline std::vector<std::string>
+Vinecop::edge_var_types(size_t tree, size_t edge) const
+{
+  const auto order = rvine_structure_.get_order();
+  const size_t partner = rvine_structure_.struct_array(tree, edge, true);
+  return { var_types_[order[edge] - 1], var_types_[order[partner - 1] - 1] };
 }
 
 //! @brief Gets the variable types.

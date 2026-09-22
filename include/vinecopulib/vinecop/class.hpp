@@ -509,6 +509,7 @@ protected:
   void check_var_types(const std::vector<std::string>& var_types) const;
   void set_continuous_var_types();
   void set_var_types_internal(const std::vector<std::string>& var_types);
+  std::vector<std::string> edge_var_types(size_t tree, size_t edge) const;
   int get_n_discrete() const;
   bool is_discrete() const;
   Eigen::MatrixXd collapse_data(const Eigen::MatrixXd& u) const;
