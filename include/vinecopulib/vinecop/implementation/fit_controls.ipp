@@ -46,7 +46,11 @@ inline FitControlsVinecop::FitControlsVinecop()
 //! @param tree_criterion The criterion for selecting the spanning
 //!     tree (`"tau"`, `"rho"`, `"hoeffd"`, `"mcor"`, `"cxi"`, `"joe"`, or
 //!     `"custom"`) during the tree-wise structure selection. `"custom"` uses
-//!     the callable set through `set_tree_criterion_function()`.
+//!     the callable set through `set_tree_criterion_function()`. A pair with
+//!     a circular variable is weighted by the circular association measure
+//!     `tools_stats::pairwise_circular()` under every criterion but
+//!     `"custom"`, since the rank-based measures depend on where the circle
+//!     is cut.
 //! @param threshold For thresholded vines (0 = no threshold).
 //! @param selection_criterion The selection criterion (`"loglik"`, `"aic"`,
 //!     `"bic"`, `"mbic"`, or `"mbicv"`) for the pair copula families.
@@ -133,7 +137,11 @@ inline FitControlsVinecop::FitControlsVinecop(
 //! @param tree_criterion The criterion for selecting the spanning
 //!     tree (`"tau"`, `"rho"`, `"hoeffd"`, `"mcor"`, `"cxi"`, `"joe"`, or
 //!     `"custom"`) during the tree-wise structure selection. `"custom"` uses
-//!     the callable set through `set_tree_criterion_function()`.
+//!     the callable set through `set_tree_criterion_function()`. A pair with
+//!     a circular variable is weighted by the circular association measure
+//!     `tools_stats::pairwise_circular()` under every criterion but
+//!     `"custom"`, since the rank-based measures depend on where the circle
+//!     is cut.
 //! @param threshold For thresholded vines (`0` = no threshold).
 //! @param show_trace Whether to show a trace of the building progress.
 //! @param select_trunc_lvl Whether the truncation shall be selected

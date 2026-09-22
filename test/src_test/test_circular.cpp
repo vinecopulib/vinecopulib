@@ -233,7 +233,7 @@ TEST(test_circular, candidate_generation_filters_by_geometry)
   EXPECT_EQ(fams, (std::vector<BicopFamily>{ BicopFamily::indep }));
 }
 
-TEST(test_circular, vinecop_accepts_the_token_but_does_not_select_yet)
+TEST(test_circular, vinecop_accepts_the_token)
 {
   auto u = tools_stats::simulate_uniform(50, 3, false, { 3 });
   Vinecop vc(3);
@@ -241,11 +241,8 @@ TEST(test_circular, vinecop_accepts_the_token_but_does_not_select_yet)
   EXPECT_EQ(vc.get_var_types(), (std::vector<std::string>{ "a", "c", "c" }));
   EXPECT_THROW(vc.set_var_types({ "a", "d", "c" }), std::runtime_error);
   EXPECT_THROW(vc.set_var_types({ "a", "x", "c" }), std::runtime_error);
-  EXPECT_THROW(vc.select(u), std::runtime_error);
-
-  Vinecop linear(3);
-  linear.set_var_types({ "c", "c", "c" });
-  EXPECT_NO_THROW(linear.select(u));
+  EXPECT_NO_THROW(vc.select(u));
+  EXPECT_EQ(vc.get_var_types(), (std::vector<std::string>{ "a", "c", "c" }));
 }
 
 // -------------------------------------------------------------------------

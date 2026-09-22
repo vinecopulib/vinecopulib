@@ -1,7 +1,7 @@
 # Circular copulas and mixed vines: implementation plan
 
-Status: stages 1 to 3 and 5 implemented on the integration branch
-`feat/circulas`; stage 6 is in progress and stage 4 follows.
+Status: stages 1 to 3, 5, and 6 implemented on the integration branch
+`feat/circulas`; stage 4 (nonparametric estimation) is next, then stage 7.
 Updated September 22, 2026.
 
 This checklist tracks the first feature release for circular variables. The
@@ -329,29 +329,50 @@ their implementations, and structure/view conversion code.
 
 ## 6. Automatic family and structure selection
 
-- [ ] Apply compatible candidate sets at every tree level, including the
+- [x] (#794) Apply compatible candidate sets at every tree level, including the
   nonparametric estimator when available and both circular-linear argument
   orders.
-- [ ] Benchmark the existing bounded criteria first: `cxi` (Chatterjee's xi,
+- [x] (#794) Benchmark the existing bounded criteria first: `cxi` (Chatterjee's xi,
   detects any functional relationship and is nearly cut-invariant) and
   `hoeffd`, on the zero-tau half-turn case, reflective association, and
   multimodal patterns. Compare against circular correlation statistics and
   likelihood gain over independence; the latter is unbounded and costs one
   full candidate fit per edge per tree, so it is an option, not the baseline.
-- [ ] Choose the default criterion for pairs involving a circular variable
+  Benchmarked in the PR (n = 500, 20 replications): |tau| and rho_S
+  vanish on the half-turn pair (0.06, 0.48 -> 0.02 under a shifted cut) and
+  change with the cut for every family; `cxi` is nearly cut-invariant and
+  strong for functional relationships (0.81 on the half-turn pair) but weak
+  for diffuse dependence (0.05 for von Mises kappa = 0.5, 0.10 for the
+  quadratic sections with a = 1, against 0.02 under independence); `hoeffd`
+  is weaker still. The moment-based circular measure is exactly
+  cut-invariant and separates every case (0.25, 0.29, 0.95 against 0.05).
+- [x] (#794) Choose the default criterion for pairs involving a circular variable
   and specify weighting, missing observations, small samples, and
   independence behavior.
-- [ ] Integrate the criterion with existing spanning-tree algorithms and
+  Chosen: `tools_stats::pairwise_circular()` for every pair with a
+  circular conditioned variable, under every built-in criterion; `"custom"`
+  receives the pair data unchanged. Weights enter as weighted means; missing
+  observations are removed by `calculate_criterion` as for the linear
+  criteria; below 11 observations the weight is 0 as for the linear criteria;
+  independence gives a value of order n^{-1/2}.
+- [x] (#794) Integrate the criterion with existing spanning-tree algorithms and
   custom criteria. Cache fitted edge candidates if likelihood-based weights
   are offered.
-- [ ] Audit thresholds, automatic threshold search, truncation selection,
+  No caching needed: the measure costs one pass over the pair.
+- [x] (#794) Audit thresholds, automatic threshold search, truncation selection,
   and mBICv against the chosen criterion's scale. Remove the stage 5 rejection
   of circular input.
-- [ ] Test selection on known mixed vines and nonlinear circular associations,
+  The measure is bounded by one like tau, so thresholds keep their
+  meaning; the threshold search and truncation selection compare it against
+  the same thresholds; mBICv does not depend on the criterion.
+- [x] (#794) Test selection on known mixed vines and nonlinear circular associations,
   including the zero-tau half-turn case. Verify reproducibility and behavior
   for explicit family restrictions and incompatible candidate sets.
-- [ ] Benchmark selection cost and confirm existing linear defaults retain
+- [x] (#794) Benchmark selection cost and confirm existing linear defaults retain
   their current effective candidate sets and numerical behavior.
+  Selection on the three-dimensional test vines takes well under a
+  second; the linear criteria are untouched, since the circular branch is
+  entered only when a pair has a circular variable.
 
 Main code: [vinecop/tools_select.ipp](../../include/vinecopulib/vinecop/implementation/tools_select.ipp),
 bivariate candidate selection, and both fit-control classes.

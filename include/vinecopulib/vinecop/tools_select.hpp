@@ -37,7 +37,8 @@ double
 calculate_criterion(const Eigen::MatrixXd& data,
                     const std::string& tree_criterion,
                     const Eigen::VectorXd& weights,
-                    const TreeCriterionFunction& tree_criterion_function = {});
+                    const TreeCriterionFunction& tree_criterion_function = {},
+                    const std::vector<std::string>& var_types = {});
 
 std::vector<size_t>
 get_disc_cols(std::vector<std::string> var_types);
@@ -180,6 +181,9 @@ protected:
   void select_edges_random(VineTree& vine_tree);
 
   Eigen::MatrixXd get_pc_data(size_t v0, size_t v1, const VineTree& tree);
+  std::vector<std::string> get_pc_var_types(size_t v0,
+                                            size_t v1,
+                                            const VineTree& tree);
 
   static const Eigen::VectorXd& get_hfunc(const VertexProperties& vertex_data,
                                           bool is_first);

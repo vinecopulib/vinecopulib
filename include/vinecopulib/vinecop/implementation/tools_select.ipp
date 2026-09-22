@@ -30,12 +30,16 @@ using namespace tools_stl;
 //! @param weights Vector of weights for each observation (can be empty).
 //! @param tree_criterion_function Custom criterion function, used when
 //!   `tree_criterion == "custom"`.
+//! @param var_types The types of the pair; a pair with a circular variable
+//!   is weighted by `tools_stats::pairwise_circular()` for every criterion
+//!   but `"custom"`.
 //! (internal) criterion dispatch on clean (NaN-free) data.
 inline double
 calculate_criterion_clean(const Eigen::MatrixXd& data,
                           const std::string& tree_criterion,
                           const Eigen::VectorXd& weights,
-                          const TreeCriterionFunction& tree_criterion_function)
+                          const TreeCriterionFunction& tree_criterion_function,
+                          const std::vector<std::string>& var_types)
 {
   double w = 0.0;
   if (data.rows() > 10) {
@@ -46,6 +50,8 @@ calculate_criterion_clean(const Eigen::MatrixXd& data,
           "callable");
       }
       w = tree_criterion_function(data, weights);
+    } else if (tools_var_types::any_circular(var_types)) {
+      w = tools_stats::pairwise_circular(data, var_types, weights);
     } else if (tree_criterion == "mcor") {
       w = tools_stats::pairwise_mcor(data, weights);
     } else if (tree_criterion == "cxi") {
@@ -69,7 +75,8 @@ inline double
 calculate_criterion(const Eigen::MatrixXd& data,
                     const std::string& tree_criterion,
                     const Eigen::VectorXd& weights,
-                    const TreeCriterionFunction& tree_criterion_function)
+                    const TreeCriterionFunction& tree_criterion_function,
+                    const std::vector<std::string>& var_types)
 {
   // fast path (the common case): no NaNs and no zero weights, so the
   // copy + compaction can be skipped altogether
@@ -79,7 +86,7 @@ calculate_criterion(const Eigen::MatrixXd& data,
   }
   if (clean) {
     return calculate_criterion_clean(
-      data, tree_criterion, weights, tree_criterion_function);
+      data, tree_criterion, weights, tree_criterion_function, var_types);
   }
 
   Eigen::MatrixXd data_no_nan = data;
@@ -87,8 +94,11 @@ calculate_criterion(const Eigen::MatrixXd& data,
   tools_eigen::remove_nans(data_no_nan, weights_no_nan);
   double freq =
     static_cast<double>(data_no_nan.rows()) / static_cast<double>(data.rows());
-  double w = calculate_criterion_clean(
-    data_no_nan, tree_criterion, weights_no_nan, tree_criterion_function);
+  double w = calculate_criterion_clean(data_no_nan,
+                                       tree_criterion,
+                                       weights_no_nan,
+                                       tree_criterion_function,
+                                       var_types);
   return w * std::sqrt(freq);
 }
 
@@ -481,8 +491,11 @@ VinecopSelector::add_allowed_edges_proximity(
     size_t v1 = entry.second;
 
     auto pc_data = get_pc_data(v0, v1, vine_tree);
-    double crit =
-      calculate_criterion(pc_data, tree_criterion, weights, criterion_fun);
+    double crit = calculate_criterion(pc_data,
+                                      tree_criterion,
+                                      weights,
+                                      criterion_fun,
+                                      get_pc_var_types(v0, v1, vine_tree));
     double w = 1.0 - static_cast<double>(crit >= threshold) * crit;
 
     // Conditioning-aware selection: penalize edges that involve any
@@ -549,8 +562,11 @@ VinecopSelector::add_allowed_edges_structured(
       size_t v1 = vine_struct_.min_array(tree, v0) - 1;
       Eigen::MatrixXd pc_data = get_pc_data(v0, v1, vine_tree);
       EdgeIterator e = boost::add_edge(v0, v1, 1.0, vine_tree).first;
-      double crit = calculate_criterion(
-        pc_data.leftCols(2), tree_criterion, weights, criterion_fun);
+      double crit = calculate_criterion(pc_data.leftCols(2),
+                                        tree_criterion,
+                                        weights,
+                                        criterion_fun,
+                                        get_pc_var_types(v0, v1, vine_tree));
       vine_tree[e].weight = 1.0;
       vine_tree[e].crit = crit;
     }
@@ -846,6 +862,18 @@ VinecopSelector::get_pc_data(size_t v0, size_t v1, const VineTree& tree)
   pc_data.col(0) = get_hfunc(tree[v0], pos0 == 0);
   pc_data.col(1) = get_hfunc(tree[v1], pos1 == 0);
   return pc_data;
+}
+
+//! @brief The variable types of the pair a candidate edge would model, in the
+//! column order of `get_pc_data()`.
+inline std::vector<std::string>
+VinecopSelector::get_pc_var_types(size_t v0, size_t v1, const VineTree& tree)
+{
+  size_t ei_common = find_common_neighbor(v0, v1, tree);
+  ptrdiff_t pos0 = find_position(ei_common, tree[v0].prev_edge_indices);
+  ptrdiff_t pos1 = find_position(ei_common, tree[v1].prev_edge_indices);
+  return { tree[v0].var_types[std::abs(1 - pos0)],
+           tree[v1].var_types[std::abs(1 - pos1)] };
 }
 
 //! @brief Whether tree `t` is the last tree whose h-functions are needed.

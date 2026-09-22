@@ -101,7 +101,11 @@ controls argument customizes the fit.
   relationships), `"joe"` for the Gaussian-copula mutual information, or
   `"custom"` for a user-supplied callable set through
   `set_tree_criterion_function()`, which is always evaluated on the calling
-  thread.
+  thread. A pair with a circular variable (`var_types` `"a"`) is weighted by
+  the circular association measure `tools_stats::pairwise_circular()` under
+  every criterion but `"custom"`: the rank-based measures depend on where the
+  circle is cut, and Kendall's tau of a perfectly dependent circular pair can
+  be zero.
 - `double threshold` — pair copulas whose weight falls below this are set to
   independence (default `0`, i.e. no thresholding).
 - `std::string tree_algorithm` — how the spanning tree is chosen:

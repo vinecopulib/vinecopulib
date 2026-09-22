@@ -12,12 +12,15 @@
 #include "gtest/gtest.h"
 #include <boost/math/constants/constants.hpp>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 #include <vinecopulib/bicop/class.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <vinecopulib/vinecop/class.hpp>
+#include <vinecopulib/vinecop/tools_select.hpp>
+#include <wdm/eigen.hpp>
 
 namespace test_circular_vinecop {
 
@@ -205,14 +208,253 @@ TEST(test_circular_vinecop, ineligible_pair_copulas_are_rejected_by_edge)
                std::runtime_error);
 }
 
-TEST(test_circular_vinecop, structure_selection_is_still_rejected)
+// -------------------------------------------------------------------------
+// structure and family selection
+
+//! the conditioned pairs of the first tree, each sorted
+std::set<std::pair<size_t, size_t>>
+first_tree_pairs(const Vinecop& vc)
+{
+  std::set<std::pair<size_t, size_t>> pairs;
+  const auto& structure = vc.get_rvine_structure();
+  const auto order = structure.get_order();
+  for (size_t e = 0; e + 1 < order.size(); ++e) {
+    size_t a = order[e];
+    size_t b = order[structure.struct_array(0, e, true) - 1];
+    pairs.emplace(std::min(a, b), std::max(a, b));
+  }
+  return pairs;
+}
+
+TEST(test_circular_vinecop, circular_criterion_is_cut_invariant)
+{
+  auto u = MixedVine().model().simulate(400, false, 1, { 61 });
+  Eigen::MatrixXd u12 = u.leftCols(2), u23 = u.rightCols(2);
+  double aa_crit = tools_stats::pairwise_circular(u12, aa);
+  double ac_crit = tools_stats::pairwise_circular(u23, ac);
+  EXPECT_GT(aa_crit, 0.3);
+  EXPECT_GT(ac_crit, 0.1);
+  EXPECT_LE(aa_crit, 1.0);
+  EXPECT_LE(ac_crit, 1.0);
+
+  // shifting the cut of a circular variable leaves the measure unchanged
+  auto shift = [](Eigen::MatrixXd x, Eigen::Index j, double by) {
+    x.col(j) = (x.col(j).array() + by).unaryExpr([](double v) {
+      return v - std::floor(v);
+    });
+    return x;
+  };
+  EXPECT_NEAR(
+    tools_stats::pairwise_circular(shift(u12, 0, 0.37), aa), aa_crit, 1e-12);
+  EXPECT_NEAR(
+    tools_stats::pairwise_circular(shift(u12, 1, 0.81), aa), aa_crit, 1e-12);
+  EXPECT_NEAR(
+    tools_stats::pairwise_circular(shift(u23, 0, 0.37), ac), ac_crit, 1e-12);
+  // ... and so does reflecting the linear variable or swapping the columns
+  Eigen::MatrixXd u23_reflected = u23;
+  u23_reflected.col(1) = 1.0 - u23.col(1).array();
+  EXPECT_NEAR(
+    tools_stats::pairwise_circular(u23_reflected, ac), ac_crit, 1e-12);
+  Eigen::MatrixXd u32 = u23;
+  u32.col(0).swap(u32.col(1));
+  EXPECT_NEAR(tools_stats::pairwise_circular(u32, ca), ac_crit, 1e-12);
+
+  // a rotation is a perfectly dependent pair
+  Eigen::MatrixXd rot(200, 2);
+  rot.col(0) = tools_stats::simulate_uniform(200, 1, false, { 67 });
+  rot = shift(rot, 1, 0.0);
+  rot.col(1) = rot.col(0);
+  rot = shift(rot, 1, 0.3);
+  EXPECT_NEAR(tools_stats::pairwise_circular(rot, aa), 1.0, 1e-12);
+
+  // weights are honored; independence gives a small value
+  Eigen::VectorXd w = Eigen::VectorXd::Constant(u.rows(), 2.0);
+  EXPECT_NEAR(tools_stats::pairwise_circular(u12, aa, w), aa_crit, 1e-12);
+  auto indep = tools_stats::simulate_uniform(2000, 2, false, { 71 });
+  EXPECT_LT(tools_stats::pairwise_circular(indep, aa), 0.1);
+  EXPECT_LT(tools_stats::pairwise_circular(indep, ac), 0.1);
+  EXPECT_THROW(tools_stats::pairwise_circular(indep, cc), std::runtime_error);
+
+  // the selector routes pairs with a circular variable to it under every
+  // built-in criterion, and leaves linear pairs alone
+  for (const char* crit : { "tau", "rho", "hoeffd", "cxi", "mcor" }) {
+    EXPECT_NEAR(
+      tools_select::calculate_criterion(u12, crit, Eigen::VectorXd(), {}, aa),
+      aa_crit,
+      1e-12);
+  }
+  EXPECT_NEAR(
+    tools_select::calculate_criterion(u23, "tau", Eigen::VectorXd(), {}, cc),
+    std::fabs(wdm::wdm(u23, "tau")(0, 1)),
+    1e-12);
+}
+
+TEST(test_circular_vinecop, select_recovers_the_mixed_vine)
+{
+  // strong tree-1 edges, a weak tree-2 edge, so that the dependence induced
+  // between variables 1 and 3 is clearly weaker than either tree-1 edge
+  std::vector<std::string> var_types{ "a", "a", "c" };
+  Vinecop truth(
+    DVineStructure(std::vector<size_t>{ 1, 2, 3 }),
+    { { Bicop(BicopFamily::von_mises, 0, par({ 1.0, 0.7 }), aa),
+        Bicop(BicopFamily::cubic_sections, 0, par({ 1.0, 1.0, 1.0 }), ac) },
+      { Bicop(BicopFamily::cubic_sections, 0, par({ 0.5, 0.5, -0.5 }), ac) } },
+    var_types);
+  auto u = truth.simulate(1500, false, 1, { 73 });
+
+  Vinecop selected(u, RVineStructure(), var_types);
+  EXPECT_EQ(selected.get_var_types(), var_types);
+  EXPECT_EQ(first_tree_pairs(selected),
+            (std::set<std::pair<size_t, size_t>>{ { 1, 2 }, { 2, 3 } }));
+  // every edge carries its geometry and a family that supports it; the
+  // circular-circular edge gets a circula
+  size_t n_aa = 0;
+  for (size_t t = 0; t < 2; ++t) {
+    for (size_t e = 0; e + t < 2; ++e) {
+      const auto pc = selected.get_pair_copula(t, e);
+      EXPECT_TRUE(family_accepts_var_types(pc.get_family(), pc.get_var_types()))
+        << get_family_name(pc.get_family());
+      if (pc.get_var_types() == aa) {
+        ++n_aa;
+        EXPECT_TRUE(
+          tools_stl::is_member(pc.get_family(), bicop_families::two_rotations));
+      }
+    }
+  }
+  EXPECT_EQ(n_aa, 1u);
+  // the selected model fits about as well as the truth
+  EXPECT_GT(selected.loglik(u), truth.loglik(u) - 30);
+
+  // the same data and a thread pool give the same model
+  FitControlsVinecop controls;
+  controls.set_num_threads(2);
+  Vinecop threaded(u, RVineStructure(), var_types, controls);
+  EXPECT_EQ(threaded.get_all_families(), selected.get_all_families());
+  EXPECT_EQ(threaded.get_rvine_structure().get_order(),
+            selected.get_rvine_structure().get_order());
+  EXPECT_TRUE(all_close(threaded.pdf(u), selected.pdf(u), 1e-10, 1e-12));
+}
+
+TEST(test_circular_vinecop, half_turn_pair_survives_selection_and_thresholding)
+{
+  // a perfectly dependent half-turn pair (Kendall's tau zero) and a weakly
+  // dependent linear variable
+  std::vector<std::string> var_types{ "a", "a", "c" };
+  Bicop half_turn(BicopFamily::wrapped_cauchy, 0, par({ 0.95, pi }), aa);
+  Bicop weak(BicopFamily::cubic_sections, 0, par({ 0.3, 0.3, 0.5 }), ac);
+  Vinecop truth(DVineStructure(std::vector<size_t>{ 1, 2, 3 }),
+                { { half_turn, weak } },
+                var_types);
+  truth.truncate(1);
+  auto u = truth.simulate(1000, false, 1, { 79 });
+  EXPECT_LT(std::fabs(wdm::wdm(u.leftCols(2), "tau")(0, 1)), 0.15);
+
+  Vinecop selected(u, RVineStructure(), var_types);
+  EXPECT_TRUE(first_tree_pairs(selected).count({ 1, 2 }));
+  EXPECT_NE(selected.get_family(0, 0), BicopFamily::indep);
+
+  // with a threshold the half-turn edge stays, and only the weak one may go
+  FitControlsVinecop controls;
+  controls.set_threshold(0.5);
+  Vinecop thresholded(u, RVineStructure(), var_types, controls);
+  auto pairs = first_tree_pairs(thresholded);
+  EXPECT_TRUE(pairs.count({ 1, 2 }));
+  for (size_t e = 0; e < 2; ++e) {
+    const auto pc = thresholded.get_pair_copula(0, e);
+    if (pc.get_var_types() == aa) {
+      EXPECT_NE(pc.get_family(), BicopFamily::indep);
+    } else {
+      EXPECT_EQ(pc.get_family(), BicopFamily::indep);
+    }
+  }
+
+  // a custom criterion is honored as is: Kendall's tau misses the pair
+  FitControlsVinecop tau_controls;
+  tau_controls.set_tree_criterion("custom");
+  tau_controls.set_tree_criterion_function(
+    [](const Eigen::MatrixXd& x, const Eigen::VectorXd& w) {
+      return std::fabs(wdm::wdm(x, "tau", w)(0, 1));
+    });
+  tau_controls.set_threshold(0.5);
+  Vinecop by_tau(u, RVineStructure(), var_types, tau_controls);
+  for (size_t e = 0; e < 2; ++e) {
+    EXPECT_EQ(by_tau.get_family(0, e), BicopFamily::indep);
+  }
+}
+
+TEST(test_circular_vinecop, family_restrictions_apply_per_edge)
 {
   MixedVine mixed;
-  auto u = mixed.model().simulate(100, false, 1, { 11 });
-  EXPECT_THROW(Vinecop(u, mixed.structure, mixed.var_types),
+  auto u = mixed.model().simulate(300, false, 1, { 83 });
+
+  // no eligible family for a circular pair
+  FitControlsVinecop only_linear;
+  only_linear.set_family_set({ BicopFamily::gaussian });
+  EXPECT_THROW(Vinecop(u, RVineStructure(), mixed.var_types, only_linear),
                std::runtime_error);
-  EXPECT_THROW(Vinecop(u, RVineStructure(), mixed.var_types),
-               std::runtime_error);
+
+  // independence rescues every edge
+  FitControlsVinecop with_indep;
+  with_indep.set_family_set({ BicopFamily::gaussian, BicopFamily::indep });
+  Vinecop indep(u, RVineStructure(), mixed.var_types, with_indep);
+  for (const auto& tree : indep.get_all_families()) {
+    for (auto fam : tree) {
+      EXPECT_EQ(fam, BicopFamily::indep);
+    }
+  }
+
+  // an explicit mixed set restricts each edge to its eligible members
+  FitControlsVinecop mixed_set;
+  mixed_set.set_family_set({ BicopFamily::von_mises,
+                             BicopFamily::cubic_sections,
+                             BicopFamily::gaussian });
+  Vinecop restricted(u, RVineStructure(), mixed.var_types, mixed_set);
+  for (size_t t = 0; t < 2; ++t) {
+    for (size_t e = 0; e + t < 2; ++e) {
+      const auto pc = restricted.get_pair_copula(t, e);
+      EXPECT_TRUE(tools_stl::is_member(
+        pc.get_family(),
+        { BicopFamily::von_mises, BicopFamily::cubic_sections }));
+      EXPECT_TRUE(
+        family_accepts_var_types(pc.get_family(), pc.get_var_types()));
+    }
+  }
+}
+
+TEST(test_circular_vinecop, truncation_and_threshold_searches_run)
+{
+  auto truth = larger_mixed_vine();
+  auto u = truth.simulate(600, false, 1, { 89 });
+  FitControlsVinecop controls;
+  controls.set_select_trunc_lvl(true);
+  controls.set_select_threshold(true);
+  Vinecop sparse(u, RVineStructure(), truth.get_var_types(), controls);
+  EXPECT_LE(sparse.get_trunc_lvl(), 4u);
+  EXPECT_TRUE(std::isfinite(sparse.loglik(u)));
+  EXPECT_EQ(sparse.get_var_types(), truth.get_var_types());
+  for (const auto& tree : sparse.get_all_pair_copulas()) {
+    for (const auto& pc : tree) {
+      EXPECT_TRUE(
+        family_accepts_var_types(pc.get_family(), pc.get_var_types()));
+    }
+  }
+  // the density is still periodic in the circular variables
+  Eigen::MatrixXd lo = u.topRows(20), hi = lo;
+  lo.col(0).setZero();
+  hi.col(0).setOnes();
+  EXPECT_TRUE(all_close(sparse.pdf(lo), sparse.pdf(hi), 1e-6, 1e-8));
+
+  // a random spanning tree also respects geometry
+  FitControlsVinecop random;
+  random.set_tree_algorithm("random_weighted");
+  random.set_seeds({ 97 });
+  Vinecop rnd(u, RVineStructure(), truth.get_var_types(), random);
+  for (const auto& tree : rnd.get_all_pair_copulas()) {
+    for (const auto& pc : tree) {
+      EXPECT_TRUE(
+        family_accepts_var_types(pc.get_family(), pc.get_var_types()));
+    }
+  }
 }
 
 // -------------------------------------------------------------------------

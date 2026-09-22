@@ -27,6 +27,18 @@
   circular variable. Structure selection still throws for circular input
   (#793).
 
+- Structure and family selection with circular variables: `Vinecop::select`
+  and the data constructors accept circular `var_types`. A pair with a
+  circular variable is weighted by the new `tools_stats::pairwise_circular()`,
+  a bounded association measure that does not depend on where the circle is
+  cut (the larger mean resultant length of the angle sums and differences for
+  two circular variables; the first two Legendre moments of the linear against
+  the circular variable otherwise), under every `tree_criterion` but
+  `"custom"`. Kendall's tau of a perfectly dependent half-turn pair is zero,
+  so the rank-based criteria would drop such an edge. Candidate families are
+  filtered by each edge's geometry, and the threshold and truncation searches
+  and the random spanning trees work unchanged (#794)
+
 ## vinecopulib 1.0.0 (September 18, 2026)
 
 The first stable release. It collects a large amount of work: analytic
