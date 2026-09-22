@@ -6,6 +6,7 @@
 
 #include <vinecopulib/misc/tools_interpolation.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
+#include <vinecopulib/misc/tools_var_types.hpp>
 #include <wdm/eigen.hpp>
 
 namespace vinecopulib {
@@ -20,6 +21,65 @@ inline KernelBicop::KernelBicop()
     Eigen::MatrixXd::Constant(grid_size, grid_size, 1.0) // independence
   );
   npars_ = 0.0;
+}
+
+//! the knots follow the geometry of the axes: when a variable changes between
+//! linear and circular, the grid is rebuilt on the new default knots with the
+//! density values kept.
+inline void
+KernelBicop::set_var_types(const std::vector<std::string>& var_types)
+{
+  const auto old_types = var_types_;
+  AbstractBicop::set_var_types(var_types);
+  bool same_geometry = true;
+  for (size_t a = 0; a < 2; ++a) {
+    same_geometry =
+      same_geometry && (tools_var_types::is_circular(old_types[a]) ==
+                        tools_var_types::is_circular(var_types_[a]));
+  }
+  if (!same_geometry) {
+    const Eigen::MatrixXd values = interp_grid_->get_values();
+    interp_grid_ = std::make_shared<tools_interpolation::InterpolationGrid>(
+      make_grid_points(var_types_[0], values.rows()),
+      make_grid_points(var_types_[1], values.cols()),
+      values,
+      0);
+  }
+}
+
+inline std::vector<Eigen::VectorXd>
+KernelBicop::get_grid_knots() const
+{
+  return { interp_grid_->get_grid_points(0), interp_grid_->get_grid_points(1) };
+}
+
+//! replaces the grid by one with explicit knots; the values are taken as they
+//! are (no margin normalization).
+inline void
+KernelBicop::set_grid(const std::vector<Eigen::VectorXd>& knots,
+                      const Eigen::MatrixXd& values)
+{
+  if (knots.size() != 2) {
+    throw std::runtime_error("grid knots must be given for both axes.");
+  }
+  for (size_t a = 0; a < 2; ++a) {
+    const Eigen::VectorXd& g = knots[a];
+    if (g.size() < 3) {
+      throw std::runtime_error("each axis needs at least 3 grid knots.");
+    }
+    for (Eigen::Index i = 0; i < g.size(); ++i) {
+      const bool ordered = (i == 0) || (g(i) > g(i - 1));
+      if (!ordered || g(i) < 0.0 || g(i) > 1.0) {
+        throw std::runtime_error(
+          "grid knots must be increasing and lie in [0, 1].");
+      }
+    }
+  }
+  if (values.minCoeff() < 0) {
+    throw std::runtime_error("density should be larger than 0. ");
+  }
+  interp_grid_ = std::make_shared<tools_interpolation::InterpolationGrid>(
+    knots[0], knots[1], values, 0);
 }
 
 inline Eigen::VectorXd
@@ -125,30 +185,28 @@ KernelBicop::get_parameters() const
 inline Eigen::MatrixXd
 KernelBicop::get_parameters_lower_bounds() const
 {
-  return Eigen::MatrixXd::Constant(30, 30, 0.0);
+  const auto& values = interp_grid_->get_values();
+  return Eigen::MatrixXd::Constant(values.rows(), values.cols(), 0.0);
 }
 
 inline Eigen::MatrixXd
 KernelBicop::get_parameters_upper_bounds() const
 {
-  return Eigen::MatrixXd::Constant(30, 30, 1e4);
+  const auto& values = interp_grid_->get_values();
+  return Eigen::MatrixXd::Constant(values.rows(), values.cols(), 1e4);
 }
 
+//! the values are placed on the default knots of the current variable types;
+//! a matrix of the current shape keeps the current knots.
 inline void
 KernelBicop::set_parameters(const Eigen::MatrixXd& parameters)
 {
   Eigen::Index rows = parameters.rows();
   Eigen::Index cols = parameters.cols();
-  if (rows != cols) {
+  if (rows < 3 || cols < 3) {
     std::stringstream message;
-    message << "parameters must be a square matrix, got " << rows
-            << " rows and " << cols << " columns.";
-    throw std::runtime_error(message.str().c_str());
-  }
-  if (rows < 3) {
-    std::stringstream message;
-    message << "parameters must be a square matrix of size at least 3, got "
-            << rows << " rows and " << cols << " columns.";
+    message << "parameters must be a matrix with at least 3 rows and 3 "
+            << "columns, got " << rows << " rows and " << cols << " columns.";
     throw std::runtime_error(message.str().c_str());
   }
   if (parameters.minCoeff() < 0) {
@@ -156,14 +214,17 @@ KernelBicop::set_parameters(const Eigen::MatrixXd& parameters)
     message << "density should be larger than 0. ";
     throw std::runtime_error(message.str().c_str());
   }
-  if (rows == interp_grid_->get_values().rows()) {
+  const auto& values = interp_grid_->get_values();
+  if (rows == values.rows() && cols == values.cols()) {
     // don't normalize again!
     interp_grid_->set_values(parameters, 0);
   } else {
     // create new interpolation grid with new size
-    auto grid_points = this->make_normal_grid(rows);
     interp_grid_ = std::make_shared<tools_interpolation::InterpolationGrid>(
-      grid_points, parameters, 0);
+      make_grid_points(var_types_[0], rows),
+      make_grid_points(var_types_[1], cols),
+      parameters,
+      0);
   }
 }
 
@@ -179,16 +240,23 @@ KernelBicop::tau_to_parameters(const double& tau)
   return no_tau_to_parameters(tau);
 }
 
-// construct default grid (equally spaced on Gaussian scale)
 inline Eigen::VectorXd
-KernelBicop::make_normal_grid(size_t m)
+KernelBicop::make_grid_points(const std::string& var_type, size_t m)
 {
+  if (tools_var_types::is_circular(var_type)) {
+    return Eigen::VectorXd::LinSpaced(static_cast<Eigen::Index>(m), 0.0, 1.0);
+  }
   Eigen::VectorXd grid_points(m);
   for (size_t i = 0; i < m; ++i)
     grid_points(i) =
       -3.25 + static_cast<double>(i) * (6.5 / static_cast<double>(m - 1));
-  grid_points = tools_stats::pnorm(grid_points);
+  return tools_stats::pnorm(grid_points);
+}
 
-  return grid_points;
+// construct default grid (equally spaced on Gaussian scale)
+inline Eigen::VectorXd
+KernelBicop::make_normal_grid(size_t m)
+{
+  return make_grid_points(tools_var_types::continuous(), m);
 }
 }

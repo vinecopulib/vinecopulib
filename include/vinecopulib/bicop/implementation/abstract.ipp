@@ -180,6 +180,21 @@ AbstractBicop::set_var_types(const std::vector<std::string>& var_types)
   }
   var_types_ = var_types;
 }
+
+//! parametric families have no interpolation grid.
+inline std::vector<Eigen::VectorXd>
+AbstractBicop::get_grid_knots() const
+{
+  return {};
+}
+
+inline void
+AbstractBicop::set_grid(const std::vector<Eigen::VectorXd>&,
+                        const Eigen::MatrixXd&)
+{
+  throw std::runtime_error("the " + get_family_name() +
+                           " copula has no interpolation grid");
+}
 //! @}
 
 //! evaluates the pdf, but truncates it's value by DBL_MIN and DBL_MAX.
