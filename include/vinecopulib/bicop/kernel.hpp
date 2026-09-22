@@ -31,6 +31,13 @@ class KernelBicop : public AbstractBicop
 public:
   KernelBicop();
 
+  void set_var_types(const std::vector<std::string>& var_types) override;
+
+  std::vector<Eigen::VectorXd> get_grid_knots() const override;
+
+  void set_grid(const std::vector<Eigen::VectorXd>& knots,
+                const Eigen::MatrixXd& values) override;
+
 protected:
   // evaluation leaves; kernel estimators store an interpolation grid rather
   // than a per-row parameter vector, so they ignore `parameters`
@@ -83,6 +90,11 @@ protected:
   void flip() override;
 
   Eigen::MatrixXd tau_to_parameters(const double& tau) override;
+
+  // the default knots of an axis: equally spaced on the normal scale for a
+  // linear axis, equally spaced on the unit interval for a circular one
+  static Eigen::VectorXd make_grid_points(const std::string& var_type,
+                                          size_t m);
 
   Eigen::VectorXd make_normal_grid(size_t m = 30);
 

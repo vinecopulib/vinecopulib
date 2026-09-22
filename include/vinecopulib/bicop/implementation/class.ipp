@@ -97,6 +97,9 @@ inline Bicop::Bicop(const nlohmann::json& input)
           tools_serialization::json_to_matrix<double>(input["par"]),
           var_types_from_json(input))
 {
+  if (input.contains("grid")) {
+    set_grid_from_json(input["grid"]);
+  }
   // try block for backwards compatibility
   try {
     nobs_ = static_cast<size_t>(input["nobs"]);
@@ -104,6 +107,38 @@ inline Bicop::Bicop(const nlohmann::json& input)
     bicop_->set_npars(input["npars"]);
   } catch (...) {
   }
+}
+
+//! places the density values of a kernel estimator on the knots recorded in
+//! the `"grid"` field; a model without the field rebuilds the default knots
+//! of its variable types from the shape of `"par"`.
+inline void
+Bicop::set_grid_from_json(const nlohmann::json& grid)
+{
+  if (!grid.contains("knots") || !grid.contains("types")) {
+    throw std::runtime_error(
+      "the \"grid\" field needs \"knots\" and \"types\"");
+  }
+  const auto types =
+    tools_serialization::json_to_vector<std::string>(grid["types"]);
+  if (types != var_types_) {
+    throw std::runtime_error("the \"types\" of the \"grid\" field disagree "
+                             "with the variable types \"vt\"");
+  }
+  if (grid["knots"].size() != 2) {
+    throw std::runtime_error(
+      "the \"knots\" of the \"grid\" field must hold two vectors");
+  }
+  std::vector<Eigen::VectorXd> knots(2);
+  for (size_t a = 0; a < 2; ++a) {
+    knots[a] = tools_serialization::json_to_matrix<double>(grid["knots"][a]);
+  }
+  const Eigen::MatrixXd values = get_parameters();
+  if (knots[0].size() != values.rows() || knots[1].size() != values.cols()) {
+    throw std::runtime_error("the \"knots\" of the \"grid\" field do not "
+                             "match the shape of \"par\"");
+  }
+  bicop_->set_grid(knots, values);
 }
 
 //! @brief Instantiates from a JSON or CBOR file.
@@ -142,6 +177,21 @@ Bicop::to_json() const
   output["nobs"] = nobs_;
   output["ll"] = bicop_->get_loglik();
   output["npars"] = bicop_->get_npars();
+  // a kernel estimator on other than the default knots of two linear axes
+  // records them, so the values reload onto the same grid
+  if (tools_var_types::any_circular(var_types_)) {
+    const auto knots = bicop_->get_grid_knots();
+    if (knots.size() == 2) {
+      nlohmann::json grid;
+      grid["knots"] = nlohmann::json::array();
+      grid["knots"].push_back(
+        tools_serialization::matrix_to_json(Eigen::MatrixXd(knots[0])));
+      grid["knots"].push_back(
+        tools_serialization::matrix_to_json(Eigen::MatrixXd(knots[1])));
+      grid["types"] = tools_serialization::vector_to_json(var_types_);
+      output["grid"] = grid;
+    }
+  }
 
   return output;
 }

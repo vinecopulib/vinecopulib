@@ -9,15 +9,7 @@
 #include <vinecopulib/bicop/kernel.hpp>
 
 namespace vinecopulib {
-//! @brief The transformation local-constant likelihood estimator.
-//!
-//! This class is used in the implementation underlying the Bicop class.
-//! Users should not use AbstractBicop or derived classes directly, but
-//! always work with the Bicop interface.
-//!
-//! @literature
-//! Nagler, Thomas. *kdecopula: An R Package for the Kernel Estimation of
-//! Copula Densities*. arXiv:1603.04229 [stat.CO], 2016
+//! @brief The transformation local likelihood estimator (`tll`).
 class TllBicop : public KernelBicop
 {
 public:
@@ -50,6 +42,61 @@ private:
            double mult,
            size_t grid_size,
            const Eigen::VectorXd& weights) override;
+
+  // the estimator for a pair with a circular variable: a product kernel that
+  // is von Mises on a circular axis and Gaussian on the probit scale of a
+  // linear one, with a local log-linear correction per axis
+  //! @brief One axis of the mixed-geometry estimator.
+  struct Axis
+  {
+    bool circular;
+    double scale;             // von Mises concentration or Gaussian sd
+    Eigen::VectorXd x;        // transformed observations
+    Eigen::VectorXd grid;     // transformed knots
+    Eigen::VectorXd knots;    // knots on the copula scale
+    Eigen::VectorXd jacobian; // density of the transform at the knots
+  };
+
+  void fit_mixed(const Eigen::MatrixXd& data,
+                 const std::string& method,
+                 double mult,
+                 size_t grid_size,
+                 const Eigen::VectorXd& weights);
+
+  static Axis make_axis(const std::string& var_type,
+                        const Eigen::VectorXd& u,
+                        size_t grid_size);
+
+  static double select_bandwidth_mixed(const Axis& axis,
+                                       size_t n,
+                                       const std::string& method,
+                                       double dependence);
+
+  //! @brief The local polynomial fit on one axis: the factor it contributes
+  //! to the density estimate and the moments of its basis under the fitted
+  //! local model.
+  struct AxisFit
+  {
+    double correction = 1.0;
+    Eigen::VectorXd first;
+    Eigen::MatrixXd second;
+  };
+
+  static AxisFit fit_linear_axis(double sd,
+                                 double m1,
+                                 double m2,
+                                 bool quadratic);
+
+  static AxisFit fit_circular_axis(double kappa,
+                                   const Eigen::VectorXd& moments,
+                                   bool quadratic);
+
+  static std::pair<double, double> local_fit_mixed(
+    const std::vector<Axis>& axes,
+    const std::array<Eigen::Index, 2>& knot,
+    const std::string& method,
+    const Eigen::VectorXd& weights,
+    Eigen::VectorXd& kernels);
 };
 }
 

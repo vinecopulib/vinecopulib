@@ -206,3 +206,147 @@ TEST(tools_interpolation, rect_mass_agrees_with_a_cdf_difference)
   }
 }
 }
+
+namespace test_tools_interpolation {
+using namespace vinecopulib;
+using tools_interpolation::InterpolationGrid;
+
+namespace {
+Eigen::VectorXd
+uniform_knots(int m)
+{
+  return Eigen::VectorXd::LinSpaced(m, 0.0, 1.0);
+}
+
+Eigen::VectorXd
+tail_knots(int m)
+{
+  // knots concentrated in the tails, as on a linear axis
+  Eigen::VectorXd g(m);
+  for (int i = 0; i < m; ++i) {
+    const double t = static_cast<double>(i) / (m - 1);
+    g(i) = 0.5 + 0.5 * std::sin((t - 0.5) * 3.14159265358979);
+  }
+  return g;
+}
+} // namespace
+
+// A grid with different knots on its two axes interpolates a bilinear surface
+// exactly, whatever the spacing of the knots.
+TEST(tools_interpolation, rectangular_grid_interpolates_bilinear_exactly)
+{
+  auto g1 = uniform_knots(9);
+  auto g2 = tail_knots(14);
+  auto f = [](double x, double y) { return 1.0 + 0.5 * x - 0.3 * y + x * y; };
+  Eigen::MatrixXd v(g1.size(), g2.size());
+  for (int i = 0; i < g1.size(); ++i) {
+    for (int j = 0; j < g2.size(); ++j) {
+      v(i, j) = f(g1(i), g2(j));
+    }
+  }
+  InterpolationGrid grid(g1, g2, v, 0);
+  EXPECT_EQ(grid.get_grid_points(0), g1);
+  EXPECT_EQ(grid.get_grid_points(1), g2);
+  EXPECT_EQ(grid.get_values(), v);
+
+  auto x = tools_stats::simulate_uniform(200, 2, false, { 3 });
+  auto vals = grid.interpolate(x);
+  for (int i = 0; i < x.rows(); ++i) {
+    EXPECT_NEAR(vals(i), f(x(i, 0), x(i, 1)), 1e-12);
+  }
+
+  // flipping exchanges the axes together with their knots
+  InterpolationGrid flipped = grid;
+  flipped.flip();
+  EXPECT_EQ(flipped.get_grid_points(0), g2);
+  EXPECT_EQ(flipped.get_grid_points(1), g1);
+  Eigen::MatrixXd xs = x;
+  xs.col(0).swap(xs.col(1));
+  EXPECT_TRUE((flipped.interpolate(xs) - vals).cwiseAbs().maxCoeff() < 1e-12);
+  flipped.flip();
+  EXPECT_EQ(flipped.get_values(), v);
+}
+
+// Conditional masses partition to one and agree with the conditional cdf on a
+// rectangular grid, in both conditioning directions.
+TEST(tools_interpolation, rectangular_grid_conditionals_are_consistent)
+{
+  auto g1 = uniform_knots(12);
+  auto g2 = tail_knots(20);
+  Eigen::MatrixXd v(g1.size(), g2.size());
+  for (int i = 0; i < g1.size(); ++i) {
+    for (int j = 0; j < g2.size(); ++j) {
+      v(i, j) = 0.4 + std::exp(-4.0 * std::abs(g1(i) - g2(j)));
+    }
+  }
+  InterpolationGrid grid(g1, g2, v);
+  for (size_t cond_var : { 1, 2 }) {
+    for (double u_cond : { 0.02, 0.37, 0.5, 0.91 }) {
+      double total = 0.0;
+      for (int k = 0; k < 7; ++k) {
+        total +=
+          grid.cond_interval_mass(u_cond, k / 7.0, (k + 1) / 7.0, cond_var);
+      }
+      EXPECT_NEAR(total, 1.0, 1e-13);
+      Eigen::MatrixXd u(1, 2);
+      const double p = 0.63;
+      if (cond_var == 1) {
+        u << u_cond, p;
+      } else {
+        u << p, u_cond;
+      }
+      auto q = grid.inverse_integrate_1d(u, cond_var);
+      Eigen::MatrixXd uq = u;
+      uq(0, cond_var == 1 ? 1 : 0) = q(0);
+      EXPECT_NEAR(grid.integrate_1d(uq, cond_var)(0), p, 1e-10);
+    }
+  }
+  // the rectangle probabilities sum to the marginal increment
+  double total = 0.0;
+  for (int i = 0; i < 5; ++i) {
+    total += grid.rect_mass(i / 5.0, (i + 1) / 5.0, 0.2, 0.7);
+  }
+  EXPECT_NEAR(total, 0.5, 1e-13);
+}
+
+// On a circular axis the two end knots are the same point: when the rows at
+// both ends agree, margin normalization keeps them equal, so the interpolant
+// stays periodic.
+TEST(tools_interpolation, normalization_keeps_periodic_ends_equal)
+{
+  const int m1 = 15, m2 = 11;
+  auto g1 = uniform_knots(m1); // circular axis
+  auto g2 = tail_knots(m2);    // linear axis
+  Eigen::MatrixXd v(m1, m2);
+  const double two_pi = 2 * 3.14159265358979;
+  for (int i = 0; i < m1; ++i) {
+    for (int j = 0; j < m2; ++j) {
+      v(i, j) = 1.0 + 0.8 * std::cos(two_pi * g1(i) - 1.0) * (2 * g2(j) - 1) +
+                0.3 * g2(j);
+    }
+  }
+  ASSERT_TRUE((v.row(0) - v.row(m1 - 1)).cwiseAbs().maxCoeff() < 1e-14);
+  InterpolationGrid grid(g1, g2, v);
+  auto w = grid.get_values();
+  EXPECT_TRUE((w.row(0) - w.row(m1 - 1)).cwiseAbs().maxCoeff() < 1e-13);
+  EXPECT_TRUE((w - v).cwiseAbs().maxCoeff() > 1e-3); // it did rescale
+
+  // the density is continuous across the cut and both margins are uniform
+  Eigen::MatrixXd lo(5, 2), hi(5, 2);
+  for (int k = 0; k < 5; ++k) {
+    lo(k, 0) = 0.0;
+    hi(k, 0) = 1.0;
+    lo(k, 1) = hi(k, 1) = 0.1 + 0.2 * k;
+  }
+  EXPECT_TRUE(
+    (grid.interpolate(lo) - grid.interpolate(hi)).cwiseAbs().maxCoeff() <
+    1e-12);
+  for (double u : { 0.1, 0.5, 0.9 }) {
+    Eigen::MatrixXd x(1, 2);
+    x << u, 1.0;
+    EXPECT_NEAR(grid.integrate_2d(x)(0), u, 1e-6);
+    x << 1.0, u;
+    EXPECT_NEAR(grid.integrate_2d(x)(0), u, 1e-6);
+  }
+}
+}

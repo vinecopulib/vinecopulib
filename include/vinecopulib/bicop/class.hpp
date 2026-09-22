@@ -415,6 +415,7 @@ private:
 
   static std::string family_var_types_hint(BicopFamily family);
 
+  void set_grid_from_json(const nlohmann::json& grid);
   static std::vector<std::string> var_types_from_json(
     const nlohmann::json& input);
 

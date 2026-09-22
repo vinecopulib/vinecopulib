@@ -68,9 +68,16 @@ protected:
 
   void set_loglik(const double loglik = NAN);
 
-  void set_var_types(const std::vector<std::string>& var_types);
+  virtual void set_var_types(const std::vector<std::string>& var_types);
 
   virtual Eigen::MatrixXd get_parameters() const = 0;
+
+  // the interpolation knots of a kernel estimator (empty for parametric
+  // families) and their replacement together with the density values
+  virtual std::vector<Eigen::VectorXd> get_grid_knots() const;
+
+  virtual void set_grid(const std::vector<Eigen::VectorXd>& knots,
+                        const Eigen::MatrixXd& values);
 
   virtual Eigen::MatrixXd get_parameters_lower_bounds() const = 0;
 

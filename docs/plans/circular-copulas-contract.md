@@ -532,6 +532,44 @@ parameter count. JSON serialization of the parametric families is unchanged:
 `"fam"`, `"rot"`, `"par"`, `"vt"`, and the fit statistics suffice, and the new
 family names round-trip through `get_family_name` / `get_family_enum`.
 
+### Nonparametric estimator
+
+For a pair with a circular variable the `tll` family fits a transformation
+local likelihood estimator with a product kernel: von Mises with
+concentration $\kappa$ in the angle $2\pi u$ on a circular axis, Gaussian
+with standard deviation $\sigma$ on the probit scale of a linear axis. The
+local model is log-linear per axis, in $z$ on a linear axis and in
+$(\cos\theta, \sin\theta)$ on a circular one, without interaction, so the
+local likelihood equations separate. With the local mean $m$ of $z - z_0$
+and the local mean resultant vector $\bar m$ of $(\cos(\theta -
+\theta_0), \sin(\theta - \theta_0))$, the estimate at a knot is the kernel
+density value times $\exp(-m^2 / 2\sigma^2)$ per linear axis and
+$\exp(r\,\hat m_1 - \kappa)\, I_0(\kappa) / I_0(r)$ per circular axis,
+where $r = A^{-1}(|\bar m|)$ with $A = I_1 / I_0$ and $\hat m = \bar m /
+|\bar m|$. `nonparametric_method` `"constant"` omits the corrections;
+`"quadratic"` adds the second harmonic on a circular axis and the square on a
+linear one; the second-harmonic normalizer has no closed form, so its moment
+equations are solved numerically (trapezoid quadrature, which is spectrally
+accurate for the periodic integrand, and a damped Newton method on the
+strictly convex dual), falling back to the first harmonic where they do not
+converge. The density on the copula scale
+multiplies by $2\pi$ per circular axis and divides by the normal density of
+$z$ per linear axis, and the margins are normalized as for linear pairs.
+
+The kernel variance is $n^{-1/3}$ (times $1.5$ for the linear fit) times the
+variance of the transformed margin, $1$ on the probit scale and
+$(2\pi)^2 / 12$ for the angle, times $1 - R$ with the circular association
+$R$ of `tools_stats::pairwise_circular`, times `nonparametric_mult`. The
+influence of an observation on the estimate at its own location is
+$K(0)\,[M^{-1}]_{00} / n$ with the local information $M = f_0\, E[(1,
+\psi)(1, \psi)^\top]$ under the fitted local model; its moments are
+Gaussian on a linear axis and Bessel ratios on a circular one. Observations
+on a circular axis enter with their values, not their ranks, so that the fit
+rotates with the data when the cut changes.
+
+Knots are equally spaced on $[0, 1]$ for a circular axis, with the value at
+$1$ equal to the value at $0$, and the normal grid for a linear axis.
+
 ### Nonparametric grid serialization
 
 A `tll` model whose grid is not the default normal grid on two linear axes
