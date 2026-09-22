@@ -39,6 +39,17 @@
   filtered by each edge's geometry, and the threshold and truncation searches
   and the random spanning trees work unchanged (#794)
 
+- The nonparametric family `tll` fits pairs with a circular variable. On a
+  circular axis the estimator smooths with a von Mises kernel on the angle
+  and interpolates on equally spaced knots whose two ends are the same point,
+  so the fitted density is periodic; a linear axis keeps the probit transform
+  and its normal-scale knots. `nonparametric_method` `"constant"` and
+  `"linear"` are supported for such pairs, `"quadratic"` throws. The
+  interpolation grid carries one knot vector per axis
+  (`InterpolationGrid::get_grid_points()`), and the JSON representation of a
+  `tll` copula with a circular variable records them in a `"grid"` field;
+  files without the field reload as before (#795)
+
 ## vinecopulib 1.0.0 (September 18, 2026)
 
 The first stable release. It collects a large amount of work: analytic

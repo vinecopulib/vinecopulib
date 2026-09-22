@@ -1,7 +1,7 @@
 # Circular copulas and mixed vines: implementation plan
 
-Status: stages 1 to 3, 5, and 6 implemented on the integration branch
-`feat/circulas`; stage 4 (nonparametric estimation) is next, then stage 7.
+Status: stages 1 to 6 implemented on the integration branch `feat/circulas`;
+stage 7 (release validation) is next.
 Updated September 22, 2026.
 
 This checklist tracks the first feature release for circular variables. The
@@ -255,42 +255,89 @@ that transformed geometry. A circular extension needs new fitting formulas;
 matching the two boundary rows after an ordinary TLL fit is insufficient.
 A circular axis has no boundary, so it needs no transform; the probit
 transform and its Jacobian apply to linear axes only.
-
-- [ ] Prototype periodic smoothing in circular coordinates and probit
+- [x] (#795) Prototype periodic smoothing in circular coordinates and probit
   smoothing in linear coordinates. Compare wrapped Gaussian and von Mises
   kernels.
-- [ ] Derive the periodic/mixed local-likelihood estimator and its supported
+  Chosen: the von Mises kernel. Its local log-linear fit in
+  $(\cos\theta, \sin\theta)$ has a closed form through the Bessel
+  ratio $A = I_1 / I_0$ and its inverse, the circular analog of the
+  Gaussian closed form on a linear axis; a wrapped Gaussian kernel has no
+  such form. The two kernels are close for every concentration in use.
+- [x] (#795) Derive the periodic/mixed local-likelihood estimator and its supported
   polynomial orders. Use a positive periodic kernel estimate as a numerical
   reference. Specify unsupported method choices rather than silently
   substituting a different estimator.
-- [ ] Define bandwidth selection for both geometries, including observation
+  Product kernel (von Mises on circular axes, Gaussian on the probit scale
+  of linear axes) with a local log-linear model per axis and no interaction
+  term, so the local likelihood equations separate and each axis contributes
+  a closed-form correction. Orders `constant` and `linear` are supported;
+  `quadratic` throws for a pair with a circular variable (the second
+  harmonic has no closed-form normalizer).
+- [x] (#795) Define bandwidth selection for both geometries, including observation
   weights. Evaluate held-out likelihood, cut sensitivity, and strong or
   multimodal dependence before choosing defaults.
-- [ ] Give each axis its own knot vector. `InterpolationGrid` takes one
+  The kernel variance is the same fraction of the transformed margin's
+  variance as on a linear axis ($n^{-1/3}$, times 1.5 for the linear
+  fit), the angle of a uniform variable having variance $(2\pi)^2/12$;
+  a factor $1 - R$ with the circular association $R$ narrows it under
+  strong dependence, and `nonparametric_mult` scales it. Weights enter the
+  kernel sums. Held-out log-likelihood minus the truth, n = 500, 4
+  replications, multipliers 0.25 / 0.5 / 1 / 2 / 4: von Mises kappa = 2,
+  constant: -0.08 / -0.03 / -0.03 / -0.07 / -0.20, linear: -0.18 / -0.06 /
+  -0.02 / -0.02 / -0.06; quadratic sections a = 0.8, constant: -0.05 /
+  -0.02 / -0.01 / -0.02 / -0.03; a bimodal mixture of two circulas prefers
+  0.25 to 0.5; the half-turn wrapped Cauchy with rho = 0.95 loses about 0.7
+  at every multiplier, a ridge too narrow for a product kernel. The default
+  multiplier 1 is at or next to the optimum in every other case, at n = 500
+  and n = 2000.
+- [x] (#795) Give each axis its own knot vector. `InterpolationGrid` takes one
   vector for both axes and `make_normal_grid` concentrates knots in the
   tails; a circular axis needs uniform knots on `[0, 1]`.
-- [ ] Represent a circular grid boundary consistently, either with shared
+  `InterpolationGrid` holds one knot vector per axis (PR #795, first
+  commit); `KernelBicop::make_grid_points` gives uniform knots on `[0, 1]`
+  for a circular axis and the normal grid otherwise.
+- [x] (#795) Represent a circular grid boundary consistently, either with shared
   endpoint values or an explicit wraparound cell. Keep density nonnegative
   and enforce uniform marginal integrals with the appropriate grid weights.
-- [ ] Ensure margin normalization preserves periodic endpoint equality.
+  Shared endpoint values: the knot at 1 repeats the knot at 0, the
+  estimator copies the value, and the trapezoid weights of the two ends add
+  up to one interior weight. Values are positive by construction.
+- [x] (#795) Ensure margin normalization preserves periodic endpoint equality.
   Require both constraints to meet tolerance before accepting the fit.
-- [ ] Adapt interpolation, one- and two-dimensional integration, and direct
+  The Sinkhorn passes rescale rows and columns; identical end rows receive
+  identical factors, so equality survives (tested).
+- [x] (#795) Adapt interpolation, one- and two-dimensional integration, and direct
   conditional inversion. Preserve anchored CDF values at `0` and `1`.
-- [ ] Preserve knots, axis geometry, density values, and effective degrees of
+  Nothing to adapt: the anchored integrals, conditional masses, and direct
+  inversion work on any ascending knot vector; the periodic ends only need
+  equal values.
+- [x] (#795) Preserve knots, axis geometry, density values, and effective degrees of
   freedom through `get_parameters`, `set_parameters`, flipping, and JSON.
   Values alone must not reload onto a different grid.
-- [ ] Derive or validate the influence/effective-degrees-of-freedom calculation
+  `get_parameters` returns the values; `set_parameters` places them on the
+  default knots of the variable types (rebuilding the grid when the shape
+  changes); `set_var_types` rebuilds the knots when the geometry of an axis
+  changes; `flip` exchanges knots with values; JSON records `"grid"` for a
+  circular pair and validates it on reading.
+- [x] (#795) Derive or validate the influence/effective-degrees-of-freedom calculation
   before using AIC, BIC, or mBIC penalties. Reusing the Gaussian TLL influence
   formula for a different smoother needs justification.
-- [ ] Test periodic densities and arbitrary asymmetric/multimodal patterns,
+  Derived: the influence is $K(0)\,[M^{-1}]_{00} / n$ with the local
+  information $M = f_0\, E[(1, \psi)(1, \psi)^\top]$ under the fitted
+  local model, whose moments are Gaussian on a linear axis and Bessel ratios
+  ($I_1/I_0$, $I_2/I_0$) on a circular one; it reduces to the
+  existing formula when both axes are linear.
+- [x] (#795) Test periodic densities and arbitrary asymmetric/multimodal patterns,
   h/inverse identities, grid refinement, bandwidth extremes, fit statistics,
   axis swaps, and compatibility with existing linear TLL reference fits.
-- [ ] Register the estimator in the eligibility tables from stage 2 and add
+- [x] (#795) Register the estimator in the eligibility tables from stage 2 and add
   it to the mixed-vine tests of stages 5 and 6 once those have landed.
 
 Main code: [tll.ipp](../../include/vinecopulib/bicop/implementation/tll.ipp),
 [kernel.ipp](../../include/vinecopulib/bicop/implementation/kernel.ipp), and
 [tools_interpolation.ipp](../../include/vinecopulib/misc/implementation/tools_interpolation.ipp).
+  `family_accepts_var_types` already admitted `tll` everywhere; the vine
+  test fits a mixed D-vine with `tll` on every edge through `select`.
 
 ## 5. Vine models with supplied structures
 
