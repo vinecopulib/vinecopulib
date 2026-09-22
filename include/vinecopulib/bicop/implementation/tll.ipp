@@ -334,12 +334,12 @@ TllBicop::make_axis(const std::string& var_type,
 //!
 //! The variance of the kernel is the same fraction of the variance of the
 //! transformed margin as in `select_bandwidth()`: \f$ n^{-1/3} \f$ for the
-//! local constant fit and \f$ 1.5 n^{-1/3} \f$ for the local linear one, times
-//! the multiplier and a dependence factor. The probit-transformed margin has
-//! unit variance; the angle of a uniform circular variable has variance
-//! \f$ (2\pi)^2 / 12 \f$. For a circular axis the result is the von Mises
-//! concentration \f$ 1 / \sigma^2 \f$, for a linear axis the standard
-//! deviation \f$ \sigma \f$.
+//! local constant fit and \f$ 1.5 n^{-1/(2p + 1)} \f$ for the local
+//! polynomial fit of degree \f$ p \f$, times the multiplier and a dependence
+//! factor. The probit-transformed margin has unit variance; the angle of a
+//! uniform circular variable has variance \f$ (2\pi)^2 / 12 \f$. For a
+//! circular axis the result is the von Mises concentration \f$ 1 / \sigma^2
+//! \f$, for a linear axis the standard deviation \f$ \sigma \f$.
 inline double
 TllBicop::select_bandwidth_mixed(const Axis& axis,
                                  size_t n,
@@ -347,8 +347,13 @@ TllBicop::select_bandwidth_mixed(const Axis& axis,
                                  double dependence)
 {
   const double nn = static_cast<double>(n);
-  double base = (method == "constant") ? std::pow(nn, -1.0 / 3.0)
-                                       : 1.5 * std::pow(nn, -1.0 / 3.0);
+  double base;
+  if (method == "constant") {
+    base = std::pow(nn, -1.0 / 3.0);
+  } else {
+    const double degree = (method == "linear") ? 1.0 : 2.0;
+    base = 1.5 * std::pow(nn, -1.0 / (2.0 * degree + 1.0));
+  }
   // stronger dependence concentrates the density, so it needs a finer kernel
   base *= std::max(1.0 - dependence, 0.1);
   double variance = base;
@@ -360,19 +365,167 @@ TllBicop::select_bandwidth_mixed(const Axis& axis,
   return std::sqrt(variance);
 }
 
+//! @brief The local log-polynomial fit on one linear axis.
+//!
+//! With a Gaussian kernel of standard deviation \f$ \sigma \f$ and a local
+//! model \f$ \exp(a + b\psi + c\psi^2) \f$ in \f$ \psi = z - z_0 \f$ (with
+//! \f$ c = 0 \f$ for the linear fit), the tilted kernel is a normal law whose
+//! mean and variance match the local sample moments, so the correction to the
+//! kernel density value and the moments that enter the influence are closed
+//! forms.
+inline TllBicop::AxisFit
+TllBicop::fit_linear_axis(double sd, double m1, double m2, bool quadratic)
+{
+  AxisFit fit;
+  const double var = quadratic ? std::max(m2 - m1 * m1, 1e-12) : sd * sd;
+  fit.correction =
+    std::exp(-0.5 * m1 * m1 / var) * (quadratic ? sd / std::sqrt(var) : 1.0);
+  // moments of psi and psi^2 under N(m1, var)
+  const double e2 = var + m1 * m1;
+  if (!quadratic) {
+    fit.first = Eigen::VectorXd::Constant(1, m1);
+    fit.second = Eigen::MatrixXd::Constant(1, 1, e2);
+    return fit;
+  }
+  const double e3 = m1 * m1 * m1 + 3.0 * m1 * var;
+  const double e4 = std::pow(m1, 4) + 6.0 * m1 * m1 * var + 3.0 * var * var;
+  fit.first.resize(2);
+  fit.first << m1, e2;
+  fit.second.resize(2, 2);
+  fit.second << e2, e3, e3, e4;
+  return fit;
+}
+
+//! @brief The local log-trigonometric fit on one circular axis.
+//!
+//! With a von Mises kernel of concentration \f$ \kappa \f$ and a local model
+//! in the first harmonic \f$ (\cos d, \sin d) \f$ (and the second harmonic
+//! for the quadratic fit), \f$ d = \theta - \theta_0 \f$, the local
+//! likelihood equations match the moments of the tilted kernel to the local
+//! sample moments. For the first harmonic the solution has a closed form
+//! through the Bessel ratio \f$ A = I_1 / I_0 \f$ and its inverse. With the
+//! second harmonic the normalizer has no closed form; the tilted moments are
+//! integrated with the trapezoid rule, which is spectrally accurate for a
+//! smooth periodic integrand, and the strictly convex moment-matching problem
+//! is solved by a damped Newton method. If that fails to converge the fit
+//! falls back to the first harmonic.
+inline TllBicop::AxisFit
+TllBicop::fit_circular_axis(double kappa,
+                            const Eigen::VectorXd& moments,
+                            bool quadratic)
+{
+  AxisFit fit;
+  Eigen::Vector2d m = moments.head(2);
+  const double rbar = std::min(m.norm(), 0.9999);
+  Eigen::Vector2d dir(1.0, 0.0);
+  if (rbar > 1e-12) {
+    dir = m / m.norm();
+  }
+  const double r = tools_circular::von_mises_a_inverse(rbar, 500.0);
+  const double log_i0_kappa = std::log(boost::math::cyl_bessel_i(0, kappa));
+  const double log_i0_r = std::log(boost::math::cyl_bessel_i(0, r));
+  fit.correction = std::exp(r * dir(0) - kappa + log_i0_kappa - log_i0_r);
+
+  // moments of the first-harmonic model, a von Mises law with direction
+  // `dir` and concentration `r`, in the basis (cos - 1, sin) centered at the
+  // knot
+  const double a1 = tools_circular::von_mises_a(r);
+  const double a2 = (r > 0.0) ? boost::math::cyl_bessel_i(2, r) /
+                                  boost::math::cyl_bessel_i(0, r)
+                              : 0.0;
+  const double theta_m = std::atan2(dir(1), dir(0));
+  const Eigen::Vector2d e0(1.0, 0.0);
+  const Eigen::Vector2d mean = a1 * dir;
+  Eigen::Matrix2d ee;
+  ee << 0.5 * (1.0 + a2 * std::cos(2.0 * theta_m)),
+    0.5 * a2 * std::sin(2.0 * theta_m), 0.5 * a2 * std::sin(2.0 * theta_m),
+    0.5 * (1.0 - a2 * std::cos(2.0 * theta_m));
+  fit.first = mean - e0;
+  fit.second =
+    ee - mean * e0.transpose() - e0 * mean.transpose() + e0 * e0.transpose();
+  if (!quadratic) {
+    return fit;
+  }
+
+  // second harmonic: moment matching by damped Newton on the quadrature grid
+  const double two_pi = tools_circular::two_pi();
+  const Eigen::Index n_nodes =
+    64 + 32 * static_cast<Eigen::Index>(std::ceil(std::sqrt(kappa)));
+  Eigen::MatrixXd psi(n_nodes, 4);
+  Eigen::VectorXd log_kernel(n_nodes);
+  for (Eigen::Index j = 0; j < n_nodes; ++j) {
+    const double d =
+      two_pi * static_cast<double>(j) / static_cast<double>(n_nodes);
+    psi.row(j) << std::cos(d), std::sin(d), std::cos(2.0 * d),
+      std::sin(2.0 * d);
+    log_kernel(j) = kappa * (std::cos(d) - 1.0);
+  }
+  // the tilted kernel, normalized on the grid, and its moments
+  Eigen::VectorXd eta = Eigen::VectorXd::Zero(4);
+  Eigen::VectorXd weights(n_nodes), mean4(4);
+  Eigen::MatrixXd cov(4, 4);
+  auto tilt = [&](const Eigen::VectorXd& e) {
+    Eigen::VectorXd lw = log_kernel + psi * e;
+    const double shift = lw.maxCoeff();
+    weights = (lw.array() - shift).exp();
+    const double total = weights.sum();
+    weights /= total;
+    mean4 = psi.transpose() * weights;
+    cov =
+      psi.transpose() * weights.asDiagonal() * psi - mean4 * mean4.transpose();
+    // log of the normalizer relative to the kernel's own mass
+    return shift + std::log(total) - std::log((log_kernel.array().exp()).sum());
+  };
+  // the dual objective log Z(eta) - eta . m is strictly convex
+  double log_z = tilt(eta);
+  double objective = log_z - eta.dot(moments);
+  bool converged = false;
+  for (int it = 0; it < 50; ++it) {
+    Eigen::VectorXd grad = mean4 - moments;
+    if (grad.norm() < 1e-10) {
+      converged = true;
+      break;
+    }
+    Eigen::VectorXd step =
+      (cov + 1e-12 * Eigen::MatrixXd::Identity(4, 4)).ldlt().solve(-grad);
+    double t = 1.0;
+    Eigen::VectorXd eta_new;
+    double obj_new = objective;
+    for (int k = 0; k < 30; ++k) {
+      eta_new = eta + t * step;
+      obj_new = tilt(eta_new) - eta_new.dot(moments);
+      if (obj_new <= objective + 1e-4 * t * grad.dot(step)) {
+        break;
+      }
+      t *= 0.5;
+    }
+    eta = eta_new;
+    objective = obj_new;
+  }
+  if (!converged || !std::isfinite(objective) || eta.norm() > 1e3) {
+    return fit; // the first-harmonic fit
+  }
+  log_z = tilt(eta);
+  // the local model at the knot, d = 0, where the basis is (1, 0, 1, 0)
+  fit.correction = std::exp(eta(0) + eta(2) - log_z);
+  // moments of the full basis, centered at the knot: (cos - 1, sin, cos 2 - 1,
+  // sin 2)
+  Eigen::VectorXd c0(4);
+  c0 << 1.0, 0.0, 1.0, 0.0;
+  fit.first = mean4 - c0;
+  fit.second = cov + fit.first * fit.first.transpose();
+  return fit;
+}
+
 //! @brief The local likelihood fit at one knot of the mixed-geometry grid.
 //!
 //! The kernel is a product of a von Mises kernel on each circular axis and a
-//! Gaussian kernel on each linear one. The local model is log-linear per
-//! axis: linear in \f$ z \f$ on a linear axis, linear in \f$ (\cos\theta,
-//! \sin\theta) \f$ on a circular one. With a product kernel and no
-//! interaction term the local likelihood equations separate, and each axis
-//! contributes a closed-form correction to the kernel density value: for a
-//! linear axis \f$ \exp(-m^2 / 2\sigma^2) \f$ with the local mean \f$ m \f$,
-//! for a circular axis \f$ \exp(r\, \hat m \cdot e_0 - \kappa)\, I_0(\kappa)
-//! / I_0(r) \f$, where \f$ \hat m \f$ is the local mean direction, \f$ r =
-//! A^{-1}(\bar R) \f$ the concentration matching the local mean resultant
-//! length, and \f$ e_0 \f$ the direction of the knot.
+//! Gaussian kernel on each linear one. The local model is log-polynomial per
+//! axis without interaction terms: linear or quadratic in \f$ z \f$ on a
+//! linear axis, the first or the first two harmonics on a circular one. With
+//! a product kernel the local likelihood equations separate, and each axis
+//! contributes a correction to the kernel density value; see
+//! `fit_linear_axis()` and `fit_circular_axis()`.
 //!
 //! @return The density estimate at the knot and the influence of an
 //!   observation at the knot on it.
@@ -421,52 +574,28 @@ TllBicop::local_fit_mixed(const std::vector<Axis>& axes,
     return { f0, kernel0 / f0 * weight / nn };
   }
 
-  // local log-linear fit: per-axis corrections and the moments of the local
-  // model under the kernel, from which the influence follows
+  // per-axis local polynomial corrections and the moments of the local model
+  // under the kernel, from which the influence follows
+  const bool quadratic = (method == "quadratic");
   double f = f0;
-  std::vector<Eigen::VectorXd> first;  // E[psi_a]
-  std::vector<Eigen::MatrixXd> second; // E[psi_a psi_a^T]
+  std::array<AxisFit, 2> fits;
   for (size_t a = 0; a < 2; ++a) {
     const Axis& axis = axes[a];
+    const Eigen::ArrayXd& d = diffs[a].array();
     if (axis.circular) {
-      const double kappa = axis.scale;
-      Eigen::Vector2d m;
-      m << (kernels.array() * diffs[a].array().cos()).sum() / kernels.sum(),
-        (kernels.array() * diffs[a].array().sin()).sum() / kernels.sum();
-      const double rbar = std::min(m.norm(), 0.9999);
-      Eigen::Vector2d dir(1.0, 0.0);
-      if (rbar > 1e-12) {
-        dir = m / m.norm();
-      }
-      const double r = tools_circular::von_mises_a_inverse(rbar, 500.0);
-      const double log_i0_kappa = std::log(boost::math::cyl_bessel_i(0, kappa));
-      const double log_i0_r = std::log(boost::math::cyl_bessel_i(0, r));
-      f *= std::exp(r * dir(0) - kappa + log_i0_kappa - log_i0_r);
-
-      // moments of the local model, a von Mises law with direction `dir` and
-      // concentration `r`, in the basis (cos - 1, sin) centered at the knot
-      const double a1 = tools_circular::von_mises_a(r);
-      const double a2 = (r > 0.0) ? boost::math::cyl_bessel_i(2, r) /
-                                      boost::math::cyl_bessel_i(0, r)
-                                  : 0.0;
-      const double theta_m = std::atan2(dir(1), dir(0));
-      Eigen::Vector2d e0(1.0, 0.0);
-      Eigen::Vector2d mean = a1 * dir;
-      Eigen::Matrix2d ee;
-      ee << 0.5 * (1.0 + a2 * std::cos(2.0 * theta_m)),
-        0.5 * a2 * std::sin(2.0 * theta_m), 0.5 * a2 * std::sin(2.0 * theta_m),
-        0.5 * (1.0 - a2 * std::cos(2.0 * theta_m));
-      first.emplace_back(mean - e0);
-      second.emplace_back(ee - mean * e0.transpose() - e0 * mean.transpose() +
-                          e0 * e0.transpose());
+      Eigen::VectorXd moments(4);
+      moments << (kernels.array() * d.cos()).sum(),
+        (kernels.array() * d.sin()).sum(),
+        (kernels.array() * (2.0 * d).cos()).sum(),
+        (kernels.array() * (2.0 * d).sin()).sum();
+      moments /= kernels.sum();
+      fits[a] = fit_circular_axis(axis.scale, moments, quadratic);
     } else {
-      const double sd = axis.scale;
-      const double m1 =
-        (kernels.array() * diffs[a].array()).sum() / kernels.sum();
-      f *= std::exp(-0.5 * m1 * m1 / (sd * sd));
-      first.emplace_back(Eigen::VectorXd::Constant(1, m1));
-      second.emplace_back(Eigen::MatrixXd::Constant(1, 1, sd * sd + m1 * m1));
+      const double m1 = (kernels.array() * d).sum() / kernels.sum();
+      const double m2 = (kernels.array() * d.square()).sum() / kernels.sum();
+      fits[a] = fit_linear_axis(axis.scale, m1, m2, quadratic);
     }
+    f *= fits[a].correction;
   }
   if (!std::isfinite(f)) {
     // the corrections can overflow where the true value is (close to) zero
@@ -476,18 +605,18 @@ TllBicop::local_fit_mixed(const std::vector<Axis>& axes,
   // the local information matrix M = f0 E[(1, psi)(1, psi)^T]; the axes are
   // independent under the product model, so the cross block is E[psi_a]
   // E[psi_b]^T
-  const Eigen::Index p1 = first[0].size();
-  const Eigen::Index p2 = first[1].size();
+  const Eigen::Index p1 = fits[0].first.size();
+  const Eigen::Index p2 = fits[1].first.size();
   Eigen::MatrixXd M = Eigen::MatrixXd::Zero(1 + p1 + p2, 1 + p1 + p2);
   M(0, 0) = 1.0;
-  M.block(1, 0, p1, 1) = first[0];
-  M.block(1 + p1, 0, p2, 1) = first[1];
-  M.block(0, 1, 1, p1) = first[0].transpose();
-  M.block(0, 1 + p1, 1, p2) = first[1].transpose();
-  M.block(1, 1, p1, p1) = second[0];
-  M.block(1 + p1, 1 + p1, p2, p2) = second[1];
-  M.block(1, 1 + p1, p1, p2) = first[0] * first[1].transpose();
-  M.block(1 + p1, 1, p2, p1) = first[1] * first[0].transpose();
+  M.block(1, 0, p1, 1) = fits[0].first;
+  M.block(1 + p1, 0, p2, 1) = fits[1].first;
+  M.block(0, 1, 1, p1) = fits[0].first.transpose();
+  M.block(0, 1 + p1, 1, p2) = fits[1].first.transpose();
+  M.block(1, 1, p1, p1) = fits[0].second;
+  M.block(1 + p1, 1 + p1, p2, p2) = fits[1].second;
+  M.block(1, 1 + p1, p1, p2) = fits[0].first * fits[1].first.transpose();
+  M.block(1 + p1, 1, p2, p1) = fits[1].first * fits[0].first.transpose();
   M *= f0;
   double infl = kernel0 * M.inverse()(0, 0) * weight / nn;
   if (!std::isfinite(infl)) {
@@ -505,11 +634,6 @@ TllBicop::fit_mixed(const Eigen::MatrixXd& data,
                     const Eigen::VectorXd& weights)
 {
   using namespace tools_interpolation;
-  if (method == "quadratic") {
-    throw std::runtime_error(
-      "nonparametric_method 'quadratic' is not available for pairs with a "
-      "circular variable; use 'constant' or 'linear'");
-  }
   const size_t n = data.rows();
 
   // a linear axis is rank-transformed as in the linear estimator; a circular

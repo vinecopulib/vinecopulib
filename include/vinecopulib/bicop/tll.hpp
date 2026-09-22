@@ -72,6 +72,25 @@ private:
                                        const std::string& method,
                                        double dependence);
 
+  //! @brief The local polynomial fit on one axis: the factor it contributes
+  //! to the density estimate and the moments of its basis under the fitted
+  //! local model.
+  struct AxisFit
+  {
+    double correction = 1.0;
+    Eigen::VectorXd first;
+    Eigen::MatrixXd second;
+  };
+
+  static AxisFit fit_linear_axis(double sd,
+                                 double m1,
+                                 double m2,
+                                 bool quadratic);
+
+  static AxisFit fit_circular_axis(double kappa,
+                                   const Eigen::VectorXd& moments,
+                                   bool quadratic);
+
   static std::pair<double, double> local_fit_mixed(
     const std::vector<Axis>& axes,
     const std::array<Eigen::Index, 2>& knot,
