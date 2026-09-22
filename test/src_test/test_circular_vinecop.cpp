@@ -297,8 +297,8 @@ TEST(test_circular_vinecop, select_recovers_the_mixed_vine)
   Vinecop truth(
     DVineStructure(std::vector<size_t>{ 1, 2, 3 }),
     { { Bicop(BicopFamily::von_mises, 0, par({ 1.0, 0.7 }), aa),
-        Bicop(BicopFamily::quad_sections, 0, par({ 1.0, 1.0 }), ac) },
-      { Bicop(BicopFamily::quad_sections, 0, par({ 0.5, -0.5 }), ac) } },
+        Bicop(BicopFamily::cubic_sections, 0, par({ 1.0, 1.0, 1.0 }), ac) },
+      { Bicop(BicopFamily::cubic_sections, 0, par({ 0.5, 0.5, -0.5 }), ac) } },
     var_types);
   auto u = truth.simulate(1500, false, 1, { 73 });
 
@@ -341,7 +341,7 @@ TEST(test_circular_vinecop, half_turn_pair_survives_selection_and_thresholding)
   // dependent linear variable
   std::vector<std::string> var_types{ "a", "a", "c" };
   Bicop half_turn(BicopFamily::wrapped_cauchy, 0, par({ 0.95, pi }), aa);
-  Bicop weak(BicopFamily::quad_sections, 0, par({ 0.3, 0.5 }), ac);
+  Bicop weak(BicopFamily::cubic_sections, 0, par({ 0.3, 0.3, 0.5 }), ac);
   Vinecop truth(DVineStructure(std::vector<size_t>{ 1, 2, 3 }),
                 { { half_turn, weak } },
                 var_types);
@@ -406,7 +406,7 @@ TEST(test_circular_vinecop, family_restrictions_apply_per_edge)
   // an explicit mixed set restricts each edge to its eligible members
   FitControlsVinecop mixed_set;
   mixed_set.set_family_set({ BicopFamily::von_mises,
-                             BicopFamily::quad_sections,
+                             BicopFamily::cubic_sections,
                              BicopFamily::gaussian });
   Vinecop restricted(u, RVineStructure(), mixed.var_types, mixed_set);
   for (size_t t = 0; t < 2; ++t) {
@@ -414,7 +414,7 @@ TEST(test_circular_vinecop, family_restrictions_apply_per_edge)
       const auto pc = restricted.get_pair_copula(t, e);
       EXPECT_TRUE(tools_stl::is_member(
         pc.get_family(),
-        { BicopFamily::von_mises, BicopFamily::quad_sections }));
+        { BicopFamily::von_mises, BicopFamily::cubic_sections }));
       EXPECT_TRUE(
         family_accepts_var_types(pc.get_family(), pc.get_var_types()));
     }

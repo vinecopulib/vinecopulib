@@ -8,9 +8,9 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/seed_seq.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
-#include <complex>
 #include <memory>
 #include <unsupported/Eigen/FFT>
+#include <vinecopulib/misc/tools_circular.hpp>
 #include <vinecopulib/misc/tools_stats_ghalton.hpp>
 #include <vinecopulib/misc/tools_stats_sobol.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
@@ -578,36 +578,25 @@ pairwise_circular(const Eigen::MatrixXd& x,
                   const std::vector<std::string>& var_types,
                   const Eigen::VectorXd& weights)
 {
-  const double two_pi = 2.0 * boost::math::constants::pi<double>();
+  const double two_pi = tools_circular::two_pi();
   const bool first_circular = tools_var_types::is_circular(var_types[0]);
   const bool second_circular = tools_var_types::is_circular(var_types[1]);
   if (!first_circular && !second_circular) {
     throw std::runtime_error("pairwise_circular needs a circular variable");
   }
-  std::complex<double> m1(0.0, 0.0), m2(0.0, 0.0);
-  double wsum = 0.0;
-  for (Eigen::Index i = 0; i < x.rows(); ++i) {
-    const double w = (weights.size() > 0) ? weights(i) : 1.0;
-    wsum += w;
-    if (first_circular && second_circular) {
-      m1 += w * std::polar(1.0, two_pi * (x(i, 1) - x(i, 0)));
-      m2 += w * std::polar(1.0, two_pi * (x(i, 1) + x(i, 0)));
-    } else {
-      const double u = first_circular ? x(i, 0) : x(i, 1);
-      const double v = first_circular ? x(i, 1) : x(i, 0);
-      const std::complex<double> z = std::polar(1.0, two_pi * u);
-      m1 += w * z * (std::sqrt(3.0) * (2.0 * v - 1.0));
-      m2 += w * z * (std::sqrt(5.0) * (6.0 * v * v - 6.0 * v + 1.0));
-    }
-  }
-  if (wsum <= 0.0) {
-    return 0.0;
-  }
-  m1 /= wsum;
-  m2 /= wsum;
+  using tools_circular::weighted_resultant;
   if (first_circular && second_circular) {
-    return std::max(std::abs(m1), std::abs(m2));
+    const Eigen::VectorXd diff = two_pi * (x.col(1) - x.col(0));
+    const Eigen::VectorXd sum = two_pi * (x.col(1) + x.col(0));
+    return std::max(std::abs(weighted_resultant(diff, weights)),
+                    std::abs(weighted_resultant(sum, weights)));
   }
+  const Eigen::VectorXd theta = two_pi * x.col(first_circular ? 0 : 1);
+  const Eigen::ArrayXd v = x.col(first_circular ? 1 : 0).array();
+  const auto m1 = weighted_resultant(
+    theta, weights, (std::sqrt(3.0) * (2.0 * v - 1.0)).matrix());
+  const auto m2 = weighted_resultant(
+    theta, weights, (std::sqrt(5.0) * (6.0 * v * v - 6.0 * v + 1.0)).matrix());
   return std::min(1.0, std::sqrt(std::norm(m1) + std::norm(m2)));
 }
 //! @}
