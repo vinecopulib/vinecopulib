@@ -56,7 +56,7 @@
   parametric circular families evaluate, fit, and are selected on such pairs
   through the usual CDF and h-function differences over the discrete atom;
   `tll` is not eligible for them. Discrete circular variables remain
-  unsupported (#TBD)
+  unsupported (#797)
 
 ## vinecopulib 1.0.0 (September 18, 2026)
 

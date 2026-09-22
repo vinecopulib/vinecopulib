@@ -619,6 +619,17 @@ $V \to 1 - V$. Both are bounded by one and vanish under independence. The
 not used for such pairs because they depend on the cut: Kendall's $\tau$ of
 the half-turn pair is zero.
 
+The circular-circular measure is a variant of Fisher and Lee's (1983)
+T-linear correlation, whose rotational and reflective components are the two
+resultant lengths above; the maximum replaces their signed difference so that
+a mixture of rotational and reflective dependence is not missed. The
+circular-linear measure is the circular-linear correlation of Johnson and
+Wehrly (1977) and Mardia (1976) with the linear regressor replaced by the
+first two Legendre polynomials; the linear regressor alone is blind to the
+cubic sections copula with $a = -b$, whose association is quadratic in the
+linear variable. Neither variant is a published statistic under a name of its
+own.
+
 ### Derivatives and views
 
 `Bicop::check_deriv_preconditions` accepts circular variable types; the

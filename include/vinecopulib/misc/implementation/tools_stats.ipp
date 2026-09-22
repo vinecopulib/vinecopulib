@@ -570,6 +570,21 @@ pairwise_cxi(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 //! the first two orthonormal Legendre polynomials \f$ f_1, f_2 \f$ on \f$ [0,
 //! 1] \f$, the moments that identify the quadratic- and cubic-sections copulas.
 //!
+//! The two resultant lengths are the rotational and reflective components of
+//! Fisher and Lee's T-linear correlation; taking their maximum rather than
+//! their difference detects either kind of dependence. The circular-linear
+//! measure replaces the linear regressor of the Johnson-Wehrly circular-linear
+//! correlation by the first two Legendre polynomials, so that a purely
+//! quadratic association is not missed.
+//!
+//! @literature
+//! Fisher, N. I. and Lee, A. J. *A correlation coefficient for circular
+//! data.* Biometrika 70(2), 327-332, 1983
+//!
+//! Johnson, R. A. and Wehrly, T. *Measures and models for angular correlation
+//! and angular-linear correlation.* Journal of the Royal Statistical Society
+//! B 39(2), 222-229, 1977
+//!
 //! @param x An \f$ n \times 2 \f$ matrix of copula data.
 //! @param var_types The two variable types, at least one of them `"a"`.
 //! @param weights Optional observation weights.
