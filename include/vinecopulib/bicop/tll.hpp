@@ -9,6 +9,7 @@
 #include <vinecopulib/bicop/kernel.hpp>
 
 namespace vinecopulib {
+//! @brief The transformation local likelihood estimator (`tll`).
 class TllBicop : public KernelBicop
 {
 public:

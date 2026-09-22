@@ -456,16 +456,16 @@ TllBicop::local_fit_mixed(const std::vector<Axis>& axes,
       ee << 0.5 * (1.0 + a2 * std::cos(2.0 * theta_m)),
         0.5 * a2 * std::sin(2.0 * theta_m), 0.5 * a2 * std::sin(2.0 * theta_m),
         0.5 * (1.0 - a2 * std::cos(2.0 * theta_m));
-      first.push_back(mean - e0);
-      second.push_back(ee - mean * e0.transpose() - e0 * mean.transpose() +
-                       e0 * e0.transpose());
+      first.emplace_back(mean - e0);
+      second.emplace_back(ee - mean * e0.transpose() - e0 * mean.transpose() +
+                          e0 * e0.transpose());
     } else {
       const double sd = axis.scale;
       const double m1 =
         (kernels.array() * diffs[a].array()).sum() / kernels.sum();
       f *= std::exp(-0.5 * m1 * m1 / (sd * sd));
-      first.push_back(Eigen::VectorXd::Constant(1, m1));
-      second.push_back(Eigen::MatrixXd::Constant(1, 1, sd * sd + m1 * m1));
+      first.emplace_back(Eigen::VectorXd::Constant(1, m1));
+      second.emplace_back(Eigen::MatrixXd::Constant(1, 1, sd * sd + m1 * m1));
     }
   }
   if (!std::isfinite(f)) {

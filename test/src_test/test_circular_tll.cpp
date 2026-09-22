@@ -81,7 +81,7 @@ read_knots(const nlohmann::json& json)
 {
   std::vector<Eigen::VectorXd> knots;
   for (const auto& k : json["grid"]["knots"]) {
-    knots.push_back(tools_serialization::json_to_matrix<double>(k));
+    knots.emplace_back(tools_serialization::json_to_matrix<double>(k));
   }
   return knots;
 }
@@ -182,7 +182,7 @@ TEST(test_circular_tll, quadratic_is_rejected_for_circular_pairs)
 
 TEST(test_circular_tll, fit_is_a_periodic_copula_density)
 {
-  for (const std::string& method : { "constant", "linear" }) {
+  for (const char* method : { "constant", "linear" }) {
     for (const auto& truth : { von_mises(), cubic() }) {
       const auto var_types = truth.get_var_types();
       auto u = truth.simulate(800, false, { 11 });
