@@ -563,14 +563,14 @@ pairwise_cxi(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 //! by one.
 //!
 //! For two circular variables it is the larger mean resultant length of the
-//! angle sums and differences, $ \max_{q = \pm 1} |E e^{i 2\pi (V - q U)}| $,
-//! which is one exactly when the pair is a rotation or reflection. For a
+//! angle sums and differences, \f$ \max_{q = \pm 1} |E e^{i 2\pi (V - q U)}|
+//! \f$, which is one exactly when the pair is a rotation or reflection. For a
 //! circular and a linear variable it is
-//! $ (|E e^{i 2\pi U} f_1(V)|^2 + |E e^{i 2\pi U} f_2(V)|^2)^{1/2} $ with the
-//! first two orthonormal Legendre polynomials $ f_1, f_2 $ on $ [0, 1] $,
-//! the moments that identify the quadratic- and cubic-sections copulas.
+//! \f$ (|E e^{i 2\pi U} f_1(V)|^2 + |E e^{i 2\pi U} f_2(V)|^2)^{1/2} \f$ with
+//! the first two orthonormal Legendre polynomials \f$ f_1, f_2 \f$ on \f$ [0,
+//! 1] \f$, the moments that identify the quadratic- and cubic-sections copulas.
 //!
-//! @param x An $ n \times 2 $ matrix of copula data.
+//! @param x An \f$ n \times 2 \f$ matrix of copula data.
 //! @param var_types The two variable types, at least one of them `"a"`.
 //! @param weights Optional observation weights.
 inline double

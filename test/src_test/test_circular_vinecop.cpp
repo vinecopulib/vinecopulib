@@ -277,7 +277,7 @@ TEST(test_circular_vinecop, circular_criterion_is_cut_invariant)
 
   // the selector routes pairs with a circular variable to it under every
   // built-in criterion, and leaves linear pairs alone
-  for (const std::string& crit : { "tau", "rho", "hoeffd", "cxi", "mcor" }) {
+  for (const char* crit : { "tau", "rho", "hoeffd", "cxi", "mcor" }) {
     EXPECT_NEAR(
       tools_select::calculate_criterion(u12, crit, Eigen::VectorXd(), {}, aa),
       aa_crit,
