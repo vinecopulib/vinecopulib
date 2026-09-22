@@ -198,7 +198,7 @@ def rotate_args(rotation, u, v):
 # cylindrical sections copulas: circular u (first argument), linear v
 # ---------------------------------------------------------------------------
 def sections_p(a, b, v):
-    """p(v) = a (1 - v)(1 - 3v) + b v (2 - 3v); quad_sections is a == b."""
+    """p(v) = a (1 - v)(1 - 3v) + b v (2 - 3v)."""
     return a * (1.0 - v) * (1.0 - 3.0 * v) + b * v * (2.0 - 3.0 * v)
 
 

@@ -37,17 +37,12 @@ create_candidate_bicops(const Eigen::MatrixXd& data,
     }
   }
 
-  // create Bicop objects for all valid family/rotation combinations; the
-  // circular families are constructed with the pair's types because their
-  // default types would be rejected
+  // create Bicop objects for all valid family/rotation combinations, each
+  // carrying the pair's variable types
   std::vector<Bicop> new_bicops;
   const Eigen::MatrixXd no_pars;
   auto add = [&](BicopFamily fam, int rotation) {
-    if (tools_stl::is_member(fam, bicop_families::circular)) {
-      new_bicops.emplace_back(fam, rotation, no_pars, var_types);
-    } else {
-      new_bicops.emplace_back(fam, rotation);
-    }
+    new_bicops.emplace_back(fam, rotation, no_pars, var_types);
   };
   for (auto& fam : families) {
     if (tools_stl::is_member(fam, bicop_families::rotationless)) {

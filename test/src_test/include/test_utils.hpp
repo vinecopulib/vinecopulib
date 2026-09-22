@@ -9,9 +9,37 @@
 #include "gtest/gtest.h"
 #include <Eigen/Dense>
 #include <cmath>
+#include <string>
+#include <vector>
+#include <vinecopulib/bicop/class.hpp>
+#include <vinecopulib/misc/tools_stl.hpp>
 
 //! Shared helpers for the unit tests.
 namespace test_utils {
+
+//! @brief Variable types every family accepts: circular-circular for the
+//! circulas, circular-linear for the cylindrical families, linear otherwise.
+inline std::vector<std::string>
+default_var_types(vinecopulib::BicopFamily family)
+{
+  using namespace vinecopulib;
+  if (tools_stl::is_member(family, bicop_families::cylindrical)) {
+    return { "a", "c" };
+  }
+  if (tools_stl::is_member(family, bicop_families::circular)) {
+    return { "a", "a" };
+  }
+  return { "c", "c" };
+}
+
+//! @brief A `Bicop` of the family with its default parameters and the types
+//! it accepts.
+inline vinecopulib::Bicop
+make_bicop(vinecopulib::BicopFamily family, int rotation = 0)
+{
+  return vinecopulib::Bicop(
+    family, rotation, Eigen::MatrixXd(), default_var_types(family));
+}
 
 //! @brief Element-wise comparison of two Eigen expressions that tolerates
 //! non-finite values.

@@ -162,7 +162,7 @@ def check_sections():
     assert np.allclose(f(a, a, mu, 1 - U, 1 - V), f(a, a, np.pi - mu, U, V))
     assert np.allclose(f(a, a, mu, U, 1 - V), f(a, a, mu + np.pi, U, V))
     assert np.allclose(f(0.6, 0.6, mu, U, V), 1 + 0.6 * np.cos(TWO_PI * U - mu) * (1 - 2 * V))
-    print("  sections: symmetry table, quad_sections == cubic_sections with a == b: OK")
+    print("  sections: symmetry table, quadratic sections at a == b: OK")
 
     # closed-form dependence measures (symbolic)
     u_, v_, a_, b_, mu_ = sp.symbols("u v a b mu", real=True)

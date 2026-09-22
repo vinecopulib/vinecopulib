@@ -159,9 +159,12 @@ $$
 
 The antiderivative is
 $\hat G(\theta) = \frac{1}{2\pi}\bigl[\theta^2 / 2 - 2\sum_{k \ge 1} \rho^k \cos(k\theta) / k^2\bigr]$,
-a geometrically convergent series (the real part of a dilogarithm); the CDF is
-needed only by `Bicop::cdf`, so one-dimensional quadrature of $h_1$ over the
-first argument is an acceptable alternative.
+a geometrically convergent series (the real part of a dilogarithm). In general,
+if $g(\theta) = \bigl(1 + 2\sum_{j \ge 1} \rho_j \cos j\theta\bigr) / 2\pi$, then
+$\hat G(\theta) = \theta^2 / 4\pi - \sum_{j \ge 1} \rho_j \cos(j\theta) / (\pi j^2)$,
+so every binding family with known Fourier coefficients ($\rho$ for the
+cardioid, $\rho^j$ for the wrapped Cauchy, $I_j(\kappa) / I_0(\kappa)$ for the
+von Mises) has a closed-form CDF.
 
 For the von Mises family the series for $\tilde G$ uses the Bessel ratios
 $I_j(\kappa) / I_0(\kappa)$, which decay like $\exp(-j^2 / 2\kappa)$; the
@@ -271,9 +274,8 @@ dependence: for $q = 1$ and $\mu = \pi$ the copula concentrates on
 $v \equiv u + 1/2$, and in the perfectly dependent limit $\tau = 0$,
 $\rho_S = -1/2$, and $\beta = -1$. Consequently:
 
-- `parameters_to_tau` is defined and computes the ordinary $\tau$ numerically
-  from $\tau = 1 - 4\int_0^1\!\int_0^1 h_1(v \mid u)\, h_2(u \mid v)\, du\, dv$,
-  to an absolute tolerance of $10^{-6}$.
+- `parameters_to_tau` returns `NaN` for every circular family, so that a
+  cut-dependent number is never reported as a dependence measure.
 - `tau_to_parameters` is not available (`no_tau_to_parameters`), the
   `bicop_families::itau` list is unchanged, and `parametric_method = "itau"`
   excludes the circular families as it excludes the two-parameter ones.
@@ -315,47 +317,9 @@ A cylindrical family has one circular and one linear argument. Internally the
 circular variable is the first argument. When `var_types` is `{"c", "a"}` the
 primitives are evaluated on swapped columns and $h_1 \leftrightarrow h_2$,
 $h_1^{-1} \leftrightarrow h_2^{-1}$ are exchanged, exactly as `flip()` would
-do; the parameter vector is the same in both orders. Both families are
-`rotationless`: their parameter sets are closed under every reflection of
-either axis, as shown below, so a rotation would only relabel parameters.
-
-### Quadratic sections
-
-The family `quad_sections` with parameters $(a, \mu)$, $a \in [0, 1]$,
-$\mu \in \mathbb{R}$, is
-
-$$
-\begin{aligned}
-c(u, v) &= 1 + a\cos(2\pi u - \mu)\,(1 - 2v), \\
-C(u, v) &= uv + \frac{a}{2\pi}\bigl[\sin(2\pi u - \mu) + \sin\mu\bigr]\, v(1 - v), \\
-h_1(v \mid u) &= v + a\cos(2\pi u - \mu)\, v(1 - v), \\
-h_2(u \mid v) &= u + \frac{a}{2\pi}\bigl[\sin(2\pi u - \mu) + \sin\mu\bigr]\,(1 - 2v).
-\end{aligned}
-$$
-
-It has quadratic sections in the linear variable $v$ in the sense of
-Quesada-Molina and Rodríguez-Lallena (1995) and is the circular-linear
-analog of the Farlie-Gumbel-Morgenstern copula: mass is shifted toward
-$u \equiv \mu / 2\pi$ for small $v$ and toward the opposite direction for
-large $v$. The term $\sin\mu$ in $C$ enforces $C(0, v) = 0$ and $C(1, v) = v$
-for every phase. Nonnegativity of $c$ is equivalent to $|a| \le 1$, and
-$(-a, \mu)$ equals $(a, \mu + \pi)$, so $a \ge 0$ is a normalization.
-Independence is $a = 0$, where $\mu$ is not identified.
-
-$h_1^{-1}(w \mid u)$ is the root in $[0, 1]$ of the quadratic
-$a\cos(2\pi u - \mu)\, v^2 - \bigl(1 + a\cos(2\pi u - \mu)\bigr) v + w = 0$,
-which is $v = w$ when the leading coefficient vanishes; $h_2^{-1}(w \mid v)$ is
-a bracketed root solve on $[0, 1]$, where $h_2$ is increasing in $u$ because
-its derivative is $c \ge 0$.
-
-Kendall's $\tau$ and Spearman's $\rho$ are closed form,
-
-$$
-\tau = \frac{2a\sin\mu}{3\pi}, \qquad \rho_S = \frac{a\sin\mu}{\pi},
-$$
-
-and both vanish at $\mu = 0$ for every $a$: the same warning as for the
-circulas applies.
+do; the parameter vector is the same in both orders. The family is
+`rotationless`: its parameter set is closed under every reflection of either
+axis, as shown below, so a rotation would only relabel parameters.
 
 ### Cubic sections
 
@@ -375,8 +339,12 @@ with $P' = p$ and $P(0) = P(1) = 0$. It has cubic sections in $v$ in the
 sense of Nelsen, Quesada-Molina, and Rodríguez-Lallena (1997). The parameter
 $a$ controls the direction preference near $v = 0$ and $b$ the one near
 $v = 1$; the two ends may prefer different directions with different
-strengths. Setting $a = b$ recovers `quad_sections`, since then
-$p(v) = a(1 - 2v)$.
+strengths. Setting $a = b$ gives quadratic sections, $p(v) = a(1 - 2v)$, in
+the sense of Quesada-Molina and Rodríguez-Lallena (1995): the circular-linear
+analog of the Farlie-Gumbel-Morgenstern copula, with mass shifted toward
+$u \equiv \mu / 2\pi$ for small $v$ and toward the opposite direction for
+large $v$. The term $\sin\mu$ in $C$ enforces $C(0, v) = 0$ and $C(1, v) = v$
+for every phase.
 
 **Constraint region.** Because $\cos(2\pi u - \mu)$ attains every value in
 $[-1, 1]$ as $u$ ranges over $[0, 1]$, nonnegativity of $c$ is equivalent to
@@ -395,19 +363,21 @@ $h_1^{-1}(w \mid u)$ is the root in $[0, 1]$ of a cubic in $v$ and
 $h_2^{-1}(w \mid v)$ a bracketed root solve in $u$; both are bracketed on
 $[0, 1]$ and monotone because the derivative is $c \ge 0$.
 
-The dependence measures are
-$\tau = (a + b)\sin\mu / (3\pi)$ and $\rho_S = (a + b)\sin\mu / (2\pi)$.
+In closed form, $\tau = (a + b)\sin\mu / (3\pi)$ and
+$\rho_S = (a + b)\sin\mu / (2\pi)$; both vanish at $\mu = 0$ for every $a, b$,
+so the same warning as for the circulas applies and `parameters_to_tau`
+returns `NaN` here as well.
 
-### Symmetries of the cylindrical families
+### Symmetries of the cylindrical family
 
 Under the reflections of the two axes and the $180$-degree rotation,
 
-| Operation | `quad_sections` $(a, \mu)$ | `cubic_sections` $(a, b, \mu)$ |
-| --- | --- | --- |
-| $u \to 1 - u$ (reflect the circular axis) | $(a, -\mu)$ | $(a, b, -\mu)$ |
-| $v \to 1 - v$ (reflect the linear axis) | $(a, \mu + \pi)$ | $(-b, -a, \mu)$, i.e. $(b, a, \mu + \pi)$ |
-| rotation $180$ | $(a, \pi - \mu)$ | $(b, a, \pi - \mu)$ |
-| `flip()` | swap `var_types`; parameters unchanged | swap `var_types`; parameters unchanged |
+| Operation | `cubic_sections` $(a, b, \mu)$ |
+| --- | --- |
+| $u \to 1 - u$ (reflect the circular axis) | $(a, b, -\mu)$ |
+| $v \to 1 - v$ (reflect the linear axis) | $(-b, -a, \mu)$, i.e. $(b, a, \mu + \pi)$ |
+| rotation $180$ | $(b, a, \pi - \mu)$ |
+| `flip()` | swap `var_types`; parameters unchanged |
 
 Each row maps the parameter domain onto itself (after the sign normalization
 of $a$), which is why no rotation is needed. `flip()` exchanges the axis
@@ -421,7 +391,7 @@ it is periodic in the circular coordinate, and periodicity in the linear one
 does no harm. It is admitted for `{"a", "c"}` and `{"c", "a"}` with the same
 parameters, rotations, and flip rules as for `{"a", "a"}`. It imposes equal
 density at the two ends of the linear coordinate, which the cylindrical
-families do not, so it complements rather than replaces them.
+family does not, so it complements rather than replaces it.
 
 ### Fitting
 
@@ -429,18 +399,15 @@ The moment initialization uses the identities
 
 $$
 \begin{aligned}
-\mathbb{E}\bigl[e^{i 2\pi U}(1 - 2V)\bigr] &= \tfrac{1}{6}\, a\, e^{i\mu}
-  &&\text{(quadratic)}, \\
 \mathbb{E}\bigl[e^{i 2\pi U} p_1(V)\bigr] &= \bigl(\tfrac{a}{15} + \tfrac{b}{60}\bigr) e^{i\mu}, \quad
-\mathbb{E}\bigl[e^{i 2\pi U} p_2(V)\bigr] = \bigl(\tfrac{a}{60} + \tfrac{b}{15}\bigr) e^{i\mu}
-  &&\text{(cubic)},
+\mathbb{E}\bigl[e^{i 2\pi U} p_2(V)\bigr] = \bigl(\tfrac{a}{60} + \tfrac{b}{15}\bigr) e^{i\mu},
 \end{aligned}
 $$
 
 with $p_1(v) = (1 - v)(1 - 3v)$ and $p_2(v) = v(2 - 3v)$. Replacing the
 expectations by weighted sample means gives $\hat\mu$ as the argument of the
-quadratic moment (or of the sum of the two cubic moments) and the amplitudes
-by a $2 \times 2$ linear solve in the cubic case; the results are clipped to
+sum of the two moments and the amplitudes by a $2 \times 2$ linear solve; the
+results are clipped to
 the parameter domain and the sign of $a$ normalized. The maximum-likelihood
 fit starts from these values.
 
@@ -526,7 +493,7 @@ Cut sensitivity of higher-tree fits is a stage 6 validation item.
 | --- | --- |
 | `{"c", "c"}`, `{"c", "d"}`, `{"d", "c"}`, `{"d", "d"}` | all existing families; unchanged |
 | `{"a", "a"}` | `indep`, `cardioid`, `wrapped_cauchy`, `von_mises`, `tll` |
-| `{"a", "c"}`, `{"c", "a"}` | `indep`, `cardioid`, `wrapped_cauchy`, `von_mises`, `quad_sections`, `cubic_sections`, `tll` |
+| `{"a", "c"}`, `{"c", "a"}` | `indep`, `cardioid`, `wrapped_cauchy`, `von_mises`, `cubic_sections`, `tll` |
 | `{"a", "d"}`, `{"d", "a"}` | rejected |
 
 Eligibility is a function of `(family, var_types)` exposed in one place and
@@ -563,8 +530,24 @@ Parameter order and domains are as in the tables above. The optimizer bounds
 are the domain bounds, with $\pm\infty$ for phases. `get_npars()` returns the
 parameter count. JSON serialization of the parametric families is unchanged:
 `"fam"`, `"rot"`, `"par"`, `"vt"`, and the fit statistics suffice, and the new
-family names round-trip through `get_family_name` / `get_family_enum`. The
-grid geometry field for the nonparametric estimator is a stage 2 decision.
+family names round-trip through `get_family_name` / `get_family_enum`.
+
+### Nonparametric grid serialization
+
+A `tll` model whose grid is not the default normal grid on two linear axes
+carries an additional JSON object `"grid"` with two fields: `"knots"`, a list
+of two vectors holding the knot positions of the first and second axis, and
+`"types"`, the two axis types (`"c"` or `"a"`) the knots were built for. The
+`"par"` field keeps the density values on the knot lattice, row `i` and
+column `j` belonging to the `i`-th knot of the first axis and the `j`-th of
+the second. On reading, a model with a `"grid"` field rebuilds its
+interpolation grid from those knots; a model without one rebuilds the normal
+grid from the row count of `"par"`, as today, so every existing file reloads
+unchanged. A `"grid"` whose knot counts disagree with the shape of `"par"`,
+whose types disagree with `"vt"`, or whose knots are not increasing in
+`[0, 1]` is rejected with a message naming the field. Writing a linear `tll`
+fit does not add the field, so files written by a linear-only library are
+read unchanged.
 
 ### Candidate generation and preselection
 
@@ -604,7 +587,7 @@ existing golden-value convention in `scripts/README.md`.
 | rotation and flip identities of the tables above | all | $10^{-12}$ | exact |
 | independence at zero concentration or amplitude | all | exact | — |
 | $(-\rho, \mu) = (\rho, \mu + \pi)$; $(-a, -b, \mu) = (a, b, \mu + \pi)$ | all | $10^{-12}$ | exact |
-| closed-form $\tau$, $\rho_S$ of the cylindrical families; numerical $\tau$ of the binding families | all | $10^{-6}$ | symbolic / Monte Carlo with $n = 2 \cdot 10^5$ |
+| closed-form $\tau$, $\rho_S$ of the cubic sections family (reference only; the library reports `NaN`) | `cubic_sections` | exact | symbolic |
 | the half-turn case at wrapped Cauchy $\rho = 0.95$: $\tau = -0.054$, $\rho_S = -0.479$, $\beta = -0.902$ (limits $0$, $-1/2$, $-1$) | binding | $\pm 0.03$ | Monte Carlo, $n = 2 \cdot 10^5$ |
 | fit recovery of $(\text{concentration}, \mu)$ at $n = 2000$, including $\mu$ near $\pm\pi$ and the half-turn case | all | $\pm 0.05$ / $\pm 0.1$ rad | simulation |
 | Rosenblatt round-trip of a mixed vine; joint density equal at each circular cut | vine | $10^{-10}$ | exact |

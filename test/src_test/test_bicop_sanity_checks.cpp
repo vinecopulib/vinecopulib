@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include "include/test_utils.hpp"
 #include "gtest/gtest.h"
 #include <boost/math/special_functions/digamma.hpp>
 #include <cmath>
@@ -22,7 +23,7 @@ TEST(bicop_sanity_checks, tau_maps_are_available_where_documented)
     BicopFamily::gumbel, BicopFamily::frank,    BicopFamily::joe
   };
   for (auto family : bicop_families::all) {
-    Bicop bicop(family);
+    Bicop bicop = test_utils::make_bicop(family);
     const bool expected = tools_stl::is_member(family, invertible);
 
     // parameters_to_tau: every family
@@ -50,7 +51,10 @@ TEST(bicop_sanity_checks, catches_wrong_parameter_size)
     EXPECT_ANY_THROW(Bicop(family, 0, Eigen::VectorXd::Zero(2)));
   }
   for (auto family : bicop_families::two_par) {
-    EXPECT_ANY_THROW(Bicop(family, 0, Eigen::VectorXd::Zero(1)));
+    EXPECT_ANY_THROW(Bicop(family,
+                           0,
+                           Eigen::VectorXd::Zero(1),
+                           test_utils::default_var_types(family)));
   }
 }
 
@@ -74,7 +78,7 @@ TEST(bicop_sanity_checks, catches_wrong_parameter_shape_in_converters)
   // one straight to the leaf, which indexes it positionally. An empty matrix
   // has no storage at all, so `parameters(0)` dereferenced a null pointer.
   for (auto family : bicop_families::all) {
-    auto bc = Bicop(family);
+    auto bc = test_utils::make_bicop(family);
     const auto expected = bc.get_parameters();
     // An empty argument is the family's own shape for `indep`, so it stays
     // legal there; every other family must reject it.

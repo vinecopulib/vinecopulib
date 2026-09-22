@@ -20,8 +20,8 @@ namespace vinecopulib {
 //! @brief Instantiates a specific bivariate copula model.
 //! @param family The copula family.
 //! @param rotation The rotation of the copula; one of 0, 90, 180, or 270
-//!     (for Independence, Gaussian, Student, Frank, nonparametric, and
-//!     cylindrical families, only 0 is allowed; for the circulas, 0 or 90).
+//!     (for Independence, Gaussian, Student, Frank, nonparametric, and cubic
+//!     sections families, only 0 is allowed; for the circulas, 0 or 90).
 //! @param parameters The copula parameters.
 //! @param var_types Two strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete,
@@ -94,12 +94,11 @@ Bicop::operator=(Bicop other)
 inline Bicop::Bicop(const nlohmann::json& input)
   : Bicop(get_family_enum(input["fam"]),
           static_cast<int>(input["rot"]),
-          tools_serialization::json_to_matrix<double>(input["par"]))
+          tools_serialization::json_to_matrix<double>(input["par"]),
+          var_types_from_json(input))
 {
   // try block for backwards compatibility
   try {
-    set_var_types(
-      tools_serialization::json_to_vector<std::string>(input["vt"]));
     nobs_ = static_cast<size_t>(input["nobs"]);
     bicop_->set_loglik(input["ll"]);
     bicop_->set_npars(input["npars"]);
@@ -1526,7 +1525,8 @@ Bicop::simulate(const size_t& n,
   auto u = tools_stats::simulate_uniform(n, 2, qrng, seeds);
   // use inverse Rosenblatt transform to generate a sample from the copula
   // (always simulate continuous data)
-  u.col(1) = this->with_var_types().hinv1(u);
+  u.col(1) =
+    this->with_var_types(tools_var_types::as_continuous(var_types_)).hinv1(u);
   return u;
 }
 
@@ -1562,7 +1562,8 @@ Bicop::simulate(const Eigen::MatrixXd& parameters,
     static_cast<size_t>(parameters.rows()), 2, qrng, seeds);
   // use inverse Rosenblatt transform to generate a sample from the copula
   // (always simulate continuous data)
-  u.col(1) = this->with_var_types().hinv1(u, parameters, num_threads);
+  u.col(1) = this->with_var_types(tools_var_types::as_continuous(var_types_))
+               .hinv1(u, parameters, num_threads);
   return u;
 }
 
@@ -2038,6 +2039,14 @@ Bicop::flip()
   // The following implements any changes to the shape beyond the change in
   // rotation. For most of our families, it does nothing.
   bicop_->flip();
+  // The two-rotation families only have rotations 0 and 90: their 270-degree
+  // rotation with a negated phase is the 90-degree rotation with the original
+  // phase, so undo both changes.
+  if (tools_stl::is_member(get_family(), bicop_families::two_rotations) &&
+      rotation_ == 270) {
+    rotation_ = 90;
+    bicop_->flip();
+  }
 }
 
 //! @brief Summarizes the model into a string (can be used for printing).
@@ -2432,6 +2441,17 @@ Bicop::check_fitted() const
     throw std::runtime_error("copula has not been fitted from data or its "
                              "parameters have been modified manually");
   }
+}
+
+//! the variable types stored in a serialized model; files written before
+//! variable types existed have none and are continuous.
+inline std::vector<std::string>
+Bicop::var_types_from_json(const nlohmann::json& input)
+{
+  if (input.contains("vt")) {
+    return tools_serialization::json_to_vector<std::string>(input["vt"]);
+  }
+  return tools_var_types::all_continuous_types(2);
 }
 
 //! @brief Checks whether var_types have the correct length, are each "c",

@@ -1,6 +1,7 @@
 # Circular copulas and mixed vines: implementation plan
 
-Status: stage 1 in progress on the integration branch `feat/circulas`.
+Status: stages 1 to 3 implemented on the integration branch `feat/circulas`;
+stages 4 and 5 are next.
 Updated September 21, 2026.
 
 This checklist tracks the first feature release for circular variables. The
@@ -42,7 +43,7 @@ will be settled in stage 1.
 | --- | --- | --- |
 | Linear-linear | Existing families | Existing TLL |
 | Circular-circular | Cardioid, wrapped Cauchy, and von Mises binding densities | Local likelihood on two periodic axes |
-| Circular-linear, either order | Quadratic and cubic sections with phase; reuse the binding-density construction where appropriate | Local likelihood on one periodic axis and one probit-transformed axis |
+| Circular-linear, either order | Cubic sections with phase (quadratic sections are the case $a = b$); reuse the binding-density construction where appropriate | Local likelihood on one periodic axis and one probit-transformed axis |
 | Any supported pair | Existing independence family | — |
 
 The binding-density construction is
@@ -185,13 +186,20 @@ when it comes, can be a further value.
   linear tau, and would drop one orientation of a circular family. 
 - [x] (#790) Specify filtering for explicit and empty family sets and behavior when
   no compatible candidate remains. Apply the same rules to fitting and selection. 
-- [ ] Preserve geometry through copying, views, flipping, rotations, resetting,
-  truncation, structure conversions, and conditional/reoriented interfaces.
-- [ ] Define the JSON field for nonparametric grid geometry. The `Bicop` JSON
-  carries only family, rotation, parameters, `var_types`, and fit statistics,
-  and `KernelBicop::set_parameters` rebuilds knots from the row count alone,
-  so a circular grid cannot reload without it. Test legacy reads and complete
-  round-trips; reject unsupported formats clearly.
+- [x] (#791) Preserve geometry through copying, views, flipping, rotations,
+  resetting, truncation, structure conversions, and conditional/reoriented
+  interfaces. Done at the `Bicop` level (copy, `BicopView::as_continuous`,
+  `flip()` with the two-rotation canonicalization, `set_rotation`, JSON);
+  the vine-level interfaces (truncation, relabeling, `VinecopView`,
+  conditional simulation and reorientation) are verified by the stage 5
+  tasks once a circular vine can be built.
+- [x] (#791) Define the JSON field for nonparametric grid geometry. The
+  `Bicop` JSON carries only family, rotation, parameters, `var_types`, and fit
+  statistics, and `KernelBicop::set_parameters` rebuilds knots from the row
+  count alone, so a circular grid cannot reload without it. Test legacy reads
+  and complete round-trips; reject unsupported formats clearly. Defined in the
+  contract (*Nonparametric grid serialization*); stage 4 implements and tests
+  it.
 - [x] Audit all special cases keyed on `BicopFamily::tll` before choosing
   between geometry-dependent `tll` and separate family identifiers. Four
   sites: the factory in `abstract.ipp`, the two parameter-skipping branches
@@ -207,29 +215,33 @@ implementations, and fit controls.
 
 ## 3. Parametric pair copulas
 
-- [ ] Implement cardioid, wrapped Cauchy, and von Mises binding families in
+- [x] (#791) Implement cardioid, wrapped Cauchy, and von Mises binding families in
   the existing `.hpp` / inline `.ipp` pattern, sharing the circular primitives
   (`g`, `G`, `G^{-1}`) that have identical semantics.
-- [ ] Implement quadratic and cubic sections, phase handling, and both axis
-  orders. Support circular-linear use of binding families without duplicating
+- [x] (#791) Implement cubic sections (quadratic sections are the case $a = b$),
+  phase handling, and both axis orders. Support circular-linear use of binding families without duplicating
   their mathematical implementations.
-- [ ] Implement stable lifted circular CDFs and inverses, retaining the number
+- [x] (#791) Implement stable lifted circular CDFs and inverses, retaining the number
   of completed turns. Audit cancellation and concentration limits, including
   the von Mises normalizing constant and wrapped Cauchy near-singular limit.
-- [ ] Implement likelihood fitting with circular initialization and periodic
+- [x] (#791) Implement likelihood fitting with circular initialization and periodic
   phase optimization. The existing tau-based starting values and search
   bounds must not constrain these fits incorrectly.
-- [ ] Implement or validate derivative support. Support broadcast and
+- [x] (#791) Implement or validate derivative support. Support broadcast and
   per-observation parameter matrices under the existing contract.
-- [ ] Honor observation weights, missing-value handling, parameter validation,
+- [x] (#791) Honor observation weights, missing-value handling, parameter validation,
   seeded simulation, and fit statistics.
-- [ ] Update candidate construction and preselection: produce exactly the two
+- [x] (#791) Update candidate construction and preselection: produce exactly the two
   rotations for circular families and bypass the tau-sign and tail
   (`lt` / `ut`) heuristics for them.
-- [ ] Test normalization, uniform marginals, CDF boundary values, CDF/density
+- [x] (#791) Test normalization, uniform marginals, CDF boundary values, CDF/density
   derivatives, h/inverse identities, independence limits, flip identities,
   simulation moments, and recovery of phases near the cut. Include the
-  zero-tau half-turn case as a fit-recovery test.
+  zero-tau half-turn case as a fit-recovery test. `BindingBicop` holds the leaves in terms of the lifted CDF; the
+  families supply `g`, the lifted CDF, its inverse, and the moment map. `SectionsBicop` reads the argument order from `var_types`. Bracketed Newton for the cardioid and von Mises inverses; closed
+  form for the wrapped Cauchy. `CircularBicop::fit` starts from moment estimates and calls the
+  extracted `ParBicop::fit_mle` with an unbounded phase. Finite-difference fallback of `ParBicop`; per-row parameters via
+  `binaryExpr_or_nan`. Done in stage 2b. `test_circular`, with golden values from `tools/circulas`.
 
 Main code: [parametric.ipp](../../include/vinecopulib/bicop/implementation/parametric.ipp),
 [tools_select.ipp](../../include/vinecopulib/bicop/implementation/tools_select.ipp),
@@ -404,7 +416,10 @@ implementing PR. Entries without a PR were settled during planning.
 | `itau` stays unavailable for circular families. | No valid identification result from linear tau. | planning |
 | Stage 4 (nonparametric) is a parallel track; stages 5 and 6 ship with parametric circular families. | Exploratory work must not gate the release. | planning |
 | One geometry-dependent `tll`; the estimator reads the axis geometry from `var_types`. | The `"vt"` JSON field already records the geometry; a separate identifier would be a second source of truth that can disagree with it. `family_set = {tll}` keeps meaning "nonparametric" for every geometry, as `{gaussian}` needs no circular twin. | audit, September 21, 2026 |
-| Family names: `cardioid`, `wrapped_cauchy`, `von_mises` (binding), `quad_sections`, `cubic_sections` (cylindrical); new group `bicop_families::two_rotations`. | Bare snake_case values match the flat existing enum; `create_candidate_bicops` branches on rotation arity, so the two-rotation families need their own group beside `rotationless`. | maintainer, September 21, 2026 |
+| Family names: `cardioid`, `wrapped_cauchy`, `von_mises` (binding), `cubic_sections` (cylindrical); new group `bicop_families::two_rotations`. | Bare snake_case values match the flat existing enum; `create_candidate_bicops` branches on rotation arity, so the two-rotation families need their own group beside `rotationless`. | maintainer, September 21, 2026 |
+| No `quad_sections` family: quadratic sections are `cubic_sections` with $a = b$. | One parameter saved under BIC did not justify a fifth family in every list, docstring, and downstream wrapper. | maintainer, September 22, 2026 (#791) |
+| `parameters_to_tau` returns `NaN` for the circular families. | Kendall's tau depends on the cut, so it misreports circular dependence; its nested quadrature also dominated the cost of printing a vine. | maintainer, September 22, 2026 (#791) |
+| The CDF of a binding family is closed form through the Fourier coefficients of `g`. | Replaces per-point quadrature of $h_1$ at a thousandth of the cost, with no accuracy loss. | #791 |
 | Stage pull requests target the integration branch `feat/circulas`, stacked where a stage depends on its predecessor; `feat/circulas` merges to `main` after stage 7. | Keeps `main` free of a half-finished feature while each stage still gets its own review. | maintainer, September 21, 2026 |
 
 Still open: parameter conventions, nonparametric fitting formulas, and the

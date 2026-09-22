@@ -91,7 +91,17 @@ ParBicop::fit(const Eigen::MatrixXd& data,
   auto ub = get_parameters_upper_bounds();
   adjust_parameters_bounds(lb, ub, tau, method);
   auto initial_parameters = get_start_parameters(winsorize_tau(tau));
+  fit_mle(data, weights, method, initial_parameters, lb, ub);
+}
 
+inline void
+ParBicop::fit_mle(const Eigen::MatrixXd& data,
+                  const Eigen::VectorXd& weights,
+                  const std::string& method,
+                  Eigen::VectorXd initial_parameters,
+                  const Eigen::MatrixXd& lb,
+                  const Eigen::MatrixXd& ub)
+{
   // find (pseudo-) mle. the optimizer works in an unconstrained space and only
   // ever sees natural parameters; it needs both the value and the gradient.
   // continuous data uses the analytic (or finite-difference) score leaves via

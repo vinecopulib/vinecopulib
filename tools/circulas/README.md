@@ -19,7 +19,9 @@ implementation is tested against numbers it did not produce.
   Exits nonzero on the first failure.
 - `dump_golden.py` — writes reference values (density, CDF, h-functions, and
   inverses on a fixed lattice of arguments and parameters, plus Kendall's tau)
-  to a JSON file for the C++ golden-value tests of stage 3.
+  to a JSON file, or with `--cpp` regenerates
+  `test/src_test/include/circular_golden.hpp`, the header the C++ golden tests
+  read them from.
 
 ## Run
 
@@ -27,7 +29,7 @@ From the repo root, with NumPy, SciPy, and SymPy available:
 
 ```bash
 python3 tools/circulas/check_contract.py
-python3 tools/circulas/dump_golden.py bench_results/circulas_golden.json
+python3 tools/circulas/dump_golden.py --cpp   # regenerates the test header
 ```
 
 The checks take under a minute. Any change to a formula in the contract must
