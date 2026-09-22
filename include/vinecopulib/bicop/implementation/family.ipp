@@ -110,11 +110,13 @@ family_accepts_var_types(BicopFamily family,
   }
   const size_t n_circular =
     is_circular(var_types[0]) + is_circular(var_types[1]);
-  if (n_circular > 0 && count_discrete(var_types) > 0) {
-    return false;
-  }
-  if (family == BicopFamily::indep || family == BicopFamily::tll) {
+  if (family == BicopFamily::indep) {
     return true;
+  }
+  if (family == BicopFamily::tll) {
+    // the nonparametric estimator recovers a latent sample of a discrete
+    // variable on the normal scale, which has no circular counterpart yet
+    return n_circular == 0 || count_discrete(var_types) == 0;
   }
   if (tools_stl::is_member(family, bicop_families::cylindrical)) {
     return n_circular == 1;
