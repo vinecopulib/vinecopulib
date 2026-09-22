@@ -37,6 +37,8 @@ const std::vector<std::string> cd = { "c", "d" };
 const std::vector<std::string> aa = { "a", "a" };
 const std::vector<std::string> ac = { "a", "c" };
 const std::vector<std::string> ca = { "c", "a" };
+const std::vector<std::string> ad = { "a", "d" };
+const std::vector<std::string> da = { "d", "a" };
 const double pi = boost::math::constants::pi<double>();
 
 Eigen::VectorXd
@@ -150,10 +152,14 @@ TEST(test_circular, eligibility_table)
         << get_family_name(fam);
     }
   }
-  // circular-discrete: nothing
-  for (auto fam : bicop_families::all) {
-    EXPECT_FALSE(family_accepts_var_types(fam, { "a", "d" }));
-    EXPECT_FALSE(family_accepts_var_types(fam, { "d", "a" }));
+  // circular with discrete linear: as circular-linear, without tll
+  for (const auto& types : { ad, da }) {
+    for (auto fam : bicop_families::all) {
+      bool expected =
+        fam == BicopFamily::indep || is_member(fam, bicop_families::circular);
+      EXPECT_EQ(family_accepts_var_types(fam, types), expected)
+        << get_family_name(fam);
+    }
   }
   // the default search for a linear pair is unchanged
   EXPECT_EQ(eligible_families(bicop_families::all, cc),
@@ -166,7 +172,7 @@ TEST(test_circular, tokens_are_enforced_by_bicop_and_vinecop)
   EXPECT_EQ(indep.get_var_types(), aa);
   indep.set_var_types(ac);
   EXPECT_EQ(indep.get_var_types(), ac);
-  EXPECT_THROW(indep.set_var_types({ "a", "d" }), std::runtime_error);
+  EXPECT_NO_THROW(indep.set_var_types(ad));
   EXPECT_THROW(indep.set_var_types({ "x", "c" }), std::runtime_error);
 
   // a linear family cannot take a circular variable; circular families need
@@ -184,11 +190,11 @@ TEST(test_circular, tokens_are_enforced_by_bicop_and_vinecop)
     EXPECT_NO_THROW(Bicop(fam, 0, Eigen::MatrixXd(), ca));
   }
 
-  // the vine accepts the token and rejects mixes with discrete variables
+  // the vine accepts the token, also next to discrete variables
   auto u = tools_stats::simulate_uniform(50, 3, false, { 3 });
   Vinecop vc(3);
+  vc.set_var_types({ "a", "d", "c" });
   vc.set_var_types({ "a", "c", "c" });
-  EXPECT_THROW(vc.set_var_types({ "a", "d", "c" }), std::runtime_error);
   EXPECT_THROW(vc.set_var_types({ "a", "x", "c" }), std::runtime_error);
   EXPECT_NO_THROW(vc.select(u));
   EXPECT_EQ(vc.get_var_types(), (std::vector<std::string>{ "a", "c", "c" }));
@@ -486,6 +492,106 @@ TEST(test_circular, select_picks_a_circular_family)
   bc2.select(truth2.simulate(1500, false, { 6 }), controls);
   EXPECT_EQ(bc2.get_family(), BicopFamily::cubic_sections) << bc2.str();
   EXPECT_EQ(bc2.get_var_types(), ca);
+}
+
+// -------------------------------------------------------------------------
+// a circular variable next to a discrete linear one
+
+//! rounds the linear column of copula data up to a lattice of `k` levels
+//! and appends the two left-limit columns
+Eigen::MatrixXd
+discretize_linear(const Eigen::MatrixXd& u, Eigen::Index linear, int k)
+{
+  Eigen::MatrixXd v(u.rows(), 4);
+  v.leftCols(2) = u;
+  v.rightCols(2) = u;
+  v.col(linear) = (u.col(linear).array() * k).ceil() / k;
+  v.col(2 + linear) = (u.col(linear).array() * k).ceil() / k - 1.0 / k;
+  return v;
+}
+
+TEST(test_circular, discrete_linear_variable_next_to_a_circular_one)
+{
+  // the circular variable first, then second; a cylindrical family and a
+  // circula on the cylinder
+  const std::vector<Bicop> truths = {
+    make(BicopFamily::cubic_sections, 0, { 0.7, -0.5, 1.0 }, ac),
+    make(BicopFamily::von_mises, 90, { 2.5, 0.4 }, ca),
+  };
+  const int k = 6;
+  for (const auto& truth : truths) {
+    const Eigen::Index linear = (truth.get_var_types() == ac) ? 1 : 0;
+    const auto types = (linear == 1) ? ad : da;
+    Bicop bc(
+      truth.get_family(), truth.get_rotation(), truth.get_parameters(), types);
+    EXPECT_EQ(bc.get_var_types(), types);
+    const std::string what = bc.str();
+
+    // the density of the pair is the conditional probability of the atom
+    // relative to its marginal probability 1 / k
+    auto u = tools_stats::simulate_uniform(60, 2, false, { 12 });
+    auto v = discretize_linear(u, linear, k);
+    Eigen::MatrixXd hi = v.leftCols(2), lo = v.leftCols(2);
+    lo.col(linear) = v.col(2 + linear);
+    Eigen::VectorXd expected = (linear == 1)
+                                 ? truth.hfunc1(hi) - truth.hfunc1(lo)
+                                 : truth.hfunc2(hi) - truth.hfunc2(lo);
+    EXPECT_TRUE(all_close(bc.pdf(v), expected * k, 1e-7, 1e-9)) << what;
+    // the h-function of the circular variable given the atom, and the cdf
+    Eigen::VectorXd h_circ = (linear == 1) ? bc.hfunc2(v) : bc.hfunc1(v);
+    EXPECT_TRUE((h_circ.array() > 0).all() && (h_circ.array() < 1).all())
+      << what;
+    EXPECT_TRUE(all_close(bc.cdf(v), truth.cdf(hi), 1e-12)) << what;
+
+    // fitting the discretized sample recovers the parameters
+    auto data =
+      discretize_linear(truth.simulate(1500, false, { 14 }), linear, k);
+    Bicop fitted(
+      truth.get_family(), truth.get_rotation(), Eigen::MatrixXd(), types);
+    fitted.fit(data);
+    const Eigen::VectorXd est = fitted.get_parameters();
+    const Eigen::VectorXd pars = truth.get_parameters();
+    for (Eigen::Index j = 0; j + 1 < pars.size(); ++j) {
+      EXPECT_NEAR(est(j), pars(j), 0.3) << what;
+    }
+    const double dphase = est(pars.size() - 1) - pars(pars.size() - 1);
+    EXPECT_NEAR(std::cos(dphase), 1.0, 0.15) << what;
+
+    // selection picks an eligible family and never the nonparametric one
+    Bicop selected(data, FitControlsBicop(), types);
+    EXPECT_TRUE(family_accepts_var_types(selected.get_family(), types))
+      << selected.str();
+    EXPECT_NE(selected.get_family(), BicopFamily::tll);
+    EXPECT_THROW(Bicop(data, FitControlsBicop({ BicopFamily::tll }), types),
+                 std::runtime_error);
+  }
+
+  // a vine with circular, discrete, and continuous variables selects and
+  // evaluates
+  Vinecop truth(
+    DVineStructure(std::vector<size_t>{ 1, 2, 3 }),
+    { { make(BicopFamily::cubic_sections, 0, { 0.7, -0.5, 1.0 }, ac),
+        make(BicopFamily::gaussian, 0, { 0.6 }, cc) },
+      { make(BicopFamily::quad_sections, 0, { 0.5, 0.0 }, ac) } },
+    { "a", "c", "c" });
+  auto u = truth.simulate(400, false, 1, { 16 });
+  Eigen::MatrixXd data(u.rows(), 4);
+  data.leftCols(3) = u;
+  data.col(1) = (u.col(1).array() * k).ceil() / k;
+  data.col(3) = data.col(1).array() - 1.0 / k;
+  std::vector<std::string> types{ "a", "d", "c" };
+  Vinecop vc(data, RVineStructure(), types);
+  EXPECT_EQ(vc.get_var_types(), types);
+  for (const auto& tree : vc.get_all_pair_copulas()) {
+    for (const auto& pc : tree) {
+      EXPECT_TRUE(family_accepts_var_types(pc.get_family(), pc.get_var_types()))
+        << pc.str();
+    }
+  }
+  EXPECT_TRUE(std::isfinite(vc.loglik(data)));
+  EXPECT_TRUE((vc.pdf(data).array() > 0).all());
+  auto sim = vc.simulate(100, false, 1, { 18 });
+  EXPECT_TRUE((sim.array() > 0).all() && (sim.array() < 1).all());
 }
 
 } // namespace test_circular
