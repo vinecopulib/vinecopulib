@@ -270,9 +270,11 @@ transform and its Jacobian apply to linear axes only.
   Product kernel (von Mises on circular axes, Gaussian on the probit scale
   of linear axes) with a local log-linear model per axis and no interaction
   term, so the local likelihood equations separate and each axis contributes
-  a closed-form correction. Orders `constant` and `linear` are supported;
-  `quadratic` throws for a pair with a circular variable (the second
-  harmonic has no closed-form normalizer).
+  a closed-form correction. Orders `constant` and `linear` have closed
+  forms; `quadratic` (the wrappers' default) adds the second harmonic on a
+  circular axis, whose normalizer has no closed form and is handled by
+  trapezoid quadrature and a damped Newton solve of the moment equations
+  (#795).
 - [x] (#795) Define bandwidth selection for both geometries, including observation
   weights. Evaluate held-out likelihood, cut sensitivity, and strong or
   multimodal dependence before choosing defaults.
@@ -284,8 +286,10 @@ transform and its Jacobian apply to linear axes only.
   kernel sums. Held-out log-likelihood minus the truth, n = 500, 4
   replications, multipliers 0.25 / 0.5 / 1 / 2 / 4: von Mises kappa = 2,
   constant: -0.08 / -0.03 / -0.03 / -0.07 / -0.20, linear: -0.18 / -0.06 /
-  -0.02 / -0.02 / -0.06; quadratic sections a = 0.8, constant: -0.05 /
-  -0.02 / -0.01 / -0.02 / -0.03; a bimodal mixture of two circulas prefers
+  -0.02 / -0.02 / -0.06, quadratic: -0.07 / -0.03 / -0.03 / -0.09 / -0.21;
+  quadratic sections a = 0.8, constant: -0.05 / -0.02 / -0.01 / -0.02 /
+  -0.03, quadratic: -0.06 / -0.02 / -0.01 / -0.01 / -0.02; a bimodal
+  mixture of two circulas prefers
   0.25 to 0.5; the half-turn wrapped Cauchy with rho = 0.95 loses about 0.7
   at every multiplier, a ridge too narrow for a product kernel. The default
   multiplier 1 is at or next to the optimum in every other case, at n = 500

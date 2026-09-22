@@ -43,8 +43,9 @@
   circular axis the estimator smooths with a von Mises kernel on the angle
   and interpolates on equally spaced knots whose two ends are the same point,
   so the fitted density is periodic; a linear axis keeps the probit transform
-  and its normal-scale knots. `nonparametric_method` `"constant"` and
-  `"linear"` are supported for such pairs, `"quadratic"` throws. The
+  and its normal-scale knots. All three `nonparametric_method` orders are
+  supported for such pairs; the quadratic order adds the second harmonic on
+  the circular axis. The
   interpolation grid carries one knot vector per axis
   (`InterpolationGrid::get_grid_points()`), and the JSON representation of a
   `tll` copula with a circular variable records them in a `"grid"` field;

@@ -547,7 +547,12 @@ density value times $\exp(-m^2 / 2\sigma^2)$ per linear axis and
 $\exp(r\,\hat m_1 - \kappa)\, I_0(\kappa) / I_0(r)$ per circular axis,
 where $r = A^{-1}(|\bar m|)$ with $A = I_1 / I_0$ and $\hat m = \bar m /
 |\bar m|$. `nonparametric_method` `"constant"` omits the corrections;
-`"quadratic"` is rejected for such pairs. The density on the copula scale
+`"quadratic"` adds the second harmonic on a circular axis and the square on a
+linear one; the second-harmonic normalizer has no closed form, so its moment
+equations are solved numerically (trapezoid quadrature, which is spectrally
+accurate for the periodic integrand, and a damped Newton method on the
+strictly convex dual), falling back to the first harmonic where they do not
+converge. The density on the copula scale
 multiplies by $2\pi$ per circular axis and divides by the normal density of
 $z$ per linear axis, and the margins are normalized as for linear pairs.
 
