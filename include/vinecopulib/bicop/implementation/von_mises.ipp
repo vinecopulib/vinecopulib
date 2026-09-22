@@ -66,6 +66,13 @@ VonMisesBicop::lifted_cdf_inverse(double w, double concentration) const
     center + pi);
 }
 
+inline std::vector<double>
+VonMisesBicop::fourier_coefficients(double concentration) const
+{
+  return tools_circular::bessel_i_ratios(
+    concentration, tools_circular::von_mises_series_length(concentration));
+}
+
 inline double
 VonMisesBicop::concentration_from_resultant(double rbar) const
 {

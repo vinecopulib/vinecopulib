@@ -8,6 +8,7 @@
 #include "include/test_utils.hpp"
 #include "gtest/gtest.h"
 #include <boost/math/constants/constants.hpp>
+#include <cmath>
 #include <string>
 #include <vector>
 #include <vinecopulib/bicop/class.hpp>
@@ -58,7 +59,6 @@ family_of(const std::string& key)
     { "cardioid", BicopFamily::cardioid },
     { "wrapped_cauchy", BicopFamily::wrapped_cauchy },
     { "von_mises", BicopFamily::von_mises },
-    { "quad_sections", BicopFamily::quad_sections },
     { "cubic_sections", BicopFamily::cubic_sections },
   };
   for (const auto& entry : table) {
@@ -84,7 +84,6 @@ TEST(test_circular, family_names_round_trip)
   EXPECT_EQ(get_family_name(BicopFamily::cardioid), "Cardioid");
   EXPECT_EQ(get_family_name(BicopFamily::wrapped_cauchy), "Wrapped Cauchy");
   EXPECT_EQ(get_family_name(BicopFamily::von_mises), "von Mises");
-  EXPECT_EQ(get_family_name(BicopFamily::quad_sections), "Quadratic sections");
   EXPECT_EQ(get_family_name(BicopFamily::cubic_sections), "Cubic sections");
 }
 
@@ -100,7 +99,6 @@ TEST(test_circular, rotation_groups_partition_the_circular_families)
     EXPECT_TRUE(is_member(fam, bicop_families::circular));
     EXPECT_TRUE(is_member(fam, bicop_families::rotationless));
   }
-  EXPECT_TRUE(is_member(BicopFamily::quad_sections, bicop_families::two_par));
   EXPECT_TRUE(
     is_member(BicopFamily::cubic_sections, bicop_families::three_par));
 }
@@ -226,11 +224,11 @@ TEST(test_circular, candidate_generation_filters_by_geometry)
   }
 
   controls.set_family_set(
-    { BicopFamily::gaussian, BicopFamily::indep, BicopFamily::quad_sections });
+    { BicopFamily::gaussian, BicopFamily::indep, BicopFamily::cubic_sections });
   auto fams = tools_select::get_candidate_families(controls, ac);
   EXPECT_EQ(fams,
             (std::vector<BicopFamily>{ BicopFamily::indep,
-                                       BicopFamily::quad_sections }));
+                                       BicopFamily::cubic_sections }));
   fams = tools_select::get_candidate_families(controls, aa);
   EXPECT_EQ(fams, (std::vector<BicopFamily>{ BicopFamily::indep }));
 }
@@ -294,8 +292,7 @@ TEST(test_circular, golden_values)
           all_close(bc.hinv2(wv), to_vector(c["hinv2"][k]), tol_inv, tol_inv))
           << what << " w = " << w(k);
       }
-      EXPECT_NEAR(bc.parameters_to_tau(pars), c["tau"].get<double>(), 1e-6)
-        << what;
+      EXPECT_TRUE(std::isnan(bc.parameters_to_tau(pars))) << what;
       ++n_cases;
     }
   }
@@ -329,7 +326,6 @@ TEST(test_circular, identities_on_a_grid)
     { BicopFamily::wrapped_cauchy, 90, { 0.95, 0.3 } },
     { BicopFamily::von_mises, 0, { 4.0, 2.5 } },
     { BicopFamily::von_mises, 90, { 30.0, -0.7 } },
-    { BicopFamily::quad_sections, 0, { 0.8, 1.2 } },
     { BicopFamily::cubic_sections, 0, { 0.9, -0.6, -2.0 } },
   };
   for (const auto& c : cases) {
@@ -381,7 +377,8 @@ TEST(test_circular, identities_on_a_grid)
     EXPECT_TRUE(all_close(bc.hfunc1(u, rows), bc.hfunc1(u), 1e-12, 1e-12))
       << what;
 
-    // no tau inversion, zero tail dependence
+    // no Kendall's tau in either direction, zero tail dependence
+    EXPECT_TRUE(std::isnan(bc.get_tau())) << what;
     EXPECT_THROW(bc.tau_to_parameters(0.3), std::runtime_error) << what;
     EXPECT_TRUE(bc.get_taildep().isZero()) << what;
   }
@@ -420,12 +417,11 @@ TEST(test_circular, phase_conventions)
   EXPECT_TRUE(all_close(c1.pdf(reflected), c3.pdf(u), 1e-10, 1e-10));
 }
 
-TEST(test_circular, half_turn_case_has_zero_tau_and_strong_dependence)
+TEST(test_circular, half_turn_case_has_strong_dependence)
 {
   Eigen::VectorXd pars(2);
   pars << 0.95, pi;
   Bicop bc(BicopFamily::wrapped_cauchy, 0, pars, aa);
-  EXPECT_NEAR(bc.parameters_to_tau(pars), -0.054, 0.01);
   EXPECT_NEAR(bc.get_beta(), -0.90, 0.02);
   auto sim = bc.simulate(2000, false, { 8 });
   EXPECT_GT(bc.loglik(sim) / 2000, 1.0); // far above independence
@@ -445,9 +441,8 @@ TEST(test_circular, fit_recovers_the_parameters)
     { BicopFamily::wrapped_cauchy, 0, { 0.7, -3.0 }, aa }, // phase near -pi
     { BicopFamily::wrapped_cauchy, 90, { 0.9, pi }, aa },  // half turn
     { BicopFamily::von_mises, 0, { 3.0, 2.0 }, ac },       // on the cylinder
-    { BicopFamily::quad_sections, 0, { 0.8, 0.5 }, ac },
-    { BicopFamily::quad_sections, 0, { 0.7, -1.0 }, ca },
     { BicopFamily::cubic_sections, 0, { 0.8, -0.7, 1.5 }, ac },
+    { BicopFamily::cubic_sections, 0, { 0.7, 0.7, -1.0 }, ca },
   };
   for (const auto& c : cases) {
     Eigen::VectorXd pars =
@@ -488,13 +483,16 @@ TEST(test_circular, select_picks_a_circular_family)
   EXPECT_EQ(bc.get_var_types(), aa);
 
   // with an explicit set on the cylinder in the reversed order
-  Bicop truth2(BicopFamily::quad_sections, 0, pars, ca);
+  Eigen::VectorXd pars2(3);
+  pars2 << 0.8, 0.8, 1.0;
+  Bicop truth2(BicopFamily::cubic_sections, 0, pars2, ca);
   auto data2 = truth2.simulate(1500, false, { 6 });
-  FitControlsBicop controls({ BicopFamily::indep, BicopFamily::quad_sections });
+  FitControlsBicop controls(
+    { BicopFamily::indep, BicopFamily::cubic_sections });
   Bicop bc2;
   bc2.set_var_types(ca);
   bc2.select(data2, controls);
-  EXPECT_EQ(bc2.get_family(), BicopFamily::quad_sections) << bc2.str();
+  EXPECT_EQ(bc2.get_family(), BicopFamily::cubic_sections) << bc2.str();
   EXPECT_EQ(bc2.get_var_types(), ca);
 }
 

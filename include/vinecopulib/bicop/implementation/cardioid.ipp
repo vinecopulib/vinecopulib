@@ -48,6 +48,12 @@ CardioidBicop::lifted_cdf_inverse(double w, double concentration) const
 }
 
 //! the mean resultant length of the cardioid is its concentration.
+inline std::vector<double>
+CardioidBicop::fourier_coefficients(double concentration) const
+{
+  return { concentration };
+}
+
 inline double
 CardioidBicop::concentration_from_resultant(double rbar) const
 {

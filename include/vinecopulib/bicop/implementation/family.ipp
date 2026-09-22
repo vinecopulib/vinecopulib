@@ -36,7 +36,6 @@ family_name_table()
     { BicopFamily::cardioid, "Cardioid" },
     { BicopFamily::wrapped_cauchy, "Wrapped Cauchy" },
     { BicopFamily::von_mises, "von Mises" },
-    { BicopFamily::quad_sections, "Quadratic sections" },
     { BicopFamily::cubic_sections, "Cubic sections" }
   };
   return table;

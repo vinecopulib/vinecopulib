@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <vector>
 #include <vinecopulib/bicop/circular.hpp>
 
 namespace vinecopulib {
@@ -50,8 +51,6 @@ protected:
 
   void flip() override;
 
-  double parameters_to_tau(const Eigen::MatrixXd& parameters) override;
-
   Eigen::VectorXd moment_start(const Eigen::MatrixXd& data,
                                const Eigen::VectorXd& weights) override;
 
@@ -65,6 +64,12 @@ protected:
 
   // the concentration whose mean resultant length is `rbar`
   virtual double concentration_from_resultant(double rbar) const = 0;
+
+  // the cosine coefficients rho_j, j >= 1, of the circular density
+  // g(theta) = (1 + 2 sum_j rho_j cos(j theta)) / (2 pi), truncated where
+  // they no longer matter; they give the CDF of the copula in closed form
+  virtual std::vector<double> fourier_coefficients(
+    double concentration) const = 0;
 };
 }
 

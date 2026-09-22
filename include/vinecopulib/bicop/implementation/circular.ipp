@@ -4,7 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
-#include <vinecopulib/misc/tools_integration.hpp>
+#include <limits>
 
 namespace vinecopulib {
 
@@ -39,26 +39,6 @@ CircularBicop::fit(const Eigen::MatrixXd& data,
     tools_circular::wrap_pi(parameters_(phase_index()));
 }
 
-//! Kendall's tau of the copula with the cut at zero,
-//! \f$ \tau = 1 - 4 \int_0^1 \int_0^1 h_1(v | u) h_2(u | v) \, du \, dv \f$,
-//! by nested quadrature of the h-function leaves.
-inline double
-CircularBicop::parameters_to_tau(const Eigen::MatrixXd& parameters)
-{
-  const Eigen::MatrixXd par_row =
-    (parameters.cols() == 1) ? parameters.transpose() : parameters;
-  Eigen::MatrixXd uv(1, 2);
-  auto inner = [&](double u) {
-    auto f = [&](double v) {
-      uv(0, 0) = u;
-      uv(0, 1) = v;
-      return hfunc1_raw(uv, par_row)(0) * hfunc2_raw(uv, par_row)(0);
-    };
-    return tools_integration::integrate_zero_to_one(f);
-  };
-  return 1.0 - 4.0 * tools_integration::integrate_zero_to_one(inner);
-}
-
 //! the densities are bounded, so no corner has tail dependence.
 inline Eigen::MatrixXd
 CircularBicop::parameters_to_taildep(const Eigen::MatrixXd&)
@@ -70,6 +50,14 @@ inline Eigen::MatrixXd
 CircularBicop::tau_to_parameters(const double& tau)
 {
   return no_tau_to_parameters(tau);
+}
+
+//! Kendall's tau of a pair with a circular variable depends on where the
+//! circle is cut, so it is not reported.
+inline double
+CircularBicop::parameters_to_tau(const Eigen::MatrixXd&)
+{
+  return std::numeric_limits<double>::quiet_NaN();
 }
 
 //! unused: the fit starts from `moment_start()`.

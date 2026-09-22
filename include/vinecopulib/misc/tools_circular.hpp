@@ -76,24 +76,28 @@ invert_increasing(const F& f,
   return x;
 }
 
-//! @brief The weighted mean resultant \f$ \sum_i w_i e^{i\theta_i} /
-//! \sum_i w_i \f$ of a sample of angles.
-//! @return the phase (in \f$ [-\pi, \pi) \f$) and length of the resultant.
-inline std::pair<double, double>
-mean_resultant(const Eigen::VectorXd& theta, const Eigen::VectorXd& weights)
+//! @brief The weighted mean of `factor_i * exp(i theta_i)`.
+//!
+//! @param theta Angles in radians.
+//! @param weights Observation weights; empty means equal weights.
+//! @param factor A real factor per observation; empty means one. For a plain
+//!   resultant, the modulus is the mean resultant length and the argument the
+//!   mean direction.
+//! @return The weighted mean, or zero when the total weight is not positive.
+inline std::complex<double>
+weighted_resultant(const Eigen::VectorXd& theta,
+                   const Eigen::VectorXd& weights,
+                   const Eigen::VectorXd& factor = Eigen::VectorXd())
 {
   std::complex<double> z(0.0, 0.0);
   double wsum = 0.0;
   for (Eigen::Index i = 0; i < theta.size(); ++i) {
     const double w = (weights.size() > 0) ? weights(i) : 1.0;
-    z += w * std::complex<double>(std::cos(theta(i)), std::sin(theta(i)));
+    const double f = (factor.size() > 0) ? factor(i) : 1.0;
+    z += w * f * std::polar(1.0, theta(i));
     wsum += w;
   }
-  if (wsum <= 0.0) {
-    return { 0.0, 0.0 };
-  }
-  z /= wsum;
-  return { std::arg(z), std::abs(z) };
+  return (wsum > 0.0) ? z / wsum : std::complex<double>(0.0, 0.0);
 }
 
 //! @brief The number of terms after which the Fourier series of the von

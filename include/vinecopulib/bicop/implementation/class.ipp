@@ -20,8 +20,8 @@ namespace vinecopulib {
 //! @brief Instantiates a specific bivariate copula model.
 //! @param family The copula family.
 //! @param rotation The rotation of the copula; one of 0, 90, 180, or 270
-//!     (for Independence, Gaussian, Student, Frank, nonparametric, and
-//!     cylindrical families, only 0 is allowed; for the circulas, 0 or 90).
+//!     (for Independence, Gaussian, Student, Frank, nonparametric, and cubic
+//!     sections families, only 0 is allowed; for the circulas, 0 or 90).
 //! @param parameters The copula parameters.
 //! @param var_types Two strings specifying the types of the variables,
 //!   e.g., `("c", "d")` means first variable continuous, second discrete,

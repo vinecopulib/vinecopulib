@@ -19,7 +19,6 @@
 #include <vinecopulib/bicop/gumbel.hpp>
 #include <vinecopulib/bicop/indep.hpp>
 #include <vinecopulib/bicop/joe.hpp>
-#include <vinecopulib/bicop/quad_sections.hpp>
 #include <vinecopulib/bicop/student.hpp>
 #include <vinecopulib/bicop/tawn.hpp>
 #include <vinecopulib/bicop/tll.hpp>
@@ -91,9 +90,6 @@ AbstractBicop::create(BicopFamily family, const Eigen::MatrixXd& parameters)
       break;
     case BicopFamily::von_mises:
       new_bicop = BicopPtr(new VonMisesBicop());
-      break;
-    case BicopFamily::quad_sections:
-      new_bicop = BicopPtr(new QuadSectionsBicop());
       break;
     case BicopFamily::cubic_sections:
       new_bicop = BicopPtr(new CubicSectionsBicop());

@@ -38,6 +38,8 @@ private:
 
   double concentration_from_resultant(double rbar) const override;
 
+  std::vector<double> fourier_coefficients(double concentration) const override;
+
   //! @brief The Bessel-function ratios of the von Mises series for one
   //! concentration, kept between consecutive calls with the same value.
   struct Series

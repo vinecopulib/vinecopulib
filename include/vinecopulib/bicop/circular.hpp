@@ -32,12 +32,12 @@ protected:
            size_t,
            const Eigen::VectorXd& weights) override;
 
-  double parameters_to_tau(const Eigen::MatrixXd& parameters) override;
-
   Eigen::MatrixXd parameters_to_taildep(
     const Eigen::MatrixXd& parameters) override;
 
   Eigen::MatrixXd tau_to_parameters(const double& tau) override;
+
+  double parameters_to_tau(const Eigen::MatrixXd& parameters) override;
 
   Eigen::VectorXd get_start_parameters(const double tau) override;
 

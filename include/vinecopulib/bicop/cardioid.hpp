@@ -36,6 +36,8 @@ private:
   double lifted_cdf_inverse(double w, double concentration) const override;
 
   double concentration_from_resultant(double rbar) const override;
+
+  std::vector<double> fourier_coefficients(double concentration) const override;
 };
 }
 

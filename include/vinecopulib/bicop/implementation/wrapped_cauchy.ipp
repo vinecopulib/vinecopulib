@@ -49,6 +49,20 @@ WrappedCauchyBicop::lifted_cdf_inverse(double w, double concentration) const
 }
 
 //! the mean resultant length of the wrapped Cauchy is its concentration.
+//! the coefficients are rho^j; the series is cut where rho^j / j^2 drops
+//! below 1e-12.
+inline std::vector<double>
+WrappedCauchyBicop::fourier_coefficients(double concentration) const
+{
+  std::vector<double> coefs;
+  double term = concentration;
+  for (size_t j = 1; term / static_cast<double>(j * j) > 1e-12; ++j) {
+    coefs.push_back(term);
+    term *= concentration;
+  }
+  return coefs;
+}
+
 inline double
 WrappedCauchyBicop::concentration_from_resultant(double rbar) const
 {

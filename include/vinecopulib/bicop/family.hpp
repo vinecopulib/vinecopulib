@@ -71,27 +71,23 @@ enum class BicopFamily
   tll,
   //! Cardioid circula (circular-circular, also usable circular-linear).
   //! 2 parameters (concentration rho in [0, 1/2], phase mu in radians);
-  //! rotations 0 / 90 degrees; no tail dependence; Kendall's tau by
-  //! numerical integration, no inverse.
+  //! rotations 0 / 90 degrees; no tail dependence; Kendall's tau is not
+  //! reported (`NaN`).
   cardioid,
   //! Wrapped Cauchy circula (circular-circular, also usable circular-linear).
   //! 2 parameters (concentration rho in [0, 0.99], phase mu in radians);
-  //! rotations 0 / 90 degrees; no tail dependence; Kendall's tau by
-  //! numerical integration, no inverse.
+  //! rotations 0 / 90 degrees; no tail dependence; Kendall's tau is not
+  //! reported (`NaN`).
   wrapped_cauchy,
   //! von Mises circula (circular-circular, also usable circular-linear).
   //! 2 parameters (concentration kappa in [0, 100], phase mu in radians);
-  //! rotations 0 / 90 degrees; no tail dependence; Kendall's tau by
-  //! numerical integration, no inverse.
+  //! rotations 0 / 90 degrees; no tail dependence; Kendall's tau is not
+  //! reported (`NaN`).
   von_mises,
-  //! Circular-linear copula with quadratic sections in the linear variable.
-  //! 2 parameters (amplitude a in [0, 1], phase mu in radians); rotationless;
-  //! no tail dependence; Kendall's tau is 2 a sin(mu) / (3 pi).
-  quad_sections,
   //! Circular-linear copula with cubic sections in the linear variable.
   //! 3 parameters (amplitudes a in [0, 1] and b in [-1, 1], phase mu in
-  //! radians); rotationless; no tail dependence; Kendall's tau is
-  //! (a + b) sin(mu) / (3 pi).
+  //! radians); rotationless; no tail dependence; Kendall's tau is not
+  //! reported (`NaN`).
   cubic_sections
 };
 
@@ -129,20 +125,18 @@ const std::vector<BicopFamily> all = { BicopFamily::indep,
                                        BicopFamily::cardioid,
                                        BicopFamily::wrapped_cauchy,
                                        BicopFamily::von_mises,
-                                       BicopFamily::quad_sections,
                                        BicopFamily::cubic_sections };
 
 //! All parametric families
 const std::vector<BicopFamily> parametric = {
-  BicopFamily::indep,         BicopFamily::gaussian,
-  BicopFamily::student,       BicopFamily::clayton,
-  BicopFamily::gumbel,        BicopFamily::frank,
-  BicopFamily::joe,           BicopFamily::bb1,
-  BicopFamily::bb6,           BicopFamily::bb7,
-  BicopFamily::bb8,           BicopFamily::tawn,
-  BicopFamily::cardioid,      BicopFamily::wrapped_cauchy,
-  BicopFamily::von_mises,     BicopFamily::quad_sections,
-  BicopFamily::cubic_sections
+  BicopFamily::indep,     BicopFamily::gaussian,
+  BicopFamily::student,   BicopFamily::clayton,
+  BicopFamily::gumbel,    BicopFamily::frank,
+  BicopFamily::joe,       BicopFamily::bb1,
+  BicopFamily::bb6,       BicopFamily::bb7,
+  BicopFamily::bb8,       BicopFamily::tawn,
+  BicopFamily::cardioid,  BicopFamily::wrapped_cauchy,
+  BicopFamily::von_mises, BicopFamily::cubic_sections
 };
 
 //! All nonparametric families
@@ -163,8 +157,7 @@ const std::vector<BicopFamily> two_par = { BicopFamily::student,
                                            BicopFamily::bb8,
                                            BicopFamily::cardioid,
                                            BicopFamily::wrapped_cauchy,
-                                           BicopFamily::von_mises,
-                                           BicopFamily::quad_sections };
+                                           BicopFamily::von_mises };
 
 //! All three-parameter families
 const std::vector<BicopFamily> three_par = { BicopFamily::tawn,
@@ -195,9 +188,8 @@ const std::vector<BicopFamily> bb = { BicopFamily::bb1,
 //!
 //! (because they already cover positive and negative dependence)
 const std::vector<BicopFamily> rotationless = {
-  BicopFamily::indep,         BicopFamily::gaussian, BicopFamily::student,
-  BicopFamily::frank,         BicopFamily::tll,      BicopFamily::quad_sections,
-  BicopFamily::cubic_sections
+  BicopFamily::indep, BicopFamily::gaussian, BicopFamily::student,
+  BicopFamily::frank, BicopFamily::tll,      BicopFamily::cubic_sections
 };
 
 //! @brief All copulas with exactly two distinct rotations, 0 and 90 degrees.
@@ -213,18 +205,15 @@ const std::vector<BicopFamily> two_rotations = { BicopFamily::cardioid,
 //!
 //! The binding-density circulas (`cardioid`, `wrapped_cauchy`, `von_mises`)
 //! accept circular-circular and circular-linear pairs; the cylindrical
-//! sections copulas (`quad_sections`, `cubic_sections`) accept circular-linear
-//! pairs only.
+//! sections copula `cubic_sections` accepts circular-linear pairs only.
 const std::vector<BicopFamily> circular = { BicopFamily::cardioid,
                                             BicopFamily::wrapped_cauchy,
                                             BicopFamily::von_mises,
-                                            BicopFamily::quad_sections,
                                             BicopFamily::cubic_sections };
 
 //! @brief The circular-linear families that require exactly one circular and
 //! one linear variable.
-const std::vector<BicopFamily> cylindrical = { BicopFamily::quad_sections,
-                                               BicopFamily::cubic_sections };
+const std::vector<BicopFamily> cylindrical = { BicopFamily::cubic_sections };
 
 //! Families with stronger dependence in the lower tail
 const std::vector<BicopFamily> lt = { BicopFamily::clayton,

@@ -43,7 +43,7 @@ will be settled in stage 1.
 | --- | --- | --- |
 | Linear-linear | Existing families | Existing TLL |
 | Circular-circular | Cardioid, wrapped Cauchy, and von Mises binding densities | Local likelihood on two periodic axes |
-| Circular-linear, either order | Quadratic and cubic sections with phase; reuse the binding-density construction where appropriate | Local likelihood on one periodic axis and one probit-transformed axis |
+| Circular-linear, either order | Cubic sections with phase (quadratic sections are the case $a = b$); reuse the binding-density construction where appropriate | Local likelihood on one periodic axis and one probit-transformed axis |
 | Any supported pair | Existing independence family | — |
 
 The binding-density construction is
@@ -218,8 +218,8 @@ implementations, and fit controls.
 - [x] (#791) Implement cardioid, wrapped Cauchy, and von Mises binding families in
   the existing `.hpp` / inline `.ipp` pattern, sharing the circular primitives
   (`g`, `G`, `G^{-1}`) that have identical semantics.
-- [x] (#791) Implement quadratic and cubic sections, phase handling, and both axis
-  orders. Support circular-linear use of binding families without duplicating
+- [x] (#791) Implement cubic sections (quadratic sections are the case $a = b$),
+  phase handling, and both axis orders. Support circular-linear use of binding families without duplicating
   their mathematical implementations.
 - [x] (#791) Implement stable lifted circular CDFs and inverses, retaining the number
   of completed turns. Audit cancellation and concentration limits, including
@@ -416,7 +416,10 @@ implementing PR. Entries without a PR were settled during planning.
 | `itau` stays unavailable for circular families. | No valid identification result from linear tau. | planning |
 | Stage 4 (nonparametric) is a parallel track; stages 5 and 6 ship with parametric circular families. | Exploratory work must not gate the release. | planning |
 | One geometry-dependent `tll`; the estimator reads the axis geometry from `var_types`. | The `"vt"` JSON field already records the geometry; a separate identifier would be a second source of truth that can disagree with it. `family_set = {tll}` keeps meaning "nonparametric" for every geometry, as `{gaussian}` needs no circular twin. | audit, September 21, 2026 |
-| Family names: `cardioid`, `wrapped_cauchy`, `von_mises` (binding), `quad_sections`, `cubic_sections` (cylindrical); new group `bicop_families::two_rotations`. | Bare snake_case values match the flat existing enum; `create_candidate_bicops` branches on rotation arity, so the two-rotation families need their own group beside `rotationless`. | maintainer, September 21, 2026 |
+| Family names: `cardioid`, `wrapped_cauchy`, `von_mises` (binding), `cubic_sections` (cylindrical); new group `bicop_families::two_rotations`. | Bare snake_case values match the flat existing enum; `create_candidate_bicops` branches on rotation arity, so the two-rotation families need their own group beside `rotationless`. | maintainer, September 21, 2026 |
+| No `quad_sections` family: quadratic sections are `cubic_sections` with $a = b$. | One parameter saved under BIC did not justify a fifth family in every list, docstring, and downstream wrapper. | maintainer, September 22, 2026 (#791) |
+| `parameters_to_tau` returns `NaN` for the circular families. | Kendall's tau depends on the cut, so it misreports circular dependence; its nested quadrature also dominated the cost of printing a vine. | maintainer, September 22, 2026 (#791) |
+| The CDF of a binding family is closed form through the Fourier coefficients of `g`. | Replaces per-point quadrature of $h_1$ at a thousandth of the cost, with no accuracy loss. | #791 |
 | Stage pull requests target the integration branch `feat/circulas`, stacked where a stage depends on its predecessor; `feat/circulas` merges to `main` after stage 7. | Keeps `main` free of a half-finished feature while each stage still gets its own review. | maintainer, September 21, 2026 |
 
 Still open: parameter conventions, nonparametric fitting formulas, and the
