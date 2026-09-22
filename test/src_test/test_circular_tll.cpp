@@ -330,7 +330,7 @@ TEST(test_circular_tll, selection_and_vines_use_the_estimator)
   Vinecop model(
     DVineStructure(std::vector<size_t>{ 1, 2, 3 }),
     { { von_mises(), cubic() },
-      { Bicop(BicopFamily::quad_sections, 0, par({ 0.8, -0.5 }), ac) } },
+      { Bicop(BicopFamily::cubic_sections, 0, par({ 0.8, 0.8, -0.5 }), ac) } },
     var_types);
   auto data = model.simulate(700, false, 1, { 53 });
   FitControlsVinecop controls;
