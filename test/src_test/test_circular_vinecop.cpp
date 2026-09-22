@@ -51,7 +51,7 @@ struct MixedVine
   std::vector<std::string> var_types{ "a", "a", "c" };
   Bicop c12{ BicopFamily::von_mises, 90, par({ 2.0, 0.7 }), aa };
   Bicop c23{ BicopFamily::cubic_sections, 0, par({ 0.6, -0.4, 1.0 }), ac };
-  Bicop c13_2{ BicopFamily::quad_sections, 0, par({ 0.8, -0.5 }), ac };
+  Bicop c13_2{ BicopFamily::cubic_sections, 0, par({ 0.8, 0.8, -0.5 }), ac };
 
   std::vector<std::vector<Bicop>> pair_copulas() const
   {
@@ -83,7 +83,7 @@ struct ConditioningOnlyVine
   DVineStructure structure{ std::vector<size_t>{ 1, 2, 3 } };
   std::vector<std::string> var_types{ "c", "a", "c" };
   Bicop c12{ BicopFamily::cubic_sections, 0, par({ 0.5, 0.3, 0.4 }), ca };
-  Bicop c23{ BicopFamily::quad_sections, 0, par({ 0.7, 2.0 }), ac };
+  Bicop c23{ BicopFamily::cubic_sections, 0, par({ 0.7, 0.7, 2.0 }), ac };
   Bicop c13_2{ BicopFamily::gaussian, 0, par({ 0.5 }), cc };
 
   Vinecop model() const
@@ -98,7 +98,7 @@ struct CircularLinearLinearVine
 {
   DVineStructure structure{ std::vector<size_t>{ 1, 2, 3 } };
   std::vector<std::string> var_types{ "a", "c", "c" };
-  Bicop c12{ BicopFamily::quad_sections, 0, par({ 0.7, 0.2 }), ac };
+  Bicop c12{ BicopFamily::cubic_sections, 0, par({ 0.7, 0.7, 0.2 }), ac };
   Bicop c23{ BicopFamily::gaussian, 0, par({ -0.6 }), cc };
   Bicop c13_2{ BicopFamily::cubic_sections, 0, par({ 0.3, 0.8, 2.5 }), ac };
 
@@ -130,8 +130,10 @@ larger_mixed_vine()
       } else if (types == cc) {
         pcs[t][e] = Bicop(BicopFamily::gaussian, 0, par({ 0.4 }), cc);
       } else {
-        pcs[t][e] = Bicop(
-          BicopFamily::quad_sections, 0, par({ 0.5, 0.8 + shift }), types);
+        pcs[t][e] = Bicop(BicopFamily::cubic_sections,
+                          0,
+                          par({ 0.5, 0.5, 0.8 + shift }),
+                          types);
       }
     }
   }
@@ -198,7 +200,7 @@ TEST(test_circular_vinecop, ineligible_pair_copulas_are_rejected_by_edge)
   EXPECT_EQ(vc.get_pair_copula(1, 0).get_var_types(), ac);
 
   // a cylindrical family on a circular-circular edge is equally rejected
-  pcs[0][0] = Bicop(BicopFamily::quad_sections, 0, par({ 0.5, 0.0 }), ac);
+  pcs[0][0] = Bicop(BicopFamily::cubic_sections, 0, par({ 0.5, 0.5, 0.0 }), ac);
   EXPECT_THROW(Vinecop(mixed.structure, pcs, mixed.var_types),
                std::runtime_error);
 }
@@ -400,10 +402,11 @@ TEST(test_circular_vinecop, fit_on_a_fixed_structure_recovers_the_parameters)
   EXPECT_NEAR(p23(0), 0.6, 0.2);
   EXPECT_NEAR(p23(1), -0.4, 0.2);
   EXPECT_LT(on_circle(p23(2), 1.0), 0.3);
-  // quadratic sections in tree 2: a, phase
+  // quadratic sections (a = b) in tree 2: a, a, phase
   Eigen::VectorXd p13 = fitted.get_pair_copula(1, 0).get_parameters();
   EXPECT_NEAR(p13(0), 0.8, 0.2);
-  EXPECT_LT(on_circle(p13(1), -0.5), 0.3);
+  EXPECT_NEAR(p13(1), 0.8, 0.2);
+  EXPECT_LT(on_circle(p13(2), -0.5), 0.3);
 
   EXPECT_GT(fitted.get_loglik(), 0.0);
   EXPECT_NEAR(fitted.get_loglik(), fitted.loglik(u), 1e-8);

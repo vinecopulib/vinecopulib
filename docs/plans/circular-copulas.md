@@ -132,8 +132,8 @@ Do not merge, tag, or publish without express authorization.
 - [x] (#785) Define ordinary Kendall's tau and Blomqvist's beta relative to the
   chosen cut. Keep their current meanings; expose circular dependence
   summaries separately. Specify tail-dependence behavior. `itau` stays
-  unavailable for circular families; `parameters_to_tau` is defined, its
-  inverse is not. Done, *Dependence measures*.
+  unavailable for circular families; `parameters_to_tau` returns `NaN` and
+  its inverse is not available. Done, *Dependence measures*.
 - [x] (#785) State the periodicity condition for a mixed vine: the conditional CDF
   of a circular variable wraps from `0` to `1`, so every pair copula in which
   that variable (or its h-transform) is a conditioned argument must have
