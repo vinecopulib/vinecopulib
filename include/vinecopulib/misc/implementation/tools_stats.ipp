@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <algorithm>
 #include <array>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/seed_seq.hpp>
@@ -163,6 +164,40 @@ to_pseudo_obs_1d(Eigen::VectorXd x,
                             seeds);
 }
 
+//! @brief Makes values that are equal up to rounding exactly equal.
+//!
+//! Sorts the values and gives every run of consecutive values, each within
+//! `tol` of its predecessor, the run's smallest value. Values further apart
+//! than that, and `NaN`s, are returned unchanged, so data whose ties are exact
+//! is returned as it came.
+//!
+//! @param x A vector of real numbers.
+//! @param tol Absolute distance up to which two values are merged.
+//! @return `x` with near-ties made exact.
+inline Eigen::VectorXd
+merge_near_ties(const Eigen::VectorXd& x, double tol)
+{
+  std::vector<Eigen::Index> order;
+  order.reserve(static_cast<size_t>(x.size()));
+  for (Eigen::Index i = 0; i < x.size(); ++i) {
+    if (!std::isnan(x(i))) {
+      order.push_back(i);
+    }
+  }
+  std::stable_sort(
+    order.begin(), order.end(), [&x](Eigen::Index a, Eigen::Index b) {
+      return x(a) < x(b);
+    });
+
+  Eigen::VectorXd out = x;
+  for (size_t k = 1; k < order.size(); ++k) {
+    if (x(order[k]) - x(order[k - 1]) <= tol) {
+      out(order[k]) = out(order[k - 1]);
+    }
+  }
+  return out;
+}
+
 // Construct a box covering from a matrix of samples.
 // @param u A matrix of samples.
 // @param K The number of boxes in each dimension.
@@ -316,8 +351,10 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   // points and attenuates their dependence. Fixed seeds keep the draw
   // reproducible.
   auto w = simulate_uniform(n, 2, false, { 5 });
-  Eigen::MatrixXd uu = w.array() * v.leftCols(2).array() +
-                       (1 - w.array()) * v.rightCols(2).array();
+  // exactly the value where there is no atom, so that ties stay exact
+  Eigen::MatrixXd uu =
+    v.rightCols(2).array() +
+    w.array() * (v.leftCols(2).array() - v.rightCols(2).array());
 
   auto covering = BoxCovering(uu);
   std::vector<size_t> indices;

@@ -178,6 +178,9 @@ private:
 Eigen::MatrixXd
 find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter = 3);
 
+Eigen::VectorXd
+merge_near_ties(const Eigen::VectorXd& x, double tol = 1e-11);
+
 double
 pairwise_mcor(const Eigen::MatrixXd& x,
               const Eigen::VectorXd& weights = Eigen::VectorXd());

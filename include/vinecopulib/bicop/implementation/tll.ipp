@@ -241,9 +241,19 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   // transform evaluation grid and data by inverse Gaussian cdf
   Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
 
+  bool discrete = (var_types_[0] == "d") || (var_types_[1] == "d");
+  // on a discrete edge, merge values equal up to rounding, since the latent
+  // draw turns any change in the random tie-breaking into another sample
+  Eigen::MatrixXd ties = data;
+  if (discrete) {
+    for (Eigen::Index j = 0; j < data.cols(); ++j) {
+      ties.col(j) = tools_stats::merge_near_ties(data.col(j));
+    }
+  }
+
   // use jittering in case observations are discrete
   auto psobs =
-    tools_stats::to_pseudo_obs(data.leftCols(2), "random", weights, { 5 });
+    tools_stats::to_pseudo_obs(ties.leftCols(2), "random", weights, { 5 });
   Eigen::MatrixXd z_data = tools_stats::qnorm(psobs);
 
   // find bandwidth matrix
@@ -251,9 +261,9 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   B *= mult;
 
   // find latent sample in case observations are discrete
-  if (var_types_[0] == "d" || var_types_[1] == "d") {
+  if (discrete) {
     psobs =
-      tools_stats::find_latent_sample(data, std::pow(B(0, 0) * B(1, 1), 0.25));
+      tools_stats::find_latent_sample(ties, std::pow(B(0, 0) * B(1, 1), 0.25));
     z_data = tools_stats::qnorm(psobs);
   }
 
@@ -279,10 +289,10 @@ TllBicop::fit(const Eigen::MatrixXd& data,
            .transpose();
   // don't normalize margins of the EDF! (norm_times = 0)
   auto infl_grid = InterpolationGrid(grid_points, infl, 0);
-  if ((var_types_[0] == "d") || (var_types_[1] == "d")) {
+  if (discrete) {
     // for discrete, use mid ranks to compute EDF and log-likelihood
     // (this is closer to "observations" than jittered or "upper" pseudo data)
-    psobs = 0.5 * (data.leftCols(2) + data.rightCols(2)).array();
+    psobs = 0.5 * (ties.leftCols(2) + ties.rightCols(2)).array();
     npars_ = tools_eigen::unique(infl_grid.interpolate(psobs)).sum();
     npars_ = std::max(npars_, 1.0);
   } else {
