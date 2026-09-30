@@ -256,15 +256,18 @@ soft_pseudo_obs(const Eigen::MatrixXd& x,
   for (Eigen::Index col = 0; col < x.cols(); ++col) {
     // one key per observation and column, from the engine's raw output, which
     // is specified exactly; a column of its own keeps the tie orders of two
-    // columns independent
-    std::vector<int> col_seeds = seeds;
-    col_seeds.push_back(static_cast<int>(col));
-    boost::random::seed_seq seq(col_seeds.begin(), col_seeds.end());
-    boost::random::mt19937 engine(seq);
-    std::vector<uint64_t> key(static_cast<size_t>(n));
-    for (auto& k : key) {
-      const uint64_t high = engine();
-      k = (high << 32) | static_cast<uint64_t>(engine());
+    // columns independent. "average" reads no keys; they are all zero there,
+    // which leaves the order to the value and the index.
+    std::vector<uint64_t> key(static_cast<size_t>(n), 0);
+    if (random) {
+      std::vector<int> col_seeds = seeds;
+      col_seeds.push_back(static_cast<int>(col));
+      boost::random::seed_seq seq(col_seeds.begin(), col_seeds.end());
+      boost::random::mt19937 engine(seq);
+      for (auto& k : key) {
+        const uint64_t high = engine();
+        k = (high << 32) | static_cast<uint64_t>(engine());
+      }
     }
 
     std::vector<Eigen::Index> order;
@@ -408,8 +411,22 @@ soft_multiplicity(const Eigen::MatrixXd& x, double scale)
   std::vector<Eigen::Index> order(static_cast<size_t>(n));
   std::iota(order.begin(), order.end(), 0);
   std::sort(order.begin(), order.end(), [&](Eigen::Index a, Eigen::Index b) {
-    return (x(a, 0) < x(b, 0)) || ((x(a, 0) == x(b, 0)) && (a < b));
+    if (x(a, 0) != x(b, 0)) {
+      return x(a, 0) < x(b, 0);
+    }
+    if (x(a, 1) != x(b, 1)) {
+      return x(a, 1) < x(b, 1);
+    }
+    return a < b;
   });
+  // where the run of points sharing a first coordinate ends
+  std::vector<size_t> run_end(order.size());
+  for (size_t k = order.size(); k-- > 0;) {
+    run_end[k] =
+      ((k + 1 < order.size()) && (x(order[k + 1], 0) == x(order[k], 0)))
+        ? run_end[k + 1]
+        : k + 1;
+  }
   const double reach = 9.0 * scale;
   Eigen::VectorXd count = Eigen::VectorXd::Zero(n);
   for (size_t k = 0; k < order.size(); ++k) {
@@ -418,6 +435,11 @@ soft_multiplicity(const Eigen::MatrixXd& x, double scale)
       const Eigen::Index j = order[l];
       if (x(j, 0) - x(i, 0) > reach) {
         break;
+      }
+      if (x(j, 1) - x(i, 1) > reach) {
+        // the rest of this run is further still, in its second coordinate
+        l = run_end[l] - 1;
+        continue;
       }
       const double d2 = (x.row(i) - x.row(j)).squaredNorm() / (scale * scale);
       const double kernel = std::exp(-0.5 * d2);
