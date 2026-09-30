@@ -77,9 +77,13 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: 6
+      # `eigen` overrides EIGEN_VERSION for one row: the library's numerics
+      # depend on Eigen's special functions, whose behavior differs between
+      # major versions, so both supported majors are built and tested.
       matrix:
         cfg:
           - { os: ubuntu-latest,  name: GNU,   cc: gcc,   cxx: g++,     platform: x64,   root_install_dir: '/home/runner/work' }
+          - { os: ubuntu-latest,  name: GNU,   cc: gcc,   cxx: g++,     platform: x64,   root_install_dir: '/home/runner/work', eigen: 5.0.1 }
           - { os: ubuntu-latest,  name: Clang, cc: clang, cxx: clang++, platform: x64,   root_install_dir: '/home/runner/work' }
           - { os: macos-15-intel, name: Clang, cc: clang, cxx: clang++, platform: x64,   root_install_dir: '/Users/runner/work' } # intel runner
           - { os: macos-15,       name: Clang, cc: clang, cxx: clang++, platform: arm64, root_install_dir: '/Users/runner/work' } # apple silicon runner
@@ -95,7 +99,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     runs-on: ${{ matrix.cfg.os }}
-    name: ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }})
+    name: ${{ matrix.cfg.os }} (${{ matrix.cfg.name }}, ${{ matrix.cfg.platform }}${{ matrix.cfg.eigen != '' && format(', Eigen {0}', matrix.cfg.eigen) || '' }})
     timeout-minutes: 90
     steps:
       - name: Checkout project
@@ -114,7 +118,7 @@ jobs:
           boost_install_dir: ${{ matrix.cfg.root_install_dir }}
           eigen_install_dir: ${{ matrix.cfg.root_install_dir }}
           boost_version: ${{ env.BOOST_VERSION }}
-          eigen_version: ${{ env.EIGEN_VERSION }}
+          eigen_version: ${{ matrix.cfg.eigen || env.EIGEN_VERSION }}
           R: true
       - name: Set environment variables and path
         run: |
@@ -131,14 +135,24 @@ jobs:
           mkdir debug && cd debug
           if [ "${{ matrix.cfg.os }}" != "windows-latest" ]; then
             if [ "${{ matrix.cfg.os }}/${{ matrix.cfg.name }}" == "ubuntu-latest/GNU" ]; then
-              cmake .. -DVINECOPULIB_STRICT_COMPILER=ON \
-                -DVINECOPULIB_CODE_COVERAGE=ON \
+              # Coverage is collected once, from the default Eigen row; the
+              # other rows build the same sanitized Debug tree and run the
+              # tests directly. Strict warnings are enforced on the pinned
+              # Eigen only, since a newer Eigen may warn differently.
+              if [ -z "${{ matrix.cfg.eigen }}" ]; then
+                strict=ON coverage=ON target=vinecopulib_coverage
+              else
+                strict=OFF coverage=OFF target=all
+              fi
+              cmake .. -DVINECOPULIB_STRICT_COMPILER=$strict \
+                -DVINECOPULIB_CODE_COVERAGE=$coverage \
                 -DVINECOPULIB_SANITIZERS=ON \
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-              ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1 \
-              UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 \
-              make vinecopulib_coverage
+              export ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1
+              export UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1
+              make $target
+              if [ "$target" != vinecopulib_coverage ]; then bin/test_all; fi
             else
               cmake .. -DCMAKE_BUILD_TYPE=Debug
               make
@@ -176,7 +190,7 @@ jobs:
         uses: codecov/codecov-action@v7
         if: >
           contains(matrix.cfg.os, 'ubuntu') && contains(matrix.cfg.name, 'GNU')
-          && env.CODECOV_TOKEN != ''
+          && matrix.cfg.eigen == '' && env.CODECOV_TOKEN != ''
         with:
           token: ${{ env.CODECOV_TOKEN }}
           files: debug/coverage.info

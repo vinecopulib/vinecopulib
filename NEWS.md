@@ -2,6 +2,19 @@
 
 ### BUG FIXES
 
+* `tools_stats::pnorm` clamps its argument before calling Eigen's `erf`, so
+  infinite and very large arguments give exactly 0 or 1 with every Eigen
+  release. Eigen 5 returns NaN from `erf` at infinity, which turned the box
+  bounds in `find_latent_sample` into NaN and read past the end of the box
+  covering: the segfault reported for discrete models built against Eigen 5.
+  The covering itself now also assigns coordinates of exactly 1 to the last
+  cell instead of one past it (#792)
+
+### BUILD SYSTEM AND DEPENDENCIES
+
+* CI builds and tests against Eigen 5.0.1 as well as 3.4.0, with the address
+  and undefined-behavior sanitizers, so a regression that only one major
+  version exposes is caught (#792)
 - A `Bicop` or `Vinecop` with discrete variables loaded from JSON or CBOR now
   evaluates with its stored variable types. Previously the reloaded model
   reported the types correctly but computed densities, h-functions, and CDFs as

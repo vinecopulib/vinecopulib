@@ -174,10 +174,28 @@ inline BoxCovering::BoxCovering(const Eigen::MatrixXd& u, uint16_t K)
 
   n_ = u.rows();
   for (size_t i = 0; i < n_; i++) {
-    size_t k = static_cast<size_t>(std::floor(u(i, 0) * K));
-    size_t j = static_cast<size_t>(std::floor(u(i, 1) * K));
-    boxes_[k * K_ + j].insert(i);
+    boxes_[cell(u(i, 0)) * K_ + cell(u(i, 1))].insert(i);
   }
+}
+
+// The cell along one axis containing a coordinate; the unit interval is
+// closed at 1, so a coordinate of exactly 1 belongs to the last cell, and
+// coordinates outside [0, 1] are assigned to the nearest boundary cell.
+inline size_t
+BoxCovering::cell(double x) const
+{
+  const double clamped = std::min(std::max(x, 0.0), 1.0);
+  return std::min(static_cast<size_t>(std::floor(clamped * K_)),
+                  static_cast<size_t>(K_ - 1));
+}
+
+// One past the last cell along one axis that a coordinate can touch, capped
+// at the number of cells.
+inline size_t
+BoxCovering::cell_end(double x) const
+{
+  const double clamped = std::min(std::max(x, 0.0), 1.0);
+  return static_cast<size_t>(std::ceil(clamped * K_));
 }
 
 // Get the indices of the samples in a box defined by lower and upper bounds.
@@ -200,10 +218,10 @@ BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
                              std::vector<size_t>& indices) const
 {
   indices.clear();
-  auto l0 = static_cast<size_t>(std::floor(lower(0) * K_));
-  auto l1 = static_cast<size_t>(std::floor(lower(1) * K_));
-  auto u0 = static_cast<size_t>(std::ceil(upper(0) * K_));
-  auto u1 = static_cast<size_t>(std::ceil(upper(1) * K_));
+  const size_t l0 = cell(lower(0));
+  const size_t l1 = cell(lower(1));
+  const size_t u0 = cell_end(upper(0));
+  const size_t u1 = cell_end(upper(1));
 
   for (size_t k = l0; k < u0; k++) {
     for (size_t j = l1; j < u1; j++) {
@@ -227,14 +245,9 @@ BoxCovering::get_box_indices(const Eigen::VectorXd& lower,
 inline void
 BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
 {
-  auto k = static_cast<size_t>(std::floor(u_(i, 0) * K_));
-  auto j = static_cast<size_t>(std::floor(u_(i, 1) * K_));
-  boxes_[k * K_ + j].erase(i);
-
+  boxes_[cell(u_(i, 0)) * K_ + cell(u_(i, 1))].erase(i);
   u_.row(i) = new_sample;
-  k = static_cast<size_t>(std::floor(new_sample(0) * K_));
-  j = static_cast<size_t>(std::floor(new_sample(1) * K_));
-  boxes_[k * K_ + j].insert(i);
+  boxes_[cell(new_sample(0)) * K_ + cell(new_sample(1))].insert(i);
 }
 
 //! @brief Recovers a continuous latent sample from a sample of a discrete
