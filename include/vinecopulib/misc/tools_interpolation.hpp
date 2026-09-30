@@ -27,11 +27,11 @@ public:
 
   InterpolationGrid(const Eigen::VectorXd& grid_points,
                     const Eigen::MatrixXd& values,
-                    int norm_maxiter = 25);
+                    int norm_maxiter = 2000);
 
   Eigen::MatrixXd get_values() const;
 
-  void set_values(const Eigen::MatrixXd& values, int norm_maxiter = 25);
+  void set_values(const Eigen::MatrixXd& values, int norm_maxiter = 2000);
 
   void flip();
 
@@ -80,40 +80,7 @@ private:
                                                 double a,
                                                 double b);
   ptrdiff_t interval_weights(double lo, double hi, Eigen::VectorXd& w) const;
-  void row_integrals(const Eigen::MatrixXd& values,
-                     const Eigen::MatrixXd& cum,
-                     double u,
-                     Eigen::VectorXd& out) const;
-  Eigen::MatrixXd cumulative_row_integrals(const Eigen::MatrixXd& values) const;
-  double interval_integral(double lo,
-                           double hi,
-                           const Eigen::VectorXd& v) const;
-  // the masses of the four blocks `(x0, x1] x (y0, y1]` splits
-  // `[0, x1] x [0, y1]` into
-  struct Blocks
-  {
-    double below_left, below, left, inside;
-  };
-  Blocks blocks_along(const Eigen::MatrixXd& values,
-                      const Eigen::MatrixXd& cum,
-                      double x0,
-                      double x1,
-                      double y0,
-                      double y1) const;
-  // `x / M(x)` at the upper end of `(x0, x1]`, for the margin whose density at
-  // the nodes is `totals`, and its increment over the interval
-  struct Rescaling
-  {
-    double upper, increment;
-  };
-  Rescaling rescaling(const Eigen::VectorXd& totals,
-                      const Eigen::VectorXd& cum,
-                      double x0,
-                      double x1) const;
-  Eigen::VectorXd cumulative_integral(const Eigen::VectorXd& v) const;
-  double margin_integral(const Eigen::VectorXd& v,
-                         const Eigen::VectorXd& cum,
-                         double x) const;
+  void row_integrals(double u, Eigen::VectorXd& out) const;
   // normalizes the grid margins; internal only (callers must refresh the
   // cached integrals afterwards, as the ctor and set_values do)
   void normalize_margins(int max_iter);
@@ -122,7 +89,6 @@ private:
   ptrdiff_t find_cell(double x) const;
   void update_cell_lookup();
   void update_cached_integrals();
-  void update_orientation();
   double cond_quantile(double u_cond,
                        double p,
                        size_t cond_var,
@@ -142,19 +108,6 @@ private:
   // refreshed eagerly whenever values_ changes (lazy caching would race
   // when a shared grid is evaluated from multiple threads)
   Eigen::MatrixXd row_cum_int_;
-  // the transpose of values_ and its row integrals, materialized so that a
-  // flipped grid computes a quantity exactly as the original computes it with
-  // the arguments swapped; flip() swaps the two pairs
-  Eigen::MatrixXd values_t_;
-  Eigen::MatrixXd row_cum_int_t_;
-  // each grid line's integral, i.e. the two margins' densities at the nodes,
-  // and the total mass
-  Eigen::VectorXd line_totals_, line_totals_t_;
-  Eigen::VectorXd margin_cum_, margin_cum_t_;
-  double total_mass_;
-  // whether the 2-d integrals run along the transpose; see
-  // `update_orientation()`
-  bool transposed_;
 };
 }
 }

@@ -36,41 +36,32 @@ skewed_grid(int m)
 
 } // namespace
 
-// A flipped grid is the same distribution with its arguments swapped, so every
-// quantity it reports for swapped arguments must be the original's, bit for
-// bit: a vine that fits a pair in one orientation and stores it flipped
-// otherwise evaluates a model its next tree was not fitted on. The skewed grid
-// is not normalized, so the two margins differ and so would any quantity
-// rescaled along one of them only.
-TEST(tools_interpolation, flipping_swaps_the_arguments_exactly)
+// The margins are normalized to convergence, not for a fixed number of passes:
+// a concentrated surface, as a strongly dependent fit gives, needs hundreds.
+TEST(tools_interpolation, normalization_converges_on_a_concentrated_surface)
 {
-  const auto grid = skewed_grid(30);
-  auto flipped = grid;
-  flipped.flip();
-  Eigen::VectorXd g(30);
-  for (int i = 0; i < 30; ++i) {
-    g(i) = static_cast<double>(i) / 29;
+  const int m = 30;
+  Eigen::VectorXd g(m);
+  for (int i = 0; i < m; ++i) {
+    g(i) = static_cast<double>(i) / (m - 1);
   }
-  auto transposed =
-    InterpolationGrid(g, Eigen::MatrixXd(grid.get_values().transpose()), 0);
-
-  Eigen::MatrixXd u(4, 2), u_swapped(4, 2);
-  u << 0.1, 0.7, 0.45, 0.2, 0.9, 0.95, 0.33, 0.33;
-  u_swapped.col(0) = u.col(1);
-  u_swapped.col(1) = u.col(0);
-  auto original = grid;
-  const Eigen::VectorXd cdf = original.integrate_2d(u);
-  EXPECT_EQ(cdf, flipped.integrate_2d(u_swapped));
-  EXPECT_EQ(cdf, transposed.integrate_2d(u_swapped));
-
-  for (double a1 : { 0.0, 0.1, 0.4 }) {
-    for (double a2 : { 0.0, 0.15, 0.55 }) {
-      const double b1 = a1 + 0.3, b2 = a2 + 0.2;
-      const double p = grid.rect_mass(a1, b1, a2, b2);
-      EXPECT_EQ(p, flipped.rect_mass(a2, b2, a1, b1));
-      EXPECT_EQ(p, transposed.rect_mass(a2, b2, a1, b1));
+  Eigen::MatrixXd v(m, m);
+  for (int i = 0; i < m; ++i) {
+    for (int j = 0; j < m; ++j) {
+      v(i, j) = std::exp(-40.0 * std::abs(g(i) - g(j))) + 1e-3 * g(i);
     }
   }
+  const Eigen::MatrixXd normalized = InterpolationGrid(g, v).get_values();
+  Eigen::VectorXd w(m);
+  w(0) = (g(1) - g(0)) / 2;
+  w(m - 1) = (g(m - 1) - g(m - 2)) / 2;
+  for (int i = 1; i < m - 1; ++i) {
+    w(i) = (g(i + 1) - g(i - 1)) / 2;
+  }
+  const double rows = ((normalized * w).array() - 1.0).abs().maxCoeff();
+  const double cols =
+    ((normalized.transpose() * w).array() - 1.0).abs().maxCoeff();
+  EXPECT_LT(std::max(rows, cols), 1e-13);
 }
 
 // Summing the rectangle probabilities over a partition of the first argument

@@ -242,18 +242,12 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
 
   bool discrete = (var_types_[0] == "d") || (var_types_[1] == "d");
-  // on a discrete edge, merge values equal up to rounding, since the latent
-  // draw turns any change in the random tie-breaking into another sample
-  Eigen::MatrixXd ties = data;
-  if (discrete) {
-    for (Eigen::Index j = 0; j < data.cols(); ++j) {
-      ties.col(j) = tools_stats::merge_near_ties(data.col(j));
-    }
-  }
-
-  // use jittering in case observations are discrete
-  auto psobs =
-    tools_stats::to_pseudo_obs(ties.leftCols(2), "random", weights, { 5 });
+  // Ties are broken at random, as jittering would. On a discrete edge the
+  // ranks also move continuously with the data, since the latent draw below
+  // turns any jump in the bandwidth into another sample; elsewhere a swap of
+  // two near-equal values moves the fit only as much as it moves the data.
+  Eigen::MatrixXd psobs = tools_stats::pair_soft_pseudo_obs(
+    data, weights, discrete ? tools_stats::default_soft_scale() : 0.0);
   Eigen::MatrixXd z_data = tools_stats::qnorm(psobs);
 
   // find bandwidth matrix
@@ -263,7 +257,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   // find latent sample in case observations are discrete
   if (discrete) {
     psobs =
-      tools_stats::find_latent_sample(ties, std::pow(B(0, 0) * B(1, 1), 0.25));
+      tools_stats::find_latent_sample(data, std::pow(B(0, 0) * B(1, 1), 0.25));
     z_data = tools_stats::qnorm(psobs);
   }
 
@@ -291,9 +285,12 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   auto infl_grid = InterpolationGrid(grid_points, infl, 0);
   if (discrete) {
     // for discrete, use mid ranks to compute EDF and log-likelihood
-    // (this is closer to "observations" than jittered or "upper" pseudo data)
-    psobs = 0.5 * (ties.leftCols(2) + ties.rightCols(2)).array();
-    npars_ = tools_eigen::unique(infl_grid.interpolate(psobs)).sum();
+    // (this is closer to "observations" than jittered or "upper" pseudo data);
+    // an observation counts once however often it is repeated
+    psobs = 0.5 * (data.leftCols(2) + data.rightCols(2)).array();
+    npars_ = infl_grid.interpolate(psobs)
+               .cwiseQuotient(tools_stats::soft_multiplicity(psobs))
+               .sum();
     npars_ = std::max(npars_, 1.0);
   } else {
     npars_ = std::max(infl_grid.interpolate(data).sum(), 1.0);

@@ -312,9 +312,7 @@ rect_prob_reference(const Eigen::VectorXd& g,
     return total;
   };
   auto cdf = [&](ld x, ld y) {
-    return (x <= 0.0L || y <= 0.0L) ? 0.0L
-                                    : mass(x, y) * (x / mass(x, 1.0L)) *
-                                        (y / mass(1.0L, y)) * mass(1.0L, 1.0L);
+    return (x <= 0.0L || y <= 0.0L) ? 0.0L : mass(x, y) * y / mass(1.0L, y);
   };
   return (cdf(b1, b2) + cdf(a1, a2)) - (cdf(a1, b2) + cdf(b1, a2));
 }

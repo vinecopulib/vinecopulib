@@ -178,8 +178,28 @@ private:
 Eigen::MatrixXd
 find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter = 3);
 
+double
+default_soft_scale();
+
+bool
+swaps_pair(const Eigen::MatrixXd& u);
+
+Eigen::MatrixXd
+soft_pseudo_obs(const Eigen::MatrixXd& x,
+                const Eigen::VectorXd& weights = Eigen::VectorXd(),
+                const std::vector<int>& seeds = { 5 },
+                double scale = default_soft_scale(),
+                const std::string& ties_method = "random");
+
+Eigen::MatrixXd
+pair_soft_pseudo_obs(const Eigen::MatrixXd& data,
+                     const Eigen::VectorXd& weights = Eigen::VectorXd(),
+                     double scale = default_soft_scale(),
+                     const std::vector<int>& seeds = { 5 });
+
 Eigen::VectorXd
-merge_near_ties(const Eigen::VectorXd& x, double tol = 1e-11);
+soft_multiplicity(const Eigen::MatrixXd& x,
+                  double scale = default_soft_scale());
 
 double
 pairwise_mcor(const Eigen::MatrixXd& x,

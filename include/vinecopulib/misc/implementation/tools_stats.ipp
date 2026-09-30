@@ -9,7 +9,10 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/seed_seq.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
+#include <cstdint>
+#include <limits>
 #include <memory>
+#include <numeric>
 #include <unsupported/Eigen/FFT>
 #include <vinecopulib/misc/tools_stats_ghalton.hpp>
 #include <vinecopulib/misc/tools_stats_sobol.hpp>
@@ -164,38 +167,267 @@ to_pseudo_obs_1d(Eigen::VectorXd x,
                             seeds);
 }
 
-//! @brief Makes values that are equal up to rounding exactly equal.
-//!
-//! Sorts the values and gives every run of consecutive values, each within
-//! `tol` of its predecessor, the run's smallest value. Values further apart
-//! than that, and `NaN`s, are returned unchanged, so data whose ties are exact
-//! is returned as it came.
-//!
-//! @param x A vector of real numbers.
-//! @param tol Absolute distance up to which two values are merged.
-//! @return `x` with near-ties made exact.
-inline Eigen::VectorXd
-merge_near_ties(const Eigen::VectorXd& x, double tol)
+//! @brief The distance below which `soft_pseudo_obs()` does not tell values
+//! apart by value alone: the square root of the machine epsilon, the usual
+//! scale for what rounding in a computation can move.
+inline double
+default_soft_scale()
 {
-  std::vector<Eigen::Index> order;
-  order.reserve(static_cast<size_t>(x.size()));
-  for (Eigen::Index i = 0; i < x.size(); ++i) {
-    if (!std::isnan(x(i))) {
-      order.push_back(i);
+  return std::sqrt(std::numeric_limits<double>::epsilon());
+}
+
+//! @brief Whether a pair is in the order of its own values.
+//!
+//! Anything that treats a pair's two arguments by position, a draw or an
+//! iteration indexed by column, is made a function of the pair rather than
+//! of how it was passed by putting the pair in this order first: at the first
+//! row whose two values (then, with four columns, whose two left limits)
+//! differ, the smaller first.
+//!
+//! @param u A pair, `[u1, u2]` or `[u1, u2, u1^-, u2^-]`.
+//! @return Whether the columns have to be swapped.
+inline bool
+swaps_pair(const Eigen::MatrixXd& u)
+{
+  for (Eigen::Index i = 0; i < u.rows(); ++i) {
+    if (u(i, 0) != u(i, 1)) {
+      return u(i, 1) < u(i, 0);
+    }
+    if ((u.cols() == 4) && (u(i, 2) != u(i, 3))) {
+      return u(i, 3) < u(i, 2);
     }
   }
-  std::stable_sort(
-    order.begin(), order.end(), [&x](Eigen::Index a, Eigen::Index b) {
-      return x(a) < x(b);
+  return false;
+}
+
+//! @brief Pseudo-observations whose ranks move continuously with the data.
+//!
+//! Ranks every column as `to_pseudo_obs(x, "random", weights, seeds)` does,
+//! with two differences that make the ranks a continuous function of the
+//! data. Tied values are ordered by a key per observation, drawn once from
+//! `seeds`: a uniformly random order within every tie group, as with
+//! `"random"`, but one that depends only on the group's members. And two
+//! values closer than a few multiples of `scale` \f$ s \f$ are ranked partly
+//! by key and partly by value: observation \f$ i \f$ counts as ranked after
+//! \f$ j \f$ with weight
+//! \f[
+//!   p_{ij} = \kappa_{ij} \, [k_i > k_j] + (1 - \kappa_{ij}) \,
+//!            \Phi(g_{ij} / s), \qquad
+//!   \kappa_{ij} = e^{-g_{ij}^2 / (2 s^2)}, \quad g_{ij} = x_i - x_j,
+//! \f]
+//! so that data moving by \f$ \delta \f$ move a rank by \f$ O(\delta / s) \f$
+//! rather than by a whole block when near-equal values reorder. Values further
+//! apart than about \f$ 9 s \f$ are ranked exactly by value, so data without
+//! such near-ties get the ordinary ranks.
+//!
+//! @param x Data, one variable per column.
+//! @param weights Optional weights, one per observation.
+//! @param seeds Seeds of the keys.
+//! @param scale The distance \f$ s \f$; zero ranks exactly by value, only the
+//!   ties being ordered by `ties_method`.
+//! @param ties_method `"random"` orders ties by the keys, as above;
+//!   `"average"` counts every tie-mate as half ranked before, which gives
+//!   tied values their average rank, and uses \f$ [k_i > k_j] = 1/2 \f$ in
+//!   \f$ p_{ij} \f$ likewise.
+//! @return \f$ r_i / (n + 1) \f$, with \f$ r_i = w_i + \sum_{j \neq i} w_j
+//!   p_{ij} \f$ the weighted rank and \f$ n \f$ the number of non-`NaN`
+//!   values; `NaN` where `x` is.
+inline Eigen::MatrixXd
+soft_pseudo_obs(const Eigen::MatrixXd& x,
+                const Eigen::VectorXd& weights,
+                const std::vector<int>& seeds,
+                double scale,
+                const std::string& ties_method)
+{
+  if ((ties_method != "random") && (ties_method != "average")) {
+    throw std::runtime_error("ties_method must be 'random' or 'average'.");
+  }
+  const bool random = (ties_method == "random");
+  // a zero scale ranks exactly by value, the ties aside
+  const bool soft = (scale > 0.0);
+  const Eigen::Index n = x.rows();
+  Eigen::MatrixXd out = Eigen::MatrixXd::Constant(
+    n, x.cols(), std::numeric_limits<double>::quiet_NaN());
+  // beyond `hard`, both terms of p_ij are exactly 0 or 1 in double precision
+  const double hard = 9.0;
+  const double inv_scale = 1.0 / scale;
+  const double inv_sqrt2 = 0.70710678118654752440;
+
+  for (Eigen::Index col = 0; col < x.cols(); ++col) {
+    // one key per observation and column, from the engine's raw output, which
+    // is specified exactly; a column of its own keeps the tie orders of two
+    // columns independent
+    std::vector<int> col_seeds = seeds;
+    col_seeds.push_back(static_cast<int>(col));
+    boost::random::seed_seq seq(col_seeds.begin(), col_seeds.end());
+    boost::random::mt19937 engine(seq);
+    std::vector<uint64_t> key(static_cast<size_t>(n));
+    for (auto& k : key) {
+      const uint64_t high = engine();
+      k = (high << 32) | static_cast<uint64_t>(engine());
+    }
+
+    std::vector<Eigen::Index> order;
+    for (Eigen::Index i = 0; i < n; ++i) {
+      if (!std::isnan(x(i, col))) {
+        order.push_back(i);
+      }
+    }
+    const double m = static_cast<double>(order.size());
+    std::vector<double> w(static_cast<size_t>(n), 1.0);
+    if (weights.size() > 0) {
+      double total = 0.0;
+      for (auto i : order) {
+        total += weights(i);
+      }
+      for (auto i : order) {
+        w[i] = weights(i) * m / total;
+      }
+    }
+    // a total order: value, then key, then index
+    std::sort(order.begin(), order.end(), [&](Eigen::Index a, Eigen::Index b) {
+      if (x(a, col) != x(b, col)) {
+        return x(a, col) < x(b, col);
+      }
+      if (key[a] != key[b]) {
+        return key[a] < key[b];
+      }
+      return a < b;
     });
 
-  Eigen::VectorXd out = x;
-  for (size_t k = 1; k < order.size(); ++k) {
-    if (x(order[k]) - x(order[k - 1]) <= tol) {
-      out(order[k]) = out(order[k - 1]);
+    // groups of equal values, in order; `prefix` accumulates their weights
+    std::vector<size_t> group;
+    std::vector<double> prefix(order.size() + 1, 0.0);
+    for (size_t k = 0; k < order.size(); ++k) {
+      if ((k == 0) || (x(order[k], col) != x(order[k - 1], col))) {
+        group.push_back(k);
+      }
+      prefix[k + 1] = prefix[k] + w[order[k]];
+    }
+    group.push_back(order.size());
+
+    // `lo` / `hi`: the groups within `hard * scale` of group `a`; every group
+    // below `lo` ranks before it and every group from `hi` on after it
+    size_t lo = 0, hi = 0;
+    for (size_t a = 0; a + 1 < group.size(); ++a) {
+      const double va = x(order[group[a]], col);
+      if (soft) {
+        while ((va - x(order[group[lo]], col)) * inv_scale > hard) {
+          ++lo;
+        }
+        while ((hi + 1 < group.size()) &&
+               (x(order[group[hi]], col) - va) * inv_scale <= hard) {
+          ++hi;
+        }
+      } else {
+        lo = a;
+        hi = a + 1;
+      }
+      for (size_t k = group[a]; k < group[a + 1]; ++k) {
+        const Eigen::Index i = order[k];
+        // below the window; then the tie-mates, those with smaller keys
+        // under "random", which come first in the group, or half of them all
+        // under "average"
+        const double mates =
+          random ? (prefix[k] - prefix[group[a]])
+                 : 0.5 * (prefix[group[a + 1]] - prefix[group[a]] - w[i]);
+        double r = prefix[group[lo]] + w[i] + mates;
+        for (size_t b = lo; b < hi; ++b) {
+          if (b == a) {
+            continue;
+          }
+          const double gs = (va - x(order[group[b]], col)) * inv_scale;
+          const double kappa = std::exp(-0.5 * gs * gs);
+          const double phi = 0.5 * std::erfc(-gs * inv_sqrt2);
+          // group b's weight below i's key: the group is in key order
+          auto first = order.begin() + static_cast<std::ptrdiff_t>(group[b]);
+          auto last = order.begin() + static_cast<std::ptrdiff_t>(group[b + 1]);
+          auto pos = std::lower_bound(
+            first, last, key[i], [&](Eigen::Index j, uint64_t kk) {
+              return key[j] < kk;
+            });
+          const double whole = prefix[group[b + 1]] - prefix[group[b]];
+          const double below =
+            random ? prefix[static_cast<size_t>(pos - order.begin())] -
+                       prefix[group[b]]
+                   : 0.5 * whole;
+          r += kappa * below + (1.0 - kappa) * phi * whole;
+        }
+        out(i, col) = r / (m + 1.0);
+      }
     }
   }
   return out;
+}
+
+//! @brief Pseudo-observations of a pair, as a kernel pair copula ranks it.
+//!
+//! `soft_pseudo_obs()` of the pair's first two columns, drawn in the pair's
+//! own order (`swaps_pair()`) and returned in the order passed: each column's
+//! keys come from a stream of its own, and this keeps the result a function
+//! of the pair rather than of the order of its arguments.
+//!
+//! @param data The pair, `[u1, u2]` or `[u1, u2, u1^-, u2^-]`.
+//! @param weights Optional weights, one per observation.
+//! @param scale As for `soft_pseudo_obs()`.
+//! @param seeds Seeds of the keys.
+//! @return An \f$ n \times 2 \f$ matrix of pseudo-observations.
+inline Eigen::MatrixXd
+pair_soft_pseudo_obs(const Eigen::MatrixXd& data,
+                     const Eigen::VectorXd& weights,
+                     double scale,
+                     const std::vector<int>& seeds)
+{
+  const bool swapped = swaps_pair(data);
+  Eigen::MatrixXd pair = data.leftCols(2);
+  if (swapped) {
+    pair.col(0).swap(pair.col(1));
+  }
+  Eigen::MatrixXd psobs = soft_pseudo_obs(pair, weights, seeds, scale);
+  if (swapped) {
+    psobs.col(0).swap(psobs.col(1));
+  }
+  return psobs;
+}
+
+//! @brief The number of points close to each point, counted continuously.
+//!
+//! \f$ m_i = \sum_j e^{-\|x_i - x_j\|^2 / (2 s^2)} \f$: an exactly repeated
+//! point counts its copies, a point far from all others counts one, and
+//! points moving by \f$ \delta \ll s \f$ change the counts by
+//! \f$ O(\delta / s) \f$. Summing \f$ f_i / m_i \f$ over points sums \f$ f \f$
+//! over the distinct points, continuously in the data.
+//!
+//! @param x Points, one per row.
+//! @param scale The distance \f$ s \f$.
+//! @return The counts, each at least one.
+inline Eigen::VectorXd
+soft_multiplicity(const Eigen::MatrixXd& x, double scale)
+{
+  const Eigen::Index n = x.rows();
+  std::vector<Eigen::Index> order(static_cast<size_t>(n));
+  std::iota(order.begin(), order.end(), 0);
+  std::sort(order.begin(), order.end(), [&](Eigen::Index a, Eigen::Index b) {
+    return (x(a, 0) < x(b, 0)) || ((x(a, 0) == x(b, 0)) && (a < b));
+  });
+  const double reach = 9.0 * scale;
+  Eigen::VectorXd count = Eigen::VectorXd::Zero(n);
+  for (size_t k = 0; k < order.size(); ++k) {
+    const Eigen::Index i = order[k];
+    for (size_t l = k; l < order.size(); ++l) {
+      const Eigen::Index j = order[l];
+      if (x(j, 0) - x(i, 0) > reach) {
+        break;
+      }
+      const double d2 = (x.row(i) - x.row(j)).squaredNorm() / (scale * scale);
+      const double kernel = std::exp(-0.5 * d2);
+      count(i) += kernel;
+      if (l != k) {
+        count(j) += kernel;
+      }
+    }
+  }
+  return count;
 }
 
 // Construct a box covering from a matrix of samples.
@@ -285,6 +517,18 @@ BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
   boxes_[cell(new_sample(0)) * K_ + cell(new_sample(1))].insert(i);
 }
 
+// SplitMix64's finalizer: a bijection of 64-bit integers whose outputs are
+// statistically uniform, computed in integer arithmetic so that every build
+// draws the same keys.
+inline uint64_t
+mix64(uint64_t z)
+{
+  z += 0x9e3779b97f4a7c15ULL;
+  z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ULL;
+  z = (z ^ (z >> 27)) * 0x94d049bb133111ebULL;
+  return z ^ (z >> 31);
+}
+
 //! @brief Recovers a continuous latent sample from a sample of a discrete
 //! copula.
 //!
@@ -325,19 +569,8 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
 
   // The draws below are indexed by column position, so ordering the pair by
   // its own values is what makes the result a function of the observations
-  // rather than of how they were passed. The columns tie only when the two
-  // variables are identical, where swapping them is a no-op.
-  bool swapped = false;
-  for (ptrdiff_t i = 0; i < u.rows(); i++) {
-    if (u(i, 0) != u(i, 1)) {
-      swapped = u(i, 1) < u(i, 0);
-      break;
-    }
-    if (u(i, 2) != u(i, 3)) {
-      swapped = u(i, 3) < u(i, 2);
-      break;
-    }
-  }
+  // rather than of how they were passed.
+  const bool swapped = swaps_pair(u);
   Eigen::MatrixXd v = u;
   if (swapped) {
     v.col(0).swap(v.col(1));
@@ -367,19 +600,35 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   Eigen::MatrixXd x(n, 2), norm_sim(n, 2);
 
   for (size_t it = 0; it < niter; it++) {
-    uu = to_pseudo_obs(uu);
+    // continuous in the cloud, so that values within rounding of each other
+    // cannot reorder a block of it
+    uu = soft_pseudo_obs(
+      uu, Eigen::VectorXd(), {}, default_soft_scale(), "average");
     x = qnorm(uu);
     // the seed vectors hold `int`, which a `size_t` does not narrow to
     // implicitly inside a braced initializer
     const auto seed = static_cast<int>(it);
     norm_sim = simulate_normal(n, 2, false, { seed, 5 }).array() * b;
-    w = simulate_uniform(n, 1, false, { seed, 55 });
+    const uint64_t sweep = mix64(static_cast<uint64_t>(it) + 55);
 
     for (size_t i = 0; i < n; i++) {
       covering.get_box_indices(lb.row(i), ub.row(i), indices);
-      double n_idx = static_cast<double>(indices.size());
-      if (n_idx > 0) {
-        size_t j = indices.at(static_cast<size_t>(w(i) * n_idx));
+      if (!indices.empty()) {
+        // The neighbor is drawn uniformly as the compatible one holding the
+        // smallest of a fixed key per (sweep, observation, neighbor). A
+        // neighbor entering or leaving the compatible set changes the draw only
+        // if it holds that key, where an index into the list of neighbors would
+        // move with any change to the list and redraw every later observation.
+        const uint64_t target = mix64(sweep ^ mix64(i));
+        size_t j = indices[0];
+        uint64_t best = mix64(target ^ j);
+        for (size_t k = 1; k < indices.size(); ++k) {
+          const uint64_t key = mix64(target ^ indices[k]);
+          if ((key < best) || ((key == best) && (indices[k] < j))) {
+            best = key;
+            j = indices[k];
+          }
+        }
         x.row(i) = x.row(j) + norm_sim.row(i);
         uu.row(i) = pnorm(x.row(i));
         covering.swap_sample(i, uu.row(i));
@@ -387,7 +636,8 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     }
   }
 
-  Eigen::MatrixXd latent = to_pseudo_obs(x);
+  Eigen::MatrixXd latent =
+    soft_pseudo_obs(x, Eigen::VectorXd(), {}, default_soft_scale(), "average");
   if (swapped) {
     latent.col(0).swap(latent.col(1));
   }
@@ -584,15 +834,8 @@ pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
   // orders can stop at different correlations; ordering the pair by its own
   // values, as `find_latent_sample` does, makes the result a function of the
   // pair rather than of how it was passed
-  bool swapped = false;
-  for (Eigen::Index i = 0; i < x.rows(); ++i) {
-    if (x(i, 0) != x(i, 1)) {
-      swapped = x(i, 1) < x(i, 0);
-      break;
-    }
-  }
   Eigen::MatrixXd v = x.leftCols(2);
-  if (swapped) {
+  if (swaps_pair(v)) {
     v.col(0).swap(v.col(1));
   }
   Eigen::MatrixXd phi = ace(v, weights);

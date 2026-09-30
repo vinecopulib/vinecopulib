@@ -591,36 +591,48 @@ TEST(discrete, kernel_fit_ignores_rounding_noise_in_tied_continuous_data)
 
 // A selected vine fits each pair in the orientation of the search and stores it
 // flipped where the final structure needs the other one, so a flipped discrete
-// pair must evaluate exactly as the one the next tree's data came from.
+// pair must evaluate as the one the next tree's data came from, up to rounding.
+// Its distribution function rescales one argument's margin only, so that holds
+// only once the margins are uniform: at strong dependence, a grid normalized
+// for a fixed number of passes stayed ~1e-4 off.
 TEST(discrete, a_flipped_kernel_pair_evaluates_as_the_original)
 {
-  auto gauss =
-    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.6));
-  auto u = gauss.simulate(2000, true, { 7 });
-  for (const auto& types :
-       std::vector<std::vector<std::string>>{ { "d", "c" }, { "d", "d" } }) {
-    Eigen::MatrixXd data(u.rows(), 4);
-    data.col(0) = (u.col(0).array() * 12).ceil() / 12;
-    data.col(2) = (u.col(0).array() * 12).floor() / 12;
-    if (types[1] == "d") {
-      data.col(1) = (u.col(1).array() * 9).ceil() / 9;
-      data.col(3) = (u.col(1).array() * 9).floor() / 9;
-    } else {
-      data.col(1) = u.col(1);
-      data.col(3) = u.col(1);
-    }
-    auto pair = Bicop();
-    pair.set_var_types(types);
-    pair.select(data, FitControlsBicop({ BicopFamily::tll }));
-    auto flipped = pair;
-    flipped.flip();
+  for (double rho : { 0.6, 0.97 }) {
+    auto gauss =
+      Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, rho));
+    auto u = gauss.simulate(2000, true, { 7 });
+    for (const auto& types :
+         std::vector<std::vector<std::string>>{ { "d", "c" }, { "d", "d" } }) {
+      Eigen::MatrixXd data(u.rows(), 4);
+      data.col(0) = (u.col(0).array() * 12).ceil() / 12;
+      data.col(2) = (u.col(0).array() * 12).floor() / 12;
+      if (types[1] == "d") {
+        data.col(1) = (u.col(1).array() * 9).ceil() / 9;
+        data.col(3) = (u.col(1).array() * 9).floor() / 9;
+      } else {
+        data.col(1) = u.col(1);
+        data.col(3) = u.col(1);
+      }
+      auto pair = Bicop();
+      pair.set_var_types(types);
+      pair.select(data, FitControlsBicop({ BicopFamily::tll }));
+      auto flipped = pair;
+      flipped.flip();
 
-    Eigen::MatrixXd swapped(data.rows(), 4);
-    swapped << data.col(1), data.col(0), data.col(3), data.col(2);
-    EXPECT_EQ(pair.pdf(data), flipped.pdf(swapped));
-    EXPECT_EQ(pair.cdf(data), flipped.cdf(swapped));
-    EXPECT_EQ(pair.hfunc1(data), flipped.hfunc2(swapped));
-    EXPECT_EQ(pair.hfunc2(data), flipped.hfunc1(swapped));
+      Eigen::MatrixXd swapped(data.rows(), 4);
+      swapped << data.col(1), data.col(0), data.col(3), data.col(2);
+      auto gap = [](const Eigen::VectorXd& a, const Eigen::VectorXd& b) {
+        return (a - b).array().abs().maxCoeff();
+      };
+      EXPECT_LT(gap(pair.pdf(data), flipped.pdf(swapped)), 1e-11)
+        << "rho = " << rho;
+      EXPECT_LT(gap(pair.cdf(data), flipped.cdf(swapped)), 1e-13)
+        << "rho = " << rho;
+      EXPECT_LT(gap(pair.hfunc1(data), flipped.hfunc2(swapped)), 1e-12)
+        << "rho = " << rho;
+      EXPECT_LT(gap(pair.hfunc2(data), flipped.hfunc1(swapped)), 1e-12)
+        << "rho = " << rho;
+    }
   }
 }
 
@@ -653,24 +665,50 @@ TEST(discrete, kernel_fit_does_not_depend_on_argument_order)
   }
 }
 
-TEST(tools_stats, merge_near_ties_leaves_exact_data_alone)
+TEST(tools_stats, soft_pseudo_obs_are_the_ranks_of_separated_values)
 {
-  Eigen::VectorXd x(6);
-  x << 0.5, 0.25, 0.5, 0.75, std::nan(""), 0.25;
-  Eigen::VectorXd out = tools_stats::merge_near_ties(x);
-  for (Eigen::Index i = 0; i < x.size(); ++i) {
-    if (std::isnan(x(i))) {
-      EXPECT_TRUE(std::isnan(out(i)));
-    } else {
-      EXPECT_EQ(out(i), x(i));
-    }
-  }
+  // without near-ties, the ordinary ranks; ties ordered by the keys, which is
+  // a permutation of the group's ranks
+  Eigen::MatrixXd x(8, 1);
+  x << 0.3, 0.1, 0.7, 0.3, 0.5, 0.3, 0.9, 0.2;
+  const Eigen::VectorXd r = tools_stats::soft_pseudo_obs(x).col(0) * 9.0;
+  const std::vector<double> expected{ 2, 1, 7, 3, 6, 8, 5, 4 };
+  EXPECT_DOUBLE_EQ(r(1), 1.0);
+  EXPECT_DOUBLE_EQ(r(7), 2.0);
+  EXPECT_DOUBLE_EQ(r(4), 6.0);
+  EXPECT_DOUBLE_EQ(r(2), 7.0);
+  EXPECT_DOUBLE_EQ(r(6), 8.0);
+  std::vector<double> tied{ r(0), r(3), r(5) };
+  std::sort(tied.begin(), tied.end());
+  EXPECT_EQ(tied, (std::vector<double>{ 3, 4, 5 }));
+}
 
-  Eigen::VectorXd y(3);
-  y << 0.3, 0.3 * (1 + 4e-16), 0.3 * (1 + 1e-6);
-  Eigen::VectorXd merged = tools_stats::merge_near_ties(y);
-  EXPECT_EQ(merged(1), merged(0));
-  EXPECT_EQ(merged(2), y(2));
+TEST(tools_stats, soft_pseudo_obs_move_continuously)
+{
+  // a crowd of distinct values within rounding of each other: shifting it by
+  // far less than the scale moves the ranks by a negligible amount, where
+  // random ties would reorder the whole crowd
+  const Eigen::Index n = 400;
+  Eigen::MatrixXd x(n, 1), y(n, 1);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    const double v = static_cast<double>(i % 50) / 50.0;
+    x(i, 0) = v + ((i % 7) - 3) * 1e-13;
+    y(i, 0) = v + ((i % 5) - 2) * 1e-13;
+  }
+  const Eigen::VectorXd a = tools_stats::soft_pseudo_obs(x).col(0);
+  const Eigen::VectorXd b = tools_stats::soft_pseudo_obs(y).col(0);
+  EXPECT_LT((a - b).array().abs().maxCoeff(), 1e-6);
+}
+
+TEST(tools_stats, soft_multiplicity_counts_repeated_points_once)
+{
+  Eigen::MatrixXd x(5, 2);
+  x << 0.1, 0.2, 0.1, 0.2, 0.1, 0.2 + 1e-15, 0.5, 0.5, 0.9, 0.1;
+  const Eigen::VectorXd m = tools_stats::soft_multiplicity(x);
+  EXPECT_NEAR(m(0), 3.0, 1e-12);
+  EXPECT_NEAR(m(2), 3.0, 1e-12);
+  EXPECT_DOUBLE_EQ(m(3), 1.0);
+  EXPECT_DOUBLE_EQ(m(4), 1.0);
 }
 
 TEST(discrete, with_var_types_round_trips_the_variable_types)
