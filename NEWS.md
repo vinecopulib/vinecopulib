@@ -10,20 +10,21 @@
   The covering itself now also assigns coordinates of exactly 1 to the last
   cell instead of one past it (#792)
 
-* A discrete `tll` fit no longer depends on how its data rounded. Values
-  equal up to rounding are made exact ties before the ranks' random
-  tie-breaking and before the latent draw, which turned a last-bit
-  difference into another fit from the second tree on; `find_latent_sample`
-  also keeps a continuous argument's ties exact. Continuous fits are
-  unchanged (#798)
+* A discrete `tll` fit moves continuously with its data: two builds, or two
+  implementations, whose h-functions differ in their last bits now fit a
+  pair to about that precision instead of drawing another latent sample. The
+  bandwidth's ranks order ties by a fixed key per observation and blend value
+  and key order for values within the square root of the machine epsilon
+  (`tools_stats::soft_pseudo_obs()`), and `find_latent_sample()` picks its
+  neighbors by fixed keys. Continuous fits change only on data with exact
+  ties, whose random order is drawn differently (#798, #799)
 
 * A `tll` pair no longer depends on the order of its arguments, so a vine
-  selected from data equals a refit of its own structure. Its distribution
-  function and rectangle probabilities are rescaled along both coordinates,
-  with both margins exactly uniform, and a flipped pair evaluates exactly as
-  the original with swapped arguments; `tools_stats::pairwise_mcor`, which
-  sets the bandwidth, is symmetric in its two variables. Kernel fits of
-  nearly independent pairs change (#799)
+  selected from data equals a refit of its own structure. The grid's margins
+  are normalized to convergence rather than for 25 passes, which left
+  strongly dependent grids up to 3e-4 short of uniform, and
+  `tools_stats::pairwise_mcor()` is symmetric in its two variables. Fits of
+  strongly dependent or nearly independent pairs change (#799)
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
