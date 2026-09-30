@@ -17,6 +17,14 @@
   also keeps a continuous argument's ties exact. Continuous fits are
   unchanged (#798)
 
+* A `tll` pair no longer depends on the order of its arguments, so a vine
+  selected from data equals a refit of its own structure. Its distribution
+  function and rectangle probabilities are rescaled along both coordinates,
+  with both margins exactly uniform, and a flipped pair evaluates exactly as
+  the original with swapped arguments; `tools_stats::pairwise_mcor`, which
+  sets the bandwidth, is symmetric in its two variables. Kernel fits of
+  nearly independent pairs change (#799)
+
 ### BUILD SYSTEM AND DEPENDENCIES
 
 * CI builds and tests against Eigen 5.0.1 as well as 3.4.0, with the address
