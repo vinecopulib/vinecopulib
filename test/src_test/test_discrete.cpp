@@ -517,10 +517,7 @@ TEST(discrete, kernel_fit_uses_the_latent_sample)
 
 TEST(discrete, kernel_fit_ignores_rounding_noise_within_an_atom)
 {
-  // From the second tree on, a discrete argument is an h-function value, and
-  // two rows of the same atom can come out a few ulps apart. The fit ranks
-  // ties at random, so without merging those near-ties every atom would split
-  // into many groups and the fitted grid would move far beyond rounding.
+  // rows of one atom a few ulps apart must fit as exact ties
   auto gauss =
     Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.6));
   auto u = gauss.simulate(3000, true, { 3 });
@@ -552,8 +549,6 @@ TEST(discrete, kernel_fit_ignores_rounding_noise_within_an_atom)
                         .abs()
                         .maxCoeff();
   EXPECT_LT(diff, 1e-10);
-  // The atoms are counted on the merged ties, so the effective degrees of
-  // freedom agree too, up to the rounding in the merged values themselves.
   EXPECT_NEAR(fit_noisy.get_npars(), fit_exact.get_npars(), 1e-9);
 }
 
