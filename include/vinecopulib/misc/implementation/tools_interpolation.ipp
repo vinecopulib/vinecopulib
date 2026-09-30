@@ -56,21 +56,55 @@ InterpolationGrid::update_cell_lookup()
   }
 }
 
-//! cumulative trapezoidal integrals of each row (used by `integrate_2d`).
+//! cumulative trapezoidal integrals of each row of the values and of their
+//! transpose (used by `integrate_2d` and `rect_mass`).
 inline void
 InterpolationGrid::update_cached_integrals()
 {
   const ptrdiff_t m = grid_points_.size();
-  row_cum_int_.resize(m, m);
-  for (ptrdiff_t k = 0; k < m; ++k) {
-    double cum = 0.0;
-    row_cum_int_(k, 0) = 0.0;
-    for (ptrdiff_t j = 0; j < m - 1; ++j) {
-      cum += (values_(k, j + 1) + values_(k, j)) *
-             (grid_points_(j + 1) - grid_points_(j)) / 2.0;
-      row_cum_int_(k, j + 1) = cum;
+  values_t_ = values_.transpose();
+  row_cum_int_ = cumulative_row_integrals(values_);
+  row_cum_int_t_ = cumulative_row_integrals(values_t_);
+  line_totals_ = row_cum_int_.col(m - 1);
+  line_totals_t_ = row_cum_int_t_.col(m - 1);
+  margin_cum_ = cumulative_integral(line_totals_);
+  margin_cum_t_ = cumulative_integral(line_totals_t_);
+  total_mass_ =
+    0.5 * (weights_.dot(line_totals_) + weights_.dot(line_totals_t_));
+  update_orientation();
+}
+
+//! integrates along the transpose if it is the smaller of the two matrices in
+//! column-major lexicographic order, so that a grid and its flipped
+//! counterpart run the same arithmetic with the roles of the arguments
+//! swapped; a symmetric grid gives the same values either way
+inline void
+InterpolationGrid::update_orientation()
+{
+  transposed_ = false;
+  for (Eigen::Index k = 0; k < values_.size(); ++k) {
+    if (values_(k) != values_t_(k)) {
+      transposed_ = values_t_(k) < values_(k);
+      return;
     }
   }
+}
+
+inline Eigen::MatrixXd
+InterpolationGrid::cumulative_row_integrals(const Eigen::MatrixXd& values) const
+{
+  const ptrdiff_t m = grid_points_.size();
+  Eigen::MatrixXd cum(m, m);
+  for (ptrdiff_t k = 0; k < m; ++k) {
+    double c = 0.0;
+    cum(k, 0) = 0.0;
+    for (ptrdiff_t j = 0; j < m - 1; ++j) {
+      c += (values(k, j + 1) + values(k, j)) *
+           (grid_points_(j + 1) - grid_points_(j)) / 2.0;
+      cum(k, j + 1) = c;
+    }
+  }
+  return cum;
 }
 
 //! O(1) cell search: bucket lookup plus a guarded advance (exact for any
@@ -123,8 +157,11 @@ InterpolationGrid::set_values(const Eigen::MatrixXd& values, int norm_maxiter)
 inline void
 InterpolationGrid::flip()
 {
-  values_.transposeInPlace();
-  update_cached_integrals();
+  values_.swap(values_t_);
+  row_cum_int_.swap(row_cum_int_t_);
+  line_totals_.swap(line_totals_t_);
+  margin_cum_.swap(margin_cum_t_);
+  update_orientation();
 }
 
 //! trapezoid weights, so that `weights_.dot(v)` is the integral over [0, 1]
@@ -383,18 +420,37 @@ InterpolationGrid::inverse_integrate_1d(const tools_eigen::ConstMatRef& u,
 
 //! Integrate the grid along the two axis
 //!
+//! @details The integral is rescaled along each coordinate so that both
+//! margins are exactly uniform: `C(x, y) = M(x, y) f(x) g(y) M(1, 1)`, where
+//! `M` is the grid's mass, `f(x) = x / M(x, 1)` and `g(y) = y / M(1, y)`. That
+//! form is symmetric in the two arguments, and flipping the grid and swapping
+//! the coordinates gives exactly the same values.
+//!
 //! @param u Mx2 matrix of evaluation points
 //! @return a vector of resulting integral values
 inline Eigen::VectorXd
 InterpolationGrid::integrate_2d(const tools_eigen::ConstMatRef& u)
 {
-  Eigen::VectorXd tmpvals2;
+  Eigen::VectorXd lines;
 
-  auto f = [this, &tmpvals2](double u1, double u2) {
-    row_integrals(u2, tmpvals2);
-    double tmpint = int_on_grid(u1, tmpvals2);
-    double tmpint1 = weights_.dot(tmpvals2);
-    return std::min(std::max(tmpint * u2 / tmpint1, 1e-10), 1 - 1e-10);
+  auto f = [this, &lines](double u1, double u2) {
+    const double x = std::min(std::max(u1, 0.0), 1.0);
+    const double y = std::min(std::max(u2, 0.0), 1.0);
+    double p = 0.0;
+    if ((x > 0.0) && (y > 0.0)) {
+      if (transposed_) {
+        row_integrals(values_t_, row_cum_int_t_, x, lines);
+      } else {
+        row_integrals(values_, row_cum_int_, y, lines);
+      }
+      const double mass = int_on_grid(transposed_ ? y : x, lines);
+      const double fx =
+        x / std::max(margin_integral(line_totals_, margin_cum_, x), 1e-20);
+      const double gy =
+        y / std::max(margin_integral(line_totals_t_, margin_cum_t_, y), 1e-20);
+      p = total_mass_ * ((fx * gy) * mass);
+    }
+    return std::min(std::max(p, 1e-10), 1 - 1e-10);
   };
 
   return tools_eigen::binaryExpr_or_nan(u, f);
@@ -432,7 +488,10 @@ InterpolationGrid::interval_weights(double lo,
 //! @param u Upper limit, clamped to `[0, 1]`.
 //! @param out Filled with one integral per grid line.
 inline void
-InterpolationGrid::row_integrals(double u, Eigen::VectorXd& out) const
+InterpolationGrid::row_integrals(const Eigen::MatrixXd& values,
+                                 const Eigen::MatrixXd& cum,
+                                 double u,
+                                 Eigen::VectorXd& out) const
 {
   const ptrdiff_t m = grid_points_.size();
   const double y = std::min(std::max(u, 0.0), 1.0);
@@ -442,16 +501,15 @@ InterpolationGrid::row_integrals(double u, Eigen::VectorXd& out) const
   out.resize(m);
   for (ptrdiff_t k = 0; k < m; ++k) {
     out(k) =
-      row_cum_int_(k, j) +
-      (2 * values_(k, j) + (values_(k, j + 1) - values_(k, j)) * s / dg) * s /
-        2.0;
+      cum(k, j) +
+      (2 * values(k, j) + (values(k, j + 1) - values(k, j)) * s / dg) * s / 2.0;
   }
 }
 
 //! @brief Probability of the rectangle `(a1, b1] x (a2, b2]`.
 //!
 //! @details Not clipped, unlike `integrate_2d()`: an empty rectangle is
-//! exactly `0`.
+//! exactly `0`. Symmetric in the two arguments, as `integrate_2d()` is.
 //!
 //! @param a1,b1 Bounds in the first argument, in either order.
 //! @param a2,b2 Bounds in the second argument, in either order.
@@ -468,31 +526,119 @@ InterpolationGrid::rect_mass(double a1, double b1, double a2, double b2) const
     return 0.0;
   }
 
-  // the mass of each grid line over the rectangle's own strip, and below it
-  Eigen::VectorXd wx, wy, strip, below;
-  const ptrdiff_t i0 = interval_weights(x0, x1, wx);
-  row_integrals(y0, below);
-  if (y0 > 0.0) {
-    const ptrdiff_t j0 = interval_weights(y0, y1, wy);
-    strip = values_.middleCols(j0, wy.size()) * wy;
+  // `integrate_2d()`'s rescaling, expanded over the four blocks so that the
+  // only differences taken are the rescalings' own increments, each over its
+  // common denominator; every term is grouped so that swapping the two
+  // coordinates swaps operands of a commutative operation
+  Blocks b;
+  if (transposed_) {
+    const Blocks q = blocks_along(values_t_, row_cum_int_t_, y0, y1, x0, x1);
+    b = { q.below_left, q.left, q.below, q.inside };
   } else {
-    // nothing below to subtract, so the cached integrals are the strip itself
-    row_integrals(y1, strip);
+    b = blocks_along(values_, row_cum_int_, x0, x1, y0, y1);
   }
+  const Rescaling f = rescaling(line_totals_, margin_cum_, x0, x1);
+  const Rescaling g = rescaling(line_totals_t_, margin_cum_t_, y0, y1);
+  return total_mass_ * (((f.upper * g.upper) * b.inside +
+                         b.below_left * (f.increment * g.increment)) +
+                        (b.below * (f.upper * g.increment) +
+                         b.left * (g.upper * f.increment)));
+}
 
-  const double m_strip = weights_.dot(strip);
-  const double m_below = std::max(weights_.dot(below), 1e-20);
-  const double total = std::max(m_below + m_strip, 1e-20);
+//! the integral over `[lo, hi]` of the piecewise linear function through
+//! `(grid_points_, v)`, with nonnegative weights
+inline double
+InterpolationGrid::interval_integral(double lo,
+                                     double hi,
+                                     const Eigen::VectorXd& v) const
+{
+  const double a = std::min(std::max(lo, 0.0), 1.0);
+  const double b = std::min(std::max(hi, a), 1.0);
+  double total = 0.0;
+  for (ptrdiff_t k = find_cell(a), kb = find_cell(b); k <= kb; ++k) {
+    const auto [w0, w1] =
+      cell_weights(grid_points_(k), grid_points_(k + 1), a, b);
+    total += w0 * v(k) + w1 * v(k + 1);
+  }
+  return total;
+}
 
-  // `integrate_2d()` rescales each grid line by `lambda(y) = y / M(1, y)`, so
-  // the probability is `lambda(y1) strip + (lambda(y1) - lambda(y0)) below`.
-  // The lambda difference is the only part that cancels; expanded over the
-  // common denominator it cancels against `y1 - y0` rather than against one.
-  const double dlambda =
-    ((y1 - y0) * m_below - y0 * m_strip) / (total * m_below);
+//! the cumulative trapezoidal integrals of `v` at the nodes
+inline Eigen::VectorXd
+InterpolationGrid::cumulative_integral(const Eigen::VectorXd& v) const
+{
+  const ptrdiff_t m = grid_points_.size();
+  Eigen::VectorXd cum(m);
+  cum(0) = 0.0;
+  for (ptrdiff_t k = 0; k < m - 1; ++k) {
+    cum(k + 1) = cum(k) + (v(k + 1) + v(k)) *
+                            (grid_points_(k + 1) - grid_points_(k)) / 2.0;
+  }
+  return cum;
+}
 
-  return y1 * wx.dot(strip.segment(i0, wx.size())) / total +
-         dlambda * wx.dot(below.segment(i0, wx.size()));
+//! the integral of `v` over `[0, x]`, from its cumulative integrals `cum`
+inline double
+InterpolationGrid::margin_integral(const Eigen::VectorXd& v,
+                                   const Eigen::VectorXd& cum,
+                                   double x) const
+{
+  const double b = std::min(std::max(x, 0.0), 1.0);
+  const ptrdiff_t j = find_cell(b);
+  const auto [w0, w1] =
+    cell_weights(grid_points_(j), grid_points_(j + 1), grid_points_(j), b);
+  return cum(j) + (w0 * v(j) + w1 * v(j + 1));
+}
+
+//! the four blocks, with each grid line of `values` integrated first
+inline InterpolationGrid::Blocks
+InterpolationGrid::blocks_along(const Eigen::MatrixXd& values,
+                                const Eigen::MatrixXd& cum,
+                                double x0,
+                                double x1,
+                                double y0,
+                                double y1) const
+{
+  // the mass of each grid line below the rectangle and over its own strip;
+  // per thread and reused, since a discrete pair asks this once per row
+  thread_local Eigen::VectorXd below, strip;
+  row_integrals(values, cum, y0, below);
+  if (y0 > 0.0) {
+    const ptrdiff_t m = grid_points_.size();
+    const double a = std::min(std::max(y0, 0.0), 1.0);
+    const double b = std::min(std::max(y1, a), 1.0);
+    strip.setZero(m);
+    for (ptrdiff_t k = find_cell(a), kb = find_cell(b); k <= kb; ++k) {
+      const auto [w0, w1] =
+        cell_weights(grid_points_(k), grid_points_(k + 1), a, b);
+      strip += w0 * values.col(k) + w1 * values.col(k + 1);
+    }
+  } else {
+    // nothing below, so the cached integrals are the strip itself
+    row_integrals(values, cum, y1, strip);
+  }
+  return { int_on_grid(x0, below),
+           interval_integral(x0, x1, below),
+           int_on_grid(x0, strip),
+           interval_integral(x0, x1, strip) };
+}
+
+inline InterpolationGrid::Rescaling
+InterpolationGrid::rescaling(const Eigen::VectorXd& totals,
+                             const Eigen::VectorXd& cum,
+                             double x0,
+                             double x1) const
+{
+  const double m0 = margin_integral(totals, cum, x0);
+  const double strip = interval_integral(x0, x1, totals);
+  const double m1 = std::max(m0 + strip, 1e-20);
+  if (!(x0 > 0.0)) {
+    // the blocks the increment multiplies are empty
+    return { x1 / m1, 0.0 };
+  }
+  // `x1 / m1 - x0 / m0` over the common denominator, where it cancels against
+  // `x1 - x0` rather than against one
+  return { x1 / m1, ((x1 - x0) * m0 - x0 * strip) / (m1 * m0) };
 }
 
 //! @brief Probability that the free coordinate falls in `(lo, hi]`, given the

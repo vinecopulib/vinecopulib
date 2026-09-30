@@ -522,4 +522,20 @@ TEST(test_tools_stats, golden_pseudo_obs)
     }
   }
 }
+
+// The maximal correlation is symmetric by definition. ACE updates one variable
+// first, and near independence the two orders stopped at correlations up to
+// several percent apart, which moved a kernel pair's bandwidth with the order
+// its arguments were passed in.
+TEST(tools_stats, pairwise_mcor_is_symmetric)
+{
+  for (int seed = 0; seed < 20; ++seed) {
+    Eigen::MatrixXd u = tools_stats::simulate_uniform(1000, 2, false, { seed });
+    Eigen::MatrixXd swapped(u.rows(), 2);
+    swapped << u.col(1), u.col(0);
+    EXPECT_EQ(tools_stats::pairwise_mcor(u),
+              tools_stats::pairwise_mcor(swapped))
+      << "seed = " << seed;
+  }
+}
 }

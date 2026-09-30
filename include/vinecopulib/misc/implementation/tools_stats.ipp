@@ -575,10 +575,27 @@ ace(const Eigen::MatrixXd& data,                        // data
 //! @{
 
 //! calculates the pairwise maximum correlation coefficient.
+//!
+//! @details Symmetric in the two variables, as the measure is by definition.
 inline double
 pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 {
-  Eigen::MatrixXd phi = ace(x, weights);
+  // ACE updates one variable first, and where the dependence is weak the two
+  // orders can stop at different correlations; ordering the pair by its own
+  // values, as `find_latent_sample` does, makes the result a function of the
+  // pair rather than of how it was passed
+  bool swapped = false;
+  for (Eigen::Index i = 0; i < x.rows(); ++i) {
+    if (x(i, 0) != x(i, 1)) {
+      swapped = x(i, 1) < x(i, 0);
+      break;
+    }
+  }
+  Eigen::MatrixXd v = x.leftCols(2);
+  if (swapped) {
+    v.col(0).swap(v.col(1));
+  }
+  Eigen::MatrixXd phi = ace(v, weights);
   return wdm::wdm(phi, "cor", weights)(0, 1);
 }
 

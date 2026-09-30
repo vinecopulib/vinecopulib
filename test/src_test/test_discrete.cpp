@@ -589,6 +589,70 @@ TEST(discrete, kernel_fit_ignores_rounding_noise_in_tied_continuous_data)
   EXPECT_LT(diff, 1e-10);
 }
 
+// A selected vine fits each pair in the orientation of the search and stores it
+// flipped where the final structure needs the other one, so a flipped discrete
+// pair must evaluate exactly as the one the next tree's data came from.
+TEST(discrete, a_flipped_kernel_pair_evaluates_as_the_original)
+{
+  auto gauss =
+    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.6));
+  auto u = gauss.simulate(2000, true, { 7 });
+  for (const auto& types :
+       std::vector<std::vector<std::string>>{ { "d", "c" }, { "d", "d" } }) {
+    Eigen::MatrixXd data(u.rows(), 4);
+    data.col(0) = (u.col(0).array() * 12).ceil() / 12;
+    data.col(2) = (u.col(0).array() * 12).floor() / 12;
+    if (types[1] == "d") {
+      data.col(1) = (u.col(1).array() * 9).ceil() / 9;
+      data.col(3) = (u.col(1).array() * 9).floor() / 9;
+    } else {
+      data.col(1) = u.col(1);
+      data.col(3) = u.col(1);
+    }
+    auto pair = Bicop();
+    pair.set_var_types(types);
+    pair.select(data, FitControlsBicop({ BicopFamily::tll }));
+    auto flipped = pair;
+    flipped.flip();
+
+    Eigen::MatrixXd swapped(data.rows(), 4);
+    swapped << data.col(1), data.col(0), data.col(3), data.col(2);
+    EXPECT_EQ(pair.pdf(data), flipped.pdf(swapped));
+    EXPECT_EQ(pair.cdf(data), flipped.cdf(swapped));
+    EXPECT_EQ(pair.hfunc1(data), flipped.hfunc2(swapped));
+    EXPECT_EQ(pair.hfunc2(data), flipped.hfunc1(swapped));
+  }
+}
+
+// A vine refitted on the structure it selected fits each pair in its final
+// orientation, where selection fitted it in the search's and flipped it. The
+// latent draw is discontinuous in its bandwidth, so the two agree only if the
+// bandwidth does not depend on the order of the arguments.
+TEST(discrete, kernel_fit_does_not_depend_on_argument_order)
+{
+  for (int seed = 0; seed < 10; ++seed) {
+    auto u = tools_stats::simulate_uniform(1000, 2, false, { seed });
+    Eigen::MatrixXd data(u.rows(), 4), swapped(u.rows(), 4);
+    data.col(0) = (u.col(0).array() * 12).ceil() / 12;
+    data.col(2) = (u.col(0).array() * 12).floor() / 12;
+    data.col(1) = u.col(1);
+    data.col(3) = u.col(1);
+    swapped << data.col(1), data.col(0), data.col(3), data.col(2);
+
+    auto controls = FitControlsBicop({ BicopFamily::tll });
+    auto pair = Bicop();
+    pair.set_var_types({ "d", "c" });
+    pair.select(data, controls);
+    auto reversed = Bicop();
+    reversed.set_var_types({ "c", "d" });
+    reversed.select(swapped, controls);
+    reversed.flip();
+    EXPECT_TRUE(
+      pair.get_parameters().isApprox(reversed.get_parameters(), 1e-12))
+      << "seed = " << seed;
+  }
+}
+
 TEST(tools_stats, merge_near_ties_leaves_exact_data_alone)
 {
   Eigen::VectorXd x(6);

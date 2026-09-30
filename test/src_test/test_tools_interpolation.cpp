@@ -36,6 +36,43 @@ skewed_grid(int m)
 
 } // namespace
 
+// A flipped grid is the same distribution with its arguments swapped, so every
+// quantity it reports for swapped arguments must be the original's, bit for
+// bit: a vine that fits a pair in one orientation and stores it flipped
+// otherwise evaluates a model its next tree was not fitted on. The skewed grid
+// is not normalized, so the two margins differ and so would any quantity
+// rescaled along one of them only.
+TEST(tools_interpolation, flipping_swaps_the_arguments_exactly)
+{
+  const auto grid = skewed_grid(30);
+  auto flipped = grid;
+  flipped.flip();
+  Eigen::VectorXd g(30);
+  for (int i = 0; i < 30; ++i) {
+    g(i) = static_cast<double>(i) / 29;
+  }
+  auto transposed =
+    InterpolationGrid(g, Eigen::MatrixXd(grid.get_values().transpose()), 0);
+
+  Eigen::MatrixXd u(4, 2), u_swapped(4, 2);
+  u << 0.1, 0.7, 0.45, 0.2, 0.9, 0.95, 0.33, 0.33;
+  u_swapped.col(0) = u.col(1);
+  u_swapped.col(1) = u.col(0);
+  auto original = grid;
+  const Eigen::VectorXd cdf = original.integrate_2d(u);
+  EXPECT_EQ(cdf, flipped.integrate_2d(u_swapped));
+  EXPECT_EQ(cdf, transposed.integrate_2d(u_swapped));
+
+  for (double a1 : { 0.0, 0.1, 0.4 }) {
+    for (double a2 : { 0.0, 0.15, 0.55 }) {
+      const double b1 = a1 + 0.3, b2 = a2 + 0.2;
+      const double p = grid.rect_mass(a1, b1, a2, b2);
+      EXPECT_EQ(p, flipped.rect_mass(a2, b2, a1, b1));
+      EXPECT_EQ(p, transposed.rect_mass(a2, b2, a1, b1));
+    }
+  }
+}
+
 // Summing the rectangle probabilities over a partition of the first argument
 // must leave the second argument's marginal increment, whatever the partition:
 // the per-grid-line rescaling is the same in every term and the masses
