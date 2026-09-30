@@ -10,6 +10,13 @@
   The covering itself now also assigns coordinates of exactly 1 to the last
   cell instead of one past it (#792)
 
+* A discrete `tll` fit no longer depends on how its data rounded. Values
+  equal up to rounding are made exact ties before the ranks' random
+  tie-breaking and before the latent draw, which turned a last-bit
+  difference into another fit from the second tree on; `find_latent_sample`
+  also keeps a continuous argument's ties exact. Continuous fits are
+  unchanged (#798)
+
 ### BUILD SYSTEM AND DEPENDENCIES
 
 * CI builds and tests against Eigen 5.0.1 as well as 3.4.0, with the address
