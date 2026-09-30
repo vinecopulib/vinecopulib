@@ -7,6 +7,7 @@
 #include "gtest/gtest.h"
 #include <boost/math/distributions/negative_binomial.hpp>
 #include <cmath>
+#include <cstring>
 #include <limits>
 #include <vinecopulib.hpp>
 #include <wdm/eigen.hpp>
@@ -662,6 +663,60 @@ TEST(discrete, kernel_fit_does_not_depend_on_argument_order)
     EXPECT_TRUE(
       pair.get_parameters().isApprox(reversed.get_parameters(), 1e-12))
       << "seed = " << seed;
+  }
+}
+
+// Two builds, or two implementations, evaluate a vine's h-functions with
+// different rounding, so the data a pair is fitted to from the second tree on
+// differ in their last bits. A discrete fit must then move by about as little:
+// its ranks, its bandwidth and its latent draw have to be continuous in the
+// data. The continuous argument here is a crowd of values a hair's breadth
+// apart, as the h-functions near a bound are, so that any threshold on their
+// gaps would be straddled; the noise is a function of each value, as rounding
+// is, so equal values stay equal.
+TEST(discrete, kernel_fit_moves_continuously_with_its_data)
+{
+  auto gauss =
+    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.7));
+  auto u = gauss.simulate(2000, true, { 11 });
+  Eigen::MatrixXd data(u.rows(), 4);
+  data.col(0) = (u.col(0).array() * 12).ceil() / 12;
+  data.col(2) = (u.col(0).array() * 12).floor() / 12;
+  for (Eigen::Index i = 0; i < u.rows(); ++i) {
+    // a quarter of the rows crowd below 1, 0.5e-11 to 1.5e-11 apart
+    data(i, 1) = (i % 4 == 0) ? 1.0 - 0.9e-6 -
+                                  static_cast<double>(i) * 1e-11 *
+                                    (1.0 + 0.5 * std::sin(i))
+                              : u(i, 1);
+    data(i, 3) = data(i, 1);
+  }
+  auto controls = FitControlsBicop({ BicopFamily::tll });
+  auto fit = [&](const Eigen::MatrixXd& x) {
+    auto pair = Bicop();
+    pair.set_var_types({ "d", "c" });
+    pair.select(x, controls);
+    return Eigen::MatrixXd(pair.get_parameters());
+  };
+  const Eigen::MatrixXd base = fit(data);
+  for (uint64_t rep = 1; rep <= 3; ++rep) {
+    Eigen::MatrixXd noisy = data;
+    for (Eigen::Index i = 0; i < noisy.rows(); ++i) {
+      for (Eigen::Index j : { 0, 1, 2 }) {
+        // a pseudo-random relative error of up to 1e-13, keyed on the value
+        uint64_t bits;
+        std::memcpy(&bits, &data(i, j), sizeof bits);
+        uint64_t key = (bits ^ rep) + 0x9e3779b97f4a7c15ULL;
+        key = (key ^ (key >> 30)) * 0xbf58476d1ce4e5b9ULL;
+        key = (key ^ (key >> 27)) * 0x94d049bb133111ebULL;
+        key ^= key >> 31;
+        const double xi =
+          static_cast<double>(key >> 11) / 9007199254740992.0 * 2.0 - 1.0;
+        noisy(i, j) = std::min(data(i, j) * (1.0 + 1e-13 * xi), 1.0);
+      }
+      noisy(i, 3) = noisy(i, 1);
+    }
+    EXPECT_LT((fit(noisy) - base).array().abs().maxCoeff(), 1e-6)
+      << "rep = " << rep;
   }
 }
 
