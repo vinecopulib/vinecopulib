@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <algorithm>
 #include <array>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/seed_seq.hpp>
@@ -161,6 +162,40 @@ to_pseudo_obs_1d(Eigen::VectorXd x,
                             ties_method,
                             wdm::utils::convert_vec(weights),
                             seeds);
+}
+
+//! @brief Makes values that are equal up to rounding exactly equal.
+//!
+//! Sorts the values and gives every run of consecutive values, each within
+//! `tol` of its predecessor, the run's smallest value. Values further apart
+//! than that, and `NaN`s, are returned unchanged, so data whose ties are exact
+//! is returned as it came.
+//!
+//! @param x A vector of real numbers.
+//! @param tol Absolute distance up to which two values are merged.
+//! @return `x` with near-ties made exact.
+inline Eigen::VectorXd
+merge_near_ties(const Eigen::VectorXd& x, double tol)
+{
+  std::vector<Eigen::Index> order;
+  order.reserve(static_cast<size_t>(x.size()));
+  for (Eigen::Index i = 0; i < x.size(); ++i) {
+    if (!std::isnan(x(i))) {
+      order.push_back(i);
+    }
+  }
+  std::stable_sort(
+    order.begin(), order.end(), [&x](Eigen::Index a, Eigen::Index b) {
+      return x(a) < x(b);
+    });
+
+  Eigen::VectorXd out = x;
+  for (size_t k = 1; k < order.size(); ++k) {
+    if (x(order[k]) - x(order[k - 1]) <= tol) {
+      out(order[k]) = out(order[k - 1]);
+    }
+  }
+  return out;
 }
 
 // Construct a box covering from a matrix of samples.

@@ -241,9 +241,22 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   // transform evaluation grid and data by inverse Gaussian cdf
   Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
 
+  // The ranks below break ties at random from a seeded stream, in the order of
+  // the tied values. From the second tree on, the data are h-functions, and
+  // values that differ only in their last bits -- one atom's rows evaluated
+  // along different paths, or distinct values crowded near a bound -- would
+  // then order differently between two evaluations of the same model, change
+  // a block of ranks and move the fit far beyond rounding. So values within
+  // `tools_stats::merge_near_ties`' tolerance are made exact ties first.
+  bool discrete = (var_types_[0] == "d") || (var_types_[1] == "d");
+  Eigen::MatrixXd ties(data.rows(), data.cols());
+  for (Eigen::Index j = 0; j < data.cols(); ++j) {
+    ties.col(j) = tools_stats::merge_near_ties(data.col(j));
+  }
+
   // use jittering in case observations are discrete
   auto psobs =
-    tools_stats::to_pseudo_obs(data.leftCols(2), "random", weights, { 5 });
+    tools_stats::to_pseudo_obs(ties.leftCols(2), "random", weights, { 5 });
   Eigen::MatrixXd z_data = tools_stats::qnorm(psobs);
 
   // find bandwidth matrix
@@ -251,7 +264,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   B *= mult;
 
   // find latent sample in case observations are discrete
-  if (var_types_[0] == "d" || var_types_[1] == "d") {
+  if (discrete) {
     psobs =
       tools_stats::find_latent_sample(data, std::pow(B(0, 0) * B(1, 1), 0.25));
     z_data = tools_stats::qnorm(psobs);
@@ -279,10 +292,11 @@ TllBicop::fit(const Eigen::MatrixXd& data,
            .transpose();
   // don't normalize margins of the EDF! (norm_times = 0)
   auto infl_grid = InterpolationGrid(grid_points, infl, 0);
-  if ((var_types_[0] == "d") || (var_types_[1] == "d")) {
+  if (discrete) {
     // for discrete, use mid ranks to compute EDF and log-likelihood
-    // (this is closer to "observations" than jittered or "upper" pseudo data)
-    psobs = 0.5 * (data.leftCols(2) + data.rightCols(2)).array();
+    // (this is closer to "observations" than jittered or "upper" pseudo data);
+    // the atoms are counted with `unique`, so they are read off the merged ties
+    psobs = 0.5 * (ties.leftCols(2) + ties.rightCols(2)).array();
     npars_ = tools_eigen::unique(infl_grid.interpolate(psobs)).sum();
     npars_ = std::max(npars_, 1.0);
   } else {
