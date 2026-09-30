@@ -351,8 +351,10 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   // points and attenuates their dependence. Fixed seeds keep the draw
   // reproducible.
   auto w = simulate_uniform(n, 2, false, { 5 });
-  Eigen::MatrixXd uu = w.array() * v.leftCols(2).array() +
-                       (1 - w.array()) * v.rightCols(2).array();
+  // exactly the value where there is no atom, so that ties stay exact
+  Eigen::MatrixXd uu =
+    v.rightCols(2).array() +
+    w.array() * (v.leftCols(2).array() - v.rightCols(2).array());
 
   auto covering = BoxCovering(uu);
   std::vector<size_t> indices;

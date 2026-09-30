@@ -552,6 +552,43 @@ TEST(discrete, kernel_fit_ignores_rounding_noise_within_an_atom)
   EXPECT_NEAR(fit_noisy.get_npars(), fit_exact.get_npars(), 1e-9);
 }
 
+TEST(discrete, kernel_fit_ignores_rounding_noise_in_tied_continuous_data)
+{
+  // a continuous argument's ties split by a few ulps must fit as exact ties,
+  // in the latent draw as well as in the ranks
+  auto gauss =
+    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.6));
+  auto u = gauss.simulate(3000, true, { 3 });
+
+  Eigen::MatrixXd exact(u.rows(), 4);
+  exact.col(0) = (u.col(0).array() * 31).ceil() / 31;
+  exact.col(2) = (u.col(0).array() * 31).floor() / 31;
+  exact.col(1) = ((u.col(1).array() * 200).floor() + 0.5) / 200;
+  exact.col(3) = exact.col(1);
+
+  Eigen::MatrixXd noisy = exact;
+  const double eps = std::numeric_limits<double>::epsilon();
+  for (Eigen::Index i = 0; i < noisy.rows(); ++i) {
+    const double step = static_cast<double>(static_cast<int>(i % 9) - 4) * eps;
+    noisy(i, 1) = exact(i, 1) * (1.0 + step);
+    noisy(i, 3) = noisy(i, 1);
+  }
+
+  auto controls = FitControlsBicop({ BicopFamily::tll });
+  auto fit_exact = Bicop();
+  fit_exact.set_var_types({ "d", "c" });
+  fit_exact.select(exact, controls);
+  auto fit_noisy = Bicop();
+  fit_noisy.set_var_types({ "d", "c" });
+  fit_noisy.select(noisy, controls);
+
+  const double diff = (fit_noisy.get_parameters() - fit_exact.get_parameters())
+                        .array()
+                        .abs()
+                        .maxCoeff();
+  EXPECT_LT(diff, 1e-10);
+}
+
 TEST(tools_stats, merge_near_ties_leaves_exact_data_alone)
 {
   Eigen::VectorXd x(6);

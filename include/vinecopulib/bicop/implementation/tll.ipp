@@ -242,11 +242,13 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
 
   bool discrete = (var_types_[0] == "d") || (var_types_[1] == "d");
-  // merge values equal up to rounding, so that the random tie-breaking in the
-  // ranks cannot depend on how the data (h-functions from later trees) rounded
-  Eigen::MatrixXd ties(data.rows(), data.cols());
-  for (Eigen::Index j = 0; j < data.cols(); ++j) {
-    ties.col(j) = tools_stats::merge_near_ties(data.col(j));
+  // on a discrete edge, merge values equal up to rounding, since the latent
+  // draw turns any change in the random tie-breaking into another sample
+  Eigen::MatrixXd ties = data;
+  if (discrete) {
+    for (Eigen::Index j = 0; j < data.cols(); ++j) {
+      ties.col(j) = tools_stats::merge_near_ties(data.col(j));
+    }
   }
 
   // use jittering in case observations are discrete
@@ -261,7 +263,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   // find latent sample in case observations are discrete
   if (discrete) {
     psobs =
-      tools_stats::find_latent_sample(data, std::pow(B(0, 0) * B(1, 1), 0.25));
+      tools_stats::find_latent_sample(ties, std::pow(B(0, 0) * B(1, 1), 0.25));
     z_data = tools_stats::qnorm(psobs);
   }
 
