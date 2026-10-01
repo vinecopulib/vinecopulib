@@ -592,10 +592,9 @@ TEST(discrete, kernel_fit_ignores_rounding_noise_in_tied_continuous_data)
 
 // A selected vine fits each pair in the orientation of the search and stores it
 // flipped where the final structure needs the other one, so a flipped discrete
-// pair must evaluate as the one the next tree's data came from, up to rounding.
-// Its distribution function rescales one argument's margin only, so that holds
-// only once the margins are uniform: at strong dependence, a grid normalized
-// for a fixed number of passes stayed ~1e-4 off.
+// pair must evaluate as the one the next tree's data came from. A kernel
+// pair's masses and distribution function treat the two arguments alike, so it
+// does, bit for bit.
 TEST(discrete, a_flipped_kernel_pair_evaluates_as_the_original)
 {
   for (double rho : { 0.6, 0.97 }) {
@@ -622,16 +621,16 @@ TEST(discrete, a_flipped_kernel_pair_evaluates_as_the_original)
 
       Eigen::MatrixXd swapped(data.rows(), 4);
       swapped << data.col(1), data.col(0), data.col(3), data.col(2);
-      auto gap = [](const Eigen::VectorXd& a, const Eigen::VectorXd& b) {
-        return (a - b).array().abs().maxCoeff();
+      auto same = [](const Eigen::VectorXd& a, const Eigen::VectorXd& b) {
+        return (a.array() == b.array()).all();
       };
-      EXPECT_LT(gap(pair.pdf(data), flipped.pdf(swapped)), 1e-11)
+      EXPECT_TRUE(same(pair.pdf(data), flipped.pdf(swapped)))
         << "rho = " << rho;
-      EXPECT_LT(gap(pair.cdf(data), flipped.cdf(swapped)), 1e-13)
+      EXPECT_TRUE(same(pair.cdf(data), flipped.cdf(swapped)))
         << "rho = " << rho;
-      EXPECT_LT(gap(pair.hfunc1(data), flipped.hfunc2(swapped)), 1e-12)
+      EXPECT_TRUE(same(pair.hfunc1(data), flipped.hfunc2(swapped)))
         << "rho = " << rho;
-      EXPECT_LT(gap(pair.hfunc2(data), flipped.hfunc1(swapped)), 1e-12)
+      EXPECT_TRUE(same(pair.hfunc2(data), flipped.hfunc1(swapped)))
         << "rho = " << rho;
     }
   }

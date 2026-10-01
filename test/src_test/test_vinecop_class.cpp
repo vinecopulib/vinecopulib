@@ -36,10 +36,9 @@ TEST_F(VinecopTest, constructors_without_error)
 }
 
 // Selection fits each pair in the search's orientation and flips it into the
-// structure's. A `tll` pair is fitted in its own order, so a vine selected from
-// continuous data and a refit of its structure hold the same pairs, bit for
-// bit: the h-functions a continuous pair passes on read the same grid lines
-// either way.
+// structure's. A `tll` pair is fitted in its own order, and its masses treat
+// the two arguments alike, so a vine selected from data and a refit of its
+// structure hold the same pairs, bit for bit, discrete variables included.
 TEST(VinecopSelect, a_selected_tll_vine_equals_a_refit_of_its_structure)
 {
   const Eigen::MatrixXd z =
@@ -47,14 +46,24 @@ TEST(VinecopSelect, a_selected_tll_vine_equals_a_refit_of_its_structure)
   Eigen::MatrixXd mix = Eigen::MatrixXd::Constant(5, 5, 0.4);
   mix.diagonal().setOnes();
   const Eigen::MatrixXd u = tools_stats::to_pseudo_obs(z * mix);
+  // the first two variables on six and nine levels, as a mixed layout
+  Eigen::MatrixXd mixed(u.rows(), 7);
+  mixed << (u.col(0).array() * 6).ceil() / 6, (u.col(1).array() * 9).ceil() / 9,
+    u.rightCols(3), (u.col(0).array() * 6).floor() / 6,
+    (u.col(1).array() * 9).floor() / 9;
   FitControlsVinecop controls({ BicopFamily::tll });
-  Vinecop selected(u, RVineStructure(), {}, controls);
-  Vinecop refit(u, selected.get_rvine_structure(), {}, controls);
-  for (size_t t = 0; t < selected.get_trunc_lvl(); ++t) {
-    for (size_t e = 0; e < selected.get_dim() - t - 1; ++e) {
-      EXPECT_TRUE(selected.get_pair_copula(t, e).get_parameters() ==
-                  refit.get_pair_copula(t, e).get_parameters())
-        << "tree " << t << ", edge " << e;
+  for (const auto& [data, types] :
+       std::vector<std::pair<Eigen::MatrixXd, std::vector<std::string>>>{
+         { u, { "c", "c", "c", "c", "c" } },
+         { mixed, { "d", "d", "c", "c", "c" } } }) {
+    Vinecop selected(data, RVineStructure(), types, controls);
+    Vinecop refit(data, selected.get_rvine_structure(), types, controls);
+    for (size_t t = 0; t < selected.get_trunc_lvl(); ++t) {
+      for (size_t e = 0; e < selected.get_dim() - t - 1; ++e) {
+        EXPECT_TRUE(selected.get_pair_copula(t, e).get_parameters() ==
+                    refit.get_pair_copula(t, e).get_parameters())
+          << types[0] << ", tree " << t << ", edge " << e;
+      }
     }
   }
 }

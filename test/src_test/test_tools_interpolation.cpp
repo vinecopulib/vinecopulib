@@ -125,12 +125,10 @@ TEST(tools_interpolation, normalization_converges_on_a_disconnected_surface)
   }
 }
 
-// Summing the rectangle probabilities over a partition of the first argument
-// must leave the second argument's marginal increment, whatever the partition:
-// the per-grid-line rescaling is the same in every term and the masses
-// telescope. This is what makes the quantity a probability and not merely a
-// mass, and it holds to the last few bits only because every weight is
-// nonnegative -- a route through cumulative differences loses it.
+// Summing the rectangle masses over a partition of the first argument must
+// leave the mass of the whole strip, whatever the partition. It holds to the
+// last few bits only because every weight is nonnegative -- a route through
+// cumulative differences loses it.
 TEST(tools_interpolation, rect_mass_telescopes_in_the_first_argument)
 {
   auto grid = skewed_grid(30);
@@ -138,16 +136,51 @@ TEST(tools_interpolation, rect_mass_telescopes_in_the_first_argument)
     for (double b2 : { 0.125, 0.5, 0.875, 1.0 }) {
       for (double width : { 1.0 / 8, 1.0 / 512 }) {
         const double a2 = std::max(b2 - width, 0.0);
+        const double whole = grid.rect_mass(0.0, 1.0, a2, b2);
         double total = 0.0;
         for (int i = 0; i < k; ++i) {
           total += grid.rect_mass(
             static_cast<double>(i) / k, static_cast<double>(i + 1) / k, a2, b2);
         }
-        EXPECT_NEAR(total, b2 - a2, 1e-14)
+        EXPECT_NEAR(total, whole, 1e-14 * whole)
           << "k = " << k << ", (a2, b2) = (" << a2 << ", " << b2 << ")";
       }
     }
   }
+}
+
+// A rectangle's mass and the distribution function treat the two arguments
+// alike, so a grid and its transpose give the same values, bit for bit, even
+// on a grid whose margins are not uniform. A flipped pair then evaluates as
+// the original, and a vine selected from data equals a refit of its own
+// structure.
+TEST(tools_interpolation, mass_and_cdf_commute_with_transposition)
+{
+  const int m = 30;
+  auto grid = skewed_grid(m);
+  Eigen::VectorXd g(m);
+  for (int i = 0; i < m; ++i) {
+    g(i) = static_cast<double>(i) / (m - 1);
+  }
+  auto flipped =
+    InterpolationGrid(g, Eigen::MatrixXd(grid.get_values().transpose()), 0);
+  for (double a1 : { 0.0, 0.1, 0.4 }) {
+    for (double a2 : { 0.0, 0.15, 0.55 }) {
+      for (double width : { 0.3, 1.0 / 512 }) {
+        const double b1 = std::min(a1 + width, 1.0);
+        const double b2 = std::min(a2 + 2.0 * width, 1.0);
+        EXPECT_EQ(grid.rect_mass(a1, b1, a2, b2),
+                  flipped.rect_mass(a2, b2, a1, b1))
+          << "(a1, a2) = (" << a1 << ", " << a2 << "), width " << width;
+      }
+    }
+  }
+  Eigen::MatrixXd u(4, 2);
+  u << 0.3, 0.7, 0.05, 0.95, 1.0, 0.4, 0.5, 0.5;
+  const Eigen::MatrixXd swapped = u.rowwise().reverse();
+  EXPECT_TRUE(
+    (grid.integrate_2d(u).array() == flipped.integrate_2d(swapped).array())
+      .all());
 }
 
 // And summing over a partition of the second argument that starts at zero must

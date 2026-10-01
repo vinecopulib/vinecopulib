@@ -13,6 +13,14 @@
   column's index. With shared seeds, columns tied in the same rows were ordered
   alike, which made the tie-breaking a source of dependence (#799)
 
+* A `tll` pair's distribution function, and a discrete `tll` pair's
+  probabilities, are the mass of its interpolated density, no longer rescaled
+  along one argument's grid lines. A grid with uniform margins, as every fit
+  has, moves by rounding only; a grid that is not normalized, such as one
+  built from raw parameters or saved by an earlier version, now evaluates as
+  its own mass, which differs by as much as its margins differ from uniform.
+  Discrete evaluation of a vine costs what it did (#799)
+
 ### NEW FEATURES
 
 * `tools_stats::to_pseudo_obs()` and `to_pseudo_obs_1d()` take a `scale`, below
@@ -41,8 +49,9 @@
 
 * A `tll` pair no longer depends on the order of its arguments, so a vine
   selected from data equals a refit of its own structure. The pair is fitted
-  in its own order and transposed back, so a pair and its flip are the same
-  fit bit for bit. The grid's margins are normalized to convergence rather
+  in its own order and transposed back, and its masses treat the two
+  arguments alike, so a pair and its flip are the same fit and evaluate
+  alike, bit for bit. The grid's margins are normalized to convergence rather
   than for 25 passes, which left strongly dependent grids up to 3e-4 short of
   uniform; Newton's method finishes what the passes start. Converging adds
   0.1 to 0.3 ms to a fit: 6% at 200 observations, within noise from 1000.
