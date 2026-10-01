@@ -44,10 +44,10 @@
   in its own order and transposed back, so a pair and its flip are the same
   fit bit for bit. The grid's margins are normalized to convergence rather
   than for 25 passes, which left strongly dependent grids up to 3e-4 short of
-  uniform; Newton's method finishes what the passes start, so a fit costs
-  what it did. And `tools_stats::pairwise_mcor()` is symmetric in its two
-  variables. Fits of strongly dependent or nearly independent pairs change
-  (#799)
+  uniform; Newton's method finishes what the passes start. Converging adds
+  0.1 to 0.3 ms to a fit: 6% at 200 observations, within noise from 1000.
+  And `tools_stats::pairwise_mcor()` is symmetric in its two variables. Fits
+  of strongly dependent or nearly independent pairs change (#799)
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
