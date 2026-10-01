@@ -308,6 +308,23 @@ TllBicop::fit(const Eigen::MatrixXd& data,
 {
   using namespace tools_interpolation;
 
+  // The pair is fitted in its own order (`tools_stats::swaps_pair()`) and its
+  // grid transposed back, so a pair and its flip are fitted bit for bit alike:
+  // the estimate's arithmetic is not symmetric in its two arguments, and a
+  // vine's later trees amplify a difference in its last bits.
+  if (tools_stats::swaps_pair(data)) {
+    Eigen::MatrixXd swapped = data;
+    swapped.col(0).swap(swapped.col(1));
+    if (swapped.cols() == 4) {
+      swapped.col(2).swap(swapped.col(3));
+    }
+    std::swap(var_types_[0], var_types_[1]);
+    fit(swapped, method, mult, grid_size, weights);
+    std::swap(var_types_[0], var_types_[1]);
+    interp_grid_->flip();
+    return;
+  }
+
   // construct default grid (equally spaced on Gaussian scale)
   auto grid_points = this->make_normal_grid(grid_size);
 

@@ -40,12 +40,14 @@
   drawn differently (#798, #799)
 
 * A `tll` pair no longer depends on the order of its arguments, so a vine
-  selected from data equals a refit of its own structure. The grid's margins
-  are normalized to convergence rather than for 25 passes, which left
-  strongly dependent grids up to 3e-4 short of uniform; Newton's method
-  finishes what the passes start, so a fit costs what it did. And
-  `tools_stats::pairwise_mcor()` is symmetric in its two variables. Fits of
-  strongly dependent or nearly independent pairs change (#799)
+  selected from data equals a refit of its own structure. The pair is fitted
+  in its own order and transposed back, so a pair and its flip are the same
+  fit bit for bit. The grid's margins are normalized to convergence rather
+  than for 25 passes, which left strongly dependent grids up to 3e-4 short of
+  uniform; Newton's method finishes what the passes start, so a fit costs
+  what it did. And `tools_stats::pairwise_mcor()` is symmetric in its two
+  variables. Fits of strongly dependent or nearly independent pairs change
+  (#799)
 
 ### BUILD SYSTEM AND DEPENDENCIES
 

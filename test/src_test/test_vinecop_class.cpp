@@ -35,6 +35,30 @@ TEST_F(VinecopTest, constructors_without_error)
   Vinecop vinecop_parametrized(model_matrix, pair_copulas);
 }
 
+// Selection fits each pair in the search's orientation and flips it into the
+// structure's. A `tll` pair is fitted in its own order, so a vine selected from
+// continuous data and a refit of its structure hold the same pairs, bit for
+// bit: the h-functions a continuous pair passes on read the same grid lines
+// either way.
+TEST(VinecopSelect, a_selected_tll_vine_equals_a_refit_of_its_structure)
+{
+  const Eigen::MatrixXd z =
+    tools_stats::qnorm(tools_stats::simulate_uniform(500, 5, false, { 3 }));
+  Eigen::MatrixXd mix = Eigen::MatrixXd::Constant(5, 5, 0.4);
+  mix.diagonal().setOnes();
+  const Eigen::MatrixXd u = tools_stats::to_pseudo_obs(z * mix);
+  FitControlsVinecop controls({ BicopFamily::tll });
+  Vinecop selected(u, RVineStructure(), {}, controls);
+  Vinecop refit(u, selected.get_rvine_structure(), {}, controls);
+  for (size_t t = 0; t < selected.get_trunc_lvl(); ++t) {
+    for (size_t e = 0; e < selected.get_dim() - t - 1; ++e) {
+      EXPECT_TRUE(selected.get_pair_copula(t, e).get_parameters() ==
+                  refit.get_pair_copula(t, e).get_parameters())
+        << "tree " << t << ", edge " << e;
+    }
+  }
+}
+
 TEST(VinecopConstructor, omitted_pair_copulas_are_independence)
 {
   const size_t d = 4;

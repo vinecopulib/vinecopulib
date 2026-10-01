@@ -637,32 +637,49 @@ TEST(discrete, a_flipped_kernel_pair_evaluates_as_the_original)
   }
 }
 
-// A vine refitted on the structure it selected fits each pair in its final
-// orientation, where selection fitted it in the search's and flipped it. The
-// latent draw is discontinuous in its bandwidth, so the two agree only if the
-// bandwidth does not depend on the order of the arguments.
+// A pair is fitted in its own order and transposed back, so a pair fitted with
+// its arguments swapped and flipped back is the same fit, bit for bit, whatever
+// its variable types: a vine selected from data then equals a refit of its own
+// structure.
 TEST(discrete, kernel_fit_does_not_depend_on_argument_order)
 {
+  auto controls = FitControlsBicop({ BicopFamily::tll });
   for (int seed = 0; seed < 10; ++seed) {
-    auto u = tools_stats::simulate_uniform(1000, 2, false, { seed });
-    Eigen::MatrixXd data(u.rows(), 4), swapped(u.rows(), 4);
-    data.col(0) = (u.col(0).array() * 12).ceil() / 12;
-    data.col(2) = (u.col(0).array() * 12).floor() / 12;
-    data.col(1) = u.col(1);
-    data.col(3) = u.col(1);
-    swapped << data.col(1), data.col(0), data.col(3), data.col(2);
-
-    auto controls = FitControlsBicop({ BicopFamily::tll });
-    auto pair = Bicop();
-    pair.set_var_types({ "d", "c" });
-    pair.select(data, controls);
-    auto reversed = Bicop();
-    reversed.set_var_types({ "c", "d" });
-    reversed.select(swapped, controls);
-    reversed.flip();
-    EXPECT_TRUE(
-      pair.get_parameters().isApprox(reversed.get_parameters(), 1e-12))
-      << "seed = " << seed;
+    const Eigen::MatrixXd u =
+      tools_stats::simulate_uniform(1000, 2, false, { seed });
+    const Eigen::MatrixXd upper = (u.array() * 12).ceil() / 12;
+    const Eigen::MatrixXd lower = (u.array() * 12).floor() / 12;
+    const std::vector<std::pair<std::vector<std::string>, Eigen::MatrixXd>>
+      cases = {
+        { { "c", "c" }, u },
+        { { "d", "c" },
+          (Eigen::MatrixXd(u.rows(), 4) << upper.col(0),
+           u.col(1),
+           lower.col(0),
+           u.col(1))
+            .finished() },
+        { { "d", "d" },
+          (Eigen::MatrixXd(u.rows(), 4) << upper, lower).finished() },
+      };
+    for (const auto& [types, data] : cases) {
+      Eigen::MatrixXd swapped = data;
+      swapped.col(0).swap(swapped.col(1));
+      if (data.cols() == 4) {
+        swapped.col(2).swap(swapped.col(3));
+      }
+      auto pair = Bicop();
+      pair.set_var_types(types);
+      pair.select(data, controls);
+      auto reversed = Bicop();
+      reversed.set_var_types({ types[1], types[0] });
+      reversed.select(swapped, controls);
+      reversed.flip();
+      const std::string label =
+        types[0] + types[1] + ", seed " + std::to_string(seed);
+      EXPECT_TRUE(pair.get_parameters() == reversed.get_parameters()) << label;
+      EXPECT_EQ(pair.get_loglik(), reversed.get_loglik()) << label;
+      EXPECT_EQ(pair.get_npars(), reversed.get_npars()) << label;
+    }
   }
 }
 
