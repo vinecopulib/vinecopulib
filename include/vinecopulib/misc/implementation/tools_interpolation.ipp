@@ -4,8 +4,10 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <algorithm>
 #include <limits>
 #include <stdexcept>
+#include <vector>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
@@ -238,10 +240,11 @@ InterpolationGrid::normalize_margins(int max_iter)
 //! \f$ b + Q a \f$ to first order, where \f$ P = \mathrm{diag}(1 / r) V W
 //! \f$ and \f$ Q = \mathrm{diag}(1 / c) V^\top W \f$ are row stochastic.
 //! Eliminating either unknown leaves an \f$ m \times m \f$ system, singular
-//! only along the scaling of rows against columns that leaves the grid as it
-//! is, which a rank-one term pins. Both eliminations are solved and their
-//! steps averaged, so that a step commutes with transposition exactly, as a
-//! pass does. Each step is halved until it reduces the residual.
+//! along the scalings of rows against columns that leave the grid as it is:
+//! one per block of its support, which a term per block pins. Both
+//! eliminations are solved and their steps averaged, so that a step commutes
+//! with transposition exactly, as a pass does. Each step is halved until it
+//! reduces the residual.
 //!
 //! @param max_steps Maximum number of steps.
 //! @return Whether the margins converged. A step that fails to reduce the
@@ -254,8 +257,6 @@ InterpolationGrid::newton_margins(int max_steps)
   const double rounding = 1e-12;
   const double min_mass = 1e-20;
   const Eigen::VectorXd& w = weights_;
-  const Eigen::MatrixXd pin =
-    Eigen::MatrixXd::Constant(m, m, 1.0 / static_cast<double>(m));
   const Eigen::MatrixXd eye = Eigen::MatrixXd::Identity(m, m);
 
   // both margins as the same product on a column-major matrix, as in a pass
@@ -266,6 +267,11 @@ InterpolationGrid::newton_margins(int max_steps)
                       Eigen::VectorXd& c) {
     r = (v * w).cwiseMax(min_mass);
     c = (v_t * w).cwiseMax(min_mass);
+    if (!r.allFinite() || !c.allFinite()) {
+      // a step that overflowed is no improvement, whatever `maxCoeff` would
+      // make of the NaN it leaves
+      return std::numeric_limits<double>::infinity();
+    }
     return std::max((r.array() - 1.0).abs().maxCoeff(),
                     (c.array() - 1.0).abs().maxCoeff());
   };
@@ -278,6 +284,63 @@ InterpolationGrid::newton_margins(int max_steps)
     const Eigen::MatrixXd s =
       margin.cwiseInverse().asDiagonal() * v * w.asDiagonal();
     return Eigen::MatrixXd((s.array() < 1e-150).select(0.0, s));
+  };
+  // The blocks of the grid's support: row `i` and column `j` are linked when
+  // `p` or `q` holds an entry between them, and a block is what the links
+  // join. A block can scale its rows against its columns without changing the
+  // grid, which leaves each eliminated system singular along that scaling. The
+  // pins fix each one with `1 / |B|` between two rows, or two columns, of a
+  // block `B`: on a connected grid, both are the rank-one `1 / m`.
+  const Eigen::MatrixXd pin =
+    Eigen::MatrixXd::Constant(m, m, 1.0 / static_cast<double>(m));
+  Eigen::MatrixXd pin_rows(m, m), pin_cols(m, m);
+  Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> linked(m, m);
+  std::vector<ptrdiff_t> block(2 * m), rows, cols, todo;
+  // whether the grid is connected; if not, sets `pin_rows` and `pin_cols`
+  auto connected = [&](const Eigen::MatrixXd& p, const Eigen::MatrixXd& q) {
+    linked = (p.array() > 0.0) || (q.transpose().array() > 0.0);
+    // nodes `0, ..., m - 1` are the rows and `m, ..., 2m - 1` the columns
+    std::fill(block.begin(), block.end(), -1);
+    rows.clear();
+    cols.clear();
+    for (ptrdiff_t start = 0; start < 2 * m; ++start) {
+      if (block[start] >= 0) {
+        continue;
+      }
+      const auto label = static_cast<ptrdiff_t>(rows.size());
+      rows.push_back(0);
+      cols.push_back(0);
+      block[start] = label;
+      todo.push_back(start);
+      while (!todo.empty()) {
+        const ptrdiff_t node = todo.back();
+        todo.pop_back();
+        const bool is_row = node < m;
+        ++(is_row ? rows : cols)[label];
+        for (ptrdiff_t k = 0; k < m; ++k) {
+          const ptrdiff_t other = is_row ? m + k : k;
+          if ((block[other] < 0) &&
+              (is_row ? linked(node, k) : linked(k, node - m))) {
+            block[other] = label;
+            todo.push_back(other);
+          }
+        }
+      }
+    }
+    if (rows.size() == 1) {
+      return true;
+    }
+    for (ptrdiff_t j = 0; j < m; ++j) {
+      for (ptrdiff_t i = 0; i < m; ++i) {
+        pin_rows(i, j) = (block[i] == block[j])
+                           ? 1.0 / static_cast<double>(rows[block[i]])
+                           : 0.0;
+        pin_cols(i, j) = (block[m + i] == block[m + j])
+                           ? 1.0 / static_cast<double>(cols[block[m + i]])
+                           : 0.0;
+      }
+    }
+    return false;
   };
 
   Eigen::VectorXd r(m), c(m), r_try(m), c_try(m);
@@ -292,11 +355,16 @@ InterpolationGrid::newton_margins(int max_steps)
     const Eigen::VectorXd lc = c.array().log();
     const Eigen::MatrixXd p = stochastic(r, values_);
     const Eigen::MatrixXd q = stochastic(c, vt);
+    const bool whole = connected(p, q);
     const Eigen::VectorXd b1 =
-      Eigen::MatrixXd(eye - q * p + pin).partialPivLu().solve(q * lr - lc);
+      Eigen::MatrixXd(eye - q * p + (whole ? pin : pin_cols))
+        .partialPivLu()
+        .solve(q * lr - lc);
     const Eigen::VectorXd a1 = -lr - p * b1;
     const Eigen::VectorXd a2 =
-      Eigen::MatrixXd(eye - p * q + pin).partialPivLu().solve(p * lc - lr);
+      Eigen::MatrixXd(eye - p * q + (whole ? pin : pin_rows))
+        .partialPivLu()
+        .solve(p * lc - lr);
     const Eigen::VectorXd b2 = -lc - q * a2;
     const Eigen::VectorXd a = (a1 + a2) / 2.0;
     const Eigen::VectorXd b = (b1 + b2) / 2.0;

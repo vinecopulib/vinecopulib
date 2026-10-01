@@ -5,6 +5,8 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include "gtest/gtest.h"
+#include <string>
+#include <utility>
 #include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_interpolation.hpp>
 
@@ -34,15 +36,10 @@ skewed_grid(int m)
   return InterpolationGrid(g, v, 0);
 }
 
-} // namespace
-
-// The margins are normalized to convergence, not for a fixed number of passes:
-// a concentrated surface, as a strongly dependent fit gives, needs hundreds of
-// passes, and at 200 or 400 more than any bound on them would allow. A grid
-// and its transpose normalize to transposes of each other, bit for bit.
-TEST(tools_interpolation, normalization_converges_on_a_concentrated_surface)
+//! An equally spaced grid on [0, 1] and its trapezoid weights.
+std::pair<Eigen::VectorXd, Eigen::VectorXd>
+grid_and_weights(int m)
 {
-  const int m = 30;
   Eigen::VectorXd g(m);
   for (int i = 0; i < m; ++i) {
     g(i) = static_cast<double>(i) / (m - 1);
@@ -53,23 +50,78 @@ TEST(tools_interpolation, normalization_converges_on_a_concentrated_surface)
   for (int i = 1; i < m - 1; ++i) {
     w(i) = (g(i + 1) - g(i - 1)) / 2;
   }
-  for (double concentration : { 40.0, 200.0, 400.0 }) {
-    Eigen::MatrixXd v(m, m);
-    for (int i = 0; i < m; ++i) {
-      for (int j = 0; j < m; ++j) {
-        v(i, j) =
-          std::exp(-concentration * std::abs(g(i) - g(j))) + 1e-3 * g(i);
-      }
+  return { g, w };
+}
+
+//! `exp(-concentration * |g_i - g_j|)`, tilted so that no margin starts out
+//! uniform: the surface a strongly dependent fit gives.
+Eigen::MatrixXd
+concentrated_surface(const Eigen::VectorXd& g, double concentration)
+{
+  const auto m = g.size();
+  Eigen::MatrixXd v(m, m);
+  for (ptrdiff_t i = 0; i < m; ++i) {
+    for (ptrdiff_t j = 0; j < m; ++j) {
+      v(i, j) = std::exp(-concentration * std::abs(g(i) - g(j))) + 1e-3 * g(i);
     }
-    const Eigen::MatrixXd normalized = InterpolationGrid(g, v).get_values();
-    const double rows = ((normalized * w).array() - 1.0).abs().maxCoeff();
-    const double cols =
-      ((normalized.transpose() * w).array() - 1.0).abs().maxCoeff();
-    EXPECT_LT(std::max(rows, cols), 1e-13) << concentration;
-    const Eigen::MatrixXd flipped =
-      InterpolationGrid(g, Eigen::MatrixXd(v.transpose())).get_values();
-    EXPECT_TRUE((flipped.transpose().array() == normalized.array()).all())
-      << concentration;
+  }
+  return v;
+}
+
+//! Both margins of the normalized `v` are uniform, and `v` and its transpose
+//! normalize to transposes of each other, bit for bit.
+void
+expect_normalized_and_equivariant(const Eigen::VectorXd& g,
+                                  const Eigen::VectorXd& w,
+                                  const Eigen::MatrixXd& v,
+                                  const std::string& label)
+{
+  const Eigen::MatrixXd normalized = InterpolationGrid(g, v).get_values();
+  const double rows = ((normalized * w).array() - 1.0).abs().maxCoeff();
+  const double cols =
+    ((normalized.transpose() * w).array() - 1.0).abs().maxCoeff();
+  EXPECT_LT(std::max(rows, cols), 1e-13) << label;
+  const Eigen::MatrixXd flipped =
+    InterpolationGrid(g, Eigen::MatrixXd(v.transpose())).get_values();
+  EXPECT_TRUE((flipped.transpose().array() == normalized.array()).all())
+    << label;
+}
+
+} // namespace
+
+// The margins are normalized to convergence, not for a fixed number of passes:
+// a concentrated surface, as a strongly dependent fit gives, needs hundreds of
+// passes, and at 200 or 400 more than any bound on them would allow. A grid
+// and its transpose normalize to transposes of each other, bit for bit.
+TEST(tools_interpolation, normalization_converges_on_a_concentrated_surface)
+{
+  const auto [g, w] = grid_and_weights(30);
+  for (double concentration : { 40.0, 200.0, 400.0 }) {
+    expect_normalized_and_equivariant(g,
+                                      w,
+                                      concentrated_surface(g, concentration),
+                                      std::to_string(concentration));
+  }
+}
+
+// A grid whose support falls apart into blocks can scale each block's rows
+// against its columns without changing, so the system each Newton step solves
+// is singular once per block rather than once. Here the blocks are two halves
+// of the diagonal, or a corner on its own.
+TEST(tools_interpolation, normalization_converges_on_a_disconnected_surface)
+{
+  const auto [g, w] = grid_and_weights(30);
+  for (double concentration : { 40.0, 200.0, 400.0 }) {
+    Eigen::MatrixXd halves = concentrated_surface(g, concentration);
+    halves.topRightCorner(15, 15).setZero();
+    halves.bottomLeftCorner(15, 15).setZero();
+    expect_normalized_and_equivariant(
+      g, w, halves, "halves, " + std::to_string(concentration));
+    Eigen::MatrixXd corner = concentrated_surface(g, concentration);
+    corner.row(0).tail(29).setZero();
+    corner.col(0).tail(29).setZero();
+    expect_normalized_and_equivariant(
+      g, w, corner, "corner, " + std::to_string(concentration));
   }
 }
 
