@@ -84,6 +84,7 @@ private:
   // normalizes the grid margins; internal only (callers must refresh the
   // cached integrals afterwards, as the ctor and set_values do)
   void normalize_margins(int max_iter);
+  bool newton_margins(int max_steps);
   void update_weights();
   ptrdiff_t binary_search(double x);
   ptrdiff_t find_cell(double x) const;

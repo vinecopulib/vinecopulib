@@ -157,11 +157,13 @@ InterpolationGrid::update_weights()
 //! normalize to flipped counterparts whether or not the iteration has
 //! converged.
 //!
-//! The passes run to convergence: they stop once the margins' residual, already
-//! at the level of rounding, no longer shrinks. A grid left short of uniform
-//! margins is not a copula density, and its distribution function, which
-//! rescales one argument's margin only, then depends on which argument is
-//! first by as much as the residual.
+//! The normalization runs to convergence: it stops once the margins' residual,
+//! already at the level of rounding, no longer shrinks. A grid left short of
+//! uniform margins is not a copula density, and its distribution function,
+//! which rescales one argument's margin only, then depends on which argument
+//! is first by as much as the residual. Passes converge slowly under strong
+//! dependence, so after the first few dozen `newton_margins()` finishes, in a
+//! handful of steps.
 //!
 //! @param max_iter Maximum number of rescaling passes; `0` leaves the values
 //! untouched.
@@ -182,6 +184,10 @@ InterpolationGrid::normalize_margins(int max_iter)
   const Eigen::VectorXd& w = weights_;
   Eigen::MatrixXd vt(m, m);
 
+  // the passes that converge most grids; past them, a pass gains little
+  const int newton_after = 25;
+  const int newton_steps = 50;
+
   for (int k = 0; k < max_iter; ++k) {
     // the transpose is materialized rather than left as an expression, so
     // that both margins are the same product on a column-major matrix and
@@ -195,6 +201,14 @@ InterpolationGrid::normalize_margins(int max_iter)
       break;
     }
     previous = err;
+    if (k == newton_after) {
+      if (newton_margins(newton_steps)) {
+        break;
+      }
+      // the passes resume from wherever the steps left the grid
+      previous = std::numeric_limits<double>::infinity();
+      continue;
+    }
 
     // Both orders are rank-one rescalings of the same values, so the second
     // margin of each is an integral against reweighted grid weights and no
@@ -214,6 +228,108 @@ InterpolationGrid::normalize_margins(int max_iter)
       }
     }
   }
+}
+
+//! Newton's method for the row and column scalings that make both margins
+//! uniform, on their logarithms
+//!
+//! @details Scaling row \f$ i \f$ by \f$ e^{a_i} \f$ and column \f$ j \f$
+//! by \f$ e^{b_j} \f$ moves the log margins by \f$ a + P b \f$ and
+//! \f$ b + Q a \f$ to first order, where \f$ P = \mathrm{diag}(1 / r) V W
+//! \f$ and \f$ Q = \mathrm{diag}(1 / c) V^\top W \f$ are row stochastic.
+//! Eliminating either unknown leaves an \f$ m \times m \f$ system, singular
+//! only along the scaling of rows against columns that leaves the grid as it
+//! is, which a rank-one term pins. Both eliminations are solved and their
+//! steps averaged, so that a step commutes with transposition exactly, as a
+//! pass does. Each step is halved until it reduces the residual.
+//!
+//! @param max_steps Maximum number of steps.
+//! @return Whether the margins converged. A step that fails to reduce the
+//! residual stops the method, leaving the values of the last one that did.
+inline bool
+InterpolationGrid::newton_margins(int max_steps)
+{
+  const ptrdiff_t m = grid_points_.size();
+  const double exact = 8 * std::numeric_limits<double>::epsilon();
+  const double rounding = 1e-12;
+  const double min_mass = 1e-20;
+  const Eigen::VectorXd& w = weights_;
+  const Eigen::MatrixXd pin =
+    Eigen::MatrixXd::Constant(m, m, 1.0 / static_cast<double>(m));
+  const Eigen::MatrixXd eye = Eigen::MatrixXd::Identity(m, m);
+
+  // both margins as the same product on a column-major matrix, as in a pass
+  Eigen::MatrixXd vt = values_.transpose();
+  auto residual = [&](const Eigen::MatrixXd& v,
+                      const Eigen::MatrixXd& v_t,
+                      Eigen::VectorXd& r,
+                      Eigen::VectorXd& c) {
+    r = (v * w).cwiseMax(min_mass);
+    c = (v_t * w).cwiseMax(min_mass);
+    return std::max((r.array() - 1.0).abs().maxCoeff(),
+                    (c.array() - 1.0).abs().maxCoeff());
+  };
+  // `diag(1 / margin) v W`, row stochastic. Entries too small to move a step
+  // are dropped, so that the products of two never fall below the smallest
+  // normal number, where arithmetic is orders of magnitude slower; the grids
+  // of strongly dependent pairs hold values near it.
+  auto stochastic = [&](const Eigen::VectorXd& margin,
+                        const Eigen::MatrixXd& v) {
+    const Eigen::MatrixXd s =
+      margin.cwiseInverse().asDiagonal() * v * w.asDiagonal();
+    return Eigen::MatrixXd((s.array() < 1e-150).select(0.0, s));
+  };
+
+  Eigen::VectorXd r(m), c(m), r_try(m), c_try(m);
+  double err = residual(values_, vt, r, c);
+  double previous = std::numeric_limits<double>::infinity();
+  Eigen::MatrixXd trial(m, m), trial_t(m, m);
+  for (int step = 0; step < max_steps; ++step) {
+    if ((err <= exact) || ((err < rounding) && (err >= previous))) {
+      return true;
+    }
+    const Eigen::VectorXd lr = r.array().log();
+    const Eigen::VectorXd lc = c.array().log();
+    const Eigen::MatrixXd p = stochastic(r, values_);
+    const Eigen::MatrixXd q = stochastic(c, vt);
+    const Eigen::VectorXd b1 =
+      Eigen::MatrixXd(eye - q * p + pin).partialPivLu().solve(q * lr - lc);
+    const Eigen::VectorXd a1 = -lr - p * b1;
+    const Eigen::VectorXd a2 =
+      Eigen::MatrixXd(eye - p * q + pin).partialPivLu().solve(p * lc - lr);
+    const Eigen::VectorXd b2 = -lc - q * a2;
+    const Eigen::VectorXd a = (a1 + a2) / 2.0;
+    const Eigen::VectorXd b = (b1 + b2) / 2.0;
+
+    bool improved = false;
+    double t = 1.0;
+    for (int halving = 0; halving < 30; ++halving, t /= 2.0) {
+      const Eigen::VectorXd sr = (t * a).array().exp();
+      const Eigen::VectorXd sc = (t * b).array().exp();
+      for (ptrdiff_t j = 0; j < m; ++j) {
+        for (ptrdiff_t i = 0; i < m; ++i) {
+          trial(i, j) = values_(i, j) * (sr(i) * sc(j));
+        }
+      }
+      trial_t = trial.transpose();
+      const double err_try = residual(trial, trial_t, r_try, c_try);
+      if (err_try < err) {
+        values_.swap(trial);
+        vt.swap(trial_t);
+        r.swap(r_try);
+        c.swap(c_try);
+        previous = err;
+        err = err_try;
+        improved = true;
+        break;
+      }
+    }
+    if (!improved) {
+      // at the floor of rounding, no step can reduce the residual further
+      return err < rounding;
+    }
+  }
+  return (err <= exact) || ((err < rounding) && (err >= previous));
 }
 
 inline ptrdiff_t

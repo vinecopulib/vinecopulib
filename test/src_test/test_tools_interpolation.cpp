@@ -37,7 +37,9 @@ skewed_grid(int m)
 } // namespace
 
 // The margins are normalized to convergence, not for a fixed number of passes:
-// a concentrated surface, as a strongly dependent fit gives, needs hundreds.
+// a concentrated surface, as a strongly dependent fit gives, needs hundreds of
+// passes, and at 200 or 400 more than any bound on them would allow. A grid
+// and its transpose normalize to transposes of each other, bit for bit.
 TEST(tools_interpolation, normalization_converges_on_a_concentrated_surface)
 {
   const int m = 30;
@@ -45,23 +47,30 @@ TEST(tools_interpolation, normalization_converges_on_a_concentrated_surface)
   for (int i = 0; i < m; ++i) {
     g(i) = static_cast<double>(i) / (m - 1);
   }
-  Eigen::MatrixXd v(m, m);
-  for (int i = 0; i < m; ++i) {
-    for (int j = 0; j < m; ++j) {
-      v(i, j) = std::exp(-40.0 * std::abs(g(i) - g(j))) + 1e-3 * g(i);
-    }
-  }
-  const Eigen::MatrixXd normalized = InterpolationGrid(g, v).get_values();
   Eigen::VectorXd w(m);
   w(0) = (g(1) - g(0)) / 2;
   w(m - 1) = (g(m - 1) - g(m - 2)) / 2;
   for (int i = 1; i < m - 1; ++i) {
     w(i) = (g(i + 1) - g(i - 1)) / 2;
   }
-  const double rows = ((normalized * w).array() - 1.0).abs().maxCoeff();
-  const double cols =
-    ((normalized.transpose() * w).array() - 1.0).abs().maxCoeff();
-  EXPECT_LT(std::max(rows, cols), 1e-13);
+  for (double concentration : { 40.0, 200.0, 400.0 }) {
+    Eigen::MatrixXd v(m, m);
+    for (int i = 0; i < m; ++i) {
+      for (int j = 0; j < m; ++j) {
+        v(i, j) =
+          std::exp(-concentration * std::abs(g(i) - g(j))) + 1e-3 * g(i);
+      }
+    }
+    const Eigen::MatrixXd normalized = InterpolationGrid(g, v).get_values();
+    const double rows = ((normalized * w).array() - 1.0).abs().maxCoeff();
+    const double cols =
+      ((normalized.transpose() * w).array() - 1.0).abs().maxCoeff();
+    EXPECT_LT(std::max(rows, cols), 1e-13) << concentration;
+    const Eigen::MatrixXd flipped =
+      InterpolationGrid(g, Eigen::MatrixXd(v.transpose())).get_values();
+    EXPECT_TRUE((flipped.transpose().array() == normalized.array()).all())
+      << concentration;
+  }
 }
 
 // Summing the rectangle probabilities over a partition of the first argument
