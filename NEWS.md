@@ -1,5 +1,25 @@
 ## vinecopulib 1.1.0 (unreleased)
 
+### BEHAVIOR CHANGES
+
+* `tools_stats::simulate_uniform()`, and so every seeded simulation, the
+  scrambled quasi-random ones included, draws from wdm's generator: uniforms on
+  a grid of 2^-53 rather than 2^-32, where a sample of a million had about 110
+  repeated values per column. The same seeds give the same draws on every
+  platform, but not the draws they gave before (#799)
+
+* `tools_stats::to_pseudo_obs()` with `ties_method = "random"` and seeds orders
+  each column's ties by seeds of its own, the given ones followed by the
+  column's index. With shared seeds, columns tied in the same rows were ordered
+  alike, which made the tie-breaking a source of dependence (#799)
+
+### NEW FEATURES
+
+* `tools_stats::to_pseudo_obs()` and `to_pseudo_obs_1d()` take a `scale`, below
+  which distinct values are ranked partly as tied, so that the
+  pseudo-observations move continuously with the data; the default, zero, is
+  the ranking by value (#799)
+
 ### BUG FIXES
 
 * `tools_stats::pnorm` clamps its argument before calling Eigen's `erf`, so
@@ -13,20 +33,25 @@
 * A discrete `tll` fit moves continuously with its data: two builds, or two
   implementations, whose h-functions differ in their last bits now fit a
   pair to about that precision instead of drawing another latent sample. The
-  bandwidth's ranks order ties by a fixed key per observation and blend value
-  and key order for values within the square root of the machine epsilon
-  (`tools_stats::soft_pseudo_obs()`), and `find_latent_sample()` picks its
-  neighbors by fixed keys. Continuous fits change only on data with exact
-  ties, whose random order is drawn differently (#798, #799)
+  bandwidth's ranks blend tied and value order for values within the square
+  root of the machine epsilon (`tools_stats::to_pseudo_obs()` with a
+  `scale`), and `find_latent_sample()` picks its neighbors by fixed keys.
+  Continuous fits change only on data with exact ties, whose random order is
+  drawn differently (#798, #799)
 
 * A `tll` pair no longer depends on the order of its arguments, so a vine
   selected from data equals a refit of its own structure. The grid's margins
   are normalized to convergence rather than for 25 passes, which left
-  strongly dependent grids up to 3e-4 short of uniform, and
+  strongly dependent grids up to 3e-4 short of uniform; Newton's method
+  finishes what the passes start, so a fit costs what it did. And
   `tools_stats::pairwise_mcor()` is symmetric in its two variables. Fits of
   strongly dependent or nearly independent pairs change (#799)
 
 ### BUILD SYSTEM AND DEPENDENCIES
+
+* Requires the wdm with soft ranks and a portable random number generator
+  (tnagler/wdm#30). `USE_BOOST` is no longer defined, since wdm no longer
+  reads it (#799)
 
 * CI builds and tests against Eigen 5.0.1 as well as 3.4.0, with the address
   and undefined-behavior sanitizers, so a regression that only one major
