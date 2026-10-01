@@ -42,7 +42,7 @@ inputs:
       The wdm commit or tag to install. Keep in sync with the FetchContent
       GIT_TAG in cmake/findDependencies.cmake.
     required: false
-    default: 'v0.3.0'
+    default: '60c74332b953429b10b595dc10f8d565591a5860'
   lcov:
     description: 'Whether to install lcov'
     required: false
