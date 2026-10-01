@@ -747,8 +747,8 @@ TEST(tools_stats, soft_pseudo_obs_move_continuously)
   Eigen::MatrixXd x(n, 1), y(n, 1);
   for (Eigen::Index i = 0; i < n; ++i) {
     const double v = static_cast<double>(i % 50) / 50.0;
-    x(i, 0) = v + ((i % 7) - 3) * 1e-13;
-    y(i, 0) = v + ((i % 5) - 2) * 1e-13;
+    x(i, 0) = v + static_cast<double>((i % 7) - 3) * 1e-13;
+    y(i, 0) = v + static_cast<double>((i % 5) - 2) * 1e-13;
   }
   const Eigen::VectorXd a = tools_stats::soft_pseudo_obs(x).col(0);
   const Eigen::VectorXd b = tools_stats::soft_pseudo_obs(y).col(0);
