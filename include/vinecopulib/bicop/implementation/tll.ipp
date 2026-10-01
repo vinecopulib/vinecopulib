@@ -254,8 +254,7 @@ TllBicop::multiplicity(const Eigen::MatrixXd& x, double scale)
   std::vector<Eigen::Index> point;
   std::vector<double> copies;
   std::vector<size_t> distinct(static_cast<size_t>(n));
-  for (size_t k = 0; k < order.size(); ++k) {
-    const Eigen::Index i = order[k];
+  for (const Eigen::Index i : order) {
     if (point.empty() || (x(i, 0) != x(point.back(), 0)) ||
         (x(i, 1) != x(point.back(), 1))) {
       point.push_back(i);
