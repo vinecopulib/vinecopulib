@@ -720,29 +720,26 @@ TEST(discrete, kernel_fit_moves_continuously_with_its_data)
   }
 }
 
-TEST(tools_stats, soft_pseudo_obs_are_the_ranks_of_separated_values)
+// The soft ranks themselves are wdm's and tested there; these check that
+// `to_pseudo_obs()` hands them the scale and seeds it should.
+TEST(tools_stats, pseudo_obs_with_a_scale_are_the_ranks_of_separated_values)
 {
-  // without near-ties, the ordinary ranks; ties ordered by the keys, which is
-  // a permutation of the group's ranks
   Eigen::MatrixXd x(8, 1);
   x << 0.3, 0.1, 0.7, 0.3, 0.5, 0.3, 0.9, 0.2;
-  const Eigen::VectorXd r = tools_stats::soft_pseudo_obs(x).col(0) * 9.0;
-  const std::vector<double> expected{ 2, 1, 7, 3, 6, 8, 5, 4 };
-  EXPECT_DOUBLE_EQ(r(1), 1.0);
-  EXPECT_DOUBLE_EQ(r(7), 2.0);
-  EXPECT_DOUBLE_EQ(r(4), 6.0);
-  EXPECT_DOUBLE_EQ(r(2), 7.0);
-  EXPECT_DOUBLE_EQ(r(6), 8.0);
-  std::vector<double> tied{ r(0), r(3), r(5) };
-  std::sort(tied.begin(), tied.end());
-  EXPECT_EQ(tied, (std::vector<double>{ 3, 4, 5 }));
+  for (const std::string ties : { "average", "random" }) {
+    EXPECT_EQ(
+      tools_stats::to_pseudo_obs(x, ties, Eigen::VectorXd(), { 5 }),
+      tools_stats::to_pseudo_obs(
+        x, ties, Eigen::VectorXd(), { 5 }, tools_stats::default_soft_scale()))
+      << ties;
+  }
 }
 
-TEST(tools_stats, soft_pseudo_obs_move_continuously)
+TEST(tools_stats, pseudo_obs_with_a_scale_move_continuously)
 {
   // a crowd of distinct values within rounding of each other: shifting it by
   // far less than the scale moves the ranks by a negligible amount, where
-  // random ties would reorder the whole crowd
+  // ranking by value would reorder the whole crowd
   const Eigen::Index n = 400;
   Eigen::MatrixXd x(n, 1), y(n, 1);
   for (Eigen::Index i = 0; i < n; ++i) {
@@ -750,20 +747,25 @@ TEST(tools_stats, soft_pseudo_obs_move_continuously)
     x(i, 0) = v + static_cast<double>((i % 7) - 3) * 1e-13;
     y(i, 0) = v + static_cast<double>((i % 5) - 2) * 1e-13;
   }
-  const Eigen::VectorXd a = tools_stats::soft_pseudo_obs(x).col(0);
-  const Eigen::VectorXd b = tools_stats::soft_pseudo_obs(y).col(0);
+  const double s = tools_stats::default_soft_scale();
+  const Eigen::VectorXd a =
+    tools_stats::to_pseudo_obs(x, "random", Eigen::VectorXd(), { 5 }, s);
+  const Eigen::VectorXd b =
+    tools_stats::to_pseudo_obs(y, "random", Eigen::VectorXd(), { 5 }, s);
   EXPECT_LT((a - b).array().abs().maxCoeff(), 1e-6);
 }
 
-TEST(tools_stats, soft_multiplicity_counts_repeated_points_once)
+TEST(tools_stats, seeded_random_ties_differ_between_columns)
 {
-  Eigen::MatrixXd x(5, 2);
-  x << 0.1, 0.2, 0.1, 0.2, 0.1, 0.2 + 1e-15, 0.5, 0.5, 0.9, 0.1;
-  const Eigen::VectorXd m = tools_stats::soft_multiplicity(x);
-  EXPECT_NEAR(m(0), 3.0, 1e-12);
-  EXPECT_NEAR(m(2), 3.0, 1e-12);
-  EXPECT_DOUBLE_EQ(m(3), 1.0);
-  EXPECT_DOUBLE_EQ(m(4), 1.0);
+  // two columns tied in the same rows are not ordered alike: that would make
+  // the tie-breaking itself a source of dependence
+  Eigen::MatrixXd x(200, 2);
+  for (Eigen::Index i = 0; i < x.rows(); ++i) {
+    x(i, 0) = x(i, 1) = static_cast<double>(i % 4);
+  }
+  const Eigen::MatrixXd u =
+    tools_stats::to_pseudo_obs(x, "random", Eigen::VectorXd(), { 1 });
+  EXPECT_FALSE(u.col(0).isApprox(u.col(1)));
 }
 
 TEST(discrete, with_var_types_round_trips_the_variable_types)

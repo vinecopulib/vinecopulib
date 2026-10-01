@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <numeric>
 #include <vinecopulib/bicop/family.hpp>
 #include <vinecopulib/misc/tools_interpolation.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
@@ -222,6 +223,82 @@ TllBicop::calculate_infl(const size_t& n,
   return kernel0 * det_irB * m_inv_00 * weight / static_cast<double>(n);
 }
 
+//! The number of points close to each point, counted continuously:
+//! \f$ m_i = \sum_j e^{-\|x_i - x_j\|^2 / (2 s^2)} \f$. An exactly repeated
+//! point counts its copies, a point far from all others counts one, and points
+//! moving by \f$ \delta \ll s \f$ change the counts by \f$ O(\delta / s) \f$,
+//! so that summing \f$ f_i / m_i \f$ over the points sums \f$ f \f$ over the
+//! distinct points, continuously in the data.
+//!
+//! @param x Points, one per row.
+//! @param scale The distance \f$ s \f$.
+//! @return The counts, each at least one.
+inline Eigen::VectorXd
+TllBicop::multiplicity(const Eigen::MatrixXd& x, double scale)
+{
+  const Eigen::Index n = x.rows();
+  std::vector<Eigen::Index> order(static_cast<size_t>(n));
+  std::iota(order.begin(), order.end(), 0);
+  std::sort(order.begin(), order.end(), [&](Eigen::Index a, Eigen::Index b) {
+    if (x(a, 0) != x(b, 0)) {
+      return x(a, 0) < x(b, 0);
+    }
+    if (x(a, 1) != x(b, 1)) {
+      return x(a, 1) < x(b, 1);
+    }
+    return a < b;
+  });
+  // the distinct points in that order, and how often each occurs: repeated
+  // points are counted as one block, so that discrete data, where repeats are
+  // the rule, cost no more than distinct points do
+  std::vector<Eigen::Index> point;
+  std::vector<double> copies;
+  std::vector<size_t> distinct(static_cast<size_t>(n));
+  for (size_t k = 0; k < order.size(); ++k) {
+    const Eigen::Index i = order[k];
+    if (point.empty() || (x(i, 0) != x(point.back(), 0)) ||
+        (x(i, 1) != x(point.back(), 1))) {
+      point.push_back(i);
+      copies.push_back(0.0);
+    }
+    copies.back() += 1.0;
+    distinct[static_cast<size_t>(i)] = point.size() - 1;
+  }
+  // where the run of distinct points sharing a first coordinate ends
+  std::vector<size_t> run_end(point.size());
+  for (size_t a = point.size(); a-- > 0;) {
+    run_end[a] =
+      ((a + 1 < point.size()) && (x(point[a + 1], 0) == x(point[a], 0)))
+        ? run_end[a + 1]
+        : a + 1;
+  }
+  const double reach = 9.0 * scale;
+  std::vector<double> count(copies);
+  for (size_t a = 0; a < point.size(); ++a) {
+    const Eigen::Index i = point[a];
+    for (size_t b = a + 1; b < point.size(); ++b) {
+      const Eigen::Index j = point[b];
+      if (x(j, 0) - x(i, 0) > reach) {
+        break;
+      }
+      if (x(j, 1) - x(i, 1) > reach) {
+        // the rest of this run is further still, in its second coordinate
+        b = run_end[b] - 1;
+        continue;
+      }
+      const double d2 = (x.row(i) - x.row(j)).squaredNorm() / (scale * scale);
+      const double kernel = std::exp(-0.5 * d2);
+      count[a] += copies[b] * kernel;
+      count[b] += copies[a] * kernel;
+    }
+  }
+  Eigen::VectorXd out(n);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    out(i) = count[distinct[static_cast<size_t>(i)]];
+  }
+  return out;
+}
+
 inline void
 TllBicop::fit(const Eigen::MatrixXd& data,
               std::string method,
@@ -288,9 +365,10 @@ TllBicop::fit(const Eigen::MatrixXd& data,
     // (this is closer to "observations" than jittered or "upper" pseudo data);
     // an observation counts once however often it is repeated
     psobs = 0.5 * (data.leftCols(2) + data.rightCols(2)).array();
-    npars_ = infl_grid.interpolate(psobs)
-               .cwiseQuotient(tools_stats::soft_multiplicity(psobs))
-               .sum();
+    npars_ =
+      infl_grid.interpolate(psobs)
+        .cwiseQuotient(multiplicity(psobs, tools_stats::default_soft_scale()))
+        .sum();
     npars_ = std::max(npars_, 1.0);
   } else {
     npars_ = std::max(infl_grid.interpolate(data).sum(), 1.0);

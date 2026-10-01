@@ -140,13 +140,15 @@ Eigen::VectorXd
 to_pseudo_obs_1d(Eigen::VectorXd x,
                  const std::string& ties_method = "average",
                  const Eigen::VectorXd& weights = Eigen::VectorXd(),
-                 std::vector<int> seeds = std::vector<int>());
+                 std::vector<int> seeds = std::vector<int>(),
+                 double scale = 0.0);
 
 Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x,
               const std::string& ties_method = "average",
               const Eigen::VectorXd& weights = Eigen::VectorXd(),
-              std::vector<int> seeds = std::vector<int>());
+              std::vector<int> seeds = std::vector<int>(),
+              double scale = 0.0);
 
 //! @brief Covers the unit hypercube with boxes and assigns each sample to a
 //! box.
@@ -185,21 +187,10 @@ bool
 swaps_pair(const Eigen::MatrixXd& u);
 
 Eigen::MatrixXd
-soft_pseudo_obs(const Eigen::MatrixXd& x,
-                const Eigen::VectorXd& weights = Eigen::VectorXd(),
-                const std::vector<int>& seeds = { 5 },
-                double scale = default_soft_scale(),
-                const std::string& ties_method = "random");
-
-Eigen::MatrixXd
 pair_soft_pseudo_obs(const Eigen::MatrixXd& data,
                      const Eigen::VectorXd& weights = Eigen::VectorXd(),
                      double scale = default_soft_scale(),
                      const std::vector<int>& seeds = { 5 });
-
-Eigen::VectorXd
-soft_multiplicity(const Eigen::MatrixXd& x,
-                  double scale = default_soft_scale());
 
 double
 pairwise_mcor(const Eigen::MatrixXd& x,
