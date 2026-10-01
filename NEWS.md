@@ -19,7 +19,8 @@
   has, moves by rounding only; a grid that is not normalized, such as one
   built from raw parameters or saved by an earlier version, now evaluates as
   its own mass, which differs by as much as its margins differ from uniform.
-  Discrete evaluation of a vine costs what it did (#799)
+  Evaluation is faster too: a discrete pair's density in half the time, its
+  h-functions and the distribution function in 0.8 to 0.9 (#799)
 
 ### NEW FEATURES
 

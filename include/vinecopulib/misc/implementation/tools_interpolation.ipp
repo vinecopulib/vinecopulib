@@ -64,21 +64,29 @@ InterpolationGrid::update_cell_lookup()
 inline void
 InterpolationGrid::update_cached_integrals()
 {
+  // A grid's transpose, and its lines' integrals both ways, all built by the
+  // same code from `values_` and from its transpose, so a transposed grid
+  // holds the same arrays with the roles swapped, bit for bit.
+  values_t_ = values_.transpose();
+  cumulative_lines(values_, row_cum_int_);
+  cumulative_lines(values_t_, col_cum_int_);
+}
+
+//! @brief Cumulative integrals of every row of `v` along its columns,
+//! `cum(k, j) = int_0^{grid_j} v(k, .)`.
+inline void
+InterpolationGrid::cumulative_lines(const Eigen::MatrixXd& v,
+                                    Eigen::MatrixXd& cum) const
+{
   const ptrdiff_t m = grid_points_.size();
-  row_cum_int_.resize(m, m);
-  col_cum_int_.resize(m, m);
-  // the same arithmetic along rows and along columns, so a grid's row
-  // integrals are its transpose's column integrals, bit for bit
+  cum.resize(m, m);
   for (ptrdiff_t k = 0; k < m; ++k) {
-    double row = 0.0, col = 0.0;
-    row_cum_int_(k, 0) = 0.0;
-    col_cum_int_(k, 0) = 0.0;
+    double total = 0.0;
+    cum(k, 0) = 0.0;
     for (ptrdiff_t j = 0; j < m - 1; ++j) {
-      const double dg = grid_points_(j + 1) - grid_points_(j);
-      row += (values_(k, j + 1) + values_(k, j)) * dg / 2.0;
-      col += (values_(j + 1, k) + values_(j, k)) * dg / 2.0;
-      row_cum_int_(k, j + 1) = row;
-      col_cum_int_(k, j + 1) = col;
+      total +=
+        (v(k, j + 1) + v(k, j)) * (grid_points_(j + 1) - grid_points_(j)) / 2.0;
+      cum(k, j + 1) = total;
     }
   }
 }
@@ -467,11 +475,10 @@ inline double
 InterpolationGrid::cond_knot(const CondLine& line, ptrdiff_t j) const
 {
   const ptrdiff_t i = line.cell;
-  const double v =
-    (line.cond_var == 1)
-      ? (values_(i, j) * line.x2x + values_(i + 1, j) * line.xx1) / line.x2x1
-      : (values_(j, i) * line.x2x + values_(j, i + 1) * line.xx1) / line.x2x1;
-  return std::max(v, 0.0);
+  // the rows of the transpose are the columns, read by the same expression
+  const Eigen::MatrixXd& v = (line.cond_var == 1) ? values_ : values_t_;
+  const double knot = (v(i, j) * line.x2x + v(i + 1, j) * line.xx1) / line.x2x1;
+  return std::max(knot, 0.0);
 }
 
 //! the weights of the nodes at `g0` and `g1` integrating the linear basis over
@@ -593,21 +600,22 @@ InterpolationGrid::integrate_2d(const tools_eigen::ConstMatRef& u)
   auto f = [this](double u1, double u2) {
     const double a = std::min(std::max(u1, 0.0), 1.0);
     const double b = std::min(std::max(u2, 0.0), 1.0);
-    Eigen::VectorXd wx, wy;
-    interval_weights(0.0, a, wx);
-    interval_weights(0.0, b, wy);
-    // the rows' integrals up to `b` against the weights up to `a`, and the
-    // columns' up to `a` against the weights up to `b`, averaged: the same
-    // mass both ways round, so a grid and its transpose agree bit for bit
-    double rows = 0.0;
-    for (ptrdiff_t i = 0; i < wx.size(); ++i) {
-      rows += wx(i) * line_integral(i, true, b);
-    }
-    double cols = 0.0;
-    for (ptrdiff_t j = 0; j < wy.size(); ++j) {
-      cols += wy(j) * line_integral(j, false, a);
-    }
-    return std::min(std::max(0.5 * (rows + cols), 1e-10), 1 - 1e-10);
+    const ptrdiff_t ia = find_cell(a);
+    const ptrdiff_t jb = find_cell(b);
+    // Rows to `b` swept across to `a`, or columns to `a` across to `b`: the
+    // same mass either way round. Which one is a rule that swaps with the
+    // arguments, so a grid and its transpose run the same code on the same
+    // arrays and agree bit for bit; on the diagonal, both, averaged.
+    const auto rows = [&] {
+      return sweep(values_, row_cum_int_, a, ia, b, jb);
+    };
+    const auto cols = [&] {
+      return sweep(values_t_, col_cum_int_, b, jb, a, ia);
+    };
+    const double c = (a < b)   ? rows()
+                     : (b < a) ? cols()
+                               : 0.5 * (rows() + cols());
+    return std::min(std::max(c, 1e-10), 1 - 1e-10);
   };
 
   return tools_eigen::binaryExpr_or_nan(u, f);
@@ -648,21 +656,50 @@ InterpolationGrid::interval_weights(double lo,
   return ka;
 }
 
-//! @brief Integral over `[0, upr]` of row `k`, or of column `k`.
+//! @brief Mass over `[0, a] x [0, b]` of the rows of `v`: each row's
+//! integral up to `b`, integrated across the rows up to `a`.
 //!
-//! @param k The row or column.
-//! @param along_row Whether to integrate row `k` rather than column `k`.
+//! @param v The grid, or its transpose.
+//! @param cum The cumulative integrals of its rows, from `cumulative_lines()`.
+//! @param a,ia Limit across the rows, and its cell from `find_cell()`.
+//! @param b,jb Limit along the rows, and its cell from `find_cell()`.
+inline double
+InterpolationGrid::sweep(const Eigen::MatrixXd& v,
+                         const Eigen::MatrixXd& cum,
+                         double a,
+                         ptrdiff_t ia,
+                         double b,
+                         ptrdiff_t jb) const
+{
+  double total = 0.0;
+  double l_k = line_integral(v, cum, 0, jb, b);
+  for (ptrdiff_t k = 0; k < ia; ++k) {
+    const double l_k1 = line_integral(v, cum, k + 1, jb, b);
+    total += (l_k1 + l_k) * (grid_points_(k + 1) - grid_points_(k)) / 2.0;
+    l_k = l_k1;
+  }
+  const auto [w0, w1] =
+    cell_weights(grid_points_(ia), grid_points_(ia + 1), 0.0, a);
+  return total + w0 * l_k + w1 * line_integral(v, cum, ia + 1, jb, b);
+}
+
+//! @brief Integral over `[0, upr]` of row `k` of `v`.
+//!
+//! @param v The grid, or its transpose.
+//! @param cum The cumulative integrals of its rows.
+//! @param k The row.
+//! @param j The cell holding `upr`, from `find_cell()`.
 //! @param upr Upper limit, in `[0, 1]`.
 inline double
-InterpolationGrid::line_integral(ptrdiff_t k, bool along_row, double upr) const
+InterpolationGrid::line_integral(const Eigen::MatrixXd& v,
+                                 const Eigen::MatrixXd& cum,
+                                 ptrdiff_t k,
+                                 ptrdiff_t j,
+                                 double upr) const
 {
-  const ptrdiff_t j = find_cell(upr);
   const double dg = grid_points_(j + 1) - grid_points_(j);
   const double s = upr - grid_points_(j);
-  const double v0 = along_row ? values_(k, j) : values_(j, k);
-  const double v1 = along_row ? values_(k, j + 1) : values_(j + 1, k);
-  const double cum = along_row ? row_cum_int_(k, j) : col_cum_int_(k, j);
-  return cum + (2 * v0 + (v1 - v0) * s / dg) * s / 2.0;
+  return cum(k, j) + (2 * v(k, j) + (v(k, j + 1) - v(k, j)) * s / dg) * s / 2.0;
 }
 
 //! @brief Probability of the rectangle `(a1, b1] x (a2, b2]`.
@@ -685,28 +722,42 @@ InterpolationGrid::rect_mass(double a1, double b1, double a2, double b2) const
     return 0.0;
   }
   // per-thread buffers: this runs once per observation of a discrete edge
-  thread_local Eigen::VectorXd wx, wy, cols_of;
+  thread_local Eigen::VectorXd wx, wy;
   const ptrdiff_t i0 = interval_weights(x0, x1, wx);
   const ptrdiff_t j0 = interval_weights(y0, y1, wy);
-  // `wx' V wy` over the covered nodes, a sum of nonnegative terms, so nothing
-  // cancels however narrow the rectangle; summed rows first and columns first
-  // in one pass and averaged, so a grid and its transpose give the same value
-  cols_of.setZero(wy.size());
-  double rows = 0.0;
-  for (ptrdiff_t i = 0; i < wx.size(); ++i) {
+  // `wx' V wy` over the covered nodes, rows first or columns first: a sum of
+  // nonnegative terms either way, so nothing cancels however narrow the
+  // rectangle. Which one is a rule that swaps with the arguments, so a grid
+  // and its transpose run the same code on the same arrays and agree bit for
+  // bit; for a rectangle on the diagonal, both, averaged.
+  const auto rows = [&] { return block_mass(values_, i0, wx, j0, wy); };
+  const auto cols = [&] { return block_mass(values_t_, j0, wy, i0, wx); };
+  if ((x0 < y0) || ((x0 == y0) && (x1 < y1))) {
+    return rows();
+  }
+  if ((y0 < x0) || ((y0 == x0) && (y1 < x1))) {
+    return cols();
+  }
+  return 0.5 * (rows() + cols());
+}
+
+//! @brief `wa' v[i0:, j0:] wb`, each row's sum first.
+inline double
+InterpolationGrid::block_mass(const Eigen::MatrixXd& v,
+                              ptrdiff_t i0,
+                              const Eigen::VectorXd& wa,
+                              ptrdiff_t j0,
+                              const Eigen::VectorXd& wb)
+{
+  double total = 0.0;
+  for (ptrdiff_t i = 0; i < wa.size(); ++i) {
     double line = 0.0;
-    for (ptrdiff_t j = 0; j < wy.size(); ++j) {
-      const double v = values_(i0 + i, j0 + j);
-      line += v * wy(j);
-      cols_of(j) += v * wx(i);
+    for (ptrdiff_t j = 0; j < wb.size(); ++j) {
+      line += v(i0 + i, j0 + j) * wb(j);
     }
-    rows += wx(i) * line;
+    total += wa(i) * line;
   }
-  double cols = 0.0;
-  for (ptrdiff_t j = 0; j < wy.size(); ++j) {
-    cols += wy(j) * cols_of(j);
-  }
-  return 0.5 * (rows + cols);
+  return total;
 }
 
 //! @brief Probability that the free coordinate falls in `(lo, hi]`, given the
