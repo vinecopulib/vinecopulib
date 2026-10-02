@@ -523,10 +523,7 @@ TEST(test_tools_stats, golden_pseudo_obs)
   }
 }
 
-// The maximal correlation is symmetric by definition. ACE updates one variable
-// first, and near independence the two orders stopped at correlations up to
-// several percent apart, which moved a kernel pair's bandwidth with the order
-// its arguments were passed in.
+// the maximal correlation is symmetric in its two variables
 TEST(tools_stats, pairwise_mcor_is_symmetric)
 {
   for (int seed = 0; seed < 20; ++seed) {

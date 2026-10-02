@@ -20,8 +20,7 @@ namespace tools_interpolation {
 //! @param values A dxd matrix of copula density values evaluated at
 //! (grid_points_i, grid_points_j).
 //! @param norm_maxiter Maximum number of margin-rescaling passes; `0` leaves
-//! the values untouched. The passes stop at convergence, well before the
-//! default bound unless the dependence is extreme.
+//! the values untouched.
 inline InterpolationGrid::InterpolationGrid(const Eigen::VectorXd& grid_points,
                                             const Eigen::MatrixXd& values,
                                             int norm_maxiter)
@@ -64,9 +63,7 @@ InterpolationGrid::update_cell_lookup()
 inline void
 InterpolationGrid::update_cached_integrals()
 {
-  // A grid's transpose, and its lines' integrals both ways, all built by the
-  // same code from `values_` and from its transpose, so a transposed grid
-  // holds the same arrays with the roles swapped, bit for bit.
+  // same code both ways, so a transposed grid swaps the arrays bit for bit
   values_t_ = values_.transpose();
   cumulative_lines(values_, row_cum_int_);
   cumulative_lines(values_t_, col_cum_int_);
@@ -173,13 +170,7 @@ InterpolationGrid::update_weights()
 //! normalize to flipped counterparts whether or not the iteration has
 //! converged.
 //!
-//! The normalization runs to convergence: it stops once the margins' residual,
-//! already at the level of rounding, no longer shrinks. A grid left short of
-//! uniform margins is not a copula density, and its distribution function,
-//! which rescales one argument's margin only, then depends on which argument
-//! is first by as much as the residual. Passes converge slowly under strong
-//! dependence, so after the first few dozen `newton_margins()` finishes, in a
-//! handful of steps.
+//! Runs to convergence; `newton_margins()` finishes what the passes start.
 //!
 //! @param max_iter Maximum number of rescaling passes; `0` leaves the values
 //! untouched.
@@ -191,8 +182,7 @@ InterpolationGrid::normalize_margins(int max_iter)
     return;
   }
 
-  // at machine precision there is nothing left to do; below `rounding`, a
-  // residual that stops shrinking has reached the floor its sums round to
+  // converged at `exact`, or below `rounding` once the residual stalls
   const double exact = 8 * std::numeric_limits<double>::epsilon();
   const double rounding = 1e-12;
   const double min_mass = 1e-20; // prevent 0/0
@@ -200,7 +190,6 @@ InterpolationGrid::normalize_margins(int max_iter)
   const Eigen::VectorXd& w = weights_;
   Eigen::MatrixXd vt(m, m);
 
-  // the passes that converge most grids; past them, a pass gains little
   const int newton_after = 25;
   const int newton_steps = 50;
 
@@ -251,18 +240,12 @@ InterpolationGrid::normalize_margins(int max_iter)
 //!
 //! @details Scaling row \f$ i \f$ by \f$ e^{a_i} \f$ and column \f$ j \f$
 //! by \f$ e^{b_j} \f$ moves the log margins by \f$ a + P b \f$ and
-//! \f$ b + Q a \f$ to first order, where \f$ P = \mathrm{diag}(1 / r) V W
-//! \f$ and \f$ Q = \mathrm{diag}(1 / c) V^\top W \f$ are row stochastic.
-//! Eliminating either unknown leaves an \f$ m \times m \f$ system, singular
-//! along the scalings of rows against columns that leave the grid as it is:
-//! one per block of its support, which a term per block pins. Both
-//! eliminations are solved and their steps averaged, so that a step commutes
-//! with transposition exactly, as a pass does. Each step is halved until it
-//! reduces the residual.
+//! \f$ b + Q a \f$, with \f$ P = \mathrm{diag}(1 / r) V W \f$ and
+//! \f$ Q = \mathrm{diag}(1 / c) V^\top W \f$. Both eliminations are solved,
+//! each pinned once per block of the support, and averaged.
 //!
 //! @param max_steps Maximum number of steps.
-//! @return Whether the margins converged. A step that fails to reduce the
-//! residual stops the method, leaving the values of the last one that did.
+//! @return Whether the margins converged.
 inline bool
 InterpolationGrid::newton_margins(int max_steps)
 {
@@ -282,29 +265,20 @@ InterpolationGrid::newton_margins(int max_steps)
     r = (v * w).cwiseMax(min_mass);
     c = (v_t * w).cwiseMax(min_mass);
     if (!r.allFinite() || !c.allFinite()) {
-      // a step that overflowed is no improvement, whatever `maxCoeff` would
-      // make of the NaN it leaves
+      // an overflowed step is no improvement
       return std::numeric_limits<double>::infinity();
     }
     return std::max((r.array() - 1.0).abs().maxCoeff(),
                     (c.array() - 1.0).abs().maxCoeff());
   };
-  // `diag(1 / margin) v W`, row stochastic. Entries too small to move a step
-  // are dropped, so that the products of two never fall below the smallest
-  // normal number, where arithmetic is orders of magnitude slower; the grids
-  // of strongly dependent pairs hold values near it.
+  // `diag(1 / margin) v W`, without entries whose products would be subnormal
   auto stochastic = [&](const Eigen::VectorXd& margin,
                         const Eigen::MatrixXd& v) {
     const Eigen::MatrixXd s =
       margin.cwiseInverse().asDiagonal() * v * w.asDiagonal();
     return Eigen::MatrixXd((s.array() < 1e-150).select(0.0, s));
   };
-  // The blocks of the grid's support: row `i` and column `j` are linked when
-  // `p` or `q` holds an entry between them, and a block is what the links
-  // join. A block can scale its rows against its columns without changing the
-  // grid, which leaves each eliminated system singular along that scaling. The
-  // pins fix each one with `1 / |B|` between two rows, or two columns, of a
-  // block `B`: on a connected grid, both are the rank-one `1 / m`.
+  // one pin `1 / |B|` per block `B` of the support; `1 / m` on a connected grid
   const Eigen::MatrixXd pin =
     Eigen::MatrixXd::Constant(m, m, 1.0 / static_cast<double>(m));
   Eigen::MatrixXd pin_rows(m, m), pin_cols(m, m);
@@ -602,10 +576,8 @@ InterpolationGrid::integrate_2d(const tools_eigen::ConstMatRef& u)
     const double b = std::min(std::max(u2, 0.0), 1.0);
     const ptrdiff_t ia = find_cell(a);
     const ptrdiff_t jb = find_cell(b);
-    // Rows to `b` swept across to `a`, or columns to `a` across to `b`: the
-    // same mass either way round. Which one is a rule that swaps with the
-    // arguments, so a grid and its transpose run the same code on the same
-    // arrays and agree bit for bit; on the diagonal, both, averaged.
+    // rows or columns first by a rule that swaps with the arguments, so a grid
+    // and its transpose agree bit for bit; both, averaged, on the diagonal
     const auto rows = [&] {
       return sweep(values_, row_cum_int_, a, ia, b, jb);
     };
@@ -725,11 +697,7 @@ InterpolationGrid::rect_mass(double a1, double b1, double a2, double b2) const
   thread_local Eigen::VectorXd wx, wy;
   const ptrdiff_t i0 = interval_weights(x0, x1, wx);
   const ptrdiff_t j0 = interval_weights(y0, y1, wy);
-  // `wx' V wy` over the covered nodes, rows first or columns first: a sum of
-  // nonnegative terms either way, so nothing cancels however narrow the
-  // rectangle. Which one is a rule that swaps with the arguments, so a grid
-  // and its transpose run the same code on the same arrays and agree bit for
-  // bit; for a rectangle on the diagonal, both, averaged.
+  // `wx' V wy`, nonnegative terms; rows or columns first by a symmetric rule
   const auto rows = [&] { return block_mass(values_, i0, wx, j0, wy); };
   const auto cols = [&] { return block_mass(values_t_, j0, wy, i0, wx); };
   if ((x0 < y0) || ((x0 == y0) && (x1 < y1))) {

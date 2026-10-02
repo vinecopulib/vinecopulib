@@ -2,32 +2,20 @@
 
 ### BEHAVIOR CHANGES
 
-* `tools_stats::simulate_uniform()`, and so every seeded simulation, the
-  scrambled quasi-random ones included, draws from wdm's generator: uniforms on
-  a grid of 2^-53 rather than 2^-32, where a sample of a million had about 110
-  repeated values per column. The same seeds give the same draws on every
-  platform, but not the draws they gave before (#799)
+* Seeded simulations draw uniforms on a 2^-53 grid from wdm's generator: the
+  same draws on every platform, but not those of earlier versions (#799)
 
-* `tools_stats::to_pseudo_obs()` with `ties_method = "random"` and seeds orders
-  each column's ties by seeds of its own, the given ones followed by the
-  column's index. With shared seeds, columns tied in the same rows were ordered
-  alike, which made the tie-breaking a source of dependence (#799)
+* `tools_stats::to_pseudo_obs()` with random ties and seeds gives each
+  column seeds of its own, so columns tied in the same rows are not ordered
+  alike (#799)
 
-* A `tll` pair's distribution function, and a discrete `tll` pair's
-  probabilities, are the mass of its interpolated density, no longer rescaled
-  along one argument's grid lines. A grid with uniform margins, as every fit
-  has, moves by rounding only; a grid that is not normalized, such as one
-  built from raw parameters or saved by an earlier version, now evaluates as
-  its own mass, which differs by as much as its margins differ from uniform.
-  Evaluation is faster too: a discrete pair's density in half the time, its
-  h-functions and the distribution function in 0.8 to 0.9 (#799)
+* A `tll` pair's distribution function and probabilities are its density's
+  mass, no longer rescaled along one argument, and evaluate faster (#799)
 
 ### NEW FEATURES
 
-* `tools_stats::to_pseudo_obs()` and `to_pseudo_obs_1d()` take a `scale`, below
-  which distinct values are ranked partly as tied, so that the
-  pseudo-observations move continuously with the data; the default, zero, is
-  the ranking by value (#799)
+* `tools_stats::to_pseudo_obs()` and `to_pseudo_obs_1d()` take a `scale` below
+  which distinct values rank partly as tied (#799)
 
 ### BUG FIXES
 
@@ -39,31 +27,16 @@
   The covering itself now also assigns coordinates of exactly 1 to the last
   cell instead of one past it (#792)
 
-* A discrete `tll` fit moves continuously with its data: two builds, or two
-  implementations, whose h-functions differ in their last bits now fit a
-  pair to about that precision instead of drawing another latent sample. The
-  bandwidth's ranks blend tied and value order for values within the square
-  root of the machine epsilon (`tools_stats::to_pseudo_obs()` with a
-  `scale`), and `find_latent_sample()` picks its neighbors by fixed keys.
-  Continuous fits change only on data with exact ties, whose random order is
-  drawn differently (#798, #799)
+* A discrete `tll` fit moves continuously with its data, so last-bit
+  differences between builds no longer change it like a new seed (#798, #799)
 
-* A `tll` pair no longer depends on the order of its arguments, so a vine
-  selected from data equals a refit of its own structure. The pair is fitted
-  in its own order and transposed back, and its masses treat the two
-  arguments alike, so a pair and its flip are the same fit and evaluate
-  alike, bit for bit. The grid's margins are normalized to convergence rather
-  than for 25 passes, which left strongly dependent grids up to 3e-4 short of
-  uniform; Newton's method finishes what the passes start. Converging adds
-  0.1 to 0.3 ms to a fit: 6% at 200 observations, within noise from 1000.
-  And `tools_stats::pairwise_mcor()` is symmetric in its two variables. Fits
-  of strongly dependent or nearly independent pairs change (#799)
+* A `tll` pair no longer depends on the order of its arguments, so a selected
+  vine equals a refit of its structure; its margins are normalized to
+  convergence, and `tools_stats::pairwise_mcor()` is symmetric (#799)
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
-* Requires the wdm with soft ranks and a portable random number generator
-  (tnagler/wdm#30). `USE_BOOST` is no longer defined, since wdm no longer
-  reads it (#799)
+* Requires tnagler/wdm#30; `USE_BOOST` is no longer defined (#799)
 
 * CI builds and tests against Eigen 5.0.1 as well as 3.4.0, with the address
   and undefined-behavior sanitizers, so a regression that only one major

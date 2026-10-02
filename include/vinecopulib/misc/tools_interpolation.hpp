@@ -120,11 +120,8 @@ private:
   // the piecewise linear function through (grid_points_, v) over [0, 1];
   // built once alongside `cell_lookup_`
   Eigen::VectorXd weights_;
-  // the transpose of values_, and the cumulative integrals of each row and of
-  // each column, row_cum_int_(k, j) = int_0^{grid_j} values_(k, .) and
-  // col_cum_int_(k, j) = int_0^{grid_j} values_(., k); refreshed eagerly
-  // whenever values_ changes (lazy caching would race when a shared grid is
-  // evaluated from multiple threads)
+  // the transpose and cumulative integrals of rows and columns, refreshed
+  // eagerly with values_ (lazy caching would race across threads)
   Eigen::MatrixXd values_t_;
   Eigen::MatrixXd row_cum_int_;
   Eigen::MatrixXd col_cum_int_;

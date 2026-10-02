@@ -112,12 +112,9 @@ pseudo_obs_1d_impl(std::vector<double>&& xvec,
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
 //! @param weights Vector of weights for the observations.
 //! @param seeds Seeds for the random number generator, used only when
-//! `ties_method = "random"`. Each column draws from seeds of its own, these
-//! followed by its index, so that two columns do not order their ties alike.
-//! @param scale The distance below which distinct values are ranked partly as
-//! tied, which makes the pseudo-observations move continuously with the data;
-//! values further apart than about nine times it are ranked by value alone.
-//! It is in the units of `x`; zero (default) ranks by value.
+//! `ties_method = "random"`; each column appends its index to them.
+//! @param scale Distance below which distinct values rank partly as tied, in
+//! the units of `x`; zero (default) ranks by value.
 //! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$
 //! (column-wise).
 inline Eigen::MatrixXd
@@ -172,8 +169,7 @@ to_pseudo_obs_1d(Eigen::VectorXd x,
 }
 
 //! @brief The `scale` of `to_pseudo_obs()` for copula data: the square root of
-//! the machine epsilon, the usual size of what rounding in a computation can
-//! move.
+//! the machine epsilon.
 inline double
 default_soft_scale()
 {
@@ -182,11 +178,8 @@ default_soft_scale()
 
 //! @brief Whether a pair is in the order of its own values.
 //!
-//! Anything that treats a pair's two arguments by position, a draw or an
-//! iteration indexed by column, is made a function of the pair rather than
-//! of how it was passed by putting the pair in this order first: at the first
-//! row whose two values (then, with four columns, whose two left limits)
-//! differ, the smaller first.
+//! At the first row whose two values (or, with four columns, left limits)
+//! differ, the smaller comes first.
 //!
 //! @param u A pair, `[u1, u2]` or `[u1, u2, u1^-, u2^-]`.
 //! @return Whether the columns have to be swapped.
@@ -206,11 +199,8 @@ swaps_pair(const Eigen::MatrixXd& u)
 
 //! @brief Pseudo-observations of a pair, as a kernel pair copula ranks it.
 //!
-//! `to_pseudo_obs(pair, "random", weights, seeds, scale)` of the pair's first
-//! two columns, ranked in the pair's own order (`swaps_pair()`) and returned
-//! in the order passed: each column orders its ties by seeds of its own, and
-//! this keeps the result a function of the pair rather than of the order of
-//! its arguments.
+//! `to_pseudo_obs(pair, "random", weights, seeds, scale)` of the first two
+//! columns, ranked in the pair's own order (`swaps_pair()`).
 //!
 //! @param data The pair, `[u1, u2]` or `[u1, u2, u1^-, u2^-]`.
 //! @param weights Optional weights, one per observation.
@@ -322,9 +312,7 @@ BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
   boxes_[cell(new_sample(0)) * K_ + cell(new_sample(1))].insert(i);
 }
 
-// SplitMix64's finalizer: a bijection of 64-bit integers whose outputs are
-// statistically uniform, computed in integer arithmetic so that every build
-// draws the same keys.
+// SplitMix64's finalizer, in integer arithmetic so every build draws alike
 inline uint64_t
 mix64(uint64_t z)
 {
@@ -372,9 +360,7 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     throw std::runtime_error("u must have four columns.");
   }
 
-  // The draws below are indexed by column position, so ordering the pair by
-  // its own values is what makes the result a function of the observations
-  // rather than of how they were passed.
+  // the draws are indexed by column, so the pair is put in its own order
   const bool swapped = swaps_pair(u);
   Eigen::MatrixXd v = u;
   if (swapped) {
@@ -405,8 +391,7 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   Eigen::MatrixXd x(n, 2), norm_sim(n, 2);
 
   for (size_t it = 0; it < niter; it++) {
-    // continuous in the cloud, so that values within rounding of each other
-    // cannot reorder a block of it
+    // soft, so values within rounding cannot reorder the cloud
     uu =
       to_pseudo_obs(uu, "average", Eigen::VectorXd(), {}, default_soft_scale());
     x = qnorm(uu);
@@ -419,11 +404,8 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     for (size_t i = 0; i < n; i++) {
       covering.get_box_indices(lb.row(i), ub.row(i), indices);
       if (!indices.empty()) {
-        // The neighbor is drawn uniformly as the compatible one holding the
-        // smallest of a fixed key per (sweep, observation, neighbor). A
-        // neighbor entering or leaving the compatible set changes the draw only
-        // if it holds that key, where an index into the list of neighbors would
-        // move with any change to the list and redraw every later observation.
+        // the compatible neighbor with the smallest fixed key: uniform, and
+        // unchanged unless that neighbor leaves the compatible set
         const uint64_t target = mix64(sweep ^ mix64(i));
         size_t j = indices[0];
         uint64_t best = mix64(target ^ j);
@@ -635,10 +617,7 @@ ace(const Eigen::MatrixXd& data,                        // data
 inline double
 pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 {
-  // ACE updates one variable first, and where the dependence is weak the two
-  // orders can stop at different correlations; ordering the pair by its own
-  // values, as `find_latent_sample` does, makes the result a function of the
-  // pair rather than of how it was passed
+  // ACE updates one variable first, so the pair is put in its own order
   Eigen::MatrixXd v = x.leftCols(2);
   if (swaps_pair(v)) {
     v.col(0).swap(v.col(1));

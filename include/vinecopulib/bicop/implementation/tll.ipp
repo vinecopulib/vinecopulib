@@ -224,11 +224,7 @@ TllBicop::calculate_infl(const size_t& n,
 }
 
 //! The number of points close to each point, counted continuously:
-//! \f$ m_i = \sum_j e^{-\|x_i - x_j\|^2 / (2 s^2)} \f$. An exactly repeated
-//! point counts its copies, a point far from all others counts one, and points
-//! moving by \f$ \delta \ll s \f$ change the counts by \f$ O(\delta / s) \f$,
-//! so that summing \f$ f_i / m_i \f$ over the points sums \f$ f \f$ over the
-//! distinct points, continuously in the data.
+//! \f$ m_i = \sum_j e^{-\|x_i - x_j\|^2 / (2 s^2)} \f$.
 //!
 //! @param x Points, one per row.
 //! @param scale The distance \f$ s \f$.
@@ -248,9 +244,7 @@ TllBicop::multiplicity(const Eigen::MatrixXd& x, double scale)
     }
     return a < b;
   });
-  // the distinct points in that order, and how often each occurs: repeated
-  // points are counted as one block, so that discrete data, where repeats are
-  // the rule, cost no more than distinct points do
+  // the distinct points in that order, and how often each occurs
   std::vector<Eigen::Index> point;
   std::vector<double> copies;
   std::vector<size_t> distinct(static_cast<size_t>(n));
@@ -307,10 +301,8 @@ TllBicop::fit(const Eigen::MatrixXd& data,
 {
   using namespace tools_interpolation;
 
-  // The pair is fitted in its own order (`tools_stats::swaps_pair()`) and its
-  // grid transposed back, so a pair and its flip are fitted bit for bit alike:
-  // the estimate's arithmetic is not symmetric in its two arguments, and a
-  // vine's later trees amplify a difference in its last bits.
+  // fitted in its own order and transposed back: a pair and its flip are the
+  // same fit, bit for bit
   if (tools_stats::swaps_pair(data)) {
     Eigen::MatrixXd swapped = data;
     swapped.col(0).swap(swapped.col(1));
@@ -335,10 +327,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
 
   bool discrete = (var_types_[0] == "d") || (var_types_[1] == "d");
-  // Ties are broken at random, as jittering would. On a discrete edge the
-  // ranks also move continuously with the data, since the latent draw below
-  // turns any jump in the bandwidth into another sample; elsewhere a swap of
-  // two near-equal values moves the fit only as much as it moves the data.
+  // ties broken at random; on a discrete edge, soft ranks
   Eigen::MatrixXd psobs = tools_stats::pair_soft_pseudo_obs(
     data, weights, discrete ? tools_stats::default_soft_scale() : 0.0);
   Eigen::MatrixXd z_data = tools_stats::qnorm(psobs);

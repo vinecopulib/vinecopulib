@@ -35,10 +35,7 @@ TEST_F(VinecopTest, constructors_without_error)
   Vinecop vinecop_parametrized(model_matrix, pair_copulas);
 }
 
-// Selection fits each pair in the search's orientation and flips it into the
-// structure's. A `tll` pair is fitted in its own order, and its masses treat
-// the two arguments alike, so a vine selected from data and a refit of its
-// structure hold the same pairs, bit for bit, discrete variables included.
+// a selected `tll` vine and a refit of its structure hold the same pairs
 TEST(VinecopSelect, a_selected_tll_vine_equals_a_refit_of_its_structure)
 {
   const Eigen::MatrixXd z =

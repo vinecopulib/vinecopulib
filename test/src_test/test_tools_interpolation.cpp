@@ -53,8 +53,7 @@ grid_and_weights(int m)
   return { g, w };
 }
 
-//! `exp(-concentration * |g_i - g_j|)`, tilted so that no margin starts out
-//! uniform: the surface a strongly dependent fit gives.
+//! `exp(-concentration * |g_i - g_j|)`, tilted off uniform margins.
 Eigen::MatrixXd
 concentrated_surface(const Eigen::VectorXd& g, double concentration)
 {
@@ -89,10 +88,7 @@ expect_normalized_and_equivariant(const Eigen::VectorXd& g,
 
 } // namespace
 
-// The margins are normalized to convergence, not for a fixed number of passes:
-// a concentrated surface, as a strongly dependent fit gives, needs hundreds of
-// passes, and at 200 or 400 more than any bound on them would allow. A grid
-// and its transpose normalize to transposes of each other, bit for bit.
+// margins converge on concentrated surfaces, and transposes normalize alike
 TEST(tools_interpolation, normalization_converges_on_a_concentrated_surface)
 {
   const auto [g, w] = grid_and_weights(30);
@@ -104,10 +100,7 @@ TEST(tools_interpolation, normalization_converges_on_a_concentrated_surface)
   }
 }
 
-// A grid whose support falls apart into blocks can scale each block's rows
-// against its columns without changing, so the system each Newton step solves
-// is singular once per block rather than once. Here the blocks are two halves
-// of the diagonal, or a corner on its own.
+// a support in two blocks, or with a corner of its own, converges too
 TEST(tools_interpolation, normalization_converges_on_a_disconnected_surface)
 {
   const auto [g, w] = grid_and_weights(30);
@@ -125,10 +118,7 @@ TEST(tools_interpolation, normalization_converges_on_a_disconnected_surface)
   }
 }
 
-// Summing the rectangle masses over a partition of the first argument must
-// leave the mass of the whole strip, whatever the partition. It holds to the
-// last few bits only because every weight is nonnegative -- a route through
-// cumulative differences loses it.
+// the masses over a partition of the first argument add up to the strip's
 TEST(tools_interpolation, rect_mass_telescopes_in_the_first_argument)
 {
   auto grid = skewed_grid(30);
@@ -149,11 +139,7 @@ TEST(tools_interpolation, rect_mass_telescopes_in_the_first_argument)
   }
 }
 
-// A rectangle's mass and the distribution function treat the two arguments
-// alike, so a grid and its transpose give the same values, bit for bit, even
-// on a grid whose margins are not uniform. A flipped pair then evaluates as
-// the original, and a vine selected from data equals a refit of its own
-// structure.
+// a grid and its transpose give the same masses and cdf, bit for bit
 TEST(tools_interpolation, mass_and_cdf_commute_with_transposition)
 {
   const int m = 30;

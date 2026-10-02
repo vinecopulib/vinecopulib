@@ -590,11 +590,7 @@ TEST(discrete, kernel_fit_ignores_rounding_noise_in_tied_continuous_data)
   EXPECT_LT(diff, 1e-10);
 }
 
-// A selected vine fits each pair in the orientation of the search and stores it
-// flipped where the final structure needs the other one, so a flipped discrete
-// pair must evaluate as the one the next tree's data came from. A kernel
-// pair's masses and distribution function treat the two arguments alike, so it
-// does, bit for bit.
+// a flipped discrete pair evaluates as the original, bit for bit
 TEST(discrete, a_flipped_kernel_pair_evaluates_as_the_original)
 {
   for (double rho : { 0.6, 0.97 }) {
@@ -636,10 +632,7 @@ TEST(discrete, a_flipped_kernel_pair_evaluates_as_the_original)
   }
 }
 
-// A pair is fitted in its own order and transposed back, so a pair fitted with
-// its arguments swapped and flipped back is the same fit, bit for bit, whatever
-// its variable types: a vine selected from data then equals a refit of its own
-// structure.
+// a pair fitted swapped and flipped back is the same fit, bit for bit
 TEST(discrete, kernel_fit_does_not_depend_on_argument_order)
 {
   auto controls = FitControlsBicop({ BicopFamily::tll });
@@ -682,14 +675,8 @@ TEST(discrete, kernel_fit_does_not_depend_on_argument_order)
   }
 }
 
-// Two builds, or two implementations, evaluate a vine's h-functions with
-// different rounding, so the data a pair is fitted to from the second tree on
-// differ in their last bits. A discrete fit must then move by about as little:
-// its ranks, its bandwidth and its latent draw have to be continuous in the
-// data. The continuous argument here is a crowd of values a hair's breadth
-// apart, as the h-functions near a bound are, so that any threshold on their
-// gaps would be straddled; the noise is a function of each value, as rounding
-// is, so equal values stay equal.
+// a discrete fit moves by about as little as its data: here a crowd of values
+// a hair's breadth apart, under noise keyed on each value, as rounding is
 TEST(discrete, kernel_fit_moves_continuously_with_its_data)
 {
   auto gauss =
@@ -736,8 +723,7 @@ TEST(discrete, kernel_fit_moves_continuously_with_its_data)
   }
 }
 
-// The soft ranks themselves are wdm's and tested there; these check that
-// `to_pseudo_obs()` hands them the scale and seeds it should.
+// the soft ranks are wdm's; this checks the scale and seeds passed to them
 TEST(tools_stats, pseudo_obs_with_a_scale_are_the_ranks_of_separated_values)
 {
   Eigen::MatrixXd x(8, 1);
@@ -753,9 +739,7 @@ TEST(tools_stats, pseudo_obs_with_a_scale_are_the_ranks_of_separated_values)
 
 TEST(tools_stats, pseudo_obs_with_a_scale_move_continuously)
 {
-  // a crowd of distinct values within rounding of each other: shifting it by
-  // far less than the scale moves the ranks by a negligible amount, where
-  // ranking by value would reorder the whole crowd
+  // a crowd within rounding: a shift far below the scale barely moves the ranks
   const Eigen::Index n = 400;
   Eigen::MatrixXd x(n, 1), y(n, 1);
   for (Eigen::Index i = 0; i < n; ++i) {
@@ -773,8 +757,7 @@ TEST(tools_stats, pseudo_obs_with_a_scale_move_continuously)
 
 TEST(tools_stats, seeded_random_ties_differ_between_columns)
 {
-  // two columns tied in the same rows are not ordered alike: that would make
-  // the tie-breaking itself a source of dependence
+  // two columns tied in the same rows are not ordered alike
   Eigen::MatrixXd x(200, 2);
   for (Eigen::Index i = 0; i < x.rows(); ++i) {
     x(i, 0) = x(i, 1) = static_cast<double>(i % 4);
