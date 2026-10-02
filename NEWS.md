@@ -1,5 +1,22 @@
 ## vinecopulib 1.1.0 (unreleased)
 
+### BEHAVIOR CHANGES
+
+* Seeded simulations draw uniforms on a 2^-53 grid from wdm's generator: the
+  same draws on every platform, but not those of earlier versions (#799)
+
+* `tools_stats::to_pseudo_obs()` with random ties and seeds gives each
+  column seeds of its own, so columns tied in the same rows are not ordered
+  alike (#799)
+
+* A `tll` pair's distribution function and probabilities are its density's
+  mass, no longer rescaled along one argument, and evaluate faster (#799)
+
+### NEW FEATURES
+
+* `tools_stats::to_pseudo_obs()` and `to_pseudo_obs_1d()` take a `scale` below
+  which distinct values rank partly as tied (#799)
+
 ### BUG FIXES
 
 * `tools_stats::pnorm` clamps its argument before calling Eigen's `erf`, so
@@ -10,14 +27,16 @@
   The covering itself now also assigns coordinates of exactly 1 to the last
   cell instead of one past it (#792)
 
-* A discrete `tll` fit no longer depends on how its data rounded. Values
-  equal up to rounding are made exact ties before the ranks' random
-  tie-breaking and before the latent draw, which turned a last-bit
-  difference into another fit from the second tree on; `find_latent_sample`
-  also keeps a continuous argument's ties exact. Continuous fits are
-  unchanged (#798)
+* A discrete `tll` fit moves continuously with its data, so last-bit
+  differences between builds no longer change it like a new seed (#798, #799)
+
+* A `tll` pair no longer depends on the order of its arguments, so a selected
+  vine equals a refit of its structure; its margins are normalized to
+  convergence, and `tools_stats::pairwise_mcor()` is symmetric (#799)
 
 ### BUILD SYSTEM AND DEPENDENCIES
+
+* Requires tnagler/wdm#30; `USE_BOOST` is no longer defined (#799)
 
 * CI builds and tests against Eigen 5.0.1 as well as 3.4.0, with the address
   and undefined-behavior sanitizers, so a regression that only one major

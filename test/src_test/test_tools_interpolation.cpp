@@ -5,6 +5,8 @@
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
 #include "gtest/gtest.h"
+#include <string>
+#include <utility>
 #include <vinecopulib.hpp>
 #include <vinecopulib/misc/tools_interpolation.hpp>
 
@@ -34,14 +36,89 @@ skewed_grid(int m)
   return InterpolationGrid(g, v, 0);
 }
 
+//! An equally spaced grid on [0, 1] and its trapezoid weights.
+std::pair<Eigen::VectorXd, Eigen::VectorXd>
+grid_and_weights(int m)
+{
+  Eigen::VectorXd g(m);
+  for (int i = 0; i < m; ++i) {
+    g(i) = static_cast<double>(i) / (m - 1);
+  }
+  Eigen::VectorXd w(m);
+  w(0) = (g(1) - g(0)) / 2;
+  w(m - 1) = (g(m - 1) - g(m - 2)) / 2;
+  for (int i = 1; i < m - 1; ++i) {
+    w(i) = (g(i + 1) - g(i - 1)) / 2;
+  }
+  return { g, w };
+}
+
+//! `exp(-concentration * |g_i - g_j|)`, tilted off uniform margins.
+Eigen::MatrixXd
+concentrated_surface(const Eigen::VectorXd& g, double concentration)
+{
+  const auto m = g.size();
+  Eigen::MatrixXd v(m, m);
+  for (ptrdiff_t i = 0; i < m; ++i) {
+    for (ptrdiff_t j = 0; j < m; ++j) {
+      v(i, j) = std::exp(-concentration * std::abs(g(i) - g(j))) + 1e-3 * g(i);
+    }
+  }
+  return v;
+}
+
+//! Both margins of the normalized `v` are uniform, and `v` and its transpose
+//! normalize to transposes of each other, bit for bit.
+void
+expect_normalized_and_equivariant(const Eigen::VectorXd& g,
+                                  const Eigen::VectorXd& w,
+                                  const Eigen::MatrixXd& v,
+                                  const std::string& label)
+{
+  const Eigen::MatrixXd normalized = InterpolationGrid(g, v).get_values();
+  const double rows = ((normalized * w).array() - 1.0).abs().maxCoeff();
+  const double cols =
+    ((normalized.transpose() * w).array() - 1.0).abs().maxCoeff();
+  EXPECT_LT(std::max(rows, cols), 1e-13) << label;
+  const Eigen::MatrixXd flipped =
+    InterpolationGrid(g, Eigen::MatrixXd(v.transpose())).get_values();
+  EXPECT_TRUE((flipped.transpose().array() == normalized.array()).all())
+    << label;
+}
+
 } // namespace
 
-// Summing the rectangle probabilities over a partition of the first argument
-// must leave the second argument's marginal increment, whatever the partition:
-// the per-grid-line rescaling is the same in every term and the masses
-// telescope. This is what makes the quantity a probability and not merely a
-// mass, and it holds to the last few bits only because every weight is
-// nonnegative -- a route through cumulative differences loses it.
+// margins converge on concentrated surfaces, and transposes normalize alike
+TEST(tools_interpolation, normalization_converges_on_a_concentrated_surface)
+{
+  const auto [g, w] = grid_and_weights(30);
+  for (double concentration : { 40.0, 200.0, 400.0 }) {
+    expect_normalized_and_equivariant(g,
+                                      w,
+                                      concentrated_surface(g, concentration),
+                                      std::to_string(concentration));
+  }
+}
+
+// a support in two blocks, or with a corner of its own, converges too
+TEST(tools_interpolation, normalization_converges_on_a_disconnected_surface)
+{
+  const auto [g, w] = grid_and_weights(30);
+  for (double concentration : { 40.0, 200.0, 400.0 }) {
+    Eigen::MatrixXd halves = concentrated_surface(g, concentration);
+    halves.topRightCorner(15, 15).setZero();
+    halves.bottomLeftCorner(15, 15).setZero();
+    expect_normalized_and_equivariant(
+      g, w, halves, "halves, " + std::to_string(concentration));
+    Eigen::MatrixXd corner = concentrated_surface(g, concentration);
+    corner.row(0).tail(29).setZero();
+    corner.col(0).tail(29).setZero();
+    expect_normalized_and_equivariant(
+      g, w, corner, "corner, " + std::to_string(concentration));
+  }
+}
+
+// the masses over a partition of the first argument add up to the strip's
 TEST(tools_interpolation, rect_mass_telescopes_in_the_first_argument)
 {
   auto grid = skewed_grid(30);
@@ -49,16 +126,47 @@ TEST(tools_interpolation, rect_mass_telescopes_in_the_first_argument)
     for (double b2 : { 0.125, 0.5, 0.875, 1.0 }) {
       for (double width : { 1.0 / 8, 1.0 / 512 }) {
         const double a2 = std::max(b2 - width, 0.0);
+        const double whole = grid.rect_mass(0.0, 1.0, a2, b2);
         double total = 0.0;
         for (int i = 0; i < k; ++i) {
           total += grid.rect_mass(
             static_cast<double>(i) / k, static_cast<double>(i + 1) / k, a2, b2);
         }
-        EXPECT_NEAR(total, b2 - a2, 1e-14)
+        EXPECT_NEAR(total, whole, 1e-14 * whole)
           << "k = " << k << ", (a2, b2) = (" << a2 << ", " << b2 << ")";
       }
     }
   }
+}
+
+// a grid and its transpose give the same masses and cdf, bit for bit
+TEST(tools_interpolation, mass_and_cdf_commute_with_transposition)
+{
+  const int m = 30;
+  auto grid = skewed_grid(m);
+  Eigen::VectorXd g(m);
+  for (int i = 0; i < m; ++i) {
+    g(i) = static_cast<double>(i) / (m - 1);
+  }
+  auto flipped =
+    InterpolationGrid(g, Eigen::MatrixXd(grid.get_values().transpose()), 0);
+  for (double a1 : { 0.0, 0.1, 0.4 }) {
+    for (double a2 : { 0.0, 0.15, 0.55 }) {
+      for (double width : { 0.3, 1.0 / 512 }) {
+        const double b1 = std::min(a1 + width, 1.0);
+        const double b2 = std::min(a2 + 2.0 * width, 1.0);
+        EXPECT_EQ(grid.rect_mass(a1, b1, a2, b2),
+                  flipped.rect_mass(a2, b2, a1, b1))
+          << "(a1, a2) = (" << a1 << ", " << a2 << "), width " << width;
+      }
+    }
+  }
+  Eigen::MatrixXd u(4, 2);
+  u << 0.3, 0.7, 0.05, 0.95, 1.0, 0.4, 0.5, 0.5;
+  const Eigen::MatrixXd swapped = u.rowwise().reverse();
+  EXPECT_TRUE(
+    (grid.integrate_2d(u).array() == flipped.integrate_2d(swapped).array())
+      .all());
 }
 
 // And summing over a partition of the second argument that starts at zero must

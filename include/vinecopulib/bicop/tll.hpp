@@ -26,6 +26,8 @@ public:
 private:
   static Eigen::VectorXd gaussian_kernel_2d(const Eigen::MatrixXd& x);
 
+  static Eigen::VectorXd multiplicity(const Eigen::MatrixXd& x, double scale);
+
   Eigen::Matrix2d select_bandwidth(const Eigen::MatrixXd& x,
                                    const std::string& method,
                                    const Eigen::VectorXd& weights);

@@ -4,6 +4,7 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <numeric>
 #include <vinecopulib/bicop/family.hpp>
 #include <vinecopulib/misc/tools_interpolation.hpp>
 #include <vinecopulib/misc/tools_stats.hpp>
@@ -222,6 +223,75 @@ TllBicop::calculate_infl(const size_t& n,
   return kernel0 * det_irB * m_inv_00 * weight / static_cast<double>(n);
 }
 
+//! The number of points close to each point, counted continuously:
+//! \f$ m_i = \sum_j e^{-\|x_i - x_j\|^2 / (2 s^2)} \f$.
+//!
+//! @param x Points, one per row.
+//! @param scale The distance \f$ s \f$.
+//! @return The counts, each at least one.
+inline Eigen::VectorXd
+TllBicop::multiplicity(const Eigen::MatrixXd& x, double scale)
+{
+  const Eigen::Index n = x.rows();
+  std::vector<Eigen::Index> order(static_cast<size_t>(n));
+  std::iota(order.begin(), order.end(), 0);
+  std::sort(order.begin(), order.end(), [&](Eigen::Index a, Eigen::Index b) {
+    if (x(a, 0) != x(b, 0)) {
+      return x(a, 0) < x(b, 0);
+    }
+    if (x(a, 1) != x(b, 1)) {
+      return x(a, 1) < x(b, 1);
+    }
+    return a < b;
+  });
+  // the distinct points in that order, and how often each occurs
+  std::vector<Eigen::Index> point;
+  std::vector<double> copies;
+  std::vector<size_t> distinct(static_cast<size_t>(n));
+  for (const Eigen::Index i : order) {
+    if (point.empty() || (x(i, 0) != x(point.back(), 0)) ||
+        (x(i, 1) != x(point.back(), 1))) {
+      point.push_back(i);
+      copies.push_back(0.0);
+    }
+    copies.back() += 1.0;
+    distinct[static_cast<size_t>(i)] = point.size() - 1;
+  }
+  // where the run of distinct points sharing a first coordinate ends
+  std::vector<size_t> run_end(point.size());
+  for (size_t a = point.size(); a-- > 0;) {
+    run_end[a] =
+      ((a + 1 < point.size()) && (x(point[a + 1], 0) == x(point[a], 0)))
+        ? run_end[a + 1]
+        : a + 1;
+  }
+  const double reach = 9.0 * scale;
+  std::vector<double> count(copies);
+  for (size_t a = 0; a < point.size(); ++a) {
+    const Eigen::Index i = point[a];
+    for (size_t b = a + 1; b < point.size(); ++b) {
+      const Eigen::Index j = point[b];
+      if (x(j, 0) - x(i, 0) > reach) {
+        break;
+      }
+      if (x(j, 1) - x(i, 1) > reach) {
+        // the rest of this run is further still, in its second coordinate
+        b = run_end[b] - 1;
+        continue;
+      }
+      const double d2 = (x.row(i) - x.row(j)).squaredNorm() / (scale * scale);
+      const double kernel = std::exp(-0.5 * d2);
+      count[a] += copies[b] * kernel;
+      count[b] += copies[a] * kernel;
+    }
+  }
+  Eigen::VectorXd out(n);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    out(i) = count[distinct[static_cast<size_t>(i)]];
+  }
+  return out;
+}
+
 inline void
 TllBicop::fit(const Eigen::MatrixXd& data,
               std::string method,
@@ -230,6 +300,21 @@ TllBicop::fit(const Eigen::MatrixXd& data,
               const Eigen::VectorXd& weights)
 {
   using namespace tools_interpolation;
+
+  // fitted in its own order and transposed back: a pair and its flip are the
+  // same fit, bit for bit
+  if (tools_stats::swaps_pair(data)) {
+    Eigen::MatrixXd swapped = data;
+    swapped.col(0).swap(swapped.col(1));
+    if (swapped.cols() == 4) {
+      swapped.col(2).swap(swapped.col(3));
+    }
+    std::swap(var_types_[0], var_types_[1]);
+    fit(swapped, method, mult, grid_size, weights);
+    std::swap(var_types_[0], var_types_[1]);
+    interp_grid_->flip();
+    return;
+  }
 
   // construct default grid (equally spaced on Gaussian scale)
   auto grid_points = this->make_normal_grid(grid_size);
@@ -242,18 +327,9 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   Eigen::MatrixXd z = tools_stats::qnorm(grid_2d);
 
   bool discrete = (var_types_[0] == "d") || (var_types_[1] == "d");
-  // on a discrete edge, merge values equal up to rounding, since the latent
-  // draw turns any change in the random tie-breaking into another sample
-  Eigen::MatrixXd ties = data;
-  if (discrete) {
-    for (Eigen::Index j = 0; j < data.cols(); ++j) {
-      ties.col(j) = tools_stats::merge_near_ties(data.col(j));
-    }
-  }
-
-  // use jittering in case observations are discrete
-  auto psobs =
-    tools_stats::to_pseudo_obs(ties.leftCols(2), "random", weights, { 5 });
+  // ties broken at random; on a discrete edge, soft ranks
+  Eigen::MatrixXd psobs = tools_stats::pair_soft_pseudo_obs(
+    data, weights, discrete ? tools_stats::default_soft_scale() : 0.0);
   Eigen::MatrixXd z_data = tools_stats::qnorm(psobs);
 
   // find bandwidth matrix
@@ -263,7 +339,7 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   // find latent sample in case observations are discrete
   if (discrete) {
     psobs =
-      tools_stats::find_latent_sample(ties, std::pow(B(0, 0) * B(1, 1), 0.25));
+      tools_stats::find_latent_sample(data, std::pow(B(0, 0) * B(1, 1), 0.25));
     z_data = tools_stats::qnorm(psobs);
   }
 
@@ -291,9 +367,13 @@ TllBicop::fit(const Eigen::MatrixXd& data,
   auto infl_grid = InterpolationGrid(grid_points, infl, 0);
   if (discrete) {
     // for discrete, use mid ranks to compute EDF and log-likelihood
-    // (this is closer to "observations" than jittered or "upper" pseudo data)
-    psobs = 0.5 * (ties.leftCols(2) + ties.rightCols(2)).array();
-    npars_ = tools_eigen::unique(infl_grid.interpolate(psobs)).sum();
+    // (this is closer to "observations" than jittered or "upper" pseudo data);
+    // an observation counts once however often it is repeated
+    psobs = 0.5 * (data.leftCols(2) + data.rightCols(2)).array();
+    npars_ =
+      infl_grid.interpolate(psobs)
+        .cwiseQuotient(multiplicity(psobs, tools_stats::default_soft_scale()))
+        .sum();
     npars_ = std::max(npars_, 1.0);
   } else {
     npars_ = std::max(infl_grid.interpolate(data).sum(), 1.0);
