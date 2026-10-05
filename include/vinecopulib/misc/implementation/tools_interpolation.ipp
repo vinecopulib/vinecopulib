@@ -4,7 +4,10 @@
 // the MIT license. For a copy, see the LICENSE file in the root directory of
 // vinecopulib or https://vinecopulib.github.io/vinecopulib/.
 
+#include <algorithm>
+#include <limits>
 #include <stdexcept>
+#include <vector>
 #include <vinecopulib/misc/tools_eigen.hpp>
 
 namespace vinecopulib {
@@ -60,15 +63,27 @@ InterpolationGrid::update_cell_lookup()
 inline void
 InterpolationGrid::update_cached_integrals()
 {
+  // same code both ways, so a transposed grid swaps the arrays bit for bit
+  values_t_ = values_.transpose();
+  cumulative_lines(values_, row_cum_int_);
+  cumulative_lines(values_t_, col_cum_int_);
+}
+
+//! @brief Cumulative integrals of every row of `v` along its columns,
+//! `cum(k, j) = int_0^{grid_j} v(k, .)`.
+inline void
+InterpolationGrid::cumulative_lines(const Eigen::MatrixXd& v,
+                                    Eigen::MatrixXd& cum) const
+{
   const ptrdiff_t m = grid_points_.size();
-  row_cum_int_.resize(m, m);
+  cum.resize(m, m);
   for (ptrdiff_t k = 0; k < m; ++k) {
-    double cum = 0.0;
-    row_cum_int_(k, 0) = 0.0;
+    double total = 0.0;
+    cum(k, 0) = 0.0;
     for (ptrdiff_t j = 0; j < m - 1; ++j) {
-      cum += (values_(k, j + 1) + values_(k, j)) *
-             (grid_points_(j + 1) - grid_points_(j)) / 2.0;
-      row_cum_int_(k, j + 1) = cum;
+      total +=
+        (v(k, j + 1) + v(k, j)) * (grid_points_(j + 1) - grid_points_(j)) / 2.0;
+      cum(k, j + 1) = total;
     }
   }
 }
@@ -155,9 +170,10 @@ InterpolationGrid::update_weights()
 //! normalize to flipped counterparts whether or not the iteration has
 //! converged.
 //!
+//! Runs to convergence; `newton_margins()` finishes what the passes start.
+//!
 //! @param max_iter Maximum number of rescaling passes; `0` leaves the values
-//! untouched. Rescaling also stops as soon as both margins integrate to 1
-//! within `1e-10`.
+//! untouched.
 inline void
 InterpolationGrid::normalize_margins(int max_iter)
 {
@@ -166,10 +182,16 @@ InterpolationGrid::normalize_margins(int max_iter)
     return;
   }
 
-  const double tol = 1e-10;
+  // converged at `exact`, or below `rounding` once the residual stalls
+  const double exact = 8 * std::numeric_limits<double>::epsilon();
+  const double rounding = 1e-12;
   const double min_mass = 1e-20; // prevent 0/0
+  double previous = std::numeric_limits<double>::infinity();
   const Eigen::VectorXd& w = weights_;
   Eigen::MatrixXd vt(m, m);
+
+  const int newton_after = 25;
+  const int newton_steps = 50;
 
   for (int k = 0; k < max_iter; ++k) {
     // the transpose is materialized rather than left as an expression, so
@@ -180,8 +202,17 @@ InterpolationGrid::normalize_margins(int max_iter)
     const Eigen::VectorXd c = (vt * w).cwiseMax(min_mass);
     const double err = std::max((r.array() - 1.0).abs().maxCoeff(),
                                 (c.array() - 1.0).abs().maxCoeff());
-    if (err < tol) {
+    if ((err <= exact) || ((err < rounding) && (err >= previous))) {
       break;
+    }
+    previous = err;
+    if (k == newton_after) {
+      if (newton_margins(newton_steps)) {
+        break;
+      }
+      // the passes resume from wherever the steps left the grid
+      previous = std::numeric_limits<double>::infinity();
+      continue;
     }
 
     // Both orders are rank-one rescalings of the same values, so the second
@@ -202,6 +233,159 @@ InterpolationGrid::normalize_margins(int max_iter)
       }
     }
   }
+}
+
+//! Newton's method for the row and column scalings that make both margins
+//! uniform, on their logarithms
+//!
+//! @details Scaling row \f$ i \f$ by \f$ e^{a_i} \f$ and column \f$ j \f$
+//! by \f$ e^{b_j} \f$ moves the log margins by \f$ a + P b \f$ and
+//! \f$ b + Q a \f$, with \f$ P = \mathrm{diag}(1 / r) V W \f$ and
+//! \f$ Q = \mathrm{diag}(1 / c) V^\top W \f$. Both eliminations are solved,
+//! each pinned once per block of the support, and averaged.
+//!
+//! @param max_steps Maximum number of steps.
+//! @return Whether the margins converged.
+inline bool
+InterpolationGrid::newton_margins(int max_steps)
+{
+  const ptrdiff_t m = grid_points_.size();
+  const double exact = 8 * std::numeric_limits<double>::epsilon();
+  const double rounding = 1e-12;
+  const double min_mass = 1e-20;
+  const Eigen::VectorXd& w = weights_;
+  const Eigen::MatrixXd eye = Eigen::MatrixXd::Identity(m, m);
+
+  // both margins as the same product on a column-major matrix, as in a pass
+  Eigen::MatrixXd vt = values_.transpose();
+  auto residual = [&](const Eigen::MatrixXd& v,
+                      const Eigen::MatrixXd& v_t,
+                      Eigen::VectorXd& r,
+                      Eigen::VectorXd& c) {
+    r = (v * w).cwiseMax(min_mass);
+    c = (v_t * w).cwiseMax(min_mass);
+    if (!r.allFinite() || !c.allFinite()) {
+      // an overflowed step is no improvement
+      return std::numeric_limits<double>::infinity();
+    }
+    return std::max((r.array() - 1.0).abs().maxCoeff(),
+                    (c.array() - 1.0).abs().maxCoeff());
+  };
+  // `diag(1 / margin) v W`, without entries whose products would be subnormal
+  auto stochastic = [&](const Eigen::VectorXd& margin,
+                        const Eigen::MatrixXd& v) {
+    const Eigen::MatrixXd s =
+      margin.cwiseInverse().asDiagonal() * v * w.asDiagonal();
+    return Eigen::MatrixXd((s.array() < 1e-150).select(0.0, s));
+  };
+  // one pin `1 / |B|` per block `B` of the support; `1 / m` on a connected grid
+  const Eigen::MatrixXd pin =
+    Eigen::MatrixXd::Constant(m, m, 1.0 / static_cast<double>(m));
+  Eigen::MatrixXd pin_rows(m, m), pin_cols(m, m);
+  Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> linked(m, m);
+  std::vector<ptrdiff_t> block(2 * m), rows, cols, todo;
+  // whether the grid is connected; if not, sets `pin_rows` and `pin_cols`
+  auto connected = [&](const Eigen::MatrixXd& p, const Eigen::MatrixXd& q) {
+    linked = (p.array() > 0.0) || (q.transpose().array() > 0.0);
+    // nodes `0, ..., m - 1` are the rows and `m, ..., 2m - 1` the columns
+    std::fill(block.begin(), block.end(), -1);
+    rows.clear();
+    cols.clear();
+    for (ptrdiff_t start = 0; start < 2 * m; ++start) {
+      if (block[start] >= 0) {
+        continue;
+      }
+      const auto label = static_cast<ptrdiff_t>(rows.size());
+      rows.push_back(0);
+      cols.push_back(0);
+      block[start] = label;
+      todo.push_back(start);
+      while (!todo.empty()) {
+        const ptrdiff_t node = todo.back();
+        todo.pop_back();
+        const bool is_row = node < m;
+        ++(is_row ? rows : cols)[label];
+        for (ptrdiff_t k = 0; k < m; ++k) {
+          const ptrdiff_t other = is_row ? m + k : k;
+          if ((block[other] < 0) &&
+              (is_row ? linked(node, k) : linked(k, node - m))) {
+            block[other] = label;
+            todo.push_back(other);
+          }
+        }
+      }
+    }
+    if (rows.size() == 1) {
+      return true;
+    }
+    for (ptrdiff_t j = 0; j < m; ++j) {
+      for (ptrdiff_t i = 0; i < m; ++i) {
+        pin_rows(i, j) = (block[i] == block[j])
+                           ? 1.0 / static_cast<double>(rows[block[i]])
+                           : 0.0;
+        pin_cols(i, j) = (block[m + i] == block[m + j])
+                           ? 1.0 / static_cast<double>(cols[block[m + i]])
+                           : 0.0;
+      }
+    }
+    return false;
+  };
+
+  Eigen::VectorXd r(m), c(m), r_try(m), c_try(m);
+  double err = residual(values_, vt, r, c);
+  double previous = std::numeric_limits<double>::infinity();
+  Eigen::MatrixXd trial(m, m), trial_t(m, m);
+  for (int step = 0; step < max_steps; ++step) {
+    if ((err <= exact) || ((err < rounding) && (err >= previous))) {
+      return true;
+    }
+    const Eigen::VectorXd lr = r.array().log();
+    const Eigen::VectorXd lc = c.array().log();
+    const Eigen::MatrixXd p = stochastic(r, values_);
+    const Eigen::MatrixXd q = stochastic(c, vt);
+    const bool whole = connected(p, q);
+    const Eigen::VectorXd b1 =
+      Eigen::MatrixXd(eye - q * p + (whole ? pin : pin_cols))
+        .partialPivLu()
+        .solve(q * lr - lc);
+    const Eigen::VectorXd a1 = -lr - p * b1;
+    const Eigen::VectorXd a2 =
+      Eigen::MatrixXd(eye - p * q + (whole ? pin : pin_rows))
+        .partialPivLu()
+        .solve(p * lc - lr);
+    const Eigen::VectorXd b2 = -lc - q * a2;
+    const Eigen::VectorXd a = (a1 + a2) / 2.0;
+    const Eigen::VectorXd b = (b1 + b2) / 2.0;
+
+    bool improved = false;
+    double t = 1.0;
+    for (int halving = 0; halving < 30; ++halving, t /= 2.0) {
+      const Eigen::VectorXd sr = (t * a).array().exp();
+      const Eigen::VectorXd sc = (t * b).array().exp();
+      for (ptrdiff_t j = 0; j < m; ++j) {
+        for (ptrdiff_t i = 0; i < m; ++i) {
+          trial(i, j) = values_(i, j) * (sr(i) * sc(j));
+        }
+      }
+      trial_t = trial.transpose();
+      const double err_try = residual(trial, trial_t, r_try, c_try);
+      if (err_try < err) {
+        values_.swap(trial);
+        vt.swap(trial_t);
+        r.swap(r_try);
+        c.swap(c_try);
+        previous = err;
+        err = err_try;
+        improved = true;
+        break;
+      }
+    }
+    if (!improved) {
+      // at the floor of rounding, no step can reduce the residual further
+      return err < rounding;
+    }
+  }
+  return (err <= exact) || ((err < rounding) && (err >= previous));
 }
 
 inline ptrdiff_t
@@ -265,11 +449,10 @@ inline double
 InterpolationGrid::cond_knot(const CondLine& line, ptrdiff_t j) const
 {
   const ptrdiff_t i = line.cell;
-  const double v =
-    (line.cond_var == 1)
-      ? (values_(i, j) * line.x2x + values_(i + 1, j) * line.xx1) / line.x2x1
-      : (values_(j, i) * line.x2x + values_(j, i + 1) * line.xx1) / line.x2x1;
-  return std::max(v, 0.0);
+  // the rows of the transpose are the columns, read by the same expression
+  const Eigen::MatrixXd& v = (line.cond_var == 1) ? values_ : values_t_;
+  const double knot = (v(i, j) * line.x2x + v(i + 1, j) * line.xx1) / line.x2x1;
+  return std::max(knot, 0.0);
 }
 
 //! the weights of the nodes at `g0` and `g1` integrating the linear basis over
@@ -388,13 +571,23 @@ InterpolationGrid::inverse_integrate_1d(const tools_eigen::ConstMatRef& u,
 inline Eigen::VectorXd
 InterpolationGrid::integrate_2d(const tools_eigen::ConstMatRef& u)
 {
-  Eigen::VectorXd tmpvals2;
-
-  auto f = [this, &tmpvals2](double u1, double u2) {
-    row_integrals(u2, tmpvals2);
-    double tmpint = int_on_grid(u1, tmpvals2);
-    double tmpint1 = weights_.dot(tmpvals2);
-    return std::min(std::max(tmpint * u2 / tmpint1, 1e-10), 1 - 1e-10);
+  auto f = [this](double u1, double u2) {
+    const double a = std::min(std::max(u1, 0.0), 1.0);
+    const double b = std::min(std::max(u2, 0.0), 1.0);
+    const ptrdiff_t ia = find_cell(a);
+    const ptrdiff_t jb = find_cell(b);
+    // rows or columns first by a rule that swaps with the arguments, so a grid
+    // and its transpose agree bit for bit; both, averaged, on the diagonal
+    const auto rows = [&] {
+      return sweep(values_, row_cum_int_, a, ia, b, jb);
+    };
+    const auto cols = [&] {
+      return sweep(values_t_, col_cum_int_, b, jb, a, ia);
+    };
+    const double c = (a < b)   ? rows()
+                     : (b < a) ? cols()
+                               : 0.5 * (rows() + cols());
+    return std::min(std::max(c, 1e-10), 1 - 1e-10);
   };
 
   return tools_eigen::binaryExpr_or_nan(u, f);
@@ -419,33 +612,66 @@ InterpolationGrid::interval_weights(double lo,
   w.setZero(kb - ka + 2);
 
   for (ptrdiff_t k = ka; k <= kb; ++k) {
-    const auto [w0, w1] =
-      cell_weights(grid_points_(k), grid_points_(k + 1), a, b);
-    w(k - ka) += w0;
-    w(k - ka + 1) += w1;
+    const double g0 = grid_points_(k);
+    const double g1 = grid_points_(k + 1);
+    if ((a <= g0) && (b >= g1)) {
+      // a whole cell: the trapezoid, with no division
+      const double half = 0.5 * (g1 - g0);
+      w(k - ka) += half;
+      w(k - ka + 1) += half;
+    } else {
+      const auto [w0, w1] = cell_weights(g0, g1, a, b);
+      w(k - ka) += w0;
+      w(k - ka + 1) += w1;
+    }
   }
   return ka;
 }
 
-//! @brief Partial integrals of every grid line over `[0, u]`.
+//! @brief Mass over `[0, a] x [0, b]` of the rows of `v`: each row's
+//! integral up to `b`, integrated across the rows up to `a`.
 //!
-//! @param u Upper limit, clamped to `[0, 1]`.
-//! @param out Filled with one integral per grid line.
-inline void
-InterpolationGrid::row_integrals(double u, Eigen::VectorXd& out) const
+//! @param v The grid, or its transpose.
+//! @param cum The cumulative integrals of its rows, from `cumulative_lines()`.
+//! @param a,ia Limit across the rows, and its cell from `find_cell()`.
+//! @param b,jb Limit along the rows, and its cell from `find_cell()`.
+inline double
+InterpolationGrid::sweep(const Eigen::MatrixXd& v,
+                         const Eigen::MatrixXd& cum,
+                         double a,
+                         ptrdiff_t ia,
+                         double b,
+                         ptrdiff_t jb) const
 {
-  const ptrdiff_t m = grid_points_.size();
-  const double y = std::min(std::max(u, 0.0), 1.0);
-  const ptrdiff_t j = find_cell(y);
-  const double dg = grid_points_(j + 1) - grid_points_(j);
-  const double s = y - grid_points_(j);
-  out.resize(m);
-  for (ptrdiff_t k = 0; k < m; ++k) {
-    out(k) =
-      row_cum_int_(k, j) +
-      (2 * values_(k, j) + (values_(k, j + 1) - values_(k, j)) * s / dg) * s /
-        2.0;
+  double total = 0.0;
+  double l_k = line_integral(v, cum, 0, jb, b);
+  for (ptrdiff_t k = 0; k < ia; ++k) {
+    const double l_k1 = line_integral(v, cum, k + 1, jb, b);
+    total += (l_k1 + l_k) * (grid_points_(k + 1) - grid_points_(k)) / 2.0;
+    l_k = l_k1;
   }
+  const auto [w0, w1] =
+    cell_weights(grid_points_(ia), grid_points_(ia + 1), 0.0, a);
+  return total + w0 * l_k + w1 * line_integral(v, cum, ia + 1, jb, b);
+}
+
+//! @brief Integral over `[0, upr]` of row `k` of `v`.
+//!
+//! @param v The grid, or its transpose.
+//! @param cum The cumulative integrals of its rows.
+//! @param k The row.
+//! @param j The cell holding `upr`, from `find_cell()`.
+//! @param upr Upper limit, in `[0, 1]`.
+inline double
+InterpolationGrid::line_integral(const Eigen::MatrixXd& v,
+                                 const Eigen::MatrixXd& cum,
+                                 ptrdiff_t k,
+                                 ptrdiff_t j,
+                                 double upr) const
+{
+  const double dg = grid_points_(j + 1) - grid_points_(j);
+  const double s = upr - grid_points_(j);
+  return cum(k, j) + (2 * v(k, j) + (v(k, j + 1) - v(k, j)) * s / dg) * s / 2.0;
 }
 
 //! @brief Probability of the rectangle `(a1, b1] x (a2, b2]`.
@@ -467,32 +693,39 @@ InterpolationGrid::rect_mass(double a1, double b1, double a2, double b2) const
   if (!(x1 > x0) || !(y1 > y0)) {
     return 0.0;
   }
-
-  // the mass of each grid line over the rectangle's own strip, and below it
-  Eigen::VectorXd wx, wy, strip, below;
+  // per-thread buffers: this runs once per observation of a discrete edge
+  thread_local Eigen::VectorXd wx, wy;
   const ptrdiff_t i0 = interval_weights(x0, x1, wx);
-  row_integrals(y0, below);
-  if (y0 > 0.0) {
-    const ptrdiff_t j0 = interval_weights(y0, y1, wy);
-    strip = values_.middleCols(j0, wy.size()) * wy;
-  } else {
-    // nothing below to subtract, so the cached integrals are the strip itself
-    row_integrals(y1, strip);
+  const ptrdiff_t j0 = interval_weights(y0, y1, wy);
+  // `wx' V wy`, nonnegative terms; rows or columns first by a symmetric rule
+  const auto rows = [&] { return block_mass(values_, i0, wx, j0, wy); };
+  const auto cols = [&] { return block_mass(values_t_, j0, wy, i0, wx); };
+  if ((x0 < y0) || ((x0 == y0) && (x1 < y1))) {
+    return rows();
   }
+  if ((y0 < x0) || ((y0 == x0) && (y1 < x1))) {
+    return cols();
+  }
+  return 0.5 * (rows() + cols());
+}
 
-  const double m_strip = weights_.dot(strip);
-  const double m_below = std::max(weights_.dot(below), 1e-20);
-  const double total = std::max(m_below + m_strip, 1e-20);
-
-  // `integrate_2d()` rescales each grid line by `lambda(y) = y / M(1, y)`, so
-  // the probability is `lambda(y1) strip + (lambda(y1) - lambda(y0)) below`.
-  // The lambda difference is the only part that cancels; expanded over the
-  // common denominator it cancels against `y1 - y0` rather than against one.
-  const double dlambda =
-    ((y1 - y0) * m_below - y0 * m_strip) / (total * m_below);
-
-  return y1 * wx.dot(strip.segment(i0, wx.size())) / total +
-         dlambda * wx.dot(below.segment(i0, wx.size()));
+//! @brief `wa' v[i0:, j0:] wb`, each row's sum first.
+inline double
+InterpolationGrid::block_mass(const Eigen::MatrixXd& v,
+                              ptrdiff_t i0,
+                              const Eigen::VectorXd& wa,
+                              ptrdiff_t j0,
+                              const Eigen::VectorXd& wb)
+{
+  double total = 0.0;
+  for (ptrdiff_t i = 0; i < wa.size(); ++i) {
+    double line = 0.0;
+    for (ptrdiff_t j = 0; j < wb.size(); ++j) {
+      line += v(i0 + i, j0 + j) * wb(j);
+    }
+    total += wa(i) * line;
+  }
+  return total;
 }
 
 //! @brief Probability that the free coordinate falls in `(lo, hi]`, given the
@@ -539,31 +772,5 @@ InterpolationGrid::cond_interval_mass(double u_cond,
   return mass / std::max(total, 1e-20);
 }
 
-// ---------------- Utility functions for integration ----------------
-
-//! @brief Integral of the piecewise linear function through
-//! `(grid_points_, vals)` over `[0, upr]`.
-//!
-//! @param upr Upper limit, clamped to `[0, 1]`.
-//! @param vals One value per grid point.
-inline double
-InterpolationGrid::int_on_grid(double upr, const Eigen::VectorXd& vals) const
-{
-  const double b = std::min(std::max(upr, 0.0), 1.0);
-  double total = 0.0;
-  double g_k = grid_points_(0);
-  for (ptrdiff_t k = 0; g_k < b; ++k) {
-    const double g_k1 = grid_points_(k + 1);
-    if (b < g_k1) {
-      const auto [w0, w1] = cell_weights(g_k, g_k1, 0.0, b);
-      return total + w0 * vals(k) + w1 * vals(k + 1);
-    }
-    // a whole cell, where the trapezoid factors a multiply cheaper than the
-    // two weights `cell_weights()` returns
-    total += (vals(k + 1) + vals(k)) * (g_k1 - g_k) / 2.0;
-    g_k = g_k1;
-  }
-  return total;
-}
 }
 }

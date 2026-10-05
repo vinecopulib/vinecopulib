@@ -257,7 +257,7 @@ Discovered in
   behind `tree_algorithm`), **Math** (distributions, constants, special
   functions, `quadrature::tanh_sinh` for 1-d integration, `tools::minima`),
   and **Random** (`mt19937`, behind QRNG scrambling and structure simulation).
-- **wdm 0.3.0** — `find_package(wdm 0.3.0 QUIET)` with a **FetchContent
+- **wdm 0.3.2** — `find_package(wdm 0.3.2 QUIET)` with a **FetchContent
   fallback** that clones `tnagler/wdm`. This project does not install it.
 - **Threads** — required.
 - **GoogleTest 1.14** — FetchContent, only when `BUILD_TESTING`.
@@ -276,7 +276,7 @@ Global compile definitions set in
 [cmake/compilerDefOpt.cmake](cmake/compilerDefOpt.cmake) (and mirrored in
 the umbrella header): `BOOST_NO_AUTO_PTR`,
 `BOOST_ALLOW_DEPRECATED_HEADERS`, `BOOST_MATH_PROMOTE_DOUBLE_POLICY=false`,
-`BOOST_ALL_NO_LIB`, `USE_BOOST`. Release flags `-O3 -DNDEBUG`, Debug
+`BOOST_ALL_NO_LIB`. Release flags `-O3 -DNDEBUG`, Debug
 `-g -O0 -DDEBUG`; always-on warnings `-Wall -Wextra -Werror=return-type`.
 `-march=native` (`-mcpu=apple-m1` on Apple silicon) is opt-in behind
 `VINECOPULIB_NATIVE_ARCH`, since the result only runs on CPUs at least as new

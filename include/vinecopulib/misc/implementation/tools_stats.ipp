@@ -6,15 +6,16 @@
 
 #include <algorithm>
 #include <array>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/seed_seq.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
+#include <cstdint>
+#include <limits>
 #include <memory>
+#include <numeric>
 #include <unsupported/Eigen/FFT>
 #include <vinecopulib/misc/tools_stats_ghalton.hpp>
 #include <vinecopulib/misc/tools_stats_sobol.hpp>
 #include <vinecopulib/misc/tools_stl.hpp>
 #include <wdm/eigen.hpp>
+#include <wdm/random.hpp>
 #include <wdm/ranks.hpp>
 
 namespace vinecopulib {
@@ -31,9 +32,11 @@ namespace tools_stats {
 //! @param d Dimension.
 //! @param qrng If true, quasi-numbers are generated.
 //! @param seeds Seeds of the random number generator; if empty (default),
-//!   the random number generator is seeded randomly.
+//!   the random number generator is seeded randomly. Given seeds draw the
+//!   same numbers on every platform.
 //! @return An \f$ n \times d \f$ matrix of independent
-//! \f$ \mathrm{U}[0, 1] \f$ random variables.
+//! \f$ \mathrm{U}[0, 1] \f$ random variables, on a grid of \f$ 2^{-53}
+//! \f$.
 inline Eigen::MatrixXd
 simulate_uniform(const size_t& n,
                  const size_t& d,
@@ -50,23 +53,11 @@ simulate_uniform(const size_t& n,
   if ((n < 1) || (d < 1)) {
     throw std::runtime_error("n and d must be at least 1.");
   }
-  if (seeds.size() == 0) {
-    // no seeds provided, seed randomly
-    std::random_device rd{};
-    seeds = std::vector<int>(20);
-    std::generate(
-      seeds.begin(), seeds.end(), [&]() { return static_cast<int>(rd()); });
-  }
-
-  // initialize random engine and uniform distribution
-  boost::random::seed_seq seq(seeds.begin(), seeds.end());
-  boost::random::mt19937 generator(seq);
-  boost::random::uniform_real_distribution<double> distribution(0.0, 1.0);
-
-  // NullaryExpr fills the result directly (column-major, same order as the
-  // previous unaryExpr-based version) without a second allocation
+  // wdm's generator, which seeds randomly given no seeds
+  wdm::random::RandomGenerator generator(seeds);
+  // filled in column-major order, without a second allocation
   return Eigen::MatrixXd::NullaryExpr(
-    n, d, [&]() { return distribution(generator); });
+    n, d, [&]() { return generator.sample_double(); });
 }
 
 //! @brief Simulates from independendent normals.
@@ -94,7 +85,8 @@ inline Eigen::VectorXd
 pseudo_obs_1d_impl(std::vector<double>&& xvec,
                    const std::string& ties_method,
                    const std::vector<double>& weights,
-                   const std::vector<int>& seeds)
+                   const std::vector<int>& seeds,
+                   double scale)
 {
   // correction for NaNs (must be counted before the move)
   size_t n = xvec.size();
@@ -103,7 +95,8 @@ pseudo_obs_1d_impl(std::vector<double>&& xvec,
       n--;
     }
   }
-  auto res = wdm::impl::rank(std::move(xvec), weights, ties_method, seeds);
+  auto res =
+    wdm::impl::rank(std::move(xvec), weights, ties_method, seeds, scale);
   return Eigen::Map<Eigen::VectorXd>(res.data(), res.size()) /
          (static_cast<double>(n) + 1.0);
 }
@@ -119,21 +112,29 @@ pseudo_obs_1d_impl(std::vector<double>&& xvec,
 //! https://stat.ethz.ch/R-manual/R-devel/library/base/html/rank.html.
 //! @param weights Vector of weights for the observations.
 //! @param seeds Seeds for the random number generator, used only when
-//! `ties_method = "random"`.
+//! `ties_method = "random"`; each column appends its index to them.
+//! @param scale Distance below which distinct values rank partly as tied, in
+//! the units of `x`; zero (default) ranks by value.
 //! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$
 //! (column-wise).
 inline Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x,
               const std::string& ties_method,
               const Eigen::VectorXd& weights,
-              std::vector<int> seeds)
+              std::vector<int> seeds,
+              double scale)
 {
   // convert the weights once instead of once per column
   const auto wvec = wdm::utils::convert_vec(weights);
   const size_t n = x.rows();
   for (int j = 0; j < x.cols(); ++j) {
     std::vector<double> xvec(x.data() + n * j, x.data() + n * (j + 1));
-    x.col(j) = pseudo_obs_1d_impl(std::move(xvec), ties_method, wvec, seeds);
+    std::vector<int> column_seeds = seeds;
+    if (!seeds.empty()) {
+      column_seeds.push_back(j);
+    }
+    x.col(j) = pseudo_obs_1d_impl(
+      std::move(xvec), ties_method, wvec, column_seeds, scale);
   }
 
   return x;
@@ -151,51 +152,77 @@ to_pseudo_obs(Eigen::MatrixXd x,
 //! @param weights Vector of weights for the observations.
 //! @param seeds Seeds for the random number generator, used only when
 //! `ties_method = "random"`.
+//! @param scale As for `to_pseudo_obs()`.
 //! @return Pseudo-observations of the copula, i.e. \f$ F_X(x) \f$.
 inline Eigen::VectorXd
 to_pseudo_obs_1d(Eigen::VectorXd x,
                  const std::string& ties_method,
                  const Eigen::VectorXd& weights,
-                 std::vector<int> seeds)
+                 std::vector<int> seeds,
+                 double scale)
 {
   return pseudo_obs_1d_impl(wdm::utils::convert_vec(x),
                             ties_method,
                             wdm::utils::convert_vec(weights),
-                            seeds);
+                            seeds,
+                            scale);
 }
 
-//! @brief Makes values that are equal up to rounding exactly equal.
-//!
-//! Sorts the values and gives every run of consecutive values, each within
-//! `tol` of its predecessor, the run's smallest value. Values further apart
-//! than that, and `NaN`s, are returned unchanged, so data whose ties are exact
-//! is returned as it came.
-//!
-//! @param x A vector of real numbers.
-//! @param tol Absolute distance up to which two values are merged.
-//! @return `x` with near-ties made exact.
-inline Eigen::VectorXd
-merge_near_ties(const Eigen::VectorXd& x, double tol)
+//! @brief The `scale` of `to_pseudo_obs()` for copula data: the square root of
+//! the machine epsilon.
+inline double
+default_soft_scale()
 {
-  std::vector<Eigen::Index> order;
-  order.reserve(static_cast<size_t>(x.size()));
-  for (Eigen::Index i = 0; i < x.size(); ++i) {
-    if (!std::isnan(x(i))) {
-      order.push_back(i);
-    }
-  }
-  std::stable_sort(
-    order.begin(), order.end(), [&x](Eigen::Index a, Eigen::Index b) {
-      return x(a) < x(b);
-    });
+  return std::sqrt(std::numeric_limits<double>::epsilon());
+}
 
-  Eigen::VectorXd out = x;
-  for (size_t k = 1; k < order.size(); ++k) {
-    if (x(order[k]) - x(order[k - 1]) <= tol) {
-      out(order[k]) = out(order[k - 1]);
+//! @brief Whether a pair is in the order of its own values.
+//!
+//! At the first row whose two values (or, with four columns, left limits)
+//! differ, the smaller comes first.
+//!
+//! @param u A pair, `[u1, u2]` or `[u1, u2, u1^-, u2^-]`.
+//! @return Whether the columns have to be swapped.
+inline bool
+swaps_pair(const Eigen::MatrixXd& u)
+{
+  for (Eigen::Index i = 0; i < u.rows(); ++i) {
+    if (u(i, 0) != u(i, 1)) {
+      return u(i, 1) < u(i, 0);
+    }
+    if ((u.cols() == 4) && (u(i, 2) != u(i, 3))) {
+      return u(i, 3) < u(i, 2);
     }
   }
-  return out;
+  return false;
+}
+
+//! @brief Pseudo-observations of a pair, as a kernel pair copula ranks it.
+//!
+//! `to_pseudo_obs(pair, "random", weights, seeds, scale)` of the first two
+//! columns, ranked in the pair's own order (`swaps_pair()`).
+//!
+//! @param data The pair, `[u1, u2]` or `[u1, u2, u1^-, u2^-]`.
+//! @param weights Optional weights, one per observation.
+//! @param scale As for `to_pseudo_obs()`.
+//! @param seeds Seeds of the tie order.
+//! @return An \f$ n \times 2 \f$ matrix of pseudo-observations.
+inline Eigen::MatrixXd
+pair_soft_pseudo_obs(const Eigen::MatrixXd& data,
+                     const Eigen::VectorXd& weights,
+                     double scale,
+                     const std::vector<int>& seeds)
+{
+  const bool swapped = swaps_pair(data);
+  Eigen::MatrixXd pair = data.leftCols(2);
+  if (swapped) {
+    pair.col(0).swap(pair.col(1));
+  }
+  Eigen::MatrixXd psobs = to_pseudo_obs(pair, "random", weights, seeds, scale);
+  if (swapped) {
+    psobs.col(0).swap(psobs.col(1));
+  }
+  return psobs;
 }
 
 // Construct a box covering from a matrix of samples.
@@ -285,6 +312,16 @@ BoxCovering::swap_sample(size_t i, const Eigen::VectorXd& new_sample)
   boxes_[cell(new_sample(0)) * K_ + cell(new_sample(1))].insert(i);
 }
 
+// SplitMix64's finalizer, in integer arithmetic so every build draws alike
+inline uint64_t
+mix64(uint64_t z)
+{
+  z += 0x9e3779b97f4a7c15ULL;
+  z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ULL;
+  z = (z ^ (z >> 27)) * 0x94d049bb133111ebULL;
+  return z ^ (z >> 31);
+}
+
 //! @brief Recovers a continuous latent sample from a sample of a discrete
 //! copula.
 //!
@@ -323,21 +360,8 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     throw std::runtime_error("u must have four columns.");
   }
 
-  // The draws below are indexed by column position, so ordering the pair by
-  // its own values is what makes the result a function of the observations
-  // rather than of how they were passed. The columns tie only when the two
-  // variables are identical, where swapping them is a no-op.
-  bool swapped = false;
-  for (ptrdiff_t i = 0; i < u.rows(); i++) {
-    if (u(i, 0) != u(i, 1)) {
-      swapped = u(i, 1) < u(i, 0);
-      break;
-    }
-    if (u(i, 2) != u(i, 3)) {
-      swapped = u(i, 3) < u(i, 2);
-      break;
-    }
-  }
+  // the draws are indexed by column, so the pair is put in its own order
+  const bool swapped = swaps_pair(u);
   Eigen::MatrixXd v = u;
   if (swapped) {
     v.col(0).swap(v.col(1));
@@ -367,19 +391,31 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
   Eigen::MatrixXd x(n, 2), norm_sim(n, 2);
 
   for (size_t it = 0; it < niter; it++) {
-    uu = to_pseudo_obs(uu);
+    // soft, so values within rounding cannot reorder the cloud
+    uu =
+      to_pseudo_obs(uu, "average", Eigen::VectorXd(), {}, default_soft_scale());
     x = qnorm(uu);
     // the seed vectors hold `int`, which a `size_t` does not narrow to
     // implicitly inside a braced initializer
     const auto seed = static_cast<int>(it);
     norm_sim = simulate_normal(n, 2, false, { seed, 5 }).array() * b;
-    w = simulate_uniform(n, 1, false, { seed, 55 });
+    const uint64_t sweep = mix64(static_cast<uint64_t>(it) + 55);
 
     for (size_t i = 0; i < n; i++) {
       covering.get_box_indices(lb.row(i), ub.row(i), indices);
-      double n_idx = static_cast<double>(indices.size());
-      if (n_idx > 0) {
-        size_t j = indices.at(static_cast<size_t>(w(i) * n_idx));
+      if (!indices.empty()) {
+        // the compatible neighbor with the smallest fixed key: uniform, and
+        // unchanged unless that neighbor leaves the compatible set
+        const uint64_t target = mix64(sweep ^ mix64(i));
+        size_t j = indices[0];
+        uint64_t best = mix64(target ^ j);
+        for (size_t k = 1; k < indices.size(); ++k) {
+          const uint64_t key = mix64(target ^ indices[k]);
+          if ((key < best) || ((key == best) && (indices[k] < j))) {
+            best = key;
+            j = indices[k];
+          }
+        }
         x.row(i) = x.row(j) + norm_sim.row(i);
         uu.row(i) = pnorm(x.row(i));
         covering.swap_sample(i, uu.row(i));
@@ -387,7 +423,8 @@ find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter)
     }
   }
 
-  Eigen::MatrixXd latent = to_pseudo_obs(x);
+  Eigen::MatrixXd latent =
+    to_pseudo_obs(x, "average", Eigen::VectorXd(), {}, default_soft_scale());
   if (swapped) {
     latent.col(0).swap(latent.col(1));
   }
@@ -575,10 +612,17 @@ ace(const Eigen::MatrixXd& data,                        // data
 //! @{
 
 //! calculates the pairwise maximum correlation coefficient.
+//!
+//! @details Symmetric in the two variables, as the measure is by definition.
 inline double
 pairwise_mcor(const Eigen::MatrixXd& x, const Eigen::VectorXd& weights)
 {
-  Eigen::MatrixXd phi = ace(x, weights);
+  // ACE updates one variable first, so the pair is put in its own order
+  Eigen::MatrixXd v = x.leftCols(2);
+  if (swaps_pair(v)) {
+    v.col(0).swap(v.col(1));
+  }
+  Eigen::MatrixXd phi = ace(v, weights);
   return wdm::wdm(phi, "cor", weights)(0, 1);
 }
 

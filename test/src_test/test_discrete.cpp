@@ -7,6 +7,7 @@
 #include "gtest/gtest.h"
 #include <boost/math/distributions/negative_binomial.hpp>
 #include <cmath>
+#include <cstring>
 #include <limits>
 #include <vinecopulib.hpp>
 #include <wdm/eigen.hpp>
@@ -589,24 +590,181 @@ TEST(discrete, kernel_fit_ignores_rounding_noise_in_tied_continuous_data)
   EXPECT_LT(diff, 1e-10);
 }
 
-TEST(tools_stats, merge_near_ties_leaves_exact_data_alone)
+// a flipped discrete pair evaluates as the original, bit for bit
+TEST(discrete, a_flipped_kernel_pair_evaluates_as_the_original)
 {
-  Eigen::VectorXd x(6);
-  x << 0.5, 0.25, 0.5, 0.75, std::nan(""), 0.25;
-  Eigen::VectorXd out = tools_stats::merge_near_ties(x);
-  for (Eigen::Index i = 0; i < x.size(); ++i) {
-    if (std::isnan(x(i))) {
-      EXPECT_TRUE(std::isnan(out(i)));
-    } else {
-      EXPECT_EQ(out(i), x(i));
+  for (double rho : { 0.6, 0.97 }) {
+    auto gauss =
+      Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, rho));
+    auto u = gauss.simulate(2000, true, { 7 });
+    for (const auto& types :
+         std::vector<std::vector<std::string>>{ { "d", "c" }, { "d", "d" } }) {
+      Eigen::MatrixXd data(u.rows(), 4);
+      data.col(0) = (u.col(0).array() * 12).ceil() / 12;
+      data.col(2) = (u.col(0).array() * 12).floor() / 12;
+      if (types[1] == "d") {
+        data.col(1) = (u.col(1).array() * 9).ceil() / 9;
+        data.col(3) = (u.col(1).array() * 9).floor() / 9;
+      } else {
+        data.col(1) = u.col(1);
+        data.col(3) = u.col(1);
+      }
+      auto pair = Bicop();
+      pair.set_var_types(types);
+      pair.select(data, FitControlsBicop({ BicopFamily::tll }));
+      auto flipped = pair;
+      flipped.flip();
+
+      Eigen::MatrixXd swapped(data.rows(), 4);
+      swapped << data.col(1), data.col(0), data.col(3), data.col(2);
+      auto same = [](const Eigen::VectorXd& a, const Eigen::VectorXd& b) {
+        return (a.array() == b.array()).all();
+      };
+      EXPECT_TRUE(same(pair.pdf(data), flipped.pdf(swapped)))
+        << "rho = " << rho;
+      EXPECT_TRUE(same(pair.cdf(data), flipped.cdf(swapped)))
+        << "rho = " << rho;
+      EXPECT_TRUE(same(pair.hfunc1(data), flipped.hfunc2(swapped)))
+        << "rho = " << rho;
+      EXPECT_TRUE(same(pair.hfunc2(data), flipped.hfunc1(swapped)))
+        << "rho = " << rho;
     }
   }
+}
 
-  Eigen::VectorXd y(3);
-  y << 0.3, 0.3 * (1 + 4e-16), 0.3 * (1 + 1e-6);
-  Eigen::VectorXd merged = tools_stats::merge_near_ties(y);
-  EXPECT_EQ(merged(1), merged(0));
-  EXPECT_EQ(merged(2), y(2));
+// a pair fitted swapped and flipped back is the same fit, bit for bit
+TEST(discrete, kernel_fit_does_not_depend_on_argument_order)
+{
+  auto controls = FitControlsBicop({ BicopFamily::tll });
+  for (int seed = 0; seed < 10; ++seed) {
+    const Eigen::MatrixXd u =
+      tools_stats::simulate_uniform(1000, 2, false, { seed });
+    const Eigen::MatrixXd upper = (u.array() * 12).ceil() / 12;
+    const Eigen::MatrixXd lower = (u.array() * 12).floor() / 12;
+    const std::vector<std::pair<std::vector<std::string>, Eigen::MatrixXd>>
+      cases = {
+        { { "c", "c" }, u },
+        { { "d", "c" },
+          (Eigen::MatrixXd(u.rows(), 4) << upper.col(0),
+           u.col(1),
+           lower.col(0),
+           u.col(1))
+            .finished() },
+        { { "d", "d" },
+          (Eigen::MatrixXd(u.rows(), 4) << upper, lower).finished() },
+      };
+    for (const auto& [types, data] : cases) {
+      Eigen::MatrixXd swapped = data;
+      swapped.col(0).swap(swapped.col(1));
+      if (data.cols() == 4) {
+        swapped.col(2).swap(swapped.col(3));
+      }
+      auto pair = Bicop();
+      pair.set_var_types(types);
+      pair.select(data, controls);
+      auto reversed = Bicop();
+      reversed.set_var_types({ types[1], types[0] });
+      reversed.select(swapped, controls);
+      reversed.flip();
+      const std::string label =
+        types[0] + types[1] + ", seed " + std::to_string(seed);
+      EXPECT_TRUE(pair.get_parameters() == reversed.get_parameters()) << label;
+      EXPECT_EQ(pair.get_loglik(), reversed.get_loglik()) << label;
+      EXPECT_EQ(pair.get_npars(), reversed.get_npars()) << label;
+    }
+  }
+}
+
+// a discrete fit moves by about as little as its data: here a crowd of values
+// a hair's breadth apart, under noise keyed on each value, as rounding is
+TEST(discrete, kernel_fit_moves_continuously_with_its_data)
+{
+  auto gauss =
+    Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, 0.7));
+  auto u = gauss.simulate(2000, true, { 11 });
+  Eigen::MatrixXd data(u.rows(), 4);
+  data.col(0) = (u.col(0).array() * 12).ceil() / 12;
+  data.col(2) = (u.col(0).array() * 12).floor() / 12;
+  for (Eigen::Index i = 0; i < u.rows(); ++i) {
+    // a quarter of the rows crowd below 1, 0.5e-11 to 1.5e-11 apart
+    data(i, 1) = (i % 4 == 0) ? 1.0 - 0.9e-6 -
+                                  static_cast<double>(i) * 1e-11 *
+                                    (1.0 + 0.5 * std::sin(i))
+                              : u(i, 1);
+    data(i, 3) = data(i, 1);
+  }
+  auto controls = FitControlsBicop({ BicopFamily::tll });
+  auto fit = [&](const Eigen::MatrixXd& x) {
+    auto pair = Bicop();
+    pair.set_var_types({ "d", "c" });
+    pair.select(x, controls);
+    return Eigen::MatrixXd(pair.get_parameters());
+  };
+  const Eigen::MatrixXd base = fit(data);
+  for (uint64_t rep = 1; rep <= 3; ++rep) {
+    Eigen::MatrixXd noisy = data;
+    for (Eigen::Index i = 0; i < noisy.rows(); ++i) {
+      for (Eigen::Index j : { 0, 1, 2 }) {
+        // a pseudo-random relative error of up to 1e-13, keyed on the value
+        uint64_t bits;
+        std::memcpy(&bits, &data(i, j), sizeof bits);
+        uint64_t key = (bits ^ rep) + 0x9e3779b97f4a7c15ULL;
+        key = (key ^ (key >> 30)) * 0xbf58476d1ce4e5b9ULL;
+        key = (key ^ (key >> 27)) * 0x94d049bb133111ebULL;
+        key ^= key >> 31;
+        const double xi =
+          static_cast<double>(key >> 11) / 9007199254740992.0 * 2.0 - 1.0;
+        noisy(i, j) = std::min(data(i, j) * (1.0 + 1e-13 * xi), 1.0);
+      }
+      noisy(i, 3) = noisy(i, 1);
+    }
+    EXPECT_LT((fit(noisy) - base).array().abs().maxCoeff(), 1e-6)
+      << "rep = " << rep;
+  }
+}
+
+// the soft ranks are wdm's; this checks the scale and seeds passed to them
+TEST(tools_stats, pseudo_obs_with_a_scale_are_the_ranks_of_separated_values)
+{
+  Eigen::MatrixXd x(8, 1);
+  x << 0.3, 0.1, 0.7, 0.3, 0.5, 0.3, 0.9, 0.2;
+  for (const std::string ties : { "average", "random" }) {
+    EXPECT_EQ(
+      tools_stats::to_pseudo_obs(x, ties, Eigen::VectorXd(), { 5 }),
+      tools_stats::to_pseudo_obs(
+        x, ties, Eigen::VectorXd(), { 5 }, tools_stats::default_soft_scale()))
+      << ties;
+  }
+}
+
+TEST(tools_stats, pseudo_obs_with_a_scale_move_continuously)
+{
+  // a crowd within rounding: a shift far below the scale barely moves the ranks
+  const Eigen::Index n = 400;
+  Eigen::MatrixXd x(n, 1), y(n, 1);
+  for (Eigen::Index i = 0; i < n; ++i) {
+    const double v = static_cast<double>(i % 50) / 50.0;
+    x(i, 0) = v + static_cast<double>((i % 7) - 3) * 1e-13;
+    y(i, 0) = v + static_cast<double>((i % 5) - 2) * 1e-13;
+  }
+  const double s = tools_stats::default_soft_scale();
+  const Eigen::VectorXd a =
+    tools_stats::to_pseudo_obs(x, "random", Eigen::VectorXd(), { 5 }, s);
+  const Eigen::VectorXd b =
+    tools_stats::to_pseudo_obs(y, "random", Eigen::VectorXd(), { 5 }, s);
+  EXPECT_LT((a - b).array().abs().maxCoeff(), 1e-6);
+}
+
+TEST(tools_stats, seeded_random_ties_differ_between_columns)
+{
+  // two columns tied in the same rows are not ordered alike
+  Eigen::MatrixXd x(200, 2);
+  for (Eigen::Index i = 0; i < x.rows(); ++i) {
+    x(i, 0) = x(i, 1) = static_cast<double>(i % 4);
+  }
+  const Eigen::MatrixXd u =
+    tools_stats::to_pseudo_obs(x, "random", Eigen::VectorXd(), { 1 });
+  EXPECT_FALSE(u.col(0).isApprox(u.col(1)));
 }
 
 TEST(discrete, with_var_types_round_trips_the_variable_types)

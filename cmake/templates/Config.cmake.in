@@ -32,7 +32,7 @@ endmacro()
 
 vinecopulib_find_dependency(Eigen3 Eigen3::Eigen "@EIGEN3_INCLUDE_DIR@" CONFIG)
 vinecopulib_find_dependency(Boost Boost::headers "@Boost_INCLUDE_DIRS@" 1.75 CONFIG)
-vinecopulib_find_dependency(wdm wdm "@wdm_INCLUDE_DIRS@" 0.3.0)
+vinecopulib_find_dependency(wdm wdm "@wdm_INCLUDE_DIRS@" 0.3.2)
 # Threads::Threads appears in the exported link interface, so the consumer needs
 # the imported target to exist.
 find_dependency(Threads)

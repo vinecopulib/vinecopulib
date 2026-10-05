@@ -27,11 +27,11 @@ public:
 
   InterpolationGrid(const Eigen::VectorXd& grid_points,
                     const Eigen::MatrixXd& values,
-                    int norm_maxiter = 25);
+                    int norm_maxiter = 2000);
 
   Eigen::MatrixXd get_values() const;
 
-  void set_values(const Eigen::MatrixXd& values, int norm_maxiter = 25);
+  void set_values(const Eigen::MatrixXd& values, int norm_maxiter = 2000);
 
   void flip();
 
@@ -48,8 +48,8 @@ public:
 
   Eigen::VectorXd integrate_2d(const tools_eigen::ConstMatRef& u);
 
-  //! @brief probability of one rectangle, without the cancellation a
-  //! difference of four `integrate_2d()` values carries.
+  //! @brief mass of the interpolant over one rectangle, without the
+  //! cancellation a difference of four `integrate_2d()` values carries.
   double rect_mass(double a1, double b1, double a2, double b2) const;
 
   //! @brief probability of one interval in the free coordinate, given the
@@ -80,10 +80,27 @@ private:
                                                 double a,
                                                 double b);
   ptrdiff_t interval_weights(double lo, double hi, Eigen::VectorXd& w) const;
-  void row_integrals(double u, Eigen::VectorXd& out) const;
+  void cumulative_lines(const Eigen::MatrixXd& v, Eigen::MatrixXd& cum) const;
+  double sweep(const Eigen::MatrixXd& v,
+               const Eigen::MatrixXd& cum,
+               double a,
+               ptrdiff_t ia,
+               double b,
+               ptrdiff_t jb) const;
+  double line_integral(const Eigen::MatrixXd& v,
+                       const Eigen::MatrixXd& cum,
+                       ptrdiff_t k,
+                       ptrdiff_t j,
+                       double upr) const;
+  static double block_mass(const Eigen::MatrixXd& v,
+                           ptrdiff_t i0,
+                           const Eigen::VectorXd& wa,
+                           ptrdiff_t j0,
+                           const Eigen::VectorXd& wb);
   // normalizes the grid margins; internal only (callers must refresh the
   // cached integrals afterwards, as the ctor and set_values do)
   void normalize_margins(int max_iter);
+  bool newton_margins(int max_steps);
   void update_weights();
   ptrdiff_t binary_search(double x);
   ptrdiff_t find_cell(double x) const;
@@ -93,7 +110,6 @@ private:
                        double p,
                        size_t cond_var,
                        Eigen::VectorXd& knots) const;
-  double int_on_grid(double upr, const Eigen::VectorXd& vals) const;
 
   Eigen::VectorXd grid_points_;
   Eigen::MatrixXd values_;
@@ -104,10 +120,11 @@ private:
   // the piecewise linear function through (grid_points_, v) over [0, 1];
   // built once alongside `cell_lookup_`
   Eigen::VectorXd weights_;
-  // cumulative row integrals R(k, j) = int_0^{grid_j} values_(k, .);
-  // refreshed eagerly whenever values_ changes (lazy caching would race
-  // when a shared grid is evaluated from multiple threads)
+  // the transpose and cumulative integrals of rows and columns, refreshed
+  // eagerly with values_ (lazy caching would race across threads)
+  Eigen::MatrixXd values_t_;
   Eigen::MatrixXd row_cum_int_;
+  Eigen::MatrixXd col_cum_int_;
 };
 }
 }

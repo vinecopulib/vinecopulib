@@ -140,13 +140,15 @@ Eigen::VectorXd
 to_pseudo_obs_1d(Eigen::VectorXd x,
                  const std::string& ties_method = "average",
                  const Eigen::VectorXd& weights = Eigen::VectorXd(),
-                 std::vector<int> seeds = std::vector<int>());
+                 std::vector<int> seeds = std::vector<int>(),
+                 double scale = 0.0);
 
 Eigen::MatrixXd
 to_pseudo_obs(Eigen::MatrixXd x,
               const std::string& ties_method = "average",
               const Eigen::VectorXd& weights = Eigen::VectorXd(),
-              std::vector<int> seeds = std::vector<int>());
+              std::vector<int> seeds = std::vector<int>(),
+              double scale = 0.0);
 
 //! @brief Covers the unit hypercube with boxes and assigns each sample to a
 //! box.
@@ -178,8 +180,17 @@ private:
 Eigen::MatrixXd
 find_latent_sample(const Eigen::MatrixXd& u, double b, size_t niter = 3);
 
-Eigen::VectorXd
-merge_near_ties(const Eigen::VectorXd& x, double tol = 1e-11);
+double
+default_soft_scale();
+
+bool
+swaps_pair(const Eigen::MatrixXd& u);
+
+Eigen::MatrixXd
+pair_soft_pseudo_obs(const Eigen::MatrixXd& data,
+                     const Eigen::VectorXd& weights = Eigen::VectorXd(),
+                     double scale = default_soft_scale(),
+                     const std::vector<int>& seeds = { 5 });
 
 double
 pairwise_mcor(const Eigen::MatrixXd& x,

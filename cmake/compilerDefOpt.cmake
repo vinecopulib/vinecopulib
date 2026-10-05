@@ -60,10 +60,6 @@ set(VINECOPULIB_DEFINITIONS
   BOOST_ALLOW_DEPRECATED_HEADERS
   BOOST_MATH_PROMOTE_DOUBLE_POLICY=false
   BOOST_ALL_NO_LIB
-  # Selects Boost's mt19937 over std::mt19937 in wdm's RandomGenerator
-  # (wdm/random.hpp). Changing it changes the "random" ties method in
-  # to_pseudo_obs, and so every tll fit.
-  USE_BOOST
 )
 
 add_compile_definitions(${VINECOPULIB_DEFINITIONS})
