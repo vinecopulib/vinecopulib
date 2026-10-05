@@ -39,6 +39,10 @@
   vine equals a refit of its structure; its margins are normalized to
   convergence, and `tools_stats::pairwise_mcor()` is symmetric (#799)
 
+* A `tll` fit with `nonparametric_method = "linear"` estimates the density
+  correctly when the bandwidth is correlated, and `"linear"` and `"quadratic"`
+  report the correct effective degrees of freedom (#800)
+
 ### BUILD SYSTEM AND DEPENDENCIES
 
 * Requires wdm 0.3.2; `USE_BOOST` is no longer defined (#799)
@@ -46,6 +50,11 @@
 * CI builds and tests against Eigen 5.0.1 as well as 3.4.0, with the address
   and undefined-behavior sanitizers, so a regression that only one major
   version exposes is caught (#792)
+
+### DOCUMENTATION AND TOOLING
+
+* `docs/tll/tll_and_interpolation.tex` describes the `tll` estimator, its grid
+  and its normalization, with the derivations (#800)
 
 ## vinecopulib 1.0.0 (September 18, 2026)
 

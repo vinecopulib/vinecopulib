@@ -1,0 +1,505 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm, bm}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\codeus}{\textunderscore\allowbreak}
+\newcommand{\code}[1]{\begingroup\let\_\codeus\texttt{#1}\endgroup}
+\emergencystretch=3em
+\newcommand{\one}{\mathbf{1}}
+
+\title{The \code{tll} pair copula: estimation, interpolation and normalization}
+\author{vinecopulib}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent
+This note describes what \code{TllBicop} computes, from the data to every
+evaluation, and points to the functions that compute it. The main text states
+each step and its result; the derivations are in the appendices.
+
+\tableofcontents
+
+\section{Overview}
+
+A \code{tll} fit (\code{TllBicop::fit}) runs these steps.
+\begin{enumerate}
+  \item Put the pair in its own order (Section~\ref{sec:symmetry}).
+  \item Rank the data and map the ranks to the normal scale
+    (Section~\ref{sec:transformation}).
+  \item Select a bandwidth matrix (Section~\ref{sec:bandwidth}).
+  \item For discrete data, replace the ranks by a latent continuous sample
+    (Section~\ref{sec:discrete}).
+  \item Estimate the density on the normal scale by local likelihood, at the
+    nodes of a grid (Section~\ref{sec:locallik}), and transform it to the
+    copula scale.
+  \item Normalize the grid to uniform margins (Section~\ref{sec:normalization}).
+  \item Compute the effective degrees of freedom and the log-likelihood
+    (Section~\ref{sec:edf}).
+\end{enumerate}
+The fitted object is the grid of density values; every evaluation reads its
+bilinear interpolant (Sections~\ref{sec:grid} and~\ref{sec:evaluation}).
+
+\section{The transformation estimator}
+\label{sec:transformation}
+
+Let $(U_1, U_2)$ have copula density $c$ and let $Z = (\Phi^{-1}(U_1),
+\Phi^{-1}(U_2))$. Its density is $f(z) = c(\Phi(z_1), \Phi(z_2))\,
+\phi(z_1)\phi(z_2)$, so
+\begin{equation}
+  c(u) = \frac{f\bigl(\Phi^{-1}(u_1), \Phi^{-1}(u_2)\bigr)}
+              {\phi\bigl(\Phi^{-1}(u_1)\bigr)\,\phi\bigl(\Phi^{-1}(u_2)\bigr)}.
+  \label{eq:transformation}
+\end{equation}
+The density $f$ has unbounded support and no boundary to correct for, which is
+why it is estimated instead of $c$. The data enter through their ranks: with
+$R_{ij}$ the rank of observation $i$ in column $j$, the pseudo-observations are
+$\widehat U_{ij} = R_{ij} / (n + 1)$ and $Z_i = \Phi^{-1}(\widehat U_i)$.
+Ties are ordered by a fixed random key per observation (\code{to\_pseudo\_obs}
+with \code{"random"} ties, through \code{pair\_soft\_pseudo\_obs}), so the
+ranks are reproducible on every platform.
+
+\section{Local likelihood on the normal scale}
+\label{sec:locallik}
+
+\subsection{The estimator}
+
+Near a point $x \in \R^2$, $\log f(x + v)$ is approximated by a polynomial
+$P_a(v) = a^\top A(v)$ of degree $p$:
+\[
+  A(v) = \begin{cases}
+    1 & p = 0\ (\code{"constant"}), \\
+    (1, v_1, v_2)^\top & p = 1\ (\code{"linear"}), \\
+    (1, v_1, v_2, v_1^2/2, v_1 v_2, v_2^2/2)^\top & p = 2\ (\code{"quadratic"}).
+  \end{cases}
+\]
+With the Gaussian kernel $W_B(v) = (2\pi)^{-1} |B|^{-1/2}
+\exp(-v^\top B^{-1} v / 2)$ and observation weights $\omega_i$ (one by
+default), the coefficients maximize the local log-likelihood
+\[
+  L_x(a) = \sum_{i=1}^n \omega_i W_B(Z_i - x)\, P_a(Z_i - x)
+           - n \int W_B(v)\, e^{P_a(v)}\, dv,
+\]
+and the estimate is $\hat f(x) = e^{\hat a_0}$
+(\code{TllBicop::fit\_local\_likelihood}).
+
+\subsection{Closed forms}
+
+All three degrees have closed-form solutions in terms of the kernel-weighted
+moments of the data around $x$. Let
+\[
+  \tilde f(x) = \frac{1}{n} \sum_{i=1}^n \omega_i W_B(Z_i - x), \qquad
+  \pi_i(x) = \frac{\omega_i W_B(Z_i - x)}{\sum_j \omega_j W_B(Z_j - x)},
+\]
+\[
+  \mu(x) = \sum_i \pi_i(x)\, (Z_i - x), \qquad
+  \Sigma(x) = \sum_i \pi_i(x)\, (Z_i - x - \mu)(Z_i - x - \mu)^\top .
+\]
+Then, dropping the argument $x$,
+\begin{align}
+  p = 0:&\quad \hat f = \tilde f, \label{eq:constant}\\
+  p = 1:&\quad \hat f = \tilde f\,
+           \exp\bigl(-\tfrac12 \mu^\top B^{-1} \mu\bigr), \label{eq:linear}\\
+  p = 2:&\quad \hat f = \tilde f\, \bigl(|B| / |\Sigma|\bigr)^{1/2}
+           \exp\bigl(-\tfrac12 \mu^\top \Sigma^{-1} \mu\bigr).
+           \label{eq:quadratic}
+\end{align}
+In each case the fitted local model is a scaled Gaussian,
+\begin{equation}
+  W_B(v)\, e^{P_{\hat a}(v)} = \tilde f\; \N(v;\, m_p, S_p), \qquad
+  (m_p, S_p) = (0, B),\ (\mu, B),\ (\mu, \Sigma)
+  \quad \text{for } p = 0, 1, 2,
+  \label{eq:gaussian}
+\end{equation}
+whose moments up to order $p$ match the kernel-weighted moments of the data
+(Appendix~\ref{app:locallik}). The quadratic fit needs $\Sigma \succ 0$; where
+a closed form is not finite, the estimate is set to $0$. The code evaluates
+these forms after whitening the data by the Cholesky factor of $B$, in which
+the bandwidth is the identity.
+
+\subsection{Bandwidth}
+\label{sec:bandwidth}
+
+The bandwidth matrix (\code{TllBicop::select\_bandwidth}) is
+\[
+  B = \kappa\, h_n\, \Bigl|\frac{\hat\rho}{\hat\rho_{\max}}\Bigr|^{\hat\rho_{\max}/2}
+      \begin{pmatrix} 1 & \hat\rho \\ \hat\rho & 1 \end{pmatrix},
+  \qquad
+  h_n = \begin{cases}
+    n^{-1/3} & p = 0, \\
+    1.5\, n^{-1/(2p + 1)} & p = 1, 2,
+  \end{cases}
+\]
+where $\kappa$ is \code{nonparametric\_mult}, $\hat\rho$ is the (weighted)
+Pearson correlation of the $Z_i$, clamped to $[-0.95, 0.95]$, and
+$\hat\rho_{\max}$ is their maximal correlation. The last factor shrinks the
+bandwidth when the dependence is far from Gaussian, that is when
+$\hat\rho_{\max}$ exceeds $|\hat\rho|$.
+
+The maximal correlation is estimated by alternating conditional expectations
+(\code{tools\_stats::ace}): starting from the standardized ranks, each variable
+is replaced in turn by the running mean of the other, over a window of
+half-width $\lceil n / 5 \rceil$ in its rank order, and standardized;
+$\hat\rho_{\max}$ is the correlation of the two transformed variables
+(\code{pairwise\_mcor}).
+
+\section{Effective degrees of freedom and log-likelihood}
+\label{sec:edf}
+
+The effective degrees of freedom are $\nu = \sum_i \mathrm{infl}(Z_i)$, with
+the influence of a point
+\[
+  \mathrm{infl}(x) = \frac{W_B(0)}{n}\, e_1^\top M(x)^{-1} e_1, \qquad
+  M(x) = \int W_B(v)\, A(v) A(v)^\top e^{P_{\hat a}(v)}\, dv .
+\]
+By~\eqref{eq:gaussian}, $M = \tilde f\, \E[A(Y) A(Y)^\top]$ with
+$Y \sim \N(m_p, S_p)$, and a Schur complement gives
+\begin{equation}
+  \mathrm{infl}(x) = \frac{W_B(0)}{n\, \tilde f(x)}
+    \bigl(1 + \bar m^\top \bar C^{-1} \bar m\bigr),
+  \label{eq:infl}
+\end{equation}
+where $\bar m$ and $\bar C$ are the mean and covariance of the non-constant
+entries of $A(Y)$ (Appendix~\ref{app:edf}). In particular,
+\[
+  \mathrm{infl} = \frac{W_B(0)}{n \tilde f} \quad (p = 0), \qquad
+  \mathrm{infl} = \frac{W_B(0)}{n \tilde f}
+    \bigl(1 + \mu^\top B^{-1} \mu\bigr) \quad (p = 1),
+\]
+and for $p = 2$ the moments of $(Y_1, Y_2, Y_1^2/2, Y_1 Y_2, Y_2^2/2)$ are
+listed in Appendix~\ref{app:edf}. With weights, the influence is multiplied by
+the local mean weight $\sum_i \omega_i W_B(Z_i - x) / \sum_i W_B(Z_i - x)$
+(\code{TllBicop::calculate\_infl}).
+
+The influence is computed at the grid nodes, clamped to $[-0.2, 1.3]$, and
+interpolated bilinearly at the data on the copula scale, without
+normalization. The number of parameters is $\max(\nu, 1)$, and the
+log-likelihood is $\sum_i \log \hat c(U_i)$ with the final interpolant.
+
+\section{The grid and its interpolant}
+\label{sec:grid}
+
+The density is estimated at the $m \times m$ nodes $(t_k, t_l)$, with $m$ the
+grid size (\code{nonparametric\_grid\_size}, $30$ by default) and
+$t_k = -3.25 + 6.5\, k / (m - 1)$. By~\eqref{eq:transformation} the grid values
+are the entries of the matrix $V = (v_{kl})$, with $v_{kl} = \hat f(t_k, t_l) /
+(\phi(t_k)\phi(t_l))$, held at the copula-scale points $g_k = \Phi(t_k)$,
+except that $g_0$ and $g_{m-1}$ are moved to $0$ and $1$ so that no evaluation
+extrapolates (\code{InterpolationGrid}).
+
+Between nodes the density is the bilinear interpolant: on the cell
+$[g_k, g_{k+1}] \times [g_l, g_{l+1}]$, with $\lambda = (g_{k+1} - u_1) /
+\Delta_k$, $\eta = (g_{l+1} - u_2) / \Delta_l$ and $\Delta_k = g_{k+1} - g_k$,
+\[
+  \hat c(u) = \lambda\eta\, v_{kl} + (1 - \lambda)\eta\, v_{k+1,l}
+            + \lambda(1 - \eta)\, v_{k,l+1} + (1 - \lambda)(1 - \eta)\,
+              v_{k+1,l+1}.
+\]
+It is nonnegative wherever $V \geq 0$. Along any line where one argument is
+fixed it is piecewise linear, so the trapezoid rule integrates it exactly, and
+its margins are
+\begin{equation}
+  \int_0^1 \hat c(u_1, s)\, ds = \lambda r_k + (1 - \lambda) r_{k+1},
+  \qquad r = V w, \qquad c = V^\top w,
+  \label{eq:margins}
+\end{equation}
+with the trapezoid weights $w_k = (g_{k+1} - g_{k-1}) / 2$ (one-sided at the
+ends), which sum to one. The interpolant is therefore a copula density exactly
+when $V \geq 0$, $V w = \one$ and $V^\top w = \one$.
+
+\section{Normalization to uniform margins}
+\label{sec:normalization}
+
+The local likelihood estimate does not have uniform margins, and the
+normalization (\code{InterpolationGrid::normalize\_margins}) rescales the rows
+and columns of $V$ until it does, to rounding. Its residual is
+$\varepsilon = \max(\lVert r - \one \rVert_\infty, \lVert c - \one
+\rVert_\infty)$.
+
+\paragraph{Passes.} A pass is the geometric mean of the two orders of
+Sinkhorn's iteration (rows then columns, columns then rows):
+\[
+  v_{kl} \leftarrow \frac{v_{kl}}{\sqrt{r_k r'_k}\, \sqrt{c_l c'_l}}, \qquad
+  r' = V (w / c), \qquad c' = V^\top (w / r),
+\]
+with $r$ and $c$ the current margins, and divisions elementwise. It treats rows
+and columns alike, so a grid and its transpose normalize to transposes of each
+other, bit for bit.
+
+\paragraph{Newton's method.} Under strong dependence the passes converge
+slowly, and after 25 of them Newton's method on the log scalings finishes
+(\code{newton\_margins}). Scaling $v_{kl}$ by $e^{a_k + b_l}$ moves the log
+margins, to first order, by
+\[
+  \log r \leftarrow \log r + a + P b, \qquad
+  \log c \leftarrow \log c + b + Q a, \qquad
+  P = \diag(r)^{-1} V D, \quad Q = \diag(c)^{-1} V^\top D,
+\]
+with $D = \diag(w)$. Setting both to zero and eliminating either unknown gives
+\begin{align*}
+  (I - PQ + \Pi_r)\, a &= P \log c - \log r, & b &= -\log c - Q a, \\
+  (I - QP + \Pi_c)\, b &= Q \log r - \log c, & a &= -\log r - P b,
+\end{align*}
+and a step averages the two solutions, so that it commutes with transposition
+as a pass does. $P$ and $Q$ are row stochastic, so $I - PQ$ and $I - QP$ are
+singular: scaling the rows of a block of the grid's support up and its columns
+down leaves the grid unchanged. The pins $\Pi_r$ and $\Pi_c$ remove that
+direction, once per block: $(\Pi_r)_{kk'} = 1 / |\mathcal B|$ for rows $k, k'$
+of the same block $\mathcal B$, and likewise for columns; on a connected
+support, which every fit has, both are the rank-one $\one\one^\top / m$. A step
+is halved until it lowers the residual, at most 30 times
+(Appendix~\ref{app:newton}).
+
+\paragraph{Stopping.} Normalization stops once
+$\varepsilon \leq 8\,\epsilon_{\text{mach}}$, or once $\varepsilon < 10^{-12}$
+stops decreasing. Newton's method runs at most 50 steps; if it stalls before
+converging, the passes resume. A fit allows 2000 passes; setting a grid as
+parameters does not normalize it.
+
+\section{Evaluation}
+\label{sec:evaluation}
+
+Every evaluation reads the interpolant and its exact integrals.
+
+\paragraph{Density.} $\hat c(u)$, floored at $10^{-20}$ (\code{pdf\_raw}).
+
+\paragraph{Conditional distribution functions.}
+\[
+  h_1(u_2 \mid u_1) = \frac{\int_0^{u_2} \hat c(u_1, s)\, ds}
+                           {\int_0^1 \hat c(u_1, s)\, ds},
+\]
+read off the line through $u_1$, whose knots are interpolated between the two
+bracketing grid lines, and clamped to $[10^{-10}, 1 - 10^{-10}]$; $h_2$ is the
+same with the arguments' roles swapped (\code{cond\_interval\_mass}). The
+normalization makes the denominator one to rounding.
+
+\paragraph{Their inverses.} Along the line, the cumulative integral is
+piecewise quadratic, so the quantile has a closed form in the cell that holds
+it (\code{cond\_quantile}, Appendix~\ref{app:interpolant}), with the level
+clamped like $h_1$. In a cell carrying no mass, every point is a quantile and
+the cell's left end is returned.
+
+\paragraph{Distribution function.} $\hat C(u_1, u_2)$ is the mass of
+$[0, u_1] \times [0, u_2]$: the line integrals $L_k(u_2) = \int_0^{u_2}
+\hat c(g_k, s)\, ds$, read off cumulative tables, are integrated across the
+rows by the trapezoid rule, exactly (Appendix~\ref{app:interpolant}). It is
+summed rows first if $u_1 < u_2$, columns first if $u_2 < u_1$, and both
+averaged on the diagonal, a rule that swaps with the arguments
+(\code{integrate\_2d}). It is clamped like $h_1$.
+
+\paragraph{Probabilities.} The mass of a rectangle $(a_1, b_1] \times
+(a_2, b_2]$ is $\omega^{(1)\top} V \omega^{(2)}$, with nonnegative weights
+integrating the linear basis over each interval (\code{rect\_mass}). Nothing
+cancels, so its relative error does not grow as the rectangle narrows, as a
+difference of four values of $\hat C$ would. The conditional mass of an
+interval given one argument is the line's mass over the interval divided by
+its total.
+
+\section{Discrete and mixed data}
+\label{sec:discrete}
+
+A discrete variable enters with its left limits: the data are
+$(u_1, u_2, u_1^-, u_2^-)$, with $u_j^- = u_j$ for a continuous variable. The
+density is taken with respect to the counting measure in each discrete
+argument:
+\[
+  c = \frac{\hat C\bigl((u_1^-, u_1] \times (u_2^-, u_2]\bigr)}
+           {(u_1 - u_1^-)(u_2 - u_2^-)} \ \text{(both discrete)}, \qquad
+  c = \frac{P\bigl(U_1 \in (u_1^-, u_1] \mid U_2 = u_2\bigr)}{u_1 - u_1^-}
+      \ \text{(first discrete)},
+\]
+both read as masses (Section~\ref{sec:evaluation}); an atom narrower than
+$5 \times 10^{-5}$ uses the derivative at its midpoint instead. An h-function
+conditioning on a discrete argument is likewise a rectangle's mass divided by
+the atom's width (\code{AbstractBicop::hfunc1}). Three steps of the fit change.
+
+\paragraph{Soft ranks.} The ranks that select the bandwidth move continuously
+with the data. The rank of $x_i$ is $1 + \sum_{j \neq i} p_{ij}$, with
+\[
+  p_{ij} = \kappa_{ij} t_{ij} + (1 - \kappa_{ij})\,
+           \Phi\Bigl(\frac{x_i - x_j}{s}\Bigr), \qquad
+  \kappa_{ij} = \exp\Bigl(-\frac{(x_i - x_j)^2}{2 s^2}\Bigr),
+\]
+where $t_{ij}$ is what the tie method assigns a tie ($1/2$ for average ties,
+the order of fixed keys for random ties) and $s = \sqrt{\epsilon_{\text{mach}}}$
+(wdm's \code{rank} with a \code{scale}). Values more than about $9s$ apart are
+ranked by value, and exact ties as before. A continuous pair uses $s = 0$,
+the ranks by value.
+
+\paragraph{Latent sample.} The local likelihood runs on a continuous sample
+drawn from the data's rectangles (\code{find\_latent\_sample}), with
+$b = (B_{11} B_{22})^{1/4}$:
+\begin{enumerate}
+  \item Start from $U_i = u_i^- + \xi_i \circ (u_i - u_i^-)$, with $\xi_i$ uniform
+    on $[0, 1]^2$ from a fixed seed; $U_i = u_i$ exactly where there is no
+    atom.
+  \item Three times: soft-rank the current points (average ties, scale $s$),
+    map them to the normal scale, $X_i = \Phi^{-1}(\cdot)$, and visit the
+    observations in order. Observation $i$ takes, among the observations whose
+    current point lies in its rectangle widened by $b$ on the normal scale,
+    the one $j$ with the smallest fixed key $k(\text{sweep}, i, j)$, and moves
+    to $X_i \leftarrow X_j + b\, \varepsilon_i$, with $\varepsilon_i \sim
+    \N(0, I)$ from a fixed seed.
+  \item Return the soft average ranks of the $X_i$.
+\end{enumerate}
+The neighbor is a uniform draw from the compatible observations that changes
+only when that neighbor leaves the set, so a small change to the data does not
+redraw every later observation.
+
+\paragraph{Degrees of freedom.} The influence is read at the midpoints
+$\bar u_i = (u_i + u_i^-) / 2$, and a repeated point counts once:
+$\nu = \sum_i \mathrm{infl}(\bar u_i) / m_i$, with the soft count
+$m_i = \sum_j \exp(-\lVert \bar u_i - \bar u_j \rVert^2 / (2 s^2))$
+(\code{TllBicop::multiplicity}).
+
+\section{Symmetry in the arguments}
+\label{sec:symmetry}
+
+A pair's own order puts first the column that is smaller at the first row
+where the two differ, comparing the left limits where the values agree
+(\code{swaps\_pair}). The fit runs in that order and transposes the grid back;
+the maximal correlation and the latent draw also run in it; and the
+normalization and every mass treat the two arguments alike. A pair and its
+flip are therefore the same fit, and evaluate alike, bit for bit.
+
+\appendix
+
+\section{Local likelihood solutions}
+\label{app:locallik}
+
+Write $P_a(v) = a_0 + b^\top v + \frac12 v^\top C v$, with $C = 0$ for $p \leq
+1$ and $b = 0$ for $p = 0$, and assume $S^{-1} = B^{-1} - C \succ 0$.
+Completing the square,
+\[
+  W_B(v)\, e^{P_a(v)} = K\, \N(v;\, S b, S), \qquad
+  K = |S|^{1/2} |B|^{-1/2} \exp\bigl(a_0 + \tfrac12 b^\top S b\bigr).
+\]
+Setting $\nabla_a L_x = 0$ gives the moment equations
+\[
+  \frac1n \sum_i \omega_i W_B(Z_i - x)\, A(Z_i - x)
+  = \int A(v)\, W_B(v)\, e^{P_a(v)}\, dv
+  = K\, \E\bigl[A(Y)\bigr], \qquad Y \sim \N(Sb, S).
+\]
+Their left side is $\tilde f$ times the $\pi$-weighted mean of $A(Z_i - x)$.
+\begin{itemize}
+  \item $p = 0$: $K = \tilde f$ and $S = B$, so $e^{a_0} = \tilde f$.
+  \item $p = 1$: $K = \tilde f$ and $K S b = \tilde f \mu$ with $S = B$, so
+    $b = B^{-1}\mu$ and $e^{a_0} = \tilde f \exp(-\frac12 \mu^\top B^{-1}
+    \mu)$.
+  \item $p = 2$: $K = \tilde f$, $S b = \mu$ and $S + \mu\mu^\top =
+    \Sigma + \mu\mu^\top$, so $S = \Sigma$, $b = \Sigma^{-1}\mu$ and
+    $e^{a_0} = \tilde f\, (|B| / |\Sigma|)^{1/2}
+    \exp(-\frac12 \mu^\top \Sigma^{-1} \mu)$.
+\end{itemize}
+These are \eqref{eq:constant}--\eqref{eq:gaussian}, with $(m_p, S_p) =
+(Sb, S)$.
+
+\section{Effective degrees of freedom}
+\label{app:edf}
+
+By the representation above, $M = \tilde f\, \E[A(Y) A(Y)^\top]$ with
+$Y \sim \N(m_p, S_p)$. Write $A = (1, \tilde A^\top)^\top$, $\bar m =
+\E[\tilde A]$ and $\bar C = \operatorname{Cov}(\tilde A)$. Then
+\[
+  M = \tilde f \begin{pmatrix} 1 & \bar m^\top \\
+                               \bar m & \bar C + \bar m \bar m^\top
+               \end{pmatrix},
+  \qquad
+  (M^{-1})_{11} = \frac{1}{\tilde f\,\bigl(1 - \bar m^\top (\bar C + \bar m
+                  \bar m^\top)^{-1} \bar m\bigr)}
+                = \frac{1 + \bar m^\top \bar C^{-1} \bar m}{\tilde f},
+\]
+the last step by the Sherman--Morrison formula, which gives~\eqref{eq:infl}.
+For $p = 1$, $\tilde A = Y \sim \N(\mu, B)$. For $p = 2$, $\tilde A = (Y_1,
+Y_2, \frac12 Y_1^2, Y_1 Y_2, \frac12 Y_2^2)$ with $Y \sim \N(\mu, \Sigma)$,
+whose moments follow from Isserlis' theorem:
+\begin{align*}
+  \E[Y_i Y_j] &= \Sigma_{ij} + \mu_i \mu_j, \\
+  \operatorname{Cov}(Y_i, Y_k Y_l) &= \Sigma_{ik} \mu_l + \Sigma_{il} \mu_k, \\
+  \operatorname{Cov}(Y_i Y_j, Y_k Y_l) &= \Sigma_{ik}\Sigma_{jl}
+    + \Sigma_{il}\Sigma_{jk} + \mu_i \mu_k \Sigma_{jl} + \mu_i \mu_l \Sigma_{jk}
+    + \mu_j \mu_k \Sigma_{il} + \mu_j \mu_l \Sigma_{ik},
+\end{align*}
+each entry of $\tilde A$ carrying its factor $\frac12$ or $1$.
+
+The influence is unchanged by a change of variables $v \mapsto L v$: it maps
+the polynomials of degree at most $p$ onto themselves and fixes the constant,
+so $e_1^\top M^{-1} e_1$ is the same in either basis, and it is computed in the
+whitened coordinates.
+
+\section{Integrals of the interpolant}
+\label{app:interpolant}
+
+\paragraph{Distribution function.} For fixed $u_2$, the line integral
+$\ell(u_1) = \int_0^{u_2} \hat c(u_1, s)\, ds$ is linear in $u_1$ on each cell,
+since $\hat c$ is. Hence
+\[
+  \hat C(u_1, u_2) = \int_0^{u_1} \ell(t)\, dt
+  = \sum_{k < i} \frac{\Delta_k}{2} \bigl(L_k + L_{k+1}\bigr)
+    + \omega_0 L_i + \omega_1 L_{i+1},
+\]
+where $u_1 \in [g_i, g_{i+1}]$, $L_k = \ell(g_k)$, and $(\omega_0, \omega_1)$
+integrate the two linear basis functions of the cell over $[g_i, u_1]$:
+with $\delta = u_1 - g_i$, $\omega_1 = \delta^2 / (2\Delta_i)$ and
+$\omega_0 = \delta - \omega_1$. Each $L_k$ is a cumulative trapezoid sum
+plus the partial cell, $L_k = \sum_{l < j} \frac{\Delta_l}{2}(v_{kl} +
+v_{k,l+1}) + \delta' (2 v_{kj} + (v_{k,j+1} - v_{kj})\,\delta'/\Delta_j)/2$,
+with $\delta' = u_2 - g_j$.
+
+\paragraph{Conditional quantile.} Within the cell $[g_k, g_{k+1}]$ that holds
+the target $\tau = p \int_0^1 \hat c(u_1, s)\, ds$, the cumulative integral is
+$L + v_k \delta + (v_{k+1} - v_k)\,\delta^2 / (2\Delta_k)$, with $L$ the mass
+up to $g_k$ and $v_k, v_{k+1}$ the line's knots. Solving for $\delta$ in the
+form that does not cancel,
+\[
+  \delta = \frac{2(\tau - L)}{v_k + \sqrt{v_k^2 + 2 (v_{k+1} - v_k)
+           (\tau - L) / \Delta_k}},
+\]
+and the quantile is $g_k + \delta$, clamped to the cell.
+
+\section{Newton's method for the margins}
+\label{app:newton}
+
+\paragraph{Linearization.} After scaling, the row margins are
+$\sum_l v_{kl} e^{a_k + b_l} w_l$, so
+\[
+  \log r_k(a, b) = a_k + \log \sum_l v_{kl} w_l e^{b_l}
+  = \log r_k + a_k + \sum_l P_{kl} b_l + O(\lVert b \rVert^2),
+\]
+with $P_{kl} = v_{kl} w_l / r_k$, and likewise for the columns with $Q$. The
+step solves $a + Pb = -\log r$ and $Qa + b = -\log c$.
+
+\paragraph{Elimination and symmetry.} Substituting $a = -\log r - Pb$ into the
+second equation gives the system for $b$, and the other substitution the
+system for $a$. Transposing the grid swaps $r \leftrightarrow c$,
+$P \leftrightarrow Q$ and $a \leftrightarrow b$, so it swaps the two
+eliminations, and their average is unchanged: a grid and its transpose take
+transposed steps.
+
+\paragraph{Pins.} $P \one = \one$ and $Q \one = \one$, so $QP$ is row
+stochastic and $(I - QP)\one_{\mathcal B} = 0$ for the column indicator
+$\one_{\mathcal B}$ of every block $\mathcal B$ of the bipartite graph linking
+row $k$ and column $l$ when $v_{kl} > 0$: scaling a block's rows by $e^t$ and
+its columns by $e^{-t}$ leaves the grid unchanged. For an irreducible
+stochastic matrix $T$ and any $z$ with $z^\top \one \neq 0$, $I - T +
+\one z^\top$ is nonsingular; applied block by block with $z = \one /
+|\mathcal B|$, this makes $I - QP + \Pi_c$ and $I - PQ + \Pi_r$ nonsingular.
+Entries of $P$ and $Q$ below $10^{-150}$ are dropped, so products of two stay
+normal numbers. The blocks are found by a search over that graph, at every
+step.
+
+\paragraph{Line search.} The averaged step is applied in full and halved until
+the residual decreases. A step with non-finite margins counts as no decrease.
+When no halving decreases the residual, Newton's method stops, and the
+normalization reports convergence only if the residual is already below
+$10^{-12}$.
+
+\end{document}
