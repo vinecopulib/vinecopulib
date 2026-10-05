@@ -8,6 +8,7 @@
 #include "include/r_parity.hpp"
 #include "include/test_utils.hpp"
 #include <limits>
+#include <vinecopulib/bicop/tll.hpp>
 
 namespace test_bicop_kernel {
 using namespace vinecopulib;
