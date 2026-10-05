@@ -51,6 +51,11 @@
   and undefined-behavior sanitizers, so a regression that only one major
   version exposes is caught (#792)
 
+### DOCUMENTATION AND TOOLING
+
+* `docs/tll/tll_and_interpolation.tex` describes the `tll` estimator, its grid
+  and its normalization, with the derivations (#800)
+
 ## vinecopulib 1.0.0 (September 18, 2026)
 
 The first stable release. It collects a large amount of work: analytic
