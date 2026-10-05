@@ -36,7 +36,7 @@
 
 ### BUILD SYSTEM AND DEPENDENCIES
 
-* Requires tnagler/wdm#30; `USE_BOOST` is no longer defined (#799)
+* Requires wdm 0.3.2; `USE_BOOST` is no longer defined (#799)
 
 * CI builds and tests against Eigen 5.0.1 as well as 3.4.0, with the address
   and undefined-behavior sanitizers, so a regression that only one major

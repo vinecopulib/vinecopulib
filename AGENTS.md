@@ -257,7 +257,7 @@ Discovered in
   behind `tree_algorithm`), **Math** (distributions, constants, special
   functions, `quadrature::tanh_sinh` for 1-d integration, `tools::minima`),
   and **Random** (`mt19937`, behind QRNG scrambling and structure simulation).
-- **wdm 0.3.0** — `find_package(wdm 0.3.0 QUIET)` with a **FetchContent
+- **wdm 0.3.2** — `find_package(wdm 0.3.2 QUIET)` with a **FetchContent
   fallback** that clones `tnagler/wdm`. This project does not install it.
 - **Threads** — required.
 - **GoogleTest 1.14** — FetchContent, only when `BUILD_TESTING`.
