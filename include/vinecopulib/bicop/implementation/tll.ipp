@@ -71,6 +71,13 @@ chol22(const Eigen::Matrix2d& B)
 
 //! evaluates local likelihood density estimate.
 //!
+//! @details In the coordinates whitened by the bandwidth, let `f0` be the
+//! kernel density estimate and `mu` and `S` the kernel-weighted mean and
+//! covariance of the observations around an evaluation point. The estimate is
+//! `f0` (constant), `f0 * exp(-mu' mu / 2)` (linear) or
+//! `f0 * exp(-mu' S^{-1} mu / 2) / sqrt(det S)` (quadratic); see
+//! `docs/tll/tll_and_interpolation.tex`.
+//!
 //! @param x Evaluation points.
 //! @param x_data Observations.
 //! @param B Bandwidth matrix.
@@ -93,50 +100,47 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
   Eigen::Matrix2d irB = chol22(B).inverse();
   double det_irB = irB.determinant();
 
-  // de-correlate data by applying B^{-1/2}
+  // de-correlate data by applying B^{-1/2}; the bandwidth is then the identity
   Eigen::MatrixXd z = (irB * x.transpose()).transpose();
   Eigen::MatrixXd z_data = (irB * x_data.transpose()).transpose();
 
   Eigen::MatrixXd res(m, 2);
-  res.col(0) = Eigen::VectorXd::Ones(m); // result will be a product
   Eigen::VectorXd kernels(n);
-  Eigen::Vector2d f1;
-  Eigen::Vector2d b;
-  Eigen::Matrix2d S(B);
-  Eigen::MatrixXd zz(n, 2), zz2(n, 2);
+  Eigen::Vector2d mu = Eigen::Vector2d::Zero();
+  Eigen::Matrix2d S = Eigen::Matrix2d::Identity();
+  Eigen::MatrixXd zz(n, 2);
   for (size_t k = 0; k < m; ++k) {
     zz = z_data.rowwise() - z.row(k);
     kernels = gaussian_kernel_2d(zz) * det_irB;
     if (weights.size() > 0)
       kernels = kernels.cwiseProduct(weights);
     double f0 = kernels.mean();
+    res(k, 0) = f0;
     if (method != "constant") {
-      zz = (irB * zz.transpose()).transpose();
-      f1 = (zz.array().colwise() * kernels.array()).colwise().mean();
-      b = f1 / f0;
+      mu = zz.transpose() * kernels / kernels.sum();
       if (method == "quadratic") {
-        zz2 = (zz.array().colwise() * kernels.array()).matrix() /
-              (f0 * static_cast<double>(n));
-        b = B * b;
-        S = (B * (zz.transpose() * zz2) * B - b * b.transpose()).inverse();
-        res(k) *= std::sqrt(S.determinant()) / det_irB;
+        zz.rowwise() -= mu.transpose();
+        S = zz.transpose() * (zz.array().colwise() * kernels.array()).matrix() /
+            kernels.sum();
       }
-      res(k) *= std::exp(-0.5 * double(b.transpose() * S * b));
-      if ((std::isnan)(res(k)) || (std::isinf)(res(k))) {
-        // inverse operation might go wrong due to rounding when
-        // true value is equal or close to zero
-        res(k) = 0.0;
+      double factor =
+        std::exp(-0.5 * double(mu.transpose() * S.inverse() * mu)) /
+        std::sqrt(S.determinant());
+      if (!(std::isfinite)(factor)) {
+        // the local covariance can be singular or not positive definite when
+        // the true value is equal or close to zero
+        factor = 0.0;
       }
+      res(k, 0) *= factor;
     }
-    res(k, 0) *= f0;
     if (weights.size() > 0) {
       // average weight in neighborhood of evaluation point (essentially a
       // kernel regression estimate);
       // kernels have already been multiplied with weights above
       double w = kernels.sum() / kernels.cwiseQuotient(weights).sum();
-      res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, w);
+      res(k, 1) = calculate_infl(n, f0, mu, S, det_irB, method, w);
     } else {
-      res(k, 1) = calculate_infl(n, f0, b, B, det_irB, S, method, 1.0);
+      res(k, 1) = calculate_infl(n, f0, mu, S, det_irB, method, 1.0);
     }
   }
 
@@ -150,13 +154,17 @@ TllBicop::fit_local_likelihood(const Eigen::MatrixXd& x,
 
 //! calculate influence for data point for density estimate based on
 //! quantities pre-computed in `fit_local_likelihood()`.
+//!
+//! @details The influence is `W(0) / n * (1 + m' C^{-1} m) / f0`, with `W(0)`
+//! the kernel at zero and `m` and `C` the mean and covariance of the
+//! non-constant terms of the local polynomial under `N(mu, S)`, in the
+//! whitened coordinates.
 inline double
 TllBicop::calculate_infl(const size_t& n,
                          const double& f0,
-                         const Eigen::Vector2d& b,
-                         const Eigen::Matrix2d& B,
-                         const double& det_irB,
+                         const Eigen::Vector2d& mu,
                          const Eigen::Matrix2d& S,
+                         const double& det_irB,
                          const std::string& method,
                          const double& weight)
 {
@@ -169,58 +177,38 @@ TllBicop::calculate_infl(const size_t& n,
     return kernel0 * det_irB / f0 * weight / static_cast<double>(n);
   }
 
-  double m_inv_00;
+  double q;
   if (method == "linear") {
-    Eigen::Matrix3d M;
-    M(0, 0) = f0;
-    M.col(0).tail(2) = B * b * f0;
-    M.row(0).tail(2) = M.col(0).tail(2);
-    M.block(1, 1, 2, 2) = f0 * B + f0 * B * b * b.transpose() * B;
-    m_inv_00 = M.inverse()(0, 0);
+    // the terms are v ~ N(mu, I)
+    q = mu.squaredNorm();
   } else {
-    Eigen::Matrix<double, 6, 6> M = Eigen::Matrix<double, 6, 6>::Zero();
-    M(0, 0) = f0;
-    M.col(0).segment(1, 2) = f0 * b;
-    M.row(0).segment(1, 2) = M.col(0).segment(1, 2);
-    M.block(1, 1, 2, 2) = f0 * B + f0 * b * b.transpose();
-    M(3, 0) = 0.5 * M(1, 1);
-    M(4, 0) = 0.5 * M(2, 2);
-    M(5, 0) = M(1, 2);
-    M.row(0).tail(3) = M.col(0).tail(3);
-    Eigen::MatrixXd Si = S.inverse();
-    M(3, 1) = 0.5 * f0 * (3.0 * Si(0, 0) * b(0) + std::pow(b(0), 3));
-    M(4, 2) = 0.5 * f0 * (3.0 * Si(1, 1) * b(1) + std::pow(b(1), 3));
-    M(4, 1) = 0.5 * f0;
-    M(4, 1) *= 2.0 * Si(0, 1) * b(1) + Si(1, 1) * b(0) + b(0) * b(1) * b(1);
-    M(3, 2) = 0.5 * f0;
-    M(3, 2) *= 2.0 * Si(0, 1) * b(0) + Si(0, 0) * b(1) + b(1) * b(0) * b(0);
-    M(5, 1) = 2.0 * M(3, 2);
-    M(5, 2) = 2.0 * M(4, 1);
-    M.block(1, 3, 2, 3) = M.block(3, 1, 3, 2).transpose();
-    M(3, 3) = 0.25 * f0;
-    M(3, 3) *= 3.0 * Si(0, 0) * Si(0, 0) + 6.0 * Si(0, 0) * b(0) * b(0) +
-               std::pow(b(0), 4);
-    M(4, 4) = 0.25 * f0;
-    M(4, 4) *= 3.0 * Si(1, 1) * Si(1, 1) + 6.0 * Si(1, 1) * b(1) * b(1) +
-               std::pow(b(1), 4);
-    M(5, 5) = Si(0, 0) * Si(1, 1) + 2.0 * S(0, 1) + b(0) * b(0) * b(1) * b(1);
-    M(5, 5) += 4.0 * Si(0, 1) * b(0) * b(1);
-    M(5, 5) += Si(0, 0) * b(1) * b(1) + Si(1, 1) * b(0) * b(0);
-    M(5, 5) *= f0;
-    M(4, 3) = M(5, 5) * 0.25;
-    M(3, 4) = M(4, 3);
-    M(5, 3) = 3.0 * Si(0, 0) * Si(0, 1) + 3.0 * Si(0, 1) * b(0) * b(0);
-    M(5, 3) += 3.0 * Si(0, 0) * b(0) * b(1) + b(1) * std::pow(b(0), 3);
-    M(5, 3) *= 0.5 * f0;
-    M(3, 5) = M(5, 3);
-    M(5, 4) = 3.0 * Si(1, 1) * Si(0, 1) + 3.0 * Si(0, 1) * b(1) * b(1);
-    M(5, 4) += 3.0 * Si(1, 1) * b(0) * b(1) + b(0) * std::pow(b(1), 3);
-    M(5, 4) *= 0.5 * f0;
-    M(4, 5) = M(5, 4);
-    m_inv_00 = M.inverse()(0, 0);
+    // the terms are (v1, v2, v1^2 / 2, v1 v2, v2^2 / 2) with v ~ N(mu, S);
+    // their moments follow from Isserlis' theorem
+    const Eigen::Index ij[3][2] = { { 0, 0 }, { 0, 1 }, { 1, 1 } };
+    const double coef[3] = { 0.5, 1.0, 0.5 };
+    Eigen::Matrix<double, 5, 1> mean;
+    Eigen::Matrix<double, 5, 5> cov;
+    mean.head(2) = mu;
+    cov.topLeftCorner(2, 2) = S;
+    for (Eigen::Index a = 0; a < 3; ++a) {
+      const Eigen::Index i = ij[a][0], j = ij[a][1];
+      mean(2 + a) = coef[a] * (S(i, j) + mu(i) * mu(j));
+      for (Eigen::Index r = 0; r < 2; ++r) {
+        cov(r, 2 + a) = coef[a] * (S(r, i) * mu(j) + S(r, j) * mu(i));
+        cov(2 + a, r) = cov(r, 2 + a);
+      }
+      for (Eigen::Index c = 0; c < 3; ++c) {
+        const Eigen::Index k = ij[c][0], l = ij[c][1];
+        cov(2 + a, 2 + c) = coef[a] * coef[c] *
+                            (S(i, k) * S(j, l) + S(i, l) * S(j, k) +
+                             mu(i) * mu(k) * S(j, l) + mu(i) * mu(l) * S(j, k) +
+                             mu(j) * mu(k) * S(i, l) + mu(j) * mu(l) * S(i, k));
+      }
+    }
+    q = mean.dot(cov.ldlt().solve(mean));
   }
 
-  return kernel0 * det_irB * m_inv_00 * weight / static_cast<double>(n);
+  return kernel0 * det_irB / f0 * (1.0 + q) * weight / static_cast<double>(n);
 }
 
 //! The number of points close to each point, counted continuously:

@@ -23,6 +23,13 @@ class TllBicop : public KernelBicop
 public:
   TllBicop();
 
+protected:
+  Eigen::MatrixXd fit_local_likelihood(const Eigen::MatrixXd& x,
+                                       const Eigen::MatrixXd& x_data,
+                                       const Eigen::Matrix2d& B,
+                                       const std::string& method,
+                                       const Eigen::VectorXd& weights);
+
 private:
   static Eigen::VectorXd gaussian_kernel_2d(const Eigen::MatrixXd& x);
 
@@ -32,18 +39,11 @@ private:
                                    const std::string& method,
                                    const Eigen::VectorXd& weights);
 
-  Eigen::MatrixXd fit_local_likelihood(const Eigen::MatrixXd& x,
-                                       const Eigen::MatrixXd& x_data,
-                                       const Eigen::Matrix2d& B,
-                                       const std::string& method,
-                                       const Eigen::VectorXd& weights);
-
   double calculate_infl(const size_t& n,
                         const double& f0,
-                        const Eigen::Vector2d& b,
-                        const Eigen::Matrix2d& B,
-                        const double& det_irB,
+                        const Eigen::Vector2d& mu,
                         const Eigen::Matrix2d& S,
+                        const double& det_irB,
                         const std::string& method,
                         const double& weight);
 

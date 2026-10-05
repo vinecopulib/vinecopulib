@@ -430,29 +430,29 @@ TEST(test_bicop_kernel_golden, golden_fits)
     1.1010338412868619, 2.8078410066920165, 5.790622493853256e-05;
 
   cases[1].method = "linear";
-  cases[1].npars = 38.996907998977427;
-  cases[1].loglik = 82.311107970841675;
+  cases[1].npars = 38.518228881716112;
+  cases[1].loglik = 82.474046581040042;
   cases[1].pdf = Eigen::VectorXd(6);
-  cases[1].pdf << 1.9658633200712368, 0.68103031478560849, 1.1464946655681973,
-    0.74537576400592953, 2.2677371963734294, 0.13640474054699916;
+  cases[1].pdf << 1.9188084368755076, 0.69510840161844223, 1.137204918323985,
+    0.75619683069637178, 2.2307219461331593, 0.15415538783697091;
   cases[1].hfunc1 = Eigen::VectorXd(6);
-  cases[1].hfunc1 << 0.22708778751645051, 0.88702576187959525,
-    0.52044817939217092, 0.12215891273478681, 0.79641161833416529,
-    0.99736086280867275;
+  cases[1].hfunc1 << 0.22103482105128525, 0.88281900042762274,
+    0.5218681353794673, 0.12728269288068772, 0.79688343566644859,
+    0.99685079203148297;
   cases[1].hinv1 = Eigen::VectorXd(6);
-  cases[1].hinv1 << 0.041578516489610237, 0.5856056838690189,
-    0.48215429776124252, 0.40290842312606356, 0.94682419469002121,
-    0.77207059596164174;
+  cases[1].hinv1 << 0.042836645988880998, 0.59177073332846897,
+    0.48076405869388239, 0.39623272868149678, 0.94683523543492631,
+    0.78562273644698866;
   cases[1].cdf = Eigen::VectorXd(6);
-  cases[1].cdf << 0.027917905194353655, 0.23093345832414061,
-    0.33329716336858661, 0.23390664447691936, 0.83361038208599914,
-    0.049910215869136236;
+  cases[1].cdf << 0.026760106976800743, 0.22963293048386801,
+    0.33036297224802852, 0.23276056961803065, 0.83294864128931778,
+    0.04988387277881965;
   cases[1].grid_probes = Eigen::VectorXd(5);
-  cases[1].grid_probes << 19.350337572442701, 2.5497376086736576,
-    1.1306573109821971, 2.9284272097950907, 2.4752609318415074e-07;
+  cases[1].grid_probes << 18.699710006479634, 2.4188195976400464,
+    1.1236231416223819, 2.7977314845160701, 2.1478682342732693e-06;
 
   cases[2].method = "quadratic";
-  cases[2].npars = 20.275342164062497;
+  cases[2].npars = 33.370124518148273;
   cases[2].loglik = 76.876425793478063;
   cases[2].pdf = Eigen::VectorXd(6);
   cases[2].pdf << 1.8251813429745112, 0.70329649116715842, 1.1450619754169749,
@@ -489,6 +489,125 @@ TEST(test_bicop_kernel_golden, golden_fits)
     Eigen::VectorXd gp(5);
     gp << grid(0), grid(217), grid(435), grid(653), grid(880);
     EXPECT_TRUE(all_close(gp, gc.grid_probes, 1e-8, 1e-10)) << gc.method;
+  }
+}
+
+namespace {
+
+class TllLocalLikelihood : public TllBicop
+{
+public:
+  using TllBicop::fit_local_likelihood;
+};
+
+//! The local likelihood fit at `x` by Newton's method, with the integral of
+//! the kernel computed by the trapezoid rule in the coordinates whitened by
+//! the bandwidth. Returns the estimate and the influence
+//! `W_B(0) / n * (M^{-1})_{00}`.
+std::pair<double, double>
+brute_force_local_likelihood(const Eigen::Vector2d& x,
+                             const Eigen::MatrixXd& data,
+                             const Eigen::Matrix2d& B,
+                             const std::string& method,
+                             const Eigen::VectorXd& weights)
+{
+  const Eigen::Index p =
+    (method == "constant") ? 1 : ((method == "linear") ? 3 : 6);
+  const auto basis = [p](const Eigen::Vector2d& v) {
+    Eigen::VectorXd a(p);
+    a(0) = 1.0;
+    if (p > 1) {
+      a(1) = v(0);
+      a(2) = v(1);
+    }
+    if (p > 3) {
+      a(3) = v(0) * v(0) / 2.0;
+      a(4) = v(0) * v(1);
+      a(5) = v(1) * v(1) / 2.0;
+    }
+    return a;
+  };
+  const double two_pi = 2.0 * 3.14159265358979323846;
+  const double kernel0 = 1.0 / (two_pi * std::sqrt(B.determinant()));
+  const Eigen::Matrix2d Bi = B.inverse();
+  const auto n = static_cast<double>(data.rows());
+
+  // the data side of the score: sum_i w_i W_B(Z_i - x) A(Z_i - x)
+  Eigen::VectorXd moments = Eigen::VectorXd::Zero(p);
+  for (Eigen::Index i = 0; i < data.rows(); ++i) {
+    const Eigen::Vector2d v = data.row(i).transpose() - x;
+    const double w = (weights.size() > 0) ? weights(i) : 1.0;
+    moments += w * kernel0 * std::exp(-0.5 * v.dot(Bi * v)) * basis(v);
+  }
+
+  // int W_B(v) g(v) dv = E[g(L z)] with z ~ N(0, I) and B = L L'
+  const Eigen::Matrix2d L = B.llt().matrixL();
+  const double h = 0.1;
+  const int half = 100;
+  std::vector<Eigen::VectorXd> nodes;
+  std::vector<double> node_weights;
+  for (int i1 = -half; i1 <= half; ++i1) {
+    for (int i2 = -half; i2 <= half; ++i2) {
+      const Eigen::Vector2d z(h * i1, h * i2);
+      nodes.push_back(basis(L * z));
+      node_weights.push_back(h * h * std::exp(-0.5 * z.squaredNorm()) / two_pi);
+    }
+  }
+
+  Eigen::VectorXd a = Eigen::VectorXd::Zero(p);
+  a(0) = std::log(moments(0) / n);
+  Eigen::MatrixXd M(p, p);
+  for (int it = 0; it < 100; ++it) {
+    Eigen::VectorXd score = moments;
+    M.setZero();
+    for (size_t q = 0; q < nodes.size(); ++q) {
+      const double e = node_weights[q] * std::exp(a.dot(nodes[q]));
+      score -= n * e * nodes[q];
+      M += e * nodes[q] * nodes[q].transpose();
+    }
+    const Eigen::VectorXd step = (n * M).ldlt().solve(score);
+    a += step;
+    if (step.lpNorm<Eigen::Infinity>() < 1e-14) {
+      break;
+    }
+  }
+  return { std::exp(a(0)), kernel0 / n * M.inverse()(0, 0) };
+}
+
+} // namespace
+
+TEST(test_bicop_kernel, local_likelihood_maximizes_the_local_likelihood)
+{
+  // a correlated bandwidth, on the normal scale
+  auto bc =
+    Bicop(BicopFamily::gaussian, 0, Eigen::MatrixXd::Constant(1, 1, 0.6));
+  const Eigen::MatrixXd data =
+    tools_stats::qnorm(bc.simulate(200, false, { 3 }));
+  Eigen::Matrix2d B;
+  B << 0.3, 0.18, 0.18, 0.3;
+  Eigen::MatrixXd x(4, 2);
+  x << 0.4, -0.2, 0.0, 0.0, 1.5, 1.2, -1.0, 1.0;
+  const Eigen::VectorXd weights =
+    1.0 + tools_stats::simulate_uniform(200, 1, false, { 4 }).array();
+
+  TllLocalLikelihood tll;
+  for (const std::string method : { "constant", "linear", "quadratic" }) {
+    const Eigen::MatrixXd fit =
+      tll.fit_local_likelihood(x, data, B, method, Eigen::VectorXd());
+    const Eigen::MatrixXd weighted =
+      tll.fit_local_likelihood(x, data, B, method, weights);
+    for (Eigen::Index k = 0; k < x.rows(); ++k) {
+      const auto [estimate, influence] = brute_force_local_likelihood(
+        x.row(k).transpose(), data, B, method, Eigen::VectorXd());
+      EXPECT_NEAR(fit(k, 0) / estimate, 1.0, 1e-9) << method << " " << k;
+      EXPECT_NEAR(fit(k, 1) / influence, 1.0, 1e-9) << method << " " << k;
+      const double weighted_estimate =
+        brute_force_local_likelihood(
+          x.row(k).transpose(), data, B, method, weights)
+          .first;
+      EXPECT_NEAR(weighted(k, 0) / weighted_estimate, 1.0, 1e-9)
+        << method << " " << k;
+    }
   }
 }
 

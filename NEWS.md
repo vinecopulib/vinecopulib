@@ -39,6 +39,10 @@
   vine equals a refit of its structure; its margins are normalized to
   convergence, and `tools_stats::pairwise_mcor()` is symmetric (#799)
 
+* A `tll` fit with `nonparametric_method = "linear"` estimates the density
+  correctly when the bandwidth is correlated, and `"linear"` and `"quadratic"`
+  report the correct effective degrees of freedom (#800)
+
 ### BUILD SYSTEM AND DEPENDENCIES
 
 * Requires wdm 0.3.2; `USE_BOOST` is no longer defined (#799)
