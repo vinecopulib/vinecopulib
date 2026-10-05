@@ -19,6 +19,11 @@
 
 ### BUG FIXES
 
+* A `Bicop` or `Vinecop` with discrete variables loaded from JSON or CBOR now
+  evaluates with its stored variable types. Previously the reloaded model
+  reported the types correctly but computed densities, h-functions, and CDFs as
+  if every variable were continuous (#789)
+
 * `tools_stats::pnorm` clamps its argument before calling Eigen's `erf`, so
   infinite and very large arguments give exactly 0 or 1 with every Eigen
   release. Eigen 5 returns NaN from `erf` at infinity, which turned the box
@@ -41,10 +46,6 @@
 * CI builds and tests against Eigen 5.0.1 as well as 3.4.0, with the address
   and undefined-behavior sanitizers, so a regression that only one major
   version exposes is caught (#792)
-- A `Bicop` or `Vinecop` with discrete variables loaded from JSON or CBOR now
-  evaluates with its stored variable types. Previously the reloaded model
-  reported the types correctly but computed densities, h-functions, and CDFs as
-  if every variable were continuous (#789).
 
 ## vinecopulib 1.0.0 (September 18, 2026)
 
