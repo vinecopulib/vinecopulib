@@ -1,4 +1,4 @@
-## vinecopulib 1.1.0 (unreleased)
+## vinecopulib 1.0.1 (October 5, 2026)
 
 ### BEHAVIOR CHANGES
 
