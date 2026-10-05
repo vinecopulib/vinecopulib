@@ -160,21 +160,21 @@ the influence of a point
   \mathrm{infl}(x) = \frac{W_B(0)}{n}\, e_1^\top M(x)^{-1} e_1, \qquad
   M(x) = \int W_B(v)\, A(v) A(v)^\top e^{P_{\hat a}(v)}\, dv .
 \]
-By~\eqref{eq:gaussian}, $M = \tilde f\, \E[A(V) A(V)^\top]$ with
-$V \sim \N(m_p, S_p)$, and a Schur complement gives
+By~\eqref{eq:gaussian}, $M = \tilde f\, \E[A(Y) A(Y)^\top]$ with
+$Y \sim \N(m_p, S_p)$, and a Schur complement gives
 \begin{equation}
   \mathrm{infl}(x) = \frac{W_B(0)}{n\, \tilde f(x)}
     \bigl(1 + \bar m^\top \bar C^{-1} \bar m\bigr),
   \label{eq:infl}
 \end{equation}
 where $\bar m$ and $\bar C$ are the mean and covariance of the non-constant
-entries of $A(V)$ (Appendix~\ref{app:edf}). In particular,
+entries of $A(Y)$ (Appendix~\ref{app:edf}). In particular,
 \[
   \mathrm{infl} = \frac{W_B(0)}{n \tilde f} \quad (p = 0), \qquad
   \mathrm{infl} = \frac{W_B(0)}{n \tilde f}
     \bigl(1 + \mu^\top B^{-1} \mu\bigr) \quad (p = 1),
 \]
-and for $p = 2$ the moments of $(V_1, V_2, V_1^2/2, V_1 V_2, V_2^2/2)$ are
+and for $p = 2$ the moments of $(Y_1, Y_2, Y_1^2/2, Y_1 Y_2, Y_2^2/2)$ are
 listed in Appendix~\ref{app:edf}. With weights, the influence is multiplied by
 the local mean weight $\sum_i \omega_i W_B(Z_i - x) / \sum_i W_B(Z_i - x)$
 (\code{TllBicop::calculate\_infl}).
@@ -190,9 +190,10 @@ log-likelihood is $\sum_i \log \hat c(U_i)$ with the final interpolant.
 The density is estimated at the $m \times m$ nodes $(t_k, t_l)$, with $m$ the
 grid size (\code{nonparametric\_grid\_size}, $30$ by default) and
 $t_k = -3.25 + 6.5\, k / (m - 1)$. By~\eqref{eq:transformation} the grid values
-are $v_{kl} = \hat f(t_k, t_l) / (\phi(t_k)\phi(t_l))$, held at the copula-scale
-points $g_k = \Phi(t_k)$, except that $g_0$ and $g_{m-1}$ are moved to $0$ and
-$1$ so that no evaluation extrapolates (\code{InterpolationGrid}).
+are the entries of the matrix $V = (v_{kl})$, with $v_{kl} = \hat f(t_k, t_l) /
+(\phi(t_k)\phi(t_l))$, held at the copula-scale points $g_k = \Phi(t_k)$,
+except that $g_0$ and $g_{m-1}$ are moved to $0$ and $1$ so that no evaluation
+extrapolates (\code{InterpolationGrid}).
 
 Between nodes the density is the bilinear interpolant: on the cell
 $[g_k, g_{k+1}] \times [g_l, g_{l+1}]$, with $\lambda = (g_{k+1} - u_1) /
@@ -240,9 +241,9 @@ margins, to first order, by
 \[
   \log r \leftarrow \log r + a + P b, \qquad
   \log c \leftarrow \log c + b + Q a, \qquad
-  P = \diag(r)^{-1} V W, \quad Q = \diag(c)^{-1} V^\top W,
+  P = \diag(r)^{-1} V D, \quad Q = \diag(c)^{-1} V^\top D,
 \]
-with $W = \diag(w)$. Setting both to zero and eliminating either unknown gives
+with $D = \diag(w)$. Setting both to zero and eliminating either unknown gives
 \begin{align*}
   (I - PQ + \Pi_r)\, a &= P \log c - \log r, & b &= -\log c - Q a, \\
   (I - QP + \Pi_c)\, b &= Q \log r - \log c, & a &= -\log r - P b,
@@ -337,7 +338,7 @@ the ranks by value.
 drawn from the data's rectangles (\code{find\_latent\_sample}), with
 $b = (B_{11} B_{22})^{1/4}$:
 \begin{enumerate}
-  \item Start from $U_i = u_i^- + W_i \circ (u_i - u_i^-)$, with $W_i$ uniform
+  \item Start from $U_i = u_i^- + \xi_i \circ (u_i - u_i^-)$, with $\xi_i$ uniform
     on $[0, 1]^2$ from a fixed seed; $U_i = u_i$ exactly where there is no
     atom.
   \item Three times: soft-rank the current points (average ties, scale $s$),
@@ -385,7 +386,7 @@ Setting $\nabla_a L_x = 0$ gives the moment equations
 \[
   \frac1n \sum_i \omega_i W_B(Z_i - x)\, A(Z_i - x)
   = \int A(v)\, W_B(v)\, e^{P_a(v)}\, dv
-  = K\, \E\bigl[A(V)\bigr], \qquad V \sim \N(Sb, S).
+  = K\, \E\bigl[A(Y)\bigr], \qquad Y \sim \N(Sb, S).
 \]
 Their left side is $\tilde f$ times the $\pi$-weighted mean of $A(Z_i - x)$.
 \begin{itemize}
@@ -404,8 +405,8 @@ These are \eqref{eq:constant}--\eqref{eq:gaussian}, with $(m_p, S_p) =
 \section{Effective degrees of freedom}
 \label{app:edf}
 
-By the representation above, $M = \tilde f\, \E[A(V) A(V)^\top]$ with
-$V \sim \N(m_p, S_p)$. Write $A = (1, \tilde A^\top)^\top$, $\bar m =
+By the representation above, $M = \tilde f\, \E[A(Y) A(Y)^\top]$ with
+$Y \sim \N(m_p, S_p)$. Write $A = (1, \tilde A^\top)^\top$, $\bar m =
 \E[\tilde A]$ and $\bar C = \operatorname{Cov}(\tilde A)$. Then
 \[
   M = \tilde f \begin{pmatrix} 1 & \bar m^\top \\
@@ -417,13 +418,13 @@ $V \sim \N(m_p, S_p)$. Write $A = (1, \tilde A^\top)^\top$, $\bar m =
                 = \frac{1 + \bar m^\top \bar C^{-1} \bar m}{\tilde f},
 \]
 the last step by the Sherman--Morrison formula, which gives~\eqref{eq:infl}.
-For $p = 1$, $\tilde A = V \sim \N(\mu, B)$. For $p = 2$, $\tilde A = (V_1,
-V_2, \frac12 V_1^2, V_1 V_2, \frac12 V_2^2)$ with $V \sim \N(\mu, \Sigma)$,
+For $p = 1$, $\tilde A = Y \sim \N(\mu, B)$. For $p = 2$, $\tilde A = (Y_1,
+Y_2, \frac12 Y_1^2, Y_1 Y_2, \frac12 Y_2^2)$ with $Y \sim \N(\mu, \Sigma)$,
 whose moments follow from Isserlis' theorem:
 \begin{align*}
-  \E[V_i V_j] &= \Sigma_{ij} + \mu_i \mu_j, \\
-  \operatorname{Cov}(V_i, V_k V_l) &= \Sigma_{ik} \mu_l + \Sigma_{il} \mu_k, \\
-  \operatorname{Cov}(V_i V_j, V_k V_l) &= \Sigma_{ik}\Sigma_{jl}
+  \E[Y_i Y_j] &= \Sigma_{ij} + \mu_i \mu_j, \\
+  \operatorname{Cov}(Y_i, Y_k Y_l) &= \Sigma_{ik} \mu_l + \Sigma_{il} \mu_k, \\
+  \operatorname{Cov}(Y_i Y_j, Y_k Y_l) &= \Sigma_{ik}\Sigma_{jl}
     + \Sigma_{il}\Sigma_{jk} + \mu_i \mu_k \Sigma_{jl} + \mu_i \mu_l \Sigma_{jk}
     + \mu_j \mu_k \Sigma_{il} + \mu_j \mu_l \Sigma_{ik},
 \end{align*}
