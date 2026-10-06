@@ -1,3 +1,10 @@
+## vinecopulib 1.1.0 (unreleased)
+
+### DOCUMENTATION AND TOOLING
+
+* The release workflow reads the version from `project()` when it lists its
+  languages, so a release is titled and archived with its version (#803)
+
 ## vinecopulib 1.0.1 (October 5, 2026)
 
 ### BEHAVIOR CHANGES
