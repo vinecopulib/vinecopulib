@@ -1,5 +1,13 @@
 ## vinecopulib 1.1.0 (unreleased)
 
+### BUG FIXES
+
+* Selecting the truncation level or the threshold (`select_trunc_lvl`,
+  `select_threshold`) weighs each tree by the mBICv prior with its counts of
+  independence and non-independence pair copulas the right way round. They were
+  exchanged, so the selection minimized a different criterion than
+  `Vinecop::get_mbicv()` reports and could truncate too early or too late (#809)
+
 ### DOCUMENTATION AND TOOLING
 
 * The release workflow reads the version from `project()` when it lists its
