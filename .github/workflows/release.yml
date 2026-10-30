@@ -36,7 +36,11 @@ jobs:
       - name: Read the declared version
         id: declared
         run: |
-          version=$(sed -nE 's/^project\(vinecopulib VERSION ([0-9.]+)\).*/\1/p' CMakeLists.txt)
+          version=$(sed -nE 's/^project\(vinecopulib VERSION ([0-9.]+)[ )].*/\1/p' CMakeLists.txt)
+          if [ -z "$version" ]; then
+            echo "Refusing to publish: no version in CMakeLists.txt's project()." >&2
+            exit 1
+          fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "Releasing version $version"
 
