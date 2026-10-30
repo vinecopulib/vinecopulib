@@ -10,8 +10,14 @@
 
 ### DOCUMENTATION AND TOOLING
 
-* The release workflow reads the version from `project()` when it lists its
-  languages, so a release is titled and archived with its version (#803)
+* The release workflow and the weekly release-drift check read the version
+  from `project()` when it lists its languages, so a release is titled and
+  archived with its version, and the check compares the declared one (#803,
+  #809)
+
+* CI follows `ubuntu-latest` to Ubuntu 26.04 and GCC 15: clang-tidy stays at
+  version 14 on an Ubuntu 24.04 runner, and the coverage build leaves test
+  sources out while capturing, which lcov 2.4 requires (#809)
 
 ## vinecopulib 1.0.1 (October 5, 2026)
 

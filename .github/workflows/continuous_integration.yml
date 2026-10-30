@@ -505,7 +505,9 @@ jobs:
   clang-tidy:
     name: clang-tidy (diff)
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    # Ubuntu 24.04 is the newest image that packages clang-tidy-14, the
+    # version the check list is tuned to.
+    runs-on: ubuntu-24.04
     timeout-minutes: 75
     steps:
       - uses: actions/checkout@v7
@@ -521,7 +523,7 @@ jobs:
         id: install-dependencies
         uses: ./.github/actions/install-dependencies
         with:
-          os: ubuntu-latest
+          os: ubuntu-24.04
           boost_version: ${{ env.BOOST_VERSION }}
           eigen_version: ${{ env.EIGEN_VERSION }}
           R: true
