@@ -134,21 +134,27 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 
     SEPARATE_ARGUMENTS(test_command UNIX_COMMAND "${_testrunner}")
 
+    # Tests and system headers are excluded while capturing, so lcov never
+    # reads them: lcov 2 rejects the records GCC 15 writes for some gtest test
+    # bodies as inconsistent.
+    SET(lcov_capture_options
+            --exclude '*test*' --exclude '/usr/*'
+            --ignore-errors mismatch,negative)
+
     # Setup target
     ADD_CUSTOM_TARGET(${_targetname}
 
             # Cleanup lcov
             ${LCOV_PATH} --directory . --zerocounters
-            
+
             # Run initial/baseline lcov
-            COMMAND ${LCOV_PATH} --directory . --capture --initial --output-file ${coverage_info} --ignore-errors mismatch,gccov,negative
-            
+            COMMAND ${LCOV_PATH} --directory . --capture --initial --output-file ${coverage_info} ${lcov_capture_options}
+
             # Run tests
             COMMAND ${test_command} ${ARGV3}
 
             # Capturing lcov counters and generating report
-            COMMAND ${LCOV_PATH} --directory . --capture --output-file ${coverage_info} --ignore-errors mismatch,cov,negative
-            COMMAND ${LCOV_PATH} --remove ${coverage_info} '*test*' '/usr/*' --output-file ${coverage_info}
+            COMMAND ${LCOV_PATH} --directory . --capture --output-file ${coverage_info} ${lcov_capture_options}
 
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."

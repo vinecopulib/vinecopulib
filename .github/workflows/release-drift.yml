@@ -24,7 +24,7 @@ jobs:
 
       - name: Compare the declared version against the tags
         run: |
-          version=$(sed -nE 's/^project\(vinecopulib VERSION ([0-9.]+)\).*/\1/p' CMakeLists.txt)
+          version=$(sed -nE 's/^project\(vinecopulib VERSION ([0-9.]+)[ )].*/\1/p' CMakeLists.txt)
           if [ -z "$version" ]; then
             echo "::error::could not read the project version from CMakeLists.txt"
             exit 1

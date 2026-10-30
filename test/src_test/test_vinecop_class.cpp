@@ -2833,6 +2833,49 @@ TEST_F(VinecopTest, sparse_truncation_selection)
   EXPECT_NEAR(fit.get_loglik(), fit.loglik(u), 0.001);
 }
 
+// With three variables, each tree is checked on its own, so the second tree is
+// kept exactly when its mBICv term is negative.
+TEST(VinecopSelect, truncation_follows_the_mbicv_of_the_last_tree)
+{
+  const size_t n = 200;
+  const double psi0 = 0.99;
+  const double psi = psi0 * psi0; // prior of a non-independence copula, tree 2
+  auto pcs = Vinecop::make_pair_copula_store(3);
+  pcs[0][0] = Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, .5));
+  pcs[0][1] = pcs[0][0];
+  pcs[1][0] = Bicop(BicopFamily::gaussian, 0, Eigen::VectorXd::Constant(1, .2));
+  const Vinecop model(DVineStructure(std::vector<size_t>{ 1, 2, 3 }), pcs);
+
+  // mBICv term of a tree holding the single pair copula `pc`, whose prior
+  // counts `q` non-independence copulas
+  auto term = [&](const Bicop& pc, double q) {
+    return -2.0 * pc.get_loglik() +
+           std::log(static_cast<double>(n)) * pc.get_npars() -
+           2.0 * (q * std::log(psi) + (1.0 - q) * std::log(1.0 - psi));
+  };
+
+  FitControlsVinecop controls({ BicopFamily::indep, BicopFamily::gaussian });
+  controls.set_psi0(psi0);
+  size_t num_sensitive = 0;
+  for (int seed = 1; seed <= 10; ++seed) {
+    const auto u = model.simulate(n, false, 1, { seed });
+    controls.set_select_trunc_lvl(false);
+    Vinecop full(3);
+    full.select(u, controls);
+    const auto pc = full.get_pair_copula(1, 0);
+    const double q = pc.get_family() != BicopFamily::indep ? 1.0 : 0.0;
+    const bool keep = term(pc, q) < 0.0;
+    num_sensitive += static_cast<size_t>(keep != (term(pc, 1.0 - q) < 0.0));
+
+    controls.set_select_trunc_lvl(true);
+    Vinecop selected(3);
+    selected.select(u, controls);
+    EXPECT_EQ(selected.get_trunc_lvl(), keep ? 2u : 1u) << "seed " << seed;
+  }
+  // the prior decides some of these: exchanging its counts flips the outcome
+  EXPECT_GT(num_sensitive, 0u);
+}
+
 TEST_F(VinecopTest, sparse_both_selection)
 {
   u.conservativeResize(20, 7);
